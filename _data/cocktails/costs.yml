@@ -15,8 +15,15 @@
 # 2026-09-05: "We can calculate top volumes, well, slightly, can't we -- I'd
 # like that to be captured actually so it can be added into the shopping list
 # feature." So `top_up_ml` below is a declared RANGE, and it does double duty:
-# it prices the champagne AND it lets shopping-list.js stop reporting
-# "to top (x3)" and start reporting a volume. See its own note.
+# it prices the champagne AND it is what lets shopping-list.js report a volume.
+# Both halves are live as of 2026-09-08 (#746): three topped sodas read
+# "300–450 ml" on the list, where they read "to top (x3)" before. See its own
+# note.
+#
+# IT IS THE ONE BLOCK IN THIS FILE THAT IS NOT A PRICE, and so the one that is
+# emitted to the deployed site: cocktails/index.html sends it UNGATED while
+# everything else here rides behind `site.show_costs`. A volume is not a price,
+# and "300–450 ml of soda water" is what the live shopping list should say too.
 #
 # WHY A SEPARATE FILE FROM bottles.yml. A price is a different KIND of fact from
 # everything in that file. `generic`, `aliases` and the appellation rulings are

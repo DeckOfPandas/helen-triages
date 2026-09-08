@@ -92,7 +92,7 @@ file from such a session is §11.0.3.
 jekyll-local        # port 4001, drafts visible — the working view
 jekyll-prod         # port 4002, exactly what deploys — no drafts, no local switches
 pytest              # content and structure checks; ONE session at a time
-node --test tests/js/*.test.js    # the JS suite — the glob is required (§10)
+node --test                       # the JS suite, discovered from the root (§10)
 
 python3 scripts/verify.py         # ALL FOUR CHECKS, and prefer this
 ```
@@ -1816,9 +1816,11 @@ pays it back once; the `em` numbers follow the title, the gutter does not).
 **A name that does not fit shrinks one step (0.86) or wraps, never
 ellipsises** (`card-name-fit.js`; with no JS the ellipsis stays). **The mood
 chips are bare words**, Courier, lowercase, a middle dot between them drawn
-on the following chip's `::before`, with `chip-rows.js` marking row-starting
-chips so no dot leads a row (#698); they are real `<button>`s that filter the
-index through one delegated listener, painted from state. **The goodness
+on the PRECEDING chip's `::after`, so a chip ending a line keeps its dot and
+none can ever lead a row (#846, which satisfies #698 by construction and
+deleted the `chip-rows.js` measurement pass that used to); they are real
+`<button>`s that filter the index through one delegated listener, painted from
+state. **The goodness
 mark is a ship and a word** (`_includes/cocktails/ship.html`, the same include
 the drink page calls; the card passes `short=true` for `ship_card_names`, the
 page says the rung's own words). **How tall a glass is drawn**: the curve
@@ -1915,8 +1917,12 @@ build stop rather than a report. Three things are load-bearing:
 
 - **`fetch-depth: 0`** — in a shallow clone `git log -- <file>` reports one
   commit for every file and §4.0's provenance test would pass over nothing.
-- **The JS suite needs a glob**: `node --test tests/js/*.test.js`. Passing the
-  DIRECTORY treats it as one file and reports "tests 1, fail 1".
+- **Run the JS suite as bare `node --test` from the repo root.** It discovers
+  every `*.test.js` on its own. Passing the DIRECTORY (`node --test tests/js/`)
+  treats it as one module and reports "tests 1, fail 1", which is what the old
+  glob form was working around — but a glob in a file-path argument now costs a
+  permission prompt on every run (`CLAUDE.md`: the checker cannot verify a file
+  list the shell has not expanded yet), and the bare form has neither problem.
 - **CI has no private drafts, and every test that reads them says what it
   does about that.** `SKIPS_WITHOUT_DRAFTS` and `PARTIAL_IN_CI` in
   `test_suite_hygiene.py` are the registries, enforced by

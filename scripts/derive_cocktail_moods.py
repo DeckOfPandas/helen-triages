@@ -343,11 +343,17 @@ def derive(drink, sets, step_words, families):
 # -----------------------------------------------------------------------------
 def expected_moods(slug, drink, stored, taxonomy, sets,
                    step_words, families):
-    """What a drink's `mood` should be: derived, corrected, and hers preserved.
+    """A drink's `mood`: derived, corrected, hers preserved, and cancelled.
 
     ONE FUNCTION SO THE SCRIPT AND THE TEST CANNOT DISAGREE. They ran the same
     four steps separately until 2026-08-30, and the copies drifted the first
     time the derivation gained an input.
+
+    CANCELLED IS THE NEWEST STEP AND THE ONLY ONE THAT REMOVES A MOOD ON THE
+    STRENGTH OF ANOTHER -- `mood_suppresses` in taxonomy.yml, #853. It runs
+    after the hand-assigned moods are folded in, because the mood doing the
+    cancelling is one of them, and before `mood_exclude`, which is the
+    per-drink escape hatch rather than a rule.
 
     HAND-ASSIGNED MOODS ARE PRESERVED, NEVER DERIVED. `moods_by_hand` in
     taxonomy.yml names the ones that describe an occasion rather than the

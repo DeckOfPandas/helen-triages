@@ -55,10 +55,17 @@
 // millilitres anyone should be told by this file. Merging units would be
 // inventing a conversion the source never made.
 //
-// AN UNQUANTIFIED ENTRY IS COUNTED, NOT SUMMED. `to top` scales with the number
-// of drinks and not with a volume, so it reports as "to top (x3)" — three
-// drinks want topping — and multiplying by the scaler multiplies the drinks,
-// which is the only honest reading.
+// AN UNQUANTIFIED ENTRY IS COUNTED, NOT SUMMED — UNLESS SOMEBODY HAS DECLARED
+// WHAT IT POURS. An entry with no volume scales with the number of drinks, so
+// it reports as "to rinse (x3)": three drinks want rinsing, and multiplying by
+// the scaler multiplies the drinks, which is the only honest reading.
+//
+// `to top` USED TO BE THE HEADLINE EXAMPLE HERE AND IS NOW THE EXCEPTION
+// (#746). `top_up_ml` in costs.yml declares champagne and prosecco at 75-100 ml
+// and soda water at 100-150, so a top reports a VOLUME RANGE — three sodas are
+// "300–450 ml", not "to top (x3)". That is reading a number somebody wrote
+// down rather than inventing a conversion, which is the standing `juice_yields`
+// already has. The count reading survives for every pour nobody has measured.
 // =============================================================================
 
 (function (root) {
