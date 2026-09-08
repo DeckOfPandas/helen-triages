@@ -402,6 +402,34 @@ unless stated.
 - **2026-09-06** — §4 had ended with "Cocktails front matter does not exist
   yet and must not be invented" since 2026-08-02, three weeks after the first
   drinks were ingested.
+- **2026-09-07, #814** — **Ingests split the ingredient side and leave the
+  method side flat, and have always done.** `.claude/commands/ingest.md` has
+  said to split both *"once, here, and never again afterwards"* since
+  2026-09-01, and the corpus says half of it happens: of 340 drafts, **142 have
+  named `ingredient_groups` and no `method_groups`, and exactly ONE is the
+  other way round.** 172 have neither, 25 have both. That ratio is a habit, not
+  a lapse.
+
+  **Derive the missing side rather than re-reading sources, and REVIEW rather
+  than propose.** Helen ruled this and corrected the reasoning that had been
+  offered against it. The claim was that the source printed the groups and
+  transcribing flat threw them away, so a later derivation could be plausible
+  but never faithful. Her answer: *"Most recipes don't have them as printed,
+  honestly... It doesn't matter though, I can catch easily at review if
+  something is in the wrong place or if names need amending."* So no
+  `proposals:` block and no calibration round — the shape `methods.yml` uses is
+  for a vocabulary that rewrites her prose, and this is not that.
+
+  **It runs in both directions and they are not equally cheap.** For the 142,
+  the phase names already exist and a human wrote them, so deriving the METHOD
+  groups from them invents nothing — assign each step to the phase whose
+  ingredients it names. For the 172, both sides have to be proposed together
+  and the names are genuinely new, which is the half to look hardest at. Two
+  batches, not one pass.
+
+  **The known failure mode**: a step saying *"add the remaining ingredients"*
+  names nothing, so nothing lands in it. An ingredient no step mentions is the
+  signal, and those get flagged rather than assigned.
 
 ### §4.0 The gate flags
 
