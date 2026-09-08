@@ -782,6 +782,82 @@ test('moneyText collapses when the ends meet, and always shows pennies', () => {
   assert.ok(SL.moneyText(3, 7.5).includes('–'));
 });
 
+// --- shelf order, #848 --------------------------------------------------------
+// Helen, 2026-09-08: "for cocktail shopping list, list items in shelf order then
+// volume", with her own nine shelves. The order is a walk round the shop, so it
+// is the OUTER sort key; the descending-volume rule she gave on 2026-09-04 is
+// unchanged and now orders within a shelf.
+
+const SHELVES = {
+  order: ['spirits', 'fortified', 'liqueurs', 'freshly squeezed fruit juice',
+          'bottled fruit juice', 'flavourings', 'sugar syrup', 'bitters', 'tops'],
+  of: {
+    'London dry gin': 'spirits',
+    'moderately aged rum': 'spirits',
+    'sweet vermouth': 'fortified',
+    'triple sec': 'liqueurs',
+    'lime juice': 'freshly squeezed fruit juice',
+    'sugar syrup 2:1': 'sugar syrup',
+    'aromatic bitters': 'bitters',
+    'soda water': 'tops'
+  }
+};
+
+test('shelf order beats volume, which is the whole of #848', () => {
+  // By volume alone this is soda, gin, vermouth, lime, syrup, bitters. By shelf
+  // the spirits lead and the soda goes last, however much of it there is.
+  const rows = SHELVES && SL.build([
+    ing('600 ml', 'soda water'),
+    ing('120 ml', 'London dry gin'),
+    ing('300 ml', 'sweet vermouth'),
+    ing('90 ml', 'lime juice'),
+    ing('60 ml', 'sugar syrup 2:1'),
+    ing('4 dashes', 'aromatic bitters')
+  ], { shelves: SHELVES });
+  assert.deepStrictEqual(labels(rows), [
+    'London dry gin', 'sweet vermouth', 'lime juice', 'sugar syrup 2:1',
+    'aromatic bitters', 'soda water'
+  ]);
+});
+
+test('within one shelf it is still descending volume', () => {
+  const rows = SL.build([
+    ing('30 ml', 'London dry gin'),
+    ing('90 ml', 'moderately aged rum')
+  ], { shelves: SHELVES });
+  assert.deepStrictEqual(labels(rows), ['moderately aged rum', 'London dry gin']);
+});
+
+test('a generic on no shelf sorts last, never first', () => {
+  // A gap in the data should be visible without being in the way.
+  const rows = SL.build([
+    ing('10 ml', 'something nobody has filed'),
+    ing('30 ml', 'London dry gin')
+  ], { shelves: SHELVES });
+  assert.deepStrictEqual(labels(rows),
+    ['London dry gin', 'something nobody has filed']);
+});
+
+test('the shelf is on the row, so a caller can group by it', () => {
+  const rows = SL.build([ing('30 ml', 'London dry gin')], { shelves: SHELVES });
+  assert.strictEqual(rows[0].shelf, 'spirits');
+});
+
+test('an unfiled generic carries a null shelf, not a guess', () => {
+  const rows = SL.build([ing('30 ml', 'unfiled')], { shelves: SHELVES });
+  assert.strictEqual(rows[0].shelf, null);
+});
+
+test('no shelves at all leaves the 2026-09-04 volume order alone', () => {
+  // The guarantee that made this safe to land: every pre-#848 caller and test
+  // describes what it always did.
+  const rows = SL.build([
+    ing('30 ml', 'London dry gin'),
+    ing('600 ml', 'soda water')
+  ]);
+  assert.deepStrictEqual(labels(rows), ['soda water', 'London dry gin']);
+});
+
 test('no topUpMl at all leaves every existing answer alone', () => {
   // The guarantee that made this change safe to land: absent the option, this
   // file behaves exactly as it did before #746.

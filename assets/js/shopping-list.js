@@ -606,6 +606,9 @@
    * @param {Object} [options.rates] - {generics: {name: [lo, hi]}, bottles:
    *        {name: rate}}, GBP per litre, resolved at build time by
    *        _plugins/cocktail_costs.rb (#820). Absent, no row carries a price.
+   * @param {Object} [options.shelves] - {order: string[], of: {generic: shelf}},
+   *        `shopping_shelves` and `shelf_of` from ingredients.yml (#848).
+   *        Absent, rows sort by volume alone as they always did.
    * @returns {Array} one row per ingredient, sorted by label:
    *        { label, note, generic, bottles: string[],
    *          totals: [{quantity, quantityMax, unit, text}],
@@ -651,6 +654,29 @@
     Object.keys(opts.topUpMl || {}).forEach(function (generic) {
       topUps[foldKey(generic)] = opts.topUpMl[generic];
     });
+
+    /* WHERE IN THE SHOP EACH LINE BELONGS -- #848, Helen: "list items in shelf
+       order then volume". Folded to a rank up front so the comparator is an
+       integer test rather than two lookups per comparison.
+
+       AN UNKNOWN GENERIC SORTS LAST, never first and never at random. A shelf
+       nobody declared is a gap in the data, and the end of the list is where a
+       gap is visible without being in the way. */
+    var shelfRank = {};
+    var shelfOrder = asList(opts.shelves && opts.shelves.order);
+    shelfOrder.forEach(function (name, i) { shelfRank[foldKey(name)] = i; });
+    var shelfOf = {};
+    var declaredShelves = (opts.shelves && opts.shelves.of) || {};
+    Object.keys(declaredShelves).forEach(function (generic) {
+      shelfOf[foldKey(generic)] = foldKey(declaredShelves[generic]);
+    });
+    var LAST_SHELF = shelfOrder.length;
+
+    function rankOf(generic) {
+      var shelf = shelfOf[foldKey(generic)];
+      var rank = shelf === undefined ? undefined : shelfRank[shelf];
+      return rank === undefined ? LAST_SHELF : rank;
+    }
 
     var groups = {};
     var order = [];
@@ -860,9 +886,26 @@
            certain to pour rather than by the most it could be. */
         millilitres: mlMin,
         millilitresMax: mlMax,
+        /* #848. On the row so a caller can group or label by it without
+           re-deriving the mapping; the sort below reads the rank, not this. */
+        shelf: shelfOf[foldKey(group.generic)] === undefined
+          ? null
+          : declaredShelves[group.generic] || shelfOrder[rankOf(group.generic)],
         text: parts.join(' + ')
       };
     }).sort(function (a, b) {
+      /* SHELF FIRST, THEN VOLUME -- #848, Helen: "list items in shelf order
+         then volume". The shelf order is hers and is a walk round the shop, so
+         it is the outer key; the volume rule below is unchanged and now orders
+         WITHIN a shelf rather than across the whole list.
+
+         ABSENT `options.shelves`, EVERY ROW RANKS THE SAME and this test falls
+         through to the volume comparison that has always been here -- which is
+         what keeps every pre-#848 caller and test describing what it did. */
+      var shelfA = rankOf(a.generic);
+      var shelfB = rankOf(b.generic);
+      if (shelfA !== shelfB) return shelfA - shelfB;
+
       /* DESCENDING BY VOLUME — Helen, 2026-09-04: "order by descending volume
          required." The big pours are what you shop for and what you might not
          have; two dashes of bitters is a bottle you almost certainly own.

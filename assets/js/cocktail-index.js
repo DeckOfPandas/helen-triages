@@ -608,7 +608,13 @@
       // the list can say a volume instead of counting tops.
       topUpMl: TOP_UPS,
       // #820. Absent on the deployed site, where no row carries a price.
-      rates: RATES
+      rates: RATES,
+      // #848: shelf order first, then volume within a shelf. Both halves come
+      // from the vocabulary already on the page, so this needs no new block.
+      shelves: {
+        order: VOCABULARY.shopping_shelves || [],
+        of: VOCABULARY.shelf_of || {}
+      }
     });
 
     /* REBUILT WHOLE, not patched. It is at most a couple of dozen rows, it

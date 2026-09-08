@@ -1636,6 +1636,208 @@ family_of:
   "Galliano": herbal
   "Becherovka": herbal
 
+# =============================================================================
+# THE SHOPPING SHELF -- what order a shopping list reads in. #848
+# =============================================================================
+# Helen, 2026-09-08: "for cocktail shopping list, list items in shelf order then
+# volume", and she gave the order. `fortified` is the one addition, on her
+# ruling the same day, because her list had nowhere for vermouth to go and
+# vermouth is in a lot of drinks.
+#
+# IT IS A SHOPPING ORDER, NOT A TAXONOMY, and that is why it is a second map
+# rather than more columns on `family_of`. A family says what a spirit IS; a
+# shelf says where you find it and in what order you would rather read it.
+# The two disagree on purpose in three places: an amaro and a herbal liqueur
+# are different FAMILIES and one shelf, champagne is `fortified` by family and
+# sits under `tops` here because that is what you do with it, and the sugars
+# share a shelf with the syrups because they do the same job in a drink.
+#
+# EVERY GENERIC IN USE HAS A ROW. A generic with none falls to the end of the
+# list rather than breaking it -- the sort treats an unknown shelf as "last" --
+# but that is a silent degradation, so a new generic should gain a row here in
+# the same commit that introduces it. There is no test for this yet; see the
+# note on #848.
+#
+# THE FRESH PRODUCE IS THE SOFT EDGE. Helen's nine shelves have no slot for a
+# pear, a cucumber or a sprig of mint, so they sit under `flavourings` with
+# everything else that is neither a bottle nor a sweetener. If that reads
+# badly on a real list it wants a tenth shelf rather than a rule change --
+# moving a generic between shelves is one line here.
+shopping_shelves:
+  - spirits
+  - fortified
+  - liqueurs
+  - freshly squeezed fruit juice
+  - bottled fruit juice
+  - flavourings
+  - sugar syrup
+  - bitters
+  - tops
+
+shelf_of:
+  # spirits (39)
+  Batavia arrack: spirits
+  Ceylon arrack: spirits
+  London dry gin: spirits
+  Old Tom: spirits
+  Plymouth: spirits
+  absinthe: spirits
+  aged Demerara rum: spirits
+  apple brandy: spirits
+  aquavit: spirits
+  añejo tequila: spirits
+  blanco tequila: spirits
+  blended overproof rum: spirits
+  bourbon: spirits
+  cachaça: spirits
+  calvados: spirits
+  clairin: spirits
+  clear blended multi-region rum: spirits
+  coconut rum: spirits
+  cognac: spirits
+  eau de vie: spirits
+  lightly aged and filtered rum: spirits
+  mezcal: spirits
+  moderately aged Jamaican rum: spirits
+  moderately aged rum: spirits
+  navy strength gin: spirits
+  overproof Demerara rum, lightly aged: spirits
+  overproof Jamaican rum, unaged: spirits
+  pineapple rum: spirits
+  pineapple vodka: spirits
+  pisco: spirits
+  reposado tequila: spirits
+  rhum agricole blanc: spirits
+  rhum agricole vieux: spirits
+  rye: spirits
+  single malt scotch whisky: spirits
+  sloe gin: spirits
+  speciality: spirits
+  vanilla vodka: spirits
+  vodka: spirits
+  # fortified (8)
+  amontillado sherry: fortified
+  blanc vermouth: fortified
+  dry vermouth: fortified
+  oloroso sherry: fortified
+  quinquina: fortified
+  red wine: fortified
+  sweet vermouth: fortified
+  tawny port: fortified
+  # liqueurs (39)
+  Amaro Ciociaro: liqueurs
+  Amaro Nonino: liqueurs
+  Aperol: liqueurs
+  Becherovka: liqueurs
+  Bénédictine: liqueurs
+  Campari: liqueurs
+  Chartreuse Jaune: liqueurs
+  Chartreuse Verte: liqueurs
+  Créole Shrubb: liqueurs
+  Cynar: liqueurs
+  Galliano: liqueurs
+  Grand Marnier: liqueurs
+  Jägermeister: liqueurs
+  Strega: liqueurs
+  Swedish flaggpunsch: liqueurs
+  amaretto: liqueurs
+  apple schnapps: liqueurs
+  apricot liqueur: liqueurs
+  blue Curaçao: liqueurs
+  cherry liqueur: liqueurs
+  coffee liqueur: liqueurs
+  crème de banane: liqueurs
+  crème de cacao: liqueurs
+  crème de cassis: liqueurs
+  crème de menthe: liqueurs
+  crème de mûre: liqueurs
+  crème de pêche: liqueurs
+  crème de violette: liqueurs
+  dry orange Curaçao: liqueurs
+  fernet: liqueurs
+  gentian liqueur: liqueurs
+  ginger liqueur: liqueurs
+  liqueur de sapin: liqueurs
+  maraschino liqueur: liqueurs
+  mastiha liqueur: liqueurs
+  orange Curaçao: liqueurs
+  passion fruit liqueur: liqueurs
+  tomato liqueur: liqueurs
+  triple sec: liqueurs
+  # freshly squeezed fruit juice (5)
+  grapefruit juice: freshly squeezed fruit juice
+  lemon juice: freshly squeezed fruit juice
+  lime juice: freshly squeezed fruit juice
+  orange juice: freshly squeezed fruit juice
+  ruby grapefruit juice: freshly squeezed fruit juice
+  # bottled fruit juice (3)
+  apple juice: bottled fruit juice
+  cranberry juice: bottled fruit juice
+  pineapple juice: bottled fruit juice
+  # flavourings (24)
+  basil: flavourings
+  black tea: flavourings
+  blackberries: flavourings
+  cider vinegar: flavourings
+  coconut cream: flavourings
+  cucumber: flavourings
+  dried apricots: flavourings
+  egg white: flavourings
+  espresso: flavourings
+  fruit purée: flavourings
+  ginger and lemongrass cordial: flavourings
+  kaffir lime leaves: flavourings
+  lemon zest: flavourings
+  lime: flavourings
+  lime cordial: flavourings
+  mint: flavourings
+  olive oil: flavourings
+  passion fruit: flavourings
+  pear: flavourings
+  pineapple: flavourings
+  raspberries: flavourings
+  rosemary: flavourings
+  salt: flavourings
+  water: flavourings
+  # sugar syrup (20)
+  agave syrup: sugar syrup
+  "cane sugar syrup 1:1": sugar syrup
+  "cane sugar syrup 2:1": sugar syrup
+  cinnamon syrup: sugar syrup
+  "demerara sugar syrup 2:1": sugar syrup
+  falernum: sugar syrup
+  ginger syrup: sugar syrup
+  golden caster sugar: sugar syrup
+  grenadine: sugar syrup
+  honey: sugar syrup
+  "honey water 1:1": sugar syrup
+  "honey water 2:1": sugar syrup
+  orgeat: sugar syrup
+  palm sugar: sugar syrup
+  passion fruit syrup: sugar syrup
+  raw sugar: sugar syrup
+  sugar cube: sugar syrup
+  "turbinado sugar syrup 2:1": sugar syrup
+  vanilla syrup: sugar syrup
+  white sugar: sugar syrup
+  # bitters (11)
+  Creole bitters: bitters
+  aromatic bitters: bitters
+  chocolate bitters: bitters
+  lavender-forward bitters: bitters
+  margarita bitters: bitters
+  orange bitters: bitters
+  peppermint bitters: bitters
+  pimento bitters: bitters
+  tiki bitters: bitters
+  warm-spiced bitters: bitters
+  wood smoke bitters: bitters
+  # tops (4)
+  champagne: tops
+  cola: tops
+  prosecco: tops
+  soda water: tops
+
 # Bases with NO family, deliberately. Same idea as
 # tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE: a decision with its
 # reason attached, so "why is this not groupable?" is answered in the repo
