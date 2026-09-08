@@ -1658,15 +1658,24 @@ family_of:
 # the same commit that introduces it. There is no test for this yet; see the
 # note on #848.
 #
-# THE FRESH PRODUCE IS THE SOFT EDGE. Helen's nine shelves have no slot for a
-# pear, a cucumber or a sprig of mint, so they sit under `flavourings` with
-# everything else that is neither a bottle nor a sweetener. If that reads
-# badly on a real list it wants a tenth shelf rather than a rule change --
-# moving a generic between shelves is one line here.
+# FRESH PRODUCE EARNED ITS OWN SHELF ON THE FIRST READING -- Helen, 2026-09-08:
+# "Fresh produce should get its own shelf, I agree." It was the soft edge of the
+# first cut, where a pear, a cucumber and a sprig of mint sat under
+# `flavourings` with the oil and the salt, and `flavourings` was carrying 24
+# rows against every other shelf's handful.
+#
+# IT SITS BEFORE THE SQUEEZED JUICES, because the citrus you squeeze IS produce
+# and this puts the fresh things together. One line to move if a real list reads
+# better with it first.
+#
+# `dried apricots` DELIBERATELY DID NOT MOVE. Dried fruit is a dry good and
+# belongs with the store cupboard; `lemon zest` DID, because what you buy for it
+# is a lemon.
 shopping_shelves:
   - spirits
   - fortified
   - liqueurs
+  - fresh produce
   - freshly squeezed fruit juice
   - bottled fruit juice
   - flavourings
@@ -1775,28 +1784,28 @@ shelf_of:
   cranberry juice: bottled fruit juice
   pineapple juice: bottled fruit juice
   # flavourings (24)
-  basil: flavourings
+  basil: fresh produce
   black tea: flavourings
-  blackberries: flavourings
+  blackberries: fresh produce
   cider vinegar: flavourings
   coconut cream: flavourings
-  cucumber: flavourings
+  cucumber: fresh produce
   dried apricots: flavourings
   egg white: flavourings
   espresso: flavourings
   fruit purée: flavourings
   ginger and lemongrass cordial: flavourings
-  kaffir lime leaves: flavourings
-  lemon zest: flavourings
-  lime: flavourings
+  kaffir lime leaves: fresh produce
+  lemon zest: fresh produce
+  lime: fresh produce
   lime cordial: flavourings
-  mint: flavourings
+  mint: fresh produce
   olive oil: flavourings
-  passion fruit: flavourings
-  pear: flavourings
-  pineapple: flavourings
-  raspberries: flavourings
-  rosemary: flavourings
+  passion fruit: fresh produce
+  pear: fresh produce
+  pineapple: fresh produce
+  raspberries: fresh produce
+  rosemary: fresh produce
   salt: flavourings
   water: flavourings
   # sugar syrup (20)
