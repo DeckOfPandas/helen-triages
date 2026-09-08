@@ -402,6 +402,34 @@ unless stated.
 - **2026-09-06** — §4 had ended with "Cocktails front matter does not exist
   yet and must not be invented" since 2026-08-02, three weeks after the first
   drinks were ingested.
+- **2026-09-07, #814** — **Ingests split the ingredient side and leave the
+  method side flat, and have always done.** `.claude/commands/ingest.md` has
+  said to split both *"once, here, and never again afterwards"* since
+  2026-09-01, and the corpus says half of it happens: of 340 drafts, **142 have
+  named `ingredient_groups` and no `method_groups`, and exactly ONE is the
+  other way round.** 172 have neither, 25 have both. That ratio is a habit, not
+  a lapse.
+
+  **Derive the missing side rather than re-reading sources, and REVIEW rather
+  than propose.** Helen ruled this and corrected the reasoning that had been
+  offered against it. The claim was that the source printed the groups and
+  transcribing flat threw them away, so a later derivation could be plausible
+  but never faithful. Her answer: *"Most recipes don't have them as printed,
+  honestly... It doesn't matter though, I can catch easily at review if
+  something is in the wrong place or if names need amending."* So no
+  `proposals:` block and no calibration round — the shape `methods.yml` uses is
+  for a vocabulary that rewrites her prose, and this is not that.
+
+  **It runs in both directions and they are not equally cheap.** For the 142,
+  the phase names already exist and a human wrote them, so deriving the METHOD
+  groups from them invents nothing — assign each step to the phase whose
+  ingredients it names. For the 172, both sides have to be proposed together
+  and the names are genuinely new, which is the half to look hardest at. Two
+  batches, not one pass.
+
+  **The known failure mode**: a step saying *"add the remaining ingredients"*
+  names nothing, so nothing lands in it. An ingredient no step mentions is the
+  signal, and those get flagged rather than assigned.
 
 ### §4.0 The gate flags
 
@@ -499,6 +527,12 @@ unless stated.
   expanded by guess, the guess was written into an issue AND a test comment as
   fact, and it survived there because both then cited each other. Ask what a
   transcribed abbreviation means; do not infer it from the letters.
+- **2026-09-07, #800** — **The label is DROPPED, not expanded.** Each of the
+  eight notes becomes a plain sentence, capital to full stop, like every other
+  note; `source:` already carries the attribution on six of them. This also
+  disposes of the two the capitalisation question could never have covered —
+  `gf tips:` and `gf tip on stock cubes:` — because with the rubric gone there
+  is no varying prefix to have a house form for.
 
 ## §6 `main_ingredients`
 
@@ -1100,6 +1134,33 @@ unless stated.
   split before accepting a lossy rename.
 
 ### §9.3.2 The bottle dictionary
+
+- **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as
+  `origin:`.** Helen's choice from three shapes: origin-qualified generics
+  (`Martinique agricole blanc`), `origin` on the bottle, or `origin` on the
+  ingredient. The fact that framed it: **origin is already inside five of the
+  fourteen `rum_styles`** — `aged Demerara rum`, the three Jamaicans, and
+  `clairin`, which is Haiti-specific by definition — so agricole was the one
+  cane family that stopped halfway. And the house owns **eight bottles under
+  `rhum agricole blanc`**: five Martinique, three Guadeloupe (the Damoiseaus),
+  with Barbancourt sitting in `vieux` behind a comment saying it is Haitian
+  because no field could.
+
+  **The accepted cost, stated so it is not rediscovered as a bug**: a recipe
+  cannot REQUIRE an origin. `martinique-swizzle`, `island-of-martinique` and
+  `lisle-martinique` are all named after a place none of them can name in
+  `generic:`; what makes them Martinican is their `suggestion:` list, and the
+  bottle dictionary is what says those bottles are Martinique.
+
+  **What it settles for free**: `coney-park-swizzle` and `port-au-prince` stop
+  being mis-typed. Both pour Barbancourt as `rhum agricole vieux` behind a `QQ`
+  admitting the guess — and under this ruling that typing is *correct*, because
+  agricole is what the bottle is by production and where it is from lives
+  elsewhere. Two notes to delete rather than answer.
+
+  **Two mechanisms for origin now coexist deliberately**: in the generic where
+  it changes the CATEGORY (Demerara, Jamaican), on the bottle where it changes
+  the FLAVOUR (agricole). The five existing styles are not being unpicked.
 
 - **2026-08-27, #529** — Added, rum-only. Planteray canonical, Plantation an
   alias.
@@ -2062,6 +2123,55 @@ unless stated.
     merged it (#809), and her text already said both things this session had
     proposed, better; **so the correct amount of `CLAUDE.md` for this session
     to write was none.**
+
+- **2026-09-08 — step 1 splits: in the devcontainer Claude commits and Helen
+  pushes.** One day after the ask was removed entirely, the container turned
+  out not to be able to push at all, for two independent reasons neither of
+  which is fixable from inside: `origin` is SSH and the image has no GitHub
+  host key (**`Host key verification failed`** on every SSH git operation,
+  `git fetch origin main:main` included), and the fine-grained PAT carries no
+  `Contents` scope, so the HTTPS fallback is **403 `Permission to
+  DeckOfPandas/helen-triages.git denied`** — the token behaving exactly as
+  §9.1's measured table says it should.
+
+  Helen: *"Because you're in docker, I won't give you a GitHub host key. Make
+  your changes, then tell me which branches to push and I'll push them -- I
+  always review locally anyway so this isn't really an extra step as otherwise
+  I'd only pull from what you pushed before I merged."*
+
+  **This is an environment fact, not a reversal of 2026-09-07.** Step 1 stands
+  wherever pushing works. What is new is 1a: name the branch, give her the
+  command, and go on opening and maintaining the PR — which still works,
+  because a PR needs `Pull requests: write` and not `Contents`.
+
+  **`/workspace` is a BIND MOUNT of Helen's own checkout**, which is what makes
+  this cheap and was got wrong before it was got right: a commit is already in
+  her tree the moment it is made, so nothing travels and nothing is stranded.
+  An unpushed commit here should never be described as trapped.
+
+  **A fetch, unlike a push, has a working substitute** — the HTTPS URL needs no
+  credentials at all on a public repo and fast-forwards `main` exactly as the
+  SSH form does.
+
+- **2026-09-08 — the shared checkout, and the second reason to check the branch
+  before committing.** The bind mount means another session, or Helen, moving
+  the checkout moves the ground under a running Claude with no signal. In one
+  session the branch went `main` → `docs/bash-friction-followups` →
+  `chore/devcontainer-per-worktree-bundle-cache` → `docs/multiline-arg-friction`,
+  none of them that session's, and an uncommitted `DECISIONS.md` edit rode
+  along into somebody else's branch. **The pre-commit `git branch
+  --show-current` check caught it**, which is the first time that rule has
+  earned its keep for a reason other than the one it was written for: the
+  question it answers is not only *am I on `main`* but *am I still where I left
+  off*, and the answer can be no when nothing you did changed it.
+
+  **This is the 2026-08-16 stranding again** — an agent lost when Helen ran
+  `git checkout main` and pulled — and the answer has moved on. That day it was
+  *one agent at a time*; 2026-09-07 replaced that with worktrees plus an
+  orchestrating Claude, which is what let the push ask be dropped. What this
+  showed is that the guarantee only holds when **every** session is actually in
+  a worktree, and `/workspace` is not one. Helen: *"I'll run Claudes in
+  worktrees going forwards."*
 
 ### §11.2 The record of this file being wrong
 
