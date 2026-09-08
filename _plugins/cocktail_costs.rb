@@ -105,8 +105,44 @@ module HelenTriages
           counted += 1
         end
       end
+      # THE RESOLVED RATE TABLE, FOR THE SHOPPING LIST — #820, #817, #818.
+      #
+      # A shopping list totals by GENERIC across every shortlisted drink, which
+      # is a figure no drink's own `cost` contains: `drink.cost` is one glass of
+      # one drink, and the list wants "420 ml of London dry gin, £11.34–£14.70".
+      #
+      # RESOLVED HERE RATHER THAN IN JAVASCRIPT, deliberately, and it is the
+      # same division that keeps `cocktail-scale.js` ignorant of prices. Every
+      # rule about what a generic costs lives in `generic_rate` above — the
+      # union of declared bottles and the generic's own row, `default_bottles`
+      # narrowing it where Helen has ruled, a squeezed juice priced from the
+      # fruit and the yield. Re-deriving any of that in the browser would be a
+      # second copy to keep in step, and the browser only needs the answer.
+      # So the JS multiplies millilitres by a number and does nothing else.
+      #
+      # BOTTLES TOO, because #818 lets Helen pick one per drink: choosing
+      # Tanqueray for a `London dry gin` line collapses that line's range onto
+      # one rate, and the browser cannot work out a bottle's rate from a price
+      # and a size it does not have.
+      #
+      # GBP PER LITRE, unrounded. Rounding is a display decision and the list
+      # multiplies before it rounds; rounding here would compound across a
+      # dozen lines.
+      generics = (@by_generic.keys + @costs["generics"].keys).compact.uniq
+      rates = {
+        "generics" => generics.each_with_object({}) do |g, h|
+          r = generic_rate(g) and h[g] = r
+        end,
+        "bottles" => @costs["bottles"].keys.each_with_object({}) do |n, h|
+          r = bottle_rate(n) and h[n] = r
+        end
+      }
+      site.data["cocktails"]["rates"] = rates
+
       Jekyll.logger.info "Costs:", "priced #{counted} drinks " \
-        "(prices checked #{@costs['checked']})"
+        "(prices checked #{@costs['checked']}); " \
+        "rates for #{rates['generics'].size} generics, " \
+        "#{rates['bottles'].size} bottles"
     end
 
     private

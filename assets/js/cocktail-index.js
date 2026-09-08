@@ -169,6 +169,21 @@
     }
   })();
 
+  /* GBP PER LITRE PER GENERIC AND PER BOTTLE — #820. Local-only and usually
+     absent, exactly like COSTS above and read the same silent way; `null`
+     rather than `{}` so `shopping-list.js` can tell "no table" from "an empty
+     one" and price nothing at all. */
+  var RATES = (function () {
+    var node = document.getElementById('drink-rates');
+    if (!node) return null;
+    try {
+      return JSON.parse(node.textContent);
+    } catch (e) {
+      console.warn('cocktail-index.js: could not parse #drink-rates — ' + e.message);
+      return null;
+    }
+  })();
+
   /* "@ £2.34", or "@ £2.10–£3.40" where the drink spans a range, or nothing at
      all. Helen asked for it "quietly again", so it is a suffix on a line that
      already exists rather than a column of its own.
@@ -512,6 +527,8 @@
      list you shop from is the one you shortlisted. */
   var shoppingEl = document.getElementById('shopping-list');
   var shoppingItems = shoppingEl && shoppingEl.querySelector('.shopping-list-items');
+  // #817. Absent is normal: the paragraph is only useful where prices are.
+  var shoppingTotal = shoppingEl && shoppingEl.querySelector('.shopping-list-total');
   var shoppingDrinks = shoppingEl && shoppingEl.querySelector('.shopping-list-drinks');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
   var setAllInput = document.getElementById('shopping-list-setall');
@@ -589,7 +606,9 @@
       juiceYields: VOCABULARY.juice_yields || {},
       // #746: champagne, prosecco and soda water declare what a top pours, so
       // the list can say a volume instead of counting tops.
-      topUpMl: TOP_UPS
+      topUpMl: TOP_UPS,
+      // #820. Absent on the deployed site, where no row carries a price.
+      rates: RATES
     });
 
     /* REBUILT WHOLE, not patched. It is at most a couple of dozen rows, it
@@ -623,11 +642,50 @@
         }
         suffix = ' <span class="shopping-list-note">(' + inner.join(', ') + ')</span>';
       }
+      /* THE PRICE AT THE END OF THE LINE — #820. A span of its own rather than
+         part of the bracketed note, because it is the one thing on the row that
+         is absent on the deployed site: keeping it separate means production
+         renders the line it always did, with nothing to strip out.
+
+         SILENT WHEN THERE IS NO RATE. 20 generics have none — the herbs, zest
+         and bitters that are free under Helen's rule, and the whole fruit and
+         weighed solids of #748 — and a line that cannot be priced says nothing
+         rather than nothing-shaped-like-zero. */
+      var price = row.price
+        ? '<span class="shopping-list-price">' + HTF.escapeHtml(row.price.text) + '</span>'
+        : '';
+
       return '<li>' +
         '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
         '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + suffix + '</span>' +
+        price +
         '</li>';
     }).join('');
+
+    renderShoppingTotal(rows);
+  }
+
+  /* WHAT THE SHOP COMES TO — #817. Summed from the rows just rendered, so the
+     figure can never disagree with the column above it.
+
+     IT SAYS WHAT IT COULD NOT PRICE. A bare total would claim to be the cost of
+     the shop while being short by whatever the unpriced lines are worth, and
+     "roughly" is doing enough work already. */
+  function renderShoppingTotal(rows) {
+    if (!shoppingTotal) return;
+    var sum = HTF.shoppingList.total(rows);
+    if (!sum) {
+      shoppingTotal.hidden = true;
+      shoppingTotal.textContent = '';
+      return;
+    }
+    var text = 'roughly ' + sum.text;
+    if (sum.unpriced) {
+      text += ' — ' + sum.unpriced +
+        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
+    }
+    shoppingTotal.textContent = text;
+    shoppingTotal.hidden = false;
   }
 
   if (shoppingDrinks) {

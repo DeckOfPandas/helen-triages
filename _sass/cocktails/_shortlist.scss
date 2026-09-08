@@ -492,6 +492,43 @@
   color: $color-clear-text;
 }
 
+// WHAT THE LINE COSTS — #820. Local-only: the span is absent on the deployed
+// site, because `site.show_costs` is declared in _config_local.yml and nowhere
+// else, so nothing here needs a production fallback.
+//
+// PLEX AND TABULAR, like `.shopping-list-amount` above and for the same stated
+// reason — "Plex is for numbers you act on" — and pushed to the right by the
+// `auto` margin so the prices form a column you can read down. That column is
+// the whole point of #817's total: a figure at the bottom you can check by
+// looking up.
+//
+// QUIETER THAN THE AMOUNT, at $color-clear-text rather than ink. The millilitres
+// are what you are shopping by; the price is context. Helen asked for the
+// drink-page figure "quietly again", and this is the same claim in the same
+// register.
+.shopping-list-price {
+  margin-left: auto;
+  flex: 0 0 auto;
+  padding-left: $space-sm;
+  font-family: $font-label;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: $color-clear-text;
+  white-space: nowrap;
+}
+
+// THE TOTAL — #817. Sits under the list rather than inside it, so it is not one
+// more row to read past; the rule above it is what says the column has ended.
+.shopping-list-total {
+  margin: $space-sm 0 0;
+  padding-top: $space-xs;
+  font-family: $font-label;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: $color-text;
+  text-align: right;
+}
+
 .shopping-list-empty {
   font-size: 0.95rem;
   color: $color-clear-text;

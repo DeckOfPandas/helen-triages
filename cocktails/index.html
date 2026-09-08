@@ -827,6 +827,18 @@ permalink: /cocktails/
     <ul class="shopping-list-drinks"></ul>
 
     <ul class="shopping-list-items"></ul>
+
+    {% comment %} WHAT THE SHOP COMES TO -- #817, and local-only for the same
+       reason every other price here is: `site.show_costs` lives in
+       _config_local.yml and nowhere else, so this paragraph is empty on the
+       deployed site and cocktail-index.js writes nothing into it.
+
+       AT THE BOTTOM, because that is where Helen asked for it and because a
+       total above its own column is a claim you cannot check by looking down.
+       It is summed from the rendered rows rather than from the pours, so it is
+       by construction the sum of the figures above it. {% endcomment %}
+    <p class="shopping-list-total" hidden></p>
+
     <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
   </section>
 
@@ -955,6 +967,29 @@ permalink: /cocktails/
      exclusion rule drops IS the drink; the reader below prints no price for a
      drink it has no entry for, which is the same silence the drink page keeps.
      {% endcomment %}
+  {% comment %} GBP PER LITRE, RESOLVED AT BUILD — #820, #817, #818. Same gate as
+     the per-drink costs below, and about 10 KB.
+
+     WHY A SECOND BLOCK RATHER THAN MORE OF `drink-costs`. They answer different
+     questions and neither can be derived from the other: `drink-costs` is what
+     one glass of one drink costs, and this is what a litre of an ingredient
+     costs. A shopping list totals by GENERIC across every shortlisted drink,
+     which no drink's own figure contains.
+
+     ALREADY RESOLVED, NOT RAW COSTS.YML. `_plugins/cocktail_costs.rb` applied
+     every rule about what a generic costs before this was written — the union
+     of declared bottles and the generic's own row, `default_bottles` narrowing
+     it where Helen has ruled, a squeezed juice priced from the fruit and the
+     yield. The browser multiplies millilitres by a number and does nothing
+     else, which is the same division that keeps `cocktail-scale.js` ignorant of
+     prices. Emitting costs.yml raw would put a second copy of those rules in
+     JavaScript. {% endcomment %}
+  {% if site.show_costs %}
+  <script type="application/json" id="drink-rates">
+    {{ site.data.cocktails.rates | jsonify }}
+  </script>
+  {% endif %}
+
   {% if site.show_costs %}
   <script type="application/json" id="drink-costs">
 {

@@ -293,6 +293,99 @@
       : low + '–' + high;
   }
 
+  /* MONEY, IN THE SHAPE THE DRINK PAGE ALREADY USES -- "£11.34", or
+     "£11.34–£14.70" where the line spans a range. Two decimal places always,
+     because a price with one looks like a mistake. The dash is the en dash
+     `costSuffix` in cocktail-index.js uses for the same job. */
+  function moneyText(low, high) {
+    var lo = '£' + Number(low).toFixed(2);
+    if (Math.abs(Number(high) - Number(low)) < 0.005) return lo;
+    return lo + '–£' + Number(high).toFixed(2);
+  }
+
+  /* WHAT A LINE COSTS -- #820. Millilitres times a declared rate, and nothing
+     cleverer, because every rule about what a generic costs was applied at
+     build time by `_plugins/cocktail_costs.rb` (see the rate table it emits).
+     This multiplies; it does not resolve.
+
+     THE NAMED BOTTLES WIN OVER THE GENERIC, when they are all priced. A line
+     whose drinks all say Tanqueray is a line you would buy Tanqueray for, and
+     the generic's range spans everything that COULD fill it. Where the drinks
+     named several bottles the range runs cheapest to dearest across them, which
+     is what #820 asks for: "a range where suggested bottles are a range".
+
+     ALL OR NOTHING ON THE NAMED SET, deliberately. If one named bottle has no
+     price, pricing from the others would quietly report a range narrower than
+     the truth -- it would look more certain for knowing less. Falling back to
+     the generic is wider and honest, and the generic's own range already spans
+     every bottle under it.
+
+     NO RATE MEANS NO PRICE, never a zero. 20 generics in the collection have
+     none: herbs, zest, oil and bitters-by-the-dash, which are free under
+     Helen's rule ("I'm catering for family, not running a bar"), and the whole
+     fruit and weighed solids that #748 ruled should be priced and which nobody
+     has entered yet. A line with no rate prints no figure, the same silence the
+     drink page keeps for an incomplete drink. */
+  function linePrice(mlMin, mlMax, generic, bottleNames, rates) {
+    if (!rates || !(mlMax > 0)) return null;
+
+    var byBottle = rates.bottles || {};
+    var named = asList(bottleNames);
+    var rate = null;
+
+    if (named.length) {
+      var found = named.map(function (n) { return byBottle[n]; });
+      if (found.every(function (r) { return typeof r === 'number'; })) {
+        rate = [Math.min.apply(null, found), Math.max.apply(null, found)];
+      }
+    }
+    if (!rate) rate = (rates.generics || {})[generic];
+    if (!rate || rate.length !== 2) return null;
+
+    var low = mlMin / 1000 * Number(rate[0]);
+    var high = mlMax / 1000 * Number(rate[1]);
+    return {
+      min: low,
+      max: high,
+      exact: Math.abs(high - low) < 0.005,
+      text: moneyText(low, high)
+    };
+  }
+
+  /* WHAT THE WHOLE LIST COSTS -- #817. Summed from the rows rather than from
+     the entries, so the figure at the bottom is by construction the sum of the
+     figures above it: a total that can disagree with its own column is worse
+     than no total.
+
+     `unpriced` IS PART OF THE ANSWER, not an error. A list containing mint and
+     a pear reports a total plus "3 lines have no price", because a bare figure
+     would claim to be the cost of the shop and would be short by whatever those
+     lines are worth. */
+  function total(rows) {
+    var min = 0;
+    var max = 0;
+    var priced = 0;
+    var unpriced = 0;
+    asList(rows).forEach(function (row) {
+      if (row && row.price) {
+        min += row.price.min;
+        max += row.price.max;
+        priced += 1;
+      } else if (row) {
+        unpriced += 1;
+      }
+    });
+    if (!priced) return null;
+    return {
+      min: min,
+      max: max,
+      exact: Math.abs(max - min) < 0.005,
+      priced: priced,
+      unpriced: unpriced,
+      text: moneyText(min, max)
+    };
+  }
+
   /* WHAT COUNTS AS A TOP, AND DELIBERATELY NOTHING ELSE. All nine topped pours
      in the collection write exactly `to top`; this also accepts `to top up`
      and tolerates case and spacing, and matches nothing else on purpose.
@@ -510,6 +603,9 @@
    * @param {Object} [options.topUpMl] - generic -> {ml_min, ml_max}, `top_up_ml`
    *        from _data/cocktails/costs.yml. Turns an unquantified `to top` into
    *        a declared volume range (#746); absent, a top stays a count.
+   * @param {Object} [options.rates] - {generics: {name: [lo, hi]}, bottles:
+   *        {name: rate}}, GBP per litre, resolved at build time by
+   *        _plugins/cocktail_costs.rb (#820). Absent, no row carries a price.
    * @returns {Array} one row per ingredient, sorted by label:
    *        { label, note, generic, bottles: string[],
    *          totals: [{quantity, quantityMax, unit, text}],
@@ -753,6 +849,10 @@
         totals: totals,
         unquantified: unquantified,
         fruit: fruit,
+        /* #820. The bottles the drinks actually named, not the group's "or"
+           form, because a rate is looked up per bottle. */
+        price: linePrice(mlMin, mlMax, group.generic, group.bottleNames,
+                         opts.rates),
         /* THE SORT AND THE CALLERS BOTH READ THE LOW END, which is why this
            stays the single number it has always been: an untopped row has
            `millilitres === millilitresMax` and nothing downstream changes.
@@ -780,6 +880,8 @@
 
   var api = {
     build: build,
+    total: total,
+    moneyText: moneyText,
     parseAmount: parseAmount,
     fruitCount: fruitCount,
     foldKey: foldKey,

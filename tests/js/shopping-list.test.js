@@ -661,6 +661,127 @@ test('an en dash, not a hyphen', () => {
   assert.ok(!rows[0].text.includes('-'), rows[0].text);
 });
 
+// --- what a line costs, #820, and what the list costs, #817 -------------------
+// GBP per litre, resolved at build time by _plugins/cocktail_costs.rb and handed
+// over as a table. This file multiplies and never resolves: every rule about
+// what a generic costs -- the union of declared bottles, `default_bottles`
+// narrowing it, a squeezed juice priced from fruit and yield -- lives in the
+// plugin, and a second copy here would be a second thing to keep in step.
+//
+// THE RATES ARE THE REAL ONES, checked against _data/cocktails/costs.yml on
+// 2026-09-08, so a failure means behaviour moved rather than a fixture drifting.
+
+const RATES = {
+  generics: {
+    'London dry gin': [31.43, 31.43],
+    'lime juice': [6.0, 15.0],
+    'moderately aged rum': [22.0, 40.0],
+    mint: undefined
+  },
+  bottles: {
+    Tanqueray: 31.43,
+    Beefeater: 24.29,
+    'Havana Club 7': 40.0
+  }
+};
+
+test('a line is priced from its millilitres and a declared rate', () => {
+  const rows = SL.build([ing('420 ml', 'London dry gin')], { rates: RATES });
+  // 0.42 l x 31.43
+  assert.strictEqual(rows[0].price.text, '£13.20');
+  assert.strictEqual(rows[0].price.exact, true);
+});
+
+test('a generic that spans a range prices as a range', () => {
+  const rows = SL.build([ing('500 ml', 'lime juice')], { rates: RATES });
+  // 0.5 l x 6.00 to 0.5 l x 15.00
+  assert.strictEqual(rows[0].price.text, '£3.00–£7.50');
+});
+
+test('the named bottles beat the generic when every one is priced', () => {
+  // #820: "a range where suggested bottles are a range". Two drinks naming two
+  // gins price cheapest to dearest across those two, not across the category.
+  const rows = SL.build([
+    ing('200 ml', 'London dry gin', 'Tanqueray'),
+    ing('200 ml', 'London dry gin', 'Beefeater')
+  ], { rates: RATES });
+  // 0.4 l x 24.29 to 0.4 l x 31.43
+  assert.strictEqual(rows[0].price.text, '£9.72–£12.57');
+});
+
+test('one unpriced bottle sends the whole line back to the generic', () => {
+  // All or nothing on the named set: pricing from the priced ones only would
+  // report a range narrower than the truth -- more certain for knowing less.
+  const rows = SL.build([
+    ing('200 ml', 'London dry gin', 'Tanqueray'),
+    ing('200 ml', 'London dry gin', 'Some Undeclared Gin')
+  ], { rates: RATES });
+  assert.strictEqual(rows[0].price.text, '£12.57'); // the generic's rate
+});
+
+test('a generic with no rate carries no price, never a zero', () => {
+  const rows = SL.build([ing('8 leaves', 'mint')], { rates: RATES });
+  assert.strictEqual(rows[0].price, null);
+});
+
+test('a top-up range widens the price too', () => {
+  // The two features meet: 3 x 100-150 ml of a generic priced 1.00-2.00 a litre
+  // is 300-450 ml, so 30p to 90p.
+  const rows = SL.build([
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water')
+  ], {
+    topUpMl: TOP_UPS,
+    rates: { generics: { 'soda water': [1.0, 2.0] }, bottles: {} }
+  });
+  assert.strictEqual(rows[0].text, '300–450 ml');
+  assert.strictEqual(rows[0].price.text, '£0.30–£0.90');
+});
+
+test('no rates at all means no prices, and everything else is unchanged', () => {
+  const rows = SL.build([ing('420 ml', 'London dry gin')]);
+  assert.strictEqual(rows[0].price, null);
+  assert.strictEqual(rows[0].text, '420 ml');
+});
+
+test('the total is the sum of the lines above it', () => {
+  const rows = SL.build([
+    ing('420 ml', 'London dry gin'),
+    ing('500 ml', 'lime juice')
+  ], { rates: RATES });
+  const sum = SL.total(rows);
+  // 13.20 + 3.00, 13.20 + 7.50
+  assert.strictEqual(sum.text, '£16.20–£20.70');
+  assert.strictEqual(sum.priced, 2);
+  assert.strictEqual(sum.unpriced, 0);
+});
+
+test('the total counts what it could not price, rather than hiding it', () => {
+  // A bare figure would claim to be the cost of the shop and be short by
+  // whatever the unpriced lines are worth.
+  const rows = SL.build([
+    ing('420 ml', 'London dry gin'),
+    ing('8 leaves', 'mint')
+  ], { rates: RATES });
+  const sum = SL.total(rows);
+  assert.strictEqual(sum.text, '£13.20');
+  assert.strictEqual(sum.priced, 1);
+  assert.strictEqual(sum.unpriced, 1);
+});
+
+test('a list with nothing priceable has no total at all', () => {
+  const rows = SL.build([ing('8 leaves', 'mint')], { rates: RATES });
+  assert.strictEqual(SL.total(rows), null);
+});
+
+test('moneyText collapses when the ends meet, and always shows pennies', () => {
+  assert.strictEqual(SL.moneyText(13.2, 13.2), '£13.20');
+  assert.strictEqual(SL.moneyText(3, 7.5), '£3.00–£7.50');
+  // An en dash, like the drink page's own cost suffix.
+  assert.ok(SL.moneyText(3, 7.5).includes('–'));
+});
+
 test('no topUpMl at all leaves every existing answer alone', () => {
   // The guarantee that made this change safe to land: absent the option, this
   // file behaves exactly as it did before #746.
