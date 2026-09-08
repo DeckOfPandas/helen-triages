@@ -101,6 +101,11 @@ module HelenTriages
         site.collections[key].docs.each do |doc|
           cost = cost_for(doc.data["ingredients"])
           next unless cost
+          # #818. Hung beside the cost rather than inside it: `cost` is what one
+          # glass costs and every template reads it, where this is a control's
+          # worth of data that only the index's shopping list wants.
+          choices = choices_for(doc.data["ingredients"])
+          cost["choices"] = choices unless choices.empty?
           doc.data["cost"] = cost
           counted += 1
         end
@@ -209,6 +214,70 @@ module HelenTriages
       @ignored.each { |w| unit = unit.sub(/\A#{Regexp.escape(w)}\s+/, "") }
       return nil if @excluded.include?(unit) || !@per_ml.key?(unit)
       m[1].to_f * @per_ml[unit].to_f
+    end
+
+    # WHERE A DRINK OFFERS A CHOICE OF BOTTLE, AND WHAT EACH ONE WOULD COST --
+    # #818, Helen: "list shopping list cocktail names at the top one per line,
+    # with radio buttons to choose from where there is a choice of declared
+    # bottles for high-volume ingredients", and "per drink" when asked whether
+    # the choice was per drink or per list.
+    #
+    # ADDITIVE, AND `cost_for` IS UNTOUCHED ON PURPOSE. This walks the same
+    # ingredients and repeats a dozen lines of it, which is a real cost -- but
+    # the alternative was refactoring the method that produces every price on
+    # the site, in a container with no Jekyll to run it in. A bug here shows up
+    # as a wrong button; a bug in `cost_for` shows up as a wrong price on 124
+    # drinks. The duplication is the cheaper mistake to make.
+    #
+    # WHAT THE BROWSER DOES WITH IT is arithmetic and nothing else, which is the
+    # same division the rate table keeps: for a chosen bottle,
+    #
+    #     lo' = drink.lo - choice.lo + choice.bottles[chosen]
+    #
+    # so it never has to know what an excluded unit is, or that a `to top` has a
+    # declared volume, or which of a suggestion and a generic wins.
+    #
+    # A CHOICE IS TWO OR MORE RESOLVABLE, PRICED BOTTLES ON ONE POUR. One bottle
+    # is not a choice and neither is none: where a pour names nothing the price
+    # already spans the whole category, and offering "the category" as a radio
+    # button would be a control that changes nothing.
+    def choices_for(ingredients)
+      return [] unless ingredients.is_a?(Array)
+
+      out = []
+      ingredients.each do |ing|
+        next unless ing.is_a?(Hash)
+        amount = ing["amount"].to_s.strip
+        generics = Array(ing["generic"]).map(&:to_s)
+
+        if amount == "to top"
+          tops = generics.filter_map { |g| @costs["top_up_ml"][g] }
+          next if tops.empty?
+          lo_ml = tops.map { |t| t["ml_min"].to_f }.min
+          hi_ml = tops.map { |t| t["ml_max"].to_f }.max
+        else
+          ml = volume_ml(amount) or next
+          lo_ml = hi_ml = ml
+        end
+
+        names = Array(ing["suggestion"]).map(&:to_s)
+                  .filter_map { |s| @alias[s.downcase] }.uniq
+        priced = names.filter_map { |n| [n, bottle_rate(n)] if bottle_rate(n) }
+        next if priced.length < 2
+
+        bottles = priced.to_h { |n, r| [n, (hi_ml * r / 1000.0).round(4)] }
+        out << {
+          "generic" => generics.join(" or "),
+          "ml_min"  => lo_ml,
+          "ml_max"  => hi_ml,
+          # What this pour contributes to the drink's range TODAY, so the
+          # browser can subtract exactly what it is replacing.
+          "lo"      => (lo_ml * priced.map(&:last).min / 1000.0).round(4),
+          "hi"      => (hi_ml * priced.map(&:last).max / 1000.0).round(4),
+          "bottles" => bottles
+        }
+      end
+      out
     end
 
     def cost_for(ingredients)

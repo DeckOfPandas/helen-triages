@@ -390,23 +390,67 @@
 // A wrapping row of number-and-name pairs rather than a column: a weekend's
 // shortlist is a handful of drinks, and a column of six would push the totals —
 // the thing the panel is FOR — below the fold on a phone.
+// ONE DRINK PER LINE SINCE #818, and that is the issue's own title: "list
+// shopping list cocktail names at the top one per line". It was a wrapping flex
+// ROW, which packed four or five drinks across and was the denser reading --
+// but a drink can now carry radio buttons underneath it, and a control belonging
+// to the third of five names on a line has nothing to hang from.
 .shopping-list-drinks {
   list-style: none;
   margin: 0 0 $space-lg;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-sm $space-lg;
 
   li {
-    display: flex;
-    align-items: baseline;
-    gap: $space-xs;
+    // BLOCK, so the choice rows below can be blocks of their own. The number
+    // box and the name stay on one line because both are inline.
+    display: block;
     font-size: 0.9rem;
     color: $color-text;
+
+    & + & { margin-top: $space-xs; }
   }
 
-  input { @extend %cocktail-number-input; }
+  // THE GLASSES BOX BY ITS CLASS, NOT BY `input` -- #818. A bare `input` here
+  // was exact while the only input in this list was the number box; the bottle
+  // radios are inputs too, and would have arrived dressed as number boxes.
+  input.shopping-list-glasses { @extend %cocktail-number-input; }
+}
+
+// A POUR THAT OFFERS A CHOICE OF BOTTLE -- #818. Helen chose "a row per pour
+// that has a choice", labelled with the generic, so it is visible WHICH pour
+// the buttons belong to on a drink that offers two.
+//
+// INDENTED PAST THE NUMBER BOX, so the rows read as belonging to the drink
+// above rather than as a second list. The indent is the box's own width plus
+// its gap, stated against the same tokens so it moves if the box does.
+.shopping-list-choice {
+  display: block;
+  margin: 0.15rem 0 0 calc(#{$space-lg} + #{$space-xs});
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+// The generic, so the buttons are labelled by the pour they change. Quiet: it
+// is a heading for the controls beside it, not a thing you act on.
+.shopping-list-choice-name {
+  color: $color-clear-text;
+  margin-right: $space-xs;
+}
+
+// EACH BOTTLE IS A LABEL WRAPPING ITS RADIO, so the whole name is clickable
+// rather than the 13px circle alone -- #823 was exactly this complaint about
+// the shortlist button, and a bottle name is a bigger target for free.
+.shopping-list-bottle-choice {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin-right: $space-sm;
+  cursor: pointer;
+  // The bottle is woowoo here for the same reason it is on a list row: it is
+  // the thing Helen chose, and `.shopping-list-bottle` says so already.
+  color: $color-wicked-woowoo-deep;
+
+  input { margin: 0; }
 }
 
 // "2 Mai Tai @ £5.24" — the price half. Helen, 2026-09-06: "please add the

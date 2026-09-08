@@ -193,12 +193,93 @@
      menu, and the same number the drink's own page shows. Multiplying here
      would make the glasses box change a price labelled per glass, which is the
      bug that had to be taken out of cocktail-scale.js on the same day. */
-  function costSuffix(url) {
+  /* WHICH BOTTLE HELEN HAS PICKED FOR WHICH POUR -- #818, and "per drink" is
+     her ruling: two drinks that both want a reposado may choose differently.
+     Keyed url -> generic -> bottle name.
+
+     IN MEMORY ONLY, DELIBERATELY. She chose "price and the list line" over
+     "and it sticks": a stored choice outlives the bottle it names, and a list
+     that opens tomorrow already committed to a rum that left the house is
+     worse than one that asks again. The shortlist itself persists; this does
+     not. */
+  var CHOSEN = {};
+
+  function chosenBottle(url, generic) {
+    return (CHOSEN[url] || {})[generic] || null;
+  }
+
+  /* WHAT ONE GLASS COSTS, AFTER ANY CHOICE -- #818.
+
+     THE ARITHMETIC IS SUBTRACT-AND-ADD, and the plugin emitted exactly what it
+     needs: each choosable pour carries what it contributes to the range TODAY
+     (`lo`, `hi`) and what each candidate bottle would cost instead. So a chosen
+     bottle is `total - what that pour was contributing + what this one costs`,
+     and the browser never has to know what an excluded unit is or which of a
+     suggestion and a generic wins.
+
+     UNCHOSEN POURS ARE LEFT ALONE, which is what makes the opening state the
+     full range Helen asked for: a drink with two choices and one made narrows
+     by exactly that one. */
+  function costFor(url) {
     var c = COSTS[url];
+    if (!c) return null;
+    var lo = Number(c.lo);
+    var hi = Number(c.hi);
+    (c.choices || []).forEach(function (choice) {
+      var bottle = chosenBottle(url, choice.generic);
+      if (!bottle) return;
+      var price = choice.bottles[bottle];
+      if (typeof price !== 'number') return;
+      lo = lo - Number(choice.lo) + price;
+      hi = hi - Number(choice.hi) + price;
+    });
+    return { lo: lo, hi: hi };
+  }
+
+  function costSuffix(url) {
+    var c = costFor(url);
     if (!c) return '';
     var lo = '£' + Number(c.lo).toFixed(2);
     if (Math.abs(c.hi - c.lo) < 0.005) return ' @ ' + lo;
     return ' @ ' + lo + '–£' + Number(c.hi).toFixed(2);
+  }
+
+  /* THE RADIO ROWS UNDER A DRINK -- #818, and Helen picked the shape: "a row
+     per pour that has a choice", with the generic labelling each set so you can
+     see WHICH pour you are choosing a bottle for.
+
+     ONE `name` PER DRINK AND POUR, which is what makes them behave as radios
+     rather than as a row of unrelated buttons -- and it has to include the URL,
+     or two shortlisted drinks wanting a reposado would share one group and
+     choosing for the second would silently unchoose the first. That is the same
+     bug in miniature as the per-list choice Helen ruled against.
+
+     NO "no preference" OPTION, because the unchosen state IS no preference and
+     it is where every list starts. Clearing one is not a thing she asked for;
+     if it turns out to be wanted, it is a fifth radio rather than a redesign. */
+  function choiceRows(url) {
+    var c = COSTS[url];
+    if (!c || !c.choices || !c.choices.length) return '';
+    return c.choices.map(function (choice, i) {
+      var group = 'bottle-' + i + '-' + url;
+      var options = Object.keys(choice.bottles).map(function (bottle) {
+        var id = group + '-' + bottle;
+        return '<label class="shopping-list-bottle-choice">' +
+          '<input type="radio" name="' + HTF.escapeHtml(group) + '"' +
+          ' value="' + HTF.escapeHtml(bottle) + '"' +
+          ' data-url="' + HTF.escapeHtml(url) + '"' +
+          ' data-generic="' + HTF.escapeHtml(choice.generic) + '"' +
+          (chosenBottle(url, choice.generic) === bottle ? ' checked' : '') +
+          ' aria-label="' + HTF.escapeHtml(bottle) + '">' +
+          '<span>' + HTF.escapeHtml(bottle) + '</span>' +
+          '</label>';
+      }).join('');
+      return '<span class="shopping-list-choice">' +
+        '<span class="shopping-list-choice-name">' +
+        HTF.escapeHtml(choice.generic) + '</span>' +
+        options +
+        '</span>';
+    }).join('');
   }
 
   /* ONE BOTTLE, HOWEVER IT WAS WRITTEN. Built from the dictionary already on the
@@ -580,6 +661,8 @@
              `show_costs` is off, which is everywhere but Helen's laptop. */
           '<span class="shopping-list-cost">' + costSuffix(url) + '</span>' +
           '</span>' +
+          // #818. After the name, indented, one row per pour with a choice.
+          choiceRows(url) +
           '</li>';
       }).join('');
     }
@@ -594,7 +677,28 @@
     (urls || shortlistedDrinks()).forEach(function (url) {
       var glasses = HTF.shortlist.glasses(url);
       (INGREDIENTS[url] || []).forEach(function (ing) {
-        entries.push({ amount: ing.a, generic: ing.g, bottle: ing.b, glasses: glasses });
+        /* A CHOICE NARROWS THE LIST LINE, NOT JUST THE PRICE -- #818, Helen
+           picked "price and the list line" over price alone: "choosing is how
+           you decide what to buy, so the list should say what you decided."
+
+           IT IS DONE HERE, ON THE ENTRY, rather than anywhere downstream, and
+           that is what makes it cost nothing: `shopping-list.js` already
+           prefers the named bottles over the generic when pricing, and already
+           builds the bracketed note from them. Replacing the suggestion with
+           the one she chose therefore fixes the price AND the note in one
+           move, with no new argument to thread through.
+
+           THE GENERIC IS JOINED THE SAME WAY THE PLUGIN JOINED IT, because a
+           list generic ("either would do", #441) is one choosable pour and the
+           key has to match on both sides. */
+        var generic = Array.isArray(ing.g) ? ing.g.join(' or ') : ing.g;
+        var picked = chosenBottle(url, generic);
+        entries.push({
+          amount: ing.a,
+          generic: ing.g,
+          bottle: picked || ing.b,
+          glasses: glasses
+        });
       });
     });
 
@@ -702,6 +806,30 @@
       HTF.shortlist.setGlasses(input.dataset.url, input.value);
       // Totals only. Re-rendering the drinks list would replace the very input
       // being typed into and take the caret with it.
+      renderTotals();
+    });
+
+    /* CHOOSING A BOTTLE -- #818. `change` rather than `input`, because a radio
+       fires `input` on every arrow-key pass through the group while it is being
+       browsed, and re-costing the whole list on each one would make the keyboard
+       route through the options feel like it was doing work.
+
+       THE ROW IS PATCHED, NOT RE-RENDERED, for the same reason the glasses
+       handler calls `renderTotals()` alone: rebuilding the list would replace
+       the radio that was just clicked and take the focus ring with it, which
+       for a keyboard user is the control vanishing mid-choice. So the price
+       span is written in place and the totals below are rebuilt. */
+    shoppingDrinks.addEventListener('change', function (ev) {
+      var input = ev.target;
+      if (!input.dataset || !input.dataset.generic) return;
+      var url = input.dataset.url;
+      CHOSEN[url] = CHOSEN[url] || {};
+      CHOSEN[url][input.dataset.generic] = input.value;
+
+      var row = input.closest ? input.closest('li') : null;
+      var cost = row && row.querySelector('.shopping-list-cost');
+      if (cost) cost.textContent = costSuffix(url);
+
       renderTotals();
     });
   }
