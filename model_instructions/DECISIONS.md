@@ -1133,6 +1133,37 @@ unless stated.
   what the CARD says never has to cost the data a distinction. Reach for the
   split before accepting a lossy rename.
 
+- **2026-09-08, #848** — **A shopping SHELF is not a taxonomy, and gets its own
+  map.** Helen: *"for cocktail shopping list, list items in shelf order then
+  volume"*, with her own order; `fortified` was added on her ruling the same
+  day, because her list had nowhere for vermouth and vermouth is in a lot of
+  drinks. `fresh produce` followed on her first reading — it was the soft edge
+  of the first cut, where a pear, a cucumber and a sprig of mint sat under
+  `flavourings` with the olive oil and `flavourings` was carrying 24 rows
+  against every other shelf's handful.
+
+  **`shelf_of` rather than more columns on `family_of`, because they disagree on
+  purpose in three places**: an amaro and a herbal liqueur are different
+  FAMILIES and one shelf; champagne is `fortified` by family and sits under
+  `tops` because that is what you do with it; the dry sugars share a shelf with
+  the syrups because they do the same job in a drink. A family says what a
+  spirit IS, a shelf says where you find it.
+
+  **All 153 generics in use are placed, and the mapping was DERIVED**:
+  `top_up_ml` gives the tops, `juice_yields` the squeezed juices, `family_of`
+  the spirits and fortified wines, name rules the rest. The 38 left over are
+  named one at a time in the generator with a reason each — chiefly that
+  absinthe and Ceylon arrack are base spirits with no `family_of` row, and that
+  a case-sensitive rule missed the capitalised Curaçaos.
+
+  **`dried apricots` stayed in `flavourings` while `lemon zest` moved**: dried
+  fruit is a dry good, and what you buy for a zest is a lemon.
+
+  **No guard yet that every generic in use has a shelf**, deliberately: an
+  unshelved generic sorts to the END rather than breaking anything, and a
+  pytest-less container is the wrong place to ship a test that stops the deploy
+  if it is wrong. Noted on the issue.
+
 ### §9.3.2 The bottle dictionary
 
 - **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as
@@ -1673,6 +1704,75 @@ unless stated.
   resemble a bird's plumage)` and five others were declared but not printed
   by the standalone document until the blocks were generated.
 
+- **2026-09-08, #775 and #845** — **`easy peasy`, and what her three additions
+  taught.** #845: *"any cocktail with equal parts of all ingredients (bar maybe
+  bitters) should get the tag 'easy peasy' once we've made it"*, widened the
+  same day to cover the short pour-and-stir drinks, which brings in the Negroni
+  family.
+
+  **Shown eleven candidates she answered: "All your 9 from 11 are right. Julien
+  Sorel and Anita's are in too, and also Long Island Ice Tea."** Those three
+  additions are the rule: Julien Sorel and Anita's are equal parts PLUS a
+  sparkling top, and Long Island Iced Tea is EIGHT ingredients every one of them
+  12.5 ml with only the cola different. **So a top or a mixer is set aside like
+  a dash is, and the equal-parts branch carries no ceiling on the count** —
+  Anita's is seven equal pours and she wants it in. The two unmade candidates
+  are out, which is the "once we've made it" clause working.
+
+  **A rule that could not see the faff was no use for a chip about faff.** The
+  first pass counted only VOLUME pours and so called the Caipirinha and the
+  Pear-and-Apricot Bellini easy — their work is a muddled lime, 20 g of palm
+  sugar, a whole pear and four dried apricots, none of which is a volume. It now
+  requires every counted ingredient to BE a volume and reads the method for
+  muddle/infuse/cook/simmer/blend.
+
+  **`moods_by_hand` IS THE TRAP, and it is silent.** A hand-applied mood missing
+  from that list is stripped off every drink the next time
+  `derive_cocktail_moods.py` runs, and `verify.py` runs it — so it reports as a
+  diff rather than as an error. `easy peasy` is earned, not derived ("once we've
+  made it" is a fact about Helen, not about the liquid), so it belongs there.
+
+- **2026-09-08, #853** — **One mood can now cancel another: `mood_suppresses`.**
+  Long Island Iced Tea carried `easy peasy` AND `I want to faff`, which say
+  opposite things, and both rendered as chips side by side. Helen: *"LIIT is
+  easy peasy, and this should suppress the derivation."*
+
+  **Neither was wrong by its own rule**, which is what made it a vocabulary
+  question rather than a bug. `I want to faff` is *"muddling, flaming, shells,
+  blending, swizzling, or nine-plus ingredients"* — **five OPERATIONS and one
+  COUNT, and the count is the odd one out.** It is a proxy for effort that holds
+  for a tiki drink with nine things happening to it and fails for this one,
+  whose whole method is "shake the first 8 ingredients with ice" and pour the
+  ninth on top.
+
+  **Suppressing rather than re-scoring is the cheaper correction**: the
+  nine-ingredient rule stays exactly as it is for the 124 drinks it is right
+  about. Her hand-applied judgement wins over a derived one, which is the
+  precedence `moods_by_hand` already sets.
+
+  **Declared in taxonomy.yml, not hardcoded** — §9.9's lesson is that the script
+  must never keep its own copy of the vocabulary, and two mood names in a Python
+  literal would be exactly that. **A one-drink `mood_exclude` entry would also
+  have worked and was not taken**: she stated the rule about the MOODS, not
+  about the drink.
+
+- **2026-09-08, #852** — **Coney Park Swizzle is Coffey Park Swizzle**, for
+  Coffey Park in Red Hook. Helen: *"delete the Coney Park one please, I remember
+  this now."* Read as "the name goes", not "that file goes", because two files
+  held the drink and the wrong one had the better content: an untracked
+  `coffey-park-swizzle.md` was an OLDER revision — `oz` amounts with the retired
+  `ml:` key, `item:` where the tracked file had `suggestion:`, bare-string notes,
+  and **no gate flags at all**, so it would have failed the publish gate and
+  reintroduced the only `oz` in 579 pours.
+
+- **2026-09-08, #836** — **Nine of the eleven glass questions were already
+  answered correctly, and the value of the ruling was DELETING THE NOTES.** Both
+  sazeracs were already old fashioned, Between the Sheets a nick and nora, both
+  martinis martini glasses. Seven QQ notes went; those notes RENDER, so
+  "Double-check this one by eye" was the thing a reader saw. Two real changes:
+  `martinique-swizzle` was still collins, missed by the 2026-08-26 sweep that
+  moved "all four" swizzles, and `mastiha-mojito` lost its second glass.
+
 ### §9.13 The visual language — the rounds
 
 - **2026-08-26** — One sitting with Helen against a mockup
@@ -1864,6 +1964,51 @@ unless stated.
   button reads `made_before`, never `ship`. `recipe-list.js` is on the
   cocktails page now and its name is wrong; renaming is its own change.
   Still not seen on an iPad.
+
+- **2026-09-08, #846** — **The chip separator moved to a TRAILING `::after`,
+  reversing a decision of 2026-09-05, and that deleted a whole measurement
+  pass.** Helen, on a card whose chips ran to several lines: *"chips which form
+  more than one line should have a . in between them even if the final chip on
+  any line before the first is a whole chip... creme de peche is at the end of a
+  line, but still gets a ."*
+
+  **`chip-rows.js` had listed exactly this as considered and rejected** — "only
+  relocates the orphan to the end of row one, where it reads as a sentence cut
+  off". She looked at the built thing and wanted it, which is how a ruling
+  changes here. The old reasoning is kept in the stylesheet beside the new rule
+  rather than deleted.
+
+  **#698 is now satisfied by construction rather than by measurement**: "no dot
+  before the first chip" is true because no chip has a leading dot at all. So
+  `chip-rows.js`, which measured `offsetTop` to mark row-starting chips, had
+  nothing left to do and went — one fewer of the three passes #828 is about.
+
+  **The feedback loop that forced absolute positioning was never about being in
+  flow.** It was that the dot was drawn CONDITIONALLY, so its width fed the wrap
+  decision that decided whether to draw it. An unconditional dot cannot do that,
+  which is what lets it go back in flow — and in flow is *wanted*, not merely
+  safe: an absolutely positioned `::after` has no width, so a dot ending a row
+  would sit past the container's right edge and be clipped away by the row cap,
+  invisible in precisely the case the issue is about.
+
+- **2026-09-08, #760 — THE PROPOSED FIX DOES NOT WORK, and the issue had said it
+  would.** #760 proposed making `.drink-card-moods` block flow and floating the
+  ship right "at the end", so chips would "flow around the ship on the last row
+  only". **A float reserves space from the TOP of its block, downwards.** Float
+  it first and the chips wrap around it on row ONE; float it last and nothing
+  comes after it, so nothing flows around it at all — it is simply placed where
+  it fits, and **dropped to a new row when the chips already filled the last
+  one, where `overflow: hidden` clips it away entirely**. That would have
+  silently removed the verdict word from the busiest cards and looked fine on
+  every card anyone checked.
+
+  **What would work, in order of cost**: take the ship out of flow
+  (`position: absolute`, bottom-right), which alone fixes the stated complaint
+  because every row above the last gets its width back; or the float-bottom-right
+  hack, a zero-width `::before` float of height *(container − one line)*, which
+  needs the container's height known and ours is not; or re-introduce a
+  measurement pass, which #846 has just removed. Tried, abandoned, branch
+  deleted, reported on the issue rather than shipped.
 
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
@@ -2172,6 +2317,26 @@ unless stated.
   showed is that the guarantee only holds when **every** session is actually in
   a worktree, and `/workspace` is not one. Helen: *"I'll run Claudes in
   worktrees going forwards."*
+
+- **2026-09-08 — A RENAME THAT SPANS BOTH REPOS MUST MERGE DRAFTS-FIRST, and
+  getting that backwards turned Helen's local `pytest` red.** #852 renamed
+  `coney-park-swizzle` to `coffey-park-swizzle`: the file lives in the private
+  drafts repo, and `mood_include` in the public `taxonomy.yml` is keyed by
+  SLUG. Both halves were written and the commit message said the slug was
+  "renamed in the same breath there" — **true of the work and false of the
+  merge.** The two repos merge independently. The public half went in, the
+  drafts half sat on an unmerged branch, and
+  `test_every_mood_correction_is_reachable_and_needed` then reported
+  `mood_include.coffey-park-swizzle: names no drink in the collection`.
+
+  **CI could not have caught it**, which is the sharp end: that test is
+  `_require_whole_collection`, so it skips wherever the private drafts are
+  absent — which is CI. Only Helen's machine, with both repos cloned, sees it.
+
+  **The rule, and it generalises past renames**: public data may name a drafts
+  slug; drafts never name public data. So **the drafts side merges first**, and
+  a change that crosses the boundary is not finished when both commits exist —
+  it is finished when both are on their `main`s, in that order.
 
 ### §11.2 The record of this file being wrong
 
