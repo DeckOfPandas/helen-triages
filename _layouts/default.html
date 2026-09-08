@@ -419,46 +419,25 @@
      every later "deal again" calls HTF.fitCardNames() itself. {% endcomment %}
   <script src="{{ '/assets/js/card-name-fit.js' | relative_url }}"></script>
 
-  {% comment %} chip-rows.js marks the mood word that BEGINS a row, so the
-     stylesheet can keep the middle dot off it — issue #698, Helen: "no dot
-     before the first chip." The dot was never before chip one; it was before
-     chip one of the SECOND row, on the 62% of drinks whose moods wrap. That
-     file's header has the arithmetic and the two CSS-only dodges it rejected.
+  {% comment %} chip-rows.js STOOD HERE until #846, 2026-09-08. It measured
+     `offsetTop` and marked the mood word beginning each row, so the stylesheet
+     could keep the middle dot off it -- #698, Helen: "no dot before the first
+     chip." The dot was never before chip one; it was before chip one of the
+     SECOND row, on the 61% of drinks whose moods wrap.
 
-     HERE FOR THE SAME THREE REASONS card-name-fit.js above is. Site-agnostic:
-     it queries `.drink-card-mood` and returns having done nothing on a page
-     with none, which is every page on food. After assets.js, the one hard
-     ordering rule, because it hangs HTF.markChipRows() off that namespace. And
-     after {{ content }}, because it measures a laid-out `offsetTop` — on the
-     cocktails index that content includes universe.js, whose dealt card this
-     file's own load pass then measures along with the other 124.
+     #846 moved the dot to a trailing `::after` on every chip but the last, at
+     Helen's word: "chips which form more than one line should have a . in
+     between them even if the final chip on any line before the first is a whole
+     chip." No chip has a leading dot now, so there is no line break for CSS to
+     be blind to and nothing for a measurement to mark. `_cards.scss` carries
+     the full story where the suppression rule used to be.
 
-     ORDER AGAINST card-name-fit.js USED TO NOT MATTER AND NOW DOES, because
-     card-line-budget.js sits between them (#776) and each pass feeds the next:
-     the name decides whether the ingredient line is clamped at two or three,
-     the rendered ingredient line decides whether the chips are capped at two or
-     three, and only then is it true where the chip rows break. Running
-     chip-rows.js first is not a crash -- it is a card whose row-leading dots
-     are marked for a row count it no longer has.
-
-     The old note said "a name's size and a chip's row are measured on different
-     elements and neither pass reads the other's classes". That was true and is
-     not any more: `.drink-card-name--wrap` is now read by the stylesheet to cap
-     both of the others. {% endcomment %}
-
-  {% comment %} card-line-budget.js measures how many lines the ingredient line
-     actually took, so the chips can be capped when it took three -- #776,
-     Helen: "if cocktail card ingredients have three lines, only allow the chips
-     two lines". CSS cannot ask that question; `-webkit-line-clamp` is a ceiling
-     and most cards do not reach it.
-
-     HERE FOR THE SAME THREE REASONS as the two around it, and BETWEEN them for
-     the ordering reason above. The name half of #776 needs no script at all --
-     `.drink-card-name--wrap` and the ingredient line are siblings, so the
-     stylesheet reaches one from the other. {% endcomment %}
-  <script src="{{ '/assets/js/card-line-budget.js' | relative_url }}"></script>
-
-  <script src="{{ '/assets/js/chip-rows.js' | relative_url }}"></script>
+     ONE FEWER MEASUREMENT PASS ON THE INDEX, which is worth stating because the
+     remaining two feed each other and #828 is about testing exactly that:
+     card-name-fit.js decides whether the ingredient line is clamped at two
+     lines or three, and card-line-budget.js reads the rendered line to decide
+     whether the chips are capped. Nothing now depends on where a chip row
+     breaks. {% endcomment %}
 
   {% comment %} shortlist.js wires every `.btn-shortlist` on the page — GitHub
      issue #546. HERE, in the shell, because the four placements are spread

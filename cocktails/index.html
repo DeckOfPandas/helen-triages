@@ -175,11 +175,12 @@ permalink: /cocktails/
      would make the glass a sibling of the whole block and it could then only
      ever sit beside it, never inside the row.
 
-     IF THE FOOT IS EVER CLONED AGAIN, universe.js has to call
-     `HTF.markChipRows()` next to its `HTF.fitCardNames()` call, because the
-     foot is where the mood chips live and their row-start marks are a
-     measurement of the container they are in (#698). It does not call it today
-     because today no chips are cloned.
+     THIS USED TO CARRY A WARNING that cloning the foot would oblige universe.js
+     to call `HTF.markChipRows()` beside its `HTF.fitCardNames()`, because the
+     chips' row-start marks were a measurement of the container they sat in
+     (#698). #846 deleted that pass — the separator dot trails every chip but
+     the last now, so nothing measures where a chip row breaks — and the warning
+     went with it. Cloning the foot is free again.
 
      AND IT FAILS SHUT, WHICH MATTERS FOR THE FIRST PROMOTION. Production has no
      drafts, so on the day the first drink is promoted this selector may well

@@ -873,19 +873,16 @@
        later page kept the three-row chip cap it should have lost, and nothing
        said so because the card still looked plausible.
 
-       IT RUNS BEFORE markChipRows AND THAT ORDER IS LOAD-BEARING: the budget
-       sets the chips' max-height, which decides where the chip rows break,
-       which is what the row marks describe. Redone unconditionally because
-       `chipsMoved` is about chip CONTENT, and this is about which cards are
-       visible -- a plain page turn moves no chips and still needs both. */
-    if (HTF.cardLineBudget) HTF.cardLineBudget();
+       IT USED TO RUN BEFORE markChipRows, AND THAT ORDER WAS LOAD-BEARING:
+       the budget sets the chips' max-height, which decides where the chip rows
+       break, which was what the row marks described. #846 deleted chip-rows.js
+       -- the dot trails every chip but the last now, so nothing depends on
+       where a row breaks -- and this is the last pass standing in that chain.
 
-    /* THE ROW-START MARKS HAVE TO BE REDONE, because moving a chip changes
-       which chip begins a row -- and `is-row-start` is what suppresses the
-       separator dot that would otherwise hang off the left margin of a wrapped
-       row. chip-rows.js exposes this hook for exactly this case and its own
-       header says nothing called it until now. */
-    if (chipsMoved && HTF.markChipRows) HTF.markChipRows();
+       STILL REDONE UNCONDITIONALLY, for its own reason rather than that one:
+       `chipsMoved` is about chip CONTENT, and this is about which cards are
+       VISIBLE. A plain page turn moves no chips and still needs the budget. */
+    if (HTF.cardLineBudget) HTF.cardLineBudget();
 
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible

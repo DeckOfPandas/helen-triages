@@ -23,7 +23,7 @@
 // ingredients and fits two lines. A rule keyed on the clamp would punish every
 // card for what the tiki drinks do.
 //
-// SO IT MEASURES, the same way card-name-fit.js and chip-rows.js do, and for
+// SO IT MEASURES, the same way card-name-fit.js does, and for
 // the same stated reason: the browser already knows. Height divided by line
 // height, rounded, is the line count; three or more sets the class.
 //
@@ -38,17 +38,22 @@
 // stylesheet keeps every decision about what it MEANS; this file measures and
 // has no opinion about chips.
 //
-// IT RUNS AFTER card-name-fit.js AND BEFORE chip-rows.js. The name decides how
-// much room the ingredients get, the ingredients decide how much the chips get,
-// and chip-rows.js measures where the chip rows actually broke. Running out of
-// order is not a crash -- it is a card whose dots are marked for a row count it
-// no longer has. `_layouts/default.html` fixes the order; see its script tags.
+// IT RUNS AFTER card-name-fit.js, AND IS NOW THE LAST PASS IN THE CHAIN.
+// The name decides how much room the ingredients get, and the ingredients
+// decide how much the chips get, so running before the name pass is not a crash
+// -- it is a budget computed against a name that had not been fitted yet.
+// `_layouts/default.html` fixes the order; see its script tags.
+//
+// A THIRD PASS USED TO FOLLOW THIS ONE. chip-rows.js measured where the chip
+// rows actually broke, so the stylesheet could suppress a leading separator dot
+// on a chip that began a row (#698). #846 moved the dot to a trailing `::after`
+// on every chip but the last, so nothing depends on where a row breaks and the
+// file was deleted.
 //
 // AND IT MUST RE-RUN WHEN THE VISIBLE SET CHANGES, which is why `run` hangs off
 // HTF. The index paginates by setting `card.hidden`, not by removing cards, and
 // A HIDDEN ELEMENT MEASURES ZERO HEIGHT -- so the load-time pass can only ever
-// classify page one. cocktail-index.js calls this on every filter pass, ahead of
-// HTF.markChipRows() for the ordering reason above.
+// classify page one. cocktail-index.js calls this on every filter pass.
 // =============================================================================
 (function () {
   'use strict';

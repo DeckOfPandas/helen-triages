@@ -713,18 +713,15 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 .drink-card-moods {
   display: flex;
   flex-wrap: wrap;
-  // COLUMN GAP HOLDS THE SEPARATOR, SINCE 2026-09-06. The middle dot used to be
-  // an in-flow `inline-block` inside the following chip, which made it part of
-  // that chip's width -- and that fed back into the wrap decision that decides
-  // whether the dot is drawn at all. See `.drink-card-mood`'s `::before` for the
-  // loop that caused and the bug Helen found. The dot is absolutely positioned
-  // now, so it has no width, and this gap is the space it sits in.
+  // ZERO SINCE #846, and the dot supplies the gap itself. It was 0.9rem to hold
+  // an absolutely positioned dot that had no width of its own; the dot is in
+  // flow now and carries 0.234rem of margin either side of a 0.42rem glyph,
+  // which is the same 0.9rem between two chips, to the pixel. Leaving the
+  // column gap as well would have doubled it.
   //
-  // 0.9rem, against the 0.28rem it replaces on this axis: the dot is 0.72rem
-  // Courier at a 0.6em advance, so 6.9px, and 14.4px leaves it a little under
-  // 4px of air either side. The ROW gap stays 0.28rem -- it is the number the
-  // two-row cap below is calculated from.
-  column-gap: 0.9rem;
+  // The ROW gap stays 0.28rem -- it is the number the three-row cap below is
+  // calculated from, and it is untouched by any of this.
+  column-gap: 0;
   row-gap: 0.28rem;
   min-width: 0;
   // TWO CHIP ROWS PLUS THE GAP -- AND PLUS THE BORDERS, which is what this was
@@ -849,75 +846,73 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   &:hover,
   &:focus-visible { color: $color-wicked-woowoo; }
 
-  // THE DOT SITS IN THE GAP AND HAS NO WIDTH, SINCE 2026-09-06. It was an
-  // in-flow `inline-block`, which put it inside the following chip's own box --
-  // and that is a feedback loop, because whether the dot is DRAWN depends on
-  // whether the row wraps, and the dot's width is part of what decides that.
+  // A TRAILING DOT ON EVERY CHIP BUT THE LAST -- #846, 2026-09-08. Helen, on a
+  // card whose chips ran to several lines: "chips which form more than one line
+  // should have a . in between them even if the final chip on any line before
+  // the first is a whole chip. Currently ingredients have this, but chips do
+  // not... creme de peche is at the end of a line, but still gets a ."
   //
-  // Helen found it on two cards. Lita Grey's four moods measure 289.5px with
-  // every dot present, against a foot of about 304px at her window: right on the
-  // threshold. So the row wrapped, `festive` was marked as starting row two, its
-  // dot was removed, the row lost 11.4px and fitted on one line after all --
-  // leaving exactly what she saw, one line with a dot missing from it. Nothing
-  // re-measured, and re-measuring would only have started the loop again in the
-  // other direction.
+  // SO THE DOT IS NOW A SEAM BETWEEN WORDS RATHER THAN A MARK BEFORE ONE, and
+  // that is the whole change. The ingredient line has always read this way,
+  // because `.drink-card-sep` is a real element between two ingredients and
+  // wraps like the text it sits in. Chips now match it.
   //
-  // Absolute positioning breaks the loop at the root: the row's width no longer
-  // depends on which dots are drawn, so the wrap decision is stable and the mark
-  // can never change it. `right: 100%` puts the dot's right edge on the chip's
-  // left edge, and the negative margin walks it back into the middle of the
-  // 0.9rem column gap.
-  position: relative;
-
-  & + &::before {
+  // THIS REVERSES A DECISION RECORDED ON 2026-09-05, and does so at Helen's
+  // word rather than by accident. `chip-rows.js`'s header listed "move the dot
+  // to the preceding chip's ::after" as considered and rejected, on the grounds
+  // that it "only relocates the orphan to the end of row one, where it reads as
+  // a sentence cut off". She has looked at the built thing and wants exactly
+  // that -- which is how a ruling changes here.
+  //
+  // #698 IS STILL SATISFIED, and by construction rather than by measurement:
+  // "no dot before the first chip" is now true because no chip has a leading
+  // dot at all. That is what makes `chip-rows.js` and its `is-row-start` class
+  // unnecessary -- there is no longer a line break for CSS to be blind to.
+  //
+  // AND THE FEEDBACK LOOP THAT FORCED ABSOLUTE POSITIONING IS GONE, which is
+  // why this can go back in flow. The loop was never about being in flow: it
+  // was that the dot was drawn CONDITIONALLY, so its width fed the wrap
+  // decision that decided whether to draw it. Helen found it on Lita Grey,
+  // whose four moods measure 289.5px with every dot present against a foot of
+  // about 304px -- the row wrapped, `festive` lost its dot, the row lost 11.4px
+  // and then fitted on one line, leaving one line with a dot missing. An
+  // unconditional dot cannot do that: the width is the same whatever the wrap.
+  //
+  // IN FLOW ON PURPOSE, not merely safely. An absolutely positioned `::after`
+  // would have no width, so a dot ending a row would sit past the container's
+  // right edge and be clipped away by the row cap's `overflow` -- invisible in
+  // precisely the case this issue is about. Occupying space is what makes the
+  // line wrap to accommodate it.
+  //
+  // INLINE-BLOCK so a matched chip's underline stops at it: a text decoration
+  // propagates to inline children and stops at atomic ones. Same reason the
+  // original had.
+  &:not(:last-child)::after {
     content: "·";
-    position: absolute;
-    right: 100%;
-    // POSITIVE, and it moves the dot LEFT. For an absolutely positioned box the
-    // constraint is `left + width + margin-right + right = containing width`, so
-    // with `right: 100%` a larger margin-right pushes it further from the chip.
-    // 0.234rem = 3.75px, which centres a 6.9px dot in the 14.4px column gap.
-    margin-right: 0.234rem;
+    display: inline-block;
+    // The chips' own `column-gap` is 0 now (see `.drink-card-moods`), so these
+    // margins are the whole gap: 0.234rem either side of a 0.42rem dot is the
+    // 0.9rem the column gap used to hold, unchanged to the pixel.
+    margin: 0 0.234rem;
     color: $color-clear-text;
     font-weight: 400;
     -webkit-text-stroke: 0;
     pointer-events: none;
   }
 
-  // ...UNLESS THE WORD STARTS A ROW -- #698, Helen: "no dot before the first
-  // chip." The `& + &` rule above has always kept the dot off chip ONE; what it
-  // cannot see is the line break. `.drink-card-moods` wraps and holds two rows,
-  // and a wrapped chip carries its `::before` over the break with it, so the
-  // seam that reads correctly between two words on a line hangs off the left
-  // margin when the line ends between them. 61% of the drinks that carry a mood
-  // list are wide enough to wrap -- 76 of 124, measured, not guessed at;
-  // assets/js/chip-rows.js's header shows the arithmetic -- so this was the
-  // common case rather than a corner.
+  // NO RULE HERE ANY MORE, AND THE ABSENCE IS THE POINT -- #846, 2026-09-08.
   //
-  // THE CLASS IS A MEASUREMENT, NOT A FACT ABOUT THE DRINK -- chip-rows.js reads
-  // `offsetTop` and marks the chips that begin a row, exactly as card-name-fit.js
-  // marks the names that did not fit. CSS has no `:first-of-line`; that file's
-  // header records the two selector-only dodges that were tried and why the
-  // drink page's focus outline vetoed the better of them.
+  // A `& + &.is-row-start::before { display: none }` stood here from 2026-09-05
+  // until #846, suppressing the LEADING dot on a chip that began a row. #698
+  // needed it: "no dot before the first chip", and a wrapped chip carried its
+  // `::before` over the line break with it, hanging a bullet off the left
+  // margin. 76 of 124 drinks were wide enough to wrap, so it was the common
+  // case rather than a corner.
   //
-  // `display: none` rather than `content: ""`, so the word's own left edge lands
-  // flush with the row above it. An emptied inline-block would still spend its
-  // 0.28rem margin and indent every second row by a space nobody asked for.
-  //
-  // `is-` RATHER THAN A `--` MODIFIER, and the distinction is this file's own:
-  // `--mood` and `--hassle` say what a chip IS, come from taxonomy.yml and are
-  // true at build time. This says where a chip happens to have LANDED at this
-  // viewport width, and changes on resize -- the same kind of thing `.is-match`
-  // and `.btn-mood.is-on` are, so it is named the same way.
-  //
-  // WRITTEN AS `& + &`, matching the rule it overrides, because it has to beat
-  // it: `.drink-card-mood--row-start::before` alone is one class to that rule's
-  // two and would lose on specificity while looking perfectly correct. There is
-  // no case to cover outside `& + &` anyway -- a chip with no preceding sibling
-  // never had a dot to suppress.
-  & + &.is-row-start::before {
-    display: none;
-  }
+  // The dot is trailing now, so no chip has a leading one and there is nothing
+  // left to suppress. `assets/js/chip-rows.js`, which measured `offsetTop` to
+  // add that class, went with it -- one fewer measurement pass on the index,
+  // and one fewer of the three #828 is about.
 
   // A chip matching an active mood filter fills, the same treatment a matched
   // ingredient gets — but in MENTHE, because the mood filter is menthe and the
