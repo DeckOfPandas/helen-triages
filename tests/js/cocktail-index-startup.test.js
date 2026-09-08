@@ -168,10 +168,18 @@ test('the fixture uses the ids the script actually reaches for', () => {
   const r = boot({ drinks: DRINKS });
   const missing = wanted.filter(function (id) { return !r.doc.getElementById(id); });
 
-  // `drink-costs` and `shopping-list` belong to features this harness does not
-  // build; they are named here so the exemption is a decision rather than a
-  // gap that grew.
-  const NOT_BUILT = ['drink-costs', 'shopping-list', 'shopping-list-setall'];
+  // `drink-costs`, `drink-rates` and `shopping-list` belong to features this
+  // harness does not build; they are named here so the exemption is a decision
+  // rather than a gap that grew.
+  //
+  // THE TWO PRICE BLOCKS ARE ALSO ABSENT IN PRODUCTION, which is the stronger
+  // reason to leave them out: both sit behind `site.show_costs`, declared in
+  // _config_local.yml and nowhere else, so a page WITHOUT them is the deployed
+  // page and the null path is the one most readers get. `drink-top-ups` is
+  // deliberately NOT here — it is emitted ungated, so a page missing it is a
+  // real anomaly and the fixture carries the real rows (#746).
+  const NOT_BUILT = ['drink-costs', 'drink-rates', 'shopping-list',
+                     'shopping-list-setall'];
   const unexpected = missing.filter(function (id) { return NOT_BUILT.indexOf(id) === -1; });
   assert.deepStrictEqual(unexpected, [],
     'cocktail-index.js reaches for these ids and the fixture has none: ' +

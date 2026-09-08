@@ -162,16 +162,27 @@ bottles:
   "El Dorado 12 Year Old":
     generic: "aged Demerara rum"
     aliases: ["El Dorado 12 year old rum", "El Dorado 12"]
-  # EL DORADO 151 WAS HERE AND IS NOW IN `not_reached_for` -- Helen, 2026-09-05.
-  # It was the one bottle admitted on the strength of wanting it rather than
-  # owning it ("wanted counts as reached-for"), and she withdrew that: "I don't
-  # own it, I just wanted to, but it looks like it's hard to get."
+  # EL DORADO 151 IS BACK -- Helen, 2026-09-08 (#750), reversing her own
+  # withdrawal of 2026-09-05. Asked whether the category wanted a bottle at all
+  # now that the demand is two 15 ml pours, she named this one.
   #
-  # SO `overproof Demerara rum, lightly aged` NOW HAS NO BOTTLE AT ALL,
-  # which is a normal state -- 78 of the 154 categories in use are in it -- and not a reason to
-  # retire the generic. Two drinks still call for it (pic-a-de-crop-punch,
-  # zombie-intoxica) and Helen is rethinking both; the category is what those
-  # drinks want, whatever ends up filling it. costs.yml prices it as a category.
+  # WHAT CHANGED IS THE SIZE OF THE QUESTION, not her view of the bottle. She
+  # withdrew it saying "I don't own it, I just wanted to, but it looks like it's
+  # hard to get and I'll need to figure out my drinks in another way" -- and
+  # that was said about pic-a-de-crop-punch pouring 360 ml, the largest single
+  # pour in the collection. The 360 was a TYPO for 15 (she read the drink
+  # against Death & Co on 2026-09-07), so the whole category now amounts to
+  # 30 ml across two drinks, and "figure out my drinks another way" was solving
+  # a problem that did not exist.
+  #
+  # NO PRICE AND NO ABV YET, DELIBERATELY. Both are hers and neither is
+  # inferable: costs.yml goes on pricing the CATEGORY, which is what it did
+  # while there was no bottle, so nothing downstream changes until she supplies
+  # them. `bottle_rate` returns nil for a bottle with no `gbp`, and the shopping
+  # list falls back to the generic rate on its own.
+  "El Dorado 151":
+    generic: "overproof Demerara rum, lightly aged"
+    aliases: ["El Dorado 151 rum", "ED151"]
   "Skipper's":
     generic: "aged Demerara rum"
     aliases: ["Skippers dark rum", "Skippers"]
@@ -1094,16 +1105,6 @@ not_reached_for:
     it still does" -- and that had quietly stopped being true. Helen called the
     spelling "a bad typo from me" on 2026-09-04; if the bottle ever returns, so
     do the three aliases.
-  "El Dorado 151": >-
-    Clears the Demerara appellation and was listed here until 2026-09-05 on the
-    strength of being WANTED rather than owned -- the one bottle this file ever
-    admitted on that basis. Helen withdrew it: "I don't own it, I just wanted
-    to, but it looks like it's hard to get and I'll need to figure out my drinks
-    in another way." So the "wanted counts as reached-for" clause is gone with
-    it, and this list means what it always meant: what she would POUR. It leaves
-    `overproof Demerara rum, lightly aged` with no bottle behind it, which
-    two drinks still ask for -- pic-a-de-crop-punch, whose 360 ml was the single largest pour of
-    any bottle in the collection, and zombie-intoxica. Both are hers to rework.
   "Lemon Hart 151": >-
     Clears the Demerara appellation and is out anyway. Helen, 2026-08-27: "I
     don't like Lemon Hart 151, never mind whether or not I could get hold of it

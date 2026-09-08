@@ -312,7 +312,8 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
 // "moods off, decision made"). They are absent from `data-universe-parts` rather
 // than hidden here: the card's foot is simply not cloned, so there is nothing in
 // the DOM for a rule to switch off. If it is ever cloned again, universe.js will
-// need to call `HTF.markChipRows()` alongside `HTF.fitCardNames()` — see the
+// needed to call `HTF.markChipRows()` alongside `HTF.fitCardNames()` — that
+// pass was deleted by #846, so only the name fit remains; see the
 // note beside the attribute in cocktails/index.html.
 
 // =============================================================================

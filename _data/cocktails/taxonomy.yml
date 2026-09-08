@@ -230,6 +230,20 @@ moods:
   on fire: >-
     Something is set alight. Two drinks, and narrow is the point: a two-drink
     answer to "something on fire" is a good answer, not a failed filter.
+  easy peasy: >-
+    Equal parts of everything but the top, or three pours with no juicing and
+    nothing to make first. The far end of `I want to faff`, and a different
+    axis from `no juicing`: a drink can want juicing and still be easy peasy if
+    it is equal parts, which is how Long Island Iced Tea qualifies -- eight
+    ingredients, every one of them 12.5 ml, and only the cola different.
+    #845, Helen: "any cocktail with equal parts of all ingredients (bar maybe
+    bitters) should get the tag 'easy peasy' once we've made it" -- so it is
+    earned rather than derived, and an unmade drink does not get it however it
+    is built. She widened it on 2026-09-08 to cover the short pour-and-stir
+    drinks as well, which is what brings in the Negroni family.
+    A TOP OR A MIXER IS SET ASIDE, along with dashes and drops. Topping a glass
+    is not faff, and neither is opening a cola -- Julien Sorel and Anita's
+    Attitude Adjuster are in on her ruling, and Anita's is seven equal pours.
 
 # =============================================================================
 # WHAT THE DEFINITIONS ABOVE MEAN IN INGREDIENTS — the derivation's vocabulary
@@ -891,6 +905,11 @@ moods_by_hand:
   - festive
   - signature
   - so wrong it's right
+  # #775. Earned rather than derived -- Helen tags it once she has MADE the
+  # drink, which is a fact about her and not about the liquid, so no rule can
+  # produce it. It is also the one hassle that is not a cost: the other four
+  # say what a drink will ask of you, and this one says it will ask nothing.
+  - easy peasy
 
 mood_groups:
   mood:
@@ -914,6 +933,7 @@ mood_groups:
     - I want to faff
     - no juicing
     - on fire
+    - easy peasy
 
 chaos:
   definitely good: "ship is yes or oh gods yes"

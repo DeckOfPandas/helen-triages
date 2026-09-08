@@ -556,3 +556,315 @@ test('NOTHING THE COCKTAILS COLLECTION WRITES PARSES DIFFERENTLY', () => {
   assert.strictEqual(SL.parseAmount('to top'), null);
   assert.strictEqual(SL.parseAmount('to rinse'), null);
 });
+
+// --- a declared top is a volume, #746 -----------------------------------------
+// `to top (x3)` was the honest answer while nothing had told this file how much
+// a top pours. `top_up_ml` in _data/cocktails/costs.yml now does, at Helen's
+// request -- "We can calculate top volumes, well, slightly, can't we -- I'd
+// like that to be captured actually so it can be added into the shopping list
+// feature." So this is reading a declared number, not inventing a conversion,
+// which is the same standing `juice_yields` has.
+//
+// THE REAL DECLARED VALUES, so a test failure means the behaviour moved rather
+// than the fixture.
+
+const TOP_UPS = {
+  champagne: { ml_min: 75, ml_max: 100 },
+  prosecco: { ml_min: 75, ml_max: 100 },
+  'soda water': { ml_min: 100, ml_max: 150 }
+};
+
+test('a declared top becomes a volume range instead of a count', () => {
+  const rows = SL.build([ing('to top', 'champagne')], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, '75–100 ml');
+  assert.deepStrictEqual(rows[0].unquantified, []);
+});
+
+test('both ends of the range scale, so three glasses is three tops', () => {
+  const rows = SL.build([
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water')
+  ], { topUpMl: TOP_UPS });
+  // 3 x 100-150, not "to top (x3)" and not one top.
+  assert.strictEqual(rows[0].text, '300–450 ml');
+});
+
+test('a fixed pour and a top on the same generic widen one total', () => {
+  const rows = SL.build([
+    ing('45 ml', 'champagne'),
+    ing('to top', 'champagne')
+  ], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, '120–145 ml');
+  assert.strictEqual(rows[0].millilitres, 120);
+  assert.strictEqual(rows[0].millilitresMax, 145);
+});
+
+test('a generic with no declared top keeps the count reading', () => {
+  // The honest fallback, and #746 asks for it explicitly. `tonic water` is not
+  // in `top_up_ml`, so nothing here knows how much it pours.
+  const rows = SL.build([
+    ing('to top', 'tonic water'),
+    ing('to top', 'tonic water')
+  ], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, 'to top (×2)');
+});
+
+test('only a top phrase converts, however well declared the generic is', () => {
+  // `to rinse` on a generic that HAS a top_up_ml row must stay a count: the
+  // declared volume is what a top pours, and a rinse is a different act.
+  const rows = SL.build([ing('to rinse', 'champagne')], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, 'to rinse');
+  assert.strictEqual(rows[0].millilitres, 0);
+});
+
+test('a topped line sorts by volume now it has one', () => {
+  // Before #746 a `to top` line had no millilitres at all and fell into the
+  // alphabetical block below every measured pour. 300-450 ml of soda is one of
+  // the largest things on the list and now sorts like it.
+  const rows = SL.build([
+    ing('45 ml', 'gin'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water')
+  ], { topUpMl: TOP_UPS });
+  assert.deepStrictEqual(labels(rows), ['soda water', 'gin']);
+});
+
+test('the top is not fruit: a squeezed count reads the fixed pour only', () => {
+  // Nothing you squeeze is something you top, so this can never differ on real
+  // data -- but counting lemons for a volume of champagne would be the wrong
+  // answer if it ever did.
+  const yields = { 'lemon juice': { fruit: 'lemon', ml_min: 30, ml_max: 40 } };
+  const rows = SL.build([
+    ing('60 ml', 'lemon juice'),
+    ing('to top', 'lemon juice')
+  ], { juiceYields: yields, topUpMl: { 'lemon juice': { ml_min: 75, ml_max: 100 } } });
+  assert.strictEqual(rows[0].millilitres, 135);
+  // 60 ml of juice, not 135: the fruit count ignores the top. 60/40 rounds up
+  // to 2 lemons; 135 ml would have asked for 4.
+  assert.strictEqual(rows[0].fruit.fewest, 2);
+  assert.strictEqual(rows[0].fruit.most, 2);
+});
+
+test('amountRangeText collapses when the ends meet', () => {
+  assert.strictEqual(SL.amountRangeText(75, 100, 'ml'), '75–100 ml');
+  assert.strictEqual(SL.amountRangeText(100, 100, 'ml'), '100 ml');
+  // Pluralised off the top of the range, the number the word agrees with.
+  assert.strictEqual(SL.amountRangeText(1, 2, 'leaf'), '1–2 leaves');
+});
+
+test('an en dash, not a hyphen', () => {
+  // House style, and the same dash costs.yml's own `basis` strings use.
+  const rows = SL.build([ing('to top', 'champagne')], { topUpMl: TOP_UPS });
+  assert.ok(rows[0].text.includes('–'), rows[0].text);
+  assert.ok(!rows[0].text.includes('-'), rows[0].text);
+});
+
+// --- what a line costs, #820, and what the list costs, #817 -------------------
+// GBP per litre, resolved at build time by _plugins/cocktail_costs.rb and handed
+// over as a table. This file multiplies and never resolves: every rule about
+// what a generic costs -- the union of declared bottles, `default_bottles`
+// narrowing it, a squeezed juice priced from fruit and yield -- lives in the
+// plugin, and a second copy here would be a second thing to keep in step.
+//
+// THE RATES ARE THE REAL ONES, checked against _data/cocktails/costs.yml on
+// 2026-09-08, so a failure means behaviour moved rather than a fixture drifting.
+
+const RATES = {
+  generics: {
+    'London dry gin': [31.43, 31.43],
+    'lime juice': [6.0, 15.0],
+    'moderately aged rum': [22.0, 40.0],
+    mint: undefined
+  },
+  bottles: {
+    Tanqueray: 31.43,
+    Beefeater: 24.29,
+    'Havana Club 7': 40.0
+  }
+};
+
+test('a line is priced from its millilitres and a declared rate', () => {
+  const rows = SL.build([ing('420 ml', 'London dry gin')], { rates: RATES });
+  // 0.42 l x 31.43
+  assert.strictEqual(rows[0].price.text, '£13.20');
+  assert.strictEqual(rows[0].price.exact, true);
+});
+
+test('a generic that spans a range prices as a range', () => {
+  const rows = SL.build([ing('500 ml', 'lime juice')], { rates: RATES });
+  // 0.5 l x 6.00 to 0.5 l x 15.00
+  assert.strictEqual(rows[0].price.text, '£3.00–£7.50');
+});
+
+test('the named bottles beat the generic when every one is priced', () => {
+  // #820: "a range where suggested bottles are a range". Two drinks naming two
+  // gins price cheapest to dearest across those two, not across the category.
+  const rows = SL.build([
+    ing('200 ml', 'London dry gin', 'Tanqueray'),
+    ing('200 ml', 'London dry gin', 'Beefeater')
+  ], { rates: RATES });
+  // 0.4 l x 24.29 to 0.4 l x 31.43
+  assert.strictEqual(rows[0].price.text, '£9.72–£12.57');
+});
+
+test('one unpriced bottle sends the whole line back to the generic', () => {
+  // All or nothing on the named set: pricing from the priced ones only would
+  // report a range narrower than the truth -- more certain for knowing less.
+  const rows = SL.build([
+    ing('200 ml', 'London dry gin', 'Tanqueray'),
+    ing('200 ml', 'London dry gin', 'Some Undeclared Gin')
+  ], { rates: RATES });
+  assert.strictEqual(rows[0].price.text, '£12.57'); // the generic's rate
+});
+
+test('a generic with no rate carries no price, never a zero', () => {
+  const rows = SL.build([ing('8 leaves', 'mint')], { rates: RATES });
+  assert.strictEqual(rows[0].price, null);
+});
+
+test('a top-up range widens the price too', () => {
+  // The two features meet: 3 x 100-150 ml of a generic priced 1.00-2.00 a litre
+  // is 300-450 ml, so 30p to 90p.
+  const rows = SL.build([
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water')
+  ], {
+    topUpMl: TOP_UPS,
+    rates: { generics: { 'soda water': [1.0, 2.0] }, bottles: {} }
+  });
+  assert.strictEqual(rows[0].text, '300–450 ml');
+  assert.strictEqual(rows[0].price.text, '£0.30–£0.90');
+});
+
+test('no rates at all means no prices, and everything else is unchanged', () => {
+  const rows = SL.build([ing('420 ml', 'London dry gin')]);
+  assert.strictEqual(rows[0].price, null);
+  assert.strictEqual(rows[0].text, '420 ml');
+});
+
+test('the total is the sum of the lines above it', () => {
+  const rows = SL.build([
+    ing('420 ml', 'London dry gin'),
+    ing('500 ml', 'lime juice')
+  ], { rates: RATES });
+  const sum = SL.total(rows);
+  // 13.20 + 3.00, 13.20 + 7.50
+  assert.strictEqual(sum.text, '£16.20–£20.70');
+  assert.strictEqual(sum.priced, 2);
+  assert.strictEqual(sum.unpriced, 0);
+});
+
+test('the total counts what it could not price, rather than hiding it', () => {
+  // A bare figure would claim to be the cost of the shop and be short by
+  // whatever the unpriced lines are worth.
+  const rows = SL.build([
+    ing('420 ml', 'London dry gin'),
+    ing('8 leaves', 'mint')
+  ], { rates: RATES });
+  const sum = SL.total(rows);
+  assert.strictEqual(sum.text, '£13.20');
+  assert.strictEqual(sum.priced, 1);
+  assert.strictEqual(sum.unpriced, 1);
+});
+
+test('a list with nothing priceable has no total at all', () => {
+  const rows = SL.build([ing('8 leaves', 'mint')], { rates: RATES });
+  assert.strictEqual(SL.total(rows), null);
+});
+
+test('moneyText collapses when the ends meet, and always shows pennies', () => {
+  assert.strictEqual(SL.moneyText(13.2, 13.2), '£13.20');
+  assert.strictEqual(SL.moneyText(3, 7.5), '£3.00–£7.50');
+  // An en dash, like the drink page's own cost suffix.
+  assert.ok(SL.moneyText(3, 7.5).includes('–'));
+});
+
+// --- shelf order, #848 --------------------------------------------------------
+// Helen, 2026-09-08: "for cocktail shopping list, list items in shelf order then
+// volume", with her own nine shelves. The order is a walk round the shop, so it
+// is the OUTER sort key; the descending-volume rule she gave on 2026-09-04 is
+// unchanged and now orders within a shelf.
+
+const SHELVES = {
+  order: ['spirits', 'fortified', 'liqueurs', 'freshly squeezed fruit juice',
+          'bottled fruit juice', 'flavourings', 'sugar syrup', 'bitters', 'tops'],
+  of: {
+    'London dry gin': 'spirits',
+    'moderately aged rum': 'spirits',
+    'sweet vermouth': 'fortified',
+    'triple sec': 'liqueurs',
+    'lime juice': 'freshly squeezed fruit juice',
+    'sugar syrup 2:1': 'sugar syrup',
+    'aromatic bitters': 'bitters',
+    'soda water': 'tops'
+  }
+};
+
+test('shelf order beats volume, which is the whole of #848', () => {
+  // By volume alone this is soda, gin, vermouth, lime, syrup, bitters. By shelf
+  // the spirits lead and the soda goes last, however much of it there is.
+  const rows = SHELVES && SL.build([
+    ing('600 ml', 'soda water'),
+    ing('120 ml', 'London dry gin'),
+    ing('300 ml', 'sweet vermouth'),
+    ing('90 ml', 'lime juice'),
+    ing('60 ml', 'sugar syrup 2:1'),
+    ing('4 dashes', 'aromatic bitters')
+  ], { shelves: SHELVES });
+  assert.deepStrictEqual(labels(rows), [
+    'London dry gin', 'sweet vermouth', 'lime juice', 'sugar syrup 2:1',
+    'aromatic bitters', 'soda water'
+  ]);
+});
+
+test('within one shelf it is still descending volume', () => {
+  const rows = SL.build([
+    ing('30 ml', 'London dry gin'),
+    ing('90 ml', 'moderately aged rum')
+  ], { shelves: SHELVES });
+  assert.deepStrictEqual(labels(rows), ['moderately aged rum', 'London dry gin']);
+});
+
+test('a generic on no shelf sorts last, never first', () => {
+  // A gap in the data should be visible without being in the way.
+  const rows = SL.build([
+    ing('10 ml', 'something nobody has filed'),
+    ing('30 ml', 'London dry gin')
+  ], { shelves: SHELVES });
+  assert.deepStrictEqual(labels(rows),
+    ['London dry gin', 'something nobody has filed']);
+});
+
+test('the shelf is on the row, so a caller can group by it', () => {
+  const rows = SL.build([ing('30 ml', 'London dry gin')], { shelves: SHELVES });
+  assert.strictEqual(rows[0].shelf, 'spirits');
+});
+
+test('an unfiled generic carries a null shelf, not a guess', () => {
+  const rows = SL.build([ing('30 ml', 'unfiled')], { shelves: SHELVES });
+  assert.strictEqual(rows[0].shelf, null);
+});
+
+test('no shelves at all leaves the 2026-09-04 volume order alone', () => {
+  // The guarantee that made this safe to land: every pre-#848 caller and test
+  // describes what it always did.
+  const rows = SL.build([
+    ing('30 ml', 'London dry gin'),
+    ing('600 ml', 'soda water')
+  ]);
+  assert.deepStrictEqual(labels(rows), ['soda water', 'London dry gin']);
+});
+
+test('no topUpMl at all leaves every existing answer alone', () => {
+  // The guarantee that made this change safe to land: absent the option, this
+  // file behaves exactly as it did before #746.
+  const rows = SL.build([
+    ing('to top', 'champagne'),
+    ing('to top', 'champagne')
+  ]);
+  assert.strictEqual(rows[0].text, 'to top (×2)');
+  assert.strictEqual(rows[0].millilitres, 0);
+});
