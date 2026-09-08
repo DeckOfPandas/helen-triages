@@ -288,7 +288,7 @@ proposals:
   # THE TWO STRAW PROPOSALS ARE GONE, 2026-08-30, #573 -- resolved rather than
   # rejected. They sat here as QQ because moving them to `to_serve` was "a
   # wording decision rather than a relocation", and Helen made it: "Serve with
-  # a straw." is now `to_serve: "Straw."` on Mai Tai and Coney Park Swizzle,
+  # a straw." is now `to_serve: "Straw."` on Mai Tai and Coffey Park Swizzle,
   # and "Serve with two straws." is "Two straws." on Pic-a-de-Crop Punch --
   # matching the terse noun phrase the three existing values already use.
   #

@@ -1152,7 +1152,7 @@ unless stated.
   `generic:`; what makes them Martinican is their `suggestion:` list, and the
   bottle dictionary is what says those bottles are Martinique.
 
-  **What it settles for free**: `coney-park-swizzle` and `port-au-prince` stop
+  **What it settles for free**: `coffey-park-swizzle` and `port-au-prince` stop
   being mis-typed. Both pour Barbancourt as `rhum agricole vieux` behind a `QQ`
   admitting the guess — and under this ruling that typing is *correct*, because
   agricole is what the bottle is by production and where it is from lives
