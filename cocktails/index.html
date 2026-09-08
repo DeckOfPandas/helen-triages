@@ -912,6 +912,27 @@ permalink: /cocktails/
 }
   </script>
 
+  {% comment %} HOW MUCH A `to top` ACTUALLY POURS — #746.
+
+     NOT GATED, unlike the costs below, and that is deliberate: `top_up_ml`
+     lives in costs.yml because the costing needed it first, but it is a VOLUME,
+     not a price. "300–450 ml of soda water" is what the shopping list should
+     say on the deployed site as much as on this one, and nothing about it
+     reveals what anything costs.
+
+     THREE ROWS, so this is about 100 bytes. Emitted whole rather than picked
+     apart, because the shape the JS wants (`generic -> {ml_min, ml_max}`) is
+     exactly the shape the YAML already has.
+
+     WHY IT IS A RANGE. costs.yml's own header: "topping is not measuring. You
+     pour until the glass looks right, and the glass differs -- a flute takes
+     less than a collins." A single figure here would be the false precision
+     `juice_yields` refuses, and this follows that file's shape on purpose.
+     {% endcomment %}
+  <script type="application/json" id="drink-top-ups">
+    {{ site.data.cocktails.costs.top_up_ml | jsonify }}
+  </script>
+
   {% comment %} WHAT EACH DRINK COSTS A GLASS — LOCAL ONLY, and the whole block
      is absent on the deployed site because `site.show_costs` is declared in
      _config_local.yml and nowhere else. Same gate as the drink page's own cost

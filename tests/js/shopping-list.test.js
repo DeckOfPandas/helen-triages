@@ -556,3 +556,118 @@ test('NOTHING THE COCKTAILS COLLECTION WRITES PARSES DIFFERENTLY', () => {
   assert.strictEqual(SL.parseAmount('to top'), null);
   assert.strictEqual(SL.parseAmount('to rinse'), null);
 });
+
+// --- a declared top is a volume, #746 -----------------------------------------
+// `to top (x3)` was the honest answer while nothing had told this file how much
+// a top pours. `top_up_ml` in _data/cocktails/costs.yml now does, at Helen's
+// request -- "We can calculate top volumes, well, slightly, can't we -- I'd
+// like that to be captured actually so it can be added into the shopping list
+// feature." So this is reading a declared number, not inventing a conversion,
+// which is the same standing `juice_yields` has.
+//
+// THE REAL DECLARED VALUES, so a test failure means the behaviour moved rather
+// than the fixture.
+
+const TOP_UPS = {
+  champagne: { ml_min: 75, ml_max: 100 },
+  prosecco: { ml_min: 75, ml_max: 100 },
+  'soda water': { ml_min: 100, ml_max: 150 }
+};
+
+test('a declared top becomes a volume range instead of a count', () => {
+  const rows = SL.build([ing('to top', 'champagne')], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, '75–100 ml');
+  assert.deepStrictEqual(rows[0].unquantified, []);
+});
+
+test('both ends of the range scale, so three glasses is three tops', () => {
+  const rows = SL.build([
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water')
+  ], { topUpMl: TOP_UPS });
+  // 3 x 100-150, not "to top (x3)" and not one top.
+  assert.strictEqual(rows[0].text, '300–450 ml');
+});
+
+test('a fixed pour and a top on the same generic widen one total', () => {
+  const rows = SL.build([
+    ing('45 ml', 'champagne'),
+    ing('to top', 'champagne')
+  ], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, '120–145 ml');
+  assert.strictEqual(rows[0].millilitres, 120);
+  assert.strictEqual(rows[0].millilitresMax, 145);
+});
+
+test('a generic with no declared top keeps the count reading', () => {
+  // The honest fallback, and #746 asks for it explicitly. `tonic water` is not
+  // in `top_up_ml`, so nothing here knows how much it pours.
+  const rows = SL.build([
+    ing('to top', 'tonic water'),
+    ing('to top', 'tonic water')
+  ], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, 'to top (×2)');
+});
+
+test('only a top phrase converts, however well declared the generic is', () => {
+  // `to rinse` on a generic that HAS a top_up_ml row must stay a count: the
+  // declared volume is what a top pours, and a rinse is a different act.
+  const rows = SL.build([ing('to rinse', 'champagne')], { topUpMl: TOP_UPS });
+  assert.strictEqual(rows[0].text, 'to rinse');
+  assert.strictEqual(rows[0].millilitres, 0);
+});
+
+test('a topped line sorts by volume now it has one', () => {
+  // Before #746 a `to top` line had no millilitres at all and fell into the
+  // alphabetical block below every measured pour. 300-450 ml of soda is one of
+  // the largest things on the list and now sorts like it.
+  const rows = SL.build([
+    ing('45 ml', 'gin'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water'),
+    ing('to top', 'soda water')
+  ], { topUpMl: TOP_UPS });
+  assert.deepStrictEqual(labels(rows), ['soda water', 'gin']);
+});
+
+test('the top is not fruit: a squeezed count reads the fixed pour only', () => {
+  // Nothing you squeeze is something you top, so this can never differ on real
+  // data -- but counting lemons for a volume of champagne would be the wrong
+  // answer if it ever did.
+  const yields = { 'lemon juice': { fruit: 'lemon', ml_min: 30, ml_max: 40 } };
+  const rows = SL.build([
+    ing('60 ml', 'lemon juice'),
+    ing('to top', 'lemon juice')
+  ], { juiceYields: yields, topUpMl: { 'lemon juice': { ml_min: 75, ml_max: 100 } } });
+  assert.strictEqual(rows[0].millilitres, 135);
+  // 60 ml of juice, not 135: the fruit count ignores the top. 60/40 rounds up
+  // to 2 lemons; 135 ml would have asked for 4.
+  assert.strictEqual(rows[0].fruit.fewest, 2);
+  assert.strictEqual(rows[0].fruit.most, 2);
+});
+
+test('amountRangeText collapses when the ends meet', () => {
+  assert.strictEqual(SL.amountRangeText(75, 100, 'ml'), '75–100 ml');
+  assert.strictEqual(SL.amountRangeText(100, 100, 'ml'), '100 ml');
+  // Pluralised off the top of the range, the number the word agrees with.
+  assert.strictEqual(SL.amountRangeText(1, 2, 'leaf'), '1–2 leaves');
+});
+
+test('an en dash, not a hyphen', () => {
+  // House style, and the same dash costs.yml's own `basis` strings use.
+  const rows = SL.build([ing('to top', 'champagne')], { topUpMl: TOP_UPS });
+  assert.ok(rows[0].text.includes('–'), rows[0].text);
+  assert.ok(!rows[0].text.includes('-'), rows[0].text);
+});
+
+test('no topUpMl at all leaves every existing answer alone', () => {
+  // The guarantee that made this change safe to land: absent the option, this
+  // file behaves exactly as it did before #746.
+  const rows = SL.build([
+    ing('to top', 'champagne'),
+    ing('to top', 'champagne')
+  ]);
+  assert.strictEqual(rows[0].text, 'to top (×2)');
+  assert.strictEqual(rows[0].millilitres, 0);
+});

@@ -143,6 +143,12 @@
      the rest of the index is untouched. */
   var INGREDIENTS = readJson('drink-ingredients', 'the drinks’ own front matter', {});
 
+  /* HOW MUCH A `to top` POURS -- #746, `top_up_ml` from costs.yml. Present on
+     both sites, unlike the costs below: it is a volume rather than a price.
+     Absent, every `to top` keeps the `(×3)` count reading it had before, which
+     is why this can use `readJson`'s fallback without a special case. */
+  var TOP_UPS = readJson('drink-top-ups', '_data/cocktails/costs.yml', {});
+
   /* WHAT EACH DRINK COSTS A GLASS. LOCAL ONLY and USUALLY ABSENT: the block is
      emitted by cocktails/index.html behind `site.show_costs`, declared in
      _config_local.yml and nowhere else, so on the deployed site this is `{}`
@@ -580,7 +586,10 @@
       exclude: VOCABULARY.not_on_cards || [],
       bottleAliases: BOTTLE_ALIASES,
       // Declared in the same file, for the four juices you squeeze yourself.
-      juiceYields: VOCABULARY.juice_yields || {}
+      juiceYields: VOCABULARY.juice_yields || {},
+      // #746: champagne, prosecco and soda water declare what a top pours, so
+      // the list can say a volume instead of counting tops.
+      topUpMl: TOP_UPS
     });
 
     /* REBUILT WHOLE, not patched. It is at most a couple of dozen rows, it

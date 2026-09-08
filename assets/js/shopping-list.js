@@ -275,6 +275,31 @@
     return shown ? quantity + ' ' + shown : String(quantity);
   }
 
+  /* A RANGE, FOR A TOTAL THAT IS HONESTLY NOT ONE NUMBER (#746). Topping a
+     glass is not measuring -- `top_up_ml` declares champagne as 75-100 ml
+     because you pour until the glass looks right, and the glass differs. The
+     unit is pluralised off the TOP of the range, since that is the number the
+     word is agreeing with in "1-2 lemons".
+
+     An en dash, not a hyphen: house style, and the same dash `costs.yml`'s own
+     `basis` strings use. Collapses to the plain form when the two ends meet,
+     so a caller never has to ask which it is getting. */
+  function amountRangeText(low, high, unit) {
+    if (low === high) return amountText(low, unit);
+    if (unit === 'whole') return wholeText(low) + '–' + wholeText(high);
+    var shown = unitLabel(unit, high);
+    return shown
+      ? low + '–' + high + ' ' + shown
+      : low + '–' + high;
+  }
+
+  /* WHAT COUNTS AS A TOP, AND DELIBERATELY NOTHING ELSE. All nine topped pours
+     in the collection write exactly `to top`; this also accepts `to top up`
+     and tolerates case and spacing, and matches nothing else on purpose.
+     A phrase this does not recognise keeps the old `(x3)` reading, which is
+     the honest fallback for a pour nobody has declared a volume for. */
+  var TOP_UP = /^to\s+top(\s+up)?$/i;
+
   /* VULGAR FRACTIONS ARE NUMBERS, and food writes a great many of them --
      `½ tsp`, `¼–½ tsp`, `1½ tbsp`, `1¾ cups`, `⅛ tsp`. Every one of these
      returned null before #801 and was counted as an unquantified phrase, so
@@ -482,9 +507,13 @@
    *        bottle name, so one bottle written several ways is one bottle
    * @param {Object} [options.juiceYields] - generic -> {fruit, ml_min, ml_max},
    *        `juice_yields` from _data/cocktails/ingredients.yml
+   * @param {Object} [options.topUpMl] - generic -> {ml_min, ml_max}, `top_up_ml`
+   *        from _data/cocktails/costs.yml. Turns an unquantified `to top` into
+   *        a declared volume range (#746); absent, a top stays a count.
    * @returns {Array} one row per ingredient, sorted by label:
    *        { label, note, generic, bottles: string[],
-   *          totals: [{quantity, unit, text}], unquantified: [{text, drinks}],
+   *          totals: [{quantity, quantityMax, unit, text}],
+   *          unquantified: [{text, drinks}], millilitres, millilitresMax,
    *          text }
    */
   function build(entries, options) {
@@ -517,6 +546,14 @@
     var yields = {};
     Object.keys(opts.juiceYields || {}).forEach(function (generic) {
       yields[foldKey(generic)] = opts.juiceYields[generic];
+    });
+
+    /* Same folding, same reason: a top declared as `soda water` is found
+       however the drink capitalised it. Absent, every `to top` keeps the count
+       reading it has always had. */
+    var topUps = {};
+    Object.keys(opts.topUpMl || {}).forEach(function (generic) {
+      topUps[foldKey(generic)] = opts.topUpMl[generic];
     });
 
     var groups = {};
@@ -557,6 +594,13 @@
           bare: 0,
           units: {},
           unitOrder: [],
+          /* A TOP'S VOLUME RIDES BESIDE THE FIXED TOTAL, not inside it (#746).
+             45 ml of gin plus a 75-100 ml top is 120-145 ml, and that is two
+             numbers -- keeping the declared range separate is what lets the
+             row report the pair instead of picking one and calling it the
+             total. Both stay 0 for every generic nobody tops. */
+          topUpMin: 0,
+          topUpMax: 0,
           unquantified: {},
           unquantifiedOrder: []
         };
@@ -609,6 +653,31 @@
       } else {
         var text = String(entry.amount || '').trim();
         if (!text) return;
+
+        /* A DECLARED TOP BECOMES A VOLUME (#746). `shopping-list.js` refuses to
+           invent a conversion for an unquantified pour, and that is still the
+           rule -- what changed is that `top_up_ml` DECLARES one, at Helen's
+           request: "We can calculate top volumes, well, slightly, can't we."
+           So this is reading a number somebody wrote down, not guessing one,
+           which is the same standing `juice_yields` has two branches up.
+
+           BOTH ENDS SCALE. Three glasses of a 75-100 ml top is 225-300 ml, not
+           three tops. */
+        var topUp = TOP_UP.test(text) ? topUps[key] : null;
+        if (topUp) {
+          /* The row has to have an `ml` total to add a range to, and a generic
+             that is ONLY ever topped (soda water) has never seen a parsed
+             amount, so `ml` is not in the order yet. Seeding it at 0 is what
+             makes "100-150 ml" possible for a line with no fixed pour at all. */
+          if (group.units.ml === undefined) {
+            group.units.ml = 0;
+            group.unitOrder.push('ml');
+          }
+          group.topUpMin += (Number(topUp.ml_min) || 0) * scale;
+          group.topUpMax += (Number(topUp.ml_max) || 0) * scale;
+          return;
+        }
+
         if (group.unquantified[text] === undefined) {
           group.unquantified[text] = 0;
           group.unquantifiedOrder.push(text);
@@ -631,10 +700,25 @@
       var label = group.generic;
       var note = group.bottleNames.join(' / ');
 
+      /* The declared top only ever adds millilitres, so it only ever widens the
+         `ml` total; every other unit is the single number it always was. */
+      var mlFixed = tidy(group.units.ml || 0);
+      var mlMin = tidy(mlFixed + group.topUpMin);
+      var mlMax = tidy(mlFixed + group.topUpMax);
+
       var totals = group.unitOrder.map(function (unit) {
         var quantity = tidy(group.units[unit]);
+        if (unit === 'ml' && group.topUpMax > 0) {
+          return {
+            quantity: mlMin,
+            quantityMax: mlMax,
+            unit: unit,
+            text: amountRangeText(mlMin, mlMax, unit)
+          };
+        }
         return {
           quantity: quantity,
+          quantityMax: quantity,
           unit: unit,
           text: amountText(quantity, unit)
         };
@@ -645,9 +729,13 @@
       });
 
       /* HOW MANY LEMONS. Only ever from the ml total: the yields are declared in
-         millilitres, and "2 dashes of lemon juice" is not a fruit. */
-      var millilitres = group.units.ml || 0;
-      var fruit = fruitCount(tidy(millilitres), yields[foldKey(group.generic)]);
+         millilitres, and "2 dashes of lemon juice" is not a fruit.
+
+         FROM THE FIXED TOTAL, NOT THE TOPPED ONE. Nothing you squeeze is
+         something you top -- the four declared yields are the citrus juices --
+         so this can never differ today, and if a topped juice ever existed,
+         counting fruit for a volume of champagne would be the wrong answer. */
+      var fruit = fruitCount(mlFixed, yields[foldKey(group.generic)]);
 
       /* ONE STRING FOR THE WHOLE AMOUNT, built here rather than in the template,
          so that the copy-to-clipboard text and the rendered row can never say
@@ -665,7 +753,13 @@
         totals: totals,
         unquantified: unquantified,
         fruit: fruit,
-        millilitres: tidy(millilitres),
+        /* THE SORT AND THE CALLERS BOTH READ THE LOW END, which is why this
+           stays the single number it has always been: an untopped row has
+           `millilitres === millilitresMax` and nothing downstream changes.
+           Sorting on the low end means a topped line ranks by what you are
+           certain to pour rather than by the most it could be. */
+        millilitres: mlMin,
+        millilitresMax: mlMax,
         text: parts.join(' + ')
       };
     }).sort(function (a, b) {
@@ -693,6 +787,7 @@
     unitLabel: unitLabel,
     wholeText: wholeText,
     amountText: amountText,
+    amountRangeText: amountRangeText,
     // #801. Used by food-shopping-list.js only; see their own headers.
     splitParenthetical: splitParenthetical,
     fractionText: fractionText,
