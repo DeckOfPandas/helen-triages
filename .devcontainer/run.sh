@@ -2,10 +2,16 @@
 # Runs the sandboxed devcontainer for this project. Save this file,
 # chmod +x it yourself, then just run it -- no arguments needed.
 #
-# Reads GH_TOKEN from .claude/settings.local.json just for the duration
-# of this one `docker run`, without ever printing it, writing it
-# anywhere else, or exporting it into your persistent shell environment.
-# Builds the image itself on first run if it doesn't exist yet.
+# Reads GH_TOKEN and AGENT_GH_TOKEN from .claude/settings.local.json just
+# for the duration of this one `docker run`, without ever printing them,
+# writing them anywhere else, or exporting them into your persistent shell
+# environment. GH_TOKEN is Helen's own fine-grained token (issues/PRs,
+# public-repo only, no push). AGENT_GH_TOKEN is DeckOfPandas-agentic's
+# classic repo-scoped token -- a separate GitHub account, invited as a
+# collaborator on just these three repos, so it can push and open PRs
+# under its own identity without ever touching Helen's SSH keys or
+# widening her personal token's scope. Builds the image itself on first
+# run if it doesn't exist yet.
 
 set -euo pipefail
 
@@ -40,12 +46,14 @@ DOTFILE_MOUNTS=()
 [ -f "$HOME/.gitconfig" ] && DOTFILE_MOUNTS+=(-v "$HOME/.gitconfig:/home/helen/.gitconfig:ro")
 
 GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['GH_TOKEN'])")" \
+AGENT_GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['AGENT_GH_TOKEN'])")" \
 docker run -it --rm \
   -v "$REPO_ROOT:/workspace" \
   -v helen-triages-claude-config:/home/helen/.claude \
   -v "$BUNDLE_VOLUME:/home/helen/.bundle-cache" \
   "${DOTFILE_MOUNTS[@]}" \
   -e GH_TOKEN \
+  -e AGENT_GH_TOKEN \
   -p 4001:4001 \
   -p 4002:4002 \
   -w /workspace \
