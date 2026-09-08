@@ -2124,6 +2124,55 @@ unless stated.
     proposed, better; **so the correct amount of `CLAUDE.md` for this session
     to write was none.**
 
+- **2026-09-08 — step 1 splits: in the devcontainer Claude commits and Helen
+  pushes.** One day after the ask was removed entirely, the container turned
+  out not to be able to push at all, for two independent reasons neither of
+  which is fixable from inside: `origin` is SSH and the image has no GitHub
+  host key (**`Host key verification failed`** on every SSH git operation,
+  `git fetch origin main:main` included), and the fine-grained PAT carries no
+  `Contents` scope, so the HTTPS fallback is **403 `Permission to
+  DeckOfPandas/helen-triages.git denied`** — the token behaving exactly as
+  §9.1's measured table says it should.
+
+  Helen: *"Because you're in docker, I won't give you a GitHub host key. Make
+  your changes, then tell me which branches to push and I'll push them -- I
+  always review locally anyway so this isn't really an extra step as otherwise
+  I'd only pull from what you pushed before I merged."*
+
+  **This is an environment fact, not a reversal of 2026-09-07.** Step 1 stands
+  wherever pushing works. What is new is 1a: name the branch, give her the
+  command, and go on opening and maintaining the PR — which still works,
+  because a PR needs `Pull requests: write` and not `Contents`.
+
+  **`/workspace` is a BIND MOUNT of Helen's own checkout**, which is what makes
+  this cheap and was got wrong before it was got right: a commit is already in
+  her tree the moment it is made, so nothing travels and nothing is stranded.
+  An unpushed commit here should never be described as trapped.
+
+  **A fetch, unlike a push, has a working substitute** — the HTTPS URL needs no
+  credentials at all on a public repo and fast-forwards `main` exactly as the
+  SSH form does.
+
+- **2026-09-08 — the shared checkout, and the second reason to check the branch
+  before committing.** The bind mount means another session, or Helen, moving
+  the checkout moves the ground under a running Claude with no signal. In one
+  session the branch went `main` → `docs/bash-friction-followups` →
+  `chore/devcontainer-per-worktree-bundle-cache` → `docs/multiline-arg-friction`,
+  none of them that session's, and an uncommitted `DECISIONS.md` edit rode
+  along into somebody else's branch. **The pre-commit `git branch
+  --show-current` check caught it**, which is the first time that rule has
+  earned its keep for a reason other than the one it was written for: the
+  question it answers is not only *am I on `main`* but *am I still where I left
+  off*, and the answer can be no when nothing you did changed it.
+
+  **This is the 2026-08-16 stranding again** — an agent lost when Helen ran
+  `git checkout main` and pulled — and the answer has moved on. That day it was
+  *one agent at a time*; 2026-09-07 replaced that with worktrees plus an
+  orchestrating Claude, which is what let the push ask be dropped. What this
+  showed is that the guarantee only holds when **every** session is actually in
+  a worktree, and `/workspace` is not one. Helen: *"I'll run Claudes in
+  worktrees going forwards."*
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
