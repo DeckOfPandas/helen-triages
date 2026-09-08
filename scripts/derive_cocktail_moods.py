@@ -126,7 +126,7 @@ def hits_in(text, words):
     """OCCURRENCES of any of `words` in `text`, not distinct words matched.
 
     The difference is load-bearing: `I want to faff` wants two or more faff
-    MOMENTS, and Coney Park Swizzle swizzles twice while Mastiha Mojito churns
+    MOMENTS, and Coffey Park Swizzle swizzles twice while Mastiha Mojito churns
     twice. Counting distinct words scores both at one and drops a mood each.
     Caught by diffing against the stored values, not by reading the code.
     """
@@ -364,6 +364,16 @@ def expected_moods(slug, drink, stored, taxonomy, sets,
     moods = derive(drink, sets, step_words, families)
     moods += [m for m in include if m not in moods]
     moods += [m for m in stored if m in by_hand and m not in moods]
+
+    # ONE MOOD CANCELS ANOTHER -- #853, and it runs AFTER the hand-assigned
+    # moods are folded in, because the mood doing the cancelling is one of
+    # them. `easy peasy` removes `I want to faff`: Helen has called the drink
+    # easy, and the nine-ingredient half of the faff rule counts INGREDIENTS
+    # where the mood means OPERATIONS. The pairs live in taxonomy.yml.
+    for winner, losers in (taxonomy.get("mood_suppresses") or {}).items():
+        if winner in moods:
+            moods = [m for m in moods if m not in losers]
+
     moods = [m for m in moods if m not in exclude]
     # taxonomy.yml's own order, so a diff is about membership, never sequence
     return [m for m in (taxonomy.get("moods") or {}) if m in moods]
