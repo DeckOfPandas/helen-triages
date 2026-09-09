@@ -151,6 +151,38 @@ unless stated.
   shelf already renders on the rum reference page), #798. **Merged:** #605 into
   #337, #821 into #642.
 
+- **2026-09-09 — a separate ARCHITECTURE log was considered and declined, and
+  the reason is the numbering rather than taste.** Helen, offering it: *"I know
+  we've mostly used that for design decisions so far -- so if you think it's
+  best then maybe start an architecture log? Fine either way."*
+
+  **The environment content already has three homes, all of them established.**
+  `§1 How to run it` is the smallest section in this file and the container is
+  how you run it. MANUAL's `§11` already sub-numbers the machinery — `§11.-1`
+  the branch workflow and the second hook, `§11.0` the destructive-git hook,
+  `§11.0.1` more than one agent shares this checkout. And `§11.2` is *"Do not
+  trust this document over the code"*, which is the exact subject of the
+  commit-message-versus-diff lesson recorded there today. A fourth document
+  would be inventing a home for content that has three.
+
+  **`§11.1` is also taken** — a file with a colon in its name crashes the build
+  — so an "architecture" section could not even take the obvious number without
+  breaking what §0 promises above: the numbers are v26's, unchanged, so every
+  `MANUAL §n` in a code comment resolves here.
+
+  **And the cost of a fourth file is paid at every session start.**
+  `START_A_SESSION.md` says read these three, in this order. A fourth adds a
+  "which file does this go in?" decision to every future ruling, whose honest
+  answer would often be "both" — which is how a document set starts drifting,
+  the failure this file already records twice (the v26 split, and #755/#787's
+  maps going stale within a day).
+
+  **What WOULD justify one**: a genuinely separate audience. The three
+  documents split by WHO READS THEM — `CLAUDE.md` is rules for an agent,
+  `MANUAL.md` is the present tense, this is the reasoning. Environment rulings
+  have the same reader as everything else here, so they are not a fourth
+  audience; they are more §1.
+
 ## §1 How to run it
 
 - **2026-08-29** — `.node-runtime/` and `.gh-runtime/` do not come with a
@@ -174,6 +206,42 @@ unless stated.
   it is a missing `known_hosts` entry in the image.
 
 ---
+
+- **2026-09-09 — the devcontainer keeps three fixes and loses the worktree
+  machinery.** Distilled from `chore/devcontainer-multi-worktree`, which is NOT
+  merged and should not be.
+
+  **Ports: 4999/5000 outside, 4001/4002 inside.** Helen: *"I'll always need to
+  build the site locally from any branch so I'd expect to do so from outside
+  the container, but inside the worktree, given it's bound... make it 4999 and
+  5000 or something I'll never use."* The old `-p 4001:4001` was not merely
+  useless but **actively in her way**: a running container HELD the host's own
+  4001, so her `jekyll-local` could not bind it. The inside pair stays 4001/4002
+  because the image's aliases serve there — though nothing listens today, the
+  image carrying no jekyll, which is the same gap that stops `verify.py`
+  running in the container.
+
+  **`REPO_ROOT` comes from `--git-common-dir`, not `--show-toplevel`.** A real
+  bug: `run.sh` is a TRACKED file, so a copy sits in every worktree, and
+  `--show-toplevel` resolves to whichever one you are standing in — running it
+  from `.claude/worktrees/foo` mounted THAT worktree as `/workspace` instead of
+  the primary clone.
+
+  **The container has a fixed name, so a second run is refused.** Without
+  `--name`, `docker run` invents one each time and two terminals gave two
+  containers on ONE bind mount — the trampling of 2026-09-08, when a session's
+  branch moved under it four times. Docker refuses a duplicate name outright.
+  It does NOT guard host-versus-container; a worktree is still the answer for
+  running several Claudes at once (§11.0.1).
+
+  **What was rejected, and why it is not merely unfinished.**
+  `enter-worktree.sh` creates worktrees INSIDE the container, because git
+  stores worktree pointers as absolute paths and `/workspace` in here is not
+  `/home/helen/projects/...` out there. Its own header states the trade: a
+  container-made worktree cannot be used from the host, and the 21 host-made
+  ones report as `prunable` inside. That is a second, parallel worktree
+  namespace rather than a unification, and Helen runs Claudes in HOST
+  worktrees — so it buys nothing she needs, for 179 lines.
 
 ## §2 The mono-repo shape
 
@@ -839,6 +907,41 @@ unless stated.
   `to-promote/`, where the move is how Helen claims it.
 - **2026-09-05** — 108 drinks with all three `false`, 16 `rewritten: true` (all
   staged), none proofread, 22 staged — a worklist snapshot.
+
+- **2026-09-09 — the first sixteen are not stranded, and the branch holding
+  them must not be merged (#864).** All sixteen are alive in
+  `_cocktail_drafts/to-promote/`, and the drafts beat
+  `worktree-opus-cocktail-data`'s promoted copies on every field that differs:
+  list `suggestion`s where the branch has scalars, canonical bottle names where
+  it has aliases, `serve:` blocks it lacks entirely, `{label, text}` notes,
+  richer methods.
+
+  **The taglines are the sharp case and the timestamps settle it.** Every
+  promoted copy carries a different tagline, and the promoted ones read like an
+  agent's — *"The Manhattan's less famous neighbour: drier, and with a bitter
+  edge."* against the draft's *"Achingly cool. You're either this or PBR."*
+  Promotion was 17:55; the drafts commit titled *"sixteen drinks into
+  to-promote/, exactly as Helen wrote them"* was 20:48. **The drafts are three
+  hours newer, so merging the branch would overwrite sixteen of her own
+  taglines with an agent's.**
+
+  **Everything else on it is superseded too**: its `bottles.yml` is 727 lines
+  SMALLER than main's, and the three ratings she revised to `oh gods yes` are
+  already in the drafts — checked, not assumed.
+
+  **What stands between the sixteen and the live site is one proofread.**
+  Measured against the gate and against the extra bar that promotion set
+  itself: 16 of 16 have no `QQ`, a written tagline, a real rung on
+  `ship_scale`, `rewritten: true`, `awaiting_fix: false` and every `suggestion`
+  a list. 16 of 16 say `proofread: false`. That is step 5 of
+  `PUBLISHING_A_DRINK.md` and it is hers alone.
+
+  **Why the batch stalled, which its own document predicted.** Promotion ran
+  while the proofread was still in progress — the promotion commit says so in
+  its body — and `PUBLISHING_A_DRINK.md` puts promotion at step 6, AFTER the
+  proofread at step 5, noting of this very batch that "the promotion order is
+  what made this land in two repos instead of one". The document was written
+  the same day, out of this.
 
 ### §9.2 / §9.2.1 The sources
 
@@ -2371,6 +2474,27 @@ unless stated.
   spans and quoted-delimiter heredocs. A first draft also denied
   `echo "${GH_TOKEN:+set}"`, the very probe the rule recommends; the 18-case
   pipe-test caught it before the hook was wired to anything.
+
+- **2026-09-09 — A COMMIT MESSAGE IS A DOCUMENT. THE DIFF IS THE CODE.** §11.2
+  says do not trust this document over the code; the same applies to any prose
+  about a change, including an excellent commit message, and this is the day
+  that cost something.
+
+  `chore/devcontainer-multi-worktree` carries a long, careful, well-argued
+  message describing verified end-to-end testing. On the strength of it alone
+  this session recommended merging the branch. **Reading the diff the next turn
+  showed its `run.sh` DELETES the two lines that read and pass
+  `AGENT_GH_TOKEN`** — because the branch predates that token. Merging it would
+  have silently removed the container's ability to push, the capability being
+  used to push at the time. Its `CLAUDE.md` was stale the same way, still
+  asserting the container cannot push.
+
+  **The message was not wrong; it was TRUE ON THE DAY and the world moved.**
+  That is the failure mode to expect from a branch that sat for four days, and
+  no amount of care in the writing protects against it. **Read the diff of any
+  branch you are about to recommend, and diff it against TODAY's main rather
+  than against its own merge base** — `git diff main..branch` is what showed
+  the deletion, where `git show branch` alone would not have.
 
 ### §11.2 The record of this file being wrong
 
