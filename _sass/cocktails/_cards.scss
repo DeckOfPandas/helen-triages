@@ -683,13 +683,35 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // ingredient line lives. Three chip rows cost 66px, still under the 68.5px the
 // old shape reserved unconditionally, so no card is worse off than it was.
 //
-// THE COST, AND IT IS REAL: the ship now takes horizontal room from EVERY chip
-// row rather than none, because a flex row cannot narrow only its last line.
-// The ship is "MEH" at about 4rem and "OH GODS YES" at about 8, so a long
-// verdict on a chip-heavy drink may wrap one word further than it used to.
-// Flagged rather than hidden -- it is the kind of thing to judge on the real
-// index, and if it reads badly the answer is to float the ship inside a
-// non-flex chip row, which is a bigger change to a recently-debugged area.
+// THAT COST WAS REAL AND IS NOW PAID OFF -- #760, 2026-09-09. While the ship
+// was a flex SIBLING it took horizontal room from EVERY chip row rather than
+// none, because a flex row cannot narrow only its last line: "MEH" is about
+// 4rem and "OH GODS YES" about 8, so a chip-heavy drink wrapped a word early on
+// rows that had no ship on them at all. Helen, 2026-09-08: "chip lines above
+// the lowest do seem to wrap early."
+//
+// THE SHIP IS OUT OF FLOW NOW, absolutely positioned at the foot's bottom
+// right, so `.drink-card-moods` is the foot's only flex item and gets the FULL
+// width on every row. That is exactly the complaint, and nothing else changes:
+// the foot is still as tall as the chips, still bottom-anchored, still
+// bottom-aligned with the ship.
+//
+// THE RESIDUE, AND IT IS MASKED RATHER THAN PREVENTED. Rows 1..n-1 now have the
+// whole width; the LAST row can run underneath the ship, because nothing
+// reserves space for an out-of-flow box. So the ship carries the card's own
+// `$color-surface` behind it and a gutter of left padding: a chip that reaches
+// it is covered rather than overlapping it, which reads as the chip being cut
+// off at the verdict instead of as two words printed on top of each other.
+// The card's background does not change on hover -- only the ::after strips and
+// the text colours do -- so the mask cannot go out of step with it.
+//
+// WHY NOT THE FLOAT THIS ISSUE ORIGINALLY PROPOSED. A float reserves space from
+// the TOP of its block downwards: placed first it wraps the chips around row
+// ONE, placed last nothing flows around it at all and it is pushed to a new row
+// when the chips leave no space -- where `overflow: hidden` deletes it, so the
+// busiest cards would silently lose their verdict. The proper bottom-right
+// float hack needs the container's height to be KNOWN, and ours is one, two or
+// three rows depending on the drink. Tried and reported on the issue, 2026-09-08.
 .drink-card-foot {
   position: absolute;
   // Same gutter as the body above, so the title and the foot share one left
@@ -744,6 +766,11 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   // ship sat BELOW them; the ship is now beside them and the foot's `gap` does
   // that job on the other axis. Leaving it would lift the chips off the ship's
   // baseline, which is the alignment the whole change is for.
+  //
+  // SINCE #760 THIS IS THE FOOT'S ONLY FLEX ITEM -- the ship is out of flow --
+  // so `1 1 auto` now means the full width on every row, which was the point.
+  // The declaration is kept rather than dropped because it is what makes the
+  // chips fill the foot rather than shrink to their content.
   flex: 1 1 auto;
 }
 
@@ -1028,9 +1055,29 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // publish, a mark with no word became a rating that says nothing. The word is
 // punctuation rather than a sixth term, which is the whole of why it is safe.
 .drink-card-ship {
+  // OUT OF FLOW SINCE #760, 2026-09-09 -- see `.drink-card-foot` for the whole
+  // argument. As a flex sibling it narrowed every chip row; absolute, it
+  // narrows none. The foot is itself positioned, so it is the containing block,
+  // and `right: 0` lands on the foot's right edge, which is already inset by
+  // the card's `$card-pad-x`.
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  // THE MASK, and it is why a chip running under the verdict reads as a chip
+  // cut off rather than as two words overprinted. `$color-surface` is the
+  // card's own background and does not change on hover (only the ::after
+  // strips and the text colours do), so this cannot go out of step with it.
+  // The padding is the card's gutter, so a masked chip stops a sensible
+  // distance from the word rather than hard against it.
+  background: $color-surface;
+  padding-left: $card-gutter;
+  // The ship is after the chips in the DOM, so it paints above them without a
+  // z-index. Said rather than relied on silently: reordering the markup would
+  // put the chips on top and the mask would stop working.
   // `flex: none` so the verdict never shrinks or wraps: it is `white-space:
   // nowrap` below, and a flex item that is allowed to shrink below its content
-  // would overflow rather than compress. The chips take what is left.
+  // would overflow rather than compress. Kept even out of flow -- it costs
+  // nothing and survives the rule being moved back into flow one day.
   flex: none;
   display: flex;
   align-items: center;

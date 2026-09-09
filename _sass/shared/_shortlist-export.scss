@@ -1,0 +1,102 @@
+// =============================================================================
+// THE SHORTLIST EXPORT PANEL — GitHub issue #849. BOTH SITES.
+// =============================================================================
+// Helen, 2026-09-08: "allow me to export my food or cocktail shortlist as a
+// YAML/JSON dump -- can be just a text area at the bottom of the page."
+//
+// WHY THIS IS IN shared/ AND THE SHORTLIST ITSELF IS NOT. `food/_shortlist.scss`
+// and `cocktails/_shortlist.scss` are forked on purpose: a shortlist control on
+// a recipe ROW and one in a drink CARD's corner are different objects in
+// different layouts, and #546 decided that. This panel is not -- it is one
+// disclosure, one hint and one textarea, identical on both indexes, emitted by
+// one script from one block of markup that is copied verbatim between the two
+// index templates. Forking it would be three declarations duplicated for no
+// difference, which is exactly what MANUAL §2.5 means by "shared" being a claim
+// about markup, cascade AND assets together.
+//
+// WHICH VARIABLES IT MAY USE, and this was checked rather than assumed --
+// MANUAL §12: "you will assume you know how many stylesheets import shared/.
+// Grep." The spacing scale IS in shared/_tokens.scss. THE COLOURS AND THE
+// FACES ARE NOT: `$color-text`, `$color-border`, `$color-surface`,
+// `$color-clear-text` and `$font-label` are declared separately in
+// `food/_palette.scss` and `cocktails/_palette.scss`, under the same names with
+// the same roles -- which is the palette contract of §2.3, and is exactly what
+// lets a shared partial name them. Both stylesheets import their own palette
+// FIRST (line 11 of each), so the values are in scope by the time this is read.
+//
+// THERE IS NO `$font-mono`, and reaching for one is the obvious mistake here.
+// `$font-label` is IBM Plex Mono on both sites and is the monospace face this
+// repo actually has.
+//
+// `assets/css/longform-demo.scss` imports neither palette in full and does NOT
+// import this -- it takes only tokens and rule, which is why adding this to the
+// two site stylesheets is the whole change.
+// =============================================================================
+
+// SITS UNDER THE SHOPPING LIST AND READS AS A FOOTNOTE TO IT. The same
+// top-border-and-space idiom `.shopping-list` uses, one step quieter: this is a
+// hatch, not part of choosing what to cook or drink.
+.shortlist-export {
+  margin: $space-xl 0 0;
+  padding-top: $space-md;
+  border-top: 1px solid $color-border;
+}
+
+// THE DISCLOSURE'S OWN WORD, in the label face so it reads as chrome rather
+// than as content. `cursor: pointer` because a summary does not get one on its
+// own in every browser, and a control that does not look clickable is one
+// Helen will not find at the bottom of a long index.
+.shortlist-export > summary {
+  font-family: $font-label;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+  cursor: pointer;
+}
+
+.shortlist-export-hint,
+.shortlist-export-empty {
+  margin: $space-sm 0 0;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+}
+
+// MONOSPACE, AND THAT IS NOT DECORATION: this holds JSON, and a proportional
+// face makes a nested structure unreadable at exactly the moment somebody is
+// checking whether it copied whole. `resize: vertical` because a long list
+// wants more rows and nobody wants it wider than the column.
+.shortlist-export-box {
+  display: block;
+  width: 100%;
+  margin-top: $space-sm;
+  padding: $space-sm;
+  box-sizing: border-box;
+  font-family: $font-label;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  resize: vertical;
+  // The box is READONLY (#850 is where pasting one back in is specified), so it
+  // must still be focusable and selectable -- that is the whole feature on a
+  // phone, where select-all is how it gets copied.
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+// SHIPS `hidden` AND shortlist-export.js REVEALS IT, so a browser where the
+// script did not run never shows a copy button that does nothing. Same rule as
+// `.btn-print` and `.btn-shortlist`.
+.btn-shortlist-copy {
+  margin-top: $space-sm;
+  font-family: $font-label;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+  background: none;
+  border: 1px solid $color-border;
+  padding: $space-xs $space-sm;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible { color: $color-text; }
+}

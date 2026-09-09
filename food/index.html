@@ -620,6 +620,33 @@ permalink: /food/
   <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
 </section>
 
+{% comment %} THE SHORTLIST AS TEXT YOU CAN COPY -- #849. The cocktails index
+   carries the identical block and the same argument: a `<details>` because it
+   is a hatch rather than part of choosing what to cook, shipping `hidden` so a
+   browser where the script did not run cannot show an empty box that looks like
+   an answer, and readonly because #850 is where pasting one back IN is
+   specified.
+
+   ONE SCRIPT SERVES BOTH SITES. shortlist-export.js finds
+   `[data-shortlist-export]` and does not care which index it is on, exactly as
+   shortlist.js does with `.btn-shortlist`. {% endcomment %}
+<details class="shortlist-export" data-shortlist-export-panel hidden>
+  <summary>Export shortlist</summary>
+  <p class="shortlist-export-hint">
+    Copy this and keep it, or paste it somewhere else. It holds what is
+    shortlisted and how many portions of each.
+  </p>
+  <p class="shortlist-export-empty" data-shortlist-export-empty hidden>
+    Nothing is shortlisted, so this is an empty list.
+  </p>
+  <textarea class="shortlist-export-box" data-shortlist-export rows="12"
+            readonly spellcheck="false"
+            aria-label="Your shortlist as JSON"></textarea>
+  <button type="button" class="btn-shortlist-copy" data-shortlist-copy hidden>
+    copy
+  </button>
+</details>
+
 {% comment %} WHAT EACH RECIPE IS MADE OF, AND HOW MANY IT FEEDS -- #801.
 
    IT HAS TO BE EVERY RECIPE, not the shortlisted ones: the shortlist lives in
@@ -712,3 +739,8 @@ permalink: /food/
 <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>
+{% comment %} #849. ORDER DOES NOT MATTER for this one, unlike the two above it:
+   it reads HTF.shortlist at run time rather than lifting helpers off another
+   module at startup, and it subscribes to an event rather than being called by
+   anybody. Last so it is obvious it is nobody's dependency. {% endcomment %}
+<script src="{{ '/assets/js/shortlist-export.js' | relative_url }}"></script>

@@ -58,6 +58,13 @@
 // own %shortlist-mark and @extends nothing from anywhere else, so this is the
 // only ordering constraint it has.
 @import "food/shortlist";
+// The export panel (#849), SHARED because it is one disclosure and one textarea
+// and is identical on both indexes -- unlike the shortlist CONTROLS above,
+// which are forked because a control on a recipe row and one in a drink card's
+// corner are different objects. It names palette variables ($color-surface,
+// $font-label) and so must come after food/palette, which it does: that is
+// line 11 of this file. See _sass/shared/_shortlist-export.scss's own header.
+@import "shared/shortlist-export";
 // The shopping list (#801), after shortlist: it is the shortlist's own panel
 // and is read as part of that feature, and it defines its own
 // %food-number-input rather than extending anything above, so this is the only
