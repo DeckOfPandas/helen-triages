@@ -869,7 +869,10 @@ generics:
   navy strength gin:  { gbp_per_litre_min: 42.86, gbp_per_litre_max: 57.14, basis: "GBP 30-40 / 70cl", confidence: medium }
   apple schnapps:     { gbp_per_litre_min: 22.86, gbp_per_litre_max: 31.43, basis: "GBP 16-22 / 70cl", confidence: low }
   crème de cassis:    { gbp_per_litre_min: 22.86, gbp_per_litre_max: 34.29, basis: "GBP 16-24 / 70cl", confidence: medium }
-  pineapple vodka:    { gbp_per_litre_min: 28.57, gbp_per_litre_max: 37.14, basis: "GBP 20-26 / 70cl", confidence: low }
+  # HELEN'S OWN FIGURE, 2026-09-09: "I have Ciroc, GBP 31, 37.5%." My guess was
+  # GBP 20-26, so the range was about 20% under. 70cl assumed -- the size she
+  # did not state and the one every other row here uses.
+  pineapple vodka:    { gbp_per_litre_min: 44.29, gbp_per_litre_max: 44.29, basis: "GBP 31 / 70cl", confidence: high }
   aguardiente:        { gbp_per_litre_min: 25.71, gbp_per_litre_max: 37.14, basis: "GBP 18-26 / 70cl", confidence: low }
   kirschwasser:       { gbp_per_litre_min: 42.86, gbp_per_litre_max: 62.86, basis: "GBP 30-44 / 70cl", confidence: low }
 

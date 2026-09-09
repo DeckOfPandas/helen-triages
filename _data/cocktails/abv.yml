@@ -379,10 +379,17 @@ generics:
                             qq: "Fir liqueurs run 25 to 45 and I could not tell which bottle this is." }
   tomato liqueur:         { abv: 20,   confidence: low,
                             qq: "No idea what bottle this is -- it is one pour and it needs your label." }
-  Swedish flaggpunsch:    { abv: 26,   confidence: medium }
+  # Helen confirmed 26 on 2026-09-09, reading this block: "Swedish Flaggpunsch
+  # is correct." Guess promoted to a checked figure.
+  Swedish flaggpunsch:    { abv: 26,   confidence: high }
   overproof Demerara rum, lightly aged: { abv: 57,   confidence: medium }
-  pineapple vodka:        { abv: 37.5, confidence: low,
-                            qq: "An infusion? If it is homemade the strength is the base spirit's, minus a little." }
+  # Helen answered the qq on 2026-09-09: "I have Ciroc, GBP 31, 37.5%." So it is
+  # a commercial bottle and not an infusion, and 37.5 was right. The bottle
+  # itself is NOT declared in bottles.yml yet -- "Ciroc" alone is a house, and
+  # this file's own rule is that a house is not a bottle, so it needs her
+  # product name before it can be entered. Until it is, the category carries the
+  # figure, which is why this row stays here.
+  pineapple vodka:        { abv: 37.5, confidence: high }
   tawny port:             { abv: 20,   confidence: high }
 
   # --- wine and sparkling -------------------------------------------------
