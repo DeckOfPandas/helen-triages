@@ -494,8 +494,8 @@ and write the source's own words where none does.
 `Rinse the glasses with Campari.` ·
 `Dip only half the rim in water (or tequila) then coarse salt.`
 
-**Express:** `Express the twist over the drink and drop it in.` ·
-`Express the twist over the drink and discard it.`
+**Express:** `Express the twist over the drink then drop it in.` ·
+`Express the twist over the drink then discard it.`
 <!-- vocab:method end -->
 
 Seven things that will catch you out:

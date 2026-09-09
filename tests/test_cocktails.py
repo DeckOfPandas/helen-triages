@@ -3663,6 +3663,29 @@ def test_no_method_step_restates_to_serve_or_garnish():
         "Float the dehydrated lime slice wheel."     an ACTION -- stays
         "Garnish with grated nutmeg."                 a RESTATEMENT -- goes
 
+    THAT FIRST EXAMPLE WAS THE 18TH CENTURY'S, AND HELEN DELETED IT ON
+    2026-09-09 (#880). The rule is unchanged and the example is now a bad one,
+    which is worth saying rather than quietly swapping. The verb test is right
+    -- "Float" IS an action and this test should not fire on it -- but that
+    drink's garnish was `dehydrated lime slice wheel`, so the page read:
+
+        Float the dehydrated lime slice wheel.
+        Garnish with a dehydrated lime slice wheel.
+
+    Helen: "We need to fix the repetition in the last two steps." A verb can be
+    a real action and still say nothing the generated garnish line does not,
+    and when it does the step is redundant even though this test is right to
+    allow it. THE FIX WAS THE DRINK, NOT THE RULE: exactly one drink in the
+    collection had a step naming its own garnish this way. The other two the
+    scan found are drinks MUDDLING an ingredient that is also the garnish
+    (east-river-underground's cucumber wheels, kill-devil-punch's raspberries),
+    which is a different thing and correct as written.
+
+    So: no test fires on this shape, and it stays that way deliberately -- a
+    rule that refused any step naming the garnish would delete those two
+    muddles. If a third redundant Float appears, delete the step; if a fourth
+    does, that is the point to reconsider the rule rather than now.
+
     (It used to cite "Express lemon zest twist and use as garnish" as the
     action that stays, and that step is gone: the LAYOUT writes it now, from the
     garnish -- Helen's ruling, 2026-09-04. See
