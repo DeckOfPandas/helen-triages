@@ -13,11 +13,20 @@ WHY AN ISSUE AND NOT A BRANCH (INGEST_INBOX_DESIGN.md §8). Helen finds recipes
 away from her desk and hands them to a claude.ai session that has no checkout;
 that session's output has to reach `_food_drafts/` or `_cocktail_drafts/`
 somehow. A branch would need contents-write on a private repo from a session
-that runs neither of this repo's git guard hooks. An issue needs nothing any
-token here does not already have -- `GH_TOKEN` is issues-only on the three repos
--- the private repos have no build so nothing an issue carries can publish, and
-the session that finally writes the file is a local one, under every guard. So
-the envelope travels as issue text and lands here.
+that runs neither of this repo's git guard hooks. An issue needs only issue
+access, the private repos have no build so nothing an issue carries can
+publish, and the session that finally writes the file is a local one, under
+every guard. So the envelope travels as issue text and lands here.
+
+ONE LEG OF THAT ARGUMENT WENT AWAY ON 2026-09-09 and the conclusion did not.
+It used to read "an issue needs nothing any token here does not already have
+-- `GH_TOKEN` is issues-only on the three repos", i.e. the narrow token made
+the branch route impossible as well as unwise. `GH_TOKEN` is now retired and
+`AGENT_GH_TOKEN` is classic `repo`-scoped, so a branch on a private repo IS
+within reach of the credential. What still holds is the part that was always
+doing the real work: the writing session is local and guarded, and an issue
+cannot publish. The route is a choice now rather than the only option --
+INGEST_INBOX_DESIGN.md §8 is the place to argue it, not here.
 
 IT PARSES, IT NEVER INTERPRETS. Every rule in `parse_envelope` is a rejection
 with a one-line reason rather than a repair: a marker that is not there, two
@@ -428,9 +437,12 @@ def write(plan: Plan) -> None:
 # =============================================================================
 
 def _api(path: str, method="GET", payload=None):
-    token = os.environ.get("GH_TOKEN")
+    # AGENT_GH_TOKEN since 2026-09-09, when GH_TOKEN was retired (CLAUDE.md).
+    # Read at the point of use and never printed -- note that the failure below
+    # names the VARIABLE and never renders it.
+    token = os.environ.get("AGENT_GH_TOKEN")
     if not token:
-        sys.exit("GH_TOKEN is not set, so there is no way to read the issues.")
+        sys.exit("AGENT_GH_TOKEN is not set, so there is no way to read the issues.")
     request = urllib.request.Request(
         f"https://api.github.com{path}",
         method=method,
