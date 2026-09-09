@@ -4,6 +4,7 @@ tagline: "Rock cakes to anyone else, but scones to me."
 source: "Grandma Kath"
 source_type: person
 makes: "2 large rounds of 4"
+serves_estimate: 8
 prep_time: "10 mins"
 cook_time: "15–20 mins"
 main_ingredients: ["self-raising flour", "salted butter", "golden caster sugar", "sultanas", "egg", "milk"]

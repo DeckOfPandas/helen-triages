@@ -567,6 +567,125 @@ permalink: /food/
   Select something to see a list.
 </div>
 
+{% comment %} THE SHOPPING LIST -- GitHub issue #801, Helen: "add scaler and
+   shopping list feature to food recipe shortlist page. This can be copied
+   directly from the [cocktail] page -- I would like all the same features. But
+   there is no need to cost the portions. When serving size is unclear, please
+   make your best guess. Group the shopping list by grocery aisle, e.g.
+   produce, dairy, fish, meat, non-perishable etc."
+
+   COPIED FROM cocktails/index.html, DELIBERATELY, down to the class names --
+   `.shopping-list`, `.shopping-list-head`, `.shopping-list-setall`,
+   `.shopping-list-items`, `.shopping-list-empty`. "All the same features" is
+   the brief, and two lists that look alike and are built out of different
+   words would be the kind of drift MANUAL 2.2 is about. What is NOT here is
+   `#drink-costs`: costing was #547 and she has ruled it out for food.
+
+   AT THE BOTTOM OF THE SHORTLIST LISTING, and it appears only while the
+   shortlisted filter is on -- the same rule the drinks list follows, and for
+   the same reason: that is what makes it "my shortlist listing" rather than a
+   running total under a browse.
+
+   THE SCALER IS PORTIONS, NOT BATCHES. A drink's box counts glasses, because a
+   drink is a drink; a recipe's counts PEOPLE, because "we are four tonight" is
+   the question a food shortlist is being asked. That is what makes the serving
+   size Helen asked to be guessed load-bearing rather than decorative: it is
+   the number the portions are divided by. _plugins/food_shopping.rb resolves
+   it and _data/food/servings.yml holds the 44 guesses.
+
+   `min=1` and no maximum beyond 99, matching the drinks list. Zero portions of
+   everything is an empty list with extra steps. {% endcomment %}
+<section class="shopping-list" id="shopping-list" hidden aria-live="polite">
+  <div class="shopping-list-head">
+    <h2 class="shopping-list-title">Shopping list</h2>
+    {% comment %} SET ALL, NOT A MULTIPLIER -- cocktails/index.html's own note
+       says why, and it holds here unchanged: it writes every recipe's own
+       number and then has no further opinion, so there is one figure per
+       recipe and one place it lives. {% endcomment %}
+    <label class="shopping-list-setall">
+      <span>set all to</span>
+      <input type="number" id="shopping-list-setall" min="1" max="99" step="1" inputmode="numeric">
+      <span>portions</span>
+    </label>
+  </div>
+
+  {% comment %} ONE COUNT PER RECIPE, rendered by filters.js from the shortlist
+     because only the browser knows what is in it. Each starts at however many
+     that recipe makes, so an untouched list shops for every recipe exactly as
+     written -- which is the answer you want before you have said anything.
+     {% endcomment %}
+  <ul class="shopping-list-recipes"></ul>
+
+  <div class="shopping-list-aisles"></div>
+  <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
+</section>
+
+{% comment %} WHAT EACH RECIPE IS MADE OF, AND HOW MANY IT FEEDS -- #801.
+
+   IT HAS TO BE EVERY RECIPE, not the shortlisted ones: the shortlist lives in
+   this browser's localStorage and the build cannot know what is in it. The
+   same fact that makes the whole feature client-side makes this blob
+   unconditional. cocktails/index.html carries the identical argument for
+   `#drink-ingredients`.
+
+   THE AISLE AND THE PORTION COUNT ARE ALREADY COMPUTED, not recomputed here.
+   _plugins/food_shopping.rb hangs `shopping`, `portions` and
+   `portions_estimated` on every document at build; this copies them out. So
+   the page never sees _data/food/aisles.yml, there is one implementation of
+   the matching rule, and the template needs no `for` loop over 400 keywords.
+   Same division `_plugins/cocktail_costs.rb` keeps with the drinks scaler.
+
+   THE ROW GATE IS REPEATED, not relaxed. A recipe that has no row on the page
+   above cannot be shortlisted from it, so an entry here would be dead weight
+   at best -- and at worst a draft's ingredients riding into a production
+   build. `is_magic_bag` is exempted in both places, exactly as it is above.
+
+   KEYS ARE ONE LETTER because this is machine-read and the collection carries
+   778 ingredients. `p` portions, `e` estimated, `y` the recipe's own words for
+   its yield, `k` WHICH KEY those words came from, `i` the ingredients -- `a`
+   amount, `n` name, `s` shelf.
+
+   `k` EXISTS BECAUSE `y` ALONE IS A TRAP. `serves` and `makes` are exclusive
+   (MANUAL 4) and `y` takes whichever is there, so a page printing `y` behind
+   a fixed word gets it right for half the collection and wrong for the other
+   half -- it read "serves About 750 ml" for the blackberry gelato until
+   2026-09-07. It is also what tells the shortlist panel whether that recipe's
+   box can count PEOPLE at all: `makes: "About 750 ml"` cannot be turned into
+   portions without inventing a portion size, so the box counts batches
+   instead. See assets/js/filters.js.
+
+   EACH VALUE THROUGH `jsonify` INDIVIDUALLY, never hand-quoted. Ingredient
+   names carry apostrophes ("goat's cheese"), accents ("crème fraîche"), and
+   the odd bracket, and `jsonify` on the string is what escapes them
+   correctly. {% endcomment %}
+<script type="application/json" id="recipe-ingredients">
+{
+{%- assign _first_recipe = true -%}
+{%- for recipe in all_recipes -%}
+{%- assign _mb = false -%}
+{%- if recipe.collection == "food_magic_bag" %}{% assign _mb = true %}{% endif -%}
+{%- if recipe.meta.rewritten or site.show_source_wording or _mb -%}
+{%- unless _first_recipe %},{% endunless %}{%- assign _first_recipe = false %}
+{{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"e":{{ recipe.portions_estimated | default: false }},"y":{{ recipe.serves | default: recipe.makes | jsonify }},"k":{% if recipe.serves %}"serves"{% else %}"makes"{% endif %},"i":[
+{%- for ing in recipe.shopping -%}
+{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}}
+{%- endfor -%}
+]}
+{%- endif -%}
+{%- endfor %}
+}
+</script>
+
+{% comment %} THE AISLES AND THEIR ORDER, straight out of _data/food/aisles.yml.
+   Only `order` is emitted -- the keyword table stays at build time (see the
+   blob above), and what the page needs is the headings and the sequence they
+   go in. Emitting the file's own list rather than a copy means adding an aisle
+   is a YAML edit and never touches this template, which is the property
+   `#ingredient-vocabulary` below already has. {% endcomment %}
+<script type="application/json" id="recipe-aisles">
+  {{ site.data.food.aisles.order | jsonify }}
+</script>
+
 {% comment %} The ingredient search vocabulary — singulars, synonyms and the
    family-button threshold — comes from _data/ingredient_words.yml. filters.js
    reads it from here rather than hardcoding any of it. {% endcomment %}
@@ -581,4 +700,15 @@ permalink: /food/
    (GitHub issue #40). Guarded by
    tests/test_site_config.py::test_filter_state_js_loads_before_filters_js. {% endcomment %}
 <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
+{% comment %} THE SHOPPING LIST'S TWO SCRIPTS, and this order is load-bearing
+   for the same reason the four above are. food-shopping-list.js reads six
+   helpers off HTF.shoppingList at STARTUP rather than on first use -- see its
+   own header -- so a page that loaded them the wrong way round would fail at
+   load rather than on the first shortlist toggle, and filters.js calls
+   HTF.foodShoppingList.build() the first time the shortlisted filter is
+   pressed. Guarded by
+   tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order,
+   the same way the cocktail scaler's three are (#545). {% endcomment %}
+<script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>

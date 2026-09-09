@@ -1,0 +1,207 @@
+// =============================================================================
+// THE SHOPPING LIST — what a shortlist of recipes adds up to
+// =============================================================================
+// GitHub issue #801. The last thing on the index, shown only while the
+// shortlisted-only filter is on — see food/index.html for why that is the
+// literal reading of "the food recipe shortlist page".
+//
+// A DELIBERATE COPY OF _sass/cocktails/_shortlist.scss's shopping-list block,
+// class for class, because Helen's brief was "I would like all the same
+// features" and two lists doing the same job in different shapes is the drift
+// MANUAL 2.2 warns about. The colours are food's own, which is the whole of
+// what 2.3's palette contract asks: the same structure, each site's hues.
+//
+// AMOUNT FIRST, NAME SECOND, and a fixed column for the amount. A shopping
+// list is read down its left edge for "how much", and a ragged amount against
+// a ragged name is two ragged columns and no way in. The column is wider here
+// than on cocktails (8.5rem against 7rem) because food's totals are longer:
+// `60–100 g`, `3 tbsp (18 g)` and `~4 tbsp` are all ordinary, where a drink
+// total is `45 ml`.
+//
+// THE AISLE HEADINGS ARE THE FEATURE. Helen: "Group the shopping list by
+// grocery aisle, e.g. produce, dairy, fish, meat, non-perishable etc." So the
+// headings have to be findable while walking a shop with a phone in one hand,
+// which is what the small caps and the rule above each one are for — they are
+// scanned, not read.
+// =============================================================================
+
+.shopping-list {
+  margin: $space-xxl 0 0;
+  padding-top: $space-lg;
+  border-top: 1px solid $color-border;
+}
+
+.shopping-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-lg;
+  flex-wrap: wrap;
+  margin-bottom: $space-md;
+}
+
+// Its own class rather than `.results-heading`, which on this index is a flex
+// wrapper around the survivor count and carries that job's margins.
+.shopping-list-title {
+  margin: 0;
+  font-family: $font-body;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $color-text;
+}
+
+// --- the two typed numbers ---------------------------------------------------
+// FOOD'S FIRST NUMBER INPUTS. Cocktails put theirs in a shared placeholder
+// (`%cocktail-number-input`) once a third control wanted one; here there are
+// two and they are both in this file, so a placeholder would be a layer with
+// nothing on either side of it. If a third appears, lift this the same way.
+//
+// PLEX, because it is a number you act on — _palette.scss's own rule, and the
+// same one that puts the ingredient amounts on a recipe page in $font-label.
+%food-number-input {
+  width: 3.4em;
+  padding: 0.15em 0.3em;
+  font-family: $font-label;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: $color-text;
+  background: $color-bg;
+  border: 1px solid $color-border;
+  border-radius: 2px;
+
+  &:focus-visible {
+    outline: 2px solid $color-recipe-link;
+    outline-offset: 1px;
+  }
+}
+
+.shopping-list-setall {
+  display: flex;
+  align-items: baseline;
+  gap: $space-xs;
+  font-family: $font-label;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+
+  input { @extend %food-number-input; }
+}
+
+// --- one count per recipe ----------------------------------------------------
+// A wrapping row of number-and-name pairs rather than a column: a week's
+// shortlist is a handful of recipes, and a column of six would push the
+// totals — the thing the panel is FOR — below the fold on a phone. Recipe
+// titles are longer than drink names, so the gap between pairs is the larger
+// one and a pair is allowed to take a whole line.
+.shopping-list-recipes {
+  list-style: none;
+  margin: 0 0 $space-lg;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-sm $space-xl;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: $space-xs;
+    font-size: 0.9rem;
+    color: $color-text;
+  }
+
+  input { @extend %food-number-input; }
+}
+
+// `.shopping-list-times` AND `.shopping-list-batch-note` STOOD HERE and are
+// gone with #815. For a fortnight a recipe with no portion count got a box
+// counting BATCHES, marked with a x, plus a line explaining why "set all to"
+// could not reach it. Every recipe carries a `serves_estimate:` now, so there
+// is one kind of number in this panel and nothing to explain.
+//
+// What is left is the case where a NEW recipe has not been given its estimate
+// yet: no box at all, and a note saying which key to add. A control that
+// cannot work must not appear -- this feature learned that twice.
+.shopping-list-recipe--unscalable {
+  color: $color-clear-text;
+}
+
+.shopping-list-yield-missing {
+  margin-left: $space-xs;
+  font-family: $font-label;
+  font-size: 0.78rem;
+  color: $color-clear-text;
+
+  code {
+    font-family: $font-label;
+    font-size: inherit;
+  }
+}
+
+// --- the totals, by aisle ----------------------------------------------------
+.shopping-list-aisle + .shopping-list-aisle {
+  margin-top: $space-lg;
+}
+
+.shopping-list-aisle-name {
+  margin: 0 0 $space-xs;
+  padding-bottom: $space-xxs;
+  border-bottom: 2px solid $color-dazzling-dragonfruit;
+  font-family: $font-label;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $color-recipe-link;
+}
+
+.shopping-list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: $space-sm;
+    padding: $space-xs 0;
+    border-bottom: 1px solid $color-border;
+  }
+}
+
+// PLEX, IN INK — the site's rule for a number you act on (MANUAL 13.10), and
+// the same choice cocktails' shopping list arrived at on 2026-09-04 after
+// trying the heading face first. The ACCENT is spent on the aisle heading
+// instead, which is the thing you are navigating by here.
+.shopping-list-amount {
+  flex: 0 0 8.5rem;
+  font-family: $font-label;
+  font-weight: 600;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+  color: $color-text;
+}
+
+.shopping-list-name {
+  font-size: 0.95rem;
+  color: $color-text;
+  min-width: 0;
+}
+
+.shopping-list-empty {
+  font-size: 0.95rem;
+  color: $color-clear-text;
+}
+
+// A phone in a shop is the case this feature is for, and 8.5rem of amount
+// column beside a name is too much of a narrow screen. Below 420px the amount
+// sits on its own line above the name, which keeps both readable and keeps the
+// amount first — the property the fixed column exists for.
+@media (max-width: 420px) {
+  .shopping-list-items li {
+    display: block;
+  }
+
+  .shopping-list-amount {
+    display: block;
+  }
+}

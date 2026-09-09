@@ -175,11 +175,12 @@ permalink: /cocktails/
      would make the glass a sibling of the whole block and it could then only
      ever sit beside it, never inside the row.
 
-     IF THE FOOT IS EVER CLONED AGAIN, universe.js has to call
-     `HTF.markChipRows()` next to its `HTF.fitCardNames()` call, because the
-     foot is where the mood chips live and their row-start marks are a
-     measurement of the container they are in (#698). It does not call it today
-     because today no chips are cloned.
+     THIS USED TO CARRY A WARNING that cloning the foot would oblige universe.js
+     to call `HTF.markChipRows()` beside its `HTF.fitCardNames()`, because the
+     chips' row-start marks were a measurement of the container they sat in
+     (#698). #846 deleted that pass — the separator dot trails every chip but
+     the last now, so nothing measures where a chip row breaks — and the warning
+     went with it. Cloning the foot is free again.
 
      AND IT FAILS SHUT, WHICH MATTERS FOR THE FIRST PROMOTION. Production has no
      drafts, so on the day the first drink is promoted this selector may well
@@ -827,6 +828,18 @@ permalink: /cocktails/
     <ul class="shopping-list-drinks"></ul>
 
     <ul class="shopping-list-items"></ul>
+
+    {% comment %} WHAT THE SHOP COMES TO -- #817, and local-only for the same
+       reason every other price here is: `site.show_costs` lives in
+       _config_local.yml and nowhere else, so this paragraph is empty on the
+       deployed site and cocktail-index.js writes nothing into it.
+
+       AT THE BOTTOM, because that is where Helen asked for it and because a
+       total above its own column is a claim you cannot check by looking down.
+       It is summed from the rendered rows rather than from the pours, so it is
+       by construction the sum of the figures above it. {% endcomment %}
+    <p class="shopping-list-total" hidden></p>
+
     <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
   </section>
 
@@ -912,6 +925,27 @@ permalink: /cocktails/
 }
   </script>
 
+  {% comment %} HOW MUCH A `to top` ACTUALLY POURS — #746.
+
+     NOT GATED, unlike the costs below, and that is deliberate: `top_up_ml`
+     lives in costs.yml because the costing needed it first, but it is a VOLUME,
+     not a price. "300–450 ml of soda water" is what the shopping list should
+     say on the deployed site as much as on this one, and nothing about it
+     reveals what anything costs.
+
+     THREE ROWS, so this is about 100 bytes. Emitted whole rather than picked
+     apart, because the shape the JS wants (`generic -> {ml_min, ml_max}`) is
+     exactly the shape the YAML already has.
+
+     WHY IT IS A RANGE. costs.yml's own header: "topping is not measuring. You
+     pour until the glass looks right, and the glass differs -- a flute takes
+     less than a collins." A single figure here would be the false precision
+     `juice_yields` refuses, and this follows that file's shape on purpose.
+     {% endcomment %}
+  <script type="application/json" id="drink-top-ups">
+    {{ site.data.cocktails.costs.top_up_ml | jsonify }}
+  </script>
+
   {% comment %} WHAT EACH DRINK COSTS A GLASS — LOCAL ONLY, and the whole block
      is absent on the deployed site because `site.show_costs` is declared in
      _config_local.yml and nowhere else. Same gate as the drink page's own cost
@@ -934,6 +968,29 @@ permalink: /cocktails/
      exclusion rule drops IS the drink; the reader below prints no price for a
      drink it has no entry for, which is the same silence the drink page keeps.
      {% endcomment %}
+  {% comment %} GBP PER LITRE, RESOLVED AT BUILD — #820, #817, #818. Same gate as
+     the per-drink costs below, and about 10 KB.
+
+     WHY A SECOND BLOCK RATHER THAN MORE OF `drink-costs`. They answer different
+     questions and neither can be derived from the other: `drink-costs` is what
+     one glass of one drink costs, and this is what a litre of an ingredient
+     costs. A shopping list totals by GENERIC across every shortlisted drink,
+     which no drink's own figure contains.
+
+     ALREADY RESOLVED, NOT RAW COSTS.YML. `_plugins/cocktail_costs.rb` applied
+     every rule about what a generic costs before this was written — the union
+     of declared bottles and the generic's own row, `default_bottles` narrowing
+     it where Helen has ruled, a squeezed juice priced from the fruit and the
+     yield. The browser multiplies millilitres by a number and does nothing
+     else, which is the same division that keeps `cocktail-scale.js` ignorant of
+     prices. Emitting costs.yml raw would put a second copy of those rules in
+     JavaScript. {% endcomment %}
+  {% if site.show_costs %}
+  <script type="application/json" id="drink-rates">
+    {{ site.data.cocktails.rates | jsonify }}
+  </script>
+  {% endif %}
+
   {% if site.show_costs %}
   <script type="application/json" id="drink-costs">
 {

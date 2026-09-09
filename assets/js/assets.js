@@ -309,9 +309,11 @@ window.HTF = window.HTF || {};
   var shortlist = (function () {
     var KEY_PREFIX = 'htf-shortlist-';
     var GLASSES_PREFIX = 'htf-shortlist-glasses-';
+    var PORTIONS_PREFIX = 'htf-shortlist-portions-';
     var VERSION = '-v1';
     var entries = null;   // the in-memory copy; null until first read
     var counts = null;    // url -> glasses, for the entries that are not 1
+    var servings = null;  // url -> portions, for the entries that have been set
 
     function storageKey() {
       return HTF.site ? KEY_PREFIX + HTF.site + VERSION : '';
@@ -380,6 +382,68 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
+    /* --- HOW MANY PORTIONS — GitHub issue #801 -----------------------------
+       A THIRD KEY, and not the glasses map under another name. The two look
+       alike and mean different things in the one place it matters: a MISSING
+       glasses entry is one glass, because a drink is a drink; a missing
+       portions entry is "however many this recipe makes", which the browser
+       cannot know and the build has to tell it. So `1` is a real, storable
+       answer here -- one portion of a thing that serves six is a Tuesday --
+       where `setGlasses` deletes it as the default.
+
+       The two sites are already namespaced apart (`HTF.site`), so food never
+       reads a glasses map and cocktails never reads this one. Keeping them as
+       separate keys rather than one map with two meanings is what stops a
+       future reader having to know which site they are on to know what a `1`
+       in storage means.
+
+       Read and written exactly as the other two are, and with the same
+       standing: untrusted input, and a failure to persist must not cost you
+       the number you just typed. */
+    function portionsKey() {
+      /* `-v2`, AND THE BUMP IS THE POINT. For a few hours on 2026-09-07 this
+         map held BATCH counts for recipes with no portion count -- the box
+         beside them counted times-the-recipe rather than people (#801), and
+         #815 replaced that with an estimate on every recipe. So a number
+         stored during that window means something this code no longer means,
+         and there is nothing in the value itself to tell the two apart: `2`
+         is a plausible batch count and a plausible portion count.
+
+         A version bump discards them all rather than reinterpreting them,
+         which is the only honest option -- and costs a browser one forgotten
+         set of numbers rather than silently shopping for twice the gelato.
+         The shortlist ITSELF is untouched: what she marked is still marked,
+         and only how many she wanted is forgotten. */
+      return HTF.site ? PORTIONS_PREFIX + HTF.site + '-v2' : '';
+    }
+
+    function readPortions() {
+      if (servings) return servings;
+      servings = {};
+      var key = portionsKey();
+      if (!key) return servings;
+      try {
+        var raw = JSON.parse(localStorage.getItem(key));
+        if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+          Object.keys(raw).forEach(function (url) {
+            var n = raw[url];
+            if (typeof n === 'number' && isFinite(n) && n > 0) {
+              servings[url] = Math.floor(n);
+            }
+          });
+        }
+      } catch (e) { /* every recipe as written, and the page works */ }
+      return servings;
+    }
+
+    function writePortions() {
+      var key = portionsKey();
+      if (!key) return;
+      try {
+        localStorage.setItem(key, JSON.stringify(servings));
+      } catch (e) { /* this visit still has it; tomorrow will not */ }
+    }
+
     return {
       /** @returns {string[]} the entries, oldest first. A copy — callers sort. */
       list: function () { return read().slice(); },
@@ -405,12 +469,14 @@ window.HTF = window.HTF || {};
         return at === -1;
       },
 
-      /** Empty it — the marks and the counts together. @returns {void} */
+      /** Empty it — the marks and both count maps together. @returns {void} */
       clear: function () {
         entries = [];
         write();
         counts = {};
         writeGlasses();
+        servings = {};
+        writePortions();
       },
 
       /* --- HOW MANY OF EACH — GitHub issue #546, Helen 2026-09-04 ------------
@@ -449,10 +515,46 @@ window.HTF = window.HTF || {};
         return value > 1 ? value : 1;
       },
 
+      /**
+       * How many portions of this recipe are wanted — #801.
+       *
+       * `null` means nobody has said, and the caller substitutes the recipe's
+       * own portion count. That is the whole difference from `glasses` above:
+       * there the default is a constant this file can hold, here it is a
+       * per-recipe fact only the build knows.
+       *
+       * @param {string} url
+       * @returns {number|null}
+       */
+      portions: function (url) {
+        var n = readPortions()[url];
+        return typeof n === 'number' && n > 0 ? n : null;
+      },
+
+      /**
+       * @param {string} url
+       * @param {number|null} n - portions; anything below 1 forgets the entry,
+       *        which puts the recipe back to however many it makes
+       * @returns {number|null} what it ended up as
+       */
+      setPortions: function (url, n) {
+        if (!url) return null;
+        var all = readPortions();
+        var value = Math.floor(Number(n));
+        if (!isFinite(value) || value < 1) {
+          delete all[url];
+          writePortions();
+          return null;
+        }
+        all[url] = value;
+        writePortions();
+        return value;
+      },
+
       /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module
          reads localStorage once and caches; a test that wants a second scenario
          in the same page needs to say so. */
-      _forget: function () { entries = null; counts = null; }
+      _forget: function () { entries = null; counts = null; servings = null; }
     };
   })();
 

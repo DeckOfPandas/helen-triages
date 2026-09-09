@@ -4,6 +4,7 @@ tagline: "Beetroot isn't here for health reasons, I promise. It keeps the cake m
 source: "Adapted from BBC Food, recipe Nigel Slater"
 source_type: website
 makes: "one 8-inch cake"
+serves_estimate: 8
 prep_time: "15 mins"
 cook_time: "40 mins"
 main_ingredients: ["beetroot", "dark chocolate", "cocoa powder", "salted butter", "plain flour", "golden caster sugar", "eggs"]

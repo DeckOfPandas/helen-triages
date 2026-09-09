@@ -4,6 +4,7 @@ tagline: "Super rich. Real chocolate and all the goodies."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 source_type: book
 makes: "950 ml"
+serves_estimate: 6
 prep_time: "20 mins"
 cook_time: "None"
 main_ingredients: ["unsweetened chocolate", "whole milk", "eggs", "golden caster sugar", "whipping cream", "vanilla extract"]

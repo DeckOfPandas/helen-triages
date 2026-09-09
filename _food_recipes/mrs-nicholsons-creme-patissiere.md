@@ -4,6 +4,7 @@ tagline: "Never-fail crème pat from someone who knows what they're doing."
 source: "Mrs Nicholson"
 source_type: person
 makes: "about 600 ml"
+serves_estimate: 8
 prep_time: "20 mins"
 cook_time: "None"
 main_ingredients: ["whole milk", "egg yolks", "golden caster sugar", "plain flour", "vanilla pod"]

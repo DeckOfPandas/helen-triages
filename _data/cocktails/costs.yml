@@ -15,8 +15,15 @@
 # 2026-09-05: "We can calculate top volumes, well, slightly, can't we -- I'd
 # like that to be captured actually so it can be added into the shopping list
 # feature." So `top_up_ml` below is a declared RANGE, and it does double duty:
-# it prices the champagne AND it lets shopping-list.js stop reporting
-# "to top (x3)" and start reporting a volume. See its own note.
+# it prices the champagne AND it is what lets shopping-list.js report a volume.
+# Both halves are live as of 2026-09-08 (#746): three topped sodas read
+# "300–450 ml" on the list, where they read "to top (x3)" before. See its own
+# note.
+#
+# IT IS THE ONE BLOCK IN THIS FILE THAT IS NOT A PRICE, and so the one that is
+# emitted to the deployed site: cocktails/index.html sends it UNGATED while
+# everything else here rides behind `site.show_costs`. A volume is not a price,
+# and "300–450 ml of soda water" is what the live shopping list should say too.
 #
 # WHY A SEPARATE FILE FROM bottles.yml. A price is a different KIND of fact from
 # everything in that file. `generic`, `aliases` and the appellation rulings are
@@ -129,19 +136,19 @@ bottles:
     gbp: 30
     confidence: high
   # --- rum: Demerara -----------------------------------------------------
-  "El Dorado 3 year old rum":
+  "El Dorado 3 Year Old":
     size_ml: 700
     gbp: 22
     confidence: high
-  "El Dorado 5 year old rum":
+  "El Dorado 5 Year Old":
     size_ml: 700
     gbp: 27
     confidence: medium
-  "El Dorado 8 year old rum":
+  "El Dorado 8 Year Old":
     size_ml: 700
     gbp: 32
     confidence: medium
-  "El Dorado 12 year old rum":
+  "El Dorado 12 Year Old":
     size_ml: 700
     gbp: 42
     confidence: medium
@@ -170,7 +177,7 @@ bottles:
     size_ml: 700
     gbp: 27
     confidence: medium
-  "Planteray Barbados 5":
+  "Planteray 5 Year Old Barbados":
     size_ml: 700
     gbp: 27
     confidence: medium
@@ -309,7 +316,7 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: medium
-  "Ophir":
+  "Opihr":
     size_ml: 700
     gbp: 24
     confidence: medium
@@ -760,7 +767,7 @@ default_bottles:
   # the time." Flor de Caña Extra Dry is the 1% and stays declared. The two are
   # within 50p of each other, so this is nearly a point price -- which is what
   # "99% of the time" ought to produce.
-  lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 year old rum"]
+  lightly aged and filtered rum: ["Havana Club 3 year old", "El Dorado 3 Year Old"]
 
   # "Same for Reposado and Anejo actually" -- the other two thirds of the
   # tequila rule, unwritable on 2026-09-05 morning because three of the four
@@ -804,7 +811,10 @@ generics:
   Jägermeister:       { gbp_per_litre_min: 28.57, gbp_per_litre_max: 28.57, basis: "GBP 20 / 70cl", confidence: medium }
   Becherovka:         { gbp_per_litre_min: 31.43, gbp_per_litre_max: 31.43, basis: "GBP 22 / 70cl", confidence: medium }
   Amaro Nonino:       { gbp_per_litre_min: 60.00, gbp_per_litre_max: 60.00, basis: "GBP 42 / 70cl", confidence: medium }
-  Amaro Ciociano:     { gbp_per_litre_min: 42.86, gbp_per_litre_max: 42.86, basis: "GBP 30 / 70cl", confidence: low }
+  # HELEN'S OWN PRICE, 2026-09-07: "Amaro Ciociano is GBP 36" -- so 51.43 a
+  # litre, up from a guessed 42.86, and `low` becomes `high`. It was one of
+  # the few `low` rows left in the file.
+  Amaro Ciociaro:     { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "GBP 36 / 70cl", confidence: high }
   liqueur de sapin:   { gbp_per_litre_min: 50.00, gbp_per_litre_max: 50.00, basis: "GBP 35 / 70cl", confidence: low }
   Swedish flaggpunsch: { gbp_per_litre_min: 40.00, gbp_per_litre_max: 40.00, basis: "GBP 28 / 70cl", confidence: low }
   Plymouth:           { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }
@@ -870,7 +880,23 @@ generics:
   # 90p. If that looks wrong the sum is right there to correct.
   cane sugar syrup 1:1: { gbp_per_litre_min: 0.60, gbp_per_litre_max: 1.00, basis: "1kg sugar @ GBP 1 + 1L water -> ~1.6L", confidence: medium }
   cane sugar syrup 2:1: { gbp_per_litre_min: 0.90, gbp_per_litre_max: 1.40, basis: "2kg sugar @ GBP 1 + 1L water -> ~2.2L", confidence: medium }
-  demerara sugar syrup: { gbp_per_litre_min: 1.50, gbp_per_litre_max: 2.20, basis: "demerara @ GBP 1.80/kg, 2:1", confidence: medium }
+  # THE `2:1` IN THE BASIS WAS ALREADY HERE before the generic said it --
+  # this row priced demerara at 2:1 while the generic carried no ratio at
+  # all, which is how #594 found the gap. Helen ruled 2:1 on 2026-09-06 and
+  # the costing needed no change, only the name.
+  demerara sugar syrup 2:1: { gbp_per_litre_min: 1.50, gbp_per_litre_max: 2.20, basis: "demerara @ GBP 1.80/kg, 2:1", confidence: medium }
+  # Turbinado is a raw cane sugar and sits between white and demerara on the
+  # shelf; priced against demerara because that is the nearer neighbour.
+  turbinado sugar syrup 2:1: { gbp_per_litre_min: 1.50, gbp_per_litre_max: 2.30, basis: "turbinado @ GBP 1.90/kg, 2:1", confidence: medium }
+  # 1:1 IS THE CHEAPER OF THE TWO, because the ratio is honey:water and so 2:1
+  # carries more honey. 2:1 is two thirds honey; 1:1 is one half. Honey is all
+  # of the cost and water is none of it, so 1:1 is priced at three quarters of
+  # 2:1 exactly: 13.00 -> 9.75 and 18.00 -> 13.50.
+  #
+  # Arrived 2026-09-07 with chartreuse-daiquiri, the first drink to use 1:1 --
+  # its own note says "Honey water is equal parts honey and water", which is
+  # what settled its ratio when the other four went to 2:1 on Helen's word.
+  honey water 1:1:    { gbp_per_litre_min: 9.75, gbp_per_litre_max: 13.50, basis: "honey @ GBP 17.60/kg, 1:1", confidence: medium }
   honey water 2:1:    { gbp_per_litre_min: 13.00, gbp_per_litre_max: 18.00, basis: "honey @ GBP 17.60/kg, 2:1", confidence: medium }
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
@@ -925,3 +951,7 @@ generics:
   lemon juice:        { from_fruit: lemon juice }
   orange juice:       { from_fruit: orange juice }
   grapefruit juice:   { from_fruit: grapefruit juice }
+  # Priced off the same fruit: a ruby grapefruit is not dearer than a white one
+  # and the yield is identical. The generic is separate because the FLAVOUR
+  # differs, not the cost.
+  ruby grapefruit juice: { from_fruit: grapefruit juice }

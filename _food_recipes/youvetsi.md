@@ -42,7 +42,7 @@ ingredient_groups:
     - amount: "100 g"
       item: halloumi
 method:
-  - "De-bone the short rib, lifting the bones away. Simmer the bones and any fat trimmings along with the stock." 
+  - "De-bone the short rib, lifting the bones away. Simmer the bones and any fat trimmings along with the stock."
   - "Slice the meat into 5-cm squares and sear in batches. Remove to a plate."
   - "Fry the onions, carrots and celery for 10 mins. Add the thyme after a few mins. Add the garlic near the end."
   - "Add the tomato purée and caramelise for 1–2 mins, then deglaze with the wine, scraping any sticky bits off the bottom."
@@ -56,5 +56,5 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 ---

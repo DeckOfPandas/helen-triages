@@ -559,7 +559,36 @@ from conftest import FRONT_MATTER, DRAFTS_PRESENT, ALL_DRAFTS
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-BASELINE_COMMIT = "9306cef"   # (copy) Helen's proofread of the citation backlog
+BASELINE_COMMIT = "9a8a324"   # Helen's own serving-size corrections, #808
+#
+# MOVED AGAIN 2026-09-07, HOURS LATER, AND THIS IS THE STRONGEST CASE THE
+# MECHANISM HAS EVER HAD: she read the 43 numbers, dictated seventeen
+# replacements in a comment on #808, and dictated the two notes verbatim as
+# well ("Please add all this as a note on the recipe and I will tidy up
+# later"). Every word now in those files came out of her own message. There is
+# no version of "her proofread describes a file she has not read" that survives
+# that.
+#
+# It covers 9a8a324 and nothing after it, which is the ordering the note below
+# insists on.
+#
+# MOVED 2026-09-07 (#815), AND HELEN NAMED THIS MECHANISM HERSELF. Asked which
+# of two ways to pay for `serves_estimate:` landing in 43 proofread recipes,
+# she quoted the exception back: "Use the documented exception. If she reviews
+# the change herself line by line, she was the last judgement, and
+# BASELINE_COMMIT in test_agent_edited_recipes_are_not_marked_proofread moves
+# forward. This is an unusually good fit: the change is ONE integer per file,
+# all 43 are already listed together in servings.yml with the source quoted,
+# and checking them is a single pass down one page rather than 43 file reads."
+#
+# WHAT THE 43 FILES GAINED IS ONE LINE EACH: `serves_estimate: 12` under the
+# `makes:` it is read from. No word of any recipe changed, so her proofread
+# still describes every one of them exactly -- the same test the awaiting_fix
+# rename passed below.
+#
+# MOVED IN ITS OWN COMMIT, AFTER 62874fa AND BEFORE ANYTHING ELSE, which is
+# what the ordering note below demands: a baseline that lands with the edits it
+# covers and nothing after them sweeps nothing up.
 #
 # MOVED 2026-08-20 (second move that day), AND THIS IS THE CASE THE MECHANISM
 # WAS BUILT FOR -- the one the failure message describes as "reviewed by Helen

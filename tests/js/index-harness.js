@@ -84,6 +84,15 @@ function buildPage(doc, options) {
   });
   json('drink-bottles', { bottles: {} });
   json('drink-ingredients', {});
+  /* #746. Emitted UNGATED by cocktails/index.html — unlike `drink-costs`, which
+     is local-only and whose absence is normal — so a page without it is a real
+     anomaly and `readJson` is right to warn. This fixture carries the real
+     three rows so the harness runs the same program the page does. */
+  json('drink-top-ups', {
+    champagne: { ml_min: 75, ml_max: 100 },
+    prosecco: { ml_min: 75, ml_max: 100 },
+    'soda water': { ml_min: 100, ml_max: 150 }
+  });
 
   const filters = el('div', 'drink-filters');
   doc.body.appendChild(filters);

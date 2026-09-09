@@ -4,6 +4,7 @@ tagline: "How can you beat this. Change the spices if you like, but this is the 
 source: "Grandma Kath"
 source_type: person
 makes: "one 7-inch round cake"
+serves_estimate: 8
 prep_time: "10 mins"
 cook_time: "35 mins"
 main_ingredients: ["salted butter", "Demerara sugar", "golden syrup", "self-raising flour", "ground ginger", "mixed spice powder"]

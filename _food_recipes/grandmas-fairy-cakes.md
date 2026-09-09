@@ -4,6 +4,7 @@ tagline: "Exactly how they're supposed to be."
 source: "Grandma Kath"
 source_type: person
 makes: "12 fairy cakes"
+serves_estimate: 12
 prep_time: "10 mins"
 cook_time: "Until done"
 main_ingredients: ["salted butter", "golden caster sugar", "eggs", "self-raising flour", "sultanas"]

@@ -4,6 +4,7 @@ tagline: "I've assaulted various Christmas parties with these over the years, an
 source: "Megan"
 source_type: person
 makes: "20–24 truffles"
+serves_estimate: 10
 prep_time: "20 mins plus time to set"
 cook_time: "5 mins"
 main_ingredients: ["dark chocolate", "ground almonds", "salted butter", "icing sugar"]

@@ -4,6 +4,7 @@ tagline: "I've absorbed a lot of waffle recipes. This is the iteration I'll put 
 source: "Adapted from Mollie Katzen's Sunlight Café"
 source_type: book
 makes: "4–6 waffles, depending on your waffle iron"
+serves_estimate: 2
 prep_time: "5 mins"
 cook_time: "15 mins"
 main_ingredients: ["plain flour", "eggs", "whole milk", "groundnut oil", "salted butter"]

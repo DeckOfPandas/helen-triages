@@ -143,6 +143,12 @@
      the rest of the index is untouched. */
   var INGREDIENTS = readJson('drink-ingredients', 'the drinks’ own front matter', {});
 
+  /* HOW MUCH A `to top` POURS -- #746, `top_up_ml` from costs.yml. Present on
+     both sites, unlike the costs below: it is a volume rather than a price.
+     Absent, every `to top` keeps the `(×3)` count reading it had before, which
+     is why this can use `readJson`'s fallback without a special case. */
+  var TOP_UPS = readJson('drink-top-ups', '_data/cocktails/costs.yml', {});
+
   /* WHAT EACH DRINK COSTS A GLASS. LOCAL ONLY and USUALLY ABSENT: the block is
      emitted by cocktails/index.html behind `site.show_costs`, declared in
      _config_local.yml and nowhere else, so on the deployed site this is `{}`
@@ -163,6 +169,21 @@
     }
   })();
 
+  /* GBP PER LITRE PER GENERIC AND PER BOTTLE — #820. Local-only and usually
+     absent, exactly like COSTS above and read the same silent way; `null`
+     rather than `{}` so `shopping-list.js` can tell "no table" from "an empty
+     one" and price nothing at all. */
+  var RATES = (function () {
+    var node = document.getElementById('drink-rates');
+    if (!node) return null;
+    try {
+      return JSON.parse(node.textContent);
+    } catch (e) {
+      console.warn('cocktail-index.js: could not parse #drink-rates — ' + e.message);
+      return null;
+    }
+  })();
+
   /* "@ £2.34", or "@ £2.10–£3.40" where the drink spans a range, or nothing at
      all. Helen asked for it "quietly again", so it is a suffix on a line that
      already exists rather than a column of its own.
@@ -172,12 +193,93 @@
      menu, and the same number the drink's own page shows. Multiplying here
      would make the glasses box change a price labelled per glass, which is the
      bug that had to be taken out of cocktail-scale.js on the same day. */
-  function costSuffix(url) {
+  /* WHICH BOTTLE HELEN HAS PICKED FOR WHICH POUR -- #818, and "per drink" is
+     her ruling: two drinks that both want a reposado may choose differently.
+     Keyed url -> generic -> bottle name.
+
+     IN MEMORY ONLY, DELIBERATELY. She chose "price and the list line" over
+     "and it sticks": a stored choice outlives the bottle it names, and a list
+     that opens tomorrow already committed to a rum that left the house is
+     worse than one that asks again. The shortlist itself persists; this does
+     not. */
+  var CHOSEN = {};
+
+  function chosenBottle(url, generic) {
+    return (CHOSEN[url] || {})[generic] || null;
+  }
+
+  /* WHAT ONE GLASS COSTS, AFTER ANY CHOICE -- #818.
+
+     THE ARITHMETIC IS SUBTRACT-AND-ADD, and the plugin emitted exactly what it
+     needs: each choosable pour carries what it contributes to the range TODAY
+     (`lo`, `hi`) and what each candidate bottle would cost instead. So a chosen
+     bottle is `total - what that pour was contributing + what this one costs`,
+     and the browser never has to know what an excluded unit is or which of a
+     suggestion and a generic wins.
+
+     UNCHOSEN POURS ARE LEFT ALONE, which is what makes the opening state the
+     full range Helen asked for: a drink with two choices and one made narrows
+     by exactly that one. */
+  function costFor(url) {
     var c = COSTS[url];
+    if (!c) return null;
+    var lo = Number(c.lo);
+    var hi = Number(c.hi);
+    (c.choices || []).forEach(function (choice) {
+      var bottle = chosenBottle(url, choice.generic);
+      if (!bottle) return;
+      var price = choice.bottles[bottle];
+      if (typeof price !== 'number') return;
+      lo = lo - Number(choice.lo) + price;
+      hi = hi - Number(choice.hi) + price;
+    });
+    return { lo: lo, hi: hi };
+  }
+
+  function costSuffix(url) {
+    var c = costFor(url);
     if (!c) return '';
     var lo = '£' + Number(c.lo).toFixed(2);
     if (Math.abs(c.hi - c.lo) < 0.005) return ' @ ' + lo;
     return ' @ ' + lo + '–£' + Number(c.hi).toFixed(2);
+  }
+
+  /* THE RADIO ROWS UNDER A DRINK -- #818, and Helen picked the shape: "a row
+     per pour that has a choice", with the generic labelling each set so you can
+     see WHICH pour you are choosing a bottle for.
+
+     ONE `name` PER DRINK AND POUR, which is what makes them behave as radios
+     rather than as a row of unrelated buttons -- and it has to include the URL,
+     or two shortlisted drinks wanting a reposado would share one group and
+     choosing for the second would silently unchoose the first. That is the same
+     bug in miniature as the per-list choice Helen ruled against.
+
+     NO "no preference" OPTION, because the unchosen state IS no preference and
+     it is where every list starts. Clearing one is not a thing she asked for;
+     if it turns out to be wanted, it is a fifth radio rather than a redesign. */
+  function choiceRows(url) {
+    var c = COSTS[url];
+    if (!c || !c.choices || !c.choices.length) return '';
+    return c.choices.map(function (choice, i) {
+      var group = 'bottle-' + i + '-' + url;
+      var options = Object.keys(choice.bottles).map(function (bottle) {
+        var id = group + '-' + bottle;
+        return '<label class="shopping-list-bottle-choice">' +
+          '<input type="radio" name="' + HTF.escapeHtml(group) + '"' +
+          ' value="' + HTF.escapeHtml(bottle) + '"' +
+          ' data-url="' + HTF.escapeHtml(url) + '"' +
+          ' data-generic="' + HTF.escapeHtml(choice.generic) + '"' +
+          (chosenBottle(url, choice.generic) === bottle ? ' checked' : '') +
+          ' aria-label="' + HTF.escapeHtml(bottle) + '">' +
+          '<span>' + HTF.escapeHtml(bottle) + '</span>' +
+          '</label>';
+      }).join('');
+      return '<span class="shopping-list-choice">' +
+        '<span class="shopping-list-choice-name">' +
+        HTF.escapeHtml(choice.generic) + '</span>' +
+        options +
+        '</span>';
+    }).join('');
   }
 
   /* ONE BOTTLE, HOWEVER IT WAS WRITTEN. Built from the dictionary already on the
@@ -506,6 +608,8 @@
      list you shop from is the one you shortlisted. */
   var shoppingEl = document.getElementById('shopping-list');
   var shoppingItems = shoppingEl && shoppingEl.querySelector('.shopping-list-items');
+  // #817. Absent is normal: the paragraph is only useful where prices are.
+  var shoppingTotal = shoppingEl && shoppingEl.querySelector('.shopping-list-total');
   var shoppingDrinks = shoppingEl && shoppingEl.querySelector('.shopping-list-drinks');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
   var setAllInput = document.getElementById('shopping-list-setall');
@@ -557,6 +661,8 @@
              `show_costs` is off, which is everywhere but Helen's laptop. */
           '<span class="shopping-list-cost">' + costSuffix(url) + '</span>' +
           '</span>' +
+          // #818. After the name, indented, one row per pour with a choice.
+          choiceRows(url) +
           '</li>';
       }).join('');
     }
@@ -571,7 +677,28 @@
     (urls || shortlistedDrinks()).forEach(function (url) {
       var glasses = HTF.shortlist.glasses(url);
       (INGREDIENTS[url] || []).forEach(function (ing) {
-        entries.push({ amount: ing.a, generic: ing.g, bottle: ing.b, glasses: glasses });
+        /* A CHOICE NARROWS THE LIST LINE, NOT JUST THE PRICE -- #818, Helen
+           picked "price and the list line" over price alone: "choosing is how
+           you decide what to buy, so the list should say what you decided."
+
+           IT IS DONE HERE, ON THE ENTRY, rather than anywhere downstream, and
+           that is what makes it cost nothing: `shopping-list.js` already
+           prefers the named bottles over the generic when pricing, and already
+           builds the bracketed note from them. Replacing the suggestion with
+           the one she chose therefore fixes the price AND the note in one
+           move, with no new argument to thread through.
+
+           THE GENERIC IS JOINED THE SAME WAY THE PLUGIN JOINED IT, because a
+           list generic ("either would do", #441) is one choosable pour and the
+           key has to match on both sides. */
+        var generic = Array.isArray(ing.g) ? ing.g.join(' or ') : ing.g;
+        var picked = chosenBottle(url, generic);
+        entries.push({
+          amount: ing.a,
+          generic: ing.g,
+          bottle: picked || ing.b,
+          glasses: glasses
+        });
       });
     });
 
@@ -580,7 +707,18 @@
       exclude: VOCABULARY.not_on_cards || [],
       bottleAliases: BOTTLE_ALIASES,
       // Declared in the same file, for the four juices you squeeze yourself.
-      juiceYields: VOCABULARY.juice_yields || {}
+      juiceYields: VOCABULARY.juice_yields || {},
+      // #746: champagne, prosecco and soda water declare what a top pours, so
+      // the list can say a volume instead of counting tops.
+      topUpMl: TOP_UPS,
+      // #820. Absent on the deployed site, where no row carries a price.
+      rates: RATES,
+      // #848: shelf order first, then volume within a shelf. Both halves come
+      // from the vocabulary already on the page, so this needs no new block.
+      shelves: {
+        order: VOCABULARY.shopping_shelves || [],
+        of: VOCABULARY.shelf_of || {}
+      }
     });
 
     /* REBUILT WHOLE, not patched. It is at most a couple of dozen rows, it
@@ -614,11 +752,50 @@
         }
         suffix = ' <span class="shopping-list-note">(' + inner.join(', ') + ')</span>';
       }
+      /* THE PRICE AT THE END OF THE LINE — #820. A span of its own rather than
+         part of the bracketed note, because it is the one thing on the row that
+         is absent on the deployed site: keeping it separate means production
+         renders the line it always did, with nothing to strip out.
+
+         SILENT WHEN THERE IS NO RATE. 20 generics have none — the herbs, zest
+         and bitters that are free under Helen's rule, and the whole fruit and
+         weighed solids of #748 — and a line that cannot be priced says nothing
+         rather than nothing-shaped-like-zero. */
+      var price = row.price
+        ? '<span class="shopping-list-price">' + HTF.escapeHtml(row.price.text) + '</span>'
+        : '';
+
       return '<li>' +
         '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
         '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + suffix + '</span>' +
+        price +
         '</li>';
     }).join('');
+
+    renderShoppingTotal(rows);
+  }
+
+  /* WHAT THE SHOP COMES TO — #817. Summed from the rows just rendered, so the
+     figure can never disagree with the column above it.
+
+     IT SAYS WHAT IT COULD NOT PRICE. A bare total would claim to be the cost of
+     the shop while being short by whatever the unpriced lines are worth, and
+     "roughly" is doing enough work already. */
+  function renderShoppingTotal(rows) {
+    if (!shoppingTotal) return;
+    var sum = HTF.shoppingList.total(rows);
+    if (!sum) {
+      shoppingTotal.hidden = true;
+      shoppingTotal.textContent = '';
+      return;
+    }
+    var text = 'roughly ' + sum.text;
+    if (sum.unpriced) {
+      text += ' — ' + sum.unpriced +
+        (sum.unpriced === 1 ? ' line has no price' : ' lines have no price');
+    }
+    shoppingTotal.textContent = text;
+    shoppingTotal.hidden = false;
   }
 
   if (shoppingDrinks) {
@@ -629,6 +806,30 @@
       HTF.shortlist.setGlasses(input.dataset.url, input.value);
       // Totals only. Re-rendering the drinks list would replace the very input
       // being typed into and take the caret with it.
+      renderTotals();
+    });
+
+    /* CHOOSING A BOTTLE -- #818. `change` rather than `input`, because a radio
+       fires `input` on every arrow-key pass through the group while it is being
+       browsed, and re-costing the whole list on each one would make the keyboard
+       route through the options feel like it was doing work.
+
+       THE ROW IS PATCHED, NOT RE-RENDERED, for the same reason the glasses
+       handler calls `renderTotals()` alone: rebuilding the list would replace
+       the radio that was just clicked and take the focus ring with it, which
+       for a keyboard user is the control vanishing mid-choice. So the price
+       span is written in place and the totals below are rebuilt. */
+    shoppingDrinks.addEventListener('change', function (ev) {
+      var input = ev.target;
+      if (!input.dataset || !input.dataset.generic) return;
+      var url = input.dataset.url;
+      CHOSEN[url] = CHOSEN[url] || {};
+      CHOSEN[url][input.dataset.generic] = input.value;
+
+      var row = input.closest ? input.closest('li') : null;
+      var cost = row && row.querySelector('.shopping-list-cost');
+      if (cost) cost.textContent = costSuffix(url);
+
       renderTotals();
     });
   }
@@ -799,12 +1000,23 @@
     });
     syncPagination(pageInfo.totalPages, visible.length);
 
-    /* THE ROW-START MARKS HAVE TO BE REDONE, because moving a chip changes
-       which chip begins a row -- and `is-row-start` is what suppresses the
-       separator dot that would otherwise hang off the left margin of a wrapped
-       row. chip-rows.js exposes this hook for exactly this case and its own
-       header says nothing called it until now. */
-    if (chipsMoved && HTF.markChipRows) HTF.markChipRows();
+    /* THE LINE BUDGET IS REDONE ON EVERY PASS, not just when chips moved --
+       #776. Pagination hides a card with `card.hidden` rather than removing it,
+       and a hidden element measures ZERO height, so card-line-budget.js's
+       load-time pass could only ever classify the cards on page one. Every
+       later page kept the three-row chip cap it should have lost, and nothing
+       said so because the card still looked plausible.
+
+       IT USED TO RUN BEFORE markChipRows, AND THAT ORDER WAS LOAD-BEARING:
+       the budget sets the chips' max-height, which decides where the chip rows
+       break, which was what the row marks described. #846 deleted chip-rows.js
+       -- the dot trails every chip but the last now, so nothing depends on
+       where a row breaks -- and this is the last pass standing in that chain.
+
+       STILL REDONE UNCONDITIONALLY, for its own reason rather than that one:
+       `chipsMoved` is about chip CONTENT, and this is about which cards are
+       VISIBLE. A plain page turn moves no chips and still needs the budget. */
+    if (HTF.cardLineBudget) HTF.cardLineBudget();
 
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible

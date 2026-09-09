@@ -4,6 +4,7 @@ tagline: "Good for jarring, cakes, or lemon meringue pie."
 source: "Grandma Kath"
 source_type: person
 makes: "Enough for one normal lemon meringue pie"
+serves_estimate: 8
 prep_time: "10 mins"
 cook_time: "20 mins"
 main_ingredients: ["lemons", "salted butter", "golden caster sugar", "eggs", "cornflour"]

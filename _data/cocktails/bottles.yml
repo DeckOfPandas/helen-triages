@@ -135,33 +135,54 @@ bottles:
     aliases: []
 
   # --- Demerara: 100% DDL, Guyana. See the appellation note above. ----------
-  # THE CANONICAL FORM IS "El Dorado N year old rum" -- Helen, 2026-09-04,
-  # going through every bottle name: "The El Dorado pattern is always like
-  # 'El Dorado 3 year old rum', for 3, 5, 8 and 12. 15 and 21 too if they ever
-  # appear. El Dorado 151 is the correct string already." The short forms the
-  # drinks write stay as aliases; a drink keeps her spelling (see the header).
-  "El Dorado 3 year old rum":
-    generic: "lightly aged and filtered rum"
-    aliases: ["El Dorado 3", "ED3", "El Dorado 3yo", "El Dorado 3yo rum"]
-  "El Dorado 5 year old rum":
-    generic: "aged Demerara rum"
-    aliases: ["El Dorado 5"]
-  "El Dorado 8 year old rum":
-    generic: "aged Demerara rum"
-    aliases: ["El Dorado 8"]
-  "El Dorado 12 year old rum":
-    generic: "aged Demerara rum"
-    aliases: ["El Dorado 12"]
-  # EL DORADO 151 WAS HERE AND IS NOW IN `not_reached_for` -- Helen, 2026-09-05.
-  # It was the one bottle admitted on the strength of wanting it rather than
-  # owning it ("wanted counts as reached-for"), and she withdrew that: "I don't
-  # own it, I just wanted to, but it looks like it's hard to get."
+  # THE CANONICAL FORM IS "El Dorado N Year Old" -- Helen, 2026-09-07, REVERSING
+  # her own ruling of three days earlier. That one read: "The El Dorado pattern
+  # is always like 'El Dorado 3 year old rum', for 3, 5, 8 and 12. 15 and 21 too
+  # if they ever appear. El Dorado 151 is the correct string already."
   #
-  # SO `overproof Demerara rum, lightly aged` NOW HAS NO BOTTLE AT ALL,
-  # which is a normal state -- 78 of the 154 categories in use are in it -- and not a reason to
-  # retire the generic. Two drinks still call for it (pic-a-de-crop-punch,
-  # zombie-intoxica) and Helen is rethinking both; the category is what those
-  # drinks want, whatever ends up filling it. costs.yml prices it as a category.
+  # The words `year old rum` came off and the capitals went on; the pattern
+  # itself is unchanged and still covers 3, 5, 8 and 12. She was asked whether
+  # renaming the 3 alone was intended, since the comment above described a
+  # pattern its own entries would then stop following -- all four, she said.
+  # `El Dorado 151` needs nothing, and neither does `El Dorado 21` on the
+  # sipping shelf.
+  #
+  # EVERY OLD SPELLING IS AN ALIAS, including the full `N year old rum` form
+  # this file used until today. A suggestion typed the old way keeps resolving
+  # whether or not the drink that wrote it has been retyped.
+  "El Dorado 3 Year Old":
+    generic: "lightly aged and filtered rum"
+    aliases: ["El Dorado 3 year old rum", "El Dorado 3", "ED3", "El Dorado 3yo", "El Dorado 3yo rum"]
+  "El Dorado 5 Year Old":
+    generic: "aged Demerara rum"
+    aliases: ["El Dorado 5 year old rum", "El Dorado 5"]
+  "El Dorado 8 Year Old":
+    generic: "aged Demerara rum"
+    aliases: ["El Dorado 8 year old rum", "El Dorado 8"]
+  "El Dorado 12 Year Old":
+    generic: "aged Demerara rum"
+    aliases: ["El Dorado 12 year old rum", "El Dorado 12"]
+  # EL DORADO 151 IS BACK -- Helen, 2026-09-08 (#750), reversing her own
+  # withdrawal of 2026-09-05. Asked whether the category wanted a bottle at all
+  # now that the demand is two 15 ml pours, she named this one.
+  #
+  # WHAT CHANGED IS THE SIZE OF THE QUESTION, not her view of the bottle. She
+  # withdrew it saying "I don't own it, I just wanted to, but it looks like it's
+  # hard to get and I'll need to figure out my drinks in another way" -- and
+  # that was said about pic-a-de-crop-punch pouring 360 ml, the largest single
+  # pour in the collection. The 360 was a TYPO for 15 (she read the drink
+  # against Death & Co on 2026-09-07), so the whole category now amounts to
+  # 30 ml across two drinks, and "figure out my drinks another way" was solving
+  # a problem that did not exist.
+  #
+  # NO PRICE AND NO ABV YET, DELIBERATELY. Both are hers and neither is
+  # inferable: costs.yml goes on pricing the CATEGORY, which is what it did
+  # while there was no bottle, so nothing downstream changes until she supplies
+  # them. `bottle_rate` returns nil for a bottle with no `gbp`, and the shopping
+  # list falls back to the generic rate on its own.
+  "El Dorado 151":
+    generic: "overproof Demerara rum, lightly aged"
+    aliases: ["El Dorado 151 rum", "ED151"]
   "Skipper's":
     generic: "aged Demerara rum"
     aliases: ["Skippers dark rum", "Skippers"]
@@ -199,9 +220,14 @@ bottles:
   # it still does". That drink had stopped saying it and the comment had gone
   # stale unnoticed, which is the same species of rot
   # test_unresolved_suggestions_has_no_stale_entries watches for one block down.
-  "Planteray Barbados 5":
+  # `Planteray 5 Year Old Barbados` SINCE 2026-09-07, Helen's call, made while
+  # giving Pic-a-de-Crop Punch the suggestion it had never had. The brand is
+  # Planteray and not Plantation -- that rename was #582 -- so both Plantation
+  # spellings stay as aliases alongside the retired Planteray one.
+  "Planteray 5 Year Old Barbados":
     generic: "moderately aged rum"
-    aliases: ["Plantation Barbados 5", "Plantation Barbados 5 year old rum"]
+    aliases: ["Planteray Barbados 5", "Plantation Barbados 5",
+              "Plantation Barbados 5 year old rum"]
 
   # --- lightly aged and filtered -------------------------------------------
   "Havana Club 3 year old":
@@ -417,9 +443,21 @@ bottles:
   # Spiced Negroni's gin. `speciality` is the generic that REPLACED `flavoured`
   # (#314, Helen 2026-08-26) and it must always carry a `character`, which is
   # why the drink gains `spiced` in the same pass.
-  "Ophir":
+  # OPIHR, NOT OPHIR -- the product is Opihr Oriental Spiced London Dry Gin, and
+  # the collection had the h and the i the wrong way round from the day it was
+  # declared. Corrected 2026-09-07 (#701). Found from the other end, by the #297
+  # ABV pass: looking up a strength sent it hunting for a product that does not
+  # exist under that spelling, which is the practical cost of a wrong declared
+  # name and is why this was worth fixing rather than tolerating.
+  #
+  # EVERY OLD SPELLING STAYS AN ALIAS, per Helen's standing correction of
+  # 2026-09-06 on La Favorite: fix it everywhere, keep the old form so a
+  # suggestion typed the wrong way keeps resolving whether or not the drink that
+  # wrote it has been retyped yet.
+  "Opihr":
     generic: "speciality"
-    aliases: ["Ophir spiced London dry gin", "Ophir Spiced Gin"]
+    aliases: ["Ophir", "Ophir spiced London dry gin", "Ophir Spiced Gin",
+              "Opihr Oriental Spiced", "Opihr Oriental Spiced London Dry Gin"]
   "Beefeater":
     generic: "London dry gin"
   "Tanqueray":
@@ -1067,16 +1105,6 @@ not_reached_for:
     it still does" -- and that had quietly stopped being true. Helen called the
     spelling "a bad typo from me" on 2026-09-04; if the bottle ever returns, so
     do the three aliases.
-  "El Dorado 151": >-
-    Clears the Demerara appellation and was listed here until 2026-09-05 on the
-    strength of being WANTED rather than owned -- the one bottle this file ever
-    admitted on that basis. Helen withdrew it: "I don't own it, I just wanted
-    to, but it looks like it's hard to get and I'll need to figure out my drinks
-    in another way." So the "wanted counts as reached-for" clause is gone with
-    it, and this list means what it always meant: what she would POUR. It leaves
-    `overproof Demerara rum, lightly aged` with no bottle behind it, which
-    two drinks still ask for -- pic-a-de-crop-punch, whose 360 ml was the single largest pour of
-    any bottle in the collection, and zombie-intoxica. Both are hers to rework.
   "Lemon Hart 151": >-
     Clears the Demerara appellation and is out anyway. Helen, 2026-08-27: "I
     don't like Lemon Hart 151, never mind whether or not I could get hold of it

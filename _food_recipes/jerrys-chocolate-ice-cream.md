@@ -4,6 +4,7 @@ tagline: "Chocolate three ways, and you don't need to make custard."
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 source_type: book
 makes: "950 ml"
+serves_estimate: 6
 prep_time: "10 mins"
 cook_time: "None"
 main_ingredients: ["unsweetened chocolate", "cocoa powder", "whipping cream", "eggs", "golden caster sugar", "dark chocolate chips", "whole milk"]

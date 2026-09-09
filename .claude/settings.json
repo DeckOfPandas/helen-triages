@@ -1,12 +1,24 @@
 {
   "permissions": {
+    "blockReadsOutsideWorkingDirectories": true,
     "allow": [
       "Bash(pytest *)",
       "Bash(python3 -m pytest *)",
       "Bash(.node-runtime/node/bin/node --test *)",
       "Bash(curl -s \"https://api.github.com/repos/DeckOfPandas/helen-triages/*)",
       "Bash(.gh-runtime/bin/gh auth status)",
-      "Bash(.gh-runtime/bin/gh issue *)"
+      "Bash(.gh-runtime/bin/gh issue *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git blame *)",
+      "Bash(git ls-tree *)",
+      "Bash(git ls-remote *)",
+      "Bash(git check-ignore *)",
+      "Bash(git commit -F *)",
+      "Bash(gh pr create *)",
+      "Bash(.gh-runtime/bin/gh pr create *)"
     ],
     "deny": [
       "Bash(chmod *)",
@@ -32,6 +44,12 @@
             "if": "Bash(git *)",
             "timeout": 20,
             "statusMessage": "Checking branch is not main"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-sed.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking for sed"
           }
         ]
       }

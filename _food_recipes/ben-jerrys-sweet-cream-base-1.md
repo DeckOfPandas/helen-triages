@@ -4,6 +4,7 @@ tagline: "Ben & Jerry say this is their most popular base. No custard step, hurr
 source: "Adapted from Ben & Jerry's Homemade Ice Cream & Dessert Book"
 source_type: book
 makes: "950 ml"
+serves_estimate: 6
 prep_time: "10 mins"
 cook_time: "none"
 main_ingredients: ["eggs", "golden caster sugar", "whipping cream", "whole milk"]

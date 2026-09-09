@@ -4,6 +4,7 @@ tagline: "Lighter and more savoury than carrot cake."
 source: "Adapted from Good Food, recipe Sara Buenfeld"
 source_type: website
 makes: "12 slices"
+serves_estimate: 12
 prep_time: "10 mins"
 cook_time: "50 mins"
 main_ingredients: ["courgette", "orange", "sultanas", "cream cheese", "pistachios", "light brown soft sugar", "icing sugar", "self-raising flour", "eggs"]

@@ -195,6 +195,11 @@ juice_yields:
     fruit: grapefruit
     ml_min: 180
     ml_max: 240
+  # Same fruit and the same yield -- only the variety differs.
+  ruby grapefruit juice:
+    fruit: grapefruit
+    ml_min: 180
+    ml_max: 240
 
 # --- what the index's ingredient pickers do with all this --------------------
 # THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
@@ -364,6 +369,40 @@ not_on_cards:
   - sugar cube
   - honey
   - lemon zest
+
+# --- HOW A POUR IS USED, not what it is --------------------------------------
+# #754, Helen 2026-09-06: "Add `as:` -- float, rinse, muddle."
+#
+# WHY A FIELD AND NOT PROSE. #567 orders a card's ingredients in seven tiers and
+# the seventh is "Floats" -- which could not be built, because nothing recorded
+# that a pour WAS one. Five drinks float something and four rinse with
+# something; before this they said so in a method step or a QQ note, which the
+# plugin cannot read. A float is a small pour of something strong, so tier 1
+# took it and sorted it by volume, landing it at the bottom of the SPIRITS
+# instead of the bottom of the CARD. Don's Mai Tai read
+# `Jamaican rum . absinthe . orange Curacao ...` with a rinse in second place,
+# ahead of an ingredient poured fifteen times its volume.
+#
+# THIS IS A CLOSED VOCABULARY and `test_ingredient_as_is_declared` holds it, the
+# same guard `rum_characters` has and for the same reason: a typo must not be
+# able to mint a new value in silence. Adding a member is a vocabulary decision
+# and therefore Helen's.
+#
+# `float` AND `rinse` BOTH SORT LAST. #567 names only floats, and Helen ruled on
+# 2026-09-07 that a rinse goes with them: both are added outside the main build,
+# so both belong at the end of the line rather than among the spirits.
+#
+# `muddle` SORTS NOTHING, AND IS DECLARED ANYWAY. #567 also asks for muddled
+# ingredients to be grouped first; that was built on 2026-09-07, looked at, and
+# dropped -- it put Ti' Punch's rhum last on a rhum drink and led P Five Punch
+# with its orgeat, because a muddle covers both expressing a lime and dissolving
+# a sugar. Helen: don't let a muddle reorder at all. The VALUE stays because it
+# is a true fact about the pour and the drink page may want it; the card simply
+# does not read it. See the plugin's header for the full finding.
+ingredient_as:
+  - "float"
+  - "rinse"
+  - "muddle"
 
 # --- other names for a family ------------------------------------------------
 # A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a
@@ -797,7 +836,11 @@ card_names:
   "navy strength gin": "navy strength gin"
   "genever": "genever"
   "blended scotch whisky": "scotch"
-  "single malt scotch whisky": "single malt"
+  # `single malt whisky`, not `single malt` -- Helen, 2026-09-08 (#844). The
+  # short form leaned on the neighbouring `scotch` to supply the noun, and a
+  # card names one ingredient at a time: read alone, "single malt" is an
+  # adjective with nothing after it.
+  "single malt scotch whisky": "single malt whisky"
   # Bonded stays its own word. Helen, 2026-08-27: "bonded rye is a different
   # thing, like overproof demerara rum" -- and five of seven rye entries in the
   # collection are bonded, so collapsing it to `rye` would hide the majority
@@ -819,7 +862,7 @@ card_names:
   # distance `demerara` is the whole fact. Helen, 2026-09-04: "Sometimes I say
   # 'demerara sugar syrup' when I mean that." The recipe line gets her full
   # phrase; the card does not need it.
-  "demerara sugar syrup": "demerara syrup"
+  "demerara sugar syrup 2:1": "demerara syrup"
   # THE TWO HONEY WATERS CAME OFF ON 2026-09-04 with the generics they named,
   # and went back on the same evening with them. Helen: "Bee's Knees needs to
   # say honey water 2:1. I'm sorry if I said the wrong thing about this before,
@@ -1229,7 +1272,14 @@ amari:
   - "Cynar"
   - "fernet"
   - "Amaro Nonino"
-  - "Amaro Ciociano"
+  # AMARO CIOCIARO, NOT CIOCIANO -- Paolucci, Lazio, 30%. The collection
+  # misspelled it until 2026-09-07 (#701). It was renamed by declaring BOTH
+  # spellings for one merge and then dropping the old one, because a generic
+  # has no alias mechanism the way a bottle does, and the drink that names it
+  # lives in the other repo: the two cannot land in one commit, so there is no
+  # single-repo step that keeps `test_every_generic_is_declared` green.
+  # DECISIONS 9.3.2 has the full shape if another generic ever needs renaming.
+  - "Amaro Ciociaro"
 
 # FIVE AROMATISED-WINE GENERICS, AND "AROMATISED WINE" IS NOT ONE OF THEM.
 # Helen, 2026-08-30, settling #568: "I would never write 'aromatised wine' as a
@@ -1340,7 +1390,8 @@ bitters:
 syrups:
   - "cane sugar syrup 1:1"
   - "cane sugar syrup 2:1"
-  - "demerara sugar syrup"
+  - "demerara sugar syrup 2:1"
+  - "turbinado sugar syrup 2:1"
   - "grenadine"
   - "ginger syrup"
   - "passion fruit syrup"
@@ -1432,6 +1483,13 @@ juices:
   - "orange juice"
   - "pineapple juice"
   - "grapefruit juice"
+  # RUBY IS A SECOND GENERIC, NOT A NOTE -- Helen, 2026-09-07, settling how
+  # Pic-a-de-Crop Punch should record what its source states. Ruby grapefruit is
+  # sweeter and much less bitter than white, which is the rum-styles test: a
+  # difference earns a name when it changes what you are making. The cost, and
+  # she took it knowingly, is that the index filters and excludes the two
+  # separately -- "no grapefruit tonight" has to name both.
+  - "ruby grapefruit juice"
   - "cranberry juice"
   - "apple juice"
 
@@ -1558,7 +1616,7 @@ family_of:
   "Cynar": amaro
   "fernet": amaro
   "Amaro Nonino": amaro
-  "Amaro Ciociano": amaro
+  "Amaro Ciociaro": amaro
   "sweet vermouth": fortified
   "dry vermouth": fortified
   "blanc vermouth": fortified
@@ -1577,6 +1635,217 @@ family_of:
   "Swedish flaggpunsch": herbal
   "Galliano": herbal
   "Becherovka": herbal
+
+# =============================================================================
+# THE SHOPPING SHELF -- what order a shopping list reads in. #848
+# =============================================================================
+# Helen, 2026-09-08: "for cocktail shopping list, list items in shelf order then
+# volume", and she gave the order. `fortified` is the one addition, on her
+# ruling the same day, because her list had nowhere for vermouth to go and
+# vermouth is in a lot of drinks.
+#
+# IT IS A SHOPPING ORDER, NOT A TAXONOMY, and that is why it is a second map
+# rather than more columns on `family_of`. A family says what a spirit IS; a
+# shelf says where you find it and in what order you would rather read it.
+# The two disagree on purpose in three places: an amaro and a herbal liqueur
+# are different FAMILIES and one shelf, champagne is `fortified` by family and
+# sits under `tops` here because that is what you do with it, and the sugars
+# share a shelf with the syrups because they do the same job in a drink.
+#
+# EVERY GENERIC IN USE HAS A ROW. A generic with none falls to the end of the
+# list rather than breaking it -- the sort treats an unknown shelf as "last" --
+# but that is a silent degradation, so a new generic should gain a row here in
+# the same commit that introduces it. There is no test for this yet; see the
+# note on #848.
+#
+# FRESH PRODUCE EARNED ITS OWN SHELF ON THE FIRST READING -- Helen, 2026-09-08:
+# "Fresh produce should get its own shelf, I agree." It was the soft edge of the
+# first cut, where a pear, a cucumber and a sprig of mint sat under
+# `flavourings` with the oil and the salt, and `flavourings` was carrying 24
+# rows against every other shelf's handful.
+#
+# IT SITS BEFORE THE SQUEEZED JUICES, because the citrus you squeeze IS produce
+# and this puts the fresh things together. One line to move if a real list reads
+# better with it first.
+#
+# `dried apricots` DELIBERATELY DID NOT MOVE. Dried fruit is a dry good and
+# belongs with the store cupboard; `lemon zest` DID, because what you buy for it
+# is a lemon.
+shopping_shelves:
+  - spirits
+  - fortified
+  - liqueurs
+  - fresh produce
+  - freshly squeezed fruit juice
+  - bottled fruit juice
+  - flavourings
+  - sugar syrup
+  - bitters
+  - tops
+
+shelf_of:
+  # spirits (39)
+  Batavia arrack: spirits
+  Ceylon arrack: spirits
+  London dry gin: spirits
+  Old Tom: spirits
+  Plymouth: spirits
+  absinthe: spirits
+  aged Demerara rum: spirits
+  apple brandy: spirits
+  aquavit: spirits
+  añejo tequila: spirits
+  blanco tequila: spirits
+  blended overproof rum: spirits
+  bourbon: spirits
+  cachaça: spirits
+  calvados: spirits
+  clairin: spirits
+  clear blended multi-region rum: spirits
+  coconut rum: spirits
+  cognac: spirits
+  eau de vie: spirits
+  lightly aged and filtered rum: spirits
+  mezcal: spirits
+  moderately aged Jamaican rum: spirits
+  moderately aged rum: spirits
+  navy strength gin: spirits
+  overproof Demerara rum, lightly aged: spirits
+  overproof Jamaican rum, unaged: spirits
+  pineapple rum: spirits
+  pineapple vodka: spirits
+  pisco: spirits
+  reposado tequila: spirits
+  rhum agricole blanc: spirits
+  rhum agricole vieux: spirits
+  rye: spirits
+  single malt scotch whisky: spirits
+  sloe gin: spirits
+  speciality: spirits
+  vanilla vodka: spirits
+  vodka: spirits
+  # fortified (8)
+  amontillado sherry: fortified
+  blanc vermouth: fortified
+  dry vermouth: fortified
+  oloroso sherry: fortified
+  quinquina: fortified
+  red wine: fortified
+  sweet vermouth: fortified
+  tawny port: fortified
+  # liqueurs (39)
+  Amaro Ciociaro: liqueurs
+  Amaro Nonino: liqueurs
+  Aperol: liqueurs
+  Becherovka: liqueurs
+  Bénédictine: liqueurs
+  Campari: liqueurs
+  Chartreuse Jaune: liqueurs
+  Chartreuse Verte: liqueurs
+  Créole Shrubb: liqueurs
+  Cynar: liqueurs
+  Galliano: liqueurs
+  Grand Marnier: liqueurs
+  Jägermeister: liqueurs
+  Strega: liqueurs
+  Swedish flaggpunsch: liqueurs
+  amaretto: liqueurs
+  apple schnapps: liqueurs
+  apricot liqueur: liqueurs
+  blue Curaçao: liqueurs
+  cherry liqueur: liqueurs
+  coffee liqueur: liqueurs
+  crème de banane: liqueurs
+  crème de cacao: liqueurs
+  crème de cassis: liqueurs
+  crème de menthe: liqueurs
+  crème de mûre: liqueurs
+  crème de pêche: liqueurs
+  crème de violette: liqueurs
+  dry orange Curaçao: liqueurs
+  fernet: liqueurs
+  gentian liqueur: liqueurs
+  ginger liqueur: liqueurs
+  liqueur de sapin: liqueurs
+  maraschino liqueur: liqueurs
+  mastiha liqueur: liqueurs
+  orange Curaçao: liqueurs
+  passion fruit liqueur: liqueurs
+  tomato liqueur: liqueurs
+  triple sec: liqueurs
+  # freshly squeezed fruit juice (5)
+  grapefruit juice: freshly squeezed fruit juice
+  lemon juice: freshly squeezed fruit juice
+  lime juice: freshly squeezed fruit juice
+  orange juice: freshly squeezed fruit juice
+  ruby grapefruit juice: freshly squeezed fruit juice
+  # bottled fruit juice (3)
+  apple juice: bottled fruit juice
+  cranberry juice: bottled fruit juice
+  pineapple juice: bottled fruit juice
+  # flavourings (24)
+  basil: fresh produce
+  black tea: flavourings
+  blackberries: fresh produce
+  cider vinegar: flavourings
+  coconut cream: flavourings
+  cucumber: fresh produce
+  dried apricots: flavourings
+  egg white: flavourings
+  espresso: flavourings
+  fruit purée: flavourings
+  ginger and lemongrass cordial: flavourings
+  kaffir lime leaves: fresh produce
+  lemon zest: fresh produce
+  lime: fresh produce
+  lime cordial: flavourings
+  mint: fresh produce
+  olive oil: flavourings
+  passion fruit: fresh produce
+  pear: fresh produce
+  pineapple: fresh produce
+  raspberries: fresh produce
+  rosemary: fresh produce
+  salt: flavourings
+  water: flavourings
+  # sugar syrup (20)
+  agave syrup: sugar syrup
+  "cane sugar syrup 1:1": sugar syrup
+  "cane sugar syrup 2:1": sugar syrup
+  cinnamon syrup: sugar syrup
+  "demerara sugar syrup 2:1": sugar syrup
+  falernum: sugar syrup
+  ginger syrup: sugar syrup
+  golden caster sugar: sugar syrup
+  grenadine: sugar syrup
+  honey: sugar syrup
+  "honey water 1:1": sugar syrup
+  "honey water 2:1": sugar syrup
+  orgeat: sugar syrup
+  palm sugar: sugar syrup
+  passion fruit syrup: sugar syrup
+  raw sugar: sugar syrup
+  sugar cube: sugar syrup
+  "turbinado sugar syrup 2:1": sugar syrup
+  vanilla syrup: sugar syrup
+  white sugar: sugar syrup
+  # bitters (11)
+  Creole bitters: bitters
+  aromatic bitters: bitters
+  chocolate bitters: bitters
+  lavender-forward bitters: bitters
+  margarita bitters: bitters
+  orange bitters: bitters
+  peppermint bitters: bitters
+  pimento bitters: bitters
+  tiki bitters: bitters
+  warm-spiced bitters: bitters
+  wood smoke bitters: bitters
+  # tops (4)
+  champagne: tops
+  cola: tops
+  prosecco: tops
+  soda water: tops
 
 # Bases with NO family, deliberately. Same idea as
 # tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE: a decision with its

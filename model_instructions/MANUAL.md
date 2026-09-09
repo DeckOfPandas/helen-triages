@@ -92,11 +92,25 @@ file from such a session is §11.0.3.
 jekyll-local        # port 4001, drafts visible — the working view
 jekyll-prod         # port 4002, exactly what deploys — no drafts, no local switches
 pytest              # content and structure checks; ONE session at a time
-node --test tests/js/*.test.js    # the JS suite — the glob is required (§10)
+node --test                       # the JS suite, discovered from the root (§10)
+
+python3 scripts/verify.py         # ALL FOUR CHECKS, and prefer this
 ```
 
+**`scripts/verify.py` runs the two suites AND the two checks that get
+forgotten** — `derive_cocktail_moods.py`, the only thing that says whether a
+vocabulary edit silently moved a drink's moods, and `build_ingest_vocab.py
+--check`, the only thing that says the standalone ingest documents still match
+the data they are rendered from. Sessions have run the two test suites, called
+the work verified, and missed both. One command, four lines of output, non-zero
+exit if anything fails.
+
 **`.node-runtime/` and `.gh-runtime/` do not come with a worktree**; they are
-gitignored, like the two drafts repos (§9.1). Use the system `node`.
+gitignored, like the two drafts repos (§9.1). Use the system `node`. **There is
+no `gh` at all in a worktree** — `gh: command not found`, and it is not
+installable from here — so anything `CLAUDE.md` describes as a `gh` command
+(reading an issue, `gh pr create`) is the REST API instead, called with
+`GH_TOKEN` from a script in `tmp/`. Measured 2026-09-07, opening PR #808.
 
 **Never run two `pytest` sessions at once.** `test_rendered_pages.py` writes
 throwaway `zzz-gate-` recipes into `_food_recipes/` (and drinks into
@@ -108,6 +122,18 @@ Local URL: `http://localhost:4001/helen-triages/`, then `/food/` or `/cocktails/
 
 **`jekyll serve` does not reload `_config.yml`.** Restart after any change to
 it.
+
+**IT DOES NOT RELOAD `_plugins/` EITHER, AND THAT ONE FAILS SILENTLY.** Ruby
+plugins are loaded once at boot; the watcher rebuilds pages without them, for
+as long as the server is up, with nothing in the log and no error on the page.
+A server started before a plugin existed serves a site where that plugin has
+simply never run. Helen lost a round of #801 to exactly this — the food
+shopping list showed its number boxes and no totals, because
+`_plugins/food_shopping.rb` had hung `shopping` and `portions` on nothing.
+**Restart after adding or editing any file in `_plugins/`.** To confirm which
+you are looking at, each plugin logs a line at build (`Costs:`, `Shopping:`);
+no line means it did not run. Reproduce deliberately with
+`--plugins <empty dir>`.
 
 **`_config_local.yml` is where every local-only switch lives, and nowhere
 else**: `show_source_wording`, `show_awaiting_fix`, `show_drafts`,
@@ -283,10 +309,21 @@ second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
 **The nav is one row, the same everywhere**: one icon per site in
 `sites.yml`, in that file's order, then the `??` about link at a literal
 `/about/`. **The footer's reference block is a column PER SITE, gated on
-having material** — food's two links appear on a cocktail page, and a
-`[ COCKTAILS ]` column appears the day cocktails has reference pages, with no
-template change. The hearts are pinned to grid column 2 so a second column
-cannot push them off centre.
+having material** — food's two links appear on a cocktail page, and since
+2026-09-06 (#529) a `[ COCKTAILS ]` column appears beside them, which cost no
+template change: the loop always asked every site rather than food. The hearts
+are pinned to grid column 2 so a second column cannot push them off centre.
+
+**A link may be `local_only: true`, and it gates the LINK, not the page.** The
+template drops such a link unless `show_local_reference_links` is set, which
+only `_config_local.yml` declares — so production renders exactly what it did
+before the key existed, and a site left with no surviving links draws no column
+rather than an empty bracketed word. **It is half a switch and must be set and
+cleared with the other half**, `published: false` on the page itself (§14):
+a link with no page is a 404 in the one place that matters, and a page with no
+link is reachable only by typing the URL. `test_site_nav_links_resolve_to_real_pages`
+INVERTS for such a link rather than skipping it — it must point at a page that
+IS unpublished — so clearing either flag alone goes red.
 
 **Two guards, and neither substitutes for the other:**
 `test_the_header_and_footer_are_identical_on_every_page` compares the
@@ -329,9 +366,10 @@ apart from DOM wiring, so Node can test it.
 | `cook-schedule.js` | the timings arithmetic | `cook-schedule.test.js` |
 | `back-link.js` | may this arrow use history? (§13.7) | `back-link.test.js` |
 | `cocktail-search.js` | the drinks index's pool, ranking and matching (§9.3.3) | `cocktail-search.test.js` |
-| `scale.js`, `shopping-list.js` | the scaler's arithmetic and the one amount parser (§9.13) | `scale.test.js`, `shopping-list.test.js` |
-| `assets.js` | `HTF.escapeHtml`, `HTF.indexMemory`, the asset helpers | `escape-html.test.js`, `index-memory.test.js` |
-| `filters.js` | DOM wiring, food index | not directly; §10.2 |
+| `scale.js`, `shopping-list.js` | the scaler's arithmetic and the one amount parser (§9.13, §8.2) | `scale.test.js`, `shopping-list.test.js` |
+| `food-shopping-list.js` | food's totals, by aisle, scaled by portions (§8.2) | `food-shopping-list.test.js` |
+| `assets.js` | `HTF.escapeHtml`, `HTF.indexMemory`, `HTF.shortlist`, the asset helpers | `escape-html.test.js`, `index-memory.test.js`, `shortlist.test.js` |
+| `filters.js` | DOM wiring, food index | `food-index-startup.test.js` (§10.2) |
 | `cocktail-index.js` | DOM wiring, drinks index | `tests/js/index-harness.js` (§10.2) |
 
 **`HTF.filterState` is the MODULE and `HTF.filterState.create(SPEC)` is a
@@ -364,6 +402,8 @@ tagline: "It's fun to have a one-pot stew that is bright and acidic..."
 source: "Adapted from Good Food, January 2026"
 source_type: publication              # required; see SOURCE_ATTRIBUTION_SPEC.md
 serves: "4"                      # xor makes: — never both. QUOTED
+serves_estimate: 6               # #815; REQUIRED unless serves: opens with a
+                                 # number. An integer, PEOPLE, UNQUOTED
 prep_time: "20 mins"
 cook_time: "1 hr 30 mins"
 main_ingredients: ["cavolo nero", "butter beans", "lemon"]
@@ -451,7 +491,30 @@ with it.
   text, so `item: "~1 tbsp tamarind paste"` renders unstyled with no error.
   No test catches this; it is an authoring habit.
 - `serves` **xor** `makes`; values may be prose in Helen's voice ("Depends on
-  appetite") — never tidy one into a number.
+  appetite") — never tidy one into a number. **That is exactly why
+  `serves_estimate:` exists** (#815): the scaler needs an integer and her words
+  must not be touched, so the estimate is a key of its own and the prose stays
+  as written. Required wherever `serves:` does not OPEN with a number — 129 of
+  423 files today, which is every `makes:` recipe plus the 20 whose `serves:`
+  is prose or `QQ`. **`makes:` is never read as people however numeric it
+  looks**: 950 ml is not 950 portions, and "12 slices" is not necessarily
+  twelve people. It is an integer and UNQUOTED — a quoted `"6"` is a string
+  and the plugin will not read it. **Produced at ingest**; ask Helen rather
+  than guess when the source does not support one.
+- **A RANGE TAKES ITS LOWER END** — Helen, 2026-09-07: *"when it's a range,
+  pick the lower number because under-catering is worse for me than
+  over-catering."* This sounds backwards and is not: the scale is portions
+  wanted OVER portions made, so a smaller base gives a bigger multiplier and
+  more food. It governs `serves: "4–6"` (the plugin already takes 4) and any
+  `serves_estimate:` written from a range.
+- **A COMPONENT RECIPE CANNOT ALWAYS BE ONE NUMBER, and the truth goes in a
+  note.** `chocolate-ganache` glazes an 8-inch cake, drips a tall one, fills
+  another, tops a Millionaire's shortbread, ices 12 cupcakes or makes 16
+  truffles; `caramel` is 5 servings as a sauce or a 16-cm tin as a filling.
+  Helen: *"I have no idea how to model this. Please add all this as a note on
+  the recipe and I will tidy up later."* So `serves_estimate:` takes the
+  commonest use and the note carries the rest, in her words. **Do not invent a
+  schema for this** without her — see `DECISIONS.md` §8.2.
 - `method` **xor** `method_groups`; both present means the second is dropped.
   Group names are bare nouns (`dressing`); method group names may be
   narrative phases; the page uppercases both.
@@ -797,6 +860,110 @@ word-match-emphasis($colour)`; and the exclude hover is a deeper cut than its
 active tone on purpose, guarded by comparing relative luminance so the
 DIRECTION is asserted.
 
+### 8.2 The food shopping list and its scaler — #801
+
+**The last thing on the food index, shown only while the shortlisted-only
+filter is on** — the same rule the drinks list follows (§9.13), and the literal
+reading of *"the food recipe shortlist page"*. It is a deliberate copy of
+cocktails' shopping list, class for class, because Helen's brief was *"I would
+like all the same features"*. **Costing is the one feature not copied**: she
+ruled it out for food.
+
+**THE SCALER COUNTS PORTIONS, NOT BATCHES**, and that is the difference from
+the drinks. A drink's box counts glasses; a recipe's counts PEOPLE, so four
+portions of a recipe that serves six is ×0.67 and the fractional multiplier the
+drink scaler refuses (§9.13, whole recipes only) is ordinary here. That is what
+makes the serving size Helen asked to be guessed load-bearing: it is the number
+the portions are divided by.
+
+**Nothing is rounded coarser than a gram** — Helen, 2026-09-07: *"don't round
+to 10 g or 5 g, round to 1g"*. Two thirds of 200 g is 133 g. Spoons and counts
+keep vulgar fractions instead (`⅔ tsp`, `3⅓`), which is NOTATION and not
+rounding — ⅔ prints for exactly two thirds and never for 0.7.
+
+**Four files, and the split is the usual one.**
+
+| file | is |
+|---|---|
+| `_data/food/aisles.yml` | Helen's ten aisles in shop order, and a KEYWORD table. **The longest keyword wins**, matched on whole words — `milk` is dairy and `coconut milk` is a tin, `garlic` is produce and `garlic paste` is a jar. An exception is an entry, never a precedence rule. `never:` (water, cold water, ice) matches the WHOLE name and drops the ingredient |
+| `serves_estimate:` in each recipe | how many PEOPLE it feeds, where `serves:` says no number (#815). `_data/food/servings.yml` held these outside the files until 2026-09-07 and is deleted |
+| `_plugins/food_shopping.rb` | assigns the aisle and resolves the portion count at BUILD, and hangs `shopping`, `portions`, `portions_estimated` on every document. The page is handed the answer and never the table |
+| `assets/js/food-shopping-list.js` | the totals. Pure; the DOM half is `filters.js` |
+
+**Why the guesses are not in the recipes.** A number in 44 files means editing
+44 files, and §4.0's rule then un-proofreads more than half the collection to
+add a figure Helen never wrote. One reviewable file instead, and not a recipe
+touched.
+
+**The amount parser is still the ONE parser** (§9.13). `shoppingList.parseAmount`
+learned vulgar fractions, ranges (`30–50 g`), a leading `~`, and plural units
+(`2 cloves` → `clove`), plus `splitParenthetical` for `1 tbsp (6 g)`. **Nothing
+the cocktails collection writes parses differently**, and a test says so by
+name — check it before widening the parser again.
+
+**Grams and millilitres are the only units totalled in**; kg, l and cl fold
+into them and come back for display, so `1½ l` plus `500 ml` is `2 l` and a
+twelfth of a litre is `125 ml` rather than `0.125 l`. This is NOT the
+conversion `shopping-list.js` refuses — that rule is about units with no
+defined relationship (a dash is not some number of ml). `tbsp`, `oz` and every
+bare count are left where they are, because those would need inventing.
+
+**EVERY RECIPE COUNTS PEOPLE, and that took two goes.** The box is portions:
+four portions of a recipe that serves six is ×0.67. A recipe whose `serves:`
+states no number carries **`serves_estimate:`** in its own front matter (§4),
+produced at ingest from the recipe's own words — 129 of 423 files. An estimate
+is printed with a `~`, which is the only thing saying a figure was reasoned
+rather than written down.
+
+**WHAT STOOD HERE FOR A FORTNIGHT, so you do not rebuild it.** A recipe with no
+portion count got a box counting BATCHES (×1, ×2) with a `×` beside it, on the
+reasoning that `makes: "About 750 ml"` cannot become people without inventing a
+portion size. Helen killed it: *"increasing it to 50+ does nothing either and
+clearly 750 ml of gelato doesn't feed 50."* **It was honest and it was wrong**
+— "set all to N portions" could not reach those recipes, and a control that
+means something different on some rows is worse than a guessed number.
+**Batches were a workaround for missing data, and the fix was the data.**
+`_data/food/servings.yml`, which held the estimates outside the recipes for the
+same fortnight, is deleted: one home for the figure, beside the words it
+estimates from.
+
+**A recipe with NO portion count gets no box at all** — not a box that does
+nothing. That is what a new recipe looks like between being written and being
+given its estimate, and the panel names the key to add. This feature shipped
+three silences in one day before the rule stuck: a control that did nothing, a
+total that would not change, and a panel that rendered empty.
+
+**`k` says WHICH KEY the yield came from**, and the blob carries it for the
+label: `serves` and `makes` are exclusive (§4), so a page printing the text
+behind a fixed word is right for half the collection. It read
+`serves About 750 ml` until 2026-09-07.
+
+**Do not print the yield beside the recipe name.** Helen, with a screenshot of
+`7  Moules Marinière serves 4`: *"This screenshot makes it look like I'm asking
+for 28 portions of mussels."* A number at each END of a short line reads as one
+expression however the middle is styled, and this row has to open with a number
+— so there is no styling fix, and the yield lives in the input's `title` and
+`aria-label`. If it ever has to be seen, it goes on a line of its own.
+
+**Two folds you will trip over.** A plural ingredient NAME folds to its
+singular for the grouping key (`onion`/`onions` are one line), reusing
+`foldUnit` rather than a second rule; the LABEL is the first spelling seen. And
+a cross-recipe link (`[grandma's lemon curd](../…)`) is KEPT here and forced to
+`other`, where §12's exclusion index drops it — different questions, different
+answers, stated in both files.
+
+**`HTF.shortlist.portions` is a THIRD localStorage key**, not `glasses` renamed:
+a missing glasses entry is one glass, a missing portions entry is *however many
+this recipe makes*, which only the build knows — so `1` is a real, storable
+answer here.
+
+**Where it is tested.** `food-shopping-list.test.js` (the arithmetic),
+`shopping-list.test.js` (the parser, including the no-change-for-cocktails
+claim), `food-index-startup.test.js` (the wiring, §10.2),
+`tests/test_food_shopping.py` (the two data files),
+`tests/test_rendered_pages.py` (the **only** place the Ruby matcher can be
+checked — it caught `garlic cloves` landing on the spice rack).
+
 ---
 
 ## 9. Cocktails
@@ -852,9 +1019,11 @@ unmerged private branch). `git fetch origin main:main` refuses on a
 checked-out branch and a merge onto `main` is refused by the hook.
 
 **The API token is a different channel.** `GH_TOKEN` carries Issues on all
-three repos and reads file contents on none of the private ones (403). Git
-can. **Pushing to the private repos needs no ask** (`CLAUDE.md`); committing or
-merging onto their `main` is still forbidden, hook-enforced.
+three repos, and **since 2026-09-07 opening pull requests too** (§11.-1); it
+reads file contents on none of the private ones (403). Git can. **Pushing
+needs no ask in any of the three repos** (`CLAUDE.md`, 2026-09-07);
+committing or merging onto any `main` is still forbidden, hook-enforced.
+**Merging a PR is not in the token and never becomes yours.**
 
 **The naming trap**: `.gitignore` matches by directory name, so a renamed
 drafts directory is un-ignored and stageable in the public repo.
@@ -1079,9 +1248,19 @@ ingredient is always a visible `QQ`, never an absent key
 card shows — §9.10.1. There is no star axis: the index filters and excludes
 by ingredient, it does not browse by spirit.
 
-**Sugar is in the generic**: `cane sugar syrup 1:1`, `cane sugar syrup 2:1`,
-`demerara sugar syrup` (#594); both cane forms read `sugar syrup` on a card.
-Three honey waters likewise (`honey water`, `1:1`, `2:1`), one card name.
+**Sugar is in the generic, and so is the RATIO** (#594): `cane sugar syrup 1:1`,
+`cane sugar syrup 2:1`, `demerara sugar syrup 2:1`, `turbinado sugar syrup 2:1`.
+Both cane forms read `sugar syrup` on a card; the other two read `demerara
+syrup` and `turbinado syrup`. **Type + ratio only where the difference is
+real** — Helen, 2026-09-06 — which is why there is one demerara and one
+turbinado and not six permutations.
+
+Three honey waters are declared (`honey water`, `1:1`, `2:1`) and share one card
+name, but **no drink uses the bare one** since 2026-09-07: it is kept as the
+default for a drink whose ratio does not matter, and because `Acacia honey` in
+`bottles.yml` needs a category. The five drinks that sat on it were split
+2:1/1:1 on Helen's word, with `chartreuse-daiquiri` at 1:1 because its own note
+says *"equal parts honey and water"*.
 
 ### 9.3.1 The ingredient vocabulary — `_data/cocktails/ingredients.yml`
 
@@ -1396,9 +1575,28 @@ is Helen's**: base spirits, then lower-proof, then citrus and juice, then
 syrups, then everything else, then bitters; largest volume first inside a
 tier; the recipe's own order breaks ties. **The sections of `ingredients.yml`
 are the classifier**; a generic in no section warns at build and fails a test.
-Tier 7 (floats) is not built and could not be — nothing records a float
-(#754); a `card_order:` per-drink override exists, is tested, and has no
-users on purpose.
+**Tier 7 is built** (#754, 2026-09-07): `as:` on an ingredient records how a
+pour is USED — `float`, `rinse` or `muddle`, a closed vocabulary in
+`ingredient_as`, guarded the way `rum_characters` is. `float` and `rinse` both
+sort last, Helen's ruling that a rinse joins the floats; **`muddle` sorts
+nothing**. #567's muddle clause was built, looked at and dropped — grouping
+muddled ingredients first put Ti' Punch's rhum last on a rhum drink, because a
+muddle covers both expressing a lime and dissolving a sugar. The value is still
+recorded because it is true; the plugin header has the finding.
+
+**`card_order:` has its first user**, Port Authority's blackberries — they are
+`fruit_and_herbs`, so the default rule sorted them fifth on a drink they are
+the point of. `0` is legal and means "before tier 1"; test it with `is not
+None`, because Ruby's `||` treats 0 as truthy and a Python mirror of this sort
+did not.
+
+**The card's three stacks share one budget** (#776): a wrapped name caps the
+ingredients and the chips at two, and three rendered ingredient lines cap the
+chips. Half of it is CSS — `.drink-card-name--wrap` is a sibling — and half is
+`card-line-budget.js`, because CSS can ask how many lines are ALLOWED and never
+how many rendered. **A hidden card measures zero**, so anything measuring cards
+must re-run when pagination changes what is visible; `cocktail-index.js` does,
+ahead of `markChipRows()`.
 
 ### 9.10a `serve` — where the ice lives
 
@@ -1618,9 +1816,11 @@ pays it back once; the `em` numbers follow the title, the gutter does not).
 **A name that does not fit shrinks one step (0.86) or wraps, never
 ellipsises** (`card-name-fit.js`; with no JS the ellipsis stays). **The mood
 chips are bare words**, Courier, lowercase, a middle dot between them drawn
-on the following chip's `::before`, with `chip-rows.js` marking row-starting
-chips so no dot leads a row (#698); they are real `<button>`s that filter the
-index through one delegated listener, painted from state. **The goodness
+on the PRECEDING chip's `::after`, so a chip ending a line keeps its dot and
+none can ever lead a row (#846, which satisfies #698 by construction and
+deleted the `chip-rows.js` measurement pass that used to); they are real
+`<button>`s that filter the index through one delegated listener, painted from
+state. **The goodness
 mark is a ship and a word** (`_includes/cocktails/ship.html`, the same include
 the drink page calls; the card passes `short=true` for `ship_card_names`, the
 page says the rung's own words). **How tall a glass is drawn**: the curve
@@ -1717,8 +1917,12 @@ build stop rather than a report. Three things are load-bearing:
 
 - **`fetch-depth: 0`** — in a shallow clone `git log -- <file>` reports one
   commit for every file and §4.0's provenance test would pass over nothing.
-- **The JS suite needs a glob**: `node --test tests/js/*.test.js`. Passing the
-  DIRECTORY treats it as one file and reports "tests 1, fail 1".
+- **Run the JS suite as bare `node --test` from the repo root.** It discovers
+  every `*.test.js` on its own. Passing the DIRECTORY (`node --test tests/js/`)
+  treats it as one module and reports "tests 1, fail 1", which is what the old
+  glob form was working around — but a glob in a file-path argument now costs a
+  permission prompt on every run (`CLAUDE.md`: the checker cannot verify a file
+  list the shell has not expanded yet), and the bare form has neither problem.
 - **CI has no private drafts, and every test that reads them says what it
   does about that.** `SKIPS_WITHOUT_DRAFTS` and `PARTIAL_IN_CI` in
   `test_suite_hygiene.py` are the registries, enforced by
@@ -1815,6 +2019,19 @@ through it. For `decorations.js`, which has none, copy the harness — and read
 the script order from `_site/`, not the layouts, because a layout's scripts
 land inside `{{ content }}`.
 
+**FOOD HAS ITS OWN, `food-index-startup.test.js`** (#801), built the same way
+but self-contained rather than sharing `index-harness.js` — one consumer, and
+the fixture is a different page. Two things to know before extending it. The
+whole of `filters.js` is inside a single `DOMContentLoaded` handler, so the
+harness has to `doc.dispatch('DOMContentLoaded')` after loading the scripts or
+nothing runs at all and every assertion is about an untouched page; and the
+canary is `.recipe-list` becoming `visibility: visible`, which is near the end
+of that handler, so anything throwing above it fails one assertion. The stub
+stores `innerHTML` as a STRING and does not parse it, so a control the page
+writes that way cannot be found with `querySelector` — dispatch at the
+delegating parent with a stand-in `target` instead, which is the object the
+listener actually reads.
+
 ---
 
 ## 11. Working practices
@@ -1830,8 +2047,11 @@ land inside `{{ content }}`.
 **Git is `CLAUDE.md`'s.** Branch, never commit or merge onto `main` in any
 repo in the tree, never `git reset --hard` or discard over a dirty tree, check
 `git branch --show-current` in its own tool call immediately before every
-commit, never push `helen-triages` without confirmation, push the private
-repos freely. Two hooks in `.claude/hooks/` enforce the two rules that were
+commit. **Push with no ask in all three repos since 2026-09-07; OPEN THE PR with no
+ask in `helen-triages` only** (§11.-1) — the token cannot open one on the two
+private repos, because that needs to read the head ref and it has no `Contents`
+permission there. Say so and let Helen open it; do not route around it. **Merging is hers, always, everywhere.**
+Two hooks in `.claude/hooks/` enforce the two rules that were
 read and broken anyway — `guard-main-branch.py` and `guard-destructive-git.py`
 — and **there are exactly two**, so do not assume a rule is mechanically
 enforced because this file states it firmly. `DECISIONS.md` §11 has why each
@@ -1895,14 +2115,53 @@ foreground. More than one agent means a worktree (§11.0.1).
 
 ### 11.-1 The branch workflow, and the second hook
 
-`CLAUDE.md`. Four steps, one of them Helen's: Claude works on a branch and
-pushes it; Helen opens the PR, reviews, merges — and nothing else; Claude
-fast-forwards `main` without checking it out (`git fetch origin main:main`,
-or plain `git fetch origin` from a worktree, where the first form refuses and
-that is not a problem to solve), deletes the merged branch, branches afresh.
-`guard-main-branch.py` refuses `git commit` and `git merge` when the target
-repo — read from a leading `cd` — is on `main`. Everything else on `main` is
-allowed.
+`CLAUDE.md`. Four steps, one of them Helen's: Claude works on a branch, then
+pushes it and opens the PR **with no ask**; **Helen reviews and merges — and
+nothing else**; Claude fast-forwards `main` without checking it out
+(`git fetch origin main:main`, or plain `git fetch origin` from a worktree,
+where the first form refuses and that is not a problem to solve), deletes the
+merged branch, branches afresh. `guard-main-branch.py` refuses `git commit`
+and `git merge` when the target repo — read from a leading `cd` — is on
+`main`. Everything else on `main` is allowed.
+
+**Step 1 widened TWICE on 2026-09-07, hours apart, and the second is the
+bigger one.** First: Claude pushed and Helen opened the PR; she handed the PR
+step over as manual overhead, folding two asks into one. Then she removed the
+ask altogether — *"push no longer needs my say so. I had this rule because
+multiple Claudes were trampling each other and it's easier to fix that
+locally, but I now get Claudes to run Claudes and everything is less
+chaotic!"*
+
+**The confirmation was never about the risk of pushing.** It was a lock
+against parallel sessions fighting over one checkout, and worktrees (§11.0.1)
+plus an orchestrating Claude solved that at the root — so the lock was cost
+with nothing left behind it. Read it that way before proposing a new ask
+anywhere: a confirmation step is worth keeping only while the thing it
+guards against is still possible.
+
+**What did NOT move, and asking again is the §11.2 mistake.** Merging is
+Helen's in all three repos. Committing or merging onto `main` is refused by
+the hook. Opening a PR is never authority to merge one. Adding
+`Pull requests: Read and write` to the PAT was hers to do, and "never broaden
+access" is unchanged — that rule is about a session asking for scope
+unprompted, not about recording a widening she has made. The token also
+cannot delete a ref, so a merged branch goes with `git push origin --delete`,
+never `gh pr close --delete-branch` (403).
+
+**A worktree has no `gh`** (§1), so the PR is opened through the REST API,
+`POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
+
+**AND ONLY THAT REPO.** The same call against either private repo returns 422
+`not all refs are readable`: creating a PR must read the head ref, which is a
+`Contents` operation, and the token carries Issues and Pull requests but not
+Contents. A public repo's refs need no permission, which is why this works in
+one place and not the other three-way. Measured 2026-09-07; `DECISIONS.md` §11
+has the table and why Helen left the permission ungranted.
+Measured 201 on 2026-09-07.
+
+**Name the issues a PR will close before opening it**, the same rule that
+already governs a `Closes #N` trailer: a PR body is the last place the
+closure can still be reworded.
 
 ### 11.0 The destructive-git hook
 
@@ -1921,10 +2180,13 @@ edit you just made, and the answer is to re-edit the file.
 ### 11.0.0 Prefer LARGER pull requests — every merge is a deploy
 
 Helen: *"I have a soft limit on deploys per hour, so I prefer larger pull
-requests where that's practical."* Accumulate related work on one branch and
-push once; keep separate COMMITS per concern. Do not batch when batching is
-wrong — an urgent fix, genuinely unrelated changes, another agent's area — and
-say what is being held back.
+requests where that's practical."* Accumulate related work on one branch, push
+once and open ONE PR; keep separate COMMITS per concern. Do not batch when
+batching is wrong — an urgent fix, genuinely unrelated changes, another
+agent's area — and say what is being held back. **This became a rule Claude
+executes rather than one it respects on 2026-09-07** (§11.-1): the number of
+PRs is now a session's own choice, so "prefer larger" is an instruction and no
+longer an observation about how Helen works.
 
 ### 11.0.1 More than one agent shares this checkout — use a worktree
 
@@ -2515,7 +2777,14 @@ Showing her the thing is always allowed, and is how rulings move.
 
 ## 14. Reference pages and the internal-temperatures data layer
 
-### What exists
+**BOTH SITES HAVE A REFERENCE LAYER SINCE 2026-09-06.** Most of this section is
+food's, which is the older and much larger half; §14.6 is cocktails'. What the
+two share is the entry route — a footer column per site, no nav link, no
+`index.html` — and nothing else: they do not share a page anatomy, a stylesheet
+or a data shape, and "The cocktails reference layer" below says why that is
+correct rather than unfinished.
+
+### What exists (food)
 
 `food/reference/` holds two pages: `internal-temperatures.html` (the charts)
 and `cooking-methods-and-timings.html` (a weight → schedule calculator plus
@@ -2596,3 +2865,59 @@ The tables page is gone (#382) and the lesson from its predecessor is about
 crosslinks: two views of one dataset must point at each other well, which is
 why every protein section on the charts carries a `?protein=` link into the
 calculator.
+
+### The cocktails reference layer
+
+One page, `cocktails/reference/rum-categories.html` (#529), built 2026-09-06.
+**It is `published: false` and local-only** until Helen signs the copy off; see
+§2.5 for the other half of that switch and why both halves must move together.
+Deleting the `published: false` line and the `local_only: true` flag is the
+whole of shipping it.
+
+**Why it is not the encyclopaedia #459 rules out.** A bare list of the fourteen
+categories would be `rum_styles` reprinted. #501 moved a question from the card
+to the reader — cards stopped naming bottles and started naming categories — so
+*"which of mine is a Demerara rum?"* had nowhere to be answered. **The bottles
+column is what carries the justification**, not the category list, and that is
+the test to apply to any second page here.
+
+**Every string on it is a lookup.** Categories are `rum_styles`; the short names
+are `card_names`; the bottles are the `bottles.yml` entries whose `generic` is
+that category; the retired words AND their reasons are `retired_rum_styles`;
+Ceylon arrack's note is `family_less`; the sipping shelf is `bottles.yml`'s
+`sipping`. Nothing on the page restates a fact the data holds — which is the
+failure #314's own closing comment fell into three times over, a rule written
+once as a list and going stale with nothing looking.
+
+**Two things it reads that no rule derives, so both are declared and both have
+guards:**
+
+| Declared in | What it is | Guard |
+|---|---|---|
+| `rum_groups` (`ingredients.yml`) | Helen's five shelves — Jamaican rum, Demerara rum, Cane juice, Non-geographical, Flavoured | `test_rum_groups_partition_the_styles`: every style in exactly one group |
+| the CASE of a `retired_rum_styles` key | lowercase = a WORD a recipe asks for (shown); capitalised = a BOTTLE whose brand-generic was retired (hidden) | `test_retired_rum_style_keys_split_by_case` |
+
+The first is the important one. **The page walks the GROUPS, not `rum_styles`**,
+so a fifteenth style added and not placed would be invisible with nothing else
+failing.
+
+**`.ref-*` is its own page anatomy, and food's trick was not available.** Food's
+reference pages reuse `.recipe`/`.recipe-body-content` and the only table CSS on
+the site — all of it in `_sass/food/`. This site's own anatomy is a DRINK's: a
+title block reserving a column for a glass drawing, an ingredients grid built
+round an amount column. So `_sass/cocktails/_reference.scss` borrows where there
+is something to borrow (the drink page's absinthe-over-violette heading mark;
+`.cocktail-suggestion`'s wicked-woowoo for a bottle name, because woowoo means
+ASKED FOR and a bottle name here is literally the same value as one in brackets
+on a drink page) and draws the rest. **One hue, deliberately** — a second is a
+new-hue decision, which is Helen's (§13.12).
+
+**A category with no bottle is correct and is not a gap to fill.** `overproof
+Demerara rum, lightly aged` has none since El Dorado 151 came off on 2026-09-05
+(*"I don't own it, I just wanted to"*). The generic stays because a drink still
+asks for it.
+
+**The prose is not the site's voice yet.** The retired-word reasons were written
+for the next Claude — they cite issue numbers and name YAML keys — and render in
+full at Helen's instruction (*"I'll copyedit when I get to it"*). That, and five
+short strings on the page, are tracked at **#784**. Do not polish them.

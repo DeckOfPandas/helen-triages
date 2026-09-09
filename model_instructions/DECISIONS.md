@@ -112,6 +112,45 @@ unless stated.
   must carry its measurement date and defer to the issues for state. Helen kept
   #755 open to close herself.
 
+- **2026-09-07 — the triage that acted on the map's lesson instead of drawing a
+  new one.** #755 and #787 were both closed the night before, so the backlog had
+  no map, and Helen asked for staleness, splits and a plan rather than another
+  grouped snapshot. **The corrections went onto the issues themselves**, which
+  is the only place that does not decay.
+
+  **What was measurably stale, having been believed for a day or more:** #828
+  asked for a DOM harness that had shipped two days earlier (`index-harness.js`
+  plus the two `*-startup.test.js` files; only the third of its three boxes was
+  real) · #778's "three remaining readers" of `var(--emboss` were seven ·
+  #297's seventeen `qq:` ABV rows were thirteen · #806 pointed at
+  `_data/food/servings.yml`, **a file that has never existed in this repo's
+  history** — #815 shipped the same idea as a `serves_estimate:` front-matter
+  key hours after #806 was written · #814 asked for a rule
+  `.claude/commands/ingest.md` has carried since 2026-09-01.
+
+  **And what was NOT stale, which matters as much:** #747's headline (83 of 127
+  bottles priced by guess) was right to within two bottles — a first pass had
+  called it stale by counting `confidence:` across the whole of `costs.yml`
+  instead of per block, mixing `bottles:`, `generics:` and `fruit_prices:`
+  together. **Count the block, not the file.** The real finding there was the
+  eleven `confidence: low` rows in `generics:` that the issue does not mention
+  at all, several with `min == max`. #752 and #744 were also called stale and
+  were not: both already carried a 2026-09-07 comment doing the correction.
+
+  **#728 was split into six (#834–#839) and closed.** It was measured, correct
+  and unreadable — six kinds of question in one checklist, decaying as a whole
+  rather than in the parts that had moved. Its own header makes that argument
+  about handover documents; it had become the thing it was raised to avoid. The
+  two blocks that change what the SITE says — 16 unfilled garnishes, 9 drinks
+  with no method — re-measured **unchanged** from 2026-09-05.
+
+  **Closed by Helen's word:** #435 (cook from drafts — *"What I'm doing is
+  working fine"*; #801 and #815 turned the local site into the shopping half of
+  that loop, so the PDF is only the cooking half now), #350, #305, #569, #708.
+  **Closed on evidence:** #795 (her own comment answered it, and the sipping
+  shelf already renders on the rum reference page), #798. **Merged:** #605 into
+  #337, #821 into #642.
+
 ## §1 How to run it
 
 - **2026-08-29** — `.node-runtime/` and `.gh-runtime/` do not come with a
@@ -121,6 +160,18 @@ unless stated.
   recipes are collected by the other run as 14 real failures.
 - **2026-09-06** — §1 had said `_config_local.yml` "overrides two things"
   since 2026-08-02; it sets seven keys and three collection outputs.
+- **2026-09-07 — in the devcontainer, `git fetch origin` fails and it is not a
+  credentials problem.** `origin` is `git@github.com:...`, and the container has
+  no GitHub host key, so every SSH git operation dies on
+  `Host key verification failed` — including `git fetch origin main:main`, the
+  command `CLAUDE.md`'s git workflow is built on. **The working substitute for a
+  fetch is the HTTPS URL**, which needs no credentials at all on a public repo:
+  `git fetch https://github.com/DeckOfPandas/helen-triages.git main:main`. It
+  fast-forwards local `main` exactly as the SSH form does. Note this does NOT
+  solve pushing — `git push` over SSH fails the same way, and the fine-grained
+  PAT deliberately carries no `Contents` scope, so there is no HTTPS substitute
+  for it. Do not read the SSH failure as a broken checkout or a revoked token;
+  it is a missing `known_hosts` entry in the image.
 
 ---
 
@@ -351,6 +402,34 @@ unless stated.
 - **2026-09-06** — §4 had ended with "Cocktails front matter does not exist
   yet and must not be invented" since 2026-08-02, three weeks after the first
   drinks were ingested.
+- **2026-09-07, #814** — **Ingests split the ingredient side and leave the
+  method side flat, and have always done.** `.claude/commands/ingest.md` has
+  said to split both *"once, here, and never again afterwards"* since
+  2026-09-01, and the corpus says half of it happens: of 340 drafts, **142 have
+  named `ingredient_groups` and no `method_groups`, and exactly ONE is the
+  other way round.** 172 have neither, 25 have both. That ratio is a habit, not
+  a lapse.
+
+  **Derive the missing side rather than re-reading sources, and REVIEW rather
+  than propose.** Helen ruled this and corrected the reasoning that had been
+  offered against it. The claim was that the source printed the groups and
+  transcribing flat threw them away, so a later derivation could be plausible
+  but never faithful. Her answer: *"Most recipes don't have them as printed,
+  honestly... It doesn't matter though, I can catch easily at review if
+  something is in the wrong place or if names need amending."* So no
+  `proposals:` block and no calibration round — the shape `methods.yml` uses is
+  for a vocabulary that rewrites her prose, and this is not that.
+
+  **It runs in both directions and they are not equally cheap.** For the 142,
+  the phase names already exist and a human wrote them, so deriving the METHOD
+  groups from them invents nothing — assign each step to the phase whose
+  ingredients it names. For the 172, both sides have to be proposed together
+  and the names are genuinely new, which is the half to look hardest at. Two
+  batches, not one pass.
+
+  **The known failure mode**: a step saying *"add the remaining ingredients"*
+  names nothing, so nothing lands in it. An ingredient no step mentions is the
+  signal, and those get flagged rather than assigned.
 
 ### §4.0 The gate flags
 
@@ -432,6 +511,28 @@ unless stated.
   one day surfaced 15 hidden violations. Both patterns gained
   `QQ\b(?!\s+Claude\b)`; `/tidy-drafts` fixed the fifteen. **A hole in a guard
   is proportional to the data flowing through it.**
+- **2026-09-07, #800** — **`gf tip:` is GOOD FOOD, the magazine, not
+  gluten-free.** #800 and the `GF_TIP` exemption in `tests/test_style.py` were
+  both written on the gluten-free reading and both offered `GF tip:` /
+  `Gluten-free tip:` as answers — the third of which would have printed a false
+  allergen claim on a recipe page. Helen, asked what it meant: *"I actually
+  have no idea what this means... Good Food tip, the magazine source I use a
+  lot?"* She was right. **Six of the eight drafts say `source: "Adapted from
+  Good Food, ..."` outright**, and not one of the eight tips is about gluten —
+  they are the magazine's standing tip box (freeze half the lasagne, use mutton
+  instead of lamb, what to do with a spent vanilla pod, and one that names the
+  magazine inside the tip: *"the magazine likes Kallo"*). It is **eight** drafts,
+  not the fourteen both the issue and the test comment claim. **The lesson is
+  the shape, not the abbreviation**: an unexplained two-letter prefix was
+  expanded by guess, the guess was written into an issue AND a test comment as
+  fact, and it survived there because both then cited each other. Ask what a
+  transcribed abbreviation means; do not infer it from the letters.
+- **2026-09-07, #800** — **The label is DROPPED, not expanded.** Each of the
+  eight notes becomes a plain sentence, capital to full stop, like every other
+  note; `source:` already carries the attribution on six of them. This also
+  disposes of the two the capitalisation question could never have covered —
+  `gf tips:` and `gf tip on stock cubes:` — because with the rubric gone there
+  is no varying prefix to have a house form for.
 
 ## §6 `main_ingredients`
 
@@ -514,6 +615,172 @@ unless stated.
   real entries; a bare `little` would turn "little gem lettuce" into "gem
   lettuce"; `can ` cannot fire on "cannellini" only because the match includes
   the trailing space.
+
+### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
+
+- **The brief, 2026-09-07** — *"add scaler and shopping list feature to food
+  recipe shortlist page. This can be copied directly from the food page — I
+  would like all the same features. But there is no need to cost the portions.
+  When serving size is unclear, please make your best guess. Group the shopping
+  list by grocery aisle, e.g. produce, dairy, fish, meat, non-perishable etc."*
+  **"The food page" was read as the COCKTAIL page**, and the three other
+  bullets are why: costing exists only on cocktails (#547), serving sizes and
+  grocery aisles are food's own. The cocktails index has had exactly this
+  feature since #546 and the food index had none of it.
+- **PORTIONS, NOT BATCHES, and it follows from her own words.** A drink's box
+  counts glasses; asking for a serving-size guess only earns its keep if the
+  number on screen is PEOPLE, and *"no need to cost the portions"* is her word
+  for the unit. So four portions of a recipe that serves six is ×0.67 — which
+  is exactly what #545's drink scaler refuses (whole recipes only, clamped at
+  ×1, because every drink amount sits on the 2.5 ml grid). Put to her as the
+  fork it is, with the 200 g → 133 g example.
+- **Her answer, 2026-09-07, and it settled the rounding rather than the fork:**
+  *"For now, don't tidy/round beyond 1 g precision"*, then, unprompted, to be
+  sure it had been understood: *"I mean don't roudn to 10 g or 5 g, round to
+  1g"*. So: scale exactly, print whole grams, tidy nothing. `⅔ tsp` rather than
+  `0.67 tsp` is NOTATION and not tidying — ⅔ prints for exactly two thirds and
+  never for 0.7 — and it is the reason `fractionText` keeps a 1e-6 tolerance
+  instead of a generous one.
+- **Ten aisles, hers.** Offered three sets; she chose *produce, meat, fish,
+  dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks,
+  other*, in that order, which is a shop and not an alphabet.
+- **A KEYWORD table, not a list of ingredients**, and the data forced it: 500
+  distinct `item:` strings, 395 after truncation, all free text ("thumb-sized
+  piece of fresh ginger"). **The longest keyword wins** and every exception is
+  therefore an entry rather than a precedence rule — `milk`/`coconut milk`,
+  `butter`/`peanut butter`, `garlic`/`garlic paste`, `mint`/`dried mint`. Two
+  ingredients out of 782 end in `other` that are not cross-recipe links.
+- **`garlic` and `cloves` are the same length**, which is the one place the
+  longest-wins rule has nothing to decide with, and the tie sent every clove of
+  garlic in the collection to the spice rack. Caught by the built-output test,
+  which is the whole argument for having one: the matcher is Ruby inside
+  Jekyll, so nothing that reads YAML can exercise it, and a Python
+  reimplementation would have passed while the site was wrong.
+- **The 44 guesses live in `_data/food/servings.yml` and NOT in the recipes.**
+  43 of the 86 open `serves:` with a number; the rest say `makes: "one 8-inch
+  cake"` or *"I mean, who cares, make double anyway"*. Putting a figure in 44
+  files means §4.0's rule un-proofreads more than half the collection to add a
+  number Helen never wrote. One reviewable file, every entry flagged
+  `estimated`, every one printed with a `~`. **Not decided for her**: if she
+  wants the number in the front matter, that is a schema change and its own
+  piece of work.
+- **Grams and millilitres are the only units totalled in.** `1½ l` of stock and
+  `500 ml` of stock were two rows, and a twelfth of the first printed as
+  `0.125 l`. Folding kg/l/cl in and re-expressing on the way out is NOT the
+  conversion `shopping-list.js` refuses: that rule is about units with no
+  defined relationship (nobody can say how many ml a dash is), and a litre is a
+  thousand millilitres on both sides of every recipe here. `tbsp`, `oz` and
+  bare counts are untouched, because each of those would need inventing.
+- **Alphabetical within an aisle**, which departs from the drinks list's
+  descending volume (Helen, 2026-09-04: *"the big pours are what you shop
+  for"*). The aisle heading has already done that job — you are standing in
+  front of the vegetables — and a food aisle mixes grams, spoons, cloves and
+  bare counts, so there is no single axis to rank on. **A session's call, not
+  hers; reversible.**
+- **Open, and deliberately not decided:** whether a bare count should round UP
+  for shopping (`2.83 onions` → 3). She said not to tidy, so it does not; but
+  a whole vegetable is a different case from a gram and she may want the
+  ceiling. Bring her the page, not the argument.
+- **2026-09-07, ON THE REAL PAGE — the scaler did nothing for a quarter of the
+  drafts.** Helen: *"Changing the amount of blackberry gelato I want doesn't
+  change anything (that I can see) in the shopping list — e.g. whipping cream
+  is always 125 ml."* Exactly right, and it was `scaleFor()`:
+  `henrys-blackberry-gelato-sicilian-style` says `makes: "About 750 ml"` with
+  no `serves:`, so `portions` came through null and the first version returned
+  `1` whatever had been typed. **The control rendered, accepted a number and
+  silently did nothing** — the failure this codebase already has a rule
+  against ("a control that silently fails is worse than no control", quoted
+  wherever a control ships `hidden`), and worse than the rule's own case
+  because it looked like it had worked.
+  - **The fix is not a guess and not a missing box.** `makes:` cannot become
+    people without inventing a portion size, so the box counts BATCHES for
+    those and PORTIONS for the rest, with a `×` drawn on the batch ones. One
+    concept — how much of this do I want, relative to what it makes — with the
+    recipe's own yield naming the unit.
+  - **84 of 336 drafts are this shape**, measured, which is what ruled out
+    both "no box" (fails her actual need) and "guess them all" (84 unchecked
+    numbers in a file whose value is that its guesses are reviewable).
+    `_data/food/servings.yml` stays published-recipes-only.
+  - **Two of my own tests asserted the wrong thing** and had to change with
+    it: a draft legitimately has no portion count now. The aisle-coverage
+    ratchet also met the drafts for the first time (373 of 3,985 unmatched)
+    and is now measured per collection — MANUAL §8's own rule for the
+    ingredient picker, word for word: *measure production, not your local
+    build*. 99 keywords added for the draft vocabulary took drafts to 171.
+  - **The worktree had no drafts, which is why this reached her.** They are
+    gitignored (§9.1) and I had not cloned them, so every measurement behind
+    #801 was taken against 86 recipes that all happen to have a numeric
+    `serves:`. **Clone the drafts before believing a measurement about the
+    food collection** — the starting prompt says so and it was still skipped.
+- **2026-09-07, #815 — the batch box lasted a few hours and Helen killed it.**
+  *"increasing it to 50+ does nothing either and clearly 750 ml of gelato
+  doesn't feed 50. We need estimate the number of people served by 750 ml, then
+  add that to the front matter somehow. [...] all of these will need to be
+  estimated at ingest. Claudes can check with me if unsure."*
+  - **The lesson, and it is worth more than the feature.** Three fixes in a
+    row had been downstream of one absence: a recipe that does not say how many
+    it feeds. The batch box, the `×`, the "set all leaves those alone" note and
+    a test for each were all machinery built around a hole. **Batches were a
+    workaround for missing data, and the fix was the data.** When a fix needs
+    a second concept to explain it, look up the chain for the missing fact.
+  - **Not every file, and the measurement is what made it decidable.** 294 of
+    423 already open `serves:` with a number; 129 needed an estimate; only 43
+    of those were `proofread: true`. Bringing that table rather than "quite a
+    lot of files" is what turned an open-ended migration into one question.
+  - **Her ruling on the proofread cost**, quoting the documented exception
+    back: *"Use the documented exception. If she reviews the change herself
+    line by line, she was the last judgement, and BASELINE_COMMIT ... moves
+    forward."* So `serves_estimate:` went into the front matter of all 129 and
+    `_data/food/servings.yml` was deleted — one home for the number, beside the
+    words it estimates from. The second home had existed only to avoid this
+    question, and her answer removed its reason.
+  - **`serves_estimate:` and not a second `serves:`, her choice**, and the data
+    supports it: `serves` xor `makes` holds perfectly (0 files carry both), but
+    `makes:` OPENS WITH A NUMBER 66 times ("950 ml", "12 slices") and `serves:`
+    gives NO number 20 times (2 published, 18 drafts, 11 of them `QQ`). So
+    neither "makes means no number" nor "serves means a number" is true, and
+    the estimate has to be its own key. **`makes:` is never read as people.**
+  - **An estimate is marked with a `~`**, her ruling in the same message — the
+    only thing saying a figure was reasoned rather than written down.
+  - **Twelve draft estimates are read off the DISH, not its yield**, because
+    their `serves:` is `QQ` — the source said nothing and she has not rewritten
+    them. Those are named in the PR as the ones to check first, and their `QQ`
+    is untouched: it is her placeholder, and this adds a key beside it rather
+    than answering it.
+  - **Found while migrating: `_food_drafts/` has subfolders.** `to-cook/` and
+    `to-promote/` track her own work, a non-recursive `*.md` glob missed two
+    files, and the built-page test caught it. Glob recursively in that repo.
+- **2026-09-07 — "this is all I can see": boxes, no totals, and it was not the
+  code at all.** A screenshot of three shortlisted recipes, three number boxes
+  and nothing underneath — with a `×` on every one, including
+  `moules-mariniere`, which states `serves: "4"` and therefore could not
+  possibly be a batch recipe. That was the tell: `×` on a recipe with a
+  serving count means its portion count never reached the page.
+  **`_plugins/food_shopping.rb` had not run.** Jekyll loads `_plugins/` ONCE AT
+  BOOT and never reloads them on watch, so Helen's `jekyll-local`, started
+  before the plugin existed, had been serving a plugin-less build ever since —
+  no log line, no error, no clue. Reproduced deliberately with `--plugins`
+  pointed at an empty directory: 427 recipes, 0 with a portion count, 0 with
+  ingredients, which is the screenshot exactly.
+  - **The lesson is about diagnosis, not about Jekyll.** Two reports in a row
+    had been real bugs in my code, and the third looked like a third. The
+    thing that settled it in one step was asking which observation was
+    IMPOSSIBLE under the theory — a `×` on the mussels — rather than starting
+    from the missing totals, which every theory explains.
+  - **The page now says so**, because this was the third silence in a row and
+    the previous two were also mine. A shortlist with recipes in it and no
+    entries to total prints the reason and the remedy instead of a blank, and
+    the console carries the plugin detail. MANUAL §1 gained the restart rule.
+- **2026-09-07 — the yield came off the row, and dimming it was not the fix.**
+  Helen, with a screenshot of `7  Moules Marinière serves 4`: *"please don't
+  say 'serves X' after the recipe name at the top of the scaler. This
+  screenshot makes it look like I'm asking for 28 portions of mussels."* It
+  was already the quietest thing on the line — Plex, 0.78rem, the
+  de-emphasised grey — so this is not a contrast problem: **a number at each
+  END of a short line reads as one expression whatever the middle says**, and
+  this row must open with a number. Moved into the input's `title` and
+  `aria-label`. The `×` on a batch box survives because it is a MARK and not a
+  second number, which is the whole distinction.
 
 ---
 
@@ -794,6 +1061,53 @@ unless stated.
   syrup 2:1` where the files say `cane sugar syrup 2:1` — the right-hand side
   was never updated when the vocabulary gained the type, which is why #728's
   largest block reads as 43 open questions when it is 43 confirmations.
+- **2026-09-07, #594 / #593 — built, and the honey-water half of the entry above
+  was WRONG.** It says honey water "settles on the `2:1` form". Measuring the
+  five drinks on the bare generic showed they **contradict each other**, and one
+  of them settles itself: `chartreuse-daiquiri`'s own note reads *"Honey water is
+  equal parts honey and water"*, which is 1:1. Helen ruled the other four to 2:1
+  and that drink keeps its 1:1. **A ruling taken on a summary is only as good as
+  the summary** — this one would have overwritten a fact the drink already
+  stated, and the fix was to measure before applying rather than after.
+  - **Two QQ notes were citing a fact that does not exist.** `brown-derby` and
+    `green-flash` justified their 2:1 as *"taken from Airmail, which Helen typed
+    2:1 by hand"*. Airmail carries no ratio at all and has no notes. Deleted.
+  - **29 QQ notes named a generic no drink has.** They read `-> sugar syrup 2:1`
+    where every file says `cane sugar syrup 2:1`: the right-hand side was never
+    updated when the vocabulary gained the type. Rewritten, and verified by
+    parsing every drink afterwards — zero notes now claim a generic its drink
+    does not carry. **The check that found it generalises**: compare a note's
+    stated value against the file's actual data rather than reading the note.
+  - **`blue-hawaiian` and `georgetown-punch` had the arrow backwards.** *"Coconut
+    rum -> Malibu"*: the generic is `coconut rum`, which the source states and
+    which is not inferred at all, while Malibu is the `suggestion` and IS a
+    guess. The note hid the real inference behind a false one.
+  - **`demerara sugar syrup 2:1` was what `costs.yml` had assumed all along** —
+    its `basis` string already read `"demerara @ GBP 1.80/kg, 2:1"` while the
+    generic carried no ratio. The pricing was ahead of the vocabulary.
+  - **`honey water 1:1` had no price and no ABV row**, because nothing had ever
+    used it; `test_every_priceable_pour_has_a_price` and
+    `test_every_counted_pour_can_reach_a_strength` both caught it the moment
+    chartreuse-daiquiri moved. Priced at three quarters of 2:1 — the ratio is
+    honey:water, so 2:1 is two thirds honey against 1:1's half, and honey is all
+    of the cost.
+  - **A non-question I raised as a question, and the correction is the useful
+    part.** I asked Helen whether `turbinado sugar syrup 2:1` should join
+    taxonomy's `aged:` list, describing it as "a flavour mood" that would change
+    `sapins-swizzle`'s derived moods. **Both halves were wrong.** `aged:` is not
+    a mood at all — it is a `mood_ingredients` set feeding ONE mood, `strong
+    brown drink`, whose rule was rewritten on 2026-08-30 precisely to stop
+    firing on "a swizzle over crushed ice" and now reads *"nothing lengthens it
+    and it is not crushed, swizzled or blended"*. Sapins Swizzle is a swizzle,
+    and is the only drink pouring turbinado.
+    Helen's answer was the right one: *"Turbinado is just a sugar... It's just a
+    flat ingredient. Does this matter?"* **Measured rather than argued**: adding
+    turbinado to `aged:` and re-running `scripts/derive_cocktail_moods.py` gives
+    `124 drinks: 124 already agree, 0 differ` — identical to leaving it out. It
+    is in `sweet:` only, and that is correct.
+    **The lesson: run the derivation before asking whether a vocabulary change
+    moves a mood.** The script is committed, defaults to a dry run, and answers
+    in seconds; a question costs Helen more than the measurement does.
 - **2026-09-06, #781 over #780** — **Overproof first, in the generic and the
   card name both.** The two issues contradicted each other and needed a ruling:
   #780 said the card name *"can remain"* `Demerara overproof rum`, #781 said
@@ -819,7 +1133,65 @@ unless stated.
   what the CARD says never has to cost the data a distinction. Reach for the
   split before accepting a lossy rename.
 
+- **2026-09-08, #848** — **A shopping SHELF is not a taxonomy, and gets its own
+  map.** Helen: *"for cocktail shopping list, list items in shelf order then
+  volume"*, with her own order; `fortified` was added on her ruling the same
+  day, because her list had nowhere for vermouth and vermouth is in a lot of
+  drinks. `fresh produce` followed on her first reading — it was the soft edge
+  of the first cut, where a pear, a cucumber and a sprig of mint sat under
+  `flavourings` with the olive oil and `flavourings` was carrying 24 rows
+  against every other shelf's handful.
+
+  **`shelf_of` rather than more columns on `family_of`, because they disagree on
+  purpose in three places**: an amaro and a herbal liqueur are different
+  FAMILIES and one shelf; champagne is `fortified` by family and sits under
+  `tops` because that is what you do with it; the dry sugars share a shelf with
+  the syrups because they do the same job in a drink. A family says what a
+  spirit IS, a shelf says where you find it.
+
+  **All 153 generics in use are placed, and the mapping was DERIVED**:
+  `top_up_ml` gives the tops, `juice_yields` the squeezed juices, `family_of`
+  the spirits and fortified wines, name rules the rest. The 38 left over are
+  named one at a time in the generator with a reason each — chiefly that
+  absinthe and Ceylon arrack are base spirits with no `family_of` row, and that
+  a case-sensitive rule missed the capitalised Curaçaos.
+
+  **`dried apricots` stayed in `flavourings` while `lemon zest` moved**: dried
+  fruit is a dry good, and what you buy for a zest is a lemon.
+
+  **No guard yet that every generic in use has a shelf**, deliberately: an
+  unshelved generic sorts to the END rather than breaking anything, and a
+  pytest-less container is the wrong place to ship a test that stops the deploy
+  if it is wrong. Noted on the issue.
+
 ### §9.3.2 The bottle dictionary
+
+- **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as
+  `origin:`.** Helen's choice from three shapes: origin-qualified generics
+  (`Martinique agricole blanc`), `origin` on the bottle, or `origin` on the
+  ingredient. The fact that framed it: **origin is already inside five of the
+  fourteen `rum_styles`** — `aged Demerara rum`, the three Jamaicans, and
+  `clairin`, which is Haiti-specific by definition — so agricole was the one
+  cane family that stopped halfway. And the house owns **eight bottles under
+  `rhum agricole blanc`**: five Martinique, three Guadeloupe (the Damoiseaus),
+  with Barbancourt sitting in `vieux` behind a comment saying it is Haitian
+  because no field could.
+
+  **The accepted cost, stated so it is not rediscovered as a bug**: a recipe
+  cannot REQUIRE an origin. `martinique-swizzle`, `island-of-martinique` and
+  `lisle-martinique` are all named after a place none of them can name in
+  `generic:`; what makes them Martinican is their `suggestion:` list, and the
+  bottle dictionary is what says those bottles are Martinique.
+
+  **What it settles for free**: `coffey-park-swizzle` and `port-au-prince` stop
+  being mis-typed. Both pour Barbancourt as `rhum agricole vieux` behind a `QQ`
+  admitting the guess — and under this ruling that typing is *correct*, because
+  agricole is what the bottle is by production and where it is from lives
+  elsewhere. Two notes to delete rather than answer.
+
+  **Two mechanisms for origin now coexist deliberately**: in the generic where
+  it changes the CATEGORY (Demerara, Jamaican), on the bottle where it changes
+  the FLAVOUR (agricole). The five existing styles are not being unpicked.
 
 - **2026-08-27, #529** — Added, rum-only. Planteray canonical, Plantation an
   alias.
@@ -895,6 +1267,39 @@ unless stated.
   #585 closed into this. The drift guard is the part that lasts:
   `test_every_suggested_bottle_resolves` tests resolution **through aliases**,
   so it can never catch a drink writing `Havana 3` forever.
+- **2026-09-07, #701** — **A BOTTLE rename and a GENERIC rename are different
+  operations, and neither is a simple find-and-replace across two repos.** Both
+  of #701's last two names were fixed on this day — `Ophir` → **Opihr** (the
+  product is Opihr Oriental Spiced) and `Amaro Ciociano` → **Amaro Ciociaro**
+  (Paolucci, Lazio). They needed opposite handling.
+  - **A bottle has aliases; a generic does not.** `bottles.yml` keeps every old
+    spelling as an alias, so nothing fails to resolve. `ingredients.yml` has no
+    such mechanism — `family_aliases` maps FAMILIES, not generic names — so a
+    generic rename has no safety net at all.
+  - **Hence the two-spellings-at-once transition for the generic.** The drink
+    (`to-promote/brooklyn.md`) lives in the private repo and the vocabulary in
+    the public one, and **the two cannot land in one commit**. Declaring both
+    `Amaro Ciociano` and `Amaro Ciociaro` through the gap is what keeps the
+    suite honest; the old one comes out in a later PR. Helen chose this over
+    accepting a red window.
+  - **THE BOTTLE RENAME HAS NO SUCH ESCAPE, AND THIS IS A NEW COST OF A GOOD
+    TEST.** `test_every_suggestion_is_the_declared_bottle_name` (added
+    2026-09-06) requires a suggestion to EQUAL the declared key rather than
+    merely resolve through an alias — which is exactly its value, and it makes
+    a bottle rename a **two-repo atomic operation**. Both orderings are red:
+    `key Opihr / drink Ophir` fails the guard, and `key Ophir / drink Opihr`
+    fails it too. No single-repo step stays green. The window is local-only (CI
+    has no drafts, so the test skips) and the mitigation is merging the pair
+    back to back. **A plan that claims otherwise is wrong** — this one did, and
+    the guard caught it on the first full run.
+  - **Not a design question, and I twice said it was.** `Amaro Ciociaro` was
+    described as possibly wanting to be a declared bottle. `ingredients.yml`
+    already answers that: it sits in `amari:` beside Campari, Aperol, Cynar,
+    fernet and Amaro Nonino, all generics named after single products with no
+    bottle entry, because *"swapping Campari for Fernet is a different drink,
+    not a variation."*
+  - Helen priced it the same day: *"Amaro Ciociano is £36"* — £51.43/litre,
+    and one of the last `confidence: low` rows in `costs.yml` becomes `high`.
 - **2026-09-06, #702** — **#701's rename does not fix the `JM` alias, and must
   not be allowed to close it.** Retyping `cobra-effect` to `Rhum JM Ambré`
   leaves the bare `JM` alias resolving to one of two stocked bottles in
@@ -1018,6 +1423,13 @@ unless stated.
   volume or a weight counts; a dash, a garnish and ice never do"**, which is a
   subtler line than `costs.yml`'s header currently draws and should be written
   there when this lands.
+
+- **2026-09-07, #818** — **The shopping list's bottle choice is per drink, not
+  once for the whole list.** Asked which, given a generic with several declared
+  bottles: *"per drink"*. So two drinks that both pour a reposado may choose
+  differently, the buttons sit on the drink's own line, and choosing collapses
+  that line's range to the chosen bottle. The range stands until a choice is
+  made.
 
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
@@ -1292,6 +1704,75 @@ unless stated.
   resemble a bird's plumage)` and five others were declared but not printed
   by the standalone document until the blocks were generated.
 
+- **2026-09-08, #775 and #845** — **`easy peasy`, and what her three additions
+  taught.** #845: *"any cocktail with equal parts of all ingredients (bar maybe
+  bitters) should get the tag 'easy peasy' once we've made it"*, widened the
+  same day to cover the short pour-and-stir drinks, which brings in the Negroni
+  family.
+
+  **Shown eleven candidates she answered: "All your 9 from 11 are right. Julien
+  Sorel and Anita's are in too, and also Long Island Ice Tea."** Those three
+  additions are the rule: Julien Sorel and Anita's are equal parts PLUS a
+  sparkling top, and Long Island Iced Tea is EIGHT ingredients every one of them
+  12.5 ml with only the cola different. **So a top or a mixer is set aside like
+  a dash is, and the equal-parts branch carries no ceiling on the count** —
+  Anita's is seven equal pours and she wants it in. The two unmade candidates
+  are out, which is the "once we've made it" clause working.
+
+  **A rule that could not see the faff was no use for a chip about faff.** The
+  first pass counted only VOLUME pours and so called the Caipirinha and the
+  Pear-and-Apricot Bellini easy — their work is a muddled lime, 20 g of palm
+  sugar, a whole pear and four dried apricots, none of which is a volume. It now
+  requires every counted ingredient to BE a volume and reads the method for
+  muddle/infuse/cook/simmer/blend.
+
+  **`moods_by_hand` IS THE TRAP, and it is silent.** A hand-applied mood missing
+  from that list is stripped off every drink the next time
+  `derive_cocktail_moods.py` runs, and `verify.py` runs it — so it reports as a
+  diff rather than as an error. `easy peasy` is earned, not derived ("once we've
+  made it" is a fact about Helen, not about the liquid), so it belongs there.
+
+- **2026-09-08, #853** — **One mood can now cancel another: `mood_suppresses`.**
+  Long Island Iced Tea carried `easy peasy` AND `I want to faff`, which say
+  opposite things, and both rendered as chips side by side. Helen: *"LIIT is
+  easy peasy, and this should suppress the derivation."*
+
+  **Neither was wrong by its own rule**, which is what made it a vocabulary
+  question rather than a bug. `I want to faff` is *"muddling, flaming, shells,
+  blending, swizzling, or nine-plus ingredients"* — **five OPERATIONS and one
+  COUNT, and the count is the odd one out.** It is a proxy for effort that holds
+  for a tiki drink with nine things happening to it and fails for this one,
+  whose whole method is "shake the first 8 ingredients with ice" and pour the
+  ninth on top.
+
+  **Suppressing rather than re-scoring is the cheaper correction**: the
+  nine-ingredient rule stays exactly as it is for the 124 drinks it is right
+  about. Her hand-applied judgement wins over a derived one, which is the
+  precedence `moods_by_hand` already sets.
+
+  **Declared in taxonomy.yml, not hardcoded** — §9.9's lesson is that the script
+  must never keep its own copy of the vocabulary, and two mood names in a Python
+  literal would be exactly that. **A one-drink `mood_exclude` entry would also
+  have worked and was not taken**: she stated the rule about the MOODS, not
+  about the drink.
+
+- **2026-09-08, #852** — **Coney Park Swizzle is Coffey Park Swizzle**, for
+  Coffey Park in Red Hook. Helen: *"delete the Coney Park one please, I remember
+  this now."* Read as "the name goes", not "that file goes", because two files
+  held the drink and the wrong one had the better content: an untracked
+  `coffey-park-swizzle.md` was an OLDER revision — `oz` amounts with the retired
+  `ml:` key, `item:` where the tracked file had `suggestion:`, bare-string notes,
+  and **no gate flags at all**, so it would have failed the publish gate and
+  reintroduced the only `oz` in 579 pours.
+
+- **2026-09-08, #836** — **Nine of the eleven glass questions were already
+  answered correctly, and the value of the ruling was DELETING THE NOTES.** Both
+  sazeracs were already old fashioned, Between the Sheets a nick and nora, both
+  martinis martini glasses. Seven QQ notes went; those notes RENDER, so
+  "Double-check this one by eye" was the thing a reader saw. Two real changes:
+  `martinique-swizzle` was still collins, missed by the 2026-08-26 sweep that
+  moved "all four" swizzles, and `mastiha-mojito` lost its second glass.
+
 ### §9.13 The visual language — the rounds
 
 - **2026-08-26** — One sitting with Helen against a mockup
@@ -1484,6 +1965,51 @@ unless stated.
   cocktails page now and its name is wrong; renaming is its own change.
   Still not seen on an iPad.
 
+- **2026-09-08, #846** — **The chip separator moved to a TRAILING `::after`,
+  reversing a decision of 2026-09-05, and that deleted a whole measurement
+  pass.** Helen, on a card whose chips ran to several lines: *"chips which form
+  more than one line should have a . in between them even if the final chip on
+  any line before the first is a whole chip... creme de peche is at the end of a
+  line, but still gets a ."*
+
+  **`chip-rows.js` had listed exactly this as considered and rejected** — "only
+  relocates the orphan to the end of row one, where it reads as a sentence cut
+  off". She looked at the built thing and wanted it, which is how a ruling
+  changes here. The old reasoning is kept in the stylesheet beside the new rule
+  rather than deleted.
+
+  **#698 is now satisfied by construction rather than by measurement**: "no dot
+  before the first chip" is true because no chip has a leading dot at all. So
+  `chip-rows.js`, which measured `offsetTop` to mark row-starting chips, had
+  nothing left to do and went — one fewer of the three passes #828 is about.
+
+  **The feedback loop that forced absolute positioning was never about being in
+  flow.** It was that the dot was drawn CONDITIONALLY, so its width fed the wrap
+  decision that decided whether to draw it. An unconditional dot cannot do that,
+  which is what lets it go back in flow — and in flow is *wanted*, not merely
+  safe: an absolutely positioned `::after` has no width, so a dot ending a row
+  would sit past the container's right edge and be clipped away by the row cap,
+  invisible in precisely the case the issue is about.
+
+- **2026-09-08, #760 — THE PROPOSED FIX DOES NOT WORK, and the issue had said it
+  would.** #760 proposed making `.drink-card-moods` block flow and floating the
+  ship right "at the end", so chips would "flow around the ship on the last row
+  only". **A float reserves space from the TOP of its block, downwards.** Float
+  it first and the chips wrap around it on row ONE; float it last and nothing
+  comes after it, so nothing flows around it at all — it is simply placed where
+  it fits, and **dropped to a new row when the chips already filled the last
+  one, where `overflow: hidden` clips it away entirely**. That would have
+  silently removed the verdict word from the busiest cards and looked fine on
+  every card anyone checked.
+
+  **What would work, in order of cost**: take the ship out of flow
+  (`position: absolute`, bottom-right), which alone fixes the stated complaint
+  because every row above the last gets its width back; or the float-bottom-right
+  hack, a zero-width `::before` float of height *(container − one line)*, which
+  needs the container's height known and ours is not; or re-introduce a
+  measurement pass, which #846 has just removed. Tried, abandoned, branch
+  deleted, reported on the issue rather than shipped.
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
@@ -1577,7 +2103,8 @@ unless stated.
   with a redirect and a fallback. `python3`, no execute bit. Same day: Helen
   merged and pulled mid-task, deleting the working branch under a session
   with three staged files; `git checkout -b` carried them across.
-- **2026-08-20** — THE AGREED WORKFLOW: Claude branches and pushes; Helen opens,
+- **2026-08-20** — THE AGREED WORKFLOW (**step 1 widened 2026-09-07, below —
+  Claude opens the PR now**): Claude branches and pushes; Helen opens,
   reviews, merges and does nothing else; Claude `git fetch origin main:main`,
   deletes the branch, branches afresh. `guard-main-branch.py` the same day,
   because the written rule was broken again by an agent that RAN the check —
@@ -1642,6 +2169,174 @@ unless stated.
   quoting it is the recorded harm behind not touching amounts.
 - **2026-09-05** — Pushing a branch in the private repos needs no ask.
 - **2026-09-06** — `CLAUDE.md`: `${GH_TOKEN:-unset}` prints the token (it did).
+- **2026-09-07 (later the same session) — and then the ask went entirely.**
+  Helen: *"push no longer needs my say so. I had this rule because multiple
+  Claudes were trampling each other and it's easier to fix that locally, but I
+  now get Claudes to run Claudes and everything is less chaotic!"* So push and
+  PR are unattended in all three repos, and `helen-triages` stops being the
+  exception it had been since the workflow was written.
+  - **THE PR HALF DOES NOT ACTUALLY WORK ON THE PRIVATE REPOS, measured later
+    the same day.** `POST /pulls` succeeds on `helen-triages` and returns 422
+    *"not all refs are readable"* on both private ones. The same five calls
+    against each repo:
+
+    | | issues | pulls list | branches | contents |
+    |---|---|---|---|---|
+    | `helen-triages` (public) | 200 | 200 | **200** | **200** |
+    | `helen-triages-food-private` | 200 | 200 | **403** | **403** |
+    | `helen-triages-cocktails-private` | 200 | 200 | **403** | **403** |
+
+    Helen asked whether she had misconfigured the token and sent its settings
+    page. **She had not.** The repository list is right and Issues + Pull
+    requests read/write is granted on all three, exactly as her screenshot
+    showed. What is missing is `Contents` — and **opening a PR must READ THE
+    HEAD REF** to check it exists and compute the diff, which is a Contents
+    operation. A public repo's refs need no permission at all, so the public
+    one works and the private two cannot.
+  - **THE ORIGINAL VERIFICATION WAS SOUND AND STILL MISLED, which is the
+    transferable part.** It ran `gh pr create` on a throwaway branch, got a real
+    PR URL, and concluded the widening worked. It was run against
+    `helen-triages` — the ONE repo of the three where the missing permission is
+    invisible. **A capability check on the most permissive member of a set
+    proves nothing about the set.** Probe the narrowest case, or probe all of
+    them; §0's rule about measuring rather than assuming is not satisfied by one
+    measurement in the easiest place.
+  - **Helen left the permission ungranted, shown the trade, 2026-09-07.**
+    `Contents: Read` would fix PR creation and would also let the token read
+    every drafts file through the API — which MANUAL §9.1 states as a property
+    the repo relies on (*"reads file contents on none of the private ones (403).
+    Git can."*). That separation is deliberate: access to the drafts goes
+    through git and SSH, where it appears in commits. Against that, pushing to
+    the private repos already needs no ask, so the only manual step left is the
+    PR form itself, usually on a branch she is about to merge anyway. Cheap to
+    keep, so it was kept.
+  - **The reason matters more than the rule, and it is the transferable
+    part.** The confirmation was never a judgement that pushing is risky — it
+    was a lock against parallel sessions fighting over one checkout. Worktrees
+    and an orchestrating Claude removed the collision, so the lock was cost
+    with nothing behind it. A confirmation step is worth keeping only while
+    the thing it guards against is still possible; **this is the question to
+    ask of an ask, before proposing another one.**
+  - **Merging did not move, and this is the third time it has been written
+    down in one day** — the workflow, the token section, and here. That is not
+    redundancy: it is a rule whose whole job is to survive the day somebody
+    finds it inconvenient, on the day the rules around it all loosened.
+  - The bundling ruling below is what this superseded, hours old. Both are
+    kept, because the intermediate state is what makes the reason legible.
+- **2026-09-07 — Claude opens the PR, and the ask is bundled with the
+  push.** *(Superseded by the entry above the same day: there is no ask at
+  all now. Kept for the reasoning, which still holds.)* Helen: *"I've added
+  permissions on GitHub for you to open PRs. Please do so now with this work,
+  to test the setup!"* She widened the
+  fine-grained PAT to `Pull requests: Read and write` herself and rewrote
+  `CLAUDE.md` herself; step 1 of the agreed workflow is now one confirmed
+  action covering both the push and the PR, because asking twice for one
+  action was overhead she was paying for nothing. **Merging did not move and
+  is not going to** — she wrote it into `CLAUDE.md` twice, in the workflow and
+  in the token section, which is the right amount for a rule whose whole job
+  is to survive the day someone finds it inconvenient.
+  - **The "never broaden access" rule is unchanged, and reading it as changed
+    would be the error.** It is about a session asking for or granting itself
+    scope; documenting a widening Helen has made is the opposite of that. The
+    2026-08-17 measurement (`opening a pull request 403`) stays on the page
+    with the flip noted beside it rather than being deleted, so the next
+    session can see that this was measured twice and not assumed once.
+  - **Measured, not assumed, both times.** Helen's own probe was a throwaway
+    branch and PR #805, closed unmerged. Mine was the real one: `POST
+    /repos/DeckOfPandas/helen-triages/pulls` → 201, PR #808, and then read
+    back to check `head`/`base`, `mergeable_state: clean` and that the body
+    really carried `Closes #801` — a 201 says a PR exists, not that it points
+    where you meant.
+  - **`gh` does not exist in a worktree**, so `CLAUDE.md`'s `gh pr create`
+    cannot be followed there: `.gh-runtime/` is gitignored and absent, exactly
+    like `.node-runtime/` and the two drafts repos. The REST API is the
+    mechanism instead. Worth knowing before reaching for the command the rules
+    name — this is the second time a documented `gh` invocation has had to be
+    done another way from a worktree.
+  - **The token's new scope stops short of ref deletion.** Helen measured
+    `gh pr close --delete-branch` 403 on the delete while the PR close itself
+    succeeded; plain `git push origin --delete` works, because that is SSH and
+    not the PAT. So step 3's branch cleanup keeps going through git.
+  - **A false start worth recording, because it is the general case.** Told
+    the permission change was merged, `git fetch origin` showed `main`
+    unmoved, no branch on the remote touching `.claude/` or `CLAUDE.md`, and
+    `.claude/settings.json` last changed by the old hook commits. It had not
+    been pushed. Stopping was right for a specific reason rather than caution
+    in general: she had said her change edited `CLAUDE.md`, and the section
+    being edited was the same one — writing then would have put the same rule
+    in the governing document twice, on the day it changed. She found and
+    merged it (#809), and her text already said both things this session had
+    proposed, better; **so the correct amount of `CLAUDE.md` for this session
+    to write was none.**
+
+- **2026-09-08 — step 1 splits: in the devcontainer Claude commits and Helen
+  pushes.** One day after the ask was removed entirely, the container turned
+  out not to be able to push at all, for two independent reasons neither of
+  which is fixable from inside: `origin` is SSH and the image has no GitHub
+  host key (**`Host key verification failed`** on every SSH git operation,
+  `git fetch origin main:main` included), and the fine-grained PAT carries no
+  `Contents` scope, so the HTTPS fallback is **403 `Permission to
+  DeckOfPandas/helen-triages.git denied`** — the token behaving exactly as
+  §9.1's measured table says it should.
+
+  Helen: *"Because you're in docker, I won't give you a GitHub host key. Make
+  your changes, then tell me which branches to push and I'll push them -- I
+  always review locally anyway so this isn't really an extra step as otherwise
+  I'd only pull from what you pushed before I merged."*
+
+  **This is an environment fact, not a reversal of 2026-09-07.** Step 1 stands
+  wherever pushing works. What is new is 1a: name the branch, give her the
+  command, and go on opening and maintaining the PR — which still works,
+  because a PR needs `Pull requests: write` and not `Contents`.
+
+  **`/workspace` is a BIND MOUNT of Helen's own checkout**, which is what makes
+  this cheap and was got wrong before it was got right: a commit is already in
+  her tree the moment it is made, so nothing travels and nothing is stranded.
+  An unpushed commit here should never be described as trapped.
+
+  **A fetch, unlike a push, has a working substitute** — the HTTPS URL needs no
+  credentials at all on a public repo and fast-forwards `main` exactly as the
+  SSH form does.
+
+- **2026-09-08 — the shared checkout, and the second reason to check the branch
+  before committing.** The bind mount means another session, or Helen, moving
+  the checkout moves the ground under a running Claude with no signal. In one
+  session the branch went `main` → `docs/bash-friction-followups` →
+  `chore/devcontainer-per-worktree-bundle-cache` → `docs/multiline-arg-friction`,
+  none of them that session's, and an uncommitted `DECISIONS.md` edit rode
+  along into somebody else's branch. **The pre-commit `git branch
+  --show-current` check caught it**, which is the first time that rule has
+  earned its keep for a reason other than the one it was written for: the
+  question it answers is not only *am I on `main`* but *am I still where I left
+  off*, and the answer can be no when nothing you did changed it.
+
+  **This is the 2026-08-16 stranding again** — an agent lost when Helen ran
+  `git checkout main` and pulled — and the answer has moved on. That day it was
+  *one agent at a time*; 2026-09-07 replaced that with worktrees plus an
+  orchestrating Claude, which is what let the push ask be dropped. What this
+  showed is that the guarantee only holds when **every** session is actually in
+  a worktree, and `/workspace` is not one. Helen: *"I'll run Claudes in
+  worktrees going forwards."*
+
+- **2026-09-08 — A RENAME THAT SPANS BOTH REPOS MUST MERGE DRAFTS-FIRST, and
+  getting that backwards turned Helen's local `pytest` red.** #852 renamed
+  `coney-park-swizzle` to `coffey-park-swizzle`: the file lives in the private
+  drafts repo, and `mood_include` in the public `taxonomy.yml` is keyed by
+  SLUG. Both halves were written and the commit message said the slug was
+  "renamed in the same breath there" — **true of the work and false of the
+  merge.** The two repos merge independently. The public half went in, the
+  drafts half sat on an unmerged branch, and
+  `test_every_mood_correction_is_reachable_and_needed` then reported
+  `mood_include.coffey-park-swizzle: names no drink in the collection`.
+
+  **CI could not have caught it**, which is the sharp end: that test is
+  `_require_whole_collection`, so it skips wherever the private drafts are
+  absent — which is CI. Only Helen's machine, with both repos cloned, sees it.
+
+  **The rule, and it generalises past renames**: public data may name a drafts
+  slug; drafts never name public data. So **the drafts side merges first**, and
+  a change that crosses the boundary is not finished when both commits exist —
+  it is finished when both are on their `main`s, in that order.
 
 ### §11.2 The record of this file being wrong
 
@@ -1901,6 +2596,68 @@ verification. Dates are when the correction landed.
 
 ---
 
+- **2026-09-07, #783 — a pinned grid COLUMN does not reserve its cell, and a
+  DATA edit is what exposed it.** The footer is `1fr auto 1fr` with
+  `.site-footer-centre` carrying `grid-column: 2`. The comment beside it claimed
+  that pin "resolves it before auto-placement runs". **It does not**: a definite
+  column with an AUTO ROW is still auto-placed, so the two reference navs were
+  positioned first, in DOM order — nav 2 took row 1 column 2 and the hearts,
+  still needing column 2, dropped to ROW 2.
+  - **It could not have been seen until the day it broke.** A neighbouring
+    comment said so in as many words — *"UNVERIFIED BY EYE: nothing renders a
+    second column yet"* — and the rum reference page (#529) made cocktails
+    render one. So the fault arrived with a change to `_data/sites.yml`, no CSS
+    edit, on every page of both sites at once. That is exactly the failure the
+    pinning comment said it was preventing, which is why the sentence was
+    corrected rather than deleted.
+  - **The fix is to place all three explicitly**, so auto-placement has nothing
+    to decide. A guarantee that depends on DOM order is not one.
+  - **AND THE FIRST ATTEMPT WAS THE WRONG FIX, which is the part worth keeping.**
+    Reading "right-align with whole page" as the viewport, `max-width` came off
+    `.site-footer`. That sent the LEFT column to the viewport edge, left the
+    right one exactly where it was, and broke an alignment another comment in the
+    same file had deliberately built. Helen: *"I would like each to be under the
+    sides of the main page container."* **A CSS change that compiles correctly
+    can still be the wrong change** — the compiled output was verified and
+    reported as reassurance, which was true and useless. Her screenshot found in
+    one image what grepping the stylesheet could not.
+- **2026-09-07, #776 — the card's three stacks share one budget.** `$card-height`
+  is fixed, and the ingredient clamp (#552) and the chip cap were each raised to
+  three on their own, with nothing stopping all three being spent at once. A
+  wrapped name now caps both; three rendered ingredient lines cap the chips.
+  - **Only half of it needed a script.** `.drink-card-name--wrap` already exists
+    from card-name-fit.js and is a SIBLING of both, so `~` reaches them. The
+    other half does: CSS can ask how many lines an element is ALLOWED, never how
+    many it rendered, and most cards do not reach the clamp.
+  - **A hidden card measures zero.** The index paginates with `card.hidden`
+    rather than by removing cards, so the load-time pass classified page one and
+    nothing else; every later page kept the cap it should have lost.
+    cocktail-index.js re-runs it on each pass, BEFORE `markChipRows()`, because
+    the budget decides the chips' max-height and the row marks describe where
+    they broke. **The same trap applies to any future card measurement.**
+- **2026-09-07, #823 — grow the TARGET, not the control.** The card's shortlist
+  mark was a ~22x25px hit area and padding could not fix it: the title's
+  reservation is computed from the button's own metrics, so every millimetre of
+  padding is a millimetre off the tape. An absolutely-positioned `::after` takes
+  it to ~44x42px without entering layout, using space that was already empty —
+  the card's own padding above and right, and the gap the reservation already
+  keeps clear of the tape on the left. It claims the top-right corner from the
+  card link, which is the trade: that corner is the worst place to aim for "open
+  this" and the best place to aim for the mark.
+- **2026-09-07, #777 — a hover says WHICH question, not just "touchable".** The
+  filter chips hovered to hot magenta in every section; the section colours
+  already mean the thing hover was saying, and `.is-on` has worn them since #548.
+  Hover and selected now agree on hue and differ in how they wear it. Done as a
+  custom property re-pointed on the section wrapper (#636's proven shape), so a
+  fourth section is one line.
+- **2026-09-07, #704 / #651 — two small ones with a rule in them.** Three glass
+  options read as a comma list with a final "or" (`old fashioned, coupe or nick
+  and nora`), no Oxford comma, because "coupe, or nick and nora" would suggest
+  the last option is a pair. And `$color-electric-absinthe-wash` is KEPT with a
+  comment rather than deleted: it is one of five `-wash` values derived as a set,
+  and deleting one member makes the set look arbitrary. What #651 forbade was it
+  sitting there unread AND unexplained.
+
 ## §14 Reference pages
 
 - **2026-08-11/12** — Built at Helen's request from 15 draft tables in
@@ -1942,3 +2699,74 @@ verification. Dates are when the correction landed.
   `NO_TEMPERATURE_BECAUSE` entry.
 - Two food-safety gaps (pork medium, fresh ham pink) flagged, not corrected —
   Helen's call.
+
+### The cocktails reference layer, #529
+
+- **2026-09-06, #529** — Cocktails gets its first reference page,
+  `rum-categories.html`. **Why it passes #459 when a bare category list would
+  not:** the bottles column. #501 moved *"which of mine is a Demerara rum?"*
+  from the card to the reader when cards stopped naming bottles, and nothing
+  answered it. A list of the fourteen names alone would be `rum_styles`
+  reprinted. Apply that same test to any second page here.
+- **2026-09-06** — The `[ COCKTAILS ]` footer column arrived with it and cost
+  **no template change**, which is what `sites.yml`'s own note had predicted
+  since 2026-08-19: the footer's loop always asked every site rather than
+  food. The asymmetry recorded in §2.5 as "an open question, not an oversight"
+  is closed.
+- **2026-09-06** — **`.ref-*` is a new page anatomy, and that is not a failure
+  to reuse.** Food's reference pages borrow `.recipe`/`.recipe-body-content`
+  and the site's only table CSS; every one of those lives in `_sass/food/`,
+  and cocktails' own anatomy is a DRINK's — a title block reserving a column
+  for a glass drawing, an ingredients grid built round an amount column.
+  Borrowed what there was to borrow: the drink page's absinthe-over-violette
+  heading mark, and `.cocktail-suggestion`'s woowoo for a bottle name, because
+  woowoo means ASKED FOR and a bottle name here is the same value as one in
+  brackets on a drink page. One hue, since a second is hers (§13.12).
+- **2026-09-06** — **Round one of candidates: table, stack or two columns; and
+  the retired words with reasons, words-only, or off.** Helen: *"This is all
+  table A"* and *"Leave reasons in full — I'll copyedit when I get to it
+  (please raise an issue)"*. The other two treatments were deleted rather than
+  left switchable. #784 raised for the copy.
+- **2026-09-06** — **Round two: column labels, and two headings that were
+  mine.** Labels repeat on **every section** (her call, and already what the
+  page did). *"By age"* → **`Non-geographical`** and *"Next to rum, and not
+  rum"* → **`Rum-adjacent`**, both hers. Worth recording why the first is
+  better rather than merely different: "By age" named the SORT ORDER and left
+  the membership rule to be worked out, while "Non-geographical" states the
+  rule — the other three shelves are Jamaica, Guyana and the cane-juice
+  islands, and this is what is left once origin stops being the answer. The
+  styles inside are still in age order, so the name and the order now say two
+  different true things instead of one twice.
+- **2026-09-06** — **One rum per line, her call**, against a first version that
+  ran them as a comma-separated sentence arguing three-to-eight names are one
+  answer. The eight agricoles are why that was wrong: names sharing their first
+  two words wrap into a ribbon, and a column you check your own shelf against is
+  scanned, not read.
+- **2026-09-06** — **`rum_groups` is DECLARED, not derived, and the page walks
+  the groups rather than `rum_styles`.** No rule recovers the shelves —
+  "Jamaican" is in two of that shelf's three style names and absent from the
+  third. The cost is that an unplaced fifteenth style would be invisible with
+  nothing else failing, which is what `test_rum_groups_partition_the_styles`
+  exists for. `rum_groups` also had to join `NOT_GENERIC_LISTS`, and is its
+  first member whose values are not strings — so omitting it raises on an
+  unhashable dict instead of quietly minting fourteen generics. Luck, not
+  design; the next such block will not be so obliging.
+- **2026-09-06, #782** — **The sipping shelf is a shelf and not a rule**, and
+  the page must not imply otherwise. Helen, asking for it: *"the name of which
+  is a little against my religions because you can sip anything plus I can mix
+  whatever I damn well want... but this section would help me keep track of my
+  collection a bit."* It gates no search, excludes no drink, forbids no pour —
+  so the block gets no category column, no card name and no "reach for this
+  instead". **The DATA shape it takes, and why its members carry no `generic`,
+  is §9's** — recorded there with the ruling that produced it.
+- **2026-09-06** — Helen's own prices and strengths replaced my guesses in the
+  same pass (Pusser's 151 £40 → £52, Ceylon Arrack £28 → £37, and Ceylon
+  arrack's ABV 33 → 40, which cleared a `qq:` rather than adding one). Both
+  guesses were about a quarter under. The bottles themselves are §9.
+- **2026-09-06** — **Local-only is TWO switches because it is two questions.**
+  Helen: *"please set it to build only locally."* `published: false` on the
+  page decides whether it exists; `local_only: true` on the `sites.yml` entry,
+  filtered on `show_local_reference_links`, decides whether anything points at
+  it. A production build with only the first is a footer link to a 404, so
+  `test_site_nav_links_resolve_to_real_pages` INVERTS for a local-only link
+  rather than exempting it. Deleting both lines is the whole of shipping.
