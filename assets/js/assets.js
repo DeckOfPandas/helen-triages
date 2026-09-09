@@ -551,6 +551,61 @@ window.HTF = window.HTF || {};
         return value;
       },
 
+      /* --- THE WHOLE LIST AS ONE VALUE — GitHub issue #849 ------------------
+         Helen, 2026-09-08: "allow me to export my food or cocktail shortlist as
+         a YAML/JSON dump -- can be just a text area at the bottom of the page."
+
+         WHY IT IS IN THE STORE AND NOT IN THE PAGE. The shortlist is three
+         localStorage keys, not one, and only this closure knows that: the
+         marks, the glasses map and the portions map have different prefixes,
+         different versions and different meanings for a missing entry. A page
+         that assembled the dump itself would be a second place that has to know
+         all of it, and would go stale the day a fourth key arrives.
+
+         JSON, NOT YAML, though the issue offers either. It is what the store
+         already speaks, it is what an importer (#850) would have to parse, and
+         `JSON.stringify(..., null, 2)` is legible enough to read in a textarea.
+         Adding a YAML writer would be a dependency for a format nothing else
+         here uses.
+
+         THE MAPS ARE FILTERED TO WHAT IS ACTUALLY SHORTLISTED, and this is the
+         one judgement in here. Both maps are deliberately sparse and
+         self-healing -- a drink dropped from the list leaves its number behind
+         because nothing reads it -- which is right for storage and wrong for a
+         dump. Exporting a count for something that is not on the list would put
+         a fact in the file that the list itself contradicts, and anyone reading
+         it (a person, or #850) would have to know the self-healing rule to
+         discount it. So the export states only what is true.
+
+         `site` AND `version` ARE FOR THE IMPORTER THAT DOES NOT EXIST YET.
+         Neither is read here. They are written because a dump with no site on
+         it can be pasted into the wrong index and silently half-work -- food
+         URLs simply never matching a drink -- and because the day this shape
+         changes, a file already in Helen's notes needs to say which shape it
+         is. Cheap now, impossible to add retrospectively.
+
+         @returns {{version:number, site:string, entries:string[],
+                    glasses:Object, portions:Object}}
+      */
+      snapshot: function () {
+        var list = read().slice();
+        var allGlasses = readGlasses();
+        var allPortions = readPortions();
+        var glasses = {};
+        var portions = {};
+        list.forEach(function (url) {
+          if (typeof allGlasses[url] === 'number') glasses[url] = allGlasses[url];
+          if (typeof allPortions[url] === 'number') portions[url] = allPortions[url];
+        });
+        return {
+          version: 1,
+          site: HTF.site || '',
+          entries: list,
+          glasses: glasses,
+          portions: portions
+        };
+      },
+
       /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module
          reads localStorage once and caches; a test that wants a second scenario
          in the same page needs to say so. */

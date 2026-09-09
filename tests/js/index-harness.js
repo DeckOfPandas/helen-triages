@@ -36,7 +36,15 @@ const SCRIPTS = [
   'filter-state.js',
   'cocktail-search.js',
   'shopping-list.js',
-  'cocktail-index.js'
+  'cocktail-index.js',
+  // #849. Nobody's dependency -- it reads HTF.shortlist at run time rather than
+  // lifting helpers off another module at startup, and it subscribes to
+  // `htf:shortlist-change` rather than being called. It is here because the
+  // test at the foot of cocktail-index-startup.test.js asserts this list IS the
+  // template's, which is the point of that test and is what caught its absence.
+  // It loads AFTER universe.js on the page; universe.js is filtered out of the
+  // comparison, so this sits last in both.
+  'shortlist-export.js'
 ];
 
 /* A small cocktails index: two drinks, two mood sections, the YOLO row and the

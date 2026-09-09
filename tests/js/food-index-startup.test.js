@@ -51,7 +51,13 @@ const SCRIPTS = [
   'filter-state.js',
   'shopping-list.js',
   'food-shopping-list.js',
-  'filters.js'
+  'filters.js',
+  // #849. Nobody's dependency: it reads HTF.shortlist at run time rather than
+  // lifting helpers off another module at startup, and it subscribes to
+  // `htf:shortlist-change` rather than being called. Listed anyway because the
+  // test at the foot of this file asserts this array IS the template's script
+  // list -- which is the point of that test, and is what caught its absence.
+  'shortlist-export.js'
 ];
 
 /* Two recipes and the panel, hand-built rather than sliced out of a real build:
