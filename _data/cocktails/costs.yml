@@ -419,6 +419,15 @@ bottles:
     size_ml: 700
     gbp: 31
     confidence: high
+  # NEW 2026-09-09 with the bottle. 75cl, like every other vermouth here and
+  # unlike the 70cl default -- the header calls that out as the thing easiest
+  # to get wrong. MINE, NOT HERS: `medium` means "within about 20% for the
+  # category", and the two Dolins she already owns are not priced here to
+  # anchor it. Overwrite when she next reads Master of Malt.
+  "Dolin Rouge":
+    size_ml: 750
+    gbp: 15
+    confidence: medium
   # --- orange liqueurs and triple sec ------------------------------------
   "Cointreau":
     size_ml: 700

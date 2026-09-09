@@ -170,9 +170,32 @@ canonical:
   # appears on the page, so the sentence is a decision like every other canonical
   # form, and it belongs where the decisions are rather than only inside a
   # template.
+  #
+  # AND SINCE 2026-09-09 THE TEMPLATE READS IT, which it did not before. The two
+  # sentences were written out in `_layouts/cocktail.html` as well as declared
+  # here -- one fact in two places, and it drifted the instant Helen changed the
+  # wording: editing this list left the page emitting the old string with
+  # nothing to notice. The template now takes `canonical.express` directly.
+  #
+  # ORDER IS LOAD-BEARING NOW. The template indexes this list: [0] is the
+  # drop-in form and [1] the discard form, chosen by whether the garnish says
+  # "discard". Reordering these two silently swaps what every twist-garnished
+  # drink tells you to do with the peel, so a test asserts which is which.
+  # `then` RATHER THAN `and` SINCE 2026-09-09 -- #880 item 3, Helen's own
+  # wording. She found the collection saying "Squeeze the twist over the drink
+  # THEN discard it" in one place and "Express the twist over the drink AND drop
+  # it in" in another, and ruled on the pair: "Suggest: 'Express the twist over
+  # the drink then discard it.' and 'Express the twist over the drink then drop
+  # it in.'"
+  #
+  # THE `Squeeze` VERSION SHE SAW IS ALREADY GONE -- it was julien-sorel's, and
+  # she deleted it herself proofreading the same afternoon, which is what the
+  # 2026-09-04 ruling above requires of every drink. So the only thing left to
+  # settle was the conjunction, and `then` is the better word anyway: these are
+  # two actions in sequence, not one action with a property.
   express:
-    - "Express the twist over the drink and drop it in."
-    - "Express the twist over the drink and discard it."
+    - "Express the twist over the drink then drop it in."
+    - "Express the twist over the drink then discard it."
 
 # =============================================================================
 # PROPOSALS -- both halves kept, so the choice is Helen's and not mine

@@ -296,7 +296,12 @@ bottles:
     aliases: ["Damoiseau 50"]
   "Damoiseau Rhum Agricole Blanc Pure Cane":
     generic: "rhum agricole blanc"
-    aliases: ["Damoiseau Pure Cane"]
+    # `Damoiseau Rhum Pure Cane` ADDED 2026-09-09: Helen wrote it that way
+    # proofreading the Mai Tai, moving that pour off the 40° and onto this
+    # bottle. A THIRD spelling of a bottle already declared, not a new one --
+    # so it is aliased rather than corrected away, which is the La Favorite
+    # rule and is what stops her having to spell a bottle this file's way.
+    aliases: ["Damoiseau Pure Cane", "Damoiseau Rhum Pure Cane"]
   # FAVORITE, NO `u`, AND THAT IS A STANDING CORRECTION -- Helen, 2026-09-06:
   # "Favorite is correct, my mistyping, please always correct." The distillery
   # is Martinican and spells it the French way; `La Favourite` was hers and
@@ -766,6 +771,20 @@ bottles:
   "Dolin Blanc":
     generic: "blanc vermouth"
     aliases: ["Dolin blanc"]
+  # HELEN'S, 2026-09-09, proofreading the 18th Century Cocktail: she gave its
+  # sweet vermouth the suggestion "Dolin red". THE THIRD DOLIN, and a different
+  # bottle from the two above rather than a spelling of either -- Dolin makes
+  # Dry, Blanc and Rouge, and the drink asks for a `sweet vermouth`, which is
+  # the Rouge.
+  #
+  # CANONICAL AS `Dolin Rouge`, WITH HER WORDS AS AN ALIAS. The label says
+  # Rouge; she wrote "red". The La Favorite rule settles which way round that
+  # goes -- the product name is canonical and every spelling anyone actually
+  # writes becomes an alias, so nothing she types has to be corrected before it
+  # resolves. The two entries above are aliased the same way.
+  "Dolin Rouge":
+    generic: "sweet vermouth"
+    aliases: ["Dolin red", "Dolin Red", "Dolin rouge", "Dolin Rouge Vermouth de Chambéry"]
 
   # --- liqueurs -------------------------------------------------------------
   # HARVESTED FROM `item` 2026-09-05 -- see the block at the head of `bottles`.
