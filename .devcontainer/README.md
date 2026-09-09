@@ -32,7 +32,7 @@ install on native Linux/macOS.
 `.devcontainer/run.sh` handles the rest: it builds the image on first
 run (skipped on later runs, since it checks whether the image already
 exists), creates the two named volumes that persist your Claude Code
-login and gem cache across restarts, reads `GH_TOKEN` from
+login and gem cache across restarts, reads `AGENT_GH_TOKEN` from
 `.claude/settings.local.json` for just that one run, and drops you into
 a shell at `/workspace` as user `helen` (not root), looking at this
 actual project directory:
@@ -111,10 +111,13 @@ rather than error.
 
 From here it's normal Claude Code, just running inside the container:
 edit files, run `bundle exec jekyll build`, run the JS tests
-(`node --test tests/js/*.test.js`), use `gh`/`git` as usual (your
-`GH_TOKEN` still needs to be passed in -- add `-e GH_TOKEN` to the
-`docker run` command, sourced from your host shell, so it's never baked
-into the image or written to disk in the container).
+(`node --test tests/js/*.test.js`), use `gh`/`git` as usual
+(`AGENT_GH_TOKEN` still needs to be passed in -- add `-e AGENT_GH_TOKEN`
+to the `docker run` command, sourced from your host shell, so it's never
+baked into the image or written to disk in the container; `run.sh`
+already does this). `gh` itself reads `GH_TOKEN`, so feed it per-command
+as `GH_TOKEN="$AGENT_GH_TOKEN" gh ...` -- that is a variable name, not a
+second credential. Helen deleted the `GH_TOKEN` secret on 2026-09-09.
 
 Exit the container (`exit` or Ctrl+D) whenever -- `--rm` cleans up the
 container itself, but the two named volumes (login, gem cache) survive

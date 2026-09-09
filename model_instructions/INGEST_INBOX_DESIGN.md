@@ -113,8 +113,10 @@ apart, which is the point:
   phone. Works today with no new access.
 - The browser session, if Helen gives claude.ai her GitHub connector or a
   fine-grained token of its own scoped to issues on the two private repos.
-  That is HER token, not `GH_TOKEN`, and it is her decision (D10). Nothing in
-  this design needs it.
+  That is HER token, not the one this repo carries, and it is her decision
+  (D10). Nothing in this design needs it. (Said `GH_TOKEN` until 2026-09-09,
+  when that token was deleted; `AGENT_GH_TOKEN` is the repo's only credential
+  now, and §8's security argument has a footnote about it below.)
 
 **Shape.** Machine-checkable, in this order, nothing else at top level:
 
@@ -168,6 +170,17 @@ Built 2026-09-03 (#672). `.claude/commands/ingest-inbox.md` is the procedure and
   (`guard-main-branch.py`, `guard-destructive-git.py`). The issue channel
   needs nothing the tokens do not already have, and the local session that
   writes the file runs under every guard this repo has.
+  - **ONE LEG OF THIS WENT AWAY ON 2026-09-09 AND THE CONCLUSION HELD.** When
+    this was written, "needs nothing the tokens do not already have" was doing
+    real work: `GH_TOKEN` was issues-only, so the branch route was impossible
+    as well as unwise. That token is deleted and `AGENT_GH_TOKEN` is classic
+    `repo`-scoped, so **contents-write on a private repo is now within reach of
+    the credential.** What still holds is the half that was always load-bearing:
+    the session that writes the file is local and guarded, and the private
+    repos have no build, so nothing an issue carries can publish. **The issue
+    channel is a choice now rather than the only option** — worth re-arguing
+    only if Helen wants the browser session writing branches, which is a
+    different decision from D10.
 - **What a bad body can do.** Nothing beyond a rejection. The parser accepts
   one fenced block, one YAML document, a dict at top; it does not `eval`,
   does not follow URLs, does not write outside the drafts root, and refuses a

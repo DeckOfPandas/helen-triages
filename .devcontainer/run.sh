@@ -2,16 +2,20 @@
 # Runs the sandboxed devcontainer for this project. Save this file,
 # chmod +x it yourself, then just run it -- no arguments needed.
 #
-# Reads GH_TOKEN and AGENT_GH_TOKEN from .claude/settings.local.json just
-# for the duration of this one `docker run`, without ever printing them,
-# writing them anywhere else, or exporting them into your persistent shell
-# environment. GH_TOKEN is Helen's own fine-grained token (issues/PRs,
-# public-repo only, no push). AGENT_GH_TOKEN is DeckOfPandas-agentic's
-# classic repo-scoped token -- a separate GitHub account, invited as a
-# collaborator on just these three repos, so it can push and open PRs
-# under its own identity without ever touching Helen's SSH keys or
-# widening her personal token's scope. Builds the image itself on first
-# run if it doesn't exist yet.
+# Reads AGENT_GH_TOKEN from .claude/settings.local.json just for the
+# duration of this one `docker run`, without ever printing it, writing it
+# anywhere else, or exporting it into your persistent shell environment.
+# AGENT_GH_TOKEN is DeckOfPandas-agentic's classic repo-scoped token -- a
+# separate GitHub account, invited as a collaborator on just these three
+# repos, so it can push and open PRs under its own identity without ever
+# touching Helen's SSH keys. Builds the image itself on first run if it
+# doesn't exist yet.
+#
+# GH_TOKEN WAS READ HERE TOO UNTIL 2026-09-09, when Helen deleted it on
+# GitHub and it stopped existing. It was her own fine-grained token and it
+# had been reduced to a subset of what AGENT_GH_TOKEN already did -- two
+# credentials where one was enough. Nothing needs adding back: every caller
+# reads AGENT_GH_TOKEN now.
 
 set -euo pipefail
 
@@ -78,7 +82,6 @@ DOTFILE_MOUNTS=()
 # jekyll-local/jekyll-prod aliases serve there. Nothing listens on them today
 # in any case -- the image carries no jekyll, which is the same gap that stops
 # `scripts/verify.py` running in the container.
-GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['GH_TOKEN'])")" \
 AGENT_GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['AGENT_GH_TOKEN'])")" \
 docker run -it --rm \
   --name helen-triages-primary \
@@ -86,7 +89,6 @@ docker run -it --rm \
   -v helen-triages-claude-config:/home/helen/.claude \
   -v "$BUNDLE_VOLUME:/home/helen/.bundle-cache" \
   "${DOTFILE_MOUNTS[@]}" \
-  -e GH_TOKEN \
   -e AGENT_GH_TOKEN \
   -p 4999:4001 \
   -p 5000:4002 \

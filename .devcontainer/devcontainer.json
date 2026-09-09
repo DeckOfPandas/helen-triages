@@ -14,7 +14,7 @@
     "CLAUDE_CONFIG_DIR": "/home/helen/.claude"
   },
   "remoteEnv": {
-    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+    "AGENT_GH_TOKEN": "${localEnv:AGENT_GH_TOKEN}"
   },
   "forwardPorts": [4001, 4002],
   "portsAttributes": {

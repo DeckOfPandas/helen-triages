@@ -2496,6 +2496,81 @@ unless stated.
   than against its own merge base** — `git diff main..branch` is what showed
   the deletion, where `git show branch` alone would not have.
 
+- **2026-09-09 — THE SAFE PROBE IS BANNED TOO, AND THE REASON IS NOT THAT IT
+  LEAKS.** `guard-token-expansion.py` was written on 2026-09-08 with one
+  deliberate exception: `${TOK:+set}` and `${TOK+set}` evaluate to the
+  replacement WORD and can never render a value, so an `echo` of one is not a
+  leak, `CLAUDE.md` named it "the only safe probe", and a first draft that
+  denied it was treated as a bug the 18-case pipe-test had caught.
+
+  **A session then ran `echo "${GH_TOKEN:+GH_TOKEN set}"` and Helen rejected
+  the call by hand.** The hook allowed it, correctly. Nothing leaked, and
+  nothing would have. **She rejected it anyway, because from the outside it is
+  indistinguishable from a leak** — deciding it was safe meant reproducing this
+  file's regex in her head, on sight, at speed. *"I shouldn't have to reject
+  the call!! I'm only human!"*
+
+  **THE LESSON, AND IT GENERALISES PAST TOKENS: A GUARD WHOSE EXCEPTIONS A
+  HUMAN HAS TO VERIFY HAS MOVED THE WORK, NOT REMOVED IT.** Every exception in
+  a guard is a rule the human must also know, and the rejection cost her more
+  than the exception ever saved. The narrowness that was a virtue on 2026-09-08
+  ("a guard that gets in the way of legitimate use is one people route around")
+  was the wrong trade here, because the "legitimate use" it protected had no
+  value: **the probe was only ever asking whether a credential existed, and the
+  honest way to ask that is to USE it and read the status code.** A 401 or 403
+  answers it exactly and renders nothing. Helen: *"I can't imagine why we
+  wouldn't do that having thought of it."*
+
+  So the hook now refuses **any** mention of a secret by `echo`/`printf` — the
+  `+` forms, the `?` forms, and `${#TOK}`, which is a length rather than a
+  value and would otherwise have been the obvious next reach. The default
+  expansions (`:-`, `:=`, `-`, `=`) are still refused everywhere, echoed or
+  not. **The rule a human can now check at a glance: an `echo` never mentions
+  a secret.** Verified by breaking it on purpose — 15 cases, 9 denials and 6
+  allowances, including that single-quoted prose about these forms is still
+  legal and that `GH_TOKEN="$AGENT_GH_TOKEN" gh ...` still passes.
+
+  **The counter-argument, recorded because it is the one that lost.** Denying
+  the `+` form removes the ability to answer "is this variable set?" without
+  side effects. That is a real capability, and it is worth nothing: no task
+  here has ever needed the answer in isolation, and every task that thought it
+  did was about to make an API call that would have answered it better.
+
+- **2026-09-09 — `GH_TOKEN` DELETED. ONE CREDENTIAL NOW, AND THE PRIVATE-REPO
+  PR GAP CLOSED WITH IT.** Helen deleted her own fine-grained PAT on GitHub the
+  same day and removed the read from `.devcontainer/run.sh`. `AGENT_GH_TOKEN` —
+  `DeckOfPandas-agentic`'s classic `repo`-scoped PAT, created 2026-09-08 — is
+  now the only credential, for every repo and every operation.
+
+  **The reason is that the second token had become a strict subset of the
+  first.** `AGENT_GH_TOKEN` already did issues, pull requests, contents, push
+  and ref deletion on all three repos; `GH_TOKEN` did issues everywhere and
+  pull requests on the public repo only. Two credentials where one was enough
+  — **and the smaller one was the one generating rules.** The 2026-09-07 scope
+  table, the 422 `not all refs are readable` on the private repos, the `gh pr
+  close --delete-branch` 403 needing `git push --delete` as a fallback, the
+  §9.1 line about the API reaching drafts contents where git could: every one
+  of those was a description of `GH_TOKEN`'s limits, and every one is now
+  history. **They are kept in this file and deleted from `MANUAL.md` and
+  `CLAUDE.md`**, which is the split those files exist for.
+
+  **WHAT THIS COST, AND IT SHOULD BE SAID PLAINLY: MERGING IS NO LONGER
+  MECHANICALLY IMPOSSIBLE.** `CLAUDE.md` used to end the permissions section
+  "the token is scoped so the rest is impossible", and for merging that was
+  true — a fine-grained token without the permission simply could not. A
+  classic `repo`-scoped token held by a collaborator **can merge a pull
+  request.** The rule is unchanged and absolute; what changed is that it is now
+  held by the rule alone. Repo settings, secrets, Actions, webhooks and
+  collaborators still need admin rights the agent account does not have, so
+  those remain mechanically out of reach.
+
+  **The second thing it cost is smaller and worth writing down**: the "why an
+  issue and not a branch" argument in `INGEST_INBOX_DESIGN.md` §8 and
+  `scripts/ingest_inbox.py` rested partly on there being no credential that
+  could write a branch to a private repo. There is one now. The conclusion
+  survives on its other leg — the session that writes the file is local and
+  runs every guard, and the private repos have no build — but **the ingest
+  envelope travelling as an issue is a choice now, not the only option.**
 - **2026-09-09 — THE INLINE-SCRIPT GUARD, AND THE RULE THAT ACTUALLY BITES IS
   NOT THE ONE I BUILT FIRST.** `CLAUDE.md` has said since 2026-09-08, in
   Helen's words, "if they take or emit variables, please write a script in

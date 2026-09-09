@@ -110,7 +110,11 @@ gitignored, like the two drafts repos (§9.1). Use the system `node`. **There is
 no `gh` at all in a worktree** — `gh: command not found`, and it is not
 installable from here — so anything `CLAUDE.md` describes as a `gh` command
 (reading an issue, `gh pr create`) is the REST API instead, called with
-`GH_TOKEN` from a script in `tmp/`. Measured 2026-09-07, opening PR #808.
+`AGENT_GH_TOKEN` from a script in `tmp/`. Measured 2026-09-07, opening PR #808.
+**Read the token from the environment at the point of use and never `echo` it
+in any form** — not even a probe that cannot leak; the hook refuses all of
+them (`CLAUDE.md`). To find out whether a credential works, use it and read
+the status code.
 
 **Never run two `pytest` sessions at once.** `test_rendered_pages.py` writes
 throwaway `zzz-gate-` recipes into `_food_recipes/` (and drinks into
@@ -1018,12 +1022,16 @@ origin/main` (or `origin/<branch>` when the public tests want data on an
 unmerged private branch). `git fetch origin main:main` refuses on a
 checked-out branch and a merge onto `main` is refused by the hook.
 
-**The API token is a different channel.** `GH_TOKEN` carries Issues on all
-three repos, and **since 2026-09-07 opening pull requests too** (§11.-1); it
-reads file contents on none of the private ones (403). Git can. **Pushing
-needs no ask in any of the three repos** (`CLAUDE.md`, 2026-09-07);
-committing or merging onto any `main` is still forbidden, hook-enforced.
-**Merging a PR is not in the token and never becomes yours.**
+**The API token is a different channel.** `AGENT_GH_TOKEN` — the only one
+since `GH_TOKEN` was deleted on 2026-09-09 — carries Issues, pull requests
+and contents on all three repos. **The old asymmetry is gone**: the retired
+fine-grained token read file contents on neither private repo (403), which is
+why several rules here used to say "git can, the API can't". They now reach
+the same places. **Pushing needs no ask in any of the three repos**
+(`CLAUDE.md`, 2026-09-07); committing or merging onto any `main` is still
+forbidden, hook-enforced. **MERGING A PR IS STILL NEVER YOURS — but it is no
+longer the token that stops you**, it is the rule, because a classic
+`repo`-scoped token can merge. Treat it as absolute.
 
 **The naming trap**: `.gitignore` matches by directory name, so a renamed
 drafts directory is un-ignored and stageable in the public repo.
@@ -2047,10 +2055,12 @@ listener actually reads.
 **Git is `CLAUDE.md`'s.** Branch, never commit or merge onto `main` in any
 repo in the tree, never `git reset --hard` or discard over a dirty tree, check
 `git branch --show-current` in its own tool call immediately before every
-commit. **Push with no ask in all three repos since 2026-09-07; OPEN THE PR with no
-ask in `helen-triages` only** (§11.-1) — the token cannot open one on the two
-private repos, because that needs to read the head ref and it has no `Contents`
-permission there. Say so and let Helen open it; do not route around it. **Merging is hers, always, everywhere.**
+commit. **Push with no ask in all three repos since 2026-09-07, and OPEN THE PR with
+no ask in all three since 2026-09-09** (§11.-1), when `GH_TOKEN` was deleted
+and `AGENT_GH_TOKEN` — which has the `Contents` permission the old one lacked
+on the private repos — became the only credential. **Merging is hers, always,
+everywhere**, and note that this is now the RULE holding rather than the
+token, which can merge.
 **Five hooks in `.claude/hooks/`** enforce the five rules that were read and
 broken anyway — `guard-main-branch.py`, `guard-destructive-git.py`,
 `guard-sed.py`, `guard-token-expansion.py` and `guard-inline-script.py` — and
@@ -2080,8 +2090,8 @@ they bite. End every commit with the `Co-Authored-By: Claude …
 > a trailer from a PRIVATE repo closes and cross-references NOTHING, so
 > closing a public issue from work done there is a separate deliberate step.
 > Do it AT COMMIT TIME; after a push it is fixed. Helen's standing preference:
-> close via commit message whenever a trailer can; the `GH_TOKEN` API is for
-> the cases it cannot reach. Before reporting an issue as done:
+> close via commit message whenever a trailer can; the `AGENT_GH_TOKEN` API is
+> for the cases it cannot reach. Before reporting an issue as done:
 > `git log main --grep="#N"`.
 
 **Helen** writes no code by choice, has strong systems judgement, wants
@@ -2155,14 +2165,20 @@ never `gh pr close --delete-branch` (403).
 
 **A worktree has no `gh`** (§1), so the PR is opened through the REST API,
 `POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
-
-**AND ONLY THAT REPO.** The same call against either private repo returns 422
-`not all refs are readable`: creating a PR must read the head ref, which is a
-`Contents` operation, and the token carries Issues and Pull requests but not
-Contents. A public repo's refs need no permission, which is why this works in
-one place and not the other three-way. Measured 2026-09-07; `DECISIONS.md` §11
-has the table and why Helen left the permission ungranted.
 Measured 201 on 2026-09-07.
+
+**AND SINCE 2026-09-09, ALL THREE REPOS.** This section used to read "AND ONLY
+THAT REPO": the same call against either private repo returned 422 `not all
+refs are readable`, because creating a PR must read the head ref — a
+`Contents` operation — and Helen's fine-grained token carried Issues and Pull
+requests but not Contents. **She deleted that token on 2026-09-09**, leaving
+`AGENT_GH_TOKEN`, which is classic `repo`-scoped and has Contents everywhere;
+a PR on `helen-triages-food-private` was measured working on 2026-09-08 (#25,
+closed unmerged). So the old instruction to "say so and let Helen open it" on
+a private repo is dead — open it yourself, in any of the three.
+`DECISIONS.md` §11 has the retired token's scope tables and why the gap
+existed; they describe a credential that no longer exists, so do not re-derive
+them.
 
 **Name the issues a PR will close before opening it**, the same rule that
 already governs a `Closes #N` trailer: a PR body is the last place the
