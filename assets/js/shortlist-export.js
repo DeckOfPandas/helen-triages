@@ -68,6 +68,28 @@
       var note = section && section.querySelector('[data-shortlist-export-empty]');
       if (note) note.hidden = !empty;
     });
+    // #849's SECOND PLACEMENT, revealed by the same pass and for the same
+    // reason: a link to a panel that never appears is a dead end.
+    Array.prototype.slice.call(
+      document.querySelectorAll('[data-shortlist-export-jump]')
+    ).forEach(function (link) { link.hidden = false; });
+  }
+
+  /* FOLLOWING THE JUMP LINK OPENS THE PANEL, and without this it does not.
+     The panel is a closed `<details>`, so the browser scrolls to it and shows
+     a summary line -- which is exactly the "I could not find it" Helen
+     reported, moved a few hundred pixels down the page rather than fixed.
+     `<details>` gained automatic opening on fragment navigation only recently
+     and not everywhere, so this does it explicitly rather than relying on it. */
+  function openOnJump() {
+    Array.prototype.slice.call(
+      document.querySelectorAll('[data-shortlist-export-jump]')
+    ).forEach(function (link) {
+      link.addEventListener('click', function () {
+        var panel = document.querySelector('[data-shortlist-export-panel]');
+        if (panel) panel.open = true;
+      });
+    });
   }
 
   /* THE COPY BUTTON IS PROGRESSIVE, and its absence is not a failure. The
@@ -94,5 +116,6 @@
   if (!boxes().length) return;
   paint();
   wireCopy();
+  openOnJump();
   document.addEventListener(EVENT, paint);
 })();

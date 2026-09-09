@@ -280,6 +280,14 @@ permalink: /food/
           id="shortlist-only"
           aria-pressed="false"
           hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
+  {% comment %} #849, SECOND PLACEMENT. The cocktails index carries the
+     identical link and the same argument: a JUMP LINK rather than a second
+     panel, because two textareas holding the same JSON would be two things to
+     keep in step and a second answer to "where is my list". Ships `hidden`
+     like every other shortlist control -- a link pointing at a panel that a
+     browser without JavaScript never reveals would be a dead end. {% endcomment %}
+  <a class="shortlist-export-jump" href="#shortlist-export"
+     data-shortlist-export-jump hidden>export list as JSON →</a>
 </div>
 
 <ul class="recipe-list">
@@ -630,8 +638,9 @@ permalink: /food/
    ONE SCRIPT SERVES BOTH SITES. shortlist-export.js finds
    `[data-shortlist-export]` and does not care which index it is on, exactly as
    shortlist.js does with `.btn-shortlist`. {% endcomment %}
-<details class="shortlist-export" data-shortlist-export-panel hidden>
-  <summary>Export shortlist</summary>
+<details class="shortlist-export" id="shortlist-export"
+         data-shortlist-export-panel hidden>
+  <summary>Export shortlist as JSON</summary>
   <p class="shortlist-export-hint">
     Copy this and keep it, or paste it somewhere else. It holds what is
     shortlisted and how many portions of each.
