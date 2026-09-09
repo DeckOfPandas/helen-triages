@@ -230,6 +230,20 @@ moods:
   on fire: >-
     Something is set alight. Two drinks, and narrow is the point: a two-drink
     answer to "something on fire" is a good answer, not a failed filter.
+  easy peasy: >-
+    Equal parts of everything but the top, or three pours with no juicing and
+    nothing to make first. The far end of `I want to faff`, and a different
+    axis from `no juicing`: a drink can want juicing and still be easy peasy if
+    it is equal parts, which is how Long Island Iced Tea qualifies -- eight
+    ingredients, every one of them 12.5 ml, and only the cola different.
+    #845, Helen: "any cocktail with equal parts of all ingredients (bar maybe
+    bitters) should get the tag 'easy peasy' once we've made it" -- so it is
+    earned rather than derived, and an unmade drink does not get it however it
+    is built. She widened it on 2026-09-08 to cover the short pour-and-stir
+    drinks as well, which is what brings in the Negroni family.
+    A TOP OR A MIXER IS SET ASIDE, along with dashes and drops. Topping a glass
+    is not faff, and neither is opening a cola -- Julien Sorel and Anita's
+    Attitude Adjuster are in on her ruling, and Anita's is seven equal pours.
 
 # =============================================================================
 # WHAT THE DEFINITIONS ABOVE MEAN IN INGREDIENTS — the derivation's vocabulary
@@ -657,7 +671,7 @@ mood_include:
     moods: [fruity]
     why: >-
       she calls it fruity and no ingredient in it is on the fruit list.
-  coney-park-swizzle:
+  coffey-park-swizzle:
     moods: [sharp]
     why: >-
       she calls it sharp; the rule's five-poured-ingredient cap excludes it.
@@ -860,6 +874,35 @@ mood_step_words:
 #
 # ADDING A NAME HERE IS WHAT MAKES A MOOD HERS. Removing one hands it back to
 # the rules, and needs a rule to hand it back TO.
+# =============================================================================
+# ONE MOOD CANCELLING ANOTHER -- #853
+# =============================================================================
+# Helen, 2026-09-08: "LIIT is easy peasy, and this should suppress the
+# derivation." Long Island Iced Tea carried `easy peasy` AND `I want to faff`,
+# which say opposite things -- one that the drink asks nothing of you, the
+# other that it asks a lot -- and both rendered as chips side by side.
+#
+# NEITHER WAS WRONG BY ITS OWN RULE, which is what makes this a vocabulary
+# question rather than a bug. `easy peasy` is hers, applied by hand. `I want to
+# faff` is derived, and its rule is "muddling, flaming, shells, blending,
+# swizzling, or nine-plus ingredients" -- five OPERATIONS and one COUNT. The
+# count is the odd one out: it is a proxy for effort that holds for a tiki drink
+# with nine things happening to it and fails for this one, whose entire method
+# is "shake the first 8 ingredients with ice" and then pour the ninth on top.
+#
+# SHE SUPPRESSES RATHER THAN RE-SCORES, and that is the cheaper correction: the
+# nine-ingredient rule stays exactly as it is for the 124 drinks it is right
+# about, and a drink she has personally called easy stops being contradicted by
+# it. Her hand-applied judgement wins over a derived one, which is the same
+# order of precedence `moods_by_hand` already establishes.
+#
+# LEFT is the mood that wins; RIGHT is what it removes. Only ever removes a
+# DERIVED mood -- suppressing a hand-applied one would mean the file arguing
+# with itself about something Helen typed twice on purpose.
+mood_suppresses:
+  easy peasy:
+    - I want to faff
+
 moods_by_hand:
   # THE FOUR BELOW MOVED HERE ON 2026-08-30, after every rule was scored
   # against a full pass Helen made over all 114 drinks. The fit, as
@@ -891,6 +934,11 @@ moods_by_hand:
   - festive
   - signature
   - so wrong it's right
+  # #775. Earned rather than derived -- Helen tags it once she has MADE the
+  # drink, which is a fact about her and not about the liquid, so no rule can
+  # produce it. It is also the one hassle that is not a cost: the other four
+  # say what a drink will ask of you, and this one says it will ask nothing.
+  - easy peasy
 
 mood_groups:
   mood:
@@ -914,6 +962,7 @@ mood_groups:
     - I want to faff
     - no juicing
     - on fire
+    - easy peasy
 
 chaos:
   definitely good: "ship is yes or oh gods yes"

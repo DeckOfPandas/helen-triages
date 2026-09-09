@@ -3652,7 +3652,7 @@ def test_no_method_step_restates_to_serve_or_garnish():
 
     THE FIELDS ALREADY EXISTED AND THE DRINKS DISAGREED WITH EACH OTHER, which
     is what #573 means by "we talked about this but it looks like we didn't
-    implement it". Mastiha Mojito said `to_serve: "Straw."`; Mai Tai and Coney
+    implement it". Mastiha Mojito said `to_serve: "Straw."`; Mai Tai and Coffey
     Park Swizzle said `Serve with a straw.` as a method step. One fact, two
     fields, decided per drink by which session last touched it. Don's Own Grog
     and Man o' War went further and restated their own `garnish:` verbatim.

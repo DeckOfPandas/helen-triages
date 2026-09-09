@@ -140,15 +140,11 @@
     // that pass has run — the same two-halves story the tape line tells.
     if (window.HTF && window.HTF.fitCardNames) window.HTF.fitCardNames();
 
-    // THERE IS NO SECOND CALL HERE FOR THE CHIP ROWS (#698), AND THAT IS A FACT
-    // ABOUT THE PARTS LIST RATHER THAN A DECISION OF THIS FILE'S. `is-row-start`
-    // is a measurement in exactly the way the name classes above are, so a fresh
-    // clone would need re-measuring on the same argument -- but the mood chips
-    // live in a card's FOOT, and since 2026-09-05 neither site's
-    // `data-universe-parts` clones one. A call would re-measure the whole page
-    // to reach nothing. If a foot is ever cloned again, this is where
-    // `HTF.markChipRows()` goes, next to its sibling above; the note beside the
-    // attribute in cocktails/index.html says so at the end that would change it.
+    // THERE IS NO SECOND CALL HERE FOR THE CHIP ROWS, AND SINCE #846 THERE IS
+    // NOTHING TO CALL. chip-rows.js measured where a chip row broke so the
+    // stylesheet could suppress a leading dot there (#698); the dot trails every
+    // chip but the last now, so no measurement describes it and the file is
+    // gone. Nothing to re-measure on a clone, whatever a clone contains.
   }
 
   if (again) again.addEventListener('click', deal);

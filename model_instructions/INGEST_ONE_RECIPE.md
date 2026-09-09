@@ -137,6 +137,7 @@ name you give is a courtesy rather than a contract.
 | `method` **xor** `method_groups` | Section 3 — the part that matters most. Flat `method:` for a recipe with one phase, `method_groups:` when the source has more. **Never both** — the layout renders one and silently drops the other. |
 | `method_short` | Always exactly `[""]`. It means "not written", and Helen writes it herself. |
 | `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. A bare string is legal in the schema but not for an ingest. Three at most; more than that and the material wants to be prose. |
+| a tip printed under the source's own label | **Transcribe the tip; drop the label.** Good Food runs its asides under a standing `gf tip` rubric, and eight drafts carry that prefix verbatim — where it reads as an abbreviation nobody can expand. `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence (*"the magazine likes Kallo"* stays). **Never carry an unexplained abbreviation across**: `gf` was read as *gluten-free* for weeks by an issue and a comment in `tests/test_style.py` alike, and one of the fixes they proposed would have printed a false allergen claim on a recipe page. Expand it now, while the source is in front of you, or drop it. |
 | `meta` | Exactly these three keys, in this order, all `false`. See below. |
 
 **`meta:` is three flags, in that order, and on a new file all three are
@@ -261,9 +262,25 @@ supplies "For the " itself, so an article there renders as "For the for the
 custard". `steps`, plural: a `step:` typo produces a group with no content and
 no error.
 
+**THE TRIGGER, because this is the field that gets skipped.** Measured across
+340 drafts on 2026-09-07: **142 have named ingredient groups and no method
+groups, and exactly one is the other way round.** The cause is the schema, not
+carelessness — `ingredient_groups:` is the only container for ingredients, so
+you are already inside the grouped shape and naming a second group is a small
+edit; grouping the method means *switching fields*, against the two warnings
+just above. Left alone, the path of least resistance writes grouped
+ingredients and a flat method every single time.
+
+So: **if you wrote more than one NAMED ingredient group, the method almost
+certainly has the same phases. Write `method_groups:` and give the groups the
+same names.** A recipe whose ingredients split into `ragù` and `white sauce`
+does not have a one-phase method.
+
 **One phase means flat `method:`.** Do not invent a second group to use the
 field, and do not split a recipe the source ran as one sequence — that is
 restructuring somebody else's recipe, which §3's rules forbid everywhere else.
+One unnamed ingredient group and a flat `method:` is the matching pair, and it
+is correct for plenty of recipes.
 
 ### What the rewrite must NOT change
 
