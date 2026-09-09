@@ -412,6 +412,13 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
+  # HELEN'S OWN FIGURE, 2026-09-09: "Ciroc Pineapple Flavoured Vodka", GBP 31.
+  # 700 ml assumed -- the size she did not state and the one every other row
+  # here uses. My generic guess was GBP 20-26, about 20% under.
+  "Ciroc Pineapple Flavoured Vodka":
+    size_ml: 700
+    gbp: 31
+    confidence: high
   # --- orange liqueurs and triple sec ------------------------------------
   "Cointreau":
     size_ml: 700

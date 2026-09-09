@@ -249,10 +249,27 @@ bottles:
   # That entry said it "has no obvious home, since `moderately aged` says
   # nothing about strength" -- true when it was written and answered on
   # 2026-08-29, when `blended overproof rum` was created and this file's own
-  # header named it as the bottle's home. It fails the 100% DDL rule the same
-  # way the other two Pusser's do, so it was never a Demerara overproof.
+  # header named it as the bottle's home.
+  #
+  # RETYPED AS A DEMERARA ON 2026-09-09, HELEN'S RULING, and it overturns the
+  # reading this file had held since 2026-08-29. The comment here used to end:
+  # "It fails the 100% DDL rule the same way the other two Pusser's do, so it
+  # was never a Demerara overproof." Helen: "Minimalist Tiki thinks Pusser's
+  # 151 is a Demerara rum, so so do I. It's 100% Guyanese."
+  #
+  # THE DISAGREEMENT WAS ABOUT A FACT, NOT A PREFERENCE, which is why it moves.
+  # #314's rule is that a Demerara is 100% DDL; the objection to Pusser's was
+  # that it is a Guyana/Trinidad blend. That is true of the Blue Label, and
+  # Helen's ruling is that it is NOT true of the 151, which is all Guyanese --
+  # so the DDL rule is intact and this bottle simply passes it. A cited source
+  # she keeps and agrees with beats an inference made here.
+  #
+  # THE OTHER TWO PUSSER'S ARE UNAFFECTED and stay `moderately aged rum`: that
+  # is an age-and-strength category, not a country one, so nothing about this
+  # ruling reaches them. If she ever wants them typed by origin too, that is a
+  # separate question and this is the paragraph to come back to.
   "Pusser's 151":
-    generic: "blended overproof rum"
+    generic: "overproof Demerara rum, lightly aged"
     aliases: ["Pussers 151", "Pusser's Navy Rum 151"]
   "Planteray Stiggins' Fancy":
     generic: "pineapple rum"
@@ -494,6 +511,17 @@ bottles:
     # label's own spelling. Aliased rather than argued about -- this file
     # governs what can be READ.
     aliases: ["Absolut vanilla vodka", "Absolut Vanilia"]
+  # HELEN NAMED THE PRODUCT ON 2026-09-09, which is what let this be entered.
+  # Asked for a price and a strength she first said "Ciroc" -- a HOUSE, and
+  # this file's standing rule since 2026-09-04 (Briottet) is that a house is
+  # not a bottle, so the category carried the figures for a few minutes until
+  # she gave the label: "Ciroc Pineapple Flavoured Vodka". The Blue Hawaiian's
+  # `pineapple vodka` now has a bottle behind it, and the generic's own abv and
+  # cost figures come out -- a category with a bottle is priced and counted
+  # from the bottle.
+  "Ciroc Pineapple Flavoured Vodka":
+    generic: "pineapple vodka"
+    aliases: ["Ciroc Pineapple", "Cîroc Pineapple", "Ciroc pineapple vodka"]
 
   # --- whisky ---------------------------------------------------------------
   # Brown Derby's bourbon, from its own `item`. The 12 is the age statement and
@@ -1079,16 +1107,13 @@ not_reached_for:
     corrected it herself: "I made a mistake, my overproof Demerara rum is
     Pusser's 151." She does not own an El Dorado 151 and never did; the 2026-09-05
     withdrawal was right and the re-declaration was a misunderstanding of the
-    question, not a change of mind. THE CATEGORY IS BACK TO HAVING NO BOTTLE,
-    which is the state it was designed to survive: the generic stays because
-    pic-a-de-crop-punch and zombie-intoxica still pour it, and costs.yml and
-    abv.yml go on carrying the CATEGORY's figures. Do not re-add it because the
-    category looks thin -- that is the mistake this block exists to stop.
-    NOTE THAT PUSSER'S 151 IS NOT THE ANSWER EITHER, at least not as the file
-    stands: it is declared as `blended overproof rum`, on #314's rule that a
-    Demerara is 100% DDL and Pusser's is a Guyana/Trinidad blend. Whether the
-    two drinks should point at `blended overproof rum` instead is Helen's
-    call and is open, 2026-09-09.
+    question, not a change of mind. Do not re-add it because the category looks
+    thin -- that is the mistake this block exists to stop.
+    PUSSER'S 151 IS THE BOTTLE THAT CATEGORY ACTUALLY HAS, settled the same
+    day: Helen named it in the same breath as the correction, and it was
+    retyped from `blended overproof rum` to this Demerara on her ruling that it
+    is 100% Guyanese. So the category is NOT bottle-less -- see the Pusser's
+    151 entry above for the whole argument.
   "Tapatio": >-
     Helen, 2026-09-05: "I've run out of Tapatio! Let's delete it." NOT THE SAME
     KIND OF EXCLUSION as the three above, and the line is here so nobody has to
