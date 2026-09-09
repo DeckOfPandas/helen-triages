@@ -2061,11 +2061,16 @@ and `AGENT_GH_TOKEN` — which has the `Contents` permission the old one lacked
 on the private repos — became the only credential. **Merging is hers, always,
 everywhere**, and note that this is now the RULE holding rather than the
 token, which can merge.
-Two hooks in `.claude/hooks/` enforce the two rules that were
-read and broken anyway — `guard-main-branch.py` and `guard-destructive-git.py`
-— and **there are exactly two**, so do not assume a rule is mechanically
-enforced because this file states it firmly. `DECISIONS.md` §11 has why each
-hook exists and what each deliberately allows; `CLAUDE.md` has the workflow.
+**Five hooks in `.claude/hooks/`** enforce the five rules that were read and
+broken anyway — `guard-main-branch.py`, `guard-destructive-git.py`,
+`guard-sed.py`, `guard-token-expansion.py` and `guard-inline-script.py` — and
+**there are exactly five**, so do not assume a rule is mechanically enforced
+because this file states it firmly. **This paragraph said "exactly two" until
+2026-09-09**, having been written when there were two and not revisited as
+three more arrived; a count in prose is a fact that rots, and the only honest
+version of this sentence is one that names them. `ls .claude/hooks/` settles
+it. `DECISIONS.md` §11 has why each exists and what each deliberately allows;
+`CLAUDE.md` has the workflow.
 
 **Branch names:** `<type>/<what-its-about>`, lowercase, hyphens; one concern;
 deleted after merge, local and remote. **Commit subjects:** `(type) lowercase

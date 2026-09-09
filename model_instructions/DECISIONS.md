@@ -2571,6 +2571,57 @@ unless stated.
   survives on its other leg — the session that writes the file is local and
   runs every guard, and the private repos have no build — but **the ingest
   envelope travelling as an issue is a choice now, not the only option.**
+- **2026-09-09 — THE INLINE-SCRIPT GUARD, AND THE RULE THAT ACTUALLY BITES IS
+  NOT THE ONE I BUILT FIRST.** `CLAUDE.md` has said since 2026-09-08, in
+  Helen's words, "if they take or emit variables, please write a script in
+  tmp/", and "when a command needs to be clever, put the cleverness in a file
+  and run the file". It was read and broken twice in one session, both times
+  with a multi-line `python3 -c` — once rejected by hand, once allowed with
+  *"please please please write those long lines to files rather than running
+  them all together."* Fifth hook, same verdict as the other four: **a rule I
+  read and break needs enforcement, not rewording.**
+
+  **THE CALIBRATION TOOK THREE GOES AND EVERY CORRECTION CAME FROM A
+  MEASUREMENT**, which is the part worth keeping:
+
+  1. **160 characters.** The probe caught a 155-character one-liner carrying a
+     dict comprehension — the exact "cleverness" the rule is about, with no
+     newline in it. Caught before the hook was wired to anything, by breaking
+     it on purpose (§12).
+  2. **120.** Helen then hit a prompt on an **89-character** command and said
+     "it looks like you need to drop your character threshold".
+  3. **100, plus the rule that mattered.** She was right that it prompted and
+     right that the threshold was loose, but **length was not why that command
+     prompted.** The allow rule is `Bash(python3 -c ' *)` — SINGLE-quoted. That
+     command contained single quotes, so it had to be double-quoted, so it
+     matched no allow rule and would have prompted at any length. `CLAUDE.md`
+     had always said "short snippets WITH NO EMBEDDED SINGLE QUOTES"; only the
+     length half had been enforced.
+
+  **THE LESSON GENERALISES PAST THIS HOOK: A GUARD BUILT FROM THE HALF OF A
+  RULE THAT IS EASY TO MEASURE WILL LOOK RIGHT AND MISS THE COMMON CASE.**
+  Length is easy to count and quoting is not, so the first draft counted
+  characters and ignored the clause sitting next to it in the same sentence.
+  The symptom was a guard that passed its own tests and still let Helen be
+  interrupted.
+
+  **What it deliberately allows**: short single-quoted one-liners (`CLAUDE.md`
+  permits these and the existing allow rule covers them), any command running a
+  FILE, `-c` on something that is not an interpreter (`git -c
+  credential.helper=...`), and `sh -c`, which is how a git credential helper is
+  spelled and whose blocking would break the documented push shape. Verified by
+  breaking it on purpose, twice: 12 cases then 9, including the 89-character
+  command that had slipped through.
+
+- **2026-09-09 — "THERE ARE EXACTLY TWO HOOKS" HAD BEEN FALSE FOR A WHILE.**
+  MANUAL §11 carried that sentence, with the useful warning attached that a
+  rule is not mechanically enforced merely because the file states it firmly.
+  The warning was right and the count was three short: `guard-sed.py`,
+  `guard-token-expansion.py` and `guard-inline-script.py` had all arrived
+  without it being revisited. **A count in prose is a fact that rots, and the
+  only honest version of such a sentence is one that names the members** — so
+  it now lists all five and says `ls .claude/hooks/` settles it. Same failure
+  as every stale number this file records; §11.2 is the family.
 
 ### §11.2 The record of this file being wrong
 

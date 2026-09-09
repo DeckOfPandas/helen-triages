@@ -56,6 +56,12 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-token-expansion.py\"",
             "timeout": 20,
             "statusMessage": "Checking for token expansion"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-inline-script.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking for inline scripts"
           }
         ]
       }
