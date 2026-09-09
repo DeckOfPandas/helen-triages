@@ -527,7 +527,7 @@ Seven things that will catch you out:
   `to_serve` and `garnish`. "Serve with a straw" becomes `to_serve: "Straw."`
 - **A step may not start with "Express" either, and this one is not obvious.**
   Helen's ruling, 2026-09-04: a garnish of any citrus twist makes the drink
-  page add `Express the twist over the drink and drop it in.` as the last
+  page add `Express the twist over the drink then drop it in.` as the last
   step, on its own — so a drink that writes it says one fact twice. If the
   source's last line expresses a twist, put the twist in `garnish:` and write
   no step. (`orange twist (discarded)` gets `...and discard it.` instead.)

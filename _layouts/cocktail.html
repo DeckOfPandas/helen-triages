@@ -744,7 +744,7 @@ layout: default
      Helen's ruling, 2026-09-04, answering el-presidente's QQ ("Express the
      orange twist and use it as a garnish. This should become canonical, for
      each type of citrus twist"): yes, a garnish of any citrus twist adds
-     "Express the twist over the drink and drop it in" at the end of the method.
+     "Express the twist over the drink then drop it in" at the end of the method.
 
      WHY THE LAYOUT AND NOT THE FILES. It is one fact — this drink is garnished
      with a twist — and a drink that states the garnish and then also writes the
@@ -778,12 +778,21 @@ layout: default
   {% for g in page.garnish %}
     {% capture bounded %}|{{ g }}|{% endcapture %}
     {% if declared_twists contains bounded %}
+      {% comment %} READ FROM methods.yml SINCE 2026-09-09, not spelled here.
+         These two sentences were written out in this template AND declared in
+         `methods.yml` under `express`, which is one fact in two places -- and
+         it drifted the moment Helen changed the wording (#880: `and` -> `then`),
+         because editing the declaration left the template emitting the old
+         string with nothing to notice. The declaration is the decision, so the
+         template reads it. `.express` is ordered: drop-in first, discard second,
+         which methods.yml states beside them. {% endcomment %}
+      {% assign express_steps = site.data.cocktails.methods.canonical.express %}
       {% if g contains "discard" %}
         {% if twist_step == "" %}
-          {% assign twist_step = "Express the twist over the drink and discard it." %}
+          {% assign twist_step = express_steps[1] %}
         {% endif %}
       {% else %}
-        {% assign twist_step = "Express the twist over the drink and drop it in." %}
+        {% assign twist_step = express_steps[0] %}
       {% endif %}
     {% endif %}
   {% endfor %}
@@ -869,7 +878,7 @@ layout: default
          important, and it's easy to miss at the top of the page."
 
          TWISTS ARE EXCLUDED because the block above already gives them a
-         better step: "Express the twist over the drink and drop it in." says
+         better step: "Express the twist over the drink then drop it in." says
          what to DO, where "Garnish with a lemon twist." only says what with.
          A drink carrying both a twist and something else gets both steps, in
          that order.

@@ -170,6 +170,17 @@ canonical:
   # appears on the page, so the sentence is a decision like every other canonical
   # form, and it belongs where the decisions are rather than only inside a
   # template.
+  #
+  # AND SINCE 2026-09-09 THE TEMPLATE READS IT, which it did not before. The two
+  # sentences were written out in `_layouts/cocktail.html` as well as declared
+  # here -- one fact in two places, and it drifted the instant Helen changed the
+  # wording: editing this list left the page emitting the old string with
+  # nothing to notice. The template now takes `canonical.express` directly.
+  #
+  # ORDER IS LOAD-BEARING NOW. The template indexes this list: [0] is the
+  # drop-in form and [1] the discard form, chosen by whether the garnish says
+  # "discard". Reordering these two silently swaps what every twist-garnished
+  # drink tells you to do with the peel, so a test asserts which is which.
   # `then` RATHER THAN `and` SINCE 2026-09-09 -- #880 item 3, Helen's own
   # wording. She found the collection saying "Squeeze the twist over the drink
   # THEN discard it" in one place and "Express the twist over the drink AND drop

@@ -3729,6 +3729,68 @@ def test_no_method_step_restates_to_serve_or_garnish():
     )
 
 
+def test_the_layout_takes_the_twist_step_from_methods_yml():
+    """The page's twist sentence is methods.yml's, not a string in the template.
+
+    WRITTEN BECAUSE THE PAIR DRIFTED, 2026-09-09. `_layouts/cocktail.html` used
+    to spell both sentences out AND methods.yml declared them -- one fact in two
+    places, with nothing comparing them. Helen changed the wording under #880
+    (`and` -> `then`); editing the declaration left the template emitting the
+    old string, and the only thing that noticed was a test about the STANDALONE
+    DOCUMENT, three steps away, which reported it as a documentation problem.
+
+    So this asserts the template READS the data rather than restating it, which
+    is the only version of this that cannot drift. Two halves:
+
+      1. no literal `Express the twist...` sentence survives in the template;
+      2. it reads `canonical.express` by index, and the ORDER of that list is
+         load-bearing -- [0] is the drop-in form and [1] the discard form,
+         chosen by whether the garnish says "discard". Swapping them would
+         silently tell you to bin a peel you should drop in, on every
+         twist-garnished drink, with every other test still green.
+    """
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+
+    # MATCH THE ASSIGNMENT, NOT THE SENTENCE. A plain scan for the quoted
+    # string fires on this template's own COMMENTS, which quote it while
+    # explaining the rule -- MANUAL §12's "a source-scanning guard will be
+    # fooled by the prose explaining it", and it fired on the unbroken file the
+    # first time this was run. What must not exist is a literal ASSIGNED to
+    # `twist_step`; a comment saying what the sentence is is documentation.
+    spelled_out = re.findall(
+        r'assign\s+twist_step\s*=\s*"[^"]+"', layout
+    )
+    assert not spelled_out, (
+        "_layouts/cocktail.html assigns the twist step as a literal instead of "
+        "reading _data/cocktails/methods.yml's `canonical.express`. That is one "
+        "fact in two places and it has drifted once already:\n  "
+        + "\n  ".join(spelled_out)
+    )
+    assert "canonical.express" in layout, (
+        "_layouts/cocktail.html no longer reads `canonical.express` from "
+        "methods.yml. If the twist step has moved somewhere else, move this "
+        "test with it -- do not delete it, because the string used to live in "
+        "the template and drifted from the declaration."
+    )
+
+    express = (_methods().get("canonical") or {}).get("express") or []
+    assert len(express) == 2, (
+        "methods.yml `canonical.express` must hold exactly two steps -- the "
+        "layout indexes it as [0] drop-in and [1] discard. It holds "
+        f"{len(express)}."
+    )
+    assert "drop it in" in express[0], (
+        "methods.yml `canonical.express`[0] must be the DROP-IN form; the "
+        f"layout takes it for a garnish that does not say 'discard'. It is "
+        f"{express[0]!r}."
+    )
+    assert "discard" in express[1], (
+        "methods.yml `canonical.express`[1] must be the DISCARD form; the "
+        f"layout takes it for a garnish that says 'discard'. It is "
+        f"{express[1]!r}."
+    )
+
+
 def test_no_method_step_opens_with_express():
     """The twist step is the LAYOUT's, not a drink's -- Helen's ruling, 2026-09-04.
 

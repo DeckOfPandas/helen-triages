@@ -1228,10 +1228,17 @@ LEADING spirit swapped in where it is not tequila (the file cannot
 parameterise a step, so a non-tequila drink writes the sentence with its own
 spirit and lives in the informative tail).
 
-**The twist step is the layout's.** A garnish naming a citrus twist makes
-`_layouts/cocktail.html` append *"Express the twist over the drink and drop
-it in."* (or *"…and discard it."* for `(discarded)`) as the last step. No drink
-writes it; `test_no_method_step_opens_with_express` refuses one that does.
+**The twist step is the layout's, and the SENTENCE is `methods.yml`'s.** A
+garnish naming a citrus twist makes `_layouts/cocktail.html` append *"Express
+the twist over the drink then drop it in."* (or *"…then discard it."* for
+`(discarded)`) as the last step. No drink writes it;
+`test_no_method_step_opens_with_express` refuses one that does. **The template
+READS `canonical.express` rather than spelling it out — since 2026-09-09, when
+the two drifted**: the strings were in both places, Helen changed the wording
+(#880, `and` → `then`), and editing the declaration left the page emitting the
+old one with nothing watching the pair.
+`test_the_layout_takes_the_twist_step_from_methods_yml` watches it now, and
+also pins the list's ORDER, which the template indexes.
 
 **`item` may exist only beside `generic: "QQ"`.** It holds what the SOURCE
 called the pour until the category is known, and goes when the generic is
