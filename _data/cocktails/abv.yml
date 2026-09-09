@@ -255,6 +255,12 @@ bottles:
   # --- vermouth, sherry, port, aromatised wine ---------------------------
   "Dolin Dry":                        { abv: 17.5, confidence: high }
   "Dolin Blanc":                      { abv: 16,   confidence: high }
+  # NEW 2026-09-09 with the bottle. `high` where its PRICE is only `medium`,
+  # and the two confidences mean different things: Dolin Rouge is 16% on every
+  # bottle and has been for years, which is exactly what `high` means in this
+  # file (see the header -- "printed on every bottle of it and stable for
+  # years"), while what a shop charges for it this month is a guess.
+  "Dolin Rouge":                      { abv: 16,   confidence: high }
   "Carpano Antica Formula":           { abv: 16.5, confidence: high }
   "Martini Rosso":                    { abv: 15,   confidence: high }
   "Cocchi Vermouth di Torino":        { abv: 16,   confidence: high }

@@ -943,6 +943,26 @@ moods_by_hand:
   # produce it. It is also the one hassle that is not a cost: the other four
   # say what a drink will ask of you, and this one says it will ask nothing.
   - easy peasy
+  # ADDED 2026-09-09, AND THIS BLOCK'S OWN COMMENT SAYS IT SHOULD HAVE BEEN HERE
+  # ALL ALONG. The scores above rank the rules by fit and then say "the bottom
+  # four are here now" -- and the bottom four by those numbers are
+  # `sugar craving` .23, `aperitivo` .36, `on fire` .40 and `tiki` .53. Three of
+  # them were added. This one was not, and nothing noticed for ten days, because
+  # the derivation happened to agree with Helen on all five drinks that had it.
+  #
+  # COBRA'S FANG IS WHAT FOUND IT. Proofreading, she added "passion fruit shells
+  # filled with Overproof rum and fire" to `to_serve` and tagged the drink
+  # `on fire` -- and the derivation stripped it, because `mood_step_words.fire`
+  # reads METHOD STEPS for 'alight', 'flame' and 'burn'. Her fire is in the
+  # SERVE, and the word is "fire", which is not in the list either.
+  #
+  # HAND-ASSIGNED RATHER THAN A WIDER RULE, and that is the choice worth
+  # recording. Adding `to_serve` to the fire scan would also have caught Mai
+  # Tai's "Optional fire if tiki mug" -- and whether an optional flourish makes
+  # a drink `on fire` is a judgement, not a parse. The derivation still tags the
+  # five drinks whose METHOD sets something alight; this only stops it deleting
+  # a sixth that Helen typed on purpose. Widening the rule stays open.
+  - on fire
 
 mood_groups:
   mood:
