@@ -663,6 +663,10 @@ mood_include:
     moods: [I want to faff]
     why: >-
       it ices a glass, rinses it with absinthe and discards the contents, which the rule counts as ONE faff moment where it wants two. See the note on caribbean-sazerac directly above.
+  6th-street-swizzle:
+    moods: [sharp]
+    why: >-
+      she calls it sharp (#843, 2026-09-08) and by every other measure it is one -- rhum agricole blanc, lime juice and cane sugar syrup, four ingredients. What excludes it is the rule's `not churned` clause: its `serve.ice` is `crushed`, and a swizzle is churned by definition. That clause is right in general -- a swizzle is a long drink over ice, not a short sharp one -- and wrong about this drink, which is exactly what a per-drink correction is for.
   carta-switchel:
     moods: [sharp]
     why: >-
