@@ -667,6 +667,10 @@ mood_include:
     moods: [sharp]
     why: >-
       she calls it sharp (#843, 2026-09-08) and by every other measure it is one -- rhum agricole blanc, lime juice and cane sugar syrup, four ingredients. What excludes it is the rule's `not churned` clause: its `serve.ice` is `crushed`, and a swizzle is churned by definition. That clause is right in general -- a swizzle is a long drink over ice, not a short sharp one -- and wrong about this drink, which is exactly what a per-drink correction is for.
+  mastiha-mojito:
+    moods: [sharp]
+    why: >-
+      Helen, 2026-09-09, and she is the only one who can settle it: "it's totally sharp. Herbally sharp, but sharp nonetheless. I have tasted it and you haven't!!!!" THE SAME `not churned` CLAUSE AS 6th-street-swizzle DIRECTLY ABOVE -- its `serve.ice` is `crushed` and the method churns twice -- and there is a second reason it fails, which is worth naming because it is the more interesting one. The rule wants a base, a citrus and a SWEETENER: the base is the rum, the citrus is the lime, and the sweetener is the mastiha liqueur, which `mood_ingredients` files under `loud` and not under `sweet`. That is not obviously wrong -- mastiha IS a loud ingredient and it is the only drink that pours it -- so adding it to `sweet` to fix one drink would be a claim about the ingredient made to reach a conclusion about the recipe. A correction says the smaller, truer thing.
   carta-switchel:
     moods: [sharp]
     why: >-
@@ -774,11 +778,23 @@ mood_exclude:
   # tagged the drink `pudding in a glass` herself on the review pass, so the
   # correction had started arguing with her.
   mastiha-mojito:
-    moods: [ice ice baby]
+    moods: [ice ice baby, I want to faff]
     why: >-
       Fine-strained into an ice-filled glass and then churned twice, so the
       rule reads it as an icy drink and she does not. Her call on the
       2026-08-30 pass: the churning is technique here rather than the point.
+      `I want to faff` JOINED IT ON 2026-09-09 FOR THE SAME REASON, in her
+      words: "Mastiha Mojito absolutely isn't faff -- how could it be?" The
+      mood comes from `churn` being in `mood_step_words.faff`, and this drink
+      is the same two churns the line above is already about — so one ruling
+      about what the churning MEANS here now governs both moods it was
+      producing.
+      NOT A RULE CHANGE, and the count is why. Exactly TWO drinks earn
+      `I want to faff` from churning alone: this one and coffey-park-swizzle.
+      Taking `churn` and `swizzle` out of the faff list would retag that drink
+      too, and Helen has not ruled on it — so the fix that touches only what
+      she ruled on is this one. If she later says a swizzle is not faff either,
+      the rule is the better change and this entry comes out with it.
 
 # `mood_up_glasses` WENT WITH `up`, 2026-08-30. It listed the stemmed glasses
 # and nothing reads it any more. Recovering it means recovering the mood; both
