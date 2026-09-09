@@ -50,6 +50,12 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-sed.py\"",
             "timeout": 20,
             "statusMessage": "Checking for sed"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-token-expansion.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking for token expansion"
           }
         ]
       }

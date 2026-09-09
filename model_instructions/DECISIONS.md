@@ -2338,6 +2338,40 @@ unless stated.
   a change that crosses the boundary is not finished when both commits exist —
   it is finished when both are on their `main`s, in that order.
 
+- **2026-09-08 — the token-expansion guard, and the third time is what earned
+  it.** `CLAUDE.md` has said since 2026-09-06 that `${GH_TOKEN:-unset}` prints
+  the whole token when it is set, and that `${GH_TOKEN:+set}` is the only safe
+  probe. In one session on 2026-09-08 the rule was broken twice more by an
+  agent that had read it: `${GH_TOKEN:-unset-marker-check}` at the start, which
+  the permission checker happened to refuse for an unrelated reason and which
+  the agent then explicitly promised not to repeat; and
+  `${AGENT_GH_TOKEN:-MISSING}` on the NEW token an hour later, which **Helen
+  caught and rejected by hand**. Twice of three, the only thing between the
+  token and the transcript was luck or a human watching.
+
+  **So it is a hook now** — `.claude/hooks/guard-token-expansion.py`, the
+  fourth in the family, and the reasoning is verbatim the one this repo reached
+  for `git commit` on `main` and for `sed`: **a rule I read and break needs
+  enforcement, not rewording.**
+
+  **WHAT IT BLOCKS IS NARROW ON PURPOSE**, because a guard that gets in the way
+  of legitimate use is a guard people route around. Two shapes, neither with a
+  defensible use: the four default-value expansions (`:-`, `:=`, `-`, `=`),
+  every one of which evaluates to the variable's own value when it is SET — so
+  the case you were probing for is exactly the case that leaks — and any
+  `echo`/`printf` of a secret. It allows `${TOK:+set}`, allows the `?` forms,
+  and allows `${TOK}` wherever it is CONSUMED rather than printed, which is how
+  the credential helper and `GH_TOKEN="$AGENT_GH_TOKEN" gh ...` both work.
+
+  **THE ONE REAL SUBTLETY, AND THE PIPE-TEST FOUND IT.** `guard-sed.py` strips
+  single AND double quoted spans, which is right for detecting a command NAME.
+  It is WRONG for detecting an expansion: the shell expands `$VAR` inside
+  double quotes, so `echo "$GH_TOKEN"` is a live leak wearing quotes. This hook
+  strips only the spans where expansion genuinely cannot happen — single-quoted
+  spans and quoted-delimiter heredocs. A first draft also denied
+  `echo "${GH_TOKEN:+set}"`, the very probe the rule recommends; the 18-case
+  pipe-test caught it before the hook was wired to anything.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
