@@ -53,6 +53,27 @@
   cursor: pointer;
 }
 
+// THE JUMP LINK, beside the `shortlisted (n)` button above the list -- #849's
+// second placement, Helen 2026-09-09: "I'd find the JSON feature more easily
+// were it right under the shortlist, and also next to the shortlist button
+// above the list -- just export list as JSON and a rightwards arrow."
+//
+// QUIETER THAN THE BUTTON IT SITS BESIDE, deliberately. `shortlisted (n)` is a
+// filter and changes what the page shows; this only takes you somewhere, so it
+// is set as a link rather than given the button's box. The arrow is in the
+// markup rather than a `::after` so it is part of the link's text for a screen
+// reader, which is what it means.
+.shortlist-export-jump {
+  margin-left: $space-md;
+  font-family: $font-label;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible { color: $color-text; text-decoration: underline; }
+}
+
 .shortlist-export-hint,
 .shortlist-export-empty {
   margin: $space-sm 0 0;

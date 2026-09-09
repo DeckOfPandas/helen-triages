@@ -417,6 +417,23 @@ permalink: /cocktails/
             id="shortlist-only"
             aria-pressed="false"
             hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
+    {% comment %} #849, SECOND PLACEMENT, Helen 2026-09-09: "I'd find the JSON
+       feature more easily were it right under the shortlist, and also next to
+       the shortlist button above the list -- just export list as JSON and a
+       rightwards arrow would do it I think."
+
+       A JUMP LINK, NOT A SECOND PANEL. One textarea, named once, reachable
+       from both ends of the page -- two boxes holding the same JSON would be
+       two things to keep in step and a second answer to "where is my list".
+       The arrow is the affordance: it says this goes somewhere rather than
+       does something.
+
+       IT SHIPS `hidden` LIKE EVERY OTHER SHORTLIST CONTROL, and
+       shortlist-export.js reveals it -- a link pointing at a panel that a
+       browser without JavaScript never reveals would be a dead end.
+       {% endcomment %}
+    <a class="shortlist-export-jump" href="#shortlist-export"
+       data-shortlist-export-jump hidden>export list as JSON →</a>
     <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
   </p>
 
@@ -859,8 +876,9 @@ permalink: /cocktails/
 
      READONLY, because #850 is where pasting one back IN is specified and a box
      that accepts edits and discards them is worse than either. {% endcomment %}
-  <details class="shortlist-export" data-shortlist-export-panel hidden>
-    <summary>Export shortlist</summary>
+  <details class="shortlist-export" id="shortlist-export"
+           data-shortlist-export-panel hidden>
+    <summary>Export shortlist as JSON</summary>
     <p class="shortlist-export-hint">
       Copy this and keep it, or paste it somewhere else. It holds what is
       shortlisted and how many of each.
