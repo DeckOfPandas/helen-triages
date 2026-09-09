@@ -296,6 +296,10 @@ bottles:
                                         qq: "Boudier's ginger sits somewhere around 20 and I could not pin it." }
   "Giffard Crème de Mûre":            { abv: 16,   confidence: high }
   "Briottet Crème de Pêche":          { abv: 18,   confidence: medium }
+  # NEW 2026-09-09 with the bottle. 18 from its siblings, not from a label --
+  # Briottet's crèmes run 16 to 25 and the fruit ones cluster at 18, so this is
+  # `medium` like the rest of them rather than the `high` a read label earns.
+  "Briottet Crème de Cerise":         { abv: 18,   confidence: medium }
   "Briottet Crème d'Abricot":         { abv: 18,   confidence: medium }
   "Briottet Crème de Cacao Blanc":    { abv: 25,   confidence: medium }
   "Briottet Crème de Menthe Blanche": { abv: 21,   confidence: medium }

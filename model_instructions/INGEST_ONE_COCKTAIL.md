@@ -335,7 +335,7 @@ fits, use the source's own words and flag it in your list.
 <!-- vocab:glass start -->
 `coupe` · `sour` · `collins` · `flute` · `highball` · `hurricane` ·
 `nick and nora` · `punch bowl` · `tiki mug` · `mug` · `mule mug` · `martini` ·
-`wine` · `pilsner` · `sling` · `absinthe` · `goblet` · `chalice` ·
+`wine` · `pilsner` · `sling` · `margarita` · `absinthe` · `goblet` · `chalice` ·
 `hollowed pineapple` · `coconut shell` · `old fashioned` ·
 `double old fashioned` · `brandy glass`
 <!-- vocab:glass end -->

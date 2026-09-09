@@ -881,6 +881,20 @@ bottles:
   "Briottet Maraschino":
     generic: "maraschino liqueur"
     aliases: ["Briottet maraschino liqueur"]
+  # THE NINTH BRIOTTET, 2026-09-09. Helen added it to the Singapore Sling
+  # proofreading -- "Briotte Cérise turns this into a Haribo cherry" -- beside
+  # Cherry Heering, which was the only `cherry liqueur` this file knew.
+  #
+  # CANONICAL AS `Briottet Crème de Cerise`, which is the pattern every other
+  # Briottet here follows (Pêche, Cacao Blanc, Violette, Menthe Blanche,
+  # d'Abricot) and is the product's own name. She wrote "Briottet Cérise", and
+  # `cerise` takes no accent in French -- so both her spellings are aliases, on
+  # the same reasoning as the standing Favorite/Favourite correction: the label
+  # is canonical and everything anyone actually types resolves to it.
+  "Briottet Crème de Cerise":
+    generic: "cherry liqueur"
+    aliases: ["Briottet Cérise", "Briottet Cerise", "Briottet cerise",
+              "Briottet Crème de Cérise", "Briotte Cérise"]
   # `Luxardo` KEEPS THE BARE BRAND AS AN ALIAS, and it is the one place this
   # file lets a house name a product. Helen, 2026-09-04: in this collection
   # Luxardo only ever means the maraschino -- the four drinks that write it
