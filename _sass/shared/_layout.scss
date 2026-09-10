@@ -981,6 +981,24 @@ $tape-protrusion: 0.2rem;
     text-align: center;
   }
 
+  // #916: THE GRID'S OWN `gap: $space-lg` (1rem) READS AS THE SAME BREATH AS
+  // ONE REFERENCE COLUMN'S OWN INTERNAL LINE SPACING ($space-sm, half of it),
+  // not as a break between two different sites' material. A phone screenshot
+  // showed [ FOOD ]'s last link sitting no more distinctly apart from
+  // [ COCKTAILS ]'s bracketed word than that word sits from its own link
+  // underneath -- the boundary between two columns needs to read as a bigger
+  // gap than the boundary between two lines of the same column, and doubling
+  // $space-sm to $space-lg was not enough of a jump to do that at this size.
+  //
+  // The adjacent-sibling selector only ever matches when a second reference
+  // column is actually rendered (default.html only emits one per site with
+  // material), so a food-only page's stack is untouched -- same
+  // gated-on-having-material convention #529 already uses for the column
+  // itself.
+  .site-footer-ref + .site-footer-ref {
+    margin-top: $space-md;
+  }
+
   .site-footer-hearts {
     grid-column: 1;
   }
