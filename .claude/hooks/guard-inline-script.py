@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Refuse a LONG or MULTI-LINE inline program passed to an interpreter's -c/-e.
+"""Refuse ANY inline program passed to an interpreter's -c/-e. Put it in a file.
 
 WHY THIS EXISTS, AND WHY IT IS A HOOK RATHER THAN A FIRMER SENTENCE. CLAUDE.md
 has said since 2026-09-08, in Helen's own words: "if they take or emit
@@ -17,35 +17,47 @@ That is the situation this repository already has a verdict on, from
 guard-main-branch.py, guard-sed.py and guard-token-expansion.py alike:
 **a rule I read and break needs enforcement, not rewording.**
 
-WHAT IT BLOCKS. An inline program given to `-c` (python) or `-e`
-(ruby/node/perl) that is MULTI-LINE, or CONTAINS A SINGLE QUOTE, or is longer
-than MAX_INLINE characters. All three are the shape the permission checker
-cannot verify, so none can be allow-listed and every one costs Helen an
-interruption.
+WHAT IT BLOCKS, SINCE 2026-09-10: every inline program given to `-c` (python)
+or `-e` (ruby/node/perl). No length carve-out, no quoting carve-out, no
+exceptions to hold in your head.
 
-THE SINGLE-QUOTE RULE IS THE ONE THAT BITES MOST OFTEN and it is not about
-length at all. The allow rule is `Bash(python3 -c ' *)` -- single-quoted. A
-program containing a `'` cannot be single-quoted in shell, so it must be
-double-quoted, so it matches nothing and prompts however short it is.
-CLAUDE.md has always said "short snippets WITH NO EMBEDDED SINGLE QUOTES";
-only the length half was enforced at first, and an 89-character command
-prompted Helen anyway, which is how this was found.
+THE CARVE-OUT THIS USED TO HAVE WAS BUILT ON AN ALLOW RULE THAT DOES NOT
+EXIST. Until 2026-09-10 this hook allowed a single-quoted one-liner under 100
+characters, and both this docstring and CLAUDE.md justified that by "the
+existing `Bash(python3 -c ' *)` allow rule already covers them". It does not:
+there is no such rule in `.claude/settings.json`, and there never was. Helen
+hit a prompt on a 78-character single-quoted one-liner -- comfortably inside
+every limit the carve-out set -- and asked, reasonably, to either do it more
+safely or not be asked at all.
 
-WHAT IT DELIBERATELY ALLOWS, because a guard that fires on harmless
+AND THE ALLOW RULE WOULD NOT HAVE SAVED IT ANYWAY, which is the part that
+settles this. `.claude/settings.json` sets
+`"blockReadsOutsideWorkingDirectories": true`. Under that block a command the
+shell parser CANNOT ANALYZE asks the person, whatever the allow list says --
+the checker's job is to prove, before anything runs, that the command reads
+only inside the working directory, and it cannot prove that about code it
+cannot see. An inline program is opaque by construction. So:
+
+    python3 -c '<anything at all>'     -> unanalyzable -> ALWAYS asks Helen
+    python3 tmp/thing.py              -> one static path -> silent
+
+There is no short-enough, no quote-free-enough. The length threshold was
+measuring the wrong thing all along: the three calibrations it went through
+(160 -> 120 -> 100, each from a real measurement) were all trying to find a
+length at which an opaque command stops being opaque, and no such length
+exists. Keeping a threshold meant Helen stayed the backstop for judging it.
+
+WHAT IT DELIBERATELY STILL ALLOWS, because a guard that fires on harmless
 invocations is one you learn to route around:
 
-  * SHORT one-liners. `python3 -c 'import yaml, sys; print(yaml.safe_load(
-    open("x.yml")).keys())'` is a legitimate quick look, CLAUDE.md explicitly
-    permits "short snippets", and the existing `Bash(python3 -c ' *)` allow
-    rule already covers them. The line this draws is length, not cleverness --
-    length is the thing a human can judge at a glance, and judging it at a
-    glance is the entire point (see guard-token-expansion.py, widened on the
-    same day for the same reason).
   * `python3 tmp/thing.py` and any other FILE argument, which is the thing this
-    hook is pushing you towards.
+    hook is pushing you towards, and which is silent under the read block.
   * `-c` on a command that is not an interpreter -- `git -c
     credential.helper=...`, `docker run -c`, `bundle exec -c`. The interpreter
     has to be the word immediately governing the flag.
+  * `sh -c` and `bash -c`, which is how a git credential helper is spelled
+    (CLAUDE.md's documented push shape); blocking it would break the
+    documented workflow.
 
 HOW IT READS THE COMMAND. `shlex.split`, not a regex: the program is a quoted
 argument and quoting is exactly what a regex gets wrong. If the command will
@@ -71,22 +83,14 @@ INTERPRETERS = {
     "ruby": "-e", "node": "-e", "perl": "-e",
 }
 
-# Longer than this, or containing a newline, and it belongs in a file.
-#
-# 100, AND IT TOOK TWO CORRECTIONS TO GET HERE, both worth recording because
-# each was found by measurement rather than argument:
-#   160 -- the first draft. The probe caught a 155-character one-liner carrying
-#          a dict comprehension: exactly the "cleverness" this is about, just
-#          without a newline in it.
-#   120 -- Helen then hit a prompt on an 89-character command and said "it
-#          looks like you need to drop your character threshold".
-# A real quick look still clears it: the canonical example in the docstring is
-# 68 characters. The two commands that earned this hook were 210 and 268.
-MAX_INLINE = 100
 
+def _offending_program(command: str) -> tuple[str, str] | None:
+    """Return (interpreter, flag) for an inline program that belongs in a file.
 
-def _offending_program(command: str) -> tuple[str, str, str] | None:
-    """Return (interpreter, flag, reason) for a program that belongs in a file."""
+    Every inline program qualifies. There is no length or quoting test left:
+    see the module docstring -- under `blockReadsOutsideWorkingDirectories` an
+    inline program is unanalyzable, so it asks Helen at any length.
+    """
     try:
         tokens = shlex.split(command)
     except ValueError:
@@ -102,27 +106,8 @@ def _offending_program(command: str) -> tuple[str, str, str] | None:
         for j in range(i + 1, len(tokens)):
             if tokens[j] == flag:
                 if j + 1 >= len(tokens):
-                    break
-                program = tokens[j + 1]
-                if "\n" in program:
-                    return name, flag, "it spans multiple lines"
-                # THE RULE THAT ACTUALLY BITES MOST OFTEN, and the one the
-                # length check missed. The allow rule is `Bash(python3 -c ' *)`
-                # -- SINGLE-quoted. A program containing a `'` cannot be
-                # single-quoted in shell, so it has to be double-quoted, so it
-                # matches no allow rule and always prompts, however short it
-                # is. CLAUDE.md has always said "short snippets WITH NO
-                # EMBEDDED SINGLE QUOTES"; this is that half, enforced. Found
-                # when an 89-character command prompted Helen anyway.
-                if "'" in program:
-                    return (name, flag,
-                            "it contains a single quote, so it cannot be "
-                            "single-quoted and matches no allow rule")
-                if len(program) > MAX_INLINE:
-                    return (name, flag,
-                            f"it is {len(program)} characters long "
-                            f"(the limit is {MAX_INLINE})")
-                break
+                    break           # the flag with no program; not ours
+                return name, flag
             # A new interpreter or a bare file argument ends the search.
             if not tokens[j].startswith("-"):
                 break
@@ -139,37 +124,41 @@ def main() -> int:
     found = _offending_program(command)
     if not found:
         return 0
-    name, flag, reason = found
+    name, flag = found
 
     print(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",
             "permissionDecisionReason": (
-                f"BLOCKED: this `{name} {flag}` program belongs in a file -- "
-                f"{reason}.\n\n"
+                f"BLOCKED: this `{name} {flag}` program belongs in a file. "
+                "Every inline program does, however short.\n\n"
                 "Helen, 2026-09-09, for the second time in one session: "
                 "\"please please please write those long lines to files rather "
                 "than running them all together.\" And CLAUDE.md: \"when a "
                 "command needs to be clever, put the cleverness in a file and "
                 "run the file.\"\n\n"
-                "THE REASON IS NOT STYLE. The permission checker proves, "
-                "before anything runs, that a command touches only the working "
-                "directory -- and it can only do that for a command whose text "
-                "is its whole meaning. A long inline program is where loops, "
-                "pipes and substitutions hide, so it can never be "
-                "allow-listed, and the cost is never a refusal: it is an "
-                "interruption, and it lands on Helen.\n\n"
+                "THE REASON IS NOT STYLE, AND IT IS NOT LENGTH. "
+                "`.claude/settings.json` sets "
+                "`blockReadsOutsideWorkingDirectories`. Under that block, a "
+                "command the shell parser cannot analyze asks Helen -- "
+                "whatever the allow list says -- because the checker's job is "
+                "to prove, before anything runs, that the command reads only "
+                "inside the working directory, and it cannot prove that about "
+                "code it cannot see. An inline program is opaque by "
+                "construction, so it always asks. A file argument is one "
+                "static path, so it is silent.\n\n"
                 "WHAT TO DO INSTEAD -- write it with the Write tool and run "
                 "the file:\n\n"
                 "    Write  tmp/thing.py\n"
                 "    Bash   python3 tmp/thing.py\n\n"
-                "That is a single static path, it matches the existing "
-                "`Bash(python3 *)` allow rule, and it leaves a record of "
-                "exactly what was measured, which a one-off inline program "
-                "never does.\n\n"
-                f"Short one-liners are still fine: under {MAX_INLINE} "
-                "characters and on one line, this hook does not fire."
+                "That leaves a record of exactly what was measured, which a "
+                "one-off inline program never does.\n\n"
+                "This hook had a carve-out for short single-quoted one-liners "
+                "until 2026-09-10. It was removed because it rested on a "
+                "`Bash(python3 -c ' *)` allow rule that does not exist, and "
+                "because the read block would have asked anyway. Do not "
+                "reinstate it by shortening your program."
             ),
         }
     }))

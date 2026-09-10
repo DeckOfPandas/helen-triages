@@ -2974,6 +2974,75 @@ verification. Dates are when the correction landed.
   bug; a 2026-08-12 architecture review's full migration plan is not to be
   resurrected. #131's `Closes` trailer never closed it.
 
+- **2026-09-10 — TWO GUARDS LOOSENED BY A FACT NEITHER OF THEM CHECKED: AN
+  ALLOW RULE THAT DOES NOT EXIST.** Helen hit a permission prompt on this:
+
+      python3 -c 'import json;d=json.load(open("tmp/issues-open.json"));print(len(d))'
+
+  78 characters, one line, single-quoted — inside every limit
+  `guard-inline-script.py` set, and exactly what `CLAUDE.md` called a "short
+  snippet" and explicitly permitted. She asked: *"let's figure out how to
+  either do that in a safer way, or not need to ask me!"*
+
+  **The carve-out was justified, in three places, by `Bash(python3 -c ' *)` —
+  and there is no such rule in `.claude/settings.json`.** Not in the allow
+  list, not anywhere; `Bash(python3 *)`, which `CLAUDE.md` also cited, is
+  absent too. The hook's docstring asserted it, `CLAUDE.md` asserted it, and
+  the 2026-09-09 entry above reasoned from it. **Three documents agreeing is
+  not evidence when they are copies of each other** — §11's standing rule is
+  "do not trust a document over the code", and the code here was 17 lines long
+  and never opened.
+
+  **AND THE ALLOW RULE WOULD NOT HAVE HELPED, WHICH IS WHAT SETTLES IT.**
+  `settings.json` sets `blockReadsOutsideWorkingDirectories: true`. Under that
+  block a command the shell parser cannot analyze asks Helen *whatever the
+  allow list says* — the checker must prove the command reads only inside the
+  working directory, and it cannot prove that about code it cannot see. The
+  prompt said so in as many words. So:
+
+      python3 -c '<anything at all>'   unanalyzable  -> ALWAYS asks
+      python3 tmp/thing.py             one path      -> silent
+
+  **THE THRESHOLD WAS MEASURING A QUANTITY THAT DOES NOT EXIST.** Its three
+  calibrations (160 → 120 → 100, each from a real measurement, each recorded
+  above as a correction) were all hunting for a length at which an opaque
+  command stops being opaque. Every one of them was a better estimate of a
+  number that isn't there. **A guard tuned by measurement can still be tuning
+  the wrong dimension, and repeated corrections in one direction are the
+  symptom** — three times the answer was "shorter", and the real answer was
+  "not at all". The hook now refuses every interpreter `-c`/`-e` program;
+  `sh -c`/`bash -c` (the credential helper) and file arguments still pass.
+  Verified by breaking it on purpose, 19 cases, including the 78-character
+  command above.
+
+- **2026-09-10 — `scripts/gh-agent.sh`, BECAUSE SAFE IS NOT THE SAME AS
+  CHECKABLE, AND THIS IS THE SECOND TIME THAT DISTINCTION HAS WON.** The
+  documented shape for `gh` was `GH_TOKEN="$AGENT_GH_TOKEN" gh ...`. It is
+  genuinely safe: an environment assignment hands the value to `gh` and prints
+  nothing, and `CLAUDE.md` sanctioned it explicitly. Helen rejected such a call
+  on sight anyway — *"Please don't print tokens. Is there anything we can do to
+  stop this? If I've misunderstood then I apologise."*
+
+  She had not misunderstood; she had done the only thing available to her.
+  **This is verbatim the argument that retired `${TOK:+set}` on 2026-09-09**
+  (§11, the entry above): from the outside, a command with a secret's name in
+  it is indistinguishable from a leak until you have run the rule in your head,
+  and *"I shouldn't have to reject the call!! I'm only human!"* The fix that
+  worked there works here — **make it checkable at a glance rather than merely
+  safe.** The name now lives in one file, read once; every call site reads
+  `sh scripts/gh-agent.sh issue list --repo ...` with no secret in it.
+
+  Run via `sh`, so no execute bit and so no chmod (which is Helen's call, every
+  time). It deliberately has **no check that the credential is present**: the
+  first draft had one, and that guard clause both named the token in an `echo`
+  and probed for it — two things §11 already forbids, reintroduced inside the
+  very file meant to clean this up. Use it and read `gh`'s 401.
+
+  **The generalisation, now that the same shape has produced two rulings:** a
+  rule whose safety a human must verify per-call has moved the work onto the
+  human, not removed it. Prefer the form that needs no verification, even when
+  the form being replaced was never unsafe.
+
 ---
 
 - 2026-09-10: "There is no `gh` at all in a worktree" (§1) was true of a
