@@ -1372,7 +1372,16 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # something the public repo can check, since it cannot see the private history
 # (#624). Nobody has designed that yet, and until they do, this line moving is
 # the visible cost of each deployment.
-COCKTAIL_BASELINE_COMMIT = "fa37ebb"   # the second promotion, all 48, 2026-09-10
+# MOVED A THIRD TIME, 2026-09-10, AND NOT FOR A PROMOTION -- read the paragraph
+# above about "an ordinary edit went red" before assuming this one is wrong.
+# `e5ebf1b` applied the accepted method proposals (#705, PR #906) to 12 live
+# drinks: one method line each, plus the Bellini's "exept". Helen chose to
+# review that diff line by line rather than re-read 12 pages -- asked how she
+# wanted to re-proofread after a methods pass: "Line by line. I can just grind
+# it out." -- which is MANUAL §4.0's exception in her words, granted before the
+# edit was made. So the flags stay `true`, nothing leaves the live site during
+# her review, and the diff IS the proofread. Covers e5ebf1b and nothing after.
+COCKTAIL_BASELINE_COMMIT = "e5ebf1b"   # the method pass, 12 live drinks, 2026-09-10
 
 
 def _newest_commit_per_published_drink():
