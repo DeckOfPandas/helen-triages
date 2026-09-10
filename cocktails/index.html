@@ -892,6 +892,34 @@ permalink: /cocktails/
     <button type="button" class="btn-shortlist-copy" data-shortlist-copy hidden>
       copy
     </button>
+
+    {% comment %} PASTING ONE BACK IN -- #850, Helen 2026-09-10: the menu on
+       her iPad, passed round twelve people before dinner, and "I just KNOW
+       that something will go wrong and I'll lose my shortlist". A SECOND
+       textarea rather than the export box made writable: the one above says
+       what is stored and must go on being trusted to say it; this one is
+       where an old dump goes, and `restore` is what does something with it.
+       Both controls ship `hidden` and shortlist-export.js reveals them, the
+       rule every JS-dependent control on both sites follows; the result line
+       is hidden until there is a result. The matching (by slug, so a dump
+       from before a drink was promoted still finds it) and the merging live
+       in HTF.shortlist.restore in assets/js/assets.js.
+
+       PLACEHOLDER COPY -- the hint below and the result sentences in
+       shortlist-export.js are the shape of the feature, not its voice.
+    {% endcomment %}
+    <p class="shortlist-export-hint">
+      Or paste a shortlist you kept, and restore it. What is already
+      shortlisted stays.
+    </p>
+    <textarea class="shortlist-export-box shortlist-import-box"
+              data-shortlist-import rows="6" spellcheck="false"
+              aria-label="A shortlist to restore, as JSON" hidden></textarea>
+    <button type="button" class="btn-shortlist-restore" data-shortlist-restore hidden>
+      restore
+    </button>
+    <p class="shortlist-import-result" data-shortlist-import-result
+       aria-live="polite" hidden></p>
   </details>
 
   {% comment %} A `?panel=` SWITCH STOOD HERE for one round, offering four glass

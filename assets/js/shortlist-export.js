@@ -22,10 +22,22 @@
 // the script did not run, would hold the empty string and look like an answer.
 // So the markup assumes JavaScript did not run and this is what proves it did.
 //
-// READONLY, AND DELIBERATELY NOT AN IMPORT. Typing into this box would look
-// exactly like it should do something, and #850 is where doing something is
-// specified. A box that accepts edits and discards them is the worst of the
-// three options, so it accepts none.
+// THE EXPORT BOX IS READONLY, AND THE IMPORT IS A SECOND BOX -- #850, built
+// 2026-09-10. Typing into the export box would look exactly like it should do
+// something, and a box that accepts edits and discards them is the worst of the
+// three options, so it still accepts none. Pasting a dump back IN is its own
+// textarea and a `restore` button underneath, in the same panel: the store's
+// `restore()` does the matching and merging, this file only carries the text
+// across and prints what came back. Helen's reason for wanting it at all:
+// "I just KNOW that something will go wrong and I'll lose my shortlist" --
+// localStorage on a phone is exactly as durable as the browser decides it is.
+//
+// THE IMPORT DISPATCHES THE SAME EVENT A CLICK DOES. Both indexes repaint
+// from state on `htf:shortlist-change` (cocktail-index.js re-runs apply(),
+// filters.js its own pass), and the export box below repaints on it too. So
+// one dispatch after a successful restore is what makes the cards, the count
+// and the dump all agree with the store again. `detail.key` is null: nothing
+// downstream reads it today, and a restore is not about one key.
 //
 // IT REPAINTS ON `htf:shortlist-change`, the event shortlist.js dispatches --
 // so shortlisting a drink with the panel open updates the text under it rather
@@ -113,9 +125,63 @@
     });
   }
 
+  /* THE RESTORE MESSAGE, one line, from the result the store hands back. The
+     sentences are PLACEHOLDER COPY in the sense #713 and #753 use: the shape
+     is the feature and the words are Helen's to change. Slugs are printed as
+     slugs -- the page has no title for a drink it could not find, which is
+     the whole reason it is being reported. */
+  function message(result) {
+    if (!result.ok) {
+      if (result.reason === 'wrong-site') {
+        return 'that is a ' + result.site + ' shortlist, not one for this site.';
+      }
+      return 'that does not read as a shortlist export.';
+    }
+    if (!result.restored && !result.unmatched.length) return 'nothing to restore.';
+    var line = 'restored ' + result.restored;
+    if (result.restored && !result.added) line += ' (all already here)';
+    else if (result.restored && result.added < result.restored) {
+      line += ' (' + (result.restored - result.added) + ' already here)';
+    }
+    if (result.unmatched.length) {
+      line += '; not found: ' + result.unmatched.join(', ');
+    }
+    return line + '.';
+  }
+
+  /* THE PASTE BOX AND THE BUTTON, revealed together for the reason the whole
+     panel is: a box that invites a paste and then does nothing with it is a
+     control that silently fails. The live keys are read at CLICK time, from
+     the same controls shortlist.js paints, so a page whose list is still
+     being built at load cannot hand the store an empty set. */
+  function wireImport() {
+    var box = document.querySelector('[data-shortlist-import]');
+    var btn = document.querySelector('[data-shortlist-restore]');
+    var out = document.querySelector('[data-shortlist-import-result]');
+    if (!box || !btn) return;
+    box.hidden = false;
+    btn.hidden = false;
+
+    btn.addEventListener('click', function () {
+      var keys = Array.prototype.slice.call(
+        document.querySelectorAll('.btn-shortlist[data-shortlist-key]')
+      ).map(function (el) { return el.getAttribute('data-shortlist-key'); });
+      var result = HTF.shortlist.restore(box.value, keys);
+      if (out) {
+        out.textContent = message(result);
+        out.hidden = false;
+      }
+      if (!result.ok) return;
+      document.dispatchEvent(new CustomEvent(EVENT, {
+        detail: { key: null, on: null, restored: result.restored }
+      }));
+    });
+  }
+
   if (!boxes().length) return;
   paint();
   wireCopy();
   openOnJump();
+  wireImport();
   document.addEventListener(EVENT, paint);
 })();

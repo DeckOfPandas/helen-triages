@@ -606,6 +606,144 @@ window.HTF = window.HTF || {};
         };
       },
 
+      /* --- THE WHOLE LIST BACK IN — GitHub issue #850 ----------------------
+         Helen, 2026-09-08: "allow me to input a YAML/JSON shortlist dump you
+         gave me to see a populated shortlist." The other half of `snapshot()`,
+         and the reason it wrote `site` and `version` in the first place.
+
+         WHY IT IS HERE AND NOT IN THE PAGE: the same argument as the export.
+         Three keys, three meanings for a missing entry, and only this closure
+         knows any of it. The page hands over the pasted text and the keys its
+         cards carry, and reads back a result it can print.
+
+         MATCHED BY SLUG, NOT BY KEY, and this is the judgement in here. A dump
+         outlives the site that wrote it: Helen's real one names
+         `/cocktails/drafts/to-promote/aviation/` from before the drink was
+         promoted, and the live card says `/cocktails/recipes/aviation/`. The
+         last path segment is the drink; the folders are where it happened to
+         live that week. So each entry is resolved to whichever LIVE key on the
+         page ends in the same slug, and the live key is what gets stored --
+         a stale key written back would be a mark nothing on the page reads.
+         An entry no card answers to is reported by slug, never dropped in
+         silence: a renamed drink is exactly the case a person has to finish
+         by hand, and cannot if nobody tells them.
+
+         MERGED, NOT REPLACED. What is already marked stays marked; a count
+         already set in this browser wins over the dump's, because the dump is
+         old by definition and the number in front of you is not. A count from
+         the dump fills only a gap.
+
+         THE OTHER SITE'S DUMP IS REFUSED, which is what `site` was for. Food
+         URLs pasted into the cocktails index would simply match nothing and
+         look like a shortlist with eleven unknown drinks in it -- a confusing
+         answer where a plain refusal is available. A dump with NO site (hand
+         made, or from a build before the export existed) is allowed through
+         and judged on its entries.
+
+         UNTRUSTED INPUT THROUGHOUT, the standing every stored value here
+         already has. Text that does not parse, a document of the wrong
+         shape, an entry that is not a string, a count that is not a positive
+         number: each is skipped or refused, and none can throw. The page is
+         in the middle of a click.
+
+         @param {string|Object} dump - the pasted text, or an already-parsed
+                document of `snapshot()`'s shape
+         @param {string[]} liveKeys - every `data-shortlist-key` on the page
+         @returns {{ok:boolean, reason:string, site:string, restored:number,
+                    added:number, unmatched:string[]}}
+                  `reason` is '' | 'unreadable' | 'wrong-site';
+                  `restored` counts entries that matched a live key, whether
+                  or not they were already marked; `added` the subset that
+                  were not; `unmatched` the slugs nothing on the page answers
+                  to, in the dump's order, once each.
+      */
+      restore: function (dump, liveKeys) {
+        var result = {
+          ok: false, reason: '', site: '', restored: 0, added: 0, unmatched: []
+        };
+        var doc = dump;
+        if (typeof doc === 'string') {
+          try { doc = JSON.parse(doc); } catch (e) { doc = null; }
+        }
+        if (!doc || typeof doc !== 'object' || Array.isArray(doc)
+            || !Array.isArray(doc.entries)) {
+          result.reason = 'unreadable';
+          return result;
+        }
+        result.site = typeof doc.site === 'string' ? doc.site : '';
+        if (result.site && HTF.site && result.site !== HTF.site) {
+          result.reason = 'wrong-site';
+          return result;
+        }
+
+        /* The last non-empty path segment, lowercased. `/food/recipes/dal/`
+           and `/food/drafts/dal/` both answer `dal`. A key with no segment at
+           all ("/") answers '', and is nobody. */
+        function slugOf(key) {
+          var parts = String(key).split('/');
+          for (var i = parts.length - 1; i >= 0; i -= 1) {
+            var part = parts[i].trim();
+            if (part) return part.toLowerCase();
+          }
+          return '';
+        }
+
+        var bySlug = {};
+        (Array.isArray(liveKeys) ? liveKeys : []).forEach(function (key) {
+          if (typeof key !== 'string') return;
+          var slug = slugOf(key);
+          // First one wins. Two cards sharing a slug would be two pages at
+          // one URL, which Jekyll refuses, so this is belt and braces.
+          if (slug && !Object.prototype.hasOwnProperty.call(bySlug, slug)) {
+            bySlug[slug] = key;
+          }
+        });
+
+        var all = read();
+        var allGlasses = readGlasses();
+        var allPortions = readPortions();
+        var dumpGlasses = (doc.glasses && typeof doc.glasses === 'object'
+                           && !Array.isArray(doc.glasses)) ? doc.glasses : {};
+        var dumpPortions = (doc.portions && typeof doc.portions === 'object'
+                            && !Array.isArray(doc.portions)) ? doc.portions : {};
+
+        function positive(n, floor) {
+          return typeof n === 'number' && isFinite(n) && n >= floor;
+        }
+
+        doc.entries.forEach(function (entry) {
+          if (typeof entry !== 'string' || !entry) return;
+          var slug = slugOf(entry);
+          var live = slug && Object.prototype.hasOwnProperty.call(bySlug, slug)
+            ? bySlug[slug] : null;
+          if (!live) {
+            var name = slug || entry;
+            if (result.unmatched.indexOf(name) === -1) result.unmatched.push(name);
+            return;
+          }
+          result.restored += 1;
+          if (all.indexOf(live) === -1) {
+            all.push(live);
+            result.added += 1;
+          }
+          // The dump's number fills a gap and never overwrites. Glasses below
+          // 2 are the default and are not stored, as setGlasses would not;
+          // a portion count of 1 is real, as setPortions says.
+          if (positive(dumpGlasses[entry], 2) && typeof allGlasses[live] !== 'number') {
+            allGlasses[live] = Math.floor(dumpGlasses[entry]);
+          }
+          if (positive(dumpPortions[entry], 1) && typeof allPortions[live] !== 'number') {
+            allPortions[live] = Math.floor(dumpPortions[entry]);
+          }
+        });
+
+        write();
+        writeGlasses();
+        writePortions();
+        result.ok = true;
+        return result;
+      },
+
       /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module
          reads localStorage once and caches; a test that wants a second scenario
          in the same page needs to say so. */

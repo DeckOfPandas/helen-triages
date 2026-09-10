@@ -654,6 +654,27 @@ permalink: /food/
   <button type="button" class="btn-shortlist-copy" data-shortlist-copy hidden>
     copy
   </button>
+
+  {% comment %} PASTING ONE BACK IN -- #850. The cocktails index carries the
+     identical block and the argument: a second textarea rather than the export
+     box made writable, both controls shipping `hidden` for shortlist-export.js
+     to reveal, matching by slug and merging in HTF.shortlist.restore.
+
+     PLACEHOLDER COPY -- the hint below and the result sentences in
+     shortlist-export.js are the shape of the feature, not its voice.
+  {% endcomment %}
+  <p class="shortlist-export-hint">
+    Or paste a shortlist you kept, and restore it. What is already
+    shortlisted stays.
+  </p>
+  <textarea class="shortlist-export-box shortlist-import-box"
+            data-shortlist-import rows="6" spellcheck="false"
+            aria-label="A shortlist to restore, as JSON" hidden></textarea>
+  <button type="button" class="btn-shortlist-restore" data-shortlist-restore hidden>
+    restore
+  </button>
+  <p class="shortlist-import-result" data-shortlist-import-result
+     aria-live="polite" hidden></p>
 </details>
 
 {% comment %} WHAT EACH RECIPE IS MADE OF, AND HOW MANY IT FEEDS -- #801.
