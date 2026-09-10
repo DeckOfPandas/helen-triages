@@ -886,9 +886,21 @@
 // IT SITS IN `.drink-count-row` SINCE 2026-09-05, not on the count line itself.
 // `margin-left: auto` is unchanged and still does the pushing; only the row it
 // pushes within has moved down one line.
+//
+// `align-items: center`, NOT baseline -- #934, Helen's screenshot showed the
+// boat sitting visibly lower than "SHIP IT?". `.drink-count-legend-icon`
+// carries no inline content of its own (its child SVG is `display: block`),
+// so it has no real text baseline to align on and flexbox synthesizes one from
+// its margin box's bottom edge -- which sits lower than the word's actual
+// glyph baseline, itself some way above the bottom of its own line box. The
+// card's own ship mark (`.drink-card-ship`, _cards.scss) and the drink page's
+// (`.cocktail-ship`, _cocktail.scss) hit this same icon-plus-word shape
+// already and both use `align-items: center`; this was the one place that
+// still said baseline, and centring both containers on their box heights,
+// rather than the word's baseline, is what actually lines up their middles.
 .drink-count-legend {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.45rem;
   margin-left: auto;
   font-family: $font-headings;
