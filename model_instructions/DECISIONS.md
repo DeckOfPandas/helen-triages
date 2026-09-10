@@ -2394,6 +2394,33 @@ unless stated.
   measurement pass, which #846 has just removed. Tried, abandoned, branch
   deleted, reported on the issue rather than shipped.
 
+- **2026-09-10, #942 — the drink page head on a phone, rebuilt from the
+  numbers.** Helen: *"All cocktail pages have the glass overlapping problem.
+  Ones with longer titles have tape cut too close to the upper and lower edge
+  of the text."* Measured at 390px rather than reasoned: the 600px block that
+  had set the glass to 4.5rem that morning sat BEFORE `.cocktail-glass-icon`'s
+  own rule, which is equally specific and set it back to 7rem, so the override
+  had never rendered — a 112px drawing in an 88px reservation. **A media
+  block only wins if it comes after the rule it overrides**, and the phone
+  head now lives beside the rules it changes. But the column itself was the
+  design fault: a glass beside EVERYTHING — title, tagline, three stacked
+  facts, chips, 574px on the Bellini — is a desktop layout squeezed. Below
+  600px the head is now a grid where only one row has two columns: the tape
+  and tagline take the full width, the glass sits beside GLASS / GARNISH /
+  SHIP IT? at the height of that stack (still at its `--glass-fill` relative
+  size), and the chips run full width beneath. The svg is out of flow inside
+  its box so its intrinsic height cannot size the row (a flute at 72px wide is
+  257px tall; the first cut spread the three facts down a 257px row). Both
+  tape bleeds are cancelled on a phone, or Cobra's Fang scrolls sideways at
+  360. **The tape complaint was a long-title fault, not a phone one:** every
+  tape SVG's band is 70.59% of its box (polygon y 28–148 of 170), so four
+  wrapped lines of lettering are taller than the band under them. On this
+  page only, the artwork is scaled so the band is the box and the vertical
+  padding recomputed to hold a one-line band at exactly its approved height
+  (59px before and after on the Negroni at 1280). Cards untouched. A
+  candidates artifact carried this and a glass-above alternative; **her pick
+  is not yet recorded — write it here when she makes it.**
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
