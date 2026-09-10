@@ -2915,6 +2915,17 @@ verification. Dates are when the correction landed.
 
 ---
 
+- 2026-09-10: "There is no `gh` at all in a worktree" (§1) was true of a
+  worktree on the host and false inside the devcontainer, whose image installs
+  it; a session spent a turn writing a REST call before `which gh` answered
+  `/usr/bin/gh`. Now stated per environment.
+- 2026-09-10: §1 gained the headless browser. Until then the manual's own
+  advice for anything visual was to build candidates and let Helen look,
+  which was right, and the fixes themselves shipped "reasoned rather than
+  seen" (#895's own words). Helen's grant, the Dockerfile's fifteen packages,
+  and `scripts/browser/` are what changed; the phone pass (#899, #900, #901,
+  #903) was the first work done by looking.
+
 ## §12 Traps — the stories
 
 - **The rule written instead of followed** — 2026-08-19, `about.html`'s
@@ -3016,6 +3027,22 @@ verification. Dates are when the correction landed.
   and none was about what was painted in it.
 
 ---
+
+- **2026-09-10 — A SCRIPT TAG DESCRIBED IN A COMMENT AND NOT WRITTEN, FOR TWO
+  DAYS.** #846 (2026-09-08) deleted `chip-rows.js` and its `<script>` tag from
+  `_layouts/default.html`, and the comment that replaced them explained the
+  two remaining measurement passes — including `card-line-budget.js` — in
+  full, while the tag for that one had gone with the other. `cocktail-index.js`
+  guards its call (`if (HTF.cardLineBudget)`), so #776's budget never ran again
+  and nothing went red: the pure tests run the file inside a stubbed window and
+  never ask whether a page loads it. Found only because the pass gained the
+  ship-collision check the same night and marked nothing on a first deal where
+  seven cards collided; the probe reported `hasFn: "undefined"` and
+  `scripts: []`, which is the kind of answer only a browser gives. The tag is
+  back, `test_the_card_measurement_passes_are_loaded_in_order` names the pair,
+  and MANUAL §12 carries the trap beside its cousin about load order. The
+  generalisation: a guard that reads a FILE proves the file; only a test that
+  reads the LAYOUT proves the page.
 
 ## §13 The visual design — the road to each value
 
