@@ -3655,6 +3655,54 @@ verification. Dates are when the correction landed.
   reach for", the arrack note and both subtitles deleted. **Nice-to-have, not
   shipping**: *"no more until design isn't noticeably odd"*, her words, so the
   page stays unpublished. #813 (agricole rows by country) waits on #591.
+- **2026-09-10, #813 — TREATMENT A: THE COUNTRY GOES INSIDE THE BOTTLES COLUMN,
+  NOT INTO A ROW OF ITS OWN.** Helen asked to "split the rhum agricole rows in
+  the rum reference table into countries", which most plainly means separate
+  rows. Three treatments were built on the real page and she chose A: one row
+  per category still, with `MARTINIQUE` / `GUADELOUPE` labels inside the third
+  column.
+
+  **THE CANDIDATES PAGE EXISTED TO SHOW A TENSION, NOT TO OFFER VARIETY**, and
+  that is the reusable part. B — a row per country — renders a left-hand cell
+  reading "rhum agricole blanc, Martinique", and **#591 had ruled three days
+  earlier against exactly that**, choosing `origin` on the bottle over
+  origin-qualified generics. A reader cannot tell a row from a category, so B
+  would have reinstated visually what the data ruling rejected. Writing that
+  out as a paragraph would have been arguing; building it let her see it and
+  decide in one word.
+
+  **C FAILED FOR A REASON ONLY THE BUILD COULD SHOW.** Tagging each bottle with
+  its country read fine in the head; on the page the bottles sort alphabetically,
+  so Martinique and Guadeloupe interleave down the column and the country becomes
+  noise rather than structure. Grouping them would have turned C into A. **That
+  is §13.11's whole argument in one case**: the objection was invisible until it
+  was rendered.
+
+  **The implementation follows the DATA, not the shelf.** Any style whose
+  bottles declare an `origin` groups; every other row is untouched. No special
+  case for "Cane juice", and it will follow `origin` wherever the field spreads.
+
+- **2026-09-10 — "EXAMPLES" WAS PINK BECAUSE OF A GRID TRACK, AND IT READ AS A
+  DECISION FOR FOUR DAYS.** Helen, choosing A: *"also the column heading please
+  -- leave the pink for the bottles."* She was right that it was wrong, and it
+  turned out never to have been chosen at all.
+
+  The rum page's header row reuses `.rum-cat-bottles` on its third cell **purely
+  to land in the same grid column** — and inherited `wicked-woowoo` with it. So
+  one of three sibling column labels was pink and the other two were
+  `$color-clear-text`. Nothing about that was intended; the class was borrowed
+  for geometry and brought a colour along.
+
+  **A CLASS CARRIES EVERY DECLARATION, NOT THE ONE YOU WANTED.** Reusing a class
+  for LAYOUT imports its COLOUR, and on a page whose header says "one hue,
+  deliberately — there is one kind of coloured string here, and it is the bottle"
+  that turned a label into a bottle. The general form is worth keeping: when a
+  class is reused for position, ask what else it says.
+
+  It also survived a design review, a copyedit and a promotion, because an
+  accidental emphasis is indistinguishable from a deliberate one once it is on
+  the page. Only Helen looking at it and saying "why is that pink" found it.
+
 - **2026-09-10, #591 — `origin` IS BUILT, THREE DAYS AFTER IT WAS RULED, AND
   THE BUILD FOUND A LIVE BUG IN SOMETHING ELSE.** Helen ruled on 2026-09-07 that
   origin goes on the BOTTLE; `origin:` appeared nowhere in `bottles.yml` until

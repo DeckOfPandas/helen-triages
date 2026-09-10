@@ -1056,13 +1056,30 @@ merges, which with two agents is several times an afternoon, and the symptom
 is a handful of `test_cocktails.py` failures naming real drinks that read
 exactly like a regression.
 
-    cd _cocktail_drafts && git fetch origin && git rev-list --count HEAD..origin/main
+**Use the wrapper — it fetches and detaches in one go, and prints what you
+actually got:**
 
-A non-zero answer means the next red test is probably not yours. To bring a
-test clone up to date without standing on `main`: `git checkout --detach
-origin/main` (or `origin/<branch>` when the public tests want data on an
-unmerged private branch). `git fetch origin main:main` refuses on a
-checked-out branch and a merge onto `main` is refused by the hook.
+    sh scripts/git-fetch-agent.sh _cocktail_drafts helen-triages-cocktails-private
+
+Detaching rather than checking out a branch is deliberate and is this section's
+own instruction: a detached HEAD cannot be committed onto by accident, which
+matters in a repo whose `main` is held by a rule and a hook. Pass a third
+argument for a branch (`… helen-triages-cocktails-private some/branch`) when
+the public tests want data that has not merged yet. **`git fetch origin` alone
+does not work in the devcontainer** — `origin` is SSH and dies on
+`Host key verification failed` — and `git fetch origin main:main` refuses on a
+checked-out branch anyway.
+
+**FOUR WRAPPERS NOW, AND THE POINT OF ALL FOUR IS THAT NO CALL SITE NAMES THE
+TOKEN**: `gh-agent.sh` (the API), `git-clone-agent.sh`, `git-fetch-agent.sh`,
+`git-push-agent.sh`. A command with a secret's name in it is indistinguishable
+from a leak until a human has run the rule in their head, and Helen should not
+have to (`CLAUDE.md`). If you find yourself typing an HTTPS-with-token URL, the
+wrapper you want either exists or is the fifth one.
+
+A stale clone's symptom is worth knowing on sight: a handful of
+`test_cocktails.py` failures naming real drinks, which reads exactly like a
+regression you caused.
 
 **The API token is a different channel.** `AGENT_GH_TOKEN` — the only one
 since `GH_TOKEN` was deleted on 2026-09-09 — carries Issues, pull requests
@@ -1455,6 +1472,19 @@ not quote it** — it is a worklist and is empty as of 2026-09-04.
   inverts and every `suggestion` is the bottle's CANONICAL name
   (`test_a_staged_drink_writes_a_bottles_canonical_name`): an alias is a
   reading convenience, a finished drink has had time to write the real name.
+- **THE DRINK PAGE PRINTS `suggestion` VERBATIM. It does NOT resolve it through
+  `bottles.yml`, and this decides what renaming a bottle costs.**
+  `_layouts/cocktail.html` takes the recipe's own string and puts it in the
+  brackets; `bottles.yml` is read by the tests, the costing, the ABVs and the
+  reference page, but not by the line a reader sees. So **renaming a bottle
+  changes nothing on any drink page** — the recipes still say what they said.
+  To change the page you must edit every recipe that names it, and for a LIVE
+  drink that is an agent edit, which sets `meta.proofread: false` and takes the
+  page off the site until Helen re-reads it (§4.0, `publish_gate.rb`).
+  **Measured on #879, 2026-09-10**: deleting one apostrophe from a bottle name
+  looked like a free data edit and was actually two of the 48 live drinks going
+  dark — so it needed her word, and she gave it (`COCKTAIL_BASELINE_COMMIT`
+  moved). Check which recipes name a bottle BEFORE promising a rename is cheap.
 - **Do not derive a bottle's category from the ingredient it sits beside.**
   Helen: *"keep only what the collection already spells out; hand me back the
   rest."* A bottle she NAMES is hers to add and always was; what is banned is
