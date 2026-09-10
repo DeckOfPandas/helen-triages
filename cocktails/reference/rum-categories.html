@@ -206,8 +206,50 @@ published: false
                row teaches nothing. {% endcomment %}
             <span class="rum-cat-card">{% unless card == style %}{{ card }}{% endunless %}</span>
             {% if bottle_names.size > 0 %}
+            {% comment %} GROUPED BY COUNTRY WHERE THERE IS A COUNTRY -- Helen,
+               2026-09-10 (#813): "split the rhum agricole rows in the rum
+               reference table into countries", answered with treatment A from
+               the candidates page, which keeps ONE ROW PER CATEGORY and puts
+               the country inside the bottles column.
+
+               THE ROW STILL MEANS THE CATEGORY, which is what a row means
+               everywhere else on this page. The rejected alternative (B) split
+               into one row per country, which reads as a category called
+               "rhum agricole blanc, Martinique" -- and #591 ruled explicitly
+               against origin-qualified generics. A shows the country without
+               inventing a category to hang it on.
+
+               DRIVEN BY THE DATA, NOT BY THE SHELF. Any style whose bottles
+               declare an `origin` groups; every other row is untouched and
+               renders the flat list it always did. So this needs no special
+               case for "Cane juice" and would follow `origin` anywhere it
+               spreads to later. {% endcomment %}
+            {% capture origin_blob %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin %}{{ pair[1].origin }}||{% endif %}{% endfor %}{% endcapture %}
+            {% assign any_origin = origin_blob | split: "||" %}
             <ul class="rum-cat-bottles">
-              {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
+              {% if any_origin.size > 0 %}
+                {% comment %} `bottle_origins` order, so the countries read the
+                   same way on every row rather than alphabetically per row. {% endcomment %}
+                {% for origin in ing.bottle_origins %}
+                  {% capture in_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == origin %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+                  {% assign origin_names = in_origin | split: "||" %}
+                  {% if origin_names.size > 0 %}
+                    <li class="rum-origin-head">{{ origin }}</li>
+                    {% for b in origin_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
+                  {% endif %}
+                {% endfor %}
+                {% comment %} A bottle in this category with NO origin still has
+                   to appear. Nothing hits this today -- every agricole and
+                   clairin bottle carries one, and `test_cane_juice_bottles_
+                   declare_an_origin` keeps it that way -- but a row that
+                   silently dropped a bottle would be the worst failure this
+                   page has. {% endcomment %}
+                {% capture no_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == nil %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+                {% assign orphan_names = no_origin | split: "||" %}
+                {% for b in orphan_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
+              {% else %}
+                {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
+              {% endif %}
             </ul>
             {% else %}
             {% comment %} PLACEHOLDER COPY. `overproof Demerara rum, lightly
