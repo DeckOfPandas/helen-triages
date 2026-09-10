@@ -289,8 +289,16 @@ PLACEHOLDER = "QQ"
 # it was loud only because its members are dicts, "that is luck, not design,
 # and the next such block will not be so obliging" -- and `shopping_shelves` is
 # a list of plain strings, so it was exactly as silent as predicted.
+# `always_fresh` JOINS THEM FOR #707. It is a list of plain strings again, and
+# every member is already declared under `juices:` -- being silently treated
+# as a second vocabulary source would have cost nothing today (its values are
+# already valid generics), but that is exactly the "harmless until it isn't"
+# shape #930 is about, so it is registered rather than left to luck.
+# `standing_notes` (also #707) needs no entry here: it is a MAPPING, not a
+# list, so `_declared_generics`'s own `isinstance(value, list)` check already
+# skips it, the same way `card_names` does.
 NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups", "ingredient_as",
-                     "bottle_origins", "shopping_shelves"}
+                     "bottle_origins", "shopping_shelves", "always_fresh"}
 
 
 def _is_character_list(key):
@@ -6040,6 +6048,73 @@ def test_things_kept_off_cards_are_real_generics():
         "`not_on_cards` in _data/cocktails/ingredients.yml names these, and no "
         "section declares them, so each one hides nothing:\n  "
         + "\n  ".join(unknown)
+    )
+
+
+def test_always_fresh_juices_are_declared_generics_the_layout_reads():
+    """`always_fresh` (#707) names real generics, and the template actually uses it.
+
+    Two ways this list could go stale in total silence: a typo or a retired
+    spelling would prefix "fresh " onto a generic no drink can ever pour (the
+    same failure mode `test_things_kept_off_cards_are_real_generics` guards for
+    `not_on_cards`); and a rename of the key in `_layouts/cocktail.html` without
+    a matching rename here would leave the data declared and never read, which
+    `test_the_layout_takes_the_twist_step_from_methods_yml`'s docstring is the
+    precedent for treating as its own failure rather than trusting the
+    cross-reference.
+    """
+    vocab = _vocab()
+    always_fresh = vocab.get("always_fresh") or []
+    assert always_fresh, (
+        "_data/cocktails/ingredients.yml declares no `always_fresh` juices -- "
+        "either the key was renamed or #707's list was emptied by mistake."
+    )
+    declared = _declared_generics(vocab)
+    unknown = sorted(set(always_fresh) - declared)
+    assert not unknown, (
+        "`always_fresh` names these, and no vocabulary section declares them, "
+        "so each one is a typo or a retired spelling:\n  "
+        + "\n  ".join(unknown)
+    )
+
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+    assert "always_fresh" in layout, (
+        "_layouts/cocktail.html no longer reads `always_fresh`, so #707's "
+        "juices are declared but nothing prefixes them with \"fresh \" on the "
+        "drink page."
+    )
+
+
+def test_standing_notes_key_declared_generics_the_layout_reads():
+    """`standing_notes` (#707) keys real generics, and the template reads it.
+
+    A MAPPING, not a list -- `test_every_generic_is_declared` walks drinks
+    forward from a generic to check it is declared, never the other way, so a
+    typo'd KEY here would silently attach the pineapple note to nothing and
+    nobody would notice on a green suite. Checked here instead, the same
+    direction `test_things_kept_off_cards_are_real_generics` checks
+    `not_on_cards` in.
+    """
+    vocab = _vocab()
+    standing_notes = vocab.get("standing_notes") or {}
+    assert standing_notes, (
+        "_data/cocktails/ingredients.yml declares no `standing_notes` -- "
+        "either the key was renamed or #707's pineapple note was deleted by "
+        "mistake."
+    )
+    declared = _declared_generics(vocab)
+    unknown = sorted(set(standing_notes) - declared)
+    assert not unknown, (
+        "`standing_notes` keys these, and no vocabulary section declares "
+        "them, so each note is attached to a generic no drink can pour:\n  "
+        + "\n  ".join(unknown)
+    )
+
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+    assert "standing_notes" in layout, (
+        "_layouts/cocktail.html no longer reads `standing_notes`, so #707's "
+        "pineapple warning is declared but nothing renders it on the drink "
+        "page."
     )
 
 

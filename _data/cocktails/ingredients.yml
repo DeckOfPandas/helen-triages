@@ -1555,6 +1555,43 @@ juices:
   - "cranberry juice"
   - "apple juice"
 
+# "FRESH" MADE EXPLICIT ON THE PAGE -- #707. The comment above says freshly
+# squeezed is implied for every juice; Helen decided four of them should say
+# so out loud on the drink page: "they should all display like 'fresh lime
+# juice'." `_layouts/cocktail.html` prefixes the ingredient headline with
+# "fresh " for a generic named here.
+#
+# A SUBSET OF `juices:` ABOVE, NOT A NEW SOURCE OF GENERIC VALUES -- every
+# member must already be declared there, so this cannot mint a generic nothing
+# pours. Registered in `NOT_GENERIC_LISTS` (tests/test_cocktails.py, #930) for
+# exactly that reason.
+#
+# RUBY GRAPEFRUIT JUICE IS LEFT OUT, DELIBERATELY. It is squeezed the same way
+# and sits in the same `freshly squeezed fruit juice` shelf (below), but #707
+# names four juices and ruby grapefruit is its own generic (2026-09-07,
+# above) that the issue never mentioned -- widening the list is Helen's call,
+# not an inference from a shelf grouping.
+#
+# CARDS DO NOT SAY "FRESH". §9.10.1: a card is a lossy scan that shows the
+# shortest name that tells you what the drink is LIKE, and nobody filters a
+# card by freshness -- it would only cost budget (#776) on an already tight
+# name. `_plugins/cocktail_card_ingredients.rb` is untouched.
+always_fresh:
+  - "lime juice"
+  - "lemon juice"
+  - "orange juice"
+  - "grapefruit juice"
+
+# THE OPPOSITE WARNING -- #707: "pineapple juice should always carry the note
+# 'Don't use fresh.'" A STANDING note, Helen's rather than a drink's own, so a
+# pour with no `note:` of its own still gets it and one that has a note gets
+# both, the drink's own first (`_layouts/cocktail.html`). A MAPPING, not a
+# list, so `_declared_generics` (tests/test_cocktails.py) skips it on shape
+# alone -- it names existing generics as KEYS rather than declaring new ones,
+# same reason `card_names` below needs no entry in `NOT_GENERIC_LISTS`.
+standing_notes:
+  "pineapple juice": "Don't use fresh."
+
 # FRUIT IS NOT JUICE. You muddle one and pour the other, and a Caipirinha made
 # with lime juice is a different drink.
 fruit_and_herbs:

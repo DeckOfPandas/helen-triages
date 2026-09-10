@@ -470,6 +470,14 @@ layout: default
   {% comment %} `family_of` used to be assigned here for the rum special case
      below. That case is gone and so is the assignment — an unread variable is
      the template equivalent of the dead selector it went with. {% endcomment %}
+  {% comment %} "FRESH" MADE EXPLICIT, AND THE OPPOSITE WARNING -- #707.
+     `_data/cocktails/ingredients.yml`'s own comment says freshly squeezed is
+     implied for every juice; these two declared lists are where that
+     implication becomes words on the page for the generics Helen named.
+     Read once here rather than per ingredient — Liquid re-resolves a `site.data`
+     path on every reference, and this loop runs once per pour. {% endcomment %}
+  {% assign always_fresh = site.data.cocktails.ingredients.always_fresh %}
+  {% assign standing_notes = site.data.cocktails.ingredients.standing_notes %}
   {% if page.ingredients.size > 0 %}
     {% comment %} THE SCALER IS ONE BOX UNDER THE LIST, 2026-09-05, and this is
        the third place it has lived. #545 first put it at the FOOT of the page,
@@ -572,13 +580,30 @@ layout: default
              line may not. Ten generics gained their spirit word first.
 
              A LIST GENERIC joins with the same quiet italic "or" as before —
-             it means "either would do" (#441), never "and". {% endcomment %}
+             it means "either would do" (#441), never "and".
+
+             "FRESH " IS PREPENDED PER GENERIC, NOT PER LINE -- #707. A list
+             generic could in principle mix an `always_fresh` member with one
+             that isn't (none does today), so each `g` is tested on its own
+             before it joins the headline, the same way each `g` already
+             looks itself up rather than the whole `item.generic` value doing
+             so. `standing_note` is picked up in the same pass, for the same
+             reason `class_html` and `headline` already build inside one loop
+             over the ingredient's fields. {% endcomment %}
           {% assign headline = "" %}
+          {% assign standing_note = "" %}
           {% for g in item.generic %}
+            {% assign g_display = g %}
+            {% if always_fresh contains g %}
+              {% capture g_display %}fresh {{ g }}{% endcapture %}
+            {% endif %}
             {% if headline == "" %}
-              {% assign headline = g %}
+              {% assign headline = g_display %}
             {% else %}
-              {% capture headline %}{{ headline }}<span class="cocktail-style-or">or</span>{{ g }}{% endcapture %}
+              {% capture headline %}{{ headline }}<span class="cocktail-style-or">or</span>{{ g_display }}{% endcapture %}
+            {% endif %}
+            {% if standing_note == "" and standing_notes[g] %}
+              {% assign standing_note = standing_notes[g] %}
             {% endif %}
           {% endfor %}
           {% comment %} Falls back to `item` only where a drink has no generic
@@ -640,6 +665,15 @@ layout: default
             {% endif %}
             {% if item.note %}
               <p class="cocktail-note">{{ item.note }}</p>
+            {% endif %}
+            {% comment %} THE STANDING NOTE, #707: Helen's own on the ingredient
+               ALWAYS wins the top slot when there is one; the standing note
+               never replaces it, it only fills the gap when a pour carries
+               none. Rendering both when both exist (drink's own first) is the
+               brief -- a pineapple pour with its own note about which tin to
+               buy still gets "Don't use fresh." underneath. {% endcomment %}
+            {% if standing_note != "" %}
+              <p class="cocktail-note">{{ standing_note }}</p>
             {% endif %}
           </li>
         {% else %}
