@@ -694,6 +694,56 @@ rum_characters:
 whisky_characters:
   - "peated"
 
+# =============================================================================
+# WHERE A BOTTLE IS FROM -- #591, Helen's ruling 2026-09-07
+# =============================================================================
+# "RULED: `origin` goes on the BOTTLE." Chosen over origin-qualified generics
+# (`Martinique agricole blanc`) and over a fourth field on the ingredient. She
+# asked for this on 2026-08-30, writing the Martinique Swizzle: "we need to add
+# a way of noting the origin of agricole given flavour varies so much."
+#
+# IT SITS ON THE SAME SIDE OF THE LINE AS `abv`. bottles.yml's own header draws
+# it: a bottle's category is INVARIANT -- "Appleton 12 is a moderately-aged
+# Jamaican in every drink that pours it" -- and where a distillery stands is
+# just as invariant. `character` is the other side, because that is what a
+# RECIPE wants from a pour, and #441 separated the two deliberately.
+#
+# THE ACCEPTED COST, WRITTEN DOWN SO IT IS NOT REDISCOVERED AS A BUG: a RECIPE
+# cannot require an origin. `martinique-swizzle` still says
+# `generic: "rhum agricole blanc"`, and what makes it Martinican is that its
+# suggestions are JM, Trois Rivières and La Favorite -- all of which this field
+# now says are Martinique. `island-of-martinique` and `lisle-martinique` are
+# named after an origin they still cannot state in data. Helen accepted that
+# explicitly when she chose this shape.
+#
+# TWO MECHANISMS FOR ORIGIN NOW COEXIST AND THAT IS DELIBERATE. Five rum styles
+# already carry an origin IN THE WORD -- the three Jamaicans, both Demeraras,
+# and `clairin`, which is Haitian by definition and was declared separately for
+# that reason. Those are NOT being unpicked. The rule is: in the generic where
+# it changes the CATEGORY, on the bottle where it changes the FLAVOUR.
+#
+# A CLOSED LIST, like rum's characters and unlike gin's, so a typo cannot mint
+# an origin in silence. `test_bottle_origin_is_declared` holds it. Only the
+# values actually used are here -- adding one is a small decision, and inventing
+# a world atlas up front would be declaring a vocabulary for bottles nobody owns.
+#
+# NOT A GENERIC LIST, AND THIS IS THE FOURTH TIME THAT TRAP HAS BEEN SET.
+# tests/test_cocktails.py derives the permitted generics from every top-level
+# LIST in this file, so without an entry in `NOT_GENERIC_LISTS` these four words
+# would silently become pourable generics. `families`, `not_on_cards`,
+# `rum_groups` and `ingredient_as` each learned that the hard way; the comment
+# above `NOT_GENERIC_LISTS` says "the next such block will not be so obliging",
+# and this is that block.
+#
+# WHETHER IT SPREADS BEYOND CANE SPIRITS IS NOT DECIDED. It is just as invariant
+# for a tequila or a pisco and the field would support it, but nothing needs it
+# today. Helen left that open on purpose.
+bottle_origins:
+  - "Martinique"
+  - "Guadeloupe"
+  - "Haiti"
+  - "Brazil"
+
 # THE CARD NAME FOR EACH RUM CATEGORY. Issue #501, Helen 2026-08-27: "set a
 # display name for each rum category, to be used as a short name on cocktail
 # cards. The recipe page can then display the full category name."
