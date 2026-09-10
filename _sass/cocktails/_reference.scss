@@ -210,6 +210,43 @@ $ref-col-card:    minmax(6rem, 9rem);
   color: $color-clear-text;
   padding-bottom: $space-xs;
   border-bottom-color: $color-clear-text;
+
+  // "EXAMPLES" WAS PINK, AND NOBODY CHOSE THAT -- Helen, 2026-09-10: "change
+  // the heading font colour to something else, and also the column heading
+  // please -- leave the pink for the bottles."
+  //
+  // The head row reuses `.rum-cat-bottles` for its third cell purely to land in
+  // the same grid track, and inherited the bottle colour along with it. So one
+  // of three sibling column labels was woowoo and the other two were
+  // `$color-clear-text`, which read as a deliberate emphasis and was an
+  // accident of markup. WOOWOO MEANS BOTTLE on this page (see the file header);
+  // a column label is not a bottle.
+  .rum-cat-bottles {
+    color: inherit;
+  }
+}
+
+// THE COUNTRY, INSIDE THE BOTTLES COLUMN -- #813, treatment A.
+//
+// It takes the column-label treatment rather than a new one, because that is
+// what it is: a label over a group of bottles, one rank down from the header
+// row's labels over columns. Same face, same tracking, same case, a size
+// smaller and quieter.
+//
+// NOT WOOWOO, for the reason the header row is not: it names a group of bottles
+// rather than being one.
+.rum-origin-head {
+  display: block;
+  font-family: $font-label;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $color-clear-text;
+  margin-top: $space-sm;
+
+  &:first-child {
+    margin-top: 0;
+  }
 }
 
 .rum-cat-name {
@@ -252,10 +289,11 @@ $ref-col-card:    minmax(6rem, 9rem);
 // rum, lightly aged` since El Dorado 151 came off on 2026-09-05. Quiet and un-hued, because
 // it is the absence of the thing the hue means rather than a different kind of
 // thing.
-.rum-cat-bottles--none {
-  color: $color-clear-text;
-  font-style: italic;
-}
+// `.rum-cat-bottles--none` WAS HERE AND IS GONE, 2026-09-10. It styled the
+// "none in the house" placeholder in a category's empty bottles track; Helen
+// deleted the words ("If we're not using them, delete them, boom"), so the
+// track renders empty and nothing emits the class. Removed rather than left,
+// for the same reason as `.rum-cat-note` below.
 
 // `.rum-cat-note` WAS HERE AND IS GONE, 2026-09-10. It styled Ceylon arrack's
 // `family_less` reason under its row; #889 deleted that note from the page

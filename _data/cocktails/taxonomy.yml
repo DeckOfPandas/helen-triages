@@ -507,7 +507,9 @@ mood_ingredients:
     #
     # IT COSTS NOTHING TODAY. Both drinks that pour Punt e Mes are covered
     # anyway -- Spiced Negroni matches on Campari, and The Ridgwell is not an
-    # aperitivo drink. If a future drink is built on Punt e Mes ALONE and wants
+    # aperitivo drink. (The Ridgwell was deleted at Helen's word on 2026-09-10,
+    # so Spiced Negroni is now the only pour; the argument is unchanged.)
+    # If a future drink is built on Punt e Mes ALONE and wants
     # this mood, the honest fix is to let mood lists name a bottle as well as a
     # generic, not to widen the category.
     - quinquina

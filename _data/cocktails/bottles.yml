@@ -284,6 +284,7 @@ bottles:
   "Clément Rhum Agricole Blanc":
     generic: "rhum agricole blanc"
     aliases: ["Clément Agricole Blanc", "Clement Agricole Blanc"]
+    origin: "Martinique"
   # THREE DAMOISEAU BLANCS, and the degree sign is part of the name: the 40°,
   # the 50°, and the Pure Cane. The 40° is the one the drinks had been writing
   # without its strength; the other two are declared because she owns them.
@@ -291,9 +292,11 @@ bottles:
     generic: "rhum agricole blanc"
     aliases: ["Damoiseau Rhum Agricole Blanc", "Damoiseau Rhum Agricole Blanc 40 proof",
               "Damoiseau Blanc", "Damoiseau 40"]
+    origin: "Guadeloupe"
   "Damoiseau Rhum Agricole Blanc 50°":
     generic: "rhum agricole blanc"
     aliases: ["Damoiseau 50"]
+    origin: "Guadeloupe"
   "Damoiseau Rhum Agricole Blanc Pure Cane":
     generic: "rhum agricole blanc"
     # `Damoiseau Rhum Pure Cane` ADDED 2026-09-09: Helen wrote it that way
@@ -302,6 +305,7 @@ bottles:
     # so it is aliased rather than corrected away, which is the La Favorite
     # rule and is what stops her having to spell a bottle this file's way.
     aliases: ["Damoiseau Pure Cane", "Damoiseau Rhum Pure Cane"]
+    origin: "Guadeloupe"
   # FAVORITE, NO `u`, AND THAT IS A STANDING CORRECTION -- Helen, 2026-09-06:
   # "Favorite is correct, my mistyping, please always correct." The distillery
   # is Martinican and spells it the French way; `La Favourite` was hers and
@@ -316,9 +320,11 @@ bottles:
     generic: "rhum agricole blanc"
     aliases: ["La Favorite Blanc", "La Favourite Rhum Agricole Blanc",
               "La Favourite Blanc"]
+    origin: "Martinique"
   "La Favorite L'Authentique Ambré":
     generic: "rhum agricole vieux"
     aliases: ["La Favourite L'Authentique Ambré"]
+    origin: "Martinique"
   # THE BARE "JM" ALIAS WENT ON 2026-09-06 (#702). Both JM bottles are stocked,
   # in DIFFERENT generics, and `JM` is the obvious thing to type for either --
   # so it was never another way of writing the ambré, it was a way of writing
@@ -332,20 +338,33 @@ bottles:
   "Rhum JM Ambré":
     generic: "rhum agricole vieux"
     aliases: ["JM Rhum Agricole ambre"]
+    origin: "Martinique"
   "Barbancourt 3 Star":
     generic: "rhum agricole vieux"
     aliases: ["Barbancourt Three Star rum", "Barbancourt 3-star rum"]
-    # Haitian cane juice, so agricole by production even though the word on the
-    # label is not "agricole".
+    origin: "Haiti"
+    # AGRICOLE BY PRODUCTION, HAITIAN BY ORIGIN, and since #591 the file can say
+    # both. It is cane juice rather than molasses, which is what makes the
+    # generic right even though the word on the label is not "agricole"; the
+    # `origin` above is what used to have to live in this comment.
+    #
+    # THIS IS THE BOTTLE THE WHOLE ISSUE WAS ABOUT. `coffey-park-swizzle` and
+    # `port-au-prince` both pour it and are both typed `rhum agricole vieux`,
+    # behind a QQ admitting the value was inferred. Under Helen's ruling that
+    # typing is CORRECT -- so those two QQ notes can be deleted rather than
+    # answered, which is two rows off #837.
   "Clairin Communal":
     generic: "clairin"
     aliases: []
+    origin: "Haiti"
   "Sagatiba":
     generic: "cachaça"
     aliases: []
+    origin: "Brazil"
   "Leblon":
     generic: "cachaça"
     aliases: []
+    origin: "Brazil"
   # Added 2026-08-27 at Helen's request, and it CORRECTS A SPELLING that has
   # been sitting in Caipirinha's drink-level note since ingestion: that note
   # ranks "Sagatiba = Leblon > Viero Barriero > Abelho > Yaguara Organic", and
@@ -356,6 +375,7 @@ bottles:
   "Velho Barreiro":
     generic: "cachaça"
     aliases: ["Viero Barriero"]
+    origin: "Brazil"
   # Named by Helen 2026-08-27 for `Jamaican, caramel forward`, alongside
   # Blackwell. NO DRINK MENTIONS IT, and it is listed anyway: this file is what
   # she would reach for, not an index of what the collection happens to cite.
@@ -384,22 +404,30 @@ bottles:
   # --- the Martinique agricoles, 2026-08-30 ---------------------------------
   # Named by Helen for the Martinique Swizzle, one per reason: JM for the
   # classic build, Trois Rivières for a savoury one, La Favorite for high
-  # proof. All three are `rhum agricole blanc` and the ORIGIN THAT SEPARATES
-  # THEM IS NOT RECORDABLE YET -- she asked for "a way of noting the origin of
-  # agricole given flavour varies so much" and it is a real gap: thirteen drinks
-  # use an agricole generic and Barbancourt, which is Haitian, is typed
-  # `rhum agricole vieux` behind a QQ admitting the value was inferred. Raised
-  # rather than invented here.
+  # proof. All three are `rhum agricole blanc`.
+  #
+  # THE ORIGIN THAT SEPARATES THEM IS RECORDABLE SINCE 2026-09-10 (#591), and
+  # this comment used to say it was not -- "she asked for a way of noting the
+  # origin of agricole given flavour varies so much and it is a real gap".
+  # The gap is closed: `origin:` is a field now, declared closed in
+  # ingredients.yml's `bottle_origins`, and every agricole bottle carries one.
+  #
+  # WHAT IS STILL TRUE, AND IS THE ACCEPTED COST OF HER SHAPE: a RECIPE cannot
+  # require an origin. The Martinique Swizzle says `rhum agricole blanc` and is
+  # Martinican because its suggestions are these three. See `bottle_origins`.
   "Rhum JM Blanc":
     generic: "rhum agricole blanc"
     aliases: ["JM Blanc", "JM blanc"]
+    origin: "Martinique"
   "Trois Rivières Cuvée de l'Océan":
     generic: "rhum agricole blanc"
     aliases: ["Trois Rivieres Cuvee de l'Ocean", "Trois Rivières", "Cuvée de l'Océan"]
+    origin: "Martinique"
   "La Favorite Cœur de Canne":
     generic: "rhum agricole blanc"
     aliases: ["La Favorite Coeur de Canne", "Coeur de Canne", "Cœur de Canne",
               "La Favourite Cœur de Canne", "La Favourite Coeur de Canne"]
+    origin: "Martinique"
 
   # --- not a rum ------------------------------------------------------------
   # The first entries here that are not cane spirits at all, which is what the

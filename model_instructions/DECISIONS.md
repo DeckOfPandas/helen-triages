@@ -1025,6 +1025,43 @@ unless stated.
   Every guard that had only ever run against drafts on her machine now runs in
   CI too.
 
+- **2026-09-10 — 61 TAGLINES IN ONE SITTING, AND THE SHAPE THAT DID IT WAS A
+  CSV.** #839 had 99 of 125 drinks at `tagline: "QQ"` and proposed a local
+  page as the way to clear them. What worked instead: every drink in one
+  table — tier by nearness to deploying (live / made and only the tagline
+  missing / made with other placeholders / not made), ship rating, current
+  line, a verdict on each — sent to Helen as a CSV, worked through in a
+  spreadsheet, sent back, diffed, and written into the files by a script.
+  Three rounds. Her words: *"this is the least chaotic way of collaborating I
+  think."* Four live drinks and 57 drafts (PR #932; private PR #56); 16 drafts
+  left, all hers to write, listed on #839.
+
+  **Voice review before the writing, and the finding was repetition, not
+  quality.** Line by line her drafts were fine; as a SET they leaned on the
+  same three devices — the drink as a person at a party (six), the adjective
+  fragment (six more), "Chartreuse doesn't care about you" (a third). She cut
+  to two or three of each. Worth knowing for any per-drink copy field: review
+  the set, not the lines.
+
+  **The Ridgwell was deleted the same day**, at her word in the tagline column
+  itself (*"QQ CLAUDE LET'S JUST DELETE THIS RECIPE"*), private PR #54. The
+  public repo's three comment mentions of it (Punt e Mes's history in
+  `ingredients.yml`, the aperitivo mood in `taxonomy.yml`, Carpano Antica in
+  `bottles.yml`) are history and stay; the taxonomy one now says so.
+
+  **`COCKTAIL_BASELINE_COMMIT` MOVED A FIFTH TIME, AND THIS ONE IS THE RULE
+  RUNNING END TO END RATHER THAN BEING GRANTED PAST.** The four live drinks
+  flipped to `proofread: false` in the tagline commit, as #367 requires. She
+  read the four built pages ON THE BRANCH, before the merge, and said so
+  (*"I've checked those four live drinks, and they're perfect. Please flip
+  their proofread flags back to true and push for me."*). Second commit flips
+  them back; third moves the constant, alone; the test was run with the old
+  value and named exactly the four. **Nothing left the live site.** That is
+  the cheapest shape the gate allows and `CLAUDE.md`'s proofreading section
+  now names it. Five moves in one day is also the "promotion is a habit"
+  case the constant's own comment predicted — raised as #933 rather than
+  designed here.
+
 - **2026-09-09 — A PROMOTED DRINK IS INDISTINGUISHABLE FROM AN EDITED ONE, AND
   THAT IS BY DESIGN.** `test_agent_edited_drinks_are_not_marked_proofread`
   reads the PUBLIC repo's history only — #624, a public test must never
@@ -3128,6 +3165,28 @@ verification. Dates are when the correction landed.
   convenience, the question is not "what do I want to stop prompting" but
   "what was that prompt the last guard of".**
 
+- **2026-09-10 — `pr edit` IS THE FIRST `gh` CALL THE CLASSIC TOKEN CANNOT
+  MAKE, AND IT FAILS ON SCOPE, NOT ON PERMISSION.** `sh scripts/gh-agent.sh pr
+  edit 932 --body-file ...` returned GraphQL errors asking for `read:org` on
+  the `login`, `name` and `slug` fields — `gh` resolves the PR through
+  GraphQL for that subcommand, and the classic `repo` scope does not cover
+  those. `pr create`, `pr view`, `pr comment`, every `issue` subcommand and
+  `api` are REST and unaffected. **The finding is a narrowing, which is the
+  rarer kind**: §11's rule that a widened token is invisible until something
+  unexpected succeeds has a mirror — a scope gap is invisible until something
+  routine fails, and this one waited a day. The fix needed nothing the token
+  lacks: `sh scripts/gh-agent.sh api -X PATCH repos/<owner>/<repo>/pulls/<N>
+  -F body=@tmp/body.md`. Recorded in `CLAUDE.md`'s `--body-file` bullet and
+  MANUAL §11; "never broaden access" is untouched.
+
+  **AND A THIRD WRAPPER, FOR THE SAME REASON AS THE FIRST TWO.** A worktree in
+  the container cannot clone the drafts repo by the SSH form MANUAL §9.1 gave,
+  so the session that needed it hand-wrote the HTTPS URL — token name and all —
+  into a `tmp/` script, which is exactly the call-site shape the two wrappers
+  above exist to retire. `scripts/git-clone-agent.sh <repo> [dir]` now; the
+  manual gives it beside the SSH form. Proved by cloning into `tmp/` and
+  deleting the result.
+
 - **2026-09-10 — CLOSING ONE HOLE OPENED ANOTHER, IN A DIFFERENT FILE, THE SAME
   DAY.** `guard-unanalyzable-bash.py` refuses a leading `cd`. `CLAUDE.md`
   documents `cd _food_drafts && git ...` as the way the nested drafts repos are
@@ -3612,6 +3671,71 @@ verification. Dates are when the correction landed.
   reach for", the arrack note and both subtitles deleted. **Nice-to-have, not
   shipping**: *"no more until design isn't noticeably odd"*, her words, so the
   page stays unpublished. #813 (agricole rows by country) waits on #591.
+- **2026-09-10, #591 — `origin` IS BUILT, THREE DAYS AFTER IT WAS RULED, AND
+  THE BUILD FOUND A LIVE BUG IN SOMETHING ELSE.** Helen ruled on 2026-09-07 that
+  origin goes on the BOTTLE; `origin:` appeared nowhere in `bottles.yml` until
+  today. Fifteen cane-spirit bottles seeded (7 Martinique, 3 Guadeloupe, 2 Haiti,
+  3 Brazil), a closed `bottle_origins` vocabulary, and two guards — one that
+  refuses an undeclared value, one that requires an origin on every bottle on
+  `rum_groups`' "Cane juice" shelf.
+
+  **THE ARRACKS ARE DELIBERATELY OUTSIDE THE GUARD**, and the reason is the
+  ruling's own: origin lives in the generic where it changes the CATEGORY and on
+  the bottle where it changes the FLAVOUR. `Batavia arrack` and `Ceylon arrack`
+  carry it in the word already, exactly as the three Jamaicans and both
+  Demeraras do. Cachaça is seeded but not required, being Brazilian by
+  definition. Agricole is the one cane family whose generic spans three
+  countries, which is the whole reason the field exists.
+
+  **AND THE TRAP FIRED FOR REAL, FOR THE FIFTH TIME, WITH NOBODY NOTICING.**
+  `tests/test_cocktails.py` derives the permitted generics from every top-level
+  LIST in `ingredients.yml`, so a list that is not a vocabulary mints its
+  members as pourable generics unless it is named in `NOT_GENERIC_LISTS`. Four
+  entries were already there, each added by somebody who happened to think of
+  it. Listing every top-level key while adding the fifth turned up
+  **`shopping_shelves`: ten AISLE NAMES — `spirits`, `fortified`, `liqueurs`,
+  `fresh produce`, `flavourings`, `tops` and four more — silently valid as
+  generics since the shelves were declared.**
+
+  The prediction was on the record and exact. `rum_groups`' own note says it was
+  caught only because its members are dicts and `set(value)` raises on those:
+  *"that is luck, not design, and the next such block will not be so obliging."*
+  `ingredient_as`, `bottle_origins` and `shopping_shelves` are all lists of
+  plain strings. Two were caught while being added. One was not.
+
+  **A GUARD FOR THIS WAS ATTEMPTED AND WAS WRONG, WHICH IS WORTH MORE THAN THE
+  GUARD.** The obvious invariant — "nothing in a `NOT_GENERIC_LISTS` list may
+  also be a declared generic" — is FALSE: `not_on_cards` is a list *of*
+  generics, the ones deliberately kept off a card, and `families` overlaps on
+  purpose (`vodka` is both a family and a pour). It went red on real data
+  immediately and was deleted. **The registry says where generics are SOURCED
+  from, not what is or is not a generic**, and those are different questions.
+
+  The real fix is to invert the default: an explicit positive registry of the
+  lists that DO declare generics, so a new list declares nothing until
+  classified and the silent failure becomes a loud one. That is a change to the
+  derivation every generic check runs through, so it is its own piece of work
+  and is raised rather than smuggled in here.
+
+- **2026-09-10 — I SHADOWED A HELPER AND NINE TESTS BLAMED THE DATA.** Adding
+  `_bottles()` for the two new guards, without checking the name was free.
+  `_bottles()` has existed since #529 at the top of the bottle-dictionary
+  section and returns the WHOLE document; mine returned only the `bottles:`
+  mapping. **Python takes the last definition**, so every pre-existing caller
+  silently got the wrong shape.
+
+  **THE FAILURE POINTED AT THE WRONG THING, WHICH IS THE PART TO REMEMBER.**
+  Nine tests went red at once saying *"bottles.yml declares no bottles, so every
+  check here is vacuous"* — a message written to describe a corrupted or empty
+  data file. So the first move was to parse `bottles.yml` and check the block
+  boundaries, and it parsed fine, 132 bottles. The message was accurate about
+  what the test SAW and misleading about why.
+
+  **An assertion message names what the test observed; it cannot name what
+  caused it.** When a data-shaped failure appears the moment you have added
+  code, suspect the code — and `grep -n '^def <name>'` before defining a helper
+  in a 7,000-line module.
+
 - **2026-09-10, #784 — AND THEN THERE WERE NO LINES AT ALL. The entry above
   describes a mechanism that lasted a few hours.** `rum_page.yml` was built to
   hold "a line or two under each rum label we aren't using", seven empty keys
@@ -3645,3 +3769,52 @@ verification. Dates are when the correction landed.
   the day. Three rules in one file styling markup nothing emitted, all within
   hours, is what a page being actively cut down looks like — worth sweeping at
   the end of such a pass rather than one at a time.
+
+- **2026-09-10, #921 — THE COPY REVIEWED, AND THREE RULINGS OUT OF IT.** The
+  first read of her prose by anyone: it needs leaving alone (the refrain
+  paragraph, "sticky, impractical effort", the arrack apology), with two
+  sentences flagged as anyone's ("The below is almost identical to…", "taste
+  component") and left for her. The rulings were about structure, not words:
+
+  **"blackstrap" IS ON TWO LISTS ON ONE PAGE, AND STAYS ON BOTH.** It sat under
+  "These words are useful to me" and under "Rum 'styles' I do not recognise",
+  and a reader sees the same word praised and dismissed on one screen. Helen:
+  *"It needs to stay in the words I don't believe in section because people
+  say 'use a blackstrap rum' which isn't a thing (to me). And then given I'm
+  using it as a character on the site, I need to list it as a character."*
+  Her fix, both halves hers: **Characters moves to the END of the page**, so
+  the reader meets the word as a not-a-style first and its real job second —
+  which also makes "Addendum" true, since it had been sitting in the middle —
+  and the word carries a parenthetical in the retired list, *"(rum character
+  not rum type)"*. The parenthetical is a lookup: any retired word that is
+  also in `rum_characters` gets it, so a second such word cannot arrive
+  without the note.
+
+  **THE TAB, THE LINK AND THE h1 DISAGREE ON PURPOSE.** The page's `title` and
+  the footer link say "rum categories"; the h1 says "My Philosophy of Rum".
+  Asked which she wanted: *"I need links to the page to stay as 'rum
+  categories' because if links say 'my philosophy of rum' the reader expects
+  stories about walks on the beach and my favourite tiki mug."* So the label is
+  wayfinding and the headline is voice, and the page's own header now says not
+  to make them agree.
+
+  **"none in the house" IS GONE**, the placeholder for a category with no
+  bottle: *"If we're not using them, delete them, boom."* The empty third
+  track is the honest rendering. Its CSS rule went with it, per the sweep
+  note above. **Two placeholders remain**, both column headings — "category"
+  and "on a card" — because the middle column IS in use (it prints the shorter
+  name a card uses, "Jamaican rum" for `moderately aged Jamaican rum`) and
+  needs a word from her rather than deletion. #784 stays open for those two.
+
+  **THE VOICE ACROSS THE SITE, since she asked how the five sit together** —
+  about page, hollandaise, ganache, the taglines, this page: one voice at five
+  volumes. The about page explains itself with anecdotes; the two recipes are
+  the instructor who has suffered, jokes inside a formal structure; the taglines
+  are that instructor at eight words; this page is the manifesto, least funny
+  per line and funny in its structure. Two things hold it together: the "you"
+  is always someone in the kitchen being told off, and the jokes come from
+  precision (temperatures, counts of rums, a bar with a pint of fun). The
+  loosest register (BRB, gap yah, hi Sue) lives only in the taglines, and
+  should. Her one open note to herself: *"I'll have a think about warming the
+  rum slightly"* — the page is nearly all what she does not care about, and
+  "I really really like rum" carries the whole positive side.

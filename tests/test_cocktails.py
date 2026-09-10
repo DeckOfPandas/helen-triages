@@ -268,7 +268,29 @@ PLACEHOLDER = "QQ"
 # hit: a list at the top of ingredients.yml is READ AS GENERIC VALUES unless it
 # says otherwise, so leaving it out would quietly mint `float`, `rinse` and
 # `muddle` as three new generics that no drink could ever pour.
-NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups", "ingredient_as"}
+# `bottle_origins` JOINS THEM FOR #591, AND IT IS THE FOURTH TIME. The comment
+# above ends "the next such block will not be so obliging", and it was right:
+# `rum_groups` was loud only because its members are dicts and `set(value)`
+# raises on those. `bottle_origins` is a list of four plain strings, so leaving
+# it out would have minted `Martinique`, `Guadeloupe`, `Haiti` and `Brazil` as
+# permitted generics in total silence -- four words no drink could ever pour,
+# quietly valid on any ingredient.
+# `shopping_shelves` JOINS THEM TOO, AND IT WAS ALREADY WRONG -- found while
+# adding `bottle_origins`, by listing every top-level list and asking how each
+# was classified. It is ten AISLE NAMES (`spirits`, `fortified`, `liqueurs`,
+# `fresh produce`, `freshly squeezed fruit juice`, `bottled fruit juice`,
+# `flavourings`, `sugar syrup`, `bitters`, `tops`), and every one of them has
+# been a silently permitted generic since the shelves were declared. Nothing
+# pours a shelf, so nothing ever noticed.
+#
+# THAT IS THE TRAP FIRING FOR REAL RATHER THAN IN A COMMENT. The four entries
+# above were each caught while the list was being added; this one was not, and
+# sat in the data. The prediction was on the record -- `rum_groups`' note says
+# it was loud only because its members are dicts, "that is luck, not design,
+# and the next such block will not be so obliging" -- and `shopping_shelves` is
+# a list of plain strings, so it was exactly as silent as predicted.
+NOT_GENERIC_LISTS = {"families", "not_on_cards", "rum_groups", "ingredient_as",
+                     "bottle_origins", "shopping_shelves"}
 
 
 def _is_character_list(key):
@@ -1400,7 +1422,18 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # it is a change so small she could see all of it in the sentence that asked for
 # it. The grant is still hers and still explicit, which is the only thing that
 # has to stay true. Covers 832c726 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "832c726"   # the Elemakule apostrophe, 2 live drinks, 2026-09-10
+# MOVED A FIFTH TIME, 2026-09-10, AND THIS ONE IS THE RULE WORKING END TO END.
+# `1e8b7d0` gave four live drinks (Accoutrement, Aperol Spritz, the Bellini,
+# L'Isle Martinique) the taglines Helen wrote that day and flipped all four to
+# `proofread: false` in the same commit, as #367 requires; they would have left
+# the live site on merge. She read the four built pages BEFORE the merge, on the
+# branch, and granted the exception in so many words: "I've checked those four
+# live drinks, and they're perfect. Please flip their proofread flags back to
+# true and push for me." `39240e8` flips them back. So the sequence the rule
+# describes happened in full -- agent edit, flag off, her read, her word, flag
+# on -- and the only thing this line records is that the last step was hers.
+# Covers 39240e8 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "39240e8"   # four taglines re-proofread, 2026-09-10
 
 
 def _newest_commit_per_published_drink():
@@ -7392,4 +7425,94 @@ def test_rum_adjacent_before_names_a_real_group():
         f"rum_groups.\n\nThe shelves are:\n  " + "\n  ".join(names)
         + "\n\nIf a shelf was renamed, this key needs the new name -- otherwise "
           "the Rum-adjacent block silently stops rendering (#919)."
+    )
+
+
+def test_bottle_origin_is_declared():
+    """An `origin:` must be a value `bottle_origins` declares -- #591.
+
+    THE SAME GUARD `rum_characters` AND `ingredient_as` HAVE, for the same
+    reason: a closed vocabulary that nothing checks is an open one, and a typo
+    mints a new member in silence. `origin: "Martinque"` would simply sit there
+    being wrong, and nothing renders it yet, so nobody would ever see it.
+
+    CLOSED RATHER THAN FREE TEXT IS HELEN'S CALL, ruled 2026-09-07 with the
+    field itself: "a closed vocabulary for it, in `_data/cocktails/
+    ingredients.yml` alongside `rum_characters` -- so a typo cannot mint an
+    origin in silence, which is the argument that file already makes for rum's
+    characters."
+    """
+    declared = set(_vocab().get("bottle_origins") or [])
+    assert declared, (
+        "ingredients.yml declares no `bottle_origins` vocabulary, so nothing "
+        "constrains the `origin:` field (#591)."
+    )
+
+    undeclared = sorted(
+        {(name, entry["origin"])
+         for name, entry in (_bottles().get("bottles") or {}).items()
+         if isinstance(entry, dict) and entry.get("origin") not in (None, "")
+         and entry["origin"] not in declared}
+    )
+    assert not undeclared, (
+        "bottle(s) whose `origin` is not in `bottle_origins`:\n  "
+        + "\n  ".join(f"{n}: {o!r}" for n, o in undeclared)
+        + "\n\nEither it is a typo, or the vocabulary needs the new value -- "
+          "and adding one is a decision about what the collection is willing to "
+          "say, which is Helen's."
+    )
+
+
+def test_cane_juice_bottles_declare_an_origin():
+    """Every bottle on the cane-juice shelf says where it is from -- #591.
+
+    WHAT IT IS FOR, in Helen's words on the ruling: "a test requiring `origin`
+    on any bottle whose generic is an agricole or clairin one, so the next
+    agricole bottle cannot arrive without it." Agricole is the one cane family
+    whose origin is NOT in its generic -- `rhum agricole blanc` covers
+    Martinique, Guadeloupe and Haiti at once -- so it is the family where a
+    missing origin actually loses something.
+
+    THE SHELF IS READ FROM `rum_groups`, NOT RETYPED HERE, so the list cannot
+    drift from the one the reference page renders. That makes a RENAME the
+    failure mode worth guarding, and it is asserted rather than assumed: rename
+    the shelf and this test would otherwise find no styles, check nothing, and
+    stay green -- the exact shape of rot `test_rum_groups_partition_the_styles`
+    and `test_there_are_prose_pages_to_check` both exist to refuse.
+
+    THE ARRACKS ARE DELIBERATELY NOT COVERED. `Batavia arrack` and
+    `Ceylon arrack` carry their origin in the generic already, the way the three
+    Jamaicans and both Demeraras do -- Batavia is Jakarta and Ceylon is Sri
+    Lanka. That is the coexistence Helen's ruling describes: in the generic
+    where it changes the category, on the bottle where it changes the flavour.
+    Cachaça is seeded with Brazil for the same reason it is not required here --
+    it is Brazilian by definition.
+    """
+    SHELF = "Cane juice"
+    groups = _vocab().get("rum_groups") or []
+    shelf = [g for g in groups if (g.get("name") or "").strip() == SHELF]
+    assert shelf, (
+        f"`rum_groups` has no {SHELF!r} shelf, so this test just checked "
+        f"nothing.\n\nThe shelves are:\n  "
+        + "\n  ".join((g.get("name") or "?") for g in groups)
+        + f"\n\nIf it was renamed, rename it here too -- otherwise the guard "
+          f"that stops an agricole bottle arriving without an origin (#591) is "
+          f"silently switched off."
+    )
+
+    styles = set(shelf[0].get("styles") or [])
+    assert styles, f"the {SHELF!r} shelf declares no styles."
+
+    missing = sorted(
+        name for name, entry in (_bottles().get("bottles") or {}).items()
+        if isinstance(entry, dict)
+        and entry.get("generic") in styles
+        and not (entry.get("origin") or "").strip()
+    )
+    assert not missing, (
+        f"cane-juice bottle(s) with no `origin`:\n  " + "\n  ".join(missing)
+        + "\n\nAgricole is the one cane family whose origin is not in its "
+          "generic -- `rhum agricole blanc` is Martinique, Guadeloupe AND Haiti "
+          "-- so a bottle without one loses the distinction Helen asked for "
+          "(#591). The permitted values are `bottle_origins` in ingredients.yml."
     )

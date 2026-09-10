@@ -1035,6 +1035,20 @@ so it reaches the private remote from anywhere:
 
     git clone git@github.com:DeckOfPandas/helen-triages-cocktails-private.git _cocktail_drafts
 
+**Inside the devcontainer that form dies** (`Host key verification failed`,
+no host key in the image — `CLAUDE.md` Git workflow step 1a), so clone over
+HTTPS as the agent account, through the wrapper that keeps the token's name
+out of the call site:
+
+    sh scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts
+
+Two things about the nested clone from there. `scripts/git-push-agent.sh`
+pushes the CWD's repo, so a branch of the nested clone is pushed by the same
+URL shape with `git -C _cocktail_drafts push ...` in a `tmp/` script (a leading
+`cd` is refused). And **`git -C <dir> commit -F <path>` resolves the path
+relative to `<dir>`**, so `-F tmp/msg.txt` fails with "could not read log
+file"; pass the absolute path. Both measured 2026-09-10.
+
 A worktree starts blind, and `tests/test_cocktails.py` skips the tests that
 read a drink, reporting green. A symlink half-works (the Edit/Write tools
 refuse it and writes land in Helen's tree); a copy goes stale silently. **Clone
@@ -1386,6 +1400,34 @@ characters and never generics. Rum's characters are a closed declared list
 `<family>_characters` list is excluded from the declared-generic set by its
 suffix and enforced by `test_a_declared_character_vocabulary_is_enforced`** —
 declaring a list is what switches enforcement on.
+
+**`origin` lives on the BOTTLE, not the recipe** (#591, Helen 2026-09-07), and
+it is the mirror image of `character`: where a distillery stands is INVARIANT,
+so it sits beside `abv` on the bottle, while `character` is what a recipe wants
+from a pour. Closed vocabulary — `bottle_origins` in `ingredients.yml`,
+currently Martinique, Guadeloupe, Haiti, Brazil. Two guards:
+`test_bottle_origin_is_declared` (no typo may mint one) and
+`test_cane_juice_bottles_declare_an_origin` (every bottle on `rum_groups`'
+"Cane juice" shelf has one, so the next agricole cannot arrive without it).
+**The accepted cost: a RECIPE cannot require an origin.** The Martinique
+Swizzle says `rhum agricole blanc` and is Martinican only because its
+suggestions are; `island-of-martinique` is named after an origin it cannot
+state. Helen chose that shape knowing so. **Two mechanisms for origin coexist
+deliberately** — in the generic where it changes the CATEGORY (the three
+Jamaicans, both Demeraras, `clairin`, both arracks), on the bottle where it
+changes the FLAVOUR.
+
+**ANY NEW TOP-LEVEL LIST IN `ingredients.yml` DECLARES POURABLE GENERICS UNLESS
+YOU SAY OTHERWISE**, and this is the trap that has now been sprung five times.
+`_declared_generics` derives the vocabulary from the file's own shape, so a list
+that is not a vocabulary silently mints its members. `families`,
+`not_on_cards`, `rum_groups`, `ingredient_as`, `bottle_origins` and
+`shopping_shelves` are all in `NOT_GENERIC_LISTS` — and `shopping_shelves` was
+found WRONG on 2026-09-10, ten aisle names (`spirits`, `tops`, `flavourings`…)
+that had been valid generics since the shelves were declared, with nothing red
+anywhere. **Nothing detects this**: a missing registration is invisible unless
+somebody lists every top-level key and asks what each one is. Do that when you
+add a list.
 
 **Naming**: every generic reads as an ingredient, natural word order, spirit
 word on the end, no inverted commas — `moderately aged Jamaican rum`, `London
@@ -2262,6 +2304,17 @@ never `gh pr close --delete-branch` (403).
 **A worktree has no `gh`** (§1), so the PR is opened through the REST API,
 `POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
 Measured 201 on 2026-09-07.
+
+**`pr edit` DOES NOT WORK ON THIS TOKEN, even where `gh` exists.** It goes
+through GraphQL, which wants `read:org` for fields the classic `repo` scope
+does not cover, and fails before touching the PR. `pr create`, `pr view`,
+`pr comment` and the `issue` subcommands are REST and fine. To change a PR's
+body or title, patch it over REST through the wrapper:
+
+    sh scripts/gh-agent.sh api -X PATCH repos/DeckOfPandas/helen-triages/pulls/932 -F body=@tmp/pr-body.md
+
+Measured 2026-09-10 (#932). Not a scope to ask for: "never broaden access"
+holds, and the REST form needs nothing the token lacks.
 
 **AND SINCE 2026-09-09, ALL THREE REPOS.** This section used to read "AND ONLY
 THAT REPO": the same call against either private repo returned 422 `not all
