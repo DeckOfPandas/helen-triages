@@ -3891,10 +3891,25 @@ verification. Dates are when the correction landed.
   **"none in the house" IS GONE**, the placeholder for a category with no
   bottle: *"If we're not using them, delete them, boom."* The empty third
   track is the honest rendering. Its CSS rule went with it, per the sweep
-  note above. **Two placeholders remain**, both column headings — "category"
-  and "on a card" — because the middle column IS in use (it prints the shorter
-  name a card uses, "Jamaican rum" for `moderately aged Jamaican rum`) and
-  needs a word from her rather than deletion. #784 stays open for those two.
+  note above. **One placeholder remains**, the column heading "category". The
+  middle column's heading was the other, and it could not simply go because
+  the column IS in use (it prints the shorter name a card uses, "Jamaican rum"
+  for `moderately aged Jamaican rum`); told that, she named it: *"site display
+  name"*. #784 stays open for the one word.
+
+  **AND THE RUM WARMED UP THE SAME EVENING.** Told the page was nearly all
+  what she does not care about, she wrote a fifth paragraph — what rum does
+  taste like — through three drafts in one sitting. What she settled on the
+  way is the reusable part: the list of forty-odd flavours stays whole because
+  its length is the argument (*"sugar sugar, it's just endless"* is the same
+  joke as the ganache's "= bad, = bad, = bad"); "freedom" came out because two
+  lines after dismissing Caribbean colonialism it was the one word a reader
+  could not read innocently; "a glorious rainbow of expressions" came out
+  because "expressions" is the word on the back of the bottle, on a page whose
+  joke is not being that; and the last sentence ends on "taste" so the next
+  paragraph's "if you don't care how a drink tastes" hangs off it — her
+  own requirement, stated before the wording was found. A line recommending
+  Pietrek's books followed. #921 closed with the PR that carried them.
 
   **THE VOICE ACROSS THE SITE, since she asked how the five sit together** —
   about page, hollandaise, ganache, the taglines, this page: one voice at five

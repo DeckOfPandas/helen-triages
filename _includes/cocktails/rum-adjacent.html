@@ -37,7 +37,11 @@
           {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
         </ul>
         {% else %}
-        <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
+        {% comment %} Empty, on purpose, as on the page's own rows: the
+           "none in the house" placeholder went on 2026-09-10 ("If we're not
+           using them, delete them, boom"), and the span stays only so the
+           grid keeps its third track. {% endcomment %}
+        <span class="rum-cat-bottles"></span>
         {% endif %}
         {% comment %} The `family_less` note (Ceylon arrack's reason for having
            no family) rendered here until 2026-09-10 -- Helen: "delete whole note
