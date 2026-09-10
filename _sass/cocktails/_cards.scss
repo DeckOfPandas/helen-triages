@@ -243,10 +243,88 @@ $card-glass-scale: 10.4rem;
 // the home colour marking the column; magenta on hover is the same claim every
 // other magenta on this page makes -- "this one" -- in the interactive tense,
 // and it matches the title turning magenta under the same cursor.
-.drink-card:hover {
+//
+// =============================================================================
+// AND THE WHOLE CARD ANSWERS NOW -- #886, 2026-09-10
+// =============================================================================
+// Helen: "do something more attractive with cocktail cards on mouseover." Three
+// treatments went on the real index and she chose from them; this is the one
+// that shipped. The other two are on the candidates page and are one class swap
+// away: B turned the GLASS DRAWING magenta (one declaration, since the artwork
+// strokes with currentColor -- the largest piece of colour on a card, and
+// nothing else moving), and C LIFTED THE FIELD one step to
+// $color-wicked-woowoo-wash, the only candidate where the card stops receding.
+//
+// WHAT SHIPPED, AND IT IS THREE OBJECTS RATHER THAN ONE. The two painted strips
+// grow into the card's whole edge; the drink's name takes magenta wherever on
+// the card the cursor is rather than only off its own letters; and both rows of
+// separator dot -- the ingredient line's and the chip row's -- come up from
+// their greys to absinthe.
+//
+// EVERY ONE OF THEM IS A HUE MOVE, which is the bar 12 sets and the bar the
+// four hover states of 2026-09-01 failed: at this type size the eye reads hue,
+// not lightness, so a brightening is a no-op dressed as a state. Magenta from a
+// grey border, magenta from a near-white title, absinthe from a mixed grey.
+//
+// AND NOT ONE OF THEM MOVES ANYTHING. `border-color` and not `border-width`:
+// the card's height, padding and every anchor on it are what this file's header
+// is about, and a border that thickened would push all of them. No shadow, no
+// lift, no transform -- 9.13's rule, and LEOPARD.md 5 restates it for the fur
+// that is parked ("nothing on a card moves under the cursor except colour").
+//
+// THE BRACKETS ARE SUBSUMED RATHER THAN DELETED. They are 3px of magenta lying
+// ON a border that is now magenta too, so they stop reading as two marks and
+// become the edge -- which is the upgrade: the whole shape of the card answers
+// instead of two stubs at one end of it. They stay in the rule because they are
+// what a NARROW card gets (below 400px the column is gone and the strips run
+// the card's full width) and because the transition is theirs.
+//
+// WHAT THE TITLE'S HALF BUYS, beyond looking better: the card is not a link --
+// only the name is -- so lighting the name from anywhere on the card is the one
+// place a card can say WHERE to click. The trade is that magenta appears
+// slightly ahead of the thing you can touch; a card is a tile with one handle,
+// and pointing at the handle is the honest reading of that.
+//
+// THE DOTS ARE THE QUIET ONE AND EARN THEIR PLACE BY RHYMING. A card's only
+// absinthe at rest is the glass drawing down its left column (2026-09-02, "the
+// colour is in the LINE WORK now"); the punctuation coming up to the same green
+// under the cursor is the drawing's colour reaching the words for as long as
+// you are on the card. It is also the only part of this that is NOT magenta,
+// which stops the state reading as one flat wash of pink.
+//
+// A MIXIN, INCLUDED TWICE, AND THE TWO RULES ARE DELIBERATELY NOT ONE COMMA
+// LIST. `:has()` is not a forgiving selector, so a browser that does not
+// understand it drops the ENTIRE selector list it appears in -- which would
+// take the plain `:hover` down with it and leave the card with no state at all.
+// Two rules cost a duplicated block and cannot fail that way.
+// (12 also warns that a property declared twice in one block is invisible to
+// test_no_selector_declares_the_same_property_twice; a mixin is the shape that
+// test's own note asks for.)
+@mixin drink-card-under-the-cursor {
+  border-color: $color-wicked-woowoo;
+
   &::after { background: $color-wicked-woowoo; }
   .drink-card-glass::after { background: $color-wicked-woowoo; }
+
+  .drink-card-sep,
+  .drink-card-mood:not(:last-child)::after {
+    color: $color-electric-absinthe;
+  }
 }
+
+.drink-card:hover { @include drink-card-under-the-cursor; }
+
+// KEYBOARD GETS EXACTLY THE SAME STATE, and `:has(:focus-visible)` rather than
+// `:focus-within` is the whole of why this is a second rule: `:focus-within`
+// fires on a MOUSE click too, so clicking a mood chip would leave one card lit
+// after the cursor had gone. `:focus-visible` is the browser's own answer to
+// "did they arrive here by keyboard", and asking for it through `:has()` is how
+// a card reads a state that only its children can be in.
+//
+// WHERE IT IS UNSUPPORTED NOTHING BREAKS: the card gains no state, every
+// child's own `:focus-visible` still paints, and `:hover` above is untouched --
+// which is the point of the two rules being separate.
+.drink-card:has(:focus-visible) { @include drink-card-under-the-cursor; }
 
 // --- the words ---------------------------------------------------------------
 .drink-card-body { min-width: 0; }
@@ -365,6 +443,12 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     color: inherit;
     text-decoration: none;
 
+    // It eases now rather than snapping -- #886. The card's border and its two
+    // separator rows all move under one cursor at 0.12s, and a title that
+    // arrived instantly in the middle of that read as a second, unrelated
+    // event. The same duration every other state on this page uses.
+    transition: color 0.12s ease, text-shadow 0.12s ease;
+
     // HOT MAGENTA ON HOVER — Helen, 2026-09-02. It was `#ffffff`, which is a
     // LIGHTNESS-ONLY step from the tape lettering's own near-white #ECE9EA:
     // about 3% of headroom, and §12's rule is that at these sizes the eye reads
@@ -387,12 +471,30 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     // a highlight needs somewhere brighter to be RELATIVE TO ITS OWN FILL, and
     // white is not brighter than magenta in any useful sense, it is simply a
     // different colour.
-    &:hover,
-    &:focus-visible {
+    // ...AND IT NOW ANSWERS THE WHOLE CARD, NOT ONLY ITS OWN LETTERS -- #886,
+    // 2026-09-10, the half of that state that belongs to the title. The card is
+    // not a link; the name is the only thing on it you can click, so a cursor
+    // anywhere on the card lights the one handle it has. See
+    // `drink-card-under-the-cursor` above for the rest of the state and for why
+    // the values are stated here rather than hoisted: this is where the
+    // highlight's reasoning lives, and a second copy of it in a mixin two
+    // hundred lines up is the "cross-reference nothing re-checks" trap.
+    //
+    // TWO BLOCKS, NOT ONE LIST, for the reason that mixin's own comment gives:
+    // `:has()` is not forgiving, and a browser that does not know it would drop
+    // every selector beside it -- including `&:hover`, which has worked since
+    // 2026-09-02 and must go on working.
+    @mixin drink-card-name-hot {
       color: $color-wicked-woowoo;
       text-shadow: -1px -1px 0 #FF9BE8,
                     1px  1px 0 rgba(5, 5, 5, 0.9);
     }
+
+    &:hover,
+    &:focus-visible,
+    .drink-card:hover & { @include drink-card-name-hot; }
+
+    .drink-card:has(:focus-visible) & { @include drink-card-name-hot; }
   }
 }
 
@@ -618,7 +720,13 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   margin: 0.5rem 0 0;
 }
 
-.drink-card-sep { color: mix($color-text, $color-surface, 25%); }
+// The seam between two ingredients. It comes up to absinthe under the cursor
+// (#886 -- see `drink-card-under-the-cursor`), so it eases like everything else
+// the card's hover moves.
+.drink-card-sep {
+  color: mix($color-text, $color-surface, 25%);
+  transition: color 0.12s ease;
+}
 
 // The matched ingredient, in the colour of the field that matched it.
 .drink-card-hit {
@@ -938,6 +1046,11 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     font-weight: 400;
     -webkit-text-stroke: 0;
     pointer-events: none;
+    // Absinthe under the cursor, with the ingredient line's own `·` and at the
+    // same 0.12s -- #886. The two rows of punctuation are the same object doing
+    // the same job one line apart, so they answer together or the card's hover
+    // reads as two events.
+    transition: color 0.12s ease;
   }
 
   // NO RULE HERE ANY MORE, AND THE ABSENCE IS THE POINT -- #846, 2026-09-08.

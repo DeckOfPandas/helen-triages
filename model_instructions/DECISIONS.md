@@ -2475,6 +2475,38 @@ unless stated.
   candidates artifact carried this and a glass-above alternative; **her pick
   is not yet recorded — write it here when she makes it.**
 
+- **2026-09-10, #886 — what a drink card does under the cursor.** The issue was
+  a sentence with no body: *"do something more attractive with cocktail cards on
+  mouseover."* The card had one hover state and it was two 3px strips bracketing
+  the glass column (2026-09-02), which is the smallest possible answer to *"you
+  can touch this"* on the biggest object the index has. Three treatments went on
+  the real index behind `html[data-hover]`, each obeying §9.13's rule that colour
+  moves and geometry does not, and each a HUE move rather than a lightness one
+  (§12: at this type size the eye reads hue, and four of this site's hover states
+  had already been caught as lightness-only no-ops):
+  - **A, the edge and the words.** The strips grow into the card's whole magenta
+    border; the drink's name takes magenta wherever on the card the cursor is,
+    rather than only off its own letters; and both rows of separator dot — the
+    ingredient line's `·` and the chip row's — come up from their greys to
+    absinthe, which is the glass drawing's own colour reaching the words.
+  - **B, the glass answers.** One declaration, because the artwork strokes with
+    `currentColor`: the whole drawing moves absinthe → magenta and nothing else
+    changes. The largest piece of colour on a card, and the loudest of the three.
+  - **C, the field lifts.** The card stops receding — its field goes to
+    `$color-wicked-woowoo-wash` — which is the one candidate that overturns the
+    inversion's *"a card is a darker field cut into a lighter one"*. It is also
+    the only one with a coupling to keep in step: `.drink-card-ship`'s mask is
+    the card's own `$color-surface`, and a lifted card leaves the verdict sitting
+    on a rectangle of the old colour unless the mask follows.
+  **A shipped on the branch, and the other two are one class swap away.** Keyboard
+  gets the identical state through `.drink-card:has(:focus-visible)`, written as
+  a SEPARATE rule and never in a comma list with `:hover`: `:has()` is not
+  forgiving, so a browser that does not know it drops every selector beside it —
+  which would take the hover down too. `:focus-within` was rejected for firing on
+  a mouse click, which would leave a card lit after the cursor had gone. Nothing
+  at rest changed, so a phone is exactly where it was. **Her pick is not yet
+  recorded — write it here when she makes it.**
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
