@@ -111,7 +111,9 @@ published: false
         <li class="rum-cat rum-cat--head" aria-hidden="true">
           <span class="rum-cat-name">category</span>
           <span class="rum-cat-card">on a card</span>
-          <span class="rum-cat-bottles">what I&rsquo;d reach for</span>
+          {% comment %} "examples", Helen's word, 2026-09-10 (#888); it was
+             "what I'd reach for", one of #784's placeholders. {% endcomment %}
+          <span class="rum-cat-bottles">examples</span>
         </li>
 
         {% for style in group.styles %}
@@ -167,9 +169,11 @@ published: false
           {% else %}
           <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
           {% endif %}
-          {% if ing.family_less[style] %}
-          <p class="rum-cat-note">{{ ing.family_less[style] }}</p>
-          {% endif %}
+          {% comment %} The `family_less` note (Ceylon arrack's reason for
+             having no family) rendered here until 2026-09-10 -- Helen: "delete
+             whole note on arrack on rum page" (#889). The reason stays in the
+             data, where the ingest reads it; the page is a list of what is in
+             the house, not why. {% endcomment %}
         </li>
       {% endfor %}
     </ul>
@@ -199,10 +203,8 @@ published: false
     <section class="ref-block ref-block--sipping">
     <h2 class="ref-section-heading" id="sipping"><span>Sipping</span></h2>
 
-    {% comment %} PLACEHOLDER COPY — see the header comment. {% endcomment %}
-    <p class="ref-note">Not a rule about what goes in a drink. Just what is on
-      the shelf.</p>
-
+    {% comment %} No subtitle -- Helen, 2026-09-10 (#890): "delete subtitle
+       under 'sipping'". The list is the section. {% endcomment %}
     <ul class="rum-sipping">
       {% for b in site.data.cocktails.bottles.sipping %}<li class="rum-sip">{{ b }}</li>{% endfor %}
     </ul>
@@ -218,10 +220,8 @@ published: false
     {% endcomment %}
     <h2 class="ref-section-heading" id="characters"><span>Characters</span></h2>
 
-    {% comment %} PLACEHOLDER COPY — see the header comment. {% endcomment %}
-    <p class="ref-note">Not categories. A character rides alongside a real
-      category and never stands in for one.</p>
-
+    {% comment %} No subtitle -- Helen, 2026-09-10 (#891): "delete subtitle
+       under 'characters'". {% endcomment %}
     <ul class="rum-chars">
       {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
     </ul>
@@ -245,10 +245,22 @@ published: false
     {% endcomment %}
     <h2 class="ref-section-heading" id="not-categories"><span>Not categories</span></h2>
 
-    {% comment %} PLACEHOLDER COPY — see the header comment. {% endcomment %}
-    <p class="ref-note">Words other people&rsquo;s recipes use for a rum. None
-      of them names a category here.</p>
-
+    {% comment %} THE REASONS ARE OFF THE PAGE, 2026-09-10 (#784). They were
+       `retired_rum_styles`' own text, written for the next Claude -- issue
+       numbers, YAML keys, Helen in the third person -- and rendered in full at
+       her instruction until she could copyedit. Her ruling instead: "my main
+       wish is to get rid of most of the copy, to be honest! I just need to
+       write a line or two under each rum label we aren't using." So the word
+       comes from `retired_rum_styles` as before (the case split below is
+       `test_retired_rum_style_keys_split_by_case`'s: lowercase is a word a
+       recipe asks for, capitalised a retired brand-generic and hidden), and
+       the line under it comes from _data/cocktails/rum_page.yml, which holds
+       nothing but her lines -- one key per word, empty until she writes it,
+       and an empty one renders nothing rather than a placeholder. The
+       ingest-facing reasons stay in ingredients.yml untouched. The
+       placeholder intro this section had ("Words other people's recipes use
+       for a rum...") went with them. {% endcomment %}
+    {% assign copy = site.data.cocktails.rum_page.retired_words %}
     <dl class="rum-retired">
       {% for pair in ing.retired_rum_styles %}
         {% assign word = pair[0] %}
@@ -256,7 +268,10 @@ published: false
         {% assign initial_lower = initial | downcase %}
         {% if initial == initial_lower %}
         <dt class="rum-retired-word">{{ word }}</dt>
-        <dd class="rum-retired-why">{{ pair[1] }}</dd>
+        {% assign line = copy[word] %}
+        {% if line and line != "" %}
+        <dd class="rum-retired-why">{{ line }}</dd>
+        {% endif %}
         {% endif %}
       {% endfor %}
     </dl>
