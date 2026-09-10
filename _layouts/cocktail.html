@@ -505,7 +505,10 @@ layout: default
        a list of amounts, and say nothing at all to someone who has not looked
        at the list yet, which is correct — this control is meaningless without
        it. `aria-label` carries the sentence for a screen reader, where the
-       visual context the `×` leans on is not available.
+       visual context the `×` leans on is not available. THE TWO STEP BUTTONS
+       ADDED FOR #731 KEEP THIS RULE: `−` and `+` are glyphs, not "fewer" and
+       "more" spelled out, and their own `aria-label`s carry the words instead —
+       see the comment beside them, below.
 
        THE TARGET-ML BOX IS GONE — #720, #721. It let you type a total and
        worked the ratios backwards, and Helen: "it's just baffling. Typing some
@@ -682,6 +685,24 @@ layout: default
       {% endfor %}
     </ul>
     <div class="cocktail-scale-controls" hidden>
+      {% comment %} THE TWO STEP BUTTONS — #731, Helen's sketch: "-  [1] x  +".
+         SHIPPED IN THE SAME `hidden` WRAPPER AS THE BOX, so they appear and
+         disappear with it in one script pass (`control.hidden = false` in
+         cocktail-scale.js) rather than needing a second reveal to keep in step.
+
+         REAL GLYPHS, NOT LETTERS OR WORDS, same rule as the `×` mark below: a
+         hyphen is too short and sits too high for a minus, so this is U+2212
+         MINUS SIGN, not `-`. The control stays wordless — Helen's brief for
+         the box itself was "no other text at all", and a button that spelled
+         out "fewer" or "more" would be the target-ml box's five words of
+         furniture again, just split two ways.
+
+         EACH CLICK GOES THROUGH `apply()`, THE SAME FUNCTION A TYPED VALUE
+         REACHES — cocktail-scale.js wires `click` to `apply(last ± 1)`, never
+         to writing the box directly, so the floor rule and the ×1 minimum are
+         the same code whether the number arrived by keystroke or by click, and
+         a refusal shows the same note either way. {% endcomment %}
+      <button type="button" class="cocktail-scale-step cocktail-scale-minus" aria-label="one fewer">−</button>
       <label class="cocktail-scale">
         {% comment %} WHOLE RECIPES ONLY, since 2026-09-05 — Helen: "logically I
            think we can solve the rounding/ratio issue by only allowing integer
@@ -704,6 +725,7 @@ layout: default
            "2 multiplication sign" gains nothing. {% endcomment %}
         <span class="cocktail-scale-mark" aria-hidden="true">×</span>
       </label>
+      <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
     </div>
     {% comment %} The floor message, empty and hidden until a refusal fills it —
        "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
