@@ -1,6 +1,6 @@
 ---
 title: "L'Isle Martinique"
-tagline: "Breezy, unbothered."
+tagline: "On first-name terms with every tiki drink."
 glass:
   - "coupe"
 garnish:
@@ -32,5 +32,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
