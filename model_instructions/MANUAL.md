@@ -2978,19 +2978,24 @@ the test to apply to any second page here.
 **Every string on it is a lookup, EXCEPT HELEN'S OWN PROSE, which is new since
 2026-09-10.** Categories are `rum_styles`; the short names are `card_names`; the
 bottles are the `bottles.yml` entries whose `generic` is that category; the
-retired words are `retired_rum_styles` and the line under each is
-`rum_page.yml`. Nothing on the page restates a fact the data holds — which is
+retired words are `retired_rum_styles` and **nothing renders under them**.
+Nothing on the page restates a fact the data holds — which is
 the failure #314's own closing comment fell into three times over, a rule
 written once as a list and going stale with nothing looking.
 
-**Three things that sentence used to name are gone, all on 2026-09-10.** The
+**Four things that sentence used to name are gone, all on 2026-09-10.** The
 retired words' REASONS came off the page (#784 — they were written for the next
 Claude, citing issue numbers); Ceylon arrack's `family_less` note came off
-(#889) and Helen's own sentence says it instead; and **the sipping shelf is
-deleted outright, page and data both** — she was asked whether the ten names
-should survive in `bottles.yml` with no reader and said "delete sipping entirely
-please", so `bottles.yml` has no `sipping` block. It is in git history if it is
-ever wanted back.
+(#889) and Helen's own sentence says it instead; **the sipping shelf is deleted
+outright, page and data both** — she was asked whether the ten names should
+survive in `bottles.yml` with no reader and said "delete sipping entirely
+please"; and **`_data/cocktails/rum_page.yml` is deleted too**. That file was
+built the same day to hold a reader-facing line under each retired word, seven
+empty keys waiting for her. Asked for them: *"I decided not to give silly rum
+words the dignity of extra copy. I want the list, bare, so please delete
+unneeded scaffolding."* The `<dl>` became a `<ul>` with it — a definition list
+whose definitions can never exist is a promise the markup cannot keep. All of it
+is in git history if it is ever wanted back.
 
 **The page carries Helen's voice now**, not just her data: a title, four opening
 paragraphs, a numbered list, two citations and the Characters preamble are all

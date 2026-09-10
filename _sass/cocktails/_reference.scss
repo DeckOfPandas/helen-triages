@@ -64,8 +64,8 @@ $ref-col-card:    minmax(6rem, 9rem);
 // THE MEASURE IS THE ONE THING THAT WAS WRONG WITH WHAT SHE WROTE. Unclassed
 // `<p>`s ran the full width of the window — her longest paragraph is 340
 // characters, which at desktop width is a single line you lose your place in.
-// 34rem is the cap `.ref-intro`, `.ref-note` and `.rum-retired-why` already use,
-// so this introduces no new number.
+// 34rem is the cap `.ref-intro` and `.ref-note` already use, so this introduces
+// no new number. (`.rum-retired-why` used it too and is gone -- see below.)
 .ref-prose {
   color: $color-text;
   max-width: 34rem;
@@ -380,16 +380,21 @@ $ref-list-gutter: 1.3rem;
 // it. The word sits above rather than beside because the line under it is a
 // sentence, not a label.
 //
-// WHERE THE LINE COMES FROM CHANGED ON 2026-09-10 and this comment said the old
-// thing: it used to read "The reasons are Helen's own, from `retired_rum_styles`,
-// and they are long — a couple of sentences each". Both halves are now wrong.
-// #784 took those reasons off the page — they were written for the next Claude,
-// citing issue numbers and YAML keys — and the line now comes from
-// `_data/cocktails/rum_page.yml`, one key per word, which Helen fills in. An
-// empty one renders no `<dd>` at all, so the word stands alone rather than
-// wearing a placeholder.
+// NOTHING GOES UNDER THE WORD, AND THE MARKUP SAYS SO NOW. This was a `<dl>`
+// with a `.rum-retired-why` `<dd>`, through two rulings on the same day. #784
+// took `retired_rum_styles`' reasons off the page (they were written for the
+// next Claude) and moved the reader's line to `_data/cocktails/rum_page.yml`,
+// one empty key per word. Then Helen decided against writing them at all: "I
+// decided not to give silly rum words the dignity of extra copy. I want the
+// list, bare, so please delete unneeded scaffolding."
+//
+// So the file is gone, the `<dd>` rule with it, and the `<dl>` is a `<ul>`: a
+// definition list whose definitions can never exist is a promise the markup
+// cannot keep.
 .rum-retired {
+  list-style: none;
   margin: $space-md 0 0;
+  padding: 0;
 }
 
 .rum-retired-word {
@@ -398,30 +403,10 @@ $ref-list-gutter: 1.3rem;
   margin-top: $space-lg;
 }
 
-.rum-retired-why {
-  margin: $space-xxs 0 0;
-  color: $color-clear-text;
-  max-width: 34rem;
-}
-
-// =============================================================================
-// SIPPING — #782
-// =============================================================================
-// NO LEFT-HAND COLUMN, because these are bottles rather than categories and
-// they have no `generic` at all (see `sipping` in bottles.yml, and Helen's
-// 2026-09-06 call about the aged Barbadians). Giving them the row shape would
-// draw two empty tracks and imply the categories are merely missing.
-//
-// WOOWOO LIKE EVERY OTHER BOTTLE NAME ON THE PAGE — the colour tracks the KIND
-// of string, not the section it is in, which is the whole reason the page
-// spends exactly one hue.
-.rum-sipping {
-  list-style: none;
-  margin: $space-md 0 0;
-  padding: 0;
-  color: $color-wicked-woowoo-deep;
-  line-height: 1.45;
-}
+// `.rum-sipping` WAS HERE AND IS GONE, 2026-09-10. It styled the Sipping
+// shelf's list of bottle names. Helen deleted the section from the page and
+// then the `sipping:` block from bottles.yml -- "delete sipping entirely
+// please" -- so nothing emits the class and nothing can.
 
 // =============================================================================
 // NARROW

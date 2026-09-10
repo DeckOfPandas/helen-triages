@@ -3547,3 +3547,36 @@ verification. Dates are when the correction landed.
   reach for", the arrack note and both subtitles deleted. **Nice-to-have, not
   shipping**: *"no more until design isn't noticeably odd"*, her words, so the
   page stays unpublished. #813 (agricole rows by country) waits on #591.
+- **2026-09-10, #784 — AND THEN THERE WERE NO LINES AT ALL. The entry above
+  describes a mechanism that lasted a few hours.** `rum_page.yml` was built to
+  hold "a line or two under each rum label we aren't using", seven empty keys
+  in her gift. Asked to fill them, she ruled the other way:
+
+  > *"I decided not to give silly rum words the dignity of extra copy. I want
+  > the list, bare, so please delete unneeded scaffolding."*
+
+  So the file is deleted, the lookup that read it is gone, and the `<dl>` is a
+  `<ul>` — **a definition list whose definitions can never exist is a promise
+  the markup cannot keep.** The reasons stay in `retired_rum_styles` for the
+  ingest, which is what they were always for.
+
+  **THE PATTERN IS WORTH MORE THAN THE RULING, AND IT HAS NOW HAPPENED THREE
+  TIMES ON ONE PAGE IN ONE DAY.** The subtitles (#890, #891), the arrack note
+  (#889) and now these seven lines were each built as a slot for Helen's words,
+  and each time the answer was that no words were wanted there. Her own summary
+  was on the board the whole time — *"my main wish is to get rid of most of the
+  copy, to be honest!"* — and it was read as "replace the agent's copy with
+  hers" when it also meant "there should be less of it".
+
+  **So an empty slot is not neutral.** It reads as a promise that something goes
+  there, it makes the page look unfinished until someone fills it, and it puts a
+  writing task on Helen that she never asked for. §13.12 says an agent ships a
+  placeholder and never a sentence; this is the other half of that rule —
+  **before building a slot, ask whether the thing wants saying at all.** The
+  cheapest version of that question is showing her the page WITHOUT it first.
+
+  Two dead CSS rules went with the two deletions (`.rum-retired-why`,
+  `.rum-sipping`), and `.rum-cat-note` had already gone the same way earlier in
+  the day. Three rules in one file styling markup nothing emitted, all within
+  hours, is what a page being actively cut down looks like — worth sweeping at
+  the end of such a pass rather than one at a time.

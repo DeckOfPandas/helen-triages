@@ -53,13 +53,16 @@ published: false
   citation, the Ceylon arrack line, the two Characters paragraphs and all three
   top-level headings. What an agent changed in them is listed at each site and
   amounts to: a class, an indent, one `<h1 <span>` that was malformed, and the
-  typo "isn't a strictly a rum". Her straight quotes and her "--" stand: no page
-  on this site uses curly quotes or an em dash in prose.
+  typo "isn't a strictly a rum". HER STRAIGHT QUOTES STAND AND HER "--" DID NOT:
+  no page on this site uses curly quotes, but `test_prose_page_typography`
+  requires an em dash, and an earlier version of this comment asserted both from
+  having checked only the first.
 
-  WHAT IS STILL A PLACEHOLDER, AND IT IS A SHORT LIST NOW: the three column
-  headings ("category", "on a card" — "examples" is hers, #888), "none in the
-  house", and the seven per-word lines in `_data/cocktails/rum_page.yml`, which
-  are empty and render nothing until she writes them. Tracked at #784, #921.
+  WHAT IS STILL A PLACEHOLDER, AND IT IS TWO THINGS: the column headings
+  "category" and "on a card" ("examples" is hers, #888), and "none in the
+  house". Tracked at #784, #921. The per-word lines under the retired words are
+  NOT on that list any more — see the "Not categories" section below; she ruled
+  against having any.
 
   THE SIPPING SHELF IS GONE, PAGE AND DATA BOTH, 2026-09-10. Helen deleted the
   section from this page herself, was asked whether the ten bottle names should
@@ -284,27 +287,34 @@ published: false
        comes from `retired_rum_styles` as before (the case split below is
        `test_retired_rum_style_keys_split_by_case`'s: lowercase is a word a
        recipe asks for, capitalised a retired brand-generic and hidden), and
-       the line under it comes from _data/cocktails/rum_page.yml, which holds
-       nothing but her lines -- one key per word, empty until she writes it,
-       and an empty one renders nothing rather than a placeholder. The
-       ingest-facing reasons stay in ingredients.yml untouched. The
-       placeholder intro this section had ("Words other people's recipes use
-       for a rum...") went with them. {% endcomment %}
-    {% assign copy = site.data.cocktails.rum_page.retired_words %}
-    <dl class="rum-retired">
+       and NOTHING GOES UNDER THE WORD AT ALL. That is the second half of the
+       ruling and it arrived later the same day. The first half built
+       `_data/cocktails/rum_page.yml`, seven empty keys waiting for the "line or
+       two" she meant to write. Asked for them, she said: "I decided not to give
+       silly rum words the dignity of extra copy. I want the list, bare, so
+       please delete unneeded scaffolding." So the file is gone, and so is the
+       lookup that read it.
+
+       A `<ul>`, NOT THE `<dl>` THIS WAS. A definition list whose definitions can
+       never exist is a promise the markup cannot keep -- it was right while the
+       lines were coming and became wrong the moment they were not. The words are
+       a list of words now, and that is all they are.
+
+       The case split is `test_retired_rum_style_keys_split_by_case`'s:
+       lowercase is a word a recipe asks for, capitalised is a retired
+       brand-generic and stays hidden. The ingest-facing reasons stay in
+       ingredients.yml untouched -- they were always the ingester's half, and
+       this section was always the reader's. {% endcomment %}
+    <ul class="rum-retired">
       {% for pair in ing.retired_rum_styles %}
         {% assign word = pair[0] %}
         {% assign initial = word | slice: 0 %}
         {% assign initial_lower = initial | downcase %}
         {% if initial == initial_lower %}
-        <dt class="rum-retired-word">{{ word }}</dt>
-        {% assign line = copy[word] %}
-        {% if line and line != "" %}
-        <dd class="rum-retired-why">{{ line }}</dd>
-        {% endif %}
+        <li class="rum-retired-word">{{ word }}</li>
         {% endif %}
       {% endfor %}
-    </dl>
+    </ul>
     </section>
 
   </div>
