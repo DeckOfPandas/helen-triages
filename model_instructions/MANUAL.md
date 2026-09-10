@@ -1028,6 +1028,20 @@ so it reaches the private remote from anywhere:
 
     git clone git@github.com:DeckOfPandas/helen-triages-cocktails-private.git _cocktail_drafts
 
+**Inside the devcontainer that form dies** (`Host key verification failed`,
+no host key in the image — `CLAUDE.md` Git workflow step 1a), so clone over
+HTTPS as the agent account, through the wrapper that keeps the token's name
+out of the call site:
+
+    sh scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts
+
+Two things about the nested clone from there. `scripts/git-push-agent.sh`
+pushes the CWD's repo, so a branch of the nested clone is pushed by the same
+URL shape with `git -C _cocktail_drafts push ...` in a `tmp/` script (a leading
+`cd` is refused). And **`git -C <dir> commit -F <path>` resolves the path
+relative to `<dir>`**, so `-F tmp/msg.txt` fails with "could not read log
+file"; pass the absolute path. Both measured 2026-09-10.
+
 A worktree starts blind, and `tests/test_cocktails.py` skips the tests that
 read a drink, reporting green. A symlink half-works (the Edit/Write tools
 refuse it and writes land in Helen's tree); a copy goes stale silently. **Clone
@@ -2258,6 +2272,17 @@ never `gh pr close --delete-branch` (403).
 **A worktree has no `gh`** (§1), so the PR is opened through the REST API,
 `POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
 Measured 201 on 2026-09-07.
+
+**`pr edit` DOES NOT WORK ON THIS TOKEN, even where `gh` exists.** It goes
+through GraphQL, which wants `read:org` for fields the classic `repo` scope
+does not cover, and fails before touching the PR. `pr create`, `pr view`,
+`pr comment` and the `issue` subcommands are REST and fine. To change a PR's
+body or title, patch it over REST through the wrapper:
+
+    sh scripts/gh-agent.sh api -X PATCH repos/DeckOfPandas/helen-triages/pulls/932 -F body=@tmp/pr-body.md
+
+Measured 2026-09-10 (#932). Not a scope to ask for: "never broaden access"
+holds, and the REST form needs nothing the token lacks.
 
 **AND SINCE 2026-09-09, ALL THREE REPOS.** This section used to read "AND ONLY
 THAT REPO": the same call against either private repo returned 422 `not all
