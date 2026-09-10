@@ -1422,7 +1422,18 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # it is a change so small she could see all of it in the sentence that asked for
 # it. The grant is still hers and still explicit, which is the only thing that
 # has to stay true. Covers 832c726 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "832c726"   # the Elemakule apostrophe, 2 live drinks, 2026-09-10
+# MOVED A FIFTH TIME, 2026-09-10, AND THIS ONE IS THE RULE WORKING END TO END.
+# `1e8b7d0` gave four live drinks (Accoutrement, Aperol Spritz, the Bellini,
+# L'Isle Martinique) the taglines Helen wrote that day and flipped all four to
+# `proofread: false` in the same commit, as #367 requires; they would have left
+# the live site on merge. She read the four built pages BEFORE the merge, on the
+# branch, and granted the exception in so many words: "I've checked those four
+# live drinks, and they're perfect. Please flip their proofread flags back to
+# true and push for me." `39240e8` flips them back. So the sequence the rule
+# describes happened in full -- agent edit, flag off, her read, her word, flag
+# on -- and the only thing this line records is that the last step was hers.
+# Covers 39240e8 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "39240e8"   # four taglines re-proofread, 2026-09-10
 
 
 def _newest_commit_per_published_drink():
