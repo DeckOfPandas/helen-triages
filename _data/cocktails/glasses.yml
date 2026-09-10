@@ -82,6 +82,15 @@ icons:
   wine: wine
   pilsner: pilsner
   sling: sling
+  # A SEVENTH, 2026-09-09, AND THE SAME SHAPE AS `martini` AND `wine` ABOVE --
+  # the artwork existed all along and simply had no key. Helen moved the classic
+  # Margarita off `old fashioned` proofreading, and the drink rendered NO ICON,
+  # silently, exactly as the six did. `margarita.svg` is in
+  # `_includes/icons/glasses/`, `heights_mm` already carries 175 and `all_icons`
+  # already lists it -- so this glass was three-quarters declared and only the
+  # lookup was missing. That is why the test asserts the map and the directory
+  # agree in BOTH directions: half a declaration reads exactly like none.
+  margarita: margarita
 
   # --- icons added 2026-08-17, ahead of any drink asking for them -------------
   # Spec, not inventory -- the same principle as declaring Plymouth and Genever
@@ -357,6 +366,9 @@ serving:
   flute: "a flute"
   highball: "a highball"
   hurricane: "a hurricane glass"
+  # WITH ITS ARTICLE, like every phrase here -- the layout drops this straight
+  # into "Strain into ___." and a bare noun would read as a telegram.
+  margarita: "a margarita glass"
   martini: "a martini glass"
   martini glass: "a martini glass"
   mug: "a mug"

@@ -494,6 +494,14 @@ bottles:
     size_ml: 700
     gbp: 18
     confidence: medium
+  # NEW 2026-09-09 with the bottle. Priced from its siblings above rather than
+  # from a shop: Briottet's crèmes sit together on a shelf and the Pêche and
+  # d'Abricot are both GBP 18. `medium` means exactly that -- within about 20%
+  # for the category. Hers to correct.
+  "Briottet Crème de Cerise":
+    size_ml: 700
+    gbp: 18
+    confidence: medium
   "Briottet Crème de Violette":
     size_ml: 700
     gbp: 20

@@ -1315,7 +1315,36 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # first ("how many drinks is this rule currently holding at proofread: false?"),
 # and never to make a red test green. Once drinks are actually promoted this
 # stops being a formality.
-COCKTAIL_BASELINE_COMMIT = "2381444"   # tip of origin/main, 2026-09-02
+# MOVED ONCE, 2026-09-09, TO THE PROMOTION ITSELF -- and this is the case the
+# paragraph above meant by "once drinks are actually promoted this stops being a
+# formality". Read this before moving it again, because the rule is otherwise
+# "never to make a red test green" and that is exactly what this looks like.
+#
+# WHAT HAPPENED. Helen proofread 19 drinks and asked for them to be moved into
+# the public repo: "please move all proofread: true files into the public repo.
+# If you do this then I don't have to fish through one by one to find out which
+# I still need to proofread." The promotion is a COPY -- byte-identical,
+# asserted rather than assumed -- so the content of every one of those files is
+# exactly what she read and approved.
+#
+# BUT THE COMMIT THAT ADDS THEM IS AN AGENT'S, and this test reads the public
+# repo's history only (#624: a public test must never require private drink
+# data). So it cannot tell a promotion from an edit: from here, 19 drinks
+# marked `proofread: true` appeared in an agent commit, which is precisely the
+# shape the test exists to catch. The blind spot is deliberate and the baseline
+# is the documented lever for it -- MANUAL §4.0's exception, "if she has
+# reviewed the change herself then she was the last judgement even though an
+# agent's commit wrote the bytes".
+#
+# IT GRANDFATHERS NOTHING GOING FORWARD, which is why this is safe. The check
+# skips a commit only if it is an ANCESTOR of this SHA, so every commit after
+# the promotion is examined exactly as before. Edit one of these 19 drinks
+# tomorrow without setting `proofread: false` and this test fires.
+#
+# THE NEXT TIME IT SHOULD MOVE is another promotion of drinks Helen has read.
+# It should NOT move because an ordinary edit went red -- that is the failure
+# it is for, and the fix there is the flag.
+COCKTAIL_BASELINE_COMMIT = "5c7ecad"   # the first promotion, 2026-09-09
 
 
 def _newest_commit_per_published_drink():
