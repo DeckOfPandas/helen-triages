@@ -1,54 +1,40 @@
 #!/bin/sh
 # Git credential helper for AGENT_GH_TOKEN.
 #
-# WHY THIS EXISTS. CLAUDE.md's documented pattern for pushing/cloning a
-# private repo in the devcontainer was to build the URL by hand with the
-# token embedded as the userinfo password -- `scheme, then the account name,
-# a colon, the token, an @, then github.com`. That works, but git then
-# stores the resulting URL -- token included -- in
-# the repo's own `.git/config` as the `origin` remote. Every later command
-# that surfaces a remote URL (`git remote -v`, `git remote show`, `git config
-# -l`, `cat .git/config`, some git error messages) then prints the token in
-# plain text. Measured 2026-09-10: a routine `git remote -v`, run for an
-# unrelated reason (MANUAL §2.1 asks you to check which remote a clone points
-# at), printed the token straight into a transcript.
+# WHY THIS EXISTS. CLAUDE.md's documented pattern for pushing and cloning a
+# private repo in the devcontainer used to be a URL built by hand with the
+# token as the userinfo password. That works, but git stores a CLONE's URL --
+# token included -- in the repo's own `.git/config` as the `origin` remote, and
+# every later command that surfaces a remote URL (`git remote -v`, `git remote
+# show`, `git config -l`, `cat .git/config`, some git error messages) then
+# prints the token in plain text. Measured 2026-09-10: a routine `git remote
+# -v`, run for an unrelated reason (MANUAL §2.1 asks you to check which remote
+# a clone points at), printed the token straight into a transcript.
 #
-# This is the fix: a git credential helper. Configure it PER REPO (never
-# globally -- CLAUDE.md forbids touching anything outside this project).
-# MIND THE PATH: git runs a repo's configured helper with its cwd at THAT
-# repo's own top level, not this project's root, so the path is one level up
-# from inside a nested drafts repo:
+# This is the fix: a git credential helper. Git calls it at the moment it
+# needs to authenticate; the token is read from the environment right here and
+# handed to git over a pipe. It is never written into a URL, never written
+# into `.git/config`, and so never something a later, unrelated command can
+# print by accident. Same principle CLAUDE.md already applies to `gh`
+# (scripts/gh-agent.sh): read the secret from the environment at the point of
+# use, and keep its name out of every call site.
 #
-#     git -C <drafts-repo> config credential.helper \
-#         '!sh ../scripts/git-credential-agent-token.sh'
-#
-# Clone and push then use a PLAIN url with no embedded credential --
-# `https://github.com/OWNER/REPO.git` -- and git calls this helper at the
-# moment it needs to authenticate. The token is read from the environment
-# right here and handed to git over a pipe; it is never written into a URL,
-# never written into `.git/config`, and so never something a later, unrelated
-# command can print by accident. Same principle CLAUDE.md already applies to
-# `gh` (`scripts/gh-agent.sh`): read the secret from the environment at the
-# point of use, and keep its name out of every call site.
-#
-# For the FIRST clone of a repo that doesn't exist locally yet, there is
-# nothing to configure the helper ON, so pass it for that one invocation with
-# `-c` instead (this does not persist anywhere). Run from this project's own
-# root, same as every other command, so the path has no `../`:
-#
-#     git -c credential.helper='!sh scripts/git-credential-agent-token.sh' \
-#         clone https://github.com/OWNER/REPO.git DEST
-#
-# Then configure it in the new clone with the OTHER form above (`../scripts/
-# ...`, run from inside DEST) so a later `git -C DEST push`/`fetch` picks it
-# up too. Measured both forms 2026-09-10, cloning and fetching
-# helen-triages-food-private -- the wrong path (`scripts/...` from inside the
-# nested repo) fails with "cannot open ... No such file", not a silent
-# no-op, so a mixed-up path is at least loud.
+# YOU DO NOT CALL THIS, AND YOU DO NOT `git config` IT. The three git wrappers
+# -- scripts/git-clone-agent.sh, git-fetch-agent.sh and git-push-agent.sh --
+# pass it to git for one invocation each, with `-c credential.helper=...` and
+# an absolute path resolved from their own location, against a PLAIN url.
+# That is the whole interface. The first version of this file said to
+# configure it per repo with `git config credential.helper`, and the session
+# that wrote it did so in the shared /workspace/.git/config, which every
+# worktree reads: git then ran a relative path from each worktree's own top
+# level, the file existed on one branch only, and every push from every other
+# worktree printed "sh: 0: cannot open scripts/git-credential-agent-token.sh"
+# -- harmless while the token was still in the URL, a hard failure the moment
+# it wasn't. Per invocation depends on nothing but the checkout the wrapper is
+# run from.
 #
 # Needs no execute bit -- CLAUDE.md forbids chmod without asking, and this is
-# invoked as `sh scripts/git-credential-agent-token.sh`, same as every other
-# script in this repo.
+# invoked as `sh <path>` by the wrappers, same as every other script here.
 #
 # Only answers `get`. `store`/`erase` are git offering to cache what it just
 # used; saying nothing back means nothing is ever written down, which is the
