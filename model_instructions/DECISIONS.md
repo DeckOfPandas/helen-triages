@@ -3112,6 +3112,55 @@ verification. Dates are when the correction landed.
   convenience, the question is not "what do I want to stop prompting" but
   "what was that prompt the last guard of".**
 
+- **2026-09-10 — CLOSING ONE HOLE OPENED ANOTHER, IN A DIFFERENT FILE, THE SAME
+  DAY.** `guard-unanalyzable-bash.py` refuses a leading `cd`. `CLAUDE.md`
+  documents `cd _food_drafts && git ...` as the way the nested drafts repos are
+  edited. So the new guard left `git -C <path>` as the only route into a nested
+  repo — **and neither git guard could read it.**
+
+  **`guard-main-branch.py`** recognised the form (its comment even says
+  "allowing for global flags like `git -C x commit`") and then resolved the
+  TARGET DIRECTORY from a leading `cd` alone. No `cd`, so it asked the outer
+  worktree which branch it was on, saw a feature branch, and allowed the commit
+  — while the drafts repo sat on `main`. That is the 2026-08-17 failure exactly:
+  four commits straight onto `_cocktail_drafts`' `main`.
+
+  **`guard-destructive-git.py` was worse and in a different way.** Its command
+  pattern was `\bgit\s+(?:-\S+\s+)*`, which allows a FLAG but not the VALUE
+  after it — so in `git -C _food_drafts reset --hard` the `-C ` matched,
+  `_food_drafts` did not, and the whole pattern failed. Every destructive
+  command aimed at a nested repo this way **walked past the hook unrecognised**:
+  not judged and permitted, never looked at. It also ran `git status` in the
+  process's own directory, so even once recognised it would have judged the
+  wrong tree.
+
+  **THE LESSON IS ABOUT GUARDS AS A SET, NOT ABOUT REGEXES.** Each hook was
+  correct when written and stayed correct in isolation. What changed was the
+  behaviour they push you towards: a new guard made the documented form
+  impossible, and the only remaining form was the one two older guards could not
+  read. **A guard that redirects behaviour has to be checked against every guard
+  that reads the same commands** — the question is not "is my rule right" but
+  "what will people do instead, and who is watching that".
+
+  Both are fixed and both were proved by building a throwaway repo in `tmp/`
+  that actually sits on `main` (or actually holds uncommitted work) and asking
+  the hook about it — 11 cases and 7 cases, 0 failing. **The probe found a
+  second bug in the first fix**: `cd a && git -C b` runs in `a/b`, because a
+  `cd` moves the shell and a later `-C` moves git again relative to it. The
+  first fix took the `-C` path alone and resolved it against the worktree root,
+  which reopened the same hole one case to the left. The two compose; they do
+  not compete.
+
+  **And a false positive in the new guard, found by tripping it.** Its
+  quote-stripper did not honour backslash escapes, so
+  `grep -n "PATTERNS\\|re.compile(r\\"x" f.py` — an escaped quote inside a
+  double-quoted pattern — read as an unterminated span, exposed the `|`, and was
+  refused as a pipe. Escapes are honoured now (and deliberately not inside
+  single quotes, where the shell treats a backslash as literal). A guard that
+  refuses a legitimate command is one you learn to route around, which is the
+  failure this repository names in three other hooks and had just committed a
+  fourth time.
+
 ---
 
 - 2026-09-10: "There is no `gh` at all in a worktree" (§1) was true of a
