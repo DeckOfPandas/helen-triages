@@ -913,6 +913,22 @@ unless stated.
   Clone.
 - **2026-09-06** — §9.1 had said "ask Helen every time" for a private push, a
   week after `CLAUDE.md` changed.
+- **2026-09-10** — `CLAUDE.md`'s own documented pattern for cloning/pushing in
+  the devcontainer (build the URL by hand, token embedded) leaked the token: a
+  routine `git remote -v`, run for the reason this section's own 2026-08-29
+  paragraph two above gives, printed it in full, because git had stored the
+  token-bearing URL as the clone's `origin` remote. Fix is
+  `scripts/git-credential-agent-token.sh`, a per-repo git credential helper
+  that reads `AGENT_GH_TOKEN` from the environment at the moment git asks for
+  it and never writes it to a URL or to `.git/config`; §9.1 above now
+  documents the HTTPS-clone paragraph. `.claude/hooks/guard-token-expansion.py`
+  was widened the same day to refuse the old embedded-URL shape outright, and
+  to also scan the content of any script file a command runs (not just the
+  command line itself) for that shape or for a literal token string, closing
+  the gap where the risky text was moved into a `tmp/` script specifically to
+  get past a different guard's complaint about the command line. Not the
+  first time this file's own §12 has that shape of lesson, and won't be the
+  last: a written rule survives exactly as long as nothing enforces it.
 
 ### §9.1.1 The drinks publication gate
 

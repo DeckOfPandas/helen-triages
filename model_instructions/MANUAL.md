@@ -247,7 +247,14 @@ never shows it and `git add` here cannot capture it. It is a separate, private
 history. Do not "fix" the missing tracking and do not report draft edits as
 at-risk work in this repo. `git remote -v` in `_food_drafts/` tells you which
 remote a clone points at (the food repo was renamed on 2026-08-29 and GitHub
-redirects the old name silently).
+redirects the old name silently). **This exact command printed
+`AGENT_GH_TOKEN` in full on 2026-09-10**, on a clone whose remote had the
+token built into the URL by hand — see §9.1's HTTPS clone paragraph. It is
+safe to run again now that clones use the credential helper instead, and
+`.claude/hooks/guard-token-expansion.py` refuses the old shape outright, but
+if a `git remote -v` on any repo ever again shows `:` and `@` around
+something that isn't a plain username, stop and say so before running it a
+second time.
 
 ### 2.2 Shared versus forked
 
@@ -1034,6 +1041,31 @@ refuse it and writes land in Helen's tree); a copy goes stale silently. **Clone
 freely to READ; while a promotion batch is open there is ONE working copy to
 WRITE** — `PUBLISHING_A_DRINK.md`. The food repo is
 `helen-triages-food-private`, same command.
+
+**WHERE SSH ISN'T THERE — the devcontainer per `CLAUDE.md`, and measured
+2026-09-10 in a plain host worktree too — the SSH clone above fails with
+`Host key verification failed`.** Use HTTPS with the credential helper
+instead, never a URL with the token built in by hand (see the trap
+immediately below): `git -c credential.helper='!sh
+scripts/git-credential-agent-token.sh' clone
+https://github.com/DeckOfPandas/helen-triages-food-private.git _food_drafts`,
+run from this project's own root. Same command for the cocktails repo,
+swapping the name. Then, so a later `fetch`/`push` in that clone also
+authenticates, configure the helper IN it — mind the `../`, git runs a
+repo's configured helper with its cwd at that repo's own top level:
+`git -C _food_drafts config credential.helper '!sh
+../scripts/git-credential-agent-token.sh'`.
+
+**THE TRAP THIS REPLACES, MEASURED 2026-09-10.** Building the URL by hand
+with the token embedded (`https://user:${AGENT_GH_TOKEN}@github.com/...`)
+also works, but git then stores that URL — token included — as the clone's
+`origin` remote in `.git/config`. Every later command that surfaces a remote
+URL (`git remote -v`, `git remote show`, `git config -l`, `cat
+.git/config`, some git error messages) then prints the token in plain text,
+which is exactly what happened: a routine `git remote -v`, run for the
+reason this section gives below, printed one in full.
+`.claude/hooks/guard-token-expansion.py` now refuses the embedded-URL shape
+outright, in a command or in a script file it runs.
 
 **Always `git fetch` immediately before any run whose result you will act
 on** — before reporting a failure, before calling a change safe, before
