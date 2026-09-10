@@ -559,7 +559,21 @@ from conftest import FRONT_MATTER, DRAFTS_PRESENT, ALL_DRAFTS
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-BASELINE_COMMIT = "86c7919"   # the ganache note, in Helen's words, #874
+# MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
+# HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
+# tarragon salad (agent edit since her last read: two commas, #806) and the
+# raspberry baked cheesecake (her answers applied -- "Butter is salted. golden
+# caster. 3 large eggs." -- plus a group name, an en dash and a longer
+# main_ingredients at her request). `main` was red and deploys blocked: the
+# salad's gate hid a page the roast beef fillet links to, and the cheesecake
+# failed five style tests. Her grant, before the read: "Please just fix all
+# those. Break the rule, explicit permission, and get everything up on the site
+# with proofread=true. Then hand on heart I'll look at them myself to confirm
+# everything is fine." A HELEN_CLEARED entry exempts a recipe FOR EVER, which
+# is more than she granted; the baseline covers ae13155 and nothing after, so
+# the next agent edit to either file trips this test again. The grant is hers,
+# explicit, and quoted, which is the only thing that has to stay true.
+BASELINE_COMMIT = "ae13155"   # the salad and the cheesecake, on Helen's word
 #
 # MOVED 2026-09-10, FOR SEVEN WORDS. #874 dictated the ganache's "how much
 # this makes" note: delete the lead-in, start with "Enough", "for a thick
