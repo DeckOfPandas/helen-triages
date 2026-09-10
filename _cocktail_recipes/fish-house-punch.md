@@ -27,8 +27,9 @@ ingredients:
     suggestion: ["Monin Pure Cane Sugar"]
 method:
   - "Make the tea. Leave to cool completely."
-  - "Shake all the other ingredients with ice, then strain into the tea."
-  - "Pour into ice-filled glasses."
+  - "Shake all ingredients other than the tea with ice."
+  - "Strain into the tea."
+  - "Pour."
 mood:
   - "sharp"
   - "fruity"

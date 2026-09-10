@@ -27,7 +27,7 @@ ingredients:
     generic: "oloroso sherry"
     as: "float"
 method:
-  - "Shake the first seven ingredients with ice."
+  - "Shake all ingredients other than the sherry with ice."
   - "Strain."
   - "Float the sherry on top."
 mood:

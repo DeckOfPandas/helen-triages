@@ -20,7 +20,7 @@ ingredients:
     generic: "maraschino liqueur"
     suggestion: ["Luxardo Maraschino"]
 method:
-  - "Stir all the ingredients with ice."
+  - "Stir all ingredients with ice."
   - "Strain."
 mood:
   - "strong brown drink"

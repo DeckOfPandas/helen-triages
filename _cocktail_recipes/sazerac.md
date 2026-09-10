@@ -34,7 +34,7 @@ ingredients:
     suggestion: ["Angostura"]
 method:
   - "Ice the glass, then rinse with the diluted absinthe."
-  - "Short shake all the other ingredients with ice."
+  - "Short shake the remaining ingredients with three ice cubes."
   - step: "Discard the contents of the glass."
     note: "You don't have to throw this away..."
   - "Strain."

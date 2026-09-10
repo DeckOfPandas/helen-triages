@@ -19,7 +19,7 @@ ingredients:
   - amount: "to top"
     generic: "soda water"
 method:
-  - "Short shake all the ingredients with three ice cubes, other than the soda water."
+  - "Short shake all ingredients other than the soda water with three ice cubes."
   - "Strain."
   - "Top with soda water."
 mood:

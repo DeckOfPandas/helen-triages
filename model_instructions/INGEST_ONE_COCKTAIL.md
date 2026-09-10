@@ -470,25 +470,40 @@ information?** "with ice" versus "over ice" carries none. "other than the
 champagne" carries all of it. So use a canonical string where one fits exactly,
 and write the source's own words where none does.
 
+**A sentence with `<X>` in it is a shape: fill the slot with the ingredient AS
+THE RECIPE NAMES IT and nothing else changes.** "Shake everything except the
+cola with ice" is written `Shake all ingredients other than the cola with ice.`;
+"shake the first four" names the one left out instead. One slot only — a step
+that needs two is free text.
+
 <!-- vocab:method start -->
 **Shake:** `Shake all ingredients with ice.` ·
 `Shake all ingredients hard with ice.` · `Shake with ice.` ·
 `Shake the remaining ingredients with ice.` ·
 `Shake all ingredients other than the champagne with ice.`
 
+**Short shake:** `Short shake all ingredients with three ice cubes.` ·
+`Short shake the remaining ingredients with three ice cubes.` ·
+`Short shake with three ice cubes.`
+
+**Dry shake:** `Dry shake all ingredients.`
+
 **Stir:** `Stir all ingredients with ice.` ·
 `Stir the remaining ingredients with ice.` ·
 `Stir all ingredients other than the champagne with ice.` · `Stir until cold.` ·
-`Stir.`
+`Stir.` · `Stir all ingredients together.`
 
 **Blend and swizzle:** `Blend all ingredients until smooth.` ·
-`Swizzle until the glass frosts.`
+`Swizzle until the glass frosts.` ·
+`Add the bitters then swizzle them into the top.`
 
 **Strain:** `Strain.` · `Double strain.` · `Fine strain.` · `Dump.` · `Pour.`
 
-**Build:** `Add the remaining ingredients.` ·
-`Fill the pitcher half full with ice cubes.` · `Fill with crushed ice.` ·
-`Top with champagne.` · `Top with soda water.` · `Top with more crushed ice.`
+**Build:** `Add all ingredients.` · `Add the remaining ingredients.` ·
+`Fill the pitcher half full with ice cubes.` ·
+`Fill the pitcher three-quarters full with ice cubes.` ·
+`Fill with crushed ice.` · `Top with champagne.` · `Top with soda water.` ·
+`Top with more crushed ice.`
 
 **Rinse and rim:** `Rinse the glass with absinthe and dump.` ·
 `Rinse the glasses with Campari.` ·
@@ -496,6 +511,18 @@ and write the source's own words where none does.
 
 **Express:** `Express the twist over the drink then drop it in.` ·
 `Express the twist over the drink then discard it.`
+
+**With a slot exclusion:**
+`Shake all ingredients other than the <X> with ice.` ·
+`Stir all ingredients other than the <X> with ice.` ·
+`Short shake all ingredients other than the <X> with three ice cubes.` ·
+`Dry shake all ingredients other than the <X>.` ·
+`Add all ingredients other than the <X>.` ·
+`Add the remaining ingredients other than the <X>.`
+
+**With a slot top:** `Top with <X>.`
+
+**With a slot float:** `Float the <X> on top.` · `Drop the <X> on top.`
 <!-- vocab:method end -->
 
 Seven things that will catch you out:

@@ -31,7 +31,7 @@ ingredients:
     suggestion: ["Angostura"]
 method:
   - "Squeeze a lime wedge into a shaker and drop it in."
-  - "Add the remaining ingredients and short shake with three ice cubes."
+  - "Short shake the remaining ingredients with three ice cubes."
   - "Strain."
 to_serve: "Straw. Zero umbrellas. Optional fire if tiki mug."
 mood:

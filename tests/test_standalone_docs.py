@@ -151,7 +151,12 @@ def _declared_garnishes() -> set[str]:
 
 
 def _canonical_steps() -> set[str]:
-    return {s for grp in _data("methods")["canonical"].values() for s in grp}
+    """Every literal under `canonical:` AND every `shapes:` sentence, since
+    2026-09-10 -- the document prints both, `<X>` and all."""
+    methods = _data("methods")
+    literal = {s for grp in methods["canonical"].values() for s in grp}
+    shapes = {s for grp in (methods.get("shapes") or {}).values() for s in grp}
+    return literal | shapes
 
 
 def _glass_icons() -> set[str]:
@@ -517,7 +522,17 @@ def test_every_vocabulary_the_cocktail_doc_prints_is_still_declared():
 
     steps = set(re.findall(r"`([A-Z][^`]*?\.)`", flat))
     assert len(steps) >= 20, f"only found {len(steps)} method steps printed"
-    stale_steps = sorted(s for s in steps if s not in _canonical_steps())
+    # A filled `shapes:` sentence in the prose ("...other than the cola with
+    # ice.") is canonical too -- 2026-09-10; the slot matches one run of text.
+    shape_res = [
+        re.compile("^" + re.escape(h) + r"(.+)" + re.escape(t) + "$")
+        for s in _canonical_steps() if "<X>" in s
+        for h, _, t in [s.partition("<X>")]
+    ]
+    stale_steps = sorted(
+        s for s in steps
+        if s not in _canonical_steps() and not any(rx.match(s) for rx in shape_res)
+    )
     assert not stale_steps, (
         f"document prints method step(s) methods.yml no longer declares: "
         f"{stale_steps}"

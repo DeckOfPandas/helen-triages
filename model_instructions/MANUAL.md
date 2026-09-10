@@ -1719,6 +1719,14 @@ phrasing carry information?** "with ice" versus "over ice" carries none;
 "other than the champagne" carries all of it. The tail is never
 canonicalised.
 
+**A `shapes:` sentence is canonical with one slot filled.** `Shake all
+ingredients other than the <X> with ice.`, `Top with <X>.`, `Float the <X> on
+top.`: the slot takes the ingredient as the recipe names it and nothing else
+varies. A filled shape counts as canonical everywhere a literal does — the
+proposal tests, the preflight, the standalone document. **One slot is the
+ceiling**; a step that needs two is tail. The exclusion tail was what the flat
+list could not hold: six live wordings of "shake all but this one".
+
 **The strain group is five strings** — `Strain.` `Fine strain.` `Double
 strain.` `Dump.` `Pour.` — because the ice has a field now (§9.10a). **A
 vocabulary that keeps growing is usually absorbing a fact that belongs in a

@@ -2016,6 +2016,49 @@ unless stated.
   `martinique-swizzle` was still collins, missed by the 2026-08-26 sweep that
   moved "all four" swizzles, and `mastiha-mojito` lost its second glass.
 
+- **2026-09-10, #894** — **An optional flame can make a drink `on fire`, and
+  the Mai Tai's does not.** Helen: *"Yes in principle, but no for a Mai Tai."*
+  So the derivation is not widened to read `to_serve`, `on fire` stays
+  hand-assigned where the method does not set anything alight, and the Mai
+  Tai's "Optional fire if tiki mug" is a serving note rather than a hassle.
+  Recorded in `taxonomy.yml` beside the mood.
+
+- **2026-09-10, #705 — the second census, and what `canonical:` could not
+  say.** With 48 drinks live: 313 steps across 124 drinks, 119 distinct, and
+  45 of the LIVE strings outside the dictionary. Three patterns were most of
+  it, and only one was a missing group. **Short shake** (six wordings, four
+  live) is a group now, "with three ice cubes" in every form because three
+  cubes is the technique. **The exclusion tail** — "everything except the
+  cola", "first four ingredients", "the first seven", "all the other", "except
+  the bitters", "with three ice cubes, other than the soda water" — was one
+  instruction differing only in WHICH ingredient stays out, which a flat list
+  of literals cannot hold. **So `shapes:` exists**: a canonical sentence with
+  exactly one `<X>`, filled with the ingredient as the recipe names it, and a
+  filled shape is canonical wherever a literal is (`_is_canonical_step`,
+  `test_every_shape_has_exactly_one_slot`, the preflight, the standalone
+  document). One slot is the ceiling on purpose: two is a grammar. **Floats**
+  ("on top" / "on the surface" / "on the top" / bare) went the same way.
+  Helen's answer to "what rules do you want?" was *"If you can't Just Sort
+  This out for me based on what it looks like I want then ask me questions"*
+  — so the rules were derived from the data and put in front of her as
+  `proposals` rows (31, four `QQ`), which is the mechanism she designed for
+  exactly this: delete a row to keep the drink's own words. The literal
+  champagne forms stay declared beside the shape that generalises them; they
+  were first, they are exact, and retiring them is churn with no reader.
+
+  **She pruned nothing and amended two, the same night** (PR #906: *"Rest
+  fine, great, please amend."*): the Martinique Swizzle's build-and-stir is
+  *"Stir all ingredients together."* — *"'Add all ingredients.' doesn't need
+  to be a step on its own. I'd prefer something more concise"* — declared
+  under `stir:`; and Sazerac (Death & Co)'s twist *"can be 'lemon twist
+  (discarded)'"*, so the hand-written squeeze step went and the layout's
+  express step took over. Applied as text edits to 12 live drinks and 16
+  drafts; `proposals` is empty again. **The live drinks kept `proofread:
+  true` on her grant** — asked how she wanted to re-proofread 48 drinks after
+  a methods pass: *"Line by line. I can just grind it out."* — so
+  `COCKTAIL_BASELINE_COMMIT` moved to the apply commit, in a commit of its
+  own, and nothing left the live site for the review.
+
 ### §9.13 The visual language — the rounds
 
 - **2026-08-26** — One sitting with Helen against a mockup

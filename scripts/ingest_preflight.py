@@ -237,6 +237,10 @@ def check_cocktail(path, fm, rep, ctx):
             # backlog and buries the handful of things that are genuinely new --
             # which is the whole failure this script exists to fix.
             continue
+        if any(rx.match(s) for rx in ctx["shape_patterns"]):
+            # A filled `shapes:` sentence ("Shake all ingredients other than
+            # the cola with ice.") is canonical too -- 2026-09-10.
+            continue
         close = difflib.get_close_matches(s, ctx["canonical_steps"], n=1, cutoff=NEAR_MISS)
         if close:
             rep.add("METHOD STEPS THAT ARE NEARLY A CANONICAL ONE (#630)",
@@ -384,6 +388,13 @@ def main():
         "canonical_steps": sorted(
             {s for grp in (methods.get("canonical") or {}).values() for s in grp}),
         "proposed_steps": set(methods.get("proposals") or {}),
+        # One regex per `shapes:` sentence, `<X>` matching one run of text.
+        "shape_patterns": [
+            re.compile("^" + re.escape(h) + r"(.+)" + re.escape(t) + "$")
+            for grp in (methods.get("shapes") or {}).values()
+            for s in grp
+            for h, _, t in [s.partition("<X>")]
+        ],
     }
 
     rep = Report()

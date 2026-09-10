@@ -21,7 +21,7 @@ ingredients:
   - amount: "15 ml"
     generic: "soda water"
 method:
-  - "Shake first four ingredients with ice."
+  - "Shake all ingredients other than the soda water with ice."
   - "Strain."
   - "Top with soda water."
 mood:

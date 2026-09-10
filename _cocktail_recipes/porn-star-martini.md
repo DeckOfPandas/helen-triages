@@ -26,7 +26,7 @@ ingredients:
 method:
   - "Shake all ingredients other than the champagne with ice."
   - "Double strain."
-  - "Float the passion fruit shell on the surface."
+  - "Float the passion fruit shell on top."
 to_serve: "Champagne on the side."
 mood:
   - "sharp"
