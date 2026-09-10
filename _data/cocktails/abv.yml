@@ -331,7 +331,7 @@ bottles:
   "Peychaud's":                       { abv: 35,   confidence: high }
   "Bitter Truth Aromatic":            { abv: 39,   confidence: high }
   "Bittermens Xocolatl Mole":         { abv: 44,   confidence: medium }
-  "Bittermens 'Elemakule Tiki Bitters": { abv: 44, confidence: medium }
+  "Bittermens Elemakule Tiki Bitters": { abv: 44, confidence: medium }
   "Bob's Margarita Bitters":          { abv: 38,   confidence: low,
                                         qq: "Bob's do not print a strength on every label in the range." }
   "Bob's Peppermint Bitters":         { abv: 38,   confidence: low,

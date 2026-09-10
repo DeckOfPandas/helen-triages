@@ -19,7 +19,7 @@ ingredients:
     generic: "cranberry juice"
   - amount: "4 drops"
     generic: "warm-spiced bitters"
-    suggestion: ["Bittermens 'Elemakule Tiki Bitters"]
+    suggestion: ["Bittermens Elemakule Tiki Bitters"]
 method:
   - "Shake all ingredients with ice."
   - "Fine strain."

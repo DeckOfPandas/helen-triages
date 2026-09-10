@@ -1381,7 +1381,26 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # it out." -- which is MANUAL §4.0's exception in her words, granted before the
 # edit was made. So the flags stay `true`, nothing leaves the live site during
 # her review, and the diff IS the proofread. Covers e5ebf1b and nothing after.
-COCKTAIL_BASELINE_COMMIT = "e5ebf1b"   # the method pass, 12 live drinks, 2026-09-10
+# MOVED A FOURTH TIME, 2026-09-10, AND IT IS THE SMALLEST GRANT YET -- which is
+# the interesting thing about it. `832c726` deletes ONE CHARACTER from each of
+# two live drinks: the leading apostrophe in `Bittermens 'Elemakule Tiki
+# Bitters`, on #879. Helen: "delete those two apostrophes, don't flip the
+# proofread flag, explicit permission."
+#
+# WHY IT NEEDED A GRANT AT ALL, when the obvious fix is the bottle dictionary:
+# _layouts/cocktail.html renders `item.suggestion` VERBATIM from the recipe file
+# and does not resolve it through bottles.yml, so the apostrophe could only be
+# removed from the PAGE by editing the two recipes. Renaming the key alone would
+# have closed nothing. Without her word that is two of 48 live drinks off the
+# site until she re-read them, for one character each.
+#
+# SO THE PRECEDENT NOW COVERS A THIRD SHAPE. The first two moves were
+# promotions (drinks she had already read appearing in an agent's commit); the
+# third was a methods pass she chose to review as a diff. This one is neither:
+# it is a change so small she could see all of it in the sentence that asked for
+# it. The grant is still hers and still explicit, which is the only thing that
+# has to stay true. Covers 832c726 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "832c726"   # the Elemakule apostrophe, 2 live drinks, 2026-09-10
 
 
 def _newest_commit_per_published_drink():

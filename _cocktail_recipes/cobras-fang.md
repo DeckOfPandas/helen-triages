@@ -36,7 +36,7 @@ ingredients:
     generic: "ginger syrup"
   - amount: "1 dash"
     generic: "warm-spiced bitters"
-    suggestion: ["Bittermens 'Elemakule Tiki Bitters"]
+    suggestion: ["Bittermens Elemakule Tiki Bitters"]
 method:
   - "Short shake all ingredients other than the bitters with three ice cubes."
   - "Strain."
