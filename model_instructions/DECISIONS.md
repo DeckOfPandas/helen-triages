@@ -913,6 +913,25 @@ unless stated.
   Clone.
 - **2026-09-06** — §9.1 had said "ask Helen every time" for a private push, a
   week after `CLAUDE.md` changed.
+- **2026-09-10** — `CLAUDE.md`'s own documented pattern for cloning/pushing in
+  the devcontainer (build the URL by hand, token embedded) leaked the token: a
+  routine `git remote -v`, run for the reason this section's own 2026-08-29
+  paragraph two above gives, printed it in full, because git had stored the
+  token-bearing URL as the clone's `origin` remote. Fix is
+  `scripts/git-credential-agent-token.sh`, a per-repo git credential helper
+  that reads `AGENT_GH_TOKEN` from the environment at the moment git asks for
+  it and never writes it to a URL or to `.git/config`; §9.1 above now
+  documents the HTTPS-clone paragraph. `.claude/hooks/guard-token-expansion.py`
+  was widened the same day to refuse the old embedded-URL shape outright, and
+  to also scan the content of any script file a command runs (not just the
+  command line itself) for that shape or for a literal token string, closing
+  the gap where the risky text was moved into a `tmp/` script specifically to
+  get past a different guard's complaint about the command line. Not the
+  first time this file's own §12 has that shape of lesson, and won't be the
+  last: a written rule survives exactly as long as nothing enforces it.
+  **"Per-repo" lasted an afternoon** — the helper is passed per invocation by
+  the three git wrappers and configured nowhere; §11's entry of the same
+  date says why.
 
 ### §9.1.1 The drinks publication gate
 
@@ -3170,6 +3189,45 @@ verification. Dates are when the correction landed.
   above exist to retire. `scripts/git-clone-agent.sh <repo> [dir]` now; the
   manual gives it beside the SSH form. Proved by cloning into `tmp/` and
   deleting the result.
+
+- **2026-09-10 — THE TOKEN LEAKED THROUGH THE DOCUMENTED PATTERN, AND THE
+  FIX'S FIRST VERSION BROKE EVERY OTHER WORKTREE.** Two lessons in one
+  afternoon, both worth more than the incident.
+
+  **THE LEAK WAS NOT A RULE BEING BROKEN.** §9.1's entry of the same date has
+  the mechanism: `CLAUDE.md` said to clone with the token in the URL's
+  userinfo, git stored that URL as `origin`, and a routine `git remote -v`
+  printed it. Four hooks had been written against `echo`, `printf` and the
+  default expansions, and none could see a secret that had been written to
+  disk hours earlier by a command every rule allowed. The session that found
+  it built the right thing — `scripts/git-credential-agent-token.sh`, so the
+  token is handed to git on a pipe at the moment of use and is never in a
+  string at all — and widened `guard-token-expansion.py` to refuse the URL
+  shape and, for the first time, to read the script FILE a command runs.
+  That last part closes the hole every other guard's advice opens: "put it in
+  a file" had been a way past the checker, and now the file is checked. The
+  wrappers that still built the URL (push, clone, and #937's fetch) were
+  converted to plain URLs plus the helper; nothing in the repo embeds a
+  credential in a URL any more. **Helen rotated the token**, which is the only
+  thing that actually undoes a leak; every hook is a bandage over an exposed
+  credential until that is done.
+
+  **"CONFIGURE IT PER REPO" WAS WRONG, AND THE WAY IT WAS WRONG IS THE KEEPER.**
+  The helper was set with `git config credential.helper` in
+  `/workspace/.git/config` — a file the primary checkout and every worktree
+  share, which nobody had needed to know until then. Git runs a configured
+  helper from each worktree's own top level with the relative path as written,
+  and the script existed on one branch. Result, measured from an unrelated
+  worktree: `sh: 0: cannot open scripts/git-credential-agent-token.sh: No such
+  file` on every push, silently tolerated by git because the token was still in
+  the URL, and a hard failure the moment the URL was made plain. **So the
+  ruling is per invocation, never persisted**: each wrapper passes the helper
+  with `-c` and an absolute path resolved from its own location, the shared
+  entry was removed, and nothing depends on which branch any worktree is on.
+  The general shape: a per-repo setting in this repo is a per-worktree
+  setting for everyone, and a path in it is only as real as the branch it was
+  typed on. #937 and #938 were superseded by one PR carrying both, this ruling,
+  and the converted wrappers, so neither merges with the old advice in it.
 
 - **2026-09-10 — CLOSING ONE HOLE OPENED ANOTHER, IN A DIFFERENT FILE, THE SAME
   DAY.** `guard-unanalyzable-bash.py` refuses a leading `cd`. `CLAUDE.md`

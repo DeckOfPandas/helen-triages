@@ -1,16 +1,23 @@
 #!/bin/sh
 # Clone one of the three repos as DeckOfPandas-agentic over HTTPS, without
-# naming the credential at the call site.
+# naming the credential at the call site, and without the credential ever
+# being in the URL git stores.
 #
 # WHY THIS EXISTS (2026-09-10). MANUAL §9.1 says a worktree gets the drinks by
 # cloning the private drafts repo, and gives the SSH form. Inside the
 # devcontainer SSH dies on `Host key verification failed` (CLAUDE.md, Git
-# workflow step 1a), so the clone has to be the HTTPS-with-token form -- and
-# the first session to need it hand-wrote that URL, token name and all, into a
-# tmp/ script. That is the shape scripts/gh-agent.sh and git-push-agent.sh
-# exist to retire: a call site with a secret's name in it is indistinguishable
-# from a leak until a human has run the rule in their head. This is the third
-# wrapper, same reasoning.
+# workflow step 1a), so the clone has to be HTTPS.
+#
+# AND WHY IT LOOKS LIKE THIS, since later the same day. The first version put
+# the token in the URL's userinfo. Git stores a clone's URL as its `origin`
+# remote in `.git/config`, token and all, and a routine `git remote -v` then
+# printed it in full -- the leak that produced scripts/git-credential-agent-
+# token.sh. So the URL here is PLAIN and the credential comes from that helper,
+# passed to git for this one invocation with `-c`. The clone's `origin` is
+# then a plain URL that nothing can leak, and later fetches and pushes go
+# through scripts/git-fetch-agent.sh and scripts/git-push-agent.sh, which
+# pass the helper the same way. Nothing is ever written into the clone's
+# config.
 #
 # USAGE:
 #   sh scripts/git-clone-agent.sh <repo> [dir]
@@ -26,11 +33,13 @@
 # `PUBLISHING_A_DRINK.md`'s one-working-copy rule while a batch is open.
 #
 # Invoked via `sh` so it needs no execute bit -- CLAUDE.md forbids changing file
-# permissions without asking. The token is read from the environment at the
-# point of use and never echoed, logged, or written to a file.
+# permissions without asking.
 set -eu
 
 repo="$1"
 shift
 
-exec git clone --quiet "https://DeckOfPandas-agentic:${AGENT_GH_TOKEN}@github.com/DeckOfPandas/${repo}.git" "$@"
+here="$(cd "$(dirname "$0")" && pwd)"
+
+exec git -c "credential.helper=!sh '${here}/git-credential-agent-token.sh'" \
+  clone --quiet "https://github.com/DeckOfPandas/${repo}.git" "$@"
