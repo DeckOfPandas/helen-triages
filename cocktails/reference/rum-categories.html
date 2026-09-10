@@ -58,11 +58,25 @@ published: false
   requires an em dash, and an earlier version of this comment asserted both from
   having checked only the first.
 
-  WHAT IS STILL A PLACEHOLDER, AND IT IS TWO THINGS: the column headings
-  "category" and "on a card" ("examples" is hers, #888), and "none in the
-  house". Tracked at #784, #921. The per-word lines under the retired words are
-  NOT on that list any more — see the "Not categories" section below; she ruled
-  against having any.
+  WHAT IS STILL A PLACEHOLDER, AND IT IS TWO WORDS: the column headings
+  "category" and "on a card" ("examples" is hers, #888). Tracked at #784, #921.
+  "none in the house" went on 2026-09-10 ("delete them, boom"); the per-word
+  lines under the retired words went the same day — see the "Not categories"
+  section below; she ruled against having any.
+
+  THE TAB SAYS "Rum Categories", THE FOOTER LINK SAYS "rum categories", AND THE
+  h1 SAYS "My Philosophy of Rum". THAT IS DELIBERATE, NOT A MISMATCH TO FIX.
+  Helen, 2026-09-10, asked which she wanted: "I need links to the page to stay
+  as 'rum categories' because if links say 'my philosophy of rum' the reader
+  expects stories about walks on the beach and my favourite tiki mug." So the
+  front-matter `title` and `sites.yml`'s link text are the WAYFINDING label —
+  what the reader clicks and what the tab shows — and the h1 is the headline
+  the page greets them with. Do not make the three agree.
+
+  SECTION ORDER SINCE 2026-09-10: categories, then the "styles" she does not
+  recognise, then Characters last. Her call, made to resolve "blackstrap"
+  sitting on both of the last two lists — see the comment above the retired
+  list.
 
   THE SIPPING SHELF IS GONE, PAGE AND DATA BOTH, 2026-09-10. Helen deleted the
   section from this page herself, was asked whether the ten bottle names should
@@ -210,10 +224,14 @@ published: false
               {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
             </ul>
             {% else %}
-            {% comment %} PLACEHOLDER COPY. `overproof Demerara rum, lightly
-               aged` is the only row that hits this today, and it is correct —
-               see the header. {% endcomment %}
-            <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
+            {% comment %} NOTHING, ON PURPOSE. This printed "none in the house"
+               until 2026-09-10 -- placeholder copy from #784, and Helen, told
+               it was still a placeholder: "If we're not using them, delete
+               them, boom." `overproof Demerara rum, lightly aged` is the only
+               row that hits this today, and an empty third track is the honest
+               rendering of a category with no bottle -- see the header. The
+               span stays so the grid keeps its three tracks. {% endcomment %}
+            <span class="rum-cat-bottles"></span>
             {% endif %}
           </li>
         {% endfor %}
@@ -228,29 +246,6 @@ published: false
        here because the question this page answers ("is this one of mine?")
        gets asked of them for the same reason it gets asked of the fourteen.
     {% endcomment %}
-    <section class="ref-block ref-block--characters">
-    {% comment %} ── CHARACTERS ──────────────────────────────────────────────
-       `rum_characters` is a separate field from `generic` and never replaces
-       one — Helen, 2026-08-24: "blackstrap is only ever given as a character
-       for another rum, like this: Moderately aged (character: blackstrap)".
-       Here because a card can show one and the page would otherwise have
-       nothing to say about the word.
-    {% endcomment %}
-    <h2 class="ref-section-heading ref-section-heading--major" id="characters"><span>Addendum: Rum Characters</span></h2>
-
-    {% comment %} THE SUBTITLE DELETED IN #891 WAS AN AGENT'S PLACEHOLDER; THESE
-       TWO PARAGRAPHS ARE HELEN'S OWN, written 2026-09-10, and are not the same
-       thing coming back. Only the indentation and the class changed -- they were
-       indented seven spaces, inside nothing. {% endcomment %}
-    <p class="ref-prose">I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
-
-    <p class="ref-prose">These words are useful to me:</p>
-    <ul class="rum-chars">
-      {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
-    </ul>
-
-    </section>
-
     <section class="ref-block ref-block--retired">
     {% comment %} ── NOT CATEGORIES ──────────────────────────────────────────
        `retired_rum_styles`, with Helen's own reasons, verbatim. This is the
@@ -305,16 +300,57 @@ published: false
        brand-generic and stays hidden. The ingest-facing reasons stay in
        ingredients.yml untouched -- they were always the ingester's half, and
        this section was always the reader's. {% endcomment %}
+    {% comment %} ONE WORD IS ON THIS LIST AND ON THE CHARACTERS LIST BELOW, AND
+       THAT IS CORRECT -- Helen, 2026-09-10, asked about "blackstrap" appearing
+       under both headings: "It needs to stay in the words I don't believe in
+       section because people say 'use a blackstrap rum' which isn't a thing
+       (to me). And then given I'm using it as a character on the site, I need
+       to list it as a character." Her resolution, both halves: the Characters
+       section moved BELOW this one, so the reader meets the word as a not-a-
+       style first and its real job second; and a parenthetical after the word
+       here, in her words. It is a LOOKUP, not a literal: any retired word that
+       is also in `rum_characters` gets it, so a second such word cannot arrive
+       silently without the note. {% endcomment %}
     <ul class="rum-retired">
       {% for pair in ing.retired_rum_styles %}
         {% assign word = pair[0] %}
         {% assign initial = word | slice: 0 %}
         {% assign initial_lower = initial | downcase %}
         {% if initial == initial_lower %}
-        <li class="rum-retired-word">{{ word }}</li>
+        <li class="rum-retired-word">{{ word }}{% if ing.rum_characters contains word %} (rum character not rum type){% endif %}</li>
         {% endif %}
       {% endfor %}
     </ul>
+    </section>
+
+    <section class="ref-block ref-block--characters">
+    {% comment %} ── CHARACTERS ──────────────────────────────────────────────
+       `rum_characters` is a separate field from `generic` and never replaces
+       one — Helen, 2026-08-24: "blackstrap is only ever given as a character
+       for another rum, like this: Moderately aged (character: blackstrap)".
+       Here because a card can show one and the page would otherwise have
+       nothing to say about the word.
+
+       LAST ON THE PAGE SINCE 2026-09-10, her call, which also makes the
+       heading's "Addendum" true: it used to sit between the categories and
+       the retired words, where an addendum is not. See the note above the
+       retired list for the blackstrap reasoning that moved it.
+    {% endcomment %}
+    <hr class="ref-divider">
+
+    <h2 class="ref-section-heading ref-section-heading--major" id="characters"><span>Addendum: Rum Characters</span></h2>
+
+    {% comment %} THE SUBTITLE DELETED IN #891 WAS AN AGENT'S PLACEHOLDER; THESE
+       TWO PARAGRAPHS ARE HELEN'S OWN, written 2026-09-10, and are not the same
+       thing coming back. Only the indentation and the class changed -- they were
+       indented seven spaces, inside nothing. {% endcomment %}
+    <p class="ref-prose">I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
+
+    <p class="ref-prose">These words are useful to me:</p>
+    <ul class="rum-chars">
+      {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
+    </ul>
+
     </section>
 
   </div>

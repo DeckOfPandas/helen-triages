@@ -252,10 +252,11 @@ $ref-col-card:    minmax(6rem, 9rem);
 // rum, lightly aged` since El Dorado 151 came off on 2026-09-05. Quiet and un-hued, because
 // it is the absence of the thing the hue means rather than a different kind of
 // thing.
-.rum-cat-bottles--none {
-  color: $color-clear-text;
-  font-style: italic;
-}
+// `.rum-cat-bottles--none` WAS HERE AND IS GONE, 2026-09-10. It styled the
+// "none in the house" placeholder in a category's empty bottles track; Helen
+// deleted the words ("If we're not using them, delete them, boom"), so the
+// track renders empty and nothing emits the class. Removed rather than left,
+// for the same reason as `.rum-cat-note` below.
 
 // `.rum-cat-note` WAS HERE AND IS GONE, 2026-09-10. It styled Ceylon arrack's
 // `family_less` reason under its row; #889 deleted that note from the page
