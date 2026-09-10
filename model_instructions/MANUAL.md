@@ -3,7 +3,9 @@
 **Helen Triages** — a Jekyll mono-repo serving two personal decision-support
 sites. **Food** answers *what shall we cook*, not *how do I cook*. **Cocktails**
 is its sibling: real drinks, a schema, a designed index and drink page, and
-nothing promoted to the live site yet.
+**48 drinks live since 2026-09-10** — this said "nothing promoted to the live
+site yet" until that day, which was true for the whole life of the collection
+and is the single biggest thing to know that has changed.
 
 **This file was `HANDOVER_v26.md` until 2026-09-06**, when it was split. v26
 was 9,900 lines: about 2,000 of rules inside 7,800 of dated journal — what was
@@ -1038,9 +1040,25 @@ drafts directory is un-ignored and stageable in the public repo.
 `test_every_drafts_collection_is_gitignored` derives its patterns from
 `_config.yml`.
 
-`_cocktail_recipes/` is declared `output: true` and **does not exist on
-disk**: Jekyll builds the collection empty and the index shows its empty
-state. Nothing is promoted into it yet. §9.1.1 is the gate.
+**`_cocktail_recipes/` HOLDS 48 DRINKS SINCE 2026-09-10, AND IS PUBLIC.** This
+paragraph said the directory "does not exist on disk" and that "nothing is
+promoted into it yet" for the whole life of the collection; both were true
+until the deployment and neither is now. §9.1.1 is the gate that let them
+through, and it is no longer a formality — every one of those 48 is
+`proofread: true`, so **an agent editing one takes it off the live site** in
+the same commit that sets the flag back (#367).
+
+**`_cocktail_drafts/to-promote/` IS EMPTY**, which is the other half of the
+same fact and the more useful one day to day: everything Helen has read has
+moved out, so anything that appears in that folder is genuinely waiting for
+her. She asked for it in exactly those terms — *"then I don't have to fish
+through one by one to find out which I still need to proofread"*.
+
+**A PROMOTED DRINK IS READABLE BY A PUBLIC TEST, which several tests were
+written to survive not having.** `_load_published()` and
+`test_agent_edited_drinks_are_not_marked_proofread` both skip while the
+collection is empty; they run for real now. If one of them starts failing, it
+is not necessarily new — it may be a check reaching data for the first time.
 
 ### 9.1.1 The drinks publication gate — three flags, and the index that reads them
 
@@ -1948,8 +1966,12 @@ build stop rather than a report. Three things are load-bearing:
 **The cocktail corpus is `_cocktail_recipes/` + `_cocktail_drafts/` through
 `_load()`, the only door** (#540; `test_every_drink_reading_test_goes_through_the_loader`).
 So a PROMOTED drink is checked everywhere including CI; the drafts remain a
-local concern by Helen's decision. With nothing promoted, CI still checks no
-drink. **The staleness half of a guard is unanswerable on a partial corpus**
+local concern by Helen's decision. **CI CHECKS 48 DRINKS SINCE 2026-09-10** —
+this sentence read "with nothing promoted, CI still checks no drink" for the
+whole life of the collection, and the deployment is what changed it. Every
+guard that has only ever run against drafts on Helen's machine now runs
+against those 48 in CI as well, which is coverage arriving rather than
+coverage changing. **The staleness half of a guard is unanswerable on a partial corpus**
 — a drink merely ABSENT looks exactly like a drink FIXED — so every check
 that hangs on a shrink-only registry or a mood's share of the book calls
 `_require_whole_collection` and skips with a reason; `WHOLE_COLLECTION_ONLY`

@@ -69,6 +69,39 @@ disk for an evening. One copy, always pushed, is the rule.
    in the public repo and commit; delete it from the private repo and commit.
    The public commit deploys.
 
+   **SHE DELEGATED IT FOR THE FIRST TIME ON 2026-09-09/10, AND THE FIRST 48
+   DRINKS WENT OUT THAT WAY.** Her reason was not that the step is hard, it
+   was that the staging folder had become a haystack: *"please move all
+   proofread: true files into the public repo. If you do this then I don't
+   have to fish through one by one to find out which I still need to
+   proofread."* Promotion is what keeps `to-promote/` meaning "waiting for
+   Helen" rather than "everything, sorted by nothing".
+
+   **FOUR THINGS THAT PROMOTION TURNED OUT TO NEED, none of them obvious
+   until it was done for real:**
+
+   - **RE-CHECK THE GATE, do not trust the flag as found.** `awaiting_fix:
+     false` AND `proofread: true`, both explicitly, failing closed. Copying a
+     drink the gate would have hidden is the one mistake no later commit
+     undoes, because the file is public the moment it merges.
+   - **COPY, COMPARE, THEN DELETE.** Byte-for-byte, asserted. What publishes
+     must be what she read, and a silent truncation between two repos is
+     exactly the failure nothing else would catch.
+   - **`git rm` WILL REFUSE, AND IT IS RIGHT TO.** It will not remove a file
+     with changes in the worktree or the index, and flipping a flag in the
+     same pass is exactly that. **Do not reach for `-f`**: forcing gets past
+     it by DISCARDING those changes, so if a copy had failed there would be
+     nothing left to notice. Unlink the file and let `git add -A` record it,
+     after the byte comparison.
+   - **`COCKTAIL_BASELINE_COMMIT` HAS TO MOVE, and that is Helen's to grant.**
+     `test_agent_edited_drinks_are_not_marked_proofread` reads the PUBLIC
+     repo's history only (#624), so it cannot tell a promotion from an edit:
+     it sees drinks marked `proofread: true` appearing in an agent's commit.
+     Move the constant to the promotion commit, in a commit OF ITS OWN so she
+     can revert just that, and prove the guard still bites afterwards by
+     breaking it on purpose. See the constant's own comment in
+     `tests/test_cocktails.py`.
+
 ## What the flags mean, in one line each
 
 - `rewritten: true` — the words are Helen's. Only she claims it; the move into

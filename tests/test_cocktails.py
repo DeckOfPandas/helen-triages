@@ -554,6 +554,19 @@ WHOLE_COLLECTION_ONLY = {
     # A correction whose drink is merely ABSENT looks exactly like one whose
     # drink is gone -- see _require_whole_collection.
     "test_every_mood_correction_is_reachable_and_needed",
+    # ADDED 2026-09-10, AND IT IS THE ONE THAT PROVED THIS LIST IS NOT A
+    # FORMALITY. The comment above this set already warned that promotion is
+    # "not one" event -- "every later promotion re-runs them over a partial
+    # corpus too" -- and this test was the member nobody had spotted. It went
+    # red in CI the night the first drinks went live, on an exception for a
+    # note belonging to a DRAFT: with no drafts the note does not exist, so the
+    # exception read as stale. The entry was fine; the corpus was partial.
+    #
+    # WHY IT HID UNTIL THAT DAY: with NOTHING promoted, CI's corpus was EMPTY,
+    # so the "live notes" set was empty and the comparison never ran against
+    # anything real. Absent is safe here and PARTIAL is not, which is the state
+    # promotion created.
+    "test_no_drink_note_exception_is_stale",
 }
 
 
@@ -1344,7 +1357,22 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # THE NEXT TIME IT SHOULD MOVE is another promotion of drinks Helen has read.
 # It should NOT move because an ordinary edit went red -- that is the failure
 # it is for, and the fix there is the flag.
-COCKTAIL_BASELINE_COMMIT = "5c7ecad"   # the first promotion, 2026-09-09
+#
+# AND THE NEXT TIME CAME WITHIN THE DAY, 2026-09-10. `5c7ecad` promoted the
+# first NINETEEN drinks; `fa37ebb` promoted the remaining twenty-nine, in a
+# second agent commit, and the live deploy went red on exactly those 29. That
+# is the rule above working rather than failing -- a second promotion is a
+# second batch of drinks Helen has read appearing in an agent's commit, and it
+# needs the same grant as the first.
+#
+# THE LESSON IS THAT PROMOTION IS NOT AN EVENT, IT IS A HABIT. The first move
+# read as a one-off; two in one day says this constant will keep moving, and
+# will keep needing Helen's word each time. If promotion becomes routine, the
+# honest fix is a test that can tell a promotion from an edit -- which needs
+# something the public repo can check, since it cannot see the private history
+# (#624). Nobody has designed that yet, and until they do, this line moving is
+# the visible cost of each deployment.
+COCKTAIL_BASELINE_COMMIT = "fa37ebb"   # the second promotion, all 48, 2026-09-10
 
 
 def _newest_commit_per_published_drink():
@@ -6148,7 +6176,25 @@ def test_no_drink_note_exception_is_stale():
     The same rot `test_unresolved_suggestions_has_no_stale_entries` catches: an
     exemption that outlives its note reads as an outstanding problem while
     quietly exempting that exact string for whoever writes it next.
+
+    IT NEEDS THE WHOLE COLLECTION, AND IT LEARNED THAT THE HARD WAY ON
+    2026-09-10 -- the day the first drinks were promoted and this test ran in
+    CI for the first time. It went red on `Not good with Brecon Botanicals or`,
+    an exception for a note on `tailspin`, which is a DRAFT: CI has no drafts,
+    so from there the note does not exist and the exception looks stale. The
+    entry was not stale; the corpus was partial.
+
+    That is exactly what `_require_whole_collection` is for, and its own
+    docstring had already stated the general case -- "an entry naming an ABSENT
+    drink is indistinguishable from one naming a FIXED drink". The call was
+    simply missing here, invisibly, because until that day CI had NO drinks at
+    all and `_load()` returned an empty corpus, so `live` was empty, so
+    `DRINK_NOTE_EXCEPTIONS` was... also skipped by the emptiness. Promotion is
+    what made the corpus partial rather than absent, and partial is the state
+    this guard cannot read.
     """
+    _require_whole_collection("a stale note exception")
+
     live = set()
     for slug, fm in _load():
         live.update((text or "").strip() for _, text in notes_of(fm))

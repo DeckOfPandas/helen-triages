@@ -943,6 +943,146 @@ unless stated.
   what made this land in two repos instead of one". The document was written
   the same day, out of this.
 
+- **2026-09-10 — THE DEPLOYMENT. 48 DRINKS LIVE, AND `to-promote/` EMPTY.**
+  The collection was built, schema'd, designed, tested and gated over three
+  weeks with nothing in it; `_cocktail_recipes/` did not exist on disk and the
+  index rendered "Nothing to see here yet" because the collection was empty
+  rather than because the template refused to look. It looks now.
+
+  **IT STARTED AS A DEADLINE, NOT A MILESTONE.** Helen raised #869 as "(GOAL)
+  I want to deploy the cocktail's site with at least these drinks by the end
+  of the day", named eleven, and the whole day's work fell out of that list:
+  the ones that were ready, the ones that were nearly ready, and the two that
+  turned out to be broken in ways nothing was looking for. All eleven are
+  live, with 37 more.
+
+  **THE SEQUENCE WAS PROOFREAD → FIX → PROMOTE, REPEATED, and the fixing half
+  is the part worth recording.** Helen proofread in batches and pushed; each
+  batch broke a handful of tests, and her framing of why was exactly right in
+  advance: *"I know some will break tests, but not all of that will be
+  mistakes -- there are things we need to add to our data model / dictionary."*
+  Across three rounds that split about evenly. Slips: `proofread: trues`, a
+  blank line before the front-matter opener, a duplicated mood, four drinks
+  whose `notes` KEY was deleted rather than emptied. Dictionary gaps: Dolin
+  Rouge, Ciroc Pineapple, a ninth Briottet, and the margarita glass. Neither
+  half was a surprise to her, and treating every red test as a mistake would
+  have thrown away half the signal.
+
+  **WHAT PROMOTION ITSELF NEEDED** is now in `PUBLISHING_A_DRINK.md` step 6,
+  because none of it was obvious until it was done: re-check the gate rather
+  than trusting the flag, copy-compare-then-delete byte for byte, do not force
+  `git rm` past its refusal, and move `COCKTAIL_BASELINE_COMMIT` — which is
+  Helen's to grant and went in a commit of its own so she could revert it
+  alone.
+
+  **AND THE GATE STOPPED BEING THEORETICAL.** Every one of the 48 is
+  `proofread: true`, so every one is live, and #367 now has teeth: an agent
+  editing any of them takes it straight off the site until she reads it again.
+  Every guard that had only ever run against drafts on her machine now runs in
+  CI too.
+
+- **2026-09-09 — A PROMOTED DRINK IS INDISTINGUISHABLE FROM AN EDITED ONE, AND
+  THAT IS BY DESIGN.** `test_agent_edited_drinks_are_not_marked_proofread`
+  reads the PUBLIC repo's history only — #624, a public test must never
+  require private drink data — so a promotion looks exactly like the thing it
+  exists to catch: drinks marked `proofread: true` appearing in an agent's
+  commit. There is no way to tell them apart from inside that constraint, and
+  loosening the constraint would be worse than the problem.
+
+  **SO THE BASELINE IS THE LEVER, and the constant's own comment had
+  anticipated the day**: "once drinks are actually promoted this stops being a
+  formality". It moved to the promotion commit.
+
+  **MOVING A BASELINE IS THE ONE CHANGE THAT CAN SILENTLY TURN A GUARD OFF**,
+  so a green run afterwards proves nothing — §12's "test that cannot fail,
+  whose symptom is green". It was verified by breaking it: a promoted drink
+  edited in a fresh agent commit without setting `proofread: false` went RED
+  and named the drink. It grandfathers nothing forward, because the check
+  skips a commit only when that commit is an ANCESTOR of the new SHA.
+
+  **THE FIRST DRAFT OF THAT PROOF WAS ITSELF A RULE BREAK**, and it is the
+  more useful half. It undid its own commit with `git reset --hard` called
+  from Python — which would have ROUTED AROUND `guard-destructive-git.py`,
+  because the hook reads Bash commands and cannot see a subprocess call.
+  **"The hook did not notice" is not permission.** A throwaway branch that is
+  checked out, committed on, left and deleted needs no destructive command at
+  all.
+
+- **2026-09-09/10 — FOUR MOOD RULINGS, AND THE INTERESTING PART IS WHICH ONES
+  BECAME RULES.** Helen asked the question directly on one of them: *"I can't
+  tell if this should be manual override or if the rule can be amended."* The
+  answer each time was a blast radius, not an opinion.
+
+  - **`on fire` is hand-assigned** — and `moods_by_hand`'s own comment said it
+    should have been for ten days. It ranks the rules by fit and says "the
+    bottom four are here now"; by its own numbers `on fire` (.40) is one of
+    the bottom four and was never added. Nothing noticed because the
+    derivation happened to agree with her on all five drinks that carried it.
+    Cobra's Fang was the sixth: she put the fire in `to_serve` and the rule
+    reads METHOD steps for 'alight'/'flame'/'burn'.
+  - **Mastiha Mojito's `sharp` is a correction, not a widened sweetener
+    list.** The rule wants a base, a citrus and a sweetener; the sweetener
+    here is mastiha liqueur, filed under `loud`. **One drink pours mastiha**,
+    so adding it to `sweet` would be a claim about the INGREDIENT made in
+    order to reach a conclusion about the RECIPE. A correction says the
+    smaller, truer thing. Her evidence was unanswerable: *"I have tasted it
+    and you haven't!!!!"*
+  - **"Swizzles are not faff" IS a rule change** — `swizzle` and `churn` left
+    `mood_step_words.faff`, because the list was making one mistake twice: a
+    swizzle IS churning, so one technique counted as two faff moments and hit
+    the threshold on its own.
+  - **"A muddled Swizzle is faff" is a correction that REPAIRS that rule
+    change.** The rule was right about Coffey Park Swizzle, the drink she was
+    looking at, and took Sapin's Swizzle with it — that one MUDDLES and
+    swizzles, so two faff moments became one, below the threshold.
+
+  **THE BLAST-RADIUS MEASUREMENT WAS WRONG THE FIRST TIME AND THE SCRIPT
+  CAUGHT IT.** It checked whether ANY faff word survived, where the rule wants
+  TWO — so it reported "exactly one drink changes" and missed the drink that
+  had two and was left with one. `derive_cocktail_moods.py` disagreed and was
+  right. **Counting the wrong thing confidently is the failure to expect when
+  measuring a blast radius**, because the shortcut ("does it still match?")
+  looks like the question and is not.
+
+- **2026-09-09 — THE MARGARITA'S MOOD WAS A SYMPTOM, NOT A DISAGREEMENT.**
+  Helen removed `ice ice baby` by hand and the derivation kept restoring it.
+  The cause was one field over: she had moved the drink from an old fashioned
+  glass to a `margarita`, and `serve.ice` was still `large cube` from the old
+  glass. *"Not served with an ice cube in the margarita glass, you're correct.
+  Extra misleading here because this margarita does not come out of a frozen
+  drink machine!"* With the serve corrected the mood derives away on its own,
+  no correction needed and nothing to remember later. **A hand-edit fighting a
+  derivation is worth reading as a bug report about the data it derives
+  from.**
+
+- **2026-09-09 — A GARNISH THE METHOD ALREADY PLACES IS NOT A GARNISH.** Modern
+  Zombie's page printed "Garnish with half an empty passion fruit shell."
+  after the fire, and Helen: "Garnish step at the end of Modern Zombie needs
+  to be deleted." **The step is GENERATED from `garnish:`, so there was no
+  method step to delete** — deleting one would have removed the fire. The
+  method fills that shell with overproof rum and sets it alight, which makes
+  it part of the BUILD. It is `no garnish` now: a DECISION that renders and
+  never generates a step, as against `[]`, which means nobody has decided.
+
+  **THE MIRROR OF #880's 18th CENTURY**, where the duplicate was the method
+  step and the fix was to delete it. Same repetition, opposite lever, and
+  which one to reach for depends entirely on which field is generating.
+
+- **2026-09-09 — TWO MODERN ZOMBIES, AND THE NEWER CONTENT WAS UNDER THE OLDER
+  NAME.** Dropping "(makes 2)" from the title left Helen's edits in
+  `modern-zombie-makes-2.md` and a copy of the pre-edit content in a new
+  `modern-zombie.md`. Which was which was decidable rather than a guess: the
+  old file had the float step whose OWN NOTE said the ingredient was written
+  wrong. **No test could see it** — two drinks, same title, both valid.
+
+  **ONE NOTE DIED WITH THE DUPLICATE AND WAS REPORTED, NOT RESTORED**:
+  "Swapping the grenadine for 20ml Falernum 10ml cane sugar syrup was great
+  (Mum was a big fan)." Rewriting the notes into labelled form looked
+  deliberate; losing a note about her mum to a copy-paste accident would not
+  have been, and only she could say which it was. She ruled it out the next
+  day. **The rule: when a delete is ambiguous between "chosen" and
+  "accidental", the report is the deliverable.**
+
 ### §9.2 / §9.2.1 The sources
 
 - **2026-08-16** — The CSV (118 drinks over 656 rows): pasted into a chat its
@@ -2622,6 +2762,77 @@ unless stated.
   only honest version of such a sentence is one that names the members** — so
   it now lists all five and says `ls .claude/hooks/` settles it. Same failure
   as every stale number this file records; §11.2 is the family.
+
+- **2026-09-09 — I READ AN EXIT CODE THAT MEANT NOTHING, TWICE, AND REPORTED
+  IT AS GREEN.** `scripts/verify.py` exits non-zero if anything fails, which is
+  true and was not what I was reading. Both commands ended in something else:
+
+      python3 scripts/verify.py 2>&1 | tail -14      <- tail's status
+      python3 scripts/verify.py > log 2>&1; tail log <- tail's status
+
+  A pipeline reports its LAST stage and a `;` list reports its LAST command, so
+  in both cases the 0 belonged to `tail`. I told Helen "exit code 0, all green"
+  with real failures underneath, including one a guard had correctly caught.
+
+  **§12 already says this in one line — "every one was caught by breaking the
+  thing on purpose and reading the OUTPUT, not the exit status" — and I broke
+  it while quoting the same section about something else.** The fix is not a
+  hook: it is that a verification's evidence is its OUTPUT, and if the output
+  is not in front of you then nothing has been verified. Redirect to a file in
+  `tmp/` and read the file.
+
+- **2026-09-09 — I RAN TWO `pytest` SESSIONS AT ONCE AND DIAGNOSED THE RESULT
+  AS A REGRESSION.** MANUAL §1 warns about this by name and even gives the
+  tell: `test_rendered_pages.py` writes throwaway `zzz-gate-` recipes and
+  deletes them, so a concurrent run collects them as real files and reports
+  schema failures that vanish on a clean rerun. I launched `verify.py` twice
+  because the first appeared to hang, got a screenful of `zzz-gate-` failures,
+  and started reading them as real. **The tell is in the test IDs and it is
+  unmistakable once you know it.** One at a time, and if a run seems slow, wait
+  for it rather than starting a second.
+
+- **2026-09-09 — `git log --branches --not --remotes` REPORTS FALSE POSITIVES
+  IN THE DEVCONTAINER, and §12 recommends it as the sweep for unpushed work.**
+  It is right on the host and wrong here, for a reason that is structural
+  rather than a bug: the container pushes by explicit HTTPS URL (`origin` is
+  SSH and dies on `Host key verification failed`), and **pushing to a URL never
+  updates the local `origin/*` tracking refs**. So every branch pushed that way
+  looks unpushed forever. It said a commit was unpushed that was demonstrably
+  on the remote and already had a PR open against it.
+
+  **`git ls-remote <url> <branch>` IS THE HONEST CHECK HERE** — it asks the
+  remote rather than a local cache of it, and comparing its SHA to
+  `git rev-parse HEAD` answers the actual question. Worth knowing before
+  reporting work as lost.
+
+- **2026-09-09 — A GUARD FOOLED BY THE PROSE EXPLAINING IT, ON ITS FIRST RUN.**
+  `test_the_layout_takes_the_twist_step_from_methods_yml` scans
+  `_layouts/cocktail.html` for a spelled-out twist sentence, and the first
+  version fired on the UNBROKEN file: the template's own comments quote that
+  sentence while explaining the rule. §12 predicts this in as many words — "a
+  source-scanning guard will be fooled by the prose explaining it… the
+  vocabulary of a rule is densest in the comment explaining it" — and the
+  prediction was six-for-six before this made it seven.
+
+  **The fix is the one §12 names: match a call SHAPE rather than a string.** It
+  looks for a literal ASSIGNED to `twist_step`, so a comment saying what the
+  sentence is stays documentation. **And the tell was running the guard against
+  the correct file and getting RED** — a break-it-on-purpose harness that only
+  ever runs the broken case would have reported a pass.
+
+- **2026-09-09 — ONE FACT IN TWO PLACES, FOUND BY CHANGING IT.** `methods.yml`
+  declared the two twist sentences and `_layouts/cocktail.html` ALSO spelled
+  them out. Helen changed the wording (#880, `and` → `then`); editing the
+  declaration left the page emitting the old string, with the whole suite
+  green.
+
+  **WHAT CAUGHT IT WAS THREE STEPS AWAY AND LOOKED LIKE SOMETHING ELSE**: the
+  standalone ingest document prints that vocabulary, so
+  `test_every_vocabulary_the_cocktail_doc_prints_is_still_declared` went red
+  and reported a DOCUMENTATION problem. The actual fault was that the page had
+  kept the old sentence and would have gone on printing it indefinitely.
+  **A test failing about a copy of a thing is worth reading as a question about
+  the thing.** The template reads the data now, and a guard watches the pair.
 
 ### §11.2 The record of this file being wrong
 
