@@ -2685,6 +2685,14 @@ close the public issue by hand.
 
 **You will loop a collection that `output: false` did not empty.** §9.1.
 
+**You will write a media block before the rule it overrides, and it will
+never render.** Equal specificity, later wins: a `@media (max-width: 600px)`
+block that sets `.cocktail-glass-icon { width: 4.5rem }` above a
+`.cocktail-glass-icon { width: 7rem }` four hundred lines below it is a
+comment, not a rule. It shipped that way for a morning (#942). Put a
+narrow-width override AFTER the rule it changes, or nest it inside; and
+measure the box at the width in question, which is what found it.
+
 **You will check one element's width and call the row safe.** Overflow is a
 property of the ROW; three sub-320px tracks side by side overflow a phone.
 The site has media queries (three, counting print).
