@@ -381,6 +381,31 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // noticed. The value is unchanged; only where it is written.
     --card-name-size: #{$title-size};
     margin: 0 0 $space-sm;
+
+    // MIN-WIDTH ZERO, AND IT FIXES TWO THINGS WITH ONE LINE -- Helen,
+    // 2026-09-09: "Long drink titles run off the cocktail page screen."
+    //
+    // This element is a direct flex child of `.cocktail-title-row`, and a flex
+    // item defaults to `min-width: auto` -- it REFUSES to shrink below its
+    // content's intrinsic width. The content is the tape word, which is
+    // `white-space: nowrap` from _cards.scss. So a long title grew the item to
+    // its full unwrapped width and pushed it off the row. That is the visible
+    // symptom.
+    //
+    // THE SECOND THING IS WHY NOTHING CAUGHT IT. card-name-fit.js decides by
+    // `scrollWidth > clientWidth` -- content wider than its box -- and that
+    // question only has an answer when something other than the content sets
+    // the box. While the item could not shrink, the two were always equal, so
+    // the script measured every drink page title, found no overflow, and
+    // correctly did nothing. Its own header says it covers "a drink page (the
+    // title, at 3.2rem through the same classes)", and it was running: it just
+    // had nothing to measure against.
+    //
+    // `_universe.scss` ALREADY DOES THIS for the same class in its own flex
+    // row, which is the tell that this was an omission rather than a decision.
+    // With the item able to shrink, the existing step-then-wrap machinery does
+    // the rest and neither number is repeated here.
+    min-width: 0;
   }
 
   // THE CARD'S OWN HORIZONTAL PADDING, AND THE BRIEF'S VERTICAL. Helen's brief

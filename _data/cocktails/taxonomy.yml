@@ -663,6 +663,10 @@ mood_include:
     moods: [I want to faff]
     why: >-
       it ices a glass, rinses it with absinthe and discards the contents, which the rule counts as ONE faff moment where it wants two. See the note on caribbean-sazerac directly above.
+  sapins-swizzle:
+    moods: [I want to faff]
+    why: >-
+      Helen, 2026-09-10: "A muddled Swizzle is faff." SHE LOST THIS DRINK'S MOOD BY ACCIDENT THE DAY BEFORE, and that is the whole story: her ruling that "swizzles are not faff" took `swizzle` and `churn` out of `mood_step_words.faff`, which was right about coffey-park-swizzle -- the drink she was looking at -- and took this one with it. It muddles AND swizzles, which was two faff moments and became one, and the threshold is two. So it lands on the rule's own existing line, the same one kill-devil-punch and arrack-punch sit on: one muddle where the rule wants two. A CORRECTION RATHER THAN A LOWER THRESHOLD, because "one muddle is faff" would retag every drink that muddles anything, and she has ruled on this one.
   6th-street-swizzle:
     moods: [sharp]
     why: >-
@@ -778,23 +782,22 @@ mood_exclude:
   # tagged the drink `pudding in a glass` herself on the review pass, so the
   # correction had started arguing with her.
   mastiha-mojito:
-    moods: [ice ice baby, I want to faff]
+    moods: [ice ice baby]
     why: >-
       Fine-strained into an ice-filled glass and then churned twice, so the
       rule reads it as an icy drink and she does not. Her call on the
       2026-08-30 pass: the churning is technique here rather than the point.
-      `I want to faff` JOINED IT ON 2026-09-09 FOR THE SAME REASON, in her
-      words: "Mastiha Mojito absolutely isn't faff -- how could it be?" The
-      mood comes from `churn` being in `mood_step_words.faff`, and this drink
-      is the same two churns the line above is already about — so one ruling
-      about what the churning MEANS here now governs both moods it was
-      producing.
-      NOT A RULE CHANGE, and the count is why. Exactly TWO drinks earn
-      `I want to faff` from churning alone: this one and coffey-park-swizzle.
-      Taking `churn` and `swizzle` out of the faff list would retag that drink
-      too, and Helen has not ruled on it — so the fix that touches only what
-      she ruled on is this one. If she later says a swizzle is not faff either,
-      the rule is the better change and this entry comes out with it.
+      `I want to faff` WAS HERE FOR A FEW HOURS ON 2026-09-09 AND CAME BACK
+      OUT, which is the entry doing what it said it would. It was added on
+      Helen's ruling that "Mastiha Mojito absolutely isn't faff -- how could it
+      be?", as a correction rather than a rule change, because `churn` earning
+      faff was also true of coffey-park-swizzle and she had not ruled on that
+      drink. It said in as many words: "if she later says a swizzle is not faff
+      either, the rule is the better change and this entry comes out with it."
+      She did, an hour later -- "Swizzles are not faff" -- so `swizzle` and
+      `churn` left `mood_step_words.faff` and this line was no longer doing
+      anything. A correction that has been overtaken by a rule is a correction
+      that lies about why a drink is tagged, so it goes.
 
 # `mood_up_glasses` WENT WITH `up`, 2026-08-30. It listed the stemmed glasses
 # and nothing reads it any more. Recovering it means recovering the mood; both
@@ -805,8 +808,39 @@ mood_exclude:
 # "swizzling" and `dehydrat` catches both spellings.
 mood_step_words:
   # Two or more of these makes `I want to faff` (or nine-plus ingredients).
+  #
+  # `swizzle` AND `churn` CAME OUT ON 2026-09-09. Helen: "Swizzles are not
+  # faff." She is right and the list was making the same mistake twice: a
+  # swizzle IS churning, so the two words were one technique counted as two
+  # faff moments, and a plain swizzle scored the threshold on its own.
+  #
+  # TWO DRINKS LOSE THE MOOD, AND THE SECOND ONE IS THE INTERESTING ONE.
+  # coffey-park-swizzle is the drink Helen ruled on. sapins-swizzle is not:
+  # it MUDDLES AND SWIZZLES, which was two faff moments and is now one, and
+  # the threshold here is two. So it falls under the rule's own existing line
+  # -- the same line kill-devil-punch and arrack-punch already have
+  # `mood_include` entries for, both reading "one muddle or one long prep,
+  # where the rule wants two".
+  #
+  # THAT IS A CONSEQUENCE OF HER RULING RATHER THAN A SEPARATE JUDGEMENT, and
+  # it is flagged to her rather than corrected away here: if she thinks a
+  # muddled swizzle is faff, the fix is a `mood_include` for that one drink,
+  # exactly like the two punches. Nine others keep the mood untouched, from
+  # `muddle` plus something else, from `alight`/`flame`, or from their own
+  # correction.
+  #
+  # A FIRST PASS AT THIS SAID "EXACTLY ONE DRINK", and it was wrong: it
+  # checked whether any faff word survived rather than whether TWO did, so it
+  # missed the drink that had two and now has one. The derivation script
+  # caught it. Counting the wrong thing confidently is worth a line here
+  # because the next person measuring a blast radius will reach for the same
+  # shortcut.
+  #
+  # `swizzle` AND `churn` STAY IN `ice` AND `churned` BELOW, deliberately.
+  # They are excellent evidence about how a drink is SERVED and useless
+  # evidence about how much work it is, which is the whole of the correction.
   faff:
-    [muddle, alight, flame, shell, blend, swizzle, churn, rinse,
+    [muddle, alight, flame, shell, blend, rinse,
      dehydrat, infus, steep, clarif]
   # Any one makes `ice ice baby`.
   # `giant ice` JOINED `large ice` ON 2026-09-04, when Helen ruled the canonical
