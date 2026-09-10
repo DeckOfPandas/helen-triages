@@ -1,6 +1,6 @@
 ---
 title: "Pear, apricot and rosemary Bellini"
-tagline: "Nicer than champagne, honestly."
+tagline: "You can use champagne instead of soda water if you insist."
 glass:
   - "flute"
 garnish:
@@ -43,8 +43,6 @@ mood:
   - "I want to faff"
   - "no juicing"
 notes:
-  - label: "sidegrade"
-    text: "You can use champagne instead of soda water if you insist."
   - label: "portioning"
     text: "1 pear makes 3–4 orders."
 source: ""

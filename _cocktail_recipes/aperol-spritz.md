@@ -1,6 +1,6 @@
 ---
 title: "Aperol Spritz"
-tagline: "Prosecco with an attitude."
+tagline: "I don't care that it isn't 2010 any more. You will prise my giant wine glass out of my cold, dead hands."
 glass:
   - "wine"
 garnish:
