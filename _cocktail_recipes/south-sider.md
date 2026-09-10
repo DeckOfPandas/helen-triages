@@ -17,7 +17,7 @@ ingredients:
     generic: "aromatic bitters"
     suggestion: ["Angostura"]
   - amount: "2 drops"
-    generic: "Creole bitters"
+    generic: "Créole bitters"
     suggestion: ["Peychaud's"]
   - amount: "15 ml"
     generic: "champagne"
@@ -41,5 +41,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

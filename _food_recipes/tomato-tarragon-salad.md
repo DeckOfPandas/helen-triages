@@ -12,7 +12,7 @@ tags: ["extras", "no-cook", "salad"]
 ingredient_groups:
   - items:
     - amount: "500 g"
-      item: "ripe, fresh, plum tomatoes (about 6)"
+      item: "ripe fresh plum tomatoes (about 6)"
     - amount: "5 tbsp"
       item: ketchup
     - amount: "2 tbsp"
@@ -41,6 +41,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
