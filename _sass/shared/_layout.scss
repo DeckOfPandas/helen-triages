@@ -150,6 +150,21 @@ main {
   display: flex;
   align-items: center;
   gap: 1.6rem;
+
+  // WRAPS RATHER THAN OVERFLOWS -- a `site_neutral` page (about) renders BOTH
+  // sites' links in this row, one icon-word-arrow group each plus the 1.6rem
+  // gap, where every other page renders only one. That second group is what a
+  // single-site page never had to make room for: `shoot.sh` found
+  // `.site-nav-icons` running 4px past a 360px viewport on /about/, the row's
+  // own two groups wider than the column even though neither group alone
+  // would be. `flex-wrap: wrap` lets the second group drop to a line of its
+  // own instead of forcing the row wider than the page; `justify-content:
+  // center` keeps a single wrapped line centred under the wordmark rather
+  // than pinned to the row's start edge, matching `justify-self: center` on
+  // the container itself. Harmless everywhere else: one group never has
+  // reason to wrap.
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 // The row's own word and arrow. Courier in the site's own bracket device --
@@ -370,14 +385,13 @@ main {
   grid-column: 2;
   grid-row: 1;
 
-  // THE COLUMN IS A STACK, in Helen's own running order for issue #652:
-  // "[heart drawing] / about / [GitHub logo] / licences line". Before
-  // 2026-09-05 only the hearts were in this grid and the other four were
-  // siblings BELOW it, centred by `.site-footer`'s own `text-align` rather
-  // than by the grid — so the footer ran two alignment systems at once, a
-  // left-aligned reference column beside a page-centred everything-else. That
-  // will read worse rather than better once cocktails earns its reference
-  // pages and the outer columns finally balance.
+  // THE COLUMN IS A STACK, in Helen's revised running order for issue #915:
+  // about / [GitHub logo] / [heart drawing] / copyright / licences line —
+  // superseding #652's "[heart drawing] / about / [GitHub logo] / licences
+  // line". #652's own case for gathering these four into the grid's middle
+  // track (rather than as siblings below it, centred by `.site-footer`'s own
+  // `text-align`, which ran two alignment systems in one footer) is unchanged;
+  // only the order within the stack moved.
   //
   // `justify-items` rather than `text-align`: the GitHub mark is a link around
   // an SVG, not text, so centring its BOX is what actually centres it. The
@@ -385,6 +399,23 @@ main {
   display: grid;
   justify-items: center;
   gap: $space-sm;
+}
+
+// #915: A CLASS OF ITS OWN, SO THE RESET BELOW CANNOT ALSO CATCH
+// `.site-footer-license` (a `.site-footer-centre p` reset would win on
+// specificity over that class alone and silently cancel its own margin-top --
+// found by measuring the actual rendered gap rather than trusting the rule).
+.site-footer-copyright {
+  // A BROWSER'S DEFAULT MARGIN-BLOCK ON <p> WAS QUIETLY FIGHTING THE
+  // "LICENCES SIT CLOSE TO COPYRIGHT" INTENT BELOW. Nothing in this file ever
+  // reset it, so on top of the grid's own row gap, this paragraph was ALSO
+  // carrying ~1em of its own UA-default margin on both sides -- measured 12px
+  // at this column's font-size, more than the whole rest of the intentional
+  // spacing in the stack. That is the actual reason the licences line never
+  // read as close to the copyright line above it despite
+  // `.site-footer-license`'s own tight margin-top: the tight margin was real,
+  // it was just being added to an invisible 12px nobody had accounted for.
+  margin: 0;
 }
 
 // STILL PLACED IN THE MIDDLE TRACK, just via its wrapper now. The reasoning
@@ -462,6 +493,13 @@ main {
   display: flex;
   justify-content: center;
   line-height: 0;
+  // #915: SPACE ON BOTH SIDES NOW, not just below. The graphic sat first in
+  // the stack under #652's order, so nothing preceded it and only its
+  // margin-bottom existed; #915 moved it to the middle of the stack, between
+  // the GitHub mark and the copyright line, and it still reads as a distinct
+  // graphic element rather than a fourth line of text only if it keeps that
+  // same breathing room on the side that's now adjacent to something too.
+  margin-top: $space-md;
   margin-bottom: $space-md;
 
   svg {
@@ -484,9 +522,13 @@ main {
 // than styled as a button -- it is one of the boring links, which is the whole
 // reason it is down here as well as up in the header (see default.html).
 // Font, size and colour are inherited from .site-footer, same as .site-footer-ref.
+//
+// NO EXTRA MARGIN-TOP, SINCE #915 -- this used to carry `$space-md` to clear
+// the hearts graphic that sat above it under #652's order. #915 put "about"
+// first in the stack instead, so a margin here would only push it down off
+// the row's own top edge, where `.site-footer-top`'s `align-items: start`
+// means it should line up with the two reference columns' bracketed words.
 .site-footer-about {
-  margin-top: $space-md;
-
   a {
     color: inherit;
     text-decoration: underline;
@@ -495,6 +537,13 @@ main {
   }
 }
 
+// #915: Helen wants the licences line sitting close to the copyright line "to
+// show they're one object" -- unaffected by that issue's reordering above,
+// since copyright and licences stay adjacent, in that order, at the foot of
+// the stack. `$space-xxs` on top of the grid's `$space-sm` row gap is already
+// noticeably tighter than every other pair of rows in this column (about
+// 10px here against ~20px elsewhere), which is what reads the two lines as
+// one object rather than two.
 .site-footer-license {
   margin-top: $space-xxs;
 
@@ -979,6 +1028,24 @@ $tape-protrusion: 0.2rem;
     justify-self: center;
     align-items: center;
     text-align: center;
+  }
+
+  // #916: THE GRID'S OWN `gap: $space-lg` (1rem) READS AS THE SAME BREATH AS
+  // ONE REFERENCE COLUMN'S OWN INTERNAL LINE SPACING ($space-sm, half of it),
+  // not as a break between two different sites' material. A phone screenshot
+  // showed [ FOOD ]'s last link sitting no more distinctly apart from
+  // [ COCKTAILS ]'s bracketed word than that word sits from its own link
+  // underneath -- the boundary between two columns needs to read as a bigger
+  // gap than the boundary between two lines of the same column, and doubling
+  // $space-sm to $space-lg was not enough of a jump to do that at this size.
+  //
+  // The adjacent-sibling selector only ever matches when a second reference
+  // column is actually rendered (default.html only emits one per site with
+  // material), so a food-only page's stack is untouched -- same
+  // gated-on-having-material convention #529 already uses for the column
+  // itself.
+  .site-footer-ref + .site-footer-ref {
+    margin-top: $space-md;
   }
 
   .site-footer-hearts {

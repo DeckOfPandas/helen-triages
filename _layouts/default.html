@@ -338,25 +338,22 @@
       {% endfor %}
       {% comment %} The hearts are chrome, so they are unconditional and named in
          decorations.js rather than chosen by a per-site `footer_svg` key. {% endcomment %}
-      {% comment %} THE CENTRE COLUMN, issue #652 — Helen's own running order:
-         "[heart drawing] / about / [GitHub logo] / licences line". Until
-         2026-09-05 only the hearts sat in `.site-footer-top`; about, the GitHub
-         mark, the copyright and the licences were siblings BELOW it, centred by
-         the footer's own `text-align` rather than by the grid. That read as two
-         alignment systems in one footer — a left-aligned reference column
-         beside a page-centred everything-else — and it will read worse, not
-         better, once cocktails earns its own right-hand column and the top row
-         finally balances.
+      {% comment %} THE CENTRE COLUMN, issue #915 — Helen's revised running
+         order: about / [GitHub logo] / [heart drawing] / copyright / licences.
+         SUPERSEDES #652's "[heart drawing] / about / [GitHub logo] / licences
+         line" — a ruling is not permanent, and this is Helen looking at the
+         built page and changing her mind about the order rather than a
+         re-argument of #652's own case for putting these four in the grid's
+         middle track at all, which stands unchanged.
 
          Putting them in the middle track makes the footer the three columns it
          has claimed to be since #374: a site's reference links either side, and
          the things belonging to neither site down the middle.
 
-         `grid-column: 2` lives on this wrapper now rather than on the hearts —
+         `grid-column: 2` lives on this wrapper rather than on the hearts —
          see _sass/shared/_layout.scss for why the middle track is pinned rather
          than auto-flowed, which is unchanged and still load-bearing. {% endcomment %}
       <div class="site-footer-centre">
-        <div class="site-footer-hearts" aria-hidden="true"></div>
         {% comment %} The about page, reachable from the footer as well as the
            header -- Helen's ask, 2026-08-23, after cooking from her phone,
            where the header nav is the harder of the two to hit.
@@ -370,25 +367,28 @@
            rather it read "???" to match the page's own wordmark, that is a
            one-word change.
 
-           SECOND IN THE CENTRE COLUMN, DIRECTLY UNDER THE HEARTS, since #652
-           put that column in Helen's own running order. That supersedes #517,
-           which had moved this BELOW the licences on the reasoning that a link
-           a reader actually wants should not sit at the top of a block of
-           boilerplate they do not. The reasoning was right and the column
-           answers it better: there is no block of boilerplate above it any
-           more, because the boilerplate is underneath it. {% endcomment %}
+           FIRST IN THE CENTRE COLUMN, since #915 put it there. {% endcomment %}
         <nav class="site-footer-about" aria-label="About this site">
           <a href="{{ '/about/' | relative_url }}">about</a>
         </nav>
         <a class="site-footer-github" href="https://github.com/DeckOfPandas/helen-triages" aria-label="Source on GitHub">
           {% include icons/github.svg %}
         </a>
-        <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
+        <div class="site-footer-hearts" aria-hidden="true"></div>
+        <p class="site-footer-copyright">&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
         {% comment %} TWO SENTENCES, EACH IN ITS OWN SPAN, so a phone can stack
            them (#902, Helen: "stack the two licences on narrower screens").
            One paragraph still; the spans are inline at desktop width and
            `display: block` under the footer's phone breakpoint in
-           _sass/shared/_layout.scss. {% endcomment %}
+           _sass/shared/_layout.scss.
+
+           SITS CLOSER TO THE COPYRIGHT LINE THAN THE GRID'S OWN ROW GAP WOULD
+           PUT IT, #915 — Helen: the licences line should sit close to the
+           copyright line "to show they're one object". See
+           `.site-footer-license`'s `margin-top` in _sass/shared/_layout.scss;
+           the tighter distance is set there rather than by this column's
+           general `gap`, which every OTHER pair of rows here still uses.
+           {% endcomment %}
         <p class="site-footer-license">
           <span class="site-footer-license-line">Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.</span>
           <span class="site-footer-license-line">Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</span>
