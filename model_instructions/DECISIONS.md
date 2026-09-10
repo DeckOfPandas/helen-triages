@@ -2046,6 +2046,19 @@ unless stated.
   champagne forms stay declared beside the shape that generalises them; they
   were first, they are exact, and retiring them is churn with no reader.
 
+  **She pruned nothing and amended two, the same night** (PR #906: *"Rest
+  fine, great, please amend."*): the Martinique Swizzle's build-and-stir is
+  *"Stir all ingredients together."* — *"'Add all ingredients.' doesn't need
+  to be a step on its own. I'd prefer something more concise"* — declared
+  under `stir:`; and Sazerac (Death & Co)'s twist *"can be 'lemon twist
+  (discarded)'"*, so the hand-written squeeze step went and the layout's
+  express step took over. Applied as text edits to 12 live drinks and 16
+  drafts; `proposals` is empty again. **The live drinks kept `proofread:
+  true` on her grant** — asked how she wanted to re-proofread 48 drinks after
+  a methods pass: *"Line by line. I can just grind it out."* — so
+  `COCKTAIL_BASELINE_COMMIT` moved to the apply commit, in a commit of its
+  own, and nothing left the live site for the review.
+
 ### §9.13 The visual language — the rounds
 
 - **2026-08-26** — One sitting with Helen against a mockup

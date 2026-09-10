@@ -26,7 +26,7 @@ ingredients:
   - amount: "to top"
     generic: "soda water"
 method:
-  - "Heat everything exept the soda water and vinegar with 100 ml water."
+  - "Heat everything except the soda water and vinegar with 100 ml water."
   - "Heat for 10 mins, or until soft."
   - "Leave to cool completely."
   - "Strain the syrup and add the vinegar."

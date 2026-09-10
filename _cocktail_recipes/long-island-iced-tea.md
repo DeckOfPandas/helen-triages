@@ -27,7 +27,7 @@ ingredients:
   - amount: "60 ml"
     generic: "cola"
 method:
-  - "Shake everything except the cola with ice."
+  - "Shake all ingredients other than the cola with ice."
   - "Strain into a highball glass, pouring the cola in at the same time."
 mood:
   - "sugar craving"

@@ -491,7 +491,7 @@ that needs two is free text.
 **Stir:** `Stir all ingredients with ice.` ·
 `Stir the remaining ingredients with ice.` ·
 `Stir all ingredients other than the champagne with ice.` · `Stir until cold.` ·
-`Stir.`
+`Stir.` · `Stir all ingredients together.`
 
 **Blend and swizzle:** `Blend all ingredients until smooth.` ·
 `Swizzle until the glass frosts.` ·

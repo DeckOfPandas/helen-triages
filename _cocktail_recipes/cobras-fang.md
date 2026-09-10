@@ -38,9 +38,9 @@ ingredients:
     generic: "warm-spiced bitters"
     suggestion: ["Bittermens 'Elemakule Tiki Bitters"]
 method:
-  - "Short shake all the ingredients except the bitters with three ice cubes."
+  - "Short shake all ingredients other than the bitters with three ice cubes."
   - "Strain."
-  - "Drop the bitters on the top."
+  - "Drop the bitters on top."
 to_serve: "Plastic giraffes, paper umbrella, teeny flamingos, passion fruit shells filled with Overproof rum and fire, cinnamon sparkles."
 mood:
   - "warming"

@@ -25,7 +25,7 @@ method:
   - "Fine strain."
   - "Churn."
   - "Fill glass with crushed ice and churn more."
-  - "Drop the olive oil on the top."
+  - "Drop the olive oil on top."
 to_serve: "Straw."
 mood:
   - "sharp"
