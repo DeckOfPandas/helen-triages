@@ -150,6 +150,21 @@ main {
   display: flex;
   align-items: center;
   gap: 1.6rem;
+
+  // WRAPS RATHER THAN OVERFLOWS -- a `site_neutral` page (about) renders BOTH
+  // sites' links in this row, one icon-word-arrow group each plus the 1.6rem
+  // gap, where every other page renders only one. That second group is what a
+  // single-site page never had to make room for: `shoot.sh` found
+  // `.site-nav-icons` running 4px past a 360px viewport on /about/, the row's
+  // own two groups wider than the column even though neither group alone
+  // would be. `flex-wrap: wrap` lets the second group drop to a line of its
+  // own instead of forcing the row wider than the page; `justify-content:
+  // center` keeps a single wrapped line centred under the wordmark rather
+  // than pinned to the row's start edge, matching `justify-self: center` on
+  // the container itself. Harmless everywhere else: one group never has
+  // reason to wrap.
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 // The row's own word and arrow. Courier in the site's own bracket device --
