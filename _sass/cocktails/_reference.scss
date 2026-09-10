@@ -135,9 +135,22 @@ $ref-col-card:    minmax(6rem, 9rem);
 
   // The drink page's INGREDIENTS/METHOD mark exactly — absinthe over violette.
   // Not the notes variant: nothing on this page is Helen's commentary.
+  //
+  // LAST LINE ONLY, #920 -- measured before it was fixed. Every heading here is
+  // a real sentence ("Rum "styles" I do not recognise", "Rum-adjacent sugarcane
+  // spirits"), not the one word a drink page's INGREDIENTS/METHOD/NOTES always
+  // is, so this is the first cocktails consumer of the mark that actually
+  // wraps. `overlapping-rule-double`'s `box-decoration-break: clone` paints a
+  // full copy of the mark on every line fragment -- at 390px "Rum "styles" I do
+  // not recognise" wrapped to two lines and wore the double rule under both,
+  // which is exactly the bug MANUAL §13.1 and `assets/js/last-line-rule.js`
+  // exist to prevent on food (Helen: "Last line only please, 10000%.").
+  // `overlapping-rule-double-last-line` is that same fix, and
+  // `last-line-rule.js`'s TARGETS now includes `.ref-section-heading span` --
+  // see that file's header for why it doesn't reuse `.section-heading-text`.
   span {
     display: inline;
-    @include overlapping-rule-double($color-electric-absinthe, $color-ultra-violette);
+    @include overlapping-rule-double-last-line($color-electric-absinthe, $color-ultra-violette);
   }
 }
 
@@ -428,16 +441,23 @@ $ref-list-gutter: 1.3rem;
 // So the file is gone, the `<dd>` rule with it, and the `<dl>` is a `<ul>`: a
 // definition list whose definitions can never exist is a promise the markup
 // cannot keep.
+//
+// AND IT NOW TAKES THE SAME MARKED-LIST FORMAT AS CHARACTERS, #920. It was a
+// bare vertical run with no gutter mark until this page's other borrowed list
+// (`.rum-chars`, below) sat five paragraphs under it in a visibly different
+// shape -- the same failure `ref-marked-list` was built to close on this page,
+// just not yet applied everywhere it fits. Both lists are the same shape (a
+// flat list of members, introduced by a colon sentence), which is the about
+// page's own pattern too: `about-ways` is reused verbatim for "the food side"
+// and "the cocktail side" rather than earning a second mark for the second
+// list. Same reasoning here -- one mark, not a new one per list.
 .rum-retired {
-  list-style: none;
-  margin: $space-md 0 0;
-  padding: 0;
+  @include ref-marked-list("→");
 }
 
 .rum-retired-word {
   font-family: $font-label;
   color: $color-text;
-  margin-top: $space-lg;
 }
 
 // `.rum-sipping` WAS HERE AND IS GONE, 2026-09-10. It styled the Sipping
@@ -463,9 +483,21 @@ $ref-list-gutter: 1.3rem;
   }
 
   // THE MAJOR HEADINGS COME DOWN, seen at 390px rather than assumed. At 2rem
-  // "Rum "styles" I do not recognise" takes three lines and the tape rule draws
-  // under every one of them, so the mark stops reading as one heading's
-  // underline and starts reading as three stripes. 1.5rem takes it to two lines.
+  // "Rum "styles" I do not recognise" took three lines against 1.5rem's two.
+  //
+  // THE REASON THIS WAS WRITTEN FOR IS GONE, #920, AND THE RULE STAYS ANYWAY.
+  // This first shipped as a stripe-avoidance measure: the mark had no
+  // last-line-only handling yet, so every extra line was another full copy of
+  // the double rule, and fewer lines read as fewer stripes. `.ref-section-
+  // heading span` now carries `overlapping-rule-double-last-line` and is a
+  // `last-line-rule.js` target, so the mark draws once under whichever line
+  // is last regardless of how many there are -- three lines at 2rem would be
+  // just as correct as two at 1.5rem now. Kept at 1.5rem anyway, on its own
+  // remaining merits: three lines of a 2rem major heading is still more
+  // vertical column than a phone screen wants to spend on one heading, one
+  // rank above shelf headings that never exceed two words. A legibility
+  // choice now, not a bug workaround -- the two happened to want the same
+  // number.
   //
   // The shelves are left alone: they are one or two words and already fit.
   .ref-section-heading--major {

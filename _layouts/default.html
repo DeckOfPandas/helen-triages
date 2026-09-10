@@ -419,9 +419,12 @@
 
      LOADED FROM THE SHARED LAYOUT, not from recipe.html, because it is
      site-agnostic in the same way print-link.js and universe.js are: it queries
-     a class list and does nothing on a page that has none. Cocktails has no
-     wrapping consumer of the mark, so on a drink page it finds nothing and
-     returns.
+     a class list and does nothing on a page that has none. A DRINK page has no
+     wrapping consumer of the mark (INGREDIENTS/METHOD/NOTES never wrap), but
+     cocktails' reference layer does — #920, the script's own header has the
+     detail. This comment said "cocktails has no wrapping consumer" full stop
+     until then, which was true of drink pages and stopped being true of the
+     site the day the rum reference page grew real sentences for headings.
 
      AFTER assets.js, which is the one hard ordering rule here
      (tests/test_site_config.py::test_assets_js_loads_before_any_other_script).

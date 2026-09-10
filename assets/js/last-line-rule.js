@@ -71,9 +71,17 @@
 //
 // Nothing in this file knows which site it is on, per the shared-JS rule and
 // the same shape as print-link.js and universe.js: it queries a class list and
-// does nothing on a page that has none. Cocktails has no consumer of
-// `overlapping-rule-double` that wraps, so on a drink page it finds nothing and
-// returns.
+// does nothing on a page that has none.
+//
+// COCKTAILS DOES HAVE A WRAPPING CONSUMER NOW, AND THIS COMMENT USED TO SAY
+// OTHERWISE — #920. `.ref-section-heading span` (the cocktails reference
+// layer, `_sass/cocktails/_reference.scss`) carries the same
+// `overlapping-rule-double` mark on real sentences ("Rum "styles" I do not
+// recognise"), not the one-word INGREDIENTS/METHOD/NOTES headings a drink page
+// has always had — those never wrap, which is exactly why the claim held for
+// as long as it did (§12: "a cross-reference to another file's behaviour is a
+// claim nothing re-checks"). At 390px it wraps to two lines and wore the
+// double rule under both, measured by screenshot before this line was added.
 // =============================================================================
 
 (function () {
@@ -83,7 +91,17 @@
   // second classes on .section-heading-text, so the base selector reaches all
   // three keys). NOT the index's `.category-label-text`, which wears the same
   // mixin on a one-word filter label that never wraps.
-  var TARGETS = '.recipe-title-text, .section-heading-text';
+  //
+  // `.ref-section-heading span` is cocktails' own equivalent — an unclassed
+  // span, because the reference layer draws its own small anatomy rather than
+  // sharing food's `.section-heading-text` (MANUAL §14: "`.ref-*` is its own
+  // page anatomy"). Reusing that class name here rather than adding a fourth
+  // selector would work by accident (it carries no bare styling of its own,
+  // only scoped under `.recipe-section-heading` or a `--modifier`), but it is
+  // exactly the trap this file's own history warns about — "a class carries
+  // every declaration, not the one you wanted" — so it gets its own selector
+  // instead.
+  var TARGETS = '.recipe-title-text, .section-heading-text, .ref-section-heading span';
 
   var els = Array.prototype.filter.call(
     document.querySelectorAll(TARGETS),
