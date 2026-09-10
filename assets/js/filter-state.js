@@ -216,7 +216,18 @@
        NARROWING, and clear-all DOES clear it. Both follow from it being an
        ordinary filter: it hides rows, so the "searching" message must not
        replace a shortlisted view; and `clear all` means "show me everything
-       again", which would be a lie if one filter survived it. */
+       again", which would be a lie if one filter survived it.
+
+       BUT IT IS A VIEW, NOT A FACET -- #918, Helen, 2026-09-10, and she
+       called it a bug rather than a preference. As a plain filter it ANDed
+       with everything else: shortlist a recipe, type "lasa", shortlist the
+       lasagne, press `shortlisted (2)` and see ONE recipe; type "duck" while
+       in the view and see NONE. Fourteen steps, four surprises, all of them
+       this composition. So `shortlisted` cannot be true while any other
+       filter is set: entering the view clears the rest (enterShortlistView),
+       and setting anything else leaves it (reconcileShortlistView, run at
+       the top of every apply). A half-typed search keeps the view -- see
+       `keepsView` on the three flags below. */
     shortlisted: { empty: function () { return false; }, narrows: true },
 
     /* The title search, folded and lowercased by filters.js before it lands
@@ -237,8 +248,12 @@
        to clear them but deleting the text by hand. Helen found that one.
 
        It does not narrow anything — it is the very state hasNarrowingFilter
-       exists to ask a question ABOUT — so narrows is false. */
-    isSearching: { empty: function () { return false; }, narrows: false },
+       exists to ask a question ABOUT — so narrows is false.
+
+       `keepsView`: typing into a box while the shortlist view is on does not
+       leave the view; only CHOOSING a result does, because only the choice
+       narrows the list (#918). The same key on the two sibling flags. */
+    isSearching: { empty: function () { return false; }, narrows: false, keepsView: true },
 
     /* isSearching's sibling for the LEAVE OUT box (#exclude-search-box, GitHub
        issue #52) — "the exclude box has text in it and nothing has been
@@ -252,7 +267,7 @@
        reasons: clear-all DOES clear it (empties the box and its results pool,
        see clearAllFilters()), so it must count towards hasAnythingToClear; it
        does not narrow anything, so narrows is false. */
-    isExcludeSearching: { empty: function () { return false; }, narrows: false }
+    isExcludeSearching: { empty: function () { return false; }, narrows: false, keepsView: true }
   };
 
   /* THE COCKTAIL INDEX'S FIELDS — GitHub issue #579.
@@ -309,8 +324,8 @@
        screen with no other way to dismiss them but deleting the text by hand.
        That is issue #274 on the food side, and it is cheaper to declare the
        field than to rediscover it here. */
-    isIncludeSearching: { empty: function () { return false; }, narrows: false },
-    isExcludeSearching: { empty: function () { return false; }, narrows: false }
+    isIncludeSearching: { empty: function () { return false; }, narrows: false, keepsView: true },
+    isExcludeSearching: { empty: function () { return false; }, narrows: false, keepsView: true }
   };
 
   // Derived, never hand-maintained: these two are why adding a field to a spec
@@ -349,6 +364,45 @@
      construction: clear-all assigns emptyState(), and both walk FIELDS. */
   function hasAnythingToClearFor(spec, state) {
     return Object.keys(spec).some(function (f) { return isFieldSet((state || {})[f]); });
+  }
+
+  /* ---------------------------------------------------------------------------
+     THE SHORTLIST VIEW -- #918
+     ---------------------------------------------------------------------------
+     `shortlisted` is exclusive: it is never true while any other field that
+     narrows the list is set. Two functions hold that, and every index calls
+     both from one place each, so neither page can drift into composing them.
+
+     enterShortlistView   the state the shortlist button produces when pressed
+                          ON: everything cleared, `shortlisted` true. The
+                          caller still has to empty its own text boxes and
+                          pools, exactly as it does for clear-all.
+     reconcileShortlistView
+                          run at the top of every apply(): if the view is on
+                          AND some other field is set, the other field arrived
+                          second (entering the view cleared everything), so the
+                          view is left. Returns true when it did so. A field
+                          marked `keepsView` -- a half-typed search -- is
+                          ignored: text in a box narrows nothing until a result
+                          is chosen, and the choice is what leaves the view.
+
+     Restoring an old record (a back navigation from before this rule, say)
+     is reconciled the same way, which is why it lives in apply() and not in
+     the click handler. */
+  function enterShortlistViewFor(spec) {
+    var state = emptyStateFor(spec);
+    if ('shortlisted' in spec) state.shortlisted = true;
+    return state;
+  }
+
+  function reconcileShortlistViewFor(spec, state) {
+    var s = state || {};
+    if (!s.shortlisted) return false;
+    var other = Object.keys(spec).some(function (f) {
+      return f !== 'shortlisted' && !spec[f].keepsView && isFieldSet(s[f]);
+    });
+    if (other) s.shortlisted = false;
+    return other;
   }
 
   /* ---------------------------------------------------------------------------
@@ -600,6 +654,8 @@
       hasAnythingToClear: function (state) { return hasAnythingToClearFor(spec, state); },
       isEmpty: function (state) { return !hasAnythingToClearFor(spec, state); },
       hasNarrowingFilter: function (state) { return hasNarrowingFilterFor(spec, state); },
+      enterShortlistView: function () { return enterShortlistViewFor(spec); },
+      reconcileShortlistView: function (state) { return reconcileShortlistViewFor(spec, state); },
       serialise: function (state) { return serialiseFor(spec, state); },
       deserialise: function (raw) { return deserialiseFor(spec, raw); }
     };
@@ -629,6 +685,8 @@
     hasAnythingToClear: food.hasAnythingToClear,
     isEmpty: food.isEmpty,
     hasNarrowingFilter: food.hasNarrowingFilter,
+    enterShortlistView: food.enterShortlistView,
+    reconcileShortlistView: food.reconcileShortlistView,
 
     // The two tables, and the factory that binds either. FOOD_FIELDS is the
     // same object the food-shaped exports above are bound to, exported so a

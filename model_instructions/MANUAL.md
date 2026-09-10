@@ -1005,6 +1005,19 @@ checked — it caught `garlic cloves` landing on the spice rack).
 
 ---
 
+### 8.9 The shortlist view on both indexes
+
+**`shortlisted (N)` is a VIEW, not a facet** (#918). Pressing it on clears
+every other filter and shows the whole shortlist; setting any filter or
+choosing a search result while it is on turns it off and applies that filter
+to the whole collection; typing into a box without choosing keeps it. `clear
+all` turns it off. The rule is two functions in `assets/js/filter-state.js`
+(`enterShortlistView`, `reconcileShortlistView`), the second run at the top
+of every `update()`/`apply()`, and `tests/js/shortlist-view.test.js`
+generates the cases from both field tables. It did compose with the other
+filters until 2026-09-10; `DECISIONS.md` §8.3 has the fourteen steps that
+ended that.
+
 ## 9. Cocktails
 
 **Cocktails does not share food's data model and is not going to.** A food

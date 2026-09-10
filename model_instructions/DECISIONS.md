@@ -880,6 +880,41 @@ unless stated.
 
 ---
 
+### §8.3 The shortlist is a view, not a facet — #918, 2026-09-10
+
+- **Helen, having used both indexes for a weekend's planning:** fourteen
+  steps written out, four of them surprising, and *"I'll even say a bug not a
+  preference."* Shortlist a recipe; type "lasa"; shortlist the lasagne; press
+  `shortlisted (2)` — see ONE recipe, because the title search is still on.
+  Clear all — see everything, not the shortlist, because clear-all clears the
+  shortlist flag too. Press `shortlisted` again — both. Type "duck" — see
+  NOTHING, because nothing shortlisted has duck in its name. Press
+  `shortlisted` to find out whether it is on — it turns OFF and the ducks
+  appear; the button still says (2), and pressing it empties the list again.
+- **Every one of those is the same fact**: `shortlisted` was declared as an
+  ordinary filter in `filter-state.js` and so ANDed with everything else.
+  `food/index.html`'s own comment sold that as a feature (*"shortlisted AND
+  make-ahead is a question you can now ask"*). Nobody had asked it on
+  purpose; she asked it by accident fourteen steps running.
+- **The rule now, held in two pure functions and generated tests across BOTH
+  field tables (`tests/js/shortlist-view.test.js`):** the view is exclusive.
+  Pressing `shortlisted` ON clears every other filter — state, boxes, pools,
+  lit buttons, the same reset clear-all uses — and shows the whole shortlist.
+  Setting any other filter while it is on turns it OFF and applies that
+  filter to the whole collection (`reconcileShortlistView`, run at the top of
+  every `update()`/`apply()`, so no handler can forget it). A half-typed
+  search (`isSearching` and its siblings, marked `keepsView`) does not leave
+  the view; choosing a result does. `clear all` still turns it off, because
+  "show me everything" is what those words mean.
+- **The alternative not taken**: keep composing but say so in the count ("1 of
+  2 shortlisted match"). It keeps a power nobody had used and keeps every
+  surprise in the list above, smaller. Rejected without a candidates page:
+  Helen had already ruled it a bug.
+- Walked on the built food index with the browser harness after the change:
+  step 5 shows two, step 10 shows nine ducks with the view off and the button
+  reading (2) unpressed, step 12 shows two again with the search box emptied,
+  clear all shows everything.
+
 ## §9 Cocktails
 
 ### §9.1 Privacy, the clone, the fetch discipline

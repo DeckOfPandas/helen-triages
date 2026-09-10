@@ -250,9 +250,12 @@ permalink: /food/
 
      NO SEPARATE PAGE, AND THAT IS THE DESIGN RATHER THAN THE CHEAP OPTION. This
      index already renders every row, already filters, counts and paginates
-     them, and already knows how to combine filters -- so "shortlisted" is one
-     more predicate over rows the page is holding anyway, and it composes:
-     shortlisted AND make-ahead is a question you can now ask. The alternative,
+     them -- so "shortlisted" is one more predicate over rows the page is
+     holding anyway. IT DOES NOT COMPOSE WITH THE OTHERS, since 2026-09-10
+     (#918): it is a VIEW of the shortlist, and pressing it clears every other
+     filter, while setting any other filter leaves it. This paragraph used to
+     say "shortlisted AND make-ahead is a question you can now ask"; Helen
+     asked it by accident fourteen steps running and called it a bug. The alternative,
      a page rendered from the stored list, needs a second copy of the row markup
      and has to decide what to do about an entry whose recipe has been renamed
      or held back by the publish gate. Here that entry simply has no row on the

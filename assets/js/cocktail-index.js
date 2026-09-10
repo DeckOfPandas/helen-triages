@@ -904,6 +904,11 @@
      top is not. Same rule filters.js states for the food index. */
   function apply(preservePage) {
     if (!preservePage) { currentPage = 1; showAll = false; }
+    /* THE SHORTLIST VIEW GIVES WAY TO ANY OTHER FILTER -- #918. Every handler
+       ends in apply(), so this is the whole of that rule on this page; the
+       button is painted from `state.shortlisted` further down in this same
+       pass. See filter-state.js. */
+    FilterState.reconcileShortlistView(state);
     var shown = 0;
     var ranked = [];
     /* Set by moveMatchedChipsFirst below. Collected across the whole pass so
@@ -1186,10 +1191,19 @@
 
      No sync call after the state change -- apply() paints this button in the
      same pass it filters, for the reason its own comment there gives. */
+  /* A VIEW, NOT A FACET -- #918, the same rule filters.js states. ON clears
+     every other filter (state, boxes, pools, lit buttons) and shows the whole
+     shortlist; OFF is the plain toggle; any filter set while it is on takes it
+     off again, in apply(). */
   if (shortlistOnlyBtn) {
     shortlistOnlyBtn.hidden = false;
     shortlistOnlyBtn.addEventListener('click', function () {
-      state.shortlisted = !state.shortlisted;
+      if (state.shortlisted) {
+        state.shortlisted = false;
+      } else {
+        state = FilterState.enterShortlistView();
+        resetControls();
+      }
       apply();
     });
   }
@@ -1455,18 +1469,26 @@
     });
   }
 
-  function clearAll() {
-    /* ONE assignment, not a field-by-field emptying. A field-by-field version
-       is a list that has to be kept in step with hasAnythingToClear()'s list,
-       and on the food side it wasn't, three times in two days. emptyState()
-       walks the same table that predicate walks. */
-    state = FilterState.emptyState();
+  /* THE BOXES, POOLS AND BUTTONS THAT ARE NOT STATE, emptied and repainted
+     after the state has been. Shared by clear-all and by the shortlist button
+     turning its view on (#918), which is a clear-all with one field kept --
+     filters.js's resetFilterControls() is the same split for the same reason. */
+  function resetControls() {
     [incInput, excInput, nameInput].forEach(function (input) {
       if (input) input.value = '';
     });
     Object.keys(redrawPool).forEach(function (field) { redrawPool[field](); });
     syncMoodButtons();
     syncChaosButtons();
+  }
+
+  function clearAll() {
+    /* ONE assignment, not a field-by-field emptying. A field-by-field version
+       is a list that has to be kept in step with hasAnythingToClear()'s list,
+       and on the food side it wasn't, three times in two days. emptyState()
+       walks the same table that predicate walks. */
+    state = FilterState.emptyState();
+    resetControls();
     apply();
   }
 

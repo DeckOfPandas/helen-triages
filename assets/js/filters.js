@@ -843,6 +843,11 @@ function renderResultsPool() {
 
   function update(preservePage) {
     if (!preservePage) { currentPage = 1; showAll = false; }
+    /* THE SHORTLIST VIEW GIVES WAY TO ANY OTHER FILTER -- #918. Every handler
+       that sets a field ends in update(), so this one line is the whole of
+       "touching a filter leaves the view", and it also reconciles a state
+       restored from before the rule existed. See filter-state.js. */
+    FilterState.reconcileShortlistView(state);
     var visibleCount = 0;
     var totalPages = 1;
     var suppressList = state.isSearching && !hasNarrowingFilter();
@@ -1182,6 +1187,31 @@ function renderResultsPool() {
     });
   }
 
+  /* THE TEXT BOXES AND POOLS THAT ARE NOT STATE. emptyState() empties every
+     field, but a box's text and a results pool's chips are DOM, and something
+     has to empty those too. Two callers: clear-all, and the shortlist button
+     when it turns the view on (#918), which is a clear-all with one field
+     kept. One function, so the two can never disagree about which boxes
+     exist -- the exact drift issue #52 was about, one layer down. */
+  function resetFilterControls() {
+    if (searchBox) searchBox.value = '';
+    if (nameSearchBox) nameSearchBox.value = '';
+    if (nameSearchClear) nameSearchClear.style.visibility = 'hidden';
+    if (resultsPool) resultsPool.innerHTML = '';
+    // The exclusions themselves are already gone -- emptyState() cleared the
+    // Set, and update() repaints the "leaving out" list from it. These three
+    // are the exclude picker's half-typed SEARCH, the same loose ends the
+    // ingredient box's own box/pool/clear are being tidied for two lines up.
+    // There is no panel to leave open any more (issue #586). The reasoning
+    // that used to sit here -- that revealing it was a decision about what
+    // this session is doing rather than a filter, so clear-all must not undo
+    // it -- is the reasoning the disclosure needed and the plain section
+    // does not.
+    if (excludeBox) excludeBox.value = '';
+    if (excludePool) excludePool.innerHTML = '';
+    if (excludeClear) excludeClear.style.visibility = 'hidden';
+  }
+
   if (clearButtons.length) {
     var clearAllFilters = function() {
       // ONE assignment, not a field-by-field emptying -- GitHub issue #52,
@@ -1190,22 +1220,7 @@ function renderResultsPool() {
       // wasn't. emptyState() walks the same FIELD_SPEC that predicate walks,
       // so a field added there is cleared here without this line changing.
       state = FilterState.emptyState();
-      if (searchBox) searchBox.value = '';
-      if (nameSearchBox) nameSearchBox.value = '';
-      if (nameSearchClear) nameSearchClear.style.visibility = 'hidden';
-      if (resultsPool) resultsPool.innerHTML = '';
-      // The exclusions themselves are already gone -- emptyState() cleared the
-      // Set, and update() repaints the "leaving out" list from it. These three
-      // are the exclude picker's half-typed SEARCH, the same loose ends the
-      // ingredient box's own box/pool/clear are being tidied for two lines up.
-      // There is no panel to leave open any more (issue #586). The reasoning
-      // that used to sit here -- that revealing it was a decision about what
-      // this session is doing rather than a filter, so clear-all must not undo
-      // it -- is the reasoning the disclosure needed and the plain section
-      // does not.
-      if (excludeBox) excludeBox.value = '';
-      if (excludePool) excludePool.innerHTML = '';
-      if (excludeClear) excludeClear.style.visibility = 'hidden';
+      resetFilterControls();
       // No button-class loop here any more: update() below calls
       // syncFilterButtons(), which paints every filter button from the state
       // this function has just emptied.
@@ -1546,10 +1561,21 @@ function renderResultsPool() {
      -- shortlist.js reveals the per-row toggles, this reveals the filter. A
      page that somehow loaded one and not the other shows exactly the half that
      works, rather than a filter that does nothing when pressed. */
+  /* A VIEW, NOT A FACET -- #918. Pressing it ON shows the whole shortlist and
+     nothing else: every other filter is cleared, boxes and pools included,
+     exactly as clear-all does it, because a shortlist seen through a title
+     search is what Helen walked into ("see just one recipe, the lasagne").
+     Pressing it OFF is the plain toggle. Filters set while the view is on
+     take it off again -- that half is reconcileShortlistView in update(). */
   if (shortlistOnlyBtn) {
     shortlistOnlyBtn.hidden = false;
     shortlistOnlyBtn.addEventListener('click', function () {
-      state.shortlisted = !state.shortlisted;
+      if (state.shortlisted) {
+        state.shortlisted = false;
+      } else {
+        state = FilterState.enterShortlistView();
+        resetFilterControls();
+      }
       update();
     });
   }
