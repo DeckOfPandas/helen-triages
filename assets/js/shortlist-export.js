@@ -80,27 +80,52 @@
       var note = section && section.querySelector('[data-shortlist-export-empty]');
       if (note) note.hidden = !empty;
     });
-    // #849's SECOND PLACEMENT, revealed by the same pass and for the same
-    // reason: a link to a panel that never appears is a dead end.
-    Array.prototype.slice.call(
-      document.querySelectorAll('[data-shortlist-export-jump]')
-    ).forEach(function (link) { link.hidden = false; });
   }
 
-  /* FOLLOWING THE JUMP LINK OPENS THE PANEL, and without this it does not.
-     The panel is a closed `<details>`, so the browser scrolls to it and shows
-     a summary line -- which is exactly the "I could not find it" Helen
-     reported, moved a few hundred pixels down the page rather than fixed.
-     `<details>` gained automatic opening on fragment navigation only recently
-     and not everywhere, so this does it explicitly rather than relying on it. */
-  function openOnJump() {
-    Array.prototype.slice.call(
-      document.querySelectorAll('[data-shortlist-export-jump]')
-    ).forEach(function (link) {
-      link.addEventListener('click', function () {
-        var panel = document.querySelector('[data-shortlist-export-panel]');
-        if (panel) panel.open = true;
-      });
+  /* THE JUMP LINK ABOVE THE LIST IS GONE, 2026-09-10. #849's second placement
+     put "export list as JSON →" beside the `shortlisted (n)` button, and the
+     `openOnJump` that used to live here opened the panel when it was followed.
+     Helen agreed it read as developer furniture to anyone else looking at the
+     page; the panel at the foot is the one way in now. */
+
+  /* CLEAR, ARMED BY A FIRST CLICK -- Helen, 2026-09-10: "we also need a
+     'clear shortlist' button somewhere." The store has had `clear()` since
+     #546 and nothing called it. Two clicks on purpose: the list is passed
+     round a table on an iPad, and one tap is how it would go. The first click
+     swaps the word for the question in `data-armed-text`; a second within
+     ARM_MS empties the list and repaints everything through the same event a
+     toggle dispatches; doing nothing lets it disarm and the word comes back.
+     No `confirm()` dialog: it is modal, it looks like an error, and on a
+     phone it steals the page. */
+  var ARM_MS = 4000;
+
+  function wireClear() {
+    var btn = document.querySelector('[data-shortlist-clear]');
+    if (!btn) return;
+    var restText = btn.textContent;
+    var armedText = btn.getAttribute('data-armed-text') || restText;
+    var timer = null;
+    btn.hidden = false;
+
+    function disarm() {
+      clearTimeout(timer);
+      timer = null;
+      btn.classList.remove('is-armed');
+      btn.textContent = restText;
+    }
+
+    btn.addEventListener('click', function () {
+      if (!timer) {
+        btn.classList.add('is-armed');
+        btn.textContent = armedText;
+        timer = setTimeout(disarm, ARM_MS);
+        return;
+      }
+      disarm();
+      HTF.shortlist.clear();
+      document.dispatchEvent(new CustomEvent(EVENT, {
+        detail: { key: null, on: null, cleared: true }
+      }));
     });
   }
 
@@ -181,7 +206,7 @@
   if (!boxes().length) return;
   paint();
   wireCopy();
-  openOnJump();
   wireImport();
+  wireClear();
   document.addEventListener(EVENT, paint);
 })();

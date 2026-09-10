@@ -247,6 +247,41 @@ def test_the_food_shopping_scripts_load_in_dependency_order():
     )
 
 
+def test_the_card_measurement_passes_are_loaded_in_order():
+    """card-name-fit.js, then card-line-budget.js, both from the shared layout.
+
+    THE SECOND TAG WAS MISSING FOR TWO DAYS AND NOTHING NOTICED -- 2026-09-08
+    to 2026-09-10. #846 deleted chip-rows.js and its tag from
+    _layouts/default.html, and the comment that replaced them described
+    card-line-budget.js's tag without keeping it. cocktail-index.js guards its
+    call with `if (HTF.cardLineBudget)`, so the #776 budget pass simply never
+    ran and every JS test stayed green: the pure tests run the file directly and
+    never ask whether a page loads it. Found when the pass gained the
+    ship-collision check and marked nothing on a page where seven cards
+    collided.
+
+    The ORDER matters too: the name pass decides how much room the ingredients
+    get, and the budget pass reads the rendered ingredient line, so the budget
+    must run second (its own header says so).
+    """
+    html = read("_layouts", "default.html")
+    order = ["card-name-fit.js", "card-line-budget.js"]
+    found = {}
+    for name in order:
+        match = re.search(r"<script src=[^>]*/" + re.escape(name), html)
+        assert match, (
+            f"_layouts/default.html no longer loads assets/js/{name}. A "
+            "measurement pass that nothing loads fails silently -- the index "
+            "guards the call -- so the tag going missing looks like nothing."
+        )
+        found[name] = match.start()
+
+    assert found["card-name-fit.js"] < found["card-line-budget.js"], (
+        "card-line-budget.js must load after card-name-fit.js: it measures the "
+        "ingredient line the name pass has just decided the clamp for."
+    )
+
+
 def test_the_shopping_list_reads_the_aisles_from_the_data_file():
     """The aisle headings are emitted from _data/food/aisles.yml, not written out.
 

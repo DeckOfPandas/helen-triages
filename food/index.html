@@ -286,8 +286,8 @@ permalink: /food/
      keep in step and a second answer to "where is my list". Ships `hidden`
      like every other shortlist control -- a link pointing at a panel that a
      browser without JavaScript never reveals would be a dead end. {% endcomment %}
-  <a class="shortlist-export-jump" href="#shortlist-export"
-     data-shortlist-export-jump hidden>export list as JSON →</a>
+  {% comment %} The "export list as JSON →" jump link sat here from 2026-09-09
+     to 2026-09-10; cocktails/index.html has the note on why it went. {% endcomment %}
 </div>
 
 <ul class="recipe-list">
@@ -640,7 +640,9 @@ permalink: /food/
    shortlist.js does with `.btn-shortlist`. {% endcomment %}
 <details class="shortlist-export" id="shortlist-export"
          data-shortlist-export-panel hidden>
-  <summary>Export shortlist as JSON</summary>
+  {% comment %} PLACEHOLDER COPY. Plain words since 2026-09-10; see
+     cocktails/index.html's panel for the note. {% endcomment %}
+  <summary>Save, restore or clear the shortlist</summary>
   <p class="shortlist-export-hint">
     Copy this and keep it, or paste it somewhere else. It holds what is
     shortlisted and how many portions of each.
@@ -675,6 +677,13 @@ permalink: /food/
   </button>
   <p class="shortlist-import-result" data-shortlist-import-result
      aria-live="polite" hidden></p>
+
+  {% comment %} CLEAR, WITH A SECOND CLICK -- the cocktails index carries the
+     same control and the note. {% endcomment %}
+  <button type="button" class="btn-shortlist-clear" data-shortlist-clear
+          data-armed-text="really clear it? click again" hidden>
+    clear the shortlist
+  </button>
 </details>
 
 {% comment %} WHAT EACH RECIPE IS MADE OF, AND HOW MANY IT FEEDS -- #801.

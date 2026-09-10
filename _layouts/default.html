@@ -452,6 +452,21 @@
      whether the chips are capped. Nothing now depends on where a chip row
      breaks. {% endcomment %}
 
+  {% comment %} card-line-budget.js -- THE TAG WENT MISSING WITH chip-rows.js,
+     2026-09-08, AND NOBODY NOTICED FOR TWO DAYS. #846 deleted chip-rows.js and
+     its tag, and the comment above replaced BOTH tags that stood here; the
+     budget pass (#776: three ingredient lines cap the chips at two rows) was
+     described in that comment and loaded by nothing. cocktail-index.js guards
+     its call with `if (HTF.cardLineBudget)`, so it failed silently -- MANUAL
+     §12's "you will assume 'end of body' means 'loads first'" has a cousin:
+     you will describe a script tag and not write it. Found on 2026-09-10 when
+     the pass gained the ship-collision check and marked nothing on a page
+     where seven cards collided. AFTER card-name-fit.js, which is the one
+     ordering it needs (its header says why), and
+     test_the_card_measurement_passes_are_loaded_in_order now holds the pair.
+     {% endcomment %}
+  <script src="{{ '/assets/js/card-line-budget.js' | relative_url }}"></script>
+
   {% comment %} shortlist.js wires every `.btn-shortlist` on the page — GitHub
      issue #546. HERE, in the shell, because the four placements are spread
      across two layouts and two index pages and there is nothing site-specific
