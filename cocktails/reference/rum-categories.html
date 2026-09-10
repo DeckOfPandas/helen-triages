@@ -49,7 +49,7 @@ published: false
   generic stays because a drink still asks for it. Do not repopulate the row.
 
   MOST OF THE COPY IS HELEN'S NOW, 2026-09-10, AND NONE OF IT IS TO BE POLISHED
-  (§13.12). She wrote the title, the four opening paragraphs, the Pietrek
+  (§13.12). She wrote the title, the five opening paragraphs, the Pietrek
   citation, the Ceylon arrack line, the two Characters paragraphs and all three
   top-level headings. What an agent changed in them is listed at each site and
   amounts to: a class, an indent, one `<h1 <span>` that was malformed, and the
@@ -58,11 +58,26 @@ published: false
   requires an em dash, and an earlier version of this comment asserted both from
   having checked only the first.
 
-  WHAT IS STILL A PLACEHOLDER, AND IT IS TWO THINGS: the column headings
-  "category" and "on a card" ("examples" is hers, #888), and "none in the
-  house". Tracked at #784, #921. The per-word lines under the retired words are
-  NOT on that list any more — see the "Not categories" section below; she ruled
-  against having any.
+  WHAT IS STILL A PLACEHOLDER, AND IT IS ONE WORD: the column heading
+  "category" ("examples" is hers, #888; "site display name" is hers, 2026-09-10).
+  Tracked at #784, #921.
+  "none in the house" went on 2026-09-10 ("delete them, boom"); the per-word
+  lines under the retired words went the same day — see the "Not categories"
+  section below; she ruled against having any.
+
+  THE TAB SAYS "Rum Categories", THE FOOTER LINK SAYS "rum categories", AND THE
+  h1 SAYS "My Philosophy of Rum". THAT IS DELIBERATE, NOT A MISMATCH TO FIX.
+  Helen, 2026-09-10, asked which she wanted: "I need links to the page to stay
+  as 'rum categories' because if links say 'my philosophy of rum' the reader
+  expects stories about walks on the beach and my favourite tiki mug." So the
+  front-matter `title` and `sites.yml`'s link text are the WAYFINDING label —
+  what the reader clicks and what the tab shows — and the h1 is the headline
+  the page greets them with. Do not make the three agree.
+
+  SECTION ORDER SINCE 2026-09-10: categories, then the "styles" she does not
+  recognise, then Characters last. Her call, made to resolve "blackstrap"
+  sitting on both of the last two lists — see the comment above the retired
+  list.
 
   THE SIPPING SHELF IS GONE, PAGE AND DATA BOTH, 2026-09-10. Helen deleted the
   section from this page herself, was asked whether the ten bottle names should
@@ -134,6 +149,16 @@ published: false
 
     <p class="ref-prose">What colour a rum is tells me very little about how a rum tastes. Boring trainspotting facts like "pot still" or "made in a distillery owned by this particular old white guy" don't interest me at all, and, again, tell me very little about how a rum tastes. The history of Caribbean colonialism also tells me — wait for it — very little about how a rum tastes.</p>
 
+    {% comment %} HELEN'S PARAGRAPH, 2026-09-10, written after the copy review
+       called the page "nearly all what you don't care about, with 'I really
+       really like rum' carrying the whole positive side" -- her reply: "I'll
+       have a think about warming the rum slightly." Three drafts in one
+       sitting; the words are the third, verbatim. Two things she settled on
+       the way, worth keeping: the list is the argument and stays whole, and
+       the last sentence ends on "taste" so the next paragraph's "if you don't
+       care how a drink tastes" hangs off it. {% endcomment %}
+    <p class="ref-prose">Rum tastes like sunshine. Human ingenuity has applied itself with zeal to making alcohol from sugar cane. Like wine, rum tastes like the ground it grows in and what grows around it. Sweet, fruity, warm, deep, rich, buttery, toasted, spicy, floral, dry, earthy, grassy, salty, woody, funky, bouncy, sticky, banana, orange, coconut, pineapple, mango, cinnamon, ginger, nutmeg, cloves, fire, petrol, coffee, toffee, caramel, vanilla, honey, brown sugar, white sugar, sugar sugar, it's just endless. How can you squash all of that down to "gold coloured" like it means anything about taste?</p>
+
     <p class="ref-prose">And if you don't care how a drink tastes, why on earth are you going to all the sticky, impractical effort of making mixed drinks?</p>
 
     <hr class="ref-divider">
@@ -149,6 +174,9 @@ published: false
       (<a href="https://cocktailwonk.com/2023/06/nine-essential-tiki-rum-styles.html">2023</a>,
       which updates
       <a href="https://cocktailwonk.com/2019/10/six-essential-tiki-rum-categories.html">2019</a>).</p>
+
+    {% comment %} Helen's line, 2026-09-10, verbatim, link and all. {% endcomment %}
+    <p class="ref-prose">Matt Pietrek has written some <a href="https://www.wonkpress.com/collections/all-books">books</a>, and they are great.</p>
 
 
     {% comment %} ── THE CATEGORIES, IN HELEN'S SECTIONS ─────────────────────
@@ -188,7 +216,11 @@ published: false
 
         <li class="rum-cat rum-cat--head" aria-hidden="true">
           <span class="rum-cat-name">category</span>
-          <span class="rum-cat-card">on a card</span>
+          {% comment %} "site display name", Helen's words, 2026-09-10,
+             replacing the "on a card" placeholder from #784. The column prints
+             the shorter name a drink card uses where it differs from the
+             category. {% endcomment %}
+          <span class="rum-cat-card">site display name</span>
           {% comment %} "examples", Helen's word, 2026-09-10 (#888); it was
              "what I'd reach for", one of #784's placeholders. {% endcomment %}
           <span class="rum-cat-bottles">examples</span>
@@ -252,10 +284,14 @@ published: false
               {% endif %}
             </ul>
             {% else %}
-            {% comment %} PLACEHOLDER COPY. `overproof Demerara rum, lightly
-               aged` is the only row that hits this today, and it is correct —
-               see the header. {% endcomment %}
-            <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
+            {% comment %} NOTHING, ON PURPOSE. This printed "none in the house"
+               until 2026-09-10 -- placeholder copy from #784, and Helen, told
+               it was still a placeholder: "If we're not using them, delete
+               them, boom." `overproof Demerara rum, lightly aged` is the only
+               row that hits this today, and an empty third track is the honest
+               rendering of a category with no bottle -- see the header. The
+               span stays so the grid keeps its three tracks. {% endcomment %}
+            <span class="rum-cat-bottles"></span>
             {% endif %}
           </li>
         {% endfor %}
@@ -270,29 +306,6 @@ published: false
        here because the question this page answers ("is this one of mine?")
        gets asked of them for the same reason it gets asked of the fourteen.
     {% endcomment %}
-    <section class="ref-block ref-block--characters">
-    {% comment %} ── CHARACTERS ──────────────────────────────────────────────
-       `rum_characters` is a separate field from `generic` and never replaces
-       one — Helen, 2026-08-24: "blackstrap is only ever given as a character
-       for another rum, like this: Moderately aged (character: blackstrap)".
-       Here because a card can show one and the page would otherwise have
-       nothing to say about the word.
-    {% endcomment %}
-    <h2 class="ref-section-heading ref-section-heading--major" id="characters"><span>Addendum: Rum Characters</span></h2>
-
-    {% comment %} THE SUBTITLE DELETED IN #891 WAS AN AGENT'S PLACEHOLDER; THESE
-       TWO PARAGRAPHS ARE HELEN'S OWN, written 2026-09-10, and are not the same
-       thing coming back. Only the indentation and the class changed -- they were
-       indented seven spaces, inside nothing. {% endcomment %}
-    <p class="ref-prose">I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
-
-    <p class="ref-prose">These words are useful to me:</p>
-    <ul class="rum-chars">
-      {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
-    </ul>
-
-    </section>
-
     <section class="ref-block ref-block--retired">
     {% comment %} ── NOT CATEGORIES ──────────────────────────────────────────
        `retired_rum_styles`, with Helen's own reasons, verbatim. This is the
@@ -347,16 +360,57 @@ published: false
        brand-generic and stays hidden. The ingest-facing reasons stay in
        ingredients.yml untouched -- they were always the ingester's half, and
        this section was always the reader's. {% endcomment %}
+    {% comment %} ONE WORD IS ON THIS LIST AND ON THE CHARACTERS LIST BELOW, AND
+       THAT IS CORRECT -- Helen, 2026-09-10, asked about "blackstrap" appearing
+       under both headings: "It needs to stay in the words I don't believe in
+       section because people say 'use a blackstrap rum' which isn't a thing
+       (to me). And then given I'm using it as a character on the site, I need
+       to list it as a character." Her resolution, both halves: the Characters
+       section moved BELOW this one, so the reader meets the word as a not-a-
+       style first and its real job second; and a parenthetical after the word
+       here, in her words. It is a LOOKUP, not a literal: any retired word that
+       is also in `rum_characters` gets it, so a second such word cannot arrive
+       silently without the note. {% endcomment %}
     <ul class="rum-retired">
       {% for pair in ing.retired_rum_styles %}
         {% assign word = pair[0] %}
         {% assign initial = word | slice: 0 %}
         {% assign initial_lower = initial | downcase %}
         {% if initial == initial_lower %}
-        <li class="rum-retired-word">{{ word }}</li>
+        <li class="rum-retired-word">{{ word }}{% if ing.rum_characters contains word %} (rum character not rum type){% endif %}</li>
         {% endif %}
       {% endfor %}
     </ul>
+    </section>
+
+    <section class="ref-block ref-block--characters">
+    {% comment %} ── CHARACTERS ──────────────────────────────────────────────
+       `rum_characters` is a separate field from `generic` and never replaces
+       one — Helen, 2026-08-24: "blackstrap is only ever given as a character
+       for another rum, like this: Moderately aged (character: blackstrap)".
+       Here because a card can show one and the page would otherwise have
+       nothing to say about the word.
+
+       LAST ON THE PAGE SINCE 2026-09-10, her call, which also makes the
+       heading's "Addendum" true: it used to sit between the categories and
+       the retired words, where an addendum is not. See the note above the
+       retired list for the blackstrap reasoning that moved it.
+    {% endcomment %}
+    <hr class="ref-divider">
+
+    <h2 class="ref-section-heading ref-section-heading--major" id="characters"><span>Addendum: Rum Characters</span></h2>
+
+    {% comment %} THE SUBTITLE DELETED IN #891 WAS AN AGENT'S PLACEHOLDER; THESE
+       TWO PARAGRAPHS ARE HELEN'S OWN, written 2026-09-10, and are not the same
+       thing coming back. Only the indentation and the class changed -- they were
+       indented seven spaces, inside nothing. {% endcomment %}
+    <p class="ref-prose">I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
+
+    <p class="ref-prose">These words are useful to me:</p>
+    <ul class="rum-chars">
+      {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
+    </ul>
+
     </section>
 
   </div>

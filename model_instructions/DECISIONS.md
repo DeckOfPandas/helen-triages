@@ -3753,3 +3753,52 @@ verification. Dates are when the correction landed.
   the day. Three rules in one file styling markup nothing emitted, all within
   hours, is what a page being actively cut down looks like — worth sweeping at
   the end of such a pass rather than one at a time.
+
+- **2026-09-10, #921 — THE COPY REVIEWED, AND THREE RULINGS OUT OF IT.** The
+  first read of her prose by anyone: it needs leaving alone (the refrain
+  paragraph, "sticky, impractical effort", the arrack apology), with two
+  sentences flagged as anyone's ("The below is almost identical to…", "taste
+  component") and left for her. The rulings were about structure, not words:
+
+  **"blackstrap" IS ON TWO LISTS ON ONE PAGE, AND STAYS ON BOTH.** It sat under
+  "These words are useful to me" and under "Rum 'styles' I do not recognise",
+  and a reader sees the same word praised and dismissed on one screen. Helen:
+  *"It needs to stay in the words I don't believe in section because people
+  say 'use a blackstrap rum' which isn't a thing (to me). And then given I'm
+  using it as a character on the site, I need to list it as a character."*
+  Her fix, both halves hers: **Characters moves to the END of the page**, so
+  the reader meets the word as a not-a-style first and its real job second —
+  which also makes "Addendum" true, since it had been sitting in the middle —
+  and the word carries a parenthetical in the retired list, *"(rum character
+  not rum type)"*. The parenthetical is a lookup: any retired word that is
+  also in `rum_characters` gets it, so a second such word cannot arrive
+  without the note.
+
+  **THE TAB, THE LINK AND THE h1 DISAGREE ON PURPOSE.** The page's `title` and
+  the footer link say "rum categories"; the h1 says "My Philosophy of Rum".
+  Asked which she wanted: *"I need links to the page to stay as 'rum
+  categories' because if links say 'my philosophy of rum' the reader expects
+  stories about walks on the beach and my favourite tiki mug."* So the label is
+  wayfinding and the headline is voice, and the page's own header now says not
+  to make them agree.
+
+  **"none in the house" IS GONE**, the placeholder for a category with no
+  bottle: *"If we're not using them, delete them, boom."* The empty third
+  track is the honest rendering. Its CSS rule went with it, per the sweep
+  note above. **Two placeholders remain**, both column headings — "category"
+  and "on a card" — because the middle column IS in use (it prints the shorter
+  name a card uses, "Jamaican rum" for `moderately aged Jamaican rum`) and
+  needs a word from her rather than deletion. #784 stays open for those two.
+
+  **THE VOICE ACROSS THE SITE, since she asked how the five sit together** —
+  about page, hollandaise, ganache, the taglines, this page: one voice at five
+  volumes. The about page explains itself with anecdotes; the two recipes are
+  the instructor who has suffered, jokes inside a formal structure; the taglines
+  are that instructor at eight words; this page is the manifesto, least funny
+  per line and funny in its structure. Two things hold it together: the "you"
+  is always someone in the kitchen being told off, and the jokes come from
+  precision (temperatures, counts of rums, a bar with a pint of fun). The
+  loosest register (BRB, gap yah, hi Sue) lives only in the taglines, and
+  should. Her one open note to herself: *"I'll have a think about warming the
+  rum slightly"* — the page is nearly all what she does not care about, and
+  "I really really like rum" carries the whole positive side.
