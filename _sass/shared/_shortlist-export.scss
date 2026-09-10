@@ -105,10 +105,29 @@
   user-select: text;
 }
 
+// THE PASTE BOX -- #850. The same box as the export, one class on top, and the
+// one thing it changes is that this box is WRITABLE: `user-select` is not the
+// point here, a caret is. A little shorter by default, because a dump goes in
+// whole and nobody reads it here.
+.shortlist-import-box {
+  margin-top: $space-sm;
+}
+
+// WHAT THE RESTORE DID, one line under the button, in the hint's own voice.
+// `aria-live` is on the element in the markup, so a screen reader hears the
+// result without the focus moving off the button.
+.shortlist-import-result {
+  margin: $space-sm 0 0;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+}
+
 // SHIPS `hidden` AND shortlist-export.js REVEALS IT, so a browser where the
 // script did not run never shows a copy button that does nothing. Same rule as
-// `.btn-print` and `.btn-shortlist`.
-.btn-shortlist-copy {
+// `.btn-print` and `.btn-shortlist`. The restore button (#850) is the same
+// control in every respect but its word, so it is the same rule.
+.btn-shortlist-copy,
+.btn-shortlist-restore {
   margin-top: $space-sm;
   font-family: $font-label;
   font-size: 0.85rem;
