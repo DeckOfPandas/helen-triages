@@ -709,7 +709,18 @@ $tape-protrusion: 0.2rem;
   position: relative;
   z-index: 1;
   font-family: $font-headings;
-  font-size: 2.5rem;
+  // 2.5rem, OR WHATEVER FITS 92vw -- #899, 2026-09-10. `[ COCKTAILS ]` at
+  // 2.5rem is 491px wide: `white-space: nowrap` below is right (a wordmark
+  // must not wrap) and `.tape-bg` is already capped at 92vw, but the WORD had
+  // no cap, so every cocktails page overflowed a phone by 124px and the whole
+  // site could be dragged sideways -- the first thing family on a phone would
+  // meet. The width of this element is its character count times (0.6em of
+  // Courier advance + 0.18em of letter-spacing) plus the 2.8em of padding, so
+  // the size that fits is 92vw divided by that; `--wordmark-chars` comes from
+  // the template (default.html), brackets counted. `[ FOOD ]` is 8 characters
+  // and the formula gives 2.5rem for it down to about 250px, so food's
+  // wordmark does not move on any phone that exists.
+  font-size: min(2.5rem, calc(92vw / (var(--wordmark-chars, 13) * 0.78 + 2.8)));
   font-weight: 1000;
   letter-spacing: 0.18em;
   text-transform: uppercase;

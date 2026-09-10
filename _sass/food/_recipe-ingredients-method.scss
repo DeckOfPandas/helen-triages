@@ -136,6 +136,21 @@ $method-group-step-indent: $space-xxl + $space-lg;
   margin-bottom: $space-xxl;
 }
 
+// LESS INDENT ON A PHONE -- #900, Helen: "Indent method numbering less for
+// narrow screens." $method-group-step-indent is 3rem, a level of hierarchy
+// under a group heading on a 900px column and a fifth of a 296px one; the
+// number column stays, the group indent shrinks to one small step so the
+// numeral still reads as nested and the text gets the width back.
+@media (max-width: 600px) {
+  .method-full li {
+    padding-left: calc(#{$space-sm} + #{$method-step-number-column});
+
+    &::before {
+      left: $space-sm;
+    }
+  }
+}
+
 .method-full {
   counter-reset: step-counter;
   margin-top: $space-sm;

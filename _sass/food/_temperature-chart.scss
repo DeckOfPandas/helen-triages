@@ -74,12 +74,18 @@ $tc-label-gap: $space-xl;
 // label column, then 1fr -- so a bar's percentage is measured against that 1fr
 // and nothing else. Anything else drawn on the plot has to use the same basis
 // or it lands somewhere else entirely; see .tc-unsafe for what that cost.
-$tc-track-start: calc(#{$tc-label-width} + #{$tc-label-gap});
-$tc-track-width: calc(100% - #{$tc-label-width} - #{$tc-label-gap});
+// CUSTOM PROPERTIES SINCE 2026-09-10 (#903), so a phone can zero them. Every
+// rule that measures against the label gutter reads these two, and the narrow
+// block at the end of this file sets both to 0 and stacks the label above the
+// track -- one change, and the bars, the threshold and the axis all agree.
+$tc-track-start: calc(var(--tc-label-w) + var(--tc-label-gap));
+$tc-track-width: calc(100% - var(--tc-label-w) - var(--tc-label-gap));
 // Headroom above the rows for the threshold's own label.
 $tc-threshold-height: 1.35rem;
 
 .tc {
+  --tc-label-w: #{$tc-label-width};
+  --tc-label-gap: #{$tc-label-gap};
   font-family: $font-body;
   font-weight: 300;
   color: $color-text;
@@ -91,10 +97,10 @@ $tc-threshold-height: 1.35rem;
 // context every bar measures itself against, so it must not move.
 .tc-row {
   display: grid;
-  grid-template-columns: $tc-label-width 1fr;
+  grid-template-columns: var(--tc-label-w) 1fr;
   align-items: center;
   min-height: $tc-row-height;
-  column-gap: $tc-label-gap;
+  column-gap: var(--tc-label-gap);
 }
 
 .tc-row-label {
@@ -239,8 +245,8 @@ $tc-threshold-height: 1.35rem;
 // --- The axis ----------------------------------------------------------------
 .tc-axis {
   display: grid;
-  grid-template-columns: $tc-label-width 1fr;
-  column-gap: $tc-label-gap;
+  grid-template-columns: var(--tc-label-w) 1fr;
+  column-gap: var(--tc-label-gap);
   margin-top: $space-xs;
 }
 
@@ -613,4 +619,73 @@ article.recipe .recipe-section-heading {
 // have one.
 .tc-crosslink-line {
   margin: 0;
+}
+
+// --- On a phone ---------------------------------------------------------------
+// #903 and #900 item 9, Helen: "the whole page is much much wider than my
+// screen, but mostly blank space" and "all the x axis numbers are crammed into
+// the final three blocks, written over each other."
+//
+// ONE CAUSE, TWO SYMPTOMS. The label gutter is a fixed 9.5rem plus a 1.5rem gap
+// -- 176px of a 296px column -- so the track every bar and tick is measured
+// against was 120px wide: the ticks bunched, and the value labels
+// (`white-space: nowrap`, hung off the bar's right end) ran up to 430px past
+// the track and dragged the whole page out to 740px. Nothing was wrong with
+// the arithmetic; the axis had no room.
+//
+// SO THE LABEL GOES ABOVE THE TRACK. Both custom properties go to zero, the
+// two grids become one column (label on its own line, left-aligned, then the
+// track at the column's full width), and the threshold and the unsafe zone --
+// which measure from the same two properties -- follow without a rule of their
+// own. Only the axis's empty first cell is left over, and it is zero height.
+//
+// THE VALUE COMES OUT OF THE TRACK AND SITS UNDER IT, IN FLOW. Beside the bar
+// it hangs off the bar's right end and cannot wrap, so on a hot protein it ran
+// off the screen -- and the longest value on the site is sixty characters
+// ("74–75°C in the thickest part of the thigh, not touching bone", 430px), which
+// no clamp along the bar could hold. Under the track it is an ordinary line of
+// text that wraps at the column's width, right-aligned so the figure still
+// reads as belonging to the bar above it. The track keeps its fixed height for
+// the bars; the row's height is the track plus however many lines the value
+// takes. Ticks keep `translateX(-50%)`: the 100°C tick's right half hangs 15px
+// past the track, inside the page's own padding.
+@media (max-width: 600px) {
+  .tc {
+    --tc-label-w: 0px;
+    --tc-label-gap: 0px;
+  }
+
+  // Two rules rather than one selector list: test_a_multi_track_row_can_become_one
+  // reads the variant per selector, and a shared block only credits the last.
+  .tc-row {
+    grid-template-columns: 1fr;
+    row-gap: 0;
+  }
+
+  .tc-axis {
+    grid-template-columns: 1fr;
+  }
+
+  .tc-row-label {
+    text-align: left;
+  }
+
+  .tc-track {
+    // The bars are positioned against this box's height; the value below is
+    // outside it, so the box stays the bars' own height.
+    height: $tc-row-height;
+  }
+
+  .tc-value {
+    position: static;
+    display: block;
+    text-align: right;
+    white-space: normal;
+    margin-top: -0.35rem;
+    padding-bottom: $space-xs;
+  }
+
+  .tc-contents {
+    columns: 1;
+  }
 }

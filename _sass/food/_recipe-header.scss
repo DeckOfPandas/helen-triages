@@ -633,6 +633,30 @@ article.recipe a:not(.badge) {
   flex-shrink: 0;
 }
 
+// ON A PHONE THE CONTROLS DROP UNDER THE TITLE -- #899 and #900, 2026-09-10.
+// `.recipe-title` is a flex row of the title (capped at 70%) and this
+// non-shrinking action row, and at 360px the two do not fit: the row ran 10px
+// past the edge (`pdf` off the screen, `print` half off, Helen's #875 item 4)
+// and the title, squeezed into 70% of 296px, broke PINEAPPLE / AND / GINGER /
+// SPATCHCOCK / CHICKEN one word to a line (#875 item 8). Wrapping the row
+// gives the title the whole width and puts shortlist / print / pdf on a line
+// of their own beneath it, right-aligned where they were. 600px is the site's
+// phone breakpoint (shared/_layout.scss's footer, cocktails' meta list).
+@media (max-width: 600px) {
+  .recipe-title {
+    flex-wrap: wrap;
+  }
+
+  .recipe-main-title {
+    max-width: 100%;
+  }
+
+  .recipe-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
 .btn-print {
   @extend %link-button;
 }
