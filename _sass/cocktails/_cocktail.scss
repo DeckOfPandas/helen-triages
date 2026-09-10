@@ -230,7 +230,14 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // arrow. That margin is zeroed for this page below, and this is the gap that
   // is left. Food's recipe page keeps $spacing-section-gap and the same latent
   // bug; fixing it there is food's call to look at, not this page's to assume.
-  margin: 2rem 0 1.75rem;
+  // $space-lg UNDER THE ARROW SINCE 2026-09-10, from 2rem -- Helen: "it now
+  // feels like there's quite a bit of space at the top of cocktail pages.
+  // Should the top bump up a bit, closer to the back arrow?" It should, and
+  // 1rem is the gap food's recipe page keeps between its arrow and its title
+  // (`.back-to-index + .recipe .recipe-title`), so the two sites open the
+  // same way. The arrow itself stays where it is, first thing under the
+  // header at the column's left edge, as on food.
+  margin: $space-lg 0 1.75rem;
   padding-bottom: $head-pad-bottom;
   border-bottom: 2px solid $color-electric-absinthe;
 
@@ -472,7 +479,14 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // the space below it. The row is what carries the space, not the toggle.
 .cocktail-controls {
   display: flex;
-  justify-content: flex-end;
+  // TOGGLE LEFT, SHORTLIST RIGHT, SINCE 2026-09-10 -- Helen, seeing the row
+  // live: "The read it make it and shortlist buttons run together now. How
+  // about moving the read it make it to the left? I can imagine that feeling
+  // quite natural in the kitchen -- I'll be on the left of the page looking at
+  // the ingredients list. Then top right for a save this feels more natural."
+  // `space-between` on a two-item row is exactly that, and the gap stays for
+  // the day the two are close enough to need it.
+  justify-content: space-between;
   align-items: center;
   gap: $space-lg;
   margin: -$space-lg 0 0;
