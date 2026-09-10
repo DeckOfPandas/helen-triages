@@ -1009,6 +1009,43 @@ unless stated.
   Every guard that had only ever run against drafts on her machine now runs in
   CI too.
 
+- **2026-09-10 — 61 TAGLINES IN ONE SITTING, AND THE SHAPE THAT DID IT WAS A
+  CSV.** #839 had 99 of 125 drinks at `tagline: "QQ"` and proposed a local
+  page as the way to clear them. What worked instead: every drink in one
+  table — tier by nearness to deploying (live / made and only the tagline
+  missing / made with other placeholders / not made), ship rating, current
+  line, a verdict on each — sent to Helen as a CSV, worked through in a
+  spreadsheet, sent back, diffed, and written into the files by a script.
+  Three rounds. Her words: *"this is the least chaotic way of collaborating I
+  think."* Four live drinks and 57 drafts (PR #932; private PR #56); 16 drafts
+  left, all hers to write, listed on #839.
+
+  **Voice review before the writing, and the finding was repetition, not
+  quality.** Line by line her drafts were fine; as a SET they leaned on the
+  same three devices — the drink as a person at a party (six), the adjective
+  fragment (six more), "Chartreuse doesn't care about you" (a third). She cut
+  to two or three of each. Worth knowing for any per-drink copy field: review
+  the set, not the lines.
+
+  **The Ridgwell was deleted the same day**, at her word in the tagline column
+  itself (*"QQ CLAUDE LET'S JUST DELETE THIS RECIPE"*), private PR #54. The
+  public repo's three comment mentions of it (Punt e Mes's history in
+  `ingredients.yml`, the aperitivo mood in `taxonomy.yml`, Carpano Antica in
+  `bottles.yml`) are history and stay; the taxonomy one now says so.
+
+  **`COCKTAIL_BASELINE_COMMIT` MOVED A FIFTH TIME, AND THIS ONE IS THE RULE
+  RUNNING END TO END RATHER THAN BEING GRANTED PAST.** The four live drinks
+  flipped to `proofread: false` in the tagline commit, as #367 requires. She
+  read the four built pages ON THE BRANCH, before the merge, and said so
+  (*"I've checked those four live drinks, and they're perfect. Please flip
+  their proofread flags back to true and push for me."*). Second commit flips
+  them back; third moves the constant, alone; the test was run with the old
+  value and named exactly the four. **Nothing left the live site.** That is
+  the cheapest shape the gate allows and `CLAUDE.md`'s proofreading section
+  now names it. Five moves in one day is also the "promotion is a habit"
+  case the constant's own comment predicted — raised as #933 rather than
+  designed here.
+
 - **2026-09-09 — A PROMOTED DRINK IS INDISTINGUISHABLE FROM AN EDITED ONE, AND
   THAT IS BY DESIGN.** `test_agent_edited_drinks_are_not_marked_proofread`
   reads the PUBLIC repo's history only — #624, a public test must never
@@ -3111,6 +3148,28 @@ verification. Dates are when the correction landed.
   The general shape, worth keeping: **when widening permissions for
   convenience, the question is not "what do I want to stop prompting" but
   "what was that prompt the last guard of".**
+
+- **2026-09-10 — `pr edit` IS THE FIRST `gh` CALL THE CLASSIC TOKEN CANNOT
+  MAKE, AND IT FAILS ON SCOPE, NOT ON PERMISSION.** `sh scripts/gh-agent.sh pr
+  edit 932 --body-file ...` returned GraphQL errors asking for `read:org` on
+  the `login`, `name` and `slug` fields — `gh` resolves the PR through
+  GraphQL for that subcommand, and the classic `repo` scope does not cover
+  those. `pr create`, `pr view`, `pr comment`, every `issue` subcommand and
+  `api` are REST and unaffected. **The finding is a narrowing, which is the
+  rarer kind**: §11's rule that a widened token is invisible until something
+  unexpected succeeds has a mirror — a scope gap is invisible until something
+  routine fails, and this one waited a day. The fix needed nothing the token
+  lacks: `sh scripts/gh-agent.sh api -X PATCH repos/<owner>/<repo>/pulls/<N>
+  -F body=@tmp/body.md`. Recorded in `CLAUDE.md`'s `--body-file` bullet and
+  MANUAL §11; "never broaden access" is untouched.
+
+  **AND A THIRD WRAPPER, FOR THE SAME REASON AS THE FIRST TWO.** A worktree in
+  the container cannot clone the drafts repo by the SSH form MANUAL §9.1 gave,
+  so the session that needed it hand-wrote the HTTPS URL — token name and all —
+  into a `tmp/` script, which is exactly the call-site shape the two wrappers
+  above exist to retire. `scripts/git-clone-agent.sh <repo> [dir]` now; the
+  manual gives it beside the SSH form. Proved by cloning into `tmp/` and
+  deleting the result.
 
 - **2026-09-10 — CLOSING ONE HOLE OPENED ANOTHER, IN A DIFFERENT FILE, THE SAME
   DAY.** `guard-unanalyzable-bash.py` refuses a leading `cd`. `CLAUDE.md`
