@@ -3650,6 +3650,22 @@ verification. Dates are when the correction landed.
   comment rather than deleted: it is one of five `-wash` values derived as a set,
   and deleting one member makes the set look arbitrary. What #651 forbade was it
   sitting there unread AND unexplained.
+- **2026-09-10, #644 / #779 — batch offered, pick not yet recorded.** Twelve
+  candidate tape backgrounds from `scripts/generate_tape.py`, four each of
+  `both_acute` / `both_obtuse` / `mixed`: seeds 101-104 (acute), 111-114
+  (obtuse), 121-124 (mixed), marks seed = seed except three that deliberately
+  pair a corner seed with a different marks seed to show that axis varying too
+  (103/203, 113/213, 123/223). Shown alongside the live seven (tape-1..7, this
+  section's 2026-08-10 entry above) at wordmark size and at a real card's size
+  on one candidates page, MANUAL §13.11's own recipe — reproducible byte for
+  byte from the seeds above, nothing kept only in `tmp/`. The same page carries
+  a "header tape: random / fixed 1..7" switch on the real header wordmark for
+  #779. **Nothing here shipped**: no file added to `assets/img/chrome/tape/`,
+  `_data/chrome.yml`'s `tape_count` untouched. The one code change made is
+  `assets/js/decorations.js`'s `FIXED_TAPE_INDEX` constant, added so #779's
+  "fixed" answer is a one-line flip rather than a future edit to `tape()`
+  itself — `null`, today's random-every-load behaviour, unchanged until she
+  says otherwise.
 
 ## §14 Reference pages
 

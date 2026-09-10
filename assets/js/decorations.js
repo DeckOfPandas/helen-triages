@@ -96,6 +96,15 @@
   // the other kind, because a failed String.replace returns its input.
   var TAPE_OPEN = /<svg(?=[\s>])/;
 
+  // #779, still open: "random every load" vs "fixed" for the header tape,
+  // offered on a candidates page (DECISIONS.md §13.9, 2026-09-10) alongside
+  // the #644 batch. NULL IS TODAY'S BEHAVIOUR, UNCHANGED -- a fresh random
+  // pick every load, same as before this constant existed. THIS ONE LINE IS
+  // THE WHOLE OF WHAT "FIXED" NEEDS IN CODE: set it to an integer 1..count
+  // (currently 1-7) once Helen picks, and every page loads that tape and
+  // only that one. Nothing else in tape() has to move.
+  var FIXED_TAPE_INDEX = null;
+
   function tape() {
     var slot = document.querySelector('.tape-bg');
     if (!slot) return;
@@ -103,7 +112,7 @@
     var count = parseInt(slot.getAttribute('data-tape-count'), 10);
     if (!count) return;
 
-    var n = Math.floor(Math.random() * count) + 1;
+    var n = FIXED_TAPE_INDEX || (Math.floor(Math.random() * count) + 1);
     var url = HTF.chromeAsset('/tape/tape-' + n + '.svg');
     HTF.fetchSvg(url, function (svg) {
       slot.innerHTML = svg.replace(TAPE_OPEN, TAPE_ATTRS);

@@ -2921,9 +2921,16 @@ automatically" mode: generate a batch, look at them against the real header,
 hand-pick. `_data/chrome.yml`'s `tape_count` must match the directory and the
 run must be gapless (`test_tape_count_matches_the_tape_directory`) —
 `decorations.js` rolls a random n. Provenance of the seven (seed / mode) is in
-`DECISIONS.md` §13.9. **Still open**: `tape()` picks one of the seven at
-random on every load, the exact pattern §13.1 rejects for wayfinding marks,
-never revisited for a background texture. Worth deciding out loud.
+`DECISIONS.md` §13.9. **Still open, #644 and #779, a batch offered
+2026-09-10**: whether to add variety beyond the current seven (a twelve-file
+candidate batch exists, reproducible from the seeds in `DECISIONS.md` §13.9,
+not yet added to the directory), and whether `tape()` should keep picking one
+of them at random on every load — the exact pattern §13.1 rejects for
+wayfinding marks, never revisited for a background texture — or be fixed to
+one file. `decorations.js`'s `FIXED_TAPE_INDEX` constant is the entire code
+change the "fixed" answer needs; it is `null` (today's random-every-load
+behaviour) until she rules. Worth deciding out loud, and by looking rather
+than arguing (§13.11).
 
 ### 13.10 Typography — three fonts, and the rule for which goes where
 
