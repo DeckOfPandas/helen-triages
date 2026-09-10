@@ -372,6 +372,39 @@ $universe-stack-width: 820px;
     flex: 0 0 100%;
     height: 0;
   }
+
+  // #917: WITHOUT THIS, THE CLOSING BRACKET WRAPS TO A THIRD LINE OF ITS OWN
+  // WHENEVER THE INGREDIENT LIST TRUNCATES. Flex line-breaking decides which
+  // items share a line using each item's UNSHRUNK hypothetical size (its flex
+  // basis, clamped by min/max-width) -- not the size it ends up rendered at
+  // after shrinking. With `flex-basis: auto`, that hypothetical size is the
+  // ingredient line's full, untruncated content width, which on a long list
+  // is wider than the whole column. Collected onto its own line (the ::before
+  // spacer above forces a break, and a line always keeps its first item even
+  // if that item alone overflows it), that oversized hypothetical size leaves
+  // no room for the bracket that follows -- so the bracket is pushed to a
+  // fourth line, alone, even though the SHRUNK, actually-rendered ellipsis box
+  // has room to spare beside it.
+  //
+  // Capping the hypothetical size fixes this without touching the shrink
+  // behaviour that already does the truncating: `max-width` clamps the flex
+  // base size used for line-collection (spec 9.3.3) the same way it clamps
+  // final layout, so as long as the reserved slice comfortably covers the
+  // bracket, both items are collected onto the SAME line, and the existing
+  // `flex: 0 1 auto; min-width: 0;` on the ingredients box still shrinks it to
+  // fit next to the bracket exactly as before. A short, non-truncating list is
+  // unaffected either way -- it never approaches this cap.
+  //
+  // THE RESERVE, MEASURED RATHER THAN GUESSED: the closing bracket's own
+  // column-gap and its cancelling negative margin (below) are equal and
+  // opposite, so the only real width to cover is the ")" glyph itself --
+  // 4.17px in $font-body at 0.82rem, measured live against the compiled page
+  // by tmp/measure_paren_glyph.js during #917. 0.65rem (10.4px) leaves
+  // headroom for a wider fallback font without ever costing a visible
+  // character of ellipsis room.
+  .universe-pick .drink-card-ingredients {
+    max-width: calc(100% - 0.65rem);
+  }
 }
 
 // STAGE TWO. The label and the control keep a line of their own and the offer

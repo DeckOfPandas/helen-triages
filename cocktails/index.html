@@ -654,9 +654,23 @@ permalink: /cocktails/
                else, then bitters — largest volume first inside each tier, and
                the recipe's own order breaking ties. `card_ingredients` arrives
                already sorted, so this loop must NOT re-sort it. {% endcomment %}
-            <p class="drink-card-ingredients">
-              {% for ing in drink.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">·</span> {% endunless %}<span class="drink-card-ing" data-ing="{{ ing.search }}">{{ ing.label }}</span>{% endfor %}
-            </p>
+            {% comment %} #917 -- NO WHITESPACE BETWEEN THE <p> TAG AND THE
+               LOOP, ON EITHER SIDE. On a normal card this is invisible: any
+               indentation here is LEADING/TRAILING whitespace inside the box
+               and browsers drop it unrendered. In the universe pick, though,
+               `.universe-pick .drink-card-ingredients::before` inserts "(" as
+               generated content ahead of everything real in this element, so
+               a text node that used to be "leading" (dropped) stops being the
+               first thing in the box and starts being a real, rendered space
+               -- one that the closing bracket, sitting outside this element
+               entirely as a flex sibling, never had a matching copy of. That
+               produced exactly the asymmetry #744 already named once: a gap
+               after "(" with none before ")". #744's fix made the closing
+               side hug flush; this closes the same gap on the opening side by
+               removing the whitespace that was creating it, rather than
+               inventing a matching gap on the other bracket -- "brackets hug
+               their text", per that fix's own words. {% endcomment %}
+            <p class="drink-card-ingredients">{% for ing in drink.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">·</span> {% endunless %}<span class="drink-card-ing" data-ing="{{ ing.search }}">{{ ing.label }}</span>{% endfor %}</p>
           {% endif %}
         </div>
 
