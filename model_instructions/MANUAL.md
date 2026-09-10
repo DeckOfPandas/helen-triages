@@ -108,15 +108,31 @@ the work verified, and missed both. One command, four lines of output, non-zero
 exit if anything fails.
 
 **`.node-runtime/` and `.gh-runtime/` do not come with a worktree**; they are
-gitignored, like the two drafts repos (§9.1). Use the system `node`. **There is
-no `gh` at all in a worktree** — `gh: command not found`, and it is not
-installable from here — so anything `CLAUDE.md` describes as a `gh` command
-(reading an issue, `gh pr create`) is the REST API instead, called with
-`AGENT_GH_TOKEN` from a script in `tmp/`. Measured 2026-09-07, opening PR #808.
-**Read the token from the environment at the point of use and never `echo` it
-in any form** — not even a probe that cannot leak; the hook refuses all of
-them (`CLAUDE.md`). To find out whether a credential works, use it and read
-the status code.
+gitignored, like the two drafts repos (§9.1). Use the system `node`. **`gh`
+depends on where you are**: the devcontainer image installs it, so inside the
+container `gh` works from any worktree (`/usr/bin/gh`, measured 2026-09-10);
+a worktree on the host has none — `gh: command not found`, not installable
+from there — and anything `CLAUDE.md` describes as a `gh` command is the REST
+API instead, called with `AGENT_GH_TOKEN` from a script in `tmp/` (measured
+2026-09-07, opening PR #808). Either way the token comes from the
+environment: `GH_TOKEN="$AGENT_GH_TOKEN" gh ...`, in a script in `tmp/`.
+**Never `echo` it in any form** — not even a probe that cannot leak; the hook
+refuses all of them (`CLAUDE.md`). To find out whether a credential works,
+use it and read the status code.
+
+**A headless browser exists, and looking is cheaper than reasoning.** Since
+2026-09-10 the devcontainer image carries Chromium's system libraries, and
+`sh scripts/browser/install.sh` puts Playwright and Chromium under
+`tmp/browser/` (gitignored; nothing touches `~` or the system, Helen's grant).
+Then `sh scripts/browser/serve.sh` in the background serves `tmp/site` at
+`127.0.0.1:4010`, `sh scripts/browser/shoot.sh <label> [paths]` screenshots
+pages at 360, 390 and 1280 and **names every element past the viewport**, and
+`sh scripts/browser/crop.sh <path> <selector> <name>` crops one element at 2x.
+Read the PNGs with the Read tool. **Mobile emulation grows the layout viewport
+to fit the widest element, so `innerWidth` is the symptom, not the measure**;
+the script compares against the width it asked for. The phone pass of #899
+found three causes of sideways scroll this way in an hour that a week of
+reasoning had not; #895 shipped "unverified" only because this did not exist.
 
 **Never run two `pytest` sessions at once.** `test_rendered_pages.py` writes
 throwaway `zzz-gate-` recipes into `_food_recipes/` (and drinks into
@@ -2425,6 +2441,15 @@ thing it guards and watch it fail.** **Never `return` early because a scan came
 back empty — assert it is non-empty**, with a message saying what to do if the
 emptiness is legitimate; `test_suite_hygiene.py` enforces it for
 non-parametrised tests. **Removing an override is not overriding.**
+
+**You will describe a script tag and not write it, and the page will not tell
+you.** `card-line-budget.js` was loaded by nothing from 2026-09-08 to
+2026-09-10: a commit deleted a neighbouring tag, and the comment that replaced
+both described the surviving one in full. The index guards the call, every
+test runs the file directly, and the pass simply never ran. When a script is
+loaded from a layout, a test names the tag
+(`test_the_card_measurement_passes_are_loaded_in_order`); when you delete a
+tag, grep the comment you leave behind for the names of the tags you kept.
 
 **You will assume "end of `<body>`" means "loads first".** A page layout's
 scripts land inside `{{ content }}`, above `default.html`'s own. `assets.js`
