@@ -349,9 +349,14 @@
           {% include icons/github.svg %}
         </a>
         <p>&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
+        {% comment %} TWO SENTENCES, EACH IN ITS OWN SPAN, so a phone can stack
+           them (#902, Helen: "stack the two licences on narrower screens").
+           One paragraph still; the spans are inline at desktop width and
+           `display: block` under the footer's phone breakpoint in
+           _sass/shared/_layout.scss. {% endcomment %}
         <p class="site-footer-license">
-          Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.
-          Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+          <span class="site-footer-license-line">Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.</span>
+          <span class="site-footer-license-line">Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</span>
         </p>
       </div>
     </div>

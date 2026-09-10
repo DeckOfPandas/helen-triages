@@ -143,10 +143,11 @@ permalink: /food/reference/cooking-methods-and-timings/
       </div>
     </div>
 
-    {% comment %} One heading over both the table and the cards, replacing
-       "Details" -- issue #253. They are two views of one answer (scan to
-       choose, then read the one you chose), and giving the second its own
-       heading made them look like two topics.
+    {% comment %} One heading over the table, replacing "Details" -- issue
+       #253. THE CARDS THAT SAT UNDER THE TABLE ARE GONE, #873, Helen
+       2026-09-09: "they're not adding information beyond the table, and
+       remain a little hard to read." cook-timer.js no longer renders them
+       and _sass/food/_timings.scss no longer styles them.
 
        #ct-summary is kept but no longer carries the count. "7 ways to cook
        2.4 kg of beef" duplicated a table sitting immediately beneath it that
@@ -162,8 +163,6 @@ permalink: /food/reference/cooking-methods-and-timings/
        by cook-timer.js; .table-scroll is the site's existing wrapper for a
        table too wide for the column. {% endcomment %}
     <div class="table-scroll" id="ct-table"></div>
-
-    <div class="ct-results" id="ct-results"></div>
     </div>{%- comment -%} /#ct-calculator {%- endcomment -%}
 
     {% comment %} The long explanation of why some rows decline used to live

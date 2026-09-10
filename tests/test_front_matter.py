@@ -559,7 +559,15 @@ from conftest import FRONT_MATTER, DRAFTS_PRESENT, ALL_DRAFTS
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-BASELINE_COMMIT = "9a8a324"   # Helen's own serving-size corrections, #808
+BASELINE_COMMIT = "86c7919"   # the ganache note, in Helen's words, #874
+#
+# MOVED 2026-09-10, FOR SEVEN WORDS. #874 dictated the ganache's "how much
+# this makes" note: delete the lead-in, start with "Enough", "for a thick
+# filling". Flipping `proofread` instead would have pulled the recipe from
+# production and 404'd the five pages that link to it, which
+# test_no_link_in_the_production_build_points_at_a_file_that_isnt_there refuses
+# -- so the exception it is, in its own commit. Covers 86c7919 and nothing
+# after it.
 #
 # MOVED AGAIN 2026-09-07, HOURS LATER, AND THIS IS THE STRONGEST CASE THE
 # MECHANISM HAS EVER HAD: she read the 43 numbers, dictated seventeen

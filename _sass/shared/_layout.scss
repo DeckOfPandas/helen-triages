@@ -477,6 +477,22 @@ main {
   }
 }
 
+// THE TWO LICENCE SENTENCES STACK ON A PHONE -- #902, Helen: "stack the two
+// licences on narrower screens (Code: MIT. / Recipes and writing ... etc)".
+// One paragraph, two spans (default.html); inline until the line would have to
+// wrap mid-sentence, then each sentence takes its own line. Shared chrome, so
+// a media query here rather than a per-site rule, and the identical-footer
+// guard is untouched because the markup is the same on every page.
+.site-footer-license-line {
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  .site-footer-license-line {
+    display: block;
+  }
+}
+
 .site-footer-github {
   display: inline-flex;
   margin-top: $space-sm;

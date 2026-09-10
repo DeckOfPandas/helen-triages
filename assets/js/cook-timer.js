@@ -75,7 +75,6 @@
     heading: root.querySelector("#ct-protein-name"),
     doneat: root.querySelector("#ct-doneat"),
     table: root.querySelector("#ct-table"),
-    out: root.querySelector("#ct-results"),
     summary: root.querySelector("#ct-summary"),
     // The two halves the dropdown swaps between -- issue #412.
     calculator: root.querySelector("#ct-calculator"),
@@ -115,7 +114,6 @@
     var kg = parseFloat(els.weight.value);
     var doneness = "rare";
 
-    els.out.innerHTML = "";
     els.table.innerHTML = "";
 
     /* THE HEADING AND THE FINISHING TEMPERATURE ARE ABOUT THE PROTEIN, NOT THE
@@ -165,15 +163,18 @@
     els.summary.textContent = "";
 
     /* --- the decision table ------------------------------------------------
-       The cards below answer "how long does this method take". They do not
-       answer "which method", which is the question you actually have first --
-       and seven cards, each with a time and a paragraph, is not something you
-       can compare at a glance. This is the same information at a length you can
-       scan: what you get, and what it costs you in time.
+       What you get, and what it costs you in time, at a length you can scan.
+       Uses the site's existing table styles (article.recipe
+       .recipe-body-content table) and the .table-scroll wrapper that already
+       exists for wide tables -- no new CSS.
 
-       Table for choosing, cards for doing. Uses the site's existing table
-       styles (article.recipe .recipe-body-content table) and the .table-scroll
-       wrapper that already exists for wide tables -- no new CSS.
+       THE CARDS UNDER IT ARE GONE -- #873, Helen, 2026-09-09: "I realised
+       thanks to the design audit that they're not adding information beyond
+       the table, and remain a little hard to read." One card per method sat
+       below this table repeating its name and time with the oven setting, the
+       stages of a multi-stage method, and the caveats; the table is the answer
+       now. HTF.cookSchedule.resolve still returns `stages`, `aside` and `why`
+       for anything that wants them; nothing on this page reads them today.
 
        Shortest first, decliners last -- see HTF.cookSchedule.orderMethods for
        why that order and not alphabetical. */
@@ -191,78 +192,6 @@
     els.table.innerHTML =
       "<table><thead><tr><th>Method</th><th>What you get</th><th>Time</th>" +
       "</tr></thead><tbody>" + rows + "</tbody></table>";
-
-    ordered.forEach(function (method) {
-      var r = CS.resolve(method, kg, doneness, protein.methods);
-      var card = document.createElement("div");
-      card.className = "ct-card" + (r.ok ? "" : " ct-card--declined");
-
-      /* NAME AND TIME ON ONE LINE, AT THE SAME WEIGHT. Helen: "the cooking
-         method name should be as bold as the time." The card used to open with
-         a small grey heading, then the oven temperature, then a large time —
-         so the eye found the number first and had to travel back up for the
-         thing it belonged to. They are one fact ("this method takes this
-         long") and now read as one line.
-
-         Everything under it is ordered by how often you need it: what you get,
-         then the two settings you act on, then the schedule, then the caveats.
-         The oven temperature moved out of its own paragraph and into that
-         settings line — it was taking a full row to say four characters. */
-      var html =
-        "<div class='ct-card-head'>" +
-          "<h3 class='ct-card-name'>" + method.name + "</h3>" +
-          "<p class='ct-total'>" + (r.ok ? timeHtml(r) : "—") + "</p>" +
-        "</div>";
-
-      /* NO `outcome` LINE ON THE CARD. It was here to "confirm" the choice you
-         made in the table above -- but the table already says it, three
-         paragraphs up, and repeating it made the card open with two
-         near-identical sentences ("Reliable default" then "Reliable, even
-         results; use a thermometer"). Helen: "below that it's still a bit of a
-         clutter." The table is where you choose; the card is where you get the
-         things the table has no room for. */
-      var settings = [];
-      if (method.oven) settings.push(method.oven);
-      if (method.covering) settings.push(method.covering.toLowerCase());
-      if (settings.length) {
-        html += "<p class='ct-settings'>" + settings.join(" &middot; ") + "</p>";
-      }
-
-      var asides = [];
-
-      if (r.ok) {
-
-        if (r.stages) {
-          html += "<ul class='ct-stages'>" + r.stages.map(function (st) {
-            return "<li><span>" + st.name + "</span> " + CS.span(st.lo, st.hi) + "</li>";
-          }).join("") + "</ul>";
-        }
-
-        /* THE IN-AT / OUT-AT / REST-UNTIL LIST WAS HERE, and went with the two
-           boxes that fed it (#244). It was the only part of a card that needed
-           to know what time you were eating. */
-
-        /* The doneness aside said "showing rare", which was the honest thing
-           to say while only one level was rendered. Both are on the card now
-           (issue #246), each labelled, so the sentence would contradict what
-           is directly above it. Every other aside is unaffected. */
-        if (r.aside && !(r.levels && r.levels.length > 1)) asides.push(r.aside);
-      } else {
-        html += "<p class='ct-declined'>Won’t guess this one.</p>" +
-                "<p class='ct-aside'>" + r.why + "</p>";
-      }
-
-      /* Caveats and notes end the card as ONE quiet block. They were two
-         paragraphs at full spacing, which gave a footnote the same presence as
-         the answer above it. */
-      if (method.notes) asides.push(method.notes);
-      if (asides.length) {
-        html += "<p class='ct-notes'>" + asides.join(" ") + "</p>";
-      }
-
-      card.innerHTML = html;
-      els.out.appendChild(card);
-    });
   }
 
   /* THE REST BOX AND ITS TOOLTIP WERE HERE. The box carried the selected

@@ -183,10 +183,9 @@
 // pushed to the same edge the read-it/make-it toggle takes so the two lined up
 // by construction. On 2026-09-05 Helen moved it under that toggle -- "move the
 // shortlist button up to below make it / read it" -- and the wrapper went with
-// it, because a flex row holding one child is not a layout. Its new home is
-// `.cocktail-head-shortlist` in _sass/cocktails/_cocktail.scss, which is the
-// same one-trick element: push right, and land under the thing above that also
-// pushes right.
+// it, because a flex row holding one child is not a layout. It then lived in
+// `.cocktail-head-shortlist` under the toggle until 2026-09-10, when both moved
+// to `.cocktail-controls` under the title block (#897, _cocktail.scss).
 //
 // Nothing about the BUTTON changed in that move, which is why there is no rule
 // here any more -- only this note, so the next person looking for the meta row

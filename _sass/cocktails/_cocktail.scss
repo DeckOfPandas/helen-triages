@@ -456,9 +456,26 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   display: inline-flex;
   align-items: center;
   gap: $space-sm;
-  // Sits on the title's own line (see .cocktail-title-row), not above it —
-  // this margin only pulls it down off the block's very top edge.
-  margin-top: $space-xs;
+}
+
+// THE CONTROLS ROW, UNDER THE TITLE BLOCK'S RULE -- #897, 2026-09-10. Helen:
+// "move read it / make it toggle to the top right of the page main content,
+// just under the section divider that sits between the metadata section and
+// ingredients." The toggle sat on the title's line from 2026-09-02 and the
+// shortlist button under it from 2026-09-05; both are here now, right-aligned,
+// in one row, so the 2026-09-05 relation ("below make it / read it") survives
+// as "beside it" without a second element to keep in step.
+//
+// THE NEGATIVE TOP MARGIN EATS PART OF THE TITLE BLOCK'S BOTTOM MARGIN
+// (1.75rem), so the row reads as hanging off the rule rather than floating in
+// the gap before INGREDIENTS; the section heading's own top margin still opens
+// the space below it. The row is what carries the space, not the toggle.
+.cocktail-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $space-lg;
+  margin: -$space-lg 0 0;
 }
 
 .cocktail-toggle-label {
@@ -532,36 +549,10 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // shortlist button up to below make it / read it."
 //
 // A row of its own that pushes its one item right, so the button lands under
-// `make it` by construction: this element and `.cocktail-title-row` are both
-// children of `.cocktail-head-words` and both take the same right edge, which
-// is the same trick the meta row used to align them when the button lived down
-// there. See _layouts/cocktail.html for why it is a sibling of the title row
-// rather than stacked inside it.
-.cocktail-head-shortlist {
-  display: flex;
-  justify-content: flex-end;
-
-  // PULLED UP AGAINST THE TOGGLE, by exactly the title's own bottom margin --
-  // Helen, 2026-09-05, looking ahead to `make it`: "in make it mode, it will
-  // look lost, neither aligned with the metadata headings nor close to the read
-  // it toggle."
-  //
-  // She is right, and the cause is that this element is a sibling of the title
-  // ROW rather than of the toggle inside it, so it clears the whole row --
-  // including `.drink-card-name`'s own $space-sm bottom margin, which exists to
-  // separate the TITLE from what follows and has nothing to say about a control
-  // in the other column. Cancelling exactly that value puts the button directly
-  // under `make it`, so the two read as one cluster in both states rather than
-  // a control stranded on a line of its own once the tagline leaves.
-  //
-  // A NEGATIVE MARGIN RATHER THAN A WRAPPER, and the wrapper was tried first:
-  // `.cocktail-title-row` is `align-items: last baseline`, and a two-item
-  // column's last baseline is its BOTTOM item's -- so stacking the toggle and
-  // the button together drags the toggle off the title's line to put the button
-  // on it. The negative margin is the smaller lie: it says "do not clear the
-  // title's trailing space", which is exactly what is meant.
-  margin-top: -$space-sm;
-}
+// `.cocktail-head-shortlist` IS GONE, 2026-09-10 (#897): the shortlist button
+// sits beside the toggle in `.cocktail-controls` above, under the title block,
+// so the one-trick wrapper that pushed it right and pulled it up under the
+// toggle has nothing left to do.
 
 .cocktail-tagline {
   font-style: italic;
@@ -729,7 +720,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // are 0.72rem, so the dot is bigger in proportion to nothing else changing.
   column-gap: 1.05rem;
   row-gap: 0.4rem;
-  margin: $space-md 0 0;
+  // $space-xl SINCE 2026-09-10 (#893), from $space-md -- Helen: "add a small
+  // amount of vertical space between cocktail glass/garnish line and chips
+  // line." `.cocktail-meta`'s own bottom margin collapses into this one, so this
+  // value IS the gap.
+  margin: $space-xl 0 0;
 
   // NO `cursor: default` ANY MORE. It was here because the chips were inert
   // `<span>`s on this page; since 2026-09-05 they are links to the index
@@ -1622,9 +1617,10 @@ $amount-gap-wide: 1.25rem;
 // THE MAKE-IT TOGGLE, AND THE STATE IT SWITCHES TO
 // =============================================================================
 // The toggle's own rules (`.cocktail-toggle`, `-label`, `-track`, `-knob`) live
-// up near `.cocktail-title-block`, next to the tape scoping — that is where it
-// sits in the markup, on the title's own line, and this section is the state it
-// drives rather than the control itself. `.cocktail-make-row` and `.btn-make`
+// up near `.cocktail-title-block`, next to the tape scoping — it sat on the
+// title's own line until 2026-09-10 and is in `.cocktail-controls` under the
+// block since (#897) — and this section is the state it drives rather than
+// the control itself. `.cocktail-make-row` and `.btn-make`
 // are gone with the single button they belonged to; the toggle's ON/inactive
 // colours are handled where it is declared, and its knob's SLIDE is the one
 // piece of it still set here, in the state block, alongside everything else
