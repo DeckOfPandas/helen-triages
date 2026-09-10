@@ -71,14 +71,25 @@ published: false
 <article class="ref" id="top">
 
   <div class="ref-title-block">
-    <h1 class="ref-title">Rum categories</h1>
+    <h1 class="ref-title">My Philosophy of Rum</h1>
   </div>
 
   <div class="ref-body">
 
-    {% comment %} PLACEHOLDER COPY — see the header comment. {% endcomment %}
-    <p class="ref-intro">The categories a cocktail card can name, and which
-      bottles in the house are one.</p>
+    <p>I really really like rum.</p>
+
+    <p>My rum philosophy cares about only two things: 1. How a rum tastes, which informs 2. how to use it in a cocktail.</p>
+
+    <p>What colour a rum is tells me very little about how a rum tastes. Boring trainspotting facts like "pot still" or "made in a distillery owned by this particular old white guy" don't interest me at all, and, again, tell me very little about how a rum tastes. The history of Caribbean colonialism also tells me -- wait for it -- very little about how a rum tastes.</p>
+
+    <p>And if you don't care how a drink tastes, why on earth are you going to all the sticky, impractical effort of making mixed drinks?</p>
+
+    <hr>
+
+    <h1>Rum categories I recognise</h1>
+
+        <p>The below is almost identical to the classification system by Matt Pietrek of Minimalist Tiki (<a href="https://cocktailwonk.com/2023/06/nine-essential-tiki-rum-styles.html">2023</a>, which updates <a href="https://cocktailwonk.com/2019/10/six-essential-tiki-rum-categories.html">2019</a>).</p>
+
 
     {% comment %} ── THE CATEGORIES, IN HELEN'S SECTIONS ─────────────────────
        GROUPED SINCE 2026-09-06, her ask: "reorganise the table into useful
@@ -153,7 +164,7 @@ published: false
     <section class="ref-block ref-block--adjacent">
     {% comment %} "Rum-adjacent" is Helen's, 2026-09-06, replacing the
        placeholder "Next to rum, and not rum". {% endcomment %}
-    <h2 class="ref-section-heading" id="adjacent"><span>Rum-adjacent</span></h2>
+    <h2 class="ref-section-heading" id="adjacent"><span>Rum-adjacent sugarcane spirits</span></h2>
 
     <ul class="rum-cats rum-cats--adjacent">
       {% for style in ing.cane_and_palm_spirits %}
@@ -178,36 +189,8 @@ published: false
       {% endfor %}
     </ul>
 
-    </section>
+    <p>Ceylon arrack isn't a strictly a rum, but I'd feel bad about leaving it off my list.</p>
 
-    {% comment %} ── SIPPING ─────────────────────────────────────────────────
-       #782, 2026-09-06, and Helen's own reservation about the name is worth
-       carrying here as well as in the data: "the name of which is a little
-       against my religions because you can sip anything plus I can mix whatever
-       I damn well want... but this section would help me keep track of my
-       collection a bit."
-
-       SO IT IS A SHELF AND NOT A RULE, and the page must not imply otherwise.
-       No category, no card name, no "reach for this instead" — just the names,
-       in her order. The `sipping` block in bottles.yml carries why these have
-       no `generic`: she chose to leave the three aged Barbadians out of the
-       category machinery rather than have one invented for them, and the rest
-       of the list keeps them company rather than splitting the mechanism in
-       two.
-
-       BOTTLES, NOT CATEGORIES, SO IT IS THE ONE BLOCK ON THIS PAGE WITH NO
-       LEFT-HAND COLUMN — a different shape because it is a different kind of
-       list, rather than the row shape stretched over something that is not a
-       category.
-    {% endcomment %}
-    <section class="ref-block ref-block--sipping">
-    <h2 class="ref-section-heading" id="sipping"><span>Sipping</span></h2>
-
-    {% comment %} No subtitle -- Helen, 2026-09-10 (#890): "delete subtitle
-       under 'sipping'". The list is the section. {% endcomment %}
-    <ul class="rum-sipping">
-      {% for b in site.data.cocktails.bottles.sipping %}<li class="rum-sip">{{ b }}</li>{% endfor %}
-    </ul>
     </section>
 
     <section class="ref-block ref-block--characters">
@@ -218,10 +201,12 @@ published: false
        Here because a card can show one and the page would otherwise have
        nothing to say about the word.
     {% endcomment %}
-    <h2 class="ref-section-heading" id="characters"><span>Characters</span></h2>
+    <h2 class="ref-section-heading" id="characters"><span>Addendum: Rum Characters</span></h2>
 
     {% comment %} No subtitle -- Helen, 2026-09-10 (#891): "delete subtitle
        under 'characters'". {% endcomment %}
+       <p>I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
+       <p>These words are useful to me:</p>
     <ul class="rum-chars">
       {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
     </ul>
@@ -243,7 +228,10 @@ published: false
        tests/test_cocktails.py holds that split so this cannot rot into
        silently dropping a real retired word.
     {% endcomment %}
-    <h2 class="ref-section-heading" id="not-categories"><span>Not categories</span></h2>
+
+    <hr>
+
+    <h1 <span>Rum "styles" I do not recognise</span></h1>
 
     {% comment %} THE REASONS ARE OFF THE PAGE, 2026-09-10 (#784). They were
        `retired_rum_styles`' own text, written for the next Claude -- issue
