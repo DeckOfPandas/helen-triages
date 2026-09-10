@@ -6227,14 +6227,21 @@ def test_drink_number_ranges_use_en_dashes(drink_file):
 # uses one file over: declaring it lets this test bite on the NEXT one instead
 # of being loosened. `test_no_drink_note_exception_is_stale` stops it outliving
 # the problem.
-DRINK_NOTE_EXCEPTIONS = {
-    # TRUNCATED MID-SENTENCE, on `tailspin`. "Not good with Brecon Botanicals
-    # or" — or what? The mechanical fix for #711 adds a full stop, and here that
-    # would turn an unfinished thought into a finished-looking one, which is a
-    # worse state than the one it is in. Helen's to finish; flagged 2026-09-06.
-    "Not good with Brecon Botanicals or":
-        "truncated mid-sentence — needs Helen, not a full stop",
-}
+# EMPTY SINCE 2026-09-10, AND THAT IS THE EXEMPTION MECHANISM WORKING RATHER
+# THAN A REASON TO DELETE IT. Its one entry was `tailspin`'s "Not good with
+# Brecon Botanicals or" -- truncated mid-sentence, flagged 2026-09-06, and
+# deliberately NOT given a full stop by #711's mechanical pass because that
+# would have turned an unfinished thought into a finished-looking one. Asked
+# what it should say, Helen answered on #799: "Tailspin: delete the note." So
+# the note is gone from the draft and the exemption goes with it, which is
+# exactly what `test_no_drink_note_exception_is_stale` exists to force.
+#
+# THE TWO HALVES ARE IN DIFFERENT REPOSITORIES AND MUST MERGE TOGETHER. The note
+# is in `_cocktail_drafts`; this is the public repo. Either order leaves a red
+# suite in the gap -- drafts first and this entry is stale, this first and the
+# note is unexempted and fails `test_drink_note_is_a_sentence`. That is #855's
+# window, and it is unavoidable here rather than an oversight.
+DRINK_NOTE_EXCEPTIONS: dict[str, str] = {}
 
 
 def test_no_drink_note_exception_is_stale():

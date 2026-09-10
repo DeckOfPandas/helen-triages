@@ -172,18 +172,32 @@ NOTE_EXCEPTIONS = {
         "leading ellipsis: the note continues the sentence above it",
 }
 
-# The `gf tip:` family. FOURTEEN DRAFTS OPEN WITH IT and it is NOT mechanically
-# fixable: naive capitalisation gives "Gf tip:", which is wrong, and "GF tip:"
-# is a house-style choice about an abbreviation that Helen has not made. The
-# phrase is the source's own (it is how the recipes were transcribed), so this
-# is a question about whether her style guide adopts it, capitalises it, or
-# rewrites it out. Raised for her rather than guessed at; see #711.
-GF_TIP = "gf tip"
+# `GF_TIP` WAS HERE AND IS GONE, 2026-09-10 (#800), AND ITS COMMENT WAS WRONG IN
+# BOTH ITS FACTS -- worth recording, because the wrong premise is what kept the
+# exemption alive for a month.
+#
+# It said FOURTEEN drafts opened with the rubric. It was eight. And it treated
+# "gf" as an abbreviation whose capitalisation Helen had yet to rule on, which
+# assumed gluten-free. **`gf` is Good Food, the magazine.** Six of the eight
+# named it in `source:` outright ("Adapted from Good Food, June 2024"), and not
+# one of the tips was about gluten -- they were the magazine's standing tip box,
+# transcribed verbatim: a nutrition note, a freezing instruction, a substitution,
+# how to make vanilla sugar. One even names the magazine inside the tip.
+#
+# SO THE QUESTION THE EXEMPTION WAS HOLDING OPEN DID NOT EXIST, and the third
+# answer it offered -- "Gluten-free tip:" -- would have put a false claim about
+# allergens on a recipe page. Helen, asked what it meant: "I actually have no
+# idea what this means... Good Food tip, the magazine source I use a lot?"
+#
+# Her ruling: drop the label. Each note is now a plain sentence like every other
+# note, and `source:` carries the attribution it always did. The rubric varied
+# (`gf tips:`, `gf tip on stock cubes:`, `gf tip - vanilla sugar:`), so no
+# capitalisation rule could have covered it anyway -- with the label gone there
+# is no varying prefix left to have a house form for.
 
 
 def _note_exempt(text: str) -> bool:
-    s = (text or "").strip()
-    return s in NOTE_EXCEPTIONS or s.lower().startswith(GF_TIP)
+    return (text or "").strip() in NOTE_EXCEPTIONS
 
 
 def test_notes_are_sentences(recipe):
