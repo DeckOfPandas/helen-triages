@@ -976,10 +976,22 @@ bottles:
   # 2026-09-04: "the maker is Bittermens, 100%." The `unresolved_suggestions`
   # entry had said "Probably Bittermens', which is memory rather than reading" --
   # the right refusal, and the only thing that could resolve it was her saying
-  # so. The leading apostrophe is the product's own: 'Elemakule is Hawaiian.
-  "Bittermens 'Elemakule Tiki Bitters":
+  # so.
+  #
+  # THE LEADING APOSTROPHE IS GONE, 2026-09-10 (#879), AND THIS COMMENT USED TO
+  # ARGUE THE OPPOSITE. It read "the leading apostrophe is the product's own:
+  # 'Elemakule is Hawaiian", which is true of the PRODUCT -- the mark is an
+  # okina and the word is Hawaiian for "old man". It was an agent's note, not a
+  # ruling, and Helen has now ruled: "Bittermens 'Elemakule Tiki Bitters should
+  # not have the apostrophe", then "delete those two apostrophes".
+  #
+  # A leading apostrophe on a bottle name is a nuisance wherever the name is
+  # sorted, quoted or typed, and this is a shopping list rather than a label. The
+  # old spelling is an alias, so anything already typed that way still resolves.
+  "Bittermens Elemakule Tiki Bitters":
     generic: "warm-spiced bitters"
-    aliases: ["Elemakule Tiki"]
+    aliases: ["Elemakule Tiki", "Bittermens 'Elemakule Tiki Bitters",
+              "Bittermens ’Elemakule Tiki Bitters"]
   # `Bob's` bare is Minty Pentones' string, beside `peppermint bitters`. The
   # house makes a great many bitters, which is why the bare name sat in
   # `unresolved_suggestions` -- and the alias is safe now for the reason the
