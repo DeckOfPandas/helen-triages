@@ -2061,6 +2061,39 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-09-10 — the family-weekend design pass, in one entry.** Helen asked
+  for an unseeded opinion: *"Where do you think we can make material
+  improvements in a day or so?"* Every page family was screenshotted at 360,
+  390 and 1280 in a headless Chromium first (the container gained one that
+  night, `tmp/browser/`, Helen's grant), and the list was ranked by what a
+  visitor looking once would meet. What she ruled, in order:
+  - **Chips clipped under the ship mark** (#760's mask read as words cut
+    mid-word): *"you're right, and that's new this evening."* Fixed by
+    measurement in `card-line-budget.js` — only a card whose last row reaches
+    the ship gets padded clear — and the pass turned out not to have been
+    LOADED since #846 (§12 has the trap).
+  - **The drink head's void (#887)**: *"I'm not seeing the problem I had any
+    more."* Closed.
+  - **A line under the wordmark** (*"What shall we cook?"*): *"No words under
+    the wordmark section please."* Declined.
+  - **The engineering showing** (the "export list as JSON →" link): *"Okay."*
+    Gone; the panel's summary reads in plain words and gained a **clear
+    button with a second-click confirm** — *"we also need a 'clear shortlist'
+    button somewhere"* — because the list is passed round a table on an iPad.
+  - **The nav** became the door to the other site, §2 above.
+  - **The drink page's controls row**: *"How about moving the read it make it
+    to the left? I can imagine that feeling quite natural in the kitchen --
+    I'll be on the left of the page looking at the ingredients list. Then top
+    right for a save this feels more natural."* Toggle left, shortlist right.
+  - **The drink page's top**: *"it now feels like there's quite a bit of space
+    at the top of cocktail pages. Should the top bump up a bit, closer to the
+    back arrow?"* The title block starts 1rem under the arrow, food's own gap;
+    the arrow stays put.
+  - **Left alone, on purpose**: the header's balance, the recipe page's method
+    indent, the food index pills' faintness at rest, the chip type size on
+    cards — each a settled call that reads as intended once you know it is
+    deliberate, and none would change a visitor's evening.
+
 - **2026-08-26** — One sitting with Helen against a mockup
   (`_dev/cocktails-design.html`, since deleted: eleven card framings, four
   hovers, six greens, five second accents, three thirds; a page of rejected
