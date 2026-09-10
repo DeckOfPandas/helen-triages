@@ -196,6 +196,25 @@
   .search-pair { grid-template-columns: 1fr; }
 }
 
+// THE INPUT UNDER ITS HEADING ON A PHONE -- #901, Helen: "stack HAS TO HAVE
+// with its input field below it for narrower screens, and same for LEAVE OUT
+// and I KNOW WHAT I WANT." The row is heading, input, clear button; the
+// heading is `nowrap` and refuses to shrink (by design, see the mixin), so on
+// a phone the input was the thing that gave and ended up a few characters
+// wide beside a word that filled the line. Wrapping the row with the heading
+// on a full-width first line keeps the input and its clear button together on
+// the second, at the width the whole column has.
+@media (max-width: 600px) {
+  .search .search-input {
+    flex-wrap: wrap;
+
+    .category-label {
+      flex-basis: 100%;
+      margin-right: 0;
+    }
+  }
+}
+
 
 // --- The dislike navigator (GitHub issue #52) --------------------------------
 // LEAVE OUT: the exclude picker, a section of its own beside HAS TO HAVE since

@@ -647,6 +647,26 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // no room. Stacked, the three facts read as the list they always were.
 @media (max-width: 600px) {
   .cocktail-meta { grid-template-columns: 1fr; }
+
+  // THE HEAD ON A PHONE, 2026-09-10, seen in a real browser for the first time
+  // (#895 was "shipped unverified"; this is the verification). At 390px the
+  // 7rem glass and its 3rem gap took 160px and left the words 198px, so a
+  // title like ARRACK CHRISTMAS PUNCH (WIFE #3) at 2.6rem wrapped to five
+  // lines beside a drawing taller than all of them. The long-title fix itself
+  // held: nothing overflowed, it just had no room. Smaller glass, smaller gap,
+  // smaller tape: the words get 280px and the title steps down one size, the
+  // same size the drink page's section headings are.
+  .cocktail-title-block {
+    padding-left: calc(4.5rem + #{$space-lg});
+  }
+
+  .cocktail-glass-icon {
+    width: 4.5rem;
+  }
+
+  .cocktail-title-block .drink-card-name {
+    --card-name-size: 2rem;
+  }
 }
 
 // SHIP IT? reuses the card's own `.drink-card-ship-icon`/`-word`, filled by

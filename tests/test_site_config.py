@@ -2060,30 +2060,22 @@ def test_no_element_can_force_horizontal_scroll():
 # its content's min-content width, which depends on a font, a string and a
 # browser. So the rule is about the collapse, not about the arithmetic.
 #
-# These four rows are declared exceptions, each with the claim it is making.
+# These rows are declared exceptions, each with the claim it is making.
 # The list only shrinks: giving one of them a narrow-screen variant means
 # deleting its entry, and an entry for a row that HAS one fails too, so it
 # cannot rot into a list of things that were fixed years ago.
+#
+# `.tc-row` AND `.tc-axis` LEFT THIS LIST ON 2026-09-10 (#903): the label sits
+# above the bar on a phone now -- exactly the redesign their entries said it
+# would take, done once the charts were finally looked at on one. The two
+# rows share one `@media` block in _sass/food/_temperature-chart.scss, so they
+# still move together, which was the point of the second entry.
 MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
         "of Courier all told, so it is believed to fit a 360px phone -- BELIEVED, "
         "not measured, and it is the same shape as the footer row that did not. "
         "The status string is built in filters.js and is the part that could grow."
-    ),
-    ".tc-row": (
-        "`$tc-label-width 1fr` -- a 9.5rem (152px) label column and a bar. It "
-        "cannot overflow, because only the label is fixed, but on a 360px phone "
-        "the bar is left about 140px. The temperature charts are read on an iPad "
-        "in the kitchen (MANUAL 14), where there is room; a phone would want "
-        "the label above the bar rather than beside it, which is a redesign of "
-        "the chart and wants Helen's eye."
-    ),
-    ".tc-axis": (
-        "The axis row for .tc-row above, and it must keep the same two tracks or "
-        "the scale stops lining up with the bars it labels. Whatever happens to "
-        ".tc-row happens to this in the same pass -- that is the point of it "
-        "being a separate entry saying so."
     ),
     ".cocktail-ingredient-top": (
         "`$amount-col 1fr` -- a 5.5rem fixed amount column and the ingredient "

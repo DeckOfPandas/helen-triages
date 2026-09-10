@@ -230,7 +230,15 @@
            is chrome config, so it comes from _data/chrome.yml. {% endcomment %}
         <span class="tape-bg" aria-hidden="true"
               data-tape-count="{{ site.data.chrome.tape_count }}"></span>
-        <span class="site-logo-word"><span class="site-logo-bracket">[ </span>{{ wordmark_word }}<span class="site-logo-bracket"> ]</span></span>
+        {% comment %} `--wordmark-chars` IS HOW THE WORD FITS A PHONE -- #899.
+           `[ COCKTAILS ]` at 2.5rem is 491px wide and nothing capped it, so
+           every cocktails page could be dragged sideways on a 390px screen.
+           The stylesheet sizes the word from this count (brackets and their
+           spaces included: 4 extra characters) so the tape never exceeds 92vw,
+           and a short word like `[ FOOD ]` keeps its full size because the
+           formula only bites when the word would not fit. See
+           `.site-logo-word` in _sass/shared/_layout.scss. {% endcomment %}
+        <span class="site-logo-word" style="--wordmark-chars: {{ wordmark_word | size | plus: 4 }};"><span class="site-logo-bracket">[ </span>{{ wordmark_word }}<span class="site-logo-bracket"> ]</span></span>
       </div>
       {% endif %}
     </div>

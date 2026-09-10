@@ -287,6 +287,21 @@
 // Food's `.search-pair` sets `max-width: none` for exactly this reason.
 .drink-searches .drink-label-row--search { max-width: none; }
 
+// THE INPUT UNDER ITS HEADING ON A PHONE -- #901's cocktails half, 2026-09-10.
+// Same shape as food's `.search .search-input` rule and for the same reason:
+// the heading is `nowrap` and will not shrink, the invisible `× clear` keeps
+// its box, and at 360px the three together ran 19px past the edge -- the last
+// thing on the cocktails index still able to drag the page sideways. The
+// heading takes a full first line; the input and its clear stay together on
+// the second, at the column's width.
+@media (max-width: 600px) {
+  .drink-label-row--search {
+    flex-wrap: wrap;
+
+    .drink-field-label { flex-basis: 100%; }
+  }
+}
+
 .btn-clear-filter {
   border: 0;
   background: none;
