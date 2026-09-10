@@ -1441,7 +1441,21 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # describes happened in full -- agent edit, flag off, her read, her word, flag
 # on -- and the only thing this line records is that the last step was hers.
 # Covers 39240e8 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "39240e8"   # four taglines re-proofread, 2026-09-10
+# MOVED A SIXTH TIME, 2026-09-10, LATE, AND THE GRANT CAME BEFORE THE READ.
+# `ae13155` sets `proofread: true` on four live drinks (Accoutrement, Sazerac,
+# South Sider, Vieux Carré) whose only agent edit since her last read was one
+# word -- `Creole bitters` to `Créole bitters` (#882, PR #946). That PR had
+# flipped them off the site as #367 requires; Helen said she had flipped them
+# back herself, but that commit never reached `main`, and with the site's
+# deploys blocked by a red suite she granted it outright: "Break the rule,
+# explicit permission, and get everything up on the site with proofread=true.
+# Then hand on heart I'll look at them myself to confirm everything is fine."
+# So this is the fourth move's shape (a change she could see whole in the
+# sentence that asked for it) with the read promised rather than done. The
+# grant is still hers, still explicit, still quoted. Covers ae13155 and
+# nothing after. #933 is the open question of whether a constant is the right
+# shape for this at all; six moves in a day say it is not.
+COCKTAIL_BASELINE_COMMIT = "ae13155"   # Créole's accent on four drinks, on Helen's word
 
 
 def _newest_commit_per_published_drink():
