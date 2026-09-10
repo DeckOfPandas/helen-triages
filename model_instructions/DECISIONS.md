@@ -2475,6 +2475,49 @@ unless stated.
   candidates artifact carried this and a glass-above alternative; **her pick
   is not yet recorded — write it here when she makes it.**
 
+- **2026-09-10, #927 — "If you liked this, how about …", three related drinks
+  at the foot of every drink page.** Helen's own scoping, in the issue: *"Not a
+  full recommendation engine! But I expect we can do something with coincidental
+  tagging."* And, mid-build, when a Ruby plugin and a `meta.ship` weighting were
+  on the table: **"Keep it simple."** So the score is `shared moods + shared
+  ingredient generics`, ties broken by title, and nothing else — no ship
+  preference, no per-field weight, no tuning. Every knob one could add is a
+  claim about what makes two drinks alike and nobody has made that claim yet.
+  **In Liquid, in the layout**, not a plugin: 48 drinks is 48 iterations per
+  page, where a generator would have cost a file, a hook-order question and a
+  `jekyll serve` that silently serves a site it never ran on (§1).
+  **The sort is the interesting part.** Liquid cannot sort by a computed
+  number, so each candidate becomes one `rank~title~url` string and the array is
+  sorted as TEXT, with `rank = 999 - score` — ascending text order then puts the
+  highest score first and breaks ties A-Z by title in the same pass, with no
+  second loop. **Measured before it was written, and the measurement is kept** —
+  `scripts/related_drinks.py` is the same scoring in Python over the same
+  corpus, so it doubles as a second implementation to check the Liquid against
+  (§13.11: a number derived in `tmp/` is one nobody can reproduce). Across the
+  48 published drinks every drink's third pick shares at least 3, most share 4,
+  the best 6 — so filtering to `score > 0` never leaves a heading over an empty
+  row. The Negroni gets South Sider (3 moods, 2 generics), Aperol Spritz (4
+  moods, 0) and Boulevardier (2, 2), and the script and the built page agree on
+  all three. **A compact row, not a card**: the index
+  card is written inline in `cocktails/index.html` rather than in an include, so
+  reusing it meant copying ninety lines of markup, and a third card design is
+  §13.12's to refuse — so it borrows the three parts the universe line borrows
+  (tiny glass, name on tape, one ingredient line) and none of the card's
+  geometry. **No new hue** and a plain `.cocktail-section-heading`, the one "To
+  serve" uses; the three coloured modifiers each carry a job and this section has
+  not earned one. **Three across, then one, with no media query** —
+  `repeat(auto-fit, minmax(13rem, 1fr))` asks the 900px column rather than the
+  viewport, which is what §12's "you will check one element's width and call the
+  row safe" is about. Hidden in `make it` (an invitation to make something else
+  is the last thing wanted with your hands full) and in PRINT, where it is the
+  opposite direction from that state's usual restore: print puts back what says
+  more about THIS drink, and this is three links off it. **The heading is a
+  marked PLACEHOLDER in Helen's own words from the issue** (§13.12) — the voice
+  is hers and an agent must not write a line of it.
+  **Deliberately not built**: food (*"the priority is cocktails"*, and the
+  mechanism is only worth porting once she has looked at this one); any weighting
+  by `meta.ship`; any hand-tuned per-field score.
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%

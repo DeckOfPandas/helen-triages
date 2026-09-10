@@ -1017,6 +1017,160 @@ layout: default
     <div class="cocktail-body-content">{{ content }}</div>
   {% endif %}
 
+  {% comment %} ─────────────────────────────────────────────────────────────────
+     IF YOU LIKED THIS, HOW ABOUT … — #927, and Helen's own framing of the
+     scope: "Not a full recommendation engine! But I expect we can do something
+     with coincidental tagging."
+
+     So this is coincidental tagging and nothing else. A drink's score against
+     this one is the number of MOODS they share plus the number of ingredient
+     GENERICS they share, and ties break on the title. No weighting, no ship
+     preference, no hand-tuned multipliers -- Helen, asked while it was being
+     built: "Keep it simple." Every knob one could add here is a claim about
+     what makes two drinks alike, and nobody has made that claim yet.
+
+     WHY THE TWO FIELDS AND NOT ANY OTHERS. `mood` is the axis the index
+     already browses by, nineteen words across the collection, half of them
+     Helen's own (§9.13) -- it is the closest thing the data has to a statement
+     of what a drink IS. `generic` is what it is MADE of, and is the other
+     thing the index filters on. Adding them is the cheapest possible model and
+     it is the honest one: a drink that shares three moods and two pours with
+     this one really is the nearest thing on the site.
+
+     MEASURED BEFORE IT WAS WRITTEN, and the measurement is kept:
+     `python3 scripts/related_drinks.py` is this scoring in Python over the same
+     corpus. Across the 48 published drinks every drink's THIRD pick still
+     shares at least 3 (nine drinks), most share 4, and the best share 6 -- so
+     `score > 0` never empties the row and the section is never a heading over
+     three arbitrary names. Run it after a promotion batch or a vocabulary edit
+     that moves moods; `python3 scripts/related_drinks.py <slug>` prints one
+     drink's picks and what each shares, which is also how to check this
+     template against a second implementation.
+
+     LIQUID, NOT A PLUGIN, AND THAT IS ALSO "KEEP IT SIMPLE". 48 drinks is 48
+     iterations per page with a handful of comparisons in each; a Ruby
+     generator would compute it once instead of 48 times and would cost a file,
+     a hook-order question and a `jekyll serve` that silently serves a site
+     where it never ran (§1). At this size the cheap thing is the template.
+
+     THE COLLECTION IS ALREADY THE PUBLISHED SET, so there is no gate test
+     here. `_plugins/publish_gate.rb` REMOVES a held-back drink from
+     `site.cocktail_recipes` at :post_read, before any URL exists -- so in
+     production this loop can only ever see live drinks. Locally
+     `show_awaiting_fix` switches the gate off and the row offers what the index
+     offers, which is the same bargain every other listing on this site makes.
+     DRAFTS ARE A DIFFERENT COLLECTION and are deliberately not concatenated in:
+     cocktails/index.html needs `site.show_drafts` to reach them and this must
+     never do so, on any config -- #235 is what a private drink name in public
+     HTML costs.
+
+     THE SORT IS A STRING SORT, WHICH IS WHY THE KEY IS INVERTED. Liquid cannot
+     sort an array by a computed number, so each candidate becomes one
+     `rank~title~url` string and the whole list is sorted as text. `rank` is
+     `999 - score`, so ASCENDING text order puts the HIGHEST score first, and
+     within a score the titles then sort A-Z -- which is the deterministic
+     tie-break, falling out of the same sort rather than needing a second pass.
+     Every rank is three digits (score is 1..15 in this collection and would
+     have to reach 100 to shorten it), so the digits compare positionally the
+     way the numbers would.
+
+     `sort_natural` RATHER THAN `sort`, the same choice the mood chips above
+     make and for the same reason: Liquid's `sort` is ASCII, so a capitalised
+     title would sort ahead of every lowercase one. Nothing in the collection
+     hits it today; the drink page's own chip loop has the measurement.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  {% capture my_generics %}{% for ing in page.ingredients %}{% for g in ing.generic %}|{{ g }}|{% endfor %}{% endfor %}{% endcapture %}
+  {% assign related_keys = "" %}
+  {% for other in site.cocktail_recipes %}
+    {% unless other.url == page.url %}
+      {% assign score = 0 %}
+      {% comment %} `contains` ON AN ARRAY IS MEMBERSHIP, not a substring probe,
+         so a mood needs no delimiters round it. A generic does: it is compared
+         against one flat string of every generic on this page, and `|lime|`
+         must not match inside `|lime juice|`. Same self-delimiting shape the
+         index's `data-ing` uses, for the same reason. {% endcomment %}
+      {% for m in page.mood %}
+        {% if other.mood contains m %}{% assign score = score | plus: 1 %}{% endif %}
+      {% endfor %}
+      {% for ing in other.ingredients %}
+        {% for g in ing.generic %}
+          {% capture token %}|{{ g }}|{% endcapture %}
+          {% if my_generics contains token %}{% assign score = score | plus: 1 %}{% endif %}
+        {% endfor %}
+      {% endfor %}
+      {% if score > 0 %}
+        {% assign rank = 999 | minus: score %}
+        {% capture related_keys %}{{ related_keys }}{{ rank }}~{{ other.title }}~{{ other.url }};{% endcapture %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+  {% assign related_sorted = related_keys | split: ";" | sort_natural %}
+
+  {% if related_sorted.size > 0 %}
+    {% comment %} PLACEHOLDER COPY, Helen's to write -- §13.12. The words are
+       her own, taken from the issue's title, so the row can be looked at
+       without an agent having invented a line of voice for it. The bitters
+       caveat (#713) and the units line (#753) are the pattern.
+
+       A PLAIN `.cocktail-section-heading`, with no modifier and no inner span,
+       exactly as "To serve" above it. The three modifiers carry a colour JOB
+       each (§9.13) and this section has not earned one -- inventing a fourth
+       pairing here would be spending a hue on a heading nobody has ruled on.
+    {% endcomment %}
+    <!-- PLACEHOLDER COPY, Helen's to write -->
+    <h2 class="cocktail-section-heading cocktail-related-heading">If you liked this, how about&hellip;</h2>
+    <ul class="cocktail-related">
+      {% for entry in related_sorted limit: 3 %}
+        {% assign parts = entry | split: "~" %}
+        {% assign rel = site.cocktail_recipes | where: "url", parts[2] | first %}
+        {% comment %} GLASS IS AN ORDERED LIST, FIRST WITH ARTWORK WINS -- the
+           same contract the head of this file and the index card follow, and
+           the same empty-string accumulator, tested against "" rather than
+           truth-tested. An empty span when there is no drawing, so the row's
+           three items keep one shape. {% endcomment %}
+        {% assign rel_icon = "" %}
+        {% for g in rel.glass %}
+          {% if rel_icon == "" %}
+            {% assign found = site.data.cocktails.glasses.icons[g] %}
+            {% if found %}{% assign rel_icon = found %}{% endif %}
+          {% endif %}
+        {% endfor %}
+        <li class="cocktail-related-item">
+          {% if rel_icon != "" %}
+            {% capture rel_icon_file %}icons/glasses/{{ rel_icon }}.svg{% endcapture %}
+            <span class="drink-card-glass">{% include {{ rel_icon_file }} %}</span>
+          {% else %}
+            <span class="drink-card-glass"></span>
+          {% endif %}
+          {% comment %} THE CARD'S OWN FOUR TAPE CLASSES, not a third name for
+             the same device -- `.drink-card-name` > `.drink-card-tape` >
+             `.drink-card-tape-bg[data-card-tape]` + `.drink-card-tape-word`,
+             which is exactly what this page's own title does at the top of the
+             file and what the universe line does on the index.
+             decorations.js's cardTapes() fills any `[data-card-tape]` slot on
+             any page, and card-name-fit.js measures any `.drink-card-name`, so
+             a long name steps and then wraps here the way it does on a card.
+             `forloop.index` only has to be stable per page (1, 2, 3). {% endcomment %}
+          <p class="drink-card-name">
+            <span class="drink-card-tape">
+              <span class="drink-card-tape-bg" data-card-tape="{{ forloop.index }}"></span>
+              <span class="drink-card-tape-word"><a href="{{ rel.url | relative_url }}">{{ rel.title }}</a></span>
+            </span>
+          </p>
+          {% comment %} ONE INGREDIENT LINE, from `card_ingredients` -- the list
+             _plugins/cocktail_card_ingredients.rb already built and ordered for
+             the card (§9.10.1), so this row cannot show a different set or a
+             different order from the same drink's card. No `data-ing`
+             attributes: those exist for the index's match highlighting and
+             there is nothing on this page to match against. {% endcomment %}
+          {% if rel.card_ingredients.size > 0 %}
+            <p class="drink-card-ingredients">{% for ing in rel.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">&middot;</span> {% endunless %}{{ ing.label }}{% endfor %}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
   {% comment %} AN EMPTY STRING IS TRUTHY TOO, not just an empty array. All
      three drinks carry source as a known-unfilled empty string, and gating
      this footer on the bare value drew a "Source:" line with nothing after

@@ -2136,3 +2136,91 @@ def test_the_shopping_list_and_the_ingredient_index_agree_on_a_name(site):
         "the shopping list and the exclusion index disagree about an "
         "ingredient's name:\n  " + "\n  ".join(problems[:20])
     )
+
+
+# =============================================================================
+# "IF YOU LIKED THIS, HOW ABOUT …" — three related drinks. Issue #927
+# =============================================================================
+# WHY IT IS CHECKED IN THE PRODUCTION BUILD AND NOT THE LOCAL ONE. The row is
+# built by looping `site.cocktail_recipes` in _layouts/cocktail.html, and that
+# collection is only the PUBLISHED set in production: `_config_local.yml` sets
+# `show_awaiting_fix`, which switches `_plugins/publish_gate.rb` off entirely,
+# so a local build's row can legitimately offer a drink that is not live. The
+# claim worth guarding -- a live drink page never points at one that is not --
+# is only true of, and only visible in, the production build.
+#
+# AND IT IS THE SAME SHAPE AS #235, the bug the `prod_site` fixture exists for:
+# a URL computed for a document that is never written is a correct-looking link
+# to a 404. `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`
+# would catch that much on its own; what it cannot see is a row of two, a row
+# of four, or a drink offering itself.
+
+RELATED_SECTION = re.compile(r'<ul class="cocktail-related">(.*?)</ul>', re.S)
+RELATED_LINK = re.compile(r'<a href="([^"]+)">')
+
+
+def _drink_pages(built_site):
+    """Every built drink page, FOUND rather than named.
+
+    MANUAL §12: "you will trust a corpus glob that names files instead of
+    finding them" -- a page the corpus cannot see is a page whose row is never
+    checked, silently. So this walks the output directory for whatever is
+    there, and the caller asserts the count is plausible.
+    """
+    return sorted((built_site / "cocktails" / "recipes").rglob("index.html"))
+
+
+def test_every_published_drink_page_offers_three_other_published_drinks(prod_site):
+    """#927. Exactly three, never itself, and every one of them a real page.
+
+    THE COUNT IS EXACTLY THREE, not "at most three". The template only emits
+    a candidate whose score is above zero, so a drink sharing no mood and no
+    ingredient generic with anything would quietly render a row of two, or a
+    heading over nothing -- and the failure mode is invisible on any page but
+    that drink's. `scripts/related_drinks.py` measured the corpus before the
+    feature was written and still does: every drink's THIRD pick shares at
+    least 3 today. This is what notices when a new drink, or a vocabulary edit
+    that moves moods, changes that -- and that script is where to look when it
+    fires, since it names which drink ran out of candidates and what it shares
+    with the ones it has.
+
+    NONE OF THEM IS THE PAGE ITSELF. The template excludes `page.url`, and a
+    self-link here would be both a dead end and evidence that the exclusion had
+    been written against the wrong field.
+    """
+    pages = _drink_pages(prod_site)
+    assert len(pages) > 20, (
+        f"only {len(pages)} drink pages in the production build, which is too "
+        "few for this collection -- the corpus walk is looking in the wrong "
+        "place, or the publish gate has held nearly everything back."
+    )
+
+    live = {"/" + str(p.relative_to(prod_site).parent).replace("\\", "/") + "/"
+            for p in pages}
+    baseurl = "/helen-triages"
+    problems = []
+
+    for page in pages:
+        url = "/" + str(page.relative_to(prod_site).parent).replace("\\", "/") + "/"
+        text = page.read_text(encoding="utf-8")
+        section = RELATED_SECTION.search(text)
+        if not section:
+            problems.append(f"{url}: no related-drinks row at all")
+            continue
+
+        hrefs = RELATED_LINK.findall(section.group(1))
+        if len(hrefs) != 3:
+            problems.append(f"{url}: {len(hrefs)} related drinks, expected 3")
+
+        for href in hrefs:
+            target = href[len(baseurl):] if href.startswith(baseurl) else href
+            if target == url:
+                problems.append(f"{url}: offers itself as a related drink")
+            if target not in live:
+                problems.append(
+                    f"{url}: offers {href}, which is not a published drink page")
+
+    assert not problems, (
+        "the related-drinks row (#927) is wrong on these pages:\n  "
+        + "\n  ".join(problems[:20])
+    )

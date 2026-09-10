@@ -60,6 +60,16 @@
   // nothing on paper.
   .universe { display: none; }
 
+  // AND SO IS "IF YOU LIKED THIS, HOW ABOUT …" (#927), for the same reason and
+  // one more. It is three links, and a link cannot be followed on paper; it is
+  // also NAVIGATION rather than a fact about this drink, and a printed page is
+  // the archive copy of one drink. Note this is the opposite direction from the
+  // block above: `make it` hides it and print does NOT put it back, because the
+  // editorial state print restores is about carrying MORE information about
+  // this drink, not more ways to leave it.
+  .cocktail-related-heading,
+  .cocktail-related { display: none; }
+
   // THE SCALER GOES TOO, AND WITH IT ITS FLOOR MESSAGE -- #545, 2026-09-04.
   // Same argument as the toggle above, plus one of its own: a PRINTED PAGE IS
   // THE RECIPE AS WRITTEN. The amounts on paper are whatever multiple happened
