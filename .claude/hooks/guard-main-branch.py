@@ -69,6 +69,26 @@ HEREDOC = re.compile(
 # A leading `cd <path>` -- the command may be operating on a nested repo.
 CD = re.compile(r"\bcd\s+([^\s;&|]+)")
 
+# `git -C <path>` -- THE OTHER WAY TO OPERATE ON A NESTED REPO, and until
+# 2026-09-10 this hook did not read it. `WRITES_HISTORY` above has always
+# MATCHED the form ("allowing for global flags like `git -C x commit`"), so a
+# `git -C _food_drafts commit` was recognised as a commit and then checked
+# against the WRONG REPOSITORY: `_repo_dir` looked only for a `cd`, found none,
+# and asked the outer worktree which branch it was on. Outer branch not `main`,
+# so allowed -- while the drafts repo sat on `main`.
+#
+# THAT IS EXACTLY THE FAILURE THIS HOOK EXISTS TO PREVENT, and it is the one
+# that happened on 2026-08-17: four commits straight onto `_cocktail_drafts`'
+# `main`. The gap was harmless for as long as `cd _food_drafts && git ...` was
+# the habit, which is what CLAUDE.md documents. It stopped being harmless the
+# moment `guard-unanalyzable-bash.py` started refusing a leading `cd` (same
+# day), because the only remaining way to reach a nested repo is `git -C`.
+#
+# A GUARD THAT PUSHES YOU TOWARDS A FORM ANOTHER GUARD CANNOT READ HAS MOVED THE
+# HOLE, NOT CLOSED IT. Worth stating because the two hooks were written months
+# apart and neither is wrong on its own.
+GIT_C = re.compile(r"\bgit\s+(?:-\S+\s+\S+\s+)*?-C\s+([^\s;&|]+)")
+
 PROTECTED = {"main", "master"}
 
 
@@ -76,18 +96,47 @@ def _strip(command: str) -> str:
     return QUOTED.sub(" ", HEREDOC.sub(" ", command))
 
 
-def _repo_dir(command: str) -> pathlib.Path:
-    """The directory git will actually run in: any `cd` target, else cwd."""
-    match = CD.search(command)
-    if not match:
-        return pathlib.Path.cwd()
+def _resolve(raw: str, base: pathlib.Path) -> pathlib.Path | None:
+    """A path argument as a real directory, resolved against `base`, or None."""
     try:
-        target = pathlib.Path(match.group(1).strip("\"'")).expanduser()
+        target = pathlib.Path(raw.strip("\"'")).expanduser()
         if not target.is_absolute():
-            target = pathlib.Path.cwd() / target
-        return target if target.is_dir() else pathlib.Path.cwd()
+            target = base / target
+        target = target.resolve()
+        return target if target.is_dir() else None
     except (OSError, ValueError):
-        return pathlib.Path.cwd()
+        return None
+
+
+def _repo_dir(command: str) -> pathlib.Path:
+    """The directory git will actually run in, modelling the shell in order.
+
+    A `cd` moves the shell; a later `-C` moves git again, RELATIVE TO WHERE THE
+    `cd` LEFT IT. So the two compose rather than compete, and reading only one
+    of them is how you end up asking the wrong repository which branch it is on.
+    `cd a && git -C b commit` runs in `a/b`, not `a` and not `b`.
+
+    Found by breaking this on purpose: the first version of the -C fix took the
+    -C path alone and resolved it against the worktree root, so exactly that
+    command resolved to a directory that does not exist, fell back to cwd, and
+    allowed a commit onto a nested `main`. One guard's fix reopening the same
+    hole one case to the left.
+    """
+    base = pathlib.Path.cwd()
+
+    cd_match = CD.search(command)
+    if cd_match:
+        moved = _resolve(cd_match.group(1), base)
+        if moved is not None:
+            base = moved
+
+    c_match = GIT_C.search(command)
+    if c_match:
+        moved = _resolve(c_match.group(1), base)
+        if moved is not None:
+            return moved
+
+    return base
 
 
 def _current_branch(directory: pathlib.Path) -> str | None:

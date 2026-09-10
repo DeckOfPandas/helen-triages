@@ -110,11 +110,35 @@ def _strip_quoted(command: str, quotes: str) -> str:
 
     So prose about substitution belongs in SINGLE quotes. Replacing with spaces
     rather than deleting keeps offsets stable.
+
+    BACKSLASH ESCAPES ARE HONOURED, and that is not a nicety -- it was a real
+    false positive on 2026-09-10, hours after this guard shipped. A perfectly
+    ordinary command was refused:
+
+        grep -n "PATTERNS\\|re.compile(r\\"\\\\bgit\\|_matched" some-file.py
+
+    The `\\"` in the middle is an ESCAPED quote, still inside the double-quoted
+    span. Without escape handling the scanner treated it as the closing quote,
+    left the rest of the pattern exposed, found a `|`, and called it a pipe. A
+    guard that refuses a legitimate command is one you learn to route around,
+    which is the failure mode this repository names in three other hooks.
+
+    Inside SINGLE quotes there is no escaping -- a backslash is a literal
+    backslash to the shell -- so escapes are honoured everywhere else and not
+    there.
     """
     out = []
     quote = None
+    escaped = False
     for ch in command:
-        if quote is None and ch in quotes:
+        if escaped:
+            # The escaped character is whatever it is, never a delimiter.
+            out.append(" " if quote is not None else ch)
+            escaped = False
+        elif ch == "\\" and quote != "'":
+            out.append(" " if quote is not None else ch)
+            escaped = True
+        elif quote is None and ch in quotes:
             quote = ch
             out.append(" ")
         elif quote is not None and ch == quote:

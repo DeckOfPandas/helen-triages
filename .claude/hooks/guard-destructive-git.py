@@ -53,7 +53,23 @@ import sys
 # `[^|;&]*?` keeps a match inside ONE command of a compound line, so
 # `git log && git checkout -- x` is caught on its second clause and
 # `echo "git reset --hard"` is not caught at all.
-_GIT = r"\bgit\s+(?:-\S+\s+)*"
+#
+# THE FLAG-WITH-A-VALUE CASE, FIXED 2026-09-10 AND IT WAS A REAL HOLE. This read
+# `(?:-\S+\s+)*`, which allows a flag but NOT the value after it -- so in
+# `git -C _food_drafts reset --hard` the `-C ` matched, `_food_drafts` did not,
+# and the pattern failed. **Every destructive command aimed at a nested repo by
+# `git -C` walked straight past this hook**, unrecognised: not judged and
+# allowed, but never looked at.
+#
+# It went unnoticed because CLAUDE.md documents `cd _food_drafts && git ...` as
+# the way those repos are edited, and that form matched fine. It became urgent
+# the same day, when guard-unanalyzable-bash.py started refusing a leading `cd`
+# and left `git -C` as the only way in.
+#
+# Spelled out rather than loosened to `\S+\s*\S*\s*`: `-C <path>` and
+# `-c <key=value>` take a value, `--flag` and `-flag` do not, and a pattern that
+# lets any token follow any flag can swallow the subcommand it is looking for.
+_GIT = r"\bgit\s+(?:-[cC]\s+\S+\s+|--\S+\s+|-\S+\s+)*"
 
 PATTERNS: list[tuple[re.Pattern[str], str]] = [
     # git checkout -- <paths>   and   git checkout <ref> -- <paths>
@@ -193,12 +209,65 @@ def _matched(command: str) -> str | None:
     return None
 
 
-def _dirty() -> list[str]:
-    """Lines of `git status --porcelain`, or [] if this is not a repo."""
+# WHICH REPOSITORY THE COMMAND IS AIMED AT, added 2026-09-10 -- until then this
+# hook always asked the process's own working directory, whatever the command
+# said. `git -C _food_drafts reset --hard` was therefore judged by whether the
+# OUTER worktree was dirty: outer tree clean, so allowed, and uncommitted work in
+# the nested drafts repo destroyed. That is the exact loss this hook exists to
+# prevent, arriving through the door it was not watching.
+#
+# DUPLICATED FROM guard-main-branch.py RATHER THAN SHARED, deliberately and in
+# keeping with this file's existing QUOTED/HEREDOC duplication: each hook is a
+# single file with no import path of its own, and a shared module would make both
+# depend on how they happen to be invoked. If one of these is ever fixed, fix the
+# other -- they are the same twenty lines and they have now been wrong together
+# once.
+CD_TARGET = re.compile(r"\bcd\s+([^\s;&|]+)")
+GIT_C_TARGET = re.compile(r"\bgit\s+(?:-\S+\s+\S+\s+)*?-C\s+([^\s;&|]+)")
+
+
+def _resolve(raw: str, base: pathlib.Path) -> pathlib.Path | None:
+    """A path argument as a real directory, resolved against `base`, or None."""
+    try:
+        target = pathlib.Path(raw.strip("\"'")).expanduser()
+        if not target.is_absolute():
+            target = base / target
+        target = target.resolve()
+        return target if target.is_dir() else None
+    except (OSError, ValueError):
+        return None
+
+
+def _repo_dir(command: str) -> pathlib.Path:
+    """The directory git will actually run in, modelling the shell in order.
+
+    A `cd` moves the shell; a later `-C` moves git again, RELATIVE TO WHERE THE
+    `cd` LEFT IT, so the two compose rather than compete: `cd a && git -C b`
+    runs in `a/b`.
+    """
+    base = pathlib.Path.cwd()
+
+    cd_match = CD_TARGET.search(command)
+    if cd_match:
+        moved = _resolve(cd_match.group(1), base)
+        if moved is not None:
+            base = moved
+
+    c_match = GIT_C_TARGET.search(command)
+    if c_match:
+        moved = _resolve(c_match.group(1), base)
+        if moved is not None:
+            return moved
+
+    return base
+
+
+def _dirty(directory: pathlib.Path) -> list[str]:
+    """Lines of `git status --porcelain` in `directory`, or [] if not a repo."""
     try:
         result = subprocess.run(
             ["git", "status", "--porcelain"],
-            capture_output=True, text=True, timeout=15,
+            cwd=directory, capture_output=True, text=True, timeout=15,
         )
     except (OSError, subprocess.SubprocessError):
         return []
@@ -249,7 +318,8 @@ def main() -> int:
     if not label:
         return 0
 
-    dirty = _dirty()
+    target = _repo_dir(command)
+    dirty = _dirty(target)
     if not dirty:
         return 0            # nothing to lose, so nothing to stop
 
@@ -258,7 +328,8 @@ def main() -> int:
         shown += f"\n  ... and {len(dirty) - 20} more"
 
     reason = (
-        f"BLOCKED: {label} with {len(dirty)} uncommitted change(s) in the tree.\n\n"
+        f"BLOCKED: {label} with {len(dirty)} uncommitted change(s) in "
+        f"{target}.\n\n"
         f"  {shown}\n\n"
         "This discards uncommitted work with no undo and no reflog entry to "
         "recover it from, and it does not distinguish your edits from Helen's -- "
