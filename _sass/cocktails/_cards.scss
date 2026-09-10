@@ -1278,7 +1278,16 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   :root { --card-glass-scale: 6.4rem; }
 
   .drink-card {
-    height: 15.4rem;
+    // THE SAME BUDGET AS THE WIDE CARD, PLUS THE BAND -- 2026-09-10, Helen's
+    // phone: "the chips are written over the ingredients". The wide card gives
+    // its name, ingredient line and foot 12.9rem less two paddings; this one
+    // said a flat 15.4rem, which after the 6.6rem band left the same three
+    // stacks 3.1rem LESS than they have at any other width, so a two-line
+    // ingredient line and two rows of chips met in the middle (measured at
+    // 390px: ingredients to 194px, foot from 189px). The line budget (#776,
+    // below) was solved for the wide card's room; the only honest height here
+    // is that room plus the band, derived so the two cannot drift again.
+    height: calc(#{$card-height} + 6.6rem - #{$card-pad-y});
     // Top padding clears the band. The glass is absolutely positioned and so
     // takes no space of its own; this is what stops the title starting
     // underneath it — the mistake the `title` variant made and Helen caught in

@@ -213,6 +213,17 @@
       margin-right: 0;
     }
   }
+
+  // MORE AIR AROUND THE SEARCH ROWS ON A PHONE -- Helen, 2026-09-10: "especially
+  // between the search input fields and the heading below." A text box ends in
+  // a hairline where a button row ends in its own padding, so the same gap
+  // reads tighter under an input. The stacked pair and the name search after
+  // it get a step more than the section gap; the margin collapses with the
+  // next section's own. Cocktails' `.drink-searches` does the same.
+  .search-pair {
+    gap: $space-xl;
+    margin-bottom: $space-xl;
+  }
 }
 
 
