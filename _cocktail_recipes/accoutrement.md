@@ -1,6 +1,6 @@
 ---
 title: "Accoutrement"
-tagline: "The correct accessory for all seasons."
+tagline: "So that Coco Chanel thing, right — but how about looking in the mirror and adding three things?"
 glass:
   - "coupe"
 garnish:
