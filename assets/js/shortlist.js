@@ -67,9 +67,20 @@
 
   /* Every count on the page, from one place. The index's own "shortlisted"
      filter shows how many there are to see; nothing else does today, and a
-     second reader costs this function nothing. */
+     second reader costs this function nothing.
+
+     HOW MANY THERE ARE TO SEE, NOT HOW MANY THE STORE HOLDS -- #847. The store
+     keeps whatever was ever marked, and a key can outlive its page: a recipe
+     renamed, a draft promoted to a new URL, a drink whose slug changed. Such a
+     key is still in the list, so `count()` said "(1)" on an index where nothing
+     was marked and the filter showed an empty list. The filter can only ever
+     show the controls on THIS page, so this counts those -- the same set
+     `controls()` paints -- and the store is left alone, because the key may be
+     right on some other page and forgetting it here would be a guess. */
   function paintCounts() {
-    var n = HTF.shortlist.count();
+    var n = controls().filter(function (btn) {
+      return HTF.shortlist.has(btn.dataset.shortlistKey);
+    }).length;
     Array.prototype.slice.call(document.querySelectorAll('[data-shortlist-count]'))
       .forEach(function (el) { el.textContent = String(n); });
   }

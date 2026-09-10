@@ -240,100 +240,22 @@
   margin-top: $spacing-section-gap;
 }
 
-.ct-results {
-  display: grid;
-  // Wider than the old 17rem: the name and the time now share the card's top
-  // line, and at 17rem a long method name wrapped under its own time and undid
-  // the point of putting them on one line.
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-  gap: $spacing-block-gap;
-  margin-bottom: $spacing-section-gap;
-}
-
-.ct-card {
-  padding: $space-xl;
-  // The violet wash, spelled out rather than borrowed. $color-box-tint and
-  // $box-tint-opacity live in food/_recipe-header.scss, which this standalone
-  // stylesheet deliberately does not import -- pulling that partial in to reach
-  // two variables would emit the whole recipe page's CSS alongside a demo. The
-  // values are the same 3% violet the note boxes and metadata grid use.
-  background-color: rgba($color-blinging-blackberry, 0.03);
-  border-radius: $radius-sm;
-  // The violet edge is the same "this is structural" signal the charts' bars
-  // carry; a declined card drops it to grey, below, so refusal is visible
-  // before you read a word.
-  border-left: 3px solid rgba($color-blinging-blackberry, 0.55);
-
-  &--declined {
-    border-left-color: $color-border;
-    background: none;
-  }
-}
-
-// THE CARD'S TOP LINE: the method and its time, at the same weight, with the
-// time pushed to the right edge so a column of cards can be read down either
-// side. They answer one question between them and used to be three elements
-// apart, with a large number arriving before the thing it described.
-.ct-card-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: $space-md;
-  margin: 0 0 $space-xs 0;
-}
-
-// SPLIT FROM ONE SHARED RULE, 2026-09-02. Both sat at the same size and weight
-// by design -- Helen: "the cooking method name should be as bold as the
-// time" -- but they are not the same KIND of type any more: .ct-card-name is
-// a name, .ct-total is the figure it answers, and food/_palette.scss's
-// $font-label rule ("is it a number you act on?") now says one of the two
-// gets Plex Mono and the other does not. Size, weight, line-height and colour
-// stay matched by hand across the two rules below so the visual pairing
-// Helen asked for survives the split -- if one changes, check the other.
-.ct-card-name {
-  font-family: $font-headings;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: $color-text;
-  margin: 0;
-  letter-spacing: 0.02em;
-  // Heading tier, 2026-09-02: this sits at exactly 1rem, the tier table's own
-  // threshold (font-size: 1rem, two rules up), so it lands on the >= 1rem
-  // side and gets the fuller stroke+shadow treatment rather than the
-  // stroke-only label one. It reads more like a card's own name than a field
-  // label, so the boundary call agrees with what the element actually is, not
-  // only with the number. See LETTERING.md.
-  @include lettering(heading);
-}
-
-// PLEX MONO, 2026-09-02: this is the card's own headline figure -- "1 hr 20
-// mins" -- the number the whole card answers "how long?" with. Weight 600
-// rather than the 700 the shared rule used to carry: 700 isn't loaded for
-// this face (shared/_fonts.scss), and matching the name's 700 by letting the
-// browser synthesise a fake bold is exactly the artefact that file's own
-// comment warns against.
-.ct-total {
-  font-family: $font-label;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.25;
-  color: $color-text;
-  margin: 0;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
+// THE METHOD CARDS ARE GONE -- #873, Helen, 2026-09-09: "they're not adding
+// information beyond the table, and remain a little hard to read." `.ct-results`,
+// `.ct-card`, `.ct-card-head`, `.ct-card-name`, `.ct-total`, `.ct-settings`,
+// `.ct-declined`, `.ct-stages`, `.ct-aside` and `.ct-notes` were the rules; the
+// table above the cards was already the answer, and cook-timer.js stopped
+// rendering them the same day. What survives below is the by-doneness block,
+// which the TABLE's time cell still emits.
 
 // A method whose rate depends on doneness shows every level rather than one --
 // GitHub issue #246, beef's standard roast and venison's haunch, the only two
 // of 73 that have the shape. Stacked, because the two times are the same kind
 // of fact and a reader compares them vertically; the label is quiet because
 // the FIGURE is what the eye is here for, and "rare"/"medium" only has to say
-// which is which.
-//
-// `.ct-total` above is `white-space: nowrap` and stays that way: each figure
-// still must not break mid-span ("1 hr 40" split across two lines reads as two
-// numbers). The stacking here is between levels, not inside one.
+// which is which. Each figure must not break mid-span ("1 hr 40" split across
+// two lines reads as two numbers). The stacking here is between levels, not
+// inside one.
 .ct-doneness {
   display: inline-flex;
   flex-direction: column;
@@ -346,11 +268,11 @@
 }
 
 .ct-doneness-label {
-  // NAMED EXPLICITLY, 2026-09-02. This sits inside .ct-total (the card) or the
-  // table's own time cell (below), both of which are Plex Mono now -- and
-  // without its own font-family this word ("rare", "medium") would silently
-  // inherit that, which is exactly backwards: "rare" is not a number you act
-  // on, the figure beside it is. See food/_palette.scss's $font-label rule.
+  // NAMED EXPLICITLY, 2026-09-02. This sits inside the table's time cell
+  // (below), which is Plex Mono -- and without its own font-family this word
+  // ("rare", "medium") would silently inherit that, which is exactly
+  // backwards: "rare" is not a number you act on, the figure beside it is.
+  // See food/_palette.scss's $font-label rule.
   font-family: $font-headings;
   font-weight: 400;
   color: $color-clear-text;
@@ -368,80 +290,4 @@
   align-items: flex-start;
 }
 
-// The two things you actually set: oven and covering, on one line, directly
-// under the head. `.ct-outcome` used to sit between them and is gone -- the
-// decision table three paragraphs up already says it, and repeating it opened
-// every card with two near-identical sentences.
-.ct-settings {
-  font-family: $font-headings;
-  font-size: 0.76rem;
-  color: $color-clear-text;
-  margin: 0 0 $space-md 0;
-  line-height: 1.4;
-}
-
-.ct-declined {
-  font-family: $font-headings;
-  font-size: 0.86rem;
-  color: $color-clear-text;
-  margin: 0 0 $space-sm 0;
-}
-
-// Was `.ct-stages, .ct-schedule`. .ct-schedule was the in-at / out-at /
-// rest-until list, which no card emits any more (#244), and a rule for a class
-// nothing writes is drift -- test_every_class_we_emit_has_a_rule_in_the_
-// stylesheet only checks the other direction, so this end is by hand. The `em`
-// inside the list went with it: it styled "(or 15:20 if it runs to the quicker
-// end)", and a stage row has no em.
-.ct-stages {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 $space-md 0;
-  font-size: 0.88rem;
-
-  li {
-    display: flex;
-    justify-content: space-between;
-    gap: $space-md;
-    padding: $space-xxs 0;
-    border-bottom: 1px dotted $color-border;
-
-    &:last-child { border-bottom: 0; }
-
-    span:first-child {
-      font-family: $font-headings;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: $letter-spacing-label;
-      color: $color-clear-text;
-      flex-shrink: 0;
-    }
-  }
-}
-
-.ct-aside {
-  font-size: 0.8rem;
-  font-style: italic;
-  color: $color-clear-text;
-  margin: 0 0 $space-sm 0;
-}
-
-// .ct-meta was here: a label/value line on the card that no version of
-// cook-timer.js in this repo emits -- it predates the card's current head, and
-// went unnoticed because nothing checks the stylesheet for rules with no
-// markup. Removed 2026-08-16 while auditing this file for the same thing after
-// #244.
-
-// Caveats and notes, as ONE closing block rather than two paragraphs at full
-// spacing -- which gave a footnote the same presence as the answer above it.
-// Set apart by a rule instead of by a gap, so the card ends deliberately rather
-// than just running out.
-.ct-notes {
-  font-size: 0.82rem;
-  color: $color-clear-text;
-  margin: $space-md 0 0 0;
-  padding-top: $space-md;
-  border-top: 1px solid rgba($color-blinging-blackberry, 0.15);
-  line-height: 1.5;
-}
 

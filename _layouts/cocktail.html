@@ -204,60 +204,15 @@ layout: default
           </span>
         </div>
 
-        {% comment %} THE READ-IT / MAKE-IT TOGGLE REPLACES A SINGLE BUTTON,
-           2026-09-02 -- Helen's brief: "remake this button as a binary
-           slider/toggle... with 'read it' or 'make it' active." It sits on the
-           title's line at the column's right edge, exactly where the old
-           `.btn-make` sat and for the same reason (Helen, 2026-08-26): the two
-           sites' recipe pages should open the same way, and food puts its own
-           toggle here.
-
-           THREE ELEMENTS, ONE GROUP: a "read it" label, a track with a knob, a
-           "make it" label. Both labels are always visible and the active one is
-           the SAME colour the old button's `.is-on` state used
-           ($color-electric-absinthe-deep) plus bold weight — so which mode the
-           page is in is legible from the words themselves, not only from a
-           knob's position. See assets/js/cocktail-make.js for why this is not
-           the ambiguous-label trap #494 fixed by holding one constant label:
-           two labels that are both always on screen cannot be misread as
-           "the state" versus "the action", because they are never the only
-           word present. {% endcomment %}
-        <div class="cocktail-toggle" role="group" aria-label="read it or make it">
-          <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
-          <button type="button" class="cocktail-toggle-track" id="cocktail-make" aria-label="switch reading or making">
-            <span class="cocktail-toggle-knob"></span>
-          </button>
-          <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
-        </div>
-      </div>
-
-      {% comment %} THE SHORTLIST BUTTON, DIRECTLY UNDER `read it` / `make it` —
-         Helen, 2026-09-05: "move the shortlist button up to below make it /
-         read it." It was at the right-hand end of the meta row, which is where
-         she put it on 2026-09-04 ("the top right of the metadata panel...
-         maybe horizontally aligned with read it / make it"); it is now under
-         the thing it was only aligned with.
-
-         A SIBLING OF THE TITLE ROW RATHER THAN A SECOND ITEM INSIDE IT. Both
-         are children of `.cocktail-head-words` and both push their right-hand
-         content to the same edge, so the button lands under the toggle by
-         construction with no number to keep in step. Putting it INSIDE the
-         title row would have meant stacking it with the toggle in a wrapper,
-         and that row is `align-items: last baseline` — a two-item column's last
-         baseline is its BOTTOM item's, so the toggle would have been dragged
-         off the title's line to put the button on it.
-
-         `page.url`, NOT `relative_url` -- the same key this drink's own index
-         card emits, which is what makes the card and this page agree about
-         whether it is shortlisted. See HTF.shortlist in assets/js/assets.js.
-         `hidden` until shortlist.js reveals it, the rule every JS-dependent
-         control on both sites follows. {% endcomment %}
-      <div class="cocktail-head-shortlist">
-        <button type="button"
-                class="btn-shortlist"
-                data-shortlist-key="{{ page.url }}"
-                aria-pressed="false"
-                hidden>shortlist</button>
+        {% comment %} THE READ-IT / MAKE-IT TOGGLE AND THE SHORTLIST BUTTON
+           LEFT THIS ROW ON 2026-09-10 (#897). They sat here on the title's
+           line from 2026-09-02 (the toggle) and under it from 2026-09-05 (the
+           button); Helen: "move read it / make it toggle to the top right of
+           the page main content, just under the section divider that sits
+           between the metadata section and ingredients." Both are in
+           `.cocktail-controls` below the title block now. The row keeps its
+           flex shape for the name alone; nothing else lives in it.
+        {% endcomment %}
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
@@ -415,6 +370,43 @@ layout: default
         </div>
       {% endif %}
     </div>
+  </div>
+
+  {% comment %} THE CONTROLS ROW: read it / make it, then shortlist, at the
+     column's right edge, just under the title block's rule -- #897, Helen,
+     2026-09-10: "move read it / make it toggle to the top right of the page
+     main content, just under the section divider that sits between the
+     metadata section and ingredients." The shortlist button travels with it,
+     because her 2026-09-05 placement for the button was "below make it /
+     read it" -- relative to the toggle, wherever the toggle is.
+
+     THE TOGGLE: three elements, one group -- a "read it" label, a track with a
+     knob, a "make it" label (Helen's 2026-09-02 brief: "remake this button as
+     a binary slider/toggle... with 'read it' or 'make it' active"). Both
+     labels are always visible and the active one is bold in
+     $color-electric-absinthe-deep, so which mode the page is in is legible
+     from the words, not only from the knob. See assets/js/cocktail-make.js
+     for why two always-visible labels are not the ambiguous-label trap #494
+     fixed by holding one constant label.
+
+     THE SHORTLIST BUTTON: `page.url`, NOT `relative_url` -- the same key this
+     drink's own index card emits, which is what makes the card and this page
+     agree about whether it is shortlisted. See HTF.shortlist in
+     assets/js/assets.js. `hidden` until shortlist.js reveals it, the rule
+     every JS-dependent control on both sites follows. {% endcomment %}
+  <div class="cocktail-controls">
+    <div class="cocktail-toggle" role="group" aria-label="read it or make it">
+      <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
+      <button type="button" class="cocktail-toggle-track" id="cocktail-make" aria-label="switch reading or making">
+        <span class="cocktail-toggle-knob"></span>
+      </button>
+      <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
+    </div>
+    <button type="button"
+            class="btn-shortlist"
+            data-shortlist-key="{{ page.url }}"
+            aria-pressed="false"
+            hidden>shortlist</button>
   </div>
 
   {% comment %} The ingredient list is FULL, not triaged the way food's
