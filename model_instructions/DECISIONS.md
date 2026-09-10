@@ -3309,3 +3309,15 @@ verification. Dates are when the correction landed.
   it. A production build with only the first is a footer link to a 404, so
   `test_site_nav_links_resolve_to_real_pages` INVERTS for a local-only link
   rather than exempting it. Deleting both lines is the whole of shipping.
+- **2026-09-10, #784** — **Most of the copy came off, and the reasons are not
+  the reader's.** The page had rendered `retired_rum_styles`' reasons in full
+  on the understanding Helen would copyedit them in place. She ruled the other
+  way: *"my main wish is to get rid of most of the copy, to be honest! I just
+  need to write a line or two under each rum label we aren't using."* So the
+  reasons stay in `ingredients.yml` for the ingest and stop rendering; the
+  page's lines live in `_data/cocktails/rum_page.yml`, one empty key per
+  retired word, and an empty key prints nothing (§13.12: a placeholder, never
+  agent prose). #888–#891 went in the same pass: "examples" for "what I'd
+  reach for", the arrack note and both subtitles deleted. **Nice-to-have, not
+  shipping**: *"no more until design isn't noticeably odd"*, her words, so the
+  page stays unpublished. #813 (agricole rows by country) waits on #591.
