@@ -53,26 +53,9 @@
   cursor: pointer;
 }
 
-// THE JUMP LINK, beside the `shortlisted (n)` button above the list -- #849's
-// second placement, Helen 2026-09-09: "I'd find the JSON feature more easily
-// were it right under the shortlist, and also next to the shortlist button
-// above the list -- just export list as JSON and a rightwards arrow."
-//
-// QUIETER THAN THE BUTTON IT SITS BESIDE, deliberately. `shortlisted (n)` is a
-// filter and changes what the page shows; this only takes you somewhere, so it
-// is set as a link rather than given the button's box. The arrow is in the
-// markup rather than a `::after` so it is part of the link's text for a screen
-// reader, which is what it means.
-.shortlist-export-jump {
-  margin-left: $space-md;
-  font-family: $font-label;
-  font-size: 0.85rem;
-  color: $color-clear-text;
-  text-decoration: none;
-
-  &:hover,
-  &:focus-visible { color: $color-text; text-decoration: underline; }
-}
+// `.shortlist-export-jump` -- the "export list as JSON →" link beside the
+// `shortlisted (n)` button -- lived here from 2026-09-09 to 2026-09-10 and is
+// gone with the link; cocktails/index.html has the note.
 
 .shortlist-export-hint,
 .shortlist-export-empty {
@@ -126,9 +109,18 @@
 // script did not run never shows a copy button that does nothing. Same rule as
 // `.btn-print` and `.btn-shortlist`. The restore button (#850) is the same
 // control in every respect but its word, so it is the same rule.
+// The clear button (2026-09-10) is the same control again, one more word; its
+// ARMED state -- the first click has been made and the second would empty the
+// list -- takes the text colour and the accent border so the question reads as
+// a different state of the same button, not a new one.
 .btn-shortlist-copy,
 .btn-shortlist-restore {
   margin-top: $space-sm;
+}
+
+.btn-shortlist-copy,
+.btn-shortlist-restore,
+.btn-shortlist-clear {
   font-family: $font-label;
   font-size: 0.85rem;
   color: $color-clear-text;
@@ -139,4 +131,16 @@
 
   &:hover,
   &:focus-visible { color: $color-text; }
+}
+
+// Its own line, a step below the restore pair: it undoes what the two above
+// preserve, and sitting beside `restore` it would read as the next step.
+.btn-shortlist-clear {
+  display: block;
+  margin-top: $space-lg;
+
+  &.is-armed {
+    color: $color-text;
+    border-color: $color-accent;
+  }
 }

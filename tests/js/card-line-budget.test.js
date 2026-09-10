@@ -140,3 +140,93 @@ test('it hangs itself off HTF so the index can re-run it', () => {
   const sandbox = run([card(LH, LH, true)]);
   assert.strictEqual(typeof sandbox.HTF.cardLineBudget, 'function');
 });
+
+// -----------------------------------------------------------------------------
+// THE SHIP AND THE LAST CHIP ROW, 2026-09-10. #760 took the verdict out of flow
+// and masked it over the chips; Helen saw "sugar crav" and "strong brown drin"
+// on the live index the same evening. The pass now measures whether a chip on
+// the ship's row reaches past the ship's left edge, and only then marks the
+// card so the stylesheet can pad that card's chips clear.
+// -----------------------------------------------------------------------------
+
+/**
+ * A card with a ship at `ship` and chips at `chips` (each {top, bottom, left,
+ * right}); the ingredient line is one line so the other rule stays quiet.
+ */
+function cardWithShip(ship, chips) {
+  const c = card(LH, LH, true);
+  const props = {};
+  c.style = {
+    setProperty: (k, v) => { props[k] = v; },
+    removeProperty: (k) => { delete props[k]; }
+  };
+  c._props = props;
+  const moods = {
+    querySelectorAll: () => chips.map((r) => ({ getBoundingClientRect: () => r }))
+  };
+  const shipEl = ship ? { getBoundingClientRect: () => ship } : null;
+  const base = c.querySelector;
+  c.querySelector = (sel) => {
+    if (sel === '.drink-card-ship') return shipEl;
+    if (sel === '.drink-card-moods') return moods;
+    return base(sel);
+  };
+  c.cleared = () => c.classList.contains('drink-card--chips-clear-ship');
+  return c;
+}
+
+const SHIP = { top: 40, bottom: 56, left: 240, right: 300, width: 60 };
+
+test('a chip on the ship\'s row that reaches the ship marks the card', () => {
+  const c = cardWithShip(SHIP, [
+    { top: 20, bottom: 36, left: 0, right: 290 },   // row above: not in the way
+    { top: 40, bottom: 56, left: 0, right: 250 }    // last row, crosses 240
+  ]);
+  run([c]);
+  assert.strictEqual(c.cleared(), true);
+  assert.strictEqual(c._props['--ship-w'], '60px',
+    'the stylesheet pads by the ship\'s own measured width');
+});
+
+test('a chip that stops short of the ship leaves the card alone', () => {
+  const c = cardWithShip(SHIP, [
+    { top: 40, bottom: 56, left: 0, right: 200 }
+  ]);
+  run([c]);
+  assert.strictEqual(c.cleared(), false);
+});
+
+test('a wide chip on a row ABOVE the ship is not a collision', () => {
+  // The ship sits on the last row only; a full-width first row is fine.
+  const c = cardWithShip(SHIP, [
+    { top: 20, bottom: 36, left: 0, right: 300 },
+    { top: 40, bottom: 56, left: 0, right: 120 }
+  ]);
+  run([c]);
+  assert.strictEqual(c.cleared(), false);
+});
+
+test('the mark comes off again when a re-run no longer earns it', () => {
+  const rows = [{ top: 40, bottom: 56, left: 0, right: 250 }];
+  const c = cardWithShip(SHIP, rows);
+  run([c]);
+  assert.strictEqual(c.cleared(), true);
+  rows[0].right = 200;
+  run([c]);
+  assert.strictEqual(c.cleared(), false, 'a state, not a ratchet');
+  assert.strictEqual(c._props['--ship-w'], undefined);
+});
+
+test('a hidden card, whose ship measures zero, is skipped', () => {
+  const c = cardWithShip({ top: 0, bottom: 0, left: 0, right: 0, width: 0 }, [
+    { top: 0, bottom: 0, left: 0, right: 0 }
+  ]);
+  run([c]);
+  assert.strictEqual(c.cleared(), false);
+});
+
+test('a card with no ship is left alone', () => {
+  const c = cardWithShip(null, [{ top: 40, bottom: 56, left: 0, right: 250 }]);
+  run([c]);
+  assert.strictEqual(c.cleared(), false);
+});

@@ -60,6 +60,18 @@
 
   var THREE_LINES = 'drink-card--ingredients-3';
 
+  // THE SHIP AND THE LAST CHIP ROW -- 2026-09-10. #760 took the ship out of
+  // flow so no chip row would pay for it, and masked it over the chips so a
+  // chip reaching it reads as cut off rather than overprinted. Helen, seeing
+  // it live: cut off mid-word is wrong ("sugar crav", "no juici"). CSS cannot
+  // pad only the row that collides, and padding every row is the cost #760
+  // refused, so this measures: if any chip on the ship's row reaches past the
+  // ship's left edge, the card gets this class and `--ship-w`, and the
+  // stylesheet pads the chips clear of the ship ON THAT CARD ONLY. A chip that
+  // then falls to a fourth row is hidden whole by the row cap, which is the
+  // lesser thing to lose.
+  var CLEAR_SHIP = 'drink-card--chips-clear-ship';
+
   function lineCount(el) {
     var style = window.getComputedStyle(el);
     var lh = parseFloat(style.lineHeight);
@@ -77,6 +89,32 @@
     // the bug card-name-fit.js's step 1 exists to prevent.
     card.classList.remove(THREE_LINES);
     if (lineCount(line) >= 3) card.classList.add(THREE_LINES);
+    clearShip(card);
+  }
+
+  /* Measured with the class OFF, so a re-run at a new width can take it away
+     again -- the same reset-then-measure order the ingredient pass keeps. The
+     ship's left edge is the line; a chip whose box crosses it AND sits on the
+     ship's row (vertical overlap) is the collision. Chips on rows above the
+     ship are not in the way and are not counted. */
+  function clearShip(card) {
+    var ship = card.querySelector('.drink-card-ship');
+    var moods = card.querySelector('.drink-card-moods');
+    card.classList.remove(CLEAR_SHIP);
+    if (card.style) card.style.removeProperty('--ship-w');
+    if (!ship || !moods) return;
+    var s = ship.getBoundingClientRect();
+    if (!s.width) return;   // hidden card, or no verdict drawn
+    var chips = moods.querySelectorAll('.drink-card-mood');
+    for (var i = 0; i < chips.length; i++) {
+      var c = chips[i].getBoundingClientRect();
+      var sameRow = c.bottom > s.top && c.top < s.bottom;
+      if (sameRow && c.right > s.left) {
+        if (card.style) card.style.setProperty('--ship-w', s.width + 'px');
+        card.classList.add(CLEAR_SHIP);
+        return;
+      }
+    }
   }
 
   function run() {
@@ -93,4 +131,15 @@
     run();
   }
   window.addEventListener('resize', run);
+
+  // AND AGAIN ONCE THE REAL FACE ARRIVES -- 2026-09-10, found by the ship
+  // pass. At DOMContentLoaded the chips are set in the fallback Courier, which
+  // is narrower than Courier Prime; the rows measured clean, then the web font
+  // landed, the last row grew into the ship and nothing re-measured. Seven of
+  // twenty cards on the first deal. card-name-fit.js re-runs on
+  // `document.fonts.ready` for the same reason; this pass now does too, and
+  // stays after it in the chain.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(run);
+  }
 })();

@@ -417,23 +417,13 @@ permalink: /cocktails/
             id="shortlist-only"
             aria-pressed="false"
             hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
-    {% comment %} #849, SECOND PLACEMENT, Helen 2026-09-09: "I'd find the JSON
-       feature more easily were it right under the shortlist, and also next to
-       the shortlist button above the list -- just export list as JSON and a
-       rightwards arrow would do it I think."
-
-       A JUMP LINK, NOT A SECOND PANEL. One textarea, named once, reachable
-       from both ends of the page -- two boxes holding the same JSON would be
-       two things to keep in step and a second answer to "where is my list".
-       The arrow is the affordance: it says this goes somewhere rather than
-       does something.
-
-       IT SHIPS `hidden` LIKE EVERY OTHER SHORTLIST CONTROL, and
-       shortlist-export.js reveals it -- a link pointing at a panel that a
-       browser without JavaScript never reveals would be a dead end.
+    {% comment %} THE JUMP LINK TO THE JSON PANEL WAS HERE from 2026-09-09
+       (#849's second placement, Helen: "just export list as JSON and a
+       rightwards arrow") until 2026-09-10, when she agreed it read as
+       developer furniture to anyone else looking at the page: "the
+       engineering is showing." The panel at the foot of the page is the one
+       way in now, and its summary line says what it does in plain words.
        {% endcomment %}
-    <a class="shortlist-export-jump" href="#shortlist-export"
-       data-shortlist-export-jump hidden>export list as JSON →</a>
     <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
   </p>
 
@@ -878,7 +868,9 @@ permalink: /cocktails/
      that accepts edits and discards them is worse than either. {% endcomment %}
   <details class="shortlist-export" id="shortlist-export"
            data-shortlist-export-panel hidden>
-    <summary>Export shortlist as JSON</summary>
+    {% comment %} PLACEHOLDER COPY. Plain words since 2026-09-10 -- it was
+       "Export shortlist as JSON", and the panel does three things now. {% endcomment %}
+    <summary>Save, restore or clear the shortlist</summary>
     <p class="shortlist-export-hint">
       Copy this and keep it, or paste it somewhere else. It holds what is
       shortlisted and how many of each.
@@ -920,6 +912,19 @@ permalink: /cocktails/
     </button>
     <p class="shortlist-import-result" data-shortlist-import-result
        aria-live="polite" hidden></p>
+
+    {% comment %} CLEAR, WITH A SECOND CLICK -- Helen, 2026-09-10: "we also need
+       a 'clear shortlist' button somewhere." An iPad passed round twelve
+       people is exactly where one tap should not empty the list, so the first
+       click only changes the word to a question and the second, within a few
+       seconds, does it; shortlist-export.js holds the arming. It ships
+       `hidden` like every other control here. The store already had `clear()`
+       (HTF.shortlist in assets.js); nothing on either page called it until
+       now. PLACEHOLDER COPY on both words. {% endcomment %}
+    <button type="button" class="btn-shortlist-clear" data-shortlist-clear
+            data-armed-text="really clear it? click again" hidden>
+      clear the shortlist
+    </button>
   </details>
 
   {% comment %} A `?panel=` SWITCH STOOD HERE for one round, offering four glass
