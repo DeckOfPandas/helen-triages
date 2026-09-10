@@ -90,8 +90,8 @@ docker run -it --rm \
   -v "$BUNDLE_VOLUME:/home/helen/.bundle-cache" \
   "${DOTFILE_MOUNTS[@]}" \
   -e AGENT_GH_TOKEN \
-  -p 4999:4001 \
-  -p 5000:4002 \
+  -p 5999:4001 \
+  -p 6000:4002 \
   -w /workspace \
   helen-triages-devcontainer \
   bash
