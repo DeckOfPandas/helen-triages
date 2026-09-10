@@ -72,6 +72,50 @@ $ref-col-card:    minmax(6rem, 9rem);
   margin: 0 0 $space-md;
 }
 
+// A PROSE LINK LOOKED EXACTLY LIKE BODY TEXT, which is what Helen hit on
+// 2026-09-10: "please format the links as links". The base rule in
+// shared/_base.scss is `color: $color-text; text-decoration: none`, so the two
+// Cocktail Wonk citations were unmarked until you happened to hover one. That
+// rule is right for the nav and the footer, where position says "link"; it is
+// wrong for a citation inside a sentence, which is the first inline prose link
+// either site has had.
+//
+// ABSINTHE AT REST, WOOWOO ON HOVER, and both halves are existing signals rather
+// than new decisions -- which is what Helen's "or something from the cocktail
+// palette that requests interaction" was asking for.
+//
+//   * ABSINTHE is already what a link BECOMES: `$color-mood-root` is
+//     `$color-electric-absinthe-deep` and it is the base `a:hover` colour for
+//     the whole site. Making it the resting state of a prose link promotes an
+//     existing signal rather than inventing one.
+//   * WOOWOO IS THE SITE'S "you are touching it" COLOUR -- every
+//     `:focus-visible` in _filters.scss, _shortlist.scss and _cards.scss lands
+//     on it, and _shortlist.scss says why in as many words: "wicked-woowoo on
+//     cocktails because it's a thing the user is choosing".
+//
+// SO WHY NOT WOOWOO AT REST, which Helen offered ("either as wicked woowoo and
+// we call that a site decision")? Because on THIS page woowoo already means one
+// specific thing -- it is every bottle name in the third column and nothing
+// else, which the file header calls "one hue, deliberately". A citation in the
+// same pink would read as a bottle. Absinthe is used here only for RULES, never
+// for a string of text, so it collides with nothing.
+//
+// THE UNDERLINE IS WHAT MAKES IT A LINK AT REST rather than a coloured word;
+// colour alone fails anyone who cannot separate absinthe from ink, which is the
+// exact failure #636 is open about for this palette.
+.ref-prose a {
+  color: $color-electric-absinthe-deep;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+
+  &:hover,
+  &:focus-visible {
+    color: $color-wicked-woowoo-deep;
+    text-decoration-color: currentColor;
+  }
+}
+
 // HER TWO `<hr>`s, 2026-09-10. She put them before the two biggest headings, so
 // they are doing the same job as `.ref-title-block`'s rule and take the same
 // treatment — 2px of absinthe — rather than a browser default bevel. No
@@ -282,6 +326,54 @@ $ref-list-gutter: 1.3rem;
 // sentence reads as prose where she wrote a list.
 .rum-chars {
   @include ref-marked-list("→");
+}
+
+// THE NUMBERED LIST, Helen 2026-09-10: "please use the numbered list styling
+// from the start of the about page for my 'two things I care about' bit."
+//
+// SAME MECHANISM AS `about-enum`, re-drawn rather than imported for the reason
+// given above -- that class is scoped to food's `.about-page` wrapper so it can
+// out-specify longform recipe styling, and importing it would drag that whole
+// context along. What is copied is the behaviour: a counter, `list-style: none`,
+// and the numeral drawn by hand in the gutter in `$font-headings`.
+//
+// THE SIZE AND THE OPTICAL NUDGE ARE THE ABOUT PAGE'S, and both are load-bearing
+// there. 1.6rem sits "between the section headings and body text: big enough to
+// read as a mark rather than as a character in a sentence"; the 0.1rem push down
+// is because "a 1.6rem numeral hung off a 0.92rem line sits visibly high when the
+// two boxes are flush" -- its cap height starts lower inside a much taller line
+// box. Both were arrived at by looking, on that page, and there is no reason for
+// this one to rediscover them.
+//
+// A WIDER GUTTER THAN THE ARROW LIST, because a 1.6rem numeral is a much wider
+// glyph than a → at body size. 2.4rem against the about page's 2.8rem: that page
+// hangs its numerals off a wider measure.
+.ref-enum {
+  display: block;
+  counter-reset: ref-enum;
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 $space-xl;
+
+  > li {
+    counter-increment: ref-enum;
+    position: relative;
+    padding-left: 2.4rem;
+    margin-bottom: $space-lg;
+    max-width: calc(34rem + 2.4rem);
+
+    &::before {
+      content: counter(ref-enum);
+      position: absolute;
+      left: 0;
+      top: 0.1rem;
+      font-family: $font-headings;
+      font-weight: 700;
+      font-size: 1.6rem;
+      line-height: 1;
+      color: $color-clear-text;
+    }
+  }
 }
 
 // A definition list, because that is what it is: the word, and what to do about

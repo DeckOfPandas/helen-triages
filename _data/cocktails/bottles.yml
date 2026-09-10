@@ -1061,52 +1061,6 @@ bottles:
     generic: "cranberry juice"
 
 # =============================================================================
-# SIPPING -- the bottles that are not here to be mixed. #782, 2026-09-06.
-# =============================================================================
-# HELEN'S OWN RESERVATION ABOUT THE NAME, RECORDED BECAUSE SHE ASKED FOR THE
-# SECTION ANYWAY: "the name of which is a little against my religions because
-# you can sip anything plus I can mix whatever I damn well want... but this
-# section would help me keep track of my collection a bit."
-#
-# SO IT IS A SHELF, NOT A RULE, and nothing in the site treats it as one. It
-# gates no search, excludes no drink and forbids no pour. Its whole job is the
-# second half of that sentence: knowing what is in the house.
-#
-# A PLAIN LIST OF NAMES, WITH NO `generic`, AND THAT IS HELEN'S CALL RATHER THAN
-# A SHORTCUT. Asked on 2026-09-06 where the three aged Barbadians should sit --
-# Foursquare Shibboleth, Foursquare Indelible and Doorly's 14 are all well past
-# what `moderately aged rum` describes, and no other category exists -- she
-# chose to leave them out of `bottles:` for now rather than have a category
-# invented for them or be squeezed into the wrong one. The same then goes for
-# the rest of the list, so it stays one list rather than two mechanisms.
-#
-# WHICH MEANS THESE ARE NOT BOTTLES AS FAR AS THE REST OF THE SITE IS CONCERNED.
-# No generic, so no card ever names one; no row in abv.yml or costs.yml, and
-# none is wanted, because nothing can pour what nothing can reference. The
-# reference page prints this list and that is the whole of its reach.
-#
-# SEVERAL OF THEM HAVE OBVIOUS CATEGORIES AND COULD MOVE UP whenever Helen wants
-# them mixable -- the three clairins are `clairin`, El Dorado 21 is a 100%-DDL
-# `aged Demerara rum`, and both La Favorites are `rhum agricole blanc`. Moving
-# one is a two-line edit: an entry in `bottles:` above, and the name deleted
-# from here. Do NOT do it on inference; the categories are hers to apply
-# (see `hers_to_apply` in ingredients.yml, and #542).
-#
-# HER ORDER, FROM THE ISSUE, and it is not alphabetical: the clairins together,
-# then the Barbadians, then the Demerara, then the two Martiniquais.
-sipping:
-  - "Clairin Vaval"
-  - "Clairin Vaval Ansyen 41 Months Single Cask Ex Cognac"
-  - "Clairin Casimir"
-  - "Clairin Casimir aged"
-  - "Foursquare Shibboleth"
-  - "Foursquare Indelible"
-  - "Doorly's 14"
-  - "El Dorado 21"
-  - "La Favorite Plaisance Canne Bleue Récolte 2024"
-  - "La Favorite La Digue 2023"
-
-# =============================================================================
 # QUALIFIES, DELIBERATELY NOT REACHED FOR -- the reason attached, as family_less
 # =============================================================================
 not_reached_for:

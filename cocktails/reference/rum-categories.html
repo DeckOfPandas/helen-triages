@@ -61,10 +61,12 @@ published: false
   house", and the seven per-word lines in `_data/cocktails/rum_page.yml`, which
   are empty and render nothing until she writes them. Tracked at #784, #921.
 
-  THE SIPPING SHELF IS GONE FROM THIS PAGE, 2026-09-10, Helen's own deletion.
-  `bottles.yml`'s `sipping` block is therefore rendered NOWHERE on the site —
-  #782's list still exists in the data and has no reader. No test covered it, so
-  nothing went red.
+  THE SIPPING SHELF IS GONE, PAGE AND DATA BOTH, 2026-09-10. Helen deleted the
+  section from this page herself, was asked whether the ten bottle names should
+  survive in `bottles.yml` with no reader, and said "delete sipping entirely
+  please" — so #782's block is out of the data too. Nothing referenced it: no
+  test, no plugin, no other template. Do not reinstate the section here without
+  it; a heading over an empty list is worse than neither.
 
   TWO RANKS OF HEADING SINCE 2026-09-10. Her three top-level sections are h2
   `--major`; the five rum shelves and Rum-adjacent sit inside the first of them
@@ -105,7 +107,27 @@ published: false
     {% endcomment %}
     <p class="ref-prose">I really really like rum.</p>
 
-    <p class="ref-prose">My rum philosophy cares about only two things: 1. How a rum tastes, which informs 2. how to use it in a cocktail.</p>
+    {% comment %} THE ABOUT PAGE'S NUMERALS, Helen 2026-09-10: "please use the
+       numbered list styling from the start of the about page for my 'two things
+       I care about' bit."
+
+       HER WORDS ARE UNCHANGED, INCLUDING THE DANGLING CONNECTIVE. She wrote
+       "1. How a rum tastes, which informs 2. how to use it in a cocktail", so
+       item one ends "which informs" and item two starts lowercase. That reads
+       as a broken sentence in isolation and as one sentence down the column,
+       which is what it is -- and it is the about page's own pattern, where item
+       2 ends "without first having to" and hands off to its sub-list.
+
+       The numeral earns itself here for the same reason it does there: the
+       prose promises the count out loud ("only two things"), so the number is a
+       fact the reader has already been given and is now looking for.
+    {% endcomment %}
+    <p class="ref-prose">My rum philosophy cares about only two things:</p>
+
+    <ol class="ref-enum">
+      <li>How a rum tastes, which informs</li>
+      <li>how to use it in a cocktail.</li>
+    </ol>
 
     <p class="ref-prose">What colour a rum is tells me very little about how a rum tastes. Boring trainspotting facts like "pot still" or "made in a distillery owned by this particular old white guy" don't interest me at all, and, again, tell me very little about how a rum tastes. The history of Caribbean colonialism also tells me — wait for it — very little about how a rum tastes.</p>
 
