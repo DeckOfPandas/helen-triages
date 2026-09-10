@@ -255,7 +255,16 @@ def _garnishes() -> str:
 
 
 def _method_steps() -> str:
-    return _grouped(_methods().get("canonical") or {}, tick=True)
+    """The literal groups, then the `shapes:` groups with their `<X>` slot
+    printed as-is -- 2026-09-10. The prose around the block says what the
+    slot means; this only has to show the sentences."""
+    spec = _methods()
+    literal = _grouped(spec.get("canonical") or {}, tick=True)
+    shapes = spec.get("shapes") or {}
+    if not shapes:
+        return literal
+    return literal + "\n\n" + _grouped(
+        {f"with_a_slot_{k}": v for k, v in shapes.items()}, tick=True)
 
 
 def _measures() -> str:

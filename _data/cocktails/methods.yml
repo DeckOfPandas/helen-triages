@@ -59,6 +59,26 @@ canonical:
     # why there is no attempt at a general form here.
     - "Shake all ingredients other than the champagne with ice."
 
+  # SHORT SHAKE IS ITS OWN GROUP, 2026-09-10 (#705). Six drinks short shook in
+  # six wordings, four of them live, and the group the 2026-08-26 census missed
+  # is simply this one. "with three ice cubes" IS the technique -- three cubes
+  # is what makes a shake short -- so by this file's own test the phrase carries
+  # information and every form here says it. The three mirror `shake:` exactly:
+  # all ingredients, the remaining ones after a build, and the bare form for
+  # what is already in the shaker (port-au-prince's, kept for the same reason
+  # sapins-swizzle's "Shake with ice." was). The exclusion form is a SHAPE
+  # below, because the excluded ingredient is the drink's own.
+  short_shake:
+    - "Short shake all ingredients with three ice cubes."
+    - "Short shake the remaining ingredients with three ice cubes."
+    - "Short shake with three ice cubes."
+
+  # DRY SHAKE, 2026-09-10 -- no ice, the egg-white technique. Two drafts say it
+  # (pink-lady, dolores-park-swizzle); "dry" is the whole instruction, so it is
+  # not a variant of `shake:` and must not be proposed into one.
+  dry_shake:
+    - "Dry shake all ingredients."
+
   stir:
     - "Stir all ingredients with ice."
     - "Stir the remaining ingredients with ice."   # after a rinse -- see shake
@@ -69,6 +89,9 @@ canonical:
   blend_and_swizzle:
     - "Blend all ingredients until smooth."
     - "Swizzle until the glass frosts."
+    # Two swizzles finish the same way in two wordings (coffey-park,
+    # dolores-park); this is coffey-park's, and the other is proposed to it.
+    - "Add the bitters then swizzle them into the top."
 
   # STRAIN IS WHERE THE SPRAWL WAS -- eleven distinct forms for what is really
   # four decisions: how fine, and into what. Note that NAMING THE GLASS is
@@ -102,8 +125,16 @@ canonical:
     - "Pour."
 
   build:
+    # THE BUILD-IN-THE-GLASS OPENER, 2026-09-10. The glass is in `glass:` and
+    # draws the icon, so "Add all ingredients to the glass." names it twice --
+    # the same duplication the strain group shed. A PITCHER is not the glass and
+    # is information, which is why the punches' "in a pitcher" steps stay free.
+    - "Add all ingredients."
     - "Add the remaining ingredients."
     - "Fill the pitcher half full with ice cubes."
+    # Four Death & Co punches fill three-quarters, and arrack-punch's note says
+    # its source did too. A different amount of ice is information.
+    - "Fill the pitcher three-quarters full with ice cubes."
     - "Fill with crushed ice."
     - "Top with champagne."
     # SODA WATER, NEVER CLUB SODA -- Helen's ruling, 2026-09-02: she is not in
@@ -198,6 +229,41 @@ canonical:
     - "Express the twist over the drink then discard it."
 
 # =============================================================================
+# SHAPES -- a canonical sentence with ONE slot, 2026-09-10
+# =============================================================================
+# The exclusion tail was the sprawl `canonical:` could not close. "other than
+# the champagne" is declared above because it is frequent; the live drinks also
+# said "everything except the cola", "first four ingredients", "the first seven
+# ingredients", "all the other ingredients", "all the ingredients except the
+# bitters", "with three ice cubes, other than the soda water" -- six wordings of
+# one instruction, differing only in WHICH ingredient stays out. That word is
+# the drink's own and cannot be enumerated here; the sentence around it can.
+#
+# So a shape is a canonical string with exactly one `<X>`, and a step that fills
+# the slot -- with the ingredient AS THE RECIPE NAMES IT -- is canonical. The
+# literal champagne forms above are kept: they were declared first, they are
+# still exact, and tests/test_cocktails.py treats a literal and a filled shape
+# alike. Nothing is parameterised beyond the one slot; a step needing two is
+# tail, and that is the rule that keeps this from growing into a grammar.
+#
+# THE FLOAT FORMS ARE HERE AND NOT IN `canonical:` because every float names
+# its own pour. "on top" rather than "on the surface" / "on the top": three
+# spellings of one position, and none of them carried anything.
+shapes:
+  exclusion:
+    - "Shake all ingredients other than the <X> with ice."
+    - "Stir all ingredients other than the <X> with ice."
+    - "Short shake all ingredients other than the <X> with three ice cubes."
+    - "Dry shake all ingredients other than the <X>."
+    - "Add all ingredients other than the <X>."
+    - "Add the remaining ingredients other than the <X>."
+  top:
+    - "Top with <X>."
+  float:
+    - "Float the <X> on top."
+    - "Drop the <X> on top."
+
+# =============================================================================
 # PROPOSALS -- both halves kept, so the choice is Helen's and not mine
 # =============================================================================
 # LEFT: the string exactly as it appears in a drink today.
@@ -228,6 +294,85 @@ canonical:
 # records that they were RESOLVED rather than rejected -- the same distinction
 # applies here.
 proposals:
+  # REFILLED 2026-09-10 from a census of all 124 drinks (48 live, 76 drafts):
+  # 313 steps, 119 distinct, 45 of the live strings outside the dictionary.
+  # Every row below is a string a drink says today, on the left, and the form it
+  # would take on the right. DELETE A ROW TO KEEP THE DRINK'S OWN WORDS. The
+  # drink each row belongs to is in the comment above it. A `QQ` on the right
+  # is a step that needs splitting or a judgement, not a rename, and is listed
+  # in the pull request rather than applied.
+
+  # brooklyn -- an article.
+  "Stir all the ingredients with ice.": "Stir all ingredients with ice."
+
+  # sazerac -- after the absinthe rinse, so "the remaining" by the 2026-09-01
+  # ruling; and a short shake, which the group above says is three cubes.
+  "Short shake all the other ingredients with ice.": "Short shake the remaining ingredients with three ice cubes."
+  # cobras-fang, tom-collins -- the exclusion shape, the tail moved into the
+  # slot. "except" -> "other than" is the declared wording.
+  "Short shake all the ingredients except the bitters with three ice cubes.": "Short shake all ingredients other than the bitters with three ice cubes."
+  "Short shake all the ingredients with three ice cubes, other than the soda water.": "Short shake all ingredients other than the soda water with three ice cubes."
+  # mai-tai -- the lime wedge is already in the shaker from step one, so
+  # "the remaining ingredients" is exactly what this step adds and shakes.
+  "Add the remaining ingredients and short shake with three ice cubes.": "Short shake the remaining ingredients with three ice cubes."
+
+  # long-island-iced-tea, the-last-wall-highball, fog-cutter-bramble-style --
+  # three ways of leaving one thing out. The ordinal ones ("first four", "first
+  # seven") say which by position; the shape says which by name, and the name
+  # is the one that survives an ingredient being reordered.
+  "Shake everything except the cola with ice.": "Shake all ingredients other than the cola with ice."
+  "Shake first four ingredients with ice.": "Shake all ingredients other than the soda water with ice."
+  "Shake the first seven ingredients with ice.": "Shake all ingredients other than the sherry with ice."
+  # fish-house-punch -- two instructions in one step (shake all but the tea;
+  # strain into the tea). A proposal maps one string to one, so this is a
+  # rewrite for Helen: "Shake all ingredients other than the tea with ice." then
+  # "Strain into the tea." as its own step, if she agrees.
+  "Shake all the other ingredients with ice, then strain into the tea.": "QQ"
+  # voodoo-that-you-do (draft) -- "cubed" in the SHAKER. Delete this row if the
+  # cube size was deliberate; the file's own test says "with ice" carries none.
+  "Shake all ingredients other than the bitters with cubed ice.": "Shake all ingredients other than the bitters with ice."
+
+  # porn-star-martini, espresso-martini, kamaniwanalaya, zombie-intoxica -- the
+  # float shape; "on the surface" and a bare "Float the X." are the same fact.
+  "Float the passion fruit shell on the surface.": "Float the passion fruit shell on top."
+  "Float the coffee beans on the surface.": "Float the coffee beans on top."
+  "Float the Prosecco.": "Float the Prosecco on top."
+  "Float the overproof rum.": "Float the overproof rum on top."
+  # mastiha-mojito, cobras-fang -- "on the top" -> "on top".
+  "Drop the olive oil on the top.": "Drop the olive oil on top."
+  "Drop the bitters on the top.": "Drop the bitters on top."
+
+  # fish-house-punch -- a bare `Pour.` composes with the glass and `serve.ice`
+  # (collins, cubed) into "Pour into a collins glass, filled with ice", which is
+  # what this says by hand. Same rule the strain forms already follow.
+  "Pour into ice-filled glasses.": "Pour."
+
+  # sazerac-death-and-co (draft) -- you cannot stir a twist; it is the garnish,
+  # and the discard is the layout's express step once `garnish:` names it.
+  "Stir the remaining ingredients with ice, other than the lemon twist.": "Stir the remaining ingredients with ice."
+
+  # The punches' build steps (drafts): arrack-punch, kill-devil-punch,
+  # billingsley-punch, la-fee-noir-punch, chartreuse-swizzle, dolores-park.
+  # "soda" -> "soda water" is the 2026-09-02 ruling; "except for" -> "other
+  # than" the declared wording; the comma in "remaining ingredients, other than"
+  # is the only difference from the shape.
+  "Add the remaining ingredients except for the soda.": "Add the remaining ingredients other than the soda water."
+  "Add the remaining ingredients except for the champagne.": "Add the remaining ingredients other than the champagne."
+  "Add the remaining ingredients, other than the rest of the soda water.": "Add the remaining ingredients other than the rest of the soda water."
+  "Add all ingredients to the glass.": "Add all ingredients."
+  "Add the bitters and swizzle them into the top of the drink.": "Add the bitters then swizzle them into the top."
+  # dons-mai-tai, martinique-swizzle, pic-a-de-crop-punch (drafts) -- each is a
+  # build AND a technique in one line, or names a vessel the data cannot. A
+  # split for Helen, listed in the pull request.
+  "Combine all ingredients in a shaker.": "QQ"
+  "Combine all in a Collins glass and stir.": "QQ"
+  "Combine all the ingredients in a pitcher, other than the soda water.": "QQ"
+
+  # 6th-street-swizzle, sapins-swizzle, blue-hawaiian (drafts) -- the declared
+  # forms already say the same thing.
+  "Swizzle until cold.": "Swizzle until the glass frosts."
+  "Swizzle.": "Swizzle until the glass frosts."
+  "Blend all ingredients including the ice.": "Blend all ingredients until smooth."
 
   # EMPTY, 2026-09-01, and the key stays. An empty mapping says "nothing
   # outstanding"; a missing one says nothing at all, and would switch off

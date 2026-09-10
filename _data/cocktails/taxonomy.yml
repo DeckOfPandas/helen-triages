@@ -1011,7 +1011,12 @@ moods_by_hand:
   # Tai's "Optional fire if tiki mug" -- and whether an optional flourish makes
   # a drink `on fire` is a judgement, not a parse. The derivation still tags the
   # five drinks whose METHOD sets something alight; this only stops it deleting
-  # a sixth that Helen typed on purpose. Widening the rule stays open.
+  # a sixth that Helen typed on purpose.
+  #
+  # RULED 2026-09-10 (#894): an optional flourish CAN make a drink `on fire` --
+  # "yes in principle" -- and the Mai Tai specifically does not get it. So the
+  # rule stays as it is, the Mai Tai stays unlit, and a future drink whose
+  # optional flame she wants offered is hand-assigned like Cobra's Fang.
   - on fire
 
 mood_groups:

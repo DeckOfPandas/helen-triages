@@ -5474,6 +5474,63 @@ def _canonical_steps(spec):
     return out
 
 
+SHAPE_SLOT = "<X>"
+
+
+def _shape_patterns(spec):
+    """Every `shapes:` string as a compiled regex, `<X>` matching one non-empty
+    run of text -- 2026-09-10.
+
+    A shape is a canonical sentence with ONE slot for the ingredient the drink
+    names ("Shake all ingredients other than the <X> with ice."). The slot is
+    the only thing that varies, so everything else is matched literally, and a
+    filled shape counts as canonical wherever a literal would. Derived from the
+    mapping's shape like `_canonical_steps`, so a group added tomorrow is
+    covered tomorrow.
+    """
+    out = []
+    for value in (spec.get("shapes") or {}).values():
+        if not isinstance(value, list):
+            continue
+        for shape in value:
+            head, _, tail = shape.partition(SHAPE_SLOT)
+            out.append((shape, re.compile(
+                "^" + re.escape(head) + r"(.+)" + re.escape(tail) + "$")))
+    return out
+
+
+def _is_canonical_step(step, spec):
+    """A literal under `canonical:`, or a filled `shapes:` sentence."""
+    if step in _canonical_steps(spec):
+        return True
+    return any(rx.match(step) for _, rx in _shape_patterns(spec))
+
+
+def test_every_shape_has_exactly_one_slot():
+    """A shape carries one `<X>` and ends on a full stop.
+
+    Two slots would be a grammar, and the file's own header says one is the
+    limit that keeps it a dictionary. Zero slots is a literal that belongs
+    under `canonical:` instead. A missing full stop would let a filled shape
+    pass while every literal is a sentence.
+    """
+    spec = _methods()
+    shapes = [s for v in (spec.get("shapes") or {}).values()
+              if isinstance(v, list) for s in v]
+    assert shapes, (
+        "methods.yml declares no `shapes:`, so the slot rule guards nothing. "
+        "If shapes were abandoned, delete this test with them."
+    )
+    bad = [s for s in shapes
+           if s.count(SHAPE_SLOT) != 1 or not s.endswith(".")]
+    assert not bad, (
+        "Shape(s) with other than one `<X>`, or no full stop:\n  "
+        + "\n  ".join(repr(s) for s in bad)
+    )
+    literal = sorted(set(shapes) & _canonical_steps(spec))
+    assert not literal, f"declared as BOTH a shape and a literal: {literal}"
+
+
 def _all_method_steps():
     """Every step in the collection, as (slug, text).
 
@@ -5499,11 +5556,12 @@ def test_every_proposal_names_a_real_canonical_step():
         "methods.yml declares no canonical steps, so this check has nothing to "
         "enforce. Either the file changed shape or `canonical` was renamed."
     )
+    # A filled `shapes:` sentence is as canonical as a literal -- 2026-09-10.
     bad = sorted(f"{k!r} -> {v!r}" for k, v in (spec.get("proposals") or {}).items()
-                 if v != "QQ" and v not in canonical)
+                 if v != "QQ" and not _is_canonical_step(v, spec))
     assert not bad, (
         "Proposal(s) pointing at a step that is not declared under "
-        "`canonical`:\n  " + "\n  ".join(bad)
+        "`canonical` and fills no `shapes:` sentence:\n  " + "\n  ".join(bad)
         + "\n\nEither it is a typo, or the target is real and belongs in the "
           "canonical list."
     )
@@ -5518,8 +5576,8 @@ def test_no_proposal_rewrites_a_step_that_is_already_canonical():
     same cluster differently.
     """
     spec = _methods()
-    canonical = _canonical_steps(spec)
-    overlap = sorted(set(spec.get("proposals") or {}) & canonical)
+    overlap = sorted(s for s in (spec.get("proposals") or {})
+                     if _is_canonical_step(s, spec))
     assert not overlap, (
         "Step(s) listed as BOTH canonical and as a proposal to be replaced:\n  "
         + "\n  ".join(repr(s) for s in overlap)
