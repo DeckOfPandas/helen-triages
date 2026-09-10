@@ -1355,6 +1355,34 @@ characters and never generics. Rum's characters are a closed declared list
 suffix and enforced by `test_a_declared_character_vocabulary_is_enforced`** —
 declaring a list is what switches enforcement on.
 
+**`origin` lives on the BOTTLE, not the recipe** (#591, Helen 2026-09-07), and
+it is the mirror image of `character`: where a distillery stands is INVARIANT,
+so it sits beside `abv` on the bottle, while `character` is what a recipe wants
+from a pour. Closed vocabulary — `bottle_origins` in `ingredients.yml`,
+currently Martinique, Guadeloupe, Haiti, Brazil. Two guards:
+`test_bottle_origin_is_declared` (no typo may mint one) and
+`test_cane_juice_bottles_declare_an_origin` (every bottle on `rum_groups`'
+"Cane juice" shelf has one, so the next agricole cannot arrive without it).
+**The accepted cost: a RECIPE cannot require an origin.** The Martinique
+Swizzle says `rhum agricole blanc` and is Martinican only because its
+suggestions are; `island-of-martinique` is named after an origin it cannot
+state. Helen chose that shape knowing so. **Two mechanisms for origin coexist
+deliberately** — in the generic where it changes the CATEGORY (the three
+Jamaicans, both Demeraras, `clairin`, both arracks), on the bottle where it
+changes the FLAVOUR.
+
+**ANY NEW TOP-LEVEL LIST IN `ingredients.yml` DECLARES POURABLE GENERICS UNLESS
+YOU SAY OTHERWISE**, and this is the trap that has now been sprung five times.
+`_declared_generics` derives the vocabulary from the file's own shape, so a list
+that is not a vocabulary silently mints its members. `families`,
+`not_on_cards`, `rum_groups`, `ingredient_as`, `bottle_origins` and
+`shopping_shelves` are all in `NOT_GENERIC_LISTS` — and `shopping_shelves` was
+found WRONG on 2026-09-10, ten aisle names (`spirits`, `tops`, `flavourings`…)
+that had been valid generics since the shelves were declared, with nothing red
+anywhere. **Nothing detects this**: a missing registration is invisible unless
+somebody lists every top-level key and asks what each one is. Do that when you
+add a list.
+
 **Naming**: every generic reads as an ingredient, natural word order, spirit
 word on the end, no inverted commas — `moderately aged Jamaican rum`, `London
 dry gin`, `rhum agricole blanc`. `rye` and `bourbon` stay bare because that is

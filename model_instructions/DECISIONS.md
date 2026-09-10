@@ -3596,6 +3596,71 @@ verification. Dates are when the correction landed.
   reach for", the arrack note and both subtitles deleted. **Nice-to-have, not
   shipping**: *"no more until design isn't noticeably odd"*, her words, so the
   page stays unpublished. #813 (agricole rows by country) waits on #591.
+- **2026-09-10, #591 — `origin` IS BUILT, THREE DAYS AFTER IT WAS RULED, AND
+  THE BUILD FOUND A LIVE BUG IN SOMETHING ELSE.** Helen ruled on 2026-09-07 that
+  origin goes on the BOTTLE; `origin:` appeared nowhere in `bottles.yml` until
+  today. Fifteen cane-spirit bottles seeded (7 Martinique, 3 Guadeloupe, 2 Haiti,
+  3 Brazil), a closed `bottle_origins` vocabulary, and two guards — one that
+  refuses an undeclared value, one that requires an origin on every bottle on
+  `rum_groups`' "Cane juice" shelf.
+
+  **THE ARRACKS ARE DELIBERATELY OUTSIDE THE GUARD**, and the reason is the
+  ruling's own: origin lives in the generic where it changes the CATEGORY and on
+  the bottle where it changes the FLAVOUR. `Batavia arrack` and `Ceylon arrack`
+  carry it in the word already, exactly as the three Jamaicans and both
+  Demeraras do. Cachaça is seeded but not required, being Brazilian by
+  definition. Agricole is the one cane family whose generic spans three
+  countries, which is the whole reason the field exists.
+
+  **AND THE TRAP FIRED FOR REAL, FOR THE FIFTH TIME, WITH NOBODY NOTICING.**
+  `tests/test_cocktails.py` derives the permitted generics from every top-level
+  LIST in `ingredients.yml`, so a list that is not a vocabulary mints its
+  members as pourable generics unless it is named in `NOT_GENERIC_LISTS`. Four
+  entries were already there, each added by somebody who happened to think of
+  it. Listing every top-level key while adding the fifth turned up
+  **`shopping_shelves`: ten AISLE NAMES — `spirits`, `fortified`, `liqueurs`,
+  `fresh produce`, `flavourings`, `tops` and four more — silently valid as
+  generics since the shelves were declared.**
+
+  The prediction was on the record and exact. `rum_groups`' own note says it was
+  caught only because its members are dicts and `set(value)` raises on those:
+  *"that is luck, not design, and the next such block will not be so obliging."*
+  `ingredient_as`, `bottle_origins` and `shopping_shelves` are all lists of
+  plain strings. Two were caught while being added. One was not.
+
+  **A GUARD FOR THIS WAS ATTEMPTED AND WAS WRONG, WHICH IS WORTH MORE THAN THE
+  GUARD.** The obvious invariant — "nothing in a `NOT_GENERIC_LISTS` list may
+  also be a declared generic" — is FALSE: `not_on_cards` is a list *of*
+  generics, the ones deliberately kept off a card, and `families` overlaps on
+  purpose (`vodka` is both a family and a pour). It went red on real data
+  immediately and was deleted. **The registry says where generics are SOURCED
+  from, not what is or is not a generic**, and those are different questions.
+
+  The real fix is to invert the default: an explicit positive registry of the
+  lists that DO declare generics, so a new list declares nothing until
+  classified and the silent failure becomes a loud one. That is a change to the
+  derivation every generic check runs through, so it is its own piece of work
+  and is raised rather than smuggled in here.
+
+- **2026-09-10 — I SHADOWED A HELPER AND NINE TESTS BLAMED THE DATA.** Adding
+  `_bottles()` for the two new guards, without checking the name was free.
+  `_bottles()` has existed since #529 at the top of the bottle-dictionary
+  section and returns the WHOLE document; mine returned only the `bottles:`
+  mapping. **Python takes the last definition**, so every pre-existing caller
+  silently got the wrong shape.
+
+  **THE FAILURE POINTED AT THE WRONG THING, WHICH IS THE PART TO REMEMBER.**
+  Nine tests went red at once saying *"bottles.yml declares no bottles, so every
+  check here is vacuous"* — a message written to describe a corrupted or empty
+  data file. So the first move was to parse `bottles.yml` and check the block
+  boundaries, and it parsed fine, 132 bottles. The message was accurate about
+  what the test SAW and misleading about why.
+
+  **An assertion message names what the test observed; it cannot name what
+  caused it.** When a data-shaped failure appears the moment you have added
+  code, suspect the code — and `grep -n '^def <name>'` before defining a helper
+  in a 7,000-line module.
+
 - **2026-09-10, #784 — AND THEN THERE WERE NO LINES AT ALL. The entry above
   describes a mechanism that lasted a few hours.** `rum_page.yml` was built to
   hold "a line or two under each rum label we aren't using", seven empty keys
