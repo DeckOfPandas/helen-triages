@@ -312,9 +312,16 @@ adding a key: does this say where you are, or what the chrome is?** The
 second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
 `test_page_links.py` fails if a removed key reappears.
 
-**The nav is one row, the same everywhere**: one icon per site in
-`sites.yml`, in that file's order, then the `??` about link at a literal
-`/about/`. **The footer's reference block is a column PER SITE, gated on
+**The nav is the door to the OTHER site, centred under the wordmark** (since
+2026-09-10, Helen's own idea, picked from a header-only candidates page): one
+loop over `sites.yml` in that file's order, skipping `page.site_key`, each
+entry an icon, its bracketed word and an arrow — `[ COCKTAILS ] →` on food.
+A `site_neutral` page (about) shows every site. The `??` about link sits
+alone at the right of that row, at a literal `/about/`. So the row varies by
+site the way the wordmark does, and by the same rule: one template, no
+per-site key; `test_the_header_and_footer_are_identical_on_every_page`
+compares the row within a site and requires each site's row to name the other
+and not itself. **The footer's reference block is a column PER SITE, gated on
 having material** — food's two links appear on a cocktail page, and since
 2026-09-06 (#529) a `[ COCKTAILS ]` column appears beside them, which cost no
 template change: the loop always asked every site rather than food. The hearts

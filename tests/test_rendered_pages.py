@@ -832,18 +832,31 @@ def _chrome_of(html: str) -> dict[str, str]:
 
 
 def test_the_header_and_footer_are_identical_on_every_page(prod_site):
-    """The nav row and the whole footer are byte-identical across both sites.
+    """The footer is byte-identical across both sites; the nav row is
+    byte-identical across every page OF A SITE, and says the other site's name.
 
     Not "equivalent", not "both present" -- identical source text. Anything a
     page is allowed to vary is by definition not part of the shared chrome, so
-    there is nothing here to normalise away and no tolerance to tune. If this
-    test ever needs an exception carved into it, that exception IS a second
-    header arriving, and it wants arguing rather than accommodating.
+    there is nothing here to normalise away and no tolerance to tune.
 
-    The wordmark is deliberately OUT of scope: `[ FOOD ]` versus
-    `[ COCKTAILS ]`, and the home link under it, say where you are, which is the
-    one job the chrome still does per-site. It lives in .site-title-link, above
-    the nav row this test reads, so the two are already separated in the markup.
+    THE NAV ROW JOINED THE WORDMARK ON THE PER-SITE SIDE ON 2026-09-10, and
+    this docstring used to say that any exception carved in here "IS a second
+    header arriving, and it wants arguing rather than accommodating". It was
+    argued: Helen chose, from a header-only candidates page, a row under the
+    wordmark that names THE OTHER site -- "[ COCKTAILS ] →" on food, "[ FOOD ]
+    →" on cocktails -- because a visitor had no way to know the small glass in
+    the corner was a second site. So the row now does the wordmark's one
+    per-site job from the other direction: it says where you are not. It is
+    still one template and one loop over sites.yml with no per-site key, which
+    is what #374 was about; what varies is the output, by the same rule the
+    wordmark varies by.
+
+    So the comparison is in two parts. The footer is identical across both
+    sites, as before. The nav is identical across pages of ONE site -- the
+    index and a recipe, which reach default.html by different routes -- and
+    the two sites' rows must each name the other site and neither name its
+    own. That last check is what stops the loop quietly showing both, or
+    neither, on a site that gained a third entry.
     """
     pages = {
         "/food/": prod_site / "food" / "index.html",
@@ -871,19 +884,46 @@ def test_the_header_and_footer_are_identical_on_every_page(prod_site):
                 f"that finds nothing to compare passes while checking nothing."
             )
 
-        reference_url, reference = next(iter(chromes.items()))
-        for url, chrome in chromes.items():
-            if chrome[block] == reference[block]:
-                continue
-            raise AssertionError(
-                f"The {block} differs between {reference_url} and {url}.\n\n"
-                f"{reference_url}:\n{reference[block]}\n\n"
-                f"{url}:\n{chrome[block]}\n\n"
-                f"There is ONE header and ONE footer in this repo (issue #374). "
-                f"A difference here means something in _layouts/default.html has "
-                f"started branching on site_key again, or a value it reads out of "
-                f"_data/sites.yml has become per-site when it should be in "
-                f"_data/chrome.yml. Both are how the two drifted apart before."
+    # The footer: one, everywhere.
+    reference_url, reference = next(iter(chromes.items()))
+    for url, chrome in chromes.items():
+        if chrome["footer"] == reference["footer"]:
+            continue
+        raise AssertionError(
+            f"The footer differs between {reference_url} and {url}.\n\n"
+            f"{reference_url}:\n{reference['footer']}\n\n"
+            f"{url}:\n{chrome['footer']}\n\n"
+            f"There is ONE footer in this repo (issue #374). A difference here "
+            f"means something in _layouts/default.html has started branching on "
+            f"site_key again, or a value it reads out of _data/sites.yml has "
+            f"become per-site when it should be in _data/chrome.yml."
+        )
+
+    # The nav: one per SITE. Two food pages by two routes must agree exactly.
+    assert chromes["/food/"]["header nav"] == chromes["/food/recipes/caramel/"]["header nav"], (
+        "The header nav differs between /food/ and /food/recipes/caramel/:\n\n"
+        f"{chromes['/food/']['header nav']}\n\n"
+        f"{chromes['/food/recipes/caramel/']['header nav']}\n\n"
+        "Within a site the row must be identical on every page; a recipe reaches "
+        "default.html through recipe.html and must not arrive with a different one."
+    )
+
+    # And each site's row is the door to the OTHER site, never to itself.
+    sites = yaml.safe_load((ROOT / "_data" / "sites.yml").read_text(encoding="utf-8")) or {}
+    words = {key: f"[ {s['word']} ]" for key, s in sites.items()}
+    for url, key in (("/food/", "food"), ("/cocktails/", "cocktails")):
+        nav = chromes[url]["header nav"]
+        assert words[key] not in nav, (
+            f"{url}'s header nav names its own site, {words[key]!r}. The tape "
+            f"above already says where you are; the row is for the other site."
+        )
+        others = [w for k, w in words.items() if k != key]
+        for w in others:
+            assert w in nav, (
+                f"{url}'s header nav does not name {w!r}. The row exists to be "
+                f"the door to the other site (Helen, 2026-09-10); a site with no "
+                f"door in the row is the #374 failure -- one site with no nav -- "
+                f"in a new shape."
             )
 
 
