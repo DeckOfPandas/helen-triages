@@ -18,12 +18,26 @@
       "Bash(git check-ignore *)",
       "Bash(git commit -F *)",
       "Bash(gh pr create *)",
-      "Bash(.gh-runtime/bin/gh pr create *)"
+      "Bash(.gh-runtime/bin/gh pr create *)",
+      "Bash(sh scripts/gh-agent.sh issue list *)",
+      "Bash(sh scripts/gh-agent.sh issue view *)",
+      "Bash(sh scripts/gh-agent.sh issue comment *)",
+      "Bash(sh scripts/gh-agent.sh issue create *)",
+      "Bash(sh scripts/gh-agent.sh issue edit *)",
+      "Bash(sh scripts/gh-agent.sh pr list *)",
+      "Bash(sh scripts/gh-agent.sh pr view *)",
+      "Bash(sh scripts/gh-agent.sh pr diff *)",
+      "Bash(sh scripts/gh-agent.sh pr create *)",
+      "Bash(sh scripts/gh-agent.sh repo clone *)"
     ],
     "deny": [
       "Bash(chmod *)",
       "Bash(chown *)",
-      "Bash(sudo *)"
+      "Bash(sudo *)",
+      "Bash(gh pr merge *)",
+      "Bash(.gh-runtime/bin/gh pr merge *)",
+      "Bash(sh scripts/gh-agent.sh pr merge *)",
+      "Bash(sh scripts/gh-agent.sh pr review *)"
     ]
   },
   "hooks": {
@@ -62,6 +76,12 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-inline-script.py\"",
             "timeout": 20,
             "statusMessage": "Checking for inline scripts"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-unanalyzable-bash.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking the command can be analysed"
           }
         ]
       }

@@ -3043,6 +3043,75 @@ verification. Dates are when the correction landed.
   human, not removed it. Prefer the form that needs no verification, even when
   the form being replaced was never unsafe.
 
+- **2026-09-10 — THE SIXTH HOOK, AND THE FIRST ONE THAT ENFORCES A RULE THIS
+  FILE HAD ALREADY WRITTEN IN FULL.** Helen, having permitted two calls by hand
+  within minutes of each other: *"can we either avoid needing to request
+  permission, or block the command if it can't be statically analysed?"* Both
+  halves were built — allow rules in `.claude/settings.json` for the routine
+  calls, and `guard-unanalyzable-bash.py` for the rest.
+
+  **THE RULE WAS ALREADY THERE, STATED BETTER THAN THE HOOK STATES IT.**
+  `CLAUDE.md`'s working-practices section already ended: *"All of these rules
+  are one rule... The permission checker proves, before anything runs, that a
+  command touches only the working directory. It can do that only for a command
+  whose text is its whole meaning."* Six shapes named, one consequence each,
+  and nothing but care behind any of them. **That is now six hooks, and every
+  one exists because a written rule was read and then broken.** The generalised
+  version of this repository's most-repeated lesson: a rule that depends on
+  care will be broken at a rate proportional to how often it is met, and the
+  well-written ones are met most often.
+
+  **WHO PAYS IS THE WHOLE ARGUMENT FOR BLOCKING RATHER THAN ASKING.** A prompt
+  is not a refusal. It is an interruption, and it lands on Helen rather than on
+  the session that earned it; a denial lands on the session, which writes the
+  script and carries on. Every friction rule in `CLAUDE.md` ends on that same
+  sentence — *"the cost is never a refusal, always an interruption to Helen"* —
+  and until now the mechanism did the opposite of what the sentence asked.
+
+  **A REAL BUG, FOUND BY BREAKING IT ON PURPOSE, AND IT WAS A CORRECTNESS ONE
+  RATHER THAN A FRICTION ONE.** The first draft blanked BOTH quote kinds before
+  looking for `$(...)`, so `git commit -m "$(cat tmp/msg.txt)"` walked straight
+  through. **The shell expands substitution inside double quotes** — the exact
+  distinction `guard-token-expansion.py` draws for `$VAR`, and the guard's own
+  docstring claimed to draw. So: both quote kinds are stripped before the
+  `&&` / `||` / `;` / `|` / glob tests, and only single quotes before the
+  substitution test. Prose about substitution belongs in single quotes.
+  35 cases, 0 failing.
+
+  **What it deliberately allows**, because a guard that fires on harmless
+  invocations is one you learn to route around: redirection to a static path
+  (`2>&1` and `>/dev/null` included — a redirection names its file, so only a
+  PIPE hides a later stage); quoted operators and globs; and a bare `$VAR`,
+  left to `guard-token-expansion.py` because a `$` in a regex is far too common
+  to pattern-match. The probe deliberately loads its ALLOW cases with commands
+  actually run in the session that built it, so a guard that would have blocked
+  real work fails at the probe rather than mid-task.
+
+  **The honest cost, stated so it is not a surprise:** `| tail -3` after a
+  pytest run is gone, and so is every other convenience pipeline. That is what
+  `CLAUDE.md` has asked for since 2026-09-08 in Helen's own words — *"if they
+  take or emit variables, please write a script in tmp/"* — and the second
+  payoff is the one she named then: the script is a record of exactly what was
+  measured, which a one-off pipeline never is.
+
+- **2026-09-10 — THE MERGE DENY, WHICH IS THE PART OF THAT SETTINGS CHANGE
+  WORTH READING TWICE.** Allow rules for the `gh` wrapper were written per
+  subcommand rather than as `sh scripts/gh-agent.sh *`, and `pr merge` and
+  `pr review` were added to the DENY list in all three spellings.
+
+  **Because a blanket allow would have removed the last thing standing in front
+  of a merge.** §11's own entry for 2026-09-09 says it plainly: `CLAUDE.md`
+  used to end the permissions section *"the token is scoped so the rest is
+  impossible"*, and for merging that stopped being true when the classic
+  `repo`-scoped token replaced the fine-grained one. **Merging is now held by
+  the rule alone.** A convenience allow-list is exactly the kind of change that
+  would have quietly removed even the prompt, while looking like nothing but
+  friction relief — and a deny rule cannot be overridden by an allow.
+
+  The general shape, worth keeping: **when widening permissions for
+  convenience, the question is not "what do I want to stop prompting" but
+  "what was that prompt the last guard of".**
+
 ---
 
 - 2026-09-10: "There is no `gh` at all in a worktree" (§1) was true of a
