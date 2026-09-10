@@ -20,7 +20,7 @@ ingredients:
   - amount: "22.5 ml"
     generic: "lemon juice"
   - amount: "2 dash"
-    generic: "Creole bitters"
+    generic: "Créole bitters"
     suggestion: ["Peychaud's"]
 method:
   - "Shake all ingredients with ice."
@@ -39,5 +39,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

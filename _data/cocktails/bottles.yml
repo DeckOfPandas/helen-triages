@@ -994,7 +994,7 @@ bottles:
   # generic already said better, while the bottle sat in `item` -- the field
   # #544 is retiring. #585 moved it here.
   "Peychaud's":
-    generic: "Creole bitters"
+    generic: "Créole bitters"  # accent aigu added -- #882
     aliases: ["Peychauds", "Peychaud's bitters", "Peychaud’s"]
   "Bittermens Xocolatl Mole":
     generic: "chocolate bitters"

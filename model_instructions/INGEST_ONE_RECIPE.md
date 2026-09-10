@@ -450,11 +450,11 @@ website). Keep one that points into the same book the recipe came from.
 
 <!-- vocab:accents start -->
 açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
-chèvre · comté · consommé · crème · crémeux · crêpe · crêpes · crudités ·
-éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau · glacé ·
-gougère · gougères · gruyère · jalapeño · jalapeños · marinière · niçoise ·
-pâté · pâtisserie · pâtissière · piña · purée · puréed · purées · ragù · rösti ·
-sauté · sautés · sautéed · soufflé · soufflés · velouté
+chèvre · comté · consommé · crème · crémeux · créole · crêpe · crêpes ·
+crudités · éclair · éclairs · entrecôte · flambé · fraîche · frisée · gâteau ·
+glacé · gougère · gougères · gruyère · jalapeño · jalapeños · marinière ·
+niçoise · pâté · pâtisserie · pâtissière · piña · purée · puréed · purées ·
+ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · velouté
 <!-- vocab:accents end -->
 
 **And the words that keep NO accent**, which is the half worth reading twice —

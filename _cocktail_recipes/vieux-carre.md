@@ -23,7 +23,7 @@ ingredients:
     generic: "aromatic bitters"
     suggestion: ["Angostura"]
   - amount: "1 dash"
-    generic: "Creole bitters"
+    generic: "Créole bitters"
     suggestion: ["Peychaud's"]
 method:
   - "Stir all ingredients with ice."
@@ -42,5 +42,5 @@ meta:
   ship: "meh"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

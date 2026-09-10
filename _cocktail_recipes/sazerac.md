@@ -27,7 +27,7 @@ ingredients:
   - amount: "7.5 ml"
     generic: "cane sugar syrup 2:1"
   - amount: "3 dashes"
-    generic: "Creole bitters"
+    generic: "Créole bitters"
     suggestion: ["Peychaud's"]
   - amount: "1 dash"
     generic: "aromatic bitters"
@@ -54,5 +54,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
