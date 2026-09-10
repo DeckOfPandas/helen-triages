@@ -3080,10 +3080,23 @@ unneeded scaffolding."* The `<dl>` became a `<ul>` with it — a definition list
 whose definitions can never exist is a promise the markup cannot keep. All of it
 is in git history if it is ever wanted back.
 
-**The page carries Helen's voice now**, not just her data: a title, four opening
-paragraphs, a numbered list, two citations and the Characters preamble are all
-hers. §13.12's rule applies with full force — an agent ships a placeholder,
-never a sentence, and never polishes one of hers.
+**The page carries Helen's voice now**, not just her data: a title, five opening
+paragraphs (the fifth, what rum tastes like, written 2026-09-10 after the copy
+review), a numbered list, the Pietrek citation and her line recommending his
+books, the Ceylon arrack apology and the Characters preamble are all hers.
+§13.12's rule applies with full force — an agent ships a placeholder, never a
+sentence, and never polishes one of hers.
+
+**Section order is categories, then the "styles" she does not recognise, then
+Characters last** — her call, 2026-09-10, made to resolve "blackstrap" sitting
+on both of the last two lists. It stays on both (*"people say 'use a blackstrap
+rum' which isn't a thing (to me). And then given I'm using it as a character
+on the site, I need to list it as a character"*): the reader meets it as a
+not-a-style first, and in the retired list it carries her parenthetical *"(rum
+character not rum type)"*, rendered by lookup for any retired word that is
+also in `rum_characters`. **The tab and footer link say "rum categories" and
+the h1 says "My Philosophy of Rum", on purpose** — the label is wayfinding,
+the headline is voice; do not make them agree.
 
 **Two things it reads that no rule derives, so both are declared and both have
 guards:**
@@ -3113,7 +3126,10 @@ Demerara rum, lightly aged` has none since El Dorado 151 came off on 2026-09-05
 (*"I don't own it, I just wanted to"*). The generic stays because a drink still
 asks for it.
 
-**The prose is not the site's voice yet.** The retired-word reasons were written
-for the next Claude — they cite issue numbers and name YAML keys — and render in
-full at Helen's instruction (*"I'll copyedit when I get to it"*). That, and five
-short strings on the page, are tracked at **#784**. Do not polish them.
+**One placeholder is left on the page: the column heading "category"**,
+tracked at **#784**. The other two headings are hers — "examples" (#888) and
+"site display name" (2026-09-10, for the column that prints the shorter name a
+card uses where it differs from the category). "none in the house", for a
+category with no bottle, was deleted the same day (*"If we're not using them,
+delete them, boom"*); the empty third track is the honest rendering. Do not
+write a word into the one that remains.
