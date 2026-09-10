@@ -184,17 +184,44 @@
      THE NAV STAYS FIRST IN THE MARKUP. It is first in the tab order on purpose
      (§12), so its column is assigned in CSS rather than by moving it after the
      wordmark. {% endcomment %}
+  {% comment %} THE ROW IS THE DOOR TO THE OTHER SITE, CENTRED UNDER THE
+     WORDMARK -- Helen's own idea, 2026-09-10, chosen from a header-only
+     candidates page in three readings: "D: the other site, icon and word,
+     arrow on." Family looking at the site once had no reason to think the
+     small glass in the corner was a second site; a row that says
+     "[ COCKTAILS ] →" under "[ FOOD ]" does.
+
+     THE SITE YOU ARE ON IS NOT IN THE ROW. The tape above already names it,
+     and the same word twice, small under large, said nothing (the candidates
+     page showed it as C). So the loop skips `page.site_key`, and on a page
+     that belongs to no site (`site_neutral`, the about page) it shows every
+     site, because there nothing above says where you are.
+
+     THIS IS THE ONE PLACE THE SHARED HEADER'S OUTPUT VARIES BY SITE BESIDES
+     THE WORDMARK, and it varies by the same rule: it says where you are, or
+     rather where you are not. One template, one loop over sites.yml, no
+     per-site key; test_the_header_and_footer_are_identical_on_every_page
+     compares the row within a site and the footer across both, and says why.
+
+     THE ARROW IS A LINK'S ARROW, NOT A SWIPE. It reads "over there"; nothing
+     swipes, on a phone or anywhere. The about link left the row for the same
+     reason the row moved: it is not a site, so it sits alone at the right,
+     level with the row, a step larger than it was. {% endcomment %}
   <div class="site-header-inner">
     <nav class="site-nav-icons">
       {% for entry in site.data.sites %}
       {% assign nav_site = entry[1] %}
+      {% if entry[0] != page.site_key or page.site_neutral %}
       <a href="{{ nav_site.home | relative_url }}" class="site-nav-icon-link" aria-label="{{ nav_site.title }}">
         {% assign nav_icon_file = "icons/" | append: nav_site.icon | append: ".svg" %}
         {% include {{ nav_icon_file }} %}
+        <span class="site-nav-word">[ {{ nav_site.word }} ]</span>
+        <span class="site-nav-arrow" aria-hidden="true">&rarr;</span>
       </a>
+      {% endif %}
       {% endfor %}
-      <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
     </nav>
+    <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>

@@ -288,6 +288,34 @@ unless stated.
 
 ---
 
+- **2026-09-10 — THE NAV ROW IS THE DOOR TO THE OTHER SITE, and it is the
+  second thing the shared header varies per site.** Asked for an unseeded
+  design opinion before the family weekend, the first finding was that
+  nothing told a first-time visitor the small glass in the corner was a
+  second site: three same-weight icons, unlabelled, none marked current.
+  Two candidates pages later (labels under the icons; the other site's
+  bracketed word beside the wordmark) Helen brought her own idea — *"the icon
+  and e.g. [ food ] centrally under the wordmark, with an arrow pointing
+  right-wards... Then we would leave ?? on the right, possibly a little
+  larger"* — and asked for an honest read rather than a build. The read: the
+  arrow-as-swipe cue is the weak part (nothing swipes), and the current site's
+  word under a tape that already says it is the same word twice; the strong
+  version shows the OTHER site. A header-only page put three readings in front
+  of her, C (her site), D (the other site) and E (both), on both grounds.
+  **She chose D: *"the other site, icon and word, arrow on"*, with *"the ??
+  horizontally aligned with the new arrow line."*** Shipped the same night:
+  row 2 of the header grid, centred in the wordmark's column, `??` in column 3
+  of that row at 1.05rem, icons 24px, a `site_neutral` page showing every
+  site. **What this cost #374's guard**: the nav row is no longer
+  byte-identical across sites, and the test's own docstring had said such an
+  exception "wants arguing rather than accommodating". It was argued: the
+  template is still one loop over `sites.yml` with no per-site key, and the
+  output varies by the wordmark's own rule (it says where you are, from the
+  other side). The test now compares the row within a site and requires each
+  site's row to name the other and never itself. **What she declined the same
+  night**: a one-line question under the wordmark (*"What shall we cook?"*) —
+  *"No words under the wordmark section please."*
+
 ## §3 The three-layer rule
 
 - **2026-08-01** — The ingredient search confirmed as earning its

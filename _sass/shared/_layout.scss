@@ -105,6 +105,10 @@ main {
 .site-header-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
+  // TWO ROWS SINCE 2026-09-10: the wordmark, then the door to the other site
+  // centred beneath it, with `??` in the third column of that second row.
+  // Helen's idea, picked by looking (see default.html's comment on the row).
+  grid-template-rows: auto auto;
   align-items: end;
   max-width: $width-content;
   margin: 0 auto;
@@ -128,37 +132,47 @@ main {
 // tape SVGs", so if that height or the SVG's margins change, re-eyeball this by
 // hand rather than expecting it to follow.
 .site-nav-icons {
-  // BOTH ITEMS NAME THEIR ROW, and without it the header stacks. Grid
-  // auto-placement is SPARSE: it walks the items in DOM order and never moves
-  // its cursor backwards. The nav comes first and is pinned to column 3, which
-  // puts the cursor past column 3 of row 1 -- so the wordmark, asking for
-  // column 2, cannot be placed in row 1 at all and starts a second row. The
-  // result is the nav above the wordmark rather than beside it, which is
-  // exactly what it looked like: icons top-right.
+  // UNDER THE WORDMARK, CENTRED, SINCE 2026-09-10 -- row 2 of the header grid,
+  // in the wordmark's own column, so it is centred on the tape by construction.
+  // It sat in row 1 column 3 (top right, beside the wordmark) from #551 until
+  // then; the `grid-row: 1` both items carried was what kept sparse
+  // auto-placement from stacking them, and the wordmark still carries it.
   //
-  // `grid-row: 1` on both is the fix rather than `grid-auto-flow: dense`, which
-  // would also work and would leave the arrangement depending on the order two
-  // elements happen to appear in. This says where they go.
-  grid-row: 1;
-  grid-column: 3;
-  justify-self: end;
-  align-self: end;
-  margin-bottom: 0.5rem;
-  // AIR BETWEEN "??" AND THE PAGE EDGE -- Helen, 2026-08-30. The nav lines up
-  // with the content column's right edge, which is the alignment
-  // .site-header-inner's max-width exists to give it; at narrower viewports
-  // that edge IS very close to the page edge, because the column is then just
-  // the viewport less `main`'s own padding. So the row sat 24px from the glass
-  // with nothing between.
-  //
-  // A margin rather than more header padding: padding would move the wordmark
-  // too, and it is the nav that needed the room. The cost is stated rather than
-  // hidden -- the nav no longer lines up exactly with the content column's
-  // right edge, it sits $space-md inside it.
-  margin-right: $space-md;
+  // WHAT IS IN THE ROW: the OTHER site's icon, its bracketed word and an arrow
+  // -- Helen: "D: the other site, icon and word, arrow on." The site you are on
+  // is on the tape above and is not repeated here (default.html has the
+  // reasoning). On the about page, which belongs to no site, both appear.
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: center;
+  align-self: start;
+  margin: 0.9rem 0 0;
   display: flex;
   align-items: center;
-  gap: 1.4rem;
+  gap: 1.6rem;
+}
+
+// The row's own word and arrow. Courier in the site's own bracket device --
+// this IS naming a site from sites.yml, which is MANUAL 13.4.1's test for the
+// brackets -- at a size that reads as a row under the tape rather than a
+// second tape. `letter-spacing` is set explicitly on both because .site-header
+// carries 0.5em for the wordmark and everything in it inherits that.
+.site-nav-word {
+  margin-left: 0.55rem;
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.site-nav-arrow {
+  margin-left: 0.55rem;
+  font-family: $font-headings;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: normal;
 }
 
 // Centre track. NO `min-width: 0`, and that is the whole of issue #551's
@@ -222,7 +236,10 @@ main {
 // both sites move together and there is no second number to keep in step.
 .nav-icon {
   display: block;
-  height: 28px;
+  // 24px SINCE 2026-09-10, the size on the header candidates page Helen chose
+  // from: beside its word and under the tape the icon is one part of a row,
+  // not the row, and 28px shouted next to 0.8rem Courier.
+  height: 24px;
   width: auto;
 }
 
@@ -241,8 +258,20 @@ main {
 // question marks. Nothing else in the nav row needed this reset because
 // nothing else in the row is text -- the icons ignore letter-spacing entirely.
 .site-about-link {
+  // ALONE AT THE RIGHT, LEVEL WITH THE ROW, SINCE 2026-09-10. It is not a
+  // site, so it left the row when the row became the door to the other site;
+  // row 2, column 3 puts it on the row's line at the column's right edge --
+  // Helen: "the ?? should probably be horizontally aligned with the new arrow
+  // line" -- and `align-self: center` is what does the aligning. A step
+  // larger than the 0.8rem it was in the icon row, her call as well.
+  grid-row: 2;
+  grid-column: 3;
+  justify-self: end;
+  align-self: center;
+  // The same $space-md of air from the page edge the row used to carry.
+  margin: 0.9rem $space-md 0 0;
   font-family: $font-body;
-  font-size: 0.8rem;
+  font-size: 1.05rem;
   font-weight: 400;
   letter-spacing: normal;
 }
@@ -896,17 +925,16 @@ $tape-protrusion: 0.2rem;
     grid-column: 1;
   }
 
+  // The row is already in row 2 and centred at every width since 2026-09-10;
+  // in one column it only has to move from the wordmark's column to the one
+  // column there is. `??` joins it in the same cell, pinned to the right end,
+  // which is where it sits at full width too.
   .site-nav-icons {
-    grid-row: 2;
     grid-column: 1;
-    justify-self: center;
-    // Both margins reset. The bottom one lined the row up with the tape's ink
-    // when it sat BESIDE the wordmark; the right one held it off the page edge
-    // when it sat at the column's edge. Centred on its own line it wants
-    // neither -- and `justify-self: center` centres the MARGIN box, so a
-    // leftover right margin would push the icons visibly off-centre.
-    margin-bottom: 0;
-    margin-right: 0;
+  }
+
+  .site-about-link {
+    grid-column: 1;
   }
 
 }
