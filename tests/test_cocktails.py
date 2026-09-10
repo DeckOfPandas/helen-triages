@@ -7327,3 +7327,43 @@ def test_rum_groups_partition_the_styles():
         f"name is a placeholder in Helen's gift, but it must be a string the "
         f"page can print -- an empty heading renders as a gap."
     )
+
+
+def test_rum_adjacent_before_names_a_real_group():
+    """`rum_adjacent_before` must name a shelf, or a whole block leaves the page.
+
+    WHAT IT GUARDS. Helen, 2026-09-10 (#919): "render rum-adjacent section
+    before flavoured". The rum page walks `rum_groups` in order and renders the
+    Rum-adjacent block when the current shelf's name matches this key, so the
+    key is the block's POSITION -- and a Liquid `{% if %}` that never matches
+    fails silently. Cachaca, Batavia arrack and Ceylon arrack would simply stop
+    appearing, with every other check green.
+
+    WHY THE VALUE IS DECLARED RATHER THAN WRITTEN INTO THE TEMPLATE. Every other
+    name on that page is a lookup and not a literal -- the categories, the card
+    names, the shelves, the retired words. A literal "Flavoured" in the template
+    would break the same way on a rename, just without anywhere to put this test.
+
+    THE FAILURE IS A RENAME, not a typo, and that is why it is worth a test: the
+    person renaming a shelf is editing `rum_groups` and has no reason to look at
+    a key twenty lines further down.
+    """
+    vocab = _vocab()
+    groups = vocab.get("rum_groups") or []
+    target = vocab.get("rum_adjacent_before")
+
+    assert target, (
+        "rum_adjacent_before is missing or empty in "
+        "_data/cocktails/ingredients.yml.\n\n"
+        "cocktails/reference/rum-categories.html renders the Rum-adjacent block "
+        "only when a shelf's name matches it, so without a value the block -- "
+        "cachaca, Batavia arrack and Ceylon arrack -- renders nowhere."
+    )
+
+    names = [(g.get("name") or "").strip() for g in groups]
+    assert target in names, (
+        f"rum_adjacent_before is {target!r}, which names no shelf in "
+        f"rum_groups.\n\nThe shelves are:\n  " + "\n  ".join(names)
+        + "\n\nIf a shelf was renamed, this key needs the new name -- otherwise "
+          "the Rum-adjacent block silently stops rendering (#919)."
+    )

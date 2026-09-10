@@ -1,0 +1,54 @@
+{% comment %}
+  RUM-ADJACENT SUGARCANE SPIRITS — the block that sits between two of the rum
+  page's shelves rather than after all of them.
+
+  WHY IT IS AN INCLUDE AND NOT INLINE MARKUP. Helen, 2026-09-10 (#919): "render
+  rum-adjacent section before flavoured". Its position is declared as
+  `rum_adjacent_before` in _data/cocktails/ingredients.yml and the page walks
+  `rum_groups` in order, so this has to render from INSIDE that loop. The
+  alternatives were both worse: a second loop over the same shelves would
+  duplicate the row markup, and naming "Flavoured" in the template would put a
+  literal where every other name on that page is a lookup.
+
+  `cane_and_palm_spirits` is cachaça and Batavia arrack — in the rum FAMILY for
+  search and exclusion only, and not rum styles — plus Ceylon arrack, which is
+  `family_less`. They are here because the question the page answers ("is this
+  one of mine?") gets asked of them for the same reason it gets asked of the
+  fourteen.
+
+  Takes `ing` and `bottles` from the including page.
+{% endcomment %}
+<section class="ref-block ref-block--adjacent">
+  {% comment %} "Rum-adjacent" was Helen's on 2026-09-06, replacing the
+     placeholder "Next to rum, and not rum"; she made it "Rum-adjacent sugarcane
+     spirits" on 2026-09-10. An h3 like the shelf headings it sits among, under
+     the "Rum categories I recognise" h2. {% endcomment %}
+  <h3 class="ref-section-heading" id="adjacent"><span>Rum-adjacent sugarcane spirits</span></h3>
+
+  <ul class="rum-cats rum-cats--adjacent">
+    {% for style in include.ing.cane_and_palm_spirits %}
+      {% capture blob %}{% for pair in include.bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
+      {% assign bottle_names = blob | split: "||" %}
+      <li class="rum-cat">
+        <span class="rum-cat-name">{{ style }}</span>
+        <span class="rum-cat-card"></span>
+        {% if bottle_names.size > 0 %}
+        <ul class="rum-cat-bottles">
+          {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
+        </ul>
+        {% else %}
+        <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
+        {% endif %}
+        {% comment %} The `family_less` note (Ceylon arrack's reason for having
+           no family) rendered here until 2026-09-10 -- Helen: "delete whole note
+           on arrack on rum page" (#889). The reason stays in the data, where the
+           ingest reads it; Helen's own line below says it in her voice.
+        {% endcomment %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% comment %} Helen's line, 2026-09-10, with one typo fixed: she wrote "isn't a
+     strictly a rum". {% endcomment %}
+  <p class="ref-prose">Ceylon arrack isn't strictly a rum, but I'd feel bad about leaving it off my list.</p>
+</section>

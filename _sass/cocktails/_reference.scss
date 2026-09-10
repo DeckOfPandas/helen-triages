@@ -56,6 +56,33 @@ $ref-col-card:    minmax(6rem, 9rem);
   max-width: 34rem;
 }
 
+// HELEN'S OWN PROSE, 2026-09-10 — the rum page stopped being a bare table that
+// day and became a page with an argument on it. IN INK, not `$color-clear-text`:
+// `.ref-intro` was a one-line caption under a title and reads as a caption, and
+// these are the body of the page.
+//
+// THE MEASURE IS THE ONE THING THAT WAS WRONG WITH WHAT SHE WROTE. Unclassed
+// `<p>`s ran the full width of the window — her longest paragraph is 340
+// characters, which at desktop width is a single line you lose your place in.
+// 34rem is the cap `.ref-intro`, `.ref-note` and `.rum-retired-why` already use,
+// so this introduces no new number.
+.ref-prose {
+  color: $color-text;
+  max-width: 34rem;
+  margin: 0 0 $space-md;
+}
+
+// HER TWO `<hr>`s, 2026-09-10. She put them before the two biggest headings, so
+// they are doing the same job as `.ref-title-block`'s rule and take the same
+// treatment — 2px of absinthe — rather than a browser default bevel. No
+// `overlapping-rule-double` here: that mark belongs to a heading's text, and an
+// `<hr>` has none.
+.ref-divider {
+  border: 0;
+  border-top: 2px solid $color-electric-absinthe;
+  margin: $space-xl 0 0;
+}
+
 .ref-section-heading {
   font-size: 1.5rem;
   font-weight: 400;
@@ -68,6 +95,31 @@ $ref-col-card:    minmax(6rem, 9rem);
     display: inline;
     @include overlapping-rule-double($color-electric-absinthe, $color-ultra-violette);
   }
+}
+
+// THE SECOND TIER, ADDED 2026-09-10 WITH HELEN'S RESTRUCTURE. Her page has three
+// top-level sections ("Rum categories I recognise", "Addendum: Rum Characters",
+// "Rum 'styles' I do not recognise") and the five rum shelves now sit INSIDE the
+// first of them, so there are two ranks of heading where there was one.
+//
+// SIZE AND SPACE ONLY, DELIBERATELY: same hues, same mark. A second mark or a
+// second colour would be a new visual decision and those are Helen's (§13.12).
+//
+// 2rem, NOT THE 1.8rem THIS FIRST SHIPPED AS, and the correction came from
+// looking rather than reasoning (MANUAL §1: "looking is cheaper than
+// reasoning"). At 1.8 against the shelves' 1.5 the two ranks read as one rank on
+// the built page: the tape underline is the loudest thing about a heading here
+// and it is identical on both, so a 0.3rem step disappears underneath it. 2rem
+// puts the major tier nearer the 2.2rem title than the shelves, which is where
+// it belongs — these three ARE the page's sections and the shelves are inside
+// one of them.
+//
+// The space above does as much work as the size. $space-xxl separates a section
+// from the one before it; the shelves' own 2.25rem separates a row block from
+// its heading.
+.ref-section-heading--major {
+  font-size: 2rem;
+  margin-top: $space-xxl;
 }
 
 // =============================================================================
@@ -161,40 +213,89 @@ $ref-col-card:    minmax(6rem, 9rem);
   font-style: italic;
 }
 
-// Ceylon arrack's `family_less` reason, and anything else the data records
-// against a row. Full width beneath the three tracks.
-.rum-cat-note {
-  grid-column: 1 / -1;
-  margin: $space-xs 0 0;
-  color: $color-clear-text;
-  font-size: 0.84rem;
-  max-width: 34rem;
-}
+// `.rum-cat-note` WAS HERE AND IS GONE, 2026-09-10. It styled Ceylon arrack's
+// `family_less` reason under its row; #889 deleted that note from the page
+// ("delete whole note on arrack on rum page") and Helen's own sentence replaced
+// it outside the list, so nothing emitted the class any more. Removed rather than
+// left: CSS for markup that no longer exists is the kind of thing the next reader
+// trusts as evidence the markup does.
 
 // =============================================================================
 // CHARACTERS AND RETIRED WORDS
 // =============================================================================
-.rum-chars {
+// ONE PER LINE WITH A MARK IN THE GUTTER, BORROWED FROM THE ABOUT PAGE —
+// Helen, 2026-09-10 (#920): "borrow list format from about page". That page's
+// three lists (`about-enum`, `about-enum-sub`, `about-ways`) all draw their own
+// mark in a left gutter in `$font-headings`, and its own comment says why they
+// are one treatment: "Extended rather than repeated so the three lists cannot
+// drift apart -- which is the entire effect."
+//
+// THE IDIOM IS BORROWED, NOT THE CLASSES, and that is forced rather than chosen.
+// `about-enum` is scoped to `article.recipe .recipe-body-content.about-page`
+// because it has to out-specify food's longform recipe styling — the same reason
+// this file exists at all (see the header). So the pattern is re-drawn here, in
+// this page's own colours.
+//
+// THE MARK IS `$color-clear-text`, NOT A HUE. This page spends exactly one
+// colour and it means "bottle" (see the header); a character is not a bottle, and
+// inventing a second hue is Helen's call, not this file's.
+$ref-list-gutter: 1.3rem;
+
+@mixin ref-marked-list($mark) {
   list-style: none;
   margin: $space-md 0 0;
   padding: 0;
+
+  > li {
+    position: relative;
+    padding-left: $ref-list-gutter;
+    margin-bottom: $space-xs;
+    max-width: calc(34rem + #{$ref-list-gutter});
+
+    // `line-height: inherit`, NOT the `1` this first shipped as, and the
+    // difference was visible rather than reasoned (a 2x crop, MANUAL §1).
+    // An absolutely-positioned box with no `top` takes the top of the LINE BOX;
+    // at `line-height: 1` against the body's 1.65 that floated the arrow up
+    // near the cap line of the word, clear of the text it belongs to. Sharing
+    // the item's line-height puts the two on one baseline.
+    //
+    // The about page reaches the same place from the other side -- it sets an
+    // explicit `top` and then nudges its arrow up 0.05rem, because "an arrow is
+    // centred on the x-height where a numeral sits on the baseline". It has
+    // numerals AND arrows to reconcile; this list has only arrows, so inheriting
+    // the line-height is the simpler half of the same fix.
+    &::before {
+      content: $mark;
+      position: absolute;
+      left: 0;
+      font-family: $font-headings;
+      font-weight: 700;
+      line-height: inherit;
+      color: $color-clear-text;
+    }
+  }
 }
 
-.rum-char {
-  display: inline;
-
-  &::after {
-    content: ", ";
-  }
-
-  &:last-child::after {
-    content: "";
-  }
+// WAS A COMMA-SEPARATED RUN until 2026-09-10, and the change is Helen's list
+// ruling rather than a preference: there are four characters, she introduces them
+// with "These words are useful to me:", and a colon followed by an inline
+// sentence reads as prose where she wrote a list.
+.rum-chars {
+  @include ref-marked-list("→");
 }
 
 // A definition list, because that is what it is: the word, and what to do about
-// it. The reasons are Helen's own, from `retired_rum_styles`, and they are long
-// — a couple of sentences each — so the word sits above rather than beside.
+// it. The word sits above rather than beside because the line under it is a
+// sentence, not a label.
+//
+// WHERE THE LINE COMES FROM CHANGED ON 2026-09-10 and this comment said the old
+// thing: it used to read "The reasons are Helen's own, from `retired_rum_styles`,
+// and they are long — a couple of sentences each". Both halves are now wrong.
+// #784 took those reasons off the page — they were written for the next Claude,
+// citing issue numbers and YAML keys — and the line now comes from
+// `_data/cocktails/rum_page.yml`, one key per word, which Helen fills in. An
+// empty one renders no `<dd>` at all, so the word stands alone rather than
+// wearing a placeholder.
 .rum-retired {
   margin: $space-md 0 0;
 }
@@ -245,5 +346,15 @@ $ref-col-card:    minmax(6rem, 9rem);
 
   .rum-cat--head {
     display: none;
+  }
+
+  // THE MAJOR HEADINGS COME DOWN, seen at 390px rather than assumed. At 2rem
+  // "Rum "styles" I do not recognise" takes three lines and the tape rule draws
+  // under every one of them, so the mark stops reading as one heading's
+  // underline and starts reading as three stripes. 1.5rem takes it to two lines.
+  //
+  // The shelves are left alone: they are one or two words and already fit.
+  .ref-section-heading--major {
+    font-size: 1.5rem;
   }
 }

@@ -620,6 +620,18 @@ rum_groups:
       - "pineapple rum"
       - "coconut rum"
 
+# WHERE THE RUM PAGE PUTS ITS "Rum-adjacent sugarcane spirits" BLOCK: the name of
+# the shelf it renders immediately BEFORE. Helen, 2026-09-10 (#919): "render
+# rum-adjacent section before flavoured". Cachaça, Batavia arrack and Ceylon
+# arrack read as near-rum in a way pineapple and coconut rum do not, so the
+# flavoured pair is the right thing to end on.
+#
+# DECLARED RATHER THAN WRITTEN INTO THE TEMPLATE, for the reason every other name
+# on that page is a lookup and not a literal: renaming this shelf would otherwise
+# move the block silently back to the end of the page, with nothing noticing.
+# `test_rum_adjacent_before_names_a_real_group` is what holds that.
+rum_adjacent_before: "Flavoured"
+
 # Permitted WITHOUT a style per #314, because nothing generalises them.
 #
 # BLACKSTRAP USED TO BE HERE AND IS NOT ANY MORE. Helen closed the question on

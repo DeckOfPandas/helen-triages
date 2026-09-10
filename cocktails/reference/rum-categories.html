@@ -48,16 +48,29 @@ published: false
   `not_reached_for` on 2026-09-05 ("I don't own it, I just wanted to"). The
   generic stays because a drink still asks for it. Do not repopulate the row.
 
-  MOST OF THE COPY HERE IS STILL A PLACEHOLDER AND IS HELEN'S TO WRITE — the
-  same status as the units line (#753) and the bitters caveat (#713), and
-  tracked at #784. That covers the intro, the three column headings, "none in
-  the house", and the sentences introducing the characters, the sipping shelf
-  and the retired words. What each must CONVEY is fixed; the words are not. Do
-  not polish them into house voice.
+  MOST OF THE COPY IS HELEN'S NOW, 2026-09-10, AND NONE OF IT IS TO BE POLISHED
+  (§13.12). She wrote the title, the four opening paragraphs, the Pietrek
+  citation, the Ceylon arrack line, the two Characters paragraphs and all three
+  top-level headings. What an agent changed in them is listed at each site and
+  amounts to: a class, an indent, one `<h1 <span>` that was malformed, and the
+  typo "isn't a strictly a rum". Her straight quotes and her "--" stand: no page
+  on this site uses curly quotes or an em dash in prose.
 
-  THE HEADINGS ARE NOT AMONG THEM ANY MORE. All five section names and
-  "Rum-adjacent" are Helen's own, given 2026-09-06; the two that were mine
-  ("By age", "Next to rum, and not rum") she replaced the same day.
+  WHAT IS STILL A PLACEHOLDER, AND IT IS A SHORT LIST NOW: the three column
+  headings ("category", "on a card" — "examples" is hers, #888), "none in the
+  house", and the seven per-word lines in `_data/cocktails/rum_page.yml`, which
+  are empty and render nothing until she writes them. Tracked at #784, #921.
+
+  THE SIPPING SHELF IS GONE FROM THIS PAGE, 2026-09-10, Helen's own deletion.
+  `bottles.yml`'s `sipping` block is therefore rendered NOWHERE on the site —
+  #782's list still exists in the data and has no reader. No test covered it, so
+  nothing went red.
+
+  TWO RANKS OF HEADING SINCE 2026-09-10. Her three top-level sections are h2
+  `--major`; the five rum shelves and Rum-adjacent sit inside the first of them
+  and are h3. All of those names are hers — five from 2026-09-06, the rest from
+  2026-09-10; the two that were an agent's ("By age", "Next to rum, and not rum")
+  she replaced the same day she first saw them.
 
   RUM ONLY, deliberately, which is the issue's own scope. `bottles.yml` stopped
   being rum-only on 2026-08-30 and now holds 127 bottles across every family,
@@ -76,19 +89,41 @@ published: false
 
   <div class="ref-body">
 
-    <p>I really really like rum.</p>
+    {% comment %} HELEN'S WORDS, 2026-09-10, and they are not to be polished
+       (§13.12). Two changes, both forced rather than chosen:
 
-    <p>My rum philosophy cares about only two things: 1. How a rum tastes, which informs 2. how to use it in a cocktail.</p>
+       THE CLASS, which caps the measure at the 34rem the rest of this page
+       already uses. Unclassed, her longest paragraph is 340 characters running
+       the full width of a desktop window.
 
-    <p>What colour a rum is tells me very little about how a rum tastes. Boring trainspotting facts like "pot still" or "made in a distillery owned by this particular old white guy" don't interest me at all, and, again, tell me very little about how a rum tastes. The history of Caribbean colonialism also tells me -- wait for it -- very little about how a rum tastes.</p>
+       AND THE EM DASHES, which `test_prose_page_typography` requires: "--" is a
+       double hyphen and the house rule is "—". Her straight QUOTES are
+       untouched and correct -- that test has no quote rule and no page on this
+       site uses curly ones. An earlier version of this comment claimed the same
+       of dashes, on the strength of having checked quotes and generalised; the
+       suite said otherwise, which is what the suite is for.
+    {% endcomment %}
+    <p class="ref-prose">I really really like rum.</p>
 
-    <p>And if you don't care how a drink tastes, why on earth are you going to all the sticky, impractical effort of making mixed drinks?</p>
+    <p class="ref-prose">My rum philosophy cares about only two things: 1. How a rum tastes, which informs 2. how to use it in a cocktail.</p>
 
-    <hr>
+    <p class="ref-prose">What colour a rum is tells me very little about how a rum tastes. Boring trainspotting facts like "pot still" or "made in a distillery owned by this particular old white guy" don't interest me at all, and, again, tell me very little about how a rum tastes. The history of Caribbean colonialism also tells me — wait for it — very little about how a rum tastes.</p>
 
-    <h1>Rum categories I recognise</h1>
+    <p class="ref-prose">And if you don't care how a drink tastes, why on earth are you going to all the sticky, impractical effort of making mixed drinks?</p>
 
-        <p>The below is almost identical to the classification system by Matt Pietrek of Minimalist Tiki (<a href="https://cocktailwonk.com/2023/06/nine-essential-tiki-rum-styles.html">2023</a>, which updates <a href="https://cocktailwonk.com/2019/10/six-essential-tiki-rum-categories.html">2019</a>).</p>
+    <hr class="ref-divider">
+
+    {% comment %} An h2, not the h1 Helen typed: the page's h1 is its title, and
+       this heading is the parent of the five shelf headings below, which drop to
+       h3 to keep the hierarchy honest. `--major` is what makes it read as the
+       bigger of the two tiers. {% endcomment %}
+    <h2 class="ref-section-heading ref-section-heading--major" id="categories"><span>Rum categories I recognise</span></h2>
+
+    <p class="ref-prose">The below is almost identical to the classification
+      system by Matt Pietrek of Minimalist Tiki
+      (<a href="https://cocktailwonk.com/2023/06/nine-essential-tiki-rum-styles.html">2023</a>,
+      which updates
+      <a href="https://cocktailwonk.com/2019/10/six-essential-tiki-rum-categories.html">2019</a>).</p>
 
 
     {% comment %} ── THE CATEGORIES, IN HELEN'S SECTIONS ─────────────────────
@@ -110,12 +145,19 @@ published: false
        scans, and column labels three screens up label nothing.
     {% endcomment %}
     {% for group in ing.rum_groups %}
+      {% comment %} THE RUM-ADJACENT BLOCK RENDERS BEFORE ONE NAMED
+         SHELF, not after all of them -- Helen, 2026-09-10 (#919):
+         "render rum-adjacent section before flavoured". Which shelf is
+         `rum_adjacent_before` in ingredients.yml, so renaming a shelf
+         cannot move this silently back to the end of the page.
+      {% endcomment %}
+      {% if group.name == ing.rum_adjacent_before %}{% include cocktails/rum-adjacent.html ing=ing bottles=bottles %}{% endif %}
       {% comment %} ALL FIVE HEADINGS ARE HELEN'S OWN WORDS. Four came from the
          brief; `Non-geographical` replaced the "By age" placeholder on
          2026-09-06, and `rum_groups`' own note in ingredients.yml records why
          it is the better name — it states the membership rule where "By age"
          only named the sort order. {% endcomment %}
-      <h2 class="ref-section-heading" id="group-{{ group.name | slugify }}"><span>{{ group.name }}</span></h2>
+      <h3 class="ref-section-heading" id="group-{{ group.name | slugify }}"><span>{{ group.name }}</span></h3>
 
       <ul class="rum-cats">
 
@@ -161,38 +203,6 @@ published: false
        here because the question this page answers ("is this one of mine?")
        gets asked of them for the same reason it gets asked of the fourteen.
     {% endcomment %}
-    <section class="ref-block ref-block--adjacent">
-    {% comment %} "Rum-adjacent" is Helen's, 2026-09-06, replacing the
-       placeholder "Next to rum, and not rum". {% endcomment %}
-    <h2 class="ref-section-heading" id="adjacent"><span>Rum-adjacent sugarcane spirits</span></h2>
-
-    <ul class="rum-cats rum-cats--adjacent">
-      {% for style in ing.cane_and_palm_spirits %}
-        {% capture blob %}{% for pair in bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-        {% assign bottle_names = blob | split: "||" %}
-        <li class="rum-cat">
-          <span class="rum-cat-name">{{ style }}</span>
-          <span class="rum-cat-card"></span>
-          {% if bottle_names.size > 0 %}
-          <ul class="rum-cat-bottles">
-            {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
-          </ul>
-          {% else %}
-          <span class="rum-cat-bottles rum-cat-bottles--none">none in the house</span>
-          {% endif %}
-          {% comment %} The `family_less` note (Ceylon arrack's reason for
-             having no family) rendered here until 2026-09-10 -- Helen: "delete
-             whole note on arrack on rum page" (#889). The reason stays in the
-             data, where the ingest reads it; the page is a list of what is in
-             the house, not why. {% endcomment %}
-        </li>
-      {% endfor %}
-    </ul>
-
-    <p>Ceylon arrack isn't a strictly a rum, but I'd feel bad about leaving it off my list.</p>
-
-    </section>
-
     <section class="ref-block ref-block--characters">
     {% comment %} ── CHARACTERS ──────────────────────────────────────────────
        `rum_characters` is a separate field from `generic` and never replaces
@@ -201,12 +211,15 @@ published: false
        Here because a card can show one and the page would otherwise have
        nothing to say about the word.
     {% endcomment %}
-    <h2 class="ref-section-heading" id="characters"><span>Addendum: Rum Characters</span></h2>
+    <h2 class="ref-section-heading ref-section-heading--major" id="characters"><span>Addendum: Rum Characters</span></h2>
 
-    {% comment %} No subtitle -- Helen, 2026-09-10 (#891): "delete subtitle
-       under 'characters'". {% endcomment %}
-       <p>I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
-       <p>These words are useful to me:</p>
+    {% comment %} THE SUBTITLE DELETED IN #891 WAS AN AGENT'S PLACEHOLDER; THESE
+       TWO PARAGRAPHS ARE HELEN'S OWN, written 2026-09-10, and are not the same
+       thing coming back. Only the indentation and the class changed -- they were
+       indented seven spaces, inside nothing. {% endcomment %}
+    <p class="ref-prose">I find it useful to note when a recipe leans on a rum for a particular taste component. Character is not inherent to a bottle. It's just a request from a recipe, which can then be satisfied (or not).</p>
+
+    <p class="ref-prose">These words are useful to me:</p>
     <ul class="rum-chars">
       {% for ch in ing.rum_characters %}<li class="rum-char">{{ ch }}</li>{% endfor %}
     </ul>
@@ -229,9 +242,16 @@ published: false
        silently dropping a real retired word.
     {% endcomment %}
 
-    <hr>
+    <hr class="ref-divider">
 
-    <h1 <span>Rum "styles" I do not recognise</span></h1>
+    {% comment %} Helen's heading, 2026-09-10, replacing "Not categories". Two
+       mechanical fixes to what she wrote, and nothing else: it was `<h1 <span>`,
+       a stray `<` that leaves the tag unclosed and swallows the span, and it is
+       an h2 because the page already has one h1 (the title). The `id` is hers
+       from before -- nothing links to it yet, but every other heading here has
+       one. Her straight quotes are kept: no page on this site uses curly ones.
+    {% endcomment %}
+    <h2 class="ref-section-heading ref-section-heading--major" id="not-categories"><span>Rum "styles" I do not recognise</span></h2>
 
     {% comment %} THE REASONS ARE OFF THE PAGE, 2026-09-10 (#784). They were
        `retired_rum_styles`' own text, written for the next Claude -- issue
