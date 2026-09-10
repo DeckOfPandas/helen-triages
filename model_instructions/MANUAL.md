@@ -247,7 +247,14 @@ never shows it and `git add` here cannot capture it. It is a separate, private
 history. Do not "fix" the missing tracking and do not report draft edits as
 at-risk work in this repo. `git remote -v` in `_food_drafts/` tells you which
 remote a clone points at (the food repo was renamed on 2026-08-29 and GitHub
-redirects the old name silently).
+redirects the old name silently). **This exact command printed
+`AGENT_GH_TOKEN` in full on 2026-09-10**, on a clone whose remote had the
+token built into the URL by hand — see §9.1's HTTPS clone paragraph. It is
+safe to run again now that clones use the credential helper instead, and
+`.claude/hooks/guard-token-expansion.py` refuses the old shape outright, but
+if a `git remote -v` on any repo ever again shows `:` and `@` around
+something that isn't a plain username, stop and say so before running it a
+second time.
 
 ### 2.2 Shared versus forked
 
@@ -1029,18 +1036,44 @@ so it reaches the private remote from anywhere:
     git clone git@github.com:DeckOfPandas/helen-triages-cocktails-private.git _cocktail_drafts
 
 **Inside the devcontainer that form dies** (`Host key verification failed`,
-no host key in the image — `CLAUDE.md` Git workflow step 1a), so clone over
-HTTPS as the agent account, through the wrapper that keeps the token's name
-out of the call site:
+no host key in the image — `CLAUDE.md` Git workflow step 1a; measured in a
+plain host worktree too, 2026-09-10), so clone over HTTPS as the agent
+account, through the wrapper:
 
     sh scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts
 
-Two things about the nested clone from there. `scripts/git-push-agent.sh`
-pushes the CWD's repo, so a branch of the nested clone is pushed by the same
-URL shape with `git -C _cocktail_drafts push ...` in a `tmp/` script (a leading
-`cd` is refused). And **`git -C <dir> commit -F <path>` resolves the path
-relative to `<dir>`**, so `-F tmp/msg.txt` fails with "could not read log
-file"; pass the absolute path. Both measured 2026-09-10.
+**THE THREE GIT WRAPPERS ARE THE ONLY WAY TO TALK TO A REMOTE OVER HTTPS, AND
+THE REASON IS NOT ONLY THAT THEY KEEP THE TOKEN'S NAME OUT OF THE CALL SITE.**
+Each one takes a PLAIN url and passes `scripts/git-credential-agent-token.sh`
+to git for that one invocation (`-c credential.helper=…`, absolute path
+resolved from the script's own location). Git asks the helper at the moment it
+authenticates, the helper reads `AGENT_GH_TOKEN` from the environment and
+answers on a pipe, and the token is never in a URL and never on disk. So a
+clone's `origin` is a plain URL, and `git remote -v` can print it all day.
+
+    sh scripts/git-clone-agent.sh <repo> [dir]
+    sh scripts/git-fetch-agent.sh <dir> <repo> [ref]
+    sh scripts/git-push-agent.sh <refspec> [repo] [dir]
+
+`dir` on the push wrapper is the checkout to push FROM — a nested drafts clone,
+say — and defaults to the current directory. A bare `git -C _cocktail_drafts
+fetch origin` has no credential and fails; that is correct, use the wrapper.
+
+**NEVER `git config credential.helper`, in any repo, and least of all this
+one.** The first version of the helper said to configure it per repo, and the
+session that built it did so in `/workspace/.git/config` — which the primary
+checkout and every worktree share. Git runs a configured helper from each
+worktree's own top level, the file existed on one branch only, and every push
+from every other worktree printed `sh: 0: cannot open
+scripts/git-credential-agent-token.sh: No such file` — tolerated by git while
+the token was still in the URL, and a hard auth failure the moment it wasn't.
+Measured 2026-09-10 from an unrelated worktree; the entry was removed the
+same day. Per invocation depends on nothing but the checkout the wrapper runs
+from.
+
+**And `git -C <dir> commit -F <path>` resolves the path relative to `<dir>`**,
+so `-F tmp/msg.txt` from the project root fails with "could not read log
+file"; pass the absolute path. Measured 2026-09-10.
 
 A worktree starts blind, and `tests/test_cocktails.py` skips the tests that
 read a drink, reporting green. A symlink half-works (the Edit/Write tools
@@ -1048,6 +1081,17 @@ refuse it and writes land in Helen's tree); a copy goes stale silently. **Clone
 freely to READ; while a promotion batch is open there is ONE working copy to
 WRITE** — `PUBLISHING_A_DRINK.md`. The food repo is
 `helen-triages-food-private`, same command.
+
+**THE TRAP THE HELPER REPLACES, MEASURED 2026-09-10.** Building the URL by
+hand with the token in its userinfo also works, but git then stores that URL —
+token included — as the clone's `origin` remote in `.git/config`. Every later
+command that surfaces a remote URL (`git remote -v`, `git remote show`, `git
+config -l`, `cat .git/config`, some git error messages) then prints the token
+in plain text, which is exactly what happened: a routine `git remote -v`, run
+for the reason this section gives below, printed one in full, and the token
+had to be rotated. `.claude/hooks/guard-token-expansion.py` now refuses the
+embedded-URL shape outright, in a command or in a script file it runs, so the
+old shape cannot come back through a `tmp/` script either.
 
 **Always `git fetch` immediately before any run whose result you will act
 on** — before reporting a failure, before calling a change safe, before
@@ -1074,8 +1118,11 @@ checked-out branch anyway.
 TOKEN**: `gh-agent.sh` (the API), `git-clone-agent.sh`, `git-fetch-agent.sh`,
 `git-push-agent.sh`. A command with a secret's name in it is indistinguishable
 from a leak until a human has run the rule in their head, and Helen should not
-have to (`CLAUDE.md`). If you find yourself typing an HTTPS-with-token URL, the
-wrapper you want either exists or is the fifth one.
+have to (`CLAUDE.md`). The three git ones also never put the token in a URL —
+they pass `git-credential-agent-token.sh` per invocation, see above — so a
+clone's `origin` can be printed without consequence. If you find yourself
+typing an HTTPS-with-token URL, stop: the hook refuses it, and the wrapper you
+want either exists or is the fifth one.
 
 A stale clone's symptom is worth knowing on sight: a handful of
 `test_cocktails.py` failures naming real drinks, which reads exactly like a
@@ -2638,6 +2685,14 @@ close the public issue by hand.
 
 **You will loop a collection that `output: false` did not empty.** §9.1.
 
+**You will write a media block before the rule it overrides, and it will
+never render.** Equal specificity, later wins: a `@media (max-width: 600px)`
+block that sets `.cocktail-glass-icon { width: 4.5rem }` above a
+`.cocktail-glass-icon { width: 7rem }` four hundred lines below it is a
+comment, not a rule. It shipped that way for a morning (#942). Put a
+narrow-width override AFTER the rule it changes, or nest it inside; and
+measure the box at the width in question, which is what found it.
+
 **You will check one element's width and call the row safe.** Overflow is a
 property of the ROW; three sub-320px tracks side by side overflow a phone.
 The site has media queries (three, counting print).
@@ -3080,10 +3135,23 @@ unneeded scaffolding."* The `<dl>` became a `<ul>` with it — a definition list
 whose definitions can never exist is a promise the markup cannot keep. All of it
 is in git history if it is ever wanted back.
 
-**The page carries Helen's voice now**, not just her data: a title, four opening
-paragraphs, a numbered list, two citations and the Characters preamble are all
-hers. §13.12's rule applies with full force — an agent ships a placeholder,
-never a sentence, and never polishes one of hers.
+**The page carries Helen's voice now**, not just her data: a title, five opening
+paragraphs (the fifth, what rum tastes like, written 2026-09-10 after the copy
+review), a numbered list, the Pietrek citation and her line recommending his
+books, the Ceylon arrack apology and the Characters preamble are all hers.
+§13.12's rule applies with full force — an agent ships a placeholder, never a
+sentence, and never polishes one of hers.
+
+**Section order is categories, then the "styles" she does not recognise, then
+Characters last** — her call, 2026-09-10, made to resolve "blackstrap" sitting
+on both of the last two lists. It stays on both (*"people say 'use a blackstrap
+rum' which isn't a thing (to me). And then given I'm using it as a character
+on the site, I need to list it as a character"*): the reader meets it as a
+not-a-style first, and in the retired list it carries her parenthetical *"(rum
+character not rum type)"*, rendered by lookup for any retired word that is
+also in `rum_characters`. **The tab and footer link say "rum categories" and
+the h1 says "My Philosophy of Rum", on purpose** — the label is wayfinding,
+the headline is voice; do not make them agree.
 
 **Two things it reads that no rule derives, so both are declared and both have
 guards:**
@@ -3113,7 +3181,10 @@ Demerara rum, lightly aged` has none since El Dorado 151 came off on 2026-09-05
 (*"I don't own it, I just wanted to"*). The generic stays because a drink still
 asks for it.
 
-**The prose is not the site's voice yet.** The retired-word reasons were written
-for the next Claude — they cite issue numbers and name YAML keys — and render in
-full at Helen's instruction (*"I'll copyedit when I get to it"*). That, and five
-short strings on the page, are tracked at **#784**. Do not polish them.
+**One placeholder is left on the page: the column heading "category"**,
+tracked at **#784**. The other two headings are hers — "examples" (#888) and
+"site display name" (2026-09-10, for the column that prints the shorter name a
+card uses where it differs from the category). "none in the house", for a
+category with no bottle, was deleted the same day (*"If we're not using them,
+delete them, boom"*); the empty third track is the honest rendering. Do not
+write a word into the one that remains.

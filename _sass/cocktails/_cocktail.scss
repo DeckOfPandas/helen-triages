@@ -662,25 +662,13 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 @media (max-width: 600px) {
   .cocktail-meta { grid-template-columns: 1fr; }
 
-  // THE HEAD ON A PHONE, 2026-09-10, seen in a real browser for the first time
-  // (#895 was "shipped unverified"; this is the verification). At 390px the
-  // 7rem glass and its 3rem gap took 160px and left the words 198px, so a
-  // title like ARRACK CHRISTMAS PUNCH (WIFE #3) at 2.6rem wrapped to five
-  // lines beside a drawing taller than all of them. The long-title fix itself
-  // held: nothing overflowed, it just had no room. Smaller glass, smaller gap,
-  // smaller tape: the words get 280px and the title steps down one size, the
-  // same size the drink page's section headings are.
-  .cocktail-title-block {
-    padding-left: calc(4.5rem + #{$space-lg});
-  }
-
-  .cocktail-glass-icon {
-    width: 4.5rem;
-  }
-
-  .cocktail-title-block .drink-card-name {
-    --card-name-size: 2rem;
-  }
+  // THE HEAD ON A PHONE LIVES BELOW `.cocktail-glass-icon` NOW -- #942. The
+  // block that sat here on 2026-09-10 set the glass to 4.5rem, and the glass's
+  // own rule, 400 lines further down and equally specific, set it straight back
+  // to 7rem: the override never rendered, the 112px drawing sat in an 88px
+  // reservation, and every drink page on a phone drew its glass over the tape
+  // and the tagline. A media block only wins if it comes AFTER the rule it is
+  // overriding, so the phone head is written beside the rules it changes.
 }
 
 // SHIP IT? reuses the card's own `.drink-card-ship-icon`/`-word`, filled by
@@ -1080,6 +1068,144 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // one least able to afford being full height.
     max-width: 100%;
     overflow: visible;
+  }
+}
+
+// =============================================================================
+// THE HEAD ON A PHONE -- #942, 2026-09-10
+// =============================================================================
+// Written here, after `.cocktail-glass-icon`, because a media block placed
+// before the rule it overrides loses to it (see the note in the 600px block
+// above, where the first attempt sat and never rendered).
+//
+// WHAT WAS WRONG, measured at 390px rather than reasoned: the glass column was
+// 112px inside an 88px reservation, so the drawing crossed the tape; and the
+// column ran the full height of the head -- title, tagline, three stacked
+// facts, chips, 574px on the Bellini -- so a flute stood beside a paragraph and
+// a mug floated over the tagline. A 7rem column beside 342px of page is a
+// desktop layout squeezed, not a phone layout.
+//
+// THE SHAPE NOW: the head is a two-column grid and only ONE row has two
+// columns. The tape and the tagline run the full width, so a title gets the
+// whole 342px and wraps to half the lines it did; the glass sits beside the
+// GLASS / GARNISH / SHIP IT? facts, which on a phone are a short stack with an
+// empty right-hand side, and is as tall as that stack -- so `--glass-fill`
+// still decides that a flute is taller than an old fashioned, against the same
+// box on every drink. The chips run full width again beneath.
+//
+// `display: contents` on `.cocktail-head-words` is what lets the grid place the
+// words' children directly; it is a plain block with no styling of its own
+// (see its rule), so nothing is lost. The glass and the meta are placed on an
+// EXPLICIT row so that a drink with no tagline, or `make it` hiding it, leaves
+// an empty zero-height row rather than pulling the glass up beside the tape.
+//
+// THE TAPE'S LEFT BLEED IS CANCELLED HERE. It bleeds 1.05em left so that the
+// LETTERING lands on the column's edge (_cards.scss); with no glass column to
+// bleed into it would run 10px past the page's own padding and scroll the
+// page sideways -- the exact fault #899 fixed everywhere else.
+@media (max-width: 600px) {
+  .cocktail-title-block {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    column-gap: $space-lg;
+    row-gap: 0;
+    padding-left: 0;
+    min-height: 0;
+  }
+
+  // No glass, no column: the words simply stack as a block.
+  .cocktail-title-block--no-glass { display: block; }
+
+  .cocktail-head-words { display: contents; }
+
+  .cocktail-title-row,
+  .cocktail-tagline,
+  .cocktail-chips { grid-column: 1 / -1; }
+
+  .cocktail-meta {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  // THE DRAWING MUST NOT SIZE ITS OWN ROW. As a grid item the glass box is as
+  // tall as the facts beside it -- but a replaced element's percentage height
+  // is `auto` while the row is being sized, so the svg contributed its
+  // intrinsic height at the column's width (a flute is 257px tall at 72px
+  // wide) and the row grew to fit it, spreading the three facts down a taller
+  // box. Taking the svg out of flow inside its box means the row is sized by
+  // the facts alone, and the percentage then resolves against a box that is
+  // definite by the time the svg is placed. `inset: 0; margin: auto` centres
+  // it both ways, which is what the flex centring did at every other width.
+  .cocktail-glass-icon {
+    position: relative;
+    grid-column: 1;
+    grid-row: 3;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    min-height: 0;
+    align-self: stretch;
+
+    svg {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+    }
+  }
+
+  .cocktail-title-block .drink-card-name {
+    --card-name-size: 2rem;
+  }
+
+  // Both bleeds, in fact: the right one runs into a card's own padding on the
+  // index, and here into the page's, which at 360px is the viewport's edge --
+  // Cobra's Fang measured 370px wide on a 360px screen with only the left
+  // bleed cancelled. The tape ends on the column at both ends.
+  .cocktail-title-block .drink-card-tape {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
+
+// THE TAPE BAND ON A WRAPPED TITLE -- #942's second half, and it is not a
+// phone problem, it is a long-title problem that phones make common.
+//
+// Every tape SVG paints its band from 16.47% to 87.06% of its own height (the
+// polygon in assets/img/chrome/tape/*.svg: y 28 to 148 of 170), and the
+// background is stretched to the tape's box. So the band is always 70.59% of
+// the box, whatever the box holds. One line of type at line-height 1 plus
+// this page's 0.5em of padding each side (the scoped `.drink-card-tape` rule
+// above) is a 2em box and a 1.412em band: 0.206em of tape above and below the
+// capitals, which is the object Helen approved. Four wrapped lines at
+// line-height 1.12 are a 5.48em box and a 3.87em band -- SHORTER than the
+// 4.48em of lettering, so the capitals stand past the tape's edge. Helen:
+// "ones with longer titles have tape cut too close to the upper and lower
+// edge of the text."
+//
+// The fix makes the band the box. The artwork is scaled so that its polygon's
+// top and bottom land on the box's own edges (the transparent margins hang
+// outside, invisibly), and the vertical padding comes down to exactly what
+// keeps a ONE-LINE band at its approved 1.412em -- measured before and after
+// at 1280px: 83px box, 58.6px band, both unchanged. A wrapped title then gets
+// the same 0.206em of air above and below its lettering as a single line.
+//
+// SCOPED TO THIS PAGE. The card's tape is tuned to a fixed-height card with
+// its own overflow; its band never wraps past two lines and its numbers are
+// its own (_cards.scss). Nothing there changes.
+.cocktail-title-block {
+  .drink-card-tape {
+    // (0.7059 x 2em - 1em) / 2: the band's height above and below one line.
+    padding-top: 0.2059em;
+    padding-bottom: 0.2059em;
+  }
+
+  .drink-card-tape-bg {
+    // 1 / 0.7059 of the box, positioned so the polygon's top (28/120 of the
+    // band above it) sits on the box's top edge.
+    top: -23.33%;
+    height: 141.67%;
   }
 }
 

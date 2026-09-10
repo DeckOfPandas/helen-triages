@@ -913,6 +913,25 @@ unless stated.
   Clone.
 - **2026-09-06** — §9.1 had said "ask Helen every time" for a private push, a
   week after `CLAUDE.md` changed.
+- **2026-09-10** — `CLAUDE.md`'s own documented pattern for cloning/pushing in
+  the devcontainer (build the URL by hand, token embedded) leaked the token: a
+  routine `git remote -v`, run for the reason this section's own 2026-08-29
+  paragraph two above gives, printed it in full, because git had stored the
+  token-bearing URL as the clone's `origin` remote. Fix is
+  `scripts/git-credential-agent-token.sh`, a per-repo git credential helper
+  that reads `AGENT_GH_TOKEN` from the environment at the moment git asks for
+  it and never writes it to a URL or to `.git/config`; §9.1 above now
+  documents the HTTPS-clone paragraph. `.claude/hooks/guard-token-expansion.py`
+  was widened the same day to refuse the old embedded-URL shape outright, and
+  to also scan the content of any script file a command runs (not just the
+  command line itself) for that shape or for a literal token string, closing
+  the gap where the risky text was moved into a `tmp/` script specifically to
+  get past a different guard's complaint about the command line. Not the
+  first time this file's own §12 has that shape of lesson, and won't be the
+  last: a written rule survives exactly as long as nothing enforces it.
+  **"Per-repo" lasted an afternoon** — the helper is passed per invocation by
+  the three git wrappers and configured nowhere; §11's entry of the same
+  date says why.
 
 ### §9.1.1 The drinks publication gate
 
@@ -2394,6 +2413,33 @@ unless stated.
   measurement pass, which #846 has just removed. Tried, abandoned, branch
   deleted, reported on the issue rather than shipped.
 
+- **2026-09-10, #942 — the drink page head on a phone, rebuilt from the
+  numbers.** Helen: *"All cocktail pages have the glass overlapping problem.
+  Ones with longer titles have tape cut too close to the upper and lower edge
+  of the text."* Measured at 390px rather than reasoned: the 600px block that
+  had set the glass to 4.5rem that morning sat BEFORE `.cocktail-glass-icon`'s
+  own rule, which is equally specific and set it back to 7rem, so the override
+  had never rendered — a 112px drawing in an 88px reservation. **A media
+  block only wins if it comes after the rule it overrides**, and the phone
+  head now lives beside the rules it changes. But the column itself was the
+  design fault: a glass beside EVERYTHING — title, tagline, three stacked
+  facts, chips, 574px on the Bellini — is a desktop layout squeezed. Below
+  600px the head is now a grid where only one row has two columns: the tape
+  and tagline take the full width, the glass sits beside GLASS / GARNISH /
+  SHIP IT? at the height of that stack (still at its `--glass-fill` relative
+  size), and the chips run full width beneath. The svg is out of flow inside
+  its box so its intrinsic height cannot size the row (a flute at 72px wide is
+  257px tall; the first cut spread the three facts down a 257px row). Both
+  tape bleeds are cancelled on a phone, or Cobra's Fang scrolls sideways at
+  360. **The tape complaint was a long-title fault, not a phone one:** every
+  tape SVG's band is 70.59% of its box (polygon y 28–148 of 170), so four
+  wrapped lines of lettering are taller than the band under them. On this
+  page only, the artwork is scaled so the band is the box and the vertical
+  padding recomputed to hold a one-line band at exactly its approved height
+  (59px before and after on the Negroni at 1280). Cards untouched. A
+  candidates artifact carried this and a glass-above alternative; **her pick
+  is not yet recorded — write it here when she makes it.**
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
@@ -3171,6 +3217,45 @@ verification. Dates are when the correction landed.
   manual gives it beside the SSH form. Proved by cloning into `tmp/` and
   deleting the result.
 
+- **2026-09-10 — THE TOKEN LEAKED THROUGH THE DOCUMENTED PATTERN, AND THE
+  FIX'S FIRST VERSION BROKE EVERY OTHER WORKTREE.** Two lessons in one
+  afternoon, both worth more than the incident.
+
+  **THE LEAK WAS NOT A RULE BEING BROKEN.** §9.1's entry of the same date has
+  the mechanism: `CLAUDE.md` said to clone with the token in the URL's
+  userinfo, git stored that URL as `origin`, and a routine `git remote -v`
+  printed it. Four hooks had been written against `echo`, `printf` and the
+  default expansions, and none could see a secret that had been written to
+  disk hours earlier by a command every rule allowed. The session that found
+  it built the right thing — `scripts/git-credential-agent-token.sh`, so the
+  token is handed to git on a pipe at the moment of use and is never in a
+  string at all — and widened `guard-token-expansion.py` to refuse the URL
+  shape and, for the first time, to read the script FILE a command runs.
+  That last part closes the hole every other guard's advice opens: "put it in
+  a file" had been a way past the checker, and now the file is checked. The
+  wrappers that still built the URL (push, clone, and #937's fetch) were
+  converted to plain URLs plus the helper; nothing in the repo embeds a
+  credential in a URL any more. **Helen rotated the token**, which is the only
+  thing that actually undoes a leak; every hook is a bandage over an exposed
+  credential until that is done.
+
+  **"CONFIGURE IT PER REPO" WAS WRONG, AND THE WAY IT WAS WRONG IS THE KEEPER.**
+  The helper was set with `git config credential.helper` in
+  `/workspace/.git/config` — a file the primary checkout and every worktree
+  share, which nobody had needed to know until then. Git runs a configured
+  helper from each worktree's own top level with the relative path as written,
+  and the script existed on one branch. Result, measured from an unrelated
+  worktree: `sh: 0: cannot open scripts/git-credential-agent-token.sh: No such
+  file` on every push, silently tolerated by git because the token was still in
+  the URL, and a hard failure the moment the URL was made plain. **So the
+  ruling is per invocation, never persisted**: each wrapper passes the helper
+  with `-c` and an absolute path resolved from its own location, the shared
+  entry was removed, and nothing depends on which branch any worktree is on.
+  The general shape: a per-repo setting in this repo is a per-worktree
+  setting for everyone, and a path in it is only as real as the branch it was
+  typed on. #937 and #938 were superseded by one PR carrying both, this ruling,
+  and the converted wrappers, so neither merges with the old advice in it.
+
 - **2026-09-10 — CLOSING ONE HOLE OPENED ANOTHER, IN A DIFFERENT FILE, THE SAME
   DAY.** `guard-unanalyzable-bash.py` refuses a leading `cd`. `CLAUDE.md`
   documents `cd _food_drafts && git ...` as the way the nested drafts repos are
@@ -3833,10 +3918,25 @@ verification. Dates are when the correction landed.
   **"none in the house" IS GONE**, the placeholder for a category with no
   bottle: *"If we're not using them, delete them, boom."* The empty third
   track is the honest rendering. Its CSS rule went with it, per the sweep
-  note above. **Two placeholders remain**, both column headings — "category"
-  and "on a card" — because the middle column IS in use (it prints the shorter
-  name a card uses, "Jamaican rum" for `moderately aged Jamaican rum`) and
-  needs a word from her rather than deletion. #784 stays open for those two.
+  note above. **One placeholder remains**, the column heading "category". The
+  middle column's heading was the other, and it could not simply go because
+  the column IS in use (it prints the shorter name a card uses, "Jamaican rum"
+  for `moderately aged Jamaican rum`); told that, she named it: *"site display
+  name"*. #784 stays open for the one word.
+
+  **AND THE RUM WARMED UP THE SAME EVENING.** Told the page was nearly all
+  what she does not care about, she wrote a fifth paragraph — what rum does
+  taste like — through three drafts in one sitting. What she settled on the
+  way is the reusable part: the list of forty-odd flavours stays whole because
+  its length is the argument (*"sugar sugar, it's just endless"* is the same
+  joke as the ganache's "= bad, = bad, = bad"); "freedom" came out because two
+  lines after dismissing Caribbean colonialism it was the one word a reader
+  could not read innocently; "a glorious rainbow of expressions" came out
+  because "expressions" is the word on the back of the bottle, on a page whose
+  joke is not being that; and the last sentence ends on "taste" so the next
+  paragraph's "if you don't care how a drink tastes" hangs off it — her
+  own requirement, stated before the wording was found. A line recommending
+  Pietrek's books followed. #921 closed with the PR that carried them.
 
   **THE VOICE ACROSS THE SITE, since she asked how the five sit together** —
   about page, hollandaise, ganache, the taglines, this page: one voice at five
