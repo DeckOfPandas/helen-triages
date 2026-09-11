@@ -4391,3 +4391,125 @@ verification. Dates are when the correction landed.
   (`fable-final-day`, confirmed via `/proc/<pid>/cwd`) — a caution for any
   session assuming a green "ok" from the harness proves it measured ITS OWN
   build rather than whatever else answers that port.
+
+  **AND IT DID NOT WORK. SEE 2026-09-11 BELOW** — the mark went on wearing twice
+  on every wrapped heading of this page for a day, because the stylesheet
+  redrew what the mixin removed. The DOM check above was right about the DOM and
+  never looked at the paint.
+
+- **2026-09-11, #980 — THE PAGE PUBLISHES, AND THAT REVERSES YESTERDAY'S
+  RULING ON HER OWN WORD.** On 2026-09-10 the answer to shipping it was *"no
+  more until design isn't noticeably odd"* and the page stayed
+  `published: false`. The next morning she raised **#980, "(feature) let's get
+  the rum page ready for publication then publish it!"**, with four snags
+  attached and a fifth added while the work ran. A ruling is not permanent
+  (§13.12); this one was reversed the ordinary way, by her looking at the page
+  and changing her mind, and the four snags are what "noticeably odd" had meant.
+
+  **THE TWO SWITCHES CAME OFF TOGETHER**, exactly as 2026-09-06's entry
+  promised: `published: false` and its comment block out of
+  `cocktails/reference/rum-categories.html`, `local_only: true` off the
+  cocktails entry in `_data/sites.yml`, one commit. Nothing else was needed —
+  `test_site_nav_links_resolve_to_real_pages` inverts rather than skips, so it
+  simply started checking the link the ordinary way and passed. The `local_only`
+  machinery (the key in `_config_local.yml`, the filter in
+  `_layouts/default.html`, the inverted branch in `tests/test_page_links.py`)
+  stays with no current user: it is the pattern for the next reference page, and
+  its comments now say so rather than naming the rum page.
+
+  **"CATEGORY" IS HELEN'S WORD, WHICH IS NOT THE SAME AS A PLACEHOLDER SHE NEVER
+  GOT TO.** #784's last open string was the first column's heading. Asked about
+  it she ruled on the word rather than replacing it: *"'category' is right."* So
+  the page changed not at all and the claim about it changed completely — the
+  PLACEHOLDER note came off the page's header comment, the heading gained the
+  same provenance comment its two siblings already had, and MANUAL §14 stopped
+  saying one placeholder was left. **A placeholder mark over an approved string
+  is not harmless bookkeeping**: it promises Helen a writing task she does not
+  have and tells every later agent not to touch a word that is finished. This
+  page has now been through the full cycle of that mistake — build a slot, learn
+  no words were wanted (the subtitles, the arrack note, the seven retired-word
+  lines), and finally learn the word already there was right.
+
+  **BLACKSTRAP'S LINE IS HERS TWICE OVER, #975.** It rendered *"(rum character
+  not rum type)"*, which is how #921's summary paraphrased her ruling. Seeing
+  it built she wrote the whole line out as that issue's title: **blackstrap (is
+  a rum character not a rum type)**. Two words back, and it stops being a pair
+  of labels and becomes a sentence. Still a lookup on `rum_characters`, so a
+  second such word cannot arrive without it. **The lesson is the small one**: a
+  paraphrase of a ruling, shipped as copy, is agent prose wearing her authority.
+
+  **#973, THE THREE COLUMN LABELS — THE SAME BUG AS THE PINK "EXAMPLES", AND THE
+  FIX FOR THAT ONE WAS TWO CLASSES TOO NARROW.** Helen: *"table headings use
+  three different combinations of size and colour. I think they should all look
+  the same."* There were exactly three, one per label, and not one was chosen:
+  the head row borrows the three CELL classes purely to land in the three grid
+  tracks, and `.rum-cat-name` brought `color: $color-text` (so "category" was in
+  ink), `.rum-cat-card` brought `font-size: 0.84rem` (so "site display name" was
+  a fifth larger, and wrapped to two lines at 1280), and `.rum-cat-bottles`
+  brought the woowoo that 2026-09-10 had already caught and fixed with
+  `color: inherit` on that one class. **The 2026-09-10 fix was right about the
+  mechanism and stopped at the symptom it could see.** The rule now says
+  `color: inherit; font-size: inherit` for all three, which is the general
+  statement: a class borrowed for POSITION contributes position and nothing
+  else. `.rum-origin-head` is untouched — she counted three, not four, and its
+  smaller size is what makes the country labels a rank below the column labels.
+
+  **#972, ALPHABETICAL BOTTLES — AND §14 ABOVE SAID THEY ALREADY WERE.** Helen:
+  *"order example rums alphabetically."* They never were: every list of bottles
+  on the page comes from a Liquid loop over `bottles.yml`, which walks it in
+  FILE order, so the Jamaicans read Signature, 8 Year, 12 Rare Casks. **#813's
+  own entry, above, rejects candidate C with "on the page the bottles sort
+  alphabetically, so Martinique and Guadeloupe interleave".** The interleaving
+  was real — file order mixes the countries just as thoroughly — but the
+  mechanism named for it did not exist, and nothing re-checked it (MANUAL §12: a
+  claim about another file's behaviour is a claim nothing re-checks). Fixed with
+  `sort_natural` at all four places the page and `_includes/cocktails/rum-adjacent.html`
+  build a list of names, not by hand-ordering the YAML: `bottles.yml` is the
+  dictionary, four other consumers read it, and a hand order goes stale at the
+  next bottle. `sort_natural` rather than `sort` because it is case-insensitive,
+  which is what "alphabetically" means to a reader. One consequence is hers to
+  rule on if she dislikes it: alphabetical puts El Dorado 12 above El Dorado 5.
+
+  **#985, SPACING — THE BIGGEST DIVISION ON THE PAGE WAS RENDERING AT THE SIZE
+  OF THE SMALLEST.** Helen: *"add more space to breathe between sections on the
+  rum page, especially before 'don't recognise' and above the section rule above
+  it."* `.ref-divider` carried 1.5rem above it, which is exactly the bottom
+  margin `.rum-cats` puts under every table — so section-from-section and
+  table-from-table were the same gap and the absinthe rule carried the whole
+  distinction alone; the shelf headings sat on a literal 2.25rem that collapsed
+  into that same 1.5rem. Now three levels from tokens only: 1.5rem inside a
+  section, `$spacing-section-gap` above a shelf heading, and
+  `$spacing-section-top` above the rule plus `$spacing-section-gap` below it —
+  7.5rem for a major section. **The bigger half goes ABOVE the rule**, following
+  `$spacing-section-top`'s own note in `_sass/shared/_tokens.scss` ("was 3rem,
+  when a scribbled rule sat in the gap as well"): above the rule it divides two
+  sections, below it, it would only detach the rule from the heading it
+  introduces. §13.3's test — obviously bigger, not 15% bigger — is what 2.25
+  against 1.5 was failing.
+
+  **AND MEASURING THAT SPACING FOUND #920'S FIX INERT, A DAY OLD AND NEVER
+  WORKING.** The 390px crop of "Rum "styles" I do not recognise" showed the
+  double rule under BOTH lines — the exact bug #920 was raised for, on the exact
+  heading, after the fix. `last-line-rule.js` was working perfectly;
+  `_sass/cocktails/_reference.scss` was undoing it. **The selector was
+  `.ref-section-heading span`, a DESCENDANT selector**, so it matched the two
+  spans the script creates inside the heading and handed `.rule-lines` — whose
+  whole job is to be unmarked — a full `overlapping-rule-double`, one
+  specificity step below the `&.rule-split { background-image: none }` meant to
+  suppress it. One character fixes it: `> span`. Food never had this because its
+  target is a CLASS the split spans do not carry.
+
+  **THREE THINGS WORTH KEEPING FROM THAT.** First, it is the third instance on
+  this one page of "a selector reaches further than the thing you had in mind" —
+  after the pink EXAMPLES and the three column labels, both above. Second, **a
+  DOM check cannot prove a paint**: #920 verified its fix by diffing the
+  heading's rendered `outerHTML`, which was correct and told it nothing about
+  what the stylesheet did to those nodes. Third, the bug was invisible to
+  reasoning in both directions — before the fix, "the script did not run" and
+  "the script ran and the CSS undid it" render identically, so changing only the
+  selector and watching it come right is what distinguished them.
+
+  Verified: `python3 scripts/verify.py` green; the whole page screenshot at
+  360/390/1280 from a PRODUCTION build (`_config.yml` alone, which is also what
+  proves the page publishes at all), plus before-and-after crops for each design
+  change and the cocktails index footer showing the [ COCKTAILS ] column's link.

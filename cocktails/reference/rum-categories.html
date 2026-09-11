@@ -2,21 +2,6 @@
 layout: default
 title: "Rum Categories"
 permalink: /cocktails/reference/rum-categories/
-# LOCAL ONLY, Helen's call 2026-09-06: "please set it to build only locally."
-# `published: false` is what keeps it out of the production build -- it has no
-# URL and no sitemap entry there -- and `unpublished: true` in
-# _config_local.yml is what brings it back at localhost:4001. Same division the
-# `dev` collection uses, reached with a page-level flag because this is a page
-# rather than a collection document, and because the permalink above is the
-# REAL one: when she signs it off, deleting this line is the whole of shipping.
-#
-# THE FOOTER LINK IS GATED SEPARATELY AND MUST STAY THAT WAY. It is
-# `local_only: true` on the cocktails entry in _data/sites.yml, filtered in
-# _layouts/default.html on `site.show_local_reference_links`. Two switches
-# rather than one because they answer different questions -- does the page
-# exist, and does anything point at it -- and a production build with the
-# second half missing is a footer link to a 404.
-published: false
 ---
 
 {% comment %}
