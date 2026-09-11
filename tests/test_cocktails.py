@@ -3447,7 +3447,11 @@ def test_every_mood_correction_is_reachable_and_needed():
                           ("mood_exclude", taxonomy.get("mood_exclude") or {})):
         for slug, entry in entries.items():
             if slug not in drinks:
-                bad.append(f"{kind}.{slug}: names no drink in the collection")
+                bad.append(
+                    f"{kind}.{slug}: names no drink in the collection "
+                    "(if you have just renamed a drink, the drafts repo may "
+                    "simply not be merged yet -- the drafts side merges "
+                    "first, DECISIONS.md §11; #855)")
                 continue
             if not str(entry.get("why", "")).strip():
                 bad.append(f"{kind}.{slug}: has no `why`")

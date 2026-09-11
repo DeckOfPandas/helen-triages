@@ -1,6 +1,9 @@
 {
   "permissions": {
     "blockReadsOutsideWorkingDirectories": true,
+    "additionalDirectories": [
+      "/workspace/.claude/worktrees"
+    ],
     "allow": [
       "Bash(pytest *)",
       "Bash(python3 -m pytest *)",
