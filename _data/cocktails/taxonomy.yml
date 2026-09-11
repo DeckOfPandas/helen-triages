@@ -1021,29 +1021,32 @@ moods_by_hand:
   # optional flame she wants offered is hand-assigned like Cobra's Fang.
   - on fire
 
+# THE ORDER OF EACH LIST IS THE ORDER THE INDEX SHOWS ITS BUTTONS IN --
+# cocktails/index.html iterates these as written. Both orders are Helen's own,
+# typed out on #966 (mood) and #967 (hassle), 2026-09-11. Do not sort them.
 mood_groups:
   mood:
-    - strong brown drink
-    - clear
-    - sharp
-    - fruity
-    - sugar craving
-    - pudding in a glass
+    - signature
     - tiki
-    - warming
+    - sharp
+    - clear
+    - strong brown drink
+    - fruity
+    - so wrong it's right
     - aperitivo
     - nightcap
     - brunch
     - sunny terrace
+    - sugar craving
+    - pudding in a glass
+    - warming
     - festive
-    - signature
-    - so wrong it's right
   hassle:
-    - ice ice baby
-    - I want to faff
     - no juicing
+    - ice ice baby
     - on fire
     - easy peasy
+    - I want to faff
 
 chaos:
   definitely good: "ship is yes or oh gods yes"
