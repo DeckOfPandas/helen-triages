@@ -124,9 +124,17 @@ def _bad_prefix(source, kind):
 
 
 def _bad_unknown(source, kind):
-    if kind == "unknown" and source != "QQ":
+    # TWO STRINGS SINCE 2026-09-11, not one. `QQ` while the question is open
+    # (and it blocks the build); `unknown` once Helen has closed it -- the
+    # apple coleslaw was ready to publish with its source still QQ, and she
+    # ruled: "Please write 'unknown' for the source on coleslaw." Spec rule
+    # 7a. Lowercase and exact: `Unknown` still reads like a finished answer
+    # someone typed without thinking, and a blank like nothing to see.
+    if kind == "unknown" and source not in ("QQ", "unknown"):
         return (
-            f"`source_type: unknown` must have `source: \"QQ\"`, not {source!r}.\n"
+            f"`source_type: unknown` must have `source: \"QQ\"` (question open, "
+            f"blocks the build) or `source: \"unknown\"` (Helen has ruled nobody "
+            f"knows), not {source!r}.\n"
             f"QQ is the marker that a citation is genuinely unestablished, and "
             f"it deliberately fails test_no_qq_placeholder so the gap cannot be "
             f"ignored. `Unknown` reads like a finished answer and a blank reads "
