@@ -358,6 +358,32 @@ $card-shortlist-size: 1.15rem;
   padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
 }
 
+// --- AND WHAT IT WAS COSTING A CARD WITH NO BUTTON ON IT -- #976 -------------
+// The scoping note above says the rule is "a card IN THE LIST", and named the
+// universe pick as the thing that wears `.drink-card-name` without a button.
+// #955 then made the drink page's three related drinks into real cards in a
+// `<ul class="cocktail-related drink-cards">` -- so they took `.drink-cards`
+// for its list reset, and with it 2.63rem of title reserved for a button that
+// was not there. Three cards across a 900px column give the name a 165px box;
+// 42px of that is 25%, and on the two-across layout the box is 101px and the
+// reservation is 41% of it.
+//
+// WHICH IS THE WHOLE OF #976. Helen: "font on titles of 'if you like this'
+// cards is not the same size... not filling the width". Measured at 484px on
+// Arrack Christmas Punch before this line: every one of the three tapes settled
+// at 87.6px inside a 101.6px name box, every tape word at 59px, and
+// ACCOUTREMENT -- one word, nothing to wrap at -- overflowed its box by 42px
+// and hung off the end of its tape. The names were small because the fit script
+// was measuring a box the button had already taken a quarter to a half of, and
+// they were not filling the width because the tape's own `max-width` is a
+// percentage OF that narrowed box.
+//
+// SO A PORTRAIT CARD PAYS NOTHING. It has no button in its corner, so there is
+// nothing for the title to keep clear of.
+.drink-cards .drink-card--portrait .drink-card-name {
+  padding-right: 0;
+}
+
 // --- The drink page's button on a phone: the card's mark, not the word ------
 // #963 put the button beside the FIRST LINE of the drink's name (the alignment
 // is built in _cocktail.scss, `.cocktail-title-row .btn-shortlist`). On a phone
