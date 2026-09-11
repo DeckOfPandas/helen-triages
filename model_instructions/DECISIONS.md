@@ -3682,8 +3682,24 @@ verification. Dates are when the correction landed.
   The reason she gave is a rule worth keeping for the next batch: a cluster on
   the left flank competes with the first letters of a card name, so a tape
   whose clearest cluster lands left is a wordmark tape rather than a card tape,
-  and the set is shared. #779 (random or fixed) is still hers: `FIXED_TAPE_INDEX`
-  stays `null`.
+  and the set is shared.
+- **2026-09-11, #779 — random each load.** Helen, on the same day, with the
+  fifteen in front of her: *"#958/#779: random each page load please."* The
+  #956 candidates page had put the two states on the real header wordmark (a
+  sticky switch between today's random pick and each fixed tape), and she chose
+  random. `FIXED_TAPE_INDEX` stays in `decorations.js` at `null` — that is now
+  the decision rather than a placeholder — and stays a constant because it is
+  still the one-line change "fixed" would need. The §13.1 argument against
+  random wayfinding marks was never about a background texture, and she has
+  now said so by looking rather than arguing (§13.11). **Then, straight after:
+  *"All tape."*** Read as: the ruling covers every tape slot, the card tapes as
+  well as the wordmark's. Until then `cardTapes()` dealt each card tape
+  `((index - 1) % count) + 1` from its `data-card-tape`, so a card wore the
+  same shape on every visit (#469's reasoning: a reload is a comparison, not a
+  lottery); now every `[data-card-tape]` slot draws its own random tape per
+  load, the same draw the wordmark makes. The attribute stays in the templates
+  because `universe.js` selects the slots by it. If "all tape" meant something
+  else, the one line in `cardTapes()` is the whole change back.
 
 ## §14 Reference pages
 

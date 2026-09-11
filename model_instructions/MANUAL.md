@@ -2924,14 +2924,17 @@ hand-pick. `_data/chrome.yml`'s `tape_count` must match the directory and the
 run must be gapless (`test_tape_count_matches_the_tape_directory`) —
 `decorations.js` rolls a random n. Provenance of every file (seed / mode) is in
 `DECISIONS.md` §13.9 (the 2026-08-10 entry for the original seven, the
-2026-09-11 entry for the batch, the retirements and the renumbering). **Still
-open, #779 only**: whether `tape()` should keep picking one of them at random
-on every load — the exact pattern §13.1 rejects for wayfinding marks, never
-revisited for a background texture — or be fixed to one file. `decorations.js`'s
-`FIXED_TAPE_INDEX` constant is the entire code change the "fixed" answer needs;
-it is `null` (today's random-every-load behaviour) until she rules. Worth
-deciding out loud, and by looking rather
-than arguing (§13.11).
+2026-09-11 entry for the batch, the retirements and the renumbering). **Random
+on every load is the decision, not a default** — #779, Helen, 2026-09-11:
+*"random each page load please."* The question was whether `tape()` should keep
+rolling — the exact pattern §13.1 rejects for wayfinding marks, never revisited
+for a background texture — or be fixed to one file; she looked at both on the
+real header and chose random. `decorations.js`'s `FIXED_TAPE_INDEX` stays in
+the file at `null` because it is still the entire code change "fixed" would
+need if she ever changed her mind. And *"All tape."*, straight after: the card
+tapes roll too — `cardTapes()` gives every `[data-card-tape]` slot its own
+random pick per load, where it used to deal a stable tape from the card's
+index (#469). Nothing about the tapes is open.
 
 ### 13.10 Typography — three fonts, and the rule for which goes where
 
