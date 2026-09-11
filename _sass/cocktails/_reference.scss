@@ -173,7 +173,33 @@ $ref-col-card:    minmax(6rem, 9rem);
   // `overlapping-rule-double-last-line` is that same fix, and
   // `last-line-rule.js`'s TARGETS now includes `.ref-section-heading span` --
   // see that file's header for why it doesn't reuse `.section-heading-text`.
-  span {
+  // `> span`, NOT `span`, SINCE 2026-09-11 -- AND #920'S FIX DID NOTHING UNTIL
+  // THIS LINE CHANGED. The mark was still wearing under BOTH lines of every
+  // wrapped heading on this page at 390px, which is the exact bug #920 was
+  // raised for and recorded as fixed. Found by screenshot while measuring #985,
+  // on the same heading.
+  //
+  // WHY THE FIX WAS INERT. `last-line-rule.js` rebuilds the heading as
+  // `<span class="rule-split"><span class="rule-lines">…</span><span
+  // class="rule-last">…</span></span>`, and the mixin above kills the mark on
+  // `.rule-split` and redraws it on `.rule-last`. But a DESCENDANT selector
+  // matches the two inner spans too, so `.rule-lines` -- the earlier lines,
+  // whose whole job is to be unmarked -- was handed the full
+  // `overlapping-rule-double` again by this very rule, one specificity step
+  // below the `&.rule-split { background-image: none }` meant to stop it.
+  // The JS was working perfectly; the CSS was re-drawing what it had removed.
+  //
+  // Food does not have this because its target is a CLASS
+  // (`.section-heading-text`), which the split spans do not carry. Cocktails'
+  // is an unclassed span, so "the heading's span" and "a span the script made
+  // inside it" were the same selector. `>` is the whole difference, and it is
+  // the same lesson this file already carries twice (the EXAMPLES colour, the
+  // three column labels): a selector reaches further than the thing you had in
+  // mind, so say where it stops.
+  //
+  // `last-line-rule.js`'s own TARGETS stays as it is: it queries the DOM once
+  // at load, before any split exists, so it can only ever match the outer span.
+  > span {
     display: inline;
     @include overlapping-rule-double-last-line($color-electric-absinthe, $color-ultra-violette);
   }
