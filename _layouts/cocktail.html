@@ -176,9 +176,11 @@ layout: default
          `.drink-card-tape-word`, the same four classes _sass/cocktails/_cards.scss
          already styles and the same slot assets/js/decorations.js's cardTapes()
          already fills for any page, not only the index — verified against that
-         function during the fold work (MANUAL §9.13). `data-card-tape` only
-         has to be a stable-per-page number, unlike the index's `forloop.index`;
-         `page.url`'s length is as good a hash as any and needs no data file.
+         function during the fold work (MANUAL §9.13). `data-card-tape` is the
+         selector cardTapes() and universe.js find the slot by; its VALUE has
+         been unused since 2026-09-11 (#779, Helen: "All tape." -- every slot
+         rolls its own random tape per load), and stays a number only so the
+         index's `forloop.index` and this `page.url` length keep one shape.
 
          THE OUTER WRAPPER IS A `<div>`, NOT THE CARD'S `<p>`. A card's tape
          wraps an `<a>` and a `<p>` may legally contain one; this page wraps a

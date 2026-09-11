@@ -6,7 +6,8 @@ is shared chrome, so there is one tape set for the whole repo rather than a copy
 per site. Regenerating no longer has a "and copy it across to cocktails" step --
 that chore, and the drift it was there to prevent, are both gone.
 
-WHAT THIS IS: the tool behind the current tape-1.svg..tape-7.svg. Each file
+WHAT THIS IS: the tool behind the current tape-1.svg..tape-15.svg (seven until
+2026-09-11; DECISIONS.md 13.9 has every file's seed and mode). Each file
 is one polygon body (viewBox 0 0 1400 170, fill #0d0d0d) plus two kinds of
 <line> texture: an edge bevel suggesting the tape sits raised off the page,
 and "machine marks" -- clusters of near-vertical, slightly overlapping

@@ -541,7 +541,8 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // THE BAND IS CENTRED BY MOVING THE ARTWORK, NOT THE WORDS.
 //
 // Every tape SVG insets its black polygon 16.47% from the top of its viewBox
-// and 12.94% from the bottom -- identical across all seven files, measured --
+// and 12.94% from the bottom -- identical across all fifteen files, measured
+// again when the set grew from seven on 2026-09-11 (#644) --
 // so the visible BAND is 70.59% of the box and its centre sits 1.765% of the
 // height BELOW the box's centre. Shifting the whole SVG up by exactly that puts
 // the band's centre on the box's centre, after which ordinary flex centring

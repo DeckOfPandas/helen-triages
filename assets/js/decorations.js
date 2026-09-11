@@ -96,6 +96,15 @@
   // the other kind, because a failed String.replace returns its input.
   var TAPE_OPEN = /<svg(?=[\s>])/;
 
+  // #779, SETTLED -- Helen, 2026-09-11: "random each page load please."
+  // "Random every load" vs "fixed" was offered on a candidates page
+  // (DECISIONS.md §13.9, 2026-09-10) alongside the #644 batch, and she chose
+  // random, so NULL IS THE DECISION, not a placeholder: a fresh pick from
+  // 1..count (1-15 since 2026-09-11) on every load. The constant stays because
+  // it is still the whole of what "fixed" would need in code if she ever
+  // changed her mind -- an integer here, and nothing else in tape() moves.
+  var FIXED_TAPE_INDEX = null;
+
   function tape() {
     var slot = document.querySelector('.tape-bg');
     if (!slot) return;
@@ -103,7 +112,7 @@
     var count = parseInt(slot.getAttribute('data-tape-count'), 10);
     if (!count) return;
 
-    var n = Math.floor(Math.random() * count) + 1;
+    var n = FIXED_TAPE_INDEX || (Math.floor(Math.random() * count) + 1);
     var url = HTF.chromeAsset('/tape/tape-' + n + '.svg');
     HTF.fetchSvg(url, function (svg) {
       slot.innerHTML = svg.replace(TAPE_OPEN, TAPE_ATTRS);
@@ -113,15 +122,26 @@
   // ---------------------------------------------------------------------------
   // Card titles on tape — issue #469, the cocktails index.
   //
-  // A SECOND FUNCTION RATHER THAN A WIDENED tape(), because the two want
-  // opposite things and saying so is cheaper than a flag. The wordmark's tape is
-  // ONE slot chosen at RANDOM per page load; these are ~124 slots that must be
-  // STABLE, so a card wears the same shape on every visit and a reload is a
-  // comparison rather than a lottery. They share the artwork, the fetch and the
-  // two attributes above, which is where the duplication actually mattered.
+  // RANDOM PER SLOT PER LOAD, LIKE THE WORDMARK -- Helen, 2026-09-11, ruling
+  // #779 with the fifteen tapes in front of her: "#958/#779: random each page
+  // load please." and then, straight after, "All tape." Read as: the ruling
+  // covers every tape slot on the page, the card tapes as well as the
+  // wordmark's, so each card draws its own tape afresh on every load. If "all
+  // tape" meant something else, this comment and the line below are the whole
+  // of what to change.
   //
-  // The count comes from the header's own slot, so there is still exactly one
-  // place that knows how many tape files exist (_data/chrome.yml).
+  // SUPERSEDED, kept for the argument: until then these ~124 slots were STABLE
+  // -- tape ((i - 1) % count) + 1 from the card's `data-card-tape` index -- so
+  // a card wore the same shape on every visit and a reload was a comparison
+  // rather than a lottery. That was the reason for a second function rather
+  // than a widened tape(); what is left of it is that these are many slots and
+  // that is one, and they still share the artwork, the fetch and the two
+  // attributes above, which is where the duplication actually mattered.
+  //
+  // `data-card-tape` stays in both templates: universe.js still selects the
+  // slots by it, and it costs nothing. The count comes from the header's own
+  // slot, so there is still exactly one place that knows how many tape files
+  // exist (_data/chrome.yml).
   // ---------------------------------------------------------------------------
   function cardTapes() {
     var slots = document.querySelectorAll('[data-card-tape]');
@@ -132,8 +152,7 @@
     if (!count) return;
 
     Array.prototype.forEach.call(slots, function (slot) {
-      var i = parseInt(slot.getAttribute('data-card-tape'), 10) || 1;
-      var n = ((i - 1) % count) + 1;
+      var n = Math.floor(Math.random() * count) + 1;
       HTF.fetchSvg(HTF.chromeAsset('/tape/tape-' + n + '.svg'), function (svg) {
         slot.innerHTML = svg.replace(TAPE_OPEN, TAPE_ATTRS);
       });

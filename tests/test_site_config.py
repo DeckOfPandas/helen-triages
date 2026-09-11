@@ -2523,7 +2523,11 @@ def test_tape_count_matches_the_tape_directory():
     )
 
     tape_dir = ROOT / "assets" / "img" / "chrome" / "tape"
-    actual = sorted(tape_dir.glob("tape-*.svg"))
+    # Sorted by the NUMBER, not the name: past nine files a lexical sort puts
+    # tape-10 before tape-2 and reports a perfectly gapless run as broken.
+    # Found the day the set went from seven to fifteen (2026-09-11, #644).
+    actual = sorted(tape_dir.glob("tape-*.svg"),
+                    key=lambda p: int(p.stem.split("-", 1)[1]))
     assert len(actual) == declared, (
         f"_data/chrome.yml says tape_count: {declared}, but "
         f"assets/img/chrome/tape/ holds {len(actual)} tape-*.svg files "

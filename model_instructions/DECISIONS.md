@@ -3713,6 +3713,56 @@ verification. Dates are when the correction landed.
   comment rather than deleted: it is one of five `-wash` values derived as a set,
   and deleting one member makes the set look arbitrary. What #651 forbade was it
   sitting there unread AND unexplained.
+- **2026-09-10, #644 / #779 — batch offered, pick not yet recorded.** Twelve
+  candidate tape backgrounds from `scripts/generate_tape.py`, four each of
+  `both_acute` / `both_obtuse` / `mixed`: seeds 101-104 (acute), 111-114
+  (obtuse), 121-124 (mixed), marks seed = seed except three that deliberately
+  pair a corner seed with a different marks seed to show that axis varying too
+  (103/203, 113/213, 123/223). Shown alongside the live seven (tape-1..7, this
+  section's 2026-08-10 entry above) at wordmark size and at a real card's size
+  on one candidates page, MANUAL §13.11's own recipe — reproducible byte for
+  byte from the seeds above, nothing kept only in `tmp/`. The same page carries
+  a "header tape: random / fixed 1..7" switch on the real header wordmark for
+  #779. Nothing shipped on that day: no file added to `assets/img/chrome/tape/`,
+  `_data/chrome.yml`'s `tape_count` untouched. The one code change made is
+  `assets/js/decorations.js`'s `FIXED_TAPE_INDEX` constant, added so #779's
+  "fixed" answer is a one-line flip rather than a future edit to `tape()`
+  itself — `null`, today's random-every-load behaviour, unchanged until she
+  says otherwise.
+- **2026-09-11, #644 — Helen's pick: fifteen tapes.** *"From the new set,
+  don't use 1 and 7, but let's keep all the rest. Please retire tapes 2 and 5
+  from my current (live) set -- the placement of that first big set of lines
+  sometimes obscures the start of a cocktail name."* So ten of the twelve
+  candidates ship (b02–b06 and b08–b12) and two of the original seven go
+  (old tape-2, seed 32, and old tape-5, seed 36 — her reason is the one above,
+  a big set of lines placed where a card name begins). The
+  directory is renumbered because `decorations.js` rolls a gapless 1..N: **new
+  tape-1..5 are old 1, 3, 4, 6, 7** (seeds 30, 33, 35, 40, 45 — the provenance
+  in the 2026-08-10 entry above reads with that map), and **tape-6..15 are
+  b02, b03, b04, b05, b06, b08, b09, b10, b11, b12** (seeds 102, 103/203, 104,
+  111, 112, 114, 121, 122, 123/223, 124), regenerated from those seeds and
+  checked byte-for-byte against the files the candidates page was built from.
+  The reason she gave is a rule worth keeping for the next batch: a cluster on
+  the left flank competes with the first letters of a card name, so a tape
+  whose clearest cluster lands left is a wordmark tape rather than a card tape,
+  and the set is shared.
+- **2026-09-11, #779 — random each load.** Helen, on the same day, with the
+  fifteen in front of her: *"#958/#779: random each page load please."* The
+  #956 candidates page had put the two states on the real header wordmark (a
+  sticky switch between today's random pick and each fixed tape), and she chose
+  random. `FIXED_TAPE_INDEX` stays in `decorations.js` at `null` — that is now
+  the decision rather than a placeholder — and stays a constant because it is
+  still the one-line change "fixed" would need. The §13.1 argument against
+  random wayfinding marks was never about a background texture, and she has
+  now said so by looking rather than arguing (§13.11). **Then, straight after:
+  *"All tape."*** Read as: the ruling covers every tape slot, the card tapes as
+  well as the wordmark's. Until then `cardTapes()` dealt each card tape
+  `((index - 1) % count) + 1` from its `data-card-tape`, so a card wore the
+  same shape on every visit (#469's reasoning: a reload is a comparison, not a
+  lottery); now every `[data-card-tape]` slot draws its own random tape per
+  load, the same draw the wordmark makes. The attribute stays in the templates
+  because `universe.js` selects the slots by it. If "all tape" meant something
+  else, the one line in `cardTapes()` is the whole change back.
 
 ## §14 Reference pages
 
