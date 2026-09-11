@@ -350,6 +350,20 @@ unless stated.
   the row everywhere above the stack: the widest wordmark, `[ COCKTAILS ]`, is
   488.8px, leaving 142px at 821px for a 141px row.
 
+- **2026-09-11, #969** — **The hearts moved to the bottom of the footer's
+  centre column, and nothing else in it moved.** Helen: *"re-order the
+  central column of the footer to put the heart SVG at the bottom --
+  everything else stays in the same place."* The stack (`_layouts/default.html`)
+  now reads about / GitHub mark / copyright / licences / hearts, superseding
+  #915's about / GitHub mark / hearts / copyright / licences. Checked by eye at
+  1280px and 360px after the move (`.site-footer-hearts`'s own margin-top and
+  margin-bottom, `_sass/shared/_layout.scss`, tuned under #915 for a graphic
+  with a neighbour on both sides): the space read fine with both margins left
+  alone, so neither was touched. `.site-footer-centre`'s explicit
+  `grid-column`/`grid-row` placement (#783, this section, 2026-09-07) is
+  untouched -- this is only a reorder of children already inside that pinned
+  cell, not a change to the grid.
+
 ## §3 The three-layer rule
 
 - **2026-08-01** — The ingredient search confirmed as earning its

@@ -343,13 +343,15 @@
       {% endfor %}
       {% comment %} The hearts are chrome, so they are unconditional and named in
          decorations.js rather than chosen by a per-site `footer_svg` key. {% endcomment %}
-      {% comment %} THE CENTRE COLUMN, issue #915 — Helen's revised running
-         order: about / [GitHub logo] / [heart drawing] / copyright / licences.
-         SUPERSEDES #652's "[heart drawing] / about / [GitHub logo] / licences
-         line" — a ruling is not permanent, and this is Helen looking at the
-         built page and changing her mind about the order rather than a
-         re-argument of #652's own case for putting these four in the grid's
-         middle track at all, which stands unchanged.
+      {% comment %} THE CENTRE COLUMN, issue #969 — Helen's revised running
+         order: about / [GitHub logo] / copyright / licences / [heart drawing].
+         SUPERSEDES #915's "about / [GitHub logo] / [heart drawing] /
+         copyright / licences", which itself superseded #652's "[heart
+         drawing] / about / [GitHub logo] / licences line" — a ruling is not
+         permanent, and this is Helen looking at the built page and changing
+         her mind about the order rather than a re-argument of #652's own case
+         for putting these four in the grid's middle track at all, which
+         stands unchanged.
 
          Putting them in the middle track makes the footer the three columns it
          has claimed to be since #374: a site's reference links either side, and
@@ -379,7 +381,6 @@
         <a class="site-footer-github" href="https://github.com/DeckOfPandas/helen-triages" aria-label="Source on GitHub">
           {% include icons/github.svg %}
         </a>
-        <div class="site-footer-hearts" aria-hidden="true"></div>
         <p class="site-footer-copyright">&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
         {% comment %} TWO SENTENCES, EACH IN ITS OWN SPAN, so a phone can stack
            them (#902, Helen: "stack the two licences on narrower screens").
@@ -398,6 +399,11 @@
           <span class="site-footer-license-line">Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.</span>
           <span class="site-footer-license-line">Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</span>
         </p>
+        {% comment %} LAST IN THE STACK, SINCE #969 -- Helen: "re-order the
+           central column of the footer to put the heart SVG at the bottom --
+           everything else stays in the same place." Previously third, between
+           the GitHub mark and the copyright line (#915). {% endcomment %}
+        <div class="site-footer-hearts" aria-hidden="true"></div>
       </div>
     </div>
   </footer>
