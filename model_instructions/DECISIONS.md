@@ -2495,6 +2495,92 @@ unless stated.
   candidates artifact carried this and a glass-above alternative; **her pick
   is not yet recorded — write it here when she makes it.**
 
+- **2026-09-10, #927 — "If you liked this, how about …", three related drinks
+  at the foot of every drink page.** Helen's own scoping, in the issue: *"Not a
+  full recommendation engine! But I expect we can do something with coincidental
+  tagging."* And, mid-build, when a Ruby plugin and a `meta.ship` weighting were
+  on the table: **"Keep it simple."** So the score is `shared moods + shared
+  ingredient generics`, ties broken by title, and nothing else — no ship
+  preference, no per-field weight, no tuning. Every knob one could add is a
+  claim about what makes two drinks alike and nobody has made that claim yet.
+  **In Liquid, in the layout**, not a plugin: 48 drinks is 48 iterations per
+  page, where a generator would have cost a file, a hook-order question and a
+  `jekyll serve` that silently serves a site it never ran on (§1).
+  **The sort is the interesting part.** Liquid cannot sort by a computed
+  number, so each candidate becomes one `rank~title~url` string and the array is
+  sorted as TEXT, with `rank = 999 - score` — ascending text order then puts the
+  highest score first and breaks ties A-Z by title in the same pass, with no
+  second loop. **Measured before it was written, and the measurement is kept** —
+  `scripts/related_drinks.py` is the same scoring in Python over the same
+  corpus, so it doubles as a second implementation to check the Liquid against
+  (§13.11: a number derived in `tmp/` is one nobody can reproduce). Across the
+  48 published drinks every drink's third pick shares at least 3, most share 4,
+  the best 6 — so filtering to `score > 0` never leaves a heading over an empty
+  row. The Negroni gets South Sider (3 moods, 2 generics), Aperol Spritz (4
+  moods, 0) and Boulevardier (2, 2), and the script and the built page agree on
+  all three. **A compact row, not a card**: the index
+  card is written inline in `cocktails/index.html` rather than in an include, so
+  reusing it meant copying ninety lines of markup, and a third card design is
+  §13.12's to refuse — so it borrows the three parts the universe line borrows
+  (tiny glass, name on tape, one ingredient line) and none of the card's
+  geometry. **No new hue** and a plain `.cocktail-section-heading`, the one "To
+  serve" uses; the three coloured modifiers each carry a job and this section has
+  not earned one. **Three across, then one, with no media query** —
+  `repeat(auto-fit, minmax(13rem, 1fr))` asks the 900px column rather than the
+  viewport, which is what §12's "you will check one element's width and call the
+  row safe" is about. Hidden in `make it` (an invitation to make something else
+  is the last thing wanted with your hands full) and in PRINT, where it is the
+  opposite direction from that state's usual restore: print puts back what says
+  more about THIS drink, and this is three links off it. **The heading is a
+  marked PLACEHOLDER in Helen's own words from the issue** (§13.12) — the voice
+  is hers and an agent must not write a line of it.
+  **Deliberately not built**: food (*"the priority is cocktails"*, and the
+  mechanism is only worth porting once she has looked at this one); any weighting
+  by `meta.ship`; any hand-tuned per-field score.
+  **And then she asked for the card, 2026-09-11, on #955:** *"1. Please add some
+  kind of divider between the end of the recipe (whether serve or notes or
+  anything else) and 'If you liked this...' 2. Please turn the suggestions into
+  cards -- 1. Allow 2 or 3 lines of ingredients to show, 2. show the chips.
+  It's fine for the cards to be portrait orientation. 3. Take the styling from
+  index page cards, including the new styling in #953 when it's finished.
+  3. Bring the glass drawing inline in the row with the name tape, so its left
+  margin is aligned with the left margin of the ingredients line."* So the
+  "compact row, not a card" above lasted a day, and the third card design is
+  hers rather than refused. **The section sits under `.cocktail-footer`'s own
+  rule** (gap, hairline, padding), so the page's tail is two objects drawn one
+  way. **Each item is `.drink-card.drink-card--portrait`**: the index card's
+  classes on the index card's parts, so face, tape, the three-line clamp, the
+  chips and their dots, the ship and its mask, and #953's hover are all
+  `_cards.scss`'s unchanged; the modifier moves geometry only (glass in a head
+  row beside the tape, foot back in flow, height from content, the grid
+  stretching a row to one height). **The markup is written in the layout, not
+  shared as an include**, because the two cards differ in four flag-shaped ways
+  (glass placement, chips as links vs filter buttons, no shortlist `+`, no
+  search `data-*`), and four flags on ninety commented lines is a worse object
+  than twenty-five plain lines naming the same classes; the stylesheet is the
+  shared half and the one that cannot drift by accident. **The drawing is flush
+  left in its slot** — centred it sat 12px in from the ingredient line, measured
+  — and at the index's own compression, not one height for all. **Two classes in
+  the grid selector**, because `cards` is imported after `cocktail` and
+  `.drink-cards`' 370px floor won on order: the first build drew two across the
+  900px column, measured, instead of three.
+  **Then, the same day, the ship:** *"Please fix the text wrapping of chips
+  above the ship... Keep the ship in the bottom right-hand corner, on the same
+  line as that row of chips."* The index's clear-the-ship pass pads every row of
+  a colliding card, and at 13rem that put the Boulevardier's chips one per row.
+  A ship placed last in a normal flex flow takes a row of its own the moment
+  the last row is full. The first answer filled the rows from the bottom
+  (`row-reverse` + `wrap-reverse`, ship first, chips reversed), which keeps the
+  ship in the corner but puts the SHORT row at the top, and she sent it back
+  within the hour: *"These still aren't right."* **The answer that stands: the
+  last chip and the ship are one flex item**, `.drink-card-tail`, that a line
+  cannot split. The chips wrap top-down like text, in order; if the pair fits
+  after the previous chip it sits there, and if not the pair wraps together,
+  so the last row always ends with the ship at the right and the short row is
+  the last one, as in a paragraph. DOM order is natural. The three-row cap is
+  off on portrait cards, because the card grows and the cap would clip the
+  ship's row on a busy drink.
+
 - **2026-09-10, #886 — what a drink card does under the cursor.** The issue was
   a sentence with no body: *"do something more attractive with cocktail cards on
   mouseover."* The card had one hover state and it was two 3px strips bracketing

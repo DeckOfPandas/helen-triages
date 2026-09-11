@@ -2055,6 +2055,43 @@ A `{step, note}` pair renders the note under its step and stays visible in
 `make it`. The amount column has two widths, counted in Plex Mono characters.
 **Not yet seen on an iPad.**
 
+**"If you liked this, how about …" — three related drinks after the notes**
+(#927, 2026-09-10). **The score is shared MOODS plus shared ingredient
+GENERICS, ties broken by title, and nothing else** — Helen: *"Not a full
+recommendation engine!"*, then *"Keep it simple."* No `meta.ship` weighting, no
+per-field weight. It is **Liquid in `_layouts/cocktail.html`**, not a plugin: 48
+drinks is 48 iterations a page. Liquid cannot sort by a computed number, so each
+candidate becomes a `rank~title~url` string sorted as TEXT with `rank = 999 -
+score` — ascending order is then highest-score-first and A-Z within a score, in
+one pass. **The collection IS the published set**: `publish_gate.rb` removes a
+held-back drink from `site.cocktail_recipes` at `:post_read`, so no gate test is
+needed here and none is written; drafts are a different collection and are never
+concatenated in. Only a candidate scoring above zero is offered, and
+`scripts/related_drinks.py` is the derivation — the same scoring in Python, over
+the same corpus, so it doubles as a second implementation to check the template
+against. Today every drink's third pick shares at least 3; **re-run it after a
+promotion batch or any vocabulary edit that moves moods.**
+**The three are PORTRAIT CARDS since 2026-09-11** (Helen on #955; DECISIONS
+§9.13 has her words): `.drink-card.drink-card--portrait` in a
+`<section class="cocktail-related-section">` that wears `.cocktail-footer`'s
+rule. The card is the index card's classes on the index card's parts, so every
+colour, face, clamp and hover state is `_sass/cocktails/_cards.scss`'s, and the
+`--portrait` modifier (in that file, beside the card) moves geometry only: the
+glass in a head row beside the tape and flush left with the ingredient line and
+the foot, the foot back in flow, height from content. The markup is written in
+the layout rather than shared with the index as an include — four flag-shaped
+differences, the reason is in the layout's comment — and the chips are LINKS to
+the filtered index, as the page's own chip row is. **No new hue**, a plain
+`.cocktail-section-heading` as "To serve" uses, `repeat(auto-fit, minmax(13rem,
+1fr))` for three-then-two-then-one with no media query (the selector carries
+two classes because `cards` is imported after `cocktail`), and the whole
+section is hidden in `make it` and in print. **The heading is a marked
+PLACEHOLDER in Helen's words from the issue.** Food has none of this: *"the
+priority is cocktails."*
+`test_every_published_drink_page_offers_three_other_published_drinks` reads the
+PRODUCTION build and counts the NAME links only, since a card carries chip links
+too.
+
 **Every drink names a glass** (`test_every_drink_names_a_glass`; the
 `GLASSLESS_ON_2026_08_27` ratchet is empty and asserted so). What made Helen's
 sixteen quick was showing the TOTAL VOLUME. `any` is retired: the freedom it

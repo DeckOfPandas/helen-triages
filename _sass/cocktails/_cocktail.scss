@@ -1774,6 +1774,79 @@ $amount-gap-wide: 1.25rem;
 
 .cocktail-body-content { font-size: 0.97rem; line-height: $line-height-body; }
 
+// =============================================================================
+// IF YOU LIKED THIS, HOW ABOUT … — three related drinks at the foot. #927
+// =============================================================================
+// The scoring, and why it is Liquid rather than a plugin, are in
+// _layouts/cocktail.html's own comment at the block that builds this. This file
+// only lays out what arrives.
+//
+// THREE CARDS, PORTRAIT -- Helen on #955, 2026-09-11. The first version of
+// this row was "a compact row, not a card": the tiny glass, the name on tape
+// and one ellipsised ingredient line, on the argument that the index card is
+// inline markup and a third card design was hers to ask for. She asked:
+// "Please turn the suggestions into cards -- 1. Allow 2 or 3 lines of
+// ingredients to show, 2. show the chips. It's fine for the cards to be
+// portrait orientation. 3. Take the styling from index page cards, including
+// the new styling in #953 when it's finished." So each item is now a
+// `.drink-card.drink-card--portrait`, and EVERYTHING about how a card looks --
+// face, tape, clamps, chip colours, the ship's mask, the #953 hover -- is the
+// index card's own rules in _cards.scss, where the portrait modifier also
+// lives (it is a card variant, so it belongs with the card). This file only
+// says where the section sits on the page and how the three are laid out.
+//
+// THE DIVIDER -- her first ask: "Please add some kind of divider between the
+// end of the recipe (whether serve or notes or anything else) and 'If you
+// liked this...'". It is `.cocktail-footer`'s own three declarations, so the
+// page's tail is two objects drawn the same way, a hairline above each: the
+// three cards, then the source line. Not a new mark; the one the page has.
+.cocktail-related-section {
+  margin-top: $spacing-section-gap;
+  padding-top: $space-lg;
+  border-top: 1px solid $color-border;
+
+  // The section heading carries 1.75rem above it for the sections that sit
+  // in the article's flow; here the section's own padding already holds the
+  // heading off the rule, and both would be two gaps where one was drawn.
+  .cocktail-section-heading { margin-top: 0; }
+}
+
+// THREE ACROSS, THEN TWO, THEN ONE, WITH NO MEDIA QUERY. `auto-fit` plus a
+// `minmax` floor does the whole of the narrowing: in the 900px column three
+// tracks of ~280px clear the floor; in an iPad's narrower column it is two and
+// one; on a 360px phone one track fits and the three become a short stack.
+// Nothing is hidden at any width and nothing can overflow, because no track is
+// ever narrower than the floor and the floor is under any phone.
+//
+// 13rem, NOT THE INDEX GRID'S 370px, and that is what "portrait" buys: the
+// index card is landscape because it needs a full ingredient line beside a
+// glass column; a portrait card stacks the same parts, so it can be half as
+// wide and still carry three lines of ingredients and three rows of chips.
+//
+// `.drink-cards` IS ON THE <ul> TOO, for its reset and nothing else; the grid
+// below overrides its columns and gap, and `.drink-card` itself never needed
+// the list. TWO CLASSES IN THE SELECTOR, because cocktails.scss imports
+// `cards` AFTER this file and `.drink-cards` alone would win the cascade on
+// order -- measured: a single-class rule here left the index's 370px floor in
+// force and drew two cards across the 900px column instead of three.
+//
+// A MEDIA QUERY WOULD HAVE BEEN A GUESS ABOUT THE COLUMN, not about the
+// viewport -- this section sits inside `<main>`'s 900px measure, and §12's
+// "check one element's width and call the row safe" is about exactly the row
+// that does its own arithmetic against the wrong box. `auto-fit` asks the
+// container.
+.cocktail-related-section .cocktail-related {
+  // THE BOTTOM MARGIN IS NOT DECORATION. `.cocktail-footer` carries
+  // `margin-top: $spacing-section-gap`, but a drink with no `source` has no
+  // footer at all -- the cost and units lines are then direct children of the
+  // article with $space-xxs above them, and they landed hard against the last
+  // card. Adjacent margins collapse, so this costs nothing on a drink that
+  // DOES have a footer.
+  margin: 0 0 $spacing-section-gap;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: $space-lg;
+}
+
 .cocktail-footer {
   margin-top: $spacing-section-gap;
   padding-top: $space-lg;
@@ -1863,6 +1936,12 @@ $amount-gap-wide: 1.25rem;
   // list it is in.
   .cocktail-ingredient .cocktail-note,
   .cocktail-suggestion,
+  // THREE OTHER DRINKS TO MAKE INSTEAD (#927) IS THE PUREST CASE THERE IS FOR
+  // THIS LIST. `make it` is the state you are in once you have decided; an
+  // invitation to consider something else is the last thing wanted with your
+  // hands full, and it is a link you are not going to follow mid-build. Same
+  // argument as the tagline, the chips and SHIP IT? above.
+  .cocktail-related-section,
   .cocktail-body-content { display: none; }
 
   // THE KNOB SLIDES ACROSS. The transition that animates it lives on

@@ -348,6 +348,21 @@ TRUSTED_DYNAMIC = (
     # against the published-page set instead.
     re.compile(r"^\{\{\s*link\.url\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*(?:recipe|cocktail)\.url\s*\|\s*relative_url\s*\}\}$"),
+    # The related-drinks row at the foot of a drink page (#927, 2026-09-10,
+    # `rel` in _layouts/cocktail.html). Provably correct for the same reason as
+    # `recipe.url` / `cocktail.url` above -- Jekyll computes `url` from the
+    # document's own permalink -- and `rel` is looked up out of
+    # `site.cocktail_recipes` by url, so it is a document from that collection
+    # or nothing at all.
+    #
+    # AND IT IS CHECKED, unlike those two, which is the difference worth
+    # recording: test_every_published_drink_page_offers_three_other_published_drinks
+    # in tests/test_rendered_pages.py reads the PRODUCTION build and asserts
+    # every one of these three hrefs lands on a published drink page. That is
+    # the check `recipe.url` does not need and this one earns anyway -- the row
+    # is CHOSEN by a score, so the interesting failure is not a broken URL but
+    # the wrong number of them, or a drink offering itself.
+    re.compile(r"^\{\{\s*rel\.url\s*\|\s*relative_url\s*\}\}$"),
     # The cocktails index's draft cards, added 2026-08-23. Provably correct
     # for the same reason as recipe.url/cocktail.url on the line above --
     # Jekyll computes `url` from the document's own permalink, so it cannot
