@@ -45,6 +45,12 @@
   align-items: baseline;
   gap: $space-xs $space-md;
   margin: $space-xs 0 $index-section-gap;
+  // A RULE UNDER THE OFFER -- Helen, 2026-09-10: "add a horizontal rule
+  // between universe section and cocktail filters." The drink page's head
+  // already ends on this exact line (`.cocktail-title-block`), so the offer
+  // closes the way a drink's head does and the filters start under it.
+  padding-bottom: $space-md;
+  border-bottom: 2px solid $color-electric-absinthe;
 }
 
 // EMPTY UNTIL THE SCRIPT RUNS — absent JavaScript there is nothing to show and
@@ -170,6 +176,13 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
   position: static;
   width: $universe-glass-slot;
   max-width: none;
+  // `height: auto` IS LOAD-BEARING BELOW 400px -- 2026-09-10, from Helen's
+  // phone. The stacked card (_cards.scss, `@media (max-width: 400px)`) gives
+  // every `.drink-card-glass` a 6.4rem band above the words, and this slot
+  // reuses that class, so on a phone the tiny glass was centred in a 102px box
+  // and drew 40px BELOW the tape it is meant to sit beside. The slot's height
+  // is the line's, as it is at every other width.
+  height: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;

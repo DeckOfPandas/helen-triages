@@ -1143,6 +1143,20 @@
   .drink-searches { grid-template-columns: 1fr; gap: $index-section-gap; }
 }
 
+// MORE AIR AROUND THE SEARCH ROWS ON A PHONE -- Helen, 2026-09-10: "especially
+// between the search input fields and the heading below. This is a
+// particular issue on mobile." A row of chips ends in its own padding; a text
+// box ends in a hairline, so the same gap reads tighter under an input than
+// under a button row. Below 600px the two stacked search rows and the name
+// search after them get a step more than the section gap. The margin
+// collapses with the next section's own, so this is the gap, not an addition.
+@media (max-width: 600px) {
+  .drink-searches {
+    gap: $space-xl;
+    margin-bottom: $space-xl;
+  }
+}
+
 
 // ============================================================================
 // PAGINATION -- #694

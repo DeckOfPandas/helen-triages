@@ -98,9 +98,15 @@ $radius-sm: 2px;   // note boxes, method-short box, meta wash
 // values moved down one rung of the spacing scale, which also moves the ratio
 // between them from 2:1 to 1.5:1 -- still a bigger gap between sections than
 // within one, just a smaller one than before.
-$index-section-gap: $space-md;   // between one filter section and the next --
-                                 // was $space-xl (1.5rem), now $space-md
-                                 // (0.75rem)
+// BACK UP ONE RUNG, 2026-09-10, from her phone: "I'd like more vertical space
+// between filter sections on the index page." $space-md was chosen for the
+// desktop fold; on a phone every section wraps to more rows and 0.75rem
+// between them read as one continuous list. 1rem, not the 1.5rem it was
+// before the fold work -- the search rows get their own extra room below
+// 600px in each site's search stylesheet, which is where she pointed.
+$index-section-gap: $space-lg;   // between one filter section and the next --
+                                 // was $space-xl (1.5rem), then $space-md
+                                 // (0.75rem), now $space-lg (1rem)
 $index-label-gap:   $space-sm;   // a label to its own buttons -- was
                                  // $space-md (0.75rem), now $space-sm (0.5rem)
 
