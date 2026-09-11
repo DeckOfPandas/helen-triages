@@ -26,9 +26,11 @@
 //
 // WHAT IT DOES, per `.drink-card-name` on the page:
 //
-//   1. Reset both classes, so every run measures the UNSTEPPED, UNWRAPPED
-//      element. Without this the second run measures the first run's output and
-//      a name can never step back up when the card gets wider.
+//   0. Mark the name `--fitted`, which is not a state: it says this script has
+//      run, and it releases the no-JS ellipsis clip. See FITTED_CLASS below.
+//   1. Reset the two state classes, so every run measures the UNSTEPPED,
+//      UNWRAPPED element. Without this the second run measures the first run's
+//      output and a name can never step back up when the card gets wider.
 //   2. Ask its `.drink-card-tape-word` whether it overflows — the width of its
 //      CONTENT (a Range over it; see `contentWidth`, and why it is not
 //      `scrollWidth` any more) against `clientWidth + 1`. The 1px is sub-pixel
@@ -95,6 +97,24 @@
   var STEP_CLASS = 'drink-card-name--step';
   var WRAP_CLASS = 'drink-card-name--wrap';
 
+  // A THIRD CLASS, AND IT IS NOT A THIRD STATE -- 2026-09-11, #971. The two
+  // states above are still the two states; this one says only "this script has
+  // run over this name", and every name gets it whatever the answer.
+  //
+  // WHAT IT IS FOR. `.drink-card-tape-word` is `overflow: hidden` so that a
+  // name too long for its tape ellipsises when this script has NOT run -- the
+  // no-JS fallback, and the behaviour the page had before this file existed.
+  // With the script running that clip can never fire: a name either fits, steps
+  // until it fits, or wraps. And since #971 the clip is actively harmful, because
+  // the card's click overlay is a pseudo-element on the name's anchor, which
+  // lives inside this box -- an ancestor's `overflow: hidden` clips it to the
+  // lettering and the rest of the card stops being clickable.
+  //
+  // So the clip is released once it is provably unnecessary, by the one thing
+  // that can know: the measurement itself. The rule is in
+  // _sass/cocktails/_cards.scss beside the two states.
+  var FITTED_CLASS = 'drink-card-name--fitted';
+
   /**
    * How wide is the CONTENT of this element -- the lettering itself?
    *
@@ -150,6 +170,12 @@
     // stepped for ever even on a card twice as wide.
     name.classList.remove(STEP_CLASS);
     name.classList.remove(WRAP_CLASS);
+
+    // NOT reset with the two above, and deliberately: it is not a state, it is
+    // a fact about this script having run, and that does not stop being true
+    // between passes. Adding it here rather than after the measurement means a
+    // name that returns early below still carries it.
+    name.classList.add(FITTED_CLASS);
 
     if (!overflows(word)) return;
 

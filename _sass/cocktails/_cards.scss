@@ -371,6 +371,12 @@ $card-glass-scale: 10.4rem;
 // padding box, and `vmax` rather than a literal means no viewport can outgrow
 // it.
 //
+// IT ALSO HAD TO GET OUT OF THE TAPE WORD, which is `overflow: hidden` for the
+// no-JS ellipsis and would otherwise clip this to the lettering.
+// `.drink-card-name--fitted` releases that clip once the fit script has proved
+// it cannot fire; the rule is beside the two fitting states below, and the
+// no-JS case keeps both the ellipsis and this morning's click target.
+//
 // NOTHING MOVES AND NOTHING IS DRAWN, which is §9.13's rule for a card and the
 // bar this had to clear: the pseudo-element has no background, no border and no
 // size in flow, so at rest a card is pixel-for-pixel what it was.
@@ -596,6 +602,28 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 $card-name-step: 0.86;
 
 .drink-card-name--step { --card-name-scale: #{$card-name-step}; }
+
+// AND A THIRD CLASS THAT IS NOT A THIRD STATE -- 2026-09-11, #971.
+// `card-name-fit.js` marks every name it has measured, whatever the answer, and
+// this is the one thing that class does.
+//
+// THE CLIP IT RELEASES IS THE NO-JS FALLBACK. `.drink-card-tape-word` is
+// `overflow: hidden` with `text-overflow: ellipsis` so a name too long for its
+// tape is cut politely when this script has NOT run -- which is the behaviour
+// the page had before the script existed, and the base rule the two states
+// above are additions to. Once the script HAS run the clip can never fire: the
+// name fits, or steps until it fits, or wraps.
+//
+// AND SINCE THE WHOLE CARD BECAME THE LINK, THE CLIP IS NOT MERELY IDLE. The
+// card's click overlay is a pseudo-element on the name's anchor, and that
+// anchor lives inside this box -- so `overflow: hidden` here clips the overlay
+// to the lettering and the rest of the card stops being a click target.
+// Releasing it lets the overlay out to the card, which clips it in turn.
+//
+// THE FALLBACK IS THEREFORE INTACT AND THE FAILURE IS THE SAFE ONE: with no
+// JavaScript there is no class, the ellipsis stays, and the card's click target
+// is the name alone -- exactly where this page was this morning.
+.drink-card-name--fitted .drink-card-tape-word { overflow: visible; }
 
 // TWO LINES OF TAPE, for the names a step cannot reach.
 //
