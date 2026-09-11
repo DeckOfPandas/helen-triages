@@ -99,6 +99,11 @@
 // stylesheet (`.cocktail.is-making`, _sass/cocktails/_cocktail.scss); it
 // changes the amount's SIZE and never its text, so scaled amounts are already
 // scaled in both states and there is nothing here to keep in step.
+//
+// THE − AND + BUTTONS, #731, GO THROUGH `apply()` -- see `step` near the
+// bottom. A click is never a second way to change the number; it is `last ± 1`
+// handed to the exact function a keystroke reaches, so the floor and the ×1
+// minimum are one piece of code answering to both.
 // =============================================================================
 (function () {
   'use strict';
@@ -111,12 +116,14 @@
 
   var control = article.querySelector('.cocktail-scale-controls');
   var input = control && control.querySelector('.cocktail-scale-multiple');
+  var minus = control && control.querySelector('.cocktail-scale-minus');
+  var plus = control && control.querySelector('.cocktail-scale-plus');
   var note = article.querySelector('.cocktail-scale-note');
   var list = article.querySelector('.cocktail-ingredients');
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.cocktail-amount')
   );
-  if (!control || !input || !note || !spans.length) return;
+  if (!control || !input || !minus || !plus || !note || !spans.length) return;
 
   /* THE AMOUNT SPANS ARE THE INDEX, NOT THE INGREDIENT LIST. An ingredient with
      no `amount` renders no span at all (the layout gates on `item.amount`), so
@@ -421,4 +428,27 @@
 
   input.addEventListener('change', settle);
   input.addEventListener('blur', settle);
+
+  /* THE STEP BUTTONS -- #731, Helen's sketch: "-  [1] x  +". THROUGH `apply()`,
+     THE SAME FUNCTION A TYPED VALUE REACHES, and nothing else: a click never
+     writes the box directly and never snaps or clamps on its own account, so
+     the floor rule and the ×1 minimum are exactly the code above, not a second
+     copy of it. `apply` reads `wanted` fresh each call, so `last` is always
+     current by the time a click asks for one more or one fewer than it.
+
+     A REFUSAL BEHAVES IDENTICALLY TO A TYPED ONE -- `apply` calls `refuse`,
+     which puts `last` back in the box and shows the note, exactly as it would
+     had the same number been typed and the box left. There is nothing here to
+     disable at ×1: asking for `last - 1` when `last` is 1 asks `apply` for 0,
+     which rounds up to the same floor (`Math.max(1, ...)` in `apply`) as
+     typing 0 or a negative number already does, so the button is never wrong
+     to click and simply has nothing further to give. */
+  function step(delta) {
+    return function () {
+      apply(last + delta);
+    };
+  }
+
+  minus.addEventListener('click', step(-1));
+  plus.addEventListener('click', step(1));
 })();

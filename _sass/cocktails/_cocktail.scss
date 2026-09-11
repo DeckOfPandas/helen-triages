@@ -927,6 +927,57 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   letter-spacing: normal;
 }
 
+// THE STEP BUTTONS — #731, Helen's sketch: "-  [1] x  +". `−` and `+` either
+// side of the box, doing by click what typing already does.
+//
+// THE SITE'S INTERACTIVE COLOUR AT REST, MAGENTA ON HOVER — §9.13. Absinthe is
+// the home colour and the one this page already uses for something clickable
+// (the title border, the make-it toggle); wicked-woowoo is the hue this site
+// keeps for "this one" the moment a pointer is over it, and it is the ONLY
+// thing hover changes here, same as everywhere else that rule applies. Neither
+// state touches size.
+//
+// NO BOX GROWTH ON HOVER OR FOCUS — #389's rule, which was written for a
+// selected filter button but is a general one: an interactive control may not
+// change its own footprint, because whatever sits beside it has nowhere to go
+// when it does. So the border is declared transparent at rest rather than
+// absent, and only its colour moves on `:focus-visible`; hover changes colour
+// alone. `test_no_active_filter_button_changes_its_own_width` reads
+// food.css's own button classes and does not reach this selector, so this is
+// enforced by construction here rather than by that guard.
+//
+// SAME HEIGHT AS THE INPUT, BY CONSTRUCTION. `%cocktail-number-input` sets no
+// explicit height either — both boxes are the same font-size, the same
+// vertical padding and the same 1px (here invisible) border, so the three
+// controls sit on one line without a hand-tuned figure anywhere to drift out
+// of step with the others.
+//
+// NO LETTERS, NO WORDS — the input's own comment in the layout has the reason
+// in full. `aria-label` on each button carries the sentence.
+.cocktail-scale-step {
+  @extend %cocktail-heading-face;
+  display: inline-block;
+  box-sizing: border-box;
+  width: 1.7rem;
+  font-size: 0.95rem;
+  padding: $space-xxs 0;
+  border: 1px solid transparent;
+  background: none;
+  color: $color-accent;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-wicked-woowoo;
+  }
+
+  &:focus-visible {
+    outline: none;
+    color: $color-wicked-woowoo;
+    border-color: $color-wicked-woowoo;
+  }
+}
+
 // ONE WRAPPER, ONE `hidden`, and it still has to beat its own display: the
 // attribute's UA rule is `display: none` at the lowest specificity there is, so
 // any display declaration on the element overrides it and the control ships
@@ -936,8 +987,14 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // The margin is the ingredient list's own bottom gap: the control belongs to
 // the list above it, so it sits close to it and hands the section's space to
 // whatever comes next.
+//
+// `inline-flex`, CENTRED, SINCE #731 — was a bare `display: block` wrapping
+// only the label; now it lines up the two buttons and the label on one
+// baseline-free row so a taller button glyph cannot nudge the box down.
 .cocktail-scale-controls {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
   margin: $space-sm 0 0;
 
   &[hidden] { display: none; }

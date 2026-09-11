@@ -100,7 +100,14 @@ function page(pours, opts) {
   opts = opts || {};
   const article = el('cocktail');
   const control = article.add(el('cocktail-scale-controls'));
+  /* THE TWO STEP BUTTONS — #731 — SIT EITHER SIDE OF THE INPUT IN THE REAL
+     MARKUP ("-  [1] x  +"), and are added here in that order for the same
+     reason the input and mark are: the shipped source is run byte for byte,
+     so a query for `.cocktail-scale-minus` or `.cocktail-scale-plus` must
+     find the same element cocktail-scale.js does. */
+  const minus = control.add(el('cocktail-scale-step cocktail-scale-minus'));
   const input = control.add(el('cocktail-scale-multiple'));
+  const plus = control.add(el('cocktail-scale-step cocktail-scale-plus'));
   const note = article.add(el('cocktail-scale-note'));
   const list = article.add(el('cocktail-ingredients'));
 
@@ -147,7 +154,7 @@ function page(pours, opts) {
   }
 
   return {
-    sandbox, control, input, note, spans, list, batch, cost, units,
+    sandbox, control, input, minus, plus, note, spans, list, batch, cost, units,
     wide: () => list.classList.contains('cocktail-ingredients--wide-amounts'),
     amounts: () => spans.map((s) => s.textContent),
     /** Type into a box the way a browser does: focus it, then `input`. */
@@ -161,6 +168,10 @@ function page(pours, opts) {
       box.fire('change');
       box.fire('blur');
       sandbox.document.activeElement = null;
+    },
+    /** Click a button the way a browser does: one `click` event, nothing else. */
+    click(button) {
+      button.fire('click');
     }
   };
 }
@@ -249,6 +260,79 @@ test('the ratios are exactly the recipe, multiplied', () => {
   const p = page(AVIATION);
   p.type(p.input, '4');
   assert.deepStrictEqual(p.amounts(), ['210 ml', '60 ml', '30 ml', '60 ml']);
+});
+
+// --- the − and + step buttons, #731 ------------------------------------------
+// "-  [1] x  +", Helen's sketch. Both buttons go through `apply()`, the exact
+// function a typed value reaches (`step()` in cocktail-scale.js calls
+// `apply(last ± 1)` and nothing else), so these tests are really asking one
+// question: does a click land on the same code a keystroke does.
+
+test('the plus button steps the multiple up by one, through the same apply() a typed value uses', () => {
+  const p = page(AVIATION);
+  p.click(p.plus);
+  assert.strictEqual(p.input.value, '2');
+  assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml']);
+  p.click(p.plus);
+  assert.strictEqual(p.input.value, '3');
+  assert.deepStrictEqual(p.amounts(), ['157.5 ml', '45 ml', '22.5 ml', '45 ml']);
+});
+
+test('the minus button steps the multiple down by one', () => {
+  const p = page(AVIATION);
+  p.type(p.input, '3');
+  // Clicking a button moves focus off the input the way a real browser does;
+  // `leave` is the stub's way of saying "the box is no longer being typed
+  // in", which is what lets `put` write into it again (see cocktail-scale.js).
+  p.leave(p.input);
+  p.click(p.minus);
+  assert.strictEqual(p.input.value, '2');
+  assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml']);
+});
+
+test('the minus button cannot take the multiple below ×1 -- the same floor typing respects', () => {
+  const p = page(AVIATION);
+  // Already at the recipe as written. `apply` rounds `last - 1` (zero) up to
+  // one the same way it rounds a typed zero or a negative number up -- see
+  // `apply`'s own `Math.max(1, ...)` -- so the button has nothing further to
+  // give and the drink stays exactly as poured.
+  p.click(p.minus);
+  assert.strictEqual(p.input.value, '1',
+    'one fewer than the recipe as written is still the recipe as written');
+  assert.deepStrictEqual(p.amounts(),
+    ['52.5 ml', '15 ml', '7.5 ml', '15 ml'], 'the recipe as written');
+  assert.strictEqual(p.note.hidden, true,
+    'refusing to go below ×1 is not an error to report');
+});
+
+test('a refusal reached by clicking − behaves exactly like a refusal reached by typing', () => {
+  // Every real drink's ×1 is always allowed (scale.js's own proof — the floor
+  // is capped there), so this scenario cannot arise from any amount in the
+  // collection today. What is being tested is the WIRING, not the arithmetic:
+  // HTF.scale.scale is the one thing cocktail-scale.js asks, per the ONE
+  // PARSER rule (MANUAL §9.13), so patching its answer proves the button
+  // reaches `refuse()` exactly as a keystroke would, without assuming a
+  // dataset the floor can no longer produce.
+  const p = page(AVIATION);
+  p.type(p.input, '2');
+  p.leave(p.input);
+  const real = p.sandbox.HTF.scale.scale;
+  p.sandbox.HTF.scale.scale = function (amounts, multiple) {
+    if (multiple === 1) {
+      return { ok: false, offender: 0, floorText: '2', floorTotalMl: 105 };
+    }
+    return real(amounts, multiple);
+  };
+  p.click(p.minus);
+  assert.strictEqual(p.input.value, '2',
+    'refused -- the box snaps back to what is actually being poured');
+  assert.strictEqual(p.note.hidden, false,
+    'the floor message shows exactly as it would for a typed refusal');
+  assert.ok(p.note.textContent.includes('can’t go below ×2 (105 ml)'),
+    'got: ' + p.note.textContent);
+  assert.ok(p.note.textContent.includes('London dry gin'),
+    'names the ingredient that set the limit, same as a typed refusal; got: ' +
+    p.note.textContent);
 });
 
 // --- leaving the box ---------------------------------------------------------

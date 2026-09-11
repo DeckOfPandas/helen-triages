@@ -2213,6 +2213,26 @@ unless stated.
     cards — each a settled call that reads as intended once you know it is
     deliberate, and none would change a visitor's evening.
 
+- **2026-09-10 — the scaler grew two buttons, #731.** Helen's sketch: "-  [1]
+  x  +". `−` (U+2212, not a hyphen) and `+` either side of the box, shipped in
+  the same `hidden` wrapper so they reveal with it in one script pass. Coloured
+  by the standing rule rather than a new decision: absinthe at rest — the home
+  colour, already worn by everything else clickable on this page — and
+  wicked-woowoo on hover, the hue this site keeps for "this one" the instant a
+  pointer is over it (above, the 2026-08-26 entry and the accent table).
+  Neither state touches the box's own size (#389's rule, generalised past the
+  one selector it was written for — `test_no_active_filter_button_changes_its_
+  own_width` reads only food.css's filter-button classes and does not reach
+  cocktails, so this one is enforced by construction, not by that guard). Each
+  click calls `apply()` in cocktail-scale.js — the exact function a keystroke
+  reaches — as `apply(last ± 1)`, never a second arithmetic path, so the ×1
+  floor and a refusal's note are the same code answering to both. Checked
+  against real drinks: no written recipe can actually make that refusal fire
+  (scale.js's own floor is capped at ×1, and the header's proof says why), so
+  `tests/js/cocktail-scale.test.js` proves the wiring by patching
+  `HTF.scale.scale`'s answer rather than assuming a dataset the floor can no
+  longer produce.
+
 - **2026-08-26** — One sitting with Helen against a mockup
   (`_dev/cocktails-design.html`, since deleted: eleven card framings, four
   hovers, six greens, five second accents, three thirds; a page of rejected
