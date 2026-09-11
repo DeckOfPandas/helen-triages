@@ -24,7 +24,7 @@ ingredients:
     generic: "orange bitters"
 method:
   - "Rinse the frozen old fashioned glass with the overproof rum, then discard the excess."
-  - "Shake the remaining ingredients with ice."
+  - "Stir the remaining ingredients with ice."
   - "Strain."
 mood:
   - "strong brown drink"
@@ -42,5 +42,5 @@ meta:
   ship: "who knows"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
