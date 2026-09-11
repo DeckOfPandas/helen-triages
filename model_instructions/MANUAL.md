@@ -135,7 +135,9 @@ Then `sh scripts/browser/build.sh` builds exactly what deploys into
 `tmp/site`, `sh scripts/browser/serve.sh` in the background serves it at
 `127.0.0.1:4010`, `sh scripts/browser/shoot.sh <label> [paths]` screenshots
 pages at 360, 390 and 1280 and **names every element past the viewport**, and
-`sh scripts/browser/crop.sh <path> <selector> <name>` crops one element at 2x.
+`sh scripts/browser/crop.sh <path> <selector> <name> [width]` crops one element
+at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`, `right`), so an
+alignment question is answered by comparing two numbers, not two images.
 Read the PNGs with the Read tool. **Mobile emulation grows the layout viewport
 to fit the widest element, so `innerWidth` is the symptom, not the measure**;
 the script compares against the width it asked for. The phone pass of #899
@@ -343,12 +345,18 @@ adding a key: does this say where you are, or what the chrome is?** The
 second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
 `test_page_links.py` fails if a removed key reappears.
 
-**The nav is the door to the OTHER site, centred under the wordmark** (since
-2026-09-10, Helen's own idea, picked from a header-only candidates page): one
-loop over `sites.yml` in that file's order, skipping `page.site_key`, each
-entry an icon, its bracketed word and an arrow — `[ COCKTAILS ] →` on food.
-A `site_neutral` page (about) shows every site. The `??` about link sits
-alone at the right of that row, at a literal `/about/`. So the row varies by
+**The nav is the door to the OTHER site** (since 2026-09-10, Helen's own idea,
+picked from a header-only candidates page): one loop over `sites.yml` in that
+file's order, skipping `page.site_key`, each entry an icon, its bracketed word
+and an arrow — `[ COCKTAILS ] →` on food. A `site_neutral` page (about) shows
+every site, wrapped into right-aligned lines where there is no room. **It sits
+at the RIGHT-HAND end of the header's second row and the `??` about link (a
+literal `/about/`) at the LEFT end, both on the cards' edges, at every width**
+(2026-09-11, #965 and Helen's desktop ruling the same afternoon; it was centred
+under the wordmark for one day). **`.site-header-inner` is the CARDS' width**,
+`$width-content` minus `main`'s padding — `main`'s 900px includes its padding,
+so a 900px header sat 24px outside the cards over 948px. Once the header stacks
+(`$header-stack-width`, 820px) the two share its one column. So the row varies by
 site the way the wordmark does, and by the same rule: one template, no
 per-site key; `test_the_header_and_footer_are_identical_on_every_page`
 compares the row within a site and requires each site's row to name the other
@@ -688,7 +696,11 @@ list inside one step. `.method-full li` is `position: relative` with an
 absolutely positioned number (not flex, which lays a nested list beside the
 number), and `.method-full ul li` resets `counter-increment` so nested bullets
 do not advance the step counter. Grouped methods compose the group indent with
-the number column via `calc`.
+the number column via `calc`. **On a phone (≤600px) the column is narrower**
+(#964): the numeral 0.5rem in and the text 2rem in, a column sized for "10."
+at the numeral's 1rem. That rule is `.method-full > li:not(...)`, (0,2,1), on
+purpose — the #900 version was `.method-full li` ABOVE the base rule's
+identical selector and never rendered (§12's equal-specificity trap).
 
 ### 4.3 The magic bag — dishes with no recipe
 
@@ -2041,7 +2053,12 @@ head's left edge (a flat 7rem column; the margin layout is gone), CENTRED in
 the head, absinthe, stroke 2, never shorter than `$glass-min`. The name is on
 the card's tape (2.6rem, 1.6em horizontal padding) with a real `<h1>` inside
 at `display: contents` and `font-size: 1em` (the UA's `h1 { 2em }` doubled it
-once). Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
+once). **The shortlist button is the title row's second item, at its right
+end** (#963), given the name's FIRST line's own box — the tape's padding as a
+top margin, one line of lettering as its height, adjusted through `:has()` for
+the fit script's step and wrap — so it centres on that line at any size; on a
+phone it is the card's `+` alone. The controls row under the head's rule holds
+only the read/make toggle, on the left. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
 to the index with `?mood=`. INGREDIENTS / METHOD / NOTES headings are 1.5rem,
 weight 400, absinthe over yvette (NOTES over lagoon); ingredient names carry
 no underline (they looked like links). **`make it`** (`cocktail-make.js`, a
@@ -2083,7 +2100,10 @@ rule. The card is the index card's classes on the index card's parts, so every
 colour, face, clamp and hover state is `_sass/cocktails/_cards.scss`'s, and the
 `--portrait` modifier (in that file, beside the card) moves geometry only: the
 glass in a head row beside the tape and flush left with the ingredient line and
-the foot, the foot back in flow, height from content. The markup is written in
+the foot, the foot back in flow, height from content, **and every title at one
+size**: the modifier sets `--card-name-scale` to `$card-name-step` itself, so
+`card-name-fit.js` can only fit or wrap a name there, never step one smaller
+than its neighbours (#960). The markup is written in
 the layout rather than shared with the index as an include — four flag-shaped
 differences, the reason is in the layout's comment — and the chips are LINKS to
 the filtered index, as the page's own chip row is. **No new hue**, a plain
@@ -2371,11 +2391,20 @@ foreground. More than one agent means a worktree (§11.0.1).
 `CLAUDE.md`. Four steps, one of them Helen's: Claude works on a branch, then
 pushes it and opens the PR **with no ask**; **Helen reviews and merges — and
 nothing else**; Claude fast-forwards `main` without checking it out
-(`git fetch origin main:main`, or plain `git fetch origin` from a worktree,
-where the first form refuses and that is not a problem to solve), deletes the
-merged branch, branches afresh. `guard-main-branch.py` refuses `git commit`
-and `git merge` when the target repo — read from a leading `cd` — is on
-`main`. Everything else on `main` is allowed.
+(`sh scripts/git-fetch-main.sh`, allow-listed and working from any worktree
+and the container, then `git merge origin/main`), deletes the merged branch,
+branches afresh. `guard-main-branch.py` refuses `git commit` and `git merge`
+when the target repo — read from a leading `cd` or `git -C` — is on `main`.
+Everything else on `main` is allowed.
+
+**Every PR's base is `main`; never stack one PR on another's branch.** GitHub
+moves a stacked PR onto `main` only when its base BRANCH is deleted, not when
+the base's PR merges — so on 2026-09-11 #970 merged into #968's branch
+twenty-four seconds after #968 merged, and #961–#967 missed the live site.
+**And read a PR's `state` before pushing to a branch you did not open this
+session** (`sh scripts/gh-agent.sh pr view N --json state`): a merged PR's
+branch still accepts a push, and the push goes nowhere — #960's first fix did.
+DECISIONS §11 has both.
 
 **Step 1 widened TWICE on 2026-09-07, hours apart, and the second is the
 bigger one.** First: Claude pushed and Helen opened the PR; she handed the PR
@@ -2397,12 +2426,15 @@ Helen's in all three repos. Committing or merging onto `main` is refused by
 the hook. Opening a PR is never authority to merge one. Adding
 `Pull requests: Read and write` to the PAT was hers to do, and "never broaden
 access" is unchanged — that rule is about a session asking for scope
-unprompted, not about recording a widening she has made. The token also
-cannot delete a ref, so a merged branch goes with `git push origin --delete`,
-never `gh pr close --delete-branch` (403).
+unprompted, not about recording a widening she has made. **The classic
+`AGENT_GH_TOKEN` can delete a ref** (measured 2026-09-08; the retired
+fine-grained token could not, and this line said so until 2026-09-11): a merged
+branch goes with `sh scripts/git-push-agent.sh :<branch>`, or
+`sh scripts/gh-agent.sh pr close --delete-branch` on an unmerged PR.
 
-**A worktree has no `gh`** (§1), so the PR is opened through the REST API,
-`POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
+**Open the PR with `sh scripts/gh-agent.sh pr create ... --body-file`**
+(allow-listed). Only on a host worktree, which has no `gh` (§1), is it the
+REST API, `POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
 Measured 201 on 2026-09-07.
 
 **`pr edit` DOES NOT WORK ON THIS TOKEN, even where `gh` exists.** It goes
