@@ -316,6 +316,28 @@ unless stated.
   night**: a one-line question under the wordmark (*"What shall we cook?"*) —
   *"No words under the wordmark section please."*
 
+  **Two corrections to the entry above.** `??` did not stay in column 3: later
+  the same night it moved to column 1, the row's LEFT end — *"move the ?? link
+  to the about page to the left, so it doesn't look like the arrow from the
+  central icon and link is pointing at it"* — recorded until 2026-09-11 only
+  in commit `a1befac` and `shared/_layout.scss`. And the row is centred only
+  at full width now:
+
+- **2026-09-11 — ONCE THE HEADER STACKS, THE ROW GOES TO THE RIGHT-HAND EDGE,
+  AND BOTH ENDS SIT ON THE CARDS' EDGES (#965).** Helen: *"on mobile, please
+  move the icon, other site name and arrow to the right-hand edge of the page,
+  in line with the edge of the cocktail cards which is symmetrical with the
+  about ?? link."* Measured first, at 390px: the cards run from 24px to 366px,
+  and `??` sat at 36px — 12px inside them, from the `$space-md` margin it
+  carries at full width — so "in line with the cards" and "symmetrical with
+  ??" were 12px apart on the right. Put to her with that fact: **"Both on the
+  cards' edge"** — the row ends on the cards' right edge and `??` loses its
+  margin to start on their left edge. Applies at every stacked width
+  (`$header-stack-width`, 820px, so iPad portrait too); at full width the row
+  stays centred under the wordmark, her 2026-09-10 call. On /about/, whose row
+  holds both sites and wraps at 360px, the wrapped groups hang from the right
+  edge as well.
+
 ## §3 The three-layer rule
 
 - **2026-08-01** — The ingredient search confirmed as earning its
@@ -2212,6 +2234,38 @@ unless stated.
     indent, the food index pills' faintness at rest, the chip type size on
     cards — each a settled call that reads as intended once you know it is
     deliberate, and none would change a visitor's evening.
+
+- **2026-09-11 — the second weekend pass: five snags from Helen's phone, and a
+  phone rule that had never rendered (#961–#967).** Each was measured before
+  and after with `scripts/browser/`, whose crop now prints the element's box,
+  so an alignment is two numbers rather than two images.
+  - **#964 supersedes "the recipe page's method indent" in the list above** —
+    Helen's own later ask: *"on mobile, reduce the indent of method step
+    numbering from the edge, and also the distance between the number and the
+    method step."* **And #900's phone indent had never rendered.** It was
+    written as `.method-full li` above the base rule, whose nested `li`
+    compiles to the same selector — equal specificity, so the later rule won
+    at every width (the #942 trap, §12). Measured on moules marinière at 390px:
+    numeral 3rem in, text 6.3rem in, the desktop values. Now `> li:not(...)`
+    (0,2,1), numeral 0.5rem in, text 2rem in — the column sized for "10." at
+    the numeral's 1rem rather than for two digits at the 1.2rem it was before
+    #94.
+  - **#961**: the food index row's shortlist sits level with the title's first
+    line, not the row's middle (which on a phone is the ingredient line). By
+    construction: it takes the title's line box.
+  - **#962**: the card's + went from 0.95rem to 1.15rem. The hit area was
+    already about 44px square (#823's ::after); the mark was what read small.
+    The size is a variable now, read by the title's reservation too.
+  - **#963**: the drink page's shortlist went back into the title row, at its
+    right end, centred on the name's FIRST line by construction — at 1280px on
+    Cobra's Fang, 320.8px against the line's 320.85px. On a phone the full
+    label took about 110px from the name (Arrack Christmas Punch, four lines to
+    five); shown both, Helen: **"B: + mark only on phones"**, the card's mark
+    at the card's size, the word from 601px up.
+  - **#965** is in §2.
+  - **#966, #967**: the MOOD and HASSLE buttons are in the order Helen typed.
+    The lists in `taxonomy.yml`'s `mood_groups` ARE the display order; a
+    comment there says not to sort them.
 
 - **2026-09-10 — the scaler grew two buttons, #731.** Helen's sketch: "-  [1]
   x  +". `−` (U+2212, not a hyphen) and `+` either side of the box, shipped in

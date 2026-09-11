@@ -206,15 +206,31 @@ layout: default
           </span>
         </div>
 
-        {% comment %} THE READ-IT / MAKE-IT TOGGLE AND THE SHORTLIST BUTTON
-           LEFT THIS ROW ON 2026-09-10 (#897). They sat here on the title's
-           line from 2026-09-02 (the toggle) and under it from 2026-09-05 (the
-           button); Helen: "move read it / make it toggle to the top right of
-           the page main content, just under the section divider that sits
-           between the metadata section and ingredients." Both are in
-           `.cocktail-controls` below the title block now. The row keeps its
-           flex shape for the name alone; nothing else lives in it.
+        {% comment %} THE READ-IT / MAKE-IT TOGGLE LEFT THIS ROW ON 2026-09-10
+           (#897) and is in `.cocktail-controls` below the title block. The
+           toggle sat here on the title's line from 2026-09-02; Helen: "move
+           read it / make it toggle to the top right of the page main content,
+           just under the section divider that sits between the metadata
+           section and ingredients."
+
+           THE SHORTLIST BUTTON CAME BACK ON 2026-09-11 -- #963, Helen: "move
+           the shortlist up to the top right, aligned with the horizontal
+           centre of the first line of the cocktail name." It is the row's
+           second item, so `space-between` puts it at the right end; the
+           alignment with the first line is built in _cocktail.scss
+           (`.cocktail-title-row .btn-shortlist`).
+
+           `page.url`, NOT `relative_url` -- the same key this drink's own
+           index card emits, which is what makes the card and this page agree
+           about whether it is shortlisted. See HTF.shortlist in
+           assets/js/assets.js. `hidden` until shortlist.js reveals it, the
+           rule every JS-dependent control on both sites follows.
         {% endcomment %}
+        <button type="button"
+                class="btn-shortlist"
+                data-shortlist-key="{{ page.url }}"
+                aria-pressed="false"
+                hidden>shortlist</button>
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
@@ -374,13 +390,13 @@ layout: default
     </div>
   </div>
 
-  {% comment %} THE CONTROLS ROW: read it / make it, then shortlist, at the
-     column's right edge, just under the title block's rule -- #897, Helen,
-     2026-09-10: "move read it / make it toggle to the top right of the page
-     main content, just under the section divider that sits between the
-     metadata section and ingredients." The shortlist button travels with it,
-     because her 2026-09-05 placement for the button was "below make it /
-     read it" -- relative to the toggle, wherever the toggle is.
+  {% comment %} THE CONTROLS ROW: read it / make it, just under the title
+     block's rule -- #897, Helen, 2026-09-10: "move read it / make it toggle to
+     the top right of the page main content, just under the section divider
+     that sits between the metadata section and ingredients." Then, the same
+     day, toggle to the LEFT of the row. The shortlist button travelled with
+     the toggle until 2026-09-11, when #963 put it at the right end of the
+     title row instead; see the comment there.
 
      THE TOGGLE: three elements, one group -- a "read it" label, a track with a
      knob, a "make it" label (Helen's 2026-09-02 brief: "remake this button as
@@ -389,13 +405,7 @@ layout: default
      $color-electric-absinthe-deep, so which mode the page is in is legible
      from the words, not only from the knob. See assets/js/cocktail-make.js
      for why two always-visible labels are not the ambiguous-label trap #494
-     fixed by holding one constant label.
-
-     THE SHORTLIST BUTTON: `page.url`, NOT `relative_url` -- the same key this
-     drink's own index card emits, which is what makes the card and this page
-     agree about whether it is shortlisted. See HTF.shortlist in
-     assets/js/assets.js. `hidden` until shortlist.js reveals it, the rule
-     every JS-dependent control on both sites follows. {% endcomment %}
+     fixed by holding one constant label. {% endcomment %}
   <div class="cocktail-controls">
     <div class="cocktail-toggle" role="group" aria-label="read it or make it">
       <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
@@ -404,11 +414,6 @@ layout: default
       </button>
       <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
     </div>
-    <button type="button"
-            class="btn-shortlist"
-            data-shortlist-key="{{ page.url }}"
-            aria-pressed="false"
-            hidden>shortlist</button>
   </div>
 
   {% comment %} The ingredient list is FULL, not triaged the way food's

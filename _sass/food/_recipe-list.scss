@@ -84,6 +84,12 @@
   }
 }
 
+// THE TITLE'S TYPE, NAMED SINCE 2026-09-11 because the row's shortlist button
+// takes the title's line box to sit level with it (#961, food/_shortlist.scss,
+// which is imported after this file and so can read these).
+$recipe-title-size: 1.2rem;
+$recipe-title-line-height: 1.3;
+
 .recipe-row-content {
   display: flex;
   flex-direction: column;
@@ -136,7 +142,7 @@
     // the biggest thing on its row, still lowercase, still ink. Tracking
     // comes in a hair and the leading down, because both were set for a
     // smaller face and read loose at this one.
-    font-size: 1.2rem;
+    font-size: $recipe-title-size;
     font-weight: 700;     // 400 and 500 render identically -- Courier Prime, like
                            // Courier New before it, ships only Regular and Bold,
                            // so anything <=500 resolves to Regular and anything
@@ -146,7 +152,7 @@
     letter-spacing: 0.04em;
     color: $color-text;
     text-decoration: none;
-    line-height: 1.3;
+    line-height: $recipe-title-line-height;
     transition: color 0.12s ease-in-out;
 
     &:hover {

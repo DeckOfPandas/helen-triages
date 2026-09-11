@@ -219,13 +219,23 @@
 // on a card is meant to be in the same place on every card; a mark that changed
 // width between its two states would move this one the moment it was pressed.
 // `+` and `✓` are both drawn in a box of the same declared width, so it cannot.
+// THE MARK'S SIZE, NAMED BECAUSE TWO RULES DEPEND ON IT: the button below, and
+// the title's reservation at the foot of this section, which is computed from
+// it. Until 2026-09-11 both carried `0.95rem` as a literal.
+//
+// 1.15rem SINCE 2026-09-11 -- #962, Helen: "let the shortlist button (+) be a
+// little larger so it's easier to click." The hit area was already about 44px
+// square (#823's ::after, below); what read as small was the mark itself. The
+// reservation grows with it by 0.85 x 0.2rem, about 0.17rem of title.
+$card-shortlist-size: 1.15rem;
+
 .btn-shortlist--card {
   position: absolute;
 
   // Bigger than the drink page's, which is a 0.78rem label sitting in a row of
   // labels. This is a lone mark with no word beside it to lend it weight, and
   // at the page's size it read as a stray character rather than a control.
-  font-size: 0.95rem;
+  font-size: $card-shortlist-size;
   line-height: 1;
 
   // A HIT AREA ROUND THE MARK, AND THE OFFSETS PAY FOR IT SO THE MARK DOES NOT
@@ -337,7 +347,33 @@
 // fits steps down or wraps by the rule Helen chose on the same day, with
 // nothing to keep in step and no second idea of how wide a title may be.
 .drink-cards .drink-card-name {
-  padding-right: calc(0.85 * 0.95rem + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
+  padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
+}
+
+// --- The drink page's button on a phone: the card's mark, not the word ------
+// #963 put the button beside the FIRST LINE of the drink's name (the alignment
+// is built in _cocktail.scss, `.cocktail-title-row .btn-shortlist`). On a phone
+// the full "+ SHORTLIST" label took about 110px of a 342px column from the
+// name, and long names wrapped further -- Arrack Christmas Punch (Wife #3)
+// went from four lines to five. Shown both at 390px on 2026-09-11, Helen
+// picked the mark alone: "B: + mark only on phones". The word stays above
+// 600px, where there is room for it.
+//
+// THE CARD'S MARK, AT THE CARD'S SIZE -- $card-shortlist-size, so a drink
+// looks the same shortlisted on its card and on its page. `font-size: 0` hides
+// the word from sight only: it is still the button's text, so a screen reader
+// still hears "shortlist" with its pressed state, and `+` / `✓` still come from
+// %shortlist-mark. No trailing margin, for the reason the card gives: the mark
+// IS the button.
+@media (max-width: 600px) {
+  .cocktail-title-row .btn-shortlist {
+    font-size: 0;
+
+    &::before {
+      font-size: $card-shortlist-size;
+      margin-right: 0;
+    }
+  }
 }
 
 // =============================================================================

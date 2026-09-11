@@ -99,15 +99,27 @@
 // --- On an index row ---------------------------------------------------------
 // The `<li>` is already `display: flex` with `.recipe-row-content` at `flex: 1`
 // (see _recipe-list.scss), so this needs no positioning: it is the second flex
-// item and lands at the right-hand end on its own. `align-self: center` because
-// the row stretches its items by default and a control pinned to the full
-// height of a two-line row reads as floating at the top of it.
+// item and lands at the right-hand end on its own.
+//
+// LEVEL WITH THE TITLE, SINCE 2026-09-11 -- #961, Helen: "align shortlist button
+// with title not ingredients." It was `align-self: center`, on the reasoning
+// that a control pinned to the top of a tall row reads as floating -- but the
+// middle of a row is its ingredient line, which on a phone is two lines under
+// a title that may itself wrap, so the button sat beside the wrong thing.
+//
+// BY CONSTRUCTION, NOT BY A MEASURED NUDGE: the button starts at the row's top,
+// which is where the title starts, and takes the title's own line box as its
+// line-height -- stated in rem because the button's font is smaller than the
+// title's, so the ratio alone would give it a shorter line. Its word then sits
+// on the centre of the title's FIRST line, whether the title is one line or
+// three, and follows $recipe-title-size if that ever moves.
 //
 // flex-shrink: 0 for the reason .recipe-actions gives on the recipe page: the
 // label is nowrap, so a shrinkable box would let it spill rather than wrap. The
 // ingredient line beside it already clamps and has room to give.
 .recipe-list .btn-shortlist {
-  align-self: center;
+  align-self: flex-start;
+  line-height: $recipe-title-size * $recipe-title-line-height;
   flex-shrink: 0;
   margin-left: $space-lg;
 }
