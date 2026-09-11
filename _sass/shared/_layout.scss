@@ -958,8 +958,18 @@ $tape-protrusion: 0.2rem;
   //
   // `order`, not a DOM change: the nav is FIRST in the markup because it is
   // first in the tab order, and it stays that way.
+  // `minmax(0, 1fr)`, NOT `1fr`, SINCE 2026-09-11 -- the one place the
+  // centre-track argument above does not hold. A bare `1fr` track cannot be
+  // narrower than its widest item's min-content, and at 390px the wordmark's is
+  // 343.5px in a 342px container, so the track ran 1.5px past the header's
+  // edge. Nobody could see that while the row was centred; once #965 put the
+  // row on the right-hand edge, the row ended 1.5px past the cards it is meant
+  // to line up with. With one column there is no neighbour for the wordmark to
+  // spill over -- the reason `min-width: 0` is refused for the centre track --
+  // so the track keeps the container's width and the wordmark overhangs by
+  // under a pixel each side, inside the page padding.
   .site-header-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     justify-items: center;
     gap: $space-lg;
   }
@@ -979,16 +989,34 @@ $tape-protrusion: 0.2rem;
     grid-column: 1;
   }
 
-  // The row is already in row 2 and centred at every width since 2026-09-10;
-  // in one column it only has to move from the wordmark's column to the one
-  // column there is. `??` joins it in the same cell, pinned to the right end,
-  // which is where it sits at full width too.
+  // THE ROW GOES TO THE RIGHT-HAND EDGE ONCE THE HEADER STACKS, SINCE
+  // 2026-09-11 -- #965, Helen: "on mobile, please move the icon, other site name
+  // and arrow to the right-hand edge of the page, in line with the edge of the
+  // cocktail cards which is symmetrical with the about ?? link." It is still
+  // centred under the wordmark at full width, which is her 2026-09-10 call.
+  //
+  // BOTH ENDS ON THE CARDS' EDGES, which is what makes her sentence true.
+  // Measured at 390px before the change: the cards run from 24px to 366px, and
+  // `??` sat at 36px, 12px inside them, because of the $space-md margin it
+  // carries at full width. Asked which to honour, Helen: "Both on the cards'
+  // edge" -- so `??` loses the margin here and the row ends on the header's
+  // own right edge, which is the cards' right edge at every stacked width
+  // (both are the page padding in from a 900px column).
+  //
+  // The two share the one cell, `??` at its start and the row at its end.
+  // `justify-content: flex-end` is for /about/, the one page whose row holds
+  // both sites and so wraps at 360px: the wrapped groups hang from the right
+  // edge like the single one does, instead of centring under a wordmark the
+  // row has left.
   .site-nav-icons {
     grid-column: 1;
+    justify-self: end;
+    justify-content: flex-end;
   }
 
   .site-about-link {
     grid-column: 1;
+    margin-left: 0;
   }
 
 }

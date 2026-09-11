@@ -205,8 +205,11 @@
 
      THE ARROW IS A LINK'S ARROW, NOT A SWIPE. It reads "over there"; nothing
      swipes, on a phone or anywhere. The about link left the row for the same
-     reason the row moved: it is not a site, so it sits alone at the right,
-     level with the row, a step larger than it was. {% endcomment %}
+     reason the row moved: it is not a site, so it sits alone at the LEFT end
+     of the row's line (moved from the right so the arrow does not point at
+     it), a step larger than it was. Once the header stacks, the row itself
+     goes to the right-hand edge and both end on the cards' edges (#965) --
+     shared/_layout.scss has the measurements. {% endcomment %}
   <div class="site-header-inner">
     <nav class="site-nav-icons">
       {% for entry in site.data.sites %}
