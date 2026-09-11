@@ -216,9 +216,13 @@ layout: default
            THE SHORTLIST BUTTON CAME BACK ON 2026-09-11 -- #963, Helen: "move
            the shortlist up to the top right, aligned with the horizontal
            centre of the first line of the cocktail name." It is the row's
-           second item, so `space-between` puts it at the right end; the
-           alignment with the first line is built in _cocktail.scss
-           (`.cocktail-title-row .btn-shortlist`).
+           second item, which above 600px puts it in the head grid's trailing
+           track: the row is `display: contents` there, so this button and the
+           name are placed straight onto `.cocktail-head-words`, and the meta
+           below ends where the name's track does (#979). On a phone the row is
+           a real flex box again and `space-between` is what throws the `+` to
+           the right. The alignment with the first line is built in
+           _cocktail.scss (`.cocktail-title-row .btn-shortlist`).
 
            `page.url`, NOT `relative_url` -- the same key this drink's own
            index card emits, which is what makes the card and this page agree

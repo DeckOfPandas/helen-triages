@@ -2058,7 +2058,14 @@ end** (#963), given the name's FIRST line's own box — the tape's padding as a
 top margin, one line of lettering as its height, adjusted through `:has()` for
 the fit script's step and wrap — so it centres on that line at any size; on a
 phone it is the card's `+` alone. The controls row under the head's rule holds
-only the read/make toggle, on the left. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
+only the read/make toggle, on the left. **The head is ONE two-column grid**
+(#979): `.cocktail-head-words` is `minmax(0, 1fr) auto` and
+`.cocktail-title-row` is `display: contents`, so everything the head says is in
+the first track and the shortlist button alone is in the second — which means
+the tagline, the meta and the chips all end exactly where the title tape's own
+box is stopped, with no number to keep in step when the button changes size. On
+a phone that grid is off (`display: contents`) and the children are placed on
+`.cocktail-title-block`'s own grid instead. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
 to the index with `?mood=`. INGREDIENTS / METHOD / NOTES headings are 1.5rem,
 weight 400, absinthe over yvette (NOTES over lagoon); ingredient names carry
 no underline (they looked like links). **`make it`** (`cocktail-make.js`, a

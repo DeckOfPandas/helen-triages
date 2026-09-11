@@ -286,16 +286,21 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   min-height: 0;
 }
 
-// The title and the make-it toggle on one line, which is food's
-// `.recipe-title` exactly: flex, last-baseline, space-between. `last baseline`
-// with `flex-end` kept beneath it as the fallback — food carries the same pair
-// and its comment says to keep both.
+// THE ROW HAS NO BOX OF ITS OWN ABOVE 600px, SINCE 2026-09-11 -- #979. It is
+// `display: contents`, so the name and the shortlist button are placed
+// directly on `.cocktail-head-words`' two-column grid below; that grid is what
+// gives the meta the same right edge the name's column has. The element stays
+// in the markup because it is what `:has()` reads to size the button (below)
+// and what the phone layout places as one item.
+//
+// IT IS A REAL FLEX ROW AGAIN ON A PHONE, in the 600px block below: there
+// `.cocktail-head-words` is itself `display: contents` and the row is placed on
+// `.cocktail-title-block`'s own grid, so it has to hold the name and the `+`
+// itself. It used to be food's `.recipe-title` exactly -- flex, last-baseline,
+// space-between -- and that is the shape the phone block restates, `last
+// baseline` with `flex-end` beneath it as the fallback, food's own pair.
 .cocktail-title-row {
-  display: flex;
-  align-items: flex-end;
-  align-items: last baseline;
-  justify-content: space-between;
-  gap: $space-xl;
+  display: contents;
 }
 
 // THE SHORTLIST BUTTON IS BACK IN THIS ROW, AT ITS RIGHT END, SINCE 2026-09-11
@@ -350,19 +355,66 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // (cocktails/_shortlist.scss has the rule and Helen's pick), and the
   // $space-xl gap was sized for a word beside the name; every rem here is a rem
   // off the name on a 342px column.
+  //
+  // AND THE ROW IS A FLEX BOX AGAIN HERE, which above 600px it is not -- see
+  // its own rule above for why. This block comes AFTER that rule, which is the
+  // only reason it wins (the #942 trap, and §12's).
   .cocktail-title-row {
+    display: flex;
+    align-items: flex-end;
+    align-items: last baseline;
+    justify-content: space-between;
     gap: $space-md;
   }
 }
 
-// A PLAIN BLOCK NOW. This was a flex column that had to declare `flex: 1` to
-// reach the container's right edge, back when it was one item in a row beside
-// the glass — without it, `space-between` in the title row pushed the toggle
-// to the right edge of the TEXT rather than of the page. With the glass out of
-// flow the words are the block's only content and fill it by default, so the
-// flex machinery and the bug it was fixing both go.
+// ONE GRID FOR THE WHOLE HEAD, SINCE 2026-09-11 -- #979. Helen: "the metadata
+// line now spans the full page -- I think it used to span the narrower reading
+// container. Either way, it looks strange", and her ruling: "The metadata line
+// could be bounded by whatever constrains the right-hand edge of the title
+// tape. I think that would look nice."
+//
+// WHAT CONSTRAINS THE TAPE'S RIGHT EDGE IS A COLUMN, so the fix is to give the
+// meta that same column rather than to subtract a number from it. The head is a
+// two-track grid: everything the head says goes in the first track, and the
+// shortlist button -- and only it -- goes in the second. `.cocktail-title-row`
+// is `display: contents` (see its rule above) so the name lands in track one and
+// the button in track two; the meta, the tagline and the chips are pinned to
+// track one below. The tape can reach the first track's right edge and no
+// further, and the meta ends there by construction, with nothing to keep in
+// step when the button changes size -- which it does, from the word above 600px
+// to the `+` alone below it (cocktails/_shortlist.scss).
+//
+// THE META USED TO RUN THE WHOLE HEAD, from 2026-09-05, because its last fact
+// had to line up with a shortlist button sitting at the head's right edge. #963
+// moved that button up into the title row on 2026-09-11 and nothing was left
+// needing the full width; the header becoming the cards' width the same day is
+// what made the leftover reach visible.
+//
+// `minmax(0, 1fr)`, NOT `1fr`. A bare `1fr` is `minmax(auto, 1fr)` and will not
+// go below its content's min-content width -- and the content here is the tape
+// word, which is `white-space: nowrap` (_cards.scss). The track would refuse to
+// shrink, the button would be pushed off the row, and card-name-fit.js would
+// never see an overflow to step or wrap (the same pair of symptoms
+// `.drink-card-name`'s own `min-width: 0` fixed below). §12's trap.
+//
+// IT IS NOT THIS GRID ON A PHONE: the 600px block near `.cocktail-glass-icon`
+// makes this element `display: contents` and places its children on
+// `.cocktail-title-block`'s own grid, where the meta sits beside the glass.
 .cocktail-head-words {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: $space-xl;
   min-width: 0;
+
+  // The universal selector reaches the DOM children -- the title row (a no-op,
+  // it has no box), the tagline, the meta and the chips -- and not the name and
+  // the button, which the row's `display: contents` hands to this grid but
+  // which are not this element's children in a selector's sense. Which is
+  // exactly the set that wants track one.
+  > * {
+    grid-column: 1;
+  }
 }
 
 // THE TITLE MOVED ONTO DYMO TAPE, 2026-09-02, and `.cocktail-title` stopped
@@ -455,12 +507,18 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // MIN-WIDTH ZERO, AND IT FIXES TWO THINGS WITH ONE LINE -- Helen,
     // 2026-09-09: "Long drink titles run off the cocktail page screen."
     //
-    // This element is a direct flex child of `.cocktail-title-row`, and a flex
+    // This element was a direct flex child of `.cocktail-title-row`, and a flex
     // item defaults to `min-width: auto` -- it REFUSES to shrink below its
     // content's intrinsic width. The content is the tape word, which is
     // `white-space: nowrap` from _cards.scss. So a long title grew the item to
     // its full unwrapped width and pushed it off the row. That is the visible
     // symptom.
+    //
+    // IT IS A GRID ITEM ABOVE 600px SINCE #979, placed on
+    // `.cocktail-head-words` because the row is `display: contents`, and the
+    // line still earns its place twice over: it is a flex item again at phone
+    // width, where the row is a real flex box, and the same automatic minimum
+    // is what `minmax(0, 1fr)` is spelling on the track that holds it.
     //
     // THE SECOND THING IS WHY NOTHING CAUGHT IT. card-name-fit.js decides by
     // `scrollWidth > clientWidth` -- content wider than its box -- and that
@@ -719,6 +777,30 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   }
 }
 
+// THE 5rem COMES DOWN WHERE THE HEAD IS STILL SHRINKING -- 2026-09-11, #979,
+// and it is what that issue's change cost rather than a second opinion about
+// the gap. Handing the shortlist button's width back to the row took ~110px off
+// the meta at every width; above $width-content the column is capped and the
+// meta is 582px, which still holds "mint sprig, lime wheel" on one line, but at
+// 834px it is 516px and Cobra's Fang's garnish broke in two.
+//
+// $width-content IS THE CROSSOVER, not a number picked to fit: the content
+// column grows with the window up to that cap, so below it the head is paying
+// 10rem of gap out of a box that is itself shrinking, and above it the head does
+// not change at all.
+//
+// THE COLUMNS DO NOT MOVE WHEN THIS CHANGES, which is why it is safe. With
+// `1fr 1fr auto` the two flexible tracks absorb whatever the gap gives back, so
+// GARNISH sits at `w/2 - ship/2` and SHIP IT? at `w - ship` whatever the gap is
+// -- the algebra cancels it. All a smaller gap buys is room inside each track
+// before a value wraps, which is the whole complaint. Helen chose 5rem on
+// 2026-09-03 (#679) when this was a left-packed flex row and the gap WAS the
+// separation; the grid made it a floor two days later, and this is that floor
+// being lowered where the floor is what is biting.
+@media (max-width: #{$width-content}) {
+  .cocktail-meta { column-gap: $space-xl; }
+}
+
 // ONE COLUMN ON A PHONE. Three `1fr` tracks cannot shrink below their contents'
 // min-content width, so on a 360px screen — where the head is already 10rem in
 // from the glass — "lemon twist" and "sunny terrace" would be a stack of broken
@@ -812,9 +894,17 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   row-gap: 0.4rem;
   // $space-xl SINCE 2026-09-10 (#893), from $space-md -- Helen: "add a small
   // amount of vertical space between cocktail glass/garnish line and chips
-  // line." `.cocktail-meta`'s own bottom margin collapses into this one, so this
-  // value IS the gap.
-  margin: $space-xl 0 0;
+  // line." That gap is still $space-xl and this value is no longer all of it:
+  // `.cocktail-meta`'s own $space-md bottom margin USED to collapse into this
+  // one, and since #979 (2026-09-11) made `.cocktail-head-words` a grid the two
+  // are grid items, which never collapse -- they add. So this is the remainder,
+  // written as the subtraction rather than as the 0.75rem it comes to, because
+  // the number that matters is $space-xl and it should be readable here.
+  //
+  // IT IS THE REMAINDER AND NOT THE WHOLE GAP MOVED HERE, deliberately: `make
+  // it` hides the chips entirely (the `.cocktail.is-making` block below), and
+  // the meta's own bottom margin is what holds the head open in that state.
+  margin: ($space-xl - $space-md) 0 0;
 
   // NO `cursor: default` ANY MORE. It was here because the chips were inert
   // `<span>`s on this page; since 2026-09-05 they are links to the index

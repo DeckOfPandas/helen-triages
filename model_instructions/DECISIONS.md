@@ -2214,6 +2214,46 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-09-11 — the drink page's metadata ends where the title tape's box ends
+  (#979).** Helen: *"the metadata line now spans the full page -- I think it
+  used to span the narrower reading container. Either way, it looks strange."*
+  Offered the shortlist button's edge as the other candidate, she picked the
+  tape: *"The metadata line could be bounded by whatever constrains the
+  right-hand edge of the title tape. I think that would look nice."* What
+  constrains that edge is a COLUMN, so the fix hands the meta that same column
+  rather than subtracting the button's width from it: `.cocktail-head-words` is
+  a two-track grid, `minmax(0, 1fr) auto`, with `.cocktail-title-row` at
+  `display: contents` so the name lands in track one and the button in track
+  two, and the tagline, the meta and the chips pinned to track one. Nothing has
+  to be kept in step when the button changes size — and it does, from the word
+  above 600px to the `+` alone below it (#963). At 1280px on Cobra's Fang the
+  meta went from 692px wide (right edge 1066, which was the BUTTON's edge) to
+  582.3px (right edge 956.3, the name's box to the pixel); at 834px, 626 to
+  516.3. The phone is untouched — below 600px `.cocktail-head-words` is
+  `display: contents` and the meta sits beside the glass on
+  `.cocktail-title-block`'s own grid, 254px at 390px before and after — and
+  `test_a_multi_track_row_can_become_one` has to name it in its exemption list
+  for exactly that reason: the phone answer here is a `display` declaration, not
+  a `grid-template-columns` one, and that test reads the latter. The meta had run
+  the full head since 2026-09-05, when its last fact lined up with a shortlist
+  button sitting at the head's right edge; #963 moved that button into the title
+  row the same morning this was raised, and the header becoming the cards' width
+  (#974) is what made the leftover reach visible. **Two things came out in the
+  wash.** Grid items never collapse margins, so `.cocktail-chips`' top margin is
+  now the REMAINDER of #893's $space-xl rather than all of it — the meta's own
+  $space-md bottom margin used to collapse into it and now adds. And the 5rem
+  column gap Helen chose on 2026-09-03 (#679), when the meta was a left-packed
+  flex row and the gap WAS the separation, is 10rem out of a head that has just
+  lost 110px: at 834px Cobra's Fang's "mint sprig, lime wheel" broke in two.
+  Below $width-content, where the column is still growing with the window, the
+  gap comes down to $space-xl; at and above it nothing changes, because the head
+  does not either. That is the cost of this change rather than a second opinion
+  about her number, and the algebra says why it is safe: with `1fr 1fr auto` the
+  flexible tracks absorb whatever the gap gives back, so GARNISH sits at
+  `w/2 - ship/2` and SHIP IT? at `w - ship` whatever the gap is. All a smaller
+  gap buys is room inside a track before a value wraps, which was the whole
+  complaint.
+
 - **2026-09-10 — the family-weekend design pass, in one entry.** Helen asked
   for an unseeded opinion: *"Where do you think we can make material
   improvements in a day or so?"* Every page family was screenshotted at 360,
