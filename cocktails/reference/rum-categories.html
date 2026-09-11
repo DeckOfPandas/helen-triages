@@ -228,8 +228,33 @@ published: false
 
         {% for style in group.styles %}
           {% assign card = ing.card_names[style] %}
+          {% comment %} ALPHABETICAL, #972: "order example rums alphabetically."
+             Helen's whole spec, 2026-09-11.
+
+             THE COLUMN WAS NEVER SORTED AT ALL, though DECISIONS §14 says in
+             passing that it was -- #813's note explains rejecting candidate C
+             with "on the page the bottles sort alphabetically, so Martinique
+             and Guadeloupe interleave". They do not: a `{% raw %}{% for pair in bottles %}{% endraw %}`
+             walks bottles.yml IN FILE ORDER, which is roughly the order Helen
+             added bottles in, so the Jamaicans read Signature, 8 Year, 12 Rare
+             Casks and the aged blends read Pusser's, Pusser's, Gosling's,
+             Havana Club, Planteray, Chairman's. The interleaving C suffered
+             from was real -- file order mixes the countries just as thoroughly
+             -- but the reason given for it was not.
+
+             `sort_natural`, NOT `sort`: it is case-insensitive, which is what
+             "alphabetically" means to a reader. Every bottle name here starts
+             with a capital today, so the two agree; the next one that does not
+             would sort into a block of its own under plain `sort`, which
+             compares codepoints.
+
+             IT IS A SORT, NOT A HAND ORDER. bottles.yml stays as it is -- its
+             order is the dictionary's own (see its header), and four other
+             consumers read it. Sorting where the page prints costs one filter
+             and cannot go stale.
+          {% endcomment %}
           {% capture blob %}{% for pair in bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-          {% assign bottle_names = blob | split: "||" %}
+          {% assign bottle_names = blob | split: "||" | sort_natural %}
           <li class="rum-cat">
             <span class="rum-cat-name">{{ style }}</span>
             {% comment %} The short name only where it DIFFERS. Eight of the
@@ -264,7 +289,10 @@ published: false
                    same way on every row rather than alphabetically per row. {% endcomment %}
                 {% for origin in ing.bottle_origins %}
                   {% capture in_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == origin %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-                  {% assign origin_names = in_origin | split: "||" %}
+                  {% comment %} Alphabetical WITHIN the country, #972. The
+                     countries themselves keep `bottle_origins` order, which is
+                     the point of the block. {% endcomment %}
+                  {% assign origin_names = in_origin | split: "||" | sort_natural %}
                   {% if origin_names.size > 0 %}
                     <li class="rum-origin-head">{{ origin }}</li>
                     {% for b in origin_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
@@ -277,7 +305,7 @@ published: false
                    silently dropped a bottle would be the worst failure this
                    page has. {% endcomment %}
                 {% capture no_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == nil %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-                {% assign orphan_names = no_origin | split: "||" %}
+                {% assign orphan_names = no_origin | split: "||" | sort_natural %}
                 {% for b in orphan_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
               {% else %}
                 {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
