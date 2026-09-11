@@ -1082,6 +1082,16 @@ NO_TEMPERATURE_BECAUSE = {
                 "it falls off the bone, and no step probes anything — "
                 "beef.tough_cuts is right about the cut and irrelevant to the "
                 "method",
+    # Promoted 2026-09-11 on Helen's word. The same kind as youvetsi: a whole
+    # 5–6 kg gammon, covered, at 140°C fan for about 5 hours and then glazed
+    # at 180°C for 45–50 minutes. ham.cured is right about the cut (this is a
+    # cook-before-eating gammon) and no step probes anything -- the recipe
+    # cooks it by time and reads doneness off the glaze. If she ever adds a
+    # probe step, wire ham.cured in and take this out.
+    "sticky-marmalade-ham": "a whole gammon cooked covered for about 5 hrs then "
+                            "glazed; done by time, and no step probes anything — "
+                            "ham.cured is right about the cut and irrelevant to "
+                            "the method",
 }
 
 

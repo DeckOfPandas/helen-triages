@@ -38,6 +38,7 @@ near-miss that has already been typed once by hand — it is `publication`.
 | `place` | A place | a bare label | `France` |
 | `joke` | The experience that produced the recipe | free text, exempt from every shape | `Bitter experience` |
 | `unknown` | Nobody has established it yet | exactly `QQ` | `QQ` |
+| `unknown` | …and Helen has ruled that nobody will | exactly `unknown` | `unknown` |
 
 ---
 
@@ -128,6 +129,16 @@ read as a finished answer and as nothing-to-see respectively, and neither is
 true. **`QQ` deliberately fails `test_no_qq_placeholder` and blocks the build.**
 That is intended: an unfinished citation should be impossible to ignore. Helen:
 *"QQ should be allowed, but will break a test and block build, which is fine."*
+
+**7a. `unknown` means Helen has established that nobody knows.** Added
+2026-09-11, when the apple coleslaw was ready to publish and its source was
+still `QQ`: *"Please write 'unknown' for the source on coleslaw."* So
+`source_type: unknown` now takes exactly one of two strings — `QQ` while the
+question is open (and the build stays blocked), `unknown` once she has closed it
+— and the second is the only unknown-typed value that may reach
+`_food_recipes/`. Still lowercase, still no `Adapted from`: it is a bare label
+in her voice, not a citation. `Unknown` and blank are still wrong, for the
+reasons in 7.
 
 **8. One work, one spelling.** `Sunlight Cafe` and `Sunlight Café` in two
 recipes is a bug. So is a trailing full stop on one of a matched pair.
