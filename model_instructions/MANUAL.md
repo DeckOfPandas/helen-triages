@@ -118,7 +118,11 @@ API instead, called with `AGENT_GH_TOKEN` from a script in `tmp/` (measured
 do not name the token: `sh scripts/gh-agent.sh <args>`** (2026-09-10 — the
 assignment lives in that one file now, because a call site with a secret's name
 in it is indistinguishable from a leak until you have run the rule in your
-head, and Helen should not have to).
+head, and Helen should not have to). **For a REST read, use
+`sh scripts/gh-read.sh <endpoint> [--jq <expr>] [--paginate]`** — GET only,
+the three repos only, and allow-listed, where `gh-agent.sh api` prompts every
+time because `api` can also merge (2026-09-11). `CLAUDE.md`'s allow-rules
+bullet lists every call that runs without asking.
 **Never `echo` it in any form** — not even a probe that cannot leak; the hook
 refuses all of them (`CLAUDE.md`). To find out whether a credential works,
 use it and read the status code.
@@ -127,7 +131,8 @@ use it and read the status code.
 2026-09-10 the devcontainer image carries Chromium's system libraries, and
 `sh scripts/browser/install.sh` puts Playwright and Chromium under
 `tmp/browser/` (gitignored; nothing touches `~` or the system, Helen's grant).
-Then `sh scripts/browser/serve.sh` in the background serves `tmp/site` at
+Then `sh scripts/browser/build.sh` builds exactly what deploys into
+`tmp/site`, `sh scripts/browser/serve.sh` in the background serves it at
 `127.0.0.1:4010`, `sh scripts/browser/shoot.sh <label> [paths]` screenshots
 pages at 360, 390 and 1280 and **names every element past the viewport**, and
 `sh scripts/browser/crop.sh <path> <selector> <name>` crops one element at 2x.

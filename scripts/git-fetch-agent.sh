@@ -42,14 +42,44 @@
 # guard-main-branch.py resolves the RIGHT repository -- it reads `-C` as of
 # 2026-09-10.
 #
+# ITS ARGUMENTS ARE CHECKED, SINCE 2026-09-11, WHEN IT BECAME ALLOW-LISTED. A
+# `dir` outside this checkout would fetch into, and detach, some other repo on
+# the disk; a repo outside the three is CLAUDE.md's "never act on any other
+# repository". Both are refused, and so is a ref that could be read as an
+# option or a second refspec. AGENT_WRAPPER_DRY_RUN=1 prints the fetch instead
+# of running it, for tests/test_agent_wrappers.py.
+#
 # Invoked via `sh` so it needs no execute bit.
 set -eu
 
+refuse() {
+  echo "git-fetch-agent.sh: refused -- $1" >&2
+  exit 2
+}
+
+[ "$#" -ge 2 ] || refuse "usage: sh scripts/git-fetch-agent.sh <dir> <repo> [ref]"
 dir="$1"
 repo="$2"
 ref="${3:-main}"
 
+case "$dir" in
+  /* | *..* | -*) refuse "'$dir' is outside this checkout" ;;
+esac
+case "$repo" in
+  helen-triages | helen-triages-food-private | helen-triages-cocktails-private) ;;
+  *) refuse "'$repo' is not one of the three repos" ;;
+esac
+case "$ref" in
+  -* | *..* | *:* | *" "*) refuse "'$ref' is not a branch name" ;;
+esac
+
 here="$(cd "$(dirname "$0")" && pwd)"
+
+if [ -n "${AGENT_WRAPPER_DRY_RUN:-}" ]; then
+  printf '%s\n' git -C "$dir" fetch "https://github.com/DeckOfPandas/${repo}.git" \
+    "+refs/heads/${ref}:refs/remotes/origin/${ref}"
+  exit 0
+fi
 
 git -C "$dir" \
   -c "credential.helper=!sh '${here}/git-credential-agent-token.sh'" \

@@ -3403,6 +3403,58 @@ verification. Dates are when the correction landed.
   failure this repository names in three other hooks and had just committed a
   fourth time.
 
+- **2026-09-11 — ALLOW RULES FOR THE WRAPPERS, AND THE THREE PROMPTS THAT
+  TURNED OUT TO BE GUARDS.** Helen, a few tool calls into a session: *"Please
+  work out how to run sh commands in a way that can be statically analysed, so
+  things remain safe without harrassing me for permissions all the time."* The
+  session had just made five `sh scripts/gh-agent.sh api ...` reads, and `api`
+  has no allow rule — rightly, since it is also `PUT .../pulls/N/merge`.
+
+  **The fix is committed wrappers under exact or argument-checked allow rules,
+  never `<tool> *`**: `scripts/gh-read.sh` (GET only, the three repos only),
+  `scripts/git-fetch-main.sh` (no arguments at all), `scripts/browser/build.sh`,
+  and rules for the three existing git wrappers, `git branch --show-current`,
+  `git add -- *`, `git merge origin/main`, `verify.py`, `node --test` and the
+  browser scripts. `CLAUDE.md`'s allow-rules bullet has the list.
+
+  **Asking "what was that prompt the last guard of" (the merge-deny entry
+  above) found three holes before they opened**, and they are why this entry
+  is worth reading:
+
+  1. `git-push-agent.sh feature:main` would have moved the public `main` — a
+     deploy — with no PR. `guard-main-branch.py` cannot see it: it refuses a
+     commit or a merge while STANDING on `main`, and a push from a feature
+     branch stands on the feature branch. The wrapper now refuses a `main`
+     destination on `helen-triages` in every spelling; the private repos keep
+     the 2026-08-29 grant.
+  2. `git-clone-agent.sh` passed every extra argument to `git clone`, and
+     `--template=<dir>` runs that directory's hooks. It now takes a repo and a
+     folder and nothing else.
+  3. `git fetch *`, the obvious rule, allows `--upload-pack=<any program>`,
+     hence a fetch wrapper that takes nothing. `git ls-remote *`, already
+     allowed, has the same option and came out.
+
+  **And one hole that was already open.** gh's built-in jq reads the process
+  environment — measured, `--jq 'env | length'` printed 38 — and `gh-agent.sh`
+  puts the token there as `GH_TOKEN`. So an allow-listed `issue list --jq`
+  could have printed it with no echo, no expansion and no prompt.
+  `guard-token-expansion.py` now refuses any gh call that mentions `env` or
+  `$ENV`, and `gh-read.sh` refuses it as well.
+
+  **`tmp/` scripts keep asking — Helen's ruling, put to her with the fact**
+  (the checker sees a script's name, not what it does, so an allow rule on
+  `tmp/` would let unreviewed code read outside the project past
+  `blockReadsOutsideWorkingDirectories`): *"keep asking me please."* `CLAUDE.md`
+  said until that day that `python3 tmp/x.py` "matches the existing
+  `Bash(python3 *)` allow rule". The 2026-09-10 entry above found there is no
+  such rule, and corrected it in one bullet; the same false sentence survived
+  one bullet further down for another day.
+
+  `tests/test_agent_wrappers.py` holds all of it: each wrapper's refusals and
+  accepted shapes under `AGENT_WRAPPER_DRY_RUN=1` (no network, no token in the
+  environment), the hook's jq check, and a pinned set of every open-ended allow
+  rule, so adding one is a decision visible in a diff.
+
 ---
 
 - 2026-09-10: "There is no `gh` at all in a worktree" (§1) was true of a

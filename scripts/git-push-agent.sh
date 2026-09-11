@@ -43,16 +43,66 @@
 # (CLAUDE.md, 2026-09-07); `main` only ever moves via a PR Helen merges, and
 # committing or merging onto `main` is refused by guard-main-branch.py.
 #
+# WHAT IT REFUSES, SINCE 2026-09-11, WHEN IT BECAME ALLOW-LISTED. Until then
+# every push prompted Helen, and that prompt was quietly the last thing in
+# front of `sh scripts/git-push-agent.sh feature:main` -- a push that moves the
+# public `main`, which deploys, without a PR. guard-main-branch.py cannot see
+# it: it refuses a commit or a merge while STANDING on `main`, and a push from
+# a feature branch stands on the feature branch. So before the allow rule went
+# in, the refusal came here:
+#   * a destination of `main` on helen-triages, however spelled (`x:main`,
+#     `+x:main`, `x:refs/heads/main`, `:main`, which deletes it). The private
+#     repos keep Helen's 2026-08-29 grant, "Pushing to main in the private
+#     repos is fine".
+#   * a refspec without a colon, since `HEAD` alone pushes to whatever the
+#     current branch is called; and one starting `-`, which git reads as an
+#     option.
+#   * a repo other than the three, and a `dir` outside this checkout.
+#
+# AGENT_WRAPPER_DRY_RUN=1 prints the command instead of running it, for
+# tests/test_agent_wrappers.py.
+#
 # Invoked via `sh` so it needs no execute bit -- CLAUDE.md forbids changing file
 # permissions without asking.
 set -eu
 
+refuse() {
+  echo "git-push-agent.sh: refused -- $1" >&2
+  exit 2
+}
+
+[ "$#" -ge 1 ] || refuse "usage: sh scripts/git-push-agent.sh <branch>:<branch> [repo] [dir]"
 refspec="$1"
 repo="${2:-helen-triages}"
 dir="${3:-.}"
 
+case "$refspec" in
+  -*) refuse "'$refspec' starts with '-', which git would read as an option" ;;
+  *:*) ;;
+  *) refuse "give the refspec as <branch>:<branch>, never a bare name or HEAD" ;;
+esac
+case "$repo" in
+  helen-triages | helen-triages-food-private | helen-triages-cocktails-private) ;;
+  *) refuse "'$repo' is not one of the three repos" ;;
+esac
+case "$dir" in
+  /* | *..* | -*) refuse "'$dir' is outside this checkout" ;;
+esac
+
+destination="${refspec#*:}"
+destination="${destination#refs/heads/}"
+if [ "$repo" = helen-triages ] && [ "$destination" = main ]; then
+  refuse "that pushes to helen-triages' main, which deploys. main only moves by a PR Helen merges"
+fi
+
 here="$(cd "$(dirname "$0")" && pwd)"
 
-exec git -C "$dir" \
+set -- git -C "$dir" \
   -c "credential.helper=!sh '${here}/git-credential-agent-token.sh'" \
   push "https://github.com/DeckOfPandas/${repo}.git" "$refspec"
+
+if [ -n "${AGENT_WRAPPER_DRY_RUN:-}" ]; then
+  printf '%s\n' "$@"
+  exit 0
+fi
+exec "$@"

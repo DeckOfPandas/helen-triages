@@ -1,6 +1,6 @@
 #!/bin/sh
-# Serve the local build (tmp/site, from `sh tmp/build.sh` or a plain
-# `bundle exec jekyll build ... -d tmp/site`) at the site's own baseurl, so
+# Serve the local build (tmp/site, from `sh scripts/browser/build.sh`) at the
+# site's own baseurl, so
 # every relative_url resolves. Run in the background; port 4010 deliberately
 # avoids jekyll-local's 4001 and jekyll-prod's 4002.
 set -e
