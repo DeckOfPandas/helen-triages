@@ -1434,8 +1434,71 @@ $card-portrait-glass-scale: 3.6rem;
     padding-top: 0.75rem;
   }
 
+  // THE SHIP IS IN THE CHIP FLOW, LAST, AND THE ROWS ABOVE IT WRAP AT THE FULL
+  // WIDTH -- Helen on #955, 2026-09-11, on a card whose chips had gone one per
+  // row: "Please fix the text wrapping of chips above the ship... Keep the
+  // ship in the bottom right-hand corner, on the same line as that row of
+  // chips." The index's answer (#760: the ship out of flow, and the one
+  // colliding card padded clear of it by card-line-budget.js) pads EVERY row
+  // of that card, which a 370px card absorbs and a 13rem one does not.
+  //
+  // THE ROWS FILL FROM THE BOTTOM, EACH FROM THE RIGHT, AND THE SHIP IS THE
+  // FIRST ITEM. `wrap-reverse` lays the first flex line at the BOTTOM of the
+  // box; `row-reverse` lays each line from the RIGHT. So the first line laid
+  // is the bottom row and its first item -- the ship, which the template
+  // emits first -- lands in the bottom-right corner, with as many chips beside
+  // it as fit; what does not fit goes to the line above, and every line above
+  // is the full width. That is the ask exactly, and CSS cannot say it any
+  // other way: a flex line breaks in sequence order, so a ship placed LAST in
+  // a normal flow takes a row of its own the moment the last row is full, and
+  // a ship out of flow needs every row padded (the index). The template emits
+  // the chips in REVERSE alphabetical order so that, read top-to-bottom and
+  // left-to-right, they come out A to Z: two reversals cancel. The DOM order
+  // is the cost, and it is stated in the template.
+  //
+  // `justify-content: flex-end` packs each reversed line toward the LEFT, so
+  // the short line (the top one, now) is left-aligned like text; the ship's
+  // `margin-left: auto` then takes the bottom line's slack between it and the
+  // chips, which is what keeps it in the corner on a line that is not full.
+  // card-line-budget.js's clear-ship pass measures chips against the ship's
+  // left edge and finds none past it, so it never fires here -- by geometry.
+  //
+  // NO ROW CAP, because the card grows: the index caps chips at three rows to
+  // fit $card-height, and here the cap would clip the TOP rows, which are now
+  // the overflow. `.drink-card--ingredients-3` is the same budget for the same
+  // fixed height and is put back to nothing for the same reason.
+  .drink-card-moods {
+    flex-direction: row-reverse;
+    flex-wrap: wrap-reverse;
+    justify-content: flex-end;
+    align-items: baseline;
+    max-height: none;
+    overflow: visible;
+  }
+
+  // THE SEAM DOT, IN A REVERSED FLOW. The rule above puts a trailing dot on
+  // every chip but the last CHILD, and "last child" is now the chip that is
+  // read FIRST (A), while the chip read last (Z) is the ship's next sibling.
+  // So: the chip after the ship loses its dot, and the last child gets one --
+  // the same dot, restated, because the base rule's selector excludes it.
+  .drink-card-ship + .drink-card-mood::after { content: none; }
+  .drink-card-mood:last-child::after {
+    content: "·";
+    display: inline-block;
+    margin: 0 0.234rem;
+    color: $color-clear-text;
+    font-weight: 400;
+    -webkit-text-stroke: 0;
+    pointer-events: none;
+  }
+
+  .drink-card-ship {
+    position: static;
+    margin-left: auto;
+  }
+
   &.drink-card--ingredients-3 .drink-card-foot .drink-card-moods {
-    max-height: calc(#{$chip-line * 3} + #{0.28rem * 2} + 6px);
+    max-height: none;
   }
 }
 

@@ -1231,8 +1231,31 @@ layout: default
                emits above, and for the same reason: on a drink page a chip
                has nothing to filter, so it takes you where the filter is.
                `mood_groups` and `chip_home` are assigned by that row. {% endcomment %}
-            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}</span>
-            <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>
+            {% comment %} THE SHIP IS INSIDE THE CHIP ROW HERE, LAST -- Helen on
+               #955, 2026-09-11, on a card whose chips had gone one per row:
+               "Please fix the text wrapping of chips above the ship... Keep
+               the ship in the bottom right-hand corner, on the same line as
+               that row of chips." On the index the ship is out of flow and
+               the chips are padded clear of it on the one card whose last row
+               collides (card-line-budget.js), which pads EVERY row of that
+               card; on a 13rem card that cost two chips a row.
+
+               THE FLOW IS REVERSED, AND THAT IS THE WHOLE TRICK. The ship is
+               the FIRST item and the chips follow in REVERSE alphabetical
+               order; the stylesheet lays the row out `row-reverse` and
+               `wrap-reverse`, so the flex lines fill from the BOTTOM and each
+               line from the RIGHT. The first line laid is therefore the
+               bottom one, and its first item -- the ship -- lands in the
+               bottom-right corner with as many chips beside it as fit; the
+               chips that do not fit go to the line above, at the full width.
+               Read top-to-bottom, left-to-right, the words come out A to Z,
+               because reversing the source order and reversing the layout
+               cancel. The one cost is that the DOM order is Z to A with the
+               ship first, so a screen reader or the Tab key meets these
+               chips backwards; on the page's OWN chip row above, which is the
+               primary one, the order is untouched. `_cards.scss`'s portrait
+               block has the rules and the seam-dot arithmetic. {% endcomment %}
+            <span class="drink-card-moods"><span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>{% assign rel_moods = rel.mood | sort_natural | reverse %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}</span>
           </div>
         </li>
       {% endfor %}

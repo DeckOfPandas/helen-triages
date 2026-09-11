@@ -2544,6 +2544,20 @@ unless stated.
   the grid selector**, because `cards` is imported after `cocktail` and
   `.drink-cards`' 370px floor won on order: the first build drew two across the
   900px column, measured, instead of three.
+  **Then, the same day, the ship:** *"Please fix the text wrapping of chips
+  above the ship... Keep the ship in the bottom right-hand corner, on the same
+  line as that row of chips."* The index's clear-the-ship pass pads every row of
+  a colliding card, and at 13rem that put the Boulevardier's chips one per row.
+  A ship placed last in a normal flex flow takes a row of its own the moment
+  the last row is full, so the portrait card's chip row is laid out
+  `row-reverse` + `wrap-reverse` with the ship emitted FIRST and the chips in
+  reverse alphabetical order: the first line laid is the bottom one, from the
+  right, so the ship is always in the corner with as many chips beside it as
+  fit, every row above is the full width, and the two reversals cancel so the
+  words read A to Z. The DOM order is the cost (a screen reader meets these
+  chips Z to A, ship first); the page's own chip row above is untouched. The
+  three-row cap is off on portrait cards, because the card grows and the cap
+  would now clip the TOP rows.
 
 - **2026-09-10, #886 — what a drink card does under the cursor.** The issue was
   a sentence with no body: *"do something more attractive with cocktail cards on
