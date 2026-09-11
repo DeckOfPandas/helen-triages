@@ -243,6 +243,22 @@ unless stated.
   namespace rather than a unification, and Helen runs Claudes in HOST
   worktrees — so it buys nothing she needs, for 179 lines.
 
+- **2026-09-11 — the browser harness takes the first free port from 4010,
+  and its own shoot.sh and crop.sh read that port from `tmp/browser/port`.**
+  `serve.sh` bound 4010 and nothing else, and both measuring scripts asked
+  4010 and nothing else. With several worktrees' sessions in one container
+  (§11.0.1), the second `serve.sh` died with `Address already in use` while
+  that session's `shoot.sh` measured the FIRST session's build and printed
+  "ok" — the trap §14's 2026-09-10 entry (#920) records finding by hand via
+  `/proc/<pid>/cwd`. Now `scripts/browser/serve.py` binds the first free port
+  in 4010–4059, writes it to this worktree's `tmp/browser/port` (per worktree,
+  gitignored, deleted when the server exits), and the two scripts read it;
+  with no file they fall back to 4010 and the refused connection is an ERROR
+  line rather than a wrong answer. No allow rule changed: the commands are the
+  same three exact strings. Measured: with this worktree's own server holding
+  4010, a second `serve.sh` in the same worktree took 4011 and wrote it, and
+  `shoot.sh` followed the file to 4011 without being told.
+
 ## §2 The mono-repo shape
 
 - **2026-08-02** — Collections cannot live inside `food/`: Jekyll only

@@ -132,8 +132,10 @@ use it and read the status code.
 `sh scripts/browser/install.sh` puts Playwright and Chromium under
 `tmp/browser/` (gitignored; nothing touches `~` or the system, Helen's grant).
 Then `sh scripts/browser/build.sh` builds exactly what deploys into
-`tmp/site`, `sh scripts/browser/serve.sh` in the background serves it at
-`127.0.0.1:4010`, `sh scripts/browser/shoot.sh <label> [paths]` screenshots
+`tmp/site`, `sh scripts/browser/serve.sh` in the background serves it on the
+first free port from 4010 and writes that port to `tmp/browser/port` (since
+2026-09-11 — one server per worktree, so a session never measures another
+session's build), `sh scripts/browser/shoot.sh <label> [paths]` screenshots
 pages at 360, 390 and 1280 and **names every element past the viewport**, and
 `sh scripts/browser/crop.sh <path> <selector> <name> [width]` crops one element
 at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`, `right`), so an
