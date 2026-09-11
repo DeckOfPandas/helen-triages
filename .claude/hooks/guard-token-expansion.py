@@ -82,6 +82,18 @@ WHAT IT BLOCKS, AND WHY EACH FORM HAS NO DEFENSIBLE USE.
      settles it without the name ever reaching an `echo`. Helen: *"I can't
      imagine why we wouldn't do that having thought of it."*
 
+  3. WIDENED 2026-09-11 -- A `gh` CALL WHOSE --jq EXPRESSION READS THE
+     ENVIRONMENT. gh's built-in jq has `env` and `$ENV`, measured that day
+     (`--jq 'env | length'` printed 38), and `scripts/gh-agent.sh` hands gh
+     the token through its environment -- as `GH_TOKEN`, a name that appears
+     nowhere on the command line. So `sh scripts/gh-agent.sh issue list --jq
+     '<env>.GH_TOKEN'` would have printed it, through an ALLOW-LISTED
+     subcommand, without a prompt and without any check above firing: no
+     echo, no expansion, no URL, no literal. Any command that runs gh (bare,
+     or through either wrapper) and mentions `env` or `$ENV` anywhere is
+     refused -- the jq expression is single-quoted, so this reads the RAW
+     text. No jq expression this repo has needed reads the environment.
+
 WHAT IT DELIBERATELY ALLOWS, because these are how the token is legitimately
 used and a guard that blocked them would be routed around within a day:
 
@@ -269,6 +281,19 @@ def _echoed_secret(text: str) -> str | None:
     return None
 
 
+# A command that runs gh: bare, by path, or through either wrapper in scripts/.
+GH_CALL = re.compile(r"(?:^|\s)(?:\S*/)?(?:gh|gh-agent\.sh|gh-read\.sh)(?:\s|$)")
+
+# jq's two doors into the environment, `env` and `$ENV`. Deliberately a word
+# match on the RAW command: the expression is always single-quoted, so the
+# stripping the echo check uses would blank it out.
+JQ_ENV = re.compile(r"\$ENV\b|(?<![\w.$-])env\b")
+
+
+def _gh_reads_environment(command: str) -> bool:
+    return bool(GH_CALL.search(command) and JQ_ENV.search(command))
+
+
 def _url_embedded_secret(text: str) -> str | None:
     for match in SECRET_IN_URL.finditer(text):
         if _is_secret(match.group(1)):
@@ -397,6 +422,20 @@ def main() -> int:
             "them."
         )
         return _deny(_reason(name, form))
+
+    if _gh_reads_environment(command):
+        return _deny(
+            "BLOCKED: this runs gh with a --jq expression that mentions `env` "
+            "or `$ENV`.\n\n"
+            "gh's built-in jq can read the process environment (measured "
+            "2026-09-11: `env | length` printed 38), and scripts/gh-agent.sh "
+            "hands gh the token through that environment as GH_TOKEN. So a jq "
+            "expression that reads the environment can print the token, "
+            "through an allow-listed call, with no echo and no expansion for "
+            "any other check to see.\n\n"
+            "Select the fields you need from the API's JSON instead; nothing "
+            "this repository reads from GitHub lives in the environment."
+        )
 
     # The URL-embedding and literal-token checks run against the command text
     # AND, if this command runs one, the referenced script's own content --

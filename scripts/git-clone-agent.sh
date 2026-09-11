@@ -32,14 +32,44 @@
 # follows the Git workflow section of CLAUDE.md: a branch, never `main`, and
 # `PUBLISHING_A_DRINK.md`'s one-working-copy rule while a batch is open.
 #
+# EXACTLY TWO ARGUMENTS, SINCE 2026-09-11, WHEN IT BECAME ALLOW-LISTED. It used
+# to pass everything after the repo straight to `git clone`, and `git clone`
+# takes `--template=<dir>` (whose hooks then run) and `-c <anything>` -- so an
+# allow rule on this script would have allowed running any program at all.
+# Now it takes a repo from the three and an optional `dir` inside this
+# checkout, and refuses anything else. AGENT_WRAPPER_DRY_RUN=1 prints the
+# command instead of running it, for tests/test_agent_wrappers.py.
+#
 # Invoked via `sh` so it needs no execute bit -- CLAUDE.md forbids changing file
 # permissions without asking.
 set -eu
 
+refuse() {
+  echo "git-clone-agent.sh: refused -- $1" >&2
+  exit 2
+}
+
+[ "$#" -ge 1 ] && [ "$#" -le 2 ] || refuse "usage: sh scripts/git-clone-agent.sh <repo> [dir]"
 repo="$1"
 shift
 
+case "$repo" in
+  helen-triages | helen-triages-food-private | helen-triages-cocktails-private) ;;
+  *) refuse "'$repo' is not one of the three repos" ;;
+esac
+if [ "$#" -eq 1 ]; then
+  case "$1" in
+    /* | *..* | -*) refuse "'$1' is outside this checkout" ;;
+  esac
+fi
+
 here="$(cd "$(dirname "$0")" && pwd)"
 
-exec git -c "credential.helper=!sh '${here}/git-credential-agent-token.sh'" \
+set -- git -c "credential.helper=!sh '${here}/git-credential-agent-token.sh'" \
   clone --quiet "https://github.com/DeckOfPandas/${repo}.git" "$@"
+
+if [ -n "${AGENT_WRAPPER_DRY_RUN:-}" ]; then
+  printf '%s\n' "$@"
+  exit 0
+fi
+exec "$@"
