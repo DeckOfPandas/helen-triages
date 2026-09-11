@@ -2023,14 +2023,29 @@ anchor is fixed** — fixed height, body anchored top-left, foot pinned — and
 the cost is clamping: three lines of ingredients and up to three rows of mood
 chip (#552 — the tiki drinks needed the third line); the foot lays chips and
 ship side by side, bottom-aligned. **No panel behind the glass**; the drawing
-is absinthe and the card shows through. Hover brackets the column with two
-painted strips (never borders — nothing moves). **The title sits on punched
+is absinthe and the card shows through. **Under the cursor the field lifts to
+the magenta wash, the glass drawing goes magenta and the drink's NAME goes
+magenta wherever the cursor is on the card** (#886 then #971, both 2026-09-11;
+one mixin, and `.drink-card:has(:focus-visible)` as its own rule for the
+keyboard). The two painted strips that used to bracket the column are deleted.
+**And the whole card is the drink's link** (#971): one anchor per card, the
+name's, with a pseudo-element stretched over the card — sized in `vmax` and cut
+to shape by the card's own `overflow: hidden`, because the anchor's nearest
+positioned ancestor is the tape word and that cannot change. The chips and the
+`+` are lifted above it (`$card-z-link` / `-controls` / `-ship` in
+`_cards.scss`, with the card isolated), and the ship is lifted above the CHIPS
+because it masks them, then declines pointer events so its corner still opens
+the drink. **The title sits on punched
 tape** (§13.4.1's device at card size): two near-whites, one tight pair, no
 softening; the band is centred by moving the ARTWORK (`top: -1.765%`), the
 geometry solved for the name's width (padding costs the name twice, a bleed
 pays it back once; the `em` numbers follow the title, the gutter does not).
 **A name that does not fit shrinks one step (0.86) or wraps, never
-ellipsises** (`card-name-fit.js`; with no JS the ellipsis stays). **The mood
+ellipsises** (`card-name-fit.js`; with no JS the ellipsis stays, and
+`drink-card-name--fitted` — a mark, not a third state — releases that clip once
+the script has run, which is what lets the card's click overlay out of the tape
+word). It measures the word's CONTENT with a Range rather than its
+`scrollWidth`, because the overlay lives inside that box. **The mood
 chips are bare words**, Courier, lowercase, a middle dot between them drawn
 on the PRECEDING chip's `::after`, so a chip ending a line keeps its dot and
 none can ever lead a row (#846, which satisfies #698 by construction and
@@ -2103,13 +2118,22 @@ glass in a head row beside the tape and flush left with the ingredient line and
 the foot, the foot back in flow, height from content, **and every title at one
 size**: the modifier sets `--card-name-scale` to `$card-name-step` itself, so
 `card-name-fit.js` can only fit or wrap a name there, never step one smaller
-than its neighbours (#960). The markup is written in
-the layout rather than shared with the index as an include — four flag-shaped
-differences, the reason is in the layout's comment — and the chips are LINKS to
-the filtered index, as the page's own chip row is. **No new hue**, a plain
-`.cocktail-section-heading` as "To serve" uses, `repeat(auto-fit, minmax(13rem,
-1fr))` for three-then-two-then-one with no media query (the selector carries
-two classes because `cards` is imported after `cocktail`), and the whole
+than its neighbours (#960). **It also carries the index card's shortlist `+`
+since #977 (2026-09-11), in a band of top padding ABOVE the head row** —
+Helen: "higher than the tape so it doesn't take up space the name could use" —
+so the tape keeps the card's full width where the index card buys that corner
+with 2.63rem of title. **And it pays nothing at all for it**: `.drink-cards
+.drink-card--portrait .drink-card-name` cancels that reservation, which the
+related cards had been paying since #955 took `.drink-cards` for its list reset
+— 42px of a 101px name box at 484px, and the whole of #976. The markup is
+written in the layout rather than shared with the index as an include — three
+flag-shaped differences, the reason is in the layout's comment — and the chips
+are LINKS to the filtered index, as the page's own chip row is. **No new hue**,
+a plain `.cocktail-section-heading` as "To serve" uses, `repeat(auto-fit,
+minmax(16rem, 1fr))` for three-then-two-then-one with no media query (16rem
+since #976, up from 13rem: the floor is what decides when a row gives up a card,
+and 13rem put two 210px tracks in a 484px viewport; the selector carries two
+classes because `cards` is imported after `cocktail`), and the whole
 section is hidden in `make it` and in print. **The heading is a marked
 PLACEHOLDER in Helen's words from the issue.** Food has none of this: *"the
 priority is cocktails."*
