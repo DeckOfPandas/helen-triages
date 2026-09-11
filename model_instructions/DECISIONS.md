@@ -4098,3 +4098,55 @@ verification. Dates are when the correction landed.
   should. Her one open note to herself: *"I'll have a think about warming the
   rum slightly"* — the page is nearly all what she does not care about, and
   "I really really like rum" carries the whole positive side.
+
+- **2026-09-10, #920 — THE MARK WORE TWICE ON A WRAPPED HEADING, AND TWO STALE
+  COMMENTS SAID IT COULDN'T HAPPEN.** `.ref-section-heading span` used
+  `overlapping-rule-double` directly, the mixin the drink page's
+  INGREDIENTS/METHOD/NOTES headings use — but those never wrap (always one
+  word) where every heading on this page is a real sentence. `box-decoration-
+  break: clone` paints a full copy of the double rule on every line fragment,
+  so "Rum "styles" I do not recognise" and "Addendum: Rum Characters" wore the
+  mark under BOTH lines at 390px, measured by screenshot before it was
+  touched — exactly what MANUAL §13.1 and `assets/js/last-line-rule.js` exist
+  to prevent on food (Helen: "Last line only please, 10000%.").
+
+  **TWO COMMENTS (this file's header, and `_layouts/default.html`'s) SAID
+  "COCKTAILS HAS NO WRAPPING CONSUMER OF THE MARK", AND BOTH WERE RIGHT UNTIL
+  THIS PAGE GREW REAL SENTENCES FOR HEADINGS.** A cross-reference to another
+  file's behaviour is a claim nothing re-checks (MANUAL §12); the fix corrects
+  both rather than working around them. `.ref-section-heading span` now uses
+  `overlapping-rule-double-last-line`, and `last-line-rule.js`'s `TARGETS`
+  gains `.ref-section-heading span` as its OWN selector — not a reuse of
+  food's `.section-heading-text`, which would work today only by accident (it
+  carries no bare styling of its own outside `.recipe-section-heading` or a
+  `--modifier`) and is exactly the "a class carries every declaration, not
+  the one you wanted" trap this same file's EXAMPLES-heading bug (above,
+  same date) already cost a design review to find.
+
+  **THE NARROW-WIDTH FONT-SIZE OVERRIDE WAS ITSELF A SYMPTOM, AND IT STAYS
+  ANYWAY.** `.ref-section-heading--major`'s 1.5rem at 34rem-and-under first
+  shipped to cut a three-line heading to two, its own comment naming the
+  goal as fewer stripes. With the mark now correct at any line count, the
+  original reason is gone; the value is kept on its own remaining legibility
+  merits (three lines of a 2rem major heading is still a lot of a phone
+  screen), and the comment says so rather than leaving a now-false
+  justification standing.
+
+  **THE RETIRED-WORDS LIST TAKES THE SAME BORROWED FORMAT AS CHARACTERS.**
+  "Rum 'styles' I do not recognise" was still a bare vertical run with no
+  gutter mark, sitting five paragraphs above the Characters list wearing the
+  arrow-marked `ref-marked-list` format built for this page the same day
+  (2026-09-10, cited in that mixin's own header as #920's "borrow list format
+  from about page"). Same shape as Characters — a flat list of members
+  introduced by a colon sentence — and the about page's own `about-ways` is
+  reused verbatim for two different lists rather than earning a second mark
+  each, so `.rum-retired` takes the mixin's default "→" rather than a new
+  glyph.
+
+  Verified: `python3 scripts/verify.py` green; screenshots at 360/390/1280
+  before and after; the DOM-level fix confirmed directly (a debug script
+  diffing the heading's rendered `outerHTML`), because the shared browser-
+  harness port (4010) turned out to belong to a different worktree's server
+  (`fable-final-day`, confirmed via `/proc/<pid>/cwd`) — a caution for any
+  session assuming a green "ok" from the harness proves it measured ITS OWN
+  build rather than whatever else answers that port.
