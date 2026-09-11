@@ -2498,14 +2498,25 @@ unless stated.
     the only one with a coupling to keep in step: `.drink-card-ship`'s mask is
     the card's own `$color-surface`, and a lifted card leaves the verdict sitting
     on a rectangle of the old colour unless the mask follows.
-  **A shipped on the branch, and the other two are one class swap away.** Keyboard
+  A shipped on the branch first, with the other two one class swap away. Keyboard
   gets the identical state through `.drink-card:has(:focus-visible)`, written as
   a SEPARATE rule and never in a comma list with `:hover`: `:has()` is not
   forgiving, so a browser that does not know it drops every selector beside it —
   which would take the hover down too. `:focus-within` was rejected for firing on
   a mouse click, which would leave a card lit after the cursor had gone. Nothing
-  at rest changed, so a phone is exactly where it was. **Her pick is not yet
-  recorded — write it here when she makes it.**
+  at rest changed, so a phone is exactly where it was.
+  **Her pick, 2026-09-11: *"option c please, but 1. without the border above and
+  below the glass, b) glass also turns pink."*** So what shipped is C plus B's one
+  declaration, minus the two 3px strips that had been the card's whole hover
+  since 2026-09-04: the field lifts to `$color-wicked-woowoo-wash`, the glass
+  drawing goes magenta, and `.drink-card-ship`'s mask lifts with the field from
+  the same mixin. The strip pseudo-elements are deleted outright (a strip with
+  no resting colour and no hover colour is a rule about nothing), and A's three
+  pieces — the magenta border, the name lighting from anywhere on the card, the
+  absinthe dots — are not in it; the name keeps only its own 2026-09-02 hover.
+  Two of the candidates page's states were each built ON TOP of the strips,
+  which is why "without the border above and below the glass" was a change to
+  C rather than a description of it.
 
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.

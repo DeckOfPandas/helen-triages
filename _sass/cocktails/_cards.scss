@@ -167,10 +167,12 @@ $card-glass-scale: 10.4rem;
   // reader's eyes that a hairline cannot deliver.
   color: $color-electric-absinthe;
 
-  // The column still animates on hover — see the bracket rules below, which are
-  // painted strips rather than a background, so the transition stays useful
-  // even with nothing behind them.
-  transition: background-color 0.12s ease;
+  // THE DRAWING ITSELF ANSWERS THE CURSOR -- #886, Helen, 2026-09-11: "glass
+  // also turns pink." The value is set in `drink-card-under-the-cursor` below;
+  // this is the easing, at the 0.12s everything else on the card moves at. It
+  // used to ease `background-color` for the two painted strips that bracketed
+  // this column under the cursor, and those are gone (see below).
+  transition: color 0.12s ease;
 
   svg {
     display: block;
@@ -192,105 +194,63 @@ $card-glass-scale: 10.4rem;
   .glass-icon-line { stroke-width: 1; }
 }
 
-// The panel's top and bottom edges. Painted strips rather than borders,
-// because a border would eat into the column's fixed height and nudge the
-// glass — and the one rule the hover has is that nothing moves. Offset -1px so
-// they land ON the card's own border rather than inside it.
-.drink-card-glass::after,
-.drink-card::after {
-  content: "";
-  position: absolute;
-  left: -1px;
-  width: var(--card-text-x);
-  height: 3px;
-  pointer-events: none;
-  transition: background-color 0.12s ease;
-}
-.drink-card-glass::after { top: -1px; background: transparent; }
-// FULL STRENGTH SINCE 2026-09-02, not a mix. It was
-// `mix($color-electric-absinthe, $color-surface, 55%)` -- absinthe halfway to
-// the card -- which read as a pale green while there was a green PANEL beside
-// it to belong to. With the panel gone this is the only green on a resting card
-// and a diluted one looks like a leftover rather than a mark.
-//
-// AND NOTHING AT REST SINCE 2026-09-04 -- the design audit's refinement:
-// "The card's green mark reads as a progress bar stuck at
-// 18 percent... in a grid of twelve it looks like loading indicators." Four
-// treatments went on the real index (the dash, a full-width baseline, a
-// vertical rule on the column's inner edge, nothing) and Helen: "Agree, no
-// mark, end of." The reasoning that survives from the paragraph above is why
-// this is right rather than merely quieter: the glass itself has drawn in
-// absinthe since 2026-09-02, so every column already carries the home colour,
-// and a dash beneath it was a second, smaller green thing saying the same
-// thing. The strip stays in the DOM, transparent, because it is the hover's
-// lower bracket; only its resting colour is gone.
-.drink-card::after       { bottom: -1px; background: transparent; }
-
-// HOVER: the two marks bracket the glass column, top and bottom.
-// Helen asked for "a very subtle lightening of the white part of the
-// background", which is not available — a card is $color-surface on
-// $color-paper, so its white is already the brightest thing on screen with
-// nowhere lighter to go. Brightening the marks instead says the same thing and
-// moves no large area at all.
-// HOVER BRACKETS THE COLUMN IN MAGENTA, REST KEEPS THE GREEN -- Helen,
-// 2026-09-02: "for mouseover on the cocktail cards the top and bottom borders
-// of the glass panel should be pink. Leave the green bottom border at rest."
-// (The green at rest went on 2026-09-04, see above; the brackets are now the
-// only mark the strips paint, and they still appear only under the cursor.)
-//
-// The two colours are now saying two different things rather than one thing at
-// two strengths, which is what green-to-brighter-green was. Green at rest is
-// the home colour marking the column; magenta on hover is the same claim every
-// other magenta on this page makes -- "this one" -- in the interactive tense,
-// and it matches the title turning magenta under the same cursor.
+// NO STRIPS ANY MORE, AND NOTHING BRACKETS THE COLUMN -- #886, Helen,
+// 2026-09-11: "without the border above and below the glass." For nine days two
+// 3px painted strips (`.drink-card::after` and `.drink-card-glass::after`,
+// offset -1px to land ON the card's border) sat top and bottom of the glass
+// column: green at rest and magenta under the cursor from 2026-09-02, then
+// transparent at rest from 2026-09-04 ("Agree, no mark, end of." -- the audit
+// had read the green one as "a progress bar stuck at 18 percent") and so, for
+// their last week, the card's whole hover state. That is the state #886 was
+// raised against, and with the field itself answering now (below) the two stubs
+// were the one part of the candidate she asked to lose. The pseudo-elements are
+// deleted rather than left transparent: a strip with no resting colour and no
+// hover colour is a rule about nothing.
 //
 // =============================================================================
-// AND THE WHOLE CARD ANSWERS NOW -- #886, 2026-09-10
+// WHAT A CARD DOES UNDER THE CURSOR -- #886, 2026-09-10 / 2026-09-11
 // =============================================================================
 // Helen: "do something more attractive with cocktail cards on mouseover." Three
-// treatments went on the real index and she chose from them; this is the one
-// that shipped. The other two are on the candidates page and are one class swap
-// away: B turned the GLASS DRAWING magenta (one declaration, since the artwork
-// strokes with currentColor -- the largest piece of colour on a card, and
-// nothing else moving), and C LIFTED THE FIELD one step to
-// $color-wicked-woowoo-wash, the only candidate where the card stops receding.
+// treatments went on the real index and she chose from them on 2026-09-11:
+// "option c please, but 1. without the border above and below the glass, b)
+// glass also turns pink." So this is C with B's one declaration added and the
+// old strips taken away. The three treatments, for the record: A grew the
+// strips into a whole magenta border, lit the name from anywhere on the card
+// and brought both rows of separator dot up to absinthe; B turned the GLASS
+// DRAWING magenta; C LIFTED THE FIELD one step to $color-wicked-woowoo-wash.
 //
-// WHAT SHIPPED, AND IT IS THREE OBJECTS RATHER THAN ONE. The two painted strips
-// grow into the card's whole edge; the drink's name takes magenta wherever on
-// the card the cursor is rather than only off its own letters; and both rows of
-// separator dot -- the ingredient line's and the chip row's -- come up from
-// their greys to absinthe.
+// WHAT SHIPPED, AND IT IS TWO OBJECTS. The card's field lifts from
+// $color-surface to the magenta wash -- the one treatment that overturns the
+// inversion's "a card is a darker field cut into a lighter one", and the reason
+// C reads as the card coming forward rather than as a mark appearing on it.
+// And the glass drawing, the largest piece of colour on a card, moves from the
+// home green to magenta: one declaration, because the artwork strokes with
+// currentColor (3). The two say the same thing at two scales -- the field
+// says "this one" and the drawing says it louder.
 //
-// EVERY ONE OF THEM IS A HUE MOVE, which is the bar 12 sets and the bar the
-// four hover states of 2026-09-01 failed: at this type size the eye reads hue,
-// not lightness, so a brightening is a no-op dressed as a state. Magenta from a
-// grey border, magenta from a near-white title, absinthe from a mixed grey.
+// BOTH ARE HUE MOVES, which is the bar 12 sets and the bar the four hover
+// states of 2026-09-01 failed: at these sizes the eye reads hue, not lightness,
+// so a brightening is a no-op dressed as a state. The wash is 14% of magenta
+// on the card's own black, which is a hue arriving rather than the black
+// getting paler; absinthe to magenta on the drawing needs no argument.
 //
-// AND NOT ONE OF THEM MOVES ANYTHING. `border-color` and not `border-width`:
-// the card's height, padding and every anchor on it are what this file's header
-// is about, and a border that thickened would push all of them. No shadow, no
-// lift, no transform -- 9.13's rule, and LEOPARD.md 5 restates it for the fur
-// that is parked ("nothing on a card moves under the cursor except colour").
+// AND NEITHER MOVES ANYTHING. No shadow, no lift, no transform, no border
+// change -- 9.13's rule, and LEOPARD.md 5 restates it for the fur that is
+// parked ("nothing on a card moves under the cursor except colour"). The
+// card's height, padding and every anchor on it are what this file's header is
+// about.
 //
-// THE BRACKETS ARE SUBSUMED RATHER THAN DELETED. They are 3px of magenta lying
-// ON a border that is now magenta too, so they stop reading as two marks and
-// become the edge -- which is the upgrade: the whole shape of the card answers
-// instead of two stubs at one end of it. They stay in the rule because they are
-// what a NARROW card gets (below 400px the column is gone and the strips run
-// the card's full width) and because the transition is theirs.
+// THE ONE COUPLING, AND IT LIVES IN THE MIXIN SO IT CANNOT BE FORGOTTEN:
+// `.drink-card-ship` masks the chips that run under the verdict with the
+// card's own background (see its rule). A lifted field with a mask that stayed
+// $color-surface leaves the verdict sitting on a black rectangle in a magenta
+// card, so the mask lifts with the field, at the same 0.12s.
 //
-// WHAT THE TITLE'S HALF BUYS, beyond looking better: the card is not a link --
-// only the name is -- so lighting the name from anywhere on the card is the one
-// place a card can say WHERE to click. The trade is that magenta appears
-// slightly ahead of the thing you can touch; a card is a tile with one handle,
-// and pointing at the handle is the honest reading of that.
-//
-// THE DOTS ARE THE QUIET ONE AND EARN THEIR PLACE BY RHYMING. A card's only
-// absinthe at rest is the glass drawing down its left column (2026-09-02, "the
-// colour is in the LINE WORK now"); the punctuation coming up to the same green
-// under the cursor is the drawing's colour reaching the words for as long as
-// you are on the card. It is also the only part of this that is NOT magenta,
-// which stops the state reading as one flat wash of pink.
+// THE NAME KEEPS ITS OWN HOVER and no more: it goes magenta under its own
+// letters (2026-09-02, below) and not from anywhere on the card. A's "light
+// the handle from the whole tile" was one of the parts of A she did not take,
+// with the border and the dots; it is one selector to add back
+// (`.drink-card:hover &` on the name's rule) if she ever asks.
 //
 // A MIXIN, INCLUDED TWICE, AND THE TWO RULES ARE DELIBERATELY NOT ONE COMMA
 // LIST. `:has()` is not a forgiving selector, so a browser that does not
@@ -301,15 +261,10 @@ $card-glass-scale: 10.4rem;
 // test_no_selector_declares_the_same_property_twice; a mixin is the shape that
 // test's own note asks for.)
 @mixin drink-card-under-the-cursor {
-  border-color: $color-wicked-woowoo;
+  background: $color-wicked-woowoo-wash;
 
-  &::after { background: $color-wicked-woowoo; }
-  .drink-card-glass::after { background: $color-wicked-woowoo; }
-
-  .drink-card-sep,
-  .drink-card-mood:not(:last-child)::after {
-    color: $color-electric-absinthe;
-  }
+  .drink-card-glass { color: $color-wicked-woowoo; }
+  .drink-card-ship { background: $color-wicked-woowoo-wash; }
 }
 
 .drink-card:hover { @include drink-card-under-the-cursor; }
@@ -443,10 +398,10 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     color: inherit;
     text-decoration: none;
 
-    // It eases now rather than snapping -- #886. The card's border and its two
-    // separator rows all move under one cursor at 0.12s, and a title that
-    // arrived instantly in the middle of that read as a second, unrelated
-    // event. The same duration every other state on this page uses.
+    // It eases now rather than snapping -- #886. The card's field and its glass
+    // move under the cursor at 0.12s, and a title that arrived instantly beside
+    // that read as a second, unrelated event. The same duration every other
+    // state on this page uses.
     transition: color 0.12s ease, text-shadow 0.12s ease;
 
     // HOT MAGENTA ON HOVER — Helen, 2026-09-02. It was `#ffffff`, which is a
@@ -471,30 +426,17 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     // a highlight needs somewhere brighter to be RELATIVE TO ITS OWN FILL, and
     // white is not brighter than magenta in any useful sense, it is simply a
     // different colour.
-    // ...AND IT NOW ANSWERS THE WHOLE CARD, NOT ONLY ITS OWN LETTERS -- #886,
-    // 2026-09-10, the half of that state that belongs to the title. The card is
-    // not a link; the name is the only thing on it you can click, so a cursor
-    // anywhere on the card lights the one handle it has. See
-    // `drink-card-under-the-cursor` above for the rest of the state and for why
-    // the values are stated here rather than hoisted: this is where the
-    // highlight's reasoning lives, and a second copy of it in a mixin two
-    // hundred lines up is the "cross-reference nothing re-checks" trap.
-    //
-    // TWO BLOCKS, NOT ONE LIST, for the reason that mixin's own comment gives:
-    // `:has()` is not forgiving, and a browser that does not know it would drop
-    // every selector beside it -- including `&:hover`, which has worked since
-    // 2026-09-02 and must go on working.
-    @mixin drink-card-name-hot {
+    // AND IT STAYS THE NAME'S OWN STATE -- #886, 2026-09-11. Candidate A lit
+    // the name from anywhere on the card ("the one handle a tile has"); Helen
+    // took C with the glass instead, so a cursor on the card lifts the field
+    // and the drawing, and the name goes magenta only under its own letters,
+    // exactly as it has since 2026-09-02. See `drink-card-under-the-cursor`.
+    &:hover,
+    &:focus-visible {
       color: $color-wicked-woowoo;
       text-shadow: -1px -1px 0 #FF9BE8,
                     1px  1px 0 rgba(5, 5, 5, 0.9);
     }
-
-    &:hover,
-    &:focus-visible,
-    .drink-card:hover & { @include drink-card-name-hot; }
-
-    .drink-card:has(:focus-visible) & { @include drink-card-name-hot; }
   }
 }
 
@@ -720,13 +662,7 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   margin: 0.5rem 0 0;
 }
 
-// The seam between two ingredients. It comes up to absinthe under the cursor
-// (#886 -- see `drink-card-under-the-cursor`), so it eases like everything else
-// the card's hover moves.
-.drink-card-sep {
-  color: mix($color-text, $color-surface, 25%);
-  transition: color 0.12s ease;
-}
+.drink-card-sep { color: mix($color-text, $color-surface, 25%); }
 
 // The matched ingredient, in the colour of the field that matched it.
 .drink-card-hit {
@@ -810,8 +746,9 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // `$color-surface` behind it and a gutter of left padding: a chip that reaches
 // it is covered rather than overlapping it, which reads as the chip being cut
 // off at the verdict instead of as two words printed on top of each other.
-// The card's background does not change on hover -- only the ::after strips and
-// the text colours do -- so the mask cannot go out of step with it.
+// The card's background DOES change on hover since #886 (it lifts to the
+// magenta wash), so the mask is set beside it in `drink-card-under-the-cursor`
+// and eases at the same 0.12s -- the coupling is in one rule, not two.
 //
 // WHY NOT THE FLOAT THIS ISSUE ORIGINALLY PROPOSED. A float reserves space from
 // the TOP of its block downwards: placed first it wraps the chips around row
@@ -1046,11 +983,6 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     font-weight: 400;
     -webkit-text-stroke: 0;
     pointer-events: none;
-    // Absinthe under the cursor, with the ingredient line's own `·` and at the
-    // same 0.12s -- #886. The two rows of punctuation are the same object doing
-    // the same job one line apart, so they answer together or the card's hover
-    // reads as two events.
-    transition: color 0.12s ease;
   }
 
   // NO RULE HERE ANY MORE, AND THE ABSENCE IS THE POINT -- #846, 2026-09-08.
@@ -1191,11 +1123,13 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
   bottom: 0;
   // THE MASK, and it is why a chip running under the verdict reads as a chip
   // cut off rather than as two words overprinted. `$color-surface` is the
-  // card's own background and does not change on hover (only the ::after
-  // strips and the text colours do), so this cannot go out of step with it.
-  // The padding is the card's gutter, so a masked chip stops a sensible
+  // card's own background at rest. Under the cursor the card lifts to the
+  // magenta wash (#886) and this lifts with it, from the same mixin and at the
+  // same easing, or the verdict would sit on a black rectangle in a magenta
+  // card. The padding is the card's gutter, so a masked chip stops a sensible
   // distance from the word rather than hard against it.
   background: $color-surface;
+  transition: background-color 0.12s ease;
   padding-left: $card-gutter;
   // The ship is after the chips in the DOM, so it paints above them without a
   // z-index. Said rather than relied on silently: reordering the markup would
@@ -1373,13 +1307,10 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // the words, which is the only place the space could come from.
 @media (max-width: 400px) {
   // The glass is no longer a left column, so everything that measured itself
-  // against that column has to stop. These are consequences of un-columning,
-  // not choices: the foot's left edge came from the column's width, and the
-  // two panel edges were as wide as the column because the column was what
-  // they bracketed. Now they bracket the card.
+  // against that column has to stop. A consequence of un-columning, not a
+  // choice: the foot's left edge came from the column's width. (The two panel
+  // edges that used to widen here with it are gone -- #886, 2026-09-11.)
   .drink-card-foot { left: $card-pad-x; }
-  .drink-card::after,
-  .drink-card-glass::after { width: calc(100% + 2px); }
 
   // THE SCALE COMES DOWN, WHICH IS COUNTERINTUITIVE. The drawing now has the
   // whole card width available — more than it has ever had — so at the full
