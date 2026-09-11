@@ -1442,55 +1442,41 @@ $card-portrait-glass-scale: 3.6rem;
   // colliding card padded clear of it by card-line-budget.js) pads EVERY row
   // of that card, which a 370px card absorbs and a 13rem one does not.
   //
-  // THE ROWS FILL FROM THE BOTTOM, EACH FROM THE RIGHT, AND THE SHIP IS THE
-  // FIRST ITEM. `wrap-reverse` lays the first flex line at the BOTTOM of the
-  // box; `row-reverse` lays each line from the RIGHT. So the first line laid
-  // is the bottom row and its first item -- the ship, which the template
-  // emits first -- lands in the bottom-right corner, with as many chips beside
-  // it as fit; what does not fit goes to the line above, and every line above
-  // is the full width. That is the ask exactly, and CSS cannot say it any
-  // other way: a flex line breaks in sequence order, so a ship placed LAST in
-  // a normal flow takes a row of its own the moment the last row is full, and
-  // a ship out of flow needs every row padded (the index). The template emits
-  // the chips in REVERSE alphabetical order so that, read top-to-bottom and
-  // left-to-right, they come out A to Z: two reversals cancel. The DOM order
-  // is the cost, and it is stated in the template.
-  //
-  // `justify-content: flex-end` packs each reversed line toward the LEFT, so
-  // the short line (the top one, now) is left-aligned like text; the ship's
-  // `margin-left: auto` then takes the bottom line's slack between it and the
-  // chips, which is what keeps it in the corner on a line that is not full.
+  // THE LAST CHIP AND THE SHIP ARE ONE FLEX ITEM, AND THE ROWS WRAP LIKE
+  // TEXT. A flex line breaks between items in sequence order, so a ship placed
+  // last on its own takes a row of its own the moment the last row is full;
+  // and filling the rows from the bottom instead (`wrap-reverse`, tried the
+  // same day) puts the SHORT row at the top, which she sent straight back:
+  // "These still aren't right." The template therefore wraps the last chip
+  // and the ship together in `.drink-card-tail`, one item a line cannot
+  // split: it sits after the previous chip if the pair fits, and wraps as a
+  // pair if not, so the last row always ends "<last chip> ... <ship>", the
+  // rows above are the full width, and the short row is the last one, as in
+  // a paragraph. `flex: 1 0 auto` lets the tail grow to the end of its row
+  // and never shrink below the pair, and the ship's `margin-left: auto`
+  // takes the tail's slack, which is what puts it in the corner.
   // card-line-budget.js's clear-ship pass measures chips against the ship's
   // left edge and finds none past it, so it never fires here -- by geometry.
   //
   // NO ROW CAP, because the card grows: the index caps chips at three rows to
-  // fit $card-height, and here the cap would clip the TOP rows, which are now
-  // the overflow. `.drink-card--ingredients-3` is the same budget for the same
-  // fixed height and is put back to nothing for the same reason.
+  // fit $card-height, and here the cap would clip the ship's own row on a busy
+  // drink. `.drink-card--ingredients-3` is the same budget for the same fixed
+  // height and is put back to nothing for the same reason.
   .drink-card-moods {
-    flex-direction: row-reverse;
-    flex-wrap: wrap-reverse;
-    justify-content: flex-end;
     align-items: baseline;
     max-height: none;
     overflow: visible;
   }
 
-  // THE SEAM DOT, IN A REVERSED FLOW. The rule above puts a trailing dot on
-  // every chip but the last CHILD, and "last child" is now the chip that is
-  // read FIRST (A), while the chip read last (Z) is the ship's next sibling.
-  // So: the chip after the ship loses its dot, and the last child gets one --
-  // the same dot, restated, because the base rule's selector excludes it.
-  .drink-card-ship + .drink-card-mood::after { content: none; }
-  .drink-card-mood:last-child::after {
-    content: "·";
-    display: inline-block;
-    margin: 0 0.234rem;
-    color: $color-clear-text;
-    font-weight: 400;
-    -webkit-text-stroke: 0;
-    pointer-events: none;
+  .drink-card-tail {
+    display: inline-flex;
+    align-items: baseline;
+    flex: 1 0 auto;
   }
+
+  // The seam dot is "every chip but the last CHILD", and inside the tail the
+  // last chip has the ship after it: no dot, it is the last word.
+  .drink-card-tail .drink-card-mood::after { content: none; }
 
   .drink-card-ship {
     position: static;

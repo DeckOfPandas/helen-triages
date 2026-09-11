@@ -1240,22 +1240,21 @@ layout: default
                collides (card-line-budget.js), which pads EVERY row of that
                card; on a 13rem card that cost two chips a row.
 
-               THE FLOW IS REVERSED, AND THAT IS THE WHOLE TRICK. The ship is
-               the FIRST item and the chips follow in REVERSE alphabetical
-               order; the stylesheet lays the row out `row-reverse` and
-               `wrap-reverse`, so the flex lines fill from the BOTTOM and each
-               line from the RIGHT. The first line laid is therefore the
-               bottom one, and its first item -- the ship -- lands in the
-               bottom-right corner with as many chips beside it as fit; the
-               chips that do not fit go to the line above, at the full width.
-               Read top-to-bottom, left-to-right, the words come out A to Z,
-               because reversing the source order and reversing the layout
-               cancel. The one cost is that the DOM order is Z to A with the
-               ship first, so a screen reader or the Tab key meets these
-               chips backwards; on the page's OWN chip row above, which is the
-               primary one, the order is untouched. `_cards.scss`'s portrait
-               block has the rules and the seam-dot arithmetic. {% endcomment %}
-            <span class="drink-card-moods"><span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>{% assign rel_moods = rel.mood | sort_natural | reverse %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}</span>
+               THE LAST CHIP AND THE SHIP ARE ONE UNBREAKABLE ITEM. The chips
+               wrap top-down like text, in alphabetical order, and the ship
+               is in the flow at the end -- but a ship placed last on its own
+               takes a row of its own the moment the last row is full, and a
+               flow that fills from the bottom (tried, 2026-09-11, and she
+               sent it back: "These still aren't right") puts the SHORT row at
+               the top. So the last chip and the ship share a `.drink-card-tail`
+               that a flex line cannot split: if the pair fits after the
+               previous chip it sits there, and if not the pair wraps together,
+               so the last row always reads "<last chip> ... <ship>" with the
+               ship at the right edge, and the short row is the last one, as
+               in a paragraph. A drink with no moods still gets its ship, in
+               a tail of its own. `_cards.scss`'s portrait block has the four
+               rules. {% endcomment %}
+            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}{% if forloop.last %}<span class="drink-card-tail">{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% if forloop.last %}<span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}{% endfor %}{% if rel_moods.size == 0 %}<span class="drink-card-tail"><span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}</span>
           </div>
         </li>
       {% endfor %}
