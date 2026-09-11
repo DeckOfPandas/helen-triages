@@ -2545,6 +2545,49 @@ unless stated.
   `.drink-cards`' 370px floor won on order: the first build drew two across the
   900px column, measured, instead of three.
 
+- **2026-09-10, #886 — what a drink card does under the cursor.** The issue was
+  a sentence with no body: *"do something more attractive with cocktail cards on
+  mouseover."* The card had one hover state and it was two 3px strips bracketing
+  the glass column (2026-09-02), which is the smallest possible answer to *"you
+  can touch this"* on the biggest object the index has. Three treatments went on
+  the real index behind `html[data-hover]`, each obeying §9.13's rule that colour
+  moves and geometry does not, and each a HUE move rather than a lightness one
+  (§12: at this type size the eye reads hue, and four of this site's hover states
+  had already been caught as lightness-only no-ops):
+  - **A, the edge and the words.** The strips grow into the card's whole magenta
+    border; the drink's name takes magenta wherever on the card the cursor is,
+    rather than only off its own letters; and both rows of separator dot — the
+    ingredient line's `·` and the chip row's — come up from their greys to
+    absinthe, which is the glass drawing's own colour reaching the words.
+  - **B, the glass answers.** One declaration, because the artwork strokes with
+    `currentColor`: the whole drawing moves absinthe → magenta and nothing else
+    changes. The largest piece of colour on a card, and the loudest of the three.
+  - **C, the field lifts.** The card stops receding — its field goes to
+    `$color-wicked-woowoo-wash` — which is the one candidate that overturns the
+    inversion's *"a card is a darker field cut into a lighter one"*. It is also
+    the only one with a coupling to keep in step: `.drink-card-ship`'s mask is
+    the card's own `$color-surface`, and a lifted card leaves the verdict sitting
+    on a rectangle of the old colour unless the mask follows.
+  A shipped on the branch first, with the other two one class swap away. Keyboard
+  gets the identical state through `.drink-card:has(:focus-visible)`, written as
+  a SEPARATE rule and never in a comma list with `:hover`: `:has()` is not
+  forgiving, so a browser that does not know it drops every selector beside it —
+  which would take the hover down too. `:focus-within` was rejected for firing on
+  a mouse click, which would leave a card lit after the cursor had gone. Nothing
+  at rest changed, so a phone is exactly where it was.
+  **Her pick, 2026-09-11: *"option c please, but 1. without the border above and
+  below the glass, b) glass also turns pink."*** So what shipped is C plus B's one
+  declaration, minus the two 3px strips that had been the card's whole hover
+  since 2026-09-04: the field lifts to `$color-wicked-woowoo-wash`, the glass
+  drawing goes magenta, and `.drink-card-ship`'s mask lifts with the field from
+  the same mixin. The strip pseudo-elements are deleted outright (a strip with
+  no resting colour and no hover colour is a rule about nothing), and A's three
+  pieces — the magenta border, the name lighting from anywhere on the card, the
+  absinthe dots — are not in it; the name keeps only its own 2026-09-02 hover.
+  Two of the candidates page's states were each built ON TOP of the strips,
+  which is why "without the border above and below the glass" was a change to
+  C rather than a description of it.
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
