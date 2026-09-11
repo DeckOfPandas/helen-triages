@@ -559,6 +559,20 @@ from conftest import FRONT_MATTER, DRAFTS_PRESENT, ALL_DRAFTS
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
+# MOVED 2026-09-11, FOR A PROMOTION -- the ham and the coleslaw. `047dba0`
+# copies two drafts Helen had rewritten and moved to `to-promote/` into
+# `_food_recipes/` with `proofread: true`, on her word: "Ham and coleslaw are
+# ready to promote to the best of my knowledge... Please do it for me." The
+# same case PUBLISHING_A_DRINK.md step 6 records for the first 48 drinks: this
+# test reads the public repo's history only, so it cannot tell a promotion
+# from an edit, and sees two proofread recipes appearing in an agent's commit.
+# The public suite then named three mechanical things the drafts suite does
+# not check (a sugar's vocabulary spelling, `whole cloves`, a duplicate
+# serving estimate), fixed in the same commit and listed in its message;
+# none is a word she would read as prose. Proved with the old value first:
+# the test named exactly these two. Covers 047dba0 and nothing after it.
+BASELINE_COMMIT = "047dba0"   # the ham and the coleslaw, promoted on Helen's word
+#
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
 # tarragon salad (agent edit since her last read: two commas, #806) and the
@@ -573,7 +587,6 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # is more than she granted; the baseline covers ae13155 and nothing after, so
 # the next agent edit to either file trips this test again. The grant is hers,
 # explicit, and quoted, which is the only thing that has to stay true.
-BASELINE_COMMIT = "ae13155"   # the salad and the cheesecake, on Helen's word
 #
 # MOVED 2026-09-10, FOR SEVEN WORDS. #874 dictated the ganache's "how much
 # this makes" note: delete the lead-in, start with "Enough", "for a thick
