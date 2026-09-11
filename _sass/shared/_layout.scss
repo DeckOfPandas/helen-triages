@@ -105,12 +105,23 @@ main {
 .site-header-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  // TWO ROWS SINCE 2026-09-10: the wordmark, then the door to the other site
-  // centred beneath it, with `??` in the third column of that second row.
-  // Helen's idea, picked by looking (see default.html's comment on the row).
+  // TWO ROWS SINCE 2026-09-10: the wordmark, then a second row with `??` at
+  // its left end and the door to the other site at its right end (since
+  // 2026-09-11, #965; centred under the wordmark for the day before that).
   grid-template-rows: auto auto;
   align-items: end;
-  max-width: $width-content;
+  // THE CARDS' WIDTH, NOT MAIN'S, SINCE 2026-09-11. The comment above says this
+  // shares main's formula so the nav lines up with the content column -- but
+  // `main` is $width-content INCLUDING its $space-xl padding, so its content
+  // column is 852px, and this was 900px inside the header's own padding. Over
+  // 948px the header's edges sat 24px outside the cards' (measured at 1280:
+  // `??` at 202px, the cards at 214px). Nobody could see it while the row was
+  // centred. With the row on the right-hand edge and `??` on the left, both on
+  // the cards' edges (#965, Helen: "Both on the cards' edge"), this width is
+  // what makes that true at every viewport width rather than below 948px.
+  // `calc()`, because $width-content is px and $space-xl rem: Sass cannot
+  // subtract them at compile time, the browser can.
+  max-width: calc(#{$width-content} - #{2 * $space-xl});
   margin: 0 auto;
 }
 
@@ -132,19 +143,26 @@ main {
 // tape SVGs", so if that height or the SVG's margins change, re-eyeball this by
 // hand rather than expecting it to follow.
 .site-nav-icons {
-  // UNDER THE WORDMARK, CENTRED, SINCE 2026-09-10 -- row 2 of the header grid,
-  // in the wordmark's own column, so it is centred on the tape by construction.
-  // It sat in row 1 column 3 (top right, beside the wordmark) from #551 until
-  // then; the `grid-row: 1` both items carried was what kept sparse
-  // auto-placement from stacking them, and the wordmark still carries it.
+  // AT THE RIGHT-HAND END OF ROW 2, ON THE CARDS' RIGHT EDGE, SINCE 2026-09-11
+  // -- column 3, `justify-self: end`, and the header's column is the cards'
+  // width (`.site-header-inner`, above). Helen, having seen the centred row on
+  // her phone: "the design I would like is for the link to the other site (and
+  // icon and arrow) to be on the right-hand side at desktop width. I have
+  // changed my mind since seeing the centred design on mobile." It was centred
+  // under the wordmark in column 2 from 2026-09-10 (her idea then, picked by
+  // looking), and in row 1 column 3 from #551 before that.
+  //
+  // COLUMN 3 IS WIDE ENOUGH AT EVERY WIDTH ABOVE THE STACK, measured: the
+  // widest wordmark, `[ COCKTAILS ]`, is 488.8px, which at 821px leaves 142px of
+  // each side track for a 141px row.
   //
   // WHAT IS IN THE ROW: the OTHER site's icon, its bracketed word and an arrow
   // -- Helen: "D: the other site, icon and word, arrow on." The site you are on
   // is on the tape above and is not repeated here (default.html has the
   // reasoning). On the about page, which belongs to no site, both appear.
   grid-row: 2;
-  grid-column: 2;
-  justify-self: center;
+  grid-column: 3;
+  justify-self: end;
   align-self: start;
   margin: 0.9rem 0 0;
   display: flex;
@@ -158,13 +176,14 @@ main {
   // `.site-nav-icons` running 4px past a 360px viewport on /about/, the row's
   // own two groups wider than the column even though neither group alone
   // would be. `flex-wrap: wrap` lets the second group drop to a line of its
-  // own instead of forcing the row wider than the page; `justify-content:
-  // center` keeps a single wrapped line centred under the wordmark rather
-  // than pinned to the row's start edge, matching `justify-self: center` on
-  // the container itself. Harmless everywhere else: one group never has
-  // reason to wrap.
+  // own instead of forcing the row wider than the page. `justify-content:
+  // flex-end` (since 2026-09-11; `center` while the row was centred) hangs a
+  // wrapped line from the right edge, like the row itself -- on /about/ the
+  // two groups are 340px, wider than column 3 at desktop width too, so they
+  // wrap there as well as on a phone. Harmless everywhere else: one group
+  // never has reason to wrap.
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 // The row's own word and arrow. Courier in the site's own bracket device --
@@ -288,8 +307,11 @@ main {
   grid-column: 1;
   justify-self: start;
   align-self: center;
-  // The same $space-md of air from the page edge the row used to carry.
-  margin: 0.9rem 0 0 $space-md;
+  // ON THE CARDS' LEFT EDGE, SINCE 2026-09-11: no side margin, now that the
+  // header's column is the cards' width. It carried "the same $space-md of air
+  // from the page edge the row used to carry" until then, which put it 12px
+  // inside the cards; Helen, on #965: "Both on the cards' edge".
+  margin: 0.9rem 0 0;
   font-family: $font-body;
   font-size: 1.05rem;
   font-weight: 400;
@@ -958,8 +980,18 @@ $tape-protrusion: 0.2rem;
   //
   // `order`, not a DOM change: the nav is FIRST in the markup because it is
   // first in the tab order, and it stays that way.
+  // `minmax(0, 1fr)`, NOT `1fr`, SINCE 2026-09-11 -- the one place the
+  // centre-track argument above does not hold. A bare `1fr` track cannot be
+  // narrower than its widest item's min-content, and at 390px the wordmark's is
+  // 343.5px in a 342px container, so the track ran 1.5px past the header's
+  // edge. Nobody could see that while the row was centred; once #965 put the
+  // row on the right-hand edge, the row ended 1.5px past the cards it is meant
+  // to line up with. With one column there is no neighbour for the wordmark to
+  // spill over -- the reason `min-width: 0` is refused for the centre track --
+  // so the track keeps the container's width and the wordmark overhangs by
+  // under a pixel each side, inside the page padding.
   .site-header-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     justify-items: center;
     gap: $space-lg;
   }
@@ -979,10 +1011,13 @@ $tape-protrusion: 0.2rem;
     grid-column: 1;
   }
 
-  // The row is already in row 2 and centred at every width since 2026-09-10;
-  // in one column it only has to move from the wordmark's column to the one
-  // column there is. `??` joins it in the same cell, pinned to the right end,
-  // which is where it sits at full width too.
+  // ONCE THE HEADER STACKS, the row and `??` share the one column there is:
+  // `??` at its start and the row at its end, both on the cards' edges, as at
+  // full width (the rules above) -- #965, Helen: "on mobile, please move the
+  // icon, other site name and arrow to the right-hand edge of the page, in line
+  // with the edge of the cocktail cards which is symmetrical with the about ??
+  // link", and, asked which when the two edges were 12px apart, "Both on the
+  // cards' edge". Only the column changes here; the ends come from above.
   .site-nav-icons {
     grid-column: 1;
   }

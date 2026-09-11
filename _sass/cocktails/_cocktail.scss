@@ -174,6 +174,12 @@ $head-pad-bottom: 1.4rem;
 // would emit the literal text `$title-size` and the title would fall back to
 // the calc's 1rem.
 $title-size:         2.6rem;   // the tape's size, emitted as `--card-name-size` below
+$title-size-phone:   2rem;     // the same, at <= 600px -- see the phone block
+// The tape's padding above and below one line of lettering, as a fraction of
+// the lettering's size: (0.7059 x 2em - 1em) / 2, derived where it is used in
+// the tape-band block. Named because the title row's shortlist button (#963)
+// is aligned by it too.
+$title-tape-pad-ratio: 0.2059;
 $title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;
 $title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
 $glass-top:          $title-half-leading + $title-cap-inset;
@@ -290,6 +296,63 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   align-items: last baseline;
   justify-content: space-between;
   gap: $space-xl;
+}
+
+// THE SHORTLIST BUTTON IS BACK IN THIS ROW, AT ITS RIGHT END, SINCE 2026-09-11
+// -- #963, Helen: "move the shortlist up to the top right, aligned with the
+// horizontal centre of the first line of the cocktail name." From #897
+// (2026-09-10) until then it sat at the right of the controls row, under the
+// title block's rule.
+//
+// ALIGNED BY CONSTRUCTION, NOT BY A MEASURED NUDGE. The button is given the
+// first line's own box: a top margin equal to the tape's padding above the
+// lettering, and a height of one line of lettering -- 1em at the tape word's
+// line-height of 1, or 1.12em once card-name-fit.js has wrapped the name
+// (`.drink-card-name--wrap`, _cards.scss). `.btn-shortlist` is already an
+// inline-flex with `align-items: center`, so its word sits on that line's
+// centre at any size. `flex-start`, NOT the row's `last baseline`, which would
+// line it up with the LAST line of a wrapped name.
+//
+// THE SIZE IS THE TITLE'S, from the same two variables the tape reads, times
+// the fitting script's 0.86 step when the name has taken it. Read through
+// `:has()` because the button is the name's SIBLING and cannot inherit the
+// `--card-name-scale` that `.drink-card-name--step` sets on the name itself; the
+// 0.86 and the 1.12 are _cards.scss's, which is imported after this file.
+.cocktail-title-row {
+  --title-line: #{$title-size};
+}
+
+.cocktail-title-row:has(.drink-card-name--step) {
+  --title-line: #{$title-size * 0.86};
+}
+
+.cocktail-title-row .btn-shortlist {
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin-top: calc(var(--title-line) * #{$title-tape-pad-ratio});
+  height: var(--title-line);
+}
+
+.cocktail-title-row:has(.drink-card-name--wrap) .btn-shortlist {
+  height: calc(var(--title-line) * 1.12);
+}
+
+@media (max-width: 600px) {
+  .cocktail-title-row {
+    --title-line: #{$title-size-phone};
+  }
+
+  .cocktail-title-row:has(.drink-card-name--step) {
+    --title-line: #{$title-size-phone * 0.86};
+  }
+
+  // A SMALLER GAP BESIDE THE MARK. On a phone the button is the + alone
+  // (cocktails/_shortlist.scss has the rule and Helen's pick), and the
+  // $space-xl gap was sized for a word beside the name; every rem here is a rem
+  // off the name on a 342px column.
+  .cocktail-title-row {
+    gap: $space-md;
+  }
 }
 
 // A PLAIN BLOCK NOW. This was a flex column that had to declare `flex: 1` to
@@ -486,6 +549,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // the ingredients list. Then top right for a save this feels more natural."
   // `space-between` on a two-item row is exactly that, and the gap stays for
   // the day the two are close enough to need it.
+  //
+  // THE TOGGLE IS ALONE HERE SINCE 2026-09-11: the shortlist went up to the
+  // title row's right end (#963, `.cocktail-title-row .btn-shortlist` above),
+  // which is Helen's "top right for a save" taken one step further. With one
+  // item, `space-between` leaves the toggle at the start, where she put it.
   justify-content: space-between;
   align-items: center;
   gap: $space-lg;
@@ -1212,7 +1280,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   }
 
   .cocktail-title-block .drink-card-name {
-    --card-name-size: 2rem;
+    --card-name-size: #{$title-size-phone};
   }
 
   // Both bleeds, in fact: the right one runs into a card's own padding on the
@@ -1254,8 +1322,8 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 .cocktail-title-block {
   .drink-card-tape {
     // (0.7059 x 2em - 1em) / 2: the band's height above and below one line.
-    padding-top: 0.2059em;
-    padding-bottom: 0.2059em;
+    padding-top: $title-tape-pad-ratio * 1em;
+    padding-bottom: $title-tape-pad-ratio * 1em;
   }
 
   .drink-card-tape-bg {
