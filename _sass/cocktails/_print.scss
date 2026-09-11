@@ -67,8 +67,7 @@
   // block above: `make it` hides it and print does NOT put it back, because the
   // editorial state print restores is about carrying MORE information about
   // this drink, not more ways to leave it.
-  .cocktail-related-heading,
-  .cocktail-related { display: none; }
+  .cocktail-related-section { display: none; }
 
   // THE SCALER GOES TOO, AND WITH IT ITS FLOOR MESSAGE -- #545, 2026-09-04.
   // Same argument as the toggle above, plus one of its own: a PRINTED PAGE IS

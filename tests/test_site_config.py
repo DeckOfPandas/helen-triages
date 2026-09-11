@@ -2124,31 +2124,6 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "360px phone one word at a time. Unlike .tc-row, there is no unbroken "
         "string here that could grow past that."
     ),
-    ".cocktail-related-item": (
-        "`$related-glass-slot minmax(0, 1fr)` -- the related-drinks row at the "
-        "foot of a drink page (#927). THE CLAIM IS STRUCTURAL RATHER THAN ABOUT "
-        "THE CONTENT, which is what makes it different from the two entries "
-        "above: the flexible track is `minmax(0, 1fr)` and not a bare `1fr`, so "
-        "its floor is a declared ZERO rather than its content's min-content "
-        "width -- the exact thing this test's message is worried about is "
-        "written out of the declaration. Both occupants take that seriously "
-        "rather than relying on it: the ingredient line carries `min-width: 0` "
-        "with `overflow: hidden` and an ellipsis, and the name carries "
-        "`min-width: 0` so card-name-fit.js can see the overflow and step then "
-        "wrap it, which is the same treatment a card's name gets. The other "
-        "track is a flat 2.8rem. "
-        "AND THE ROW ALREADY HAS ITS NARROW BEHAVIOUR, one level up, where this "
-        "scanner cannot see it: the `.cocktail-related` grid around it is "
-        "`repeat(auto-fit, minmax(13rem, 1fr))`, which this test exempts by "
-        "construction, so on a phone each item gets the WHOLE column rather "
-        "than a third of it. Collapsing this inner grid as well would put the "
-        "glass on a line of its own above the name, which is worse, not "
-        "narrower. Measured, not believed: at 360 on aperol-spritz -- the page "
-        "carrying the longest title in the collection, 'Pear, apricot and "
-        "rosemary Bellini' -- scripts/browser/shoot.sh reports no element past "
-        "the viewport, and the name wraps onto two lines of tape inside its "
-        "track."
-    ),
 }
 
 

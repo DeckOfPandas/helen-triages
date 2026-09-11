@@ -2071,16 +2071,26 @@ concatenated in. Only a candidate scoring above zero is offered, and
 the same corpus, so it doubles as a second implementation to check the template
 against. Today every drink's third pick shares at least 3; **re-run it after a
 promotion batch or any vocabulary edit that moves moods.**
-**The row is the universe line's three parts** — the tiny glass, the name on
-tape, one ingredient line — using the card's own child classes and none of its
-geometry, because the card is inline in `cocktails/index.html` rather than an
-include and a third card design is §13.12's to refuse. **No new hue**, a plain
+**The three are PORTRAIT CARDS since 2026-09-11** (Helen on #955; DECISIONS
+§9.13 has her words): `.drink-card.drink-card--portrait` in a
+`<section class="cocktail-related-section">` that wears `.cocktail-footer`'s
+rule. The card is the index card's classes on the index card's parts, so every
+colour, face, clamp and hover state is `_sass/cocktails/_cards.scss`'s, and the
+`--portrait` modifier (in that file, beside the card) moves geometry only: the
+glass in a head row beside the tape and flush left with the ingredient line and
+the foot, the foot back in flow, height from content. The markup is written in
+the layout rather than shared with the index as an include — four flag-shaped
+differences, the reason is in the layout's comment — and the chips are LINKS to
+the filtered index, as the page's own chip row is. **No new hue**, a plain
 `.cocktail-section-heading` as "To serve" uses, `repeat(auto-fit, minmax(13rem,
-1fr))` for three-then-one with no media query, and it is hidden in `make it` and
-in print. **The heading is a marked PLACEHOLDER in Helen's words from the
-issue.** Food has none of this: *"the priority is cocktails."*
+1fr))` for three-then-two-then-one with no media query (the selector carries
+two classes because `cards` is imported after `cocktail`), and the whole
+section is hidden in `make it` and in print. **The heading is a marked
+PLACEHOLDER in Helen's words from the issue.** Food has none of this: *"the
+priority is cocktails."*
 `test_every_published_drink_page_offers_three_other_published_drinks` reads the
-PRODUCTION build.
+PRODUCTION build and counts the NAME links only, since a card carries chip links
+too.
 
 **Every drink names a glass** (`test_every_drink_names_a_glass`; the
 `GLASSLESS_ON_2026_08_27` ratchet is empty and asserted so). What made Helen's

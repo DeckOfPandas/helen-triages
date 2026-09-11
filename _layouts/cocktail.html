@@ -1117,17 +1117,63 @@ layout: default
        each (§9.13) and this section has not earned one -- inventing a fourth
        pairing here would be spending a hue on a heading nobody has ruled on.
     {% endcomment %}
+    {% comment %} A SECTION WITH A RULE ABOVE IT -- Helen on #955, 2026-09-11:
+       "Please add some kind of divider between the end of the recipe (whether
+       serve or notes or anything else) and 'If you liked this...'". The rule
+       is `.cocktail-footer`'s own (margin, padding, hairline), so the page
+       ends with two objects drawn the same way: three other drinks, then the
+       source line. {% endcomment %}
+    <section class="cocktail-related-section">
     <!-- PLACEHOLDER COPY, Helen's to write -->
     <h2 class="cocktail-section-heading cocktail-related-heading">If you liked this, how about&hellip;</h2>
-    <ul class="cocktail-related">
+    {% comment %} REAL CARDS, PORTRAIT -- Helen on #955, 2026-09-11: "Please
+       turn the suggestions into cards -- 1. Allow 2 or 3 lines of ingredients
+       to show, 2. show the chips. It's fine for the cards to be portrait
+       orientation. 3. Take the styling from index page cards, including the
+       new styling in #953 when it's finished." And: "Bring the glass drawing
+       inline in the row with the name tape, so its left margin is aligned with
+       the left margin of the ingredients line."
+
+       SO THIS IS THE INDEX CARD'S OWN VOCABULARY -- `.drink-card`, its glass,
+       name, tape, ingredient line, foot, chips and ship -- with one modifier,
+       `drink-card--portrait`, that changes the GEOMETRY only: the glass sits
+       in a head row beside the tape instead of down a fixed left column, and
+       the card is as tall as its content instead of $card-height. Every
+       colour, face, clamp and hover state (the #953 field-and-glass one
+       included) comes from _sass/cocktails/_cards.scss unchanged, because
+       the classes are the same classes. The first version of this row
+       borrowed three of those parts with none of the geometry; the card was
+       "yours to ask for", and she asked.
+
+       WHY THE MARKUP IS WRITTEN HERE AND NOT SHARED WITH cocktails/index.html
+       AS AN INCLUDE. The two cards differ in four places that are each a
+       flag on an include: the glass is inside a head row here and a sibling
+       of the body there; the chips are LINKS to the filtered index here (as
+       this page's own chips are, a few hundred lines up) and filter BUTTONS
+       there; there is no shortlist `+` here (the page's own shortlist button
+       is for THIS drink, a stone's throw above); and the index's `data-*`
+       search attributes have nothing to match against on this page. Four
+       flags on ninety lines of commented markup is a worse object than
+       twenty-five plain lines that name the same classes. What they share is
+       the stylesheet, and that is the half that cannot drift by accident.
+
+       THE GLASS IS DRAWN AT THE INDEX'S OWN COMPRESSION -- the ratio mapped
+       onto 0.5-1.0 and `display_scale` applied -- against the same
+       `tallest_mm` this page counts at its top for its hero glass. Not one
+       height for every glass, which the first row did and argued for: on a
+       CARD the drawing is the card's own mark, and the index already decided
+       what a Collins looks like beside an old-fashioned at card size.
+       `--card-portrait-glass-scale` is the head row's own headroom dial, set
+       once in _cards.scss beside $card-glass-scale. {% endcomment %}
+    <ul class="cocktail-related drink-cards">
       {% for entry in related_sorted limit: 3 %}
         {% assign parts = entry | split: "~" %}
         {% assign rel = site.cocktail_recipes | where: "url", parts[2] | first %}
         {% comment %} GLASS IS AN ORDERED LIST, FIRST WITH ARTWORK WINS -- the
            same contract the head of this file and the index card follow, and
            the same empty-string accumulator, tested against "" rather than
-           truth-tested. An empty span when there is no drawing, so the row's
-           three items keep one shape. {% endcomment %}
+           truth-tested. An empty span when there is no drawing, so the tape
+           starts at the same x on all three cards. {% endcomment %}
         {% assign rel_icon = "" %}
         {% for g in rel.glass %}
           {% if rel_icon == "" %}
@@ -1135,10 +1181,19 @@ layout: default
             {% if found %}{% assign rel_icon = found %}{% endif %}
           {% endif %}
         {% endfor %}
-        <li class="cocktail-related-item">
+        {% assign rel_ship = rel.meta.ship | default: "who knows" %}
+        <li class="drink-card drink-card--portrait">
+          <div class="drink-card-head">
           {% if rel_icon != "" %}
+            {% assign rel_mm = heights_mm[rel_icon] %}
+            {% assign rel_ratio = 1.0 %}
+            {% if rel_mm and tallest_mm > 0 %}
+              {% assign rel_ratio = rel_mm | times: 1.0 | divided_by: tallest_mm %}
+              {% assign rel_ratio = rel_ratio | times: 0.5 | plus: 0.5 %}
+            {% endif %}
+            {% assign rel_cheat = site.data.cocktails.glasses.display_scale[rel_icon] | default: 1.0 %}
             {% capture rel_icon_file %}icons/glasses/{{ rel_icon }}.svg{% endcapture %}
-            <span class="drink-card-glass">{% include {{ rel_icon_file }} %}</span>
+            <span class="drink-card-glass" style="--glass-ratio: {{ rel_ratio }}; --glass-cheat: {{ rel_cheat }};">{% include {{ rel_icon_file }} %}</span>
           {% else %}
             <span class="drink-card-glass"></span>
           {% endif %}
@@ -1157,18 +1212,32 @@ layout: default
               <span class="drink-card-tape-word"><a href="{{ rel.url | relative_url }}">{{ rel.title }}</a></span>
             </span>
           </p>
-          {% comment %} ONE INGREDIENT LINE, from `card_ingredients` -- the list
+          </div>
+          {% comment %} THE INGREDIENT LINE, from `card_ingredients` -- the list
              _plugins/cocktail_card_ingredients.rb already built and ordered for
-             the card (§9.10.1), so this row cannot show a different set or a
-             different order from the same drink's card. No `data-ing`
-             attributes: those exist for the index's match highlighting and
-             there is nothing on this page to match against. {% endcomment %}
+             the card (§9.10.1), so this card cannot show a different set or a
+             different order from the same drink's index card. Clamped to three
+             lines by the card's own rule. No `data-ing` attributes: those exist
+             for the index's match highlighting and there is nothing on this
+             page to match against. No whitespace inside the <p>, per #917. {% endcomment %}
           {% if rel.card_ingredients.size > 0 %}
             <p class="drink-card-ingredients">{% for ing in rel.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">&middot;</span> {% endunless %}{{ ing.label }}{% endfor %}</p>
           {% endif %}
+          <div class="drink-card-foot">
+            {% comment %} THE CHIPS ARE THE PAGE'S OWN CHIPS: alphabetical
+               (`sort_natural`, for the capital I in "I want to faff"), grouped
+               through taxonomy.yml's `mood_groups`, and LINKS to the index
+               filtered on the word -- exactly what this drink's own chip row
+               emits above, and for the same reason: on a drink page a chip
+               has nothing to filter, so it takes you where the filter is.
+               `mood_groups` and `chip_home` are assigned by that row. {% endcomment %}
+            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}</span>
+            <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>
+          </div>
         </li>
       {% endfor %}
     </ul>
+    </section>
   {% endif %}
 
   {% comment %} AN EMPTY STRING IS TRUTHY TOO, not just an empty array. All

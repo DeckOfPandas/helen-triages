@@ -1298,6 +1298,104 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 }
 
 // =============================================================================
+// THE PORTRAIT CARD -- #927 / #955, Helen, 2026-09-11
+// =============================================================================
+// "It's fine for the cards to be portrait orientation... Take the styling
+// from index page cards... Bring the glass drawing inline in the row with the
+// name tape, so its left margin is aligned with the left margin of the
+// ingredients line."
+//
+// ONE MODIFIER, AND IT CHANGES GEOMETRY ONLY. Every rule above -- the face,
+// the tape and its two fitting states, the three-line ingredient clamp, the
+// chip colours and their dots, the ship's mask and the clear-ship pass, the
+// hover -- applies to a portrait card unchanged, because it is the same
+// classes on the same parts. What this block moves: the glass leaves the
+// fixed left column and sits in a HEAD ROW beside the tape; the foot comes
+// back into flow at the bottom of a column; and the card is as tall as its
+// content rather than $card-height. Three cards in one grid row still share a
+// height, because the grid stretches them -- which is the fixed-anchor
+// argument's whole reason, met by the grid rather than by a constant.
+//
+// THE ALIGNMENT SHE ASKED FOR IS THE PADDING, AND NOTHING ELSE. The glass is
+// the head row's first item, the ingredient line and the foot are the card's
+// next children, and all three start at the card's own left padding -- one
+// value, so they cannot drift. The tape still bleeds left by its own padding
+// (the rule above), so its LETTERING lands on the drawing's right edge plus
+// the gutter, a hair over it as on the index; that is the same object, not a
+// new one.
+//
+// THE DRAWING IS AT THE INDEX'S COMPRESSION, NOT ONE HEIGHT FOR EVERY GLASS.
+// The row's first version drew every glass 1.7rem tall as "a mark at the head
+// of a line". On a card the drawing is the card's own mark, and the index
+// decided on 2026-08-31 what a Collins looks like beside an old-fashioned at
+// card size; the template hands over the same `--glass-ratio` and
+// `--glass-cheat`, and this is the head row's own headroom dial, the third
+// after $card-glass-scale and the narrow layout's 6.4rem. The head row's
+// `min-height` is that dial, so a short glass does not pull the tape up and
+// the ingredient line starts at the same y on all three cards.
+//
+// THE CHIPS ARE NOT BUDGETED AGAINST THE INGREDIENTS. `.drink-card--ingredients-3`
+// caps the chips at two rows because a 12.9rem card cannot hold three of
+// everything; a portrait card grows instead, so the cap is put back to three
+// rows here with the same arithmetic. (`.drink-card-name--wrap ~` never
+// reaches here: the name is inside the head row, not the foot's sibling.)
+$card-portrait-glass-w:     3.4rem;
+$card-portrait-glass-scale: 3.6rem;
+:root { --card-portrait-glass-scale: #{$card-portrait-glass-scale}; }
+
+.drink-card--portrait {
+  height: auto;
+  padding: $card-pad-y $card-pad-x;
+  display: flex;
+  flex-direction: column;
+
+  .drink-card-head {
+    display: flex;
+    align-items: center;
+    gap: $card-gutter;
+    min-height: $card-portrait-glass-scale;
+    margin-bottom: 0.15rem;
+  }
+
+  .drink-card-glass {
+    position: static;
+    width: $card-portrait-glass-w;
+    height: $card-portrait-glass-scale;
+    flex: none;
+    // FLUSH LEFT, NOT CENTRED IN THE SLOT: "so its left margin is aligned with
+    // the left margin of the ingredients line" is about the DRAWING's edge,
+    // and a centred drawing in a 3.4rem slot sat 12px in from the line the
+    // ingredients start on. Measured before this was set.
+    justify-content: flex-start;
+
+    svg {
+      height: calc(var(--glass-ratio, 1) * var(--glass-cheat, 1)
+                   * var(--card-portrait-glass-scale));
+      max-width: 100%;
+    }
+  }
+
+  .drink-card-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .drink-card-foot {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin-top: auto;
+    padding-top: 0.75rem;
+  }
+
+  &.drink-card--ingredients-3 .drink-card-foot .drink-card-moods {
+    max-height: calc(#{$chip-line * 3} + #{0.28rem * 2} + 6px);
+  }
+}
+
+// =============================================================================
 // THE CARD'S LINE BUDGET -- #776
 // =============================================================================
 // Helen: "if cocktail card ingredients have three lines, only allow the chips

@@ -2517,6 +2517,33 @@ unless stated.
   **Deliberately not built**: food (*"the priority is cocktails"*, and the
   mechanism is only worth porting once she has looked at this one); any weighting
   by `meta.ship`; any hand-tuned per-field score.
+  **And then she asked for the card, 2026-09-11, on #955:** *"1. Please add some
+  kind of divider between the end of the recipe (whether serve or notes or
+  anything else) and 'If you liked this...' 2. Please turn the suggestions into
+  cards -- 1. Allow 2 or 3 lines of ingredients to show, 2. show the chips.
+  It's fine for the cards to be portrait orientation. 3. Take the styling from
+  index page cards, including the new styling in #953 when it's finished.
+  3. Bring the glass drawing inline in the row with the name tape, so its left
+  margin is aligned with the left margin of the ingredients line."* So the
+  "compact row, not a card" above lasted a day, and the third card design is
+  hers rather than refused. **The section sits under `.cocktail-footer`'s own
+  rule** (gap, hairline, padding), so the page's tail is two objects drawn one
+  way. **Each item is `.drink-card.drink-card--portrait`**: the index card's
+  classes on the index card's parts, so face, tape, the three-line clamp, the
+  chips and their dots, the ship and its mask, and #953's hover are all
+  `_cards.scss`'s unchanged; the modifier moves geometry only (glass in a head
+  row beside the tape, foot back in flow, height from content, the grid
+  stretching a row to one height). **The markup is written in the layout, not
+  shared as an include**, because the two cards differ in four flag-shaped ways
+  (glass placement, chips as links vs filter buttons, no shortlist `+`, no
+  search `data-*`), and four flags on ninety commented lines is a worse object
+  than twenty-five plain lines naming the same classes; the stylesheet is the
+  shared half and the one that cannot drift by accident. **The drawing is flush
+  left in its slot** — centred it sat 12px in from the ingredient line, measured
+  — and at the index's own compression, not one height for all. **Two classes in
+  the grid selector**, because `cards` is imported after `cocktail` and
+  `.drink-cards`' 370px floor won on order: the first build drew two across the
+  900px column, measured, instead of three.
 
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.

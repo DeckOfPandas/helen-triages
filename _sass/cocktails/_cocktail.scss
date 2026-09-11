@@ -1724,168 +1724,70 @@ $amount-gap-wide: 1.25rem;
 // _layouts/cocktail.html's own comment at the block that builds this. This file
 // only lays out what arrives.
 //
-// A COMPACT ROW, NOT A CARD, AND THE CARD WAS NEVER AN OPTION. The index card
-// is written inline in cocktails/index.html rather than in an include, so
-// reusing it here would mean a second copy of ~90 lines of markup — and a third
-// drink-card design is exactly what §13.12 says not to invent. So this borrows
-// the same three PARTS the universe line borrows (§9.13: the tiny glass, the
-// name on tape, one ingredient line) using the card's own child classes, and
-// none of the card's geometry.
+// THREE CARDS, PORTRAIT -- Helen on #955, 2026-09-11. The first version of
+// this row was "a compact row, not a card": the tiny glass, the name on tape
+// and one ellipsised ingredient line, on the argument that the index card is
+// inline markup and a third card design was hers to ask for. She asked:
+// "Please turn the suggestions into cards -- 1. Allow 2 or 3 lines of
+// ingredients to show, 2. show the chips. It's fine for the cards to be
+// portrait orientation. 3. Take the styling from index page cards, including
+// the new styling in #953 when it's finished." So each item is now a
+// `.drink-card.drink-card--portrait`, and EVERYTHING about how a card looks --
+// face, tape, clamps, chip colours, the ship's mask, the #953 hover -- is the
+// index card's own rules in _cards.scss, where the portrait modifier also
+// lives (it is a card variant, so it belongs with the card). This file only
+// says where the section sits on the page and how the three are laid out.
 //
-// IT IS NOT THE UNIVERSE LINE EITHER, and the difference is the reason both
-// exist: that one is a single offer laid across a full-width row with a control
-// at the end of it, and this is three offers side by side in a 900px column. So
-// the parts are the same and the layout is its own.
-//
-// NO NEW HUE (§13.12). Nothing here is coloured at all beyond what the card
-// classes already carry — the glass is absinthe because `.drink-card-glass`
-// says so, the ingredient line is body text, and the heading is the plain
-// `.cocktail-section-heading` "To serve" uses. The palette's count is the
-// design and this section did not need to spend from it.
+// THE DIVIDER -- her first ask: "Please add some kind of divider between the
+// end of the recipe (whether serve or notes or anything else) and 'If you
+// liked this...'". It is `.cocktail-footer`'s own three declarations, so the
+// page's tail is two objects drawn the same way, a hairline above each: the
+// three cards, then the source line. Not a new mark; the one the page has.
+.cocktail-related-section {
+  margin-top: $spacing-section-gap;
+  padding-top: $space-lg;
+  border-top: 1px solid $color-border;
 
-// THE GLASS'S TWO NUMBERS, declared before the first rule that reads one --
-// Sass resolves a variable at the point of use, so a declaration below the
-// grid that sizes its column is an "Undefined variable" build failure. The
-// argument for both values is on `.drink-card-glass` below.
-//
-// THE SLOT IS DERIVED, NOT PICKED. `scripts/universe_glass_slot.py` measured
-// the drawings' width-over-height off their viewBoxes: the punch bowl is the
-// widest at 1.505 and the flute the narrowest at 0.280. A slot has to clear
-// 1.505 × the height, or the widest glass is capped by WIDTH and drawn shorter
-// than its neighbours -- the one thing "all the same height" forbids. Run that
-// script if a new glass is ever drawn; it names the widest.
-//
-// THESE ARE THIS SECTION'S OWN NUMBERS, deliberately not shared with the
-// universe line's pair. They live in a file imported earlier (cocktails.scss
-// orders `cocktail` before `universe`), so sharing would mean moving a token
-// into the palette or the shared layer for one caller -- and a copy that CLAIMS
-// to track another file is the cross-reference §12 warns about. They are free
-// to diverge, and do: this row has room the index's single line does not.
-$related-glass-height: 1.7rem;
-$related-glass-slot:   2.8rem;   // 1.7rem × 1.505 (punch bowl) + air
+  // The section heading carries 1.75rem above it for the sections that sit
+  // in the article's flow; here the section's own padding already holds the
+  // heading off the rule, and both would be two gaps where one was drawn.
+  .cocktail-section-heading { margin-top: 0; }
+}
 
-// THREE ACROSS, THEN ONE, WITH NO MEDIA QUERY. `auto-fit` plus a `minmax`
-// floor does the whole of the narrowing: in the 900px column three tracks of
-// ~270px clear the floor comfortably; around 600px it drops to two; on a 360px
-// phone the column is ~312px and only one track fits, so the three become a
-// short stack. Nothing is hidden at any width and nothing can overflow, because
-// no track is ever narrower than the floor and the floor is under any phone.
+// THREE ACROSS, THEN TWO, THEN ONE, WITH NO MEDIA QUERY. `auto-fit` plus a
+// `minmax` floor does the whole of the narrowing: in the 900px column three
+// tracks of ~280px clear the floor; in an iPad's narrower column it is two and
+// one; on a 360px phone one track fits and the three become a short stack.
+// Nothing is hidden at any width and nothing can overflow, because no track is
+// ever narrower than the floor and the floor is under any phone.
+//
+// 13rem, NOT THE INDEX GRID'S 370px, and that is what "portrait" buys: the
+// index card is landscape because it needs a full ingredient line beside a
+// glass column; a portrait card stacks the same parts, so it can be half as
+// wide and still carry three lines of ingredients and three rows of chips.
+//
+// `.drink-cards` IS ON THE <ul> TOO, for its reset and nothing else; the grid
+// below overrides its columns and gap, and `.drink-card` itself never needed
+// the list. TWO CLASSES IN THE SELECTOR, because cocktails.scss imports
+// `cards` AFTER this file and `.drink-cards` alone would win the cascade on
+// order -- measured: a single-class rule here left the index's 370px floor in
+// force and drew two cards across the 900px column instead of three.
 //
 // A MEDIA QUERY WOULD HAVE BEEN A GUESS ABOUT THE COLUMN, not about the
-// viewport — this section sits inside `<main>`'s 900px measure, and §12's
+// viewport -- this section sits inside `<main>`'s 900px measure, and §12's
 // "check one element's width and call the row safe" is about exactly the row
 // that does its own arithmetic against the wrong box. `auto-fit` asks the
 // container.
-.cocktail-related {
-  list-style: none;
+.cocktail-related-section .cocktail-related {
   // THE BOTTOM MARGIN IS NOT DECORATION. `.cocktail-footer` carries
   // `margin-top: $spacing-section-gap`, but a drink with no `source` has no
   // footer at all -- the cost and units lines are then direct children of the
   // article with $space-xxs above them, and they landed hard against the last
-  // related drink's ingredient line, at the same size and nearly the same
-  // colour, reading as a fourth ingredient. Seen at 360 on the Negroni.
-  // Adjacent margins collapse, so this costs nothing on a drink that DOES have
-  // a footer.
+  // card. Adjacent margins collapse, so this costs nothing on a drink that
+  // DOES have a footer.
   margin: 0 0 $spacing-section-gap;
-  padding: 0;
-  display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: $space-lg $space-lg;
-}
-
-// THE GLASS AND THE NAME ON ONE LINE, THE INGREDIENTS UNDER THE NAME. Two
-// columns, two rows: the drawing marks the item at the left, and the ingredient
-// line starts where the tape starts rather than under the glass, so the three
-// items read as three blocks of words with a mark in front of each.
-.cocktail-related-item {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: $related-glass-slot minmax(0, 1fr);
-  align-items: center;
-  column-gap: $space-xs;
-  row-gap: $space-xxs;
-}
-
-// ONE HEIGHT FOR EVERY GLASS, and a slot wider than the widest drawing — the
-// same two rules the universe line follows, for one of the same reasons and not
-// the other. The reason that carries over: at this size the drawing is a mark at
-// the head of a line, not the subject of a column, so true relative height (what
-// a card does) would read as three glasses of random size rather than as a fact.
-// The reason that does NOT: the universe's slot is there so the tape cannot jump
-// when a new drink is dealt into it, and nothing here ever redeals. The slot is
-// still worth it, because it makes the three tapes start at the same x.
-.cocktail-related-item .drink-card-glass {
-  // `.drink-card-glass` is absolutely positioned down a card's left column; here
-  // it is a grid item and has to be in flow. `left`/`top`/`bottom` are inert
-  // once it is static, so only `position` and `width` need saying.
-  position: static;
-  width: $related-glass-slot;
-  grid-column: 1;
-  grid-row: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  // The card's painted panel strip has nothing to sit on here — same as the
-  // universe pick.
-  &::after { content: none; }
-
-  // The card's height is `--glass-ratio × --glass-cheat × --card-glass-scale`;
-  // this bypasses all three by setting the height outright, which is what "one
-  // height for every glass" means.
-  svg {
-    height: $related-glass-height;
-    width: auto;
-    max-width: 100%;
-  }
-
-  // #650's arithmetic on one element, as the universe line already pays it: the
-  // artwork strokes with `vector-effect: non-scaling-stroke`, so a weight chosen
-  // against a 166px drawing is the same number of SCREEN pixels on a 27px one.
-  // A card uses 1 and the universe line 0.7; this drawing sits between the two
-  // in size and takes the lighter weight, because it is a mark beside a name.
-  .glass-icon-line { stroke-width: 0.7; }
-}
-
-// The name shrinks rather than holding max-content, which is the opposite of the
-// universe line's choice and is right here: there the name is the whole answer
-// and the ingredients give way, but these three tracks are equal by
-// construction, so a long name has to fit its own track. `min-width: 0` is what
-// lets card-name-fit.js see an overflow at all — it measures the tape word
-// against its box, and a box at max-content never overflows, so without this a
-// 48-character title would simply run out of the track.
-.cocktail-related-item .drink-card-name {
-  grid-column: 2;
-  grid-row: 1;
-  min-width: 0;
-  margin: 0;
-}
-
-// The card's tape bleeds right into the card's own padding; there is no padding
-// here for it to bleed into, so it is cancelled — #744's finding, applied at the
-// second place the tape has been borrowed.
-.cocktail-related-item .drink-card-tape {
-  margin-right: 0;
-}
-
-// ONE LINE, ELLIPSISED. The card clamps this to three lines with
-// `-webkit-box`; line clamping and `text-overflow` are two different mechanisms
-// and the box wins if it is left in, so `display: block` is load-bearing rather
-// than tidying (the universe line makes the same override for the same reason).
-//
-// One line and not two, because this is a gloss on a name rather than the card's
-// "what is this drink" job: three items each showing three lines of ingredients
-// would be a second card grid at the foot of the page.
-.cocktail-related-item .drink-card-ingredients {
-  grid-column: 2;
-  grid-row: 2;
-  min-width: 0;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin: 0;
-  color: $color-clear-text;
+  gap: $space-lg;
 }
 
 .cocktail-footer {
@@ -1982,8 +1884,7 @@ $related-glass-slot:   2.8rem;   // 1.7rem × 1.505 (punch bowl) + air
   // invitation to consider something else is the last thing wanted with your
   // hands full, and it is a link you are not going to follow mid-build. Same
   // argument as the tagline, the chips and SHIP IT? above.
-  .cocktail-related-heading,
-  .cocktail-related,
+  .cocktail-related-section,
   .cocktail-body-content { display: none; }
 
   // THE KNOB SLIDES ACROSS. The transition that animates it lives on

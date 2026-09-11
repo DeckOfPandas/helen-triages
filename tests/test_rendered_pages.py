@@ -2155,8 +2155,11 @@ def test_the_shopping_list_and_the_ingredient_index_agree_on_a_name(site):
 # would catch that much on its own; what it cannot see is a row of two, a row
 # of four, or a drink offering itself.
 
-RELATED_SECTION = re.compile(r'<ul class="cocktail-related">(.*?)</ul>', re.S)
-RELATED_LINK = re.compile(r'<a href="([^"]+)">')
+RELATED_SECTION = re.compile(r'<ul class="cocktail-related drink-cards">(.*?)</ul>', re.S)
+# The NAME's link only. Since 2026-09-11 the items are portrait cards
+# (#955) and each carries chip links to the filtered index as well; those are
+# `<a class="drink-card-mood ...">` and must not count as offered drinks.
+RELATED_LINK = re.compile(r'<span class="drink-card-tape-word"><a href="([^"]+)">')
 
 
 def _drink_pages(built_site):
