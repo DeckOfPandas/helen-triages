@@ -412,13 +412,14 @@ main {
   grid-column: 2;
   grid-row: 1;
 
-  // THE COLUMN IS A STACK, in Helen's revised running order for issue #915:
-  // about / [GitHub logo] / [heart drawing] / copyright / licences line —
-  // superseding #652's "[heart drawing] / about / [GitHub logo] / licences
-  // line". #652's own case for gathering these four into the grid's middle
-  // track (rather than as siblings below it, centred by `.site-footer`'s own
-  // `text-align`, which ran two alignment systems in one footer) is unchanged;
-  // only the order within the stack moved.
+  // THE COLUMN IS A STACK, in Helen's revised running order for issue #969:
+  // about / [GitHub logo] / copyright / licences line / [heart drawing] —
+  // superseding #915's "about / [GitHub logo] / [heart drawing] / copyright /
+  // licences line", which itself superseded #652's "[heart drawing] / about /
+  // [GitHub logo] / licences line". #652's own case for gathering these four
+  // into the grid's middle track (rather than as siblings below it, centred
+  // by `.site-footer`'s own `text-align`, which ran two alignment systems in
+  // one footer) is unchanged; only the order within the stack moved.
   //
   // `justify-items` rather than `text-align`: the GitHub mark is a link around
   // an SVG, not text, so centring its BOX is what actually centres it. The
