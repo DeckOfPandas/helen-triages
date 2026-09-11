@@ -29,10 +29,11 @@
 //   1. Reset both classes, so every run measures the UNSTEPPED, UNWRAPPED
 //      element. Without this the second run measures the first run's output and
 //      a name can never step back up when the card gets wider.
-//   2. Ask its `.drink-card-tape-word` whether it overflows —
-//      `scrollWidth > clientWidth + 1`. The 1px is sub-pixel layout: a word
-//      exactly filling its box reports a scrollWidth a fraction over.
-//   3. If it does and `scrollWidth <= clientWidth / 0.86`, the step reaches it:
+//   2. Ask its `.drink-card-tape-word` whether it overflows — the width of its
+//      CONTENT (a Range over it; see `contentWidth`, and why it is not
+//      `scrollWidth` any more) against `clientWidth + 1`. The 1px is sub-pixel
+//      layout: a word exactly filling its box measures a fraction over.
+//   3. If it does and `content width <= clientWidth / 0.86`, the step reaches it:
 //      add `drink-card-name--step`. Dividing rather than multiplying is the
 //      right way round — the QUESTION is how wide the box would have to be to
 //      hold today's word, and 0.86 of the type needs 1/0.86 of the space.
@@ -95,14 +96,48 @@
   var WRAP_CLASS = 'drink-card-name--wrap';
 
   /**
+   * How wide is the CONTENT of this element -- the lettering itself?
+   *
+   * A Range over the element's contents, rather than the `scrollWidth` this
+   * used until 2026-09-11. The two answered the same question until #971 put
+   * the card's click overlay inside this very box: the drink's name is the
+   * card's only link, the whole card is that link's hit area, and the way that
+   * is expressed is an absolutely positioned pseudo-element on the anchor. The
+   * anchor sits inside `.drink-card-tape-word`, which is `position: relative`
+   * AND transformed (the tape's text nudge), so it is the overlay's containing
+   * block however the overlay is written -- and an out-of-flow descendant
+   * counts towards its containing block's scrollable overflow. `scrollWidth`
+   * therefore came back as the word plus most of a viewport, every name looked
+   * like it overflowed, and every name wrapped. Measured on Cobra's Fang at
+   * 1280: 1389px of "scroll" for a 109px word in a 165px box.
+   *
+   * A RANGE MEASURES THE DOM, AND A PSEUDO-ELEMENT IS NOT IN THE DOM. So this
+   * asks what the question always meant -- how wide is the lettering -- rather
+   * than "does anything inside this box stick out of it", which was only ever a
+   * proxy for it and stopped being true the moment something else moved in.
+   *
+   * It also measures the drink page's title correctly, where the word wraps a
+   * real `<h1>` at `display: contents`: that element generates no box of its
+   * own, so asking IT for a rect would give zero, while a Range over the text
+   * inside it is exactly right.
+   */
+  function contentWidth(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var w = range.getBoundingClientRect().width;
+    range.detach();
+    return w;
+  }
+
+  /**
    * Does this element's content run wider than its box?
    *
    * 1px of tolerance rather than a bare `>`: sub-pixel layout makes a word that
-   * exactly fills its box report a scrollWidth a fraction larger, and without
-   * the tolerance a comfortable name would be stepped for nothing.
+   * exactly fills its box measure a fraction larger, and without the tolerance
+   * a comfortable name would be stepped for nothing.
    */
   function overflows(el) {
-    return el.scrollWidth > el.clientWidth + 1;
+    return contentWidth(el) > el.clientWidth + 1;
   }
 
   function fit(name) {
@@ -120,8 +155,8 @@
 
     // How much wider the box would have to be to hold this word. At 0.86 of the
     // type the word needs 0.86 of the width it needs now, so it fits exactly
-    // when today's scrollWidth is within clientWidth / 0.86 — about 16% over.
-    if (word.scrollWidth <= word.clientWidth / STEP) {
+    // when today's content width is within clientWidth / 0.86 — about 16% over.
+    if (contentWidth(word) <= word.clientWidth / STEP) {
       name.classList.add(STEP_CLASS);
 
       // THE PREDICTION IS A MODEL AND THE BROWSER IS THE FACT. Re-measure once,

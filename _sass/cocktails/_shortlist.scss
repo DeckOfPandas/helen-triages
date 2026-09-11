@@ -232,6 +232,14 @@ $card-shortlist-size: 1.15rem;
 .btn-shortlist--card {
   position: absolute;
 
+  // ABOVE THE CARD'S CLICK OVERLAY -- #971, 2026-09-11. The whole card is the
+  // drink's link now, drawn as a pseudo-element over the card, and a stretched
+  // link covers every control that is not lifted past it. This is the one
+  // control in the card's top-right corner and #823 gave it that corner on
+  // purpose, so it is lifted to the same level as the chips. The scale is named
+  // in _cards.scss, which is imported before this file.
+  z-index: $card-z-controls;
+
   // Bigger than the drink page's, which is a 0.78rem label sitting in a row of
   // labels. This is a lone mark with no word beside it to lend it weight, and
   // at the page's size it read as a stray character rather than a control.
