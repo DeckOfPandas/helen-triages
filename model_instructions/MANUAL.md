@@ -3279,10 +3279,11 @@ Demerara rum, lightly aged` has none since El Dorado 151 came off on 2026-09-05
 (*"I don't own it, I just wanted to"*). The generic stays because a drink still
 asks for it.
 
-**One placeholder is left on the page: the column heading "category"**,
-tracked at **#784**. The other two headings are hers — "examples" (#888) and
-"site display name" (2026-09-10, for the column that prints the shorter name a
-card uses where it differs from the category). "none in the house", for a
-category with no bottle, was deleted the same day (*"If we're not using them,
-delete them, boom"*); the empty third track is the honest rendering. Do not
-write a word into the one that remains.
+**No placeholder is left on the page, and #784 is closed** (2026-09-11). The
+last one was the column heading "category", and Helen ruled on the word rather
+than replacing it: *"'category' is right."* All three column headings are hers
+— "category" (2026-09-11), "site display name" (2026-09-10, for the column that
+prints the shorter name a card uses where it differs from the category) and
+"examples" (#888). "none in the house", for a category with no bottle, was
+deleted on 2026-09-10 (*"If we're not using them, delete them, boom"*); the
+empty third track is the honest rendering.
