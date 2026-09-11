@@ -224,18 +224,45 @@ $ref-col-card:    minmax(6rem, 9rem);
   padding-bottom: $space-xs;
   border-bottom-color: $color-clear-text;
 
-  // "EXAMPLES" WAS PINK, AND NOBODY CHOSE THAT -- Helen, 2026-09-10: "change
-  // the heading font colour to something else, and also the column heading
-  // please -- leave the pink for the bottles."
+  // THE THREE LABELS TAKE THIS ROW'S TREATMENT AND NOTHING ELSE -- #973, Helen,
+  // 2026-09-11: "table headings use three different combinations of size and
+  // colour. I think they should all look the same."
   //
-  // The head row reuses `.rum-cat-bottles` for its third cell purely to land in
-  // the same grid track, and inherited the bottle colour along with it. So one
-  // of three sibling column labels was woowoo and the other two were
-  // `$color-clear-text`, which read as a deliberate emphasis and was an
-  // accident of markup. WOOWOO MEANS BOTTLE on this page (see the file header);
-  // a column label is not a bottle.
+  // She counted three because there were exactly three, one per label, and not
+  // one of them was chosen. The head row borrows the three CELL classes purely
+  // to land in the three grid tracks, and each one brought its own declarations
+  // along:
+  //
+  //   * `.rum-cat-name`    -> `color: $color-text`, so "category" was in INK
+  //                           where its two siblings were `$color-clear-text`.
+  //   * `.rum-cat-card`    -> `font-size: 0.84rem`, so "site display name" was
+  //                           a fifth larger than the 0.7rem this row sets.
+  //   * `.rum-cat-bottles` -> `color: $color-wicked-woowoo-deep`, which is the
+  //                           same bug found on 2026-09-10 ("change the heading
+  //                           font colour... leave the pink for the bottles")
+  //                           and fixed then with `color: inherit` on this one
+  //                           class alone. WOOWOO MEANS BOTTLE on this page
+  //                           (see the file header); a column label is not one.
+  //
+  // So the 2026-09-10 fix was right about the mechanism and too narrow by two
+  // classes, which is why this is now stated once for all three rather than
+  // patched a class at a time: A CLASS CARRIES EVERY DECLARATION, NOT THE ONE
+  // YOU WANTED (DECISIONS §14), and a cell class borrowed for POSITION should
+  // contribute position and nothing else.
+  //
+  // THE SURVIVING TREATMENT IS THIS ROW'S OWN -- $font-label, 0.7rem,
+  // uppercase, 0.1em, `$color-clear-text` -- because it is the one the most
+  // headings on the page already use: "examples" renders it outright, and
+  // `.rum-origin-head`'s MARTINIQUE/GUADELOUPE labels are the same face, case,
+  // tracking and colour one rank down. `.rum-origin-head` is deliberately not
+  // touched: it labels a group of bottles INSIDE a cell rather than a column,
+  // it was not one of the three she counted, and its 0.66rem is what makes the
+  // rank visible.
+  .rum-cat-name,
+  .rum-cat-card,
   .rum-cat-bottles {
     color: inherit;
+    font-size: inherit;
   }
 }
 
