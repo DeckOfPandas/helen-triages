@@ -2560,6 +2560,17 @@ unless stated.
   the last one, as in a paragraph. DOM order is natural. The three-row cap is
   off on portrait cards, because the card grows and the cap would clip the
   ship's row on a busy drink.
+  **And the titles, #960:** *"font on titles of 'if you like this' cards is not
+  the same size."* card-name-fit.js decides each name alone — full size, the
+  0.86 step, or a wrap — which the index's dense grid hides and a row of three
+  does not: measured at 1280, Cobra's Fang's row had Modern Zombie stepped
+  beside Mai Tai at full size, and Arrack Christmas Punch's had Julien Sorel
+  and Accoutrement stepped beside Bee's Knees. **Portrait cards are set at the
+  step from the start** (`$card-name-step`, now named in `_cards.scss`), so the
+  script's base state there is already the stepped size, its step is a no-op,
+  and a name that still overflows wraps at its neighbours' size. No JS change.
+  The alternative — each row sharing the size its longest name needs, full size
+  where all three fit — was offered in the reply rather than built.
 
 - **2026-09-10, #886 — what a drink card does under the cursor.** The issue was
   a sentence with no body: *"do something more attractive with cocktail cards on

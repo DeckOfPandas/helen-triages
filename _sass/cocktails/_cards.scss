@@ -480,7 +480,11 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 // $card-tape-bleed-right, which is `rem` on purpose — it is a fact about the
 // card's own padding, not a ratio to the title (§9.13's rule about which tape
 // numbers are em and which are not).
-.drink-card-name--step { --card-name-scale: 0.86; }
+// Named since 2026-09-11 because the portrait cards below are set at it from
+// the start (#960). card-name-fit.js's STEP is the same number; see there.
+$card-name-step: 0.86;
+
+.drink-card-name--step { --card-name-scale: #{$card-name-step}; }
 
 // TWO LINES OF TAPE, for the names a step cannot reach.
 //
@@ -1419,10 +1423,23 @@ $card-portrait-glass-scale: 3.6rem;
     }
   }
 
+  // ONE TITLE SIZE ACROSS THE ROW -- #960, Helen: "font on titles of 'if you
+  // like this' cards is not the same size". card-name-fit.js decides each name
+  // on its own: fits at full size, steps to 0.86, or wraps. On the index that
+  // is invisible at the density of the grid, which is the ground Helen chose it
+  // on; three cards side by side show it at once (Modern Zombie stepped beside
+  // Mai Tai at full size, measured on Cobra's Fang's row).
+  //
+  // SO THESE CARDS ARE SET AT THE STEP FROM THE START, and the script needs no
+  // change: its base state here is already the stepped size, the step it tries
+  // is a no-op, its re-measure still overflows, and the name wraps -- at the
+  // same size as its neighbours. Every related card on every drink page carries
+  // its title at one size.
   .drink-card-name {
     flex: 1 1 auto;
     min-width: 0;
     margin: 0;
+    --card-name-scale: #{$card-name-step};
   }
 
   .drink-card-foot {
