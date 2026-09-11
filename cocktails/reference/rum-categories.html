@@ -370,14 +370,23 @@ published: false
        style first and its real job second; and a parenthetical after the word
        here, in her words. It is a LOOKUP, not a literal: any retired word that
        is also in `rum_characters` gets it, so a second such word cannot arrive
-       silently without the note. {% endcomment %}
+       silently without the note.
+
+       THE WORDING IS HERS TWICE OVER, AND THE SECOND TIME CORRECTED THE FIRST.
+       It rendered "(rum character not rum type)" from 2026-09-10, which is how
+       #921's summary paraphrased her. Seeing the built line she wrote the whole
+       of it out as the title of #975: "blackstrap (is a rum character not a rum
+       type)". Two words back -- "is" and the second "a" -- and it is a sentence
+       about the word rather than a pair of labels. Still a lookup, so any
+       future retired word that is also a character gets the same line.
+       {% endcomment %}
     <ul class="rum-retired">
       {% for pair in ing.retired_rum_styles %}
         {% assign word = pair[0] %}
         {% assign initial = word | slice: 0 %}
         {% assign initial_lower = initial | downcase %}
         {% if initial == initial_lower %}
-        <li class="rum-retired-word">{{ word }}{% if ing.rum_characters contains word %} (rum character not rum type){% endif %}</li>
+        <li class="rum-retired-word">{{ word }}{% if ing.rum_characters contains word %} (is a rum character not a rum type){% endif %}</li>
         {% endif %}
       {% endfor %}
     </ul>
