@@ -22,6 +22,9 @@
 #               down somewhere; decorations.js reads it off the slot rather than
 #               hardcoding it, so adding an eighth tape is a one-line data edit.
 #               tests/test_site_config.py checks it against the real directory.
+#               Seven from 2026-08-10 (#122) to 2026-09-11; fifteen since --
+#               #644, Helen's pick from a batch of twelve, with two of the
+#               original seven retired (DECISIONS.md 13.9).
 # =============================================================================
 
-tape_count: 7
+tape_count: 15

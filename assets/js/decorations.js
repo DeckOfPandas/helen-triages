@@ -101,8 +101,8 @@
   // the #644 batch. NULL IS TODAY'S BEHAVIOUR, UNCHANGED -- a fresh random
   // pick every load, same as before this constant existed. THIS ONE LINE IS
   // THE WHOLE OF WHAT "FIXED" NEEDS IN CODE: set it to an integer 1..count
-  // (currently 1-7) once Helen picks, and every page loads that tape and
-  // only that one. Nothing else in tape() has to move.
+  // (1-15 since 2026-09-11, #644) once Helen picks, and every page loads that
+  // tape and only that one. Nothing else in tape() has to move.
   var FIXED_TAPE_INDEX = null;
 
   function tape() {

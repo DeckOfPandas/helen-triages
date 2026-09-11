@@ -228,11 +228,12 @@ $universe-glass-slot:   2.3rem;   // 1.4rem × 1.505 (punch bowl) + air
 //
 // So the bracket sits 0.4rem INSIDE the tape's box on every deal. Whether it
 // touches the ink is then down to two things that both vary, which is the whole
-// of "sometimes": the seven tape drawings end at x = 1326 to 1354 of a 1400
-// viewBox (a 2% spread), and `preserveAspectRatio="none"` stretches that inset
-// with the tape — so a SHORT name has a narrow tape whose 3.3% inset is only a
-// pixel or two, and a wide one has room to spare. Longest names on tape-3 or
-// tape-6 are the collisions.
+// of "sometimes": the fifteen tape drawings end at x = 1342 to 1358 of a 1400
+// viewBox (a 1% spread; measured 2026-09-11 when #644 took the set from seven
+// to fifteen and renumbered it), and `preserveAspectRatio="none"` stretches
+// that inset with the tape — so a SHORT name has a narrow tape whose 3% inset
+// is only a pixel or two, and a wide one has room to spare. Longest names on
+// the widest drawings (tape-15 and tape-8) are the collisions.
 //
 // Cancelled rather than compensated for: there is no card padding in this row
 // for the tape to bleed into, so the bleed simply does not apply. The LEFT bleed
