@@ -180,6 +180,19 @@ $title-size-phone:   2rem;     // the same, at <= 600px -- see the phone block
 // the tape-band block. Named because the title row's shortlist button (#963)
 // is aligned by it too.
 $title-tape-pad-ratio: 0.2059;
+// The tape's padding to the LEFT and RIGHT of the lettering at page size, in em
+// of the title. The card's own is $card-tape-pad-x (1.05em); Helen widened this
+// one to 1.6em on 2026-09-05 -- "I would like some more empty tape either side
+// of the cocktail name" -- and it is named here because the tape's left BLEED
+// is now the same value (#995), which is what puts the lettering on the
+// metadata's own left edge.
+$title-tape-pad-x: 1.6em;
+// How far the black band is inset from the LEFT end of a tape SVG's own
+// viewBox, as a fraction of the tape's rendered width -- the artwork is
+// stretched to its box, so this is a percentage and not a length. The modal
+// value across the fifteen files (`tmp/tape_insets.py`); the phone block near
+// the foot of this file is the only thing that reads it, and says why.
+$tape-art-inset-x: 4.14%;
 $title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;
 $title-cap-inset:    0.14rem;   // em box top -> cap top, Courier Prime
 $glass-top:          $title-half-leading + $title-cap-inset;
@@ -567,8 +580,14 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   //
   // em OF THE TITLE, so it is proportional exactly as the card's is, and it
   // follows `.drink-card-name--step` down for free when a long name shrinks.
+  //
+  // THE LEFT BLEED STAYS THE CARD'S 1.05em AT THIS WIDTH, so the lettering
+  // starts 0.55em inside the column the tagline and the meta are set against.
+  // #995 asked for that gap closed and then said which screen it meant: "This
+  // is for mobile view, I should have been clear, NOT desktop or ipad." The
+  // phone block below is where it is answered.
   .drink-card-tape {
-    padding: 0.5em 1.6em;
+    padding: 0.5em $title-tape-pad-x;
   }
 }
 
@@ -1377,10 +1396,42 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // index, and here into the page's, which at 360px is the viewport's edge --
   // Cobra's Fang measured 370px wide on a 360px screen with only the left
   // bleed cancelled. The tape ends on the column at both ends.
+  //
+  // AND THEN THE ARTWORK'S OWN MARGIN WAS STILL IN THE WAY -- #995, 2026-09-12.
+  // Helen, on a phone screenshot of the Margarita: "the whole graphic -- tape
+  // plus lettering -- could start further left, keeping the gap between the
+  // left end of the tape and the start of the letters", and, when this was
+  // first read as a desktop change: "This is for mobile view, I should have
+  // been clear, NOT desktop or ipad."
+  //
+  // WHAT SHE IS SEEING IS NOT THE BOX. With both bleeds cancelled the tape's
+  // BOX already starts exactly where the back arrow and the tagline do
+  // (measured at 390px: both at x=24). What starts further in is the BLACK
+  // BAND, because every tape SVG insets its polygon from its own viewBox and
+  // decorations.js stretches that artwork to the box
+  // (`preserveAspectRatio="none"`) -- so the inset is not a fixed number of
+  // pixels but a percentage of the tape's rendered width, about 14px on a
+  // full-width phone tape. Same class of fact as the vertical band offset the
+  // `.drink-card-tape-bg { top: -1.765% }` rule corrects, and measured the same
+  // way: `tmp/tape_insets.py` prints all fifteen polygons.
+  //
+  // 4.14% IS THE MODAL LEFT INSET, ten of the fifteen tapes (the others run
+  // 3.02%-4.14%, and #779 rolls a random one per load, so no single number can
+  // be exact for all of them). On the ten it puts the band's leading corner on
+  // the column's edge; on the other five the band overhangs it by up to 4px,
+  // into the page's own 24px of side padding -- a hair of tape past the column,
+  // which is what the tape does on a card by design and is never a scroll
+  // (only overflow to the RIGHT is, which is what #899 was about).
+  //
+  // THE `max-width` MOVES WITH IT so the name GAINS the width rather than only
+  // sliding left -- the second half of the issue's title, "giving us as much
+  // space for the name as possible". Both percentages resolve against
+  // `.drink-card-name`, so the tape starts 4.14% of the column left of it and
+  // may still end exactly on its right edge.
   .cocktail-title-block .drink-card-tape {
-    margin-left: 0;
+    margin-left: -$tape-art-inset-x;
     margin-right: 0;
-    max-width: 100%;
+    max-width: calc(100% + #{$tape-art-inset-x});
   }
 }
 
