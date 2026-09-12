@@ -159,6 +159,14 @@ layout: default
     {% capture glass_icon_style %} style="--glass-fill: {{ compressed }};"{% endcapture %}
   {% endif %}
 
+  {% comment %} WHERE THE INDEX IS, FROM _data/sites.yml VIA `page.site_key`,
+     never a literal `/cocktails/` -- the same lookup _includes/back-to-index.html
+     makes for the journey in the other direction, so a drink page's back arrow,
+     its see-all link (#994) and its mood chips can never disagree about it.
+     Assigned here rather than beside the chips because the title row below now
+     reads it first. {% endcomment %}
+  {% assign index_home = site.data.sites[page.site_key].home %}
+
   {% comment %} TWO STATES, ONE PAGE. The toggle adds `is-making` to the
      article and _sass/cocktails/_cocktail.scss does the rest — nothing leaves
      the DOM, so this page still prints and still reads with JS off, in the
@@ -229,12 +237,59 @@ layout: default
            about whether it is shortlisted. See HTF.shortlist in
            assets/js/assets.js. `hidden` until shortlist.js reveals it, the
            rule every JS-dependent control on both sites follows.
+
+           AND IT GAINED A SECOND CONTROL UNDER IT ON 2026-09-12 -- #994, Helen:
+           "Currently it's hard to figure out how to see your shortlist once
+           you've added something to it from the separate page. Add a mark to
+           the line below. On desktop and ipad: SHORTLIST + / SEE ALL ->. On
+           mobile, this needs to be a simple icon not a word. Not sure what.
+           Maybe a right arrow? Mobile: + / ->"
+
+           SO THE TWO ARE ONE OBJECT NOW, a column at the row's right end. The
+           wrapper is what the head grid places in its trailing track and what
+           carries the alignment with the title's first line (#963's rule moved
+           onto it, unchanged in kind); the button and the link stack inside it.
+           Without the wrapper the link would be a third grid item and land
+           under the NAME, in track one.
         {% endcomment %}
-        <button type="button"
-                class="btn-shortlist"
-                data-shortlist-key="{{ page.url }}"
-                aria-pressed="false"
-                hidden>shortlist</button>
+        <div class="cocktail-shortlist-controls">
+          <button type="button"
+                  class="btn-shortlist"
+                  data-shortlist-key="{{ page.url }}"
+                  aria-pressed="false"
+                  hidden>shortlist</button>
+          {% comment %} A LINK, NOT A BUTTON, and for the reason the mood chips
+             below are links: an `<a>` with a real href is what makes
+             middle-click, open-in-new-tab, copy-link-address and "where does
+             this go" on hover all work, where a button plus `location.href`
+             breaks every one of them. It also means the control works with no
+             JavaScript, so unlike the shortlist button beside it, it is not
+             `hidden` -- the shortlist VIEW on the index is JS, but a link to
+             the index is a link to the index.
+
+             `?shortlist=1` IS READ BY assets/js/cocktail-index.js, which calls
+             the same `enterShortlistView()` the `shortlisted (N)` button calls,
+             so arriving this way and pressing that button land in exactly one
+             state. It is a VIEW and not a facet (#918, MANUAL 8.9), which is
+             why it clears the restored list rather than narrowing it.
+
+             `index_home` COMES FROM _data/sites.yml VIA `page.site_key`, not
+             from a literal `/cocktails/` -- the same lookup the mood chips make
+             below (they read this same variable) and the same one
+             _includes/back-to-index.html makes for the journey in the other
+             direction, so nothing on this page can disagree about where the
+             index is.
+
+             THE ARROW IS THE HEADER'S OWN MARK, _includes/icons/arrow-right.svg
+             (#993), passed a class of its own. It is drawn rather than set for
+             the reason that file's caller in _layouts/default.html gives: an
+             arrow typed as `&rarr;` is whatever face the reader's machine
+             substitutes, and its ink then sits wherever that face puts it. {% endcomment %}
+          <a class="btn-see-shortlist" href="{{ index_home | relative_url }}?shortlist=1">
+            <span class="btn-see-shortlist-word">see all</span>
+            {% include icons/arrow-right.svg class="btn-see-shortlist-arrow" %}
+          </a>
+        </div>
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
@@ -361,8 +416,11 @@ layout: default
          for the same journey in the other direction, and it means a drink page
          and its back arrow can never disagree about where the index is.
       {% endcomment %}
+      {% comment %} `index_home` IS ASSIGNED ABOVE THE TITLE BLOCK now that the
+         see-all link (#994) needs it before this row does; it was `chip_home`
+         and assigned here until 2026-09-12. One lookup, three users on this
+         page -- that link, these chips and the related cards' chips. {% endcomment %}
       {% assign mood_groups = site.data.cocktails.taxonomy.mood_groups %}
-      {% assign chip_home = site.data.sites[page.site_key].home %}
       {% comment %} ALPHABETICAL, NOT AUTHORED -- #710, Helen: "render cocktail
          tags on cocktail pages in alphabetical order because no one cares which
          group they came from."
@@ -388,7 +446,7 @@ layout: default
       {% if page.mood.size > 0 %}
         {% assign sorted_moods = page.mood | sort_natural %}
         <div class="cocktail-chips">
-          {% for m in sorted_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}
+          {% for m in sorted_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}
         </div>
       {% endif %}
     </div>
@@ -1269,7 +1327,7 @@ layout: default
                filtered on the word -- exactly what this drink's own chip row
                emits above, and for the same reason: on a drink page a chip
                has nothing to filter, so it takes you where the filter is.
-               `mood_groups` and `chip_home` are assigned by that row. {% endcomment %}
+               `mood_groups` and `index_home` are assigned above. {% endcomment %}
             {% comment %} THE SHIP IS INSIDE THE CHIP ROW HERE, LAST -- Helen on
                #955, 2026-09-11, on a card whose chips had gone one per row:
                "Please fix the text wrapping of chips above the ship... Keep
@@ -1293,7 +1351,7 @@ layout: default
                in a paragraph. A drink with no moods still gets its ship, in
                a tail of its own. `_cards.scss`'s portrait block has the four
                rules. {% endcomment %}
-            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}{% if forloop.last %}<span class="drink-card-tail">{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% if forloop.last %}<span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}{% endfor %}{% if rel_moods.size == 0 %}<span class="drink-card-tail"><span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}</span>
+            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}{% if forloop.last %}<span class="drink-card-tail">{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% if forloop.last %}<span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}{% endfor %}{% if rel_moods.size == 0 %}<span class="drink-card-tail"><span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}</span>
           </div>
           {% comment %} THE SHORTLIST `+`, TOP RIGHT AND ABOVE THE TAPE -- #977,
              Helen, 2026-09-11: "add shortlist button to top right of 'if you

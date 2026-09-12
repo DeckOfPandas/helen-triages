@@ -344,15 +344,96 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   --title-line: #{$title-size * 0.86};
 }
 
-.cocktail-title-row .btn-shortlist {
+// AND SINCE 2026-09-12 IT IS A COLUMN OF TWO -- #994, Helen: "Currently it's
+// hard to figure out how to see your shortlist once you've added something to
+// it from the separate page. Add a mark to the line below."
+//
+// THE WRAPPER IS WHAT THE HEAD GRID PLACES, and it carries the alignment that
+// used to be on the button: the top margin above is the tape's own padding over
+// the lettering, so the first child still centres on the title's first line at
+// any size, and the second sits under it. `align-self: flex-start` reads as
+// `start` in the grid above 600px and as itself in the phone row below, which
+// is the same word doing the same job in both layouts -- and in the phone row
+// it is what overrides `align-items: last baseline`, so the pair stays at the
+// TOP right of a name that wraps to four lines.
+//
+// `align-items: flex-end` IS THE RIGHT EDGE. Both controls hang from the
+// column's right, so the `+` and the arrow line up under each other however
+// long the words beside them are -- which is the whole of the mobile ask
+// ("+" over "->"), got for free at every width.
+.cocktail-shortlist-controls {
   align-self: flex-start;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $space-xs;
   margin-top: calc(var(--title-line) * #{$title-tape-pad-ratio});
+}
+
+// ALIGNED BY CONSTRUCTION, NOT BY A MEASURED NUDGE: one line of lettering as
+// its height -- 1em at the tape word's line-height of 1, or 1.12em once
+// card-name-fit.js has wrapped the name (`.drink-card-name--wrap`,
+// _cards.scss). `.btn-shortlist` is already an inline-flex with
+// `align-items: center`, so its word sits on that line's centre at any size.
+//
+// THE MARK IS ON THE RIGHT HERE, AND ONLY HERE -- #994, where Helen drew the
+// pair she wanted: "SHORTLIST +" over "SEE ALL ->". Both marks then hang from
+// the column's right edge and sit under each other, which is what makes the
+// two controls read as one object rather than as two rows that happen to end
+// together -- and it is the same pair the phone shows with the words hidden.
+//
+// `row-reverse` RATHER THAN A SECOND `::after`. The mark is `.btn-shortlist`'s
+// own `::before`, and it is that pseudo-element whose CONTENT changes to a tick
+// when the drink is saved (_shortlist.scss). Reversing the flex row moves the
+// box it already draws; giving this placement an `::after` would be a second
+// mark to keep in step with that rule, for the same picture.
+.cocktail-title-row .btn-shortlist {
   height: var(--title-line);
+  flex-direction: row-reverse;
+
+  &::before {
+    margin-right: 0;
+    margin-left: 0.25em;
+  }
 }
 
 .cocktail-title-row:has(.drink-card-name--wrap) .btn-shortlist {
   height: calc(var(--title-line) * 1.12);
+}
+
+// THE SECOND CONTROL: the same face, size and colours as the button above it,
+// because they are one object in two rows and not two designs that share an
+// edge -- exactly the argument `.btn-shortlist` itself makes for matching
+// `.cocktail-toggle-label`. Magenta on hover is what this site means by "you
+// can touch this" (§9.13), and it is a link, so it gets it for free from
+// nothing else.
+//
+// THE ARROW INHERITS ITS COLOUR (`stroke: currentColor` in the include), so the
+// word and the mark change together with no second rule and no second value.
+.btn-see-shortlist {
+  @extend %cocktail-heading-face;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: $color-clear-text;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-wicked-woowoo; }
+}
+
+// Sized by width, height from the viewBox, as in the header row -- see
+// `.site-nav-arrow` in shared/_layout.scss for why this mark is drawn at all.
+.btn-see-shortlist-arrow {
+  flex: none;
+  display: block;
+  width: 0.62rem;
+  height: auto;
 }
 
 @media (max-width: 600px) {

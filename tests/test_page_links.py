@@ -390,11 +390,13 @@ TRUSTED_DYNAMIC = (
     # index pre-filtered by that mood, echoing food's badges
     # (_includes/recipe_badges.html, issue #40).
     #
-    # THE PATH HALF IS COVERED THE SAME WAY THE BACK ARROW'S IS: `chip_home` is
+    # THE PATH HALF IS COVERED THE SAME WAY THE BACK ARROW'S IS: `index_home` is
     # `site.data.sites[page.site_key].home`, which
     # test_site_nav_links_resolve_to_real_pages already checks against the
     # published-page set for every site. This scanner cannot follow the
-    # subscript, and does not have to.
+    # subscript, and does not have to. (It was `chip_home` until 2026-09-12,
+    # when #994's see-all link became its second reader and the assign moved to
+    # the top of the layout.)
     #
     # THE QUERY HALF IS DELIBERATELY NOT A LINK QUESTION. `?mood=...` does not
     # change which page is fetched, so a mood that no longer exists still lands
@@ -402,8 +404,16 @@ TRUSTED_DYNAMIC = (
     # matches no button in silence, which is food's own policy for `?tag=`.
     # There is nothing here for a link checker to resolve, and a stale mood is a
     # taxonomy question that tests/test_cocktails.py owns.
-    re.compile(r"^\{\{\s*chip_home\s*\|\s*relative_url\s*\}\}\?mood="
+    re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood="
                r"\{\{\s*m\s*\|\s*url_encode\s*\}\}$"),
+    # The drink page's see-all link, added 2026-09-12 (#994) -- the same index,
+    # the same variable, and the same two halves: the path is checked by
+    # test_site_nav_links_resolve_to_real_pages, and `?shortlist=1` does not
+    # change which page is fetched. It is a VIEW the index's own JS switches on
+    # when it sees it (MANUAL 8.9), so with JavaScript off the link still lands
+    # on a real, working index -- which is why it is not `hidden` the way the
+    # button above it is.
+    re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?shortlist=1$"),
 )
 
 

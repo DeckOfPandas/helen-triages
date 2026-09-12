@@ -432,14 +432,42 @@ $card-shortlist-size: 1.15rem;
 // still hears "shortlist" with its pressed state, and `+` / `✓` still come from
 // %shortlist-mark. No trailing margin, for the reason the card gives: the mark
 // IS the button.
+// AND THE SEE-ALL LINK UNDER IT DOES THE SAME THING -- #994, 2026-09-12, and
+// it is Helen's own instruction for that control rather than a consistency
+// argument: "On mobile, this needs to be a simple icon not a word. Not sure
+// what. Maybe a right arrow?" So on a phone the column is the `+` over the
+// arrow, both marks, which is the sketch in the issue.
+//
+// `font-size: 0` HIDES THE WORD FROM SIGHT ONLY, exactly as above: it is still
+// the link's text, so a screen reader still hears "see all", and the flex gap
+// is in `em` so it closes with the word rather than leaving a hole. The arrow
+// is sized in rem and does not notice.
+//
+// THE ARROW TAKES THE CARD MARK'S SIZE so the two marks in the column are one
+// pair -- the same `$card-shortlist-size` the `+` above takes, which is also
+// what makes a drink look the same shortlisted on its card and on its page.
 @media (max-width: 600px) {
   .cocktail-title-row .btn-shortlist {
     font-size: 0;
 
     &::before {
       font-size: $card-shortlist-size;
+      // BOTH SIDES, because above 600px the mark is on the RIGHT of the word
+      // here (#994, _cocktail.scss) and carries a left margin instead. With the
+      // word at `font-size: 0` either one would be a gap beside a mark that is
+      // now the whole control.
       margin-right: 0;
+      margin-left: 0;
     }
+  }
+
+  .btn-see-shortlist {
+    font-size: 0;
+    gap: 0;
+  }
+
+  .btn-see-shortlist-arrow {
+    width: $card-shortlist-size;
   }
 }
 

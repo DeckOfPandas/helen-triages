@@ -1616,6 +1616,37 @@
     if (changed) syncMoodButtons();
   })();
 
+  /* ARRIVING FROM A DRINK PAGE'S SEE-ALL LINK -- `?shortlist=1`, #994,
+     2026-09-12. Helen: "Currently it's hard to figure out how to see your
+     shortlist once you've added something to it from the separate page."
+
+     IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
+     `enterShortlistView()` plus `resetControls()` is exactly what pressing
+     `shortlisted (N)` does a few hundred lines above, so a reader who arrives
+     by the link and one who presses the button are in one state, and #918's
+     rule that this is a VIEW and not a facet holds for both.
+
+     WHICH IS ALSO WHY IT RUNS LAST and replaces rather than adds. The mood
+     query above narrows the list you came back to; this one is the opposite
+     instruction -- show me everything I have saved -- so it clears the restored
+     memory and any mood in the same URL, in the order that makes the last word
+     the link's own.
+
+     A LITERAL TEST RATHER THAN `parseQuery`. That grammar is the two sites'
+     shared FIELD grammar (`mood`, and food's own list), and `shortlisted` is
+     not a field a URL may set: it is a view, with one value, and any other
+     value means nothing. `indexOf` over the search string keeps it that way. */
+  if (location.search.indexOf('shortlist=1') !== -1) {
+    state = FilterState.enterShortlistView();
+    resetControls();
+    /* AND THE REMEMBERED SCROLL GOES WITH THE REMEMBERED LIST. `restored` is
+       where you were in the list you left; this link is a request for a
+       different, shorter list, so restoring 2,400px into it lands past the end
+       of a three-drink shortlist. The same argument the scroll restore's own
+       comment below makes about applying before scrolling. */
+    restored = null;
+  }
+
   apply();
 
   /* AFTER apply(), because the page is not its full height until the hidden
