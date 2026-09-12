@@ -350,7 +350,15 @@ second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
 **The nav is the door to the OTHER site** (since 2026-09-10, Helen's own idea,
 picked from a header-only candidates page): one loop over `sites.yml` in that
 file's order, skipping `page.site_key`, each entry an icon, its bracketed word
-and an arrow — `[ COCKTAILS ] →` on food. A `site_neutral` page (about) shows
+and an arrow — `[ COCKTAILS ] →` on food. **The arrow is DRAWN, not typed**
+(`_includes/icons/arrow-right.svg`, #993, 2026-09-12): Courier Prime ships as
+an 18KB subset with no arrow in it, so `&rarr;` was whatever face the reader's
+machine substituted for U+2192 — and a substituted glyph is a substituted FONT,
+which moves metrics and decides where the ink sits in its box. The row's three
+marks are centred by `align-items: center` on their BOXES, which is exact only
+when every box has its ink centred in it; a drawn mark does, a borrowed glyph
+may not. The include takes a `class` parameter, and the drink page's see-all
+link (§9.13, #994) is its second caller. A `site_neutral` page (about) shows
 every site, wrapped into right-aligned lines where there is no room. **It sits
 at the RIGHT-HAND end of the header's second row and the `??` about link (a
 literal `/about/`) at the LEFT end, both on the cards' edges, at every width**
@@ -1039,6 +1047,13 @@ of every `update()`/`apply()`, and `tests/js/shortlist-view.test.js`
 generates the cases from both field tables. It did compose with the other
 filters until 2026-09-10; `DECISIONS.md` §8.3 has the fourteen steps that
 ended that.
+
+**`?shortlist=1` on the COCKTAILS index enters it** (#994, 2026-09-12), by
+calling the same `enterShortlistView()` the button calls — so the drink page's
+see-all link (§9.13) and the button land in one state, and the view's "clears
+everything else" rule holds for both. It runs after the `?mood=` block and
+replaces rather than narrows, and drops the remembered scroll with the
+remembered list. Food has no such link and no such query.
 
 ## 9. Cocktails
 
@@ -2073,15 +2088,30 @@ head's left edge (a flat 7rem column; the margin layout is gone), CENTRED in
 the head, absinthe, stroke 2, never shorter than `$glass-min`. The name is on
 the card's tape (2.6rem, 1.6em horizontal padding) with a real `<h1>` inside
 at `display: contents` and `font-size: 1em` (the UA's `h1 { 2em }` doubled it
-once). **The shortlist button is the title row's second item, at its right
-end** (#963), given the name's FIRST line's own box — the tape's padding as a
-top margin, one line of lettering as its height, adjusted through `:has()` for
-the fit script's step and wrap — so it centres on that line at any size; on a
-phone it is the card's `+` alone. The controls row under the head's rule holds
+once). **The tape bleeds left by the card's 1.05em above 600px and by the
+ARTWORK'S OWN left inset (4.14%) on a phone** (#995, 2026-09-12): every tape SVG
+insets its polygon inside its viewBox and `decorations.js` stretches the artwork
+to the box, so that inset is a percentage of the tape's rendered width, not a
+length — which is why the phone tape's BOX started on the column and its black
+BAND did not. `tmp/tape_insets.py` is how the fifteen were measured; the modal
+value is the one used, and the `max-width` grows with the bleed so the name
+gains the width rather than only sliding into it. **The shortlist button and a
+SEE-ALL link are a column at the title row's right end** (#963, then #994,
+2026-09-12): `.cocktail-shortlist-controls` is what the head grid places, and it
+carries the alignment — the tape's padding as a top margin, one line of
+lettering as the button's height, adjusted through `:has()` for the fit script's
+step and wrap — so the first control centres on the name's FIRST line at any
+size. Helen drew the pair as `SHORTLIST +` over `SEE ALL →`, so the `+` sits to
+the RIGHT of its word here and only here (`row-reverse`, not a second
+pseudo-element — the `::before` is the one whose content becomes a tick), and
+both marks hang from the same edge. On a phone both words go to `font-size: 0`
+and the column is the two marks alone at `$card-shortlist-size`. The link is an
+`<a>` to `?shortlist=1` (§8.9) and is never `hidden`: the view is JavaScript, a
+link to the index is not. The controls row under the head's rule holds
 only the read/make toggle, on the left. **The head is ONE two-column grid**
 (#979): `.cocktail-head-words` is `minmax(0, 1fr) auto` and
 `.cocktail-title-row` is `display: contents`, so everything the head says is in
-the first track and the shortlist button alone is in the second — which means
+the first track and the shortlist column alone is in the second — which means
 the tagline, the meta and the chips all end exactly where the title tape's own
 box is stopped, with no number to keep in step when the button changes size. On
 a phone that grid is off (`display: contents`) and the children are placed on
@@ -2120,33 +2150,30 @@ concatenated in. Only a candidate scoring above zero is offered, and
 the same corpus, so it doubles as a second implementation to check the template
 against. Today every drink's third pick shares at least 3; **re-run it after a
 promotion batch or any vocabulary edit that moves moods.**
-**The three are PORTRAIT CARDS since 2026-09-11** (Helen on #955; DECISIONS
-§9.13 has her words): `.drink-card.drink-card--portrait` in a
-`<section class="cocktail-related-section">` that wears `.cocktail-footer`'s
-rule. The card is the index card's classes on the index card's parts, so every
-colour, face, clamp and hover state is `_sass/cocktails/_cards.scss`'s, and the
-`--portrait` modifier (in that file, beside the card) moves geometry only: the
-glass in a head row beside the tape and flush left with the ingredient line and
-the foot, the foot back in flow, height from content, **and every title at one
-size**: the modifier sets `--card-name-scale` to `$card-name-step` itself, so
-`card-name-fit.js` can only fit or wrap a name there, never step one smaller
-than its neighbours (#960). **It also carries the index card's shortlist `+`
-since #977 (2026-09-11), in a band of top padding ABOVE the head row** —
-Helen: "higher than the tape so it doesn't take up space the name could use" —
-so the tape keeps the card's full width where the index card buys that corner
-with 2.63rem of title. **And it pays nothing at all for it**: `.drink-cards
-.drink-card--portrait .drink-card-name` cancels that reservation, which the
-related cards had been paying since #955 took `.drink-cards` for its list reset
-— 42px of a 101px name box at 484px, and the whole of #976. The markup is
-written in the layout rather than shared with the index as an include — three
-flag-shaped differences, the reason is in the layout's comment — and the chips
-are LINKS to the filtered index, as the page's own chip row is. **No new hue**,
-a plain `.cocktail-section-heading` as "To serve" uses, `repeat(auto-fit,
-minmax(16rem, 1fr))` for three-then-two-then-one with no media query (16rem
-since #976, up from 13rem: the floor is what decides when a row gives up a card,
-and 13rem put two 210px tracks in a 484px viewport; the selector carries two
-classes because `cards` is imported after `cocktail`), and the whole
-section is hidden in `make it` and in print. **The heading is a marked
+**The three are INDEX CARDS since 2026-09-12** — plain `.drink-card`, the same
+markup shape, in a `<section class="cocktail-related-section">` that wears
+`.cocktail-footer`'s rule. **Nothing about the card is decided on this page**:
+geometry, fixed height, the three-line clamp, the chip cap, the ship pinned to
+its corner with the clear-ship pass, the hover and the 370px grid floor are all
+`_sass/cocktails/_cards.scss`'s, so the row wraps two-then-one in the 900px
+column exactly as the index wraps an odd count, and un-columns below 400px as
+the index's card does. **Two differences remain and neither is geometry**: the
+chips are LINKS to the filtered index rather than filter buttons (a chip on a
+drink page has nothing to filter — the page's own chip row is the same), and the
+index's `data-*` search attributes are absent. That is why the markup is written
+in the layout rather than shared as an include; the stylesheet is the shared
+half and the one that cannot drift.
+**They were `--portrait` cards for one day, 2026-09-11 to 2026-09-12, and #991
+deleted the variant** — Helen: *"We are fighting this design, and trying to
+invent a new design language, where we should just reuse what we've already
+made."* The modifier moved geometry only, and in a day it had grown a chip-row
+cap, a `.drink-card-tail` in the markup, a title-size lock (#960), a grid floor
+tuned twice (#976), a shortlist corner of its own (#977) and an exemption from
+the title padding that corner costs. **That sequence is the thing to recognise,
+not the card**: six issues about a variant of something the site already had.
+DECISIONS §9.13 has her words and the full list.
+**No new hue**, a plain `.cocktail-section-heading` as "To serve" uses, and the
+whole section is hidden in `make it` and in print. **The heading is a marked
 PLACEHOLDER in Helen's words from the issue.** Food has none of this: *"the
 priority is cocktails."*
 `test_every_published_drink_page_offers_three_other_published_drinks` reads the

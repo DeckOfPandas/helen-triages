@@ -2244,6 +2244,103 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-09-12, #991 — the related cards are the index's cards, and the variant
+  is deleted.** Helen, in full: *"We are fighting this design, and trying to
+  invent a new design language, where we should just reuse what we've already
+  made."* The title was *"if you liked this cards should render the same as
+  cards on the index list"*, and the entry below — #955, one day earlier — is
+  what she is reversing.
+  **The sequence is the lesson, not the card.** `--portrait` was introduced as
+  "one modifier that moves geometry only", which was true of the modifier and
+  not of what followed it. Within one day it needed: the chip-row cap removed
+  (a growing card would clip the ship's row), a `.drink-card-tail` invented in
+  the markup so the ship did not take a row of its own, `--card-name-scale`
+  pinned to `$card-name-step` so three names could not differ in size (#960), a
+  grid floor of its own set at 13rem and then raised to 16rem (#976), a
+  shortlist corner bought with height instead of title width (#977), and an
+  exemption from the title reservation every other card pays. **Six issues
+  about a variant of a thing that already existed.** A modifier that keeps
+  needing a second rule is not a modifier; it is a second design being built
+  one issue at a time, and the tell is the issue COUNT rather than any one of
+  them looking unreasonable.
+  **What ships:** `.drink-card` with no modifier, the index card's markup shape
+  (glass, `.drink-card-body`, `.drink-card-foot`, button), and `.drink-cards`'
+  own 370px grid floor — two across the 900px column, then one, which is what
+  the index does with an odd count. 372 lines out, 149 in. **Two differences
+  remain and neither is geometry**: chips are LINKS here (a chip on a drink page
+  has nothing to filter) and the index's search `data-*` are absent. Those two
+  are why the markup is still written in the layout rather than shared as an
+  include; the stylesheet is shared entirely now, which is the half that could
+  drift.
+  **Not asked and not done:** making the row three across again by any other
+  means. The index's floor decides it, and that is the point.
+
+- **2026-09-12, #994 — a see-all link under the drink page's shortlist button.**
+  Helen: *"Currently it's hard to figure out how to see your shortlist once
+  you've added something to it from the separate page. Add a mark to the line
+  below. On desktop and ipad: SHORTLIST + / SEE ALL ->. On mobile, this needs to
+  be a simple icon not a word. Not sure what. Maybe a right arrow? Mobile: + /
+  ->"* **Her sketch is the placement**: the two marks under each other at the
+  column's right edge, which is why the shortlist `+` moved to the RIGHT of its
+  word on this page (and only this page) — `row-reverse` on the button rather
+  than a second pseudo-element, because the `::before` is the one whose content
+  becomes a tick. The pair is one wrapper, `.cocktail-shortlist-controls`, which
+  is what the head grid places and what carries #963's alignment with the
+  title's first line; without it the link would have been a third grid item and
+  landed under the NAME.
+  **A LINK, NOT A BUTTON** — the mood chips' own argument (middle-click, open in
+  a new tab, copy link address, and seeing where it goes on hover), and it is
+  why it is not `hidden`: the shortlist VIEW is JavaScript, a link to the index
+  is not. **`?shortlist=1` calls the button's own `enterShortlistView()`**, so
+  the two doors lead to one state and #918's "a view, not a facet" holds for
+  both; it runs after the `?mood=` block and replaces rather than narrows, and
+  drops the remembered scroll with the remembered list. Three tests in
+  `tests/js/cocktail-index-startup.test.js`.
+
+- **2026-09-12, #993 — the other-site arrow is drawn now, and the bug could not
+  be reproduced.** Helen: *"the go to the other site mark should have its centre
+  horizontally aligned with the arrow"*, with a screenshot. **On a controlled
+  build the row was already aligned**: `align-items: center` centres the three
+  BOXES, and every icon's ink is centred in its own viewBox, so the glass, the
+  lettering and the arrow agreed within a quarter-pixel — measured before
+  touching anything. In her screenshot the arrow sits ~1px below the glass and
+  ~2px below the lettering, and its PROPORTIONS are not this build's.
+  **Courier Prime ships here as an 18KB subset with no arrow in it**, so
+  `&rarr;` was drawn by whatever face her machine substitutes for U+2192 — and
+  a substituted glyph is a substituted FONT, which moves metrics rather than
+  only the picture. `_sass/cocktails/_shortlist.scss` already records that trap
+  for the shortlist `+`/tick; this is it one step worse, because a fallback also
+  decides where the ink sits INSIDE its box, which no rule here can reach.
+  Offered a drawn mark, a test page to look at, a measured nudge, or leaving it,
+  she chose the drawn mark. **The general shape: "aligned by construction" is
+  only as true as the boxes are honest, and a borrowed glyph's box is not ours.**
+  A nudge would have been calibrated against a font only this container has.
+
+- **2026-09-12, #995 — the phone title tape starts on the column, and the cause
+  was the artwork.** Helen: *"name tape can start left-aligned with the
+  metadata, giving us as much space for the name as possible"*, then, on being
+  shown a desktop build of it: *"Here, the whole graphic -- tape plus lettering
+  -- could start further left, keeping the gap between the left end of the tape
+  and the start of the letters. This is for mobile view, I should have been
+  clear, NOT desktop or ipad."* **The first reading cost a round trip and is
+  worth recording**: "left-aligned with the metadata" was read as the lettering
+  landing on the meta's edge at desktop width, which is a real and different
+  change, and the picture is what made the mismatch obvious in one message
+  rather than at review (§13.11 again).
+  **What was actually wrong was not the box.** At 390px the tape's box already
+  started exactly where the back arrow and the tagline do, both at x=24; what
+  started further in was the black BAND, because every tape SVG insets its
+  polygon inside its own viewBox and `decorations.js` stretches the artwork to
+  the box (`preserveAspectRatio="none"`) — so the inset is a PERCENTAGE of the
+  tape's rendered width, about 14px on a full-width phone tape, and no fixed
+  length could have expressed it. Same class of fact as the vertical band offset
+  `.drink-card-tape-bg { top: -1.765% }` already corrects. 4.14% is the modal
+  left inset across the fifteen tapes (`tmp/tape_insets.py`; the rest run
+  3.02–4.14%, and #779 rolls a random one per load, so no single number is exact
+  for all), and the `max-width` grows with the bleed so the name gains the width
+  rather than only sliding into it. **A left overhang is never a sideways
+  scroll** — only overflow to the right is, which is what #899 was about.
+
 - **2026-09-11 — the drink page's metadata ends where the title tape's box ends
   (#979).** Helen: *"the metadata line now spans the full page -- I think it
   used to span the narrower reading container. Either way, it looks strange."*

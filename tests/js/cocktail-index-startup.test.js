@@ -414,3 +414,60 @@ test('#757: the chips are moved in the DOM, not merely reordered visually', () =
       'what the dot selector reads.');
   });
 });
+
+// --- arriving from a drink page's see-all link, #994 -------------------------
+//
+// `?shortlist=1` is the one query the index reads besides `?mood=`, and it is
+// the only wiring in #994 that is not markup: the link itself is an <a> with a
+// real href and needs no script at all. What needs a test is that the index
+// still turns the VIEW on when it arrives -- and specifically that it calls the
+// same `enterShortlistView()` the `shortlisted (N)` button calls, so the two
+// doors lead to one state (#918, MANUAL 8.9).
+//
+// THE SHORTLIST IS EMPTY IN THIS HARNESS, deliberately and not by accident:
+// HTF.shortlist keys its storage on `HTF.site`, which comes from a meta tag the
+// stub page does not carry, so the store is a no-op here. That is enough for
+// what these assert -- the view is ON and it has narrowed to nothing -- and it
+// keeps them about the wiring rather than about the store, which
+// shortlist.test.js and shortlist-view.test.js already own.
+
+function shortlistViewIsOn(r) {
+  const btn = r.doc.getElementById('shortlist-only');
+  assert.ok(btn, 'the fixture has no shortlisted-only button.');
+  return btn.getAttribute('aria-pressed') === 'true' &&
+         btn.classList.contains('is-on');
+}
+
+test('#994: ?shortlist=1 turns the shortlist view on at startup', () => {
+  const r = boot({ drinks: DRINKS, search: '?shortlist=1' });
+  assert.ok(shortlistViewIsOn(r),
+    'the see-all link is the only way into this view from a drink page; if ' +
+    'the index does not read the query, the link lands on an ordinary index ' +
+    'and the issue is not fixed.');
+  assert.deepStrictEqual(visibleTitles(r.page), [],
+    'the view is on and this browser has shortlisted nothing, so nothing ' +
+    'survives -- which is also what proves the state reached apply().');
+});
+
+test('#994: without the query the view stays off', () => {
+  // The control. A test that only ever boots with the query would pass on an
+  // index that turned the view on unconditionally.
+  const r = boot({ drinks: DRINKS });
+  assert.ok(!shortlistViewIsOn(r));
+  assert.strictEqual(visibleTitles(r.page).length, DRINKS.length);
+});
+
+test('#994: shortlist=1 beats a mood in the same URL', () => {
+  // It is a VIEW, not a facet (#918): pressing the button clears every other
+  // filter, and arriving by the link must mean the same thing or the two doors
+  // lead somewhere different. The order in the file is what decides it, so
+  // this is the assertion that a later edit reordering those two blocks would
+  // trip.
+  const r = boot({ drinks: DRINKS, search: '?mood=sharp&shortlist=1' });
+  assert.ok(shortlistViewIsOn(r));
+  const lit = r.page.filters.querySelectorAll("[data-mood='sharp']")
+    .filter(function (b) { return b.classList.contains('is-on'); });
+  assert.deepStrictEqual(lit, [],
+    'the mood button is still lit, so the view did not clear it -- a filter ' +
+    'the reader can see but the list is not obeying.');
+});
