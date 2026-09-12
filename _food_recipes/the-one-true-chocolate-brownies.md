@@ -24,7 +24,8 @@ ingredient_groups:
       item: vanilla extract
     - amount: "200 g"
       item: plain flour
-    - item: "1 tsp salt"
+    - amount: "1 tsp"
+      item: salt
       note: "don't be shy with the salt"
 method:
   - Melt the chocolate over a bain-marie, then stir in the butter until totally melted and glossy.
@@ -46,6 +47,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

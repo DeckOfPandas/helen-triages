@@ -54,11 +54,11 @@ ingredient_groups:
       item: fresh garlic cloves
     - amount: "6"
       item: "banana shallots (echalions), peeled"
-    - amount: "5 cm"
-      item: "piece of fresh ginger, peeled and chopped"
+    - amount: "5 cm piece"
+      item: "fresh ginger, peeled and chopped"
       note: "not giving an equivalent here because fresh ginger is mandatory"
-    - amount: "2 cm"
-      item: "piece of galangal, peeled and chopped"
+    - amount: "2 cm piece"
+      item: "galangal, peeled and chopped"
       note: "or 4 tsp paste from a jar"
     - amount: "10"
       item: macadamia nuts
@@ -92,6 +92,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

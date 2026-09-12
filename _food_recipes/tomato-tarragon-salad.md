@@ -28,7 +28,8 @@ ingredient_groups:
       item: extra virgin olive oil
     - amount: "2"
       item: "shallots, peeled and finely chopped"
-    - item: "large handful each of tarragon and flat-leaf parsley, chopped"
+    - amount: "1 large handful each"
+      item: "tarragon and flat-leaf parsley, chopped"
 method:
   - "Cut each tomato in half and squeeze out the seeds. Finely chop the flesh and place in a large bowl."
   - "Add all remaining ingredients except the herbs. Mix well and season with salt and pepper to taste. Cover and chill for at least 20 mins because #chemistry."
@@ -41,6 +42,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

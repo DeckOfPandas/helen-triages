@@ -12,14 +12,16 @@ internal_temp_ref: poultry.goose
 tags: ["festive", "showstopper"]
 ingredient_groups:
   - items:
-    - item: "4–5.5-kg fresh goose"
+    - amount: "4–5.5 kg"
+      item: fresh goose
     - amount: "4"
       item: "lemons, zested"
     - amount: "3"
       item: "limes, zested"
     - amount: "1 tsp"
       item: "[Chinese five-spice powder](../five-spice-powder/)"
-    - item: "small handful each of parsley sprigs, thyme and sage, plus extra for garnishing"
+    - amount: "1 small handful each"
+      item: "parsley sprigs, thyme and sage, plus extra for garnishing"
     - amount: "3 tbsp"
       item: clear honey
     - item: fresh parsley, thyme and sage
@@ -44,6 +46,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

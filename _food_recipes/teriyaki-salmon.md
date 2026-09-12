@@ -26,8 +26,8 @@ ingredient_groups:
       item: dark brown soft sugar
     - amount: "2 tbsp"
       item: honey
-    - amount: "2"
-      item: "cloves garlic, minced"
+    - amount: "2 cloves"
+      item: "garlic, minced"
     - amount: "1½ tsp"
       item: fresh ginger, minced
     - amount: "1 tsp"
@@ -49,6 +49,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

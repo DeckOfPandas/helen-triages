@@ -17,8 +17,8 @@ ingredient_groups:
       item: "onion, diced"
     - amount: "2 medium"
       item: "carrots, diced"
-    - amount: "2"
-      item: "stalks celery, diced"
+    - amount: "2 stalks"
+      item: "celery, diced"
     - amount: "3 cloves"
       item: "garlic, minced"
     - amount: "50 ml"
@@ -55,6 +55,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

@@ -45,7 +45,8 @@ ingredient_groups:
       item: bay leaf
     - amount: "1"
       item: thyme sprig
-    - item: splash of red wine vinegar
+    - amount: "1 splash"
+      item: "red wine vinegar"
     - amount: "1 bottle"
       item: "red wine (750 ml)"
       note: "preferably Merlot or Cab"
@@ -87,6 +88,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

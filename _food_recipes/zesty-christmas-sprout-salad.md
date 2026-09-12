@@ -22,7 +22,8 @@ ingredient_groups:
       item: pomegranate seeds
     - amount: "75 g"
       item: walnuts
-    - item: "handful of mint leaves, chopped, plus extra to garnish"
+    - amount: "1 handful"
+      item: "mint leaves, chopped, plus extra to garnish"
   - name: dressing
     items:
     - amount: "1"
@@ -50,6 +51,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

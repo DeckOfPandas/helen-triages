@@ -720,16 +720,23 @@ _SPICE_BLEND_RECIPES = {
 }
 
 
-def _spice_rank(name: str):
+def _spice_rank(name: str, herb_context: str = None):
     """None if `name` isn't one of the tracked spices at all -- most
     ingredients aren't, and that's not a signal either way. Base spices
     rank 0..3 by their required order; every warm spice ties at rank 4,
     since order among them is deliberately not enforced.
+
+    `herb_context` is checked for the coriander herb-vs-spice signal instead
+    of `name` alone when given -- #982 moved the measure word out of `item:`
+    and into `amount:`, so "1 handful" / "coriander, torn (optional)" no
+    longer carries "handful" in the text this function was originally
+    checking. Defaults to `name` so any other caller keeps today's behaviour.
     """
     if _SPICE_GARLIC_EXCLUDE.search(name):
         return None
+    context = name if herb_context is None else herb_context
     for i, word in enumerate(_SPICE_BASE_ORDER):
-        if word == "coriander" and _CORIANDER_HERB_SIGNAL.search(name):
+        if word == "coriander" and _CORIANDER_HERB_SIGNAL.search(context):
             continue
         if re.search(rf"\b{word}\b", name, re.I):
             return i
@@ -755,8 +762,9 @@ def test_spice_order_within_group(recipe):
         ranked = []
         for it in group.get("items") or []:
             text = it.get("item", "") if isinstance(it, dict) else str(it)
+            amount = it.get("amount", "") if isinstance(it, dict) else ""
             name = re.split(r"[,(]", text)[0].strip()
-            rank = _spice_rank(name)
+            rank = _spice_rank(name, f"{amount} {text}")
             if rank is not None:
                 ranked.append((rank, text))
         for i in range(len(ranked)):

@@ -37,7 +37,8 @@ ingredient_groups:
       item: "lemons, finely grated zest and juice"
     - amount: "3"
       item: "garlic cloves, crushed"
-    - item: "small bunch of flat-leaf parsley, leaves only, chopped"
+    - amount: "1 small bunch"
+      item: "flat-leaf parsley, leaves only, chopped"
 method_groups:
   - name: Herb butter
     steps:
@@ -58,6 +59,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

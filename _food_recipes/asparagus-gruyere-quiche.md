@@ -23,7 +23,8 @@ ingredient_groups:
     - amount: "4 tsp"
       item: cold water
     - item: salt
-    - item: pinch of paprika, unless feeding Helen
+    - amount: "1 pinch"
+      item: "paprika, unless feeding Helen"
       note: fine to skip
   - name: filling
     items:
@@ -35,7 +36,8 @@ ingredient_groups:
       item: double cream
     - amount: "2 bunches"
       item: "young asparagus, chopped on a diagonal into ½–1-inch pieces"
-    - item: "150 g gruyère, grated"
+    - amount: "150 g"
+      item: "gruyère, grated"
       note: "all cheese amounts are notional"
     - amount: "20 g"
       item: plain flour
@@ -72,6 +74,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

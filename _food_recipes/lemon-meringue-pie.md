@@ -22,7 +22,8 @@ ingredient_groups:
       note: "or 2 oz, but the pastry will be less crisp"
     - amount: "1 large"
       item: egg yolk
-    - item: pinch of salt
+    - amount: "1 pinch"
+      item: salt
   - name: filling
     items:
     - item: "[grandma's lemon curd](../grandmas-lemon-curd/)"
@@ -30,7 +31,8 @@ ingredient_groups:
     items:
     - amount: "4 large"
       item: egg whites
-    - item: "pinch of cream of tartar"
+    - amount: "1 pinch"
+      item: "cream of tartar"
     - amount: "4 oz"
       item: "white caster sugar"
 method_groups:
@@ -56,6 +58,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

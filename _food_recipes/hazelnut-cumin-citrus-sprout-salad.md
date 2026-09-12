@@ -21,7 +21,8 @@ ingredient_groups:
       note: fine to halve or skip
     - amount: "400 g"
       item: "Brussels sprouts, shredded"
-    - item: "handful coriander, torn (optional)"
+    - amount: "1 handful"
+      item: "coriander, torn (optional)"
     - amount: "100 g"
       item: pomegranate seeds
   - name: dressing
@@ -52,6 +53,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
