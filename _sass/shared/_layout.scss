@@ -201,12 +201,29 @@ main {
   white-space: nowrap;
 }
 
+// THE ARROW IS DRAWN, NOT SET -- #993, 2026-09-12. It was `&rarr;` in
+// $font-headings at 1rem/700 until then; _layouts/default.html carries the
+// reasoning, and the short version is that Courier Prime has no arrow, so the
+// glyph came from whatever face the reader's machine substitutes -- which
+// decides both the box's height and where the ink sits inside it, and neither
+// is something a stylesheet can correct for.
+//
+// SIZED BY WIDTH, so it keeps the 0.6em the monospace arrow occupied in the
+// row and the height follows the viewBox. `display: block` because an inline
+// SVG otherwise sits on the text baseline and brings the line box's descender
+// back into the arrangement -- exactly what was being escaped. With that, the
+// flex row centres this box on the icon's box, and both boxes have their ink
+// centred in them, so the three marks agree by construction at any size.
+//
+// `stroke: currentColor` IS IN THE FILE and the colour comes from
+// `.site-nav-icon-link` by inheritance, so the hover carries it with no rule
+// here -- the same contract every other icon under _includes/icons/ keeps.
 .site-nav-arrow {
   margin-left: 0.55rem;
-  font-family: $font-headings;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: normal;
+  flex: none;
+  display: block;
+  width: 0.62rem;
+  height: auto;
 }
 
 // Centre track. NO `min-width: 0`, and that is the whole of issue #551's

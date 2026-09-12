@@ -221,7 +221,34 @@
         {% assign nav_icon_file = "icons/" | append: nav_site.icon | append: ".svg" %}
         {% include {{ nav_icon_file }} %}
         <span class="site-nav-word">[ {{ nav_site.word }} ]</span>
-        <span class="site-nav-arrow" aria-hidden="true">&rarr;</span>
+        {% comment %} A DRAWN ARROW, NOT `&rarr;` -- #993, 2026-09-12. Helen:
+           "the go to the other site mark should have its centre horizontally
+           aligned with the arrow", with a screenshot of the food site's row in
+           which the arrow sits about a pixel below the glass and two below the
+           lettering.
+
+           THE ROW WAS ALREADY ALIGNED BY CONSTRUCTION and that is why the bug
+           could not be reproduced here: the link is a flex row with
+           `align-items: center`, so it centres the three BOXES on each other,
+           and every icon's ink is centred in its own viewBox (§9.14 fits each
+           viewBox to its artwork). Measured on this build, the glass, the
+           lettering and the arrow agreed within a quarter of a pixel.
+
+           WHAT VARIED WAS THE GLYPH. Courier Prime ships here as an 18KB
+           subset with no arrow in it, so `&rarr;` was drawn by whatever face
+           the reader's machine substitutes for U+2192 -- and a substituted
+           glyph is a substituted FONT, which changes metrics and not only the
+           picture. That is the same trap `_sass/cocktails/_shortlist.scss`
+           records for the shortlist button's `+` and tick, one step worse:
+           there the fallback moved a box, here it also decides where the ink
+           sits inside one, which no rule in this repo can reach.
+
+           So the arrow is now a mark we draw, like every other mark on the
+           site: ink centred in a viewBox, sized in CSS, aligned by the same
+           flex centring as the icon beside it, and identical on every machine
+           and browser. Helen chose this over a measured nudge, which would
+           have been calibrated against a font only this container has. {% endcomment %}
+        {% include icons/arrow-right.svg %}
       </a>
       {% endif %}
       {% endfor %}
