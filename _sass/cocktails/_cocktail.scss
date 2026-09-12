@@ -1886,10 +1886,21 @@ $amount-gap-wide: 1.25rem;
 // Nothing is hidden at any width and nothing can overflow, because no track is
 // ever narrower than the floor and the floor is under any phone.
 //
-// 13rem, NOT THE INDEX GRID'S 370px, and that is what "portrait" buys: the
-// index card is landscape because it needs a full ingredient line beside a
-// glass column; a portrait card stacks the same parts, so it can be half as
-// wide and still carry three lines of ingredients and three rows of chips.
+// NOT THE INDEX GRID'S 370px, and that is what "portrait" buys: the index card
+// is landscape because it needs a full ingredient line beside a glass column; a
+// portrait card stacks the same parts, so it can be well under half as wide and
+// still carry three lines of ingredients and three rows of chips.
+//
+// 16rem SINCE 2026-09-11, UP FROM 13rem -- #976, and it is the second half of
+// that fix. Helen: "Wrap to two then one card at wider screen widths if that
+// helps." It does: 13rem put two tracks in a 436px column at a 484px viewport,
+// each 210px, which leaves the name a 101px box once the glass column and the
+// gutter are out of it -- a 12-letter drink needs more than that at any size the
+// row can share. The floor is what decides when a row gives up a card, so it is
+// the dial she is asking for, and raising it is the whole change: three tracks
+// still clear it in the 900px column (3 x 256 + 2 x 16 = 800 against 852), two
+// hold down to a 528px column, and below that it is one wide card rather than
+// two cramped ones. Still no media query, for the reason below.
 //
 // `.drink-cards` IS ON THE <ul> TOO, for its reset and nothing else; the grid
 // below overrides its columns and gap, and `.drink-card` itself never needed
@@ -1911,7 +1922,7 @@ $amount-gap-wide: 1.25rem;
   // card. Adjacent margins collapse, so this costs nothing on a drink that
   // DOES have a footer.
   margin: 0 0 $spacing-section-gap;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   gap: $space-lg;
 }
 

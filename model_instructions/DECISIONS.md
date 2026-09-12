@@ -2244,6 +2244,86 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-09-11 — three rulings on the cards, given the same evening the
+  weekend's family visit started (#971, #976, #977).**
+  - **#971, the card under the cursor, and it is two rulings in one sentence.**
+    Helen: *"#971: agree. I declined the title turning pink, and should have
+    accepted. BUT I also want the whole card to be clickable, which is
+    different."*
+    - **The name.** This REVERSES the #886 entry below within the day. That
+      entry closes *"the name keeps only its own 2026-09-02 hover... it is one
+      selector to add back if she ever asks"*, because candidate A's "light the
+      handle from the whole tile" was among the pieces of A she did not take
+      when she chose C. **It was declined on 2026-09-11 and accepted the same
+      day on seeing the result** — which is §13.12's rule about how a ruling
+      moves here, running at its fastest so far. Both halves are kept: the
+      argument for C without A stands, and it lost to looking at it. One mixin
+      now carries the four values, so the name's own hover and the card's
+      cannot drift to two pinks. A's other two pieces (the magenta border, the
+      absinthe dots) are still not in it.
+    - **The click, and it is the piece with a mechanism.** One anchor per card
+      — the name's, the only link a card has — with a pseudo-element stretched
+      over the card. **`inset: 0` does not work and cannot be made to**: the
+      anchor's nearest positioned ancestor is `.drink-card-tape-word`
+      (`position: relative` AND transformed, for the tape's text nudge) and
+      above that `.drink-card-tape`, which has to stay positioned so the tape
+      artwork has a box to be absolute against. So the overlay is drawn far
+      larger than any card in `vmax` and `.drink-card`'s own `overflow: hidden`
+      cuts it to shape; clipping governs hit-testing as well as painting.
+      **Moving the anchor up the markup instead was ruled out by measurement,
+      not taste**: `cocktail-index.js` rewrites `.drink-card-name a`'s
+      `innerHTML` to mark a title hit, so an anchor wrapping the tape would have
+      its artwork destroyed on the first keystroke of a name search.
+    - **TWO BUGS CAME OUT OF IT AND BOTH ARE THE SAME SHAPE.** An out-of-flow
+      descendant counts towards its containing block's scrollable overflow, so
+      the overlay landed inside the box `card-name-fit.js` measures:
+      `scrollWidth` read 1389px for a 109px word, every name looked overflowed,
+      every name wrapped. The script measures the word's CONTENT with a Range
+      now — a pseudo-element is not in the DOM — which is what the question
+      always meant. **And fixing that exposed the second**: the overlay had
+      measured as working only because every name was wrapped, and
+      `.drink-card-name--wrap` sets `overflow: visible` on the tape word. Put
+      back to their proper states, the words clip again and the overlay with
+      them. **A green measurement can be green for the wrong reason.** The clip
+      is the no-JS ellipsis and is kept; `drink-card-name--fitted`, a mark
+      rather than a third state, releases it once the script has proved it can
+      never fire. With no JavaScript there is no class, the ellipsis stays and
+      the click target is the name alone — where the page was that morning.
+  - **#976, the related cards' names — and #960 did not cause it.** Helen:
+    *"First option please. I'm open to reducing the size of every name a
+    little, but would like the same size on each card. Wrap to two then one card
+    at wider screen widths if that helps."* The cause is one line in
+    `_shortlist.scss`: the index card's `+` is paid for out of the title, and
+    that reservation is scoped to `.drink-cards` — which #955 took for the
+    related-drinks list, along with 2.63rem of padding for a button that was not
+    there. Measured on Arrack Christmas Punch at 484px: name box 101.6px with
+    42px of it reserved, all three tapes stuck at 87.6px, all three tape words
+    at 59px, and ACCOUTREMENT — one word, nothing to wrap at — hanging 42px off
+    the end of its tape. That is the whole of "small, not filling the width,
+    wrapping weirdly": the fit script was measuring a box a phantom button had
+    taken a quarter to a half of, and the tape's `max-width` is a percentage OF
+    that box. **The grid floor is the second half**: 16rem, up from 13rem,
+    because the floor is what decides when `auto-fit` gives up a card, and
+    13rem put two 210px tracks in a 484px viewport. **The size is NOT reduced**
+    — she offered and it is not needed; every name fits at `$card-name-step` on
+    both test drinks at 390, 484, 600, 700, 900 and 1280. #960's mechanism is
+    untouched.
+  - **#977, the `+` on the related cards.** Helen: *"add shortlist button to top
+    right of 'if you liked this' cards. Higher than the tape so it doesn't take
+    up space the name could use."* The index card's button unchanged, and
+    `shortlist.js` needed nothing: its header has said since #546 that a fifth
+    placement is markup and a stylesheet rule, and this is the first time that
+    was taken up. **"Higher than the tape" is a band, not a nudge** — the card
+    opens top padding derived from the button's own metrics so the head row
+    starts below it, which is the trade running the opposite way from the
+    index's: a fixed-height card has no spare row and buys the corner with
+    title width, a portrait card grows and buys it with height. #823's hit area
+    is 46.8 x 44.8px and its lower edge lands on the head row's first pixel.
+    **This retires the fourth of the "four flag-shaped differences"** the
+    related card's markup is written out for rather than shared as an include
+    (that reasoning is in the 2026-09-11 #955 entry below): "no shortlist `+`
+    here" was a decision, and it was hers to overturn.
+
 - **2026-09-10 — the family-weekend design pass, in one entry.** Helen asked
   for an unseeded opinion: *"Where do you think we can make material
   improvements in a day or so?"* Every page family was screenshotted at 360,

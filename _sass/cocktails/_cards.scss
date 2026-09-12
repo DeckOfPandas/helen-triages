@@ -83,6 +83,28 @@ $card-pad-y:    1.05rem;
 $card-foot-y:   0.95rem;
 $chip-line:     1.15rem;
 
+// THE CARD'S FOUR LAYERS, NAMED -- #971, 2026-09-11, when the whole card became
+// the drink's link. `.drink-card` is `isolation: isolate` below, so these are
+// numbers about THIS card and nothing else on the page can be caught by them.
+// They are written here rather than as three literals on three rules because
+// the ORDER is the design and it is only legible in one place:
+//
+//   the card's own face        no z-index at all -- background, glass, tape,
+//                              ingredient line: everything that is only looked
+//                              at stays where it has always been
+//   $card-z-link          1    the stretched link's overlay, over the face
+//   $card-z-controls      2    the chips and the shortlist mark, over the
+//                              overlay, because they are clicked for their own
+//                              sake
+//   $card-z-ship          3    the goodness mark, over the chips, because it
+//                              MASKS the ones that run under it (#760)
+//
+// The tape's own two layers (`.drink-card-tape-bg` 0, `.drink-card-tape-word`
+// 1) are not in this scale: they sit inside the tape and order each other.
+$card-z-link:     1;
+$card-z-controls: 2;
+$card-z-ship:     3;
+
 // The tallest glass, in the card grid's own units. Every glass is drawn at a
 // compressed fraction of this — see cocktails/index.html, which counts the
 // tallest live from glasses.yml rather than hardcoding one.
@@ -118,6 +140,16 @@ $card-glass-scale: 10.4rem;
   position: relative;
   height: $card-height;
   overflow: hidden;
+
+  // A STACKING CONTEXT OF ITS OWN -- #971, 2026-09-11. The stretched link below
+  // gives this card four layers that have to stay in a fixed order (the card's
+  // face, the click overlay, the controls that must stay clickable through it,
+  // and the ship's mask over the chips), and without this they would be four
+  // z-indexes competing with every other z-index on the page -- the header's,
+  // the shortlist panel's -- for no reason. `isolation` makes a stacking
+  // context without positioning anything or painting anything, so the four
+  // numbers mean "within this card" and nothing outside can be caught by them.
+  isolation: isolate;
   padding: $card-pad-y $card-pad-x $card-pad-y
            calc(var(--card-text-x) + #{$card-gutter});
   background: $color-surface;
@@ -246,11 +278,25 @@ $card-glass-scale: 10.4rem;
 // $color-surface leaves the verdict sitting on a black rectangle in a magenta
 // card, so the mask lifts with the field, at the same 0.12s.
 //
-// THE NAME KEEPS ITS OWN HOVER and no more: it goes magenta under its own
-// letters (2026-09-02, below) and not from anywhere on the card. A's "light
-// the handle from the whole tile" was one of the parts of A she did not take,
-// with the border and the dots; it is one selector to add back
-// (`.drink-card:hover &` on the name's rule) if she ever asks.
+// THE NAME ANSWERS THE CURSOR FROM ANYWHERE ON THE CARD SINCE 2026-09-11 --
+// #971, and this is candidate A's one surviving piece. She declined it on
+// 2026-09-11 with the rest of A ("it is one selector to add back if she ever
+// asks", said the comment that stood here) and accepted it the same day on
+// seeing the result: "I declined the title turning pink, and should have
+// accepted." So a cursor anywhere on the card now lifts the field, turns the
+// drawing magenta AND lights the name -- the same hue the name has taken under
+// its own letters since 2026-09-02, which is why both states go through one
+// mixin below rather than two copies of the same four values.
+//
+// A's other two pieces are still not in it: the magenta border round the card
+// and the absinthe separator dots.
+//
+// IT WOULD HAPPEN ANYWAY, AND IS STATED ANYWAY. The stretched link below puts
+// an invisible copy of the name's own anchor over the whole card, so `a:hover`
+// is already true wherever the cursor is -- but a colour that depends on a
+// click target's geometry is a colour nobody can find the rule for. This says
+// it, and `:has(:focus-visible)` then gives the keyboard the same state, which
+// the overlay alone never would.
 //
 // A MIXIN, INCLUDED TWICE, AND THE TWO RULES ARE DELIBERATELY NOT ONE COMMA
 // LIST. `:has()` is not a forgiving selector, so a browser that does not
@@ -260,11 +306,24 @@ $card-glass-scale: 10.4rem;
 // (12 also warns that a property declared twice in one block is invisible to
 // test_no_selector_declares_the_same_property_twice; a mixin is the shape that
 // test's own note asks for.)
+// THE NAME'S MAGENTA, IN ONE PLACE. Two rules want these exact four values:
+// the name under its own letters (2026-09-02) and the whole card under the
+// cursor (#971, 2026-09-11). #FF9BE8 is the hue lightened -- the highlight copy
+// has to be a step brighter than the fill it sits behind, which is the whole
+// argument on `.drink-card-name a` below, and it is written down once here so
+// the two states cannot drift to two different pinks.
+@mixin drink-card-name-under-the-cursor {
+  color: $color-wicked-woowoo;
+  text-shadow: -1px -1px 0 #FF9BE8,
+                1px  1px 0 rgba(5, 5, 5, 0.9);
+}
+
 @mixin drink-card-under-the-cursor {
   background: $color-wicked-woowoo-wash;
 
   .drink-card-glass { color: $color-wicked-woowoo; }
   .drink-card-ship { background: $color-wicked-woowoo-wash; }
+  .drink-card-name a { @include drink-card-name-under-the-cursor; }
 }
 
 .drink-card:hover { @include drink-card-under-the-cursor; }
@@ -280,6 +339,64 @@ $card-glass-scale: 10.4rem;
 // child's own `:focus-visible` still paints, and `:hover` above is untouched --
 // which is the point of the two rules being separate.
 .drink-card:has(:focus-visible) { @include drink-card-under-the-cursor; }
+
+// =============================================================================
+// THE WHOLE CARD IS THE LINK -- #971, Helen, 2026-09-11
+// =============================================================================
+// "I also want the whole card to be clickable, which is different." Different
+// from the hover above, which is what the issue was raised about: a card that
+// says "this one" under the cursor and then only opens the drink from the eight
+// characters of its name is a tile that looks like a button and behaves like a
+// footnote.
+//
+// ONE ANCHOR, STRETCHED -- the pattern, and the reason it is the pattern. A
+// card has exactly one link on it (the name's `<a>`, in both templates), and
+// this gives that anchor an invisible pseudo-element over the card, so the
+// whole card is that link's own hit area. No second anchor, no nested
+// interactive content, no JavaScript click handler -- the drink's URL is in the
+// status bar, middle-click and cmd-click open a tab, and a screen reader still
+// hears one link named after the drink.
+// `test_every_published_drink_page_offers_three_other_published_drinks` counts
+// name links and is unmoved by this, which is the test saying the same thing.
+//
+// WHY IT IS SIZED IN vmax AND NOT `inset: 0`. `inset: 0` would be the obvious
+// spelling and it would cover the WORD: the anchor's nearest positioned
+// ancestor is `.drink-card-tape-word`, and above that `.drink-card-tape`, both
+// of which are `position: relative` so the tape's artwork has a box to be
+// absolute against. Neither can stop being positioned without moving the
+// artwork somewhere else. So the overlay is drawn far bigger than any card can
+// be and `.drink-card`'s own `overflow: hidden` -- there since the fixed-height
+// design, clipping the three clamps -- cuts it to exactly the card. Clipping
+// governs hit-testing as well as painting, so the click area IS the card's
+// padding box, and `vmax` rather than a literal means no viewport can outgrow
+// it.
+//
+// IT ALSO HAD TO GET OUT OF THE TAPE WORD, which is `overflow: hidden` for the
+// no-JS ellipsis and would otherwise clip this to the lettering.
+// `.drink-card-name--fitted` releases that clip once the fit script has proved
+// it cannot fire; the rule is beside the two fitting states below, and the
+// no-JS case keeps both the ellipsis and this morning's click target.
+//
+// NOTHING MOVES AND NOTHING IS DRAWN, which is §9.13's rule for a card and the
+// bar this had to clear: the pseudo-element has no background, no border and no
+// size in flow, so at rest a card is pixel-for-pixel what it was.
+//
+// THE CURSOR IS THE ONE VISIBLE CHANGE, and it comes free: the overlay is part
+// of the anchor, so the UA's own `cursor: pointer` for a link covers the card.
+.drink-card .drink-card-tape-word a::after {
+  content: '';
+  position: absolute;
+  inset: -100vmax;
+  z-index: $card-z-link;
+}
+
+// WHAT HAS TO STAY ABOVE THE OVERLAY. A stretched link paints over everything
+// that is not lifted past it, and hit-testing follows painting -- so every
+// control on a card is raised by hand, each on its own rule with its own
+// reason: `.drink-card-mood` (the chips are buttons on the index and links on a
+// related card), `.btn-shortlist--card` in _shortlist.scss, and
+// `.drink-card-ship`, which is raised only because the chips were and which
+// declines pointer events so the corner still opens the drink.
 
 // --- the words ---------------------------------------------------------------
 .drink-card-body { min-width: 0; }
@@ -426,17 +543,17 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
     // a highlight needs somewhere brighter to be RELATIVE TO ITS OWN FILL, and
     // white is not brighter than magenta in any useful sense, it is simply a
     // different colour.
-    // AND IT STAYS THE NAME'S OWN STATE -- #886, 2026-09-11. Candidate A lit
-    // the name from anywhere on the card ("the one handle a tile has"); Helen
-    // took C with the glass instead, so a cursor on the card lifts the field
-    // and the drawing, and the name goes magenta only under its own letters,
-    // exactly as it has since 2026-09-02. See `drink-card-under-the-cursor`.
+    // IT WAS THE NAME'S OWN STATE AND IS THE CARD'S NOW -- #886 then #971,
+    // 2026-09-11, the same day. Candidate A lit the name from anywhere on the
+    // card and Helen took C with the glass instead, so for a few hours the name
+    // went magenta only under its own letters. Then: "I declined the title
+    // turning pink, and should have accepted." `drink-card-under-the-cursor`
+    // carries it now, from the same mixin as this, so the two cannot disagree
+    // about which pink -- and this rule stays because the name is still a link
+    // in its own right, and a link's own hover and focus states are not
+    // something to leave to a hover state on its grandparent.
     &:hover,
-    &:focus-visible {
-      color: $color-wicked-woowoo;
-      text-shadow: -1px -1px 0 #FF9BE8,
-                    1px  1px 0 rgba(5, 5, 5, 0.9);
-    }
+    &:focus-visible { @include drink-card-name-under-the-cursor; }
   }
 }
 
@@ -485,6 +602,28 @@ $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 $card-name-step: 0.86;
 
 .drink-card-name--step { --card-name-scale: #{$card-name-step}; }
+
+// AND A THIRD CLASS THAT IS NOT A THIRD STATE -- 2026-09-11, #971.
+// `card-name-fit.js` marks every name it has measured, whatever the answer, and
+// this is the one thing that class does.
+//
+// THE CLIP IT RELEASES IS THE NO-JS FALLBACK. `.drink-card-tape-word` is
+// `overflow: hidden` with `text-overflow: ellipsis` so a name too long for its
+// tape is cut politely when this script has NOT run -- which is the behaviour
+// the page had before the script existed, and the base rule the two states
+// above are additions to. Once the script HAS run the clip can never fire: the
+// name fits, or steps until it fits, or wraps.
+//
+// AND SINCE THE WHOLE CARD BECAME THE LINK, THE CLIP IS NOT MERELY IDLE. The
+// card's click overlay is a pseudo-element on the name's anchor, and that
+// anchor lives inside this box -- so `overflow: hidden` here clips the overlay
+// to the lettering and the rest of the card stops being a click target.
+// Releasing it lets the overlay out to the card, which clips it in turn.
+//
+// THE FALLBACK IS THEREFORE INTACT AND THE FAILURE IS THE SAFE ONE: with no
+// JavaScript there is no class, the ellipsis stays, and the card's click target
+// is the name alone -- exactly where this page was this morning.
+.drink-card-name--fitted .drink-card-tape-word { overflow: visible; }
 
 // TWO LINES OF TAPE, for the names a step cannot reach.
 //
@@ -884,9 +1023,19 @@ $card-name-step: 0.86;
   border-radius: 0;
   cursor: pointer;
 
-  // The card itself is not a link, so nothing is competing for this click --
-  // but the title above it IS, and a chip sits inside the same card. The
-  // handler calls preventDefault for that reason.
+  // ABOVE THE CARD'S CLICK OVERLAY -- #971, 2026-09-11. The whole card is the
+  // drink's link now, drawn as a pseudo-element over the card, and a stretched
+  // link covers every control it is not lifted past. A chip is a real control
+  // in both templates -- a filter BUTTON on the index, a LINK to the filtered
+  // index on a related card -- so it is lifted. `position: relative` is only
+  // here to make the z-index apply; nothing moves.
+  position: relative;
+  z-index: $card-z-controls;
+
+  // The card itself is a link now (#971) and the title has always been one, so
+  // this chip has two things competing for its click rather than one. The
+  // handler calls preventDefault for that reason, and the z-index above is what
+  // makes the chip the topmost target in the first place.
   // A BARE WORD MOVES ITS TEXT on hover, as the filter words do (§9.13, "a
   // chip has a box and a filter word does not"): with the box gone, the text
   // is what there is to move.
@@ -1126,6 +1275,20 @@ $card-name-step: 0.86;
   position: absolute;
   right: 0;
   bottom: 0;
+  // ABOVE THE CHIPS, WHICH IS NEW AND IS NOT ABOUT CLICKING -- #971,
+  // 2026-09-11. The mask below only works because this paints after the chips,
+  // and until today that was DOM order doing it (see the note further down).
+  // The card's click overlay pushed the chips to `$card-z-controls`, which
+  // would have put them above this and silently undone the mask -- the "sugar
+  // crav" chip 2026-09-10 was spent on. So the ship goes one higher.
+  //
+  // AND THEN DECLINES THE CLICK, because being above the overlay would
+  // otherwise make the bottom-right corner the one part of a card that does not
+  // open the drink. Nothing in here is interactive -- it is a ship and a word
+  // -- and #823 already decided which corner a card gives up, which was the
+  // TOP-right one, to the shortlist mark.
+  z-index: $card-z-ship;
+  pointer-events: none;
   // THE MASK, and it is why a chip running under the verdict reads as a chip
   // cut off rather than as two words overprinted. `$color-surface` is the
   // card's own background at rest. Under the cursor the card lifts to the
