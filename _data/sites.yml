@@ -86,12 +86,9 @@ cocktails:
   # the [ COCKTAILS ] column now draws beside [ FOOD ] on every page of both
   # sites.
   reference_links:
-    # `local_only` GATES THE LINK, and the page gates itself -- see its own
-    # front matter. Helen, 2026-09-06: "please set it to build only locally."
-    # The template drops a local-only link unless `show_local_reference_links`
-    # is set, which only _config_local.yml declares, and a site left with no
-    # links draws no column -- so production is exactly as it was before this
-    # key existed. Delete the flag to ship the page.
+    # SHIPPED 2026-09-11, issue #980: "let's get the rum page ready for
+    # publication then publish it!" The `local_only: true` flag that used to sit
+    # on this entry, and the `published: false` on the page itself, were deleted
+    # in the same commit -- they were always halves of one switch.
     - text: rum categories
       url: /cocktails/reference/rum-categories/
-      local_only: true

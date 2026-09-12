@@ -377,7 +377,10 @@ cleared with the other half**, `published: false` on the page itself (§14):
 a link with no page is a 404 in the one place that matters, and a page with no
 link is reachable only by typing the URL. `test_site_nav_links_resolve_to_real_pages`
 INVERTS for such a link rather than skipping it — it must point at a page that
-IS unpublished — so clearing either flag alone goes red.
+IS unpublished — so clearing either flag alone goes red. **No link carries it
+today**: the rum page was the only one and #980 shipped it on 2026-09-11,
+clearing both halves in one commit. The key, the filter and the inverted check
+all stay for the next page that needs them.
 
 **Two guards, and neither substitutes for the other:**
 `test_the_header_and_footer_are_identical_on_every_page` compares the
@@ -3231,11 +3234,14 @@ calculator.
 
 ### The cocktails reference layer
 
-One page, `cocktails/reference/rum-categories.html` (#529), built 2026-09-06.
-**It is `published: false` and local-only** until Helen signs the copy off; see
-§2.5 for the other half of that switch and why both halves must move together.
-Deleting the `published: false` line and the `local_only: true` flag is the
-whole of shipping it.
+One page, `cocktails/reference/rum-categories.html` (#529), built 2026-09-06 and
+**LIVE SINCE 2026-09-11** (#980, *"let's get the rum page ready for publication
+then publish it!"*). It was `published: false` and local-only for five days
+while Helen settled the copy; shipping it was exactly what §2.5 said it would
+be — deleting the `published: false` line and the `local_only: true` flag on the
+`sites.yml` entry, in one commit, because a page with no link and a link with no
+page are both broken. Nothing is marked `local_only` now; the mechanism stays
+for the next such page.
 
 **Why it is not the encyclopaedia #459 rules out.** A bare list of the fourteen
 categories would be `rum_styles` reprinted. #501 moved a question from the card
@@ -3312,10 +3318,11 @@ Demerara rum, lightly aged` has none since El Dorado 151 came off on 2026-09-05
 (*"I don't own it, I just wanted to"*). The generic stays because a drink still
 asks for it.
 
-**One placeholder is left on the page: the column heading "category"**,
-tracked at **#784**. The other two headings are hers — "examples" (#888) and
-"site display name" (2026-09-10, for the column that prints the shorter name a
-card uses where it differs from the category). "none in the house", for a
-category with no bottle, was deleted the same day (*"If we're not using them,
-delete them, boom"*); the empty third track is the honest rendering. Do not
-write a word into the one that remains.
+**No placeholder is left on the page, and #784 is closed** (2026-09-11). The
+last one was the column heading "category", and Helen ruled on the word rather
+than replacing it: *"'category' is right."* All three column headings are hers
+— "category" (2026-09-11), "site display name" (2026-09-10, for the column that
+prints the shorter name a card uses where it differs from the category) and
+"examples" (#888). "none in the house", for a category with no bottle, was
+deleted on 2026-09-10 (*"If we're not using them, delete them, boom"*); the
+empty third track is the honest rendering.

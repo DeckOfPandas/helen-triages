@@ -2,21 +2,6 @@
 layout: default
 title: "Rum Categories"
 permalink: /cocktails/reference/rum-categories/
-# LOCAL ONLY, Helen's call 2026-09-06: "please set it to build only locally."
-# `published: false` is what keeps it out of the production build -- it has no
-# URL and no sitemap entry there -- and `unpublished: true` in
-# _config_local.yml is what brings it back at localhost:4001. Same division the
-# `dev` collection uses, reached with a page-level flag because this is a page
-# rather than a collection document, and because the permalink above is the
-# REAL one: when she signs it off, deleting this line is the whole of shipping.
-#
-# THE FOOTER LINK IS GATED SEPARATELY AND MUST STAY THAT WAY. It is
-# `local_only: true` on the cocktails entry in _data/sites.yml, filtered in
-# _layouts/default.html on `site.show_local_reference_links`. Two switches
-# rather than one because they answer different questions -- does the page
-# exist, and does anything point at it -- and a production build with the
-# second half missing is a footer link to a 404.
-published: false
 ---
 
 {% comment %}
@@ -58,9 +43,13 @@ published: false
   requires an em dash, and an earlier version of this comment asserted both from
   having checked only the first.
 
-  WHAT IS STILL A PLACEHOLDER, AND IT IS ONE WORD: the column heading
-  "category" ("examples" is hers, #888; "site display name" is hers, 2026-09-10).
-  Tracked at #784, #921.
+  NOTHING ON THIS PAGE IS A PLACEHOLDER ANY MORE, 2026-09-11, #784 CLOSED. The
+  last one was the column heading "category", and Helen ruled on the word
+  itself rather than replacing it: *"'category' is right."* So all three column
+  headings are hers — "category" (2026-09-11), "site display name"
+  (2026-09-10), "examples" (#888) — and every other string here is a lookup or
+  her own prose. Do not reintroduce a PLACEHOLDER note anywhere on this page
+  without a new string to hang it on.
   "none in the house" went on 2026-09-10 ("delete them, boom"); the per-word
   lines under the retired words went the same day — see the "Not categories"
   section below; she ruled against having any.
@@ -215,6 +204,11 @@ published: false
       <ul class="rum-cats">
 
         <li class="rum-cat rum-cat--head" aria-hidden="true">
+          {% comment %} "category", Helen's word, 2026-09-11 (#784). It was the
+             page's last placeholder, offered in #784 as one of five strings for
+             her to write; asked about it with the other two headings settled,
+             she kept it: "'category' is right." Same status as the two below --
+             hers, not a slot. {% endcomment %}
           <span class="rum-cat-name">category</span>
           {% comment %} "site display name", Helen's words, 2026-09-10,
              replacing the "on a card" placeholder from #784. The column prints
@@ -228,8 +222,33 @@ published: false
 
         {% for style in group.styles %}
           {% assign card = ing.card_names[style] %}
+          {% comment %} ALPHABETICAL, #972: "order example rums alphabetically."
+             Helen's whole spec, 2026-09-11.
+
+             THE COLUMN WAS NEVER SORTED AT ALL, though DECISIONS §14 says in
+             passing that it was -- #813's note explains rejecting candidate C
+             with "on the page the bottles sort alphabetically, so Martinique
+             and Guadeloupe interleave". They do not: a `{% raw %}{% for pair in bottles %}{% endraw %}`
+             walks bottles.yml IN FILE ORDER, which is roughly the order Helen
+             added bottles in, so the Jamaicans read Signature, 8 Year, 12 Rare
+             Casks and the aged blends read Pusser's, Pusser's, Gosling's,
+             Havana Club, Planteray, Chairman's. The interleaving C suffered
+             from was real -- file order mixes the countries just as thoroughly
+             -- but the reason given for it was not.
+
+             `sort_natural`, NOT `sort`: it is case-insensitive, which is what
+             "alphabetically" means to a reader. Every bottle name here starts
+             with a capital today, so the two agree; the next one that does not
+             would sort into a block of its own under plain `sort`, which
+             compares codepoints.
+
+             IT IS A SORT, NOT A HAND ORDER. bottles.yml stays as it is -- its
+             order is the dictionary's own (see its header), and four other
+             consumers read it. Sorting where the page prints costs one filter
+             and cannot go stale.
+          {% endcomment %}
           {% capture blob %}{% for pair in bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-          {% assign bottle_names = blob | split: "||" %}
+          {% assign bottle_names = blob | split: "||" | sort_natural %}
           <li class="rum-cat">
             <span class="rum-cat-name">{{ style }}</span>
             {% comment %} The short name only where it DIFFERS. Eight of the
@@ -264,7 +283,10 @@ published: false
                    same way on every row rather than alphabetically per row. {% endcomment %}
                 {% for origin in ing.bottle_origins %}
                   {% capture in_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == origin %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-                  {% assign origin_names = in_origin | split: "||" %}
+                  {% comment %} Alphabetical WITHIN the country, #972. The
+                     countries themselves keep `bottle_origins` order, which is
+                     the point of the block. {% endcomment %}
+                  {% assign origin_names = in_origin | split: "||" | sort_natural %}
                   {% if origin_names.size > 0 %}
                     <li class="rum-origin-head">{{ origin }}</li>
                     {% for b in origin_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
@@ -277,7 +299,7 @@ published: false
                    silently dropped a bottle would be the worst failure this
                    page has. {% endcomment %}
                 {% capture no_origin %}{% for pair in bottles %}{% if pair[1].generic == style and pair[1].origin == nil %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-                {% assign orphan_names = no_origin | split: "||" %}
+                {% assign orphan_names = no_origin | split: "||" | sort_natural %}
                 {% for b in orphan_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
               {% else %}
                 {% for b in bottle_names %}<li class="rum-bottle">{{ b }}</li>{% endfor %}
@@ -370,14 +392,23 @@ published: false
        style first and its real job second; and a parenthetical after the word
        here, in her words. It is a LOOKUP, not a literal: any retired word that
        is also in `rum_characters` gets it, so a second such word cannot arrive
-       silently without the note. {% endcomment %}
+       silently without the note.
+
+       THE WORDING IS HERS TWICE OVER, AND THE SECOND TIME CORRECTED THE FIRST.
+       It rendered "(rum character not rum type)" from 2026-09-10, which is how
+       #921's summary paraphrased her. Seeing the built line she wrote the whole
+       of it out as the title of #975: "blackstrap (is a rum character not a rum
+       type)". Two words back -- "is" and the second "a" -- and it is a sentence
+       about the word rather than a pair of labels. Still a lookup, so any
+       future retired word that is also a character gets the same line.
+       {% endcomment %}
     <ul class="rum-retired">
       {% for pair in ing.retired_rum_styles %}
         {% assign word = pair[0] %}
         {% assign initial = word | slice: 0 %}
         {% assign initial_lower = initial | downcase %}
         {% if initial == initial_lower %}
-        <li class="rum-retired-word">{{ word }}{% if ing.rum_characters contains word %} (rum character not rum type){% endif %}</li>
+        <li class="rum-retired-word">{{ word }}{% if ing.rum_characters contains word %} (is a rum character not a rum type){% endif %}</li>
         {% endif %}
       {% endfor %}
     </ul>

@@ -28,7 +28,11 @@
   <ul class="rum-cats rum-cats--adjacent">
     {% for style in include.ing.cane_and_palm_spirits %}
       {% capture blob %}{% for pair in include.bottles %}{% if pair[1].generic == style %}{{ pair[0] }}||{% endif %}{% endfor %}{% endcapture %}
-      {% assign bottle_names = blob | split: "||" %}
+      {% comment %} ALPHABETICAL, #972, the same filter the page's own rows take
+         -- "order example rums alphabetically", Helen 2026-09-11. This block
+         needed it too: cachaça read Sagatiba, Leblon, Velho Barreiro, which is
+         bottles.yml's file order and nothing else. {% endcomment %}
+      {% assign bottle_names = blob | split: "||" | sort_natural %}
       <li class="rum-cat">
         <span class="rum-cat-name">{{ style }}</span>
         <span class="rum-cat-card"></span>

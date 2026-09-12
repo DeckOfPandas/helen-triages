@@ -121,17 +121,42 @@ $ref-col-card:    minmax(6rem, 9rem);
 // treatment — 2px of absinthe — rather than a browser default bevel. No
 // `overlapping-rule-double` here: that mark belongs to a heading's text, and an
 // `<hr>` has none.
+//
+// $spacing-section-top ABOVE IT, NOT $space-xl -- #985, Helen 2026-09-11: "add
+// more space to breathe between sections on the rum page, especially before
+// 'don't recognise' and above the section rule above it."
+//
+// The rule is where a section STARTS, so the gap above it is the gap between
+// two sections and takes the token named for that job (4.5rem, "above a section
+// heading"). It was $space-xl, 1.5rem -- the same gap `.rum-cats` already put
+// below every table, so the biggest division on the page was rendering at
+// exactly the size of the smallest one and the rule was carrying the whole
+// distinction on its own. §13.3: a gap reads as hierarchy only if it is
+// obviously bigger than the one below it.
+//
+// The about page's own `<hr>` between movements is the same shape and reaches
+// the same place from the other side (`margin: $spacing-section-gap 0` in
+// _sass/food/_about.scss) -- space on both sides of the rule rather than only
+// above. Here the space below belongs to the heading, which is the next rule
+// down, so it is set there instead of twice.
 .ref-divider {
   border: 0;
   border-top: 2px solid $color-electric-absinthe;
-  margin: $space-xl 0 0;
+  margin: $spacing-section-top 0 0;
 }
 
 .ref-section-heading {
   font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 0.08em;
-  margin: 2.25rem 0 $space-md;
+  // $spacing-section-gap ABOVE A SHELF HEADING, #985, was a literal 2.25rem.
+  // The shelves are the second rank of section on this page and they were only
+  // 0.75rem clear of the table above them once `.rum-cats`' own 1.5rem bottom
+  // margin collapsed into this one. 3rem doubles the page's within-a-section
+  // gap, which is what makes it read as a level rather than as a paragraph
+  // break, and it is a token rather than the fourth hand-picked number in this
+  // file.
+  margin: $spacing-section-gap 0 $space-md;
 
   // The drink page's INGREDIENTS/METHOD mark exactly — absinthe over violette.
   // Not the notes variant: nothing on this page is Helen's commentary.
@@ -148,7 +173,33 @@ $ref-col-card:    minmax(6rem, 9rem);
   // `overlapping-rule-double-last-line` is that same fix, and
   // `last-line-rule.js`'s TARGETS now includes `.ref-section-heading span` --
   // see that file's header for why it doesn't reuse `.section-heading-text`.
-  span {
+  // `> span`, NOT `span`, SINCE 2026-09-11 -- AND #920'S FIX DID NOTHING UNTIL
+  // THIS LINE CHANGED. The mark was still wearing under BOTH lines of every
+  // wrapped heading on this page at 390px, which is the exact bug #920 was
+  // raised for and recorded as fixed. Found by screenshot while measuring #985,
+  // on the same heading.
+  //
+  // WHY THE FIX WAS INERT. `last-line-rule.js` rebuilds the heading as
+  // `<span class="rule-split"><span class="rule-lines">…</span><span
+  // class="rule-last">…</span></span>`, and the mixin above kills the mark on
+  // `.rule-split` and redraws it on `.rule-last`. But a DESCENDANT selector
+  // matches the two inner spans too, so `.rule-lines` -- the earlier lines,
+  // whose whole job is to be unmarked -- was handed the full
+  // `overlapping-rule-double` again by this very rule, one specificity step
+  // below the `&.rule-split { background-image: none }` meant to stop it.
+  // The JS was working perfectly; the CSS was re-drawing what it had removed.
+  //
+  // Food does not have this because its target is a CLASS
+  // (`.section-heading-text`), which the split spans do not carry. Cocktails'
+  // is an unclassed span, so "the heading's span" and "a span the script made
+  // inside it" were the same selector. `>` is the whole difference, and it is
+  // the same lesson this file already carries twice (the EXAMPLES colour, the
+  // three column labels): a selector reaches further than the thing you had in
+  // mind, so say where it stops.
+  //
+  // `last-line-rule.js`'s own TARGETS stays as it is: it queries the DOM once
+  // at load, before any split exists, so it can only ever match the outer span.
+  > span {
     display: inline;
     @include overlapping-rule-double-last-line($color-electric-absinthe, $color-ultra-violette);
   }
@@ -171,12 +222,24 @@ $ref-col-card:    minmax(6rem, 9rem);
 // it belongs — these three ARE the page's sections and the shelves are inside
 // one of them.
 //
-// The space above does as much work as the size. $space-xxl separates a section
-// from the one before it; the shelves' own 2.25rem separates a row block from
-// its heading.
+// The space above does as much work as the size, and since #985 (2026-09-11) it
+// is the page's largest gap by a wide margin rather than by 0.25rem.
+// $spacing-section-gap sits BELOW the absinthe rule and $spacing-section-top
+// above it, so a major section opens on 7.5rem of clear page against the
+// shelves' 3rem and a table's own 1.5rem -- three levels, each double the one
+// under it. Helen: "add more space to breathe between sections on the rum page,
+// especially before 'don't recognise' and above the section rule above it."
+//
+// 3rem HERE AND 4.5rem ABOVE THE RULE, THAT WAY ROUND, because the rule is in
+// the gap. $spacing-section-top's own note in shared/_tokens.scss is the
+// precedent: it "was 3rem, when a scribbled rule sat in the gap as well; with
+// the rule gone the space carries the whole separation on its own". The rule is
+// still here, so the bigger half of the separation goes above it, where it
+// divides the two sections, and the smaller half below, where it keeps the rule
+// attached to the heading it introduces rather than floating between two.
 .ref-section-heading--major {
   font-size: 2rem;
-  margin-top: $space-xxl;
+  margin-top: $spacing-section-gap;
 }
 
 // =============================================================================
@@ -224,18 +287,45 @@ $ref-col-card:    minmax(6rem, 9rem);
   padding-bottom: $space-xs;
   border-bottom-color: $color-clear-text;
 
-  // "EXAMPLES" WAS PINK, AND NOBODY CHOSE THAT -- Helen, 2026-09-10: "change
-  // the heading font colour to something else, and also the column heading
-  // please -- leave the pink for the bottles."
+  // THE THREE LABELS TAKE THIS ROW'S TREATMENT AND NOTHING ELSE -- #973, Helen,
+  // 2026-09-11: "table headings use three different combinations of size and
+  // colour. I think they should all look the same."
   //
-  // The head row reuses `.rum-cat-bottles` for its third cell purely to land in
-  // the same grid track, and inherited the bottle colour along with it. So one
-  // of three sibling column labels was woowoo and the other two were
-  // `$color-clear-text`, which read as a deliberate emphasis and was an
-  // accident of markup. WOOWOO MEANS BOTTLE on this page (see the file header);
-  // a column label is not a bottle.
+  // She counted three because there were exactly three, one per label, and not
+  // one of them was chosen. The head row borrows the three CELL classes purely
+  // to land in the three grid tracks, and each one brought its own declarations
+  // along:
+  //
+  //   * `.rum-cat-name`    -> `color: $color-text`, so "category" was in INK
+  //                           where its two siblings were `$color-clear-text`.
+  //   * `.rum-cat-card`    -> `font-size: 0.84rem`, so "site display name" was
+  //                           a fifth larger than the 0.7rem this row sets.
+  //   * `.rum-cat-bottles` -> `color: $color-wicked-woowoo-deep`, which is the
+  //                           same bug found on 2026-09-10 ("change the heading
+  //                           font colour... leave the pink for the bottles")
+  //                           and fixed then with `color: inherit` on this one
+  //                           class alone. WOOWOO MEANS BOTTLE on this page
+  //                           (see the file header); a column label is not one.
+  //
+  // So the 2026-09-10 fix was right about the mechanism and too narrow by two
+  // classes, which is why this is now stated once for all three rather than
+  // patched a class at a time: A CLASS CARRIES EVERY DECLARATION, NOT THE ONE
+  // YOU WANTED (DECISIONS §14), and a cell class borrowed for POSITION should
+  // contribute position and nothing else.
+  //
+  // THE SURVIVING TREATMENT IS THIS ROW'S OWN -- $font-label, 0.7rem,
+  // uppercase, 0.1em, `$color-clear-text` -- because it is the one the most
+  // headings on the page already use: "examples" renders it outright, and
+  // `.rum-origin-head`'s MARTINIQUE/GUADELOUPE labels are the same face, case,
+  // tracking and colour one rank down. `.rum-origin-head` is deliberately not
+  // touched: it labels a group of bottles INSIDE a cell rather than a column,
+  // it was not one of the three she counted, and its 0.66rem is what makes the
+  // rank visible.
+  .rum-cat-name,
+  .rum-cat-card,
   .rum-cat-bottles {
     color: inherit;
+    font-size: inherit;
   }
 }
 

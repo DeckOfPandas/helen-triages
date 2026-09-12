@@ -75,9 +75,11 @@ show_units: true
 # state. Never move this into _config.yml.
 show_drafts: true
 
-# Build pages whose front matter says `published: false` (#529's rum reference,
-# and food's cooking-methods prose archive). Jekyll's own flag; production does
-# not declare it, so those pages have no URL and no sitemap entry there.
+# Build pages whose front matter says `published: false` -- today that is
+# food's cooking-methods prose archive and nothing else. Jekyll's own flag;
+# production does not declare it, so such a page has no URL and no sitemap entry
+# there. #529's rum reference was the other one until 2026-09-11, when #980
+# shipped it.
 unpublished: true
 
 # Draw footer reference links marked `local_only` in _data/sites.yml. LOCAL
@@ -85,4 +87,11 @@ unpublished: true
 # feature: a page that does not build in production must not be linked from
 # there either. Same idiom as show_costs / show_units / show_drafts, and it
 # must stay out of _config.yml for the same reason.
+#
+# NOTHING IS MARKED `local_only` RIGHT NOW, since #980 shipped the rum page and
+# took the flag off its entry on 2026-09-11. The key, the filter in
+# _layouts/default.html and the inverted check in test_page_links.py all stay:
+# they are the pattern for the NEXT reference page, which will be written the
+# same way (MANUAL §2.5, §14), and a facility with no current user is cheaper to
+# keep than to rediscover.
 show_local_reference_links: true
