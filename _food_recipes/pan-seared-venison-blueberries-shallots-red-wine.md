@@ -28,8 +28,8 @@ ingredient_groups:
     - amount: "200 g"
       item: fresh blueberries
       note: "thaw and drain well if using frozen"
-    - amount: "2 large"
-      item: "pats of salted butter"
+    - amount: "2 large pats"
+      item: salted butter
 method:
   - "Crush the thyme and juniper berries with salt and pepper. Loosen with olive oil. Pat the venison dry and rub the oil mixture all over it."
   - "Sear in a hot pan on all sides — roughly 6 mins for medium rare, 7–8 mins for medium (check [internal temperatures chart](#doneness)). Cover and rest on a plate."
@@ -46,6 +46,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

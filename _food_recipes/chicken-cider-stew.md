@@ -17,8 +17,8 @@ ingredient_groups:
       item: "onions, diced"
     - amount: "4 medium"
       item: "carrots, diced"
-    - amount: "4"
-      item: "stalks celery, diced"
+    - amount: "4 stalks"
+      item: "celery, diced"
     - amount: "4 cloves"
       item: "garlic, minced"
     - amount: "350 ml"
@@ -33,7 +33,8 @@ ingredient_groups:
       item: green beans
     - amount: "150 g"
       item: crème fraîche
-    - item: "handful of fresh chives and/or parsley"
+    - amount: "1 handful"
+      item: "fresh chives and/or parsley"
     - item: seasoning and flavourings — see note
 method:
   - Toss the chicken in olive oil then season generously.
@@ -61,6 +62,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

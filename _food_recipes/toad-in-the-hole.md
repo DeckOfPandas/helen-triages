@@ -20,8 +20,8 @@ ingredient_groups:
       item: red onions
     - amount: "2 cloves"
       item: "garlic, minced"
-    - amount: "2"
-      item: pats salted butter
+    - amount: "2 pats"
+      item: salted butter
     - amount: "6 tbsp"
       item: balsamic vinegar
     - amount: "1 level tbsp"
@@ -57,6 +57,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

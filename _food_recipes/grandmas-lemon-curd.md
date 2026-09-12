@@ -22,7 +22,8 @@ ingredient_groups:
       item: "lemons, rind and juice"
     - amount: "3 large"
       item: eggs
-    - item: knob of salted butter, optional
+    - amount: "1 knob"
+      item: "salted butter, optional"
 method:
   - "Slowly melt the butter in a pan, then stir in the sugar until dissolved."
   - "Mix the cornflour with some of the lemon juice until combined and even-ish, then add the rest of the juice and the rind."
@@ -38,6 +39,6 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

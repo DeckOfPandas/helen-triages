@@ -25,10 +25,10 @@ ingredient_groups:
       item: "celery sticks, finely chopped"
     - amount: "4"
       item: "garlic cloves, minced"
-    - amount: ½
-      item: bunch of fresh thyme
-    - amount: "1"
-      item: heaped tbsp tomato purée
+    - amount: "½ bunch"
+      item: fresh thyme
+    - amount: "1 heaped tbsp"
+      item: tomato purée
     - amount: "175 ml"
       item: red wine
     - amount: "400 ml"
@@ -56,5 +56,5 @@ method_short:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

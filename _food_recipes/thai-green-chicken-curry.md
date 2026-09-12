@@ -20,8 +20,8 @@ ingredient_groups:
       item: chicken
     - amount: "~1"
       item: "garlic clove (or squirty or chopped)"
-    - amount: "~½ to 1"
-      item: "jar Thai green curry paste"
+    - amount: "~½ to 1 jar"
+      item: "Thai green curry paste"
     - amount: "~1 tbsp"
       item: tamarind paste
     - item: "lemongrass paste to taste"
@@ -57,6 +57,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

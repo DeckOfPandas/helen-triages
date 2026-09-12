@@ -19,7 +19,8 @@ ingredient_groups:
       item: "shallots, finely sliced"
     - amount: "250 ml"
       item: dry white wine
-    - item: "handful of fresh flat-leaf parsley, chopped"
+    - amount: "1 handful"
+      item: "fresh flat-leaf parsley, chopped"
 method:
   - "Rinse the mussels under cold running water, discarding any that: a) are cracked, b) don't close under running water with enthusiastic rattling AND then continue not to close when tapped sharply on the side of the sink. Drain well."
   - "Melt the butter in a large, deep, lidded pan over a medium heat, then soften the shallots with salt for 3–4 mins."
@@ -34,6 +35,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
