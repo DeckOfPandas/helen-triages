@@ -1179,16 +1179,22 @@ layout: default
        "yours to ask for", and she asked.
 
        WHY THE MARKUP IS WRITTEN HERE AND NOT SHARED WITH cocktails/index.html
-       AS AN INCLUDE. The two cards differ in four places that are each a
+       AS AN INCLUDE. The two cards differ in three places that are each a
        flag on an include: the glass is inside a head row here and a sibling
        of the body there; the chips are LINKS to the filtered index here (as
        this page's own chips are, a few hundred lines up) and filter BUTTONS
-       there; there is no shortlist `+` here (the page's own shortlist button
-       is for THIS drink, a stone's throw above); and the index's `data-*`
-       search attributes have nothing to match against on this page. Four
-       flags on ninety lines of commented markup is a worse object than
-       twenty-five plain lines that name the same classes. What they share is
-       the stylesheet, and that is the half that cannot drift by accident.
+       there; and the index's `data-*` search attributes have nothing to match
+       against on this page. Three flags on ninety lines of commented markup is
+       a worse object than twenty-five plain lines that name the same classes.
+       What they share is the stylesheet, and that is the half that cannot
+       drift by accident.
+
+       IT WAS FOUR DIFFERENCES UNTIL #977, 2026-09-11. The fourth was "there is
+       no shortlist `+` here", on the reasoning that this page's own shortlist
+       button is for THIS drink, a stone's throw above. Helen asked for one
+       anyway -- "add shortlist button to top right of 'if you liked this'
+       cards" -- and she is right: a card is an invitation to save the drink it
+       names, and the button above saves a different one.
 
        THE GLASS IS DRAWN AT THE INDEX'S OWN COMPRESSION -- the ratio mapped
        onto 0.5-1.0 and `display_scale` applied -- against the same
@@ -1289,6 +1295,40 @@ layout: default
                rules. {% endcomment %}
             <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}{% if forloop.last %}<span class="drink-card-tail">{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ chip_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% if forloop.last %}<span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}{% endfor %}{% if rel_moods.size == 0 %}<span class="drink-card-tail"><span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}</span>
           </div>
+          {% comment %} THE SHORTLIST `+`, TOP RIGHT AND ABOVE THE TAPE -- #977,
+             Helen, 2026-09-11: "add shortlist button to top right of 'if you
+             liked this' cards. Higher than the tape so it doesn't take up
+             space the name could use."
+
+             THE INDEX CARD'S BUTTON, EXACTLY -- same two classes, same three
+             attributes, same `hidden`. There is no second placement and no
+             second design: `assets/js/shortlist.js` finds every
+             `.btn-shortlist[data-shortlist-key]` on the document, reveals it
+             and wires one delegated listener, so a fifth placement is markup
+             and a stylesheet rule and nothing else. That file's header says so
+             and this is the first time it has been taken up.
+
+             THE KEY IS THE RELATED DRINK'S OWN URL, which is what the index
+             card for that drink uses, so a drink shortlisted from here is the
+             same entry shortlisted from there -- and the button on THIS page's
+             title row, a few hundred lines up, keys on this page's drink and
+             is untouched.
+
+             ITS SECOND HALF IS IN _sass/cocktails/_shortlist.scss: the portrait
+             card takes a band of top padding so the button sits ABOVE the head
+             row rather than beside the tape, which is the "higher than the
+             tape" half of the ask -- so the tape keeps the card's full width
+             and pays nothing for the corner, where the index card pays 2.63rem
+             of title for it.
+
+             LAST IN THE MARKUP, as on the index, so the tab order runs name,
+             ingredients, chips, then this. {% endcomment %}
+          <button type="button"
+                  class="btn-shortlist btn-shortlist--card"
+                  data-shortlist-key="{{ rel.url }}"
+                  aria-label="shortlist {{ rel.title }}"
+                  aria-pressed="false"
+                  hidden></button>
         </li>
       {% endfor %}
     </ul>

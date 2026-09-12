@@ -243,6 +243,22 @@ unless stated.
   namespace rather than a unification, and Helen runs Claudes in HOST
   worktrees — so it buys nothing she needs, for 179 lines.
 
+- **2026-09-11 — the browser harness takes the first free port from 4010,
+  and its own shoot.sh and crop.sh read that port from `tmp/browser/port`.**
+  `serve.sh` bound 4010 and nothing else, and both measuring scripts asked
+  4010 and nothing else. With several worktrees' sessions in one container
+  (§11.0.1), the second `serve.sh` died with `Address already in use` while
+  that session's `shoot.sh` measured the FIRST session's build and printed
+  "ok" — the trap §14's 2026-09-10 entry (#920) records finding by hand via
+  `/proc/<pid>/cwd`. Now `scripts/browser/serve.py` binds the first free port
+  in 4010–4059, writes it to this worktree's `tmp/browser/port` (per worktree,
+  gitignored, deleted when the server exits), and the two scripts read it;
+  with no file they fall back to 4010 and the refused connection is an ERROR
+  line rather than a wrong answer. No allow rule changed: the commands are the
+  same three exact strings. Measured: with this worktree's own server holding
+  4010, a second `serve.sh` in the same worktree took 4011 and wrote it, and
+  `shoot.sh` followed the file to 4011 without being told.
+
 ## §2 The mono-repo shape
 
 - **2026-08-02** — Collections cannot live inside `food/`: Jekyll only
@@ -349,6 +365,20 @@ unless stated.
   ends sit on the cards' edges at every width by construction. Column 3 fits
   the row everywhere above the stack: the widest wordmark, `[ COCKTAILS ]`, is
   488.8px, leaving 142px at 821px for a 141px row.
+
+- **2026-09-11, #969** — **The hearts moved to the bottom of the footer's
+  centre column, and nothing else in it moved.** Helen: *"re-order the
+  central column of the footer to put the heart SVG at the bottom --
+  everything else stays in the same place."* The stack (`_layouts/default.html`)
+  now reads about / GitHub mark / copyright / licences / hearts, superseding
+  #915's about / GitHub mark / hearts / copyright / licences. Checked by eye at
+  1280px and 360px after the move (`.site-footer-hearts`'s own margin-top and
+  margin-bottom, `_sass/shared/_layout.scss`, tuned under #915 for a graphic
+  with a neighbour on both sides): the space read fine with both margins left
+  alone, so neither was touched. `.site-footer-centre`'s explicit
+  `grid-column`/`grid-row` placement (#783, this section, 2026-09-07) is
+  untouched -- this is only a reorder of children already inside that pinned
+  cell, not a change to the grid.
 
 ## §3 The three-layer rule
 
@@ -2253,6 +2283,85 @@ unless stated.
   `w/2 - ship/2` and SHIP IT? at `w - ship` whatever the gap is. All a smaller
   gap buys is room inside a track before a value wraps, which was the whole
   complaint.
+- **2026-09-11 — three rulings on the cards, given the same evening the
+  weekend's family visit started (#971, #976, #977).**
+  - **#971, the card under the cursor, and it is two rulings in one sentence.**
+    Helen: *"#971: agree. I declined the title turning pink, and should have
+    accepted. BUT I also want the whole card to be clickable, which is
+    different."*
+    - **The name.** This REVERSES the #886 entry below within the day. That
+      entry closes *"the name keeps only its own 2026-09-02 hover... it is one
+      selector to add back if she ever asks"*, because candidate A's "light the
+      handle from the whole tile" was among the pieces of A she did not take
+      when she chose C. **It was declined on 2026-09-11 and accepted the same
+      day on seeing the result** — which is §13.12's rule about how a ruling
+      moves here, running at its fastest so far. Both halves are kept: the
+      argument for C without A stands, and it lost to looking at it. One mixin
+      now carries the four values, so the name's own hover and the card's
+      cannot drift to two pinks. A's other two pieces (the magenta border, the
+      absinthe dots) are still not in it.
+    - **The click, and it is the piece with a mechanism.** One anchor per card
+      — the name's, the only link a card has — with a pseudo-element stretched
+      over the card. **`inset: 0` does not work and cannot be made to**: the
+      anchor's nearest positioned ancestor is `.drink-card-tape-word`
+      (`position: relative` AND transformed, for the tape's text nudge) and
+      above that `.drink-card-tape`, which has to stay positioned so the tape
+      artwork has a box to be absolute against. So the overlay is drawn far
+      larger than any card in `vmax` and `.drink-card`'s own `overflow: hidden`
+      cuts it to shape; clipping governs hit-testing as well as painting.
+      **Moving the anchor up the markup instead was ruled out by measurement,
+      not taste**: `cocktail-index.js` rewrites `.drink-card-name a`'s
+      `innerHTML` to mark a title hit, so an anchor wrapping the tape would have
+      its artwork destroyed on the first keystroke of a name search.
+    - **TWO BUGS CAME OUT OF IT AND BOTH ARE THE SAME SHAPE.** An out-of-flow
+      descendant counts towards its containing block's scrollable overflow, so
+      the overlay landed inside the box `card-name-fit.js` measures:
+      `scrollWidth` read 1389px for a 109px word, every name looked overflowed,
+      every name wrapped. The script measures the word's CONTENT with a Range
+      now — a pseudo-element is not in the DOM — which is what the question
+      always meant. **And fixing that exposed the second**: the overlay had
+      measured as working only because every name was wrapped, and
+      `.drink-card-name--wrap` sets `overflow: visible` on the tape word. Put
+      back to their proper states, the words clip again and the overlay with
+      them. **A green measurement can be green for the wrong reason.** The clip
+      is the no-JS ellipsis and is kept; `drink-card-name--fitted`, a mark
+      rather than a third state, releases it once the script has proved it can
+      never fire. With no JavaScript there is no class, the ellipsis stays and
+      the click target is the name alone — where the page was that morning.
+  - **#976, the related cards' names — and #960 did not cause it.** Helen:
+    *"First option please. I'm open to reducing the size of every name a
+    little, but would like the same size on each card. Wrap to two then one card
+    at wider screen widths if that helps."* The cause is one line in
+    `_shortlist.scss`: the index card's `+` is paid for out of the title, and
+    that reservation is scoped to `.drink-cards` — which #955 took for the
+    related-drinks list, along with 2.63rem of padding for a button that was not
+    there. Measured on Arrack Christmas Punch at 484px: name box 101.6px with
+    42px of it reserved, all three tapes stuck at 87.6px, all three tape words
+    at 59px, and ACCOUTREMENT — one word, nothing to wrap at — hanging 42px off
+    the end of its tape. That is the whole of "small, not filling the width,
+    wrapping weirdly": the fit script was measuring a box a phantom button had
+    taken a quarter to a half of, and the tape's `max-width` is a percentage OF
+    that box. **The grid floor is the second half**: 16rem, up from 13rem,
+    because the floor is what decides when `auto-fit` gives up a card, and
+    13rem put two 210px tracks in a 484px viewport. **The size is NOT reduced**
+    — she offered and it is not needed; every name fits at `$card-name-step` on
+    both test drinks at 390, 484, 600, 700, 900 and 1280. #960's mechanism is
+    untouched.
+  - **#977, the `+` on the related cards.** Helen: *"add shortlist button to top
+    right of 'if you liked this' cards. Higher than the tape so it doesn't take
+    up space the name could use."* The index card's button unchanged, and
+    `shortlist.js` needed nothing: its header has said since #546 that a fifth
+    placement is markup and a stylesheet rule, and this is the first time that
+    was taken up. **"Higher than the tape" is a band, not a nudge** — the card
+    opens top padding derived from the button's own metrics so the head row
+    starts below it, which is the trade running the opposite way from the
+    index's: a fixed-height card has no spare row and buys the corner with
+    title width, a portrait card grows and buys it with height. #823's hit area
+    is 46.8 x 44.8px and its lower edge lands on the head row's first pixel.
+    **This retires the fourth of the "four flag-shaped differences"** the
+    related card's markup is written out for rather than shared as an include
+    (that reasoning is in the 2026-09-11 #955 entry below): "no shortlist `+`
+    here" was a decision, and it was hers to overturn.
 
 - **2026-09-10 — the family-weekend design pass, in one entry.** Helen asked
   for an unseeded opinion: *"Where do you think we can make material
