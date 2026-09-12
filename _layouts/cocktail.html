@@ -1217,51 +1217,46 @@ layout: default
     <section class="cocktail-related-section">
     <!-- PLACEHOLDER COPY, Helen's to write -->
     <h2 class="cocktail-section-heading cocktail-related-heading">If you liked this, how about&hellip;</h2>
-    {% comment %} REAL CARDS, PORTRAIT -- Helen on #955, 2026-09-11: "Please
-       turn the suggestions into cards -- 1. Allow 2 or 3 lines of ingredients
-       to show, 2. show the chips. It's fine for the cards to be portrait
-       orientation. 3. Take the styling from index page cards, including the
-       new styling in #953 when it's finished." And: "Bring the glass drawing
-       inline in the row with the name tape, so its left margin is aligned with
-       the left margin of the ingredients line."
+    {% comment %} THE INDEX CARD. NOT A VARIANT OF IT -- #991, Helen,
+       2026-09-12: "if you liked this cards should render the same as cards on
+       the index list. We are fighting this design, and trying to invent a new
+       design language, where we should just reuse what we've already made."
 
-       SO THIS IS THE INDEX CARD'S OWN VOCABULARY -- `.drink-card`, its glass,
-       name, tape, ingredient line, foot, chips and ship -- with one modifier,
-       `drink-card--portrait`, that changes the GEOMETRY only: the glass sits
-       in a head row beside the tape instead of down a fixed left column, and
-       the card is as tall as its content instead of $card-height. Every
-       colour, face, clamp and hover state (the #953 field-and-glass one
-       included) comes from _sass/cocktails/_cards.scss unchanged, because
-       the classes are the same classes. The first version of this row
-       borrowed three of those parts with none of the geometry; the card was
-       "yours to ask for", and she asked.
+       WHAT THAT REPLACED, and why it is worth knowing: from #955 (2026-09-11)
+       these were `.drink-card.drink-card--portrait`, the index card's classes
+       with one modifier that moved geometry -- the glass into a head row beside
+       the tape, the foot back into flow, the height from the content. The
+       modifier was small; what grew around it was not. In one day it needed a
+       rule for the chip rows it had uncapped, a `.drink-card-tail` in this
+       markup to keep the ship out of a row of its own, its own title-size lock
+       (#960), its own grid floor tuned twice (#976), its own shortlist corner
+       and its own cancellation of the title padding that corner costs (#977).
+       Six issues, all of them about a card that was nearly the card we already
+       had. That is the fight Helen is naming, and the way out is not to tune it
+       again.
 
-       WHY THE MARKUP IS WRITTEN HERE AND NOT SHARED WITH cocktails/index.html
-       AS AN INCLUDE. The two cards differ in three places that are each a
-       flag on an include: the glass is inside a head row here and a sibling
-       of the body there; the chips are LINKS to the filtered index here (as
-       this page's own chips are, a few hundred lines up) and filter BUTTONS
-       there; and the index's `data-*` search attributes have nothing to match
-       against on this page. Three flags on ninety lines of commented markup is
-       a worse object than twenty-five plain lines that name the same classes.
-       What they share is the stylesheet, and that is the half that cannot
-       drift by accident.
+       SO EVERY ONE OF THOSE IS DELETED, not disabled. The markup below is
+       cocktails/index.html's card with the same classes in the same order --
+       glass, body, foot, button -- and the geometry, the clamps, the chip cap,
+       the ship's pinned corner and its clear-ship pass, the hover, the fixed
+       height and the 370px grid floor are all _cards.scss's, unchanged,
+       because there is no longer anything here that differs from a card.
 
-       IT WAS FOUR DIFFERENCES UNTIL #977, 2026-09-11. The fourth was "there is
-       no shortlist `+` here", on the reasoning that this page's own shortlist
-       button is for THIS drink, a stone's throw above. Helen asked for one
-       anyway -- "add shortlist button to top right of 'if you liked this'
-       cards" -- and she is right: a card is an invitation to save the drink it
-       names, and the button above saves a different one.
+       TWO DIFFERENCES REMAIN, and neither is geometry. The chips are LINKS to
+       the filtered index rather than filter BUTTONS, because on a drink page a
+       chip has nothing to filter -- which is exactly what this page's own chip
+       row does a few hundred lines up. And the index's `data-*` search
+       attributes are absent, because there is nothing on this page to match
+       against. That is why this is still written out here rather than shared
+       with the index as an include: two flags on a card's worth of markup is a
+       worse object than markup that names the same classes. The STYLESHEET is
+       the shared half, and it is the half that cannot drift by accident.
 
        THE GLASS IS DRAWN AT THE INDEX'S OWN COMPRESSION -- the ratio mapped
        onto 0.5-1.0 and `display_scale` applied -- against the same
-       `tallest_mm` this page counts at its top for its hero glass. Not one
-       height for every glass, which the first row did and argued for: on a
-       CARD the drawing is the card's own mark, and the index already decided
-       what a Collins looks like beside an old-fashioned at card size.
-       `--card-portrait-glass-scale` is the head row's own headroom dial, set
-       once in _cards.scss beside $card-glass-scale. {% endcomment %}
+       `tallest_mm` this page counts at its top for its hero glass, and it now
+       hangs in the index card's own fixed left column at `$card-glass-scale`,
+       because it is the index card's own glass. {% endcomment %}
     <ul class="cocktail-related drink-cards">
       {% for entry in related_sorted limit: 3 %}
         {% assign parts = entry | split: "~" %}
@@ -1279,8 +1274,7 @@ layout: default
           {% endif %}
         {% endfor %}
         {% assign rel_ship = rel.meta.ship | default: "who knows" %}
-        <li class="drink-card drink-card--portrait">
-          <div class="drink-card-head">
+        <li class="drink-card">
           {% if rel_icon != "" %}
             {% assign rel_mm = heights_mm[rel_icon] %}
             {% assign rel_ratio = 1.0 %}
@@ -1294,32 +1288,40 @@ layout: default
           {% else %}
             <span class="drink-card-glass"></span>
           {% endif %}
-          {% comment %} THE CARD'S OWN FOUR TAPE CLASSES, not a third name for
-             the same device -- `.drink-card-name` > `.drink-card-tape` >
-             `.drink-card-tape-bg[data-card-tape]` + `.drink-card-tape-word`,
-             which is exactly what this page's own title does at the top of the
-             file and what the universe line does on the index.
-             decorations.js's cardTapes() fills any `[data-card-tape]` slot on
-             any page, and card-name-fit.js measures any `.drink-card-name`, so
-             a long name steps and then wraps here the way it does on a card.
-             `forloop.index` only has to be stable per page (1, 2, 3). {% endcomment %}
-          <p class="drink-card-name">
-            <span class="drink-card-tape">
-              <span class="drink-card-tape-bg" data-card-tape="{{ forloop.index }}"></span>
-              <span class="drink-card-tape-word"><a href="{{ rel.url | relative_url }}">{{ rel.title }}</a></span>
-            </span>
-          </p>
+          {% comment %} THE BODY WRAPPER IS THE INDEX CARD'S OWN, and it is not
+             decoration: `.drink-card-body` is what the card's fixed geometry
+             anchors top-left while the foot is pinned to the bottom, and its
+             `min-width: 0` is what lets a long name's tape shrink so the
+             ellipsis can fire. The portrait card had a `.drink-card-head`
+             instead, holding the glass and the tape in one row; that element is
+             gone with the modifier (#991). {% endcomment %}
+          <div class="drink-card-body">
+            {% comment %} THE CARD'S OWN FOUR TAPE CLASSES, not a third name for
+               the same device -- `.drink-card-name` > `.drink-card-tape` >
+               `.drink-card-tape-bg[data-card-tape]` + `.drink-card-tape-word`,
+               which is exactly what this page's own title does at the top of the
+               file and what the universe line does on the index.
+               decorations.js's cardTapes() fills any `[data-card-tape]` slot on
+               any page, and card-name-fit.js measures any `.drink-card-name`, so
+               a long name steps and then wraps here the way it does on a card.
+               `forloop.index` only has to be stable per page (1, 2, 3). {% endcomment %}
+            <p class="drink-card-name">
+              <span class="drink-card-tape">
+                <span class="drink-card-tape-bg" data-card-tape="{{ forloop.index }}"></span>
+                <span class="drink-card-tape-word"><a href="{{ rel.url | relative_url }}">{{ rel.title }}</a></span>
+              </span>
+            </p>
+            {% comment %} THE INGREDIENT LINE, from `card_ingredients` -- the list
+               _plugins/cocktail_card_ingredients.rb already built and ordered for
+               the card (§9.10.1), so this card cannot show a different set or a
+               different order from the same drink's index card. Clamped to three
+               lines by the card's own rule. No `data-ing` attributes: those exist
+               for the index's match highlighting and there is nothing on this
+               page to match against. No whitespace inside the <p>, per #917. {% endcomment %}
+            {% if rel.card_ingredients.size > 0 %}
+              <p class="drink-card-ingredients">{% for ing in rel.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">&middot;</span> {% endunless %}{{ ing.label }}{% endfor %}</p>
+            {% endif %}
           </div>
-          {% comment %} THE INGREDIENT LINE, from `card_ingredients` -- the list
-             _plugins/cocktail_card_ingredients.rb already built and ordered for
-             the card (§9.10.1), so this card cannot show a different set or a
-             different order from the same drink's index card. Clamped to three
-             lines by the card's own rule. No `data-ing` attributes: those exist
-             for the index's match highlighting and there is nothing on this
-             page to match against. No whitespace inside the <p>, per #917. {% endcomment %}
-          {% if rel.card_ingredients.size > 0 %}
-            <p class="drink-card-ingredients">{% for ing in rel.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">&middot;</span> {% endunless %}{{ ing.label }}{% endfor %}</p>
-          {% endif %}
           <div class="drink-card-foot">
             {% comment %} THE CHIPS ARE THE PAGE'S OWN CHIPS: alphabetical
                (`sort_natural`, for the capital I in "I want to faff"), grouped
@@ -1328,30 +1330,17 @@ layout: default
                emits above, and for the same reason: on a drink page a chip
                has nothing to filter, so it takes you where the filter is.
                `mood_groups` and `index_home` are assigned above. {% endcomment %}
-            {% comment %} THE SHIP IS INSIDE THE CHIP ROW HERE, LAST -- Helen on
-               #955, 2026-09-11, on a card whose chips had gone one per row:
-               "Please fix the text wrapping of chips above the ship... Keep
-               the ship in the bottom right-hand corner, on the same line as
-               that row of chips." On the index the ship is out of flow and
-               the chips are padded clear of it on the one card whose last row
-               collides (card-line-budget.js), which pads EVERY row of that
-               card; on a 13rem card that cost two chips a row.
-
-               THE LAST CHIP AND THE SHIP ARE ONE UNBREAKABLE ITEM. The chips
-               wrap top-down like text, in alphabetical order, and the ship
-               is in the flow at the end -- but a ship placed last on its own
-               takes a row of its own the moment the last row is full, and a
-               flow that fills from the bottom (tried, 2026-09-11, and she
-               sent it back: "These still aren't right") puts the SHORT row at
-               the top. So the last chip and the ship share a `.drink-card-tail`
-               that a flex line cannot split: if the pair fits after the
-               previous chip it sits there, and if not the pair wraps together,
-               so the last row always reads "<last chip> ... <ship>" with the
-               ship at the right edge, and the short row is the last one, as
-               in a paragraph. A drink with no moods still gets its ship, in
-               a tail of its own. `_cards.scss`'s portrait block has the four
-               rules. {% endcomment %}
-            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}{% if forloop.last %}<span class="drink-card-tail">{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% if forloop.last %}<span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}{% endfor %}{% if rel_moods.size == 0 %}<span class="drink-card-tail"><span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span></span>{% endif %}</span>
+            {% comment %} THE SHIP IS THE FOOT'S SECOND CHILD, OUT OF FLOW, as
+               on the index -- #991. It was inside the chip row, wrapped with the
+               last chip in a `.drink-card-tail` that a flex line could not
+               split, because a portrait card grew and the index's own answer
+               (the ship pinned to the corner, and card-line-budget.js padding
+               the chips clear of it on the one card whose last row collides)
+               cost two chips a row at 13rem. On a 370px card it costs nothing,
+               which is why the index has always done it this way -- so the tail
+               is gone with the modifier and this is the card's own foot. {% endcomment %}
+            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}</span>
+            <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>
           </div>
           {% comment %} THE SHORTLIST `+`, TOP RIGHT AND ABOVE THE TAPE -- #977,
              Helen, 2026-09-11: "add shortlist button to top right of 'if you
@@ -1372,12 +1361,15 @@ layout: default
              title row, a few hundred lines up, keys on this page's drink and
              is untouched.
 
-             ITS SECOND HALF IS IN _sass/cocktails/_shortlist.scss: the portrait
-             card takes a band of top padding so the button sits ABOVE the head
-             row rather than beside the tape, which is the "higher than the
-             tape" half of the ask -- so the tape keeps the card's full width
-             and pays nothing for the corner, where the index card pays 2.63rem
-             of title for it.
+             AND IT IS IN THE CARD'S OWN CORNER SINCE #991, not in a band above
+             the head row. Her ask on #977 was "higher than the tape so it
+             doesn't take up space the name could use", and a portrait card
+             could buy the corner with height because it grew; an index card is
+             a fixed height and buys it with 2.63rem of title, which is the
+             trade every card on the index already makes. One card, one corner,
+             one reservation -- `.drink-cards .drink-card-name` in
+             _sass/cocktails/_shortlist.scss, with no exception carved out of it
+             any more.
 
              LAST IN THE MARKUP, as on the index, so the tab order runs name,
              ingredients, chips, then this. {% endcomment %}

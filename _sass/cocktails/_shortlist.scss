@@ -358,64 +358,27 @@ $card-shortlist-size: 1.15rem;
   padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
 }
 
-// --- AND WHAT IT WAS COSTING A CARD WITH NO BUTTON ON IT -- #976 -------------
-// The scoping note above says the rule is "a card IN THE LIST", and named the
-// universe pick as the thing that wears `.drink-card-name` without a button.
-// #955 then made the drink page's three related drinks into real cards in a
-// `<ul class="cocktail-related drink-cards">` -- so they took `.drink-cards`
-// for its list reset, and with it 2.63rem of title reserved for a button that
-// was not there. Three cards across a 900px column give the name a 165px box;
-// 42px of that is 25%, and on the two-across layout the box is 101px and the
-// reservation is 41% of it.
+// --- IT APPLIES TO EVERY CARD IN EVERY LIST, INCLUDING THE RELATED ONES ------
+// #976 carved an exception out of this rule for `.drink-card--portrait`: the
+// drink page's three related drinks were cards of their own shape, growing
+// rather than fixed, so they could buy the shortlist corner with HEIGHT (a band
+// of top padding above the head row -- #977, Helen: "higher than the tape so it
+// doesn't take up space the name could use") and keep every pixel of the tape.
 //
-// WHICH IS THE WHOLE OF #976. Helen: "font on titles of 'if you like this'
-// cards is not the same size... not filling the width". Measured at 484px on
-// Arrack Christmas Punch before this line: every one of the three tapes settled
-// at 87.6px inside a 101.6px name box, every tape word at 59px, and
-// ACCOUTREMENT -- one word, nothing to wrap at -- overflowed its box by 42px
-// and hung off the end of its tape. The names were small because the fit script
-// was measuring a box the button had already taken a quarter to a half of, and
-// they were not filling the width because the tape's own `max-width` is a
-// percentage OF that narrowed box.
+// #991 DELETED THAT CARD AND THE EXCEPTION WITH IT, 2026-09-12. Helen: "if you
+// liked this cards should render the same as cards on the index list. We are
+// fighting this design, and trying to invent a new design language, where we
+// should just reuse what we've already made." A related card is an index card
+// now, fixed height and all, so it buys its corner the way every other card on
+// the site does -- out of the title -- and there is one reservation here rather
+// than one and an exemption.
 //
-// SO A PORTRAIT CARD PAYS NOTHING, and it still pays nothing now that #977 has
-// put a real `+` on it: that button sits in a band ABOVE the head row rather
-// than beside the tape (the next rule), which is exactly what Helen asked for
-// -- "Higher than the tape so it doesn't take up space the name could use."
-.drink-cards .drink-card--portrait .drink-card-name {
-  padding-right: 0;
-}
-
-// --- The portrait card's own corner -- #977, 2026-09-11 ----------------------
-// "add shortlist button to top right of 'if you liked this' cards. Higher than
-// the tape so it doesn't take up space the name could use."
-//
-// THE BUTTON IS THE INDEX CARD'S, UNCHANGED -- same classes, same mark, same
-// #823 hit area, pinned to the same two card paddings. What changes is what is
-// UNDER it: the card opens a band at the top for it, so the head row (glass and
-// tape) starts below the button instead of beside it. That is the whole of the
-// difference between the two cards' corners, and it is the trade running the
-// other way from the index's: the index buys the corner with title width
-// because its card has a fixed height and no spare row; a portrait card grows,
-// so it can buy it with height and keep every pixel of the tape.
-//
-// DERIVED FROM THE BUTTON, NOT PICKED. The mark's box is its own font size plus
-// the hit-area padding on both sides, and it starts $space-xs above the card's
-// padding (`top`, above), so its bottom edge sits at
-//
-//     $card-pad-y + $card-shortlist-size + $space-xs
-//
-// and the head row starts one more $space-xs below that. Stated against the
-// same tokens the button is placed with, so #962's next change of mind about
-// how big the mark should be moves this with it rather than leaving a band
-// sized for the old one.
-//
-// THE #823 HIT AREA IS UNTOUCHED AND STILL CLEARS THE TAPE: its `::after`
-// reaches $space-xs below the button, which is exactly the gap above, so it
-// stops on the head row's first pixel and never overlaps the lettering.
-.drink-card--portrait {
-  padding-top: calc(#{$card-pad-y} + #{$card-shortlist-size} + 2 * #{$space-xs});
-}
+// #976's MEASUREMENT IS STILL WORTH KEEPING, because it is what a card this
+// narrow costs: at 484px on Arrack Christmas Punch, three across a 900px column
+// gave the name a 165px box and this reservation took 42px of it, and at two
+// across the box was 101px and the reservation 41% of it. That is an argument
+// about how narrow a card may be, not about who pays -- and the index card's
+// own 370px floor is the answer to it.
 
 // --- The drink page's button on a phone: the card's mark, not the word ------
 // #963 put the button beside the FIRST LINE of the drink's name (the alignment

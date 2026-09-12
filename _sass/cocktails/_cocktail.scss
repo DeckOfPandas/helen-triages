@@ -2071,19 +2071,23 @@ $amount-gap-wide: 1.25rem;
 // _layouts/cocktail.html's own comment at the block that builds this. This file
 // only lays out what arrives.
 //
-// THREE CARDS, PORTRAIT -- Helen on #955, 2026-09-11. The first version of
-// this row was "a compact row, not a card": the tiny glass, the name on tape
-// and one ellipsised ingredient line, on the argument that the index card is
-// inline markup and a third card design was hers to ask for. She asked:
-// "Please turn the suggestions into cards -- 1. Allow 2 or 3 lines of
-// ingredients to show, 2. show the chips. It's fine for the cards to be
-// portrait orientation. 3. Take the styling from index page cards, including
-// the new styling in #953 when it's finished." So each item is now a
-// `.drink-card.drink-card--portrait`, and EVERYTHING about how a card looks --
-// face, tape, clamps, chip colours, the ship's mask, the #953 hover -- is the
-// index card's own rules in _cards.scss, where the portrait modifier also
-// lives (it is a card variant, so it belongs with the card). This file only
-// says where the section sits on the page and how the three are laid out.
+// THEY ARE INDEX CARDS -- #991, Helen, 2026-09-12: "if you liked this cards
+// should render the same as cards on the index list. We are fighting this
+// design, and trying to invent a new design language, where we should just
+// reuse what we've already made."
+//
+// SO THIS FILE HAS NOTHING TO SAY ABOUT THE CARDS ANY MORE, only about where
+// the section sits. Every question a card asks -- how wide, how tall, how the
+// glass hangs, how the chips wrap, where the ship sits, what happens under the
+// cursor -- is answered once in _cards.scss, for the index and for these three
+// together. The row below carries a bottom margin and nothing else.
+//
+// WHAT IT REPLACED: from #955 (2026-09-11) each item was
+// `.drink-card.drink-card--portrait`, a variant with its own geometry and, by
+// the end of one day, its own chip-row cap, its own title-size lock (#960), its
+// own grid floor at 13rem then 16rem (#976), its own shortlist corner (#977)
+// and its own cancellation of the title padding that corner costs. That is the
+// fight Helen named. The card the site already had needs none of it.
 //
 // THE DIVIDER -- her first ask: "Please add some kind of divider between the
 // end of the recipe (whether serve or notes or anything else) and 'If you
@@ -2101,41 +2105,16 @@ $amount-gap-wide: 1.25rem;
   .cocktail-section-heading { margin-top: 0; }
 }
 
-// THREE ACROSS, THEN TWO, THEN ONE, WITH NO MEDIA QUERY. `auto-fit` plus a
-// `minmax` floor does the whole of the narrowing: in the 900px column three
-// tracks of ~280px clear the floor; in an iPad's narrower column it is two and
-// one; on a 360px phone one track fits and the three become a short stack.
-// Nothing is hidden at any width and nothing can overflow, because no track is
-// ever narrower than the floor and the floor is under any phone.
-//
-// NOT THE INDEX GRID'S 370px, and that is what "portrait" buys: the index card
-// is landscape because it needs a full ingredient line beside a glass column; a
-// portrait card stacks the same parts, so it can be well under half as wide and
-// still carry three lines of ingredients and three rows of chips.
-//
-// 16rem SINCE 2026-09-11, UP FROM 13rem -- #976, and it is the second half of
-// that fix. Helen: "Wrap to two then one card at wider screen widths if that
-// helps." It does: 13rem put two tracks in a 436px column at a 484px viewport,
-// each 210px, which leaves the name a 101px box once the glass column and the
-// gutter are out of it -- a 12-letter drink needs more than that at any size the
-// row can share. The floor is what decides when a row gives up a card, so it is
-// the dial she is asking for, and raising it is the whole change: three tracks
-// still clear it in the 900px column (3 x 256 + 2 x 16 = 800 against 852), two
-// hold down to a 528px column, and below that it is one wide card rather than
-// two cramped ones. Still no media query, for the reason below.
-//
-// `.drink-cards` IS ON THE <ul> TOO, for its reset and nothing else; the grid
-// below overrides its columns and gap, and `.drink-card` itself never needed
-// the list. TWO CLASSES IN THE SELECTOR, because cocktails.scss imports
-// `cards` AFTER this file and `.drink-cards` alone would win the cascade on
-// order -- measured: a single-class rule here left the index's 370px floor in
-// force and drew two cards across the 900px column instead of three.
-//
-// A MEDIA QUERY WOULD HAVE BEEN A GUESS ABOUT THE COLUMN, not about the
-// viewport -- this section sits inside `<main>`'s 900px measure, and §12's
-// "check one element's width and call the row safe" is about exactly the row
-// that does its own arithmetic against the wrong box. `auto-fit` asks the
-// container.
+// THE GRID IS `.drink-cards`' OWN, AND THAT IS THE POINT OF #991. This rule
+// used to override the columns and the gap -- `repeat(auto-fit, minmax(16rem,
+// 1fr))`, three across the 900px column, tuned from 13rem the day it was
+// written -- with two classes in the selector, because cocktails.scss imports
+// `cards` AFTER this file and one class would have lost the cascade on order.
+// A row of three narrower-than-a-card cards is exactly the "new design
+// language" Helen is asking us to stop inventing: with the override gone, the
+// list wraps at the index's own 370px floor, which is two across the 900px
+// column and then one, which is what the index does with an odd number of
+// drinks in it. Nothing here decides it any more.
 .cocktail-related-section .cocktail-related {
   // THE BOTTOM MARGIN IS NOT DECORATION. `.cocktail-footer` carries
   // `margin-top: $spacing-section-gap`, but a drink with no `source` has no
@@ -2144,8 +2123,6 @@ $amount-gap-wide: 1.25rem;
   // card. Adjacent margins collapse, so this costs nothing on a drink that
   // DOES have a footer.
   margin: 0 0 $spacing-section-gap;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: $space-lg;
 }
 
 .cocktail-footer {
