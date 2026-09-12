@@ -1455,7 +1455,17 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # grant is still hers, still explicit, still quoted. Covers ae13155 and
 # nothing after. #933 is the open question of whether a constant is the right
 # shape for this at all; six moves in a day say it is not.
-COCKTAIL_BASELINE_COMMIT = "ae13155"   # Créole's accent on four drinks, on Helen's word
+# MOVED A SEVENTH TIME, 2026-09-12, AND THE GRANT AGAIN CAME BEFORE THE READ.
+# `ea6525d` sets `proofread: true` on Sazerac and Caribbean Sazerac. Their only
+# agent edit since Helen's last read was 46bdc4c, changing the method from
+# shake to stir on her ruling (#883), which correctly flipped both to
+# `proofread: false` in the same commit. Helen, this session: "Please flip the
+# proofread flag on sazerac and caribbean sazerac -- this is explicit
+# permission. They are both in published recipes, but were touched by an
+# agent so needed to be proofread again." The grant is hers, explicit, and
+# quoted -- the sixth move's shape exactly, read promised rather than shown.
+# Covers ea6525d and nothing after.
+COCKTAIL_BASELINE_COMMIT = "ea6525d"   # Sazerac and Caribbean Sazerac back to stir, on Helen's word
 
 
 def _newest_commit_per_published_drink():
