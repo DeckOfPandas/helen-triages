@@ -51,31 +51,29 @@
 #   medium  right for this bottle within about a point. Fine for a unit count.
 #   low     a genuine guess. OVERWRITE THESE FIRST.
 # A row that needs HELEN specifically -- not a better source, her bottle --
-# also carries `qq:` saying why. `grep -n 'qq:'` is the worklist. There are
-# TEN, and every one is something no source settles: a rhum bottled at three
-# strengths, a bottle whose name matches no product I could place, a category
-# whose range spans 20 points.
+# also carries `qq:` saying why, and every one is something no source settles:
+# a rhum bottled at three strengths, a bottle whose name matches no product I
+# could place, a category whose range spans 20 points.
 #
-#   TEN, NOT ELEVEN, SINCE 2026-09-09, and this line said eleven until
-#   2026-09-14. Flaggpunsch was promoted to a checked figure that day -- the
-#   note recording it is a few blocks down in this same file -- and the count up
-#   here was not moved with it. Worth the correction and worth the lesson: a
-#   COUNT in a comment is a second copy of something the file already knows, and
-#   it goes stale the first time anybody edits the thing it counts.
-#
-#   SEVEN OF THE TEN CANNOT CHANGE ANY PUBLISHED NUMBER TODAY, and
-#   `python3 scripts/abv_worklist.py` is what says which -- it replays the
-#   units plugin's own resolution over the published drinks, so it knows what a
-#   grep cannot. Both Bob's bitters are in that seven because they are only ever
-#   poured in dashes, and a dash never reaches the arithmetic (see the bitters
-#   block below); the rest are named by no published drink. They are flagged
+#   THE WORKLIST IS `python3 scripts/abv_worklist.py`, NOT `grep -n 'qq:'`,
+#   since the unit count went public (#1001, 2026-09-14). The grep lists the
+#   rows; the script replays the units plugin's own resolution over the
+#   PUBLISHED drinks and says which of them change a number somebody can see.
+#   Many do not: both Bob's bitters are only ever poured in dashes, and a dash
+#   never reaches the arithmetic (see the bitters block below). They are flagged
 #   anyway, because the day one of them is poured in millilitres is not the day
 #   to discover the strength was a guess.
 #
-#   AND THE COUNT IS NOT A CONSTANT: the Caribbean Sazerac pours a bare `rhum
-#   agricole blanc`, which averages every bottle under that category including
-#   two unsettled ones, so proofreading that drink moves a row from the seven
-#   into the three. Run the script rather than trusting this paragraph.
+#   NO COUNT IN THIS COMMENT, AND THAT IS THE RULE. This said "There are
+#   ELEVEN" from the web pass until 2026-09-14, five days after Flaggpunsch was
+#   promoted to a checked figure (the note recording it is a few blocks down)
+#   and nobody moved the number -- and one session copied the stale figure into
+#   four more files before anyone counted. A count in a comment is a second copy
+#   of something the file already knows, and it goes stale the first time
+#   anybody edits the thing it counts. Which rows reach a published drink is not
+#   even a constant: the Caribbean Sazerac pours a bare `rhum agricole blanc`,
+#   which averages every bottle under that category, so proofreading that one
+#   drink changes the answer. Run the script.
 #
 # IT WAS SEVENTEEN UNTIL THE WEB PASS, 2026-09-06. Helen's instruction was
 # "knowledge first, web only for the doubtful ones", and the web half settled

@@ -232,7 +232,7 @@ main {
 // about this font-size, and it scales with the type the way the tape's padding
 // does. To re-measure after any change to the face or the size:
 // `sh scripts/browser/crop.sh /food/ ".site-nav-icon-link" nav` then
-// `python3 tmp/inkbox.py tmp/shots/crop-nav.png 6`.
+// `python3 scripts/browser/inkbox.py tmp/shots/crop-nav.png 6`.
 //
 // `position: relative` MOVES NOTHING ELSE. The row's height and every other
 // item's place are unchanged, which is what makes this safe to carry: it is a

@@ -1622,12 +1622,15 @@
 
      NOTHING ON THE SITE LINKS TO IT TODAY, AND IT STAYS ANYWAY. The drink
      page's see-all link was this query's one caller and #1000 removed it on
-     2026-09-14. This is kept under #651's rule -- a thing nothing
-     reads is only safe while a comment says why it is kept -- and the reasons
-     are that the URL works, is tested, and is the plumbing any future answer
-     to that issue would want; the issue itself was never declared solved. If
-     the answer turns out to be something else, delete this with its tests
-     rather than leaving both.
+     2026-09-14. That complaint is answered by THIS PAGE'S OWN BUTTON -- Helen,
+     the same day: "Shortlist is still viewable when I click on the shortlist
+     button at the top of the cocktail card section, which will do for now, and
+     at least it matches food." Offered this query's removal, she left it, so it
+     is kept under #651's rule (a thing nothing reads is only safe while a
+     comment says why): it works, it is tested, and "for now" is not "never".
+     FOOD HAS NO SUCH QUERY, so this is the one way the two shortlists differ.
+     If exact parity is wanted, delete this block WITH its three tests in
+     tests/js/cocktail-index-startup.test.js, never one without the other.
 
      IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
      `enterShortlistView()` plus `resetControls()` is exactly what pressing

@@ -224,6 +224,48 @@ layout: default
            `.cocktail-controls` below, and the same include sits in the same
            place on a recipe page. `?shortlist=1` on the index (MANUAL 8.9)
            has a caller again -- the see-shortlist link in that row. {% endcomment %}
+        {% comment %} THE READ-IT / MAKE-IT TOGGLE LEFT THIS ROW ON 2026-09-10
+           (#897) and is in `.cocktail-controls` below the title block. The
+           toggle sat here on the title's line from 2026-09-02; Helen: "move
+           read it / make it toggle to the top right of the page main content,
+           just under the section divider that sits between the metadata
+           section and ingredients."
+
+           THE SHORTLIST BUTTON CAME BACK ON 2026-09-11 -- #963, Helen: "move
+           the shortlist up to the top right, aligned with the horizontal
+           centre of the first line of the cocktail name." It is the row's
+           second item, which above 600px puts it in the head grid's trailing
+           track: the row is `display: contents` there, so this button and the
+           name are placed straight onto `.cocktail-head-words`, and the meta
+           below ends where the name's track does (#979). On a phone the row is
+           a real flex box again and `space-between` is what throws the `+` to
+           the right. The alignment with the first line is built in
+           _cocktail.scss (`.cocktail-title-row .btn-shortlist`).
+
+           `page.url`, NOT `relative_url` -- the same key this drink's own
+           index card emits, which is what makes the card and this page agree
+           about whether it is shortlisted. See HTF.shortlist in
+           assets/js/assets.js. `hidden` until shortlist.js reveals it, the
+           rule every JS-dependent control on both sites follows.
+
+           IT HAD A SEE-ALL LINK UNDER IT BRIEFLY -- #994 added it on 2026-09-12
+           and #1000 removed it on 2026-09-14: "remove 'see all'
+           button from below shortlist button on cocktail page." So the button
+           is the row's second item again, on its own, and the wrapper, the
+           `row-reverse` that put its `+` on the right to line the two marks up,
+           and the link itself are all gone.
+
+           HOW A READER FINDS THEIR SHORTLIST FROM HERE is the index's own
+           `shortlisted (N)` button, one click back. Helen, the same day: "which
+           will do for now, and at least it matches food." `?shortlist=1` on the
+           index outlived the link and is kept with its reasons in
+           assets/js/cocktail-index.js (MANUAL 8.9).
+        {% endcomment %}
+        <button type="button"
+                class="btn-shortlist"
+                data-shortlist-key="{{ page.url }}"
+                aria-pressed="false"
+                hidden>shortlist</button>
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
@@ -1080,12 +1122,13 @@ layout: default
      THE GATE IS GONE, and that is the "add to live site" half. It was
      `site.show_units`, declared in _config_local.yml and nowhere else, so
      production rendered nothing. Helen's 2026-09-06 reason for that gate is
-     still written beside the key: eleven `qq:` rows in _data/cocktails/abv.yml
-     are strengths nobody could settle without the bottle on her shelf, and
-     "publishing a unit count built partly on those is a different promise from
-     publishing a rough price, and it is hers to make once they are cleared."
-     They are not cleared; this is her making the call anyway, which is hers to
-     make. The key itself is retired in _config_local.yml.
+     still written where the key was: the `qq:` rows in
+     _data/cocktails/abv.yml are strengths nobody could settle without the
+     bottle on her shelf, and "publishing a unit count built partly on those is
+     a different promise from publishing a rough price, and it is hers to make
+     once they are cleared." They are not cleared; this is her making the call
+     anyway, which is hers to make. `python3 scripts/abv_worklist.py` says which
+     of those rows reach a published drink (#1012 is the snapshot).
 
      `page.units` STILL GUARDS IT. A drink whose ingredients carry no alcohol at
      all gets no line rather than a confident zero.
