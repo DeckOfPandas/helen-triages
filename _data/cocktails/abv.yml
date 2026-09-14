@@ -283,7 +283,11 @@ bottles:
 
   # --- brandy ------------------------------------------------------------
   "Courvoisier":                      { abv: 40,   confidence: high }
+  # "Pierre Ferrand Ambré and Pierre Ferrand 1840 are different bottles, but
+  # both £53 and both 40 % ABV." -- Helen, 2026-09-14 (#745). The 1840 was
+  # collapsed into the Ambré from 2026-09-05 until then.
   "Pierre Ferrand Ambré":             { abv: 40,   confidence: high }
+  "Pierre Ferrand 1840":              { abv: 40,   confidence: high }
   "Avallen":                          { abv: 40,   confidence: high }
   "Massenez Kirsch Vieux":            { abv: 40,   confidence: medium }
 

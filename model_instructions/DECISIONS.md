@@ -1834,6 +1834,28 @@ unless stated.
   the shape every one of these takes, and it is not a half-finished rename.
   `Ophir`/Opihr and `Amaro Ciociano`/Ciociaro are the same class and are
   **still outstanding**, under #701.
+- **2026-09-14, #745 — the Ferrand collapse, reversed by the person who ruled
+  it.** On 2026-09-05 Helen said the Pierre Ferrand 1840 WAS her Ambré, and the
+  two entries collapsed into one with the 1840 spellings as aliases; that day's
+  note called it "a confident inference about the world" losing to "the owner of
+  the cupboard". #745 was raised because two notes on the Sazerac (Death & Co)
+  still described them as different, and was posed to her as a yes/no about
+  whether an agent may delete a note a later ruling made false. **She answered a
+  different question, and it is the one that mattered**: *"I was wrong above.
+  Pierre Ferrand Ambré and Pierre Ferrand 1840 are different bottles, but both
+  £53 and both 40 % ABV. For 1: delete the ingredient note, add the bottle
+  suggestion (1840) to the line. For 2: delete the note."* So the notes had been
+  RIGHT, and the collapse wrong. The 1840 is its own bottle again with its three
+  spellings; the Ambré moved from £45 to £53. **The general question #745 asked
+  -- may an agent correct a note a ruling has made false? -- is still
+  unanswered**, and the case shows why it is not a simple yes: here the note
+  and the ruling disagreed, and the note was the one telling the truth.
+  **Two gaps the collapse had left, found tracing its history**: the note
+  deleted on the Death & Co Sazerac also recorded its source's Rittenhouse 100,
+  and Legend's own typing ("Pièrre Ferrand 1840 cognac") lost its bottle when
+  `item` was deleted on 2026-09-05. Asked, she restored both: *"Yes, add
+  Rittenhouse 100"*, *"Yes, the 1840"*. The live Vieux Carré and Sazerac were
+  only re-accented by the collapse and name the Ambré correctly.
 
 ### §9.3.3 The drinks index's search
 

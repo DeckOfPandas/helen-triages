@@ -398,10 +398,18 @@ bottles:
     size_ml: 700
     gbp: 28
     confidence: high
+  # BOTH PIERRE FERRANDS ARE £53, HELEN'S OWN FIGURE, 2026-09-14 (#745): "different
+  # bottles, but both £53 and both 40 % ABV". The Ambré was £45 at `medium`
+  # until then. 70cl assumed for both, the size every cognac here uses. The
+  # 1840 is not a `default_bottles` input -- her cognac rule names the Ambré.
   "Pierre Ferrand Ambré":
     size_ml: 700
-    gbp: 45
-    confidence: medium
+    gbp: 53
+    confidence: high
+  "Pierre Ferrand 1840":
+    size_ml: 700
+    gbp: 53
+    confidence: high
   "Avallen":
     size_ml: 700
     gbp: 30

@@ -714,15 +714,38 @@ bottles:
   "Courvoisier":
     generic: "cognac"
     aliases: []
-  # "Pierre Ferrand 1840" WAS A SEPARATE ENTRY HERE AND WAS THE SAME BOTTLE.
-  # It is collapsed into "Pierre Ferrand Ambré" below -- see that entry.
+  # A SEPARATE BOTTLE AGAIN, 2026-09-14 (#745) -- Helen: "I was wrong above.
+  # Pierre Ferrand Ambré and Pierre Ferrand 1840 are different bottles, but both
+  # £53 and both 40 % ABV." It was collapsed into the Ambré on 2026-09-05 on her
+  # word that they were one bottle; see the Ambré's note below for that day's
+  # reasoning, which is kept because the reversal is the lesson. The 1840
+  # spellings are this bottle's aliases again, not the Ambré's.
+  #
+  # Harvested from Legend's `item` on 2026-09-05 ("Pièrre Ferrand 1840 cognac",
+  # Helen's own spelling), and poured by the Sazerac (Death & Co)'s source.
+  "Pierre Ferrand 1840":
+    generic: "cognac"
+    aliases: ["Pièrre Ferrand 1840", "Pierre Ferrand 1840 Original Formula"]
   # Charleston's kirsch, from its own `item`. `eau de vie` is the generic the
   # drink already carries; `kirschwasser` is declared too and is the narrower
   # term, but the drink's own typing is what this follows.
   "Massenez Kirsch Vieux":
     generic: "eau de vie"
     aliases: ["Massenez Kirsch Vieux cherry brandy", "Massenez Kirsch"]
-  # ===== ONE BOTTLE, NOT TWO. Helen, 2026-09-05 ==============================
+  # ===== TWO BOTTLES AFTER ALL. Helen, 2026-09-14 (#745) =====================
+  # "I was wrong above. Pierre Ferrand Ambré and Pierre Ferrand 1840 are
+  # different bottles, but both £53 and both 40 % ABV." So the 1840 is its own
+  # entry again, above, and its three spellings left this entry's aliases.
+  #
+  # EVERYTHING BELOW THIS BANNER IS THE 2026-09-05 COLLAPSE, KEPT AS WRITTEN,
+  # because it is now a lesson in the other direction. That day's note said a
+  # confident inference about the world had beaten the owner of the cupboard for
+  # six hours; nine days later the owner corrected herself, and the inference had
+  # been right about her shelf too. Neither the products nor her memory is the
+  # authority on its own -- the bottle in the cupboard is, which is why a rename
+  # here always goes through her.
+  #
+  # ===== ONE BOTTLE, NOT TWO. Helen, 2026-09-05 (REVERSED 2026-09-14) =========
   # "Pierre Ferrand 1840 is 'Pierre Ferrand Cognac Ambre' (the e needs an accent
   # aigu)." So the two cognac entries this file carried were the same bottle
   # under two names, and they collapse here.
@@ -756,9 +779,7 @@ bottles:
     generic: "cognac"
     aliases: ["Pierre Ferrand Ambre", "Pierre Ferrand ambre",
               "Pièrre Ferrand Ambre", "Pièrre Ferrand Ambre cognac",
-              "Pierre Ferrand Cognac Ambré", "Pierre Ferrand Cognac Ambre",
-              "Pierre Ferrand 1840", "Pièrre Ferrand 1840",
-              "Pierre Ferrand 1840 Original Formula"]
+              "Pierre Ferrand Cognac Ambré", "Pierre Ferrand Cognac Ambre"]
   "Avallen":
     generic: "calvados"
 
