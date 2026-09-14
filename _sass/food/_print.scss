@@ -27,7 +27,9 @@
   // _recipe-header.scss), and this rule had to go with it: a print rule
   // matching nothing fails silently and on paper only, which is exactly what
   // test_print_rules_target_classes_that_exist exists to catch. It did.
-  .recipe-actions,
+  // `.recipe-controls` is the row the actions sit in since #1005; the actions
+  // themselves are hidden by shared/_print.scss on both sites.
+  .recipe-controls,
   .btn-method-toggle {
     display: none;
   }

@@ -44,10 +44,10 @@ flowchart TD
 
     subgraph DRAFTS["THE PRIVATE DRAFTS REPO — Helen's folders"]
         POOL["pool (root)<br/>ingested, not yet hers"]:::helen
-        RW["to-rewrite/ (food)<br/>picked; she rewrites next"]:::helen
-        MK["to-make/ (both)<br/>readable enough to make"]:::helen
-        KP["keep/ (both)<br/>made and liked;<br/>not rewriting yet"]:::helen
-        PR["to-promote/ (both)<br/>her words are in; waiting on<br/>the mechanical pass and her proofread"]:::helen
+        RW["1-rewrite/ (food)<br/>picked; she rewrites next"]:::helen
+        MK["2-make/ (both)<br/>readable enough to make"]:::helen
+        KP["3-keep/ (both)<br/>made and liked;<br/>not rewriting yet"]:::helen
+        PR["4-promote/ (both)<br/>her words are in; waiting on<br/>the mechanical pass and her proofread"]:::helen
     end
 
     POOL -->|"rewrite ‹slug›"| RW
@@ -59,7 +59,7 @@ flowchart TD
     MK -->|"bin ‹slug›"| BIN["deleted"]:::machine
 
     PR --> MP["MECHANICAL PASS (Claude)<br/>rewritten: true · suite green ·<br/>canonical bottles · one list of judgements ·<br/>then the word: final: ‹slugs›"]:::claude
-    MP --> PF["HELEN PROOFREADS THE RENDERED PAGE<br/>jekyll-local /…/drafts/to-promote/‹slug›/<br/>proofread: true"]:::helen
+    MP --> PF["HELEN PROOFREADS THE RENDERED PAGE<br/>jekyll-local /…/drafts/4-promote/‹slug›/<br/>proofread: true"]:::helen
     PF --> PROMO["PROMOTE (Claude, on her word)<br/>re-check the gate · copy · byte-compare ·<br/>delete from private · baseline commit · PR"]:::claude
     PROMO --> MERGE["Helen merges → deploy"]:::helen
     MERGE --> LIVE["_food_recipes/ · _cocktail_recipes/<br/>awaiting_fix: false AND proofread: true"]:::live
@@ -67,7 +67,7 @@ flowchart TD
     LIVE -->|"an agent edit"| TOUCH{"how big?"}:::claude
     TOUCH -->|"a word or a number"| ASK["ask Helen; she may grant<br/>no flip (HELEN_CLEARED / baseline)"]:::helen
     TOUCH -->|"anything else"| DEMOTE["proofread: false in the same commit<br/>+ an issue labelled blocked-on-helen<br/>page stays in the public repo, hidden by the gate"]:::claude
-    TOUCH -->|"something big is wrong"| BACK["delete from public, re-add to<br/>private to-promote/ + the issue"]:::claude
+    TOUCH -->|"something big is wrong"| BACK["delete from public, re-add to<br/>private 4-promote/ + the issue"]:::claude
     DEMOTE --> PF
     BACK --> PR
     ASK --> LIVE
@@ -120,16 +120,20 @@ a truncated step. A silence in the source is `QQ`, never a default.
 ## 3. The folders, and the four words that move a file
 
 The private repo's subfolders are Helen's: they record where she is with a
-file, which no flag can say. Since 2026-09-14 both sites use the same set, and
-`to-cook/` is renamed `to-make/` (her ruling, so the two sites share a word).
+file, which no flag can say. Since 2026-09-14 both sites use the same set,
+**numbered in pipeline order so they sort to the top of her file list in the
+order a file travels** — her ask: *"I'd like each subfolder to appear in order
+at the top of my files list -- small usability tweak for future-Helen. So
+shall we try 1-rewrite, 2-make, and so on?"* Drinks have no `1-rewrite/` and
+keep the same numbers for the rest, so one name means one stage on both sites.
 
 | folder | food | drinks | means |
 |---|---|---|---|
 | pool (the root) | ✓ | ✓ | ingested; nobody has touched it since |
-| `to-rewrite/` | ✓ | — | she has picked it and will rewrite it next. Drinks skip this stage — *"they're not as annoying as food recipes"* |
-| `to-make/` | ✓ | ✓ | readable enough to make from (was `to-cook/`) |
-| `keep/` | ✓ | ✓ | made and liked, and she is NOT rewriting it yet — the intermediate state #429 said did not exist and now does |
-| `to-promote/` | ✓ | ✓ | her words are in; waiting on the mechanical pass, then her proofread |
+| `1-rewrite/` | ✓ | — | she has picked it and will rewrite it next. Drinks skip this stage — *"they're not as annoying as food recipes"* (was `to-rewrite/`) |
+| `2-make/` | ✓ | ✓ | readable enough to make from (was `to-cook/`) |
+| `3-keep/` | ✓ | ✓ | made and liked, and she is NOT rewriting it yet — the intermediate state #429 said did not exist and now does |
+| `4-promote/` | ✓ | ✓ | her words are in; waiting on the mechanical pass, then her proofread (was `to-promote/`) |
 
 **Claude may move a file between folders on her word** (2026-09-14, reversing
 "never move a file unless asked" — the word IS the ask). Four words, typed in
@@ -137,14 +141,14 @@ the chat or in an issue, each followed by one or more slugs:
 
 | she types | Claude does |
 |---|---|
-| `rewrite ‹slug›` | moves it to `to-rewrite/` |
-| `make ‹slug›` | moves it to `to-make/` |
-| `keep ‹slug›` | moves it to `keep/` — *made it, want it, not rewriting it now* |
-| `ready ‹slug›` | moves it to `to-promote/` and starts the mechanical pass (§4) — *made it, rewritten it, it ships* |
+| `rewrite ‹slug›` | moves it to `1-rewrite/` |
+| `make ‹slug›` | moves it to `2-make/` |
+| `keep ‹slug›` | moves it to `3-keep/` — *made it, want it, not rewriting it now* |
+| `ready ‹slug›` | moves it to `4-promote/` and starts the mechanical pass (§4) — *made it, rewritten it, it ships* |
 | `bin ‹slug›` | deletes it from the private repo — made and disliked |
 
 So "I've tried it and want to keep it" is `keep` when she is not rewriting now
-and `ready` when the words are already hers. A `keep` file can later become
+and `ready` when the words are already hers. A `3-keep/` file can later become
 `rewrite` (food, her next pass) or `ready` (the words went in while it sat).
 Every move is a commit on a branch of the private repo, pushed, one line in the
 reply. She can still move files by hand; the words exist so she does not have to.
@@ -154,17 +158,17 @@ staged draft renders at `/food/drafts/‹folder›/‹slug›/` and
 `/cocktails/drafts/‹folder›/‹slug›/` on `jekyll-local`, and the local index
 lists every draft with a `draft` badge. Proposed and not yet built: a `to make
 (N)` view beside `shortlisted (N)` on both local indexes, listing exactly the
-`to-make/` folder — the question that folder answers is *what shall we cook
+`2-make/` folder — the question that folder answers is *what shall we cook
 this week*, which is the question the index exists for.
 
 ---
 
-## 4. Out: `to-promote/` to the live site
+## 4. Out: `4-promote/` to the live site
 
 `PUBLISHING_A_DRINK.md` has each step in full and the word "final"; both sites
 follow it since 2026-09-14 (food used to have no written procedure for this).
 
-1. **Helen says `ready ‹slug›`** or moves the file into `to-promote/` herself.
+1. **Helen says `ready ‹slug›`** or moves the file into `4-promote/` herself.
    The move is how she claims the words: it is the ONE place an agent may set
    `rewritten: true`, on both sites.
 2. **Claude runs the mechanical pass**: `rewritten: true`; suite green
@@ -174,7 +178,7 @@ follow it since 2026-09-14 (food used to have no written procedure for this).
    grouped by decision. Commit, push.
 3. **Claude says `final: ‹slugs›`.** Until that word the served pages are work
    in progress and not for proofreading.
-4. **Helen proofreads the rendered page** at `/…/drafts/to-promote/‹slug›/`
+4. **Helen proofreads the rendered page** at `/…/drafts/4-promote/‹slug›/`
    and sets `proofread: true`, or names the slugs and Claude sets it on her
    word. A small thing wrong: `awaiting_fix: true` in a commit that says what;
    fixed between them; she re-reads; flag back.
@@ -198,7 +202,7 @@ in three sizes, hers to rule:
 |---|---|
 | a word or a number | **asks first.** She may grant the change WITHOUT the flip — then it lands under `HELEN_CLEARED` or a baseline move, per the constant's own comment, and she is still the last judgement because she granted it |
 | anything else | flips the flag, leaves the file in the public repo (the gate hides it), and **raises an issue labelled `blocked-on-helen`**: title `proofread: ‹slug›`, body naming what changed, why, and the local URL to re-read. She closes it by flipping the flag in a commit with `Fixes #N` |
-| something big is wrong | deletes the file from the public repo and re-adds it to the private repo's `to-promote/` with the same issue, so it goes back through §4 |
+| something big is wrong | deletes the file from the public repo and re-adds it to the private repo's `4-promote/` with the same issue, so it goes back through §4 |
 
 **The issue is the signal, and it replaces the build-log line as the thing she
 can see.** `blocked-on-helen` exists on the public repo already. One issue per
@@ -219,10 +223,12 @@ so she knows the cost is two pages and not one.
 
 Listed so the map is honest about which lines are drawn and which are paved.
 
-- [ ] Rename `to-cook/` to `to-make/` in `_food_drafts/` (a `git mv` in the
-      private repo) and create `to-make/` and `keep/` in both private repos.
-      Nothing in the public repo names the folders except one test fixture and
-      two comments, updated with this document.
+- [ ] Rename the folders in the private repos: `to-rewrite/` → `1-rewrite/`,
+      `to-cook/` → `2-make/`, `to-promote/` → `4-promote/` (a branch and a PR
+      on each private repo; `3-keep/` and drinks' `2-make/` appear on first
+      use, since git keeps no empty folder). The public repo's tests and
+      scripts name `4-promote/` since 2026-09-14, so the private PRs and the
+      public one land together.
 - [ ] `scripts/needs_helen.py`: the flip and the issue body, for §5.
 - [ ] `scripts/promote.py`: the copy, compare, delete and baseline steps of §4,
       which have been done by hand and got wrong once each.

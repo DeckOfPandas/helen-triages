@@ -3681,6 +3681,19 @@ unless stated.
   What the map does NOT yet have paved is listed in its §6 — the folder rename
   in the private repo, `promote.py`, the local `to make (N)` view — so the doc
   is honest about which lines are drawn.
+  - **Then, the same evening, the names:** *"I'd like each subfolder to
+    appear in order at the top of my files list -- small usability tweak for
+    future-Helen. So shall we try 1-rewrite, 2-make, and so on?"* So
+    `1-rewrite/`, `2-make/`, `3-keep/`, `4-promote/`, the same numbers on both
+    sites with drinks simply lacking the first. `tests/test_cocktails.py`'s
+    `STAGED` and the tidy and inbox fixtures name the new folders; the private
+    repos' folders move on branches of their own.
+  - **And the backlog surfaced:** *"raise issue for any file currently in
+    published where proofread is false, both food and cocktails."* 21 food
+    recipes, no drinks; #1026 for the two with live pages linking to them and
+    #1027–#1045 one each for the rest, bodies naming the commit that last
+    touched each file (`tmp/raise_proofread_issues.py`, on
+    `scripts/needs_helen.py`'s helpers).
 
 ### §11.2 The record of this file being wrong
 
@@ -4427,14 +4440,33 @@ verification. Dates are when the correction landed.
   Built the same day without waiting for the picks: pdfs for drinks (the
   generator renders both collections), `?shortlist=1` on the food index, the
   caps, the related rows (the index's own rows, at her word), the portion
-  scaler. **The placements, the header and the spacing are on two candidates
+  scaler. **The placements, the header and the spacing went on two candidates
   pages** — the real drink and recipe pages with a switcher for each question
-  — **and her pick is not yet recorded; write it here when she makes it.**
-  Two findings from building them, both honest costs rather than bugs: four
-  actions on the drink page's title line squeeze the name and the meta (the
-  head is a two-track grid and the actions take the second track), and a
-  search box in the header fits the empty middle of the second row between
-  the `??` and the other-site link with no change to the shared template.
+  — **and her picks, the same evening:**
+  - **#1005: "row under the head."** The actions row sits in
+    `.cocktail-controls` beside the toggle and in a new `.recipe-controls`
+    under food's badges, closed by a hairline (MANUAL §13.13).
+  - **#1024: "back arrow's line, but on the right not in the centre."** The
+    header's empty middle was the other candidate and lost.
+  - **#1006: "half way, BUT with a little extra space between the make it
+    read it line and the rule above it."** Section headings 3rem/1.25rem, the
+    scaler and the related hairline moved by the same half step, and the
+    controls row's `-1rem` hang under the rule went to 0.
+  - **#1007: "I am genuinely unsure! Could you advise me? I am sure that all
+    three are better than what we have now."** Advised the word and the arrow,
+    no icon: the row exists because family did not read a small glass as a
+    second site, so the word is the part doing the work; the icon was the busy
+    part; and a tiny second tape under the wordmark's tape reads as a
+    mis-sized copy of it. Built that one; she will judge it live, and it is
+    one include line to change.
+  Two findings from building the candidates, both honest costs rather than
+  bugs, and both now moot: four actions on the drink page's title line
+  squeezed the name and the meta (the head was a two-track grid), and a search
+  box fitted the header's empty middle with no change to the shared template.
+  **And a fact found on the way that belongs to #1008**: `proofread: false` on
+  21 published food recipes and no drinks, none of them visible to Helen until
+  she asked for an issue each (#1027–#1045, plus #1026 for the two that other
+  pages link to).
 
 ## §14 Reference pages
 

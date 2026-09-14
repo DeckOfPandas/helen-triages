@@ -83,6 +83,17 @@
     }).length;
     Array.prototype.slice.call(document.querySelectorAll('[data-shortlist-count]'))
       .forEach(function (el) { el.textContent = String(n); });
+
+    /* THE STORE'S OWN COUNT, for a link that promises a different page --
+       "see shortlist (N)" on a recipe or drink page (#1005/#1011, 2026-09-14,
+       _includes/page-actions.html). The page-count above is #847's honest
+       number for the index's filter, which can only show this page's controls;
+       this link goes TO the index, so the honest number is everything the
+       store holds. A stale key (a renamed page) counts one too many here and
+       is the same key #847 chose to leave in the store rather than guess at. */
+    var total = String(HTF.shortlist.count());
+    Array.prototype.slice.call(document.querySelectorAll('[data-shortlist-total]'))
+      .forEach(function (el) { el.textContent = total; });
   }
 
   /* THE WHOLE PAGE, NOT THE BUTTON THAT WAS CLICKED. A row and a card are one
@@ -104,6 +115,10 @@
       // The proof that JavaScript ran. See the header.
       btn.hidden = false;
     });
+    // The see-shortlist link ships `hidden` for the same reason: its count is
+    // this script's, and a link reading "(0)" for ever is a control that lies.
+    Array.prototype.slice.call(document.querySelectorAll('.btn-see-shortlist'))
+      .forEach(function (link) { link.hidden = false; });
     paintCounts();
 
     /* ONE DELEGATED LISTENER, on the document. The food index reorders its rows

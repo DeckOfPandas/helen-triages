@@ -113,6 +113,31 @@ test('arity is the caller\'s business -- two stars both come back', () => {
   assert.deepStrictEqual(FS.parseQuery('?star=lamb,beef').star, ['lamb', 'beef']);
 });
 
+// --- the name query, #1024 -----------------------------------------------------
+// `?q=` arrives from the search box on a recipe or drink page's furniture line.
+// It is NOT a kind: it is one string, whole, and a title may carry a comma, so
+// it stays out of parseQuery's return shape (which every test above reads as
+// exactly three keys) and has a reader of its own.
+
+test('parseName reads ?q= whole, with the same decoding as the kinds', () => {
+  assert.strictEqual(FS.parseName('?q=negroni'), 'negroni');
+  assert.strictEqual(FS.parseName('?q=pear%2C+apricot+and+rosemary'),
+    'pear, apricot and rosemary');
+  assert.strictEqual(FS.parseName('?tag=soup&q=lemon+curd'), 'lemon curd');
+});
+
+test('parseName is empty when there is no q, an empty q, or no search at all', () => {
+  assert.strictEqual(FS.parseName(''), '');
+  assert.strictEqual(FS.parseName(undefined), '');
+  assert.strictEqual(FS.parseName('?q='), '');
+  assert.strictEqual(FS.parseName('?q=+'), '');
+  assert.strictEqual(FS.parseName('?tag=soup'), '');
+});
+
+test('parseName does not leak into parseQuery', () => {
+  assert.deepStrictEqual(FS.parseQuery('?q=negroni'), { star: [], tag: [], mood: [] });
+});
+
 test('KINDS is exported so filters.js and the tests agree on what exists', () => {
   assert.deepStrictEqual(FS.KINDS, ['star', 'tag', 'mood']);
 });

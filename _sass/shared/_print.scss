@@ -116,6 +116,14 @@
     display: none;
   }
 
+  // THE PAGE FURNITURE, #1005/#1024: the back arrow's line (the arrow and the
+  // search box) and the actions row. All of it is a way of getting somewhere
+  // else or doing something to the screen; none of it is the recipe.
+  .page-furniture,
+  .page-actions {
+    display: none;
+  }
+
   // <main>'s padding holds the content off the window edge; @page's margin
   // above does that job on paper, and keeping both would inset the text by
   // roughly 30mm a side. The width cap goes for the same reason — the sheet

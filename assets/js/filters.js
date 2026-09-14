@@ -1710,6 +1710,20 @@ function renderResultsPool() {
     restored = null;
   }
 
+  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box on
+     a recipe page's furniture line. Exactly what typing into the name box does
+     (its `input` handler above): the box shows the text, the query is folded
+     the same way, and the list is reordered by title tier. Applied after the
+     memory and the shuffle, because a name you just typed is a fresh
+     instruction, and the remembered scroll goes with the remembered list. */
+  var arrivedName = FilterState.parseName(location.search);
+  if (arrivedName && nameSearchBox) {
+    nameSearchBox.value = arrivedName;
+    state.nameQuery = HTF.ingredientSearch.fold(arrivedName.toLowerCase());
+    reorderForTitleSearch();
+    restored = null;
+  }
+
   update(!!restored);          // preserve the restored page number
   if (recipeList) recipeList.style.visibility = 'visible';
 

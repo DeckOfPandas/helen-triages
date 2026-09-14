@@ -252,14 +252,14 @@ def test_the_same_title_with_a_different_formula_is_the_sazerac_case(drafts):
 
 
 def test_a_draft_in_a_staging_subfolder_still_counts(drafts):
-    """`rglob`, not `glob`. `_food_drafts/` has `to-make/` and friends under it
+    """`rglob`, not `glob`. `_food_drafts/` has `2-make/` and friends under it
     (`to-cook/` until 2026-09-14, PIPELINE.md §3), and food's own loader
     silently stopped seeing seven files -- the seven closest to promotion --
     the day that pipeline appeared (MANUAL §4).
     """
-    (drafts / "to-make").mkdir()
+    (drafts / "2-make").mkdir()
     inbox.write(_plan("valid_food", "food", drafts))
-    (drafts / "to-make" / "crispy-sage-butter-gnocchi.md").write_text(
+    (drafts / "2-make" / "crispy-sage-butter-gnocchi.md").write_text(
         (drafts / "crispy-sage-butter-gnocchi.md").read_text(encoding="utf-8"),
         encoding="utf-8")
     (drafts / "crispy-sage-butter-gnocchi.md").unlink()

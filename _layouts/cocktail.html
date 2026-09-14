@@ -214,50 +214,16 @@ layout: default
           </span>
         </div>
 
-        {% comment %} THE READ-IT / MAKE-IT TOGGLE LEFT THIS ROW ON 2026-09-10
-           (#897) and is in `.cocktail-controls` below the title block. The
-           toggle sat here on the title's line from 2026-09-02; Helen: "move
-           read it / make it toggle to the top right of the page main content,
-           just under the section divider that sits between the metadata
-           section and ingredients."
-
-           THE SHORTLIST BUTTON CAME BACK ON 2026-09-11 -- #963, Helen: "move
-           the shortlist up to the top right, aligned with the horizontal
-           centre of the first line of the cocktail name." It is the row's
-           second item, which above 600px puts it in the head grid's trailing
-           track: the row is `display: contents` there, so this button and the
-           name are placed straight onto `.cocktail-head-words`, and the meta
-           below ends where the name's track does (#979). On a phone the row is
-           a real flex box again and `space-between` is what throws the `+` to
-           the right. The alignment with the first line is built in
-           _cocktail.scss (`.cocktail-title-row .btn-shortlist`).
-
-           `page.url`, NOT `relative_url` -- the same key this drink's own
-           index card emits, which is what makes the card and this page agree
-           about whether it is shortlisted. See HTF.shortlist in
-           assets/js/assets.js. `hidden` until shortlist.js reveals it, the
-           rule every JS-dependent control on both sites follows.
-
-           IT HAD A SEE-ALL LINK UNDER IT BRIEFLY -- #994 added it on 2026-09-12
-           and #1000 removed it on 2026-09-14: "remove 'see all'
-           button from below shortlist button on cocktail page." So the button
-           is the row's second item again, on its own, and the wrapper, the
-           `row-reverse` that put its `+` on the right to line the two marks up,
-           and the link itself are all gone.
-
-           WHAT IS NOT GONE IS `?shortlist=1` on the index (MANUAL 8.9). No page
-           links to it now, and it is kept deliberately under #651's rule -- a
-           thing nothing reads is only safe while a comment says why: it is a
-           real, reachable, tested way into the shortlist view, the problem #994
-           was raised about ("it's hard to figure out how to see your shortlist")
-           has not been declared solved, and it is the plumbing any future answer
-           would want. Delete it if that answer turns out to be something else.
-        {% endcomment %}
-        <button type="button"
-                class="btn-shortlist"
-                data-shortlist-key="{{ page.url }}"
-                aria-pressed="false"
-                hidden>shortlist</button>
+        {% comment %} THE NAME IS ALONE ON THIS LINE SINCE 2026-09-14 (#1005).
+           The read it / make it toggle sat here from 2026-09-02 to 2026-09-10
+           (#897), and the shortlist button from 2026-09-11 (#963) -- its
+           fourth home in ten days, which is the fact #1005 was raised on: no
+           rule said where actions live. Helen's pick from the candidates
+           page, "row under the head": every action is in
+           _includes/page-actions.html, beside the toggle in
+           `.cocktail-controls` below, and the same include sits in the same
+           place on a recipe page. `?shortlist=1` on the index (MANUAL 8.9)
+           has a caller again -- the see-shortlist link in that row. {% endcomment %}
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
@@ -444,6 +410,13 @@ layout: default
       </button>
       <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
     </div>
+    {% comment %} THE ACTIONS, AT THE ROW'S RIGHT END -- #1005 / #1011,
+       2026-09-14. shortlist, see shortlist (N), print, pdf: one include, the
+       same on a recipe page. Print and pdf are new to this page; the print
+       stylesheet (_sass/cocktails/_print.scss) already forces the full
+       editorial page whatever the toggle says, and scripts/generate_pdfs.py
+       renders a drink's pdf beside its page as it does a recipe's. {% endcomment %}
+    {% include page-actions.html %}
   </div>
 
   {% comment %} The ingredient list is FULL, not triaged the way food's
@@ -1503,6 +1476,9 @@ layout: default
    default.html: the arrow is page furniture rather than site chrome, so a page
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
+{% comment %} The print button's reveal and wiring (#1005; food's #86). Site-
+   agnostic: it queries `.btn-print` and does nothing on a page with none. {% endcomment %}
+<script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
 {% comment %} THE SCALER, IN DEPENDENCY ORDER AND FOR A REASON — issue #545.
    shopping-list.js is the AMOUNT PARSER (`HTF.shoppingList.parseAmount`, its

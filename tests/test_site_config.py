@@ -2029,21 +2029,30 @@ def test_pdf_link_points_where_the_pdfs_are_written():
     # "/food/recipes/:path/" -> "/food/recipes/"
     expected = permalink.split(":")[0]
 
-    layout = read("_layouts", "recipe.html")
-    link = re.search(r"\{\{\s*'([^']+)'\s*\|\s*append:\s*page\.slug\s*\|\s*append:\s*'\.pdf'", layout)
-    assert link, (
-        "_layouts/recipe.html no longer builds the PDF link as "
-        "`'<dir>' | append: page.slug | append: '.pdf'`. If the link is built "
-        "another way now, this check needs to follow it -- it is the only "
-        "thing tying the link to where the files are written."
+    # THE LINK IS BUILT FROM `page.url` SINCE #1005 (2026-09-14), in
+    # _includes/page-actions.html, which both page layouts include: the page's
+    # own URL with its trailing slash swapped for `.pdf`. That is where the
+    # script writes each file -- beside the page's output directory -- for
+    # whatever permalink a collection has, so the link cannot point at a
+    # different directory from the page it is on. What is left to check is
+    # that the include still builds it that way, and that the script renders
+    # every collection whose pages carry the include (below).
+    include = read("_includes", "page-actions.html")
+    assert re.search(
+        r"page\.url\s*\|\s*append:\s*'\.pdf'\s*\|\s*replace:\s*'/\.pdf',\s*'\.pdf'",
+        include,
+    ), (
+        "_includes/page-actions.html no longer builds the PDF link from "
+        "page.url (`page.url | append: '.pdf' | replace: '/.pdf', '.pdf'`). "
+        "If it is built another way now, this check needs to follow it -- it "
+        "is the only thing tying the link to where the files are written."
     )
-    assert link.group(1) == expected, (
-        f"The PDF link points at {link.group(1)!r} but recipe pages are "
-        f"published under {expected!r} (from _config.yml's permalink), which "
-        f"is where scripts/generate_pdfs.py writes each PDF -- it puts "
-        f"<slug>.pdf beside the recipe's own output directory. One of the two "
-        f"has moved and the other has not."
-    )
+    for layout_name in ("recipe.html", "cocktail.html"):
+        assert "page-actions.html" in read("_layouts", layout_name), (
+            f"_layouts/{layout_name} no longer includes page-actions.html, so "
+            f"its pages have no pdf link -- or have one built somewhere this "
+            f"test does not read."
+        )
 
     # BOTH COLLECTIONS SINCE #1005 (2026-09-14): the script walks one tuple of
     # directories and this reads that tuple rather than a literal glob, so a

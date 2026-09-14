@@ -137,7 +137,11 @@ function boot(options) {
   json('recipe-aisles', AISLES);
   json('recipe-ingredients', recipes);
 
-  doc.body.appendChild(el('div', 'controls'));
+  // The name box, so `?q=` (#1024) has somewhere to land; the input handler
+  // is not exercised here, only the query's arrival.
+  const controls = el('div', 'controls');
+  controls.appendChild(el('input', '', { id: 'name-search-box', type: 'text' }));
+  doc.body.appendChild(controls);
 
   const list = el('ul', 'recipe-list');
   Object.keys(recipes).forEach((url) => {
@@ -623,6 +627,21 @@ test('#1011: a shortlisted recipe is what the link shows', () => {
   assert.deepStrictEqual(
     visibleRows(list).map((li) => li.getAttribute('data-url')),
     ['/food/recipes/a/']);
+});
+
+// --- arriving with a name, #1024 -----------------------------------------------
+
+test('#1024: ?q= fills the name box and narrows the list', () => {
+  const { doc, list } = boot({ search: '?q=beetroot' });
+  assert.strictEqual(doc.getElementById('name-search-box').value, 'beetroot',
+    'the box should show what the reader typed on the page they came from.');
+  // THE REORDER, NOT THE VISIBLE SET. reorderForTitleSearch() runs before the
+  // highlight and puts the tier-1 match first; the highlight then rewrites
+  // the title through innerHTML, which this stub CLEARS rather than parses
+  // (dom-stub.js), so the row's title reads as '' to the filter here and
+  // nowhere else. The order is what proves the query reached the script.
+  assert.strictEqual(list.children[0].getAttribute('data-url'), '/food/recipes/b/',
+    'the query must reach reorderForTitleSearch(), not only the box.');
 });
 
 // --- the list of scripts is the template's list --------------------------------

@@ -1,0 +1,47 @@
+{% comment %} ── THE ACTIONS ROW: the same four controls, in the same order, on
+  both sites -- #1005 and #1011, 2026-09-14. Helen's ruling on the feature
+  set: "back, shortlist, see shortlist (N), print, pdf on both", and her pick
+  from the candidates pages for where they live: "row under the head". A
+  recipe page puts this include in `.recipe-controls` under its badges; a
+  drink page puts it in `.cocktail-controls` beside the read it / make it
+  toggle, under the head's rule. One include, so the order and the markup
+  cannot drift between the two -- the reason the shortlist button alone had
+  moved four times in ten days was that nothing defined where actions live.
+
+  EVERY CONTROL THAT NEEDS JAVASCRIPT SHIPS `hidden` and is revealed by the
+  script that makes it work: the shortlist button and the see-shortlist link
+  by shortlist.js, the print button by print-link.js. The pdf link is a plain
+  anchor to a real file and needs nothing. The rule is _layouts/recipe.html's
+  own: a control that silently fails is worse than no control.
+
+  `page.url`, NOT `relative_url`, on the shortlist key -- the same key the
+  index row or card for this page emits, which is what makes the two agree.
+
+  THE COUNT ON "SEE SHORTLIST" IS THE STORE'S, not this page's. shortlist.js
+  paints `[data-shortlist-count]` with how many controls ON THIS PAGE are
+  marked (#847's rule for the index filter, where that is the honest number);
+  this link promises a different page, so it carries `data-shortlist-total`
+  and gets `HTF.shortlist.count()`. The link is `?shortlist=1` on this site's
+  index, which enters the shortlist view (MANUAL 8.9; food's half since #1011).
+
+  THE PDF PATH IS THE PAGE'S OWN URL WITH THE TRAILING SLASH SWAPPED FOR
+  `.pdf`, which is exactly where scripts/generate_pdfs.py writes it -- beside
+  the page's output directory -- for both collections. Gated on
+  `site.pdf_downloads`, which _config_local.yml turns off because nothing
+  renders the files there (issue #86's finding: a link in the view you work
+  in all day would be a permanent 404). {% endcomment %}
+{% assign actions_site = site.data.sites[page.site_key] %}
+<div class="page-actions">
+  <button type="button"
+          class="btn-shortlist"
+          data-shortlist-key="{{ page.url }}"
+          aria-pressed="false"
+          hidden>shortlist</button>
+  <a class="btn-see-shortlist"
+     href="{{ actions_site.home | relative_url }}?shortlist=1"
+     hidden>see shortlist (<span data-shortlist-total>0</span>)</a>
+  <button type="button" class="btn-print" hidden>print</button>
+  {% if site.pdf_downloads %}
+    <a class="btn-pdf" href="{{ page.url | append: '.pdf' | replace: '/.pdf', '.pdf' | relative_url }}">pdf</a>
+  {% endif %}
+</div>

@@ -4,7 +4,9 @@ Written 2026-09-04, on the day the first sixteen drinks went through it, for
 Helen to check and for the next session to follow. It is short on purpose.
 **Since 2026-09-14 (#1008) the same six steps carry a FOOD recipe too, and
 `model_instructions/PIPELINE.md` §4 is the map both sites follow; this file
-keeps the detail and the history of each step.**
+keeps the detail and the history of each step. The staging folder is
+`4-promote/` since the same day — every `to-promote/` below is that folder
+under the name it had when the step was written.**
 **MANUAL §9.1.1 has the gate's mechanics and §4.0 says what the flags MEAN;
 `.claude/commands/ingest.md` is how a drink gets INTO the drafts and where the
 mechanical/non-mechanical boundary is stated in full.** This is the procedure

@@ -218,8 +218,18 @@
       {% assign nav_site = entry[1] %}
       {% if entry[0] != page.site_key or page.site_neutral %}
       <a href="{{ nav_site.home | relative_url }}" class="site-nav-icon-link" aria-label="{{ nav_site.title }}">
-        {% assign nav_icon_file = "icons/" | append: nav_site.icon | append: ".svg" %}
-        {% include {{ nav_icon_file }} %}
+        {% comment %} NO ICON SINCE 2026-09-14 -- #1007, Helen: "navbar button
+           for other site is too large and busy". The site's icon
+           (`nav_site.icon`, _includes/icons/) stood here beside the word from
+           2026-09-10; shown three alternatives on the real header -- the word
+           and the arrow, the icon and the arrow, the word on a tiny tape --
+           she asked for a recommendation and took the word: it is the part
+           that did the work (the row exists because family did not read a
+           small glass as a second site), the icon was the busy part, and a
+           second tape under the wordmark's tape read as a mis-sized copy of
+           it. The key and the artwork stay in sites.yml and _includes/icons/;
+           the class rules stay in shared/_layout.scss and shared/_chrome.scss,
+           so putting it back is this one include line. {% endcomment %}
         <span class="site-nav-word">[ {{ nav_site.word }} ]</span>
         {% comment %} A DRAWN ARROW, NOT `&rarr;` -- #993, 2026-09-12. Helen:
            "the go to the other site mark should have its centre horizontally
