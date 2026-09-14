@@ -191,6 +191,52 @@ main {
 // brackets -- at a size that reads as a row under the tape rather than a
 // second tape. `letter-spacing` is set explicitly on both because .site-header
 // carries 0.5em for the wordmark and everything in it inherits that.
+// THE LETTERING SITS ON THE MARKS' LINE, 2026-09-14, and the last 1px of #993.
+// With the arrow drawn (below) the icon and the arrow agree exactly, because
+// `align-items: center` centres their BOXES and both have their ink centred in
+// their own viewBox. Type does not: all-caps ink runs from the baseline up to
+// the cap line, while the line box keeps the descender depth underneath it, so
+// the ink's centre sits ABOVE the box's centre and the word floated over the
+// row it was supposedly centred in.
+//
+// 0.1em IS MEASURED, NOT CHOSEN, and measuring is the only honest way to get
+// it: the correction is (line box centre - ink centre), which needs Courier
+// Prime's real ascent, descent and cap height, and the face ships here as woff2
+// only -- the same wall _sass/cocktails/_cards.scss hit compensating for the
+// tape band on the text, which it escaped by correcting the ARTWORK instead.
+// There is no artwork to correct here.
+//
+// MEASURE IT IN ONE IMAGE, NOT TWO. Crop the whole LINK and compare the ink
+// bands inside that single crop. An element screenshot pads its box by about a
+// pixel, so measuring the word in its own crop and the icon in its own and
+// subtracting the two page positions is wrong by that padding -- which at this
+// size is most of the answer. Doing exactly that produced a first version of
+// this rule at 0.082em, and the word was still visibly high.
+//
+// THE NUMBERS. In one crop of `.site-nav-icon-link` at 1280px and
+// deviceScaleFactor 2, the ink bands read glass 25.5, `[` 22.5, caps 22.0,
+// `]` 22.5, arrow 25.5: the word sat 3 device pixels -- 1.5 CSS px -- above the
+// two marks. 0.082em moved it 2 device pixels and left it 1 above; 0.117em
+// moved it 3 and left it 1 BELOW; and 0.1em paints identically to 0.117em.
+// So the true correction is 2.5 device pixels, 1.25 CSS px, 0.0977em, and the
+// raster can only land on 2 or 3. 0.1em is that value to two places and rounds
+// the way that costs half a device pixel at DPR 2 -- below anything a display
+// can show, and the nearest either side is worse.
+//
+// THE BRACKETS ARE WHAT IS ALIGNED, not the capitals: `[ COCKTAILS ]` is one
+// object and the brackets bound it, so the object's ink centre is theirs. The
+// capitals sit half a device pixel above that, which is the object being
+// centred rather than its tallest part.
+//
+// IN `em`, SO IT TRACKS THE SIZE. The offset is a fact about the FACE, not
+// about this font-size, and it scales with the type the way the tape's padding
+// does. To re-measure after any change to the face or the size:
+// `sh scripts/browser/crop.sh /food/ ".site-nav-icon-link" nav` then
+// `python3 tmp/inkbox.py tmp/shots/crop-nav.png 6`.
+//
+// `position: relative` MOVES NOTHING ELSE. The row's height and every other
+// item's place are unchanged, which is what makes this safe to carry: it is a
+// correction to what is drawn, not to the layout.
 .site-nav-word {
   margin-left: 0.55rem;
   font-family: $font-headings;
@@ -199,6 +245,8 @@ main {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
+  position: relative;
+  top: 0.1em;
 }
 
 // THE ARROW IS DRAWN, NOT SET -- #993, 2026-09-12. It was `&rarr;` in
