@@ -1616,9 +1616,18 @@
     if (changed) syncMoodButtons();
   })();
 
-  /* ARRIVING FROM A DRINK PAGE'S SEE-ALL LINK -- `?shortlist=1`, #994,
-     2026-09-12. Helen: "Currently it's hard to figure out how to see your
-     shortlist once you've added something to it from the separate page."
+  /* ARRIVING AT THE SHORTLIST BY URL -- `?shortlist=1`, #994, 2026-09-12.
+     Helen: "Currently it's hard to figure out how to see your shortlist once
+     you've added something to it from the separate page."
+
+     NOTHING ON THE SITE LINKS TO IT TODAY, AND IT STAYS ANYWAY. The drink
+     page's see-all link was this query's one caller and #1000 removed it on
+     2026-09-14. This is kept under #651's rule -- a thing nothing
+     reads is only safe while a comment says why it is kept -- and the reasons
+     are that the URL works, is tested, and is the plumbing any future answer
+     to that issue would want; the issue itself was never declared solved. If
+     the answer turns out to be something else, delete this with its tests
+     rather than leaving both.
 
      IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
      `enterShortlistView()` plus `resetControls()` is exactly what pressing
