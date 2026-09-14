@@ -490,10 +490,6 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: medium
-  "Giffard Menthe Pastille":
-    size_ml: 700
-    gbp: 19
-    confidence: medium
   "Briottet Crème de Pêche":
     size_ml: 700
     gbp: 18

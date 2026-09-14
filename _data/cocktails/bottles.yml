@@ -829,15 +829,16 @@ bottles:
     generic: "triple sec"
     aliases: ["L'Original Combier Triple Sec Liqueur", "Combier Triple Sec",
               "Combier"]
+  # RESTORED 2026-09-14, having been deleted alongside "Giffard Menthe
+  # Pastille" on Helen's "delete Giffard from our dictionary (I really don't
+  # like it)". This is the ONLY declared bottle under `crème de mûre`, so
+  # deleting it left the generic with no bottles, no `generics:` row and no
+  # `default_bottles:` entry -- zeroing the cost/ABV of every drink that pours
+  # it unnamed, including the published dons-own-grog. Kept until she says
+  # she wants that generic re-bottled to something else, not just Giffard gone.
   "Giffard Crème de Mûre":
     generic: "crème de mûre"
     aliases: ["Giffard Creme de Mure"]
-  # Helen named this one directly, replacing #984's Monte Carlo with her own
-  # recipe -- the exception to "never declare a bottle from the ingredient
-  # beside it": a bottle SHE names is hers to add.
-  "Giffard Menthe Pastille":
-    generic: "crème de menthe"
-    aliases: []
   "Fernet Branca":
     generic: "fernet"
     aliases: ["Fernet Branca liqueur", "Fernet-Branca"]
