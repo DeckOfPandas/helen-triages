@@ -49,7 +49,20 @@
   // between universe section and cocktail filters." The drink page's head
   // already ends on this exact line (`.cocktail-title-block`), so the offer
   // closes the way a drink's head does and the filters start under it.
-  padding-bottom: $space-md;
+  //
+  // $space-xl SINCE 2026-09-14 -- #998, Helen: "add a small amount of space
+  // between universe and the horizontal rule so the top of the page feels less
+  // cramped." It was $space-md, which put the rule 12px under the name tape
+  // (measured: tape bottom 272.3, rule top 284.3) -- close enough to read as
+  // underlining the tape rather than closing the row.
+  //
+  // IT STILL SITS NEARER THE OFFER THAN THE FILTERS, which is the thing not to
+  // break: the rule belongs to the universe line. The clearance BELOW it is not
+  // this element's margin alone -- `$index-section-gap` (1rem) plus the filter
+  // panel's own `padding-top` plus the first section's top margin is about 37px
+  // -- so 24px above keeps the rule on the offer's side of the gap. 1rem was
+  // built and looked at first and barely moved it.
+  padding-bottom: $space-xl;
   border-bottom: 2px solid $color-electric-absinthe;
 }
 

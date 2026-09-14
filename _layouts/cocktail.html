@@ -161,10 +161,10 @@ layout: default
 
   {% comment %} WHERE THE INDEX IS, FROM _data/sites.yml VIA `page.site_key`,
      never a literal `/cocktails/` -- the same lookup _includes/back-to-index.html
-     makes for the journey in the other direction, so a drink page's back arrow,
-     its see-all link (#994) and its mood chips can never disagree about it.
-     Assigned here rather than beside the chips because the title row below now
-     reads it first. {% endcomment %}
+     makes for the journey in the other direction, so a drink page's back arrow
+     and its two rows of mood chips can never disagree about it. Assigned up
+     here rather than beside the chips since #994; that issue's link, which read
+     it first, is gone (#1000) and the chips are its two readers again. {% endcomment %}
   {% assign index_home = site.data.sites[page.site_key].home %}
 
   {% comment %} TWO STATES, ONE PAGE. The toggle adds `is-making` to the
@@ -238,58 +238,26 @@ layout: default
            assets/js/assets.js. `hidden` until shortlist.js reveals it, the
            rule every JS-dependent control on both sites follows.
 
-           AND IT GAINED A SECOND CONTROL UNDER IT ON 2026-09-12 -- #994, Helen:
-           "Currently it's hard to figure out how to see your shortlist once
-           you've added something to it from the separate page. Add a mark to
-           the line below. On desktop and ipad: SHORTLIST + / SEE ALL ->. On
-           mobile, this needs to be a simple icon not a word. Not sure what.
-           Maybe a right arrow? Mobile: + / ->"
+           IT HAD A SEE-ALL LINK UNDER IT BRIEFLY -- #994 added it on 2026-09-12
+           and #1000 removed it on 2026-09-14: "remove 'see all'
+           button from below shortlist button on cocktail page." So the button
+           is the row's second item again, on its own, and the wrapper, the
+           `row-reverse` that put its `+` on the right to line the two marks up,
+           and the link itself are all gone.
 
-           SO THE TWO ARE ONE OBJECT NOW, a column at the row's right end. The
-           wrapper is what the head grid places in its trailing track and what
-           carries the alignment with the title's first line (#963's rule moved
-           onto it, unchanged in kind); the button and the link stack inside it.
-           Without the wrapper the link would be a third grid item and land
-           under the NAME, in track one.
+           WHAT IS NOT GONE IS `?shortlist=1` on the index (MANUAL 8.9). No page
+           links to it now, and it is kept deliberately under #651's rule -- a
+           thing nothing reads is only safe while a comment says why: it is a
+           real, reachable, tested way into the shortlist view, the problem #994
+           was raised about ("it's hard to figure out how to see your shortlist")
+           has not been declared solved, and it is the plumbing any future answer
+           would want. Delete it if that answer turns out to be something else.
         {% endcomment %}
-        <div class="cocktail-shortlist-controls">
-          <button type="button"
-                  class="btn-shortlist"
-                  data-shortlist-key="{{ page.url }}"
-                  aria-pressed="false"
-                  hidden>shortlist</button>
-          {% comment %} A LINK, NOT A BUTTON, and for the reason the mood chips
-             below are links: an `<a>` with a real href is what makes
-             middle-click, open-in-new-tab, copy-link-address and "where does
-             this go" on hover all work, where a button plus `location.href`
-             breaks every one of them. It also means the control works with no
-             JavaScript, so unlike the shortlist button beside it, it is not
-             `hidden` -- the shortlist VIEW on the index is JS, but a link to
-             the index is a link to the index.
-
-             `?shortlist=1` IS READ BY assets/js/cocktail-index.js, which calls
-             the same `enterShortlistView()` the `shortlisted (N)` button calls,
-             so arriving this way and pressing that button land in exactly one
-             state. It is a VIEW and not a facet (#918, MANUAL 8.9), which is
-             why it clears the restored list rather than narrowing it.
-
-             `index_home` COMES FROM _data/sites.yml VIA `page.site_key`, not
-             from a literal `/cocktails/` -- the same lookup the mood chips make
-             below (they read this same variable) and the same one
-             _includes/back-to-index.html makes for the journey in the other
-             direction, so nothing on this page can disagree about where the
-             index is.
-
-             THE ARROW IS THE HEADER'S OWN MARK, _includes/icons/arrow-right.svg
-             (#993), passed a class of its own. It is drawn rather than set for
-             the reason that file's caller in _layouts/default.html gives: an
-             arrow typed as `&rarr;` is whatever face the reader's machine
-             substitutes, and its ink then sits wherever that face puts it. {% endcomment %}
-          <a class="btn-see-shortlist" href="{{ index_home | relative_url }}?shortlist=1">
-            <span class="btn-see-shortlist-word">see all</span>
-            {% include icons/arrow-right.svg class="btn-see-shortlist-arrow" %}
-          </a>
-        </div>
+        <button type="button"
+                class="btn-shortlist"
+                data-shortlist-key="{{ page.url }}"
+                aria-pressed="false"
+                hidden>shortlist</button>
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
@@ -822,10 +790,17 @@ layout: default
        the question #545 says the scaler exists to answer: "not poisoning my
        friends".
 
-       LOCAL ONLY, gated on the same two keys as the lines it derives from —
-       `show_costs` and `show_units` are declared in _config_local.yml and
-       nowhere else, so this cannot reach production (MANUAL §1). It renders
-       whichever halves are switched on.
+       IT REACHES PRODUCTION SINCE 2026-09-14, AND ONLY ITS UNITS HALF DOES.
+       This used to be gated on `show_costs or show_units`, both declared in
+       _config_local.yml and nowhere else, so the element could not exist in a
+       production build at all. #1001 put the units line on the live site, so
+       the gate now asks the same question the two lines themselves ask: is
+       there a cost line to read (`site.show_costs`, still local-only), or is
+       there a unit count (`page.units`, everywhere)? Each half is read
+       independently by cocktail-scale.js, so in production the note says the
+       batch's units and nothing about money -- which is the half that answers
+       "not poisoning my friends", and the half a reader who is not Helen has
+       any use for.
 
        `data-has-dashes` IS WHY THE BITTERS LINE IS NOT UNIVERSAL. #720.1 deleted
        the last bitters caveat for firing unconditionally — Aperol Spritz, which
@@ -836,7 +811,7 @@ layout: default
        Helen asked for the trigger (>1) and did not speak to the condition; if
        she wants it on every drink, delete the `hasDashes` check in
        cocktail-scale.js and this attribute. {% endcomment %}
-    {% if site.show_costs or site.show_units %}
+    {% if site.show_costs or page.units %}
       {% assign has_dashes = false %}
       {% for ingredient in page.ingredients %}
         {% assign amount_text = ingredient.amount | downcase %}
@@ -1106,6 +1081,86 @@ layout: default
 
   {% if content != '' %}
     <div class="cocktail-body-content">{{ content }}</div>
+  {% endif %}
+
+  {% comment %} HOW MANY UNITS — THE LAST LINE OF THE RECIPE, AND ON THE LIVE
+     SITE. #1001, Helen, 2026-09-14: "move units line to just below the notes
+     section if it's there, above if you liked this, and add to live site", and
+     then: "Not too close to the method -- don't let it demand attention."
+
+     WHERE IT WAS: in the footer under the source and cost lines, which is where
+     she put it on 2026-09-06 ("Only in the bottom section with source and cost,
+     so the line below those"). That footer is about the PAGE -- where the recipe
+     came from, what it costs to stock. This is a fact about the DRINK, and it
+     now ends the drink the way the ingredients and the method begin it. Above
+     the related section, so the page still closes on three other drinks and
+     then its source line.
+
+     "NOT TOO CLOSE TO THE METHOD" IS THE MARGIN, and it is the whole of what the
+     stylesheet does differently here: $spacing-section-gap above it, the page's
+     own "below a section" token, so on a drink with no notes and no To serve --
+     where this lands directly under the last method step -- it reads as a
+     separate quiet remark rather than a sixth step. The type is unchanged and
+     deliberately so: same size and same muted colour as the source line, which
+     is the register "don't let it demand attention" asks for.
+
+     THE GATE IS GONE, and that is the "add to live site" half. It was
+     `site.show_units`, declared in _config_local.yml and nowhere else, so
+     production rendered nothing. Helen's 2026-09-06 reason for that gate is
+     still written beside the key: eleven `qq:` rows in _data/cocktails/abv.yml
+     are strengths nobody could settle without the bottle on her shelf, and
+     "publishing a unit count built partly on those is a different promise from
+     publishing a rough price, and it is hers to make once they are cleared."
+     They are not cleared; this is her making the call anyway, which is hers to
+     make. The key itself is retired in _config_local.yml.
+
+     `page.units` STILL GUARDS IT. A drink whose ingredients carry no alcohol at
+     all gets no line rather than a confident zero.
+  {% endcomment %}
+  {% comment %} IT IS UNITS, NOT THE DRINK'S ABV, and Helen drew that line
+     herself: "I want the number of units in a drink, not the ABV of the drink,
+     i.e. water etc don't matter." The ABV of a finished drink needs the dilution
+     modelled and nothing records it; the units do not care.
+
+     `units.exact` MEANS EVERY ALCOHOLIC POUR NAMED ITS BOTTLE. Where a pour
+     named only a category the strength is derived from Helen's
+     `default_bottles` ruling, or the mean of that category's bottles. Note that
+     a vague 0% ingredient does NOT spoil exactness: a Collins topped with soda
+     water is still exact, because soda water is 0% however loosely it is
+     described.
+
+     NOTHING RENDERS `units.exact` ANY MORE, AND THAT IS DELIBERATE — #651's
+     rule, that a value nothing reads is only safe while a comment says why it
+     is kept. It used to gate the word "About" on this line. Helen's wording of
+     2026-09-06 says "Roughly" on EVERY drink, exact or not, which reads the
+     honest way round: a unit count is an estimate even when the ABV is exact,
+     because how accurately a drink is poured is not something the data knows.
+     Asked whether to retire `units.exact` with the word, she kept it. It stays
+     a true and computed fact about a drink, and the obvious consumers are a
+     future reference page or an honesty indicator; do not delete it because
+     grep says nothing reads it.
+
+     THE WORDING IS HELEN'S OWN, given 2026-09-06 for #713 and #753: "Roughly X
+     units of alcohol in a serving". Do not polish it, and do not let an agent
+     rewrite it into house voice. Punches keep their own tail — she was asked
+     about "a glass" to match the cost line beside it and chose to leave the
+     mismatch alone.
+
+     `data-units-per-serve` AND `data-serves` ARE READ BY cocktail-scale.js for
+     the batch note (#713), which needs the number to compute a TOTAL -- a
+     different quantity that genuinely does scale. This figure is PER SERVING
+     and must never move with the multiple box; that guarantee comes from the
+     scaler never writing to `.cocktail-units`, not from the number being
+     unreachable. If this line ever moves with the scaler, that is the bug, and
+     this is where it came from. {% endcomment %}
+  {% if page.units %}
+    <p class="cocktail-units"
+       data-units-per-serve="{{ page.units.per_serve }}"
+       data-serves="{{ page.units.serves }}">Roughly
+      <span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
+      {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
+      {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
+      {%- else %} in a serving.{% endif %}</p>
   {% endif %}
 
   {% comment %} ─────────────────────────────────────────────────────────────────
@@ -1439,68 +1494,6 @@ layout: default
        data-cost-max="{{ page.cost.max }}">Roughly <span class="cocktail-cost-figure">{% if page.cost.exact
         %}&pound;{{ page.cost.min }}{% else
         %}&pound;{{ page.cost.min }}&ndash;&pound;{{ page.cost.max }}{% endif %}</span> a glass in ingredients.</p>
-  {% endif %}
-
-  {% comment %} HOW MANY UNITS — LOCAL ONLY, AND THE LINE BELOW COST. Helen,
-     2026-09-06, asked for it exactly here: "Only in the bottom section with
-     source and cost, so the line below those." Same footer, same incidental
-     register, same `_config_local.yml`-only gate as the cost line above it —
-     `site.show_units` is declared there and nowhere else, so production
-     renders nothing. See #297.
-
-     IT IS UNITS, NOT THE DRINK'S ABV, and Helen drew that line herself:
-     "I want the number of units in a drink, not the ABV of the drink, i.e.
-     water etc don't matter." The ABV of a finished drink needs the dilution
-     modelled and nothing records it; the units do not care.
-
-     THERE ARE NO DATA ATTRIBUTES HERE AND THAT IS DELIBERATE. The cost line
-     carries `data-cost-min`/`max` so cocktail-scale.js can multiply them,
-     because a drink made at ×4 costs four times as much. This figure is PER
-     SERVING — "so scaler setting doesn't matter" — and a serving does not get
-     stronger when you make eight of them. Giving the scaler nothing to read is
-     what guarantees it cannot go stale behind the multiple box.
-
-     `units.exact` MEANS EVERY ALCOHOLIC POUR NAMED ITS BOTTLE. Where a pour
-     named only a category the strength is derived from Helen's
-     `default_bottles` ruling, or the mean of that category's bottles. Note that
-     a vague 0% ingredient does NOT spoil exactness: a Collins topped with soda
-     water is still exact, because soda water is 0% however loosely it is
-     described.
-
-     NOTHING RENDERS `units.exact` ANY MORE, AND THAT IS DELIBERATE — #651's
-     rule, that a value nothing reads is only safe while a comment says why it
-     is kept. It used to gate the word "About" on this line. Helen's wording of
-     2026-09-06 says "Roughly" on EVERY drink, exact or not, which reads the
-     honest way round: a unit count is an estimate even when the ABV is exact,
-     because how accurately a drink is poured is not something the data knows.
-     Asked whether to retire `units.exact` with the word, she kept it. It stays
-     a true and computed fact about a drink, and the obvious consumers are a
-     future reference page or an honesty indicator; do not delete it because
-     grep says nothing reads it.
-
-     THE WORDING IS HELEN'S OWN, given 2026-09-06 for #713 and #753: "Roughly X
-     units of alcohol in a serving". Do not polish it, and do not let an agent
-     rewrite it into house voice. Punches keep their own tail — she was asked
-     about "a glass" to match the cost line beside it and chose to leave the
-     mismatch alone. {% endcomment %}
-  {% comment %} `data-units-per-serve` AND `data-serves` ARE NEW, AND THE COMMENT
-     ABOVE SAYING THERE ARE DELIBERATELY NO DATA ATTRIBUTES HERE IS NOW HALF
-     WRONG — it is kept because its REASON still holds and is the thing worth
-     reading: this figure is per serving and must not move with the multiple
-     box, and giving the scaler nothing to read was one way to guarantee that.
-     The batch note (#713) needs the number to compute a TOTAL, which is a
-     different quantity that genuinely does scale, so the guarantee now comes
-     from cocktail-scale.js never writing to `.cocktail-units` rather than from
-     the number being unreachable. If a future change makes this line move with
-     the scaler, that is the bug, and this is where it came from. {% endcomment %}
-  {% if site.show_units and page.units %}
-    <p class="cocktail-units"
-       data-units-per-serve="{{ page.units.per_serve }}"
-       data-serves="{{ page.units.serves }}">Roughly
-      <span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
-      {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
-      {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
-      {%- else %} in a serving.{% endif %}</p>
   {% endif %}
 
 </article>

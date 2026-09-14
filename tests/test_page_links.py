@@ -406,14 +406,6 @@ TRUSTED_DYNAMIC = (
     # taxonomy question that tests/test_cocktails.py owns.
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood="
                r"\{\{\s*m\s*\|\s*url_encode\s*\}\}$"),
-    # The drink page's see-all link, added 2026-09-12 (#994) -- the same index,
-    # the same variable, and the same two halves: the path is checked by
-    # test_site_nav_links_resolve_to_real_pages, and `?shortlist=1` does not
-    # change which page is fetched. It is a VIEW the index's own JS switches on
-    # when it sees it (MANUAL 8.9), so with JavaScript off the link still lands
-    # on a real, working index -- which is why it is not `hidden` the way the
-    # button above it is.
-    re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?shortlist=1$"),
 )
 
 

@@ -344,96 +344,30 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   --title-line: #{$title-size * 0.86};
 }
 
-// AND SINCE 2026-09-12 IT IS A COLUMN OF TWO -- #994, Helen: "Currently it's
-// hard to figure out how to see your shortlist once you've added something to
-// it from the separate page. Add a mark to the line below."
+// ALIGNED BY CONSTRUCTION, NOT BY A MEASURED NUDGE. The button is given the
+// first line's own box: a top margin equal to the tape's padding above the
+// lettering, and a height of one line of lettering -- 1em at the tape word's
+// line-height of 1, or 1.12em once card-name-fit.js has wrapped the name
+// (`.drink-card-name--wrap`, _cards.scss). `.btn-shortlist` is already an
+// inline-flex with `align-items: center`, so its word sits on that line's
+// centre at any size. `flex-start`, NOT the row's `last baseline`, which would
+// line it up with the LAST line of a wrapped name.
 //
-// THE WRAPPER IS WHAT THE HEAD GRID PLACES, and it carries the alignment that
-// used to be on the button: the top margin above is the tape's own padding over
-// the lettering, so the first child still centres on the title's first line at
-// any size, and the second sits under it. `align-self: flex-start` reads as
-// `start` in the grid above 600px and as itself in the phone row below, which
-// is the same word doing the same job in both layouts -- and in the phone row
-// it is what overrides `align-items: last baseline`, so the pair stays at the
-// TOP right of a name that wraps to four lines.
-//
-// `align-items: flex-end` IS THE RIGHT EDGE. Both controls hang from the
-// column's right, so the `+` and the arrow line up under each other however
-// long the words beside them are -- which is the whole of the mobile ask
-// ("+" over "->"), got for free at every width.
-.cocktail-shortlist-controls {
+// IT WAS A COLUMN OF TWO BRIEFLY -- #994 put a see-all link under it on
+// 2026-09-12 and #1000 took that back on 2026-09-14. The wrapper those two
+// shared carried this alignment while it existed, and the `+` sat on the RIGHT
+// of its word (`row-reverse`) so the two marks lined up under each other. With
+// one control again, both go: the mark is back on the left, which is where it
+// is on a card, in the food twin and in every other placement of this button.
+.cocktail-title-row .btn-shortlist {
   align-self: flex-start;
   flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: $space-xs;
   margin-top: calc(var(--title-line) * #{$title-tape-pad-ratio});
-}
-
-// ALIGNED BY CONSTRUCTION, NOT BY A MEASURED NUDGE: one line of lettering as
-// its height -- 1em at the tape word's line-height of 1, or 1.12em once
-// card-name-fit.js has wrapped the name (`.drink-card-name--wrap`,
-// _cards.scss). `.btn-shortlist` is already an inline-flex with
-// `align-items: center`, so its word sits on that line's centre at any size.
-//
-// THE MARK IS ON THE RIGHT HERE, AND ONLY HERE -- #994, where Helen drew the
-// pair she wanted: "SHORTLIST +" over "SEE ALL ->". Both marks then hang from
-// the column's right edge and sit under each other, which is what makes the
-// two controls read as one object rather than as two rows that happen to end
-// together -- and it is the same pair the phone shows with the words hidden.
-//
-// `row-reverse` RATHER THAN A SECOND `::after`. The mark is `.btn-shortlist`'s
-// own `::before`, and it is that pseudo-element whose CONTENT changes to a tick
-// when the drink is saved (_shortlist.scss). Reversing the flex row moves the
-// box it already draws; giving this placement an `::after` would be a second
-// mark to keep in step with that rule, for the same picture.
-.cocktail-title-row .btn-shortlist {
   height: var(--title-line);
-  flex-direction: row-reverse;
-
-  &::before {
-    margin-right: 0;
-    margin-left: 0.25em;
-  }
 }
 
 .cocktail-title-row:has(.drink-card-name--wrap) .btn-shortlist {
   height: calc(var(--title-line) * 1.12);
-}
-
-// THE SECOND CONTROL: the same face, size and colours as the button above it,
-// because they are one object in two rows and not two designs that share an
-// edge -- exactly the argument `.btn-shortlist` itself makes for matching
-// `.cocktail-toggle-label`. Magenta on hover is what this site means by "you
-// can touch this" (§9.13), and it is a link, so it gets it for free from
-// nothing else.
-//
-// THE ARROW INHERITS ITS COLOUR (`stroke: currentColor` in the include), so the
-// word and the mark change together with no second rule and no second value.
-.btn-see-shortlist {
-  @extend %cocktail-heading-face;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  color: $color-clear-text;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.12s ease-in-out;
-
-  &:hover,
-  &:focus-visible { color: $color-wicked-woowoo; }
-}
-
-// Sized by width, height from the viewBox, as in the header row -- see
-// `.site-nav-arrow` in shared/_layout.scss for why this mark is drawn at all.
-.btn-see-shortlist-arrow {
-  flex: none;
-  display: block;
-  width: 0.62rem;
-  height: auto;
 }
 
 @media (max-width: 600px) {
@@ -2161,10 +2095,23 @@ $amount-gap-wide: 1.25rem;
   }
 }
 
-// THE UNIT COUNT, SITTING UNDER THE COST LINE (#297). Helen put it there:
-// "Only in the bottom section with source and cost, so the line below those."
-// Same incidental register as its two neighbours -- if this one announced
-// itself the footer would stop being a footer.
+// THE UNIT COUNT, ENDING THE RECIPE (#297, moved by #1001 on 2026-09-14).
+// It sat in the footer under the cost line from 2026-09-06 -- Helen: "Only in
+// the bottom section with source and cost, so the line below those" -- and she
+// moved it: "move units line to just below the notes section if it's there,
+// above if you liked this."
+//
+// THE TOP MARGIN IS THE WHOLE OF "NOT TOO CLOSE TO THE METHOD", her second
+// sentence on that issue, and $spacing-section-gap is the page's own "below a
+// section" token rather than a number picked for this line. It earns its keep
+// on the drinks with no notes and no To serve, where this lands directly under
+// the last method step: at the section gap it reads as a separate remark, and
+// at the $space-xxs it used to carry in the footer it would read as a sixth
+// step in a smaller face.
+//
+// THE TYPE DOES NOT CHANGE, and that is the other half of the ask -- "don't let
+// it demand attention". Same size and same muted colour as `.cocktail-source`
+// below it, so leaving the footer did not promote it.
 //
 // NO TABULAR FIGURES, AND THAT IS THE DIFFERENCE FROM `.cocktail-cost` ABOVE.
 // Tabular digits are there because the scaler rewrites the price on every
@@ -2174,7 +2121,7 @@ $amount-gap-wide: 1.25rem;
 .cocktail-units {
   font-size: 0.82rem;
   color: $color-clear-text;
-  margin: $space-xxs 0 0;
+  margin: $spacing-section-gap 0 0;
 
   .cocktail-units-figure {
     font-weight: 600;

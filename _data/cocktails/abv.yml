@@ -52,15 +52,30 @@
 #   low     a genuine guess. OVERWRITE THESE FIRST.
 # A row that needs HELEN specifically -- not a better source, her bottle --
 # also carries `qq:` saying why. `grep -n 'qq:'` is the worklist. There are
-# ELEVEN, and every one is something no source settles: a rhum bottled at three
+# TEN, and every one is something no source settles: a rhum bottled at three
 # strengths, a bottle whose name matches no product I could place, a category
 # whose range spans 20 points.
 #
-#   TWO OF THE ELEVEN CANNOT CHANGE ANY NUMBER and are marked anyway. Both
-#   Bob's bitters are only ever poured in dashes, and a dash never reaches the
-#   arithmetic (see the bitters block below). They are flagged because the day
-#   one of them is poured in millilitres is not the day to discover the strength
-#   was a guess -- but they can be ignored while the drinks stay as they are.
+#   TEN, NOT ELEVEN, SINCE 2026-09-09, and this line said eleven until
+#   2026-09-14. Flaggpunsch was promoted to a checked figure that day -- the
+#   note recording it is a few blocks down in this same file -- and the count up
+#   here was not moved with it. Worth the correction and worth the lesson: a
+#   COUNT in a comment is a second copy of something the file already knows, and
+#   it goes stale the first time anybody edits the thing it counts.
+#
+#   SEVEN OF THE TEN CANNOT CHANGE ANY PUBLISHED NUMBER TODAY, and
+#   `python3 scripts/abv_worklist.py` is what says which -- it replays the
+#   units plugin's own resolution over the published drinks, so it knows what a
+#   grep cannot. Both Bob's bitters are in that seven because they are only ever
+#   poured in dashes, and a dash never reaches the arithmetic (see the bitters
+#   block below); the rest are named by no published drink. They are flagged
+#   anyway, because the day one of them is poured in millilitres is not the day
+#   to discover the strength was a guess.
+#
+#   AND THE COUNT IS NOT A CONSTANT: the Caribbean Sazerac pours a bare `rhum
+#   agricole blanc`, which averages every bottle under that category including
+#   two unsettled ones, so proofreading that drink moves a row from the seven
+#   into the three. Run the script rather than trusting this paragraph.
 #
 # IT WAS SEVENTEEN UNTIL THE WEB PASS, 2026-09-06. Helen's instruction was
 # "knowledge first, web only for the doubtful ones", and the web half settled

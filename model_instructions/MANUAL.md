@@ -171,8 +171,10 @@ no line means it did not run. Reproduce deliberately with
 
 **`_config_local.yml` is where every local-only switch lives, and nowhere
 else**: `show_source_wording`, `show_awaiting_fix`, `show_drafts`,
-`show_costs`, `show_units` (all `true`), `pdf_downloads: false`, and
+`show_costs` (all `true`), `pdf_downloads: false`, and
 `output: true` on the `dev`, `food_drafts` and `cocktail_drafts` collections.
+(`show_units` was one until 2026-09-14, when #1001 put the unit count on the
+live site and the key was retired rather than left at `true`.)
 Production declares none of these keys, which is the whole mechanism (§9.1):
 a template gates on the key existing, so it can never be true on the live
 site. Never put a baseurl in it, and never move one of these keys into
@@ -357,8 +359,15 @@ machine substituted for U+2192 — and a substituted glyph is a substituted FONT
 which moves metrics and decides where the ink sits in its box. The row's three
 marks are centred by `align-items: center` on their BOXES, which is exact only
 when every box has its ink centred in it; a drawn mark does, a borrowed glyph
-may not. The include takes a `class` parameter, and the drink page's see-all
-link (§9.13, #994) is its second caller. A `site_neutral` page (about) shows
+may not. The include takes a `class` parameter (its second caller, the drink
+page's see-all link, went with #1000). **And TYPE never has its ink centred in
+its box**, which is the last pixel of the same issue: all-caps runs baseline to
+cap line while the line box keeps the descender depth under it, so
+`.site-nav-word` carries `top: 0.1em` to drop its lettering onto the marks'
+line (2026-09-14). That number is measured, and the rule says how to re-measure
+it — **crop the whole LINK and read the ink bands in that ONE image**, because
+an element screenshot pads its box by about a pixel and cropping the word and
+the icon separately makes that padding most of the answer. A `site_neutral` page (about) shows
 every site, wrapped into right-aligned lines where there is no room. **It sits
 at the RIGHT-HAND end of the header's second row and the `??` about link (a
 literal `/about/`) at the LEFT end, both on the cards' edges, at every width**
@@ -1049,11 +1058,17 @@ filters until 2026-09-10; `DECISIONS.md` §8.3 has the fourteen steps that
 ended that.
 
 **`?shortlist=1` on the COCKTAILS index enters it** (#994, 2026-09-12), by
-calling the same `enterShortlistView()` the button calls — so the drink page's
-see-all link (§9.13) and the button land in one state, and the view's "clears
-everything else" rule holds for both. It runs after the `?mood=` block and
-replaces rather than narrows, and drops the remembered scroll with the
-remembered list. Food has no such link and no such query.
+calling the same `enterShortlistView()` the button calls — so the two doors land
+in one state, and the view's "clears everything else" rule holds for both. It
+runs after the `?mood=` block and replaces rather than narrows, and drops the
+remembered scroll with the remembered list. Food has no such query.
+**NOTHING LINKS TO IT.** The drink page's see-all link was its one caller and
+#1000 removed that on 2026-09-14; the query is kept under #651's rule (a thing
+nothing reads is only safe while a comment says why) because it works, is
+tested, and is the plumbing any other answer to #994 would want — that issue's
+complaint was never declared solved. `cocktail-index.js` and
+`tests/js/cocktail-index-startup.test.js` both say so, and both say to delete it
+WITH its tests if the answer turns out to be something else.
 
 ## 9. Cocktails
 
@@ -1642,20 +1657,29 @@ the pool, ranking, families and the two matching rules (pure, tested);
 
 ### 9.3.4 Units of alcohol — #297
 
-**Local only** (`show_units` in `_config_local.yml`). **Helen wants UK units,
+**ON THE LIVE SITE since 2026-09-14** (#1001, Helen: *"add to live site"*).
+`show_units` is RETIRED — the drink page gates the line on `page.units` alone,
+so there is no switch and no second place to look. **Helen wants UK units,
 not the strength of the finished drink** — `ml × ABV% ÷ 1000`, so water and
 dilution do not matter and nothing needs modelling. `_data/cocktails/abv.yml`
 holds a strength per BOTTLE (invariant, like the appellations, and a separate
 file from `costs.yml` because a price decays and a strength does not) plus
 per-generic figures where no bottle is named and `abv: 0` declared for every
 non-alcoholic pour — **a missing key is a test failure; a zero is a
-statement**. `_plugins/cocktail_units.rb` renders one line under the cost
-line. Dashes do not count (asked, and Helen chose the same rule as costing;
-the exclusion list is read out of `costs.yml`, never restated). A zero is
-withheld rather than printed as "alcohol-free". Per serving, divided by
-`serves:` where present, and no data attributes for the scaler on purpose.
-`grep -n 'qq:' _data/cocktails/abv.yml` is the worklist of strengths only
-Helen's shelf can settle; publishing would need it cleared.
+statement**. `_plugins/cocktail_units.rb` computes it; the line renders at the
+END of the recipe, under the notes and above "If you liked this" (#1001; it was
+under the cost line in the footer from 2026-09-06). Dashes do not count (asked,
+and Helen chose the same rule as costing; the exclusion list is read out of
+`costs.yml`, never restated). A zero is withheld rather than printed as
+"alcohol-free". Per serving, divided by `serves:` where present; the scaler
+reads its two data attributes for the BATCH note's total only and never writes
+to the line, which is what keeps a per-serving figure from moving with the
+multiple box.
+**`grep -n 'qq:' _data/cocktails/abv.yml` is the worklist of strengths only
+Helen's shelf can settle, and it is now a PUBLIC number that leans on them.**
+The gate existed because publishing on eleven unsettled strengths was, in her
+2026-09-06 words, "hers to make once they are cleared"; she made it without
+clearing them, which is hers to do. The line says "Roughly" on every drink.
 
 ### 9.3.5 What a drink costs — #547
 
@@ -2009,6 +2033,20 @@ left on a card. **The names are the bottles** (#555).
   mark, no mood chips, no square brackets, no full width — each Helen's call.
   `data-universe-parts` names the child classes so the glass can sit on
   either side of the tape. Food turned the feature down (§13.4).
+  **It closes on the drink page's own absinthe rule**, with `$space-xl` of
+  clearance under the tape since #998 (2026-09-14, from `$space-md`, which put
+  the rule 12px under the tape and read as underlining it). The rule must stay
+  NEARER the offer than the filters — the clearance below it is the row's
+  margin plus the filter panel's padding plus the first section's margin,
+  about 37px, so 24px above is still on the offer's side.
+- **On a phone the filter sections are a step further apart than the desktop's**
+  (#999, 2026-09-14): `$space-xl` between the chip sections and `$space-xxl`
+  around the search block, where `$index-section-gap` is 1rem everywhere else.
+  A section boundary used to be worth exactly two chip rows (`$index-label-gap`
+  and `.drink-btns`' gap are both 0.5rem), so MOOD's five rows ran into
+  HASSLE's heading. **The two values move together and the search block keeps
+  its extra step** — "a row of chips ends in its own padding; a text box ends
+  in a hairline" (2026-09-10).
 - **Five named questions, in Helen's order**: YOLO? (`no chaos please` / `I'm
   open to chaos` / `chaos only` — the third reads `made_before: false`, never
   `ship`, because the two come apart the day she makes one), Mood (what the
@@ -2095,23 +2133,21 @@ to the box, so that inset is a percentage of the tape's rendered width, not a
 length — which is why the phone tape's BOX started on the column and its black
 BAND did not. `tmp/tape_insets.py` is how the fifteen were measured; the modal
 value is the one used, and the `max-width` grows with the bleed so the name
-gains the width rather than only sliding into it. **The shortlist button and a
-SEE-ALL link are a column at the title row's right end** (#963, then #994,
-2026-09-12): `.cocktail-shortlist-controls` is what the head grid places, and it
-carries the alignment — the tape's padding as a top margin, one line of
-lettering as the button's height, adjusted through `:has()` for the fit script's
-step and wrap — so the first control centres on the name's FIRST line at any
-size. Helen drew the pair as `SHORTLIST +` over `SEE ALL →`, so the `+` sits to
-the RIGHT of its word here and only here (`row-reverse`, not a second
-pseudo-element — the `::before` is the one whose content becomes a tick), and
-both marks hang from the same edge. On a phone both words go to `font-size: 0`
-and the column is the two marks alone at `$card-shortlist-size`. The link is an
-`<a>` to `?shortlist=1` (§8.9) and is never `hidden`: the view is JavaScript, a
-link to the index is not. The controls row under the head's rule holds
+gains the width rather than only sliding into it. **The shortlist button is the
+title row's second item, at its right end** (#963), given the name's FIRST
+line's own box — the tape's padding as a top margin, one line of lettering as
+its height, adjusted through `:has()` for the fit script's step and wrap — so it
+centres on that line at any size; on a phone it is the card's `+` alone. **A
+see-all link sat under it for two days** (#994, 2026-09-12 to #1000,
+2026-09-14) in a `.cocktail-shortlist-controls` column, with the `+` moved to
+the RIGHT of its word so the two marks stacked; all of that is gone and the
+mark is back on the left, as on a card and on food. **`?shortlist=1` on the
+index survives it** (§8.9), linked from nowhere and kept deliberately. The
+controls row under the head's rule holds
 only the read/make toggle, on the left. **The head is ONE two-column grid**
 (#979): `.cocktail-head-words` is `minmax(0, 1fr) auto` and
 `.cocktail-title-row` is `display: contents`, so everything the head says is in
-the first track and the shortlist column alone is in the second — which means
+the first track and the shortlist button alone is in the second — which means
 the tagline, the meta and the chips all end exactly where the title tape's own
 box is stopped, with no number to keep in step when the button changes size. On
 a phone that grid is off (`display: contents`) and the children are placed on

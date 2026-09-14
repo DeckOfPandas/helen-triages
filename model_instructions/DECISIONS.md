@@ -2244,6 +2244,109 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-09-14, #1000 — the see-all link comes out again, two days old.** Helen:
+  *"remove 'see all' button from below shortlist button on cocktail page"*, and
+  in the same message: *"I know some of this is changing my mind, but please go
+  with me!"* #994's entry below is what it reverses, and the entry stays: what
+  she asked for was built, looked at, and turned down on sight, which is exactly
+  how §13.11 says a decision gets made here.
+  **Everything #994 added to the head is gone** — the wrapper, the `row-reverse`
+  that moved the `+` to the right of its word so the two marks stacked, the
+  phone rules that hid the link's word. The mark is back on the LEFT, where it
+  is on a card, in the food twin and at every other placement of this button,
+  and #963's alignment with the title's first line moved back off the wrapper
+  onto the button unchanged.
+  **`?shortlist=1` ON THE INDEX IS KEPT, and that is the one judgement call in
+  it.** The link was its only caller. It stays under #651's rule — a thing
+  nothing reads is only safe while a comment says why — because the URL works,
+  it is tested, it is the plumbing any other answer would want, and the
+  complaint that raised #994 (*"it's hard to figure out how to see your
+  shortlist"*) was never declared solved. The script and the tests both say so
+  and both say to delete it WITH its tests if the answer turns out to be
+  something else. **Flagged to Helen rather than assumed**: this is the kind of
+  thing that becomes invisible dead code if nobody re-reads the comment.
+
+- **2026-09-14, #1001 — the unit count ends the recipe, and goes public.**
+  Helen: *"move units line to just below the notes section if it's there, above
+  if you liked this, and add to live site"*, then, on the same issue: *"Not too
+  close to the method -- don't let it demand attention."*
+  **The move is an argument about what a footer is for.** It sat under the
+  source and cost lines from 2026-09-06, her placement then ("Only in the bottom
+  section with source and cost, so the line below those"). That footer is about
+  the PAGE — where the recipe came from, what it costs to stock. A unit count is
+  a fact about the DRINK, so it now ends the drink, above the three other drinks
+  and the source line.
+  **"Not too close to the method" is the margin and nothing else**:
+  `$spacing-section-gap` above it, the page's own "below a section" token rather
+  than a number picked for this line, which earns its keep on a drink with no
+  notes and no To serve, where the line lands directly under the last method
+  step. The type does not change — same size and muted colour as the source line
+  — because that is the register the second sentence asks for.
+  **AND SHE OVERRULED A CAUTION SHE HERSELF RECORDED, which is hers to do and
+  worth writing down.** `show_units` was local-only because of her 2026-09-06
+  call: *"local only now, and I'll note what publishing would need."* What
+  publishing needed was the `qq:` rows in `abv.yml` — eleven strengths nobody
+  can settle without the bottle on her shelf — and the config comment said
+  publishing on them "is hers to make once they are cleared". They are not
+  cleared. She published anyway. The line says "Roughly" on every drink, which
+  was already the honest wording for a different reason, and
+  `grep -n 'qq:' _data/cocktails/abv.yml` is now a worklist that improves a
+  number the public can see. **The key is retired rather than set to `true`**:
+  a switch nothing reads is the thing `_config_local.yml`'s whole idiom depends
+  on not existing. The batch note's gate moved with it, from `show_costs or
+  show_units` to `show_costs or page.units`, so in production it says the
+  batch's units and nothing about money.
+
+- **2026-09-14, #998 and #999 — two spacing rounds on the index, and both are
+  about the same thing.** #998: *"add a small amount of space between universe
+  and the horizontal rule so the top of the page feels less cramped."* #999:
+  *"add a little more space at the bottom of each filter section on phones only.
+  We're not prioritising above the fold on a phone, and it's a little hard to
+  work out what goes where now."*
+  **#998 is 12px to 24px under the tape**, measured (tape bottom 272.3, rule top
+  284.3), and the constraint that decided it is that the rule must stay NEARER
+  the offer than the filters, because it belongs to the offer. The clearance
+  below it is not the row's bottom margin alone — it is that plus the filter
+  panel's own padding-top plus the first section's top margin, about 37px — so
+  24px above is still on the offer's side. `$space-lg` was built and looked at
+  first and barely moved it.
+  **#999 is a ratio problem, not a size problem.** `$index-section-gap` is 1rem
+  and both `$index-label-gap` and `.drink-btns`' gap are 0.5rem, so a section
+  boundary was worth exactly two chip rows — and MOOD's five rows of chips ran
+  into HASSLE's heading with nothing but a doubled row gap to say a new question
+  had started. The coloured heading bars carry that on a desktop, where whole
+  sections are in view at once; on a 342px column they are not. **One step each,
+  not one value for all**: the chip sections to `$space-xl` and the search block
+  to `$space-xxl`, so 2026-09-10's relationship survives — a section ending in a
+  hairline gets more air than one ending in a row of chips.
+
+- **2026-09-14 — the nav lettering, and the measuring mistake is the reusable
+  part.** Helen, in session, having read the note this session left at the end
+  of #993: *"please correct the snag you mentioned above, where the nav row's
+  all-caps lettering sits slightly high."*
+  **Type never has its ink centred in its box**, which is why #993's fix left a
+  pixel behind: all-caps ink runs baseline to cap line while the line box keeps
+  the descender depth underneath, so centring the BOXES floats the word above
+  the marks it shares a row with. There is no deriving the correction — it needs
+  Courier Prime's real ascent, descent and cap height, and the face ships here
+  as woff2 only (the wall `_cards.scss` hit once and escaped by correcting the
+  ARTWORK; there is no artwork here).
+  **SO IT IS MEASURED, AND THE FIRST MEASUREMENT WAS WRONG BY ITS METHOD.**
+  Cropping the word in one image and the icon in another and subtracting their
+  page positions ignores that an element screenshot pads its box by about a
+  pixel — which at 0.8rem is most of the answer. That produced 0.082em, and the
+  word was still visibly high. **Crop the whole LINK and read the ink bands
+  inside that one image**: glass 25.5, `[` 22.5, caps 22.0, `]` 22.5, arrow 25.5
+  at deviceScaleFactor 2, so the word was 3 device pixels above the marks.
+  0.082em moves it 2 and leaves it 1 above; 0.117em moves it 3 and leaves it 1
+  below; 0.1em paints identically to 0.117em. The true correction is 2.5 device
+  pixels — 0.0977em — and the raster can only land either side of it, so
+  `top: 0.1em` is that value to two places. In `em` because it is a fact about
+  the face; `position: relative` because the layout must not move.
+  **The general form, and it is the one to carry: a measurement whose error term
+  is the same size as the thing being measured will confirm whatever you already
+  think.** The single-image reading has no such term.
+
 - **2026-09-12, #991 — the related cards are the index's cards, and the variant
   is deleted.** Helen, in full: *"We are fighting this design, and trying to
   invent a new design language, where we should just reuse what we've already

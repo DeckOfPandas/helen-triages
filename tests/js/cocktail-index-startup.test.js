@@ -415,14 +415,19 @@ test('#757: the chips are moved in the DOM, not merely reordered visually', () =
   });
 });
 
-// --- arriving from a drink page's see-all link, #994 -------------------------
+// --- arriving at the shortlist by URL, #994 ----------------------------------
 //
-// `?shortlist=1` is the one query the index reads besides `?mood=`, and it is
-// the only wiring in #994 that is not markup: the link itself is an <a> with a
-// real href and needs no script at all. What needs a test is that the index
-// still turns the VIEW on when it arrives -- and specifically that it calls the
-// same `enterShortlistView()` the `shortlisted (N)` button calls, so the two
-// doors lead to one state (#918, MANUAL 8.9).
+// `?shortlist=1` is the one query the index reads besides `?mood=`. It was
+// added for a drink page's see-all link, and #1000 removed that link two days
+// later -- so nothing on the site points here now and the query is kept
+// deliberately (cocktail-index.js says why). These tests are half of what
+// keeps it honest: a URL nothing links to is a URL nobody would notice
+// breaking.
+//
+// What they assert is that the index turns the VIEW on when it arrives, and
+// specifically that it calls the same `enterShortlistView()` the
+// `shortlisted (N)` button calls, so the two doors lead to one state
+// (#918, MANUAL 8.9).
 //
 // THE SHORTLIST IS EMPTY IN THIS HARNESS, deliberately and not by accident:
 // HTF.shortlist keys its storage on `HTF.site`, which comes from a meta tag the
@@ -441,9 +446,8 @@ function shortlistViewIsOn(r) {
 test('#994: ?shortlist=1 turns the shortlist view on at startup', () => {
   const r = boot({ drinks: DRINKS, search: '?shortlist=1' });
   assert.ok(shortlistViewIsOn(r),
-    'the see-all link is the only way into this view from a drink page; if ' +
-    'the index does not read the query, the link lands on an ordinary index ' +
-    'and the issue is not fixed.');
+    'if the index does not read the query, the URL lands on an ordinary ' +
+    'index -- which looks like a working page and is not one.');
   assert.deepStrictEqual(visibleTitles(r.page), [],
     'the view is on and this browser has shortlisted nothing, so nothing ' +
     'survives -- which is also what proves the state reached apply().');
