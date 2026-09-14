@@ -100,8 +100,9 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      # GitHub issue #86. Renders every built recipe page to a PDF beside it,
-      # so /food/recipes/<slug>.pdf is a real file rather than something the
+      # GitHub issue #86, and #1005 for the drinks. Renders every built recipe
+      # and drink page to a PDF beside it, so /food/recipes/<slug>.pdf and
+      # /cocktails/recipes/<slug>.pdf are real files rather than something the
       # browser is asked to make. Runs on the FINISHED _site, between the build
       # and the upload -- Jekyll never sees the PDFs.
       #

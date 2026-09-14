@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Render every built recipe page to a PDF sitting beside it. GitHub issue #86.
+"""Render every built recipe and drink page to a PDF sitting beside it.
+GitHub issue #86 (food); #1005 brought cocktails in on 2026-09-14.
 
 Runs against a FINISHED BUILD, after `jekyll build` and before the Pages
 artifact is uploaded, and writes into _site/ directly -- Jekyll never sees the
 PDFs, so there is no collection, no permalink and no front matter to keep in
 step. `_site/food/recipes/beef-wellington/index.html` gets
 `_site/food/recipes/beef-wellington.pdf` next to it, which is the URL
-_layouts/recipe.html links to.
+_layouts/recipe.html links to; `_site/cocktails/recipes/negroni/index.html`
+gets `negroni.pdf` beside it the same way, for _layouts/cocktail.html.
 
     python3 scripts/generate_pdfs.py                 # against ./_site
     python3 scripts/generate_pdfs.py --site _site_prod --jobs 8
@@ -164,13 +166,23 @@ def main() -> int:
     SCRATCH.mkdir(exist_ok=True)
     chrome = _chrome(args.chrome)
 
-    recipes = sorted(site.glob("food/recipes/*/index.html"))
-    if not recipes:
-        sys.exit(
-            f"No recipe pages found under {site}/food/recipes/. Either the "
-            f"build did not run or the permalink has changed -- silently "
-            f"producing zero PDFs would leave every 'pdf' link broken."
-        )
+    # BOTH SITES SINCE #1005 (2026-09-14): a drink page gets a pdf beside it at
+    # /cocktails/recipes/<slug>.pdf exactly as a recipe does, rendered through
+    # cocktails' own print stylesheet (_sass/cocktails/_print.scss, which
+    # forces the full editorial page whatever the read-it/make-it toggle was
+    # left at). Each collection is checked for emptiness on its own: a build
+    # that lost one collection's pages would otherwise be hidden by the other
+    # still rendering, and a pdf link on every page of that site would 404.
+    recipes = []
+    for collection in ("food/recipes", "cocktails/recipes"):
+        pages = sorted(site.glob(f"{collection}/*/index.html"))
+        if not pages:
+            sys.exit(
+                f"No pages found under {site}/{collection}/. Either the build "
+                f"did not run or the permalink has changed -- silently "
+                f"producing zero PDFs would leave every 'pdf' link broken."
+            )
+        recipes.extend(pages)
 
     # Read the baseurl off the BUILD rather than out of _config.yml. Every page
     # states it, because assets.js needs it (_layouts/default.html emits
@@ -210,8 +222,12 @@ def main() -> int:
     try:
         jobs = []
         for page in recipes:
+            # The URL is the page's own path under the build, so a recipe and
+            # a drink are one loop and neither collection's prefix is written
+            # here a second time.
+            rel = page.parent.relative_to(site).as_posix()
             slug = page.parent.name
-            url = f"http://127.0.0.1:{port}{prefix}/food/recipes/{slug}/"
+            url = f"http://127.0.0.1:{port}{prefix}/{rel}/"
             jobs.append((url, page.parent.parent / f"{slug}.pdf"))
 
         print(f"rendering {len(jobs)} recipe PDFs with {args.jobs} workers")

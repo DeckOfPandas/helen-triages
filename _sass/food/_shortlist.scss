@@ -55,16 +55,19 @@
 .btn-shortlist {
   @extend %shortlist-mark;
 
-  // Matched to .btn-clear-inline, the index's other quiet inline control (see
-  // _category-labels.scss): sans, small, lowercase, a colour-shift hover. NOT
-  // %link-button, which is the recipe page's body-link match and carries
-  // $font-size-body-sm — right beside `print`, too loud at the end of a row.
-  // One design for both placements, because it is one control.
-  font-family: $font-body;
+  // COURIER CAPS SINCE 2026-09-14 (#1005), the drink page's own treatment for
+  // this control, so the two sites draw one action one way. Helen: "let's try
+  // all actions in capitals (shortlist button at top of index lists too) to
+  // help show they're actions". It was matched to .btn-clear-inline -- sans,
+  // small, lowercase -- which is the index's QUIET control, and this is not
+  // quiet: it is the one thing on a row that changes something. Same size and
+  // tracking as _sass/cocktails/_shortlist.scss's, only the colours differ,
+  // which is the whole shape of this repo's split.
+  font-family: $font-headings;
   font-size: 0.78rem;
-  font-weight: 400;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 
   background: none;
   border: 0;
@@ -168,8 +171,11 @@
   font-family: $font-headings;
   font-size: 0.8rem;
   font-weight: 400;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
+  // UPPERCASE SINCE 2026-09-14 (#1005) -- Helen: "shortlist button at top of
+  // index lists too". A view switch is an action, and on both sites an action
+  // now wears capitals; the pill, the border and the colours are unchanged.
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 
   background: $color-surface;
   border: 1.5px solid $color-border;

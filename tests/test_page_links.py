@@ -363,6 +363,13 @@ TRUSTED_DYNAMIC = (
     # is CHOSEN by a score, so the interesting failure is not a broken URL but
     # the wrong number of them, or a drink offering itself.
     re.compile(r"^\{\{\s*rel\.url\s*\|\s*relative_url\s*\}\}$"),
+    # The related-recipes row at the foot of a RECIPE page (#1005, 2026-09-14,
+    # `_rel` in _layouts/recipe.html): the food twin of the line above, looked
+    # up out of `site.food_recipes` by url the same way, and checked the same
+    # way -- test_every_published_recipe_page_offers_three_other_published_recipes
+    # reads the production build and asserts each of the three lands on a
+    # published recipe page.
+    re.compile(r"^\{\{\s*_rel\.url\s*\|\s*relative_url\s*\}\}$"),
     # The cocktails index's draft cards, added 2026-08-23. Provably correct
     # for the same reason as recipe.url/cocktail.url on the line above --
     # Jekyll computes `url` from the document's own permalink, so it cannot

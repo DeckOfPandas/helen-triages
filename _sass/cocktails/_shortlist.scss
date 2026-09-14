@@ -63,8 +63,11 @@
   @extend %drink-btn-base;
   font-family: $font-headings;
   font-size: 0.8rem;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
+  // UPPERCASE SINCE 2026-09-14 (#1005) -- Helen: "let's try all actions in
+  // capitals (shortlist button at top of index lists too) to help show
+  // they're actions". Food's twin made the same move the same day.
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   padding: 0.25rem 0.65rem;
   white-space: nowrap;
 

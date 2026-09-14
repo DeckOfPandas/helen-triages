@@ -216,6 +216,29 @@ def test_the_scaler_scripts_load_in_dependency_order():
     )
 
 
+def test_the_recipe_scaler_scripts_load_in_dependency_order():
+    """#1005. Four scripts on the recipe page, each read at parse time by the
+    one after it: shopping-list.js (the one amount parser), food-shopping-
+    list.js (food's formatting on top of it), food-scale.js (one amount at a
+    factor, built on both), recipe-scale.js (the wiring). Loaded the wrong
+    way round the page throws once, silently, and the portions box never
+    appears -- the same failure the drink page's three-script test guards.
+    """
+    html = read("_layouts", "recipe.html")
+    order = ["shopping-list.js", "food-shopping-list.js", "food-scale.js",
+             "recipe-scale.js"]
+    positions = []
+    for name in order:
+        match = re.search(r"<script src=[^>]*/" + re.escape(name), html)
+        assert match, f"_layouts/recipe.html no longer loads {name}."
+        positions.append(match.start())
+    assert positions == sorted(positions), (
+        "the recipe scaler's four scripts are out of order in "
+        "_layouts/recipe.html. Each one reads the one before it off HTF at "
+        f"parse time, so the order must be: {', '.join(order)}."
+    )
+
+
 def test_the_food_shopping_scripts_load_in_dependency_order():
     """food-shopping-list.js reads HTF.shoppingList, and filters.js reads both.
 
@@ -2022,11 +2045,27 @@ def test_pdf_link_points_where_the_pdfs_are_written():
         f"has moved and the other has not."
     )
 
+    # BOTH COLLECTIONS SINCE #1005 (2026-09-14): the script walks one tuple of
+    # directories and this reads that tuple rather than a literal glob, so a
+    # third collection is one entry there and one permalink here.
     script = read("scripts", "generate_pdfs.py")
-    assert 'glob("food/recipes/*/index.html")' in script, (
-        "scripts/generate_pdfs.py no longer globs food/recipes/*/index.html, "
-        "so it may be writing PDFs somewhere other than beside the recipe "
-        "pages this link points at."
+    dirs = re.search(r'for collection in \(([^)]*)\):', script)
+    assert dirs, (
+        "scripts/generate_pdfs.py no longer loops `for collection in (...)` "
+        "over the directories it renders, so this check cannot see where it "
+        "writes PDFs. Follow the script's new shape here."
+    )
+    rendered = re.findall(r'"([^"]+)"', dirs.group(1))
+    assert expected.strip("/") in rendered, (
+        f"scripts/generate_pdfs.py renders {rendered}, which does not include "
+        f"{expected.strip('/')!r} -- recipe pages would get no PDF and every "
+        f"pdf link on food would 404."
+    )
+    drinks = ((config.get("collections") or {}).get("cocktail_recipes") or {}).get("permalink")
+    assert drinks and drinks.split(":")[0].strip("/") in rendered, (
+        f"scripts/generate_pdfs.py renders {rendered}, which does not include "
+        f"the cocktail_recipes permalink {drinks!r} -- drink pages get a pdf "
+        f"link since #1005, and it would 404."
     )
 
 

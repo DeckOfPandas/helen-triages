@@ -171,7 +171,7 @@ function boot(options) {
     localStorage: createStorage(),
     console: { warn() {}, error() {}, log() {} },
     setTimeout, clearTimeout,
-    location: { search: '', pathname: '/food/', hash: '' },
+    location: { search: (options && options.search) || '', pathname: '/food/', hash: '' },
     history: { replaceState() {}, pushState() {} },
     performance: { getEntriesByType: () => [], navigation: { type: 0 } },
     matchMedia: () => ({ matches: false, addEventListener() {} }),
@@ -575,6 +575,54 @@ test('a shortlisted recipe that is no longer on the page is dropped quietly', ()
   showTheList(doc);
   assert.ok(!recipesHtml(panel).includes('/food/recipes/gone/'));
   assert.match(aislesHtml(panel), /200 g/);
+});
+
+// --- arriving at the shortlist by URL, #1011 -----------------------------------
+//
+// `?shortlist=1` is food's half of what #994 gave the drinks index: the "see
+// shortlist" action on a recipe page links here. The same three assertions
+// tests/js/cocktail-index-startup.test.js makes, for the same reason -- the
+// index must turn the VIEW on when it arrives, through the same
+// `enterShortlistView()` the `shortlisted (N)` button calls, so the two doors
+// lead to one state (#918, MANUAL 8.9).
+
+function shortlistViewIsOn(doc) {
+  const btn = doc.getElementById('shortlist-only');
+  assert.ok(btn, 'the fixture has no shortlisted-only button.');
+  return btn.getAttribute('aria-pressed') === 'true' &&
+         btn.classList.contains('is-on');
+}
+
+function visibleRows(list) {
+  return list.children.filter((li) => !li.hidden && li.style.display !== 'none');
+}
+
+test('#1011: ?shortlist=1 turns the shortlist view on at startup', () => {
+  const { doc, list } = boot({ search: '?shortlist=1' });
+  assert.ok(shortlistViewIsOn(doc),
+    'if the index does not read the query, the URL lands on an ordinary ' +
+    'index -- which looks like a working page and is not one.');
+  assert.strictEqual(visibleRows(list).length, 0,
+    'the view is on and nothing is shortlisted, so nothing survives -- which ' +
+    'is also what proves the state reached update().');
+});
+
+test('#1011: without the query the view stays off', () => {
+  const { doc, list } = boot();
+  assert.ok(!shortlistViewIsOn(doc));
+  assert.strictEqual(visibleRows(list).length, Object.keys(RECIPES).length);
+});
+
+test('#1011: a shortlisted recipe is what the link shows', () => {
+  const { win, doc, list } = boot({ search: '?shortlist=1' });
+  // The store is read at update time, so marking one after boot and
+  // dispatching the change event is what a row's own toggle does.
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  doc.dispatch('htf:shortlist-change');
+  assert.ok(shortlistViewIsOn(doc), 'a toggle must not knock the view off');
+  assert.deepStrictEqual(
+    visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/']);
 });
 
 // --- the list of scripts is the template's list --------------------------------
