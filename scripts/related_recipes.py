@@ -6,14 +6,19 @@ in Liquid by `_layouts/recipe.html`. The score is:
 
     shared tags  +  shared main_ingredients
 
-with ties broken by title -- the drinks rule ported directly, at Helen's word
-("Yes"). ONE THING ON TOP OF IT, hers as well: "prioritise (star*mood)". A
-candidate that shares this recipe's STAR INGREDIENT and at least one MOOD tag
-outranks every candidate that does not, whatever the counts say; among the
-prioritised, and among the rest, the score then decides. Nothing else -- no
-weighting, no per-field multiplier -- for the reason the drinks version gives:
-every knob one could add is a claim about what makes two recipes alike, and
-nobody has made that claim.
+-- the drinks rule ported directly, at Helen's word ("Yes"). TWO THINGS ON TOP
+OF IT, hers as well. "Prioritise (star*mood)": a candidate that shares this
+recipe's STAR INGREDIENT and at least one MOOD tag outranks every candidate that
+does not, whatever the counts say. And a TIE is broken by shared ingredients,
+larder staples last -- "where just one tag is shared, do you think it would be
+better to pick matched ingredients (in larder order)?" -- so within a score the
+candidate sharing more NON-pantry main ingredients comes first, then the one
+sharing more pantry staples (_data/food/pantry.yml), then A-Z. Measured before
+it was chosen (DECISIONS §13): weighting ingredients above tags changed 49 of
+69 rows and put chocolate ice cream beside cauliflower cheese via "whole milk";
+the tie-break changed 37, nearly all the cases she meant. Nothing else -- no
+per-field multiplier -- for the reason the drinks version gives: every knob one
+could add is a claim about what makes two recipes alike, and nobody has made it.
 
 WHY THIS SCRIPT EXISTS: the template only offers a candidate scoring above
 zero (or prioritised), so a recipe sharing no tag and no main ingredient with
@@ -37,6 +42,7 @@ import yaml
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RECIPES = os.path.join(ROOT, "_food_recipes")
 TAXONOMY = os.path.join(ROOT, "_data", "food", "taxonomy.yml")
+PANTRY = os.path.join(ROOT, "_data", "food", "pantry.yml")
 
 HOW_MANY = 3        # the template's `limit: 3`
 
@@ -55,6 +61,13 @@ def front_matter(path):
 def mood_tags():
     with open(TAXONOMY, encoding="utf-8") as handle:
         return set(yaml.safe_load(handle)["tags"]["mood"])
+
+
+def pantry():
+    """The larder staples, lowercased -- a bare list in pantry.yml, matched
+    exactly, as food/index.html matches it."""
+    with open(PANTRY, encoding="utf-8") as handle:
+        return {str(p).strip().lower() for p in yaml.safe_load(handle)}
 
 
 def published():
@@ -76,13 +89,16 @@ def lowered(values):
     return {str(v).strip().lower() for v in (values or [])}
 
 
-def scored_against(slug, doc, corpus, moods):
+def scored_against(slug, doc, corpus, moods, larder=None):
     """Every other published recipe, best first -- the template's order.
 
-    The Liquid sorts `prio~rank~title~url` as TEXT with `prio` 0 for a
-    prioritised candidate and 1 otherwise and `rank = 999 - score`, so
-    ascending text order is prioritised first, highest score first within
-    each, A-Z within a score. This reproduces that."""
+    The Liquid sorts `prio~rank~real~larder~title~url` as TEXT -- `prio` 0
+    for a prioritised candidate and 1 otherwise, `rank = 999 - score`,
+    `real = 99 - shared non-larder ingredients`, `larder = 99 - shared larder
+    staples` -- so ascending text order is prioritised first, highest score
+    first within each, most real ingredients within a score, most larder
+    staples within that, A-Z last. This reproduces that."""
+    larder = pantry() if larder is None else larder
     tags = lowered(doc.get("tags"))
     mine = lowered(doc.get("main_ingredients"))
     star = (doc.get("star_ingredient") or "").strip().lower()
@@ -93,13 +109,15 @@ def scored_against(slug, doc, corpus, moods):
         other_tags = lowered(other.get("tags"))
         shared_tags = tags & other_tags
         shared_ings = mine & lowered(other.get("main_ingredients"))
+        real = {i for i in shared_ings if i not in larder}
         score = len(shared_tags) + len(shared_ings)
         other_star = (other.get("star_ingredient") or "").strip().lower()
         prio = bool(star) and other_star == star and bool(shared_tags & moods)
         if score > 0 or prio:
             rows.append((0 if prio else 1, score, other.get("title", ""),
-                         other_slug, len(shared_tags), len(shared_ings), prio))
-    rows.sort(key=lambda r: (r[0], -r[1], r[2].lower()))
+                         other_slug, len(shared_tags), len(shared_ings), prio,
+                         len(real), len(shared_ings) - len(real)))
+    rows.sort(key=lambda r: (r[0], -r[1], -r[7], -r[8], r[2].lower()))
     return rows
 
 
@@ -124,7 +142,8 @@ def main():
             for row in scored_against(slug, doc, corpus, moods)[:8]:
                 flag = "  star+mood" if row[6] else ""
                 print(f"    {row[2]:44s} score={row[1]}  "
-                      f"tags={row[4]} mains={row[5]}{flag}")
+                      f"tags={row[4]} mains={row[5]} (real {row[7]}, "
+                      f"larder {row[8]}){flag}")
             return 0
         print(f"no published recipe called {wanted!r}")
         return 1

@@ -392,14 +392,31 @@ layout: default
      live page can only ever offer a live one. Drafts and the magic bag are
      other collections and are never in this loop.
 
+     A TIE IS BROKEN BY SHARED INGREDIENTS, LARDER STAPLES LAST -- Helen's
+     second ruling, the same evening: "where just one tag is shared, do you
+     think it would be better to pick matched ingredients (in larder order)?"
+     Measured before it was written (DECISIONS §13): weighting ingredients
+     ABOVE tags changed 49 of 69 pages' rows and put chocolate ice cream
+     beside cauliflower cheese on the strength of "whole milk", because
+     _data/food/pantry.yml is exact and conservative by design ("milk" is in
+     it, "whole milk" is not) and that gap decides too much once ingredients
+     outweigh tags. Breaking TIES only changed 37 pages, nearly all of them
+     the cases she meant -- caramel loses the ramen eggs and gains the sponge
+     cake through double cream, cranberry sauce gains the chestnut loaf over
+     two ice-cream bases -- so a lone shared tag never outranks a shared
+     ingredient at the same score, and a shared larder staple never outranks
+     a real one, and nothing else moves.
+
      THE SORT IS A STRING SORT, as on the drink page: each candidate becomes
-     one `prio~rank~title~url` string, `prio` 0 for a star-and-mood match and
-     1 otherwise, `rank = 999 - score`, and ascending text order is then
-     prioritised first, highest score first within each half, A-Z within a
-     score. `scripts/related_recipes.py` is the same scoring in Python over
-     the same corpus -- re-run it after a promotion batch or a taxonomy edit
-     that moves tags, and read it when the rendered-pages test names a recipe
-     that could not fill its row.
+     one `prio~rank~real~larder~title~url` string -- `prio` 0 for a
+     star-and-mood match and 1 otherwise, `rank = 999 - score`, `real = 99 -
+     shared non-larder ingredients`, `larder = 99 - shared larder staples` --
+     and ascending text order is then prioritised first, highest score first
+     within each half, most real ingredients within a score, most larder
+     staples within that, A-Z last. `scripts/related_recipes.py` is the same
+     rule in Python over the same corpus -- re-run it after a promotion batch
+     or a taxonomy edit that moves tags, and read it when the rendered-pages
+     test names a recipe that could not fill its row.
 
      LOWERCASED ON BOTH SIDES. Tags are a lowercase vocabulary already;
      main_ingredients are free text and "Demerara sugar" beside "demerara
@@ -409,12 +426,15 @@ layout: default
      words from #927, the same line the drink page shows.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   {% assign _mood_tags = site.data.food.taxonomy.tags.mood %}
+  {% assign _pantry = site.data.food.pantry %}
   {% capture _my_ings %}|{% for _ing in page.main_ingredients %}{{ _ing | downcase }}|{% endfor %}{% endcapture %}
   {% assign _my_star = page.star_ingredient | default: "" | downcase %}
   {% assign _related_keys = "" %}
   {% for _other in site.food_recipes %}
     {% unless _other.url == page.url %}
       {% assign _score = 0 %}
+      {% assign _real = 0 %}
+      {% assign _larder = 0 %}
       {% assign _shared_mood = false %}
       {% for _t in page.tags %}
         {% if _other.tags contains _t %}
@@ -423,8 +443,16 @@ layout: default
         {% endif %}
       {% endfor %}
       {% for _ing in _other.main_ingredients %}
-        {% capture _token %}|{{ _ing | downcase }}|{% endcapture %}
-        {% if _my_ings contains _token %}{% assign _score = _score | plus: 1 %}{% endif %}
+        {% assign _key = _ing | downcase %}
+        {% capture _token %}|{{ _key }}|{% endcapture %}
+        {% if _my_ings contains _token %}
+          {% assign _score = _score | plus: 1 %}
+          {% if _pantry contains _key %}
+            {% assign _larder = _larder | plus: 1 %}
+          {% else %}
+            {% assign _real = _real | plus: 1 %}
+          {% endif %}
+        {% endif %}
       {% endfor %}
       {% assign _prio = "1" %}
       {% if _my_star != "" and _shared_mood %}
@@ -433,7 +461,9 @@ layout: default
       {% endif %}
       {% if _score > 0 or _prio == "0" %}
         {% assign _rank = 999 | minus: _score %}
-        {% capture _related_keys %}{{ _related_keys }}{{ _prio }}~{{ _rank }}~{{ _other.title }}~{{ _other.url }};{% endcapture %}
+        {% assign _rrank = 99 | minus: _real %}
+        {% assign _lrank = 99 | minus: _larder %}
+        {% capture _related_keys %}{{ _related_keys }}{{ _prio }}~{{ _rank }}~{{ _rrank }}~{{ _lrank }}~{{ _other.title }}~{{ _other.url }};{% endcapture %}
       {% endif %}
     {% endunless %}
   {% endfor %}
@@ -448,7 +478,7 @@ layout: default
       <ul class="recipe-list recipe-related">
         {% for _entry in _related_sorted limit: 3 %}
           {% assign _parts = _entry | split: "~" %}
-          {% assign _rel = site.food_recipes | where: "url", _parts[3] | first %}
+          {% assign _rel = site.food_recipes | where: "url", _parts[5] | first %}
           <li data-url="{{ _rel.url }}">
             <div class="recipe-row-content">
               <a class="recipe-title-link" href="{{ _rel.url | relative_url }}">{{ _rel.title }}</a>

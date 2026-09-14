@@ -4467,6 +4467,28 @@ verification. Dates are when the correction landed.
   21 published food recipes and no drinks, none of them visible to Helen until
   she asked for an issue each (#1027–#1045, plus #1026 for the two that other
   pages link to).
+  - **Related recipes, the tie-break — later the same evening.** Told that
+    eight recipes' third pick shared only one tag, Helen: *"where just one tag
+    is shared, do you think it would be better to pick matched ingredients (in
+    larder order)?"* Measured two readings over the 69 published recipes
+    (`tmp/related_variants.py`, the numbers kept here because the script is
+    scratch). **Ingredients weighted above tags** (a shared non-larder
+    ingredient counting double, a larder staple nothing) changed 49 pages'
+    rows and some of them wrongly: cauliflower cheese got both chocolate ice
+    creams on "whole milk", Caesar dressing got hollandaise and mackerel pâté
+    on "lemon juice" — `pantry.yml` is exact and conservative by design, so
+    "milk" is in it and "whole milk" is not, and that gap decides too much
+    once ingredients outweigh tags. **Ties broken by shared ingredients,
+    larder staples last**, changed 37 pages, nearly all of them the cases she
+    meant: caramel lost the ramen eggs and the coleslaw and gained the sponge
+    cake and macarons through double cream; cranberry sauce lost two
+    ice-cream bases and gained the chestnut loaf and the marmalade ham;
+    masala chai got the three spice blends. Advised the second; Helen:
+    *"Agree with your version, please go ahead."* So the rule is: score as
+    before, then most real ingredients, then most larder staples, then A–Z —
+    a lone shared tag never outranks a shared ingredient at the same score.
+    Built as two extra digits in the Liquid sort key and the same key in
+    `scripts/related_recipes.py`.
 
 ## §14 Reference pages
 
