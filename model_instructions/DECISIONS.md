@@ -3694,6 +3694,22 @@ unless stated.
     #1027–#1045 one each for the rest, bodies naming the commit that last
     touched each file (`tmp/raise_proofread_issues.py`, on
     `scripts/needs_helen.py`'s helpers).
+  - **AND THAT BURST GOT THE AGENT ACCOUNT FLAGGED AS SPAM, the same
+    evening.** Twenty issues and two PRs in under an hour from
+    `DeckOfPandas-agentic`, and GitHub hid the account: its profile, the
+    two PRs (#1046 here, #35 on the food repo), all twenty-one issues and
+    the earlier merged #1023 returned 404 to everyone but the account,
+    while the API called as that account listed every one of them open and
+    normal. Helen said three times that there were no PRs anywhere, and
+    was answered twice with API output before anyone ran an anonymous
+    `curl` -- which returned 404 for the PR and 200 for her own issue
+    #1005, the whole diagnosis in two lines. The rule is in `CLAUDE.md`'s
+    GitHub section: never a burst of creations, a batch of issues is one
+    issue with a checklist, and when Helen cannot see something the API
+    says exists, believe her and curl the page. The branches were never
+    affected -- a push is a ref, not content -- so the compare links open
+    a PR by hand under her own name; the appeal to GitHub Support is the
+    account owner's, not a session's.
 
 ### §11.2 The record of this file being wrong
 
