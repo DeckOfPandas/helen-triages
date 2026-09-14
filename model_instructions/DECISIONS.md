@@ -639,6 +639,23 @@ unless stated.
   **The trap generalises: tightening a gate silently unpublishes whatever only
   passed the loose version.** Measure the count before the change, not after.
 
+- **2026-09-14, #1009** — **The same trap from the other side: a correct
+  proofread flag took two pages dark AND left the links to them.** #982 / PR
+  #996 moved measures from `item:` into `amount:` across twenty food recipes and
+  set `proofread: false` on every one, exactly as §4.0 requires. Two of the
+  twenty — `grandmas-lemon-curd` and `tomato-tarragon-salad` — are linked to
+  from other recipes (`lemon-feather-sponge`, `roast-beef-fillet`), so the gate
+  removed the pages and the links stayed: two 404s on the live site.
+  `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there` caught
+  it; it went red on `main` with the merge, and was found by a session merging
+  `main` into an unrelated branch. **Nothing about #996 was wrong**, which is
+  the point: the rule that every edit clears the flag and the rule that the gate
+  removes the page are each right, and together they make any linked-to recipe
+  a page whose inbound links break the moment an agent touches it. The fix for
+  the two is Helen's (proofread them); **whether a recipe should render a link
+  to a held-back recipe at all** is raised in the issue as a separate design
+  question and not decided.
+
 ### §4.3 The magic bag
 
 - **2026-08-26** — Built: Helen's own name for her brain, answering the
@@ -1819,6 +1836,36 @@ unless stated.
   to eleven. Three data faults found on the first run (#752): Ti' Punch's 15
   ml of rhum in a 35 ml drink, Pic-A-De-Crop's 360 ml of 57% into 675 ml, the
   pear Bellini with no alcohol recorded at all.
+- **2026-09-14, #1001 then #1012 — public, and a worklist that knows what shows.**
+  #1001 put the line on the live site without the `qq:` rows cleared (§9.13 has
+  that ruling). Helen then: *"List the bottles missing ABVs on a new issue please
+  for me to enter."* **The grep was the wrong tool for that question**, and
+  `scripts/abv_worklist.py` is what replaced it: once the figure is public, the
+  question is not "which rows are guesses" but "which guesses change a number
+  somebody can see", and that depends on resolution. The script replays
+  `cocktail_units.rb`'s — a named `suggestion:` wins, otherwise
+  `default_bottles` or the mean of every bottle under the generic, and a pour
+  that does not parse to millilitres does not count — over the drinks the gate
+  publishes. On the day: of ten unsettled rows, three reached a published figure
+  (Apple Cart's bare `apple schnapps`, Smokestack Lightning's Ardbeg XO, the Mai
+  Tai's Damoiseau Pure Cane — all three checked by hand) and seven did not, both
+  Bob's bitters among them because a dash never reaches the arithmetic. **And
+  one of the seven was a proofread away from the three**: the Caribbean Sazerac,
+  held back, pours a bare `rhum agricole blanc` that averages eight bottles
+  including Clément. **That happened within hours**: Helen proofread both
+  Sazeracs the same afternoon, Clément moved into the live set, and another
+  session's ingest added two new `qq:` rows (Angostura orange bitters, white
+  wine) — four live and eight not, by the evening. #1012 was refreshed to match.
+  Those numbers are the day's, not the rule's — run the script.
+  **"Seventeen `qq:` rows down to eleven" above was true on 2026-09-06 and not
+  after 2026-09-09**, when Flaggpunsch was promoted — and `abv.yml`'s header
+  said "There are ELEVEN" until 2026-09-14. Worse than the stale header: the
+  #1001 session copied "eleven" into the layout, `_config_local.yml`, MANUAL
+  §9.3.4 and this journal before counting, then found the real number while
+  building the worklist. **A count in a comment is a second copy of something
+  the data already knows**; the header, the manual and the config now point at
+  the script and state no count at all, and MANUAL §9.3.4 says never to write
+  one.
 
 ### §9.3.5 What a drink costs — #547, built 2026-09-05/06
 
@@ -2256,15 +2303,25 @@ unless stated.
   is on a card, in the food twin and at every other placement of this button,
   and #963's alignment with the title's first line moved back off the wrapper
   onto the button unchanged.
-  **`?shortlist=1` ON THE INDEX IS KEPT, and that is the one judgement call in
-  it.** The link was its only caller. It stays under #651's rule — a thing
-  nothing reads is only safe while a comment says why — because the URL works,
-  it is tested, it is the plumbing any other answer would want, and the
-  complaint that raised #994 (*"it's hard to figure out how to see your
-  shortlist"*) was never declared solved. The script and the tests both say so
-  and both say to delete it WITH its tests if the answer turns out to be
-  something else. **Flagged to Helen rather than assumed**: this is the kind of
-  thing that becomes invisible dead code if nobody re-reads the comment.
+  **`?shortlist=1` ON THE INDEX IS KEPT, and that was the one judgement call in
+  it.** The link was its only caller. It was kept under #651's rule — a thing
+  nothing reads is only safe while a comment says why — and flagged to Helen
+  rather than assumed, with the offer to remove it.
+  **HER ANSWER, the same day, settles #994's complaint and not the query:**
+  *"Shortlist is still viewable when I click on the shortlist button at the top
+  of the cocktail card section, which will do for now, and at least it matches
+  food."* So the problem that raised #994 — *"it's hard to figure out how to see
+  your shortlist"* — is answered by the index's own `shortlisted (N)` button,
+  **for now**, and the reason the first version of this entry gave for keeping
+  the query ("the complaint was never declared solved") is gone. She did not ask
+  for the query to go when told it could, so it stays, and its reason is the
+  smaller one that is left: it works, it is tested, and "for now" is not
+  "never".
+  **One tension, left with her rather than resolved here**: "at least it matches
+  food" is an argument for parity, and food has no `?shortlist=1`. Keeping the
+  query on cocktails is, strictly, the two sites differing. Deleting it is one
+  small commit — the block in `cocktail-index.js` and its three tests — if she
+  wants the parity to be exact.
 
 - **2026-09-14, #1001 — the unit count ends the recipe, and goes public.**
   Helen: *"move units line to just below the notes section if it's there, above
@@ -2285,13 +2342,14 @@ unless stated.
   **AND SHE OVERRULED A CAUTION SHE HERSELF RECORDED, which is hers to do and
   worth writing down.** `show_units` was local-only because of her 2026-09-06
   call: *"local only now, and I'll note what publishing would need."* What
-  publishing needed was the `qq:` rows in `abv.yml` — eleven strengths nobody
-  can settle without the bottle on her shelf — and the config comment said
+  publishing needed was the `qq:` rows in `abv.yml` — strengths nobody can
+  settle without the bottle on her shelf — and the config comment said
   publishing on them "is hers to make once they are cleared". They are not
   cleared. She published anyway. The line says "Roughly" on every drink, which
-  was already the honest wording for a different reason, and
-  `grep -n 'qq:' _data/cocktails/abv.yml` is now a worklist that improves a
-  number the public can see. **The key is retired rather than set to `true`**:
+  was already the honest wording for a different reason, and the `qq:` rows are
+  now a worklist that improves a number the public can see (§9.3.4 below has
+  what came of that). *This entry first said "eleven strengths", copied from
+  `abv.yml`'s header, which was one out of date — see §9.3.4.* **The key is retired rather than set to `true`**:
   a switch nothing reads is the thing `_config_local.yml`'s whole idiom depends
   on not existing. The batch note's gate moved with it, from `show_costs or
   show_units` to `show_costs or page.units`, so in production it says the
@@ -2438,7 +2496,7 @@ unless stated.
   tape's rendered width, about 14px on a full-width phone tape, and no fixed
   length could have expressed it. Same class of fact as the vertical band offset
   `.drink-card-tape-bg { top: -1.765% }` already corrects. 4.14% is the modal
-  left inset across the fifteen tapes (`tmp/tape_insets.py`; the rest run
+  left inset across the fifteen tapes (`scripts/tape_insets.py`; the rest run
   3.02–4.14%, and #779 rolls a random one per load, so no single number is exact
   for all), and the `max-width` grows with the bleed so the name gains the width
   rather than only sliding into it. **A left overhang is never a sideways

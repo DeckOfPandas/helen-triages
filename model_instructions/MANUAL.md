@@ -140,6 +140,14 @@ pages at 360, 390 and 1280 and **names every element past the viewport**, and
 `sh scripts/browser/crop.sh <path> <selector> <name> [width]` crops one element
 at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`, `right`), so an
 alignment question is answered by comparing two numbers, not two images.
+**A box is not ink**, and `python3 scripts/browser/inkbox.py <png> [gap]`
+answers the other half: it prints each band of ink in a crop with its vertical
+extent and centre, for "is this glass centred on that arrow". **Crop the element
+that contains every mark you are comparing and read them from that ONE image** —
+an element screenshot pads its box by about a pixel, so two crops subtracted by
+page position are wrong by that padding, which at small sizes is most of the
+answer (the nav lettering's first correction, 2026-09-14, was a pixel short for
+exactly this reason).
 Read the PNGs with the Read tool. **Mobile emulation grows the layout viewport
 to fit the widest element, so `innerWidth` is the symptom, not the measure**;
 the script compares against the width it asked for. The phone pass of #899
@@ -1063,12 +1071,17 @@ in one state, and the view's "clears everything else" rule holds for both. It
 runs after the `?mood=` block and replaces rather than narrows, and drops the
 remembered scroll with the remembered list. Food has no such query.
 **NOTHING LINKS TO IT.** The drink page's see-all link was its one caller and
-#1000 removed that on 2026-09-14; the query is kept under #651's rule (a thing
-nothing reads is only safe while a comment says why) because it works, is
-tested, and is the plumbing any other answer to #994 would want — that issue's
-complaint was never declared solved. `cocktail-index.js` and
-`tests/js/cocktail-index-startup.test.js` both say so, and both say to delete it
-WITH its tests if the answer turns out to be something else.
+#1000 removed that on 2026-09-14. **How a reader finds their shortlist is the
+index's own `shortlisted (N)` button** — Helen, the same day: *"Shortlist is
+still viewable when I click on the shortlist button at the top of the cocktail
+card section, which will do for now, and at least it matches food."* The query
+is kept under #651's rule (a thing nothing reads is only safe while a comment
+says why): offered its removal, she left it, it works and is tested, and "for
+now" is not "never". **Food has no such query**, so strictly it is the one
+place the two sites' shortlists differ; deleting it is the block in
+`cocktail-index.js` plus its three tests in
+`tests/js/cocktail-index-startup.test.js`, and both files say to take them
+together.
 
 ## 9. Cocktails
 
@@ -1675,11 +1688,27 @@ and Helen chose the same rule as costing; the exclusion list is read out of
 reads its two data attributes for the BATCH note's total only and never writes
 to the line, which is what keeps a per-serving figure from moving with the
 multiple box.
-**`grep -n 'qq:' _data/cocktails/abv.yml` is the worklist of strengths only
-Helen's shelf can settle, and it is now a PUBLIC number that leans on them.**
-The gate existed because publishing on eleven unsettled strengths was, in her
+**The unsettled strengths are a PUBLIC number's worklist now.** A `qq:` row
+(always `confidence: low`, and every low row has one) is a strength only Helen's
+shelf can settle. The gate existed because publishing on them was, in her
 2026-09-06 words, "hers to make once they are cleared"; she made it without
 clearing them, which is hers to do. The line says "Roughly" on every drink.
+**`python3 scripts/abv_worklist.py` is the worklist, not the grep** (2026-09-14,
+#1012 is the snapshot she works from). `grep -n 'qq:'` lists the rows; it cannot
+say which of them change a number somebody can see, because that depends on how
+a pour resolves and whether it counts at all — both Bob's bitters carry a `qq:`
+and neither moves any figure, because a dash never reaches the arithmetic. The
+script replays `cocktail_units.rb`'s own resolution over the PUBLISHED drinks,
+so it is also a second implementation of that lookup, the way
+`scripts/related_drinks.py` is of the related-drinks scoring. **The split is
+not a constant, and it moved the day it was measured**: the Caribbean Sazerac
+pours a bare `rhum agricole blanc`, which averages every bottle under that
+category, so when Helen proofread it on 2026-09-14 Clément went from reaching
+nothing to reaching a live drink — and another session's ingest added two new
+`qq:` rows the same afternoon. Run it; do not quote a count from here.
+**Never write the number of `qq:` rows into a comment.** `abv.yml`'s header said
+eleven for five days after one was promoted (2026-09-09 to 2026-09-14), and one
+session copied the stale figure into four more places before anyone counted.
 
 ### 9.3.5 What a drink costs — #547
 
@@ -2131,7 +2160,7 @@ ARTWORK'S OWN left inset (4.14%) on a phone** (#995, 2026-09-12): every tape SVG
 insets its polygon inside its viewBox and `decorations.js` stretches the artwork
 to the box, so that inset is a percentage of the tape's rendered width, not a
 length — which is why the phone tape's BOX started on the column and its black
-BAND did not. `tmp/tape_insets.py` is how the fifteen were measured; the modal
+BAND did not. `scripts/tape_insets.py` is how the fifteen were measured; the modal
 value is the one used, and the `max-width` grows with the bleed so the name
 gains the width rather than only sliding into it. **The shortlist button is the
 title row's second item, at its right end** (#963), given the name's FIRST

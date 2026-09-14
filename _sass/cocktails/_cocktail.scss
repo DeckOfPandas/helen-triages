@@ -190,7 +190,7 @@ $title-tape-pad-x: 1.6em;
 // How far the black band is inset from the LEFT end of a tape SVG's own
 // viewBox, as a fraction of the tape's rendered width -- the artwork is
 // stretched to its box, so this is a percentage and not a length. The modal
-// value across the fifteen files (`tmp/tape_insets.py`); the phone block near
+// value across the fifteen files (`scripts/tape_insets.py`); the phone block near
 // the foot of this file is the only thing that reads it, and says why.
 $tape-art-inset-x: 4.14%;
 $title-half-leading: ($line-height-body - 1) * 0.5 * $title-size;
@@ -1428,7 +1428,8 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // pixels but a percentage of the tape's rendered width, about 14px on a
   // full-width phone tape. Same class of fact as the vertical band offset the
   // `.drink-card-tape-bg { top: -1.765% }` rule corrects, and measured the same
-  // way: `tmp/tape_insets.py` prints all fifteen polygons.
+  // way: `python3 scripts/tape_insets.py` prints all fifteen polygons and the
+  // modal value.
   //
   // 4.14% IS THE MODAL LEFT INSET, ten of the fifteen tapes (the others run
   // 3.02%-4.14%, and #779 rolls a random one per load, so no single number can
