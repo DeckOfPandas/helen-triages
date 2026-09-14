@@ -220,7 +220,7 @@ test rather than rendering:
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
 `small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` · `half` ·
-`whole` · `to top` · `to rinse`
+`whole` · `to top` · `to rinse` · `to taste`
 <!-- vocab:measures end -->
 
 Four things a source prints as if they were units, and what to do instead

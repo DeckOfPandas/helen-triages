@@ -392,6 +392,9 @@ mood_ingredients:
     - pear
     - calvados
     - apple schnapps
+    # NEW 2026-09-14 with the generic (#1013), by this block's own standing rule
+    # that the fruit liqueurs are `fruity` -- see `pudding_flavour` below.
+    - peach schnapps
     - fruit purée
     - passion fruit syrup
     - crème de mûre
@@ -399,6 +402,10 @@ mood_ingredients:
     - crème de pêche
     - apricot liqueur
     - cherry liqueur
+    # NEW 2026-09-14, split out of `cherry liqueur` for Cherry Heering -- the
+    # same fruit, and the same rule, so the Singapore Sling's pour cannot lose
+    # `fruity` by being retyped to name both.
+    - cherry brandy
     - passion fruit liqueur
     - dried apricots
 

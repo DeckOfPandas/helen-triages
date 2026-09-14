@@ -285,6 +285,15 @@ bottles:
     generic: "rhum agricole blanc"
     aliases: ["Clément Agricole Blanc", "Clement Agricole Blanc"]
     origin: "Martinique"
+  # ON THE SHELF SINCE 2026-09-14 (#1012). Helen gave its strength answering
+  # the `qq:` about which Clément she owned -- "Clement Rhum Agricole Canne
+  # Bleue is 50 %" -- and, asked whether that meant it was hers: "Yes, add it."
+  # No drink names it yet. It is one of the bottles `rhum agricole blanc`'s
+  # mode is taken over, and it agrees with that mode (50).
+  "Clément Rhum Agricole Canne Bleue":
+    generic: "rhum agricole blanc"
+    aliases: ["Clement Rhum Agricole Canne Bleue", "Clément Canne Bleue", "Clement Canne Bleue"]
+    origin: "Martinique"
   # THREE DAMOISEAU BLANCS, and the degree sign is part of the name: the 40°,
   # the 50°, and the Pure Cane. The 40° is the one the drinks had been writing
   # without its strength; the other two are declared because she owns them.
@@ -382,23 +391,33 @@ bottles:
   "Myers":
     generic: "caramel-forward Jamaican rum"
     aliases: ["Myers's", "Myer's"]
-  "Van Osten Botanik Arrack":
+  # RENAMED 2026-09-14 (#796) from `Van Osten Botanik Arrack`, which was a
+  # misspelling of the house and not the bottle's name at all. Helen: "the
+  # bottle I own is 'Batavia Arrack van Oosten' (note misspelling on current
+  # site)". Both old spellings stay as aliases, so the two drafts that write the
+  # old name keep resolving until they are retyped.
+  "Batavia Arrack van Oosten":
     generic: "Batavia arrack"
-    aliases: ["Van Osten"]
-  # THE ONE BOTTLE IN THIS FILE KEYED ON A CATEGORY RATHER THAN A LABEL, and it
-  # is declared rather than accidental. #782 said "Ceylon Arrack" with no brand;
-  # Helen's call, 2026-09-06, was to enter it as she wrote it rather than have a
-  # brand guessed onto her shelf. So this row means "the Ceylon arrack in the
-  # house, whichever it is" and the day the label is read off the bottle, this
-  # key is what changes -- the generic below is already right either way.
+    aliases: ["Van Osten Botanik Arrack", "Van Osten", "Van Oosten", "Batavia Arrack Van Oosten"]
+  # THE LABEL IS READ, AND IT IS WHAT IT SAID. #782 said "Ceylon Arrack" with no
+  # brand, and Helen's call on 2026-09-06 was to enter it as written rather than
+  # have a brand guessed onto her shelf, so this row sat for a week meaning "the
+  # Ceylon arrack in the house, whichever it is". #796, 2026-09-14: "Confirmed:
+  # the name of the bottle is 'Ceylon Arrack', and the generic is
+  # 'coconut flower-arrack'" -- so the key was the label all along, and the
+  # thing that changed is the GENERIC, which was `Ceylon arrack` until then.
   #
-  # Ceylon arrack is coconut flower sap and shares only a name with the Batavia
-  # above; `family_less` in ingredients.yml carries that and is why it has no
-  # family at all.
+  # `coconut-flower arrack`, lowercase and hyphenated as a compound adjective,
+  # was Helen's pick of the three spellings her comment used. It is coconut
+  # flower sap and shares only a name with the Batavia above; `family_less` in
+  # ingredients.yml carries that and is why it has no family at all.
   "Ceylon Arrack":
-    generic: "Ceylon arrack"
-    # No aliases: the key differs from the generic only in case, and matching
-    # here is case-insensitive, so one would be the same string twice.
+    generic: "coconut-flower arrack"
+    # STILL NO ALIASES. The generic's old name, `Ceylon arrack`, differs from
+    # this key only in case, and matching here is case-insensitive -- so a
+    # suggestion written that way already resolves to this bottle, and an alias
+    # would be the same string twice. As a GENERIC the old name is retired
+    # (ingredients.yml `retired_cane_and_palm_spirits`).
     aliases: []
 
   # --- the Martinique agricoles, 2026-08-30 ---------------------------------
@@ -607,8 +626,13 @@ bottles:
   # alone can be an alias of neither.
   "Bulleit Rye":
     generic: "rye"
-  "Ardbeg XO":
+  # "Ardbeg XO should be 'Ardbeg An Oa', ABV 46.6 %." -- Helen, 2026-09-14
+  # (#1012). There is no standard Ardbeg XO; the name was a mis-transcription.
+  # The old name is an alias, so it still resolves -- but Smokestack Lightning
+  # prints its suggestion from its own file, so that file was retyped too.
+  "Ardbeg An Oa":
     generic: "single malt scotch whisky"
+    aliases: ["Ardbeg XO"]
   # THE PRODUCT REALLY IS CALLED "SAZERAC", which is why it sat in
   # `unresolved_suggestions` for days under the reasonable suspicion that the
   # Sazerac's suggestion was just its own title written twice. Helen,
@@ -858,8 +882,13 @@ bottles:
     aliases: ["Galliano L'Autentico liqueur", "Galliano"]
   "Cointreau":
     generic: "triple sec"
+  # A CHERRY BRANDY SINCE 2026-09-14, not a cherry liqueur. Helen: "Cherry
+  # Heering is a cherry brandy, Briottet Cerise is a cherry liqueur." The two
+  # had shared `cherry liqueur` since the Briottet was added, which made them
+  # look interchangeable; the Singapore Sling, which names both for one pour,
+  # now says `[cherry liqueur, cherry brandy]` -- either would do.
   "Cherry Heering":
-    generic: "cherry liqueur"
+    generic: "cherry brandy"
   "Suze":
     generic: "gentian liqueur"
   "John D Taylor's Velvet Falernum":
@@ -961,8 +990,21 @@ bottles:
     generic: "orange Curaçao"
   "Gabriel Boudier Crème de Menthe":
     generic: "crème de menthe"
-  "Gabriel Boudier Gingembre":
+  # RENAMED 2026-09-14 (#1012) -- Helen: "'Gabriel Boudier Liqueur de
+  # Gingembre' is 18 % -- and please update the name string." The short form
+  # is the alias. No drink names it today.
+  "Gabriel Boudier Liqueur de Gingembre":
     generic: "ginger liqueur"
+    aliases: ["Gabriel Boudier Gingembre"]
+  # BOTTLES FOR TWO CATEGORIES THAT HAD NONE, 2026-09-14 (#1012). Helen named
+  # the one on her shelf in each: "Briottet Liqueur de Sapin is 40 %" and
+  # "'La Tomato Liqueur' is 25 %, and this is the only tomato liqueur I have
+  # (shocker)". Their category rows left abv.yml's `generics:` the same day;
+  # their prices moved from category rows to these bottles in costs.yml.
+  "Briottet Liqueur de Sapin":
+    generic: "liqueur de sapin"
+  "La Tomato Liqueur":
+    generic: "tomato liqueur"
   # Art de Vivre writes `Roots` bare against `mastiha liqueur`, and three more
   # drinks write "Roots Mastiha" as their `item`. One product, so the house name
   # resolves -- the `Velvet` case again.

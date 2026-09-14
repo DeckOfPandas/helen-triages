@@ -222,6 +222,12 @@ bottles:
     size_ml: 700
     gbp: 32
     confidence: medium
+  # NEW 2026-09-14 (#1012). Helen's figure, £46. The size was not given and is
+  # taken as 70cl, which is what every other agricole blanc here is sold in.
+  "Clément Rhum Agricole Canne Bleue":
+    size_ml: 700
+    gbp: 46
+    confidence: high
   "Damoiseau Rhum Agricole Blanc 40°":
     size_ml: 700
     gbp: 28
@@ -278,15 +284,14 @@ bottles:
     size_ml: 700
     gbp: 16
     confidence: medium
-  "Van Osten Botanik Arrack":
+  # RENAMED 2026-09-14 (#796) from `Van Osten Botanik Arrack` -- see bottles.yml.
+  "Batavia Arrack van Oosten":
     size_ml: 700
     gbp: 40
     confidence: high
-  # In the house since 2026-09-06, #782, and keyed on the words in the issue
-  # rather than a label. HELEN'S OWN FIGURE: 37, against the 28 I guessed. High
-  # despite the key still being the category, for the reason abv.yml gives on
-  # the matching row -- what she read off is the bottle in the house, whatever
-  # the label eventually turns out to say.
+  # In the house since 2026-09-06, #782. HELEN'S OWN FIGURE: 37, against the 28
+  # I guessed. The key turned out to be the label after all (#796, 2026-09-14);
+  # what changed that day was its generic, `coconut-flower arrack`.
   "Ceylon Arrack":
     size_ml: 700
     gbp: 37
@@ -349,7 +354,9 @@ bottles:
     size_ml: 700
     gbp: 34
     confidence: medium
-  "Ardbeg XO":
+  # RENAMED 2026-09-14 (#1012) from `Ardbeg XO` -- the bottle was always An Oa.
+  # The price is the one Helen gave under the old name, for the same bottle.
+  "Ardbeg An Oa":
     size_ml: 700
     gbp: 54
     confidence: high
@@ -522,10 +529,25 @@ bottles:
     size_ml: 700
     gbp: 28
     confidence: medium
-  "Gabriel Boudier Gingembre":
+  # RENAMED 2026-09-14 (#1012) from `Gabriel Boudier Gingembre`.
+  "Gabriel Boudier Liqueur de Gingembre":
     size_ml: 700
     gbp: 20
     confidence: high
+  # BOTTLES NAMED 2026-09-14 (#1012) for two categories that had none. THE
+  # PRICES ARE NOT NEW: each is the figure the category row in `generics:`
+  # carried until that day, moved onto the bottle it now belongs to, still
+  # `low` because nobody has checked it against the bottle. The category rows
+  # are gone -- with a bottle under each, a price there would be a second
+  # answer to the same question.
+  "Briottet Liqueur de Sapin":
+    size_ml: 700
+    gbp: 35
+    confidence: low
+  "La Tomato Liqueur":
+    size_ml: 700
+    gbp: 30
+    confidence: low
   "Roots Mastiha":
     size_ml: 700
     gbp: 30
@@ -806,6 +828,38 @@ default_bottles:
   reposado tequila: ["Rooster Rojo Tequila Reposado", "Patrón Reposado"]
   añejo tequila: ["Rooster Rojo Tequila Añejo", "Patrón Añejo"]
 
+  # --- the no-mode categories, 2026-09-14 (#1016) ------------------------------
+  # WHY THESE SEVEN, AND WHY NOW. #1016 made an unbottled pour's STRENGTH the
+  # mode of the bottles declared under its generic ("more meaningful than mean
+  # or median"). Measured that day, seven categories had no mode at all -- every
+  # bottle a different strength -- so the rule had no answer for them. Asked
+  # what should happen, Helen chose "name a default bottle" over the highest,
+  # the mean or the median, and named each one in the same sitting.
+  #
+  # A DEFAULT HERE SETS THE PRICE TOO, and she was told so before choosing: an
+  # unbottled bourbon pour now costs a Woodford's rather than the four-bourbon
+  # range. That is the rule this block has always had; these are simply the
+  # first defaults that arrived for the strength's sake rather than the price's.
+  #
+  # test_every_bottled_generic_resolves_to_one_strength is what makes the next
+  # one arrive the same way: a new bottle that leaves a category with no mode
+  # and no default fails the build, naming the category.
+  bourbon: ["Woodford's Reserve"]
+  absinthe: ["Vieux Pontarlier"]
+  cachaça: ["Sagatiba"]
+  amontillado sherry: ["Lustau Amontillado"]
+  # "Gabriel Boudier Liqueur de Gingembre (18%)" over King's Ginger (41%).
+  ginger liqueur: ["Gabriel Boudier Liqueur de Gingembre"]
+  maraschino liqueur: ["Luxardo Maraschino"]
+  # "If cherry liqueur then Briottet, if cherry brandy then Cherry Heering." The
+  # answer split one category into two (bottles.yml): each now has exactly one
+  # bottle, so neither default changes a number today. Both are recorded
+  # because "if cherry liqueur then Briottet" is a RULING, and the next cherry
+  # liqueur added would otherwise silently become a two-bottle mode question --
+  # the orgeat argument above.
+  cherry liqueur: ["Briottet Crème de Cerise"]
+  cherry brandy: ["Cherry Heering"]
+
 # --- generics with no bottle behind them --------------------------------------
 # 438 of 685 pours name a generic and no bottle, and this is what prices them.
 # A generic that DOES have bottles is deliberately absent: its range is computed
@@ -844,13 +898,19 @@ generics:
   # litre, up from a guessed 42.86, and `low` becomes `high`. It was one of
   # the few `low` rows left in the file.
   Amaro Ciociaro:     { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "GBP 36 / 70cl", confidence: high }
-  liqueur de sapin:   { gbp_per_litre_min: 50.00, gbp_per_litre_max: 50.00, basis: "GBP 35 / 70cl", confidence: low }
+  # `liqueur de sapin` and `tomato liqueur` MOVED TO BOTTLES 2026-09-14 (#1012):
+  # Briottet Liqueur de Sapin and La Tomato Liqueur, above, at the same prices.
   Swedish flaggpunsch: { gbp_per_litre_min: 40.00, gbp_per_litre_max: 40.00, basis: "GBP 28 / 70cl", confidence: low }
   Plymouth:           { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }
-  Ceylon arrack:      { gbp_per_litre_min: 37.33, gbp_per_litre_max: 37.33, basis: "GBP 28 / 75cl", confidence: low }
-  tomato liqueur:     { gbp_per_litre_min: 42.86, gbp_per_litre_max: 42.86, basis: "GBP 30 / 70cl", confidence: low }
+  # RENAMED 2026-09-14 (#796) from `Ceylon arrack`, with the generic.
+  coconut-flower arrack: { gbp_per_litre_min: 37.33, gbp_per_litre_max: 37.33, basis: "GBP 28 / 75cl", confidence: low }
   lime cordial:       { gbp_per_litre_min: 7.14,  gbp_per_litre_max: 7.14,  basis: "Rose's, GBP 5 / 70cl", confidence: medium }
   coconut cream:      { gbp_per_litre_min: 5.00,  gbp_per_litre_max: 7.50,  basis: "GBP 2-3 / 400ml tin", confidence: medium }
+  # HELEN'S OWN FIGURE, 2026-09-14 (#1014): "Use £4.50/litre for both sites."
+  # Only this site prices anything -- food's shopping list counts and does not
+  # cost (_plugins/food_shopping.rb) -- so this is the one place it can go.
+  # The Grasshopper (#984) is the first drink to pour cream by volume.
+  cream:              { gbp_per_litre_min: 4.50,  gbp_per_litre_max: 4.50,  basis: "GBP 4.50 / litre", confidence: high }
 
   # --- a real category: the range is the span of what you might buy ------------
   # `overproof Demerara rum, lightly aged` JOINED THIS BLOCK ON 2026-09-05,
@@ -898,6 +958,10 @@ generics:
   apple brandy:       { gbp_per_litre_min: 40.00, gbp_per_litre_max: 57.14, basis: "GBP 28-40 / 70cl", confidence: medium }
   navy strength gin:  { gbp_per_litre_min: 42.86, gbp_per_litre_max: 57.14, basis: "GBP 30-40 / 70cl", confidence: medium }
   apple schnapps:     { gbp_per_litre_min: 22.86, gbp_per_litre_max: 31.43, basis: "GBP 16-22 / 70cl", confidence: low }
+  # NEW 2026-09-14 (#1013). HELEN'S OWN FIGURE, "£12"; 70cl assumed, the size
+  # every schnapps row here uses. A point price rather than a range, the
+  # pineapple-vodka case: she named the thing she buys.
+  peach schnapps:     { gbp_per_litre_min: 17.14, gbp_per_litre_max: 17.14, basis: "GBP 12 / 70cl", confidence: high }
   crème de cassis:    { gbp_per_litre_min: 22.86, gbp_per_litre_max: 34.29, basis: "GBP 16-24 / 70cl", confidence: medium }
   # HELEN'S OWN FIGURE, 2026-09-09: "I have Ciroc, GBP 31, 37.5%." My guess was
   # GBP 20-26, so the range was about 20% under. 70cl assumed -- the size she

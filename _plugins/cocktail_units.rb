@@ -55,6 +55,20 @@
 # quantity that moves a figure printed to one decimal place. Six dashes of
 # Angostura is 0.02 units. A drink is either alcoholic and countable, or it has
 # no alcohol in it and 0.0 is the right answer.
+#
+# --- DIFFERENCE 5: BITTERS NEVER COUNT, 2026-09-14 ---------------------------
+# Helen, #1012: "Don't include bitters in our ABV calculations." Until then a
+# bitters dropped out only because a dash does not parse to millilitres; one
+# poured by volume would have counted at 44.7%. Now any pour whose generic is in
+# ingredients.yml's `bitters:` list is skipped before its amount is read. COST IS
+# UNTOUCHED -- she ruled on strength, and costing already excludes the dash.
+# Measured the day it landed: no drink, live or draft, poured a bitters by
+# volume, so no figure moved.
+#
+# --- DIFFERENCE 6: A CATEGORY'S STRENGTH IS ITS MODE, 2026-09-14 -------------
+# See `generic_abv` below. Cost takes a category's RANGE across its bottles;
+# strength takes one figure, and since #1016 that figure is the most common
+# strength among the bottles rather than their mean.
 # =============================================================================
 
 require "set"
@@ -93,6 +107,9 @@ module HelenTriages
       @defaults = costs["default_bottles"] || {}
 
       @non_alcoholic = (@abv["non_alcoholic"] || []).to_set
+      # READ FROM THE VOCABULARY, NOT RESTATED -- DIFFERENCE 5 above. The list
+      # a bitters is declared in is the list that excludes it.
+      @bitters = (@ing["bitters"] || []).to_set
 
       @alias = {}
       @by_generic = Hash.new { |h, k| h[k] = [] }
@@ -132,22 +149,52 @@ module HelenTriages
     # ONE, exactly as it decides its price. "London dry gin let's say the
     # default is tanqueray" makes an unqualified gin 43.1% -- a real bottle's
     # strength rather than an average across six gins she would not have poured
-    # for it. Absent a ruling, the mean across every bottle declared under the
-    # generic, which is the honest reading of not knowing which she reached for.
+    # for it. A default of TWO bottles (blanco tequila: "Rooster when it doesn't
+    # matter loads, Patron Silver if it really does") is a real range she chose,
+    # and is averaged, as it always was.
     #
-    # THE MEAN, NOT THE MIDPOINT, and the difference shows up in exactly one
-    # place: `rhum agricole blanc` has eight bottles, six of them at 50% and two
-    # lower. The midpoint of the extremes would report 45% for a category that
-    # is overwhelmingly 50%. The mean follows the shelf.
+    # ABSENT A RULING, THE MODE, SINCE 2026-09-14 -- #1016, Helen: "if a bottle
+    # isn't stated for a cocktail recipe, assume the MODE ABV of bottles we've
+    # declared. This will be more meaningful than mean or median." It was the
+    # mean until then. The mode is a strength a bottle on her shelf actually
+    # HAS; the mean usually was not: `rhum agricole blanc` averaged 45.25% over
+    # bottles that are all 40, 42 or 50, and now reads 50. (This comment used to
+    # argue for the mean over the midpoint on exactly that category. Both were
+    # the wrong shape of answer for the same reason.)
+    #
+    # A CATEGORY WITH NO MODE IS HER CALL, NOT THIS FILE'S. Seven categories had
+    # every bottle at a different strength the day this landed; asked, she chose
+    # "name a default bottle" over the highest, the mean or the median, and named
+    # all seven (costs.yml `default_bottles`). So the mean below is a LAST RESORT
+    # that keeps a page building, and
+    # test_every_bottled_generic_resolves_to_one_strength fails the build the
+    # moment it would be read -- naming the category that needs a default.
     def generic_abv(g)
       return 0.0 if @non_alcoholic.include?(g)
 
-      names = @defaults[g] || @by_generic[g]
-      vals = names.map { |n| bottle_abv(n) }.compact
-      return vals.sum / vals.size unless vals.empty?
+      if @defaults[g]
+        vals = @defaults[g].map { |n| bottle_abv(n) }.compact
+        return vals.sum / vals.size unless vals.empty?
+      else
+        vals = @by_generic[g].map { |n| bottle_abv(n) }.compact
+        unless vals.empty?
+          mode = self.class.unique_mode(vals)
+          return mode || vals.sum / vals.size
+        end
+      end
 
       row = @abv["generics"][g]
       row && row["abv"] && row["abv"].to_f
+    end
+
+    # The single most common value, or nil when there is none -- a tie at the
+    # top, or (the same thing) every value different. A class method so the
+    # test can ask the plugin's own question rather than re-implementing it.
+    def self.unique_mode(vals)
+      counts = vals.tally
+      top = counts.values.max
+      winners = counts.select { |_, c| c == top }.keys
+      winners.size == 1 ? winners.first : nil
     end
 
     # Millilitres for an amount string, or nil when the pour does not count.
@@ -173,6 +220,11 @@ module HelenTriages
         next unless ing.is_a?(Hash)
         amount = ing["amount"].to_s.strip
         generics = Array(ing["generic"]).map(&:to_s)
+
+        # BITTERS NEVER COUNT -- DIFFERENCE 5. Skipped on the generic, before
+        # the amount is even parsed, so a bitters in millilitres is excluded as
+        # surely as one in dashes.
+        next if !generics.empty? && generics.all? { |g| @bitters.include?(g) }
 
         # --- how much liquid, if any ---------------------------------------
         # A `to top` is a declared RANGE, so its midpoint is the best single

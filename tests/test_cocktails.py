@@ -7183,12 +7183,28 @@ def test_a_low_confidence_strength_says_what_helen_has_to_check():
     first, and the `qq` is the sentence saying why this one could not be settled
     without her bottle. Rhum JM is bottled at 50 and at 55: that is a question,
     not an error.
+
+    BITTERS ARE EXEMPT SINCE 2026-09-14, because the question has no answer
+    worth her time. Helen, #1012: "Don't include bitters in our ABV
+    calculations." A bitters bottle's strength can never reach a unit figure,
+    so a `qq:` on one would be a question for her shelf about a number nothing
+    reads. The rows stay `low` -- they are still guesses, and if bitters ever
+    count again they are the ones to overwrite first -- but they are no longer
+    on her worklist, and scripts/abv_worklist.py skips them the same way.
     """
     data = _abv()
+    bitters = set(_vocab().get("bitters") or [])
+    bottle_generic = {
+        name: (entry or {}).get("generic")
+        for name, entry in _declared_bottles().items()
+    }
     silent = []
     for block in ("bottles", "generics"):
         for name, row in sorted((data.get(block) or {}).items()):
             if isinstance(row, dict) and row.get("confidence") == "low":
+                generic = bottle_generic.get(name) if block == "bottles" else name
+                if generic in bitters:
+                    continue
                 if not str(row.get("qq") or "").strip():
                     silent.append(f"{block}/{name}")
     assert not silent, (
@@ -7222,6 +7238,69 @@ def test_no_generic_gets_its_strength_from_two_places():
     assert not contradicted, (
         "These generics are in `non_alcoholic:` and also given a strength "
         "somewhere. One of the two is wrong:\n  " + "\n  ".join(contradicted)
+    )
+
+
+def _unique_mode(values):
+    """The single most common value, or None -- the plugin's `unique_mode`."""
+    counts = {}
+    for v in values:
+        counts[v] = counts.get(v, 0) + 1
+    top = max(counts.values())
+    winners = [v for v, c in counts.items() if c == top]
+    return winners[0] if len(winners) == 1 else None
+
+
+def test_every_bottled_generic_resolves_to_one_strength():
+    """A category with bottles has a mode, or Helen has named its default.
+
+    #1016, Helen, 2026-09-14: "if a bottle isn't stated for a cocktail recipe,
+    assume the MODE ABV of bottles we've declared. This will be more meaningful
+    than mean or median." cocktail_units.rb takes an unbottled pour's strength
+    from the most common strength among the category's bottles.
+
+    A MODE DOES NOT ALWAYS EXIST, and that is what this guards. The day the rule
+    landed, seven categories had every bottle at a different strength -- bourbon
+    was 40, 43.2, 45 and 47 -- so the rule had no answer. Asked what should
+    happen, Helen chose "name a default bottle" over the highest, the mean or
+    the median, and named all seven. So the plugin's fallback to the mean is a
+    last resort that keeps a page building, and THIS is what keeps it from ever
+    being read: a new bottle that breaks a category's mode, in a category with
+    no default, fails here and names the category that needs one.
+
+    TWO KINDS OF CATEGORY ARE NOT ASKED. One with a `default_bottles` ruling --
+    her ruling decides it whatever the strengths are, and a two-bottle default
+    (blanco tequila) is a range she chose and is averaged. And the bitters,
+    which never reach a unit figure at all (Helen, #1012).
+    """
+    abv_bottles = _abv().get("bottles") or {}
+    defaults = _costs().get("default_bottles") or {}
+    bitters = set(_vocab().get("bitters") or [])
+
+    by_generic = {}
+    for name, entry in _declared_bottles().items():
+        generic = (entry or {}).get("generic")
+        row = abv_bottles.get(name)
+        if generic and isinstance(row, dict) and row.get("abv") is not None:
+            by_generic.setdefault(generic, []).append((name, float(row["abv"])))
+
+    no_answer = []
+    for generic, rows in sorted(by_generic.items()):
+        if generic in defaults or generic in bitters:
+            continue
+        if _unique_mode([abv for _, abv in rows]) is None:
+            no_answer.append(
+                f"{generic}: " + ", ".join(f"{n} {abv:g}%" for n, abv in sorted(rows))
+            )
+
+    assert not no_answer, (
+        "These categories have no single most common strength and no default "
+        "bottle, so an unbottled pour of them has no answer under Helen's mode "
+        "rule (#1016) and the units plugin is falling back to the mean she "
+        "ruled against:\n  " + "\n  ".join(no_answer)
+        + "\n\nAsk Helen which bottle is the default, and add it to "
+          "`default_bottles` in _data/cocktails/costs.yml. That also sets the "
+          "category's price for an unbottled pour -- tell her so."
     )
 
 
@@ -7266,6 +7345,8 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
         | set(data.get("non_alcoholic") or [])
     )
 
+    bitters = set(vocab.get("bitters") or [])
+
     unmeasured = []
     for ing in drink_file.fm.get("ingredients") or []:
         if not isinstance(ing, dict):
@@ -7273,6 +7354,11 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
         amount = str(ing.get("amount", "")).strip()
         generics = ing.get("generic")
         generics = [generics] if isinstance(generics, str) else (generics or [])
+
+        # Bitters never count, whatever the amount -- Helen, #1012, and
+        # cocktail_units.rb's DIFFERENCE 5. Matching the plugin exactly.
+        if generics and all(str(g) in bitters for g in generics):
+            continue
 
         if amount == "to top":
             if not any(str(g) in top_up for g in generics):
@@ -7498,8 +7584,8 @@ def test_rum_adjacent_before_names_a_real_group():
     before flavoured". The rum page walks `rum_groups` in order and renders the
     Rum-adjacent block when the current shelf's name matches this key, so the
     key is the block's POSITION -- and a Liquid `{% if %}` that never matches
-    fails silently. Cachaca, Batavia arrack and Ceylon arrack would simply stop
-    appearing, with every other check green.
+    fails silently. Cachaca, Batavia arrack and coconut-flower arrack would
+    simply stop appearing, with every other check green.
 
     WHY THE VALUE IS DECLARED RATHER THAN WRITTEN INTO THE TEMPLATE. Every other
     name on that page is a lookup and not a literal -- the categories, the card
@@ -7519,7 +7605,7 @@ def test_rum_adjacent_before_names_a_real_group():
         "_data/cocktails/ingredients.yml.\n\n"
         "cocktails/reference/rum-categories.html renders the Rum-adjacent block "
         "only when a shelf's name matches it, so without a value the block -- "
-        "cachaca, Batavia arrack and Ceylon arrack -- renders nowhere."
+        "cachaca, Batavia arrack and coconut-flower arrack -- renders nowhere."
     )
 
     names = [(g.get("name") or "").strip() for g in groups]
@@ -7583,11 +7669,17 @@ def test_cane_juice_bottles_declare_an_origin():
     stay green -- the exact shape of rot `test_rum_groups_partition_the_styles`
     and `test_there_are_prose_pages_to_check` both exist to refuse.
 
-    THE ARRACKS ARE DELIBERATELY NOT COVERED. `Batavia arrack` and
-    `Ceylon arrack` carry their origin in the generic already, the way the three
-    Jamaicans and both Demeraras do -- Batavia is Jakarta and Ceylon is Sri
-    Lanka. That is the coexistence Helen's ruling describes: in the generic
-    where it changes the category, on the bottle where it changes the flavour.
+    THE ARRACKS ARE DELIBERATELY NOT COVERED -- they are not on the Cane juice
+    shelf at all, but on `cane_and_palm_spirits`, so this test never reads them.
+    `Batavia arrack` carries its origin in the generic, the way the three
+    Jamaicans and both Demeraras do -- Batavia is Jakarta. The other arrack did
+    too until #796 (2026-09-14): it was `Ceylon arrack`, and is now
+    `coconut-flower arrack`, named for what it is made from rather than where.
+    So its origin now lives nowhere, and whether the Ceylon Arrack BOTTLE should
+    say `origin: "Sri Lanka"` is an open question (adding a value to
+    `bottle_origins` is Helen's), not an oversight. That is the coexistence
+    Helen's ruling describes: in the generic where it changes the category, on
+    the bottle where it changes the flavour.
     Cachaça is seeded with Brazil for the same reason it is not required here --
     it is Brazilian by definition.
     """

@@ -15,7 +15,7 @@ ingredients:
     generic: "single malt scotch whisky"
     character:
       - "peated"
-    suggestion: ["Ardbeg XO"]
+    suggestion: ["Ardbeg An Oa"]
   - amount: "15 ml"
     generic: "agave syrup"
   - amount: "22.5 ml"
@@ -40,5 +40,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
