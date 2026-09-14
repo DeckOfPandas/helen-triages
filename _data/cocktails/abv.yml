@@ -294,7 +294,6 @@ bottles:
   "King's Ginger":                    { abv: 41,   confidence: high }
   "Gabriel Boudier Gingembre":        { abv: 20,   confidence: low,
                                         qq: "Boudier's ginger sits somewhere around 20 and I could not pin it." }
-  "Giffard Crème de Mûre":            { abv: 16,   confidence: high }
   "Briottet Crème de Pêche":          { abv: 18,   confidence: medium }
   # NEW 2026-09-09 with the bottle. 18 from its siblings, not from a label --
   # Briottet's crèmes run 16 to 25 and the fruit ones cluster at 18, so this is
@@ -315,6 +314,7 @@ bottles:
   # 20% in Britain -- it was relaunched here at the higher strength, which is
   # the liqueur's own older figure. This file had 15 from general knowledge and
   # the web pass corrected it: a third of a unit on every 25 ml pour.
+  "Giffard Crème de Mûre":            { abv: 16,   confidence: high }
   "Suze":                             { abv: 20,   confidence: high }
   "Liquore Strega":                   { abv: 40,   confidence: high }
   "Bénédictine D.O.M.":               { abv: 40,   confidence: high }
@@ -328,6 +328,8 @@ bottles:
   # can require EVERY declared bottle to carry a figure without an exception
   # list, which is the kind of exception that rots.
   "Angostura":                        { abv: 44.7, confidence: high }
+  "Angostura orange bitters":         { abv: 28,   confidence: low,
+                                        qq: "Estimated; not checked against Helen's own bottle." }
   "Peychaud's":                       { abv: 35,   confidence: high }
   "Bitter Truth Aromatic":            { abv: 39,   confidence: high }
   "Bittermens Xocolatl Mole":         { abv: 44,   confidence: medium }
@@ -416,6 +418,8 @@ generics:
   champagne:          { abv: 12,   confidence: high }
   prosecco:           { abv: 11,   confidence: high }
   red wine:           { abv: 13,   confidence: medium }
+  white wine:         { abv: 12.5, confidence: low,
+                        qq: "Estimated; no white wine drink existed to check a real bottle against." }
 
 # --- poured, and contributes nothing ------------------------------------------
 # EVERY ONE OF THESE IS A DELIBERATE ZERO, not a gap. Helen: "water etc don't

@@ -69,10 +69,17 @@ no_garnish: "no garnish"
 # entry under `canonical`. Both halves should be real garnishes in their own
 # right, so the reader can act on either.
 #
-# ONE DRINK USES IT TODAY. That is deliberately not enough to build machinery
-# for -- #459's rule about not becoming an encyclopaedia. If a third or fourth
-# arrives, the question to ask is whether every combination declaring its own
-# string has become the wrong shape; until then this costs one line.
+# A SECOND DRINK USES IT NOW, 2026-09-14 -- #984's Grasshopper, whose source
+# offers three alternatives rather than two: "mint sprig, mint leaf or grated
+# nutmeg". The shape generalises without changing it: a comma between every
+# option but the last, "or" before the last, still one string, still declared
+# under `canonical` in whichever category fits (this one spans two --
+# herbs_and_leaves and spice_and_other -- so it sits with the first-named
+# option's group rather than needing a third). Still not enough to build
+# machinery for -- #459's rule about not becoming an encyclopaedia. If this
+# keeps recurring, the question to ask is whether every combination declaring
+# its own string has become the wrong shape; until then this costs one line
+# per combination.
 
 # --- THE VOCABULARY ----------------------------------------------------------
 # tests/test_cocktails.py flattens every list under `canonical`, so a group
@@ -130,6 +137,7 @@ canonical:
     - "lemon wheel"
     - "lemon slice"
     - "orange slice"
+    - "orange wheel"
     - "orange crescent"
     - "grapefruit crescents"
     - "citrus wheel"
@@ -168,11 +176,17 @@ canonical:
 
   herbs_and_leaves:
     - "mint sprig"
+    - "mint leaf"
     - "mint bouquet"
     - "rosemary sprig"
     - "kaffir lime leaves"
     - "cucumber wheels"
     - "edible violet"
+    # #984's Grasshopper: "mint sprig, mint leaf or grated nutmeg" -- the
+    # source's own three-way choice, one string, the same pattern as "orange
+    # or lemon twist" above, generalised past two options (see that entry's
+    # own comment).
+    - "mint sprig, mint leaf or grated nutmeg"
 
   spice_and_other:
     - "grated nutmeg"
