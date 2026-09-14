@@ -62,13 +62,16 @@ show_costs: true
 # WHAT SHE DECIDED, AND IT IS WORTH KEEPING. The gate existed because of her
 # 2026-09-06 call -- "local only now, and I'll note what publishing would need"
 # -- and what publishing needed was the `qq:` rows in _data/cocktails/abv.yml:
-# eleven strengths nobody could settle without the bottle on her shelf. Those
-# rows are STILL THERE. Publishing a unit count built partly on them was
-# described here as "a different promise from publishing a rough price, and it
-# is hers to make once they are cleared"; she has made it without clearing them,
-# which is hers to do. The line says "Roughly" on every drink for related
-# reasons (see the layout). `grep -n 'qq:' _data/cocktails/abv.yml` is still the
-# worklist, and clearing it now improves a number the public can see.
+# strengths nobody could settle without the bottle on her shelf. Those rows are
+# STILL THERE. Publishing a unit count built partly on them was described here
+# as "a different promise from publishing a rough price, and it is hers to make
+# once they are cleared"; she has made it without clearing them, which is hers
+# to do. The line says "Roughly" on every drink for related reasons (see the
+# layout). `python3 scripts/abv_worklist.py` is the worklist now, and it says
+# which of those rows reach a published figure, which the old grep could not;
+# #1012 is the snapshot Helen works from. NO COUNT HERE ON PURPOSE -- this
+# comment said "eleven" for a day, copied from abv.yml's header, which was
+# already one out of date.
 
 # Show cocktail drafts on the cocktails index. LOCAL ONLY, AND THAT IS THE
 # WHOLE POINT: `output: false` stops Jekyll writing a draft but does NOT take

@@ -245,13 +245,11 @@ layout: default
            `row-reverse` that put its `+` on the right to line the two marks up,
            and the link itself are all gone.
 
-           WHAT IS NOT GONE IS `?shortlist=1` on the index (MANUAL 8.9). No page
-           links to it now, and it is kept deliberately under #651's rule -- a
-           thing nothing reads is only safe while a comment says why: it is a
-           real, reachable, tested way into the shortlist view, the problem #994
-           was raised about ("it's hard to figure out how to see your shortlist")
-           has not been declared solved, and it is the plumbing any future answer
-           would want. Delete it if that answer turns out to be something else.
+           HOW A READER FINDS THEIR SHORTLIST FROM HERE is the index's own
+           `shortlisted (N)` button, one click back. Helen, the same day: "which
+           will do for now, and at least it matches food." `?shortlist=1` on the
+           index outlived the link and is kept with its reasons in
+           assets/js/cocktail-index.js (MANUAL 8.9).
         {% endcomment %}
         <button type="button"
                 class="btn-shortlist"
@@ -1107,12 +1105,13 @@ layout: default
      THE GATE IS GONE, and that is the "add to live site" half. It was
      `site.show_units`, declared in _config_local.yml and nowhere else, so
      production rendered nothing. Helen's 2026-09-06 reason for that gate is
-     still written beside the key: eleven `qq:` rows in _data/cocktails/abv.yml
-     are strengths nobody could settle without the bottle on her shelf, and
-     "publishing a unit count built partly on those is a different promise from
-     publishing a rough price, and it is hers to make once they are cleared."
-     They are not cleared; this is her making the call anyway, which is hers to
-     make. The key itself is retired in _config_local.yml.
+     still written where the key was: the `qq:` rows in
+     _data/cocktails/abv.yml are strengths nobody could settle without the
+     bottle on her shelf, and "publishing a unit count built partly on those is
+     a different promise from publishing a rough price, and it is hers to make
+     once they are cleared." They are not cleared; this is her making the call
+     anyway, which is hers to make. `python3 scripts/abv_worklist.py` says which
+     of those rows reach a published drink (#1012 is the snapshot).
 
      `page.units` STILL GUARDS IT. A drink whose ingredients carry no alcohol at
      all gets no line rather than a confident zero.
