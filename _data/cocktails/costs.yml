@@ -615,6 +615,11 @@ bottles:
     size_ml: 200
     gbp: 11.75
     confidence: high
+  "Angostura orange bitters":
+    size_ml: 148
+    gbp: 12
+    confidence: low
+    basis: "estimated from typical UK retail listings, not checked against Helen's own bottle"
   "Peychaud's":
     size_ml: 148
     gbp: 12
@@ -886,6 +891,7 @@ generics:
   champagne:          { gbp_per_litre_min: 26.67, gbp_per_litre_max: 26.67, basis: "Heidsieck Blue Top, GBP 20 / 75cl", confidence: high }
   prosecco:           { gbp_per_litre_min: 10.67, gbp_per_litre_max: 18.67, basis: "GBP 8-14 / 75cl", confidence: medium }
   red wine:           { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl", confidence: medium }
+  white wine:         { gbp_per_litre_min: 9.33,  gbp_per_litre_max: 16.00, basis: "GBP 7-12 / 75cl, same range as red wine, not separately checked", confidence: low }
   sloe gin:           { gbp_per_litre_min: 32.00, gbp_per_litre_max: 44.00, basis: "GBP 16-22 / 50cl", confidence: medium }
   aquavit:            { gbp_per_litre_min: 37.14, gbp_per_litre_max: 48.57, basis: "GBP 26-34 / 70cl", confidence: medium }
   pisco:              { gbp_per_litre_min: 34.29, gbp_per_litre_max: 45.71, basis: "GBP 24-32 / 70cl", confidence: medium }

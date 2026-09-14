@@ -829,6 +829,13 @@ bottles:
     generic: "triple sec"
     aliases: ["L'Original Combier Triple Sec Liqueur", "Combier Triple Sec",
               "Combier"]
+  # RESTORED 2026-09-14, having been deleted alongside "Giffard Menthe
+  # Pastille" on Helen's "delete Giffard from our dictionary (I really don't
+  # like it)". This is the ONLY declared bottle under `crème de mûre`, so
+  # deleting it left the generic with no bottles, no `generics:` row and no
+  # `default_bottles:` entry -- zeroing the cost/ABV of every drink that pours
+  # it unnamed, including the published dons-own-grog. Kept until she says
+  # she wants that generic re-bottled to something else, not just Giffard gone.
   "Giffard Crème de Mûre":
     generic: "crème de mûre"
     aliases: ["Giffard Creme de Mure"]
@@ -989,6 +996,15 @@ bottles:
   "Angostura":
     generic: "aromatic bitters"
     aliases: ["Angostura bitters"]
+  # A DIFFERENT PRODUCT FROM THE ENTRY ABOVE, and its own bottle key rather
+  # than a second alias of "Angostura" -- a bottle name is unique across this
+  # file, and "Angostura" was already claimed by the aromatic bitters. #984's
+  # Peach Me named this one; Helen's ruling was a new generic
+  # (`orange-forward bitters`, alongside plain `orange bitters`) and a new,
+  # fully-spelled bottle key for it.
+  "Angostura orange bitters":
+    generic: "orange-forward bitters"
+    aliases: []
   # The exact twin of the entry above, and it arrived the same way: the
   # Sazerac's `suggestion` said "or other Creole-style bitters", which its
   # generic already said better, while the bottle sat in `item` -- the field
