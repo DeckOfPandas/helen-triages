@@ -153,7 +153,8 @@ def _load(directory: Path) -> list[Recipe]:
 
     RECURSIVE SINCE 2026-08-20, AND IT MATTERS. This used to be `glob("*.md")`,
     which was correct while `_food_drafts/` was flat. Helen then built a
-    three-stage staging pipeline -- `to-cook/`, `to-rewrite/`, `to-promote/` --
+    three-stage staging pipeline -- `to-cook/` (now `to-make/`), `to-rewrite/`,
+    `to-promote/`; PIPELINE.md §3 has today's set --
     and moved drafts into it, at which point every draft test stopped seeing
     them. Not failing on them: not looking at them, and reporting green.
 

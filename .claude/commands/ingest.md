@@ -63,32 +63,27 @@ is held to house style like any other prose. Both `conftest._QQ_LINE` and
 
 ## Where a new file goes
 
-**Food.** New ingests land in `_food_drafts/` root. That is the pool. The
-staging folders are HELEN'S, and she moves files through them herself:
+**`model_instructions/PIPELINE.md` §3 is the authority on the folders since
+2026-09-14 (#1008)**; this is the short form. New ingests land in the ROOT of
+`_food_drafts/` or `_cocktail_drafts/` -- the pool. The staging folders are
+HELEN'S: they record where she is with a file, which no flag can say, and both
+sites use one set of names:
 
-    _food_drafts/                 the pool -- everything lives here
-      to-rewrite/                 she has picked these to work on next
-      to-cook/                    she has rewritten them enough to cook from
-      to-promote/                 cooked, amended, ready for a Claude proofread
-                                  then her proofread, then _food_recipes/
+    _food_drafts/  /  _cocktail_drafts/     the pool -- everything lives here
+      to-rewrite/          (food only)      she has picked these to work on next
+      to-make/             (both)           readable enough to make from
+                                            (was `to-cook/` until 2026-09-14)
+      keep/                (both)           made and liked; not rewriting yet
+      to-promote/          (both)           her words are in; waiting on the
+                                            mechanical pass, then her proofread,
+                                            then the public collection
 
-**Never move a file between these folders unless asked.** They record where SHE
-is with a recipe, which no flag can say -- all four files in `to-cook/` today
-are `rewritten: false`, because "readable enough to cook from" sits below "the
-prose is mine". The folders and the flags answer different questions and are not
-expected to agree.
-
-**Cocktails.** New ingests land in `_cocktail_drafts/` root — that is the pool,
-and it is where nearly everything still is. There is now ONE staging folder,
-and it is Helen's in exactly the way the food ones are:
-
-    _cocktail_drafts/             the pool -- everything lives here
-      to-promote/                 she has made it, amended it, and it ships;
-                                  waiting on her proofread, then
-                                  _cocktail_recipes/
-
-**Never move a drink into `to-promote/` unless asked.** It records that she has
-MADE the drink and decided it ships, which no flag says.
+**Move a file between these folders only on her word** -- and her word is one
+of `rewrite`, `make`, `keep`, `ready` or `bin` followed by the slug
+(`PIPELINE.md` §3). Never on your own reading of the file: a file in
+`to-make/` may say `rewritten: false`, because "readable enough to make from"
+sits below "the prose is mine", and the folders and the flags answer different
+questions.
 
 > ### `to-promote/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE
 >

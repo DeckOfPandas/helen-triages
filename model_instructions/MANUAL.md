@@ -72,7 +72,8 @@ Run `ls model_instructions/` rather than trusting this list.
 | `INGEST_ONE_RECIPE.md`, `INGEST_ONE_COCKTAIL.md` | for a Claude with NO repository. They stand alone because the closed vocabularies are small enough to print; every vocabulary block in them sits between `<!-- vocab:… -->` markers and is RENDERED from `_data/` by `scripts/build_ingest_vocab.py` (`--check` / `--write`), which `tests/test_standalone_docs.py` enforces. Hand-edit nothing inside a marker pair. Everything outside one is prose and must be kept in step by hand when §4, §5, §7, §9.3 or the attribution spec changes |
 | `CLAUDE_WEB_INGEST.md` | the claude.ai Project that holds those two files, and what it is told |
 | `INGEST_INBOX_DESIGN.md` | §6 the envelope an ingest issue carries, §8 its security argument, §9 the rulings; the rest is stubs |
-| `PUBLISHING_A_DRINK.md` | the six steps a drink goes through from Helen's rewrite to the public repo, the word "final", the one-working-copy rule |
+| `PIPELINE.md` | **the one map** (#1008, 2026-09-14): the three doors in, the intake pass, Helen's folders and the four words that move a file, the way out, and the way back when an agent touches a published file. Read it before any of the four procedure documents |
+| `PUBLISHING_A_DRINK.md` | the six steps a drink goes through from Helen's rewrite to the public repo, the word "final", the one-working-copy rule -- §4 of `PIPELINE.md` is the same journey for both sites |
 | `LETTERING.md` | the four tiers of punched-tape type; supersedes §13.4.1 and §13.10.2 |
 | `LEOPARD.md` | the black-on-black print: generator, tones, Helen's rounds. **She holds it; ship nothing** |
 
@@ -532,7 +533,7 @@ nowhere, so it is in `INVISIBLE_KEYS` (§4.0) and correcting it does not
 invalidate a proofread.
 
 **The staging folders are Helen's** — `_food_drafts/to-rewrite/` →
-`to-cook/` → `to-promote/` record where SHE is with a recipe, which no flag
+`to-make/` → `to-promote/` record where SHE is with a recipe, which no flag
 can say; all three are read by the draft suite. **Never move a file between
 them unless asked, and never delete a `QQ original` line**: dropping a
 superseded original is her own edit, made when she takes a file out of
@@ -2400,6 +2401,10 @@ listener actually reads.
 
 ## 11. Working practices
 
+> **`model_instructions/PIPELINE.md` IS THE MAP OF ALL FOUR** (#1008,
+> 2026-09-14): where a file is, who moves it, and what happens when a published
+> one is touched. Read it first; the four below hold the detail of their step.
+>
 > **THE FOUR PROCEDURE DOCUMENTS, and each is the authority on its own half:**
 > getting material IN — `.claude/commands/ingest.md` (§11.0.3); when it
 > arrived as a GitHub Issue — `ingest-inbox.md` (§11.0.4); the mechanical half
