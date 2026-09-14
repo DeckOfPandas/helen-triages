@@ -367,8 +367,9 @@ orange twist (discarded) · orange or lemon twist · grapefruit twist ·
 flamed orange zest coin
 
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel · lemon wheel ·
-lemon slice · orange slice · orange crescent · grapefruit crescents ·
-citrus wheel · dehydrated lime slice wheel · half lime shell
+lemon slice · orange slice · orange wheel · orange crescent ·
+grapefruit crescents · citrus wheel · dehydrated lime slice wheel ·
+half lime shell
 
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
@@ -379,8 +380,9 @@ half an empty passion fruit shell · pineapple and brandied cherry
 skewered maraschino cherry · cherry flag ·
 fruit stick (skewered pineapple cubes and a maraschino cherry)
 
-**Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
-kaffir lime leaves · cucumber wheels · edible violet
+**Herbs and leaves:** mint sprig · mint leaf · mint bouquet · rosemary sprig ·
+kaffir lime leaves · cucumber wheels · edible violet ·
+mint sprig, mint leaf or grated nutmeg
 
 **Spice and other:** grated nutmeg · cinnamon stick · three coffee beans
 <!-- vocab:garnish end -->

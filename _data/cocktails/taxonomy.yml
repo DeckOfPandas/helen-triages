@@ -759,6 +759,18 @@ mood_include:
       to give it honorary membership." That is a fact about who she pours it
       for, which is exactly the kind of thing no rule reads and an override
       exists to hold.
+  rosita:
+    moods: [aperitivo, clear]
+    why: >-
+      2026-09-14, #984. Helen's first word was "definitely tag strong and
+      brown"; the derivation disagreed and dropped it, and on seeing that she
+      said "I was wrong" and asked for aperitivo and clear instead. Both are
+      derived moods the rule does not currently produce for Rosita -- amaro,
+      two vermouths and a bitters dash over tequila reads as more of an
+      aperitivo mixed drink than the rule's own markers catch, and clear is
+      the mouthfeel judgement the rule's own header says is Helen's to make
+      per drink rather than by colour. `no juicing` needed no correction; the
+      derivation already gives Rosita that one on its own.
 
 # THE SWIZZLE'S `tiki` CORRECTION DIED WITH THE DRINK AND IS NOT REPLACED HERE,
 # because reinstating it would be deciding something that is Helen's.

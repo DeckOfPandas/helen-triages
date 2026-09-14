@@ -832,6 +832,12 @@ bottles:
   "Giffard Crème de Mûre":
     generic: "crème de mûre"
     aliases: ["Giffard Creme de Mure"]
+  # Helen named this one directly, replacing #984's Monte Carlo with her own
+  # recipe -- the exception to "never declare a bottle from the ingredient
+  # beside it": a bottle SHE names is hers to add.
+  "Giffard Menthe Pastille":
+    generic: "crème de menthe"
+    aliases: []
   "Fernet Branca":
     generic: "fernet"
     aliases: ["Fernet Branca liqueur", "Fernet-Branca"]
@@ -989,6 +995,15 @@ bottles:
   "Angostura":
     generic: "aromatic bitters"
     aliases: ["Angostura bitters"]
+  # A DIFFERENT PRODUCT FROM THE ENTRY ABOVE, and its own bottle key rather
+  # than a second alias of "Angostura" -- a bottle name is unique across this
+  # file, and "Angostura" was already claimed by the aromatic bitters. #984's
+  # Peach Me named this one; Helen's ruling was a new generic
+  # (`orange-forward bitters`, alongside plain `orange bitters`) and a new,
+  # fully-spelled bottle key for it.
+  "Angostura orange bitters":
+    generic: "orange-forward bitters"
+    aliases: []
   # The exact twin of the entry above, and it arrived the same way: the
   # Sazerac's `suggestion` said "or other Creole-style bitters", which its
   # generic already said better, while the bottle sat in `item` -- the field
