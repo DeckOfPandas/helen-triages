@@ -1852,8 +1852,11 @@ unless stated.
   Bob's bitters among them because a dash never reaches the arithmetic. **And
   one of the seven was a proofread away from the three**: the Caribbean Sazerac,
   held back, pours a bare `rhum agricole blanc` that averages eight bottles
-  including Clément. Those numbers are the day's, not the rule's — run the
-  script.
+  including Clément. **That happened within hours**: Helen proofread both
+  Sazeracs the same afternoon, Clément moved into the live set, and another
+  session's ingest added two new `qq:` rows (Angostura orange bitters, white
+  wine) — four live and eight not, by the evening. #1012 was refreshed to match.
+  Those numbers are the day's, not the rule's — run the script.
   **"Seventeen `qq:` rows down to eleven" above was true on 2026-09-06 and not
   after 2026-09-09**, when Flaggpunsch was promoted — and `abv.yml`'s header
   said "There are ELEVEN" until 2026-09-14. Worse than the stale header: the

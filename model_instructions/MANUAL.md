@@ -1701,9 +1701,11 @@ and neither moves any figure, because a dash never reaches the arithmetic. The
 script replays `cocktail_units.rb`'s own resolution over the PUBLISHED drinks,
 so it is also a second implementation of that lookup, the way
 `scripts/related_drinks.py` is of the related-drinks scoring. **The split is
-not a constant**: the Caribbean Sazerac pours a bare `rhum agricole blanc`,
-which averages eight bottles including two unsettled ones, so proofreading that
-one drink moves a row into the live set. Run it; do not quote a count from here.
+not a constant, and it moved the day it was measured**: the Caribbean Sazerac
+pours a bare `rhum agricole blanc`, which averages every bottle under that
+category, so when Helen proofread it on 2026-09-14 Clément went from reaching
+nothing to reaching a live drink — and another session's ingest added two new
+`qq:` rows the same afternoon. Run it; do not quote a count from here.
 **Never write the number of `qq:` rows into a comment.** `abv.yml`'s header said
 eleven for five days after one was promoted (2026-09-09 to 2026-09-14), and one
 session copied the stale figure into four more places before anyone counted.
