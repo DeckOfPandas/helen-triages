@@ -656,6 +656,24 @@ unless stated.
   to a held-back recipe at all** is raised in the issue as a separate design
   question and not decided.
 
+- **2026-09-14 — a food promotion delegated to an agent, asked for directly:
+  "Please promote meringue swans from food drafts to published."** Cocktails
+  had this in `PUBLISHING_A_DRINK.md` already; food never has a written
+  procedure of its own, so the cocktails steps were followed by analogy —
+  clone, re-check the gate as found rather than trusting the flag, copy
+  byte-for-byte, compare, delete from the drafts repo, commit both sides. Two
+  mechanical suite failures on the copy (a missing 70% cacao qualifier, a
+  method-step note with no full stop) were fixed the same way the mechanical
+  half of a promotion always is — silently, and said afterwards.
+  `meta.rewritten` and `meta.proofread` were left exactly as the draft had
+  them, both `false`: `source_type: joke` is a bare label with nothing
+  external to adapt, so an unset `rewritten` is not a gap on this one the way
+  it would be on an adapted recipe, and `proofread` stays hers regardless. The
+  recipe is in `_food_recipes/` now but off the live site until she reads the
+  built page and sets `proofread: true` herself — promotion into the
+  collection and the gate opening are two different moments, on food exactly
+  as `PUBLISHING_A_DRINK.md` insists they are on cocktails.
+
 ### §4.3 The magic bag
 
 - **2026-08-26** — Built: Helen's own name for her brain, answering the
@@ -1607,6 +1625,25 @@ unless stated.
   pytest-less container is the wrong place to ship a test that stops the deploy
   if it is wrong. Noted on the issue.
 
+- **2026-09-14, #984** — **Four new generics, all from ingesting seven drinks
+  whose recipe was already written down.** `white wine` (`wine_and_sparkling`,
+  family `fortified` beside `red wine`) for Bicicletta, which had nothing —
+  the family only had champagne, prosecco, red wine and cider. `maraschino
+  cherry` and `citrus slice` (`fruit_and_herbs`) for Peach Me, where a whole
+  cherry and a whole citrus slice are MUDDLED as ingredients rather than
+  perched as a garnish; the garnish vocabulary already had both objects under
+  those names, nothing had the ones poured. `orange-forward bitters`
+  (`bitters`), the exact shape of `lavender-forward bitters` next to a plain
+  `orange bitters` that has never had a bottle: Peach Me's source said
+  "Angostura orange bitters", and `Angostura` was already the declared bottle
+  under `aromatic bitters` — a different Angostura product needed its own
+  generic to have anywhere to put its own bottle (§9.3.2).
+- **2026-09-14, #984** — **`peach schnapps` and unqualified `tequila` were left
+  QQ rather than coined**, on Helen's ruling that a generic needing coining, or
+  a base spirit whose STYLE the source does not state, is hers to decide, not
+  an agent's. Raised as #1013 (schnapps) and left as a per-drink QQ on Rosita's
+  tequila pour, with the reasoning in the file rather than a guess.
+
 ### §9.3.2 The bottle dictionary
 
 - **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as
@@ -1773,6 +1810,49 @@ unless stated.
   the shape every one of these takes, and it is not a half-finished rename.
   `Ophir`/Opihr and `Amaro Ciociano`/Ciociaro are the same class and are
   **still outstanding**, under #701.
+
+- **2026-09-14, #984 — a bottle name is unique across the file, and that is
+  what forced a new generic.** Peach Me's source names "Angostura orange
+  bitters", a different product from the `Angostura` already declared under
+  `aromatic bitters`. It could not become a second alias of that entry (the
+  two products are not the same bottle) and could not become a second entry
+  spelled `Angostura` (the key is taken), so it needed its own generic
+  (`orange-forward bitters`, §9.3.1) to have anywhere to declare
+  `Angostura orange bitters` as its own bottle.
+
+- **2026-09-14, #984 — Monte Carlo, replaced twice, and a real bottle each
+  time.** The drink #984 ingested had no method and no glass — "the
+  ingredients alone do not settle whether it is stirred and strained up or
+  built over ice, and that decides the glass" — so it stayed QQ on both,
+  correctly, rather than guessed. Helen then wrote a complete replacement
+  recipe in a comment on #984 (gin, crème de menthe, lemon, a champagne top),
+  which is a full rewrite of the drink, not an answer to the two QQs, so the
+  draft was deleted and rewritten rather than patched. Its crème de menthe
+  bottle went through two names in one afternoon:
+
+  - First, `Giffard Menthe Pastille`, added as a new bottle because nothing
+    declared crème de menthe under that house — Helen had not yet said which
+    bottle she meant, and Giffard was a reasonable-looking gap to fill.
+  - Helen's correction: *"My mistake, mint bottle for Monte Carlo is Briottet
+    Creme de Menthe. Please update, and delete Giffard from our dictionary (I
+    really don't like it)."* `Briottet Crème de Menthe Blanche` was already
+    declared (#701's house-naming pass), so the fix was retyping the
+    suggestion to an existing bottle, not adding one.
+  - **Deleting "Giffard" was read as the whole house at first, and that broke
+    a published drink.** `Giffard Crème de Mûre` — a different product,
+    already declared, used by nobody's mint drink — is the ONLY bottle under
+    the `crème de mûre` generic, with no `generics:` row and no
+    `default_bottles:` entry to fall back on. Deleting it zeroed the cost and
+    ABV of every drink pouring that generic unnamed, including the published
+    `dons-own-grog` and the draft `lita-grey` — caught by
+    `test_every_priceable_pour_has_a_price` and
+    `test_every_counted_pour_can_reach_a_strength` naming both, before either
+    PR was pushed. Restored. **The generalisable trap: a generic with exactly
+    one bottle behind it is that bottle, invisibly** — deleting the bottle
+    because you dislike a DIFFERENT product from the same house is deleting
+    the generic's only source of a number for every drink that pours it
+    unnamed, and nothing says so until a drink you did not touch goes to
+    zero.
 
 ### §9.3.3 The drinks index's search
 
@@ -2157,6 +2237,27 @@ unless stated.
   `orange or lemon twist` — *"either of these are lovely and the maker can
   choose. I like this approach on principle."* The `proposals` guard asserted
   non-empty for one day and was wrong (§12).
+- **2026-09-14, #984 — the "either of these, maker's choice" pattern used a
+  second time, and generalised past two options.** `orange wheel` declared
+  (`citrus_cut`) — Helen, asked whether it was really a new cut and not just
+  `orange slice` again: *"Orange wheel is real and distinct new garnish —
+  please add."* `mint leaf` declared (`herbs_and_leaves`), the one of
+  Grasshopper's three garnish alternatives the dictionary was missing (`mint
+  sprig` and `grated nutmeg` both already existed). The source itself offers
+  three, not two — "mint sprig, mint leaf or grated nutmeg" — and the shape
+  from `orange or lemon twist` needed no change to take it: still one string,
+  still a comma between every option but the last and "or" before the last,
+  still declared under `canonical`. Helen's own framing going in was *"create
+  a pattern for offering garnish options if we don't already have one"*; the
+  answer was that the pattern already existed from one prior use, and this is
+  now two, with the generalisation to three written into `garnish.yml`'s own
+  comment rather than left to be re-derived next time. **A floated GARNISH
+  turned out not to belong in `method:` at all** — a first draft wrote "Float
+  the garnish on top." and `test_a_method_that_floats_or_rinses_says_so_in_a_
+  field` refused it: the `as: "float"` field is for a floated POUR, and a
+  garnish's placement (floated or not) is already said once by `garnish:`
+  itself, the same principle that keeps a twist's expressing step out of
+  hand-written `method:` text (§9.12 above).
 - **2026-09-02, #630** — The methods pass done: 161 distinct steps → 146, 110
   canonical uses → 177, 24 proposals → 0; 65 steps across 64 drinks. The four
   QQ rows: `north-sea-oil` "Stir with ice." is step 1 → "Stir all ingredients
@@ -2776,6 +2877,22 @@ unless stated.
   banane out (nobody builds a sour on orange juice; the orange LIQUEURS
   tested and rejected). Fourteen mood buttons; `pudding in a glass` has two
   drinks (#337).
+- **2026-09-14, #984 — `pudding in a glass`'s two-drink floor moved by one, and
+  a hand-typed mood was reverted before Helen saw why.** The Grasshopper (cream,
+  no egg) is a real member by the rule, closing the gap #337 was raised over.
+  Separately, Helen's first word on Rosita was *"definitely tag strong and
+  brown"*; typed directly into the drink file, it lasted exactly one
+  `derive_cocktail_moods.py --write` — the mood is derived, not hers to hand-set
+  outside `mood_include`, and the script disagreed and removed it. Told, she
+  said *"I was wrong. Add at least aperitivo, clear, no juicing."* `no juicing`
+  already derived on its own; `aperitivo` and `clear` went into `mood_include`
+  properly this time (keyed `rosita`, with a `why:`), which is what survives a
+  re-run. **The mechanism worked as designed** — a hand edit to a derived
+  drink's `mood:` list is never the one that sticks, `mood_include` is — but it
+  is worth recording that the FIRST correction was overruled silently by the
+  tool before the SECOND, corrected one was applied by hand into the right
+  place; a session that had not re-run the script after the first edit would
+  have shipped a drink whose mood quietly did not say what Helen asked for.
 - **2026-08-30** — Index headings to five greens over a shared absinthe bar.
 - **2026-08-31, #595** — Back-navigation restore on the drinks index, *"exactly
   as the food site does"*; cocktails restores SORT KEYS where food restores an
@@ -3439,6 +3556,22 @@ unless stated.
   slug; drafts never name public data. So **the drafts side merges first**, and
   a change that crosses the boundary is not finished when both commits exist —
   it is finished when both are on their `main`s, in that order.
+
+- **2026-09-14, #984 — the same rule broken the same way, this time by the
+  session that had just read the entry above.** #984's `mood_include.rosita`
+  correction (previous section) landed on `helen-triages`' `main` via PR #1015
+  before `helen-triages-cocktails-private`'s PR #60 — the one that actually
+  writes `rosita.md` — had merged. As of this entry PR #60 is **still open**,
+  so `main` on the public repo currently names a drafts slug that does not yet
+  exist on `main` of the private one: exactly the shape #852 named, the public
+  half in and the drafts half sitting on an unmerged branch.
+  `test_every_mood_correction_is_reachable_and_needed` would report it on any
+  machine with both repos cloned on their real `main`s, same as it did then —
+  it read clean in this session only because the local `_cocktail_drafts`
+  clone had the feature branch checked out, which is not what a fresh clone or
+  Helen's own machine would have. **Merge PR #60 to close the gap**; until
+  then, `main` + `main` is briefly inconsistent, and CI cannot see it for the
+  same reason as before — the drafts are absent there entirely.
 
 - **2026-09-08 — the token-expansion guard, and the third time is what earned
   it.** `CLAUDE.md` has said since 2026-09-06 that `${GH_TOKEN:-unset}` prints
@@ -4163,6 +4296,15 @@ verification. Dates are when the correction landed.
   `height="100%"`; the text nudged for a fact about the artwork. And: told
   twice the tape was "still small", every measurement of the BOX was right
   and none was about what was painted in it.
+- **A generic with exactly one bottle is that bottle, invisibly** —
+  2026-09-14 (§9.3.2 above): deleting `Giffard Menthe Pastille` on sight was
+  fine, deleting `Giffard Crème de Mûre` for disliking the OTHER Giffard
+  product zeroed the cost and ABV of two unrelated drinks that pour that
+  generic unnamed, because it was the only bottle behind it.
+- **The merge-order rule broken by the session that had just read it** —
+  2026-09-14 (§11 above): a `mood_include` correction naming a drafts slug
+  merged to the public repo's `main` before the drafts commit that writes the
+  slug merged to the private repo's `main` — #852's exact shape, recurring.
 
 ---
 
