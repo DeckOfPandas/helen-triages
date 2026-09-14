@@ -1150,10 +1150,30 @@
 // under a button row. Below 600px the two stacked search rows and the name
 // search after them get a step more than the section gap. The margin
 // collapses with the next section's own, so this is the gap, not an addition.
+//
+// AND EVERY SECTION GOT A STEP ON 2026-09-14 -- #999, Helen: "add a little more
+// space at the bottom of each filter section on phones only. We're not
+// prioritising above the fold on a phone, and it's a little hard to work out
+// what goes where now."
+//
+// WHY IT READ AS A WALL. `$index-section-gap` is 1rem between one section and
+// the next, and `$index-label-gap` and `.drink-btns`' own gap are both 0.5rem
+// -- so a section boundary was worth exactly two chip rows, and MOOD's five
+// rows of chips ran into HASSLE's heading with nothing but a doubled row gap to
+// say a new question had started. On a desktop the headings' coloured bars
+// carry that on their own, because whole sections are in view at once; on a
+// 342px column they are not.
+//
+// ONE STEP EACH, NOT ONE VALUE FOR ALL. The searches keep the extra step they
+// were given above, so the relationship 2026-09-10 established survives: a
+// section that ends in a hairline gets more air than one that ends in a row of
+// chips. Both move together; neither overtakes the other.
 @media (max-width: 600px) {
+  .drink-filter { margin-bottom: $space-xl; }
+
   .drink-searches {
-    gap: $space-xl;
-    margin-bottom: $space-xl;
+    gap: $space-xxl;
+    margin-bottom: $space-xxl;
   }
 }
 
