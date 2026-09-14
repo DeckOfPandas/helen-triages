@@ -1,13 +1,16 @@
-{% comment %} ── BACK TO THE INDEX ─────────────────────────────────────────────
-  Issue #387. A small arrow at the top left of a recipe or cocktail page,
-  returning to the index it came from.
+{% comment %} ── THE PAGE'S FURNITURE LINE: the back arrow, and the search box ──
+  Issue #387 (the arrow) and #1024 (the search box, 2026-09-14). A row at the
+  top of every recipe and drink page: the arrow at its left end returning to
+  the index it came from, a search box at its right end that hands a name to
+  that same index. Helen's placement for the box, from the candidates page:
+  "back arrow's line, but on the right not in the centre."
 
-  IT IS A REAL LINK FIRST, AND AN ENHANCEMENT SECOND, which is the whole design.
-  The href points at this site's own index (from _data/sites.yml, so a cocktail
-  goes back to /cocktails/ and a recipe to /food/) and works with no JavaScript,
-  from a bookmark, from a search result, anywhere. assets/js/back-link.js then
-  upgrades it to history.back() -- and ONLY when it can prove you actually
-  arrived from that index.
+  THE ARROW IS A REAL LINK FIRST, AND AN ENHANCEMENT SECOND, which is the whole
+  design. The href points at this site's own index (from _data/sites.yml, so a
+  cocktail goes back to /cocktails/ and a recipe to /food/) and works with no
+  JavaScript, from a bookmark, from a search result, anywhere.
+  assets/js/back-link.js then upgrades it to history.back() -- and ONLY when it
+  can prove you actually arrived from that index.
 
   WHY history.back() RATHER THAN REBUILDING THE INDEX FROM A URL. Helen asked
   whether this could avoid a refresh "so the index page has the same recipe list
@@ -19,17 +22,33 @@
   cache instead: filters, page number, shuffle order and scroll position all
   intact, because the page was never re-rendered.
 
-  That is also why `toQuery()` in assets/js/filter-state.js is still unwritten.
-  Its own comment says to add it "the day something calls it"; this is not that
-  day, because the thing that would call it turns out not to want it.
+  THE SEARCH BOX IS A PLAIN FORM, AND IT WORKS WITH NO JAVASCRIPT. A GET to the
+  index with `q=<what you typed>`; assets/js/filter-state.js's `parseName`
+  reads it and each index puts the text into its own I KNOW WHAT I WANT box and
+  applies it, so the two boxes are one control in two places (the placeholder
+  is the index's own, from sites.yml). It searches NAMES, which is what that
+  box searches; "omnisearch" in #1024's title is the ambition and this is its
+  first, honest step -- widening it to ingredients or moods is a decision about
+  the index's grammar, not about this box.
 
-  The arrow is page furniture, not chrome: it lives in the two page layouts
+  `toQuery()` in assets/js/filter-state.js is still unwritten. Its own comment
+  says to add it "the day something calls it"; this form is not that day either,
+  because a single `q` needs no serialiser.
+
+  The row is page furniture, not chrome: it lives in the two page layouts
   rather than in default.html, because it is about where THIS page sits, not
   about the site shell. See MANUAL 2.5 for that boundary.
 {% endcomment %}
 {% assign back_site = site.data.sites[page.site_key] %}
 {% if back_site %}
-<a class="back-to-index" href="{{ back_site.home | relative_url }}" aria-label="Back to {{ back_site.title }}">
-  <span aria-hidden="true">&larr;</span>
-</a>
+<div class="page-furniture">
+  <a class="back-to-index" href="{{ back_site.home | relative_url }}" aria-label="Back to {{ back_site.title }}">
+    <span aria-hidden="true">&larr;</span>
+  </a>
+  <form class="page-search" role="search" method="get" action="{{ back_site.home | relative_url }}">
+    <input type="search" name="q" class="page-search-input" autocomplete="off"
+           placeholder="{{ back_site.search_placeholder | default: 'search…' }}"
+           aria-label="Search {{ back_site.title }} by name">
+  </form>
+</div>
 {% endif %}

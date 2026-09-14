@@ -144,6 +144,27 @@
     return out;
   }
 
+  // THE NAME QUERY IS NOT A KIND -- #1024, 2026-09-14. `?q=<text>` arrives from
+  // the search box on a recipe or drink page's furniture line and is what the
+  // reader typed, whole: a title may carry a comma ("Pear, apricot and rosemary
+  // Bellini"), so it must not go through the comma-split above, and it is one
+  // string rather than a list. Kept OUT of parseQuery's return shape, which
+  // every caller and test reads as exactly the three kinds. Each index puts
+  // this into its own I KNOW WHAT I WANT box and applies it the way a keystroke
+  // would. The last `q` wins; an empty one is no query.
+  function parseName(search) {
+    var body = String(search == null ? '' : search).replace(/^[?#]/, '');
+    var name = '';
+    body.split('&').forEach(function (chunk) {
+      var eq = chunk.indexOf('=');
+      if (eq === -1) return;
+      if (decodeValue(chunk.slice(0, eq)) !== 'q') return;
+      var value = decodeValue(chunk.slice(eq + 1)).trim();
+      if (value) name = value;
+    });
+    return name;
+  }
+
   // ---------------------------------------------------------------------------
   // THE STATE SHAPE
   // ---------------------------------------------------------------------------
@@ -669,6 +690,7 @@
     KINDS: KINDS,
     EXCLUDE_PREFIX: EXCLUDE_PREFIX,
     parseQuery: parseQuery,
+    parseName: parseName,
     serialise: food.serialise,
     deserialise: food.deserialise,
     FIELDS: FIELDS,

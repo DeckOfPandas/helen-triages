@@ -2228,3 +2228,70 @@ def test_every_published_drink_page_offers_three_other_published_drinks(prod_sit
         "the related-drinks row (#927) is wrong on these pages:\n  "
         + "\n  ".join(problems[:20])
     )
+
+
+# =============================================================================
+# "IF YOU LIKED THIS, HOW ABOUT …" on a RECIPE page — #1005, 2026-09-14
+# =============================================================================
+# The same claim as the drinks test above, for the same reasons: a live recipe
+# page never offers a recipe that is not live, offers exactly three, and never
+# itself. `scripts/related_recipes.py` is where to look when it fires.
+
+RELATED_RECIPES_SECTION = re.compile(
+    r'<ul class="recipe-list recipe-related">(.*?)</ul>', re.S)
+# The TITLE's link only: each row also carries badge links to the filtered
+# index, and those must not count as offered recipes.
+RELATED_RECIPE_LINK = re.compile(r'<a class="recipe-title-link" href="([^"]+)">')
+
+
+def _recipe_pages(built_site):
+    return sorted((built_site / "food" / "recipes").rglob("index.html"))
+
+
+def test_every_published_recipe_page_offers_three_other_published_recipes(prod_site):
+    """#1005. Exactly three, never itself, and every one of them a real page.
+
+    The template only emits a candidate scoring above zero (shared tags plus
+    shared main ingredients) or sharing the star and a mood, so a recipe
+    unlike everything else would quietly render a row of two, or a heading
+    over nothing, on its own page and nowhere else. `scripts/related_recipes.py`
+    measured the published set the day this was written: every recipe's third
+    pick shared at least 1. This is what notices when a promotion or a
+    taxonomy edit changes that.
+    """
+    pages = _recipe_pages(prod_site)
+    assert len(pages) > 20, (
+        f"only {len(pages)} recipe pages in the production build, which is too "
+        "few for this collection -- the corpus walk is looking in the wrong "
+        "place, or the publish gate has held nearly everything back."
+    )
+
+    live = {"/" + str(p.relative_to(prod_site).parent).replace("\\", "/") + "/"
+            for p in pages}
+    baseurl = "/helen-triages"
+    problems = []
+
+    for page in pages:
+        url = "/" + str(page.relative_to(prod_site).parent).replace("\\", "/") + "/"
+        text = page.read_text(encoding="utf-8")
+        section = RELATED_RECIPES_SECTION.search(text)
+        if not section:
+            problems.append(f"{url}: no related-recipes row at all")
+            continue
+
+        hrefs = RELATED_RECIPE_LINK.findall(section.group(1))
+        if len(hrefs) != 3:
+            problems.append(f"{url}: {len(hrefs)} related recipes, expected 3")
+
+        for href in hrefs:
+            target = href[len(baseurl):] if href.startswith(baseurl) else href
+            if target == url:
+                problems.append(f"{url}: offers itself as a related recipe")
+            if target not in live:
+                problems.append(
+                    f"{url}: offers {href}, which is not a published recipe page")
+
+    assert not problems, (
+        "the related-recipes row (#1005) is wrong on these pages:\n  "
+        + "\n  ".join(problems[:20])
+    )

@@ -1,0 +1,117 @@
+// =============================================================================
+// PAGE FURNITURE — the back arrow's line and the actions row, on both sites
+// =============================================================================
+// #1005 / #1011 / #1024, 2026-09-14. Two rows every recipe and drink page
+// carries, styled once because they are the same object on both sites and
+// Helen's complaint (#1005) was precisely that they were not: "I always find
+// myself surprised by the locations of the back, shortlist, print and pdf
+// buttons." The markup is _includes/back-to-index.html and
+// _includes/page-actions.html; each site's stylesheet imports this after
+// shared/chrome, and names only the ten palette-contract variables.
+//
+// WHAT STAYS PER SITE: the shortlist button's own colours and states
+// (food/_shortlist.scss, cocktails/_shortlist.scss), and the row the actions
+// sit in -- `.recipe-controls` on food, `.cocktail-controls` on a drink page,
+// each already a flex row in its own file. This file styles what is INSIDE
+// the row and the furniture line above the title.
+
+// --- The furniture line: arrow left, search right -----------------------------
+// `space-between` puts the two at the column's edges; `flex-wrap` lets the box
+// drop under the arrow on a phone rather than squeeze it. The arrow keeps its
+// own rule in shared/_chrome.scss (size, colour, hover); only its bottom margin
+// is taken over by the row, so the two sites' title blocks start the same
+// distance under it (each layout's own rule does that).
+.page-furniture {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-lg $space-xxl;
+  flex-wrap: wrap;
+  margin-bottom: $space-lg;
+
+  .back-to-index { margin-bottom: 0; }
+}
+
+// THE SEARCH BOX IS THE INDEX'S OWN BOX, DRAWN HERE. Same type mixin, same
+// hairline, same placeholder tone (shared/_rule.scss), so a reader who has used
+// I KNOW WHAT I WANT recognises it. 16rem is about what "recipe name..." and
+// a real title need; the form takes the box's width and no more.
+.page-search {
+  margin: 0;
+  flex: 0 1 16rem;
+  min-width: 0;
+}
+
+.page-search-input {
+  @include index-search-input-type;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid lighten($color-clear-text, 25%);
+  border-radius: 0;
+  padding: 0 0 3px 0;
+  margin: 0;
+  color: $color-text;
+  outline: none;
+  // A `type="search"` input draws its own clear mark and rounded corners in
+  // some browsers; this is a hairline box, not a widget.
+  -webkit-appearance: none;
+  appearance: none;
+
+  &:focus { border-bottom-color: lighten($color-clear-text, 5%); }
+  &::placeholder { @include index-search-placeholder; }
+}
+
+// --- The actions row: shortlist · see shortlist (N) · print · pdf -------------
+// ONE TYPE FOR EVERY ACTION, Helen 2026-09-14: "let's try all actions in
+// capitals ... to help show they're actions". The drink page's Courier caps
+// at 0.78rem / 0.08em, which its shortlist button already wore; the rest of
+// the row takes the same, and the food shortlist button was matched the same
+// day (food/_shortlist.scss).
+//
+// THE SHORTLIST BUTTON IS NOT RESTYLED HERE. It has a base rule per site with
+// its own colours and its `+` / `✓` mark, and a row that re-coloured it would
+// be a second answer to what "on" looks like. The three other controls get
+// their resting and hover colours below: the site's quiet UI grey, and its
+// accent under the cursor -- which is the shortlist button's own pair on food.
+// Cocktails hovers its shortlist button in magenta (the site's "this one"),
+// and cocktails/_shortlist.scss re-points these three to match.
+.page-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: $space-sm 1.4rem;
+}
+
+.btn-see-shortlist,
+.btn-print,
+.btn-pdf {
+  font-family: $font-headings;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: $color-clear-text;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  // A heading's letter-spacing, text-stroke and text-shadow all inherit, and
+  // a placement inside one would quietly wear the heading's emboss.
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  transition: color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible { color: $color-accent; }
+}
+
+// Tabular, so the count changing from 9 to 10 does not move `print`.
+[data-shortlist-total] {
+  font-variant-numeric: tabular-nums;
+}

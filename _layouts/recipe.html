@@ -10,67 +10,15 @@ layout: default
       <span class="recipe-title-text">{{ page.title }}</span>
     </h1>
 
-    {% comment %} GitHub issue #86. Two ways of taking this recipe off the
-       screen, said as two separate things on purpose -- Helen: "one for print,
-       one for PDF, then the user knows exactly what to expect." One opens the print dialogue on
-       this page (the print stylesheet decides what comes out); the other is a
-       file that already exists, built at deploy time.
-
-       Beside the title, bottom-aligned, at Helen's ask (2026-08-14). They sat
-       under the source line first, on the reasoning that the empty 30% next to
-       a title capped at 70% looks like an obvious home for a control right up
-       until a long title wraps into it -- and this site has no media queries to
-       rescue that with. What makes it safe here is that .recipe-title is a flex
-       row rather than the absolute positioning that reasoning assumed: the two
-       boxes are laid out against each other, so a long title shortens the gap
-       instead of running underneath them.
-
-       SHIPS HIDDEN, REVEALED BY JS. The button does nothing without
-       assets/js/print-link.js, and a control that silently fails is worse than
-       no control -- so the markup starts `hidden` and the script removes that
-       once it has something to attach. Same reasoning as .recipe-list starting
-       `visibility: hidden` on the index: CSS cannot ask whether JS ran, so the
-       markup assumes it did not. The PDF link beside it is an ordinary anchor
-       and needs none of this. {% endcomment %}
-    <div class="recipe-actions">
-      {% comment %} THE SHORTLIST TOGGLE, beside `print` -- Helen's placement,
-         2026-09-04, noting that this row "needs a redesign anyway". First in the
-         group rather than last: it is the only one of the three that changes
-         something rather than taking the page off the screen, and print/pdf are
-         a pair that should stay adjacent.
-
-         `hidden` FOR THE SAME REASON `.btn-print` IS, stated in the comment
-         above: it does nothing without its script, and a control that silently
-         fails is worse than no control. shortlist.js reveals it.
-
-         `page.url`, NOT `relative_url` -- the same key the index row for this
-         recipe emits, which is the whole reason the two agree. See
-         HTF.shortlist in assets/js/assets.js. {% endcomment %}
-      <button type="button"
-              class="btn-shortlist"
-              data-shortlist-key="{{ page.url }}"
-              aria-pressed="false"
-              hidden>shortlist</button>
-      <button type="button" class="btn-print" hidden>print</button>
-      {% comment %} Config-gated, not environment-gated, and the difference is
-         the whole point. The PDFs are rendered from a finished build by
-         scripts/generate_pdfs.py -- nothing Jekyll does creates them -- so this
-         link would 404 in the jekyll-local working view, which is a good way to
-         learn to ignore a link. But `jekyll.environment` was the wrong lever
-         for that: jekyll-prod serves with --config _config.yml and no
-         JEKYLL_ENV, so it reads as "development" as well, and the link rendered
-         NOWHERE Helen could look at it -- found the first time she went
-         looking, 2026-08-14.
-
-         site.pdf_downloads is true in _config.yml (deployed site, and the
-         localhost:4002 mockup that exists to show what deploys) and false in
-         _config_local.yml (localhost:4001). Same two-layer split the site
-         already uses for show_source_wording, rather than a third idea of what
-         "production" means. {% endcomment %}
-      {% if site.pdf_downloads %}
-        <a href="{{ '/food/recipes/' | append: page.slug | append: '.pdf' | relative_url }}">pdf</a>
-      {% endif %}
-    </div>
+    {% comment %} THE ACTIONS LEFT THIS LINE ON 2026-09-14 (#1005). From
+       2026-08-14 the print and pdf controls sat here beside the title,
+       bottom-aligned, and the shortlist button joined them on 2026-09-04 with
+       Helen's note that the row "needs a redesign anyway". The redesign is
+       _includes/page-actions.html in `.recipe-controls` under the badges --
+       "row under the head", her pick from the candidates page -- the same
+       include in the same place the drink page has it. The title is alone on
+       its line again, which is also what lets a long one wrap without a control
+       to negotiate with. {% endcomment %}
   </div>
 
   {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
@@ -164,6 +112,16 @@ layout: default
     {% include recipe_badges.html recipe=page %}
   </div>
 
+  {% comment %} THE ACTIONS ROW, UNDER THE HEAD -- #1005 / #1011, 2026-09-14,
+     Helen's pick from the candidates page: "row under the head". The same
+     include the drink page puts beside its read it / make it toggle, so the
+     two sites offer the same four controls in the same order in the same
+     place: shortlist, see shortlist (N), print, pdf. The head ends here, on a
+     hairline, and INGREDIENTS opens below it at the section's own gap. {% endcomment %}
+  <div class="recipe-controls">
+    {% include page-actions.html %}
+  </div>
+
   {% comment %} `.size > 0` for the same reason the NOTES section below uses it:
      an empty array is truthy in Liquid, so `ingredient_groups: []` would render
      an INGREDIENTS heading with nothing beneath it. No file does that today --
@@ -235,6 +193,49 @@ layout: default
       {% endfor %}
     </ul>
   {% endfor %}
+
+  {% comment %} THE SCALER -- #1005, 2026-09-14. PORTIONS, NOT MULTIPLES, which
+     is the one place food and drinks answer the same question differently and
+     Helen ruled it so: "Portions." A drink is scaled by whole recipes because
+     "how many does this make" and "how much am I making" are different
+     questions there (MANUAL 9.13); a recipe already carries its answer to the
+     first, and the index's shopping list has scaled by it since #801. So the
+     box holds PEOPLE, starts at however many the recipe makes, and the
+     amounts are multiplied by wanted over made -- the same arithmetic the
+     shopping list runs, from the same parser (assets/js/food-scale.js).
+
+     `page.portions` IS THE PLUGIN'S -- _plugins/food_shopping.rb resolves it
+     from `serves:` first and `serves_estimate:` second (#815), and marks an
+     estimate. A recipe with no count gets no control at all rather than one
+     that cannot work, which is the rule this feature's index half learned
+     twice. The `~` says the number was reasoned rather than written down,
+     as it does on the shopping list.
+
+     UNDER THE LAST INGREDIENT GROUP, as the drink's sits under its list: a
+     control that RE-READS the list belongs after it. `hidden` until
+     assets/js/recipe-scale.js reveals it, the rule every JS-dependent control
+     on both sites follows.
+
+     "2 large" SCALES -- Helen: "Things like '2 large' can scale, surely" --
+     because the parser reads `large` as the unit. What cannot scale is an
+     amount with no number in it ("a few handfuls", "some"), or an ingredient
+     with no amount at all; those are named in the note below when the
+     portions move, so the reader knows which lines are still as written.
+     PLACEHOLDER COPY on that note, Helen's to write ("copy tbc, just put in
+     a placeholder"). {% endcomment %}
+  {% if page.portions and page.ingredient_groups.size > 0 %}
+    <div class="recipe-scale-controls" hidden>
+      <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
+      <label class="recipe-scale">
+        {% if page.portions_estimated %}<span class="recipe-scale-approx" title="an estimate -- the recipe does not say how many it serves">~</span>{% endif %}
+        <input type="text" value="{{ page.portions }}" inputmode="numeric" class="recipe-scale-portions" data-portions="{{ page.portions }}" aria-label="portions to make">
+        <span class="recipe-scale-word">portions</span>
+      </label>
+      <button type="button" class="recipe-scale-step recipe-scale-plus" aria-label="one more portion">+</button>
+    </div>
+    <!-- PLACEHOLDER COPY, Helen's to write -->
+    <p class="recipe-scale-note" hidden></p>
+  {% endif %}
 
   {% comment %} short_method_enabled (_config.yml) -- Helen, 2026-08-14: the
      toggle and its print/PDF "In short:" section are both undeployed, off
@@ -364,8 +365,178 @@ layout: default
   </div>
   {% endif %}
 
+  {% comment %} ─────────────────────────────────────────────────────────────────
+     IF YOU LIKED THIS, HOW ABOUT … — three related recipes. #1005, 2026-09-14,
+     the drink page's #927 brought to food at Helen's word, with one rule of
+     her own on top.
+
+     THE SCORE IS SHARED TAGS PLUS SHARED MAIN INGREDIENTS, ties broken by
+     title, and nothing else -- the drinks rule ported directly ("Yes"). Then
+     her addition: "prioritise (star*mood)". A candidate sharing this recipe's
+     STAR INGREDIENT and at least one MOOD tag outranks every candidate that
+     does not, whatever the counts say; the score decides within each half.
+     No weighting beyond that, for #927's reason: every knob one could add is
+     a claim about what makes two recipes alike, and nobody has made it.
+
+     THE ROWS ARE THE INDEX'S OWN ROWS -- Helen: "same design as index recipe
+     list rows as a baseline to build from". Same classes, same order: title,
+     ingredient line, badges, the shortlist control at the row's end. Written
+     out here rather than shared as an include for the reason the drink page
+     gives: the index row carries five `data-*` attributes and a derived
+     exclusion vocabulary this page has no use for, and the STYLESHEET is the
+     shared half, which is the half that cannot drift by accident. The pantry
+     ordering of the ingredient line is copied exactly (see food/index.html).
+
+     THE COLLECTION IS ALREADY THE PUBLISHED SET: _plugins/publish_gate.rb
+     removes a held-back recipe from `site.food_recipes` at :post_read, so a
+     live page can only ever offer a live one. Drafts and the magic bag are
+     other collections and are never in this loop.
+
+     A TIE IS BROKEN BY SHARED INGREDIENTS, LARDER STAPLES LAST -- Helen's
+     second ruling, the same evening: "where just one tag is shared, do you
+     think it would be better to pick matched ingredients (in larder order)?"
+     Measured before it was written (DECISIONS §13): weighting ingredients
+     ABOVE tags changed 49 of 69 pages' rows and put chocolate ice cream
+     beside cauliflower cheese on the strength of "whole milk", because
+     _data/food/pantry.yml is exact and conservative by design ("milk" is in
+     it, "whole milk" is not) and that gap decides too much once ingredients
+     outweigh tags. Breaking TIES only changed 37 pages, nearly all of them
+     the cases she meant -- caramel loses the ramen eggs and gains the sponge
+     cake through double cream, cranberry sauce gains the chestnut loaf over
+     two ice-cream bases -- so a lone shared tag never outranks a shared
+     ingredient at the same score, and a shared larder staple never outranks
+     a real one, and nothing else moves.
+
+     THE SORT IS A STRING SORT, as on the drink page: each candidate becomes
+     one `prio~rank~real~larder~title~url` string -- `prio` 0 for a
+     star-and-mood match and 1 otherwise, `rank = 999 - score`, `real = 99 -
+     shared non-larder ingredients`, `larder = 99 - shared larder staples` --
+     and ascending text order is then prioritised first, highest score first
+     within each half, most real ingredients within a score, most larder
+     staples within that, A-Z last. `scripts/related_recipes.py` is the same
+     rule in Python over the same corpus -- re-run it after a promotion batch
+     or a taxonomy edit that moves tags, and read it when the rendered-pages
+     test names a recipe that could not fill its row.
+
+     LOWERCASED ON BOTH SIDES. Tags are a lowercase vocabulary already;
+     main_ingredients are free text and "Demerara sugar" beside "demerara
+     sugar" is one ingredient. The star is compared the same way.
+
+     PLACEHOLDER COPY, Helen's to write -- §13.12. The heading is her own
+     words from #927, the same line the drink page shows.
+  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  {% assign _mood_tags = site.data.food.taxonomy.tags.mood %}
+  {% assign _pantry = site.data.food.pantry %}
+  {% capture _my_ings %}|{% for _ing in page.main_ingredients %}{{ _ing | downcase }}|{% endfor %}{% endcapture %}
+  {% assign _my_star = page.star_ingredient | default: "" | downcase %}
+  {% assign _related_keys = "" %}
+  {% for _other in site.food_recipes %}
+    {% unless _other.url == page.url %}
+      {% assign _score = 0 %}
+      {% assign _real = 0 %}
+      {% assign _larder = 0 %}
+      {% assign _shared_mood = false %}
+      {% for _t in page.tags %}
+        {% if _other.tags contains _t %}
+          {% assign _score = _score | plus: 1 %}
+          {% if _mood_tags contains _t %}{% assign _shared_mood = true %}{% endif %}
+        {% endif %}
+      {% endfor %}
+      {% for _ing in _other.main_ingredients %}
+        {% assign _key = _ing | downcase %}
+        {% capture _token %}|{{ _key }}|{% endcapture %}
+        {% if _my_ings contains _token %}
+          {% assign _score = _score | plus: 1 %}
+          {% if _pantry contains _key %}
+            {% assign _larder = _larder | plus: 1 %}
+          {% else %}
+            {% assign _real = _real | plus: 1 %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% assign _prio = "1" %}
+      {% if _my_star != "" and _shared_mood %}
+        {% assign _other_star = _other.star_ingredient | default: "" | downcase %}
+        {% if _other_star == _my_star %}{% assign _prio = "0" %}{% endif %}
+      {% endif %}
+      {% if _score > 0 or _prio == "0" %}
+        {% assign _rank = 999 | minus: _score %}
+        {% assign _rrank = 99 | minus: _real %}
+        {% assign _lrank = 99 | minus: _larder %}
+        {% capture _related_keys %}{{ _related_keys }}{{ _prio }}~{{ _rank }}~{{ _rrank }}~{{ _lrank }}~{{ _other.title }}~{{ _other.url }};{% endcapture %}
+      {% endif %}
+    {% endunless %}
+  {% endfor %}
+  {% assign _related_sorted = _related_keys | split: ";" | sort_natural %}
+
+  {% if _related_sorted.size > 0 %}
+    <section class="recipe-related-section">
+      <!-- PLACEHOLDER COPY, Helen's to write -->
+      <h2 class="recipe-section-heading">
+        <span class="section-heading-text">If you liked this, how about&hellip;</span>
+      </h2>
+      <ul class="recipe-list recipe-related">
+        {% for _entry in _related_sorted limit: 3 %}
+          {% assign _parts = _entry | split: "~" %}
+          {% assign _rel = site.food_recipes | where: "url", _parts[5] | first %}
+          <li data-url="{{ _rel.url }}">
+            <div class="recipe-row-content">
+              <a class="recipe-title-link" href="{{ _rel.url | relative_url }}">{{ _rel.title }}</a>
+              {% if _rel.main_ingredients and _rel.main_ingredients.size > 0 %}
+                {% assign _pantry = site.data.food.pantry %}
+                {% assign _lead = "" %}
+                {% assign _tail = "" %}
+                {% for _ing in _rel.main_ingredients %}
+                  {% assign _key = _ing | downcase %}
+                  {% if _pantry contains _key %}
+                    {% assign _tail = _tail | append: _ing | append: "|" %}
+                  {% else %}
+                    {% assign _lead = _lead | append: _ing | append: "|" %}
+                  {% endif %}
+                {% endfor %}
+                {% assign _lead_count = _lead | split: "|" | size %}
+                {% assign _ordered = _lead | append: _tail | split: "|" %}
+                <div class="ingredient-list">
+                  {% for _ing in _ordered %}
+                    {% if forloop.index0 < _lead_count %}<span class="ingredient-pill">{{ _ing }}</span>{% else %}<span class="ingredient-pill ingredient-pill--pantry">{{ _ing }}</span>{% endif %}{% unless forloop.last %}<span class="ingredient-sep">,</span>{% endunless %}
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <div class="badge-group">
+                <div class="badge-group-content">
+                  {% include recipe_badges.html recipe=_rel %}
+                </div>
+              </div>
+            </div>
+            {% comment %} THE INDEX ROW'S BUTTON, EXACTLY: same class, same key,
+               same `hidden`. shortlist.js finds every `.btn-shortlist` on the
+               document, so this placement is markup and nothing else. {% endcomment %}
+            <button type="button"
+                    class="btn-shortlist"
+                    data-shortlist-key="{{ _rel.url }}"
+                    aria-label="shortlist {{ _rel.title }}"
+                    aria-pressed="false"
+                    hidden>shortlist</button>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
 </article>
 
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/method-toggle.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
+{% comment %} THE SCALER, IN DEPENDENCY ORDER -- #1005. shopping-list.js is the
+   ONE amount parser (MANUAL 9.13), food-shopping-list.js is the food
+   formatting built on it (grams to the gram, spoons in fractions),
+   food-scale.js is one amount times a factor built on both, and
+   recipe-scale.js is the wiring. Each reads the one before it off `HTF` at
+   parse time, so loaded the wrong way round the page throws once, silently,
+   and the control never appears; tests/test_site_config.py guards the
+   order, as it does for the drink page's three. {% endcomment %}
+<script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/food-scale.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/recipe-scale.js' | relative_url }}"></script>

@@ -1683,6 +1683,47 @@ function renderResultsPool() {
   // shuffles, so the rule above is unchanged rather than weakened.
   var restored = restoreIndexMemory();
   if (!restored) shuffleRecipeList();
+
+  /* ARRIVING AT THE SHORTLIST BY URL -- `?shortlist=1`, #1011 (2026-09-14),
+     food's half of what #994 gave the drinks index on 2026-09-12. The "see
+     shortlist" action on a recipe page links here, so a reader who has just
+     marked something has one click to see everything they have marked.
+
+     IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
+     `enterShortlistView()` plus `resetFilterControls()` is exactly what
+     pressing `shortlisted (N)` does a few hundred lines above, so a reader who
+     arrives by the link and one who presses the button are in one state, and
+     #918's rule that this is a VIEW and not a facet holds for both.
+
+     AFTER THE QUERY-STRING FILTERS AND THE MEMORY, AND IT REPLACES BOTH: a
+     `?tag=` in the same URL narrows a list, and this is the opposite
+     instruction -- show me everything I have saved -- so the last word is the
+     link's own. The remembered scroll goes with the remembered list, for the
+     reason cocktail-index.js gives: 2,400px into a three-recipe shortlist
+     lands past the end of it.
+
+     A LITERAL TEST RATHER THAN `parseQuery`, as on cocktails: `shortlisted` is
+     a view with one value, not a field a URL may set. */
+  if (location.search.indexOf('shortlist=1') !== -1) {
+    state = FilterState.enterShortlistView();
+    resetFilterControls();
+    restored = null;
+  }
+
+  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box on
+     a recipe page's furniture line. Exactly what typing into the name box does
+     (its `input` handler above): the box shows the text, the query is folded
+     the same way, and the list is reordered by title tier. Applied after the
+     memory and the shuffle, because a name you just typed is a fresh
+     instruction, and the remembered scroll goes with the remembered list. */
+  var arrivedName = FilterState.parseName(location.search);
+  if (arrivedName && nameSearchBox) {
+    nameSearchBox.value = arrivedName;
+    state.nameQuery = HTF.ingredientSearch.fold(arrivedName.toLowerCase());
+    reorderForTitleSearch();
+    restored = null;
+  }
+
   update(!!restored);          // preserve the restored page number
   if (recipeList) recipeList.style.visibility = 'visible';
 

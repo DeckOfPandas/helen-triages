@@ -341,6 +341,12 @@ TRUSTED_DYNAMIC = (
     # published-page set for EVERY site, so this href is covered by that rather
     # than being unchecked.
     re.compile(r"^\{\{\s*back_site\.home\s*\|\s*relative_url\s*\}\}$"),
+    # The see-shortlist link in the actions row (#1005/#1011, 2026-09-14,
+    # _includes/page-actions.html): the same site `home` as the back arrow,
+    # checked the same way by test_site_nav_links_resolve_to_real_pages, with
+    # `?shortlist=1` appended -- a query both indexes read (MANUAL 8.9), and a
+    # query is not a path, so the target page is the home page either way.
+    re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1$"),
     # The footer's reference links, added 2026-08-16. Same shape and same
     # treatment as the three above: the value lives in _data/sites.yml, so this
     # scanner cannot read it out of the template, and
@@ -363,6 +369,13 @@ TRUSTED_DYNAMIC = (
     # is CHOSEN by a score, so the interesting failure is not a broken URL but
     # the wrong number of them, or a drink offering itself.
     re.compile(r"^\{\{\s*rel\.url\s*\|\s*relative_url\s*\}\}$"),
+    # The related-recipes row at the foot of a RECIPE page (#1005, 2026-09-14,
+    # `_rel` in _layouts/recipe.html): the food twin of the line above, looked
+    # up out of `site.food_recipes` by url the same way, and checked the same
+    # way -- test_every_published_recipe_page_offers_three_other_published_recipes
+    # reads the production build and asserts each of the three lands on a
+    # published recipe page.
+    re.compile(r"^\{\{\s*_rel\.url\s*\|\s*relative_url\s*\}\}$"),
     # The cocktails index's draft cards, added 2026-08-23. Provably correct
     # for the same reason as recipe.url/cocktail.url on the line above --
     # Jekyll computes `url` from the document's own permalink, so it cannot

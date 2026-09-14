@@ -461,6 +461,23 @@ test('#994: without the query the view stays off', () => {
   assert.strictEqual(visibleTitles(r.page).length, DRINKS.length);
 });
 
+// --- arriving with a name, #1024 -----------------------------------------------
+// `?q=` is what the search box on a drink page's furniture line sends. The
+// index must put it into I KNOW WHAT I WANT and apply it, exactly as typing
+// there would, so the two boxes are one control in two places.
+
+test('#1024: ?q= fills the name box and narrows the list', () => {
+  const r = boot({ drinks: DRINKS, search: '?q=negroni' });
+  assert.strictEqual(r.doc.getElementById('drink-name').value, 'negroni',
+    'the box should show what the reader typed on the page they came from.');
+  // BY KEY, NOT BY TITLE. A matched name is re-rendered with a <mark> through
+  // innerHTML, which this stub CLEARS rather than parses (dom-stub.js), so
+  // the matched card's title reads as '' here and nowhere else.
+  const visible = r.page.list.children.filter(function (li) { return !li.hidden; });
+  assert.deepStrictEqual(visible.map(function (li) { return li.getAttribute('data-url'); }),
+    ['/b'], 'the query must reach apply(), not only the box.');
+});
+
 test('#994: shortlist=1 beats a mood in the same URL', () => {
   // It is a VIEW, not a facet (#918): pressing the button clears every other
   // filter, and arriving by the link must mean the same thing or the two doors

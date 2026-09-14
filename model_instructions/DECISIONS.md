@@ -639,6 +639,25 @@ unless stated.
   **The trap generalises: tightening a gate silently unpublishes whatever only
   passed the loose version.** Measure the count before the change, not after.
 
+- **2026-09-14, #1008 — what happens AFTER the flip, in three sizes, and an
+  issue as the signal.** The flag rule is unchanged; what was missing was the
+  next step, and Helen ruled it in three sizes: *"If Claude touches a
+  published file, if it's only something like a single word or number then
+  ask me and I will consider granting permission to make the change without
+  flipping the flag. If not, then leave on public site but unpublished. If
+  something big is wrong, delete from public repo and re-add to private."*
+  Then, the same evening, the mechanism: *"when Claude touches a published
+  file in a way that flips proofread to false, raise a github issue labelled
+  blocked on Helen so I know I need to do something"* — the label already
+  existed. `scripts/needs_helen.py` does the flip and writes the issue body;
+  `PIPELINE.md` §5 is the procedure. **Its first use was the same day, and it
+  was not an agent's own edit**: #982's data pass had put
+  `grandmas-lemon-curd` and `tomato-tarragon-salad` to `proofread: false`
+  (correctly), two live pages link to them, and
+  `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`
+  was red on `main` with nobody told. #1026 is the issue, and the lesson it
+  carries is in the doc: a demotion can break links, so the issue names the
+  linking pages too.
 - **2026-09-14, #1009** — **The same trap from the other side: a correct
   proofread flag took two pages dark AND left the links to them.** #982 / PR
   #996 moved measures from `item:` into `amount:` across twenty food recipes and
@@ -3826,6 +3845,62 @@ unless stated.
   **A test failing about a copy of a thing is worth reading as a question about
   the thing.** The template reads the data now, and a guard watches the pair.
 
+- **2026-09-14, #1008 — ONE MAP, `PIPELINE.md`, and the folders settled for
+  both sites.** Helen: *"Basically I want this process to be as smooth as
+  possible. We've reinvented this hundreds of ways together recently, which
+  is laborious and inefficient."* The process was real and worked; it was
+  spread across five documents and three manual sections with no picture of
+  the whole. Her rulings, taken in one exchange:
+  - **cocktails gets no `to-rewrite/`** — *"they're not as annoying as food
+    recipes"*;
+  - **`to-cook/` becomes `to-make/`, on both sites** — one word for one stage;
+  - **`keep/` exists**, on both sites: made and liked, not rewriting yet. This
+    is the intermediate state #429 (2026-08-21) said promotion did not have —
+    *"cooked-and-liked (promoted), cooked-and-disliked (deleted) or not
+    cooked"* — and she named it herself: *"tell me how to tell you I've tried a
+    recipe and want to keep it a) and want to rewrite it now and b) don't want
+    to rewrite it now -- there are a few intermediate states."* Folders, not a
+    flag: the flags are what the suite reads, and the folders are hers;
+  - **Claude may move files between the staging folders on her word** —
+    reversing `ingest.md`'s "never move a file between these folders unless
+    asked" by making the word the ask: `rewrite`, `make`, `keep`, `ready`,
+    `bin`, each followed by a slug.
+  - **The `rewritten: true` flip on the move into `to-promote/` now holds for
+    food as well** (it was a drinks-only ruling from 2026-09-04); the six
+    steps of `PUBLISHING_A_DRINK.md` carry a recipe too.
+  What the map does NOT yet have paved is listed in its §6 — the folder rename
+  in the private repo, `promote.py`, the local `to make (N)` view — so the doc
+  is honest about which lines are drawn.
+  - **Then, the same evening, the names:** *"I'd like each subfolder to
+    appear in order at the top of my files list -- small usability tweak for
+    future-Helen. So shall we try 1-rewrite, 2-make, and so on?"* So
+    `1-rewrite/`, `2-make/`, `3-keep/`, `4-promote/`, the same numbers on both
+    sites with drinks simply lacking the first. `tests/test_cocktails.py`'s
+    `STAGED` and the tidy and inbox fixtures name the new folders; the private
+    repos' folders move on branches of their own.
+  - **And the backlog surfaced:** *"raise issue for any file currently in
+    published where proofread is false, both food and cocktails."* 21 food
+    recipes, no drinks; #1026 for the two with live pages linking to them and
+    #1027–#1045 one each for the rest, bodies naming the commit that last
+    touched each file (`tmp/raise_proofread_issues.py`, on
+    `scripts/needs_helen.py`'s helpers).
+  - **AND THAT BURST GOT THE AGENT ACCOUNT FLAGGED AS SPAM, the same
+    evening.** Twenty issues and two PRs in under an hour from
+    `DeckOfPandas-agentic`, and GitHub hid the account: its profile, the
+    two PRs (#1046 here, #35 on the food repo), all twenty-one issues and
+    the earlier merged #1023 returned 404 to everyone but the account,
+    while the API called as that account listed every one of them open and
+    normal. Helen said three times that there were no PRs anywhere, and
+    was answered twice with API output before anyone ran an anonymous
+    `curl` -- which returned 404 for the PR and 200 for her own issue
+    #1005, the whole diagnosis in two lines. The rule is in `CLAUDE.md`'s
+    GitHub section: never a burst of creations, a batch of issues is one
+    issue with a checklist, and when Helen cannot see something the API
+    says exists, believe her and curl the page. The branches were never
+    affected -- a push is a ref, not content -- so the compare links open
+    a PR by hand under her own name; the appeal to GitHub Support is the
+    account owner's, not a session's.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
@@ -4553,6 +4628,82 @@ verification. Dates are when the correction landed.
   load, the same draw the wordmark makes. The attribute stays in the templates
   because `universe.js` selects the slots by it. If "all tape" meant something
   else, the one line in `cardTapes()` is the whole change back.
+
+- **2026-09-14, #1005 / #1006 / #1007 / #1011 / #1024 — the feature set
+  settled, the placements on two candidates pages.** Helen's grumbles came as
+  five issues; the reading that unified them was that the two sites put the
+  same controls in different rows and nothing defined "where actions live"
+  (the drink page's shortlist button alone had moved four times in ten days),
+  and that the drink page never adopted food's named spacing scale (§13.3),
+  so every gap in her #1006 screenshot was the same 1.75rem. The pdf she
+  thought missing was only missing on `jekyll-local`, where the local config
+  turns the link off. Her rulings, before looking at anything:
+  - **the same controls on both pages**: back, shortlist, see shortlist (N),
+    print, pdf; read it / make it stays cocktails'; the scaler and "if you
+    liked this" come to food — *"Yes."*;
+  - **food scales by PORTIONS** where drinks scale by whole recipes —
+    *"Portions. Things like '2 large' can scale, surely, then let's add a note
+    to bitters and handfuls (copy tbc, just put in a placeholder)."*;
+  - **related recipes score by shared tags plus shared main ingredients, and
+    "prioritise (star*mood)"** — a candidate sharing the star ingredient AND a
+    mood tag outranks the rest; `scripts/related_recipes.py` measured every
+    published recipe's third pick at 1 or more;
+  - **all actions in Courier caps, on both sites, the index pills too** —
+    *"Let's try all actions in capitals (shortlist button at top of index
+    lists too) to help show they're actions????"* — the question marks are
+    hers, so this is a try rather than a ruling.
+  Built the same day without waiting for the picks: pdfs for drinks (the
+  generator renders both collections), `?shortlist=1` on the food index, the
+  caps, the related rows (the index's own rows, at her word), the portion
+  scaler. **The placements, the header and the spacing went on two candidates
+  pages** — the real drink and recipe pages with a switcher for each question
+  — **and her picks, the same evening:**
+  - **#1005: "row under the head."** The actions row sits in
+    `.cocktail-controls` beside the toggle and in a new `.recipe-controls`
+    under food's badges, closed by a hairline (MANUAL §13.13).
+  - **#1024: "back arrow's line, but on the right not in the centre."** The
+    header's empty middle was the other candidate and lost.
+  - **#1006: "half way, BUT with a little extra space between the make it
+    read it line and the rule above it."** Section headings 3rem/1.25rem, the
+    scaler and the related hairline moved by the same half step, and the
+    controls row's `-1rem` hang under the rule went to 0.
+  - **#1007: "I am genuinely unsure! Could you advise me? I am sure that all
+    three are better than what we have now."** Advised the word and the arrow,
+    no icon: the row exists because family did not read a small glass as a
+    second site, so the word is the part doing the work; the icon was the busy
+    part; and a tiny second tape under the wordmark's tape reads as a
+    mis-sized copy of it. Built that one; she will judge it live, and it is
+    one include line to change.
+  Two findings from building the candidates, both honest costs rather than
+  bugs, and both now moot: four actions on the drink page's title line
+  squeezed the name and the meta (the head was a two-track grid), and a search
+  box fitted the header's empty middle with no change to the shared template.
+  **And a fact found on the way that belongs to #1008**: `proofread: false` on
+  21 published food recipes and no drinks, none of them visible to Helen until
+  she asked for an issue each (#1027–#1045, plus #1026 for the two that other
+  pages link to).
+  - **Related recipes, the tie-break — later the same evening.** Told that
+    eight recipes' third pick shared only one tag, Helen: *"where just one tag
+    is shared, do you think it would be better to pick matched ingredients (in
+    larder order)?"* Measured two readings over the 69 published recipes
+    (`tmp/related_variants.py`, the numbers kept here because the script is
+    scratch). **Ingredients weighted above tags** (a shared non-larder
+    ingredient counting double, a larder staple nothing) changed 49 pages'
+    rows and some of them wrongly: cauliflower cheese got both chocolate ice
+    creams on "whole milk", Caesar dressing got hollandaise and mackerel pâté
+    on "lemon juice" — `pantry.yml` is exact and conservative by design, so
+    "milk" is in it and "whole milk" is not, and that gap decides too much
+    once ingredients outweigh tags. **Ties broken by shared ingredients,
+    larder staples last**, changed 37 pages, nearly all of them the cases she
+    meant: caramel lost the ramen eggs and the coleslaw and gained the sponge
+    cake and macarons through double cream; cranberry sauce lost two
+    ice-cream bases and gained the chestnut loaf and the marmalade ham;
+    masala chai got the three spice blends. Advised the second; Helen:
+    *"Agree with your version, please go ahead."* So the rule is: score as
+    before, then most real ingredients, then most larder staples, then A–Z —
+    a lone shared tag never outranks a shared ingredient at the same score.
+    Built as two extra digits in the Liquid sort key and the same key in
+    `scripts/related_recipes.py`.
 
 ## §14 Reference pages
 

@@ -216,6 +216,29 @@ def test_the_scaler_scripts_load_in_dependency_order():
     )
 
 
+def test_the_recipe_scaler_scripts_load_in_dependency_order():
+    """#1005. Four scripts on the recipe page, each read at parse time by the
+    one after it: shopping-list.js (the one amount parser), food-shopping-
+    list.js (food's formatting on top of it), food-scale.js (one amount at a
+    factor, built on both), recipe-scale.js (the wiring). Loaded the wrong
+    way round the page throws once, silently, and the portions box never
+    appears -- the same failure the drink page's three-script test guards.
+    """
+    html = read("_layouts", "recipe.html")
+    order = ["shopping-list.js", "food-shopping-list.js", "food-scale.js",
+             "recipe-scale.js"]
+    positions = []
+    for name in order:
+        match = re.search(r"<script src=[^>]*/" + re.escape(name), html)
+        assert match, f"_layouts/recipe.html no longer loads {name}."
+        positions.append(match.start())
+    assert positions == sorted(positions), (
+        "the recipe scaler's four scripts are out of order in "
+        "_layouts/recipe.html. Each one reads the one before it off HTF at "
+        f"parse time, so the order must be: {', '.join(order)}."
+    )
+
+
 def test_the_food_shopping_scripts_load_in_dependency_order():
     """food-shopping-list.js reads HTF.shoppingList, and filters.js reads both.
 
@@ -2006,27 +2029,52 @@ def test_pdf_link_points_where_the_pdfs_are_written():
     # "/food/recipes/:path/" -> "/food/recipes/"
     expected = permalink.split(":")[0]
 
-    layout = read("_layouts", "recipe.html")
-    link = re.search(r"\{\{\s*'([^']+)'\s*\|\s*append:\s*page\.slug\s*\|\s*append:\s*'\.pdf'", layout)
-    assert link, (
-        "_layouts/recipe.html no longer builds the PDF link as "
-        "`'<dir>' | append: page.slug | append: '.pdf'`. If the link is built "
-        "another way now, this check needs to follow it -- it is the only "
-        "thing tying the link to where the files are written."
+    # THE LINK IS BUILT FROM `page.url` SINCE #1005 (2026-09-14), in
+    # _includes/page-actions.html, which both page layouts include: the page's
+    # own URL with its trailing slash swapped for `.pdf`. That is where the
+    # script writes each file -- beside the page's output directory -- for
+    # whatever permalink a collection has, so the link cannot point at a
+    # different directory from the page it is on. What is left to check is
+    # that the include still builds it that way, and that the script renders
+    # every collection whose pages carry the include (below).
+    include = read("_includes", "page-actions.html")
+    assert re.search(
+        r"page\.url\s*\|\s*append:\s*'\.pdf'\s*\|\s*replace:\s*'/\.pdf',\s*'\.pdf'",
+        include,
+    ), (
+        "_includes/page-actions.html no longer builds the PDF link from "
+        "page.url (`page.url | append: '.pdf' | replace: '/.pdf', '.pdf'`). "
+        "If it is built another way now, this check needs to follow it -- it "
+        "is the only thing tying the link to where the files are written."
     )
-    assert link.group(1) == expected, (
-        f"The PDF link points at {link.group(1)!r} but recipe pages are "
-        f"published under {expected!r} (from _config.yml's permalink), which "
-        f"is where scripts/generate_pdfs.py writes each PDF -- it puts "
-        f"<slug>.pdf beside the recipe's own output directory. One of the two "
-        f"has moved and the other has not."
-    )
+    for layout_name in ("recipe.html", "cocktail.html"):
+        assert "page-actions.html" in read("_layouts", layout_name), (
+            f"_layouts/{layout_name} no longer includes page-actions.html, so "
+            f"its pages have no pdf link -- or have one built somewhere this "
+            f"test does not read."
+        )
 
+    # BOTH COLLECTIONS SINCE #1005 (2026-09-14): the script walks one tuple of
+    # directories and this reads that tuple rather than a literal glob, so a
+    # third collection is one entry there and one permalink here.
     script = read("scripts", "generate_pdfs.py")
-    assert 'glob("food/recipes/*/index.html")' in script, (
-        "scripts/generate_pdfs.py no longer globs food/recipes/*/index.html, "
-        "so it may be writing PDFs somewhere other than beside the recipe "
-        "pages this link points at."
+    dirs = re.search(r'for collection in \(([^)]*)\):', script)
+    assert dirs, (
+        "scripts/generate_pdfs.py no longer loops `for collection in (...)` "
+        "over the directories it renders, so this check cannot see where it "
+        "writes PDFs. Follow the script's new shape here."
+    )
+    rendered = re.findall(r'"([^"]+)"', dirs.group(1))
+    assert expected.strip("/") in rendered, (
+        f"scripts/generate_pdfs.py renders {rendered}, which does not include "
+        f"{expected.strip('/')!r} -- recipe pages would get no PDF and every "
+        f"pdf link on food would 404."
+    )
+    drinks = ((config.get("collections") or {}).get("cocktail_recipes") or {}).get("permalink")
+    assert drinks and drinks.split(":")[0].strip("/") in rendered, (
+        f"scripts/generate_pdfs.py renders {rendered}, which does not include "
+        f"the cocktail_recipes permalink {drinks!r} -- drink pages get a pdf "
+        f"link since #1005, and it would 404."
     )
 
 

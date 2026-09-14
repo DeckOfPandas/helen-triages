@@ -72,7 +72,8 @@ Run `ls model_instructions/` rather than trusting this list.
 | `INGEST_ONE_RECIPE.md`, `INGEST_ONE_COCKTAIL.md` | for a Claude with NO repository. They stand alone because the closed vocabularies are small enough to print; every vocabulary block in them sits between `<!-- vocab:… -->` markers and is RENDERED from `_data/` by `scripts/build_ingest_vocab.py` (`--check` / `--write`), which `tests/test_standalone_docs.py` enforces. Hand-edit nothing inside a marker pair. Everything outside one is prose and must be kept in step by hand when §4, §5, §7, §9.3 or the attribution spec changes |
 | `CLAUDE_WEB_INGEST.md` | the claude.ai Project that holds those two files, and what it is told |
 | `INGEST_INBOX_DESIGN.md` | §6 the envelope an ingest issue carries, §8 its security argument, §9 the rulings; the rest is stubs |
-| `PUBLISHING_A_DRINK.md` | the six steps a drink goes through from Helen's rewrite to the public repo, the word "final", the one-working-copy rule |
+| `PIPELINE.md` | **the one map** (#1008, 2026-09-14): the three doors in, the intake pass, Helen's folders and the four words that move a file, the way out, and the way back when an agent touches a published file. Read it before any of the four procedure documents |
+| `PUBLISHING_A_DRINK.md` | the six steps a drink goes through from Helen's rewrite to the public repo, the word "final", the one-working-copy rule -- §4 of `PIPELINE.md` is the same journey for both sites |
 | `LETTERING.md` | the four tiers of punched-tape type; supersedes §13.4.1 and §13.10.2 |
 | `LEOPARD.md` | the black-on-black print: generator, tones, Helen's rounds. **She holds it; ship nothing** |
 
@@ -359,8 +360,12 @@ second belongs in `chrome.yml`, or nowhere. `RETIRED_SITE_KEYS` in
 
 **The nav is the door to the OTHER site** (since 2026-09-10, Helen's own idea,
 picked from a header-only candidates page): one loop over `sites.yml` in that
-file's order, skipping `page.site_key`, each entry an icon, its bracketed word
-and an arrow — `[ COCKTAILS ] →` on food. **The arrow is DRAWN, not typed**
+file's order, skipping `page.site_key`, each entry its bracketed word and an
+arrow — `[ COCKTAILS ] →` on food. **The icon left the row on 2026-09-14**
+(#1007, *"too large and busy"*; she asked for a recommendation between the
+word, the icon and a tiny tape, and took the word — the `icon` key and the
+artwork stay, and putting it back is one include line in `default.html`).
+**The arrow is DRAWN, not typed**
 (`_includes/icons/arrow-right.svg`, #993, 2026-09-12): Courier Prime ships as
 an 18KB subset with no arrow in it, so `&rarr;` was whatever face the reader's
 machine substituted for U+2192 — and a substituted glyph is a substituted FONT,
@@ -540,7 +545,7 @@ nowhere, so it is in `INVISIBLE_KEYS` (§4.0) and correcting it does not
 invalidate a proofread.
 
 **The staging folders are Helen's** — `_food_drafts/to-rewrite/` →
-`to-cook/` → `to-promote/` record where SHE is with a recipe, which no flag
+`2-make/` → `4-promote/` record where SHE is with a recipe, which no flag
 can say; all three are read by the draft suite. **Never move a file between
 them unless asked, and never delete a `QQ original` line**: dropping a
 superseded original is her own edit, made when she takes a file out of
@@ -2162,25 +2167,22 @@ to the box, so that inset is a percentage of the tape's rendered width, not a
 length — which is why the phone tape's BOX started on the column and its black
 BAND did not. `scripts/tape_insets.py` is how the fifteen were measured; the modal
 value is the one used, and the `max-width` grows with the bleed so the name
-gains the width rather than only sliding into it. **The shortlist button is the
-title row's second item, at its right end** (#963), given the name's FIRST
-line's own box — the tape's padding as a top margin, one line of lettering as
-its height, adjusted through `:has()` for the fit script's step and wrap — so it
-centres on that line at any size; on a phone it is the card's `+` alone. **A
-see-all link sat under it for two days** (#994, 2026-09-12 to #1000,
-2026-09-14) in a `.cocktail-shortlist-controls` column, with the `+` moved to
-the RIGHT of its word so the two marks stacked; all of that is gone and the
-mark is back on the left, as on a card and on food. **`?shortlist=1` on the
-index survives it** (§8.9), linked from nowhere and kept deliberately. The
-controls row under the head's rule holds
-only the read/make toggle, on the left. **The head is ONE two-column grid**
-(#979): `.cocktail-head-words` is `minmax(0, 1fr) auto` and
-`.cocktail-title-row` is `display: contents`, so everything the head says is in
-the first track and the shortlist button alone is in the second — which means
-the tagline, the meta and the chips all end exactly where the title tape's own
-box is stopped, with no number to keep in step when the button changes size. On
-a phone that grid is off (`display: contents`) and the children are placed on
-`.cocktail-title-block`'s own grid instead. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
+gains the width rather than only sliding into it. **The name is alone on its
+line since 2026-09-14** (#1005). The shortlist button sat at the title row's
+right end from #963 (2026-09-11) — aligned to the name's first line through
+`:has()`, the `+` alone on a phone — and before that in the controls row
+(#897), under the toggle, and in the meta row: four homes in ten days, which is
+the fact #1005 was raised on. **Every action is in the controls row under the
+head's rule now** (§13.13): the read/make toggle at its left, and at its right
+`_includes/page-actions.html` — shortlist, see shortlist (N), print, pdf — the
+same include a recipe page carries. **`?shortlist=1` on the index has a caller
+again** (§8.9): the see-shortlist link. **The head is one column** —
+`.cocktail-head-words` is `minmax(0, 1fr)` (a grid rather than a block so the
+tape word's `nowrap` cannot set the head's min-content width and defeat the
+fit script) and `.cocktail-title-row` is `display: contents`; #979's ruling
+that the meta ends where the tape's track ends holds with nothing left to
+subtract. On a phone that grid is off (`display: contents`) and the children
+are placed on `.cocktail-title-block`'s own grid instead. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
 to the index with `?mood=`. INGREDIENTS / METHOD / NOTES headings are 1.5rem,
 weight 400, absinthe over yvette (NOTES over lagoon); ingredient names carry
 no underline (they looked like links). **`make it`** (`cocktail-make.js`, a
@@ -2429,6 +2431,10 @@ listener actually reads.
 
 ## 11. Working practices
 
+> **`model_instructions/PIPELINE.md` IS THE MAP OF ALL FOUR** (#1008,
+> 2026-09-14): where a file is, who moves it, and what happens when a published
+> one is touched. Read it first; the four below hold the detail of their step.
+>
 > **THE FOUR PROCEDURE DOCUMENTS, and each is the authority on its own half:**
 > getting material IN — `.claude/commands/ingest.md` (§11.0.3); when it
 > arrived as a GitHub Issue — `ingest-inbox.md` (§11.0.4); the mechanical half
@@ -3230,6 +3236,33 @@ re-arguing it.
 ingredient lines on a card; matched chips keeping their colour) — neither
 re-argued into existence; she looked at the built page and changed her mind.
 Showing her the thing is always allowed, and is how rulings move.
+
+### 13.13 The page furniture — the same two rows on both sites
+
+#1005, #1011 and #1024, settled 2026-09-14 from two candidates pages (the real
+drink and recipe pages, one switcher per question). Two shared includes, one
+shared partial (`_sass/shared/_furniture.scss`, names only the ten contract
+variables), and the row each site puts the actions in:
+
+- **The furniture line**, `_includes/back-to-index.html`: the back arrow at
+  the left, a search box at the right — *"back arrow's line, but on the right
+  not in the centre."* The box is a plain GET form to this site's index with
+  `q=`, works with no JavaScript, and searches NAMES: `HTF.filterState.parseName`
+  reads it (kept out of `parseQuery`'s three-kind shape because a title may
+  carry a comma) and each index puts the text into its own I KNOW WHAT I WANT
+  box and applies it as a keystroke would. The placeholder is the index's own,
+  `search_placeholder` in `sites.yml`. "Omnisearch" is the ambition; widening
+  to ingredients or moods is a change to the index grammar, not to the box.
+- **The actions row**, `_includes/page-actions.html`: shortlist, see shortlist
+  (N), print, pdf, in that order, in Courier caps — *"all actions in
+  capitals"* — with the count from the STORE (`data-shortlist-total`), not the
+  page. Food puts it in `.recipe-controls` under the badges, closed by a
+  hairline; cocktails in `.cocktail-controls` beside the toggle. Her pick: *"row
+  under the head."* The four move together or not at all; a fifth action is a
+  line in the include.
+- **Print and pdf reach drinks with it.** `scripts/generate_pdfs.py` renders
+  both collections and the pdf link is `page.url` with its slash swapped for
+  `.pdf`, so it points beside the page whatever the permalink.
 
 ---
 

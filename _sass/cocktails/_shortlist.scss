@@ -63,8 +63,11 @@
   @extend %drink-btn-base;
   font-family: $font-headings;
   font-size: 0.8rem;
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
+  // UPPERCASE SINCE 2026-09-14 (#1005) -- Helen: "let's try all actions in
+  // capitals (shortlist button at top of index lists too) to help show
+  // they're actions". Food's twin made the same move the same day.
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   padding: 0.25rem 0.65rem;
   white-space: nowrap;
 
@@ -380,29 +383,27 @@ $card-shortlist-size: 1.15rem;
 // about how narrow a card may be, not about who pays -- and the index card's
 // own 370px floor is the answer to it.
 
-// --- The drink page's button on a phone: the card's mark, not the word ------
-// #963 put the button beside the FIRST LINE of the drink's name (the alignment
-// is built in _cocktail.scss, `.cocktail-title-row .btn-shortlist`). On a phone
-// the full "+ SHORTLIST" label took about 110px of a 342px column from the
-// name, and long names wrapped further -- Arrack Christmas Punch (Wife #3)
-// went from four lines to five. Shown both at 390px on 2026-09-11, Helen
-// picked the mark alone: "B: + mark only on phones". The word stays above
-// 600px, where there is room for it.
+// --- The drink page's button: in the actions row since 2026-09-14 (#1005) ---
+// It sat beside the FIRST LINE of the name from #963 (2026-09-11), and on a
+// phone shrank to the `+` alone ("B: + mark only on phones", chosen at 390px)
+// because the word took 110px of a 342px column from the name. Both went with
+// the move: the button is one of four in `.cocktail-controls` now, under the
+// head's rule, with nothing to take width from, so it keeps its word at every
+// size. The phone block that did the shrinking is deleted rather than kept
+// for a selector nothing matches.
 //
-// THE CARD'S MARK, AT THE CARD'S SIZE -- $card-shortlist-size, so a drink
-// looks the same shortlisted on its card and on its page. `font-size: 0` hides
-// the word from sight only: it is still the button's text, so a screen reader
-// still hears "shortlist" with its pressed state, and `+` / `✓` still come from
-// %shortlist-mark. No trailing margin, for the reason the card gives: the mark
-// IS the button.
-@media (max-width: 600px) {
-  .cocktail-title-row .btn-shortlist {
-    font-size: 0;
-
-    &::before {
-      font-size: $card-shortlist-size;
-      margin-right: 0;
-    }
+// THE THREE CONTROLS BESIDE IT HOVER IN THIS SITE'S "THIS ONE" COLOUR.
+// shared/_furniture.scss gives see shortlist / print / pdf the site's accent
+// under the cursor, which on food is the shortlist button's own magenta and
+// on this site is absinthe -- while `.btn-shortlist` above hovers wicked
+// woowoo, §9.13's rule that magenta means "this one" wherever a pointer is.
+// One row, one hover: the three are re-pointed here to match the button.
+.page-actions {
+  .btn-see-shortlist,
+  .btn-print,
+  .btn-pdf {
+    &:hover,
+    &:focus-visible { color: $color-wicked-woowoo; }
   }
 }
 
