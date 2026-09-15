@@ -55,6 +55,20 @@ WHAT IT REFUSES, each with the `CLAUDE.md` rule it belongs to:
      measured, so both characters are refused; only `sh scripts/` was measured,
      so nothing else is. The remedy is `gh-read.sh --fields` / `--each`, which
      build the jq expression inside the script.
+  8. A LEADING SHELL ENVIRONMENT ASSIGNMENT (`NAME=value cmd ...`) -- since
+     2026-09-15, after a session ran `PLAYWRIGHT_BROWSERS_PATH=... NODE_PATH=...
+     node tmp/repro.js` and it asked Helen, for the same reason as the leading
+     `cd`: the assignment is not part of the command word, so the checker
+     cannot tell what `NAME=` might be routing the rest of the command through
+     (a different `NODE_PATH`, a different `PATH`), and no allow rule can name
+     every value it might take. Helen: *"I want to reduce the number of
+     interruptions to a minimum."* Her pick, of three options offered: refuse
+     the prefix here, and add more committed wrappers so this is rarely
+     needed. Use a committed wrapper instead -- `scripts/browser/`'s scripts
+     already source `scripts/browser/env.sh` themselves, which is what that
+     repro script was reaching for by hand -- or put the whole command in a
+     script in `tmp/` and run the file, where the assignment sits on its own
+     line and needs no prefix at all.
 
 WHAT IT DELIBERATELY ALLOWS, because a guard that fires on harmless
 invocations is one you learn to route around (the lesson `guard-destructive-git
@@ -75,6 +89,13 @@ invocations is one you learn to route around (the lesson `guard-destructive-git
     pattern-matcher to judge, and the one case that actually matters -- a
     secret -- already has `guard-token-expansion.py`. A guard that fires on
     `grep -n 'x$' file` would teach you to route around this one.
+  * An `=` that is not a LEADING assignment. `git -c credential.helper=...` is
+    fine -- the command word is `git`, and `credential.helper=...` is an
+    ordinary argument to `-c`, not a prefix the shell would strip before
+    running anything. So is a `--flag=value` option, wherever it sits, and an
+    `=` inside quotes (`git commit -m "PLAYWRIGHT_BROWSERS_PATH=foo bar"`).
+    Only one or more `NAME=value` tokens sitting BEFORE the command word --
+    the shape a shell itself treats as an environment assignment -- counts.
 
 HOW IT READS THE COMMAND. Quote-stripping first, then substring and token
 tests. NOT `shlex.split`: an unbalanced quote is exactly what a malformed
@@ -105,6 +126,33 @@ _GLOB = re.compile(r"\*")
 
 # An invocation of a committed wrapper, the only shape shape 7 was measured on.
 _SCRIPT_CALL = re.compile(r"^\s*sh\s+scripts/")
+
+# A single token shaped like a shell environment assignment: `NAME=`, with
+# whatever follows. Applied only to the LEADING run of tokens (shape 8) --
+# `git -c credential.helper=x` never reaches this, because its first token is
+# `git`, which does not match.
+_ENV_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+
+
+def _has_leading_env_assignment(bare: str) -> bool:
+    """True if one or more `NAME=value` tokens precede an actual command word.
+
+    Splits the QUOTE-STRIPPED command on whitespace. Stripping first matters
+    here as much as it does for the pipe/chaining checks: it blanks a quoted
+    value's spaces to plain spaces (`NAME='a b' cmd` -> `NAME=      cmd`),
+    which `.split()` then collapses back into the right token boundaries
+    without needing to understand quoting itself. A token is required both
+    before AND after the run of assignments -- `FOO=bar` alone sets a
+    variable and runs nothing, so it is not this shape.
+    """
+    tokens = bare.split()
+    count = 0
+    for token in tokens:
+        if _ENV_ASSIGNMENT.match(token):
+            count += 1
+        else:
+            break
+    return 0 < count < len(tokens)
 
 
 def _strip_quoted(command: str, quotes: str) -> str:
@@ -190,6 +238,18 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "drop it -- the Bash tool already runs in the project root, so "
                 "`grep ...` works where `cd /workspace; grep ...` matches no "
                 "allow rule and always prompts")
+
+    if _has_leading_env_assignment(bare):
+        return ("a leading shell environment assignment (`NAME=value` before "
+                "the command word), which the checker cannot see through to "
+                "know what the rest of the command will do",
+                "use a committed wrapper instead -- `scripts/browser/`'s "
+                "scripts already source `scripts/browser/env.sh` themselves, "
+                "so a Playwright command never needs "
+                "`PLAYWRIGHT_BROWSERS_PATH=...`/`NODE_PATH=...` typed by hand "
+                "-- or put the whole command in a script in `tmp/` and run "
+                "the file, where the assignment sits on its own line with no "
+                "prefix at all")
 
     # Redirections out of the way first, so `2>&1` is not read as chaining.
     scannable = _REDIRECT.sub(" ", bare)

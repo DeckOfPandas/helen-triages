@@ -204,6 +204,35 @@ def test_the_hook_leaves_plain_wrapper_calls_and_other_quoted_text_alone(command
     assert not _unanalyzable_denies(command), f"refused {command!r}"
 
 
+# --- guard-unanalyzable-bash.py shape 8: a leading env assignment -----------
+
+@pytest.mark.parametrize("command", [
+    # the exact call Helen was asked about, 2026-09-15
+    "PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright "
+    "NODE_PATH=/opt/playwright/node_modules node tmp/repro.js",
+    "FOO=bar node tmp/x.js",
+    "FOO=bar BAZ=qux python3 tmp/x.py",
+    "FOO='a b' node tmp/x.js",
+    'FOO="a b" node tmp/x.js',
+])
+def test_the_hook_refuses_a_leading_env_assignment(command):
+    assert _unanalyzable_denies(command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    # nothing to run after the assignment -- sets a variable, executes nothing
+    "FOO=bar",
+    # an `=` that is not a LEADING assignment
+    "git -c credential.helper=value push origin main",
+    "node --flag=value tmp/x.js",
+    'git commit -m "PLAYWRIGHT_BROWSERS_PATH=foo bar"',
+    "grep -rn 'FOO=bar' dir/",
+    "sh scripts/browser/styles.sh /food/ .btn-shortlist-only 390",
+])
+def test_the_hook_leaves_non_leading_or_empty_assignments_alone(command):
+    assert not _unanalyzable_denies(command), f"refused {command!r}"
+
+
 # --- git-push-agent.sh: never the public main --------------------------------
 
 @pytest.mark.parametrize("args", [
@@ -427,6 +456,68 @@ def test_github_public_status_asks_for_a_status_and_nothing_else(url):
                    for line in lines), f"a logged-out status check sent more: {lines!r}"
 
 
+# --- scripts/browser/styles.sh, gaps.sh, click-crop.sh: arguments only -------
+#
+# Added 2026-09-15 alongside guard-unanalyzable-bash.py's new env-assignment
+# refusal, so a Playwright question rarely needs a one-off tmp/ script that
+# names PLAYWRIGHT_BROWSERS_PATH/NODE_PATH by hand. None of the three touches
+# the network or a real build; every case here is refused before `. env.sh`
+# runs, so nothing is exercised but the argument checks themselves.
+
+@pytest.mark.parametrize("args", [
+    [],
+    ["/food/"],
+    ["food/", ".btn"],
+    ["../food/", ".btn"],
+    ["/food/../etc", ".btn"],
+    ["http://evil.example/", ".btn"],
+    ["/food/", ""],
+    ["/food/", ".btn", "abc"],
+    ["/food/", ".btn", "199"],
+    ["/food/", ".btn", "2001"],
+    ["/food/", ".btn", "390", ",color"],
+    ["/food/", ".btn", "390", "color,"],
+    ["/food/", ".btn", "390", "color,,gap"],
+    ["/food/", ".btn", "390", "Color"],
+    ["/food/", ".btn", "390", "color;gap"],
+    ["/food/", ".btn", "390", "background-color|gap"],
+])
+def test_styles_refuses_bad_arguments(args):
+    _assert_refused("browser/styles.sh", args)
+
+
+@pytest.mark.parametrize("args", [
+    [],
+    ["food/"],
+    ["../food/"],
+    ["/food/../etc"],
+    ["http://evil.example/"],
+    ["/food/", "abc"],
+    ["/food/", "199"],
+    ["/food/", "2001"],
+])
+def test_gaps_refuses_bad_arguments(args):
+    _assert_refused("browser/gaps.sh", args)
+
+
+@pytest.mark.parametrize("args", [
+    [],
+    ["food/", ".btn", ".results", "name"],
+    ["/food/", "", ".results", "name"],
+    ["/food/", ".btn,.btn2", ".results", "name"],
+    ["/food/", ".btn", "", "name"],
+    ["/food/", ".btn", ".results", ""],
+    ["/food/", ".btn", ".results", "Name"],
+    ["/food/", ".btn", ".results", "name with spaces"],
+    ["/food/", ".btn", ".results", "../escape"],
+    ["/food/", ".btn", ".results", "name", "abc"],
+    ["/food/", ".btn", ".results", "name", "199"],
+    ["/food/", ".btn", ".results", "name", "2001"],
+])
+def test_click_crop_refuses_bad_arguments(args):
+    _assert_refused("browser/click-crop.sh", args)
+
+
 # --- guard-token-expansion.py: gh's jq can read the environment ---------------
 
 def _hook_denies(command: str) -> bool:
@@ -512,6 +603,16 @@ REVIEWED_OPEN_RULES = {
     "Bash(sh scripts/git-clone-agent.sh *)",
     "Bash(sh scripts/browser/shoot.sh *)",
     "Bash(sh scripts/browser/crop.sh *)",
+    # Added 2026-09-15, alongside guard-unanalyzable-bash.py's env-assignment
+    # refusal (Helen: "I want to reduce the number of interruptions to a
+    # minimum"). All three only ever GET the local build through the local
+    # server (a path validated to start with `/`, contain no `..` and no
+    # scheme), and the only one that writes a file (click-crop.sh) writes
+    # solely under tmp/shots/, to a name validated as [a-z0-9-]+. None takes
+    # an option that runs a program or reads/writes anywhere else.
+    "Bash(sh scripts/browser/styles.sh *)",
+    "Bash(sh scripts/browser/gaps.sh *)",
+    "Bash(sh scripts/browser/click-crop.sh *)",
 }
 
 
