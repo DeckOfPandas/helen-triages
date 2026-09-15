@@ -579,10 +579,20 @@ main {
 
 // The bracketed site word. Quieter than the links it heads -- it is a label
 // saying whose pages these are, not a thing to click.
+//
+// WAS `opacity: 0.65`, ISSUE #1086 -- that faded $color-clear-text to 3.27:1
+// on food and 3.37:1 on cocktails against $color-bg, both under the 4.5:1
+// WCAG AA text minimum (axe-core's color-contrast rule, design review
+// 2026-09-15). Opacity and `mix()` compute the same blended colour -- the bug
+// was never the mechanism, it was the 65% weight -- so this stays a mix of
+// two palette variables, not a new hex, and just leans harder toward
+// $color-clear-text: 82% of it against $color-bg reaches 4.90:1 on food and
+// 4.71:1 on cocktails (tmp/contrast.py), while staying visibly lighter than
+// the full-strength $color-clear-text the links under it rest at.
 .site-footer-ref-word {
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  opacity: 0.65;
+  color: mix($color-clear-text, $color-bg, 82%);
 }
 
 .site-footer-hearts {

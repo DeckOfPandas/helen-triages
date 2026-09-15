@@ -274,6 +274,20 @@
     .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
   }
 
+  // FOCUS-VISIBLE RINGS, ISSUE #1086 -- .btn-tag's shared base
+  // (_sass/food/_buttons.scss) gives every chip a $color-accent ring; these
+  // two sections override the colour to their own hue, the same way the
+  // active-state block above overrides .tag-shape's fill. .btn-star does not
+  // need an entry here: it is emitted only by the STAR section, so its
+  // override sits directly on the class in _buttons.scss.
+  &.category--mood .btn-tag:focus-visible {
+    outline-color: $color-mood-root;
+  }
+
+  &.category--practicalities .btn-tag:focus-visible {
+    outline-color: $color-practicalities-root;
+  }
+
   .category-buttons {
     display: flex;
     flex-wrap: wrap;

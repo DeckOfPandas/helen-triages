@@ -83,10 +83,23 @@
 
   &:hover { color: $color-recipe-link-hover; }
 
+  // WAS `outline: none` with the colour move carried by `border-color`
+  // alone, ISSUE #1086 -- a 1px border this close to a 0.95rem glyph, in the
+  // same colour the text itself was already moving to, read as no focus
+  // style at all in the design review (found by eye, 2026-09-15 --
+  // axe-core's own ruleset has no automated check for focus-ring
+  // visibility). `border` stays untouched here -- it is always
+  // `1px solid transparent`, at rest and focused alike, so this control
+  // never grows -- and a real `outline` carries the visible ring instead:
+  // 2px, offset 2px so it clears the glyph rather than crowding it. No
+  // section hue applies on a recipe page (§13.5: colour there is decoration,
+  // rationed, not a filter code), so this takes the recipe page's own accent
+  // family, same value $color-recipe-link-hover already used ($color-accent
+  // on food, MANUAL 13.2).
   &:focus-visible {
-    outline: none;
+    outline: 2px solid $color-recipe-link-hover;
+    outline-offset: 2px;
     color: $color-recipe-link-hover;
-    border-color: $color-recipe-link-hover;
   }
 }
 
