@@ -41,6 +41,9 @@ This public mono-repo holds both the food and cocktails sides, with private repo
 8. View locally before merging on GitHub:
 ``` bundle exec jekyll serve --config _config.yml,_config_local.yml --port PORT_NUMBER```
 
+Web artifacts turn up sometimes when importing files:
+  * `find . -name '*Zone.Identifier*' -delete`
+
 ## Rebuilding the container after changes
 ```
 docker image list
