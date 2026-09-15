@@ -138,9 +138,11 @@ first free port from 4010 and writes that port to `tmp/browser/port` (since
 2026-09-11 — one server per worktree, so a session never measures another
 session's build), `sh scripts/browser/shoot.sh <label> [paths]` screenshots
 pages at 360, 390 and 1280 and **names every element past the viewport**, and
-`sh scripts/browser/crop.sh <path> <selector> <name> [width]` crops one element
-at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`, `right`), so an
-alignment question is answered by comparing two numbers, not two images.
+`sh scripts/browser/crop.sh <path> <selector> <name> [width] [type-into] [text]`
+crops one element at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`,
+`right`), so an alignment question is answered by comparing two numbers, not
+two images; the last two arguments type text into a box first, for a control
+that only shows itself once somebody has typed (the search dropdown, #1050).
 **A box is not ink**, and `python3 scripts/browser/inkbox.py <png> [gap]`
 answers the other half: it prints each band of ink in a crop with its vertical
 extent and centre, for "is this glass centred on that arrow". **Crop the element
@@ -3279,7 +3281,9 @@ variables), and the row each site puts the actions in:
   (`tests/js/page-search.test.js`); the group headings take each site's own
   section hue from its own stylesheet, the panel itself names only the palette
   contract. The two "recipes"/"drinks" group labels and the no-match line are
-  PLACEHOLDER copy.
+  PLACEHOLDER copy. Helen's second look is #1051–#1059 (DECISIONS §13 lists
+  them); read those before changing the matching, the group titles or where
+  a link lands.
 - **The actions row**, `_includes/page-actions.html`: shortlist, see shortlist
   (N), print, pdf, in that order, in Courier caps — *"all actions in
   capitals"* — with the count from the STORE (`data-shortlist-total`), not the

@@ -4545,6 +4545,20 @@ verification. Dates are when the correction landed.
   link ends in `#results`, the id on both indexes' count line, and each index
   scrolls there again after its reveal. A badge or chip link on a page keeps
   landing at the top; that is #40's behaviour and she spoke to search results.
+  (A report that the placeholder was NOT going on focus was withdrawn a
+  message later — *"My mistake, it is transparent now"* — so nothing moved.)
+  **Her second look came back as issues rather than notes, and they are the
+  worklist this feature leaves behind:** #1051 (a joined "X or Y" card label
+  must not be offered — the cocktails `?ing=` limitation named above, now a
+  ticket), #1052 (prefix and whole-word matching only, which reverses the
+  substring fallback recorded above), #1053 (group titles heavier and slightly
+  larger), #1055 (the no-match line's copy: *"nothing to see here"*), #1056
+  (the magnifying glass to the RIGHT end of the input — reversing her own
+  layout in the issue, on seeing it), #1057 and #1059 (the snap extended to
+  "see shortlist" and to a chip clicked at the top of a recipe — the two
+  links the entry above deliberately left landing at the top), and #1058
+  (food's actions line matched to cocktails'). #1024, "consider omnisearch box
+  at top of pages", is what this built and is hers to close by hand.
   The GitHub account was flagged as spam that day, so the work went up as a
   branch for Helen to open the PR from: *"push work to branches which I will
   then merge. Larger pushes better please to avoid making things worse."*
