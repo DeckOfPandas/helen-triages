@@ -2405,6 +2405,19 @@ both ways) and not in `_data/cocktails/` (the site's vocabulary).
 
 ## 10. Validation — run `pytest`, don't read this
 
+**A red `main` is a deploy outage, not a red build, and nothing on the site
+says so.** Because the suite gates the deploy (next paragraph), a merge that
+turns the suite red stops every later merge from going live too, silently:
+the only signal is GitHub's Actions email. That happened from 2026-09-12 to
+2026-09-15 (PR #996 un-proofread two recipes that two live recipes linked to,
+said in its own message that the link test would go red "until those two are
+reproofread", and about twenty merges then sat undeployed for three days;
+DECISIONS §12). **So: a session that merges, or is told of a merge, checks the
+run went green** — `sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/actions/runs?per_page=3 --jq '.workflow_runs[] | {head_branch, conclusion, created_at}'`
+— and a red one is the first thing to report, before the work it came for.
+Never merge over a known-red suite expecting the next PR to fix it; #1093 has
+the options for making this visible without a session having to look.
+
 **The suite gates the deploy** (#369): `.github/workflows/build-and-deploy.yml`
 has a `test` job and `build` declares `needs: test`, so every guard here is a
 build stop rather than a report. Three things are load-bearing:
