@@ -4873,6 +4873,29 @@ verification. Dates are when the correction landed.
   generalisation: a guard that reads a FILE proves the file; only a test that
   reads the LAYOUT proves the page.
 
+- **2026-09-15, #1112 — TEN FIXED ISSUES LEFT OPEN BY A MERGE THAT SAID IT
+  CLOSED THEM.** PR #1100 was opened by the agent account. Its description
+  ended `Fixes #1051, #1052, #1053, #1055, #1056, #1057, #1058, #1059, #1092,
+  #1096.`, and ten of its commits carried their own `Fixes #N` line. Helen
+  merged it, and #1051 closed alone, with #1086 from a `Closes #1086.` of its
+  own. Nothing noticed until an issue scan found #1052–#1099 still open. **Two
+  separate faults.** (1) A closing keyword covers only the reference straight
+  after it, so a comma list closes its first number. (2) The commits' keywords
+  closed nothing: #1057's timeline shows a `referenced` event from the merge
+  and no close. Yet the same shape in bbdc142, `Fixes #1016` on its own line
+  above `Co-Authored-By`, closed #1016 through PR #1074, which Helen had opened.
+  The one difference found is who opened the PR (Helen, against
+  `DeckOfPandas-agentic-claude`). One example each way, so the explanation is
+  the leading one, not a proven one. **Confirmed the same evening:** PR #1113,
+  also agent-opened, carried one `Closes #N` per line in its description and
+  closed all 22 it listed. The rule is in CLAUDE.md's "ALWAYS tag issues"
+  bullet: trailers for the history, the description for the closing, one
+  keyword per line, and read the issue list after the merge. **Also recorded
+  there from the same evening:** Helen's ruling that separate issues are fine
+  one at a time, 10–30 seconds apart (a background `sleep`, because a
+  foreground one is refused), and that a merged branch is deleted with
+  `sh scripts/git-push-agent.sh :<branch>`, which does not prompt.
+
 ## §13 The visual design — the road to each value
 
 - **2026-07-31 / 2026-08-01 / 2026-08-02** — Recipe page redesigned; index
