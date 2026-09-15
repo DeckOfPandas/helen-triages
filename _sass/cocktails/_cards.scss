@@ -1401,6 +1401,49 @@ $card-name-step: 0.86;
 
 @media (max-width: 720px) {
   .drink-cards { grid-template-columns: 1fr; }
+
+  // BELOW THE TWO-COLUMN BREAKPOINT, "ROW-MATCHED" HEIGHT IS A ROW OF ONE --
+  // design review #1086. `$card-height` is fixed (top of file) because the
+  // grid needs every card in a ROW the same height, and #776's line budget
+  // (below) exists to keep the three stacks inside that fixed height honest.
+  // Both arguments are about a row with more than one card in it. Below this
+  // breakpoint `.drink-cards` is one column, so every row has exactly one
+  // card and nothing is being matched any more -- the fixed height just
+  // leaves a short card (one ingredient line, one chip) with a dead band
+  // between the ingredient line and the foot, which is what #1086 was raised
+  // against (Planteray Pineapple Daiquiri, Apple Cart, Yellow Cactus Flower).
+  // `height: auto` lets each card be exactly as tall as its own content.
+  //
+  // At 1280px and any width down to 721px this rule does not apply at all --
+  // `$card-height` and the line budget are completely untouched there, and
+  // two-column rows still match heights exactly as they did before.
+  .drink-card { height: auto; }
+
+  // THE FOOT COMES OUT OF ABSOLUTE POSITIONING TOO, for the same reason.
+  // `.drink-card-foot` is normally pinned to the card's bottom edge --
+  // "EVERY ANCHOR IS FIXED" is the whole point of the two-column card (top of
+  // file), so the goodness mark sits in the same corner on every card in a
+  // row. With `height: auto` there is no longer a fixed bottom edge to pin
+  // it to: an absolutely positioned foot does not contribute to an auto
+  // height at all (it is out of flow), so `bottom: #{$card-foot-y}` would
+  // sit it hard against whatever the in-flow content happened to end at,
+  // overlapping the ingredient line rather than following it. `position:
+  // relative` puts it back in flow, right where the body's own left/right
+  // padding already lines it up (the `left`/`right` values below match the
+  // card's own padding exactly, which is what let them work as absolute
+  // offsets in the first place), with a margin standing in for the gap the
+  // absolute layout used to give it for free. `.drink-card-ship` anchors
+  // itself to the foot's own box (see that rule's comment), and `position:
+  // relative` keeps the foot a positioned containing block for it, so the
+  // ship still sits at the foot's bottom-right corner -- just a corner that
+  // now moves with the card's own content instead of the row's.
+  .drink-card-foot {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin: $space-md 0 0;
+  }
 }
 
 // #483. Helen, 2026-08-27: "Are screens realistically going to be narrower
@@ -1480,9 +1523,13 @@ $card-name-step: 0.86;
 @media (max-width: 400px) {
   // The glass is no longer a left column, so everything that measured itself
   // against that column has to stop. A consequence of un-columning, not a
-  // choice: the foot's left edge came from the column's width. (The two panel
-  // edges that used to widen here with it are gone -- #886, 2026-09-11.)
-  .drink-card-foot { left: $card-pad-x; }
+  // choice: the foot's left edge used to come from the column's width. (The
+  // two panel edges that used to widen here with it are gone -- #886,
+  // 2026-09-11.) NO `left` OVERRIDE HERE ANY MORE -- design review #1086, see
+  // the `@media (max-width: 720px)` block below, which took the foot out of
+  // absolute positioning entirely at this width, so its position comes from
+  // the card's own padding the same way the body's does, and a per-breakpoint
+  // left edge has nothing left to override.
 
   // THE SCALE COMES DOWN, WHICH IS COUNTERINTUITIVE. The drawing now has the
   // whole card width available — more than it has ever had — so at the full
@@ -1494,18 +1541,20 @@ $card-name-step: 0.86;
   :root { --card-glass-scale: 6.4rem; }
 
   .drink-card {
-    // THE SAME BUDGET AS THE WIDE CARD, PLUS THE BAND -- 2026-09-10, Helen's
-    // phone: "the chips are written over the ingredients". The wide card gives
-    // its name, ingredient line and foot 12.9rem less two paddings; this one
-    // said a flat 15.4rem, which after the 6.6rem band left the same three
-    // stacks 3.1rem LESS than they have at any other width, so a two-line
-    // ingredient line and two rows of chips met in the middle (measured at
-    // 390px: ingredients to 194px, foot from 189px). The line budget (#776,
-    // below) was solved for the wide card's room; the only honest height here
-    // is that room plus the band, derived so the two cannot drift again.
-    height: calc(#{$card-height} + 6.6rem - #{$card-pad-y});
-    // Top padding clears the band. The glass is absolutely positioned and so
-    // takes no space of its own; this is what stops the title starting
+    // NO FIXED HEIGHT HERE ANY MORE -- design review #1086. This used to be
+    // "the same budget as the wide card, plus the band"
+    // (`calc(#{$card-height} + 6.6rem - #{$card-pad-y})`, 2026-09-10, solving
+    // Helen's phone: "the chips are written over the ingredients"), which was
+    // the right fix while every card at this width still had to match a
+    // row-mate's height. Below 720px a card is alone in its own grid row (see
+    // the `@media (max-width: 720px)` block below), so nothing needs it to
+    // match anything any more, and the fixed sum left a card whose content
+    // was short (a one-line ingredient list, one chip) with the same empty
+    // band under its foot that #1086 was raised against. `height: auto` there
+    // now applies here too, with nothing to override it back.
+    //
+    // Top padding still clears the band. The glass is absolutely positioned
+    // and so takes no space of its own; this is what stops the title starting
     // underneath it — the mistake the `title` variant made and Helen caught in
     // one look at /dev/cards-narrow/, which is why that page existed.
     padding: 6.6rem $card-pad-x $card-pad-y $card-pad-x;

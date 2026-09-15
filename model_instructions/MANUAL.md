@@ -2163,11 +2163,20 @@ left on a card. **The names are the bottles** (#555).
 **The card** (`_cards.scss`): horizontal, the glass drawn large down a fixed
 left column (`$card-text-x`, 6.5rem, a custom property as well as a Sass
 variable so five rules cannot bake their own copy), words beside it. **Every
-anchor is fixed** — fixed height, body anchored top-left, foot pinned — and
-the cost is clamping: three lines of ingredients and up to three rows of mood
-chip (#552 — the tiki drinks needed the third line); the foot lays chips and
-ship side by side, bottom-aligned. **No panel behind the glass**; the drawing
-is absinthe and the card shows through. **Under the cursor the field lifts to
+anchor is fixed above the two-column breakpoint (720px)** — fixed height,
+body anchored top-left, foot pinned — and the cost is clamping: three lines
+of ingredients and up to three rows of mood chip (#552 — the tiki drinks
+needed the third line); the foot lays chips and ship side by side,
+bottom-aligned. **Below 720px the height is the card's own content's**
+(#1086, design review, 2026-09-15): a single column is a grid row of one, so
+nothing is left to match, and the fixed height was leaving a short card with
+a dead band under its ingredient line. `.drink-card-foot` goes from
+`position: absolute` to `position: relative` there, so it stops contributing
+nothing to an auto height and starts following the content instead — the
+ship still anchors to the foot itself, so the goodness mark still sits at
+the foot's own corner, just a corner that now moves with the card rather
+than the row. **No panel behind the glass**; the drawing is absinthe and the
+card shows through. **Under the cursor the field lifts to
 the magenta wash, the glass drawing goes magenta and the drink's NAME goes
 magenta wherever the cursor is on the card** (#886 then #971, both 2026-09-11;
 one mixin, and `.drink-card:has(:focus-visible)` as its own rule for the
