@@ -89,6 +89,12 @@
           },
           {
             "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-awk.py\"",
+            "timeout": 20,
+            "statusMessage": "Checking for awk"
+          },
+          {
+            "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-token-expansion.py\"",
             "timeout": 20,
             "statusMessage": "Checking for token expansion"

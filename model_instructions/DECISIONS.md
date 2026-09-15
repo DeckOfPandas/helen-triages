@@ -4131,6 +4131,21 @@ unless stated.
     unless someone remembers otherwise) and **#933** (the proofread baseline
     wants a shape that is not a constant); **#1009**'s substance lives on as a
     comment on #1064.
+  - **`guard-awk.py`, the same evening.** Helen's README draft listed "Never
+    `awk` (same)" under "Never `sed`", and a review found nothing behind it.
+    Asked whether she should have one — *"I feel like I should"* — the answer
+    was yes, for a stronger reason than sed's: awk is an interpreter whose
+    program arrives inline, the opacity `guard-inline-script.py` already
+    refuses for `python -c` and friends, and inside it `print > "file"`
+    writes, `system()` runs anything, and `gawk -i inplace` edits in place. A
+    pipe into awk was already refused (a pipe); awk alone was not. The hook
+    refuses `awk`, `gawk`, `mawk` and `nawk` as whole command words, strips
+    quotes and heredocs like `guard-sed.py`, and is deliberately not clever.
+    `tests/test_text_tool_guards.py` is the first test either text-tool guard
+    has had, and was proved by narrowing the set to `awk` alone and watching
+    `gawk`, `mawk` and `nawk` fail. In passing, `guard-sed.py`'s refusal
+    stopped recommending `python3 -c '...'`, which the inline-script guard has
+    refused since 2026-09-10 — its advice walked straight into the next guard.
 
 ### §11.2 The record of this file being wrong
 
