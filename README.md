@@ -20,7 +20,7 @@ This public mono-repo holds both the food and cocktails sides, with private repo
 4. Run the container (running bash):
     * `.devcontainer/run.sh`
     * Builds the container if it doesn't already exist based on the Dockerfile
-      * Plenty of packages are installed 
+      * Plenty of packages are pre-installed, including Playwright and its dependencies
     * Binds the container /workspace to the primary checkout
     * Reads in AGENT_GH_TOKEN
     * Binds dotfiles for quality of life
