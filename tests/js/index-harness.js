@@ -114,14 +114,19 @@ function buildPage(doc, options) {
   chaos.appendChild(el('button', 'btn-clear-filter', { id: 'clear-chaos' }));
 
   // MOOD and HASSLE: two sections, one state.moods behind them (#695).
-  const mood = el('div', 'drink-filter drink-filter--mood');
+  // `id="filter-mood"` / `id="filter-hassle"` -- #1059, 2026-09-15. A drink
+  // page's own mood chips end their href in one of these two fragments; the
+  // fixture must carry the real ids or a test asserting the scroll lands on
+  // the right SECTION (not merely on the page) would be testing a page this
+  // site does not ship.
+  const mood = el('div', 'drink-filter drink-filter--mood', { id: 'filter-mood' });
   filters.appendChild(mood);
   moodWords.forEach((m) => {
     mood.appendChild(el('button', 'btn-mood', { 'data-mood': m, type: 'button' }));
   });
   mood.appendChild(el('button', 'btn-clear-filter', { id: 'clear-mood' }));
 
-  const hassle = el('div', 'drink-filter drink-filter--hassle');
+  const hassle = el('div', 'drink-filter drink-filter--hassle', { id: 'filter-hassle' });
   filters.appendChild(hassle);
   hassleWords.forEach((m) => {
     hassle.appendChild(el('button', 'btn-mood', { 'data-mood': m, type: 'button' }));
@@ -172,7 +177,7 @@ function buildPage(doc, options) {
   pager.appendChild(el('button', 'btn-page btn-page-see-all', { id: 'drink-page-see-all' }));
   doc.body.appendChild(pager);
 
-  return { filters, list, pager, el, count };
+  return { filters, list, pager, el, mood, hassle, count };
 }
 
 function addCard(doc, list, spec) {

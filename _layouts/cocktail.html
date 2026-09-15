@@ -350,6 +350,14 @@ layout: default
          dependency food's badges have, and it matters here for every two-word
          mood ("sunny terrace", "no juicing", "i want to faff").
 
+         EVERY HREF ENDS IN `#filter-mood` OR `#filter-hassle` -- #1059,
+         2026-09-15, the same argument food's badges make: nothing intercepts
+         this click, so the fragment is what lands the reader on the section
+         holding the lit chip rather than the top of the index. `chip` below is
+         already `"mood"` or `"hassle"`, the same word cocktails/index.html's
+         two section ids use, so a chip and its section can never disagree
+         about the fragment.
+
          THE HOME URL COMES FROM _data/sites.yml VIA `page.site_key`, not from a
          literal `/cocktails/`. That is what _includes/back-to-index.html does
          for the same journey in the other direction, and it means a drink page
@@ -385,7 +393,7 @@ layout: default
       {% if page.mood.size > 0 %}
         {% assign sorted_moods = page.mood | sort_natural %}
         <div class="cocktail-chips">
-          {% for m in sorted_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}
+          {% for m in sorted_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}#filter-{{ chip }}">{{ m }}</a>{% endfor %}
         </div>
       {% endif %}
     </div>
@@ -1390,7 +1398,11 @@ layout: default
                filtered on the word -- exactly what this drink's own chip row
                emits above, and for the same reason: on a drink page a chip
                has nothing to filter, so it takes you where the filter is.
-               `mood_groups` and `index_home` are assigned above. {% endcomment %}
+               `mood_groups` and `index_home` are assigned above.
+
+               `#filter-{{ chip }}` TOO -- #1059, same argument as the chip row
+               above: this is the identical mechanism reused, so it lands on
+               the lit section the same way. {% endcomment %}
             {% comment %} THE SHIP IS THE FOOT'S SECOND CHILD, OUT OF FLOW, as
                on the index -- #991. It was inside the chip row, wrapped with the
                last chip in a `.drink-card-tail` that a flex line could not
@@ -1400,7 +1412,7 @@ layout: default
                cost two chips a row at 13rem. On a 370px card it costs nothing,
                which is why the index has always done it this way -- so the tail
                is gone with the modifier and this is the card's own foot. {% endcomment %}
-            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}">{{ m }}</a>{% endfor %}</span>
+            <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}#filter-{{ chip }}">{{ m }}</a>{% endfor %}</span>
             <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>
           </div>
           {% comment %} THE SHORTLIST `+`, TOP RIGHT AND ABOVE THE TAPE -- #977,

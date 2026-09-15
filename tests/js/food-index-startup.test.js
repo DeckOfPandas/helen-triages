@@ -157,10 +157,16 @@ function boot(options) {
   controls.appendChild(el('div', 'category-buttons search-results', { id: 'ingredient-results-pool' }));
   doc.body.appendChild(controls);
 
-  // `id="results"` -- #1050. The count line above the list, and the id the
-  // search dropdown's filtered links already end in.
+  // `id="results"` (#1050) and `id="filter-star"` (#1059) -- the two kinds of
+  // fragment a link on this site can end in: the count line above the list,
+  // and a filter section a badge names. Real food/index.html carries several
+  // more (`filter-mood`, `filter-practicalities`); one is enough to prove the
+  // startup block scrolls to WHATEVER `location.hash` names rather than only
+  // the literal string "results".
   const results = el('div', 'results-heading', { id: 'results' });
   doc.body.appendChild(results);
+  const starSection = el('div', 'category category--star', { id: 'filter-star' });
+  doc.body.appendChild(starSection);
 
   const list = el('ul', 'recipe-list');
   Object.keys(recipes).forEach((url) => {
@@ -256,7 +262,7 @@ function boot(options) {
   // filters.js is one big DOMContentLoaded handler; nothing above has run yet.
   doc.dispatch('DOMContentLoaded');
 
-  return { doc, win, panel, list, results };
+  return { doc, win, panel, list, results, starSection };
 }
 
 const aislesHtml = (panel) => panel.querySelector('.shopping-list-aisles').innerHTML;
@@ -810,9 +816,12 @@ test('#1050: an ingredient nothing names leaves the picker in a plain search', (
     'nothing was chosen, so nothing should be narrowing the list.');
 });
 
-// --- arriving at a fragment, #1057 --------------------------------------------
+// --- arriving at a fragment, #1057 and #1059 ------------------------------------
 // The search dropdown's own `#results` landing (#1050) already had no test at
-// this level; this is the first.
+// this level; these are the first, and they cover the WIDENING rather than
+// only the original case -- any element id named by `location.hash`, not only
+// "results" -- since that generalisation is what #1057 (the see-shortlist
+// link) and #1059 (a badge's own filter-section fragment) both rely on.
 
 test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
   const { results } = boot({ hash: '#results' });
@@ -825,9 +834,19 @@ test('#1050/#1057: arriving at #results scrolls the count line into view', () =>
   assert.strictEqual(results._scrollCalls[0].block, 'start');
 });
 
+test('#1059: arriving at a filter section\'s own fragment scrolls IT into view, not #results', () => {
+  const { starSection, results } = boot({ hash: '#filter-star' });
+  assert.strictEqual(starSection._scrollCalls.length, 1,
+    'a badge\'s own fragment (e.g. #filter-star) must be read generically off ' +
+    'location.hash, not hardcoded to "results".');
+  assert.strictEqual(results._scrollCalls, undefined,
+    'only the id location.hash actually names should be scrolled to.');
+});
+
 test('with no hash at all, nothing is scrolled', () => {
-  const { results } = boot();
+  const { results, starSection } = boot();
   assert.strictEqual(results._scrollCalls, undefined);
+  assert.strictEqual(starSection._scrollCalls, undefined);
 });
 
 test('#387: a genuine back navigation restores scroll instead, and skips the fragment scroll', () => {

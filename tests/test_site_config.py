@@ -675,6 +675,87 @@ def test_recipe_badges_are_links_carrying_their_own_filter_value():
             f"KIND -- and filters.js only knows how to read that one."
         )
 
+    # #1059, 2026-09-15: a badge's href must land on the filter SECTION that
+    # holds it, not the top of the index. The star badge always names one
+    # fixed section; a tag badge's section depends on which group.name loop
+    # iteration produced it, so its fragment is built from that same variable
+    # rather than a literal -- see the loop just below this function's own
+    # test for the section ids that fragment has to resolve against.
+    assert "#filter-star" in html, (
+        '_includes/recipe_badges.html\'s star badge no longer ends its href '
+        'in "#filter-star" -- #1059. Clicking the badge on a recipe page must '
+        'land on the STAR INGREDIENT section, not the top of the index.'
+    )
+    assert re.search(r'\?tag=[^"]*#filter-\{\{\s*group\.name\s*\}\}', html), (
+        '_includes/recipe_badges.html\'s tag badge no longer ends its href in '
+        '"#filter-{{ group.name }}" -- #1059. A tag\'s fragment has to name '
+        'whichever section (mood or practicalities) actually holds it, so it '
+        'is built from the same group.name the badge\'s class already uses, '
+        'not a fixed string.'
+    )
+
+
+def test_filter_sections_carry_the_id_their_badges_and_chips_link_to():
+    """#1059, 2026-09-15: "clicking a chip at the top of a recipe should snap
+    the index page to that filter group." A chip's href ends in a fragment
+    (test_recipe_badges_are_links_carrying_their_own_filter_value and
+    _layouts/cocktail.html's mood chips, checked below); this is the other
+    half -- the section the fragment names must actually carry that id.
+
+    Asserted against the templates rather than a build, like every other test
+    in this file that can be: food/index.html passes each filter_group.html
+    call a `section_id`, which _includes/filter_group.html turns into the
+    wrapper's `id`; cocktails' MOOD and HASSLE sections write the literal id
+    directly, since they are not built through that shared include.
+    """
+    filter_group = read("_includes", "filter_group.html")
+    assert 'id="{{ include.section_id }}"' in filter_group, (
+        "_includes/filter_group.html no longer passes include.section_id "
+        "through to the wrapper's id -- #1059. Without it, no filter section "
+        "built through this include has a stable id for a badge to link to."
+    )
+
+    food_index = read("food", "index.html")
+    assert re.search(r'section_id\s*=\s*"filter-star"', food_index), (
+        'food/index.html\'s STAR INGREDIENT filter_group.html call no longer '
+        'passes section_id="filter-star" -- #1059. The star badge '
+        '(recipe_badges.html) links to exactly this fragment.'
+    )
+    assert re.search(
+        r'\{%-?\s*capture\s+group_section_id\s*%\}filter-\{\{\s*group\.name\s*\}\}',
+        food_index,
+    ), (
+        "food/index.html no longer builds a per-tag-group fragment id "
+        "(`filter-<group.name>`) for its tag_groups loop -- #1059. MOOD and "
+        "PRACTICALITIES must each carry a stable id a tag badge can name."
+    )
+    assert re.search(r'section_id\s*=\s*group_section_id', food_index), (
+        "food/index.html's tag_groups filter_group.html call no longer "
+        "passes the captured section_id through -- #1059."
+    )
+
+    cocktails_index = read("cocktails", "index.html")
+    for group, section_id in (("mood", "filter-mood"), ("hassle", "filter-hassle")):
+        assert re.search(
+            r'class="drink-filter drink-filter--' + group + r'"\s+id="' + section_id + r'"',
+            cocktails_index,
+        ), (
+            f'cocktails/index.html\'s {group.upper()} section no longer '
+            f'carries id="{section_id}" -- #1059. A drink page\'s own {group} '
+            f'chips (_layouts/cocktail.html) link to exactly this fragment.'
+        )
+
+    cocktail_layout = read("_layouts", "cocktail.html")
+    assert re.search(
+        r'href="\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood=\{\{\s*m\s*\|\s*'
+        r'url_encode\s*\}\}#filter-\{\{\s*chip\s*\}\}"',
+        cocktail_layout,
+    ), (
+        "_layouts/cocktail.html's mood chip no longer ends its href in "
+        '"#filter-{{ chip }}" -- #1059. `chip` is already "mood" or "hassle", '
+        "the same word cocktails/index.html's two section ids use."
+    )
+
 
 def test_the_see_shortlist_link_lands_on_the_results_list():
     """#1057, 2026-09-15: "clicking 'see shortlist' should snap to the section

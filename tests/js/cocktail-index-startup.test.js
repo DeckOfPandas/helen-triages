@@ -545,10 +545,13 @@ test('#994: shortlist=1 beats a mood in the same URL', () => {
     'the reader can see but the list is not obeying.');
 });
 
-// --- arriving at a fragment, #1057 --------------------------------------------
+// --- arriving at a fragment, #1057 and #1059 ------------------------------------
 // food-index-startup.test.js carries the fuller set and the reasoning; this is
-// the cocktails half -- the actions row's "see shortlist" link ends in
-// `#results` the same way a search result (#1050) does.
+// the cocktails half of the same widening -- any element id named by
+// location.hash, not only the literal string "results" -- since a drink
+// page's own mood chips (_layouts/cocktail.html) end their href in
+// `#filter-mood` or `#filter-hassle`, and the actions row's "see shortlist"
+// link ends in `#results` the same way a search result does.
 
 test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
   const r = boot({ drinks: DRINKS, hash: '#results' });
@@ -558,7 +561,24 @@ test('#1050/#1057: arriving at #results scrolls the count line into view', () =>
   assert.strictEqual(r.page.count._scrollCalls[0].block, 'start');
 });
 
+test('#1059: arriving at #filter-mood scrolls the MOOD section, not #results', () => {
+  const r = boot({ drinks: DRINKS, hash: '#filter-mood' });
+  assert.strictEqual(r.page.mood._scrollCalls.length, 1,
+    'a mood chip\'s own fragment must be read generically off location.hash, ' +
+    'not hardcoded to "results".');
+  assert.strictEqual(r.page.count._scrollCalls, undefined,
+    'only the id location.hash actually names should be scrolled to.');
+});
+
+test('#1059: arriving at #filter-hassle scrolls the HASSLE section', () => {
+  const r = boot({ drinks: DRINKS, hash: '#filter-hassle' });
+  assert.strictEqual(r.page.hassle._scrollCalls.length, 1);
+  assert.strictEqual(r.page.mood._scrollCalls, undefined);
+});
+
 test('with no hash at all, nothing is scrolled', () => {
   const r = boot({ drinks: DRINKS });
   assert.strictEqual(r.page.count._scrollCalls, undefined);
+  assert.strictEqual(r.page.mood._scrollCalls, undefined);
+  assert.strictEqual(r.page.hassle._scrollCalls, undefined);
 });

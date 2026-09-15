@@ -274,7 +274,11 @@ permalink: /cocktails/
     {% endcomment %}
     {% assign groups = taxonomy.mood_groups %}
 
-    <div class="drink-filter drink-filter--mood">
+    {% comment %} `id="filter-mood"` -- #1059, 2026-09-15. A drink page's own
+       mood chips (_layouts/cocktail.html) end their `?mood=` link in this
+       fragment when the mood belongs to this group, so the reader lands on
+       the section holding the lit chip rather than the top of the page. {% endcomment %}
+    <div class="drink-filter drink-filter--mood" id="filter-mood">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-mood" hidden>&times; clear</button>
@@ -289,7 +293,9 @@ permalink: /cocktails/
       </div>
     </div>
 
-    <div class="drink-filter drink-filter--hassle">
+    {% comment %} `id="filter-hassle"` -- #1059, same argument as MOOD above,
+       for a chip whose mood is in the hassle group instead. {% endcomment %}
+    <div class="drink-filter drink-filter--hassle" id="filter-hassle">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-hassle" hidden>&times; clear</button>

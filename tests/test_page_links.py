@@ -421,8 +421,17 @@ TRUSTED_DYNAMIC = (
     # matches no button in silence, which is food's own policy for `?tag=`.
     # There is nothing here for a link checker to resolve, and a stale mood is a
     # taxonomy question that tests/test_cocktails.py owns.
+    #
+    # `#filter-{{ chip }}` SINCE #1059 (2026-09-15) IS THE SAME KIND OF
+    # QUESTION, ONE LEVEL DOWN. `chip` is computed to "mood" or "hassle" a few
+    # lines above in the layout, and cocktails/index.html's own two section ids
+    # (test_filter_sections_carry_the_id_their_badges_and_chips_link_to in
+    # tests/test_site_config.py) are exactly those two words with `filter-`
+    # in front, so this scanner cannot trace the fragment but does not need to:
+    # the two possible values are both real ids on the target page, checked by
+    # that test rather than this one.
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood="
-               r"\{\{\s*m\s*\|\s*url_encode\s*\}\}$"),
+               r"\{\{\s*m\s*\|\s*url_encode\s*\}\}#filter-\{\{\s*chip\s*\}\}$"),
 )
 
 

@@ -75,12 +75,16 @@ permalink: /food/
   {% assign all_stars = site.data.food.taxonomy.star_ingredients %}
 
   {% if all_stars.size > 0 %}
+    {% comment %} `section_id="filter-star"` -- #1059. A star badge's own link
+       (recipe_badges.html) ends in this exact fragment, so a reader following
+       it lands on this section rather than the top of the page. {% endcomment %}
     {% include filter_group.html
       group_class=star_data.class
       label=star_data.label
       items=all_stars
       btn_class="btn-star"
       data_attr="data-star"
+      section_id="filter-star"
     %}
   {% endif %}
 
@@ -94,12 +98,20 @@ permalink: /food/
       {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
     {% endfor %}
 
+    {% comment %} `section_id="filter-{{ group.name }}"` -- #1059. `group.name`
+       is `mood` or `practicalities`, the same key recipe_badges.html finds a
+       tag's group under, so the two can never name a different fragment for
+       the same section. Built with `capture` rather than inline in the
+       include's own parameter list -- a Liquid tag parameter is not
+       guaranteed to accept a filter chain the way a plain output does. {% endcomment %}
+    {% capture group_section_id %}filter-{{ group.name }}{% endcapture %}
     {% include filter_group.html
       group_class=group.class
       label=group.label
       items=group_tags
       btn_class="btn-tag"
       data_attr="data-tag"
+      section_id=group_section_id
     %}
   {% endfor %}
 

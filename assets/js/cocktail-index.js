@@ -1790,17 +1790,23 @@
     window.scrollTo(0, restored.scrollY);
   }
 
-  /* ARRIVING FROM A SEARCH RESULT -- `#results`, #1050 (2026-09-15). The same
-     block filters.js has, for the same reason it gives: the drink page's
-     dropdown ends every filtered link in this fragment and the count line
-     carries the id, so the browser has landed there once already, against a
-     page whose hidden cards were all still standing; after apply() the page
-     has its real height and this puts the reader on the answer. Not on a back
-     navigation, where the remembered scroll is the truer answer. */
-  if (!restored && location.hash === '#results') {
-    var results = document.getElementById('results');
-    if (results && typeof results.scrollIntoView === 'function') {
-      results.scrollIntoView({ block: 'start' });
+  /* ARRIVING AT A FRAGMENT -- `#results`, #1050 (2026-09-15), widened to ANY
+     fragment for #1057/#1059 (2026-09-15). The same block filters.js has, for
+     the same reasons it gives: the drink page's search dropdown ends every
+     filtered link in `#results`; its mood chips (_layouts/cocktail.html) end
+     their own link in the id of the filter section holding that mood --
+     `#filter-mood` or `#filter-hassle` -- so the reader lands on the lit chip;
+     and the actions row's "see shortlist" link ends in `#results` too. The
+     browser has landed at the fragment once already, against a page whose
+     hidden cards were all still standing; after apply() the page has its real
+     height and this puts the reader on the answer. Reading `location.hash`
+     rather than naming `results` specifically is what lets one block serve
+     every fragment a link on this site ends in. Not on a back navigation,
+     where the remembered scroll is the truer answer. */
+  if (!restored && location.hash && location.hash.length > 1) {
+    var target = document.getElementById(location.hash.slice(1));
+    if (target && typeof target.scrollIntoView === 'function') {
+      target.scrollIntoView({ block: 'start' });
     }
   }
 

@@ -19,10 +19,21 @@
 
    data-star/data-tag carry the raw, unencoded value for the click handler, so
    nothing on the JS side ever has to un-encode an href or read a badge's own
-   text back out of the DOM. {% endcomment %}
+   text back out of the DOM.
+
+   EVERY HREF ENDS IN THE FILTER SECTION'S OWN FRAGMENT -- #1059, 2026-09-15.
+   On a recipe page nothing intercepts the click, so the fragment is what gets
+   the reader onto the lit chip rather than the top of the index; on the index
+   row filters.js still intercepts the click first, so the fragment travels
+   along unused there, exactly as the query string already did before this
+   badge was ever a real link (#40's own argument, restated for a fragment
+   rather than a query). `#filter-star` matches `section_id="filter-star"` on
+   food/index.html's star filter_group.html call; `#filter-{{ group.name }}`
+   matches that same file's per-tag-group call, so a badge and its section can
+   never name the fragment differently. {% endcomment %}
 
 {% if include.recipe.star_ingredient %}
-  <a class="badge badge-star" data-star="{{ include.recipe.star_ingredient }}" href="{{ '/food/' | relative_url }}?star={{ include.recipe.star_ingredient | url_encode }}"><span class="tag-shape" aria-hidden="true"></span>{{ include.recipe.star_ingredient }}</a>
+  <a class="badge badge-star" data-star="{{ include.recipe.star_ingredient }}" href="{{ '/food/' | relative_url }}?star={{ include.recipe.star_ingredient | url_encode }}#filter-star"><span class="tag-shape" aria-hidden="true"></span>{{ include.recipe.star_ingredient }}</a>
 {% endif %}
 
 {% comment %} Group membership comes from _data/taxonomy.yml; the badge class is
@@ -37,7 +48,7 @@
 
   {% for tag in include.recipe.tags %}
     {% if group_tags contains tag %}
-      <a class="badge badge-{{ group.name }}" data-tag="{{ tag }}" href="{{ '/food/' | relative_url }}?tag={{ tag | url_encode }}"><span class="tag-shape" aria-hidden="true"></span>{{ tag }}</a>
+      <a class="badge badge-{{ group.name }}" data-tag="{{ tag }}" href="{{ '/food/' | relative_url }}?tag={{ tag | url_encode }}#filter-{{ group.name }}"><span class="tag-shape" aria-hidden="true"></span>{{ tag }}</a>
     {% endif %}
   {% endfor %}
 {% endfor %}
