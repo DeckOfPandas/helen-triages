@@ -1,5 +1,5 @@
 #!/bin/sh
-# Push as DeckOfPandas-agentic over HTTPS, without naming the credential, and
+# Push as DeckOfPandas-agentic-claude over HTTPS, without naming the credential, and
 # without the credential ever being in a URL.
 #
 # WHY THIS EXISTS. The companion to scripts/gh-agent.sh, added the same day

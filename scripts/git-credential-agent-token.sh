@@ -39,9 +39,14 @@
 # Only answers `get`. `store`/`erase` are git offering to cache what it just
 # used; saying nothing back means nothing is ever written down, which is the
 # whole point.
+#
+# The username is the agent account's, DeckOfPandas-agentic-claude since
+# 2026-09-15 (DECISIONS §11; the first account was flagged as spam). GitHub
+# authenticates the token, not this name, so a stale name here fails nothing --
+# which is exactly why it should be right rather than merely harmless.
 case "$1" in
     get)
-        printf 'username=%s\n' "DeckOfPandas-agentic"
+        printf 'username=%s\n' "DeckOfPandas-agentic-claude"
         printf 'password=%s\n' "${AGENT_GH_TOKEN}"
         ;;
 esac

@@ -4056,10 +4056,14 @@ unless stated.
     `.user.login` off every PR a session opens rather than assume. From then
     on #65 on the cocktails repo, #1083 here and a comment on #1064 all
     reported the new login, and the profile and #1083 returned 200 logged out.
-    The scripts' headers and `CLAUDE.md` still say `DeckOfPandas-agentic` in
-    places; the account's name is not load-bearing anywhere (GitHub
-    authenticates the token, not the credential helper's `username=`), and the
-    rename is its own piece of work.
+    **Renamed wherever the name means "the account in use now"**, at Helen's
+    request the same day: the credential helper's `username=`, the five git
+    and `gh` wrappers' headers, `.devcontainer/run.sh`, and `CLAUDE.md`'s
+    present-tense lines. Dated history — here, the spam bullet's story, the
+    retired embedded-URL example — keeps `DeckOfPandas-agentic`, because that
+    account is what did those things. Nothing was load-bearing (GitHub
+    authenticates the token, not the helper's `username=`), which is why a
+    wrong name would never have announced itself.
   - **`scripts/gh-write.sh` and `scripts/github-public-status.sh`, on Helen's
     word:** *"When you want to run commands that build paths at runtime,
     please find a way into scripts that can be statically analysed so

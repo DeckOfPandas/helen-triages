@@ -1,5 +1,5 @@
 #!/bin/sh
-# Bring a drafts clone up to date as DeckOfPandas-agentic, without naming the
+# Bring a drafts clone up to date as DeckOfPandas-agentic-claude, without naming the
 # credential at the call site, without the credential ever being in a URL, and
 # without standing on `main`.
 #

@@ -5,7 +5,7 @@
 # Reads AGENT_GH_TOKEN from .claude/settings.local.json just for the
 # duration of this one `docker run`, without ever printing it, writing it
 # anywhere else, or exporting it into your persistent shell environment.
-# AGENT_GH_TOKEN is DeckOfPandas-agentic's classic repo-scoped token -- a
+# AGENT_GH_TOKEN is DeckOfPandas-agentic-claude's classic repo-scoped token -- a
 # separate GitHub account, invited as a collaborator on just these three
 # repos, so it can push and open PRs under its own identity without ever
 # touching Helen's SSH keys. Builds the image itself on first run if it
