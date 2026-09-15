@@ -1655,15 +1655,19 @@ fruit_and_herbs:
   - "basil"
   - "rosemary"
   - "fruit purée"
-  # #984's Peach Me muddles a whole cherry and a whole citrus slice as
+  # #984's Peach Me muddles a whole cherry and a whole orange slice as
   # ingredients, not garnishes -- the garnish vocabulary already has
   # `maraschino cherry` and `orange slice`/`orange crescent`, but nothing here
-  # covered the same objects poured rather than perched on the rim. `citrus
-  # slice` is fruit-agnostic on purpose: a slice muddled for its oil and juice
-  # is the same act whichever citrus it is, unlike the garnish forms, which
-  # name the fruit because it is what a reader sees on the glass.
+  # covered the same objects poured rather than perched on the rim.
+  #
+  # `orange slice`, NOT `citrus slice`, SINCE 2026-09-15 (#1079). The first
+  # version coined a fruit-agnostic `citrus slice` on the argument that a slice
+  # muddled for its oil and juice is the same act whichever citrus it is.
+  # Helen: "'citrus slice' shouldn't be the generic because citrus fruits
+  # aren't interchangeable." A muddled slice names its fruit, the same as the
+  # garnish forms do; a second citrus gets its own generic when a drink pours it.
   - "maraschino cherry"
-  - "citrus slice"
+  - "orange slice"
   # Both from East River Underground, which muddles them and then garnishes
   # with them again. Helen, 2026-08-31: "Cucumber and kaffir lime leaves will
   # need to go in the dictionary naked" -- bare, no qualifier, because neither
@@ -1947,7 +1951,6 @@ shelf_of:
   black tea: flavourings
   blackberries: fresh produce
   cider vinegar: flavourings
-  citrus slice: fresh produce
   coconut cream: flavourings
   cucumber: fresh produce
   dried apricots: flavourings
@@ -1962,6 +1965,7 @@ shelf_of:
   maraschino cherry: fresh produce
   mint: fresh produce
   olive oil: flavourings
+  orange slice: fresh produce
   passion fruit: fresh produce
   pear: fresh produce
   pineapple: fresh produce
