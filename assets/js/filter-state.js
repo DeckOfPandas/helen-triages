@@ -273,11 +273,23 @@
        it up by iteration. */
     excludedIngredients: { empty: function () { return new Set(); }, narrows: true },
 
-    /* The chosen ingredient-search result. NOT narrowing, deliberately:
-       filters.js's renderResultsPool() nulls it on every keystroke, so while
-       the ingredient box is being typed into it is always null, and including
-       it in hasNarrowingFilter would be a no-op dressed up as a rule. */
-    ingredient: { empty: function () { return null; }, narrows: false },
+    /* HAS TO HAVE — GitHub issue #1092. A Set, not a single value: cocktails'
+       own HAS TO HAVE (`include`, below) is already AND-across-chips ("adding
+       an ingredient means and this one too, how a cupboard works"), and this
+       field used to be a lone string that a second pick REPLACED rather than
+       joined -- the one way the two sites' identically-labelled question
+       answered differently. Multi-select, like excludedIngredients above, but
+       the opposite direction: a row survives only if it has EVERY chosen
+       entry, not if it lacks every excluded one.
+
+       Narrowing, for the same reason excludedIngredients is: once something
+       is chosen it is a real filter with no OTHER button lit up for it, so it
+       must count towards hasAnythingToClear and towards suppressList's
+       "is anything else already narrowing the list" question --
+       renderResultsPool() nulling the CURRENT SEARCH on every keystroke
+       (isSearching, its own field below) is a different question from
+       whether anything has been chosen yet. */
+    includedIngredients: { empty: function () { return new Set(); }, narrows: true },
 
     // The meta filters (rewrite/proofread/short/draft), local builds only.
 
@@ -540,6 +552,40 @@
     return hit;
   }
 
+  /* THE OTHER DIRECTION OF SET MEMBERSHIP -- "does this row have EVERY
+     ingredient the cook required?", GitHub issue #1092. HAS TO HAVE is AND
+     across its chosen entries, the way LEAVE OUT's exclusion above is OR --
+     and the way cocktail-search.js's own `include` already works ("adding an
+     ingredient means and this one too, how a cupboard works").
+
+     NOT excludesRow WITH THE ANSWER FLIPPED. Every value here ALWAYS goes
+     through familyMatch, family suffix or not -- unlike excludesRow, which
+     only reaches for familyMatch on an actual "(all)" value and otherwise
+     trusts exact membership. That is not an oversight: LEAVE OUT matches
+     against the DERIVED index (data-all-ingredients), where the picker only
+     ever hands back a literal entry, so exact membership is correct and
+     cheap. HAS TO HAVE matches against `main_ingredients`, a deliberately
+     partial hint (MANUAL 8.1) -- "chicken" has to reach a row whose own words
+     are "chicken breast", which is exactly the fuzzy, vocabulary-aware
+     question familyMatch (ingredient-search.js's entriesMatchKey) answers and
+     plain list membership cannot. So a plain, non-family key still needs a
+     real familyMatch to match anything, and with none supplied the whole
+     filter fails closed -- an empty list is visibly wrong, where a silently
+     unenforced EXCLUSION would hand back the very thing ruled out; the two
+     functions fail in the directions that show. */
+  function includesRow(entries, included, familyMatch) {
+    if (!included) return true;
+    var list = entries || [];
+    var values = typeof included.forEach === 'function' ? included : [];
+    var everyMatch = true;
+    values.forEach(function (value) {
+      if (!everyMatch) return;
+      var key = String(value).replace(FAMILY_SUFFIX, '').trim();
+      if (!familyMatch || !familyMatch(list, key)) everyMatch = false;
+    });
+    return everyMatch;
+  }
+
   /* THE OTHER HALF OF THE ROW QUESTION — "is this row one you asked for?" —
      issue #506, and it is deliberately NOT merged with excludesRow above.
      ---------------------------------------------------------------------
@@ -600,10 +646,7 @@
        make-ahead is one predicate, not two places that have to agree. */
     if (s.shortlisted && !r.shortlisted) return false;
 
-    if (s.ingredient) {
-      var key = String(s.ingredient).replace(FAMILY_SUFFIX, '').trim();
-      if (!familyMatch || !familyMatch(r.ingredients || [], key)) return false;
-    }
+    if (!includesRow(r.ingredients || [], s.includedIngredients, familyMatch)) return false;
 
     return true;
   }
@@ -618,8 +661,10 @@
      This one asks: "while the ingredient box is being typed into, is anything
      ELSE still narrowing the list?" It is the one input to filters.js's
      suppressList, which decides whether the list hides behind the "searching"
-     message. Hence NARROWING_FIELDS rather than FIELDS: see `ingredient` and
-     `isSearching` in FIELD_SPEC for why each is excluded. */
+     message. Hence NARROWING_FIELDS rather than FIELDS: see `isSearching` in
+     FIELD_SPEC for why it is excluded -- `includedIngredients`, unlike the
+     half-typed search that fills it, IS narrowing now (#1092), the same as
+     `excludedIngredients` beside it. */
   function hasNarrowingFilterFor(spec, state) {
     return Object.keys(spec).filter(function (f) { return spec[f].narrows; })
       .some(function (f) { return isFieldSet((state || {})[f]); });
@@ -760,9 +805,11 @@
     isFieldSet: isFieldSet,
     FAMILY_SUFFIX: FAMILY_SUFFIX,
     excludesRow: excludesRow,
-    // The pair, and food-shaped: tags, star, name and the one ingredient key
-    // are the food index's questions. The cocktail index asks a different
-    // five and answers them in cocktail-index.js against COCKTAIL_FIELDS.
+    includesRow: includesRow,
+    // The pair, and food-shaped: tags, star, name and the set of chosen
+    // ingredients are the food index's questions. The cocktail index asks a
+    // different five and answers them in cocktail-index.js against
+    // COCKTAIL_FIELDS.
     rowMatchesFilters: rowMatchesFilters,
     arrivedByGoingBack: arrivedByGoingBack,
     hasAnythingToClear: food.hasAnythingToClear,

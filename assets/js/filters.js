@@ -13,7 +13,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
        state.tags        Set, the MOOD/PRACTICALITIES tag buttons
        state.star        string|null, single-select STAR INGREDIENT
-       state.ingredient  string|null, the chosen ingredient-search result
+       state.includedIngredients
+                         Set, HAS TO HAVE (issue #1092). AND across chosen
+                         entries -- adding a second means "and this one too",
+                         the way excludedIngredients' OR and cocktails' own
+                         `include` cupboard already work. Matched against
+                         main_ingredients via IS.entriesMatchKey, never as a
+                         substring -- see FilterState.includesRow.
        state.excludedIngredients
                          Set, the "they hate peas" exclusions (issue #52).
                          Entries of the DERIVED ingredient index
@@ -41,6 +47,17 @@ document.addEventListener('DOMContentLoaded', function () {
                          hidden beside a pool of results with no other way to
                          dismiss them. Same treatment as isSearching. */
   var state = FilterState.emptyState();
+
+  /* HAS TO HAVE's display text per chosen KEY, GitHub issue #1092. Not part
+     of `state` -- FilterState only ever holds the match key an aliased entry
+     collapses to (e.g. "five-spice"), never the prettier label the button
+     showed ("Chinese five-spice powder", display_names in
+     ingredient_words.yml), and a filter's identity has to be the key or two
+     spellings of one ingredient would count as two. Kept here, alongside the
+     Set it labels, and carried through go-back memory the same way (see
+     saveIndexMemory/restoreIndexMemory) since a restored chip needs a label
+     to show and `state` alone cannot supply one. */
+  var ingredientLabels = {};
 
   var PAGE_SIZE = 20;
   var currentPage = 1;
@@ -280,11 +297,12 @@ document.addEventListener('DOMContentLoaded', function () {
     HTF.indexMemory.save(MEMORY_KEY, {
       order: items.map(rowKey),
       filters: FilterState.serialise(state),
-      // The chosen ingredient result's DISPLAY text, which is not its match
-      // key -- an aliased entry like "five-spice" shows as "Chinese five-spice
-      // powder" (see display_names in ingredient_words.yml). The box echoes
-      // what the button shows, so that is what has to come back.
-      ingredientLabel: searchBox ? searchBox.value : '',
+      // Every chosen entry's DISPLAY text, keyed by its match key -- an
+      // aliased entry like "five-spice" shows as "Chinese five-spice powder"
+      // (see display_names in ingredient_words.yml), and a plain object
+      // round-trips through JSON exactly like the ingredient set itself,
+      // one label per member of state.includedIngredients.
+      ingredientLabels: ingredientLabels,
       page: currentPage,
       showAll: showAll,
       scrollY: window.scrollY || 0
@@ -329,19 +347,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (nameSearchBox) nameSearchBox.value = state.nameQuery || '';
     if (excludeBox) excludeBox.value = '';
-    if (searchBox) searchBox.value = state.ingredient ? (saved.ingredientLabel || '') : '';
+    // Cleared rather than filled -- with more than one entry possibly chosen
+    // there is no longer one label the box could echo. The chosen entries are
+    // rebuilt below instead, same as LEAVE OUT's own #exclude-active never
+    // lived in its search box to begin with.
+    if (searchBox) searchBox.value = '';
 
-    /* Rebuild the chosen ingredient's button exactly as clicking it leaves
-       things (see the .btn-ingredient branch of the matrix click handler): the
-       pool holds that one button, active, with its tape shape. Reproducing the
-       end state rather than replaying a search -- a replay would re-derive the
-       whole candidate pool to then throw all but one of it away. */
-    if (state.ingredient && resultsPool) {
+    /* Rebuild every chosen ingredient's button exactly as choosing it leaves
+       things (see the .btn-ingredient branch of the matrix click handler):
+       the pool holds one button per entry in state.includedIngredients,
+       active, each with its tape shape. Reproducing the end state rather than
+       replaying a search -- a replay would re-derive a whole candidate pool
+       for each one just to keep a single button out of it. */
+    ingredientLabels = (saved.ingredientLabels && typeof saved.ingredientLabels === 'object')
+      ? saved.ingredientLabels : {};
+    if (state.includedIngredients.size && resultsPool) {
       resultsPool.innerHTML = '';
-      resultsPool.appendChild(makeIngredientButton(
-        state.ingredient, saved.ingredientLabel || state.ingredient, true
-      ));
-      ensureActiveIngredientShape();
+      state.includedIngredients.forEach(function (key) {
+        resultsPool.appendChild(makeIngredientButton(key, ingredientLabels[key] || key, true));
+      });
+      ensureActiveIngredientShapes();
     }
 
     currentPage = (typeof saved.page === 'number' && saved.page > 0) ? saved.page : 1;
@@ -456,7 +481,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn-tag btn-ingredient';
-    if (key === state.ingredient) btn.classList.add('active');
+    if (state.includedIngredients.has(key)) btn.classList.add('active');
     if (wordMatch) btn.classList.add('btn-ingredient--word-match');
     btn.dataset.ingredient = key;
     btn.textContent = label;
@@ -469,22 +494,29 @@ document.addEventListener('DOMContentLoaded', function () {
   // built by makeIngredientButton() above with no slot at all, deliberately
   // — a shape on every one of an unbounded swarm of search results would be
   // exactly the "count is unbounded" noise .btn-ingredient--word-match's own
-  // comment already argues against. Only the ONE active button (Helen:
-  // "apply the same tag styling to active ingredient search tags") gets a
-  // slot, added here rather than at creation time since which button ends
-  // up active isn't always known yet when it's built (renderResultsPool's
+  // comment already argues against. Only ACTIVE buttons (Helen: "apply the
+  // same tag styling to active ingredient search tags") get a slot, added
+  // here rather than at creation time since which buttons end up active
+  // isn't always known yet when they are built (renderResultsPool's
   // narrow-to-one-match case sets .active on an already-built button).
-  function ensureActiveIngredientShape() {
+  //
+  // EVERY .btn-ingredient.active, PLURAL SINCE #1092: HAS TO HAVE went from
+  // one chosen entry to a Set of them, so more than one button can be active
+  // in the matrix at once -- a family (all) button chosen earlier keeps its
+  // shape while a second, unrelated entry gets chosen this call.
+  function ensureActiveIngredientShapes() {
     if (!matrix) return;
-    var activeBtn = matrix.querySelector('.btn-ingredient.active');
-    if (!activeBtn) return;
-    if (!activeBtn.querySelector('.tag-shape')) {
-      var shape = document.createElement('span');
-      shape.className = 'tag-shape';
-      shape.setAttribute('aria-hidden', 'true');
-      activeBtn.insertBefore(shape, activeBtn.firstChild);
-    }
-    if (window.HTF && HTF.tagShapes) HTF.tagShapes();
+    var any = false;
+    matrix.querySelectorAll('.btn-ingredient.active').forEach(function (activeBtn) {
+      any = true;
+      if (!activeBtn.querySelector('.tag-shape')) {
+        var shape = document.createElement('span');
+        shape.className = 'tag-shape';
+        shape.setAttribute('aria-hidden', 'true');
+        activeBtn.insertBefore(shape, activeBtn.firstChild);
+      }
+    });
+    if (any && window.HTF && HTF.tagShapes) HTF.tagShapes();
   }
 
   function updateIngredientClear() {
@@ -495,7 +527,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // appeared instead of the clear link calmly sitting in space that
       // was already there (Helen: "the clear link appears cutting off the
       // field rather than to the right of it").
-      ingredientClear.style.visibility = (state.ingredient || (searchBox && searchBox.value.trim())) ? 'visible' : 'hidden';
+      ingredientClear.style.visibility =
+        (state.includedIngredients.size || (searchBox && searchBox.value.trim())) ? 'visible' : 'hidden';
     }
   }
 
@@ -537,9 +570,22 @@ function renderResultsPool() {
   if (!searchBox || !resultsPool) return;
   var query = fold(searchBox.value.trim().toLowerCase());
   resultsPool.innerHTML = '';
-  state.ingredient = null;
   state.isSearching = !!query;
+
+  /* CHOSEN ENTRIES STAY VISIBLE AND CLICKABLE (TO REMOVE) REGARDLESS OF WHAT
+     IS TYPED -- GitHub issue #1092. HAS TO HAVE is AND-multi-select now, the
+     same shape as LEAVE OUT and cocktails' own HAS TO HAVE ("adding an
+     ingredient means and this one too"), and a chosen requirement must not
+     disappear the instant you go looking for the next one -- unlike the
+     single-value picker this replaces, typing here is never a way to clear
+     what is already required; that is ingredientClear's job, and it clears
+     the SEARCH, not the choices (see its own handler below). */
+  state.includedIngredients.forEach(function (key) {
+    resultsPool.appendChild(makeIngredientButton(key, ingredientLabels[key] || key, true));
+  });
+
   if (!query) {
+    ensureActiveIngredientShapes();
     update();
     return;
   }
@@ -547,6 +593,8 @@ function renderResultsPool() {
 
   result.familyButtons.forEach(function(fw) {
     var label = fw + ' (all)';
+    // Already shown above as a chosen entry -- never offered twice.
+    if (state.includedIngredients.has(label)) return;
     // Always a word match by construction — a family only ever forms
     // (curated or structural) when its word already starts with the
     // query, so this is never in doubt for an (all) button.
@@ -559,17 +607,30 @@ function renderResultsPool() {
     // to 'chicken' I'd look at both". Only suppresses an exact bare-word
     // entry, never a real multi-word one like "chicken breast".
     if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
+    // Already shown above as a chosen entry -- never offered twice.
+    if (state.includedIngredients.has(r.ing)) return;
     resultsPool.appendChild(makeIngredientButton(r.ing, r.label || r.ing, r.hasWordMatch));
   });
 
-  var buttons = resultsPool.querySelectorAll('.btn-ingredient');
-  if (buttons.length === 1) {
-    var onlyBtn = buttons[0];
-    state.ingredient = onlyBtn.dataset.ingredient;
+  // Auto-select on a unique match, same as ever -- but "unique" now means
+  // unique among what is NOT already chosen, so searching towards a second
+  // or third requirement still commits it the moment nothing else in the
+  // vocabulary could be meant. A plain JS filter rather than a `:not(.active)`
+  // selector -- the same answer, without asking a CSS engine for something
+  // this file can just check itself.
+  var freshButtons = Array.prototype.filter.call(
+    resultsPool.querySelectorAll('.btn-ingredient'),
+    function (b) { return !b.classList.contains('active'); }
+  );
+  if (freshButtons.length === 1) {
+    var onlyBtn = freshButtons[0];
+    var onlyKey = onlyBtn.dataset.ingredient;
+    state.includedIngredients.add(onlyKey);
+    ingredientLabels[onlyKey] = onlyBtn.textContent;
     onlyBtn.classList.add('active');
     state.isSearching = false;
   }
-  ensureActiveIngredientShape();
+  ensureActiveIngredientShapes();
   update();
   updateIngredientClear();
 }
@@ -789,11 +850,14 @@ function renderResultsPool() {
 
   if (ingredientClear) {
     ingredientClear.addEventListener('click', function() {
-      state.ingredient = null;
-      state.isSearching = false;
+      // Clears the SEARCH, not the choices -- issue #1092 gives HAS TO HAVE
+      // the rule LEAVE OUT's own clear already follows: those come off one
+      // at a time by their own chip, or all at once with clear all.
+      // renderResultsPool() with an empty box repaints exactly the chosen
+      // chips and nothing else -- the same thing this handler used to do by
+      // hand, back when there was only ever one to keep.
       if (searchBox) searchBox.value = '';
-      if (resultsPool) resultsPool.innerHTML = '';
-      update();
+      renderResultsPool();
     });
   }
 
@@ -820,7 +884,7 @@ function renderResultsPool() {
   // be right; the toggles below just change state and call update().
   //
   // .btn-ingredient is excluded deliberately: those buttons also carry
-  // .btn-tag, but their selected state is state.ingredient's, not
+  // .btn-tag, but their selected state is state.includedIngredients', not
   // state.tags', and it is maintained where they are built and clicked.
   function syncFilterButtons() {
     if (!matrix) return;
@@ -1010,15 +1074,18 @@ function renderResultsPool() {
       }
     });
 
-    // Highlight matching ingredient pills
-    var activeKey2 = state.ingredient ? state.ingredient.replace(' (all)', '').trim() : '';
-    var activeSynonyms2 = activeKey2 ? IS.getSynonymWords(activeKey2) : null;
-    var activeWords = (!activeSynonyms2 && activeKey2)
-      ? getWords(activeKey2).map(IS.normaliseIngredientWord)
-      : [];
+    // Highlight matching ingredient pills -- GitHub issue #1092 widened this
+    // from one active key to a set. A pill lights up if it matches ANY
+    // chosen entry (this is a visual "which ingredient earned this row" aid,
+    // not the AND requirement itself -- that is FilterState.includesRow's
+    // question, already asked above in rowMatchesFilters).
+    var activeKeys2 = [];
+    state.includedIngredients.forEach(function (k) {
+      activeKeys2.push(String(k).replace(' (all)', '').trim());
+    });
     document.querySelectorAll('.recipe-list .ingredient-pill').forEach(function(pill) {
       pill.classList.remove('ingredient-pill--matched');
-      if (!activeKey2) {
+      if (!activeKeys2.length) {
         // Strip any shape left from a previous match -- .ingredient-pill
         // has no default .tag-shape colour of its own (unlike .badge/
         // .btn-tag), so an orphaned slot here would render at whatever
@@ -1029,15 +1096,18 @@ function renderResultsPool() {
         return;
       }
       var pillText = pill.textContent.trim().toLowerCase();
-      var matches;
-      if (activeSynonyms2) {
-        matches = activeSynonyms2.some(function(syn) { return pillText.indexOf(syn) !== -1; });
-      } else {
-        var pillWords = getWords(pillText).map(IS.normaliseIngredientWord);
-        matches = activeWords.every(function(aw) {
+      var pillWords = null;
+      var matches = activeKeys2.some(function (activeKey2) {
+        var activeSynonyms2 = IS.getSynonymWords(activeKey2);
+        if (activeSynonyms2) {
+          return activeSynonyms2.some(function(syn) { return pillText.indexOf(syn) !== -1; });
+        }
+        if (!pillWords) pillWords = getWords(pillText).map(IS.normaliseIngredientWord);
+        var activeWords = getWords(activeKey2).map(IS.normaliseIngredientWord);
+        return activeWords.every(function(aw) {
           return pillWords.some(function(pw) { return pw.indexOf(aw) !== -1; });
         });
-      }
+      });
       if (matches) {
         pill.classList.add('ingredient-pill--matched');
         if (!pill.querySelector('.tag-shape')) {
@@ -1048,7 +1118,7 @@ function renderResultsPool() {
         }
       }
     });
-    if (activeKey2 && window.HTF && HTF.tagShapes) HTF.tagShapes();
+    if (activeKeys2.length && window.HTF && HTF.tagShapes) HTF.tagShapes();
 
     // Null-guarded like every other lookup in this function. It was the one
     // exception among roughly fifteen, and the consequences were out of all
@@ -1162,26 +1232,33 @@ function renderResultsPool() {
 
       if (target.classList.contains('btn-ingredient')) {
         var ing = target.dataset.ingredient;
-        if (state.ingredient === ing) {
-          state.ingredient = null;
-          state.isSearching = true;
+        if (state.includedIngredients.has(ing)) {
+          // Remove just this one requirement -- GitHub issue #1092. No
+          // longer exclusive: the other buttons in the pool, chosen or not,
+          // are left exactly where they are.
+          state.includedIngredients.delete(ing);
+          delete ingredientLabels[ing];
           target.classList.remove('active');
           var staleShape = target.querySelector('.tag-shape');
           if (staleShape) staleShape.remove();
         } else {
-          state.ingredient = ing;
-          state.isSearching = false;
-          // The search box should echo what the button actually SHOWS, not
-          // its internal match key -- for an aliased entry like "five-spice"
-          // displayed as "Chinese five-spice powder", the two differ. See
-          // display_names in _data/ingredient_words.yml.
-          if (searchBox) searchBox.value = target.textContent.replace(' (all)', '').trim();
-          resultsPool.innerHTML = '';
-          resultsPool.appendChild(target);
-          matrix.querySelectorAll('.btn-ingredient').forEach(function(b) { b.classList.remove('active'); });
+          // Add it as ANOTHER requirement -- AND, not replace (#1092). A
+          // second pick used to collapse the pool down to itself and
+          // discard the rest; now it joins the first, the way LEAVE OUT's
+          // own exclusions and cocktails' `include` cupboard already do, so
+          // several chips from one search can be picked without retyping.
+          state.includedIngredients.add(ing);
+          // The label the button actually SHOWS, not its internal match
+          // key -- for an aliased entry like "five-spice" displayed as
+          // "Chinese five-spice powder", the two differ (display_names in
+          // _data/ingredient_words.yml). Recorded here rather than read off
+          // the box, which may hold a different search by the time this
+          // label is next needed (a repaint, a saved go-back record).
+          ingredientLabels[ing] = target.textContent.replace(' (all)', '').trim();
           target.classList.add('active');
-          ensureActiveIngredientShape();
+          ensureActiveIngredientShapes();
         }
+        state.isSearching = !!(searchBox && searchBox.value.trim());
         update();
         return;
       }
@@ -1766,16 +1843,20 @@ function renderResultsPool() {
       var wantedIng = wanted.ing[wanted.ing.length - 1];
       searchBox.value = wantedIng;
       renderResultsPool();
-      if (!state.ingredient) {
-        var wantedKey = fold(wantedIng.trim().toLowerCase());
-        var exact = null;
-        resultsPool.querySelectorAll('.btn-ingredient').forEach(function (btn) {
-          if (exact) return;
-          var byKey = fold(String(btn.dataset.ingredient || '').toLowerCase()) === wantedKey;
-          var byLabel = fold(String(btn.textContent || '').replace(' (all)', '').trim().toLowerCase()) === wantedKey;
-          if (byKey || byLabel) exact = btn;
-        });
-        if (exact && typeof exact.click === 'function') exact.click();
+      var wantedKey = fold(wantedIng.trim().toLowerCase());
+      var exact = null;
+      resultsPool.querySelectorAll('.btn-ingredient').forEach(function (btn) {
+        if (exact) return;
+        var byKey = fold(String(btn.dataset.ingredient || '').toLowerCase()) === wantedKey;
+        var byLabel = fold(String(btn.textContent || '').replace(' (all)', '').trim().toLowerCase()) === wantedKey;
+        if (byKey || byLabel) exact = btn;
+      });
+      // Skip the click when renderResultsPool()'s own auto-select-on-a-
+      // unique-match already added it (#1092: the matrix's click handler now
+      // TOGGLES a chosen entry, so clicking an already-active button would
+      // remove the very thing this block exists to add).
+      if (exact && !exact.classList.contains('active') && typeof exact.click === 'function') {
+        exact.click();
       }
     }
   })();
