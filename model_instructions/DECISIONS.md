@@ -1676,6 +1676,15 @@ unless stated.
   a base spirit whose STYLE the source does not state, is hers to decide, not
   an agent's. Raised as #1013 (schnapps) and left as a per-drink QQ on Rosita's
   tequila pour, with the reasoning in the file rather than a guess.
+- **2026-09-15, #1079** — **`citrus slice` becomes `orange slice`.** The entry
+  above coined the muddled slice fruit-agnostic, on the argument that muddling a
+  slice for its oil and juice is the same act whatever the fruit. Helen:
+  *"'citrus slice' shouldn't be the generic because citrus fruits aren't
+  interchangeable."* So a muddled slice names its fruit, as the garnish forms
+  always did, and a lemon or lime slice gets its own generic the day a drink
+  pours one. Peach Me was the only drink using it; its draft moves in the paired
+  `helen-triages-cocktails-private` PR, which merges SECOND (the draft names a
+  public generic).
 
 - **2026-09-14 — four vocabulary rulings from one sitting (#796, #1013, #752,
   and cherry).**
