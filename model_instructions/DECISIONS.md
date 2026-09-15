@@ -4037,6 +4037,44 @@ unless stated.
     a PR by hand under her own name; the appeal to GitHub Support is the
     account owner's, not a session's.
 
+- **2026-09-15 — what the flag looked like a day later, a new agent account,
+  and the writes get a wrapper.**
+  - **A flagged account's issues drop out of LISTINGS, even for that account,
+    but a GET by number still returns them.** Rebuilding the backlog, `GET
+    .../issues?state=all` returned none of `DeckOfPandas-agentic`'s issues
+    (the day before, the same account's API had listed them normally), while
+    `GET .../issues/984` returned #984 open. `GET .../pulls` still listed the
+    account's PRs. So a number missing from the issue listing and absent from
+    the PR listing is a hidden issue, and that is how the invisible backlog was
+    reconstructed. **And probing numbers one by one hit the REST rate limit at
+    about 200 calls**, across a token other sessions share: pace any sweep (a
+    few seconds per call) and stop at the first 403.
+  - **Helen made a new account, `DeckOfPandas-agentic-claude`**, a collaborator
+    on all three repos, with its token under the same `AGENT_GH_TOKEN` name.
+    Its first PR (#1081) came back authored by `DeckOfPandas` — the token in
+    the variable was hers until she corrected it — which is the reason to read
+    `.user.login` off every PR a session opens rather than assume. From then
+    on #65 on the cocktails repo, #1083 here and a comment on #1064 all
+    reported the new login, and the profile and #1083 returned 200 logged out.
+    The scripts' headers and `CLAUDE.md` still say `DeckOfPandas-agentic` in
+    places; the account's name is not load-bearing anywhere (GitHub
+    authenticates the token, not the credential helper's `username=`), and the
+    rename is its own piece of work.
+  - **`scripts/gh-write.sh` and `scripts/github-public-status.sh`, on Helen's
+    word:** *"When you want to run commands that build paths at runtime,
+    please find a way into scripts that can be statically analysed so
+    read/write scope can be checked without asking me."* The session had
+    opened PRs, commented and patched a PR body through `sh
+    scripts/gh-agent.sh api -X ... -F body=@tmp/...`, and checked visibility
+    with `curl -o /dev/null`; each asked her. `@tmp/...` is a read gh performs
+    at run time and `-o` a write curl does, neither visible to the checker, and
+    `api` is also the door to a merge — so no allow rule could ever have
+    covered them. The wrappers take only the arguments they understand (three
+    writes; a body under `tmp/`; base `main`; the three repos; a status for our
+    own pages), and `tests/test_agent_wrappers.py` proves what they refuse.
+    This is the 2026-09-11 `gh-read.sh` ruling applied to writes, and
+    `CLAUDE.md`'s allow-rules bullet now states it as the general rule.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not

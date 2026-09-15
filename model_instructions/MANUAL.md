@@ -2612,21 +2612,33 @@ fine-grained token could not, and this line said so until 2026-09-11): a merged
 branch goes with `sh scripts/git-push-agent.sh :<branch>`, or
 `sh scripts/gh-agent.sh pr close --delete-branch` on an unmerged PR.
 
-**Open the PR with `sh scripts/gh-agent.sh pr create ... --body-file`**
-(allow-listed). Only on a host worktree, which has no `gh` (§1), is it the
-REST API, `POST /repos/DeckOfPandas/helen-triages/pulls`, from a script in `tmp/`.
-Measured 201 on 2026-09-07.
+**Open the PR, correct its body, and comment, with `scripts/gh-write.sh`**
+(allow-listed, REST, since 2026-09-15):
+
+    sh scripts/gh-write.sh pr-create helen-triages data/some-branch "(data) the title" tmp/pr-body.md
+    sh scripts/gh-write.sh pr-body   helen-triages 1081 tmp/pr-body.md
+    sh scripts/gh-write.sh comment   helen-triages 1064 tmp/comment.md
+
+The body is always a plain file under `tmp/`, written with the Write tool; a
+PR's base is always `main`; the repo is one of the three, named bare. It
+prints the new PR's number, URL and author, which is also how you see which
+account GitHub recorded. It does nothing else, and cannot merge — so it could
+be allow-listed where `sh scripts/gh-agent.sh api -X ...` never can
+(`CLAUDE.md`, and `tests/test_agent_wrappers.py` for what it refuses).
+`sh scripts/gh-agent.sh pr create ... --body-file` still works and is
+allow-listed too, but it is GraphQL, which Helen found less reliable on a
+young account.
 
 **`pr edit` DOES NOT WORK ON THIS TOKEN, even where `gh` exists.** It goes
 through GraphQL, which wants `read:org` for fields the classic `repo` scope
-does not cover, and fails before touching the PR. `pr create`, `pr view`,
-`pr comment` and the `issue` subcommands are REST and fine. To change a PR's
-body or title, patch it over REST through the wrapper:
+does not cover, and fails before touching the PR. That is why `gh-write.sh
+pr-body` exists (measured over REST on #932, 2026-09-10). A PR's title is not
+covered — change it by hand, or ask. Not a scope to ask for: "never broaden
+access" holds, and the REST form needs nothing the token lacks.
 
-    sh scripts/gh-agent.sh api -X PATCH repos/DeckOfPandas/helen-triages/pulls/932 -F body=@tmp/pr-body.md
-
-Measured 2026-09-10 (#932). Not a scope to ask for: "never broaden access"
-holds, and the REST form needs nothing the token lacks.
+**Is it visible to anyone else?** `sh scripts/github-public-status.sh <url>`
+prints the logged-out HTTP status of a page under `DeckOfPandas` or an agent
+account: 200 visible, 404 hidden (the 2026-09-14 spam flag's signature).
 
 **AND SINCE 2026-09-09, ALL THREE REPOS.** This section used to read "AND ONLY
 THAT REPO": the same call against either private repo returned 422 `not all
