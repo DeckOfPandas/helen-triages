@@ -20,8 +20,16 @@ sitemap: false
   line, label for label, from _plugins/cocktail_card_ingredients.rb: the card
   name is the chip the index's HAS TO HAVE field offers (MANUAL 9.10.1, "cards
   and search read the VOCABULARY"), so a word chosen here is a word the index
-  can apply. A label joining two options with "or" names no single chip and
-  the index drops it silently, the same policy it applies to any stale value.
+  can apply.
+
+  A JOINED "X OR Y" LABEL IS NEVER OFFERED -- #1051. `card_ingredients` marks
+  one of these with `generics: 2` (or more): the card still prints
+  "aged rum or Jamaican rum" as a true fact about the pour, but that string
+  names no single HAS TO HAVE chip, so omnisearch would offer a result that
+  matches nothing when clicked (the `?ing=` grammar matches a chip WHOLE,
+  MANUAL 13.13). Excluded here rather than filtered in page-search.js, so the
+  dropdown never has to know the difference between a real ingredient and a
+  joined one -- the feed simply never contains it.
 
   `items_label` IS PLACEHOLDER COPY, Helen's to write (MANUAL 13.12).
 {%- endcomment -%}
@@ -43,7 +51,8 @@ sitemap: false
   ],
   "items": [
     {%- for d in sorted_drinks %}
-    {% unless forloop.first %},{% endunless %}{"t": {{ d.title | jsonify }}, "u": {{ d.url | relative_url | jsonify }}, "moods": {{ d.mood | jsonify }}, "ing": [{% for ing in d.card_ingredients %}{% unless forloop.first %}, {% endunless %}{{ ing.label | jsonify }}{% endfor %}]}
+    {%- assign _single_ings = d.card_ingredients | where: "generics", 1 -%}
+    {% unless forloop.first %},{% endunless %}{"t": {{ d.title | jsonify }}, "u": {{ d.url | relative_url | jsonify }}, "moods": {{ d.mood | jsonify }}, "ing": [{% for ing in _single_ings %}{% unless forloop.first %}, {% endunless %}{{ ing.label | jsonify }}{% endfor %}]}
     {%- endfor %}
   ]
 }
