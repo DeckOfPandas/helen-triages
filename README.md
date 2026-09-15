@@ -67,16 +67,17 @@ Then build and run the container again:
    - `.devcontainer/run.sh`
 
 
-## Recipe data pipeline (`model_instructions/PIPELINE.md`)
+## Recipe data pipeline
+https://github.com/DeckOfPandas/helen-triages/blob/main/model_instructions/PIPELINE.md
 
-How a recipe or drink gets in, gets rewritten by me, gets fixed by Claude, gets proofread by me, then goes live. There's a Mermaid diagram at the top, ooOoooh.
+There's a Mermaid diagram at the top, ooOoooh.
 
 Three ways in:
 1. claude.ai Project
 2. An `ingest` issue on a private repo
 3. I dump files in `tmp/inbox-*`), 
 
-An intake pass that ends in ONE list of questions for me. Anything the source doesn't say is `QQ`.
+Then an intake pass results in ONE list of questions for me. Anything the source doesn't say is `QQ`.
 
 The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/` (food only because cocktails are usually less garbage on the way in), `2-make/`, `3-keep/`, `4-promote/`. 
 
