@@ -168,14 +168,22 @@
   border-top: 1px solid $color-border;
 }
 
-// The kind, in the small Courier caps the actions row wears (above) -- it is
-// a label for a set of things you can act on, which is what those are.
+// THE KIND, HEAVIER AND SLIGHTLY LARGER -- #1053. It used to wear the small
+// Courier caps the actions row wears (above), at 700 -- already the heaviest
+// weight Courier Prime ships (_sass/shared/_fonts.scss: two faces, 400 and
+// 700, so there is no heavier Courier to reach for). Helen: "switch font to
+// the other one if you have to," so this is $font-body (Selawik) at the same
+// 700 -- also its heaviest face -- rather than a font-weight this site cannot
+// actually serve. Selawik's bold reads heavier than Courier Prime's at this
+// size because a sans-serif's strokes fill more of the letterform than a
+// mono's do, which is the visual effect asked for even though the numeric
+// weight is unchanged. `0.7rem`, up from `0.66rem`, is the "slightly larger."
 .page-search-group-label {
-  font-family: $font-headings;
-  font-size: 0.66rem;
+  font-family: $font-body;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   line-height: 1;
   color: $color-clear-text;
   padding: $space-xs $space-md $space-xs;
