@@ -1106,6 +1106,23 @@ unless stated.
   Helen offered, the same afternoon, to write the placeholder strings while the
   work went on.
 
+- **2026-09-15, #1092 — food's HAS TO HAVE picks several ingredients, AND.**
+  Raised as *"HAS TO HAVE filter on food site no longer allows selecting more
+  than one chip"*, with no body. An agent reproduced it in the browser, then
+  searched the history for the change that broke it and found none: the picker
+  had held ONE string, replaced on every pick and collapsing its pool, since
+  its first commit (bcaac87, 2026-06-22). #583 had renamed it to cocktails'
+  "HAS TO HAVE", whose `include` is a Set, AND across chips ("how a cupboard
+  works"), and nothing had ruled food's single. So the fix gives food the
+  label's own meaning: `state.includedIngredients` is a Set, a chip toggles,
+  chosen chips persist in the pool across searches, and `FilterState.includesRow`
+  requires every chosen entry through the family match. `?ing=` (#1050) is
+  unchanged in effect. The new tests fail on the old code (two in the food
+  harness, five in filter-state's), checked by swapping the old files in. **It
+  shipped as a new capability, not a restored one**, and the report to Helen
+  said so. The agent's browser re-runs used an env-prefixed `node` command
+  that asked Helen twice; that shape is what #1098's guard refuses.
+
 ## §9 Cocktails
 
 ### §9.1 Privacy, the clone, the fetch discipline
@@ -5428,6 +5445,44 @@ verification. Dates are when the correction landed.
   - **Found and not acted on:** the reference pages and about carry no
     furniture line (no back arrow, no search), so the search-for-anything box
     exists only on recipe and drink pages. Nobody has asked for it there.
+  - **Two of the agents' results needed Helen after merging.** On the
+    omnisearch build she found the box returning only drink names: *"I still
+    want the omnisearch box to be able to search for everything (the
+    includes)... Please put it back."* #1051's `where: "generics", 1` dropped
+    every ingredient on a server running the old plugin, and a no-generic row
+    on any build; the filter now leaves out only a row counting two or more
+    (MANUAL §13.13). And #1092 turned out not to be a regression (§8 below).
+
+- **2026-09-15, #1099 — Helen's second look at the #1093 branch, six items in
+  one issue (the spam-flag rule), in her words:**
+  - *"Please let typing in the omnisearch box grow the word from right to
+    left, like this ____r ___rh __rhu _rhum."* The input is right-aligned
+    again; the agent's left-alignment for #1056 had reasoned that text should
+    grow towards a glass on the right, and she wanted the word anchored at the
+    glass instead.
+  - *"Order on cocktail page: ... ingredients, scaler, method, notes, <hr>,
+    source, roughly X units of alcohol per serving, roughly £x-y in
+    ingredients per serving, <hr>, if you liked this ..."* Asked where TO SERVE
+    goes, which the list did not name: *"After method (as now)"*. The source and
+    cost lines came up from under the related cards into one footer with the
+    units line; the two rules are the footer's and the related section's own
+    hairlines. The sentences are unchanged: the list names the lines.
+  - *"Show me a candidate page where active chips on cocktail cards are
+    inverted instead of underlined, same as for active chips in the filter
+    groups."* https://claude.ai/artifact/MpYrFCPFqxLo7qQeGxZLSZ — A underlined
+    (now), B inverted tight, C inverted padded. Built with the separator dot
+    carried just outside a filled chip, because it is drawn inside the chip and
+    a fill would swallow it. **Her pick is pending.**
+  - *"Please try the absinthe rule above the actions row on cocktail pages at
+    1px."* A try, live. The rum page's title rule is still 2px.
+  - *"Remove the bordered box around the omnisearch input field when it's
+    active."* Told the box was #1087's keyboard focus ring (#1086's
+    accessibility finding), and that a text input matches `:focus-visible` on a
+    click too, her pick of two was the underline: accent colour and a second
+    pixel on focus, drawn as an inset shadow so nothing moves.
+  - *"Lighten the omnisearch input field's lower border, both sites."* Mixed
+    towards each page's ground, not `lighten()`ed: on cocktails' dark page a
+    lightened grey is a brighter line.
 
 ## §14 Reference pages
 

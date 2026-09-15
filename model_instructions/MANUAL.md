@@ -960,6 +960,18 @@ cook. #52 chose the harder source deliberately (`main_ingredients` is a partial
 hint), so the answer to a bad exclude candidate is always to teach the
 vocabulary, never to fork the logic.
 
+**HAS TO HAVE picks SEVERAL, AND across them, since #1092 (2026-09-15)** —
+`state.includedIngredients` is a Set, like `excludedIngredients` and like
+cocktails' `include`; a chip click toggles membership, chosen chips stay in the
+pool across searches (first, still removable), and a unique typed match is
+ADDED rather than replacing. `FilterState.includesRow` is `excludesRow`'s
+sibling but always goes through the family match, because the include side
+reads the partial `main_ingredients`. Display labels live in `filters.js`'s
+`ingredientLabels` map and ride the #387 memory. **It was never multi-select
+before**, whatever the issue's "no longer" said: it had been one string,
+replaced on each pick, since the picker's first commit, and #583 only gave it
+cocktails' label. Nothing in DECISIONS had ruled it single.
+
 **Measure production, not your local build.** The local build folds in every
 draft and every unrewritten recipe, and a draft's `item:` lines are the worst
 input the picker ever sees; they are rewritten before publishing, so a
@@ -2333,7 +2345,11 @@ against. Today every drink's third pick shares at least 3; **re-run it after a
 promotion batch or any vocabulary edit that moves moods.**
 **The three are INDEX CARDS since 2026-09-12** — plain `.drink-card`, the same
 markup shape, in a `<section class="cocktail-related-section">` that wears
-`.cocktail-footer`'s rule. **Nothing about the card is decided on this page**:
+`.cocktail-footer`'s rule. **The page ends in Helen's order since #1099**:
+ingredients, scaler, method, to serve, notes, then `.cocktail-footer` (hairline;
+source, units, cost — cost local only), then this section (hairline; the
+cards). The footer came up from under the cards that day, and the units line
+went into it. **Nothing about the card is decided on this page**:
 geometry, fixed height, the three-line clamp, the chip cap, the ship pinned to
 its corner with the clear-ship pass, the hover and the 370px grid floor are all
 `_sass/cocktails/_cards.scss`'s, so the row wraps two-then-one in the 900px
@@ -3411,7 +3427,10 @@ variables), and the row each site puts the actions in:
   applies it as a keystroke would. Enter or the magnifying glass submits.
   **Since 2026-09-15 (#1050) it is the SEARCH FOR ANYTHING**: the glass sits
   at the RIGHT end and never moves (#1056), the input is 24 characters wide and
-  left-aligned so the text grows towards the glass, the placeholder reads
+  RIGHT-aligned so a word grows leftwards from the glass (#1099, Helen:
+  "____r ___rh __rhu _rhum"); focus is the underline in `$color-accent` plus an
+  inset second pixel, never a box (#1099, which replaced #1087's outline), and
+  the resting underline is mixed towards the page's own ground; the placeholder reads
   `I know what I want...` on both sites with no written label, the glass being
   the only one (#1096, Helen: *"no written label/title, just the magnifying
   glass"*; the input's `aria-label` carries the words), and
@@ -3423,7 +3442,11 @@ variables), and the row each site puts the actions in:
   food, mood / hassle on cocktails, then the ingredients (main_ingredients on
   food, the card's ingredient labels on cocktails, never a label joining two
   generics, "X or Y", #1051: `card_ingredients` rows carry a `generics` count
-  and `cocktails/search.json` keeps the ones). Group titles are Selawik 700 at
+  and `cocktails/search.json` leaves out only rows counting two or more. **It
+  fails open on purpose**: its first version kept `generics == 1`, which on a
+  `jekyll serve` started before the plugin gained the field dropped EVERY
+  ingredient (§1: plugins are not reloaded), and Helen saw a box that found
+  only drink names). Group titles are Selawik 700 at
   0.7rem (#1053) and the no-match line reads `nothing to see here` (#1055).
   Every result is a real link: to the page,
   or to the index with `?star=`, `?tag=`, `?mood=` or `?ing=` **ending in
