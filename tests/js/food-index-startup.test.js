@@ -863,7 +863,7 @@ test('#387: a genuine back navigation restores scroll instead, and skips the fra
       w.HTF.indexMemory.save('htf-index-memory-v1', {
         order: Object.keys(RECIPES),
         filters: w.HTF.filterState.serialise(w.HTF.filterState.emptyState()),
-        ingredientLabel: '',
+        ingredientLabels: {},
         page: 1,
         showAll: false,
         scrollY: 321
@@ -876,6 +876,85 @@ test('#387: a genuine back navigation restores scroll instead, and skips the fra
     'a genuine back navigation must not ALSO jump to location.hash -- the ' +
     'remembered scroll is the truer answer, same as before #1057/#1059 ' +
     'widened this from "#results" to any fragment.');
+});
+
+// --- HAS TO HAVE is AND-multi-select -- GitHub issue #1092 ---------------------
+// "HAS TO HAVE filter on food site no longer allows selecting more than one
+// chip." A second pick used to REPLACE the first (state.ingredient was a
+// single string); it now joins it, the way LEAVE OUT's own exclusions and
+// cocktails' `include` cupboard already work -- so both requirements apply
+// at once, AND, not the most recent one alone.
+//
+// Typing each of these narrows to exactly one candidate ("aubergines",
+// "olive oil" and "beetroot" are each a whole entry in MAIN_INGREDIENTS and
+// share no prefix with anything else in the fixture), so each commits the
+// moment it is typed -- no click needed, the same auto-select #1050 already
+// relies on. This is deliberately the fully-typed-unique-word path rather
+// than a click on an ambiguous pool: it is the shortest route to proving the
+// SECOND commit doesn't erase the first, which is exactly what the old
+// single-value state did.
+
+function typeIngredient(doc, word) {
+  const box = doc.getElementById('ingredient-search-box');
+  box.value = word;
+  box.dispatch('input');
+}
+
+test('#1092: a second HAS TO HAVE pick joins the first instead of replacing it', () => {
+  const { doc, list } = boot();
+  typeIngredient(doc, 'aubergines');
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/'],
+    'choosing "aubergines" alone should already narrow to the one recipe that names it.');
+
+  typeIngredient(doc, 'olive oil');
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/'],
+    'both chosen ingredients are on the SAME recipe, so it should still be the ' +
+    'only survivor -- this alone cannot tell "AND both" from "replaced by the ' +
+    'second", which the next assertion is for.');
+
+  // The old single-value code REPLACES "aubergines" with "beetroot" here and
+  // ends up with the one row that names beetroot (recipe b). The AND-set
+  // fixed by #1092 requires EVERY chosen ingredient, and no recipe in the
+  // fixture names both aubergines and beetroot, so the true regression case
+  // is an EMPTY list, not recipe b's survival.
+  typeIngredient(doc, 'beetroot');
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')), [],
+    'aubergines, olive oil AND beetroot are three requirements now, and no ' +
+    'fixture recipe carries all three -- if this shows recipe b, the third ' +
+    'pick replaced the first two instead of joining them.');
+
+  // Both a chosen ingredient's own button and the inline clear stay visible
+  // for a filter that is actually still applied.
+  const activeButtons = Array.from(
+    doc.getElementById('ingredient-results-pool').querySelectorAll('.btn-ingredient.active')
+  );
+  assert.deepStrictEqual(
+    activeButtons.map((b) => b.dataset.ingredient).sort(),
+    ['aubergines', 'beetroot', 'olive oil'],
+    'all three chosen entries should still show as active chips, not just the last one.'
+  );
+});
+
+test('#1092: removing one chosen ingredient leaves the others in place', () => {
+  const { doc, list } = boot();
+  typeIngredient(doc, 'aubergines');
+  typeIngredient(doc, 'olive oil');
+
+  // Clicking an already-chosen chip removes just that one -- the matrix click
+  // handler's own toggle, exercised here rather than through another
+  // typeIngredient() call so this test is about the chip, not the box.
+  const pool = doc.getElementById('ingredient-results-pool');
+  const aubergineChip = Array.from(pool.querySelectorAll('.btn-ingredient'))
+    .find((b) => b.dataset.ingredient === 'aubergines');
+  assert.ok(aubergineChip, 'the chosen aubergines chip should still be on screen to click.');
+  aubergineChip.dispatch('click');
+
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/'],
+    'olive oil alone still narrows to recipe a; removing aubergines must not ' +
+    'have cleared the whole picker with it.');
 });
 
 // --- the list of scripts is the template's list --------------------------------
