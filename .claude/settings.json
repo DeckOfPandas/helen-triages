@@ -5,6 +5,8 @@
       "/workspace/.claude/worktrees"
     ],
     "allow": [
+      "Read(//dev/null)",
+      "Edit(//dev/null)",
       "Bash(pytest *)",
       "Bash(python3 -m pytest *)",
       "Bash(.node-runtime/node/bin/node --test *)",
