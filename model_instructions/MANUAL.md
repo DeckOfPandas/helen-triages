@@ -1101,23 +1101,29 @@ generates the cases from both field tables. It did compose with the other
 filters until 2026-09-10; `DECISIONS.md` §8.3 has the fourteen steps that
 ended that.
 
-**`?shortlist=1` on the COCKTAILS index enters it** (#994, 2026-09-12), by
+**`?shortlist=1` enters it on BOTH indexes** (#994 cocktails, #1011 food), by
 calling the same `enterShortlistView()` the button calls — so the two doors land
 in one state, and the view's "clears everything else" rule holds for both. It
-runs after the `?mood=` block and replaces rather than narrows, and drops the
-remembered scroll with the remembered list. Food has no such query.
-**NOTHING LINKS TO IT.** The drink page's see-all link was its one caller and
-#1000 removed that on 2026-09-14. **How a reader finds their shortlist is the
-index's own `shortlisted (N)` button** — Helen, the same day: *"Shortlist is
-still viewable when I click on the shortlist button at the top of the cocktail
-card section, which will do for now, and at least it matches food."* The query
-is kept under #651's rule (a thing nothing reads is only safe while a comment
-says why): offered its removal, she left it, it works and is tested, and "for
-now" is not "never". **Food has no such query**, so strictly it is the one
-place the two sites' shortlists differ; deleting it is the block in
-`cocktail-index.js` plus its three tests in
-`tests/js/cocktail-index-startup.test.js`, and both files say to take them
-together.
+runs after the other query blocks and replaces rather than narrows, and drops
+the remembered scroll with the remembered list. The actions row's `see
+shortlist (N)` links to it, ending `#results` since #1057.
+
+**`?shortlist=slug,slug` is a shortlist someone SENT** (#1093, 2026-09-15), and
+the index SHOWS it without saving any of it — Helen: *"Show it, don't save it"*.
+Both meanings are read by `HTF.filterState.parseShortlist` (slugs `[a-z0-9-]`
+only; `1` is never a slug), and the slugs are matched to live keys by
+`HTF.shortlist.resolveSlugs`, which writes nothing. The view is the ordinary
+shortlist view with `sharedKeys` answering "is this one on it" instead of the
+store, so #918 holds unchanged, and the page drops the list the moment the view
+goes. Over a shared list: the note `[data-shared-shortlist]` says how many and
+names any slug nothing answers to; the shopping list hides (its numbers write
+to the store); `shortlisted (N)` is not lit, and pressing it shows YOUR list;
+**"keep these"** merges the list in (`HTF.shortlist.addAll`) and shows yours.
+The link itself leads the export panel (`[data-shortlist-share]`, built by
+`shortlist-export.js` from `shortlistQuery` and `slugOf`), with the JSON
+behind it for portions and glasses. Every string is PLACEHOLDER COPY. Tests:
+`tests/js/shortlist-share.test.js` (the store), `filter-state.test.js` (the
+grammar), and both index startup harnesses (the wiring).
 
 ## 9. Cocktails
 
@@ -3131,6 +3137,19 @@ as hierarchy if it is obviously bigger than the one below it. `padding` does
 not collapse, `margin` does; **a flex item's margins never collapse**, which
 once cost 36px on every drink page.
 
+**The gaps the two sites share, measured in #1093's spacing review
+(2026-09-15):** a recipe or drink title starts `$space-lg` under the furniture
+line (`.page-furniture + .recipe .recipe-title`; a test holds the selector to
+the include); a page with no furniture line (the reference pages, about)
+starts its title `$space-xxl` under the header; on both indexes the filter
+panel ends in `$spacing-section-gap` and the count line pads `$space-md` above
+itself. **Deliberately NOT shared:** section headings are 4.5rem / 2rem on
+food's pages and 3rem / 1.25rem on a drink page (#1006, *"half way"*). A
+sibling selector goes stale silently when a wrapper is added, which is how the
+first of these drifted: measure, with `scripts/browser/`, rather than read the
+Sass. **Motion:** one `prefers-reduced-motion` query in `_sass/shared/_base.scss`
+cuts every transition for a reader who asks.
+
 ### 13.4 The index page
 
 Five sections in page order — STAR INGREDIENT, MOOD, PRACTICALITIES, **HAS TO
@@ -3220,6 +3239,10 @@ on purpose. **Pagination**, 20 per page, prev/next, a status label, `(see
 all)`; the maths in `recipe-list.js`. **Shuffle** (Fisher-Yates) on clear-all
 and on every fresh load; `.recipe-list` starts `visibility: hidden` and is
 revealed after the first render, trading a visible flip for a blank instant.
+**No results** ("Nothing to see here." / "Blank canvas.") carries a third `×
+clear all` inside the line (#1093), in the same list as the top and bottom
+buttons so it cannot disagree with them about whether there is anything to
+clear.
 **One arrival is exempt: going back** (#387) restores shuffle order, filters,
 page, see-all and scroll from `sessionStorage`, gated on
 `performance.getEntriesByType('navigation')[0].type === 'back_forward'` — a
@@ -3387,21 +3410,30 @@ variables), and the row each site puts the actions in:
   comma) and each index puts the text into its own I KNOW WHAT I WANT box and
   applies it as a keystroke would. Enter or the magnifying glass submits.
   **Since 2026-09-15 (#1050) it is the SEARCH FOR ANYTHING**: the glass sits
-  at the left and never moves, the input is 24 characters wide and
-  right-aligned so the text grows towards the glass, the placeholder reads
-  "search for anything..." on both sites (so it left `sites.yml`, whose test
-  for a key is "does it say where you are"), and `assets/js/page-search.js`
-  hangs a dropdown under it as you type. The dropdown is PER SITE and grouped
-  by kind in the index's own order — the recipes or drinks by name first
-  (title tiers, prefix before substring, a substring only when nothing
-  prefixes), then star / mood / practicalities on food, mood / hassle on
-  cocktails, then the ingredients (main_ingredients on food, the card's
-  ingredient labels on cocktails). Every result is a real link: to the page,
+  at the RIGHT end and never moves (#1056), the input is 24 characters wide and
+  left-aligned so the text grows towards the glass, the placeholder reads
+  `I know what I want...` on both sites with no written label, the glass being
+  the only one (#1096, Helen: *"no written label/title, just the magnifying
+  glass"*; the input's `aria-label` carries the words), and
+  `assets/js/page-search.js` hangs a dropdown under it as you type. The
+  dropdown is PER SITE and grouped by kind in the index's own order — the
+  recipes or drinks by name first (title tiers; since #1052 a result matches
+  only when EVERY typed word is a prefix of a whole word in it, in any order,
+  and there is no substring match at all), then star / mood / practicalities on
+  food, mood / hassle on cocktails, then the ingredients (main_ingredients on
+  food, the card's ingredient labels on cocktails, never a label joining two
+  generics, "X or Y", #1051: `card_ingredients` rows carry a `generics` count
+  and `cocktails/search.json` keeps the ones). Group titles are Selawik 700 at
+  0.7rem (#1053) and the no-match line reads `nothing to see here` (#1055).
+  Every result is a real link: to the page,
   or to the index with `?star=`, `?tag=`, `?mood=` or `?ing=` **ending in
   `#results`**, the id both indexes carry on the count line above their list,
-  so the reader lands on the answer and not the panel (each index scrolls
-  there again after its reveal; a badge or chip link still lands at the top) —
-  **`ing` is the
+  so the reader lands on the answer and not the panel. Each index scrolls to
+  whatever `location.hash` names after its reveal, except when going back
+  (#387). **A badge or chip link lands on its own filter SECTION** since
+  #1059: `#filter-star`, `#filter-mood`, `#filter-practicalities` on food
+  (`_includes/filter_group.html`'s `section_id`), `#filter-mood` and
+  `#filter-hassle` on cocktails — **`ing` is the
   fourth kind in `filter-state.js`'s grammar**, and each index hands it to its
   own HAS TO HAVE (food chooses the picker's matching entry through the
   button's own click, or leaves the pool on screen when none is exact;
@@ -3412,17 +3444,21 @@ variables), and the row each site puts the actions in:
   holds the JSON to the built pages. The pure half is `HTF.pageSearch`
   (`tests/js/page-search.test.js`); the group headings take each site's own
   section hue from its own stylesheet, the panel itself names only the palette
-  contract. The two "recipes"/"drinks" group labels and the no-match line are
-  PLACEHOLDER copy. Helen's second look is #1051–#1059 (DECISIONS §13 lists
-  them); read those before changing the matching, the group titles or where
-  a link lands.
+  contract. The two "recipes"/"drinks" group labels are PLACEHOLDER copy.
+  Helen's second look was #1051–#1059, built on 2026-09-15 (DECISIONS §13);
+  read those before changing the matching, the group titles or where a link
+  lands.
 - **The actions row**, `_includes/page-actions.html`: shortlist, see shortlist
   (N), print, pdf, in that order, in Courier caps — *"all actions in
   capitals"* — with the count from the STORE (`data-shortlist-total`), not the
   page. Food puts it in `.recipe-controls` under the badges, closed by a
   hairline; cocktails in `.cocktail-controls` beside the toggle. Her pick: *"row
   under the head."* The four move together or not at all; a fifth action is a
-  line in the include.
+  line in the include. **Its type and gaps are the same on both sites** (#1058,
+  measured): SEE SHORTLIST and PDF are `<a>`s, so food's
+  `article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf)` has to exclude
+  them or they take the prose-link colour; and `.recipe-controls` pads
+  `$spacing-block-gap` under its hairline, cocktails' rule-to-row gap.
 - **Print and pdf reach drinks with it.** `scripts/generate_pdfs.py` renders
   both collections and the pdf link is `page.url` with its slash swapped for
   `.pdf`, so it points beside the page whatever the permalink.

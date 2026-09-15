@@ -1080,6 +1080,32 @@ unless stated.
   reading (2) unpressed, step 12 shows two again with the search box emptied,
   clear all shows everything.
 
+- **2026-09-15, #1093 — a shortlist share link, shown and not saved.** The
+  design review's finding: saving a shortlist meant copying a JSON blob that
+  exposes internal paths, with nowhere obvious to paste it on a phone. A link
+  does the job in one tap and can be sent to someone. Three rulings, each asked
+  with the fact that forced it:
+  - **What opening a link does to the reader's own shortlist: *"Show it, don't
+    save it"***, over merging it in, replacing, or parking the feature. The
+    index enters the ordinary shortlist view and answers "is this one on it"
+    from the link. The reader's store is untouched, and any filter or clear all
+    leaves the view exactly as #918 says.
+  - **The shopping list over a shared list: *"Hide it in shared view"***, over
+    shopping for the shared recipes. Its numbers write to the store.
+  - **A one-tap way to make it yours: *"Yes, a 'keep these' button"***, which
+    merges the list in (`HTF.shortlist.addAll`, never un-marks anything) and
+    then shows the reader's own shortlist.
+  Built alongside, as consequences rather than rulings: the own-list button is
+  not lit over a shared list, and pressing it shows YOUR list; a slug nothing on
+  the page answers to is named in the note, as restore() names one. The link
+  is `?shortlist=slug,slug`, leading the export panel with a copy button, and
+  the JSON stays behind it for portions and glasses. **`?shortlist=1` keeps its
+  meaning** and both indexes stopped testing `indexOf('shortlist=1')`, which a
+  slug beginning `1` would have matched: `parseShortlist` in filter-state.js
+  reads both, slugs `[a-z0-9-]` only. Every new string is PLACEHOLDER COPY.
+  Helen offered, the same afternoon, to write the placeholder strings while the
+  work went on.
+
 ## §9 Cocktails
 
 ### §9.1 Privacy, the clone, the fetch discipline
@@ -5327,6 +5353,81 @@ verification. Dates are when the correction landed.
     `assets/js/last-line-rule.js` needed no change: it re-measures the
     rendered title on every load, so the double rule still finds the true
     last line at the smaller size, checked by crop. `_sass/food/_recipe-header.scss`.
+
+- **2026-09-15, #1093 — the design review's leftovers, the spacing review
+  Helen added to it, and her recent follow-up issues, in one PR.** Scope, her
+  brief: #1093 minus the ship-rating item, the print-palette item and the "not
+  yet looked at" section, plus *"Please review each type main page of each
+  site for consistent and pleasing spacing"* (her pick of pages: the indexes,
+  a recipe and a drink page, the reference pages and about). Then, mid-session:
+  *"pick up the handful of recent design issues as well"* — asked which, *"All
+  please -- orchestrate Sonnets if you think that will work"*. What she ruled,
+  in the order it came up:
+  - **The no-results line gets its own `× clear all`**, a third copy of the
+    button inside "Nothing to see here." / "Blank canvas.", in the same list as
+    the other two so its click and visibility cannot disagree with them.
+    Not a ruling; the issue's fix, built.
+  - **Reduced motion: one blanket `prefers-reduced-motion` query** in
+    `_sass/shared/_base.scss`. Every transition on either site is a nicety.
+  - **Red main: the README badge**, of the three options (badge, a workflow
+    line, a required status check). The status check is a repository setting
+    and hers. The workflow line was not chosen.
+  - **MANUAL §9.13's "bands and washes, not fills": *"Add a clause."*** It is
+    a rule about cards; the index's active chip has been a fill since #1086.
+  - **The shortlist share link (§8 has the entry).**
+  - **#1007 closed: *"Close this -- fixed"*.** **#1086 closed by a trailer in
+    this PR**, at her word; #1087 did the work and said "Towards".
+  - **#1096, the two searches: *"Retain current behaviour for both. Rename
+    onmisearch box to 'I know what I want'"*, then, asked what its placeholder
+    says: *"'I know what I want...' as a placeholder, no written label/title,
+    just the magnifying glass"*.** So #1055's "nothing to see here" is the
+    dropdown's no-match line, as this journal already recorded it.
+  - **The omnisearch set (#1051, #1052, #1053, #1055, #1056), built by an
+    agent to the issues' words.** The glass moved to the RIGHT (#1056) and the
+    input is left-aligned, so typed text still grows towards the glass (#1050's
+    own principle, carried over). Group titles are Selawik 700 at 0.7rem, from
+    Courier at 0.66rem (#1053: *"Switch font to the other one if you have
+    to"*). #1052 was read as: every typed word must be a prefix of a whole word
+    of the candidate, at a word boundary, in any order; the substring fallback
+    is gone. #1051: a card ingredient label joining two generics ("X or Y") is
+    no longer offered, via a `generics` count on `card_ingredients` and a
+    filter in `cocktails/search.json`. **One consequence recorded rather than
+    fixed:** Singapore Sling's "cherry brandy or cherry liqueur" names two
+    generics that no other drink uses, so once that drink publishes neither can
+    be found through the search. Nothing is findable less today.
+  - **#1057 and #1059, the index jumps, built by an agent.** "see shortlist"
+    ends `?shortlist=1#results`; a badge or chip ends in its filter section's
+    new id (`#filter-star`, `#filter-mood`, `#filter-practicalities`,
+    `#filter-hassle`), and both indexes scroll to whatever `location.hash`
+    names after their reveal, not only `results`. Instant, not smooth, the
+    plainest match to #1050's landing.
+  - **#1058, food's actions row matched to cocktails', by an agent measuring
+    computed styles on both.** Two real differences, both fixed. SEE SHORTLIST
+    and PDF are `<a>`s, so `article.recipe a:not(.badge)` repainted them in
+    the prose-link magenta at 600 while the two `<button>`s stayed grey at 700;
+    they joined the `:not()`. The hairline-to-row gap was 13px on food and
+    about 30px on cocktails; `.recipe-controls` now pads `$spacing-block-gap`.
+    **Left open for Helen:** food's hairline is 1px `$color-border` where
+    cocktails' rule is 2px absinthe. Each site's own closing device, or should
+    food's weight match?
+  - **The spacing review measured every page type's block gaps at 390 and
+    1280.** Two drifts from existing rulings were fixed without asking:
+    **(1) recipe titles sat 3rem under the back arrow, not 1rem.** #1024
+    wrapped the arrow in `.page-furniture` (4723b80, 2026-09-14) and
+    `.back-to-index + .recipe .recipe-title` silently stopped matching.
+    `test_the_recipe_title_gap_names_the_furniture_includes_own_wrapper` now
+    holds the selector to the include. **(2) cocktails' no-results line** had
+    not followed food's to 1.2rem / 700 / 0.04em. Two gaps with no ruling went
+    to her as numbers. **Index, bottom clear-all to "N survivors", 24px on food
+    and about 60px on cocktails: *"Food matches cocktails"*.** **Where a page
+    with no back arrow starts, 48px on the food reference pages and about and
+    32px on rum categories: *"All at 32px"*.** Checked and left alone, because
+    each is already ruled: the drink page's 3rem / 1.25rem headings against
+    food's 4.5rem / 2rem (#1006, *"half way"*, 2026-09-14, above), and rum
+    categories' heading gaps (#985).
+  - **Found and not acted on:** the reference pages and about carry no
+    furniture line (no back arrow, no search), so the search-for-anything box
+    exists only on recipe and drink pages. Nobody has asked for it there.
 
 ## §14 Reference pages
 

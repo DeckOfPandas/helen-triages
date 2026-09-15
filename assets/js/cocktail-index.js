@@ -1720,16 +1720,10 @@
      Helen: "Currently it's hard to figure out how to see your shortlist once
      you've added something to it from the separate page."
 
-     NOTHING ON THE SITE LINKS TO IT TODAY, AND IT STAYS ANYWAY. The drink
-     page's see-all link was this query's one caller and #1000 removed it on
-     2026-09-14. That complaint is answered by THIS PAGE'S OWN BUTTON -- Helen,
-     the same day: "Shortlist is still viewable when I click on the shortlist
-     button at the top of the cocktail card section, which will do for now, and
-     at least it matches food." Offered this query's removal, she left it, so it
-     is kept under #651's rule (a thing nothing reads is only safe while a
-     comment says why): it works, it is tested, and "for now" is not "never".
-     Food has had the same query since #1011 (2026-09-14), where its recipe
-     page's "see shortlist" action does link to it.
+     THE ACTIONS ROW LINKS TO IT. #1000 removed the drink page's see-all link
+     on 2026-09-14, and the same day #1005 put `see shortlist (N)` in the
+     shared actions row (_includes/page-actions.html) on both sites, pointing
+     here; it ends `#results` since #1057. Food has the same query (#1011).
 
      IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
      `enterShortlistView()` plus `resetControls()` is exactly what pressing
