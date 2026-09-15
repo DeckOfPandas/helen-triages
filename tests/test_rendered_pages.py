@@ -1392,6 +1392,12 @@ EXPECTED_ROOT_FILES = {
     "robots.txt",
     "README.md",      # deliberately published; it is the repo's front page
     "LICENSE",
+    # The not-found page. GitHub Pages serves a root 404.html for any URL it
+    # cannot find, project sites included, so the file has to be HERE and not
+    # in a directory -- 404.html's own front matter says why. Added by the
+    # 2026-09-15 design review (#1086); before it, a stale bookmark got
+    # GitHub's own page with no way back to either site.
+    "404.html",
 }
 
 

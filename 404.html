@@ -1,0 +1,61 @@
+---
+layout: default
+title: "404"
+permalink: /404.html
+# GitHub Pages serves the file at the built site's root for any URL it cannot
+# find, on a project site included -- so the permalink is the bare filename,
+# not a directory, and the built file lands beside index.html.
+# tests/test_rendered_pages.py's EXPECTED_ROOT_FILES names it, deliberately.
+#
+# THE SAME THREE KEYS AS about.html, FOR THE SAME REASONS -- read that file's
+# front matter before changing any of them. A missing page belongs to neither
+# site, so the tape says so (wordmark_word), the tab says only the page's own
+# name (site_neutral), and site_key: food is what gives it a stylesheet at all
+# (MANUAL 2.4: a page with no site_key ships as raw unstyled HTML, silently).
+wordmark_word: "404"
+site_neutral: true
+site_key: food
+# jekyll-sitemap must not list an error page.
+sitemap: false
+---
+
+{% comment %} ── THE 404 PAGE. Design review, 2026-09-15, #1086. ─────────────
+  Until this file existed, a stale bookmark or a mistyped URL got GitHub's own
+  404 with no way back to either site; the two renamed reference pages (#383,
+  #384) and the publish gate (a recipe can stop having a URL) make that a real
+  route, not a hypothetical. The page is the shared chrome plus the two doors,
+  and nothing else: the header already carries both site words, so the body
+  only has to say what happened and point at them.
+
+  It shares about.html's shape (.recipe wrapper, .recipe-body-content.about-page
+  for the arrow-marked list) rather than inventing a third longform style. The
+  arrows are .about-ways' own device: "here is where you can go".
+
+  PLACEHOLDER COPY, Helen's to write -- MANUAL 13.12. The sentence and the two
+  link texts are the shape, not the words; the pattern is the bitters caveat
+  (#713) and the units line (#753). A page that ships with a marked placeholder
+  beats a page that does not exist, which is what the 404 was.
+{% endcomment %}
+
+<article class="recipe">
+  <div class="recipe-title">
+    <h1 class="recipe-main-title"><span class="recipe-title-text">404</span></h1>
+  </div>
+
+  <div class="recipe-body-content about-page">
+    <!-- PLACEHOLDER COPY, Helen's to write -->
+    <p>There is nothing at this address. It may have moved, or it may never have been published.</p>
+
+    {% comment %} Literal paths, not a loop over sites.yml: tests/test_page_links.py
+       resolves every href to a literal target and refuses a shape it cannot
+       trace (test_no_link_shape_is_silently_unresolved), which is what keeps a
+       renamed index from leaving a silent do-nothing link here. The header's
+       own loop already proves both homes exist
+       (test_site_nav_links_resolve_to_real_pages); the words are the titles
+       from sites.yml so the two cannot say different names. {% endcomment %}
+    <ul class="about-ways">
+      <li><a href="{{ '/food/' | relative_url }}">{{ site.data.sites.food.title }}</a></li>
+      <li><a href="{{ '/cocktails/' | relative_url }}">{{ site.data.sites.cocktails.title }}</a></li>
+    </ul>
+  </div>
+</article>
