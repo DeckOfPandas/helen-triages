@@ -707,12 +707,16 @@ layout: default
          disappear with it in one script pass (`control.hidden = false` in
          cocktail-scale.js) rather than needing a second reveal to keep in step.
 
-         REAL GLYPHS, NOT LETTERS OR WORDS, same rule as the `×` mark below: a
-         hyphen is too short and sits too high for a minus, so this is U+2212
-         MINUS SIGN, not `-`. The control stays wordless — Helen's brief for
-         the box itself was "no other text at all", and a button that spelled
-         out "fewer" or "more" would be the target-ml box's five words of
-         furniture again, just split two ways.
+         REAL GLYPHS, NOT LETTERS: a hyphen is too short and sits too high for
+         a minus, so this is U+2212 MINUS SIGN, not `-`. THE BUTTONS stay
+         wordless — Helen's brief for the box itself was "no other text at
+         all", and a button that spelled out "fewer" or "more" would be the
+         target-ml box's five words of furniture again, just split two ways.
+
+         THE MARK BETWEEN THEM IS A WORD SINCE 2026-09-15 (#1086, "C: word
+         after the box") and this rule did not change with it. A unit after a
+         figure is what the `×` already was; a VERB on a button is the thing
+         "no other text at all" was refusing, and there is still none.
 
          EACH CLICK GOES THROUGH `apply()`, THE SAME FUNCTION A TYPED VALUE
          REACHES — cocktail-scale.js wires `click` to `apply(last ± 1)`, never
@@ -736,11 +740,32 @@ layout: default
            more — puts a phone's plain number pad up, which is now exactly the
            set of characters this box accepts. {% endcomment %}
         <input type="text" value="1" inputmode="numeric" class="cocktail-scale-multiple" aria-label="make this many times the recipe">
-        {% comment %} A MULTIPLICATION SIGN, not the letter x and not a word.
-           `aria-hidden` because "times" read out after the number is the one
-           thing the input's own label already says, and a screen reader hearing
-           "2 multiplication sign" gains nothing. {% endcomment %}
-        <span class="cocktail-scale-mark" aria-hidden="true">×</span>
+        {% comment %} A WORD AFTER THE BOX, NOT A MULTIPLICATION SIGN -- #1086,
+           2026-09-15. Helen, picking C from the scaler candidates page:
+           "C: word after the box". The control read `− [1] × +`; it now reads
+           `− [1] drinks +`, which says what the number counts instead of
+           leaving the reader to infer it from the list above.
+
+           THE WORD IS PLACEHOLDER COPY AND THE SIGN WAS NOT, which is the whole
+           difference between this round and the four before it. `×` was a
+           TYPOGRAPHIC choice an agent could make (U+00D7 against the letter x,
+           the same call as the `−` on the button above); "drinks" is a word in
+           Helen's voice, and §13.12 says the voice is hers. So it ships marked,
+           the way the bitters caveat (#713) and the units line (#753) did, and
+           she renames it in one place.
+
+           `aria-hidden` STAYS, and for the same reason it was there for the
+           sign: the input's own `aria-label` already says "make this many times
+           the recipe", so a screen reader reaching this span would hear the
+           count named twice. The word is a caption for the eye.
+
+           SHIPPED AS MARKUP, NOT `content:` ON A PSEUDO-ELEMENT. Copy that only
+           exists in a stylesheet cannot be found by anyone looking for the
+           string, cannot be selected or translated, and is reached by a
+           screen reader in some browsers and not others. The element was
+           already here; only what is inside it changed. {% endcomment %}
+        <!-- PLACEHOLDER COPY, Helen's to write -->
+        <span class="cocktail-scale-mark" aria-hidden="true">drinks</span>
       </label>
       <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
     </div>

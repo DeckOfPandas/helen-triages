@@ -137,7 +137,35 @@
 </head>
 <body>
 
-  <header class="site-header">
+  {% comment %} TWO WHOLE TAGS RATHER THAN A LIQUID TAG INSIDE ONE class=""
+     ATTRIBUTE, AND THAT IS LOAD-BEARING, NOT A STYLE CHOICE.
+     test_every_chrome_class_has_a_rule_in_every_site_stylesheet reads the
+     chrome's class attributes out of this file with
+     `class=['"]([^'"{}]+)['"]` -- a pattern that deliberately refuses braces,
+     so ONE Liquid conditional inside a class attribute makes the whole
+     attribute invisible to it. Written the obvious way (a conditional wrapping
+     just the second class name), `site-header` would have dropped out of the
+     set of classes that test checks and `site-neutral` would never have
+     entered it: the test would go on passing while covering less. Spelled
+     as two literal tags, both classes are scanned and both must be styled on
+     both sites, which is the point of that test.
+
+     WHAT THE CLASS IS FOR: /about/ belongs to no site (§13.8), so its nav row
+     renders BOTH doors where every other page renders one. That row is placed
+     in column 3 of a `1fr auto 1fr` grid, and two doors are wider than that
+     column at every viewport width -- so on the one page that has two, the row
+     wrapped onto a second line. This hook lets shared/_layout.scss give the row
+     the full width on that page alone.
+
+     THE WHITESPACE MARKERS KEEP EVERY OTHER PAGE BYTE-IDENTICAL. `-%}` on the
+     endcomment eats its own newline and the next line's indent, and neither
+     branch below carries an indent of its own -- so the two spaces in front of
+     this comment's own opening tag up there are what indents the header tag,
+     and a page that is not site_neutral renders exactly the bytes it rendered
+     before this comment existed. Verified by diffing the built /food/ and
+     /cocktails/ against a build of the previous template, not by reading the
+     markers. {% endcomment -%}
+{%- if page.site_neutral %}<header class="site-header site-neutral">{% else %}<header class="site-header">{% endif %}
   {% comment %} ── ONE HEADER, NOT TWO THAT MATCH ──────────────────────────────
      Issue #374, Helen 2026-08-19: "Literally the same code and assets."
 
@@ -263,7 +291,38 @@
       {% endif %}
       {% endfor %}
     </nav>
+    {%- comment %} NOT EMITTED ON THE PAGE IT POINTS AT -- #1086, 2026-09-15.
+       Helen, picking C from the about-header candidates page: "C: doors on one
+       line, no ??". /about/ is the one site_neutral page, so it is the one page
+       whose row carries both doors; C gives that row the full width (see
+       `.site-neutral .site-nav-icons` in shared/_layout.scss) and drops the `??`
+       from it, which on that page was a link to the page you are already on.
+
+       `unless`, NOT `hidden` AND NOT `display: none`. A hidden element is still
+       in the tab order in the first case and still announced by some tooling in
+       neither -- so a keyboard reaching the about page would still stop on a
+       link back to it. The only way for it not to be reachable is for it not to
+       be there.
+
+       IT IS ON EVERY OTHER PAGE, unchanged, at the LEFT end of the row's line
+       (the row's own comment above has why it sits there rather than beside the
+       arrow). This is not the link becoming conditional in general; it is the
+       one page that IS the destination not offering itself.
+
+       test_the_header_and_footer_are_identical_on_every_page is unaffected and
+       it is worth saying why rather than leaving it to be rediscovered: that
+       test compares `<nav class="site-nav-icons">...</nav>`, and this link is a
+       SIBLING of that nav, not a child. It also compares pages of one site, and
+       /about/ is of neither.
+
+       THE WHITESPACE MARKERS ARE THE SAME TRICK THE HEADER TAG USES, for the
+       same reason: every page except /about/ must render the bytes it rendered
+       before. The opening marker eats the newline and indent after `</nav>`;
+       the tag below restores them, and the closing one eats the newline this
+       block would otherwise add. {% endcomment -%}
+{%- unless page.site_neutral %}
     <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
+    {%- endunless %}
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>

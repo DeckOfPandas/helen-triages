@@ -5078,6 +5078,124 @@ verification. Dates are when the correction landed.
     a lone shared tag never outranks a shared ingredient at the same score.
     Built as two extra digits in the Liquid sort key and the same key in
     `scripts/related_recipes.py`.
+- **2026-09-15, #1086 (design review) — four candidates pages, four picks.**
+  Each question went up as two to five treatments on the real page with the real
+  compiled CSS, per §13.11, and Helen chose by looking. Her words, and what each
+  one cost:
+  - **The phone header: "B: mark at two thirds."** `.site-header` was 211.5px on
+    a 390px screen — a quarter of the phone spent on chrome before the first
+    card. A shrank the type alone, B shrank the whole lockup and halved the gap
+    under it, C moved the nav row up beside the wordmark. B measured 169px on
+    the candidates page and 168.4px built, identically on `/food/`,
+    `/food/recipes/pineapple-ginger-spatchcock-chicken/` and `/cocktails/`;
+    1280px is untouched at 195.5px. **`@media (max-width: 600px)`, and
+    `$header-stack-width` (820px) was the alternative.** They answer different
+    questions: 820px is where the wordmark and the nav stop fitting on one line,
+    which is a LAYOUT limit, and a tablet at 700px has the stacked header with
+    plenty of room for it. This is a SIZE judgement about phones. 600px is also
+    the width the candidates were built and judged at, so it is the number her
+    eye actually ruled on, and the file already had it (the footer's own block).
+    **The three sizes became named variables so the ratio is the thing in the
+    file**: `$wordmark-top-size`, `$wordmark-word-size`, `$wordmark-tape-height`
+    and `$wordmark-phone-scale` in `_sass/shared/_layout.scss`, because
+    "1.33rem" in a media query is a number nobody can check against a 2rem three
+    hundred lines up. The factor is written `0.6667` rather than `2/3`: `/` is
+    division-deprecated in Dart Sass and an `@import`-ed partial cannot carry a
+    `@use "sass:math"`. That is two thirds to within a third of a device pixel
+    on the largest of the three (46.669px against the candidate's 47px).
+    **Each row's `font-size` moves and nothing is `transform: scale()`d** —
+    §13.8's grid takes the width of whichever row is naturally wider, and a
+    transform paints smaller while reporting the old box. The `[ COCKTAILS ]`
+    tape is the wide one and drags nothing sideways: `shoot.sh` reports no
+    OVERFLOW at 360 or 390 on either site. **The nav row's own top margin went
+    0.9rem → 0.45rem, which is a HALF and not the two thirds**, because the gap
+    and the mark were two separate halves of her sentence; that offset is
+    eyeballed against the tape's bottom ink line by standing instruction, and it
+    was re-eyeballed at 390px rather than derived.
+  - **The cocktail active filter chip: "B: filled block."** A chosen chip wore a
+    0.22em underline in its section's hue (#548, 2026-09-03); food's wears a
+    filled shape in its section's hue with near-black text. Shown both sites
+    side by side she took food's, so `.is-on` is now the page's own dark
+    (`$color-bg`) on a `background` in `$color-heading-yolo` / `-mood` /
+    `-hassle`, with the faux-bold stroke flipped to the letter's colour. **#548's
+    objection to filling the box does not carry over**: it rejected an inset
+    shadow because "the band ran the full hit area" when a band is meant to hug
+    the word — a block is supposed to run the full hit area, so the 0.75rem of
+    padding stops being a defect and becomes the block's margin. **Paint only,
+    per §13.4.2 and #389**: measured on the built page, a selected chip is
+    105.45 × 26.88 with padding 4.8px 12px, font-size 14.4px and letter-spacing
+    0.144px — its resting metrics exactly, so nothing to its right moves.
+    **And the guard was widened rather than remembered**:
+    `test_no_active_filter_button_changes_its_own_width` read `food.css` alone
+    for six weeks, so cocktails' half of the rule was held by a comment in
+    `_sass/cocktails/_cocktail.scss` saying the test did not reach it. It now
+    scans both stylesheets, `.active` on food and `.is-on` on cocktails.
+    **THE FIRST VERSION OF THAT WIDENING WAS GREEN AND NEARLY BLIND, AND THAT IS
+    THE PART WORTH KEEPING.** It copied food's shape —
+    `\.btn-(?:mood|chaos)[^,{]*\.is-on`, button class then chosen class — and on
+    cocktails that order is wrong. Food authors each rule as
+    `.category--star .btn-star.active`, which Sass emits unchanged; cocktails
+    writes `&.is-on` nested inside a PLACEHOLDER, and `@extend` substitutes the
+    extender into the placeholder's slot, so the compiled selector is
+    `.is-on.btn-chaos` — chosen class FIRST. The pattern therefore missed the one
+    rule carrying the entire active state, while still matching the three
+    per-section `background` rules, so the "a scan that matches nothing passes
+    while checking nothing" assertion was satisfied and the test looked alive.
+    It also matched `.btn-mood:hover:not(.is-on)` — literally the rule for a
+    button that is NOT chosen. Found by printing what the scan actually matched
+    instead of trusting that it matched something, and fixed by splitting the
+    selector list on commas, stripping `:not(...)`, and asking for both classes
+    in either order. Then proved: a `padding` added to the `.is-on` block on
+    purpose made the test name that exact reversed-order selector, and it was
+    taken out again. **A guard copied from a working one is not a working guard
+    until something has been broken in front of it.** A
+    consequence worth knowing: `.drink-name-hit`'s 0.22em was chosen by matching
+    this chip's band, and the band is gone — the number stays as that mark's own,
+    and its comment now says so instead of pointing at something that no longer
+    exists.
+  - **The about page header: "C: doors on one line, no ??."** `/about/` is the
+    one `site_neutral` page, so its nav row emits BOTH doors where every other
+    page emits one; two doors measured 267.9px against a ~264px column 3, four
+    pixels over, and `flex-wrap: wrap` — there precisely so nothing overflows —
+    dropped the second onto its own line. `.site-neutral .site-nav-icons` takes
+    `grid-column: 1 / -1` on that page only; the row still ends on the cards'
+    right edge at x=1066, and the header came down 235.1px → 189px. The `??` is
+    not emitted there at all rather than hidden, because a hidden element is
+    still in the tab order and the link pointed at the page you were already on.
+    **On a phone nothing changed and that was checked, not assumed**: the `??` is
+    a grid sibling rather than a flex child, so removing it never made the row
+    narrower, and the two doors were already on one line — 268.6px in the 312px a
+    360px viewport gives them. **The class is emitted as two whole `<header>`
+    tags**, because `test_every_chrome_class_has_a_rule_in_every_site_stylesheet`
+    scans class attributes with a pattern that refuses braces: one Liquid
+    conditional inside the attribute and `site-header` would have dropped out of
+    the set that test checks while it went on passing. `/food/` and `/cocktails/`
+    build byte-identical apart from the stylesheet cache-buster, diffed against a
+    build of the previous template rather than reasoned about.
+  - **The cocktail scaler: "C: word after the box."** `− [1] × +` became
+    `− [1] drinks +`. **The word is PLACEHOLDER COPY and the `×` was not**, which
+    is the whole difference from the four rounds before it: `×` (U+00D7, against
+    the letter x) was a typographic call an agent could make, and a word is
+    voice, which §13.12 says is Helen's. So it ships marked with the layouts'
+    own `<!-- PLACEHOLDER COPY, Helen's to write -->` and she renames it in one
+    place. Shipped as markup rather than CSS `content:`, so the string can be
+    found, selected and translated. The element and its `aria-hidden` are
+    unchanged — the input's `aria-label` already says "make this many times the
+    recipe", so the span would only name the count twice. `.cocktail-scale-mark`
+    came from 0.95rem to the label's own 0.78rem / 0.08em: 0.95rem was chosen to
+    make ONE small high-sitting glyph hold its own beside a figure, and a word at
+    that size read as a second louder label. The control is 149.2 × 23.8 at 390
+    and at 1280, one line, no wrap.
+  **A recorded inconsistency rather than one left to be found.**
+  `assets/js/cocktail-scale.js` composes its own strings with a literal `×` —
+  the refusal note ("can't go below ×1 (82.5 ml)") and the batch line ("×3:
+  roughly £12.00–£18.00…"). Those are COPY, they are asserted on by
+  `tests/js/cocktail-scale.test.js`, and they are untouched. So the control now
+  says "drinks" while its own messages say "×". That is deliberate for today —
+  the mark was a design pick and the sentences are voice — and it is the kind of
+  drift that reads as an oversight in three months, so it is written down here.
+  Rewording them is Helen's, and it is the same one-word decision as the
+  placeholder above.
 
 ## §14 Reference pages
 

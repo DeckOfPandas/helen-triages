@@ -993,11 +993,16 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // nobody was measuring.
 //
 // NO LABEL, NO LEGEND, NO TOTAL. The control sits immediately after the
-// amounts it multiplies, and a number box with a `×` beside it directly under a
-// list of quantities does not need a sentence — that is the whole reason it had
-// to move below the list rather than being shortened where it was. The
-// `aria-label` on the input carries the sentence for anyone who cannot see the
-// arrangement.
+// amounts it multiplies, and a number box directly under a list of quantities
+// does not need a sentence — that is the whole reason it had to move below the
+// list rather than being shortened where it was. The `aria-label` on the input
+// carries the sentence for anyone who cannot see the arrangement.
+//
+// ONE WORD IS NOT A LABEL, and since 2026-09-15 (#1086) there is one: the mark
+// after the box reads "drinks" rather than `×`. That is a UNIT after a figure,
+// the same job the `×` was doing, and it is still inside the control rather
+// than announcing it from above — which is what "no label, no legend" has
+// always meant here. A sentence would still be a sentence.
 .cocktail-scale {
   @extend %cocktail-heading-face;
   display: inline-flex;
@@ -1031,14 +1036,35 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   }
 }
 
-// THE MARK. `×` — U+00D7, the multiplication sign, not a lowercase x, which is
-// a letter and sets like one beside a figure. It is the only thing on the page
-// that says what the box does, so it takes the ink colour rather than the
-// control grey: the box is a control, the mark is a unit.
+// THE MARK, WHICH IS A WORD NOW -- #1086, 2026-09-15, Helen: "C: word after the
+// box". It held `×` (U+00D7, the multiplication sign, not a lowercase x, which
+// is a letter and sets like one beside a figure) from #731 until then. Either
+// way it is the only thing on the page that says what the box does, so it takes
+// the ink colour rather than the control grey: the box is a control, the mark is
+// a unit. The word itself is PLACEHOLDER COPY -- see the layout, where it is
+// marked as such.
+//
+// THE SIZE CAME DOWN TO THE LABEL'S OWN, 0.95rem -> 0.78rem, AND THAT IS NOT A
+// TIDY-UP. 0.95rem was chosen for a single glyph: `×` is small, sits high, and
+// had to hold its own beside a figure, so it was set LARGER than the control
+// around it. A word has no such problem -- it is six characters of the same
+// face as the rest of the line, and left at 0.95rem it read as a second,
+// louder label rather than a unit after a number. `.cocktail-scale`'s own
+// `font-size: 0.78rem` and `letter-spacing: 0.08em` are what the line is set
+// in, so the word joins them.
+//
+// `letter-spacing` IS THE ONE THING THAT DOES NOT SIMPLY INHERIT. The parent
+// sets 0.08em and this rule used to cancel it to `normal`, because tracking
+// applied to a single `×` is a trailing gap and nothing else. A word wants the
+// tracking -- it is what makes it sit as lettering rather than as type -- so
+// the cancellation goes and the value is restated at the value it inherits,
+// which is deliberate: the input beside it cancels tracking for its own
+// reasons (digits), and leaving this implicit would read as the same
+// cancellation having been forgotten.
 .cocktail-scale-mark {
   color: $color-text;
-  font-size: 0.95rem;
-  letter-spacing: normal;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
 }
 
 // THE STEP BUTTONS — #731, Helen's sketch: "-  [1] x  +". `−` and `+` either
@@ -1056,9 +1082,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // change its own footprint, because whatever sits beside it has nowhere to go
 // when it does. So the border is declared transparent at rest rather than
 // absent, and only its colour moves on `:focus-visible`; hover changes colour
-// alone. `test_no_active_filter_button_changes_its_own_width` reads
-// food.css's own button classes and does not reach this selector, so this is
-// enforced by construction here rather than by that guard.
+// alone. `test_no_active_filter_button_changes_its_own_width` reads both
+// sites' FILTER-button classes (food's `.active`, cocktails' `.is-on` -- it
+// gained the second on 2026-09-15, #1086) and still does not reach this
+// selector, which is a scale control rather than a filter, so this is enforced
+// by construction here rather than by that guard.
 //
 // SAME HEIGHT AS THE INPUT, BY CONSTRUCTION. `%cocktail-number-input` sets no
 // explicit height either — both boxes are the same font-size, the same

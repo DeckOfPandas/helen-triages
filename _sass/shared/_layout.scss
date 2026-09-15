@@ -178,12 +178,69 @@ main {
   // would be. `flex-wrap: wrap` lets the second group drop to a line of its
   // own instead of forcing the row wider than the page. `justify-content:
   // flex-end` (since 2026-09-11; `center` while the row was centred) hangs a
-  // wrapped line from the right edge, like the row itself -- on /about/ the
-  // two groups are 340px, wider than column 3 at desktop width too, so they
-  // wrap there as well as on a phone. Harmless everywhere else: one group
-  // never has reason to wrap.
+  // wrapped line from the right edge, like the row itself. Harmless everywhere
+  // else: one group never has reason to wrap.
+  //
+  // AND ON /about/ IT NO LONGER FIRES, SINCE 2026-09-15 (#1086). This comment
+  // used to end "on /about/ the two groups are 340px, wider than column 3 at
+  // desktop width too, so they wrap there as well as on a phone" -- which was
+  // the wrap doing its job and the about page alone wearing a two-line nav.
+  // Helen chose "C: doors on one line, no ??", so `.site-neutral
+  // .site-nav-icons` below gives that page the full header width and sets
+  // `nowrap` explicitly. The 340px is stale as well: the icon left the row on
+  // 2026-09-14 (#1007) and the two groups measure 268.6px now.
+  //
+  // THIS DECLARATION STAYS, and not only for the pages that still use it. It is
+  // the reason nothing here can ever overflow rather than a layout choice, so
+  // it remains the base and the about page overrides it -- which is the right
+  // way round: a new site_neutral page, or a third site, gets the safe
+  // behaviour by default and has to ask for the other one.
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+// =============================================================================
+// THE ABOUT PAGE'S ROW GETS THE WHOLE WIDTH — #1086, 2026-09-15
+// =============================================================================
+// Helen, picking C from the about-header candidates page: "C: doors on one line,
+// no ??". Two halves, and the other half is in _layouts/default.html, which
+// stops emitting the `??` on this page (it pointed at the page you were on) and
+// puts `.site-neutral` on the header so this rule has something to hang off.
+//
+// THE PROBLEM IS ARITHMETIC, NOT TASTE, which is why it shows up on exactly one
+// page. `.site-header-inner` is `1fr auto 1fr`: the wordmark takes the middle
+// track and the two side tracks split what is left. On food at 1280 that leaves
+// each side track about 264px. Every ordinary page puts ONE door in the row
+// (the site you are not on), which fits; /about/ belongs to no site (§13.8), so
+// its loop emits BOTH, and two doors plus the 1.6rem between them measured
+// 267.9px. Four pixels over, so `flex-wrap: wrap` -- which is there precisely so
+// this overflows nothing -- dropped the second door onto a line of its own, and
+// the about page alone wore a two-line nav.
+//
+// `grid-column: 1 / -1` IS THE FIX AND IT COSTS THE OTHER TRACKS NOTHING. The
+// row is `justify-self: end`, so it still ends exactly where column 3 ended --
+// on the cards' right edge (#965) -- and it is the only thing in row 2 on this
+// page now that `??` is gone, so spanning all three tracks takes room from
+// nobody. On every other page this selector does not match and the row stays in
+// column 3.
+//
+// `flex-wrap: nowrap` IS THE INSTRUCTION, NOT AN OPTIMISATION: with the width
+// available the row would no longer wrap at 1280 anyway, but "both doors on one
+// line" is what was chosen, and saying it means the row cannot quietly go back
+// to two lines at some width nobody screenshotted.
+//
+// SAFE ON A PHONE, MEASURED RATHER THAN ASSUMED, because `nowrap` is the one
+// declaration here that could overflow. Below $header-stack-width the header is
+// one column, so the row already has the full width; the two doors measure
+// 268.6px, and the narrowest viewport this site is checked at (360px) gives them
+// 312px. They were already on one line there -- the `??` is a grid sibling, not
+// a flex child, so removing it never made this row narrower -- which is why the
+// candidates page showed no change on a phone. `shoot.sh` reports OVERFLOW at
+// 360 and 390 if that ever stops being true.
+.site-neutral .site-nav-icons {
+  grid-column: 1 / -1;
+  justify-self: end;
+  flex-wrap: nowrap;
 }
 
 // The row's own word and arrow. Courier in the site's own bracket device --
@@ -726,6 +783,31 @@ main {
 // is already just this one number changing.
 $tape-protrusion: 0.2rem;
 
+// THE WORDMARK'S THREE SIZES, NAMED SO THE PHONE CAN BE DERIVED FROM THEM
+// RATHER THAN RE-TYPED -- 2026-09-15, #1086. All three were literals sitting in
+// the three rules below, which was fine while there was one size; it stopped
+// being fine the moment a second size had to be two thirds of the first, because
+// "1.33rem" in a media query is a number nobody can check against "2rem" three
+// hundred lines up. They are here rather than in shared/_tokens.scss for the
+// same reason $tape-protrusion above is: they are facts about this one lockup,
+// not values any other component may reach for.
+//
+// THE RATIO IS THE DECISION, NOT THE RESULTS. Helen, 2026-09-15, picking B from
+// the phone-header candidates page: "B: mark at two thirds". So the phone block
+// at the bottom of this file multiplies each of these by the factor, and the
+// three rendered sizes (1.33rem, 1.67rem, 46.7px) are consequences -- change the
+// factor and all three move together, which is what "two thirds" means.
+//
+// 0.6667 RATHER THAN 2/3, deliberately: `/` is division-deprecated in Dart Sass
+// and this file is loaded through @import, so it cannot carry a `@use
+// "sass:math"`. Four places is 2/3 to within a third of a device pixel on the
+// largest of the three (46.669px against the candidates page's own 47px), which
+// is below anything a screen can draw.
+$wordmark-top-size:    2rem;     // HELEN TRIAGES
+$wordmark-word-size:   2.5rem;   // the ceiling for [ FOOD ] / [ COCKTAILS ]
+$wordmark-tape-height: 70px;     // the black tape behind the word
+$wordmark-phone-scale: 0.6667;   // two thirds, below 600px
+
 // The CORE (what .tape-bg's protrusion is measured from) is whichever of the
 // two rows is naturally wider, not always HELEN TRIAGES. Both
 // .site-logo-top and .site-logo-tape report their own natural width to the
@@ -749,7 +831,7 @@ $tape-protrusion: 0.2rem;
                       // it's the text now driving the width, so the cap moved
                       // to the text
   font-family: $font-headings;
-  font-size: 2rem;
+  font-size: $wordmark-top-size;
   font-weight: 1000;
   letter-spacing: 0.18em;
   // Cancels the trailing letter-spacing gap `letter-spacing` adds after the
@@ -857,7 +939,7 @@ $tape-protrusion: 0.2rem;
   justify-content: center;
   transform: rotate(-1.75deg);
   transform-origin: center center;
-  height: 70px;
+  height: $wordmark-tape-height;
   margin-top: -$space-lg;  // pull it up toward HELEN TRIAGES
 
   .tape-bg {
@@ -904,7 +986,7 @@ $tape-protrusion: 0.2rem;
   // the template (default.html), brackets counted. `[ FOOD ]` is 8 characters
   // and the formula gives 2.5rem for it down to about 250px, so food's
   // wordmark does not move on any phone that exists.
-  font-size: min(2.5rem, calc(92vw / (var(--wordmark-chars, 13) * 0.78 + 2.8)));
+  font-size: min($wordmark-word-size, calc(92vw / (var(--wordmark-chars, 13) * 0.78 + 2.8)));
   font-weight: 1000;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1103,6 +1185,91 @@ $tape-protrusion: 0.2rem;
 
   .site-about-link {
     grid-column: 1;
+  }
+
+}
+
+// =============================================================================
+// THE MARK AT TWO THIRDS ON A PHONE — #1086, 2026-09-15
+// =============================================================================
+// Helen, picking B from the phone-header candidates page: "B: mark at two
+// thirds". The header was 211.5px on a 390px screen, which is a quarter of the
+// phone spent on chrome before a single recipe title; at two thirds it is
+// 168.4px (169px on the candidates page, which rounded the three sizes rather
+// than deriving them). Three candidates were built on the real
+// header (A shrank the type alone, B shrank the whole lockup and halved the gap
+// under it, C moved the row beside the wordmark); she looked and chose B.
+//
+// 600px, NOT $header-stack-width (820px), AND THE DIFFERENCE IS THE POINT. The
+// two questions are genuinely different. 820px is "the wordmark and the nav no
+// longer fit on one line", which is a LAYOUT limit and where the header stacks.
+// This is "the stacked header is eating a phone", which is a SIZE judgement, and
+// a tablet at 700px has the stacked layout and plenty of room for it -- shrinking
+// the mark there would be fixing a problem that viewport does not have. 600px is
+// also the number the candidates were built and picked at, so it is the width
+// Helen's eye actually ruled on, and it is already in this file (the footer
+// block below) rather than being a third breakpoint arriving.
+//
+// AFTER THE $header-stack-width BLOCK, NOT INSIDE IT. Every rule here overrides
+// one set up there at the same specificity, so source order is what decides --
+// `gap` in particular. Moving this block above that one silently reverts the
+// gap on every phone.
+//
+// EACH ROW'S font-size MOVES; NOTHING IS `transform: scale()`d. §13.8: .site-logo
+// is an inline-grid whose single `max-content` column takes the width of
+// whichever row is naturally wider, so both rows must go on reporting their own
+// natural width. A transform paints smaller and reports the UNSCALED box, so
+// the column -- and with it the tape, whose width derives from it -- would stay
+// sized for a wordmark half as big again as the one actually drawn on it.
+@media (max-width: 600px) {
+
+  // HELEN TRIAGES and the tape, each two thirds of the size it is above 600px.
+  // The derivation is up at $wordmark-phone-scale; these read as multiplications
+  // so that the ratio stays checkable against the wide values.
+  .site-logo-top {
+    font-size: $wordmark-top-size * $wordmark-phone-scale;
+  }
+
+  // ONLY THE CEILING SCALES. The second term is #899's guard -- the size at which
+  // `[ COCKTAILS ]` still fits 92vw -- and it is a fact about the viewport, not
+  // about the mark's size, so it is untouched. min() keeps picking whichever is
+  // smaller, exactly as before; all that changes is that the ceiling it is being
+  // compared against is now the phone's. On a 390px screen the guard gives
+  // ~2.32rem for 13 characters, so the ceiling is what bites and the word lands
+  // at two thirds like its neighbours; the guard still catches a longer word.
+  .site-logo-word {
+    font-size: min(
+      $wordmark-word-size * $wordmark-phone-scale,
+      calc(92vw / (var(--wordmark-chars, 13) * 0.78 + 2.8))
+    );
+  }
+
+  // The tape is sized to the lettering (§13.8), so its height takes the same
+  // factor, and so does the negative margin that pulls it up under HELEN
+  // TRIAGES -- that lift is a proportion of the lockup, not a fixed gap.
+  .site-logo-tape {
+    height: $wordmark-tape-height * $wordmark-phone-scale;
+    margin-top: -$space-lg * $wordmark-phone-scale;
+  }
+
+  // AND THE GAP UNDER THE MARK IS HALVED, WHICH IS A SECOND NUMBER AND NOT THE
+  // SAME ONE. Helen's phrase was "mark at two thirds, gap under them halved":
+  // the lockup shrinks by a third, the air under it by a half. $space-sm is
+  // exactly half $space-lg, so the tokens say the halving themselves.
+  .site-header-inner {
+    gap: $space-sm;
+  }
+
+  // The nav row's own top margin is the other half of that gap. 0.45rem is the
+  // 0.9rem above it halved -- written out rather than derived on purpose: the
+  // rule up at .site-nav-icons says in so many words that this offset is
+  // eyeballed against the tape's bottom ink line and must be re-eyeballed by
+  // hand if the tape's height changes, which is exactly what has just happened
+  // here. It was re-eyeballed on the candidates page at 390px, and 0.45rem is
+  // what Helen picked; it is not 0.9rem times two thirds and should not become
+  // it.
+  .site-nav-icons {
+    margin-top: 0.45rem;
   }
 
 }

@@ -388,12 +388,27 @@ cap line while the line box keeps the descender depth under it, so
 line (2026-09-14). That number is measured, and the rule says how to re-measure
 it — **crop the whole LINK and read the ink bands in that ONE image**, because
 an element screenshot pads its box by about a pixel and cropping the word and
-the icon separately makes that padding most of the answer. A `site_neutral` page (about) shows
-every site, wrapped into right-aligned lines where there is no room. **It sits
-at the RIGHT-HAND end of the header's second row and the `??` about link (a
-literal `/about/`) at the LEFT end, both on the cards' edges, at every width**
-(2026-09-11, #965 and Helen's desktop ruling the same afternoon; it was centred
-under the wordmark for one day). **`.site-header-inner` is the CARDS' width**,
+the icon separately makes that padding most of the answer. A `site_neutral`
+page (about) shows every site. **It sits at the RIGHT-HAND end of the header's
+second row and the `??` about link (a literal `/about/`) at the LEFT end, both
+on the cards' edges, at every width** (2026-09-11, #965 and Helen's desktop
+ruling the same afternoon; it was centred under the wordmark for one day) —
+**on every page except /about/, which is the exception below.**
+
+**/about/ IS THE ONE PAGE WITH TWO DOORS, AND SINCE 2026-09-15 IT IS LAID OUT
+FOR THEM** (#1086, Helen: *"C: doors on one line, no ??"*). Two doors measure
+267.9px against a ~264px column 3, so the row's own `flex-wrap: wrap` — which
+is there so nothing can ever overflow — used to drop the second onto a line of
+its own, and the about page alone wore a two-line nav. `.site-neutral
+.site-nav-icons` now spans all three tracks on that page and sets `nowrap`
+explicitly; the row still ends on the cards' right edge. **And the `??` is not
+emitted there at all** — not hidden: a hidden element is still in the tab
+order, and on /about/ that link points at the page you are already on. So that
+one page has no `??` and its row is not in column 3; every other page is
+exactly as the paragraph above describes. Nothing changed on a phone, where the
+two doors already shared one line (268.6px in the 312px a 360px viewport
+gives them) — the `??` is a grid SIBLING of the row, not a flex child, so
+removing it never made the row narrower. **`.site-header-inner` is the CARDS' width**,
 `$width-content` minus `main`'s padding — `main`'s 900px includes its padding,
 so a 900px header sat 24px outside the cards over 948px. Once the header stacks
 (`$header-stack-width`, 820px) the two share its one column. So the row varies by
@@ -2095,10 +2110,17 @@ promise the card already keeps** — nothing was assigned by taste alone. **The
 index headings are a ramp, one bar each**: reposado → coral → hot pink →
 cosmopolitan → yvette, top to bottom, single solid bar, weight 400 (bold
 light-on-dark stems bloom). **The section's colour reaches the card**: a
-chosen filter word underlines in its section's colour, a matched mood chip
-lights coral, a matched hassle chip hot pink, a matched ingredient
+chosen filter word becomes a FILLED BLOCK in its section's colour, a matched
+mood chip lights coral, a matched hassle chip hot pink, a matched ingredient
 cosmopolitan, the title hit yvette; a matched chip keeps its section colour
 (never white) and moves to the FRONT of the row in the DOM (#756, #757).
+**The chosen chip was an underline until 2026-09-15** (#548's band, 0.22em in
+the section hue); Helen, shown the two sites' active states side by side,
+took food's — *"B: filled block"* (#1086). The letter drops to the page's own
+ground (`$color-bg`) and the faux-bold stroke goes with it, so the word reads
+as punched out of the block. The three heading variables did not move; only
+their job did, from `text-decoration-color` to `background`. Paint only —
+§13.4.2.
 **Magenta means "this one" on hover, and it is the only thing hover changes**:
 nothing moves, nothing resizes; a chip moves its box, a bare word its text;
 `:hover` and `.is-on` are the same specificity so hover carries `:not(.is-on)`.
@@ -2250,8 +2272,14 @@ weight 400, absinthe over yvette (NOTES over lagoon); ingredient names carry
 no underline (they looked like links). **`make it`** (`cocktail-make.js`, a
 three-part toggle) is one class, `is-making`; nothing leaves the DOM; SHIP IT?,
 the tagline and the chips are read-mode only; **print is the FULL page**,
-forced by `_print.scss`. **The scaler is one box and a `×` under the
-ingredients list**, **whole recipes only** (integer multiples, clamped at ×1
+forced by `_print.scss`. **The scaler is one box and a word under the
+ingredients list** — `− [1] drinks +` since 2026-09-15 (#1086, Helen: *"C:
+word after the box"*); it read `×` from #731 until then, and **the word is
+PLACEHOLDER copy, hers to rename** (§13.12), where the multiplication sign
+was a typographic call. `cocktail-scale.js` still writes a literal `×` in
+its refusal note and its batch line, which are copy and were left alone —
+so the control and its own messages deliberately disagree for now.
+**Whole recipes only** (integer multiples, clamped at ×1
 — every written amount is on the 2.5 ml grid, so nothing ever needs
 rounding); counts multiply and re-pluralise, `to top` / `to rinse` pass
 through; the floor is a REFUSAL naming the ingredient; ONE parser
@@ -2990,7 +3018,14 @@ measure the box at the width in question, which is what found it.
 
 **You will check one element's width and call the row safe.** Overflow is a
 property of the ROW; three sub-320px tracks side by side overflow a phone.
-The site has media queries (three, counting print).
+Measure the row, at the width in question, with `shoot.sh` — it reports
+OVERFLOW against the viewport, which is the only answer that settles it.
+(This line used to end "the site has media queries (three, counting print)",
+which stopped being true long before anyone noticed: there are around thirty
+`@media` blocks across `_sass/` at ten distinct breakpoints. Counting them was
+never the point — reaching for a media query as the fix for a row that
+overflows is usually the wrong move, because the row overflows at every width
+and a breakpoint only hides it below one.)
 
 **You will assume DOM order decides what paints on top.** It decides only
 among peers at the same level; `position` or `transform` promotes an element
@@ -3120,10 +3155,14 @@ Courier Prime ships only Regular and Bold, so `font-weight: 900` is already
 Bold and a same-colour stroke is the only way to get "heavier than bold" —
 which is what an active filter button needs. They set `text-shadow: none`
 explicitly: the punched treatment means "landmark" everywhere else. **An
-active filter rule may change colour, `.tag-shape` fill and stroke, and
+active filter rule may change colour, a fill (`.tag-shape` on food, a
+`background` on cocktails since #1086) and stroke, and
 nothing that changes a box's size** (#389 — letter-spacing on the active
 state shifted every tag to its right);
-`test_no_active_filter_button_changes_its_own_width` reads the compiled CSS.
+`test_no_active_filter_button_changes_its_own_width` reads BOTH sites'
+compiled CSS — food's `.active` and cocktails' `.is-on` — since 2026-09-15.
+It read food.css alone until then, and cocktails' half of the rule was held
+by a comment saying so.
 
 ### 13.5 The colour contract, and why the two pages differ
 
@@ -3299,8 +3338,12 @@ re-arguing it.
 - **Leopard.** `LEOPARD.md`; she holds it. Ship nothing.
 - **Any new hue.** Both palettes argue at length that the COUNT is the design.
 - **The voice.** Do not touch a word of copy; where a feature needs a string,
-  ship a marked PLACEHOLDER — the bitters caveat (#713) is the pattern, and
-  the units line (#753) followed it.
+  ship a marked PLACEHOLDER — the bitters caveat (#713) is the pattern, the
+  units line (#753) followed it, and the drink scaler's `drinks` (#1086,
+  2026-09-15) is the third. **That last one marks the line the rule actually
+  draws**: the `×` it replaced was NOT a placeholder, because choosing U+00D7
+  over the letter x is typography; choosing the word a number is counted in is
+  voice. If a string would sound like Helen, it is hers.
 - **Whether the recipe title takes the tape.** Offered and declined.
 - **Which drinks are faffy, rich, or otherwise judged.** Moods are DERIVED; a
   disagreement goes in `mood_include` / `mood_exclude` with its reason.
