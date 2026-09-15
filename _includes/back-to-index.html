@@ -1,9 +1,10 @@
 {% comment %} ── THE PAGE'S FURNITURE LINE: the back arrow, and the search box ──
-  Issue #387 (the arrow) and #1024 (the search box, 2026-09-14). A row at the
-  top of every recipe and drink page: the arrow at its left end returning to
-  the index it came from, a search box at its right end that hands a name to
-  that same index. Helen's placement for the box, from the candidates page:
-  "back arrow's line, but on the right not in the centre."
+  Issue #387 (the arrow), #1024 (the search box, 2026-09-14) and #1050 (the
+  search for anything, 2026-09-15). A row at the top of every recipe and drink
+  page: the arrow at its left end returning to the index it came from, a
+  search box at its right end that searches THIS site. Helen's placement for
+  the box, from the candidates page: "back arrow's line, but on the right not
+  in the centre."
 
   THE ARROW IS A REAL LINK FIRST, AND AN ENHANCEMENT SECOND, which is the whole
   design. The href points at this site's own index (from _data/sites.yml, so a
@@ -22,18 +23,41 @@
   cache instead: filters, page number, shuffle order and scroll position all
   intact, because the page was never re-rendered.
 
-  THE SEARCH BOX IS A PLAIN FORM, AND IT WORKS WITH NO JAVASCRIPT. A GET to the
-  index with `q=<what you typed>`; assets/js/filter-state.js's `parseName`
-  reads it and each index puts the text into its own I KNOW WHAT I WANT box and
-  applies it, so the two boxes are one control in two places (the placeholder
-  is the index's own, from sites.yml). It searches NAMES, which is what that
-  box searches; "omnisearch" in #1024's title is the ambition and this is its
-  first, honest step -- widening it to ingredients or moods is a decision about
-  the index's grammar, not about this box.
+  THE SEARCH BOX IS A PLAIN FORM FIRST, AND IT WORKS WITH NO JAVASCRIPT. A GET
+  to the index with `q=<what you typed>`; assets/js/filter-state.js's
+  `parseName` reads it and each index puts the text into its own I KNOW WHAT I
+  WANT box and applies it. Pressing Enter, or the magnifying glass (a real
+  submit button, at the LEFT end so it never moves as you type -- Helen's
+  layout), does exactly that. That was the whole of #1024.
 
-  `toQuery()` in assets/js/filter-state.js is still unwritten. Its own comment
-  says to add it "the day something calls it"; this form is not that day either,
-  because a single `q` needs no serialiser.
+  THEN assets/js/page-search.js MAKES IT A SEARCH FOR ANYTHING -- #1050. As you
+  type, a dropdown under the box offers what the word could mean on this site,
+  grouped by kind and in the index's own order: a recipe or drink by name
+  first, then the star ingredients, moods, practicalities or hassles, then the
+  ingredients. Each result is a real link -- to the page, or to the index
+  already filtered by that word (`?star=`, `?tag=`, `?mood=`, `?ing=`, the
+  grammar in filter-state.js). What it searches is this site's search.json,
+  fetched the first time the box takes focus; `data-search-index` says where.
+  The dropdown element is rendered here, empty and hidden, so the no-script
+  page is exactly this page minus the script.
+
+  THE GLASS IS HELEN'S OWN ARTWORK, _includes/icons/search.svg -- SVG Repo's
+  "Interface / Search_Magnifying_Glass", pasted into #1050 -- redrawn to the
+  site's icon contract the way icons/arrow-right.svg is: no fixed width or
+  height, `currentColor` for the stroke so it takes the button's colour and
+  hover, and a `class` parameter. The 800px canvas and the black stroke of the
+  original were the repo's export settings, not the design. The partial
+  carries no comment of its own because a Liquid tag inside an SVG file is not
+  XML, and test_every_shipped_svg_actually_parses reads the file as XML.
+
+  THE INPUT IS RIGHT-ALIGNED AND 24 CHARACTERS WIDE, so what you type grows
+  leftwards from the box's right edge towards the glass -- Helen's brief, to
+  the character: "Input field text right-aligned, 24 characters wide,
+  placeholder text 'search for anything...', then input text pushes out
+  left-wards. Magnifying glass icon on the left which doesn't move on typing."
+  The placeholder is written here rather than read from sites.yml: it stopped
+  saying where you are (both sites say the same words now), which is that
+  file's test for a key.
 
   The row is page furniture, not chrome: it lives in the two page layouts
   rather than in default.html, because it is about where THIS page sits, not
@@ -45,10 +69,15 @@
   <a class="back-to-index" href="{{ back_site.home | relative_url }}" aria-label="Back to {{ back_site.title }}">
     <span aria-hidden="true">&larr;</span>
   </a>
-  <form class="page-search" role="search" method="get" action="{{ back_site.home | relative_url }}">
+  <form class="page-search" role="search" method="get" action="{{ back_site.home | relative_url }}"
+        data-search-index="{{ back_site.home | append: 'search.json' | relative_url }}">
+    <button type="submit" class="page-search-go" aria-label="Search {{ back_site.title }}">{% include icons/search.svg class="page-search-mark" %}</button>
     <input type="search" name="q" class="page-search-input" autocomplete="off"
-           placeholder="{{ back_site.search_placeholder | default: 'search…' }}"
-           aria-label="Search {{ back_site.title }} by name">
+           placeholder="search for anything..."
+           aria-label="Search {{ back_site.title }} for anything"
+           role="combobox" aria-autocomplete="list" aria-expanded="false"
+           aria-controls="page-search-results">
+    <div class="page-search-results" id="page-search-results" role="listbox" hidden></div>
   </form>
 </div>
 {% endif %}

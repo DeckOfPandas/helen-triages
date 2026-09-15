@@ -1,0 +1,49 @@
+---
+permalink: /cocktails/search.json
+sitemap: false
+---
+{%- comment -%}
+  WHAT THE "SEARCH FOR ANYTHING" BOX SEARCHES ON A DRINK PAGE -- GitHub issue
+  #1050, 2026-09-15. The drinks' half of food/search.json; read that file's
+  comment for the shape and the reasoning, which are the same. Fetched by
+  assets/js/page-search.js from the box _includes/back-to-index.html renders.
+
+  THE SAME LIST THE INDEX SHOWS. `all_drinks` is assembled exactly as
+  cocktails/index.html assembles it -- the gated public collection, plus the
+  drafts ONLY under `site.show_drafts`, which _config_local.yml declares and
+  production does not (#235). tests/test_rendered_pages.py holds the two lists
+  equal in a production build.
+
+  WHAT A DRINK CARRIES HERE. `moods` is the drink's mood list, which the MOOD
+  and HASSLE groups both count (one filter with two headings, MANUAL 9.13 --
+  the split is taxonomy.yml's `mood_groups`). `ing` is the CARD'S ingredient
+  line, label for label, from _plugins/cocktail_card_ingredients.rb: the card
+  name is the chip the index's HAS TO HAVE field offers (MANUAL 9.10.1, "cards
+  and search read the VOCABULARY"), so a word chosen here is a word the index
+  can apply. A label joining two options with "or" names no single chip and
+  the index drops it silently, the same policy it applies to any stale value.
+
+  `items_label` IS PLACEHOLDER COPY, Helen's to write (MANUAL 13.12).
+{%- endcomment -%}
+{%- assign this_site = site.data.sites[page.site_key] -%}
+{%- assign groups = site.data.cocktails.taxonomy.mood_groups -%}
+{%- assign all_drinks = site.cocktail_recipes -%}
+{%- if site.show_drafts -%}
+  {%- assign all_drinks = all_drinks | concat: site.cocktail_drafts -%}
+{%- endif -%}
+{%- assign sorted_drinks = all_drinks | sort: "title" -%}
+{
+  "site": {{ page.site_key | jsonify }},
+  "home": {{ this_site.home | relative_url | jsonify }},
+  "items_label": "drinks",
+  "groups": [
+    {"kind": "mood", "label": "Mood", "param": "mood", "field": "moods", "values": {{ groups.mood | jsonify }}},
+    {"kind": "hassle", "label": "Hassle", "param": "mood", "field": "moods", "values": {{ groups.hassle | jsonify }}},
+    {"kind": "ingredient", "label": "Has to have", "param": "ing", "field": "ing"}
+  ],
+  "items": [
+    {%- for d in sorted_drinks %}
+    {% unless forloop.first %},{% endunless %}{"t": {{ d.title | jsonify }}, "u": {{ d.url | relative_url | jsonify }}, "moods": {{ d.mood | jsonify }}, "ing": [{% for ing in d.card_ingredients %}{% unless forloop.first %}, {% endunless %}{{ ing.label | jsonify }}{% endfor %}]}
+    {%- endfor %}
+  ]
+}

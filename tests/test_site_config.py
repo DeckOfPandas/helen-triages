@@ -216,6 +216,69 @@ def test_the_scaler_scripts_load_in_dependency_order():
     )
 
 
+def test_the_furniture_line_searches_for_anything():
+    """#1050. The search box on the back arrow's line, as Helen specified it,
+    and the plumbing it needs to be more than a name search.
+
+    THE ORDER IN THE MARKUP IS THE LAYOUT: the glass is a submit button BEFORE
+    the input, so it sits at the left and never moves as the text grows
+    leftwards from the box's right edge. The dropdown element is rendered
+    empty and hidden so the no-script page is the page minus the script; the
+    form names the JSON it searches; both page layouts load page-search.js
+    after back-link.js; and the two JSON pages exist, one per site, out of the
+    sitemap. `search_placeholder` is gone from sites.yml: the words are the
+    same on both sites now, so the key stopped saying where you are.
+    """
+    include = read("_includes", "back-to-index.html")
+    # The include's Liquid comment discusses the markup at length; only the
+    # markup after it is asserted on.
+    body = re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", include, flags=re.S)
+
+    go = re.search(r'<button[^>]*class="page-search-go"[^>]*type="submit"|'
+                   r'<button[^>]*type="submit"[^>]*class="page-search-go"', body)
+    box = re.search(r'<input[^>]*class="page-search-input"', body)
+    panel = re.search(r'<div[^>]*class="page-search-results"[^>]*hidden', body)
+    assert go, "the magnifying glass is not a submit button (.page-search-go)."
+    assert box, "the box (.page-search-input) is missing."
+    assert panel, "the dropdown (.page-search-results) must be rendered, hidden."
+    assert go.start() < box.start() < panel.start(), (
+        "glass, then input, then dropdown -- the glass at the LEFT is Helen's "
+        "layout, and it only stays put if it is before the input in the row."
+    )
+    assert 'placeholder="search for anything..."' in body, (
+        "the placeholder is Helen's exact words: 'search for anything...'"
+    )
+    assert "data-search-index=" in body and "search.json" in body, (
+        "the form must say which JSON it searches (data-search-index)."
+    )
+    assert "icons/search.svg" in body, "the glass is _includes/icons/search.svg."
+
+    for layout in ("recipe.html", "cocktail.html"):
+        html = read("_layouts", layout)
+        back = html.find("back-link.js")
+        search = html.find("page-search.js")
+        assert back != -1 and search != -1 and back < search, (
+            f"_layouts/{layout} must load page-search.js beside (after) "
+            f"back-link.js -- the two halves of the furniture line."
+        )
+
+    for site in ("food", "cocktails"):
+        path = ROOT / site / "search.json"
+        assert path.exists(), f"{site}/search.json is missing."
+        text = path.read_text(encoding="utf-8")
+        assert f"permalink: /{site}/search.json" in text
+        assert "sitemap: false" in text, (
+            f"{site}/search.json is not a page and must stay out of the sitemap."
+        )
+
+    sites = read("_data", "sites.yml")
+    assert not re.search(r"^\s+search_placeholder:", sites, re.M), (
+        "sites.yml still declares search_placeholder; the placeholder lives in "
+        "_includes/back-to-index.html since #1050 (it says the same words on "
+        "both sites, so it no longer says where you are)."
+    )
+
+
 def test_the_recipe_scaler_scripts_load_in_dependency_order():
     """#1005. Four scripts on the recipe page, each read at parse time by the
     one after it: shopping-list.js (the one amount parser), food-shopping-

@@ -18,9 +18,11 @@
 //
 //   /food/?star=lamb&tag=soup,make-ahead
 //
-//   - ONE PARAMETER PER FILTER KIND, never one per value. `star` and `tag`
-//     today; `ing` (the ingredient search) is the obvious third and is
-//     deliberately not implemented, because nothing emits it yet.
+//   - ONE PARAMETER PER FILTER KIND, never one per value. `star`, `tag`,
+//     `mood` and `ing`. `ing` was "the obvious third ... deliberately not
+//     implemented, because nothing emits it yet" until 2026-09-15, when the
+//     search-for-anything box on a recipe or drink page (#1050) started
+//     emitting it; each index puts the value into its own HAS TO HAVE.
 //   - VALUES ARE COMMA-SEPARATED within a kind. Safe because no tag, star
 //     ingredient or main_ingredients entry contains a comma — checked against
 //     _data/food/taxonomy.yml. The split happens BEFORE decoding, so a value
@@ -95,7 +97,14 @@
   // empty array. Splitting this per site would be two grammars to keep in step
   // for no gain -- and this file's own header already argues that the query
   // grammar is one thing.
-  var KINDS = ['star', 'tag', 'mood'];
+  //
+  // `ing` JOINED THEM ON 2026-09-15 (#1050), and it is the one kind BOTH sites
+  // read: food puts it into HAS TO HAVE's picker (filters.js), cocktails into
+  // its HAS TO HAVE pool (cocktail-index.js). The value is a name the page's
+  // own search offered -- a main_ingredients entry on food, a card's
+  // ingredient label on cocktails -- and each index matches it against what
+  // its picker would have offered for that text, never by substring.
+  var KINDS = ['star', 'tag', 'mood', 'ing'];
 
   var EXCLUDE_PREFIX = '-';
 

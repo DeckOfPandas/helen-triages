@@ -2244,6 +2244,70 @@ RELATED_RECIPES_SECTION = re.compile(
 RELATED_RECIPE_LINK = re.compile(r'<a class="recipe-title-link" href="([^"]+)">')
 
 
+# --- the search-for-anything box's index, #1050 -------------------------------
+# food/search.json and cocktails/search.json are what the box on a recipe or
+# drink page searches. Each is generated from the same gated list its index
+# renders -- the JSON copies the index's own Liquid rather than paraphrasing it
+# -- and this is what notices if the two ever drift: a page in the JSON that
+# does not exist is a dropdown result that 404s, and a built page missing from
+# the JSON is one the box can never find.
+
+SEARCH_SITES = {
+    "food": ["food/recipes", "food/magic-bag"],
+    "cocktails": ["cocktails/recipes"],
+}
+
+
+@pytest.mark.parametrize("site_key", sorted(SEARCH_SITES))
+def test_the_search_index_lists_exactly_the_published_pages(prod_site, site_key):
+    path = prod_site / site_key / "search.json"
+    assert path.exists(), (
+        f"{site_key}/search.json was not built. The search box on every "
+        f"{site_key} page fetches it and, without it, is only a name search."
+    )
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise AssertionError(
+            f"{site_key}/search.json is not valid JSON ({exc}). A title or "
+            "ingredient with a character the template hand-quoted, most likely "
+            "-- every value goes through `jsonify`."
+        ) from exc
+
+    baseurl = "/helen-triages"
+    assert data["home"] == f"{baseurl}/{site_key}/"
+    assert data["items_label"], "the pages' group needs a label, placeholder or not"
+    assert data["groups"], "no word groups at all -- the dropdown would offer names only"
+    for group in data["groups"]:
+        assert group["kind"] and group["label"] and group["param"] and group["field"], group
+        # `param` must be a kind filter-state.js reads, or the index ignores the link.
+        grammar = (ROOT / "assets" / "js" / "filter-state.js").read_text(encoding="utf-8")
+        kinds = re.search(r"var KINDS = \[([^\]]+)\];", grammar).group(1)
+        assert f"'{group['param']}'" in kinds, (
+            f"{site_key}/search.json links {group['kind']} results with "
+            f"?{group['param']}=, which filter-state.js's KINDS does not read."
+        )
+
+    listed = {item["u"] for item in data["items"]}
+    built = set()
+    for folder in SEARCH_SITES[site_key]:
+        for page in (prod_site / folder).rglob("index.html"):
+            built.add(baseurl + "/" + str(page.relative_to(prod_site).parent).replace("\\", "/") + "/")
+    assert len(built) > 20, (
+        f"only {len(built)} built pages under {SEARCH_SITES[site_key]} -- the "
+        "corpus walk is looking in the wrong place."
+    )
+    assert listed == built, (
+        f"{site_key}/search.json and the built pages disagree.\n"
+        f"  in the JSON but not built (a result that 404s): {sorted(listed - built)}\n"
+        f"  built but not in the JSON (a page the box cannot find): {sorted(built - listed)}\n"
+        "The JSON copies the index's own list-building Liquid; whichever "
+        "changed, change the other in the same commit."
+    )
+    for item in data["items"]:
+        assert item["t"], f"{item['u']} has no title in the search index"
+
+
 def _recipe_pages(built_site):
     return sorted((built_site / "food" / "recipes").rglob("index.html"))
 

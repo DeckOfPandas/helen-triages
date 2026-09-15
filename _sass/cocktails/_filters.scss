@@ -172,6 +172,19 @@
 // LEAVE OUT a sixth colour precisely because it had earned one; this has not.
 .drink-search--exclude .drink-field-label { color: $color-clear-text; }
 
+// THE SEARCH-FOR-ANYTHING DROPDOWN'S HEADINGS, in the ramp -- #1050. The
+// dropdown is shared/_furniture.scss; a drink page's is the same panel as a
+// recipe page's, in this site's ink and paper. What is this site's is which
+// step of the ramp each KIND of result wears, and it is the heading colour the
+// index gives that section (above): a MOOD result and the MOOD section it
+// lands on are one colour making one claim, which is this file's own rule for
+// a heading. Names take I KNOW WHAT I WANT's violette, because a title search
+// is that box.
+.page-search-group--name       .page-search-group-label { color: $color-heading-name; }
+.page-search-group--mood       .page-search-group-label { color: $color-heading-mood; }
+.page-search-group--hassle     .page-search-group-label { color: $color-heading-hassle; }
+.page-search-group--ingredient .page-search-group-label { color: $color-heading-include; }
+
 // FOOD'S GAP BETWEEN SECTIONS, not this file's own. It was
 // $spacing-section-gap (3rem), which is the RECIPE PAGE's "below a section"
 // token; food's index uses $index-section-gap ($space-md, 0.75rem since the

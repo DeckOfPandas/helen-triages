@@ -1,11 +1,28 @@
-// Screenshot one element at 2x. Usage: node crop.js <url> <selector> <out.png> [width]
+// Screenshot one element at 2x.
+// Usage: node crop.js <url> <selector> <out.png> [width] [type-into-selector] [text]
+//
+// THE LAST TWO TYPE INTO A BOX BEFORE THE SHOT, since 2026-09-15 (#1050): a
+// dropdown that opens as you type cannot be looked at from a page that nobody
+// has typed into, and "look at the built thing" is how a design decision gets
+// made here (MANUAL 13.11). The box is focused, the text typed key by key, and
+// the shot waits for the network to go quiet -- the search box fetches its
+// index on first focus -- and then a beat for the paint.
 const { chromium } = require('playwright');
-const [url, selector, out, width] = process.argv.slice(2);
+const [url, selector, out, width, typeInto, text] = process.argv.slice(2);
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: Number(width || 1280), height: 900 }, deviceScaleFactor: 2 });
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.waitForTimeout(400);
+  if (typeInto) {
+    const box = await page.$(typeInto);
+    if (!box) { console.log('no element to type into for', typeInto); process.exit(1); }
+    await box.focus();
+    await page.waitForLoadState('networkidle');
+    await box.type(text || '', { delay: 40 });
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(400);
+  }
   const el = await page.$(selector);
   if (!el) { console.log('no element for', selector); process.exit(1); }
   await el.screenshot({ path: out });

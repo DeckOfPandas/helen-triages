@@ -170,6 +170,50 @@ window.HTF = window.HTF || {};
   };
 
   /**
+   * Fetch a JSON file and hand the parsed value to cb, or null if it could not
+   * be had -- #1050, for the search-for-anything box's per-site index
+   * (food/search.json, cocktails/search.json). The one other thing on the
+   * site fetched at run time, and it goes through here for the reason the
+   * SVGs do: one place that caches, one place that warns, and
+   * test_svg_fetching_goes_through_the_shared_helper holds every other file to
+   * that.
+   *
+   * UNLIKE fetchSvg, THE CALLBACK IS CALLED ON FAILURE TOO, with null. A
+   * decoration that fails to load has nothing to do next; a search box does --
+   * it stays a plain form, and it has to be told so rather than left waiting.
+   *
+   * @param {string} url
+   * @param {function(?Object)} cb - receives the parsed JSON, or null
+   */
+  var jsonCache = {};
+  var jsonPending = {};
+  HTF.fetchJson = function (url, cb) {
+    if (jsonCache[url]) { cb(jsonCache[url]); return; }
+    if (jsonPending[url]) { jsonPending[url].push(cb); return; }
+    jsonPending[url] = [cb];
+    function settle(value) {
+      var waiting = jsonPending[url] || [];
+      delete jsonPending[url];
+      waiting.forEach(function (fn) { fn(value); });
+    }
+    fetch(url, { credentials: 'same-origin' })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        jsonCache[url] = data;
+        settle(data);
+      })
+      .catch(function (error) {
+        console.warn('assets.js: could not load ' + url + ' — ' + error.message);
+        settle(null);
+      });
+  };
+
+  /**
    * Deal names from a shuffled pool without repeats until it is exhausted.
    * Shuffled once per page load, so a given page has variety and a reload
    * gives you something different.

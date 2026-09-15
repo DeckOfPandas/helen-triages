@@ -103,6 +103,19 @@
   }
 }
 
+// --- The search-for-anything dropdown's headings, in this site's hues ---------
+// #1050. The dropdown itself is shared/_furniture.scss; what is food's is which
+// colour each KIND of result wears, and it is the section's own -- the same
+// hue the index paints that section's active buttons in, so a MOOD heading in
+// the dropdown and the MOOD section on the index you land on are one colour
+// making one claim. The names group takes I KNOW WHAT I WANT's hue for the
+// same reason: a title search is that box.
+.page-search-group--name           .page-search-group-label { color: $color-name-search-active; }
+.page-search-group--star           .page-search-group-label { color: $color-star-active; }
+.page-search-group--mood           .page-search-group-label { color: $color-mood-active; }
+.page-search-group--practicalities .page-search-group-label { color: $color-practicalities-active; }
+.page-search-group--ingredient     .page-search-group-label { color: $color-ingredient-active; }
+
 // --- Name search ------------------------------------------------------------
 // `margin-top: $space-sm` used to sit here. It never did anything: adjacent
 // .category siblings collapse their margins and the larger wins, so

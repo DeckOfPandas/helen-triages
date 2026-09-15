@@ -103,6 +103,15 @@ const TITLES = {
   '/food/recipes/gelato/': 'Blackberry gelato'
 };
 
+/* `data-ingredients` -- main_ingredients, comma-joined as food/index.html
+   joins them. What the HAS TO HAVE picker's vocabulary is built from, and so
+   what `?ing=` (#1050) has to find. */
+const MAIN_INGREDIENTS = {
+  '/food/recipes/a/': 'aubergines,olive oil',
+  '/food/recipes/b/': 'beetroot,plain flour',
+  '/food/recipes/gelato/': 'blackberries,whipping cream'
+};
+
 /**
  * A food index with everything the scripts read, and nothing else.
  *
@@ -141,13 +150,18 @@ function boot(options) {
   // is not exercised here, only the query's arrival.
   const controls = el('div', 'controls');
   controls.appendChild(el('input', '', { id: 'name-search-box', type: 'text' }));
+  // HAS TO HAVE's box and pool, so `?ing=` (#1050) has somewhere to land; as
+  // with the name box, the input handler is not exercised here, only the
+  // query's arrival.
+  controls.appendChild(el('input', '', { id: 'ingredient-search-box', type: 'text' }));
+  controls.appendChild(el('div', 'category-buttons search-results', { id: 'ingredient-results-pool' }));
   doc.body.appendChild(controls);
 
   const list = el('ul', 'recipe-list');
   Object.keys(recipes).forEach((url) => {
     const li = el('li', '', {
       'data-url': url, 'data-tags': '', 'data-star': '',
-      'data-ingredients': '', 'data-all-ingredients': '|'
+      'data-ingredients': MAIN_INGREDIENTS[url] || '', 'data-all-ingredients': '|'
     });
     const link = el('a', 'recipe-title-link', { href: url });
     link.textContent = TITLES[url];
@@ -642,6 +656,34 @@ test('#1024: ?q= fills the name box and narrows the list', () => {
   // nowhere else. The order is what proves the query reached the script.
   assert.strictEqual(list.children[0].getAttribute('data-url'), '/food/recipes/b/',
     'the query must reach reorderForTitleSearch(), not only the box.');
+});
+
+// --- arriving with an ingredient, #1050 -----------------------------------------
+// `?ing=` is what the search-for-anything box on a recipe page sends when the
+// reader picks an ingredient. It must land in HAS TO HAVE and be applied as
+// choosing that result there would, so the dropdown and the picker are one
+// control in two places.
+
+test('#1050: ?ing= fills the HAS TO HAVE box and narrows the list to that ingredient', () => {
+  const { doc, list } = boot({ search: '?ing=beetroot' });
+  assert.strictEqual(doc.getElementById('ingredient-search-box').value, 'beetroot',
+    'the box should show the word the reader chose on the page they came from.');
+  assert.deepStrictEqual(
+    visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/b/'],
+    'the word must reach the picker and be CHOSEN, not only typed -- one row ' +
+    'names beetroot and only that row should survive.');
+});
+
+test('#1050: an ingredient nothing names leaves the picker in a plain search', () => {
+  // The policy every other query kind follows: a stale value must not error,
+  // and must not silently narrow the list either. Here it leaves the typed
+  // text in the box with nothing chosen -- the state the box would be in had
+  // the reader typed it -- and every row still shows.
+  const { doc, list } = boot({ search: '?ing=quince' });
+  assert.strictEqual(doc.getElementById('ingredient-search-box').value, 'quince');
+  assert.strictEqual(visibleRows(list).length, 3,
+    'nothing was chosen, so nothing should be narrowing the list.');
 });
 
 // --- the list of scripts is the template's list --------------------------------

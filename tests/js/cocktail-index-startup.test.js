@@ -478,6 +478,34 @@ test('#1024: ?q= fills the name box and narrows the list', () => {
     ['/b'], 'the query must reach apply(), not only the box.');
 });
 
+// --- arriving with an ingredient, #1050 -----------------------------------------
+// `?ing=` is what the search-for-anything box on a drink page sends when the
+// reader picks an ingredient: a card's own ingredient name, which is the chip
+// HAS TO HAVE offers. It must be added to `include` exactly as choosing that
+// chip would, so the two are one control in two places.
+
+test('#1050: ?ing= adds the chip to HAS TO HAVE and narrows the list', () => {
+  const r = boot({ drinks: DRINKS, search: '?ing=gin' });
+  const on = r.doc.getElementById('drink-include-pool').querySelectorAll('.btn-pool')
+    .filter((b) => b.classList.contains('is-on'))
+    .map((b) => b.querySelector('.btn-pool-label').textContent);
+  assert.deepStrictEqual(on, ['gin'],
+    'the chip should be on screen as chosen, or the reader cannot undo it.');
+  assert.deepStrictEqual(visibleTitles(r.page), ['Negroni'],
+    'the chip must reach apply(), not only the pool.');
+});
+
+test('#1050: an ingredient no card names is dropped in silence', () => {
+  // A joined label ("X or Y") or a stale name matches no chip WHOLE, and the
+  // rule is the exclusion rule's: never a substring. The index lands
+  // unfiltered, which is a working page rather than a stuck one.
+  const r = boot({ drinks: DRINKS, search: '?ing=gi' });
+  assert.strictEqual(visibleTitles(r.page).length, DRINKS.length);
+  const on = r.doc.getElementById('drink-include-pool').querySelectorAll('.btn-pool')
+    .filter((b) => b.classList.contains('is-on'));
+  assert.deepStrictEqual(on, []);
+});
+
 test('#994: shortlist=1 beats a mood in the same URL', () => {
   // It is a VIEW, not a facet (#918): pressing the button clears every other
   // filter, and arriving by the link must mean the same thing or the two doors

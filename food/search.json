@@ -1,0 +1,62 @@
+---
+permalink: /food/search.json
+sitemap: false
+---
+{%- comment -%}
+  WHAT THE "SEARCH FOR ANYTHING" BOX SEARCHES -- GitHub issue #1050, 2026-09-15.
+  Fetched by assets/js/page-search.js the first time the box on a recipe
+  page's furniture line takes focus (_includes/back-to-index.html). One file
+  per site, because the search is per site: this is food's, and
+  cocktails/search.json is the drinks'.
+
+  THE SAME LIST THE INDEX SHOWS, BY CONSTRUCTION. `site.food_recipes` has
+  already been through _plugins/publish_gate.rb at :post_read, so a held-back
+  recipe is not in it; the magic bag joins unconditionally and drafts join only
+  when their collection actually publishes -- the three lines below are
+  food/index.html's own, copied rather than paraphrased, and
+  tests/test_rendered_pages.py holds the two lists equal in a production
+  build. If the index's list ever changes shape, change it here in the same
+  commit or that test says so.
+
+  SHAPE. `home` is where a chosen word is sent (as `?<param>=<word>`); `items`
+  are the pages, one letter per key because the file is machine-read:
+      t  title      u  url (relative_url'd)     star  star_ingredient
+      tags  the recipe's tags                  ing   main_ingredients
+  `groups` are the kinds of word offered, in the INDEX'S OWN ORDER, each
+  naming the query parameter the index reads for it (assets/js/filter-state.js
+  KINDS), the item key it counts, and -- where the vocabulary is declared --
+  the declared list, so the dropdown offers words in taxonomy order and never
+  a tag no recipe carries. The ingredient group has no declared list: it is
+  built from what the items carry. Labels are the index's own, from
+  _data/food/filter_sections.yml, so the dropdown's headings are the panel's.
+
+  `items_label` IS PLACEHOLDER COPY, Helen's to write (MANUAL 13.12).
+{%- endcomment -%}
+{%- assign this_site = site.data.sites[page.site_key] -%}
+{%- assign sections = site.data.food.filter_sections -%}
+{%- assign taxonomy = site.data.food.taxonomy -%}
+{%- assign all_recipes = site.food_recipes -%}
+{%- assign all_recipes = all_recipes | concat: site.food_magic_bag -%}
+{%- assign _drafts_collection = site.collections | where: "label", "food_drafts" | first -%}
+{%- if _drafts_collection.output -%}
+  {%- assign all_recipes = all_recipes | concat: site.food_drafts -%}
+{%- endif -%}
+{%- assign all_recipes = all_recipes | sort: "title" -%}
+{%- assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_source_wording or r.collection == 'food_magic_bag'" -%}
+{
+  "site": {{ page.site_key | jsonify }},
+  "home": {{ this_site.home | relative_url | jsonify }},
+  "items_label": "recipes",
+  "groups": [
+    {"kind": "star", "label": {{ sections.star.label | jsonify }}, "param": "star", "field": "star", "values": {{ taxonomy.star_ingredients | jsonify }}},
+    {%- for group in sections.tag_groups %}
+    {"kind": {{ group.name | jsonify }}, "label": {{ group.label | jsonify }}, "param": "tag", "field": "tags", "values": {{ taxonomy.tags[group.name] | jsonify }}},
+    {%- endfor %}
+    {"kind": "ingredient", "label": {{ sections.ingredients.label | jsonify }}, "param": "ing", "field": "ing"}
+  ],
+  "items": [
+    {%- for r in _rendered_recipes %}
+    {% unless forloop.first %},{% endunless %}{"t": {{ r.title | jsonify }}, "u": {{ r.url | relative_url | jsonify }}, "star": {{ r.star_ingredient | jsonify }}, "tags": {{ r.tags | jsonify }}, "ing": {{ r.main_ingredients | jsonify }}}
+    {%- endfor %}
+  ]
+}
