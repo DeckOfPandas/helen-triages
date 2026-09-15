@@ -4299,6 +4299,30 @@ unless stated.
     nothing. Not measured, so not refused: brackets or pipes quoted in commands
     other than `sh scripts/` wrappers.
 
+- **2026-09-15 — a leading env assignment asked Helen, and her pick was to
+  refuse it AND add wrappers, not just one or the other.** A session ran
+  `PLAYWRIGHT_BROWSERS_PATH=... NODE_PATH=... node tmp/repro.js` to reach for
+  Playwright directly, and the assignment prefix is not part of the command
+  word, so the checker could not tell what the rest of the command would do
+  and asked. Helen: *"I want to reduce the number of interruptions to a
+  minimum."* Offered three options -- allow-list the exact prefix, refuse the
+  shape outright, or refuse it and add more committed wrappers so it comes up
+  less -- she picked the third. `guard-unanalyzable-bash.py` gained an eighth
+  refused shape (one or more `NAME=value` tokens before the command word;
+  `git -c credential.helper=...`, a `--flag=value` argument, and `=` inside
+  quotes are all left alone, since none of them is a LEADING assignment), and
+  `scripts/browser/` gained three wrappers that source `env.sh` themselves so
+  the prefix is rarely needed by hand again: `styles.sh` (a selector's box and
+  computed styles), `gaps.sh` (the vertical gap between visible block
+  siblings, the tool #1093's review used to find two spacing drifts), and
+  `click-crop.sh` (click one element, crop another). Deliberately NOT added:
+  any wrapper that runs arbitrary code from `tmp/`, or an allow rule for
+  `node`, `sh tmp/...` or the like -- the 2026-09-11 ruling that `tmp/` scripts
+  keep asking stands. Each wrapper validates its own arguments (a path
+  starting `/` with no `..` and no scheme, a width from 200 to 2000, a name
+  matching `[a-z0-9-]+`) and is proved by `tests/test_agent_wrappers.py`,
+  which is why all three could go straight into `REVIEWED_OPEN_RULES`.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not

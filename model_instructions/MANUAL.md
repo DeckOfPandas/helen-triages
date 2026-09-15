@@ -152,7 +152,17 @@ crops one element at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`,
 `right`), so an alignment question is answered by comparing two numbers, not
 two images; the last two arguments type text into a box first, for a control
 that only shows itself once somebody has typed (the search dropdown, #1050).
-**A box is not ink**, and `python3 scripts/browser/inkbox.py <png> [gap]`
+Three more tools, all added 2026-09-15 so a Playwright question rarely needs a
+one-off `tmp/` script: `sh scripts/browser/styles.sh <path> <selector> [width]
+[prop,prop,...]` prints every matching element's box and a set of computed
+styles (font, color, margin/padding, gap, display by default); `sh
+scripts/browser/gaps.sh <path> [width] [root-selector]` walks the visible
+block-level descendants of `main` (or another root) to depth 4, printing each
+one's tag.class, height, margin/padding top/bottom and the gap to the sibling
+before it -- the tool that found two spacing drifts in #1093's review; and `sh
+scripts/browser/click-crop.sh <path> <click-selector> <crop-selector> <name>
+[width]` clicks one element once and crops another at 2x, for a control that
+only reveals or changes something once clicked. **A box is not ink**, and `python3 scripts/browser/inkbox.py <png> [gap]`
 answers the other half: it prints each band of ink in a crop with its vertical
 extent and centre, for "is this glass centred on that arrow". **Crop the element
 that contains every mark you are comparing and read them from that ONE image** —
