@@ -299,150 +299,46 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   min-height: 0;
 }
 
-// THE ROW HAS NO BOX OF ITS OWN ABOVE 600px, SINCE 2026-09-11 -- #979. It is
-// `display: contents`, so the name and the shortlist button are placed
-// directly on `.cocktail-head-words`' two-column grid below; that grid is what
-// gives the meta the same right edge the name's column has. The element stays
-// in the markup because it is what `:has()` reads to size the button (below)
-// and what the phone layout places as one item.
+// THE ROW HAS NO BOX OF ITS OWN -- `display: contents` since #979 (2026-09-11),
+// so the name is placed straight on `.cocktail-head-words` below, and on a
+// phone straight on `.cocktail-title-block`'s own grid. The element stays in
+// the markup as the name's wrapper and the phone grid's one placed item.
 //
-// IT IS A REAL FLEX ROW AGAIN ON A PHONE, in the 600px block below: there
-// `.cocktail-head-words` is itself `display: contents` and the row is placed on
-// `.cocktail-title-block`'s own grid, so it has to hold the name and the `+`
-// itself. It used to be food's `.recipe-title` exactly -- flex, last-baseline,
-// space-between -- and that is the shape the phone block restates, `last
-// baseline` with `flex-end` beneath it as the fallback, food's own pair.
+// IT HELD THE SHORTLIST BUTTON AT ITS RIGHT END FROM 2026-09-11 TO 2026-09-14
+// (#963 -> #1005), and this file carried forty lines to sit that button on the
+// name's FIRST line: a `--title-line` custom property read through `:has()`
+// for the fit script's 0.86 step and its 1.12 wrap, a top margin of the tape's
+// padding, a phone block that turned the row back into a flex box for the `+`
+// alone. All of it went with the button. Every action is in the controls row
+// under the head now (`.cocktail-controls`, _includes/page-actions.html),
+// Helen's pick from the candidates page: "row under the head". The name has
+// the whole head to itself, and a long one wraps with nothing to negotiate.
 .cocktail-title-row {
   display: contents;
 }
 
-// THE SHORTLIST BUTTON IS BACK IN THIS ROW, AT ITS RIGHT END, SINCE 2026-09-11
-// -- #963, Helen: "move the shortlist up to the top right, aligned with the
-// horizontal centre of the first line of the cocktail name." From #897
-// (2026-09-10) until then it sat at the right of the controls row, under the
-// title block's rule.
-//
-// ALIGNED BY CONSTRUCTION, NOT BY A MEASURED NUDGE. The button is given the
-// first line's own box: a top margin equal to the tape's padding above the
-// lettering, and a height of one line of lettering -- 1em at the tape word's
-// line-height of 1, or 1.12em once card-name-fit.js has wrapped the name
-// (`.drink-card-name--wrap`, _cards.scss). `.btn-shortlist` is already an
-// inline-flex with `align-items: center`, so its word sits on that line's
-// centre at any size. `flex-start`, NOT the row's `last baseline`, which would
-// line it up with the LAST line of a wrapped name.
-//
-// THE SIZE IS THE TITLE'S, from the same two variables the tape reads, times
-// the fitting script's 0.86 step when the name has taken it. Read through
-// `:has()` because the button is the name's SIBLING and cannot inherit the
-// `--card-name-scale` that `.drink-card-name--step` sets on the name itself; the
-// 0.86 and the 1.12 are _cards.scss's, which is imported after this file.
-.cocktail-title-row {
-  --title-line: #{$title-size};
-}
-
-.cocktail-title-row:has(.drink-card-name--step) {
-  --title-line: #{$title-size * 0.86};
-}
-
-// ALIGNED BY CONSTRUCTION, NOT BY A MEASURED NUDGE. The button is given the
-// first line's own box: a top margin equal to the tape's padding above the
-// lettering, and a height of one line of lettering -- 1em at the tape word's
-// line-height of 1, or 1.12em once card-name-fit.js has wrapped the name
-// (`.drink-card-name--wrap`, _cards.scss). `.btn-shortlist` is already an
-// inline-flex with `align-items: center`, so its word sits on that line's
-// centre at any size. `flex-start`, NOT the row's `last baseline`, which would
-// line it up with the LAST line of a wrapped name.
-//
-// IT WAS A COLUMN OF TWO BRIEFLY -- #994 put a see-all link under it on
-// 2026-09-12 and #1000 took that back on 2026-09-14. The wrapper those two
-// shared carried this alignment while it existed, and the `+` sat on the RIGHT
-// of its word (`row-reverse`) so the two marks lined up under each other. With
-// one control again, both go: the mark is back on the left, which is where it
-// is on a card, in the food twin and in every other placement of this button.
-.cocktail-title-row .btn-shortlist {
-  align-self: flex-start;
-  flex-shrink: 0;
-  margin-top: calc(var(--title-line) * #{$title-tape-pad-ratio});
-  height: var(--title-line);
-}
-
-.cocktail-title-row:has(.drink-card-name--wrap) .btn-shortlist {
-  height: calc(var(--title-line) * 1.12);
-}
-
-@media (max-width: 600px) {
-  .cocktail-title-row {
-    --title-line: #{$title-size-phone};
-  }
-
-  .cocktail-title-row:has(.drink-card-name--step) {
-    --title-line: #{$title-size-phone * 0.86};
-  }
-
-  // A SMALLER GAP BESIDE THE MARK. On a phone the button is the + alone
-  // (cocktails/_shortlist.scss has the rule and Helen's pick), and the
-  // $space-xl gap was sized for a word beside the name; every rem here is a rem
-  // off the name on a 342px column.
-  //
-  // AND THE ROW IS A FLEX BOX AGAIN HERE, which above 600px it is not -- see
-  // its own rule above for why. This block comes AFTER that rule, which is the
-  // only reason it wins (the #942 trap, and §12's).
-  .cocktail-title-row {
-    display: flex;
-    align-items: flex-end;
-    align-items: last baseline;
-    justify-content: space-between;
-    gap: $space-md;
-  }
-}
-
-// ONE GRID FOR THE WHOLE HEAD, SINCE 2026-09-11 -- #979. Helen: "the metadata
-// line now spans the full page -- I think it used to span the narrower reading
-// container. Either way, it looks strange", and her ruling: "The metadata line
+// ONE COLUMN FOR THE WHOLE HEAD. #979 (2026-09-11) made this a two-track grid
+// so the meta ended where the title tape's track did rather than running under
+// the shortlist button at the head's right edge -- Helen: "The metadata line
 // could be bounded by whatever constrains the right-hand edge of the title
-// tape. I think that would look nice."
+// tape." With the button gone (#1005) there is nothing at that edge but the
+// tape, so one track is that ruling with nothing left to subtract: the tape,
+// the tagline, the meta and the chips all end on the same edge because it is
+// the only edge there is.
 //
-// WHAT CONSTRAINS THE TAPE'S RIGHT EDGE IS A COLUMN, so the fix is to give the
-// meta that same column rather than to subtract a number from it. The head is a
-// two-track grid: everything the head says goes in the first track, and the
-// shortlist button -- and only it -- goes in the second. `.cocktail-title-row`
-// is `display: contents` (see its rule above) so the name lands in track one and
-// the button in track two; the meta, the tagline and the chips are pinned to
-// track one below. The tape can reach the first track's right edge and no
-// further, and the meta ends there by construction, with nothing to keep in
-// step when the button changes size -- which it does, from the word above 600px
-// to the `+` alone below it (cocktails/_shortlist.scss).
-//
-// THE META USED TO RUN THE WHOLE HEAD, from 2026-09-05, because its last fact
-// had to line up with a shortlist button sitting at the head's right edge. #963
-// moved that button up into the title row on 2026-09-11 and nothing was left
-// needing the full width; the header becoming the cards' width the same day is
-// what made the leftover reach visible.
-//
-// `minmax(0, 1fr)`, NOT `1fr`. A bare `1fr` is `minmax(auto, 1fr)` and will not
-// go below its content's min-content width -- and the content here is the tape
-// word, which is `white-space: nowrap` (_cards.scss). The track would refuse to
-// shrink, the button would be pushed off the row, and card-name-fit.js would
-// never see an overflow to step or wrap (the same pair of symptoms
-// `.drink-card-name`'s own `min-width: 0` fixed below). §12's trap.
+// STILL A GRID WITH `minmax(0, 1fr)`, NOT A BLOCK, for the reason the two-track
+// version gave: a bare block would let the tape word's `white-space: nowrap`
+// (_cards.scss) set the head's min-content width, and card-name-fit.js would
+// never see an overflow to step or wrap. §12's trap, and `.drink-card-name`'s
+// own `min-width: 0` is the other half of the same fix.
 //
 // IT IS NOT THIS GRID ON A PHONE: the 600px block near `.cocktail-glass-icon`
 // makes this element `display: contents` and places its children on
 // `.cocktail-title-block`'s own grid, where the meta sits beside the glass.
 .cocktail-head-words {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: $space-xl;
+  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
-
-  // The universal selector reaches the DOM children -- the title row (a no-op,
-  // it has no box), the tagline, the meta and the chips -- and not the name and
-  // the button, which the row's `display: contents` hands to this grid but
-  // which are not this element's children in a selector's sense. Which is
-  // exactly the set that wants track one.
-  > * {
-    grid-column: 1;
-  }
 }
 
 // THE TITLE MOVED ONTO DYMO TAPE, 2026-09-02, and `.cocktail-title` stopped
@@ -628,28 +524,42 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // in one row, so the 2026-09-05 relation ("below make it / read it") survives
 // as "beside it" without a second element to keep in step.
 //
-// THE NEGATIVE TOP MARGIN EATS PART OF THE TITLE BLOCK'S BOTTOM MARGIN
-// (1.75rem), so the row reads as hanging off the rule rather than floating in
-// the gap before INGREDIENTS; the section heading's own top margin still opens
-// the space below it. The row is what carries the space, not the toggle.
+// THE ROW SITS THE TITLE BLOCK'S FULL MARGIN (1.75rem) UNDER THE RULE, SINCE
+// 2026-09-14 -- #1006. It carried `-$space-lg` from #897 so it hung 0.75rem off
+// the rule; on the candidates page Helen chose the half-way spacing "BUT with a
+// little extra space between the make it read it line and the rule above it",
+// and this is that extra: the negative margin gone, so the row stands off the
+// rule by the block's own gap. The section heading's top margin (3rem, below)
+// opens the space under it.
 .cocktail-controls {
   display: flex;
-  // TOGGLE LEFT, SHORTLIST RIGHT, SINCE 2026-09-10 -- Helen, seeing the row
-  // live: "The read it make it and shortlist buttons run together now. How
-  // about moving the read it make it to the left? I can imagine that feeling
-  // quite natural in the kitchen -- I'll be on the left of the page looking at
-  // the ingredients list. Then top right for a save this feels more natural."
-  // `space-between` on a two-item row is exactly that, and the gap stays for
-  // the day the two are close enough to need it.
-  //
-  // THE TOGGLE IS ALONE HERE SINCE 2026-09-11: the shortlist went up to the
-  // title row's right end (#963, `.cocktail-title-row .btn-shortlist` above),
-  // which is Helen's "top right for a save" taken one step further. With one
-  // item, `space-between` leaves the toggle at the start, where she put it.
+  // TOGGLE LEFT, ACTIONS RIGHT. Helen, 2026-09-10, seeing the first row live:
+  // "The read it make it and shortlist buttons run together now. How about
+  // moving the read it make it to the left? I can imagine that feeling quite
+  // natural in the kitchen -- I'll be on the left of the page looking at the
+  // ingredients list. Then top right for a save this feels more natural."
+  // `space-between` on a two-item row is exactly that. The right-hand item was
+  // the shortlist button alone until #963 (2026-09-11) moved it up to the title
+  // row; since #1005 (2026-09-14) it is the whole actions row --
+  // _includes/page-actions.html, the same four controls a recipe page has --
+  // which is her "top right for a save" with the save's neighbours beside it.
   justify-content: space-between;
   align-items: center;
   gap: $space-lg;
-  margin: -$space-lg 0 0;
+  margin: 0;
+  // WRAPS ON A PHONE. Four actions beside the toggle do not fit a 342px
+  // column: measured at 390px, the toggle's labels broke to two lines each
+  // and the actions stacked beside them. Wrapped, the toggle keeps its line
+  // and the actions take the next, still at the right edge.
+  flex-wrap: wrap;
+}
+
+.cocktail-toggle {
+  flex-shrink: 0;
+}
+
+.cocktail-toggle-label {
+  white-space: nowrap;
 }
 
 .cocktail-toggle-label {
@@ -1000,11 +910,21 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // direct child of the article again, and this margin collapses as it always
 // did. Worth the paragraph because the row's own comment reasoned about exactly
 // this and read it the right way round as a feature.
+// 3rem ABOVE AND 1.25rem BELOW SINCE 2026-09-14 -- #1006, Helen: "spacing on
+// the cocktail page doesn't feel nice any more... This is all so close
+// together." Every gap in her screenshot was this heading's old 1.75rem --
+// scaler to METHOD, METHOD to its list, list to NOTES -- because this page
+// never adopted food's named scale (MANUAL 13.3: 4.5rem above a heading, 3rem
+// below a section, 1.75rem within one) and the flat rhythm made a document read
+// as a control panel. Three candidates on the real page: as it was, half way,
+// and food's scale. Her pick: "half way". So 3rem and 1.25rem, the scaler and
+// the related section moved by the same half step, and `.cocktail-controls`
+// got the "little extra" she asked for with it.
 .cocktail-section-heading {
   font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 0.08em;
-  margin: 1.75rem 0 $space-md;
+  margin: 3rem 0 1.25rem;
 
   span {
     display: inline;
@@ -1187,7 +1107,8 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   display: inline-flex;
   align-items: center;
   gap: $space-xs;
-  margin: $space-sm 0 0;
+  // $space-md since #1006 (2026-09-14), the half step the page's headings took.
+  margin: $space-md 0 0;
 
   &[hidden] { display: none; }
 }
@@ -2030,8 +1951,10 @@ $amount-gap-wide: 1.25rem;
 // page's tail is two objects drawn the same way, a hairline above each: the
 // three cards, then the source line. Not a new mark; the one the page has.
 .cocktail-related-section {
-  margin-top: $spacing-section-gap;
-  padding-top: $space-lg;
+  // 3.5rem and 1.25rem since #1006 (2026-09-14): the half step the section
+  // headings took, applied to the hairline's clearance above and below.
+  margin-top: 3.5rem;
+  padding-top: 1.25rem;
   border-top: 1px solid $color-border;
 
   // The section heading carries 1.75rem above it for the sections that sit

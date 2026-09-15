@@ -11,7 +11,7 @@ command deliberately does not restate them -- two copies of a schema drift, and
 the manual is the one the tests are written against.
 
 **AND `model_instructions/PUBLISHING_A_DRINK.md` IF THE DRINK IS GOING ANYWHERE
-NEAR `to-promote/`.** That file is the six steps a drink goes through, the word
+NEAR `4-promote/`.** That file is the six steps a drink goes through, the word
 "final" and what it promises, and the one-working-copy rule. This command gets a
 drink INTO the drafts; that one gets it out.
 
@@ -63,34 +63,30 @@ is held to house style like any other prose. Both `conftest._QQ_LINE` and
 
 ## Where a new file goes
 
-**Food.** New ingests land in `_food_drafts/` root. That is the pool. The
-staging folders are HELEN'S, and she moves files through them herself:
+**`model_instructions/PIPELINE.md` §3 is the authority on the folders since
+2026-09-14 (#1008)**; this is the short form. New ingests land in the ROOT of
+`_food_drafts/` or `_cocktail_drafts/` -- the pool. The staging folders are
+HELEN'S: they record where she is with a file, which no flag can say, and both
+sites use one set of names:
 
-    _food_drafts/                 the pool -- everything lives here
-      to-rewrite/                 she has picked these to work on next
-      to-cook/                    she has rewritten them enough to cook from
-      to-promote/                 cooked, amended, ready for a Claude proofread
-                                  then her proofread, then _food_recipes/
+    _food_drafts/  /  _cocktail_drafts/     the pool -- everything lives here
+      1-rewrite/           (food only)      she has picked these to work on next
+      2-make/              (both)           readable enough to make from
+                                            (was `to-cook/` until 2026-09-14)
+      3-keep/              (both)           made and liked; not rewriting yet
+      4-promote/           (both)           her words are in; waiting on the
+                                            mechanical pass, then her proofread,
+                                            then the public collection
 
-**Never move a file between these folders unless asked.** They record where SHE
-is with a recipe, which no flag can say -- all four files in `to-cook/` today
-are `rewritten: false`, because "readable enough to cook from" sits below "the
-prose is mine". The folders and the flags answer different questions and are not
-expected to agree.
+Numbered so they sort in pipeline order at the top of her file list (her ask,
+2026-09-14). **Move a file between these folders only on her word** -- and her
+word is one of `rewrite`, `make`, `keep`, `ready` or `bin` followed by the slug
+(`PIPELINE.md` §3). Never on your own reading of the file: a file in
+`2-make/` may say `rewritten: false`, because "readable enough to make from"
+sits below "the prose is mine", and the folders and the flags answer different
+questions.
 
-**Cocktails.** New ingests land in `_cocktail_drafts/` root — that is the pool,
-and it is where nearly everything still is. There is now ONE staging folder,
-and it is Helen's in exactly the way the food ones are:
-
-    _cocktail_drafts/             the pool -- everything lives here
-      to-promote/                 she has made it, amended it, and it ships;
-                                  waiting on her proofread, then
-                                  _cocktail_recipes/
-
-**Never move a drink into `to-promote/` unless asked.** It records that she has
-MADE the drink and decided it ships, which no flag says.
-
-> ### `to-promote/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE
+> ### `4-promote/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE
 >
 > Two rules bite in those two places and nowhere else — Helen's rulings,
 > 2026-09-04, reading Fish House Punch. Both are enforced
@@ -405,7 +401,7 @@ carries a price and a size there, and
 bottle with no price, and a price naming no bottle. See MANUAL 9.3.5.
 
 **ONE EXCEPTION TO `meta.rewritten`, AND ONLY ONE:** a drink Helen has MOVED
-into `_cocktail_drafts/to-promote/`. The move is how she claims the words, so
+into `_cocktail_drafts/4-promote/`. The move is how she claims the words, so
 the mechanical pass flips `rewritten: true` there -- her standing instruction,
 2026-09-04, `PUBLISHING_A_DRINK.md` step 2. Not in the pool, not on food, and
 never `proofread`, which stays hers everywhere.
@@ -491,7 +487,7 @@ never `proofread`, which stays hers everywhere.
     bitters`, not `lavender bitters`; `bonded rye` and `rye` are distinct;
   - spelling: **in the POOL**, leave the drink as she wrote it and add the
     spelling as an alias -- never retype a pooled drink to a canonical bottle
-    name. **In `to-promote/` and `_cocktail_recipes/` the rule inverts** and
+    name. **In `4-promote/` and `_cocktail_recipes/` the rule inverts** and
     every `suggestion` is the canonical name; see the box above. The two are
     not in tension: an alias is a reading convenience, and a finished drink has
     had time to write the real name.

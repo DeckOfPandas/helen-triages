@@ -214,6 +214,16 @@ layout: default
           </span>
         </div>
 
+        {% comment %} THE NAME IS ALONE ON THIS LINE SINCE 2026-09-14 (#1005).
+           The read it / make it toggle sat here from 2026-09-02 to 2026-09-10
+           (#897), and the shortlist button from 2026-09-11 (#963) -- its
+           fourth home in ten days, which is the fact #1005 was raised on: no
+           rule said where actions live. Helen's pick from the candidates
+           page, "row under the head": every action is in
+           _includes/page-actions.html, beside the toggle in
+           `.cocktail-controls` below, and the same include sits in the same
+           place on a recipe page. `?shortlist=1` on the index (MANUAL 8.9)
+           has a caller again -- the see-shortlist link in that row. {% endcomment %}
         {% comment %} THE READ-IT / MAKE-IT TOGGLE LEFT THIS ROW ON 2026-09-10
            (#897) and is in `.cocktail-controls` below the title block. The
            toggle sat here on the title's line from 2026-09-02; Helen: "move
@@ -442,6 +452,13 @@ layout: default
       </button>
       <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
     </div>
+    {% comment %} THE ACTIONS, AT THE ROW'S RIGHT END -- #1005 / #1011,
+       2026-09-14. shortlist, see shortlist (N), print, pdf: one include, the
+       same on a recipe page. Print and pdf are new to this page; the print
+       stylesheet (_sass/cocktails/_print.scss) already forces the full
+       editorial page whatever the toggle says, and scripts/generate_pdfs.py
+       renders a drink's pdf beside its page as it does a recipe's. {% endcomment %}
+    {% include page-actions.html %}
   </div>
 
   {% comment %} The ingredient list is FULL, not triaged the way food's
@@ -1502,6 +1519,9 @@ layout: default
    default.html: the arrow is page furniture rather than site chrome, so a page
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
+{% comment %} The print button's reveal and wiring (#1005; food's #86). Site-
+   agnostic: it queries `.btn-print` and does nothing on a page with none. {% endcomment %}
+<script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
 {% comment %} THE SCALER, IN DEPENDENCY ORDER AND FOR A REASON — issue #545.
    shopping-list.js is the AMOUNT PARSER (`HTF.shoppingList.parseAmount`, its

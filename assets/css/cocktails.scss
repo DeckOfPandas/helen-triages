@@ -40,6 +40,10 @@
 // no heart colour, and TWO COMPLETELY UNSTYLED NAV ICONS. Same relative
 // position as food.scss, after the structure.
 @import "shared/chrome";
+// The page furniture -- the back arrow's line with its search box, and the
+// actions row (#1005/#1011/#1024). Both page layouts emit the two includes it
+// styles; after chrome, before cocktails/shortlist, which re-points its hovers.
+@import "shared/furniture";
 @import "cocktails/decoration";
 @import "cocktails/cocktail";
 @import "cocktails/cards";

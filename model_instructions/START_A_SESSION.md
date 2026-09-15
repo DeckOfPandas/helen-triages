@@ -26,7 +26,9 @@ in this order:
    A ruling changes when I look at the built thing and change my mind, never
    by being argued at.
 
-Then, depending on the task, the procedure document that owns it:
+Then, for anything that moves a recipe or a drink through the system,
+`model_instructions/PIPELINE.md` — the one map of the whole journey, in,
+out and back — and, depending on the task, the procedure document that owns it:
 `.claude/commands/ingest.md` (getting recipes and drinks in — the boundary is
 *is the answer in the source, or in Helen's head?*), `ingest-inbox.md` (when
 they arrived as GitHub issues), `tidy-drafts.md` (the mechanical half of a

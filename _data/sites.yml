@@ -37,10 +37,17 @@
 #   css         basename under assets/css/ — `food` means assets/css/food.scss
 #   home        where this site's own nav icon links, relative to baseurl
 #   icon        basename (no .svg) of an _includes/icons/ partial standing for
-#               this site in the header nav. Every site gets one slot in that
-#               row, on every page, in the order they appear in this file --
-#               so the row is the same wherever you are, and the icon you are
-#               looking at is not the odd one out.
+#               this site. It stood in the header nav beside the site's word
+#               until 2026-09-14 (#1007), when Helen took the icon out of the
+#               row -- the word and the arrow are the door now. The key and
+#               the artwork stay: the partial is still the site's mark, and
+#               test_site_nav_links_resolve_to_real_pages still asks for it.
+#   search_placeholder
+#               the placeholder in the search box on the back arrow's line of
+#               a recipe or drink page (#1024, 2026-09-14) -- the same words
+#               that site's own index puts in its I KNOW WHAT I WANT box, so
+#               the two boxes read as one control in two places. Says where
+#               you are, which is this file's test for a key.
 #   reference_links
 #               reference pages belonging to THIS site, rendered in the shared
 #               footer as a column headed by this site's own bracketed word. The
@@ -64,6 +71,7 @@ food:
   css: food
   home: /food/
   icon: food-cloche-heart
+  search_placeholder: "recipe name..."
   reference_links:
     - text: internal temperatures
       url: /food/reference/internal-temperatures/
@@ -80,6 +88,7 @@ cocktails:
   css: cocktails
   home: /cocktails/
   icon: glass-martini
+  search_placeholder: "drink name…"
   # THE DAY ARRIVED, 2026-09-06, issue #529 -- and it cost no template change,
   # which is what the note that used to sit here predicted. The footer's loop
   # already asked every site rather than food; this key is the whole of it, and

@@ -1659,6 +1659,20 @@
     restored = null;
   }
 
+  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box on
+     a drink page's furniture line. Exactly what typing into I KNOW WHAT I WANT
+     does (`nameInput`'s handler above): the box shows the text and
+     `state.nameQuery` is the same lowercased string. `HTF.filterState`, the
+     MODULE, for the same reason the mood block reads it there: the grammar is
+     not part of the create() binding. A fresh instruction, so the remembered
+     scroll goes. */
+  var arrivedName = HTF.filterState.parseName(location.search);
+  if (arrivedName && nameInput) {
+    nameInput.value = arrivedName;
+    state.nameQuery = arrivedName.toLowerCase();
+    restored = null;
+  }
+
   apply();
 
   /* AFTER apply(), because the page is not its full height until the hidden

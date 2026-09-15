@@ -285,17 +285,18 @@ def test_a_file_with_no_front_matter_is_named_and_left_alone(drinks):
 
 
 def test_a_drink_in_a_staging_subfolder_is_reached(drinks):
-    """`to-promote/` is half the collection and a flat glob would miss it.
+    """`4-promote/` (`to-promote/` until 2026-09-14) is half the collection and
+    a flat glob would miss it.
 
     22 of the 124 drinks live there. The food side went recursive on 2026-08-20
     for the same reason and the failure was invisible: a flat glob reports the
     files it found, all of them clean, and says nothing about the ones it did
     not look for.
     """
-    (drinks / "to-promote").mkdir()
-    path = write_drink(drinks, "to-promote/staged.md")
+    (drinks / "4-promote").mkdir()
+    path = write_drink(drinks, "4-promote/staged.md")
     out = run(drinks)
-    assert "to-promote/staged.md" in out, out
+    assert "4-promote/staged.md" in out, out
     assert "would apply 6 mechanical change(s)" in out, out
     assert path.read_text(encoding="utf-8") == BEFORE
 

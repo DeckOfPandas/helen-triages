@@ -22,6 +22,11 @@
 // cascade while looking shared in the markup. After shared/layout, so it
 // overrides the structure it styles.
 @import "shared/chrome";
+// The page furniture -- the back arrow's line with its search box, and the
+// actions row (#1005/#1011/#1024). Shared because the two includes it styles
+// are emitted by both page layouts; after chrome, and before the food partials
+// so a site's own file can re-point a hover.
+@import "shared/furniture";
 // The blocky rule, before the index partials below — they use its mixin,
 // same reason.
 @import "food/rule";
@@ -70,6 +75,9 @@
 // %food-number-input rather than extending anything above, so this is the only
 // ordering constraint it has either.
 @import "food/shopping-list";
+// The recipe page's portion scaler (#1005), after shopping-list because it
+// @extends that file's %food-number-input -- the third control of that kind.
+@import "food/recipe-scale";
 // The about page, last: it sits on top of .recipe-body-content's longform
 // styling (that page uses the same wrapper) and overrides the parts built for a
 // recipe's Troubleshooting section, so it has to be imported after it.

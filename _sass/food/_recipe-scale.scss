@@ -1,0 +1,102 @@
+// =============================================================================
+// THE SCALER ON A RECIPE PAGE -- #1005, 2026-09-14. Portions, under the list.
+// =============================================================================
+// The drink page's control (`.cocktail-scale-*`, cocktails/_cocktail.scss)
+// drawn in food's own materials: the same three pieces in a row -- a step
+// button, a box, a step button -- with one word after the box because the
+// number here is PEOPLE and a bare `×` would say the wrong thing. Helen's
+// ruling for food is portions, not multiples (_layouts/recipe.html has it).
+//
+// THE BOX IS `%food-number-input`, the third control of that kind on this site
+// and the one _shopping-list.scss's own comment said would arrive: "If a third
+// appears, lift this the same way." It is @extended rather than lifted, because
+// the placeholder is still in one file and two @extends do not make it a
+// layer; if a fourth wants it, move the placeholder to a partial of its own.
+// This file is imported after food/shopping-list so the placeholder exists.
+//
+// UNDER THE LIST, WITH THE LIST'S OWN GAP. `.ingredients li` carries
+// $space-md below each row, so the control sits one row-gap under the last
+// ingredient and hands the section's space to METHOD's own top margin.
+.recipe-scale-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-xs;
+  margin: $space-sm 0 0;
+
+  // ONE WRAPPER, ONE `hidden`, and it has to beat its own display -- the
+  // attribute's UA rule loses to any author `display`, so without this the
+  // control would ship VISIBLE to a reader whose JavaScript never ran.
+  &[hidden] { display: none; }
+}
+
+.recipe-scale {
+  display: inline-flex;
+  align-items: baseline;
+  gap: $space-xs;
+  font-family: $font-label;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+
+  input {
+    @extend %food-number-input;
+    // Two digits and the caret; the shopping list's 3.4em box holds the same
+    // numbers and this is that box.
+    width: 3.4em;
+    text-align: center;
+    letter-spacing: normal;
+  }
+}
+
+// The word is the unit. Lowercase Plex in the control's grey, the register the
+// shopping list's "set all to" label already speaks in.
+.recipe-scale-word {
+  text-transform: lowercase;
+}
+
+// `~` FOR AN ESTIMATE, the shopping list's own mark (#815): the only thing on
+// the page saying the number was reasoned rather than written down. Ink, not
+// grey, so it reads as part of the figure.
+.recipe-scale-approx {
+  color: $color-text;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+// THE STEP BUTTONS: the site's interactive colour at rest, lighter on hover,
+// the direction every link on this site takes. No box growth on hover or
+// focus (#389's rule): the border is transparent at rest and only its colour
+// moves.
+.recipe-scale-step {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 1.7rem;
+  font-family: $font-label;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: $space-xxs 0;
+  border: 1px solid transparent;
+  background: none;
+  color: $color-recipe-link;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover { color: $color-recipe-link-hover; }
+
+  &:focus-visible {
+    outline: none;
+    color: $color-recipe-link-hover;
+    border-color: $color-recipe-link-hover;
+  }
+}
+
+// THE NOTE -- which lines are still as written once the portions move. Quiet,
+// under the control, in the grey the control itself wears; a paragraph of its
+// own so its sentence cannot push the box along. PLACEHOLDER COPY, Helen's to
+// write (the layout marks it).
+.recipe-scale-note {
+  margin: $space-sm 0 0;
+  max-width: 65ch;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}

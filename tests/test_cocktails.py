@@ -61,12 +61,18 @@ RECIPES = ROOT / "_cocktail_recipes"
 DRAFTS = ROOT / "_cocktail_drafts"
 # THE STAGING FOLDER IS THE PUBLISHED TENSE -- Helen, 2026-09-04, going through
 # Fish House Punch: "'ED3' isn't a bottle" and "this has 'item' everywhere too".
-# `to-promote/` is where a drink sits once she has cooked it, amended it and
+# `4-promote/` is where a drink sits once she has cooked it, amended it and
 # decided it ships; the only thing between it and `_cocktail_recipes/` is her
 # own proofread. So the rules that bite at promotion bite HERE, where there is
 # still time to fix them, rather than at the moment of the move. See
 # `_load_staged`.
-STAGED = DRAFTS / "to-promote"
+# `4-promote/` SINCE 2026-09-14 (#1008), was `4-promote/`. Helen numbered the
+# staging folders so they sort in pipeline order at the top of her file list:
+# "I'd like each subfolder to appear in order at the top of my files list --
+# small usability tweak for future-Helen. So shall we try 1-rewrite, 2-make,
+# and so on?" PIPELINE.md §3 is the set: 1-rewrite (food only), 2-make, 3-keep,
+# 4-promote.
+STAGED = DRAFTS / "4-promote"
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
 BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
@@ -451,7 +457,7 @@ def _load_published():
 
 
 def _load_staged():
-    """The published tense: `_cocktail_recipes/` plus `_cocktail_drafts/to-promote/`.
+    """The published tense: `_cocktail_recipes/` plus `_cocktail_drafts/4-promote/`.
 
     A THIRD DOOR, AND IT EXISTS BECAUSE PROMOTION IS TOO LATE TO FIND OUT.
     `_load_published` asks about drinks the world can already see, which is the
@@ -461,12 +467,12 @@ def _load_staged():
     a thing nobody mentioned while it was being written.
 
     Helen drew the line herself, 2026-09-04, reading Fish House Punch: *"'ED3'
-    isn't a bottle"* and *"this has 'item' everywhere too"*. `to-promote/` is
+    isn't a bottle"* and *"this has 'item' everywhere too"*. `4-promote/` is
     hers -- she moves files into it once she has made the drink and decided it
     ships -- so a file in there is finished prose waiting on her proofread, and
     the fields the site publishes should already be in their published form.
 
-    IT SKIPS WHEN NEITHER DIRECTORY IS ON DISK, and only then. `to-promote/`
+    IT SKIPS WHEN NEITHER DIRECTORY IS ON DISK, and only then. `4-promote/`
     lives in the private drafts repo, so CI never has it; `_cocktail_recipes/`
     is in this repo and is simply empty today. Either one present and yielding
     drinks is enough to run, which is the same bargain `_load_files` strikes --
@@ -478,14 +484,14 @@ def _load_staged():
         return out
     if not (RECIPES.is_dir() or STAGED.is_dir()):
         pytest.skip(
-            "Neither `_cocktail_recipes/` nor `_cocktail_drafts/to-promote/` is "
+            "Neither `_cocktail_recipes/` nor `_cocktail_drafts/4-promote/` is "
             "on this machine, so there is no staged drink to check. The staging "
             "folder is in the private drafts repo (gitignored here), and "
             "`_cocktail_recipes/` starts empty -- see NO_DRINKS_REASON."
         )
     pytest.skip(
         "No drinks are staged for publication. `_cocktail_recipes/` is empty "
-        "and `_cocktail_drafts/to-promote/` holds nothing, which is a fact "
+        "and `_cocktail_drafts/4-promote/` holds nothing, which is a fact "
         "about where Helen is rather than a stale loader: these rules start "
         "running the moment she moves the first file into either."
     )
@@ -931,7 +937,7 @@ def test_a_promoted_drink_carries_no_draft_only_key():
 # =============================================================================
 # THE PUBLISHED TENSE -- Helen's rulings on Fish House Punch, 2026-09-04
 # =============================================================================
-# Two rules, one scope: `_cocktail_drafts/to-promote/` and `_cocktail_recipes/`.
+# Two rules, one scope: `_cocktail_drafts/4-promote/` and `_cocktail_recipes/`.
 # Both are about the difference between a drink being WRITTEN and a drink being
 # FINISHED, and both were things Helen had to say out loud while reading a file
 # she was about to ship.
@@ -957,7 +963,7 @@ def test_a_staged_drink_writes_a_bottles_canonical_name():
     everywhere else: write the bottle as she spells it, add the spelling as an
     alias, never retype a drink to canonical form. The alias map is what lets an
     ingest be fast. This says only that the fast form is not the finished form,
-    and it fires in `to-promote/` -- where there is still time -- rather than at
+    and it fires in `4-promote/` -- where there is still time -- rather than at
     the moment of the move.
 
     A SUGGESTION THAT RESOLVES TO NOTHING IS NOT THIS TEST'S PROBLEM: it is
@@ -988,7 +994,7 @@ def test_a_staged_drink_writes_a_bottles_canonical_name():
         "Staged drink(s) writing a bottle's ALIAS rather than its name:\n  "
         + "\n  ".join(sorted(bad))
         + "\n\nRetype the `suggestion` to the name on the right -- the one "
-          "_data/cocktails/bottles.yml declares. A drink in `to-promote/` or "
+          "_data/cocktails/bottles.yml declares. A drink in `4-promote/` or "
           "`_cocktail_recipes/` is finished writing and is read by strangers, "
           "and an alias is shorthand Helen wrote for herself while transcribing "
           "(\"'ED3' isn't a bottle\", 2026-09-04). Everywhere else the opposite "
@@ -1010,7 +1016,7 @@ def test_a_staged_drink_carries_no_transcription_field():
     THE DEADLINE WAS IN THE WRONG PLACE, which is the whole of this test. A
     drink only reaches `_cocktail_recipes/` by being MOVED there, so the rule
     fired at the one moment when the answer to "what did the source say?" is
-    least available and the job is meant to be finished. In `to-promote/` the
+    least available and the job is meant to be finished. In `4-promote/` the
     drink is still in front of her, and the field is still there to read.
 
     NOTHING RENDERS `item` (§9.10, #544), so deleting one changes no page and

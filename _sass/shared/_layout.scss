@@ -238,7 +238,10 @@ main {
 // item's place are unchanged, which is what makes this safe to carry: it is a
 // correction to what is drawn, not to the layout.
 .site-nav-word {
-  margin-left: 0.55rem;
+  // NO LEFT MARGIN SINCE 2026-09-14 (#1007): the icon it stood off is out of
+  // the row, and the word is the row's first mark. The 0.55rem is kept on the
+  // arrow after it.
+  margin-left: 0;
   font-family: $font-headings;
   font-size: 0.8rem;
   font-weight: 700;

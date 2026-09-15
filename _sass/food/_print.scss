@@ -27,8 +27,26 @@
   // _recipe-header.scss), and this rule had to go with it: a print rule
   // matching nothing fails silently and on paper only, which is exactly what
   // test_print_rules_target_classes_that_exist exists to catch. It did.
-  .recipe-actions,
+  // `.recipe-controls` is the row the actions sit in since #1005; the actions
+  // themselves are hidden by shared/_print.scss on both sites.
+  .recipe-controls,
   .btn-method-toggle {
+    display: none;
+  }
+
+  // THE SCALER AND ITS NOTE (#1005), for the drink page's reason
+  // (cocktails/_print.scss): a printed page is the recipe as written, and a
+  // number box beside the amounts would invite the reader to believe the sheet
+  // could still be changed.
+  .recipe-scale-controls,
+  .recipe-scale-note {
+    display: none;
+  }
+
+  // AND "IF YOU LIKED THIS" (#1005), for the same reason the drink page hides
+  // its own: three links, and a link cannot be followed on paper; navigation
+  // rather than a fact about this recipe.
+  .recipe-related-section {
     display: none;
   }
 
