@@ -124,6 +124,86 @@ def test_gh_read_passes_a_read_through_as_an_explicit_get(args, tail):
     assert lines[5:] == tail
 
 
+# --fields and --each, 2026-09-15: a bracketed --jq made Claude Code ask Helen
+# even though gh-read.sh is allow-listed, so the script builds that expression.
+
+PR = "repos/DeckOfPandas/helen-triages/pulls/1091"
+
+
+@pytest.mark.parametrize("args, jq", [
+    ([PR, "--fields", "state"], "[.state] | @tsv"),
+    ([PR, "--fields", "state,merged_at,user.login"],
+     "[.state, .merged_at, .user.login] | @tsv"),
+    (["repos/DeckOfPandas/helen-triages/pulls?state=all&per_page=40",
+      "--each", "number,title"],
+     ".[] | [.number, .title] | @tsv"),
+])
+def test_gh_read_builds_the_jq_from_plain_field_names(args, jq):
+    lines = _accepted_lines("gh-read.sh", args)
+    assert lines[-2:] == ["--jq", jq]
+
+
+@pytest.mark.parametrize("args", [
+    [PR, "--fields"],
+    [PR, "--fields", ""],
+    [PR, "--fields", "state]"],
+    [PR, "--fields", "state|env"],
+    [PR, "--fields", "state,"],
+    [PR, "--fields", ",state"],
+    [PR, "--fields", "state,,title"],
+    [PR, "--fields", ".state"],
+    [PR, "--fields", "user..login"],
+    [PR, "--fields", "state name"],
+    [PR, "--fields", "$ENV"],
+    [PR, "--fields", "environment"],
+    [PR, "--each", "number;id"],
+    [PR, "--fields", "state", "--jq", ".title"],
+    [PR, "--fields", "state", "--each", "title"],
+])
+def test_gh_read_refuses_field_lists_that_are_not_plain_names(args):
+    _assert_refused("gh-read.sh", args)
+
+
+# --- guard-unanalyzable-bash.py shape 7: quoted brackets to a wrapper ---------
+
+UNANALYZABLE_HOOK = ROOT / ".claude" / "hooks" / "guard-unanalyzable-bash.py"
+
+
+def _unanalyzable_denies(command: str) -> bool:
+    result = subprocess.run(
+        ["python3", str(UNANALYZABLE_HOOK)],
+        input=json.dumps({"tool_input": {"command": command}}),
+        cwd=ROOT, capture_output=True, text=True, timeout=30,
+    )
+    return '"deny"' in result.stdout
+
+
+@pytest.mark.parametrize("command", [
+    # the exact call Helen was asked about, 2026-09-15
+    "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/pulls/1091 "
+    "--jq '[.state, .merged_at] | @tsv'",
+    "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues --jq '.[].title'",
+    'sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues --jq ".number | tostring"',
+    'sh scripts/gh-write.sh pr-create helen-triages feat/x "[wip] a title" tmp/b.md',
+])
+def test_the_hook_refuses_quoted_brackets_and_pipes_given_to_a_wrapper(command):
+    assert _unanalyzable_denies(command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    # the two measured calls that did NOT ask
+    "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/pulls/1091",
+    "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/pulls/1091 --jq .state",
+    "sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/pulls/1091 --fields state,merged_at",
+    'sh scripts/gh-write.sh pr-create helen-triages feat/x "(chore) a title" tmp/b.md',
+    # shape 7 is measured on wrappers only; elsewhere quoted text stays inert
+    "grep -rn 'a|b' model_instructions/",
+    "grep -n '[0-9]' tests/test_agent_wrappers.py",
+])
+def test_the_hook_leaves_plain_wrapper_calls_and_other_quoted_text_alone(command):
+    assert not _unanalyzable_denies(command), f"refused {command!r}"
+
+
 # --- git-push-agent.sh: never the public main --------------------------------
 
 @pytest.mark.parametrize("args", [

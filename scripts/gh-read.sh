@@ -29,15 +29,25 @@
 # thing on any other gh call.
 #
 # USAGE (quote the endpoint whenever it carries a query string):
-#   sh scripts/gh-read.sh <endpoint> [--jq <expr>] [--paginate]
+#   sh scripts/gh-read.sh <endpoint> [--fields a,b.c | --each a,b.c | --jq <expr>] [--paginate]
 #
-#   sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues/944/comments --jq '.[].body'
-#   sh scripts/gh-read.sh 'repos/DeckOfPandas/helen-triages/pulls?state=all&per_page=40' --jq '.[] | [.number, .state, .title] | @tsv'
+#   sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/pulls/1091 --fields state,merged_at,user.login
+#   sh scripts/gh-read.sh 'repos/DeckOfPandas/helen-triages/pulls?state=all&per_page=40' --each number,state,title
+#   sh scripts/gh-read.sh repos/DeckOfPandas/helen-triages/issues/944 --jq .body
 #
-# A WRITE IS NOT THIS SCRIPT'S JOB. Use the named gh-agent.sh subcommands
-# (allow-listed where routine), or for the one REST write the docs name -- a PR
-# body, since `pr edit` fails on this token -- `sh scripts/gh-agent.sh api -X
-# PATCH ...`, which prompts on purpose.
+# PREFER --fields AND --each TO --jq, SINCE 2026-09-15. Measured that day with
+# Helen reporting which calls asked her: `--jq .state` ran unasked, and
+# `--jq '[.state, .merged_at] | @tsv'` asked ("sh names a path that is computed
+# at run time") -- Claude Code reads a script's arguments as possible paths, and
+# a bracket or a pipe makes one look computed, quotes or not. So this script
+# builds that expression itself from plain field names: `--fields a,b` is
+# `[.a, .b] | @tsv` on one object, `--each a,b` is `.[] | [.a, .b] | @tsv` on
+# a list. guard-unanalyzable-bash.py refuses a quoted `[`, `]` or `|` given to
+# any `sh scripts/` wrapper, so a bracketed --jq no longer reaches Helen at all.
+#
+# A WRITE IS NOT THIS SCRIPT'S JOB. scripts/gh-write.sh makes the three routine
+# writes (a PR, a PR body, a comment); anything else goes through gh-agent.sh
+# and asks, on purpose.
 #
 # AGENT_WRAPPER_DRY_RUN=1 prints the command it would run, one argument per
 # line, and exits -- for tests/test_agent_wrappers.py, which proves the
@@ -52,7 +62,24 @@ refuse() {
   exit 2
 }
 
-[ "$#" -ge 1 ] || refuse "usage: sh scripts/gh-read.sh <repos/DeckOfPandas/REPO/...> [--jq <expr>] [--paginate]"
+[ "$#" -ge 1 ] || refuse "usage: sh scripts/gh-read.sh <repos/DeckOfPandas/REPO/...> [--fields a,b | --each a,b | --jq <expr>] [--paginate]"
+
+# `a,b.c` -> `[.a, .b.c] | @tsv`. Plain names only: letters, digits, `_`, and
+# `.` between names; nothing jq could run.
+fields_to_jq() {
+  case "$1" in
+    '' | ,* | *, | *,,* | .* | *.,* | *,.* | *. | *..* | *[!A-Za-z0-9_.,]*)
+      refuse "'$1' is not a comma-separated list of field names (letters, digits, _ and . only)" ;;
+  esac
+  list=""
+  old_ifs="$IFS"
+  IFS=,
+  for field in $1; do
+    list="${list:+$list, }.$field"
+  done
+  IFS="$old_ifs"
+  printf '[%s] | @tsv' "$list"
+}
 endpoint="$1"
 shift
 
@@ -72,9 +99,14 @@ have_jq=""
 paginate=""
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --jq)
-      [ "$#" -ge 2 ] || refuse "--jq needs an expression"
-      jq="$2"
+    --jq | --fields | --each)
+      [ "$#" -ge 2 ] || refuse "$1 needs a value"
+      [ -z "$have_jq" ] || refuse "give one of --fields, --each and --jq, not two"
+      case "$1" in
+        --jq) jq="$2" ;;
+        --fields) jq="$(fields_to_jq "$2")" ;;
+        --each) jq=".[] | $(fields_to_jq "$2")" ;;
+      esac
       have_jq=1
       shift 2
       ;;
@@ -83,7 +115,7 @@ while [ "$#" -gt 0 ]; do
       shift
       ;;
     *)
-      refuse "'$1' -- this wrapper only reads, and takes an endpoint, --jq <expr> and --paginate. A write goes through gh-agent.sh"
+      refuse "'$1' -- this wrapper only reads, and takes an endpoint, --fields, --each or --jq, and --paginate. A write goes through gh-write.sh"
       ;;
   esac
 done

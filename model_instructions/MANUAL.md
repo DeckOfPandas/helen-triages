@@ -120,9 +120,12 @@ do not name the token: `sh scripts/gh-agent.sh <args>`** (2026-09-10 — the
 assignment lives in that one file now, because a call site with a secret's name
 in it is indistinguishable from a leak until you have run the rule in your
 head, and Helen should not have to). **For a REST read, use
-`sh scripts/gh-read.sh <endpoint> [--jq <expr>] [--paginate]`** — GET only,
-the three repos only, and allow-listed, where `gh-agent.sh api` prompts every
-time because `api` can also merge (2026-09-11). `CLAUDE.md`'s allow-rules
+`sh scripts/gh-read.sh <endpoint> --fields state,merged_at`** (one object) or
+**`--each number,title`** (a list) — GET only, the three repos only, and
+allow-listed, where `gh-agent.sh api` prompts every time because `api` can also
+merge (2026-09-11). `--jq <expr>` still exists, but a quoted `[`, `]` or `|` in
+it makes Claude Code ask Helen despite the allow rule, and the unanalysable-bash
+hook refuses it (measured 2026-09-15); `--jq .body` is fine. `CLAUDE.md`'s allow-rules
 bullet lists every call that runs without asking.
 **Never `echo` it in any form** — not even a probe that cannot leak; the hook
 refuses all of them (`CLAUDE.md`). To find out whether a credential works,

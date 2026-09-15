@@ -44,6 +44,17 @@ WHAT IT REFUSES, each with the `CLAUDE.md` rule it belongs to:
   5. CHAINING with `&&`, `||` or `;` -- checked as a whole, so it matches
      neither part's rule even when both parts are allowed on their own.
   6. A PIPE -- a pipeline's later stages are runtime-computed.
+  7. A QUOTED `[`, `]` OR `|` IN AN ARGUMENT TO `sh scripts/...` -- since
+     2026-09-15, and the one shape here that is NOT inert inside quotes. Measured
+     that day, three read-only calls to the allow-listed `gh-read.sh`, Helen
+     reporting which asked: no `--jq` ran unasked, `--jq .state` ran unasked,
+     `--jq '[.state, .merged_at] | @tsv'` asked ("sh names a path that is
+     computed at run time, which cannot be checked against the read block").
+     The checker treats a script's arguments as possible paths, and a bracket
+     or a pipe makes one look computed, quotes or not. Only the combination was
+     measured, so both characters are refused; only `sh scripts/` was measured,
+     so nothing else is. The remedy is `gh-read.sh --fields` / `--each`, which
+     build the jq expression inside the script.
 
 WHAT IT DELIBERATELY ALLOWS, because a guard that fires on harmless
 invocations is one you learn to route around (the lesson `guard-destructive-git
@@ -91,6 +102,9 @@ _LEADING_CD = re.compile(r"^\s*cd(\s|$)")
 # far more often a regex or a URL query than a glob, and `*` is the form every
 # CLAUDE.md example uses.
 _GLOB = re.compile(r"\*")
+
+# An invocation of a committed wrapper, the only shape shape 7 was measured on.
+_SCRIPT_CALL = re.compile(r"^\s*sh\s+scripts/")
 
 
 def _strip_quoted(command: str, quotes: str) -> str:
@@ -200,6 +214,21 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "(`grep -r 'x' dir/`, no `*.md` needed), or list the files "
                 "explicitly")
 
+    # Shape 7. `bare` has the same length as `command`, with every quoted
+    # character blanked -- so a character blanked in `bare` and a bracket or
+    # pipe in `command` is one that sat inside quotes.
+    if _SCRIPT_CALL.match(command) and any(
+        bare[i] == " " and ch in "[]|" for i, ch in enumerate(command)
+    ):
+        return ("a quoted `[`, `]` or `|` in an argument to a scripts/ wrapper, "
+                "which Claude Code reads as a path computed at run time and "
+                "asks Helen about even though the wrapper is allow-listed "
+                "(measured 2026-09-15)",
+                "for a GitHub read, name the fields instead of writing jq: "
+                "`sh scripts/gh-read.sh <endpoint> --fields state,merged_at` "
+                "for one object, `--each number,title` for a list. Otherwise "
+                "rephrase the argument without brackets or a pipe")
+
     return None
 
 
@@ -243,7 +272,8 @@ def main() -> int:
                 "CLAUDE.md: \"When a command needs to be clever, put the "
                 "cleverness in a file and run the file.\"\n\n"
                 "Quoted text is exempt for `&&`, `||`, `;`, `|` and globs, "
-                "which are inert inside either kind of quote. NOT for "
+                "which are inert inside either kind of quote -- EXCEPT a "
+                "quoted `[`, `]` or `|` given to `sh scripts/...`. NOT for "
                 "`$(...)` and backticks: the shell expands those inside "
                 "DOUBLE quotes, so prose about substitution belongs in single "
                 "quotes. Redirection to a static path is fine, `2>&1` "

@@ -4277,6 +4277,27 @@ unless stated.
     `gawk`, `mawk` and `nawk` fail. In passing, `guard-sed.py`'s refusal
     stopped recommending `python3 -c '...'`, which the inline-script guard has
     refused since 2026-09-10 — its advice walked straight into the next guard.
+  - **A bracket in a quoted argument makes an allow-listed wrapper ask, and
+    Helen had stopped reading the prompts.** She pasted one back:
+    `sh scripts/gh-read.sh .../pulls/1091 --jq '[.state, .merged_at] | @tsv'`,
+    reason *"sh names a path that is computed at run time, which cannot be
+    checked against the read block"*, and asked whether requests could be made
+    more meaningful — adding that she had had "quite a few" `sh` prompts that
+    day and *"stopped reading them in the name of a quiet life."* **Measured,
+    not guessed**, with three read-only calls she reported on: no `--jq` —
+    unasked; `--jq .state` — unasked; the bracketed, piped `--jq` — asked. So
+    wrappers and their allow rules work, and CLAUDE.md's claim that they do
+    not prompt holds; what fails is a `[`/`]`/`|` inside quotes, which Claude
+    Code reads as a computed path in a script's arguments (the bracket and the
+    pipe were not separated). Our own hook exempted quoted text, so nothing
+    stopped it reaching her. Three changes: `gh-read.sh --fields a,b` and
+    `--each a,b` build `[.a, .b] | @tsv` inside the script from plain names;
+    `guard-unanalyzable-bash.py` refuses a quoted `[`, `]` or `|` given to
+    `sh scripts/...` (proved by disabling the rule and watching its four
+    refusal tests fail); and CLAUDE.md now requires every Bash `description`
+    to say what the call reads or writes, since a prompt nobody reads guards
+    nothing. Not measured, so not refused: brackets or pipes quoted in commands
+    other than `sh scripts/` wrappers.
 
 ### §11.2 The record of this file being wrong
 
