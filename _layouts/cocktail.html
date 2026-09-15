@@ -1167,14 +1167,61 @@ layout: default
      scaler never writing to `.cocktail-units`, not from the number being
      unreachable. If this line ever moves with the scaler, that is the bug, and
      this is where it came from. {% endcomment %}
-  {% if page.units %}
-    <p class="cocktail-units"
-       data-units-per-serve="{{ page.units.per_serve }}"
-       data-serves="{{ page.units.serves }}">Roughly
-      <span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
-      {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
-      {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
-      {%- else %} in a serving.{% endif %}</p>
+  {% comment %} THE FOOTER CAME UP ABOVE THE RELATED DRINKS -- #1099, Helen,
+     2026-09-15: "ingredients, scaler, method, notes, <hr>, source, roughly X
+     units of alcohol per serving, roughly £x-y in ingredients per serving,
+     <hr>, if you liked this". So the two paragraphs above about WHERE the units
+     line sits describe the order before today; the reasons for its wording and
+     its data attributes still hold. One block, under one hairline
+     (`.cocktail-footer`), in her order: source, units, cost. The related
+     section's own hairline is the second rule. The sentences are unchanged:
+     her list names the lines, it does not reword them.
+
+     AN EMPTY STRING IS TRUTHY TOO, not just an empty array. Three drinks once
+     carried source as a known-unfilled empty string, and gating on the bare
+     value drew a "Source:" line with nothing after it. Test the value against
+     "", not its existence. (Tag delimiters are PARSED inside a comment block,
+     so the bad Liquid is not quoted here: it broke this build once.)
+
+     THE COST LINE IS LOCAL ONLY. `site.show_costs` is declared in
+     _config_local.yml and nowhere else, so production renders nothing (Helen,
+     2026-09-05: "I only want to show price on the locally built site, and only
+     as an incidental"). Never move the key into _config.yml. `cost.complete`
+     false withholds the figure (the Bellini's weighed and counted pours);
+     `cost.exact` prints one figure rather than a range. The figures sit in data
+     attributes because cocktail-scale.js multiplies them. {% endcomment %}
+  {% assign has_source = false %}
+  {% if page.source != "" or page.source_url != "" %}{% assign has_source = true %}{% endif %}
+  {% assign has_cost = false %}
+  {% if site.show_costs and page.cost and page.cost.complete %}{% assign has_cost = true %}{% endif %}
+  {% if has_source or page.units or has_cost %}
+    <div class="cocktail-footer">
+      {% if has_source %}
+        <p class="cocktail-source">
+          {% if page.source_url %}
+            Source: <a href="{{ page.source_url }}">{{ page.source | default: page.source_url }}</a>
+          {% else %}
+            Source: {{ page.source }}
+          {% endif %}
+        </p>
+      {% endif %}
+      {% if page.units %}
+        <p class="cocktail-units"
+           data-units-per-serve="{{ page.units.per_serve }}"
+           data-serves="{{ page.units.serves }}">Roughly
+          <span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
+          {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
+          {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
+          {%- else %} in a serving.{% endif %}</p>
+      {% endif %}
+      {% if has_cost %}
+        <p class="cocktail-cost"
+           data-cost-min="{{ page.cost.min }}"
+           data-cost-max="{{ page.cost.max }}">Roughly <span class="cocktail-cost-figure">{% if page.cost.exact
+            %}&pound;{{ page.cost.min }}{% else
+            %}&pound;{{ page.cost.min }}&ndash;&pound;{{ page.cost.max }}{% endif %}</span> a glass in ingredients.</p>
+      {% endif %}
+    </div>
   {% endif %}
 
   {% comment %} ─────────────────────────────────────────────────────────────────
@@ -1458,61 +1505,9 @@ layout: default
     </section>
   {% endif %}
 
-  {% comment %} AN EMPTY STRING IS TRUTHY TOO, not just an empty array. All
-     three drinks carry source as a known-unfilled empty string, and gating
-     this footer on the bare value drew a "Source:" line with nothing after
-     it on every one of them. Test the value against "", not its existence.
-
-     This comment does not quote the bad Liquid, deliberately: tag delimiters
-     are PARSED inside a comment block, so writing the offending if-tag here
-     is itself a syntax error. It broke this build once, exactly as
-     _layouts/recipe.html's own comments warn.
-  {% endcomment %}
-  {% if page.source != "" or page.source_url != "" %}
-    <div class="cocktail-footer">
-      <p class="cocktail-source">
-        {% if page.source_url %}
-          Source: <a href="{{ page.source_url }}">{{ page.source | default: page.source_url }}</a>
-        {% else %}
-          Source: {{ page.source }}
-        {% endif %}
-      </p>
-    </div>
-  {% endif %}
-
-  {% comment %} WHAT IT COSTS, ROUGHLY — LOCAL ONLY. Helen, 2026-09-05: "I only
-     want to show price on the locally built site, and only as an incidental —
-     just somewhere on the recipe page." So it sits in the footer under the
-     source line rather than up beside the ingredients, and it is one quiet
-     sentence rather than a feature.
-
-     `site.show_costs` IS DECLARED IN _config_local.yml AND NOWHERE ELSE, which
-     is exactly the `show_drafts` idiom two keys above it in that file:
-     production declares no such key, the condition is false there, and nothing
-     renders. Never move the key into _config.yml. The prices themselves are
-     public data in _data/cocktails/costs.yml either way — this gate governs
-     what the SITE claims, not what the repo stores.
-
-     `cost.complete` IS FALSE FOR ONE DRINK and the figure is withheld rather
-     than printed with a caveat. The Bellini is a pear, four apricots and 75 g
-     of sugar cooked into a syrup; all of those are weighed or counted, and
-     Helen excluded weighed and counted things, so the rule costs it at 7p —
-     not an approximation of anything. See the plugin's `cost_complete` note.
-
-     `cost.exact` MEANS EVERY POUR NAMED ITS BOTTLE, so there is no span to
-     print and one figure is the honest output, not a range that collapsed.
-
-     THE FIGURES ARE ALSO IN DATA ATTRIBUTES so cocktail-scale.js can multiply
-     them. Cost is linear in volume, so ×4 is exactly four times and the scaler
-     needs to know nothing about prices. Without that the number would go stale
-     and wrong the moment the multiple changed. {% endcomment %}
-  {% if site.show_costs and page.cost and page.cost.complete %}
-    <p class="cocktail-cost"
-       data-cost-min="{{ page.cost.min }}"
-       data-cost-max="{{ page.cost.max }}">Roughly <span class="cocktail-cost-figure">{% if page.cost.exact
-        %}&pound;{{ page.cost.min }}{% else
-        %}&pound;{{ page.cost.min }}&ndash;&pound;{{ page.cost.max }}{% endif %}</span> a glass in ingredients.</p>
-  {% endif %}
+  {% comment %} The source and cost lines lived here, after the related drinks,
+     until #1099 (2026-09-15) moved them into `.cocktail-footer` above it. See
+     that block for their gates. {% endcomment %}
 
 </article>
 
