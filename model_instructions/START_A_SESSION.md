@@ -75,6 +75,7 @@ and anything you left undone and why.
 
 
 # TASK
+If no brief is given in the command line prompt, do this:
 1. Please read all the GitHub issues
 2. Tell me which are stale
 3. Tell me which should be split out into seprate issues

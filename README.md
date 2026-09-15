@@ -2,13 +2,14 @@
 
 About the site: https://deckofpandas.github.io/helen-triages/about/
 
-This is a Jekyll site hosted on GitHub Pages. A GitHub Actions workflow runs the tests, then builds, then deploys to Pages. Nothing deploys if the tests fail. 
+This Jekyll repo serves two personal decision-support sites: **food** (what shall we cook?) and **cocktails** (what shall we drink?). A GitHub Actions workflow runs the tests, builds, then deploys to Pages.
 
-This public mono-repo holds both the food and cocktails sides, with private repos holding drafts for each.
+This public repo holds both the food and cocktails sides, with private repos holding drafts for each.
 
 ---
 
 ## Initial setup:
+
 1. Set up Claude's GitHub access
    - Create a new GitHub user for Claude so it doesn't act as me / use my SSH keys
    - Add Claude's account as a Collaborator to the three repos
@@ -20,29 +21,28 @@ This public mono-repo holds both the food and cocktails sides, with private repo
    - Set `AGENT_GH_TOKEN` in `.claude/settings.local.json`
       - Note that the token goes under the env key in `settings.local.json` (`run.sh` reads `['env']['AGENT_GH_TOKEN']`), and that file is gitignored
 2. Check the three repos out locally
-3. Add permissions to execute the Docker build-and-run script in the main repo directory:
-   - `chmod +x .devcontainer/run.sh`
-4. Run the container (running bash):
+3. Run the container (running bash):
    - `.devcontainer/run.sh`
-      - Builds the image if it doesn't already exist based on the Dockerfile
+      - Builds the image from the Dockerfile if it doesn't exist yet
       - Plenty of packages are pre-installed, including Playwright and its dependencies
       - Bind-mounts the primary checkout at /workspace, even when run from inside a worktree
       - Reads `AGENT_GH_TOKEN` from `settings.local.json` and passes it in as an environment variable
       - Mounts ~/.gitconfig read-only
       - Mounts dotfiles if present, read-only, for quality of life
-      - Publishes container ports 4001 and 4002 on host ports 5999 and 6000, picked as I had to state something, and I'm unlikely to try and use those for anything else
-         - There's no Jekyll in the docker image anyway
-5. Run Claude inside the container, in worktrees
+      - Publishes container ports 4001 and 4002 on host ports 5998 and 5999, picked as I had to state something, and I'm unlikely to try and use those for anything else
+         - Jekyll isn't in the image anyway -- `bundle install` inside the container puts it in the cache volume
+4. Run Claude inside the container, in worktrees
    - `claude --worktree NAME`
-6. To get terminal (bash) access to the container while running:
+5. To get terminal (bash) access to the container while running:
    - `docker exec -it helen-triages-primary bash`
 
 Extra things to remind Claude sometimes:
-   - Try REST, because GraphQL `pr edit` fails on this token
-   - Pace requests when making multiple, e.g. opening a batch of Issues, to reduce the likelihood of account flagging (this is in Claude's instructions).
+   - Use REST, not GraphQL
+   - Space out writes (a batch of Issues got the first agent account flagged as spam)
    - Tag Issue numbers in commit messages because it's annoying when this doesn't happen (this is in Claude's instructions)
 
 ## General dev workflow:
+
 1. Pull
    - Helpful script to update drafts repos:
       - `scripts/update-drafts-repos.sh`
@@ -59,6 +59,7 @@ WSL leaves Zone.Identifier files behind when I copy things in from Windows. They
 
 
 ## Rebuilding the image after changes
+
 ```
 docker image list
 docker image rm helen-triages-devcontainer
@@ -68,6 +69,7 @@ Then build and run the container again:
 
 
 ## Recipe data pipeline
+
 https://github.com/DeckOfPandas/helen-triages/blob/main/model_instructions/PIPELINE.md
 
 There's a Mermaid diagram at the top, ooOoooh.
@@ -75,13 +77,13 @@ There's a Mermaid diagram at the top, ooOoooh.
 Three ways in:
 1. claude.ai Project
 2. An `ingest` issue on a private repo
-3. I dump files in `tmp/inbox-*`), 
+3. I dump files in `tmp/inbox-*` 
 
 Then an intake pass results in ONE list of questions for me. Anything the source doesn't say is `QQ`.
 
 The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/` (food only because cocktails are usually less garbage on the way in), `2-make/`, `3-keep/`, `4-promote/`. 
 
-Then Claude does a mechanical pass on what's in `to-promote`, then I proofread the rendered page, Claude promotes it in a PR, I merge, and the merge deploys.
+Then Claude does a mechanical pass on what's in `4-promote`, then I proofread the rendered page, Claude promotes it in a PR, I merge, and the merge deploys.
 
 If Claude edits a live file, it sets `proofread: false` and raises a `blocked-on-helen` issue because the recipe will disappear from the live site. If something big is wrong, the file goes back to `4-promote/`.
 
@@ -95,18 +97,20 @@ Principles:
 4. Don't publish anything I haven't proofread.
 
 ### Don't harass me
+
 Aims:
 1. Claude Code only runs commands without asking when the command matches an allow rule and its static check finds no path outside the project.
-2. Commands should keep meaning clear, and anything clever (paths constructed at run time, variable expansions etc) should go in a committed script the checker can read.
+2. Anything clever (paths built at run time, variable expansions) goes in a committed script the checker can read.
    - Claude being clever at the prompt means me clicking "yes" all day after 2-min instalments of not being able to get anything else done
 
 How I try to achieve this:
+
+Steps 1 to 4 exist because Claude read the written rules and then broke most of them anyway.
+
 1. Hook:
    - `guard-unanalyzable-bash.py` refuses commands that would otherwise have to ask me:
       - heredocs, `$(...)` or backticks, a leading `cd`, pipes, `&&`/`||`/`;` chains, and globs in arguments
-      - Claude gets told no and writes a script instead, so I don't get a prompt -- it still allows redirection to a named file and plain `$VAR`
-      - This one exists because I asked "can we either avoid needing to request permission, or block the command if it can't be statically analysed?"
-   - One command per bash call (so no `;` or `&&`), because an extra round trip beats interrupting me
+   - Claude gets told no and writes a script instead, so I don't get a prompt -- it still allows redirection to a named file and plain `$VAR`
 
 2. Allow-list:
    - `sh scripts/gh-read.sh`: any REST read, GET only, my three repos only
@@ -119,8 +123,8 @@ How I try to achieve this:
    - Reading and writing to `/dev/null`, as an exact path
 
 3. Wrappers that check their own arguments:
-   - Allow rules ending in * can obviously accept arguments that run programs (`git clone --template=`, `git fetch --upload-pack=`, `node --import`), so they only go on wrappers that check their arguments
-      - There's a test requiring every rule ending in `*` to be on a reviewed list
+   - Allow rules ending in * can obviously accept arguments that run programs (`git clone --template=`, `git fetch --upload-pack=`, `node --import`)
+      - Kept to a reviewed list, mostly wrappers
       - Dry-run tests prove what each wrapper refuses
    - `git-push-agent.sh` refuses a push to the public `main`, a bare refspec, other repos, and folders outside the checkout
    - `git-clone-agent.sh` and `git-fetch-agent.sh` refuse extra options such as `--template=` and `--upload-pack=`, which can run programs
@@ -133,9 +137,7 @@ How I try to achieve this:
    - Every allow rule that accepts arbitrary extra arguments must be on a reviewed list
    - No allow rule may open `gh ... api`, because it can merge
    - No allow rule may run a `tmp/` script: I chose "keep asking me please" 
-   - Scratch files live only in the project's `tmp/`, never the system `/tmp`, `~`, or job directories (written rule)
    - Every allow-listed script exists
-
 
 5. Habits, written in CLAUDE.md:
    - One command per call
@@ -144,21 +146,23 @@ How I try to achieve this:
    - Commit messages and PR or issue bodies go in files (`-F`, `--body-file`)
    - Anything that builds a path at run time goes in a committed wrapper, so no prompts for Helen
 
-6. Misc:
-   - Never `sed` (`guard-sed.py`)
-   - Never `awk` (`guard-awk.py`)
-   - Scratch files live only in the project's `tmp/`, never the system `/tmp`, `~`, or job directories
-   - `blockReadsOutsideWorkingDirectories=true` blocks `Read`, `Grep` and `Glob` outside the project 
-
-But unfortunately:
-
-7. Brackets and pipes in quotes still trigger prompts:
+6. Brackets and pipes in quotes triggered prompts even in an allow-listed call:
    - Claude Code reads arguments as possible paths, so `--jq '[.state] | @tsv'` harasses me even though `gh-read.sh` is allow-listed
    - `gh-read.sh --fields state,merged_at` (or `--each` for lists) builds the jq inside the script, and `guard-unanalyzable-bash.py` refuses a quoted `[`, `]` or `|` in any `sh scripts/...` call
    - Every Bash description has to say what the call reads or writes, because I'd stopped reading prompts in the name of a quiet life
 
+7. Misc:
+   - Never `sed` (`guard-sed.py`)
+   - Never `awk` (`guard-awk.py`)
+   - Scratch files live only in the project's `tmp/`, never the system `/tmp`, `~`, or job directories (written rule)
+   - `blockReadsOutsideWorkingDirectories=true` blocks `Read`, `Grep` and `Glob` outside the project 
 
-### Don't print secrets
+But unfortunately:
+
+
+
+
+### Don't print secrets (again)
 
 The GitHub token is visible in the container, passed in as an environment variable. So any process in the container can read it, and `docker inspect` on the host shows it -- fine for a single-user dev box.
 
@@ -173,7 +177,8 @@ Mitigations:
       - anything shaped like a real GitHub token (`ghp_`, `github_pat_...`)
       - a `gh --jq` that reads the environment
 
-### Don't annihilate my repos
+### Don't annihilate my repos (twice and counting)
+
    - `guard-main-branch.py` refuses `git commit` or `git merge` while on `main`, in any repo, including through `cd` or `git -C`
    - `guard-destructive-git.py` refuses `reset --hard`, `checkout`/`restore` over changed files, and `clean -fd` when there's uncommitted work, naming what would be lost
    - Deny rules block `pr merge` and `pr review` 
@@ -192,13 +197,15 @@ Mitigations:
       - never broaden access
 
 ### Don't publish anything I haven't proofread.
+
    - Publish gate (`_plugins/publish_gate.rb`): content goes live only with `proofread: true` and `awaiting_fix: false` -- a missing or misspelled flag blocks it
-   - Test `test_agent_edited_recipes_are_not_marked_proofread` reads history -- if Claude's commit is the newest on a recipe or drink, the file must say `proofread: false`
+   - Tests `test_agent_edited_recipes_are_not_marked_proofread` and `test_agent_edited_drinks_are_not_marked_proofread` reads history -- if Claude's commit is the newest on a recipe or drink, the file must say `proofread: false`
    - CI runs the tests before deployment
 
 ### Dear future Helen
-1. Don't run `git worktree prune` on the host while container sessions are open
-   - Container worktrees are recorded as `/workspace/...`, which doesn't exist on the host, so `prune` would delete them
+
+1. If you value sanity, don't run `git worktree prune` on the host while container sessions are open:
+   - Container worktrees are recorded as `/workspace/...`, which doesn't exist on the host, so `prune` orphans them
 2. `run.sh` uses --rm, so exit the container before `docker image rm helen-triages-devcontainer`, or the removal is refused
 3. Claude config and bundle cache are named volumes and survive a rebuild
 
