@@ -5492,8 +5492,10 @@ verification. Dates are when the correction landed.
     is food's 1px grey rule over the actions row against cocktails' now-1px
     absinthe one, asked twice this session. Settled. Do not raise it again.
   - **The shortlist panel: *"Save, restore or clear the shortlist" -> "Share or
-    save the shortlist"*; the link's hint becomes *"Loading this shows drinks
-    without saving them."* (food's reads "recipes"); and *"Remove the rest of
+    save the shortlist"*; the link's hint became *"Loading this shows drinks
+    without saving them."*, and then, when food's copy had been adapted to
+    "recipes": *"My mistake. 'Loading this shows recipes without saving them.'
+    for both sites."* — the same words on both; and *"Remove the rest of
     the apparatus: no JSON export or import, no clear."*** So #849's export,
     #850's restore and the two-click clear of 2026-09-10 are deleted, with
     `HTF.shortlist.snapshot()`, `restore()` and their tests. What they were
