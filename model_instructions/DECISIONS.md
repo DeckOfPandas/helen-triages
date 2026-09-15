@@ -4736,6 +4736,15 @@ verification. Dates are when the correction landed.
   seen" (#895's own words). Helen's grant, the Dockerfile's fifteen packages,
   and `scripts/browser/` are what changed; the phone pass (#899, #900, #901,
   #903) was the first work done by looking.
+- **2026-09-15: `guard-unanalyzable-bash.py` refuses an unquoted `(` or `)`.**
+  A session ran `git log origin/main -25 --format=%h%x09%s%x09%(trailers:key=Fixes,valueonly,separator=%x2C)`
+  with the format unquoted. The shell cannot parse `%(`, so the checker put it
+  to Helen ("Parse error; ... a command the shell parser cannot analyze asks the
+  person"); she declined it and asked *"Can we do anything?"* The guard had no
+  shape for it, the same gap the leading env assignment had been that morning
+  (#1098). An unquoted parenthesis is a subshell or a parse error and never an
+  ordinary argument, so refusing it costs nothing; a quoted or backslash-escaped
+  one passes. Tests in `tests/test_agent_wrappers.py` carry the exact command.
 
 ## §12 Traps — the stories
 
