@@ -300,6 +300,18 @@ permalink: /food/
      to 2026-09-10; cocktails/index.html has the note on why it went. {% endcomment %}
 </div>
 
+{% comment %} A SHORTLIST SOMEONE SENT -- #1093. Shown only while the index is
+   showing a `?shortlist=slug,slug` link, which it does without saving anything
+   (Helen, 2026-09-15); "keep these" is the one tap that saves it. filters.js
+   fills the text and reveals both. Its own line under the count row, not in
+   it: that row is a flex line, and beside the button a sentence with a button
+   in it wrapped into a narrow column on a phone. PLACEHOLDER COPY.
+   {% endcomment %}
+<p class="shared-shortlist" data-shared-shortlist hidden>
+  <span data-shared-shortlist-text></span>
+  <button type="button" class="btn-shared-keep" data-shared-shortlist-keep hidden>keep these</button>
+</p>
+
 <ul class="recipe-list">
   {% for recipe in all_recipes %}
     {% assign is_magic_bag = false %}
@@ -662,6 +674,20 @@ permalink: /food/
   {% comment %} PLACEHOLDER COPY. Plain words since 2026-09-10; see
      cocktails/index.html's panel for the note. {% endcomment %}
   <summary>Save, restore or clear the shortlist</summary>
+  {% comment %} THE LINK FIRST -- #1093. One line anyone can open or send,
+     where the JSON below needs somewhere to paste it. It opens this index
+     showing the list without saving it; the portions stay behind, which is
+     what the JSON is still for. shortlist-export.js fills it and reveals it.
+     PLACEHOLDER COPY. {% endcomment %}
+  <p class="shortlist-export-hint" data-shortlist-share-hint hidden>
+    A link to this shortlist, to open or send. It shows the recipes without
+    saving them, and leaves the portions behind.
+  </p>
+  <input type="text" class="shortlist-share-link" data-shortlist-share
+         readonly spellcheck="false" aria-label="A link to this shortlist" hidden>
+  <button type="button" class="btn-shortlist-copy" data-shortlist-share-copy hidden>
+    copy link
+  </button>
   <p class="shortlist-export-hint">
     Copy this and keep it, or paste it somewhere else. It holds what is
     shortlisted and how many portions of each.

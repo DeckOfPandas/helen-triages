@@ -428,6 +428,14 @@ permalink: /cocktails/
        {% endcomment %}
     <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
   </p>
+  {% comment %} A SHORTLIST SOMEONE SENT -- #1093, food/index.html has the
+     note. Its own line under the count row rather than inside it: that row
+     is a <p>, and this is a second sentence with a button in it.
+     PLACEHOLDER COPY. {% endcomment %}
+  <p class="shared-shortlist" data-shared-shortlist hidden>
+    <span data-shared-shortlist-text></span>
+    <button type="button" class="btn-shared-keep" data-shared-shortlist-keep hidden>keep these</button>
+  </p>
 
   <ul class="drink-cards">
     {% assign sorted_drinks = all_drinks | sort: "title" %}
@@ -887,6 +895,17 @@ permalink: /cocktails/
     {% comment %} PLACEHOLDER COPY. Plain words since 2026-09-10 -- it was
        "Export shortlist as JSON", and the panel does three things now. {% endcomment %}
     <summary>Save, restore or clear the shortlist</summary>
+    {% comment %} THE LINK FIRST -- #1093, food/index.html has the note.
+       PLACEHOLDER COPY. {% endcomment %}
+    <p class="shortlist-export-hint" data-shortlist-share-hint hidden>
+      A link to this shortlist, to open or send. It shows the drinks without
+      saving them, and leaves the glasses behind.
+    </p>
+    <input type="text" class="shortlist-share-link" data-shortlist-share
+           readonly spellcheck="false" aria-label="A link to this shortlist" hidden>
+    <button type="button" class="btn-shortlist-copy" data-shortlist-share-copy hidden>
+      copy link
+    </button>
     <p class="shortlist-export-hint">
       Copy this and keep it, or paste it somewhere else. It holds what is
       shortlisted and how many of each.

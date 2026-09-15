@@ -174,6 +174,56 @@
     return name;
   }
 
+  // THE SHORTLIST QUERY IS NOT A KIND EITHER, and it has two meanings -- #1093.
+  //   ?shortlist=1              this browser's own shortlist (#994, #1011)
+  //   ?shortlist=negroni,aviation   a shortlist someone SENT, by slug
+  // Kept out of parseQuery for #994's reason (`shortlisted` is a view, not a
+  // field a URL may set) and out of a literal `indexOf('shortlist=1')`, which
+  // is what both indexes used until a second meaning arrived and a slug
+  // beginning `1` would have read as the first.
+  //
+  // A SLUG IS [a-z0-9-] AND NOTHING ELSE. Anything outside that is dropped
+  // rather than matched: a link is untrusted input, and the one thing a slug
+  // is ever compared with is a Jekyll-written URL segment, which never carries
+  // any other character. `1` alone is the own-list flag and never a slug. The
+  // last `shortlist` parameter wins; values are deduplicated in link order.
+  //
+  // -> { own: boolean, slugs: string[] }. `own` and a non-empty `slugs` never
+  // both hold.
+  var SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
+
+  function parseShortlist(search) {
+    var body = String(search == null ? '' : search).replace(/^[?#]/, '');
+    var out = { own: false, slugs: [] };
+    body.split('&').forEach(function (chunk) {
+      var eq = chunk.indexOf('=');
+      if (eq === -1) return;
+      if (decodeValue(chunk.slice(0, eq)) !== 'shortlist') return;
+      var raw = chunk.slice(eq + 1);
+      out = { own: false, slugs: [] };
+      if (decodeValue(raw).trim() === '1') { out.own = true; return; }
+      raw.split(',').forEach(function (rawValue) {
+        var slug = decodeValue(rawValue).trim().toLowerCase();
+        if (!SLUG_RE.test(slug) || slug === '1') return;
+        if (out.slugs.indexOf(slug) === -1) out.slugs.push(slug);
+      });
+    });
+    return out;
+  }
+
+  // The other half: the query string that parseShortlist reads back as these
+  // slugs. Slugs failing the same test are left out, so a link this writes
+  // is always one this reads. '' for an empty list -- there is no link to a
+  // shortlist of nothing.
+  function shortlistQuery(slugs) {
+    var kept = [];
+    (Array.isArray(slugs) ? slugs : []).forEach(function (s) {
+      var slug = String(s).trim().toLowerCase();
+      if (SLUG_RE.test(slug) && slug !== '1' && kept.indexOf(slug) === -1) kept.push(slug);
+    });
+    return kept.length ? 'shortlist=' + kept.join(',') : '';
+  }
+
   // ---------------------------------------------------------------------------
   // THE STATE SHAPE
   // ---------------------------------------------------------------------------
@@ -700,6 +750,8 @@
     EXCLUDE_PREFIX: EXCLUDE_PREFIX,
     parseQuery: parseQuery,
     parseName: parseName,
+    parseShortlist: parseShortlist,
+    shortlistQuery: shortlistQuery,
     serialise: food.serialise,
     deserialise: food.deserialise,
     FIELDS: FIELDS,

@@ -88,6 +88,38 @@
   user-select: text;
 }
 
+// THE SHARE LINK -- #1093. The export box's face and ground on one line, so
+// the link and the dump under it read as the same kind of thing: something
+// this browser wrote for you to take away. Readonly and selectable for the
+// box's own reason; shortlist-export.js selects it whole on focus.
+.shortlist-share-link {
+  display: block;
+  width: 100%;
+  margin-top: $space-sm;
+  padding: $space-xs $space-sm;
+  box-sizing: border-box;
+  font-family: $font-label;
+  font-size: 0.82rem;
+  color: $color-text;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+// THE NOTE OVER A SHARED LIST -- #1093. The hint's voice, because it says
+// where the list came from rather than being part of it, and "keep these" is
+// the panel's own button so a save looks like the other saves.
+// Under the count row on both indexes, taking that row's own gap above it and
+// giving the same gap to the list below.
+.shared-shortlist {
+  margin: 0 0 $space-lg;
+  font-size: 0.9rem;
+  color: $color-clear-text;
+
+  .btn-shared-keep { margin-left: $space-sm; }
+}
+
 // THE PASTE BOX -- #850. The same box as the export, one class on top, and the
 // one thing it changes is that this box is WRITABLE: `user-select` is not the
 // point here, a caret is. A little shorter by default, because a dump goes in
@@ -120,7 +152,8 @@
 
 .btn-shortlist-copy,
 .btn-shortlist-restore,
-.btn-shortlist-clear {
+.btn-shortlist-clear,
+.btn-shared-keep {
   font-family: $font-label;
   font-size: 0.85rem;
   color: $color-clear-text;

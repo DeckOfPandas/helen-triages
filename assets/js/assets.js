@@ -488,6 +488,34 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
+    /* A KEY'S SLUG: the last non-empty path segment, lowercased.
+       `/food/recipes/dal/` and `/food/drafts/dal/` both answer `dal`. A key
+       with no segment at all ("/") answers '', and is nobody. Shared by
+       restore() (#850) and the share link (#1093), which both have to find a
+       live card from a name that may have been written somewhere else. */
+    function slugOf(key) {
+      var parts = String(key).split('/');
+      for (var i = parts.length - 1; i >= 0; i -= 1) {
+        var part = parts[i].trim();
+        if (part) return part.toLowerCase();
+      }
+      return '';
+    }
+
+    function keysBySlug(liveKeys) {
+      var bySlug = {};
+      (Array.isArray(liveKeys) ? liveKeys : []).forEach(function (key) {
+        if (typeof key !== 'string') return;
+        var slug = slugOf(key);
+        // First one wins. Two cards sharing a slug would be two pages at
+        // one URL, which Jekyll refuses, so this is belt and braces.
+        if (slug && !Object.prototype.hasOwnProperty.call(bySlug, slug)) {
+          bySlug[slug] = key;
+        }
+      });
+      return bySlug;
+    }
+
     return {
       /** @returns {string[]} the entries, oldest first. A copy — callers sort. */
       list: function () { return read().slice(); },
@@ -720,28 +748,7 @@ window.HTF = window.HTF || {};
           return result;
         }
 
-        /* The last non-empty path segment, lowercased. `/food/recipes/dal/`
-           and `/food/drafts/dal/` both answer `dal`. A key with no segment at
-           all ("/") answers '', and is nobody. */
-        function slugOf(key) {
-          var parts = String(key).split('/');
-          for (var i = parts.length - 1; i >= 0; i -= 1) {
-            var part = parts[i].trim();
-            if (part) return part.toLowerCase();
-          }
-          return '';
-        }
-
-        var bySlug = {};
-        (Array.isArray(liveKeys) ? liveKeys : []).forEach(function (key) {
-          if (typeof key !== 'string') return;
-          var slug = slugOf(key);
-          // First one wins. Two cards sharing a slug would be two pages at
-          // one URL, which Jekyll refuses, so this is belt and braces.
-          if (slug && !Object.prototype.hasOwnProperty.call(bySlug, slug)) {
-            bySlug[slug] = key;
-          }
-        });
+        var bySlug = keysBySlug(liveKeys);
 
         var all = read();
         var allGlasses = readGlasses();
@@ -786,6 +793,61 @@ window.HTF = window.HTF || {};
         writePortions();
         result.ok = true;
         return result;
+      },
+
+      /* --- A SHORTLIST SOMEONE SENT — #1093 ---------------------------------
+         `?shortlist=aviation,negroni` names drinks by slug, because a link is
+         read and typed by people and a slug is the part of a key that
+         survives a folder move (restore()'s argument, above).
+
+         slugOf() is the one spelling of "a key's slug"; the share link is
+         built from it, so a link this site writes always resolves here.
+         @param {string} key @returns {string} */
+      slugOf: slugOf,
+
+      /**
+       * Which live keys a list of slugs names. READS NOTHING AND WRITES
+       * NOTHING: Helen's ruling is that opening a shared link shows the list
+       * and saves none of it, so this only answers the question.
+       *
+       * @param {string[]} slugs - as parsed from the URL, in link order
+       * @param {string[]} liveKeys - every `data-shortlist-key` on the page
+       * @returns {{keys:string[], unmatched:string[]}} `keys` in link order,
+       *          once each; `unmatched` the slugs nothing on the page answers
+       *          to, reported rather than dropped in silence
+       */
+      resolveSlugs: function (slugs, liveKeys) {
+        var bySlug = keysBySlug(liveKeys);
+        var out = { keys: [], unmatched: [] };
+        (Array.isArray(slugs) ? slugs : []).forEach(function (raw) {
+          if (typeof raw !== 'string') return;
+          var slug = raw.trim().toLowerCase();
+          if (!slug) return;
+          if (Object.prototype.hasOwnProperty.call(bySlug, slug)) {
+            if (out.keys.indexOf(bySlug[slug]) === -1) out.keys.push(bySlug[slug]);
+          } else if (out.unmatched.indexOf(slug) === -1) {
+            out.unmatched.push(slug);
+          }
+        });
+        return out;
+      },
+
+      /**
+       * Mark every one of these and persist once — the shared view's
+       * "keep these" (#1093). A MERGE, as restore() is: what is already
+       * marked stays marked and keeps its place in the order.
+       * @param {string[]} urls
+       * @returns {number} how many were not already marked
+       */
+      addAll: function (urls) {
+        var all = read();
+        var added = 0;
+        (Array.isArray(urls) ? urls : []).forEach(function (url) {
+          if (typeof url !== 'string' || !url) return;
+          if (all.indexOf(url) === -1) { all.push(url); added += 1; }
+        });
+        if (added) write();
+        return added;
       },
 
       /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module

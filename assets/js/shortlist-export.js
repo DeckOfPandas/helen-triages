@@ -69,7 +69,43 @@
     return JSON.stringify(HTF.shortlist.snapshot(), null, 2);
   }
 
+  /* THE SHARE LINK -- #1093. This index's own address with
+     `?shortlist=slug,slug`, which both indexes read back as a list to SHOW
+     and not save (HTF.filterState.parseShortlist, HTF.shortlist.resolveSlugs).
+     Slugs rather than keys: a link is read by people, and the slug is the
+     part of a key that survives a folder move. Built from the page's own
+     origin and path, so a link made on a local build points at the local
+     build. '' when nothing is shortlisted -- there is no link to nothing. */
+  function shareLink() {
+    if (!HTF.filterState || !HTF.filterState.shortlistQuery) return '';
+    var query = HTF.filterState.shortlistQuery(
+      HTF.shortlist.list().map(HTF.shortlist.slugOf));
+    if (!query) return '';
+    return location.origin + location.pathname + '?' + query;
+  }
+
+  function all(selector) {
+    return Array.prototype.slice.call(document.querySelectorAll(selector));
+  }
+
+  function canCopy() {
+    return !!(navigator.clipboard && navigator.clipboard.writeText);
+  }
+
+  function paintShare() {
+    var link = shareLink();
+    all('[data-shortlist-share]').forEach(function (field) {
+      field.value = link;
+      field.hidden = !link;
+    });
+    all('[data-shortlist-share-hint]').forEach(function (hint) { hint.hidden = !link; });
+    all('[data-shortlist-share-copy]').forEach(function (btn) {
+      btn.hidden = !link || !canCopy();
+    });
+  }
+
   function paint() {
+    paintShare();
     var dump = text();
     var empty = HTF.shortlist.count() === 0;
     boxes().forEach(function (box) {
@@ -150,6 +186,29 @@
     });
   }
 
+  /* THE LINK'S COPY BUTTON, progressive for the reason the JSON's is; the
+     field itself selects whole on focus, so a phone with no clipboard API
+     still gets the link in one long-press. */
+  function wireShareCopy() {
+    all('[data-shortlist-share]').forEach(function (field) {
+      field.addEventListener('focus', function () {
+        if (field.select) field.select();
+      });
+    });
+    if (!canCopy()) return;
+    all('[data-shortlist-share-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var link = shareLink();
+        if (!link) return;
+        navigator.clipboard.writeText(link).then(function () {
+          var was = btn.textContent;
+          btn.textContent = 'copied';
+          setTimeout(function () { btn.textContent = was; }, 1200);
+        }, function () { /* the field is still there to select by hand */ });
+      });
+    });
+  }
+
   /* THE RESTORE MESSAGE, one line, from the result the store hands back. The
      sentences are PLACEHOLDER COPY in the sense #713 and #753 use: the shape
      is the feature and the words are Helen's to change. Slugs are printed as
@@ -206,6 +265,7 @@
   if (!boxes().length) return;
   paint();
   wireCopy();
+  wireShareCopy();
   wireImport();
   wireClear();
   document.addEventListener(EVENT, paint);

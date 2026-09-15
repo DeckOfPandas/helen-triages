@@ -70,6 +70,23 @@ document.addEventListener('DOMContentLoaded', function () {
      `hidden`, and it is this script rather than shortlist.js that proves the
      filter half exists. */
   var shortlistOnlyBtn = document.getElementById('shortlist-only');
+
+  /* A SHORTLIST SOMEONE SENT -- #1093, `?shortlist=slug,slug`. Helen's
+     rulings, 2026-09-15: opening the link SHOWS the list and saves none of it
+     ("Show it, don't save it"); the shopping list hides while it is showing,
+     because its numbers write to this browser's store; and a "keep these"
+     button makes it yours in one tap.
+
+     THE VIEW IS THE SHORTLIST VIEW, with a different answer to "is this row
+     on it". `state.shortlisted` is true exactly as `?shortlist=1` sets it, so
+     #918's rule holds unchanged -- any filter, clear all, or the button takes
+     the view off -- and update() drops this list the moment it does. It is
+     not in `state` because it is not a filter anyone sets on this page, and
+     the back-memory must not carry a stranger's list into this browser's
+     next visit. null whenever no shared list is showing. */
+  var sharedKeys = null;
+  var sharedUnmatched = [];
+  var sharedNote = document.querySelector('[data-shared-shortlist]');
   // Two buttons, same action -- issue #67. The top one is the original,
   // pinned top-right of the matrix; the bottom one repeats it after the last
   // filter section so clearing doesn't mean scrolling back up past five
@@ -833,8 +850,27 @@ function renderResultsPool() {
        one is not in the matrix, and `is-on` is what the shortlist's own
        controls already use on both sites (shortlist.js, and the cocktail
        index's mood and chaos buttons). One feature, one state class. */
-    shortlistOnlyBtn.classList.toggle('is-on', !!state.shortlisted);
-    shortlistOnlyBtn.setAttribute('aria-pressed', state.shortlisted ? 'true' : 'false');
+    // A shared list is not YOUR shortlist, so the button that says how many
+    // you have does not claim to be what is showing (#1093).
+    var own = !!state.shortlisted && !sharedKeys;
+    shortlistOnlyBtn.classList.toggle('is-on', own);
+    shortlistOnlyBtn.setAttribute('aria-pressed', own ? 'true' : 'false');
+  }
+
+  /* THE NOTE OVER A SHARED LIST, and its "keep these". PLACEHOLDER COPY in
+     #713's sense: the count and the not-found slugs are the feature, the words
+     around them are Helen's to change. */
+  function syncSharedNote() {
+    if (!sharedNote) return;
+    sharedNote.hidden = !sharedKeys;
+    if (!sharedKeys) return;
+    var text = sharedNote.querySelector('[data-shared-shortlist-text]');
+    if (text) {
+      text.textContent = 'a shared shortlist (' + sharedKeys.length + ')' +
+        (sharedUnmatched.length ? '; not found: ' + sharedUnmatched.join(', ') : '');
+    }
+    var keep = sharedNote.querySelector('[data-shared-shortlist-keep]');
+    if (keep) keep.hidden = sharedKeys.length === 0;
   }
 
   // The three toggles, lifted out of the matrix click handler so a badge
@@ -863,6 +899,8 @@ function renderResultsPool() {
        "touching a filter leaves the view", and it also reconciles a state
        restored from before the rule existed. See filter-state.js. */
     FilterState.reconcileShortlistView(state);
+    if (!state.shortlisted) { sharedKeys = null; sharedUnmatched = []; }
+    syncSharedNote();
     var visibleCount = 0;
     var totalPages = 1;
     var suppressList = state.isSearching && !hasNarrowingFilter();
@@ -906,7 +944,9 @@ function renderResultsPool() {
            is on, for the reason `titleFolded` below is: it is a lookup per row
            per update, and a lookup nobody is waiting on is worth not doing. */
         shortlisted: state.shortlisted
-          ? HTF.shortlist.has(li.dataset.url || '')
+          ? (sharedKeys
+            ? sharedKeys.indexOf(li.dataset.url || '') !== -1
+            : HTF.shortlist.has(li.dataset.url || ''))
           : false,
         // Named class, not querySelector('a') -- see reorderForTitleSearch()
         // above for why that stopped being safe with issue #40's badge links.
@@ -1402,8 +1442,10 @@ function renderResultsPool() {
 
   function renderShoppingList() {
     if (!shoppingEl) return;
-    shoppingEl.hidden = !state.shortlisted;
-    if (!state.shortlisted) return;
+    // Hidden over a shared list (#1093): its numbers write to this browser's
+    // store, and a list you were sent is not yours until you keep it.
+    shoppingEl.hidden = !state.shortlisted || !!sharedKeys;
+    if (shoppingEl.hidden) return;
 
     var urls = shortlistedRecipes();
     if (shoppingEmpty) shoppingEmpty.hidden = urls.length > 0;
@@ -1585,7 +1627,12 @@ function renderResultsPool() {
   if (shortlistOnlyBtn) {
     shortlistOnlyBtn.hidden = false;
     shortlistOnlyBtn.addEventListener('click', function () {
-      if (state.shortlisted) {
+      if (sharedKeys) {
+        // Over a shared list the button is not on (syncShortlistOnly), so a
+        // press means what it means when off: show MY shortlist.
+        sharedKeys = null;
+        sharedUnmatched = [];
+      } else if (state.shortlisted) {
         state.shortlisted = false;
       } else {
         state = FilterState.enterShortlistView();
@@ -1612,6 +1659,25 @@ function renderResultsPool() {
   document.addEventListener('htf:shortlist-change', function () {
     update(true);
   });
+
+  /* KEEP THESE -- #1093. Merges the shared list into this browser's
+     shortlist (HTF.shortlist.addAll, which never un-marks anything), then
+     shows YOUR shortlist, which now holds them: the view stays on and only its
+     source changes. The change event is what repaints every row's toggle and
+     the button's count, exactly as a restore does. */
+  var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
+  if (sharedKeep) {
+    sharedKeep.addEventListener('click', function () {
+      if (!sharedKeys) return;
+      var keys = sharedKeys;
+      sharedKeys = null;
+      sharedUnmatched = [];
+      HTF.shortlist.addAll(keys);
+      document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
+        detail: { key: null, on: true, kept: keys.length }
+      }));
+    });
+  }
 
   var pagePrevBtn = document.getElementById('recipe-page-prev');
   var pageNextBtn = document.getElementById('recipe-page-next');
@@ -1748,12 +1814,25 @@ function renderResultsPool() {
      reason cocktail-index.js gives: 2,400px into a three-recipe shortlist
      lands past the end of it.
 
-     A LITERAL TEST RATHER THAN `parseQuery`, as on cocktails: `shortlisted` is
-     a view with one value, not a field a URL may set. */
-  if (location.search.indexOf('shortlist=1') !== -1) {
+     NOT `parseQuery`, as on cocktails: `shortlisted` is a view, not a field a
+     URL may set. `parseShortlist` since #1093, which gave the parameter a
+     second meaning -- a list of slugs someone sent -- and a literal
+     `indexOf('shortlist=1')` could not tell the two apart.
+
+     A SENT LIST ENTERS THE SAME VIEW and answers "is this row on it" from the
+     link instead of the store (`sharedKeys`, at the top of this file). The
+     slugs are matched by HTF.shortlist.resolveSlugs, which writes nothing. */
+  var arrivedShortlist = FilterState.parseShortlist(location.search);
+  if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
     state = FilterState.enterShortlistView();
     resetFilterControls();
     restored = null;
+    if (arrivedShortlist.slugs.length) {
+      var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
+        items.map(function (li) { return li.dataset.url || ''; }));
+      sharedKeys = resolvedShared.keys;
+      sharedUnmatched = resolvedShared.unmatched;
+    }
   }
 
   /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box on

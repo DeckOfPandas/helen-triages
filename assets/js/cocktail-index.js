@@ -354,6 +354,17 @@
      index carries the twin of this on its own results heading. */
   var shortlistOnlyBtn = document.getElementById('shortlist-only');
 
+  /* A SHORTLIST SOMEONE SENT -- #1093, `?shortlist=slug,slug`. The same three
+     rulings filters.js carries at its own copy of this (Helen, 2026-09-15):
+     the link SHOWS the list and saves none of it, the shopping list hides
+     while it shows, and "keep these" makes it yours. The view is the ordinary
+     shortlist view with a different answer to "is this card on it", so #918's
+     rule holds unchanged, and apply() drops this the moment the view goes.
+     null whenever no shared list is showing. */
+  var sharedKeys = null;
+  var sharedUnmatched = [];
+  var sharedNote = document.querySelector('[data-shared-shortlist]');
+
   // Declared here rather than beside the code that builds them, so apply() can
   // never read them before they exist. Populated further down.
   var clearAllButtons = [];
@@ -507,7 +518,9 @@
        into the markup by the build; this one is in this browser's localStorage
        and can change between two calls of this function -- which is exactly
        what happens when you press a card's own toggle while the filter is on. */
-    if (state.shortlisted && !HTF.shortlist.has(d.url)) return false;
+    if (state.shortlisted && !(sharedKeys
+      ? sharedKeys.indexOf(d.url) !== -1
+      : HTF.shortlist.has(d.url))) return false;
 
     /* mood: OR within the section, ranked by moodScore below. If this ever
        becomes AND the ranking is redundant rather than merely unused — see the
@@ -636,8 +649,10 @@
 
   function renderShoppingList() {
     if (!shoppingEl) return;
-    shoppingEl.hidden = !state.shortlisted;
-    if (!state.shortlisted) return;
+    // Hidden over a shared list (#1093): its numbers write to this browser's
+    // store, and a list you were sent is not yours until you keep it.
+    shoppingEl.hidden = !state.shortlisted || !!sharedKeys;
+    if (shoppingEl.hidden) return;
 
     var urls = shortlistedDrinks();
 
@@ -902,6 +917,21 @@
      landing on page 4 of a set that now has two pages -- or on page 4 of a
      completely different set -- is disorienting in a way that going back to the
      top is not. Same rule filters.js states for the food index. */
+  /* THE NOTE OVER A SHARED LIST, and its "keep these" -- #1093. PLACEHOLDER
+     COPY in #713's sense, as filters.js's copy of this says. */
+  function syncSharedNote() {
+    if (!sharedNote) return;
+    sharedNote.hidden = !sharedKeys;
+    if (!sharedKeys) return;
+    var text = sharedNote.querySelector('[data-shared-shortlist-text]');
+    if (text) {
+      text.textContent = 'a shared shortlist (' + sharedKeys.length + ')' +
+        (sharedUnmatched.length ? '; not found: ' + sharedUnmatched.join(', ') : '');
+    }
+    var keep = sharedNote.querySelector('[data-shared-shortlist-keep]');
+    if (keep) keep.hidden = sharedKeys.length === 0;
+  }
+
   function apply(preservePage) {
     if (!preservePage) { currentPage = 1; showAll = false; }
     /* THE SHORTLIST VIEW GIVES WAY TO ANY OTHER FILTER -- #918. Every handler
@@ -909,6 +939,7 @@
        button is painted from `state.shortlisted` further down in this same
        pass. See filter-state.js. */
     FilterState.reconcileShortlistView(state);
+    if (!state.shortlisted) { sharedKeys = null; sharedUnmatched = []; }
     var shown = 0;
     var ranked = [];
     /* Set by moveMatchedChipsFirst below. Collected across the whole pass so
@@ -1048,9 +1079,13 @@
        object without touching any markup, so a class set where it was clicked
        would outlive the filter it stands for. */
     if (shortlistOnlyBtn) {
-      shortlistOnlyBtn.classList.toggle('is-on', !!state.shortlisted);
-      shortlistOnlyBtn.setAttribute('aria-pressed', state.shortlisted ? 'true' : 'false');
+      // A shared list is not YOUR shortlist, so the button that counts yours
+      // does not claim to be what is showing (#1093).
+      var ownView = !!state.shortlisted && !sharedKeys;
+      shortlistOnlyBtn.classList.toggle('is-on', ownView);
+      shortlistOnlyBtn.setAttribute('aria-pressed', ownView ? 'true' : 'false');
     }
+    syncSharedNote();
 
     /* In the same pass as everything else -- #546. So a card toggled while the
        filter is on updates the list in the same frame the card leaves it, and
@@ -1198,7 +1233,12 @@
   if (shortlistOnlyBtn) {
     shortlistOnlyBtn.hidden = false;
     shortlistOnlyBtn.addEventListener('click', function () {
-      if (state.shortlisted) {
+      if (sharedKeys) {
+        // Over a shared list the button is not on, so a press means what it
+        // means when off: show MY shortlist (#1093).
+        sharedKeys = null;
+        sharedUnmatched = [];
+      } else if (state.shortlisted) {
         state.shortlisted = false;
       } else {
         state = FilterState.enterShortlistView();
@@ -1215,6 +1255,23 @@
      runs, which is what stops the shortlisted view and the toggles on it from
      ever disagreeing. */
   document.addEventListener('htf:shortlist-change', apply);
+
+  /* KEEP THESE -- #1093. Merges the shared list into this browser's
+     shortlist and shows YOURS, which now holds them; the change event repaints
+     the card toggles and the button's count, as a restore does. */
+  var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
+  if (sharedKeep) {
+    sharedKeep.addEventListener('click', function () {
+      if (!sharedKeys) return;
+      var keys = sharedKeys;
+      sharedKeys = null;
+      sharedUnmatched = [];
+      HTF.shortlist.addAll(keys);
+      document.dispatchEvent(new CustomEvent('htf:shortlist-change', {
+        detail: { key: null, on: true, kept: keys.length }
+      }));
+    });
+  }
 
   /* --- the two ingredient fields ------------------------------------------ */
   /* One builder for both, because they are the same control with opposite
@@ -1671,9 +1728,8 @@
      at least it matches food." Offered this query's removal, she left it, so it
      is kept under #651's rule (a thing nothing reads is only safe while a
      comment says why): it works, it is tested, and "for now" is not "never".
-     FOOD HAS NO SUCH QUERY, so this is the one way the two shortlists differ.
-     If exact parity is wanted, delete this block WITH its three tests in
-     tests/js/cocktail-index-startup.test.js, never one without the other.
+     Food has had the same query since #1011 (2026-09-14), where its recipe
+     page's "see shortlist" action does link to it.
 
      IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
      `enterShortlistView()` plus `resetControls()` is exactly what pressing
@@ -1687,13 +1743,22 @@
      memory and any mood in the same URL, in the order that makes the last word
      the link's own.
 
-     A LITERAL TEST RATHER THAN `parseQuery`. That grammar is the two sites'
-     shared FIELD grammar (`mood`, and food's own list), and `shortlisted` is
-     not a field a URL may set: it is a view, with one value, and any other
-     value means nothing. `indexOf` over the search string keeps it that way. */
-  if (location.search.indexOf('shortlist=1') !== -1) {
+     NOT `parseQuery`. That grammar is the two sites' shared FIELD grammar
+     (`mood`, and food's own list), and `shortlisted` is not a field a URL may
+     set: it is a view. `parseShortlist` since #1093, which gave the parameter
+     a second meaning -- a list of slugs someone sent, shown through the same
+     view from `sharedKeys` rather than the store -- and the literal
+     `indexOf('shortlist=1')` this used to be could not tell the two apart. */
+  var arrivedShortlist = HTF.filterState.parseShortlist(location.search);
+  if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
     state = FilterState.enterShortlistView();
     resetControls();
+    if (arrivedShortlist.slugs.length) {
+      var resolvedShared = HTF.shortlist.resolveSlugs(arrivedShortlist.slugs,
+        model.map(function (d) { return d.url || ''; }));
+      sharedKeys = resolvedShared.keys;
+      sharedUnmatched = resolvedShared.unmatched;
+    }
     /* AND THE REMEMBERED SCROLL GOES WITH THE REMEMBERED LIST. `restored` is
        where you were in the list you left; this link is a request for a
        different, shorter list, so restoring 2,400px into it lands past the end

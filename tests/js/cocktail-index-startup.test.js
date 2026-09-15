@@ -506,6 +506,30 @@ test('#1050: an ingredient no card names is dropped in silence', () => {
   assert.deepStrictEqual(on, []);
 });
 
+// --- a shortlist someone sent, #1093 ------------------------------------------------
+// food-index-startup.test.js carries the full set, including "keep these"
+// (this harness's store is a no-op, see above). These are the wiring: the
+// sent list reaches matches(), and the own-list button is not lit over it.
+
+test('#1093: ?shortlist=<slugs> shows exactly those drinks', () => {
+  const r = boot({ drinks: DRINKS, search: '?shortlist=c,a' });
+  assert.deepStrictEqual(visibleTitles(r.page).sort(), ['Bamboo', 'Daiquiri']);
+  assert.ok(!shortlistViewIsOn(r),
+    'the button counts THIS browser\'s shortlist and must not claim a sent one.');
+});
+
+test('#1093: a sent list beats a mood in the same URL, as shortlist=1 does', () => {
+  const r = boot({ drinks: DRINKS, search: '?mood=sharp&shortlist=c' });
+  assert.deepStrictEqual(visibleTitles(r.page), ['Bamboo']);
+});
+
+test('#1093: a slug beginning with 1 is not read as the own-list flag', () => {
+  const drinks = DRINKS.concat([{ url: '/12-mile-limit', name: '12 mile limit',
+    title: '12 Mile Limit', moods: [], ingredients: ['rum|rum'] }]);
+  const r = boot({ drinks, search: '?shortlist=12-mile-limit' });
+  assert.deepStrictEqual(visibleTitles(r.page), ['12 Mile Limit']);
+});
+
 test('#994: shortlist=1 beats a mood in the same URL', () => {
   // It is a VIEW, not a facet (#918): pressing the button clears every other
   // filter, and arriving by the link must mean the same thing or the two doors

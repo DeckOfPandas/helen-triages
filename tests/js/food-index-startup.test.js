@@ -173,7 +173,16 @@ function boot(options) {
 
   const countRow = el('div', 'results-count-row');
   countRow.appendChild(el('button', 'btn-shortlist-only', { id: 'shortlist-only' }));
+  // #1093's note over a shared list, with the attributes filters.js reaches for.
+  const shared = el('p', 'shared-shortlist', { 'data-shared-shortlist': '' });
+  shared.appendChild(el('span', '', { 'data-shared-shortlist-text': '' }));
+  shared.appendChild(el('button', 'btn-shared-keep', { 'data-shared-shortlist-keep': '' }));
+  countRow.appendChild(shared);
   doc.body.appendChild(countRow);
+
+  // The stub has `dispatch(type)`; the page calls the DOM's dispatchEvent with
+  // a CustomEvent, which "keep these" (#1093) does to repaint everything.
+  doc.dispatchEvent = (ev) => doc.dispatch(ev.type, ev);
 
   const panel = el('section', 'shopping-list', { id: 'shopping-list' });
   const head = el('div', 'shopping-list-head');
@@ -641,6 +650,86 @@ test('#1011: a shortlisted recipe is what the link shows', () => {
   assert.deepStrictEqual(
     visibleRows(list).map((li) => li.getAttribute('data-url')),
     ['/food/recipes/a/']);
+});
+
+// --- a shortlist someone sent, #1093 ------------------------------------------------
+//
+// `?shortlist=a,gelato` opens the same VIEW `?shortlist=1` does, answering "is
+// this row on it" from the link. Helen's three rulings, 2026-09-15, each with
+// its assertion: the link SHOWS the list and saves none of it; the shopping
+// list hides while it shows; "keep these" makes it yours in one tap.
+
+const sharedNote = (doc) => doc.querySelector('[data-shared-shortlist]');
+const visibleUrls = (list) => visibleRows(list).map((li) => li.getAttribute('data-url'));
+
+test('#1093: a sent list shows exactly those recipes', () => {
+  const { doc, list } = boot({ search: '?shortlist=gelato,a' });
+  assert.deepStrictEqual(visibleUrls(list).sort(), ['/food/recipes/a/', '/food/recipes/gelato/']);
+});
+
+test('#1093: opening a sent list saves NOTHING to this browser', () => {
+  const { win } = boot({ search: '?shortlist=gelato,a' });
+  assert.strictEqual(win.HTF.shortlist.count(), 0,
+    'the link wrote to the store. Helen: "Show it, don\'t save it".');
+});
+
+test('#1093: the sent list is shown over this browser\'s own, not merged with it', () => {
+  const { win, doc, list } = boot({ search: '?shortlist=gelato' });
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  doc.dispatch('htf:shortlist-change');
+  assert.deepStrictEqual(visibleUrls(list), ['/food/recipes/gelato/'],
+    'a recipe marked in THIS browser leaked into the list someone sent.');
+});
+
+test('#1093: the button that counts YOUR shortlist is not lit over a sent one', () => {
+  const { doc } = boot({ search: '?shortlist=gelato' });
+  assert.ok(!shortlistViewIsOn(doc));
+});
+
+test('#1093: the note says how many, and names what it could not find', () => {
+  const { doc } = boot({ search: '?shortlist=gelato,renamed-thing' });
+  const note = sharedNote(doc);
+  assert.strictEqual(note.hidden, false);
+  const text = note.querySelector('[data-shared-shortlist-text]').textContent;
+  assert.match(text, /\(1\)/);
+  assert.match(text, /renamed-thing/);
+});
+
+test('#1093: the shopping list hides over a sent list', () => {
+  const { panel } = boot({ search: '?shortlist=gelato,a' });
+  assert.strictEqual(panel.hidden, true,
+    'its numbers write to this browser\'s store, and the list is not yours yet.');
+});
+
+test('#1093: keep these merges the list in and shows YOUR shortlist', () => {
+  const { win, doc, list, panel } = boot({ search: '?shortlist=gelato' });
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  doc.querySelector('[data-shared-shortlist-keep]').dispatch('click');
+
+  // Through JSON: the array was made in the page's realm, not this one.
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(win.HTF.shortlist.list())),
+    ['/food/recipes/b/', '/food/recipes/gelato/']);
+  assert.ok(shortlistViewIsOn(doc), 'after keeping, the view is your own shortlist');
+  assert.deepStrictEqual(visibleUrls(list).sort(), ['/food/recipes/b/', '/food/recipes/gelato/']);
+  assert.strictEqual(sharedNote(doc).hidden, true);
+  assert.strictEqual(panel.hidden, false, 'your own list shops again');
+});
+
+test('#1093: pressing shortlisted (N) over a sent list shows YOUR list instead', () => {
+  const { win, doc, list } = boot({ search: '?shortlist=gelato' });
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  doc.getElementById('shortlist-only').dispatch('click');
+  assert.ok(shortlistViewIsOn(doc));
+  assert.deepStrictEqual(visibleUrls(list), ['/food/recipes/b/']);
+  assert.strictEqual(sharedNote(doc).hidden, true);
+});
+
+test('#1093: a slug nothing answers to still enters the view, showing nothing', () => {
+  const { doc, list } = boot({ search: '?shortlist=nothing-by-this-name' });
+  assert.deepStrictEqual(visibleUrls(list), []);
+  assert.strictEqual(sharedNote(doc).hidden, false, 'and the note says why');
+  assert.strictEqual(doc.querySelector('[data-shared-shortlist-keep]').hidden, true,
+    'there is nothing to keep');
 });
 
 // --- arriving with a name, #1024 -----------------------------------------------

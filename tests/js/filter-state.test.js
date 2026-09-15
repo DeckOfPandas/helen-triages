@@ -138,6 +138,65 @@ test('parseName does not leak into parseQuery', () => {
   assert.deepStrictEqual(FS.parseQuery('?q=negroni'), { star: [], tag: [], mood: [], ing: [] });
 });
 
+// --- ?shortlist=, #1093 ---------------------------------------------------------
+// Two meanings in one parameter: `1` is this browser's own list (#994, #1011),
+// anything else is a list of slugs someone sent. The literal
+// `indexOf('shortlist=1')` both indexes used could not tell `1` from a slug
+// that begins with it, which is why this is a parser now.
+
+test('parseShortlist: ?shortlist=1 is the own list, with no slugs', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1'), { own: true, slugs: [] });
+  assert.deepStrictEqual(FS.parseShortlist('?mood=sharp&shortlist=1'), { own: true, slugs: [] });
+});
+
+test('parseShortlist: a list of slugs is a sent list, in link order, once each', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=negroni,aviation,negroni'),
+    { own: false, slugs: ['negroni', 'aviation'] });
+});
+
+test('parseShortlist: a slug beginning with 1 is a slug, not the own-list flag', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=10-minute-dal'),
+    { own: false, slugs: ['10-minute-dal'] });
+});
+
+test('parseShortlist: anything that is not [a-z0-9-] is dropped, not matched', () => {
+  // A link is untrusted input and a slug is only ever compared with a
+  // Jekyll-written URL segment, which carries no other character.
+  assert.deepStrictEqual(
+    FS.parseShortlist('?shortlist=Dal,%3Cscript%3E,../x,,-lead,moules%20mariniere'),
+    { own: false, slugs: ['dal'] });
+});
+
+test('parseShortlist: nothing, an empty value, or no parameter is neither', () => {
+  const none = { own: false, slugs: [] };
+  assert.deepStrictEqual(FS.parseShortlist(''), none);
+  assert.deepStrictEqual(FS.parseShortlist(undefined), none);
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist='), none);
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist'), none);
+  assert.deepStrictEqual(FS.parseShortlist('?tag=soup'), none);
+});
+
+test('parseShortlist: the last shortlist parameter wins', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=dal&shortlist=1'), { own: true, slugs: [] });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1&shortlist=dal'), { own: false, slugs: ['dal'] });
+});
+
+test('shortlistQuery writes what parseShortlist reads back', () => {
+  const q = FS.shortlistQuery(['negroni', 'Aviation', 'negroni']);
+  assert.strictEqual(q, 'shortlist=negroni,aviation');
+  assert.deepStrictEqual(FS.parseShortlist('?' + q), { own: false, slugs: ['negroni', 'aviation'] });
+});
+
+test('shortlistQuery leaves out what the parser would drop, and is empty for nothing', () => {
+  assert.strictEqual(FS.shortlistQuery(['1', 'a b', '']), '');
+  assert.strictEqual(FS.shortlistQuery([]), '');
+  assert.strictEqual(FS.shortlistQuery(undefined), '');
+});
+
+test('parseShortlist does not leak into parseQuery', () => {
+  assert.deepStrictEqual(FS.parseQuery('?shortlist=dal'), { star: [], tag: [], mood: [], ing: [] });
+});
+
 test('KINDS is exported so filters.js and the tests agree on what exists', () => {
   assert.deepStrictEqual(FS.KINDS, ['star', 'tag', 'mood', 'ing']);
 });
