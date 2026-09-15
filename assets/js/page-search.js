@@ -380,9 +380,9 @@
     if (!found) { close(); return; }
 
     if (!found.groups.length) {
-      // PLACEHOLDER COPY, Helen's to write (MANUAL 13.12).
+      // Helen's copy, #1055: "nothing to see here."
       var none = el('p', 'page-search-none');
-      none.textContent = 'nothing called that here';
+      none.textContent = 'nothing to see here';
       panel.appendChild(none);
     }
 
