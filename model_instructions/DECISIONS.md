@@ -3456,6 +3456,40 @@ unless stated.
   which is why "without the border above and below the glass" was a change to
   C rather than a description of it.
 
+- **2026-09-15, #1086 — the drink page prints pale grey on white; a design
+  review found it, not a ticket.** #482 (2026-08-27, above) forces PRINT to be
+  the full editorial page, and never touched colour, because it did not need
+  to at the time: food's page was already dark ink on light paper, and so was
+  cocktails', four days before it inverted for the screen (#469, "black on
+  black"). Nothing about print was revisited when the inversion shipped —
+  `_sass/cocktails/_print.scss` hides controls and restores the editorial
+  state, and stops there — so every accent this site has spent this whole
+  section solving against a black card or a black page prints against WHITE
+  PAPER instead, which none of them were solved for. Measured, not eyeballed:
+  `$color-ink` at 1.25:1 on white, the coral/hot-pink mood chips at 2.89 /
+  3.11:1, the ship mark (reposado) at 2.67:1, a note card's lagoon border and
+  label at 1.84:1 — all well under the 4.5:1 body-text floor §9.13 (above)
+  holds every other hue on this page to. **The fix is a second, print-only
+  palette, scoped to `.cocktail` inside `@media print` so it touches nothing
+  on screen.** Two of its values are reused rather than invented — food's own
+  `$color-text` and `$color-clear-text` (`_sass/food/_palette.scss`) — the
+  same "near-black ink" and "de-emphasised grey" problem food already solved
+  for exactly this ground, and cocktails has no ink of its own to reach for,
+  having inverted every value it had. The five accent hues have no food
+  equivalent to borrow, so each is `darken()`ed off its own rule colour by the
+  smallest step clearing 4.5:1 — the same method food's own
+  `$darken-active-lime` already uses, "how far to darken is a property of the
+  hue, not of the section." **The name tape is untouched.** `.cocktail-title`
+  sits inside `.drink-card-tape-word`, whose black band and light lettering
+  are artwork (this section's own "the card title sits on punched tape"), not
+  a heading, and read their own custom properties rather than the
+  `--lettering-heading-*` trio re-pointed here for INGREDIENTS / METHOD /
+  NOTES. Checked against a real render as well as a screenshot:
+  `scripts/generate_pdfs.py` against a two-page mirror of the built site
+  (Playwright's own Chromium, no system Chrome in this environment) produced a
+  Cobra's Fang PDF with dark ink throughout and every chip, note card and
+  ship mark legible.
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
