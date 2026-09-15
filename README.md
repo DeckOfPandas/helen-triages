@@ -29,6 +29,10 @@ This public mono-repo holds both the food and cocktails sides, with private repo
 7. To get terminal (bash) access to the container while running:
    * `docker exec -it helen-triages-primary bash`
 
+Remind Claude to try the REST API rather than GraphQL as it's less likely to trigger account flagging, and remind it to space requests when making multiple (e.g. opening a batch of Issues). This is in its instructions.
+
+Remind Claude to tag Issue numbers in commit messages because it's annoying when this doesn't happen.
+
 ## General dev workflow:
 1. Pull
    * Helpful script to update drafts repos:
