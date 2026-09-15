@@ -340,7 +340,7 @@ permalink: /cocktails/
         <div class="drink-label-row drink-label-row--search">
           <h2 class="drink-field-label"><label for="drink-include"><span class="drink-field-label-text">Has to have</span></label></h2>
           <input class="drink-search-input" type="text" id="drink-include"
-                 autocomplete="off" placeholder="ingredient name…" />
+                 autocomplete="off" placeholder="ingredient name..." />
           <button type="button" class="btn-clear-filter" id="clear-include" hidden>&times; clear</button>
         </div>
         <div class="drink-pool" id="drink-include-pool" aria-live="polite"></div>
@@ -350,7 +350,7 @@ permalink: /cocktails/
         <div class="drink-label-row drink-label-row--search">
           <h2 class="drink-field-label"><label for="drink-exclude"><span class="drink-field-label-text">Leave out</span></label></h2>
           <input class="drink-search-input" type="text" id="drink-exclude"
-                 autocomplete="off" placeholder="ingredient name…" />
+                 autocomplete="off" placeholder="ingredient name..." />
           <button type="button" class="btn-clear-filter" id="clear-exclude" hidden>&times; clear</button>
         </div>
         <div class="drink-pool" id="drink-exclude-pool" aria-live="polite"></div>
@@ -363,12 +363,18 @@ permalink: /cocktails/
        as a search box, which is not what it is for. Helen browses here on
        purpose: "I find browsing quick and inspirational... I want to steer
        myself then read for a while then settle." Last means it is available
-       without being the offer. {% endcomment %}
+       without being the offer.
+
+       "recipe name...", NOT "drink name…", SINCE #1097 (2026-09-15). Helen's
+       words for content: "Food recipes / Cocktail recipes. 'Recipes' means
+       recipes across both sites." Food's box already said "recipe name...",
+       and the three placeholders here take its three dots too, so one box reads
+       the same on both sites. {% endcomment %}
     <div class="drink-filter drink-filter--name">
       <div class="drink-label-row drink-label-row--search">
         <h2 class="drink-field-label"><label for="drink-name"><span class="drink-field-label-text">I know what I want</span></label></h2>
         <input class="drink-search-input" type="text" id="drink-name"
-               autocomplete="off" placeholder="drink name…" />
+               autocomplete="off" placeholder="recipe name..." />
         <button type="button" class="btn-clear-filter" id="clear-name" hidden>&times; clear</button>
       </div>
     </div>

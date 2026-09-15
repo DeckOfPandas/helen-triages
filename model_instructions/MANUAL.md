@@ -3482,7 +3482,9 @@ variables), and the row each site puts the actions in:
   holds the JSON to the built pages. The pure half is `HTF.pageSearch`
   (`tests/js/page-search.test.js`); the group headings take each site's own
   section hue from its own stylesheet, the panel itself names only the palette
-  contract. The two "recipes"/"drinks" group labels are PLACEHOLDER copy.
+  contract. The names group is headed "recipes" on both sites since #1097
+  (Helen: *"'Recipes' means recipes across both sites."*); cocktails' said
+  "drinks" until then, as placeholder copy.
   Helen's second look was #1051–#1059, built on 2026-09-15 (DECISIONS §13);
   read those before changing the matching, the group titles or where a link
   lands.
