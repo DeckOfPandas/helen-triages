@@ -188,8 +188,18 @@
       };
     });
 
+    /* A filtered link ENDS IN `#results` -- Helen, 2026-09-15: "load the index
+       page filtered as appropriate, with the screen snapped to the returned
+       recipes (so don't have to scroll down)." Both indexes put that id on
+       their count line, just above the list, so the browser lands the reader
+       on the answer rather than on the panel of questions above it (and each
+       index scrolls there again once its list is revealed). A badge or chip
+       link on a page does not carry it: those have landed at the top since
+       #40 and this is a change to what a SEARCH result does. */
+    var RESULTS_FRAGMENT = '#results';
+
     function hrefForWord(group, label) {
-      return home + '?' + encode(group.param) + '=' + encode(label);
+      return home + '?' + encode(group.param) + '=' + encode(label) + RESULTS_FRAGMENT;
     }
 
     /* The whole dropdown for one query: a list of groups, each with the
@@ -260,7 +270,7 @@
       return { query: typed, groups: out };
     }
 
-    return { search: search, groups: groups, itemCount: items.length };
+    return { search: search, groups: groups, itemCount: items.length, RESULTS_FRAGMENT: RESULTS_FRAGMENT };
   }
 
   // --- Exported the same way every other split module here is ------------------

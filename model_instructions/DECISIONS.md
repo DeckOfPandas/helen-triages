@@ -4531,6 +4531,20 @@ verification. Dates are when the correction landed.
     held equal to the built pages by a test.
   - **Copy left as PLACEHOLDER**: the two group labels for the pages
     ("recipes", "drinks") and the no-match line.
+  **Her three notes on seeing it, the same day, all built:** *"placeholder
+  text and magnifying glass: for the cocktail site, make grey-er/darker, so it
+  demands less attention at the top of the page"* (the quiet grey darkened
+  15%, 3.88:1, a hint and a mark); *"both sites, remove placeholder on click"*
+  (transparent on focus, the drinks index's own rule); *"food site: group
+  headings need to be brighter, closer to core colours although obviously
+  we're limited by contrast"* (five `-bright` tones in `food/_palette.scss`,
+  each root darkened by exactly what 4.5:1 on the surface costs — 8, 20, 12,
+  12 and 25 points — measured, not picked); and *"when a user clicks a search
+  result, load the index page filtered as appropriate, with the screen snapped
+  to the returned recipes (so don't have to scroll down)"* — every filtered
+  link ends in `#results`, the id on both indexes' count line, and each index
+  scrolls there again after its reveal. A badge or chip link on a page keeps
+  landing at the top; that is #40's behaviour and she spoke to search results.
   The GitHub account was flagged as spam that day, so the work went up as a
   branch for Helen to open the PR from: *"push work to branches which I will
   then merge. Larger pushes better please to avoid making things worse."*

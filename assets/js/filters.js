@@ -1763,5 +1763,20 @@ function renderResultsPool() {
     window.scrollTo(0, restored.scrollY);
   }
 
+  /* ARRIVING FROM A SEARCH RESULT -- `#results`, #1050 (2026-09-15). The
+     dropdown on a recipe page ends every filtered link in this fragment, and
+     the count line above the list carries the id, so the browser has already
+     scrolled there once; this does it again AFTER the reveal, because the
+     native scroll happened against a page whose rows were all still in place
+     and whose fonts may not have been. Helen: "with the screen snapped to the
+     returned recipes (so don't have to scroll down)." Not on a back
+     navigation, where the remembered scroll is the truer answer. */
+  if (!restored && location.hash === '#results') {
+    var results = document.getElementById('results');
+    if (results && typeof results.scrollIntoView === 'function') {
+      results.scrollIntoView({ block: 'start' });
+    }
+  }
+
   window.addEventListener('pagehide', saveIndexMemory);
 });

@@ -148,8 +148,12 @@ function buildPage(doc, options) {
   filters.appendChild(el('button', 'btn-clear-filter', { id: 'clear-name' }));
 
   doc.body.appendChild(el('p', 'drink-none'));
-  doc.body.appendChild(el('span', '', { id: 'drink-count-n' }));
-  doc.body.appendChild(el('span', '', { id: 'drink-count-word' }));
+  // THE COUNT LINE CARRIES `id="results"` -- #1050, where a search result
+  // lands; the script reaches for it to scroll there after apply().
+  const count = el('p', 'drink-count', { id: 'results' });
+  count.appendChild(el('span', '', { id: 'drink-count-n' }));
+  count.appendChild(el('span', '', { id: 'drink-count-word' }));
+  doc.body.appendChild(count);
   doc.body.appendChild(el('button', 'btn-shortlist-only', { id: 'shortlist-only' }));
 
   const list = el('ul', 'drink-cards');

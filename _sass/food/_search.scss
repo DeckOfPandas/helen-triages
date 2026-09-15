@@ -106,15 +106,23 @@
 // --- The search-for-anything dropdown's headings, in this site's hues ---------
 // #1050. The dropdown itself is shared/_furniture.scss; what is food's is which
 // colour each KIND of result wears, and it is the section's own -- the same
-// hue the index paints that section's active buttons in, so a MOOD heading in
-// the dropdown and the MOOD section on the index you land on are one colour
-// making one claim. The names group takes I KNOW WHAT I WANT's hue for the
-// same reason: a title search is that box.
-.page-search-group--name           .page-search-group-label { color: $color-name-search-active; }
-.page-search-group--star           .page-search-group-label { color: $color-star-active; }
-.page-search-group--mood           .page-search-group-label { color: $color-mood-active; }
-.page-search-group--practicalities .page-search-group-label { color: $color-practicalities-active; }
-.page-search-group--ingredient     .page-search-group-label { color: $color-ingredient-active; }
+// hue the index gives that section, so a MOOD heading in the dropdown and the
+// MOOD section on the index you land on are one colour making one claim. The
+// names group takes I KNOW WHAT I WANT's hue for the same reason: a title
+// search is that box.
+//
+// THE -bright TONES, NOT THE -active ONES. They wore the active tones for a
+// day and Helen asked for "brighter, closer to core colours although
+// obviously we're limited by contrast" -- so each is its root darkened by
+// exactly what 4.5:1 on the surface costs and no more (_palette.scss has the
+// measurements). The panel is a small surface and the headings are its only
+// colour, which is what lets them run closer to the roots than a button label
+// among a hundred others can.
+.page-search-group--name           .page-search-group-label { color: $color-name-search-bright; }
+.page-search-group--star           .page-search-group-label { color: $color-star-bright; }
+.page-search-group--mood           .page-search-group-label { color: $color-mood-bright; }
+.page-search-group--practicalities .page-search-group-label { color: $color-practicalities-bright; }
+.page-search-group--ingredient     .page-search-group-label { color: $color-ingredient-bright; }
 
 // --- Name search ------------------------------------------------------------
 // `margin-top: $space-sm` used to sit here. It never did anything: adjacent

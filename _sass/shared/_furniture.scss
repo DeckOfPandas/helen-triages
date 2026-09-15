@@ -100,6 +100,13 @@
 
   &:focus { border-bottom-color: lighten($color-clear-text, 5%); }
   &::placeholder { @include index-search-placeholder; }
+  // THE PLACEHOLDER GOES ON FOCUS, NOT ON THE FIRST KEYSTROKE -- Helen,
+  // 2026-09-15: "both sites, remove placeholder on click." The cocktails index
+  // already does this for its three boxes and says why (cocktails/_filters.scss):
+  // a click means "I am about to type", so the field should be empty exactly
+  // then. `color: transparent` rather than emptying the attribute, so the hint
+  // is still there for a screen reader and the box does not change width.
+  &:focus::placeholder { color: transparent; }
   // The clear mark WebKit draws inside a search box would sit on the left of a
   // right-aligned text, between the glass and the words.
   &::-webkit-search-cancel-button { display: none; }

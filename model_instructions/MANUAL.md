@@ -3263,7 +3263,11 @@ variables), and the row each site puts the actions in:
   prefixes), then star / mood / practicalities on food, mood / hassle on
   cocktails, then the ingredients (main_ingredients on food, the card's
   ingredient labels on cocktails). Every result is a real link: to the page,
-  or to the index with `?star=`, `?tag=`, `?mood=` or `?ing=` — **`ing` is the
+  or to the index with `?star=`, `?tag=`, `?mood=` or `?ing=` **ending in
+  `#results`**, the id both indexes carry on the count line above their list,
+  so the reader lands on the answer and not the panel (each index scrolls
+  there again after its reveal; a badge or chip link still lands at the top) —
+  **`ing` is the
   fourth kind in `filter-state.js`'s grammar**, and each index hands it to its
   own HAS TO HAVE (food chooses the picker's matching entry through the
   button's own click, or leaves the pool on screen when none is exact;

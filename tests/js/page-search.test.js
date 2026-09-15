@@ -169,13 +169,26 @@ test('a word is offered once however many pages carry it, with its count', () =>
 test('a word\'s link carries the parameter the index grammar reads', () => {
   const found = PS.create(FOOD).search('make');
   const tag = found.groups.find((g) => g.kind === 'practicalities').results[0];
-  assert.strictEqual(tag.href, '/helen-triages/food/?tag=make-ahead');
-  const parsed = FS.parseQuery(tag.href.slice(tag.href.indexOf('?')));
-  assert.deepStrictEqual(parsed.tag, ['make-ahead']);
+  assert.strictEqual(tag.href, '/helen-triages/food/?tag=make-ahead#results');
+  // What a browser hands the index as location.search: the query, no hash.
+  const query = tag.href.slice(tag.href.indexOf('?'), tag.href.indexOf('#'));
+  assert.deepStrictEqual(FS.parseQuery(query).tag, ['make-ahead']);
 
   const ing = PS.create(FOOD).search('cavolo').groups.find((g) => g.kind === 'ingredient').results[0];
-  assert.strictEqual(ing.href, '/helen-triages/food/?ing=cavolo%20nero');
+  assert.strictEqual(ing.href, '/helen-triages/food/?ing=cavolo%20nero#results');
   assert.deepStrictEqual(FS.parseQuery('?ing=cavolo%20nero').ing, ['cavolo nero']);
+});
+
+test('a filtered link lands on the results, a page link on the page', () => {
+  // Helen, 2026-09-15: "with the screen snapped to the returned recipes".
+  // Every word's link ends in the fragment both indexes put on their count
+  // line; a recipe's own link is the page and carries none.
+  const s = PS.create(FOOD);
+  const found = s.search('ch');
+  found.groups.forEach((g) => g.results.forEach((r) => {
+    if (g.kind === 'name') assert.ok(!/#/.test(r.href), r.href);
+    else assert.ok(r.href.endsWith(s.RESULTS_FRAGMENT), r.href);
+  }));
 });
 
 test('every group\'s parameter is a KIND filter-state.js knows', () => {
@@ -219,12 +232,12 @@ test('the drinks index: one mood list, two groups, card ingredients', () => {
   const s = PS.create(DRINKS);
   const no = s.search('no');
   assert.deepStrictEqual(groupKinds(no), ['hassle']);
-  assert.strictEqual(no.groups[0].results[0].href, '/helen-triages/cocktails/?mood=no%20juicing');
+  assert.strictEqual(no.groups[0].results[0].href, '/helen-triages/cocktails/?mood=no%20juicing#results');
   const ni = s.search('nigh');
   assert.deepStrictEqual(groupKinds(ni), ['mood']);
   const ca = s.search('camp');
   assert.deepStrictEqual(labelsOf(ca, 'ingredient'), ['Campari']);
-  assert.strictEqual(ca.groups[0].results[0].href, '/helen-triages/cocktails/?ing=Campari');
+  assert.strictEqual(ca.groups[0].results[0].href, '/helen-triages/cocktails/?ing=Campari#results');
   // A substring on a drink name: "roni" is inside Negroni and starts no word.
   assert.deepStrictEqual(labelsOf(s.search('roni'), 'name'), ['Negroni']);
 });

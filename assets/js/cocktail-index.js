@@ -1710,6 +1710,20 @@
     window.scrollTo(0, restored.scrollY);
   }
 
+  /* ARRIVING FROM A SEARCH RESULT -- `#results`, #1050 (2026-09-15). The same
+     block filters.js has, for the same reason it gives: the drink page's
+     dropdown ends every filtered link in this fragment and the count line
+     carries the id, so the browser has landed there once already, against a
+     page whose hidden cards were all still standing; after apply() the page
+     has its real height and this puts the reader on the answer. Not on a back
+     navigation, where the remembered scroll is the truer answer. */
+  if (!restored && location.hash === '#results') {
+    var results = document.getElementById('results');
+    if (results && typeof results.scrollIntoView === 'function') {
+      results.scrollIntoView({ block: 'start' });
+    }
+  }
+
   /* pagehide rather than unload: it fires on the way out INCLUDING into
      bfcache, and unlike unload it does not itself disqualify the page from it.
      On the deployed site bfcache does apply, and this mechanism should stay out

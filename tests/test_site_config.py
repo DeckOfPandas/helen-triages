@@ -271,6 +271,19 @@ def test_the_furniture_line_searches_for_anything():
             f"{site}/search.json is not a page and must stay out of the sitemap."
         )
 
+    # A filtered result lands on the list, not the panel above it (Helen,
+    # 2026-09-15): the dropdown's links end in `#results`, and both indexes
+    # must carry that id on the line above their list, or the fragment lands
+    # nowhere and the page opens at the top as if nothing had been asked.
+    js = (JS_DIR / "page-search.js").read_text(encoding="utf-8")
+    assert "var RESULTS_FRAGMENT = '#results';" in js
+    for page in ("food", "cocktails"):
+        html = read(page, "index.html")
+        assert re.search(r'<(div|p)[^>]*\bid="results"', html), (
+            f"{page}/index.html has no element with id=\"results\"; the search "
+            "dropdown's filtered links end in #results and would land at the top."
+        )
+
     sites = read("_data", "sites.yml")
     assert not re.search(r"^\s+search_placeholder:", sites, re.M), (
         "sites.yml still declares search_placeholder; the placeholder lives in "
