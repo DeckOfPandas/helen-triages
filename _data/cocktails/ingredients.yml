@@ -146,6 +146,15 @@ measures:
     # says when.
     - to top
     - to rinse
+    # A THIRD ACTION, 2026-09-14 (#752): the Ti' Punch. Helen: "let's say 60 ml
+    # rum, then lime and sugar to taste -- this drink is typically served as
+    # rhum in a glass with lime and sugar on the side so people can roll their
+    # own." The drinker decides how much, so no figure is honest -- and, as she
+    # said, "This obviously doesn't change the units in the drink." It reads by
+    # the same whole-string lookup as the two above: cost and units skip it,
+    # scale.js passes it through untouched, and the shopping list counts it
+    # the way it counts `to rinse`.
+    - to taste
 
   # Words that may sit between the number and its unit without changing either.
   # One entry, and it is real: "1 heaping oz" on Kill Devil Punch.
@@ -877,7 +886,12 @@ card_names:
   # session (another agent). Rename it to `card_names` the next time that file
   # is open. Nothing else needs to change -- the template only ever looks a
   # generic up in it.
-  "Ceylon arrack": "Ceylon arrack"
+  #
+  # `coconut-flower arrack` SINCE 2026-09-14 (#796), renamed from `Ceylon
+  # arrack`. Helen: "the generic is 'coconut flower-arrack'", and she picked
+  # this spelling of the three her comment used. The BOTTLE is still called
+  # Ceylon Arrack; it is the category that was mis-named.
+  "coconut-flower arrack": "coconut-flower arrack"
 
   # --- BEYOND RUM, 2026-08-29 -------------------------------------------------
   # Helen's model, from her own worked examples: the card shows the shortest
@@ -1178,11 +1192,26 @@ brandy_styles:
 # Cane and palm spirits that are NOT rum. #314: "cachaca is its own generic" --
 # same raw material as an agricole rhum, completely different product. Batavia
 # arrack is a cane-and-rice spirit and Helen's call is that it stars as `rum`.
-# Ceylon arrack is coconut flower sap and shares only the name.
+# Coconut-flower arrack is coconut flower sap and shares only the name -- and
+# the category was called `Ceylon arrack`, after its origin, until #796
+# (2026-09-14), when Helen named it for what it is made from.
 cane_and_palm_spirits:
   - "cachaça"
   - "Batavia arrack"
-  - "Ceylon arrack"
+  - "coconut-flower arrack"
+
+# NEW BLOCK 2026-09-14. The same `retired_*` shape every other section uses, so
+# test_no_drink_uses_a_retired_generic catches the old name coming back -- which
+# is a real risk here and not a formality: _cocktail_drafts/ingest_from_csv.py
+# maps a bare "Arrack" onto this generic, and an ingest run from an older copy
+# of that script would type the retired spelling.
+retired_cane_and_palm_spirits:
+  "Ceylon arrack": >-
+    Renamed `coconut-flower arrack`, 2026-09-14 (#796). Helen: "the name of the
+    bottle is 'Ceylon Arrack', and the generic is 'coconut flower-arrack'" --
+    Ceylon is where the bottle comes from, coconut flower sap is what the
+    category is. The bottle keeps its name. Re-type as `coconut-flower arrack`;
+    Arrack Christmas Punch was the one drink that poured it.
 
 other_base_spirits:
   - "vodka"
@@ -1271,12 +1300,24 @@ liqueurs:
   # de vie is not, and her own note says "Don't use plain kirsch". The eau de
   # vie itself lives under brandy_styles.
   - "cherry liqueur"
+  # AND A SECOND CHERRY SINCE 2026-09-14. "Cherry Heering is a cherry brandy,
+  # Briottet Cerise is a cherry liqueur." Asked which bottle an unqualified
+  # cherry liqueur should mean, Helen split the category rather than pick. It
+  # sits HERE and not under brandy_styles: a cherry brandy in this sense is a
+  # sweetened liqueur made on a brandy base, not an eau de vie -- the Singapore
+  # Sling's own note, "De Kuyper cherry brandy makes this a bit horrible", is
+  # the same product family.
+  - "cherry brandy"
   - "apricot liqueur"
   - "coffee liqueur"
   - "ginger liqueur"
   - "passion fruit liqueur"
   - "gentian liqueur"
   - "apple schnapps"
+  # NEW 2026-09-14 (#1013). Helen: "Add 'peach schnapps' as a generic". Not
+  # `peach brandy` (a distilled spirit, ~35%) and not `apple schnapps` (a
+  # different fruit): its own thing, at 18%. Peach Me is its only pour.
+  - "peach schnapps"
   - "mastiha liqueur"
   - "tomato liqueur"
   - "amaretto"
@@ -1801,7 +1842,6 @@ shopping_shelves:
 shelf_of:
   # spirits (39)
   Batavia arrack: spirits
-  Ceylon arrack: spirits
   London dry gin: spirits
   Old Tom: spirits
   Plymouth: spirits
@@ -1818,6 +1858,7 @@ shelf_of:
   clairin: spirits
   clear blended multi-region rum: spirits
   coconut rum: spirits
+  coconut-flower arrack: spirits
   cognac: spirits
   eau de vie: spirits
   lightly aged and filtered rum: spirits
@@ -1849,7 +1890,7 @@ shelf_of:
   white wine: fortified
   sweet vermouth: fortified
   tawny port: fortified
-  # liqueurs (39)
+  # liqueurs (41)
   Amaro Ciociaro: liqueurs
   Amaro Nonino: liqueurs
   Aperol: liqueurs
@@ -1869,6 +1910,7 @@ shelf_of:
   apple schnapps: liqueurs
   apricot liqueur: liqueurs
   blue Curaçao: liqueurs
+  cherry brandy: liqueurs
   cherry liqueur: liqueurs
   coffee liqueur: liqueurs
   crème de banane: liqueurs
@@ -1887,6 +1929,7 @@ shelf_of:
   mastiha liqueur: liqueurs
   orange Curaçao: liqueurs
   passion fruit liqueur: liqueurs
+  peach schnapps: liqueurs
   tomato liqueur: liqueurs
   triple sec: liqueurs
   # freshly squeezed fruit juice (5)
@@ -1971,11 +2014,12 @@ shelf_of:
 # reason attached, so "why is this not groupable?" is answered in the repo
 # rather than in someone's memory.
 family_less:
-  "Ceylon arrack": >-
+  "coconut-flower arrack": >-
     Coconut flower sap, sharing only a name with Batavia arrack. Used once, in
-    Arrack Christmas Punch, where rum dominates by volume. Helen, 2026-08-17:
-    "no idea what to do about Ceylon arrack, but I don't recall a drink where
-    it's the star so maybe unimportant."
+    Arrack Christmas Punch, where rum dominates by volume. Helen, 2026-08-17,
+    when the generic was still called Ceylon arrack: "no idea what to do about
+    Ceylon arrack, but I don't recall a drink where it's the star so maybe
+    unimportant." Renamed to what it is made from on 2026-09-14 (#796).
   "absinthe": >-
     Used in dashes and rinses throughout this collection, never as a base. If a
     drink ever builds on it, give absinthe a family then.

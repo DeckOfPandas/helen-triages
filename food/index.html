@@ -365,16 +365,25 @@ permalink: /food/
         {% for _item in _group.items %}
           {% comment %} An item is USUALLY {amount, item, note} but is allowed to
              be a bare string (tests/conftest.py's ingredient_items accepts
-             both), and there is currently one that is a dict with an `amount:`
-             and no `item:` at all -- indonesian-chicken-curry-gulai-ayam.md
-             line 45, an ingredient whose name was lost to a duplicate YAML key
-             on the line below it. `_item.item | default: _item` handled the
-             first two and turned the third into a vocabulary entry reading
-             `{"amount"=>"200 ml"}`, because Liquid stringifies the hash rather
-             than admitting there was nothing to take. Named cases instead: a
-             dict with a name uses it, a dict without one is skipped (there is
-             no ingredient there to avoid), and anything else is the bare-string
-             form.
+             both). There USED TO BE a third shape, a dict with an `amount:` and
+             no `item:` -- indonesian-chicken-curry-gulai-ayam.md's `200 ml`,
+             whose `item: coconut cream` had landed on the NEXT entry as a
+             duplicate key, silently throwing away that entry's flavourings
+             line -- and `_item.item | default: _item` turned it into a
+             vocabulary entry reading `{"amount"=>"200 ml"}`, because Liquid
+             stringifies the hash rather than admitting there was nothing to
+             take. Named cases instead: a dict with a name uses it, a dict
+             without one is skipped (there is no ingredient there to avoid), and
+             anything else is the bare-string form.
+
+             THE RECIPE WAS FIXED ON 2026-08-16 AND THIS COMMENT WAS NOT, until
+             #983 (2026-09-14) noticed it still said "there is currently one".
+             The branch stays because it is cheap and correct. What stops the
+             CAUSE recurring is
+             tests/test_front_matter.py::test_front_matter_has_no_duplicate_keys,
+             written the same day as the fix: PyYAML keeps the last value of a
+             repeated key in silence, so only a loader that refuses duplicates
+             can see one.
 
              The dict-without-a-name test asks about `amount`/`note` and
              deliberately not about the incidental flag, even though that would

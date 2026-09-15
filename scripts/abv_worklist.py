@@ -69,6 +69,9 @@ class Resolver:
         self.abv_bottles = abv.get("bottles") or {}
         self.abv_generics = abv.get("generics") or {}
         self.non_alcoholic = set(abv.get("non_alcoholic") or [])
+        # Bitters never count -- Helen, #1012, 2026-09-14, and the plugin's
+        # DIFFERENCE 5. Read from the list a bitters is declared in.
+        self.bitters = set(ingredients.get("bitters") or [])
 
         self.per_ml = ingredients["measures"]["per_ml"]
         self.ignored_words = ingredients["measures"].get("ignored_words") or []
@@ -105,6 +108,10 @@ class Resolver:
         return bool(row and row.get("abv") is not None)
 
     def rows_for_generic(self, g):
+        # EVERY BOTTLE UNDER THE GENERIC, even though since #1016 the plugin
+        # reads only their MODE. For a worklist that is the right answer, not an
+        # approximation: an unsettled strength on any one of them can change
+        # which value is the mode, so every one of them reaches the figure.
         if g in self.non_alcoholic:
             return []
         names = self.defaults.get(g) or self.by_generic.get(g) or []
@@ -119,6 +126,9 @@ class Resolver:
         raw = ing.get("generic")
         generics = [str(x) for x in raw] if isinstance(raw, list) else \
                    ([str(raw)] if raw else [])
+
+        if generics and all(g in self.bitters for g in generics):
+            return []
 
         if amount == "to top":
             if not [g for g in generics if g in self.top_up]:
@@ -174,10 +184,21 @@ def build():
                 for key in r.rows_for_pour(ing):
                     users.setdefault(key, set()).add(title)
 
+    # A bitters bottle is never on the worklist, however unsure its strength:
+    # by Helen's ruling it cannot reach a unit figure, so asking her shelf about
+    # it is a question about a number nothing reads.
+    bottle_generic = {}
+    for generic, names in r.by_generic.items():
+        for n in names:
+            bottle_generic[n] = generic
+
     unsettled = []
     for kind, table in (("bottle", r.abv_bottles), ("generic", r.abv_generics)):
         for name, row in table.items():
             row = row or {}
+            generic = bottle_generic.get(name) if kind == "bottle" else name
+            if generic in r.bitters:
+                continue
             if row.get("qq") or row.get("confidence") == "low":
                 unsettled.append((kind, name, row))
     unsettled.sort(key=lambda e: e[1].lower())

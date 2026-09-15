@@ -1085,6 +1085,20 @@ unless stated.
   **"Per-repo" lasted an afternoon** — the helper is passed per invocation by
   the three git wrappers and configured nowhere; §11's entry of the same
   date says why.
+- **2026-09-14 — the push wrapper pushed the public repo at the private one,
+  and only a missing token scope stopped it.** A session with branches of the
+  same name in both repos ran `sh scripts/git-push-agent.sh <branch>:<branch>
+  helen-triages-cocktails-private` from the worktree root, without the third
+  `dir` argument. The wrapper pushed from the current directory — the PUBLIC
+  checkout — so GitHub received helen-triages history for the drafts repo, and
+  refused it only because that history contains a workflow file and the
+  agent's token lacks the `workflow` scope. Re-run with `_cocktail_drafts` as
+  `dir`, it pushed the right branch. **The reverse mistake is the dangerous
+  one and nothing refuses it**: a drafts branch pushed at `helen-triages` puts
+  private drink names in a public repo, the #235 failure by another road.
+  MANUAL §9.1 now says to give `dir` every time a private repo is named. A
+  wrapper check that `dir` and `repo` agree was noted to Helen rather than
+  written, since the wrapper is safety tooling she reviews.
 
 ### §9.1.1 The drinks publication gate
 
@@ -1663,6 +1677,53 @@ unless stated.
   an agent's. Raised as #1013 (schnapps) and left as a per-drink QQ on Rosita's
   tequila pour, with the reasoning in the file rather than a guess.
 
+- **2026-09-14 — four vocabulary rulings from one sitting (#796, #1013, #752,
+  and cherry).**
+  **Arrack (#796)**: *"the name of the bottle is 'Ceylon Arrack', and the generic
+  is 'coconut flower-arrack'"* — the bottle's key was its label all along; the
+  CATEGORY was mis-named after where it comes from rather than what it is made
+  of. Her comment spelled it three ways; she picked `coconut-flower arrack`
+  (lowercase, hyphenated) from the options, and `Batavia arrack` stays as it is
+  — the bracket in *"Batavia arrack (aged Indonesian rum)"* was a gloss. `Ceylon
+  arrack` is retired under a new `retired_cane_and_palm_spirits`, because the
+  drafts' `ingest_from_csv.py` mapped a bare "Arrack" onto it. *"Please update on
+  recipes, and on the rum reference page"* covered the one live drink and the
+  category's name in her own arrack line on that page; no other word of it moved.
+  **Cherry**: asked which bottle an unqualified cherry liqueur should default
+  to, *"If cherry liqueur then Briottet, if cherry brandy then Cherry Heering"*,
+  then *"Cherry Heering is a cherry brandy, Briottet Cerise is a cherry
+  liqueur."* A new generic rather than a default; the Singapore Sling, which
+  named both for one pour, pours `[cherry brandy, cherry liqueur]`. And *"Delete
+  the Myrtle Daiquiri"* — the one draft that read the bare cherry default.
+  **Peach schnapps (#1013)**: *"Add 'peach schnapps' as a generic let's say ABV
+  18%"*, £12. Both new liqueurs joined `fruity` by that list's own rule, which
+  moved one derived mood (Peach Me).
+  **`to taste` (#752)**: the third action amount, for the Ti' Punch's lime and
+  syrup — *"typically served as rhum in a glass with lime and sugar on the side
+  so people can roll their own"*. The draft read 15 ml of rhum in a 35 ml
+  drink; it now pours 60. Her approved step "Serve the lime and the syrup on the
+  side…" hit the rule that a "Serve" step is presentation, and she chose moving
+  it to `to_serve` over rewording it as a method step.
+  **Character is never copied from a bottle**, stated answering a question about
+  the Spiced Negroni's gin: *"We don't name characters on bottles. We name
+  characters on recipe lines, maybe suggesting a bottle, then bottle choice is
+  up to future Helen. Because I think for the most part having a character is
+  only in a context."* The line had cardamom, cubeb pepper and black pepper,
+  copied from Opihr's botanical list; *"This drink wants cardamom."*
+
+- **2026-09-14 — the punches are parked, and why that is not a no.** Asked
+  whether Pic-A-De-Crop should serve over a block like its siblings, and whether
+  Arrack Punch should take its source's ice and serving count: *"Some punches
+  are indeed made over a large ice block in the punch bowl, but then served plain
+  in cups/glasses, or over crushed ice. So 'serve' in some of those above is
+  misapplied. I'll need to pick through one by one."* So **a punch's `serve:
+  ice: block` may describe how it is MADE rather than how it is served**, and no
+  agent should treat the sibling punches as precedent for another. And asked
+  about Anita's Attitude Adjuster's prosecco top (source 30–45 ml, house range
+  75–100): *Raise an issue for "Calculate ml for top", because we can totally
+  work this out* — a top fills the glass, so glass capacity less what is already
+  poured, less ice. No glass records a capacity today.
+
 ### §9.3.2 The bottle dictionary
 
 - **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as
@@ -1829,6 +1890,28 @@ unless stated.
   the shape every one of these takes, and it is not a half-finished rename.
   `Ophir`/Opihr and `Amaro Ciociano`/Ciociaro are the same class and are
   **still outstanding**, under #701.
+- **2026-09-14, #745 — the Ferrand collapse, reversed by the person who ruled
+  it.** On 2026-09-05 Helen said the Pierre Ferrand 1840 WAS her Ambré, and the
+  two entries collapsed into one with the 1840 spellings as aliases; that day's
+  note called it "a confident inference about the world" losing to "the owner of
+  the cupboard". #745 was raised because two notes on the Sazerac (Death & Co)
+  still described them as different, and was posed to her as a yes/no about
+  whether an agent may delete a note a later ruling made false. **She answered a
+  different question, and it is the one that mattered**: *"I was wrong above.
+  Pierre Ferrand Ambré and Pierre Ferrand 1840 are different bottles, but both
+  £53 and both 40 % ABV. For 1: delete the ingredient note, add the bottle
+  suggestion (1840) to the line. For 2: delete the note."* So the notes had been
+  RIGHT, and the collapse wrong. The 1840 is its own bottle again with its three
+  spellings; the Ambré moved from £45 to £53. **The general question #745 asked
+  -- may an agent correct a note a ruling has made false? -- is still
+  unanswered**, and the case shows why it is not a simple yes: here the note
+  and the ruling disagreed, and the note was the one telling the truth.
+  **Two gaps the collapse had left, found tracing its history**: the note
+  deleted on the Death & Co Sazerac also recorded its source's Rittenhouse 100,
+  and Legend's own typing ("Pièrre Ferrand 1840 cognac") lost its bottle when
+  `item` was deleted on 2026-09-05. Asked, she restored both: *"Yes, add
+  Rittenhouse 100"*, *"Yes, the 1840"*. The live Vieux Carré and Sazerac were
+  only re-accented by the collapse and name the Ambré correctly.
 
 - **2026-09-14, #984 — a bottle name is unique across the file, and that is
   what forced a new generic.** Peach Me's source names "Angostura orange
@@ -1965,6 +2048,45 @@ unless stated.
   the data already knows**; the header, the manual and the config now point at
   the script and state no count at all, and MANUAL §9.3.4 says never to write
   one.
+- **2026-09-14, #1016 / #1012 / #297 — the mode, the bitters, and every
+  strength answered in one sitting.** Helen assigned ten data issues and asked
+  for them to be worked as questions: *"Ask me questions as we go and we can
+  quickly knock out some decisions and missing values."*
+  **The mode (#1016)**: *"if a bottle isn't stated for a cocktail recipe, assume
+  the MODE ABV of bottles we've declared. This will be more meaningful than mean
+  or median."* **Measuring it first found the question the issue did not ask**:
+  seven of the fifteen multi-bottle categories had no mode at all, every bottle
+  a different strength (bourbon 40 / 43.2 / 45 / 47, with the live Man O'War
+  pouring it unbottled). Offered "name a default bottle", the highest, the mean
+  or the median for those, she chose defaults and named all seven in two
+  questions: Woodford's Reserve, Vieux Pontarlier, Sagatiba, Lustau, Gabriel
+  Boudier Liqueur de Gingembre, Luxardo — and for cherry, not a pick but a
+  split (below). **She was told first that `default_bottles` also sets an
+  unbottled pour's price.** The mean survives only as the plugin's
+  keep-the-page-building fallback, and a new test fails the build the moment
+  it would be read. Where there was a mode, five live figures moved slightly
+  (Airmail, Caribbean Sazerac, Chartreuse Daiquiri, Banana Boulevardier, South
+  Sider).
+  **The strengths (#1012, #297)**, from her two issue comments and the session:
+  apple schnapps 20 (*"the 40% is the brandies"*), Ardbeg XO is really *"Ardbeg
+  An Oa, ABV 46.6 %"*, both Cléments and a Canne Bleue she owns (*"Yes, add
+  it"*, £46), *"'Gabriel Boudier Liqueur de Gingembre' is 18 % -- and please
+  update the name string"*, Briottet Liqueur de Sapin 40 and *"'La Tomato
+  Liqueur' is 25 %, and this is the only tomato liqueur I have (shocker)"* —
+  bottles where only categories were — aguardiente 40, white wine 12.5 (*"12.5%
+  is fine"*). **The Damoiseau Pure Cane was 40 in her comment and 50 an hour
+  later**: *"just saw 40% scroll past and wanted to correct in case I
+  mistyped."* Showing values back as they land is what caught it.
+  **Bitters**: *"Don't include bitters in our ABV calculations."* Nothing poured
+  a bitters by volume, so nothing moved; it is now a rule about bitters rather
+  than a side-effect of dashes. The three `low` bitters rows lost their `qq:`
+  (a question about a number nothing reads) and the low-confidence test exempts
+  them. The worklist read zero afterwards.
+  **Two live drinks went dark by her choice**: Smokestack Lightning (the page
+  prints "Ardbeg XO" from the drink file, so an alias alone would have left the
+  wrong name live) and, for other reasons, the Arrack Christmas Punch and the
+  Singapore Sling. Offered reading them on the branch so nothing left the site,
+  she chose *"Let them go dark"*.
 
 ### §9.3.5 What a drink costs — #547, built 2026-09-05/06
 
@@ -2408,6 +2530,20 @@ unless stated.
   a methods pass: *"Line by line. I can just grind it out."* — so
   `COCKTAIL_BASELINE_COMMIT` moved to the apply commit, in a commit of its
   own, and nothing left the live site for the review.
+- **2026-09-14 — shake or stir, ruled per drink (#883).** The audit listed every
+  drink whose citrus was never shaken, or whose shake had no citrus. Helen, by
+  number: *"arrack-christmas-punch-wife-3 is shake"*, *"bali-hai is shake"*,
+  *"lita-grey is shake"*; *"arrack-punch is muddle (citrus into solid sugar is
+  always a muddle not a shake)"*, and the same for Billingsley, East River
+  Underground and La Fée Noir; *"pic-a-de-crop-punch is stir because it's
+  big!"*; *"espresso-martini is shake, to get the foam"*; and, asked about the
+  one she skipped, Kill Devil Punch as it stands. **The rule is a guide and not a
+  test** — two clean exceptions (solid sugar, size) and one about texture — so
+  no guard was written for it. The three shakes are one verb each.
+- **2026-09-14 — `skewered brandied cherry`, and a garnish still carries no
+  count.** The Pink Lady's source garnishes with three brandied cherries on a
+  pick, dropped at ingest as presentation. Helen kept the detail, singular like
+  `skewered maraschino cherry`, and *"no note"*.
 
 ### §9.13 The visual language — the rounds
 

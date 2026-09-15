@@ -13,7 +13,7 @@ ingredients:
     generic: "London dry gin"
     suggestion: ["Tanqueray"]
   - amount: "15 ml"
-    generic: "cherry liqueur"
+    generic: ["cherry brandy", "cherry liqueur"]
     suggestion: ["Cherry Heering", "Briottet Crème de Cerise"]
   - amount: "7.5 ml"
     generic: "Bénédictine"
@@ -45,5 +45,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -171,6 +171,12 @@ canonical:
     - "maraschino cherry"
     - "Luxardo maraschino cherry"
     - "skewered maraschino cherry"
+    # NEW 2026-09-14, for the Pink Lady, whose source garnishes with three
+    # brandied cherries on a cocktail pick. The draft had dropped the pick and
+    # the count as presentation; asked, Helen kept the detail, in THIS shape --
+    # singular like `skewered maraschino cherry` beside it, and "no note", so
+    # the count stays out of the garnish the way it does for every other entry.
+    - "skewered brandied cherry"
     - "cherry flag"
     - "fruit stick (skewered pineapple cubes and a maraschino cherry)"
 

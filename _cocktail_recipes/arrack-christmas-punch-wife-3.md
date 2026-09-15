@@ -15,7 +15,7 @@ ingredients:
     generic: "rhum agricole vieux"
     suggestion: ["Rhum JM Ambré"]
   - amount: "20 ml"
-    generic: "Ceylon arrack"
+    generic: "coconut-flower arrack"
   - amount: "35 ml"
     generic: "lemon juice"
   - amount: "10 ml"
@@ -23,7 +23,7 @@ ingredients:
   - amount: "to top"
     generic: "champagne"
 method:
-  - "Stir all ingredients other than the champagne with ice."
+  - "Shake all ingredients other than the champagne with ice."
   - "Strain."
   - "Top with champagne."
 mood:
@@ -39,5 +39,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -220,7 +220,7 @@ test rather than rendering:
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
 `small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` · `half` ·
-`whole` · `to top` · `to rinse`
+`whole` · `to top` · `to rinse` · `to taste`
 <!-- vocab:measures end -->
 
 Four things a source prints as if they were units, and what to do instead
@@ -377,7 +377,7 @@ blackberry · dried apple slice · banana chip · raspberries ·
 half an empty passion fruit shell · pineapple and brandied cherry
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
-skewered maraschino cherry · cherry flag ·
+skewered maraschino cherry · skewered brandied cherry · cherry flag ·
 fruit stick (skewered pineapple cubes and a maraschino cherry)
 
 **Herbs and leaves:** mint sprig · mint leaf · mint bouquet · rosemary sprig ·

@@ -1145,6 +1145,19 @@ clone's `origin` is a plain URL, and `git remote -v` can print it all day.
 say — and defaults to the current directory. A bare `git -C _cocktail_drafts
 fetch origin` has no credential and fails; that is correct, use the wrapper.
 
+**NAMING A PRIVATE `repo` IS NOT ENOUGH — GIVE ITS `dir` TOO, EVERY TIME.**
+Without `dir` the wrapper pushes the CURRENT checkout's branch to whatever repo
+you named. On 2026-09-14 `sh scripts/git-push-agent.sh <branch>:<branch>
+helen-triages-cocktails-private` pushed the PUBLIC repo's branch, history and
+all, at the private drafts repo, and it was refused only because that history
+contains `.github/workflows/build-and-deploy.yml` and the token has no
+`workflow` scope. The other direction — a drafts clone's branch pushed at
+`helen-triages` — would put private drink names into a public repo, and nothing
+would refuse it (#235 is what that costs). The branch names were identical in
+both repos, which is exactly the case where the mistake is silent. Nothing in
+the wrapper checks that `dir` matches `repo`; until something does, the three
+arguments together are the check.
+
 **NEVER `git config credential.helper`, in any repo, and least of all this
 one.** The first version of the helper said to configure it per repo, and the
 session that built it did so in `/workspace/.git/config` — which the primary
@@ -1434,7 +1447,13 @@ apart — and carries a `QQ - no unit in the source` note that the guard reads.
 is `amount: "to top"`, a rinse `"to rinse"`, salt in the drink `"1 small
 pinch"`, each declared in `measures:` `non_volumetric` and each with a method
 step saying WHEN (`Top with champagne.` / `Top with soda water.` / `Rinse the
-glass with absinthe and dump.`). The two strings appear nowhere in the test.
+glass with absinthe and dump.`). The strings appear nowhere in the test.
+**`"to taste"` is the third action** (2026-09-14, #752), for a pour the drinker
+decides — the Ti' Punch's lime and syrup, *"served as rhum in a glass with lime
+and sugar on the side so people can roll their own"*. Cost and units skip it,
+the scaler passes it through. Where the drinker adds it at the table, the
+serving goes in `to_serve` ("Lime and syrup on the side, to add to taste."),
+never a method step opening "Serve" — `test_no_method_step_restates_to_serve_or_garnish`.
 **Soda water, never club soda.** **`half` and `whole` are units** — a whole
 fruit is counted, never measured, because the juice a lime gives is a range.
 
@@ -1512,7 +1531,13 @@ know which" stays `QQ`.
 **`character` lives on the recipe, not a bottle dictionary** (#441, Helen
 overturning the first draft): it is *why this drink wants this bottle*, a
 property of the recipe's use of it, so restating it across recipes is each
-recipe correctly stating its own reasoning. `blackstrap` and `peated` are
+recipe correctly stating its own reasoning. **And it is never copied FROM the
+bottle** — Helen, 2026-09-14, on a Spiced Negroni whose gin character had been
+filled in from Opihr's botanical list: *"We don't name characters on bottles. We
+name characters on recipe lines, maybe suggesting a bottle, then bottle choice
+is up to future Helen. Because I think for the most part having a character is
+only in a context."* The line kept the one character the drink wants
+(cardamom), not the three the label lists. `blackstrap` and `peated` are
 characters and never generics. Rum's characters are a closed declared list
 (`rum_characters`); gin's are free text by Helen's call. **Any
 `<family>_characters` list is excluded from the declared-generic set by its
@@ -1691,14 +1716,32 @@ statement**. `_plugins/cocktail_units.rb` computes it; the line renders at the
 END of the recipe, under the notes and above "If you liked this" (#1001; it was
 under the cost line in the footer from 2026-09-06). Dashes do not count (asked,
 and Helen chose the same rule as costing; the exclusion list is read out of
-`costs.yml`, never restated). A zero is withheld rather than printed as
-"alcohol-free". Per serving, divided by `serves:` where present; the scaler
+`costs.yml`, never restated). **Bitters never count, whatever the amount**
+(2026-09-14, #1012: *"Don't include bitters in our ABV calculations."*) — a
+pour whose generic is in `ingredients.yml` `bitters:` is skipped before its
+amount is read; cost is untouched. A zero is withheld rather than printed as
+"alcohol-free".
+**An unbottled pour takes its category's MODE** (2026-09-14, #1016: *"assume
+the MODE ABV of bottles we've declared. This will be more meaningful than mean
+or median."*) — the most common strength among the bottles declared under the
+generic; it was the mean until then. A `default_bottles` ruling in `costs.yml`
+still wins (a two-bottle default is averaged, as her chosen range), and a
+generic with no bottle still reads its own `generics:` row. **A category with no
+single mode gets a default bottle, never a statistic**: seven had none the day
+the rule landed, and asked, Helen named a default for each rather than take the
+highest, the mean or the median. `test_every_bottled_generic_resolves_to_one_strength`
+fails the build for the next one, naming the category; the plugin's fallback to
+the mean exists only so a page never breaks. Remember when adding a default for
+this reason that `default_bottles` sets the unbottled pour's PRICE too. Per serving, divided by `serves:` where present; the scaler
 reads its two data attributes for the BATCH note's total only and never writes
 to the line, which is what keeps a per-serving figure from moving with the
 multiple box.
 **The unsettled strengths are a PUBLIC number's worklist now.** A `qq:` row
-(always `confidence: low`, and every low row has one) is a strength only Helen's
-shelf can settle. The gate existed because publishing on them was, in her
+(always `confidence: low`, and every low row has one — except a bitters, which
+stays `low` with no `qq:` because by her ruling it can never reach a figure) is
+a strength only Helen's shelf can settle. All of them were answered on
+2026-09-14 in one sitting (#1012, #297); run the script rather than assuming
+that is still true. The gate existed because publishing on them was, in her
 2026-09-06 words, "hers to make once they are cleared"; she made it without
 clearing them, which is hers to do. The line says "Roughly" on every drink.
 **`python3 scripts/abv_worklist.py` is the worklist, not the grep** (2026-09-14,
