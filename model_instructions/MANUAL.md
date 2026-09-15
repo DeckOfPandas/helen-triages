@@ -2504,16 +2504,16 @@ and `AGENT_GH_TOKEN` — which has the `Contents` permission the old one lacked
 on the private repos — became the only credential. **Merging is hers, always,
 everywhere**, and note that this is now the RULE holding rather than the
 token, which can merge.
-**Six hooks in `.claude/hooks/`** enforce the six rules that were read and
-broken anyway — `guard-main-branch.py`, `guard-destructive-git.py`,
-`guard-sed.py`, `guard-token-expansion.py`, `guard-inline-script.py` and
+**The hooks in `.claude/hooks/`** enforce the rules that were read and
+broken anyway, or that nothing enforced at all — `guard-main-branch.py`,
+`guard-destructive-git.py`, `guard-sed.py`, `guard-awk.py` (since 2026-09-15),
+`guard-token-expansion.py`, `guard-inline-script.py` and
 `guard-unanalyzable-bash.py` — so do not assume a rule is mechanically enforced
 because this file states it firmly. **This paragraph said "exactly two" until
-2026-09-09 and "exactly five" until 2026-09-10**, each time because it was
-written when the count was right and not revisited as more arrived. It has now
-rotted twice, which is the argument for naming the members rather than counting
-them — and for not writing the number at all, which is why the words "exactly
-five" are gone rather than replaced. `ls .claude/hooks/` settles it. `DECISIONS.md` §11 has why each exists and what each deliberately allows;
+2026-09-09, "exactly five" until 2026-09-10 and "Six hooks" until 2026-09-15**,
+each time because it was written when the count was right and not revisited as
+more arrived. It rotted three times, which is the argument for naming the
+members rather than counting them — and for not writing the number at all. `ls .claude/hooks/` settles it. `DECISIONS.md` §11 has why each exists and what each deliberately allows;
 `CLAUDE.md` has the workflow.
 
 **Branch names:** `<type>/<what-its-about>`, lowercase, hyphens; one concern;
