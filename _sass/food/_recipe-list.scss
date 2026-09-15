@@ -18,6 +18,10 @@
 // $spacing-section-top is the recipe page's own token, reused rather than
 // inventing a second "gap above a heading" value.
 .results-heading {
+  // WHERE A SEARCH RESULT LANDS -- `#results`, #1050. The snap puts this line
+  // at the very top of the viewport; a step of air above it keeps the count
+  // from kissing the screen's edge.
+  scroll-margin-top: $space-lg;
   // $spacing-section-gap (3rem) above, not $spacing-section-top (4.5rem).
   // The 4.5 was chosen when the filter matrix ended on a row of buttons and
   // the heading needed to read as "leaving the filters behind" -- the

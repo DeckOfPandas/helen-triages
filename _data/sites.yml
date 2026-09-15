@@ -42,12 +42,6 @@
 #               row -- the word and the arrow are the door now. The key and
 #               the artwork stay: the partial is still the site's mark, and
 #               test_site_nav_links_resolve_to_real_pages still asks for it.
-#   search_placeholder
-#               the placeholder in the search box on the back arrow's line of
-#               a recipe or drink page (#1024, 2026-09-14) -- the same words
-#               that site's own index puts in its I KNOW WHAT I WANT box, so
-#               the two boxes read as one control in two places. Says where
-#               you are, which is this file's test for a key.
 #   reference_links
 #               reference pages belonging to THIS site, rendered in the shared
 #               footer as a column headed by this site's own bracketed word. The
@@ -71,7 +65,12 @@ food:
   css: food
   home: /food/
   icon: food-cloche-heart
-  search_placeholder: "recipe name..."
+  # `search_placeholder` STOOD HERE FROM 2026-09-14 TO 2026-09-15 (#1024), the
+  # index's own "recipe name..." repeated in the furniture line's box so the
+  # two boxes read as one control. #1050 made that box a search for anything,
+  # whose placeholder says the same words on both sites -- so it no longer says
+  # where you are, which is this file's test for a key, and it moved into
+  # _includes/back-to-index.html as a literal.
   reference_links:
     - text: internal temperatures
       url: /food/reference/internal-temperatures/
@@ -88,7 +87,6 @@ cocktails:
   css: cocktails
   home: /cocktails/
   icon: glass-martini
-  search_placeholder: "drink name…"
   # THE DAY ARRIVED, 2026-09-06, issue #529 -- and it cost no template change,
   # which is what the note that used to sit here predicted. The footer's loop
   # already asked every site rather than food; this key is the whole of it, and

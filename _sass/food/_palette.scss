@@ -147,6 +147,23 @@ $color-practicalities-active: darken($color-practicalities-root, $darken-active)
 $color-ingredient-active:     darken($color-ingredient-root,     $darken-active);
 $color-name-search-active:    darken($color-name-search-root,    $darken-active-extra);
 
+// THE BRIGHT TONES -- the search-for-anything dropdown's group headings, #1050,
+// Helen 2026-09-15: "group headings need to be brighter, closer to core
+// colours although obviously we're limited by contrast." So each is the
+// SMALLEST darkening of its root that clears 4.5:1 on $color-surface, the
+// dropdown's ground, measured with scripts/palette_measure.py rather than
+// picked (tmp/measure_headings.py, 2026-09-15: magenta clears at -8 (4.61:1),
+// cerulean and orange at -12 (4.60, 4.56), lime at -20 (4.53), aureolin at
+// -25 (4.62)). Where the -active tones above darken every hue by one shared
+// step for legibility as a BUTTON LABEL, these take exactly what contrast
+// costs and no more -- which is why they are five numbers and not one. A hue
+// that moves needs its step re-measured, not carried over.
+$color-star-bright:           darken($color-star-root,            8);
+$color-mood-bright:           darken($color-mood-root,           20);
+$color-practicalities-bright: darken($color-practicalities-root, 12);
+$color-ingredient-bright:     darken($color-ingredient-root,     12);
+$color-name-search-bright:    darken($color-name-search-root,    25);
+
 // Clear filters button — the background and border went with the wash-era
 // styling; what is left is the text.
 $color-clear-text:   #4f4e4a;

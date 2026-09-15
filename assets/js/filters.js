@@ -1666,6 +1666,37 @@ function renderResultsPool() {
     wanted.star.forEach(function(value) {
       if (isOffered('.btn-star', 'star', value)) state.star = value;
     });
+
+    /* AN INGREDIENT, FROM THE SEARCH-FOR-ANYTHING BOX -- `?ing=`, #1050
+       (2026-09-15). filter-state.js's header called this "the obvious third
+       ... deliberately not implemented, because nothing emits it yet"; the
+       dropdown on a recipe page emits it now, carrying a main_ingredients
+       entry it offered. It lands in HAS TO HAVE exactly as typing the word
+       there would: the text goes into the box and the pool is painted by the
+       same function a keystroke calls, which already chooses the result when
+       it is the only one. When the vocabulary offers several, the one whose
+       name IS the word is chosen through its own button, so the choice takes
+       the click handler's path and not a second copy of it. When none is --
+       the picker renamed the entry (a modifier stripped, an alias applied) --
+       the pool is left on screen for the reader to pick from: a half-finished
+       search, which is a truthful state and the one the box would be in had
+       they typed it. Last value wins, as with the star. */
+    if (wanted.ing.length && searchBox && resultsPool) {
+      var wantedIng = wanted.ing[wanted.ing.length - 1];
+      searchBox.value = wantedIng;
+      renderResultsPool();
+      if (!state.ingredient) {
+        var wantedKey = fold(wantedIng.trim().toLowerCase());
+        var exact = null;
+        resultsPool.querySelectorAll('.btn-ingredient').forEach(function (btn) {
+          if (exact) return;
+          var byKey = fold(String(btn.dataset.ingredient || '').toLowerCase()) === wantedKey;
+          var byLabel = fold(String(btn.textContent || '').replace(' (all)', '').trim().toLowerCase()) === wantedKey;
+          if (byKey || byLabel) exact = btn;
+        });
+        if (exact && typeof exact.click === 'function') exact.click();
+      }
+    }
   })();
 
   // A fresh page load starts from the same random base order "clear all"
@@ -1730,6 +1761,21 @@ function renderResultsPool() {
   // After the reveal, so the page has its real height to scroll within.
   if (restored && typeof restored.scrollY === 'number') {
     window.scrollTo(0, restored.scrollY);
+  }
+
+  /* ARRIVING FROM A SEARCH RESULT -- `#results`, #1050 (2026-09-15). The
+     dropdown on a recipe page ends every filtered link in this fragment, and
+     the count line above the list carries the id, so the browser has already
+     scrolled there once; this does it again AFTER the reveal, because the
+     native scroll happened against a page whose rows were all still in place
+     and whose fonts may not have been. Helen: "with the screen snapped to the
+     returned recipes (so don't have to scroll down)." Not on a back
+     navigation, where the remembered scroll is the truer answer. */
+  if (!restored && location.hash === '#results') {
+    var results = document.getElementById('results');
+    if (results && typeof results.scrollIntoView === 'function') {
+      results.scrollIntoView({ block: 'start' });
+    }
   }
 
   window.addEventListener('pagehide', saveIndexMemory);

@@ -242,7 +242,14 @@ permalink: /food/
    isn't one of the five filter categories, so it doesn't borrow one of their
    hues. The count is the server-rendered resting value; filters.js keeps it
    live as filters change. {% endcomment %}
-<div class="results-heading">
+{% comment %} `id="results"` IS WHERE A SEARCH RESULT LANDS -- #1050, Helen,
+   2026-09-15: "load the index page filtered as appropriate, with the screen
+   snapped to the returned recipes (so don't have to scroll down)." Every
+   filtered link the search-for-anything dropdown offers ends in `#results`,
+   the browser scrolls here on arrival, and filters.js does it again once the
+   list is revealed. The same id on the drinks index, so page-search.js knows
+   one word for both sites. {% endcomment %}
+<div class="results-heading" id="results">
   <span class="category-label"><span class="category-label-text" id="recipe-count">{{ _rendered_recipes.size }} survivor{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span>
 
   {% comment %} THE SHORTLISTED-ONLY VIEW -- GitHub issue #546's second half,

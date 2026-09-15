@@ -380,7 +380,9 @@ permalink: /cocktails/
      whitespace between its items was the entire cause. That fix is deleted
      rather than kept as insurance: a workaround outliving its bug is how a
      stylesheet stops being readable. {% endcomment %}
-  <p class="drink-count">
+  {% comment %} `id="results"` IS WHERE A SEARCH RESULT LANDS -- #1050; the
+     food index carries the same id on its count line and says why. {% endcomment %}
+  <p class="drink-count" id="results">
     <strong id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>

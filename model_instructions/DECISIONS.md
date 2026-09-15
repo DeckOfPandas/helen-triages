@@ -4494,6 +4494,60 @@ verification. Dates are when the correction landed.
   and the doneness charts and timing calculator. Send note labels back to
   Courier."* — `.note-label` the last to return, after holding the face since
   08-24 under a rule that was a proxy for the true one.
+- **2026-09-15, #1050 — the search box becomes the search for anything.**
+  Helen's brief, numbered, in the issue: search ANYTHING on this site (name,
+  ingredients, star/mood/practicalities/hassle); results in a dropdown under
+  the box, grouped by type; *"prefix-matched title string results first, then
+  tags"*; a result goes either to the filtered index or to the page; Enter or
+  the magnifying glass submits; *"input field text right-aligned, 24
+  characters wide, placeholder text 'search for anything...', then input text
+  pushes out left-wards. Magnifying glass icon on the left which doesn't move
+  on typing"*, with the SVG pasted in. Two clarifications mid-build: *"to
+  search per site, not across sites"*, and *"search results should also have
+  a group for ingredient name."* Built as written, and the decisions that were
+  not hers are recorded so she can overrule them by looking:
+  - **A substring hit on a name is offered only when nothing prefixes.** Her
+    "prefix-matched title" read literally: "roni" finds Negroni because nothing
+    else does, but "st" does not append chicken and sticky under the recipes
+    that start with it.
+  - **Two characters before the dropdown opens**; one letter matches most of
+    a collection. The form still submits at any length.
+  - **The dropdown's headings take each index's section hues** (food's active
+    tones, cocktails' ramp), names taking I KNOW WHAT I WANT's, and the
+    matched run of each result is in the site's accent. Six names and five
+    words per group, the rest stated as "+N more".
+  - **A word no page carries is not offered**, so a result never lands on an
+    empty index — the rule the drinks index already applies to its mood
+    buttons.
+  - **The ingredient hand-off is `?ing=`**, the kind `filter-state.js` had
+    reserved "until something emits it". Food chooses the picker's entry
+    through the button's own click, or leaves the pool on screen when the
+    picker renamed the entry; cocktails matches a chip whole and drops a miss.
+    A drinks card label joining two options ("Demerara rum or overproof")
+    therefore selects nothing, which is the honest outcome of a name that is
+    two chips.
+  - **The data is a per-site `search.json`** fetched on first focus, not
+    inlined into every page; generated from the indexes' own gated lists and
+    held equal to the built pages by a test.
+  - **Copy left as PLACEHOLDER**: the two group labels for the pages
+    ("recipes", "drinks") and the no-match line.
+  **Her three notes on seeing it, the same day, all built:** *"placeholder
+  text and magnifying glass: for the cocktail site, make grey-er/darker, so it
+  demands less attention at the top of the page"* (the quiet grey darkened
+  15%, 3.88:1, a hint and a mark); *"both sites, remove placeholder on click"*
+  (transparent on focus, the drinks index's own rule); *"food site: group
+  headings need to be brighter, closer to core colours although obviously
+  we're limited by contrast"* (five `-bright` tones in `food/_palette.scss`,
+  each root darkened by exactly what 4.5:1 on the surface costs — 8, 20, 12,
+  12 and 25 points — measured, not picked); and *"when a user clicks a search
+  result, load the index page filtered as appropriate, with the screen snapped
+  to the returned recipes (so don't have to scroll down)"* — every filtered
+  link ends in `#results`, the id on both indexes' count line, and each index
+  scrolls there again after its reveal. A badge or chip link on a page keeps
+  landing at the top; that is #40's behaviour and she spoke to search results.
+  The GitHub account was flagged as spam that day, so the work went up as a
+  branch for Helen to open the PR from: *"push work to branches which I will
+  then merge. Larger pushes better please to avoid making things worse."*
 - **2026-09-04 (design audit)** — Food's universe turned down: *"This advice
   was the only part of the design review I disagreed with. Having all the
   dolly mixture colours visible together and first thing pleases me. I don't

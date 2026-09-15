@@ -172,6 +172,31 @@
 // LEAVE OUT a sixth colour precisely because it had earned one; this has not.
 .drink-search--exclude .drink-field-label { color: $color-clear-text; }
 
+// THE SEARCH-FOR-ANYTHING DROPDOWN'S HEADINGS, in the ramp -- #1050. The
+// dropdown is shared/_furniture.scss; a drink page's is the same panel as a
+// recipe page's, in this site's ink and paper. What is this site's is which
+// step of the ramp each KIND of result wears, and it is the heading colour the
+// index gives that section (above): a MOOD result and the MOOD section it
+// lands on are one colour making one claim, which is this file's own rule for
+// a heading. Names take I KNOW WHAT I WANT's violette, because a title search
+// is that box.
+.page-search-group--name       .page-search-group-label { color: $color-heading-name; }
+.page-search-group--mood       .page-search-group-label { color: $color-heading-mood; }
+.page-search-group--hassle     .page-search-group-label { color: $color-heading-hassle; }
+.page-search-group--ingredient .page-search-group-label { color: $color-heading-include; }
+
+// THE GLASS AND THE PLACEHOLDER SIT BACK ON THIS SITE -- Helen, 2026-09-15:
+// "for the cocktail site, make grey-er/darker, so it demands less attention at
+// the top of the page." The shared rule gives the placeholder the index boxes'
+// tone, which on a dark ground is LIGHTER than the quiet grey (lighten() moves
+// towards white here), so the box at the top of every drink page read brighter
+// than the ingredient boxes on the index. Both take the quiet grey darkened by
+// 15%: #716F74, 3.88:1 on the page (scripts/palette_measure.py) -- a hint and
+// a mark, not text, so the 3:1 bar is the one that applies, and it is cleared.
+// The glass still goes to the accent under the cursor (shared/_furniture.scss).
+.page-search-go { color: darken($color-clear-text, 15%); }
+.page-search-input::placeholder { color: darken($color-clear-text, 15%); }
+
 // FOOD'S GAP BETWEEN SECTIONS, not this file's own. It was
 // $spacing-section-gap (3rem), which is the RECIPE PAGE's "below a section"
 // token; food's index uses $index-section-gap ($space-md, 0.75rem since the
@@ -820,6 +845,9 @@
 // THE SPACING WAS SETTLED 2026-09-02, with the fold work: it now takes the
 // same margin food's `.results-heading` uses above its own list.
 .drink-count {
+  // WHERE A SEARCH RESULT LANDS -- `#results`, #1050; food's `.results-heading`
+  // carries the same step of air for the same reason.
+  scroll-margin-top: $space-lg;
   // NOT A FLEX ROW ANY MORE, SINCE 2026-09-05, and #675 is closed by that
   // rather than by the fix it briefly had. This was `display: flex` so the
   // "ship it?" legend could be pushed to the far end of the line by

@@ -526,6 +526,11 @@ layout: default
 </article>
 
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
+{% comment %} The search box's dropdown (#1050) -- the other half of the
+   furniture line, loaded beside the arrow's script for the same reason: page
+   furniture, not chrome. It hangs HTF.pageSearch off the namespace assets.js
+   creates in the head and reaches for nothing else. {% endcomment %}
+<script src="{{ '/assets/js/page-search.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/method-toggle.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 {% comment %} THE SCALER, IN DEPENDENCY ORDER -- #1005. shopping-list.js is the

@@ -1519,6 +1519,11 @@ layout: default
    default.html: the arrow is page furniture rather than site chrome, so a page
    with no arrow loads no script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
+{% comment %} The search box's dropdown (#1050) -- the other half of the
+   furniture line, loaded beside the arrow's script for the same reason. The
+   same file the recipe page loads; which site it searches comes from the
+   form's own `data-search-index`, never from this layout. {% endcomment %}
+<script src="{{ '/assets/js/page-search.js' | relative_url }}"></script>
 {% comment %} The print button's reveal and wiring (#1005; food's #86). Site-
    agnostic: it queries `.btn-print` and does nothing on a page with none. {% endcomment %}
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>

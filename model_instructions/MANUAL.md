@@ -452,6 +452,7 @@ apart from DOM wiring, so Node can test it.
 | `filter-state.js` | what an index's filter state IS: `create(spec)`, `FOOD_FIELDS`, `COCKTAIL_FIELDS`, `arrivedByGoingBack`, `KINDS` | `filter-state.test.js` |
 | `cook-schedule.js` | the timings arithmetic | `cook-schedule.test.js` |
 | `back-link.js` | may this arrow use history? (§13.7) | `back-link.test.js` |
+| `page-search.js` | the search-for-anything box's ranking and grouping (§13.13) | `page-search.test.js` |
 | `cocktail-search.js` | the drinks index's pool, ranking and matching (§9.3.3) | `cocktail-search.test.js` |
 | `scale.js`, `shopping-list.js` | the scaler's arithmetic and the one amount parser (§9.13, §8.2) | `scale.test.js`, `shopping-list.test.js` |
 | `food-shopping-list.js` | food's totals, by aisle, scaled by portions (§8.2) | `food-shopping-list.test.js` |
@@ -3247,12 +3248,38 @@ variables), and the row each site puts the actions in:
 - **The furniture line**, `_includes/back-to-index.html`: the back arrow at
   the left, a search box at the right — *"back arrow's line, but on the right
   not in the centre."* The box is a plain GET form to this site's index with
-  `q=`, works with no JavaScript, and searches NAMES: `HTF.filterState.parseName`
-  reads it (kept out of `parseQuery`'s three-kind shape because a title may
-  carry a comma) and each index puts the text into its own I KNOW WHAT I WANT
-  box and applies it as a keystroke would. The placeholder is the index's own,
-  `search_placeholder` in `sites.yml`. "Omnisearch" is the ambition; widening
-  to ingredients or moods is a change to the index grammar, not to the box.
+  `q=`, works with no JavaScript, and submits a NAME search: `HTF.filterState.parseName`
+  reads it (kept out of `parseQuery`'s kinds because a title may carry a
+  comma) and each index puts the text into its own I KNOW WHAT I WANT box and
+  applies it as a keystroke would. Enter or the magnifying glass submits.
+  **Since 2026-09-15 (#1050) it is the SEARCH FOR ANYTHING**: the glass sits
+  at the left and never moves, the input is 24 characters wide and
+  right-aligned so the text grows towards the glass, the placeholder reads
+  "search for anything..." on both sites (so it left `sites.yml`, whose test
+  for a key is "does it say where you are"), and `assets/js/page-search.js`
+  hangs a dropdown under it as you type. The dropdown is PER SITE and grouped
+  by kind in the index's own order — the recipes or drinks by name first
+  (title tiers, prefix before substring, a substring only when nothing
+  prefixes), then star / mood / practicalities on food, mood / hassle on
+  cocktails, then the ingredients (main_ingredients on food, the card's
+  ingredient labels on cocktails). Every result is a real link: to the page,
+  or to the index with `?star=`, `?tag=`, `?mood=` or `?ing=` **ending in
+  `#results`**, the id both indexes carry on the count line above their list,
+  so the reader lands on the answer and not the panel (each index scrolls
+  there again after its reveal; a badge or chip link still lands at the top) —
+  **`ing` is the
+  fourth kind in `filter-state.js`'s grammar**, and each index hands it to its
+  own HAS TO HAVE (food chooses the picker's matching entry through the
+  button's own click, or leaves the pool on screen when none is exact;
+  cocktails matches a pool chip WHOLE and drops a miss in silence). What it
+  searches is `food/search.json` / `cocktails/search.json`, generated from the
+  same gated lists the two indexes render and fetched through `HTF.fetchJson`
+  the first time the box takes focus; `test_the_search_index_lists_exactly_the_published_pages`
+  holds the JSON to the built pages. The pure half is `HTF.pageSearch`
+  (`tests/js/page-search.test.js`); the group headings take each site's own
+  section hue from its own stylesheet, the panel itself names only the palette
+  contract. The two "recipes"/"drinks" group labels and the no-match line are
+  PLACEHOLDER copy.
 - **The actions row**, `_includes/page-actions.html`: shortlist, see shortlist
   (N), print, pdf, in that order, in Courier caps — *"all actions in
   capitals"* — with the count from the STORE (`data-shortlist-total`), not the

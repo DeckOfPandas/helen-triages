@@ -1616,6 +1616,34 @@
     if (changed) syncMoodButtons();
   })();
 
+  /* AN INGREDIENT, FROM THE SEARCH-FOR-ANYTHING BOX -- `?ing=`, #1050
+     (2026-09-15). The dropdown on a drink page offers the CARD'S ingredient
+     names, which are the chips HAS TO HAVE offers (MANUAL 9.10.1), so a chosen
+     one arrives here as a chip value: matched against the pool WHOLE and
+     case-folded, and added to `include` -- never a substring, which is the
+     rule exclusion already follows and the one that keeps a joined label
+     ("Demerara rum or overproof", a card line naming two options) from
+     selecting anything. Dropped in silence otherwise, like a retired mood,
+     for the same reason: a filter nothing on screen can undo is one the page
+     is stuck in. Its own block rather than a tail on the mood one, because a
+     page with no mood buttons must still read it. */
+  (function applyIngredientQuery() {
+    var wantedIng = HTF.filterState.parseQuery(location.search).ing;
+    var added = false;
+    wantedIng.forEach(function (value) {
+      var key = value.trim().toLowerCase();
+      var hit = null;
+      pool.forEach(function (chip) {
+        if (!hit && String(chip.value).trim().toLowerCase() === key) hit = chip;
+      });
+      if (hit && !state.include.has(hit.value)) {
+        state.include.add(hit.value);
+        added = true;
+      }
+    });
+    if (added && redrawPool.include) redrawPool.include();
+  })();
+
   /* ARRIVING AT THE SHORTLIST BY URL -- `?shortlist=1`, #994, 2026-09-12.
      Helen: "Currently it's hard to figure out how to see your shortlist once
      you've added something to it from the separate page."
@@ -1680,6 +1708,20 @@
      tall and about to become 900px lands somewhere else entirely. */
   if (restored && typeof restored.scrollY === 'number') {
     window.scrollTo(0, restored.scrollY);
+  }
+
+  /* ARRIVING FROM A SEARCH RESULT -- `#results`, #1050 (2026-09-15). The same
+     block filters.js has, for the same reason it gives: the drink page's
+     dropdown ends every filtered link in this fragment and the count line
+     carries the id, so the browser has landed there once already, against a
+     page whose hidden cards were all still standing; after apply() the page
+     has its real height and this puts the reader on the answer. Not on a back
+     navigation, where the remembered scroll is the truer answer. */
+  if (!restored && location.hash === '#results') {
+    var results = document.getElementById('results');
+    if (results && typeof results.scrollIntoView === 'function') {
+      results.scrollIntoView({ block: 'start' });
+    }
   }
 
   /* pagehide rather than unload: it fires on the way out INCLUDING into

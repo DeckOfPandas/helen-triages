@@ -34,18 +34,57 @@
 
 // THE SEARCH BOX IS THE INDEX'S OWN BOX, DRAWN HERE. Same type mixin, same
 // hairline, same placeholder tone (shared/_rule.scss), so a reader who has used
-// I KNOW WHAT I WANT recognises it. 16rem is about what "recipe name..." and
-// a real title need; the form takes the box's width and no more.
+// I KNOW WHAT I WANT recognises it.
+//
+// THE GLASS ON THE LEFT, THE TEXT GROWING TOWARDS IT -- #1050, Helen's layout
+// to the character: "Input field text right-aligned, 24 characters wide,
+// placeholder text 'search for anything...', then input text pushes out
+// left-wards. Magnifying glass icon on the left which doesn't move on typing."
+// A flex row of two: the glass is a submit button of fixed size, the input is
+// `24ch` wide and right-aligned, so what you type starts at the box's right
+// edge and extends left, and the glass never moves because nothing about the
+// input's box changes as it fills. `ch` is the width of a zero in the box's
+// own face, which is exactly "characters wide" for a monospace face.
+//
+// `position: relative` is the dropdown's anchor: the results panel hangs
+// under the box from its right edge (below).
 .page-search {
+  position: relative;
   margin: 0;
-  flex: 0 1 16rem;
+  display: flex;
+  align-items: center;
+  gap: $space-sm;
+  flex: 0 0 auto;
   min-width: 0;
+}
+
+.page-search-go {
+  flex: 0 0 auto;
+  display: block;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+  color: $color-clear-text;
+  cursor: pointer;
+  // Hue, not lightness, on hover -- the arrow's own rule (shared/_chrome.scss).
+  &:hover,
+  &:focus-visible { color: $color-accent; }
+}
+
+.page-search-mark {
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .page-search-input {
   @include index-search-input-type;
-  width: 100%;
-  box-sizing: border-box;
+  width: 24ch;
+  max-width: 100%;
+  box-sizing: content-box;
+  text-align: right;
   background: transparent;
   border: none;
   border-bottom: 1px solid lighten($color-clear-text, 25%);
@@ -61,6 +100,112 @@
 
   &:focus { border-bottom-color: lighten($color-clear-text, 5%); }
   &::placeholder { @include index-search-placeholder; }
+  // THE PLACEHOLDER GOES ON FOCUS, NOT ON THE FIRST KEYSTROKE -- Helen,
+  // 2026-09-15: "both sites, remove placeholder on click." The cocktails index
+  // already does this for its three boxes and says why (cocktails/_filters.scss):
+  // a click means "I am about to type", so the field should be empty exactly
+  // then. `color: transparent` rather than emptying the attribute, so the hint
+  // is still there for a screen reader and the box does not change width.
+  &:focus::placeholder { color: transparent; }
+  // The clear mark WebKit draws inside a search box would sit on the left of a
+  // right-aligned text, between the glass and the words.
+  &::-webkit-search-cancel-button { display: none; }
+}
+
+// --- The dropdown: everything the word could mean here, grouped by kind ------
+// #1050. Hangs from the box's right edge so it lines up with the text's own
+// right edge; on a phone the furniture line has wrapped and the box sits at
+// the column's right, so the panel's left edge is what has to stay on screen
+// -- `max-width` against the viewport does that, and the options ellipsise
+// rather than wrap so the panel keeps one row per result.
+//
+// A SURFACE ON THE PAGE, not a floating widget: the site's card surface and
+// hairline, a shadow only just present, square corners. Names the palette
+// contract's variables and nothing else, so it draws in each site's own ink
+// and paper; the GROUP HEADINGS take the section hue each index already gives
+// that kind of word, and those are the sites' own -- food/_search.scss and
+// cocktails/_filters.scss re-point `.page-search-group--<kind>` because only a
+// site's stylesheet may name its section colours.
+.page-search-results {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  margin-top: $space-xs;
+  min-width: 100%;
+  width: max-content;
+  max-width: min(26rem, calc(100vw - 2rem));
+  box-sizing: border-box;
+  padding: $space-sm 0;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.09);
+  text-align: left;
+}
+
+.page-search-group + .page-search-group {
+  margin-top: $space-sm;
+  padding-top: $space-sm;
+  border-top: 1px solid $color-border;
+}
+
+// The kind, in the small Courier caps the actions row wears (above) -- it is
+// a label for a set of things you can act on, which is what those are.
+.page-search-group-label {
+  font-family: $font-headings;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: $color-clear-text;
+  padding: $space-xs $space-md $space-xs;
+}
+
+// One result, one line. A real link (page-search.js says why), in the same
+// lowercase Courier the box itself is typed in, a step larger so the list
+// reads as the answer and the box as the question.
+.page-search-option {
+  display: block;
+  padding: $space-xs $space-md;
+  font-family: $font-headings;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  color: $color-text;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  // Hover and the keyboard's row are one state, drawn as a wash of the site's
+  // accent -- "this one", the meaning the accent already carries on both
+  // sites' chrome -- rather than a change to the words.
+  &:hover,
+  &:focus-visible,
+  &.is-active {
+    background: mix($color-accent, $color-surface, 14%);
+    color: $color-text;
+    outline: none;
+  }
+}
+
+// The run that matched what you typed, in the accent: the part of the answer
+// that is your question.
+.page-search-hit {
+  color: $color-accent;
+}
+
+// "+N more -- keep typing", and the no-match line. Body face, quiet grey: they
+// are remarks about the list, not entries in it.
+.page-search-more,
+.page-search-none {
+  margin: 0;
+  padding: $space-xs $space-md 0;
+  font-family: $font-body;
+  font-size: 0.74rem;
+  color: $color-clear-text;
 }
 
 // --- The actions row: shortlist · see shortlist (N) · print · pdf -------------
