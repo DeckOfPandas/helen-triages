@@ -223,13 +223,17 @@ so she knows the cost is two pages and not one.
 
 Listed so the map is honest about which lines are drawn and which are paved.
 
-- [ ] Rename the folders in the private repos: `to-rewrite/` → `1-rewrite/`,
-      `to-cook/` → `2-make/`, `to-promote/` → `4-promote/` (a branch and a PR
-      on each private repo; `3-keep/` and drinks' `2-make/` appear on first
-      use, since git keeps no empty folder). The public repo's tests and
-      scripts name `4-promote/` since 2026-09-14, so the private PRs and the
-      public one land together.
-- [ ] `scripts/needs_helen.py`: the flip and the issue body, for §5.
+- [x] The folders exist in both private repos, always (#1080, 2026-09-15).
+      Helen: *"These folders should always be present even if they don't
+      contain any drafts."* So each holds a `.gitkeep` (food: `1-rewrite/`,
+      `2-make/`, `3-keep/`, `4-promote/`; drinks: the last three) rather than
+      appearing on first use, and `tests/test_staging_folders.py` fails locally
+      when a clone is missing one (it skips in CI, where the drafts are
+      absent). The old `to-rewrite/`, `to-cook/` and `to-promote/` names were
+      already gone from both `main`s by then.
+- [x] `scripts/needs_helen.py`: the flip and the issue body, for §5. Built
+      2026-09-14, in the same commit that wrote this map; this box was left
+      unticked until 2026-09-15.
 - [ ] `scripts/promote.py`: the copy, compare, delete and baseline steps of §4,
       which have been done by hand and got wrong once each.
 - [ ] The `to make (N)` view on both local indexes (§3), if Helen wants it.
