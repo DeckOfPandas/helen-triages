@@ -10,7 +10,7 @@
 #   sh scripts/browser/install.sh        # once per fresh tmp/
 #   sh scripts/browser/serve.sh          # serve tmp/site at 127.0.0.1:4010, in the background
 #   sh scripts/browser/shoot.sh <label> <path>...   # screenshots + overflow report
-#   sh scripts/browser/crop.sh <path> <selector> <name> [width]   # one element at 2x
+#   sh scripts/browser/crop.sh <path> <selector> <name> [width] [type-into] [text]   # one element at 2x, after typing
 set -e
 mkdir -p tmp/browser
 cd tmp/browser
