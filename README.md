@@ -1,5 +1,9 @@
 # Helen Triages [Food, Cocktails]
 
+[![Build and deploy](https://github.com/DeckOfPandas/helen-triages/actions/workflows/build-and-deploy.yml/badge.svg?branch=main)](https://github.com/DeckOfPandas/helen-triages/actions/workflows/build-and-deploy.yml)
+
+**Red means the live site is not updating.** Tests gate the deploy, so while `main` is failing, nothing merged reaches the site.
+
 About the site: https://deckofpandas.github.io/helen-triages/about/
 
 This Jekyll repo serves two personal decision-support sites: **food** (what shall we cook?) and **cocktails** (what shall we drink?). A GitHub Actions workflow runs the tests, builds, then deploys to Pages.
