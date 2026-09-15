@@ -335,7 +335,11 @@ lightness-only no-op of §12), never a state to leave.
 
 `_config.yml`'s `defaults:` sets `site_key` per collection and directory. It
 keys into `_data/sites.yml` (title, word, description, css, home, icon,
-reference_links) and `_data/<key>/` (vocabulary). **A root-level page must
+social_image, reference_links) and `_data/<key>/` (vocabulary).
+`social_image` is the site's link-preview card, a PNG of its own wordmark
+rendered by `scripts/render_social_images.py` from the built site; the
+site-neutral pages take the [ ?? ] card named by `social_image` in
+`_config.yml` (2026-09-15, #1086; DECISIONS §2 has the ruling). **A root-level page must
 declare `site_key` in its own front matter** — the defaults assign it by
 directory, and there are only two. A page with no `site_key` gets the
 repo-level title and **no stylesheet**, silently:

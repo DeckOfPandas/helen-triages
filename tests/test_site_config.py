@@ -1409,6 +1409,65 @@ def test_page_has_a_description_and_link_preview():
     )
 
 
+def _png_size(path: Path) -> tuple[int, int]:
+    """Width and height from a PNG's IHDR chunk -- bytes 16..24, big-endian."""
+    head = path.read_bytes()[:24]
+    assert head[:8] == b"\x89PNG\r\n\x1a\n", f"{path} is not a PNG"
+    return int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big")
+
+
+def test_every_link_preview_image_exists_at_the_size_the_layout_claims():
+    """The og:image cards: one per site in sites.yml, one repo-level in
+    _config.yml for the site-neutral pages, all rendered by
+    scripts/render_social_images.py (design review 2026-09-15, #1086).
+
+    Three things can rot independently: a site can name a card that was never
+    rendered (a preview with a broken picture, which is worse than none); the
+    layout's og:image:width/height can drift from what the script writes
+    (Facebook and WhatsApp size the card off those numbers and crop to them);
+    and the script's own constants can move without the layout following.
+    So this reads the PNG headers and holds every one to the numbers the
+    layout states, and holds the layout's numbers to the script's.
+    """
+    sites = yaml.safe_load(read("_data", "sites.yml"))
+    config = yaml.safe_load(read("_config.yml"))
+    cards = {f"sites.yml {key}": s.get("social_image") for key, s in sites.items()}
+    cards["_config.yml"] = config.get("social_image")
+    missing_key = [where for where, path in cards.items() if not path]
+    assert not missing_key, (
+        f"No social_image declared for: {missing_key}. Every site names its own "
+        f"card and _config.yml names the [ ?? ] one; _layouts/default.html falls "
+        f"back to text-only for a page with none, which is the state this test "
+        f"exists to end."
+    )
+
+    layout = read("_layouts", "default.html")
+    width = re.search(r'property="og:image:width" content="(\d+)"', layout)
+    height = re.search(r'property="og:image:height" content="(\d+)"', layout)
+    assert width and height, "_layouts/default.html no longer states og:image:width/height"
+    claimed = (int(width.group(1)), int(height.group(1)))
+
+    script = read("scripts", "render_social_images.py")
+    dims = re.search(r"^WIDTH, HEIGHT, SCALE = (\d+), (\d+), (\d+)", script, re.M)
+    assert dims, "scripts/render_social_images.py no longer declares WIDTH, HEIGHT, SCALE"
+    written = (int(dims.group(1)) * int(dims.group(3)), int(dims.group(2)) * int(dims.group(3)))
+    assert claimed == written, (
+        f"_layouts/default.html claims og:image is {claimed}, but "
+        f"scripts/render_social_images.py writes {written}. Change both together."
+    )
+
+    problems = []
+    for where, path in cards.items():
+        file = ROOT / path.lstrip("/")
+        if not file.is_file():
+            problems.append(f"{where}: {path} is not in the repo -- run the script")
+            continue
+        size = _png_size(file)
+        if size != claimed:
+            problems.append(f"{where}: {path} is {size}, the layout claims {claimed}")
+    assert not problems, "\n".join(problems)
+
+
 # --- accessibility of the interactive layer ----------------------------------
 # The decorative layer is already sound: every ornamental SVG carries
 # aria-hidden. These guard the controls, which is where the gaps were.

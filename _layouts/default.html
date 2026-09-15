@@ -56,17 +56,32 @@
      Without these you get a bare link, which for a site whose entire job is
      "what shall we cook" is a real loss.
 
-     og:image is deliberately conditional. Add `social_image: /assets/img/...`
-     to _config.yml when you have artwork you want on the card; until then the
-     preview is text-only, which is correct rather than broken.
+     THE IMAGE IS THE SITE'S OWN WORDMARK, SINCE 2026-09-15 (#1086, the design
+     review). Helen: "The wordmark is fine for a start -- I don't think we have
+     anything else that feels like branding anyway." Each site names its card in
+     _data/sites.yml (`social_image`), because the tape on it says where you
+     are, which is that file's test for a key; the repo-level `social_image` in
+     _config.yml is the [ ?? ] card for a page that belongs to neither site
+     (site_neutral: /about/, /404.html). scripts/render_social_images.py makes
+     all three from the built site's real header and compiled CSS; re-run it
+     when the wordmark changes. The text half of a preview needs nothing per
+     page: og:description above is already the recipe's or drink's own tagline.
+
+     The width and height are what that script writes (1200x630 CSS px at a
+     device scale of 2); tests/test_site_config.py reads the PNG headers and
+     holds them to these two numbers.
   {% endcomment %}
+  {% assign social_image = this_site.social_image | default: site.social_image %}
+  {% if page.site_neutral %}{% assign social_image = site.social_image | default: social_image %}{% endif %}
   <meta property="og:type" content="{% if page.collection %}article{% else %}website{% endif %}">
   <meta property="og:site_name" content="{{ site_title | escape }}">
   <meta property="og:title" content="{{ page.title | default: site_title | escape }}">
   <meta property="og:description" content="{{ page_description | escape }}">
   <meta property="og:url" content="{{ page.url | absolute_url }}">
-  {% if site.social_image %}
-  <meta property="og:image" content="{{ site.social_image | absolute_url }}">
+  {% if social_image %}
+  <meta property="og:image" content="{{ social_image | absolute_url }}">
+  <meta property="og:image:width" content="2400">
+  <meta property="og:image:height" content="1260">
   <meta name="twitter:card" content="summary_large_image">
   {% else %}
   <meta name="twitter:card" content="summary">

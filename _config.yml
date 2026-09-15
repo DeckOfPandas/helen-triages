@@ -31,6 +31,14 @@
 title: Helen Triages
 description: What not How.
 
+# The link-preview card for a page that belongs to NEITHER site (/about/ and
+# /404.html, the site_neutral pages): the wordmark on [ ?? ] tape. Each site's
+# own card is `social_image` in _data/sites.yml, and all three are rendered by
+# scripts/render_social_images.py from the built site's real header --
+# 2026-09-15, #1086. _layouts/default.html reads this only for a site-neutral
+# page, or as the fallback when a site declares no card of its own.
+social_image: /assets/img/social/neutral.png
+
 # GitHub Pages project site. Repo is helen-triages, so the published URL is
 #   https://<your-github-username>.github.io/helen-triages/
 # baseurl must match the repo name exactly: leading slash, no trailing slash.

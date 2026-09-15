@@ -402,6 +402,31 @@ unless stated.
   untouched -- this is only a reorder of children already inside that pinned
   cell, not a change to the grid.
 
+- **2026-09-15, #1086 — the link-preview image is the wordmark, one card per
+  site and one for neither.** The design review found no `og:image` anywhere,
+  so a pasted link showed title and tagline with no picture; the layout had
+  carried a conditional for it since the meta tags were written, waiting on
+  artwork. Helen: *"Let's do the og:image. The wordmark is fine for a start --
+  I don't think we have anything else that feels like branding anyway."* And,
+  asked whether the preview text should be generated per page: it already is
+  -- `og:description` is the recipe's or drink's own tagline -- so only the
+  image was missing. **Three cards, not one**, because the tape says where you
+  are: `social_image` in `_data/sites.yml` per site (that file's test for a key,
+  and this passes it), and `social_image` in `_config.yml` for the
+  `site_neutral` pages, the [ ?? ] tape from `/about/`. **Rendered from the
+  built site, not drawn**: `scripts/render_social_images.py` lifts the
+  `site-title-link` block out of each built index, inlines one tape SVG with
+  decorations.js's two attributes, loads the site's compiled stylesheet, scales
+  the lockup to four fifths of a 1200×630 frame and screenshots it at device
+  scale 2 with the same headless Chrome `generate_pdfs.py` uses. So the
+  lettering, emboss and palette on the card are whatever the header renders
+  that day; change the wordmark, re-run the script. **One tape, fixed, on
+  purpose**: #779's random-per-load is a ruling about a live page, and a file
+  wears one tape (`--tape`, default 7). The PNGs are committed and CI never
+  renders them. `test_every_link_preview_image_exists_at_the_size_the_layout_claims`
+  reads the PNG headers and holds each to the `og:image:width`/`height` the
+  layout states, and those to the script's own constants.
+
 ## §3 The three-layer rule
 
 - **2026-08-01** — The ingredient search confirmed as earning its
