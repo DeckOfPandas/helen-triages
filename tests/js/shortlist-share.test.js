@@ -9,7 +9,7 @@
 // ruling, 2026-09-15: "Show it, don't save it" -- so the store's part is two
 // questions and one deliberate write:
 //
-//   1. slugOf()       the one spelling of a key's slug, shared with restore()
+//   1. slugOf()       the one spelling of a key's slug
 //   2. resolveSlugs() which live keys a link names, and which it names that
 //                     nothing on the page answers to. WRITES NOTHING.
 //   3. addAll()       "keep these": a merge, persisted once.
@@ -113,11 +113,11 @@ test('addAll of nothing new writes nothing', () => {
   assert.strictEqual(storage.writes(), 0);
 });
 
-test('restore still matches by slug after slugOf moved out of it', () => {
-  // The refactor's own guard: restore() and the share link share one slugOf.
+test('the JSON export and restore are gone -- #1100', () => {
+  // Helen: "Remove the rest of the apparatus: no JSON export or import, no
+  // clear." The share link is the only way a list leaves a browser. If these
+  // come back, they come back on purpose, with tests of their own.
   const s = store();
-  const result = s.restore({ version: 1, site: 'cocktails',
-    entries: ['/cocktails/drafts/to-promote/aviation/'] }, LIVE);
-  assert.strictEqual(result.restored, 1);
-  assert.deepStrictEqual(plain(s.list()), ['/cocktails/recipes/aviation/']);
+  assert.strictEqual(typeof s.snapshot, 'undefined');
+  assert.strictEqual(typeof s.restore, 'undefined');
 });

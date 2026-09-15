@@ -491,7 +491,7 @@ window.HTF = window.HTF || {};
     /* A KEY'S SLUG: the last non-empty path segment, lowercased.
        `/food/recipes/dal/` and `/food/drafts/dal/` both answer `dal`. A key
        with no segment at all ("/") answers '', and is nobody. Shared by
-       restore() (#850) and the share link (#1093), which both have to find a
+       the share link (#1093) and, until #1100 removed it, restore() (#850): both had to find a
        live card from a name that may have been written somewhere else. */
     function slugOf(key) {
       var parts = String(key).split('/');
@@ -623,182 +623,18 @@ window.HTF = window.HTF || {};
         return value;
       },
 
-      /* --- THE WHOLE LIST AS ONE VALUE — GitHub issue #849 ------------------
-         Helen, 2026-09-08: "allow me to export my food or cocktail shortlist as
-         a YAML/JSON dump -- can be just a text area at the bottom of the page."
-
-         WHY IT IS IN THE STORE AND NOT IN THE PAGE. The shortlist is three
-         localStorage keys, not one, and only this closure knows that: the
-         marks, the glasses map and the portions map have different prefixes,
-         different versions and different meanings for a missing entry. A page
-         that assembled the dump itself would be a second place that has to know
-         all of it, and would go stale the day a fourth key arrives.
-
-         JSON, NOT YAML, though the issue offers either. It is what the store
-         already speaks, it is what an importer (#850) would have to parse, and
-         `JSON.stringify(..., null, 2)` is legible enough to read in a textarea.
-         Adding a YAML writer would be a dependency for a format nothing else
-         here uses.
-
-         THE MAPS ARE FILTERED TO WHAT IS ACTUALLY SHORTLISTED, and this is the
-         one judgement in here. Both maps are deliberately sparse and
-         self-healing -- a drink dropped from the list leaves its number behind
-         because nothing reads it -- which is right for storage and wrong for a
-         dump. Exporting a count for something that is not on the list would put
-         a fact in the file that the list itself contradicts, and anyone reading
-         it (a person, or #850) would have to know the self-healing rule to
-         discount it. So the export states only what is true.
-
-         `site` AND `version` ARE FOR THE IMPORTER THAT DOES NOT EXIST YET.
-         Neither is read here. They are written because a dump with no site on
-         it can be pasted into the wrong index and silently half-work -- food
-         URLs simply never matching a drink -- and because the day this shape
-         changes, a file already in Helen's notes needs to say which shape it
-         is. Cheap now, impossible to add retrospectively.
-
-         @returns {{version:number, site:string, entries:string[],
-                    glasses:Object, portions:Object}}
-      */
-      snapshot: function () {
-        var list = read().slice();
-        var allGlasses = readGlasses();
-        var allPortions = readPortions();
-        var glasses = {};
-        var portions = {};
-        list.forEach(function (url) {
-          if (typeof allGlasses[url] === 'number') glasses[url] = allGlasses[url];
-          if (typeof allPortions[url] === 'number') portions[url] = allPortions[url];
-        });
-        return {
-          version: 1,
-          site: HTF.site || '',
-          entries: list,
-          glasses: glasses,
-          portions: portions
-        };
-      },
-
-      /* --- THE WHOLE LIST BACK IN — GitHub issue #850 ----------------------
-         Helen, 2026-09-08: "allow me to input a YAML/JSON shortlist dump you
-         gave me to see a populated shortlist." The other half of `snapshot()`,
-         and the reason it wrote `site` and `version` in the first place.
-
-         WHY IT IS HERE AND NOT IN THE PAGE: the same argument as the export.
-         Three keys, three meanings for a missing entry, and only this closure
-         knows any of it. The page hands over the pasted text and the keys its
-         cards carry, and reads back a result it can print.
-
-         MATCHED BY SLUG, NOT BY KEY, and this is the judgement in here. A dump
-         outlives the site that wrote it: Helen's real one names
-         `/cocktails/drafts/to-promote/aviation/` from before the drink was
-         promoted, and the live card says `/cocktails/recipes/aviation/`. The
-         last path segment is the drink; the folders are where it happened to
-         live that week. So each entry is resolved to whichever LIVE key on the
-         page ends in the same slug, and the live key is what gets stored --
-         a stale key written back would be a mark nothing on the page reads.
-         An entry no card answers to is reported by slug, never dropped in
-         silence: a renamed drink is exactly the case a person has to finish
-         by hand, and cannot if nobody tells them.
-
-         MERGED, NOT REPLACED. What is already marked stays marked; a count
-         already set in this browser wins over the dump's, because the dump is
-         old by definition and the number in front of you is not. A count from
-         the dump fills only a gap.
-
-         THE OTHER SITE'S DUMP IS REFUSED, which is what `site` was for. Food
-         URLs pasted into the cocktails index would simply match nothing and
-         look like a shortlist with eleven unknown drinks in it -- a confusing
-         answer where a plain refusal is available. A dump with NO site (hand
-         made, or from a build before the export existed) is allowed through
-         and judged on its entries.
-
-         UNTRUSTED INPUT THROUGHOUT, the standing every stored value here
-         already has. Text that does not parse, a document of the wrong
-         shape, an entry that is not a string, a count that is not a positive
-         number: each is skipped or refused, and none can throw. The page is
-         in the middle of a click.
-
-         @param {string|Object} dump - the pasted text, or an already-parsed
-                document of `snapshot()`'s shape
-         @param {string[]} liveKeys - every `data-shortlist-key` on the page
-         @returns {{ok:boolean, reason:string, site:string, restored:number,
-                    added:number, unmatched:string[]}}
-                  `reason` is '' | 'unreadable' | 'wrong-site';
-                  `restored` counts entries that matched a live key, whether
-                  or not they were already marked; `added` the subset that
-                  were not; `unmatched` the slugs nothing on the page answers
-                  to, in the dump's order, once each.
-      */
-      restore: function (dump, liveKeys) {
-        var result = {
-          ok: false, reason: '', site: '', restored: 0, added: 0, unmatched: []
-        };
-        var doc = dump;
-        if (typeof doc === 'string') {
-          try { doc = JSON.parse(doc); } catch (e) { doc = null; }
-        }
-        if (!doc || typeof doc !== 'object' || Array.isArray(doc)
-            || !Array.isArray(doc.entries)) {
-          result.reason = 'unreadable';
-          return result;
-        }
-        result.site = typeof doc.site === 'string' ? doc.site : '';
-        if (result.site && HTF.site && result.site !== HTF.site) {
-          result.reason = 'wrong-site';
-          return result;
-        }
-
-        var bySlug = keysBySlug(liveKeys);
-
-        var all = read();
-        var allGlasses = readGlasses();
-        var allPortions = readPortions();
-        var dumpGlasses = (doc.glasses && typeof doc.glasses === 'object'
-                           && !Array.isArray(doc.glasses)) ? doc.glasses : {};
-        var dumpPortions = (doc.portions && typeof doc.portions === 'object'
-                            && !Array.isArray(doc.portions)) ? doc.portions : {};
-
-        function positive(n, floor) {
-          return typeof n === 'number' && isFinite(n) && n >= floor;
-        }
-
-        doc.entries.forEach(function (entry) {
-          if (typeof entry !== 'string' || !entry) return;
-          var slug = slugOf(entry);
-          var live = slug && Object.prototype.hasOwnProperty.call(bySlug, slug)
-            ? bySlug[slug] : null;
-          if (!live) {
-            var name = slug || entry;
-            if (result.unmatched.indexOf(name) === -1) result.unmatched.push(name);
-            return;
-          }
-          result.restored += 1;
-          if (all.indexOf(live) === -1) {
-            all.push(live);
-            result.added += 1;
-          }
-          // The dump's number fills a gap and never overwrites. Glasses below
-          // 2 are the default and are not stored, as setGlasses would not;
-          // a portion count of 1 is real, as setPortions says.
-          if (positive(dumpGlasses[entry], 2) && typeof allGlasses[live] !== 'number') {
-            allGlasses[live] = Math.floor(dumpGlasses[entry]);
-          }
-          if (positive(dumpPortions[entry], 1) && typeof allPortions[live] !== 'number') {
-            allPortions[live] = Math.floor(dumpPortions[entry]);
-          }
-        });
-
-        write();
-        writeGlasses();
-        writePortions();
-        result.ok = true;
-        return result;
-      },
-
+      /* `snapshot()` (the JSON export, #849) and `restore()` (pasting one back,
+         #850) lived here until #1100, 2026-09-15 -- Helen: "Remove the rest of
+         the apparatus: no JSON export or import, no clear." The share link is
+         the one way a list leaves a browser now. Their idea that outlived them
+         is below: a list names drinks by SLUG, because the folders around a
+         key move and the last segment does not. `clear()` above stays; the
+         store's own tests use it, and it is the obvious call for any future
+         control. git has the two functions if they are ever wanted back. */
       /* --- A SHORTLIST SOMEONE SENT — #1093 ---------------------------------
          `?shortlist=aviation,negroni` names drinks by slug, because a link is
          read and typed by people and a slug is the part of a key that
-         survives a folder move (restore()'s argument, above).
+         survives a folder move.
 
          slugOf() is the one spelling of "a key's slug"; the share link is
          built from it, so a link this site writes always resolves here.
@@ -834,7 +670,7 @@ window.HTF = window.HTF || {};
 
       /**
        * Mark every one of these and persist once — the shared view's
-       * "keep these" (#1093). A MERGE, as restore() is: what is already
+       * "keep these" (#1093). A MERGE: what is already
        * marked stays marked and keeps its place in the order.
        * @param {string[]} urls
        * @returns {number} how many were not already marked
