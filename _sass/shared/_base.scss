@@ -24,6 +24,24 @@ a {
   }
 }
 
+// A READER WHO HAS ASKED FOR LESS MOTION GETS NONE -- #1093. The sites move
+// very little (colour fades on hover, the make-it knob sliding across), which
+// is why this is one blanket rule and not a line on each: every `transition`
+// in both stylesheets is a nicety, none carries meaning, so there is nothing
+// to keep. `!important` because this has to beat component rules written
+// after it, and 0.01ms rather than 0 because `transitionend` still fires at
+// that duration, so a script waiting on one is not left waiting forever.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 // EVERY HEADING ON EVERY SITE GETS THE PUNCHED-TAPE LETTERING FROM HERE, not
 // from a list of named components. Helen, 2026-08-12: "Did your heading
 // lettering change touch all headings on the whole site? That is what I want."

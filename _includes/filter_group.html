@@ -4,8 +4,16 @@
 
    The filter buttons carry aria-pressed so assistive tech knows they are
    toggles. filters.js keeps the value in step with the .active class.
+
+   `include.section_id` -- #1059, 2026-09-15. A STABLE id on the section
+   itself, not derived from `group_class` here: the caller already knows which
+   section this is (it is choosing the label and the items), and a badge or
+   chip on a recipe page needs to name this same id in its own href
+   (recipe_badges.html) without re-deriving it from a class string. Optional,
+   so a filter_group.html call this issue never touched (there are none today)
+   costs nothing by omitting it.
 {% endcomment %}
-<div class="category {{ include.group_class }}">
+<div class="category {{ include.group_class }}"{% if include.section_id %} id="{{ include.section_id }}"{% endif %}>
   <div class="category-label-row">
     {% comment %} The label text is wrapped rather than bare because the blocky
        rule is a per-line background on an INLINE box, and .category-label is a

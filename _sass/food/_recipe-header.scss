@@ -92,7 +92,20 @@ article.recipe .method-short {
 // code from the recipe page's badge row. `:not()` takes its argument's
 // specificity, so this is (0,2,1) -- still comfortably ahead of the shared
 // `a { color: $color-text }` it exists to beat, and the exclusion is free.
-article.recipe a:not(.badge) {
+//
+// `.btn-see-shortlist` and `.btn-pdf` JOIN THE EXCLUSION, issue #1058. Two of
+// the actions row's four controls (_includes/page-actions.html) are `<a>`
+// tags, not `<button>`s, and with no exclusion this rule outranked
+// shared/_furniture.scss's `.btn-see-shortlist, .btn-print, .btn-pdf` (0,1,0)
+// the same way it would have outranked the badges: PDF and SEE SHORTLIST (N)
+// rendered in $color-recipe-link at font-weight 600 -- this page's prose-link
+// colour and weight -- while SHORTLIST and PRINT (both `<button>`s, never
+// touched by an `a` selector) rendered correctly in $color-clear-text at 700.
+// Found by measuring the row's computed styles against cocktails', where
+// `.cocktail-controls` has no such generic link rule to fight and all four
+// controls already agreed. `:not()`'s specificity is its most specific
+// argument, so adding two more class names here costs nothing.
+article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   color: $color-recipe-link;
   font-weight: 600;
 
@@ -175,7 +188,13 @@ article.recipe a:not(.badge) {
   align-items: last baseline;
   justify-content: space-between;
   gap: $space-xl;
-  margin: $spacing-section-gap 0 1.25rem 0;
+  // 2rem ABOVE WHERE THERE IS NO ARROW SINCE #1093 (2026-09-15), from
+  // $spacing-section-gap. Every recipe page carries the furniture line and
+  // takes $space-lg from the rule below, so this value is now only the
+  // reference pages' and the about page's -- which opened 48px under the
+  // header where rum categories opens 32px (`.ref-title-block`). Helen, shown
+  // both: "All at 32px".
+  margin: $space-xxl 0 1.25rem 0;
   text-align: left;
   position: relative;
 }
@@ -185,8 +204,16 @@ article.recipe a:not(.badge) {
 // already separates the title from the header, so the section gap above
 // stacked a second gap on top of it -- about 4rem of dead space below the
 // arrow's baseline for one job. Scoped to pages that actually render the
-// arrow; where there is none, .recipe-title above keeps its 3rem.
-.back-to-index + .recipe .recipe-title {
+// arrow; where there is none, .recipe-title above keeps its 2rem.
+//
+// `.page-furniture +`, NOT `.back-to-index +`, SINCE #1093 (2026-09-15). #1024
+// wrapped the arrow and the search box in `.page-furniture` on 2026-09-14,
+// after which `.back-to-index` was no longer the article's sibling, this rule
+// matched nothing, and every recipe title sat 3rem under the arrow where the
+// drink page sits 1rem -- the gap the two sites were ruled to share on
+// 2026-09-10 (see `.cocktail-title-block` in _sass/cocktails/_cocktail.scss).
+// Found by measuring, in the spacing review: 48px on food, 16px on cocktails.
+.page-furniture + .recipe .recipe-title {
   margin-top: $space-lg;
 }
 
@@ -619,10 +646,19 @@ article.recipe a:not(.badge) {
 // and pushed right, with the block gap below so INGREDIENTS opens at the
 // section's own distance. The title is alone on its line again and keeps its
 // 70% cap and its balance; a long one wraps without a control to fight.
+//
+// PADDING-TOP IS $spacing-block-gap, NOT $space-md -- issue #1058. Cocktails'
+// equivalent gap (its title block's own `margin-bottom`, between its
+// border-bottom rule and `.cocktail-controls`) is $spacing-block-gap
+// (1.75rem, MANUAL 13.3); this row measured only $space-md (0.75rem) under
+// its own hairline, so the two sites' rows sat at a different distance off
+// the rule that closes the head, even though the row's own contents already
+// matched exactly. Measured before: 13px from the hairline to the row's
+// text on food, 30.6px on cocktails, `tmp/measure_actions_row.js`.
 .recipe-controls {
   display: flex;
   justify-content: flex-end;
-  padding-top: $space-md;
+  padding-top: $spacing-block-gap;
   border-top: 1px solid $color-border;
   margin: 0 0 $spacing-block-gap;
 }

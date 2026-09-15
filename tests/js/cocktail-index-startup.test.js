@@ -506,6 +506,30 @@ test('#1050: an ingredient no card names is dropped in silence', () => {
   assert.deepStrictEqual(on, []);
 });
 
+// --- a shortlist someone sent, #1093 ------------------------------------------------
+// food-index-startup.test.js carries the full set, including "keep these"
+// (this harness's store is a no-op, see above). These are the wiring: the
+// sent list reaches matches(), and the own-list button is not lit over it.
+
+test('#1093: ?shortlist=<slugs> shows exactly those drinks', () => {
+  const r = boot({ drinks: DRINKS, search: '?shortlist=c,a' });
+  assert.deepStrictEqual(visibleTitles(r.page).sort(), ['Bamboo', 'Daiquiri']);
+  assert.ok(!shortlistViewIsOn(r),
+    'the button counts THIS browser\'s shortlist and must not claim a sent one.');
+});
+
+test('#1093: a sent list beats a mood in the same URL, as shortlist=1 does', () => {
+  const r = boot({ drinks: DRINKS, search: '?mood=sharp&shortlist=c' });
+  assert.deepStrictEqual(visibleTitles(r.page), ['Bamboo']);
+});
+
+test('#1093: a slug beginning with 1 is not read as the own-list flag', () => {
+  const drinks = DRINKS.concat([{ url: '/12-mile-limit', name: '12 mile limit',
+    title: '12 Mile Limit', moods: [], ingredients: ['rum|rum'] }]);
+  const r = boot({ drinks, search: '?shortlist=12-mile-limit' });
+  assert.deepStrictEqual(visibleTitles(r.page), ['12 Mile Limit']);
+});
+
 test('#994: shortlist=1 beats a mood in the same URL', () => {
   // It is a VIEW, not a facet (#918): pressing the button clears every other
   // filter, and arriving by the link must mean the same thing or the two doors
@@ -519,4 +543,42 @@ test('#994: shortlist=1 beats a mood in the same URL', () => {
   assert.deepStrictEqual(lit, [],
     'the mood button is still lit, so the view did not clear it -- a filter ' +
     'the reader can see but the list is not obeying.');
+});
+
+// --- arriving at a fragment, #1057 and #1059 ------------------------------------
+// food-index-startup.test.js carries the fuller set and the reasoning; this is
+// the cocktails half of the same widening -- any element id named by
+// location.hash, not only the literal string "results" -- since a drink
+// page's own mood chips (_layouts/cocktail.html) end their href in
+// `#filter-mood` or `#filter-hassle`, and the actions row's "see shortlist"
+// link ends in `#results` the same way a search result does.
+
+test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
+  const r = boot({ drinks: DRINKS, hash: '#results' });
+  assert.strictEqual(r.page.count._scrollCalls.length, 1,
+    'the startup block must scroll to location.hash again after apply(), the ' +
+    'same landing a search result and "see shortlist" both rely on.');
+  assert.strictEqual(r.page.count._scrollCalls[0].block, 'start');
+});
+
+test('#1059: arriving at #filter-mood scrolls the MOOD section, not #results', () => {
+  const r = boot({ drinks: DRINKS, hash: '#filter-mood' });
+  assert.strictEqual(r.page.mood._scrollCalls.length, 1,
+    'a mood chip\'s own fragment must be read generically off location.hash, ' +
+    'not hardcoded to "results".');
+  assert.strictEqual(r.page.count._scrollCalls, undefined,
+    'only the id location.hash actually names should be scrolled to.');
+});
+
+test('#1059: arriving at #filter-hassle scrolls the HASSLE section', () => {
+  const r = boot({ drinks: DRINKS, hash: '#filter-hassle' });
+  assert.strictEqual(r.page.hassle._scrollCalls.length, 1);
+  assert.strictEqual(r.page.mood._scrollCalls, undefined);
+});
+
+test('with no hash at all, nothing is scrolled', () => {
+  const r = boot({ drinks: DRINKS });
+  assert.strictEqual(r.page.count._scrollCalls, undefined);
+  assert.strictEqual(r.page.mood._scrollCalls, undefined);
+  assert.strictEqual(r.page.hassle._scrollCalls, undefined);
 });

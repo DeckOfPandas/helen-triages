@@ -220,12 +220,13 @@ def test_the_furniture_line_searches_for_anything():
     """#1050. The search box on the back arrow's line, as Helen specified it,
     and the plumbing it needs to be more than a name search.
 
-    THE ORDER IN THE MARKUP IS THE LAYOUT: the glass is a submit button BEFORE
-    the input, so it sits at the left and never moves as the text grows
-    leftwards from the box's right edge. The dropdown element is rendered
-    empty and hidden so the no-script page is the page minus the script; the
-    form names the JSON it searches; both page layouts load page-search.js
-    after back-link.js; and the two JSON pages exist, one per site, out of the
+    THE ORDER IN THE MARKUP IS THE LAYOUT: the input is BEFORE the glass
+    (#1056 moved the glass to the right end, reversing #1050's own layout),
+    so it sits at the right and never moves as the text grows rightwards
+    from the box's left edge. The dropdown element is rendered empty and
+    hidden so the no-script page is the page minus the script; the form
+    names the JSON it searches; both page layouts load page-search.js after
+    back-link.js; and the two JSON pages exist, one per site, out of the
     sitemap. `search_placeholder` is gone from sites.yml: the words are the
     same on both sites now, so the key stopped saying where you are.
     """
@@ -241,12 +242,13 @@ def test_the_furniture_line_searches_for_anything():
     assert go, "the magnifying glass is not a submit button (.page-search-go)."
     assert box, "the box (.page-search-input) is missing."
     assert panel, "the dropdown (.page-search-results) must be rendered, hidden."
-    assert go.start() < box.start() < panel.start(), (
-        "glass, then input, then dropdown -- the glass at the LEFT is Helen's "
-        "layout, and it only stays put if it is before the input in the row."
+    assert box.start() < go.start() < panel.start(), (
+        "input, then glass, then dropdown -- #1056 put the glass at the "
+        "RIGHT end, and it only stays put if it comes after the input in "
+        "the row."
     )
-    assert 'placeholder="search for anything..."' in body, (
-        "the placeholder is Helen's exact words: 'search for anything...'"
+    assert 'placeholder="I know what I want..."' in body, (
+        "the placeholder is Helen's exact words, #1096: 'I know what I want...'"
     )
     assert "data-search-index=" in body and "search.json" in body, (
         "the form must say which JSON it searches (data-search-index)."
@@ -674,6 +676,102 @@ def test_recipe_badges_are_links_carrying_their_own_filter_value():
             f"assets/js/filter-state.js's header -- one parameter per filter "
             f"KIND -- and filters.js only knows how to read that one."
         )
+
+    # #1059, 2026-09-15: a badge's href must land on the filter SECTION that
+    # holds it, not the top of the index. The star badge always names one
+    # fixed section; a tag badge's section depends on which group.name loop
+    # iteration produced it, so its fragment is built from that same variable
+    # rather than a literal -- see the loop just below this function's own
+    # test for the section ids that fragment has to resolve against.
+    assert "#filter-star" in html, (
+        '_includes/recipe_badges.html\'s star badge no longer ends its href '
+        'in "#filter-star" -- #1059. Clicking the badge on a recipe page must '
+        'land on the STAR INGREDIENT section, not the top of the index.'
+    )
+    assert re.search(r'\?tag=[^"]*#filter-\{\{\s*group\.name\s*\}\}', html), (
+        '_includes/recipe_badges.html\'s tag badge no longer ends its href in '
+        '"#filter-{{ group.name }}" -- #1059. A tag\'s fragment has to name '
+        'whichever section (mood or practicalities) actually holds it, so it '
+        'is built from the same group.name the badge\'s class already uses, '
+        'not a fixed string.'
+    )
+
+
+def test_filter_sections_carry_the_id_their_badges_and_chips_link_to():
+    """#1059, 2026-09-15: "clicking a chip at the top of a recipe should snap
+    the index page to that filter group." A chip's href ends in a fragment
+    (test_recipe_badges_are_links_carrying_their_own_filter_value and
+    _layouts/cocktail.html's mood chips, checked below); this is the other
+    half -- the section the fragment names must actually carry that id.
+
+    Asserted against the templates rather than a build, like every other test
+    in this file that can be: food/index.html passes each filter_group.html
+    call a `section_id`, which _includes/filter_group.html turns into the
+    wrapper's `id`; cocktails' MOOD and HASSLE sections write the literal id
+    directly, since they are not built through that shared include.
+    """
+    filter_group = read("_includes", "filter_group.html")
+    assert 'id="{{ include.section_id }}"' in filter_group, (
+        "_includes/filter_group.html no longer passes include.section_id "
+        "through to the wrapper's id -- #1059. Without it, no filter section "
+        "built through this include has a stable id for a badge to link to."
+    )
+
+    food_index = read("food", "index.html")
+    assert re.search(r'section_id\s*=\s*"filter-star"', food_index), (
+        'food/index.html\'s STAR INGREDIENT filter_group.html call no longer '
+        'passes section_id="filter-star" -- #1059. The star badge '
+        '(recipe_badges.html) links to exactly this fragment.'
+    )
+    assert re.search(
+        r'\{%-?\s*capture\s+group_section_id\s*%\}filter-\{\{\s*group\.name\s*\}\}',
+        food_index,
+    ), (
+        "food/index.html no longer builds a per-tag-group fragment id "
+        "(`filter-<group.name>`) for its tag_groups loop -- #1059. MOOD and "
+        "PRACTICALITIES must each carry a stable id a tag badge can name."
+    )
+    assert re.search(r'section_id\s*=\s*group_section_id', food_index), (
+        "food/index.html's tag_groups filter_group.html call no longer "
+        "passes the captured section_id through -- #1059."
+    )
+
+    cocktails_index = read("cocktails", "index.html")
+    for group, section_id in (("mood", "filter-mood"), ("hassle", "filter-hassle")):
+        assert re.search(
+            r'class="drink-filter drink-filter--' + group + r'"\s+id="' + section_id + r'"',
+            cocktails_index,
+        ), (
+            f'cocktails/index.html\'s {group.upper()} section no longer '
+            f'carries id="{section_id}" -- #1059. A drink page\'s own {group} '
+            f'chips (_layouts/cocktail.html) link to exactly this fragment.'
+        )
+
+    cocktail_layout = read("_layouts", "cocktail.html")
+    assert re.search(
+        r'href="\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood=\{\{\s*m\s*\|\s*'
+        r'url_encode\s*\}\}#filter-\{\{\s*chip\s*\}\}"',
+        cocktail_layout,
+    ), (
+        "_layouts/cocktail.html's mood chip no longer ends its href in "
+        '"#filter-{{ chip }}" -- #1059. `chip` is already "mood" or "hassle", '
+        "the same word cocktails/index.html's two section ids use."
+    )
+
+
+def test_the_see_shortlist_link_lands_on_the_results_list():
+    """#1057, 2026-09-15: "clicking 'see shortlist' should snap to the section
+    of the page where the shortlisted recipes start" -- the same landing a
+    search-dropdown result already gets (#1050), the count line both indexes
+    carry id="results" on, not the top of the index.
+    """
+    page_actions = read("_includes", "page-actions.html")
+    assert re.search(r'href="[^"]*\?shortlist=1#results"', page_actions), (
+        '_includes/page-actions.html\'s "see shortlist" link no longer ends '
+        'in "?shortlist=1#results" -- #1057. It must land on the count line '
+        'both indexes carry id="results" on, the same landing a search '
+        'result gets.'
+    )
 
 
 def test_filters_js_holds_no_ingredient_vocabulary():
@@ -1485,6 +1583,28 @@ def test_search_inputs_have_a_label():
             f'[ SEARCH … ] text should BE the label rather than sitting next to '
             f"one — same styling, same position, `span` becomes `label`."
         )
+
+
+def test_the_recipe_title_gap_names_the_furniture_includes_own_wrapper():
+    """The 1rem under the back arrow is a sibling selector, and it went stale.
+
+    `_sass/food/_recipe-header.scss` closes the gap between the arrow and a
+    recipe's title with `.<wrapper> + .recipe .recipe-title`. #1024 wrapped the
+    arrow in `.page-furniture` on 2026-09-14 and the rule still said
+    `.back-to-index +`, which then matched nothing: every recipe title sat 3rem
+    under the arrow, against the drink page's 1rem, for a day, with nothing red.
+    Found by measuring in #1093's spacing review. So this asks the include what
+    its outermost element is called and holds the rule to that name.
+    """
+    include = read("_includes", "back-to-index.html")
+    wrapper = re.search(r'^<(\w+) class="([\w-]+)"', _strip_comments(include, ".html"), re.M)
+    assert wrapper, "_includes/back-to-index.html has no top-level classed element."
+    selector = f".{wrapper.group(2)} + .recipe .recipe-title"
+    assert selector in read("_sass", "food", "_recipe-header.scss"), (
+        f"The food recipe title's gap under the arrow must be `{selector}`: that is "
+        f"the element directly before article.recipe now. A sibling selector naming "
+        f"anything else matches nothing, silently, and the title drops to 3rem."
+    )
 
 
 def test_clear_controls_are_buttons():

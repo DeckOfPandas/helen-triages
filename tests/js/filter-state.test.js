@@ -138,6 +138,65 @@ test('parseName does not leak into parseQuery', () => {
   assert.deepStrictEqual(FS.parseQuery('?q=negroni'), { star: [], tag: [], mood: [], ing: [] });
 });
 
+// --- ?shortlist=, #1093 ---------------------------------------------------------
+// Two meanings in one parameter: `1` is this browser's own list (#994, #1011),
+// anything else is a list of slugs someone sent. The literal
+// `indexOf('shortlist=1')` both indexes used could not tell `1` from a slug
+// that begins with it, which is why this is a parser now.
+
+test('parseShortlist: ?shortlist=1 is the own list, with no slugs', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1'), { own: true, slugs: [] });
+  assert.deepStrictEqual(FS.parseShortlist('?mood=sharp&shortlist=1'), { own: true, slugs: [] });
+});
+
+test('parseShortlist: a list of slugs is a sent list, in link order, once each', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=negroni,aviation,negroni'),
+    { own: false, slugs: ['negroni', 'aviation'] });
+});
+
+test('parseShortlist: a slug beginning with 1 is a slug, not the own-list flag', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=10-minute-dal'),
+    { own: false, slugs: ['10-minute-dal'] });
+});
+
+test('parseShortlist: anything that is not [a-z0-9-] is dropped, not matched', () => {
+  // A link is untrusted input and a slug is only ever compared with a
+  // Jekyll-written URL segment, which carries no other character.
+  assert.deepStrictEqual(
+    FS.parseShortlist('?shortlist=Dal,%3Cscript%3E,../x,,-lead,moules%20mariniere'),
+    { own: false, slugs: ['dal'] });
+});
+
+test('parseShortlist: nothing, an empty value, or no parameter is neither', () => {
+  const none = { own: false, slugs: [] };
+  assert.deepStrictEqual(FS.parseShortlist(''), none);
+  assert.deepStrictEqual(FS.parseShortlist(undefined), none);
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist='), none);
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist'), none);
+  assert.deepStrictEqual(FS.parseShortlist('?tag=soup'), none);
+});
+
+test('parseShortlist: the last shortlist parameter wins', () => {
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=dal&shortlist=1'), { own: true, slugs: [] });
+  assert.deepStrictEqual(FS.parseShortlist('?shortlist=1&shortlist=dal'), { own: false, slugs: ['dal'] });
+});
+
+test('shortlistQuery writes what parseShortlist reads back', () => {
+  const q = FS.shortlistQuery(['negroni', 'Aviation', 'negroni']);
+  assert.strictEqual(q, 'shortlist=negroni,aviation');
+  assert.deepStrictEqual(FS.parseShortlist('?' + q), { own: false, slugs: ['negroni', 'aviation'] });
+});
+
+test('shortlistQuery leaves out what the parser would drop, and is empty for nothing', () => {
+  assert.strictEqual(FS.shortlistQuery(['1', 'a b', '']), '');
+  assert.strictEqual(FS.shortlistQuery([]), '');
+  assert.strictEqual(FS.shortlistQuery(undefined), '');
+});
+
+test('parseShortlist does not leak into parseQuery', () => {
+  assert.deepStrictEqual(FS.parseQuery('?shortlist=dal'), { star: [], tag: [], mood: [], ing: [] });
+});
+
 test('KINDS is exported so filters.js and the tests agree on what exists', () => {
   assert.deepStrictEqual(FS.KINDS, ['star', 'tag', 'mood', 'ing']);
 });
@@ -233,9 +292,18 @@ test('NARROWING_FIELDS is a subset of FIELDS -- no filter exists outside the sha
 // difference for a silent behaviour change at whichever call site lost its own
 // answer. It feeds suppressList only.
 
-test('hasNarrowingFilter EXCLUDES ingredient -- it is nulled on every keystroke', () => {
-  const state = stateWithOnly('ingredient');
-  assert.strictEqual(FS.hasNarrowingFilter(state), false);
+test('hasNarrowingFilter INCLUDES includedIngredients -- issue #1092 made it a real filter', () => {
+  // It used to be `ingredient`, a lone string EXCLUDED here on purpose:
+  // renderResultsPool() nulled it on every keystroke, so while the box was
+  // being typed into it was always empty and counting it towards
+  // hasNarrowingFilter would have been a no-op dressed up as a rule. Multi-
+  // select changed the question: a chosen entry now SURVIVES the next
+  // keystroke (it takes an explicit remove, same as excludedIngredients
+  // beside it), so it is a real filter and belongs in NARROWING_FIELDS --
+  // where the generated sweep two tests up already covers it, this one just
+  // says why the answer flipped.
+  const state = stateWithOnly('includedIngredients');
+  assert.strictEqual(FS.hasNarrowingFilter(state), true);
   assert.strictEqual(FS.hasAnythingToClear(state), true);
 });
 
@@ -434,7 +502,7 @@ test('a full state survives a round trip through JSON', () => {
   state.star = 'beef';
   state.excludedIngredients.add('peas');
   state.nameQuery = 'stew';
-  state.ingredient = 'cavolo nero';
+  state.includedIngredients.add('cavolo nero');
   state.isSearching = true;
 
   const back = FS.deserialise(JSON.parse(JSON.stringify(FS.serialise(state))));
@@ -443,7 +511,7 @@ test('a full state survives a round trip through JSON', () => {
   assert.strictEqual(back.star, 'beef');
   assert.deepStrictEqual([...back.excludedIngredients], ['peas']);
   assert.strictEqual(back.nameQuery, 'stew');
-  assert.strictEqual(back.ingredient, 'cavolo nero');
+  assert.deepStrictEqual([...back.includedIngredients], ['cavolo nero']);
   assert.strictEqual(back.isSearching, true);
 });
 
@@ -686,7 +754,7 @@ test('a draft row is not filtered on any more, in either direction', () => {
 
 test('the ingredient key drops its (all) suffix before it is matched', () => {
   const state = EMPTY();
-  state.ingredient = 'lamb (all)';
+  state.includedIngredients.add('lamb (all)');
   assert.strictEqual(
     FS.rowMatchesFilters(ROW(), state, EXACT), true,
     'the umbrella was matched with its suffix still attached, so it looked for ' +
@@ -699,8 +767,38 @@ test('with no matcher, an ingredient filter selects nothing rather than everythi
   // fail where it shows: an empty list is visibly wrong, where a silently
   // unenforced EXCLUSION would hand back the thing you ruled out.
   const state = EMPTY();
-  state.ingredient = 'lamb';
+  state.includedIngredients.add('lamb');
   assert.strictEqual(FS.rowMatchesFilters(ROW(), state, undefined), false);
+});
+
+// --- HAS TO HAVE is AND across its chosen entries -- GitHub issue #1092 -------
+// A second (or third) pick used to REPLACE state.ingredient's one value; now
+// it joins a Set, and a row must satisfy every member, the same shape
+// excludesRow's caller already has for LEAVE OUT (OR, the opposite
+// direction) and cocktail-search.js's own `include` cupboard.
+
+test('two chosen ingredients are AND -- a row must have both, not either', () => {
+  const state = EMPTY();
+  state.includedIngredients.add('lamb');
+  state.includedIngredients.add('barley');
+  assert.strictEqual(
+    FS.rowMatchesFilters(ROW(), state, EXACT), true,
+    'the row carries lamb, barley and carrots -- both chosen ingredients are on it.'
+  );
+
+  state.includedIngredients.add('peas');
+  assert.strictEqual(
+    FS.rowMatchesFilters(ROW(), state, EXACT), false,
+    'the row does not carry peas, so requiring lamb AND barley AND peas must ' +
+    'drop it -- the regression this issue was filed over replaced the first ' +
+    'two choices with the third instead of joining them, which would have ' +
+    'kept this row (peas alone matches nothing here, true, but the failure ' +
+    'mode was "only the last pick counts", not "peas never matches").'
+  );
+});
+
+test('an empty set of chosen ingredients filters nothing, same as excludedIngredients', () => {
+  assert.strictEqual(FS.rowMatchesFilters(ROW(), EMPTY(), EXACT), true);
 });
 
 test('the row rules are ALL of them, and each one alone can drop a row', () => {

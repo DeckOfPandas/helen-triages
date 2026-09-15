@@ -157,6 +157,17 @@ function boot(options) {
   controls.appendChild(el('div', 'category-buttons search-results', { id: 'ingredient-results-pool' }));
   doc.body.appendChild(controls);
 
+  // `id="results"` (#1050) and `id="filter-star"` (#1059) -- the two kinds of
+  // fragment a link on this site can end in: the count line above the list,
+  // and a filter section a badge names. Real food/index.html carries several
+  // more (`filter-mood`, `filter-practicalities`); one is enough to prove the
+  // startup block scrolls to WHATEVER `location.hash` names rather than only
+  // the literal string "results".
+  const results = el('div', 'results-heading', { id: 'results' });
+  doc.body.appendChild(results);
+  const starSection = el('div', 'category category--star', { id: 'filter-star' });
+  doc.body.appendChild(starSection);
+
   const list = el('ul', 'recipe-list');
   Object.keys(recipes).forEach((url) => {
     const li = el('li', '', {
@@ -173,7 +184,16 @@ function boot(options) {
 
   const countRow = el('div', 'results-count-row');
   countRow.appendChild(el('button', 'btn-shortlist-only', { id: 'shortlist-only' }));
+  // #1093's note over a shared list, with the attributes filters.js reaches for.
+  const shared = el('p', 'shared-shortlist', { 'data-shared-shortlist': '' });
+  shared.appendChild(el('span', '', { 'data-shared-shortlist-text': '' }));
+  shared.appendChild(el('button', 'btn-shared-keep', { 'data-shared-shortlist-keep': '' }));
+  countRow.appendChild(shared);
   doc.body.appendChild(countRow);
+
+  // The stub has `dispatch(type)`; the page calls the DOM's dispatchEvent with
+  // a CustomEvent, which "keep these" (#1093) does to repaint everything.
+  doc.dispatchEvent = (ev) => doc.dispatch(ev.type, ev);
 
   const panel = el('section', 'shopping-list', { id: 'shopping-list' });
   const head = el('div', 'shopping-list-head');
@@ -187,14 +207,34 @@ function boot(options) {
   const win = {
     document: doc,
     localStorage: createStorage(),
+    // sessionStorage too, since #387/#1057's back-navigation memory
+    // (HTF.indexMemory in assets.js) reads and writes it -- every call is
+    // wrapped in try/catch there and treats a missing sessionStorage as "carry
+    // on as a fresh load", so leaving this out would make a real back
+    // navigation untestable here without failing loudly anywhere.
+    sessionStorage: createStorage(),
     console: { warn() {}, error() {}, log() {} },
     setTimeout, clearTimeout,
-    location: { search: (options && options.search) || '', pathname: '/food/', hash: '' },
+    location: {
+      search: (options && options.search) || '',
+      pathname: '/food/',
+      hash: (options && options.hash) || ''
+    },
     history: { replaceState() {}, pushState() {} },
-    performance: { getEntriesByType: () => [], navigation: { type: 0 } },
+    // `options.backForward` -- #387/#1057, 2026-09-15. FilterState.arrivedByGoingBack
+    // reads exactly this entry; a test that wants to prove the fragment scroll
+    // is SKIPPED on a genuine back navigation (rather than merely on every
+    // load, which would be the bug this generalisation could have introduced)
+    // needs to be able to say so was true.
+    performance: {
+      getEntriesByType: () => (options && options.backForward
+        ? [{ type: 'back_forward' }] : []),
+      navigation: { type: 0 }
+    },
     matchMedia: () => ({ matches: false, addEventListener() {} }),
     requestAnimationFrame: (fn) => fn(),
-    scrollTo() {},
+    __scrollToCalls: [],
+    scrollTo(...args) { this.__scrollToCalls.push(args); },
     CustomEvent: class {
       constructor(type, options) { this.type = type; Object.assign(this, options || {}); }
     },
@@ -209,10 +249,20 @@ function boot(options) {
       context, { filename: name });
   });
 
+  // A hook between the scripts loading (so win.HTF exists) and
+  // DOMContentLoaded firing (so nothing has read location/sessionStorage
+  // yet) -- #387/#1057. Its one caller today seeds a valid HTF.indexMemory
+  // record to prove the fragment scroll is skipped on a genuine restore, the
+  // same way `options.recipes` above lets a test replace the ingredients
+  // blob before anything reads it.
+  if (options && typeof options.beforeStart === 'function') {
+    options.beforeStart(win, doc);
+  }
+
   // filters.js is one big DOMContentLoaded handler; nothing above has run yet.
   doc.dispatch('DOMContentLoaded');
 
-  return { doc, win, panel, list };
+  return { doc, win, panel, list, results, starSection };
 }
 
 const aislesHtml = (panel) => panel.querySelector('.shopping-list-aisles').innerHTML;
@@ -643,6 +693,86 @@ test('#1011: a shortlisted recipe is what the link shows', () => {
     ['/food/recipes/a/']);
 });
 
+// --- a shortlist someone sent, #1093 ------------------------------------------------
+//
+// `?shortlist=a,gelato` opens the same VIEW `?shortlist=1` does, answering "is
+// this row on it" from the link. Helen's three rulings, 2026-09-15, each with
+// its assertion: the link SHOWS the list and saves none of it; the shopping
+// list hides while it shows; "keep these" makes it yours in one tap.
+
+const sharedNote = (doc) => doc.querySelector('[data-shared-shortlist]');
+const visibleUrls = (list) => visibleRows(list).map((li) => li.getAttribute('data-url'));
+
+test('#1093: a sent list shows exactly those recipes', () => {
+  const { doc, list } = boot({ search: '?shortlist=gelato,a' });
+  assert.deepStrictEqual(visibleUrls(list).sort(), ['/food/recipes/a/', '/food/recipes/gelato/']);
+});
+
+test('#1093: opening a sent list saves NOTHING to this browser', () => {
+  const { win } = boot({ search: '?shortlist=gelato,a' });
+  assert.strictEqual(win.HTF.shortlist.count(), 0,
+    'the link wrote to the store. Helen: "Show it, don\'t save it".');
+});
+
+test('#1093: the sent list is shown over this browser\'s own, not merged with it', () => {
+  const { win, doc, list } = boot({ search: '?shortlist=gelato' });
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  doc.dispatch('htf:shortlist-change');
+  assert.deepStrictEqual(visibleUrls(list), ['/food/recipes/gelato/'],
+    'a recipe marked in THIS browser leaked into the list someone sent.');
+});
+
+test('#1093: the button that counts YOUR shortlist is not lit over a sent one', () => {
+  const { doc } = boot({ search: '?shortlist=gelato' });
+  assert.ok(!shortlistViewIsOn(doc));
+});
+
+test('#1093: the note says how many, and names what it could not find', () => {
+  const { doc } = boot({ search: '?shortlist=gelato,renamed-thing' });
+  const note = sharedNote(doc);
+  assert.strictEqual(note.hidden, false);
+  const text = note.querySelector('[data-shared-shortlist-text]').textContent;
+  assert.match(text, /\(1\)/);
+  assert.match(text, /renamed-thing/);
+});
+
+test('#1093: the shopping list hides over a sent list', () => {
+  const { panel } = boot({ search: '?shortlist=gelato,a' });
+  assert.strictEqual(panel.hidden, true,
+    'its numbers write to this browser\'s store, and the list is not yours yet.');
+});
+
+test('#1093: keep these merges the list in and shows YOUR shortlist', () => {
+  const { win, doc, list, panel } = boot({ search: '?shortlist=gelato' });
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  doc.querySelector('[data-shared-shortlist-keep]').dispatch('click');
+
+  // Through JSON: the array was made in the page's realm, not this one.
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(win.HTF.shortlist.list())),
+    ['/food/recipes/b/', '/food/recipes/gelato/']);
+  assert.ok(shortlistViewIsOn(doc), 'after keeping, the view is your own shortlist');
+  assert.deepStrictEqual(visibleUrls(list).sort(), ['/food/recipes/b/', '/food/recipes/gelato/']);
+  assert.strictEqual(sharedNote(doc).hidden, true);
+  assert.strictEqual(panel.hidden, false, 'your own list shops again');
+});
+
+test('#1093: pressing shortlisted (N) over a sent list shows YOUR list instead', () => {
+  const { win, doc, list } = boot({ search: '?shortlist=gelato' });
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  doc.getElementById('shortlist-only').dispatch('click');
+  assert.ok(shortlistViewIsOn(doc));
+  assert.deepStrictEqual(visibleUrls(list), ['/food/recipes/b/']);
+  assert.strictEqual(sharedNote(doc).hidden, true);
+});
+
+test('#1093: a slug nothing answers to still enters the view, showing nothing', () => {
+  const { doc, list } = boot({ search: '?shortlist=nothing-by-this-name' });
+  assert.deepStrictEqual(visibleUrls(list), []);
+  assert.strictEqual(sharedNote(doc).hidden, false, 'and the note says why');
+  assert.strictEqual(doc.querySelector('[data-shared-shortlist-keep]').hidden, true,
+    'there is nothing to keep');
+});
+
 // --- arriving with a name, #1024 -----------------------------------------------
 
 test('#1024: ?q= fills the name box and narrows the list', () => {
@@ -684,6 +814,147 @@ test('#1050: an ingredient nothing names leaves the picker in a plain search', (
   assert.strictEqual(doc.getElementById('ingredient-search-box').value, 'quince');
   assert.strictEqual(visibleRows(list).length, 3,
     'nothing was chosen, so nothing should be narrowing the list.');
+});
+
+// --- arriving at a fragment, #1057 and #1059 ------------------------------------
+// The search dropdown's own `#results` landing (#1050) already had no test at
+// this level; these are the first, and they cover the WIDENING rather than
+// only the original case -- any element id named by `location.hash`, not only
+// "results" -- since that generalisation is what #1057 (the see-shortlist
+// link) and #1059 (a badge's own filter-section fragment) both rely on.
+
+test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
+  const { results } = boot({ hash: '#results' });
+  assert.strictEqual(results._scrollCalls.length, 1,
+    'the startup block must scroll to location.hash again after the reveal, ' +
+    'the same landing a search result and "see shortlist" both rely on.');
+  // Not assert.deepStrictEqual: the options object was built inside the vm
+  // context filters.js runs in, so it has that realm's own Object.prototype
+  // and fails a STRICT structural compare despite being the same shape.
+  assert.strictEqual(results._scrollCalls[0].block, 'start');
+});
+
+test('#1059: arriving at a filter section\'s own fragment scrolls IT into view, not #results', () => {
+  const { starSection, results } = boot({ hash: '#filter-star' });
+  assert.strictEqual(starSection._scrollCalls.length, 1,
+    'a badge\'s own fragment (e.g. #filter-star) must be read generically off ' +
+    'location.hash, not hardcoded to "results".');
+  assert.strictEqual(results._scrollCalls, undefined,
+    'only the id location.hash actually names should be scrolled to.');
+});
+
+test('with no hash at all, nothing is scrolled', () => {
+  const { results, starSection } = boot();
+  assert.strictEqual(results._scrollCalls, undefined);
+  assert.strictEqual(starSection._scrollCalls, undefined);
+});
+
+test('#387: a genuine back navigation restores scroll instead, and skips the fragment scroll', () => {
+  // The remembered scroll (sessionStorage) is the truer answer on a back
+  // navigation than re-jumping to whatever fragment happens to still be in
+  // the URL -- restoreIndexMemory() only fires when
+  // performance.getEntriesByType('navigation')[0].type === 'back_forward'
+  // AND a valid record is there to restore, both arranged here exactly as
+  // saveIndexMemory() would have written them on the way out.
+  const { win, results } = boot({
+    hash: '#results',
+    backForward: true,
+    beforeStart(w) {
+      w.HTF.indexMemory.save('htf-index-memory-v1', {
+        order: Object.keys(RECIPES),
+        filters: w.HTF.filterState.serialise(w.HTF.filterState.emptyState()),
+        ingredientLabels: {},
+        page: 1,
+        showAll: false,
+        scrollY: 321
+      });
+    }
+  });
+  assert.strictEqual(win.__scrollToCalls[win.__scrollToCalls.length - 1][1], 321,
+    'the remembered scroll position must still be restored.');
+  assert.strictEqual(results._scrollCalls, undefined,
+    'a genuine back navigation must not ALSO jump to location.hash -- the ' +
+    'remembered scroll is the truer answer, same as before #1057/#1059 ' +
+    'widened this from "#results" to any fragment.');
+});
+
+// --- HAS TO HAVE is AND-multi-select -- GitHub issue #1092 ---------------------
+// "HAS TO HAVE filter on food site no longer allows selecting more than one
+// chip." A second pick used to REPLACE the first (state.ingredient was a
+// single string); it now joins it, the way LEAVE OUT's own exclusions and
+// cocktails' `include` cupboard already work -- so both requirements apply
+// at once, AND, not the most recent one alone.
+//
+// Typing each of these narrows to exactly one candidate ("aubergines",
+// "olive oil" and "beetroot" are each a whole entry in MAIN_INGREDIENTS and
+// share no prefix with anything else in the fixture), so each commits the
+// moment it is typed -- no click needed, the same auto-select #1050 already
+// relies on. This is deliberately the fully-typed-unique-word path rather
+// than a click on an ambiguous pool: it is the shortest route to proving the
+// SECOND commit doesn't erase the first, which is exactly what the old
+// single-value state did.
+
+function typeIngredient(doc, word) {
+  const box = doc.getElementById('ingredient-search-box');
+  box.value = word;
+  box.dispatch('input');
+}
+
+test('#1092: a second HAS TO HAVE pick joins the first instead of replacing it', () => {
+  const { doc, list } = boot();
+  typeIngredient(doc, 'aubergines');
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/'],
+    'choosing "aubergines" alone should already narrow to the one recipe that names it.');
+
+  typeIngredient(doc, 'olive oil');
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/'],
+    'both chosen ingredients are on the SAME recipe, so it should still be the ' +
+    'only survivor -- this alone cannot tell "AND both" from "replaced by the ' +
+    'second", which the next assertion is for.');
+
+  // The old single-value code REPLACES "aubergines" with "beetroot" here and
+  // ends up with the one row that names beetroot (recipe b). The AND-set
+  // fixed by #1092 requires EVERY chosen ingredient, and no recipe in the
+  // fixture names both aubergines and beetroot, so the true regression case
+  // is an EMPTY list, not recipe b's survival.
+  typeIngredient(doc, 'beetroot');
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')), [],
+    'aubergines, olive oil AND beetroot are three requirements now, and no ' +
+    'fixture recipe carries all three -- if this shows recipe b, the third ' +
+    'pick replaced the first two instead of joining them.');
+
+  // Both a chosen ingredient's own button and the inline clear stay visible
+  // for a filter that is actually still applied.
+  const activeButtons = Array.from(
+    doc.getElementById('ingredient-results-pool').querySelectorAll('.btn-ingredient.active')
+  );
+  assert.deepStrictEqual(
+    activeButtons.map((b) => b.dataset.ingredient).sort(),
+    ['aubergines', 'beetroot', 'olive oil'],
+    'all three chosen entries should still show as active chips, not just the last one.'
+  );
+});
+
+test('#1092: removing one chosen ingredient leaves the others in place', () => {
+  const { doc, list } = boot();
+  typeIngredient(doc, 'aubergines');
+  typeIngredient(doc, 'olive oil');
+
+  // Clicking an already-chosen chip removes just that one -- the matrix click
+  // handler's own toggle, exercised here rather than through another
+  // typeIngredient() call so this test is about the chip, not the box.
+  const pool = doc.getElementById('ingredient-results-pool');
+  const aubergineChip = Array.from(pool.querySelectorAll('.btn-ingredient'))
+    .find((b) => b.dataset.ingredient === 'aubergines');
+  assert.ok(aubergineChip, 'the chosen aubergines chip should still be on screen to click.');
+  aubergineChip.dispatch('click');
+
+  assert.deepStrictEqual(visibleRows(list).map((li) => li.getAttribute('data-url')),
+    ['/food/recipes/a/'],
+    'olive oil alone still narrows to recipe a; removing aubergines must not ' +
+    'have cleared the whole picker with it.');
 });
 
 // --- the list of scripts is the template's list --------------------------------

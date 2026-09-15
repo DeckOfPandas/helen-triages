@@ -274,7 +274,11 @@ permalink: /cocktails/
     {% endcomment %}
     {% assign groups = taxonomy.mood_groups %}
 
-    <div class="drink-filter drink-filter--mood">
+    {% comment %} `id="filter-mood"` -- #1059, 2026-09-15. A drink page's own
+       mood chips (_layouts/cocktail.html) end their `?mood=` link in this
+       fragment when the mood belongs to this group, so the reader lands on
+       the section holding the lit chip rather than the top of the page. {% endcomment %}
+    <div class="drink-filter drink-filter--mood" id="filter-mood">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-mood" hidden>&times; clear</button>
@@ -289,7 +293,9 @@ permalink: /cocktails/
       </div>
     </div>
 
-    <div class="drink-filter drink-filter--hassle">
+    {% comment %} `id="filter-hassle"` -- #1059, same argument as MOOD above,
+       for a chip whose mood is in the hassle group instead. {% endcomment %}
+    <div class="drink-filter drink-filter--hassle" id="filter-hassle">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-hassle" hidden>&times; clear</button>
@@ -427,6 +433,14 @@ permalink: /cocktails/
        way in now, and its summary line says what it does in plain words.
        {% endcomment %}
     <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
+  </p>
+  {% comment %} A SHORTLIST SOMEONE SENT -- #1093, food/index.html has the
+     note. Its own line under the count row rather than inside it: that row
+     is a <p>, and this is a second sentence with a button in it.
+     PLACEHOLDER COPY. {% endcomment %}
+  <p class="shared-shortlist" data-shared-shortlist hidden>
+    <span data-shared-shortlist-text></span>
+    <button type="button" class="btn-shared-keep" data-shared-shortlist-keep hidden>keep these</button>
   </p>
 
   <ul class="drink-cards">
@@ -866,80 +880,18 @@ permalink: /cocktails/
     <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
   </section>
 
-  {% comment %} THE SHORTLIST AS TEXT YOU CAN COPY -- #849, Helen 2026-09-08:
-     "allow me to export my food or cocktail shortlist as a YAML/JSON dump --
-     can be just a text area at the bottom of the page."
-
-     A `<details>` RATHER THAN AN OPEN PANEL. It is a hatch, not part of
-     choosing a drink, and an always-open box of JSON under the shopping list
-     would be the first thing the eye lands on at the bottom of the page. Closed
-     by default costs one tap and keeps the page about drinks.
-
-     IT SHIPS `hidden` AND shortlist-export.js REVEALS IT, which is
-     `.btn-print`'s rule: a textarea claiming to hold your shortlist, in a
-     browser where the script did not run, would hold the empty string and look
-     like an answer.
-
-     READONLY, because #850 is where pasting one back IN is specified and a box
-     that accepts edits and discards them is worse than either. {% endcomment %}
+  {% comment %} SHARE OR SAVE THE SHORTLIST -- one link, and nothing else since
+     #1100. food/index.html carries the identical block and the note: Helen,
+     2026-09-15, "Remove the rest of the apparatus: no JSON export or import, no
+     clear." The words below are hers. {% endcomment %}
   <details class="shortlist-export" id="shortlist-export"
            data-shortlist-export-panel hidden>
-    {% comment %} PLACEHOLDER COPY. Plain words since 2026-09-10 -- it was
-       "Export shortlist as JSON", and the panel does three things now. {% endcomment %}
-    <summary>Save, restore or clear the shortlist</summary>
-    <p class="shortlist-export-hint">
-      Copy this and keep it, or paste it somewhere else. It holds what is
-      shortlisted and how many of each.
-    </p>
-    <p class="shortlist-export-empty" data-shortlist-export-empty hidden>
-      Nothing is shortlisted, so this is an empty list.
-    </p>
-    <textarea class="shortlist-export-box" data-shortlist-export rows="12"
-              readonly spellcheck="false"
-              aria-label="Your shortlist as JSON"></textarea>
-    <button type="button" class="btn-shortlist-copy" data-shortlist-copy hidden>
-      copy
-    </button>
-
-    {% comment %} PASTING ONE BACK IN -- #850, Helen 2026-09-10: the menu on
-       her iPad, passed round twelve people before dinner, and "I just KNOW
-       that something will go wrong and I'll lose my shortlist". A SECOND
-       textarea rather than the export box made writable: the one above says
-       what is stored and must go on being trusted to say it; this one is
-       where an old dump goes, and `restore` is what does something with it.
-       Both controls ship `hidden` and shortlist-export.js reveals them, the
-       rule every JS-dependent control on both sites follows; the result line
-       is hidden until there is a result. The matching (by slug, so a dump
-       from before a drink was promoted still finds it) and the merging live
-       in HTF.shortlist.restore in assets/js/assets.js.
-
-       PLACEHOLDER COPY -- the hint below and the result sentences in
-       shortlist-export.js are the shape of the feature, not its voice.
-    {% endcomment %}
-    <p class="shortlist-export-hint">
-      Or paste a shortlist you kept, and restore it. What is already
-      shortlisted stays.
-    </p>
-    <textarea class="shortlist-export-box shortlist-import-box"
-              data-shortlist-import rows="6" spellcheck="false"
-              aria-label="A shortlist to restore, as JSON" hidden></textarea>
-    <button type="button" class="btn-shortlist-restore" data-shortlist-restore hidden>
-      restore
-    </button>
-    <p class="shortlist-import-result" data-shortlist-import-result
-       aria-live="polite" hidden></p>
-
-    {% comment %} CLEAR, WITH A SECOND CLICK -- Helen, 2026-09-10: "we also need
-       a 'clear shortlist' button somewhere." An iPad passed round twelve
-       people is exactly where one tap should not empty the list, so the first
-       click only changes the word to a question and the second, within a few
-       seconds, does it; shortlist-export.js holds the arming. It ships
-       `hidden` like every other control here. The store already had `clear()`
-       (HTF.shortlist in assets.js); nothing on either page called it until
-       now. PLACEHOLDER COPY on both words. {% endcomment %}
-    <button type="button" class="btn-shortlist-clear" data-shortlist-clear
-            data-armed-text="really clear it? click again" hidden>
-      clear the shortlist
+    <summary>Share or save the shortlist</summary>
+    <p class="shortlist-export-hint">Loading this shows recipes without saving them.</p>
+    <input type="text" class="shortlist-share-link" data-shortlist-share
+           readonly spellcheck="false" aria-label="A link to this shortlist">
+    <button type="button" class="btn-shortlist-copy" data-shortlist-share-copy hidden>
+      copy link
     </button>
   </details>
 

@@ -253,12 +253,15 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // feels like there's quite a bit of space at the top of cocktail pages.
   // Should the top bump up a bit, closer to the back arrow?" It should, and
   // 1rem is the gap food's recipe page keeps between its arrow and its title
-  // (`.back-to-index + .recipe .recipe-title`), so the two sites open the
+  // (`.page-furniture + .recipe .recipe-title`), so the two sites open the
   // same way. The arrow itself stays where it is, first thing under the
   // header at the column's left edge, as on food.
   margin: $space-lg 0 1.75rem;
   padding-bottom: $head-pad-bottom;
-  border-bottom: 2px solid $color-electric-absinthe;
+  // 1px, FROM 2px, #1099 -- Helen: "Please try the absinthe rule above the
+  // actions row on cocktail pages at 1px." A try, to be judged live. The rum
+  // page's `.ref-title-block` still draws 2px; it was not part of the ask.
+  border-bottom: 1px solid $color-electric-absinthe;
 
   // THE WORDS ARE INDENTED PAST THE GLASS. `calc()` rather than Sass `+` is no
   // longer forced — $glass-col is a plain length again now the clamp is gone —
@@ -2085,7 +2088,10 @@ $amount-gap-wide: 1.25rem;
 .cocktail-units {
   font-size: 0.82rem;
   color: $color-clear-text;
-  margin: $spacing-section-gap 0 0;
+  // INSIDE `.cocktail-footer` SINCE #1099, between the source and cost lines,
+  // so it takes the cost line's step rather than a section gap; the footer's
+  // own hairline and margin are what hold it off the notes now.
+  margin: $space-xxs 0 0;
 
   .cocktail-units-figure {
     font-weight: 600;

@@ -1227,14 +1227,38 @@ $card-name-step: 0.86;
   // matched chip from its neighbours at a glance -- and 0.04em in the chip's own
   // colour thickens the word without introducing a hue the card has not already
   // spent. Same device `.btn-mood.is-on` uses in _filters.scss.
+  //
+  // INVERTED SINCE #1099 / #1100, 2026-09-15, WHICH REVERSES #756 ABOVE. Helen
+  // asked to see "active chips on cocktail cards ... inverted instead of
+  // underlined, same as for active chips in the filter groups", picked from
+  // three candidates on the real index (underlined, inverted tight, inverted
+  // padded): "Chip option B please." So a matched chip is the filter button's
+  // own `.is-on` (#1086): a block in the section's hue with the page's dark as
+  // the letter, and the same-colour faux-bold stroke. Tight, `0 0.25em`, so the
+  // row's rhythm barely moves. #756's point that the colour says which section
+  // matched still holds -- it is the block's colour now, not the word's.
+  //
+  // THE SEPARATOR DOT IS DRAWN INSIDE THE CHIP (`::after` above), so a fill
+  // would swallow it. A matched chip carries it just outside its own box, with
+  // the same room reserved as a right margin.
   &.is-match {
-    -webkit-text-stroke: 0.04em currentColor;
-    text-decoration: underline;
-    text-decoration-color: currentColor;
-    text-decoration-thickness: 0.2em;
-    text-underline-offset: 0.16em;
-    text-decoration-skip-ink: none;
+    color: $color-bg;
+    -webkit-text-stroke: 0.04em $color-bg;
+    text-decoration: none;
+    padding: 0 0.25em;
+
+    &:hover,
+    &:focus-visible { color: $color-bg; }
+
+    &:not(:last-child) { margin-right: 0.9rem; }
+    &:not(:last-child)::after {
+      position: absolute;
+      left: 100%;
+      top: 0;
+    }
   }
+  &--mood.is-match   { background: $color-heading-mood; }
+  &--hassle.is-match { background: $color-heading-hassle; }
 }
 
 // --- the goodness mark -------------------------------------------------------

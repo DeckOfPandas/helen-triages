@@ -57,70 +57,58 @@
 // `shortlisted (n)` button -- lived here from 2026-09-09 to 2026-09-10 and is
 // gone with the link; cocktails/index.html has the note.
 
-.shortlist-export-hint,
-.shortlist-export-empty {
+.shortlist-export-hint {
   margin: $space-sm 0 0;
   font-size: 0.9rem;
   color: $color-clear-text;
 }
 
-// MONOSPACE, AND THAT IS NOT DECORATION: this holds JSON, and a proportional
-// face makes a nested structure unreadable at exactly the moment somebody is
-// checking whether it copied whole. `resize: vertical` because a long list
-// wants more rows and nobody wants it wider than the column.
-.shortlist-export-box {
+// THE JSON BOX, THE PASTE BOX, RESTORE AND CLEAR ARE GONE -- #1100, Helen:
+// "Remove the rest of the apparatus: no JSON export or import, no clear." The
+// panel is the share link alone; git has the rules if they are ever wanted.
+
+// THE SHARE LINK -- #1093. Monospace on the surface ground, as the JSON box it
+// sat above was drawn: something this browser wrote for you to take away.
+// Readonly but selectable, because select-all is how it is copied on a phone
+// with no clipboard API; shortlist-export.js selects it whole on focus.
+.shortlist-share-link {
   display: block;
   width: 100%;
   margin-top: $space-sm;
-  padding: $space-sm;
+  padding: $space-xs $space-sm;
   box-sizing: border-box;
   font-family: $font-label;
   font-size: 0.82rem;
-  line-height: 1.45;
   color: $color-text;
   background: $color-surface;
   border: 1px solid $color-border;
-  resize: vertical;
-  // The box is READONLY (#850 is where pasting one back in is specified), so it
-  // must still be focusable and selectable -- that is the whole feature on a
-  // phone, where select-all is how it gets copied.
   -webkit-user-select: text;
   user-select: text;
 }
 
-// THE PASTE BOX -- #850. The same box as the export, one class on top, and the
-// one thing it changes is that this box is WRITABLE: `user-select` is not the
-// point here, a caret is. A little shorter by default, because a dump goes in
-// whole and nobody reads it here.
-.shortlist-import-box {
-  margin-top: $space-sm;
-}
-
-// WHAT THE RESTORE DID, one line under the button, in the hint's own voice.
-// `aria-live` is on the element in the markup, so a screen reader hears the
-// result without the focus moving off the button.
-.shortlist-import-result {
-  margin: $space-sm 0 0;
+// THE NOTE OVER A SHARED LIST -- #1093. The hint's voice, because it says
+// where the list came from rather than being part of it, and "keep these" is
+// the panel's own button so a save looks like the other saves.
+// Under the count row on both indexes, taking that row's own gap above it and
+// giving the same gap to the list below.
+.shared-shortlist {
+  margin: 0 0 $space-lg;
   font-size: 0.9rem;
   color: $color-clear-text;
+
+  .btn-shared-keep { margin-left: $space-sm; }
 }
 
 // SHIPS `hidden` AND shortlist-export.js REVEALS IT, so a browser where the
-// script did not run never shows a copy button that does nothing. Same rule as
-// `.btn-print` and `.btn-shortlist`. The restore button (#850) is the same
-// control in every respect but its word, so it is the same rule.
-// The clear button (2026-09-10) is the same control again, one more word; its
-// ARMED state -- the first click has been made and the second would empty the
-// list -- takes the text colour and the accent border so the question reads as
-// a different state of the same button, not a new one.
-.btn-shortlist-copy,
-.btn-shortlist-restore {
+// script did not run, or has no clipboard, never shows a copy button that does
+// nothing. Same rule as `.btn-print` and `.btn-shortlist`.
+.btn-shortlist-copy {
   margin-top: $space-sm;
 }
 
+// "keep these" is drawn as the panel's own button, so a save looks like one.
 .btn-shortlist-copy,
-.btn-shortlist-restore,
-.btn-shortlist-clear {
+.btn-shared-keep {
   font-family: $font-label;
   font-size: 0.85rem;
   color: $color-clear-text;
@@ -131,16 +119,4 @@
 
   &:hover,
   &:focus-visible { color: $color-text; }
-}
-
-// Its own line, a step below the restore pair: it undoes what the two above
-// preserve, and sitting beside `restore` it would read as the next step.
-.btn-shortlist-clear {
-  display: block;
-  margin-top: $space-lg;
-
-  &.is-armed {
-    color: $color-text;
-    border-color: $color-accent;
-  }
 }

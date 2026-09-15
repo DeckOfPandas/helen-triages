@@ -1080,6 +1080,49 @@ unless stated.
   reading (2) unpressed, step 12 shows two again with the search box emptied,
   clear all shows everything.
 
+- **2026-09-15, #1093 — a shortlist share link, shown and not saved.** The
+  design review's finding: saving a shortlist meant copying a JSON blob that
+  exposes internal paths, with nowhere obvious to paste it on a phone. A link
+  does the job in one tap and can be sent to someone. Three rulings, each asked
+  with the fact that forced it:
+  - **What opening a link does to the reader's own shortlist: *"Show it, don't
+    save it"***, over merging it in, replacing, or parking the feature. The
+    index enters the ordinary shortlist view and answers "is this one on it"
+    from the link. The reader's store is untouched, and any filter or clear all
+    leaves the view exactly as #918 says.
+  - **The shopping list over a shared list: *"Hide it in shared view"***, over
+    shopping for the shared recipes. Its numbers write to the store.
+  - **A one-tap way to make it yours: *"Yes, a 'keep these' button"***, which
+    merges the list in (`HTF.shortlist.addAll`, never un-marks anything) and
+    then shows the reader's own shortlist.
+  Built alongside, as consequences rather than rulings: the own-list button is
+  not lit over a shared list, and pressing it shows YOUR list; a slug nothing on
+  the page answers to is named in the note, as restore() names one. The link
+  is `?shortlist=slug,slug`, leading the export panel with a copy button, and
+  the JSON stays behind it for portions and glasses. **`?shortlist=1` keeps its
+  meaning** and both indexes stopped testing `indexOf('shortlist=1')`, which a
+  slug beginning `1` would have matched: `parseShortlist` in filter-state.js
+  reads both, slugs `[a-z0-9-]` only. Every new string is PLACEHOLDER COPY.
+  Helen offered, the same afternoon, to write the placeholder strings while the
+  work went on.
+
+- **2026-09-15, #1092 — food's HAS TO HAVE picks several ingredients, AND.**
+  Raised as *"HAS TO HAVE filter on food site no longer allows selecting more
+  than one chip"*, with no body. An agent reproduced it in the browser, then
+  searched the history for the change that broke it and found none: the picker
+  had held ONE string, replaced on every pick and collapsing its pool, since
+  its first commit (bcaac87, 2026-06-22). #583 had renamed it to cocktails'
+  "HAS TO HAVE", whose `include` is a Set, AND across chips ("how a cupboard
+  works"), and nothing had ruled food's single. So the fix gives food the
+  label's own meaning: `state.includedIngredients` is a Set, a chip toggles,
+  chosen chips persist in the pool across searches, and `FilterState.includesRow`
+  requires every chosen entry through the family match. `?ing=` (#1050) is
+  unchanged in effect. The new tests fail on the old code (two in the food
+  harness, five in filter-state's), checked by swapping the old files in. **It
+  shipped as a new capability, not a restored one**, and the report to Helen
+  said so. The agent's browser re-runs used an env-prefixed `node` command
+  that asked Helen twice; that shape is what #1098's guard refuses.
+
 ## §9 Cocktails
 
 ### §9.1 Privacy, the clone, the fetch discipline
@@ -5351,6 +5394,138 @@ verification. Dates are when the correction landed.
     `assets/js/last-line-rule.js` needed no change: it re-measures the
     rendered title on every load, so the double rule still finds the true
     last line at the smaller size, checked by crop. `_sass/food/_recipe-header.scss`.
+
+- **2026-09-15, #1093 — the design review's leftovers, the spacing review
+  Helen added to it, and her recent follow-up issues, in one PR.** Scope, her
+  brief: #1093 minus the ship-rating item, the print-palette item and the "not
+  yet looked at" section, plus *"Please review each type main page of each
+  site for consistent and pleasing spacing"* (her pick of pages: the indexes,
+  a recipe and a drink page, the reference pages and about). Then, mid-session:
+  *"pick up the handful of recent design issues as well"* — asked which, *"All
+  please -- orchestrate Sonnets if you think that will work"*. What she ruled,
+  in the order it came up:
+  - **The no-results line gets its own `× clear all`**, a third copy of the
+    button inside "Nothing to see here." / "Blank canvas.", in the same list as
+    the other two so its click and visibility cannot disagree with them.
+    Not a ruling; the issue's fix, built.
+  - **Reduced motion: one blanket `prefers-reduced-motion` query** in
+    `_sass/shared/_base.scss`. Every transition on either site is a nicety.
+  - **Red main: the README badge**, of the three options (badge, a workflow
+    line, a required status check). The status check is a repository setting
+    and hers. The workflow line was not chosen.
+  - **MANUAL §9.13's "bands and washes, not fills": *"Add a clause."*** It is
+    a rule about cards; the index's active chip has been a fill since #1086.
+  - **The shortlist share link (§8 has the entry).**
+  - **#1007 closed: *"Close this -- fixed"*.** **#1086 closed by a trailer in
+    this PR**, at her word; #1087 did the work and said "Towards".
+  - **#1096, the two searches: *"Retain current behaviour for both. Rename
+    onmisearch box to 'I know what I want'"*, then, asked what its placeholder
+    says: *"'I know what I want...' as a placeholder, no written label/title,
+    just the magnifying glass"*.** So #1055's "nothing to see here" is the
+    dropdown's no-match line, as this journal already recorded it.
+  - **The omnisearch set (#1051, #1052, #1053, #1055, #1056), built by an
+    agent to the issues' words.** The glass moved to the RIGHT (#1056) and the
+    input is left-aligned, so typed text still grows towards the glass (#1050's
+    own principle, carried over). Group titles are Selawik 700 at 0.7rem, from
+    Courier at 0.66rem (#1053: *"Switch font to the other one if you have
+    to"*). #1052 was read as: every typed word must be a prefix of a whole word
+    of the candidate, at a word boundary, in any order; the substring fallback
+    is gone. #1051: a card ingredient label joining two generics ("X or Y") is
+    no longer offered, via a `generics` count on `card_ingredients` and a
+    filter in `cocktails/search.json`. **One consequence recorded rather than
+    fixed:** Singapore Sling's "cherry brandy or cherry liqueur" names two
+    generics that no other drink uses, so once that drink publishes neither can
+    be found through the search. Nothing is findable less today.
+  - **#1057 and #1059, the index jumps, built by an agent.** "see shortlist"
+    ends `?shortlist=1#results`; a badge or chip ends in its filter section's
+    new id (`#filter-star`, `#filter-mood`, `#filter-practicalities`,
+    `#filter-hassle`), and both indexes scroll to whatever `location.hash`
+    names after their reveal, not only `results`. Instant, not smooth, the
+    plainest match to #1050's landing.
+  - **#1058, food's actions row matched to cocktails', by an agent measuring
+    computed styles on both.** Two real differences, both fixed. SEE SHORTLIST
+    and PDF are `<a>`s, so `article.recipe a:not(.badge)` repainted them in
+    the prose-link magenta at 600 while the two `<button>`s stayed grey at 700;
+    they joined the `:not()`. The hairline-to-row gap was 13px on food and
+    about 30px on cocktails; `.recipe-controls` now pads `$spacing-block-gap`.
+    **Left open for Helen:** food's hairline is 1px `$color-border` where
+    cocktails' rule is 2px absinthe. Each site's own closing device, or should
+    food's weight match?
+  - **The spacing review measured every page type's block gaps at 390 and
+    1280.** Two drifts from existing rulings were fixed without asking:
+    **(1) recipe titles sat 3rem under the back arrow, not 1rem.** #1024
+    wrapped the arrow in `.page-furniture` (4723b80, 2026-09-14) and
+    `.back-to-index + .recipe .recipe-title` silently stopped matching.
+    `test_the_recipe_title_gap_names_the_furniture_includes_own_wrapper` now
+    holds the selector to the include. **(2) cocktails' no-results line** had
+    not followed food's to 1.2rem / 700 / 0.04em. Two gaps with no ruling went
+    to her as numbers. **Index, bottom clear-all to "N survivors", 24px on food
+    and about 60px on cocktails: *"Food matches cocktails"*.** **Where a page
+    with no back arrow starts, 48px on the food reference pages and about and
+    32px on rum categories: *"All at 32px"*.** Checked and left alone, because
+    each is already ruled: the drink page's 3rem / 1.25rem headings against
+    food's 4.5rem / 2rem (#1006, *"half way"*, 2026-09-14, above), and rum
+    categories' heading gaps (#985).
+  - **Found and not acted on:** the reference pages and about carry no
+    furniture line (no back arrow, no search), so the search-for-anything box
+    exists only on recipe and drink pages. Nobody has asked for it there.
+  - **Two of the agents' results needed Helen after merging.** On the
+    omnisearch build she found the box returning only drink names: *"I still
+    want the omnisearch box to be able to search for everything (the
+    includes)... Please put it back."* #1051's `where: "generics", 1` dropped
+    every ingredient on a server running the old plugin, and a no-generic row
+    on any build; the filter now leaves out only a row counting two or more
+    (MANUAL §13.13). And #1092 turned out not to be a regression (§8 below).
+
+- **2026-09-15, #1099 — Helen's second look at the #1093 branch, six items in
+  one issue (the spam-flag rule), in her words:**
+  - *"Please let typing in the omnisearch box grow the word from right to
+    left, like this ____r ___rh __rhu _rhum."* The input is right-aligned
+    again; the agent's left-alignment for #1056 had reasoned that text should
+    grow towards a glass on the right, and she wanted the word anchored at the
+    glass instead.
+  - *"Order on cocktail page: ... ingredients, scaler, method, notes, <hr>,
+    source, roughly X units of alcohol per serving, roughly £x-y in
+    ingredients per serving, <hr>, if you liked this ..."* Asked where TO SERVE
+    goes, which the list did not name: *"After method (as now)"*. The source and
+    cost lines came up from under the related cards into one footer with the
+    units line; the two rules are the footer's and the related section's own
+    hairlines. The sentences are unchanged: the list names the lines.
+  - *"Show me a candidate page where active chips on cocktail cards are
+    inverted instead of underlined, same as for active chips in the filter
+    groups."* https://claude.ai/artifact/MpYrFCPFqxLo7qQeGxZLSZ — A underlined
+    (now), B inverted tight, C inverted padded. Built with the separator dot
+    carried just outside a filled chip, because it is drawn inside the chip and
+    a fill would swallow it. **She picked B** on PR #1100 (below).
+  - *"Please try the absinthe rule above the actions row on cocktail pages at
+    1px."* A try, live. The rum page's title rule is still 2px.
+  - *"Remove the bordered box around the omnisearch input field when it's
+    active."* Told the box was #1087's keyboard focus ring (#1086's
+    accessibility finding), and that a text input matches `:focus-visible` on a
+    click too, her pick of two was the underline: accent colour and a second
+    pixel on focus, drawn as an inset shadow so nothing moves.
+  - *"Lighten the omnisearch input field's lower border, both sites."* Mixed
+    towards each page's ground, not `lighten()`ed: on cocktails' dark page a
+    lightened grey is a brighter line.
+
+- **2026-09-15, PR #1100 — Helen's review comment, three rulings.**
+  - **The card chips: *"Chip option B please."*** Inverted and tight, from
+    the candidates page above; §9.13's card chip comment in `_cards.scss`
+    records that it reverses #756's coloured-word-plus-underline.
+  - **The hairlines: *"The hairline rules are now fine, stop asking!"*** That
+    is food's 1px grey rule over the actions row against cocktails' now-1px
+    absinthe one, asked twice this session. Settled. Do not raise it again.
+  - **The shortlist panel: *"Save, restore or clear the shortlist" -> "Share or
+    save the shortlist"*; the link's hint became *"Loading this shows drinks
+    without saving them."*, and then, when food's copy had been adapted to
+    "recipes": *"My mistake. 'Loading this shows recipes without saving them.'
+    for both sites."* — the same words on both; and *"Remove the rest of
+    the apparatus: no JSON export or import, no clear."*** So #849's export,
+    #850's restore and the two-click clear of 2026-09-10 are deleted, with
+    `HTF.shortlist.snapshot()`, `restore()` and their tests. What they were
+    built for (*"I just KNOW that something will go wrong and I'll lose my
+    shortlist"*) is now served by the link alone, which keeps no portions or
+    glasses. Git has all of it.
 
 ## §14 Reference pages
 

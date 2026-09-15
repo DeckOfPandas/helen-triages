@@ -8,7 +8,16 @@
 
 // Shared with cocktails' own filter panel -- see @mixin index-panel in
 // shared/_rule.scss. `position: relative` is what .btn-clear anchors to.
-.controls { @include index-panel; }
+// $spacing-section-gap BELOW THE PANEL SINCE #1093 (2026-09-15), cocktails'
+// `.drink-filters` value. The spacing review measured 24px from the bottom
+// `× clear all` to "N survivors" here against about 60px on cocktails, and
+// Helen, shown both numbers: "Food matches cocktails". With
+// `.results-heading`'s `padding-top` below, the two sites now build the gap
+// from the same two pieces.
+.controls {
+  @include index-panel;
+  margin: 0 0 $spacing-section-gap;
+}
 
 // The boundary between filters and results, previously just a margin on
 // .recipe-list, now belongs to this heading instead -- the same three-to-one
@@ -47,6 +56,8 @@
   // control panel (§13.4). $space-xl and $space-sm are the index's own scale
   // instead, matched to cocktails' `.drink-count` below its own list.
   margin: $space-xl 0 $space-sm;
+  // Cocktails' `.drink-count` padding, #1093 -- see `.controls` above.
+  padding-top: $space-md;
   display: flex;
   // Was flex-end -- Helen, 2026-08-03: sitting alone at the right edge of
   // an otherwise left-aligned page, it read as stray rather than placed.
