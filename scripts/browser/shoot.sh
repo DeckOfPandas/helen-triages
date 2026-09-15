@@ -21,6 +21,5 @@ if [ -f tmp/browser/port ]; then
   read -r port < tmp/browser/port
 fi
 mkdir -p tmp/shots
-export PLAYWRIGHT_BROWSERS_PATH="$PWD/tmp/browser/ms-playwright"
-export NODE_PATH="$PWD/tmp/browser/node_modules"
+. scripts/browser/env.sh
 node scripts/browser/shoot.js "http://127.0.0.1:$port/helen-triages" tmp/shots "$label" "$@"

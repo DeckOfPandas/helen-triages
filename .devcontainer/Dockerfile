@@ -48,6 +48,28 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+# Playwright and its headless Chromium, for scripts/browser/ (MANUAL §1), with
+# every system library Chromium needs (`--with-deps` apt-installs Playwright's
+# own list, which supersedes the hand-picked libs above -- they stay, harmless).
+# Helen, 2026-09-15: "shall I pre-install Playwright (and its dependencies) into
+# this Docker image?" -- because sessions now start in fresh worktrees, and
+# tmp/browser/ belongs to one worktree, so every session that wanted a
+# screenshot downloaded a few hundred MB first.
+#
+# THE VERSION IS PINNED TWICE, HERE AND IN scripts/browser/install.sh, and
+# tests/test_browser_harness.py fails if they differ. Bumping it means editing
+# both and rebuilding this image. Until the image is rebuilt, install.sh sees
+# the old version and installs the pinned one into tmp/browser/ as before.
+#
+# Root-owned under /opt, readable by the `helen` user without any chmod; the
+# harness reads it through scripts/browser/env.sh.
+RUN mkdir -p /opt/playwright \
+    && cd /opt/playwright \
+    && npm init -y > /dev/null \
+    && npm install --no-audit --no-fund playwright@1.47.2 \
+    && PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright npx playwright install --with-deps chromium \
+    && rm -rf /var/lib/apt/lists/* /root/.npm
+
 # GitHub CLI, matching the project's own `gh` usage (read/write on Issues
 # and PRs via GH_TOKEN -- see CLAUDE.md).
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \

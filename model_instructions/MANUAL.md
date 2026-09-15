@@ -129,10 +129,16 @@ refuses all of them (`CLAUDE.md`). To find out whether a credential works,
 use it and read the status code.
 
 **A headless browser exists, and looking is cheaper than reasoning.** Since
-2026-09-10 the devcontainer image carries Chromium's system libraries, and
-`sh scripts/browser/install.sh` puts Playwright and Chromium under
-`tmp/browser/` (gitignored; nothing touches `~` or the system, Helen's grant).
-Then `sh scripts/browser/build.sh` builds exactly what deploys into
+2026-09-15 the devcontainer image carries Playwright 1.47.2, its Chromium and
+every system library Chromium needs, under `/opt/playwright`, so a fresh
+worktree needs no install: `sh scripts/browser/install.sh` checks the image's
+copy is the pinned version and stops. Outside the image, or in an image built
+before the pin moved, it installs Playwright and Chromium under `tmp/browser/`
+as before (gitignored; nothing touches `~` or the system, Helen's grant), and
+`scripts/browser/env.sh` — which `shoot.sh` and `crop.sh` source — prefers that
+local copy when it exists. The version is pinned in the Dockerfile and in
+`install.sh`; `tests/test_browser_harness.py` fails if they differ, and bumping
+it means a rebuild. Then `sh scripts/browser/build.sh` builds exactly what deploys into
 `tmp/site`, `sh scripts/browser/serve.sh` in the background serves it on the
 first free port from 4010 and writes that port to `tmp/browser/port` (since
 2026-09-11 — one server per worktree, so a session never measures another

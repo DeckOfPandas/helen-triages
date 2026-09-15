@@ -259,6 +259,28 @@ unless stated.
   4010, a second `serve.sh` in the same worktree took 4011 and wrote it, and
   `shoot.sh` followed the file to 4011 without being told.
 
+- **2026-09-15 — Playwright, its Chromium and its system libraries go into the
+  devcontainer image.** Helen asked: *"shall I pre-install Playwright (and its
+  dependencies) into this Docker image?"*, then *"Please make those changes"*
+  and *"Including allowing dependencies please."* The reason is the one
+  §11.0.1 created: sessions start in fresh worktrees, and `tmp/browser/`
+  belongs to one worktree, so every session that wanted a screenshot
+  re-downloaded a few hundred MB first — the step most likely to be skipped
+  when it is slow, and looking is cheaper than reasoning (MANUAL §1).
+  - **Where:** `/opt/playwright`, root-owned and world-readable by default, so
+    no `chmod` anywhere. `npx playwright install --with-deps chromium` puts in
+    Playwright's own library list, which supersedes the hand-picked one the
+    image has carried since 2026-09-10 (left in place; it costs nothing).
+  - **How the harness finds it:** `scripts/browser/env.sh`, sourced by
+    `shoot.sh` and `crop.sh`, prefers a `tmp/browser/` install when one exists
+    (somebody made it on purpose — a host, or a stale image) and falls back to
+    the image. `install.sh` checks the image's copy is the pinned version and
+    stops; if it is not, it says to rebuild and installs locally meanwhile.
+  - **One version, pinned twice** (the Dockerfile and `install.sh`), and
+    `tests/test_browser_harness.py` fails when they differ. Screenshots from
+    two Chromium builds are not the same measurement. Bumping means both
+    files and a rebuild, which is the cost Helen accepted for the speed.
+
 ## §2 The mono-repo shape
 
 - **2026-08-02** — Collections cannot live inside `food/`: Jekyll only
