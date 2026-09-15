@@ -2227,14 +2227,24 @@ right end from #963 (2026-09-11) — aligned to the name's first line through
 the fact #1005 was raised on. **Every action is in the controls row under the
 head's rule now** (§13.13): the read/make toggle at its left, and at its right
 `_includes/page-actions.html` — shortlist, see shortlist (N), print, pdf — the
-same include a recipe page carries. **`?shortlist=1` on the index has a caller
+same include a recipe page carries. **#1005 left a SECOND copy of the shortlist
+button in the head and it shipped for a day**, so a drink page carried two;
+Helen, at the 2026-09-15 design review: *"actions row only"* (#1086), and the
+head's copy is the one that went. **`?shortlist=1` on the index has a caller
 again** (§8.9): the see-shortlist link. **The head is one column** —
 `.cocktail-head-words` is `minmax(0, 1fr)` (a grid rather than a block so the
 tape word's `nowrap` cannot set the head's min-content width and defeat the
-fit script) and `.cocktail-title-row` is `display: contents`; #979's ruling
-that the meta ends where the tape's track ends holds with nothing left to
-subtract. On a phone that grid is off (`display: contents`) and the children
-are placed on `.cocktail-title-block`'s own grid instead. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
+fit script); #979's ruling that the meta ends where the tape's track ends holds
+with nothing left to subtract. On a phone that grid is off (`display: contents`)
+and the children are placed on `.cocktail-title-block`'s own grid instead —
+the NAME across both its columns, the glass and the meta sharing row three.
+**`.cocktail-title-row` is gone with the button** (#1086): it was
+`display: contents` around one child, and the phone grid still named it in the
+rule that spans both columns — a declaration aimed at an element with no box,
+so the name auto-placed into the 4.5rem glass column and a long one wrapped to
+five lines with its lettering out over the page. A wrapped name gets the same
+step-then-wrap the cards get (`card-name-fit.js`), now that the fit script has
+the real column to measure against. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
 to the index with `?mood=`. INGREDIENTS / METHOD / NOTES headings are 1.5rem,
 weight 400, absinthe over yvette (NOTES over lagoon); ingredient names carry
 no underline (they looked like links). **`make it`** (`cocktail-make.js`, a

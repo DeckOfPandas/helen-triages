@@ -2229,6 +2229,13 @@ def test_no_element_can_force_horizontal_scroll():
 # would take, done once the charts were finally looked at on one. The two
 # rows share one `@media` block in _sass/food/_temperature-chart.scss, so they
 # still move together, which was the point of the second entry.
+#
+# `.cocktail-head-words` LEFT IT ON 2026-09-15 (#1086), and it left by losing
+# the second track rather than by gaining a variant. The entry claimed
+# "`minmax(0, 1fr) auto` -- the words and, in the second track, the shortlist
+# button alone (#979)"; #1005 moved every action into the controls row under
+# the head, so the row has been one `minmax(0, 1fr)` track since, and this
+# test only ever asks about rows of two or more.
 MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
@@ -2247,19 +2254,6 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "suggestion in the data (_cocktail_drafts/*.md) is comfortably under a "
         "360px phone one word at a time. Unlike .tc-row, there is no unbroken "
         "string here that could grow past that."
-    ),
-    ".cocktail-head-words": (
-        "`minmax(0, 1fr) auto` -- the drink head's words and, in the second "
-        "track, the shortlist button alone (#979). It DOES collapse below "
-        "600px, and to fewer tracks than one: _cocktail.scss's phone block "
-        "gives this element `display: contents`, so it has no grid and no "
-        "tracks at all there and its children are placed on "
-        "`.cocktail-title-block`'s own two-column grid instead. That is a "
-        "restatement this test cannot see, because it reads "
-        "`grid-template-columns` and the phone answer is a `display` "
-        "declaration. The floor the test worries about is absent by "
-        "construction anyway: the first track is `minmax(0, ...)`, which has "
-        "no min-content floor, and the second is one button."
     ),
 }
 

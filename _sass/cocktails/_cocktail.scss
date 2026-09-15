@@ -299,24 +299,26 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   min-height: 0;
 }
 
-// THE ROW HAS NO BOX OF ITS OWN -- `display: contents` since #979 (2026-09-11),
-// so the name is placed straight on `.cocktail-head-words` below, and on a
-// phone straight on `.cocktail-title-block`'s own grid. The element stays in
-// the markup as the name's wrapper and the phone grid's one placed item.
+// `.cocktail-title-row` IS GONE, 2026-09-15 (#1086), AND THE WAY IT FAILED IS
+// THE PART WORTH KEEPING. It wrapped the name and the shortlist button from
+// #963 (2026-09-11), and this file carried forty lines to sit that button on
+// the name's FIRST line: a `--title-line` custom property read through
+// `:has()` for the fit script's 0.86 step and its 1.12 wrap, a top margin of
+// the tape's padding, a phone block that turned the row back into a flex box
+// for the `+` alone. #1005 moved every action into the controls row under the
+// head (`.cocktail-controls`, _includes/page-actions.html) -- Helen: "row
+// under the head" -- and took all forty lines with it, leaving the row at
+// `display: contents` around one child.
 //
-// IT HELD THE SHORTLIST BUTTON AT ITS RIGHT END FROM 2026-09-11 TO 2026-09-14
-// (#963 -> #1005), and this file carried forty lines to sit that button on the
-// name's FIRST line: a `--title-line` custom property read through `:has()`
-// for the fit script's 0.86 step and its 1.12 wrap, a top margin of the tape's
-// padding, a phone block that turned the row back into a flex box for the `+`
-// alone. All of it went with the button. Every action is in the controls row
-// under the head now (`.cocktail-controls`, _includes/page-actions.html),
-// Helen's pick from the candidates page: "row under the head". The name has
-// the whole head to itself, and a long one wraps with nothing to negotiate.
-.cocktail-title-row {
-  display: contents;
-}
-
+// AN ELEMENT WITH NO BOX CANNOT BE PLACED, AND NOTHING SAYS SO. The phone grid
+// below still named `.cocktail-title-row` in its `grid-column: 1 / -1` list,
+// which `display: contents` makes a no-op -- so the NAME auto-placed into
+// column one, the 4.5rem glass column, and a title wrapped to five lines with
+// its lettering running out of a 72px tape and across the page. The rule was
+// valid CSS, the selector matched, and the declaration reached an element that
+// had no box to place. So the name is a direct child of the head's grid now,
+// and the phone rule names the name.
+//
 // ONE COLUMN FOR THE WHOLE HEAD. #979 (2026-09-11) made this a two-track grid
 // so the meta ended where the title tape's track did rather than running under
 // the shortlist button at the head's right edge -- Helen: "The metadata line
@@ -431,18 +433,18 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     // MIN-WIDTH ZERO, AND IT FIXES TWO THINGS WITH ONE LINE -- Helen,
     // 2026-09-09: "Long drink titles run off the cocktail page screen."
     //
-    // This element was a direct flex child of `.cocktail-title-row`, and a flex
-    // item defaults to `min-width: auto` -- it REFUSES to shrink below its
-    // content's intrinsic width. The content is the tape word, which is
-    // `white-space: nowrap` from _cards.scss. So a long title grew the item to
-    // its full unwrapped width and pushed it off the row. That is the visible
-    // symptom.
+    // This element was a direct flex child of `.cocktail-title-row` (deleted in
+    // #1086), and a flex item defaults to `min-width: auto` -- it REFUSES to
+    // shrink below its content's intrinsic width. The content is the tape word,
+    // which is `white-space: nowrap` from _cards.scss. So a long title grew the
+    // item to its full unwrapped width and pushed it off the row. That is the
+    // visible symptom.
     //
-    // IT IS A GRID ITEM ABOVE 600px SINCE #979, placed on
-    // `.cocktail-head-words` because the row is `display: contents`, and the
-    // line still earns its place twice over: it is a flex item again at phone
-    // width, where the row is a real flex box, and the same automatic minimum
-    // is what `minmax(0, 1fr)` is spelling on the track that holds it.
+    // IT IS A GRID ITEM AT EVERY WIDTH NOW -- on `.cocktail-head-words` above
+    // 600px (#979) and on `.cocktail-title-block`'s own grid below it -- and the
+    // line still earns its place: the same automatic minimum is what
+    // `minmax(0, 1fr)` is spelling on the track that holds it, and the phone
+    // grid's `minmax(0, 1fr)` second column spells it there.
     //
     // THE SECOND THING IS WHY NOTHING CAUGHT IT. card-name-fit.js decides by
     // `scrollWidth > clientWidth` -- content wider than its box -- and that
@@ -1288,7 +1290,17 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 
   .cocktail-head-words { display: contents; }
 
-  .cocktail-title-row,
+  // THE NAME IS NAMED HERE, NOT ITS OLD WRAPPER -- 2026-09-15, #1086. This list
+  // read `.cocktail-title-row` until then, and that element was
+  // `display: contents`: it generates no box, so `grid-column` had nothing to
+  // apply to and the NAME auto-placed into column one, the 4.5rem glass
+  // column. A title then wrapped to five lines inside a 72px tape with its
+  // lettering out over the page (and, until the same issue, under the second
+  // shortlist button sitting in column two). The wrapper is deleted; the tape
+  // spans both columns as this rule always meant it to, and card-name-fit.js
+  // finally has the full column to measure a long name against -- one step of
+  // 0.86, then wrap, the same answer a card gives.
+  .cocktail-head-words > .drink-card-name,
   .cocktail-tagline,
   .cocktail-chips { grid-column: 1 / -1; }
 
