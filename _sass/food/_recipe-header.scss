@@ -175,7 +175,13 @@ article.recipe a:not(.badge) {
   align-items: last baseline;
   justify-content: space-between;
   gap: $space-xl;
-  margin: $spacing-section-gap 0 1.25rem 0;
+  // 2rem ABOVE WHERE THERE IS NO ARROW SINCE #1093 (2026-09-15), from
+  // $spacing-section-gap. Every recipe page carries the furniture line and
+  // takes $space-lg from the rule below, so this value is now only the
+  // reference pages' and the about page's -- which opened 48px under the
+  // header where rum categories opens 32px (`.ref-title-block`). Helen, shown
+  // both: "All at 32px".
+  margin: $space-xxl 0 1.25rem 0;
   text-align: left;
   position: relative;
 }
@@ -185,7 +191,7 @@ article.recipe a:not(.badge) {
 // already separates the title from the header, so the section gap above
 // stacked a second gap on top of it -- about 4rem of dead space below the
 // arrow's baseline for one job. Scoped to pages that actually render the
-// arrow; where there is none, .recipe-title above keeps its 3rem.
+// arrow; where there is none, .recipe-title above keeps its 2rem.
 //
 // `.page-furniture +`, NOT `.back-to-index +`, SINCE #1093 (2026-09-15). #1024
 // wrapped the arrow and the search box in `.page-furniture` on 2026-09-14,
