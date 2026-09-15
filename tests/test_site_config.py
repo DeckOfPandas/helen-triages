@@ -220,12 +220,13 @@ def test_the_furniture_line_searches_for_anything():
     """#1050. The search box on the back arrow's line, as Helen specified it,
     and the plumbing it needs to be more than a name search.
 
-    THE ORDER IN THE MARKUP IS THE LAYOUT: the glass is a submit button BEFORE
-    the input, so it sits at the left and never moves as the text grows
-    leftwards from the box's right edge. The dropdown element is rendered
-    empty and hidden so the no-script page is the page minus the script; the
-    form names the JSON it searches; both page layouts load page-search.js
-    after back-link.js; and the two JSON pages exist, one per site, out of the
+    THE ORDER IN THE MARKUP IS THE LAYOUT: the input is BEFORE the glass
+    (#1056 moved the glass to the right end, reversing #1050's own layout),
+    so it sits at the right and never moves as the text grows rightwards
+    from the box's left edge. The dropdown element is rendered empty and
+    hidden so the no-script page is the page minus the script; the form
+    names the JSON it searches; both page layouts load page-search.js after
+    back-link.js; and the two JSON pages exist, one per site, out of the
     sitemap. `search_placeholder` is gone from sites.yml: the words are the
     same on both sites now, so the key stopped saying where you are.
     """
@@ -241,12 +242,13 @@ def test_the_furniture_line_searches_for_anything():
     assert go, "the magnifying glass is not a submit button (.page-search-go)."
     assert box, "the box (.page-search-input) is missing."
     assert panel, "the dropdown (.page-search-results) must be rendered, hidden."
-    assert go.start() < box.start() < panel.start(), (
-        "glass, then input, then dropdown -- the glass at the LEFT is Helen's "
-        "layout, and it only stays put if it is before the input in the row."
+    assert box.start() < go.start() < panel.start(), (
+        "input, then glass, then dropdown -- #1056 put the glass at the "
+        "RIGHT end, and it only stays put if it comes after the input in "
+        "the row."
     )
-    assert 'placeholder="search for anything..."' in body, (
-        "the placeholder is Helen's exact words: 'search for anything...'"
+    assert 'placeholder="I know what I want..."' in body, (
+        "the placeholder is Helen's exact words, #1096: 'I know what I want...'"
     )
     assert "data-search-index=" in body and "search.json" in body, (
         "the form must say which JSON it searches (data-search-index)."

@@ -287,7 +287,15 @@ module HelenTriages
           "tier"   => tier,
           "ml"     => volume_ml(ing["amount"]),
           "citrus" => generics.any? { |g| CITRUS.include?(g) } ? 0 : 1,
-          "index"  => index
+          "index"  => index,
+          # HOW MANY GENERICS EARNED THIS LABEL -- #1051. 1 for an ordinary
+          # ingredient, 2+ when `label_for` joined a disjunctive list with
+          # " or ". The card still prints the joined label as before (it is a
+          # true fact about the pour); this is here so a CONSUMER that must
+          # not offer a joined label -- cocktails/search.json's omnisearch
+          # feed -- can tell the two apart without re-parsing the string for
+          # the word "or", which a real ingredient name could itself contain.
+          "generics" => generics.length
         }
       end
 

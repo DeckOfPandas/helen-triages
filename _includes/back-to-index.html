@@ -27,8 +27,16 @@
   to the index with `q=<what you typed>`; assets/js/filter-state.js's
   `parseName` reads it and each index puts the text into its own I KNOW WHAT I
   WANT box and applies it. Pressing Enter, or the magnifying glass (a real
-  submit button, at the LEFT end so it never moves as you type -- Helen's
-  layout), does exactly that. That was the whole of #1024.
+  submit button), does exactly that. That was the whole of #1024.
+
+  THE GLASS MOVED TO THE RIGHT END -- #1056, reversing #1050's own layout on
+  seeing it built. It is now AFTER the input in the markup, which is also the
+  natural tab order (type, then reach the submit control). §13.13's principle
+  -- "the input is right-aligned so the text grows towards the glass" -- is
+  applied again rather than dropped: with the glass now on the right, the
+  input's text is LEFT-aligned, so what you type still grows towards the
+  glass, only now from the box's left edge rightwards instead of the other
+  way round.
 
   THEN assets/js/page-search.js MAKES IT A SEARCH FOR ANYTHING -- #1050. As you
   type, a dropdown under the box offers what the word could mean on this site,
@@ -50,14 +58,24 @@
   carries no comment of its own because a Liquid tag inside an SVG file is not
   XML, and test_every_shipped_svg_actually_parses reads the file as XML.
 
-  THE INPUT IS RIGHT-ALIGNED AND 24 CHARACTERS WIDE, so what you type grows
-  leftwards from the box's right edge towards the glass -- Helen's brief, to
-  the character: "Input field text right-aligned, 24 characters wide,
-  placeholder text 'search for anything...', then input text pushes out
-  left-wards. Magnifying glass icon on the left which doesn't move on typing."
-  The placeholder is written here rather than read from sites.yml: it stopped
-  saying where you are (both sites say the same words now), which is that
-  file's test for a key.
+  THE INPUT IS 24 CHARACTERS WIDE AND NOW LEFT-ALIGNED -- #1056 moved the
+  glass to the right end and flipped the alignment with it, so what you type
+  still grows towards the glass, from the box's left edge rightwards. #1050's
+  original brief, for the record, was the mirror image of this: "Input field
+  text right-aligned, 24 characters wide ... Magnifying glass icon on the left
+  which doesn't move on typing" -- right-aligned text growing left, towards a
+  glass that sat on the left. The glass sits on the right now, so the same
+  principle -- text grows towards the glass -- means left-aligned text growing
+  right.
+
+  THE PLACEHOLDER IS "I know what I want..." ON BOTH SITES -- #1096, Helen's
+  ruling on seeing #1050 built: keep the two searches behaving exactly as
+  built, drop the "search for anything..." placeholder (and any separate
+  written label or title) and give the box no visible words beyond that
+  placeholder and the glass. It is written here rather than read from
+  sites.yml for the same reason #1050's placeholder was: it stopped saying
+  where you are, which is that file's test for a key. The input's aria-label
+  carries the same words, so a screen reader hears what a sighted reader sees.
 
   The row is page furniture, not chrome: it lives in the two page layouts
   rather than in default.html, because it is about where THIS page sits, not
@@ -71,12 +89,12 @@
   </a>
   <form class="page-search" role="search" method="get" action="{{ back_site.home | relative_url }}"
         data-search-index="{{ back_site.home | append: 'search.json' | relative_url }}">
-    <button type="submit" class="page-search-go" aria-label="Search {{ back_site.title }}">{% include icons/search.svg class="page-search-mark" %}</button>
     <input type="search" name="q" class="page-search-input" autocomplete="off"
-           placeholder="search for anything..."
-           aria-label="Search {{ back_site.title }} for anything"
+           placeholder="I know what I want..."
+           aria-label="I know what I want"
            role="combobox" aria-autocomplete="list" aria-expanded="false"
            aria-controls="page-search-results">
+    <button type="submit" class="page-search-go" aria-label="Search {{ back_site.title }}">{% include icons/search.svg class="page-search-mark" %}</button>
     <div class="page-search-results" id="page-search-results" role="listbox" hidden></div>
   </form>
 </div>

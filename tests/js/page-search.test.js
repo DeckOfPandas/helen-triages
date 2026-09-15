@@ -5,8 +5,9 @@
 //   node --test
 //
 // WHAT IS WORTH TESTING HERE is the part Helen ruled on: names first, then the
-// kinds of word in the index's own order; a prefix match on a name outranks a
-// substring and a substring is offered only when nothing prefixes; a word no
+// kinds of word in the index's own order; PREFIX MATCHES ONLY, AT A WORD
+// BOUNDARY -- #1052 removed the substring fallback entirely, so a query that
+// only matches mid-word ("roni" in Negroni) is not a match at all; a word no
 // page carries is never offered; and each result's link is one the index will
 // actually read (assets/js/filter-state.js's grammar). The DOM half -- the
 // dropdown, the keys -- is the rest of that file and is exercised by looking.
@@ -81,7 +82,7 @@ test('a query matching nothing is an empty answer, not silence', () => {
   assert.deepStrictEqual(found.groups, []);
 });
 
-// --- names first, prefix before substring -----------------------------------------
+// --- names first, prefix and whole words only -------------------------------------
 
 test('names come first, in title tiers', () => {
   const found = PS.create(FOOD).search('ch');
@@ -101,27 +102,57 @@ test('a word-start match outranks a title-start match only by tier, not by kind'
     ['Chicken sorrel potato stew', 'Lemony cavolo nero butter bean soup']);
 });
 
-test('a substring hit on a name is offered only when nothing prefixes', () => {
-  // "tail" is inside oxTAIL and starts no word anywhere.
-  const only = PS.create(FOOD).search('tail');
-  assert.deepStrictEqual(labelsOf(only, 'name'), ['Sticky oxtail stew']);
+test('a mid-word hit is never offered -- #1052 removed the substring fallback', () => {
+  // "tail" is inside oxTAIL and prefixes no word anywhere -- no match at all,
+  // where this used to be the substring fallback's one result.
+  const tail = PS.create(FOOD).search('tail');
+  assert.deepStrictEqual(tail.groups, []);
 
-  // "ick" is inside chICKen and stICKy -- but "st" prefixes "stew" and
-  // "Sticky", so for "st" the substring hits must NOT join the prefix ones.
+  // "ick" is inside chICKen and stICKy and prefixes neither -- also nothing.
+  const ick = PS.create(FOOD).search('ick');
+  assert.deepStrictEqual(ick.groups, []);
+
+  // "st" still finds both, because it PREFIXES "Sticky" and "stew" -- a
+  // prefix match, not the substring the two cases above used to fall back to.
   const st = PS.create(FOOD).search('st');
   assert.deepStrictEqual(labelsOf(st, 'name'),
     ['Sticky oxtail stew', 'Chicken sorrel potato stew']);
 });
 
+test('a multi-word query matches word for word, each one a prefix', () => {
+  // #1052's interpretation: EACH typed word must prefix a whole word in the
+  // candidate. "chi sor" -- "chi" prefixes "Chicken", "sor" prefixes
+  // "sorrel" -- so the title matches even though neither word is a prefix of
+  // the TITLE as a whole (tier 2, not tier 1).
+  const found = PS.create(FOOD).search('chi sor');
+  assert.deepStrictEqual(labelsOf(found, 'name'), ['Chicken sorrel potato stew']);
+
+  // "chi pie" -- "chi" prefixes "Chicken", but "pie" prefixes no word on the
+  // card at all, so the AND fails and nothing matches.
+  const miss = PS.create(FOOD).search('chi pie');
+  assert.deepStrictEqual(miss.groups, []);
+});
+
 test('the highlight marks the run that begins a word, accents intact', () => {
-  const found = PS.create(FOOD).search('or');
-  const duck = found.groups.find((g) => g.kind === 'name').results
-    .find((r) => r.label.indexOf('Duck') === 0);
-  // "l’orange": the o of orange, not the o in "Duck à l’Orange"'s ... there
-  // is only one, and it is at index 9 in the ORIGINAL string.
-  assert.deepStrictEqual(duck.hit, [9, 11]);
-  assert.strictEqual(duck.label.slice(duck.hit[0], duck.hit[1]), 'or');
-  assert.strictEqual(duck.href, '/helen-triages/food/recipes/duck-a-lorange-sanguine/');
+  // hitOf directly, below MIN_QUERY_CHARS's search() gate, so a single
+  // folded character ('à' -> 'a') can stand for the whole word it is.
+  const original = 'Duck à l’orange sanguine';
+  const folded = PS.foldByCharacter(original);
+  const hit = PS.hitOf(folded, 'a');
+  // "à" is its own word between "Duck" and "l’orange"; the highlight lands on
+  // the ACCENTED character in the original string, not the folded plain "a".
+  assert.deepStrictEqual(hit, [5, 6]);
+  assert.strictEqual(original.slice(hit[0], hit[1]), 'à');
+
+  // A real prefix match through search(), for the ordinary case: "sor"
+  // prefixes "sorrel", mid-title.
+  const found = PS.create(FOOD).search('sor');
+  const chicken = found.groups.find((g) => g.kind === 'name').results
+    .find((r) => r.label.indexOf('Chicken') === 0);
+  const title = 'Chicken sorrel potato stew';
+  const at = title.indexOf('sorrel');
+  assert.deepStrictEqual(chicken.hit, [at, at + 3]);
+  assert.strictEqual(chicken.label.slice(chicken.hit[0], chicken.hit[1]), 'sor');
 });
 
 // --- then the kinds of word, in the index's order ---------------------------------
@@ -238,6 +269,7 @@ test('the drinks index: one mood list, two groups, card ingredients', () => {
   const ca = s.search('camp');
   assert.deepStrictEqual(labelsOf(ca, 'ingredient'), ['Campari']);
   assert.strictEqual(ca.groups[0].results[0].href, '/helen-triages/cocktails/?ing=Campari#results');
-  // A substring on a drink name: "roni" is inside Negroni and starts no word.
-  assert.deepStrictEqual(labelsOf(s.search('roni'), 'name'), ['Negroni']);
+  // "roni" is inside Negroni and prefixes no word in it -- #1052 removed the
+  // substring fallback that used to offer it here, so this is now no match.
+  assert.deepStrictEqual(s.search('roni').groups, []);
 });
