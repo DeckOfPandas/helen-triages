@@ -676,6 +676,21 @@ def test_recipe_badges_are_links_carrying_their_own_filter_value():
         )
 
 
+def test_the_see_shortlist_link_lands_on_the_results_list():
+    """#1057, 2026-09-15: "clicking 'see shortlist' should snap to the section
+    of the page where the shortlisted recipes start" -- the same landing a
+    search-dropdown result already gets (#1050), the count line both indexes
+    carry id="results" on, not the top of the index.
+    """
+    page_actions = read("_includes", "page-actions.html")
+    assert re.search(r'href="[^"]*\?shortlist=1#results"', page_actions), (
+        '_includes/page-actions.html\'s "see shortlist" link no longer ends '
+        'in "?shortlist=1#results" -- #1057. It must land on the count line '
+        'both indexes carry id="results" on, the same landing a search '
+        'result gets.'
+    )
+
+
 def test_filters_js_holds_no_ingredient_vocabulary():
     """Singulars and synonyms belong in YAML, not in the JavaScript."""
     js = read("assets", "js", "filters.js")

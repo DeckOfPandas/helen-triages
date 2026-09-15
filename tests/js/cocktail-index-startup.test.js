@@ -544,3 +544,21 @@ test('#994: shortlist=1 beats a mood in the same URL', () => {
     'the mood button is still lit, so the view did not clear it -- a filter ' +
     'the reader can see but the list is not obeying.');
 });
+
+// --- arriving at a fragment, #1057 --------------------------------------------
+// food-index-startup.test.js carries the fuller set and the reasoning; this is
+// the cocktails half -- the actions row's "see shortlist" link ends in
+// `#results` the same way a search result (#1050) does.
+
+test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
+  const r = boot({ drinks: DRINKS, hash: '#results' });
+  assert.strictEqual(r.page.count._scrollCalls.length, 1,
+    'the startup block must scroll to location.hash again after apply(), the ' +
+    'same landing a search result and "see shortlist" both rely on.');
+  assert.strictEqual(r.page.count._scrollCalls[0].block, 'start');
+});
+
+test('with no hash at all, nothing is scrolled', () => {
+  const r = boot({ drinks: DRINKS });
+  assert.strictEqual(r.page.count._scrollCalls, undefined);
+});

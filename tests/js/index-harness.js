@@ -172,7 +172,7 @@ function buildPage(doc, options) {
   pager.appendChild(el('button', 'btn-page btn-page-see-all', { id: 'drink-page-see-all' }));
   doc.body.appendChild(pager);
 
-  return { filters, list, pager, el };
+  return { filters, list, pager, el, count };
 }
 
 function addCard(doc, list, spec) {
@@ -248,13 +248,33 @@ function boot(options) {
   const sandbox = {
     document: doc,
     localStorage: createStorage(options.storage),
-    location: { search: options.search || '', pathname: '/cocktails/', href: 'http://x/cocktails/' },
+    // sessionStorage too -- #387/#1057/#1059, 2026-09-15. HTF.indexMemory
+    // (assets.js) reads and writes it for the back-navigation restore; every
+    // call there is wrapped in try/catch and treats a missing sessionStorage
+    // as "carry on as a fresh load", which is exactly what this harness did
+    // before this line existed. Adding it is what makes a genuine restore
+    // testable rather than merely un-thrown.
+    sessionStorage: createStorage(options.sessionStorage),
+    location: {
+      search: options.search || '',
+      pathname: '/cocktails/',
+      href: 'http://x/cocktails/',
+      hash: options.hash || ''
+    },
     history: { replaceState() {}, pushState() {} },
     console: { log() {}, warn(...a) { errors.push(a.join(' ')); }, error(...a) { errors.push(a.join(' ')); } },
     setTimeout: (fn) => fn(),
     clearTimeout() {},
     requestAnimationFrame: (fn) => fn(),
-    performance: { now: () => 0 },
+    // `options.backForward` -- #387/#1057/#1059. FilterState.arrivedByGoingBack
+    // reads exactly this shape; without it every boot() looks like a fresh
+    // visit, which is correct for every OTHER test in this file and wrong for
+    // the one that has to prove a genuine back navigation still skips the
+    // fragment scroll #1057/#1059 added.
+    performance: {
+      now: () => 0,
+      getEntriesByType: () => (options.backForward ? [{ type: 'back_forward' }] : [])
+    },
     Math: Math,
     Date: Date,
     JSON: JSON,

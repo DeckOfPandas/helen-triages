@@ -346,7 +346,11 @@ TRUSTED_DYNAMIC = (
     # checked the same way by test_site_nav_links_resolve_to_real_pages, with
     # `?shortlist=1` appended -- a query both indexes read (MANUAL 8.9), and a
     # query is not a path, so the target page is the home page either way.
-    re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1$"),
+    # `#results` since #1057 (2026-09-15): both indexes carry that id on the
+    # count line above their list (test_the_furniture_line_searches_for_anything
+    # in tests/test_site_config.py), so this is the same fragment #1050's
+    # search-dropdown links already end in, checked the same way.
+    re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1#results$"),
     # The footer's reference links, added 2026-08-16. Same shape and same
     # treatment as the three above: the value lives in _data/sites.yml, so this
     # scanner cannot read it out of the template, and
