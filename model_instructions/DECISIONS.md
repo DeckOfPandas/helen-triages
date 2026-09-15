@@ -3490,6 +3490,37 @@ unless stated.
   Cobra's Fang PDF with dark ink throughout and every chip, note card and
   ship mark legible.
 
+- **2026-09-15, design review / #1086 — a single-column card is not a grid
+  row, so it should stop matching one.** `$card-height` is fixed (top of
+  file) so that a ROW of cards matches heights, and #776's line budget
+  (above) exists to keep the card's three stacks inside that fixed height
+  honest — both arguments are about a row with more than one card in it.
+  Below the two-column breakpoint (720px) `.drink-cards` is already one
+  column, so every row holds exactly one card and nothing is being matched —
+  but the height stayed fixed anyway, so a short card (one ingredient line,
+  one chip: Planteray Pineapple Daiquiri, Apple Cart, Yellow Cactus Flower)
+  carried a dead band of 50-100px between the ingredient line and the foot
+  (measured on Apple Cart: 295.2px tall before, content that needed 242.2px).
+  `.drink-card` takes `height: auto` below 720px. `.drink-card-foot` —
+  normally `position: absolute; bottom: …`, because the goodness mark has to
+  sit in the same corner on every card in a row ("EVERY ANCHOR IS FIXED",
+  top of file) — takes `position: relative` there instead: an absolutely
+  positioned box takes no part in an auto height at all, so left fixed it
+  would have landed the foot on top of the ingredient line rather than under
+  it. `.drink-card-ship` still anchors itself to the foot's own box (see that
+  rule's comment), so the mark still sits at the foot's own bottom-right
+  corner — just a corner that now moves with the card's own content instead
+  of the row's. The narrow-screen glass-stacking rules below 400px
+  (2026-09-10, "the chips are written over the ingredients") lose their own
+  fixed-height formula (`calc($card-height + 6.6rem - $card-pad-y)`) the same
+  way, since it was solving the same row-matching problem the 720px rule now
+  owns, and its `.drink-card-foot { left: … }` override goes with it — a
+  foot that is no longer absolutely positioned has nothing for a `left` to
+  do. Two-column rows are untouched above 720px: `$card-height` and the line
+  budget keep their old values and one screenshot of the real index at
+  1280px still shows every row's two cards sharing one height, whatever their
+  own content. `_sass/cocktails/_cards.scss`.
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
@@ -5196,6 +5227,45 @@ verification. Dates are when the correction landed.
   drift that reads as an oversight in three months, so it is written down here.
   Rewording them is Helen's, and it is the same one-word decision as the
   placeholder above.
+
+- **2026-09-15, design review / #1086 — three phone-layout snags on the
+  recipe page, fixed without touching desktop or tablet.**
+  - **The meta card's COOK cell towered on a phone.** SERVES and PREP held one
+    word each while COOK's "but check internal temperatures chart" hedge
+    (`_layouts/recipe.html`, #352/#338) wrapped eight lines in a column no
+    wider than the other two. The first attempt pulled the link onto its own
+    full-width line; Helen, having looked, asked for something else instead:
+    *"I'd like to try stacking the three metadata boxes on a phone, avoiding
+    the jar in length differences, but also allowing more space for any
+    'cook' line."* Below 600px `.recipe-meta` drops from three columns to
+    one, each cell a full-width row divided by a hairline instead of the
+    grid's vertical rule; desktop and tablet keep the three-column grid
+    exactly as it was (verified: an 852×125.4px crop box at 1280px, identical
+    before and after, on duck à l'orange sanguine, pineapple ginger
+    spatchcock chicken and caramel). `_sass/food/_recipe-header.scss`.
+  - **The actions row orphaned PDF on a phone.** `+ SHORTLIST · SEE SHORTLIST
+    (0) · PRINT` fit one line and PDF alone dropped to a second, right-aligned
+    line — issue #1058 is the separate, still-open question of matching the
+    two sites' styling for this row; this only fixes the wrap. Below 600px
+    `.page-actions` becomes a two-column `max-content` grid instead of a
+    `flex-wrap` row, so the four controls always lay out as two pairs
+    (shortlist / see shortlist, print / pdf) with their right edges exactly
+    where `flex-end` already had them — `justify-items: end` inside each
+    `max-content` column, `justify-content: end` for the pair of columns as a
+    block. `_sass/shared/_furniture.scss` — shared by both sites, so the same
+    rule closes the identical orphan on a drink page's controls row too
+    (measured on Cobra's Fang) without a second copy of it.
+  - **Recipe titles stacked one word per line with loose leading below
+    400px.** Pineapple and Ginger Spatchcock Chicken ran to four lines at the
+    inherited 1.6 line-height, each line reading as its own island rather
+    than one title. Below 400px `.recipe-title-text` steps down one size, to
+    1.9rem, with a 1.1 line-height — tighter than any other heading on the
+    page, but still comfortably above `.recipe-section-heading`'s 1.8rem, so
+    the h1 stays the biggest heading on the page at every width (the rule
+    2.2rem itself exists to establish, see that rule's own comment).
+    `assets/js/last-line-rule.js` needed no change: it re-measures the
+    rendered title on every load, so the double rule still finds the true
+    last line at the smaller size, checked by crop. `_sass/food/_recipe-header.scss`.
 
 ## §14 Reference pages
 
