@@ -67,9 +67,9 @@ Enforce (hooks):
   * One command per bash call, so no chaining with ; or && to save a round trip
     * Chained commands are checked as a whole, so `grep ... && node ... ` harrasses me for permission even when each part on its own is allow-listed
     * A round trip is better than interrupting to harass me about things that are obviously fine 
+  * Commands that build paths at run time go through committed scripts
   * Prefer exact commands for running programs because of rules ending in *, or a committed wrapper that checks its own arguments
     * There's a test for existing open-ended rules proving each wrapper refuses what it should
-  * Write complicated commands to scripts that can be statically analysed, for example, where paths or variables etc are expanded on running
   * No `git reset --hard`
   * No pushing to main
   * No `pr merge` or `pr review`
