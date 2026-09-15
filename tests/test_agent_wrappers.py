@@ -233,6 +233,31 @@ def test_the_hook_leaves_non_leading_or_empty_assignments_alone(command):
     assert not _unanalyzable_denies(command), f"refused {command!r}"
 
 
+# --- guard-unanalyzable-bash.py shape 9: an unquoted parenthesis -------------
+
+@pytest.mark.parametrize("command", [
+    # the exact call Helen was asked about and declined, 2026-09-15
+    "git log origin/main -25 --format=%h%x09%s%x09%(trailers:key=Fixes,valueonly,separator=%x2C)",
+    "(git status)",
+    "echo (x)",
+    "ls tmp)",
+])
+def test_the_hook_refuses_an_unquoted_parenthesis(command):
+    assert _unanalyzable_denies(command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    "git log origin/main -25 --format='%h %s %(trailers:key=Fixes,valueonly)'",
+    'sh scripts/gh-write.sh pr-create helen-triages feat/x "(chore) a title" tmp/b.md',
+    "grep -n 'foo(bar)' assets/js/filters.js",
+    'grep -n "re.compile(r" .claude/hooks/guard-sed.py',
+    "find tmp -name x",
+    "grep -n foo\\(bar\\) assets/js/filters.js",
+])
+def test_the_hook_leaves_quoted_or_escaped_parentheses_alone(command):
+    assert not _unanalyzable_denies(command), f"refused {command!r}"
+
+
 # --- git-push-agent.sh: never the public main --------------------------------
 
 @pytest.mark.parametrize("args", [

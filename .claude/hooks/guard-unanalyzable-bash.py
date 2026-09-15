@@ -267,6 +267,21 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "parts are allowed on their own. Two calls cost a round trip; "
                 "one chained call costs Helen an interruption")
 
+    # Shape 9, 2026-09-15. An UNQUOTED parenthesis is shell syntax -- a
+    # subshell, or, far more often from an agent, a parse error: this was
+    # `git log --format=%h%x09%(trailers:key=Fixes,valueonly)`, whose `%(...)`
+    # the shell cannot parse, so the checker asked Helen ("Parse error ... a
+    # command the shell parser cannot analyze asks the person") and she had to
+    # decline it. A backslash-escaped paren (`find . \( -name x \)`) is an
+    # ordinary character and is cleared first; a quoted one was stripped above.
+    if re.search(r"[()]", re.sub(r"\\[()]", "  ", scannable)):
+        return ("an unquoted `(` or `)`, which the shell reads as a subshell or "
+                "cannot parse at all",
+                "quote the argument that carries it -- single quotes, e.g. "
+                "`git log --format='%h %s %(trailers:key=Fixes)'` -- or, for a "
+                "real subshell, put the commands in a script in `tmp/` and run "
+                "the file")
+
     if _GLOB.search(scannable):
         return ("a glob, which expands at runtime so the file list cannot be "
                 "verified",
