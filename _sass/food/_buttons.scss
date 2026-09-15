@@ -42,11 +42,36 @@
   }
 }
 
+// WAS `outline: none` PLUS THE 15% TINT ALONE, ISSUE #1086 -- on a page of
+// grey chips a background tint this faint is not a keyboard focus indicator,
+// which the design review found by eye (2026-09-15; axe-core's own ruleset
+// has no automated check for focus-ring visibility, only for things like
+// colour contrast and missing accessible names -- see the footer word below
+// and the ship icon in _includes/icons/ship.svg for what it DID catch). The
+// tint stays (it does no harm and was the previous intent), but the outline is what
+// actually says "this one has focus": 2px, offset 2px so it clears the tape
+// shape rather than sitting on top of it, and never a change to width/
+// border/padding, which is what
+// test_no_active_filter_button_changes_its_own_width guards.
+//
+// $color-accent is the fallback for a control with no single section of its
+// own -- .btn-clear is the global "clear all", not one filter's chip.
 .btn-tag, .btn-star, .btn-clear {
   &:focus-visible {
-    outline: none;
+    outline: 2px solid $color-accent;
+    outline-offset: 2px;
     background-color: rgba($color-text, 0.15);
   }
+}
+
+// .btn-star is emitted by exactly one section (food/index.html's STAR
+// filter, btn_class="btn-star") so it can take its own section hue directly,
+// with no .category--star wrapper needed to disambiguate it -- unlike
+// .btn-tag, which MOOD, PRACTICALITIES and the ingredient search pool all
+// share, and whose section hue is set per-wrapper instead (see
+// _category-labels.scss and _search.scss).
+.btn-star:focus-visible {
+  outline-color: $color-star-root;
 }
 
 // A search-result tag where some word genuinely starts with what was typed

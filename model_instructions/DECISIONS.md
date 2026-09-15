@@ -402,6 +402,31 @@ unless stated.
   untouched -- this is only a reorder of children already inside that pinned
   cell, not a change to the grid.
 
+- **2026-09-15, #1086 — the link-preview image is the wordmark, one card per
+  site and one for neither.** The design review found no `og:image` anywhere,
+  so a pasted link showed title and tagline with no picture; the layout had
+  carried a conditional for it since the meta tags were written, waiting on
+  artwork. Helen: *"Let's do the og:image. The wordmark is fine for a start --
+  I don't think we have anything else that feels like branding anyway."* And,
+  asked whether the preview text should be generated per page: it already is
+  -- `og:description` is the recipe's or drink's own tagline -- so only the
+  image was missing. **Three cards, not one**, because the tape says where you
+  are: `social_image` in `_data/sites.yml` per site (that file's test for a key,
+  and this passes it), and `social_image` in `_config.yml` for the
+  `site_neutral` pages, the [ ?? ] tape from `/about/`. **Rendered from the
+  built site, not drawn**: `scripts/render_social_images.py` lifts the
+  `site-title-link` block out of each built index, inlines one tape SVG with
+  decorations.js's two attributes, loads the site's compiled stylesheet, scales
+  the lockup to four fifths of a 1200×630 frame and screenshots it at device
+  scale 2 with the same headless Chrome `generate_pdfs.py` uses. So the
+  lettering, emboss and palette on the card are whatever the header renders
+  that day; change the wordmark, re-run the script. **One tape, fixed, on
+  purpose**: #779's random-per-load is a ruling about a live page, and a file
+  wears one tape (`--tape`, default 7). The PNGs are committed and CI never
+  renders them. `test_every_link_preview_image_exists_at_the_size_the_layout_claims`
+  reads the PNG headers and holds each to the `og:image:width`/`height` the
+  layout states, and those to the script's own constants.
+
 ## §3 The three-layer rule
 
 - **2026-08-01** — The ingredient search confirmed as earning its
@@ -2578,6 +2603,47 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-09-15, #1086 — "actions row only", and the title that was laid out in
+  the glass column.** From the design review. Helen, shown a drink page carrying
+  two shortlist buttons: *"actions row only."* So the `.btn-shortlist` inside
+  the head went and the one in `_includes/page-actions.html`, in
+  `.cocktail-controls` under the head's rule, stays — which is #1005's ruling
+  ("row under the head") finally true of the markup as well as of the
+  stylesheet.
+  **THE SECOND BUTTON WAS A LEFTOVER, AND THE STYLESHEET HAD ALREADY MOVED ON.**
+  #1005 deleted every rule that held the head's button — the `--title-line`
+  custom property, the `:has()` alignment with the name's first line, the phone
+  block that made the row a flex box for the `+` — and rewrote both files'
+  comments to say the button had gone. The `<button>` itself was not deleted.
+  So it rendered unstyled and unplaced for a day: at 1280px it stacked under the
+  tape (the head's own head grew 282.7px to 268.7px when it went, x, y and the
+  right edge all unchanged at 214 / 291.5 / 1066), and in `make it`, where the
+  tagline is hidden, it sat hard against GLASS with nothing between them
+  (173.3px to 159.3px). **A comment saying a thing is gone is not the thing
+  being gone**, and nothing tested for one control appearing twice.
+  **AND IT IS WHAT MADE THE PHONE BUG VISIBLE RATHER THAN WHAT CAUSED IT.** On a
+  phone `.cocktail-title-block` is a two-column grid, 4.5rem for the glass and
+  the rest for the words, and the rule that spans a full-width child both
+  columns named `.cocktail-title-row` — which #1005 had left at
+  `display: contents` around its one remaining child. **An element with no box
+  cannot be placed, and CSS says nothing about it**: the selector matched, the
+  declaration was valid, and it reached an element that generates no box, so the
+  NAME auto-placed into column one. Measured at 360px on the Bellini: the tape
+  72px wide in a 312px column, the name wrapped to five lines with its lettering
+  running out across the page, and the leftover button drawn over "AND" in
+  column two. The fix is to delete the wrapper and name the name — the tape
+  spans the column the title occupies, the name runs across it on every line,
+  and `card-name-fit.js` has the real column to measure against at last, so a
+  long name takes the cards' own answer: one step of 0.86, then wrap.
+  **Nothing above 600px changes but the missing button.** Five drinks checked at
+  360 and 390 (Cobra's Fang, the Bellini, the mulled wine, the Negroni, the 18th
+  Century Cocktail) and Cobra's Fang at 1280 before and after.
+  **The class was two weeks old and had three jobs in that time** — flex row for
+  the toggle, flex row for the shortlist button, then nothing. A wrapper that
+  outlives every reason it was added is the shape #991 named on the portrait
+  card: not wrong at any one step, and worth deleting as soon as the last reason
+  goes.
+
 - **2026-09-14, #1000 — the see-all link comes out again, two days old.** Helen:
   *"remove 'see all' button from below shortlist button on cocktail page"*, and
   in the same message: *"I know some of this is changing my mind, but please go
@@ -3414,6 +3480,71 @@ unless stated.
   Two of the candidates page's states were each built ON TOP of the strips,
   which is why "without the border above and below the glass" was a change to
   C rather than a description of it.
+
+- **2026-09-15, #1086 — the drink page prints pale grey on white; a design
+  review found it, not a ticket.** #482 (2026-08-27, above) forces PRINT to be
+  the full editorial page, and never touched colour, because it did not need
+  to at the time: food's page was already dark ink on light paper, and so was
+  cocktails', four days before it inverted for the screen (#469, "black on
+  black"). Nothing about print was revisited when the inversion shipped —
+  `_sass/cocktails/_print.scss` hides controls and restores the editorial
+  state, and stops there — so every accent this site has spent this whole
+  section solving against a black card or a black page prints against WHITE
+  PAPER instead, which none of them were solved for. Measured, not eyeballed:
+  `$color-ink` at 1.25:1 on white, the coral/hot-pink mood chips at 2.89 /
+  3.11:1, the ship mark (reposado) at 2.67:1, a note card's lagoon border and
+  label at 1.84:1 — all well under the 4.5:1 body-text floor §9.13 (above)
+  holds every other hue on this page to. **The fix is a second, print-only
+  palette, scoped to `.cocktail` inside `@media print` so it touches nothing
+  on screen.** Two of its values are reused rather than invented — food's own
+  `$color-text` and `$color-clear-text` (`_sass/food/_palette.scss`) — the
+  same "near-black ink" and "de-emphasised grey" problem food already solved
+  for exactly this ground, and cocktails has no ink of its own to reach for,
+  having inverted every value it had. The five accent hues have no food
+  equivalent to borrow, so each is `darken()`ed off its own rule colour by the
+  smallest step clearing 4.5:1 — the same method food's own
+  `$darken-active-lime` already uses, "how far to darken is a property of the
+  hue, not of the section." **The name tape is untouched.** `.cocktail-title`
+  sits inside `.drink-card-tape-word`, whose black band and light lettering
+  are artwork (this section's own "the card title sits on punched tape"), not
+  a heading, and read their own custom properties rather than the
+  `--lettering-heading-*` trio re-pointed here for INGREDIENTS / METHOD /
+  NOTES. Checked against a real render as well as a screenshot:
+  `scripts/generate_pdfs.py` against a two-page mirror of the built site
+  (Playwright's own Chromium, no system Chrome in this environment) produced a
+  Cobra's Fang PDF with dark ink throughout and every chip, note card and
+  ship mark legible.
+
+- **2026-09-15, design review / #1086 — a single-column card is not a grid
+  row, so it should stop matching one.** `$card-height` is fixed (top of
+  file) so that a ROW of cards matches heights, and #776's line budget
+  (above) exists to keep the card's three stacks inside that fixed height
+  honest — both arguments are about a row with more than one card in it.
+  Below the two-column breakpoint (720px) `.drink-cards` is already one
+  column, so every row holds exactly one card and nothing is being matched —
+  but the height stayed fixed anyway, so a short card (one ingredient line,
+  one chip: Planteray Pineapple Daiquiri, Apple Cart, Yellow Cactus Flower)
+  carried a dead band of 50-100px between the ingredient line and the foot
+  (measured on Apple Cart: 295.2px tall before, content that needed 242.2px).
+  `.drink-card` takes `height: auto` below 720px. `.drink-card-foot` —
+  normally `position: absolute; bottom: …`, because the goodness mark has to
+  sit in the same corner on every card in a row ("EVERY ANCHOR IS FIXED",
+  top of file) — takes `position: relative` there instead: an absolutely
+  positioned box takes no part in an auto height at all, so left fixed it
+  would have landed the foot on top of the ingredient line rather than under
+  it. `.drink-card-ship` still anchors itself to the foot's own box (see that
+  rule's comment), so the mark still sits at the foot's own bottom-right
+  corner — just a corner that now moves with the card's own content instead
+  of the row's. The narrow-screen glass-stacking rules below 400px
+  (2026-09-10, "the chips are written over the ingredients") lose their own
+  fixed-height formula (`calc($card-height + 6.6rem - $card-pad-y)`) the same
+  way, since it was solving the same row-matching problem the 720px rule now
+  owns, and its `.drink-card-foot { left: … }` override goes with it — a
+  foot that is no longer absolutely positioned has nothing for a `left` to
+  do. Two-column rows are untouched above 720px: `$card-height` and the line
+  budget keep their old values and one screenshot of the real index at
+  1280px still shows every row's two cards sharing one height, whatever their
+  own content. `_sass/cocktails/_cards.scss`.
 
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
@@ -5018,6 +5149,163 @@ verification. Dates are when the correction landed.
     a lone shared tag never outranks a shared ingredient at the same score.
     Built as two extra digits in the Liquid sort key and the same key in
     `scripts/related_recipes.py`.
+- **2026-09-15, #1086 (design review) — four candidates pages, four picks.**
+  Each question went up as two to five treatments on the real page with the real
+  compiled CSS, per §13.11, and Helen chose by looking. Her words, and what each
+  one cost:
+  - **The phone header: "B: mark at two thirds."** `.site-header` was 211.5px on
+    a 390px screen — a quarter of the phone spent on chrome before the first
+    card. A shrank the type alone, B shrank the whole lockup and halved the gap
+    under it, C moved the nav row up beside the wordmark. B measured 169px on
+    the candidates page and 168.4px built, identically on `/food/`,
+    `/food/recipes/pineapple-ginger-spatchcock-chicken/` and `/cocktails/`;
+    1280px is untouched at 195.5px. **`@media (max-width: 600px)`, and
+    `$header-stack-width` (820px) was the alternative.** They answer different
+    questions: 820px is where the wordmark and the nav stop fitting on one line,
+    which is a LAYOUT limit, and a tablet at 700px has the stacked header with
+    plenty of room for it. This is a SIZE judgement about phones. 600px is also
+    the width the candidates were built and judged at, so it is the number her
+    eye actually ruled on, and the file already had it (the footer's own block).
+    **The three sizes became named variables so the ratio is the thing in the
+    file**: `$wordmark-top-size`, `$wordmark-word-size`, `$wordmark-tape-height`
+    and `$wordmark-phone-scale` in `_sass/shared/_layout.scss`, because
+    "1.33rem" in a media query is a number nobody can check against a 2rem three
+    hundred lines up. The factor is written `0.6667` rather than `2/3`: `/` is
+    division-deprecated in Dart Sass and an `@import`-ed partial cannot carry a
+    `@use "sass:math"`. That is two thirds to within a third of a device pixel
+    on the largest of the three (46.669px against the candidate's 47px).
+    **Each row's `font-size` moves and nothing is `transform: scale()`d** —
+    §13.8's grid takes the width of whichever row is naturally wider, and a
+    transform paints smaller while reporting the old box. The `[ COCKTAILS ]`
+    tape is the wide one and drags nothing sideways: `shoot.sh` reports no
+    OVERFLOW at 360 or 390 on either site. **The nav row's own top margin went
+    0.9rem → 0.45rem, which is a HALF and not the two thirds**, because the gap
+    and the mark were two separate halves of her sentence; that offset is
+    eyeballed against the tape's bottom ink line by standing instruction, and it
+    was re-eyeballed at 390px rather than derived.
+  - **The cocktail active filter chip: "B: filled block."** A chosen chip wore a
+    0.22em underline in its section's hue (#548, 2026-09-03); food's wears a
+    filled shape in its section's hue with near-black text. Shown both sites
+    side by side she took food's, so `.is-on` is now the page's own dark
+    (`$color-bg`) on a `background` in `$color-heading-yolo` / `-mood` /
+    `-hassle`, with the faux-bold stroke flipped to the letter's colour. **#548's
+    objection to filling the box does not carry over**: it rejected an inset
+    shadow because "the band ran the full hit area" when a band is meant to hug
+    the word — a block is supposed to run the full hit area, so the 0.75rem of
+    padding stops being a defect and becomes the block's margin. **Paint only,
+    per §13.4.2 and #389**: measured on the built page, a selected chip is
+    105.45 × 26.88 with padding 4.8px 12px, font-size 14.4px and letter-spacing
+    0.144px — its resting metrics exactly, so nothing to its right moves.
+    **And the guard was widened rather than remembered**:
+    `test_no_active_filter_button_changes_its_own_width` read `food.css` alone
+    for six weeks, so cocktails' half of the rule was held by a comment in
+    `_sass/cocktails/_cocktail.scss` saying the test did not reach it. It now
+    scans both stylesheets, `.active` on food and `.is-on` on cocktails.
+    **THE FIRST VERSION OF THAT WIDENING WAS GREEN AND NEARLY BLIND, AND THAT IS
+    THE PART WORTH KEEPING.** It copied food's shape —
+    `\.btn-(?:mood|chaos)[^,{]*\.is-on`, button class then chosen class — and on
+    cocktails that order is wrong. Food authors each rule as
+    `.category--star .btn-star.active`, which Sass emits unchanged; cocktails
+    writes `&.is-on` nested inside a PLACEHOLDER, and `@extend` substitutes the
+    extender into the placeholder's slot, so the compiled selector is
+    `.is-on.btn-chaos` — chosen class FIRST. The pattern therefore missed the one
+    rule carrying the entire active state, while still matching the three
+    per-section `background` rules, so the "a scan that matches nothing passes
+    while checking nothing" assertion was satisfied and the test looked alive.
+    It also matched `.btn-mood:hover:not(.is-on)` — literally the rule for a
+    button that is NOT chosen. Found by printing what the scan actually matched
+    instead of trusting that it matched something, and fixed by splitting the
+    selector list on commas, stripping `:not(...)`, and asking for both classes
+    in either order. Then proved: a `padding` added to the `.is-on` block on
+    purpose made the test name that exact reversed-order selector, and it was
+    taken out again. **A guard copied from a working one is not a working guard
+    until something has been broken in front of it.** A
+    consequence worth knowing: `.drink-name-hit`'s 0.22em was chosen by matching
+    this chip's band, and the band is gone — the number stays as that mark's own,
+    and its comment now says so instead of pointing at something that no longer
+    exists.
+  - **The about page header: "C: doors on one line, no ??."** `/about/` is the
+    one `site_neutral` page, so its nav row emits BOTH doors where every other
+    page emits one; two doors measured 267.9px against a ~264px column 3, four
+    pixels over, and `flex-wrap: wrap` — there precisely so nothing overflows —
+    dropped the second onto its own line. `.site-neutral .site-nav-icons` takes
+    `grid-column: 1 / -1` on that page only; the row still ends on the cards'
+    right edge at x=1066, and the header came down 235.1px → 189px. The `??` is
+    not emitted there at all rather than hidden, because a hidden element is
+    still in the tab order and the link pointed at the page you were already on.
+    **On a phone nothing changed and that was checked, not assumed**: the `??` is
+    a grid sibling rather than a flex child, so removing it never made the row
+    narrower, and the two doors were already on one line — 268.6px in the 312px a
+    360px viewport gives them. **The class is emitted as two whole `<header>`
+    tags**, because `test_every_chrome_class_has_a_rule_in_every_site_stylesheet`
+    scans class attributes with a pattern that refuses braces: one Liquid
+    conditional inside the attribute and `site-header` would have dropped out of
+    the set that test checks while it went on passing. `/food/` and `/cocktails/`
+    build byte-identical apart from the stylesheet cache-buster, diffed against a
+    build of the previous template rather than reasoned about.
+  - **The cocktail scaler: "C: word after the box."** `− [1] × +` became
+    `− [1] drinks +`. **The word is PLACEHOLDER COPY and the `×` was not**, which
+    is the whole difference from the four rounds before it: `×` (U+00D7, against
+    the letter x) was a typographic call an agent could make, and a word is
+    voice, which §13.12 says is Helen's. So it ships marked with the layouts'
+    own `<!-- PLACEHOLDER COPY, Helen's to write -->` and she renames it in one
+    place. Shipped as markup rather than CSS `content:`, so the string can be
+    found, selected and translated. The element and its `aria-hidden` are
+    unchanged — the input's `aria-label` already says "make this many times the
+    recipe", so the span would only name the count twice. `.cocktail-scale-mark`
+    came from 0.95rem to the label's own 0.78rem / 0.08em: 0.95rem was chosen to
+    make ONE small high-sitting glyph hold its own beside a figure, and a word at
+    that size read as a second louder label. The control is 149.2 × 23.8 at 390
+    and at 1280, one line, no wrap.
+  **A recorded inconsistency rather than one left to be found.**
+  `assets/js/cocktail-scale.js` composes its own strings with a literal `×` —
+  the refusal note ("can't go below ×1 (82.5 ml)") and the batch line ("×3:
+  roughly £12.00–£18.00…"). Those are COPY, they are asserted on by
+  `tests/js/cocktail-scale.test.js`, and they are untouched. So the control now
+  says "drinks" while its own messages say "×". That is deliberate for today —
+  the mark was a design pick and the sentences are voice — and it is the kind of
+  drift that reads as an oversight in three months, so it is written down here.
+  Rewording them is Helen's, and it is the same one-word decision as the
+  placeholder above.
+
+- **2026-09-15, design review / #1086 — three phone-layout snags on the
+  recipe page, fixed without touching desktop or tablet.**
+  - **The meta card's COOK cell towered on a phone.** SERVES and PREP held one
+    word each while COOK's "but check internal temperatures chart" hedge
+    (`_layouts/recipe.html`, #352/#338) wrapped eight lines in a column no
+    wider than the other two. The first attempt pulled the link onto its own
+    full-width line; Helen, having looked, asked for something else instead:
+    *"I'd like to try stacking the three metadata boxes on a phone, avoiding
+    the jar in length differences, but also allowing more space for any
+    'cook' line."* Below 600px `.recipe-meta` drops from three columns to
+    one, each cell a full-width row divided by a hairline instead of the
+    grid's vertical rule; desktop and tablet keep the three-column grid
+    exactly as it was (verified: an 852×125.4px crop box at 1280px, identical
+    before and after, on duck à l'orange sanguine, pineapple ginger
+    spatchcock chicken and caramel). `_sass/food/_recipe-header.scss`.
+  - **The actions row orphaned PDF on a phone.** `+ SHORTLIST · SEE SHORTLIST
+    (0) · PRINT` fit one line and PDF alone dropped to a second, right-aligned
+    line — issue #1058 is the separate, still-open question of matching the
+    two sites' styling for this row; this only fixes the wrap. Below 600px
+    `.page-actions` becomes a two-column `max-content` grid instead of a
+    `flex-wrap` row, so the four controls always lay out as two pairs
+    (shortlist / see shortlist, print / pdf) with their right edges exactly
+    where `flex-end` already had them — `justify-items: end` inside each
+    `max-content` column, `justify-content: end` for the pair of columns as a
+    block. `_sass/shared/_furniture.scss` — shared by both sites, so the same
+    rule closes the identical orphan on a drink page's controls row too
+    (measured on Cobra's Fang) without a second copy of it.
+  - **Recipe titles stacked one word per line with loose leading below
+    400px.** Pineapple and Ginger Spatchcock Chicken ran to four lines at the
+    inherited 1.6 line-height, each line reading as its own island rather
+    than one title. Below 400px `.recipe-title-text` steps down one size, to
+    1.9rem, with a 1.1 line-height — tighter than any other heading on the
+    page, but still comfortably above `.recipe-section-heading`'s 1.8rem, so
+    the h1 stays the biggest heading on the page at every width (the rule
+    2.2rem itself exists to establish, see that rule's own comment).
+    `assets/js/last-line-rule.js` needed no change: it re-measures the
+    rendered title on every load, so the double rule still finds the true
+    last line at the smaller size, checked by crop. `_sass/food/_recipe-header.scss`.
 
 ## §14 Reference pages
 
@@ -5527,3 +5815,112 @@ verification. Dates are when the correction landed.
   360/390/1280 from a PRODUCTION build (`_config.yml` alone, which is also what
   proves the page publishes at all), plus before-and-after crops for each design
   change and the cocktails index footer showing the [ COCKTAILS ] column's link.
+
+- **2026-09-15, #1086 — THREE ACCESSIBILITY FINDINGS FROM A DESIGN REVIEW,
+  MEASURED WITH AXE-CORE RATHER THAN EYEBALLED.** A first run of axe-core
+  4.10.2 (WCAG 2A/2AA/2.1AA + best-practice tags) against `/food/`,
+  `/cocktails/`, `/food/recipes/caramel/` and
+  `/cocktails/recipes/cobras-fang/` found exactly two violation types, both
+  `serious`: `color-contrast` on `.site-footer-ref-word` (both sites) and
+  `svg-img-alt` on `.ship-icon` (every cocktails page it appears on,
+  including the drink-count legend). A separate pass by eye found a third,
+  which axe's ruleset does not check at all: three keyboard-`:focus-visible`
+  states on food that were either suppressed or too faint to register. After
+  all three fixes, the same axe run reports zero violations on all four
+  pages. `tmp/axe.js` (Playwright, `page.addScriptTag` to inject
+  `axe-core/axe.min.js`, then `axe.run`) is the harness; `tmp/contrast.py`
+  copies the luminance formula from `tests/test_rendered_pages.py`'s
+  `_luminance` (around line 1335) to check the footer word's ratio
+  independently of axe's own number.
+
+  **§13 — `.site-footer-ref-word` (§13.4.1's "footer's reference block" use
+  of brackets) was `opacity: 0.65` on `$color-clear-text`, which axe measured
+  at 3.27:1 on food (`#faf7f8` ground) and 3.38:1 on cocktails (`#0e0e10`
+  ground) — both under the 4.5:1 AA text minimum, and both measured
+  independently by `tmp/contrast.py` at 3.27:1 / 3.37:1 (the 0.01 gap from
+  axe is rounding in axe's own reported RGB, not a different number).
+  Opacity and Sass `mix()` compute the identical blended colour — diluting
+  toward the page ground either way — so the bug was never the mechanism, it
+  was the 65% weight: `tmp/contrast.py`'s binary search puts the quietest
+  passing weight at 79% on food and 80% on cocktails, right at the 4.5:1
+  edge either browser rounding could tip either way. Landed on 82% (one value
+  for both sites, since the rule is shared chrome): 4.90:1 on food, 4.71:1 on
+  cocktails, both with real margin, both still visibly lighter than the
+  full-strength `$color-clear-text` the footer's links rest at — so the word
+  stays quieter than the links, which is the whole point of the rule's own
+  comment. **The rule actually lives in `_sass/shared/_layout.scss`, not
+  `_chrome.scss`** — grepped to confirm there is exactly one definition;
+  `_chrome.scss`'s own header says "if `_layouts/default.html` emits the
+  class, its colour belongs in this file", and the footer partial that
+  actually holds `.site-footer`, `.site-footer-top` and this rule together is
+  `_layout.scss`, so that is where the fix went. No new hex: `mix($color-clear-text,
+  $color-bg, 82%)`, both palette-contract variables.
+
+  Same review, same section: three `:focus-visible` states on food were
+  either `outline: none` with nothing replacing it, or a change too subtle to
+  read as focus at all. `.btn-tag, .btn-star, .btn-clear`
+  (`_sass/food/_buttons.scss`) dropped the outline for a 15% background tint
+  alone — invisible on a page of grey chips. `.page-search-input`
+  (`_sass/shared/_furniture.scss`, the furniture search box from #1024/#1050)
+  dropped it for a few shades of underline-lightening on `:focus` (not even
+  `:focus-visible`). `.recipe-scale-step` (`_sass/food/_recipe-scale.scss`,
+  #1005's portion steppers) moved its 1px border to the same colour the text
+  was already moving to, which reads as no change at all beside a 0.95rem
+  glyph. All three now carry a real `outline: 2px solid <colour>;
+  outline-offset: 2px;` on `:focus-visible` and nothing added to
+  size/border/padding — `test_no_active_filter_button_changes_its_own_width`
+  (§13.4.2) stayed green throughout, unmodified, because outline never
+  participates in layout. **Colour follows §13.5's code where one applies**:
+  `.btn-star` takes `$color-star-root` directly (it is emitted by exactly one
+  section, food/index.html's STAR filter, so no `.category--star` wrapper is
+  needed to disambiguate it); `.category--mood .btn-tag` and
+  `.category--practicalities .btn-tag` get their own root hues as compound
+  overrides in `_sass/food/_category-labels.scss`, right beside the existing
+  per-section `.tag-shape`/`.btn-clear-inline` overrides; the HAS TO HAVE
+  ingredient-search pool (`.search .btn-tag.btn-ingredient`) gets the same
+  treatment in `_sass/food/_search.scss`. Controls with no single section —
+  `.btn-clear` (the global clear-all) and `.page-search-input` (shared chrome,
+  both sites) — fall back to `$color-accent`. `.recipe-scale-step` takes
+  `$color-recipe-link-hover`, which the rule already used and which equals
+  `$color-accent` on food (MANUAL 13.2) — recipe-page colour is decoration,
+  not a filter code (§13.5), so no section hue applies there. Cocktails'
+  filter chips were not touched: they still take the browser's own focus
+  ring, and the review found nothing wrong with that. Verified with real
+  keyboard focus, not `.focus()` (`:focus-visible` does not reliably engage
+  for the latter) — `tmp/focus.js` drives `page.keyboard.press('Tab')` in a
+  loop, stopping the instant `document.activeElement` matches the target
+  selector, then screenshots a padded crop at 2x: `tmp/focus-shots/focus-food-chip.png`
+  (a `.btn-star` chip, magenta ring), `focus-search-input.png` (the furniture
+  box, accent ring), `focus-recipe-scale-step.png` (a stepper, accent ring).
+  All three show a clearly visible ring with no box-size change.
+
+  **§9.13 — THE SHIP ICON'S `role="img"` HAD NO ACCESSIBLE NAME.**
+  `_includes/icons/ship.svg` (the goodness mark on a drink card, #corrected
+  from a Noun Project source per that file's own credit comment) carried
+  `role="img"` and nothing else — no `aria-label`, no `<title>` child — on
+  every one of its four call sites: the index card and the related-drinks
+  card (`_layouts/cocktail.html`, `cocktails/index.html`, both via
+  `_includes/cocktails/ship.html`), the drink page's own meta row, and the
+  index's summary-panel legend (`.drink-count-legend-icon`,
+  `cocktails/index.html`). At every one of those the rating word the include
+  emits right beside it — "yes", "sure", "oh gods yes", or `???` for an
+  off-scale value (`_includes/cocktails/ship.html`'s `ship_word`, and
+  "ship it?" beside the legend copy) — already carries the meaning, so the
+  icon repeating it under `role="img"` was a role promising a name it never
+  had, not a missing label needing one. Checked the one place the word's
+  container hides (`.cocktail-meta-ship` in "make it" mode,
+  `_sass/cocktails/_print.scss`'s `display: revert` list) and it hides the
+  icon with it — the icon is never left to speak alone. So: `aria-hidden="true"
+  focusable="false"` added, `role="img"` kept rather than dropped, matching
+  the exact attribute set every glass icon in `_includes/icons/glasses/`
+  already carries (§9.13 above). No test named `ship-icon` or `role="img"`
+  existed to update — grepped `tests/` for both and found nothing scoped to
+  this icon.
+
+  Verified: `node --test` (704/704 green, unrelated to any of this); `python3
+  -m pytest tests/test_rendered_pages.py -q` — one pre-existing, unrelated
+  failure (`test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`,
+  two cross-recipe links to recipe slugs that do not exist,
+  `_food_recipes/roast-beef-fillet.md` and `_food_recipes/lemon-feather-sponge.md`,
+  last touched 2026-08-21 — confirmed pre-existing and out of scope for this
+  review, not a design or accessibility question).

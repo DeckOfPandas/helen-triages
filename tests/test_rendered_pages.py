@@ -1179,6 +1179,39 @@ LAYOUT_PROPERTIES = (
 )
 
 
+def _selects_a_chosen_button(selector: str, buttons: tuple[str, ...],
+                             chosen: str) -> bool:
+    """Does ONE selector (no commas) target a filter button in its chosen state?
+
+    Both classes anywhere in the selector, in either order, outside any `:not()`.
+    All three of those conditions were learned from a rule that slipped past a
+    pattern, so none of them is defensive tidiness.
+
+    ORDER, BECAUSE @extend WRITES IT BACKWARDS. This was `\\.btn-x[^,{]*\\.active`
+    for six weeks and that reads correctly on food, where every active rule is
+    authored as `.category--star .btn-star.active` and Sass emits it unchanged.
+    Cocktails writes the same idea as `&.is-on` nested in a PLACEHOLDER, so the
+    compiled selector is the extender substituted into the placeholder's
+    position -- `.is-on.btn-chaos`, chosen class FIRST. A pattern that assumes
+    an order silently skipped the one rule that carries the whole active state
+    (2026-09-15, #1086, found by printing what the scan actually matched rather
+    than trusting that it matched something -- three per-section `background`
+    rules did match, so the scan was green and looked alive).
+
+    `:not()`, BECAUSE `.btn-mood:hover:not(.is-on)` IS THE OPPOSITE RULE. It
+    contains both class names and means "a button that is NOT chosen" -- the
+    resting hover state. Scanning it would let a padding change on HOVER be
+    reported as an active-state offence, and worse, would count towards the
+    "did this scan match anything" assertion above.
+    """
+    bare = re.sub(r":not\([^()]*\)", "", selector)
+    if f".{chosen}" not in bare:
+        return False
+    # `(?![-\w])` so `.btn-tag` does not match `.btn-tag-thing`.
+    return any(re.search(r"\." + re.escape(b) + r"(?![-\w])", bare)
+               for b in buttons)
+
+
 def test_no_active_filter_button_changes_its_own_width(site):
     """Selecting a filter must not resize it. Issue #389.
 
@@ -1203,35 +1236,57 @@ def test_no_active_filter_button_changes_its_own_width(site):
     -webkit-text-stroke is deliberately NOT on the list: it paints outside the
     glyph and occupies no space, which is exactly why it is the right lever for
     a selected state and why it survived the fix (§13.4.2).
+
+    BOTH SITES SINCE 2026-09-15, #1086, AND THAT IS THE SAME LESSON ONE LEVEL
+    UP. This read food.css alone for six weeks, because that is where #389
+    happened -- so cocktails' own chips were held to the rule by whoever
+    remembered it, which for a while was `_sass/cocktails/_cocktail.scss`
+    writing "this guard does not reach this selector, so this is enforced by
+    construction here" in a comment. A rule enforced by a comment is a rule
+    that will be broken by the next person who does not read it. The trigger
+    was Helen choosing a filled block for a chosen cocktail chip: the moment
+    the two sites' active states were being brought into line, the guard on one
+    of them was still site-specific. `.is-on` is cocktails' spelling of
+    `.active`; the property list and the reasoning are shared.
     """
-    css = (site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
-
-    # Rules whose selector says "a filter button in its selected state".
-    blocks = re.findall(r"([^{}]+)\{([^{}]*)\}", css)
-    active = [(sel.strip(), body) for sel, body in blocks
-              if re.search(r"\.btn-(?:tag|star|meta|ingredient|exclude)[^,{]*\.active", sel)]
-    assert active, (
-        "No active filter-button rules found in the compiled CSS. Either the "
-        "class naming changed or this pattern went stale -- and a scan that "
-        "matches nothing passes while checking nothing."
+    # (stylesheet, the filter-button classes, the class that means "chosen").
+    scans = (
+        ("food.css", ("btn-tag", "btn-star", "btn-meta",
+                      "btn-ingredient", "btn-exclude"), "active"),
+        ("cocktails.css", ("btn-mood", "btn-chaos"), "is-on"),
     )
 
-    offenders = []
-    for sel, body in active:
-        for decl in body.split(";"):
-            prop = decl.split(":")[0].strip().lower()
-            if prop in LAYOUT_PROPERTIES:
-                offenders.append(f"{sel} declares {decl.strip()}")
+    for stylesheet, buttons, chosen in scans:
+        css = (site / "assets" / "css" / stylesheet).read_text(encoding="utf-8")
 
-    assert not offenders, (
-        "Active filter-button rule(s) declare a property that changes the "
-        "button's size:\n  " + "\n  ".join(sorted(set(offenders)))
-        + "\n\nThe button grows or shrinks the moment it is selected, and every "
-          "button after it on the row moves (issue #389). A selected state may "
-          "change colour, .tag-shape fill and -webkit-text-stroke, none of "
-          "which occupies space. If a metric genuinely must change, change the "
-          "RESTING state to match so the two agree."
-    )
+        # Rules whose selector says "a filter button in its selected state".
+        blocks = re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+        active = [(sel.strip(), body) for sel, body in blocks
+                  if any(_selects_a_chosen_button(part, buttons, chosen)
+                         for part in sel.split(","))]
+        assert active, (
+            f"No active filter-button rules found in {stylesheet}. Either the "
+            f"class naming changed or this pattern went stale -- and a scan that "
+            f"matches nothing passes while checking nothing."
+        )
+
+        offenders = []
+        for sel, body in active:
+            for decl in body.split(";"):
+                prop = decl.split(":")[0].strip().lower()
+                if prop in LAYOUT_PROPERTIES:
+                    offenders.append(f"{sel} declares {decl.strip()}")
+
+        assert not offenders, (
+            f"Active filter-button rule(s) in {stylesheet} declare a property "
+            f"that changes the button's size:\n  " + "\n  ".join(sorted(set(offenders)))
+            + "\n\nThe button grows or shrinks the moment it is selected, and every "
+              "button after it on the row moves (issue #389). A selected state may "
+              "change colour, a fill (.tag-shape on food, `background` on "
+              "cocktails) and -webkit-text-stroke, none of which occupies space. "
+              "If a metric genuinely must change, change the RESTING state to "
+              "match so the two agree."
+        )
 
 
 # Properties that give a box vertical size of its own, i.e. that an EMPTY
@@ -1392,6 +1447,12 @@ EXPECTED_ROOT_FILES = {
     "robots.txt",
     "README.md",      # deliberately published; it is the repo's front page
     "LICENSE",
+    # The not-found page. GitHub Pages serves a root 404.html for any URL it
+    # cannot find, project sites included, so the file has to be HERE and not
+    # in a directory -- 404.html's own front matter says why. Added by the
+    # 2026-09-15 design review (#1086); before it, a stale bookmark got
+    # GitHub's own page with no way back to either site.
+    "404.html",
 }
 
 

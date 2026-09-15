@@ -42,6 +42,13 @@
 #               row -- the word and the arrow are the door now. The key and
 #               the artwork stay: the partial is still the site's mark, and
 #               test_site_nav_links_resolve_to_real_pages still asks for it.
+#   social_image
+#               this site's link-preview card (og:image), a PNG under
+#               assets/img/social/ rendered from the site's own wordmark by
+#               scripts/render_social_images.py -- 2026-09-15, #1086. Per site
+#               because the tape on the card says where you are. The [ ?? ]
+#               card for a page belonging to neither site is `social_image` in
+#               _config.yml.
 #   reference_links
 #               reference pages belonging to THIS site, rendered in the shared
 #               footer as a column headed by this site's own bracketed word. The
@@ -65,6 +72,7 @@ food:
   css: food
   home: /food/
   icon: food-cloche-heart
+  social_image: /assets/img/social/food.png
   # `search_placeholder` STOOD HERE FROM 2026-09-14 TO 2026-09-15 (#1024), the
   # index's own "recipe name..." repeated in the furniture line's box so the
   # two boxes read as one control. #1050 made that box a search for anything,
@@ -87,6 +95,7 @@ cocktails:
   css: cocktails
   home: /cocktails/
   icon: glass-martini
+  social_image: /assets/img/social/cocktails.png
   # THE DAY ARRIVED, 2026-09-06, issue #529 -- and it cost no template change,
   # which is what the note that used to sit here predicted. The footer's loop
   # already asked every site rather than food; this key is the whole of it, and

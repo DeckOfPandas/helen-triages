@@ -635,6 +635,46 @@ article.recipe a:not(.badge) {
   .recipe-main-title {
     max-width: 100%;
   }
+
+  // STACK THE THREE METADATA BOXES ON A PHONE -- design review #1086, from
+  // Helen directly (2026-09-15): "I'd like to try stacking the three
+  // metadata boxes on a phone, avoiding the jar in length differences, but
+  // also allowing more space for any 'cook' line." Side by side at this
+  // width, SERVES/PREP hold one word each while COOK's "but check internal
+  // temperatures chart" hedge (added by the layout, see recipe.html) wraps
+  // eight lines tall in a column no wider than the other two, and the three
+  // cells sit at wildly different heights. One column gives every cell the
+  // full width for its own text, so COOK gets the room it actually needs.
+  // Desktop and tablet (above 600px) keep the three-column grid untouched.
+  .recipe-meta {
+    grid-template-columns: 1fr;
+
+    li {
+      border-right: none;
+      border-bottom: 1px solid $color-border;
+
+      &:last-child { border-bottom: none; }
+    }
+  }
+}
+
+// A NARROWER PHONE STEPS THE TITLE DOWN A SIZE AND TIGHTENS ITS LEADING --
+// design review #1086. Below 400px (where a 390/360px phone lands but a
+// 600px tablet does not) a title like PINEAPPLE AND GINGER SPATCHCOCK
+// CHICKEN wraps to several lines of display caps at the inherited 1.6
+// line-height, and each line reads as its own island rather than one title.
+// One step down the site's size rhythm (2.2rem, matching .recipe-section-
+// heading's 1.8rem step below it, without dropping to that size and losing
+// the h1-bigger-than-any-h2 rule the 2.2rem comment above states) plus a
+// tighter ~1.1 line-height for a display size closes the gaps between lines
+// without touching the desktop/tablet size. `assets/js/last-line-rule.js`
+// re-measures the rendered element on every load, so the double rule (13.1)
+// keeps finding the true last line at this size with no change of its own.
+@media (max-width: 400px) {
+  .recipe-title-text {
+    font-size: 1.9rem;
+    line-height: 1.1;
+  }
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------

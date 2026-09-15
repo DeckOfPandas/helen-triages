@@ -176,7 +176,7 @@ four days, so they were dropped on 2026-09-06 — grep the selector.
 
 | element | file | size | tier |
 |---|---|---|---|
-| `.site-logo-top` (HELEN TRIAGES) | `_sass/shared/_layout.scss` | 2rem | **display** |
+| `.site-logo-top` (HELEN TRIAGES) | `_sass/shared/_layout.scss` | 2rem, two thirds of that below 600px † | **display** |
 | `h1, h2, h3` (unstyled fallback) | `_sass/shared/_base.scss` | browser default (≥1rem) | heading |
 | `.recipe-title-text` | `_sass/food/_recipe-header.scss` | 2.2rem | display (offset-lg) — Helen, later the same day: "recipe title goes hard like the wordmark" |
 | `.recipe-section-heading` | `_sass/food/_recipe-header.scss` | 1.8rem | heading (offset-lg) |
@@ -193,6 +193,17 @@ four days, so they were dropped on 2026-09-06 — grep the selector.
 | `.recipe-group-heading` | `_sass/food/_recipe-notes-body.scss` | 1rem | heading — boundary case |
 | `.about-faq-item h3` (FAQ question) | `_sass/food/_about.scss` | 0.85rem | label |
 | `.cocktail-section-heading` (INGREDIENTS/METHOD/NOTES — the drink page) | `_sass/cocktails/_cocktail.scss` | 1.5rem (1.35rem until 2026-09-05, MANUAL §9.13) | heading |
+
+† **The one size in this table that varies by viewport**, as of 2026-09-15
+(#1086, Helen: *"B: mark at two thirds"*). Below 600px the whole wordmark
+lockup — HELEN TRIAGES, the bracketed word's ceiling, and the tape's height
+and lift — is multiplied by `$wordmark-phone-scale`, so `.site-logo-top`
+renders at 1.33rem on a phone. Every other row here is one size at every
+width; checked, not assumed. **The TIER does not change with it** — display is
+display at any size, which is the whole point of the tiers being ratios
+(§2) rather than pixel values. And the shrink is a `font-size`, never a
+`transform: scale()`: the wordmark's grid sizes itself off the rows' natural
+widths (MANUAL §13.8), and a transform reports the unscaled box.
 
 ### 5.1 The four boundary cases
 

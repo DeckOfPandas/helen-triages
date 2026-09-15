@@ -92,13 +92,28 @@
   padding: 0 0 3px 0;
   margin: 0;
   color: $color-text;
-  outline: none;
   // A `type="search"` input draws its own clear mark and rounded corners in
   // some browsers; this is a hairline box, not a widget.
   -webkit-appearance: none;
   appearance: none;
 
   &:focus { border-bottom-color: lighten($color-clear-text, 5%); }
+
+  // WAS `outline: none` ON THE RULE ABOVE, WITH ONLY THE UNDERLINE
+  // LIGHTENING A FEW SHADES ON `:focus` -- ISSUE #1086, found by eye in the
+  // design review (axe-core's own ruleset has no automated check for
+  // focus-ring visibility). This is shared chrome
+  // (_sass/shared/, used on both sites -- §2.5), so it names no section hue
+  // and no site-specific accent; it takes $color-accent, the one colour
+  // every palette owes for exactly this ("this is interactive"), same as
+  // the header nav icons in _chrome.scss. `:focus-visible`, not `:focus`,
+  // so a mouse click does not draw a ring a pointer user never asked for --
+  // the existing `:focus` underline-lighten above still covers that case.
+  // 2px, offset 2px; nothing here touches size, border or padding.
+  &:focus-visible {
+    outline: 2px solid $color-accent;
+    outline-offset: 2px;
+  }
   &::placeholder { @include index-search-placeholder; }
   // THE PLACEHOLDER GOES ON FOCUS, NOT ON THE FIRST KEYSTROKE -- Helen,
   // 2026-09-15: "both sites, remove placeholder on click." The cocktails index
@@ -228,6 +243,29 @@
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: $space-sm 1.4rem;
+}
+
+// BELOW 600px THE ROW BECOMES TWO PAIRS, NOT A FOUR-WIDE LINE THAT DROPS ONE
+// CONTROL ALONE. Design review #1086 (issue #1058 is the separate, still-open
+// question of matching the two sites' styling for this row -- this only fixes
+// the wrap). At 390/360px the four labels' natural widths no longer fit
+// `flex-wrap`'s single line, so it breaks after PRINT and strands PDF by
+// itself on its own right-aligned line. A two-column grid keeps the DOM order
+// (shortlist, see shortlist, print, pdf) but always lays it out as two rows of
+// two: `max-content` columns size each to its own widest occupant rather than
+// an even split, so SEE SHORTLIST (N) does not crowd PDF's narrower column,
+// and `justify-items: end` / `justify-content: end` keeps every control's
+// right edge where `flex-end` already had it -- the same resting position,
+// just two rows instead of one.
+@media (max-width: 600px) {
+  .page-actions {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: end;
+    justify-items: end;
+    row-gap: $space-sm;
+    column-gap: 1.4rem;
+  }
 }
 
 .btn-see-shortlist,

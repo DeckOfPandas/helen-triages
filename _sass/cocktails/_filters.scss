@@ -521,25 +521,62 @@
   // and Helen chose the version where "a chosen filter word underlines in
   // its own section's colour" from the candidates page: "I'm in love with
   // the top!" See _palette.scss's heading bars for the whole rule.
+  // A FILLED BLOCK IN THE SECTION'S HUE, NOT A BAND UNDER THE WORD -- #1086,
+  // 2026-09-15. Helen, picking B from the cocktail-filter candidates page:
+  // "B: filled block". The band (text-decoration: underline at 0.22em, the whole
+  // paragraph above) was A, and it is what she had chosen in #548 when the
+  // alternative on offer was an inset shadow that painted the padding box. The
+  // question this round was a different one -- food's chips and cocktails' had
+  // arrived at two different answers for the same state -- and she looked at
+  // both sites side by side and took food's.
+  //
+  // WHICH IS WHY THE FILL IS THE PADDING BOX AND THAT IS NOW CORRECT. #548's
+  // objection to a box-shadow was that "the band ran the full hit area" when it
+  // was meant to hug the word; a BLOCK is supposed to run the full hit area,
+  // because the thing being drawn is the target, not an underline. The 0.75rem
+  // of horizontal padding stops being a defect and becomes the block's margin.
+  //
+  // FOOD'S THREE PROPERTIES, EXACTLY (see %btn-active-base's consumers in
+  // _sass/food/_category-labels.scss): the fill carries the section hue, the
+  // letter goes to the PAGE'S OWN GROUND so it reads as punched out of the
+  // block, and the faux-bold stroke flips to the letter's own colour with it.
+  // On food that ground is near-white paper and the letter is near-black; here
+  // the site is inverted, so $color-bg is the near-black and the letter is dark
+  // on a bright fill -- the same relationship, not the same hex.
+  //
+  // NOTHING HERE CHANGES THE BOX (§13.4.2, #389). Colour, background, a stroke
+  // that paints outside the glyph, and the removal of a decoration that never
+  // occupied space either: an active chip measures exactly what it measured at
+  // rest, so the chips to its right do not move when it is clicked.
+  // `test_no_active_filter_button_changes_its_own_width` reads this file's
+  // compiled CSS as well as food's, as of the same day -- it used to read
+  // food.css alone, which is how two sites' active states came to disagree
+  // without anything noticing.
+  //
+  // `text-shadow: none` IS FOOD'S TOO, and it is a statement rather than a
+  // no-op: these buttons carry no punched treatment today, and 13.4.1's rule is
+  // that the punched treatment means "landmark". A chosen answer under a
+  // heading is not a landmark, so if the tiers ever reach a button this says
+  // what should happen.
   &.is-on {
-    color: $color-text;
-    -webkit-text-stroke: 0.05em $color-text;
-    text-decoration: underline;
-    text-decoration-thickness: 0.22em;
-    text-underline-offset: 0.18em;
-    text-decoration-skip-ink: none;
+    color: $color-bg;
+    -webkit-text-stroke: 0.05em $color-bg;
+    text-decoration: none;
+    text-shadow: none;
   }
 }
 
 .btn-mood  { @extend %drink-btn-naked; }
 .btn-chaos { @extend %drink-btn-naked; }
 
-// A chosen word wears the bar of the heading it answers -- the same variable,
+// A chosen word wears the hue of the heading it answers -- the same variable,
 // so the two cannot drift. HASSLE's buttons carry .btn-mood (shared
 // behaviour, one set), which is why the section wrapper is what selects.
-.drink-filter--chaos  .btn-chaos.is-on { text-decoration-color: $color-heading-yolo; }
-.drink-filter--mood   .btn-mood.is-on  { text-decoration-color: $color-heading-mood; }
-.drink-filter--hassle .btn-mood.is-on  { text-decoration-color: $color-heading-hassle; }
+// These were `text-decoration-color` until 2026-09-15; the hue's JOB changed
+// from colouring a band to filling a block, and the three variables did not.
+.drink-filter--chaos  .btn-chaos.is-on { background: $color-heading-yolo; }
+.drink-filter--mood   .btn-mood.is-on  { background: $color-heading-mood; }
+.drink-filter--hassle .btn-mood.is-on  { background: $color-heading-hassle; }
 
 // BIGGER, WHITE, AND HOVERING TO MAGENTA — Helen's settings, 2026-09-02.
 //
@@ -1105,11 +1142,20 @@
 // shadow has to keep reaching the glyphs and stop reaching the mark, and a
 // background is not a text decoration, so it simply is not painted.
 //
-// 0.22em MATCHES `.btn-mood.is-on`'s band exactly, which is the "nice and
-// bright" she is pointing at, and it is thicker than the 0.2em underline this
+// 0.22em WAS `.btn-mood.is-on`'s band exactly -- that band was the "nice and
+// bright" she was pointing at -- and it is thicker than the 0.2em underline this
 // replaces. Drawn from the bottom of the line box rather than offset from the
 // baseline, because a background has no baseline to offset from -- if it ever
 // reads a shade low or high, that one length is the dial.
+//
+// THE BAND IT WAS MATCHED TO IS GONE, 2026-09-15 (#1086): Helen chose a filled
+// block for a chosen chip, so `.btn-mood.is-on` no longer draws an underline of
+// any thickness. 0.22em STAYS, and this note is why rather than a leftover. It
+// was arrived at by matching, but what she approved was the mark on this title
+// at this size; the chip was the route to the number, not a constraint on it.
+// There is nothing left to keep it in step with, so it is now simply this mark's
+// own thickness -- and the next person to change it owes an eye on this title,
+// not a comparison with a chip.
 //
 // -deep RATHER THAN THE BARE HUE, and this is the half "bright" actually turns
 // on. Bare ultraviolet is 3.52:1 on this ground where the magenta it is being
