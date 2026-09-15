@@ -1,5 +1,5 @@
 #!/bin/sh
-# Read the GitHub REST API as DeckOfPandas-agentic: GET only, the three repos only.
+# Read the GitHub REST API as DeckOfPandas-agentic-claude: GET only, the three repos only.
 #
 # WHY THIS EXISTS (2026-09-11). Helen: "Please work out how to run sh commands in
 # a way that can be statically analysed, so things remain safe without

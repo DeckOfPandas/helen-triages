@@ -1,5 +1,5 @@
 #!/bin/sh
-# Run `gh` as DeckOfPandas-agentic, without naming the credential at the call site.
+# Run `gh` as DeckOfPandas-agentic-claude, without naming the credential at the call site.
 #
 # WHY THIS EXISTS (2026-09-10, Helen's call). The sanctioned shape for gh was
 # `GH_TOKEN="$AGENT_GH_TOKEN" gh ...` -- an environment assignment, which passes

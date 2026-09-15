@@ -4046,6 +4046,70 @@ unless stated.
     a PR by hand under her own name; the appeal to GitHub Support is the
     account owner's, not a session's.
 
+- **2026-09-15 — what the flag looked like a day later, a new agent account,
+  and the writes get a wrapper.**
+  - **A flagged account's issues drop out of LISTINGS, even for that account,
+    but a GET by number still returns them.** Rebuilding the backlog, `GET
+    .../issues?state=all` returned none of `DeckOfPandas-agentic`'s issues
+    (the day before, the same account's API had listed them normally), while
+    `GET .../issues/984` returned #984 open. `GET .../pulls` still listed the
+    account's PRs. So a number missing from the issue listing and absent from
+    the PR listing is a hidden issue, and that is how the invisible backlog was
+    reconstructed. **And probing numbers one by one hit the REST rate limit at
+    about 200 calls**, across a token other sessions share: pace any sweep (a
+    few seconds per call) and stop at the first 403.
+  - **Helen made a new account, `DeckOfPandas-agentic-claude`**, a collaborator
+    on all three repos, with its token under the same `AGENT_GH_TOKEN` name.
+    Its first PR (#1081) came back authored by `DeckOfPandas` — the token in
+    the variable was hers until she corrected it — which is the reason to read
+    `.user.login` off every PR a session opens rather than assume. From then
+    on #65 on the cocktails repo, #1083 here and a comment on #1064 all
+    reported the new login, and the profile and #1083 returned 200 logged out.
+    **Renamed wherever the name means "the account in use now"**, at Helen's
+    request the same day: the credential helper's `username=`, the five git
+    and `gh` wrappers' headers, `.devcontainer/run.sh`, and `CLAUDE.md`'s
+    present-tense lines. Dated history — here, the spam bullet's story, the
+    retired embedded-URL example — keeps `DeckOfPandas-agentic`, because that
+    account is what did those things. Nothing was load-bearing (GitHub
+    authenticates the token, not the helper's `username=`), which is why a
+    wrong name would never have announced itself.
+  - **`scripts/gh-write.sh` and `scripts/github-public-status.sh`, on Helen's
+    word:** *"When you want to run commands that build paths at runtime,
+    please find a way into scripts that can be statically analysed so
+    read/write scope can be checked without asking me."* The session had
+    opened PRs, commented and patched a PR body through `sh
+    scripts/gh-agent.sh api -X ... -F body=@tmp/...`, and checked visibility
+    with `curl -o /dev/null`; each asked her. `@tmp/...` is a read gh performs
+    at run time and `-o` a write curl does, neither visible to the checker, and
+    `api` is also the door to a merge — so no allow rule could ever have
+    covered them. The wrappers take only the arguments they understand (three
+    writes; a body under `tmp/`; base `main`; the three repos; a status for our
+    own pages), and `tests/test_agent_wrappers.py` proves what they refuse.
+    This is the 2026-09-11 `gh-read.sh` ruling applied to writes, and
+    `CLAUDE.md`'s allow-rules bullet now states it as the general rule.
+  - **The tracker tidy, closed by trailer on Helen's word** (*"Please commit
+    something with those closes trailers you list"*), each checked against
+    `main` or the drafts before it was listed:
+    - hidden, stale: **#904** (units line in production — done by `06fe3f5`,
+      #1001), **#926** (Blue Hawaiian's stray notes — the draft now carries a
+      real `Sugar baby` note), **#984** (the seven-drink ingest — merged as
+      cocktails-private #60 and #63; Helen tracks what is left in #1072),
+      **#1048** (calculate a top-up's ml — the same issue as her #1076, which
+      stays open).
+    - visible, done: **#1065** and **#1066** (peach schnapps and cream — her
+      re-raises of hidden #1013 and #1014, both fixed by `bbdc142`), **#752**
+      (the Ti' Punch pours 60 ml with lime and sugar `to taste`, her ruling
+      applied in the drafts), **#1024** (the search box — built by #1050;
+      Helen commented *"Complete"*).
+    By the time of the commit the four hidden ones returned 404 to the NEW
+    account too — only the flagged account could see its own issues, and its
+    token is gone — so whether a trailer closes a hidden issue could not be
+    checked by anything a session holds. Still open and still real, with no
+    visible home: **#930** (a new list in `ingredients.yml` declares generics
+    unless someone remembers otherwise) and **#933** (the proofread baseline
+    wants a shape that is not a constant); **#1009**'s substance lives on as a
+    comment on #1064.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not

@@ -217,6 +217,136 @@ def test_git_clone_agent_clones_one_of_the_three(args):
     assert lines[lines.index(url) + 1:] == args[1:]
 
 
+# --- gh-write.sh: three REST writes, the body always a file under tmp/ --------
+#
+# Helen, 2026-09-15: "When you want to run commands that build paths at
+# runtime, please find a way into scripts that can be statically analysed so
+# read/write scope can be checked without asking me." The `api -X` calls this
+# replaces could never be allow-listed: `api` is also the door to a merge.
+
+BODY = "tmp/test-agent-wrappers-body.md"
+
+
+@pytest.fixture
+def body_file():
+    path = ROOT / BODY
+    path.parent.mkdir(exist_ok=True)
+    path.write_text("a body\n", encoding="utf-8")
+    yield BODY
+    path.unlink()
+
+
+@pytest.mark.parametrize("args", [
+    [],
+    ["merge", "helen-triages", "1"],
+    ["review", "helen-triages", "1", BODY],
+    ["close", "helen-triages", "1"],
+    ["api", "-X", "PUT", "repos/DeckOfPandas/helen-triages/pulls/1/merge"],
+    # a PR from main, or onto anything but main
+    ["pr-create", "helen-triages", "main", "t", BODY],
+    ["pr-create", "helen-triages", "refs/heads/main", "t", BODY],
+    ["pr-create", "helen-triages", "someone:feature", "t", BODY],
+    ["pr-create", "helen-triages", "--base=other", "t", BODY],
+    ["pr-create", "helen-triages", "feat/../main", "t", BODY],
+    ["pr-create", "helen-triages", "feature", "", BODY],
+    ["pr-create", "helen-triages", "feature", "t", BODY, "--base", "other"],
+    ["pr-create", "helen-triages", "feature", "t"],
+    # other repositories
+    ["pr-create", "some-other-repo", "feature", "t", BODY],
+    ["comment", "DeckOfPandas/helen-triages", "1", BODY],
+    ["comment", "helen-triages-lookalike", "1", BODY],
+    # bodies from anywhere but a plain file under tmp/
+    ["comment", "helen-triages", "1", "/etc/passwd"],
+    ["comment", "helen-triages", "1", "tmp/../CLAUDE.md"],
+    ["comment", "helen-triages", "1", "tmp/does-not-exist.md"],
+    ["comment", "helen-triages", "1", "CLAUDE.md"],
+    ["comment", "helen-triages", "1", "@tmp/x.md"],
+    # numbers that are not numbers
+    ["comment", "helen-triages", "1/merge", BODY],
+    ["pr-body", "helen-triages", "-1", BODY],
+    ["pr-body", "helen-triages", "", BODY],
+    ["pr-body", "helen-triages", "1", BODY, "-f", "state=closed"],
+])
+def test_gh_write_refuses_everything_but_its_three_writes(body_file, args):
+    _assert_refused("gh-write.sh", args)
+
+
+def test_gh_write_refuses_a_symlinked_body(body_file):
+    link = ROOT / "tmp" / "test-agent-wrappers-link.md"
+    link.symlink_to(ROOT / "CLAUDE.md")
+    try:
+        _assert_refused("gh-write.sh",
+                        ["comment", "helen-triages", "1", "tmp/test-agent-wrappers-link.md"])
+    finally:
+        link.unlink()
+
+
+def _gh_write_lines(args):
+    lines = _accepted_lines("gh-write.sh", args)
+    assert lines[0] == "sh" and lines[1].endswith("/scripts/gh-agent.sh"), (
+        "gh-write.sh must go through gh-agent.sh, so the token's name stays in "
+        f"one file; it ran {lines[:2]!r}"
+    )
+    return lines[2:]
+
+
+def test_gh_write_opens_a_pr_onto_main(body_file):
+    lines = _gh_write_lines(
+        ["pr-create", "helen-triages-cocktails-private", "data/x", "(data) a title", BODY])
+    assert lines[:3] == ["api", "--method", "POST"]
+    assert lines[3] == "repos/DeckOfPandas/helen-triages-cocktails-private/pulls"
+    assert "base=main" in lines and "head=data/x" in lines
+    assert "title=(data) a title" in lines
+    assert f"body=@{BODY}" in lines
+
+
+def test_gh_write_replaces_a_pr_body_and_nothing_else(body_file):
+    lines = _gh_write_lines(["pr-body", "helen-triages", "1081", BODY])
+    assert lines[:4] == ["api", "--method", "PATCH", "repos/DeckOfPandas/helen-triages/pulls/1081"]
+    fields = [lines[i + 1] for i, line in enumerate(lines) if line in ("-f", "-F")]
+    assert fields == [f"body=@{BODY}"], f"a pr-body call sets only the body, not {fields!r}"
+
+
+def test_gh_write_comments_on_an_issue_or_pr(body_file):
+    lines = _gh_write_lines(["comment", "helen-triages", "1064", BODY])
+    assert lines[:4] == ["api", "--method", "POST",
+                         "repos/DeckOfPandas/helen-triages/issues/1064/comments"]
+    fields = [lines[i + 1] for i, line in enumerate(lines) if line in ("-f", "-F")]
+    assert fields == [f"body=@{BODY}"]
+
+
+# --- github-public-status.sh: logged-out status of our own pages only ---------
+
+@pytest.mark.parametrize("args", [
+    [],
+    ["https://example.com/"],
+    ["http://github.com/DeckOfPandas/helen-triages"],
+    ["https://github.com/someone-else/repo"],
+    ["https://github.com/DeckOfPandasX/repo"],
+    ["https://github.com/DeckOfPandas@example.com/"],
+    ["https://github.com/DeckOfPandas/../someone-else"],
+    ["https://github.com/DeckOfPandas/helen-triages", "--output", "tmp/x"],
+    ["https://github.com/DeckOfPandas/helen-triages;id"],
+    ["-K", "tmp/config"],
+])
+def test_github_public_status_refuses_other_urls_and_options(args):
+    _assert_refused("github-public-status.sh", args)
+
+
+@pytest.mark.parametrize("url", [
+    "https://github.com/DeckOfPandas/helen-triages/pull/1083",
+    "https://github.com/DeckOfPandas-agentic-claude",
+    "https://github.com/DeckOfPandas/helen-triages/issues/1064#issuecomment-5679508121",
+])
+def test_github_public_status_asks_for_a_status_and_nothing_else(url):
+    lines = _accepted_lines("github-public-status.sh", [url])
+    assert lines[0] == "curl"
+    assert lines[-1] == url
+    assert "--proto" in lines and "=https" in lines
+    assert not any(line in ("-L", "--location", "-H", "--header", "-u", "--user")
+                   for line in lines), f"a logged-out status check sent more: {lines!r}"
+
+
 # --- guard-token-expansion.py: gh's jq can read the environment ---------------
 
 def _hook_denies(command: str) -> bool:
@@ -295,6 +425,8 @@ REVIEWED_OPEN_RULES = {
     "Bash(sh scripts/gh-agent.sh pr comment *)",
     "Bash(sh scripts/gh-agent.sh repo clone *)",
     "Bash(sh scripts/gh-read.sh *)",
+    "Bash(sh scripts/gh-write.sh *)",
+    "Bash(sh scripts/github-public-status.sh *)",
     "Bash(sh scripts/git-push-agent.sh *)",
     "Bash(sh scripts/git-fetch-agent.sh *)",
     "Bash(sh scripts/git-clone-agent.sh *)",

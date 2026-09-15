@@ -1,5 +1,5 @@
 #!/bin/sh
-# Clone one of the three repos as DeckOfPandas-agentic over HTTPS, without
+# Clone one of the three repos as DeckOfPandas-agentic-claude over HTTPS, without
 # naming the credential at the call site, and without the credential ever
 # being in the URL git stores.
 #
