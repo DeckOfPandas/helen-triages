@@ -157,6 +157,17 @@ function boot(options) {
   controls.appendChild(el('div', 'category-buttons search-results', { id: 'ingredient-results-pool' }));
   doc.body.appendChild(controls);
 
+  // `id="results"` (#1050) and `id="filter-star"` (#1059) -- the two kinds of
+  // fragment a link on this site can end in: the count line above the list,
+  // and a filter section a badge names. Real food/index.html carries several
+  // more (`filter-mood`, `filter-practicalities`); one is enough to prove the
+  // startup block scrolls to WHATEVER `location.hash` names rather than only
+  // the literal string "results".
+  const results = el('div', 'results-heading', { id: 'results' });
+  doc.body.appendChild(results);
+  const starSection = el('div', 'category category--star', { id: 'filter-star' });
+  doc.body.appendChild(starSection);
+
   const list = el('ul', 'recipe-list');
   Object.keys(recipes).forEach((url) => {
     const li = el('li', '', {
@@ -196,14 +207,34 @@ function boot(options) {
   const win = {
     document: doc,
     localStorage: createStorage(),
+    // sessionStorage too, since #387/#1057's back-navigation memory
+    // (HTF.indexMemory in assets.js) reads and writes it -- every call is
+    // wrapped in try/catch there and treats a missing sessionStorage as "carry
+    // on as a fresh load", so leaving this out would make a real back
+    // navigation untestable here without failing loudly anywhere.
+    sessionStorage: createStorage(),
     console: { warn() {}, error() {}, log() {} },
     setTimeout, clearTimeout,
-    location: { search: (options && options.search) || '', pathname: '/food/', hash: '' },
+    location: {
+      search: (options && options.search) || '',
+      pathname: '/food/',
+      hash: (options && options.hash) || ''
+    },
     history: { replaceState() {}, pushState() {} },
-    performance: { getEntriesByType: () => [], navigation: { type: 0 } },
+    // `options.backForward` -- #387/#1057, 2026-09-15. FilterState.arrivedByGoingBack
+    // reads exactly this entry; a test that wants to prove the fragment scroll
+    // is SKIPPED on a genuine back navigation (rather than merely on every
+    // load, which would be the bug this generalisation could have introduced)
+    // needs to be able to say so was true.
+    performance: {
+      getEntriesByType: () => (options && options.backForward
+        ? [{ type: 'back_forward' }] : []),
+      navigation: { type: 0 }
+    },
     matchMedia: () => ({ matches: false, addEventListener() {} }),
     requestAnimationFrame: (fn) => fn(),
-    scrollTo() {},
+    __scrollToCalls: [],
+    scrollTo(...args) { this.__scrollToCalls.push(args); },
     CustomEvent: class {
       constructor(type, options) { this.type = type; Object.assign(this, options || {}); }
     },
@@ -218,10 +249,20 @@ function boot(options) {
       context, { filename: name });
   });
 
+  // A hook between the scripts loading (so win.HTF exists) and
+  // DOMContentLoaded firing (so nothing has read location/sessionStorage
+  // yet) -- #387/#1057. Its one caller today seeds a valid HTF.indexMemory
+  // record to prove the fragment scroll is skipped on a genuine restore, the
+  // same way `options.recipes` above lets a test replace the ingredients
+  // blob before anything reads it.
+  if (options && typeof options.beforeStart === 'function') {
+    options.beforeStart(win, doc);
+  }
+
   // filters.js is one big DOMContentLoaded handler; nothing above has run yet.
   doc.dispatch('DOMContentLoaded');
 
-  return { doc, win, panel, list };
+  return { doc, win, panel, list, results, starSection };
 }
 
 const aislesHtml = (panel) => panel.querySelector('.shopping-list-aisles').innerHTML;
@@ -773,6 +814,68 @@ test('#1050: an ingredient nothing names leaves the picker in a plain search', (
   assert.strictEqual(doc.getElementById('ingredient-search-box').value, 'quince');
   assert.strictEqual(visibleRows(list).length, 3,
     'nothing was chosen, so nothing should be narrowing the list.');
+});
+
+// --- arriving at a fragment, #1057 and #1059 ------------------------------------
+// The search dropdown's own `#results` landing (#1050) already had no test at
+// this level; these are the first, and they cover the WIDENING rather than
+// only the original case -- any element id named by `location.hash`, not only
+// "results" -- since that generalisation is what #1057 (the see-shortlist
+// link) and #1059 (a badge's own filter-section fragment) both rely on.
+
+test('#1050/#1057: arriving at #results scrolls the count line into view', () => {
+  const { results } = boot({ hash: '#results' });
+  assert.strictEqual(results._scrollCalls.length, 1,
+    'the startup block must scroll to location.hash again after the reveal, ' +
+    'the same landing a search result and "see shortlist" both rely on.');
+  // Not assert.deepStrictEqual: the options object was built inside the vm
+  // context filters.js runs in, so it has that realm's own Object.prototype
+  // and fails a STRICT structural compare despite being the same shape.
+  assert.strictEqual(results._scrollCalls[0].block, 'start');
+});
+
+test('#1059: arriving at a filter section\'s own fragment scrolls IT into view, not #results', () => {
+  const { starSection, results } = boot({ hash: '#filter-star' });
+  assert.strictEqual(starSection._scrollCalls.length, 1,
+    'a badge\'s own fragment (e.g. #filter-star) must be read generically off ' +
+    'location.hash, not hardcoded to "results".');
+  assert.strictEqual(results._scrollCalls, undefined,
+    'only the id location.hash actually names should be scrolled to.');
+});
+
+test('with no hash at all, nothing is scrolled', () => {
+  const { results, starSection } = boot();
+  assert.strictEqual(results._scrollCalls, undefined);
+  assert.strictEqual(starSection._scrollCalls, undefined);
+});
+
+test('#387: a genuine back navigation restores scroll instead, and skips the fragment scroll', () => {
+  // The remembered scroll (sessionStorage) is the truer answer on a back
+  // navigation than re-jumping to whatever fragment happens to still be in
+  // the URL -- restoreIndexMemory() only fires when
+  // performance.getEntriesByType('navigation')[0].type === 'back_forward'
+  // AND a valid record is there to restore, both arranged here exactly as
+  // saveIndexMemory() would have written them on the way out.
+  const { win, results } = boot({
+    hash: '#results',
+    backForward: true,
+    beforeStart(w) {
+      w.HTF.indexMemory.save('htf-index-memory-v1', {
+        order: Object.keys(RECIPES),
+        filters: w.HTF.filterState.serialise(w.HTF.filterState.emptyState()),
+        ingredientLabel: '',
+        page: 1,
+        showAll: false,
+        scrollY: 321
+      });
+    }
+  });
+  assert.strictEqual(win.__scrollToCalls[win.__scrollToCalls.length - 1][1], 321,
+    'the remembered scroll position must still be restored.');
+  assert.strictEqual(results._scrollCalls, undefined,
+    'a genuine back navigation must not ALSO jump to location.hash -- the ' +
+    'remembered scroll is the truer answer, same as before #1057/#1059 ' +
+    'widened this from "#results" to any fragment.');
 });
 
 // --- the list of scripts is the template's list --------------------------------

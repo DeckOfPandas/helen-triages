@@ -346,7 +346,11 @@ TRUSTED_DYNAMIC = (
     # checked the same way by test_site_nav_links_resolve_to_real_pages, with
     # `?shortlist=1` appended -- a query both indexes read (MANUAL 8.9), and a
     # query is not a path, so the target page is the home page either way.
-    re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1$"),
+    # `#results` since #1057 (2026-09-15): both indexes carry that id on the
+    # count line above their list (test_the_furniture_line_searches_for_anything
+    # in tests/test_site_config.py), so this is the same fragment #1050's
+    # search-dropdown links already end in, checked the same way.
+    re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1#results$"),
     # The footer's reference links, added 2026-08-16. Same shape and same
     # treatment as the three above: the value lives in _data/sites.yml, so this
     # scanner cannot read it out of the template, and
@@ -417,8 +421,17 @@ TRUSTED_DYNAMIC = (
     # matches no button in silence, which is food's own policy for `?tag=`.
     # There is nothing here for a link checker to resolve, and a stale mood is a
     # taxonomy question that tests/test_cocktails.py owns.
+    #
+    # `#filter-{{ chip }}` SINCE #1059 (2026-09-15) IS THE SAME KIND OF
+    # QUESTION, ONE LEVEL DOWN. `chip` is computed to "mood" or "hassle" a few
+    # lines above in the layout, and cocktails/index.html's own two section ids
+    # (test_filter_sections_carry_the_id_their_badges_and_chips_link_to in
+    # tests/test_site_config.py) are exactly those two words with `filter-`
+    # in front, so this scanner cannot trace the fragment but does not need to:
+    # the two possible values are both real ids on the target page, checked by
+    # that test rather than this one.
     re.compile(r"^\{\{\s*index_home\s*\|\s*relative_url\s*\}\}\?mood="
-               r"\{\{\s*m\s*\|\s*url_encode\s*\}\}$"),
+               r"\{\{\s*m\s*\|\s*url_encode\s*\}\}#filter-\{\{\s*chip\s*\}\}$"),
 )
 
 

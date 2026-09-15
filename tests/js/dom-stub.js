@@ -169,6 +169,19 @@ class Element {
     return null;
   }
 
+  // scrollIntoView -- #1057/#1059, 2026-09-15. Recorded rather than a no-op:
+  // filters.js and cocktail-index.js both feature-test
+  // `typeof el.scrollIntoView === 'function'` before calling it, so leaving
+  // this off entirely would make every arrival-scroll test pass by never
+  // running the code it means to exercise. `this._scrollCalls` is read back
+  // by the tests below rather than a return value, matching how the rest of
+  // this stub hands a test something to inspect (`style`, `dataset`) instead
+  // of instrumenting a spy framework this repo does not depend on.
+  scrollIntoView(opts) {
+    this._scrollCalls = this._scrollCalls || [];
+    this._scrollCalls.push(opts);
+  }
+
   // Everything below this element, document order.
   _descendants(out) {
     out = out || [];

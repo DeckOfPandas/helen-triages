@@ -24,6 +24,14 @@
   and gets `HTF.shortlist.count()`. The link is `?shortlist=1` on this site's
   index, which enters the shortlist view (MANUAL 8.9; food's half since #1011).
 
+  ENDS IN `#results` -- #1057, 2026-09-15. The shortlisted list is the count
+  line both indexes already carry that id on (#1050), so landing here is the
+  same landing a search-dropdown link gets: the index's own startup block
+  scrolls to `location.hash` again once the shortlisted-only view has
+  revealed, the same generalised scroll #1059 needed for a badge or chip's own
+  section fragment. Going back (#387) is untouched -- that restore skips the
+  hash scroll entirely, same as it already did for a search result.
+
   THE PDF PATH IS THE PAGE'S OWN URL WITH THE TRAILING SLASH SWAPPED FOR
   `.pdf`, which is exactly where scripts/generate_pdfs.py writes it -- beside
   the page's output directory -- for both collections. Gated on
@@ -38,7 +46,7 @@
           aria-pressed="false"
           hidden>shortlist</button>
   <a class="btn-see-shortlist"
-     href="{{ actions_site.home | relative_url }}?shortlist=1"
+     href="{{ actions_site.home | relative_url }}?shortlist=1#results"
      hidden>see shortlist (<span data-shortlist-total>0</span>)</a>
   <button type="button" class="btn-print" hidden>print</button>
   {% if site.pdf_downloads %}

@@ -1857,18 +1857,27 @@ function renderResultsPool() {
     window.scrollTo(0, restored.scrollY);
   }
 
-  /* ARRIVING FROM A SEARCH RESULT -- `#results`, #1050 (2026-09-15). The
-     dropdown on a recipe page ends every filtered link in this fragment, and
-     the count line above the list carries the id, so the browser has already
-     scrolled there once; this does it again AFTER the reveal, because the
-     native scroll happened against a page whose rows were all still in place
-     and whose fonts may not have been. Helen: "with the screen snapped to the
-     returned recipes (so don't have to scroll down)." Not on a back
-     navigation, where the remembered scroll is the truer answer. */
-  if (!restored && location.hash === '#results') {
-    var results = document.getElementById('results');
-    if (results && typeof results.scrollIntoView === 'function') {
-      results.scrollIntoView({ block: 'start' });
+  /* ARRIVING AT A FRAGMENT -- `#results`, #1050 (2026-09-15), widened to ANY
+     fragment for #1057/#1059 (2026-09-15). The search dropdown on a recipe
+     page ends every filtered link in `#results`, the count line above the
+     list; a badge or chip at the top of a recipe page ends its own link in
+     the id of the filter SECTION holding it (`#filter-star`, `#filter-mood`,
+     `#filter-practicalities` -- see recipe_badges.html) so the reader lands on
+     the lit chip rather than the top of the page; and the actions row's "see
+     shortlist" link (page-actions.html) ends in `#results` too, since the
+     shortlisted list is the same count line. All three need the same repeat
+     scroll: the browser has already jumped to the fragment once, against a
+     page whose rows were all still in place (or, for the shortlist view,
+     still showing the unfiltered list) and whose fonts may not have loaded;
+     this does it again AFTER the reveal, once the page has its real height.
+     Not on a back navigation, where the remembered scroll is the truer
+     answer. Reading the id off `location.hash` rather than naming `results`
+     specifically is what makes one block serve every fragment a link on this
+     site ends in, present or future, with no second copy of this comment. */
+  if (!restored && location.hash && location.hash.length > 1) {
+    var target = document.getElementById(location.hash.slice(1));
+    if (target && typeof target.scrollIntoView === 'function') {
+      target.scrollIntoView({ block: 'start' });
     }
   }
 
