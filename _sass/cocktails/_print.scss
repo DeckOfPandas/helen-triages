@@ -91,4 +91,152 @@
   .cocktail-scale,
   .cocktail-scale-note,
   .cocktail-scale-batch { display: none; }
+
+  // ---------------------------------------------------------------------
+  // COLOUR: DARK ON LIGHT. Design review #1086.
+  // ---------------------------------------------------------------------
+  // shared/_print.scss makes html and body transparent so paper stays white
+  // (see that file's own header) but names no colour -- it can only name the
+  // nine palette-contract variables, and none of them is an "ink for paper"
+  // value. On food that is fine, because food's page IS already dark ink on
+  // a light ground; nothing there needs to change for print. Cocktails
+  // inverted its whole palette for the screen (#469, "black on black"), so
+  // $color-text here is #e8e6e2 -- near-white -- and every explicit
+  // `color: $color-text` / `$color-clear-text` / accent-deep declaration on
+  // this page prints as pale grey-on-white or a washed-out tint, because
+  // each one was solved against a black card or a black page, never against
+  // paper. MEASURED, not assumed -- tmp/contrast.py, kept out of the repo
+  // proper because tmp/ is gitignored, the same note _palette.scss's own
+  // separation check leaves about its own tmp/ tools:
+  //
+  //   $color-ink on white:                1.25:1  (body text)
+  //   $color-clear-text on white:         2.97:1  (units, source, optional,
+  //                                                 the method numerals...)
+  //   mood/hassle chip hues on white:     2.89 / 3.11:1
+  //   ship (reposado) on white:           2.67:1
+  //   suggestion (woowoo) on white:       3.45:1
+  //   notes (lagoon) on white:            1.84:1
+  //   glass icon (absinthe) on white:     1.61:1
+  //
+  // all well under the 4.5:1 body-text floor MANUAL 9.13 sets.
+  //
+  // THE FIX IS A SECOND PALETTE FOR THIS ONE MEDIUM, scoped to `.cocktail`
+  // so it touches nothing on screen. Two of the seven values below are
+  // REUSED rather than invented: $print-ink is food's own $color-text
+  // (_sass/food/_palette.scss) and $print-ink-quiet is food's own
+  // $color-clear-text -- food already solved "near-black ink" and "a
+  // de-emphasised grey" for this exact ground, dark-on-light, and cocktails
+  // has no ink of its own to reach for, having inverted every value it had.
+  // The five accent hues have no food equivalent to borrow -- they are
+  // this site's own -- so each is darken()ed off its own rule colour by the
+  // smallest step that clears 4.5:1 on white, the same method
+  // food/_palette.scss's own $darken-active-lime already uses for the same
+  // reason ("how far to darken is a property of the hue, not of the
+  // section"). Found by search (tmp/darken_search.py) rather than picked by
+  // eye, with a percentage point or two of margin over the measured
+  // minimum:
+  //
+  //   $print-mood        darken(22%)   4.82:1
+  //   $print-hassle       darken(20%)  4.69:1
+  //   $print-ship          darken(18%) 5.02:1
+  //   $print-suggestion   darken( 8%)  4.75:1
+  //   $print-notes         darken(24%) 4.77:1
+  //   $print-glass          darken(26%) 4.69:1 (decorative line art, not
+  //                                              text, but solved to the
+  //                                              same bar so the drawing
+  //                                              reads rather than washes
+  //                                              out)
+  //
+  // THE NAME TAPE IS DELIBERATELY UNTOUCHED. `.cocktail-title` sits inside
+  // `.drink-card-tape-word`, which paints its own black band with light
+  // lettering (§9.13, "the card title sits on punched tape") -- it is
+  // artwork, the same as it is on the index and on a card, and printing it
+  // any other way would be redrawing the mark rather than fixing the bug.
+  $print-ink:        #211f20;  // = food's $color-text
+  $print-ink-quiet:  #4f4e4a;  // = food's $color-clear-text
+  $print-mood:        darken($color-banging-bellini, 22%);
+  $print-hassle:      darken($color-charismatic-cosmopolitan, 20%);
+  $print-ship:        darken($color-raucous-reposado, 18%);
+  $print-suggestion:  darken($color-wicked-woowoo, 8%);
+  $print-notes:       darken($color-luminous-lagoon, 24%);
+  $print-glass:       darken($color-electric-absinthe, 26%);
+
+  .cocktail {
+    color: $print-ink;
+
+    a { color: $print-ink; }
+
+    // Explicit $color-text on this page -- inheriting the override above
+    // does not reach these, because each already paints its own colour.
+    .cocktail-tagline,
+    .cocktail-amount {
+      color: $print-ink;
+    }
+
+    // Explicit $color-clear-text -- the de-emphasised ink used for the
+    // units line, the source and cost lines, an optional ingredient, the
+    // bottle's character aside, the "or" between alternatives, an
+    // ingredient or method-step note, and the GLASS/GARNISH/SHIP IT?
+    // labels and method numerals.
+    .cocktail-source,
+    .cocktail-cost,
+    .cocktail-units,
+    .cocktail-optional,
+    .cocktail-style-or,
+    .cocktail-character,
+    .cocktail-note,
+    .cocktail-meta dt,
+    .cocktail-method li::marker {
+      color: $print-ink-quiet;
+    }
+
+    .cocktail-glass-icon {
+      color: $print-glass;
+    }
+
+    // The mood chips -- reused from the index card, solved for a black
+    // card (_cards.scss: "coral is 6.66:1 on the page ground").
+    .drink-card-mood--mood { color: $print-mood; }
+    .drink-card-mood--hassle { color: $print-hassle; }
+
+    // The bottle suggestion in brackets, and the class line above it --
+    // both woowoo-deep.
+    .cocktail-suggestion,
+    .cocktail-type-line {
+      color: $print-suggestion;
+    }
+
+    // SHIP IT? -- the icon and the word's underline, both reposado.
+    .drink-card-ship-icon { color: $print-ship; }
+    .drink-card-ship-word { text-decoration-color: $print-ship; }
+
+    // A note card. $color-surface (#17171a) is near-black and paints
+    // opaque -- only html/body go transparent (shared/_print.scss) -- so
+    // dark ink on an unpainted note card would be invisible, not merely
+    // grey. Ground goes to paper; the border and the left accent, both
+    // lagoon, follow the label below.
+    .note {
+      background: $color-white;
+      border-left-color: $print-notes;
+    }
+    .note-label {
+      color: $print-notes;
+    }
+
+    // INGREDIENTS / METHOD / NOTES -- the punched heading lettering.
+    // shared/_rule.scss's tiers are computed off $color-text, solved once
+    // per site; cocktails/_rule.scss re-points them for light ink on a
+    // black ground (issue #469), which is the inverse problem from print's
+    // dark ink on white. Re-pointed again here, scoped to the section
+    // heading alone so the name tape's own lettering (a different custom
+    // property, read from a different element) is untouched. The formulas
+    // are shared/_rule.scss's own defaults -- "food's values are the
+    // dark-on-light set" -- run against $print-ink since that is this
+    // stylesheet's own ink rather than food's.
+    .cocktail-section-heading {
+      --lettering-heading-stroke-c: #{darken($print-ink, 5%)};
+      --lettering-heading-light:    #{lighten($print-ink, 65%)};
+      --lettering-heading-shadow:   #{rgba($print-ink, 0.16)};
+    }
+  }
 }
