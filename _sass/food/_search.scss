@@ -457,3 +457,10 @@
   -webkit-text-stroke: $faux-bold-stroke $color-text;
   .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
 }
+
+// FOCUS-VISIBLE RING, ISSUE #1086, same treatment as the MOOD/PRACTICALITIES
+// override in _category-labels.scss -- HAS TO HAVE's own section hue instead
+// of the $color-accent fallback .btn-tag gets in _buttons.scss.
+.search .btn-tag.btn-ingredient:focus-visible {
+  outline-color: $color-ingredient-root;
+}

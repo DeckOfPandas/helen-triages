@@ -5553,3 +5553,112 @@ verification. Dates are when the correction landed.
   360/390/1280 from a PRODUCTION build (`_config.yml` alone, which is also what
   proves the page publishes at all), plus before-and-after crops for each design
   change and the cocktails index footer showing the [ COCKTAILS ] column's link.
+
+- **2026-09-15, #1086 — THREE ACCESSIBILITY FINDINGS FROM A DESIGN REVIEW,
+  MEASURED WITH AXE-CORE RATHER THAN EYEBALLED.** A first run of axe-core
+  4.10.2 (WCAG 2A/2AA/2.1AA + best-practice tags) against `/food/`,
+  `/cocktails/`, `/food/recipes/caramel/` and
+  `/cocktails/recipes/cobras-fang/` found exactly two violation types, both
+  `serious`: `color-contrast` on `.site-footer-ref-word` (both sites) and
+  `svg-img-alt` on `.ship-icon` (every cocktails page it appears on,
+  including the drink-count legend). A separate pass by eye found a third,
+  which axe's ruleset does not check at all: three keyboard-`:focus-visible`
+  states on food that were either suppressed or too faint to register. After
+  all three fixes, the same axe run reports zero violations on all four
+  pages. `tmp/axe.js` (Playwright, `page.addScriptTag` to inject
+  `axe-core/axe.min.js`, then `axe.run`) is the harness; `tmp/contrast.py`
+  copies the luminance formula from `tests/test_rendered_pages.py`'s
+  `_luminance` (around line 1335) to check the footer word's ratio
+  independently of axe's own number.
+
+  **§13 — `.site-footer-ref-word` (§13.4.1's "footer's reference block" use
+  of brackets) was `opacity: 0.65` on `$color-clear-text`, which axe measured
+  at 3.27:1 on food (`#faf7f8` ground) and 3.38:1 on cocktails (`#0e0e10`
+  ground) — both under the 4.5:1 AA text minimum, and both measured
+  independently by `tmp/contrast.py` at 3.27:1 / 3.37:1 (the 0.01 gap from
+  axe is rounding in axe's own reported RGB, not a different number).
+  Opacity and Sass `mix()` compute the identical blended colour — diluting
+  toward the page ground either way — so the bug was never the mechanism, it
+  was the 65% weight: `tmp/contrast.py`'s binary search puts the quietest
+  passing weight at 79% on food and 80% on cocktails, right at the 4.5:1
+  edge either browser rounding could tip either way. Landed on 82% (one value
+  for both sites, since the rule is shared chrome): 4.90:1 on food, 4.71:1 on
+  cocktails, both with real margin, both still visibly lighter than the
+  full-strength `$color-clear-text` the footer's links rest at — so the word
+  stays quieter than the links, which is the whole point of the rule's own
+  comment. **The rule actually lives in `_sass/shared/_layout.scss`, not
+  `_chrome.scss`** — grepped to confirm there is exactly one definition;
+  `_chrome.scss`'s own header says "if `_layouts/default.html` emits the
+  class, its colour belongs in this file", and the footer partial that
+  actually holds `.site-footer`, `.site-footer-top` and this rule together is
+  `_layout.scss`, so that is where the fix went. No new hex: `mix($color-clear-text,
+  $color-bg, 82%)`, both palette-contract variables.
+
+  Same review, same section: three `:focus-visible` states on food were
+  either `outline: none` with nothing replacing it, or a change too subtle to
+  read as focus at all. `.btn-tag, .btn-star, .btn-clear`
+  (`_sass/food/_buttons.scss`) dropped the outline for a 15% background tint
+  alone — invisible on a page of grey chips. `.page-search-input`
+  (`_sass/shared/_furniture.scss`, the furniture search box from #1024/#1050)
+  dropped it for a few shades of underline-lightening on `:focus` (not even
+  `:focus-visible`). `.recipe-scale-step` (`_sass/food/_recipe-scale.scss`,
+  #1005's portion steppers) moved its 1px border to the same colour the text
+  was already moving to, which reads as no change at all beside a 0.95rem
+  glyph. All three now carry a real `outline: 2px solid <colour>;
+  outline-offset: 2px;` on `:focus-visible` and nothing added to
+  size/border/padding — `test_no_active_filter_button_changes_its_own_width`
+  (§13.4.2) stayed green throughout, unmodified, because outline never
+  participates in layout. **Colour follows §13.5's code where one applies**:
+  `.btn-star` takes `$color-star-root` directly (it is emitted by exactly one
+  section, food/index.html's STAR filter, so no `.category--star` wrapper is
+  needed to disambiguate it); `.category--mood .btn-tag` and
+  `.category--practicalities .btn-tag` get their own root hues as compound
+  overrides in `_sass/food/_category-labels.scss`, right beside the existing
+  per-section `.tag-shape`/`.btn-clear-inline` overrides; the HAS TO HAVE
+  ingredient-search pool (`.search .btn-tag.btn-ingredient`) gets the same
+  treatment in `_sass/food/_search.scss`. Controls with no single section —
+  `.btn-clear` (the global clear-all) and `.page-search-input` (shared chrome,
+  both sites) — fall back to `$color-accent`. `.recipe-scale-step` takes
+  `$color-recipe-link-hover`, which the rule already used and which equals
+  `$color-accent` on food (MANUAL 13.2) — recipe-page colour is decoration,
+  not a filter code (§13.5), so no section hue applies there. Cocktails'
+  filter chips were not touched: they still take the browser's own focus
+  ring, and the review found nothing wrong with that. Verified with real
+  keyboard focus, not `.focus()` (`:focus-visible` does not reliably engage
+  for the latter) — `tmp/focus.js` drives `page.keyboard.press('Tab')` in a
+  loop, stopping the instant `document.activeElement` matches the target
+  selector, then screenshots a padded crop at 2x: `tmp/focus-shots/focus-food-chip.png`
+  (a `.btn-star` chip, magenta ring), `focus-search-input.png` (the furniture
+  box, accent ring), `focus-recipe-scale-step.png` (a stepper, accent ring).
+  All three show a clearly visible ring with no box-size change.
+
+  **§9.13 — THE SHIP ICON'S `role="img"` HAD NO ACCESSIBLE NAME.**
+  `_includes/icons/ship.svg` (the goodness mark on a drink card, #corrected
+  from a Noun Project source per that file's own credit comment) carried
+  `role="img"` and nothing else — no `aria-label`, no `<title>` child — on
+  every one of its four call sites: the index card and the related-drinks
+  card (`_layouts/cocktail.html`, `cocktails/index.html`, both via
+  `_includes/cocktails/ship.html`), the drink page's own meta row, and the
+  index's summary-panel legend (`.drink-count-legend-icon`,
+  `cocktails/index.html`). At every one of those the rating word the include
+  emits right beside it — "yes", "sure", "oh gods yes", or `???` for an
+  off-scale value (`_includes/cocktails/ship.html`'s `ship_word`, and
+  "ship it?" beside the legend copy) — already carries the meaning, so the
+  icon repeating it under `role="img"` was a role promising a name it never
+  had, not a missing label needing one. Checked the one place the word's
+  container hides (`.cocktail-meta-ship` in "make it" mode,
+  `_sass/cocktails/_print.scss`'s `display: revert` list) and it hides the
+  icon with it — the icon is never left to speak alone. So: `aria-hidden="true"
+  focusable="false"` added, `role="img"` kept rather than dropped, matching
+  the exact attribute set every glass icon in `_includes/icons/glasses/`
+  already carries (§9.13 above). No test named `ship-icon` or `role="img"`
+  existed to update — grepped `tests/` for both and found nothing scoped to
+  this icon.
+
+  Verified: `node --test` (704/704 green, unrelated to any of this); `python3
+  -m pytest tests/test_rendered_pages.py -q` — one pre-existing, unrelated
+  failure (`test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`,
+  two cross-recipe links to recipe slugs that do not exist,
+  `_food_recipes/roast-beef-fillet.md` and `_food_recipes/lemon-feather-sponge.md`,
+  last touched 2026-08-21 — confirmed pre-existing and out of scope for this
+  review, not a design or accessibility question).
