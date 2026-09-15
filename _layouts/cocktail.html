@@ -206,66 +206,33 @@ layout: default
          that span's colour, stroke, shadow, size, line-height and ellipsis for
          free, while the DOM keeps a real heading for anyone not reading pixels.
       {% endcomment %}
-      <div class="cocktail-title-row">
-        <div class="drink-card-name">
-          <span class="drink-card-tape">
-            <span class="drink-card-tape-bg" data-card-tape="{{ page.url | size }}"></span>
-            <span class="drink-card-tape-word"><h1 class="cocktail-title">{{ page.title }}</h1></span>
-          </span>
-        </div>
+      {% comment %} THE NAME IS ALONE IN THE HEAD, AND SINCE 2026-09-15 (#1086)
+         IT HAS NO WRAPPER ROW EITHER. The read it / make it toggle sat on this
+         line from 2026-09-02 to 2026-09-10 (#897), and the shortlist button
+         from 2026-09-11 (#963) -- its fourth home in ten days, which is the
+         fact #1005 was raised on: no rule said where actions live. Helen's
+         pick from the candidates page was "row under the head", and #1005
+         moved every action into _includes/page-actions.html, beside the
+         toggle in `.cocktail-controls` below -- the same include a recipe
+         page carries. A second copy of the shortlist button was left behind
+         HERE by that change, so a drink page carried two of them until the
+         2026-09-15 design review; Helen, on being shown it: "actions row
+         only." The one in the controls row is the one that stays, and
+         `?shortlist=1` on the index (MANUAL 8.9) still has its caller in that
+         row's see-shortlist link.
 
-        {% comment %} THE NAME IS ALONE ON THIS LINE SINCE 2026-09-14 (#1005).
-           The read it / make it toggle sat here from 2026-09-02 to 2026-09-10
-           (#897), and the shortlist button from 2026-09-11 (#963) -- its
-           fourth home in ten days, which is the fact #1005 was raised on: no
-           rule said where actions live. Helen's pick from the candidates
-           page, "row under the head": every action is in
-           _includes/page-actions.html, beside the toggle in
-           `.cocktail-controls` below, and the same include sits in the same
-           place on a recipe page. `?shortlist=1` on the index (MANUAL 8.9)
-           has a caller again -- the see-shortlist link in that row. {% endcomment %}
-        {% comment %} THE READ-IT / MAKE-IT TOGGLE LEFT THIS ROW ON 2026-09-10
-           (#897) and is in `.cocktail-controls` below the title block. The
-           toggle sat here on the title's line from 2026-09-02; Helen: "move
-           read it / make it toggle to the top right of the page main content,
-           just under the section divider that sits between the metadata
-           section and ingredients."
-
-           THE SHORTLIST BUTTON CAME BACK ON 2026-09-11 -- #963, Helen: "move
-           the shortlist up to the top right, aligned with the horizontal
-           centre of the first line of the cocktail name." It is the row's
-           second item, which above 600px puts it in the head grid's trailing
-           track: the row is `display: contents` there, so this button and the
-           name are placed straight onto `.cocktail-head-words`, and the meta
-           below ends where the name's track does (#979). On a phone the row is
-           a real flex box again and `space-between` is what throws the `+` to
-           the right. The alignment with the first line is built in
-           _cocktail.scss (`.cocktail-title-row .btn-shortlist`).
-
-           `page.url`, NOT `relative_url` -- the same key this drink's own
-           index card emits, which is what makes the card and this page agree
-           about whether it is shortlisted. See HTF.shortlist in
-           assets/js/assets.js. `hidden` until shortlist.js reveals it, the
-           rule every JS-dependent control on both sites follows.
-
-           IT HAD A SEE-ALL LINK UNDER IT BRIEFLY -- #994 added it on 2026-09-12
-           and #1000 removed it on 2026-09-14: "remove 'see all'
-           button from below shortlist button on cocktail page." So the button
-           is the row's second item again, on its own, and the wrapper, the
-           `row-reverse` that put its `+` on the right to line the two marks up,
-           and the link itself are all gone.
-
-           HOW A READER FINDS THEIR SHORTLIST FROM HERE is the index's own
-           `shortlisted (N)` button, one click back. Helen, the same day: "which
-           will do for now, and at least it matches food." `?shortlist=1` on the
-           index outlived the link and is kept with its reasons in
-           assets/js/cocktail-index.js (MANUAL 8.9).
-        {% endcomment %}
-        <button type="button"
-                class="btn-shortlist"
-                data-shortlist-key="{{ page.url }}"
-                aria-pressed="false"
-                hidden>shortlist</button>
+         THE ROW WENT WITH IT, because a `.cocktail-title-row` at
+         `display: contents` with one child is a wrapper that draws nothing and
+         can still be told to do something -- the phone grid asked it to span
+         both columns, an element with no box could not, and the name was laid
+         out in the 4.5rem GLASS column with its lettering running out over the
+         page (#1086, bug 1). The name is placed on the head's grid directly
+         now, and on a phone on `.cocktail-title-block`'s own grid. {% endcomment %}
+      <div class="drink-card-name">
+        <span class="drink-card-tape">
+          <span class="drink-card-tape-bg" data-card-tape="{{ page.url | size }}"></span>
+          <span class="drink-card-tape-word"><h1 class="cocktail-title">{{ page.title }}</h1></span>
+        </span>
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
@@ -292,19 +259,15 @@ layout: default
          may be off the scale ("who knows"), and the include below renders that
          as `???` — Helen, 2026-09-05, #722 — so the line always has a word in
          it and there is nothing to gate here. {% endcomment %}
-      {% comment %} THE META PANEL AND THE SHORTLIST TOGGLE ON ONE ROW -- Helen's
-         placement, 2026-09-04: the toggle at "the top right of the metadata
-         panel on cocktail pages, maybe horizontally aligned with read it / make
-         it". It is aligned with them, and by construction rather than by a
-         number: this wrapper and `.cocktail-title-row` are both children of
-         `.cocktail-head-words` and both push their right-hand item to the same
-         edge, so the two controls share a column with nothing to keep in step.
-
-         A WRAPPER RATHER THAN A FOURTH ITEM INSIDE THE `<dl>`. The list is three
-         facts about the drink with a 5rem gap between them, chosen by Helen on
-         the real page; a control dropped into that flex row would inherit the
-         gap, wrap with the facts on a narrow screen, and claim to be a fourth
-         thing the drink IS. {% endcomment %}
+      {% comment %} THE META IS THREE FACTS AND NOTHING ELSE. It shared a row
+         with a shortlist toggle from 2026-09-04 (Helen's placement then: "the
+         top right of the metadata panel on cocktail pages"), inside a wrapper
+         rather than as a fourth item in the `<dl>` -- the list is three facts
+         with a 5rem gap between them, and a control dropped into that flex row
+         would inherit the gap, wrap with the facts on a narrow screen, and
+         claim to be a fourth thing the drink IS. The control left in #897 and
+         the wrapper with it; the argument is kept because it is the one to
+         make again if anything is ever proposed for this row. {% endcomment %}
       <dl class="cocktail-meta">
         {% comment %} THE GLASS LINE IS THE GLASS AND NOTHING ELSE, 2026-09-05.
            The ice and the rim rode here for about an hour and Helen killed it:
@@ -434,7 +397,9 @@ layout: default
      that sits between the metadata section and ingredients." Then, the same
      day, toggle to the LEFT of the row. The shortlist button travelled with
      the toggle until 2026-09-11, when #963 put it at the right end of the
-     title row instead; see the comment there.
+     title row instead; it came back here with the rest of the actions in
+     #1005, and the copy #1005 left in the head was deleted in #1086 ("actions
+     row only") -- so this row holds the only one on the page.
 
      THE TOGGLE: three elements, one group -- a "read it" label, a track with a
      knob, a "make it" label (Helen's 2026-09-02 brief: "remake this button as

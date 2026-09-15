@@ -2578,6 +2578,47 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-09-15, #1086 — "actions row only", and the title that was laid out in
+  the glass column.** From the design review. Helen, shown a drink page carrying
+  two shortlist buttons: *"actions row only."* So the `.btn-shortlist` inside
+  the head went and the one in `_includes/page-actions.html`, in
+  `.cocktail-controls` under the head's rule, stays — which is #1005's ruling
+  ("row under the head") finally true of the markup as well as of the
+  stylesheet.
+  **THE SECOND BUTTON WAS A LEFTOVER, AND THE STYLESHEET HAD ALREADY MOVED ON.**
+  #1005 deleted every rule that held the head's button — the `--title-line`
+  custom property, the `:has()` alignment with the name's first line, the phone
+  block that made the row a flex box for the `+` — and rewrote both files'
+  comments to say the button had gone. The `<button>` itself was not deleted.
+  So it rendered unstyled and unplaced for a day: at 1280px it stacked under the
+  tape (the head's own head grew 282.7px to 268.7px when it went, x, y and the
+  right edge all unchanged at 214 / 291.5 / 1066), and in `make it`, where the
+  tagline is hidden, it sat hard against GLASS with nothing between them
+  (173.3px to 159.3px). **A comment saying a thing is gone is not the thing
+  being gone**, and nothing tested for one control appearing twice.
+  **AND IT IS WHAT MADE THE PHONE BUG VISIBLE RATHER THAN WHAT CAUSED IT.** On a
+  phone `.cocktail-title-block` is a two-column grid, 4.5rem for the glass and
+  the rest for the words, and the rule that spans a full-width child both
+  columns named `.cocktail-title-row` — which #1005 had left at
+  `display: contents` around its one remaining child. **An element with no box
+  cannot be placed, and CSS says nothing about it**: the selector matched, the
+  declaration was valid, and it reached an element that generates no box, so the
+  NAME auto-placed into column one. Measured at 360px on the Bellini: the tape
+  72px wide in a 312px column, the name wrapped to five lines with its lettering
+  running out across the page, and the leftover button drawn over "AND" in
+  column two. The fix is to delete the wrapper and name the name — the tape
+  spans the column the title occupies, the name runs across it on every line,
+  and `card-name-fit.js` has the real column to measure against at last, so a
+  long name takes the cards' own answer: one step of 0.86, then wrap.
+  **Nothing above 600px changes but the missing button.** Five drinks checked at
+  360 and 390 (Cobra's Fang, the Bellini, the mulled wine, the Negroni, the 18th
+  Century Cocktail) and Cobra's Fang at 1280 before and after.
+  **The class was two weeks old and had three jobs in that time** — flex row for
+  the toggle, flex row for the shortlist button, then nothing. A wrapper that
+  outlives every reason it was added is the shape #991 named on the portrait
+  card: not wrong at any one step, and worth deleting as soon as the last reason
+  goes.
+
 - **2026-09-14, #1000 — the see-all link comes out again, two days old.** Helen:
   *"remove 'see all' button from below shortlist button on cocktail page"*, and
   in the same message: *"I know some of this is changing my mind, but please go
