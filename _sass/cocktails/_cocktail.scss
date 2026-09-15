@@ -253,7 +253,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // feels like there's quite a bit of space at the top of cocktail pages.
   // Should the top bump up a bit, closer to the back arrow?" It should, and
   // 1rem is the gap food's recipe page keeps between its arrow and its title
-  // (`.back-to-index + .recipe .recipe-title`), so the two sites open the
+  // (`.page-furniture + .recipe .recipe-title`), so the two sites open the
   // same way. The arrow itself stays where it is, first thing under the
   // header at the column's left edge, as on food.
   margin: $space-lg 0 1.75rem;

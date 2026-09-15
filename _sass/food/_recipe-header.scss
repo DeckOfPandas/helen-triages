@@ -186,7 +186,15 @@ article.recipe a:not(.badge) {
 // stacked a second gap on top of it -- about 4rem of dead space below the
 // arrow's baseline for one job. Scoped to pages that actually render the
 // arrow; where there is none, .recipe-title above keeps its 3rem.
-.back-to-index + .recipe .recipe-title {
+//
+// `.page-furniture +`, NOT `.back-to-index +`, SINCE #1093 (2026-09-15). #1024
+// wrapped the arrow and the search box in `.page-furniture` on 2026-09-14,
+// after which `.back-to-index` was no longer the article's sibling, this rule
+// matched nothing, and every recipe title sat 3rem under the arrow where the
+// drink page sits 1rem -- the gap the two sites were ruled to share on
+// 2026-09-10 (see `.cocktail-title-block` in _sass/cocktails/_cocktail.scss).
+// Found by measuring, in the spacing review: 48px on food, 16px on cocktails.
+.page-furniture + .recipe .recipe-title {
   margin-top: $space-lg;
 }
 

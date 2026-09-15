@@ -1002,19 +1002,25 @@
 // two of them would be two things to keep in step for no gain.
 //
 // So the treatment is food's, value for value -- the type of a recipe title at
-// 1rem/600, lowercase, 0.05em, in $color-clear-text rather than ink because
+// 1.2rem/700, lowercase, 0.04em, in $color-clear-text rather than ink because
 // this is not something to reach for. See _sass/food/_active-filter-states.scss
 // for why it follows the TITLES' font: "the same as the titles" has to keep
 // meaning that when the titles move.
 //
 // `text-transform: lowercase` is what makes the copy lower case, so the markup
 // keeps ordinary sentence capitalisation and nothing has to remember not to.
+//
+// 1.2rem / 700 / 0.04em SINCE #1093 (2026-09-15). Food's line moved with its
+// titles on 2026-09-04 and this one did not, so "value for value" above had
+// been false for eleven days: 1rem / 600 / 0.05em here against food's
+// 1.2rem / 700 / 0.04em. Found by the spacing review, which put the two
+// no-results lines side by side.
 .drink-none {
   font-family: $font-headings;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   text-transform: lowercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: $color-clear-text;
   text-align: center;
   padding: $space-xxl 0;

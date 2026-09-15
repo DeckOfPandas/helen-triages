@@ -1487,6 +1487,28 @@ def test_search_inputs_have_a_label():
         )
 
 
+def test_the_recipe_title_gap_names_the_furniture_includes_own_wrapper():
+    """The 1rem under the back arrow is a sibling selector, and it went stale.
+
+    `_sass/food/_recipe-header.scss` closes the gap between the arrow and a
+    recipe's title with `.<wrapper> + .recipe .recipe-title`. #1024 wrapped the
+    arrow in `.page-furniture` on 2026-09-14 and the rule still said
+    `.back-to-index +`, which then matched nothing: every recipe title sat 3rem
+    under the arrow, against the drink page's 1rem, for a day, with nothing red.
+    Found by measuring in #1093's spacing review. So this asks the include what
+    its outermost element is called and holds the rule to that name.
+    """
+    include = read("_includes", "back-to-index.html")
+    wrapper = re.search(r'^<(\w+) class="([\w-]+)"', _strip_comments(include, ".html"), re.M)
+    assert wrapper, "_includes/back-to-index.html has no top-level classed element."
+    selector = f".{wrapper.group(2)} + .recipe .recipe-title"
+    assert selector in read("_sass", "food", "_recipe-header.scss"), (
+        f"The food recipe title's gap under the arrow must be `{selector}`: that is "
+        f"the element directly before article.recipe now. A sibling selector naming "
+        f"anything else matches nothing, silently, and the title drops to 3rem."
+    )
+
+
 def test_clear_controls_are_buttons():
     """They were <span>s with click handlers: not focusable, not announced."""
     html = read("food", "index.html") + read("_includes", "filter_group.html")
