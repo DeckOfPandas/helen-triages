@@ -31,14 +31,16 @@
 // pages themselves; the module below reads it and assumes nothing about which
 // site it came from.
 //
-// THE RANKING IS THE SITES' OWN, not a new one. Titles are tiered exactly as
-// I KNOW WHAT I WANT tiers them (recipe-list.js's titleMatchTier: the title
-// starts with the query, then some word does, then it is merely a substring),
-// and a vocabulary word is banded exactly as the ingredient pickers band theirs
-// (ingredient-search.js: prefix of the first word, prefix of any word,
-// substring). What Helen ruled here is the ORDER OF THE GROUPS -- names first,
-// then the tags -- and that a substring hit on a name is not a "prefix-matched
-// title", so it is offered only when no prefix match exists at all.
+// THE RANKING STARTED AS THE SITES' OWN (recipe-list.js's titleMatchTier,
+// ingredient-search.js's banding) AND #1052 THEN NARROWED IT. Helen: "omnisearch
+// should prefix match only, and whole words only." A result matches only when
+// every word typed is a PREFIX of a whole word in the candidate, at a word
+// boundary -- never mid-word. There is no substring fallback any more: "roni"
+// no longer finds Negroni, because "roni" prefixes no word in it. Tier 1 is the
+// candidate starting with the query outright (which is also, trivially, its
+// first word being prefixed); tier 2 is every other case where each query word
+// prefixes some word in the candidate. What Helen ruled beyond that here is the
+// ORDER OF THE GROUPS -- names first, then the tags.
 //
 // THE DECISION IS PURE, AND THE DOM WIRING IS THE REST OF THE FILE (MANUAL §3).
 // `create(data)` returns a searcher a Node test can ask a question of without
@@ -94,14 +96,18 @@
   }
 
   /* Which tier a display string falls into for an already-folded, lowercased
-     query: 1 it starts with it, 2 some word does, 3 it is a substring, 0 no
-     match. recipe-list.js's titleMatchTier, spelled for a string that has
-     already been folded per character. */
+     query: 1 the candidate starts with the query outright, 2 every word the
+     query is made of prefixes some whole word in the candidate (word boundary
+     only -- never mid-word), 0 no match. #1052: there is no substring tier any
+     more. A multi-word query ("duck a") matches word for word, in any order,
+     against the candidate's words -- it need not read as a run. */
   function tierOf(folded, query) {
-    var ws = words(folded);
-    if (ws.length && ws[0].indexOf(query) === 0) return 1;
-    if (ws.some(function (w) { return w.indexOf(query) === 0; })) return 2;
-    if (folded.indexOf(query) !== -1) return 3;
+    if (folded.indexOf(query) === 0) return 1;
+    var qWords = words(query);
+    var cWords = words(folded);
+    if (qWords.length && qWords.every(function (qw) {
+      return cWords.some(function (cw) { return cw.indexOf(qw) === 0; });
+    })) return 2;
     return 0;
   }
 
@@ -216,18 +222,17 @@
       var out = [];
 
       // --- the names, first ---------------------------------------------------
-      var byTier = [[], [], [], []];
+      var byTier = [[], [], []];
       items.forEach(function (entry) {
         var tier = tierOf(entry.folded, query);
         if (tier) byTier[tier].push(entry);
       });
-      /* PREFIX FIRST, and a substring only when nothing prefixes. Helen's
-         "prefix-matched title string results first": a title whose word
-         starts with what you typed is what you meant; a title that happens
-         to contain it mid-word ("roni" in Negroni) is a fallback for when
-         there is nothing else, not a second helping under the same heading. */
+      /* PREFIX ONLY, WHOLE WORDS ONLY -- #1052. Helen's "prefix-matched title
+         string results first" used to fall back to a mid-word substring when
+         nothing prefixed ("roni" finding Negroni); that fallback is gone, so a
+         query that prefixes no word anywhere in the title is simply not a
+         name match. */
       var named = byTier[1].concat(byTier[2]);
-      if (!named.length) named = byTier[3];
       if (named.length) {
         out.push({
           kind: 'name',
@@ -245,12 +250,12 @@
 
       // --- then the words, one group per kind, in the index's order -----------
       groups.forEach(function (g) {
-        var bands = [[], [], [], []];
+        var bands = [[], [], []];
         g.vocab.forEach(function (v) {
           var tier = tierOf(v.key, query);
           if (tier) bands[tier].push(v);
         });
-        var matched = bands[1].concat(bands[2], bands[3]);
+        var matched = bands[1].concat(bands[2]);
         if (!matched.length) return;
         out.push({
           kind: g.kind,
