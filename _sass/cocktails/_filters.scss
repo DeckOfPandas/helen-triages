@@ -1213,6 +1213,9 @@
 // Shared -- @mixin index-clear-all-bottom.
 .btn-clear--bottom { @include index-clear-all-bottom; }
 
+// Shared -- @mixin index-clear-all-empty, the one inside "Blank canvas." (#1093).
+.btn-clear--empty  { @include index-clear-all-empty; }
+
 @media (max-width: $index-stack-width) {
   .drink-searches { grid-template-columns: 1fr; gap: $index-section-gap; }
 }

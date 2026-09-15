@@ -1469,6 +1469,21 @@
     });
   }
 
+  /* A THIRD, UNDER "Blank canvas." -- #1093. On a phone the top button is two
+     screens above the empty list, so the one way out of a search that found
+     nothing was out of sight of the line saying so. Same class, same click,
+     same visibility rule: it is one more entry in clearAllButtons, so it can
+     never disagree with the other two about whether there is anything to
+     clear. It lives inside the line, so it hides with it. */
+  if (noneEl) {
+    var noneClear = document.createElement('button');
+    noneClear.type = 'button';
+    noneClear.className = 'btn-clear btn-clear--empty';
+    noneClear.textContent = '× clear all';
+    noneEl.appendChild(noneClear);
+    clearAllButtons.push(noneClear);
+  }
+
   /* THE BOXES, POOLS AND BUTTONS THAT ARE NOT STATE, emptied and repainted
      after the state has been. Shared by clear-all and by the shortlist button
      turning its view on (#918), which is a clear-all with one field kept --

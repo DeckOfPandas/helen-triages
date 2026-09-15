@@ -768,6 +768,16 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   margin: $spacing-block-gap 0 0 auto;
 }
 
+// And a third, inside the no-results line (#1093), centred under the words
+// because the line itself is centred. Its own type, not the line's: the line
+// is set as a row title and this is still the clear-all control.
+@mixin index-clear-all-empty {
+  position: static;
+  display: block;
+  width: fit-content;
+  margin: $space-md auto 0;
+}
+
 
 // --- A label row with an input in it -----------------------------------------
 // Three mixins rather than one, because the two sites name their children

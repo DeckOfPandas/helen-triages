@@ -91,6 +91,21 @@ document.addEventListener('DOMContentLoaded', function () {
     clearButtons.push(clearBtnBottom);
   }
 
+  // A third, under "Nothing to see here." -- #1093. On a phone the other two
+  // are screens away from the empty list, so the way out of a search that
+  // found nothing was out of sight of the line saying so. One more entry in
+  // clearButtons, so its click and its visibility are the other two's by
+  // construction; inside the line, so it hides with it.
+  var emptyMessageEl = document.querySelector('.recipe-list-empty');
+  if (emptyMessageEl) {
+    var clearBtnEmpty = document.createElement('button');
+    clearBtnEmpty.type = 'button';
+    clearBtnEmpty.className = 'btn-clear btn-clear--empty';
+    clearBtnEmpty.textContent = '× clear all';
+    emptyMessageEl.appendChild(clearBtnEmpty);
+    clearButtons.push(clearBtnEmpty);
+  }
+
   var searchBox = document.getElementById('ingredient-search-box');
   var resultsPool = document.getElementById('ingredient-results-pool');
   var ingredientClear = document.getElementById('ingredient-search-clear');

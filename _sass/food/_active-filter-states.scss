@@ -104,6 +104,7 @@
 // has spare width to consume and pushes it to the right, same edge as the
 // top copy, without needing a wrapping element.
 .btn-clear--bottom { @include index-clear-all-bottom; }
+.btn-clear--empty  { @include index-clear-all-empty; }
 
 // "Nothing to see here." and "Select something to see a list." -- Helen,
 // 2026-08-26: both are "doing the same job" as a recipe row title, so they are
