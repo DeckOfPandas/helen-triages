@@ -40,7 +40,9 @@ sitemap: false
   A missing `generics` is nil, and nil compares false against 1 in Liquid,
   so such a row is kept.
 
-  `items_label` IS PLACEHOLDER COPY, Helen's to write (MANUAL 13.12).
+  `items_label` IS "recipes" ON BOTH SITES SINCE #1097 (2026-09-15) -- Helen:
+  "'Recipes' means recipes across both sites." It said "drinks" here until
+  then, as placeholder copy.
 {%- endcomment -%}
 {%- assign this_site = site.data.sites[page.site_key] -%}
 {%- assign groups = site.data.cocktails.taxonomy.mood_groups -%}
@@ -52,7 +54,7 @@ sitemap: false
 {
   "site": {{ page.site_key | jsonify }},
   "home": {{ this_site.home | relative_url | jsonify }},
-  "items_label": "drinks",
+  "items_label": "recipes",
   "groups": [
     {"kind": "mood", "label": "Mood", "param": "mood", "field": "moods", "values": {{ groups.mood | jsonify }}},
     {"kind": "hassle", "label": "Hassle", "param": "mood", "field": "moods", "values": {{ groups.hassle | jsonify }}},

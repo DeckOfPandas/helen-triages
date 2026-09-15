@@ -5536,6 +5536,20 @@ verification. Dates are when the correction landed.
     shortlist"*) is now served by the link alone, which keeps no portions or
     glasses. Git has all of it.
 
+- **2026-09-15, #1097 — the words for content.** Helen: *"Food recipes /
+  Cocktail recipes. 'Recipes' means recipes across both sites. Sometimes:
+  Portions / Drinks. Please summarise the changes that will need to be made to
+  bring everything into line."* The summary is her issue's comment. Changed on
+  the site: cocktails' name box placeholder (`drink name…` → `recipe name...`,
+  food's own words), the search dropdown's names group (`drinks` → `recipes`),
+  and cocktails' two ingredient placeholders' `…` → `...`, so each box reads
+  the same on both sites. Left, because they fit the rule: the scaler's "drinks"
+  and food's "portions" (counts), prose about drinking, and the cocktails
+  tagline's verb. **Not yet decided:** whether the manual and procedures (about
+  280 uses of "drink" as the noun) are brought into line. This journal is never
+  rewritten. Code names (`drink-card`, `#drink-name`) are recommended left
+  alone.
+
 ## §14 Reference pages
 
 - **2026-08-11/12** — Built at Helen's request from 15 draft tables in
