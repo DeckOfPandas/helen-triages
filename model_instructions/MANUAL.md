@@ -2135,7 +2135,9 @@ nothing moves, nothing resizes; a chip moves its box, a bare word its text;
 the dichromacy bar applies only where colour carries meaning ALONE (the
 goodness mark and the matched ingredient). **Text on a wash is ink, never the
 `-deep`**; **bands and washes, not fills** — the goodness mark is the only fill
-left on a card. **The names are the bottles** (#555).
+left on a card. That is a rule about CARDS, not the site: the index's active
+filter chip has been a filled block since #1086 (§13.4.2). **The names are the
+bottles** (#555).
 
 **The index** (`cocktails/index.html`, `_filters.scss`, `cocktail-index.js`):
 
