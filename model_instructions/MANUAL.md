@@ -1131,9 +1131,14 @@ goes. Over a shared list: the note `[data-shared-shortlist]` says how many and
 names any slug nothing answers to; the shopping list hides (its numbers write
 to the store); `shortlisted (N)` is not lit, and pressing it shows YOUR list;
 **"keep these"** merges the list in (`HTF.shortlist.addAll`) and shows yours.
-The link itself leads the export panel (`[data-shortlist-share]`, built by
-`shortlist-export.js` from `shortlistQuery` and `slugOf`), with the JSON
-behind it for portions and glasses. Every string is PLACEHOLDER COPY. Tests:
+**The link is the whole panel** at the foot of each index, "Share or save the
+shortlist" (`[data-shortlist-export-panel]`, shown only while something is
+shortlisted; `[data-shortlist-share]` built by `shortlist-export.js` from
+`shortlistQuery` and `slugOf`). **There is no JSON export, no restore and no
+clear button** since #1100 — Helen: *"Remove the rest of the apparatus: no JSON
+export or import, no clear."* A link carries no portions or glasses; nothing
+does now. The panel's two lines are Helen's words; the shared-view note and
+"keep these" are still PLACEHOLDER COPY. Tests:
 `tests/js/shortlist-share.test.js` (the store), `filter-state.test.js` (the
 grammar), and both index startup harnesses (the wiring).
 

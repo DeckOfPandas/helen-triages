@@ -5472,7 +5472,7 @@ verification. Dates are when the correction landed.
     groups."* https://claude.ai/artifact/MpYrFCPFqxLo7qQeGxZLSZ — A underlined
     (now), B inverted tight, C inverted padded. Built with the separator dot
     carried just outside a filled chip, because it is drawn inside the chip and
-    a fill would swallow it. **Her pick is pending.**
+    a fill would swallow it. **She picked B** on PR #1100 (below).
   - *"Please try the absinthe rule above the actions row on cocktail pages at
     1px."* A try, live. The rum page's title rule is still 2px.
   - *"Remove the bordered box around the omnisearch input field when it's
@@ -5483,6 +5483,23 @@ verification. Dates are when the correction landed.
   - *"Lighten the omnisearch input field's lower border, both sites."* Mixed
     towards each page's ground, not `lighten()`ed: on cocktails' dark page a
     lightened grey is a brighter line.
+
+- **2026-09-15, PR #1100 — Helen's review comment, three rulings.**
+  - **The card chips: *"Chip option B please."*** Inverted and tight, from
+    the candidates page above; §9.13's card chip comment in `_cards.scss`
+    records that it reverses #756's coloured-word-plus-underline.
+  - **The hairlines: *"The hairline rules are now fine, stop asking!"*** That
+    is food's 1px grey rule over the actions row against cocktails' now-1px
+    absinthe one, asked twice this session. Settled. Do not raise it again.
+  - **The shortlist panel: *"Save, restore or clear the shortlist" -> "Share or
+    save the shortlist"*; the link's hint becomes *"Loading this shows drinks
+    without saving them."* (food's reads "recipes"); and *"Remove the rest of
+    the apparatus: no JSON export or import, no clear."*** So #849's export,
+    #850's restore and the two-click clear of 2026-09-10 are deleted, with
+    `HTF.shortlist.snapshot()`, `restore()` and their tests. What they were
+    built for (*"I just KNOW that something will go wrong and I'll lose my
+    shortlist"*) is now served by the link alone, which keeps no portions or
+    glasses. Git has all of it.
 
 ## §14 Reference pages
 
