@@ -16,7 +16,7 @@ ingredients:
     suggestion: ["Rhum JM Ambré"]
   - amount: "20 ml"
     generic: "coconut-flower arrack"
-    suggestion: "Ceylon Arrack"
+    suggestion: ["Ceylon Arrack"]
   - amount: "35 ml"
     generic: "lemon juice"
   - amount: "10 ml"

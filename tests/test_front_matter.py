@@ -571,7 +571,21 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # serving estimate), fixed in the same commit and listed in its message;
 # none is a word she would read as prose. Proved with the old value first:
 # the test named exactly these two. Covers 047dba0 and nothing after it.
-BASELINE_COMMIT = "047dba0"   # the ham and the coleslaw, promoted on Helen's word
+# MOVED 2026-09-16, FOR THREE MECHANICAL FAULTS IN A PROOFREAD SHE HAD JUST
+# DONE. Her PR #1126 set `proofread: true` on the meringue swans and rewrote a
+# good deal of their method; two style tests then failed on the new text (a
+# method note missing its full stop, and "dark chocolate, melted" without the
+# cacao percentage house style requires), so `main` was red and nothing was
+# deploying. Asked how to fix recipes she had just read -- flip the flags and
+# have her re-read on the branch, or keep `proofread: true` and move the
+# baseline -- she chose: "Fix and keep proofread true". Neither fix changes a
+# word she would read as prose: one adds a full stop, one restores the "70%
+# cacao" her own earlier version carried. `3039210` also fixes the Arrack
+# Christmas Punch's `suggestion` (see COCKTAIL_BASELINE_COMMIT, moved the same
+# way in this commit). Proved with the old value first: the test named
+# meringue-swans-with-diplomat-cream.md and nothing else. Covers 3039210 and
+# nothing after it.
+BASELINE_COMMIT = "3039210"   # three mechanical faults in #1126's proofread, on Helen's word
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato

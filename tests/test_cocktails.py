@@ -1471,7 +1471,16 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # agent so needed to be proofread again." The grant is hers, explicit, and
 # quoted -- the sixth move's shape exactly, read promised rather than shown.
 # Covers ea6525d and nothing after.
-COCKTAIL_BASELINE_COMMIT = "ea6525d"   # Sazerac and Caribbean Sazerac back to stir, on Helen's word
+# MOVED 2026-09-16, WITH ITS FOOD TWIN, FOR ONE BARE STRING. Her PR #1126
+# proofread the Arrack Christmas Punch and added `suggestion: "Ceylon Arrack"`,
+# which `test_suggestion_is_always_a_list` refuses -- so `main` was red and
+# nothing was deploying. `3039210` wraps it in a list and changes nothing a
+# reader sees: the drink page prints the bottle name either way. Her grant,
+# asked as a choice between flipping the flag and moving the baseline: "Fix and
+# keep proofread true". Proved with the old value first: the test named
+# arrack-christmas-punch-wife-3.md and nothing else. Covers 3039210 and nothing
+# after it.
+COCKTAIL_BASELINE_COMMIT = "3039210"   # one bare `suggestion` string in #1126's proofread, on Helen's word
 
 
 def _newest_commit_per_published_drink():
