@@ -1,6 +1,6 @@
 ---
 title: "Smokestack Lightning"
-tagline: "A Margarita at a ceilidh. Note to self: arrange a ceilidh with tequila."
+tagline: "A Margarita at a ceilidh. Note to self: arrange a ceilidh with Margaritas."
 glass:
   - "old fashioned"
 garnish:
