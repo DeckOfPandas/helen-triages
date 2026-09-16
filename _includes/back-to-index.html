@@ -58,23 +58,35 @@
   carries no comment of its own because a Liquid tag inside an SVG file is not
   XML, and test_every_shipped_svg_actually_parses reads the file as XML.
 
-  THE INPUT IS 12 CHARACTERS WIDE AND RIGHT-ALIGNED -- the width is #1123
-  (2026-09-16, halved from 24: "reduce the width of the omnisearch input text
-  field to 12 chars (continuing to scroll off to the left)") and the alignment
-  is #1099, which reversed #1056's on seeing it built: Helen's own picture of
-  what she wanted is "____r ___rh __rhu _rhum", the word anchored at the glass
-  and growing leftwards. That pairing is what makes a short box safe: what
-  scrolls out of sight is the BEGINNING of a long word, never the letters
-  being typed, so 12 characters cuts nothing off the live end.
+  THE INPUT IS 22 CHARACTERS WIDE AND RIGHT-ALIGNED -- the width is #1123
+  (2026-09-16) and the alignment is #1099, which reversed #1056's on seeing it
+  built: Helen's own picture of what she wanted is "____r ___rh __rhu _rhum",
+  the word anchored at the glass and growing leftwards. That pairing is what
+  makes a short box safe for TYPING: what scrolls out of sight is the BEGINNING
+  of a long word, never the letters being typed.
+
+  THE WIDTH IS THE PLACEHOLDER'S LENGTH, AND THAT IS THE WHOLE RULE. #1123 went
+  24 -> 12 first ("reduce the width of the omnisearch input text field to 12
+  chars"), and 12 cut the resting box to "i know what": the placeholder is the
+  one string that can never scroll into view, because nobody is typing it.
+  Helen, looking at it: "the omnisearch placeholder needs to all be visible, so
+  I guess our input field needs to be 10 chars wider". "I know what I want..."
+  is 20 characters, which at the box's 0.04em tracking measures about 21.3ch,
+  so the box is 22ch.
+
+  AND THE THING SHE ACTUALLY WANTED WAS QUIET, NOT SMALL -- "to make it less
+  obtrusive, which is what I actually want". That is the colour now (the
+  hairline and the placeholder both step towards the page's own ground; see
+  $page-search-quiet in _sass/shared/_furniture.scss), not the width. Worth
+  keeping: a narrow box is not a quiet one.
 
   This paragraph said "24 characters wide and now left-aligned" until #1123,
   which was half stale for a day: #1099 had already moved the alignment back to
   the right in _sass/shared/_furniture.scss and this comment was not updated
   with it. #1050's original brief -- "Input field text right-aligned, 24
   characters wide ... Magnifying glass icon on the left which doesn't move on
-  typing" -- is where both numbers came from; the glass has since moved to the
-  right end (#1056) and the width has halved, and only the right-alignment
-  survives from it unchanged.
+  typing" -- is where the original number came from; the glass has since moved
+  to the right end (#1056), and only the right-alignment survives unchanged.
 
   THE PLACEHOLDER IS "I know what I want..." ON BOTH SITES -- #1096, Helen's
   ruling on seeing #1050 built: keep the two searches behaving exactly as

@@ -45,19 +45,30 @@
 // build left-aligned it, reasoning that text should grow towards a glass on
 // the right; she looked and wanted the word anchored at the glass instead.)
 // A flex row of two, the glass a submit button of fixed size, the input
-// `12ch` wide, so the glass never moves because nothing about the input's box
+// `22ch` wide, so the glass never moves because nothing about the input's box
 // changes as it fills. `ch` is the width of a zero in the box's own face,
 // which is exactly "characters wide" for a monospace face.
 //
-// TWELVE CHARACTERS, HALVED FROM 24 -- #1123, 2026-09-16, Helen: "reduce the
-// width of the omnisearch input text field to 12 chars (continuing to scroll
-// off to the left)". The parenthesis is the part that makes the number safe:
-// the box is RIGHT-aligned (#1099), so a word longer than the box scrolls its
-// beginning off the left edge while its end stays against the glass -- the
-// newest letters are always the visible ones, at 12ch exactly as at 24ch.
-// Nothing is cut and nothing is hidden that the reader is currently typing.
-// The dropdown below is `min-width: 100%` and `width: max-content`, so it
-// keeps its own readable width and simply hangs from a narrower box.
+// TWENTY-TWO CHARACTERS, AND THE NUMBER IS THE PLACEHOLDER'S -- #1123,
+// 2026-09-16. It went 24 -> 12 first ("reduce the width of the omnisearch input
+// text field to 12 chars"), and at 12 the resting box read `i know what`:
+// `I know what I want...` is 20 characters and the placeholder is the one
+// string that CANNOT scroll into view, because nobody is typing it. Helen, on
+// seeing it: "the omnisearch placeholder needs to all be visible, so I guess
+// our input field needs to be 10 chars wider". So the width is now the
+// placeholder's own length plus its tracking: 20 characters at
+// `letter-spacing: 0.04em` need about 21.3ch, and 22ch clears it.
+//
+// WHICH IS WHY MAKING IT SMALLER WAS THE WRONG TOOL FOR THE JOB. What she
+// actually wanted was the box to stop shouting -- "to make it less obtrusive,
+// which is what I actually want" -- and that is the COLOUR below, not the
+// width. A narrow box is not a quiet one; it is a quiet box's worth of loud.
+//
+// TYPED TEXT STILL SCROLLS OFF TO THE LEFT and that is untouched: the box is
+// RIGHT-aligned (#1099), so a word longer than the box scrolls its beginning
+// off the left edge while its end stays against the glass -- the newest letters
+// are always the visible ones. The dropdown below is `min-width: 100%` and
+// `width: max-content`, so it keeps its own readable width whatever this is.
 //
 // `position: relative` is the dropdown's anchor: the results panel hangs
 // under the box from its right edge (below).
@@ -92,9 +103,27 @@
   height: 1.15rem;
 }
 
+// HOW QUIET THE RESTING BOX IS, as a share of $color-clear-text mixed towards
+// each site's own ground -- #1123, 2026-09-16. Named rather than written twice
+// because the hairline and the placeholder must not drift apart: they are one
+// object, and the day they take different numbers is the day the box reads as
+// a line and a word rather than as a control.
+//
+// 45%, WHICH IS ONE STEP DOWN FROM #1099's 55% AND IS MEASURED, NOT PICKED.
+// Against each site's ground (tmp/quiet_step.py): food 2.63:1 -> 2.15:1,
+// cocktails 2.73:1 -> 2.23:1. Going on to 40% lands at 1.96:1 and 1.99:1,
+// which is where the hairline starts to disappear on food's chalk ground
+// rather than merely quieten -- so this is the step before the one that costs
+// the reader the box.
+//
+// The TYPED text is not this colour and deliberately so: it stays
+// `$color-text` below, because what you have typed is the one thing in this
+// control you have to be able to read back.
+$page-search-quiet: 45%;
+
 .page-search-input {
   @include index-search-input-type;
-  width: 12ch;
+  width: 22ch;
   max-width: 100%;
   box-sizing: content-box;
   text-align: right;
@@ -103,7 +132,13 @@
   // LIGHTER SINCE #1099, both sites. Mixed towards the page's own ground
   // rather than `lighten()`ed, which it was: on cocktails' dark page a
   // lightened grey is a BRIGHTER line, the opposite of what was asked.
-  border-bottom: 1px solid mix($color-clear-text, $color-bg, 55%);
+  //
+  // ONE STEP QUIETER AGAIN, 55% -> $page-search-quiet -- #1123, 2026-09-16,
+  // Helen: "to make it less obtrusive, which is what I actually want... please
+  // step its colour (border and font) closer to the background". The line and
+  // the lettering take the SAME value, so the box is one object at one volume
+  // rather than a hairline and a word that disagree.
+  border-bottom: 1px solid mix($color-clear-text, $color-bg, $page-search-quiet);
   border-radius: 0;
   padding: 0 0 3px 0;
   margin: 0;
@@ -126,7 +161,30 @@
     border-bottom-color: $color-accent;
     box-shadow: inset 0 -1px 0 $color-accent;
   }
-  &::placeholder { @include index-search-placeholder; }
+  // THE LETTERING TAKES THE LINE'S OWN TONE -- #1123, 2026-09-16, and this is
+  // the half of "less obtrusive" that was actually doing the shouting.
+  //
+  // The mixin's own `lighten($color-clear-text, 30%)` is #1099's trap surviving
+  // in the one place that issue did not reach: lightening a grey moves it
+  // towards WHITE, which on cocktails' #0e0e10 ground is away from the page and
+  // not towards it. That site had already had to say something else for exactly
+  // this reason (cocktails/_filters.scss, Helen 2026-09-15) -- and that override
+  // is deleted with this change, because mixing towards each site's OWN ground
+  // is the same intent expressed once for both.
+  //
+  // Overridden here rather than in the mixin, because the mixin also dresses
+  // each index's I KNOW WHAT I WANT boxes -- those pages' primary control, and
+  // not what was asked about. `font-weight: 300` is still the mixin's, which is
+  // why it is still included.
+  //
+  // MEASURED OFF THE RENDERED PIXELS, not off the Sass: food 2.63:1 -> 2.15:1,
+  // cocktails 3.88:1 -> 2.23:1. DECISIONS §13 (2026-09-16, #1123) has the
+  // numbers, what 40% would have cost, and the trap that made the first reading
+  // of them wrong.
+  &::placeholder {
+    @include index-search-placeholder;
+    color: mix($color-clear-text, $color-bg, $page-search-quiet);
+  }
   // THE PLACEHOLDER GOES ON FOCUS, NOT ON THE FIRST KEYSTROKE -- Helen,
   // 2026-09-15: "both sites, remove placeholder on click." The cocktails index
   // already does this for its three boxes and says why (cocktails/_filters.scss):

@@ -5583,6 +5583,69 @@ verification. Dates are when the correction landed.
   rewritten. Code names (`drink-card`, `#drink-name`) are recommended left
   alone.
 
+- **2026-09-16, #1123 — the omnisearch box: 24 → 12 → 22 characters, and the
+  thing that was actually wrong was the COLOUR.** Helen first asked to *"reduce
+  the width of the omnisearch input text field to 12 chars (continuing to scroll
+  off to the left)"*, which shipped and which she then looked at: *"the
+  omnisearch placeholder needs to all be visible, so I guess our input field
+  needs to be 10 chars wider. To make it less obtrusive, which is what I
+  actually want, please step its colour (border and font) closer to the
+  background."*
+
+  **The lesson is the second sentence.** A narrow box is not a quiet box; it is
+  a quiet box's worth of loud. The width was the wrong instrument for the want,
+  and one round on the real page is what showed it.
+
+  **THE WIDTH IS NOW THE PLACEHOLDER'S OWN LENGTH.** `I know what I want...` is
+  20 characters, which at the box's `letter-spacing: 0.04em` measures about
+  21.3ch, so the box is **22ch**. At 12ch it read `i know what`: the placeholder
+  is the one string in that box that can never scroll into view, because nobody
+  is typing it — the right-alignment (#1099) only ever saves what a reader is
+  currently typing. So the rule to keep is *a box may be as narrow as you like,
+  but never narrower than the words it shows when empty.*
+
+  **THE COLOUR IS ONE VALUE FOR THE LINE AND THE LETTERING**, named
+  `$page-search-quiet` in `_sass/shared/_furniture.scss`: 45% of
+  `$color-clear-text` mixed towards each site's own ground, one step down from
+  #1099's 55%. Measured on the rendered pixels of a real build, not on the Sass
+  (`tmp/quiet_step.py` derived it, `tmp/sample_placeholder.py` read it back off
+  the screenshot): **food 2.63:1 → 2.15:1, cocktails 3.88:1 → 2.23:1.** 40% was
+  rejected at 1.96:1 / 1.99:1, where food's hairline stops quietening and starts
+  disappearing. The TYPED text is deliberately not stepped and stays
+  `$color-text`: what you have typed is the one thing in the control you have to
+  be able to read back.
+
+  **AND IT RETIRED A PER-SITE FORK.** `cocktails/_filters.scss` carried
+  `.page-search-input::placeholder { color: darken($color-clear-text, 15%) }`
+  from Helen's 2026-09-15 ruling (*"for the cocktail site, make grey-er/darker,
+  so it demands less attention at the top of the page"*), which existed because
+  the shared mixin's `lighten($color-clear-text, 30%)` moves towards WHITE — the
+  wrong way on a #0e0e10 ground, and the same trap #1099 had already taken off
+  the border. Mixing towards each site's own ground expresses that intent once
+  for both sites, so the override is deleted. **It was also silently undoing
+  this issue's own step**, loading after `shared/furniture` at equal
+  specificity: with it standing, food would have quietened and the dark site
+  would have sat at 3.88:1. A per-site rule that merely repeats the shared
+  answer is the fork §2.3 exists to prevent; one that CONTRADICTS a later shared
+  decision is worse, because nothing says so.
+
+  **What this cost, and it is Helen's to weigh:** the cocktails placeholder goes
+  under the 3:1 bar that the 2026-09-15 comment cleared for it and for the glass
+  (3.88:1). The glass keeps its own colour, so on that site the two no longer
+  match. The counter-argument is that food's placeholder has sat at 2.62:1
+  throughout and was never held to that bar — but it is a real trade and it was
+  put to her rather than decided here.
+
+  **A measuring trap, recorded because it produced a confidently wrong report.**
+  The first reading of these crops sampled the strongest ink in the right-hand
+  third of the furniture line and called it the placeholder. It is the
+  MAGNIFYING GLASS, which is darker than the lettering on both sites — so the
+  numbers that came back were the glass's (7.82:1 on food, 3.88:1 on cocktails)
+  and appeared to show the change had not applied at all. A screenshot read by
+  eye said the same. The compiled CSS and a sampler that stops short of the
+  glass are what settled it. **When a measurement disagrees with the CSS you
+  just compiled, suspect the measurement.**
+
 ## §14 Reference pages
 
 - **2026-08-11/12** — Built at Helen's request from 15 draft tables in
