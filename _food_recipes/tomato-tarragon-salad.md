@@ -19,7 +19,8 @@ ingredient_groups:
       item: Worcestershire sauce
     - amount: "1 tbsp"
       item: Dijon mustard
-    - item: "few dashes of Tabasco sauce to taste, unless feeding Helen"
+    - item: "a few dashes of Tabasco sauce to taste"
+      note: "if feeding Helen, swap for a mixture of soy sauce, apple cider vinegar, and tamarind concentrate"
     - amount: "1" 
       item: "lemon, juiced"
     - amount: "2 tbsp"
@@ -42,6 +43,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 
 ---
