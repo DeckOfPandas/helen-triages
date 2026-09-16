@@ -2787,7 +2787,10 @@ longer an observation about how Helen works.
 has no drafts and no runtimes (§1, §9.1): **CLONE the private repo you need**
 into it — never symlink — and, if a promotion batch is open, do not open a
 second writable copy (`PUBLISHING_A_DRINK.md`). Never stash, move or commit
-another agent's uncommitted work.
+another agent's uncommitted work. **And never REMOVE a worktree**, including an
+`agent-*` one whose branch is merged and gone — Helen keeps them to look at
+(`CLAUDE.md`, 2026-09-16); they hold the scratch files and screenshots the
+branch does not.
 
 ### 11.0.2 `/tidy-drafts`
 
