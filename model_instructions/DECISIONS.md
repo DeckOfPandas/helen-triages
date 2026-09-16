@@ -4896,6 +4896,16 @@ verification. Dates are when the correction landed.
   foreground one is refused), and that a merged branch is deleted with
   `sh scripts/git-push-agent.sh :<branch>`, which does not prompt.
 
+- **2026-09-16 — an agent's worktree is Helen's to keep, not yours to tidy.**
+  Told that four `.claude/worktrees/agent-*` worktrees were still on disk after
+  their branches merged, and offered their removal: *"Leave the worktrees -- I
+  may well want to go back and look."* They carry the scratch scripts, the
+  measurements and the screenshots a helper worked from, which the merged
+  branch does not. `CLAUDE.md`'s normal-workflow section and MANUAL §11.0.1
+  both say so now. The related refusal — `git branch -d` will not delete a
+  branch checked out in another worktree — is therefore permanent and is not a
+  problem to solve.
+
 ## §13 The visual design — the road to each value
 
 - **2026-07-31 / 2026-08-01 / 2026-08-02** — Recipe page redesigned; index
