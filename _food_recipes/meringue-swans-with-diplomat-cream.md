@@ -44,7 +44,7 @@ ingredient_groups:
   - name: finishing
     items:
     - amount: "20 g"
-      item: "dark chocolate, melted"
+      item: "dark chocolate, 70% cacao, melted"
       note: "for beaks, and for gluing snapped necks back on"
     - item: "icing sugar, to dust"
 method_groups:
@@ -66,7 +66,7 @@ method_groups:
       - step: "Pipe 10–12 elongated S shapes 8–10 cm tall with the small nozzle, tapering to a point at the head."
         note: "Necks will break, so best to pipe a few extras."
       - step: "Pipe teardrop bodies 7–8 cm long with the star nozzle: steady pressure for a rounded base, then release and pull away to taper the tail."
-        note: "Or pipe flat bases with the small nozzle to avoid faffing with two piping sets"
+        note: "Or pipe flat bases with the small nozzle to avoid faffing with two piping sets."
       - "Pipe two wings per swan with the same nozzle, commas about half the size of the bodies."
       - step: "Bake at 100°C fan, necks for 1 hour, and the rest for about 1 hour 15 mins, until they lift cleanly off the parchment and sound hollow. Turn the oven off and leave everything inside to dry, another hour at least, ideally overnight."
         note: "Achieving shells rather than chewy discs is determined by proper cooling."
