@@ -40,9 +40,23 @@
 
   input {
     @extend %food-number-input;
-    // Two digits and the caret; the shopping list's 3.4em box holds the same
-    // numbers and this is that box.
-    width: 3.4em;
+    // TWO CHARACTERS AND THE CARET, THE DRINK SCALER'S OWN WIDTH -- #1118,
+    // Helen: "the same number of characters as the cocktail recipe scaler
+    // (just over 2)". The formula is copied from `.cocktail-scale input`
+    // (cocktails/_cocktail.scss) rather than converted to a number, because it
+    // is the same decision: `2ch` is the two digits, in THIS box's own face,
+    // and the 1.6ch is the caret and the box's breathing room, not a third
+    // character. Stated in `ch` it stays two characters wide whatever the face
+    // or the root size, which `3.4em` never guaranteed.
+    //
+    // THE OVERRIDE IS LOCAL AND HAS TO BE. `%food-number-input` is 3.4em and is
+    // @extended by the shopping list's two boxes as well (food/_shopping-list.scss);
+    // those hold totals like `12`, were not asked about, and do not move.
+    //
+    // PORTIONS ARE WHOLE NUMBERS, which is what makes two characters honest
+    // here -- the same argument the drink scaler's own comment makes about
+    // integer multiples. `recipe-scale.js` steps the value in whole portions.
+    width: calc(2ch + 1.6ch);
     text-align: center;
     letter-spacing: normal;
   }
