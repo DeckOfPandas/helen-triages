@@ -3444,9 +3444,11 @@ variables), and the row each site puts the actions in:
   comma) and each index puts the text into its own I KNOW WHAT I WANT box and
   applies it as a keystroke would. Enter or the magnifying glass submits.
   **Since 2026-09-15 (#1050) it is the SEARCH FOR ANYTHING**: the glass sits
-  at the RIGHT end and never moves (#1056), the input is 24 characters wide and
-  RIGHT-aligned so a word grows leftwards from the glass (#1099, Helen:
-  "____r ___rh __rhu _rhum"); focus is the underline in `$color-accent` plus an
+  at the RIGHT end and never moves (#1056), the input is 12 characters wide
+  (#1123, halved from 24) and RIGHT-aligned so a word grows leftwards from the
+  glass (#1099, Helen: "____r ___rh __rhu _rhum") — the two go together, since
+  right-alignment is what scrolls the START of a long word out of sight rather
+  than the letters being typed, which is what lets the box be short at all; focus is the underline in `$color-accent` plus an
   inset second pixel, never a box (#1099, which replaced #1087's outline), and
   the resting underline is mixed towards the page's own ground; the placeholder reads
   `I know what I want...` on both sites with no written label, the glass being

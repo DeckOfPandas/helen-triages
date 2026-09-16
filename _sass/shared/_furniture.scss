@@ -45,9 +45,19 @@
 // build left-aligned it, reasoning that text should grow towards a glass on
 // the right; she looked and wanted the word anchored at the glass instead.)
 // A flex row of two, the glass a submit button of fixed size, the input
-// `24ch` wide, so the glass never moves because nothing about the input's box
+// `12ch` wide, so the glass never moves because nothing about the input's box
 // changes as it fills. `ch` is the width of a zero in the box's own face,
 // which is exactly "characters wide" for a monospace face.
+//
+// TWELVE CHARACTERS, HALVED FROM 24 -- #1123, 2026-09-16, Helen: "reduce the
+// width of the omnisearch input text field to 12 chars (continuing to scroll
+// off to the left)". The parenthesis is the part that makes the number safe:
+// the box is RIGHT-aligned (#1099), so a word longer than the box scrolls its
+// beginning off the left edge while its end stays against the glass -- the
+// newest letters are always the visible ones, at 12ch exactly as at 24ch.
+// Nothing is cut and nothing is hidden that the reader is currently typing.
+// The dropdown below is `min-width: 100%` and `width: max-content`, so it
+// keeps its own readable width and simply hangs from a narrower box.
 //
 // `position: relative` is the dropdown's anchor: the results panel hangs
 // under the box from its right edge (below).
@@ -84,7 +94,7 @@
 
 .page-search-input {
   @include index-search-input-type;
-  width: 24ch;
+  width: 12ch;
   max-width: 100%;
   box-sizing: content-box;
   text-align: right;

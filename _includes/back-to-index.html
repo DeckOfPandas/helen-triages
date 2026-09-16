@@ -58,15 +58,23 @@
   carries no comment of its own because a Liquid tag inside an SVG file is not
   XML, and test_every_shipped_svg_actually_parses reads the file as XML.
 
-  THE INPUT IS 24 CHARACTERS WIDE AND NOW LEFT-ALIGNED -- #1056 moved the
-  glass to the right end and flipped the alignment with it, so what you type
-  still grows towards the glass, from the box's left edge rightwards. #1050's
-  original brief, for the record, was the mirror image of this: "Input field
-  text right-aligned, 24 characters wide ... Magnifying glass icon on the left
-  which doesn't move on typing" -- right-aligned text growing left, towards a
-  glass that sat on the left. The glass sits on the right now, so the same
-  principle -- text grows towards the glass -- means left-aligned text growing
-  right.
+  THE INPUT IS 12 CHARACTERS WIDE AND RIGHT-ALIGNED -- the width is #1123
+  (2026-09-16, halved from 24: "reduce the width of the omnisearch input text
+  field to 12 chars (continuing to scroll off to the left)") and the alignment
+  is #1099, which reversed #1056's on seeing it built: Helen's own picture of
+  what she wanted is "____r ___rh __rhu _rhum", the word anchored at the glass
+  and growing leftwards. That pairing is what makes a short box safe: what
+  scrolls out of sight is the BEGINNING of a long word, never the letters
+  being typed, so 12 characters cuts nothing off the live end.
+
+  This paragraph said "24 characters wide and now left-aligned" until #1123,
+  which was half stale for a day: #1099 had already moved the alignment back to
+  the right in _sass/shared/_furniture.scss and this comment was not updated
+  with it. #1050's original brief -- "Input field text right-aligned, 24
+  characters wide ... Magnifying glass icon on the left which doesn't move on
+  typing" -- is where both numbers came from; the glass has since moved to the
+  right end (#1056) and the width has halved, and only the right-alignment
+  survives from it unchanged.
 
   THE PLACEHOLDER IS "I know what I want..." ON BOTH SITES -- #1096, Helen's
   ruling on seeing #1050 built: keep the two searches behaving exactly as
@@ -85,7 +93,31 @@
 {% if back_site %}
 <div class="page-furniture">
   <a class="back-to-index" href="{{ back_site.home | relative_url }}" aria-label="Back to {{ back_site.title }}">
-    <span aria-hidden="true">&larr;</span>
+    {% comment %} A DRAWN ARROW, NOT `&larr;` -- #1119, 2026-09-16. Helen: "back
+       arrow and site door in navbar should use the same graphic", and asked for
+       the navbar's: the site door (default.html's `.site-nav-icon-link`) is the
+       word plus icons/arrow-right.svg, and this is that same file, mirrored.
+
+       THIS IS #993'S FIX ARRIVING AT ITS SECOND SITE, and the reason is already
+       written out in full beside the navbar's own include. Courier Prime ships
+       here as an 18KB subset with NO arrow in it, so `&larr;` was drawn by
+       whatever face the reader's machine substitutes for U+2190 -- and a
+       substituted glyph is a substituted FONT, which changes the metrics and not
+       only the picture. #993 replaced `&rarr;` in the navbar for exactly that;
+       the back arrow was the other one and kept the glyph for four more days.
+
+       MIRRORED RATHER THAN A SECOND FILE, because "the same graphic" is the
+       whole of the ask: one artwork, one stroke weight, one set of end caps, and
+       no pair of files to keep in step. `transform: scaleX(-1)` is in
+       shared/_chrome.scss with the size.
+
+       THE SIZE DOES NOT CHANGE AND IS NOT #993'S. Helen set this arrow at 3rem
+       in #411, looking at it, over my 1.6rem -- "this is the only control on a
+       recipe page and has no row of siblings to be consistent with". The navbar's
+       arrow is 0.62rem because it sits beside a word. Same graphic, each at its
+       own size; the width here is measured from what the glyph occupied so the
+       furniture line's geometry does not move. {% endcomment %}
+    {% include icons/arrow-right.svg class="back-to-index-mark" %}
   </a>
   <form class="page-search" role="search" method="get" action="{{ back_site.home | relative_url }}"
         data-search-index="{{ back_site.home | append: 'search.json' | relative_url }}">
