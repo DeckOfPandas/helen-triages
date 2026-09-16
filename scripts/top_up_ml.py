@@ -453,8 +453,14 @@ def markdown(r):
                 "`in_the_glass:`, keyed on the same ice values — the fraction "
                 "of that volume the ice takes, so `none` is 0."]
 
+    drafts = "read" if os.path.isdir(DRAFTS) else (
+        "**NOT read — `_cocktail_drafts/` is absent**, which is the normal "
+        "state of a worktree (MANUAL §9.1). Anita's Attitude Adjuster, the "
+        "drink that raised #1076, is one of them, so clone the drafts repo "
+        "before taking these counts as the whole collection")
     out += ["", "---", "",
             f"{len(rows)} topped drinks, {len(live)} of them published. "
+            f"Drafts {drafts}. "
             "Regenerate with `python3 scripts/top_up_ml.py`."]
     return "\n".join(out) + "\n"
 
@@ -463,6 +469,8 @@ def main():
     r = Report()
     rows = r.topped()
     if "--counts" in sys.argv:
+        print("drafts collection:       "
+              + ("read" if os.path.isdir(DRAFTS) else "ABSENT (worktree)"))
         print(f"drinks read:             {len(r.all)}")
         print(f"with a `to top`:         {len(rows)}")
         print(f"  published:             {sum(1 for x in rows if x['live'])}")
