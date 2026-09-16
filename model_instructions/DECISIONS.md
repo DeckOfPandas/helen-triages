@@ -2224,6 +2224,54 @@ unless stated.
   that line's range to the chosen bottle. The range stands until a choice is
   made.
 
+- **2026-09-16, #1076** — **What a `to top` pours: measured, and what it is
+  blocked on.** Helen's sum is *"glass capacity less what is already poured,
+  less ice"*, and two of its three terms are measurements this repo does not
+  hold — no glass records a capacity (#295, open) and `serve.ice` says what
+  KIND of ice, never how much room it takes. `scripts/top_up_ml.py` runs the
+  part that does, and reports the rest rather than guessing it. What it found:
+
+  **Five drinks carry `amount: "to top"`, and all five are published** —
+  Airmail, Arrack Christmas Punch (Wife #3), Julien Sorel and the Pear, Apricot
+  and Rosemary Bellini in a flute, Tom Collins in a highball. Four of the five
+  are champagne or soda into a flute, which is why the flute is where the
+  arithmetic bites.
+
+  **The unknowns cancel between two drinks in the same glass, and that is the
+  whole result.** Same glass, same ice means the same fill line, so
+  `top(A) − top(B) = build(B) − build(A)` and capacity, fill level and ice all
+  drop out of both sides. In the flute: the Arrack Punch builds 135 ml, the
+  Airmail and Julien Sorel 60 ml each. **So those two take exactly 75 ml more
+  champagne than the Arrack Punch does** — and `top_up_ml` gives all three the
+  identical 75–100 ml, which is the same statement as "these three fill to
+  lines 75 ml apart". Whatever a flute holds, the house range cannot be right
+  for all three. **This turns #295 from a prerequisite into a convenience**:
+  one answer per glass (how much goes into the drink with the least room left)
+  settles every other drink in that glass for free, and it is a question that
+  can be answered by pouring one drink rather than measuring the cupboard.
+  The Tom Collins is alone in its glass, so nothing cancels and it needs an
+  answer of its own.
+
+  **A build volume is a floor, not a total, whenever a pour will not convert,**
+  and the Bellini is the case that forces it: its `ingredients:` are a batch
+  SYRUP (a whole pear, four apricots, 75 g sugar) and only its METHOD knows
+  that a serving is `25 ml syrup`. Six of its eight pours have no millilitre
+  figure, so the sum of the two that do says 10 ml and means nothing. The
+  script marks it incomplete and never spends the figure — the same honesty
+  `cost.complete` keeps for a price known to be wrong, on the same drink.
+
+  **It is per glass, so it divides by `serves:`** — read undivided the Modern
+  Zombie (410 ml, `serves: 2`) claims a collins glass holds 410 ml. Worth
+  knowing before the first punch is topped: **`cocktail_units.rb` divides the
+  TOP by `serves:` too**, which is right for a unit count (the bowl's alcohol
+  shared out) and wrong for this sum (four glasses need four tops). No topped
+  drink declares `serves:` today, so the two rules have never yet disagreed.
+
+  **Not decided, and both Helen's**: whether a calculated figure replaces
+  `top_up_ml` or sits beside it, and whether a source's own printed range
+  (Anita's Attitude Adjuster prints `Top (30-45)` against the house 75–100)
+  overrides the calculation.
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16** — Ingredients are additive, never a choose-one (asked
