@@ -197,6 +197,23 @@ canonical:
   spice_and_other:
     - "grated nutmeg"
     - "cinnamon stick"
+    # GINGER, TWO ENTRIES, 2026-09-17. Helen: "Ginger, yes, two entries (and
+    # counting)" -- so this is deliberately not one `ginger` garnish with the
+    # cut left to the maker. A wheel cut off a raw root and a slice of stem
+    # ginger out of its syrup are different objects: one is hot and fibrous,
+    # the other sweet and soft, and a drink that wants one does not want the
+    # other. Biggles Sidecar takes the wheel, German Vacation the stem slice.
+    #
+    # `ginger wheel` AND NOT `fresh ginger wheel`, which is how Biggles Sidecar
+    # wrote it. Raw is the default for a root, the same way `lemon wheel` does
+    # not say fresh -- and `stem ginger slice` beside it is the one that has to
+    # say what it is, because preserved is the departure. Shortest name that
+    # says what it is, the rule that collapsed the twists above.
+    #
+    # "and counting" is a warning, not a shrug: more ginger is expected, so the
+    # next cut gets its own entry here rather than widening one of these two.
+    - "ginger wheel"
+    - "stem ginger slice"
     # THE COUNT IS THE SPEC HERE, which is why it survives where `12
     # raspberries` did not. Three coffee beans is the Espresso Martini, not an
     # arbitrary number of beans.

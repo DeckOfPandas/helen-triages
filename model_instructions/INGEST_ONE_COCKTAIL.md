@@ -384,7 +384,8 @@ fruit stick (skewered pineapple cubes and a maraschino cherry)
 kaffir lime leaves · cucumber wheels · edible violet ·
 mint sprig, mint leaf or grated nutmeg
 
-**Spice and other:** grated nutmeg · cinnamon stick · three coffee beans
+**Spice and other:** grated nutmeg · cinnamon stick · ginger wheel ·
+stem ginger slice · three coffee beans
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
