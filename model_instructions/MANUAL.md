@@ -703,7 +703,10 @@ must say `proofread: false`. Three things about it:
 from Helen's; only the staging can.
 
 **A recipe publishes only if it says `awaiting_fix: false` AND
-`proofread: true`. Nothing else publishes.** Either flag missing, the old
+`proofread: true`. Nothing else publishes** — and **a DRINK must also say
+`rewritten: true`**, a third leg added by #1137 (2026-09-17, `cocktail_recipes`
+only; `made_before` deliberately does NOT gate, so an unmade drink publishes —
+§9.1.1 has both). Either flag missing, the old
 hyphenated name, either value quoted as a string: all held back.
 `_plugins/publish_gate.rb` removes the document from its collection at
 `:post_read`, so it gets no URL, no sitemap entry and no place in
@@ -1338,11 +1341,32 @@ keys — so a drink's `meta:` block is exactly:
       awaiting_fix: false
       proofread: false
 
-**`rewritten: true` is Helen's CLAIM, not Helen's keystroke** — it *"shows me if
-I have rewritten it, not an agent"*: the notes and the tagline mainly, though
-her first pass also checks ingredients, bottles and method. **The one place an
-agent may type it is `_cocktail_drafts/to-promote/`**, where the MOVE is how she
-claims it (`PUBLISHING_A_DRINK.md` step 2). Nowhere else, on either site.
+**`rewritten: true` is Helen's CLAIM, and since #1137 it is her KEYSTROKE too**
+— it *"shows me if I have rewritten it, not an agent"*: the notes and the
+tagline mainly, though her first pass also checks ingredients, bottles and
+method. **An agent never writes it, anywhere, on either site.** The one
+exception — `_cocktail_drafts/to-promote/`, where the MOVE was how she claimed
+it for a batch — **went on 2026-09-17**, because a drink may now publish
+unrewritten, so that folder holds both kinds and the move no longer says which
+(`PUBLISHING_A_DRINK.md` step 1).
+
+**AND SINCE #1137 IT IS THE THIRD LEG OF THE DRINKS GATE.** A drink publishes
+only on `awaiting_fix: false` AND `proofread: true` AND `rewritten: true`.
+Helen, 2026-09-17: *"I want to block cocktails that have not been rewritten. I
+want to allow cocktails that I have not made. I will rewrite these before making
+them."* Until then the flag was read by nothing, so the only thing between a
+source's own wording and the live site was the promotion procedure remembering
+to check; this is that check in the one place that cannot forget. **It cost
+nothing on the day it landed** — all 47 drinks then live already said
+`rewritten: true` (`tmp/rewritten_census.py`), so no page went dark.
+
+**`made_before` IS DELIBERATELY NOT A LEG**, and the pair is the point. An
+unmade drink publishes and always has (#722, 2026-09-05: *"It will be much
+easier for me to browse drinks I want to try from the live site than a local
+build"*). #1137 is the other half of that sentence — she reads the drink on the
+live site in order to MAKE it, and what she reads there should be her words.
+**Drinks only**: food keeps two legs, and widening it there is a separate
+ruling with its own blast radius.
 What keeps a draft private is `output: false`, not these flags. The counts
 (how many `rewritten: true`, how many staged) are a worklist — re-count, do
 not quote.

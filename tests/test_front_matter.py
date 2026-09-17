@@ -878,16 +878,29 @@ INVISIBLE_KEYS = {
         "Gordon Ramsay's Ultimate Cookery Course` are the same string shape and "
         "no regex separates them. Read by tests only. Issue #406."
     ),
-    "meta.rewritten": (
-        "Records that Helen has rewritten the source's wording in her own words, "
-        "rather than the draft still carrying the original text. Read by nothing "
-        "that builds a page -- the index badge and the publish gate hang off "
-        "meta.awaiting_fix and meta.proofread, not this. Listable only since the "
-        "scanner below learned to ignore comments: the sole match on the render "
-        "surface is an English sentence in assets/js/ingredient-search.js about "
-        "ingredient text being rewritten, which has nothing to do with the key. "
-        "Issues #418, #428."
-    ),
+    # `meta.rewritten` STOOD HERE UNTIL #1137, 2026-09-17, AND ITS OWN ENTRY IS
+    # WHAT WENT FALSE. It read: "Read by nothing that builds a page -- the index
+    # badge and the publish gate hang off meta.awaiting_fix and meta.proofread,
+    # not this." True for five weeks, and untrue the moment the gate grew a
+    # third leg for drinks: on `cocktail_recipes` the key now decides whether a
+    # page exists at all.
+    #
+    # SO THE EXEMPTION HAD TO GO WITH IT, and that is the point rather than a
+    # chore. This list exists so a commit touching only keys NOTHING RENDERS can
+    # leave `proofread: true` standing -- Helen's judgement still covers what a
+    # reader sees. Flipping `rewritten` now changes what a reader sees to the
+    # extent of adding or removing a page, so such a commit cannot claim her
+    # proofread is untouched.
+    #
+    # It is also moot in practice from the same day: `rewritten` is Helen's
+    # keystroke now and an agent never writes it (MANUAL 9.1.1), so the only
+    # commits that could have claimed this exemption are ones that may no longer
+    # be made. The entry goes anyway -- a list of "invisible" keys that names a
+    # gate leg is wrong even when nothing is currently relying on it.
+    #
+    # This test found it unprompted on the first run after the plugin changed,
+    # which is the whole argument for scanning `_plugins/` rather than trusting
+    # the note in an entry.
     "meta.cooked_before": (
         "Retired 2026-08-21, issue #429. Recorded whether Helen had cooked the "
         "recipe before; read by no layout, include, plugin or script, and "

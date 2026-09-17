@@ -400,11 +400,22 @@ carries a price and a size there, and
 `test_every_declared_bottle_carries_a_price` fails in BOTH directions -- a
 bottle with no price, and a price naming no bottle. See MANUAL 9.3.5.
 
-**ONE EXCEPTION TO `meta.rewritten`, AND ONLY ONE:** a drink Helen has MOVED
-into `_cocktail_drafts/4-promote/`. The move is how she claims the words, so
-the mechanical pass flips `rewritten: true` there -- her standing instruction,
-2026-09-04, `PUBLISHING_A_DRINK.md` step 2. Not in the pool, not on food, and
-never `proofread`, which stays hers everywhere.
+**THERE IS NO LONGER ANY EXCEPTION TO `meta.rewritten` -- #1137, 2026-09-17.**
+An agent never writes that flag, anywhere, on either site.
+
+The exception this replaces was real and is worth knowing about. A drink Helen
+had MOVED into `_cocktail_drafts/4-promote/` got `rewritten: true` from the
+mechanical pass, on the grounds that the move WAS her claim to the words (her
+standing instruction, 2026-09-04).
+
+**What killed it is that the flag now GATES PUBLICATION.** #1137 made
+`rewritten: true` the third leg of the drinks gate -- a drink without it does
+not reach the live site -- and a flag that decides whether a page exists cannot
+be one an agent sets on a folder's say-so. It belongs exactly where `proofread`
+is: hers to type, everywhere, always. So there is no folder shortcut any more.
+
+If a drink staged for promotion still says `rewritten: false`, it will not
+publish: **say so and let her flip it.** That is the one thing to do about it.
 
 ---
 

@@ -800,6 +800,136 @@ def test_the_gate_covers_a_promoted_drink():
 
 
 # =============================================================================
+# THE THIRD LEG, DRINKS ONLY — `rewritten`, GitHub issue #1137
+# =============================================================================
+# Both drink-side flags are parameterised here, where the fixtures above pin all
+# but one: the rule is about the COMBINATION of `rewritten` and `made_before`,
+# and one of those gates while the other deliberately does not.
+
+GATE_DRINK_ANY = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "coupe"\ngarnish:\n  - "lime twist"\n'
+    'ingredients:\n  - amount: "50 ml"\n    generic: "London dry gin"\n'
+    '  - amount: "25 ml"\n    generic: "lime juice"\n'
+    'method:\n  - "Shake all ingredients with ice."\n'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  made_before: {made_before}\n  ship: "who knows"\n'
+    '  rewritten: {rewritten}\n  awaiting_fix: false\n  proofread: true\n---\n'
+)
+
+GATE_FOOD_UNREWRITTEN = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
+    'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n'
+    '  rewritten: false\n  awaiting_fix: false\n  proofread: true\n'
+    '  cooked_before: false\n---\n'
+)
+
+
+def test_an_unrewritten_drink_is_held_back_but_an_unmade_one_publishes():
+    """`rewritten: true` gates a drink; `made_before` does not. Issue #1137,
+    Helen's ruling 2026-09-17.
+
+    HER WORDS: "I want to block cocktails that have not been rewritten. I want
+    to allow cocktails that I have not made. I will rewrite these before making
+    them." The two flags look alike and answer different questions, which is
+    exactly why this test pairs them rather than checking either alone.
+
+    WHY `rewritten` EARNED A LEG. It means the prose on the page is hers rather
+    than the source's, and until #1137 it was read by nothing -- so the only
+    thing between a source's own wording and the live site was the promotion
+    procedure remembering to check. `made_before` stays ungated on her earlier
+    ruling (#722, 2026-09-05): "It will be much easier for me to browse drinks I
+    want to try from the live site than a local build." #1137 is the other half
+    of that sentence -- she reads the drink on the live site in order to MAKE
+    it, and what she reads there should be her words.
+
+    FOUR FIXTURES, ONE BUILD, because each row is satisfied on its own by a
+    plugin that does nothing or by one that drops everything:
+
+        drink, rewritten,     unmade  -> PUBLISHES (the point of the pairing)
+        drink, NOT rewritten, made    -> held      (the new leg)
+        drink, NOT rewritten, unmade  -> held      (the leg, not the other flag)
+        FOOD,  NOT rewritten          -> PUBLISHES (drinks only; food keeps two)
+
+    The last row is the one a future refactor would most easily break, by
+    reading the flags without the collection name -- it would take every
+    unrewritten food recipe off the live site, silently.
+
+    It cost nothing on the day it landed: all 47 drinks then live already said
+    `rewritten: true` (tmp/rewritten_census.py), so no page went dark.
+    """
+    _require_bundler()
+    out = ROOT / "tmp" / "_test_site_1137_rewritten"
+    recipes = ROOT / "_cocktail_recipes"
+    created_dir = not recipes.exists()
+    made = []
+    try:
+        recipes.mkdir(exist_ok=True)
+        drinks = {
+            # slug: (rewritten, made_before)
+            "zzz-1137-rewritten-unmade":     ("true",  "false"),
+            "zzz-1137-unrewritten-made":     ("false", "true"),
+            "zzz-1137-unrewritten-unmade":   ("false", "false"),
+        }
+        for slug, (rw, mb) in drinks.items():
+            p = recipes / f"{slug}.md"
+            p.write_text(
+                GATE_DRINK_ANY.format(t=slug, rewritten=rw, made_before=mb),
+                encoding="utf-8")
+            made.append(p)
+
+        food = ROOT / "_food_recipes" / "zzz-1137-food-unrewritten.md"
+        food.write_text(
+            GATE_FOOD_UNREWRITTEN.format(t="zzz-1137-food-unrewritten"),
+            encoding="utf-8")
+        made.append(food)
+
+        result = subprocess.run(
+            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
+             "--destination", str(out)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+        )
+        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
+
+        def drink_live(slug):
+            return (out / "cocktails" / "recipes" / slug / "index.html").exists()
+
+        assert drink_live("zzz-1137-rewritten-unmade"), (
+            "A drink with `rewritten: true` and `made_before: false` was HELD "
+            "BACK. An unmade drink must publish -- #722, and #1137 restates it: "
+            "the live site is where Helen picks what to try next and reads it "
+            "while making it. `made_before` must not be a leg of the gate."
+        )
+        assert not drink_live("zzz-1137-unrewritten-made"), (
+            "A drink with `rewritten: false` was PUBLISHED. #1137 makes that "
+            "flag the third leg of the gate for `cocktail_recipes`: the prose "
+            "on a published drink is Helen's, and until this leg existed the "
+            "only thing checking was the promotion procedure remembering to."
+        )
+        assert not drink_live("zzz-1137-unrewritten-unmade"), (
+            "An unrewritten, unmade drink was PUBLISHED. The two flags are "
+            "separate questions: being unmade is fine, being unrewritten is "
+            "not, and this row is what stops the pair being read as one."
+        )
+        assert (out / "food" / "recipes" / "zzz-1137-food-unrewritten"
+                / "index.html").exists(), (
+            "A FOOD recipe with `rewritten: false` was HELD BACK. #1137 is "
+            "drinks only -- Helen ruled on cocktails, and food keeps its two "
+            "legs. The new leg must be scoped to the `cocktail_recipes` "
+            "collection; unscoped, it takes every unrewritten recipe off the "
+            "live site."
+        )
+    finally:
+        for p in made:
+            p.unlink(missing_ok=True)
+        if created_dir and recipes.is_dir() and not any(recipes.iterdir()):
+            recipes.rmdir()
+        shutil.rmtree(out, ignore_errors=True)
+
+
+# =============================================================================
 # ONE HEADER AND ONE FOOTER FOR THE WHOLE REPO — GitHub issue #374
 # =============================================================================
 # Helen, 2026-08-19: "I don't want parity between two footers -- I want one

@@ -1,10 +1,15 @@
 # =============================================================================
-# THE PUBLICATION GATE. TWO FLAGS, BOTH REQUIRED. Issues #331 and #667.
+# THE PUBLICATION GATE. TWO FLAGS EVERYWHERE, THREE ON DRINKS.
+# Issues #331, #667 and #1137.
 # =============================================================================
 # A page reaches the live site only when it says BOTH:
 #
 #     meta.awaiting_fix: false     -- no known, open problem with this page
 #     meta.proofread:    true      -- Helen has read what is now in the file
+#
+# and a DRINK must also say:
+#
+#     meta.rewritten:    true      -- the prose on the page is hers (#1137)
 #
 # Anything else is held back. This file was `hide_awaiting_fix.rb` until
 # 2026-09-02 and gated on the first flag alone; it was renamed when the second
@@ -148,6 +153,40 @@ Jekyll::Hooks.register :site, :post_read do |site|
       reasons = []
       reasons << "awaiting_fix" unless meta["awaiting_fix"] == false
       reasons << "proofread"    unless meta["proofread"] == true
+
+      # A THIRD LEG, ON DRINKS ONLY -- #1137, 2026-09-17. Helen: "I want to
+      # block cocktails that have not been rewritten. I want to allow cocktails
+      # that I have not made. I will rewrite these before making them."
+      #
+      # WHY IT IS A GATE LEG AND NOT A CONVENTION. `rewritten: true` means the
+      # prose on the page is hers rather than the source's, and until today it
+      # was recorded and read by nothing -- so the one thing standing between a
+      # source's own wording and the live site was the promotion procedure
+      # remembering to check. This is that check, in the one place that cannot
+      # forget.
+      #
+      # AND `made_before` IS DELIBERATELY NOT HERE. An unmade drink publishes
+      # and always has since #722 (2026-09-05): "made_before does not have to be
+      # true for the recipe to publish... It will be much easier for me to
+      # browse drinks I want to try from the live site than a local build."
+      # #1137 is the other half of that sentence -- she reads the drink on the
+      # live site in order to MAKE it, and what she reads there should be her
+      # words. The two flags answer different questions and only one of them
+      # gates.
+      #
+      # DRINKS ONLY, because that is what she ruled on. Food's `rewritten` is
+      # untouched and `food_recipes` keeps two legs; if that is ever wanted it
+      # is a separate ruling with its own blast radius.
+      #
+      # IT COST NOTHING ON THE DAY IT LANDED, measured rather than assumed
+      # (tmp/rewritten_census.py): all 47 drinks then live already said
+      # `rewritten: true`, so no page went dark. This leg guards the future.
+      #
+      # Fails closed like the others: exactly `true`, so a missing key, a
+      # `false` or the string "true" all hold the drink back.
+      if name == "cocktail_recipes"
+        reasons << "rewritten" unless meta["rewritten"] == true
+      end
 
       # NAMED, NOT COUNTED. The log line is the only evidence in the build that
       # the gate did anything, and "held back 6 pages" leaves you diffing front
