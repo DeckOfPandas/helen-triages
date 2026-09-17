@@ -403,18 +403,19 @@ bottle with no price, and a price naming no bottle. See MANUAL 9.3.5.
 **THERE IS NO LONGER ANY EXCEPTION TO `meta.rewritten` -- #1137, 2026-09-17.**
 An agent never writes that flag, anywhere, on either site.
 
-The exception this replaces was real and is worth knowing about, because the
-reason it went is the interesting part. A drink Helen had MOVED into
-`_cocktail_drafts/4-promote/` got `rewritten: true` from the mechanical pass,
-on the grounds that the move WAS her claim to the words (her standing
-instruction, 2026-09-04). That held while promoting and rewriting were the same
-act. They are not any more: a drink she has not rewritten may now publish, so
-the folder can hold both kinds and the move no longer says which. Helen,
-choosing between keeping the shortcut and keeping the flag's meaning: she sets
-it herself, and Claude never writes it.
+The exception this replaces was real and is worth knowing about. A drink Helen
+had MOVED into `_cocktail_drafts/4-promote/` got `rewritten: true` from the
+mechanical pass, on the grounds that the move WAS her claim to the words (her
+standing instruction, 2026-09-04).
 
-So `rewritten: true` means exactly what it says again -- the prose is hers --
-and like `proofread` it is hers to type, everywhere.
+**What killed it is that the flag now GATES PUBLICATION.** #1137 made
+`rewritten: true` the third leg of the drinks gate -- a drink without it does
+not reach the live site -- and a flag that decides whether a page exists cannot
+be one an agent sets on a folder's say-so. It belongs exactly where `proofread`
+is: hers to type, everywhere, always. So there is no folder shortcut any more.
+
+If a drink staged for promotion still says `rewritten: false`, it will not
+publish: **say so and let her flip it.** That is the one thing to do about it.
 
 ---
 

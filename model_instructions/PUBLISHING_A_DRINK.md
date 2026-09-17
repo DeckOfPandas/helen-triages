@@ -31,12 +31,13 @@ disk for an evening. One copy, always pushed, is the rule.
 1. **Helen moves** a drink into `_cocktail_drafts/to-promote/`. The move is the
    signal; nothing else is needed. She tells Claude when a round of moves is
    done, because Claude will be editing the same files next.
-   - **The move no longer means she has rewritten it — #1137, 2026-09-17.** A
-     drink may publish with `rewritten: false`, so this folder now holds both
-     kinds: ones whose prose is hers, and ones she wants on the live site to
-     read while she makes them. **She sets `rewritten: true` herself, when it
-     is true.** If a batch needs it and she has not, ask; never infer it from
-     the folder, which is what it used to mean and no longer does.
+   - **She sets `rewritten: true` herself — #1137, 2026-09-17.** The move used
+     to be how she claimed it for a batch, and the mechanical pass flipped the
+     flag for everything in this folder. It does not any more: `rewritten` is a
+     LEG OF THE PUBLISH GATE for drinks now, and a flag that decides whether a
+     page exists belongs with `proofread` — hers to type, never an agent's.
+     **If a drink in here still says `rewritten: false`, it will not publish:
+     say so and let her flip it.** Never infer it from the folder.
 2. **Claude runs the mechanical pass** over everything in `to-promote/`:
    **touches no gate flag at all** — `rewritten` joined `proofread` and
    `awaiting_fix` as Helen's alone on 2026-09-17, and `ingest.md`'s TIER 3 says
@@ -116,12 +117,13 @@ disk for an evening. One copy, always pushed, is the rule.
 
 - `rewritten: true` — the words are Helen's. **Only she writes it, and since
   #1137 (2026-09-17) that is literal: no folder, no batch and no agent sets it.**
-  It gates nothing — a drink publishes with it `false` — so it is a record of
-  whose prose is on the page and nothing else.
-- `made_before: false` — she has not made it yet, and it publishes anyway
-  (#722, 2026-09-05). The live site is where she picks what to try next, and
-  since #1137 the same is true of a drink she has not rewritten: she reads it
-  there while making it, which beats exporting a PDF.
+  It is the drinks gate's third leg, so a drink with it `false` does not
+  publish at all.
+- `made_before: false` — she has not made it yet, and **it publishes anyway**
+  (#722, 2026-09-05): the live site is where she picks what to try next, and
+  she reads the drink there while making it, which beats exporting a PDF. The
+  pair is the rule and the two halves are easy to swap by mistake: **unmade is
+  fine, unrewritten is not.** She rewrites a drink before she makes it.
 - `awaiting_fix: true` — one thing is ticketed; she has read it; it will not
   publish until the flag is false again.
 - `proofread: true` — she read the rendered page. Any agent edit after that

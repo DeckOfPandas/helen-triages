@@ -1192,8 +1192,62 @@ unless stated.
 
 ### §9.1.1 The drinks publication gate
 
+- **2026-09-17, #1137, THE SETTLED RULE (third reading, and the two below are
+  what it took to get here). `rewritten: true` is the drinks gate's THIRD LEG.
+  `made_before` does not gate.** Helen: *"Oh god, I'm not thinking properly. I
+  want to block cocktails that have not been rewritten. I want to allow
+  cocktails that I have not made. I will rewrite these before making them."*
+
+  So a drink publishes only on `awaiting_fix: false` AND `proofread: true` AND
+  `rewritten: true`; an unmade drink publishes, exactly as #722 ruled on
+  2026-09-05. **The two halves are easy to swap and were swapped twice** — the
+  pairing to remember is *unmade is fine, unrewritten is not*, and the reason
+  they go together is her last sentence: she rewrites a drink BEFORE she makes
+  it, and the live site is what she reads while making it.
+
+  **WHY IT EARNED A LEG.** `rewritten` means the prose on the page is hers
+  rather than the source's, and until today it was read by nothing — so the
+  only thing standing between a source's own wording and the live site was the
+  promotion procedure remembering to check. Now it is checked in the one place
+  that cannot forget.
+
+  **IT COST NOTHING ON THE DAY, measured before writing the rule** rather than
+  after (`tmp/rewritten_census.py`): all 47 drinks then live already said
+  `rewritten: true`, so no page went dark. Adding a gate leg can only ever take
+  pages OFF the site, which makes that census the first thing to run, not the
+  last.
+
+  **AND IT SETTLES WHO TYPES THE FLAG, in the direction the middle entry below
+  had already chosen but for a better reason.** A flag that decides whether a
+  page exists belongs with `proofread`: hers, always, everywhere. The
+  `4-promote/` shortcut — where the MOVE was her claim and the mechanical pass
+  flipped the flag — is therefore gone for good, and an agent never writes
+  `rewritten` on either site. If a staged drink still says `false`, say so and
+  let her flip it. `meta.rewritten` comes off `INVISIBLE_KEYS` with it: a list
+  of keys "nothing renders" may not name a gate leg.
+
+  **Drinks only.** Food keeps two legs; widening it there is a separate ruling
+  with its own blast radius, and `test_an_unrewritten_drink_is_held_back_but_an_unmade_one_publishes`
+  holds that boundary with a FOOD row that fails the moment the leg is read
+  without the collection name.
+
+  **THE PROCESS NOTE, because three readings of one sentence is the real
+  lesson.** The issue title said *"unmade drinks are allowed on the site if
+  `rewritten: true` and `proofread: true` and `awaiting_fix: true`"*. It was
+  implemented first as "publish despite a ticket", then as "publish while
+  unrewritten", and is in fact "do not publish while unrewritten". Two wrong
+  builds, neither merged, both caught by her reading a plain-English summary of
+  what the code would now do. **Where a rule is a conjunction of flags, state
+  the resulting TRUTH TABLE back before building it** — each row as a sentence
+  about what does and does not reach the live site. That is the artefact she
+  can check in seconds, and the one that would have caught this on the first
+  pass rather than the third.
+
 - **2026-09-17, #1137 — an unrewritten drink may publish; a drink awaiting a fix
-  may not; and the gate itself does not change at all.** Helen's issue title read
+  may not; and the gate itself does not change at all.** **SUPERSEDED THE SAME
+  DAY by the entry above — she was misread twice; this is the middle of three
+  readings, kept because the measurement in it is still true and because the
+  journal is never rewritten.** Helen's issue title read
   *"unmade drinks are allowed on the site if `rewritten: true` and
   `proofread: true` and `awaiting_fix: true`"*, which was implemented as an
   exemption in `_plugins/publish_gate.rb` letting a rewritten drink publish with
