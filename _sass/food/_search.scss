@@ -111,18 +111,41 @@
 // names group takes I KNOW WHAT I WANT's hue for the same reason: a title
 // search is that box.
 //
-// THE -bright TONES, NOT THE -active ONES. They wore the active tones for a
-// day and Helen asked for "brighter, closer to core colours although
-// obviously we're limited by contrast" -- so each is its root darkened by
-// exactly what 4.5:1 on the surface costs and no more (_palette.scss has the
-// measurements). The panel is a small surface and the headings are its only
-// colour, which is what lets them run closer to the roots than a button label
-// among a hundred others can.
-.page-search-group--name           .page-search-group-label { color: $color-name-search-bright; }
-.page-search-group--star           .page-search-group-label { color: $color-star-bright; }
-.page-search-group--mood           .page-search-group-label { color: $color-mood-bright; }
-.page-search-group--practicalities .page-search-group-label { color: $color-practicalities-bright; }
-.page-search-group--ingredient     .page-search-group-label { color: $color-ingredient-bright; }
+// FILLED, NOT COLOURED, SINCE #1136 (2026-09-17). Helen asked for it on
+// cocktails -- "should take their section's background colour with black
+// lettering, like active chips on the index page" -- looked at it, and asked
+// for "the same for the food site". So the ramp is the BLOCK's colour now
+// rather than the letter's, on both.
+//
+// THE ROOT HUES, NOT THE -bright ONES, AND THAT IS A MEASUREMENT RATHER THAN A
+// PREFERENCE. The `-bright` tones exist to be READ as text on the panel: each
+// is its root darkened by exactly what 4.5:1 there costs (_palette.scss), which
+// makes them mid-tone -- and near-black on a mid-tone is not text any more.
+// Measured (tmp/food_group_fill.py), `$color-text` on the five `-bright` fills
+// lands at 3.45-3.52:1, under the bar on every one; the paper letter on them is
+// 4.37-4.46:1, under it too. On the ROOTS the same near-black reads 4.75:1
+// (star's magenta, the darkest) to 13.77:1 (the banana yellow) -- so the fill
+// that works is the section's own core colour, which is also the one Helen
+// keeps asking these headings to move towards ("brighter, closer to core
+// colours although obviously we're limited by contrast", 2026-09-15). Filling
+// with them rather than lettering in them is what finally allows it.
+//
+// WHAT IT COSTS, and it is worth knowing before anyone calls it a bug: on this
+// near-white paper the yellow and wasabi blocks stand off the page at only
+// 1.12:1 and 1.45:1, so their EDGES are faint even though the black on them is
+// the most legible on the panel. That is a light site carrying bright hues, the
+// same reason food's own chips fill with a tint rather than a wash of ink.
+//
+// The letter is `$color-text`, this site's near-black, matching what its active
+// chips letter in (food/_category-labels.scss) -- the same RELATIONSHIP as
+// cocktails' `$color-bg`, each site's own near-black, never a literal black.
+.page-search-group-label { color: $color-text; }
+
+.page-search-group--name           .page-search-group-label { background: $color-name-search-root; }
+.page-search-group--star           .page-search-group-label { background: $color-star-root; }
+.page-search-group--mood           .page-search-group-label { background: $color-mood-root; }
+.page-search-group--practicalities .page-search-group-label { background: $color-practicalities-root; }
+.page-search-group--ingredient     .page-search-group-label { background: $color-ingredient-root; }
 
 // --- Name search ------------------------------------------------------------
 // `margin-top: $space-sm` used to sit here. It never did anything: adjacent

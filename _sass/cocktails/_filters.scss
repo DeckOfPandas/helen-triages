@@ -180,10 +180,28 @@
 // lands on are one colour making one claim, which is this file's own rule for
 // a heading. Names take I KNOW WHAT I WANT's violette, because a title search
 // is that box.
-.page-search-group--name       .page-search-group-label { color: $color-heading-name; }
-.page-search-group--mood       .page-search-group-label { color: $color-heading-mood; }
-.page-search-group--hassle     .page-search-group-label { color: $color-heading-hassle; }
-.page-search-group--ingredient .page-search-group-label { color: $color-heading-include; }
+// FILLED, NOT COLOURED, SINCE #1136 (2026-09-17). Helen: "omnisearch dropdown
+// result group headings should take their section's background colour with
+// black lettering, like active chips on the index page." So the ramp stops
+// being the LETTER's colour and becomes the BLOCK's, which is the same move
+// #1086 made for the filter buttons and #1099/#1100 for the cards' matched
+// chips -- this heading was the last place on the site still saying "this kind"
+// with coloured text alone.
+//
+// The block's SHAPE is shared/_furniture.scss's (it hugs its words there, for
+// both sites); what is this file's is the hue and the letter.
+//
+// `$color-bg` IS THE "BLACK": the page's own near-black, which is what every
+// other inverted chip on this site uses, so the dropdown cannot drift from them
+// by using a literal black instead.
+.page-search-group-label {
+  color: $color-bg;
+}
+
+.page-search-group--name       .page-search-group-label { background: $color-heading-name; }
+.page-search-group--mood       .page-search-group-label { background: $color-heading-mood; }
+.page-search-group--hassle     .page-search-group-label { background: $color-heading-hassle; }
+.page-search-group--ingredient .page-search-group-label { background: $color-heading-include; }
 
 // THE GLASS SITS BACK ON THIS SITE -- Helen, 2026-09-15: "for the cocktail
 // site, make grey-er/darker, so it demands less attention at the top of the

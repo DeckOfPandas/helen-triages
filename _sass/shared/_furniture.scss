@@ -246,6 +246,18 @@ $page-search-quiet: 45%;
 // size because a sans-serif's strokes fill more of the letterform than a
 // mono's do, which is the visual effect asked for even though the numeric
 // weight is unchanged. `0.7rem`, up from `0.66rem`, is the "slightly larger."
+// INLINE-BLOCK BECAUSE BOTH SITES FILL IT NOW -- #1136, 2026-09-17. The heading
+// is a `<div>` (page-search.js), so a background painted on it would run the
+// dropdown's full width and read as a section bar rather than as a chip; this
+// makes the block hug its words, and the padding above becomes the block's own
+// margin exactly as it does for an active filter chip.
+//
+// HERE RATHER THAN IN EACH SITE, and that is the day's other lesson: the same
+// issue's cocktails half went in as a per-site rule in the morning, and food
+// asking for "the same" a few hours later would have made it two copies of one
+// decision -- which is how `.page-search-input::placeholder` came to carry a
+// cocktails override that silently undid #1123 (see this file's own note there).
+// What is per-site is the HUE and the letter; the shape is one rule.
 .page-search-group-label {
   font-family: $font-body;
   font-size: 0.7rem;
@@ -253,6 +265,7 @@ $page-search-quiet: 45%;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   line-height: 1;
+  display: inline-block;
   color: $color-clear-text;
   padding: $space-xs $space-md $space-xs;
 }
