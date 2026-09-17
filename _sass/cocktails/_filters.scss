@@ -830,9 +830,42 @@
 // colour change only -- the border-WIDTH is untouched, so the box measures
 // exactly what it measured at rest and the chips beside it do not move
 // (§13.4.2, and test_no_active_filter_button_changes_its_own_width).
+// CUT TIGHT TO THE WORDS, AND PAINTED RATHER THAN PADDED -- #1134 round two,
+// 2026-09-17. Helen, on the first version: "please cut the active chip
+// background in the HAS TO HAVE filter section tighter to the words. Because
+// the lettering is (rightly) smaller here than for the other chips, the
+// background looks enormous."
+//
+// SHE IS DESCRIBING A REAL RATIO AND IT MEASURES. At 1280 a chosen chip here
+// and a chosen MOOD chip draw almost exactly the same block -- 26.6px tall
+// against 26.9px -- around lettering of 12.8px and 14.4px. The padding is the
+// same in `em`; what differs is that this chip's type is a sixth smaller, so
+// the same block holds visibly less ink. Filling the whole padding box was
+// right for `.btn-mood` and too much here.
+//
+// THE BOX MUST NOT MOVE, WHICH IS WHY THIS IS A GRADIENT AND NOT LESS PADDING.
+// #389: a chosen filter may not resize itself, or every chip after it on the
+// row slides along -- and these chips WRAP, so a resize would reflow the pool.
+// (`test_no_active_filter_button_changes_its_own_width` scans `btn-mood` and
+// `btn-chaos`, not `btn-pool`, so the rule here is kept by construction: this
+// declares no layout property at all.) A one-colour `linear-gradient` is a
+// background IMAGE, so `background-size` can shrink the painted block inside a
+// box that does not change -- paint only, §13.4.2.
+//
+// THE TWO NUMBERS, in `em` so they follow this chip's own smaller type: 0.7em
+// off the width and 0.3em off the height, centred. Against the padding box
+// that leaves about 5.9px of block each side of the word rather than 10.4px,
+// and about 2px above and below the line box -- a block that hugs the word,
+// with the chip's own hit area unchanged around it.
+//
+// THE BORDER GOES TRANSPARENT rather than taking the fill's colour. Tracing the
+// full box in magenta would restore exactly the shape this change removes, and
+// a grey frame around a magenta block reads as two objects. Transparent keeps
+// the 1.5px the box has always reserved, so again nothing moves.
 .drink-search--include .btn-pool.is-on {
-  background: $color-heading-include;
-  border-color: $color-heading-include;
+  background: linear-gradient($color-heading-include, $color-heading-include)
+              no-repeat center / calc(100% - 0.7em) calc(100% - 0.3em);
+  border-color: transparent;
   color: $color-bg;
   -webkit-text-stroke: 0.05em $color-bg;
   text-shadow: none;

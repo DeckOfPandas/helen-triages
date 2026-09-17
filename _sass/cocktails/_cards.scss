@@ -855,9 +855,34 @@ $card-name-step: 0.86;
   // element wraps properly where the headings' inset box-shadow does not, which
   // is why the old comment reached for text-decoration and why this does not
   // have to.
-  background: $color-wicked-woowoo;
-  color: $color-bg;
-  -webkit-text-stroke: 0.04em $color-bg;
+  // A WASH AT 70%, NOT THE SOLID HUE -- #1134 round two, 2026-09-17. Helen, on
+  // the solid version: "please try making the pink active chip background on
+  // the cards a little less intense. Maybe with transparency? I really want
+  // this to work, we're just not there yet."
+  //
+  // AND THE LETTER HAD TO FLIP WITH IT, WHICH IS PHYSICS RATHER THAN TASTE.
+  // Fading composites the block towards the card underneath it, so the fill
+  // darkens and the gap to a DARK letter closes. Measured over $color-surface
+  // (tmp/hit_alpha.py): $color-bg on the block reads 5.59:1 solid, 4.71:1 at
+  // 90% and 4.29:1 at 85% -- so the punched-out letter runs out of contrast
+  // almost immediately, and "a little less intense" while keeping it means 90%,
+  // which is not visibly less intense at all. Past that the block is a dark
+  // tint and wants the LIGHT letter: at 70% $color-text reads 4.79:1 on it and
+  // the block still stands off the card at 3.00:1, which is what keeps a hit
+  // legible AS a hit.
+  //
+  // SO THIS IS NO LONGER THE MOOD CHIP'S TREATMENT, and that is the one thing
+  // to know when reading the two side by side. `.drink-card-mood.is-match` is
+  // still a punched block (dark letter on a bright fill) because a chip is two
+  // or three words in a row of its own; this is a whole ingredient name inside
+  // a line of other ingredients, so the same fill covers far more of the card
+  // and reads louder at the same alpha. Same hue, same block, quieter surface.
+  //
+  // The stroke follows the letter, as it does everywhere this device is used:
+  // faux-bold in the letter's own colour, never a second hue.
+  background: rgba($color-wicked-woowoo, 0.7);
+  color: $color-text;
+  -webkit-text-stroke: 0.04em $color-text;
   padding: 0 0.25em;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
