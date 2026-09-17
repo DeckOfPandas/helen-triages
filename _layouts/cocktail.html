@@ -804,10 +804,19 @@ layout: default
        nothing. This is a true sentence about the recipe as written whether or
        not anything ever runs, so it prints, and it is right on paper.
 
-       A DRINK WITH NO `page.volume` GETS NO LINE. That is five published drinks
-       today and every one of them tops up; `volume_for`'s header says why a
-       midpoint of `top_up_ml` is not good enough for this particular number,
-       and what would unlock them (#1076, #295). {% endcomment %}
+       "Approximately" IS DOING REAL WORK ON A TOPPED DRINK, not just rounding.
+       A `to top` spends the midpoint of a declared range — Helen, 2026-09-17,
+       overruling this line's first shape: "Midpoint please, I'll cope on the
+       spot." So a Tom Collins's 237.5 ml is 112.5 ml of build plus the house
+       100–150 halved, and her word is carrying that 50 ml span. The same
+       expression feeds the units line's figure (`top_up_ml` in the plugin, one
+       expression and two callers), so the two sentences can never disagree
+       about what a top pours.
+
+       A DRINK WITH NO `page.volume` GETS NO LINE, and that is a different kind
+       of thing from an approximate one: two published drinks whose excluded
+       pours ARE the drink, where a figure would be wrong rather than rough.
+       `volume_for`'s header names them and says why. {% endcomment %}
     {% if page.volume %}
       <p class="cocktail-scale-total" data-total-ml="{{ page.volume.total_ml }}">Approximately
         <span class="cocktail-scale-total-figure">{{ page.volume.total_ml }}</span> ml</p>
@@ -1209,8 +1218,11 @@ layout: default
      and the two elements being different elements is what prevents it.
 
      THE TAIL IS DROPPED RATHER THAN GUESSED where the volume is unknown, and
-     the sentence falls back to exactly what it said before #1121. The four
-     drinks that keep the old wording all top up — see `volume_for` in
+     the sentence falls back to exactly what it said before #1121. One
+     published drink keeps the old wording — the Caipirinha, whose excluded
+     pours ARE the drink. A TOPPED drink is not in that class: since Helen's
+     ruling of 2026-09-17 it spends the declared range's midpoint, the same
+     one this line's own unit figure has always spent. See `volume_for` in
      _plugins/cocktail_units.rb.
 
      `data-units-per-serve` AND `data-serves` ARE READ BY cocktail-scale.js for

@@ -78,8 +78,9 @@
 # exclusion vocabulary, and a second implementation of "how big is this pour"
 # is a second answer waiting to disagree with the one the units line prints.
 # It is a SEPARATE KEY from `units` because the two withhold independently --
-# a drink with no alcohol in it still has a volume, and a topped drink has a
-# unit count and no volume anyone can state.
+# a drink with no alcohol recorded in it may still have a volume, and a drink
+# whose excluded pours ARE the drink has a unit count and no volume anyone can
+# state. Both spend the `to top` midpoint, through one shared `top_up_ml`.
 # =============================================================================
 
 require "set"
@@ -169,7 +170,7 @@ module HelenTriages
       # work out which. `withheld` is the honest half of #1121 -- see
       # `volume_for` -- and it is expected to be non-zero.
       Jekyll.logger.info "Volume:", "measured #{measured} drinks " \
-        "(#{withheld} withheld -- topped up, or the excluded pours ARE the drink)"
+        "(#{withheld} withheld -- the excluded pours ARE the drink)"
     end
 
     private
@@ -265,6 +266,28 @@ module HelenTriages
       [m[1].to_f, unit]
     end
 
+    # WHAT A `to top` POURS: the midpoint of the declared range, or nil when
+    # nothing declares one.
+    #
+    # ONE EXPRESSION, TWO CALLERS, SINCE #1121 -- `units_for` and `volume_for`.
+    # It was inline in the first of those and is lifted out rather than copied,
+    # because the two lines a drink page prints about a topped drink ("Roughly
+    # 2.4 units", "Approximately 237.5 ml") are now BOTH spending this range,
+    # and the one thing they must never do is disagree about what the top
+    # pours. A copy would have been two answers to one question.
+    #
+    # `.max` ACROSS A LIST GENERIC, unchanged from the inline version: a pour
+    # written as several generics means "either would do" (#441), and the
+    # largest declared top is the one that fills the glass. (Every topper in
+    # the collection is a single generic today, so this has never been
+    # exercised; it is kept because deleting it would be a silent change of
+    # rule rather than a simplification.)
+    def top_up_ml(generics)
+      tops = Array(generics).filter_map { |g| @top_up[g] }
+      return nil if tops.empty?
+      tops.map { |t| (t["ml_min"].to_f + t["ml_max"].to_f) / 2.0 }.max
+    end
+
     # One decimal place, AND AN INTEGER WHERE THE FIGURE IS A WHOLE NUMBER OF
     # MILLILITRES. Liquid prints a Ruby Float 90.0 as "90.0"; the page wants
     # "90 ml", never "90.0 ml", which is the same rule assets/js/scale.js's
@@ -301,37 +324,73 @@ module HelenTriages
     # still a total -- the reader can see what was skipped, because those pours
     # are still on the list unchanged.
     #
+    # --- A `to top` TAKES ITS MIDPOINT, AND "Approximately" IS WHY -----------
+    # HELEN RULED ON THIS, 2026-09-17, OVERRIDING THE ANSWER THIS FILE SHIPPED
+    # WITH THAT MORNING: "Midpoint please, I'll cope on the spot."
+    #
+    # So a topped drink prints a figure, and `top_up_ml` above resolves it --
+    # the same expression the unit count spends, deliberately one expression
+    # and not two. The argument she overruled is kept here because it is the
+    # argument to make again if the figure ever looks silly on a real glass:
+    # `top_up_ml` in costs.yml declares ONE range per topper whatever the drink
+    # (champagne 75-100, soda water 100-150), and #1076 established that the
+    # range is a stand-in for a calculation this repo cannot yet run -- a top
+    # fills the glass, so it is capacity - build - room for the ice, and NO
+    # GLASS RECORDS A CAPACITY (#295 is open). One source already prints
+    # "Top (30-45)" against the house 75-100. The midpoint is therefore a
+    # figure resting on a placeholder, and 25 ml either way is 0.3 of a unit in
+    # the footer's other sentence but a whole 25 ml here.
+    #
+    # WHAT MAKES IT SAFE IS THE WORD SHE CHOSE. "Approximately X ml" is doing
+    # real work on these five drinks and rounding on the other thirty-six: it
+    # is carrying a declared 50 ml span, and it is her word, on a line she
+    # reads while deciding how many glasses to pour. "I'll cope on the spot" is
+    # the whole trade -- a figure to work from beats a blank, for a reader who
+    # is standing at the counter with the bottle in her hand.
+    #
+    # WHEN `capacity_ml:` LANDS IN glasses.yml, `top_up_ml` stops being a house
+    # range and this stops being an approximation. Nothing here has to change;
+    # the figure simply gets better.
+    #
     # --- AND WHEN THERE IS NO FIGURE TO PRINT AT ALL -------------------------
-    # Two ways, and both of them withhold rather than approximate. "A number
-    # known to be wrong is worse than no number" is this repo's own sentence,
-    # from the day cocktail-scale.js deleted the millilitre box.
+    # TWO REMAINING WAYS, AND THEY ARE A DIFFERENT KIND OF THING FROM THE TOP.
+    # A topped figure is APPROXIMATE -- the right number, give or take a
+    # declared range. These two would be WRONG -- not a rough answer to the
+    # question but an answer to a different question -- so they withhold, and
+    # Helen's ruling above does not reach them because there is no range to
+    # take a midpoint of.
     #
-    # 1. A `to top`. `top_up_ml` declares ONE range per topper whatever the
-    #    drink (champagne 75-100, soda water 100-150), and #1076 established
-    #    that the range is a stand-in for a calculation this repo cannot yet
-    #    run: a top fills the glass, so it is capacity - build - room for the
-    #    ice, and NO GLASS RECORDS A CAPACITY (#295 is open). Helen, 2026-09-14:
-    #    "Calculate ml for top, because we can totally work this out" -- and a
-    #    source already prints "Top (30-45)" against the house 75-100. So the
-    #    midpoint would be a confident number resting on a placeholder, in the
-    #    one place on the page whose whole job is "how many glasses is this".
-    #    A UNIT COUNT SPENDS THE SAME RANGE AND THAT IS NOT AN INCONSISTENCY:
-    #    25 ml either way of a 100 ml pour of 12% prosecco is 0.3 of a unit,
-    #    which does not move a figure printed to one decimal place. The same
-    #    25 ml is 25 ml of the volume. Five published drinks are withheld by
-    #    this rule (airmail, julien-sorel, arrack-christmas-punch-wife-3,
-    #    pear-apricot-and-rosemary-bellini, tom-collins); the day `capacity_ml`
-    #    lands in glasses.yml, delete this branch and add the top.
-    #
-    # 2. The excluded pours ARE the drink. THE SAME TEST cocktail_costs.rb
+    # 1. The excluded pours ARE the drink. THE SAME TEST cocktail_costs.rb
     #    applies for `cost.complete`, and deliberately its own constant rather
     #    than a copy of it: "a drink whose excluded pours are INGREDIENTS
     #    rather than flourishes". The Caipirinha is 45 ml of cachaca, half a
-    #    lime and 20 g of palm sugar, and "45 ml" is not what is in the glass.
-    #    A dozen sugar cubes in a punch is a flourish and does not spoil it.
+    #    lime and 20 g of palm sugar, and "45 ml" is not an approximation of
+    #    what is in that glass -- it is the cachaca, and the drink is not. A
+    #    dozen sugar cubes in a punch is a flourish and does not spoil it.
+    #    The Pear, Apricot and Rosemary Bellini fails this too, and resolving
+    #    its top does not rescue it: six of its eight pours are a batch syrup
+    #    (a whole pear, four apricots, 75 g of sugar, 25 g of honey) that only
+    #    its METHOD portions -- "Add 25 ml syrup to a champagne flute" -- so
+    #    the ingredient list does not describe one serving at all. Adding an
+    #    87.5 ml top to a 10 ml vinegar pour would produce a confident 97.5 ml
+    #    for a drink whose real build nothing here can see.
+    #
+    # 2. An amount nothing can read, or a topper with no declared range. Both
+    #    are gaps rather than exclusions, and there are none today --
+    #    test_every_amount_is_readable_as_a_quantity (#571) and
+    #    test_top_up_volumes_cover_every_to_top_pour keep it so.
     #
     # A drink with no volumetric pour at all (nothing but dashes) returns nil
     # for the plain reason that there is nothing to add up.
+    #
+    # --- ONE TRAP, PRIMED AND NOT YET SPRUNG --------------------------------
+    # `serve_ml` divides the WHOLE total by `serves:`, the top included, and
+    # for a topped punch that would be wrong: a bowl's alcohol is shared out,
+    # but a top fills ONE glass and four glasses need four tops.
+    # scripts/top_up_ml.py found this on the same data and said the same thing.
+    # No topped drink declares `serves:` today, so the two rules have never
+    # disagreed on a real drink -- and a test asserts exactly that, so the
+    # first topped punch is a red build rather than a quietly wrong number.
     def volume_for(ingredients, serves)
       return nil unless ingredients.is_a?(Array) && !ingredients.empty?
 
@@ -344,8 +403,20 @@ module HelenTriages
         amount = ing["amount"].to_s.strip
         number, unit = unit_named(amount)
 
-        # 1. THE TOPPED DRINKS -- see above. Withheld whole, not estimated.
-        return nil if unit == "to top"
+        # A `to top` SPENDS ITS DECLARED RANGE'S MIDPOINT -- Helen's ruling, and
+        # `top_up_ml` is the same expression the unit count asks. A topper with
+        # no declared range is a gap in the data and withholds the whole figure
+        # rather than quietly leaving the glass half empty; `units_for` skips
+        # such a pour instead, which is right there and wrong here (a missing
+        # strength costs a fraction of a unit, a missing top is most of the
+        # drink).
+        if unit == "to top"
+          topped = top_up_ml(Array(ing["generic"]).map(&:to_s))
+          return nil if topped.nil?
+          total += topped
+          pours += 1
+          next
+        end
 
         if number && @per_ml.key?(unit)
           total += number * @per_ml[unit].to_f
@@ -354,7 +425,8 @@ module HelenTriages
         end
 
         if @non_volumetric.include?(unit)
-          # 2. AN INGREDIENT-SIZED EXCLUSION, borrowed rather than restated.
+          # AN INGREDIENT-SIZED EXCLUSION, borrowed rather than restated --
+          # withholding rule 1 above.
           substantial += 1 if CocktailCosts::SUBSTANTIAL.match?(amount)
           next
         end
@@ -405,9 +477,8 @@ module HelenTriages
         # being topped with contains alcohol -- see DIFFERENCE 1 above.
         topped = false
         if amount == "to top"
-          tops = generics.filter_map { |g| @top_up[g] }
-          next if tops.empty?
-          ml = tops.map { |t| (t["ml_min"].to_f + t["ml_max"].to_f) / 2.0 }.max
+          ml = top_up_ml(generics)
+          next if ml.nil?
           topped = true
         else
           ml = volume_ml(amount)

@@ -133,9 +133,9 @@ function page(pours, opts) {
 
   /* THE TOTAL LINE IS OPT-IN FOR A DIFFERENT REASON FROM THE THREE ABOVE --
      #1121. Those are missing in PRODUCTION; this one is missing on a DRINK
-     whose volume the repo cannot state, which is five published drinks and
-     every one of them tops up (see `volume_for` in cocktail_units.rb). So a
-     page without it is a real live page, not a config.
+     whose volume would be wrong rather than rough, which is two published
+     drinks (see `volume_for` in cocktail_units.rb). So a page without it is a
+     real live page, not a config.
 
      `opts.totalMl` IS WHAT THE PLUGIN WROTE, and the span starts holding it
      because the SERVER rendered ×1 before any script ran. A test that started
@@ -547,10 +547,12 @@ test('the units line does not move with the scaler, and the total does', () => {
     'while the batch line beside the control says what is on the table');
 });
 
-test('a topped drink renders no total line, and the scaler is unaffected', () => {
-  // Five published drinks have no `page.volume` — every one of them tops up,
-  // and `top_up_ml` is a house range #1076 has not settled. The element is
-  // absent, not empty.
+test('a drink with no stated volume renders no total line, and the scaler is unaffected', () => {
+  // Two published drinks have no `page.volume` — the Caipirinha and the pear
+  // Bellini, where the excluded pours ARE the drink and a figure would be
+  // wrong rather than rough. (A TOPPED drink is not one of them: since Helen's
+  // ruling of 2026-09-17 it spends its declared range's midpoint.) The element
+  // is absent, not empty.
   const p = page(AVIATION);
   assert.strictEqual(p.total, null);
   p.type(p.input, '3');

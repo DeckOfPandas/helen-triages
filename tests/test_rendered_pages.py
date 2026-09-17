@@ -2577,23 +2577,27 @@ UNITS_LINE = re.compile(r'<p class="cocktail-units"(.*?)</p>', re.S)
 SERVING_OF = re.compile(r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml\.")
 
 # THE DRINKS THAT STATE NO VOLUME, PINNED BY NAME -- see `volume_for` in
-# _plugins/cocktail_units.rb for the two rules and the argument behind each.
-# Five top up, and `top_up_ml` is a house range #1076 has shown is a stand-in
-# for a calculation this repo cannot yet run (no glass records a capacity,
-# #295). One is the Caipirinha, where the excluded pours ARE the drink -- the
-# same judgement, and the same constant, as `cost.complete`.
+# _plugins/cocktail_units.rb for the rule and the argument.
+#
+# A TOPPED DRINK IS NOT ONE OF THEM, since Helen's ruling of 2026-09-17:
+# "Midpoint please, I'll cope on the spot." Five drinks printed nothing for
+# half a day because `top_up_ml` is a house range #1076 has shown is a
+# stand-in; they now spend its midpoint, which is what the unit count beside
+# them has always done, and her "Approximately" carries the span.
+#
+# WHAT IS LEFT IS A DIFFERENT KIND OF DRINK: one whose excluded pours ARE the
+# drink, where a figure would be WRONG rather than rough. The same judgement,
+# and the same constant, as `cost.complete`. The Bellini is both topped and
+# incomplete, and resolving its top does not rescue it -- six of its eight
+# pours are a batch syrup only its method portions.
 #
 # A RATCHET IN BOTH DIRECTIONS, deliberately. A new name here means a drink
 # quietly lost a figure it used to print; a name leaving means one gained a
-# figure, which is either #1076 landing (good, and update this list in that
-# commit) or the withholding rule being weakened by accident.
+# figure, which is either a data fix (good -- update this list in that commit)
+# or the withholding rule being weakened by accident.
 NO_VOLUME_STATED = {
-    "airmail",
-    "arrack-christmas-punch-wife-3",
     "caipirinha",
-    "julien-sorel",
     "pear-apricot-and-rosemary-bellini",
-    "tom-collins",
 }
 
 
@@ -2617,10 +2621,11 @@ def test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot(prod_s
         f"  newly silent (lost a figure they used to print): "
         f"{sorted(silent - NO_VOLUME_STATED)}\n"
         f"  newly speaking (gained one): {sorted(NO_VOLUME_STATED - silent)}\n"
-        "`volume_for` in _plugins/cocktail_units.rb has the two rules. If a "
-        "topped drink has gained a figure because `capacity_ml:` finally landed "
-        "in glasses.yml (#1076, #295), that is the good outcome -- take its name "
-        "out of NO_VOLUME_STATED in the same commit."
+        "`volume_for` in _plugins/cocktail_units.rb has the rule: a drink says "
+        "nothing only when its excluded pours ARE the drink, so a figure would "
+        "be wrong rather than rough. A topped drink is NOT such a drink -- it "
+        "spends the midpoint of its declared range (Helen, 2026-09-17: "
+        "\"Midpoint please, I'll cope on the spot\")."
     )
 
 
@@ -2628,10 +2633,11 @@ def test_a_drink_with_no_volume_keeps_the_units_sentence_it_had_before(prod_site
     """The tail is DROPPED, never guessed, and the old sentence is the fallback.
 
     Helen's wording is "Roughly X units of alcohol in a serving of Y ml". Where
-    Y is unknown the line falls back to exactly what #753 shipped -- "in a
-    serving." -- rather than inventing a figure or a hedge. The Bellini has no
-    units line at all (no alcohol is recorded in its ingredients), which is a
-    separate, older withholding and not this one.
+    Y would be wrong the line falls back to exactly what #753 shipped -- "in a
+    serving." -- rather than inventing a figure or a hedge. The Caipirinha is
+    the only drink this reaches today. The Bellini has no units line at all (no
+    alcohol is recorded in its ingredients), which is a separate, older
+    withholding and not this one.
     """
     problems = []
     for page in _drink_pages(prod_site):
@@ -2702,6 +2708,88 @@ def test_only_the_scaler_line_carries_a_figure_the_scaler_can_reach(prod_site):
     assert not problems, (
         "the two volume figures on a drink page have come apart:\n  "
         + "\n  ".join(problems[:20])
+    )
+
+
+TOP_UP_POUR = re.compile(r'<span class="cocktail-amount">\s*to top\s*</span>')
+
+
+def _topped_pages(built_site):
+    """Every built drink page that prints a `to top` in its amounts."""
+    return [p for p in _drink_pages(built_site)
+            if TOP_UP_POUR.search(p.read_text(encoding="utf-8"))]
+
+
+def test_a_topped_drink_spends_the_midpoint_of_its_declared_range(prod_site):
+    """Helen, 2026-09-17: "Midpoint please, I'll cope on the spot."
+
+    THE MIDPOINT, NOT EITHER END, and that is the whole of what this checks.
+    `top_up_ml` declares 100-150 for soda water; the Tom Collins pours
+    60 + 30 + 22.5 = 112.5 ml before it, so the three answers a plausible bug
+    could give are 212.5 (`ml_min`), 237.5 (the midpoint) and 262.5 (`ml_max`).
+    Read out of costs.yml rather than typed here, so changing the house range
+    changes this test's expectation with it -- the claim is about the RULE.
+
+    It is also, quietly, the check that both callers still share one
+    expression: the footer's unit count has spent this midpoint since #297, and
+    `top_up_ml` in the plugin is now the one place either of them asks.
+    """
+    costs = yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "costs.yml").read_text(encoding="utf-8"))
+    soda = (costs.get("top_up_ml") or {}).get("soda water")
+    assert soda, "costs.yml declares no `top_up_ml` for soda water"
+    midpoint = (float(soda["ml_min"]) + float(soda["ml_max"])) / 2
+
+    page = prod_site / "cocktails" / "recipes" / "tom-collins" / "index.html"
+    assert page.exists(), "the Tom Collins is not in the production build"
+    html = page.read_text(encoding="utf-8")
+
+    total = SCALE_TOTAL.search(html)
+    assert total, (
+        "the Tom Collins prints no volume. Since 2026-09-17 a topped drink "
+        "takes the midpoint of its declared range rather than withholding."
+    )
+    expected = 60 + 30 + 22.5 + midpoint
+    assert float(total.group(1)) == expected, (
+        f"the Tom Collins totals {total.group(1)} ml; its build is "
+        f"60 + 30 + 22.5 = 112.5 and soda water's declared "
+        f"{soda['ml_min']}-{soda['ml_max']} ml has midpoint {midpoint}, so it "
+        f"should be {expected}. `ml_min` would give "
+        f"{112.5 + float(soda['ml_min'])} and `ml_max` "
+        f"{112.5 + float(soda['ml_max'])}."
+    )
+
+
+def test_no_topped_drink_is_also_a_punch(prod_site):
+    """A PRIMED TRAP, AND THIS IS THE PIN -- `volume_for`'s closing note.
+
+    `serve_ml` divides the whole total by `serves:`, the top included. For a
+    bowl that is right about alcohol (it is shared out) and wrong about a top:
+    a top fills ONE glass, and four glasses need four tops. scripts/top_up_ml.py
+    found the same thing on the same data and said so.
+
+    No topped drink declares `serves:` today, so the two rules have never
+    disagreed on a real drink. This is what makes the first topped punch a red
+    build rather than a quietly wrong number -- the fix is to add the top after
+    the division rather than before it, in `volume_for`, and to ask Helen what
+    the scaler's own line should then say.
+
+    READ OFF THE BUILT PAGE, not the front matter: a drink with `serves:` is
+    exactly the drink whose units line says "in each of N servings".
+    """
+    offenders = []
+    for page in _topped_pages(prod_site):
+        units = UNITS_LINE.search(page.read_text(encoding="utf-8"))
+        if units and "each of" in units.group(1):
+            offenders.append(page.parent.name)
+
+    assert not offenders, (
+        "these drinks both top up and declare `serves:`, which the volume sum "
+        f"does not yet handle: {sorted(offenders)}\n"
+        "`volume_for` in _plugins/cocktail_units.rb divides the top by "
+        "`serves:` along with everything else, so each glass is credited with "
+        "a fraction of one top instead of a whole one. Add the top after the "
+        "division, and say so here."
     )
 
 
