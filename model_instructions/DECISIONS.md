@@ -3589,6 +3589,122 @@ unless stated.
   1280px still shows every row's two cards sharing one height, whatever their
   own content. `_sass/cocktails/_cards.scss`.
 
+- **2026-09-17, #1134 — HAS TO HAVE inverts, and so does a matched ingredient
+  on a card. This reverses two of Helen's own rulings, and the reason it is a
+  reversal and not a contradiction is worth keeping.** Her ask: *"HAS TO HAVE
+  chips should also invert when active, same as YOLO, MOOD and HASSLE"*, and
+  *"Also invert them on the cocktail cards to make the hits more obvious"*, with
+  the instruction *"I'm keen you copy as much of the styling as possible from
+  the existing active chips because I love them!"* — so no candidates page, and
+  nothing invented: both are `%drink-btn-naked`'s `.is-on` and
+  `.drink-card-mood.is-match` copied.
+
+  **WHAT WAS REVERSED.** The filter chip banded rather than filled on her
+  ruling of 2026-08-30 (*"has to have chips should show magenta underline on
+  select rather than fill in on select"*, when the fills on that page *"were
+  beginning to become too loud"*), narrowed on 2026-09-02 (*"the has to have
+  selected button should lose its pink underline when it gains its pink box"*).
+  The card's matched ingredient underlined on her ruling of 2026-08-28
+  (*"there's just a lot going on... underline the ingredient rather than
+  highlight"*), which is where §9.13's *bands and washes, not fills* came from.
+
+  **WHY BOTH COULD FLIP WITHOUT EITHER ARGUMENT BEING WRONG.** Both were
+  answers to "this card/page is carrying too many fills at once", and the
+  surroundings emptied out underneath them: the goodness mark became a ship and
+  a word (2026-08-30), the filter buttons became filled blocks in #1086 (*"B:
+  filled block"*), and the cards' matched mood chips became inverted blocks in
+  #1099/#1100 (*"Chip option B please"*). By 2026-09-17 the two things this
+  issue names were the only matched things left still underlining while
+  everything around them inverted — so the band had stopped being the quiet
+  choice and become the odd one out, and the complaint had flipped from "too
+  much on the card" to "the hits aren't obvious enough". **A ruling about
+  RELATIVE loudness expires when its neighbours change.**
+
+  **MEASURED BEFORE COPYING** (`tmp/chip_contrast.py`), because the inverted
+  treatment puts `$color-bg` ON the section hue and HAS TO HAVE's hue is not one
+  of the two that had been tested: the dark letter reads **5.59:1** on
+  `$color-wicked-woowoo`, beside 6.66:1 on MOOD's coral and 6.19:1 on HASSLE's
+  pink. Same family, clear of 4.5:1. The palette's older note that a deep
+  magenta *"has to go almost to black before it clears 4.5"* was about ink ON
+  magenta at text sizes; this is the page's own near-black, which is that black.
+
+  **THE WRAP WAS THE REAL RISK AND IT IS HANDLED, NOT WISHED AWAY.** 2026-08-28's
+  strongest point was that a matched ingredient WRAPS, so a long name became
+  *"two solid slabs on two lines"* — which is why that rule reached for
+  `text-decoration` and said so. `box-decoration-break: clone` gives each line
+  fragment its own padded box, so it reads as two chips rather than one slab
+  with a stub; the same device `.drink-name-hit` already uses, and §13.1's
+  section marks before it. Verified on the real index at 360px, where
+  `maraschino liqueur` on the Julien Sorel breaks across two lines.
+
+  **SCOPED BY SECTION, AND THAT IS LOAD-BEARING.** `.btn-pool` is BOTH pickers'
+  chip and LEAVE OUT's chosen state is deliberately colourless, so the rule is
+  `.drink-search--include .btn-pool.is-on` — the same shape as
+  `.drink-filter--mood .btn-mood.is-on`. A bare `.btn-pool.is-on` carrying the
+  faux-bold stroke would hollow out every EXCLUDED chip in `$color-bg` on a dark
+  page. The border takes the fill's colour (these chips have a 1.5px outline
+  where `.btn-mood` is naked) — a colour change only, so the box measures what
+  it measured at rest and `test_no_active_filter_button_changes_its_own_width`
+  still passes.
+
+- **2026-09-17, #1134 round two — the fill came off the card the same day it
+  went on, and the chip kept it. The entry above stands as what was tried.**
+  Helen, on the built thing: *"card ingredient chips aren't working for me at
+  all. Let's go back to the underline. Can we try a thicker underline? Or
+  basically anything else you can think of to get some more pink on the card!
+  The filter chips look great! But please centre the box on the word
+  vertically."*
+
+  **SO THE SPLIT IS THE RULE, AND IT IS NOT A COMPROMISE.** A CHIP fills when it
+  matches; a WORD bands. A mood chip is two or three words in a row of its own,
+  where a block is the object; a matched ingredient is a name inside a line of
+  other names, so the same fill covers far more of the card, wraps, and competes
+  with the drink's own title. Everything the entry above says about the
+  surroundings emptying out was true and still did not make a fill right HERE —
+  **the thing that had changed was the card's other furniture, not this
+  element's own shape.**
+
+  **WHAT THE BAND CARRIES INSTEAD IS WEIGHT**: 0.16em → **0.3em**, which is
+  Helen's own number from `.drink-name-hit` (*"the purple underline for searched
+  cocktail titles should be thicker to make it stand out more"*), so the site has
+  one thickness for "this matched" rather than two. Offset 0.16em → 0.12em, so a
+  thicker band still reads as belonging to the word. A second candidate — the
+  matched word itself in the hue as well — was built and shown rather than
+  argued: band and letters merge into one mass and the word gets harder to read,
+  so it was not taken.
+
+  **FADING DID NOT RESCUE THE FILL EITHER, AND THE REASON IS WORTH KEEPING.**
+  Asked to make the block *"a little less intense. Maybe with transparency?"*,
+  the measurement (`tmp/hit_alpha.py`, over `$color-surface`) said no useful
+  alpha exists: a fading block composites towards the card, so the punched-out
+  `$color-bg` letter loses contrast at once — 5.59:1 solid, 4.71:1 at 90%,
+  4.29:1 at 85%. Past that the letter must flip light, which is a DIFFERENT
+  treatment rather than a quieter one (at 70%: light letter 4.79:1, block 3.00:1
+  off the card). **"Less intense" is not always available as a dial; sometimes
+  the only quieter thing is a different shape.**
+
+  **THE CHIP'S BLOCK IS CENTRED ON ITS WORD, AND THAT NEEDED MEASURING.**
+  `background-position: center` centres the block in the PADDING BOX, and a line
+  box is not centred on its own ink — the face's ascent and descent are
+  asymmetric and the leading splits evenly, so the glyphs sit high in it and the
+  block hangs low. `tmp/chip_centring.py` reads the block's edges and the ink's
+  edges out of a 2× crop of the real page: the block sat 3 device px (1.5 CSS
+  px) high, which is 0.12em of this chip's 12.8px type. Corrected to within 0.5
+  CSS px, the remainder being the background snapping to whole device pixels.
+  **A "centre it" ask is measurable and should be measured; by eye it is a nudge
+  war.**
+
+  Also from this round, and the reason the chip's fill is a gradient: **Helen's
+  "the background looks enormous" was a ratio, not a size.** A chosen chip here
+  and a chosen MOOD chip draw almost the same block (26.6px against 26.9px tall)
+  around lettering of 12.8px and 14.4px — the padding is identical in `em`, the
+  type is a sixth smaller, so the same block holds visibly less ink. Cutting the
+  padding was not available (#389: a chosen filter may not resize itself, and
+  these chips wrap, so a resize reflows the pool), so the fill is a one-colour
+  `linear-gradient` — a background IMAGE, whose `background-size` can shrink the
+  painted block inside a box that never changes. **Paint-only is not only about
+  neighbours moving; it is also the lever that lets a fill be retuned at all.**
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%

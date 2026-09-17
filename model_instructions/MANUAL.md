@@ -2167,10 +2167,21 @@ nothing moves, nothing resizes; a chip moves its box, a bare word its text;
 `scripts/palette_measure.py` is the contrast / dichromacy / CIEDE2000 tool;
 the dichromacy bar applies only where colour carries meaning ALONE (the
 goodness mark and the matched ingredient). **Text on a wash is ink, never the
-`-deep`**; **bands and washes, not fills** — the goodness mark is the only fill
-left on a card. That is a rule about CARDS, not the site: the index's active
-filter chip has been a filled block since #1086 (§13.4.2). **The names are the
-bottles** (#555).
+`-deep`**; **a CHIP fills when it matches, a WORD bands** (#1134, 2026-09-17,
+and the split is the rule): the matched mood or hassle chip (#1099/#1100), the
+index's active filter chip (#1086) and HAS TO HAVE's chosen chip (#1134) are
+one treatment — the section's hue as the fill, `$color-bg` as the letter, the
+faux-bold stroke in the letter's colour; **the matched INGREDIENT is a band
+under the words**, `text-decoration` in the same hue at 0.3em, because it is a
+name inside a line of other names rather than a chip in a row of its own, and a
+fill there covers far more of the card and wraps. #1134 tried the fill on it
+for an afternoon (solid, then a 70% wash) and Helen's verdict was *"card
+ingredient chips aren't working for me at all. Let's go back to the
+underline"*; the thickness is what carries "more obvious" instead. **The
+goodness mark is the only fill left on a card.** 0.3em is also
+`.drink-name-hit`'s thickness, from the same ask about title hits — one number
+for "this matched". DECISIONS §9.13 (2026-09-17) has both rounds. **The names
+are the bottles** (#555).
 
 **The index** (`cocktails/index.html`, `_filters.scss`, `cocktail-index.js`):
 
