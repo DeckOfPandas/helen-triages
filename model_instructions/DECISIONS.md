@@ -1192,47 +1192,6 @@ unless stated.
 
 ### §9.1.1 The drinks publication gate
 
-- **2026-09-17, #1137 — an unmade drink may go live: the first hole ever cut in
-  the publish gate, and it is cocktails-only.** Helen: *"cocktails: unmade
-  drinks are allowed on the site if `rewritten: true` and `proofread: true` and
-  `awaiting_fix: true`"*, and asked for the reason to be recorded with it: *"One
-  of the uses of this site for me is to test recipes, and it's been annoying
-  exporting PDFs from the food site so I can do that from my iPad. The stakes
-  are much lower for cocktails, and they're much easier for me (and you) to
-  rewrite too."*
-
-  **WHY THIS IS NOT A LOOSENING OF #331/#667.** `awaiting_fix: true` has never
-  meant "unfinished" — her own 2026-09-01 definition is *"I've proofread, but
-  one small thing has been raised as a ticket, meaning that once that's fixed I
-  can look for just that one thing rather than having to read the entire file
-  again carefully."* A drink she has rewritten, proofread and not yet MADE is
-  exactly that state, and it is also the state in which the site is most useful
-  to her: she reads it in the kitchen while making the thing. The gate was
-  holding back the page at the one moment it had a job to do.
-
-  **WHAT IS AND IS NOT FORGIVEN.** Only the `awaiting_fix` leg, only for
-  `cocktail_recipes`, and only on `rewritten == true`. `proofread` is untouched
-  on both sites — it is *"the very last touch that I, the human, make to the
-  file"* and a drink still cannot reach the site unread. Food keeps both legs,
-  which is the asymmetry she named: a recipe is longer, harder to rewrite and
-  read by more people.
-
-  **TWO PROPERTIES MAKE THE HOLE SAFE, AND BOTH ARE STRUCTURAL RATHER THAN
-  REMEMBERED.** It is keyed on `rewritten`, which is Helen's CLAIM and never an
-  agent's keystroke (§9.1.1 above), so no agent can open it; and it is keyed on
-  the COLLECTION NAME, so no food recipe can fall through it even if it carries
-  the same flags. It also still fails closed: `rewritten` must be exactly
-  `true`, so a missing key or the string `"true"` leaves the gate shut.
-
-  **Guarded by a four-row truth table in one build**
-  (`test_a_rewritten_drink_publishes_with_a_ticket_open_and_food_still_does_not`):
-  rewritten drink with a ticket publishes; the same drink unrewritten is held;
-  the same drink unproofread is held; a FOOD recipe with identical flags is
-  held. Proved by breaking it twice — with the exemption off, the first row
-  fails; with it unscoped from the collection, the food row fails. **The food
-  row is the one that matters most and the easiest to lose in a refactor that
-  reads the flags without the collection name.**
-
 - **2026-09-02, #668, rulings D1–D5 (architecture plan §8)** — D1: reuse all
   three of food's flag names, in food's order, after the two drink keys.
   `rewritten` ported too: it *"shows me if I have rewritten it, not an
