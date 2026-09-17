@@ -28,14 +28,19 @@ disk for an evening. One copy, always pushed, is the rule.
 
 ## The steps
 
-1. **Helen rewrites** a drink — tagline, notes, bottles, anything — and moves
-   it into `_cocktail_drafts/to-promote/`. The move is the signal; nothing
-   else is needed. She tells Claude when a round of moves is done, because
-   Claude will be editing the same files next.
-2. **Claude runs the mechanical pass** over everything in `to-promote/`: flips
-   `rewritten: true` (Helen's standing instruction, for files in that folder
-   only — it is the ONE place an agent may write that flag, and
-   `ingest.md`'s TIER 3 names the same exception), runs the suite, fixes what
+1. **Helen moves** a drink into `_cocktail_drafts/to-promote/`. The move is the
+   signal; nothing else is needed. She tells Claude when a round of moves is
+   done, because Claude will be editing the same files next.
+   - **The move no longer means she has rewritten it — #1137, 2026-09-17.** A
+     drink may publish with `rewritten: false`, so this folder now holds both
+     kinds: ones whose prose is hers, and ones she wants on the live site to
+     read while she makes them. **She sets `rewritten: true` herself, when it
+     is true.** If a batch needs it and she has not, ask; never infer it from
+     the folder, which is what it used to mean and no longer does.
+2. **Claude runs the mechanical pass** over everything in `to-promote/`:
+   **touches no gate flag at all** — `rewritten` joined `proofread` and
+   `awaiting_fix` as Helen's alone on 2026-09-17, and `ingest.md`'s TIER 3 says
+   the same — runs the suite, fixes what
    the suite names — spellings the vocabularies already declare, a missing key,
    a hyphen that should be an en dash, a house name where a bottle belongs, an
    alias where the canonical name belongs, a scalar `suggestion` that should be
@@ -109,8 +114,14 @@ disk for an evening. One copy, always pushed, is the rule.
 
 ## What the flags mean, in one line each
 
-- `rewritten: true` — the words are Helen's. Only she claims it; the move into
-  `to-promote/` is how she claims it for a batch.
+- `rewritten: true` — the words are Helen's. **Only she writes it, and since
+  #1137 (2026-09-17) that is literal: no folder, no batch and no agent sets it.**
+  It gates nothing — a drink publishes with it `false` — so it is a record of
+  whose prose is on the page and nothing else.
+- `made_before: false` — she has not made it yet, and it publishes anyway
+  (#722, 2026-09-05). The live site is where she picks what to try next, and
+  since #1137 the same is true of a drink she has not rewritten: she reads it
+  there while making it, which beats exporting a PDF.
 - `awaiting_fix: true` — one thing is ticketed; she has read it; it will not
   publish until the flag is false again.
 - `proofread: true` — she read the rendered page. Any agent edit after that

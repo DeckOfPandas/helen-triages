@@ -1192,6 +1192,46 @@ unless stated.
 
 ### §9.1.1 The drinks publication gate
 
+- **2026-09-17, #1137 — an unrewritten drink may publish; a drink awaiting a fix
+  may not; and the gate itself does not change at all.** Helen's issue title read
+  *"unmade drinks are allowed on the site if `rewritten: true` and
+  `proofread: true` and `awaiting_fix: true`"*, which was implemented as an
+  exemption in `_plugins/publish_gate.rb` letting a rewritten drink publish with
+  its ticket open. **That was a misreading and she corrected it:** *"I might not
+  follow: I want to allow cocktails that have not been rewritten. I do not want
+  to allow cocktails that are awaiting a fix."* The plugin change was reverted
+  before it merged.
+
+  **WHAT SHE ACTUALLY WANTED NEEDED NO CODE, AND THE WAY THAT WAS ESTABLISHED IS
+  THE POINT.** The gate reads `awaiting_fix` and `proofread` and has never read
+  `rewritten`; `made_before` stopped gating on 2026-09-05 (#722). So an
+  unrewritten, unmade drink was already publishable — proved by BUILDING one
+  (`tmp/check_unrewritten.py`: `rewritten: false`, `made_before: false`,
+  `awaiting_fix: false`, `proofread: true` → page exists, listed on the index,
+  gate silent) rather than by reading the plugin and concluding it. Two
+  misreadings in one issue, both fixed by measuring instead of reasoning.
+
+  **WHAT DID CHANGE IS THE PROCEDURE, WHICH WAS THE ONLY THING SAYING NO.**
+  `PUBLISHING_A_DRINK.md` step 1 made the move into `to-promote/` *mean* "Helen
+  rewrote this", and step 2 had the mechanical pass flip `rewritten: true` for
+  everything in that folder — the one place an agent could write that flag.
+  That held while promoting and rewriting were the same act. They are not any
+  more: the folder now holds both kinds, so the move no longer says which.
+
+  **HER RULING, choosing between the shortcut and the flag's meaning: she sets
+  `rewritten` herself, and Claude never writes it — anywhere, on either site.**
+  So it joins `proofread` and `awaiting_fix` as hers alone, it gates nothing,
+  and it means exactly what it says again: whose prose is on the page. The
+  `to-promote/` exception is deleted from `PUBLISHING_A_DRINK.md`, `ingest.md`'s
+  TIER 3 and MANUAL §9.1.1. Nothing in the test suite encoded it, which is why
+  this is a documentation change and not a code one.
+
+  **The reason, in her words**: *"One of the uses of this site for me is to test
+  recipes, and it's been annoying exporting PDFs from the food site so I can do
+  that from my iPad. The stakes are much lower for cocktails, and they're much
+  easier for me (and you) to rewrite too."* Exactly #722's argument for
+  `made_before`, one flag along.
+
 - **2026-09-02, #668, rulings D1–D5 (architecture plan §8)** — D1: reuse all
   three of food's flag names, in food's order, after the two drink keys.
   `rewritten` ported too: it *"shows me if I have rewritten it, not an

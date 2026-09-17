@@ -1338,11 +1338,23 @@ keys — so a drink's `meta:` block is exactly:
       awaiting_fix: false
       proofread: false
 
-**`rewritten: true` is Helen's CLAIM, not Helen's keystroke** — it *"shows me if
-I have rewritten it, not an agent"*: the notes and the tagline mainly, though
-her first pass also checks ingredients, bottles and method. **The one place an
-agent may type it is `_cocktail_drafts/to-promote/`**, where the MOVE is how she
-claims it (`PUBLISHING_A_DRINK.md` step 2). Nowhere else, on either site.
+**`rewritten: true` is Helen's CLAIM, and since #1137 it is her KEYSTROKE too**
+— it *"shows me if I have rewritten it, not an agent"*: the notes and the
+tagline mainly, though her first pass also checks ingredients, bottles and
+method. **An agent never writes it, anywhere, on either site.** The one
+exception — `_cocktail_drafts/to-promote/`, where the MOVE was how she claimed
+it for a batch — **went on 2026-09-17**, because a drink may now publish
+unrewritten, so that folder holds both kinds and the move no longer says which
+(`PUBLISHING_A_DRINK.md` step 1).
+
+**AND IT GATES NOTHING.** A drink publishes on `awaiting_fix: false` AND
+`proofread: true`, whatever `rewritten` and `made_before` say — measured on a
+real build, 2026-09-17, not inferred: an unrewritten, unmade drink gets its page
+and its place on the index. Helen, #1137: *"One of the uses of this site for me
+is to test recipes, and it's been annoying exporting PDFs from the food site so
+I can do that from my iPad. The stakes are much lower for cocktails."* Same
+reasoning as #722's `made_before` ruling, and **the two flags that DO gate are
+unchanged: a drink awaiting a fix does not publish.**
 What keeps a draft private is `output: false`, not these flags. The counts
 (how many `rewritten: true`, how many staged) are a worklist — re-count, do
 not quote.
