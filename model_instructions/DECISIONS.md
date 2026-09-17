@@ -2320,6 +2320,46 @@ unless stated.
 
 ### §9.3.6 How much liquid is in a drink — #1121, built 2026-09-17
 
+- **2026-09-17, #1121 — the ml line cost the batch note its totals, and the
+  lesson is about what a NEW line does to the ones already there.** Helen, on
+  the built branch: *"I like the line. But the cost and units line below has
+  come back and I don't want it to be there."* The line she means is #713's
+  batch note, which appears under the scaler above ×1 and read
+  `×3: roughly £12.00–£18.00 in ingredients, roughly 7.2 units of alcohol in
+  total.`
+
+  **#713's argument was sound and expired anyway.** It said TOTALS because
+  totals were the only thing that moved — the cost and units lines are both per
+  glass and invariant under scaling, so repeating them would restate the footer,
+  while "what is on the table" had no other answer. `Approximately X ml` is now
+  that answer, in the same spot, at the multiple actually set. **A line that
+  exists because nothing else says a thing stops earning its place the day
+  something else says it better** — the same shape as the card's matched
+  ingredient (§9.13, 2026-09-17), where a treatment stopped being right because
+  its neighbours changed rather than because its own reasoning failed.
+
+  **THE CAVEAT IS NOT A TOTAL, so the element survives carrying only it**:
+  "Don't scale bitters linearly — add to taste." She asked for it in the same
+  breath as the totals (#713) rather than as part of them, and deleting the
+  element would have taken it along with what she actually objected to. The gate
+  drops from `site.show_costs or page.units` to `has_dashes` alone — with
+  nothing but the caveat left, the only question is whether the drink pours a
+  dash — so the element now renders on **15 of 47** built pages instead of 46,
+  measured before and after.
+
+  **The cost half never reached the live site at all** and that is worth
+  recording, because the complaint named it: `has_cost` requires
+  `site.show_costs`, declared only in `_config_local.yml`. A production build of
+  all 47 drinks contains **zero** cost lines, before and after. She was reading a
+  local build, where that switch is on.
+
+  **What the census settled first**, before a line of this was written: our
+  branch had NOT brought anything back. `cocktail-units` 46 → 46, `cocktail-cost`
+  0 → 0, `cocktail-scale-batch` 46 → 46; the only change was the new
+  `cocktail-scale-total` on 45. **When a complaint says "X has come back",
+  measure whether it did before changing anything** — the answer decided that
+  this was a removal she wanted rather than a regression to undo.
+
 - **2026-09-17, #1121 — two sentences, and the interesting part is the six
   drinks that get neither.** Helen specified both lines herself, in her own
   words: *"A line UNDER THE SCALER on a drink page reading: 'Approximately X

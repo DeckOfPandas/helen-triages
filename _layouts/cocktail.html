@@ -840,9 +840,31 @@ layout: default
        paragraph of its own beneath the control rather than text inside the
        label, so a long sentence cannot push the number box around. {% endcomment %}
     <p class="cocktail-scale-note" hidden></p>
-    {% comment %} THE BATCH NOTE — #713, and Helen's request of 2026-09-06:
-       "Bitters text appearing next to the scaler if it's edited to >1. Cost and
-       units on a note."
+    {% comment %} THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, SINCE
+       #1121 (2026-09-17). It was #713 — Helen, 2026-09-06: "Bitters text
+       appearing next to the scaler if it's edited to >1. Cost and units on a
+       note." — and it carried the batch's cost and units totals until she saw
+       them sitting under the new ml line: "I like the line. But the cost and
+       units line below has come back and I don't want it to be there."
+
+       WHAT CHANGED UNDERNEATH #713 IS THIS PAGE. Its totals were the only
+       answer to "what is on the table" when they shipped. #1121 put
+       `Approximately X ml` directly above this note, so the same spot now has a
+       line saying how much liquid the batch is, a footer saying the units in a
+       glass, and this repeating a version of both — three grey sentences where
+       the reader wanted one.
+
+       THE CAVEAT IS NOT A TOTAL, WHICH IS WHY THE ELEMENT SURVIVED. It answers
+       what does NOT scale linearly, and she asked for it in the same breath as
+       the totals rather than as a part of them. Deleting the element would have
+       taken it along with what she actually objected to.
+
+       SO THE GATE IS `has_dashes` ALONE NOW. It used to be
+       `site.show_costs or page.units` — is there a cost line to read, is there
+       a unit count — which was the right question while the note read those two
+       lines. With nothing left but the caveat, the only question is whether
+       this drink pours anything in dashes or drops, and a drink that does not
+       gets no element at all rather than an empty hidden one.
 
        A SEPARATE ELEMENT FROM THE FLOOR MESSAGE ABOVE, on purpose. That one is
        a refusal and this one is information about a multiple that WORKED, so
@@ -851,27 +873,26 @@ layout: default
        backspace bug, the `<= 0` clause). Sharing one element would have meant
        teaching that logic about a second kind of message.
 
-       IT SAYS TOTALS, BECAUSE TOTALS ARE THE ONLY THING THAT MOVES. The cost
-       line and the units line are both PER GLASS and both invariant under
-       scaling — see the cost comment in cocktail-scale.js, Helen 2026-09-06:
-       "the price per glass you calculate needs to divide by the scaled number",
-       so ×n multiplies and divides and cancels. Repeating those figures here
-       would restate the footer. What the footer cannot tell you is what the
-       whole batch costs and how much alcohol is standing on the table, which is
-       the question #545 says the scaler exists to answer: "not poisoning my
-       friends".
+       WHAT THE TOTALS ARGUED, KEPT because it is the case to make again if the
+       batch figures are ever wanted back. They said TOTALS because totals were
+       the only thing that moved: the cost line and the units line are both PER
+       GLASS and invariant under scaling — Helen, 2026-09-06, "the price per
+       glass you calculate needs to divide by the scaled number", so ×n
+       multiplies and divides and cancels — and what the footer could not tell
+       you was what the whole batch cost and how much alcohol was standing on
+       the table, the question #545 says the scaler exists to answer: "not
+       poisoning my friends".
 
-       IT REACHES PRODUCTION SINCE 2026-09-14, AND ONLY ITS UNITS HALF DOES.
-       This used to be gated on `show_costs or show_units`, both declared in
-       _config_local.yml and nowhere else, so the element could not exist in a
-       production build at all. #1001 put the units line on the live site, so
-       the gate now asks the same question the two lines themselves ask: is
-       there a cost line to read (`site.show_costs`, still local-only), or is
-       there a unit count (`page.units`, everywhere)? Each half is read
-       independently by cocktail-scale.js, so in production the note says the
-       batch's units and nothing about money -- which is the half that answers
-       "not poisoning my friends", and the half a reader who is not Helen has
-       any use for.
+       THAT WAS TRUE UNTIL THE ml LINE EXISTED. "How much is on the table" now
+       has a better answer directly above this one, in millilitres, at the
+       multiple you actually set — and the alcohol half is a multiplication the
+       reader can do from the footer's per-glass figure if they want it.
+
+       ITS PRODUCTION HISTORY, ALSO KEPT: the note was gated on
+       `show_costs or show_units` (both `_config_local.yml` only) so it could not
+       exist in a production build at all, until #1001 put the units line on the
+       live site and the gate became "is there a cost line, or is there a unit
+       count". Both of those questions are moot now; see the gate above.
 
        `data-has-dashes` IS WHY THE BITTERS LINE IS NOT UNIVERSAL. #720.1 deleted
        the last bitters caveat for firing unconditionally — Aperol Spritz, which
@@ -882,17 +903,15 @@ layout: default
        Helen asked for the trigger (>1) and did not speak to the condition; if
        she wants it on every drink, delete the `hasDashes` check in
        cocktail-scale.js and this attribute. {% endcomment %}
-    {% if site.show_costs or page.units %}
-      {% assign has_dashes = false %}
-      {% for ingredient in page.ingredients %}
-        {% assign amount_text = ingredient.amount | downcase %}
-        {% if amount_text contains "dash" or amount_text contains "drop" %}
-          {% assign has_dashes = true %}
-        {% endif %}
-      {% endfor %}
-      <p class="cocktail-scale-batch"
-         data-has-dashes="{% if has_dashes %}true{% else %}false{% endif %}"
-         hidden></p>
+    {% assign has_dashes = false %}
+    {% for ingredient in page.ingredients %}
+      {% assign amount_text = ingredient.amount | downcase %}
+      {% if amount_text contains "dash" or amount_text contains "drop" %}
+        {% assign has_dashes = true %}
+      {% endif %}
+    {% endfor %}
+    {% if has_dashes %}
+      <p class="cocktail-scale-batch" data-has-dashes="true" hidden></p>
     {% endif %}
   {% endif %}
 

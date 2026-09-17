@@ -2415,8 +2415,14 @@ ingredients list** — `− [1] drinks +` since 2026-09-15 (#1086, Helen: *"C:
 word after the box"*); it read `×` from #731 until then, and **the word is
 PLACEHOLDER copy, hers to rename** (§13.12), where the multiplication sign
 was a typographic call. `cocktail-scale.js` still writes a literal `×` in
-its refusal note and its batch line, which are copy and were left alone —
-so the control and its own messages deliberately disagree for now.
+its refusal note, which is copy and was left alone — so the control and its
+own message deliberately disagree for now. (Its BATCH line no longer writes
+one: **that note is the bitters caveat and nothing else since #1121**,
+2026-09-17. It carried the batch's cost and units totals from #713 until Helen
+saw them under the new `Approximately X ml` line — *"the cost and units line
+below has come back and I don't want it to be there"*. The element now renders
+only for a drink that pours a dash or a drop, 15 of the 47 built pages, and
+says only *"Don't scale bitters linearly — add to taste."*)
 **Whole recipes only** (integer multiples, clamped at ×1
 — every written amount is on the 2.5 ml grid, so nothing ever needs
 rounding); counts multiply and re-pluralise, `to top` / `to rinse` pass
