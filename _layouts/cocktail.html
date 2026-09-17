@@ -1065,15 +1065,50 @@ layout: default
          A drink carrying both a twist and something else gets both steps, in
          that order.
 
-         THE ARTICLE IS A RULE PLUS A DECLARED EXCEPTION LIST. `a` by default,
-         `an` before a vowel, and nothing at all for the plurals and mass nouns
-         in garnish.yml's `no_article` -- "Garnish with a raspberries." is the
-         failure that list exists to stop, and no rule short of a dictionary
-         knows that `raspberries` is plural while `brandied cherry` is not.
+         THE ARTICLE IS A RULE, A PLURAL TEST AND A DECLARED EXCEPTION LIST, in
+         that order of specificity: `a` by default, `an` before a vowel, nothing
+         before a word ending in `s`, and nothing at all for anything in
+         garnish.yml's `no_article`. "Garnish with a raspberries." is the
+         failure this exists to stop.
+
+         THE PLURAL TEST IS NEW -- #1143, 2026-09-17, Helen: "If the garnish is
+         plural, it should not start with 'a'." This paragraph used to say that
+         "no rule short of a dictionary knows that `raspberries` is plural while
+         `brandied cherry` is not", and that was overstated: a final `s` tells
+         those two apart correctly, and every plural in the collection with it.
+         What the list was really carrying was the cases a final `s` CANNOT
+         reach -- `grated nutmeg` (a mass noun), `half an empty passion fruit
+         shell` (brings its own article), `pineapple and brandied cherry` (two
+         things) -- so the list keeps exactly those and stops being the only
+         thing standing between a new plural and the page.
+
+         WHY THAT MATTERS MORE THAN IT LOOKS: `no_article` can only name a
+         garnish someone has DECLARED, and the failure Helen hit was a draft's
+         `fruit wedges`, which is not in the vocabulary at all. A list-only rule
+         is silent on exactly the values nobody has classified yet, which is
+         where a new spelling always appears first.
+
+         A SINGULAR NOUN ENDING IN `s` WOULD BE WRONG HERE -- `lemongrass`,
+         `hibiscus`, `watercress`. None is declared today. If one arrives, it
+         wants an `always_article` list beside `no_article` rather than a
+         cleverer test; `test_no_declared_garnish_needs_an_article_it_cannot_get`
+         is what will say so.
 
          `no garnish` NEVER RENDERS A STEP. It is the decision that this drink
-         takes none, which is worth recording and not worth instructing. {% endcomment %}
-      {% assign garnish_step = "" %}
+         takes none, which is worth recording and not worth instructing.
+
+         THE LIST READS AS ENGLISH -- #1138, 2026-09-17, Helen: "If there are
+         more than two garnishes, separate all with a comma except for the
+         penultimate pair, which get no comma." So one garnish is itself, two
+         are joined by `and`, and three or more are `A, B and C` -- no serial
+         comma. Every garnish was joined by `and` until today, which gave the
+         Hurricane "a mint sprig and a fruit wedges and a maraschino cherry".
+
+         The parts are accumulated into one string and split back into an array,
+         because Liquid has no way to append to one. `|` is the separator: no
+         declared garnish contains it, and `test_no_garnish_contains_the_join_separator`
+         keeps it that way. {% endcomment %}
+      {% assign garnish_joined = "" %}
       {% for g in page.garnish %}
         {% capture bounded %}|{{ g }}|{% endcapture %}
         {% unless declared_twists contains bounded or g == "no garnish" %}
@@ -1082,17 +1117,34 @@ layout: default
           {% if first == "a" or first == "e" or first == "i" or first == "o" or first == "u" %}
             {% assign article = "an " %}
           {% endif %}
+          {% assign final = g | slice: -1 | downcase %}
+          {% if final == "s" %}
+            {% assign article = "" %}
+          {% endif %}
           {% if site.data.cocktails.garnish.no_article contains g %}
             {% assign article = "" %}
           {% endif %}
-          {% capture one %}{{ article }}{{ g }}{% endcapture %}
-          {% if garnish_step == "" %}
-            {% assign garnish_step = one %}
-          {% else %}
-            {% capture garnish_step %}{{ garnish_step }} and {{ one }}{% endcapture %}
-          {% endif %}
+          {% capture garnish_joined %}{{ garnish_joined }}|{{ article }}{{ g }}{% endcapture %}
         {% endunless %}
       {% endfor %}
+      {% assign garnish_step = "" %}
+      {% if garnish_joined != "" %}
+        {% assign garnish_parts = garnish_joined | remove_first: "|" | split: "|" %}
+        {% assign garnish_count = garnish_parts | size %}
+        {% if garnish_count == 1 %}
+          {% assign garnish_step = garnish_parts[0] %}
+        {% else %}
+          {% assign before_last_two = garnish_count | minus: 2 %}
+          {% assign last_index = garnish_count | minus: 1 %}
+          {% capture garnish_tail %}{{ garnish_parts[before_last_two] }} and {{ garnish_parts[last_index] }}{% endcapture %}
+          {% if before_last_two > 0 %}
+            {% assign garnish_head = garnish_parts | slice: 0, before_last_two %}
+            {% capture garnish_step %}{{ garnish_head | join: ", " }}, {{ garnish_tail }}{% endcapture %}
+          {% else %}
+            {% assign garnish_step = garnish_tail %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
       {% if garnish_step != "" %}<li>Garnish with {{ garnish_step }}.</li>{% endif %}
     </ol>
   {% elsif page.method %}

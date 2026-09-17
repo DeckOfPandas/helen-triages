@@ -719,6 +719,131 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build():
         shutil.rmtree(out, ignore_errors=True)
 
 
+# =============================================================================
+# THE GARNISH STEP READS AS ENGLISH — #1138 and #1143, 2026-09-17
+# =============================================================================
+
+GARNISH_DRINK = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "coupe"\ngarnish:\n{garnish}'
+    'ingredients:\n  - amount: "50 ml"\n    generic: "London dry gin"\n'
+    '  - amount: "25 ml"\n    generic: "lime juice"\n'
+    'method:\n  - "Shake all ingredients with ice."\n'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  made_before: true\n  ship: "yes"\n'
+    '  rewritten: true\n  awaiting_fix: false\n  proofread: true\n---\n'
+)
+
+
+def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
+    """`A, B and C`, and no `a` before a plural. Issues #1138 and #1143.
+
+    Helen, 2026-09-17, on the Hurricane: "I think we still have 'Garnish with a
+    mint sprig and a fruit wedges and a maraschino cherry.'... 1. If the garnish
+    is plural, it should not start with 'a'. 2. If there are more than two
+    garnishes, separate all with a comma except for the penultimate pair, which
+    get no comma."
+
+    WHY A BUILT PAGE AND NOT A UNIT TEST: the rule is Liquid in
+    `_layouts/cocktail.html` and there is no harness that can call it. The
+    sentence a reader sees is the only place it can be checked.
+
+    WHY FIXTURES AND NOT REAL DRINKS: no published drink carries three garnishes
+    today (measured — five carry two, twenty-four carry one), so the list rule
+    has nothing live to bite on and would be a test asserting nothing. The drink
+    that provoked the issue is a DRAFT, which a public test may never require
+    (#624). `fruit wedges` is deliberately not in garnish.yml: it models the case
+    the old list-only rule could not reach, which is a garnish nobody has
+    classified yet — where a new spelling always appears first.
+    """
+    _require_bundler()
+    out = ROOT / "tmp" / "_test_site_garnish"
+    recipes = ROOT / "_cocktail_recipes"
+    created_dir = not recipes.exists()
+    made = []
+
+    def lines(items):
+        return "".join(f'  - "{g}"\n' for g in items)
+
+    cases = {
+        # slug: (garnishes, the sentence it must render)
+        "zzz-garnish-one": (
+            ["brandied cherry"],
+            "Garnish with a brandied cherry."),
+        "zzz-garnish-two": (
+            ["brandied cherry", "lemon wheel"],
+            "Garnish with a brandied cherry and a lemon wheel."),
+        "zzz-garnish-three": (
+            ["mint sprig", "fruit wedges", "maraschino cherry"],
+            "Garnish with a mint sprig, fruit wedges and a maraschino cherry."),
+        "zzz-garnish-four": (
+            ["mint sprig", "raspberries", "lemon wheel", "brandied cherry"],
+            "Garnish with a mint sprig, raspberries, a lemon wheel "
+            "and a brandied cherry."),
+    }
+    try:
+        recipes.mkdir(exist_ok=True)
+        for slug, (garnishes, _) in cases.items():
+            p = recipes / f"{slug}.md"
+            p.write_text(GARNISH_DRINK.format(t=slug, garnish=lines(garnishes)),
+                         encoding="utf-8")
+            made.append(p)
+
+        result = subprocess.run(
+            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
+             "--destination", str(out)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+        )
+        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
+
+        for slug, (_, expected) in cases.items():
+            page = out / "cocktails" / "recipes" / slug / "index.html"
+            assert page.exists(), f"{slug} did not build"
+            html = page.read_text(encoding="utf-8")
+            found = re.search(r"<li>Garnish with (.*?)\.</li>", html, re.S)
+            assert found, f"{slug} rendered no garnish step at all"
+            got = "Garnish with " + " ".join(
+                re.sub(r"<[^>]+>", "", found.group(1)).split()) + "."
+            assert got == expected, (
+                f"{slug}\n  expected: {expected}\n  got:      {got}\n\n"
+                "#1138 is the punctuation (one garnish is itself, two are joined "
+                "by `and`, three or more are `A, B and C` with no serial comma) "
+                "and #1143 is the article (nothing before a word ending in `s`, "
+                "whether or not it is declared in garnish.yml's `no_article`). "
+                "Both live in the garnish-step block of _layouts/cocktail.html."
+            )
+    finally:
+        for p in made:
+            p.unlink(missing_ok=True)
+        if created_dir and recipes.is_dir() and not any(recipes.iterdir()):
+            recipes.rmdir()
+        shutil.rmtree(out, ignore_errors=True)
+
+
+def test_no_garnish_contains_the_join_separator():
+    """The garnish step joins its parts with `|` and splits them back.
+
+    Liquid cannot append to an array, so the step builds one string and splits
+    it. A garnish containing the separator would silently become two garnishes.
+    Nothing does today; this is what keeps it that way, and it is cheaper than
+    choosing a cleverer separator that the next reader has to decode.
+    """
+    import yaml as _yaml
+    data = _yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "garnish.yml").read_text(encoding="utf-8"))
+    offenders = []
+    for group, values in (data.get("canonical") or {}).items():
+        for g in (values or []):
+            if isinstance(g, str) and "|" in g:
+                offenders.append(f"{group}: {g!r}")
+    assert not offenders, (
+        "Garnish value(s) containing `|`, which the garnish step uses to join "
+        "its parts before splitting them back:\n  " + "\n  ".join(offenders)
+        + "\n\nEither rename the garnish or change the separator in "
+          "_layouts/cocktail.html's garnish-step block."
+    )
+
+
 def test_the_gate_covers_a_promoted_drink():
     """The cocktail collection is gated too, and this proves it on a bare CI
     checkout. GitHub issues #667, #668 and #624.
