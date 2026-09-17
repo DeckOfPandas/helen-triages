@@ -474,9 +474,31 @@
            icons' classes from the one test that proves both stylesheets style
            them. The wrapper span takes the footer's own sizing instead.
         {% endcomment %}
+        {% comment %} ICON AND WORD ON ONE LINE -- #1139, 2026-09-17, replacing
+           #1122's stacked arrangement the day after it shipped. Helen: "the
+           footer icons look strange because food and cocktails are different
+           lengths, so reduce the icon size and bring it inline with the
+           heading, left for food and right for the cocktails."
+
+           WHY CENTRING FAILED, which is the part worth keeping: `[ FOOD ]` and
+           `[ COCKTAILS ]` are different WIDTHS, so an icon centred over each
+           column's links landed at a different horizontal offset in each -- and
+           the two columns sit at opposite edges of the footer, where that
+           difference reads as a mistake rather than as symmetry. Centred on the
+           column is not the same as agreeing with its neighbour.
+
+           ONE ROW, REVERSED IN THE SECOND COLUMN, so each icon sits on the
+           OUTSIDE of its own word: column one is left-aligned and gets the icon
+           first, column three is right-aligned and gets it last. The mirroring
+           is `flex-direction: row-reverse` in the stylesheet, not a second
+           branch here -- the footer stays one template emitting one shape per
+           site, which is what test_the_header_and_footer_are_identical_on_every_page
+           holds it to. {% endcomment %}
         {% assign ref_icon_file = "icons/" | append: ref_site.icon | append: ".svg" %}
-        <span class="site-footer-ref-icon">{% include {{ ref_icon_file }} %}</span>
-        <span class="site-footer-ref-word">[ {{ ref_site.word }} ]</span>
+        <span class="site-footer-ref-head">
+          <span class="site-footer-ref-icon">{% include {{ ref_icon_file }} %}</span>
+          <span class="site-footer-ref-word">[ {{ ref_site.word }} ]</span>
+        </span>
         {% for link in ref_links %}
         <a href="{{ link.url | relative_url }}">{{ link.text }}</a>
         {% endfor %}

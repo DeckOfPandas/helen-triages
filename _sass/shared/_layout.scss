@@ -646,27 +646,51 @@ main {
 // $color-clear-text: 82% of it against $color-bg reaches 4.90:1 on food and
 // 4.71:1 on cocktails (tmp/contrast.py), while staying visibly lighter than
 // the full-strength $color-clear-text the links under it rest at.
-// THE SITE'S ICON AT THE HEAD OF ITS COLUMN -- #1122, 2026-09-16. Helen:
-// "centered over the links for each site".
+// THE SITE'S ICON, ON THE HEADING'S OWN LINE -- #1122 put it back in the
+// footer, #1139 moved it beside the word the next day. Helen: "the footer icons
+// look strange because food and cocktails are different lengths, so reduce the
+// icon size and bring it inline with the heading, left for food and right for
+// the cocktails."
 //
-// `align-self: center` IS THE WHOLE OF "CENTERED", and it has to be said here
-// because the two columns deliberately are not centred: `.site-footer-ref` is
-// `align-items: flex-start` and its second instance `flex-end`, so the links
-// hang off the page's outer edges (the rule above explains why column one
-// starts on main's text edge). Centring the icon against the column's own
-// width therefore means overriding that for this one item, not changing it.
-// Under 600px both columns already centre themselves and this simply agrees
-// with them.
+// WHY THE STACKED VERSION LOOKED WRONG, and it is a useful trap: the icon WAS
+// centred, correctly, over its own column -- but `[ FOOD ]` and `[ COCKTAILS ]`
+// are different widths, so "centred on the column" put the two icons at
+// different horizontal offsets, in two columns that sit at opposite edges of
+// the footer where the eye compares them directly. Centred on its own container
+// is not the same as agreeing with its neighbour.
 //
-// NO SIZE OF ITS OWN: the SVG inside is `.nav-icon`, which is 24px high --
-// the size Helen picked for these exact two icons from the header candidates
-// page on 2026-09-10, so the footer is not choosing a second number for the
-// same artwork. `line-height: 0` for the same reason `.site-footer-hearts`
-// has it: the span is a box around a drawing, and the inherited line-height
-// would otherwise add a strip of text leading under it.
+// EACH ICON SITS ON THE OUTSIDE OF ITS OWN WORD, which is what makes the pair
+// read as a mirror rather than as two attempts at the same thing: column one is
+// left-aligned and takes the icon first, column three is right-aligned and
+// takes it last. One row in the markup, reversed here for the second column, so
+// the template still emits one shape per site.
+.site-footer-ref-head {
+  display: flex;
+  align-items: center;
+  gap: $space-xs;
+}
+
+.site-footer-ref:nth-of-type(2) .site-footer-ref-head {
+  flex-direction: row-reverse;
+}
+
+// SMALLER THAN THE HEADER'S 24px, BECAUSE IT IS NOW TYPE-SIZED RATHER THAN
+// BLOCK-SIZED. `.nav-icon`'s 24px is the size Helen chose on 2026-09-10 for an
+// icon standing on its own beside a wordmark; beside 0.75rem lettering it is
+// twice the height of the word it labels. 1.3em of the footer's own text is
+// ~15.6px, which sits on the line with `[ FOOD ]` rather than towering over it,
+// and stated in `em` so it follows the footer if that size ever moves.
+//
+// `line-height: 0` for the reason `.site-footer-hearts` has it: the span is a
+// box around a drawing, and the inherited line-height would otherwise add a
+// strip of text leading under it.
 .site-footer-ref-icon {
-  align-self: center;
   line-height: 0;
+
+  .nav-icon {
+    height: 1.3em;
+    width: auto;
+  }
 }
 
 .site-footer-ref-word {
