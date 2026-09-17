@@ -2339,31 +2339,65 @@ unless stated.
   asserts that, because it is the kind of thing that stays true until somebody
   helpfully adds an attribute.
 
-  **THE WITHHOLDING, WHICH IS THE ONLY DECISION AN AGENT MADE HERE.** Six
-  published drinks print no volume at all: airmail, arrack-christmas-punch-
-  wife-3, julien-sorel, tom-collins and the pear Bellini, all of which `to top`,
-  plus the Caipirinha. Three options were on the table for a topped drink — say
-  nothing, print the midpoint of `top_up_ml`, or print the range — and the
-  midpoint is what `cocktail_units.rb` already spends for the unit count, so it
-  was the obvious answer. **It was rejected on the arithmetic of what the error
-  is worth in each line.** 25 ml either way of a 100 ml pour of 12% prosecco
-  moves a unit count by 0.3, under the rounding; the same 25 ml is 25 ml of a
-  volume, and the volume line's entire purpose is "how many glasses does this
-  fill". #1076 had already established the range is a stand-in for a sum this
-  repo cannot run — a top is capacity − build − room for the ice, and no glass
-  records a capacity (#295, open) — and one source already prints "Top (30-45)"
-  against the house 75-100. Printing a confident figure there would quietly
-  settle an open question on the live site. **The range was rejected for a
-  smaller reason**: "Approximately 172.5–222.5 ml" substitutes a shape she did
-  not ask for into a sentence she wrote.
+  **THE TOPPED DRINKS: WITHHELD FOR HALF A DAY, THEN HELEN RULED.** The first
+  shape of this printed nothing at all for the five drinks that `to top`, and
+  the question went back to her the same afternoon. Her answer, and it is the
+  whole of it: ***"Midpoint please, I'll cope on the spot."***
 
-  The Caipirinha is the second rule and is not new: `substantial < priced`,
-  `CocktailCosts::SUBSTANTIAL` itself rather than a copy of it, so a drink whose
-  excluded pours are INGREDIENTS rather than flourishes says nothing — 45 ml of
-  cachaça is not what is in that glass. A dozen sugar cubes in a punch is a
-  flourish and does not spoil a figure. The Bellini is caught twice over, which
-  is the right number of times: six of its eight pours are a batch syrup only
-  its method portions.
+  **The argument she overruled is kept, because it was a real one and she
+  overrode it knowingly.** Three options were on the table — say nothing, take
+  the midpoint of `top_up_ml`, or print the range. The midpoint is what
+  `cocktail_units.rb` already spends for the unit count, so it was the obvious
+  answer, and it was rejected on *what the error is worth in each line*: 25 ml
+  either way of a 100 ml pour of 12% prosecco moves a unit count by 0.3, under
+  the rounding, while the same 25 ml is a whole 25 ml of a volume — and the
+  volume line's entire purpose is "how many glasses does this fill". #1076 had
+  established the range is a stand-in for a sum this repo cannot run (a top is
+  capacity − build − room for the ice; no glass records a capacity, #295,
+  open), and one source already prints "Top (30-45)" against the house 75-100.
+  So the figure rests on a placeholder. **The range was rejected separately and
+  more cheaply**: "Approximately 172.5–222.5 ml" substitutes a shape into a
+  sentence she wrote.
+
+  **What her five words answer is the part the argument never weighed: who is
+  reading the line and when.** She is at the counter with the bottle in her
+  hand, deciding how many glasses to pour, and a figure to work from beats a
+  blank even when it is soft — she can see the glass, which is precisely the
+  term the repo is missing. **And "Approximately" turns out to be doing real
+  work** on those five drinks rather than only rounding: her own word carries
+  the declared span, which is why the change was safe to make at all. It is a
+  good illustration of §13.11 in a line of prose rather than a candidates page
+  — the argument was sound and answered the wrong question.
+
+  So a `to top` takes its midpoint, through ONE expression (`top_up_ml` in the
+  plugin) with two callers, lifted out of `units_for` rather than copied: the
+  two sentences a topped drink prints are now both spending that range and the
+  one thing they must never do is disagree about it. Tom Collins reads
+  "Approximately 237.5 ml" — 112.5 of build plus soda water's 100–150 halved —
+  and a test pins the midpoint against `costs.yml` so `ml_min` cannot quietly
+  replace it.
+
+  **TWO DRINKS STILL SAY NOTHING, AND IT IS A DIFFERENT KIND OF SILENCE.** A
+  topped figure is APPROXIMATE; these would be WRONG — an answer to a different
+  question, not a rough answer to this one — so her ruling does not reach them,
+  there being no range to take a midpoint of. The rule is not new:
+  `substantial < pours`, using `CocktailCosts::SUBSTANTIAL` itself rather than a
+  copy, so a drink whose excluded pours are INGREDIENTS rather than flourishes
+  says nothing. The Caipirinha is 45 ml of cachaça, half a lime and 20 g of palm
+  sugar, and 45 ml is not an approximation of what is in that glass — it is the
+  cachaça, and the drink is not. A dozen sugar cubes in a punch is a flourish
+  and does not spoil a figure. **The pear Bellini is caught twice over and needs
+  to be**: resolving its top would have produced a confident 97.5 ml, because
+  six of its eight pours are a batch syrup that only its METHOD portions ("Add
+  25 ml syrup to a champagne flute"). Its ingredient list does not describe one
+  serving at all.
+
+  **AND ONE TRAP IS PRIMED RATHER THAN SPRUNG.** `serve_ml` divides the whole
+  total by `serves:`, the top included, which is right for a bowl's alcohol and
+  wrong for a top — a top fills one glass, and four glasses need four tops.
+  `scripts/top_up_ml.py` found the same thing on the same data and said so. No
+  topped drink declares `serves:` today; a test asserts that, so the first
+  topped punch is a red build rather than a quietly wrong number.
 
   **`HTF.scale.totalMl` WAS NOT REUSED, AND THAT WAS DELIBERATE.** It reads the
   printed amount strings and its `VOLUMETRIC` map is `ml` and only `ml`, so an
@@ -2374,11 +2408,15 @@ unless stated.
   multiplies it (`HTF.scale.batchTotalMl`). Linear is exact, not an
   approximation: the control allows whole multiples only.
 
-  **ONE THING LEFT WITH HELEN.** The line renders without JavaScript and prints
-  on paper, unlike the control above it — a figure invites nothing, where a
-  number box invites the reader to think the sheet can be changed — but the
-  print stylesheet's own header says "a printed page is the recipe as written",
-  and whether that sentence was meant to cover a derived total is hers.
+  **TWO SMALLER THINGS SHE ALSO SETTLED, 2026-09-17, both left as built.** The
+  line renders without JavaScript and PRINTS, unlike the control above it — a
+  figure invites nothing where a number box invites the reader to think the
+  sheet can be changed — but the print stylesheet's own header says "a printed
+  page is the recipe as written", so whether that covered a derived total was
+  hers: *"Yes"*, keep it on paper. And at ×1 a single-glass drink says "90 ml"
+  twice, half a page apart, which she was shown and called *"Fine"* — the two
+  figures diverge the instant the scaler is touched, which is the point of
+  having both.
 
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
