@@ -2318,6 +2318,68 @@ unless stated.
   that line's range to the chosen bottle. The range stands until a choice is
   made.
 
+### §9.3.6 How much liquid is in a drink — #1121, built 2026-09-17
+
+- **2026-09-17, #1121 — two sentences, and the interesting part is the six
+  drinks that get neither.** Helen specified both lines herself, in her own
+  words: *"A line UNDER THE SCALER on a drink page reading: 'Approximately X
+  ml'"* and *"an addition LOWER DOWN, to the existing units line, so it reads:
+  'Roughly X units of alcohol in a serving of Y ml'"*. Both shipped as given
+  (§13.12) — not marked PLACEHOLDER, because she wrote them; the marker is for
+  a string an agent had to invent, which is the line #1086's `drinks` draws.
+  **The punch tail extends rather than being rewritten**: "in each of 8
+  servings of 160 ml", the minimal reading of her sentence against the tail
+  #753 already had.
+
+  **THE TWO NUMBERS ARE DIFFERENT AND THE SEPARATION IS STRUCTURAL.** The
+  batch moves; the per-glass figure must not, which is #713's and #1001's
+  standing guarantee. It is kept by the moving figure living on its own element
+  with its own attribute — `data-total-ml` on `.cocktail-scale-total` — while
+  the units line carries nothing the scaler can reach. A rendered-page test
+  asserts that, because it is the kind of thing that stays true until somebody
+  helpfully adds an attribute.
+
+  **THE WITHHOLDING, WHICH IS THE ONLY DECISION AN AGENT MADE HERE.** Six
+  published drinks print no volume at all: airmail, arrack-christmas-punch-
+  wife-3, julien-sorel, tom-collins and the pear Bellini, all of which `to top`,
+  plus the Caipirinha. Three options were on the table for a topped drink — say
+  nothing, print the midpoint of `top_up_ml`, or print the range — and the
+  midpoint is what `cocktail_units.rb` already spends for the unit count, so it
+  was the obvious answer. **It was rejected on the arithmetic of what the error
+  is worth in each line.** 25 ml either way of a 100 ml pour of 12% prosecco
+  moves a unit count by 0.3, under the rounding; the same 25 ml is 25 ml of a
+  volume, and the volume line's entire purpose is "how many glasses does this
+  fill". #1076 had already established the range is a stand-in for a sum this
+  repo cannot run — a top is capacity − build − room for the ice, and no glass
+  records a capacity (#295, open) — and one source already prints "Top (30-45)"
+  against the house 75-100. Printing a confident figure there would quietly
+  settle an open question on the live site. **The range was rejected for a
+  smaller reason**: "Approximately 172.5–222.5 ml" substitutes a shape she did
+  not ask for into a sentence she wrote.
+
+  The Caipirinha is the second rule and is not new: `substantial < priced`,
+  `CocktailCosts::SUBSTANTIAL` itself rather than a copy of it, so a drink whose
+  excluded pours are INGREDIENTS rather than flourishes says nothing — 45 ml of
+  cachaça is not what is in that glass. A dozen sugar cubes in a punch is a
+  flourish and does not spoil a figure. The Bellini is caught twice over, which
+  is the right number of times: six of its eight pours are a batch syrup only
+  its method portions.
+
+  **`HTF.scale.totalMl` WAS NOT REUSED, AND THAT WAS DELIBERATE.** It reads the
+  printed amount strings and its `VOLUMETRIC` map is `ml` and only `ml`, so an
+  `oz` or a `tsp` pour is a count to it; the plugin converts everything
+  `measures.per_ml` declares. Two implementations of "how big is this drink"
+  printing two sentences on one page is the drift this repo keeps writing
+  about, so the figure is computed once at build time and the browser only
+  multiplies it (`HTF.scale.batchTotalMl`). Linear is exact, not an
+  approximation: the control allows whole multiples only.
+
+  **ONE THING LEFT WITH HELEN.** The line renders without JavaScript and prints
+  on paper, unlike the control above it — a figure invites nothing, where a
+  number box invites the reader to think the sheet can be changed — but the
+  print stylesheet's own header says "a printed page is the recipe as written",
+  and whether that sentence was meant to cover a derived total is hers.
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16** — Ingredients are additive, never a choose-one (asked

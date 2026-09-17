@@ -1820,7 +1820,11 @@ the mean exists only so a page never breaks. Remember when adding a default for
 this reason that `default_bottles` sets the unbottled pour's PRICE too. Per serving, divided by `serves:` where present; the scaler
 reads its two data attributes for the BATCH note's total only and never writes
 to the line, which is what keeps a per-serving figure from moving with the
-multiple box.
+multiple box. **Since #1121 the line also says how big the serving is** —
+"Roughly X units of alcohol in a serving of Y ml", her words again — and Y is
+§9.3.6's `page.volume.serve_ml`, printed once and carrying no attribute the
+scaler could reach. Where the volume is unknown the tail is DROPPED and the
+sentence is exactly #753's.
 **The unsettled strengths are a PUBLIC number's worklist now.** A `qq:` row
 (always `confidence: low`, and every low row has one — except a bitters, which
 stays `low` with no `qq:` because by her ruling it can never reach a figure) is
@@ -1867,6 +1871,37 @@ the file's honesty and the field to distrust first. Master of Malt returns 429
 to every automated request; Helen reads it herself. Apply her corrections by
 script against the parsed YAML, refusing on any name not found; a regex over
 this file matches the wrong block.
+
+### 9.3.6 How much liquid is in a drink — #1121
+
+**Two sentences, two numbers, and confusing them is the whole risk.** Helen:
+*"add total ml next to recipe scaler to help me choose the right number of
+glasses... This means I can vary target units of alcohol myself."* Under the
+scaler, **"Approximately X ml"** — the BATCH, and the only figure on a drink
+page that moves with the multiple box. In the footer, the units line's new
+tail, **"in a serving of Y ml"** — ONE GLASS, invariant, exactly as the unit
+count beside it is. Both wordings are hers and ship unpolished (§13.12).
+
+`page.volume` (`total_ml`, `serve_ml`, `serves`, `pours`) is computed by
+`volume_for` in `_plugins/cocktail_units.rb` — the same generator, because a
+unit IS millilitres times a strength and a second parse of the amounts is a
+second answer waiting to disagree. **The browser does no volume arithmetic**:
+`data-total-ml` carries the ×1 figure and `HTF.scale.batchTotalMl` multiplies
+it. `HTF.scale.totalMl` is deliberately NOT used — it reads the printed strings
+and counts `ml` and only `ml`, so an `oz` or `tsp` pour totals differently
+there than in the footer.
+
+**IT WITHHOLDS RATHER THAN ESTIMATES, and six published drinks say nothing.**
+Five top up: `top_up_ml` declares one range per topper whatever the drink, and
+#1076 showed that range is a stand-in for a sum this repo cannot run (a top is
+capacity − build − room for the ice, and no glass records a capacity, #295). A
+unit count spends the same range and is right to — 25 ml of 12% prosecco is 0.3
+of a unit — but 25 ml of a volume is 25 ml, in the one place whose job is "how
+many glasses". The sixth is the Caipirinha, where the excluded pours ARE the
+drink: the same judgement and literally the same constant as `cost.complete`
+(`CocktailCosts::SUBSTANTIAL`). `tests/test_rendered_pages.py` pins the set by
+name in both directions. **When `capacity_ml:` lands in `glasses.yml`, delete
+the `to top` branch and take those five names out in the same commit.**
 
 ### 9.4 Decided — do not re-litigate
 
