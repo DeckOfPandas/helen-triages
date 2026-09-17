@@ -779,34 +779,63 @@
   &:hover,
   &:focus-visible { border-color: $color-wicked-woowoo; }
 
-  // BANDS, DOES NOT FILL -- Helen, 2026-08-30: "has to have chips should show
-  // magenta underline on select rather than fill in on select." The last fill
-  // on the page, and the same call §9.13 made for the cards on 2026-08-28.
+  // WHAT A CHOSEN CHIP SHARES WITH EVERY OTHER SECTION'S. The fill itself is
+  // per section, below: HAS TO HAVE inverts (#1134) and LEAVE OUT deliberately
+  // does not, so the two cannot be stated here.
   //
-  // The border still changes, because a chip has an outline where a filter word
-  // does not -- so it has two things to move and uses both. The contrast note
-  // this replaces is kept next door in the palette: ink was chosen over a
-  // darkened magenta because magenta's fill is light enough that the deep has
-  // to go almost to black before it clears 4.5, at which point it is not
-  // magenta any more. With no fill the question does not arise; the text is ink
-  // on paper at 16:1.
-  // ONE MAGENTA MARK, NOT TWO — Helen, 2026-09-02: "the has to have selected
-  // button should lose its pink underline when it gains its pink box."
-  //
-  // The underline was the whole signal while a chip was a bare word; then the
-  // border started moving too, and a chosen chip carried the same colour twice
-  // in two shapes. The border is the better of the two here because a chip HAS
-  // an outline where a filter word does not, so it is a change available to
-  // this control and not to that one -- and because the underline is the
-  // language the WORD-MATCH mark uses, which is a different fact about a chip
-  // and now has the shape to itself.
+  // THIS BLOCK USED TO BAND RATHER THAN FILL, and the reversal is Helen's own,
+  // twice over. She ruled the band in on 2026-08-30 ("has to have chips should
+  // show magenta underline on select rather than fill in on select", when the
+  // fills on this page "were beginning to become too loud"), and narrowed it on
+  // 2026-09-02 ("the has to have selected button should lose its pink underline
+  // when it gains its pink box"). What changed underneath both is that every
+  // OTHER chip on the site has since become a filled block -- the filter
+  // buttons in #1086 ("B: filled block") and the cards' own matched chips in
+  // #1099/#1100 ("Chip option B please") -- so by 2026-09-17 the band was not
+  // the quiet choice any more, it was the odd one out. #1134 is her closing
+  // that gap: "HAS TO HAVE chips should also invert when active, same as YOLO,
+  // MOOD and HASSLE."
   &.is-on {
-    background: none;
-    border-color: $color-wicked-woowoo-deep;
-    color: $color-text;
     font-weight: 600;
     text-decoration: none;
   }
+}
+
+// HAS TO HAVE INVERTS, AND IT IS THE FILTER BUTTONS' OWN `.is-on` -- #1134,
+// 2026-09-17. Helen: "I'm keen you copy as much of the styling as possible from
+// the existing active chips because I love them!" So this is
+// `%drink-btn-naked`'s active state (above) with nothing invented: the fill
+// carries the section's hue, the letter goes to the PAGE'S OWN GROUND so it
+// reads as punched out of the block, and the faux-bold stroke flips to the
+// letter's colour with it.
+//
+// SELECTED BY SECTION, exactly as `.drink-filter--mood .btn-mood.is-on` is, and
+// that is load-bearing rather than stylistic: `.btn-pool` is BOTH pickers'
+// chip, and LEAVE OUT's chosen state is deliberately colourless (below). A bare
+// `.btn-pool.is-on` carrying the stroke would hollow out every excluded chip in
+// $color-bg on a dark page -- the section wrapper is what keeps the two apart.
+//
+// $color-heading-include IS THE SAME VARIABLE THE HEADING USES, so the block and
+// the words HAS TO HAVE cannot drift; it resolves to the hot magenta, which
+// already means MATCHED everywhere on a card. Measured before copying the
+// treatment across (tmp/chip_contrast.py): the dark letter reads 5.59:1 on this
+// magenta, beside 6.66:1 on MOOD's coral and 6.19:1 on HASSLE's pink -- the
+// same family, and clear of 4.5:1. The palette's old note that a DEEP magenta
+// "has to go almost to black before it clears 4.5" was about ink ON magenta at
+// text sizes; this is the page's near-black, which is that black.
+//
+// THE BORDER TAKES THE FILL'S COLOUR rather than staying $color-border: these
+// chips have a 1.5px outline where `.btn-mood` is naked, and a chosen chip
+// should read as one solid block, not as a block inside a grey frame. It is a
+// colour change only -- the border-WIDTH is untouched, so the box measures
+// exactly what it measured at rest and the chips beside it do not move
+// (§13.4.2, and test_no_active_filter_button_changes_its_own_width).
+.drink-search--include .btn-pool.is-on {
+  background: $color-heading-include;
+  border-color: $color-heading-include;
+  color: $color-bg;
+  -webkit-text-stroke: 0.05em $color-bg;
+  text-shadow: none;
 }
 
 // LEAVE OUT IS DELIBERATELY COLOURLESS. Violet lived here for one revision and

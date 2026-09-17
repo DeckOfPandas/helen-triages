@@ -814,32 +814,54 @@ $card-name-step: 0.86;
 
 // The matched ingredient, in the colour of the field that matched it.
 .drink-card-hit {
-  // A BAND UNDER THE WORDS, NOT A BLOCK BEHIND THEM. Helen, 2026-08-28, on a
-  // card with three filled things on it: "there's just a lot going on...
-  // underline the ingredient rather than highlight."
+  // A BLOCK BEHIND THE WORDS AGAIN -- #1134, 2026-09-17, and this reverses
+  // 2026-08-28 deliberately and with its eyes open. Helen: "Also invert them on
+  // the cocktail cards to make the hits more obvious", and "I'm keen you copy
+  // as much of the styling as possible from the existing active chips because I
+  // love them!"
   //
-  // Fill is the loudest tool available and this card had reached for it three
-  // times -- and the ingredient one is the worst of the three, because a
-  // matched ingredient WRAPS, so a long name became two solid slabs on two
-  // lines. It also fought the drink's name, which is the thing you are meant
-  // to read first.
+  // WHAT THE BAND WAS FOR, because the argument has not evaporated. On
+  // 2026-08-28 this card carried three filled things and she said "there's just
+  // a lot going on... underline the ingredient rather than highlight" -- fill
+  // being the loudest tool available, and this the worst of the three to spend
+  // it on, since a matched ingredient WRAPS and a long name became two solid
+  // slabs on two lines. §9.13's "bands and washes, not fills" came out of that
+  // sitting.
   //
-  // The band is the same language as the section headings, which is the point:
-  // "this colour under text" now means one thing everywhere on the site, and a
-  // matched ingredient is visibly the answer to the magenta heading that found
-  // it.
+  // WHAT CHANGED IS EVERYTHING AROUND IT. The card is not carrying three fills
+  // any more: the goodness mark became a ship and a word (2026-08-30), and the
+  // matched mood chip became an inverted block in #1099/#1100 ("Chip option B
+  // please", picked from three candidates on the real index). So by today the
+  // ingredient was the one matched thing still underlining while the chip
+  // beside it inverted -- and the complaint has flipped round: not "too much on
+  // the card" but "the hits aren't obvious enough".
   //
-  // text-decoration RATHER THAN THE HEADINGS' inset box-shadow, because this
-  // one wraps. A box-shadow paints the element's box and gives a wrapped
-  // fragment an odd stub; text-decoration follows each line properly.
-  color: $color-text;
-  text-decoration: underline;
-  text-decoration-color: $color-wicked-woowoo;
-  text-decoration-thickness: 0.16em;
-  text-underline-offset: 0.16em;
-  text-decoration-skip-ink: none;
-  // No padding. It was there to give the old FILL room to breathe, and with a
-  // band instead it makes the line run wider than the word it underlines.
+  // SO IT IS `.drink-card-mood.is-match`, COPIED, and every value here is that
+  // rule's: the page's own ground as the letter so it reads punched out, the
+  // same-colour faux-bold stroke at 0.04em, and `0 0.25em` of padding, which is
+  // the tight option she chose there over the padded one.
+  //
+  // THE HUE IS UNCHANGED AND IS THE POINT: magenta means MATCHED everywhere on
+  // this site, and it is $color-wicked-woowoo here exactly as it is on the
+  // heading and on the HAS TO HAVE chip that lit this up. The dark letter reads
+  // 5.59:1 on it (tmp/chip_contrast.py), beside 6.66:1 and 6.19:1 for the mood
+  // and hassle chips this copies.
+  //
+  // THE WRAP IS STILL REAL AND IS HANDLED RATHER THAN WISHED AWAY.
+  // `box-decoration-break: clone` gives each line fragment its own padded box,
+  // so a two-line ingredient reads as two chips rather than as one slab with a
+  // stub -- the same device `.drink-name-hit` uses in _filters.scss for the
+  // same reason, and §13.1's section marks before it. A background on an inline
+  // element wraps properly where the headings' inset box-shadow does not, which
+  // is why the old comment reached for text-decoration and why this does not
+  // have to.
+  background: $color-wicked-woowoo;
+  color: $color-bg;
+  -webkit-text-stroke: 0.04em $color-bg;
+  padding: 0 0.25em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  text-decoration: none;
   font-weight: 600;
 }
 

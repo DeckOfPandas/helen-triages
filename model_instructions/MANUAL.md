@@ -2167,10 +2167,20 @@ nothing moves, nothing resizes; a chip moves its box, a bare word its text;
 `scripts/palette_measure.py` is the contrast / dichromacy / CIEDE2000 tool;
 the dichromacy bar applies only where colour carries meaning ALONE (the
 goodness mark and the matched ingredient). **Text on a wash is ink, never the
-`-deep`**; **bands and washes, not fills** — the goodness mark is the only fill
-left on a card. That is a rule about CARDS, not the site: the index's active
-filter chip has been a filled block since #1086 (§13.4.2). **The names are the
-bottles** (#555).
+`-deep`**; **a MATCH is a filled block, everywhere, since #1134** (2026-09-17)
+— the matched mood or hassle chip (#1099/#1100), the matched ingredient
+(#1134), the index's active filter chip (#1086) and HAS TO HAVE's chosen chip
+(#1134) are one treatment: the section's hue as the fill, `$color-bg` as the
+letter, the faux-bold stroke in the letter's colour. **This replaced "bands and
+washes, not fills", which was a rule about CARDS and expired when its
+neighbours changed**: it was written on 2026-08-28 against a card carrying
+three fills at once, and by 2026-09-17 the goodness mark was a ship and a word
+and every other matched thing had inverted, so the two remaining bands were the
+odd ones out rather than the quiet ones — DECISIONS §9.13 (2026-09-17) has
+Helen's words and the reasoning, which generalises: **a ruling about RELATIVE
+loudness expires when the things it was relative to change.** A wrapping fill
+takes `box-decoration-break: clone` so each line fragment is its own padded box
+(`.drink-card-hit`, `.drink-name-hit`). **The names are the bottles** (#555).
 
 **The index** (`cocktails/index.html`, `_filters.scss`, `cocktail-index.js`):
 
