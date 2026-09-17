@@ -3647,6 +3647,64 @@ unless stated.
   it measured at rest and `test_no_active_filter_button_changes_its_own_width`
   still passes.
 
+- **2026-09-17, #1134 round two — the fill came off the card the same day it
+  went on, and the chip kept it. The entry above stands as what was tried.**
+  Helen, on the built thing: *"card ingredient chips aren't working for me at
+  all. Let's go back to the underline. Can we try a thicker underline? Or
+  basically anything else you can think of to get some more pink on the card!
+  The filter chips look great! But please centre the box on the word
+  vertically."*
+
+  **SO THE SPLIT IS THE RULE, AND IT IS NOT A COMPROMISE.** A CHIP fills when it
+  matches; a WORD bands. A mood chip is two or three words in a row of its own,
+  where a block is the object; a matched ingredient is a name inside a line of
+  other names, so the same fill covers far more of the card, wraps, and competes
+  with the drink's own title. Everything the entry above says about the
+  surroundings emptying out was true and still did not make a fill right HERE —
+  **the thing that had changed was the card's other furniture, not this
+  element's own shape.**
+
+  **WHAT THE BAND CARRIES INSTEAD IS WEIGHT**: 0.16em → **0.3em**, which is
+  Helen's own number from `.drink-name-hit` (*"the purple underline for searched
+  cocktail titles should be thicker to make it stand out more"*), so the site has
+  one thickness for "this matched" rather than two. Offset 0.16em → 0.12em, so a
+  thicker band still reads as belonging to the word. A second candidate — the
+  matched word itself in the hue as well — was built and shown rather than
+  argued: band and letters merge into one mass and the word gets harder to read,
+  so it was not taken.
+
+  **FADING DID NOT RESCUE THE FILL EITHER, AND THE REASON IS WORTH KEEPING.**
+  Asked to make the block *"a little less intense. Maybe with transparency?"*,
+  the measurement (`tmp/hit_alpha.py`, over `$color-surface`) said no useful
+  alpha exists: a fading block composites towards the card, so the punched-out
+  `$color-bg` letter loses contrast at once — 5.59:1 solid, 4.71:1 at 90%,
+  4.29:1 at 85%. Past that the letter must flip light, which is a DIFFERENT
+  treatment rather than a quieter one (at 70%: light letter 4.79:1, block 3.00:1
+  off the card). **"Less intense" is not always available as a dial; sometimes
+  the only quieter thing is a different shape.**
+
+  **THE CHIP'S BLOCK IS CENTRED ON ITS WORD, AND THAT NEEDED MEASURING.**
+  `background-position: center` centres the block in the PADDING BOX, and a line
+  box is not centred on its own ink — the face's ascent and descent are
+  asymmetric and the leading splits evenly, so the glyphs sit high in it and the
+  block hangs low. `tmp/chip_centring.py` reads the block's edges and the ink's
+  edges out of a 2× crop of the real page: the block sat 3 device px (1.5 CSS
+  px) high, which is 0.12em of this chip's 12.8px type. Corrected to within 0.5
+  CSS px, the remainder being the background snapping to whole device pixels.
+  **A "centre it" ask is measurable and should be measured; by eye it is a nudge
+  war.**
+
+  Also from this round, and the reason the chip's fill is a gradient: **Helen's
+  "the background looks enormous" was a ratio, not a size.** A chosen chip here
+  and a chosen MOOD chip draw almost the same block (26.6px against 26.9px tall)
+  around lettering of 12.8px and 14.4px — the padding is identical in `em`, the
+  type is a sixth smaller, so the same block holds visibly less ink. Cutting the
+  padding was not available (#389: a chosen filter may not resize itself, and
+  these chips wrap, so a resize reflows the pool), so the fill is a one-colour
+  `linear-gradient` — a background IMAGE, whose `background-size` can shrink the
+  painted block inside a box that never changes. **Paint-only is not only about
+  neighbours moving; it is also the lever that lets a fill be retuned at all.**
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%

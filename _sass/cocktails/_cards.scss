@@ -814,79 +814,51 @@ $card-name-step: 0.86;
 
 // The matched ingredient, in the colour of the field that matched it.
 .drink-card-hit {
-  // A BLOCK BEHIND THE WORDS AGAIN -- #1134, 2026-09-17, and this reverses
-  // 2026-08-28 deliberately and with its eyes open. Helen: "Also invert them on
-  // the cocktail cards to make the hits more obvious", and "I'm keen you copy
-  // as much of the styling as possible from the existing active chips because I
-  // love them!"
+  // A BAND UNDER THE WORDS, NOT A BLOCK BEHIND THEM. Helen, 2026-08-28, on a
+  // card with three filled things on it: "there's just a lot going on...
+  // underline the ingredient rather than highlight."
   //
-  // WHAT THE BAND WAS FOR, because the argument has not evaporated. On
-  // 2026-08-28 this card carried three filled things and she said "there's just
-  // a lot going on... underline the ingredient rather than highlight" -- fill
-  // being the loudest tool available, and this the worst of the three to spend
-  // it on, since a matched ingredient WRAPS and a long name became two solid
-  // slabs on two lines. §9.13's "bands and washes, not fills" came out of that
-  // sitting.
+  // THICKER SINCE #1134, 0.16em -> 0.3em, AND THAT IS THE WHOLE OF WHAT THAT
+  // ISSUE LEFT HERE. It asked for a block ("Also invert them on the cocktail
+  // cards to make the hits more obvious") and got one for an afternoon, in the
+  // filter chip's exact treatment. She looked: "card ingredient chips aren't
+  // working for me at all. Let's go back to the underline. Can we try a thicker
+  // underline? Or basically anything else you can think of to get some more
+  // pink on the card!" So the band is restored and the WANT is carried by its
+  // weight instead -- more pink, same shape.
   //
-  // WHAT CHANGED IS EVERYTHING AROUND IT. The card is not carrying three fills
-  // any more: the goodness mark became a ship and a word (2026-08-30), and the
-  // matched mood chip became an inverted block in #1099/#1100 ("Chip option B
-  // please", picked from three candidates on the real index). So by today the
-  // ingredient was the one matched thing still underlining while the chip
-  // beside it inverted -- and the complaint has flipped round: not "too much on
-  // the card" but "the hits aren't obvious enough".
+  // 0.3em IS HER OWN NUMBER FROM THE ONE OTHER PLACE THIS QUESTION AROSE:
+  // `.drink-name-hit` in _filters.scss went 0.22em -> 0.3em on "the purple
+  // underline for searched cocktail titles should be thicker to make it stand
+  // out more". Same ask, same answer, so the site has one thickness for "this
+  // matched" rather than two. The offset comes in a touch (0.16em -> 0.12em) so
+  // the thicker band still reads as belonging to the word rather than floating
+  // under the line.
   //
-  // SO IT IS `.drink-card-mood.is-match`, COPIED, and every value here is that
-  // rule's: the page's own ground as the letter so it reads punched out, the
-  // same-colour faux-bold stroke at 0.04em, and `0 0.25em` of padding, which is
-  // the tight option she chose there over the padded one.
-  //
-  // THE HUE IS UNCHANGED AND IS THE POINT: magenta means MATCHED everywhere on
-  // this site, and it is $color-wicked-woowoo here exactly as it is on the
-  // heading and on the HAS TO HAVE chip that lit this up. The dark letter reads
-  // 5.59:1 on it (tmp/chip_contrast.py), beside 6.66:1 and 6.19:1 for the mood
-  // and hassle chips this copies.
-  //
-  // THE WRAP IS STILL REAL AND IS HANDLED RATHER THAN WISHED AWAY.
-  // `box-decoration-break: clone` gives each line fragment its own padded box,
-  // so a two-line ingredient reads as two chips rather than as one slab with a
-  // stub -- the same device `.drink-name-hit` uses in _filters.scss for the
-  // same reason, and §13.1's section marks before it. A background on an inline
-  // element wraps properly where the headings' inset box-shadow does not, which
-  // is why the old comment reached for text-decoration and why this does not
-  // have to.
-  // A WASH AT 70%, NOT THE SOLID HUE -- #1134 round two, 2026-09-17. Helen, on
-  // the solid version: "please try making the pink active chip background on
-  // the cards a little less intense. Maybe with transparency? I really want
-  // this to work, we're just not there yet."
-  //
-  // AND THE LETTER HAD TO FLIP WITH IT, WHICH IS PHYSICS RATHER THAN TASTE.
-  // Fading composites the block towards the card underneath it, so the fill
-  // darkens and the gap to a DARK letter closes. Measured over $color-surface
-  // (tmp/hit_alpha.py): $color-bg on the block reads 5.59:1 solid, 4.71:1 at
-  // 90% and 4.29:1 at 85% -- so the punched-out letter runs out of contrast
-  // almost immediately, and "a little less intense" while keeping it means 90%,
-  // which is not visibly less intense at all. Past that the block is a dark
-  // tint and wants the LIGHT letter: at 70% $color-text reads 4.79:1 on it and
-  // the block still stands off the card at 3.00:1, which is what keeps a hit
-  // legible AS a hit.
-  //
-  // SO THIS IS NO LONGER THE MOOD CHIP'S TREATMENT, and that is the one thing
-  // to know when reading the two side by side. `.drink-card-mood.is-match` is
-  // still a punched block (dark letter on a bright fill) because a chip is two
+  // WHY THE BLOCK FAILED HERE AND WORKS ON A CHIP, which is worth keeping
+  // because the two look like the same object and are not. A mood chip is two
   // or three words in a row of its own; this is a whole ingredient name inside
-  // a line of other ingredients, so the same fill covers far more of the card
-  // and reads louder at the same alpha. Same hue, same block, quieter surface.
+  // a line of other ingredients, so the same fill covers far more of the card,
+  // and it WRAPS -- the exact objection of 2026-08-28, which
+  // `box-decoration-break: clone` made tidy (two padded chips rather than a
+  // slab with a stub) without making it quiet. Fading it did not rescue it
+  // either: the block composites towards the card as it fades, so the
+  // punched-out letter runs out of contrast almost at once (5.59:1 solid,
+  // 4.71:1 at 90%, 4.29:1 at 85% -- tmp/hit_alpha.py), and a 70% wash with the
+  // light letter was a different treatment rather than a quieter one.
   //
-  // The stroke follows the letter, as it does everywhere this device is used:
-  // faux-bold in the letter's own colour, never a second hue.
-  background: rgba($color-wicked-woowoo, 0.7);
+  // text-decoration RATHER THAN THE HEADINGS' inset box-shadow, because this
+  // one wraps. A box-shadow paints the element's box and gives a wrapped
+  // fragment an odd stub; text-decoration follows each line properly.
+  background: none;
   color: $color-text;
-  -webkit-text-stroke: 0.04em $color-text;
-  padding: 0 0.25em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: $color-wicked-woowoo;
+  text-decoration-thickness: 0.3em;
+  text-underline-offset: 0.12em;
+  text-decoration-skip-ink: none;
+  // No padding. It was there to give a FILL room to breathe, and with a band
+  // instead it makes the line run wider than the word it underlines.
   font-weight: 600;
 }
 

@@ -862,9 +862,27 @@
 // full box in magenta would restore exactly the shape this change removes, and
 // a grey frame around a magenta block reads as two objects. Transparent keeps
 // the 1.5px the box has always reserved, so again nothing moves.
+// CENTRED ON THE WORD, NOT ON THE BOX -- Helen, 2026-09-17: "please centre the
+// box on the word vertically." `center` centres the block in the PADDING BOX,
+// and a line box is not centred on its own ink: the face's ascent and descent
+// are asymmetric and the leading is split evenly above and below, so the glyphs
+// sit high inside it and the block hangs low.
+//
+// 0.12em IS MEASURED, NOT NUDGED (tmp/chip_centring.py, which reads the block's
+// edges and the ink's edges out of a 2x crop of the real page): the block's
+// centre sat 3 device pixels -- 1.5 CSS px -- above the ink's centre, and
+// 0.12em of this chip's 12.8px type is that 1.5px. In `em` so it holds if the
+// chip's size ever moves.
+//
+// LONGHANDS RATHER THAN THE SHORTHAND, because `background-color` now has to be
+// reset explicitly: %drink-btn-base sets `background: $color-surface` and the
+// shorthand used to clear it for free.
 .drink-search--include .btn-pool.is-on {
-  background: linear-gradient($color-heading-include, $color-heading-include)
-              no-repeat center / calc(100% - 0.7em) calc(100% - 0.3em);
+  background-color: transparent;
+  background-image: linear-gradient($color-heading-include, $color-heading-include);
+  background-repeat: no-repeat;
+  background-size: calc(100% - 0.7em) calc(100% - 0.3em);
+  background-position: center calc(50% + 0.12em);
   border-color: transparent;
   color: $color-bg;
   -webkit-text-stroke: 0.05em $color-bg;
