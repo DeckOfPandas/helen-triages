@@ -1740,10 +1740,16 @@ $amount-gap-wide: 1.25rem;
 
 // OPTIONAL — #570. An ingredient the drink survives without.
 //
-// A WORD, NOT A PARENTHETICAL, and the reason is the bracket above: on this
-// line brackets mean "the bottle" and nothing else, so "(optional)" sitting
-// where "(Beefeater)" sits would make one mark carry two jobs. Same argument
-// #441 made about a bare "(blackstrap)".
+// A PARENTHETICAL SINCE #1141 (2026-09-17), reversing the paragraph that stood
+// here. It argued that on this line brackets mean "the bottle" and nothing
+// else, so "(optional)" sitting where "(Beefeater)" sits would make one mark
+// carry two jobs — #441's argument about a bare "(blackstrap)".
+//
+// It was guarding a collision that has never occurred: the two marks only meet
+// when ONE ingredient carries both, and the published collection holds exactly
+// one optional ingredient (Corpse Reviver No. 2's cane sugar syrup), which
+// names no bottle — measured, tmp/optional_census.py. The brackets are in the
+// markup beside the suggestion's own, so the words copy as they read.
 //
 // Italic and in $color-clear-text rather than a hue. It is not a filter axis
 // and nothing on the index matches it, so it has no colour to tie back to —

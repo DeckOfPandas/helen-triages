@@ -674,19 +674,33 @@ layout: default
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
               {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
-              {% comment %} `optional` is a plain word after the name, NOT a
-                 parenthetical — the brackets on this line already mean "the
-                 bottle", and "sugar syrup (optional)" beside "gin (Beefeater)"
-                 would make one punctuation mark carry two unrelated jobs.
-                 That is #441's argument about "(blackstrap)" arriving on a
-                 different field. {% endcomment %}
+              {% comment %} `optional` IS A PARENTHETICAL SINCE #1141
+                 (2026-09-17), and this reverses the paragraph that stood here.
+                 It argued: the brackets on this line already mean "the bottle",
+                 so "sugar syrup (optional)" beside "gin (Beefeater)" would make
+                 one punctuation mark carry two unrelated jobs — #441's argument
+                 about "(blackstrap)" arriving on a different field.
+
+                 THE ARGUMENT WAS ABOUT A COLLISION THAT DOES NOT HAPPEN. It is
+                 only true when ONE ingredient carries both, and measured on the
+                 published collection (tmp/optional_census.py, 2026-09-17) there
+                 is exactly one optional ingredient in the whole of it — Corpse
+                 Reviver No. 2's cane sugar syrup — and it names no bottle. So
+                 the two marks have never yet appeared on one line, and the rule
+                 was protecting a reader nobody has been.
+
+                 IF THEY EVER DO COLLIDE it renders "syrup (Monin) (optional)",
+                 which is two bracket groups in a row and worth asking Helen
+                 about rather than solving in advance. The brackets live in the
+                 markup, beside the suggestion's own, so the words copy and
+                 paste as they read. {% endcomment %}
               {% comment %} `headline` GETS ITS OWN SPAN, 2026-09-02, so the
                  double-rule underline (violette over absinthe, Helen's brief:
                  "yvette showing what is in something") lands under the
                  ingredient's name only — never under the bottle suggestion in
                  brackets after it, which is a different colour making a
                  different claim. {% endcomment %}
-              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">optional</span>{% endif %}</span>
+              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>
