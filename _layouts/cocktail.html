@@ -777,6 +777,41 @@ layout: default
       </label>
       <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
     </div>
+    {% comment %} HOW MUCH THIS COMES TO — #1121, Helen: "add total ml next to
+       recipe scaler to help me choose the right number of glasses... This means
+       I can vary target units of alcohol myself." Her line, in her words:
+       "Approximately X ml". It is not polished, not caveated and not reworded
+       (§13.12: the voice is hers).
+
+       THIS IS THE BATCH AND IT MOVES. It is the ONLY figure on the page that
+       does: the units line below and the cost line beside it are both per glass
+       and both invariant under the multiple box (see their own comments, and
+       cocktail-scale.js's "THE COST LINE DOES NOT MOVE WITH THE SCALER"). So
+       this line and the units line carry two different numbers on purpose, and
+       the same drink says both — ×4 of an Aviation is "Approximately 360 ml"
+       here and "in a serving of 90 ml" down there.
+
+       THE NUMBER COMES FROM THE PLUGIN, NOT FROM `HTF.scale.totalMl`, and the
+       reason is in _plugins/cocktail_units.rb's `volume_for`: scale.js reads
+       the printed strings and counts `ml` and only `ml`, so an `oz` or a `tsp`
+       pour would total differently there than in the footer's own sentence.
+       One figure is computed at build time and the browser multiplies it, so
+       the two lines cannot disagree about the same drink.
+
+       IT RENDERS WITHOUT JAVASCRIPT, unlike the control above it, and that is
+       deliberate rather than an oversight. The `hidden` on the scaler is the
+       rule for a control that silently FAILS — a number box that renumbers
+       nothing. This is a true sentence about the recipe as written whether or
+       not anything ever runs, so it prints, and it is right on paper.
+
+       A DRINK WITH NO `page.volume` GETS NO LINE. That is five published drinks
+       today and every one of them tops up; `volume_for`'s header says why a
+       midpoint of `top_up_ml` is not good enough for this particular number,
+       and what would unlock them (#1076, #295). {% endcomment %}
+    {% if page.volume %}
+      <p class="cocktail-scale-total" data-total-ml="{{ page.volume.total_ml }}">Approximately
+        <span class="cocktail-scale-total-figure">{{ page.volume.total_ml }}</span> ml</p>
+    {% endif %}
     {% comment %} The floor message, empty and hidden until a refusal fills it —
        "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
        paragraph of its own beneath the control rather than text inside the
@@ -1160,6 +1195,24 @@ layout: default
      about "a glass" to match the cost line beside it and chose to leave the
      mismatch alone.
 
+     AND IT SAYS HOW BIG THE SERVING IS, SINCE #1121 — again her words, again
+     unpolished: "Roughly X units of alcohol in a serving of Y ml". A punch
+     extends the same way ("in each of 8 servings of 160 ml"), which is the
+     minimal reading of her sentence against the tail that was already here.
+
+     Y IS ONE GLASS AND MUST NOT MOVE WITH THE SCALER, exactly as X must not.
+     Both come from `serves:`-divided build-time figures and neither carries a
+     data attribute the scaler could reach: `page.volume.serve_ml` is printed
+     once, and `data-total-ml` — the number that DOES move — lives on
+     `.cocktail-scale-total` up beside the control, where the moving figure
+     belongs. If this line ever moves with the multiple box, that is the bug,
+     and the two elements being different elements is what prevents it.
+
+     THE TAIL IS DROPPED RATHER THAN GUESSED where the volume is unknown, and
+     the sentence falls back to exactly what it said before #1121. The four
+     drinks that keep the old wording all top up — see `volume_for` in
+     _plugins/cocktail_units.rb.
+
      `data-units-per-serve` AND `data-serves` ARE READ BY cocktail-scale.js for
      the batch note (#713), which needs the number to compute a TOTAL -- a
      different quantity that genuinely does scale. This figure is PER SERVING
@@ -1211,8 +1264,9 @@ layout: default
            data-serves="{{ page.units.serves }}">Roughly
           <span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
           {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
-          {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
-          {%- else %} in a serving.{% endif %}</p>
+          {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings
+          {%- else %} in a serving{% endif %}
+          {%- if page.volume %} of {{ page.volume.serve_ml }} ml{% endif %}.</p>
       {% endif %}
       {% if has_cost %}
         <p class="cocktail-cost"

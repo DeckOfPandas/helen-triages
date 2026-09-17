@@ -278,7 +278,43 @@
     });
     fitAmountColumn(verdict.amounts);
     put(input, box(last));
+    drawTotal(n);
     batch(n);
+  }
+
+  /* THE LINE UNDER THE SCALER -- #1121, Helen: "add total ml next to recipe
+     scaler to help me choose the right number of glasses". It is the one figure
+     on this page that MOVES: the cost line and the units line are both per
+     glass and both invariant (see the long comment below, and the units line's
+     own in _layouts/cocktail.html), and this is the batch.
+
+     THE PER-RECIPE VOLUME IS READ OFF THE PAGE, NOT COMPUTED FROM THE AMOUNTS.
+     _plugins/cocktail_units.rb works it out once at build time and writes it
+     into `data-total-ml`; `HTF.scale.batchTotalMl` only multiplies. Its own doc
+     comment says why `HTF.scale.totalMl` is the wrong tool for this particular
+     number -- in short, it counts `ml` and only `ml`, and the footer's "in a
+     serving of Y ml" is computed the other way. Two sentences about the size of
+     one drink must not be able to disagree.
+
+     ABSENT IS NORMAL. A drink whose volume the repo cannot state renders no
+     element at all -- five published drinks, every one of them topped up
+     (#1076). `totalFigure` is then null and nothing here runs, exactly as
+     `batchNote` is null in a production build. */
+  var totalLine = article.querySelector('.cocktail-scale-total');
+  var totalFigure = totalLine
+    && totalLine.querySelector('.cocktail-scale-total-figure');
+  var perRecipeMl = totalLine
+    ? parseFloat(totalLine.getAttribute('data-total-ml'))
+    : NaN;
+
+  function drawTotal(n) {
+    if (!totalFigure) return;
+    var ml = HTF.scale.batchTotalMl(perRecipeMl, n);
+    /* A MISSING OR UNREADABLE ATTRIBUTE LEAVES THE SERVER'S OWN SENTENCE
+       STANDING. It was right at ×1 before this script ran, and a blanked figure
+       would be worse than a stale one. */
+    if (ml === null) return;
+    totalFigure.textContent = String(ml);
   }
 
   /* THE BATCH NOTE -- #713, and Helen's request of 2026-09-06: "Bitters text

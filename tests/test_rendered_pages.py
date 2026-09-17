@@ -2550,3 +2550,189 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
         "the related-recipes row (#1005) is wrong on these pages:\n  "
         + "\n  ".join(problems[:20])
     )
+
+
+# =============================================================================
+# HOW MUCH LIQUID IS IN A DRINK -- #1121
+# =============================================================================
+# Helen: "add total ml next to recipe scaler to help me choose the right number
+# of glasses... This means I can vary target units of alcohol myself." Two
+# sentences came out of that, and the whole risk is that they are DIFFERENT
+# NUMBERS:
+#
+#   under the scaler   "Approximately 360 ml"   -- the BATCH, and it moves
+#   in the footer      "...in a serving of 90 ml." -- ONE GLASS, and it must not
+#
+# The second guarantee is structural rather than remembered: the moving figure
+# lives on `.cocktail-scale-total`, which carries `data-total-ml`, and the units
+# line carries no attribute any of this could reach. These tests are what says
+# so about BUILT HTML, which is the only place the two sentences meet.
+#
+# BOTH LINES ARE PRODUCTION, so `prod_site`. The units line went live with #1001
+# and the volume line is ungated for the same reason: neither is a price.
+
+SCALE_TOTAL = re.compile(
+    r'<p class="cocktail-scale-total" data-total-ml="([^"]*)">(.*?)</p>', re.S)
+UNITS_LINE = re.compile(r'<p class="cocktail-units"(.*?)</p>', re.S)
+SERVING_OF = re.compile(r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml\.")
+
+# THE DRINKS THAT STATE NO VOLUME, PINNED BY NAME -- see `volume_for` in
+# _plugins/cocktail_units.rb for the two rules and the argument behind each.
+# Five top up, and `top_up_ml` is a house range #1076 has shown is a stand-in
+# for a calculation this repo cannot yet run (no glass records a capacity,
+# #295). One is the Caipirinha, where the excluded pours ARE the drink -- the
+# same judgement, and the same constant, as `cost.complete`.
+#
+# A RATCHET IN BOTH DIRECTIONS, deliberately. A new name here means a drink
+# quietly lost a figure it used to print; a name leaving means one gained a
+# figure, which is either #1076 landing (good, and update this list in that
+# commit) or the withholding rule being weakened by accident.
+NO_VOLUME_STATED = {
+    "airmail",
+    "arrack-christmas-punch-wife-3",
+    "caipirinha",
+    "julien-sorel",
+    "pear-apricot-and-rosemary-bellini",
+    "tom-collins",
+}
+
+
+def test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot(prod_site):
+    """#1121. A figure known to be wrong is worse than no figure.
+
+    The rule is in the plugin; this is the census of what it actually withheld,
+    on the built pages, where a Liquid guard that silently inverted would show.
+    """
+    pages = _drink_pages(prod_site)
+    assert len(pages) > 20, (
+        f"only {len(pages)} drink pages in the production build -- the corpus "
+        "walk is looking in the wrong place."
+    )
+
+    silent = {p.parent.name for p in pages
+              if not SCALE_TOTAL.search(p.read_text(encoding="utf-8"))}
+
+    assert silent == NO_VOLUME_STATED, (
+        "the set of drinks printing no volume has moved.\n"
+        f"  newly silent (lost a figure they used to print): "
+        f"{sorted(silent - NO_VOLUME_STATED)}\n"
+        f"  newly speaking (gained one): {sorted(NO_VOLUME_STATED - silent)}\n"
+        "`volume_for` in _plugins/cocktail_units.rb has the two rules. If a "
+        "topped drink has gained a figure because `capacity_ml:` finally landed "
+        "in glasses.yml (#1076, #295), that is the good outcome -- take its name "
+        "out of NO_VOLUME_STATED in the same commit."
+    )
+
+
+def test_a_drink_with_no_volume_keeps_the_units_sentence_it_had_before(prod_site):
+    """The tail is DROPPED, never guessed, and the old sentence is the fallback.
+
+    Helen's wording is "Roughly X units of alcohol in a serving of Y ml". Where
+    Y is unknown the line falls back to exactly what #753 shipped -- "in a
+    serving." -- rather than inventing a figure or a hedge. The Bellini has no
+    units line at all (no alcohol is recorded in its ingredients), which is a
+    separate, older withholding and not this one.
+    """
+    problems = []
+    for page in _drink_pages(prod_site):
+        slug = page.parent.name
+        if slug not in NO_VOLUME_STATED:
+            continue
+        units = UNITS_LINE.search(page.read_text(encoding="utf-8"))
+        if not units:
+            continue
+        if SERVING_OF.search(units.group(1)):
+            problems.append(f"{slug}: states a serving volume it cannot know")
+        elif "in a serving." not in units.group(1) \
+                and "servings." not in units.group(1):
+            problems.append(f"{slug}: {' '.join(units.group(1).split())}")
+
+    assert not problems, (
+        "a drink with no stated volume must keep #753's own sentence:\n  "
+        + "\n  ".join(problems)
+    )
+
+
+def test_only_the_scaler_line_carries_a_figure_the_scaler_can_reach(prod_site):
+    """THE ONE THING THAT KEEPS THE UNITS LINE STILL.
+
+    cocktail-scale.js writes to `.cocktail-scale-total-figure` and to nothing
+    else on this subject; it finds that element by `data-total-ml`. If that
+    attribute ever appears on `.cocktail-units`, the per-serving figure becomes
+    reachable by the multiple box, which is the bug the layout's own comment
+    says to come here for. Cheap to check and impossible to notice by eye.
+    """
+    problems = []
+    for page in _drink_pages(prod_site):
+        html = page.read_text(encoding="utf-8")
+        slug = page.parent.name
+
+        for units in UNITS_LINE.finditer(html):
+            if "data-total-ml" in units.group(1):
+                problems.append(f"{slug}: the units line carries data-total-ml")
+
+        total = SCALE_TOTAL.search(html)
+        if not total:
+            continue
+
+        attr, body = total.group(1), " ".join(total.group(2).split())
+        assert re.fullmatch(r"[\d.]+", attr), f"{slug}: data-total-ml={attr!r}"
+        figure = float(attr)
+        assert figure > 0, f"{slug}: a volume of {figure}"
+
+        # THE PRINTED FIGURE IS THE ATTRIBUTE. The browser multiplies the
+        # attribute; the reader reads the text. At x1 they are the same number,
+        # and the day they are not, the line lies the moment anyone touches it.
+        expected = ("Approximately "
+                    f'<span class="cocktail-scale-total-figure">{attr}</span> ml')
+        if expected not in " ".join(total.group(0).split()):
+            problems.append(f"{slug}: {body!r} does not print {attr} ml")
+
+        # AND WHERE A DRINK IS ONE GLASS, THE FOOTER SAYS THE SAME NUMBER --
+        # the batch at x1 IS the serving. A punch divides by `serves:` and is
+        # left out of this comparison rather than given a second sum here.
+        units = UNITS_LINE.search(html)
+        if units and "each of" not in units.group(1):
+            said = SERVING_OF.search(units.group(1))
+            if said and float(said.group(1)) != figure:
+                problems.append(
+                    f"{slug}: the scaler says {figure} ml and the units line "
+                    f"says {said.group(1)} ml for the same single glass")
+
+    assert not problems, (
+        "the two volume figures on a drink page have come apart:\n  "
+        + "\n  ".join(problems[:20])
+    )
+
+
+def test_the_aviation_prints_the_volume_its_own_amounts_add_up_to(prod_site):
+    """ONE ANCHOR WITH A REAL NUMBER IN IT, checkable by eye.
+
+    52.5 + 15 + 7.5 + 15 = 90 ml, and every other test above checks a
+    RELATIONSHIP -- which would all still pass if the plugin's arithmetic were
+    wrong in the same way in both places. This is the one that would not.
+
+    If Helen repours the Aviation, this test names itself and the fix is this
+    number. It is not a claim about the recipe; it is a claim about the sum.
+    """
+    page = prod_site / "cocktails" / "recipes" / "aviation" / "index.html"
+    assert page.exists(), "the Aviation is not in the production build"
+    html = page.read_text(encoding="utf-8")
+
+    total = SCALE_TOTAL.search(html)
+    assert total, "no volume line on the Aviation"
+    assert total.group(1) == "90", (
+        f"the Aviation totals {total.group(1)} ml; its amounts are "
+        "52.5 + 15 + 7.5 + 15 = 90"
+    )
+    assert "Approximately" in total.group(2), (
+        "Helen's wording is 'Approximately X ml' (#1121, §13.12: the voice is "
+        f"hers). The line now reads: {' '.join(total.group(2).split())!r}"
+    )
+
+    units = UNITS_LINE.search(html)
+    assert units, "no units line on the Aviation"
+    assert "of alcohol in a serving of 90 ml." in " ".join(units.group(1).split()), (
+        "Helen's wording is 'Roughly X units of alcohol in a serving of Y ml' "
+        f"(#1121). The line now reads: {' '.join(units.group(1).split())!r}"
+    )
