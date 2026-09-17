@@ -185,17 +185,33 @@
 .page-search-group--hassle     .page-search-group-label { color: $color-heading-hassle; }
 .page-search-group--ingredient .page-search-group-label { color: $color-heading-include; }
 
-// THE GLASS AND THE PLACEHOLDER SIT BACK ON THIS SITE -- Helen, 2026-09-15:
-// "for the cocktail site, make grey-er/darker, so it demands less attention at
-// the top of the page." The shared rule gives the placeholder the index boxes'
-// tone, which on a dark ground is LIGHTER than the quiet grey (lighten() moves
-// towards white here), so the box at the top of every drink page read brighter
-// than the ingredient boxes on the index. Both take the quiet grey darkened by
-// 15%: #716F74, 3.88:1 on the page (scripts/palette_measure.py) -- a hint and
-// a mark, not text, so the 3:1 bar is the one that applies, and it is cleared.
-// The glass still goes to the accent under the cursor (shared/_furniture.scss).
+// THE GLASS SITS BACK ON THIS SITE -- Helen, 2026-09-15: "for the cocktail
+// site, make grey-er/darker, so it demands less attention at the top of the
+// page." The quiet grey darkened by 15%: #716F74, 3.88:1 on the page
+// (scripts/palette_measure.py) -- a mark, not text, so the 3:1 bar is the one
+// that applies, and it is cleared. The glass still goes to the accent under
+// the cursor (shared/_furniture.scss).
 .page-search-go { color: darken($color-clear-text, 15%); }
-.page-search-input::placeholder { color: darken($color-clear-text, 15%); }
+
+// THE PLACEHOLDER'S HALF OF THAT RULING IS THE SHARED RULE'S JOB NOW -- #1123,
+// 2026-09-16. It stood here with the line above, for the reason above: the
+// shared mixin's `lighten($color-clear-text, 30%)` moves towards WHITE, which
+// on a #0e0e10 ground is the wrong way, so this site had to say something else.
+// `$page-search-quiet` in shared/_furniture.scss now mixes towards each site's
+// own ground instead, which is the same intent expressed once for both sites
+// -- and a per-site override that merely repeats the shared answer is the kind
+// of fork §2.3 exists to prevent.
+//
+// IT IS NOT MERELY A TIDY-UP: this override was ALSO silently undoing #1123's
+// own step, because it loads after shared/furniture and is no less specific.
+// Helen asked for the box to be "less obtrusive... step its colour (border and
+// font) closer to the background", and with this line standing the dark site
+// would have kept 3.88:1 while food quietened.
+//
+// WHAT IT COSTS, AND IT IS THE ONE THING TO LOOK AT: the placeholder goes from
+// #716F74 (3.88:1) to 2.23:1, which is UNDER the 3:1 bar the ruling above
+// clears for the glass. The glass keeps its own colour, so the two no longer
+// match on this site.
 
 // FOOD'S GAP BETWEEN SECTIONS, not this file's own. It was
 // $spacing-section-gap (3rem), which is the RECIPE PAGE's "below a section"

@@ -228,6 +228,13 @@
   // 3rem. Worth recording which of us was measuring and which was looking:
   // matching the nav icons was the wrong target, because this is the only
   // control on a recipe page and has no row of siblings to be consistent with.
+  //
+  // THE ARROW IS A DRAWING SINCE #1119 AND THESE TWO LINES NO LONGER SIZE IT --
+  // they are kept because they are still what the BOX is: `font-size` is the
+  // 3rem #411 settled, and `.back-to-index-mark` below states its width as a
+  // share of it, so her number still governs the arrow through one indirection
+  // rather than being replaced by a second one. `line-height: 1` keeps the link
+  // box from growing a strip of leading around a box that holds no text.
   font-size: 3rem;
   line-height: 1;
   color: $color-clear-text;
@@ -241,6 +248,37 @@
   &:active {
     color: $color-accent;
   }
+}
+
+// THE ARROW ITSELF -- #1119, 2026-09-16. icons/arrow-right.svg, mirrored, at
+// the size the glyph it replaces occupied.
+//
+// `scaleX(-1)` RATHER THAN A SECOND FILE. Helen asked for the back arrow and
+// the navbar's site door to "use the same graphic", and one artwork drawn
+// backwards is the only reading of that which cannot drift: an arrow-left.svg
+// would be a second file to keep in step, and this arrow is symmetrical about
+// its own shaft, so the mirror is exact rather than approximate. The stroke is
+// `currentColor`, so the hover above reaches it with no rule of its own.
+//
+// 0.6em IS MEASURED, NOT CHOSEN. `&larr;` at font-size 3rem occupied a 28.97px
+// advance in this container, which is 0.604 of the 48px em -- so the drawn mark
+// takes 0.6em and the furniture line's geometry is where it was. Stated as a
+// share of the font-size rather than as 1.8rem so that #411's 3rem stays the
+// one number governing this arrow's size.
+//
+// AND THAT MEASUREMENT IS WHY THE GLYPH HAD TO GO. Courier Prime's subset has
+// no U+2190, so 28.97px is what ONE machine's substituted face happened to give
+// it -- the same trap #993 recorded for the navbar's `&rarr;`, where a
+// substituted font moved both the box and the ink inside it. The width is now a
+// number this stylesheet states rather than one a reader's font decides.
+//
+// `height: auto` with the 20x12 viewBox makes the mark 0.36em tall; `display:
+// block` so the anchor's box is the drawing's box and not a text line's.
+.back-to-index-mark {
+  display: block;
+  width: 0.6em;
+  height: auto;
+  transform: scaleX(-1);
 }
 
 // Not on paper. Same reasoning as .recipe-actions and .btn-method-toggle in

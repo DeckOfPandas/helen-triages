@@ -1054,6 +1054,29 @@
        VISIBLE. A plain page turn moves no chips and still needs the budget. */
     if (HTF.cardLineBudget) HTF.cardLineBudget();
 
+    /* AND THE NAME FIT WITH IT, FOR THE SAME REASON AND THE SAME BUG -- #1115,
+       2026-09-16. Helen: "names on cocktail cards aren't wrapping but should
+       be", with two screenshots of names running past their tape.
+
+       IT IS #776 A SECOND TIME, one file along. A paginated-away card is
+       `hidden`, a hidden element measures ZERO in both directions, and
+       card-name-fit.js asks a name whether its lettering is wider than its box:
+       0 > 0 is false, so every name on page two answered "I fit" at load and
+       was never asked again. The wrap state was never broken -- it was never
+       reached. Page one wrapped correctly the whole time, which is exactly why
+       this could sit here unseen.
+
+       UNCONDITIONAL, LIKE THE BUDGET ABOVE AND FOR THE SAME REASON: the answer
+       depends on which cards are VISIBLE and on how wide they are, and a plain
+       page turn changes the first without touching a filter. It also covers the
+       reflow a filter causes, since the grid's cards change width when the
+       shopping panel opens beside them.
+
+       GUARDED, because `card-name-fit.js` is not in tests/js/index-harness.js's
+       script list and a page that somehow loaded without it must still filter.
+       Same guard, same shape, as the budget's. */
+    if (HTF.fitCardNames) HTF.fitCardNames();
+
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible
        for a filter that is already empty. */

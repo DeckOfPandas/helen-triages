@@ -26,7 +26,12 @@
 //
 // WHAT IT DOES, per `.drink-card-name` on the page:
 //
-//   0. Mark the name `--fitted`, which is not a state: it says this script has
+//   0. Leave a name whose box has no client rects entirely alone -- it is
+//      paginated away or otherwise not laid out, and every measurement below
+//      would come back as zero and read as "it fits" (#1115). It keeps the
+//      no-JS base state, not even `--fitted`, until a later pass can measure
+//      it.
+//   0a. Mark the name `--fitted`, which is not a state: it says this script has
 //      run, and it releases the no-JS ellipsis clip. See FITTED_CLASS below.
 //   1. Reset the two state classes, so every run measures the UNSTEPPED,
 //      UNWRAPPED element. Without this the second run measures the first run's
@@ -163,6 +168,29 @@
   function fit(name) {
     var word = name.querySelector(WORD);
     if (!word) return;
+
+    // A BOX WITH NO WIDTH CANNOT BE MEASURED, AND SILENCE IS THE RIGHT ANSWER
+    // -- #1115, 2026-09-16. The cocktails index paginates by setting
+    // `card.hidden` rather than by removing the card, and a hidden element
+    // measures ZERO in both directions. Asking this element anything in that
+    // state produces `0 > 0 + 1`, which is false, which reads as "the name
+    // fits" -- so every name on page two was classified as fitting at load,
+    // however long it was.
+    //
+    // RETURNING BEFORE `FITTED_CLASS` IS THE POINT, not an oversight. That class
+    // releases the no-JS ellipsis clip on the strength of a measurement having
+    // happened; released on the strength of a measurement that could not happen,
+    // it takes away the fallback and puts nothing in its place, which is a name
+    // running off its tape rather than one politely cut. An unmeasurable name
+    // keeps the base state until it can be measured -- and it will be, because
+    // cocktail-index.js re-runs this pass on every apply(), which is what a page
+    // turn is.
+    //
+    // NOT A `hidden` CHECK. This asks the browser whether it got an answer,
+    // which also covers `display: none` on an ancestor, a card inside a closed
+    // panel, and the drink page's title before its own layout settles -- none of
+    // which this file should have to know about.
+    if (!word.getClientRects().length) return;
 
     // ALWAYS FROM THE BASE STATE. Every run has to measure the element as the
     // stylesheet would draw it with no class on it, or the second run measures

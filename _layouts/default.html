@@ -445,6 +445,37 @@
       {% endunless %}
       {% if ref_links and ref_links.size > 0 %}
       <nav class="site-footer-ref" aria-label="{{ ref_site.title }} reference">
+        {% comment %} THE SITE'S ICON, BACK FROM THE NAVBAR -- #1122, 2026-09-16.
+           Helen: "put the cloche (food) and martini glass (cocktails) SVGs in
+           the footer columns, centered over the links for each site", and why:
+           "These used to be in the navbar but didn't make the redesign, and I
+           miss them!"
+
+           IT IS THE SAME KEY AND THE SAME ARTWORK #1007 PARKED. That issue took
+           the icons out of the header ("navbar button for other site is too
+           large and busy") and the note left behind at that spot says exactly
+           what survived: "The key and the artwork stay in sites.yml and
+           _includes/icons/; the class rules stay in shared/_layout.scss and
+           shared/_chrome.scss, so putting it back is this one include line."
+           This is that line, in the footer rather than the header -- so the
+           icons return where they are a column's head rather than a second
+           tape competing with the wordmark's, which was #1007's actual
+           complaint.
+
+           THE ASSIGN IS HOW A DYNAMIC INCLUDE IS SPELLED HERE, kept from the
+           header's own version of this line (dfdf7e8): Liquid's `include`
+           takes a variable only in the `{% include {{ var }} %}` form.
+
+           NO `class` PARAMETER, DELIBERATELY. Both partials carry their classes
+           in the file (`nav-icon nav-icon--food`, `nav-icon nav-icon--martini`),
+           and test_every_chrome_class_has_a_rule_in_every_site_stylesheet reads
+           those files to find them with a pattern that skips anything holding
+           Liquid braces -- so parameterising the class here would hide these
+           icons' classes from the one test that proves both stylesheets style
+           them. The wrapper span takes the footer's own sizing instead.
+        {% endcomment %}
+        {% assign ref_icon_file = "icons/" | append: ref_site.icon | append: ".svg" %}
+        <span class="site-footer-ref-icon">{% include {{ ref_icon_file }} %}</span>
         <span class="site-footer-ref-word">[ {{ ref_site.word }} ]</span>
         {% for link in ref_links %}
         <a href="{{ link.url | relative_url }}">{{ link.text }}</a>

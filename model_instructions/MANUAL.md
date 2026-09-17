@@ -3444,9 +3444,20 @@ variables), and the row each site puts the actions in:
   comma) and each index puts the text into its own I KNOW WHAT I WANT box and
   applies it as a keystroke would. Enter or the magnifying glass submits.
   **Since 2026-09-15 (#1050) it is the SEARCH FOR ANYTHING**: the glass sits
-  at the RIGHT end and never moves (#1056), the input is 24 characters wide and
-  RIGHT-aligned so a word grows leftwards from the glass (#1099, Helen:
-  "____r ___rh __rhu _rhum"); focus is the underline in `$color-accent` plus an
+  at the RIGHT end and never moves (#1056), the input is **22 characters wide,
+  which is the PLACEHOLDER's length** (#1123: `I know what I want...` is 20
+  characters and at 0.04em tracking measures ~21.3ch — it went to 12 first and
+  the resting box read `i know what`, the placeholder being the one string that
+  can never scroll into view), and RIGHT-aligned so a word grows leftwards from
+  the glass (#1099, Helen: "____r ___rh __rhu _rhum") — which is what scrolls
+  the START of a long TYPED word out of sight rather than the letters being
+  typed. **The hairline and the placeholder both sit at `$page-search-quiet`**
+  (45% of `$color-clear-text` mixed towards each site's ground, #1123: "step its
+  colour (border and font) closer to the background"), and the typed text stays
+  `$color-text` — the one thing in the control you must be able to read back.
+  That override is also where #1099's `lighten()` trap finally died: the
+  placeholder mixin still lightens, which on cocktails' #0e0e10 ground rendered
+  the quietest control on the page at 15.08:1 beside a 2.73:1 line; focus is the underline in `$color-accent` plus an
   inset second pixel, never a box (#1099, which replaced #1087's outline), and
   the resting underline is mixed towards the page's own ground; the placeholder reads
   `I know what I want...` on both sites with no written label, the glass being

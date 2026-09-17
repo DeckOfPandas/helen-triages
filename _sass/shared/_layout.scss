@@ -646,6 +646,29 @@ main {
 // $color-clear-text: 82% of it against $color-bg reaches 4.90:1 on food and
 // 4.71:1 on cocktails (tmp/contrast.py), while staying visibly lighter than
 // the full-strength $color-clear-text the links under it rest at.
+// THE SITE'S ICON AT THE HEAD OF ITS COLUMN -- #1122, 2026-09-16. Helen:
+// "centered over the links for each site".
+//
+// `align-self: center` IS THE WHOLE OF "CENTERED", and it has to be said here
+// because the two columns deliberately are not centred: `.site-footer-ref` is
+// `align-items: flex-start` and its second instance `flex-end`, so the links
+// hang off the page's outer edges (the rule above explains why column one
+// starts on main's text edge). Centring the icon against the column's own
+// width therefore means overriding that for this one item, not changing it.
+// Under 600px both columns already centre themselves and this simply agrees
+// with them.
+//
+// NO SIZE OF ITS OWN: the SVG inside is `.nav-icon`, which is 24px high --
+// the size Helen picked for these exact two icons from the header candidates
+// page on 2026-09-10, so the footer is not choosing a second number for the
+// same artwork. `line-height: 0` for the same reason `.site-footer-hearts`
+// has it: the span is a box around a drawing, and the inherited line-height
+// would otherwise add a strip of text leading under it.
+.site-footer-ref-icon {
+  align-self: center;
+  line-height: 0;
+}
+
 .site-footer-ref-word {
   text-transform: uppercase;
   letter-spacing: 0.06em;
