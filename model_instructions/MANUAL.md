@@ -1820,7 +1820,11 @@ the mean exists only so a page never breaks. Remember when adding a default for
 this reason that `default_bottles` sets the unbottled pour's PRICE too. Per serving, divided by `serves:` where present; the scaler
 reads its two data attributes for the BATCH note's total only and never writes
 to the line, which is what keeps a per-serving figure from moving with the
-multiple box.
+multiple box. **Since #1121 the line also says how big the serving is** —
+"Roughly X units of alcohol in a serving of Y ml", her words again — and Y is
+§9.3.6's `page.volume.serve_ml`, printed once and carrying no attribute the
+scaler could reach. Where a volume would be wrong the tail is DROPPED and the
+sentence is exactly #753's — one published drink, the Caipirinha.
 **The unsettled strengths are a PUBLIC number's worklist now.** A `qq:` row
 (always `confidence: low`, and every low row has one — except a bitters, which
 stays `low` with no `qq:` because by her ruling it can never reach a figure) is
@@ -1867,6 +1871,54 @@ the file's honesty and the field to distrust first. Master of Malt returns 429
 to every automated request; Helen reads it herself. Apply her corrections by
 script against the parsed YAML, refusing on any name not found; a regex over
 this file matches the wrong block.
+
+### 9.3.6 How much liquid is in a drink — #1121
+
+**Two sentences, two numbers, and confusing them is the whole risk.** Helen:
+*"add total ml next to recipe scaler to help me choose the right number of
+glasses... This means I can vary target units of alcohol myself."* Under the
+scaler, **"Approximately X ml"** — the BATCH, and the only figure on a drink
+page that moves with the multiple box. In the footer, the units line's new
+tail, **"in a serving of Y ml"** — ONE GLASS, invariant, exactly as the unit
+count beside it is. Both wordings are hers and ship unpolished (§13.12).
+
+`page.volume` (`total_ml`, `serve_ml`, `serves`, `pours`) is computed by
+`volume_for` in `_plugins/cocktail_units.rb` — the same generator, because a
+unit IS millilitres times a strength and a second parse of the amounts is a
+second answer waiting to disagree. **The browser does no volume arithmetic**:
+`data-total-ml` carries the ×1 figure and `HTF.scale.batchTotalMl` multiplies
+it. `HTF.scale.totalMl` is deliberately NOT used — it reads the printed strings
+and counts `ml` and only `ml`, so an `oz` or `tsp` pour totals differently
+there than in the footer.
+
+**A `to top` SPENDS ITS DECLARED RANGE'S MIDPOINT** — Helen, 2026-09-17:
+*"Midpoint please, I'll cope on the spot."* One expression, `top_up_ml` in the
+plugin, asked by both the unit count (which has spent it since #297) and the
+volume, so the two sentences on a topped drink can never disagree about what
+the top pours. Tom Collins: 112.5 ml of build plus soda water's 100–150 halved
+= **"Approximately 237.5 ml"**. **"Approximately" is doing real work there**,
+carrying a declared 50 ml span rather than rounding — which is why her word
+fits and why the change was safe. The argument she overruled is kept in
+`volume_for`'s header: `top_up_ml` is one range per topper whatever the drink,
+and #1076 showed it is a stand-in for a sum this repo cannot run (capacity −
+build − room for the ice; no glass records a capacity, #295). Make it again
+only if a figure looks silly on a real glass.
+
+**IT STILL WITHHOLDS WHERE A FIGURE WOULD BE WRONG RATHER THAN ROUGH, and two
+published drinks say nothing.** The Caipirinha — 45 ml of cachaça, half a lime,
+20 g of palm sugar — because the excluded pours ARE the drink: the same
+judgement and literally the same constant as `cost.complete`
+(`CocktailCosts::SUBSTANTIAL`). And the pear Bellini, which is topped AND
+incomplete: six of its eight pours are a batch syrup only its method portions
+("Add 25 ml syrup to a champagne flute"), so resolving the top does not rescue
+it. `tests/test_rendered_pages.py` pins the set by name in both directions, and
+pins the midpoint against `costs.yml` so `ml_min` cannot quietly replace it.
+
+**ONE TRAP, PRIMED AND NOT SPRUNG**: `serve_ml` divides the whole total by
+`serves:`, the top included, and a top fills ONE glass — four glasses need four
+tops. `scripts/top_up_ml.py` found the same thing. No topped drink declares
+`serves:` today and a test says so, so the first topped punch is a red build
+rather than a quietly wrong number.
 
 ### 9.4 Decided — do not re-litigate
 

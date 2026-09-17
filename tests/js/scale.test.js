@@ -220,6 +220,38 @@ test('a range counts its LOWER end in the total', () => {
   assert.strictEqual(scaler.totalMl(['20–30 ml', '30 ml'], 1), 50);
 });
 
+// --- the batch total the drink page prints -------------------------------------
+// #1121, Helen: "add total ml next to recipe scaler to help me choose the right
+// number of glasses." The figure comes from _plugins/cocktail_units.rb, in
+// `data-total-ml`, and this multiplies it — see `batchTotalMl`'s own comment for
+// why it is not `totalMl` above.
+
+test('the batch total is the recipe as written, times whole recipes', () => {
+  // The Aviation: 52.5 + 15 + 7.5 + 15 = 90 ml, which is what the plugin
+  // writes into the page and what the footer's "in a serving of 90 ml" says.
+  assert.strictEqual(scaler.batchTotalMl(90, 1), 90);
+  assert.strictEqual(scaler.batchTotalMl(90, 4), 360);
+  assert.strictEqual(scaler.batchTotalMl(90, 12), 1080);
+});
+
+test('a half-millilitre volume stays exact as it scales', () => {
+  // The Negroni as the plugin totals it. 82.5 × 3 has no exact binary form;
+  // `tidy` is what keeps it from printing as 247.50000000000003.
+  assert.strictEqual(scaler.batchTotalMl(82.5, 3), 247.5);
+  assert.strictEqual(scaler.batchTotalMl(22.75, 2), 45.5);
+});
+
+test('nothing usable leaves the page saying what it already said', () => {
+  // A drink with no `page.volume` renders no element at all, so this is the
+  // belt: a missing, blank or garbled `data-total-ml` gives null, and
+  // cocktail-scale.js leaves the server's own sentence alone rather than
+  // blanking it. NaN is what `parseFloat` returns for an absent attribute.
+  [NaN, null, undefined, '', 'lots', 0, -90].forEach((bad) => {
+    assert.strictEqual(scaler.batchTotalMl(bad, 2), null, String(bad));
+    assert.strictEqual(scaler.batchTotalMl(90, bad), null, String(bad));
+  });
+});
+
 // --- a target total -----------------------------------------------------------
 
 test('a target total becomes the multiple that reaches it', () => {
