@@ -188,16 +188,13 @@
 // chips -- this heading was the last place on the site still saying "this kind"
 // with coloured text alone.
 //
-// INLINE-BLOCK, SO IT HUGS THE WORDS. The heading is a `<div>` (page-search.js),
-// so a background would otherwise paint the dropdown's full width and read as a
-// section bar rather than as a chip. Its existing padding becomes the block's
-// margin, exactly as it did for `.btn-mood.is-on`.
+// The block's SHAPE is shared/_furniture.scss's (it hugs its words there, for
+// both sites); what is this file's is the hue and the letter.
 //
 // `$color-bg` IS THE "BLACK": the page's own near-black, which is what every
 // other inverted chip on this site uses, so the dropdown cannot drift from them
 // by using a literal black instead.
 .page-search-group-label {
-  display: inline-block;
   color: $color-bg;
 }
 
