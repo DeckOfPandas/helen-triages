@@ -10,6 +10,12 @@
 # 2026-09-02 and gated on the first flag alone; it was renamed when the second
 # joined, because a name that describes half a rule is worse than no name.
 #
+# ONE EXCEPTION, ON COCKTAILS ONLY, SINCE #1137 (2026-09-17): a DRINK that says
+# `meta.rewritten: true` publishes even with `awaiting_fix: true`. Helen reads
+# the site while making a drink she has not made before, and the flag that
+# marks such a drink is the one that was holding it back. `proofread` is not
+# forgiven on either site. The full reasoning is at the rule itself, below.
+#
 # WHAT EACH FLAG MEANS, because they are easy to read as the same thing.
 #
 # `awaiting_fix: true` does NOT mean "unfinished". Helen, 2026-09-01: "'awaiting
@@ -145,8 +151,42 @@ Jekyll::Hooks.register :site, :post_read do |site|
         next true
       end
 
+      # A TICKET DOES NOT HOLD A DRINK BACK, IF HELEN HAS REWRITTEN IT -- #1137,
+      # 2026-09-17, and this is the first hole ever cut in the gate, so it is
+      # worth being exact about its shape.
+      #
+      # HER REASON, which is what makes it a rule rather than a loosening: "One
+      # of the uses of this site for me is to test recipes, and it's been
+      # annoying exporting PDFs from the food site so I can do that from my
+      # iPad. The stakes are much lower for cocktails, and they're much easier
+      # for me (and you) to rewrite too." An unmade drink is one she is about to
+      # go and MAKE, and the site is the thing she reads while making it -- so
+      # holding it back until it is finished defeats the one job it has at that
+      # moment. `awaiting_fix: true` is exactly the flag such a drink carries:
+      # it means "proofread, with one thing still open" (Helen, 2026-09-01), not
+      # "unfinished", which is precisely why it is safe to publish past.
+      #
+      # COCKTAILS ONLY, AND THAT ASYMMETRY IS THE RULING. Food keeps both legs:
+      # she named the stakes herself, and a recipe is longer, harder to rewrite
+      # and read by more people than a drink. `name` is the collection, so
+      # `food_recipes` and `food_magic_bag` are untouched by construction rather
+      # than by remembering.
+      #
+      # `proofread` IS NOT FORGIVEN AND MUST NOT BE. It is "the very last touch
+      # that I, the human, make to the file" (#667), and nothing here changes
+      # that: a drink still reaches the site only if Helen has read it. What
+      # changes is that a drink she has read AND rewritten no longer waits for
+      # its ticket to close.
+      #
+      # STILL FAILS CLOSED. The exemption needs `rewritten` to be exactly
+      # `true` -- a missing key, a string "true" or a `false` all leave the
+      # `awaiting_fix` leg in force, the same way every other flag here is read.
+      # And `rewritten: true` is Helen's own claim, never an agent's keystroke
+      # (MANUAL §9.1.1), so the hole can only ever be opened by her.
+      ticket_forgiven = name == "cocktail_recipes" && meta["rewritten"] == true
+
       reasons = []
-      reasons << "awaiting_fix" unless meta["awaiting_fix"] == false
+      reasons << "awaiting_fix" unless meta["awaiting_fix"] == false || ticket_forgiven
       reasons << "proofread"    unless meta["proofread"] == true
 
       # NAMED, NOT COUNTED. The log line is the only evidence in the build that

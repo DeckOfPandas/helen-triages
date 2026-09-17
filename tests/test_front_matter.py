@@ -878,16 +878,23 @@ INVISIBLE_KEYS = {
         "Gordon Ramsay's Ultimate Cookery Course` are the same string shape and "
         "no regex separates them. Read by tests only. Issue #406."
     ),
-    "meta.rewritten": (
-        "Records that Helen has rewritten the source's wording in her own words, "
-        "rather than the draft still carrying the original text. Read by nothing "
-        "that builds a page -- the index badge and the publish gate hang off "
-        "meta.awaiting_fix and meta.proofread, not this. Listable only since the "
-        "scanner below learned to ignore comments: the sole match on the render "
-        "surface is an English sentence in assets/js/ingredient-search.js about "
-        "ingredient text being rewritten, which has nothing to do with the key. "
-        "Issues #418, #428."
-    ),
+    # `meta.rewritten` STOOD HERE UNTIL #1137, 2026-09-17, AND ITS OWN ENTRY IS
+    # WHAT WENT FALSE. It read: "Read by nothing that builds a page -- the index
+    # badge and the publish gate hang off meta.awaiting_fix and meta.proofread,
+    # not this." That was true for five weeks and stopped being true the moment
+    # `_plugins/publish_gate.rb` began forgiving a drink's open ticket on
+    # `rewritten == true`: the key now decides whether a page exists.
+    #
+    # SO THE EXEMPTION HAD TO GO WITH IT, and that is the point rather than a
+    # chore. This list exists so a commit touching only keys NOTHING RENDERS can
+    # leave `proofread: true` standing -- Helen's judgement still covers what a
+    # reader sees. Flipping `rewritten` now changes what a reader sees to the
+    # extent of putting a page on the site, so a commit doing that cannot claim
+    # her proofread is untouched.
+    #
+    # This test found it, unprompted, the first time the suite ran after the
+    # plugin changed -- which is the whole argument for scanning `_plugins/`
+    # rather than trusting the note in the entry.
     "meta.cooked_before": (
         "Retired 2026-08-21, issue #429. Recorded whether Helen had cooked the "
         "recipe before; read by no layout, include, plugin or script, and "

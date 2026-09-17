@@ -686,7 +686,9 @@ must say `proofread: false`. Three things about it:
   own comment insists on measuring first: how many recipes is the rule
   holding at `proofread: false` right now?
 - **Two narrower escape hatches, #417.** `INVISIBLE_KEYS` names keys nothing
-  renders (`source_type`, `meta.rewritten`, the two retired meta keys) — a
+  renders (`source_type` and the two retired meta keys — **`meta.rewritten`
+  came OFF that list on 2026-09-17**, because #1137 made the publish gate read
+  it and a key that decides whether a page exists is not invisible) — a
   commit changing only those, body byte-identical, needs no flip, and
   `test_invisible_keys_are_really_invisible` scans the render surface
   (`_layouts`, `_includes`, `_plugins`, `assets/js`, `scripts` — **not pages**;
@@ -703,7 +705,10 @@ must say `proofread: false`. Three things about it:
 from Helen's; only the staging can.
 
 **A recipe publishes only if it says `awaiting_fix: false` AND
-`proofread: true`. Nothing else publishes.** Either flag missing, the old
+`proofread: true`. Nothing else publishes** — **except a DRINK that says
+`rewritten: true`, which publishes with a ticket open** (#1137, 2026-09-17: the
+one hole ever cut in this gate, `cocktail_recipes` only, `proofread` never
+forgiven — §9.1.1 has it in full). Either flag missing, the old
 hyphenated name, either value quoted as a string: all held back.
 `_plugins/publish_gate.rb` removes the document from its collection at
 `:post_read`, so it gets no URL, no sitemap entry and no place in
@@ -1343,6 +1348,21 @@ I have rewritten it, not an agent"*: the notes and the tagline mainly, though
 her first pass also checks ingredients, bottles and method. **The one place an
 agent may type it is `_cocktail_drafts/to-promote/`**, where the MOVE is how she
 claims it (`PUBLISHING_A_DRINK.md` step 2). Nowhere else, on either site.
+
+**AND SINCE #1137 (2026-09-17) THAT CLAIM ALSO OPENS THE GATE.** A drink with
+`rewritten: true` and `proofread: true` publishes **even with
+`awaiting_fix: true`** — the only exception in `_plugins/publish_gate.rb`, and
+drinks only. Helen's reason: *"One of the uses of this site for me is to test
+recipes, and it's been annoying exporting PDFs from the food site so I can do
+that from my iPad. The stakes are much lower for cocktails, and they're much
+easier for me (and you) to rewrite too."* An unmade drink is the one she most
+needs to read on a screen in the kitchen, and `awaiting_fix: true` — *"I've
+proofread, but one small thing has been raised as a ticket"* — is exactly what
+such a drink carries. **`proofread` is never forgiven, on either site**, and
+food keeps both legs. Because the hole is keyed on a flag only Helen may set,
+an agent cannot open it; because it is keyed on the COLLECTION, no food recipe
+can fall through it. `test_a_rewritten_drink_publishes_with_a_ticket_open_and_food_still_does_not`
+holds all four rows of that truth table.
 What keeps a draft private is `output: false`, not these flags. The counts
 (how many `rewritten: true`, how many staged) are a worklist — re-count, do
 not quote.
