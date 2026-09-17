@@ -1836,7 +1836,16 @@ bottle. **`default_bottles` is a pricing fact and never a suggestion**
 **Only a VOLUME counts** — no dashes, garnishes, muddled fruit, ice, salt or
 sugar (*"I'm catering for family, not running a bar"*); the excluded list
 lives in the data. `to top` is the one exception, as a declared RANGE
-(`top_up_ml`), and the shopping list does not spend it yet. **The figure is
+(`top_up_ml`), and the shopping list does not spend it yet. **What a top
+actually pours is `python3 scripts/top_up_ml.py`, not that range** (#1076): a
+top fills the glass, so it is capacity less the build less the ice, and two of
+those three are measurements nobody has made (#295 for the capacities;
+`serve.ice` says what kind of ice, never how much room). The script measures
+the build, and **the unknowns cancel between two drinks in the same glass** —
+which is already decisive for the flute, where the Arrack Christmas Punch
+builds 75 ml more than the Airmail and Julien Sorel and all three are given the
+same 75–100 ml. Run it rather than re-deriving; `DECISIONS.md` §9.3.5 has the
+finding. **The figure is
 per glass and does not move with the scaler.** `cost.complete` withholds a
 figure known to be wrong (the pear Bellini, the Caipirinha). `checked:` is
 the file's honesty and the field to distrust first. Master of Malt returns 429
