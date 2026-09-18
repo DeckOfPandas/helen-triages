@@ -158,6 +158,22 @@ canonical:
     - "raspberries"
     - "half an empty passion fruit shell"
     - "pineapple and brandied cherry"
+    # THE ONE ENTRY THAT DELIBERATELY DOES NOT NAME ITS FRUIT, Helen's ruling
+    # 2026-09-18, for Zombie Intoxica. Offered `pineapple wedge` (declared
+    # above, used by three drinks) or Modern Zombie's `no garnish`, she kept
+    # what she wrote -- so the vagueness is the point rather than an unfinished
+    # transcription. On a heaped tiki mug the fruit is whatever is about, and a
+    # drink that already carries mint, a cherry and a flaming shell is not
+    # asking anyone to source a specific wedge.
+    #
+    # IT IS A KNOWN EXCEPTION TO THIS FILE'S OWN RULE, not a precedent. Every
+    # other entry names the fruit and the cut, and #1079 settled the general
+    # case against fruit-agnostic names ("'citrus slice' shouldn't be the
+    # generic because citrus fruits aren't interchangeable"). That ruling was
+    # about a POUR, where the fruit changes the drink; this is decoration on a
+    # tiki mug, where it does not. The next vague garnish still gets asked
+    # about rather than added on the strength of this line.
+    - "fruit wedges"
 
   # THE THREE QUALIFIED CHERRIES ALL STAY, ruled 2026-08-31. A Luxardo really is
   # a different object from a bright red cocktail cherry, `skewered` says how it

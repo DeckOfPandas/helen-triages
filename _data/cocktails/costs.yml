@@ -977,6 +977,17 @@ generics:
   pineapple vodka:    { gbp_per_litre_min: 44.29, gbp_per_litre_max: 44.29, basis: "GBP 31 / 70cl", confidence: high }
   aguardiente:        { gbp_per_litre_min: 25.71, gbp_per_litre_max: 37.14, basis: "GBP 18-26 / 70cl", confidence: low }
   kirschwasser:       { gbp_per_litre_min: 42.86, gbp_per_litre_max: 62.86, basis: "GBP 30-44 / 70cl", confidence: low }
+  # NEW 2026-09-18, with Gunmetal Blue's first pour of the generic. Helen ruled
+  # the drink is peach brandy and dropped its Briottet suggestion -- "that's
+  # what I had at the time" -- so the pour has no bottle behind it and this row
+  # is the only thing that can price it.
+  #
+  # `low`, AND THE RANGE IS SAT BETWEEN ITS TWO DECLARED SIBLINGS rather than
+  # read off a shelf: apple brandy is GBP 28-40 and kirschwasser GBP 30-44, and
+  # a peach brandy is scarcer in the UK than either, so the top is a little
+  # above both. NOT CHECKED IN A SHOP -- that is exactly what `low` says here,
+  # and it is the row to correct first if Helen ever buys one.
+  peach brandy:       { gbp_per_litre_min: 40.00, gbp_per_litre_max: 60.00, basis: "GBP 28-42 / 70cl, sat between apple brandy and kirschwasser, not shop-checked", confidence: low }
 
   # --- made, not bought -------------------------------------------------------
   # THE ARITHMETIC IS IN `basis` ON PURPOSE. A syrup's price is the only kind

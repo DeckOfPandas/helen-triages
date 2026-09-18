@@ -374,7 +374,7 @@ half lime shell
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
 blackberry · dried apple slice · banana chip · raspberries ·
-half an empty passion fruit shell · pineapple and brandied cherry
+half an empty passion fruit shell · pineapple and brandied cherry · fruit wedges
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
 skewered maraschino cherry · skewered brandied cherry · cherry flag ·
