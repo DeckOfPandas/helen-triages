@@ -134,6 +134,28 @@ keep the same numbers for the rest, so one name means one stage on both sites.
 | `2-make/` | ✓ | ✓ | readable enough to make from (was `to-cook/`) |
 | `3-keep/` | ✓ | ✓ | made and liked, and she is NOT rewriting it yet — the intermediate state #429 said did not exist and now does |
 | `4-promote/` | ✓ | ✓ | her words are in; waiting on the mechanical pass, then her proofread (was `to-promote/`) |
+| `5-final-proofread/` | — | ✓ | staged for promotion and **bounced back**: something in it needs Helen and no agent can supply it. Added 2026-09-18 |
+
+**`5-final-proofread/` IS THE ONLY FOLDER AN AGENT PUTS A FILE IN**, and it
+exists because `4-promote/` stopped answering one question. Helen asked for it
+on 2026-09-18, after a seventeen-drink batch came back with ten of them
+needing a ruling: *"we're going to need a fifth folder in _drafts, something
+like 5-final-proofread, to hold recipes I wanted to promote but you
+(reasonably) bounced back."* It is the same argument that made her delegate
+promotion in the first place — *"then I don't have to fish through one by one
+to find out which I still need to proofread"* — applied one stage earlier.
+`4-promote/` means *waiting on Claude*; this means *waiting on Helen*. A file
+goes back to `4-promote/` on `ready ‹slug›` once she has ruled.
+
+**IT IS THE PUBLISHED TENSE, exactly as `4-promote/` is** (`STAGED_DIRS` in
+`tests/test_cocktails.py`): a drink got here BY being staged and goes live the
+moment she rules, so the rules that bite at promotion — a bottle's canonical
+name rather than an alias, no `item` — bite here too. Leaving it out of that
+constant would have been silent: those two tests would simply have stopped
+applying to the drinks that sit longest in a folder while being edited.
+
+**Drinks only for now.** Food has not hit the same pile-up, and an empty
+folder on a site that does not use it is clutter Helen sees every day.
 
 **Claude may move a file between folders on her word** (2026-09-14, reversing
 "never move a file unless asked" — the word IS the ask). Four words, typed in
@@ -144,8 +166,14 @@ the chat or in an issue, each followed by one or more slugs:
 | `rewrite ‹slug›` | moves it to `1-rewrite/` |
 | `make ‹slug›` | moves it to `2-make/` |
 | `keep ‹slug›` | moves it to `3-keep/` — *made it, want it, not rewriting it now* |
-| `ready ‹slug›` | moves it to `4-promote/` and starts the mechanical pass (§4) — *made it, rewritten it, it ships* |
+| `ready ‹slug›` | moves it to `4-promote/` and starts the mechanical pass (§4) — *made it, rewritten it, it ships*. Also the way OUT of `5-final-proofread/` once she has ruled |
 | `bin ‹slug›` | deletes it from the private repo — made and disliked |
+
+**The fifth folder needs no word of hers, because the move is Claude's.** A
+drink lands in `5-final-proofread/` when the mechanical pass finishes and
+something in it still needs her — an undeclared garnish, a generic nobody has
+coined, a choice between two shapes. That move goes in the same commit as the
+list of what it is waiting for, so the folder and the list never disagree.
 
 So "I've tried it and want to keep it" is `keep` when she is not rewriting now
 and `ready` when the words are already hers. A `3-keep/` file can later become
@@ -176,8 +204,11 @@ follow it since 2026-09-14 (food used to have no written procedure for this).
    names, list-shaped `suggestion`s, no `item`); never a tagline, a note's
    words, a method's words or an amount. One list of the non-mechanical things,
    grouped by decision. Commit, push.
-3. **Claude says `final: ‹slugs›`.** Until that word the served pages are work
-   in progress and not for proofreading.
+3. **Claude says `final: ‹slugs›`**, and **moves anything still needing a
+   ruling into `5-final-proofread/`** (drinks). Until that word the served
+   pages are work in progress and not for proofreading; after it, the two
+   folders say who each drink is waiting on without anyone having to re-read
+   the list.
 4. **Helen proofreads the rendered page** at `/…/drafts/4-promote/‹slug›/`
    and sets `proofread: true`, or names the slugs and Claude sets it on her
    word. A small thing wrong: `awaiting_fix: true` in a commit that says what;
@@ -202,7 +233,7 @@ in three sizes, hers to rule:
 |---|---|
 | a word or a number | **asks first.** She may grant the change WITHOUT the flip — then it lands under `HELEN_CLEARED` or a baseline move, per the constant's own comment, and she is still the last judgement because she granted it |
 | anything else | flips the flag, leaves the file in the public repo (the gate hides it), and **raises an issue labelled `blocked-on-helen`**: title `proofread: ‹slug›`, body naming what changed, why, and the local URL to re-read. She closes it by flipping the flag in a commit with `Fixes #N` |
-| something big is wrong | deletes the file from the public repo and re-adds it to the private repo's `4-promote/` with the same issue, so it goes back through §4 |
+| something big is wrong | deletes the file from the public repo and re-adds it to the private repo — `5-final-proofread/` for drinks if it needs a ruling from her, `4-promote/` if it only needs the mechanical pass — with the same issue, so it goes back through §4 |
 
 **The issue is the signal, and it replaces the build-log line as the thing she
 can see.** `blocked-on-helen` exists on the public repo already. One issue per
@@ -230,7 +261,9 @@ Listed so the map is honest about which lines are drawn and which are paved.
       appearing on first use, and `tests/test_staging_folders.py` fails locally
       when a clone is missing one (it skips in CI, where the drafts are
       absent). The old `to-rewrite/`, `to-cook/` and `to-promote/` names were
-      already gone from both `main`s by then.
+      already gone from both `main`s by then. **`5-final-proofread/` joined on
+      the drinks side 2026-09-18, with its own `.gitkeep`** — so drinks now
+      hold four and food still holds four, but not the same four.
 - [x] `scripts/needs_helen.py`: the flip and the issue body, for §5. Built
       2026-09-14, in the same commit that wrote this map; this box was left
       unticked until 2026-09-15.

@@ -85,11 +85,13 @@ Three ways in:
 
 Then an intake pass results in ONE list of questions for me. Anything the source doesn't say is `QQ`.
 
-The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/` (food only because cocktails are usually less garbage on the way in), `2-make/`, `3-keep/`, `4-promote/`. 
+The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/` (food only because cocktails are usually less garbage on the way in), `2-make/`, `3-keep/`, `4-promote/`, and for drinks `5-final-proofread/`.
 
 Then Claude does a mechanical pass on what's in `4-promote`, then I proofread the rendered page, Claude promotes it in a PR, I merge, and the merge deploys.
 
-If Claude edits a live file, it sets `proofread: false` and raises a `blocked-on-helen` issue because the recipe will disappear from the live site. If something big is wrong, the file goes back to `4-promote/`.
+`5-final-proofread/` is for the ones that come back to me. The mechanical pass fixes what the tests can name, but some things need a ruling only I can give — a garnish nothing has declared yet, an ingredient that turns out to be two ingredients — and those used to sit in `4-promote/` looking identical to the ones that were ready. Now `4-promote/` means waiting on Claude and `5-final-proofread/` means waiting on me, so I can see at a glance which pile is mine.
+
+If Claude edits a live file, it sets `proofread: false` and raises a `blocked-on-helen` issue because the recipe will disappear from the live site. If something big is wrong, the file goes back to `4-promote/` — or to `5-final-proofread/` if fixing it needs me.
 
 
 ## To reduce harassment by Claude, but safely

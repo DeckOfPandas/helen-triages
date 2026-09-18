@@ -1719,10 +1719,15 @@ not quote it** — it is a worklist and is empty as of 2026-09-04.
 - **A spirit type beside its own generic is not a suggestion**; it goes.
 - **A syrup's suggestion may name what it is made from** ("Acacia honey").
 - **Spelling: in the POOL, leave the drink as she wrote it and add the
-  spelling as an alias.** In `to-promote/` and `_cocktail_recipes/` the rule
+  spelling as an alias.** In the staging folders — `4-promote/` and, since
+  2026-09-18, `5-final-proofread/` — and in `_cocktail_recipes/` the rule
   inverts and every `suggestion` is the bottle's CANONICAL name
   (`test_a_staged_drink_writes_a_bottles_canonical_name`): an alias is a
   reading convenience, a finished drink has had time to write the real name.
+  **`STAGED_DIRS` in `tests/test_cocktails.py` is the list**, and it is a list
+  rather than one path on purpose: a drink bounced back for a ruling sits in a
+  folder being edited for longer than anything else, which is exactly when an
+  alias creeps in, and a rule that stopped applying there would report green.
 - **THE DRINK PAGE PRINTS `suggestion` VERBATIM. It does NOT resolve it through
   `bottles.yml`, and this decides what renaming a bottle costs.**
   `_layouts/cocktail.html` takes the recipe's own string and puts it in the

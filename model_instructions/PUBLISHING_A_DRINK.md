@@ -142,12 +142,20 @@ turn that made it.
 
 ## What "promotion-ready" means for the data
 
-In `to-promote/` and in `_cocktail_recipes/` a drink is in its published
-tense: every `suggestion` is a bottle's canonical name (aliases are for reading
-drafts, never for a published file) **and is a LIST even when it names one
-bottle**, and every generic is a declared one. Tests in
+In `4-promote/`, in `5-final-proofread/` and in `_cocktail_recipes/` a drink is
+in its published tense: every `suggestion` is a bottle's canonical name
+(aliases are for reading drafts, never for a published file) **and is a LIST
+even when it names one bottle**, and every generic is a declared one. Tests in
 `tests/test_cocktails.py` hold all of that, so the mechanical pass cannot
 forget it.
+
+**`STAGED_DIRS` IS THE LIST, AND IT IS A LIST FOR A REASON.**
+`5-final-proofread/` joined on 2026-09-18 (`PIPELINE.md` §3): a drink is there
+because it was staged and bounced back for a ruling, so it is going live the
+moment Helen answers, and it sits in a folder being edited for longer than
+anything else in the pipeline — which is precisely when a shorthand alias or a
+stray `item` creeps in. Had the constant stayed singular, the two staged rules
+would have stopped applying to exactly those drinks, quietly and green.
 
 **`item` IS NO LONGER A PROMOTION CONCERN, since 2026-09-05.** It used to be
 one of the things the staging folder checked for, on the reasoning that the

@@ -77,6 +77,8 @@ sites use one set of names:
       4-promote/           (both)           her words are in; waiting on the
                                             mechanical pass, then her proofread,
                                             then the public collection
+      5-final-proofread/   (drinks only)    staged and BOUNCED BACK: something
+                                            in it needs Helen (2026-09-18)
 
 Numbered so they sort in pipeline order at the top of her file list (her ask,
 2026-09-14). **Move a file between these folders only on her word** -- and her
@@ -86,10 +88,20 @@ word is one of `rewrite`, `make`, `keep`, `ready` or `bin` followed by the slug
 sits below "the prose is mine", and the folders and the flags answer different
 questions.
 
-> ### `4-promote/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE
+**`5-final-proofread/` IS THE ONE EXCEPTION TO "ONLY ON HER WORD", because the
+move IS the report.** A drink goes there when the mechanical pass is done and
+something still needs a ruling only she can give, in the same commit as the
+list of what it is waiting for. `4-promote/` then means *waiting on Claude*
+and this means *waiting on Helen*, which is the distinction it was asked for
+(2026-09-18). `ready ‹slug›` is the way back out once she has ruled.
+
+> ### `4-promote/`, `5-final-proofread/` AND `_cocktail_recipes/` ARE THE PUBLISHED TENSE
 >
-> Two rules bite in those two places and nowhere else — Helen's rulings,
-> 2026-09-04, reading Fish House Punch. Both are enforced
+> Two rules bite in those three places and nowhere else — Helen's rulings,
+> 2026-09-04, reading Fish House Punch. `5-final-proofread/` joined on
+> 2026-09-18 because a drink gets there BY being staged and goes live the
+> moment she rules, so it is the same tense for the same reason; the folders
+> are `STAGED_DIRS` in `tests/test_cocktails.py`. Both are enforced
 > (`test_a_staged_drink_writes_a_bottles_canonical_name`,
 > `test_a_staged_drink_carries_no_transcription_field`), and both are things to
 > FIX when a drink is moved rather than reasons to refuse the move.
@@ -498,8 +510,9 @@ publish: **say so and let her flip it.** That is the one thing to do about it.
     bitters`, not `lavender bitters`; `bonded rye` and `rye` are distinct;
   - spelling: **in the POOL**, leave the drink as she wrote it and add the
     spelling as an alias -- never retype a pooled drink to a canonical bottle
-    name. **In `4-promote/` and `_cocktail_recipes/` the rule inverts** and
-    every `suggestion` is the canonical name; see the box above. The two are
+    name. **In `4-promote/`, `5-final-proofread/` and `_cocktail_recipes/` the
+    rule inverts** and every `suggestion` is the canonical name; see the box
+    above. The two are
     not in tension: an alias is a reading convenience, and a finished drink has
     had time to write the real name.
 - **Every note an ingest ADDS is `{label, text}` with both fields set, each
