@@ -674,19 +674,33 @@ layout: default
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
               {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
-              {% comment %} `optional` is a plain word after the name, NOT a
-                 parenthetical — the brackets on this line already mean "the
-                 bottle", and "sugar syrup (optional)" beside "gin (Beefeater)"
-                 would make one punctuation mark carry two unrelated jobs.
-                 That is #441's argument about "(blackstrap)" arriving on a
-                 different field. {% endcomment %}
+              {% comment %} `optional` IS A PARENTHETICAL SINCE #1141
+                 (2026-09-17), and this reverses the paragraph that stood here.
+                 It argued: the brackets on this line already mean "the bottle",
+                 so "sugar syrup (optional)" beside "gin (Beefeater)" would make
+                 one punctuation mark carry two unrelated jobs — #441's argument
+                 about "(blackstrap)" arriving on a different field.
+
+                 THE ARGUMENT WAS ABOUT A COLLISION THAT DOES NOT HAPPEN. It is
+                 only true when ONE ingredient carries both, and measured on the
+                 published collection (tmp/optional_census.py, 2026-09-17) there
+                 is exactly one optional ingredient in the whole of it — Corpse
+                 Reviver No. 2's cane sugar syrup — and it names no bottle. So
+                 the two marks have never yet appeared on one line, and the rule
+                 was protecting a reader nobody has been.
+
+                 IF THEY EVER DO COLLIDE it renders "syrup (Monin) (optional)",
+                 which is two bracket groups in a row and worth asking Helen
+                 about rather than solving in advance. The brackets live in the
+                 markup, beside the suggestion's own, so the words copy and
+                 paste as they read. {% endcomment %}
               {% comment %} `headline` GETS ITS OWN SPAN, 2026-09-02, so the
                  double-rule underline (violette over absinthe, Helen's brief:
                  "yvette showing what is in something") lands under the
                  ingredient's name only — never under the bottle suggestion in
                  brackets after it, which is a different colour making a
                  different claim. {% endcomment %}
-              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">optional</span>{% endif %}</span>
+              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>
@@ -777,14 +791,80 @@ layout: default
       </label>
       <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
     </div>
+    {% comment %} HOW MUCH THIS COMES TO — #1121, Helen: "add total ml next to
+       recipe scaler to help me choose the right number of glasses... This means
+       I can vary target units of alcohol myself." Her line, in her words:
+       "Approximately X ml". It is not polished, not caveated and not reworded
+       (§13.12: the voice is hers).
+
+       THIS IS THE BATCH AND IT MOVES. It is the ONLY figure on the page that
+       does: the units line below and the cost line beside it are both per glass
+       and both invariant under the multiple box (see their own comments, and
+       cocktail-scale.js's "THE COST LINE DOES NOT MOVE WITH THE SCALER"). So
+       this line and the units line carry two different numbers on purpose, and
+       the same drink says both — ×4 of an Aviation is "Approximately 360 ml"
+       here and "in a serving of 90 ml" down there.
+
+       THE NUMBER COMES FROM THE PLUGIN, NOT FROM `HTF.scale.totalMl`, and the
+       reason is in _plugins/cocktail_units.rb's `volume_for`: scale.js reads
+       the printed strings and counts `ml` and only `ml`, so an `oz` or a `tsp`
+       pour would total differently there than in the footer's own sentence.
+       One figure is computed at build time and the browser multiplies it, so
+       the two lines cannot disagree about the same drink.
+
+       IT RENDERS WITHOUT JAVASCRIPT, unlike the control above it, and that is
+       deliberate rather than an oversight. The `hidden` on the scaler is the
+       rule for a control that silently FAILS — a number box that renumbers
+       nothing. This is a true sentence about the recipe as written whether or
+       not anything ever runs, so it prints, and it is right on paper.
+
+       "Approximately" IS DOING REAL WORK ON A TOPPED DRINK, not just rounding.
+       A `to top` spends the midpoint of a declared range — Helen, 2026-09-17,
+       overruling this line's first shape: "Midpoint please, I'll cope on the
+       spot." So a Tom Collins's 237.5 ml is 112.5 ml of build plus the house
+       100–150 halved, and her word is carrying that 50 ml span. The same
+       expression feeds the units line's figure (`top_up_ml` in the plugin, one
+       expression and two callers), so the two sentences can never disagree
+       about what a top pours.
+
+       A DRINK WITH NO `page.volume` GETS NO LINE, and that is a different kind
+       of thing from an approximate one: two published drinks whose excluded
+       pours ARE the drink, where a figure would be wrong rather than rough.
+       `volume_for`'s header names them and says why. {% endcomment %}
+    {% if page.volume %}
+      <p class="cocktail-scale-total" data-total-ml="{{ page.volume.total_ml }}">Approximately
+        <span class="cocktail-scale-total-figure">{{ page.volume.total_ml }}</span> ml</p>
+    {% endif %}
     {% comment %} The floor message, empty and hidden until a refusal fills it —
        "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
        paragraph of its own beneath the control rather than text inside the
        label, so a long sentence cannot push the number box around. {% endcomment %}
     <p class="cocktail-scale-note" hidden></p>
-    {% comment %} THE BATCH NOTE — #713, and Helen's request of 2026-09-06:
-       "Bitters text appearing next to the scaler if it's edited to >1. Cost and
-       units on a note."
+    {% comment %} THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, SINCE
+       #1121 (2026-09-17). It was #713 — Helen, 2026-09-06: "Bitters text
+       appearing next to the scaler if it's edited to >1. Cost and units on a
+       note." — and it carried the batch's cost and units totals until she saw
+       them sitting under the new ml line: "I like the line. But the cost and
+       units line below has come back and I don't want it to be there."
+
+       WHAT CHANGED UNDERNEATH #713 IS THIS PAGE. Its totals were the only
+       answer to "what is on the table" when they shipped. #1121 put
+       `Approximately X ml` directly above this note, so the same spot now has a
+       line saying how much liquid the batch is, a footer saying the units in a
+       glass, and this repeating a version of both — three grey sentences where
+       the reader wanted one.
+
+       THE CAVEAT IS NOT A TOTAL, WHICH IS WHY THE ELEMENT SURVIVED. It answers
+       what does NOT scale linearly, and she asked for it in the same breath as
+       the totals rather than as a part of them. Deleting the element would have
+       taken it along with what she actually objected to.
+
+       SO THE GATE IS `has_dashes` ALONE NOW. It used to be
+       `site.show_costs or page.units` — is there a cost line to read, is there
+       a unit count — which was the right question while the note read those two
+       lines. With nothing left but the caveat, the only question is whether
+       this drink pours anything in dashes or drops, and a drink that does not
+       gets no element at all rather than an empty hidden one.
 
        A SEPARATE ELEMENT FROM THE FLOOR MESSAGE ABOVE, on purpose. That one is
        a refusal and this one is information about a multiple that WORKED, so
@@ -793,27 +873,26 @@ layout: default
        backspace bug, the `<= 0` clause). Sharing one element would have meant
        teaching that logic about a second kind of message.
 
-       IT SAYS TOTALS, BECAUSE TOTALS ARE THE ONLY THING THAT MOVES. The cost
-       line and the units line are both PER GLASS and both invariant under
-       scaling — see the cost comment in cocktail-scale.js, Helen 2026-09-06:
-       "the price per glass you calculate needs to divide by the scaled number",
-       so ×n multiplies and divides and cancels. Repeating those figures here
-       would restate the footer. What the footer cannot tell you is what the
-       whole batch costs and how much alcohol is standing on the table, which is
-       the question #545 says the scaler exists to answer: "not poisoning my
-       friends".
+       WHAT THE TOTALS ARGUED, KEPT because it is the case to make again if the
+       batch figures are ever wanted back. They said TOTALS because totals were
+       the only thing that moved: the cost line and the units line are both PER
+       GLASS and invariant under scaling — Helen, 2026-09-06, "the price per
+       glass you calculate needs to divide by the scaled number", so ×n
+       multiplies and divides and cancels — and what the footer could not tell
+       you was what the whole batch cost and how much alcohol was standing on
+       the table, the question #545 says the scaler exists to answer: "not
+       poisoning my friends".
 
-       IT REACHES PRODUCTION SINCE 2026-09-14, AND ONLY ITS UNITS HALF DOES.
-       This used to be gated on `show_costs or show_units`, both declared in
-       _config_local.yml and nowhere else, so the element could not exist in a
-       production build at all. #1001 put the units line on the live site, so
-       the gate now asks the same question the two lines themselves ask: is
-       there a cost line to read (`site.show_costs`, still local-only), or is
-       there a unit count (`page.units`, everywhere)? Each half is read
-       independently by cocktail-scale.js, so in production the note says the
-       batch's units and nothing about money -- which is the half that answers
-       "not poisoning my friends", and the half a reader who is not Helen has
-       any use for.
+       THAT WAS TRUE UNTIL THE ml LINE EXISTED. "How much is on the table" now
+       has a better answer directly above this one, in millilitres, at the
+       multiple you actually set — and the alcohol half is a multiplication the
+       reader can do from the footer's per-glass figure if they want it.
+
+       ITS PRODUCTION HISTORY, ALSO KEPT: the note was gated on
+       `show_costs or show_units` (both `_config_local.yml` only) so it could not
+       exist in a production build at all, until #1001 put the units line on the
+       live site and the gate became "is there a cost line, or is there a unit
+       count". Both of those questions are moot now; see the gate above.
 
        `data-has-dashes` IS WHY THE BITTERS LINE IS NOT UNIVERSAL. #720.1 deleted
        the last bitters caveat for firing unconditionally — Aperol Spritz, which
@@ -824,17 +903,15 @@ layout: default
        Helen asked for the trigger (>1) and did not speak to the condition; if
        she wants it on every drink, delete the `hasDashes` check in
        cocktail-scale.js and this attribute. {% endcomment %}
-    {% if site.show_costs or page.units %}
-      {% assign has_dashes = false %}
-      {% for ingredient in page.ingredients %}
-        {% assign amount_text = ingredient.amount | downcase %}
-        {% if amount_text contains "dash" or amount_text contains "drop" %}
-          {% assign has_dashes = true %}
-        {% endif %}
-      {% endfor %}
-      <p class="cocktail-scale-batch"
-         data-has-dashes="{% if has_dashes %}true{% else %}false{% endif %}"
-         hidden></p>
+    {% assign has_dashes = false %}
+    {% for ingredient in page.ingredients %}
+      {% assign amount_text = ingredient.amount | downcase %}
+      {% if amount_text contains "dash" or amount_text contains "drop" %}
+        {% assign has_dashes = true %}
+      {% endif %}
+    {% endfor %}
+    {% if has_dashes %}
+      <p class="cocktail-scale-batch" data-has-dashes="true" hidden></p>
     {% endif %}
   {% endif %}
 
@@ -988,15 +1065,50 @@ layout: default
          A drink carrying both a twist and something else gets both steps, in
          that order.
 
-         THE ARTICLE IS A RULE PLUS A DECLARED EXCEPTION LIST. `a` by default,
-         `an` before a vowel, and nothing at all for the plurals and mass nouns
-         in garnish.yml's `no_article` -- "Garnish with a raspberries." is the
-         failure that list exists to stop, and no rule short of a dictionary
-         knows that `raspberries` is plural while `brandied cherry` is not.
+         THE ARTICLE IS A RULE, A PLURAL TEST AND A DECLARED EXCEPTION LIST, in
+         that order of specificity: `a` by default, `an` before a vowel, nothing
+         before a word ending in `s`, and nothing at all for anything in
+         garnish.yml's `no_article`. "Garnish with a raspberries." is the
+         failure this exists to stop.
+
+         THE PLURAL TEST IS NEW -- #1143, 2026-09-17, Helen: "If the garnish is
+         plural, it should not start with 'a'." This paragraph used to say that
+         "no rule short of a dictionary knows that `raspberries` is plural while
+         `brandied cherry` is not", and that was overstated: a final `s` tells
+         those two apart correctly, and every plural in the collection with it.
+         What the list was really carrying was the cases a final `s` CANNOT
+         reach -- `grated nutmeg` (a mass noun), `half an empty passion fruit
+         shell` (brings its own article), `pineapple and brandied cherry` (two
+         things) -- so the list keeps exactly those and stops being the only
+         thing standing between a new plural and the page.
+
+         WHY THAT MATTERS MORE THAN IT LOOKS: `no_article` can only name a
+         garnish someone has DECLARED, and the failure Helen hit was a draft's
+         `fruit wedges`, which is not in the vocabulary at all. A list-only rule
+         is silent on exactly the values nobody has classified yet, which is
+         where a new spelling always appears first.
+
+         A SINGULAR NOUN ENDING IN `s` WOULD BE WRONG HERE -- `lemongrass`,
+         `hibiscus`, `watercress`. None is declared today. If one arrives, it
+         wants an `always_article` list beside `no_article` rather than a
+         cleverer test; `test_no_declared_garnish_needs_an_article_it_cannot_get`
+         is what will say so.
 
          `no garnish` NEVER RENDERS A STEP. It is the decision that this drink
-         takes none, which is worth recording and not worth instructing. {% endcomment %}
-      {% assign garnish_step = "" %}
+         takes none, which is worth recording and not worth instructing.
+
+         THE LIST READS AS ENGLISH -- #1138, 2026-09-17, Helen: "If there are
+         more than two garnishes, separate all with a comma except for the
+         penultimate pair, which get no comma." So one garnish is itself, two
+         are joined by `and`, and three or more are `A, B and C` -- no serial
+         comma. Every garnish was joined by `and` until today, which gave the
+         Hurricane "a mint sprig and a fruit wedges and a maraschino cherry".
+
+         The parts are accumulated into one string and split back into an array,
+         because Liquid has no way to append to one. `|` is the separator: no
+         declared garnish contains it, and `test_no_garnish_contains_the_join_separator`
+         keeps it that way. {% endcomment %}
+      {% assign garnish_joined = "" %}
       {% for g in page.garnish %}
         {% capture bounded %}|{{ g }}|{% endcapture %}
         {% unless declared_twists contains bounded or g == "no garnish" %}
@@ -1005,17 +1117,34 @@ layout: default
           {% if first == "a" or first == "e" or first == "i" or first == "o" or first == "u" %}
             {% assign article = "an " %}
           {% endif %}
+          {% assign final = g | slice: -1 | downcase %}
+          {% if final == "s" %}
+            {% assign article = "" %}
+          {% endif %}
           {% if site.data.cocktails.garnish.no_article contains g %}
             {% assign article = "" %}
           {% endif %}
-          {% capture one %}{{ article }}{{ g }}{% endcapture %}
-          {% if garnish_step == "" %}
-            {% assign garnish_step = one %}
-          {% else %}
-            {% capture garnish_step %}{{ garnish_step }} and {{ one }}{% endcapture %}
-          {% endif %}
+          {% capture garnish_joined %}{{ garnish_joined }}|{{ article }}{{ g }}{% endcapture %}
         {% endunless %}
       {% endfor %}
+      {% assign garnish_step = "" %}
+      {% if garnish_joined != "" %}
+        {% assign garnish_parts = garnish_joined | remove_first: "|" | split: "|" %}
+        {% assign garnish_count = garnish_parts | size %}
+        {% if garnish_count == 1 %}
+          {% assign garnish_step = garnish_parts[0] %}
+        {% else %}
+          {% assign before_last_two = garnish_count | minus: 2 %}
+          {% assign last_index = garnish_count | minus: 1 %}
+          {% capture garnish_tail %}{{ garnish_parts[before_last_two] }} and {{ garnish_parts[last_index] }}{% endcapture %}
+          {% if before_last_two > 0 %}
+            {% assign garnish_head = garnish_parts | slice: 0, before_last_two %}
+            {% capture garnish_step %}{{ garnish_head | join: ", " }}, {{ garnish_tail }}{% endcapture %}
+          {% else %}
+            {% assign garnish_step = garnish_tail %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
       {% if garnish_step != "" %}<li>Garnish with {{ garnish_step }}.</li>{% endif %}
     </ol>
   {% elsif page.method %}
@@ -1160,6 +1289,27 @@ layout: default
      about "a glass" to match the cost line beside it and chose to leave the
      mismatch alone.
 
+     AND IT SAYS HOW BIG THE SERVING IS, SINCE #1121 — again her words, again
+     unpolished: "Roughly X units of alcohol in a serving of Y ml". A punch
+     extends the same way ("in each of 8 servings of 160 ml"), which is the
+     minimal reading of her sentence against the tail that was already here.
+
+     Y IS ONE GLASS AND MUST NOT MOVE WITH THE SCALER, exactly as X must not.
+     Both come from `serves:`-divided build-time figures and neither carries a
+     data attribute the scaler could reach: `page.volume.serve_ml` is printed
+     once, and `data-total-ml` — the number that DOES move — lives on
+     `.cocktail-scale-total` up beside the control, where the moving figure
+     belongs. If this line ever moves with the multiple box, that is the bug,
+     and the two elements being different elements is what prevents it.
+
+     THE TAIL IS DROPPED RATHER THAN GUESSED where the volume is unknown, and
+     the sentence falls back to exactly what it said before #1121. One
+     published drink keeps the old wording — the Caipirinha, whose excluded
+     pours ARE the drink. A TOPPED drink is not in that class: since Helen's
+     ruling of 2026-09-17 it spends the declared range's midpoint, the same
+     one this line's own unit figure has always spent. See `volume_for` in
+     _plugins/cocktail_units.rb.
+
      `data-units-per-serve` AND `data-serves` ARE READ BY cocktail-scale.js for
      the batch note (#713), which needs the number to compute a TOTAL -- a
      different quantity that genuinely does scale. This figure is PER SERVING
@@ -1211,8 +1361,9 @@ layout: default
            data-serves="{{ page.units.serves }}">Roughly
           <span class="cocktail-units-figure">{{ page.units.per_serve }}</span>
           {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
-          {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings.
-          {%- else %} in a serving.{% endif %}</p>
+          {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings
+          {%- else %} in a serving{% endif %}
+          {%- if page.volume %} of {{ page.volume.serve_ml }} ml{% endif %}.</p>
       {% endif %}
       {% if has_cost %}
         <p class="cocktail-cost"

@@ -1180,6 +1180,31 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   color: $color-clear-text;
 }
 
+// THE BATCH TOTAL — #1121, Helen: "add total ml next to recipe scaler to help
+// me choose the right number of glasses."
+//
+// THE SAME QUIET VOICE AS THE TWO ABOVE, and for the same reason: it sits under
+// the control, it answers something you just did, and every colour on this page
+// already has a job. It takes the tighter $space-xxs rather than their $space-sm
+// because it belongs to the control directly — the floor message and the batch
+// note are occasional remarks that appear and go, and this line is always there.
+//
+// TABULAR FIGURES, WHICH IS THE ONE THING IT DOES NOT SHARE WITH `.cocktail-units`
+// and the one thing it shares with `.cocktail-cost-figure`. The rule across the
+// page is exactly this: a number the scaler rewrites on every keystroke gets
+// tabular digits so the sentence does not breathe as it counts up, and a number
+// written once does not. This is the only figure on a drink page that moves.
+.cocktail-scale-total {
+  margin: $space-xxs 0 0;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+
+  .cocktail-scale-total-figure {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+}
+
 // SIZED BY HEIGHT, NEVER WIDTH, and this is the whole reason the icons keep
 // their own viewBoxes rather than being forced into a square one. The glasses
 // are genuinely different proportions — a flute is 27mm wide by 98 tall, a
@@ -1740,10 +1765,16 @@ $amount-gap-wide: 1.25rem;
 
 // OPTIONAL — #570. An ingredient the drink survives without.
 //
-// A WORD, NOT A PARENTHETICAL, and the reason is the bracket above: on this
-// line brackets mean "the bottle" and nothing else, so "(optional)" sitting
-// where "(Beefeater)" sits would make one mark carry two jobs. Same argument
-// #441 made about a bare "(blackstrap)".
+// A PARENTHETICAL SINCE #1141 (2026-09-17), reversing the paragraph that stood
+// here. It argued that on this line brackets mean "the bottle" and nothing
+// else, so "(optional)" sitting where "(Beefeater)" sits would make one mark
+// carry two jobs — #441's argument about a bare "(blackstrap)".
+//
+// It was guarding a collision that has never occurred: the two marks only meet
+// when ONE ingredient carries both, and the published collection holds exactly
+// one optional ingredient (Corpse Reviver No. 2's cane sugar syrup), which
+// names no bottle — measured, tmp/optional_census.py. The brackets are in the
+// markup beside the suggestion's own, so the words copy as they read.
 //
 // Italic and in $color-clear-text rather than a hue. It is not a filter axis
 // and nothing on the index matches it, so it has no colour to tie back to —

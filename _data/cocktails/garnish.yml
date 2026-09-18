@@ -156,6 +156,21 @@ canonical:
     # Twelve is how many that punch happened to want; three coffee beans is the
     # drink. See spice_and_other.
     - "raspberries"
+    # DELIBERATELY UNSPECIFIC, and that is the whole value of it -- Helen,
+    # 2026-09-17, asked whether a draft's `fruit wedges` wanted a narrower
+    # name: "Honestly fruit wedges is enough, the maker can choose." It names
+    # the SHAPE and leaves the fruit to whoever is standing at the counter,
+    # which is a different kind of entry from the ones around it: every other
+    # value here names a specific thing because the drink wants that thing.
+    #
+    # IT NEEDS NO `no_article` ENTRY, which is the point of #1143's rule. Its
+    # final `s` is what drops the article, so it reads "Garnish with a mint
+    # sprig, fruit wedges and a maraschino cherry" without anyone remembering
+    # to list it. Declared plurals added before that rule (`raspberries`,
+    # `cucumber wheels`, `kaffir lime leaves`, `grapefruit crescents`) are
+    # still in the list and no longer need to be; they are left there because
+    # an explicit ruling is not worth deleting to save four lines.
+    - "fruit wedges"
     - "half an empty passion fruit shell"
     - "pineapple and brandied cherry"
 

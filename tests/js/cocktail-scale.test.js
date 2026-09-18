@@ -131,6 +131,29 @@ function page(pours, opts) {
     units.setAttribute('data-serves', opts.units[1] === undefined ? 1 : opts.units[1]);
   }
 
+  /* THE TOTAL LINE IS OPT-IN FOR A DIFFERENT REASON FROM THE THREE ABOVE --
+     #1121. Those are missing in PRODUCTION; this one is missing on a DRINK
+     whose volume would be wrong rather than rough, which is two published
+     drinks (see `volume_for` in cocktail_units.rb). So a page without it is a
+     real live page, not a config.
+
+     `opts.totalMl` IS WHAT THE PLUGIN WROTE, and the span starts holding it
+     because the SERVER rendered ×1 before any script ran. A test that started
+     the span empty would be testing a page that never exists. */
+  const total = opts.totalMl === undefined
+    ? null : article.add(el('cocktail-scale-total'));
+  const totalFigure = total
+    ? total.add(el('cocktail-scale-total-figure', String(opts.totalMl)))
+    : null;
+  /* `totalAttr` SEPARATELY, so a test can put a figure on screen and rubbish in
+     the attribute behind it -- which is the only way to reach the "leave what
+     the server wrote alone" branch, since cocktail-scale.js reads the attribute
+     once, at init, exactly as it stashes the original amounts once. */
+  if (total) {
+    total.setAttribute('data-total-ml',
+      opts.totalAttr === undefined ? opts.totalMl : opts.totalAttr);
+  }
+
   const spans = pours.map(([amount, name]) => {
     const li = list.add(el('cocktail-ingredient'));
     const span = li.add(el('cocktail-amount', amount));
@@ -155,6 +178,7 @@ function page(pours, opts) {
 
   return {
     sandbox, control, input, minus, plus, note, spans, list, batch, cost, units,
+    total, totalFigure,
     wide: () => list.classList.contains('cocktail-ingredients--wide-amounts'),
     amounts: () => spans.map((s) => s.textContent),
     /** Type into a box the way a browser does: focus it, then `input`. */
@@ -393,15 +417,23 @@ test('an amount longer than the column holds opens it at rest', () => {
 });
 
 // =============================================================================
-// THE BATCH NOTE — #713, and Helen's request of 2026-09-06: "Bitters text
-// appearing next to the scaler if it's edited to >1. Cost and units on a note."
+// THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE — #1121, 2026-09-17
+// =============================================================================
+// It was #713 (Helen, 2026-09-06: "Bitters text appearing next to the scaler if
+// it's edited to >1. Cost and units on a note.") and it carried the batch's cost
+// and units totals until she saw them under the new ml line: "I like the line.
+// But the cost and units line below has come back and I don't want it to be
+// there."
 //
-// WHY IT SAYS TOTALS AND NOT THE FOOTER'S FIGURES. The cost line and the units
-// line are both PER GLASS and both invariant under scaling — see the "THE COST
-// LINE DOES NOT MOVE WITH THE SCALER" comment in cocktail-scale.js, and Helen's
-// ruling that produced it. So a note repeating them would say what the footer
-// already says. The total is the quantity that actually moves, and the alcohol
-// half is the one #545 exists for: "not poisoning my friends".
+// THE TOTALS' OWN ARGUMENT IS WORTH KNOWING, because it was sound when made:
+// the cost line and the units line are both PER GLASS and invariant under
+// scaling, so a note repeating them would restate the footer, while "what is on
+// the table" had no other answer. #1121 gave it one — `Approximately X ml`,
+// directly above this note, at the multiple actually set.
+//
+// THE CAVEAT SURVIVED BECAUSE IT IS NOT A TOTAL. It answers what does NOT scale
+// linearly. The tests below are what stop it being deleted along with the
+// figures it used to sit beside.
 // =============================================================================
 
 /** The Aviation with a price and a strength on it. */
@@ -410,53 +442,44 @@ function priced(opts) {
 }
 
 test('the batch note stays hidden at the recipe as written', () => {
-  const p = priced();
+  const p = priced({ hasDashes: true });
   assert.strictEqual(p.batch.hidden, true,
-    'at ×1 the totals ARE the per-glass figures, and the footer already says them');
+    'bitters are worth a word when you are making several, not when making one');
 });
 
-test('above ×1 the batch note gives the totals, not the per-glass figures', () => {
-  const p = priced();
+test('above ×1 the note says the bitters caveat and nothing else', () => {
+  const p = priced({ hasDashes: true });
   p.type(p.input, '3');
   assert.strictEqual(p.batch.hidden, false);
   assert.strictEqual(p.batch.textContent,
-    '×3: roughly £12.00–£18.00 in ingredients, roughly 7.2 units of alcohol in total.',
-    '4–6 a glass is 12–18 for three; 2.4 units a serving is 7.2 on the table');
+    'Don’t scale bitters linearly — add to taste.',
+    'the cost and units totals came off in #1121; only the caveat is left');
 });
 
-test('an exact price reads as one figure rather than a range of itself', () => {
-  const p = priced({ cost: [5, 5] });
-  p.type(p.input, '2');
-  assert.ok(p.batch.textContent.includes('roughly £10.00 in ingredients'),
-    'got: ' + p.batch.textContent);
-  assert.ok(!p.batch.textContent.includes('£10.00–£10.00'));
+test('no price or unit count reaches the note, however loudly the page states them', () => {
+  // THE REGRESSION THIS EXISTS FOR. The element still has a cost line and a
+  // units line on the page beside it, both carrying data attributes the note
+  // used to read. Helen asked for those figures to stop appearing here.
+  const p = priced({ hasDashes: true, cost: [4, 6], units: [2.1, 4] });
+  p.type(p.input, '3');
+  assert.ok(!/£|unit|ingredients|×3/.test(p.batch.textContent),
+    'no money, no units, no multiple: got ' + p.batch.textContent);
 });
 
-test('a punch multiplies by its own servings too', () => {
-  // A bowl serving 4 at 2.1 units a serving is 8.4 units; two bowls, 16.8.
-  const p = priced({ units: [2.1, 4] });
-  p.type(p.input, '2');
-  assert.ok(p.batch.textContent.includes('roughly 16.8 units of alcohol in total'),
-    'got: ' + p.batch.textContent);
-});
-
-test('the bitters line appears only on a drink that pours a dash', () => {
-  const withDashes = priced({ hasDashes: true });
-  withDashes.type(withDashes.input, '4');
-  assert.ok(withDashes.batch.textContent.includes(
-    'Don’t scale bitters linearly — add to taste.'),
-    'got: ' + withDashes.batch.textContent);
-
-  // #720.1: the caveat that fired on Aperol Spritz is why this is conditional.
+test('a drink that pours no dash gets no note at all', () => {
+  // #720.1: the caveat that fired on Aperol Spritz is why this is conditional --
+  // "a caveat that fires where it does not apply teaches you to stop reading
+  // caveats". With the totals gone there is nothing else the note could say, so
+  // such a drink now renders no element (the layout gates on `has_dashes`).
   const without = priced({ hasDashes: false });
   without.type(without.input, '4');
-  assert.ok(!without.batch.textContent.includes('bitters'),
-    'a drink with no dash in it must not be warned about bitters; got: ' +
-    without.batch.textContent);
+  assert.strictEqual(without.batch.textContent, '',
+    'nothing to say; got: ' + without.batch.textContent);
+  assert.strictEqual(without.batch.hidden, true);
 });
 
 test('the note goes away again on the way back down to ×1', () => {
-  const p = priced();
+  const p = priced({ hasDashes: true });
   p.type(p.input, '5');
   assert.strictEqual(p.batch.hidden, false);
   p.type(p.input, '1');
@@ -471,6 +494,77 @@ test('production renders none of these elements, and nothing breaks', () => {
   p.type(p.input, '3');
   assert.deepStrictEqual(p.amounts(), ['157.5 ml', '45 ml', '22.5 ml', '45 ml'],
     'the scaler itself is unaffected by the note it cannot find');
+});
+
+// =============================================================================
+// THE LINE UNDER THE SCALER — #1121, Helen: "add total ml next to recipe scaler
+// to help me choose the right number of glasses... This means I can vary target
+// units of alcohol myself."
+//
+// TWO NUMBERS THAT MUST NOT BE CONFUSED, and these tests exist to hold them
+// apart. The line under the scaler is the BATCH and moves; the units line is
+// PER GLASS and does not (the layout's own comment says so, and #713's ruling
+// before it). They are different elements carrying different attributes, which
+// is the mechanism that makes the second guarantee structural rather than
+// remembered.
+// =============================================================================
+
+test('the line under the scaler multiplies with the box', () => {
+  // The Aviation as the plugin totals it: 52.5 + 15 + 7.5 + 15 = 90 ml.
+  const p = page(AVIATION, { totalMl: 90 });
+  assert.strictEqual(p.totalFigure.textContent, '90',
+    'the server rendered ×1 and the script has nothing to correct');
+  p.type(p.input, '4');
+  assert.strictEqual(p.totalFigure.textContent, '360');
+  p.type(p.input, '2');
+  assert.strictEqual(p.totalFigure.textContent, '180',
+    'it is a state, not a ratchet');
+  p.type(p.input, '1');
+  assert.strictEqual(p.totalFigure.textContent, '90', 'and back to the recipe');
+});
+
+test('an integer total prints as an integer, never 360.0', () => {
+  const p = page(AVIATION, { totalMl: 82.5 });
+  p.type(p.input, '2');
+  assert.strictEqual(p.totalFigure.textContent, '165');
+  p.type(p.input, '3');
+  assert.strictEqual(p.totalFigure.textContent, '247.5',
+    'and a half millilitre survives the float');
+});
+
+test('the units line does not move with the scaler, and the total does', () => {
+  // THE GUARANTEE #713 AND #1001 BOTH REST ON. The units figure is per serving
+  // and invariant; scaling ×6 makes six drinks, not a stronger one. Nothing in
+  // cocktail-scale.js writes to `.cocktail-units`, and this is what says so.
+  const p = page(AVIATION, { totalMl: 90, units: [2.4] });
+  p.units.textContent = 'Roughly 2.4 units of alcohol in a serving of 90 ml.';
+  p.type(p.input, '6');
+  assert.strictEqual(p.units.textContent,
+    'Roughly 2.4 units of alcohol in a serving of 90 ml.',
+    'the per-glass sentence is untouched, figure and volume alike');
+  assert.strictEqual(p.totalFigure.textContent, '540',
+    'while the batch line beside the control says what is on the table');
+});
+
+test('a drink with no stated volume renders no total line, and the scaler is unaffected', () => {
+  // Two published drinks have no `page.volume` — the Caipirinha and the pear
+  // Bellini, where the excluded pours ARE the drink and a figure would be
+  // wrong rather than rough. (A TOPPED drink is not one of them: since Helen's
+  // ruling of 2026-09-17 it spends its declared range's midpoint.) The element
+  // is absent, not empty.
+  const p = page(AVIATION);
+  assert.strictEqual(p.total, null);
+  p.type(p.input, '3');
+  assert.deepStrictEqual(p.amounts(), ['157.5 ml', '45 ml', '22.5 ml', '45 ml'],
+    'the scaler does not care about a line it cannot find');
+});
+
+test('an unreadable volume leaves the sentence the server wrote', () => {
+  // A blanked figure would be worse than a stale one, and the page was right
+  // at ×1 before any script ran.
+  const p = page(AVIATION, { totalMl: 90, totalAttr: 'lots' });
+  p.type(p.input, '4');
+  assert.strictEqual(p.totalFigure.textContent, '90');
 });
 
 test('a bitters-only drink still gets its caveat with no figures to show', () => {

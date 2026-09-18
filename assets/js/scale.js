@@ -623,6 +623,38 @@
     return multipleOf(here.step, here.floor.steps);
   }
 
+  /**
+   * The batch total, from a volume somebody else has already worked out.
+   *
+   * #1121, and it is deliberately NOT `totalMl` below. That function reads the
+   * printed amount strings, and its `VOLUMETRIC` map is `ml` and only `ml`, so
+   * an `oz` or a `tsp` pour is a COUNT to it and sits outside its sum. The
+   * drink page's figure is computed once at build time by
+   * _plugins/cocktail_units.rb, which converts every unit `measures.per_ml`
+   * declares and knows which pours are deliberately excluded — so the page
+   * hands that number in and the browser only multiplies it. One answer to
+   * "how big is this drink", printed in two places (the scaler's line and the
+   * units line's tail), which cannot therefore disagree.
+   *
+   * LINEAR IS EXACT HERE, not an approximation: the control allows whole
+   * multiples only (see cocktail-scale.js's `apply`), every gridded amount is
+   * multiplied by that integer, and an off-grid one (cobra-effect's 22.75 ml)
+   * is multiplied too rather than rounded. So the poured total really is the
+   * written total times n, and this does not have to re-read the page.
+   *
+   * @param {number} perRecipeMl - the drink as written, in millilitres
+   * @param {number} multiple - whole recipes
+   * @returns {number|null} null when either is not a positive number, so a
+   *          caller can leave whatever the page already said in place
+   */
+  function batchTotalMl(perRecipeMl, multiple) {
+    var base = Number(perRecipeMl);
+    var m = Number(multiple);
+    if (!isFinite(base) || base <= 0) return null;
+    if (!isFinite(m) || m <= 0) return null;
+    return tidy(base * m);
+  }
+
   /** The volumetric total at a multiple, for the note and for anything later. */
   function totalMl(amounts, multiple) {
     var here = plan(amounts);
@@ -644,6 +676,7 @@
     scale: scale,
     floorMultiple: floorMultiple,
     totalMl: totalMl,
+    batchTotalMl: batchTotalMl,
     multipleForTotal: multipleForTotal,
     snapMultiple: snapMultiple,
     allowedStep: allowedStep,

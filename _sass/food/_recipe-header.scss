@@ -663,6 +663,42 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   margin: 0 0 $spacing-block-gap;
 }
 
+// THE FIRST SECTION HEADING SITS WHERE A DRINK PAGE'S DOES -- #1124,
+// 2026-09-17. Helen: "begin the INGREDIENTS heading at the same place
+// vertically on both sites -- food should match cocktails", and, asked which
+// space she meant: "the vertical space between the rule underneath the header
+// material and the word INGREDIENTS."
+//
+// THAT CLARIFICATION IS WHAT MAKES THIS A TEN-MINUTE CHANGE RATHER THAN A
+// DESIGN PROBLEM. Read as "the same absolute y", it is not achievable: this
+// page's head varies with a wrapped title, an optional tagline, 0-2 source
+// lines and a meta grid that stacks under 600px, so a fixed position would mean
+// dead air on a short recipe or a clamped title on a long one. Measured from
+// the RULE, the head's height drops out of the question entirely and only one
+// gap has to move.
+//
+// MEASURED, BOTH SITES, AT 1280 (scripts/browser/styles.sh):
+//   cocktails  rule y=524.0, INGREDIENTS y=619.2  ->  95.2px
+//   food       rule y=642.4, INGREDIENTS y=757.4  -> 115.0px
+// Food's fixed part after the rule is the controls box, 43px including its own
+// padding, so the gap that closes the 19.8px difference is 95.2 - 43 = 52.2px.
+// 3.25rem is 52px, which lands within a fifth of a pixel of the drink page.
+//
+// THE FIRST HEADING ONLY, AND MANUAL §13.3 IS WHY. That section records the two
+// sites' heading rhythms as DELIBERATELY different -- 4.5rem/2rem here against
+// 3rem/1.25rem on a drink page (#1006, Helen's "half way") -- and she asked
+// about one gap, not about the scale. So METHOD, NOTES and everything below
+// keep their 4.5rem and this rule reaches exactly one heading: the one directly
+// after the controls row.
+//
+// WHAT IS NOT MATCHED, because it cannot be from here: the two headings are set
+// at different sizes (47.5px tall against 38.4px), so the word's INK sits a
+// little differently inside each box even with the boxes' tops aligned. The box
+// is what a rule can move; the leading is the type's own.
+.recipe-controls + .recipe-section-ingredients .recipe-section-heading {
+  margin-top: 3.25rem;
+}
+
 // ON A PHONE THE TITLE TAKES THE WHOLE WIDTH. #899/#900 wrapped the old action
 // row under it at 600px; with the row gone the cap is the only thing left to
 // lift, and 70% of 296px still breaks PINEAPPLE / AND / GINGER / SPATCHCOCK /
