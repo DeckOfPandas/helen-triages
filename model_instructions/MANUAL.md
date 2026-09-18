@@ -92,13 +92,21 @@ file from such a session is §11.0.3.
 ## 1. How to run it
 
 ```
-jekyll-local        # port 4001, drafts visible — the working view
-jekyll-prod         # port 4002, exactly what deploys — no drafts, no local switches
+jekyll-local        # port 4001, drafts visible — the working view    HELEN ONLY
+jekyll-prod         # port 4002, exactly what deploys — no local switches  HELEN ONLY
 pytest              # content and structure checks; ONE session at a time
 node --test                       # the JS suite, discovered from the root (§10)
 
 python3 scripts/verify.py         # ALL FOUR CHECKS, and prefer this
 ```
+
+**THE TWO SERVERS ARE HELEN'S TO START, AND A SESSION NEVER OFFERS.** Her
+instruction, 2026-09-18: *"As a greater point, I start my own local servers,
+so don't do that."* Say which URL needs looking at and stop there; a server a
+session starts is a background process she did not ask for, on a port she may
+already be using, outliving the turn that made it. `scripts/browser/serve.sh`
+is the exception and is not the same thing — it is a short-lived server the
+screenshot tooling owns, started and stopped inside one measurement.
 
 **`scripts/verify.py` runs the two suites AND the two checks that get
 forgotten** — `derive_cocktail_moods.py`, the only thing that says whether a

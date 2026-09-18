@@ -17,14 +17,24 @@ MANUAL §11.
 
 For a batch in progress there is **one** working copy of the private drinks
 repo: the clone inside the coordinating Claude's worktree, on a branch named
-for the batch (`content/<what-the-batch-is>`), served on a port the session
-names when it opens the batch. Helen edits there, Claude commits and
-pushes there, and the dev server builds from there. Helen's own local clone
-is not used while a batch is open — it is where promotion happens afterwards
-(step 6), from `main`, after the branch is merged.
+for the batch (`content/<what-the-batch-is>`). Helen edits there, Claude
+commits and pushes there, and the dev server builds from there. Helen's own
+local clone is not used while a batch is open — it is where promotion happens
+afterwards (step 6), from `main`, after the branch is merged.
 
 Two copies is how the first batch got tangled: sixteen files sat only on one
 disk for an evening. One copy, always pushed, is the rule.
+
+**NEVER START A DEV SERVER, AND NEVER OFFER TO. HELEN STARTS HER OWN.** Her
+instruction, 2026-09-18, given to an offer to serve a finished batch for her
+proofread: *"As a greater point, I start my own local servers, so don't do
+that."* This paragraph used to say the batch was "served on a port the session
+names when it opens the batch", which invited exactly the wrong thing. A
+session's job is to say WHICH pages need reading and at what URLs —
+`/cocktails/drafts/4-promote/<slug>/` — and stop there. `jekyll-local` and
+`jekyll-prod` are hers to run; a background server a session starts is a
+process she did not ask for, on a port she may already be using, outliving the
+turn that made it.
 
 ## The steps
 
