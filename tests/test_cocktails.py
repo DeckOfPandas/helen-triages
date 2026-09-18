@@ -1480,7 +1480,27 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # keep proofread true". Proved with the old value first: the test named
 # arrack-christmas-punch-wife-3.md and nothing else. Covers 3039210 and nothing
 # after it.
-COCKTAIL_BASELINE_COMMIT = "3039210"   # one bare `suggestion` string in #1126's proofread, on Helen's word
+# MOVED 2026-09-18 FOR A PROMOTION, WHICH IS THE ONE CASE THIS CONSTANT CANNOT
+# TELL APART FROM AN EDIT. `b196949` copies seven drinks from the private
+# repo's `4-promote/` into `_cocktail_recipes/` unchanged -- byte-for-byte,
+# asserted at copy time -- and the test reads the PUBLIC repo's history only
+# (#624), so all it can see is seven files marked `proofread: true` appearing
+# in an agent's commit. That is indistinguishable from an agent editing seven
+# proofread drinks, and it is exactly what `PUBLISHING_A_DRINK.md` step 6
+# warned this constant would have to absorb.
+#
+# HER GRANT, and the read is already done rather than promised, which makes
+# this the cheapest shape rather than the sixth move's. Helen, 2026-09-18, of
+# the seven: "Are the 7 remainders ready to promote otherwise? If yes then
+# please do it." Four of them this batch never touched at all; the other three
+# were edited only from `notes:` YAML null to `notes: []`, which renders
+# identically -- so her existing proofread covers the published bytes exactly,
+# and no page went up that she has not read. The ten drinks that DID change
+# visibly are not here: they went to `proofread: false` and are back with her.
+#
+# Proved with the old value first, as every move before it was: the test named
+# all seven promoted files and nothing else. Covers b196949 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "b196949"   # seven drinks promoted unchanged, on Helen's word
 
 
 def _newest_commit_per_published_drink():
