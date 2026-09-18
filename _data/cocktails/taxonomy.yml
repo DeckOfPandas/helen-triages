@@ -711,11 +711,22 @@ mood_include:
   fish-house-punch:
     moods: [ice ice baby, sharp]
     why: >-
-      she calls it icy; the method does not say how; she calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  gunmetal-blue:
-    moods: [ice ice baby]
-    why: >-
-      she calls it icy; the method does not say how.
+      Helen, 2026-09-18, asked directly because this and gunmetal-blue were the collection's only two `ice ice baby` corrections and the other one turned out to be wrong: "Fish House Punch: a) I call 'ice tea', and b) comes over lots and lots of ice." SO THIS ENTRY IS RIGHT AND STAYS, and the reason is now a fact about the drink rather than the vague "she calls it icy" it said before. `serve.ice` is `cubed`, which the rule deliberately does not count -- crushed, large cube, block and blended are the values that earn the mood -- and the thing the field cannot carry is QUANTITY. Lots and lots of cubed ice is an icy drink; one cube in a rocks glass is not, and both are spelled `cubed`. She calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  # GUNMETAL-BLUE'S `ice ice baby` ENTRY WAS HERE AND IS GONE, 2026-09-18. It
+  # read "she calls it icy; the method does not say how" -- word for word what
+  # fish-house-punch's said above, written on the same pass -- and it was the
+  # only thing giving that drink the mood: `serve.ice` is `none`, the method
+  # shakes and strains into a coupe, and no other drink in the collection
+  # carried `ice ice baby` on `serve.ice: "none"`. Helen, 2026-09-18, reading
+  # her own moods back: "Gunmetal Blue doesn't have ice..."
+  #
+  # WHAT THE PAIR IS WORTH REMEMBERING FOR. Two entries, identical wording,
+  # one right and one wrong, and the words could not tell them apart: "she
+  # calls it icy" records that she answered, not what is true of the drink.
+  # Asked again about both, she gave a checkable fact for one -- lots and lots
+  # of ice -- and withdrew the other. A `why` that paraphrases an answer
+  # instead of naming the property is a `why` nobody can audit later, which is
+  # this field's whole job.
   hurricane-classic:
     moods: [I want to faff]
     why: >-
@@ -823,6 +834,25 @@ mood_exclude:
       `churn` left `mood_step_words.faff` and this line was no longer doing
       anything. A correction that has been overtaken by a rule is a correction
       that lies about why a drink is tagged, so it goes.
+  gunmetal-blue:
+    moods: [warming]
+    why: >-
+      Helen, 2026-09-18: "I don't just want to call anything with cinnamon in
+      it 'warming' (although I accept we will often do that)." The
+      parenthesis is why this is a correction and not a rule change, and she
+      was offered both: `cinnamon syrup` sits in `mood_ingredients.warming`
+      and the rule is one-hit, so 7.5 ml of it in a 92.5 ml drink of mezcal,
+      blue curacao and peach brandy reads as a warm drink. It is not one.
+      MEASURED BEFORE CHOOSING, because the alternative was cheap enough to be
+      tempting: exactly two drinks in the collection take `warming` from
+      cinnamon ALONE -- this one and fake-id -- so deleting `cinnamon syrup`
+      from the trigger list would have cost only those two. FAKE-ID KEEPS IT,
+      which is what makes the rule change wrong: it is a strong brown drink
+      that is also `nightcap` and `festive`, and cinnamon is doing real work
+      there. Every other cinnamon-syrup drink (ginger-snap, cobras-fang) also
+      carries ginger or warm-spiced bitters and would keep the mood either way.
+      The drink is left on three moods, which Helen confirmed on sight: "fine
+      with three moods".
 
 # `mood_up_glasses` WENT WITH `up`, 2026-08-30. It listed the stemmed glasses
 # and nothing reads it any more. Recovering it means recovering the mood; both
