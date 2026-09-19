@@ -142,7 +142,16 @@ canonical:
     - "grapefruit crescents"
     - "citrus wheel"
     - "dehydrated lime slice wheel"
-    - "half lime shell"
+    # `half an empty lime shell` SINCE 2026-09-19, was `half lime shell`.
+    # Helen, given the choice between rewording it and adding the old form to
+    # `no_article`, picked the words: the step had been reading "Garnish with a
+    # half lime shell", which is correct data and not English anybody writes.
+    # The new form brings its own article, exactly as `half an empty passion
+    # fruit shell` does in `fruit` below, so the two shells now match -- and
+    # `empty` is the fact that makes it a garnish rather than an ingredient:
+    # the lime has been juiced into the drink and the husk is what is left.
+    # Both Mai Tais retyped in the same commit.
+    - "half an empty lime shell"
 
   fruit:
     - "pineapple wedge"
@@ -289,12 +298,19 @@ proposals: {}
 # right for 35 of them and a field that is almost always the same value stops
 # being read.
 no_article:
+  # ADDED 2026-09-19, one day late. `fruit wedges` was declared yesterday for
+  # Zombie Intoxica and not added here, so the page read "Garnish with a fruit
+  # wedges" -- exactly the failure this list's own comment names, walked into
+  # by the commit that added the plural. Helen found it on the rendered page.
+  # A NEW PLURAL GOES IN BOTH PLACES OR IT GOES IN NEITHER.
+  - fruit wedges
   - grapefruit crescents
   - raspberries
   - kaffir lime leaves
   - cucumber wheels
   - grated nutmeg
   - three coffee beans
+  - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"
   - pineapple and brandied cherry       # two things, not one
   - no garnish                          # never rendered as a step anyway

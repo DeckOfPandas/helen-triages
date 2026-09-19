@@ -5,7 +5,7 @@ glass:
   - "old fashioned"
   - "tiki mug"
 garnish:
-  - "half lime shell"
+  - "half an empty lime shell"
   - "mint sprig"
 serve:
   ice: "crushed"
