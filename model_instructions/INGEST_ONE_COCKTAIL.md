@@ -369,7 +369,7 @@ flamed orange zest coin
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel · lemon wheel ·
 lemon slice · orange slice · orange wheel · orange crescent ·
 grapefruit crescents · citrus wheel · dehydrated lime slice wheel ·
-half lime shell
+half an empty lime shell
 
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
