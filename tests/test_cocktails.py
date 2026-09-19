@@ -1578,7 +1578,30 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 #
 # Proved with the old value first, as every move before it: the test named all
 # ten promoted files and nothing else. Covers 4eacc21 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "4eacc21"   # ten drinks promoted unchanged, on Helen's word
+# MOVED 2026-09-19 FOR ONE FLAG ON ONE DRINK, AND THIS IS THE SHAPE THE
+# MECHANISM IS WEAKEST AT. `1031e77` sets `proofread: true` on Smokestack
+# Lightning and changes nothing else in the file. Helen: "Smokestack is
+# proofread, please flip the flag and commit with this work now." The drink had
+# been off the live site since 9d5621a on 2026-09-16 and nothing surfaced that
+# -- the cards deliberately do not show the flags (#562) -- so it was found by
+# counting 65 files against 64 pages while checking something unrelated.
+#
+# NOT A `HELEN_CLEARED` ENTRY, and the drinks side has no such list anyway.
+# `test_front_matter.py`'s baseline comment worked through the same choice on
+# 2026-09-10 and reached the same answer: an exemption entry covers a file FOR
+# EVER, which is more than a single read grants, while the baseline covers this
+# commit and nothing after -- so the next agent edit to this drink trips the
+# test again, which is correct.
+#
+# FOUR MOVES IN TWO DAYS, all for promotions or for a flag Helen dictated, and
+# none for an edit the rule was written to catch. #933 asks whether a constant
+# is the right shape for this at all; this batch is more evidence that it is
+# not, and none that the RULE is wrong.
+#
+# Proved with the old value first: the test named
+# `_cocktail_recipes/smokestack-lightning.md` and nothing else. Covers 1031e77
+# and nothing after.
+COCKTAIL_BASELINE_COMMIT = "1031e77"   # Smokestack Lightning's flag, on Helen's word
 
 
 def _newest_commit_per_published_drink():
