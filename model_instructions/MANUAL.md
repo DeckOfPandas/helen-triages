@@ -3,9 +3,11 @@
 **Helen Triages** — a Jekyll mono-repo serving two personal decision-support
 sites. **Food** answers *what shall we cook*, not *how do I cook*. **Cocktails**
 is its sibling: real drinks, a schema, a designed index and drink page, and
-**48 drinks live since 2026-09-10** — this said "nothing promoted to the live
-site yet" until that day, which was true for the whole life of the collection
-and is the single biggest thing to know that has changed.
+**65 drinks live** — 48 on 2026-09-10, which was the day the collection
+stopped saying "nothing promoted to the live site yet" after that had been
+true for its whole life, and 17 more on 2026-09-18/19. **Re-count rather than
+quoting this number**; the line is here to say the collection is PUBLIC and
+growing, not to be an inventory.
 
 **This file was `HANDOVER_v26.md` until 2026-09-06**, when it was split. v26
 was 9,900 lines: about 2,000 of rules inside 7,800 of dated journal — what was
@@ -1315,19 +1317,32 @@ drafts directory is un-ignored and stageable in the public repo.
 `test_every_drafts_collection_is_gitignored` derives its patterns from
 `_config.yml`.
 
-**`_cocktail_recipes/` HOLDS 48 DRINKS SINCE 2026-09-10, AND IS PUBLIC.** This
-paragraph said the directory "does not exist on disk" and that "nothing is
-promoted into it yet" for the whole life of the collection; both were true
-until the deployment and neither is now. §9.1.1 is the gate that let them
-through, and it is no longer a formality — every one of those 48 is
-`proofread: true`, so **an agent editing one takes it off the live site** in
-the same commit that sets the flag back (#367).
+**`_cocktail_recipes/` IS PUBLIC AND HOLDS 65 DRINKS** — 48 on 2026-09-10 and
+17 more on 2026-09-18/19. This paragraph said the directory "does not exist on
+disk" and that "nothing is promoted into it yet" for the whole life of the
+collection; both were true until the deployment and neither is now. §9.1.1 is
+the gate that let them through, and it is no longer a formality — nearly every
+one of them is `proofread: true`, so **an agent editing one takes it off the
+live site** in the same commit that sets the flag back (#367). **Re-count
+rather than quoting the number.**
 
-**`_cocktail_drafts/to-promote/` IS EMPTY**, which is the other half of the
-same fact and the more useful one day to day: everything Helen has read has
-moved out, so anything that appears in that folder is genuinely waiting for
-her. She asked for it in exactly those terms — *"then I don't have to fish
-through one by one to find out which I still need to proofread"*.
+**A HELD DRINK IS INVISIBLE, AND THE ONLY THING THAT SHOWS IT IS COUNTING.**
+The gate fails closed: a `proofread: false` drink keeps its file and loses its
+page, and the cards deliberately do not show the flags (#562 — a work-state
+note on every row is a to-do list down the side of the page you use to decide
+what to drink). So **the file count and the page count differ by exactly the
+number of drinks Helen is deliberately holding**, and nothing else says what
+that number should be. Smokestack Lightning sat dark for three days after
+2026-09-16 and was found only because a promotion check printed 65 files
+against 64 pages. Count both after a promotion; the difference is the check.
+
+**BOTH STAGING FOLDERS ARE EMPTY**, which is the other half of the same fact
+and the more useful one day to day. `4-promote/` means waiting on Claude and
+`5-final-proofread/` means waiting on Helen (PIPELINE.md §3), so anything
+appearing in either is genuinely new work. She asked for the first in exactly
+those terms — *"then I don't have to fish through one by one to find out which
+I still need to proofread"* — and for the second when ten drinks of one batch
+came back needing rulings and `4-promote/` stopped answering the question.
 
 **A PROMOTED DRINK IS READABLE BY A PUBLIC TEST, which several tests were
 written to survive not having.** `_load_published()` and
@@ -2517,12 +2532,13 @@ build stop rather than a report. Three things are load-bearing:
 **The cocktail corpus is `_cocktail_recipes/` + `_cocktail_drafts/` through
 `_load()`, the only door** (#540; `test_every_drink_reading_test_goes_through_the_loader`).
 So a PROMOTED drink is checked everywhere including CI; the drafts remain a
-local concern by Helen's decision. **CI CHECKS 48 DRINKS SINCE 2026-09-10** —
-this sentence read "with nothing promoted, CI still checks no drink" for the
-whole life of the collection, and the deployment is what changed it. Every
-guard that has only ever run against drafts on Helen's machine now runs
-against those 48 in CI as well, which is coverage arriving rather than
-coverage changing. **The staleness half of a guard is unanswerable on a partial corpus**
+local concern by Helen's decision. **CI CHECKS EVERY PROMOTED DRINK SINCE
+2026-09-10** — 48 that day and 65 after 2026-09-19; re-count rather than
+quoting. This sentence read "with nothing promoted, CI still checks no drink"
+for the whole life of the collection, and the deployment is what changed it.
+Every guard that has only ever run against drafts on Helen's machine now runs
+against the promoted drinks in CI as well, which is coverage arriving rather
+than coverage changing. **The staleness half of a guard is unanswerable on a partial corpus**
 — a drink merely ABSENT looks exactly like a drink FIXED — so every check
 that hangs on a shrink-only registry or a mood's share of the book calls
 `_require_whole_collection` and skips with a reason; `WHOLE_COLLECTION_ONLY`

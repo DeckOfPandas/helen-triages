@@ -4,9 +4,13 @@ Written 2026-09-04, on the day the first sixteen drinks went through it, for
 Helen to check and for the next session to follow. It is short on purpose.
 **Since 2026-09-14 (#1008) the same six steps carry a FOOD recipe too, and
 `model_instructions/PIPELINE.md` §4 is the map both sites follow; this file
-keeps the detail and the history of each step. The staging folder is
-`4-promote/` since the same day — every `to-promote/` below is that folder
-under the name it had when the step was written.**
+keeps the detail and the history of each step.**
+**THERE ARE TWO STAGING FOLDERS FOR DRINKS SINCE 2026-09-18**: `4-promote/`,
+which means waiting on Claude, and `5-final-proofread/`, which means waiting
+on Helen. PIPELINE.md §3 is the authority on both. This preamble used to
+promise that "every `to-promote/` below" meant `4-promote/` — a redirection
+note that made sense for a week and had become a thing every reader held in
+their head; the old name is gone from the steps instead.
 **MANUAL §9.1.1 has the gate's mechanics and §4.0 says what the flags MEAN;
 `.claude/commands/ingest.md` is how a drink gets INTO the drafts and where the
 mechanical/non-mechanical boundary is stated in full.** This is the procedure
@@ -38,7 +42,7 @@ turn that made it.
 
 ## The steps
 
-1. **Helen moves** a drink into `_cocktail_drafts/to-promote/`. The move is the
+1. **Helen moves** a drink into `_cocktail_drafts/4-promote/`. The move is the
    signal; nothing else is needed. She tells Claude when a round of moves is
    done, because Claude will be editing the same files next.
    - **She sets `rewritten: true` herself — #1137, 2026-09-17.** The move used
@@ -48,7 +52,7 @@ turn that made it.
      page exists belongs with `proofread` — hers to type, never an agent's.
      **If a drink in here still says `rewritten: false`, it will not publish:
      say so and let her flip it.** Never infer it from the folder.
-2. **Claude runs the mechanical pass** over everything in `to-promote/`:
+2. **Claude runs the mechanical pass** over everything in `4-promote/`:
    **touches no gate flag at all** — `rewritten` joined `proofread` and
    `awaiting_fix` as Helen's alone on 2026-09-17, and `ingest.md`'s TIER 3 says
    the same — runs the suite, fixes what
@@ -62,18 +66,43 @@ turn that made it.
 3. **Claude lists the non-mechanical things**, one line each, and Helen rules
    on them. Each ruling is written into the vocabularies, the manual and
    the ingest documents the same day, so it is never asked twice.
+   - **Move those drinks into `5-final-proofread/` in the same commit as the
+     list** (PIPELINE.md §3, 2026-09-18). It is the one folder an agent puts a
+     file in, and the move IS the report: `4-promote/` then means *waiting on
+     Claude* and `5-final-proofread/` means *waiting on Helen*, so neither she
+     nor the next session has to re-read a chat message to tell them apart. It
+     was asked for when a batch of seventeen produced ten bounce-backs and
+     `4-promote/` stopped answering the question.
 4. **Claude says "final: <slugs>".** That word means: the suite is green over
    those drinks, every open ruling is applied, and Claude will not touch
    those files again except to flip a flag Helen asks for or to open an
    `awaiting_fix` round. **Until Helen sees that word, the served pages are
    work in progress and not for proofreading.** (This is the step that was
    missing on the first day.)
-5. **Helen proofreads** by reading each drink's built page on the dev server —
-   `/cocktails/drafts/to-promote/<slug>/` — and flips `proofread: true` in
-   the file, or tells Claude the slugs and Claude flips them on her word.
+5. **Helen proofreads** by reading each drink's built page on her own dev
+   server — `/cocktails/drafts/<folder>/<slug>/` — and flips `proofread: true`
+   in the file, or tells Claude the slugs and Claude flips them on her word.
    Reading the served page *is* the proofread; the flag says "I read this
    rendered and it is what I want". Claude commits, pushes, and Helen merges
    the branch on GitHub.
+   - **SAY WHICH REPO THE BRANCH IS IN, AND HOW TO GET IT. THE URLs ARE
+     USELESS WITHOUT THE FILES.** `_cocktail_drafts/` is a SEPARATE private
+     repo, gitignored here (`.gitignore`), so **checking out the public branch
+     brings no drink files at all** — not the folder move, not the flag flips,
+     not a single edit from the batch. Her clone stays on its own `main` and
+     the pages she is being sent to simply do not exist.
+
+     This cost a session on 2026-09-19: ten URLs were handed over with no
+     mention of the private branch, she checked out the public one, saw
+     nothing change, and reasonably concluded something was broken. The fix is
+     two commands and they belong in the message that gives the URLs:
+
+         git -C _cocktail_drafts fetch origin
+         git -C _cocktail_drafts checkout content/<the-batch-branch>
+
+     **The general rule: "pushed" is not "she can see it".** Every handover in
+     this file crosses two repos, and the drinks half is always the one that
+     needs the extra step.
    - If a small thing is wrong: `awaiting_fix: true` in a commit that says
      what; fix between them; Helen re-reads (the whole page — drinks are
      short); flag back.
@@ -95,16 +124,23 @@ turn that made it.
    was that the staging folder had become a haystack: *"please move all
    proofread: true files into the public repo. If you do this then I don't
    have to fish through one by one to find out which I still need to
-   proofread."* Promotion is what keeps `to-promote/` meaning "waiting for
+   proofread."* Promotion is what keeps `4-promote/` meaning "waiting for
    Helen" rather than "everything, sorted by nothing".
 
-   **FOUR THINGS THAT PROMOTION TURNED OUT TO NEED, none of them obvious
+   **PROMOTE FROM WHICHEVER FOLDER THE DRINK IS IN.** Since 2026-09-18 that
+   is `4-promote/` or `5-final-proofread/` — both are the published tense
+   (`STAGED_DIRS`), and a bounced-back drink that Helen has now passed goes
+   straight out rather than taking a ceremonial hop back through `4-promote/`
+   with a commit attached.
+
+   **SIX THINGS THAT PROMOTION TURNED OUT TO NEED, none of them obvious
    until it was done for real:**
 
-   - **RE-CHECK THE GATE, do not trust the flag as found.** `awaiting_fix:
-     false` AND `proofread: true`, both explicitly, failing closed. Copying a
-     drink the gate would have hidden is the one mistake no later commit
-     undoes, because the file is public the moment it merges.
+   - **RE-CHECK THE GATE, do not trust the flag as found.** All THREE legs
+     since #1137 — `rewritten: true` AND `awaiting_fix: false` AND `proofread:
+     true` — read out of the file at copy time, explicitly, failing closed.
+     Copying a drink the gate would have hidden is the one mistake no later
+     commit undoes, because the file is public the moment it merges.
    - **COPY, COMPARE, THEN DELETE.** Byte-for-byte, asserted. What publishes
      must be what she read, and a silent truncation between two repos is
      exactly the failure nothing else would catch.
@@ -122,6 +158,36 @@ turn that made it.
      can revert just that, and prove the guard still bites afterwards by
      breaking it on purpose. See the constant's own comment in
      `tests/test_cocktails.py`.
+
+     **The proof is cheap and it is not optional: run the test with the OLD
+     value and read the names.** It should name exactly the drinks you
+     promoted and nothing else. Four moves went through on 2026-09-18/19 and
+     each one was proved that way; a move that names a drink you did not
+     touch is a move that is grandfathering something you have not looked at.
+
+   - **CHECK THE PROMOTED PAGES BY NAME IN THE PRODUCTION BUILD.** `sh
+     scripts/browser/build.sh`, then assert each slug exists at
+     `tmp/site/cocktails/recipes/<slug>/index.html`. **The gate fails closed,
+     so a drink with a flag wrong is simply ABSENT — which looks exactly like
+     nothing going wrong.** Copying the file and committing it proves nothing
+     about whether it publishes.
+
+     It is also the only thing that finds a drink held back for an unrelated
+     reason: that check printed 65 files against 64 pages on 2026-09-19 and
+     turned up Smokestack Lightning, `proofread: false` since 2026-09-16 and
+     off the live site for three days with nobody looking. **Count the files
+     and count the pages; the difference should be exactly the drinks Helen is
+     deliberately holding.**
+
+   - **RUN `scripts/verify.py`, NOT THE SUITE YOU HAVE BEEN RUNNING.** A
+     promotion batch makes `tests/test_cocktails.py` feel like the whole
+     world, and it is not: the moment a commit touches `_data/`, the generated
+     standalone documents go stale and only the full run notices. A garnish
+     rename on 2026-09-19 passed the cocktails suite and failed two
+     `test_standalone_docs.py` checks plus the ingest-vocabulary check, all of
+     which `verify.py` runs and MANUAL §1 calls "the two checks that get
+     forgotten". **A narrow suite stops being the right check the moment you
+     edit a vocabulary, however green it is.**
 
 ## What the flags mean, in one line each
 
