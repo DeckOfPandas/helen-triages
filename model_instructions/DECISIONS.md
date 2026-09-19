@@ -2318,6 +2318,146 @@ unless stated.
   that line's range to the chosen bottle. The range stands until a choice is
   made.
 
+### §9.3.6 How much liquid is in a drink — #1121, built 2026-09-17
+
+- **2026-09-17, #1121 — the ml line cost the batch note its totals, and the
+  lesson is about what a NEW line does to the ones already there.** Helen, on
+  the built branch: *"I like the line. But the cost and units line below has
+  come back and I don't want it to be there."* The line she means is #713's
+  batch note, which appears under the scaler above ×1 and read
+  `×3: roughly £12.00–£18.00 in ingredients, roughly 7.2 units of alcohol in
+  total.`
+
+  **#713's argument was sound and expired anyway.** It said TOTALS because
+  totals were the only thing that moved — the cost and units lines are both per
+  glass and invariant under scaling, so repeating them would restate the footer,
+  while "what is on the table" had no other answer. `Approximately X ml` is now
+  that answer, in the same spot, at the multiple actually set. **A line that
+  exists because nothing else says a thing stops earning its place the day
+  something else says it better** — the same shape as the card's matched
+  ingredient (§9.13, 2026-09-17), where a treatment stopped being right because
+  its neighbours changed rather than because its own reasoning failed.
+
+  **THE CAVEAT IS NOT A TOTAL, so the element survives carrying only it**:
+  "Don't scale bitters linearly — add to taste." She asked for it in the same
+  breath as the totals (#713) rather than as part of them, and deleting the
+  element would have taken it along with what she actually objected to. The gate
+  drops from `site.show_costs or page.units` to `has_dashes` alone — with
+  nothing but the caveat left, the only question is whether the drink pours a
+  dash — so the element now renders on **15 of 47** built pages instead of 46,
+  measured before and after.
+
+  **The cost half never reached the live site at all** and that is worth
+  recording, because the complaint named it: `has_cost` requires
+  `site.show_costs`, declared only in `_config_local.yml`. A production build of
+  all 47 drinks contains **zero** cost lines, before and after. She was reading a
+  local build, where that switch is on.
+
+  **What the census settled first**, before a line of this was written: our
+  branch had NOT brought anything back. `cocktail-units` 46 → 46, `cocktail-cost`
+  0 → 0, `cocktail-scale-batch` 46 → 46; the only change was the new
+  `cocktail-scale-total` on 45. **When a complaint says "X has come back",
+  measure whether it did before changing anything** — the answer decided that
+  this was a removal she wanted rather than a regression to undo.
+
+- **2026-09-17, #1121 — two sentences, and the interesting part is the six
+  drinks that get neither.** Helen specified both lines herself, in her own
+  words: *"A line UNDER THE SCALER on a drink page reading: 'Approximately X
+  ml'"* and *"an addition LOWER DOWN, to the existing units line, so it reads:
+  'Roughly X units of alcohol in a serving of Y ml'"*. Both shipped as given
+  (§13.12) — not marked PLACEHOLDER, because she wrote them; the marker is for
+  a string an agent had to invent, which is the line #1086's `drinks` draws.
+  **The punch tail extends rather than being rewritten**: "in each of 8
+  servings of 160 ml", the minimal reading of her sentence against the tail
+  #753 already had.
+
+  **THE TWO NUMBERS ARE DIFFERENT AND THE SEPARATION IS STRUCTURAL.** The
+  batch moves; the per-glass figure must not, which is #713's and #1001's
+  standing guarantee. It is kept by the moving figure living on its own element
+  with its own attribute — `data-total-ml` on `.cocktail-scale-total` — while
+  the units line carries nothing the scaler can reach. A rendered-page test
+  asserts that, because it is the kind of thing that stays true until somebody
+  helpfully adds an attribute.
+
+  **THE TOPPED DRINKS: WITHHELD FOR HALF A DAY, THEN HELEN RULED.** The first
+  shape of this printed nothing at all for the five drinks that `to top`, and
+  the question went back to her the same afternoon. Her answer, and it is the
+  whole of it: ***"Midpoint please, I'll cope on the spot."***
+
+  **The argument she overruled is kept, because it was a real one and she
+  overrode it knowingly.** Three options were on the table — say nothing, take
+  the midpoint of `top_up_ml`, or print the range. The midpoint is what
+  `cocktail_units.rb` already spends for the unit count, so it was the obvious
+  answer, and it was rejected on *what the error is worth in each line*: 25 ml
+  either way of a 100 ml pour of 12% prosecco moves a unit count by 0.3, under
+  the rounding, while the same 25 ml is a whole 25 ml of a volume — and the
+  volume line's entire purpose is "how many glasses does this fill". #1076 had
+  established the range is a stand-in for a sum this repo cannot run (a top is
+  capacity − build − room for the ice; no glass records a capacity, #295,
+  open), and one source already prints "Top (30-45)" against the house 75-100.
+  So the figure rests on a placeholder. **The range was rejected separately and
+  more cheaply**: "Approximately 172.5–222.5 ml" substitutes a shape into a
+  sentence she wrote.
+
+  **What her five words answer is the part the argument never weighed: who is
+  reading the line and when.** She is at the counter with the bottle in her
+  hand, deciding how many glasses to pour, and a figure to work from beats a
+  blank even when it is soft — she can see the glass, which is precisely the
+  term the repo is missing. **And "Approximately" turns out to be doing real
+  work** on those five drinks rather than only rounding: her own word carries
+  the declared span, which is why the change was safe to make at all. It is a
+  good illustration of §13.11 in a line of prose rather than a candidates page
+  — the argument was sound and answered the wrong question.
+
+  So a `to top` takes its midpoint, through ONE expression (`top_up_ml` in the
+  plugin) with two callers, lifted out of `units_for` rather than copied: the
+  two sentences a topped drink prints are now both spending that range and the
+  one thing they must never do is disagree about it. Tom Collins reads
+  "Approximately 237.5 ml" — 112.5 of build plus soda water's 100–150 halved —
+  and a test pins the midpoint against `costs.yml` so `ml_min` cannot quietly
+  replace it.
+
+  **TWO DRINKS STILL SAY NOTHING, AND IT IS A DIFFERENT KIND OF SILENCE.** A
+  topped figure is APPROXIMATE; these would be WRONG — an answer to a different
+  question, not a rough answer to this one — so her ruling does not reach them,
+  there being no range to take a midpoint of. The rule is not new:
+  `substantial < pours`, using `CocktailCosts::SUBSTANTIAL` itself rather than a
+  copy, so a drink whose excluded pours are INGREDIENTS rather than flourishes
+  says nothing. The Caipirinha is 45 ml of cachaça, half a lime and 20 g of palm
+  sugar, and 45 ml is not an approximation of what is in that glass — it is the
+  cachaça, and the drink is not. A dozen sugar cubes in a punch is a flourish
+  and does not spoil a figure. **The pear Bellini is caught twice over and needs
+  to be**: resolving its top would have produced a confident 97.5 ml, because
+  six of its eight pours are a batch syrup that only its METHOD portions ("Add
+  25 ml syrup to a champagne flute"). Its ingredient list does not describe one
+  serving at all.
+
+  **AND ONE TRAP IS PRIMED RATHER THAN SPRUNG.** `serve_ml` divides the whole
+  total by `serves:`, the top included, which is right for a bowl's alcohol and
+  wrong for a top — a top fills one glass, and four glasses need four tops.
+  `scripts/top_up_ml.py` found the same thing on the same data and said so. No
+  topped drink declares `serves:` today; a test asserts that, so the first
+  topped punch is a red build rather than a quietly wrong number.
+
+  **`HTF.scale.totalMl` WAS NOT REUSED, AND THAT WAS DELIBERATE.** It reads the
+  printed amount strings and its `VOLUMETRIC` map is `ml` and only `ml`, so an
+  `oz` or a `tsp` pour is a count to it; the plugin converts everything
+  `measures.per_ml` declares. Two implementations of "how big is this drink"
+  printing two sentences on one page is the drift this repo keeps writing
+  about, so the figure is computed once at build time and the browser only
+  multiplies it (`HTF.scale.batchTotalMl`). Linear is exact, not an
+  approximation: the control allows whole multiples only.
+
+  **TWO SMALLER THINGS SHE ALSO SETTLED, 2026-09-17, both left as built.** The
+  line renders without JavaScript and PRINTS, unlike the control above it — a
+  figure invites nothing where a number box invites the reader to think the
+  sheet can be changed — but the print stylesheet's own header says "a printed
+  page is the recipe as written", so whether that covered a derived total was
+  hers: *"Yes"*, keep it on paper. And at ×1 a single-glass drink says "90 ml"
+  twice, half a page apart, which she was shown and called *"Fine"* — the two
+  figures diverge the instant the scaler is touched, which is the point of
+  having both.
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16** — Ingredients are additive, never a choose-one (asked

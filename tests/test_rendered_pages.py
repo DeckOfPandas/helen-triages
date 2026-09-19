@@ -719,6 +719,131 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build():
         shutil.rmtree(out, ignore_errors=True)
 
 
+# =============================================================================
+# THE GARNISH STEP READS AS ENGLISH — #1138 and #1143, 2026-09-17
+# =============================================================================
+
+GARNISH_DRINK = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "coupe"\ngarnish:\n{garnish}'
+    'ingredients:\n  - amount: "50 ml"\n    generic: "London dry gin"\n'
+    '  - amount: "25 ml"\n    generic: "lime juice"\n'
+    'method:\n  - "Shake all ingredients with ice."\n'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  made_before: true\n  ship: "yes"\n'
+    '  rewritten: true\n  awaiting_fix: false\n  proofread: true\n---\n'
+)
+
+
+def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
+    """`A, B and C`, and no `a` before a plural. Issues #1138 and #1143.
+
+    Helen, 2026-09-17, on the Hurricane: "I think we still have 'Garnish with a
+    mint sprig and a fruit wedges and a maraschino cherry.'... 1. If the garnish
+    is plural, it should not start with 'a'. 2. If there are more than two
+    garnishes, separate all with a comma except for the penultimate pair, which
+    get no comma."
+
+    WHY A BUILT PAGE AND NOT A UNIT TEST: the rule is Liquid in
+    `_layouts/cocktail.html` and there is no harness that can call it. The
+    sentence a reader sees is the only place it can be checked.
+
+    WHY FIXTURES AND NOT REAL DRINKS: no published drink carries three garnishes
+    today (measured — five carry two, twenty-four carry one), so the list rule
+    has nothing live to bite on and would be a test asserting nothing. The drink
+    that provoked the issue is a DRAFT, which a public test may never require
+    (#624). `fruit wedges` is deliberately not in garnish.yml: it models the case
+    the old list-only rule could not reach, which is a garnish nobody has
+    classified yet — where a new spelling always appears first.
+    """
+    _require_bundler()
+    out = ROOT / "tmp" / "_test_site_garnish"
+    recipes = ROOT / "_cocktail_recipes"
+    created_dir = not recipes.exists()
+    made = []
+
+    def lines(items):
+        return "".join(f'  - "{g}"\n' for g in items)
+
+    cases = {
+        # slug: (garnishes, the sentence it must render)
+        "zzz-garnish-one": (
+            ["brandied cherry"],
+            "Garnish with a brandied cherry."),
+        "zzz-garnish-two": (
+            ["brandied cherry", "lemon wheel"],
+            "Garnish with a brandied cherry and a lemon wheel."),
+        "zzz-garnish-three": (
+            ["mint sprig", "fruit wedges", "maraschino cherry"],
+            "Garnish with a mint sprig, fruit wedges and a maraschino cherry."),
+        "zzz-garnish-four": (
+            ["mint sprig", "raspberries", "lemon wheel", "brandied cherry"],
+            "Garnish with a mint sprig, raspberries, a lemon wheel "
+            "and a brandied cherry."),
+    }
+    try:
+        recipes.mkdir(exist_ok=True)
+        for slug, (garnishes, _) in cases.items():
+            p = recipes / f"{slug}.md"
+            p.write_text(GARNISH_DRINK.format(t=slug, garnish=lines(garnishes)),
+                         encoding="utf-8")
+            made.append(p)
+
+        result = subprocess.run(
+            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
+             "--destination", str(out)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+        )
+        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
+
+        for slug, (_, expected) in cases.items():
+            page = out / "cocktails" / "recipes" / slug / "index.html"
+            assert page.exists(), f"{slug} did not build"
+            html = page.read_text(encoding="utf-8")
+            found = re.search(r"<li>Garnish with (.*?)\.</li>", html, re.S)
+            assert found, f"{slug} rendered no garnish step at all"
+            got = "Garnish with " + " ".join(
+                re.sub(r"<[^>]+>", "", found.group(1)).split()) + "."
+            assert got == expected, (
+                f"{slug}\n  expected: {expected}\n  got:      {got}\n\n"
+                "#1138 is the punctuation (one garnish is itself, two are joined "
+                "by `and`, three or more are `A, B and C` with no serial comma) "
+                "and #1143 is the article (nothing before a word ending in `s`, "
+                "whether or not it is declared in garnish.yml's `no_article`). "
+                "Both live in the garnish-step block of _layouts/cocktail.html."
+            )
+    finally:
+        for p in made:
+            p.unlink(missing_ok=True)
+        if created_dir and recipes.is_dir() and not any(recipes.iterdir()):
+            recipes.rmdir()
+        shutil.rmtree(out, ignore_errors=True)
+
+
+def test_no_garnish_contains_the_join_separator():
+    """The garnish step joins its parts with `|` and splits them back.
+
+    Liquid cannot append to an array, so the step builds one string and splits
+    it. A garnish containing the separator would silently become two garnishes.
+    Nothing does today; this is what keeps it that way, and it is cheaper than
+    choosing a cleverer separator that the next reader has to decode.
+    """
+    import yaml as _yaml
+    data = _yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "garnish.yml").read_text(encoding="utf-8"))
+    offenders = []
+    for group, values in (data.get("canonical") or {}).items():
+        for g in (values or []):
+            if isinstance(g, str) and "|" in g:
+                offenders.append(f"{group}: {g!r}")
+    assert not offenders, (
+        "Garnish value(s) containing `|`, which the garnish step uses to join "
+        "its parts before splitting them back:\n  " + "\n  ".join(offenders)
+        + "\n\nEither rename the garnish or change the separator in "
+          "_layouts/cocktail.html's garnish-step block."
+    )
+
+
 def test_the_gate_covers_a_promoted_drink():
     """The cocktail collection is gated too, and this proves it on a bare CI
     checkout. GitHub issues #667, #668 and #624.
@@ -2549,4 +2674,278 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
     assert not problems, (
         "the related-recipes row (#1005) is wrong on these pages:\n  "
         + "\n  ".join(problems[:20])
+    )
+
+
+# =============================================================================
+# HOW MUCH LIQUID IS IN A DRINK -- #1121
+# =============================================================================
+# Helen: "add total ml next to recipe scaler to help me choose the right number
+# of glasses... This means I can vary target units of alcohol myself." Two
+# sentences came out of that, and the whole risk is that they are DIFFERENT
+# NUMBERS:
+#
+#   under the scaler   "Approximately 360 ml"   -- the BATCH, and it moves
+#   in the footer      "...in a serving of 90 ml." -- ONE GLASS, and it must not
+#
+# The second guarantee is structural rather than remembered: the moving figure
+# lives on `.cocktail-scale-total`, which carries `data-total-ml`, and the units
+# line carries no attribute any of this could reach. These tests are what says
+# so about BUILT HTML, which is the only place the two sentences meet.
+#
+# BOTH LINES ARE PRODUCTION, so `prod_site`. The units line went live with #1001
+# and the volume line is ungated for the same reason: neither is a price.
+
+SCALE_TOTAL = re.compile(
+    r'<p class="cocktail-scale-total" data-total-ml="([^"]*)">(.*?)</p>', re.S)
+UNITS_LINE = re.compile(r'<p class="cocktail-units"(.*?)</p>', re.S)
+SERVING_OF = re.compile(r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml\.")
+
+# THE DRINKS THAT STATE NO VOLUME, PINNED BY NAME -- see `volume_for` in
+# _plugins/cocktail_units.rb for the rule and the argument.
+#
+# A TOPPED DRINK IS NOT ONE OF THEM, since Helen's ruling of 2026-09-17:
+# "Midpoint please, I'll cope on the spot." Five drinks printed nothing for
+# half a day because `top_up_ml` is a house range #1076 has shown is a
+# stand-in; they now spend its midpoint, which is what the unit count beside
+# them has always done, and her "Approximately" carries the span.
+#
+# WHAT IS LEFT IS A DIFFERENT KIND OF DRINK: one whose excluded pours ARE the
+# drink, where a figure would be WRONG rather than rough. The same judgement,
+# and the same constant, as `cost.complete`. The Bellini is both topped and
+# incomplete, and resolving its top does not rescue it -- six of its eight
+# pours are a batch syrup only its method portions.
+#
+# A RATCHET IN BOTH DIRECTIONS, deliberately. A new name here means a drink
+# quietly lost a figure it used to print; a name leaving means one gained a
+# figure, which is either a data fix (good -- update this list in that commit)
+# or the withholding rule being weakened by accident.
+NO_VOLUME_STATED = {
+    "caipirinha",
+    "pear-apricot-and-rosemary-bellini",
+}
+
+
+def test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot(prod_site):
+    """#1121. A figure known to be wrong is worse than no figure.
+
+    The rule is in the plugin; this is the census of what it actually withheld,
+    on the built pages, where a Liquid guard that silently inverted would show.
+    """
+    pages = _drink_pages(prod_site)
+    assert len(pages) > 20, (
+        f"only {len(pages)} drink pages in the production build -- the corpus "
+        "walk is looking in the wrong place."
+    )
+
+    silent = {p.parent.name for p in pages
+              if not SCALE_TOTAL.search(p.read_text(encoding="utf-8"))}
+
+    assert silent == NO_VOLUME_STATED, (
+        "the set of drinks printing no volume has moved.\n"
+        f"  newly silent (lost a figure they used to print): "
+        f"{sorted(silent - NO_VOLUME_STATED)}\n"
+        f"  newly speaking (gained one): {sorted(NO_VOLUME_STATED - silent)}\n"
+        "`volume_for` in _plugins/cocktail_units.rb has the rule: a drink says "
+        "nothing only when its excluded pours ARE the drink, so a figure would "
+        "be wrong rather than rough. A topped drink is NOT such a drink -- it "
+        "spends the midpoint of its declared range (Helen, 2026-09-17: "
+        "\"Midpoint please, I'll cope on the spot\")."
+    )
+
+
+def test_a_drink_with_no_volume_keeps_the_units_sentence_it_had_before(prod_site):
+    """The tail is DROPPED, never guessed, and the old sentence is the fallback.
+
+    Helen's wording is "Roughly X units of alcohol in a serving of Y ml". Where
+    Y would be wrong the line falls back to exactly what #753 shipped -- "in a
+    serving." -- rather than inventing a figure or a hedge. The Caipirinha is
+    the only drink this reaches today. The Bellini has no units line at all (no
+    alcohol is recorded in its ingredients), which is a separate, older
+    withholding and not this one.
+    """
+    problems = []
+    for page in _drink_pages(prod_site):
+        slug = page.parent.name
+        if slug not in NO_VOLUME_STATED:
+            continue
+        units = UNITS_LINE.search(page.read_text(encoding="utf-8"))
+        if not units:
+            continue
+        if SERVING_OF.search(units.group(1)):
+            problems.append(f"{slug}: states a serving volume it cannot know")
+        elif "in a serving." not in units.group(1) \
+                and "servings." not in units.group(1):
+            problems.append(f"{slug}: {' '.join(units.group(1).split())}")
+
+    assert not problems, (
+        "a drink with no stated volume must keep #753's own sentence:\n  "
+        + "\n  ".join(problems)
+    )
+
+
+def test_only_the_scaler_line_carries_a_figure_the_scaler_can_reach(prod_site):
+    """THE ONE THING THAT KEEPS THE UNITS LINE STILL.
+
+    cocktail-scale.js writes to `.cocktail-scale-total-figure` and to nothing
+    else on this subject; it finds that element by `data-total-ml`. If that
+    attribute ever appears on `.cocktail-units`, the per-serving figure becomes
+    reachable by the multiple box, which is the bug the layout's own comment
+    says to come here for. Cheap to check and impossible to notice by eye.
+    """
+    problems = []
+    for page in _drink_pages(prod_site):
+        html = page.read_text(encoding="utf-8")
+        slug = page.parent.name
+
+        for units in UNITS_LINE.finditer(html):
+            if "data-total-ml" in units.group(1):
+                problems.append(f"{slug}: the units line carries data-total-ml")
+
+        total = SCALE_TOTAL.search(html)
+        if not total:
+            continue
+
+        attr, body = total.group(1), " ".join(total.group(2).split())
+        assert re.fullmatch(r"[\d.]+", attr), f"{slug}: data-total-ml={attr!r}"
+        figure = float(attr)
+        assert figure > 0, f"{slug}: a volume of {figure}"
+
+        # THE PRINTED FIGURE IS THE ATTRIBUTE. The browser multiplies the
+        # attribute; the reader reads the text. At x1 they are the same number,
+        # and the day they are not, the line lies the moment anyone touches it.
+        expected = ("Approximately "
+                    f'<span class="cocktail-scale-total-figure">{attr}</span> ml')
+        if expected not in " ".join(total.group(0).split()):
+            problems.append(f"{slug}: {body!r} does not print {attr} ml")
+
+        # AND WHERE A DRINK IS ONE GLASS, THE FOOTER SAYS THE SAME NUMBER --
+        # the batch at x1 IS the serving. A punch divides by `serves:` and is
+        # left out of this comparison rather than given a second sum here.
+        units = UNITS_LINE.search(html)
+        if units and "each of" not in units.group(1):
+            said = SERVING_OF.search(units.group(1))
+            if said and float(said.group(1)) != figure:
+                problems.append(
+                    f"{slug}: the scaler says {figure} ml and the units line "
+                    f"says {said.group(1)} ml for the same single glass")
+
+    assert not problems, (
+        "the two volume figures on a drink page have come apart:\n  "
+        + "\n  ".join(problems[:20])
+    )
+
+
+TOP_UP_POUR = re.compile(r'<span class="cocktail-amount">\s*to top\s*</span>')
+
+
+def _topped_pages(built_site):
+    """Every built drink page that prints a `to top` in its amounts."""
+    return [p for p in _drink_pages(built_site)
+            if TOP_UP_POUR.search(p.read_text(encoding="utf-8"))]
+
+
+def test_a_topped_drink_spends_the_midpoint_of_its_declared_range(prod_site):
+    """Helen, 2026-09-17: "Midpoint please, I'll cope on the spot."
+
+    THE MIDPOINT, NOT EITHER END, and that is the whole of what this checks.
+    `top_up_ml` declares 100-150 for soda water; the Tom Collins pours
+    60 + 30 + 22.5 = 112.5 ml before it, so the three answers a plausible bug
+    could give are 212.5 (`ml_min`), 237.5 (the midpoint) and 262.5 (`ml_max`).
+    Read out of costs.yml rather than typed here, so changing the house range
+    changes this test's expectation with it -- the claim is about the RULE.
+
+    It is also, quietly, the check that both callers still share one
+    expression: the footer's unit count has spent this midpoint since #297, and
+    `top_up_ml` in the plugin is now the one place either of them asks.
+    """
+    costs = yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "costs.yml").read_text(encoding="utf-8"))
+    soda = (costs.get("top_up_ml") or {}).get("soda water")
+    assert soda, "costs.yml declares no `top_up_ml` for soda water"
+    midpoint = (float(soda["ml_min"]) + float(soda["ml_max"])) / 2
+
+    page = prod_site / "cocktails" / "recipes" / "tom-collins" / "index.html"
+    assert page.exists(), "the Tom Collins is not in the production build"
+    html = page.read_text(encoding="utf-8")
+
+    total = SCALE_TOTAL.search(html)
+    assert total, (
+        "the Tom Collins prints no volume. Since 2026-09-17 a topped drink "
+        "takes the midpoint of its declared range rather than withholding."
+    )
+    expected = 60 + 30 + 22.5 + midpoint
+    assert float(total.group(1)) == expected, (
+        f"the Tom Collins totals {total.group(1)} ml; its build is "
+        f"60 + 30 + 22.5 = 112.5 and soda water's declared "
+        f"{soda['ml_min']}-{soda['ml_max']} ml has midpoint {midpoint}, so it "
+        f"should be {expected}. `ml_min` would give "
+        f"{112.5 + float(soda['ml_min'])} and `ml_max` "
+        f"{112.5 + float(soda['ml_max'])}."
+    )
+
+
+def test_no_topped_drink_is_also_a_punch(prod_site):
+    """A PRIMED TRAP, AND THIS IS THE PIN -- `volume_for`'s closing note.
+
+    `serve_ml` divides the whole total by `serves:`, the top included. For a
+    bowl that is right about alcohol (it is shared out) and wrong about a top:
+    a top fills ONE glass, and four glasses need four tops. scripts/top_up_ml.py
+    found the same thing on the same data and said so.
+
+    No topped drink declares `serves:` today, so the two rules have never
+    disagreed on a real drink. This is what makes the first topped punch a red
+    build rather than a quietly wrong number -- the fix is to add the top after
+    the division rather than before it, in `volume_for`, and to ask Helen what
+    the scaler's own line should then say.
+
+    READ OFF THE BUILT PAGE, not the front matter: a drink with `serves:` is
+    exactly the drink whose units line says "in each of N servings".
+    """
+    offenders = []
+    for page in _topped_pages(prod_site):
+        units = UNITS_LINE.search(page.read_text(encoding="utf-8"))
+        if units and "each of" in units.group(1):
+            offenders.append(page.parent.name)
+
+    assert not offenders, (
+        "these drinks both top up and declare `serves:`, which the volume sum "
+        f"does not yet handle: {sorted(offenders)}\n"
+        "`volume_for` in _plugins/cocktail_units.rb divides the top by "
+        "`serves:` along with everything else, so each glass is credited with "
+        "a fraction of one top instead of a whole one. Add the top after the "
+        "division, and say so here."
+    )
+
+
+def test_the_aviation_prints_the_volume_its_own_amounts_add_up_to(prod_site):
+    """ONE ANCHOR WITH A REAL NUMBER IN IT, checkable by eye.
+
+    52.5 + 15 + 7.5 + 15 = 90 ml, and every other test above checks a
+    RELATIONSHIP -- which would all still pass if the plugin's arithmetic were
+    wrong in the same way in both places. This is the one that would not.
+
+    If Helen repours the Aviation, this test names itself and the fix is this
+    number. It is not a claim about the recipe; it is a claim about the sum.
+    """
+    page = prod_site / "cocktails" / "recipes" / "aviation" / "index.html"
+    assert page.exists(), "the Aviation is not in the production build"
+    html = page.read_text(encoding="utf-8")
+
+    total = SCALE_TOTAL.search(html)
+    assert total, "no volume line on the Aviation"
+    assert total.group(1) == "90", (
+        f"the Aviation totals {total.group(1)} ml; its amounts are "
+        "52.5 + 15 + 7.5 + 15 = 90"
+    )
+    assert "Approximately" in total.group(2), (
+        "Helen's wording is 'Approximately X ml' (#1121, §13.12: the voice is "
+        f"hers). The line now reads: {' '.join(total.group(2).split())!r}"
+    )
+
+    units = UNITS_LINE.search(html)
+    assert units, "no units line on the Aviation"
+    assert "of alcohol in a serving of 90 ml." in " ".join(units.group(1).split()), (
+        "Helen's wording is 'Roughly X units of alcohol in a serving of Y ml' "
+        f"(#1121). The line now reads: {' '.join(units.group(1).split())!r}"
     )
