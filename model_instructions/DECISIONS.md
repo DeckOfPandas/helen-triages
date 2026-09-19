@@ -3939,6 +3939,87 @@ unless stated.
   painted block inside a box that never changes. **Paint-only is not only about
   neighbours moving; it is also the lever that lets a fill be retuned at all.**
 
+### §9.1 — the September promotion batch, 2026-09-17 to 2026-09-19
+Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
+48 to 65. Seven promoted unchanged on 2026-09-18, ten after rulings on
+2026-09-19. What it settled, beyond the drinks:
+
+- **2026-09-17** — **Two ginger garnishes, not one.** `garnish.yml` had no
+  ginger at all and two drinks wanted different ginger. Helen: *"Ginger, yes,
+  two entries (and counting)."* A wheel off a raw root and a slice of stem
+  ginger out of its syrup are different objects; `ginger wheel` drops the
+  drafts' "fresh", since raw is the default for a root.
+- **2026-09-17** — **`fruit wedges` is declared, and is the one garnish that
+  does not name its fruit.** Offered `pineapple wedge` or Modern Zombie's `no
+  garnish`, she kept what she wrote: on a heaped tiki mug the fruit is
+  whatever is about. **A known exception, not a precedent** — #1079 settled
+  the general case the other way for POURS (*"citrus fruits aren't
+  interchangeable"*), and that ruling was about an ingredient, where the fruit
+  changes the drink.
+- **2026-09-17** — **Gunmetal Blue pours `peach brandy`, not `crème de
+  pêche`.** *"The Briottet instead of peach brandy will be because that's what
+  I had at the time, so let's remove the suggestion, just leaving the
+  generic."* `ingredients.yml` had flagged this drink BY NAME since 2026-08-29
+  (*"a 20% sweetened infusion is standing in for a 35% distillate"*). It made
+  a spec-only generic a poured one, so it needed an `abv.yml` row (35, the
+  figure already written down when the generic was coined) and a `costs.yml`
+  row (GBP 40–60/litre, `low`, sat between apple brandy and kirschwasser and
+  not shop-checked). **It also cost the drink its `fruity` mood** — a sweet
+  peach liqueur carries it, a dry distillate does not.
+- **2026-09-17** — **Hurricane gets `I want to faff` from a `mood_include`,
+  not a rule change.** *"it has 50000 ingredients AND needs a blender, does
+  that count?"* It misses by one on each axis: eight ingredients where nine is
+  the threshold, one `blend` hit where two are wanted. Measured before
+  choosing: threshold 9→8 gives it to six drinks and makes two existing
+  entries spent (a test then demands their deletion); blend-counts-as-two
+  gives it to all five drinks that blend, including the four-ingredient
+  frozen-fruit-daiquiri. She sits at exactly `sazerac`'s coordinates, and that
+  drink needed an entry too.
+- **2026-09-17** — **Ti Punch keeps a method.** Her idea was no method at all,
+  just a Serve line reading *"Assemblage au choix."*
+  `test_method_is_a_non_empty_list` refuses that — nine drinks had no method
+  until 2026-09-02 and *"a drink you cannot make rendered as a drink with
+  nothing left to do"*. So one method step, the phrase in `to_serve` where she
+  wanted it, and "sometimes I squeeze, sometimes I muddle" in a note. Dropping
+  "optionally muddle" from the method also means nothing has to assert which
+  of the two builds is THE drink.
+- **2026-09-18** — **`serve.ice` cannot carry QUANTITY, and that is what
+  separated two identical-looking corrections.** Fish House Punch and Gunmetal
+  Blue were the collection's only two `ice ice baby` `mood_include`s, written
+  on the same pass with word-for-word the same reason (*"she calls it icy; the
+  method does not say how"*). Asked about both, she kept one and withdrew the
+  other: *"Fish House Punch: a) I call 'ice tea', and b) comes over lots and
+  lots of ice"* against *"Gunmetal Blue doesn't have ice..."*. Lots of cubed
+  ice is an icy drink and one cube is not, and both are spelled `cubed`.
+  **Lesson recorded beside both entries: a `why` that paraphrases an answer
+  instead of naming a property is a `why` nobody can audit later.**
+- **2026-09-18** — **`warming` from cinnamon is a correction, not a rule
+  change.** *"I don't just want to call anything with cinnamon in it 'warming'
+  (although I accept we will often do that)."* The parenthesis is the ruling.
+  Exactly two drinks take `warming` from cinnamon ALONE — gunmetal-blue and
+  fake-id — and **fake-id keeps it**, which is what makes deleting the trigger
+  wrong.
+- **2026-09-19** — **Check `moods_by_hand` before reaching for
+  `mood_exclude`.** Told *"Biggles: drop mood 'sugar craving'"*, the reflex was
+  a correction, because the two mood changes before it had needed one.
+  `sugar craving` is hand-assigned (it fitted the rules at 0.23, the worst on
+  the 2026-08-30 table), so nothing derived it and there was nothing to
+  correct — it comes out of the drink file.
+  `test_every_mood_correction_is_reachable_and_needed` refused the entry in
+  one line.
+- **2026-09-19** — **The passion fruit shell leaves Zombie's garnish**, which
+  reverses a recommendation made two days earlier to answer #838. The layout
+  already carries the rule, for twists: *"the block above already gives them a
+  better step... 'Garnish with a lemon twist' only says what with."* The
+  method names the shell, so the garnish line was saying it twice. #838's
+  complaint does not return: it was written when that method had no build step
+  at all.
+- **2026-09-19** — **`half lime shell` becomes `half an empty lime shell`**,
+  so both shells in the vocabulary bring their own article. Granted without a
+  flag flip: *"Those rewords are fine for Mai Tais, no need to flip the
+  flag."* PIPELINE.md §5's first row, and the cheapest shape the baseline
+  constant has taken — the words she would re-read are the words she supplied.
+
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.
 - **2026-08-31** — The narrow-screen table (360px: 157px text column, 39%
@@ -3999,6 +4080,52 @@ unless stated.
 
 ## §11 Working practices
 
+- **2026-09-19** — **"Pushed" is not "she can see it", and the drinks half is
+  always the one that needs the extra step.** Ten draft URLs were handed over
+  with no mention that the files live in a SEPARATE private repo; she checked
+  out the public branch, saw nothing change, and reasonably concluded
+  something was broken. Her clone of `_cocktail_drafts/` was on its own `main`
+  the whole time. The fix is two commands, and they belong in the message that
+  gives the URLs (`PUBLISHING_A_DRINK.md` step 5). Second time the two-repo
+  split has cost a session, after the Caribbean Sazerac on 2026-09-06.
+- **2026-09-19** — **A narrow suite stops being the right check the moment a
+  commit touches `_data/`.** A garnish rename passed `tests/test_cocktails.py`
+  — where a whole promotion batch's action had been — and failed two
+  `test_standalone_docs.py` checks and the ingest-vocabulary check, because
+  the generated documents had gone stale. Only `scripts/verify.py` runs those;
+  MANUAL §1 calls them "the two checks that get forgotten" and it is right.
+  Caught before a push, so it cost a round trip.
+- **2026-09-19** — **A gate that fails closed makes a held page look exactly
+  like nothing going wrong.** Promoted drinks must be asserted BY NAME in the
+  production build, not merely copied and committed. Doing so turned up
+  Smokestack Lightning as a freebie — `proofread: false` since 2026-09-16,
+  off the live site for three days, invisible because the cards deliberately
+  do not show the flags (#562). **The file count minus the page count is the
+  number of drinks Helen is deliberately holding, and nothing else says what
+  that number should be.**
+- **2026-09-18** — **Helen starts her own dev servers; a session never offers.**
+  *"As a greater point, I start my own local servers, so don't do that."*
+  `PUBLISHING_A_DRINK.md` had invited the mistake by saying the batch was
+  "served on a port the session names". A session's job is to say WHICH pages
+  need reading and at what URLs, and stop.
+- **2026-09-19** — **`.claude/` excluded from the Jekyll build, because
+  `exclude:` is also listen's ignore list.** Her server died on *"directory is
+  already being watched!"*, which reads like a port clash and is not:
+  `scripts/browser/serve.sh` symlinks `tmp/serve/helen-triages -> ../site`, so
+  every worktree that has ever taken a screenshot holds two paths to one
+  directory, and the watcher walked into them. **The existing `tmp/` exclude
+  did not cover it** — patterns anchor at the source root. Nothing cleans that
+  symlink up and nothing should (*"Leave the worktrees — I may well want to go
+  back and look"*, 2026-09-16), so the count only grows; one line defuses all
+  of them. The session was asked to stop a dev server it had never started.
+- **2026-09-18/19** — **`COCKTAIL_BASELINE_COMMIT` moved four times in two
+  days** and not once for the thing the rule exists to catch: two promotions,
+  a garnish rewording Helen dictated, and a flag she dictated. Each move was
+  its own commit, quoting her, and proved by running the test with the OLD
+  value and reading the names. More evidence for #933's question — whether a
+  constant is the right shape — and none at all that the RULE is wrong.
+  `HELEN_CLEARED` was considered and rejected each time: it exempts a file FOR
+  EVER, which is more than a single read grants.
 - **2026-08-12** — Helen: *"Did your heading lettering change touch all
   headings on the whole site? That is what I want."*
 - **2026-08-14** — The four interaction rules written down (show don't

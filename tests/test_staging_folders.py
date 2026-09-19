@@ -25,9 +25,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 # PIPELINE.md §3. Drinks skip 1-rewrite/ ("they're not as annoying as food
 # recipes") and keep the same numbers for the rest.
+# `5-final-proofread/` IS DRINKS-ONLY FOR NOW, 2026-09-18. Helen asked for it
+# on the drinks side, where a seventeen-drink batch had just produced ten
+# bounce-backs in one sitting; food has not hit that yet and an empty folder on
+# a site that does not use it is clutter she would see every day. One name
+# means one stage on both sites where a folder exists on both -- adding it to
+# food later is this dict plus a `.gitkeep`.
 FOLDERS = {
     "_food_drafts": ["1-rewrite", "2-make", "3-keep", "4-promote"],
-    "_cocktail_drafts": ["2-make", "3-keep", "4-promote"],
+    "_cocktail_drafts": ["2-make", "3-keep", "4-promote", "5-final-proofread"],
 }
 
 

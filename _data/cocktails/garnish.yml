@@ -142,7 +142,16 @@ canonical:
     - "grapefruit crescents"
     - "citrus wheel"
     - "dehydrated lime slice wheel"
-    - "half lime shell"
+    # `half an empty lime shell` SINCE 2026-09-19, was `half lime shell`.
+    # Helen, given the choice between rewording it and adding the old form to
+    # `no_article`, picked the words: the step had been reading "Garnish with a
+    # half lime shell", which is correct data and not English anybody writes.
+    # The new form brings its own article, exactly as `half an empty passion
+    # fruit shell` does in `fruit` below, so the two shells now match -- and
+    # `empty` is the fact that makes it a garnish rather than an ingredient:
+    # the lime has been juiced into the drink and the husk is what is left.
+    # Both Mai Tais retyped in the same commit.
+    - "half an empty lime shell"
 
   fruit:
     - "pineapple wedge"
@@ -170,6 +179,21 @@ canonical:
     # `cucumber wheels`, `kaffir lime leaves`, `grapefruit crescents`) are
     # still in the list and no longer need to be; they are left there because
     # an explicit ruling is not worth deleting to save four lines.
+    #
+    # IT IS A KNOWN EXCEPTION TO THIS FILE'S OWN RULE, NOT A PRECEDENT, and
+    # she was offered the alternatives before choosing it: `pineapple wedge`,
+    # declared above and used by three drinks, or Modern Zombie's `no garnish`.
+    # #1079 settled the general case the other way -- "'citrus slice' shouldn't
+    # be the generic because citrus fruits aren't interchangeable" -- but that
+    # ruling was about a POUR, where the fruit changes the drink. This is
+    # decoration on a heaped tiki mug, where it does not. The next vague
+    # garnish still gets asked about rather than added on the strength of this
+    # one.
+    #
+    # THIS ENTRY WAS WRITTEN TWICE, by two sessions on the same day, and the
+    # merge kept the better half of each. That is the cost of two agents in one
+    # collection; the duplicate was caught by reading the merged file rather
+    # than by any test, because a YAML list happily holds the same string twice.
     - "fruit wedges"
     - "half an empty passion fruit shell"
     - "pineapple and brandied cherry"
@@ -212,6 +236,23 @@ canonical:
   spice_and_other:
     - "grated nutmeg"
     - "cinnamon stick"
+    # GINGER, TWO ENTRIES, 2026-09-17. Helen: "Ginger, yes, two entries (and
+    # counting)" -- so this is deliberately not one `ginger` garnish with the
+    # cut left to the maker. A wheel cut off a raw root and a slice of stem
+    # ginger out of its syrup are different objects: one is hot and fibrous,
+    # the other sweet and soft, and a drink that wants one does not want the
+    # other. Biggles Sidecar takes the wheel, German Vacation the stem slice.
+    #
+    # `ginger wheel` AND NOT `fresh ginger wheel`, which is how Biggles Sidecar
+    # wrote it. Raw is the default for a root, the same way `lemon wheel` does
+    # not say fresh -- and `stem ginger slice` beside it is the one that has to
+    # say what it is, because preserved is the departure. Shortest name that
+    # says what it is, the rule that collapsed the twists above.
+    #
+    # "and counting" is a warning, not a shrug: more ginger is expected, so the
+    # next cut gets its own entry here rather than widening one of these two.
+    - "ginger wheel"
+    - "stem ginger slice"
     # THE COUNT IS THE SPEC HERE, which is why it survives where `12
     # raspberries` did not. Three coffee beans is the Espresso Martini, not an
     # arbitrary number of beans.
@@ -271,12 +312,23 @@ proposals: {}
 # right for 35 of them and a field that is almost always the same value stops
 # being read.
 no_article:
+  # `fruit wedges` WAS ADDED HERE ON 2026-09-19 AND TAKEN OUT AGAIN IN THE
+  # SAME DAY'S MERGE, which is worth a line because the two fixes disagreed
+  # about the shape and the other one was right. Two sessions hit Helen's
+  # "Garnish with a fruit wedges" independently: one added the plural to this
+  # list, the other (#1143) made a trailing `s` drop the article on its own
+  # and left this list holding only what `s` cannot reach. A LIST CAN ONLY
+  # NAME A GARNISH SOMEONE HAS DECLARED, and the value that broke was a
+  # draft's, declared nowhere -- so the list-only fix would have gone on being
+  # silent about exactly the values nobody has classified yet, which is where
+  # a new spelling always appears first.
   - grapefruit crescents
   - raspberries
   - kaffir lime leaves
   - cucumber wheels
   - grated nutmeg
   - three coffee beans
+  - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"
   - pineapple and brandied cherry       # two things, not one
   - no garnish                          # never rendered as a step anyway

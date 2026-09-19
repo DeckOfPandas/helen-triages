@@ -66,13 +66,36 @@ DRAFTS = ROOT / "_cocktail_drafts"
 # own proofread. So the rules that bite at promotion bite HERE, where there is
 # still time to fix them, rather than at the moment of the move. See
 # `_load_staged`.
-# `4-promote/` SINCE 2026-09-14 (#1008), was `4-promote/`. Helen numbered the
+# `4-promote/` SINCE 2026-09-14 (#1008), was `to-promote/`. Helen numbered the
 # staging folders so they sort in pipeline order at the top of her file list:
 # "I'd like each subfolder to appear in order at the top of my files list --
 # small usability tweak for future-Helen. So shall we try 1-rewrite, 2-make,
 # and so on?" PIPELINE.md §3 is the set: 1-rewrite (food only), 2-make, 3-keep,
-# 4-promote.
-STAGED = DRAFTS / "4-promote"
+# 4-promote, 5-final-proofread (drinks only).
+#
+# TWO FOLDERS SINCE 2026-09-18, AND THE PLURAL IS THE WHOLE POINT.
+# `5-final-proofread/` holds a drink that was staged for promotion and bounced
+# back because something in it needs Helen. It is just as much the published
+# tense as `4-promote/` is -- it got there BY being staged, it is going to be
+# promoted the moment she rules, and the only difference is which of them is
+# holding it up. So the rules that bite at promotion must bite there too.
+#
+# LEAVING THIS SINGULAR WOULD HAVE FAILED SILENTLY, which is why it is spelled
+# out. `test_a_staged_drink_writes_a_bottles_canonical_name` and
+# `test_a_staged_drink_carries_no_transcription_field` are the two rules that
+# read it, and both would simply have stopped applying to exactly the drinks
+# that sit longest in a folder being edited -- a drink could pick up a
+# shorthand alias or an `item` while it waited for a ruling, and nothing would
+# say so. A test that stops checking reports green.
+STAGED_DIRS = (DRAFTS / "4-promote", DRAFTS / "5-final-proofread")
+# The folder names as prose, for failure messages that want to say WHERE the
+# rule bites. Derived here rather than spelled out in each message so there is
+# one list -- and it exists as its own constant because the AST guard below
+# (`test_every_drink_reading_test_goes_through_the_loader`) refuses any test
+# that names `STAGED_DIRS` directly, which it should: naming the paths inside a
+# test is how a test comes to read the collection without the loader. It caught
+# this on the day the folder was added, which is the guard doing its job.
+STAGED_NAMES = ", ".join(f"`{d.name}/`" for d in STAGED_DIRS)
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
 BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
@@ -457,7 +480,7 @@ def _load_published():
 
 
 def _load_staged():
-    """The published tense: `_cocktail_recipes/` plus `_cocktail_drafts/4-promote/`.
+    """The published tense: `_cocktail_recipes/` plus every staging folder in STAGED_DIRS.
 
     A THIRD DOOR, AND IT EXISTS BECAUSE PROMOTION IS TOO LATE TO FIND OUT.
     `_load_published` asks about drinks the world can already see, which is the
@@ -472,28 +495,39 @@ def _load_staged():
     ships -- so a file in there is finished prose waiting on her proofread, and
     the fields the site publishes should already be in their published form.
 
-    IT SKIPS WHEN NEITHER DIRECTORY IS ON DISK, and only then. `4-promote/`
-    lives in the private drafts repo, so CI never has it; `_cocktail_recipes/`
-    is in this repo and is simply empty today. Either one present and yielding
-    drinks is enough to run, which is the same bargain `_load_files` strikes --
-    "this machine has no staged drinks" and "I looked and found nothing" must
-    not produce the same green.
+    `5-final-proofread/` JOINED 2026-09-18 and is the same tense for the same
+    reason. A drink is there because it WAS staged and got bounced back for a
+    ruling only Helen can give, so it is finished prose waiting on her exactly
+    as `4-promote/` is -- the difference is only which of them is holding it
+    up, and a drink sits there longest, being edited, which is when a shorthand
+    alias or a stray `item` is most likely to creep in. See STAGED_DIRS.
+
+    IT SKIPS WHEN NO DIRECTORY IS ON DISK, and only then. The staging folders
+    live in the private drafts repo, so CI never has them; `_cocktail_recipes/`
+    is in this repo. Any one present and yielding drinks is enough to run,
+    which is the same bargain `_load_files` strikes -- "this machine has no
+    staged drinks" and "I looked and found nothing" must not produce the same
+    green.
     """
-    out = _read(RECIPES) + _read(STAGED)
+    out = _read(RECIPES)
+    for staged in STAGED_DIRS:
+        out += _read(staged)
     if out:
         return out
-    if not (RECIPES.is_dir() or STAGED.is_dir()):
+    if not (RECIPES.is_dir() or any(d.is_dir() for d in STAGED_DIRS)):
         pytest.skip(
-            "Neither `_cocktail_recipes/` nor `_cocktail_drafts/4-promote/` is "
-            "on this machine, so there is no staged drink to check. The staging "
-            "folder is in the private drafts repo (gitignored here), and "
-            "`_cocktail_recipes/` starts empty -- see NO_DRINKS_REASON."
+            "Neither `_cocktail_recipes/` nor any staging folder "
+            f"({', '.join(d.name for d in STAGED_DIRS)}) is on this machine, so "
+            "there is no staged drink to check. The staging folders are in the "
+            "private drafts repo (gitignored here), and `_cocktail_recipes/` "
+            "starts empty -- see NO_DRINKS_REASON."
         )
     pytest.skip(
         "No drinks are staged for publication. `_cocktail_recipes/` is empty "
-        "and `_cocktail_drafts/4-promote/` holds nothing, which is a fact "
-        "about where Helen is rather than a stale loader: these rules start "
-        "running the moment she moves the first file into either."
+        f"and the staging folders ({', '.join(d.name for d in STAGED_DIRS)}) "
+        "hold nothing, which is a fact about where Helen is rather than a "
+        "stale loader: these rules start running the moment she moves the "
+        "first file into any of them."
     )
 
 
@@ -753,7 +787,15 @@ def test_every_drink_reading_test_goes_through_the_loader():
         if node.name in LOADER_GUARDS:
             continue
         names = {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
-        named = sorted(names & {"RECIPES", "DRAFTS", "STAGED"})
+        # `STAGED_DIRS` since 2026-09-18, and `STAGED` stays in the set on
+        # purpose even though no such name exists any more: a test written
+        # against the old singular would be a NameError rather than a silent
+        # hole, but leaving it costs nothing and the guard is here precisely
+        # for the things nobody thought of. Rename this constant again and the
+        # new name must join this set in the same commit, or the guard quietly
+        # stops seeing direct access to it -- green, in CI only, which is the
+        # #540 hole reopening.
+        named = sorted(names & {"RECIPES", "DRAFTS", "STAGED", "STAGED_DIRS"})
         if named:
             offenders.append(f"{node.name} names {', '.join(named)} directly")
 
@@ -994,7 +1036,8 @@ def test_a_staged_drink_writes_a_bottles_canonical_name():
         "Staged drink(s) writing a bottle's ALIAS rather than its name:\n  "
         + "\n  ".join(sorted(bad))
         + "\n\nRetype the `suggestion` to the name on the right -- the one "
-          "_data/cocktails/bottles.yml declares. A drink in `4-promote/` or "
+          "_data/cocktails/bottles.yml declares. A drink in a staging folder "
+          f"({STAGED_NAMES}) or in "
           "`_cocktail_recipes/` is finished writing and is read by strangers, "
           "and an alias is shorthand Helen wrote for herself while transcribing "
           "(\"'ED3' isn't a bottle\", 2026-09-04). Everywhere else the opposite "
@@ -1480,7 +1523,85 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # keep proofread true". Proved with the old value first: the test named
 # arrack-christmas-punch-wife-3.md and nothing else. Covers 3039210 and nothing
 # after it.
-COCKTAIL_BASELINE_COMMIT = "3039210"   # one bare `suggestion` string in #1126's proofread, on Helen's word
+# MOVED 2026-09-18 FOR A PROMOTION, WHICH IS THE ONE CASE THIS CONSTANT CANNOT
+# TELL APART FROM AN EDIT. `b196949` copies seven drinks from the private
+# repo's `4-promote/` into `_cocktail_recipes/` unchanged -- byte-for-byte,
+# asserted at copy time -- and the test reads the PUBLIC repo's history only
+# (#624), so all it can see is seven files marked `proofread: true` appearing
+# in an agent's commit. That is indistinguishable from an agent editing seven
+# proofread drinks, and it is exactly what `PUBLISHING_A_DRINK.md` step 6
+# warned this constant would have to absorb.
+#
+# HER GRANT, and the read is already done rather than promised, which makes
+# this the cheapest shape rather than the sixth move's. Helen, 2026-09-18, of
+# the seven: "Are the 7 remainders ready to promote otherwise? If yes then
+# please do it." Four of them this batch never touched at all; the other three
+# were edited only from `notes:` YAML null to `notes: []`, which renders
+# identically -- so her existing proofread covers the published bytes exactly,
+# and no page went up that she has not read. The ten drinks that DID change
+# visibly are not here: they went to `proofread: false` and are back with her.
+#
+# Proved with the old value first, as every move before it was: the test named
+# all seven promoted files and nothing else. Covers b196949 and nothing after.
+# MOVED AGAIN 2026-09-19, FOR A GARNISH REWORDING SHE DICTATED. `3644a61`
+# retypes `half lime shell` to `half an empty lime shell` in both Mai Tais and
+# in garnish.yml, because the generated step had been reading "Garnish with a
+# half lime shell" -- correct data and not English. Helen chose the words
+# herself and then granted the flag: "Those rewords are fine for Mai Tais, no
+# need to flip the flag."
+#
+# THE CHEAPEST OF THE SHAPES THIS CONSTANT HAS TAKEN, and the fourth move's
+# exactly -- a change she could see whole in the sentence that asked for it,
+# where the words she is being asked to re-read are the words she supplied.
+# Flipping would have taken the classic Mai Tai off the live site until she
+# re-read a page whose only change was her own. `PIPELINE.md` §5's first row
+# is this case in as many words: a word or a number, asked first, granted
+# without the flip.
+#
+# Proved with the old value first: the test named
+# `_cocktail_recipes/mai-tai.md` and `mai-tai-diffords-recipe.md`, and nothing
+# else. Covers 3644a61 and nothing after.
+# MOVED 2026-09-19 FOR THE BATCH'S SECOND PROMOTION, which finishes it. `4eacc21`
+# copies the remaining ten out of `5-final-proofread/` unchanged -- byte-for-byte,
+# asserted at copy time -- and this test reads the PUBLIC repo's history only
+# (#624), so all it can see is ten files marked `proofread: true` appearing in an
+# agent's commit. Indistinguishable from an agent editing ten proofread drinks,
+# which is the case `PUBLISHING_A_DRINK.md` step 6 says this constant exists to
+# absorb.
+#
+# HER GRANT: "Those are all fine. Set proofread to true, and fully promote!"
+# The flags were set by Claude on her word in the private repo's 52590ba, which
+# is step 5's documented alternative ("tells Claude the slugs and Claude flips
+# them on her word") rather than an exception to it. She had been reading the
+# rendered pages throughout -- she quoted Zombie Intoxica's generated garnish
+# line back verbatim, article bug and all, which is not visible in the source.
+#
+# Proved with the old value first, as every move before it: the test named all
+# ten promoted files and nothing else. Covers 4eacc21 and nothing after.
+# MOVED 2026-09-19 FOR ONE FLAG ON ONE DRINK, AND THIS IS THE SHAPE THE
+# MECHANISM IS WEAKEST AT. `1031e77` sets `proofread: true` on Smokestack
+# Lightning and changes nothing else in the file. Helen: "Smokestack is
+# proofread, please flip the flag and commit with this work now." The drink had
+# been off the live site since 9d5621a on 2026-09-16 and nothing surfaced that
+# -- the cards deliberately do not show the flags (#562) -- so it was found by
+# counting 65 files against 64 pages while checking something unrelated.
+#
+# NOT A `HELEN_CLEARED` ENTRY, and the drinks side has no such list anyway.
+# `test_front_matter.py`'s baseline comment worked through the same choice on
+# 2026-09-10 and reached the same answer: an exemption entry covers a file FOR
+# EVER, which is more than a single read grants, while the baseline covers this
+# commit and nothing after -- so the next agent edit to this drink trips the
+# test again, which is correct.
+#
+# FOUR MOVES IN TWO DAYS, all for promotions or for a flag Helen dictated, and
+# none for an edit the rule was written to catch. #933 asks whether a constant
+# is the right shape for this at all; this batch is more evidence that it is
+# not, and none that the RULE is wrong.
+#
+# Proved with the old value first: the test named
+# `_cocktail_recipes/smokestack-lightning.md` and nothing else. Covers 1031e77
+# and nothing after.
+COCKTAIL_BASELINE_COMMIT = "1031e77"   # Smokestack Lightning's flag, on Helen's word
 
 
 def _newest_commit_per_published_drink():

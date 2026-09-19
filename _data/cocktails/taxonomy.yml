@@ -711,11 +711,26 @@ mood_include:
   fish-house-punch:
     moods: [ice ice baby, sharp]
     why: >-
-      she calls it icy; the method does not say how; she calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  gunmetal-blue:
-    moods: [ice ice baby]
+      Helen, 2026-09-18, asked directly because this and gunmetal-blue were the collection's only two `ice ice baby` corrections and the other one turned out to be wrong: "Fish House Punch: a) I call 'ice tea', and b) comes over lots and lots of ice." SO THIS ENTRY IS RIGHT AND STAYS, and the reason is now a fact about the drink rather than the vague "she calls it icy" it said before. `serve.ice` is `cubed`, which the rule deliberately does not count -- crushed, large cube, block and blended are the values that earn the mood -- and the thing the field cannot carry is QUANTITY. Lots and lots of cubed ice is an icy drink; one cube in a rocks glass is not, and both are spelled `cubed`. She calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  # GUNMETAL-BLUE'S `ice ice baby` ENTRY WAS HERE AND IS GONE, 2026-09-18. It
+  # read "she calls it icy; the method does not say how" -- word for word what
+  # fish-house-punch's said above, written on the same pass -- and it was the
+  # only thing giving that drink the mood: `serve.ice` is `none`, the method
+  # shakes and strains into a coupe, and no other drink in the collection
+  # carried `ice ice baby` on `serve.ice: "none"`. Helen, 2026-09-18, reading
+  # her own moods back: "Gunmetal Blue doesn't have ice..."
+  #
+  # WHAT THE PAIR IS WORTH REMEMBERING FOR. Two entries, identical wording,
+  # one right and one wrong, and the words could not tell them apart: "she
+  # calls it icy" records that she answered, not what is true of the drink.
+  # Asked again about both, she gave a checkable fact for one -- lots and lots
+  # of ice -- and withdrew the other. A `why` that paraphrases an answer
+  # instead of naming the property is a `why` nobody can audit later, which is
+  # this field's whole job.
+  hurricane-classic:
+    moods: [I want to faff]
     why: >-
-      she calls it icy; the method does not say how.
+      Helen, 2026-09-17: "Hurricane gained faff because it has 50000 ingredients AND needs a blender, does that count?" Under the rule it does not, by one on each axis -- eight ingredients where nine is the threshold, and `blend` is one faff word where two hits are wanted -- so neither half reaches on its own and the drink derived nothing. Her judgement is that the two halves together do reach, which is precisely what this block is for. A PER-DRINK CORRECTION AND NOT A RULE CHANGE, measured before choosing: dropping the threshold to eight would hand the mood to six drinks and make the sazerac and pear-apricot-and-rosemary-bellini entries below spent (a test then demands their deletion), and counting a blend as two moments would give it to all five drinks that blend, including the four-ingredient frozen-fruit-daiquiri. Both are bigger claims than she made. Note she sits at exactly the same coordinates as sazerac and the bellini -- eight ingredients, a one-hit method -- and both of those needed an entry here too.
   kill-devil-punch:
     moods: [I want to faff]
     why: >-
@@ -797,6 +812,21 @@ mood_include:
 # Add it back here if she says tiki; leave it if she does not.
 
 mood_exclude:
+  # BIGGLES SIDECAR WAS BRIEFLY HERE, 2026-09-19, AND SHOULD NEVER HAVE BEEN.
+  # Helen said "Biggles: drop mood 'sugar craving'" and the reflex was a
+  # correction, because the two mood changes before it needed one. This one did
+  # not: `sugar craving` is in `moods_by_hand` below, so no rule derives it on
+  # any drink and there was nothing to correct -- dropping it is an ordinary
+  # edit to the drink file. `test_every_mood_correction_is_reachable_and_needed`
+  # caught it in one line ("'sugar craving' is not derived anyway -- nothing to
+  # remove, so this entry does nothing"), which is the guard earning its keep
+  # against exactly the failure it was written for: a correction that reads as
+  # a live reason while doing nothing.
+  #
+  # THE TELL, FOR NEXT TIME: check `moods_by_hand` before reaching for
+  # `mood_exclude`. A hand-assigned mood is Helen's to add and remove in the
+  # file, and the ten in that list are precisely the ones where the rules were
+  # measured against her own pass and lost.
   # BLUE HAWAIIAN'S EXCLUSION IS GONE, 2026-08-30. It read: "it has coconut
   # cream, which is genuinely on the rich list... don't take it off the dessert
   # list until it's failed us more than this." It has not failed -- Helen
@@ -819,6 +849,25 @@ mood_exclude:
       `churn` left `mood_step_words.faff` and this line was no longer doing
       anything. A correction that has been overtaken by a rule is a correction
       that lies about why a drink is tagged, so it goes.
+  gunmetal-blue:
+    moods: [warming]
+    why: >-
+      Helen, 2026-09-18: "I don't just want to call anything with cinnamon in
+      it 'warming' (although I accept we will often do that)." The
+      parenthesis is why this is a correction and not a rule change, and she
+      was offered both: `cinnamon syrup` sits in `mood_ingredients.warming`
+      and the rule is one-hit, so 7.5 ml of it in a 92.5 ml drink of mezcal,
+      blue curacao and peach brandy reads as a warm drink. It is not one.
+      MEASURED BEFORE CHOOSING, because the alternative was cheap enough to be
+      tempting: exactly two drinks in the collection take `warming` from
+      cinnamon ALONE -- this one and fake-id -- so deleting `cinnamon syrup`
+      from the trigger list would have cost only those two. FAKE-ID KEEPS IT,
+      which is what makes the rule change wrong: it is a strong brown drink
+      that is also `nightcap` and `festive`, and cinnamon is doing real work
+      there. Every other cinnamon-syrup drink (ginger-snap, cobras-fang) also
+      carries ginger or warm-spiced bitters and would keep the mood either way.
+      The drink is left on three moods, which Helen confirmed on sight: "fine
+      with three moods".
 
 # `mood_up_glasses` WENT WITH `up`, 2026-08-30. It listed the stemmed glasses
 # and nothing reads it any more. Recovering it means recovering the mood; both

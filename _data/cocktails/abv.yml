@@ -465,6 +465,19 @@ generics:
   aguardiente:            { abv: 40,   confidence: high }
   apple brandy:           { abv: 40,   confidence: medium }
   kirschwasser:           { abv: 40,   confidence: medium }
+  # NEW 2026-09-18, arriving with Gunmetal Blue, which is the generic's first
+  # pour. 35 is the figure `ingredients.yml` already carried when the generic
+  # was coined on 2026-08-29 ("Distilled peach wine, ~35%, clear or aged"), so
+  # this is not a fresh guess -- it is the number that was written down at the
+  # time being read by the layer that needs it. `medium`, the same as its two
+  # siblings above: a category figure, no label read.
+  #
+  # DELIBERATELY BELOW THE 40 THE OTHER FRUIT DISTILLATES CARRY. A peach brandy
+  # is distilled peach WINE and runs lower than a pomace or apple spirit; the
+  # whole reason this generic exists is that `crème de pêche` at 18-20 was
+  # standing in for it, and splitting the difference at 40 would repeat that
+  # mistake in the other direction.
+  peach brandy:           { abv: 35,   confidence: medium }
   # 20, CONFIRMED by Helen 2026-09-14 (#1012): "Apple schnapps: 20% (the 40%
   # is the brandies)." The `qq:` said the category spans 15 to 40; the top of
   # that range was the apple brandies, which are their own generic above.
