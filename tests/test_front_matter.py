@@ -585,7 +585,36 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # way in this commit). Proved with the old value first: the test named
 # meringue-swans-with-diplomat-cream.md and nothing else. Covers 3039210 and
 # nothing after it.
-BASELINE_COMMIT = "3039210"   # three mechanical faults in #1126's proofread, on Helen's word
+# MOVED 2026-09-19 FOR #982's 18 RECIPES, AND THE BLUNTNESS THAT USUALLY ARGUES
+# AGAINST A BASELINE IS WHY IT IS RIGHT HERE. `4390dfc` sets `proofread: true`
+# on the 18 still-false recipes of `e27753a` ("Move 24 ingredients' measures
+# from item: into amount: (#982)"), which is precisely the "sweeping and
+# content-free" case HELEN_CLEARED's own comment names as the baseline's job --
+# fifteen entries would have been fifteen lines saying the same sentence.
+#
+# HER GRANT: "the 24 files in this commit are perfect... Please find them, set
+# proofread to true, and PR. I just tried to cook mussels and they weren't
+# there!" One recipe of the twenty was the one she went looking for and could
+# not find; the gate had been holding all eighteen since 2026-09-12.
+#
+# THE HAZARD THIS COMMENT WARNS ABOUT WAS MEASURED, NOT WAVED AWAY. A baseline
+# "grandfathers EVERYTHING at or before a commit", and the 2026-08-21 en-dash
+# pass chose thirteen HELEN_CLEARED entries over one baseline move precisely
+# because #406's citation work was being held at `proofread: false` behind it.
+# Nothing is being held now: all 90 recipes are `proofread: true` and
+# `awaiting_fix: false` (`tmp/held_food.py`), 90 files produce 90 pages, and
+# running this test against `4390dfc` named ONLY that commit's own files -- so
+# there is no other recipe whose agent edit this move could silence.
+#
+# `e27753a` ITSELF IS NOT THE BASELINE, deliberately. The flag flip is a later
+# commit and the test reads each file's NEWEST commit, so the baseline has to
+# cover the flip. Three of the twenty needed nothing: beef-wellington,
+# indonesian-chicken-curry-gulai-ayam and lemon-meringue-pie are already in
+# HELEN_CLEARED, which is why the guard named fifteen and not eighteen.
+#
+# Proved with the old value first, as every move before it: the test named the
+# fifteen files of `4390dfc` and nothing else. Covers 4390dfc and nothing after.
+BASELINE_COMMIT = "4390dfc"   # #982's 18 recipes, on Helen's word
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
