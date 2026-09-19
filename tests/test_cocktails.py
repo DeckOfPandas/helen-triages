@@ -1543,7 +1543,25 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 #
 # Proved with the old value first, as every move before it was: the test named
 # all seven promoted files and nothing else. Covers b196949 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "b196949"   # seven drinks promoted unchanged, on Helen's word
+# MOVED AGAIN 2026-09-19, FOR A GARNISH REWORDING SHE DICTATED. `3644a61`
+# retypes `half lime shell` to `half an empty lime shell` in both Mai Tais and
+# in garnish.yml, because the generated step had been reading "Garnish with a
+# half lime shell" -- correct data and not English. Helen chose the words
+# herself and then granted the flag: "Those rewords are fine for Mai Tais, no
+# need to flip the flag."
+#
+# THE CHEAPEST OF THE SHAPES THIS CONSTANT HAS TAKEN, and the fourth move's
+# exactly -- a change she could see whole in the sentence that asked for it,
+# where the words she is being asked to re-read are the words she supplied.
+# Flipping would have taken the classic Mai Tai off the live site until she
+# re-read a page whose only change was her own. `PIPELINE.md` §5's first row
+# is this case in as many words: a word or a number, asked first, granted
+# without the flip.
+#
+# Proved with the old value first: the test named
+# `_cocktail_recipes/mai-tai.md` and `mai-tai-diffords-recipe.md`, and nothing
+# else. Covers 3644a61 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "3644a61"   # the lime shell rewording, on Helen's word
 
 
 def _newest_commit_per_published_drink():
