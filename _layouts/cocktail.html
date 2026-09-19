@@ -996,7 +996,22 @@ layout: default
 
          `no garnish` NEVER RENDERS A STEP. It is the decision that this drink
          takes none, which is worth recording and not worth instructing. {% endcomment %}
-      {% assign garnish_step = "" %}
+      {% comment %} THREE OR MORE GARNISHES NEED COMMAS, NOT MORE "and"s.
+         Until 2026-09-19 every join was " and ", so the Mai Tai read "Garnish
+         with a half lime shell and a mint sprig and a fruit stick" -- correct,
+         and not a sentence anybody would write. Four drinks carried three or
+         more garnishes and all four read like that; it went unnoticed because
+         the collection was almost all one- and two-garnish drinks, where " and
+         " is right and stays.
+
+         Built by collecting the parts into a `|`-delimited string and
+         splitting it, because Liquid cannot append to an array. `|` is safe as
+         a delimiter for the same reason the twist check above already uses it
+         to bound a name: no garnish in the vocabulary contains one.
+
+         NO OXFORD COMMA -- "a, b and c" -- which is the house style everywhere
+         else on the site. {% endcomment %}
+      {% assign garnish_parts = "" %}
       {% for g in page.garnish %}
         {% capture bounded %}|{{ g }}|{% endcapture %}
         {% unless declared_twists contains bounded or g == "no garnish" %}
@@ -1009,12 +1024,23 @@ layout: default
             {% assign article = "" %}
           {% endif %}
           {% capture one %}{{ article }}{{ g }}{% endcapture %}
-          {% if garnish_step == "" %}
-            {% assign garnish_step = one %}
+          {% if garnish_parts == "" %}
+            {% assign garnish_parts = one %}
           {% else %}
-            {% capture garnish_step %}{{ garnish_step }} and {{ one }}{% endcapture %}
+            {% capture garnish_parts %}{{ garnish_parts }}|{{ one }}{% endcapture %}
           {% endif %}
         {% endunless %}
+      {% endfor %}
+      {% assign garnish_list = garnish_parts | split: "|" %}
+      {% assign garnish_step = "" %}
+      {% for p in garnish_list %}
+        {% if forloop.first %}
+          {% assign garnish_step = p %}
+        {% elsif forloop.last %}
+          {% capture garnish_step %}{{ garnish_step }} and {{ p }}{% endcapture %}
+        {% else %}
+          {% capture garnish_step %}{{ garnish_step }}, {{ p }}{% endcapture %}
+        {% endif %}
       {% endfor %}
       {% if garnish_step != "" %}<li>Garnish with {{ garnish_step }}.</li>{% endif %}
     </ol>

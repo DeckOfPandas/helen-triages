@@ -812,6 +812,21 @@ mood_include:
 # Add it back here if she says tiki; leave it if she does not.
 
 mood_exclude:
+  # BIGGLES SIDECAR WAS BRIEFLY HERE, 2026-09-19, AND SHOULD NEVER HAVE BEEN.
+  # Helen said "Biggles: drop mood 'sugar craving'" and the reflex was a
+  # correction, because the two mood changes before it needed one. This one did
+  # not: `sugar craving` is in `moods_by_hand` below, so no rule derives it on
+  # any drink and there was nothing to correct -- dropping it is an ordinary
+  # edit to the drink file. `test_every_mood_correction_is_reachable_and_needed`
+  # caught it in one line ("'sugar craving' is not derived anyway -- nothing to
+  # remove, so this entry does nothing"), which is the guard earning its keep
+  # against exactly the failure it was written for: a correction that reads as
+  # a live reason while doing nothing.
+  #
+  # THE TELL, FOR NEXT TIME: check `moods_by_hand` before reaching for
+  # `mood_exclude`. A hand-assigned mood is Helen's to add and remove in the
+  # file, and the ten in that list are precisely the ones where the rules were
+  # measured against her own pass and lost.
   # BLUE HAWAIIAN'S EXCLUSION IS GONE, 2026-08-30. It read: "it has coconut
   # cream, which is genuinely on the rich list... don't take it off the dessert
   # list until it's failed us more than this." It has not failed -- Helen
