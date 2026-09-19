@@ -242,6 +242,29 @@ exclude:
   # collected by `node --test` and failing against a path that doesn't resolve
   # from its copied location. The scratch folder is not part of the site.
   - tmp/
+  # `.claude/` AND THE REASON IS THE WATCHER, NOT THE OUTPUT. Nothing in here
+  # was ever being served -- Jekyll skips dotfiles when it collects site files
+  # -- but `exclude:` is ALSO what Jekyll hands listen as its ignore list, and
+  # listen is not so fussy. Running `jekyll-local` from the repo root walked
+  # every agent worktree under `.claude/worktrees/`, and died:
+  #
+  #     Directory: .../worktrees/big-design/tmp/serve/helen-triages
+  #     is already being watched through: .../worktrees/big-design/tmp/site
+  #     ** ERROR: directory is already being watched! **
+  #
+  # `scripts/browser/serve.sh` symlinks `tmp/serve/helen-triages -> ../site`,
+  # so a worktree that has ever taken a screenshot holds two paths to one
+  # directory, and listen refuses the second. Nothing cleans that symlink up
+  # and nothing should -- Helen, 2026-09-16, on the worktrees themselves:
+  # "Leave the worktrees -- I may well want to go back and look." So the count
+  # of these only ever grows, and every one of them is a mine under her own
+  # dev server.
+  #
+  # THE `tmp/` LINE ABOVE DOES NOT COVER IT: exclude patterns anchor at the
+  # source root, so `tmp/` matches `<root>/tmp/` and never
+  # `.claude/worktrees/<name>/tmp/`. Diagnosed 2026-09-19, when the symptom
+  # ("stop your dev server") named a server that did not exist.
+  - .claude/
   - .jekyll-cache/
   - .sass-cache/
   - Gemfile
