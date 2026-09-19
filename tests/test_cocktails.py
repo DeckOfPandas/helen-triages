@@ -1561,7 +1561,24 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first: the test named
 # `_cocktail_recipes/mai-tai.md` and `mai-tai-diffords-recipe.md`, and nothing
 # else. Covers 3644a61 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "3644a61"   # the lime shell rewording, on Helen's word
+# MOVED 2026-09-19 FOR THE BATCH'S SECOND PROMOTION, which finishes it. `4eacc21`
+# copies the remaining ten out of `5-final-proofread/` unchanged -- byte-for-byte,
+# asserted at copy time -- and this test reads the PUBLIC repo's history only
+# (#624), so all it can see is ten files marked `proofread: true` appearing in an
+# agent's commit. Indistinguishable from an agent editing ten proofread drinks,
+# which is the case `PUBLISHING_A_DRINK.md` step 6 says this constant exists to
+# absorb.
+#
+# HER GRANT: "Those are all fine. Set proofread to true, and fully promote!"
+# The flags were set by Claude on her word in the private repo's 52590ba, which
+# is step 5's documented alternative ("tells Claude the slugs and Claude flips
+# them on her word") rather than an exception to it. She had been reading the
+# rendered pages throughout -- she quoted Zombie Intoxica's generated garnish
+# line back verbatim, article bug and all, which is not visible in the source.
+#
+# Proved with the old value first, as every move before it: the test named all
+# ten promoted files and nothing else. Covers 4eacc21 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "4eacc21"   # ten drinks promoted unchanged, on Helen's word
 
 
 def _newest_commit_per_published_drink():
