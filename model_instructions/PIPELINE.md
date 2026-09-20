@@ -232,6 +232,7 @@ in three sizes, hers to rule:
 | the change | what Claude does |
 |---|---|
 | a word or a number | **asks first.** She may grant the change WITHOUT the flip — then it lands under `HELEN_CLEARED` or a baseline move, per the constant's own comment, and she is still the last judgement because she granted it |
+| **a DERIVED value, across a batch** | **flips the flag, then tells her what the batch was and offers the grant.** Added 2026-09-20 (#1127). See below — this is the row that covers a re-derivation |
 | anything else | flips the flag, leaves the file in the public repo (the gate hides it), and **raises an issue labelled `blocked-on-helen`**: title `proofread: ‹slug›`, body naming what changed, why, and the local URL to re-read. She closes it by flipping the flag in a commit with `Fixes #N` |
 | something big is wrong | deletes the file from the public repo and re-adds it to the private repo — `5-final-proofread/` for drinks if it needs a ruling from her, `4-promote/` if it only needs the mechanical pass — with the same issue, so it goes back through §4 |
 
@@ -240,6 +241,34 @@ can see.** `blocked-on-helen` exists on the public repo already. One issue per
 demotion, never one per commit: a second edit to a file with an open issue
 comments on that issue. `scripts/needs_helen.py ‹path› --why "…"` does the
 flip and writes the issue body; the wrapper opens the issue.
+
+**A DERIVED VALUE IS THE THIRD SIZE, AND IT ARRIVES FIFTEEN FILES AT A TIME.**
+Added 2026-09-20 (#1127), when `no measuring` landed on 15 published drinks at
+once. The first row's "ask first" does not fit — the change is a re-run of a
+script, not a word, and there is nothing to quote her until it has run. The
+second row's per-file issue does not fit either: fifteen issues in an hour is
+exactly what got the agent account flagged as spam (`CLAUDE.md`). So:
+
+1. **Flip the flags, as always.** The rule does not bend for a batch.
+2. **Run the derivation and say what it did** — how many files, and what
+   changed in each. `python3 scripts/derive_cocktail_moods.py` names them.
+3. **Offer her the grant, with the batch in front of her.** Helen, 2026-09-20:
+   *"if the only change to those 15 files is the chip appearing, I don't need
+   to proofread, please just let them be live."*
+4. **If she grants it, CHECK THE CONDITION before acting on it.** A grant of
+   this shape is conditional on the diff really being only the derived line.
+   Diff every touched file against `main` and require every changed line to be
+   one of the two you expect — `tmp/prove_only_the_chip.py` in that branch is
+   the pattern. A reordered mood or a changed amount must fail it.
+5. **Then one commit flipping back, one moving the baseline**, the baseline
+   alone and proved with the old value first, as every move before it.
+
+**Why she can grant it and the rule still holds.** MANUAL §4.0's reason is that
+an agent's edit outruns her read — her proofread no longer covers what is in
+the file. A derived value does not: it is COMPUTED from fields she has already
+read, by a rule she ruled on, and it renders as a chip rather than as prose.
+**That is a reason, not a licence.** She grants it; a session never assumes it,
+and never skips the flip in the first place on the strength of this paragraph.
 
 **A demotion can break links.** A live page that links to a demoted one gets a
 404 in production, and `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`
