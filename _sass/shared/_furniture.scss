@@ -338,26 +338,30 @@ $page-search-quiet: 45%;
   gap: $space-sm 1.4rem;
 }
 
-// BELOW 600px THE ROW BECOMES TWO PAIRS, NOT A FOUR-WIDE LINE THAT DROPS ONE
-// CONTROL ALONE. Design review #1086 (issue #1058 is the separate, still-open
-// question of matching the two sites' styling for this row -- this only fixes
-// the wrap). At 390/360px the four labels' natural widths no longer fit
-// `flex-wrap`'s single line, so it breaks after PRINT and strands PDF by
-// itself on its own right-aligned line. A two-column grid keeps the DOM order
-// (shortlist, see shortlist, print, pdf) but always lays it out as two rows of
-// two: `max-content` columns size each to its own widest occupant rather than
-// an even split, so SEE SHORTLIST (N) does not crowd PDF's narrower column,
-// and `justify-items: end` / `justify-content: end` keeps every control's
-// right edge where `flex-end` already had it -- the same resting position,
-// just two rows instead of one.
+// BELOW 600px THE ROW BECOMES ONE COLUMN -- ALL FOUR WRAP, OR NONE DOES.
+// #1163, 2026-09-21. Helen: "as soon as action buttons need to wrap, all
+// should wrap", with a screenshot of the row she was looking at.
+//
+// WHAT THIS REPLACED, AND WHY IT WAS NOT ENOUGH. #1086 made this a TWO-column
+// grid, because `flex-wrap` was breaking after PRINT and stranding PDF alone
+// on its own line. Two rows of two fixed the stranding, and it was reported as
+// working as designed in the 2026-09-20 phone review -- the right edges do
+// line up in their columns. Helen looked at the built page and disagreed: two
+// rows of two reads as an arrangement, and the arrangement changes depending
+// on how long the labels happen to be. One control per line does not.
+//
+// IT IS THE SAME ARGUMENT #1086 MADE, CARRIED ONE STEP FURTHER: a row that
+// cannot hold everything should not hold SOME of it. `1fr` rather than
+// `max-content` so the single column is the full width available, with
+// `justify-items: end` keeping every label's right edge where `flex-end` had
+// it at full width -- the same resting position, one per line.
 @media (max-width: 600px) {
   .page-actions {
     display: grid;
-    grid-template-columns: max-content max-content;
+    grid-template-columns: 1fr;
     justify-content: end;
     justify-items: end;
     row-gap: $space-sm;
-    column-gap: 1.4rem;
   }
 }
 

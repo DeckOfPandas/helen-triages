@@ -6396,6 +6396,93 @@ verification. Dates are when the correction landed.
   squeezed to the width of a number — under the OLD grid too, so these are
   guards, not regressions.
 
+- **2026-09-21, #1148 round two — aligning the BOXES was not aligning the
+  MARKS, and the one-image rule is what settled it.** Helen, after the first fix
+  shipped and deployed: *"The navbar lines are still misaligned for me. This is
+  both locally and on the recently deployed site after last merge."* She was
+  right. Measured across eight widths from 360 to 1280, the two boxes now share
+  a `y` at every one of them — the first fix did exactly what it claimed — but
+  the boxes are 20.5px and 26.9px tall and their ink sits differently inside
+  them, because `[ COCKTAILS ]` is 0.8rem `$font-headings` and `??` is 1.05rem
+  `$font-body`. **A box is not ink, and "the boxes now agree" is not an answer
+  to "these two marks look wrong".**
+
+  **THE MEASUREMENT HAD TO BE ONE IMAGE, and doing it from two crops gave a
+  number that was wrong by a factor of two.** MANUAL §1 says so and this is the
+  case that proves it: the same comparison read from separate crops of each
+  element reported the nudge moving the ink 0.7px when the true shift was
+  1.68px, because each crop pads its box by about a device pixel and the two
+  rasters land on different sub-pixel phases. `.site-header-inner` holds both
+  marks but also the tape, whose ink shares their COLUMNS, so inkbox's column
+  bands spanned both. **`tmp/nav_candidate.py` hides `.site-logo` with
+  `visibility: hidden`** — the box stays, so nothing below moves — and the
+  bottom row is then alone in one crop. Read that way: `??` 195.5, the
+  brackets 192.5, **3 device pixels = 1.5 CSS px low.**
+
+  **`align-self: baseline` ON BOTH WAS TRIED AND REJECTED ON A MEASUREMENT.**
+  It is alignment by construction, which #993 prefers to a measured nudge, and
+  it would have been font-proof. But the larger `??` sets the shared baseline,
+  so the ROW drops 6px (y 109.3 → 115.3) — and that gap under the tape is a
+  value Helen picked by eye on #1086's candidates page. **The row is the anchor;
+  the `??` is the mark that moves.**
+
+  **0.12em, AND THE LAST DEVICE PIXEL IS UNREACHABLE.** Walked at 390px: 0.10em
+  lands the ink 1 device pixel low, 0.12/0.14/0.16 land it 1 high, 0.18 lands it
+  3 high. Nothing lands it level, and the reason is **parity** — the `??`'s ink
+  band is 26 device pixels tall and the brackets' is 24, so their centres are
+  permanently half a pixel out of step. 0.10 and 0.12 are equidistant from true;
+  0.12 reads level, and a question mark carries no descender where the brackets
+  do, so its mass wants to sit slightly high of a pure centre.
+
+  **The lesson for the next alignment bug**, and it cost two rounds and a
+  deploy: *measure the thing the eye is judging.* The first fix measured
+  margins, which were genuinely wrong and genuinely fixed, and never asked where
+  the ink went.
+
+- **2026-09-21, #1163 — "as soon as action buttons need to wrap, all should
+  wrap", and my "working as designed" was wrong.** The 2026-09-20 phone review
+  reported the actions row's two-by-two stack as #1086 behaving correctly — the
+  right edges do line up in their columns — and recommended leaving it. Helen
+  looked at the built page and raised it anyway. **Two rows of two reads as an
+  arrangement, and the arrangement changes with whatever the labels happen to
+  measure; one control per line does not.** A review that checks whether
+  something matches its own design note has not asked whether the design is
+  right.
+
+  Both halves of her ask: the actions are one column below 600px
+  (`grid-template-columns: 1fr`, `justify-items: end`), and *"the first line of
+  action buttons should be aligned with read it make it button at all widths"* —
+  so `.cocktail-controls` stops dropping the whole block below the toggle.
+
+  **`nowrap` WAS THE OBVIOUS FIX AND IT OVERFLOWED THE PAGE.** Measured at
+  360px: the toggle is 166.4px and the widest label 136px, which with the
+  16px gap is 318.4px in a 312px content column — 6.4px past the viewport, the
+  exact fault #899 exists to prevent. **The gap is what moved instead**
+  (`$space-lg` → `$space-sm`, 16px → 8px), bringing the pair to 310.4px, and
+  `flex-wrap: wrap` stays as the safety valve. Below about 350px it drops again
+  and it has to: toggle plus widest label is 302.4px with no gap at all.
+
+  **The `align-items` change is scoped to the phone**, because `flex-start`
+  lifts the labels 2.6px against the taller toggle at desktop, where the actions
+  are a single line and centring is what puts them on the toggle's optical line.
+
+- **2026-09-21, #1161 — `padding` cannot inset an absolutely positioned child,
+  and the screenshot is what caught it.** Helen: *"give the glass a little more
+  left and right padding, AND give the glass/garnish/ship a wider left margin."*
+  The second half is one token (`column-gap` `$space-lg` → `$space-xl`). The
+  first half was written as `padding-inline` on `.cocktail-glass-icon` and
+  **moved the drawing not one pixel**: the glass svg is `position: absolute;
+  inset: 0`, and an absolutely positioned element's containing block is its
+  ancestor's **padding box, which includes the padding**. `inset: 0 $space-sm`
+  on the svg is the same intent stated where it applies. Horizontal only —
+  the vertical `0`s are what keep the drawing from sizing the row (#942).
+
+- **2026-09-21, #1164 — the count leads on "see shortlist".** Helen: *"swap
+  shortlist and (0) in the button so the structure of the + shortlist is
+  repeated."* The button above it is a mark then a word (`+` is a `::before`),
+  so `(0) see shortlist` makes the pair read as one pattern. The span is
+  unmoved — `shortlist.js` paints `[data-shortlist-total]` wherever it sits.
+
 - **2026-09-20 — `crop.sh` / `styles.sh` / `shoot.sh` paths are site-relative,
   and getting it wrong reports the WRONG FAILURE.** The tools prepend
   `/helen-triages` themselves, so the argument is `/food/`. Passing
