@@ -25,7 +25,7 @@ const JS_DIR = path.join(__dirname, '..', '..', 'assets', 'js');
 
 // The order cocktails/index.html loads them, plus assets.js from the layout.
 // A test asserts this list still matches the template.
-const SCRIPTS = [
+const PAGE_SCRIPTS = [
   'assets.js',
   // #694 put `recipe-list.js` on this page: cocktail-index.js calls
   // HTF.recipeList.paginate, and without it the script throws on its first
@@ -46,6 +46,32 @@ const SCRIPTS = [
   // comparison, so this sits last in both.
   'shortlist-export.js'
 ];
+
+// THE TWO CARD MEASUREMENT PASSES, FROM THE SHARED LAYOUT -- #1107, 2026-09-20.
+// They are not in `cocktails/index.html`: `_layouts/default.html` loads them
+// for both sites, BELOW `{{ content }}`, which is why they run after every
+// script above. That order is the one thing card-line-budget.js's header says
+// it needs -- the name decides how much room the ingredients get, and the
+// ingredients decide how much the chips get -- so the list must keep it.
+//
+// WHY THEY WERE ABSENT AND WHY THAT MATTERED. #828 built this harness so a
+// startup crash fails the suite, and named the class of bug it wanted caught:
+// "a pass measuring a hidden card and getting zero, a pass throwing and taking
+// the rest of the page with it". Neither pass was loaded here, so neither was
+// exercised -- and the second one was not hypothetical. card-line-budget.js
+// calls `card.style.setProperty('--ship-w', …)`, which against this stub's
+// plain-object `style` was a TypeError; the stub grew the CSSOM methods in the
+// same commit as this line.
+//
+// A SEPARATE LIST, NOT APPENDED TO THE ONE ABOVE, because the drift test that
+// keeps the harness honest reads `cocktails/index.html` and these two are not
+// in it. `test_the_card_passes_follow_the_layout` reads default.html instead.
+const LAYOUT_SCRIPTS = [
+  'card-name-fit.js',
+  'card-line-budget.js'
+];
+
+const SCRIPTS = PAGE_SCRIPTS.concat(LAYOUT_SCRIPTS);
 
 /* A small cocktails index: two drinks, two mood sections, the YOLO row and the
    list. Deliberately hand-built rather than sliced out of a real build -- a
@@ -190,12 +216,44 @@ function addCard(doc, list, spec) {
   card.setAttribute('data-made-before', spec.madeBefore === false ? 'false' : 'true');
   card.setAttribute('data-ingredients', (spec.ingredients || []).join('|'));
 
+  /* THE TAPE WORD IS THE REAL SHAPE and was missing until #1107, 2026-09-20.
+     cocktails/index.html emits `.drink-card-name > .drink-card-tape-word > a`;
+     this built `.drink-card-name > a`, so card-name-fit.js -- which queries
+     `.drink-card-tape-word` and returns having found nothing -- could not be
+     exercised here at all. The same failure the `.drink-card-moods` wrapper
+     note below records, and the one this harness exists to avoid.
+     `.drink-card-name a` still matches, so nothing that read the title breaks. */
   const nameP = doc.createElement('p');
   nameP.setAttribute('class', 'drink-card-name');
+  const word = doc.createElement('span');
+  word.setAttribute('class', 'drink-card-tape-word');
   const a = doc.createElement('a');
   a.textContent = spec.title;
-  nameP.appendChild(a);
+  word.appendChild(a);
+  nameP.appendChild(word);
   card.appendChild(nameP);
+  if (spec.name_box) {
+    word.__box = spec.name_box;
+    /* THE ONE PIECE OF MODELLING IN THIS FIXTURE, and it is here rather than in
+       dom-stub.js on purpose. card-name-fit.js steps the type down, then
+       RE-MEASURES, because "the prediction is a model and the browser is the
+       fact" -- and a stub that returns the same width before and after the step
+       can never take the step path: every stepped name would be undone and
+       wrapped, so the outcome Helen actually chose would be untestable.
+       `contentWidthStepped` is what the lettering measures once
+       `--step` is on, which the test supplies and this reads back through the
+       class the pass itself just set. Omit it and the width does not change,
+       which is the honest model of a step that did not help. */
+    Object.defineProperty(word, '__contentWidth', {
+      get() {
+        const stepped = nameP.classList.contains('drink-card-name--step');
+        if (stepped && spec.name_box.contentWidthStepped !== undefined) {
+          return spec.name_box.contentWidthStepped;
+        }
+        return spec.name_box.contentWidth || 0;
+      }
+    });
+  }
 
   const ings = doc.createElement('p');
   ings.setAttribute('class', 'drink-card-ingredients');
@@ -207,6 +265,8 @@ function addCard(doc, list, spec) {
     ings.appendChild(s);
   });
   card.appendChild(ings);
+  // #1107: what card-line-budget.js divides by its line height.
+  if (spec.ingredients_box) ings.__box = spec.ingredients_box;
 
   /* THE FOOT'S REAL SHAPE: a `.drink-card-moods` wrapper and a
      `.drink-card-ship` beside it, which is what cocktails/index.html emits and
@@ -220,11 +280,19 @@ function addCard(doc, list, spec) {
 
   const moods = doc.createElement('span');
   moods.setAttribute('class', 'drink-card-moods');
-  (spec.moods || []).forEach((m) => {
+  (spec.moods || []).forEach((m, i) => {
     const chip = doc.createElement('button');
     chip.setAttribute('class', 'drink-card-mood');
     chip.setAttribute('data-mood', m);
     chip.textContent = m;
+    /* #1107: `chip_boxes[i]` is where this chip sits, so a test can put one on
+       the ship's row and past its left edge -- the collision card-line-budget.js
+       measures. #1100 made a MATCHED chip an inverted block with its separator
+       carried in a margin, which is exactly the chip whose box moved. */
+    if (spec.chip_boxes && spec.chip_boxes[i]) chip.__box = spec.chip_boxes[i];
+    if ((spec.matched_moods || []).indexOf(m) !== -1) {
+      chip.classList.add('is-match');
+    }
     moods.appendChild(chip);
   });
   foot.appendChild(moods);
@@ -232,6 +300,7 @@ function addCard(doc, list, spec) {
   const ship = doc.createElement('span');
   ship.setAttribute('class', 'drink-card-ship');
   ship.textContent = spec.ship || 'meh';
+  if (spec.ship_box) ship.__box = spec.ship_box;
   foot.appendChild(ship);
 
   card.appendChild(foot);
@@ -308,6 +377,20 @@ function boot(options) {
     (doc.listeners[type] = doc.listeners[type] || []).push(fn);
   };
 
+  /* #1107. card-line-budget.js asks for `lineHeight` and, when that is the
+     `normal` keyword, `fontSize`. Both come off the element's own
+     `__computed`, which a test sets; the defaults are the stylesheet's real
+     values (`_cards.scss`: 0.82rem at line-height 1.5, 16px root), so a test
+     that only stubs a height is measuring against the numbers the page uses.
+     Nothing here computes style -- see dom-stub.js on why it must not. */
+  sandbox.window.getComputedStyle = (el) => {
+    const c = (el && el.__computed) || {};
+    return {
+      lineHeight: c.lineHeight === undefined ? '19.68px' : c.lineHeight,
+      fontSize: c.fontSize === undefined ? '13.12px' : c.fontSize
+    };
+  };
+
   const context = vm.createContext(sandbox);
   const loaded = [];
   let thrown = null;
@@ -333,4 +416,6 @@ function boot(options) {
   return { doc, page, sandbox, errors, loaded, thrown, SCRIPTS: SCRIPTS.slice() };
 }
 
-module.exports = { boot, buildPage, addCard, SCRIPTS, Element };
+module.exports = {
+  boot, buildPage, addCard, SCRIPTS, PAGE_SCRIPTS, LAYOUT_SCRIPTS, Element
+};

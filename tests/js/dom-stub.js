@@ -28,6 +28,23 @@
 
 let nextId = 1;
 
+/** `el.style`: a plain bag of written values, plus the CSSOM methods.
+ *
+ * The three methods are non-enumerable so that everything which treats this as
+ * a bag -- reading `style.display`, listing what a script wrote -- is
+ * unchanged. `setProperty` is the only way to write a custom property, and
+ * card-line-budget.js writes `--ship-w` (#1107).
+ */
+function makeStyle() {
+  const bag = Object.create(null);
+  const method = (name, fn) =>
+    Object.defineProperty(bag, name, { value: fn, enumerable: false });
+  method('setProperty', (key, value) => { bag[key] = String(value); });
+  method('removeProperty', (key) => { const had = bag[key]; delete bag[key]; return had; });
+  method('getPropertyValue', (key) => (key in bag ? bag[key] : ''));
+  return bag;
+}
+
 class ClassList {
   constructor(el) { this.el = el; }
   _list() { return this.el.className ? this.el.className.split(/\s+/).filter(Boolean) : []; }
@@ -62,8 +79,70 @@ class Element {
     // A plain bag. Nothing here computes style, and nothing needs it to: the
     // index scripts only ever WRITE to it (`visibility`, `display`), and a test
     // that wants to know what they wrote reads it back.
-    this.style = Object.create(null);
+    //
+    // IT GREW THREE METHODS ON 2026-09-20 (#1107) and stayed a plain bag. A
+    // CUSTOM PROPERTY CANNOT BE SET ANY OTHER WAY: card-line-budget.js writes
+    // `card.style.setProperty('--ship-w', …)`, and against a bare object that
+    // is a TypeError that takes the whole pass down -- which is precisely the
+    // "a pass throwing and taking the rest of the page with it" failure #828
+    // named and nothing exercised. They are non-enumerable so that a test
+    // reading `Object.keys(el.style)` still sees only what was written.
+    this.style = makeStyle();
     this.classList = new ClassList(this);
+
+    // --- measurement ------------------------------------------------------
+    // #1107. A test sets `el.__box` to the rect this element should report and
+    // `el.__contentWidth` to the width a Range over its contents should give.
+    // NOTHING HERE COMPUTES LAYOUT and nothing should: the stub has no line
+    // breaking, no font metrics and no box model, so a pixel result would be a
+    // number this file invented. What the card passes actually DO with a
+    // measurement -- round height over line-height, compare a chip's right
+    // edge against the ship's left -- is arithmetic, and arithmetic over
+    // stubbed boxes is a real test of a real decision.
+    this.__box = null;
+    this.__contentWidth = 0;
+  }
+
+  /** True unless this element or an ancestor is `hidden`.
+   *
+   * The index paginates by setting `card.hidden` rather than by removing the
+   * card, and a hidden element measures ZERO in both directions in a real
+   * browser -- which is the whole of #1115. Modelling that here is what lets a
+   * test assert that card-name-fit.js leaves a paginated-away name alone.
+   */
+  get __rendered() {
+    for (let node = this; node; node = node.parentNode) {
+      if (node.hidden) return false;
+    }
+    return true;
+  }
+
+  get clientWidth() {
+    if (!this.__rendered || !this.__box) return 0;
+    return this.__box.clientWidth || 0;
+  }
+
+  getBoundingClientRect() {
+    const b = this.__rendered ? (this.__box || {}) : {};
+    const width = b.width || 0;
+    const height = b.height || 0;
+    const top = b.top || 0;
+    const left = b.left || 0;
+    return {
+      width, height, top, left,
+      right: b.right === undefined ? left + width : b.right,
+      bottom: b.bottom === undefined ? top + height : b.bottom
+    };
+  }
+
+  /** `[]` for anything not laid out, one rect otherwise -- the browser's own
+   *  answer to "did you get a box for this", which card-name-fit.js asks
+   *  instead of checking `hidden` itself (#1115). */
+  getClientRects() {
+    if (!this.__rendered || !this.__box) return [];
+    const rect = this.getBoundingClientRect();
+    if (!rect.width && !rect.height) return [];
+    return [rect];
   }
 
   // --- tree ---------------------------------------------------------------
@@ -331,6 +410,24 @@ function createDocument() {
   doc.getElementById = (id) => doc.querySelector('#' + id);
   doc.readyState = 'complete';
   doc.documentElement = doc;
+
+  /* #1107. card-name-fit.js measures the LETTERING rather than the element --
+     a Range over the contents, because the drink page's title sits in an
+     element at `display: contents` which generates no box of its own. The stub
+     answers from the element's `__contentWidth`, which is the number the test
+     set, and reports zero for anything not laid out so that the hidden-card
+     path is reachable. */
+  doc.createRange = () => {
+    let node = null;
+    return {
+      selectNodeContents(el) { node = el; },
+      getBoundingClientRect() {
+        if (!node || !node.__rendered) return { width: 0, height: 0 };
+        return { width: node.__contentWidth || 0, height: 0 };
+      },
+      detach() {}
+    };
+  };
   return doc;
 }
 
