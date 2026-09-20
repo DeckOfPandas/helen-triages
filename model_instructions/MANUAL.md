@@ -1440,9 +1440,14 @@ construction while the collection is empty.
 
 **`cocktails/index.html` has food's shape**: `all_drinks =
 site.cocktail_recipes`, the drafts concatenated only under `site.show_drafts`,
-and every mood loop, the count and the sort read `all_drinks`. Production
-renders "Nothing to see here yet" because the collection is empty, not
-because the template refuses to look.
+and every mood loop, the count and the sort read `all_drinks`. The template
+never refused to look: it rendered "Nothing to see here yet" only because the
+collection was empty, and **that stopped being true on 2026-09-10** — the
+drinks are live and production renders them. The line is still there, for the
+state it names; Helen, ruling on its wording in #1088 (2026-09-20): *"'Nothing
+to see here yet' is fine for when the cocktail site is empty, which it
+currently is not."* It is a different line from the no-results one ("Blank
+canvas.", on both indexes).
 
 **The cards do NOT show the flags** — the same ruling as food's #562: a
 work-state note on every unfinished row is a to-do list down the side of the
@@ -3435,10 +3440,13 @@ on purpose. **Pagination**, 20 per page, prev/next, a status label, `(see
 all)`; the maths in `recipe-list.js`. **Shuffle** (Fisher-Yates) on clear-all
 and on every fresh load; `.recipe-list` starts `visibility: hidden` and is
 revealed after the first render, trading a visible flip for a blank instant.
-**No results** ("Nothing to see here." / "Blank canvas.") carries a third `×
-clear all` inside the line (#1093), in the same list as the top and bottom
-buttons so it cannot disagree with them about whether there is anything to
-clear.
+**No results** ("Blank canvas." on BOTH indexes since #1088, 2026-09-20 —
+food said "Nothing to see here." until then) carries a third `× clear all`
+inside the line (#1093), in the same list as the top and bottom buttons so it
+cannot disagree with them about whether there is anything to clear. **That is
+not the same line as the EMPTY-COLLECTION one** ("Nothing to see here yet.",
+cocktails only): one says the search was too narrow, the other says there is
+nothing here so far, and Helen ruled them as two states.
 **One arrival is exempt: going back** (#387) restores shuffle order, filters,
 page, see-all and scroll from `sessionStorage`, gated on
 `performance.getEntriesByType('navigation')[0].type === 'back_forward'` — a
@@ -3581,6 +3589,17 @@ re-arguing it.
   draws**: the `×` it replaced was NOT a placeholder, because choosing U+00D7
   over the letter x is typography; choosing the word a number is counted in is
   voice. If a string would sound like Helen, it is hers.
+
+  **MARKED IS NOT THE SAME AS UNWRITTEN, and #1088 (2026-09-20) is the case
+  that proves it.** A sitting put every marked string on the live site to her
+  at once. "If you liked this, how about…" came back *"isn't a placeholder.
+  Final version."* — the words had been hers all along (from #927's title) and
+  the marker recorded only that nobody had confirmed them; `drinks` and
+  `portions` came back confirmed unchanged. So a marker says *she has not
+  ruled*, not *these words are wrong*. **The only markers left on the live site
+  are the shortlist panel's, parked pending a feature change.** Grep
+  `PLACEHOLDER COPY` rather than trusting any list of them: two of #1088's own
+  checkboxes were already stale when it was worked.
 - **Whether the recipe title takes the tape.** Offered and declined.
 - **Which drinks are faffy, rich, or otherwise judged.** Moods are DERIVED; a
   disagreement goes in `mood_include` / `mood_exclude` with its reason.

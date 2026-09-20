@@ -30,7 +30,25 @@ sitemap: false
   built from what the items carry. Labels are the index's own, from
   _data/food/filter_sections.yml, so the dropdown's headings are the panel's.
 
-  `items_label` IS PLACEHOLDER COPY, Helen's to write (MANUAL 13.12).
+  `items_label` IS "food" HERE AND "cocktails" ON THE OTHER SITE -- Helen on
+  #1088, 2026-09-20: 'Search dropdown group labels: "food" and "cocktails"'.
+  It was "recipes" on both from #1097 (2026-09-15) and placeholder copy before
+  that.
+
+  THIS IS NOT A REVERSAL OF #1097, and the distinction is the reason the two
+  rulings sit together rather than fighting. #1097 fixes the word for CONTENT
+  -- "'Recipes' means recipes across both sites", so a drink is a recipe too.
+  This label does a different job: it heads the group of PAGES in a dropdown
+  whose other groups are kinds of word (Mood, Hassle, Has to have), so what it
+  has to say is which pile these results came from, not what kind of thing they
+  are. "food" and "cocktails" are #1097's own site adjectives, from its "Food
+  recipes / Cocktail recipes".
+
+  THE CASE HERE NEVER SHOWS. `.page-search-group-label` is `text-transform:
+  uppercase` (shared/_furniture.scss), so this renders as FOOD either way;
+  Helen's lowercase is kept as written rather than tidied to match the
+  capitalised labels beside it, which are the index panel's own and come from
+  _data/food/filter_sections.yml.
 {%- endcomment -%}
 {%- assign this_site = site.data.sites[page.site_key] -%}
 {%- assign sections = site.data.food.filter_sections -%}
@@ -46,7 +64,7 @@ sitemap: false
 {
   "site": {{ page.site_key | jsonify }},
   "home": {{ this_site.home | relative_url | jsonify }},
-  "items_label": "recipes",
+  "items_label": "food",
   "groups": [
     {"kind": "star", "label": {{ sections.star.label | jsonify }}, "param": "star", "field": "star", "values": {{ taxonomy.star_ingredients | jsonify }}},
     {%- for group in sections.tag_groups %}

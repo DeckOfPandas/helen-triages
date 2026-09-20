@@ -334,6 +334,14 @@ ASSIGN_LITERAL = re.compile(
 TRUSTED_DYNAMIC = (
     re.compile(r"^\{\{\s*this_site\.home\s*\|\s*default:\s*'/'\s*\|\s*relative_url\s*\}\}$"),
     re.compile(r"^\{\{\s*nav_site\.home\s*\|\s*relative_url\s*\}\}$"),
+    # The footer reference column's HEAD -- the site's icon and bracketed word,
+    # one link to that site's index (#1149, 2026-09-19, _layouts/default.html).
+    # Identical in kind to `nav_site.home` on the line above and checked by the
+    # identical mechanism: the value is a site's `home` out of _data/sites.yml,
+    # and test_site_nav_links_resolve_to_real_pages below reads that file and
+    # asserts every site's `home` is a published page. It is the same key the
+    # header's own door uses, so there is one value and one check behind both.
+    re.compile(r"^\{\{\s*ref_site\.home\s*\|\s*relative_url\s*\}\}$"),
     # The back arrow on a recipe/cocktail page (issue #387,
     # _includes/back-to-index.html). Same shape and same treatment as the two
     # above: the value is a site's `home` in _data/sites.yml, which

@@ -22,11 +22,25 @@
 // control, so the markup assumes the script did not run and this is the proof
 // that it did. CSS cannot ask that question.
 //
-// A REFUSAL PUTS THE OLD VALUE BACK. Helen, 2026-09-04: "say you can't go below
-// X ml if any ingredient wants to go below 2.5 ml." So the input reverts to the
-// last multiple that worked and the note says what the limit is and which
-// ingredient set it -- named from the page, since HTF.scale deals in indexes
-// and knows nothing about markup.
+// A REFUSAL PUTS THE OLD VALUE BACK, AND SAYS NOTHING. The input reverts to the
+// last multiple that worked; there is no message.
+//
+// THERE USED TO BE ONE, and why it went is worth keeping. Helen, 2026-09-04:
+// "say you can't go below X ml if any ingredient wants to go below 2.5 ml" --
+// so a refusal named the limit and the ingredient that set it. Whole recipes
+// only (2026-09-05, see `box` below) then made it unreachable: `apply` clamps
+// to `Math.max(1, Math.round(wanted))`, so the smallest thing anyone can ask
+// for is the recipe as written, and scaling UP never takes an amount below
+// where it started. It survived that as a safety net for the day a drink is
+// ingested with a sub-2.5 ml pour.
+//
+// IT WAS A BAD SAFETY NET, which is the part that had not been noticed. On such
+// a drink the floor would land somewhere above ×1 -- so the message would have
+// fired on the drink's OWN written recipe, telling the reader they could not
+// make the thing the page is showing them. Helen, #1088, 2026-09-20: "We don't
+// go lower than the recipe amounts, because the scaler is an integer and
+// doesn't go below 1." Silence degrades correctly instead: the amounts on
+// screen are the written ones, which is exactly what such a drink should show.
 //
 // ONE BOX, SINCE 2026-09-05, AND THE MILLILITRE BOX IS GONE. It let you type a
 // total and worked the ratios backwards to a multiple. Helen, issue #721: "it's
@@ -55,9 +69,12 @@
 // the way IN, so `HTF.scale.scale` is never handed a raw typed value and the
 // amounts are never approximate.
 //
-// THE FLOOR IS ASKED BEFORE THE SNAP, and that order is load-bearing: the snap
-// clamps to the floor, so asking after it would turn "you can't make a drink
-// that small" into a silent nudge and Helen's message would never appear.
+// THE FLOOR IS ASKED BEFORE THE SNAP. That order was load-bearing while there
+// was a message -- the snap clamps to the floor, so asking after it would have
+// turned "you can't make a drink that small" into a silent nudge. With the
+// message gone (see above) the order no longer changes what the reader sees,
+// and it is kept because it is where the check belongs, not because anything
+// now depends on it.
 //
 // THE BOX HOLDS A WHOLE NUMBER, AND THAT IS THE WHOLE OF IT -- Helen,
 // 2026-09-05: "logically I think we can solve the rounding/ratio issue by only
@@ -118,12 +135,16 @@
   var input = control && control.querySelector('.cocktail-scale-multiple');
   var minus = control && control.querySelector('.cocktail-scale-minus');
   var plus = control && control.querySelector('.cocktail-scale-plus');
-  var note = article.querySelector('.cocktail-scale-note');
   var list = article.querySelector('.cocktail-ingredients');
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.cocktail-amount')
   );
-  if (!control || !input || !minus || !plus || !note || !spans.length) return;
+  /* `note` WAS IN THIS GUARD AND WENT WITH THE ELEMENT (#1088). Worth a line,
+     because it was the trap in removing it: the floor message's paragraph was
+     REQUIRED here, so deleting the element from the layout without deleting it
+     from this list would have made every drink's scaler fail to initialise --
+     silently, since the control ships `hidden` and this is what reveals it. */
+  if (!control || !input || !minus || !plus || !spans.length) return;
 
   /* THE AMOUNT SPANS ARE THE INDEX, NOT THE INGREDIENT LIST. An ingredient with
      no `amount` renders no span at all (the layout gates on `item.amount`), so
@@ -201,8 +222,14 @@
      THE FLOOR CANNOT FIRE EITHER, and that was checked against the data rather
      than assumed: no drink in the collection has a written millilitre pour
      under MIN_POUR, and scaling UP can never take an amount below where it
-     started. `refuse` stays anyway, because it costs nothing and the day a
-     drink is ingested with a 1 ml pour it will be telling the truth.
+     started. `refuse` stays anyway -- it costs nothing and it keeps a drink
+     that cannot be poured at the asked-for multiple from being drawn wrong.
+
+     WHAT IT NO LONGER DOES IS SAY ANYTHING (#1088, 2026-09-20). This note used
+     to end "the day a drink is ingested with a 1 ml pour it will be telling the
+     truth", and that was wrong: on such a drink the floor lands above ×1, so
+     the message would have fired on the drink's OWN written recipe. The header
+     has Helen's ruling and the whole argument.
 
      THE ARITHMETIC ITSELF IS UNTOUCHED. HTF.scale keeps its step, its snap and
      its fractions -- the shopping list's own scaler still uses them, and this
@@ -221,27 +248,22 @@
     if (field !== document.activeElement) field.value = value;
   }
 
-  /** The ingredient's own name, for the note. */
-  function nameFor(index) {
-    var span = spans[index];
-    var item = span && span.closest ? span.closest('.cocktail-ingredient') : null;
-    var name = item ? item.querySelector('.cocktail-item-name') : null;
-    return name ? name.textContent.trim() : 'an ingredient';
-  }
-
   /* THE BOX SNAPS BACK to the last multiple that worked -- through `put`, so
      the box being typed in is left alone. That was the deletion bug (header),
-     and it is the reason a refusal mid-type shows a message without yanking the
-     text out from under the cursor. */
-  function refuse(verdict) {
+     and it is why a refusal mid-type cannot yank the text out from under the
+     cursor.
+
+     AND THAT IS NOW THE WHOLE OF A REFUSAL (#1088) -- no message. The header
+     has Helen's ruling and why the message it replaced would have misfired.
+     `nameFor`, which looked the offending ingredient's name up out of the
+     markup for that sentence, went with it: HTF.scale deals in indexes, so it
+     existed only to turn `verdict.offender` into words, and nothing else asked.
+
+     THE VERDICT IS STILL READ, not ignored -- `apply` returns on `!ok` rather
+     than rendering, so a drink that genuinely cannot be poured at the requested
+     multiple keeps the amounts it already had rather than being drawn wrong. */
+  function refuse() {
     put(input, box(last));
-    var who = verdict.offender === null
-      ? 'an ingredient'
-      : 'the ' + nameFor(verdict.offender);
-    note.textContent = 'can’t go below ×' + verdict.floorText +
-      ' (' + verdict.floorTotalMl + ' ml): ' + who +
-      ' would be under ' + HTF.scale.MIN_POUR + ' ml';
-    note.hidden = false;
   }
 
   /**
@@ -267,12 +289,11 @@
 
     var verdict = HTF.scale.scale(original, n);
     if (!verdict.ok) {
-      refuse(verdict);
+      refuse();
       return;
     }
 
     last = n;
-    note.hidden = true;
     spans.forEach(function (span, index) {
       span.textContent = verdict.amounts[index];
     });
@@ -399,7 +420,9 @@
      -- 2026-09-05. Zero is finite and parses, so it used to reach `apply`, get
      refused by the floor, and flash "can't go below ×⅓" -- on the way to `0.5`,
      because `0` is the first keystroke of it. Helen, #721: the warning "changes
-     on single character typing or deletion".
+     on single character typing or deletion". (There is no warning left to flash
+     since #1088; this clause is still the reason a keystroke is not a request,
+     which was always the larger half of it.)
      Nobody ever wants zero of a drink, and the box's `min` is the drink's own
      floor, which is always above it. So a non-positive value is never a request;
      it is always a keystroke on the way somewhere, and the page holds still for
@@ -449,8 +472,8 @@
      current by the time a click asks for one more or one fewer than it.
 
      A REFUSAL BEHAVES IDENTICALLY TO A TYPED ONE -- `apply` calls `refuse`,
-     which puts `last` back in the box and shows the note, exactly as it would
-     had the same number been typed and the box left. There is nothing here to
+     which puts `last` back in the box, exactly as it would had the same number
+     been typed and the box left. There is nothing here to
      disable at ×1: asking for `last - 1` when `last` is 1 asks `apply` for 0,
      which rounds up to the same floor (`Math.max(1, ...)` in `apply`) as
      typing 0 or a negative number already does, so the button is never wrong

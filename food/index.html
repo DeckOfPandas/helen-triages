@@ -610,8 +610,20 @@ permalink: /food/
   <button type="button" class="btn-page btn-page-see-all" id="recipe-page-see-all">(see all)</button>
 </div>
 
+{% comment %} "Blank canvas." ON BOTH INDEXES -- Helen on #1088, 2026-09-20:
+   'Both "blank canvas."' It said "Nothing to see here." here and "Blank
+   canvas." on cocktails, which was two lines for one state; hers is the
+   cocktails one.
+
+   THIS IS THE FILTERED-TO-NOTHING STATE, NOT THE EMPTY-COLLECTION ONE, and
+   the two are different lines on purpose. Cocktails keeps "Nothing to see
+   here yet." for a collection with nothing in it -- Helen, same ruling:
+   "'Nothing to see here yet' is fine for when the cocktail site is empty,
+   which it currently is not." So the word "yet" is doing real work: one line
+   says your search was too narrow, the other says there is nothing here so
+   far. {% endcomment %}
 <div class="recipe-list-empty" style="display: none;">
-  Nothing to see here.
+  Blank canvas.
 </div>
 
 <div class="recipe-list-searching" style="display: none;">

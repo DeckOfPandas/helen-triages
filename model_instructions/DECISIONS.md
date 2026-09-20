@@ -3591,8 +3591,47 @@ unless stated.
   against; SHIP IT? read-mode only (shipped the other way round for an hour
   on a mis-stated instruction). Helen dropped the ship mark from `make it`.
   The floor: *"say you can't go below X ml if any ingredient wants to go
-  below 2.5 ml"* — the message reads *"can't go below ×1 (112.5 ml): the cider
+  below 2.5 ml"* — the message read *"can't go below ×1 (112.5 ml): the cider
   vinegar would be under 2.5 ml"* (carta switchel); #721 *"changes on single character typing or deletion"*.
+  **THE MESSAGE WAS DELETED ON 2026-09-20 — see the entry below.**
+- **2026-09-20, #1088 — the floor message is gone, and the interesting part is
+  that it was WRONG rather than merely unreachable.** Helen, asked whether the
+  `×` in it should follow the scaler's new word: *"Drop the can't-go-below text,
+  it is not needed"*, and then, asked whether she meant silence or merely
+  leaving the `×` alone: *"We don't go lower than the recipe amounts, because
+  the scaler is an integer and doesn't go below 1."*
+
+  **She is right, and the file already said the first half.** Whole recipes only
+  (2026-09-05, above) made `refuse` unreachable: `apply` clamps to
+  `Math.max(1, Math.round(wanted))`, so the smallest thing anyone can ask for is
+  the recipe as written, and scaling UP never takes an amount below where it
+  started. `assets/js/cocktail-scale.js` recorded exactly that, checked against
+  the data — no drink has a written millilitre pour under `MIN_POUR`.
+
+  **What it got wrong was the conclusion it drew.** The message survived on the
+  reasoning that *"the day a drink is ingested with a 1 ml pour it will be
+  telling the truth"*. It would not have been. On such a drink the floor lands
+  ABOVE ×1 — so the message would have fired on the drink's OWN written recipe
+  and told the reader they could not make the thing the page was showing them.
+  Silence degrades correctly instead: `apply` returns without rendering, and the
+  amounts on screen stay the written ones, which is what such a drink should
+  show. **A safety net nobody can trigger is also a safety net nobody has
+  watched behave.**
+
+  **THE TRAP IN REMOVING IT, recorded in the guard itself.** The message's
+  paragraph was in `cocktail-scale.js`'s init guard
+  (`if (!control || !input || !minus || !plus || !note || !spans.length) return;`),
+  so deleting `<p class="cocktail-scale-note">` from the layout without deleting
+  it there would have stopped **every drink's scaler initialising** — silently,
+  because the control ships `hidden` and the script is what reveals it. The test
+  fixture stopped supplying the element for the same reason: with a note in the
+  fixture, that regression would have gone on passing green.
+
+  Gone with it: `nameFor` (it existed only to turn `verdict.offender` into
+  words), the `.cocktail-scale-note` selector in `_sass/cocktails/_cocktail.scss`
+  and `_print.scss`, and the two assertions in `tests/js/cocktail-scale.test.js`
+  that pinned the sentence. The click-equals-keystroke wiring test stayed, which
+  was always its real point.
 - **2026-09-06** — Three ingredient lines (#552; *"showing three lines is
   appropriate given the number of tiki drinks I have!"*), paid for by the foot
   (Helen from a screenshot: *"we could stand to move the chips on cards
@@ -6276,6 +6315,126 @@ verification. Dates are when the correction landed.
   eye said the same. The compiled CSS and a sampler that stops short of the
   glass are what settled it. **When a measurement disagrees with the CSS you
   just compiled, suspect the measurement.**
+
+- **2026-09-20, #1149 — the footer column head is a door, and it looks like the
+  header's door rather than like the links under it.** Helen's issue was two
+  words and a title: "[ FOOD ]", "[ COCKTAILS ]", "footer group headers should
+  be links, and the icons". Three treatments were built on the real daiquiri
+  page and she picked by looking (§13.11): **A door** — no underline, the word
+  resting at its quiet mix, hover taking word and icon to `$color-accent` — over
+  **B list** (underlined at rest at the links' own colour) and **C quiet**
+  (underline only on hover). Her words: *"Footer A please."*
+
+  **The reasoning the pick settles, worth keeping because the footer now has two
+  link styles on purpose.** The links below the head are a LIST OF PAGES, where
+  the underline is what says "link" in a footer Helen has ruled may not wear the
+  accent at rest. The head is a DOOR TO A SITE — the same object as the header's
+  `[ COCKTAILS ]` row, which has been `text-decoration: none` with a darkening
+  hover since it was built. Matching the header keeps one idea looking like
+  itself in both pieces of chrome; matching the list would have made the
+  column's head read as its first entry.
+
+  **"And the icons" put the icon INSIDE the anchor**, not beside it: an icon
+  sitting on a link's line but outside it is the near-miss target a thumb finds
+  first.
+
+  **A CASCADE TRAP, and it is the kind no test would have caught.**
+  `.site-footer-ref a:hover` sets `$color-accent` on the ANCHOR. The icon picks
+  that up because an SVG here paints in `currentColor`; the WORD does not,
+  because `.site-footer-ref-word` sets its own `color`, and **a direct
+  declaration on a child beats an inherited value from the parent whatever the
+  parent's specificity**. Left alone, the head would have hovered with the icon
+  changing colour and the word sitting still.
+
+  **A comment reversed rather than deleted.** `.site-footer-ref-word` was
+  documented as *"a label saying whose pages these are, not a thing to click"* —
+  true while the head was the one mark down there that went nowhere, false the
+  moment she asked for the link (§13.12: a ruling is not permanent). The resting
+  colour did NOT move with it: what changed is that the head goes somewhere, not
+  that it should shout.
+
+- **2026-09-20, #1088 — the placeholder sitting: what Helen wrote, and the two
+  checkboxes that were already done.** Every marked placeholder on the live site
+  was put to her in one pass (§13.12: an agent ships a placeholder, never a
+  line of voice). Her rulings:
+
+  - **"If you liked this, how about…" is FINAL, not a placeholder** — *"The if
+    you like this text isn't a placeholder. Final version."* The words were
+    always hers, from #927's title; the marker only ever recorded that nobody
+    had confirmed they were the shipped line. **Marked ≠ unwritten**, and this
+    is the case that shows the difference.
+  - **The search dropdown's group labels are "food" and "cocktails"**, where
+    both said "recipes". **This does NOT reverse #1097.** That ruling fixes the
+    word for CONTENT — *"'Recipes' means recipes across both sites"*, so a drink
+    is a recipe under it. This label heads the group of PAGES in a dropdown
+    whose other groups are kinds of word (Mood, Hassle, Has to have), so what it
+    has to say is which pile these results came from, not what kind of thing
+    they are. "food" and "cocktails" are #1097's own site adjectives, from its
+    *"Food recipes / Cocktail recipes"*. Both `search.json` files carry the
+    argument so it is not re-litigated. The case never shows:
+    `.page-search-group-label` is `text-transform: uppercase`.
+  - **Both indexes say "Blank canvas."** — *'Both "blank canvas."'* Food said
+    "Nothing to see here.", which was two lines for one state. **Cocktails keeps
+    "Nothing to see here yet." for the EMPTY-COLLECTION state**, which she names
+    as a different thing: *"'Nothing to see here yet' is fine for when the
+    cocktail site is empty, which it currently is not."* The word "yet" is doing
+    real work — one line says your search was too narrow, the other says there
+    is nothing here so far.
+  - **"drinks" and "portions"** confirmed final. Both were already the shipped
+    words; they are #1097's *"Sometimes: Portions / Drinks"*, so this is that
+    vocabulary landing rather than a choice made at the scaler.
+  - **The recipe scaler's note is `(Not scaled: salt, black pepper, olive oil)`**
+    — parenthesised, no full stop. Her written example carried a comma AND a
+    semicolon; asked which she meant, she settled it as **commas throughout**.
+    Knowingly given up: a name containing a comma would read as two. The house
+    style puts a qualifier before the ingredient ("flaked salt", not "salt,
+    flaked"), so nothing in the collection breaks today.
+  - **The shortlist panel and the restore sentences are PARKED** — *"Park
+    shortlist copy for now please pending feature change"*. They are the only
+    markers left on the live site.
+
+  **Two of the issue's checkboxes were stale, which is worth noticing about a
+  list an agent wrote.** The dropdown's no-match line already said "nothing to
+  see here" (#1055 shipped it), and half the scaler line was obsolete because
+  #1121 had moved the cost and units out of the batch note — so the only `×`
+  left to decide about was the floor message's, and that got deleted outright
+  (§9, 2026-09-20). **A checklist of copy goes stale faster than the copy
+  does; re-grep before working one.**
+
+- **2026-09-20, #1088 — the 404's ways out left `.about-ways`, and her sketch is
+  what decided it.** Helen wrote the page out: `You know the drill.`, then
+  `[ FOOD ] ->` and `[ COCKTAILS] ->`. The arrow's SIDE is the ruling hiding in
+  that. `.about-ways` draws its arrow with a `::before` on the LEFT — three
+  doors into one room, the about page's own device. An arrow AFTER the word,
+  pointing out, is the header's "over there": two ways OUT of a page that does
+  not exist. So the two links borrow `.site-nav-icon-link` and its word and
+  arrow rather than becoming a fourth arrangement of a bracketed word (#991:
+  *"we should just reuse what we've already made"*), and a change to the
+  header's door now reaches this page for free.
+
+  **The arrow had to be the drawn one (#993)**, and the about list's character
+  could not have been borrowed even if the side had matched: that mark renders
+  in the body face, where U+2192 is in WGL4 and safe, but a bracketed word is
+  `$font-headings` — Courier Prime, which ships here as a subset with **no arrow
+  in it**, so the glyph would have come from whatever face the reader's machine
+  substitutes, taking the metrics with it.
+
+  **A SPECIFICITY BUG THAT WOULD HAVE SHIPPED SILENTLY.** `article.recipe
+  a:not(.badge, .btn-see-shortlist, .btn-pdf)` (`_sass/food/_recipe-header.scss`)
+  is (0,2,2) and paints every link in a recipe magenta at weight 600 — right for
+  a cross-recipe link mid-method, wrong for a door meant to match the header
+  directly above it. A bare `.site-nav-icon-link` is (0,1,0) and loses.
+  `.not-found-ways` exists for the cascade and not for the look, and says so in
+  its own comment. **Borrowing chrome classes into a page body means inheriting
+  that page's link rule; check the specificity before assuming the borrow
+  worked.**
+
+  **`[ COCKTAILS ]` carries the space her sketch omits.** Bracketing is
+  typography, not voice — §13.12's own line is that choosing U+00D7 over the
+  letter x is typography while choosing the word a number is counted in is voice
+  — and every bracketed word in the repo is built `"[ " + word + " ]"`. A
+  one-off missing space would have read as this page being slightly wrong rather
+  than as a decision.
 
 ## §14 Reference pages
 

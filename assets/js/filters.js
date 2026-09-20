@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
     clearButtons.push(clearBtnBottom);
   }
 
-  // A third, under "Nothing to see here." -- #1093. On a phone the other two
+  // A third, under "Blank canvas." -- #1093. On a phone the other two
   // are screens away from the empty list, so the way out of a search that
   // found nothing was out of sight of the line saying so. One more entry in
   // clearButtons, so its click and its visibility are the other two's by

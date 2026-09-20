@@ -235,6 +235,43 @@ article.recipe .recipe-body-content.about-page {
     }
   }
 
+  // --- The 404's two ways out ------------------------------------------------
+  // #1088, 2026-09-20. Helen wrote the page out as "[ FOOD ] ->" and
+  // "[ COCKTAILS] ->", so the doors are the HEADER'S door reused -- 404.html
+  // carries why, and why they left `.about-ways` above (that list draws its
+  // arrow on the LEFT, which is a different sentence: three ways into one room,
+  // not two ways out of a page that is not there).
+  //
+  // THIS RULE EXISTS FOR THE CASCADE, NOT FOR THE LOOK. Everything visual is
+  // already in shared/_layout.scss's `.site-nav-icon-link`, `.site-nav-word`
+  // and `.site-nav-arrow`, which is the point of borrowing them. What that
+  // cannot survive on its own is this page's own link rule:
+  // `article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf)`
+  // (_recipe-header.scss) is (0,2,2) and paints EVERY link in a recipe magenta
+  // at weight 600 -- right for a cross-recipe link mid-method, wrong for a door
+  // that is meant to look like the one in the header directly above it. A bare
+  // `.site-nav-icon-link` is (0,1,0) and loses. Nested here it is (0,5,1) and
+  // does not, which is the whole job of these six lines.
+  .not-found-ways {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 $space-xl 0;
+
+    > li {
+      margin-bottom: $space-sm;
+    }
+
+    .site-nav-icon-link {
+      color: $color-clear-text;
+      font-weight: 400;
+
+      &:hover,
+      &:focus-visible {
+        color: $color-text;
+      }
+    }
+  }
+
   // --- The FAQ ---------------------------------------------------------------
   // A question and its answer, wrapped so the pair can share one gutter -- the
   // mark belongs to the exchange, not to the heading alone, and an answer

@@ -221,8 +221,10 @@ layout: default
      amount with no number in it ("a few handfuls", "some"), or an ingredient
      with no amount at all; those are named in the note below when the
      portions move, so the reader knows which lines are still as written.
-     PLACEHOLDER COPY on that note, Helen's to write ("copy tbc, just put in
-     a placeholder"). {% endcomment %}
+     THE NOTE IS HELEN'S OWN LINE SINCE #1088, 2026-09-20 -- "(Not scaled:
+     salt, black pepper; olive oil)", settled as commas throughout. It shipped
+     as placeholder copy from her "copy tbc, just put in a placeholder";
+     assets/js/recipe-scale.js builds it. {% endcomment %}
   {% if page.portions and page.ingredient_groups.size > 0 %}
     <div class="recipe-scale-controls" hidden>
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
@@ -233,7 +235,6 @@ layout: default
       </label>
       <button type="button" class="recipe-scale-step recipe-scale-plus" aria-label="one more portion">+</button>
     </div>
-    <!-- PLACEHOLDER COPY, Helen's to write -->
     <p class="recipe-scale-note" hidden></p>
   {% endif %}
 
@@ -422,8 +423,12 @@ layout: default
      main_ingredients are free text and "Demerara sugar" beside "demerara
      sugar" is one ingredient. The star is compared the same way.
 
-     PLACEHOLDER COPY, Helen's to write -- §13.12. The heading is her own
-     words from #927, the same line the drink page shows.
+     THE HEADING IS FINAL, NOT A PLACEHOLDER -- Helen on #1088, 2026-09-20:
+     "The if you like this text isn't a placeholder. Final version." It was
+     always her own words (from #927's title), and the marker said only that
+     nobody had confirmed they were meant as the shipped line. Now they are.
+     The drink page carries the identical line and lost its marker in the
+     same pass.
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   {% assign _mood_tags = site.data.food.taxonomy.tags.mood %}
   {% assign _pantry = site.data.food.pantry %}
@@ -471,7 +476,6 @@ layout: default
 
   {% if _related_sorted.size > 0 %}
     <section class="recipe-related-section">
-      <!-- PLACEHOLDER COPY, Helen's to write -->
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">If you liked this, how about&hellip;</span>
       </h2>
