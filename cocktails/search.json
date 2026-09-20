@@ -40,9 +40,17 @@ sitemap: false
   A missing `generics` is nil, and nil compares false against 1 in Liquid,
   so such a row is kept.
 
-  `items_label` IS "recipes" ON BOTH SITES SINCE #1097 (2026-09-15) -- Helen:
-  "'Recipes' means recipes across both sites." It said "drinks" here until
-  then, as placeholder copy.
+  `items_label` IS "cocktails" HERE AND "food" ON THE OTHER SITE -- Helen on
+  #1088, 2026-09-20: 'Search dropdown group labels: "food" and "cocktails"'.
+  It said "drinks" as placeholder copy, then "recipes" on both sites from
+  #1097 (2026-09-15).
+
+  #1097 STILL STANDS: "'Recipes' means recipes across both sites" is the word
+  for CONTENT, and a drink is a recipe under it. This label does a different
+  job -- it heads the group of PAGES in a dropdown whose other groups are
+  kinds of word (Mood, Hassle, Has to have), so it says which pile the results
+  came from rather than what kind of thing they are. food/search.json carries
+  the same note.
 {%- endcomment -%}
 {%- assign this_site = site.data.sites[page.site_key] -%}
 {%- assign groups = site.data.cocktails.taxonomy.mood_groups -%}
@@ -54,7 +62,7 @@ sitemap: false
 {
   "site": {{ page.site_key | jsonify }},
   "home": {{ this_site.home | relative_url | jsonify }},
-  "items_label": "recipes",
+  "items_label": "cocktails",
   "groups": [
     {"kind": "mood", "label": "Mood", "param": "mood", "field": "moods", "values": {{ groups.mood | jsonify }}},
     {"kind": "hassle", "label": "Hassle", "param": "mood", "field": "moods", "values": {{ groups.hassle | jsonify }}},

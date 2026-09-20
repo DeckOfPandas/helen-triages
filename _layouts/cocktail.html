@@ -768,13 +768,20 @@ layout: default
            `− [1] drinks +`, which says what the number counts instead of
            leaving the reader to infer it from the list above.
 
-           THE WORD IS PLACEHOLDER COPY AND THE SIGN WAS NOT, which is the whole
-           difference between this round and the four before it. `×` was a
-           TYPOGRAPHIC choice an agent could make (U+00D7 against the letter x,
-           the same call as the `−` on the button above); "drinks" is a word in
-           Helen's voice, and §13.12 says the voice is hers. So it ships marked,
-           the way the bitters caveat (#713) and the units line (#753) did, and
-           she renames it in one place.
+           "drinks" IS FINAL SINCE #1088, 2026-09-20 -- Helen, confirming the
+           pair: '"drinks" and "portions"'. The recipe page's own scaler says
+           "portions" and was confirmed in the same breath; the two words are
+           #1097's "Sometimes: Portions / Drinks", so this is that vocabulary
+           landing rather than a word chosen here.
+
+           THE WORD WAS PLACEHOLDER COPY AND THE SIGN WAS NOT, which was the
+           whole difference between that round and the four before it, and is
+           worth keeping now the marker has gone. `×` was a TYPOGRAPHIC choice
+           an agent could make (U+00D7 against the letter x, the same call as
+           the `−` on the button above); "drinks" is a word in Helen's voice,
+           and §13.12 says the voice is hers. So it shipped marked, the way the
+           bitters caveat (#713) and the units line (#753) did, and she confirmed
+           it in one place.
 
            `aria-hidden` STAYS, and for the same reason it was there for the
            sign: the input's own `aria-label` already says "make this many times
@@ -786,7 +793,6 @@ layout: default
            string, cannot be selected or translated, and is reached by a
            screen reader in some browsers and not others. The element was
            already here; only what is inside it changed. {% endcomment %}
-        <!-- PLACEHOLDER COPY, Helen's to write -->
         <span class="cocktail-scale-mark" aria-hidden="true">drinks</span>
       </label>
       <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
@@ -835,11 +841,13 @@ layout: default
       <p class="cocktail-scale-total" data-total-ml="{{ page.volume.total_ml }}">Approximately
         <span class="cocktail-scale-total-figure">{{ page.volume.total_ml }}</span> ml</p>
     {% endif %}
-    {% comment %} The floor message, empty and hidden until a refusal fills it —
-       "can't go below ×1 (82.5 ml): the absinthe would be under 2.5 ml". A
-       paragraph of its own beneath the control rather than text inside the
-       label, so a long sentence cannot push the number box around. {% endcomment %}
-    <p class="cocktail-scale-note" hidden></p>
+    {% comment %} THE FLOOR MESSAGE STOOD HERE UNTIL #1088, 2026-09-20 -- an
+       empty paragraph that a refusal filled with "can't go below ×1 (82.5 ml):
+       the absinthe would be under 2.5 ml". Helen: "We don't go lower than the
+       recipe amounts, because the scaler is an integer and doesn't go below 1."
+       A refusal is silent now; assets/js/cocktail-scale.js's header has why the
+       message could not fire, and why it would have been wrong on the one drink
+       that could ever have made it fire. {% endcomment %}
     {% comment %} THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, SINCE
        #1121 (2026-09-17). It was #713 — Helen, 2026-09-06: "Bitters text
        appearing next to the scaler if it's edited to >1. Cost and units on a
@@ -1465,10 +1473,13 @@ layout: default
   {% assign related_sorted = related_keys | split: ";" | sort_natural %}
 
   {% if related_sorted.size > 0 %}
-    {% comment %} PLACEHOLDER COPY, Helen's to write -- §13.12. The words are
-       her own, taken from the issue's title, so the row can be looked at
-       without an agent having invented a line of voice for it. The bitters
-       caveat (#713) and the units line (#753) are the pattern.
+    {% comment %} THE HEADING IS FINAL, NOT A PLACEHOLDER -- Helen on #1088,
+       2026-09-20: "The if you like this text isn't a placeholder. Final
+       version." The words were always hers, taken from #927's title so the row
+       could be looked at without an agent inventing a line of voice for it;
+       the marker recorded only that nobody had confirmed they were the shipped
+       line. The recipe page carries the identical line and lost its marker in
+       the same pass.
 
        A PLAIN `.cocktail-section-heading`, with no modifier and no inner span,
        exactly as "To serve" above it. The three modifiers carry a colour JOB
@@ -1482,7 +1493,6 @@ layout: default
        ends with two objects drawn the same way: three other drinks, then the
        source line. {% endcomment %}
     <section class="cocktail-related-section">
-    <!-- PLACEHOLDER COPY, Helen's to write -->
     <h2 class="cocktail-section-heading cocktail-related-heading">If you liked this, how about&hellip;</h2>
     {% comment %} THE INDEX CARD. NOT A VARIANT OF IT -- #991, Helen,
        2026-09-12: "if you liked this cards should render the same as cards on

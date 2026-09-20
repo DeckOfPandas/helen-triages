@@ -31,10 +31,40 @@ sitemap: false
   for the arrow-marked list) rather than inventing a third longform style. The
   arrows are .about-ways' own device: "here is where you can go".
 
-  PLACEHOLDER COPY, Helen's to write -- MANUAL 13.12. The sentence and the two
-  link texts are the shape, not the words; the pattern is the bitters caveat
-  (#713) and the units line (#753). A page that ships with a marked placeholder
-  beats a page that does not exist, which is what the 404 was.
+  HELEN'S WORDS AND HER SHAPE SINCE #1088, 2026-09-20. She wrote the page out:
+
+      [404 title]
+      You know the drill.
+
+      [ FOOD ] ->
+      [ COCKTAILS] ->
+
+  So the sentence is "You know the drill." (it was "There is nothing at this
+  address. It may have moved, or it may never have been published." -- an
+  agent's placeholder explaining a thing her reader already understands), and
+  the two ways out stopped being the sites' TITLES in a marked list and became
+  the doors the header already draws.
+
+  THE DOOR IS THE HEADER'S DOOR, REUSED, NOT REDRAWN. `[ WORD ]` then an arrow
+  is exactly `.site-nav-icon-link` (_layouts/default.html), so this page borrows
+  those classes rather than inventing a fourth arrangement of a bracketed word
+  -- #991, Helen: "We are fighting this design, and trying to invent a new
+  design language, where we should just reuse what we've already made." It also
+  means a change to the header's door reaches this page for free.
+
+  AND THAT IS WHY IT LEFT `.about-ways`, which is the part her sketch decides
+  rather than decorates. That list draws its arrow with a `::before` on the
+  LEFT of each item -- three doors into one room, the about page's own device.
+  Her sketch puts the arrow AFTER the word, pointing out, which is the header's
+  "over there" arrow and a different sentence: these are two ways OUT of a page
+  that does not exist.
+
+  THE ARROW IS THE DRAWN ONE (#993), NOT `&rarr;`, and this page could not have
+  borrowed the about list's character even if the side had matched: that mark
+  renders in the body face, where U+2192 is in WGL4 and safe, but a bracketed
+  word is $font-headings -- Courier Prime, which ships here as an 18KB subset
+  with NO arrow in it, so the glyph would come from whatever face the reader's
+  machine substitutes, taking the metrics with it.
 {% endcomment %}
 
 <article class="recipe">
@@ -43,19 +73,40 @@ sitemap: false
   </div>
 
   <div class="recipe-body-content about-page">
-    <!-- PLACEHOLDER COPY, Helen's to write -->
-    <p>There is nothing at this address. It may have moved, or it may never have been published.</p>
+    <p>You know the drill.</p>
 
     {% comment %} Literal paths, not a loop over sites.yml: tests/test_page_links.py
        resolves every href to a literal target and refuses a shape it cannot
        trace (test_no_link_shape_is_silently_unresolved), which is what keeps a
        renamed index from leaving a silent do-nothing link here. The header's
        own loop already proves both homes exist
-       (test_site_nav_links_resolve_to_real_pages); the words are the titles
-       from sites.yml so the two cannot say different names. {% endcomment %}
-    <ul class="about-ways">
-      <li><a href="{{ '/food/' | relative_url }}">{{ site.data.sites.food.title }}</a></li>
-      <li><a href="{{ '/cocktails/' | relative_url }}">{{ site.data.sites.cocktails.title }}</a></li>
+       (test_site_nav_links_resolve_to_real_pages).
+
+       THE WORDS ARE `word` NOW, NOT `title` -- `[ FOOD ]`, not "Helen Triages
+       Food". Same file, same reason the two cannot drift: it is the key the
+       tape, the header's door and the footer's column head all read, so this
+       page cannot end up calling a site something the rest of the chrome does
+       not.
+
+       `[ COCKTAILS ]`, WITH THE SPACE. Helen's sketch reads "[ COCKTAILS]"; the
+       bracketing is typography rather than voice (§13.12's own line: choosing
+       U+00D7 over x is typography, choosing the word is voice), and every other
+       bracketed word in the repo is built as "[ " + word + " ]" -- the tape, the
+       header, the footer. A one-off missing space here would read as this page
+       being slightly wrong rather than as a decision. {% endcomment %}
+    <ul class="not-found-ways">
+      <li>
+        <a href="{{ '/food/' | relative_url }}" class="site-nav-icon-link">
+          <span class="site-nav-word">[ {{ site.data.sites.food.word }} ]</span>
+          {% include icons/arrow-right.svg class="site-nav-arrow" %}
+        </a>
+      </li>
+      <li>
+        <a href="{{ '/cocktails/' | relative_url }}" class="site-nav-icon-link">
+          <span class="site-nav-word">[ {{ site.data.sites.cocktails.word }} ]</span>
+          {% include icons/arrow-right.svg class="site-nav-arrow" %}
+        </a>
+      </li>
     </ul>
   </div>
 </article>

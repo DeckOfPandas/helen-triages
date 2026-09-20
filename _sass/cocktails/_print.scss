@@ -95,9 +95,10 @@
   // when they hit print. The argument above — a printed page is the recipe as
   // written — is about not inviting the reader to change paper, and a figure
   // invites nothing. It takes $print-ink-quiet with the other quiet lines below.
+  // `.cocktail-scale-note` was in this list until #1088 deleted the floor
+  // message it styled.
   .cocktail-scale-controls,
   .cocktail-scale,
-  .cocktail-scale-note,
   .cocktail-scale-batch { display: none; }
 
   // ---------------------------------------------------------------------

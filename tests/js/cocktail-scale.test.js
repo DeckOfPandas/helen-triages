@@ -108,7 +108,12 @@ function page(pours, opts) {
   const minus = control.add(el('cocktail-scale-step cocktail-scale-minus'));
   const input = control.add(el('cocktail-scale-multiple'));
   const plus = control.add(el('cocktail-scale-step cocktail-scale-plus'));
-  const note = article.add(el('cocktail-scale-note'));
+  /* NO `.cocktail-scale-note` -- #1088 deleted the floor message and its
+     paragraph, and this fixture has to keep matching the shipped layout. It
+     matters more than an unused element usually would: that paragraph was in
+     cocktail-scale.js's init guard, so a fixture still supplying one would go
+     on passing even if the script still demanded it, which is the exact
+     regression that would blank every drink's scaler in production. */
   const list = article.add(el('cocktail-ingredients'));
 
   /* THE BATCH NOTE AND THE TWO FIGURE LINES ARE OPT-IN, because in PRODUCTION
@@ -177,7 +182,7 @@ function page(pours, opts) {
   }
 
   return {
-    sandbox, control, input, minus, plus, note, spans, list, batch, cost, units,
+    sandbox, control, input, minus, plus, spans, list, batch, cost, units,
     total, totalFigure,
     wide: () => list.classList.contains('cocktail-ingredients--wide-amounts'),
     amounts: () => spans.map((s) => s.textContent),
@@ -236,8 +241,6 @@ test('the box can be emptied — nothing is written back into it', () => {
     assert.strictEqual(p.input.value, partial,
       `typing "${partial}" left the box holding "${p.input.value}"`);
   }
-  assert.strictEqual(p.note.hidden, true,
-    'a half-typed number must not flash the floor message');
   assert.deepStrictEqual(p.amounts(), poured, 'and the page holds still');
 });
 
@@ -260,7 +263,6 @@ test('one recipe is the floor, and a smaller ask settles there', () => {
   p.type(p.input, '0.4');
   assert.deepStrictEqual(p.amounts(),
     ['52.5 ml', '15 ml', '7.5 ml', '15 ml'], 'the recipe as written');
-  assert.strictEqual(p.note.hidden, true, 'and it is not an error to have asked');
   p.leave(p.input);
   assert.strictEqual(p.input.value, '1');
 });
@@ -325,8 +327,6 @@ test('the minus button cannot take the multiple below ×1 -- the same floor typi
     'one fewer than the recipe as written is still the recipe as written');
   assert.deepStrictEqual(p.amounts(),
     ['52.5 ml', '15 ml', '7.5 ml', '15 ml'], 'the recipe as written');
-  assert.strictEqual(p.note.hidden, true,
-    'refusing to go below ×1 is not an error to report');
 });
 
 test('a refusal reached by clicking − behaves exactly like a refusal reached by typing', () => {
@@ -337,6 +337,14 @@ test('a refusal reached by clicking − behaves exactly like a refusal reached b
   // PARSER rule (MANUAL §9.13), so patching its answer proves the button
   // reaches `refuse()` exactly as a keystroke would, without assuming a
   // dataset the floor can no longer produce.
+  //
+  // WHAT A REFUSAL IS, SINCE #1088: the box snaps back and nothing is said.
+  // This test used to assert the floor message's text and the ingredient it
+  // named; Helen deleted that message ("We don't go lower than the recipe
+  // amounts, because the scaler is an integer and doesn't go below 1"), so
+  // what is left to prove is the half that was always the point -- that a
+  // click and a keystroke reach the same code and leave the box saying what
+  // is actually being poured.
   const p = page(AVIATION);
   p.type(p.input, '2');
   p.leave(p.input);
@@ -350,13 +358,9 @@ test('a refusal reached by clicking − behaves exactly like a refusal reached b
   p.click(p.minus);
   assert.strictEqual(p.input.value, '2',
     'refused -- the box snaps back to what is actually being poured');
-  assert.strictEqual(p.note.hidden, false,
-    'the floor message shows exactly as it would for a typed refusal');
-  assert.ok(p.note.textContent.includes('can’t go below ×2 (105 ml)'),
-    'got: ' + p.note.textContent);
-  assert.ok(p.note.textContent.includes('London dry gin'),
-    'names the ingredient that set the limit, same as a typed refusal; got: ' +
-    p.note.textContent);
+  assert.deepStrictEqual(p.amounts(), ['105 ml', '30 ml', '15 ml', '30 ml'],
+    'and the amounts stay at the multiple that worked, rather than being ' +
+    'redrawn from a verdict that said no');
 });
 
 // --- leaving the box ---------------------------------------------------------
@@ -376,7 +380,6 @@ test('a blank box on blur restores what is being poured rather than refusing', (
   p.type(p.input, '');
   p.leave(p.input);
   assert.strictEqual(p.input.value, '2', 'settled to what is being poured');
-  assert.strictEqual(p.note.hidden, true, 'asking nothing is not an error');
 });
 
 

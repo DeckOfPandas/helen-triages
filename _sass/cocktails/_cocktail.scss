@@ -1146,17 +1146,25 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   &[hidden] { display: none; }
 }
 
-// THE FLOOR MESSAGE — Helen, 2026-09-04: "say you can't go below X ml if any
-// ingredient wants to go below 2.5 ml." Quiet: it is an answer to something you
-// just tried, not a warning, so it takes the clear-text grey the control itself
-// wears rather than a colour that means something on this page. (Every colour
-// here already has a job — see the four-colours note above — and a message in
-// pink would read as a claim about a bottle.)
+// THE BATCH NOTE. The floor message shared this rule until #1088 (2026-09-20),
+// when it was deleted — Helen: "We don't go lower than the recipe amounts,
+// because the scaler is an integer and doesn't go below 1." It could not fire,
+// and on the one kind of drink that could ever have fired it, it would have
+// scolded the reader about the drink's own written recipe;
+// assets/js/cocktail-scale.js's header has the argument.
+//
+// QUIET, and the reasoning is the batch note's as much as it was the floor
+// message's: it answers something you just did rather than warning you, so it
+// takes the clear-text grey the control itself wears rather than a colour that
+// means something on this page. (Every colour here already has a job — see the
+// four-colours note above — and a message in pink would read as a claim about a
+// bottle.)
 //
 // IT SITS UNDER THE CONTROL, NOT INSIDE THE LABEL, so its sentence cannot push
 // the number box along as it grows.
 //
-// THE BITTERS CAVEAT THAT USED TO SHARE THIS CLASS IS GONE — #720.1. It was
+// THE BITTERS CAVEAT THAT USED TO SHARE THE FLOOR MESSAGE'S CLASS IS GONE —
+// #720.1, and this note is what it became. It was
 // revealed unconditionally at init, so a drink with no dash or drop in it was
 // warned that bitters do not scale linearly; Aperol Spritz is prosecco, Aperol
 // and soda water. A caveat that fires where it does not apply teaches you to
@@ -1164,16 +1172,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 //
 // IT CAME BACK ON 2026-09-06 AS `.cocktail-scale-batch` (#713), AND THE LESSON
 // CAME WITH IT: the line is now gated on the drink's own `data-has-dashes`, so
-// Aperol Spritz is still not told about bitters it does not contain. The batch
-// note is a SEPARATE element from the floor message because one is a refusal
-// and the other describes a multiple that worked — both can be wanted at once,
-// and the refusal's show/hide is the delicate part of cocktail-scale.js.
-//
-// THE TWO SHARE THESE VALUES because they are the same kind of voice in the
-// same place: quiet, small, clear-text grey, sitting under the control. Listed
-// as two selectors rather than given a shared class, because they are unrelated
-// in meaning and a shared class would invite someone to treat them as one thing.
-.cocktail-scale-note,
+// Aperol Spritz is still not told about bitters it does not contain. It was a
+// SEPARATE element from the floor message because one was a refusal and the
+// other describes a multiple that worked — both could be wanted at once. With
+// the refusal silent there is one line here again, and keeping them apart is
+// what made removing one a three-line edit rather than an untangling.
 .cocktail-scale-batch {
   margin: $space-sm 0 0;
   font-size: 0.85rem;

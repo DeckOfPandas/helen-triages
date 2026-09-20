@@ -30,7 +30,8 @@
 // ingredient with no amount at all. When the portions differ from the
 // recipe's own, both kinds are listed by name under the control; at the
 // recipe's own count the note is hidden, because nothing has moved.
-// PLACEHOLDER COPY -- the sentence is marked in the layout and is hers.
+// HELEN'S WORDS SINCE #1088, 2026-09-20 -- "(Not scaled: salt, black pepper;
+// olive oil)", settled as commas throughout. See `apply` below.
 //
 // THE CONTROL SHIPS `hidden` AND THIS REVEALS IT -- the rule every
 // JS-dependent control on both sites follows.
@@ -127,9 +128,20 @@
     last = n;
     put(input, String(n));
 
-    /* PLACEHOLDER COPY, Helen's to write -- the layout marks the element. */
+    /* HELEN'S LINE, #1088, 2026-09-20: "(Not scaled: salt, black pepper;
+       olive oil)". Parenthesised, no full stop, and COMMAS between the names
+       -- her example carried one of each and she settled it as commas
+       throughout when asked, so the semicolon this used to join with is gone
+       along with the trailing period.
+
+       A NAME CONTAINING A COMMA WOULD READ AS TWO. That is the one thing the
+       semicolon bought, and it is being given up knowingly: the names come
+       from `.recipe-item-name`, where the house style puts a qualifier before
+       the ingredient ("flaked salt", not "salt, flaked"), so there is nothing
+       in the collection this breaks today. If a comma-bearing name ever
+       arrives, this is the line it will look wrong on. */
     if (n !== base && still.length) {
-      note.textContent = 'Not scaled: ' + still.join('; ') + '.';
+      note.textContent = '(Not scaled: ' + still.join(', ') + ')';
       note.hidden = false;
     } else {
       note.hidden = true;
