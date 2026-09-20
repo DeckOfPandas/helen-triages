@@ -86,7 +86,7 @@
 
   // --- Exported the same way every other split module here is ------------------
   // Node requires it to test the decision; the browser gets it on window.HTF and
-  // runs the wiring below. Same shape as recipe-list.js and ingredient-search.js
+  // runs the wiring below. Same shape as list-view.js and ingredient-search.js
   // (MANUAL §3), so there is one convention rather than three.
   var api = { shouldGoBackToIndex: shouldGoBackToIndex };
 

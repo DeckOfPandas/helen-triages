@@ -1,17 +1,28 @@
 // =============================================================================
-// RECIPE LIST — pure ordering/paging logic, no DOM.
+// LIST VIEW — pure ordering/paging logic, no DOM.
 //
-// IT IS NOT ABOUT RECIPES AND HAS NOT BEEN SINCE 2026-09-06. The name records
-// where these three helpers were born, not who uses them: #694 brought the
-// COCKTAIL index to the same `paginate`, so the two indexes cannot drift about
-// what "page 3 of 7" means. `shuffle` and `titleMatchTier` are as site-neutral.
+// `recipe-list.js` UNTIL 2026-09-20 (#759), AND IT WAS NEVER ABOUT RECIPES.
+// The old name recorded where these three helpers were born, not who uses
+// them: #694 brought the COCKTAIL index to the same `paginate`, so the two
+// indexes cannot drift about what "page 3 of 7" means, and `shuffle` and
+// `titleMatchTier` are as site-neutral. A cocktails developer was reading a
+// `<script src=".../recipe-list.js">` on a page with no recipes on it.
 //
-// Renaming the file to say so would be right and is deliberately not done here:
-// it is loaded by name in two templates and required by name in a test, so the
-// rename is its own change with its own diff, not a drive-by inside a feature.
+// THE HEADER ITSELF WAS THE ARGUMENT FOR RENAMING. It had said, since #694,
+// that the file is not about recipes -- which removed most of the cost of the
+// wrong name for anyone who read the paragraph, and none of it for anyone who
+// did not. #759: "a name that needs a paragraph of explanation is a name that
+// will mislead someone who does not read the paragraph."
+//
+// `list-view.js` rather than `pagination.js`, because paging is one of the
+// three things here. It sits beside `filter-state.js` and
+// `ingredient-search.js` in the same pure, no-DOM, directly-testable family.
+//
+// NOT TO BE CONFUSED WITH `.recipe-list`, which is a CSS class on the FOOD
+// index's `<ul>` and keeps its name: that one really is a list of recipes.
 //
 // Extracted out of filters.js for the same reason ingredient-search.js was:
-// testable directly with Node (see tests/js/recipe-list.test.js) instead of
+// testable directly with Node (see tests/js/list-view.test.js) instead of
 // only checked by hand against a live page. Each caller still owns everything
 // DOM-shaped -- filters.js reads `items` off the page and sets
 // `li.style.display`; cocktail-index.js toggles `card.hidden` instead, and the
@@ -87,6 +98,10 @@
     module.exports = api;
   } else {
     root.HTF = root.HTF || {};
-    root.HTF.recipeList = api;
+    // `HTF.recipeList` UNTIL 2026-09-20 (#759), renamed with the file and for
+    // the same reason: the key was as misleading as the filename, and
+    // `HTF.recipeList.paginate` sitting in cocktail-index.js is the exact
+    // sentence the issue complains about. One name, changed once.
+    root.HTF.listView = api;
   }
 })(typeof window !== 'undefined' ? window : this);

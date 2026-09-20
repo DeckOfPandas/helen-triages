@@ -5,7 +5,7 @@
 // the filter it stands for (`_includes/recipe_badges.html`), which means the
 // index's filter state now has a written-down URL form. This file owns that
 // grammar and nothing else. filters.js stays the DOM half, exactly as it does
-// for recipe-list.js and ingredient-search.js (MANUAL §3).
+// for list-view.js and ingredient-search.js (MANUAL §3).
 //
 // Loaded two ways from the one file, no bundler:
 //   - In the browser, as a plain <script> before filters.js, attaching to

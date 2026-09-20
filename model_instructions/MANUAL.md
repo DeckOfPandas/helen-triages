@@ -512,7 +512,7 @@ apart from DOM wiring, so Node can test it.
 | Module | Holds | Tested by |
 |---|---|---|
 | `ingredient-search.js` | matching/ranking; `fold`, `getWords`, `orderByBand` (shared discipline, per-site bands) | `tests/js/ingredient-search.test.js` |
-| `recipe-list.js` | shuffle (Fisher-Yates) and pagination maths — used by BOTH indexes since #694 | `recipe-list.test.js` |
+| `list-view.js` | shuffle (Fisher-Yates) and pagination maths — used by BOTH indexes since #694; `recipe-list.js` until #759 | `list-view.test.js` |
 | `filter-state.js` | what an index's filter state IS: `create(spec)`, `FOOD_FIELDS`, `COCKTAIL_FIELDS`, `arrivedByGoingBack`, `KINDS` | `filter-state.test.js` |
 | `cook-schedule.js` | the timings arithmetic | `cook-schedule.test.js` |
 | `back-link.js` | may this arrow use history? (§13.7) | `back-link.test.js` |
@@ -3437,7 +3437,7 @@ or not"*.
 **"N survivors"**, left-aligned, plain body text, no punched treatment —
 `.results-heading .category-label` sets every value back to the body default
 on purpose. **Pagination**, 20 per page, prev/next, a status label, `(see
-all)`; the maths in `recipe-list.js`. **Shuffle** (Fisher-Yates) on clear-all
+all)`; the maths in `list-view.js`. **Shuffle** (Fisher-Yates) on clear-all
 and on every fresh load; `.recipe-list` starts `visibility: hidden` and is
 revealed after the first render, trading a visible flip for a blank instant.
 **No results** ("Blank canvas." on BOTH indexes since #1088, 2026-09-20 —

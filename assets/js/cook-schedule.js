@@ -2,7 +2,7 @@
 // COOK SCHEDULE — the arithmetic behind the cook timer, no DOM.
 //
 // Extracted out of cook-timer.js for the same reason ingredient-search.js and
-// recipe-list.js came out of filters.js: testable directly with Node (see
+// list-view.js came out of filters.js: testable directly with Node (see
 // tests/js/cook-schedule.test.js) instead of only ever checked by looking at a
 // live page. cook-timer.js still owns everything DOM-shaped -- reading the
 // weight box, building cards, filling the protein dropdown.

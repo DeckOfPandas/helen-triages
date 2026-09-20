@@ -71,7 +71,7 @@
   if (!cards.length) return;
 
   /* PAGINATION -- #694, ported from the food index rather than designed again.
-     The arithmetic is HTF.recipeList.paginate (assets/js/recipe-list.js), the
+     The arithmetic is HTF.listView.paginate (assets/js/list-view.js), the
      same pure function filters.js uses, so the two indexes cannot drift about
      what page 3 of 7 means.
 
@@ -1029,7 +1029,7 @@
        a legal page in that case -- so `currentPage` takes its answer rather
        than staying on a page that no longer exists. */
     var visible = ranked.filter(function (r) { return r.ok; });
-    var pageInfo = HTF.recipeList.paginate(visible.length, currentPage, PAGE_SIZE, showAll);
+    var pageInfo = HTF.listView.paginate(visible.length, currentPage, PAGE_SIZE, showAll);
     currentPage = pageInfo.currentPage;
     visible.forEach(function (r, i) {
       r.card.hidden = !(i >= pageInfo.start && i < pageInfo.end);

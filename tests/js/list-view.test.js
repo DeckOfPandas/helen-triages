@@ -1,5 +1,5 @@
 // =============================================================================
-// Tests for assets/js/recipe-list.js — the pure shuffle and pagination-maths
+// Tests for assets/js/list-view.js — the pure shuffle and pagination-maths
 // behind the index's recipe list, no DOM required.
 //
 // Run from the repo root, with the local Node runtime:
@@ -12,7 +12,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
-const RL = require('../../assets/js/recipe-list.js');
+const RL = require('../../assets/js/list-view.js');
 
 test('shuffle returns a permutation, not a subset or a superset', () => {
   const input = ['a', 'b', 'c', 'd', 'e'];

@@ -27,11 +27,12 @@ const JS_DIR = path.join(__dirname, '..', '..', 'assets', 'js');
 // A test asserts this list still matches the template.
 const PAGE_SCRIPTS = [
   'assets.js',
-  // #694 put `recipe-list.js` on this page: cocktail-index.js calls
-  // HTF.recipeList.paginate, and without it the script throws on its first
-  // apply(). THIS HARNESS CAUGHT THAT, which is the plainest demonstration of
-  // why it exists -- every other test stayed green while the index was dead.
-  'recipe-list.js',
+  // #694 put this on the page (as `recipe-list.js`, renamed 2026-09-20 by
+  // #759): cocktail-index.js calls HTF.listView.paginate, and without it the
+  // script throws on its first apply(). THIS HARNESS CAUGHT THAT, which is the
+  // plainest demonstration of why it exists -- every other test stayed green
+  // while the index was dead.
+  'list-view.js',
   'ingredient-search.js',
   'filter-state.js',
   'cocktail-search.js',

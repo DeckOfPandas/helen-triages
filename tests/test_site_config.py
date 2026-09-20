@@ -119,25 +119,35 @@ def test_ingredient_search_js_loads_before_filters_js():
     )
 
 
-def test_recipe_list_js_loads_before_filters_js():
-    """filters.js calls HTF.recipeList at startup (shuffleRecipeList, update's
+def test_list_view_js_loads_before_filters_js():
+    """filters.js calls HTF.listView at startup (shuffleRecipeList, update's
     pagination) -- it must already exist, same trap as ingredient-search.js.
+
+    THE FILE WAS `recipe-list.js` AND THE KEY WAS `HTF.recipeList` UNTIL
+    2026-09-20 (#759). It is three pure helpers the food index happened to need
+    first, and #694 put it on the cocktails index too; both names recorded
+    where it was born rather than what it does. The PATTERN below is what
+    matters here, not the name -- it is
+    matched against the real template, so a tag renamed without this test
+    renamed fails loudly rather than silently passing on a regex that matches
+    nothing. `.recipe-list`, the CSS class on food's `<ul>`, is untouched and
+    really is a list of recipes.
     """
     html = read("food", "index.html")
-    recipe_list_tag = re.search(r"<script src=[^>]*recipe-list\.js", html)
+    list_view_tag = re.search(r"<script src=[^>]*list-view\.js", html)
     filters_tag = re.search(r"<script src=[^>]*filters\.js", html)
-    assert recipe_list_tag, "food/index.html no longer loads assets/js/recipe-list.js."
+    assert list_view_tag, "food/index.html no longer loads assets/js/list-view.js."
     assert filters_tag, "food/index.html no longer loads assets/js/filters.js."
-    assert recipe_list_tag.start() < filters_tag.start(), (
-        "recipe-list.js must load BEFORE filters.js, or "
-        "HTF.recipeList won't exist yet when filters.js runs."
+    assert list_view_tag.start() < filters_tag.start(), (
+        "list-view.js must load BEFORE filters.js, or "
+        "HTF.listView won't exist yet when filters.js runs."
     )
 
 
 def test_filter_state_js_loads_before_filters_js():
     """filters.js reads HTF.filterState at startup -- it must already exist.
 
-    Same trap as ingredient-search.js and recipe-list.js above, and worth
+    Same trap as ingredient-search.js and list-view.js above, and worth
     stating again because of how it fails rather than because the shape is
     new. GitHub issue #40 made every taxonomy badge a link into
     `/food/?star=…&tag=…`, and filters.js applies that query string in its
@@ -161,7 +171,7 @@ def test_filter_state_js_loads_before_filters_js():
 def test_cook_schedule_js_loads_before_cook_timer_js():
     """cook-timer.js reads HTF.cookSchedule at startup -- it must already exist.
 
-    Third of the same trap as ingredient-search.js and recipe-list.js above:
+    Third of the same trap as ingredient-search.js and list-view.js above:
     the arithmetic (resolving a method to minutes, the backwards-from-the-plate
     clock maths, the rounding) lives in assets/js/cook-schedule.js, and
     cook-timer.js grabs it into `CS` in its first few lines. Loaded the wrong

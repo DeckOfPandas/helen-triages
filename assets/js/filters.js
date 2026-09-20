@@ -233,13 +233,13 @@ document.addEventListener('DOMContentLoaded', function () {
     return FilterState.hasAnythingToClear(state);
   }
 
-  // The shuffle itself is pure -- assets/js/recipe-list.js, tested directly
+  // The shuffle itself is pure -- assets/js/list-view.js, tested directly
   // with Node. This is the DOM half: re-appending in the new order.
   // appendChild on a node already in the document MOVES it rather than
   // duplicating it, so this reorders the real DOM, not a detached copy.
   function shuffleRecipeList() {
     if (!recipeList) return;
-    items = HTF.recipeList.shuffle(items);
+    items = HTF.listView.shuffle(items);
     items.forEach(function(li) { recipeList.appendChild(li); });
   }
 
@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // GitHub issues #63/#78: while a title search is active, matching rows
   // are grouped into three tiers (title starts with the query > some other
   // word in the title starts with it > query is only a mid-word substring
-  // somewhere) — see HTF.recipeList.titleMatchTier's own comment for the
+  // somewhere) — see HTF.listView.titleMatchTier's own comment for the
   // exact rule. Each tier is independently shuffled, same "fair shot" idea
   // as shuffleRecipeList() above, so no recipe is permanently stuck at the
   // bottom of a tier it shares with dozens of others. Runs on every
@@ -394,13 +394,13 @@ document.addEventListener('DOMContentLoaded', function () {
       // still the title today and stops being it the moment anything is
       // added above it. Named, so it cannot drift.
       var title = (li.querySelector('.recipe-title-link') || {}).textContent || '';
-      var tier = HTF.recipeList.titleMatchTier(title, state.nameQuery, fold);
+      var tier = HTF.listView.titleMatchTier(title, state.nameQuery, fold);
       byTier[tier].push(li);
     });
     items = [].concat(
-      HTF.recipeList.shuffle(byTier[1]),
-      HTF.recipeList.shuffle(byTier[2]),
-      HTF.recipeList.shuffle(byTier[3]),
+      HTF.listView.shuffle(byTier[1]),
+      HTF.listView.shuffle(byTier[2]),
+      HTF.listView.shuffle(byTier[3]),
       byTier[0]
     );
     items.forEach(function(li) { recipeList.appendChild(li); });
@@ -1040,11 +1040,11 @@ function renderResultsPool() {
     visibleCount = matchingLis.length;
 
     if (!suppressList) {
-      // The maths is pure -- assets/js/recipe-list.js -- and returns a
+      // The maths is pure -- assets/js/list-view.js -- and returns a
       // legal currentPage even if the one we asked for no longer exists
       // (a filter can narrow the results out from under whatever page you
       // were on), so it's adopted back rather than just read.
-      var pageInfo = HTF.recipeList.paginate(visibleCount, currentPage, PAGE_SIZE, showAll);
+      var pageInfo = HTF.listView.paginate(visibleCount, currentPage, PAGE_SIZE, showAll);
       currentPage = pageInfo.currentPage;
       totalPages = pageInfo.totalPages;
 
@@ -1800,7 +1800,7 @@ function renderResultsPool() {
     // No `!HTF.filterState` guard any more: since issue #52 this file's own
     // state object comes from that module at the top, so a page that loaded
     // filters.js without it never reaches this line. Same stance the file
-    // already takes on HTF.ingredientSearch and HTF.recipeList.
+    // already takes on HTF.ingredientSearch and HTF.listView.
     if (!matrix) return;
     var wanted = FilterState.parseQuery(location.search);
 

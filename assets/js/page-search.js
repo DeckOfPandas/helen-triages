@@ -31,7 +31,7 @@
 // pages themselves; the module below reads it and assumes nothing about which
 // site it came from.
 //
-// THE RANKING STARTED AS THE SITES' OWN (recipe-list.js's titleMatchTier,
+// THE RANKING STARTED AS THE SITES' OWN (list-view.js's titleMatchTier,
 // ingredient-search.js's banding) AND #1052 THEN NARROWED IT. Helen: "omnisearch
 // should prefix match only, and whole words only." A result matches only when
 // every word typed is a PREFIX of a whole word in the candidate, at a word

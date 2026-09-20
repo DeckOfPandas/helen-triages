@@ -258,7 +258,7 @@ test('#695: with only one section asked, the order is unchanged', () => {
 // cocktail-index.js's IIFE like everything else here, so before the harness the
 // only way to check "does next actually advance" was to open a browser. The
 // harness caught a real break while this was being written: #694 added
-// `recipe-list.js` to the page and the script threw on its first apply() until
+// `list-view.js` to the page and the script threw on its first apply() until
 // the harness was told, with every other test green.
 
 function manyDrinks(n) {
