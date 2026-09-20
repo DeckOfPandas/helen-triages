@@ -227,6 +227,37 @@ moods:
     "can't be bothered to juice": it names "the urgh, juicing, urghh feeling
     when you want a single drink on a weeknight without using 47 pieces of
     equipment and making your worktops sticky". The low-effort end, 38 drinks.
+  no measuring: >-
+    ONE RECEPTACLE, WHOLE POURS OF IT. Every measured amount is a whole-number
+    multiple of the smallest one, and the whole drink is eight of those pours
+    or fewer -- 1/1/1, 2/1/1, 3/2/1. Whatever is to hand does it: a jigger, an
+    egg cup, a shot glass. Helen, #1127: "for drinks I can make with just one
+    receptacle, if that's all I have."
+    THE CAP IS WHAT MAKES IT A FILTER. Without one the rule is 58% of the
+    collection, which test_no_mood_covers_more_than_half_the_collection refuses
+    outright -- the same bar that retired food's `one-pot` at 57%. Almost any
+    set of amounts is whole multiples of SOMETHING: the Corpse Reviver #2 is
+    integer-proportioned at 41 pours of 7.5 ml, which is not a drink anyone is
+    making with an egg cup. Helen's own caveat named the same thing before the
+    measurement did -- "some drinks may be like this but only if I make loads".
+    At eight it is 28 drinks; at six, 23; at ten, 33. She chose eight on
+    2026-09-19, over a printed list of what each catches, because eight is
+    where Anita's Attitude Adjuster (seven equal pours) sits comfortably inside.
+    NOT MEASURED, NOT COUNTED: dashes, drops, pinches, a `to top`, a `to taste`
+    and half a lime are all ignored, because none of them has a volume to be in
+    proportion to. Helen, #1127: "ignore ingredients in drops, dashes, pinches,
+    etc." A drink whose only measured line is one pour of spirit therefore
+    qualifies, and that is right rather than a loophole -- the Caipirinha is
+    45 ml of cachaça, half a lime and 20 g of palm sugar, and you measure
+    exactly one of those things.
+    A TOP IS AN AMOUNT, NOT AN INGREDIENT, and this is where it differs from
+    `easy peasy`, which sets a mixer aside by what it IS. Helen, 2026-09-19:
+    "No ingredient in the Aperol Spritz is a top." Its prosecco is 90 ml on the
+    page and belongs to the 3:2:1 as much as the Aperol does; champagne written
+    `to top` is a different thing and falls out on its own for having no volume.
+    The cost of the distinction is Long Island Iced Tea and Lita Grey, both
+    `easy peasy` and both carrying a measured 60 ml of cola or champagne -- and
+    a measured 60 ml is exactly what this tag promises you will not have to do.
   on fire: >-
     Something is set alight. Two drinks, and narrow is the point: a two-drink
     answer to "something on fire" is a good answer, not a failed filter.
@@ -1111,6 +1142,11 @@ mood_groups:
     - festive
   hassle:
     - no juicing
+    # NEXT TO `no juicing` DELIBERATELY, #1127: the two chips that name a piece
+    # of equipment you will not have to get out read as a pair, and both are
+    # the low-effort end of the row. Helen's orders above are hers; this one
+    # position is the only thing in either list that was not typed by her.
+    - no measuring
     - ice ice baby
     - on fire
     - easy peasy

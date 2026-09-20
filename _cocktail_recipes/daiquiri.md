@@ -21,6 +21,7 @@ mood:
   - "sharp"
   - "tiki"
   - "sunny terrace"
+  - "no measuring"
   - "easy peasy"
 notes: []
 source: ""
@@ -30,5 +31,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

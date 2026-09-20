@@ -28,6 +28,7 @@ mood:
   - "sharp"
   - "aperitivo"
   - "brunch"
+  - "no measuring"
 notes: []
 source: ""
 source_url: ""
@@ -36,5 +37,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

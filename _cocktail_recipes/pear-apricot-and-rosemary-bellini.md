@@ -42,6 +42,7 @@ mood:
   - "signature"
   - "I want to faff"
   - "no juicing"
+  - "no measuring"
 notes:
   - label: "portioning"
     text: "1 pear makes 3–4 orders."
@@ -52,5 +53,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

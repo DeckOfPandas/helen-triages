@@ -25,6 +25,7 @@ method:
 mood:
   - "sharp"
   - "signature"
+  - "no measuring"
   - "easy peasy"
 notes:
   - label: "I've run out of gin"
@@ -36,5 +37,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -28,6 +28,7 @@ mood:
   - "sharp"
   - "sunny terrace"
   - "so wrong it's right"
+  - "no measuring"
   - "easy peasy"
 notes: []
 source: "Difford's"
@@ -37,5 +38,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

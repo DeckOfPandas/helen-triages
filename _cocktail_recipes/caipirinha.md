@@ -37,6 +37,7 @@ mood:
   - "signature"
   - "I want to faff"
   - "no juicing"
+  - "no measuring"
 notes:
   - label: "Fruit option"
     text: "Add 10 blueberries and 3 basil leaves after first muddle."
@@ -49,5 +50,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

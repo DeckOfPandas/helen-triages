@@ -23,6 +23,7 @@ method:
 mood:
   - "aperitivo"
   - "signature"
+  - "no measuring"
   - "easy peasy"
 notes: []
 source: ""
@@ -32,5 +33,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

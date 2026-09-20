@@ -23,6 +23,7 @@ mood:
   - "clear"
   - "aperitivo"
   - "no juicing"
+  - "no measuring"
 notes:
   - label: "Yuzu? Mezu!"
     text: "Also fine with La Yuzu."
@@ -33,5 +34,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

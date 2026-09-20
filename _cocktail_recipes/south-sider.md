@@ -30,6 +30,7 @@ mood:
   - "clear"
   - "festive"
   - "no juicing"
+  - "no measuring"
   - "easy peasy"
 notes:
   - label: "steady hand"
@@ -41,5 +42,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -38,6 +38,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from fractions import Fraction
 from pathlib import Path
 
 import yaml
@@ -91,6 +92,16 @@ BASE_FAMILIES = {"rum", "gin", "whisky", "brandy", "agave", "vodka", "aquavit"}
 # it to 44% base spirit and force a hand-correction.
 NOT_A_POUR = {"water"}
 
+# `no measuring` -- the most pours of the smallest measure a drink may take and
+# still be a one-receptacle drink. Helen's number, 2026-09-19 (#1127), chosen
+# over a printed list of what six, eight, ten and twelve each catch.
+#
+# A NUMBER, NOT A SHAPE, IS WHAT MAKES THIS A FILTER AT ALL. Uncapped the rule
+# is 58% of the collection and test_no_mood_covers_more_than_half_the_collection
+# refuses it. taxonomy.yml's definition carries the reasoning; this is the
+# number the definition's own prose states, and the two must agree.
+MAX_POURS = 8
+
 
 def spirit_volumes(entries, measures, family_of, whisky):
     """Millilitres per spirit FAMILY, not per ingredient.
@@ -120,6 +131,41 @@ def _listed(value):
     if value is None:
         return []
     return value if isinstance(value, list) else [value]
+
+
+def pour_count(entries, measures):
+    """How many pours of the SMALLEST measured amount the drink takes.
+
+    None where the amounts are not whole-number multiples of the smallest, and
+    none where nothing in the drink is measured by volume at all. `no measuring`
+    is the only caller -- #1127.
+
+    EXACT ARITHMETIC, THROUGH `Fraction`, AND NOT BECAUSE ANYONE LIKES THEM.
+    `millilitres` returns a float, and 45.0 / 22.5 is exactly 2.0 while
+    22.5 / 7.5 is 2.9999999999999996 on some values -- so `is_integer()` over
+    floats decides a drink's mood by the binary expansion of a decimal amount.
+    `Fraction(str(x))` reads the DECIMAL the float prints, which is the number
+    the recipe actually says, and the division is then exact.
+
+    NOTHING IS SET ASIDE BY INGREDIENT, unlike `easy peasy`. Helen, 2026-09-19:
+    "No ingredient in the Aperol Spritz is a top." A top is an AMOUNT -- the
+    literal string `to top` -- and it drops out here for free, along with
+    dashes, drops, pinches, `to taste` and half a lime, because `millilitres`
+    hands back None for every one of them. Prosecco written `90 ml` is an
+    ingredient in the ratio, and the Spritz is 3 : 2 : 1.
+    """
+    amounts = []
+    for entry in entries:
+        millilitres_ = millilitres(entry.get("amount", ""), measures)
+        if millilitres_ is None or millilitres_ == 0:
+            continue
+        amounts.append(Fraction(str(millilitres_)))
+    if not amounts:
+        return None
+    multiples = [a / min(amounts) for a in amounts]
+    if not all(m.denominator == 1 for m in multiples):
+        return None
+    return sum(int(m) for m in multiples)
 
 
 def hits_in(text, words):
@@ -334,6 +380,15 @@ def derive(drink, sets, step_words, families):
         out.append("I want to faff")
     if not has("citrus"):
         out.append("no juicing")
+
+    # `no measuring` -- #1127, and it reads AMOUNTS where every other rule here
+    # reads ingredients or steps. Whole multiples of the smallest measure, in
+    # MAX_POURS of it or fewer. See taxonomy.yml for why there is a cap and why
+    # a drink with a single measured line still qualifies.
+    pours = pour_count(entries, sets["_measures"])
+    if pours is not None and pours <= MAX_POURS:
+        out.append("no measuring")
+
     if hits_in(steps, step_words.get("fire") or []):
         out.append("on fire")
 

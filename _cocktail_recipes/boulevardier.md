@@ -26,6 +26,7 @@ mood:
   - "strong brown drink"
   - "nightcap"
   - "no juicing"
+  - "no measuring"
   - "easy peasy"
 notes: []
 source: "Death & Co"
@@ -35,5 +36,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

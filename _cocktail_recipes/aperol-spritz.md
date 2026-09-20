@@ -22,6 +22,7 @@ mood:
   - "brunch"
   - "sunny terrace"
   - "no juicing"
+  - "no measuring"
   - "easy peasy"
 notes: []
 source: ""
@@ -31,5 +32,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
