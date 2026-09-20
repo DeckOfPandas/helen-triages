@@ -35,7 +35,8 @@ method:
 method_short:
   - ""
 notes:
-  - "QQ - the source stops after the garlic. Nothing tells you when the parmesan goes in, or how the gnocchi and the butter meet."
+  - label: "QQ"
+    text: "QQ - the source stops after the garlic. Nothing tells you when the parmesan goes in, or how the gnocchi and the butter meet."
 meta:
   rewritten: false
   awaiting_fix: false

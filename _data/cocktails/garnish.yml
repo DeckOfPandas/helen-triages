@@ -129,11 +129,23 @@ canonical:
     - "orange or lemon twist"
     - "grapefruit twist"
     - "flamed orange zest coin"
+    # NEW 2026-09-20, for the Gin Rickey, whose Difford's source garnishes with
+    # a "length of lime peel". Helen declared the source's own words rather than
+    # `lime twist`, and the difference is real: `twist` in a garnish makes
+    # _layouts/cocktail.html append an "Express the twist..." step, and this
+    # source never says to express anything. It is not a second spelling of a
+    # twist and must not be collapsed into one.
+    - "length of lime peel"
 
   citrus_cut:
     - "lime wedge"
     - "lime wedge on rim"
     - "lime wheel"
+    # NEW 2026-09-20, for the Cadillac Margarita: the source says "lime wheel
+    # or wedge" and leaves the cut to the maker. ONE STRING, not two, by the
+    # convention documented at the top of this file (`orange or lemon twist`):
+    # the list is conjunctive, so two entries would ask for both.
+    - "lime wheel or wedge"
     - "lemon wheel"
     - "lemon slice"
     - "orange slice"
@@ -224,6 +236,10 @@ canonical:
     - "mint leaf"
     - "mint bouquet"
     - "rosemary sprig"
+    # NEW 2026-09-20, for the White Negroni Piña Colada. The source's garnish
+    # line says "frond" and its directions say "pineapple leaf"; Helen declared
+    # the garnish line's word.
+    - "pineapple frond"
     - "kaffir lime leaves"
     - "cucumber wheels"
     - "edible violet"
@@ -235,6 +251,19 @@ canonical:
 
   spice_and_other:
     - "grated nutmeg"
+    # NEW 2026-09-20, all three from the Punch batch (#606) at Helen's word:
+    # "add all those garnishes to garnish.yml".
+    #
+    # `Angostura bitters` IS A GARNISH HERE, NOT A POUR, because the White
+    # Negroni Piña Colada tops the drink with "several dashes" and gives no
+    # count -- an amount nothing could total. The capital is the brand's, as
+    # with `Luxardo maraschino cherry`. Its final `s` drops the article
+    # without a `no_article` entry (#1143).
+    - "Angostura bitters"
+    # OPTIONAL IN ITS SOURCE (Rum Cow, and only for some glasses), which this
+    # list cannot say: a garnish is present or absent. The drink's own note
+    # carries the condition. A mass noun, so it IS in `no_article` below.
+    - "whipped cream"
     - "cinnamon stick"
     # GINGER, TWO ENTRIES, 2026-09-17. Helen: "Ginger, yes, two entries (and
     # counting)" -- so this is deliberately not one `ginger` garnish with the
@@ -327,6 +356,7 @@ no_article:
   - kaffir lime leaves
   - cucumber wheels
   - grated nutmeg
+  - whipped cream                       # a mass noun
   - three coffee beans
   - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"
