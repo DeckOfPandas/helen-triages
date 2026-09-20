@@ -1445,6 +1445,36 @@ $card-name-step: 0.86;
 @media (max-width: 720px) {
   .drink-cards { grid-template-columns: 1fr; }
 
+  // THE GLASS COMES DOWN WITH THE CARD -- #1165, 2026-09-21. Helen: "glasses
+  // are too large and are overflowing vertically on cocktail cards at medium
+  // screen widths."
+  //
+  // IT IS THIS BLOCK'S OWN `height: auto` THAT BROKE IT, which is why the fix
+  // belongs here. Above 720px a card is a fixed $card-height (206.4px) and the
+  // tallest glass is 166.4px -- 81% of the card, Helen's pick from
+  // /dev/card-glasses/ on 2026-08-31, and it always fits because the box is
+  // guaranteed. #1086 gave a card below this width `height: auto` so a short
+  // one would stop carrying a dead band, and the drawing kept its 10.4rem: a
+  // card with one ingredient line and one chip is 133.7px tall holding a
+  // 166.4px glass, which `overflow: hidden` then clips top and bottom.
+  //
+  // MEASURED BEFORE CHOOSING (tmp/card_heights.sh, tmp/card_summary.py, over
+  // the 20 cards each width renders). Cards shorter than their own glass:
+  // 2/20 at 420px, 7/20 at 500px, 14/20 at 620px, 17/20 at 700px, and 20/20 at
+  // 719px -- every card on the page. The shortest card in the band is 133.7px.
+  //
+  // 7.5rem = 120px, WHICH IS 90% OF THAT SHORTEST CARD and clips none of them
+  // at any width sampled. 8rem (128px) also fits everything measured but fills
+  // a short card almost edge to edge; 8.5rem clips 9 to 12 cards again. Helen
+  // chose from the three on the related-drinks row at 620px, which is the one
+  // set of cards that does not reshuffle between builds.
+  //
+  // THE ≤400px BLOCK STILL WINS BELOW 400, where the glass is a band across the
+  // top rather than a left column and takes 6.4rem. It sits later in this file,
+  // so source order does it -- both are `:root`, so neither out-specifies the
+  // other and moving either one past the other would silently swap them.
+  :root { --card-glass-scale: 7.5rem; }
+
   // BELOW THE TWO-COLUMN BREAKPOINT, "ROW-MATCHED" HEIGHT IS A ROW OF ONE --
   // design review #1086. `$card-height` is fixed (top of file) because the
   // grid needs every card in a ROW the same height, and #776's line budget

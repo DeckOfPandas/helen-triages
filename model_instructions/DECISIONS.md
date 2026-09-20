@@ -6477,6 +6477,33 @@ verification. Dates are when the correction landed.
   on the svg is the same intent stated where it applies. Horizontal only —
   the vertical `0`s are what keep the drawing from sizing the row (#942).
 
+- **2026-09-21, #1165 — the card glass clipped between 400 and 720px, and
+  #1086's own fix is what broke it.** Helen: *"glasses are too large and are
+  overflowing vertically on cocktail cards at medium screen widths."*
+
+  **ABOVE 720px IT CANNOT HAPPEN.** A card is a fixed `$card-height` (206.4px)
+  and the tallest glass is 166.4px — 81% of it, Helen's pick from
+  `/dev/card-glasses/` on 2026-08-31 — and it always fits because the box is
+  guaranteed. Below 720px #1086 gave the card `height: auto`, so a short card
+  would stop carrying a dead band under its foot, and the drawing kept its
+  10.4rem. A card with one ingredient line and one chip is 133.7px tall holding
+  a 166.4px glass, and `overflow: hidden` clips it top and bottom. **A fixed
+  drawing in a box that stopped being fixed.**
+
+  **MEASURED BEFORE CHOOSING, over the 20 cards each width renders**
+  (`tmp/card_heights.sh` + `tmp/card_summary.py`). Cards shorter than their own
+  glass: 2/20 at 420px, 7/20 at 500px, 14/20 at 620px, 17/20 at 700px, and
+  **20/20 at 719px** — every card on the page. Shortest card in the band:
+  128.1px. 7.5rem (120px) clips none of them; 8rem fits everything sampled but
+  fills a short card edge to edge; 8.5rem clips 9–12 again.
+
+  **THE INDEX SHUFFLES, SO IT CANNOT BE THE A/B TARGET.** `.drink-card:first-child`
+  is a different drink in every screenshot (Fisher-Yates on every fresh load),
+  which makes a before/after of "the same card" impossible there. The
+  **related-drinks row on a drink page** is chosen by score, is the same three
+  cards every build, and its cards are ordinary `.drink-card`s — so that is the
+  stable target for any card comparison, and worth remembering for the next one.
+
 - **2026-09-21, #1164 — the count leads on "see shortlist".** Helen: *"swap
   shortlist and (0) in the button so the structure of the + shortlist is
   repeated."* The button above it is a mark then a word (`+` is a `::before`),
