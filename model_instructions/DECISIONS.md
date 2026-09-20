@@ -3422,6 +3422,54 @@ unless stated.
   tool before the SECOND, corrected one was applied by hand into the right
   place; a session that had not re-run the script after the first edit would
   have shipped a drink whose mood quietly did not say what Helen asked for.
+- **2026-09-19/20, #1127 — `no measuring`, the sixth hassle chip, and the
+  first rule that reads AMOUNTS.** Helen: *"for drinks I can make with just one
+  receptacle, if that's all I have. Such as 1/1/1, 2/1/0.5."* Every measured
+  amount a whole-number multiple of the smallest, in eight of those pours or
+  fewer. 28 drinks of 129, 15 of them published.
+
+  **The cap was not in the issue and is the whole feature.** Uncapped the rule
+  is 58% of the collection, refused outright by
+  `test_no_mood_covers_more_than_half_the_collection` — the bar that retired
+  food's `one-pot` at 57%. **Almost any set of decimal amounts is whole
+  multiples of SOMETHING**: the Corpse Reviver #2 is integer-proportioned at 41
+  pours of 7.5 ml, which is not a drink anyone makes with an egg cup. Her own
+  caveat had named the same thing before the measurement did — *"some drinks
+  may be like this but only if I make loads"*. Chosen over a printed table of
+  six / eight / ten / twelve catching 23 / 28 / 33 / 39.
+
+  **A TOP IS AN AMOUNT, NOT AN INGREDIENT, and she corrected me on it.** I
+  proposed setting every lengthener aside by name, the way `easy peasy` does,
+  and cited Long Island Iced Tea as the evidence. Her answer: *"No ingredient
+  in the Aperol Spritz is a top."* The Spritz's prosecco is 90 ml on the page
+  and belongs to its 3:2:1 as much as the Aperol does; champagne written `to
+  top` is a different thing and falls out on its own for having no volume.
+  **The cost is measured and accepted**: LIIT and Lita Grey drop out, both
+  `easy peasy`, both carrying a measured 60 ml of cola or champagne — and a
+  measured 60 ml is precisely what the chip promises you will not have to do.
+  The two moods now answer genuinely different questions, which they did not
+  when one was a copy of the other's set-aside.
+
+  **The name is hers and it reframed the rule.** Mine was `integer
+  proportions`; she wrote `no measuring`, which pairs against `no juicing` and
+  settled a question I had put to her at the same time — whether a drink with
+  only one measured line qualifies. It does: *"The tag is 'no measuring', and
+  all your examples clear that bar."* The Caipirinha is 45 ml of cachaça, half
+  a lime and 20 g of palm sugar, and exactly one of those is measured.
+
+  **AND A DERIVED MOOD LANDING ON PUBLISHED DRINKS SHIPS INVISIBLE.** Not
+  predicted, found by screenshotting the built index: the chip was absent. All
+  15 published drinks that gained it went to `proofread: false` in the same
+  commit (#367), the publish gate held all 15 back, and `cocktails/index.html`
+  renders no button for a mood with no live member — so the new filter cannot
+  appear on the live site until Helen has re-read at least one drink. **The
+  same shape as `pudding in a glass`'s empty button, arriving from the other
+  direction.** Expect it on any future derived mood that is not confined to
+  drafts, and expect
+  `test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot` to go
+  red with it whenever the batch includes caipirinha or the Bellini: it reads
+  the production build, and a drink gated off the build states no volume
+  because it states nothing at all.
 - **2026-08-30** — Index headings to five greens over a shared absinthe bar.
 - **2026-08-31, #595** — Back-navigation restore on the drinks index, *"exactly
   as the food site does"*; cocktails restores SORT KEYS where food restores an

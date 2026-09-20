@@ -1535,9 +1535,21 @@ run the script dry after any such edit, `--write` only if it reports a
 difference. `test_every_drinks_moods_match_the_derivation` re-derives every
 drink, so a hand-edited mood cannot outlive the rule. Helen's own rulings
 override the derivation through `mood_include` / `mood_exclude`, each naming
-the single mood it is about. Nine moods are derived; **ten are hers alone**
-(`moods_by_hand`) and no rule produces them — a newly ingested drink is
-missing half its browse axes until she is asked (§9.13).
+the single mood it is about. Of 21 declared moods ten are derived and **twelve
+are hers alone** (`moods_by_hand`) — `on fire` is both, hand-assigned on a
+drink whose fire is in the SERVE rather than the METHOD — and no rule produces
+the other eleven, so a newly ingested drink is missing half its browse axes
+until she is asked (§9.13). **Re-count rather than quoting those numbers**:
+`moods_by_hand` in `taxonomy.yml` and the `out.append` lines in the deriver
+are the two lists, and this sentence had been stale on both counts since
+`easy peasy` and `on fire` joined the first one.
+
+**`no measuring` is the one rule that reads AMOUNTS** (#1127) rather than
+ingredients, glass or method steps: every measured amount a whole-number
+multiple of the smallest, in `MAX_POURS` of that measure or fewer. The cap is
+what makes it a filter — uncapped it is 58% of the collection — and a `to top`
+falls out of it for having no volume, which is deliberately NOT the same rule
+as `easy peasy`'s set-aside-a-mixer. `taxonomy.yml` carries both arguments.
 
 **`amount` is the only quantity field.** `ml:` is retired (#571).
 Conversions and non-volumetric units live in `measures:` in
