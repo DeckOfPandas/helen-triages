@@ -177,6 +177,71 @@ def test_a_malformed_envelope_is_rejected_with_its_reason(name, site, expected):
     assert "\n" not in reason, "a rejection is ONE line -- it is read in a list"
 
 
+COCKTAIL_NOTE = (
+    '  - label: "QQ"\n'
+    '    text: "QQ - `generic` and `suggestion` not filled in. The source names '
+    'one bottle (Campari) and otherwise gives categories, and a category is not '
+    'derivable from a bottle name."\n'
+)
+FOOD_NOTE = (
+    '  - label: "QQ"\n'
+    '    text: "QQ - the source stops after the garlic. Nothing tells you when '
+    'the parmesan goes in, or how the gnocchi and the butter meet."\n'
+)
+
+
+@pytest.mark.parametrize("name,site,old,new,expected", [
+    # A bare string renders under the page's fallback title, "note" -- #1120.
+    ("valid_cocktail", "cocktail", COCKTAIL_NOTE,
+     '  - "QQ - generics not filled in."\n',
+     "note 1 is a bare string"),
+    ("valid_cocktail", "cocktail", COCKTAIL_NOTE,
+     '  - label: "note"\n    text: "QQ - generics not filled in."\n',
+     "note 1 is labelled 'note', not 'QQ'"),
+    ("valid_cocktail", "cocktail", COCKTAIL_NOTE,
+     '  - label: "QQ"\n    text: "Generics not filled in."\n',
+     "note 1 has text that does not begin `QQ`"),
+    ("valid_cocktail", "cocktail", COCKTAIL_NOTE,
+     COCKTAIL_NOTE + '  - "QQ - a second note, bare."\n',
+     "note 2 is a bare string"),
+    # The food site has the same fallback title and the same rule.
+    ("valid_food", "food", FOOD_NOTE,
+     '  - "QQ - the source stops after the garlic."\n',
+     "note 1 is a bare string"),
+])
+def test_a_note_that_is_not_labelled_qq_is_rejected(name, site, old, new, expected):
+    """#1120. The rule has been in both documents since 2026-09-04; this is the
+    first place anything checked it.
+
+    Built by replacing the valid fixture's note rather than keeping four more
+    files, so the assert below is what stops a reworded fixture turning the
+    replacement into a silent no-op that "rejects" nothing.
+    """
+    text = envelope_text(name)
+    assert old in text, f"the {name} fixture's note has moved; update this test"
+    with pytest.raises(inbox.Rejected) as caught:
+        inbox.parse_envelope(text.replace(old, new), site)
+    reason = str(caught.value)
+    assert expected in reason, f"reason was {reason!r}"
+    assert "#1120" in reason
+    assert "\n" not in reason, "a rejection is ONE line -- it is read in a list"
+
+
+@pytest.mark.parametrize("name,site", [
+    ("valid_cocktail", "cocktail"),
+    ("valid_food", "food"),
+])
+def test_an_envelope_with_no_notes_is_not_a_rejection(name, site):
+    """The rule is about the notes that ARE there. A source that answers
+    everything has nothing to ask, and an empty `notes` must not be refused."""
+    text = envelope_text(name)
+    old = COCKTAIL_NOTE if site == "cocktail" else FOOD_NOTE
+    assert old in text, f"the {name} fixture's note has moved; update this test"
+    swapped = text.replace("notes:\n" + old, "notes: []\n")
+    assert swapped != text
+    assert inbox.parse_envelope(swapped, site).fm["notes"] == []
+
+
 def test_a_rejection_never_reaches_the_writing_half(drafts):
     """A refusal is a refusal, not a slower write."""
     plan = inbox.plan_for(envelope_text("no_marker"), "food", [], drafts, number=7)

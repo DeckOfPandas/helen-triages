@@ -143,6 +143,12 @@ Rules the consumer enforces:
   implement rather than guessing what changed.
 - Exactly one fenced `yaml` block. Its first line is `---`. It parses as
   YAML with a dict at the top. Its `title` is present.
+- Every entry in `notes` is `label: "QQ"` with text beginning `QQ` (#1120,
+  added 2026-09-20). A note with no label is titled "note" on the page and
+  looks finished, so an unread note would publish under a heading that says
+  nothing is wrong. An envelope carries no note of Helen's, so the rule can be
+  demanded of every entry; a bare string, another label, or `QQ` text under a
+  different label is a rejection.
 - `## What I could not know` is present, even if its only bullet is "nothing".
 - `## Fingerprint` is one line: the title lowercased, then every amount in
   ingredient order, `|`-separated. The consumer builds the same line from the

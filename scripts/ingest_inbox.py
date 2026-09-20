@@ -161,6 +161,40 @@ def _section(prose: str, heading: str) -> list:
     return out
 
 
+def _reject_unlabelled_notes(fm: dict) -> None:
+    """Every note an ingest adds is `label: "QQ"` with text beginning `QQ`.
+
+    #1120, Helen: the page titles a note with no label "note", which looks
+    finished, so a note nobody has read would publish under a heading that says
+    nothing is wrong. `QQ` is the title she can see and search for. Both
+    documents have said so since 2026-09-04 and nothing checked it here.
+
+    A FRESH INGEST HAS NO NOTE OF HELEN'S, which is what makes this safe to
+    demand of every entry: her own remarks are added afterwards, by her, to a
+    file that is already in the drafts. Only an envelope is held to it.
+    """
+    notes = fm.get("notes")
+    if not isinstance(notes, list):
+        return
+    for number, note in enumerate(notes, start=1):
+        if isinstance(note, str):
+            problem = "is a bare string"
+        elif not isinstance(note, dict):
+            problem = f"is a {type(note).__name__}, not a `{{label, text}}` pair"
+        elif note.get("label") != "QQ":
+            problem = f"is labelled {note.get('label')!r}, not 'QQ'"
+        elif not (isinstance(note.get("text"), str)
+                  and note["text"].lstrip().startswith("QQ")):
+            problem = "has text that does not begin `QQ`"
+        else:
+            continue
+        raise Rejected(
+            f"note {number} {problem}; every note an ingest adds is "
+            f'`label: "QQ"` with text beginning `QQ`, because a note with no '
+            f'label is titled "note" on the page and looks finished (#1120)'
+        )
+
+
 def parse_envelope(body: str, site: str) -> Envelope:
     """§6 of the design, rule for rule. Raises `Rejected` with one line."""
     lines = [line.rstrip() for line in body.replace("\r\n", "\n").split("\n")]
@@ -219,6 +253,7 @@ def parse_envelope(body: str, site: str) -> Envelope:
     title = fm.get("title")
     if not isinstance(title, str) or not title.strip():
         raise Rejected("the fenced block has no `title:`")
+    _reject_unlabelled_notes(fm)
 
     prose = _strip_fences(body)
     hand_back = _section(prose, HAND_BACK_HEADING)
