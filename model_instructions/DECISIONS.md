@@ -6316,6 +6316,41 @@ verification. Dates are when the correction landed.
   glass are what settled it. **When a measurement disagrees with the CSS you
   just compiled, suspect the measurement.**
 
+- **2026-09-20, #1148 — `??` sat 9.4px below the row on a phone, and the block
+  that did it was half-written.** Helen: *"On narrower screens, ?? renders lower
+  than [ COCKTAILS ]."* Measured on the real build at 390px with `crop.sh` and
+  `inkbox.py`: the row's ink centre 120.3, the `??`'s 129.7.
+
+  **The cause.** `.site-nav-icons` and `.site-about-link` both carry
+  `margin: 0.9rem 0 0` in the base rules, which is what puts them on one line at
+  desktop width. #1086's `@media (max-width: 600px)` block halved the ROW's to
+  `0.45rem` for the phone header and left the `??` at `0.9rem`. The whole
+  difference is that one missing line.
+
+  **What the measurement turned up that the issue did not.** The pair is not
+  level at ANY width. Both boxes top-align, and their ink sits differently
+  inside them because `[ COCKTAILS ]` is 0.8rem `$font-headings` and `??` is
+  1.05rem `$font-body` — at 1280px the row reads 154.6 and the `??` 156.8, the
+  same 2.2px, present since the row was built and never mentioned by anyone.
+
+  **So it was put to her as two fixes, not one** (§13.11, on the real crops with
+  a rule drawn at each ink centre): **A** halves the margin, restoring the
+  desktop relationship exactly and leaving the old 2.2px; **B** adds a measured
+  `top: -0.131em` so the ink genuinely agrees, at every width including the one
+  she did not report a problem with. **A shipped.** **A bug report names a
+  symptom, and the width it was reported at is not always the width the fault
+  lives at — measure the others before deciding how wide the fix should be.**
+
+- **2026-09-20 — `crop.sh` / `styles.sh` / `shoot.sh` paths are site-relative,
+  and getting it wrong reports the WRONG FAILURE.** The tools prepend
+  `/helen-triages` themselves, so the argument is `/food/`. Passing
+  `/helen-triages/food/` asks for it twice, the server 404s, the page has no
+  elements, and the tool says `no elements for .site-nav-icons` — which reads as
+  a selector that does not match, not as a page that is not there. Cost a
+  detour on #1148 spent doubting a selector that was correct all along; MANUAL
+  §1 now says so at the tools. **When a browser tool reports an empty match for
+  a selector you are confident about, doubt the URL before the selector.**
+
 - **2026-09-20, #1149 — the footer column head is a door, and it looks like the
   header's door rather than like the links under it.** Helen's issue was two
   words and a title: "[ FOOD ]", "[ COCKTAILS ]", "footer group headers should

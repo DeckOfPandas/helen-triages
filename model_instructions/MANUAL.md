@@ -176,6 +176,15 @@ crops one element at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`,
 `right`), so an alignment question is answered by comparing two numbers, not
 two images; the last two arguments type text into a box first, for a control
 that only shows itself once somebody has typed (the search dropdown, #1050).
+**EVERY `<path>` IS SITE-RELATIVE AND THE TOOL ADDS `/helen-triages` ITSELF**
+— `/food/`, `/cocktails/recipes/daiquiri/`, never `/helen-triages/food/`.
+Passing the baseurl yourself asks for `/helen-triages/helen-triages/food/`,
+which the server answers 404; the page then has no elements at all, so the
+tool says **`no elements for <selector>`** — indistinguishable from a selector
+that simply does not match, and the reason this is written down (2026-09-20,
+#1148, after a detour spent doubting the selector). If a selector you are sure
+about reports nothing, check the path before anything else; `python3
+tmp/check_serve.py`-style direct fetch of the URL settles it in one call.
 Three more tools, all added 2026-09-15 so a Playwright question rarely needs a
 one-off `tmp/` script: `sh scripts/browser/styles.sh <path> <selector> [width]
 [prop,prop,...]` prints every matching element's box and a set of computed

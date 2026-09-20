@@ -1363,6 +1363,34 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     margin-top: 0.45rem;
   }
 
+  // AND `??` TAKES THE SAME HALVING -- #1148, 2026-09-19. Helen: "On narrower
+  // screens, ?? renders lower than [ COCKTAILS ]."
+  //
+  // THE BUG WAS THIS BLOCK BEING HALF-WRITTEN. `.site-about-link` and
+  // `.site-nav-icons` both carry `margin: 0.9rem 0 0` in the base rules, which
+  // is what puts them on one line at desktop width; #1086 halved the row's here
+  // and left the `??` at 0.9rem, so below 600px they sat 7.2px apart. Measured
+  // on the real page at 390px before the fix: the row's ink centre 120.3, the
+  // `??`'s 129.7.
+  //
+  // WHY THE ANSWER IS THE SAME NUMBER AND NOT A TUNED ONE. The pair is not
+  // perfectly level at ANY width -- the two boxes are top-aligned and their ink
+  // sits differently inside them, because `[ COCKTAILS ]` is 0.8rem
+  // $font-headings and `??` is 1.05rem $font-body, so the `??` reads 2.2px low
+  // on desktop too. That residual is old, nobody has minded it, and it is not
+  // what #1148 reported. Halving this margin restores the desktop relationship
+  // exactly; correcting the 2.2px would be a change to every width and is
+  // Helen's to ask for (§13.12).
+  //
+  // To re-measure after any change to either face or size:
+  // `sh scripts/browser/crop.sh /food/ ".site-nav-icons" ink-row 390` and
+  // `... ".site-about-link" ink-about 390`, then
+  // `python3 scripts/browser/inkbox.py` on each -- the BRACKETS bound the row's
+  // object, so its ink centre is theirs, not the capitals'.
+  .site-about-link {
+    margin-top: 0.45rem;
+  }
+
 }
 
 // THE FOOTER STACKS AT ITS OWN WIDTH, NOT THE HEADER'S, and the two were one
