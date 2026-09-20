@@ -3,19 +3,29 @@
 
     python3 scripts/verify.py
 
-FOUR CHECKS, AND THE POINT IS THAT THEY ARE ONE COMMAND. MANUAL §1 lists them
+FIVE CHECKS, AND THE POINT IS THAT THEY ARE ONE COMMAND. MANUAL §1 lists them
 separately and they were being typed separately after every change, which has
-two costs. The small one is four invocations instead of one. The real one is
-that the last two are EASY TO FORGET -- `derive_cocktail_moods.py` is the only
-thing that says whether a vocabulary edit silently moved a drink's moods, and
+two costs. The small one is five invocations instead of one. The real one is
+that the last three are EASY TO FORGET -- `derive_cocktail_moods.py` is the
+only thing that says whether a vocabulary edit silently moved a drink's moods,
 `build_ingest_vocab.py --check` is the only thing that says the standalone
-ingest documents still match the data they are rendered from. Both have been
+ingest documents still match the data they are rendered from, and
+`check_slug_keys.py` is the only thing that can see a public entry keyed by a
+drink slug that no longer names a drink. Both of the first two have been
 skipped in sessions that ran the two test suites and called it verified.
 
   pytest                              content and structure
   node --test tests/js/*.test.js      the JS suite
   derive_cocktail_moods.py            did a vocabulary change move a mood?
   build_ingest_vocab.py --check       are the standalone docs in step?
+  check_slug_keys.py                  does every slug-keyed entry name a drink?
+
+A CHECK MAY REPORT **SKIP**, WHICH IS NOT A PASS AND NOT A FAILURE. Exit code 2
+means "I verified nothing", and `check_slug_keys.py` returns it whenever the
+drafts clone is absent -- which is every fresh worktree and all of CI. The run
+still goes green, because a missing private repo is not a defect; the line says
+SKIP so that nobody reads a check that ran over half a corpus as one that
+passed. That distinction is the entire content of #1106.
 
 WHY THIS FILE IS COMMITTED AND NOT IN tmp/. It started as a scratch runner, and
 `tests/js/cocktail-scale.test.js`'s own header explains why that was the wrong
@@ -30,10 +40,14 @@ file added tomorrow would be silently skipped and the run would still say PASS.
 MANUAL §10 says the glob is required, and Python's glob satisfies it without
 handing a wildcard to bash.
 
-ONE PYTEST AT A TIME, still (MANUAL §1). `test_rendered_pages.py` writes
-throwaway `zzz-gate-` recipes into the collections and deletes them after; a
-second concurrent run collects them as real files and reports failures that
-vanish on a clean rerun. This script cannot detect that -- it is on you.
+ONE PYTEST AT A TIME, still (MANUAL §1) -- but no longer for the reason this
+paragraph used to give. It said `test_rendered_pages.py` writes throwaway
+`zzz-gate-` recipes into the collections, so a second concurrent run collects
+them as real files and reports failures that vanish on a clean rerun. Since
+#1153 (2026-09-20) those fixtures go into a COPY of the tree and the real
+collections are never written to, so that particular collision cannot happen.
+Two concurrent runs still share one `.jekyll-cache` and one `tmp/`, which is
+reason enough.
 
 Exits non-zero if anything fails, so it works as a gate.
 """
@@ -53,14 +67,20 @@ def js_suite() -> list[str]:
     return ["node", "--test", *files]
 
 
-# (name, argv, a string the output must contain for a pass -- or None)
-def checks() -> list[tuple[str, list[str], str | None]]:
+# (name, argv, a string the output must contain for a pass -- or None,
+#  the exit code that means SKIPPED rather than failed -- or None)
+def checks() -> list[tuple[str, list[str], str | None, int | None]]:
     return [
-        ("pytest", ["python3", "-m", "pytest", "-q"], None),
-        ("node --test", js_suite(), "# fail 0"),
-        ("moods", ["python3", "scripts/derive_cocktail_moods.py"], "0 differ"),
+        ("pytest", ["python3", "-m", "pytest", "-q"], None, None),
+        ("node --test", js_suite(), "# fail 0", None),
+        ("moods", ["python3", "scripts/derive_cocktail_moods.py"], "0 differ",
+         None),
         ("ingest vocab", ["python3", "scripts/build_ingest_vocab.py", "--check"],
-         "matches its generator"),
+         "matches its generator", None),
+        # 2 means "no drafts clone, so I verified nothing" -- see #1106 and
+        # this file's header. Not a failure: the private repo is legitimately
+        # absent in every fresh worktree and in CI.
+        ("slug keys", ["python3", "scripts/check_slug_keys.py"], None, 2),
     ]
 
 
@@ -71,18 +91,27 @@ def main() -> int:
               "the repo root. Refusing to report a pass on zero tests.")
         return 1
 
-    failed = []
-    for name, cmd, expect in checks():
+    failed, skipped = [], []
+    for name, cmd, expect, skip_code in checks():
         try:
             r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True,
                                timeout=1800)
         except FileNotFoundError as exc:
-            print("%-14s SKIP   %s" % (name, exc))
+            # A MISSING BINARY IS A FAILURE, not a skip, whatever it prints:
+            # the check did not run and nobody chose that.
+            print("%-14s FAIL   %s" % (name, exc))
             failed.append(name)
             continue
 
         out = (r.stdout + r.stderr).strip()
         lines = [ln for ln in out.split("\n") if ln.strip()]
+
+        if skip_code is not None and r.returncode == skip_code:
+            # The check ran, declined to answer, and said why. Its FIRST line
+            # carries the reason; the last is the remedy, which is no use here.
+            print("%-14s SKIP   %s" % (name, (lines[0] if lines else "")[:84]))
+            skipped.append(name)
+            continue
 
         ok = r.returncode == 0
         if ok and expect:
@@ -105,6 +134,10 @@ def main() -> int:
     if failed:
         print("FAILED: " + ", ".join(failed))
         return 1
+    if skipped:
+        print("All green, but " + ", ".join(skipped)
+              + " verified nothing -- see the SKIP line above.")
+        return 0
     print("All green.")
     return 0
 

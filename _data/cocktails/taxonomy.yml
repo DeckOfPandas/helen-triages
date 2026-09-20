@@ -943,17 +943,46 @@ mood_step_words:
   faff:
     [muddle, alight, flame, shell, blend, rinse,
      dehydrat, infus, steep, clarif]
-  # Any one makes `ice ice baby`.
-  # `giant ice` JOINED `large ice` ON 2026-09-04, when Helen ruled the canonical
-  # strain step says GIANT: "I really do want 'giant ice cube' for e.g. strong
-  # brown drinks over ice." Both stay -- the canonical steps say giant, and
-  # banana-boulevardier's free-text "strain into a glass over a large ice block"
-  # is her own wording and is not being retyped. A step reworded out of this
-  # list silently loses the mood, which is the drift this block's own note
-  # warns about, and it is exactly what four drinks did for one commit.
-  ice:
-    ["crushed ice", swizzle, churn, blend, "large ice", "giant ice",
-     "ice block", "block of ice"]
+  # Any one of these TECHNIQUES makes `ice ice baby`. The other half of that
+  # rule is the drink's own `serve.ice` value -- see `mood_serve_ice` below.
+  #
+  # THIS BLOCK WAS DEAD DATA FROM 2026-09-05 TO 2026-09-20 (#1147). It declared
+  # eight entries and nothing read one of them: the rule kept its own hardcoded
+  # copy in `derive_cocktail_moods.py`. Every other list here IS read, so this
+  # one looked live and was not -- editing it to change which steps make a
+  # drink icy would have done nothing at all, with no error and no failing
+  # test. `test_every_mood_step_word_list_is_actually_read` is what stops a
+  # third one of these appearing: it RUNS the derivation over the collection
+  # and asks which keys were touched, so a list nothing reads fails by name.
+  #
+  # IT LOST FOUR ENTRIES RATHER THAN BEING WIRED UP AS IT STOOD, and that is
+  # the part to read before restoring them. "crushed ice", "large ice",
+  # "giant ice" and "ice block" are the PRE-2026-09-05 PROSE PROXY: the rule
+  # used to grep method steps for them, the serve pass reworded 63 steps at
+  # once, and nine drinks silently lost the mood. `serve.ice` records the fact
+  # directly now and cannot be broken by rewording. Reading those four back in
+  # would re-break exactly that, so they are gone and the field carries them.
+  #
+  # What is left is the three that were never about ice: a swizzle, a churn and
+  # a blend are TECHNIQUES, they appear in the method because that is where a
+  # technique belongs, and a swizzle is this mood's own example.
+  #
+  # IT DECIDES NO DRINK TODAY, AND IT STILL EARNS ITS PLACE. Measured 2026-09-20
+  # over all 139 files: 14 drinks satisfy both halves of the rule, 24 the
+  # `serve.ice` half alone, and NONE this half alone -- every drink whose method
+  # swizzles, churns or blends also records an icy serve. That is not an
+  # accident, it is serve.yml's own design: its `crushed` entry reads "Every
+  # swizzle". So emptying this list moves nothing, and a reader who tries it
+  # will conclude it is still dead. It is not.
+  #
+  # WHAT IT IS FOR IS THE DRINK THAT HAS NOT BEEN DECIDED YET. `serve.ice` is
+  # OPTIONAL -- "absent is always legal and means nobody has decided yet",
+  # test_serve_block_uses_only_declared_keys_and_values, with Pic-a-de-Crop
+  # Punch as the live case -- so a freshly ingested swizzle carries no serve
+  # value at all, and this half is what gives it the mood until Helen rules.
+  # Deleting it would cost exactly that drink, silently, at the moment the
+  # collection is least able to notice.
+  ice: [swizzle, churn, blend]
   # A NARROWER LIST, and it is not `ice` above. `strong brown drink` is
   # disqualified by being crushed, swizzled or blended -- but NOT by a big
   # block of ice, which is precisely how you serve one. Banana Boulevardier
@@ -962,6 +991,26 @@ mood_step_words:
   churned: ["crushed ice", swizzle, churn, blend]
   # Any one makes `on fire`.
   fire: [alight, flame, burn]
+
+# The `serve.ice` values that earn `ice ice baby` -- the OTHER half of that
+# rule, and data since 2026-09-20 (#1147) for the same reason the list above
+# is: the rule held its own hardcoded copy, which is the vocabulary living in
+# the guard instead of in the data.
+#
+# `serve.yml` DECLARES WHAT THE FIELD MAY SAY -- none, cubed, crushed, large
+# cube, block, blended -- AND THIS SAYS WHICH OF THOSE ARE ICY ENOUGH TO BE A
+# MOOD. Two different questions, so two different lists:
+# `test_every_icy_serve_value_is_a_real_one` requires every name here to be a
+# declared `serve.ice` value, so a rename in serve.yml cannot silently empty
+# this the way #452's renames emptied `mood_ingredients`.
+#
+# `cubed` IS DELIBERATELY ABSENT and Fish House Punch is why. Helen,
+# 2026-09-18: "comes over lots and lots of ice" -- and the thing the field
+# cannot carry is QUANTITY. Lots of cubed ice is an icy drink; one cube in a
+# rocks glass is not, and both spell `cubed`. That drink carries a
+# `mood_include` instead, which is the right shape for a judgement the data
+# cannot make.
+mood_serve_ice: [crushed, large cube, block, blended]
 
 # =============================================================================
 # APPETITE FOR CHAOS — how much risk you want tonight

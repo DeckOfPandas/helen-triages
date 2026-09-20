@@ -4184,6 +4184,51 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   a steady red** — a run that fails once in ten teaches people to re-run rather
   than read. The guarantee that saves it today is an accident of collection
   order that nothing states or checks.
+- **2026-09-20 — THE DERIVATION AND HARNESS GROUP: #1147, #1153, #1106, #1107,
+  and they turned out to be one bug four times.** Helen picked the group on the
+  stated grounds that not one of them touches a drink file, so nothing goes
+  dark. What they share is sharper than that: **every one is something that
+  looks live and is not**, and in all four cases nothing failed, because
+  nothing was looking.
+
+  - **#1147, a vocabulary that lied.** `warming` was derived twice from two
+    identical copies eleven lines apart, invisible because a later sort
+    dedupes — an accident, not a guarantee. And `mood_step_words.ice` declared
+    eight entries that NOTHING read: the rule held a hardcoded copy, so editing
+    the data to change which steps make a drink icy would have done nothing at
+    all. The same rule held a second hardcoded list, the `serve.ice` values,
+    now `mood_serve_ice`.
+  - **#1153, fixtures in a live directory.** Five tests wrote throwaway recipes
+    into `_food_recipes/` and `_cocktail_recipes/`; they go into a copy of the
+    tree now, at 0.09s against a 5.25s build.
+  - **#1106, a check that skipped.** Slug-keyed public entries can only be
+    resolved on a machine holding the drafts clone, so CI skipped and the
+    mistake was found after the merge.
+  - **#1107, a harness that loaded neither pass it was built for.**
+
+  **THE LESSON THAT GENERALISES: "it runs" is not "it works", and four of these
+  were green.** So every fix in this group was proved by BREAKING the thing on
+  purpose and watching the guard name it — five mutations of the card passes,
+  three of the publish gate, four states of the slug check, an injected fault
+  in each new taxonomy guard, all in `tmp/` scripts that restore the file in a
+  `finally`. Two of those mutations found real gaps while being written. **A
+  guard that has never failed is a guard nobody has checked.**
+
+  **AND A CHECK THAT VERIFIED NOTHING MUST NOT READ AS A PASS**, which is
+  #1106's second bullet and now a property of `verify.py`: exit code 2 means
+  SKIP, the line says SKIP, the run stays green because an absent private repo
+  is not a defect, and the closing line names what went unchecked. A green run
+  in a fresh worktree has NOT checked the slug keys and now says so.
+
+  **ONE THING WAS MEASURED AND KEPT ANYWAY**, which is worth recording because
+  the instinct is to delete it. `mood_step_words.ice`'s three technique words
+  decide NO drink today — 14 drinks satisfy both halves of the icy rule, 24 the
+  `serve.ice` half alone, none the step half alone, because serve.yml's
+  `crushed` entry says "Every swizzle". It stays because `serve.ice` is
+  OPTIONAL: a freshly ingested swizzle has no serve value until Helen rules,
+  and this half is what gives it the mood meanwhile. The measurement sits
+  beside the list so the next reader does not empty it, see nothing move, and
+  conclude it is dead again.
 
 ---
 

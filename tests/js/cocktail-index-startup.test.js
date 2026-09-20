@@ -30,7 +30,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const { boot, SCRIPTS } = require('./index-harness.js');
+const { boot, SCRIPTS, PAGE_SCRIPTS, LAYOUT_SCRIPTS } = require('./index-harness.js');
 const { createDocument } = require('./dom-stub.js');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -149,10 +149,44 @@ test('the script list matches the order cocktails/index.html loads them in', () 
   // rather than wiring the filters, and it needs artwork this stub has no
   // opinion about. Everything else the page loads must be here, in order.
   const wanted = inPage.filter(function (n) { return n !== 'universe.js'; });
-  const got = SCRIPTS.filter(function (n) { return n !== 'assets.js'; });
+  const got = PAGE_SCRIPTS.filter(function (n) { return n !== 'assets.js'; });
   assert.deepStrictEqual(got, wanted,
     'index-harness.js loads a different set or order of scripts than the page ' +
     'does. Follow the page.');
+});
+
+test('the card measurement passes follow _layouts/default.html', () => {
+  // #1107. These two are NOT in cocktails/index.html -- the shared layout
+  // loads them for both sites, below {{ content }}, so they run after every
+  // script the page itself loads. The harness has to keep both facts: that it
+  // loads them, and that it loads them in the layout's order.
+  //
+  // THE ORDER IS THE ONE card-line-budget.js SAYS IT NEEDS: the name pass
+  // decides how much room the ingredient line gets, and the ingredient line
+  // decides how much the chips get. Running the budget first is not a crash,
+  // it is a budget computed against a name that had not been fitted yet --
+  // which is exactly the kind of wrong a harness in the wrong order would
+  // report as fine.
+  const layout = fs.readFileSync(path.join(ROOT, '_layouts', 'default.html'), 'utf8');
+  const inLayout = [];
+  const re = /<script src="\{\{\s*'\/assets\/js\/([a-z-]+\.js)'/g;
+  let m;
+  while ((m = re.exec(layout)) !== null) {
+    if (LAYOUT_SCRIPTS.indexOf(m[1]) !== -1 && inLayout.indexOf(m[1]) === -1) {
+      inLayout.push(m[1]);
+    }
+  }
+
+  assert.deepStrictEqual(inLayout, LAYOUT_SCRIPTS,
+    '_layouts/default.html loads the card measurement passes in a different ' +
+    'order than index-harness.js does, or has stopped loading one of them. ' +
+    'The tag for card-line-budget.js went missing once already (#846 deleted ' +
+    'chip-rows.js and took it with it) and nothing noticed for two days, ' +
+    'because cocktail-index.js guards its call with `if (HTF.cardLineBudget)`.');
+
+  assert.deepStrictEqual(SCRIPTS.slice(-LAYOUT_SCRIPTS.length), LAYOUT_SCRIPTS,
+    'the harness must run the card passes LAST, as the layout does: they sit ' +
+    'below {{ content }}, so every script the page loads has already run.');
 });
 
 test('the fixture uses the ids the script actually reaches for', () => {

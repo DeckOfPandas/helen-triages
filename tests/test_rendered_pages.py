@@ -21,6 +21,7 @@ still runs on a machine without the Ruby toolchain.
 """
 from __future__ import annotations
 
+import contextlib
 import html as html_module
 import json
 import os
@@ -60,6 +61,90 @@ def _require_bundler():
             "actually published."
         )
     pytest.skip("no bundler on this machine; skipping rendered-output tests")
+
+
+# =============================================================================
+# BUILDING WITH THROWAWAY FIXTURES, WITHOUT TOUCHING THE REAL COLLECTIONS
+# =============================================================================
+# #1153, 2026-09-20. Five tests below need a recipe or a drink that CANNOT
+# exist in the real collection -- a missing gate flag, `proofread: false` on a
+# promoted file, three garnishes on one drink -- because the rest of the suite
+# forbids exactly those states. So each wrote its fixtures into
+# `_food_recipes/` or `_cocktail_recipes/`, built, and deleted them in a
+# `finally`.
+#
+# THAT IS A LIVE COLLECTION DIRECTORY THAT THREE SESSION-SCOPED JEKYLL BUILDS
+# ALSO READ, and the section below used to say so: "pytest must never run
+# twice at once on this machine -- a concurrent session collects these
+# `zzz-gate-` files as real recipes and reports a screenful of bogus
+# failures." The cost showed up on 2026-09-20 as a single food test failing on
+# `/food/recipes/zzz-gate-proofread/` in one full run and never again, which
+# is the worst way for it to show up: an intermittent teaches people to re-run
+# rather than to read.
+#
+# THE ORDERING THAT SAVES IT TODAY IS AN ACCIDENT NOTHING CHECKS. `site` is
+# first requested well above the first fixture-writing test, so in a plain
+# full run both builds happen before any fixture exists. Any ordering that
+# does not hold that -- a `-m` marker selection, a `-k` filter, a single-file
+# run, a new test file that sorts earlier and asks for a build -- puts a build
+# after the fixtures are on disk, and nothing states or enforces the
+# invariant.
+#
+# SO THE FIXTURES GO IN A COPY OF THE SOURCE TREE INSTEAD. Measured: the copy
+# costs 0.09s against a 5.25s build, which is the entire objection to doing it
+# this way and it is not much of one. The real collections are never written
+# to, `pytest` may run twice at once as far as these tests are concerned, and
+# the `_cocktail_recipes/`-did-not-exist dance three of them performed is
+# simply gone -- creating a directory inside the copy cannot change what
+# `_load_published` sees.
+#
+# WHAT IS DELIBERATELY NOT EXCLUDED: the drafts collections. The copy is meant
+# to be the same build these tests did before, minus the writes, so it carries
+# whatever the machine has. `.git` goes (it is the bulk and Jekyll never reads
+# it), as do the caches and this project's own tooling directories.
+_COPY_IGNORE = shutil.ignore_patterns(
+    ".git", "tmp", "_site", "node_modules", ".claude", "__pycache__",
+    ".pytest_cache", ".jekyll-cache")
+
+
+@contextlib.contextmanager
+def built_with_fixtures(name, files):
+    """Build the PRODUCTION site from a copy of the tree, plus `files`.
+
+    `files` maps a repo-relative path to its text. Yields the output directory;
+    removes the copy and the output afterwards whatever happens.
+
+    PRODUCTION CONFIG ALONE (`_config.yml`), because every caller is testing
+    the publish gate or the rendered drink page as the world sees it. A local
+    build would publish drafts and answer a different question.
+    """
+    _require_bundler()
+    src = ROOT / "tmp" / f"_fixture_src_{name}"
+    out = ROOT / "tmp" / f"_fixture_out_{name}"
+    shutil.rmtree(src, ignore_errors=True)
+    shutil.rmtree(out, ignore_errors=True)
+    try:
+        shutil.copytree(ROOT, src, ignore=_COPY_IGNORE, symlinks=True)
+        for relpath, text in files.items():
+            target = src / relpath
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(text, encoding="utf-8")
+
+        result = subprocess.run(
+            ["bundle", "exec", "jekyll", "build",
+             "--source", str(src),
+             "--config", str(src / "_config.yml"),
+             "--destination", str(out)],
+            cwd=ROOT, capture_output=True, text=True, timeout=600,
+        )
+        assert result.returncode == 0, (
+            "jekyll build failed, so nothing this test asserts can be "
+            "trusted:\n" + result.stdout[-2000:] + result.stderr[-2000:]
+        )
+        yield out
+    finally:
+        shutil.rmtree(src, ignore_errors=True)
+        shutil.rmtree(out, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
@@ -570,15 +655,13 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
     This builds its own site because the condition cannot exist in the real
     collection: tests/test_front_matter.py forbids both a missing flag and the
     old spelling, so by the time the suite is green there is nothing left to
-    observe. Two throwaway recipes are written, built, and removed.
+    observe. Two throwaway recipes go into a COPY of the tree (#1153) -- see
+    `built_with_fixtures` for why they no longer go into `_food_recipes/`.
 
     The CONTROL matters as much as the two subjects. A build that fell over, or
     a gate that hid everything, would satisfy "the flagged ones are absent"
     perfectly -- so a known-good recipe must be present in the same output.
     """
-    _require_bundler()
-    out = ROOT / "tmp" / "_test_site_failclosed"
-    made = []
     body = ('---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
             'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
             'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
@@ -586,29 +669,20 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
             '  proofread: true\n{flag}  cooked_before: false\n'
             '---\n')
     # `proofread: true` ON A FIXTURE, DELIBERATELY, and it is not a claim about
-    # anything Helen has read -- these two files exist for one build and are
-    # deleted in the `finally` below. Since #667 the gate has two legs, and a
-    # fixture that fails both proves nothing about either: `proofread: false`
-    # here would hold the page back on its own and the awaiting_fix assertion
-    # would pass whatever the plugin did with the key it is named for. The one
-    # leg under test is the only one allowed to fail.
-    try:
-        cases = {
-            "zzz-gate-no-flag": "",                             # field absent entirely
-            "zzz-gate-old-key": "  awaiting-fix: false\n",      # only the old spelling
-        }
-        for slug, flag in cases.items():
-            p = ROOT / "_food_recipes" / f"{slug}.md"
-            p.write_text(body.format(t=slug, flag=flag), encoding="utf-8")
-            made.append(p)
+    # anything Helen has read -- these two files exist inside one throwaway
+    # copy of the tree and never touch the real collection. Since #667 the gate
+    # has two legs, and a fixture that fails both proves nothing about either:
+    # `proofread: false` here would hold the page back on its own and the
+    # awaiting_fix assertion would pass whatever the plugin did with the key it
+    # is named for. The one leg under test is the only one allowed to fail.
+    cases = {
+        "zzz-gate-no-flag": "",                             # field absent entirely
+        "zzz-gate-old-key": "  awaiting-fix: false\n",      # only the old spelling
+    }
+    files = {f"_food_recipes/{slug}.md": body.format(t=slug, flag=flag)
+             for slug, flag in cases.items()}
 
-        result = subprocess.run(
-            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
-             "--destination", str(out)],
-            cwd=ROOT, capture_output=True, text=True, timeout=600,
-        )
-        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
-
+    with built_with_fixtures("failclosed", files) as out:
         published = [s for s in cases if (out / "food" / "recipes" / s / "index.html").exists()]
         assert not published, (
             "The gate FAILED OPEN for:\n  " + "\n  ".join(published)
@@ -620,10 +694,6 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
             "The control recipe is missing too, so this build proves nothing "
             "about the gate -- it either failed or is hiding everything."
         )
-    finally:
-        for p in made:
-            p.unlink(missing_ok=True)
-        shutil.rmtree(out, ignore_errors=True)
 
 
 # =============================================================================
@@ -631,16 +701,18 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
 # =============================================================================
 # A page publishes only on `awaiting_fix: false` AND `proofread: true` since
 # 2026-09-02. The two tests below are the `proofread` half of what the two
-# above do for `awaiting_fix`, and they follow the same fixture discipline for
-# the same reason: BOTH STATES ARE WRITTEN INTO THE REAL COLLECTION for one
-# build and removed in a `finally`.
+# above do for `awaiting_fix`, and they follow the same fixture discipline:
+# BOTH STATES ARE WRITTEN, because a single held-back fixture is satisfied
+# perfectly by a plugin that drops every document.
 #
-# That discipline is why `pytest` must never run twice at once on this
-# machine -- a concurrent session collects these `zzz-gate-` files as real
-# recipes and reports a screenful of bogus failures. It is also why the drink
-# fixture below removes `_cocktail_recipes/` itself when it created it: an
-# empty directory left behind changes what tests/test_cocktails.py's
-# `_load_published` does on the next run.
+# THE FIXTURES GO INTO A COPY OF THE TREE SINCE 2026-09-20 (#1153), never into
+# the real collection -- `built_with_fixtures` above has the argument. Two
+# paragraphs that used to live here are gone with the writes: that `pytest`
+# must never run twice at once on this machine, which was true of these tests
+# and is not any more; and that the drink fixture must remove
+# `_cocktail_recipes/` when it created it, because an empty directory left
+# behind changed what `_load_published` saw. Neither can happen to a directory
+# inside a throwaway copy.
 
 FOOD_GATE_FIXTURE = (
     '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
@@ -684,24 +756,12 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build():
     whose only defect is being unproofread AND stay the corpus the rest of the
     suite reasons about.
     """
-    _require_bundler()
-    out = ROOT / "tmp" / "_test_site_proofread_gate"
-    made = []
-    try:
-        cases = {"zzz-gate-unproofread": "false", "zzz-gate-proofread": "true"}
-        for slug, value in cases.items():
-            p = ROOT / "_food_recipes" / f"{slug}.md"
-            p.write_text(FOOD_GATE_FIXTURE.format(t=slug, proofread=value),
-                         encoding="utf-8")
-            made.append(p)
+    cases = {"zzz-gate-unproofread": "false", "zzz-gate-proofread": "true"}
+    files = {f"_food_recipes/{slug}.md":
+             FOOD_GATE_FIXTURE.format(t=slug, proofread=value)
+             for slug, value in cases.items()}
 
-        result = subprocess.run(
-            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
-             "--destination", str(out)],
-            cwd=ROOT, capture_output=True, text=True, timeout=600,
-        )
-        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
-
+    with built_with_fixtures("proofread_gate", files) as out:
         assert not (out / "food" / "recipes" / "zzz-gate-unproofread" / "index.html").exists(), (
             "A recipe with `meta.proofread: false` was PUBLISHED. The gate's "
             "second leg has failed open -- _plugins/publish_gate.rb must "
@@ -713,10 +773,6 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build():
             "is missing too, so this build proves nothing about the gate. It "
             "is over-firing, or the build dropped everything."
         )
-    finally:
-        for p in made:
-            p.unlink(missing_ok=True)
-        shutil.rmtree(out, ignore_errors=True)
 
 
 # =============================================================================
@@ -756,12 +812,6 @@ def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
     the old list-only rule could not reach, which is a garnish nobody has
     classified yet — where a new spelling always appears first.
     """
-    _require_bundler()
-    out = ROOT / "tmp" / "_test_site_garnish"
-    recipes = ROOT / "_cocktail_recipes"
-    created_dir = not recipes.exists()
-    made = []
-
     def lines(items):
         return "".join(f'  - "{g}"\n' for g in items)
 
@@ -781,21 +831,11 @@ def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
             "Garnish with a mint sprig, raspberries, a lemon wheel "
             "and a brandied cherry."),
     }
-    try:
-        recipes.mkdir(exist_ok=True)
-        for slug, (garnishes, _) in cases.items():
-            p = recipes / f"{slug}.md"
-            p.write_text(GARNISH_DRINK.format(t=slug, garnish=lines(garnishes)),
-                         encoding="utf-8")
-            made.append(p)
+    files = {f"_cocktail_recipes/{slug}.md":
+             GARNISH_DRINK.format(t=slug, garnish=lines(garnishes))
+             for slug, (garnishes, _) in cases.items()}
 
-        result = subprocess.run(
-            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
-             "--destination", str(out)],
-            cwd=ROOT, capture_output=True, text=True, timeout=600,
-        )
-        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
-
+    with built_with_fixtures("garnish", files) as out:
         for slug, (_, expected) in cases.items():
             page = out / "cocktails" / "recipes" / slug / "index.html"
             assert page.exists(), f"{slug} did not build"
@@ -812,12 +852,6 @@ def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
                 "whether or not it is declared in garnish.yml's `no_article`). "
                 "Both live in the garnish-step block of _layouts/cocktail.html."
             )
-    finally:
-        for p in made:
-            p.unlink(missing_ok=True)
-        if created_dir and recipes.is_dir() and not any(recipes.iterdir()):
-            recipes.rmdir()
-        shutil.rmtree(out, ignore_errors=True)
 
 
 def test_no_garnish_contains_the_join_separator():
@@ -855,33 +889,19 @@ def test_the_gate_covers_a_promoted_drink():
     cocktail leg of the gate is exercised in exactly the checkout where the
     real collection is empty.
 
-    `_cocktail_recipes/` does not exist on disk yet (nothing is promoted), so
-    this creates it and, if it did, removes it again. An empty directory left
-    behind is not harmless: tests/test_cocktails.py's `_load_published` reads
-    its presence.
+    IT USED TO MATTER THAT `_cocktail_recipes/` MIGHT NOT EXIST -- this test
+    created it and removed it again, because an empty directory left behind
+    changes what tests/test_cocktails.py's `_load_published` sees. Since #1153
+    the fixtures live in a copy of the tree, so a directory created there is
+    gone with the copy and cannot be seen by anything.
     """
-    _require_bundler()
-    out = ROOT / "tmp" / "_test_site_drink_gate"
-    recipes = ROOT / "_cocktail_recipes"
-    created_dir = not recipes.exists()
-    made = []
-    try:
-        recipes.mkdir(exist_ok=True)
-        cases = {"zzz-gate-drink-unproofread": "false",
-                 "zzz-gate-drink-proofread": "true"}
-        for slug, value in cases.items():
-            p = recipes / f"{slug}.md"
-            p.write_text(DRINK_GATE_FIXTURE.format(t=slug, proofread=value),
-                         encoding="utf-8")
-            made.append(p)
+    cases = {"zzz-gate-drink-unproofread": "false",
+             "zzz-gate-drink-proofread": "true"}
+    files = {f"_cocktail_recipes/{slug}.md":
+             DRINK_GATE_FIXTURE.format(t=slug, proofread=value)
+             for slug, value in cases.items()}
 
-        result = subprocess.run(
-            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
-             "--destination", str(out)],
-            cwd=ROOT, capture_output=True, text=True, timeout=600,
-        )
-        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
-
+    with built_with_fixtures("drink_gate", files) as out:
         held = out / "cocktails" / "recipes" / "zzz-gate-drink-unproofread" / "index.html"
         live = out / "cocktails" / "recipes" / "zzz-gate-drink-proofread" / "index.html"
 
@@ -916,12 +936,6 @@ def test_the_gate_covers_a_promoted_drink():
             "-- an index gated on `show_drafts` alone shows nothing the day a "
             "drink is promoted."
         )
-    finally:
-        for p in made:
-            p.unlink(missing_ok=True)
-        if created_dir and recipes.is_dir() and not any(recipes.iterdir()):
-            recipes.rmdir()
-        shutil.rmtree(out, ignore_errors=True)
 
 
 # =============================================================================
@@ -985,39 +999,19 @@ def test_an_unrewritten_drink_is_held_back_but_an_unmade_one_publishes():
     It cost nothing on the day it landed: all 47 drinks then live already said
     `rewritten: true` (tmp/rewritten_census.py), so no page went dark.
     """
-    _require_bundler()
-    out = ROOT / "tmp" / "_test_site_1137_rewritten"
-    recipes = ROOT / "_cocktail_recipes"
-    created_dir = not recipes.exists()
-    made = []
-    try:
-        recipes.mkdir(exist_ok=True)
-        drinks = {
-            # slug: (rewritten, made_before)
-            "zzz-1137-rewritten-unmade":     ("true",  "false"),
-            "zzz-1137-unrewritten-made":     ("false", "true"),
-            "zzz-1137-unrewritten-unmade":   ("false", "false"),
-        }
-        for slug, (rw, mb) in drinks.items():
-            p = recipes / f"{slug}.md"
-            p.write_text(
-                GATE_DRINK_ANY.format(t=slug, rewritten=rw, made_before=mb),
-                encoding="utf-8")
-            made.append(p)
+    drinks = {
+        # slug: (rewritten, made_before)
+        "zzz-1137-rewritten-unmade":     ("true",  "false"),
+        "zzz-1137-unrewritten-made":     ("false", "true"),
+        "zzz-1137-unrewritten-unmade":   ("false", "false"),
+    }
+    files = {f"_cocktail_recipes/{slug}.md":
+             GATE_DRINK_ANY.format(t=slug, rewritten=rw, made_before=mb)
+             for slug, (rw, mb) in drinks.items()}
+    files["_food_recipes/zzz-1137-food-unrewritten.md"] = (
+        GATE_FOOD_UNREWRITTEN.format(t="zzz-1137-food-unrewritten"))
 
-        food = ROOT / "_food_recipes" / "zzz-1137-food-unrewritten.md"
-        food.write_text(
-            GATE_FOOD_UNREWRITTEN.format(t="zzz-1137-food-unrewritten"),
-            encoding="utf-8")
-        made.append(food)
-
-        result = subprocess.run(
-            ["bundle", "exec", "jekyll", "build", "--config", "_config.yml",
-             "--destination", str(out)],
-            cwd=ROOT, capture_output=True, text=True, timeout=600,
-        )
-        assert result.returncode == 0, result.stdout[-2000:] + result.stderr[-2000:]
-
+    with built_with_fixtures("1137_rewritten", files) as out:
         def drink_live(slug):
             return (out / "cocktails" / "recipes" / slug / "index.html").exists()
 
@@ -1046,12 +1040,6 @@ def test_an_unrewritten_drink_is_held_back_but_an_unmade_one_publishes():
             "collection; unscoped, it takes every unrewritten recipe off the "
             "live site."
         )
-    finally:
-        for p in made:
-            p.unlink(missing_ok=True)
-        if created_dir and recipes.is_dir() and not any(recipes.iterdir()):
-            recipes.rmdir()
-        shutil.rmtree(out, ignore_errors=True)
 
 
 # =============================================================================

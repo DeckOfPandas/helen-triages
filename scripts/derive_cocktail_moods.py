@@ -319,17 +319,15 @@ def derive(drink, sets, step_words, families):
     # dropped Jungle Bird and Better and Better ("only three ingredients, but
     # they're bonkers"); intensity recovers them and drags in nothing.
 
-    if has("warming"):
-        out.append("warming")
-
-    # `up` IS GONE, 2026-08-30, and the reason is worth more than the mood.
-    # Read straight off the glass it covered 58 of 114 -- 51% --  and
-    # test_no_mood_covers_more_than_half_the_collection refused it: the guard
-    # that retired food's `one-pot` at 57% and caught `fruity` at 51% before it
-    # was ever written down. Helen had said "I'm not sold on up, let's retain
-    # it but with suspicion" an hour earlier, and the suite reached her
-    # conclusion independently. Narrowing was not available: the coupe alone is
-    # 40 drinks, so any version without it is not `up`.
+    # `warming` -- ONE COPY OF THIS RULE, and it was two until 2026-09-20
+    # (#1147). The duplicate sat eleven lines below, separated by a shorter
+    # paste of the `up` note that follows, so neither copy was visible from the
+    # other. It changed no drink's moods, because `expected_moods` re-sorts the
+    # result through taxonomy's key order and that pass dedupes -- an accident,
+    # not a guarantee, and anything counting moods or reading `out` before the
+    # sort saw `warming` twice. The real cost was the next edit: a rule written
+    # twice is a rule where a fix lands on one copy and silently disagrees with
+    # the other.
     if has("warming"):
         out.append("warming")
 
@@ -371,10 +369,33 @@ def derive(drink, sets, step_words, families):
     # records it, so the mood asks the drink directly and cannot be broken by
     # rewording. `swizzle`/`churn`/`blend` stay on the step list because those
     # are TECHNIQUES rather than ice, and a swizzle is the mood's own example.
+    #
+    # BOTH LISTS ARE DATA SINCE 2026-09-20 (#1147), AND NEITHER WAS. This rule
+    # carried two hardcoded vocabularies where every other rule in this file
+    # reads one from taxonomy.yml -- and `mood_step_words.ice` was declared
+    # there, looked live, and was read by nothing at all. Editing it to change
+    # which steps make a drink icy would have done exactly nothing, with no
+    # error and no failing test. That is the same shape of bug the `faff` list
+    # was safe from only because the data is what the code reads.
+    #
+    # `mood_step_words.ice` NOW HOLDS THE THREE TECHNIQUES, not the eight
+    # entries it held while nothing read it -- four of those were the pre-
+    # 2026-09-05 prose proxy ("crushed ice", "large ice", "giant ice", "ice
+    # block"), and reading them back in would have re-broken the rule this
+    # comment describes. The serve values live in `mood_serve_ice`.
+    #
+    # THE STEP HALF DECIDES NO DRINK TODAY AND IS NOT REDUNDANT. Measured
+    # 2026-09-20 over all 139 files: 14 drinks satisfy both halves, 24 the
+    # serve half alone, none the step half alone -- serve.yml's `crushed`
+    # entry says "Every swizzle", so the overlap is by design. It matters
+    # because `serve.ice` is OPTIONAL: a freshly ingested swizzle has no serve
+    # value until Helen rules on one, and this half is what gives it the mood
+    # in the meantime. taxonomy.yml carries the measurement so the next reader
+    # does not empty the list, see nothing move, and conclude it is still dead.
     serve = drink.get("serve") or {}
     served_ice = serve.get("ice")
-    if served_ice in ("crushed", "large cube", "block", "blended") \
-            or hits_in(steps, ["swizzle", "churn", "blend"]):
+    if served_ice in set(sets.get("_serve_ice") or []) \
+            or hits_in(steps, step_words.get("ice") or []):
         out.append("ice ice baby")
     if hits_in(steps, step_words.get("faff") or []) >= 2 or n_ingredients >= 9:
         out.append("I want to faff")
@@ -466,6 +487,12 @@ def load_sets(taxonomy, vocab):
     sets["_measures"] = vocab.get("measures") or {}
     sets["_family_of"] = vocab.get("family_of") or {}
     sets["_whisky"] = set(vocab.get("whisky_styles") or [])
+    # The `serve.ice` values that earn `ice ice baby` -- data since 2026-09-20
+    # (#1147), hardcoded in the rule before that. `_data/cocktails/serve.yml`
+    # declares what the field may say; taxonomy.yml says which of those are icy
+    # enough to be a mood, and `test_every_icy_serve_value_is_a_real_one` keeps
+    # the two in step.
+    sets["_serve_ice"] = list(taxonomy.get("mood_serve_ice") or [])
     return sets
 
 

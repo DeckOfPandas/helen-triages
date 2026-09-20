@@ -99,7 +99,7 @@ jekyll-prod         # port 4002, exactly what deploys — no local switches  HEL
 pytest              # content and structure checks; ONE session at a time
 node --test                       # the JS suite, discovered from the root (§10)
 
-python3 scripts/verify.py         # ALL FOUR CHECKS, and prefer this
+python3 scripts/verify.py         # ALL FIVE CHECKS, and prefer this
 ```
 
 **THE TWO SERVERS ARE HELEN'S TO START, AND A SESSION NEVER OFFERS.** Her
@@ -110,13 +110,27 @@ already be using, outliving the turn that made it. `scripts/browser/serve.sh`
 is the exception and is not the same thing — it is a short-lived server the
 screenshot tooling owns, started and stopped inside one measurement.
 
-**`scripts/verify.py` runs the two suites AND the two checks that get
+**`scripts/verify.py` runs the two suites AND the three checks that get
 forgotten** — `derive_cocktail_moods.py`, the only thing that says whether a
-vocabulary edit silently moved a drink's moods, and `build_ingest_vocab.py
+vocabulary edit silently moved a drink's moods; `build_ingest_vocab.py
 --check`, the only thing that says the standalone ingest documents still match
-the data they are rendered from. Sessions have run the two test suites, called
-the work verified, and missed both. One command, four lines of output, non-zero
-exit if anything fails.
+the data they are rendered from; and `check_slug_keys.py` (#1106), the only
+thing that can see a public entry keyed by a drink slug that no longer names a
+drink. Sessions have run the two test suites, called the work verified, and
+missed the first two. One command, five lines of output, non-zero exit if
+anything fails.
+
+**A CHECK MAY SAY `SKIP`, WHICH IS NEITHER A PASS NOR A FAILURE**, and
+`check_slug_keys.py` is the one that does. `mood_include` / `mood_exclude` live
+in the PUBLIC taxonomy and are keyed by slug, but most of the drinks they name
+are DRAFTS — so only a checkout holding the drafts clone can tell a correction
+naming a real draft from one naming nothing at all. Without the clone it
+returns exit code 2 and says, in as many words, that it verified nothing; the
+run still goes green, because an absent private repo is not a defect. **So a
+green `verify.py` in a fresh worktree has NOT checked this**, and the closing
+line says so. Clone the drafts repo (§9.1) and run it again before merging
+anything that touches a slug-keyed entry — that is the whole of #1106, whose
+complaint was that the mistake is found after the merge rather than before.
 
 **`.node-runtime/` and `.gh-runtime/` do not come with a worktree**; they are
 gitignored, like the two drafts repos (§9.1). Use the system `node`. **`gh`
