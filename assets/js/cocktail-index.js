@@ -71,7 +71,7 @@
   if (!cards.length) return;
 
   /* PAGINATION -- #694, ported from the food index rather than designed again.
-     The arithmetic is HTF.recipeList.paginate (assets/js/recipe-list.js), the
+     The arithmetic is HTF.recipeList.paginate (assets/js/list-view.js), the
      same pure function filters.js uses, so the two indexes cannot drift about
      what page 3 of 7 means.
 

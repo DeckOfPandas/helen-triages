@@ -47,7 +47,7 @@ const JS_DIR = path.join(ROOT, 'assets', 'js');
 const SCRIPTS = [
   'assets.js',
   'ingredient-search.js',
-  'recipe-list.js',
+  'list-view.js',
   'filter-state.js',
   'shopping-list.js',
   'food-shopping-list.js',
@@ -962,7 +962,7 @@ test('#1092: removing one chosen ingredient leaves the others in place', () => {
 test('this harness loads what food/index.html actually loads', () => {
   // The harness is only worth having if it runs the real program. A tag added
   // to the template and not here means the thing under test drifts away from
-  // the thing that ships -- which is how #694 put recipe-list.js on the
+  // the thing that ships -- which is how #694 put list-view.js on the
   // cocktails index without its harness noticing.
   const html = fs.readFileSync(path.join(ROOT, 'food', 'index.html'), 'utf8');
   const inTemplate = [...html.matchAll(/<script src="\{\{ '\/assets\/js\/([^']+)'/g)]

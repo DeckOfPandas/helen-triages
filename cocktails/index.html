@@ -801,7 +801,7 @@ permalink: /cocktails/
 
   {% comment %} PAGINATION -- #694, and it is food's control ported rather than
      a second design. Same three buttons, same `(see all)` escape, same shared
-     arithmetic (`HTF.recipeList.paginate` in assets/js/recipe-list.js), same
+     arithmetic (`HTF.recipeList.paginate` in assets/js/list-view.js), same
      `display: none` until the script has something to page.
 
      TWENTY A PAGE, WHICH IS FOOD'S NUMBER AND DIVIDES THIS GRID EXACTLY. The
@@ -1081,15 +1081,17 @@ permalink: /cocktails/
 
      Guarded by tests/test_site_config.py, the same way food's four are.
   {% endcomment %}
-  {% comment %} `recipe-list.js` IS NOT ABOUT RECIPES -- it is three pure
-     helpers (shuffle, paginate, titleMatchTier) that the food index happened to
-     need first, and it is named after where it was born. #694 brings the
-     cocktails index to the SAME `paginate`, so the two pagers cannot drift
+  {% comment %} `list-view.js` is three pure helpers -- shuffle, paginate,
+     titleMatchTier -- that the food index happened to need first. #694 brought
+     the cocktails index to the SAME `paginate`, so the two pagers cannot drift
      about what "page 3 of 7" means. Loaded before cocktail-index.js, which
-     calls it. Renaming the file to say what it is would be right and is a
-     separate change: it is loaded by name in two templates and required by name
-     in a test. {% endcomment %}
-  <script src="{{ '/assets/js/recipe-list.js' | relative_url }}"></script>
+     calls it.
+
+     IT WAS `recipe-list.js` UNTIL 2026-09-20 (#759), which is why a reader may
+     remember that name: it was named after where it was born rather than what
+     it does, and a cocktails developer was reading a script tag for recipes on
+     a page with no recipes on it. {% endcomment %}
+  <script src="{{ '/assets/js/list-view.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>

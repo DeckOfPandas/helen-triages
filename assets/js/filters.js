@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return FilterState.hasAnythingToClear(state);
   }
 
-  // The shuffle itself is pure -- assets/js/recipe-list.js, tested directly
+  // The shuffle itself is pure -- assets/js/list-view.js, tested directly
   // with Node. This is the DOM half: re-appending in the new order.
   // appendChild on a node already in the document MOVES it rather than
   // duplicating it, so this reorders the real DOM, not a detached copy.
@@ -1040,7 +1040,7 @@ function renderResultsPool() {
     visibleCount = matchingLis.length;
 
     if (!suppressList) {
-      // The maths is pure -- assets/js/recipe-list.js -- and returns a
+      // The maths is pure -- assets/js/list-view.js -- and returns a
       // legal currentPage even if the one we asked for no longer exists
       // (a filter can narrow the results out from under whatever page you
       // were on), so it's adopted back rather than just read.
