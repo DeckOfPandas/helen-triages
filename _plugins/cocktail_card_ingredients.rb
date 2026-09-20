@@ -295,7 +295,37 @@ module HelenTriages
           # not offer a joined label -- cocktails/search.json's omnisearch
           # feed -- can tell the two apart without re-parsing the string for
           # the word "or", which a real ingredient name could itself contain.
-          "generics" => generics.length
+          "generics" => generics.length,
+          # THE LABEL, IN THE PIECES A FILTER CAN ACTUALLY APPLY -- #1130.
+          # One entry for an ordinary pour; one PER GENERIC where `label_for`
+          # joined a disjunctive list.
+          #
+          # WHY THE FEED CANNOT JUST SPLIT `label` ON " or ". Two reasons, and
+          # the second is the one that would bite quietly. A real ingredient
+          # name may contain the word (nothing does today, which is not a
+          # guarantee). And `card_name_joins` REWRITES the joined string --
+          # `Demerara overproof rum or Demerara rum` is Helen's
+          # `Demerara rum or overproof`, which drops two words from the second
+          # option -- so splitting the display string yields "overproof",
+          # which is no chip at all. These come from the generics themselves,
+          # through the same `card_names` map the chips are built from, so
+          # each one IS a chip and `?ing=` resolves it whole.
+          #
+          # HIDDEN GENERICS ARE LEFT OUT. A row is dropped entirely only when
+          # EVERY generic on it is hidden, so a MIXED row survives and its
+          # label names something the card declined to print. There is no such
+          # row today (measured over all 139 drinks, 8 multi-generic pours,
+          # none mixed) -- this is what stops the first one silently offering
+          # `white sugar` in the search box.
+          #
+          # FALLS BACK TO THE LABEL when no generic is left: a row labelled
+          # from its `item` has none to begin with (`generics: 0`), and that
+          # row is a real searchable ingredient.
+          "search_labels" => (
+            visible = generics.reject { |g| @hidden.include?(g) }
+                              .map { |g| @card_names[g] || g }
+            visible.empty? ? [label] : visible
+          )
         }
       end
 

@@ -529,6 +529,43 @@ test('#1050: ?ing= adds the chip to HAS TO HAVE and narrows the list', () => {
     'the chip must reach apply(), not only the pool.');
 });
 
+test('#1130: either half of a joined "X or Y" pour finds the drink', () => {
+  // THE CLAIM THE SEARCH FEED NOW MAKES, CHECKED AT THE OTHER END. A
+  // disjunctive `generic` means "either would do" (#441), so the card prints
+  // "cherry brandy or cherry liqueur" and cocktails/search.json offers the two
+  // halves separately -- because the joined string names no chip, while each
+  // half does. That is only true if `?ing=<half>` actually resolves, which is
+  // this test: the Singapore Sling's real pour, and a click on either word.
+  //
+  // It is the Sling because it is the case that has no other route. Neither
+  // generic is poured alone by any published drink, so before #1130 the box
+  // did not carry either word at all and the drink was findable only by name.
+  const vocabulary = { liqueurs: ['cherry brandy', 'cherry liqueur'] };
+  const drinks = [
+    { url: '/sling', name: 'sling', title: 'Singapore Sling', moods: ['sharp'],
+      ingredients: ['cherry brandy|cherry liqueur|cherry heering'],
+      chaos: 'good', madeBefore: true },
+    { url: '/other', name: 'other', title: 'Other', moods: ['sharp'],
+      ingredients: ['gin|gin'], chaos: 'good', madeBefore: true }
+  ];
+
+  ['cherry brandy', 'cherry liqueur'].forEach(function (half) {
+    const r = boot({ drinks: drinks, vocabulary: vocabulary,
+                     search: '?ing=' + encodeURIComponent(half) });
+    assert.deepStrictEqual(visibleTitles(r.page), ['Singapore Sling'],
+      '?ing=' + half + ' found no drink. The search feed offers this word, so ' +
+      'a reader who picks it lands on an index filtered to nothing -- the ' +
+      '"result that matches nothing when clicked" #1051 excluded joined ' +
+      'labels to avoid, arriving through the fix for it.');
+
+    const on = r.doc.getElementById('drink-include-pool').querySelectorAll('.btn-pool')
+      .filter((b) => b.classList.contains('is-on'))
+      .map((b) => b.querySelector('.btn-pool-label').textContent);
+    assert.deepStrictEqual(on, [half],
+      'the chip must be on screen as chosen, or the reader cannot undo it.');
+  });
+});
+
 test('#1050: an ingredient no card names is dropped in silence', () => {
   // A joined label ("X or Y") or a stale name matches no chip WHOLE, and the
   // rule is the exclusion rule's: never a substring. The index lands

@@ -110,12 +110,18 @@ function buildPage(doc, options) {
     doc.body.appendChild(node);
   };
 
-  json('drink-vocabulary', {
+  /* OVERRIDABLE SINCE #1130, the same way `options.moods` is and for the same
+     reason: a test about a chip needs the vocabulary to DECLARE that chip.
+     `cocktail-search.js` treats every list-valued key here as a generic
+     vocabulary (bar `families` and `*_characters`), so a test wanting two
+     generics on one pour supplies its own list. The default is what most
+     tests need and is unchanged. */
+  json('drink-vocabulary', Object.assign({
     search: { family_button_min_chars: 3 },
     families: ['rum'],
     family_of: { 'lightly aged and filtered rum': 'rum' },
     card_names: { 'lightly aged and filtered rum': 'lightly aged rum' }
-  });
+  }, options.vocabulary || {}));
   json('drink-bottles', { bottles: {} });
   json('drink-ingredients', {});
   /* #746. Emitted UNGATED by cocktails/index.html — unlike `drink-costs`, which

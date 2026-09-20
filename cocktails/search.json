@@ -22,23 +22,36 @@ sitemap: false
   and search read the VOCABULARY"), so a word chosen here is a word the index
   can apply.
 
-  A JOINED "X OR Y" LABEL IS NEVER OFFERED -- #1051. `card_ingredients` marks
-  one of these with `generics: 2` (or more): the card still prints
-  "aged rum or Jamaican rum" as a true fact about the pour, but that string
-  names no single HAS TO HAVE chip, so omnisearch would offer a result that
-  matches nothing when clicked (the `?ing=` grammar matches a chip WHOLE,
-  MANUAL 13.13). Excluded here rather than filtered in page-search.js, so the
-  dropdown never has to know the difference between a real ingredient and a
-  joined one -- the feed simply never contains it.
+  A JOINED "X OR Y" LABEL IS OFFERED AS ITS PARTS -- #1130, 2026-09-20. The
+  card prints "cherry brandy or cherry liqueur" as a true fact about the pour,
+  and that string names no single HAS TO HAVE chip, so offering it would be a
+  result that matches nothing when clicked (the `?ing=` grammar matches a chip
+  WHOLE, MANUAL 13.13). #1051 solved that by dropping such a row from this
+  feed; this offers `ing.search_labels` instead, which is the same label in
+  the pieces a filter can actually apply -- one per generic, from the same
+  `card_names` map the chips themselves are built from.
 
-  IT FAILS OPEN: only a row that SAYS it joins two or more generics is left
-  out. The first version kept `where: "generics", 1`, which also dropped a
-  row with no generic at all (`generics: 0`, labelled from its item) and
-  EVERY row on a `jekyll serve` started before the plugin gained the field
-  (MANUAL §1: plugins are not reloaded). Helen, testing it on 2026-09-15:
-  "Now the only things it returns are cocktail names. Please put it back."
-  A missing `generics` is nil, and nil compares false against 1 in Liquid,
-  so such a row is kept.
+  WHY IT IS BETTER THAN DROPPING THE ROW. A disjunctive `generic` means
+  "either would do" (#441), so the drink genuinely answers a HAS TO HAVE
+  question about either -- and `buildPool` in cocktail-search.js already adds
+  a chip PER GENERIC, so both halves have been clickable on the index all
+  along. The box was the one door that disagreed. The Singapore Sling going
+  live made it visible: `cherry brandy` and `cherry liqueur` are poured by
+  nothing else, so neither word existed in this feed at all, and the drink was
+  findable only by name. Two of the three joined pours were quieter and no
+  more correct -- Grand Marnier, triple sec, lightly aged rum and clear
+  blended rum are all poured alone elsewhere, so the words were here and the
+  two drinks that could use them simply did not answer to them.
+
+  IT STILL FAILS OPEN, and the reason is worth keeping because it has bitten.
+  The first version of #1051 kept `where: "generics", 1`, which dropped a row
+  with no generic at all (`generics: 0`, labelled from its item) and EVERY row
+  on a `jekyll serve` started before the plugin gained the field (MANUAL §1:
+  plugins are not reloaded). Helen, testing it on 2026-09-15: "Now the only
+  things it returns are cocktail names. Please put it back." So the `if`
+  below falls back to `ing.label` whenever `search_labels` is missing: on a
+  stale server that is exactly the pre-#1051 behaviour, which is imperfect,
+  rather than an empty list, which is broken.
 
   `items_label` IS "recipes" ON BOTH SITES SINCE #1097 (2026-09-15) -- Helen:
   "'Recipes' means recipes across both sites." It said "drinks" here until
@@ -62,7 +75,7 @@ sitemap: false
   ],
   "items": [
     {%- for d in sorted_drinks %}
-    {% unless forloop.first %},{% endunless %}{"t": {{ d.title | jsonify }}, "u": {{ d.url | relative_url | jsonify }}, "moods": {{ d.mood | jsonify }}, "ing": [{%- assign _first_ing = true -%}{%- for ing in d.card_ingredients -%}{%- unless ing.generics > 1 -%}{%- unless _first_ing %}, {% endunless -%}{{ ing.label | jsonify }}{%- assign _first_ing = false -%}{%- endunless -%}{%- endfor -%}]}
+    {% unless forloop.first %},{% endunless %}{"t": {{ d.title | jsonify }}, "u": {{ d.url | relative_url | jsonify }}, "moods": {{ d.mood | jsonify }}, "ing": [{%- assign _first_ing = true -%}{%- for ing in d.card_ingredients -%}{%- if ing.search_labels -%}{%- for _l in ing.search_labels -%}{%- unless _first_ing %}, {% endunless -%}{{ _l | jsonify }}{%- assign _first_ing = false -%}{%- endfor -%}{%- else -%}{%- unless _first_ing %}, {% endunless -%}{{ ing.label | jsonify }}{%- assign _first_ing = false -%}{%- endif -%}{%- endfor -%}]}
     {%- endfor %}
   ]
 }
