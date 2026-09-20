@@ -65,8 +65,8 @@ flowchart TD
     MERGE --> LIVE["_food_recipes/ · _cocktail_recipes/<br/>awaiting_fix: false AND proofread: true"]:::live
 
     LIVE -->|"an agent edit"| TOUCH{"how big?"}:::claude
-    TOUCH -->|"a word or a number"| ASK["ask Helen; she may grant<br/>no flip (HELEN_CLEARED / baseline)"]:::helen
-    TOUCH -->|"anything else"| DEMOTE["proofread: false in the same commit<br/>+ an issue labelled blocked-on-helen<br/>page stays in the public repo, hidden by the gate"]:::claude
+    TOUCH -->|"a word or a number"| ASK["ask Helen; she may grant<br/>no flip (move the baseline)"]:::helen
+    TOUCH -->|"anything else"| DEMOTE["proofread: false in the same commit<br/>+ ONE batch issue, blocked-on-helen<br/>page stays in the public repo, hidden by the gate"]:::claude
     TOUCH -->|"something big is wrong"| BACK["delete from public, re-add to<br/>private 4-promote/ + the issue"]:::claude
     DEMOTE --> PF
     BACK --> PR
@@ -231,15 +231,44 @@ in three sizes, hers to rule:
 
 | the change | what Claude does |
 |---|---|
-| a word or a number | **asks first.** She may grant the change WITHOUT the flip — then it lands under `HELEN_CLEARED` or a baseline move, per the constant's own comment, and she is still the last judgement because she granted it |
-| anything else | flips the flag, leaves the file in the public repo (the gate hides it), and **raises an issue labelled `blocked-on-helen`**: title `proofread: ‹slug›`, body naming what changed, why, and the local URL to re-read. She closes it by flipping the flag in a commit with `Fixes #N` |
+| a word or a number | **asks first.** She may grant the change WITHOUT the flip — then it lands as a baseline move, in a commit of its own, quoting her, and she is still the last judgement because she granted it. (`HELEN_CLEARED`, the per-recipe exemption list, was deleted 2026-09-20: it matched on filename and so never expired.) |
+| anything else | flips the flag, leaves the file in the public repo (the gate hides it), and **raises ONE issue for the whole batch, labelled `blocked-on-helen`**: title `proofread: ‹N› pages off the site — ‹batch›`, body giving what changed and why, then a checklist of every demoted page with its local URL. She closes it by flipping the flags in a commit with `Fixes #N` |
 | something big is wrong | deletes the file from the public repo and re-adds it to the private repo — `5-final-proofread/` for drinks if it needs a ruling from her, `4-promote/` if it only needs the mechanical pass — with the same issue, so it goes back through §4 |
 
 **The issue is the signal, and it replaces the build-log line as the thing she
-can see.** `blocked-on-helen` exists on the public repo already. One issue per
-demotion, never one per commit: a second edit to a file with an open issue
-comments on that issue. `scripts/needs_helen.py ‹path› --why "…"` does the
-flip and writes the issue body; the wrapper opens the issue.
+can see.** `blocked-on-helen` exists on the public repo already.
+
+**ONE ISSUE PER BATCH, NOT ONE PER FILE — CHANGED 2026-09-20, AND THE OLD RULE
+IS THE ONE THAT NEARLY KILLED THIS MECHANISM.** It used to read "one issue per
+demotion", and that is exactly the shape that got the agent account flagged as
+spam on 2026-09-14: twenty issues in under an hour hid the account's entire
+history from everyone but itself. **The rule written that same day —
+CLAUDE.md's "a batch of issues is ONE issue with a checklist, never one issue
+per file" — contradicted this section from the moment it was written**, and
+`scripts/needs_helen.py` implemented the losing side. Helen, 2026-09-20: *"We
+need to put that rule back in place, but add the list of dark recipes to one
+issue per batch rather than one issue per file."*
+
+    python3 scripts/needs_helen.py <path> [<path>...] --batch "…" --why "…"
+
+Pass every file you are demoting in ONE call. It flips each flag, finds the
+pages that link to each, writes one body with a checklist to
+`tmp/needs-helen-batch.md`, and prints the single wrapper command that opens
+the issue. It validates every path before flipping any, so a typo in the last
+argument cannot leave half a batch demoted with no issue.
+
+**Before opening it, check the tracker for an open `blocked-on-helen` issue
+naming one of your slugs** — a page demoted twice does not want two live
+issues. Comment on the open one and leave that slug out of the new body.
+
+**`python3 scripts/dark_pages.py [ref]` lists everything the gate is currently
+hiding**, on both sites, and is how to check afterwards that the batch is the
+whole story. A dark page is invisible by design — the file stays, the page
+stops existing, and the cards do not show the flags (#562) — so counting is
+the only thing that finds one. Smokestack Lightning sat dark for three days in
+September 2026 and was found by a file-count-versus-page-count that was
+checking something else. Pass `origin/main` to ask about the live site rather
+than the working tree, and fetch first.
 
 **A demotion can break links.** A live page that links to a demoted one gets a
 404 in production, and `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`
@@ -266,7 +295,14 @@ Listed so the map is honest about which lines are drawn and which are paved.
       hold four and food still holds four, but not the same four.
 - [x] `scripts/needs_helen.py`: the flip and the issue body, for §5. Built
       2026-09-14, in the same commit that wrote this map; this box was left
-      unticked until 2026-09-15.
+      unticked until 2026-09-15. **Rewritten 2026-09-20 to take many files and
+      emit ONE batch issue**, which is the rule it should have had from the
+      day after it was written.
+- [x] `scripts/dark_pages.py`: list every page the gate is hiding, on either
+      site, from any ref. Built 2026-09-20, when Helen asked "are there any
+      other recipes currently sitting dark, on either site?" and the honest
+      answer needed a script rather than a memory. The answer that day was
+      none, on both.
 - [ ] `scripts/promote.py`: the copy, compare, delete and baseline steps of §4,
       which have been done by hand and got wrong once each.
 - [ ] The `to make (N)` view on both local indexes (§3), if Helen wants it.
