@@ -6681,6 +6681,60 @@ def test_drink_scalar_fields_are_quoted(drink_file):
     )
 
 
+def test_drink_front_matter_has_no_duplicate_keys(drink_file):
+    """A repeated key in a YAML mapping is DISCARDED, silently, last one wins.
+
+    #1077, and #983 split it out. **Food has had this guard since 2026-08-16
+    and the drinks have never had one**, which is the whole issue: the two
+    collections have the same shape, the same ingest routes and the same
+    hand-editing, and only one of them was covered.
+
+    THE FOOD CASE IS WHAT IT LOOKS LIKE IN REAL LIFE. An ingredient entry in
+    `indonesian-chicken-curry-gulai-ayam.md` declared `item:` twice, and the
+    first line -- a whole flavourings note -- was simply gone. Not from the
+    derived index: from the recipe page, for as long as it had been there. The
+    file parses, the build succeeds, the page renders, and EVERY OTHER TEST IN
+    THIS SUITE READS THE PARSED FRONT MATTER, which by then is missing the line
+    entirely. Nothing could see it.
+
+    A DRINK IS IF ANYTHING MORE EXPOSED. Its ingredient entries are mappings of
+    four or five short keys -- `amount`, `item`, `generic`, `suggestion`,
+    `note` -- repeated once per pour down a file that is edited by hand, by an
+    ingest, and by `derive_cocktail_moods.py`. A `generic:` written twice in
+    one entry loses the first silently, and the drink goes on pouring something
+    nobody declared.
+
+    THE SAME LOADER, IMPORTED, NOT A SECOND COPY. `_StrictLoader` and its
+    constructor live in tests/test_front_matter.py; this is the argument
+    `test_agent_edited_drinks_are_not_marked_proofread` already makes about
+    `_git` and `_only_invisible_keys_changed`, and it is stronger here because
+    the whole mechanism is nine lines that would drift the first time either
+    was fixed. `yaml.safe_load` accepts duplicates by specification, so
+    catching this needs a loader that refuses them, and that is the entire
+    test.
+
+    THERE ARE NO DUPLICATES TODAY (#1077 says so and this confirms it over
+    every drink on the machine, drafts included). A guard written while the
+    collection is clean is the cheap moment to write one.
+    """
+    from test_front_matter import _StrictLoader
+
+    _require_drink(drink_file)
+    match = re.match(r"\A---\n(.*?\n)---", drink_file.raw, re.S)
+    assert match, f"{_drink_where(drink_file)} has no front matter to read."
+    try:
+        yaml.load(match.group(1), Loader=_StrictLoader)
+    except yaml.constructor.ConstructorError as exc:
+        raise AssertionError(
+            f"{_drink_where(drink_file)} has a duplicate key in its front "
+            f"matter: {exc}.\nYAML keeps only the LAST one, so whatever the "
+            f"earlier line said has already been thrown away. Check what is "
+            f"missing from the rendered drink page, not just what looks wrong "
+            f"in the file -- every other test here reads the parsed front "
+            f"matter and cannot see the discarded line at all."
+        ) from None
+
+
 def test_drink_number_ranges_use_en_dashes(drink_file):
     """`3–4 dashes`, not `3-4 dashes` -- §7's first line.
 
