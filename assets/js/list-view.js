@@ -98,6 +98,10 @@
     module.exports = api;
   } else {
     root.HTF = root.HTF || {};
-    root.HTF.recipeList = api;
+    // `HTF.recipeList` UNTIL 2026-09-20 (#759), renamed with the file and for
+    // the same reason: the key was as misleading as the filename, and
+    // `HTF.recipeList.paginate` sitting in cocktail-index.js is the exact
+    // sentence the issue complains about. One name, changed once.
+    root.HTF.listView = api;
   }
 })(typeof window !== 'undefined' ? window : this);

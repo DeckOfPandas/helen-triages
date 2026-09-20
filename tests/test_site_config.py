@@ -120,13 +120,14 @@ def test_ingredient_search_js_loads_before_filters_js():
 
 
 def test_list_view_js_loads_before_filters_js():
-    """filters.js calls HTF.recipeList at startup (shuffleRecipeList, update's
+    """filters.js calls HTF.listView at startup (shuffleRecipeList, update's
     pagination) -- it must already exist, same trap as ingredient-search.js.
 
-    THE FILE WAS `recipe-list.js` UNTIL 2026-09-20 (#759). It is three pure
-    helpers the food index happened to need first, and #694 put it on the
-    cocktails index too; the name recorded where it was born rather than what
-    it does. The PATTERN below is what matters here, not the name -- it is
+    THE FILE WAS `recipe-list.js` AND THE KEY WAS `HTF.recipeList` UNTIL
+    2026-09-20 (#759). It is three pure helpers the food index happened to need
+    first, and #694 put it on the cocktails index too; both names recorded
+    where it was born rather than what it does. The PATTERN below is what
+    matters here, not the name -- it is
     matched against the real template, so a tag renamed without this test
     renamed fails loudly rather than silently passing on a regex that matches
     nothing. `.recipe-list`, the CSS class on food's `<ul>`, is untouched and
@@ -139,7 +140,7 @@ def test_list_view_js_loads_before_filters_js():
     assert filters_tag, "food/index.html no longer loads assets/js/filters.js."
     assert list_view_tag.start() < filters_tag.start(), (
         "list-view.js must load BEFORE filters.js, or "
-        "HTF.recipeList won't exist yet when filters.js runs."
+        "HTF.listView won't exist yet when filters.js runs."
     )
 
 

@@ -28,7 +28,7 @@ const JS_DIR = path.join(__dirname, '..', '..', 'assets', 'js');
 const PAGE_SCRIPTS = [
   'assets.js',
   // #694 put this on the page (as `recipe-list.js`, renamed 2026-09-20 by
-  // #759): cocktail-index.js calls HTF.recipeList.paginate, and without it the
+  // #759): cocktail-index.js calls HTF.listView.paginate, and without it the
   // script throws on its first apply(). THIS HARNESS CAUGHT THAT, which is the
   // plainest demonstration of why it exists -- every other test stayed green
   // while the index was dead.
