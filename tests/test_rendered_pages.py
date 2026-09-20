@@ -2612,6 +2612,116 @@ def test_the_search_index_lists_exactly_the_published_pages(prod_site, site_key)
         assert item["t"], f"{item['u']} has no title in the search index"
 
 
+def test_the_drinks_search_offers_no_joined_ingredient_label(prod_site):
+    """No `ing` term in the feed is a joined "X or Y" label -- #1051, #1130.
+
+    A disjunctive `generic` means "either would do" (#441), so the card prints
+    "cherry brandy or cherry liqueur" as a true fact about the pour. That
+    string names no single HAS TO HAVE chip, and `?ing=` matches a chip WHOLE
+    (MANUAL §13.13), so offering it is a result that matches nothing when
+    clicked.
+
+    #1051 SOLVED THAT BY DROPPING THE ROW, and #1130 replaced that with
+    offering each HALF -- which each is a chip, and which
+    `test_...either_half_of_a_joined_pour_finds_the_drink` in
+    tests/js/cocktail-index-startup.test.js proves resolves. This is the guard
+    that stays true under both: whatever the feed offers, none of it is the
+    joined string.
+
+    THE PARTS ARE DERIVED FROM THE DATA, NOT BY SPLITTING THE LABEL, and that
+    is the whole care in this test. Splitting the display string on " or " is
+    the obvious wrong fix, and it agrees with the right one on every drink
+    live today -- so a test that split the label to compute what it expected
+    would pass over either implementation and guarantee nothing. Measured
+    while writing this: reverting to #1051's behaviour fails the second half
+    below, and substituting a `split: " or "` in the template does NOT, which
+    is why the expectation now comes from each pour's own generics through
+    `card_names`.
+
+    WHERE THE TWO ACTUALLY DIVERGE: `card_name_joins` REWRITES a joined label
+    -- `Demerara overproof rum or Demerara rum` became Helen's `Demerara rum
+    or overproof`, which drops two words from the second option -- so a split
+    of that display string yields "overproof", which is no chip at all. That
+    map is EMPTY today, which is exactly why no live drink can tell the two
+    implementations apart, and why this test derives rather than splits: it is
+    inert about the difference now and correct the day an entry returns.
+    """
+    feed = json.loads((prod_site / "cocktails" / "search.json")
+                      .read_text(encoding="utf-8"))
+    offered = {term for item in feed["items"] for term in item.get("ing", [])}
+    assert offered, "the drinks search feed offers no ingredients at all."
+
+    index = (prod_site / "cocktails" / "index.html").read_text(encoding="utf-8")
+    printed = set(re.findall(
+        r'<span class="drink-card-ing" data-ing="[^"]*">(.*?)</span>', index, re.S))
+    joined = {re.sub(r"<[^>]+>", "", label).strip() for label in printed
+              if " or " in re.sub(r"<[^>]+>", "", label)}
+
+    leaked = sorted(joined & offered)
+    assert not leaked, (
+        "the drinks search feed offers joined label(s) that name no chip:\n  "
+        + "\n  ".join(leaked)
+        + "\n\nEach would take a reader to an index filtered to nothing. "
+          "cocktails/search.json must offer `ing.search_labels` -- the label "
+          "in the pieces a filter can apply -- and never `ing.label` for a "
+          "row with more than one generic."
+    )
+
+    # AND THE PARTS ARE ACTUALLY THERE, which is the other half of #1130 and
+    # the half that a "never offer the joined string" test passes vacuously by
+    # offering nothing at all.
+    import yaml as _yaml
+
+    front_matter = re.compile(r"\A---\n(.*?)\n---", re.S)
+    vocab = _yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "ingredients.yml").read_text(encoding="utf-8"))
+    card_names = vocab.get("card_names") or {}
+    hidden = set(vocab.get("not_on_cards") or [])
+
+    offered_by_slug = {
+        item["u"].rstrip("/").rsplit("/", 1)[-1]: item.get("ing", [])
+        for item in feed["items"]
+    }
+
+    missing, checked = [], 0
+    for path in sorted((ROOT / "_cocktail_recipes").glob("*.md")):
+        match = front_matter.match(path.read_text(encoding="utf-8"))
+        if not match or path.stem not in offered_by_slug:
+            continue
+        drink = _yaml.safe_load(match.group(1)) or {}
+        for ing in (drink.get("ingredients") or []):
+            if not isinstance(ing, dict):
+                continue
+            raw = ing.get("generic")
+            generics = [str(g) for g in (raw if isinstance(raw, list) else [raw]) if g]
+            if len(generics) < 2:
+                continue
+            # A row every one of whose generics is hidden is dropped from the
+            # card altogether, so it offers nothing and owes nothing.
+            wanted = [card_names.get(g, g) for g in generics if g not in hidden]
+            if not wanted:
+                continue
+            checked += 1
+            for part in wanted:
+                if part not in offered_by_slug[path.stem]:
+                    missing.append(
+                        f"{path.stem}: pours {generics} -> {part!r} is not offered")
+
+    assert checked, (
+        "no published drink pours more than one generic, so this half of the "
+        "test checked nothing. If that is now true of the collection, say so "
+        "here rather than leaving a test that reads as though it bites."
+    )
+    assert not missing, (
+        f"across {checked} multi-generic pour(s), a part is missing from that "
+        "drink's search terms:\n  " + "\n  ".join(missing)
+        + "\n\nThe drink genuinely answers a HAS TO HAVE question about "
+          "either (#441, 'either would do'), and the index's own picker "
+          "already offers both chips -- `buildPool` in cocktail-search.js "
+          "adds one per generic. The feed must agree with it."
+    )
+
+
 def _recipe_pages(built_site):
     return sorted((built_site / "food" / "recipes").rglob("index.html"))
 
