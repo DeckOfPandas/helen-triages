@@ -701,9 +701,23 @@ must say `proofread: false`. Three things about it:
   `test_invisible_keys_are_really_invisible` scans the render surface
   (`_layouts`, `_includes`, `_plugins`, `assets/js`, `scripts` — **not pages**;
   `food/index.html` reads `meta.rewritten`, so a rename of that key WOULD
-  invalidate proofreads) to keep the claim honest. `HELEN_CLEARED` names
-  individual recipes she has cleared by hand. Read the constants' own
-  comments before reaching for either.
+  invalidate proofreads) to keep the claim honest. Read that constant's own
+  comment before reaching for it.
+- **`HELEN_CLEARED` IS GONE, 2026-09-20, and is not to be rebuilt in the same
+  shape.** It named individual recipes Helen had cleared by hand — and it
+  matched on FILENAME, so an entry never expired: a recipe in it was exempt
+  from the proofread rule for ever, including every future agent edit. She
+  spotted it from the description alone: *"I don't want a permanent exemption
+  list. If I change one of those files again, the flag will need to go back to
+  false until I proofread it again."* All 17 entries were measured spent the
+  day it went — every one's newest commit was already behind the baseline, so
+  deleting the list turned nothing red, and all 17 had been edited by an agent
+  since being cleared. **The remaining escapes are `BASELINE_COMMIT` and
+  `INVISIBLE_KEYS`**, and the difference that matters is that a baseline names
+  a point in HISTORY and this named a file for ever. If the one-recipe-cleared-
+  while-others-held case returns — it is real, and a baseline genuinely cannot
+  express it — build an entry that clears ONE COMMIT, with the case in front of
+  you.
 - **"Nothing changed" and "I cannot tell what changed" are opposite
   answers.** A commit that reorders the `meta:` block is exempt (same file
   spelled differently); a guard that fails closed is right to only when it

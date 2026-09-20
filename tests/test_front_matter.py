@@ -585,7 +585,43 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # way in this commit). Proved with the old value first: the test named
 # meringue-swans-with-diplomat-cream.md and nothing else. Covers 3039210 and
 # nothing after it.
-BASELINE_COMMIT = "3039210"   # three mechanical faults in #1126's proofread, on Helen's word
+# EVERY MENTION OF `HELEN_CLEARED` BELOW AND ABOVE IS HISTORY: the list was
+# DELETED on 2026-09-20 and this constant is now the only way Helen can grant a
+# change without the flip. Those older entries are kept unedited because they
+# record real reasoning at the time -- several of them chose the list OVER a
+# baseline move, and that trade-off is still worth understanding even though
+# one side of it no longer exists.
+#
+# MOVED 2026-09-19 FOR #982's 18 RECIPES, AND THE BLUNTNESS THAT USUALLY ARGUES
+# AGAINST A BASELINE IS WHY IT IS RIGHT HERE. `4390dfc` sets `proofread: true`
+# on the 18 still-false recipes of `e27753a` ("Move 24 ingredients' measures
+# from item: into amount: (#982)"), which is precisely the "sweeping and
+# content-free" case HELEN_CLEARED's own comment names as the baseline's job --
+# fifteen entries would have been fifteen lines saying the same sentence.
+#
+# HER GRANT: "the 24 files in this commit are perfect... Please find them, set
+# proofread to true, and PR. I just tried to cook mussels and they weren't
+# there!" One recipe of the twenty was the one she went looking for and could
+# not find; the gate had been holding all eighteen since 2026-09-12.
+#
+# THE HAZARD THIS COMMENT WARNS ABOUT WAS MEASURED, NOT WAVED AWAY. A baseline
+# "grandfathers EVERYTHING at or before a commit", and the 2026-08-21 en-dash
+# pass chose thirteen HELEN_CLEARED entries over one baseline move precisely
+# because #406's citation work was being held at `proofread: false` behind it.
+# Nothing is being held now: all 90 recipes are `proofread: true` and
+# `awaiting_fix: false` (`tmp/held_food.py`), 90 files produce 90 pages, and
+# running this test against `4390dfc` named ONLY that commit's own files -- so
+# there is no other recipe whose agent edit this move could silence.
+#
+# `e27753a` ITSELF IS NOT THE BASELINE, deliberately. The flag flip is a later
+# commit and the test reads each file's NEWEST commit, so the baseline has to
+# cover the flip. Three of the twenty needed nothing: beef-wellington,
+# indonesian-chicken-curry-gulai-ayam and lemon-meringue-pie are already in
+# HELEN_CLEARED, which is why the guard named fifteen and not eighteen.
+#
+# Proved with the old value first, as every move before it: the test named the
+# fifteen files of `4390dfc` and nothing else. Covers 4390dfc and nothing after.
+BASELINE_COMMIT = "4390dfc"   # #982's 18 recipes, on Helen's word
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
@@ -699,138 +735,6 @@ BASELINE_COMMIT = "3039210"   # three mechanical faults in #1126's proofread, on
 # not whether the change felt small.
 AGENT_TRAILER = "co-authored-by: claude"
 
-# RECIPES HELEN HAS CLEARED ONE AT A TIME, when the baseline is the wrong tool.
-#
-# The baseline is a blunt instrument: it grandfathers EVERYTHING at or before a
-# commit. That is right when the change was sweeping and content-free (a key
-# rename across all 82). It is wrong when a single recipe needs clearing and
-# other recipes are being held on purpose -- sliding the baseline forward to
-# reach the one would quietly release the others too.
-#
-# That case arrived on 2026-08-20. Helen asked for slow-cooked-duck-legs-confit
-# to go back to proofread: true ("this is an exception"), and the same commit
-# had to keep holding beef-wellington and indian-mutton-raan-roast at false,
-# because an agent had just rewritten their citation lines. One baseline cannot
-# express both. So: name the file, and leave the baseline alone.
-#
-# THIS HAS THE SAME WEAKNESS AS THE BASELINE and it is worth saying plainly --
-# an agent can add an entry here to turn a red test green, exactly as it could
-# move a SHA. What makes it better is legibility, not security: a diff that adds
-# a filename, a date and a sentence of reason is something Helen can review at a
-# glance, where a forty-character SHA changing is not. The protection is her
-# eyes on the diff, so make the entry easy to read and never add one she has not
-# asked for in words.
-HELEN_CLEARED: dict[str, str] = {
-    "_food_recipes/slow-cooked-duck-legs-confit.md":
-        "2026-08-20 -- the last of the eight-recipe backlog she re-proofread in "
-        "c07104a. She cleared the other seven in her own commit and this one by "
-        "instruction: 'Duck legs confit can go back to true, please, this is an "
-        "exception.'",
-
-    # --- the en-dash pass, 2026-08-21 (issue #413) ---------------------------
-    #
-    # THIRTEEN ENTRIES FROM ONE SESSION, WHICH IS WORTH EXPLAINING, because a
-    # block this size is exactly the shape of an agent quietly clearing its own
-    # work. It is not. Helen asked to see the lines individually -- "Show me the
-    # lines here one by one, then I can't miss anything, and we can agree
-    # together. This means the proofread flag can stay true." -- and then read
-    # and confirmed all fourteen, one message at a time, before any edit was
-    # made. She was the last judgement on every one of them.
-    #
-    # WHY NOT MOVE THE BASELINE. It would have been one line instead of
-    # thirteen, and it would have been wrong: a baseline grandfathers
-    # EVERYTHING at or before a commit, and the citation work of #406 is sitting
-    # behind this point being held at proofread: false on purpose. Sliding past
-    # it to reach these thirteen would have released those too, silently. That
-    # is the case HELEN_CLEARED exists for.
-    #
-    # WHAT SHE ACTUALLY APPROVED, so this is checkable rather than asserted: one
-    # ASCII hyphen became an en dash in a number range, on one line per file
-    # (two in roast-beef-fillet). No word changed, in any file. The full list
-    # with line numbers is in the commit message.
-    #
-    # Her ruling on the one that was not prose, cauliflower-cheese's cook_time
-    # metadata field: "These still render to the user, so correct to en dash
-    # please." The test that followed is scoped by that principle -- what a
-    # reader sees -- rather than by whether a field is prose.
-    "_food_recipes/beef-wellington.md":
-        "2026-08-21 -- en-dash pass, `30-60 seconds` in a method step.",
-    "_food_recipes/ben-jerrys-sweet-cream-base-1.md":
-        "2026-08-21 -- en-dash pass, `36-40% fat` in an ingredient note.",
-    "_food_recipes/ben-jerrys-sweet-cream-base-2.md":
-        "2026-08-21 -- en-dash pass, `36-40% fat` in an ingredient note.",
-    "_food_recipes/cauliflower-cheese.md":
-        "2026-08-21 -- en-dash pass, `20-25 mins` in the cook_time field.",
-    "_food_recipes/duck-leg-barley-casserole.md":
-        "2026-08-21 -- en-dash pass, `6-9` in an ingredient amount.",
-    "_food_recipes/goats-cheese-squash-rosemary-griddle-cakes.md":
-        "2026-08-21 -- en-dash pass, `3-4 mins` in a method step.",
-    "_food_recipes/indonesian-chicken-curry-gulai-ayam.md":
-        "2026-08-21 -- en-dash pass, `12-15 passes` in an ingredient note.",
-    "_food_recipes/lemon-meringue-pie.md":
-        "2026-08-21 -- en-dash pass, `15-20 mins` in a method step note.",
-    "_food_recipes/macarons.md":
-        "2026-08-21 -- en-dash pass, `130-140°C` in a method step.",
-    "_food_recipes/miso-salmon-veg-traybake.md":
-        "2026-08-21 -- en-dash pass, `11-14 mins` in a method step. "
-        "ALSO 2026-09-06 -- #711, one full stop added to a note ('...for "
-        "drizzling at the end.'); Helen's explicit one-off, see the block at "
-        "the foot of this dict.",
-    "_food_recipes/peanut-butter-cookies.md":
-        "2026-08-21 -- en-dash pass, `8-12 mins` in a method step.",
-    "_food_recipes/roast-beef-fillet.md":
-        "2026-08-21 -- en-dash pass, `170-180°C` in two method steps.",
-    "_food_recipes/sweet-shortcrust-pastry-mince-pies.md":
-        "2026-08-21 -- en-dash pass, `15-20 mins` in a method step.",
-
-    # --- the copywriting review, 2026-09-04 -----------------------------------
-    #
-    # Helen asked for a copy review of her two longform recipes, applied the
-    # notes herself in tmp/inbox ("it's easier to internalise the feedback when
-    # I apply it myself"), had the agent install her files with only paste
-    # slips fixed (an indented `---`, `proofread: fasle`, a mangled title, one
-    # `--`), read both rendered pages on a local build of the branch, and then:
-    # "Ganache and Hollandaise are signed off, so please flip proofread and
-    # push." The words on the page are hers and she read them last; the agent's
-    # commits wrote the bytes, which is the only reason these entries exist.
-    #
-    # WHY NOT THE BASELINE: same reason as the en-dash block above. Two named
-    # files, and anything else an agent has touched since 9306cef stays held.
-    "_food_recipes/henrys-quick-bulletproof-hollandaise-sauce.md":
-        "2026-09-04 -- copywriting review; Helen's own rewrite of the tips and "
-        "troubleshooting, read on the rendered page and signed off in words.",
-    "_food_recipes/chocolate-ganache.md":
-        "2026-09-04 -- copywriting review; Helen's own rewrite of the tips and "
-        "troubleshooting, read on the rendered page and signed off in words.",
-
-    # --- the #711 full stops, 2026-09-06 --------------------------------------
-    #
-    # TWO RECIPES, AND THE ENTIRE CHANGE IS ONE FULL STOP EACH. #711 is Helen's
-    # rule that a note ends with one; these two notes did not.
-    #
-    #   miso-salmon-veg-traybake   "...for drizzling at the end" -> "end."
-    #   pancetta-white-bean-stew   "...straight from frozen"     -> "frozen."
-    #
-    # The flags were flipped to false with the edit, as the rule requires, and
-    # Helen then directed them back by name and in words, 2026-09-06: "Explicit
-    # direction as a one-off: flip the proofread flag back on miso salmon and
-    # pancetta white bean. Life is too short."
-    #
-    # SHE IS CLEARING THE CHANGE, NOT THE RULE. The one-off is about these two
-    # full stops, and it is exactly the case the paragraph at the top of this
-    # block describes -- a change small enough for her to hold in her head from
-    # its description, named file by file so nothing else rides along. Do not
-    # read it as permission to clear the next agent edit without asking.
-    #
-    # miso-salmon-veg-traybake ALREADY HAD AN ENTRY from the en-dash pass, so
-    # its reason is extended rather than duplicated: a stale reason on a live
-    # exemption is the rot the staleness guards elsewhere in this suite exist to
-    # catch, and this dict has no such guard.
-    "_food_recipes/pancetta-white-bean-stew.md":
-        "2026-09-06 -- #711, one full stop added to a note ('...straight from "
-        "frozen.'). Helen's explicit one-off: 'flip the proofread flag back on "
-        "miso salmon and pancetta white bean. Life is too short.'",
-}
 
 
 def _git(*args):
@@ -855,14 +759,20 @@ def _git(*args):
 # awaiting_fix rename; the difference is that this does it by rule instead of by
 # asking her again each time, which is what she asked for.
 #
-# WHY THIS IS NOT THE USUAL "AN AGENT CAN JUST ADD AN ENTRY" HOLE. HELEN_CLEARED
-# above is protected only by being legible -- nothing can check whether she
-# really cleared a recipe. This list is different: the claim "no template reads
-# this key" is a FACT ABOUT THE REPOSITORY, and
-# test_invisible_keys_are_really_invisible checks it. A key cannot be added here
-# unless it is genuinely unread, and the day someone starts rendering one, that
-# test goes red and the entry has to come out. The guard is mechanical, not
-# social.
+# WHY THIS IS NOT THE USUAL "AN AGENT CAN JUST ADD AN ENTRY" HOLE, AND WHY IT
+# IS THE ONLY ESCAPE HATCH LEFT THAT ISN'T. The claim "no template reads this
+# key" is a FACT ABOUT THE REPOSITORY, and test_invisible_keys_are_really_
+# invisible checks it: a key cannot be added here unless it is genuinely
+# unread, and the day someone starts rendering one, that test goes red and the
+# entry has to come out. The guard is mechanical, not social.
+#
+# THE CONTRAST USED TO BE WITH `HELEN_CLEARED`, WHICH WAS DELETED 2026-09-20.
+# That list was protected only by being legible -- nothing could check whether
+# Helen had really cleared a recipe -- and it matched on FILENAME, so an entry
+# never expired and covered every future edit to that recipe as well. All 17 of
+# its entries were measured spent on the day it went. What is left is this
+# list, which a test can verify, and BASELINE_COMMIT, which at least names a
+# point in history rather than a file for ever.
 #
 # WHAT IT DELIBERATELY DOES NOT COVER: the body text, and any key that IS read.
 # A commit qualifies only if every single difference between the two versions of
@@ -1346,23 +1256,6 @@ def test_no_agent_commit_claims_helens_rewrite():
     )
 
 
-def test_every_cleared_recipe_still_exists():
-    """A HELEN_CLEARED entry naming a file that is gone is a silent hole.
-
-    Renaming a recipe would leave its clearance behind, pointing at nothing --
-    and then the new name is held to the rule again with no sign that it was
-    ever cleared, or worse, a future recipe reusing the old slug inherits a
-    clearance nobody granted it. Cheap to check, so check it.
-    """
-    missing = sorted(p for p in HELEN_CLEARED if not (ROOT / p).exists())
-    assert not missing, (
-        "HELEN_CLEARED names recipe(s) that no longer exist:\n  "
-        + "\n  ".join(missing)
-        + "\n\nIf one was renamed, move its entry to the new path and keep the "
-          "reason. If it was deleted, delete the entry -- do not leave it to be "
-          "inherited by whatever takes the slug next."
-    )
-
 
 def test_agent_edited_recipes_are_not_marked_proofread():
     """A recipe whose newest commit is an agent's must have proofread: false."""
@@ -1403,8 +1296,6 @@ def test_agent_edited_recipes_are_not_marked_proofread():
         if subprocess.run(["git", "merge-base", "--is-ancestor", commit, base],
                           cwd=ROOT, capture_output=True).returncode == 0:
             continue
-        if relpath in HELEN_CLEARED:
-            continue                                  # cleared by name, see above
         if _only_invisible_keys_changed(commit, relpath):
             continue                                  # renders nothing; see above
         if commit not in agent_commit:
@@ -1430,10 +1321,16 @@ def test_agent_edited_recipes_are_not_marked_proofread():
           "  2. If the commit changed ONLY keys that render nothing, add them to "
           "INVISIBLE_KEYS -- but only if test_invisible_keys_are_really_"
           "invisible still passes, which is the check that keeps this honest.\n"
-          "  3. If Helen reviewed the change herself, either name the recipe in "
-          "HELEN_CLEARED or, for a sweeping content-free change across many "
-          "recipes, move BASELINE_COMMIT forward. Both are hers to grant, and "
-          "the commit message must say she did."
+          "  3. If Helen reviewed the change herself, move BASELINE_COMMIT "
+          "forward, in a commit of its own, quoting her. It is hers to grant.\n\n"
+          "There is NO per-recipe exemption list. HELEN_CLEARED was deleted on "
+          "2026-09-20 because it matched on FILENAME and so never expired: a "
+          "recipe named in it was exempt from this rule for ever, including "
+          "every future edit. Helen: 'If I change one of those files again, the "
+          "flag will need to go back to false until I proofread it again.' If "
+          "you find yourself wanting one back, what you actually want is an "
+          "entry that clears ONE COMMIT -- and that is worth building properly, "
+          "with the case in front of you, not reinstating the filename version."
     )
 
 

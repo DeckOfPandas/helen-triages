@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Take a published recipe or drink off the live site and tell Helen why.
+"""Take published recipes or drinks off the live site and tell Helen why -- ONE issue for the batch.
 
-    python3 scripts/needs_helen.py _food_recipes/roast-beef-fillet.md --why "..."
-    python3 scripts/needs_helen.py _cocktail_recipes/negroni.md --why "..." --dry-run
+    python3 scripts/needs_helen.py _food_recipes/roast-beef-fillet.md \\
+        --batch "the en-dash pass" --why "..."
+
+    python3 scripts/needs_helen.py _food_recipes/a.md _cocktail_recipes/b.md \\
+        --batch "#711's note sentences" --why "..." --dry-run
 
 PIPELINE.md §5 is the procedure; this is the engine for its middle row. When an
 agent edits a published file in any way bigger than a word or a number, the
@@ -13,18 +16,35 @@ reading a build log. Her idea, 2026-09-14: "when Claude touches a published
 file in a way that flips proofread to false, raise a github issue labelled
 blocked on Helen so I know I need to do something".
 
-WHAT IT DOES. Flips the flag by a textual edit of the one line (never a YAML
-round-trip, which would lose comment placement and key order); finds every
-other published page that links to this one, because a demotion turns those
-links into 404s in production and she should know the cost is two pages and
-not one; writes the issue body to tmp/needs-helen-<slug>.md; and prints the
-ONE command that opens the issue. It does not open the issue itself and does
-not commit: the wrapper call is allow-listed as a direct command and a commit
-is the session's to make with the rest of the change.
+ONE ISSUE PER BATCH, NOT ONE PER FILE -- CHANGED 2026-09-20, AND THE REASON IS
+THE REASON THIS TOOL NEARLY KILLED ITSELF. The original rule was one issue per
+demoted file, and that is precisely the shape that got the agent account
+flagged as spam on 2026-09-14: twenty issues in under an hour hid the account's
+entire history from everyone but itself. CLAUDE.md's rule from that day -- "a
+batch of issues is ONE issue with a checklist, never one issue per file" -- was
+in direct contradiction with PIPELINE.md §5 from the moment it was written, and
+this tool implemented the losing side. Helen, 2026-09-20: "We need to put that
+rule back in place, but add the list of dark recipes to one issue per batch
+rather than one issue per file."
 
-ONE ISSUE PER FILE, NOT PER EDIT. Search the tracker for an open
-`proofread: <slug>` before running this; a second edit to a file that already
-has one is a comment on that issue, not a new one.
+So: pass every file you are demoting in one call, get one body with a
+checklist, and open one issue.
+
+WHAT IT DOES. Flips each flag by a textual edit of the one line (never a YAML
+round-trip, which would lose comment placement and key order); finds every
+other published page that links to each one, because a demotion turns those
+links into 404s in production and she should know the cost; writes one issue
+body to tmp/needs-helen-batch.md; and prints the ONE command that opens it. It
+does not open the issue itself and does not commit: the wrapper call is
+allow-listed as a direct command and a commit is the session's to make with
+the rest of the change.
+
+BEFORE OPENING IT, check the tracker for an open `blocked-on-helen` issue that
+already names one of your slugs. A page demoted twice does not want two live
+issues; comment on the open one and leave that slug out of the new body.
+
+`scripts/dark_pages.py` lists everything the gate is currently hiding, which is
+the way to check afterwards that the batch is the whole story.
 """
 from __future__ import annotations
 
@@ -73,62 +93,101 @@ def linking_pages(collection_dir: Path, slug: str) -> list[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("path", help="the published file, under _food_recipes/ or _cocktail_recipes/")
+    parser.add_argument("paths", nargs="+",
+                        help="the published files, under _food_recipes/ or _cocktail_recipes/")
+    parser.add_argument("--batch", required=True,
+                        help="a short name for what caused the demotion, for the issue title")
     parser.add_argument("--why", required=True, help="what changed and why, in a sentence or two")
-    parser.add_argument("--dry-run", action="store_true", help="flip nothing, write nothing, print what would happen")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="flip nothing, write nothing, print what would happen")
     args = parser.parse_args()
 
-    path = (ROOT / args.path).resolve()
-    if not path.exists():
-        sys.exit(f"{args.path}: no such file")
-    collection = path.parent.name
-    if collection not in COLLECTIONS:
-        sys.exit(f"{args.path}: not under one of {', '.join(COLLECTIONS)} -- only a "
-                 f"PUBLISHED file is demoted this way; a draft is not on the site.")
-    site, prefix = COLLECTIONS[collection]
-    slug = path.stem
+    # Resolve and validate EVERY path before flipping any, so a typo in the
+    # last argument does not leave half a batch demoted with no issue.
+    targets, bad = [], []
+    for raw in args.paths:
+        path = (ROOT / raw).resolve()
+        if not path.exists():
+            bad.append(f"{raw}: no such file")
+            continue
+        if path.parent.name not in COLLECTIONS:
+            bad.append(f"{raw}: not under one of {', '.join(COLLECTIONS)} -- only a "
+                       f"PUBLISHED file is demoted this way; a draft is not on the site.")
+            continue
+        targets.append((raw, path))
+    if bad:
+        sys.exit("refused, nothing flipped:\n  " + "\n  ".join(bad))
 
-    outcome = flip(path, args.dry_run)
-    links = linking_pages(path.parent, slug)
+    seen = {p.stem for _, p in targets}
+    if len(seen) != len(targets):
+        sys.exit("refused: the same file is listed twice")
 
+    rows = []
+    for raw, path in targets:
+        site, prefix = COLLECTIONS[path.parent.name]
+        slug = path.stem
+        rows.append({
+            "raw": raw, "slug": slug, "prefix": prefix,
+            "outcome": flip(path, args.dry_run),
+            "links": linking_pages(path.parent, slug),
+        })
+
+    n = len(rows)
+    noun = "page" if n == 1 else "pages"
     body = [
-        f"`{args.path}` was edited by an agent and `proofread` is now `false`, so the "
-        f"page is off the live site until you have read it again (PIPELINE.md §5).",
+        f"**{n} {noun} {'is' if n == 1 else 'are'} off the live site** until you have "
+        f"read {'it' if n == 1 else 'them'} again. An agent edited "
+        f"{'it' if n == 1 else 'each of them'} and `proofread` is now `false`, so the "
+        f"publish gate hides the {noun} while the {'file stays' if n == 1 else 'files stay'} "
+        f"in the repo (PIPELINE.md §5).",
         "",
         "**What changed, and why**",
         "",
         args.why.strip(),
         "",
-        "**To read it**",
+        f"**The {noun}**, on `jekyll-local` (the production build hides "
+        f"{'it' if n == 1 else 'them'}):",
         "",
-        f"{LOCAL}{prefix}{slug}/ on `jekyll-local` (the production build hides it).",
+    ]
+    for r in rows:
+        body.append(f"- [ ] [`{r['slug']}`]({LOCAL}{r['prefix']}{r['slug']}/)")
+        for other in r["links"]:
+            body.append(f"      - links from `{r['prefix']}{other}/`, which 404s in "
+                        f"production until this is back")
+
+    body += [
         "",
         "**To close this**",
         "",
-        f"Set `proofread: true` in `{args.path}` in a commit whose message says "
-        f"`Fixes #<this issue>`; nothing else is needed.",
+        f"Set `proofread: true` on each, in a commit whose message says "
+        f"`Fixes #<this issue>`. Tick them off here as you go if it helps; the "
+        f"issue is done when the list is.",
+        "",
+        "_Raised as one issue for the whole batch rather than one per page: "
+        "one-per-page is what got the agent account flagged as spam on "
+        "2026-09-14 (CLAUDE.md)._",
     ]
-    if links:
-        body += [
-            "",
-            "**Other live pages link here and 404 in production until this is back**",
-            "",
-        ] + [f"- `{prefix}{other}/`" for other in links]
     body_text = "\n".join(body) + "\n"
 
-    out = ROOT / "tmp" / f"needs-helen-{slug}.md"
+    out = ROOT / "tmp" / "needs-helen-batch.md"
     if not args.dry_run:
         out.parent.mkdir(exist_ok=True)
         out.write_text(body_text, encoding="utf-8")
 
-    print(f"{args.path}: proofread {outcome}" + (" (dry run)" if args.dry_run else ""))
-    if links:
-        print(f"linked from: {', '.join(links)}")
-    print(f"issue body: {out.relative_to(ROOT)}")
-    print("open the issue with:")
+    for r in rows:
+        line = f"{r['raw']}: proofread {r['outcome']}"
+        if r["links"]:
+            line += f"   (linked from {', '.join(r['links'])})"
+        print(line + (" (dry run)" if args.dry_run else ""))
+
+    title = f"proofread: {n} {noun} off the site -- {args.batch}"
+    print(f"\nissue body: {out.relative_to(ROOT)}")
+    print("open ONE issue with:")
     print(f'  sh scripts/gh-agent.sh issue create --repo {REPO} '
-          f'--title "proofread: {slug}" --label {LABEL} '
+          f'--title "{title}" --label {LABEL} '
           f'--body-file {out.relative_to(ROOT)}')
+    print("\nfirst check the tracker for an open blocked-on-helen issue naming "
+          "any of these slugs -- comment on that one instead of listing it again.")
     if args.dry_run:
         print("\n--- body ---\n" + body_text)
     return 0
