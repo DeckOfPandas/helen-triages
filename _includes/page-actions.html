@@ -45,9 +45,26 @@
           data-shortlist-key="{{ page.url }}"
           aria-pressed="false"
           hidden>shortlist</button>
+  {% comment %} THE COUNT LEADS -- #1164, 2026-09-21. Helen: "swap shortlist
+     and (0) in the button so the structure of the + shortlist is repeated",
+     written out as:
+
+         + SHORTLIST
+         (0) SEE SHORTLIST
+         PRINT
+
+     It read "see shortlist (0)" until then. The button above it is a mark and
+     then a word (`+` is a `::before` on `.btn-shortlist`), so putting the
+     count first makes the pair read as one pattern rather than as two
+     differently-built controls that happen to sit together.
+
+     THE SPAN IS UNMOVED, only what surrounds it: shortlist.js paints
+     `[data-shortlist-total]` with `HTF.shortlist.count()` and does not care
+     where in the link it sits. The brackets stay literal text outside it, as
+     they were. {% endcomment %}
   <a class="btn-see-shortlist"
      href="{{ actions_site.home | relative_url }}?shortlist=1#results"
-     hidden>see shortlist (<span data-shortlist-total>0</span>)</a>
+     hidden>(<span data-shortlist-total>0</span>) see shortlist</a>
   <button type="button" class="btn-print" hidden>print</button>
   {% if site.pdf_downloads %}
     <a class="btn-pdf" href="{{ page.url | append: '.pdf' | replace: '/.pdf', '.pdf' | relative_url }}">pdf</a>

@@ -549,13 +549,36 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // _includes/page-actions.html, the same four controls a recipe page has --
   // which is her "top right for a save" with the save's neighbours beside it.
   justify-content: space-between;
+  // CENTRED HERE, `flex-start` ONLY ON A PHONE (#1163's block below). Above
+  // 600px the actions are a single line beside the toggle and centring is what
+  // puts the two on the same optical line -- measured, `flex-start` lifts the
+  // labels 2.6px against the taller toggle, which is a change to a width Helen
+  // did not ask about.
   align-items: center;
   gap: $space-lg;
   margin: 0;
-  // WRAPS ON A PHONE. Four actions beside the toggle do not fit a 342px
-  // column: measured at 390px, the toggle's labels broke to two lines each
-  // and the actions stacked beside them. Wrapped, the toggle keeps its line
-  // and the actions take the next, still at the right edge.
+  // IT NO LONGER WRAPS -- #1163, 2026-09-21. Helen: "first line of action
+  // buttons should be aligned with read it make it button at all widths."
+  //
+  // WHAT IT USED TO DO. `flex-wrap: wrap` let the whole actions block drop to
+  // its own line under the toggle once the two would not fit, which is why on
+  // a phone the toggle sat alone on one line and the actions began on the
+  // next. That was fine while the actions were a compact two-by-two; with one
+  // control per line (shared/_furniture.scss, #1163's other half) the block is
+  // tall and narrow, and dropping it below the toggle wastes the whole
+  // right-hand side of the row.
+  //
+  // THE WRAP STAYS, AS A SAFETY VALVE, AND THE GAP IS WHAT MOVED (see the
+  // `@media` block below). `nowrap` was tried first and measured: at 360px the
+  // toggle is 166.4px and the actions column 136px, which with this 16px gap
+  // is 318.4px in a 312px content column -- it ran 6.4px past the page and
+  // would have scrolled it sideways, the exact fault #899 exists to prevent.
+  //
+  // So the row still wraps when it genuinely cannot fit; the phone block just
+  // makes "cannot fit" rarer than the labels' own widths made it. Below about
+  // 350px it drops again, and it has to: the toggle and the widest label come
+  // to 302.4px with no gap at all, so nothing but a smaller type size would
+  // keep them on one line at 320px.
   flex-wrap: wrap;
 }
 
@@ -760,6 +783,29 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // no room. Stacked, the three facts read as the list they always were.
 @media (max-width: 600px) {
   .cocktail-meta { grid-template-columns: 1fr; }
+
+  // A TIGHTER GAP SO THE ACTIONS STAY ON THE TOGGLE'S LINE -- #1163,
+  // 2026-09-21. Helen: "first line of action buttons should be aligned with
+  // read it make it button at all widths." With the actions one-per-line
+  // (shared/_furniture.scss) the pair is the toggle's 166.4px plus the widest
+  // label's 136px; at 360px the content column is 312px, so the 16px gap left
+  // it 6.4px over and `flex-wrap` dropped the whole block below the toggle.
+  // $space-sm is 8px, which brings it to 310.4px and keeps them on one line on
+  // the narrowest phone this repo measures at.
+  //
+  // IT IS THE GAP AND NOT `nowrap` DELIBERATELY: see `.cocktail-controls`.
+  // Forcing the row to stay on one line would push it past the viewport below
+  // ~350px instead of wrapping, and a sideways-scrolling page is a worse
+  // failure than a wrapped row.
+  //
+  // AND `flex-start`, because here the actions are a tall COLUMN rather than a
+  // line: centring the two items would float the toggle down beside the middle
+  // of that column instead of level with its first entry, which is the half of
+  // #1163 this block exists for. Above 600px the base rule keeps `center`.
+  .cocktail-controls {
+    gap: $space-sm;
+    align-items: flex-start;
+  }
 
   // THE HEAD ON A PHONE LIVES BELOW `.cocktail-glass-icon` NOW -- #942. The
   // block that sat here on 2026-09-10 set the glass to 4.5rem, and the glass's
@@ -1335,10 +1381,15 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // bleed into it would run 10px past the page's own padding and scroll the
 // page sideways -- the exact fault #899 fixed everywhere else.
 @media (max-width: 600px) {
+  // $space-xl, NOT $space-lg, SINCE #1161 (2026-09-21). Helen: "give the
+  // glass/garnish/ship a wider left margin". It was 16px; this is 24px, one
+  // step up the existing scale rather than a number picked for this one place.
+  // The glass's own `padding-inline` below adds to it, so the drawing and the
+  // facts are 32px apart where they were 16.
   .cocktail-title-block {
     display: grid;
     grid-template-columns: 4.5rem minmax(0, 1fr);
-    column-gap: $space-lg;
+    column-gap: $space-xl;
     row-gap: 0;
     padding-left: 0;
     min-height: 0;
@@ -1387,10 +1438,28 @@ $glass-top:          $title-half-leading + $title-cap-inset;
     width: auto;
     min-height: 0;
     align-self: stretch;
+    // AIR EITHER SIDE OF THE DRAWING -- #1161, 2026-09-21. Helen: "give the
+    // glass a little more left and right padding". It filled its 72px column
+    // edge to edge, so on the left it sat flush against the page's own content
+    // edge -- the same line the tape's lettering starts on, which made the
+    // drawing read as part of the margin rather than as a thing in a column.
+    //
+    // THE INSET IS ON THE SVG, AND `padding` HERE WOULD DO NOTHING. That was
+    // tried first and shot: an absolutely positioned child's containing block
+    // is its ancestor's PADDING box, which INCLUDES the padding, so `inset: 0`
+    // lands the drawing on the inside of the border either way and
+    // `padding-inline` moved it not one pixel. Naming the inset on the svg is
+    // the same intent stated where it actually applies.
+    //
+    // HORIZONTAL ONLY. The vertical `0`s are load-bearing: the comment above
+    // explains that this box is stretched to the facts' height and the svg is
+    // taken out of flow so it cannot size the row. Insetting it vertically
+    // would shrink the drawing against a height that is already the row's.
+    // The drawing is 56px wide in the same 72px column.
 
     svg {
       position: absolute;
-      inset: 0;
+      inset: 0 $space-sm;
       margin: auto;
     }
   }

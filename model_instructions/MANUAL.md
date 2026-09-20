@@ -176,6 +176,17 @@ crops one element at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`,
 `right`), so an alignment question is answered by comparing two numbers, not
 two images; the last two arguments type text into a box first, for a control
 that only shows itself once somebody has typed (the search dropdown, #1050).
+**A BOX IS NOT INK, AND TWO CROPS ARE NOT ONE IMAGE — and when the marks you
+are comparing sit in an element that also holds the tape, hide the tape.**
+`tmp/nav_candidate.py` (#1148, 2026-09-21) is the pattern: `visibility: hidden`
+on `.site-logo` keeps its box, so nothing below it moves, and the two marks are
+then alone in one crop of `.site-header-inner`. Measuring them from separate
+crops instead reported a 0.7px shift where the true one was 1.68px — each crop
+pads its box by about a device pixel and the two rasters land on different
+sub-pixel phases. **And the last device pixel may be unreachable**: two ink
+bands of different heights have centres permanently half a pixel out of step,
+so walk the value, read what each one paints, and take the one that looks level
+(§13.11) rather than dividing the gap by the font size.
 **EVERY `<path>` IS SITE-RELATIVE AND THE TOOL ADDS `/helen-triages` ITSELF**
 — `/food/`, `/cocktails/recipes/daiquiri/`, never `/helen-triages/food/`.
 Passing the baseurl yourself asks for `/helen-triages/helen-triages/food/`,

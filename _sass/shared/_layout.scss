@@ -441,6 +441,47 @@ main {
   font-size: 1.05rem;
   font-weight: 400;
   letter-spacing: normal;
+  // LEVEL WITH THE ROW'S INK, NOT JUST ITS BOX -- #1148's second round,
+  // 2026-09-21. Helen, after the first fix shipped: "The navbar lines are still
+  // misaligned for me. This is both locally and on the recently deployed site."
+  //
+  // THE FIRST FIX WAS RIGHT AND NOT ENOUGH. It halved this element's top margin
+  // inside the phone block, which the `@media (max-width: 600px)` rule below had
+  // forgotten, and that put the two BOXES on the same `y` at every width --
+  // measured across eight widths from 360 to 1280, all equal. But the two boxes
+  // are different heights (20.5px against 26.9px) and their ink sits differently
+  // inside them, because `[ COCKTAILS ]` is 0.8rem $font-headings and this is
+  // 1.05rem $font-body. Aligning the boxes left the INK 1.5px apart, which is
+  // what she could still see.
+  //
+  // `position: relative` MOVES NOTHING ELSE, which is why this and not a margin:
+  // the header's height, the tape gap Helen eyeballed for #1086 and every other
+  // item's place are untouched. It is a correction to what is drawn.
+  //
+  // WHY NOT `align-self: baseline` ON BOTH, which would have been alignment by
+  // construction rather than a measured number (#993's own preference): tried
+  // and measured, and it moves the ROW down 6px (y 109.3 -> 115.3) because the
+  // larger `??` sets the shared baseline. That changes the gap under the tape,
+  // which is a value Helen picked by eye on a candidates page. The row is the
+  // anchor; this is the mark that moves.
+  //
+  // 0.12em, AND THE LAST DEVICE PIXEL IS UNREACHABLE. Walked at 390px --
+  // 0.10em lands the ink 1 device pixel LOW, 0.12/0.14/0.16 land it 1 HIGH,
+  // 0.18 lands it 3 high. Nothing lands it level, and the reason is parity: the
+  // `??`'s ink band is 26 device pixels tall and the brackets' is 24, so their
+  // centres are always half a pixel out of step with each other. 0.10 and 0.12
+  // are equidistant from true; 0.12 is the one that reads level, and a question
+  // mark carries no descender while the brackets do, so its mass wants to sit
+  // slightly high of a pure centre.
+  //
+  // TO RE-MEASURE after any change to either face or size, and it must be done
+  // in ONE image (tmp/nav_candidate.py builds it): hide `.site-logo`, then
+  // `sh scripts/browser/crop.sh /food/ ".site-header-inner" nav 390` and
+  // `python3 scripts/browser/inkbox.py tmp/shots/crop-nav.png 30`. Two separate
+  // crops are wrong by their own padding -- doing it that way here reported a
+  // 0.7px shift where the true one was 1.68px.
+  position: relative;
+  top: -0.12em;
 }
 
 // THE FOOTER IS AS WIDE AS THE ARTICLE, AND ITS OUTER COLUMNS SIT UNDER THE
