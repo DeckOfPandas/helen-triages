@@ -364,12 +364,12 @@ see the warning in §2. Do not infer one.
 **Citrus peel:** lemon twist · lemon twist (discarded) ·
 lemon twist after expressing over cocktail · orange twist ·
 orange twist (discarded) · orange or lemon twist · grapefruit twist ·
-flamed orange zest coin
+flamed orange zest coin · length of lime peel
 
-**Citrus cut:** lime wedge · lime wedge on rim · lime wheel · lemon wheel ·
-lemon slice · orange slice · orange wheel · orange crescent ·
-grapefruit crescents · citrus wheel · dehydrated lime slice wheel ·
-half an empty lime shell
+**Citrus cut:** lime wedge · lime wedge on rim · lime wheel ·
+lime wheel or wedge · lemon wheel · lemon slice · orange slice · orange wheel ·
+orange crescent · grapefruit crescents · citrus wheel ·
+dehydrated lime slice wheel · half an empty lime shell
 
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
@@ -381,11 +381,11 @@ skewered maraschino cherry · skewered brandied cherry · cherry flag ·
 fruit stick (skewered pineapple cubes and a maraschino cherry)
 
 **Herbs and leaves:** mint sprig · mint leaf · mint bouquet · rosemary sprig ·
-kaffir lime leaves · cucumber wheels · edible violet ·
+pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
 mint sprig, mint leaf or grated nutmeg
 
-**Spice and other:** grated nutmeg · cinnamon stick · ginger wheel ·
-stem ginger slice · three coffee beans
+**Spice and other:** grated nutmeg · Angostura bitters · whipped cream ·
+cinnamon stick · ginger wheel · stem ginger slice · three coffee beans
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
@@ -651,6 +651,11 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
 - **Never write `suggestion` as a bare string.** Always a list.
 - **Never invent a `serve.chill`** — a chilled glass is assumed. §4a.
 - **Never put a pour in `garnish`.** Anything with an amount is an ingredient.
+- **Never give a note you add any label but `QQ`, and never write one as a bare
+  string.** Both fields set, both beginning `QQ`. A drink page titles a note
+  with no label "note", which looks finished, so a note nobody has read would
+  publish under a heading that says nothing is wrong. `QQ` is the title she can
+  see and search for (#1120, Helen).
 - **Never reconstruct a truncated method**, however obvious the pattern. But
   **do say in your list that it looks truncated** — three of these were found
   in one day in 2026-09, all by machine and none by a reader.
