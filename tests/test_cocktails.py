@@ -3759,6 +3759,124 @@ def test_every_mood_ingredient_is_declared():
     # mood silently rather than erroring.
 
 
+def test_every_icy_serve_value_is_a_real_one():
+    """`mood_serve_ice` names declared `serve.ice` values -- #1147.
+
+    THE SAME BARGAIN AS THE TEST ABOVE, one field along. `serve.yml` declares
+    what `serve.ice` may say; `mood_serve_ice` in taxonomy.yml says which of
+    those are icy enough to earn `ice ice baby`. Two lists, because they answer
+    two questions -- and two lists is exactly the arrangement #452's renames
+    turned into 34 strings that named nothing.
+
+    A MISMATCH HERE FAILS SILENTLY AND IN THE SAFE-LOOKING DIRECTION. The rule
+    is `served_ice in set(...)`, so a value renamed in serve.yml and not here
+    does not raise: the comparison simply stops matching, and every drink
+    served that way loses the mood while the data still reads as though it
+    should have it. That is what nine drinks did on 2026-09-05 for the
+    equivalent mistake in prose.
+    """
+    taxonomy = _taxonomy()
+    declared = (_serve_vocab() or {}).get("ice") or {}
+    assert declared, (
+        "serve.yml declares no `ice:` values, so this check compares nothing. "
+        "It is the vocabulary `serve.ice` is validated against."
+    )
+
+    icy = taxonomy.get("mood_serve_ice") or []
+    assert icy, (
+        "`mood_serve_ice` is missing from taxonomy.yml. `ice ice baby` reads "
+        "it for the serve half of its rule, so without it the mood fires only "
+        "on a swizzle, churn or blend -- quietly, on every drink served over "
+        "crushed ice or a block."
+    )
+
+    unknown = sorted(str(v) for v in icy if str(v) not in declared)
+    assert not unknown, (
+        "`mood_serve_ice` names serve.ice value(s) that serve.yml does not "
+        "declare:\n  " + "\n  ".join(unknown)
+        + f"\n\nDeclared values: {sorted(declared)}. A name here that no drink "
+          "can carry matches nothing, and the mood goes quiet for every drink "
+          "served that way rather than failing. If a value was renamed in "
+          "serve.yml, follow it here in the same commit."
+    )
+
+
+def test_every_mood_step_word_list_is_actually_read():
+    """Every `mood_step_words` list is read by the derivation -- #1147.
+
+    THIS IS THE TEST WHOSE ABSENCE LEFT `ice` DEAD FOR FIFTEEN DAYS. That block
+    declared eight step words, sat beside `faff`, `churned` and `fire` which
+    are all genuinely read, and was read by nothing: the `ice ice baby` rule
+    kept its own hardcoded copy in `derive_cocktail_moods.py`. So the
+    vocabulary looked live, and editing it to change which steps make a drink
+    icy would have done exactly nothing -- no error, no failing test, no
+    difference in a single drink's moods.
+
+    IT ASKS THE RUNNING CODE, NOT THE SOURCE TEXT. A grep for `step_words.get(
+    "ice")` would pass on a call sitting in a branch nothing reaches, and would
+    fail on a legitimate refactor that reads the dict another way. So this runs
+    the real derivation over the real collection through a dict that records
+    which keys were fetched, and asks which were never touched. Same principle
+    as `test_every_priceable_pour_has_a_price` running from the drinks rather
+    than from the table: the table can be immaculate and unreached.
+
+    EVERY RULE THAT READS ONE READS IT UNCONDITIONALLY, which is what makes
+    "never fetched across the whole collection" mean "dead" rather than "not
+    exercised by these drinks". If a future rule fetches a list only inside a
+    branch, this test will report it dead on a collection that never takes that
+    branch -- and the fix is to hoist the fetch, not to weaken this.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import derive_cocktail_moods as deriver
+    except ImportError:  # pragma: no cover
+        pytest.skip("scripts/derive_cocktail_moods.py not importable")
+
+    taxonomy = _taxonomy()
+    declared = taxonomy.get("mood_step_words") or {}
+    assert declared, (
+        "taxonomy.yml has no `mood_step_words`, so this check has nothing to "
+        "do. `I want to faff`, `on fire` and `ice ice baby` all read it."
+    )
+
+    class Recording(dict):
+        """A `mood_step_words` that remembers which lists were asked for."""
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fetched = set()
+
+        def get(self, key, default=None):
+            self.fetched.add(key)
+            return super().get(key, default)
+
+    recorded = Recording(declared)
+    vocab = _vocab()
+    sets = deriver.load_sets(taxonomy, vocab)
+    families = set(vocab.get("family_of") or {})
+
+    drinks = list(_load())
+    assert drinks, (
+        "no drinks loaded, so the derivation never ran and every list would "
+        "read as dead."
+    )
+    for slug, fm in drinks:
+        stored = [str(m) for m in (fm.get("mood") or [])]
+        deriver.expected_moods(slug, fm, stored, taxonomy, sets,
+                               recorded, families)
+
+    dead = sorted(set(declared) - recorded.fetched)
+    assert not dead, (
+        "`mood_step_words` list(s) that the derivation never reads:\n  "
+        + "\n  ".join(dead)
+        + "\n\nA declared vocabulary nothing reads is worse than no "
+          "vocabulary: it invites an edit that cannot take effect. Either "
+          "wire the list into its rule in scripts/derive_cocktail_moods.py, "
+          "or delete the block. `ice` sat here dead from 2026-09-05 to "
+          "2026-09-20 (#1147) because the rule held a hardcoded copy."
+    )
+
+
 def test_source_names_a_source_and_source_url_holds_the_url():
     """`source` is who, `source_url` is where -- #454. A SHAPE rule only.
 
