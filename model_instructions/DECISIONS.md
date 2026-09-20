@@ -3422,6 +3422,72 @@ unless stated.
   tool before the SECOND, corrected one was applied by hand into the right
   place; a session that had not re-run the script after the first edit would
   have shipped a drink whose mood quietly did not say what Helen asked for.
+- **2026-09-19/20, #1127 — `no measuring`, the sixth hassle chip, and the
+  first rule that reads AMOUNTS.** Helen: *"for drinks I can make with just one
+  receptacle, if that's all I have. Such as 1/1/1, 2/1/0.5."* Every measured
+  amount a whole-number multiple of the smallest, in eight of those pours or
+  fewer. 28 drinks of 129, 15 of them published.
+
+  **The cap was not in the issue and is the whole feature.** Uncapped the rule
+  is 58% of the collection, refused outright by
+  `test_no_mood_covers_more_than_half_the_collection` — the bar that retired
+  food's `one-pot` at 57%. **Almost any set of decimal amounts is whole
+  multiples of SOMETHING**: the Corpse Reviver #2 is integer-proportioned at 41
+  pours of 7.5 ml, which is not a drink anyone makes with an egg cup. Her own
+  caveat had named the same thing before the measurement did — *"some drinks
+  may be like this but only if I make loads"*. Chosen over a printed table of
+  six / eight / ten / twelve catching 23 / 28 / 33 / 39.
+
+  **A TOP IS AN AMOUNT, NOT AN INGREDIENT, and she corrected me on it.** I
+  proposed setting every lengthener aside by name, the way `easy peasy` does,
+  and cited Long Island Iced Tea as the evidence. Her answer: *"No ingredient
+  in the Aperol Spritz is a top."* The Spritz's prosecco is 90 ml on the page
+  and belongs to its 3:2:1 as much as the Aperol does; champagne written `to
+  top` is a different thing and falls out on its own for having no volume.
+  **The cost is measured and accepted**: LIIT and Lita Grey drop out, both
+  `easy peasy`, both carrying a measured 60 ml of cola or champagne — and a
+  measured 60 ml is precisely what the chip promises you will not have to do.
+  The two moods now answer genuinely different questions, which they did not
+  when one was a copy of the other's set-aside.
+
+  **The name is hers and it reframed the rule.** Mine was `integer
+  proportions`; she wrote `no measuring`, which pairs against `no juicing` and
+  settled a question I had put to her at the same time — whether a drink with
+  only one measured line qualifies. It does: *"The tag is 'no measuring', and
+  all your examples clear that bar."* The Caipirinha is 45 ml of cachaça, half
+  a lime and 20 g of palm sugar, and exactly one of those is measured.
+
+  **AND A DERIVED MOOD LANDING ON PUBLISHED DRINKS SHIPS INVISIBLE.** Not
+  predicted, found by screenshotting the built index: the chip was absent. All
+  15 published drinks that gained it went to `proofread: false` in the same
+  commit (#367), the publish gate held all 15 back, and `cocktails/index.html`
+  renders no button for a mood with no live member — so the new filter could
+  not appear on the live site until Helen had re-read at least one drink. **The
+  same shape as `pudding in a glass`'s empty button, arriving from the other
+  direction.** Expect it on any future derived mood that is not confined to
+  drafts.
+
+  **SHE ENDED IT WITH A GRANT, AND THE GRANT IS THE RULING THAT OUTLIVES THIS
+  FEATURE.** Told the 15 were dark and the chip with them, before merging:
+  *"if the only change to those 15 files is the chip appearing, I don't need to
+  proofread, please just let them be live."* So `cf4967a` put `proofread: true`
+  back on all 15 and `d699289` moved `COCKTAIL_BASELINE_COMMIT` to it — the
+  widest that constant has ever stretched, and the constant's own comment
+  carries the argument.
+
+  **WHY A DERIVED VALUE IS NOT AN EDIT.** #367 exists because an agent editing
+  a recipe means Helen's read no longer covers what is in the file. Here it
+  did: the one added line is COMPUTED from amounts she had already read, by a
+  rule she ruled on the same day, and it renders as a chip rather than as
+  anything she would proofread. **The grant was CONDITIONAL and the condition
+  was checked rather than assumed** — `tmp/prove_only_the_chip.py` diffed all
+  15 against `main` and required every changed line to be one of exactly two,
+  the added mood and the flag; a reordered mood or a changed amount would have
+  failed it. **15 files on one grant is the number to be uneasy about**, not
+  the reasoning: `_only_invisible_keys_changed` is the mechanism that would
+  answer this properly, since `mood` is not invisible (it renders a chip) but
+  it IS derived, and the suite has no word for that yet. More evidence for
+  #933's question about whether a constant is the right shape at all.
 - **2026-08-30** — Index headings to five greens over a shared absinthe bar.
 - **2026-08-31, #595** — Back-navigation restore on the drinks index, *"exactly
   as the food site does"*; cocktails restores SORT KEYS where food restores an
@@ -4075,6 +4141,49 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   reorder testable, and found a bug writing the second (clearing a mood left
   its chip stranded at the front). Its selector engine had one real bug: a
   whitespace split broke `[data-mood='no juicing']`.
+- **2026-09-20, #1127** — **"It's not useful to have a situation where we
+  expect tests to fail, and we should rearchitect."** Helen's ruling, on being
+  shown five failures and told four were drafts-only and invisible to CI. The
+  answer to a guard that fires on correct data is to fix the guard, never to
+  learn which failures to ignore. Two fell out of it, both fixed in `489eb83`:
+
+  **A QQ IS A DECLARED ABSENCE, NOT A NAME.** Four checks — card tier, price,
+  ABV strength, bottle resolution — looked `generic: "QQ"` up as though it were
+  a real generic, found nothing, and reported a stale vocabulary. The rest of
+  the suite already knew better (`PLACEHOLDER = "QQ"`;
+  `test_every_generic_is_declared_or_qq` reads `generic != "QQ"`), so the suite
+  was asserting that no draft holds an unanswered question **against a
+  collection whose whole purpose is holding unanswered questions**. Rosita
+  alone failed four tests for one honest `QQ - the source does not say blanco,
+  reposado or añejo.` **It survived because it was invisible in CI**, which
+  checks out the public repo alone: `_cocktail_drafts/` is absent, so none of
+  the four is even parametrised into existence. Green in the pipeline, red on
+  any machine with a clone — the worst arrangement, because the local signal
+  that matters is buried under noise the pipeline never sees. Same tell as
+  #624 on 2026-08-31, from the other side. Proved by moving the clone aside and
+  re-running: 197 assertions green, all four gone.
+
+  **A DARK DRINK IS NOT A DRINK THAT GAINED A FIGURE.** `NO_VOLUME_STATED` pins
+  caipirinha and the Bellini and compares them against the BUILT production
+  site, so a pinned drink taken off the site produces no page, cannot be
+  silent, and read as *"newly speaking (gained a figure)"* — which is the alarm
+  for the withholding rule having inverted. **A guard that cannot tell a rule
+  change from a drink being off the site**, and #367 REQUIRES the flip that
+  takes it off, so it fires on every proofread batch touching either drink.
+  The census now runs over what is in the build and names what it set aside;
+  the ratchet is untouched for every drink that IS there. Same judgement as
+  `_require_whole_collection` and `_load_published`'s
+  skip-while-nothing-is-promoted: **a claim about a whole corpus is not
+  checkable against a partial one.**
+
+  **And one that could not be reproduced was raised rather than buried**
+  (#1153): a food census test failed once on `zzz-gate-proofread`, the
+  proofread-gate test's temporary fixture, which that test writes into the live
+  `_food_recipes/` directory three session-scoped Jekyll builds also read. It
+  passes alone and the next full run was green. **An intermittent is worse than
+  a steady red** — a run that fails once in ten teaches people to re-run rather
+  than read. The guarantee that saves it today is an accident of collection
+  order that nothing states or checks.
 
 ---
 

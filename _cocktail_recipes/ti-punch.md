@@ -22,6 +22,7 @@ mood:
   - "sunny terrace"
   - "signature"
   - "no juicing"
+  - "no measuring"
 notes:
   - label: "Assemblage au choix"
     text: "Sometimes I squeeze the lime over; sometimes I muddle the lime with the sugar and pour the rum over that."

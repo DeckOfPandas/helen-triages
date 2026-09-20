@@ -260,6 +260,40 @@ GATE_FLAGS = ["rewritten", "awaiting_fix", "proofread"]
 # must not reach the live site. See test_a_promoted_drink_has_a_real_tagline.
 PLACEHOLDER = "QQ"
 
+
+def _unanswered(values):
+    """True where every name given is the `QQ` placeholder.
+
+    A QQ IS A DECLARED ABSENCE, NOT A NAME, and this predicate exists because
+    four tests forgot that on 2026-09-20. `test_every_generic_is_declared_or_qq`
+    states the contract -- `if generic and generic != "QQ" and generic not in
+    declared` -- and an ingredient nobody has typed yet writes `generic: "QQ"`
+    on purpose, so that the gap is visible rather than silent (#335, #1108).
+
+    WHAT WENT WRONG WITHOUT IT. The card-tier, price, ABV-strength and bottle-
+    resolution checks looked a QQ up as though it were a real name, found
+    nothing, and reported it as a stale vocabulary. So the suite asserted that
+    no draft has an unanswered question, against a collection whose entire
+    purpose is holding unanswered questions -- and rosita alone failed four
+    tests for one honest `QQ - the source does not say blanco, reposado or
+    añejo.`
+
+    IT WAS INVISIBLE IN CI, WHICH IS WHY IT SURVIVED. CI checks out the public
+    repo alone, so `_cocktail_drafts/` is absent and none of the four is even
+    parametrised into existence. The suite was green there and red on any
+    machine with a drafts clone -- the worst arrangement, because the local
+    signal that matters is buried under noise the pipeline never sees. Helen,
+    2026-09-20: "it's not useful to have a situation where we expect tests to
+    fail, and we should rearchitect."
+
+    NOTHING IS WEAKENED. A generic that is a real name and is missing from the
+    vocabulary still fails every one of the four. Only the value that MEANS
+    "not answered yet" is set aside, and answering it is tracked as a backlog
+    rather than as a defect.
+    """
+    names = [str(v).strip() for v in values if v is not None and str(v).strip()]
+    return bool(names) and all(n == PLACEHOLDER for n in names)
+
 # Groups in ingredients.yml that are lists of generic VALUES. Everything else at
 # the top level is a mapping (family_of, family_less, retired_*) or the family
 # list itself, and must not be mistaken for declared generics.
@@ -1601,7 +1635,41 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first: the test named
 # `_cocktail_recipes/smokestack-lightning.md` and nothing else. Covers 1031e77
 # and nothing after.
-COCKTAIL_BASELINE_COMMIT = "1031e77"   # Smokestack Lightning's flag, on Helen's word
+# MOVED 2026-09-20 FOR A DERIVED CHIP ON FIFTEEN DRINKS -- the widest move this
+# constant has made, and the one whose argument is the least about the files.
+# `cf4967a` puts `proofread: true` back on the fifteen published drinks that
+# gained `no measuring` (#1127), so none of them ever leaves the live site.
+#
+# HER GRANT, given before merging and conditional: "if the only change to those
+# 15 files is the chip appearing, I don't need to proofread, please just let
+# them be live."
+#
+# THE CONDITION WAS CHECKED, NOT ASSUMED, which is what a conditional grant
+# asks for. `tmp/prove_only_the_chip.py` diffed all fifteen against `main` and
+# required every changed line to be one of exactly two: the added
+# `- "no measuring"`, and the flag itself. A reordered mood, a changed amount
+# or a stray whitespace edit would have failed it.
+#
+# WHY A DERIVED VALUE IS DIFFERENT FROM AN EDIT, and this is the part worth
+# keeping. #367's reason is that an agent editing a recipe means Helen's read
+# no longer covers what is in the file. Here it does: the one added line is
+# COMPUTED from amounts she has already read, by a rule she ruled on the same
+# day, and it renders as a chip rather than as prose. Nothing she proofread
+# changed. That is not a new kind of exception -- it is the fourth and fifth
+# moves' shape (a change she can see whole in the sentence that asked for it)
+# arriving for a field no human types at all.
+#
+# FIFTEEN FILES ON ONE GRANT is the number to be uneasy about rather than the
+# reasoning. #933's question gets sharper every time this happens: a constant
+# that moves for a mechanical re-derivation is absorbing something the rule was
+# never pointed at, and `_only_invisible_keys_changed` is the mechanism that
+# would answer it properly -- `mood` is not invisible (it renders a chip), but
+# it is DERIVED, and the suite has no word for that yet.
+#
+# Proved with the old value first, as every move before it: the test named all
+# fifteen files, every one of them "last touched by cf4967a9", and nothing
+# else. Covers cf4967a and nothing after.
+COCKTAIL_BASELINE_COMMIT = "cf4967a"   # the `no measuring` chip, on Helen's grant
 
 
 def _newest_commit_per_published_drink():
@@ -3051,6 +3119,12 @@ def _suggested_bottle_scan():
             suggestion = item.get("suggestion")
             for name in (suggestion if isinstance(suggestion, list)
                          else [suggestion] if suggestion else []):
+                # A `QQ` is not a bottle name to resolve -- it is the drink
+                # saying nobody has chosen one yet. Not counted as CHECKED
+                # either: counting it would inflate the coverage figure
+                # test_the_bottle_index_is_exercised reads.
+                if _unanswered([name]):
+                    continue
                 checked += 1
                 key = name.strip().lower()
                 if key in index or key in known or key in excluded:
@@ -6181,6 +6255,8 @@ def test_every_poured_generic_has_a_tier(drink_file):
         generics = [str(g) for g in generics]
         if generics and all(g in hidden for g in generics):
             continue
+        if _unanswered(generics):
+            continue        # nobody has typed it yet -- see `_unanswered`
         for g in generics:
             if g not in placed:
                 unplaced.append(g)
@@ -7138,6 +7214,8 @@ def test_every_priceable_pour_has_a_price(drink_file):
         generics = generics if isinstance(generics, list) else [generics]
         if any(g and (str(g) in backed or str(g) in generic_costs) for g in generics):
             continue
+        if _unanswered(generics):
+            continue        # nobody has typed it yet -- see `_unanswered`
         unpriced.append(f"{amount} {' or '.join(str(g) for g in generics if g)}")
 
     assert not unpriced, (
@@ -7519,6 +7597,8 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
             continue
         if any(str(g) in reachable for g in generics):
             continue
+        if _unanswered(generics):
+            continue        # nobody has typed it yet -- see `_unanswered`
         unmeasured.append(f"{amount} {generics or '(no generic)'}")
 
     assert not unmeasured, (

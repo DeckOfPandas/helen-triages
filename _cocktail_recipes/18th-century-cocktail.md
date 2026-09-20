@@ -25,6 +25,7 @@ mood:
   - "sharp"
   - "sugar craving"
   - "so wrong it's right"
+  - "no measuring"
 notes:
   - label: "Pick n Mix"
     text: "Also good with fruit flavours: Briottet passion fruit, Briottet pineapple. Briottet blue Curaçao for something even weirder."

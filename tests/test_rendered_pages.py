@@ -2731,6 +2731,30 @@ def test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot(prod_s
 
     The rule is in the plugin; this is the census of what it actually withheld,
     on the built pages, where a Liquid guard that silently inverted would show.
+
+    IT COMPARES AGAINST WHAT IS IN THE BUILD, NOT AGAINST THE PINNED SET --
+    2026-09-20, and the bug it fixes is one this guard could not distinguish
+    from the thing it exists to catch. A drink here that is not on the live
+    site produces no page, so it cannot be silent, so it read as "newly
+    speaking (gained a figure)" -- which is the alarm for the withholding rule
+    having inverted. The truth was that the page was not there at all.
+
+    IT WILL HAPPEN ON EVERY PROOFREAD BATCH THAT TOUCHES EITHER DRINK, which is
+    what makes it worth fixing rather than working around. #367 REQUIRES an
+    agent editing a drink to set `meta.proofread: false` in the same commit,
+    and since 2026-09-02 that takes the drink off the live site until Helen
+    reads it again. Both names here went dark exactly that way on 2026-09-20,
+    for a one-line mood addition (#1127). A guard that fires on the routine,
+    correct operation of another rule is a guard people learn to ignore.
+
+    THE RATCHET IS NOT WEAKENED, and this is the part to check when reading
+    this again. A drink in the build that prints a figure it should withhold
+    still fails; one that withholds a figure it should print still fails. Only
+    the drinks that are not in the build at all are set aside, and those are
+    named in the failure message so the set-aside is visible rather than
+    silent. Same judgement, and the same reason, as `_require_whole_collection`
+    and `_load_published`'s skip-while-nothing-is-promoted: a claim about a
+    whole corpus is not checkable against a partial one.
     """
     pages = _drink_pages(prod_site)
     assert len(pages) > 20, (
@@ -2738,14 +2762,23 @@ def test_the_drinks_that_state_no_volume_are_exactly_the_ones_that_cannot(prod_s
         "walk is looking in the wrong place."
     )
 
+    built = {p.parent.name for p in pages}
     silent = {p.parent.name for p in pages
               if not SCALE_TOTAL.search(p.read_text(encoding="utf-8"))}
 
-    assert silent == NO_VOLUME_STATED, (
+    # The pinned drinks that are actually on the site. One that is not is dark
+    # -- gated off by `awaiting_fix`/`proofread` -- and has no page to judge.
+    expected = NO_VOLUME_STATED & built
+    dark = sorted(NO_VOLUME_STATED - built)
+
+    assert silent == expected, (
+        (f"  ({', '.join(dark)}: not in the production build, so set aside "
+         f"-- gated off the site, and unjudgeable until back on it)\n"
+         if dark else "") +
         "the set of drinks printing no volume has moved.\n"
         f"  newly silent (lost a figure they used to print): "
-        f"{sorted(silent - NO_VOLUME_STATED)}\n"
-        f"  newly speaking (gained one): {sorted(NO_VOLUME_STATED - silent)}\n"
+        f"{sorted(silent - expected)}\n"
+        f"  newly speaking (gained one): {sorted(expected - silent)}\n"
         "`volume_for` in _plugins/cocktail_units.rb has the rule: a drink says "
         "nothing only when its excluded pours ARE the drink, so a figure would "
         "be wrong rather than rough. A topped drink is NOT such a drink -- it "

@@ -23,6 +23,7 @@ mood:
   - "clear"
   - "aperitivo"
   - "no juicing"
+  - "no measuring"
 notes:
   - label: "Yuzu? Mezu!"
     text: "Also fine with La Yuzu."

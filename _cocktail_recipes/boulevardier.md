@@ -26,6 +26,7 @@ mood:
   - "strong brown drink"
   - "nightcap"
   - "no juicing"
+  - "no measuring"
   - "easy peasy"
 notes: []
 source: "Death & Co"

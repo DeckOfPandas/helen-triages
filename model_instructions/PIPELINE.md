@@ -66,8 +66,12 @@ flowchart TD
 
     LIVE -->|"an agent edit"| TOUCH{"how big?"}:::claude
     TOUCH -->|"a word or a number"| ASK["ask Helen; she may grant<br/>no flip (move the baseline)"]:::helen
+    TOUCH -->|"a derived value, in a batch"| DERIVED["proofread: false as always, then<br/>tell her the batch and offer the grant"]:::claude
     TOUCH -->|"anything else"| DEMOTE["proofread: false in the same commit<br/>+ ONE batch issue, blocked-on-helen<br/>page stays in the public repo, hidden by the gate"]:::claude
     TOUCH -->|"something big is wrong"| BACK["delete from public, re-add to<br/>private 4-promote/ + the issue"]:::claude
+    DERIVED -->|"she grants it<br/>(check the condition)"| GRANT["flip back + move the baseline"]:::claude
+    DERIVED -->|"she wants to read them"| DEMOTE
+    GRANT --> LIVE
     DEMOTE --> PF
     BACK --> PR
     ASK --> LIVE
@@ -232,6 +236,7 @@ in three sizes, hers to rule:
 | the change | what Claude does |
 |---|---|
 | a word or a number | **asks first.** She may grant the change WITHOUT the flip — then it lands as a baseline move, in a commit of its own, quoting her, and she is still the last judgement because she granted it. (`HELEN_CLEARED`, the per-recipe exemption list, was deleted 2026-09-20: it matched on filename and so never expired.) |
+| **a DERIVED value, across a batch** | **flips the flags, then tells her what the batch was and offers her the grant.** Added 2026-09-20 (#1127). See below — this is the row that covers a re-derivation, and the one where the pages may never go dark at all |
 | anything else | flips the flag, leaves the file in the public repo (the gate hides it), and **raises ONE issue for the whole batch, labelled `blocked-on-helen`**: title `proofread: ‹N› pages off the site — ‹batch›`, body giving what changed and why, then a checklist of every demoted page with its local URL. She closes it by flipping the flags in a commit with `Fixes #N` |
 | something big is wrong | deletes the file from the public repo and re-adds it to the private repo — `5-final-proofread/` for drinks if it needs a ruling from her, `4-promote/` if it only needs the mechanical pass — with the same issue, so it goes back through §4 |
 
@@ -269,6 +274,44 @@ the only thing that finds one. Smokestack Lightning sat dark for three days in
 September 2026 and was found by a file-count-versus-page-count that was
 checking something else. Pass `origin/main` to ask about the live site rather
 than the working tree, and fetch first.
+
+**A DERIVED VALUE IS THE THIRD SIZE, AND IT ARRIVES FIFTEEN FILES AT A TIME.**
+Added 2026-09-20 (#1127), when `no measuring` landed on 15 published drinks at
+once. The first row's "ask first" does not fit — the change is a re-run of a
+script, not a word, and there is nothing to quote her until it has run. The
+third row fits mechanically — since the batch rule above, one issue covers a
+whole re-derivation perfectly well — but it answers the wrong question: it
+assumes the pages are going dark and asks her to re-read them, when for a
+derived value **there may be nothing for her to re-read at all.** So:
+
+1. **Flip the flags, as always.** The rule does not bend for a batch, and a
+   session does not pre-judge the grant by skipping the flip.
+2. **Run the derivation and say what it did** — how many files, and what
+   changed in each. `python3 scripts/derive_cocktail_moods.py` names them.
+3. **Offer her the grant, with the batch in front of her.** Helen, 2026-09-20:
+   *"if the only change to those 15 files is the chip appearing, I don't need
+   to proofread, please just let them be live."*
+4. **If she grants it, CHECK THE CONDITION before acting on it.** A grant of
+   this shape is conditional on the diff really being only the derived line.
+   Diff every touched file against `main` and require every changed line to be
+   one of the two you expect — `tmp/prove_only_the_chip.py` in that branch is
+   the pattern. A reordered mood or a changed amount must fail it.
+5. **Then one commit flipping back, one moving the baseline**, the baseline
+   alone and proved with the old value first, as every move before it.
+
+**If she does NOT grant it, it is an ordinary batch demotion** and the third
+row takes over unchanged: `python3 scripts/needs_helen.py <paths> --batch …
+--why …` in ONE call, one `blocked-on-helen` issue with the checklist, and
+`python3 scripts/dark_pages.py` afterwards to prove the batch was the whole
+story. Nothing about a derived value earns a different shape once she has said
+she wants to read them.
+
+**Why she can grant it and the rule still holds.** MANUAL §4.0's reason is that
+an agent's edit outruns her read — her proofread no longer covers what is in
+the file. A derived value does not: it is COMPUTED from fields she has already
+read, by a rule she ruled on, and it renders as a chip rather than as prose.
+**That is a reason, not a licence.** She grants it; a session never assumes it,
+and never skips the flip in the first place on the strength of this paragraph.
 
 **A demotion can break links.** A live page that links to a demoted one gets a
 404 in production, and `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`

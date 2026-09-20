@@ -30,6 +30,7 @@ mood:
   - "clear"
   - "festive"
   - "no juicing"
+  - "no measuring"
   - "easy peasy"
 notes:
   - label: "steady hand"
