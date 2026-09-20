@@ -176,6 +176,15 @@ crops one element at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`,
 `right`), so an alignment question is answered by comparing two numbers, not
 two images; the last two arguments type text into a box first, for a control
 that only shows itself once somebody has typed (the search dropdown, #1050).
+**EVERY `<path>` IS SITE-RELATIVE AND THE TOOL ADDS `/helen-triages` ITSELF**
+— `/food/`, `/cocktails/recipes/daiquiri/`, never `/helen-triages/food/`.
+Passing the baseurl yourself asks for `/helen-triages/helen-triages/food/`,
+which the server answers 404; the page then has no elements at all, so the
+tool says **`no elements for <selector>`** — indistinguishable from a selector
+that simply does not match, and the reason this is written down (2026-09-20,
+#1148, after a detour spent doubting the selector). If a selector you are sure
+about reports nothing, check the path before anything else; `python3
+tmp/check_serve.py`-style direct fetch of the URL settles it in one call.
 Three more tools, all added 2026-09-15 so a Playwright question rarely needs a
 one-off `tmp/` script: `sh scripts/browser/styles.sh <path> <selector> [width]
 [prop,prop,...]` prints every matching element's box and a set of computed
@@ -2499,14 +2508,24 @@ says only *"Don't scale bitters linearly — add to taste."*)
 **Whole recipes only** (integer multiples, clamped at ×1
 — every written amount is on the 2.5 ml grid, so nothing ever needs
 rounding); counts multiply and re-pluralise, `to top` / `to rinse` pass
-through; the floor is a REFUSAL naming the ingredient; ONE parser
+through; the floor is a SILENT refusal — the box snaps back to the last
+multiple that worked and nothing is said, since #1088 (2026-09-20) found the
+message it used to show could only ever have fired on a drink's own written
+recipe; ONE parser
 (`shoppingList.parseAmount`) across `shopping-list.js` → `scale.js` →
 `cocktail-scale.js`, guarded by `test_the_scaler_scripts_load_in_dependency_order`.
 `serves:` exists on nine punch-bowl drinks and the scaler does not read it —
 *how many does this make* and *how much am I making* are different questions.
 A `{step, note}` pair renders the note under its step and stays visible in
-`make it`. The amount column has two widths, counted in Plex Mono characters.
-**Not yet seen on an iPad.**
+`make it`. **The amount column is sized by the drink** (#1088, 2026-09-20):
+`.cocktail-ingredients` is `grid-template-columns: max-content 1fr` and each
+row reaches those tracks through `subgrid`, so the column is exactly as wide
+as THIS drink's longest amount and the sub-lines sit in track 2 rather than
+past a computed indent. It replaced a flat 5.5rem with a second, wider pair
+that `cocktail-scale.js` switched to by counting Plex Mono characters — one
+guessed number kept in step across two files, which cost 41.5px of empty
+column on a phone and still wrapped "1 small pinch". Nothing counts characters
+any more. **Not yet seen on an iPad.**
 
 **"If you liked this, how about …" — three related drinks after the notes**
 (#927, 2026-09-10). **The score is shared MOODS plus shared ingredient

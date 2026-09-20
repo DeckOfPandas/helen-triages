@@ -6316,6 +6316,96 @@ verification. Dates are when the correction landed.
   glass are what settled it. **When a measurement disagrees with the CSS you
   just compiled, suspect the measurement.**
 
+- **2026-09-20, #1148 — `??` sat 9.4px below the row on a phone, and the block
+  that did it was half-written.** Helen: *"On narrower screens, ?? renders lower
+  than [ COCKTAILS ]."* Measured on the real build at 390px with `crop.sh` and
+  `inkbox.py`: the row's ink centre 120.3, the `??`'s 129.7.
+
+  **The cause.** `.site-nav-icons` and `.site-about-link` both carry
+  `margin: 0.9rem 0 0` in the base rules, which is what puts them on one line at
+  desktop width. #1086's `@media (max-width: 600px)` block halved the ROW's to
+  `0.45rem` for the phone header and left the `??` at `0.9rem`. The whole
+  difference is that one missing line.
+
+  **What the measurement turned up that the issue did not.** The pair is not
+  level at ANY width. Both boxes top-align, and their ink sits differently
+  inside them because `[ COCKTAILS ]` is 0.8rem `$font-headings` and `??` is
+  1.05rem `$font-body` — at 1280px the row reads 154.6 and the `??` 156.8, the
+  same 2.2px, present since the row was built and never mentioned by anyone.
+
+  **So it was put to her as two fixes, not one** (§13.11, on the real crops with
+  a rule drawn at each ink centre): **A** halves the margin, restoring the
+  desktop relationship exactly and leaving the old 2.2px; **B** adds a measured
+  `top: -0.131em` so the ink genuinely agrees, at every width including the one
+  she did not report a problem with. **A shipped.** **A bug report names a
+  symptom, and the width it was reported at is not always the width the fault
+  lives at — measure the others before deciding how wide the fix should be.**
+
+- **2026-09-20, #1088 — the drink amount column is sized by the DRINK, and the
+  phone pass is how it was found.** Helen, asked whether there was too much
+  space between an amount and its name on a phone, was right: measured on the
+  Zombie at 390px, the widest amount's ink ended at 62.5px and the names began
+  at 104px — **41.5px of empty column** on a list 342px wide, while the names
+  wrapped beside it. Her ruling on being shown the alternatives: *"Sizing the
+  column by drink sounds perfect."*
+
+  **THE FAULT WAS FIXED WIDTH, NOT THE WIDTH CHOSEN — and that is the part
+  worth keeping.** `--amount-col` was a flat 5.5rem everywhere, so it had to
+  hold the longest amount in the WHOLE COLLECTION. Counted across the 346
+  amounts in the live drinks (`tmp/amount_widths.py`): 59.5% are five
+  characters ("20 ml", 45.6px), 96% fit in seven, and one is "1 small pinch"
+  (13). Three-fifths of every row paid for the worst row on the site.
+
+  **A NARROWER FIXED COLUMN WAS TRIED AND SHOT, AND IT FAILED VISIBLY.** At
+  4rem, "3 drops" broke onto two lines — the column held exactly 7.0 characters
+  and "3 drops" is 7 — and the scaler's widen-when-it-will-not-fit escape did
+  not fire, because `AMOUNT_FITS = 9` was itself derived from the 5.5rem. Since
+  a fixed column must still clear "0.5 pinch" and "12 leaves" (9 characters,
+  82.1px), the only safe shrink was 88px to about 83px. **Five pixels.**
+  Building the bad candidate is what proved the constraint; reasoning about it
+  had suggested 4rem was fine.
+
+  **WHAT SHIPPED.** `.cocktail-ingredients` owns the tracks (`max-content 1fr`)
+  and each row reaches them through `subgrid`. It has to be the LIST and not the
+  row: each `.cocktail-ingredient-top` used to be its own grid, so the amounts
+  lined up only because the width was a constant — make that `max-content` per
+  row and every row sizes independently, losing the straight edge the column
+  exists to make. The sub-lines (`.cocktail-type-line`, an ingredient's
+  `.cocktail-note`) are placed with `grid-column: 2` instead of a left margin of
+  `calc(var(--amount-col) + var(--amount-gap))`.
+
+  **IT DELETED MACHINERY RATHER THAN ADDING IT**, which is the argument for it:
+  `$amount-col`, `$amount-col-wide`, `$amount-gap-wide`, the `--wide-amounts`
+  class, the `make it` block's 1.37 factor on the column, and in
+  `cocktail-scale.js` both `AMOUNT_FITS` and `fitAmountColumn` — plus the `list`
+  lookup, so that file no longer touches the ingredient list at all. All of it
+  existed to keep one guessed number in step with a stylesheet across two files.
+  A scaled amount now widens the column by being wider.
+
+  **Measured after, at 390px:** the Daiquiri's column 46px where it took 88, the
+  Zombie's 64px, and **"1 small pinch" fits on one line for the first time** —
+  it overflowed even the old WIDE column. `make it` needs no factor now, because
+  `max-content` is in whatever units the amounts are currently set in.
+  `shoot.sh` reports no element past the viewport at 360 or 390 on five drink
+  pages and the index.
+
+  **Two rows have no live example and are guarded anyway**, both recorded in
+  `tmp/find_amountless.py`: a plain-string ingredient renders as a bare `<li>`
+  with no `.cocktail-ingredient` class, and an ingredient with no `amount`
+  renders no first cell. Either would be auto-placed into the amount column and
+  squeezed to the width of a number — under the OLD grid too, so these are
+  guards, not regressions.
+
+- **2026-09-20 — `crop.sh` / `styles.sh` / `shoot.sh` paths are site-relative,
+  and getting it wrong reports the WRONG FAILURE.** The tools prepend
+  `/helen-triages` themselves, so the argument is `/food/`. Passing
+  `/helen-triages/food/` asks for it twice, the server 404s, the page has no
+  elements, and the tool says `no elements for .site-nav-icons` — which reads as
+  a selector that does not match, not as a page that is not there. Cost a
+  detour on #1148 spent doubting a selector that was correct all along; MANUAL
+  §1 now says so at the tools. **When a browser tool reports an empty match for
+  a selector you are confident about, doubt the URL before the selector.**
+
 - **2026-09-20, #1149 — the footer column head is a door, and it looks like the
   header's door rather than like the links under it.** Helen's issue was two
   words and a title: "[ FOOD ]", "[ COCKTAILS ]", "footer group headers should

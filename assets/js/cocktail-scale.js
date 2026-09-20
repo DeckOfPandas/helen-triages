@@ -135,7 +135,10 @@
   var input = control && control.querySelector('.cocktail-scale-multiple');
   var minus = control && control.querySelector('.cocktail-scale-minus');
   var plus = control && control.querySelector('.cocktail-scale-plus');
-  var list = article.querySelector('.cocktail-ingredients');
+  /* `list` STOOD HERE AND WENT WITH `fitAmountColumn` (#1088). It was looked up
+     only to toggle the wide-column class on; the column measures itself now, so
+     this file no longer touches the ingredient list at all -- it writes the
+     amount spans and nothing else. */
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.cocktail-amount')
   );
@@ -166,41 +169,32 @@
      to have arrows. At two characters there is no room for a pair, and the
      values that matter -- 2, 3, a half -- are one keystroke each. The snap that
      the step was expressing still happens, on every value, on the way in. */
-  /* THE AMOUNT COLUMN WIDENS ONLY WHEN A SCALED AMOUNT NEEDS IT -- Helen,
-     2026-09-05: "please reduce the space between ingredient amounts and names
-     again, but increase it when an amount would otherwise linebreak due to use
-     of the scaler."
+  /* THE AMOUNT COLUMN IS NOT THIS FILE'S PROBLEM ANY MORE -- #1088, 2026-09-20.
 
-     COUNTED, NOT MEASURED, and that is sound rather than lazy: `.cocktail-amount`
-     is set in $font-label, which is IBM Plex MONO, so every character is the
-     same width and a character count IS a width. Measuring would mean asking
-     the browser for layout on every keystroke to learn something arithmetic
-     already knows.
+     `AMOUNT_FITS = 9` and `fitAmountColumn` stood here. Helen, 2026-09-05:
+     "please reduce the space between ingredient amounts and names again, but
+     increase it when an amount would otherwise linebreak due to use of the
+     scaler." So the column had two fixed widths and this file chose between
+     them by counting characters -- sound rather than lazy, because
+     `.cocktail-amount` is IBM Plex MONO and a character count IS a width, and
+     cheaper than asking the browser for layout on every keystroke.
 
-     NINE IS THE FIT. The narrow column is 5.5rem = 88px; Plex Mono advances
-     0.6em and the amount is set at 0.95rem, so one character is 0.6 x 0.95 x 16
-     = 9.12px and the column holds 88 / 9.12 = 9.6 of them. Nine fit, ten do
-     not. "112.5 ml" is eight and "1012.5 ml" is nine, so the common scaled
-     amounts stay in the narrow column and only the genuinely long ones open it.
+     WHAT IT COST was that the number lived in two files. Nine was 5.5rem / 9.12px
+     per character, so the stylesheet's column width and this constant had to
+     agree; `make it` scaled the column by 1.37 precisely so nine still fit at
+     the larger size; and a phone could not have a narrower column without this
+     constant learning about viewports.
 
-     A DRINK CAN ALSO BE BORN WIDE. The Airmail's "Top (30-45) ml" is fourteen
-     characters at x1 and has always wrapped inside its column; it now gets the
-     wide pair at rest, which is the same fix arriving for the same reason. */
-  var AMOUNT_FITS = 9;
-
-  function fitAmountColumn(amounts) {
-    if (!list || !list.classList) return;
-    var longest = 0;
-    amounts.forEach(function (a) {
-      if (a.length > longest) longest = a.length;
-    });
-    list.classList.toggle('cocktail-ingredients--wide-amounts',
-                          longest > AMOUNT_FITS);
-  }
+     `.cocktail-ingredients` is now `grid-template-columns: max-content 1fr`,
+     shared down to each row by `subgrid`, so the column is measured from
+     whatever the amounts currently say -- by the browser, at the moment they
+     say it. A scaled amount widens the column by being wider. That is what the
+     counting was approximating, and it needs no threshold, no class and no
+     agreement with a stylesheet. `_sass/cocktails/_cocktail.scss` has the
+     measurement that prompted it. */
 
   var last = 1;
   input.value = box(last);
-  fitAmountColumn(original);
   control.hidden = false;
 
   /* WHOLE RECIPES ONLY, SINCE 2026-09-05 -- Helen: "logically I think we can
@@ -297,7 +291,9 @@
     spans.forEach(function (span, index) {
       span.textContent = verdict.amounts[index];
     });
-    fitAmountColumn(verdict.amounts);
+    /* Writing the amounts IS the column resize now (#1088): the list's
+       `max-content` track re-measures on the text change, so the line that
+       used to follow this loop has nothing left to do. */
     put(input, box(last));
     drawTotal(n);
     batch(n);

@@ -2432,17 +2432,23 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "not measured, and it is the same shape as the footer row that did not. "
         "The status string is built in filters.js and is the part that could grow."
     ),
-    ".cocktail-ingredient-top": (
-        "`$amount-col 1fr` -- a 5.5rem fixed amount column and the ingredient "
-        "name/suggestion text. Only the amount track is fixed; the amount itself "
-        "wraps inside its own column rather than growing past it (see "
-        "$amount-col's own comment), so it contributes no floor of its own. The "
-        "`1fr` track is ordinary wrapping prose, not a nowrap label or a flat-"
-        "width image the way the footer's hearts were -- its min-content is the "
-        "width of its single longest WORD, and every ingredient name and bottle "
-        "suggestion in the data (_cocktail_drafts/*.md) is comfortably under a "
-        "360px phone one word at a time. Unlike .tc-row, there is no unbroken "
-        "string here that could grow past that."
+    ".cocktail-ingredients": (
+        "`max-content 1fr` -- the amount column and the ingredient "
+        "name/suggestion text. It was `.cocktail-ingredient-top` with "
+        "`$amount-col 1fr` until #1088 (2026-09-20) moved the tracks up to the "
+        "list so every row could share one measured column via `subgrid`; the "
+        "claim is the same one, and the first track's is now stronger rather "
+        "than weaker. `max-content` is bounded by the longest AMOUNT in one "
+        "drink -- 13 characters of Plex Mono across the whole live collection "
+        "('1 small pinch', about 119px), measured in tmp/amount_widths.py -- "
+        "where the old fixed 5.5rem was paid by every drink whether it needed "
+        "it or not. The `1fr` track is ordinary wrapping prose, not a nowrap "
+        "label or a flat-width image the way the footer's hearts were: its "
+        "min-content is the width of its single longest WORD, and every "
+        "ingredient name and bottle suggestion in the data is comfortably under "
+        "a 360px phone one word at a time. Unlike .tc-row, there is no unbroken "
+        "string here that could grow past that. Verified at 360 and 390 with "
+        "shoot.sh, which reported no element past the viewport."
     ),
 }
 

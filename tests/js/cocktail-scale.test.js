@@ -184,7 +184,6 @@ function page(pours, opts) {
   return {
     sandbox, control, input, minus, plus, spans, list, batch, cost, units,
     total, totalFigure,
-    wide: () => list.classList.contains('cocktail-ingredients--wide-amounts'),
     amounts: () => spans.map((s) => s.textContent),
     /** Type into a box the way a browser does: focus it, then `input`. */
     type(box, text) {
@@ -383,40 +382,37 @@ test('a blank box on blur restores what is being poured rather than refusing', (
 });
 
 
-// --- the amount column's two widths ------------------------------------------
-// Helen, 2026-09-05: "reduce the space between ingredient amounts and names
-// again, but increase it when an amount would otherwise linebreak due to use of
-// the scaler." Counted rather than measured — the amounts are set in Plex Mono,
-// so a character count is a width. Nine fit in the narrow column.
+// --- the amount column ---------------------------------------------------
+// THREE TESTS STOOD HERE AND WENT WITH THE MECHANISM THEY PINNED (#1088,
+// 2026-09-20). They asserted `cocktail-ingredients--wide-amounts` went on when
+// a written or scaled amount passed nine characters and came off again, which
+// was the right check while the column had two fixed widths and this script
+// chose between them by counting.
+//
+// The column is `max-content` on the list now, shared down by `subgrid`, so it
+// is measured from whatever the amounts currently say and there is no class,
+// no threshold and nothing for this file to decide. There is deliberately NO
+// replacement assertion about the width: it is the browser's, it depends on a
+// font this suite does not load, and a test that re-implemented the
+// measurement would only be asserting its own arithmetic.
+//
+// WHAT WAS WORTH KEEPING is below — that scaling writes the amounts, which is
+// the event the column now sizes itself from. The "9 dashes" drink is kept
+// because it is the case that actually grows under scaling: millilitre figures
+// tend to SHORTEN, since the decimal falls off ("52.5 ml" doubles to "105 ml").
 
-test('the amount column stays narrow for a drink as written', () => {
-  const p = page(AVIATION);
-  assert.strictEqual(p.wide(), false,
-    '"52.5 ml" is seven characters; nothing needs the room');
-});
-
-test('a scaled amount that would wrap opens the column, and closes it again', () => {
-  // A count with a long unit is what actually reaches ten characters under
-  // scaling: millilitre figures tend to SHORTEN as they scale, because the
-  // decimal falls off ("52.5 ml" doubles to "105 ml").
+test('scaling writes the amounts, which is what the column now measures', () => {
   const p = page([['9 dashes', 'Angostura'], ['30 ml', 'rye']]);
-  assert.strictEqual(p.wide(), false, '"9 dashes" is eight characters');
+  assert.deepStrictEqual(p.amounts(), ['9 dashes', '30 ml'], 'as written');
 
   p.type(p.input, '12');
-  assert.strictEqual(p.amounts()[0], '108 dashes', 'ten characters');
-  assert.strictEqual(p.wide(), true, 'so the column opens');
+  assert.deepStrictEqual(p.amounts(), ['108 dashes', '360 ml'],
+    'the longest amount grew by four characters, so the track grows with it');
 
   p.type(p.input, '2');
-  assert.strictEqual(p.amounts()[0], '18 dashes', 'nine characters');
-  assert.strictEqual(p.wide(), false, 'and closes again — it is a state, not a ratchet');
-});
-
-test('an amount longer than the column holds opens it at rest', () => {
-  // The Airmail's own written amount, fourteen characters, which has wrapped
-  // inside its column since the column existed.
-  const p = page([['Top (30-45) ml', 'champagne'], ['15 ml', 'lime juice']]);
-  assert.strictEqual(p.wide(), true,
-    'a drink can be born too wide for the narrow column, not only scaled into it');
+  assert.deepStrictEqual(p.amounts(), ['18 dashes', '60 ml'],
+    'and shrinks back — the track follows the text both ways, with no state ' +
+    'to get stuck on');
 });
 
 // =============================================================================
