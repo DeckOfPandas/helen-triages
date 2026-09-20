@@ -634,8 +634,15 @@ main {
   }
 }
 
-// The bracketed site word. Quieter than the links it heads -- it is a label
-// saying whose pages these are, not a thing to click.
+// The bracketed site word. Quieter than the links it heads -- it says whose
+// pages these are, and it is the column's head rather than one of its entries.
+//
+// IT IS A THING TO CLICK SINCE #1149, 2026-09-19, and this comment used to end
+// "not a thing to click". The resting colour did not move with it: the word is
+// still the quietest mark in the column, because what changed is that the head
+// now goes somewhere, not that it should shout. The link, the underline
+// question and the hover all live on `.site-footer-ref-head` below, which wraps
+// this span and the icon.
 //
 // WAS `opacity: 0.65`, ISSUE #1086 -- that faded $color-clear-text to 3.27:1
 // on food and 3.37:1 on cocktails against $color-bg, both under the 4.5:1
@@ -664,10 +671,47 @@ main {
 // left-aligned and takes the icon first, column three is right-aligned and
 // takes it last. One row in the markup, reversed here for the second column, so
 // the template still emits one shape per site.
+// AND IT IS A LINK SINCE #1149, 2026-09-19 -- an anchor to this site's index,
+// wrapping the icon and the word together. _layouts/default.html carries why
+// it is one link rather than two, and why "and the icons" put the icon inside
+// it.
+//
+// THE FOOTER'S OTHER LINKS UNDERLINE AND THIS ONE DOES NOT, which is a
+// deliberate split and not an oversight. The links below are a LIST OF PAGES,
+// where the underline is what says "these are links" in a footer that rests in
+// its own colour (shared/_chrome.scss has Helen's ruling against the accent at
+// rest). The head is a DOOR TO A SITE, the same object as the header's
+// `[ COCKTAILS ]` row -- and that one is `text-decoration: none` with a hover
+// that darkens (`.site-nav-icon-link`). Matching the header keeps one idea
+// looking like itself in both pieces of chrome; matching the list below would
+// have made the column's head read as its first entry.
+//
+// THE OVERRIDE IS LOAD-BEARING. `.site-footer-ref a` up at the column rule sets
+// `text-decoration: underline` on every anchor in the column, so an anchor here
+// gets it unless this says otherwise. Same specificity, later in the file --
+// so this block must stay BELOW `.site-footer-ref`, and moving it above
+// silently underlines both heads.
 .site-footer-ref-head {
   display: flex;
   align-items: center;
   gap: $space-xs;
+  text-decoration: none;
+
+  // THE HOVER HAS TO NAME THE WORD, and this is the trap worth recording.
+  // `.site-footer-ref a:hover` (shared/_chrome.scss) sets `color: $color-accent`
+  // on the ANCHOR -- which the icon picks up by inheritance, because an SVG
+  // here paints in `currentColor`, but the word does NOT: `.site-footer-ref-word`
+  // sets its own `color`, and a direct declaration on the child beats an
+  // inherited value from the parent no matter what the parent's specificity is.
+  // Without this rule the head hovers with the icon changing colour and the
+  // word sitting still, which reads as a broken target rather than a quiet one.
+  &:hover,
+  &:focus-visible,
+  &:active {
+    .site-footer-ref-word {
+      color: $color-accent;
+    }
+  }
 }
 
 .site-footer-ref:nth-of-type(2) .site-footer-ref-head {

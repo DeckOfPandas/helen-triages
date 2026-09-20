@@ -494,11 +494,40 @@
            branch here -- the footer stays one template emitting one shape per
            site, which is what test_the_header_and_footer_are_identical_on_every_page
            holds it to. {% endcomment %}
+        {% comment %} THE HEAD IS A DOOR TO THE SITE -- #1149, 2026-09-19.
+           Helen's issue is the two words and nothing else: "[ FOOD ]",
+           "[ COCKTAILS ]", under the title "footer group headers should be
+           links, and the icons". So the icon and the word became ONE link to
+           that site's index, rather than the word alone -- "and the icons"
+           reads as the icon coming along, and an icon that sits on a link's
+           line but is not part of it is the kind of near-miss target a phone
+           finds first.
+
+           THIS REVERSES A NOTE, NOT A RULING, and the note is worth naming
+           because it is still in the stylesheet's history: .site-footer-ref-word
+           used to be described as "a label saying whose pages these are, not a
+           thing to click". That was true while the column head was the only
+           thing down here that went nowhere; it stopped being true the moment
+           Helen asked for the link. §13.12: a ruling is not permanent, and this
+           one moved because she looked at the built footer and wanted the word
+           to do something.
+
+           `ref_site.home`, NOT A NEW KEY. _data/sites.yml already declares
+           where each site's front door is -- it is what the header's own
+           `[ COCKTAILS ]` link uses -- so the footer asks the same key and
+           there is no second place to keep in step.
+
+           STILL ONE SHAPE PER SITE. The element changed from a span to an
+           anchor; the class, the two children and the order are untouched, so
+           `.site-footer-ref:nth-of-type(2) .site-footer-ref-head`'s
+           row-reverse mirroring still applies and
+           test_the_header_and_footer_are_identical_on_every_page still sees
+           one template emitting one shape. {% endcomment %}
         {% assign ref_icon_file = "icons/" | append: ref_site.icon | append: ".svg" %}
-        <span class="site-footer-ref-head">
+        <a class="site-footer-ref-head" href="{{ ref_site.home | relative_url }}">
           <span class="site-footer-ref-icon">{% include {{ ref_icon_file }} %}</span>
           <span class="site-footer-ref-word">[ {{ ref_site.word }} ]</span>
-        </span>
+        </a>
         {% for link in ref_links %}
         <a href="{{ link.url | relative_url }}">{{ link.text }}</a>
         {% endfor %}
