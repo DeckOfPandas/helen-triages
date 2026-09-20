@@ -372,6 +372,10 @@ serving:
   martini: "a martini glass"
   martini glass: "a martini glass"
   mug: "a mug"
+  # NEW 2026-09-20, for the Moscow Mule (#1068): the first drink to use it. The
+  # source says "copper mug" and `mule mug` is the declared spelling; the icon
+  # is the plain mug's (see the alias above), so only the phrase was missing.
+  mule mug: "a mule mug"
   nick and nora: "a Nick and Nora"
   old fashioned: "an old fashioned glass"
   pilsner: "a pilsner"
