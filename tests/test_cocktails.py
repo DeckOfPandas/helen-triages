@@ -1635,7 +1635,41 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first: the test named
 # `_cocktail_recipes/smokestack-lightning.md` and nothing else. Covers 1031e77
 # and nothing after.
-COCKTAIL_BASELINE_COMMIT = "1031e77"   # Smokestack Lightning's flag, on Helen's word
+# MOVED 2026-09-20 FOR A DERIVED CHIP ON FIFTEEN DRINKS -- the widest move this
+# constant has made, and the one whose argument is the least about the files.
+# `cf4967a` puts `proofread: true` back on the fifteen published drinks that
+# gained `no measuring` (#1127), so none of them ever leaves the live site.
+#
+# HER GRANT, given before merging and conditional: "if the only change to those
+# 15 files is the chip appearing, I don't need to proofread, please just let
+# them be live."
+#
+# THE CONDITION WAS CHECKED, NOT ASSUMED, which is what a conditional grant
+# asks for. `tmp/prove_only_the_chip.py` diffed all fifteen against `main` and
+# required every changed line to be one of exactly two: the added
+# `- "no measuring"`, and the flag itself. A reordered mood, a changed amount
+# or a stray whitespace edit would have failed it.
+#
+# WHY A DERIVED VALUE IS DIFFERENT FROM AN EDIT, and this is the part worth
+# keeping. #367's reason is that an agent editing a recipe means Helen's read
+# no longer covers what is in the file. Here it does: the one added line is
+# COMPUTED from amounts she has already read, by a rule she ruled on the same
+# day, and it renders as a chip rather than as prose. Nothing she proofread
+# changed. That is not a new kind of exception -- it is the fourth and fifth
+# moves' shape (a change she can see whole in the sentence that asked for it)
+# arriving for a field no human types at all.
+#
+# FIFTEEN FILES ON ONE GRANT is the number to be uneasy about rather than the
+# reasoning. #933's question gets sharper every time this happens: a constant
+# that moves for a mechanical re-derivation is absorbing something the rule was
+# never pointed at, and `_only_invisible_keys_changed` is the mechanism that
+# would answer it properly -- `mood` is not invisible (it renders a chip), but
+# it is DERIVED, and the suite has no word for that yet.
+#
+# Proved with the old value first, as every move before it: the test named all
+# fifteen files, every one of them "last touched by cf4967a9", and nothing
+# else. Covers cf4967a and nothing after.
+COCKTAIL_BASELINE_COMMIT = "cf4967a"   # the `no measuring` chip, on Helen's grant
 
 
 def _newest_commit_per_published_drink():
