@@ -150,6 +150,15 @@ canonical:
     # record of what a source said and is not rewritten.
     - "Top with soda water."
     - "Top with more crushed ice."
+    # NEW 2026-09-20, Helen's wording, for the Moscow Mule (#1068): the mug is
+    # filled with cubed ice, the ginger beer goes in, and crushed ice is
+    # crowned over the rim. HEAPING IS THE INFORMATION: "Fill with crushed ice."
+    # says the glass is full, and this says the ice stands above it. It is the
+    # tail of two free-text steps already in the collection -- german-vacation
+    # ("Top and heap with more crushed ice...") and zombie-intoxica ("...then
+    # top and heap with crushed ice") -- each of which also carries something
+    # else, so neither collapses to this one.
+    - "Heap crushed ice on top."
 
   # RINSE AND RIM -- added 2026-09-02 with the amount ruling that needed them.
   # An ingredient whose amount is `to rinse` is poured by one of these steps and

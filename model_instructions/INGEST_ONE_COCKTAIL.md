@@ -378,11 +378,11 @@ half an empty passion fruit shell · pineapple and brandied cherry
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
 skewered maraschino cherry · skewered brandied cherry · cherry flag ·
-fruit stick (skewered pineapple cubes and a maraschino cherry)
+fruit stick (skewered pineapple cubes and a maraschino cherry) · fresh cherries
 
 **Herbs and leaves:** mint sprig · mint leaf · mint bouquet · rosemary sprig ·
 pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
-mint sprig, mint leaf or grated nutmeg
+edible orchid · mint sprig, mint leaf or grated nutmeg
 
 **Spice and other:** grated nutmeg · Angostura bitters · whipped cream ·
 cinnamon stick · ginger wheel · stem ginger slice · three coffee beans
@@ -506,7 +506,7 @@ that needs two is free text.
 `Fill the pitcher half full with ice cubes.` ·
 `Fill the pitcher three-quarters full with ice cubes.` ·
 `Fill with crushed ice.` · `Top with champagne.` · `Top with soda water.` ·
-`Top with more crushed ice.`
+`Top with more crushed ice.` · `Heap crushed ice on top.`
 
 **Rinse and rim:** `Rinse the glass with absinthe and dump.` ·
 `Rinse the glasses with Campari.` ·

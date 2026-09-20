@@ -230,6 +230,13 @@ canonical:
     - "skewered brandied cherry"
     - "cherry flag"
     - "fruit stick (skewered pineapple cubes and a maraschino cherry)"
+    # NEW 2026-09-20, for Fanny Chu's Piña Colada, whose Punch source garnishes
+    # with "cherries" and no kind. Helen: "'Cherries' is just cherries, so maybe
+    # 'fresh cherries'". The word says what the source does not say outright and
+    # what every other entry here is not: NOT a brandied or maraschino cherry,
+    # which are preserved and have their own entries above. Plural, so its final
+    # `s` drops the article without a `no_article` line (#1143).
+    - "fresh cherries"
 
   herbs_and_leaves:
     - "mint sprig"
@@ -243,6 +250,10 @@ canonical:
     - "kaffir lime leaves"
     - "cucumber wheels"
     - "edible violet"
+    # NEW 2026-09-20, Fanny Chu's Piña Colada: "an edible orchid". A flower, so
+    # it sits beside the violet; `an` comes from the first letter, no entry
+    # needed in `no_article`.
+    - "edible orchid"
     # #984's Grasshopper: "mint sprig, mint leaf or grated nutmeg" -- the
     # source's own three-way choice, one string, the same pattern as "orange
     # or lemon twist" above, generalised past two options (see that entry's
