@@ -1594,82 +1594,99 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 //      earns its keep on a drink page. Food reached the same conclusion about
 //      the same element and its palette file argues it at length: amounts and
 //      note labels are what you look at while cooking.
-//   2. THE AMOUNT HAS A FIXED COLUMN, so the amounts form a straight edge you
-//      can run your eye down instead of stepping in and out with the length of
-//      each number. $amount-col and $amount-gap are named because the class
-//      line and the note both indent past them; three values that must agree
-//      are one value plus arithmetic.
+//   2. THE AMOUNTS SHARE ONE COLUMN, so they form a straight edge you can run
+//      your eye down instead of stepping in and out with the length of each
+//      number. The column is `max-content` on the LIST, shared down to each row
+//      by `subgrid`, so it is exactly as wide as the longest amount in THIS
+//      drink -- see the block below.
 //   3. IT IS INK, NOT GREY, and the item is no longer bold. Those were the
 //      wrong way round: the amount is the thing you re-read, the item name is
 //      the thing you already know.
 // =============================================================================
 
-// The amount column, and the gap after it. The sub-lines below hang past both,
-// derived rather than written down, so they cannot drift out of alignment.
-// 5.5rem, DOWN FROM 6.6rem, 2026-09-02 — Helen's brief and mockup both set it
-// there. The reasoning that grew it to 6.6rem still holds in spirit (a HARD
-// width, not a `min-width`, so a long amount like the Airmail's "Top (30-45)
-// ml" wraps inside its own column instead of shoving the item name along) —
-// only the number moved, on Helen's own call against the page she was actually
-// looking at, and a fixed width pays that back on every row exactly as before.
+// THE COLUMN IS SIZED BY THE DRINK, NOT BY THE COLLECTION — #1088/#1153,
+// 2026-09-20. Helen, shown the measurement: "Sizing the column by drink sounds
+// perfect."
 //
-// IT IS TWO WIDTHS NOW, AND THE PAGE PICKS ONE — Helen, 2026-09-05: "please
-// reduce the space between ingredient amounts and names again, but increase it
-// when an amount would otherwise linebreak due to use of the scaler."
+// WHAT IT REPLACED, AND WHY A NUMBER COULD NOT WORK. `--amount-col` was a flat
+// 5.5rem at every width and on every drink, so it had to hold the longest
+// amount in the WHOLE COLLECTION. Measured across the 346 amounts in the live
+// drinks: 59.5% are five characters ("20 ml", 45.6px) and 96% fit in seven,
+// but one is "1 small pinch" (13). On a 390px phone that left 41.5px of empty
+// column between the widest amount's ink and the names, on a list 342px wide,
+// while the names wrapped beside it.
 //
-// Earlier the same day this went to 6.5rem/1.25rem for the scaler's sake, and
-// that was the right worry solved in the wrong place: the resting page pays a
-// permanent gap for a problem only a scaled page has. A written amount is the
-// single-order one ("15 ml", "52.5 ml") and fits 5.5rem comfortably; ×2 or ×3
-// reaches "112.5 ml" or "1050 ml", and a fixed column that a real value
-// overflows WRAPS the number rather than shoving the name — so the failure is
-// silent and ugly instead of loud, which is what the wide pair is for.
+// AND IT COULD NOT BE TUNED DOWN. A fixed column still has to fit "0.5 pinch"
+// and "12 leaves" (9 characters, 82.1px), so the only safe shrink was 88px to
+// about 83px. Five pixels. A candidate at 4rem was built and shot to check:
+// "3 drops" broke onto two lines, because the column held exactly 7.0
+// characters and the scaler's widen-when-it-will-not-fit escape did not fire —
+// its threshold was itself derived from the 5.5rem. Fixed width WAS the
+// problem, so a better fixed width was never the answer.
 //
-// CUSTOM PROPERTIES RATHER THAN TWO SETS OF RULES, so the sub-lines that indent
-// past the column (the character line, the ingredient note) follow the switch
-// with no second copy of the arithmetic to keep in step. That is the same
-// "three values that must agree are one value plus arithmetic" the numbered
-// note above makes, extended to a value that now changes at runtime.
+// HOW IT WORKS NOW. `.cocktail-ingredients` is the grid and owns the tracks
+// (`max-content 1fr`); each row reaches them through `subgrid`. The browser
+// measures, so the column is exactly as wide as this drink's longest amount —
+// the Daiquiri 46px where it used to take 88, the Zombie 64px, and Man o' War
+// the ~119px it genuinely needs and never got, because "1 small pinch"
+// overflowed even the old WIDE column.
 //
-// WHO FLIPS IT: assets/js/cocktail-scale.js, which is the only thing that knows
-// what the amounts currently say. It counts characters rather than measuring,
-// and it can: $font-label is IBM Plex MONO, so a character count is a width.
-// The threshold and its arithmetic live beside the code that applies it.
-$amount-col: 5.5rem;
+// WHAT THAT DELETED, which is the real argument for it: `$amount-col`,
+// `$amount-col-wide`, `$amount-gap-wide`, the `--wide-amounts` class, and in
+// assets/js/cocktail-scale.js both `AMOUNT_FITS` and `fitAmountColumn`. All of
+// it existed to keep one guessed number in step with a stylesheet, across two
+// files, with a second copy of the arithmetic in the `make it` block. A scaled
+// amount now widens the column by being wider, which is the thing the machinery
+// was approximating.
+//
+// $amount-gap SURVIVES because a gap is a design value and not a measurement,
+// and it is still a custom property: the `make it` state scales it with the
+// type, and nothing else needs to know.
 $amount-gap: 1rem;
-$amount-col-wide: 7rem;
-$amount-gap-wide: 1.25rem;
 
 // 34rem, Helen's mockup's own measure — matches `.cocktail-method` below, so
 // the two sections that read as prose (steps, and a wrapped ingredient note or
 // character line) share one column width.
-// THE AMOUNT COLUMN'S TWO WIDTHS LIVE ON THE ARTICLE, not on the list that uses
-// them, for two reasons. Everything that indents past the column is inside this
-// element — the grid, the character line, the ingredient note — so one
-// declaration reaches all of them; and a `var()` whose property is guaranteed to
-// be defined needs no fallback, which keeps `#{}` out of the declarations
-// themselves. (That is not only tidiness: tests/test_site_config.py's grid-track
-// check reads these declarations as text, and a Sass interpolation inside a
-// `var()` fallback reads to it as the start of a block.)
+// THE GAP LIVES ON THE ARTICLE, not on the list that uses it, so the `make it`
+// state can scale it once for everything inside. (`--amount-col` stood here
+// too, and went with the fixed column — see the block above. A `var()` whose
+// property is guaranteed to be defined needs no fallback, which keeps `#{}` out
+// of the declarations themselves; that is not only tidiness, since
+// tests/test_site_config.py's grid-track check reads these declarations as text
+// and a Sass interpolation inside a `var()` fallback reads to it as the start
+// of a block.)
 .cocktail {
-  --amount-col: #{$amount-col};
   --amount-gap: #{$amount-gap};
 }
 
+// THE LIST OWNS THE TRACKS, AND THE ROWS BORROW THEM — #1088, 2026-09-20.
+// `max-content` is the whole feature: the amount column is measured from this
+// drink's own longest amount, so no number is guessed here or kept in step in
+// the script.
+//
+// IT HAS TO BE THE LIST, not the row, and this is the part worth keeping. Each
+// `.cocktail-ingredient-top` used to be its own grid, so the amounts only lined
+// up because the width was a constant — the moment it became `max-content` each
+// row would size independently and the straight edge the amounts exist to make
+// (see the numbered note above) would go ragged. One grid up here, shared down
+// by `subgrid`, is what gives a measured column AND one edge.
+//
+// EVERY DIRECT CHILD SPANS BOTH TRACKS. A plain-string ingredient renders as a
+// bare `<li>` with no `.cocktail-ingredient` class (_layouts/cocktail.html's
+// `{% else %}` branch), and without this it would be placed in the amount
+// column and squeezed to the width of a number.
 .cocktail-ingredients {
   list-style: none;
   margin: 0;
   padding: 0;
   max-width: 34rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--amount-gap);
 }
 
-// SET BY assets/js/cocktail-scale.js WHEN A SCALED AMOUNT NEEDS THE ROOM, and
-// removed again when it does not — so the wide column is a state the page is in
-// rather than a width it always pays for. A page with no JavaScript never gets
-// this class and never needs it: nothing can scale the amounts.
-.cocktail-ingredients--wide-amounts {
-  --amount-col: #{$amount-col-wide};
-  --amount-gap: #{$amount-gap-wide};
+.cocktail-ingredients > li {
+  grid-column: 1 / -1;
 }
 
 // NO HAIRLINE BETWEEN ROWS, 2026-09-02 — Helen's brief and mockup. The
@@ -1677,8 +1694,14 @@ $amount-gap-wide: 1.25rem;
 // gone together (see the retirement note where `$rule-ingredient` was declared,
 // near the top of this file) and the spacing below is what divides one row
 // from the next now.
+// A SUBGRID SINCE #1088, so the row's own children land in the LIST's tracks.
+// The padding is vertical only, which is why it can be a subgrid and still
+// carry it: a subgrid's tracks align with its parent's, and horizontal padding
+// here would push them out of line.
 .cocktail-ingredient {
   padding: $space-md 0;
+  display: grid;
+  grid-template-columns: subgrid;
 }
 
 // A GRID NOW, NOT A FLEX ROW, 2026-09-02 -- Helen's brief: "a grid of amount...
@@ -1686,11 +1709,29 @@ $amount-gap-wide: 1.25rem;
 // (`width` plus `flex: none`), so the visible result is close either way; grid
 // is what the brief and the mockup both name, and it reads more directly as
 // "two columns" than a flex row achieving the same thing by other means.
+//
+// A SUBGRID TOO SINCE #1088, one level further down: this div is what actually
+// holds the amount and the name, so it has to reach the list's tracks through
+// its `<li>` rather than declare a pair of its own. `column-gap` is not
+// restated -- a subgrid inherits the parent's gaps unless it sets its own, and
+// one declaration on the list is the point.
 .cocktail-ingredient-top {
+  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: var(--amount-col) 1fr;
+  grid-template-columns: subgrid;
   align-items: baseline;
-  column-gap: var(--amount-gap);
+}
+
+// THE NAME IS PLACED, NOT AUTO-FLOWED. The layout omits `.cocktail-amount`
+// entirely when an ingredient carries no `amount`, and a lone child would
+// otherwise be auto-placed into the FIRST track -- putting the name in the
+// amount column, squeezed to the width of a number. No live drink has such a
+// row today (tmp/find_amountless.py: none in the 65 built pages), and the old
+// fixed grid would have done the same thing, so this is a guard rather than a
+// fix; it costs one declaration and it is the drafts collection, not this
+// repo, that decides whether the case ever arrives.
+.cocktail-ingredient-top > .cocktail-item {
+  grid-column: 2;
 }
 
 .cocktail-amount {
@@ -1815,10 +1856,16 @@ $amount-gap-wide: 1.25rem;
 // NO `max-width` OF ITS OWN, since $rule-ingredient retired — this line wraps
 // against `.cocktail-ingredients`' own 34rem measure now, minus the margin
 // below, rather than against a percentage bound that no longer exists.
+// IT SITS IN THE NAME'S COLUMN, #1088 — `grid-column: 2`, not a left margin of
+// `calc(var(--amount-col) + var(--amount-gap))`. That arithmetic was how a
+// sub-line hung past a column whose width was a number; with the column
+// measured there is no number to add up, and naming the track is both simpler
+// and incapable of drifting out of alignment with it.
 .cocktail-type-line {
+  grid-column: 2;
   color: $color-wicked-woowoo-deep;
   font-size: 0.84rem;
-  margin: 0.3rem 0 0 calc(var(--amount-col) + var(--amount-gap));
+  margin: 0.3rem 0 0;
 }
 
 // THE MONO IS GONE, 2026-08-26. Helen: "some of the ingredient generics are in
@@ -1889,12 +1936,22 @@ $amount-gap-wide: 1.25rem;
 // note near the top of this file), the note simply wraps against
 // `.cocktail-ingredients`' own 34rem measure now, same as the character line
 // above it.
+// NO LEFT MARGIN SINCE #1088 -- an ingredient's note is placed in the name's
+// column by the rule below instead, for the reason `.cocktail-type-line` gives.
+// This rule is shared with the METHOD note, which is not in that grid at all
+// and used to have to cancel the indent; it now inherits nothing to cancel.
 .cocktail-note {
   color: $color-clear-text;
   font-size: 0.84rem;
   font-style: italic;
   line-height: 1.55;
-  margin: 0.25rem 0 0 calc(var(--amount-col) + var(--amount-gap));
+  margin: 0.25rem 0 0;
+}
+
+// Only the ingredient's own note is in the grid. Scoped to the row rather than
+// put on `.cocktail-note`, because that class is also the method note's.
+.cocktail-ingredient > .cocktail-note {
+  grid-column: 2;
 }
 
 // A METHOD STEP MAY CARRY ONE TOO — Helen, 2026-09-04: "separate note field
@@ -1903,10 +1960,14 @@ $amount-gap-wide: 1.25rem;
 // muddler not the polite smooth one"), and it takes the class rather than a
 // copy of the four declarations.
 //
-// THE ONLY DIFFERENCE IS THE INDENT, and it has to be: `$amount-indent` lines an
-// ingredient's note up under the ingredient's NAME, past the amount column,
-// which is a column the method list does not have. Here the note simply sits
-// under its own step's text.
+// THE INDENT USED TO BE THE DIFFERENCE, and since #1088 there is none to
+// cancel. `.cocktail-note` carried a left margin of
+// `calc(var(--amount-col) + var(--amount-gap))` to line an ingredient's note up
+// under the ingredient's NAME, past a column the method list does not have, and
+// this rule existed to undo it. The ingredient's note is placed by
+// `grid-column: 2` now, which reaches only the rows actually in that grid, so
+// the shared rule no longer indents anything and this override is kept at zero
+// only as the explicit statement that a method note sits under its own step.
 .cocktail-method-note {
   margin-left: 0;
 }
@@ -2298,27 +2359,22 @@ $amount-gap-wide: 1.25rem;
   // override was quietly asking the browser to synthesise a fake bold on top
   // of the base rule's real one. Only the size needs restating for the larger
   // "make it" view; the weight and family are the base rule's already.
-  // THE COLUMN GROWS WITH THE TYPE, and it has to: `--amount-col` is a fixed
-  // 5.5rem holding ~9.6 characters of Plex Mono at the resting 0.95rem, and this
-  // state sets the same figures at 1.3rem. Left alone, the column would hold
-  // barely seven -- "52.5 ml" fits by half a pixel and "112.5 ml" wraps, in the
-  // one state where a wrapped amount is worst, because `make it` is the view you
-  // read with your hands full and a jigger in one of them.
+  // ONLY THE GAP IS SCALED NOW, #1088. This block used to scale `--amount-col`
+  // as well, and needed a paragraph to say why: the column was a fixed 5.5rem
+  // holding ~9.6 characters of Plex Mono at the resting 0.95rem, and this state
+  // sets the same figures at 1.3rem, so left alone it would have held barely
+  // seven -- "112.5 ml" wrapping in the one view you read with your hands full
+  // and a jigger in one of them. 1.37 (1.3 / 0.95) kept the ratio of column to
+  // character identical in both states, which was what kept the script's
+  // character threshold honest across them.
   //
-  // 1.37 IS 1.3 / 0.95, so the ratio of column to character is identical in both
-  // states. That is what keeps assets/js/cocktail-scale.js's threshold honest:
-  // it counts characters rather than measuring, and nine fit in the narrow
-  // column at BOTH sizes because both were scaled by the same number. A
-  // mode-aware threshold in the script would have been the other way to fix
-  // this, and a worse one -- the script would have to know what the stylesheet
-  // does to the type.
-  --amount-col: #{$amount-col * 1.37};
+  // THE COLUMN NOW GROWS WITH THE TYPE BY MEASURING IT. `max-content` on the
+  // list is in the same units as whatever the amount is currently set in, so
+  // this state needs no factor, no second copy of the wide pair, and no
+  // agreement with a threshold in another file. The gap keeps its 1.37 because
+  // a gap is a design value that should grow with the type, which is the one
+  // part of the old block that was never arithmetic about characters.
   --amount-gap: #{$amount-gap * 1.37};
-
-  .cocktail-ingredients--wide-amounts {
-    --amount-col: #{$amount-col-wide * 1.37};
-    --amount-gap: #{$amount-gap-wide * 1.37};
-  }
 
   .cocktail-amount { font-size: 1.3rem; font-weight: 600; }
   .cocktail-item { font-size: 1.15rem; }

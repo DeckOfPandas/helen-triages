@@ -2508,14 +2508,24 @@ says only *"Don't scale bitters linearly — add to taste."*)
 **Whole recipes only** (integer multiples, clamped at ×1
 — every written amount is on the 2.5 ml grid, so nothing ever needs
 rounding); counts multiply and re-pluralise, `to top` / `to rinse` pass
-through; the floor is a REFUSAL naming the ingredient; ONE parser
+through; the floor is a SILENT refusal — the box snaps back to the last
+multiple that worked and nothing is said, since #1088 (2026-09-20) found the
+message it used to show could only ever have fired on a drink's own written
+recipe; ONE parser
 (`shoppingList.parseAmount`) across `shopping-list.js` → `scale.js` →
 `cocktail-scale.js`, guarded by `test_the_scaler_scripts_load_in_dependency_order`.
 `serves:` exists on nine punch-bowl drinks and the scaler does not read it —
 *how many does this make* and *how much am I making* are different questions.
 A `{step, note}` pair renders the note under its step and stays visible in
-`make it`. The amount column has two widths, counted in Plex Mono characters.
-**Not yet seen on an iPad.**
+`make it`. **The amount column is sized by the drink** (#1088, 2026-09-20):
+`.cocktail-ingredients` is `grid-template-columns: max-content 1fr` and each
+row reaches those tracks through `subgrid`, so the column is exactly as wide
+as THIS drink's longest amount and the sub-lines sit in track 2 rather than
+past a computed indent. It replaced a flat 5.5rem with a second, wider pair
+that `cocktail-scale.js` switched to by counting Plex Mono characters — one
+guessed number kept in step across two files, which cost 41.5px of empty
+column on a phone and still wrapped "1 small pinch". Nothing counts characters
+any more. **Not yet seen on an iPad.**
 
 **"If you liked this, how about …" — three related drinks after the notes**
 (#927, 2026-09-10). **The score is shared MOODS plus shared ingredient
