@@ -1442,6 +1442,69 @@ $card-name-step: 0.86;
   text-decoration-skip-ink: none;
 }
 
+// =============================================================================
+// THE DRAFT MARK -- #1162, 2026-09-21
+// =============================================================================
+// Helen: "add a DRAFT badge on the local site for unpublished cocktails".
+// _includes/cocktails/draft-badge.html emits it, and only a local build has a
+// draft in the loop to emit it for.
+//
+// NO NEW HUE, WHICH IS 13.12'S RULE AND NOT A SHORTAGE OF IDEAS. Every colour
+// on this card is already spoken for -- absinthe is the glass, magenta is
+// "this one, chosen", the reposado orange is the ship's verdict -- and a draft
+// mark makes no claim about the DRINK at all. It says where the file is in
+// Helen's own process, so it takes the card's quiet text colour and earns its
+// visibility from the hairline and the letter-spacing instead. A badge nobody
+// asked a hue for should not spend one.
+//
+// FOOD'S `.badge-draft` IS NOT REUSED, and could not be: that mark is a
+// clip-path "hastily broken highlighter tape" in _sass/food/_badges.scss, which
+// the cocktails stylesheet does not import (2.5 -- the two sites share chrome,
+// not card vocabulary). The word is the same and the drawing is each site's
+// own, which is the same arrangement the two indexes already have.
+//
+// `nowrap` BECAUSE IT IS ONE WORD and a five-character label that wraps to
+// "DRA/FT" in a tight corner is worse than one that pushes the tape a little.
+.drink-draft-badge {
+  font-family: $font-headings;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  color: $color-clear-text;
+  border: 1px solid $color-border;
+  border-radius: 2px;
+  padding: 0.22em 0.42em;
+}
+
+// ON A CARD IT IS POSITIONED IN _shortlist.scss, NOT HERE, and that is an
+// import-order fact rather than a filing preference: the offset is derived from
+// `$card-shortlist-size`, which that file declares, and this one is imported
+// first. Putting it here fails the build outright -- which is how it was found.
+//
+// --- on a drink page: to the right of the tape, below if needed --------------
+// Helen's words again, and the second half of them is why this is flow rather
+// than position. `.drink-card-name` is a block everywhere else; here it becomes
+// a wrapping flex row so the badge takes the space beside the tape when there
+// is any and drops under it when there is not, with no width to guess.
+//
+// `align-items: baseline` puts the small word on the title's own line rather
+// than centring it against a 3.2rem tape, and `flex-wrap` is what delivers
+// "below if needed".
+//
+// card-name-fit.js IS UNAFFECTED: it measures `.drink-card-tape-word`'s
+// clientWidth, and the tape is still the flex item it was -- it simply has a
+// sibling now. Verified on a draft page at 1280 and 390.
+.cocktail-title-block .drink-card-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: $space-md;
+  row-gap: $space-xs;
+}
+
 @media (max-width: 720px) {
   .drink-cards { grid-template-columns: 1fr; }
 

@@ -228,11 +228,19 @@ layout: default
          out in the 4.5rem GLASS column with its lettering running out over the
          page (#1086, bug 1). The name is placed on the head's grid directly
          now, and on a phone on `.cocktail-title-block`'s own grid. {% endcomment %}
+      {% comment %} THE DRAFT MARK SITS INSIDE THE NAME, AFTER THE TAPE --
+         #1162. Helen: "to the right of the name tape, below if needed", which
+         is a flow instruction and not a position: this wrapper becomes a
+         wrapping flex row (_sass/cocktails/_cocktail.scss), so the badge takes
+         the space beside the tape when there is any and drops under it when
+         there is not. The card's own copy of this badge is absolute instead,
+         because there the corner it goes in is already spoken for. {% endcomment %}
       <div class="drink-card-name">
         <span class="drink-card-tape">
           <span class="drink-card-tape-bg" data-card-tape="{{ page.url | size }}"></span>
           <span class="drink-card-tape-word"><h1 class="cocktail-title">{{ page.title }}</h1></span>
         </span>
+        {% include cocktails/draft-badge.html doc=page %}
       </div>
 
       {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see

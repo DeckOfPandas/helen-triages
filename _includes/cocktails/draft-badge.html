@@ -1,0 +1,31 @@
+{% comment %} ── THE DRAFT MARK -- #1162, 2026-09-21 ──────────────────────────
+  Helen: "add a DRAFT badge on the local site for unpublished cocktails", on
+  cards "squished in on the top right" and on a drink page "to the right of the
+  name tape, below if needed".
+
+  IT CANNOT REACH PRODUCTION, and not because this include checks a flag. A
+  draft is a document of `cocktail_drafts`, a collection with `output: false`
+  whose documents only enter a page at all under `site.show_drafts` -- a key
+  only _config_local.yml declares (MANUAL §2). So in a production build there is
+  no draft in the loop for this to mark, and the test below is answering "which
+  collection is this drink from", never "may I say so".
+
+  `collection` IS THE TEST, which is food/index.html's own idiom
+  (`recipe.collection == "food_drafts"`, #562) rather than a second way of
+  asking the same question. It is a string on every document Jekyll renders.
+
+  ONE INCLUDE, TWO CALL SITES: the index card and the drink page's own title.
+  The word and the class are therefore the same in both by construction, which
+  is the reason this is not two inline spans -- the shortlist button spent ten
+  days moving around this card because nothing defined where it lived.
+
+  THE RELATED-DRINKS ROW IS NOT A CALL SITE, and that is a fact about the data
+  rather than an omission: that row is built from `site.cocktail_recipes` only
+  (_layouts/cocktail.html says so where it builds it -- "DRAFTS ARE A DIFFERENT
+  COLLECTION and are deliberately not concatenated in"), so no card in it can
+  ever be a draft. Adding the include there would be dead markup.
+
+  `doc` RATHER THAN READING `page`, because two of the three call sites are
+  inside a loop over other drinks and `page` there is the page doing the
+  rendering, not the drink being drawn.
+{% endcomment %}{% if include.doc.collection == "cocktail_drafts" %}<span class="drink-draft-badge">draft</span>{% endif %}

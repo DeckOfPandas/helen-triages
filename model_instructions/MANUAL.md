@@ -282,9 +282,16 @@ _food_drafts/        output: false   permalink /food/drafts/:path/       local o
 _cocktail_recipes/   output: true    permalink /cocktails/recipes/:path/ empty until a drink is promoted
 _cocktail_drafts/    output: false   permalink /cocktails/drafts/:path/  local only; its own private repo
 
+**A DRAFT SAYS SO, ON THE LOCAL SITE ONLY** (#1162, 2026-09-21): a `draft`
+badge on its index card, squished in beside the shortlist `+`, and beside the
+name tape on its own page. `_includes/cocktails/draft-badge.html`, emitted by
+`collection` the way food's own draft pill is (#562). Nothing gates it, because
+nothing needs to — a production build has no draft in the loop to mark.
+
 _layouts/     default.html (shared)   recipe.html (food)   cocktail.html (cocktails)
               magic_bag.html (food, §4.3)
 _includes/    filter_group.html   recipe_badges.html   cocktails/ship.html
+              cocktails/draft-badge.html (§2, local-only draft mark)
               icons/glasses/ (the published glass artwork, §9.11)   food/ (reference partials, §14)
 _plugins/     publish_gate.rb   cocktail_costs.rb   cocktail_units.rb   cocktail_card_ingredients.rb
 _sass/        shared/{_tokens,_base,_layout,_rule,_chrome,_fonts}   food/   cocktails/
