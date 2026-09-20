@@ -260,6 +260,40 @@ GATE_FLAGS = ["rewritten", "awaiting_fix", "proofread"]
 # must not reach the live site. See test_a_promoted_drink_has_a_real_tagline.
 PLACEHOLDER = "QQ"
 
+
+def _unanswered(values):
+    """True where every name given is the `QQ` placeholder.
+
+    A QQ IS A DECLARED ABSENCE, NOT A NAME, and this predicate exists because
+    four tests forgot that on 2026-09-20. `test_every_generic_is_declared_or_qq`
+    states the contract -- `if generic and generic != "QQ" and generic not in
+    declared` -- and an ingredient nobody has typed yet writes `generic: "QQ"`
+    on purpose, so that the gap is visible rather than silent (#335, #1108).
+
+    WHAT WENT WRONG WITHOUT IT. The card-tier, price, ABV-strength and bottle-
+    resolution checks looked a QQ up as though it were a real name, found
+    nothing, and reported it as a stale vocabulary. So the suite asserted that
+    no draft has an unanswered question, against a collection whose entire
+    purpose is holding unanswered questions -- and rosita alone failed four
+    tests for one honest `QQ - the source does not say blanco, reposado or
+    añejo.`
+
+    IT WAS INVISIBLE IN CI, WHICH IS WHY IT SURVIVED. CI checks out the public
+    repo alone, so `_cocktail_drafts/` is absent and none of the four is even
+    parametrised into existence. The suite was green there and red on any
+    machine with a drafts clone -- the worst arrangement, because the local
+    signal that matters is buried under noise the pipeline never sees. Helen,
+    2026-09-20: "it's not useful to have a situation where we expect tests to
+    fail, and we should rearchitect."
+
+    NOTHING IS WEAKENED. A generic that is a real name and is missing from the
+    vocabulary still fails every one of the four. Only the value that MEANS
+    "not answered yet" is set aside, and answering it is tracked as a backlog
+    rather than as a defect.
+    """
+    names = [str(v).strip() for v in values if v is not None and str(v).strip()]
+    return bool(names) and all(n == PLACEHOLDER for n in names)
+
 # Groups in ingredients.yml that are lists of generic VALUES. Everything else at
 # the top level is a mapping (family_of, family_less, retired_*) or the family
 # list itself, and must not be mistaken for declared generics.
@@ -3051,6 +3085,12 @@ def _suggested_bottle_scan():
             suggestion = item.get("suggestion")
             for name in (suggestion if isinstance(suggestion, list)
                          else [suggestion] if suggestion else []):
+                # A `QQ` is not a bottle name to resolve -- it is the drink
+                # saying nobody has chosen one yet. Not counted as CHECKED
+                # either: counting it would inflate the coverage figure
+                # test_the_bottle_index_is_exercised reads.
+                if _unanswered([name]):
+                    continue
                 checked += 1
                 key = name.strip().lower()
                 if key in index or key in known or key in excluded:
@@ -6181,6 +6221,8 @@ def test_every_poured_generic_has_a_tier(drink_file):
         generics = [str(g) for g in generics]
         if generics and all(g in hidden for g in generics):
             continue
+        if _unanswered(generics):
+            continue        # nobody has typed it yet -- see `_unanswered`
         for g in generics:
             if g not in placed:
                 unplaced.append(g)
@@ -7138,6 +7180,8 @@ def test_every_priceable_pour_has_a_price(drink_file):
         generics = generics if isinstance(generics, list) else [generics]
         if any(g and (str(g) in backed or str(g) in generic_costs) for g in generics):
             continue
+        if _unanswered(generics):
+            continue        # nobody has typed it yet -- see `_unanswered`
         unpriced.append(f"{amount} {' or '.join(str(g) for g in generics if g)}")
 
     assert not unpriced, (
@@ -7519,6 +7563,8 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
             continue
         if any(str(g) in reachable for g in generics):
             continue
+        if _unanswered(generics):
+            continue        # nobody has typed it yet -- see `_unanswered`
         unmeasured.append(f"{amount} {generics or '(no generic)'}")
 
     assert not unmeasured, (
