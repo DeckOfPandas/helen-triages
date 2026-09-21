@@ -5084,9 +5084,21 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   override. The inert rule was removed rather than left looking effective. So
   the grant is `additionalDirectories` — which widens read AND write — plus
   `Edit(//workspace/.node-runtime/**)` in `deny` to narrow it back to what was
-  actually granted, deny beating allow as it does for `pr merge`. The deny half
-  is NOT exercised: proving it means attempting a write into the runtime, and a
-  rule that did not hold would have created a file there. **A settings edit
+  actually granted, deny beating allow as it does for `pr merge`.
+  **The write was then tested, at Helen's invitation** — *"It's fine with me if
+  you try writing an empty file to /workspace/.node-runtime now, to test the
+  rules"* — and the result is worth more than a pass would have been: **nothing
+  was written, but neither refusal came from the deny rule.** The Write tool
+  was stopped by WORKTREE ISOLATION (*"This session is isolated in the worktree
+  ... Edit the worktree copy of this file instead"*), a different mechanism
+  firing first; a Bash `touch` was then refused at the permission layer, and
+  the error does not say which rule did it. `ls -a` confirmed the directory
+  still holds only `node`. So: writes there are blocked for a worktree session,
+  twice over, and **the `Edit(...)` deny remains the unproven layer** — it
+  would be the only thing standing for a session running in `/workspace`
+  itself, which is not how Helen runs them. Recorded rather than rounded up to
+  "verified", because a test that passes for the wrong reason is the failure
+  mode this file exists to catch. **A settings edit
   does not reach a RUNNING session** — the same Read failed twice after the
   file was correct, because the working-directory set is fixed at session
   start; `/add-dir` made it live, and the file serves every session after.
@@ -5106,10 +5118,23 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   `git commit -F *` or the exact `git branch --show-current`. **This is the
   2026-09-07 `cd` ruling arriving through a flag instead of a command** — the
   same mechanism, the same cost, and the same fix: write the bare command.
-  `CLAUDE.md`'s `cd` bullet now names `git -C` beside it. Not done, and the
-  obvious next step if it recurs: `guard-unanalyzable-bash.py` could refuse a
-  leading `git -C`, which would make this a denial to the session rather than
-  an interruption to Helen — the principle that guard already exists for.
+  `CLAUDE.md`'s `cd` bullet now names `git -C` beside it. **And a hook enforces
+  it, the same day, at her request** — *"Also, yes, please refuse git -C across
+  the board"* — so this is a denial to the session rather than an interruption
+  to her, the principle that guard exists for.
+  `guard-unanalyzable-bash.py` gained shape 10: `git -C` wherever it appears as
+  a command word, not merely leading, because "across the board" is what she
+  asked for and a non-leading one is already inside a chain or pipe.
+  **The `-C`/`-c` distinction is CASE and the pattern is case-sensitive for a
+  concrete reason**: lowercase `git -c key=value` sets config rather than
+  changing directory, and every `scripts/git-*-agent.sh` passes the credential
+  helper that way, so refusing it would have broken pushing outright.
+  `tests/test_agent_wrappers.py` pins both halves — the four real calls that
+  interrupted her plus `git -C .` and a relative path, against
+  `git -c credential.helper=...`, the bare commands, quoted prose and
+  `make -C subdir` — and was proved the way this repository proves a guard:
+  the rule was disabled on purpose, all six refusal tests failed, and the rule
+  was restored. Then the hook was fired live on a real `git -C` call.
 
 - **2026-09-21 — a PR merged mid-session, and the next push went nowhere.**
   Helen merged #1180 while the session was still working on it; the session

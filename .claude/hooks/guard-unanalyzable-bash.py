@@ -69,6 +69,24 @@ WHAT IT REFUSES, each with the `CLAUDE.md` rule it belongs to:
      repro script was reaching for by hand -- or put the whole command in a
      script in `tmp/` and run the file, where the assignment sits on its own
      line and needs no prefix at all.
+  9. AN UNQUOTED `(` OR `)` -- since 2026-09-15; a subshell, or far more often
+     a parse error the shell cannot analyse at all. Documented at its own test
+     below.
+ 10. `git -C <path>` -- since 2026-09-21. Helen, of a session that had used it
+     throughout: *"There's no need to run git -C for commands like that because
+     you're already in the folder you're targetting (sorry if I'ive
+     misunderstood)"*. She had not misunderstood, and the cost is larger than
+     the redundancy she named. **This is shape 4 wearing a flag instead of a
+     command.** Every git allow rule names a SUBCOMMAND -- `Bash(git status *)`,
+     `Bash(git add -- *)`, `Bash(git commit -F *)`, the exact
+     `Bash(git branch --show-current)` -- and an allow rule is a PREFIX match,
+     so a `-C` sitting between `git` and its subcommand makes every one of them
+     fail. That session's git calls each interrupted her and not one needed to.
+     The Bash tool already runs in the worktree root; write the bare command.
+     Refused wherever it appears as a command word, not only leading, since
+     "across the board" is what she asked for. Its LOWERCASE sibling
+     `git -c key=value` is a different flag and stays allowed -- see below.
+     NOT refused, because neither was measured: `--git-dir=` and `--work-tree=`.
 
 WHAT IT DELIBERATELY ALLOWS, because a guard that fires on harmless
 invocations is one you learn to route around (the lesson `guard-destructive-git
@@ -96,6 +114,14 @@ invocations is one you learn to route around (the lesson `guard-destructive-git
     `=` inside quotes (`git commit -m "PLAYWRIGHT_BROWSERS_PATH=foo bar"`).
     Only one or more `NAME=value` tokens sitting BEFORE the command word --
     the shape a shell itself treats as an environment assignment -- counts.
+  * `git -c key=value`, the LOWERCASE sibling of shape 10. The `-C`/`-c`
+    distinction is CASE and it is the whole difference between the two: `-C`
+    changes directory and breaks every git allow rule, `-c` sets a config value
+    and breaks nothing. `scripts/git-push-agent.sh` and its siblings pass the
+    credential helper this way on every invocation, so refusing it would break
+    pushing outright. Shape 10's pattern is case-sensitive for exactly this
+    reason, and `git -c credential.helper=value push origin main` has a test
+    saying so.
 
 HOW IT READS THE COMMAND. Quote-stripping first, then substring and token
 tests. NOT `shlex.split`: an unbalanced quote is exactly what a malformed
@@ -118,6 +144,13 @@ _REDIRECT = re.compile(r"\d*>{1,2}\s*&?\s*\d*|\d*<\s*")
 
 # `cd` as the first word, with or without a following path.
 _LEADING_CD = re.compile(r"^\s*cd(\s|$)")
+
+# `git -C` as a command word, anywhere -- shape 10. CASE-SENSITIVE on purpose:
+# lowercase `git -c key=value` is a different flag, is harmless, and is how
+# every scripts/git-*-agent.sh passes the credential helper. Not anchored to
+# the start, because Helen asked for it refused "across the board"; in practice
+# a non-leading one is already inside a chain or a pipe, both refused above.
+_GIT_DASH_C = re.compile(r"(?:^|\s)git\s+-C(?=\s|$)")
 
 # A glob character in an unquoted token. `?` is deliberately excluded: it is
 # far more often a regex or a URL query than a glob, and `*` is the form every
@@ -238,6 +271,18 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "drop it -- the Bash tool already runs in the project root, so "
                 "`grep ...` works where `cd /workspace; grep ...` matches no "
                 "allow rule and always prompts")
+
+    if _GIT_DASH_C.search(bare):
+        return ("`git -C <path>`, which breaks every prefix-based git allow rule",
+                "drop it -- the Bash tool already runs in the worktree root, so "
+                "`git status --short` works where "
+                "`git -C /workspace/.claude/worktrees/foo status --short` "
+                "matches no allow rule and prompts Helen. Every git allow rule "
+                "names the SUBCOMMAND (`git status *`, `git add -- *`, "
+                "`git commit -F *`, the exact `git branch --show-current`), and "
+                "a `-C` between `git` and its subcommand makes the prefix match "
+                "fail. Lowercase `git -c key=value` is a different flag and is "
+                "not refused")
 
     if _has_leading_env_assignment(bare):
         return ("a leading shell environment assignment (`NAME=value` before "

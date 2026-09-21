@@ -258,6 +258,49 @@ def test_the_hook_leaves_quoted_or_escaped_parentheses_alone(command):
     assert not _unanalyzable_denies(command), f"refused {command!r}"
 
 
+# --- guard-unanalyzable-bash.py shape 10: `git -C` ---------------------------
+#
+# Helen, 2026-09-21: "please refuse git -C across the board". Every one of the
+# refused commands below was actually run in the session that prompted the
+# rule, and every one of them interrupted her: an allow rule is a PREFIX match,
+# so a `-C` between `git` and its subcommand makes `Bash(git status *)`,
+# `Bash(git add -- *)`, `Bash(git commit -F *)` and the exact
+# `Bash(git branch --show-current)` all fail to match.
+
+@pytest.mark.parametrize("command", [
+    # the four real calls from 2026-09-21, one per allow rule they missed
+    "git -C /workspace/.claude/worktrees/opus-improve-devops status --short",
+    "git -C /workspace/.claude/worktrees/opus-improve-devops branch --show-current",
+    "git -C /workspace/.claude/worktrees/opus-improve-devops add -- .claude/settings.json",
+    "git -C /workspace/.claude/worktrees/opus-improve-devops commit -F tmp/msg.txt",
+    # relative paths and `.` are the same shape
+    "git -C . status",
+    "git -C ../other log --oneline",
+])
+def test_the_hook_refuses_git_dash_capital_c(command):
+    assert _unanalyzable_denies(command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    # LOWERCASE -c is a different flag: config, not chdir. Every
+    # scripts/git-*-agent.sh passes the credential helper this way, so refusing
+    # it would break pushing outright.
+    "git -c credential.helper=value push origin main",
+    "git -c credential.helper=sh\\ scripts/git-credential-agent-token.sh push origin x",
+    # the bare commands that should be written instead
+    "git status --short",
+    "git branch --show-current",
+    "git add -- .claude/settings.json",
+    # prose about it is inert inside quotes, like every other shape here
+    'git commit -m "stop using git -C, it breaks the allow rules"',
+    "grep -rn 'git -C' model_instructions/",
+    # a -C belonging to some other command is not this shape
+    "make -C subdir all",
+])
+def test_the_hook_leaves_lowercase_dash_c_and_bare_git_alone(command):
+    assert not _unanalyzable_denies(command), f"refused {command!r}"
+
+
 # --- git-push-agent.sh: never the public main --------------------------------
 
 @pytest.mark.parametrize("args", [
