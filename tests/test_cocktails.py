@@ -191,11 +191,26 @@ SERVE_KEYS = {"ice", "rim"}
 # look alike.
 REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 
-# `item` IS DRAFT-ONLY, ruled by Helen 2026-09-02 (D8; DECISIONS.md §9.10).
-# It holds what the SOURCE called the ingredient and is being retired by #544;
-# 282 draft entries still carry one and nothing renders it (§9.10). So it is
-# permitted where the migration is still running and refused where the world can
-# see the file -- which makes promotion the deadline rather than a someday.
+# `item` IS GONE, AND #544'S MIGRATION IS OVER -- Helen, 2026-09-21: "'item'
+# needs to go. Kill it with fire. Data can be read straight into
+# generic/suggestion with or without QQs, and anything genuinely unclear added
+# to a page note for me (titled QQ so I definitely find it)."
+#
+# It was the SOURCE's own wording for a pour, held beside `generic: "QQ"` until
+# the category was known, and it had been retiring since 2026-09-02. What ended
+# it was `QQ <the source's words>`: once the words go in `generic` -- the field
+# the page and the cards actually read -- a second field holding the same string
+# renders nowhere and is read by nothing. Three whole tests went with it
+# (`test_item_is_gone_once_the_generic_is_filled_in`,
+# `test_a_staged_drink_carries_no_transcription_field`,
+# `test_a_promoted_drink_carries_no_draft_only_key`), along with
+# `INGREDIENT_KEYS_RECIPES`, which existed only to subtract this one key.
+#
+# `suggestion` IS NOW WRITTEN EVEN WHEN IT IS EMPTY -- same ruling: "At ingest,
+# please add a blank suggestion field if there isn't a named suggestion, because
+# that saves me typing YAML when I come to it if I want to note my own
+# suggestion." `suggestion: []` is the shape; `["QQ"]` is not, and never was
+# anything but a bottle nobody had chosen.
 #
 # `as` AND `card_order` ARE THE TWO PRESENTATION KEYS, added 2026-09-07 (#754).
 # `as` says how a pour is USED -- float, rinse, muddle -- and the card ordering
@@ -207,11 +222,10 @@ REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 # it since #567 and this whitelist would have rejected any drink that wrote one.
 # A field the code supports and the schema refuses is a trap for whoever tries
 # it first, so both are declared here now.
-INGREDIENT_KEYS_DRAFTS = {
-    "generic", "amount", "item", "suggestion", "note", "character", "optional",
+INGREDIENT_KEYS = {
+    "generic", "amount", "suggestion", "note", "character", "optional",
     "as", "card_order",
 }
-INGREDIENT_KEYS_RECIPES = INGREDIENT_KEYS_DRAFTS - {"item"}
 
 # `amount` is not required HERE because it has its own test with its own
 # explanation -- see test_every_ingredient_has_an_amount below.
@@ -360,7 +374,7 @@ def _unanswered(values):
 # adding `bottle_origins`, by listing every top-level list and asking how each
 # was classified. It is ten AISLE NAMES (`spirits`, `fortified`, `liqueurs`,
 # `fresh produce`, `freshly squeezed fruit juice`, `bottled fruit juice`,
-# `flavourings`, `sugar syrup`, `bitters`, `tops`), and every one of them has
+# `larder`, `sugar syrup`, `bitters`, `tops`), and every one of them has
 # been a silently permitted generic since the shelves were declared. Nothing
 # pours a shelf, so nothing ever noticed.
 #
@@ -520,7 +534,20 @@ def _load_published():
     drinks would be the vacuous green tests/test_suite_hygiene.py exists to
     prevent.
     """
-    out = _read(RECIPES)
+    return [(drink.slug, drink.fm) for drink in _load_published_files()]
+
+
+def _load_published_files():
+    """`_load_published`, with the raw text left on.
+
+    THE SAME DOOR, NOT A SECOND ONE -- the relationship `_load_files` has to
+    `_load`, for the same reason. A rule about the WHOLE FILE rather than about
+    a parsed field (`test_no_published_drink_carries_a_qq` is the one) needs the
+    text, and the alternative is a test globbing `RECIPES` itself, which
+    `test_every_drink_reading_test_goes_through_the_loader` refuses on #540's
+    grounds and was right to.
+    """
+    out = _scan(RECIPES)
     if not out:
         pytest.skip(
             "No promoted drinks. `_cocktail_recipes/` is empty, so there is "
@@ -982,11 +1009,17 @@ def test_required_top_level_keys_present():
 
 
 def test_no_unknown_ingredient_keys():
-    """An ingredient entry holds only the seven keys the schema declares.
+    """An ingredient entry holds only the keys the schema declares.
 
     The same argument as the top-level check, and it bites harder: an entry is a
     bare mapping with no layout of its own, so a stray key renders nowhere and
     fails nothing. `note` versus `notes` is the whole failure mode.
+
+    ONE SET FOR BOTH COLLECTIONS SINCE 2026-09-21, when `item` was retired.
+    There used to be two -- `INGREDIENT_KEYS_DRAFTS` and a `_RECIPES` that
+    subtracted exactly one key -- plus a second test to apply the smaller one to
+    published drinks, plus a third to apply it early at the staging folders.
+    Retiring the key collapsed all of that into this.
     """
     bad = []
     for slug, fm in _load():
@@ -994,37 +1027,16 @@ def test_no_unknown_ingredient_keys():
             if not isinstance(item, dict):
                 bad.append(f"{slug} entry {i}: {type(item).__name__}, not a mapping")
                 continue
-            for key in sorted(set(item) - INGREDIENT_KEYS_DRAFTS):
+            for key in sorted(set(item) - INGREDIENT_KEYS):
                 bad.append(f"{slug} entry {i}: {key!r}")
     assert not bad, (
         "Undeclared ingredient key(s):\n  " + "\n  ".join(bad)
-        + "\n\nDeclared: " + ", ".join(sorted(INGREDIENT_KEYS_DRAFTS))
+        + "\n\nDeclared: " + ", ".join(sorted(INGREDIENT_KEYS))
         + ". Nothing reads anything else -- see §9.10 for what the line renders."
-    )
-
-
-def test_a_promoted_drink_carries_no_draft_only_key():
-    """A published drink has no `item` -- it is draft-only, ruled 2026-09-02.
-
-    A SECOND DOOR RATHER THAN A BRANCH INSIDE THE CHECK ABOVE, for `_load_published`'s
-    own reason: this is a claim about published drinks alone, and asking it of
-    the combined corpus would hold 124 drafts to a rule that is deliberately not
-    theirs while #544's migration is still running.
-    """
-    bad = []
-    for slug, fm in _load_published():
-        for i, item in enumerate(fm.get("ingredients") or [], 1):
-            if not isinstance(item, dict):
-                continue
-            for key in sorted(set(item) - INGREDIENT_KEYS_RECIPES):
-                bad.append(f"{slug} entry {i}: {key!r}")
-    assert not bad, (
-        "Promoted drink(s) carrying a draft-only ingredient key:\n  "
-        + "\n  ".join(bad)
-        + "\n\n`item` holds the source's own words for an ingredient and is "
-          "retired by #544 -- nothing renders it (§9.10), and where it survives "
-          "on a draft it is migration residue. Promotion is the deadline: fold "
-          "it into `generic`, `suggestion` or `note`, or drop it."
+        + "\n\nIf this is `item`: it was retired on 2026-09-21. The source's own "
+          "words go in `generic`, after a `QQ ` where the category is not "
+          "settled, because that is the field the page and the cards read. "
+          "Anything they do not carry goes in a `note:`."
     )
 
 
@@ -1095,49 +1107,6 @@ def test_a_staged_drink_writes_a_bottles_canonical_name():
           "(\"'ED3' isn't a bottle\", 2026-09-04). Everywhere else the opposite "
           "rule holds and is deliberate: leave a draft as she spelled it and "
           "teach the dictionary the spelling (MANUAL §9.3.2)."
-    )
-
-
-def test_a_staged_drink_carries_no_transcription_field():
-    """A drink ready to publish has no `item` left on any ingredient.
-
-    Helen, 2026-09-04, on the same file: *"this has 'item' everywhere too."*
-    §9.10 has said since 2026-09-02 that `item` is a DRAFTS-ONLY transcription
-    field -- what the source called the pour, kept so she can see the original
-    words while she fills in `generic` and `suggestion` -- and that *"promotion
-    is the deadline rather than a someday"*. `INGREDIENT_KEYS_RECIPES` enforced
-    that in `_cocktail_recipes/`.
-
-    THE DEADLINE WAS IN THE WRONG PLACE, which is the whole of this test. A
-    drink only reaches `_cocktail_recipes/` by being MOVED there, so the rule
-    fired at the one moment when the answer to "what did the source say?" is
-    least available and the job is meant to be finished. In `4-promote/` the
-    drink is still in front of her, and the field is still there to read.
-
-    NOTHING RENDERS `item` (§9.10, #544), so deleting one changes no page and
-    loses no reader anything -- but it can lose a FACT. Before deleting one,
-    check that everything it says is already carried by `generic`, `suggestion`
-    or `amount`; where it is not, the fact goes into a `note:` on the same
-    ingredient. Five entries on Fish House Punch, two on the pear Bellini and
-    three on Smokestack Lightning went that way on 2026-09-04, and one of them
-    left a note behind.
-    """
-    bad = []
-    for slug, fm in _load_staged():
-        for i, item in enumerate(fm.get("ingredients") or [], 1):
-            if not isinstance(item, dict) or "item" not in item:
-                continue
-            bad.append(f"{slug} entry {i}: item: {item['item']!r}")
-
-    assert not bad, (
-        "Staged drink(s) still carrying the `item` transcription field:\n  "
-        + "\n  ".join(bad)
-        + "\n\n`item` holds what the SOURCE called the ingredient and nothing "
-          "renders it (§9.10). Read each one before deleting it: if it says "
-          "something `generic`, `suggestion` and `amount` do not already say, "
-          "that fact belongs in a `note:` on the ingredient. If it says nothing "
-          "new -- which is the usual case, 385 of 617 entries restated their "
-          "own generic -- just delete the line."
     )
 
 
@@ -1339,22 +1308,56 @@ def test_tagline_is_a_non_empty_string():
     )
 
 
-def test_a_promoted_drink_has_a_real_tagline():
-    """A published drink's tagline is written prose, never the `QQ` placeholder.
+_QQ_ANYWHERE = re.compile(r"\bQQ\b")
 
-    Helen's ruling D7, 2026-09-02: a `QQ` tagline never publishes. It skips today
-    because `_cocktail_recipes/` is empty -- a fact about the collection, not a
-    stale loader -- and starts running on the day the first drink is promoted,
-    which is exactly the day it matters.
+
+def test_no_published_drink_carries_a_qq():
+    """`QQ` never reaches the live site, in any field, in any shape.
+
+    HELEN'S RULING, 2026-09-21, and it is the whole specification: *"QQ just
+    means 'Helen pay attention to this for some reason' ... Honestly we don't
+    need to disambiguate, only to block anything on the site from publishing
+    with a QQ in any context, hence why I use 'QQ' rather than any mark that
+    might appear in real, wanted text."*
+
+    THIS IS FOOD'S `test_no_qq_placeholder`, WHICH DRINKS HAD NEVER HAD. That
+    guard is parametrised over the food `recipe` fixture and `tests/conftest.py`
+    names `_food_recipes/` and `_food_drafts/` and nothing else, so the one rule
+    that keeps an unfinished marker off the live site covered one of the two
+    sites. A drink published on `awaiting_fix: false` + `proofread: true` alone,
+    and those two flags are about whether Helen has READ the file, not about
+    whether anything in it is still owed.
+
+    IT REPLACES `test_a_promoted_drink_has_a_real_tagline`, which asked whether
+    the tagline was EXACTLY `"QQ"` -- and stopped being sufficient the moment a
+    QQ could carry the source's words after it. `tagline: "QQ."` and
+    `tagline: "QQ - rewrite: ..."` both exist in `_food_drafts/` today and both
+    walked past that equality test. A word-boundary search over the whole file
+    is the shape that cannot be outgrown by a new convention, which is why
+    Helen's rule is about the two letters and not about a grammar.
+
+    IT ALSO ENFORCES THE TAGLINE RULE SHE ASKED FOR IN THE SAME BREATH -- *"a
+    drink without a tagline written by me gets a QQ, so I protect my voice in
+    the public content."* An unwritten tagline says QQ; a QQ cannot publish; so
+    the line on the live site is hers. One check, both rules, no second list of
+    which fields matter.
+
+    READS THE RAW TEXT, not the parsed front matter, so a QQ in a method step, a
+    note, a comment or the body is caught alongside one in a field.
     """
-    bad = [f"{slug}: {fm.get('tagline')!r}" for slug, fm in _load_published()
-           if str(fm.get("tagline", "")).strip() == PLACEHOLDER]
+    bad = []
+    for drink in _load_published_files():
+        for n, line in enumerate(drink.raw.splitlines(), 1):
+            if _QQ_ANYWHERE.search(line):
+                bad.append(f"{drink.slug}:{n}: {line.strip()[:90]}")
     assert not bad, (
-        "Promoted drink(s) still carrying the placeholder tagline:\n  "
+        f"{len(bad)} line(s) in `_cocktail_recipes/` still carry a `QQ`:\n  "
         + "\n  ".join(bad)
-        + "\n\n`QQ` means \"not written yet\" everywhere in this repo, and the "
-          "live site is the one place it must never appear. Write the line, or "
-          "move the drink back to `_cocktail_drafts/` until it has one."
+        + "\n\n`QQ` means \"Helen, look at this\" and the live site is the one "
+          "place it must never appear. Answer it, or move the drink back to "
+          "`_cocktail_drafts/` until it is answered. Never delete a QQ to make "
+          "this green -- a QQ that has been ANSWERED becomes a plain note "
+          "recording the answer; only a QQ that was wrong to ask gets deleted."
     )
 
 
@@ -1829,29 +1832,33 @@ def _declared_generics(vocab):
 
 
 def _ingredients():
-    """(drink, item, generic) for every ingredient entry, one row per generic.
+    """(drink, generic) for every ingredient entry, one row per generic.
 
     `generic` MAY BE A LIST, and that is deliberate rather than sloppy: two
     ingredients in the collection genuinely offer alternatives in one cell --
     "Demerara or dark Muscovado sugar" and "Grand Marnier / Cointreau / Triple
     Sec". Helen, 2026-08-17: "What I have there is fine. I can do what I want on
-    the spot." So the item text stays as she wrote it and the generic carries
-    both, which is what `glass` and `garnish` already do for the same reason.
+    the spot." So the generic carries both, which is what `glass` and `garnish`
+    already do for the same reason.
 
     Flattened here so every check below sees one generic at a time and none of
     them has to know about the list form. A list arriving somewhere that expects
     a string is exactly how the `glass` scalar bug would have gone unnoticed.
+
+    IT USED TO CARRY `item` AS ITS MIDDLE VALUE, dropped with the field on
+    2026-09-21. That is worth a line because one caller was reading it as a
+    GUARD rather than as a label -- see test_every_ingredient_has_a_generic_or_a_qq.
     """
     out = []
     for slug, fm in _load():
-        for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict):
+        for entry in (fm.get("ingredients") or []):
+            if not isinstance(entry, dict):
                 continue
-            name, generic = item.get("item") or "", item.get("generic")
+            generic = entry.get("generic")
             if isinstance(generic, list):
-                out += [(slug, name, g) for g in generic]
+                out += [(slug, g) for g in generic]
             else:
-                out.append((slug, name, generic))
+                out.append((slug, generic))
     return out
 
 
@@ -1902,8 +1909,8 @@ def test_every_generic_is_declared():
     )
     retired = set(_retired(vocab))
     bad = sorted({
-        f"{slug}: {item!r} -> {generic!r}"
-        for slug, item, generic in _ingredients()
+        f"{slug}: {generic!r}"
+        for slug, generic in _ingredients()
         if generic and not _is_qq(generic) and generic not in declared
         and generic not in retired
     })
@@ -1928,8 +1935,8 @@ def test_no_drink_uses_a_retired_generic():
         "retirements were reversed, delete this test deliberately."
     )
     bad = [
-        f"{slug}: {item!r} -> {generic!r} ({retired[generic]})"
-        for slug, item, generic in _ingredients()
+        f"{slug}: {generic!r} ({retired[generic]})"
+        for slug, generic in _ingredients()
         if generic in retired
     ]
     assert not bad, (
@@ -1937,61 +1944,6 @@ def test_no_drink_uses_a_retired_generic():
         + "\n\nRe-type against the vocabulary. Which rum a drink wants is "
           "Helen's own knowledge and is not recoverable from the spreadsheet -- "
           "use QQ, do not guess."
-    )
-
-
-def test_item_is_gone_once_the_generic_is_filled_in():
-    """`item` is a TRANSCRIPTION field with a death date, and this is the date.
-
-    INGEST_ONE_COCKTAIL.md §3 has always described the lifecycle: `item` holds
-    the source's own wording "so that Helen can see what the page said when she
-    comes to fill those two in. SHE DELETES IT AT THAT POINT, which is the same
-    moment she stops guessing about the bottle."
-
-    THE DELETION NEVER HAPPENED, because it was a manual step nobody performed
-    and nothing checked. By 2026-09-05 every one of the 683 pours had a real
-    generic -- not one `QQ` left -- so by the document's own rule the field
-    should have been empty, and it was on 215 of them. Helen: "we agreed to drop
-    item, but then I was persuaded to allow it back as somewhere to hold
-    incoming data, but it's become a dumping ground again."
-
-    SO THE RULE IS CONDITIONAL, NOT ABSOLUTE, and that is deliberate. A freshly
-    ingested drink SHOULD carry `item` on every pour with `generic: QQ` beside
-    it -- that is exactly what the ingest document asks for, and forbidding the
-    field outright would break the one job it does. What is forbidden is the
-    field OUTLIVING the answer it was holding a place for.
-
-    WHY A TEST RATHER THAN A FIRMER SENTENCE. The same conclusion this repo
-    already reached about `meta.awaiting_fix` and `meta.proofread`, and about
-    the destructive-git guards: a rule that gets read and then not followed
-    needs enforcement, not rewording. Three passes emptied the field on
-    2026-09-05 and this is what stops it filling for a third time.
-
-    WHAT TO DO WHEN THIS FAILS. Do not delete the `item` to make it green. Ask
-    what it knows that the fields beside it do not:
-      - a bottle           -> `suggestion` (34 pours were this, and the card
-                              could not show any of them, because `item` does
-                              not render)
-      - a bottle this repo does not know yet -> add it to bottles.yml FIRST,
-                              then move it (23 pours were this)
-      - a flavour property -> `character`
-      - a ratio            -> the precise generic (`honey water 2:1`)
-      - guidance on what to pour -> `note`
-    Only when the answer is "nothing the generic does not already say" is
-    deleting it correct.
-    """
-    bad = sorted(
-        f"{slug}: item {item!r} beside generic {generic!r}"
-        for slug, item, generic in _ingredients()
-        if item and generic and not _is_qq(generic)
-    )
-    assert not bad, (
-        f"{len(bad)} pour(s) keep an `item` after the generic was settled:\n  "
-        + "\n  ".join(bad)
-        + "\n\n`item` does not render, so anything it alone knows is invisible "
-          "on the page and invisible to ABV and costing. Move what it holds to "
-          "the field that owns it -- see this test's docstring for the five "
-          "cases -- and delete it only when it says nothing new."
     )
 
 
@@ -2378,9 +2330,17 @@ def test_every_ingredient_has_a_generic_or_a_qq():
     it matched no pattern, so it got no generic AND no QQ -- invisible to both
     the declared-value check and the retirement check. An absent key reads as
     "nothing to see"; a QQ reads as "not done yet". Only one of those is true.
+
+    IT WAS GATED ON `item` UNTIL 2026-09-21 -- `if item and not generic` -- so
+    that it only spoke about entries that had the source's words to show you.
+    When `item` was retired the gate would have been false on every entry in the
+    collection and this check would have passed over an empty set forever, which
+    is the "green because it examined nothing" shape #540 is about. The gate is
+    gone rather than rewritten: an entry with no generic is wrong whether or not
+    anything else on it can be quoted back.
     """
-    missing = sorted({f"{slug}: {item!r}" for slug, item, generic
-                      in _ingredients() if item and not generic})
+    missing = sorted({f"{slug}: entry with no `generic` key"
+                      for slug, generic in _ingredients() if not generic})
     assert not missing, (
         f"{len(missing)} ingredient(s) carry no `generic` key at all:\n  "
         + "\n  ".join(missing[:15])
@@ -4024,38 +3984,39 @@ def test_no_drink_uses_a_generic_that_is_helens_to_apply():
 
 
 def test_every_ingredient_entry_has_something_the_line_renders():
-    """An entry with none of `amount`/`generic`/`item` prints as a raw Hash.
+    """An entry with neither `amount` nor `generic` prints as a raw Hash.
 
     `_layouts/cocktail.html` renders the structured ingredient line when the
-    entry carries one of those three and otherwise falls through to a
-    bare-string branch, where Liquid stringifies a dict. Tried on Aperol
-    Spritz: the page printed `{"amount"=>"90 ml", "generic"=>"prosecco"}` with
-    a clean build and nothing in the log.
+    entry carries one of those and otherwise falls through to a bare-string
+    branch, where Liquid stringifies a dict. Tried on Aperol Spritz: the page
+    printed `{"amount"=>"90 ml", "generic"=>"prosecco"}` with a clean build and
+    nothing in the log.
 
-    THE GATE USED TO NAME `item` ALONE, which #544 move 1 stopped rendering, so
-    this was primed to fire on move 2's first and safest step -- dropping
-    `item` from the ~283 entries whose every word already appears in the
-    generic beside them. Fixed there; this is the data half.
+    THE GATE NAMED `item` TWICE OVER AND NOW NAMES IT NEITHER TIME. It was
+    `item` alone until #544 move 1 stopped rendering that field, which primed
+    this to fire on move 2; it then named all three until the field was retired
+    on 2026-09-21. The gate must ask for what the branch RENDERS, and there are
+    two of those.
 
-    There are no bare-string ingredients today (619 of 619 are dicts), and that
-    branch is for a genuinely unstructured one. A dict arriving there is not
-    that shape, it is this one with a key missing, which is why it must never
-    be reachable by omission.
+    There are no bare-string ingredients today, and that branch is for a
+    genuinely unstructured one. A dict arriving there is not that shape, it is
+    this one with a key missing, which is why it must never be reachable by
+    omission.
     """
     checked = 0
     bad = []
     for slug, fm in _load():
-        for item in (fm.get("ingredients") or []):
-            if not isinstance(item, dict):
+        for entry in (fm.get("ingredients") or []):
+            if not isinstance(entry, dict):
                 continue
             checked += 1
-            if not (item.get("amount") or item.get("generic") or item.get("item")):
-                bad.append(f"{slug}: {item!r}")
+            if not (entry.get("amount") or entry.get("generic")):
+                bad.append(f"{slug}: {entry!r}")
     assert not bad, (
         "Ingredient entries with nothing the line can render:\n  "
         + "\n  ".join(bad)
-        + "\n\nEach needs an `amount`, a `generic` or an `item`. Without one "
-          "the drink page prints the YAML dict itself, on a green build."
+        + "\n\nEach needs an `amount` or a `generic`. Without one the drink "
+          "page prints the YAML dict itself, on a green build."
     )
     assert checked, "No ingredient entries were scanned, so this compared nothing."
 
@@ -4091,7 +4052,7 @@ def test_no_drink_writes_plantation():
         for item in (fm.get("ingredients") or []):
             if not isinstance(item, dict):
                 continue
-            for key in ("item", "generic", "suggestion", "note"):
+            for key in ("generic", "suggestion", "note"):
                 value = item.get(key)
                 haystack += [(key, v) for v in
                              (value if isinstance(value, list) else [value])]
@@ -4428,7 +4389,7 @@ def test_no_ingredient_says_optional_in_prose():
         for item in (fm.get("ingredients") or []):
             if not isinstance(item, dict):
                 continue
-            for key in ("item", "generic", "suggestion"):
+            for key in ("generic", "suggestion"):
                 value = item.get(key)
                 for text in (value if isinstance(value, list) else [value]):
                     if not isinstance(text, str):
@@ -4440,13 +4401,13 @@ def test_no_ingredient_says_optional_in_prose():
         "An ingredient says it is optional in prose rather than in the "
         "field:\n  " + "\n  ".join(bad)
         + "\n\nWrite `optional: true` on the entry and take the word out of "
-          "the text. A word inside `item`/`generic`/`suggestion` becomes part "
+          "the text. A word inside `generic`/`suggestion` becomes part "
           "of the ingredient's name -- it reaches the card, the search pool "
           "and the recipe line as though it were the category."
     )
     assert checked, (
         "No ingredient text was scanned at all, so this check compared "
-        "nothing. It reads `item`, `generic` and `suggestion` across every "
+        "nothing. It reads `generic` and `suggestion` across every "
         "drink; an empty scan means the loader or the key names have moved."
     )
 
@@ -6564,17 +6525,15 @@ def test_the_citrus_that_sorts_first_is_juice_that_exists():
 # `QQ` lines are blanked for every collection by `conftest.checkable_text`:
 # they are the SOURCE's wording awaiting a rewrite, and correcting a dash there
 # tidies text that is about to be deleted, by editing someone else's words
-# (MANUAL §5, issue #426). These four keys are the drink-shaped rest of that
+# (MANUAL §5, issue #426). These three keys are the drink-shaped rest of that
 # same sentence:
 #
-#   `item`        -- "the source's own wording, held so that Helen can see what
-#                    the page said" (INGEST_ONE_COCKTAIL §3). It renders
-#                    NOWHERE -- `_layouts/cocktail.html` reads it only as a
-#                    fallback for an entry with no `generic`, and no such entry
-#                    exists -- it is refused on a promoted drink
-#                    (INGREDIENT_KEYS_RECIPES above), and #544 is retiring it.
-#                    A transcription that is never read is the last thing to
-#                    restyle.
+#   `item` WAS THE FOURTH AND IS GONE (2026-09-21). It held the source's own
+#   wording for a pour; that wording now lives in `generic` behind a `QQ `,
+#   where `conftest.checkable_text` already blanks it for being a QQ line. So
+#   the exclusion this list used to grant it is granted by the predicate
+#   instead, which is one mechanism rather than two.
+#
 #   `suggestion`  -- a bottle, and §7's own rule is "reproduce a bottle or brand
 #                    exactly as it spells itself, accents and all". A rule that
 #                    accented `Briottet Creme d'Abricot` would be correcting the
@@ -6584,13 +6543,7 @@ def test_the_citrus_that_sorts_first_is_juice_that_exists():
 #                    reason ("Cafe Delites" is a real name), and
 #                    scripts/tidy_drafts.py never touches it either.
 #
-# WHAT THIS COSTS, said plainly: six of the seven hyphenated number ranges in
-# the collection sit in an `item`, so this exclusion is the difference between
-# one failing drink and seven. It is written as a rule about whose words they
-# are, not as a way to be green -- and the six went to Helen in the #670
-# hand-back list either way, because reversing this is one line and hers to ask
-# for.
-VERBATIM_KEYS = ("item", "suggestion", "source", "source_url")
+VERBATIM_KEYS = ("suggestion", "source", "source_url")
 _VERBATIM_LINE = re.compile(
     rf"^(?:-\s*)?(?:{'|'.join(VERBATIM_KEYS)}):(?P<value>.*)$"
 )

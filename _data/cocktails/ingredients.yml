@@ -1836,7 +1836,7 @@ family_of:
 # FRESH PRODUCE EARNED ITS OWN SHELF ON THE FIRST READING -- Helen, 2026-09-08:
 # "Fresh produce should get its own shelf, I agree." It was the soft edge of the
 # first cut, where a pear, a cucumber and a sprig of mint sat under
-# `flavourings` with the oil and the salt, and `flavourings` was carrying 24
+# `larder` with the oil and the salt, and that shelf was carrying 24
 # rows against every other shelf's handful.
 #
 # IT SITS BEFORE THE SQUEEZED JUICES, because the citrus you squeeze IS produce
@@ -1853,33 +1853,45 @@ shopping_shelves:
   - fresh produce
   - freshly squeezed fruit juice
   - bottled fruit juice
-  - flavourings
+  - larder
   - sugar syrup
   - bitters
   - tops
 
 shelf_of:
-  # spirits (39)
+  # spirits (52)
   Batavia arrack: spirits
+  Irish whiskey: spirits
+  Japanese whisky: spirits
   London dry gin: spirits
+  New Western dry: spirits
   Old Tom: spirits
   Plymouth: spirits
   absinthe: spirits
   aged Demerara rum: spirits
+  aguardiente: spirits
   apple brandy: spirits
   aquavit: spirits
+  armagnac: spirits
   añejo tequila: spirits
   blanco tequila: spirits
   blended overproof rum: spirits
+  blended scotch whisky: spirits
+  bonded rye: spirits
   bourbon: spirits
   cachaça: spirits
   calvados: spirits
+  caramel-forward Jamaican rum: spirits
   clairin: spirits
   clear blended multi-region rum: spirits
   coconut rum: spirits
   coconut-flower arrack: spirits
   cognac: spirits
   eau de vie: spirits
+  genever: spirits
+  gin liqueur: spirits
+  grappa: spirits
+  kirschwasser: spirits
   lightly aged and filtered rum: spirits
   mezcal: spirits
   moderately aged Jamaican rum: spirits
@@ -1887,6 +1899,7 @@ shelf_of:
   navy strength gin: spirits
   overproof Demerara rum, lightly aged: spirits
   overproof Jamaican rum, unaged: spirits
+  peach brandy: spirits
   pineapple rum: spirits
   pineapple vodka: spirits
   pisco: spirits
@@ -1899,9 +1912,11 @@ shelf_of:
   speciality: spirits
   vanilla vodka: spirits
   vodka: spirits
-  # fortified (8)
+  # fortified (11)
+  americano: fortified
   amontillado sherry: fortified
   blanc vermouth: fortified
+  cider: fortified
   dry vermouth: fortified
   oloroso sherry: fortified
   quinquina: fortified
@@ -1962,34 +1977,37 @@ shelf_of:
   apple juice: bottled fruit juice
   cranberry juice: bottled fruit juice
   pineapple juice: bottled fruit juice
-  # flavourings (24)
+  # fresh produce and larder (29)
   basil: fresh produce
-  black tea: flavourings
+  black tea: larder
   blackberries: fresh produce
-  cider vinegar: flavourings
-  coconut cream: flavourings
+  cider vinegar: larder
+  coconut cream: larder
+  cream: larder
   cucumber: fresh produce
-  dried apricots: flavourings
-  egg white: flavourings
-  espresso: flavourings
-  fruit purée: flavourings
-  ginger and lemongrass cordial: flavourings
+  dried apricots: larder
+  egg white: larder
+  espresso: larder
+  fruit purée: larder
+  ginger and lemongrass cordial: larder
   kaffir lime leaves: fresh produce
   lemon zest: fresh produce
   lime: fresh produce
-  lime cordial: flavourings
+  lime cordial: larder
   maraschino cherry: fresh produce
+  milk: larder
   mint: fresh produce
-  olive oil: flavourings
+  olive oil: larder
   orange slice: fresh produce
   passion fruit: fresh produce
   pear: fresh produce
   pineapple: fresh produce
   raspberries: fresh produce
   rosemary: fresh produce
-  salt: flavourings
-  water: flavourings
-  # sugar syrup (20)
+  salt: larder
+  water: larder
+  whole egg: larder
+  # sugar syrup (22)
   agave syrup: sugar syrup
   "cane sugar syrup 1:1": sugar syrup
   "cane sugar syrup 2:1": sugar syrup
@@ -2000,8 +2018,10 @@ shelf_of:
   golden caster sugar: sugar syrup
   grenadine: sugar syrup
   honey: sugar syrup
+  honey water: sugar syrup
   "honey water 1:1": sugar syrup
   "honey water 2:1": sugar syrup
+  molasses sugar: sugar syrup
   orgeat: sugar syrup
   palm sugar: sugar syrup
   passion fruit syrup: sugar syrup

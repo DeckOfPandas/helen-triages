@@ -492,7 +492,21 @@ def _drink_problems(fm: dict) -> list[str]:
             problems.append(f"US unit in the example: {amount!r}")
         if re.fullmatch(r"[\d.]+", amount.strip()):
             problems.append(f"bare number with no unit: {amount!r}")
-        if item.get("generic") != "QQ":
+        # A QQ, BARE OR CARRYING THE SOURCE'S WORDS -- `QQ` or `QQ <words>`.
+        #
+        # IT USED TO DEMAND EXACTLY `QQ`, and retiring `item` on 2026-09-21 is
+        # what ended that. The rule these documents teach is unchanged and is
+        # the whole reason they exist: a repo-less session cannot see
+        # `ingredients.yml`, so it must never TYPE a category. But `item` was
+        # where the source's own words went while the category was unknown, and
+        # with the field gone there is exactly one place left for them --
+        # `generic`, behind a `QQ `, which is also the only field the page
+        # renders. Demanding a bare `QQ` here would now mean demanding that the
+        # transcription be thrown away.
+        #
+        # WHAT IS STILL REFUSED IS A GUESS: a `generic` that is not a QQ at all.
+        generic = str(item.get("generic") or "").strip()
+        if not (generic == "QQ" or generic.startswith("QQ ")):
             problems.append(f"a block guessed a generic: {item.get('generic')!r}")
 
     return [f"{fm.get('title', '?')}: {p}" for p in problems]

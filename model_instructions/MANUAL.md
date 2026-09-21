@@ -1765,7 +1765,7 @@ YOU SAY OTHERWISE**, and this is the trap that has now been sprung five times.
 that is not a vocabulary silently mints its members. `families`,
 `not_on_cards`, `rum_groups`, `ingredient_as`, `bottle_origins` and
 `shopping_shelves` are all in `NOT_GENERIC_LISTS` — and `shopping_shelves` was
-found WRONG on 2026-09-10, ten aisle names (`spirits`, `tops`, `flavourings`…)
+found WRONG on 2026-09-10, ten aisle names (`spirits`, `tops`, `larder`…)
 that had been valid generics since the shelves were declared, with nothing red
 anywhere. **Nothing detects this**: a missing registration is invisible unless
 somebody lists every top-level key and asks what each one is. Do that when you

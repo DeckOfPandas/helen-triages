@@ -770,7 +770,7 @@ aliases:
   pork or turkey mince: [pork, turkey mince]
   rice or cider vinegar: [rice, cider vinegar]
   rock sugar or caster sugar: [rock sugar, caster sugar]
-  shallots or onions: [shallots, onions]
+  shallots or onions: [shallots, onion]
   soy sauce or tamari: [soy sauce, tamari]
   sugar or honey: [sugar, honey]
   sunflower oil or butter: [sunflower oil, butter]
@@ -868,12 +868,24 @@ aliases:
   # The sugars are deliberately NOT here. "dark brown muscovado" and "light
   # brown soft" read like prep to a word counter but are distinct products a
   # baker chooses between, so they keep their own entries.
+  #
+  # AN ALIAS RESOLVES ONE HOP, SO POINT IT AT THE FINAL ANSWER -- 2026-09-21.
+  # `applyAlias` in assets/js/ingredient-search.js returns `aliasMap[key]`
+  # without re-resolving, and three entries here pointed at another alias KEY:
+  # `spring onions in thin strips` -> `spring onions` -> `spring onion`, the
+  # same for `thick-cut beef short ribs` and for `onions` inside `shallots or
+  # onions`. The first hop landed on the plural and stopped, so the index grew
+  # a SECOND button for an ingredient the singulars block below exists to
+  # collapse -- `citrus-soy-salmon-sticky-rice` did it to itself, its `item:`
+  # giving `spring onions` and its `main_ingredients` giving `spring onion`.
+  # Measured against the real matcher, not inferred. Never alias to a key that
+  # is itself aliased; write the target the chain ends at.
   extra virgin olive oil: olive oil
   freshly ground black peppercorns: black peppercorns
   freshly ground szechuan peppercorns: szechuan peppercorns
   skin-on boneless pork belly: pork belly
-  spring onions in thin strips: spring onions
-  thick-cut beef short ribs: beef short ribs
+  spring onions in thin strips: spring onion
+  thick-cut beef short ribs: beef short rib
   unsalted butter straight from the fridge: unsalted butter
   bart bouquet garni bags: bouquet garni
 

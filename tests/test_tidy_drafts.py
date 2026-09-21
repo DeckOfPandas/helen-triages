@@ -62,6 +62,14 @@ SCRIPT = ROOT / "scripts" / "tidy_drafts.py"
 # Everything else in the file is a fault of the same MECHANICAL SHAPE sitting
 # somewhere the pass does not go, and each is here because leaving it out would
 # make the byte-for-byte assertion below prove less than it looks like it does.
+#
+# THE FIRST POUR USED TO CARRY AN `item:`, and it was the off-limits case for
+# "somebody else's words on an ingredient". The field was retired on 2026-09-21,
+# and its content moved to where the page can actually show it -- `generic`,
+# behind a `QQ `. The fixture followed, which makes it a better case than it
+# was: `item` was excluded by being named in a key list, while this line is
+# excluded twice over, by `generic` being a closed vocabulary AND by the QQ
+# predicate. Both mechanisms have to fail for the `--` in it to be "corrected".
 BEFORE = '''---
 title: "Test Drink"
 tagline: Sharp -- and bright, 2-3 dashes of it
@@ -71,8 +79,7 @@ garnish:
   - "lemon twist"
 ingredients:
   - amount: "30-45 ml"
-    item: "Somebody Else's Rum -- as printed on the label"
-    generic: "aged rum"
+    generic: "QQ Somebody Else's Rum -- as printed on the label"
   - amount: "10 ml"
     generic: "cane sugar syrup 2:1"
     note: "A 2-3 ml difference is not worth measuring -- use the 10."
@@ -114,8 +121,7 @@ garnish:
   - "lemon twist"
 ingredients:
   - amount: "30-45 ml"
-    item: "Somebody Else's Rum -- as printed on the label"
-    generic: "aged rum"
+    generic: "QQ Somebody Else's Rum -- as printed on the label"
   - amount: "10 ml"
     generic: "cane sugar syrup 2:1"
     note: "A 2–3 ml difference is not worth measuring — use the 10."
@@ -221,7 +227,7 @@ def test_apply_fixes_exactly_those_and_touches_nothing_else(drinks):
 @pytest.mark.parametrize("line", [
     'text: "QQ - the source said 2-3 dashes -- reproduce, do not correct"',
     'amount: "30-45 ml"',
-    'item: "Somebody Else\'s Rum -- as printed on the label"',
+    'generic: "QQ Somebody Else\'s Rum -- as printed on the label"',
     '- "Peychaud\'s -- if you have it"',
 ])
 def test_the_lines_the_pass_must_not_touch_survive_apply(drinks, line):

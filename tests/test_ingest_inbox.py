@@ -133,7 +133,7 @@ def test_the_cocktail_fixture_obeys_the_drink_schema():
     a second, private copy of the schema is a fixture that can be valid here and
     rejected by `pytest -m cocktails` the moment it lands in `_cocktail_drafts/`.
     """
-    from test_cocktails import (INGREDIENT_KEYS_DRAFTS, META_KEYS_IN_ORDER,
+    from test_cocktails import (INGREDIENT_KEYS, META_KEYS_IN_ORDER,
                                 REQUIRED_TOP_LEVEL, TOP_LEVEL_KEYS)
     from test_standalone_docs import _drink_problems
 
@@ -144,9 +144,8 @@ def test_the_cocktail_fixture_obeys_the_drink_schema():
     assert REQUIRED_TOP_LEVEL <= set(fm), f"missing: {REQUIRED_TOP_LEVEL - set(fm)}"
     assert list(fm["meta"]) == META_KEYS_IN_ORDER
     for item in fm["ingredients"]:
-        assert set(item) <= INGREDIENT_KEYS_DRAFTS, (
-            f"ingredient key(s) forbidden even on a draft: "
-            f"{set(item) - INGREDIENT_KEYS_DRAFTS}"
+        assert set(item) <= INGREDIENT_KEYS, (
+            f"undeclared ingredient key(s): {set(item) - INGREDIENT_KEYS}"
         )
 
 

@@ -10,20 +10,20 @@ garnish:
   - "pineapple wedge"
 ingredients:
   - amount: "45 ml"
-    item: "blackstrap rum"
-    generic: "QQ"
+    generic: "QQ blackstrap rum"
+    suggestion: []
   - amount: "22.5 ml"
-    item: "Campari"
-    generic: "QQ"
+    generic: "QQ Campari"
+    suggestion: []
   - amount: "15 ml"
-    item: "lime juice"
-    generic: "QQ"
+    generic: "QQ lime juice"
+    suggestion: []
   - amount: "15 ml"
-    item: "simple syrup"
-    generic: "QQ"
+    generic: "QQ simple syrup"
+    suggestion: []
   - amount: "45 ml"
-    item: "pineapple juice"
-    generic: "QQ"
+    generic: "QQ pineapple juice"
+    suggestion: []
 method:
   - "Shake all ingredients with ice."
   - "Strain over crushed ice."
@@ -45,7 +45,7 @@ meta:
 
 ## What I could not know
 
-- **No `generic` on any pour, per the standing rule.**
+- **No `generic` typed on any pour, per the standing rule** -- each carries `QQ` and then the source's own words, so you can see what the page said.
 - **`mood: []` needs deriving** -- run `python3 scripts/derive_cocktail_moods.py --write`.
 - **No source recorded** -- tell me the book and I will write the citation.
 - **Jungle Bird is a well-known drink and may already be in your collection in a different form.** Compare the formula, not the name.
