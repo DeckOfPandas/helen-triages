@@ -260,19 +260,19 @@ $emboss-vars-emitted: false !default;
 
     --lettering-label-stroke-c:   #{$lettering-label-stroke-c};
 
-    // --emboss-stroke-c/-light/-shadow ARE THE PRE-TIER NAMES, 2026-09-02.
-    // They stay, as aliases of the heading set, so nothing that still reads
-    // them directly changes underneath it -- "nothing un-migrated changes".
-    // That is fewer things than it sounds: every food and shared consumer
-    // that used to read them is migrated onto @include lettering() in this
-    // same commit (see food/_rule.scss and the files it lists), and the one
-    // caller left is punched() itself, which cocktails/_cocktail.scss still
-    // calls directly for the drink page (briefed and edited separately --
-    // not touched here). Delete these three lines, and punched()'s doc
-    // comment below, once that file also names a tier.
-    --emboss-stroke-c: var(--lettering-heading-stroke-c);
-    --emboss-light:    var(--lettering-heading-light);
-    --emboss-shadow:   var(--lettering-heading-shadow);
+    // --emboss-stroke-c/-light/-shadow STOOD HERE AS ALIASES OF THE HEADING
+    // SET AND ARE GONE -- #778, 2026-09-21. They existed so that nothing still
+    // reading the pre-tier names changed underneath the 2026-09-02 migration;
+    // LETTERING §10 said to delete them once nothing read them, and nothing
+    // does. The last two readers went in the same commit: `punched()` below
+    // (which had no callers left) and `.drink-card-tape-word`, repointed at
+    // --lettering-heading-stroke-c, which on cocktails was already the same
+    // value by construction (cocktails/_rule.scss set both in one block).
+    //
+    // --emboss-stroke-w AND --emboss-offset ARE NOT AFFECTED AND ARE NOT
+    // ALIASES. They are tier-INDEPENDENT numbers -- one stroke width and one
+    // offset for the whole site -- and `lettering()` itself reads both. Only
+    // the three COLOURS were duplicated per tier, and only those three went.
   }
 
   // `.on-dark` LIVED HERE AND IS GONE, 2026-09-02, issue #469 -- and it is
@@ -309,48 +309,52 @@ $emboss-vars-emitted: false !default;
   $emboss-vars-emitted: true !global;
 }
 
-@mixin punched($style: raised, $offset: var(--emboss-offset)) {
-  $neg: calc(#{$offset} * -1);
-  @if $style == raised {
-    text-shadow: #{$neg} #{$neg} 0 var(--emboss-light),
-                 #{$offset} #{$offset} 0 var(--emboss-shadow);
-  } @else {
-    text-shadow: #{$offset} #{$offset} 0 var(--emboss-light),
-                 #{$neg} #{$neg} 0 var(--emboss-shadow);
-  }
-}
+// `@mixin punched($style, $offset)` STOOD HERE AND IS GONE -- #778, 2026-09-21.
+// It drew the two-copy raised (or pressed) shadow from --emboss-light and
+// --emboss-shadow, and it was the reason those two aliases had to survive the
+// 2026-09-02 tier migration. By the time #778 was worked it had no callers at
+// all: `grep -rn "@include punched"` across _sass/ and assets/ returned five
+// hits and every one was prose in a comment. `lettering()` below draws the same
+// two copies per tier and deliberately does NOT call this (its own header says
+// why -- the aliases inherit, so a locally rebound pair would leak into every
+// descendant rather than into the mixin's own output).
+//
+// Recover it with `git show` on this file if a `pressed` treatment is ever
+// wanted again; the tiers have no equivalent, because nothing ever asked for
+// one. Its doc comment below became `lettering()`'s.
 
 // =============================================================================
 // @mixin lettering($tier, $offset) -- THE FOUR TIERS, AS ONE CALL
 // =============================================================================
 // Says WHAT a punched element IS -- display, heading, label or plain -- and
-// resolves that to a stroke and a shadow, rather than asking every call site
-// to write `-webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
-// @include punched(raised);` by hand and get the pairing right every time.
+// resolves that to a stroke and a shadow, rather than asking every call site to
+// pair a stroke colour with a shadow by hand and get it right every time. Until
+// #778 that pairing was written out as `-webkit-text-stroke: var(--emboss-
+// stroke-w) var(--emboss-stroke-c); @include punched(raised);`; both halves of
+// it are gone now, and this mixin is the only way to draw a punched element.
 // See the long comment above $lettering-display-stroke-c for the physics this
 // is built on (the highlight-darker-than-paper, shadow-lighter-than-letter
 // finding, 2026-09-02) and LETTERING.md for the full reference -- the table of
 // values per site, the consumer inventory, the traps.
 //
-// DOES NOT CALL punched(), on purpose, even though `display` and `heading` are
-// both a stroke plus a two-copy raised shadow -- exactly what punched() draws.
-// punched() reads --emboss-light/--emboss-shadow, which are shared, inherited
-// custom properties; routing a tier through it would mean locally
-// REDECLARING those two properties on every display/heading element so
-// punched() picks up the right pair, and a locally redeclared custom property
-// inherits into every descendant of that element, not just into punched()'s
-// own text-shadow line. That is a real behaviour change for anything nested
-// inside a heading that also happens to read --emboss-light or --emboss-shadow
-// (nothing does today, but the two are shared, general-purpose names, and
-// someone migrating a component AFTER this one would have no reason to expect
-// a heading was silently rebinding them underneath it). Duplicating punched()'s
-// two-line raised-shadow arithmetic here, reading the tier's OWN four
-// properties directly, costs four lines and avoids that trap outright.
+// IT NEVER CALLED punched(), on purpose, and the argument is worth keeping now
+// that punched() itself is gone (#778) -- it is why the tiers are shaped like
+// this. `display` and `heading` are both a stroke plus a two-copy raised
+// shadow, exactly what punched() drew, so routing a tier through it looked
+// obvious. It read --emboss-light/--emboss-shadow, which were shared,
+// INHERITED custom properties; a tier would have had to locally REDECLARE
+// those two on every display/heading element to make it pick up the right
+// pair, and a locally redeclared custom property inherits into every
+// descendant of that element, not just into the one text-shadow line meant to
+// read it. A heading would have been silently rebinding two general-purpose
+// names for everything inside it. Duplicating the two-line raised-shadow
+// arithmetic here, reading the tier's OWN properties directly, costs four
+// lines and the trap never existed.
 //
 // EVERY TIERED CONSUMER IS `raised` -- nothing on the site uses `pressed`
-// through a tier, so the mixin does not take a $style argument. punched()
-// keeps it, for cocktails/_cocktail.scss and any future direct caller that
-// genuinely wants the inverted read.
+// through a tier, so the mixin does not take a $style argument. punched() kept
+// one for a future direct caller that wanted the inverted read; none ever
+// appeared, which is part of why it could go.
 //
 // $offset DEFAULTS TO var(--emboss-offset) (1px) FOR EVERY TIER, since the
 // wordmark's old 2px is gone (see shared/_layout.scss's .site-logo-top). Two
