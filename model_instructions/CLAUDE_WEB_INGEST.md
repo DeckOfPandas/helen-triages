@@ -79,13 +79,18 @@ a deploy.
 
 ### What to expect, and what not to
 
-- **Every `generic` and `suggestion` on a drink will be `QQ`**, every
-  `mood: []`, every `ship: "who knows"`. That is the standing ruling, not the
-  web session being lazy: a category is not derivable from a bottle name, and
-  moods are derived by a script it does not have.
+- **A drink's `generic` is typed only where the printed vocabulary settles it
+  outright, and is `QQ` plus the source's own words everywhere else** —
+  `generic: "QQ aged Jamaican rum"`. Since 2026-09-21 `INGEST_ONE_COCKTAIL.md`
+  §3a prints all 181 declared generics, so an EXACT match is a lookup that
+  session can do; a bottle, a brand or a near-miss is still a judgement it
+  cannot. **Every `suggestion` will be `[]`** — it does not have the bottle
+  dictionary — with the bottle the source names in that pour's `note:`. Every
+  `mood: []`, every `ship: "who knows"`: moods are derived by a script it does
+  not have, and a rating means she drank it.
 - **Every food method step arrives as a pair** (`QQ original` verbatim, then
-  `QQ Claude`), every tagline as `QQ` unless the source had a line worth
-  adapting, every time and temperature only if printed.
+  `QQ Claude`), **every tagline prefixed `QQ `** whether or not the source gave
+  it words, every time and temperature only if printed.
 - **It will not deduplicate against your collection.** It cannot see it. The
   local consumer compares a fingerprint of the amounts against every existing
   draft, which is how a second Sazerac is told apart from a duplicate.
@@ -155,8 +160,11 @@ NEVER INVENT. The files say this in every section and it bears repeating once:
 a silence in the source is written as QQ, never filled from general knowledge.
 A wrong "whole milk" or a wrong glass looks exactly as confident as a right
 one, and Helen would far rather answer a question than find an invention. On a
-drink, every generic and every suggestion is "QQ", mood is [], ship is
-"who knows", made_before is false — always, by her standing ruling.
+drink, a generic is typed only on an EXACT match in the printed vocabulary and
+is otherwise "QQ" plus the source's own words; every suggestion is []; mood is
+[], ship is "who knows", made_before is false — always, by her standing ruling.
+Every tagline begins "QQ ", on either site: it is her voice on a published page
+and it is never the ingest's.
 
 IF HELEN ASKS FOR A FILE INSTEAD OF AN ENVELOPE, the yaml block inside the
 envelope is the file: give exactly that content under the filename the file's

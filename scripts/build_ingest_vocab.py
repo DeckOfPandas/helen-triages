@@ -282,6 +282,49 @@ def _measures() -> str:
     return _dots(measures.get("non_volumetric") or [], tick=True)
 
 
+def _generics() -> str:
+    """Every declared generic, grouped by the list that declares it.
+
+    THE BLOCK THIS FILE EXISTED FOR AND NEVER RENDERED -- added 2026-09-21,
+    after a data-model review asked why the one vocabulary the cocktail document
+    tells a session to `QQ` on every single line was the one vocabulary it did
+    not print. It already printed six: measures, glasses, glass corrections,
+    garnishes, methods, accents. `.claude/commands/ingest.md` said the repo-less
+    Project "cannot see the vocabulary", and that was a choice rather than a
+    constraint, because THIS IS THE MECHANISM FOR MAKING IT SEE ONE.
+
+    It costs about 3,200 characters, which is 8% of the cocktail document and
+    less than its method and garnish blocks together.
+
+    DERIVED FROM THE FILE'S OWN SHAPE, exactly as `_declared_generics` in
+    tests/test_cocktails.py does it, and the two exclusions are that function's:
+    a `<family>_characters` list is a vocabulary of characters, not generics,
+    and `NOT_GENERIC_LISTS` names the lists that REFER to the vocabulary rather
+    than declaring any of it. Importing the test module's own constants rather
+    than restating them is the rule this whole script is built on -- a generator
+    carrying its own copy would write a stale document that then passes the
+    drift check, because the check would compare the copy against itself.
+
+    `hers_to_apply` IS EXCLUDED AND IS THE ONE JUDGEMENT HERE. It is a mapping,
+    so `_declared_generics` already skips it, and that is correct twice over:
+    a style Helen has reserved for herself must not be offered to a session that
+    cannot know she has reserved it (`test_no_drink_uses_a_generic_that_is_
+    helens_to_apply`), and a document that printed one would be teaching a value
+    the suite refuses.
+    """
+    from test_cocktails import NOT_GENERIC_LISTS, _is_character_list
+
+    vocab = _vocab()
+    groups = {
+        key: value for key, value in vocab.items()
+        if isinstance(value, list) and value
+        and key not in NOT_GENERIC_LISTS
+        and not _is_character_list(key)
+        and not key.startswith("retired_")
+    }
+    return _grouped(groups, tick=True)
+
+
 def renderers() -> dict:
     """Block name -> the function that renders it.
 
@@ -301,6 +344,7 @@ def renderers() -> dict:
         "garnish": _garnishes,
         "method": _method_steps,
         "measures": _measures,
+        "generics": _generics,
     }
     for group in _food_taxonomy()["tags"]:
         out[f"tags:{group}"] = (lambda g: lambda: _tags(g))(group)
@@ -321,7 +365,7 @@ def required_blocks() -> dict:
         FOOD_DOC: tags | {"stars", "source_types", "accents", "no_accent"},
         COCKTAIL_DOC: {
             "glass", "glass_corrections", "garnish", "method", "measures",
-            "accents",
+            "accents", "generics",
         },
     }
 

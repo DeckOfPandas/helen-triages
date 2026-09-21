@@ -150,6 +150,19 @@ def _declared_garnishes() -> set[str]:
     return out
 
 
+def _declared_generics() -> set[str]:
+    """Every generic `ingredients.yml` declares, through the suite's own loader.
+
+    IMPORTED, NOT RESTATED. `test_cocktails._declared_generics` derives the set
+    from the file's own shape and knows the two exclusions -- `NOT_GENERIC_LISTS`
+    and the `<family>_characters` suffix. A second copy here would drift from it
+    silently, and this module's whole subject is two copies of one vocabulary
+    drifting apart.
+    """
+    from test_cocktails import _declared_generics as declared, _vocab
+    return declared(_vocab())
+
+
 def _canonical_steps() -> set[str]:
     """Every literal under `canonical:` AND every `shapes:` sentence, since
     2026-09-10 -- the document prints both, `<X>` and all."""
@@ -492,7 +505,30 @@ def _drink_problems(fm: dict) -> list[str]:
             problems.append(f"US unit in the example: {amount!r}")
         if re.fullmatch(r"[\d.]+", amount.strip()):
             problems.append(f"bare number with no unit: {amount!r}")
-        if item.get("generic") != "QQ":
+        # A QQ, OR A GENERIC THE DOCUMENT ITSELF PRINTS. Anything else is a
+        # guess, and that is the whole rule these documents exist to enforce.
+        #
+        # IT USED TO DEMAND EXACTLY `QQ`, ON THE GROUNDS THAT A REPO-LESS
+        # SESSION CANNOT SEE THE VOCABULARY. That was true until 2026-09-21 and
+        # then stopped being: `vocab:generics` prints all 181 declared generics
+        # into the cocktail document, so an exact match is now a LOOKUP a reader
+        # of that document can do, and the document teaches them to do it. The
+        # old check would have failed the document for following its own
+        # instructions.
+        #
+        # TWO THINGS CHANGED IT, AND BOTH ARE HERE. Retiring `item` left the
+        # source's own words nowhere to go but `generic`, behind a `QQ ` -- so
+        # a bare `QQ` cannot be demanded either, or the transcription is thrown
+        # away. And printing the vocabulary made typing an exact match honest.
+        #
+        # WHAT IS STILL REFUSED IS THE GUESS IN BETWEEN: a generic that is
+        # neither a QQ nor a value the document prints. `agave nectar` beside
+        # `agave syrup`, `rye whiskey` beside `rye`, `chartreuse` for either of
+        # the two Chartreuses -- every one a real wrong guess, and every one
+        # caught here rather than in her collection.
+        generic = str(item.get("generic") or "").strip()
+        if not (generic == "QQ" or generic.startswith("QQ ")
+                or generic in _declared_generics()):
             problems.append(f"a block guessed a generic: {item.get('generic')!r}")
 
     return [f"{fm.get('title', '?')}: {p}" for p in problems]

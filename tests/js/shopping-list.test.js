@@ -790,7 +790,7 @@ test('moneyText collapses when the ends meet, and always shows pennies', () => {
 
 const SHELVES = {
   order: ['spirits', 'fortified', 'liqueurs', 'freshly squeezed fruit juice',
-          'bottled fruit juice', 'flavourings', 'sugar syrup', 'bitters', 'tops'],
+          'bottled fruit juice', 'larder', 'sugar syrup', 'bitters', 'tops'],
   of: {
     'London dry gin': 'spirits',
     'moderately aged rum': 'spirits',

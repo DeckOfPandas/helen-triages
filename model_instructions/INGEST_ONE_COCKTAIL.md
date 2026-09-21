@@ -48,31 +48,44 @@ fold two drinks into one block.
 
 ## 1. What is different about a cocktail, and it is the whole document
 
-A food ingest can fill in nearly everything, because the vocabularies are small
-enough to print. **A cocktail has two fields whose vocabularies are not, and
-they are the two that matter most:**
+A cocktail has two fields that carry its whole identity:
 
-- **`generic`** — what CATEGORY of spirit a pour is: "moderately aged Jamaican
-  rum", "lightly aged and filtered rum", "blanc vermouth". A closed vocabulary
-  of well over a hundred declared terms.
-- **`suggestion`** — the specific bottle, from a declared dictionary that
-  resolves spellings by alias.
+- **`generic`** — what CATEGORY of pour it is: "moderately aged Jamaican rum",
+  "blanc vermouth", "lime juice". A closed vocabulary, printed in §3a.
+- **`suggestion`** — the specific bottle, from a dictionary you do not have.
 
-**Leave both as `QQ`. Always. This is Helen's own standing ruling**, made on
-2026-08-31 when a book named eleven bottles she did not own:
+**`generic` is the field the drink page, the cards and the search all read.**
+It is the only one a reader sees. So an untyped pour must still SAY something:
+write `QQ`, a space, and then **the source's own words** —
+`generic: "QQ aged Jamaican rum"`. Helen, 2026-09-20: *"if it's not obvious
+write QQ then whatever the source said then I have a chance of being able to fix
+it myself."* A bare `QQ` left her looking at "90 ml QQ" with nothing to fix it
+from.
+
+**Type it where §3a settles it and QQ it everywhere else.** An item that names
+a declared generic exactly — `lime juice`, `vodka`, `orgeat` — is a lookup, not
+a judgement, and copying it is READING. Anything short of an exact match is a
+judgement: **a bottle's category is not derivable from the ingredient printed
+beside it.** "Appleton Estate Signature" does not tell you it is moderately aged
+Jamaican; you have to know, and a wrong `generic` looks exactly as confident as
+a right one. Near-misses are judgements too — `agave nectar` beside `agave
+syrup` is not a match.
+
+**`suggestion` is never yours.** You do not have the bottle dictionary, so you
+cannot know whether a bottle is declared or how Helen spells it. Write the key
+with an empty list — `suggestion: []` — which is what she asked for (*"that
+saves me typing YAML when I come to it if I want to note my own suggestion"*),
+and put the bottle the source names in that pour's `note:`.
+
+Her standing ruling, made on 2026-08-31 when a book named eleven bottles she did
+not own, is what all of this serves:
 
 > "I will update these when I make the drinks, so QQ is right. These won't get
 > promoted until I've made them."
 
-It is not a size problem — it is that **a bottle's category is not derivable
-from the ingredient printed beside it.** "Appleton Estate Signature" does not
-tell you it is moderately aged Jamaican; you have to know. A wrong `generic`
-looks exactly as confident as a right one, and it is the field the drink page,
-the cards and the search all read.
-
-So: **transcribe faithfully, convert the units, canonicalise the build, and
-`QQ` every judgement.** That is a genuinely useful drink file, and it is what
-an in-repo photo ingest produces too.
+So: **transcribe faithfully, convert the units, canonicalise the build, type
+only what §3a settles outright, and `QQ` every judgement — with the source's
+words after it.**
 
 ---
 
@@ -88,17 +101,19 @@ garnish:
   - "lime wedge"
 ingredients:
   - amount: "52.5 ml"
-    item: "Patron Reposado tequila"
-    generic: "QQ"
+    generic: "QQ Patron Reposado tequila"   # a BOTTLE; the category is a
+    suggestion: []                          #  judgement, so QQ and the words
+    note: "The source names Patron Reposado."
   - amount: "7.5 ml"
-    item: "Peated Scotch whisky"
-    generic: "QQ"
+    generic: "QQ Peated Scotch whisky"      # `peated` is a CHARACTER, not a
+    suggestion: []                          #  generic — so this is not a match
   - amount: "15 ml"
-    item: "agave syrup"
-    generic: "QQ"
+    generic: "agave syrup"                  # an exact match in §3a. Typed.
+    suggestion: []
   - amount: "4 drops"
-    item: "Difford's Margarita bitters"
-    generic: "QQ"
+    generic: "QQ Difford's Margarita bitters"
+    suggestion: []
+    note: "The source names Difford's own Margarita bitters."
 serve:
   ice: "cubed"          # how the drink is ICED IN THE GLASS. §4a. OMIT the
                         # whole `serve:` key if the source does not say.
@@ -114,7 +129,7 @@ to_serve: ""
 mood: []
 notes:
   - label: "QQ"
-    text: "QQ - `generic` and `suggestion` not filled in; the source names bottles, not categories."
+    text: "QQ - three of the four pours carry the source's words behind a `QQ`; the source names bottles, not categories. No `suggestion` is filled in."
 source: "Difford's"
 source_url: "https://..."
 meta:
@@ -132,13 +147,14 @@ meta:
 | Field | Rule |
 |---|---|
 | `title` | The drink's name. **If the source is a specific bar or book's version, say so in the title** — `"Sazerac (Death & Co)"`. See §6. |
-| `tagline` | One line of prose. **Almost always `"QQ"`** — this is Helen's voice about a drink she has not made yet. |
+| `tagline` | One line of prose, **and it always begins `QQ `, because it is never yours** — this is Helen's voice about a drink she has not made yet, on a page that carries her name. Almost always a bare `"QQ"`; if the source has a line worth keeping, prefix it. Her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content."* |
 | `glass` | **A LIST, not a scalar**, even for one glass. **Required — see the warning below.** Canonical spellings in §4. |
 | `mood` | **Always `mood: []`.** The key is required and the value is DERIVED in her repo by a script. Never write a mood yourself. |
 | `garnish` | **A LIST.** `[]` means nobody has filled it in; `["no garnish"]` means the drink genuinely takes none. Vocabulary in §4. |
 | `ingredients` | The FULL list, untriaged, **in build order**. §3. |
-| `ingredients[].item` | What the SOURCE called the pour, brand and all. **A drafts-only field with a DEATH DATE** — §3. |
-| `ingredients[].suggestion` | The bottle. **ALWAYS A LIST**, even for one bottle: `["Beefeater"]`. §3. |
+| `ingredients[].amount` | The ONLY quantity field, and **every ingredient has one**. No US units, never a bare number. §3. |
+| `ingredients[].generic` | The category. **Typed only where §3a settles it outright; otherwise `QQ` then the source's own words** — `"QQ aged Jamaican rum"`. §1 and §3a. |
+| `ingredients[].suggestion` | The bottle — **never yours to write**, because you do not have the dictionary. **ALWAYS A LIST, and always present: `suggestion: []`.** The bottle the source names goes in that pour's `note:`. §3. |
 | `ingredients[].character` | Why a drink wants a particular bottle. **Never yours to write** — §3. |
 | `serve` | How it is iced, and any rim. **A mapping, and OPTIONAL — omit it entirely if the source does not say.** §4a. |
 | `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. A step is a string, or a `{step, note}` pair — **used sparingly** (Helen, 2026-09-04), for an aside about how she does the step rather than part of the instruction. |
@@ -187,15 +203,15 @@ nobody derived it. The key must be present; `[]` is the right value.
 ```yaml
 ingredients:
   - amount: "45 ml"
-    item: "Appleton Estate Signature"   # what the SOURCE called it
-    generic: "QQ"                        # the category. Never guess it.
+    generic: "QQ Appleton Estate Signature"  # a bottle. QQ, then the SOURCE's
+    suggestion: []                           #  words. Never guess the category.
   - amount: "2 dashes"
-    item: "Angostura bitters"
-    generic: "QQ"
+    generic: "QQ Angostura bitters"          # a bottle again — `aromatic
+    suggestion: []                           #  bitters` would be a judgement
   - amount: "15 ml"
-    item: "lime juice"
-    generic: "QQ"
-    optional: true                       # BOOLEAN. Absent means required.
+    generic: "lime juice"                    # an exact match in §3a. Typed.
+    suggestion: []
+    optional: true                           # BOOLEAN. Absent means required.
 ```
 
 **`amount` is the only quantity field.** Never a separate `ml:` key.
@@ -228,9 +244,11 @@ Four things a source prints as if they were units, and what to do instead
 
 - **A barspoon is `"5 ml"`.** Convert it like a teaspoon; her suite rejects
   the word.
-- **An egg or a sugar cube is an INGREDIENT, not a unit.** `amount: "1"`,
-  `generic: "QQ"`, `item: "whole egg"` (or `"sugar cube"`), the same as any
-  other pour.
+- **An egg or a sugar cube is an INGREDIENT, not a unit.** `amount: "1 whole"`,
+  `generic: "whole egg"`; `amount: "1 cube"`, `generic: "sugar cube"`. Both are
+  declared generics and both units are declared, so both are exact matches and
+  neither needs a `QQ`. **The count still needs its unit** — `amount: "1"` is a
+  bare number and is rejected.
 - **Half a fruit is `amount: "half"`** — Helen's ruling, 2026-09-04, on a
   Caipirinha's lime. `half` and `whole` are units, and a whole fruit is
   COUNTED, never measured: do not turn half a lime into millilitres, because
@@ -249,8 +267,9 @@ source really gives one, write it as it stands **and add a note saying the
 source had no unit** — the ladders 30/22.5/15/7.5 and 0.75/0.5 are thirty
 times apart and a wrong guess looks exactly as confident as a right one.
 
-**`item` is what the source called it, brand and all.** `generic` is the
-category, and it is always `QQ` from you. Do not put the quantity in `item`.
+**The source's own words go in `generic`, behind the `QQ`, brand and all** —
+`generic: "QQ Appleton Estate Signature"`. Do not put the quantity in there; it
+has its own field.
 
 **Write the bottle as the source spells it, and do not tidy it.** Helen's
 bottle dictionary resolves spellings by alias, and her standing rule
@@ -261,38 +280,36 @@ things — if the source names the product, write the product), and a spirit
 TYPE printed beside its own name is not a bottle at all (a source's
 "aguardiente" next to aguardiente is the generic, not a suggestion).
 
-### `item` is a transcription field, and it lives only in the drafts
+### There is no `item` field. Do not write one.
 
-**It does not render on a published drink page, and a promoted drink will not
-carry it.** The line a reader sees is built from `generic` and `suggestion`;
-`item` is the source's own wording, held so that Helen can see what the page
-said when she comes to fill those two in. She deletes it at that point, which
-is the same moment she stops guessing about the bottle.
+There used to be. It held the source's own wording for a pour while the category
+was unknown, and it was **retired on 2026-09-21** — Helen: *"'item' needs to go.
+Kill it with fire. Data can be read straight into generic/suggestion with or
+without QQs, and anything genuinely unclear added to a page note for me."*
 
-So: **write it on every pour, and do not treat it as the answer.** A file whose
-`item` fields are perfect and whose `generic` fields are all `QQ` is exactly
-what this document is asking for. A file that resolved the categories and lost
-the source's words is worse, in both directions at once.
-
-**THE DEATH DATE IS NOW ENFORCED, AND IT IS WHY THIS FIELD STILL EXISTS.**
-`tests/test_cocktails.py::test_item_is_gone_once_the_generic_is_filled_in`
-refuses an `item` on any pour whose `generic` is no longer `QQ`. The rule is
-CONDITIONAL, which is the point: your file, with `QQ` on every pour, is exactly
-right and passes. What is forbidden is the field outliving the answer it was
-holding a place for.
-
-It had to become a test. The lifecycle above was written down and then not
-followed: by 2026-09-05 every one of 683 pours had a real category and 215 still
-carried the `item` that had been a placeholder for it. Helen: *"we agreed to
-drop item, but then I was persuaded to allow it back as somewhere to hold
-incoming data, but it's become a dumping ground again."* Emptying it turned up
-57 bottles the page had never been able to show, 23 of which existed nowhere
+**It went because nothing rendered it.** The line a reader sees is built from
+`generic` and `suggestion`, so a transcription sitting in a third field was
+invisible on the page, invisible to the cards and the search, and invisible to
+costing and ABV. By 2026-09-05 every one of 683 pours had a real category and
+215 still carried the `item` that had been a placeholder for it. Helen: *"we
+agreed to drop item, but then I was persuaded to allow it back as somewhere to
+hold incoming data, but it's become a dumping ground again."* Emptying it turned
+up 57 bottles the page had never been able to show, 23 of which existed nowhere
 else in the repository — so the field had been quietly hoarding, not holding.
 
-### `suggestion` is ALWAYS a list
+**So the source's words go where they can be seen: `generic`, behind a `QQ `.**
+A fact that none of `amount`, `generic` or `suggestion` carries goes in that
+pour's `note:`.
 
-`suggestion: ["Beefeater"]`, never `suggestion: "Beefeater"`. One bottle or
-five, the shape is the same, and a test enforces it.
+### `suggestion` is ALWAYS a list, and always present
+
+`suggestion: []` on every pour you cannot answer, which is every pour: you do
+not have the bottle dictionary. Helen asked for the empty key rather than no key
+— *"that saves me typing YAML when I come to it if I want to note my own
+suggestion."*
+
+Where a bottle IS named, it is `["Beefeater"]`, never `"Beefeater"`. One bottle
+or five, the shape is the same, and a test enforces it.
 
 Liquid treats a bare string as a one-item sequence, so both shapes rendered
 correctly and nothing complained while 194 pours used one and 18 used the
@@ -315,13 +332,113 @@ this: Moderately aged (character: blackstrap)."* So it rides ALONGSIDE a real
 `generic` and never replaces one — a pour still needs its category, and the
 character says why that particular bottle.
 
-**Which means you cannot write one, because you are not writing `generic`
-either.** A character with no category under it is a property attached to
-nothing, and for rum and whisky the vocabulary is closed and declared in her
-repository, where you cannot see it. Leave the field out. If the source names a
-property beside a pour, it is already in `item` where you transcribed it, and
-one line in your list is what turns it into a `character` when she makes the
-drink.
+**Which means you cannot write one.** A character with no settled category under
+it is a property attached to nothing, and for rum and whisky the vocabulary is
+closed and declared in her repository, where you cannot see it. Leave the field
+out. If the source names a property beside a pour, it is already in the
+`QQ <the source's words>` you transcribed, and one line in your list is what
+turns it into a `character` when she makes the drink.
+
+---
+
+## 3a. The generic vocabulary — the whole of it
+
+**These are every category a pour may be declared as.** An item that names one
+of them EXACTLY is a lookup, not a judgement: write it, with no `QQ`. Anything
+else — a bottle, a brand, a near-miss, a category you think you recognise but
+cannot find below — is `QQ` and then the source's own words.
+
+**Exactly, and nothing looser.** `agave nectar` is not `agave syrup`. `rye
+whiskey` is not `rye`. `chartreuse` is neither `Chartreuse Verte` nor
+`Chartreuse Jaune` and you cannot know which. `peach liqueur` is not
+`crème de pêche`. Every one of those five was a real wrong guess, caught by a
+test the day the vocabulary was first written down.
+
+**Some of these are proper nouns and that is deliberate** — Campari, Cynar,
+Bénédictine, Becherovka. Where nothing generalises a bottle, the bottle IS the
+category; they are not suggestions that wandered into the wrong field.
+
+**A ratio is part of the name** (`cane sugar syrup 2:1`), and where the source
+does not give one you cannot pick: that is a `QQ`.
+
+<!-- vocab:generics start -->
+**Rum styles:** `moderately aged Jamaican rum` ·
+`caramel-forward Jamaican rum` · `lightly aged and filtered rum` ·
+`moderately aged rum` · `aged Demerara rum` ·
+`overproof Demerara rum, lightly aged` · `overproof Jamaican rum, unaged` ·
+`rhum agricole blanc` · `rhum agricole vieux` · `clairin` ·
+`clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
+`coconut rum`
+
+**Gin styles:** `London dry gin` · `Old Tom` · `Plymouth` · `New Western dry` ·
+`genever` · `navy strength gin` · `speciality` · `gin liqueur` · `sloe gin`
+
+**Whisky styles:** `rye` · `bonded rye` · `bourbon` · `blended scotch whisky` ·
+`single malt scotch whisky` · `Irish whiskey` · `Japanese whisky`
+
+**Agave styles:** `blanco tequila` · `reposado tequila` · `añejo tequila` ·
+`mezcal`
+
+**Brandy styles:** `cognac` · `armagnac` · `calvados` · `pisco` · `grappa` ·
+`apple brandy` · `eau de vie` · `aguardiente` · `kirschwasser` · `peach brandy`
+
+**Cane and palm spirits:** `cachaça` · `Batavia arrack` ·
+`coconut-flower arrack`
+
+**Other base spirits:** `vodka` · `vanilla vodka` · `pineapple vodka` ·
+`absinthe` · `aquavit`
+
+**Liqueurs:** `triple sec` · `orange Curaçao` · `dry orange Curaçao` ·
+`Grand Marnier` · `blue Curaçao` · `Créole Shrubb` · `maraschino liqueur` ·
+`crème de mûre` · `crème de cassis` · `crème de pêche` · `crème de banane` ·
+`crème de violette` · `crème de cacao` · `coconut rhum` · `crème de menthe` ·
+`cherry liqueur` · `cherry brandy` · `apricot liqueur` · `coffee liqueur` ·
+`ginger liqueur` · `passion fruit liqueur` · `gentian liqueur` ·
+`apple schnapps` · `peach schnapps` · `mastiha liqueur` · `tomato liqueur` ·
+`amaretto`
+
+**Herbal liqueurs:** `Chartreuse Verte` · `Chartreuse Jaune` · `Bénédictine` ·
+`Galliano` · `Strega` · `Jägermeister` · `liqueur de sapin` ·
+`Swedish flaggpunsch` · `Becherovka`
+
+**Amari:** `Campari` · `Aperol` · `Cynar` · `fernet` · `Amaro Nonino` ·
+`Amaro Ciociaro`
+
+**Fortified and aromatised:** `sweet vermouth` · `dry vermouth` ·
+`blanc vermouth` · `quinquina` · `americano` · `amontillado sherry` ·
+`oloroso sherry` · `tawny port`
+
+**Wine and sparkling:** `champagne` · `prosecco` · `red wine` · `white wine` ·
+`cider`
+
+**Bitters:** `aromatic bitters` · `orange bitters` · `orange-forward bitters` ·
+`Créole bitters` · `chocolate bitters` · `tiki bitters` ·
+`lavender-forward bitters` · `peppermint bitters` · `wood smoke bitters` ·
+`warm-spiced bitters` · `margarita bitters` · `pimento bitters`
+
+**Syrups:** `cane sugar syrup 1:1` · `cane sugar syrup 2:1` ·
+`demerara sugar syrup 2:1` · `turbinado sugar syrup 2:1` · `grenadine` ·
+`ginger syrup` · `passion fruit syrup` · `cinnamon syrup` · `agave syrup` ·
+`vanilla syrup` · `orgeat` · `falernum` · `lime cordial` ·
+`ginger and lemongrass cordial`
+
+**Honeys:** `honey` · `honey water` · `honey water 1:1` · `honey water 2:1`
+
+**Sugars:** `white sugar` · `raw sugar` · `golden caster sugar` ·
+`molasses sugar` · `palm sugar` · `sugar cube`
+
+**Juices:** `lime juice` · `lemon juice` · `orange juice` · `pineapple juice` ·
+`grapefruit juice` · `ruby grapefruit juice` · `cranberry juice` · `apple juice`
+
+**Fruit and herbs:** `lime` · `pineapple` · `passion fruit` · `raspberries` ·
+`blackberries` · `pear` · `dried apricots` · `lemon zest` · `mint` · `basil` ·
+`rosemary` · `fruit purée` · `maraschino cherry` · `orange slice` · `cucumber` ·
+`kaffir lime leaves`
+
+**Other:** `soda water` · `ginger beer` · `water` · `black tea` · `espresso` ·
+`cola` · `coconut cream` · `egg white` · `salt` · `cider vinegar` ·
+`olive oil` · `cream` · `milk` · `whole egg`
+<!-- vocab:generics end -->
 
 ---
 
@@ -637,7 +754,16 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
 
 ## 8. Never do these
 
-- **Never guess a `generic` or a `suggestion`.** Both are `QQ`, every time.
+- **Never guess a `generic`.** An EXACT match in §3a is a lookup and you write
+  it; everything else is `QQ` and then the source's own words. A near-miss is a
+  guess.
+- **Never write a `suggestion`, and never leave the key out.** `suggestion: []`,
+  every pour, every time. The bottle the source names goes in that pour's
+  `note:`.
+- **Never write an `item:`.** There is no such field — it was retired on
+  2026-09-21 and a file carrying one fails her schema outright.
+- **Never write a `tagline` that is not prefixed `QQ `.** It is Helen's voice on
+  a published page and it is never yours.
 - **Never invent `meta.ship`** — that is Helen's rating of a drink she has
   drunk. `"who knows"` is the only value an ingest writes, and **never `"QQ"`**:
   `QQ` is not in the ship vocabulary at all.
@@ -670,10 +796,11 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
 > they describe colour or strength, not production, and colour is routinely
 > adjusted with caramel.
 >
-> **This changes nothing about what you write**, because you write `generic:
-> "QQ"` regardless. It matters for your `item` and for your list: transcribe
-> the source's word faithfully, and **say in your "what I could not know" list
-> that the source asked for a category Helen does not use.** If the source also
+> **This changes nothing about what you write**, because none of those words is
+> in §3a, so the pour is a `QQ` either way. It matters for the WORDS after the
+> QQ and for your list: transcribe the source's word faithfully — `generic: "QQ
+> navy rum"` — and **say in your "what I could not know" list that the source
+> asked for a category Helen does not use.** If the source also
 > names a BOTTLE, say so in the same bullet — her bottle dictionary resolves
 > the category from the bottle mechanically, and that is the answer in 13 cases
 > out of 22 when it was measured.
@@ -703,20 +830,20 @@ garnish:
   - "pineapple wedge"
 ingredients:
   - amount: "45 ml"
-    item: "blackstrap rum"
-    generic: "QQ"
+    generic: "QQ blackstrap rum"
+    suggestion: []
   - amount: "22.5 ml"
-    item: "Campari"
-    generic: "QQ"
+    generic: "Campari"
+    suggestion: []
   - amount: "15 ml"
-    item: "lime juice"
-    generic: "QQ"
+    generic: "lime juice"
+    suggestion: []
   - amount: "15 ml"
-    item: "simple syrup"
-    generic: "QQ"
+    generic: "QQ simple syrup"
+    suggestion: []
   - amount: "45 ml"
-    item: "pineapple juice"
-    generic: "QQ"
+    generic: "pineapple juice"
+    suggestion: []
 serve:
   ice: "crushed"
 method:
@@ -726,7 +853,7 @@ to_serve: "Straw."
 mood: []
 notes:
   - label: "QQ"
-    text: "QQ - `generic` and `suggestion` not filled in. The source names one bottle (Campari) and otherwise gives categories, and a category is not derivable from a bottle name."
+    text: "QQ - two pours carry the source's words behind a `QQ`. `blackstrap` is a character rather than a category, and `simple syrup` does not say which sugar or what ratio. No `suggestion` is filled in."
 source: "QQ"
 source_url: ""
 meta:
@@ -740,8 +867,11 @@ meta:
 
 **What I could not know:**
 
-- **No `generic` on any pour, per the standing rule.** "Blackstrap rum" is
-  close to a category already, but which one it maps to is a lookup I cannot do.
+- **Two pours are typed, three are not.** `Campari`, `lime juice` and
+  `pineapple juice` are exact matches in §3a, so they are lookups. "Blackstrap
+  rum" is close to a category but `blackstrap` is a CHARACTER, and "simple
+  syrup" does not say which sugar or what ratio — both carry the source's words
+  behind a `QQ` instead.
 - **`mood: []` needs deriving** — run `python3 scripts/derive_cocktail_moods.py
   --write`. Until you do, one test fails and it is that one.
 - **No source recorded** — tell me the book and I will write the citation.

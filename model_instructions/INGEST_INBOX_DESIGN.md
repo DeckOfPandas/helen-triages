@@ -96,7 +96,8 @@ columns like the rest of the documents.
   states (split once, at ingest, when the source has phases) and a two-group
   example. Keep flat `method:` as the single-phase form.
 - Cocktail document §3: add `character:` with its rule from MANUAL §9.3.1,
-  and resolve the `item:` question per D8.
+  and resolve the `item:` question per D8. (Resolved 2026-09-21 by retiring the
+  field; §3 now says there is no such key and §3a prints the vocabulary.)
 - Both documents: a short §0 "How to hand this back" that describes the
   envelope in §6, so the browser produces it without being told twice.
 
@@ -206,7 +207,7 @@ Built 2026-09-03 (#672). `.claude/commands/ingest-inbox.md` is the procedure and
 
 | ID | Question | Ruling |
 |---|---|---|
-| D8 | With `item` being retired (#544, WS4), where does the SOURCE's wording for a pour go at ingest, given `generic` and `suggestion` are `QQ` by her standing rule? | **`item` is a draft-only transcription field.** Allowed in `_cocktail_drafts/`, forbidden in `_cocktail_recipes/` by the WS1 schema guard, deleted by Helen when she fills `generic`/`suggestion` on making the drink. The cocktail document keeps teaching it, and says it is draft-only. |
+| D8 | With `item` being retired (#544, WS4), where does the SOURCE's wording for a pour go at ingest, given `generic` and `suggestion` are `QQ` by her standing rule? | ~~**`item` is a draft-only transcription field**, allowed in `_cocktail_drafts/` and forbidden in `_cocktail_recipes/`.~~ **SUPERSEDED 2026-09-21: `item` is gone entirely** (Helen: *"'item' needs to go. Kill it with fire"*), and the answer is the one this row was reaching for — **the source's wording goes in `generic`, behind a `QQ `, because that is the only field the page renders.** A draft-only field nothing rendered was a place for facts to go missing; `suggestion` is `[]` and an undeclared bottle's name goes in that pour's `note:`. |
 | D9 | Label name and title prefix | **`ingest` and `ingest: <slug>`.** Both private repos get the label by hand once. |
 | D10 | Does the browser get its own issue-writing access, or does Helen paste the output into an issue herself? | **Paste, for now.** Helen: "I am new to this and quite conservative." No new access, no connector. Revisit only if she asks. |
 | D11 | Should `garnish.yml` gain a `group:` per entry so the document's grouping is data? | **Yes.** Every declared garnish carries a `group:`, and a test says so. |

@@ -112,12 +112,16 @@ authority; this is the summary):
 - **food: every method step as a `QQ original` / `QQ Claude` pair** — the
   verbatim line kept untidied, the paraphrase held to house style;
 - **drinks: millilitres, canonical method steps, `serve.ice` rather than a
-  step, no `Express…` step, `generic` and `suggestion` left `QQ`**, moods
-  derived.
+  step, no `Express…` step, `generic` typed only on an exact match in the
+  vocabulary and otherwise `QQ` plus the source's own words, `suggestion: []`**,
+  moods derived.
 
-**What is never transformed**: anything in Helen's head. Her voice, `meta.ship`,
-`meta.rewritten`, `meta.proofread`, a bottle nobody declared, a reconstruction of
-a truncated step. A silence in the source is `QQ`, never a default.
+**What is never transformed**: anything in Helen's head. Her VOICE — every
+tagline an ingest writes begins `QQ `, on both sites, because the line carries
+her name on a published page. `meta.ship`, `meta.rewritten`, `meta.proofread`, a
+bottle nobody declared, a category the vocabulary does not settle, a
+reconstruction of a truncated step. A silence in the source is `QQ`, never a
+default.
 
 ---
 
@@ -154,9 +158,11 @@ goes back to `4-promote/` on `ready ‹slug›` once she has ruled.
 **IT IS THE PUBLISHED TENSE, exactly as `4-promote/` is** (`STAGED_DIRS` in
 `tests/test_cocktails.py`): a drink got here BY being staged and goes live the
 moment she rules, so the rules that bite at promotion — a bottle's canonical
-name rather than an alias, no `item` — bite here too. Leaving it out of that
-constant would have been silent: those two tests would simply have stopped
-applying to the drinks that sit longest in a folder while being edited.
+name rather than an alias, and no `QQ` left anywhere — bite here too. Leaving it
+out of that constant would have been silent: those tests would simply have
+stopped applying to the drinks that sit longest in a folder while being edited.
+(The `no item` rule was the third of them until 2026-09-21, when the field was
+retired outright and the whole check with it.)
 
 **Drinks only for now.** Food has not hit the same pile-up, and an empty
 folder on a site that does not use it is clutter Helen sees every day.
@@ -205,8 +211,8 @@ follow it since 2026-09-14 (food used to have no written procedure for this).
    `rewritten: true`, on both sites.
 2. **Claude runs the mechanical pass**: `rewritten: true`; suite green
    (spellings the vocabularies declare, missing keys, dashes, canonical bottle
-   names, list-shaped `suggestion`s, no `item`); never a tagline, a note's
-   words, a method's words or an amount. One list of the non-mechanical things,
+   names, list-shaped `suggestion`s, no `QQ` left anywhere); never a tagline, a
+   note's words, a method's words or an amount. One list of the non-mechanical things,
    grouped by decision. Commit, push.
 3. **Claude says `final: ‹slugs›`**, and **moves anything still needing a
    ruling into `5-final-proofread/`** (drinks). Until that word the served

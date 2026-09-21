@@ -585,24 +585,31 @@ layout: default
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
         {% comment %} THE GATE ASKS FOR THE FIELDS THIS BLOCK ACTUALLY RENDERS,
-           and it used to ask for `item.item`, which this block stopped
-           rendering at all in #544 move 1. That left a trap primed for move 2:
+           and it has twice asked for one it did not. It named `item.item` until
+           #544 move 1 stopped rendering that field, which left a trap primed:
            drop `item` from an entry and it falls through to the bare-string
            branch below, where `{{ item }}` stringifies a Hash. Tried on Aperol
-           Spritz before this was changed, and the page printed
+           Spritz, and the page printed
 
                {"amount"=>"90 ml", "generic"=>"prosecco"}
 
-           with a clean build and nothing in the log. `item` is on 282 entries
-           whose every word is already in the generic beside it, so move 2's
-           first and safest step would have done this several hundred times.
+           with a clean build and nothing in the log. The gate then named all
+           three until the field was RETIRED on 2026-09-21 (Helen: "'item'
+           needs to go. Kill it with fire"), and this block's `item` fallback
+           for a headline went with it -- an entry with no `generic` fails
+           test_every_ingredient_has_a_generic_or_a_qq, so the fallback was
+           guarding against data the schema already refuses.
 
            A GATE MUST NAME WHAT THE BRANCH NEEDS, not what the data happened
            to carry when it was written. The bare-string branch is for an
            ingredient written as a plain string; there are none today, and a
            dict arriving there is not that shape, it is this one with a key
-           missing. {% endcomment %}
-        {% if item.amount or item.generic or item.item %}
+           missing.
+
+           `item` IS STILL THE LOOP VARIABLE, which is unfortunate and is not
+           the retired field: `{% raw %}{% for item in page.ingredients %}{% endraw %}` names each
+           ENTRY. Read `item.generic`, never `item.item`. {% endcomment %}
+        {% if item.amount or item.generic %}
           {% comment %} THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS —
              #544, Helen 2026-08-29: "London dry gin (Beefeater)". `item` does
              not render at all, which is what makes "prosecco / prosecco" and
@@ -642,10 +649,6 @@ layout: default
               {% assign standing_note = standing_notes[g] %}
             {% endif %}
           {% endfor %}
-          {% comment %} Falls back to `item` only where a drink has no generic
-             at all. Every one of the 617 entries is typed, so this is a guard
-             against future data rather than a live path. {% endcomment %}
-          {% if headline == "" %}{% assign headline = item.item %}{% endif %}
 
           {% comment %} The bottle, oxford-joined, in brackets after the class.
              `suggestion` is name(s) only since #457, so it needs no shaping. {% endcomment %}
