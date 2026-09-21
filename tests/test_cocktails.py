@@ -261,6 +261,24 @@ GATE_FLAGS = ["rewritten", "awaiting_fix", "proofread"]
 PLACEHOLDER = "QQ"
 
 
+def _is_qq(value):
+    """`QQ`, or `QQ` followed by whatever the source said.
+
+    Helen, 2026-09-20, of a draft whose page showed a bare `QQ` beside 90 ml and
+    nothing else: "if it's not obvious write QQ then whatever the source said
+    then I have a chance of being able to fix it myself." The page reads
+    `generic`, not `item`, so the source's words have to be IN `generic` to be
+    seen: `generic: "QQ aged Jamaican rum"`. It is still an unanswered question
+    and every check that sets a bare `QQ` aside sets this aside for the same
+    reason. What it must not do is match a real generic that merely starts with
+    those letters, hence the space.
+    """
+    if value is None:
+        return False
+    text = str(value).strip()
+    return text == PLACEHOLDER or text.startswith(PLACEHOLDER + " ")
+
+
 def _unanswered(values):
     """True where every name given is the `QQ` placeholder.
 
@@ -292,7 +310,7 @@ def _unanswered(values):
     rather than as a defect.
     """
     names = [str(v).strip() for v in values if v is not None and str(v).strip()]
-    return bool(names) and all(n == PLACEHOLDER for n in names)
+    return bool(names) and all(_is_qq(n) for n in names)
 
 # Groups in ingredients.yml that are lists of generic VALUES. Everything else at
 # the top level is a mapping (family_of, family_less, retired_*) or the family
@@ -1841,6 +1859,27 @@ def _ingredients():
 # 1 and 2 -- the vocabulary is closed, and retirements bite
 # =============================================================================
 
+def test_qq_followed_by_the_sources_words_is_still_a_qq():
+    """`generic: "QQ aged Jamaican rum"` is an unanswered question with a hint.
+
+    Helen, 2026-09-20: "if it's not obvious write QQ then whatever the source
+    said." CI has no drafts clone, so nothing else there would notice `_is_qq`
+    breaking; this pins it directly, in both directions -- the words must be
+    accepted, and a real generic that merely starts with those two letters
+    must not be.
+    """
+    assert _is_qq("QQ")
+    assert _is_qq("QQ aged Jamaican rum")
+    assert _is_qq("  QQ  Coco mix (3:1, Coco Lopez to coconut milk)")
+    assert _unanswered(["QQ", "QQ simple syrup"])
+
+    assert not _is_qq("QQuince liqueur")
+    assert not _is_qq("aged Jamaican rum")
+    assert not _is_qq("")
+    assert not _is_qq(None)
+    assert not _unanswered(["QQ simple syrup", "lime juice"])
+
+
 def test_every_generic_is_declared():
     """A `generic` is a declared value or the literal `QQ`. A third thing is how
     a typo mints a category silently.
@@ -1865,7 +1904,7 @@ def test_every_generic_is_declared():
     bad = sorted({
         f"{slug}: {item!r} -> {generic!r}"
         for slug, item, generic in _ingredients()
-        if generic and generic != "QQ" and generic not in declared
+        if generic and not _is_qq(generic) and generic not in declared
         and generic not in retired
     })
     assert not bad, (
@@ -1944,7 +1983,7 @@ def test_item_is_gone_once_the_generic_is_filled_in():
     bad = sorted(
         f"{slug}: item {item!r} beside generic {generic!r}"
         for slug, item, generic in _ingredients()
-        if item and generic and generic != "QQ"
+        if item and generic and not _is_qq(generic)
     )
     assert not bad, (
         f"{len(bad)} pour(s) keep an `item` after the generic was settled:\n  "

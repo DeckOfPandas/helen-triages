@@ -488,6 +488,11 @@ generics:
   # overwrite. Peach Me is its only pour today.
   peach schnapps:         { abv: 18,   confidence: medium }
   crème de cassis:        { abv: 20,   confidence: medium }
+  # PLACEHOLDER, 2026-09-20, for Clement Mahina Coconut Rhum Liqueur (White
+  # Negroni Piña Colada). NOT LABEL-CHECKED and Helen has not seen it: 18 is a
+  # working figure for a coconut liqueur of this kind, `low` because nothing here
+  # has read the bottle. She is reviewing the generic itself.
+  coconut rhum:           { abv: 18,   confidence: low, qq: "Working figure for Clement Mahina Coconut Rhum Liqueur, not read off the bottle. What is its strength?" }
   # `liqueur de sapin` and `tomato liqueur` LEFT THIS BLOCK 2026-09-14: each
   # gained a bottle (Briottet Liqueur de Sapin, La Tomato Liqueur -- see
   # `other liqueurs` above), and a bottle's figure wins.
@@ -546,6 +551,10 @@ non_alcoholic:
   - raw sugar
   - molasses sugar
   - soda water
+  # Ginger beer is non-alcoholic (2026-09-20). A brewed one can carry a trace,
+  # which is not what this list is asking: it is a soft drink for the strength
+  # test, like cola beside it.
+  - ginger beer
   - water
   - cola
   - black tea
@@ -555,6 +564,9 @@ non_alcoholic:
   # declared long before anything poured it by volume; the Grasshopper (#984)
   # is the first, and it failed the strength test until this line.
   - cream
+  # Milk is non-alcoholic (2026-09-20, Rum Cow -- the first drink to pour it by
+  # volume once it was typed).
+  - milk
   - fruit purée
   - egg white
   - cider vinegar

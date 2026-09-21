@@ -170,7 +170,7 @@ def check_cocktail(path, fm, rep, ctx):
 
         gen = item.get("generic")
         for g in (gen if isinstance(gen, list) else [gen]):
-            if g == "QQ":
+            if isinstance(g, str) and (g == "QQ" or g.startswith("QQ ")):
                 rep.add("UNTYPED INGREDIENTS -- a generic is needed, or a new one declaring",
                         f"{item.get('amount') or '?'} -- {item.get('note') or 'no note'}",
                         slug,

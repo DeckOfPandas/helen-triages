@@ -35,7 +35,8 @@ what makes it findable, and there are exactly these:**
 | where | what to write |
 |---|---|
 | a `tagline` she has not written | `tagline: "QQ"` |
-| a drink's `generic` / `suggestion` | `"QQ"`, always, both sites of the pour -- her standing ruling, not a size problem |
+| a drink's `generic` / `suggestion`, **in this repo** | typed where the repo settles it, else `generic: "QQ <the source's words>"` -- see the block below (her ruling, 2026-09-20, which replaced "`QQ`, always") |
+| a drink's `generic` / `suggestion`, **from the repo-less Project** | `"QQ"`, always -- that session cannot see the vocabulary |
 | a drink's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (2026-09-05, `test_meta_ship_is_a_rung_or_who_knows`); `meta.made_before: false` beside it says she has not made it |
 | a food method step | the PAIR: `QQ original <verbatim>` then `QQ Claude <the rewrite>` |
 | any note an ingest ADDS | `- label: "QQ"` / `text: "QQ - …"` -- **both fields set, both beginning `QQ`**. A note with no label is titled "note" on the page and looks finished, so this is what stops an unread note publishing unnoticed (#1120) |
@@ -46,6 +47,14 @@ what makes it findable, and there are exactly these:**
 **Never a bare string note from an ingest** (Helen, 2026-09-04: *"It's annoying
 for me to remember how to type YAML every time"*). A note that ALREADY exists
 keeps whatever shape it has.
+
+**IN THIS REPO A DRINK'S `generic` IS TYPED AT INGEST, WHERE THE REPO SETTLES IT -- Helen, 2026-09-20.** It used to be `QQ`, always, because a bottle's category is not derivable from the ingredient beside it. That is still true of an ingest session with no repo. This one has the vocabulary, so her words were: *"Surely we're able to fill in generics at ingest, or at least try then review with me"* and *"if it's not obvious write QQ then whatever the source said then I have a chance of being able to fix it myself."* Three tiers, and the boundary between the second and third is the one that matters:
+
+1. **A bottle `bottles.yml` declares** -- the dictionary's own generic, plus `suggestion`, mechanically. Look it up in the file with a script; never from recall. A bottle it does NOT declare is not yours to declare (Tier 3): its name goes in the pour's `note`, and `suggestion` stays absent.
+2. **An item that names a declared generic exactly** -- `lime juice`, `vodka`, `orgeat`. A near-match is not exact: `agave nectar` beside `agave syrup` is a judgement call, so type it AND put a `QQ` note on the drink saying what you assumed, so that review cannot be skipped.
+3. **Everything else** -- `generic: "QQ aged Jamaican rum"`: `QQ`, a space, then the source's own words. **The words go IN `generic` because the page reads `generic` and never `item`**; a bare `QQ` left her looking at "90 ml QQ" with nothing to fix it from. Then drop `item`. Never a guess from general knowledge, and never a bare `QQ`.
+
+**A typed pour is checked for a price and a strength, and a bare `QQ` never was** -- so typing can turn the suite red on `costs.yml` and `abv.yml`. Do NOT invent those numbers: a placeholder row at `confidence: low`, with a `basis` that says `PLACEHOLDER ... not shop-checked` and (for a strength) a `qq:` saying what Helen has to check, is the sanctioned shape, and it goes on her list. A NEW generic (`ginger beer`, `coconut rhum`) is hers to say: ask, and register it in `ingredients.yml` (its list, `shelf_of`) once she has. `_is_qq` in `tests/test_cocktails.py` is what makes `QQ <words>` legal to every check.
 
 **Three things a `QQ` is not.** It is not an error: do not flag it, fix it, or
 convert it. It is not a prompt to answer from general knowledge -- that is the

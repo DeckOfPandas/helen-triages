@@ -1295,6 +1295,14 @@ liqueurs:
   - "crème de banane"
   - "crème de violette"
   - "crème de cacao"
+  # NEW 2026-09-20, PROVISIONAL, for White Negroni Piña Colada (#606): Clement
+  # Mahina Coconut Rhum Liqueur. Helen: "I guess the generic is coconut rhum.
+  # Add it for now and I can review another time." Filed here and not under
+  # rum, for the reason `Créole Shrubb` above is: it is a rhum-based LIQUEUR, so
+  # "no rum tonight" should not drop it. `coconut rum` is a rum style in
+  # `rum_styles`, and she has said it means Malibu for now (see below); this
+  # is not folded into it.
+  - "coconut rhum"
   - "crème de menthe"
   # Cherry: the distinction Helen believes in. A liqueur is sweetened, an eau
   # de vie is not, and her own note says "Don't use plain kirsch". The eau de
@@ -1682,6 +1690,13 @@ fruit_and_herbs:
 
 other:
   - "soda water"
+  # NEW 2026-09-20, for the Moscow Mule (#1068) and Dark 'n' Stormy (#1069),
+  # both Difford's. Helen: "Ginger Beer is a new ingredient, no category, so
+  # that's the name." Declared as its own thing rather than filed under a
+  # ginger syrup or liqueur, which it is not: the nearest declared generics
+  # (`ginger syrup`, `ginger liqueur`, a cordial) are all different pours. A
+  # top, like `soda water` and `cola`, so it shelves with them.
+  - "ginger beer"
   - "water"
   - "black tea"
   - "espresso"
@@ -1894,7 +1909,7 @@ shelf_of:
   white wine: fortified
   sweet vermouth: fortified
   tawny port: fortified
-  # liqueurs (41)
+  # liqueurs (42)
   Amaro Ciociaro: liqueurs
   Amaro Nonino: liqueurs
   Aperol: liqueurs
@@ -1916,6 +1931,7 @@ shelf_of:
   blue Curaçao: liqueurs
   cherry brandy: liqueurs
   cherry liqueur: liqueurs
+  coconut rhum: liqueurs
   coffee liqueur: liqueurs
   crème de banane: liqueurs
   crème de cacao: liqueurs
@@ -2007,9 +2023,10 @@ shelf_of:
   tiki bitters: bitters
   warm-spiced bitters: bitters
   wood smoke bitters: bitters
-  # tops (4)
+  # tops (5)
   champagne: tops
   cola: tops
+  ginger beer: tops
   prosecco: tops
   soda water: tops
 
