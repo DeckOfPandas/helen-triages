@@ -34,9 +34,9 @@ what makes it findable, and there are exactly these:**
 
 | where | what to write |
 |---|---|
-| a `tagline` she has not written | `tagline: "QQ"` |
-| a drink's `generic` / `suggestion`, **in this repo** | typed where the repo settles it, else `generic: "QQ <the source's words>"` -- see the block below (her ruling, 2026-09-20, which replaced "`QQ`, always") |
-| a drink's `generic` / `suggestion`, **from the repo-less Project** | `"QQ"`, always -- that session cannot see the vocabulary |
+| a `tagline` she has not written | `tagline: "QQ"`, or `QQ ` then the source's line where one is worth keeping. **Never an unprefixed tagline from an ingest, either site** -- Helen, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"* |
+| a `generic` the vocabulary does not settle outright | `generic: "QQ <the source's words>"` -- see the block below |
+| a `suggestion` | `suggestion: []` unless a DECLARED bottle names it; the bottle the source names goes in that pour's `note` |
 | a drink's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (2026-09-05, `test_meta_ship_is_a_rung_or_who_knows`); `meta.made_before: false` beside it says she has not made it |
 | a food method step | the PAIR: `QQ original <verbatim>` then `QQ Claude <the rewrite>` |
 | any note an ingest ADDS | `- label: "QQ"` / `text: "QQ - …"` -- **both fields set, both beginning `QQ`**. A note with no label is titled "note" on the page and looks finished, so this is what stops an unread note publishing unnoticed (#1120) |
@@ -48,13 +48,15 @@ what makes it findable, and there are exactly these:**
 for me to remember how to type YAML every time"*). A note that ALREADY exists
 keeps whatever shape it has.
 
-**IN THIS REPO A DRINK'S `generic` IS TYPED AT INGEST, WHERE THE REPO SETTLES IT -- Helen, 2026-09-20.** It used to be `QQ`, always, because a bottle's category is not derivable from the ingredient beside it. That is still true of an ingest session with no repo. This one has the vocabulary, so her words were: *"Surely we're able to fill in generics at ingest, or at least try then review with me"* and *"if it's not obvious write QQ then whatever the source said then I have a chance of being able to fix it myself."* Three tiers, and the boundary between the second and third is the one that matters:
+**A DRINK'S `generic` IS TYPED WHERE THE VOCABULARY SETTLES IT -- Helen, 2026-09-20 -- AND THE SAME RULE NOW HOLDS IN BOTH SESSIONS.** It used to be `QQ`, always, because a bottle's category is not derivable from the ingredient beside it. Her words: *"Surely we're able to fill in generics at ingest, or at least try then review with me"* and *"if it's not obvious write QQ then whatever the source said then I have a chance of being able to fix it myself."* Three tiers, and the boundary between the second and third is the one that matters:
 
-1. **A bottle `bottles.yml` declares** -- the dictionary's own generic, plus `suggestion`, mechanically. Look it up in the file with a script; never from recall. A bottle it does NOT declare is not yours to declare (Tier 3): its name goes in the pour's `note`, and `suggestion` stays absent.
+1. **A bottle `bottles.yml` declares** -- the dictionary's own generic, plus `suggestion`, mechanically. Look it up in the file with a script; never from recall. A bottle it does NOT declare is not yours to declare (Tier 3): its name goes in the pour's `note`, and `suggestion` stays `[]`.
 2. **An item that names a declared generic exactly** -- `lime juice`, `vodka`, `orgeat`. A near-match is not exact: `agave nectar` beside `agave syrup` is a judgement call, so type it AND put a `QQ` note on the drink saying what you assumed, so that review cannot be skipped.
-3. **Everything else** -- `generic: "QQ aged Jamaican rum"`: `QQ`, a space, then the source's own words. **The words go IN `generic` because the page reads `generic` and never `item`**; a bare `QQ` left her looking at "90 ml QQ" with nothing to fix it from. Then drop `item`. Never a guess from general knowledge, and never a bare `QQ`.
+3. **Everything else** -- `generic: "QQ aged Jamaican rum"`: `QQ`, a space, then the source's own words. **The words go IN `generic` because that is the only field the page, the cards and the search read.** A bare `QQ` left her looking at "90 ml QQ" with nothing to fix it from. Never a guess from general knowledge, and never a bare `QQ` where the source gave you words.
 
-**A typed pour is checked for a price and a strength, and a bare `QQ` never was** -- so typing can turn the suite red on `costs.yml` and `abv.yml`. Do NOT invent those numbers: a placeholder row at `confidence: low`, with a `basis` that says `PLACEHOLDER ... not shop-checked` and (for a strength) a `qq:` saying what Helen has to check, is the sanctioned shape, and it goes on her list. A NEW generic (`ginger beer`, `coconut rhum`) is hers to say: ask, and register it in `ingredients.yml` (its list, `shelf_of`) once she has. `_is_qq` in `tests/test_cocktails.py` is what makes `QQ <words>` legal to every check.
+**THE REPO-LESS PROJECT FOLLOWS THE SAME THREE TIERS NOW.** It used to be the exception -- `"QQ"`, always, because that session could not see the vocabulary -- and on 2026-09-21 that stopped being a constraint and became what it had always actually been, a choice: `INGEST_ONE_COCKTAIL.md` §3a PRINTS all 181 declared generics, rendered by `scripts/build_ingest_vocab.py` like the six vocabularies it already printed. So tier 2 is a lookup that session can do, and tier 1 is the only one still out of its reach.
+
+**A typed pour is checked for a price and a strength, and a bare `QQ` never was** -- so typing can turn the suite red on `costs.yml` and `abv.yml`. Do NOT invent those numbers: a placeholder row at `confidence: low`, with a `basis` that says it is a placeholder and not shop-checked, and (for a strength) a `qq:` saying what Helen has to check, is the sanctioned shape, and it goes on her list. A NEW generic (`ginger beer`, `coconut rhum`) is hers to say: ask, and register it in `ingredients.yml` -- **its list, `shelf_of`, and a cost row** -- once she has. A generic with no `shelf_of` entry falls to the end of her shopping list in an unlabelled group, which nothing reports.
 
 **Three things a `QQ` is not.** It is not an error: do not flag it, fix it, or
 convert it. It is not a prompt to answer from general knowledge -- that is the
@@ -123,19 +125,14 @@ and this means *waiting on Helen*, which is the distinction it was asked for
 >   stays: leave a drink as she spelled it and add the spelling as an alias
 >   (MANUAL §9.3.2). The alias map is what lets an ingest be fast; a finished
 >   drink has had time to say the real name.
-> - **No ingredient carries `item`.** *"This has 'item' everywhere too."* It is
->   the source's own wording, allowed only beside `generic: "QQ"` and gone the
->   moment the generic is filled in, wherever the file is
->   (`test_item_is_gone_once_the_generic_is_filled_in`, §9.3) -- so a staged
->   drink, whose generics are all filled, has none. Nothing renders it. **Read each one before deleting it:** if it says something
->   `generic`, `suggestion` and `amount` do not already say — "Strong cold black
->   breakfast tea" beside `black tea`, "pear, sliced" beside `pear` — that fact
->   moves to a `note:` on the same ingredient. If it merely restates the generic,
->   which is the usual case, delete the line.
+> - **No pour still says `QQ`.** A staged drink is one Helen is about to
+>   publish, and a `QQ` anywhere in `_cocktail_recipes/` fails
+>   `test_no_published_drink_carries_a_qq` outright. Staging is where they get
+>   answered, because the source is still in front of her.
 >
-> **A bottle named only in `item` is still not yours to declare.** Where the
-> bottle is undeclared (Patrón Reposado), the fact goes in a `note:` and the
-> `suggestion` field is left for Helen — TIER 3, unchanged.
+> **A bottle the repo does not declare is still not yours to declare.** Where it
+> is undeclared (Patrón Reposado), the fact goes in a `note:` and `suggestion`
+> stays `[]` — TIER 3, unchanged.
 
 ---
 
@@ -176,10 +173,14 @@ file say the same things.
 4. **`/tidy-drafts`**, either collection (both since 2026-09-05), if the
    quoting or typography needs it. It never touches a `QQ` line, so the
    transcription is safe.
-5. **Work the hand-back list, and treat every item as a TIER 3 question.**
-   These are the things that session could not know, which is nearly always
-   because the answer is in Helen's head rather than in the source. A missing
-   glass, a `generic`, a `tagline`: ask, do not fill in.
+5. **Work the hand-back list against the three tiers above, not as one pile.**
+   It used to say "treat every item as a TIER 3 question ... ask, do not fill
+   in", which contradicted the tiers 130 lines above it in this same file, for
+   this same session -- corrected 2026-09-21. A `generic` whose pour names a
+   DECLARED BOTTLE is tier 1 and you resolve it; one that matches a declared
+   generic exactly is tier 2 and you type it. **What genuinely remains is tier 3
+   and is hers**: a missing glass, a `tagline`, a category the vocabulary does
+   not settle. Ask; never fill in.
 6. **Run `python3 scripts/ingest_preflight.py`** for a drink, which reports the
    undeclared bottles and near-miss garnishes in the same shape as a photo
    batch.

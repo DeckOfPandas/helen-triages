@@ -1557,10 +1557,8 @@ ingredients:                     # FULL list, untriaged, in build order
   - amount: "15 ml"              # the ONLY quantity field, NO US UNITS, and
                                  # NEVER a bare number — the unit is required
     generic: "moderately aged Jamaican rum"  # the vocabulary; see §9.3.1
-    suggestion: ["Appleton Estate Signature"]  # the bottle. ALWAYS A LIST — §9.10
-                                 # (`item` goes here on a FRESH ingest, beside
-                                 #  generic: "QQ", and goes when the category is
-                                 #  filled in — §9.10)
+    suggestion: ["Appleton Estate Signature"]  # the bottle. ALWAYS A LIST, and
+                                 # `[]` where nobody has chosen one — §9.10
   - amount: "15 ml"
     generic:                     # a LIST means "or", never "and" — §9.3.1
       - "lightly aged and filtered rum"
@@ -1674,20 +1672,34 @@ old one with nothing watching the pair.
 `test_the_layout_takes_the_twist_step_from_methods_yml` watches it now, and
 also pins the list's ORDER, which the template indexes.
 
-**`item` may exist only beside `generic: "QQ"`.** It holds what the SOURCE
-called the pour until the category is known, and goes when the generic is
-filled in, wherever the file is (`test_item_is_gone_once_the_generic_is_filled_in`),
-so a staged or published drink never carries one. Nothing renders it. Before
-deleting one, check whether it says something `generic`, `suggestion` and
-`amount` do not — a bottle nobody has declared, "brewed strong, from breakfast
-tea, and cold" — and move that to a `note:`; **a field nothing renders can
-still be hoarding facts** (23 real bottles came out of it once).
+**THERE IS NO `item` FIELD — retired 2026-09-21.** It held what the SOURCE
+called a pour until the category was known, and Helen ended it: *"'item' needs
+to go. Kill it with fire. Data can be read straight into generic/suggestion
+with or without QQs, and anything genuinely unclear added to a page note for
+me."* It went because **nothing rendered it**, so a transcription sitting there
+was invisible to the page, the cards, the search, costing and ABV alike — and a
+field nothing renders hoards rather than holds (23 real bottles came out of it
+once). The source's words now go in `generic` behind a `QQ `, where they show;
+anything the three fields do not carry goes in a `note:`. Three whole tests went
+with the field, along with `INGREDIENT_KEYS_RECIPES` and the layout's headline
+fallback.
 
 **`generic` is fully typed and is what the index browses by.** An untyped
 ingredient is always a visible `QQ`, never an absent key
-(`test_every_ingredient_has_a_generic_or_a_qq`). Since #501 it is also what a
-card shows — §9.10.1. There is no star axis: the index filters and excludes
-by ingredient, it does not browse by spirit.
+(`test_every_ingredient_has_a_generic_or_a_qq`), and **a `QQ` carries the
+source's own words after it** — `generic: "QQ aged Jamaican rum"` — because
+`generic` is the one field a reader sees and a bare `QQ` renders as "90 ml QQ".
+`_is_qq` in `tests/test_cocktails.py` is the predicate; every check that sets a
+bare QQ aside sets that shape aside too. Since #501 it is also what a card shows
+— §9.10.1. There is no star axis: the index filters and excludes by ingredient,
+it does not browse by spirit.
+
+**`suggestion` is always present, `[]` where nobody has chosen a bottle.**
+Helen, 2026-09-21: *"At ingest, please add a blank suggestion field if there
+isn't a named suggestion, because that saves me typing YAML when I come to it if
+I want to note my own suggestion."* `["QQ"]` is not a shape — it made
+`test_every_suggested_bottle_resolves` skip the pour, so a real bottle parked
+behind a QQ would never have resolved, reported or rendered.
 
 **Sugar is in the generic, and so is the RATIO** (#594): `cane sugar syrup 1:1`,
 `cane sugar syrup 2:1`, `demerara sugar syrup 2:1`, `turbinado sugar syrup 2:1`.
@@ -1791,10 +1803,12 @@ names two bottles: write the PRODUCT, not the house.
 rename — that falsifies it.
 
 **`hers_to_apply`** lists styles that have bottles and no drink, which are
-Helen's to apply and never to be retyped into from `item` text
+Helen's to apply and never to be typed into from a source's own words
 (`caramel-forward Jamaican rum` is the case that earned it). Removing a line
 is her grant, in the same commit as the drink that earns the style.
-`test_no_drink_uses_a_generic_that_is_helens_to_apply` enforces it.
+`test_no_drink_uses_a_generic_that_is_helens_to_apply` enforces it, and
+`build_ingest_vocab.py` keeps the list out of the printed vocabulary so a
+repo-less session is never offered one.
 
 **The governing principle (#459)**: *"everything we do is focused on the user
 (i.e. Helen), and making sure the user gets the drink she wants. Being an
@@ -2121,9 +2135,11 @@ its own quiet line, then `note`:
               character: blackstrap
     22.5 ml lime juice
 
-**`item` does not render** — that is the whole fix for #513 (item and
-generic restating each other on two lines). **A card name may be lossy; a
-recipe line may not** (#561 is why the page was possible). `character` gets a
+**The line is `generic` plus the bottle, and nothing else** — that was the whole
+fix for #513, where `item` and `generic` restated each other on two lines, and
+since 2026-09-21 the transcription field is gone rather than merely unrendered.
+**A card name may be lossy; a recipe line may not** (#561 is why the page was
+possible). `character` gets a
 LINE, not a parenthetical, because "moderately aged rum (blackstrap)" reads
 as a TYPE of rum. `.cocktail-suggestion` is quieter than the class it
 follows: the class is what the drink REQUIRES, the bottle what Helen reaches

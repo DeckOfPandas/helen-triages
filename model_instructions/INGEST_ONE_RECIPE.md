@@ -80,7 +80,7 @@ ended.
 ```yaml
 ---
 title: "Lemony Cavolo Nero and Butter Bean Soup"
-tagline: "It's fun to have a one-pot stew that is bright and acidic."
+tagline: "QQ It's fun to have a one-pot stew that is bright and acidic."
 source: "Adapted from Good Food, January 2026"
 source_type: publication
 serves: "4"
@@ -125,7 +125,7 @@ name you give is a courtesy rather than a contract.
 | Field | Rule |
 |---|---|
 | `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. |
-| `tagline` | One line of prose, no full stop needed. If the source has an intro sentence worth keeping, adapt it. If not, write `"QQ"` — do **not** invent enthusiasm. |
+| `tagline` | One line of prose, **and it always begins `QQ `, because it is never yours.** If the source has an intro sentence worth keeping, adapt it and prefix it — `"QQ A saucy, slow-cooked ragù…"`. If there is nothing worth keeping, write `"QQ"` alone. Do **not** invent enthusiasm. **The tagline is Helen's voice on a published page**, and a `QQ` is what stops somebody else's marketing copy reaching it under her name. Her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*, and for food: *"it's less of a problem for me if source taglines remain, but please QQ at the start of the line."* |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. |
 | `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **If the source does not support an estimate, ASK Helen rather than guess** -- her rule: "Claudes can check with me if unsure." |
@@ -578,7 +578,8 @@ meta:
 - **The recipe is cut off.** The source ends mid-build: the gnocchi are drained,
   the butter is made, and no step brings them together or uses the parmesan.
   Flagged in a note rather than finished.
-- **No `tagline`.** The source's intro was marketing copy, so `QQ`.
+- **No `tagline` worth keeping.** The source's intro was marketing copy with
+  nothing in it, so a bare `QQ` rather than a `QQ ` plus its words.
 - **No `star_ingredient`.** Gnocchi is not one of the fourteen and nothing else
   is the hero.
 - **`carbs party` is a proposal.** `cheese-tastic` is arguable on 30 g of
