@@ -222,9 +222,45 @@ REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 # it since #567 and this whitelist would have rejected any drink that wrote one.
 # A field the code supports and the schema refuses is a trap for whoever tries
 # it first, so both are declared here now.
+# THE THREE `_claude` KEYS ARE A PROPOSAL, NOT AN ANSWER -- added 2026-09-21.
+# Helen, asked where a Claude's proposed category should live so she can check
+# it against the source's own words: "I'd want to make sure Claude doesn't
+# always confidently write 'Gosling's' instead of both."
+#
+# SO THE SOURCE'S WORDS STAY IN `generic`, BEHIND THE QQ, AND THE PROPOSAL SITS
+# BESIDE THEM. It is the `QQ original` / `QQ Claude` pair applied to a field
+# rather than to a method step: both halves are on the file, the page renders
+# the QQ so the drink cannot publish, and she collapses the pair by ruling.
+#
+# THEY ARE FOR A NARROWER CASE THAN IT FIRST LOOKS, and her own rule is what
+# narrows it: "If the source says 'Gosling's' then the correct thing for Claude
+# to do is give 'moderately aged rum, character: blackstrap'. But if a recipe
+# gives 'blackstrap' Claude shouldn't suggest anything." A DECLARED BOTTLE is a
+# dictionary read -- write `generic` and `suggestion` outright, no proposal. A
+# bare category word nobody can resolve is hers alone -- `QQ <the words>` and
+# nothing else. A proposal belongs only in between.
+#
+# `character_claude` IS THE CLEAREST CASE THERE IS, and it exists because
+# `bottles.yml` deliberately has no character column: its own note against
+# Gosling's Black Seal says the bottle is "reached for FOR its blackstrap, which
+# is a `character` on the recipe and never a generic -- #314, and the reason
+# this file has no character column". So resolving the BOTTLE gives the generic
+# and the suggestion mechanically and gives no character at all, and Helen's
+# 2026-09-14 ruling says why: "We don't name characters on bottles. We name
+# characters on recipe lines ... having a character is only in a context."
+# A character is therefore always an inference about THIS recipe, and an
+# inference is exactly what belongs in a proposal rather than in the field.
 INGREDIENT_KEYS = {
     "generic", "amount", "suggestion", "note", "character", "optional",
     "as", "card_order",
+    "generic_claude", "suggestion_claude", "character_claude",
+}
+
+# The proposal keys, and the field each one proposes a value for.
+CLAUDE_PROPOSALS = {
+    "generic_claude": "generic",
+    "suggestion_claude": "suggestion",
+    "character_claude": "character",
 }
 
 # `amount` is not required HERE because it has its own test with its own
@@ -1918,6 +1954,113 @@ def test_every_generic_is_declared():
         "Undeclared generic(s):\n  " + "\n  ".join(bad)
         + "\n\nEither it is a typo, or the value is real and belongs in "
           "_data/cocktails/ingredients.yml. Issue #322 is the spec."
+    )
+
+
+def test_a_claude_proposal_only_sits_beside_an_open_question():
+    """A `_claude` key is legal only while the POUR still carries a `QQ`.
+
+    CONDITIONAL, AND THAT IS THE WHOLE DESIGN, the same shape the retired `item`
+    rule had: the proposal is allowed exactly as long as the question it answers
+    is open, and is forbidden the moment it is settled. A proposal beside a
+    fully-answered pour is one that outlived its answer -- which is how `item`
+    became a dumping ground, 215 pours deep, before it was retired.
+
+    THE QQ MAY BE IN THE `note`, NOT ONLY IN `generic`, and that is not a
+    loophole -- it is the case the proposal keys were ADDED for. A source
+    naming `Gosling's` resolves its generic and its suggestion outright, from
+    `bottles.yml`, so no QQ survives in `generic`; what is still open is the
+    CHARACTER, which `bottles.yml` deliberately does not record. That pour is
+    typed and has an open question, and the question lives in a `QQ -` note
+    beside the proposal. Helen's own definition is what makes this right: `QQ`
+    means "Helen pay attention to this for some reason", and it is the marker
+    rather than the field that carries the meaning.
+
+    IT IS ALSO WHY NO SECOND LIST IS NEEDED FOR PUBLISHED DRINKS. A published
+    drink carries no `QQ` anywhere (`test_no_published_drink_carries_a_qq`), so
+    by this rule it can carry no proposal either. One rule, both collections, no
+    `INGREDIENT_KEYS_RECIPES` to keep in step -- and that matters, because the
+    last key that needed a published-tense list of its own needed three tests
+    and got them wrong twice.
+    """
+    bad = []
+    for slug, fm in _load():
+        for i, entry in enumerate(fm.get("ingredients") or [], 1):
+            if not isinstance(entry, dict):
+                continue
+            proposals = sorted(set(entry) & set(CLAUDE_PROPOSALS))
+            if not proposals:
+                continue
+            open_question = (_unanswered(_listed(entry.get("generic")))
+                             or _is_qq(entry.get("note")))
+            if not open_question:
+                bad.append(f"{slug} entry {i}: {', '.join(proposals)} on a pour "
+                           f"with nothing left open "
+                           f"(generic {entry.get('generic')!r}, "
+                           f"note {entry.get('note')!r})")
+    assert not bad, (
+        f"{len(bad)} proposal(s) outliving the question they answer:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nA `_claude` key is a PROPOSAL and is legal only while the pour "
+          "still asks something -- a `QQ` in `generic`, or a `QQ -` note saying "
+          "what is open. Once Helen has ruled, the proposal either becomes the "
+          "field's value or is wrong; either way it stops being a proposal and "
+          "the key goes. Do not delete a QQ to make this green."
+    )
+
+
+def _listed(value):
+    if value is None:
+        return []
+    return value if isinstance(value, list) else [value]
+
+
+def test_a_claude_proposal_names_a_real_value():
+    """A proposed generic, character or bottle is one the repo declares.
+
+    A PROPOSAL IS STILL HELD TO THE VOCABULARY, and it has to be: its whole
+    purpose is to be promotable into the field with one edit, so a value the
+    field would refuse is a proposal that can never be accepted. This is the
+    guard that stops `generic_claude: "blackstrap"` -- a word that is a
+    CHARACTER in this model and has been retired as a generic since #314, which
+    is precisely the confusion Helen raised when she asked for these keys.
+
+    `suggestion_claude` RESOLVES THROUGH THE ALIAS MAP, like any suggestion, so
+    a proposal may name a bottle the way the source spelled it.
+    """
+    vocab = _vocab()
+    declared = _declared_generics(vocab)
+    retired = _retired(vocab)
+    characters = {c for key, value in vocab.items()
+                  if _is_character_list(key) for c in value}
+    bottles = _bottle_index(_bottles())
+
+    bad = []
+    for slug, fm in _load():
+        for entry in (fm.get("ingredients") or []):
+            if not isinstance(entry, dict):
+                continue
+            for g in _listed(entry.get("generic_claude")):
+                if g in retired:
+                    bad.append(f"{slug}: generic_claude {g!r} is RETIRED "
+                               f"({retired[g]})")
+                elif g not in declared:
+                    bad.append(f"{slug}: generic_claude {g!r} is not declared")
+            for c in _listed(entry.get("character_claude")):
+                if characters and c not in characters:
+                    bad.append(f"{slug}: character_claude {c!r} is not a "
+                               f"declared character")
+            for s in _listed(entry.get("suggestion_claude")):
+                if str(s).strip().lower() not in bottles:
+                    bad.append(f"{slug}: suggestion_claude {s!r} names no "
+                               f"known bottle")
+    assert not bad, (
+        "Proposal(s) naming something the field would refuse:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nA proposal exists to be promoted into its field with one edit, "
+          "so it is held to the same vocabulary the field is. If the right "
+          "answer is not in the vocabulary, there is no proposal to make -- "
+          "leave the `QQ` and the source's words alone."
     )
 
 
