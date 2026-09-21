@@ -357,8 +357,51 @@ $card-shortlist-size: 1.15rem;
 // `clientWidth`, and this narrows exactly that box — so a name that no longer
 // fits steps down or wraps by the rule Helen chose on the same day, with
 // nothing to keep in step and no second idea of how wide a title may be.
+// AND A DRAFT CARD BUYS A LITTLE MORE -- #1162, 2026-09-21. The draft mark sits
+// to the LEFT of the button, on the same anchor, so on a local build it makes
+// the same kind of collision with the tape and pays for it the same way.
+//
+// A CUSTOM PROPERTY ADDED INTO THIS ONE calc, RATHER THAN A SECOND RULE
+// RESTATING IT. `--card-draft-reserve` is 0 everywhere by the fallback, so a
+// published card's reservation is byte for byte what it was; only a card
+// wearing the mark pays. A second `padding-right` rule would have been a
+// duplicate of the four terms above, and the reason that matters is written
+// three paragraphs up -- card-name-fit.js measures whatever box this leaves, so
+// there must only ever be one idea of how wide a title may be.
 .drink-cards .drink-card-name {
-  padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right});
+  padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right} + var(--card-draft-reserve, 0px));
+}
+
+// --- the draft mark's own corner, beside the button --------------------------
+// #1162. Helen asked for it "squished in on the top right", and #823 gave that
+// corner to the `+`. So the badge sits to its LEFT on the same top anchor.
+//
+// IT LIVES IN THIS FILE BECAUSE THE OFFSET IS THE BUTTON'S ARITHMETIC: the mark
+// is `0.85em` of `$card-shortlist-size` (its `::before` sets that width), it
+// carries `$space-xs` of padding on each side, and `$space-sm` separates the
+// two objects. `$card-shortlist-size` is declared here and _cards.scss is
+// imported first, so the rule cannot be written there -- the build says so.
+// Change the button's size and this follows it.
+//
+// `z-index` TO MATCH THE BUTTON, for the reason that rule gives: the whole card
+// is a link drawn as a pseudo-element, and anything not lifted past it is
+// painted underneath. `pointer-events: none` because the badge is a label, not
+// a control -- the card's own link should keep that patch of the card.
+//
+// THE RESERVE IS A SEPARATE NUMBER from the offset and cannot be derived from
+// it: it is how wide the WORD is, which depends on the face and the tracking in
+// _cards.scss. 3.1rem measured on the built page; it only ever narrows the tape
+// on a local build, and card-name-fit.js does the rest.
+.drink-card--draft {
+  --card-draft-reserve: 3.1rem;
+}
+
+.drink-cards .drink-draft-badge {
+  position: absolute;
+  z-index: $card-z-controls;
+  top: $card-pad-y;
+  right: calc(#{$card-pad-x} + 0.85 * #{$card-shortlist-size} + 2 * #{$space-xs} + #{$space-sm});
+  pointer-events: none;
 }
 
 // --- IT APPLIES TO EVERY CARD IN EVERY LIST, INCLUDING THE RELATED ONES ------

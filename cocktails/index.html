@@ -535,7 +535,16 @@ permalink: /cocktails/
          carrying it would neither survive a change to it nor match the key this
          drink's own page emits. food/index.html's row carries the same
          attribute for the same reason. {% endcomment %}
-      <li class="drink-card"
+      {% comment %} `.drink-card--draft` CARRIES THE RESERVATION, NOT THE MARK
+         -- #1162. The badge itself is emitted further down by
+         _includes/cocktails/draft-badge.html; this class exists so the card can
+         set `--card-draft-reserve`, which the tape's own padding calc adds in
+         (_sass/cocktails/_shortlist.scss). A modifier rather than a second
+         `{% raw %}{% if %}{% endraw %}` around that padding, because the
+         reservation belongs to the CARD and the word belongs to the badge.
+         Both ask `collection`, which is food/index.html's idiom (#562).
+         {% endcomment %}
+      <li class="drink-card{% if drink.collection == 'cocktail_drafts' %} drink-card--draft{% endif %}"
           data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
@@ -790,6 +799,15 @@ permalink: /cocktails/
                 aria-label="shortlist {{ drink.title }}"
                 aria-pressed="false"
                 hidden></button>
+        {% comment %} THE DRAFT MARK, BESIDE THE SHORTLIST BUTTON -- #1162.
+           Helen asked for it "squished in on the top right", and that corner
+           already belongs to the `+` (#823 gave it there on purpose, and it
+           claims the corner from the card's own link). So the badge sits to its
+           LEFT, on the same top anchor, and the room is bought the way the
+           button's own is -- see `--card-draft-reserve` in
+           _sass/cocktails/_shortlist.scss. Last in the markup with the button,
+           for the tab-order reason its comment gives. {% endcomment %}
+        {% include cocktails/draft-badge.html doc=drink %}
       </li>
     {% endfor %}
   </ul>

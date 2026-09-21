@@ -6477,6 +6477,52 @@ verification. Dates are when the correction landed.
   on the svg is the same intent stated where it applies. Horizontal only —
   the vertical `0`s are what keep the drawing from sizing the row (#942).
 
+- **2026-09-21, #1162 — a DRAFT mark on the local site.** Helen: *"add a DRAFT
+  badge on the local site for unpublished cocktails"*, on cards *"squished in on
+  the top right"* and on a drink page *"to the right of the name tape, below if
+  needed"*. She asked whether it needed discussing; it did not, beyond one thing
+  worth saying before building: **the card's top-right corner is already taken.**
+  #823 gave it to the shortlist `+`, which claims it from the card's own
+  stretched link, so "squished in" had to mean beside it.
+
+  **IT CANNOT REACH PRODUCTION, AND NOT BECAUSE ANYTHING CHECKS A FLAG.** Drafts
+  are a collection with `output: false` that only enters a loop under
+  `site.show_drafts`, a key only `_config_local.yml` declares — so a production
+  build has no draft for the badge to mark. Verified rather than argued: the
+  deploy build carries the CSS rule and **no markup wearing it**, on any page.
+
+  **NO NEW HUE (§13.12).** Every colour on a card is spoken for — absinthe is
+  the glass, magenta is "this one, chosen", reposado orange is the ship's
+  verdict — and a draft mark makes no claim about the drink at all; it says
+  where the file is in Helen's process. So it takes the card's quiet text colour
+  and earns its visibility from a hairline and the tracking.
+
+  **FOOD'S `.badge-draft` IS NOT REUSED AND COULD NOT BE**: that mark is a
+  clip-path in `_sass/food/_badges.scss`, which the cocktails stylesheet does
+  not import (§2.5 — the two sites share chrome, not card vocabulary). Same
+  word, each site's own drawing, which is what the two indexes already do.
+
+  **TWO PLACEMENTS, TWO MECHANISMS, and the issue's own wording chose them.**
+  "Squished in on the top right" is a position, so the card's badge is absolute,
+  offset from the button's own terms (`0.85em` of `$card-shortlist-size` plus
+  its padding and a gap) rather than off a screenshot. "Below if needed" is a
+  FLOW instruction, so the drink page's is an in-flow item in a wrapping flex
+  row. The room the card's costs is added into the tape's existing reservation
+  through `--card-draft-reserve`, which is `0` everywhere by its fallback — one
+  `calc`, not a second rule duplicating four terms, because `card-name-fit.js`
+  measures whatever box that leaves and there must be one idea of how wide a
+  title may be.
+
+  **AN IMPORT-ORDER TRAP, found by the build failing.** The card's offset needs
+  `$card-shortlist-size`, which `_shortlist.scss` declares — and `_cards.scss`
+  is imported first, so writing the rule there is `Error: Undefined variable`.
+  The rule lives with the button whose arithmetic it borrows, which is where it
+  belonged anyway.
+
+  **The related-drinks row is not a call site**, and that is a fact about the
+  data: it is built from `site.cocktail_recipes` only, so no card in it can ever
+  be a draft.
+
 - **2026-09-21, #1165 — the card glass clipped between 400 and 720px, and
   #1086's own fix is what broke it.** Helen: *"glasses are too large and are
   overflowing vertically on cocktail cards at medium screen widths."*
