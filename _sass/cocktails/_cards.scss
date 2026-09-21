@@ -738,7 +738,22 @@ $card-name-step: 0.86;
   line-height: 1;
 
   color: #ECE9EA;
-  -webkit-text-stroke: var(--emboss-stroke-w) var(--emboss-stroke-c);
+  // `--lettering-heading-stroke-c`, NOT `--emboss-stroke-c` -- #778, 2026-09-21.
+  // This was the last live reader of that alias anywhere in the repo, and the
+  // alias is gone with it (shared/_rule.scss).
+  //
+  // IT IS A RE-POINT AND NOT A RE-VALUE, which is the trap LETTERING §10 names:
+  // both names resolved to `$color-label-stroke` on this site already, because
+  // cocktails/_rule.scss set the two in the same block and said so in as many
+  // words ("--lettering-heading-stroke-c mirrors --emboss-stroke-c above").
+  // Verified as well as reasoned: the computed stroke on this element is
+  // `0.16px rgb(164, 156, 141)` before and after.
+  //
+  // STILL DELIBERATELY UNTIERED (LETTERING §7). Reading one tier's colour is
+  // not the same as taking the tier -- the shadow below is this element's own
+  // pair, tuned at card size, and `@include lettering(heading)` would replace
+  // it. The tier supplies a colour here, nothing more.
+  -webkit-text-stroke: var(--emboss-stroke-w) var(--lettering-heading-stroke-c);
   text-shadow: -1px -1px 0 #fdfbfe,
                 1px  1px 0 rgba(5, 5, 5, 0.9);
 

@@ -28,18 +28,20 @@ is the thing most likely to be got wrong when adding a new consumer by hand.
 **Where it lives:**
 
 - `_sass/shared/_rule.scss` — `$emboss-stroke`, `$emboss-offset`,
-  `$emboss-offset-large`, the `--emboss-*` custom properties, `@mixin
-  punched($style, $offset)`, and the subject of this document, `@mixin
-  lettering($tier, $offset)`.
+  `$emboss-offset-large`, `--emboss-stroke-w` / `--emboss-offset`, and the
+  subject of this document, `@mixin lettering($tier, $offset)`.
 - `_sass/food/_rule.scss` and `_sass/cocktails/_rule.scss` re-point the tier
   custom properties to each site's own values (§3 below).
-- `punched()` is the older, untiered primitive. **It has no direct caller any
-  more** — checked 2026-09-06, `grep "include punched" _sass/` finds only
-  comments. It stays defined as the reference implementation of the two-copy
-  raised shadow, and because the `--emboss-*` aliases (§10) are still read
-  by three files. This said "exactly one direct caller, `_cocktail.scss`'s
-  drink-page headings" until 2026-09-06; those headings take the heading
-  tier through the shared `h1, h2, h3` rule now. Everything reads a tier.
+- **`punched()` IS GONE** (#778, 2026-09-21), and so are the three `--emboss-*`
+  COLOUR aliases it read. It was the older, untiered primitive, kept as the
+  reference implementation of the two-copy raised shadow and because those
+  aliases still had readers; by 2026-09-21 it had no caller at all and they had
+  none either. `lettering()` draws the same two copies per tier. Recover it from
+  git history if a `pressed` treatment is ever wanted — no tier has one, because
+  nothing ever asked.
+  **`--emboss-stroke-w` and `--emboss-offset` survive and are not aliases**:
+  one stroke width and one offset for the whole site, which `lettering()` reads
+  for every tier.
 
 ## 2. The physics, and the finding that fixed it
 
@@ -150,24 +152,25 @@ That is the whole interface. It sets `-webkit-text-stroke` and `text-shadow`
 together; nothing else about an element (font, size, colour, letter-spacing,
 the blocky rule underneath it) is this mixin's concern.
 
-**Why it doesn't call `punched()`,** even though `display` and `heading` are
-both a stroke plus a two-copy raised shadow — exactly what `punched()` draws.
-`punched()` reads `var(--emboss-light)` / `var(--emboss-shadow)`, shared
-inherited custom properties. Routing a tier through it would mean locally
-*redeclaring* those two properties on every display/heading element so
-`punched()` picks up the right pair — and a locally redeclared custom
-property inherits into every descendant of that element, not just into
-`punched()`'s own text-shadow line. Nothing today reads `--emboss-light` or
-`--emboss-shadow` inside a heading, but they are shared, general-purpose
-names, and a future component doing so would have no reason to expect a
-heading was silently rebinding them underneath it. `lettering()` duplicates
-`punched()`'s two-line raised-shadow arithmetic instead, reading each tier's
-own four properties directly — four lines, and the trap is gone.
+**Why it never called `punched()`** — kept because the argument is why the
+tiers are shaped as they are, and `punched()` itself is gone (§1, #778).
+`display` and `heading` are both a stroke plus a two-copy raised shadow, which
+is exactly what `punched()` drew, so routing a tier through it looks obvious.
+It reads `var(--emboss-light)` / `var(--emboss-shadow)` — shared, INHERITED
+custom properties — so a tier would have had to locally *redeclare* those two
+on every display/heading element to make it pick up the right pair. **A locally
+redeclared custom property inherits into every descendant of that element**,
+not just into the one text-shadow line meant to read it, so a heading would
+have silently rebound two general-purpose names for everything inside it.
+`lettering()` duplicates the two-line raised-shadow arithmetic instead, reading
+each tier's own properties directly — four lines, and the trap never existed.
+**That reasoning is the reason those two aliases had no other business surviving
+either**, and #778 deleted them with the mixin.
 
-**Why it has no `$style` argument.** Every tiered consumer is `raised`;
-nothing reaches a tier wanting `pressed` (letters punched *down*).
-`punched()` keeps `$style` for any future direct caller that genuinely wants
-the inverted read; none exists today (§1).
+**Why it has no `$style` argument.** Every tiered consumer is `raised`; nothing
+reaches a tier wanting `pressed` (letters punched *down*). `punched()` kept a
+`$style` argument for a future direct caller that wanted the inverted read; none
+ever appeared, which is part of why it could go.
 
 ## 5. Every consumer, its tier, and why
 
@@ -333,28 +336,34 @@ a punched element:
   and every migrated consumer picks up the change with no specificity fight
   and no list of selectors to maintain (see `_sass/shared/_rule.scss`'s "THE TWO
   GROUNDS" section, and the now-removed `.on-dark` class's own postmortem in
-  the same file for the mechanism worked out in full). It also means a
-  mixin that locally redeclares `--emboss-light` / `--emboss-shadow` (which
-  `lettering()` deliberately does NOT do — see §4) would leak that
-  redeclaration into every descendant, not just the one shadow line meant to
-  read it.
+  the same file for the mechanism worked out in full). The same inheritance is
+  a trap from the other side: a mixin that locally redeclares a shared property
+  so its own one line reads the right value leaks that redeclaration into every
+  descendant. That is why `lettering()` duplicates the shadow arithmetic rather
+  than routing through a mixin reading shared names (§4) — the case that
+  argument was made against, `punched()`, is gone (#778), but the shape of it
+  applies to any shared property a component is tempted to rebind locally.
 - **Anything below 1rem must be `label` or `plain`.** Giving a small element
   the heading or display treatment doesn't fail loudly — it compiles, it
   renders, and it reads as a smudge or a second faint letterform, because the
   shadow copy cannot clear the stroke at that size. This is not a rule of
   thumb to override with a bigger offset; §3's physics section explains why
   more offset doesn't fix it either.
-- **`--emboss-stroke-c` / `--emboss-light` / `--emboss-shadow` are aliases of
-  the heading tier now, not independent values.** They exist so the files
-  that still read the old names keep rendering exactly as before —
-  `_sass/cocktails/_cards.scss`, `_sass/shared/_layout.scss` and
-  `_sass/food/_recipe-header.scss` as of 2026-09-06 (`_cocktail.scss` no
-  longer does; this bullet named it until then). Do not re-point them
-  directly to fix a heading-tier problem — re-point `--lettering-heading-*`
-  instead, or those consumers will silently pick up a value meant for
-  something else. Delete the alias block in `_sass/shared/_rule.scss` once
-  nothing reads the old names directly (grep `var(--emboss` across `_sass/`
-  to check; it is not yet).
+- **`--emboss-stroke-c` / `--emboss-light` / `--emboss-shadow` are GONE**
+  (#778, 2026-09-21). They were aliases of the heading tier, kept so that files
+  still reading the pre-tier names rendered exactly as before, and this bullet
+  used to end "delete the alias block once nothing reads the old names". Nothing
+  did, so it went. The last two readers went with it: `punched()`, which by then
+  had no callers at all, and `.drink-card-tape-word`, re-pointed at
+  `--lettering-heading-stroke-c` — the same value it was already getting, since
+  `_sass/cocktails/_rule.scss` set both in one block and said so.
+  **`--emboss-stroke-w` and `--emboss-offset` are NOT affected and never were
+  aliases**: they are tier-independent numbers that `lettering()` itself reads.
+  Only the three colours were per-tier duplicates.
+  **The trap this bullet existed to name is still live in general form:** do not
+  fix a tier problem by re-pointing a shared name that other consumers also
+  read — re-point, never re-value, and check `git log` for what the name used to
+  mean before assuming it is yours to move.
 - **Cocktails' `h1, h2, h3` stroke override in `_rule.scss` is gone, on
   purpose, not lost.** It used to restate `--emboss-stroke-w` /
   `--emboss-stroke-c` a second time to win a specificity fight with a
