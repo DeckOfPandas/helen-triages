@@ -1256,6 +1256,25 @@ plain host worktree too, 2026-09-10), so clone over HTTPS as the agent
 account, through the wrapper:
 
     sh scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts
+    sh scripts/git-clone-agent.sh helen-triages-food-private _food_drafts
+
+**DO IT WHENEVER YOU WANT THEM, WITHOUT ASKING, AND BOTH OF THEM** — Helen's
+standing grant, 2026-09-21. Both lines are here because a session that needs
+one usually needs the other and only ever remembered this one: §9.1 is the
+cocktails chapter, `_food_drafts/` is the same repo shape with the same
+wrapper, and it had no equally findable home. The `dir` arguments are not free
+choices — `conftest.DRAFTS_DIR`, `test_cocktails.DRAFTS` and `tidy_drafts.py`
+all name these two paths.
+
+**AND THE REASON IS THE SUITE, NOT CONVENIENCE.** A bare worktree collects
+10,660 tests; with both clones it collects **30,901**, and the skip count
+*falls* from 110 to 27 — most of what is missing is parametrised per file, so
+it is never created rather than skipped, and the run reports green having
+checked a third of what it names (measured 2026-09-21). §12's own rule about
+a stale glob applies to a whole absent collection: **a green `pytest` in a
+bare worktree says nothing about the drinks or the drafts.** Helen, 2026-09-20,
+on the same arrangement: *"it's not useful to have a situation where we expect
+tests to fail, and we should rearchitect."*
 
 **THE THREE GIT WRAPPERS ARE THE ONLY WAY TO TALK TO A REMOTE OVER HTTPS, AND
 THE REASON IS NOT ONLY THAT THEY KEEP THE TOKEN'S NAME OUT OF THE CALL SITE.**
