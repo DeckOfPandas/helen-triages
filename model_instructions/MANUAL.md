@@ -133,7 +133,12 @@ anything that touches a slug-keyed entry — that is the whole of #1106, whose
 complaint was that the mistake is found after the merge rather than before.
 
 **`.node-runtime/` and `.gh-runtime/` do not come with a worktree**; they are
-gitignored, like the two drafts repos (§9.1). Use the system `node`. **`gh`
+gitignored, like the two drafts repos (§9.1). Use the system `node`. **Since
+2026-09-21 the file tools MAY read the primary clone's `/workspace/.node-runtime`,
+which is above a worktree and so was refused before** — Helen's grant, read-only
+(`additionalDirectories` plus an `Edit(...)` deny; `CLAUDE.md`'s filesystem
+bullet). It holds node v24.18.1 (measured 2026-09-21). That is for LOOKING at
+it; what you run is still the system `node`. **`gh`
 depends on where you are**: the devcontainer image installs it, so inside the
 container `gh` works from any worktree (`/usr/bin/gh`, measured 2026-09-10);
 a worktree on the host has none — `gh: command not found`, not installable
@@ -165,7 +170,11 @@ as before (gitignored; nothing touches `~` or the system, Helen's grant), and
 `scripts/browser/env.sh` — which `shoot.sh` and `crop.sh` source — prefers that
 local copy when it exists. The version is pinned in the Dockerfile and in
 `install.sh`; `tests/test_browser_harness.py` fails if they differ, and bumping
-it means a rebuild. Then `sh scripts/browser/build.sh` builds exactly what deploys into
+it means a rebuild — which since 2026-09-21 `run.sh` does by itself, because it
+stamps each image with a hash of `.devcontainer/` and rebuilds when that hash no
+longer matches the files on disk (`.devcontainer/README.md`, "Keeping the image
+and the Dockerfile in step"). Editing the pinned version in the Dockerfile is
+therefore the whole of the change; the next `run.sh` notices. Then `sh scripts/browser/build.sh` builds exactly what deploys into
 `tmp/site`, `sh scripts/browser/serve.sh` in the background serves it on the
 first free port from 4010 and writes that port to `tmp/browser/port` (since
 2026-09-11 — one server per worktree, so a session never measures another
