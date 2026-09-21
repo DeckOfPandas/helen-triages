@@ -1726,7 +1726,39 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first, as every move before it: the test named all
 # fifteen files, every one of them "last touched by cf4967a9", and nothing
 # else. Covers cf4967a and nothing after.
-COCKTAIL_BASELINE_COMMIT = "cf4967a"   # the `no measuring` chip, on Helen's grant
+#
+# MOVED 2026-09-21 FOR TWO SOURCE LINES, AND THIS IS THE NARROWEST MOVE THE
+# CONSTANT HAS MADE. `742aa73` normalises `Difford's Guide` to `Difford's` on
+# `biggles-sidecar` and `classic-champagne-cocktail` -- 24 other drinks say
+# `Difford's`, and the new `_data/cocktails/sources.yml` declares that the house
+# form. Two files, one field, four characters removed from each.
+#
+# HER GRANT, UNPROMPTED AND EXPLICITLY BOUNDED: "If you're tweaking a bracket in
+# a source line there's no need to flip the proofread flag, in this session
+# only, normal rules again after this." The bound is hers and is recorded here
+# because a grant with an expiry is worthless if only the taker remembers it:
+# THIS IS THAT SESSION AND THERE IS NOT ANOTHER. A later commit citing this
+# paragraph for a different edit is misreading it.
+#
+# WHY IT IS A DEFENSIBLE ONE ANYWAY, on the terms #367 actually sets. The rule
+# is that an agent's edit means her read no longer covers what is in the file.
+# What changed here is the SPELLING of a publication's name, on a line whose
+# content she has read, to the form she has read on 24 other drinks. There is no
+# reading of "Difford's Guide" that her proofread of "Difford's" fails to cover.
+# That is the fourth and fifth moves' shape -- a change she can see whole in the
+# sentence that asked for it -- rather than the fifteen-file shape #933 is uneasy
+# about.
+#
+# AND IT IS STILL A VISIBLE FIELD, which is why this needed a grant at all
+# rather than `_only_invisible_keys_changed`. `source` prints on the drink page;
+# only `source_type` is on the invisible list. A spelling that renders is a
+# spelling a reader sees.
+#
+# Proved with the old value first, as every move before it: the test named
+# `_cocktail_recipes/biggles-sidecar.md` and
+# `_cocktail_recipes/classic-champagne-cocktail.md`, both "last touched by
+# 742aa738", and nothing else. Covers 742aa73 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "742aa73"   # two source spellings, on Helen's bounded grant
 
 
 def _newest_commit_per_published_drink():
