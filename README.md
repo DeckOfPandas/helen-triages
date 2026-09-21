@@ -27,7 +27,7 @@ This public repo holds both the food and cocktails sides, with private repos hol
 2. Check the three repos out locally
 3. Run the container (running bash):
    - `.devcontainer/run.sh`
-      - Builds the image from the Dockerfile if it doesn't exist yet
+      - Builds the image from the Dockerfile if it doesn't exist yet, and rebuilds it if `.devcontainer/` has changed since the image was built (see "Rebuilding the image after changes" below)
       - Plenty of packages are pre-installed, including Playwright and its dependencies
       - Bind-mounts the primary checkout at /workspace, even when run from inside a worktree
       - Reads `AGENT_GH_TOKEN` from `settings.local.json` and passes it in as an environment variable
@@ -64,11 +64,24 @@ WSL leaves Zone.Identifier files behind when I copy things in from Windows. They
 
 ## Rebuilding the image after changes
 
+Since 2026-09-21 this is automatic: `run.sh` stamps each image it builds with a hash of everything in `.devcontainer/`, and rebuilds whenever that hash no longer matches the files on disk. So edit the Dockerfile and just run it:
+   - `.devcontainer/run.sh`
+
+This exists because "does the image exist" and "does the image match the Dockerfile" are different questions, and only the second one is the one I care about -- I once added packages, rebuilt, and kept getting containers without them.
+
+It compares file contents, so `touch` alone doesn't trigger a rebuild and undoing an edit goes back to the image that already matches. It can't see the base image or apt packages moving upstream, though, since nothing on disk changes when they do. For that, force it by hand:
+
+```
+docker build --pull --no-cache -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
+```
+
+Or start from nothing (the container must be stopped first, see the notes at the bottom):
+
 ```
 docker image list
 docker image rm helen-triages-devcontainer
 ```
-Then build and run the container again:
+Then run the container again and `run.sh` will rebuild:
    - `.devcontainer/run.sh`
 
 
