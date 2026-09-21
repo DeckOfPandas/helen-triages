@@ -1505,6 +1505,23 @@ $card-name-step: 0.86;
   row-gap: $space-xs;
 }
 
+// AT THE RIGHT-HAND END OF THAT LINE, NOT BESIDE THE TAPE -- Helen, 2026-09-21,
+// having looked at the first version: "let's put the draft badge on the right
+// not the left, but still the same line you have it."
+//
+// `margin-left: auto` RATHER THAN `justify-content: space-between` on the row.
+// The row can hold a wrapped title, and `space-between` would spread THOSE
+// items too; an auto margin belongs to the one item that should be pushed and
+// leaves every other line alone. It is also what keeps her second clause true
+// -- the badge is still on the tape's line, moved along it rather than off it.
+//
+// AND IT STILL DROPS "IF NEEDED". When the line has no room the badge wraps as
+// before; the auto margin then simply pushes it to the right of its own line,
+// which is the same edge it was already heading for.
+.cocktail-title-block .drink-draft-badge {
+  margin-left: auto;
+}
+
 @media (max-width: 720px) {
   .drink-cards { grid-template-columns: 1fr; }
 
