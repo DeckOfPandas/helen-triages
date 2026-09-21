@@ -31,7 +31,7 @@ notes:
     text: "Mum says she doesn't like ginger, but she liked this. Maybe she just doesn't like vegetables."
   - label: "Are things getting out of hand? (no)"
     text: "One year we started drinking these while making our yearly army of Christmas puddings in August. That same year we started upping the number of kinds of ginger in our puddings. Just leaving that there."
-source: "Difford's Guide"
+source: "Difford's"
 source_url: "https://www.diffordsguide.com/cocktails/recipe/2296/biggles-sidecar"
 meta:
   made_before: true

@@ -2099,6 +2099,89 @@ def _serve_vocab():
     return yaml.safe_load(SERVE.read_text(encoding="utf-8")) or {}
 
 
+SOURCES = ROOT / "_data" / "cocktails" / "sources.yml"
+
+
+def _sources_data():
+    if not SOURCES.exists():
+        pytest.skip("_data/cocktails/sources.yml does not exist yet.")
+    return yaml.safe_load(SOURCES.read_text(encoding="utf-8")) or {}
+
+
+def test_every_source_spelling_is_canonical():
+    """A drink that cites a declared publication spells it the declared way.
+
+    A SPELLING RULE, NEVER A COVERAGE ONE, and `sources.yml`'s own header
+    argues the distinction at length. Helen ruled on 2026-08-30 that most
+    drinks will say `source: ""` and that this is right: "I sort of don't care
+    about this ... I'm not going to sweat it." A `source` matching nothing in
+    the table is free text and passes, which is the entire point -- her own
+    answers ("life", "Original", "spitting out weird soapy drinks every time I
+    accidentally use Blanc") are answers, and compound attributions name two
+    sources on purpose.
+
+    WHAT IT CATCHES is the one fault a table can catch: `Difford's` on 24
+    drinks and `Difford's Guide` on two. One publication, two spellings, and
+    nothing to tell the next ingest which is the house form -- so a third was
+    only a matter of time. The same shape `bottles.yml` uses for bottles, and
+    for the same reason.
+
+    THE MATCH IS ON THE WHOLE FIELD, not a substring, so "Satan's Whiskers,
+    London, via punchdrink.com" is untouched: it is a compound attribution that
+    happens to contain a publication's domain, and correcting inside one would
+    be rewriting a citation rather than spelling it.
+    """
+    declared = _sources_data().get("publications") or {}
+    canonical = {name.strip().lower(): name for name in declared}
+    alias_of = {}
+    for name, entry in declared.items():
+        for alias in ((entry or {}).get("aliases") or []):
+            alias_of[alias.strip().lower()] = name
+
+    overlap = sorted(set(alias_of) & set(canonical))
+    assert not overlap, (
+        f"spelling(s) declared as both a name and an alias: {overlap}. "
+        f"One of the two entries is wrong, and while both exist the rule "
+        f"below cannot say which spelling it wants."
+    )
+
+    bad = []
+    for slug, fm in _load():
+        source = str(fm.get("source") or "").strip()
+        if not source:
+            continue
+        got = alias_of.get(source.lower())
+        if got:
+            bad.append(f"{slug}: source {source!r} -> {got!r}")
+    assert not bad, (
+        "Drink(s) spelling a declared publication a second way:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\n`_data/cocktails/sources.yml` names the form this collection "
+          "uses and lists the variants seen in the wild. Write the name, or -- "
+          "if this really is a different publication -- give it its own entry."
+    )
+
+
+def test_no_source_alias_is_stale():
+    """The other direction: a declared alias is one somebody might write.
+
+    The same rule `unresolved_suggestions` and the garnish `proposals` have.
+    An alias nobody has ever written is a guess about the future, and a table
+    of guesses is one nobody trusts to be current -- so an alias earns its
+    place by having been seen, or by being the form the publication itself
+    uses.
+    """
+    declared = _sources_data().get("publications") or {}
+    assert declared, "sources.yml declares no publications, so this checks nothing."
+    for name, entry in declared.items():
+        assert isinstance(entry, dict), f"{name}: expected a mapping"
+        aliases = entry.get("aliases") or []
+        assert aliases, (
+            f"{name!r} declares no aliases, so it filters nothing. Either name "
+            f"the spellings it is meant to catch, or take the entry out."
+        )
+
+
 def test_serve_block_uses_only_declared_keys_and_values():
     """`serve` is a closed vocabulary, declared in _data/cocktails/serve.yml.
 

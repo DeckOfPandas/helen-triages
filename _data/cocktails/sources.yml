@@ -1,0 +1,77 @@
+# =============================================================================
+# WHERE A DRINK CAME FROM — the publications, and how each one spells itself.
+# =============================================================================
+# THIS IS A SPELLING TABLE, NOT A COVERAGE REQUIREMENT, and the distinction is
+# Helen's own ruling and is not up for revisiting. 2026-08-30, asked whether
+# `source:` should be filled in everywhere:
+#
+#   "I sort of don't care about this. You can't copyright facts, and I am
+#    taking no prose from anywhere. Some will be attributable to a big-name
+#    inventor, bar or maybe hotel, and it's nice to note that, but I'm not
+#    going to sweat it."
+#
+# So `source: ""` is correct on most drinks and always will be, and
+# `test_source_names_a_source_and_source_url_holds_the_url` asks for shape
+# alone. Nothing here changes that. This exists for one narrower fault.
+#
+# THE FAULT: `Difford's` on 24 drinks and `Difford's Guide` on two. One
+# publication, two spellings, and nothing anywhere to tell the next ingest
+# which is the house form — so the third spelling was a matter of time. The
+# same problem `bottles.yml` solves for bottles, solved the same way: a
+# canonical name, the variants seen in the wild, and a document that prints the
+# canonical one so a repo-less session has something to copy.
+#
+# A COMPOUND ATTRIBUTION IS NOT A VARIANT, and none is listed. "Difford's /
+# Rémy Martin" names two sources on purpose; so does "Henry Craddock, Savoy
+# Hotel, London / Death & Co". Both are information, not drift.
+#
+# NOR IS HELEN'S OWN VOICE. `source: "life"`, `"Original"`, and "spitting out
+# weird soapy drinks every time I accidentally use Blanc" are answers to "where
+# did this come from?", and the field is free text precisely so they can be.
+# An ingest writes a publication's name or nothing; she writes whatever she
+# likes.
+#
+# HOW IT IS USED. `scripts/build_ingest_vocab.py` prints the canonical names
+# into `INGEST_ONE_COCKTAIL.md`, and `test_every_source_spelling_is_canonical`
+# fails a drink that uses a known alias instead of the name beside it. A
+# `source` matching nothing here is free text and passes, which is the whole
+# point — this is an inbound filter for the handful of publications that recur,
+# not a gate on the field.
+# =============================================================================
+
+publications:
+  "Difford's":
+    # 24 drinks, by a distance the commonest. The site brands itself "Difford's
+    # Guide" and the drinks that say so are not wrong, they are just not the
+    # form the other 24 use.
+    # No case-only variants here: the match folds case, so `difford's` would
+    # be this entry's own name spelled differently and the guard below refuses
+    # a string that is both a name and an alias. It caught exactly that on the
+    # first draft of this file.
+    aliases: ["Difford's Guide", "Diffords", "Diffords Guide"]
+
+  "Death & Co":
+    # 13 drinks. `&` rather than `and` deliberately: §7's rule that a title uses
+    # `and` is about HELEN's titles, and this is the bar's own name.
+    aliases: ["Death and Co", "Death & Company", "Death and Company"]
+
+  "Punch":
+    # 8 drinks, from punchdrink.com. `Punch` is the publication; the URL form
+    # appears inside a compound attribution ("Satan's Whiskers, London, via
+    # punchdrink.com") and is left alone there.
+    aliases: ["Punch Drink", "punchdrink.com"]
+
+  "Alcohol Professor":
+    aliases: ["The Alcohol Professor", "alcoholprofessor.com"]
+
+  "Thrillist":
+    aliases: ["thrillist.com"]
+
+  "kindredcocktails.com":
+    # THE DOMAIN IS THE CANONICAL FORM HERE, and that is deliberate rather than
+    # sloppy. One drink cites it, `cynar-toronto`, and it writes the domain --
+    # so there is no drift to correct, and §7's rule is that a citation is
+    # reproduced as the publication writes it rather than tidied. Declaring
+    # "Kindred Cocktails" canonical would invent a variance, then demand an
+    # edit to a published page to resolve it.
+    aliases: ["Kindred Cocktails", "Kindred"]
