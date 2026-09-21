@@ -57,9 +57,18 @@
 $emboss-cocktails-vars-emitted: false !default;
 @if not $emboss-cocktails-vars-emitted {
   :root {
-    --emboss-stroke-c: #{$color-label-stroke};
+    // --emboss-stroke-c AND --emboss-shadow STOOD HERE AND WENT WITH THE
+    // ALIASES THEY OVERRODE -- #778, 2026-09-21. They re-pointed the shared
+    // pre-tier names for this site's inverted ground, and the block below
+    // already set --lettering-heading-stroke-c / -shadow to the SAME two
+    // values, saying so in as many words ("--lettering-heading-stroke-c
+    // mirrors --emboss-stroke-c above"). With the aliases deleted upstream
+    // there is nothing left to mirror, and the tier names carry the numbers.
+    //
+    // --emboss-stroke-w STAYS, and it is not an alias of anything: it is this
+    // site's one stroke WIDTH, read by `lettering()` for every tier. The
+    // paragraph above explains why it comes down on light-on-dark type.
     --emboss-stroke-w: 0.010em;
-    --emboss-shadow:   #{rgba($color-paper, 0.06)};
 
     // THE TIER NAMES, RESOLVED FOR THIS SITE, 2026-09-02. shared/_rule.scss's
     // own defaults for --lettering-heading-* are darken/lighten/rgba of
