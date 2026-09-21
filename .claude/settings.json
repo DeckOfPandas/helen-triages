@@ -2,7 +2,8 @@
   "permissions": {
     "blockReadsOutsideWorkingDirectories": true,
     "additionalDirectories": [
-      "/workspace/.claude/worktrees"
+      "/workspace/.claude/worktrees",
+      "/workspace/.node-runtime"
     ],
     "allow": [
       "Read(//dev/null)",
@@ -56,6 +57,7 @@
       "Bash(sh scripts/browser/click-crop.sh *)"
     ],
     "deny": [
+      "Edit(//workspace/.node-runtime/**)",
       "Bash(chmod *)",
       "Bash(chown *)",
       "Bash(sudo *)",
