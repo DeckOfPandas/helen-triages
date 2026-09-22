@@ -177,15 +177,13 @@ How I try to achieve these two aims -- work that exists because Claude read my w
    - `gh-read.sh --fields state,merged_at` (or `--each` for lists) builds the jq inside the script, and `guard-unanalyzable-bash.py` refuses a quoted `[`, `]` or `|` in any `sh scripts/...` call
    - Every Bash description has to say what the call reads or writes, because I stopped reading prompts in the name of a quiet life
 
-7. At session start, `session-ground-truth.py` reports the branch, whether the tree is cleam, position against origin/main, and whether the drafts clones are present. This reduces Claude hassling me. (No network calls, which would be slow, resulting in me turning this featuer off again).
+7. At session start, `session-ground-truth.py` reports the branch, whether the tree is cleam, position against origin/main, and whether the drafts clones are present. This reduces Claude hassling me. (No network calls, which would be slow, resulting in me turning this feature off again).
 
 8. Misc:
    - Never `sed` (`guard-sed.py`)
    - Never `awk` (`guard-awk.py`)
    - Scratch files live only in the project's `tmp/`, never the system `/tmp`, `~`, or job directories (written rule)
    - `blockReadsOutsideWorkingDirectories=true` blocks `Read`, `Grep` and `Glob` outside the project, with one read-only exception for /workspace/.node-runtime because this seems fair enough.
-
-
 
 ### Don't print secrets (again)
 
@@ -204,7 +202,7 @@ Mitigations:
 
 ### Don't annihilate my repos (twice and counting)
 
-   - `guard-main-branch.py` refuses `git commit` or `git merge` while on `main`, in any repo, including through `cd`, and `git -C` is refused by `guard-unanalysable-bash.py`
+   - `guard-main-branch.py` refuses `git commit` or `git merge` while on `main`, in any repo, including through `cd`, and `git -C` is refused by `guard-unanalyzable-bash.py`
    - `guard-destructive-git.py` refuses `reset --hard`, `checkout`/`restore` over changed files, and `clean -fd` when there's uncommitted work, naming what would be lost
    - Deny rules block `pr merge` and `pr review` 
       - `pr merge` is denied in three spellings (`gh`, `.gh-runtime/bin/gh`, `sh scripts/gh-agent.sh`)
@@ -224,7 +222,7 @@ Mitigations:
 ### Don't publish anything I haven't proofread.
 
    - Publish gate (`_plugins/publish_gate.rb`): content goes live only with `proofread: true` and `awaiting_fix: false` -- a missing or misspelled flag blocks it
-   - Tests `test_agent_edited_recipes_are_not_marked_proofread` and `test_agent_edited_drinks_are_not_marked_proofread` reads history -- if Claude's commit is the newest on a recipe or drink, the file must say `proofread: false`
+   - Tests `test_agent_edited_recipes_are_not_marked_proofread` and `test_agent_edited_drinks_are_not_marked_proofread` read history -- if Claude's commit is the newest on a recipe or drink, the file must say `proofread: false`
    - CI runs the tests before deployment
 
 ### Dear future Helen
