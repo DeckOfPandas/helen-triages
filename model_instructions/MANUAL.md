@@ -1285,6 +1285,19 @@ bare worktree says nothing about the drinks or the drafts.** Helen, 2026-09-20,
 on the same arrangement: *"it's not useful to have a situation where we expect
 tests to fail, and we should rearchitect."*
 
+**SINCE 2026-09-22 THE RUN SAYS SO ITSELF, and it will never fail for it.**
+`conftest.py` prints one line before the dots and the same fact in the terminal
+summary — where a green run is actually read — naming each absent clone with
+the command that fetches it, and counting the per-draft checks that produced no
+tests at all. It is SILENT when both clones are present. It is a report and not
+a check because Helen ruled the obvious alternative out: *"I don't want to run
+tests locally with the expectation that some will fail, because a suite with
+failures starts to get ignored...plus it's very annoying"* — and because the
+drafts are legitimately unfinished until she has cooked from them, so their
+state is not a defect a test could sensibly flag (DECISIONS §11). Re-measured
+that day with both clones pulled into a bare worktree: **30,917** collected,
+`tests/test_drafts.py` alone going from 50 to 16,370.
+
 **THE THREE GIT WRAPPERS ARE THE ONLY WAY TO TALK TO A REMOTE OVER HTTPS, AND
 THE REASON IS NOT ONLY THAT THEY KEEP THE TOKEN'S NAME OUT OF THE CALL SITE.**
 Each one takes a PLAIN url and passes `scripts/git-credential-agent-token.sh`
@@ -2856,6 +2869,14 @@ each time because it was written when the count was right and not revisited as
 more arrived. It rotted three times, which is the argument for naming the
 members rather than counting them — and for not writing the number at all. `ls .claude/hooks/` settles it. `DECISIONS.md` §11 has why each exists and what each deliberately allows;
 `CLAUDE.md` has the workflow.
+**One of them refuses nothing: `session-ground-truth.py`** (since 2026-09-21)
+is a `SessionStart` hook that REPORTS — the branch, whether the tree is
+already dirty, the position against `origin/main` as last fetched, and whether
+the two private drafts clones are present, with the clone command for each
+that is not. It makes no network call, deliberately, because a hook that waits
+on GitHub delays every session start and a slow hook is one Helen turns off.
+It is listed here because it sits in the same directory as the guards and is
+not one; do not read its silence as a guard having passed.
 
 **Branch names:** `<type>/<what-its-about>`, lowercase, hyphens; one concern;
 deleted after merge, local and remote. **Commit subjects:** `(type) lowercase
