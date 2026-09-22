@@ -5914,6 +5914,49 @@ verification. Dates are when the correction landed.
   branch checked out in another worktree — is therefore permanent and is not a
   problem to solve.
 
+- **A red `main` is a deploy outage, and it ran for three days** — 2026-09-12
+  to 2026-09-15. PR #996 (#982, the amount/item split) un-proofread
+  `grandmas-lemon-curd` and `tomato-tarragon-salad` as the standing rule
+  requires; two live recipes link to them by relative path; the production-
+  build link test went red, exactly as that PR's own commit message said it
+  would, "left for Helen's call rather than guessed at". The suite gates the
+  deploy (#369), so every one of the roughly twenty merges after it — the
+  search for anything, the data rulings, the README, the Docker image — built
+  nothing and shipped nothing, and the only signal was an Actions email per
+  push. Found by the 2026-09-15 design review's orchestrator while wondering
+  why its own PR would carry one red test: `actions/runs` showed every run on
+  `main` since 16:32 on the 12th failing at "Python tests", the last green one
+  being the commit before #996. Two lessons. **A test that is allowed to stay
+  red on `main` is a deploy switch left off**, whatever its message says; the
+  honest options were to hold the two links back in the same PR, or to
+  proofread the two recipes there and then (#1064). And **nobody looks at the
+  Actions tab**: the check is now written into the manual (§10) as the merging
+  session's job, and #1093 lists the ways to make a red `main` visible without
+  anyone looking.
+  - **RECOVERED 2026-09-22, SEVEN DAYS LATE, AND THE DELAY IS PART OF THE
+    LESSON.** This entry and the two below were written on 2026-09-15 on
+    `design/1086-review-batch`, and that branch was never merged. Helen found
+    it herself — *"I think I might have lost work (well, not merged it)"* —
+    looking at branches ahead of `main`. Two other branches ahead of `main`
+    turned out to have lost nothing (their content had been re-applied under
+    different SHAs); this one had lost all 65 lines. **So for seven days the
+    instruction telling sessions to check the deploy was itself undeployed**,
+    and no session ran it. `main` was green when this was recovered — checked,
+    not assumed, all of the last ten runs — so nothing was silently held back
+    in the meantime. `scripts/main-ci-status.sh` exists now so the check is one
+    allow-listed command; the `--jq` the manual originally prescribed has
+    brackets and a pipe in it, which makes Claude Code prompt Helen, and a
+    check that costs an interruption is a check nobody runs.
+- **A double hyphen inside an SVG comment** — 2026-09-15, #1086. The
+  accessibility stream wrote a prose comment into `_includes/icons/ship.svg`
+  with the repo's usual ASCII `--` for a dash; `--` is illegal inside an XML
+  comment, a browser renders nothing at all for a malformed SVG, and the ship
+  mark was one merge from vanishing off every card and drink page.
+  `test_every_shipped_svg_actually_parses` caught it on the integration
+  branch — the stream had run only the rendered-page tests for its own change.
+  The lesson is the old one: run the file that owns what you touched, and an
+  SVG is owned by `test_site_config.py`, not by the page it appears on.
+
 ## §13 The visual design — the road to each value
 
 - **2026-07-31 / 2026-08-01 / 2026-08-02** — Recipe page redesigned; index
@@ -6287,6 +6330,32 @@ verification. Dates are when the correction landed.
     a lone shared tag never outranks a shared ingredient at the same score.
     Built as two extra digits in the Liquid sort key and the same key in
     `scripts/related_recipes.py`.
+- **2026-09-15 — the design review, and how it was run.** Helen asked for "a
+  'standard' review, rather than my blinkered request", of visual design, user
+  flows and general niceness, then added copy (tone, consistency, interest,
+  flair, embarrassment) mid-task. The review is an artifact
+  (https://claude.ai/artifact/Cy5qUxscxk89hBx8MRyexF): seven bugs, fourteen
+  polish items, nine to consider, ten things to keep, and a copy section. Her
+  rulings on the plan, in order: *candidates for the judgement calls, bugs
+  fixed directly*; *"actions row only"* for the drink page's two shortlist
+  buttons; *yes* to phone-header candidates despite the about page's "I cook
+  from my 13-inch iPad"; *one combined PR*. The work ran as five agents in
+  their own worktrees (Opus on the drink title and the candidates pages,
+  Sonnet on print, phone layout and accessibility) merged one at a time into
+  one integration branch, with the full suite run there and one PR opened
+  (#1087, tracking #1086). Her four picks from the candidates pages are the
+  entry below; her mid-task change of brief on the meta card ("stacking the
+  three metadata boxes") is in the phone-layout entry. What was deliberately
+  kept out of the PR, and where it went: the placeholder strings (#1088), the
+  copy findings (#1089), related-picks weighting (#1090), and everything else
+  the review raised (#1093, one issue in sections, because a burst of issues
+  is what flagged the agent account on 2026-09-14). **Two things the round
+  found that were not on its list**: `main` had been red and undeployed for
+  three days (§12), and a `--` in an SVG comment (§12). **And one habit worth
+  keeping**: every stream shipped before/after crop boxes at 360, 390 and
+  1280, so a "nothing changed on desktop" claim was two numbers, not a
+  sentence. (Recovered 2026-09-22 from `design/1086-review-batch`, which was
+  written on 2026-09-15 and never merged — see §12.)
 - **2026-09-15, #1086 (design review) — four candidates pages, four picks.**
   Each question went up as two to five treatments on the real page with the real
   compiled CSS, per §13.11, and Helen chose by looking. Her words, and what each

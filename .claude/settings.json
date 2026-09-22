@@ -32,6 +32,7 @@
       "Bash(sh scripts/gh-read.sh *)",
       "Bash(sh scripts/gh-write.sh *)",
       "Bash(sh scripts/github-public-status.sh *)",
+      "Bash(sh scripts/main-ci-status.sh)",
       "Bash(sh scripts/git-push-agent.sh *)",
       "Bash(sh scripts/git-fetch-agent.sh *)",
       "Bash(sh scripts/git-clone-agent.sh *)",
