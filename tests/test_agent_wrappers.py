@@ -686,12 +686,31 @@ def _rules(kind: str) -> list[str]:
 # same reason as fetch. The four scripts/ wrappers are here because their
 # arguments are tested above. Adding to this set is a decision, not a chore:
 # say in the commit which options of the tool you checked.
+#
+# FIVE CAME OUT ON 2026-09-21, and removing one is a decision too. Helen:
+# "I'm keen to prune rules with *, so let's discuss", then, asked the one
+# question that settled four of them -- does Claude ever run on the host? --
+# "Claude always runs in a container, never on the host (any more). This will
+# be my setup indefinitely."
+#   * `Bash(.gh-runtime/bin/gh issue *)`, `Bash(.gh-runtime/bin/gh pr create *)`
+#     and `Bash(.node-runtime/node/bin/node --test *)` named extracted runtimes
+#     that only ever existed in a HOST checkout. Measured in the container the
+#     same day: `which gh node` gives /usr/bin/gh and /usr/bin/node. Dead paths.
+#     `Bash(.gh-runtime/bin/gh auth status)` went with them (exact, not open).
+#   * `Bash(gh pr create *)` was superseded by the wrapper rules below and by
+#     `sh scripts/gh-write.sh pr-create`.
+#   * `Bash(curl -s "https://api.github.com/repos/DeckOfPandas/helen-triages/*)`
+#     was the interesting one, and it had been REVIEWED AGAINST THE WRONG
+#     CRITERION. The standard above is "an option that runs a program"; `curl`
+#     has none, but `-o <path>` WRITES A FILE ANYWHERE, and the trailing `*`
+#     accepted it. `scripts/gh-read.sh` does these reads now, GET-only and
+#     three repos only. The lesson for the next addition: ask what the option
+#     can WRITE as well as what it can RUN.
+# The matching DENY rules were deliberately left alone. A deny on a dead path
+# costs nothing, and removing safety rails is not pruning.
 REVIEWED_OPEN_RULES = {
     "Bash(pytest *)",
     "Bash(python3 -m pytest *)",
-    "Bash(.node-runtime/node/bin/node --test *)",
-    'Bash(curl -s "https://api.github.com/repos/DeckOfPandas/helen-triages/*)',
-    "Bash(.gh-runtime/bin/gh issue *)",
     "Bash(git status *)",
     "Bash(git diff *)",
     "Bash(git log *)",
@@ -701,8 +720,6 @@ REVIEWED_OPEN_RULES = {
     "Bash(git check-ignore *)",
     "Bash(git commit -F *)",
     "Bash(git add -- *)",
-    "Bash(gh pr create *)",
-    "Bash(.gh-runtime/bin/gh pr create *)",
     "Bash(sh scripts/gh-agent.sh issue list *)",
     "Bash(sh scripts/gh-agent.sh issue view *)",
     "Bash(sh scripts/gh-agent.sh issue comment *)",
@@ -768,6 +785,25 @@ def test_merging_and_approving_stay_denied():
         "Bash(sh scripts/gh-agent.sh pr review *)",
     ):
         assert rule in deny, f"{rule} left the deny list"
+
+
+def test_no_allow_rule_names_a_host_only_runtime():
+    """`.gh-runtime/` and `.node-runtime/` are host-checkout artefacts, and
+    Claude runs only in the container now (Helen, 2026-09-21: "never on the
+    host (any more). This will be my setup indefinitely"). In there `gh` and
+    `node` are on PATH at /usr/bin. An allow rule naming those paths grants
+    nothing and reads as though the host setup were still live."""
+    for rule in _rules("allow"):
+        assert ".gh-runtime" not in rule, rule
+        assert ".node-runtime/node/bin" not in rule, rule
+
+
+def test_no_allow_rule_lets_curl_choose_where_to_write():
+    """`curl -o <path>` writes anywhere, and a rule ending ` *` accepts it.
+    GitHub reads go through scripts/gh-read.sh, which is GET-only and cannot
+    write at all. Removed 2026-09-21; this keeps it removed."""
+    for rule in _rules("allow"):
+        assert not rule.startswith("Bash(curl"), rule
 
 
 def test_no_allow_rule_runs_a_tmp_script():
