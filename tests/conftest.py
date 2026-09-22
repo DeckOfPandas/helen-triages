@@ -234,10 +234,90 @@ def pytest_generate_tests(metafunc):
     if "recipe" in metafunc.fixturenames:
         metafunc.parametrize("recipe", ALL_RECIPES, ids=[r.slug for r in ALL_RECIPES])
     if "draft" in metafunc.fixturenames:
+        if not ALL_DRAFTS:
+            UNCREATED.append(metafunc.definition.name)
         metafunc.parametrize("draft", ALL_DRAFTS, ids=[d.slug for d in ALL_DRAFTS])
     if "magic_bag" in metafunc.fixturenames:
         metafunc.parametrize("magic_bag", ALL_MAGIC_BAG,
                              ids=[m.slug for m in ALL_MAGIC_BAG])
+
+
+# =============================================================================
+# WHAT THIS RUN NEVER LOOKED AT -- 2026-09-22
+# =============================================================================
+# Helen, asked whether a test should FAIL when the drafts are absent: "I don't
+# want to run tests locally with the expectation that some will fail, because
+# a suite with failures starts to get ignored...plus it's very annoying." She
+# is right, and the reason is hers too: the drafts are legitimately unfinished
+# until she has cooked from them, so their state is not a defect to flag.
+#
+# So this reports and never fails. Nothing here can turn a run red.
+#
+# WHY A REPORT IS NEEDED AT ALL, when DRAFTS_PRESENT and NO_DRAFTS_REASON
+# above already make each draft-reading test say what it did. Those work
+# test by test. What neither can show is the AGGREGATE: a test parametrised
+# per file produces NO TESTS AT ALL when the files are absent -- not a
+# failure, not even a skip, simply nothing. So the run is quieter, not
+# noisier, and the skip count FALLS as coverage collapses. Measured
+# 2026-09-21: 10,660 tests collected in a bare worktree against 30,901 with
+# both clones, with skips falling from 110 to 27. Re-measured here on
+# 2026-09-22 by cloning both into a bare worktree mid-session: 30,917
+# collected, and `tests/test_drafts.py` alone went from 50 tests to 16,370.
+# Fifty green dots and sixteen thousand green dots are the same word.
+#
+# A lower skip count reads as better news. That is the whole problem, and it
+# is invisible from inside any single test.
+#
+# `UNCREATED` counts by NAME, filled at collection time above, so the figure
+# is computed from this run rather than quoted from a measurement that will
+# age. It covers food's `draft` fixture only -- the cocktails suite has its
+# own loader and mostly SKIPS with a reason (test_suite_hygiene.py's
+# SKIPS_WITHOUT_DRAFTS registry insists on it), and a skip is already visible.
+# The asymmetry is stated rather than papered over.
+COCKTAIL_DRAFTS_DIR = ROOT / "_cocktail_drafts"
+
+UNCREATED: list[str] = []
+
+_CLONE = {
+    "_food_drafts": "sh scripts/git-clone-agent.sh helen-triages-food-private _food_drafts",
+    "_cocktail_drafts": "sh scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts",
+}
+
+
+def _absent_drafts() -> list[str]:
+    return [d.name for d in (DRAFTS_DIR, COCKTAIL_DRAFTS_DIR) if not d.is_dir()]
+
+
+def pytest_report_header(config):
+    """One line at the top, so the caveat is present before the dots start."""
+    absent = _absent_drafts()
+    if not absent:
+        return None
+    return f"drafts: {', '.join(absent)} absent -- this run is not evidence about them"
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    """The same fact at the END, which is where a green run is actually read.
+
+    A header scrolls away behind several thousand dots. This does not.
+    """
+    try:
+        absent = _absent_drafts()
+        if not absent:
+            return
+        write = terminalreporter.write_line
+        write("")
+        write("Not evidence about the drafts:", bold=True)
+        for name in absent:
+            write(f"  {name} is absent -- {_CLONE[name]}")
+        if UNCREATED:
+            n = len(UNCREATED)
+            write(f"  {n} per-draft check{'s' if n != 1 else ''} in this suite "
+                  f"produced no tests at all, rather than failing or skipping.")
+        write("  Cloning is reading: it needs no ask, and both clones make the "
+              "suite whole.")
+    except Exception:
+        return          # a report that breaks a run would be worse than none
 
 
 @pytest.fixture(scope="session")

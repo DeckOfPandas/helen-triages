@@ -332,3 +332,73 @@ def test_every_draft_reading_test_says_what_it_does_without_drafts():
         f"it no longer reads _food_drafts/ and the entry is now noise. A "
         f"registry with dead entries stops being read."
     )
+
+
+# =============================================================================
+# THE AGGREGATE CAVEAT — conftest's end-of-run report, 2026-09-22
+# =============================================================================
+# The registries above work test by test. What none of them can show is how
+# much of the corpus a run never opened: a per-file test produces NO TESTS AT
+# ALL when the files are absent, so the run gets quieter rather than noisier
+# and the skip count FALLS as coverage collapses.
+#
+# Helen ruled out the obvious fix. Asked whether a test should FAIL when the
+# drafts are missing: "I don't want to run tests locally with the expectation
+# that some will fail, because a suite with failures starts to get ignored...
+# plus it's very annoying." So conftest REPORTS instead, and what is pinned
+# here is that the report is honest in both directions -- it must say so when
+# the drafts are missing, and must be silent when they are not. A caveat
+# printed on every run is noise, and noise is ignored exactly like a failure.
+
+def test_the_drafts_caveat_is_silent_when_both_clones_are_present(tmp_path):
+    import conftest
+
+    present = tmp_path / "here"
+    present.mkdir()
+    original = (conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR)
+    try:
+        conftest.DRAFTS_DIR = present
+        conftest.COCKTAIL_DRAFTS_DIR = present
+        assert conftest._absent_drafts() == []
+        assert conftest.pytest_report_header(None) is None
+    finally:
+        conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR = original
+
+
+def test_the_drafts_caveat_names_each_absent_clone_and_how_to_get_it(tmp_path):
+    import conftest
+
+    original = (conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR)
+    try:
+        conftest.DRAFTS_DIR = tmp_path / "_food_drafts"
+        conftest.COCKTAIL_DRAFTS_DIR = tmp_path / "_cocktail_drafts"
+        absent = conftest._absent_drafts()
+        assert absent == ["_food_drafts", "_cocktail_drafts"]
+        header = conftest.pytest_report_header(None)
+        for name in absent:
+            assert name in header
+            # A caveat that does not say what to do about it is a complaint.
+            assert name in conftest._CLONE, (
+                f"{name} can be reported absent but has no clone command"
+            )
+            assert conftest._CLONE[name].startswith("sh scripts/git-clone-agent.sh")
+    finally:
+        conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR = original
+
+
+def test_the_drafts_caveat_can_never_turn_a_run_red(tmp_path):
+    """It reports; it does not judge. A summary hook that raised would take the
+    whole run down, which is a far worse trade than the silence it replaced."""
+    import conftest
+
+    class _Exploding:
+        def write_line(self, *args, **kwargs):
+            raise RuntimeError("terminal gone")
+
+    original = (conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR)
+    try:
+        conftest.DRAFTS_DIR = tmp_path / "_food_drafts"
+        conftest.COCKTAIL_DRAFTS_DIR = tmp_path / "_cocktail_drafts"
+        conftest.pytest_terminal_summary(_Exploding(), 0, None)
+    finally:
+        conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR = original
