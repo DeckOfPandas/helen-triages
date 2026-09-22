@@ -281,6 +281,42 @@ unless stated.
     two Chromium builds are not the same measurement. Bumping means both
     files and a rebuild, which is the cost Helen accepted for the speed.
 
+- **2026-09-21 — `run.sh` asks whether the image MATCHES `.devcontainer/`, not
+  merely whether an image exists.** Helen: *"I'd rebuilt the image to add some
+  packages (via the Dockerfile), but Claudes in the container couldn't find
+  them... I'd rebuilt the image, but my containers were being created from an
+  older one."* The check was a bare `docker image inspect`, which answers a
+  different question from the one that matters. **An image that exists is not
+  an image that matches**, and nothing ever compared the two.
+  - **A label, not a timestamp.** Each build through `run.sh` now passes
+    `--label com.deckofpandas.build-inputs=<sha256 of every file in
+    .devcontainer/>`, and each run recomputes and compares. One comparison
+    covers three cases — no image, an image with no stamp (built before this,
+    or by hand), a stamp that disagrees with disk — and the message says which.
+  - **Why not the mtime test Helen asked for.** She asked for "the Dockerfile
+    is newer than the image, or otherwise inconsistent"; content is the second
+    half and subsumes the first in both directions (`touch` alone does not
+    rebuild; reverting an edit returns to the image that already matches rather
+    than building a third). And mtime has a trap that never settles: **a fully
+    cached rebuild keeps the CACHED layer's `Created` date**, so an image's
+    timestamp can stay older than the Dockerfile forever and the check fires on
+    every single run.
+  - **Every file in `.devcontainer/` is hashed**, not just the `Dockerfile` and
+    the `init-firewall.sh` it `COPY`s — a hand-maintained list of "the files
+    that matter" is one more thing to keep in sync, and the Dockerfile's own
+    note about `requirements-test.txt` records how that goes. The price is that
+    editing `run.sh` or the README rebuilds once, which with the Dockerfile
+    unchanged is a fully cached no-op needing no network. Wrong in the safe
+    direction. A `.dockerignore` would remove even that and was left out.
+  - **What it cannot see:** `ruby:3.3-bookworm` moving upstream, or an
+    `apt-get install` resolving to newer packages. Nothing on disk changes, so
+    nothing here notices; both READMEs give `docker build --pull --no-cache`.
+  - **Measured and unmeasured, stated.** The hash is deterministic across runs,
+    unchanged by `touch`, changed by a one-line edit and restored by reverting
+    it. Docker is not reachable from a worktree, so `docker build --label` and
+    `docker image inspect --format` went in unexercised, and the first `run.sh`
+    after the merge rebuilds once to plant the stamp. PR #1180.
+
 ## §2 The mono-repo shape
 
 - **2026-08-02** — Collections cannot live inside `food/`: Jekyll only
@@ -5035,6 +5071,103 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   starting `/` with no `..` and no scheme, a width from 200 to 2000, a name
   matching `[a-z0-9-]+`) and is proved by `tests/test_agent_wrappers.py`,
   which is why all three could go straight into `REVIEWED_OPEN_RULES`.
+
+- **2026-09-21 — the file tools may read `/workspace/.node-runtime`, and the
+  obvious way to grant that does not work.** Helen: *"Reading
+  /workspace/.node-runtime is fine, please modify your settings to allow it."*
+  It sits above every worktree, so `CLAUDE.md`'s "never read above the folder
+  you're in" covered it until she said otherwise; the rule is hers to relax.
+  **The narrow spelling was tried FIRST and measured to fail.**
+  `Read(//workspace/.node-runtime/**)` in `allow` left the read refused, with
+  `blockReadsOutsideWorkingDirectories` named in the error and `/add-dir`
+  offered as the fix: that setting is a hard block an allow rule does not
+  override. The inert rule was removed rather than left looking effective. So
+  the grant is `additionalDirectories` — which widens read AND write — plus
+  `Edit(//workspace/.node-runtime/**)` in `deny` to narrow it back to what was
+  actually granted, deny beating allow as it does for `pr merge`.
+  **The write was then tested, at Helen's invitation** — *"It's fine with me if
+  you try writing an empty file to /workspace/.node-runtime now, to test the
+  rules"* — and the result is worth more than a pass would have been: **nothing
+  was written, but neither refusal came from the deny rule.** The Write tool
+  was stopped by WORKTREE ISOLATION (*"This session is isolated in the worktree
+  ... Edit the worktree copy of this file instead"*), a different mechanism
+  firing first; a Bash `touch` was then refused at the permission layer, and
+  the error does not say which rule did it. `ls -a` confirmed the directory
+  still holds only `node`. So: writes there are blocked for a worktree session,
+  twice over, and **the `Edit(...)` deny remains the unproven layer** — it
+  would be the only thing standing for a session running in `/workspace`
+  itself, which is not how Helen runs them. Recorded rather than rounded up to
+  "verified", because a test that passes for the wrong reason is the failure
+  mode this file exists to catch. **A settings edit
+  does not reach a RUNNING session** — the same Read failed twice after the
+  file was correct, because the working-directory set is fixed at session
+  start; `/add-dir` made it live, and the file serves every session after.
+  The runtime holds node
+  v24.18.1, and `MANUAL §1`'s "use the system `node`" is unchanged — the grant
+  is for looking at it.
+  - **AND THE SAME SESSION THEN CALLED `Read(//dev/null)` INERT, WRONGLY, BY
+    TESTING THE WRONG THING.** Reasoning from the finding above, it ran the
+    Read TOOL on `/dev/null`, watched the block refuse it, and reported the
+    rule dead. Helen: *"Claude can read and write to /dev/null, so retain
+    whatever means that."* She is right and the pair stays. The measurement
+    was real; the CLAIM drawn from it was several sizes larger.
+    `blockReadsOutsideWorkingDirectories` governs `Read`/`Grep`/`Glob`, and a
+    **Bash redirection is a different path entirely** — `>/dev/null` appears in
+    `run.sh`, in the `git checkout -- x 2>/dev/null` story above, and was used
+    repeatedly by the very session that pronounced the rule useless. The
+    general lesson, and it is the same one as the write test three paragraphs
+    up: **a permission rule and a permission block are different mechanisms,
+    and exercising one says nothing about the other.** Two wrong conclusions in
+    one session from the same habit — proving something narrower than the thing
+    being claimed.
+
+- **2026-09-21 — `git -C <path>` defeats every git allow rule, and a whole
+  session's git calls interrupted Helen for nothing.** She raised it gently —
+  *"There's no need to run git -C for commands like that because you're already
+  in the folder you're targetting (sorry if I'ive misunderstood)"* — and had
+  not misunderstood at all; the cost is larger than the redundancy she named.
+  The Bash tool already runs in the worktree root, and an allow rule is a
+  PREFIX match: `Bash(git status *)` wants a command starting `git status`, so
+  `git -C /path status` matches nothing, and neither do `git add -- *`,
+  `git commit -F *` or the exact `git branch --show-current`. **This is the
+  2026-09-07 `cd` ruling arriving through a flag instead of a command** — the
+  same mechanism, the same cost, and the same fix: write the bare command.
+  `CLAUDE.md`'s `cd` bullet now names `git -C` beside it. **And a hook enforces
+  it, the same day, at her request** — *"Also, yes, please refuse git -C across
+  the board"* — so this is a denial to the session rather than an interruption
+  to her, the principle that guard exists for.
+  `guard-unanalyzable-bash.py` gained shape 10: `git -C` wherever it appears as
+  a command word, not merely leading, because "across the board" is what she
+  asked for and a non-leading one is already inside a chain or pipe.
+  **The `-C`/`-c` distinction is CASE and the pattern is case-sensitive for a
+  concrete reason**: lowercase `git -c key=value` sets config rather than
+  changing directory, and every `scripts/git-*-agent.sh` passes the credential
+  helper that way, so refusing it would have broken pushing outright.
+  `tests/test_agent_wrappers.py` pins both halves — the four real calls that
+  interrupted her plus `git -C .` and a relative path, against
+  `git -c credential.helper=...`, the bare commands, quoted prose and
+  `make -C subdir` — and was proved the way this repository proves a guard:
+  the rule was disabled on purpose, all six refusal tests failed, and the rule
+  was restored. Then the hook was fired live on a real `git -C` call.
+
+- **2026-09-21 — a PR merged mid-session, and the next push went nowhere.**
+  Helen merged #1180 while the session was still working on it; the session
+  then committed a second, unrelated change, pushed it to the same branch, and
+  rewrote #1180's description to describe both. Both were wrong. **A merged
+  PR's branch still accepts a push and the commit reaches nothing** — the
+  #960 lesson of 2026-09-11, repeating — and a merged PR's description should
+  describe what merged, not what someone hoped to add. Caught by reading the
+  state that `gh-write.sh` prints back, which is the argument for it printing
+  the state at all. Recovery: the description was restored, and the stranded
+  commit was cherry-picked onto a fresh branch off `origin/main`.
+  **The rule that would have prevented it is already written** — `CLAUDE.md`
+  says to read a PR's `state` before pushing to a branch you did not open this
+  session — and the gap is that this session HAD opened the branch, so the rule
+  read as not applying. It applies to any branch whose PR you have not checked
+  since you last looked, including your own: **merging is Helen's, so a branch's
+  state can change under you at any moment, and being told is a courtesy rather
+  than a guarantee.** She said so herself in the workflow: if Claude has been
+  told nothing, it should check rather than assume.
 
 ### §11.2 The record of this file being wrong
 
