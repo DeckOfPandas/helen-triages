@@ -217,9 +217,16 @@ unless stated.
   5000 or something I'll never use."* The old `-p 4001:4001` was not merely
   useless but **actively in her way**: a running container HELD the host's own
   4001, so her `jekyll-local` could not bind it. The inside pair stays 4001/4002
-  because the image's aliases serve there — though nothing listens today, the
-  image carrying no jekyll, which is the same gap that stops `verify.py`
-  running in the container.
+  because the image's aliases serve there. **THE REST OF THIS PARAGRAPH WAS
+  FALSE AND STOOD FOR TWELVE DAYS** — it said "nothing listens today, the image
+  carrying no jekyll, which is the same gap that stops `verify.py` running in
+  the container", and `run.sh` carried the same claim in a comment. Measured
+  2026-09-22 from inside a real container, after Helen asked *"I'm pretty sure
+  the container has Jekyll... Are you not able to check?"*: `bundle exec jekyll
+  --version` prints 4.4.1 and `python3 scripts/verify.py` exits 0 over the full
+  corpus. The image does not BAKE the gem — it arrives from the Gemfile via
+  `bundle install` into the cache volume — but that is a first-run cost, not a
+  gap, and the aliases are exactly how it gets used. See §11.2.
 
   **`REPO_ROOT` comes from `--git-common-dir`, not `--show-toplevel`.** A real
   bug: `run.sh` is a TRACKED file, so a copy sits in every worktree, and
@@ -5279,6 +5286,73 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
     `read:org`, measured 2026-09-10 — so a PR body changes through
     `sh scripts/gh-write.sh pr-body <repo> <N> tmp/whatever.md`, which is REST.
 
+- **2026-09-22 — the suite REPORTS what it never looked at, and a failing test
+  was the wrong answer.** Offered a sentinel test that would go red when the
+  private drafts clones are absent, Helen refused it: *"I don't want to run
+  tests locally with the expectation that some will fail, because a suite with
+  failures starts to get ignored...plus it's very annoying."* **That is the
+  same ending as a green that lies, reached from the other side**, and it
+  settles the shape of any future answer to #378's family of problems.
+  - **Her second reason is the one a session would not have guessed.** The
+    drafts are legitimately unfinished until she has cooked from them — the
+    workflow is Claude rewrites, she cooks, she improves, Claude polishes — so
+    *"this isn't worth doing if the recipes turn out to be naff"*. Their
+    untidiness is not a defect to be flagged; it is the state they are
+    supposed to be in. A test cannot tell those apart, which is why this is a
+    report and not a check.
+  - **What the existing machinery could not do.** `DRAFTS_PRESENT`,
+    `NO_DRAFTS_REASON` and `test_suite_hygiene.py`'s two registries already
+    make each draft-reading test say what it did. They work test by test. None
+    can show the AGGREGATE, because a test parametrised per file produces NO
+    TESTS AT ALL when the files are absent — not a failure, not even a skip.
+    The run gets QUIETER rather than noisier and the skip count FALLS as
+    coverage collapses, so a lower skip count reads as better news.
+  - **The shape.** `pytest_report_header` for one line before the dots, and
+    `pytest_terminal_summary` for the same fact at the END, which is where a
+    green run is actually read — a header scrolls away behind several thousand
+    dots. It names each absent clone WITH the command that fetches it, because
+    a caveat that does not say what to do about it is a complaint; it counts
+    the per-draft checks that produced nothing from THIS run rather than
+    quoting a figure that will age (36 in a bare worktree); and it is SILENT
+    when both clones are present, pinned by a test, because a caveat printed
+    on every run is noise and noise gets ignored exactly like a failure.
+  - **Measured, not quoted.** Both clones were pulled into a bare worktree
+    mid-session and the suite re-collected: **30,917** tests against the
+    10,660 a bare worktree collects, with `tests/test_drafts.py` alone going
+    from 50 to 16,370. Fifty green dots and sixteen thousand green dots are
+    the same word. The report went silent the moment the clones landed, which
+    is the half that could not be proved any other way. PR #1185.
+
+- **2026-09-21/22 — the devops session: a hook that tells, five allow rules
+  gone, and two false comments in `run.sh`.** Helen asked what else was worth
+  doing and then took most of it.
+  - **`session-ground-truth.py`, the first hook here that refuses nothing.**
+    Every other one denies something; not one ever told a session a fact, and
+    `CLAUDE.md` had been compensating with prose about *"am I still where I
+    left off"*. Prose can only ask a session to remember to look. It reports
+    branch, dirtiness, position against `origin/main` as last fetched, and the
+    drafts clones — no network call, because a slow hook is one she turns off.
+    Both audiences get the same text and a test pins that they cannot drift.
+  - **Five allow rules pruned**, on the strength of one question and her
+    answer: *"Claude always runs in a container, never on the host (any more).
+    This will be my setup indefinitely."* Four named `.gh-runtime/` and
+    `.node-runtime/` paths that exist only in a host checkout — in the
+    container `which gh node` gives `/usr/bin/gh` and `/usr/bin/node`. The
+    fifth, `Bash(curl -s "https://api.github.com/...*)`, **had been reviewed
+    against the wrong criterion**: the standard recorded in
+    `REVIEWED_OPEN_RULES` is "an option that runs a program", and `curl` has
+    none — but `-o <path>` WRITES A FILE ANYWHERE and the trailing `*`
+    accepted it. **Ask what an option can write as well as what it can run.**
+    The matching DENY rules were deliberately left: a deny on a dead path
+    costs nothing, and removing safety rails is not pruning.
+  - **The bundle volume's name was dead cleverness under a false comment.**
+    `helen-triages-bundle-cache-$(basename "$REPO_ROOT")` promised one volume
+    per worktree, but `REPO_ROOT` comes from `--git-common-dir` and so always
+    resolves to the primary clone; the basename could only ever be
+    `helen-triages`. Nothing was lost — the race it claimed to prevent is
+    already impossible, because `--name` refuses a second container outright.
+  - **And the image-stamp check** that opened the session is at §1.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
@@ -5298,7 +5372,28 @@ verification. Dates are when the correction landed.
   as the guard; §11.0.1's `ln -s`; §9.13's "raises every ratio to a power"
   (three comments, never true); §13.7's "right-aligned, punched" survivors
   line (three weeks, and #615 was written from it). 2026-09-06: DOCS_REVIEW's
-  twenty-five (§0).
+  twenty-five (§0). 2026-09-22: §1's "the image carrying no jekyll, which is
+  the same gap that stops `verify.py` running in the container" — both halves
+  false, twelve days, and `run.sh` carried the same sentence; `jekyll 4.4.1`
+  and `verify.py` exit 0, measured in a real container the moment Helen asked
+  whether it could be checked.
+- **2026-09-22 — two wrong conclusions in ONE session, from one habit: proving
+  something narrower than the thing being claimed.** Neither reached a merge
+  as a false statement, but both were written down as fact first.
+  - A write test into `/workspace/.node-runtime` wrote nothing, and was
+    reported as the `Edit(...)` deny rule working. It was not: the Write tool
+    hit WORKTREE ISOLATION first, and a Bash `touch` was refused at the
+    permission layer without saying which rule did it. The deny remains the
+    unproven layer.
+  - `Read(//dev/null)` was pronounced inert after the Read TOOL was refused —
+    reasoning by analogy from a real measurement about `additionalDirectories`
+    minutes earlier. Helen: *"Claude can read and write to /dev/null, so
+    retain whatever means that."* `blockReadsOutsideWorkingDirectories`
+    governs `Read`/`Grep`/`Glob`; a Bash redirection is a different path, and
+    `>/dev/null` was in use by the same session that called the rule dead.
+  - **The general form, stated once so it need not be learned twice: a
+    permission RULE and a permission BLOCK are different mechanisms, and
+    exercising one says nothing about the other.**
 - **2026-08-30 / 2026-08-31, #600** — An issue rots faster: #600 copied #542's
   "Also outstanding" without re-measuring, four days on, and every claim was
   false (six half-empty disjunctions — zero; Kamaniwanalaya already had the
