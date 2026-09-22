@@ -5169,6 +5169,116 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   than a guarantee.** She said so herself in the workflow: if Claude has been
   told nothing, it should check rather than assume.
 
+- **2026-09-22 — `CLAUDE.md` became the rules, and this file took the reasons.**
+  Helen, of a list of devops suggestions: *"Can we move parts of CLAUDE.md to
+  other docs?"*, then *"please do this next."* It had reached 56,637 bytes —
+  118 bullets averaging ~480 characters — and every byte was loaded into every
+  session before a word of work. Most of it was not rules. It was the HISTORY
+  of each rule: who ruled it, what broke, on what date, and what the previous
+  wording had been. **That is this file's job, and it was being done twice.**
+  The split took it to 24,822 bytes, a 56% cut, with nothing dropped.
+
+  **THE RULE APPLIED, and it is worth stating because it decides every case:**
+  where a HOOK enforces a rule, the story moves here and `CLAUDE.md` keeps the
+  rule, the hook's name and the one non-obvious carve-out. Where only
+  DISCIPLINE enforces a rule, the paragraph explaining it IS the enforcement,
+  and it stays. That is why the spam-flag bullet, the stacked-PR bullet and
+  the `awaiting_fix`/`proofread` gate survive nearly whole, while the token
+  bullets — with `guard-token-expansion.py` behind them — reduce to a
+  sentence. Eight hooks now do what prose used to have to do alone.
+
+  **VERIFIED BY MEASUREMENT, NOT BY READING IT BACK.** Prose can be rewritten
+  freely; a `backticked` token going missing is how an instruction quietly
+  dies. `tmp/check_split_lost_nothing.py` extracted all 311 distinct
+  backticked tokens from the pre-split file and checked each one still appears
+  in `CLAUDE.md`, this file or `MANUAL.md`. **53 did not, and each was judged
+  one at a time rather than counted.** The facts among them were written into
+  the rest of this entry; `git ls-remote --upload-pack=` was a genuine
+  omission and went back into `CLAUDE.md`'s list of options that run a
+  program. (No final figure is quoted, because naming a token in this entry
+  is itself enough to make the checker find it — the number falls every time
+  the entry explains another one, so it measures the writing rather than the
+  loss.) **What remains are illustrations of a banned pattern**
+  (`cat some/*.txt`, `git commit -m "$(cat <<'EOF' ...)"`, `grep ... && node
+  ...`, `ruby <<'RB'`, `python3 -c '<code>'`, `ruby tmp/thing.rb`), near
+  variants of text that is present (`perl -e` and `ruby -e` under the rule
+  naming python/ruby/node/perl; `NAME=value cmd` under "a leading
+  `NAME=value`"), or the worktree names a measurement happened in
+  (`.claude/worktrees/opus-data-model`). The rule each one illustrates
+  survives; the illustration is what went.
+
+  **The checker needed fixing before its output could be trusted**, which is
+  its own small lesson: the first version did a raw substring test, so any
+  token line-wrapped into this file read as lost, and it reported 28 when the
+  truth was 23. A checker that cries wolf gets skimmed, which is the same
+  failure as no checker. It normalises whitespace now.
+
+  - **The chmod story, 2026-08-17.** `.gh-runtime/bin/gh` and
+    `.node-runtime/node/bin/node` had been extracted without their execute
+    bit, which is why the JS test suite had silently not been running. The fix
+    was legitimate and it was still Helen's call to make, not an agent's —
+    which is the whole content of the rule. Both paths are now dead: Claude
+    runs only in the container, where `gh` and `node` are at `/usr/bin`.
+  - **Where the credential lives.** `AGENT_GH_TOKEN` is set under the `env`
+    key of `.claude/settings.local.json`, which is gitignored, and `run.sh`
+    reads `['env']['AGENT_GH_TOKEN']` and passes it into the container.
+    `devcontainer.json` and the devcontainer README were updated alongside
+    `MANUAL.md` and `scripts/ingest_inbox.py` when `GH_TOKEN` was deleted on
+    2026-09-09.
+  - **The four default-value expansions the token hook refuses**, all of which
+    evaluate to the variable's own value when it is set: `${TOK:-x}`,
+    `${TOK:=x}`, `${TOK-x}`, `${TOK=x}`. It also refuses a
+    GitHub-token-shaped string anywhere — `ghp_...`, `gho_...`,
+    `github_pat_...` and siblings — because a token that has reached a
+    transcript is as dangerous pasted back in as expanded fresh. And it
+    refuses a secret in a URL's userinfo (`https://user:${AGENT_GH_TOKEN}@host`)
+    regardless of quoting, because the pattern is what gets stored on disk.
+    Note `echo "$AGENT_GH_TOKEN"` is a real leak wearing quotes, which is why
+    that hook strips single-quoted spans but not double-quoted ones.
+  - **The retired push URL.** Building it by hand as
+    `https://DeckOfPandas-agentic:${AGENT_GH_TOKEN}@github.com/...` worked
+    until a clone stored it in `.git/config` and a routine `git remote -v`
+    printed it. `git config -l`, `git remote show` and some git error messages
+    do the same. Retired 2026-09-10 for the credential helper. The helper is
+    passed per invocation and deliberately NOT written into any repo's config:
+    `/workspace/.git/config` is shared by every worktree, and a helper path
+    that exists on only one branch fails on every other — measured that day as
+    `sh: 0: cannot open scripts/git-credential-agent-token.sh: No such file`,
+    silently tolerated by git while the token was still in the URL, and a hard
+    failure the moment it was not.
+  - **That the agent account was really the author** was confirmed on
+    2026-09-08 by reading `"author":{"login":"DeckOfPandas-agentic"}` off the
+    API, not by a 200.
+  - **The retired `main`-update patterns.** `git checkout main && git pull
+    origin main` went on 2026-08-20 after a commit landed on `main` in the gap
+    it opens. Its replacement, `git fetch origin main:main`, refuses inside a
+    worktree with `fatal: refusing to fetch into branch 'refs/heads/main'
+    checked out at '/home/helen/projects/helen-triages'` — git protecting the
+    same invariant, not an obstacle. `sh scripts/git-fetch-main.sh` superseded
+    both on 2026-09-11.
+  - **The destructive-git hook's blind spot, 2026-08-19.** Its first version
+    patterned `git checkout -- <paths>` alone, so the bare-path form
+    `git checkout <path>` walked straight past it and destroyed a file's
+    uncommitted work the same day. A path cannot be told from a branch by
+    pattern — `git checkout main` is harmless, `git checkout feat/thing` looks
+    exactly like a path — so it now asks the filesystem whether the argument
+    names a real file. The command that started it was
+    `git checkout -- <two files> 2>/dev/null || true`, run to undo an agent's
+    own edit.
+  - **Why a PR description closes issues and a commit trailer does not**
+    (#1112). A keyword covers only the ONE reference after it, so a
+    description reading `Fixes #1051, #1052, …` closed #1051 alone. PR #1113,
+    with one `Closes #N` per line, closed all 22.
+  - **Deleting a merged branch.** `sh scripts/gh-agent.sh pr close
+    --delete-branch ...` works directly on this token, but it prompts;
+    `sh scripts/git-push-agent.sh :<branch>` does not, and still refuses
+    `:main` on `helen-triages`.
+  - **The browser wrappers' one writer** is `click-crop.sh`, and it writes
+    only under `tmp/shots/`.
+  - **`gh pr edit` still fails on this token** — it is GraphQL and wants
+    `read:org`, measured 2026-09-10 — so a PR body changes through
+    `sh scripts/gh-write.sh pr-body <repo> <N> tmp/whatever.md`, which is REST.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
