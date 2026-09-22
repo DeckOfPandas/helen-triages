@@ -301,6 +301,57 @@ def test_the_hook_leaves_lowercase_dash_c_and_bare_git_alone(command):
     assert not _unanalyzable_denies(command), f"refused {command!r}"
 
 
+# --- session-ground-truth.py: the one hook that TELLS rather than refuses ----
+#
+# Added 2026-09-21. Every other hook here refuses something; this one reports
+# where the session is, because CLAUDE.md had been asking sessions to remember
+# to look ("am I still where I left off" -- the branch can move under a running
+# session, /workspace being a bind mount). A report that fails is worse than no
+# report, so what is pinned is that it always emits usable JSON and never
+# blocks.
+
+GROUND_TRUTH_HOOK = ROOT / ".claude" / "hooks" / "session-ground-truth.py"
+
+
+def _ground_truth_payload() -> dict:
+    result = subprocess.run(
+        ["python3", str(GROUND_TRUTH_HOOK)],
+        input="{}", cwd=ROOT, capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    return json.loads(result.stdout)
+
+
+def test_the_ground_truth_hook_is_wired_as_a_session_start_hook():
+    hooks = json.loads(SETTINGS.read_text(encoding="utf-8"))["hooks"]
+    commands = [
+        entry["command"]
+        for group in hooks["SessionStart"] for entry in group["hooks"]
+        if entry.get("type") == "command"
+    ]
+    assert any("session-ground-truth.py" in c for c in commands), commands
+
+
+def test_the_ground_truth_hook_reports_branch_tree_and_drafts():
+    payload = _ground_truth_payload()
+    context = payload["hookSpecificOutput"]["additionalContext"]
+    # Both audiences get the same text: Helen reads systemMessage, the session
+    # reads additionalContext. They must not drift apart.
+    assert payload["systemMessage"] == context
+    assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    for expected in ("branch:", "tree:", "vs origin/main:", "drafts:"):
+        assert expected in context, f"{expected!r} missing from {context!r}"
+
+
+def test_the_ground_truth_hook_never_blocks_a_session():
+    """It has nothing to refuse, and a status report that could stop a session
+    starting would be a worse trade than no report at all."""
+    payload = _ground_truth_payload()
+    assert "permissionDecision" not in payload.get("hookSpecificOutput", {})
+    assert payload.get("continue") is not False
+    assert payload.get("decision") != "block"
+
+
 # --- git-push-agent.sh: never the public main --------------------------------
 
 @pytest.mark.parametrize("args", [
