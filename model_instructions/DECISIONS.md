@@ -5102,10 +5102,24 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   does not reach a RUNNING session** — the same Read failed twice after the
   file was correct, because the working-directory set is fixed at session
   start; `/add-dir` made it live, and the file serves every session after.
-  Worth knowing: `Read(//dev/null)` is presumably inert for the same reason,
-  and was left alone rather than tidied on a guess. The runtime holds node
+  The runtime holds node
   v24.18.1, and `MANUAL §1`'s "use the system `node`" is unchanged — the grant
   is for looking at it.
+  - **AND THE SAME SESSION THEN CALLED `Read(//dev/null)` INERT, WRONGLY, BY
+    TESTING THE WRONG THING.** Reasoning from the finding above, it ran the
+    Read TOOL on `/dev/null`, watched the block refuse it, and reported the
+    rule dead. Helen: *"Claude can read and write to /dev/null, so retain
+    whatever means that."* She is right and the pair stays. The measurement
+    was real; the CLAIM drawn from it was several sizes larger.
+    `blockReadsOutsideWorkingDirectories` governs `Read`/`Grep`/`Glob`, and a
+    **Bash redirection is a different path entirely** — `>/dev/null` appears in
+    `run.sh`, in the `git checkout -- x 2>/dev/null` story above, and was used
+    repeatedly by the very session that pronounced the rule useless. The
+    general lesson, and it is the same one as the write test three paragraphs
+    up: **a permission rule and a permission block are different mechanisms,
+    and exercising one says nothing about the other.** Two wrong conclusions in
+    one session from the same habit — proving something narrower than the thing
+    being claimed.
 
 - **2026-09-21 — `git -C <path>` defeats every git allow rule, and a whole
   session's git calls interrupted Helen for nothing.** She raised it gently —
