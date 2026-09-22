@@ -7,7 +7,7 @@ makes: "4 eggs"
 serves_estimate: 4
 prep_time: "10 mins"
 cook_time: "6–7 mins"
-main_ingredients: ["medium eggs", "mirin", "light soy sauce", "dark soy sauce", "fresh garlic cloves", "fresh ginger", "star anise"]
+main_ingredients: ["eggs", "mirin", "light soy sauce", "dark soy sauce", "fresh garlic cloves", "fresh ginger", "star anise"]
 star_ingredient: "eggs"
 tags: ["extras"]
 ingredient_groups:
@@ -51,5 +51,5 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
