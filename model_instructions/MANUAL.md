@@ -2016,13 +2016,20 @@ per-generic figure where it does not — the four most-poured things are lime
 juice, lemon juice, sugar syrup and pineapple juice and none will ever be a
 bottle. **`default_bottles` is a pricing fact and never a suggestion**
 ("gin means Tanqueray unless I say otherwise" is a fact about her shelf).
-**Only a VOLUME counts** — no dashes, garnishes, muddled fruit, ice, salt or
-sugar (*"I'm catering for family, not running a bar"*); the excluded list
-lives in the data. `to top` is the one exception, as a declared RANGE
-(`top_up_ml`), and the shopping list does not spend it yet. **The figure is
-per glass and does not move with the scaler.** `cost.complete` withholds a
-figure known to be wrong (the pear Bellini, the Caipirinha). `checked:` is
-the file's honesty and the field to distrust first. Master of Malt returns 429
+**A VOLUME counts, and so does a counted fruit or a weighed solid that has a
+price row** (#748, *"Price whole fruit and weighed solids"*): `fruit_prices`
+is GBP per piece and prices `1 whole`, `4 whole`, `9 each`, `5 cubes` and
+`half`; `weight_prices` is GBP per kilo and prices `25 g`. A count or weight
+with no row is a flourish and free — a dash, a leaf, a garnish, ice, salt and
+the sugar CUBE never count (*"I'm catering for family, not running a bar"*);
+the excluded list lives in the data. `to top` is a declared RANGE
+(`top_up_ml`), and the shopping list spends it. The shopping list's rate table
+carries `fruit` and `weight` maps beside `generics` and `bottles`, and
+multiplies. **The figure is per glass and does not move with the scaler.**
+`cost.complete` withholds a figure known to be wrong: a drink whose excluded
+pours outnumber its priced ones. None does today; the Bellini's figure is the
+cost of its batch syrup plus one top, which its own note says is 3–4 orders.
+`checked:` is the file's honesty and the field to distrust first. Master of Malt returns 429
 to every automated request; Helen reads it herself. Apply her corrections by
 script against the parsed YAML, refusing on any name not found; a regex over
 this file matches the wrong block.
