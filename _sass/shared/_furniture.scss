@@ -330,39 +330,42 @@ $page-search-quiet: 45%;
 // accent under the cursor -- which is the shortlist button's own pair on food.
 // Cocktails hovers its shortlist button in magenta (the site's "this one"),
 // and cocktails/_shortlist.scss re-points these three to match.
+// TWO COLUMNS AT EVERY WIDTH -- #1182, 2026-09-21, superseding #1163's
+// one-per-line phone block the same day and #1086's two-by-two before it.
+// Helen, having looked at both: "Left aligned: + SHORTLIST / (0) SEE SHORTLIST.
+// Right aligned: PRINT / PDF." The shortlist pair is one column, its labels
+// flush left with each other; the print pair is the other, flush right; and
+// the arrangement is the SAME at 360px and at 1280px, which is what #1163's
+// complaint was really about -- not that two rows of two is wrong, but that
+// the shape changed with the width and with the labels' lengths.
+//
+// A GRID FILLED BY COLUMN, so the include's DOM order (shortlist, see
+// shortlist, print, pdf -- the order Helen fixed in #1005) lands the first two
+// in column one and the last two in column two without any per-control
+// placement. `auto` tracks so each column is as wide as its widest label and
+// no wider; the block as a whole still sits where each site puts it
+// (`.recipe-controls` pushes it right on food, `.cocktail-controls` sets it
+// beside the toggle on a drink page), so nothing outside this rule moved.
+//
+// THE TWO COLUMNS ALIGN OPPOSITE WAYS, and that is the whole of her spec:
+// `justify-items: start` on the grid for the shortlist column, overridden to
+// `end` on the two print controls by the `grid-column: 2` rule below. A
+// right-aligned right column is what keeps PDF's edge on the block's right
+// edge, where the whole row's edge was before.
 .page-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  grid-auto-flow: column;
+  justify-items: start;
   align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: $space-sm 1.4rem;
+  column-gap: 1.4rem;
+  row-gap: $space-sm;
 }
 
-// BELOW 600px THE ROW BECOMES ONE COLUMN -- ALL FOUR WRAP, OR NONE DOES.
-// #1163, 2026-09-21. Helen: "as soon as action buttons need to wrap, all
-// should wrap", with a screenshot of the row she was looking at.
-//
-// WHAT THIS REPLACED, AND WHY IT WAS NOT ENOUGH. #1086 made this a TWO-column
-// grid, because `flex-wrap` was breaking after PRINT and stranding PDF alone
-// on its own line. Two rows of two fixed the stranding, and it was reported as
-// working as designed in the 2026-09-20 phone review -- the right edges do
-// line up in their columns. Helen looked at the built page and disagreed: two
-// rows of two reads as an arrangement, and the arrangement changes depending
-// on how long the labels happen to be. One control per line does not.
-//
-// IT IS THE SAME ARGUMENT #1086 MADE, CARRIED ONE STEP FURTHER: a row that
-// cannot hold everything should not hold SOME of it. `1fr` rather than
-// `max-content` so the single column is the full width available, with
-// `justify-items: end` keeping every label's right edge where `flex-end` had
-// it at full width -- the same resting position, one per line.
-@media (max-width: 600px) {
-  .page-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-    justify-content: end;
-    justify-items: end;
-    row-gap: $space-sm;
-  }
+.page-actions .btn-print,
+.page-actions .btn-pdf {
+  justify-self: end;
 }
 
 .btn-see-shortlist,
