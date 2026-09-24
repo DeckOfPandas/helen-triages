@@ -2899,6 +2899,18 @@ on GitHub delays every session start and a slow hook is one Helen turns off.
 It is listed here because it sits in the same directory as the guards and is
 not one; do not read its silence as a guard having passed.
 
+**ITS FIRST LINE NAMES THE CHECKOUT IT IS TALKING ABOUT, and that is a fix
+rather than a flourish (2026-09-24).** It used to take its root from its own
+file's path, and Claude Code loads it as
+`$CLAUDE_PROJECT_DIR/.claude/hooks/session-ground-truth.py` — which in a
+worktree session is the PRIMARY clone. So it opened a session in
+`.claude/worktrees/opus-improve-devops` with `branch: main`, `1 uncommitted
+change`, `13 behind`: all true of `/workspace`, none of it true of the session,
+and the session nearly acted on it. **If the path it prints is not the worktree
+you are working in, stop and trust nothing else in the report.** DECISIONS §11.
+The same trap as §2.1's `--show-toplevel`, from the other side: a tracked file
+cannot learn where it is from its own path.
+
 **Branch names:** `<type>/<what-its-about>`, lowercase, hyphens; one concern;
 deleted after merge, local and remote. **Commit subjects:** `(type) lowercase
 description`, no full stop, the type words in use derived by `git log main

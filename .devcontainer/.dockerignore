@@ -1,0 +1,22 @@
+# Files in this build context that the image does not use.
+#
+# TWO EFFECTS, AND THE SECOND IS THE REASON THIS FILE EXISTS (#1191, 2026-09-24).
+# Docker stops sending them as build context, which is marginal here. And
+# `run.sh` excludes them from the build-input hash it stamps each image with, so
+# editing the README or `run.sh` itself no longer triggers a rebuild. Before
+# this, every edit to either cost one fully-cached rebuild -- about a second and
+# no network, so it was wrong only in the safe direction, but it was noise.
+#
+# EXACT FILENAMES ONLY. `run.sh` reads this file and refuses to interpret
+# anything cleverer: a line containing a `*`, a `/`, a `!` or a leading `#`
+# beyond these comments makes it fall back to hashing the whole directory. That
+# is deliberate -- a half-understood ignore pattern would silently shrink what
+# the stamp covers, and an image that is not rebuilt when it should be is the
+# bug this whole mechanism exists to prevent. Wrong in the safe direction, both
+# times.
+#
+# So: if you add a pattern here that Docker understands and `run.sh` does not,
+# nothing breaks except that you are back to a rebuild per README edit.
+README.md
+run.sh
+devcontainer.json

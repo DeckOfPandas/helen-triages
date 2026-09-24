@@ -23,6 +23,7 @@ asking.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import pathlib
@@ -350,6 +351,72 @@ def test_the_ground_truth_hook_never_blocks_a_session():
     assert "permissionDecision" not in payload.get("hookSpecificOutput", {})
     assert payload.get("continue") is not False
     assert payload.get("decision") != "block"
+
+
+# --- the hook reported the WRONG REPOSITORY, 2026-09-24 ----------------------
+#
+# On its first real outing it opened a session in
+# `.claude/worktrees/opus-improve-devops` by announcing `branch: main`,
+# `1 uncommitted change`, `13 behind`. Every word was true of `/workspace` and
+# none of it was true of the session, because the root came from
+# `Path(__file__).parent.parent.parent` -- the checkout the SCRIPT was loaded
+# from, which for a worktree session is the primary clone ($CLAUDE_PROJECT_DIR).
+# The session read its own hook and nearly acted on it.
+#
+# A fact with no subject attached is what made that misleading rather than
+# merely wrong, so the fix is two things and the second is the durable one: pick
+# the root from the session's cwd, AND print which path the report is about.
+
+def _load_ground_truth():
+    spec = importlib.util.spec_from_file_location("ground_truth", GROUND_TRUTH_HOOK)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_the_report_names_the_repository_it_describes():
+    """Without this, a report about the wrong checkout is indistinguishable
+    from a report about the right one."""
+    context = _ground_truth_payload()["hookSpecificOutput"]["additionalContext"]
+    assert str(ROOT) in context, (
+        f"the report does not say which checkout it is about:\n{context}"
+    )
+
+
+def test_the_root_comes_from_the_sessions_cwd_not_the_scripts_location(tmp_path):
+    """The payload's `cwd` wins over where this file happens to live.
+
+    Proved against a real second repository rather than a mock -- a throwaway
+    `git init`, deliberately NOT a worktree of this repo. A `git worktree add`
+    here would prove the same thing while mutating this repo's worktree list,
+    and an interrupted test would leave a stale entry that only
+    `git worktree prune` clears -- which is Helen's, not a test's
+    (CLAUDE.md, normal workflow).
+    """
+    module = _load_ground_truth()
+    elsewhere = tmp_path / "another-repo"
+    elsewhere.mkdir()
+    made = subprocess.run(["git", "init", "--quiet"], cwd=elsewhere,
+                          capture_output=True, text=True, timeout=60)
+    if made.returncode != 0:
+        pytest.skip(f"could not git init a probe repo: {made.stderr.strip()}")
+
+    resolved = module.resolve_root({"cwd": str(elsewhere)})
+    assert resolved.resolve() == elsewhere.resolve(), (
+        f"resolved {resolved} from a cwd of {elsewhere} -- the hook is reading "
+        f"its own location again, which is the 2026-09-24 bug"
+    )
+
+
+def test_a_cwd_that_is_not_a_repository_is_skipped_rather_than_reported(tmp_path):
+    """A junk `cwd` must fall through to something real, not produce a report
+    about a directory git knows nothing about."""
+    module = _load_ground_truth()
+    nowhere = tmp_path / "not-a-repo"
+    nowhere.mkdir()
+    resolved = module.resolve_root({"cwd": str(nowhere)})
+    assert resolved.resolve() != nowhere.resolve()
+    assert (resolved / ".git").exists() or resolved.is_dir()
 
 
 # --- git-push-agent.sh: never the public main --------------------------------

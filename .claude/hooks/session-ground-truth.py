@@ -53,11 +53,34 @@ execute bit -- `CLAUDE.md` forbids changing file permissions without asking.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent.parent
+# WHICH REPOSITORY IS THIS ABOUT? -- fixed 2026-09-24, and it reported the WRONG
+# ONE on its first real outing, which is worse than reporting nothing.
+#
+# It used to be `Path(__file__).resolve().parent.parent.parent`, i.e. "the
+# checkout this script was loaded from". Claude Code invokes the hook as
+# `$CLAUDE_PROJECT_DIR/.claude/hooks/session-ground-truth.py`, and in a worktree
+# session $CLAUDE_PROJECT_DIR is the PRIMARY clone -- so the hook opened a
+# session in `.claude/worktrees/opus-improve-devops` by announcing
+# `branch: main`, `1 uncommitted change`, `13 behind`. Every word was true of
+# `/workspace` and none of it was true of the session. The session then read its
+# own hook and nearly acted on it.
+#
+# This is the `--show-toplevel` bug of DECISIONS §1 arriving from the other
+# side: `run.sh` needed the primary clone and was getting the worktree; this
+# needed the worktree and was getting the primary.
+#
+# TWO CHANGES, and the second is the one that makes a future mistake survivable.
+# It now prefers the hook payload's own `cwd`, then the process's, and only then
+# falls back to its own location -- and it asks git for `--show-toplevel` from
+# there, so the answer is whatever git itself would use. And it PRINTS THE PATH
+# in the first line. A fact with no subject attached is what made this
+# misleading rather than merely wrong.
+_FALLBACK_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # The two private drafts repos, and the wrapper that clones each. Helen's
 # standing grant, 2026-09-21: clone them into a fresh worktree whenever you
@@ -68,11 +91,11 @@ DRAFTS = [
 ]
 
 
-def _git(*args: str) -> str | None:
+def _git_in(cwd: Path, *args: str) -> str | None:
     """A git command's stdout, or None if it failed for any reason at all."""
     try:
         done = subprocess.run(
-            ["git", *args], cwd=ROOT,
+            ["git", *args], cwd=cwd,
             capture_output=True, text=True, timeout=10,
         )
     except (OSError, subprocess.SubprocessError):
@@ -80,8 +103,33 @@ def _git(*args: str) -> str | None:
     return done.stdout.strip() if done.returncode == 0 else None
 
 
-def _branch_line() -> str:
-    branch = _git("branch", "--show-current")
+def resolve_root(payload: dict) -> Path:
+    """The checkout this session is actually working in.
+
+    In order of trust: the `cwd` the hook was handed, the process's own cwd,
+    then this file's location. The first two are where the SESSION is; the third
+    is only where this SCRIPT is, which in a worktree is the primary clone and
+    is what made the first version report someone else's branch.
+
+    Each candidate is confirmed by asking git for `--show-toplevel` from it, so
+    the returned path is the one git itself would act on rather than a guess.
+    """
+    candidates = []
+    for value in (payload.get("cwd"), os.getcwd()):
+        if value:
+            candidates.append(Path(str(value)))
+    candidates.append(_FALLBACK_ROOT)
+    for candidate in candidates:
+        if not candidate.is_dir():
+            continue
+        top = _git_in(candidate, "rev-parse", "--show-toplevel")
+        if top:
+            return Path(top)
+    return _FALLBACK_ROOT
+
+
+def _branch_line(root: Path) -> str:
+    branch = _git_in(root, "branch", "--show-current")
     if branch is None:
         return "branch: could not be read"
     if not branch:
@@ -92,8 +140,8 @@ def _branch_line() -> str:
     return f"branch: {branch}"
 
 
-def _dirty_line() -> str:
-    status = _git("status", "--porcelain")
+def _dirty_line(root: Path) -> str:
+    status = _git_in(root, "status", "--porcelain")
     if status is None:
         return "tree: could not be read"
     if not status:
@@ -102,9 +150,9 @@ def _dirty_line() -> str:
     return f"tree: {n} uncommitted change{'s' if n != 1 else ''} already here"
 
 
-def _position_line() -> str:
+def _position_line(root: Path) -> str:
     """How this branch sits against origin/main AS LAST FETCHED."""
-    counts = _git("rev-list", "--left-right", "--count", "origin/main...HEAD")
+    counts = _git_in(root, "rev-list", "--left-right", "--count", "origin/main...HEAD")
     if counts is None:
         return "vs origin/main: no origin/main ref -- run sh scripts/git-fetch-main.sh"
     try:
@@ -123,8 +171,8 @@ def _position_line() -> str:
     return f"vs origin/main: {', '.join(parts)} (as last fetched){tail}"
 
 
-def _drafts_lines() -> list[str]:
-    missing = [(d, repo) for d, repo in DRAFTS if not (ROOT / d).is_dir()]
+def _drafts_lines(root: Path) -> list[str]:
+    missing = [(d, repo) for d, repo in DRAFTS if not (root / d).is_dir()]
     if not missing:
         return ["drafts: both private clones present -- the suite is complete"]
     out = [
@@ -139,9 +187,21 @@ def _drafts_lines() -> list[str]:
 
 def main() -> int:
     try:
-        lines = [_branch_line(), _dirty_line(), _position_line()]
-        lines += _drafts_lines()
-        report = "Where this session actually is:\n" + "\n".join(
+        payload = {}
+        raw = sys.stdin.read()
+        if raw.strip():
+            try:
+                payload = json.loads(raw)
+            except (json.JSONDecodeError, ValueError):
+                payload = {}
+        root = resolve_root(payload if isinstance(payload, dict) else {})
+        lines = [_branch_line(root), _dirty_line(root), _position_line(root)]
+        lines += _drafts_lines(root)
+        # THE PATH IS THE FIRST THING PRINTED, and that is the fix for the
+        # 2026-09-24 bug rather than a nicety: the old report stated a
+        # branch with no subject, so a reader had no way to notice it
+        # described a different checkout.
+        report = f"Where this session actually is -- {root}:\n" + "\n".join(
             f"  {line}" for line in lines
         )
     except Exception as exc:                 # never stop a session starting
