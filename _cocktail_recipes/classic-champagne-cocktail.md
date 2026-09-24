@@ -31,7 +31,7 @@ mood:
 notes: 
   - label: "Cognac option for a more delicate drink"
     text: "For something smoother, try Pierre Ferrand Ambre (a more standard 40% ABV). Use anywhere down to half the sugar, and no more than 2 dashes of the bitters."
-source: "Difford's Guide"
+source: "Difford's"
 source_url: ""
 meta:
   made_before: false

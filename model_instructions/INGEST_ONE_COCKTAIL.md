@@ -160,7 +160,7 @@ meta:
 | `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. A step is a string, or a `{step, note}` pair — **used sparingly** (Helen, 2026-09-04), for an aside about how she does the step rather than part of the instruction. |
 | `to_serve` | **Serveware only** — what the drink is served WITH. `"Straw."`, `"Two straws."`, `"Ladle and punch glasses."` A terse noun phrase, or `""`. **Never the ice** — that is `serve.ice`. |
 | `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. A bare string is legal in the schema but not for an ingest. Use one to record what the source could not give you. |
-| `source` / `source_url` | Free text here, unlike food. `"Difford's"`, `"Death & Co"`. `source_url` may be `""`. |
+| `source` / `source_url` | Free text here, unlike food — and `""` is a perfectly good answer, on most drinks. **But if it IS one of the publications in §6a, spell it the way §6a spells it.** `source_url` may be `""`. |
 | a tip printed under the source's own label | **Transcribe the tip; drop the label.** A book or a site that runs its asides under a standing rubric is showing you its furniture, and `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence. **Never carry an unexplained abbreviation across** — eight food drafts kept a `gf tip:` prefix that was read as *gluten-free* for weeks by an issue and a test comment alike, and one proposed fix would have printed a false allergen claim. Expand it now, while the source is in front of you, or drop it. |
 | `meta.made_before` | Has Helen made this drink? **Always `false` on a fresh ingest** — unquoted, never `"false"`. A transcription cannot know whether she has poured it, and this is the field that says so. She flips it herself when she makes it. Issue #722. |
 | `meta.ship` | Helen's rating. **Always `"who knows"`, never `"QQ"`** — you have not drunk it and neither has she, and `QQ` is not a ship value. Helen, 2026-09-05: "I think that's clearer than QQ or leaving it unset, because it's a positive presence." The pair reads straight: she has not made it, so she has no idea. |
@@ -553,16 +553,16 @@ serve:
   ice: "crushed"
 ```
 
-**Six values, and nothing else is legal:**
+**These values, and nothing else is legal:**
 
-| Value | Means |
-|---|---|
-| `none` | Served up, in an empty glass. The commonest answer by a wide margin. |
-| `cubed` | Ordinary cubes — an ice-filled glass. |
-| `crushed` | Crushed or pebble ice. Every swizzle. |
-| `large cube` | One big rock. |
-| `block` | A large block, in a punch bowl or pitcher. |
-| `blended` | The ice is IN the drink. Frozen drinks. |
+<!-- vocab:serve_ice start -->
+- `none` — Served up, in an empty glass.
+- `cubed` — Ordinary cubes, an ice-filled glass.
+- `crushed` — Crushed or pebble ice.
+- `large cube` — One big rock.
+- `block` — A large block, in a punch bowl or a pitcher.
+- `blended` — The ice is IN the drink, not under it.
+<!-- vocab:serve_ice end -->
 
 **OMIT THE WHOLE `serve:` KEY IF THE SOURCE DOES NOT SAY.** Absent means nobody
 has decided; `ice: "none"` means somebody decided it is served up. Exactly the
@@ -722,6 +722,38 @@ drink pours "jalapeño-infused blanco tequila" and the infusion recipe is not in
 frame, the drink cannot be made from what you have. Say so — steeping time and
 chilli count decide whether it is pleasant or inedible, and neither is
 inferable.
+
+---
+
+## 6a. `source` — the publications, and how each spells itself
+
+**Most drinks say `source: ""` and that is right.** Helen, 2026-08-30: *"I sort
+of don't care about this. You can't copyright facts, and I am taking no prose
+from anywhere. Some will be attributable to a big-name inventor, bar or maybe
+hotel, and it's nice to note that, but I'm not going to sweat it."* So this is
+never a field to fill in for the sake of filling it in, and there is no coverage
+rule here or anywhere.
+
+**It is a SPELLING list, for the handful that recur.** If the source you are
+looking at is one of these, write the name exactly as it appears below:
+
+<!-- vocab:sources start -->
+- `Difford's` (also seen as Difford's Guide, Diffords, Diffords Guide)
+- `Death & Co` (also seen as Death and Co, Death & Company, Death and Company)
+- `Punch` (also seen as Punch Drink, punchdrink.com)
+- `Alcohol Professor` (also seen as The Alcohol Professor, alcoholprofessor.com)
+- `Thrillist` (also seen as thrillist.com)
+- `kindredcocktails.com` (also seen as Kindred Cocktails, Kindred)
+<!-- vocab:sources end -->
+
+**Anything else is free text and stays free.** A compound attribution names two
+sources on purpose — "Henry Craddock, Savoy Hotel, London / Death & Co" — and is
+not a misspelling of either. A bar, a person, a book nobody has cited before:
+write it as the source writes it.
+
+**`source` is WHO and `source_url` is WHERE.** A URL in `source` is the one
+mistake here that is a mistake: the drink page prints a name where you put it,
+and leaves the field that holds links empty beside it.
 
 ---
 

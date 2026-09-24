@@ -621,7 +621,35 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #
 # Proved with the old value first, as every move before it: the test named the
 # fifteen files of `4390dfc` and nothing else. Covers 4390dfc and nothing after.
-BASELINE_COMMIT = "4390dfc"   # #982's 18 recipes, on Helen's word
+#
+# MOVED 2026-09-22 FOR ONE WORD ON ONE RECIPE, AND IT IS THE CHEAPEST SHAPE THIS
+# MECHANISM HAS. `da31a37` puts `proofread: true` back on `ajitsuke-tamago`,
+# whose `main_ingredients[0]` went from `medium eggs` to `eggs`.
+#
+# THE PAGE NEVER WENT DARK, which is the whole point of doing it this way.
+# MANUAL 4.0: "if she reads the rendered pages ON THE BRANCH before it merges
+# and says so, flip the flags back in a second commit and move the baseline in a
+# third". The flip to `false` landed on the branch, she read it there, and the
+# flip back and this move follow -- so `main` never sees the dark state and the
+# recipe is live throughout. Three commits instead of one, and no 404.
+#
+# HER GRANT: "Ajitsuke Tamago: please flip proofread to true."
+#
+# WHAT IT COVERS IS ONE FIELD AND NOT THE PAGE. The ingredient list is
+# untouched and still reads `amount: "4 medium"` with `item: "eggs"` -- the size
+# riding with the count, which is the schema's own rule -- so nothing about how
+# to shop for or cook this recipe changed. The only difference a reader could
+# find is which filter button the index files it under, which is the change she
+# asked for: `main_ingredients` is the BROWSE axis, and across both collections
+# 81 entries say plain `eggs` against the one that said `medium eggs`.
+#
+# NOTHING ELSE IS SILENCED BY IT, checked rather than assumed: run against
+# `4390dfc` this test named `_food_recipes/ajitsuke-tamago.md` and nothing else,
+# so there is no other recipe whose agent edit this move could cover.
+#
+# Proved with the old value first, as every move before it. Covers da31a37 and
+# nothing after.
+BASELINE_COMMIT = "da31a37"   # ajitsuke-tamago's `eggs`, on Helen's word
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato

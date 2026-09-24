@@ -60,7 +60,7 @@ sys.path.insert(0, str(ROOT / "tests"))
 
 from conftest import SHARED_DATA_DIR                            # noqa: E402
 from test_cocktails import (                                    # noqa: E402
-    _garnish_vocab, _glasses, _methods, _vocab,
+    _garnish_vocab, _glasses, _methods, _serve_vocab, _sources_data, _vocab,
 )
 from test_source_attribution import VALID_TYPES                 # noqa: E402
 from test_standalone_docs import (                              # noqa: E402
@@ -282,6 +282,58 @@ def _measures() -> str:
     return _dots(measures.get("non_volumetric") or [], tick=True)
 
 
+def _serve_ice() -> str:
+    """The `serve.ice` vocabulary, with what each value MEANS.
+
+    DECLARED SINCE THE FIELD EXISTED AND NEVER PRINTED, which is the same gap
+    `vocab:generics` filled: `serve.yml` holds six values and a paragraph of
+    reasoning for each, and the repo-less document described the field in prose
+    and named none of them. A session that cannot see the six either guesses or
+    omits, and `ice` is the field #290 created specifically to stop seventeen
+    spellings of "strain".
+
+    THE GLOSSES COME FROM THE DATA, not from here. Each value's own note in
+    serve.yml opens with a sentence that IS the definition, so the first
+    sentence is what prints -- and a value whose meaning is rewritten there
+    rewrites the document on the next `--write`.
+    """
+    ice = (_serve_vocab().get("ice") or {})
+    rows = []
+    for value, note in ice.items():
+        first = re.split(r"(?<=[.!?])\s", str(note).strip())[0]
+        rows.append(f"`{value}` — {first}")
+    return "\n".join(f"- {r}" for r in rows)
+
+
+def _sources() -> str:
+    """The publications a drink's `source` names, and their canonical spelling.
+
+    NOT A CLOSED VOCABULARY, AND IT MUST NOT BECOME ONE. Helen ruled on
+    2026-08-30 that coverage here is optional and always will be: "I sort of
+    don't care about this. You can't copyright facts ... I'm not going to sweat
+    it." 86 of 114 drinks say `source: ""` and that is correct.
+
+    WHAT THIS FIXES IS SPELLING, NOT COVERAGE. `Difford's` appears on 24 drinks
+    and `Difford's Guide` on two -- one publication, two spellings, and nothing
+    to tell the next ingest which is the house style. This is the same shape
+    `bottles.yml` uses for bottles: a canonical name, its known aliases, and a
+    document that prints the canonical one.
+
+    THE COMPOUND ATTRIBUTIONS ARE NOT VARIANTS AND ARE NOT LISTED. "Difford's /
+    Rémy Martin" and "Henry Craddock, Savoy Hotel, London / Death & Co" name two
+    sources each, on purpose, and so do Helen's own jokes ("life", "spitting out
+    weird soapy drinks every time I accidentally use Blanc"). Free text stays
+    free.
+    """
+    sources = _sources_data().get("publications") or {}
+    rows = []
+    for name, entry in sources.items():
+        aliases = (entry or {}).get("aliases") or []
+        tail = f" (also seen as {', '.join(aliases)})" if aliases else ""
+        rows.append(f"`{name}`{tail}")
+    return "\n".join(f"- {r}" for r in rows)
+
+
 def _generics() -> str:
     """Every declared generic, grouped by the list that declares it.
 
@@ -345,6 +397,8 @@ def renderers() -> dict:
         "method": _method_steps,
         "measures": _measures,
         "generics": _generics,
+        "serve_ice": _serve_ice,
+        "sources": _sources,
     }
     for group in _food_taxonomy()["tags"]:
         out[f"tags:{group}"] = (lambda g: lambda: _tags(g))(group)
@@ -365,7 +419,7 @@ def required_blocks() -> dict:
         FOOD_DOC: tags | {"stars", "source_types", "accents", "no_accent"},
         COCKTAIL_DOC: {
             "glass", "glass_corrections", "garnish", "method", "measures",
-            "accents", "generics",
+            "accents", "generics", "serve_ice", "sources",
         },
     }
 

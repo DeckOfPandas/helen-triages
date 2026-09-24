@@ -222,9 +222,45 @@ REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
 # it since #567 and this whitelist would have rejected any drink that wrote one.
 # A field the code supports and the schema refuses is a trap for whoever tries
 # it first, so both are declared here now.
+# THE THREE `_claude` KEYS ARE A PROPOSAL, NOT AN ANSWER -- added 2026-09-21.
+# Helen, asked where a Claude's proposed category should live so she can check
+# it against the source's own words: "I'd want to make sure Claude doesn't
+# always confidently write 'Gosling's' instead of both."
+#
+# SO THE SOURCE'S WORDS STAY IN `generic`, BEHIND THE QQ, AND THE PROPOSAL SITS
+# BESIDE THEM. It is the `QQ original` / `QQ Claude` pair applied to a field
+# rather than to a method step: both halves are on the file, the page renders
+# the QQ so the drink cannot publish, and she collapses the pair by ruling.
+#
+# THEY ARE FOR A NARROWER CASE THAN IT FIRST LOOKS, and her own rule is what
+# narrows it: "If the source says 'Gosling's' then the correct thing for Claude
+# to do is give 'moderately aged rum, character: blackstrap'. But if a recipe
+# gives 'blackstrap' Claude shouldn't suggest anything." A DECLARED BOTTLE is a
+# dictionary read -- write `generic` and `suggestion` outright, no proposal. A
+# bare category word nobody can resolve is hers alone -- `QQ <the words>` and
+# nothing else. A proposal belongs only in between.
+#
+# `character_claude` IS THE CLEAREST CASE THERE IS, and it exists because
+# `bottles.yml` deliberately has no character column: its own note against
+# Gosling's Black Seal says the bottle is "reached for FOR its blackstrap, which
+# is a `character` on the recipe and never a generic -- #314, and the reason
+# this file has no character column". So resolving the BOTTLE gives the generic
+# and the suggestion mechanically and gives no character at all, and Helen's
+# 2026-09-14 ruling says why: "We don't name characters on bottles. We name
+# characters on recipe lines ... having a character is only in a context."
+# A character is therefore always an inference about THIS recipe, and an
+# inference is exactly what belongs in a proposal rather than in the field.
 INGREDIENT_KEYS = {
     "generic", "amount", "suggestion", "note", "character", "optional",
     "as", "card_order",
+    "generic_claude", "suggestion_claude", "character_claude",
+}
+
+# The proposal keys, and the field each one proposes a value for.
+CLAUDE_PROPOSALS = {
+    "generic_claude": "generic",
+    "suggestion_claude": "suggestion",
+    "character_claude": "character",
 }
 
 # `amount` is not required HERE because it has its own test with its own
@@ -1690,7 +1726,39 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first, as every move before it: the test named all
 # fifteen files, every one of them "last touched by cf4967a9", and nothing
 # else. Covers cf4967a and nothing after.
-COCKTAIL_BASELINE_COMMIT = "cf4967a"   # the `no measuring` chip, on Helen's grant
+#
+# MOVED 2026-09-21 FOR TWO SOURCE LINES, AND THIS IS THE NARROWEST MOVE THE
+# CONSTANT HAS MADE. `742aa73` normalises `Difford's Guide` to `Difford's` on
+# `biggles-sidecar` and `classic-champagne-cocktail` -- 24 other drinks say
+# `Difford's`, and the new `_data/cocktails/sources.yml` declares that the house
+# form. Two files, one field, four characters removed from each.
+#
+# HER GRANT, UNPROMPTED AND EXPLICITLY BOUNDED: "If you're tweaking a bracket in
+# a source line there's no need to flip the proofread flag, in this session
+# only, normal rules again after this." The bound is hers and is recorded here
+# because a grant with an expiry is worthless if only the taker remembers it:
+# THIS IS THAT SESSION AND THERE IS NOT ANOTHER. A later commit citing this
+# paragraph for a different edit is misreading it.
+#
+# WHY IT IS A DEFENSIBLE ONE ANYWAY, on the terms #367 actually sets. The rule
+# is that an agent's edit means her read no longer covers what is in the file.
+# What changed here is the SPELLING of a publication's name, on a line whose
+# content she has read, to the form she has read on 24 other drinks. There is no
+# reading of "Difford's Guide" that her proofread of "Difford's" fails to cover.
+# That is the fourth and fifth moves' shape -- a change she can see whole in the
+# sentence that asked for it -- rather than the fifteen-file shape #933 is uneasy
+# about.
+#
+# AND IT IS STILL A VISIBLE FIELD, which is why this needed a grant at all
+# rather than `_only_invisible_keys_changed`. `source` prints on the drink page;
+# only `source_type` is on the invisible list. A spelling that renders is a
+# spelling a reader sees.
+#
+# Proved with the old value first, as every move before it: the test named
+# `_cocktail_recipes/biggles-sidecar.md` and
+# `_cocktail_recipes/classic-champagne-cocktail.md`, both "last touched by
+# 742aa738", and nothing else. Covers 742aa73 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "742aa73"   # two source spellings, on Helen's bounded grant
 
 
 def _newest_commit_per_published_drink():
@@ -1921,6 +1989,113 @@ def test_every_generic_is_declared():
     )
 
 
+def test_a_claude_proposal_only_sits_beside_an_open_question():
+    """A `_claude` key is legal only while the POUR still carries a `QQ`.
+
+    CONDITIONAL, AND THAT IS THE WHOLE DESIGN, the same shape the retired `item`
+    rule had: the proposal is allowed exactly as long as the question it answers
+    is open, and is forbidden the moment it is settled. A proposal beside a
+    fully-answered pour is one that outlived its answer -- which is how `item`
+    became a dumping ground, 215 pours deep, before it was retired.
+
+    THE QQ MAY BE IN THE `note`, NOT ONLY IN `generic`, and that is not a
+    loophole -- it is the case the proposal keys were ADDED for. A source
+    naming `Gosling's` resolves its generic and its suggestion outright, from
+    `bottles.yml`, so no QQ survives in `generic`; what is still open is the
+    CHARACTER, which `bottles.yml` deliberately does not record. That pour is
+    typed and has an open question, and the question lives in a `QQ -` note
+    beside the proposal. Helen's own definition is what makes this right: `QQ`
+    means "Helen pay attention to this for some reason", and it is the marker
+    rather than the field that carries the meaning.
+
+    IT IS ALSO WHY NO SECOND LIST IS NEEDED FOR PUBLISHED DRINKS. A published
+    drink carries no `QQ` anywhere (`test_no_published_drink_carries_a_qq`), so
+    by this rule it can carry no proposal either. One rule, both collections, no
+    `INGREDIENT_KEYS_RECIPES` to keep in step -- and that matters, because the
+    last key that needed a published-tense list of its own needed three tests
+    and got them wrong twice.
+    """
+    bad = []
+    for slug, fm in _load():
+        for i, entry in enumerate(fm.get("ingredients") or [], 1):
+            if not isinstance(entry, dict):
+                continue
+            proposals = sorted(set(entry) & set(CLAUDE_PROPOSALS))
+            if not proposals:
+                continue
+            open_question = (_unanswered(_listed(entry.get("generic")))
+                             or _is_qq(entry.get("note")))
+            if not open_question:
+                bad.append(f"{slug} entry {i}: {', '.join(proposals)} on a pour "
+                           f"with nothing left open "
+                           f"(generic {entry.get('generic')!r}, "
+                           f"note {entry.get('note')!r})")
+    assert not bad, (
+        f"{len(bad)} proposal(s) outliving the question they answer:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nA `_claude` key is a PROPOSAL and is legal only while the pour "
+          "still asks something -- a `QQ` in `generic`, or a `QQ -` note saying "
+          "what is open. Once Helen has ruled, the proposal either becomes the "
+          "field's value or is wrong; either way it stops being a proposal and "
+          "the key goes. Do not delete a QQ to make this green."
+    )
+
+
+def _listed(value):
+    if value is None:
+        return []
+    return value if isinstance(value, list) else [value]
+
+
+def test_a_claude_proposal_names_a_real_value():
+    """A proposed generic, character or bottle is one the repo declares.
+
+    A PROPOSAL IS STILL HELD TO THE VOCABULARY, and it has to be: its whole
+    purpose is to be promotable into the field with one edit, so a value the
+    field would refuse is a proposal that can never be accepted. This is the
+    guard that stops `generic_claude: "blackstrap"` -- a word that is a
+    CHARACTER in this model and has been retired as a generic since #314, which
+    is precisely the confusion Helen raised when she asked for these keys.
+
+    `suggestion_claude` RESOLVES THROUGH THE ALIAS MAP, like any suggestion, so
+    a proposal may name a bottle the way the source spelled it.
+    """
+    vocab = _vocab()
+    declared = _declared_generics(vocab)
+    retired = _retired(vocab)
+    characters = {c for key, value in vocab.items()
+                  if _is_character_list(key) for c in value}
+    bottles = _bottle_index(_bottles())
+
+    bad = []
+    for slug, fm in _load():
+        for entry in (fm.get("ingredients") or []):
+            if not isinstance(entry, dict):
+                continue
+            for g in _listed(entry.get("generic_claude")):
+                if g in retired:
+                    bad.append(f"{slug}: generic_claude {g!r} is RETIRED "
+                               f"({retired[g]})")
+                elif g not in declared:
+                    bad.append(f"{slug}: generic_claude {g!r} is not declared")
+            for c in _listed(entry.get("character_claude")):
+                if characters and c not in characters:
+                    bad.append(f"{slug}: character_claude {c!r} is not a "
+                               f"declared character")
+            for s in _listed(entry.get("suggestion_claude")):
+                if str(s).strip().lower() not in bottles:
+                    bad.append(f"{slug}: suggestion_claude {s!r} names no "
+                               f"known bottle")
+    assert not bad, (
+        "Proposal(s) naming something the field would refuse:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nA proposal exists to be promoted into its field with one edit, "
+          "so it is held to the same vocabulary the field is. If the right "
+          "answer is not in the vocabulary, there is no proposal to make -- "
+          "leave the `QQ` and the source's words alone."
+    )
+
+
 def test_no_drink_uses_a_retired_generic():
     """Retired values fail with their retirement REASON attached.
 
@@ -1954,6 +2129,89 @@ def _serve_vocab():
     if not SERVE.exists():
         pytest.skip("_data/cocktails/serve.yml does not exist yet.")
     return yaml.safe_load(SERVE.read_text(encoding="utf-8")) or {}
+
+
+SOURCES = ROOT / "_data" / "cocktails" / "sources.yml"
+
+
+def _sources_data():
+    if not SOURCES.exists():
+        pytest.skip("_data/cocktails/sources.yml does not exist yet.")
+    return yaml.safe_load(SOURCES.read_text(encoding="utf-8")) or {}
+
+
+def test_every_source_spelling_is_canonical():
+    """A drink that cites a declared publication spells it the declared way.
+
+    A SPELLING RULE, NEVER A COVERAGE ONE, and `sources.yml`'s own header
+    argues the distinction at length. Helen ruled on 2026-08-30 that most
+    drinks will say `source: ""` and that this is right: "I sort of don't care
+    about this ... I'm not going to sweat it." A `source` matching nothing in
+    the table is free text and passes, which is the entire point -- her own
+    answers ("life", "Original", "spitting out weird soapy drinks every time I
+    accidentally use Blanc") are answers, and compound attributions name two
+    sources on purpose.
+
+    WHAT IT CATCHES is the one fault a table can catch: `Difford's` on 24
+    drinks and `Difford's Guide` on two. One publication, two spellings, and
+    nothing to tell the next ingest which is the house form -- so a third was
+    only a matter of time. The same shape `bottles.yml` uses for bottles, and
+    for the same reason.
+
+    THE MATCH IS ON THE WHOLE FIELD, not a substring, so "Satan's Whiskers,
+    London, via punchdrink.com" is untouched: it is a compound attribution that
+    happens to contain a publication's domain, and correcting inside one would
+    be rewriting a citation rather than spelling it.
+    """
+    declared = _sources_data().get("publications") or {}
+    canonical = {name.strip().lower(): name for name in declared}
+    alias_of = {}
+    for name, entry in declared.items():
+        for alias in ((entry or {}).get("aliases") or []):
+            alias_of[alias.strip().lower()] = name
+
+    overlap = sorted(set(alias_of) & set(canonical))
+    assert not overlap, (
+        f"spelling(s) declared as both a name and an alias: {overlap}. "
+        f"One of the two entries is wrong, and while both exist the rule "
+        f"below cannot say which spelling it wants."
+    )
+
+    bad = []
+    for slug, fm in _load():
+        source = str(fm.get("source") or "").strip()
+        if not source:
+            continue
+        got = alias_of.get(source.lower())
+        if got:
+            bad.append(f"{slug}: source {source!r} -> {got!r}")
+    assert not bad, (
+        "Drink(s) spelling a declared publication a second way:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\n`_data/cocktails/sources.yml` names the form this collection "
+          "uses and lists the variants seen in the wild. Write the name, or -- "
+          "if this really is a different publication -- give it its own entry."
+    )
+
+
+def test_no_source_alias_is_stale():
+    """The other direction: a declared alias is one somebody might write.
+
+    The same rule `unresolved_suggestions` and the garnish `proposals` have.
+    An alias nobody has ever written is a guess about the future, and a table
+    of guesses is one nobody trusts to be current -- so an alias earns its
+    place by having been seen, or by being the form the publication itself
+    uses.
+    """
+    declared = _sources_data().get("publications") or {}
+    assert declared, "sources.yml declares no publications, so this checks nothing."
+    for name, entry in declared.items():
+        assert isinstance(entry, dict), f"{name}: expected a mapping"
+        aliases = entry.get("aliases") or []
+        assert aliases, (
+            f"{name!r} declares no aliases, so it filters nothing. Either name "
+            f"the spellings it is meant to catch, or take the entry out."
+        )
 
 
 def test_serve_block_uses_only_declared_keys_and_values():
