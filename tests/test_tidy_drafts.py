@@ -239,11 +239,17 @@ def test_the_lines_the_pass_must_not_touch_survive_apply(drinks, line):
     do-nothing script would also pass.
 
     A `QQ` NOTE IS THE FIRST CASE AND THE LOAD-BEARING ONE. On a drink the
-    marker sits behind a key -- `text: "QQ - ..."` -- and the food QQ pattern in
-    tidy_drafts.py, which allows only a list dash and a quote in front of it,
-    matches that line not at all. The drinks half asks
-    `conftest.checkable_text` instead; this is the test that fails if anybody
-    ever "simplifies" it back to the food one.
+    marker sits behind a key -- `text: "QQ - ..."` -- and the drinks half asks
+    `conftest.checkable_text`, which knows that. This is the test that fails if
+    anybody ever "simplifies" it to something that does not.
+
+    THE FOOD PATTERN DID NOT KNOW THAT UNTIL 2026-09-22, and this docstring said
+    so approvingly for three weeks -- "the food QQ pattern ... matches that line
+    not at all" was written as a reason the DRINKS side is careful, and never
+    read as the statement about FOOD that it also was. It was a real hole: 534
+    lines in `_food_drafts/` were QQ lines the food pass could not see, five of
+    them carrying a fault it would have "corrected". See the test below, which
+    is the food half of this one.
     """
     path = write_drink(drinks)
     assert line in path.read_text(encoding="utf-8"), (
@@ -253,6 +259,135 @@ def test_the_lines_the_pass_must_not_touch_survive_apply(drinks, line):
     run(drinks, "--apply")
     assert line in path.read_text(encoding="utf-8"), (
         f"the tidy pass edited a line it must leave alone:\n  {line}"
+    )
+
+
+# =============================================================================
+# THE FOOD HALF, WHICH DID NOT EXIST UNTIL 2026-09-22
+# =============================================================================
+# Every test above runs `--site cocktails`. The food rules had no test of which
+# lines they must not touch at all, which is how `QQ_LINE` went three weeks
+# allowing only a list dash in front of the marker while the drinks half was
+# carefully asking a pattern that knew about keys.
+#
+# THE FIXTURE CARRIES THE SAME FAULT IN BOTH PLACES, exactly as the drinks one
+# does: `2-3` and `--` in prose the pass SHOULD fix, and the identical `2-3` and
+# `--` behind a `QQ` where it must not. A "nothing changed" assertion would pass
+# on a do-nothing script; this one cannot.
+
+FOOD_BEFORE = '''---
+title: "Test Recipe"
+tagline: "QQ - rewrite: a bright, sharp thing, 2-3 ways"
+source: "Adapted from Somebody"
+source_type: person
+serves: "4"
+prep_time: "QQ, plus 30 mins resting -- it needs it"
+cook_time: "20 mins"
+main_ingredients: ["gnocchi", "sage"]
+star_ingredient: "pasta"
+tags: ["carbs party"]
+ingredient_groups:
+  - name: "the lot"
+    items:
+    - amount: "500 g"
+      item: "gnocchi"
+      note: "give it 2-3 mins -- no more"
+method:
+  - "QQ original Fry for 2-3 mins -- until golden."
+  - "QQ Claude Fry 2-3 mins -- until golden."
+notes:
+  - label: "QQ"
+    text: "QQ - the source said 2-3 mins -- reproduce, do not correct"
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+---
+'''
+
+
+@pytest.fixture
+def food():
+    root = ROOT / "tmp" / "test_tidy_drafts_food"
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True)
+    yield root
+    shutil.rmtree(root)
+
+
+def run_food(root, *extra):
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), "--site", "food",
+         "--drafts-dir", str(root), "--allow-dirty", *extra],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, (
+        f"the script exited {result.returncode}:\n{result.stdout}\n{result.stderr}"
+    )
+    return result.stdout
+
+
+@pytest.mark.parametrize("line", [
+    'tagline: "QQ - rewrite: a bright, sharp thing, 2-3 ways"',
+    'prep_time: "QQ, plus 30 mins resting -- it needs it"',
+    '    text: "QQ - the source said 2-3 mins -- reproduce, do not correct"',
+    '  - "QQ original Fry for 2-3 mins -- until golden."',
+])
+def test_a_food_qq_behind_a_key_survives_apply(food, line):
+    """A marker behind a KEY is still a marker, and the food pass now knows it.
+
+    THE FOUR CASES ARE THE FOUR SHAPES THE OLD PATTERN MISSED. It allowed an
+    optional list dash and an optional quote and nothing else, so only the
+    fourth of these -- the method step -- was ever skipped. The other three
+    carry `2-3` and `--` that the pass fixes two lines away in the same file,
+    so a leak shows here rather than hiding in a general assertion.
+
+    MEASURED WHEN THIS WAS WRITTEN: 534 lines in `_food_drafts/` were QQ lines
+    the old pattern could not see, 248 of them taglines added the day before,
+    and five in four files carried a fault it would have rewritten.
+    """
+    path = food / "test-recipe.md"
+    path.write_text(FOOD_BEFORE, encoding="utf-8")
+    assert line in path.read_text(encoding="utf-8"), (
+        f"the fixture no longer contains {line!r}, so this case checks nothing. "
+        f"Fix the fixture, never this assertion."
+    )
+    run_food(food, "--apply")
+    assert line in path.read_text(encoding="utf-8"), (
+        f"the food tidy pass edited a QQ line it must leave alone:\n  {line}"
+    )
+
+
+def test_a_food_qq_claude_line_is_still_held_to_house_style(food):
+    """The one QQ shape the pass MAY edit, and it must still edit it.
+
+    A widened skip that swallowed `QQ Claude` would be the opposite failure and
+    just as invisible: that line is our own paraphrase, and MANUAL §4 holds it
+    to house style like any other prose. Fifteen hyphenated ranges were hiding
+    behind an over-wide pattern on 2026-09-01, which is why this is a test and
+    not a comment.
+    """
+    path = food / "test-recipe.md"
+    path.write_text(FOOD_BEFORE, encoding="utf-8")
+    run_food(food, "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert '"QQ Claude Fry 2–3 mins — until golden."' in got, (
+        "a `QQ Claude` line is OUR prose and must still be tidied:\n"
+        + "\n".join(l for l in got.split("\n") if "QQ Claude" in l)
+    )
+
+
+def test_food_prose_outside_a_qq_is_still_fixed(food):
+    """And the pass must still do its job, or the tests above prove nothing."""
+    path = food / "test-recipe.md"
+    path.write_text(FOOD_BEFORE, encoding="utf-8")
+    run_food(food, "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert 'note: "give it 2–3 mins — no more"' in got, (
+        "the ingredient note is Helen's own prose and carries both faults; if "
+        "it is untouched the skip has swallowed the whole file:\n"
+        + "\n".join(l for l in got.split("\n") if "no more" in l)
     )
 
 

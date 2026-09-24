@@ -3099,11 +3099,34 @@ byte on a fixture. A title diverging from its slug is NOT a finding on a draft.
 `.claude/commands/ingest.md` over `scripts/ingest_preflight.py`: one list,
 grouped by DECISION not by file, so the same ruling arrives once rather than
 eleven times. **The return journey for a file from a repo-less session** is
-the second section of that command — save on a branch, derive moods for a
-drink (it fails exactly one test until then, expected), pytest, `/tidy-drafts`,
-work the hand-back list as TIER 3 questions, pre-flight — and **do not redo
-the parts that are done**: its prose has been rewritten once already.
-`CLAUDE_WEB_INGEST.md` is the web side.
+the second section of that command — save on a branch, resolve the pours,
+derive moods for a drink (it fails exactly one test until then, expected),
+pytest, `/tidy-drafts`, work what is LEFT as TIER 3 questions, pre-flight — and
+**do not redo the parts that are done**: its prose has been rewritten once
+already. `CLAUDE_WEB_INGEST.md` is the web side.
+
+**THREE SCRIPTS RUN IN A FIXED ORDER AND EACH REFUSES THE NEXT ONE'S JOB.**
+
+    resolve_pours.py       what `bottles.yml` and the vocabulary SETTLE
+    derive_cocktail_moods  what the amounts and generics IMPLY
+    ingest_preflight.py    what is LEFT, as one list for Helen
+
+`resolve_pours.py` is new on 2026-09-21 and is the one to reach for first,
+because it removes the largest class of round trip: 42 of 77 `QQ` notes in the
+drafts asked either "which category?" or "which bottle?", and both are exact
+dictionary reads where the source names something declared. It writes tier 1 (a
+declared bottle) and tier 2 (an exact vocabulary match) and **refuses tier 3
+by construction** — the lookup is an exact read, so `blackstrap rum` names no
+bottle and is left alone, which is the case Helen raised. Moods run AFTER it,
+because they read the generics it just wrote. DECISIONS §9.3.
+
+**`derive_main_ingredients.py` is FOOD's, and is a reorder unless you ask
+otherwise.** Default: Helen's own members in her stated order (star, then how
+much of a game over it would be, then proportion, then larder order), membership
+untouched. `--derive` replaces the list and is only for a recipe that HAS none —
+every draft today has one and hers beat the derivation, which scores 0.55 and
+says so in its own docstring. `_food_recipes/` is never written to: those lists
+are the yardstick it is scored against. DECISIONS §6.
 
 ### 11.0.4 `/ingest-inbox`
 

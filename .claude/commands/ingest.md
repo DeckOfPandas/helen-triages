@@ -173,23 +173,36 @@ file say the same things.
 4. **`/tidy-drafts`**, either collection (both since 2026-09-05), if the
    quoting or typography needs it. It never touches a `QQ` line, so the
    transcription is safe.
-5. **Work the hand-back list against the three tiers above, not as one pile.**
-   It used to say "treat every item as a TIER 3 question ... ask, do not fill
-   in", which contradicted the tiers 130 lines above it in this same file, for
-   this same session -- corrected 2026-09-21. A `generic` whose pour names a
-   DECLARED BOTTLE is tier 1 and you resolve it; one that matches a declared
-   generic exactly is tier 2 and you type it. **What genuinely remains is tier 3
-   and is hers**: a missing glass, a `tagline`, a category the vocabulary does
-   not settle. Ask; never fill in.
-6. **Run `python3 scripts/ingest_preflight.py`** for a drink, which reports the
+5. **DRINKS: `python3 scripts/resolve_pours.py`**, which does tiers 1 and 2 for
+   you and refuses to do tier 3. It reads every pour whose `generic` is still a
+   `QQ`, looks the source's words up in `bottles.yml` and in the vocabulary, and
+   writes only what an EXACT match settles -- `--apply` to write, nothing by
+   default. **Run this before you type a generic by hand**: the batch of
+   2026-09-20 resolved nine bottles from recall and got them right, which is
+   nine chances to have been confidently wrong.
+6. **Work whatever is LEFT against the three tiers, not as one pile.** It used
+   to say "treat every item as a TIER 3 question ... ask, do not fill in", which
+   contradicted the tiers 130 lines above it in this same file, for this same
+   session -- corrected 2026-09-21. After step 5 what remains really is tier 3
+   and really is hers: a missing glass, a `tagline`, a category the vocabulary
+   does not settle. Ask; never fill in.
+7. **Run `python3 scripts/ingest_preflight.py`** for a drink, which reports the
    undeclared bottles and near-miss garnishes in the same shape as a photo
    batch.
+8. **FOOD, only if the file arrived with no `main_ingredients`:**
+   `python3 scripts/derive_main_ingredients.py --derive --only <slug>`. Every
+   draft today has a list and hers are better than the derivation, so this is
+   for a file that genuinely has none -- read its docstring before trusting it,
+   it scores 0.55 and says so. Without `--derive` the script REORDERS an
+   existing list into Helen's stated order and changes no membership, which is
+   safe to run on anything.
 
-**WHAT NOT TO DO TO IT.** Do not rewrite its prose, do not re-derive its
-`main_ingredients`, and do not "improve" a `QQ Claude` line -- a rewrite pass
-has already happened and redoing it burns Helen's review twice. Do not fill in
-a `generic` or a `suggestion`: those are `QQ` by her standing ruling until she
-makes the drink, and that is not relaxed by the file arriving from elsewhere.
+**WHAT NOT TO DO TO IT.** Do not rewrite its prose, do not "improve" a
+`QQ Claude` line -- a rewrite pass has already happened and redoing it burns
+Helen's review twice. Do not REPLACE a `main_ingredients` list that already
+exists. And do not type a `generic` or a `suggestion` that step 5 declined:
+what it leaves alone, it leaves alone because no dictionary settles it, and
+that is not relaxed by the file having arrived from elsewhere.
 
 ---
 
@@ -215,12 +228,16 @@ build exactly that list.
 
 The order to work in:
 
-1. `python3 scripts/derive_cocktail_moods.py` -- dry, for a drink; `--write`
-   only if it reports a difference.
-2. `pytest` (never two sessions at once -- MANUAL §1).
-3. `/tidy-drafts`, either collection, if the quoting or typography needs it.
-4. `python3 scripts/ingest_preflight.py` for a drink.
-5. One list to Helen. Then commit.
+1. `python3 scripts/resolve_pours.py` -- dry, for a drink; `--apply` to write
+   what `bottles.yml` and the vocabulary settle outright. **Before typing any
+   generic by hand.**
+2. `python3 scripts/derive_cocktail_moods.py` -- dry, for a drink; `--write`
+   only if it reports a difference. After step 1, because the moods read the
+   generics it just wrote.
+3. `pytest` (never two sessions at once -- MANUAL §1).
+4. `/tidy-drafts`, either collection, if the quoting or typography needs it.
+5. `python3 scripts/ingest_preflight.py` for a drink.
+6. One list to Helen. Then commit.
 
 **A red test is not always yours.** `cd _<site>_drafts && git fetch origin &&
 git rev-list --count HEAD..origin/main` first: a non-zero answer means the

@@ -166,7 +166,35 @@ NUMBER_RANGE = re.compile(r"(?<![\d.])(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)(?![\
 # wording; a `QQ Claude` line is the paraphrase written here, and MANUAL §4
 # holds it to normal house style like any other prose. Fifteen hyphenated
 # number ranges were hiding behind the old pattern on 2026-09-01.
-QQ_LINE = re.compile(r"^\s*(-\s*)?[\"']?QQ\b(?!\s+Claude\b)")
+#
+# IT NOW ALLOWS A KEY IN FRONT OF THE MARKER, AND THIS WAS A REAL HOLE -- fixed
+# 2026-09-22. The pattern permitted an optional list dash and an optional quote
+# and nothing else, so `- "QQ original ..."` was skipped and
+# `text: "QQ - ..."`, `tagline: "QQ ..."` and `prep_time: "QQ"` were NOT. A
+# marker behind a key was invisible to the food pass, which then "corrected"
+# somebody else's words -- the exact harm MANUAL §5 exists to prevent.
+#
+# THE DRINKS HALF NEVER HAD THE BUG, which is what makes this a copy that
+# drifted rather than an oversight. `drink_editable` below asks
+# `conftest.checkable_text` precisely because "a drink puts the source's own
+# wording behind a key", and its docstring says using this pattern there "would
+# have left every QQ tagline in the collection open to editing while the report
+# claimed the rule was applied". Every word of that was true of FOOD as well and
+# nobody checked.
+#
+# MEASURED BEFORE AND AFTER, because the exposure is not the same as the damage.
+# 534 lines in `_food_drafts/` are QQ lines the old pattern could not see, 248
+# of them taglines added on 2026-09-21; of those, five in four files actually
+# carried a fault the pass would have rewritten (`QQ - pulled out as its own
+# recipe from ...` notes, an en dash and four em dashes). A latent hole that one
+# day's work quadrupled.
+#
+# THE KEY PATTERN IS conftest's, CHARACTER FOR CHARACTER: `[a-z_]+:` and a
+# single optional space, so `main_ingredients:` and `text:` match and a
+# capitalised or dotted key does not. Keeping the two literally identical is the
+# point -- this file already carries one copy of a rule that drifted from its
+# original, and a second spelling would be a third thing to keep in step.
+QQ_LINE = re.compile(r"^\s*(-\s*)?(?:[a-z_]+:\s*)?[\"']?QQ\b(?!\s+Claude\b)")
 
 
 # =============================================================================
