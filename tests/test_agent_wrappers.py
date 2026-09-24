@@ -575,6 +575,64 @@ def test_github_public_status_asks_for_a_status_and_nothing_else(url):
                    for line in lines), f"a logged-out status check sent more: {lines!r}"
 
 
+# --- main-ci-status.sh: is the site deploying? ------------------------------
+#
+# Added 2026-09-22. A red `main` is a DEPLOY OUTAGE -- the suite gates the
+# deploy, so one red merge stops every later one going live, silently, for as
+# long as nobody looks (three days in September; DECISIONS §12). The manual has
+# asked sessions to check since 2026-09-15 and nobody did, partly because the
+# instruction sat on an unmerged branch and partly because the form it
+# prescribed was a bracketed `--jq` that prompts Helen. This wrapper takes NO
+# arguments, so there is no repo, path or option for a caller to steer.
+
+@pytest.mark.parametrize("args", [
+    ["main"],
+    ["--repo", "someone-else/repo"],
+    ["https://example.com/"],
+    ["--output", "tmp/x"],
+])
+def test_main_ci_status_takes_no_arguments_at_all(args):
+    _assert_refused("main-ci-status.sh", args)
+
+
+def test_main_ci_status_reads_one_fixed_public_endpoint_with_no_credential():
+    lines = _accepted_lines("main-ci-status.sh", [])
+    assert lines[0] == "curl"
+    url = lines[-1]
+    assert url.startswith(
+        "https://api.github.com/repos/DeckOfPandas/helen-triages/actions/runs"
+    ), url
+    assert "branch=main" in url
+    # A public read: sending a credential here would be scope this does not need.
+    assert not any(line in ("-H", "--header", "-u", "--user") for line in lines), lines
+
+
+def test_main_ci_status_treats_an_empty_answer_as_unanswered_not_green():
+    """`{"workflow_runs": []}` means the check did not run, not that all is
+    well -- the green-that-lies failure this repo names everywhere else."""
+    result = subprocess.run(
+        ["python3", str(ROOT / "scripts" / "main_ci_status.py")],
+        input='{"workflow_runs": []}',
+        cwd=ROOT, capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 2, result.stdout
+    assert "NOT a green result" in result.stderr
+
+
+def test_main_ci_status_calls_a_failure_a_deploy_outage():
+    runs = {"workflow_runs": [
+        {"conclusion": "failure", "created_at": "2026-09-12T16:32:00Z",
+         "display_title": "Merge pull request #996"},
+    ]}
+    result = subprocess.run(
+        ["python3", str(ROOT / "scripts" / "main_ci_status.py")],
+        input=json.dumps(runs),
+        cwd=ROOT, capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 1, result.stdout
+    assert "DEPLOY OUTAGE" in result.stdout
+
+
 # --- scripts/browser/styles.sh, gaps.sh, click-crop.sh: arguments only -------
 #
 # Added 2026-09-15 alongside guard-unanalyzable-bash.py's new env-assignment

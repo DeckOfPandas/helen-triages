@@ -2707,6 +2707,27 @@ both ways) and not in `_data/cocktails/` (the site's vocabulary).
 
 ## 10. Validation — run `pytest`, don't read this
 
+**A RED `main` IS A DEPLOY OUTAGE, NOT A RED BUILD, AND NOTHING ON THE SITE
+SAYS SO.** Because the suite gates the deploy (next paragraph), a merge that
+turns the suite red stops every LATER merge from going live too, silently: the
+only signal is GitHub's Actions email. That happened from 2026-09-12 to
+2026-09-15 — PR #996 un-proofread two recipes that two live recipes linked to,
+said in its own message that the link test would go red "until those two are
+reproofread", and about twenty merges then sat undeployed for three days
+(DECISIONS §12). **So: a session that merges, or is told of a merge, checks
+the run went green** — `sh scripts/main-ci-status.sh`, which is allow-listed
+and takes no arguments — **and a red one is the first thing to report, before
+the work it came for.** Never merge over a known-red suite expecting the next
+PR to fix it; #1093 has the options for making this visible without anyone
+having to look.
+
+This paragraph was written on 2026-09-15 and did not reach `main` until
+2026-09-22, because the branch carrying it was never merged — **so for seven
+days the instruction telling sessions to check the deploy was itself
+undeployed.** The wrapper exists because the original form of this check was a
+`--jq` whose brackets and pipe make Claude Code prompt Helen, and a check that
+costs an interruption is a check nobody runs.
+
 **The suite gates the deploy** (#369): `.github/workflows/build-and-deploy.yml`
 has a `test` job and `build` declares `needs: test`, so every guard here is a
 build stop rather than a report. Three things are load-bearing:
