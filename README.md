@@ -27,7 +27,7 @@ This public repo holds both the food and cocktails sides, with private repos hol
 2. Check the three repos out locally
 3. Run the container (running bash):
    - `.devcontainer/run.sh`
-      - Builds the image from the Dockerfile if it doesn't exist yet
+      - Builds the image from the Dockerfile if it doesn't exist yet, and rebuilds it if `.devcontainer/` has changed since the image was built (see "Rebuilding the image after changes" below)
       - Plenty of packages are pre-installed, including Playwright and its dependencies
       - Bind-mounts the primary checkout at /workspace, even when run from inside a worktree
       - Reads `AGENT_GH_TOKEN` from `settings.local.json` and passes it in as an environment variable
@@ -64,11 +64,24 @@ WSL leaves Zone.Identifier files behind when I copy things in from Windows. They
 
 ## Rebuilding the image after changes
 
+Since 2026-09-21 this is automatic: `run.sh` stamps each image it builds with a hash of everything in `.devcontainer/`, and rebuilds whenever that hash no longer matches the files on disk. So edit the Dockerfile and just run it:
+   - `.devcontainer/run.sh`
+
+This exists because "does the image exist" and "does the image match the Dockerfile" are different questions, and only the second one is the one I care about -- I once added packages, rebuilt, and kept getting containers without them.
+
+It compares file contents, so `touch` alone doesn't trigger a rebuild and undoing an edit goes back to the image that already matches. It can't see the base image or apt packages moving upstream, though, since nothing on disk changes when they do. For that, force it by hand:
+
+```
+docker build --pull --no-cache -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
+```
+
+Or start from nothing (the container must be stopped first, see the notes at the bottom):
+
 ```
 docker image list
 docker image rm helen-triages-devcontainer
 ```
-Then build and run the container again:
+Then run the container again and `run.sh` will rebuild:
    - `.devcontainer/run.sh`
 
 
@@ -109,13 +122,20 @@ Aims:
 2. Anything clever (paths built at run time, variable expansions) goes in a committed script the checker can read.
    - Claude being clever at the prompt means me clicking "yes" all day after 2-min instalments of not being able to get anything else done
 
-How I try to achieve this:
-
-Steps 1 to 4 exist because Claude read the written rules and then broke most of them anyway.
+How I try to achieve these two aims -- work that exists because Claude read my written rules and then broke or worked round most of them:
 
 1. Hook:
    - `guard-unanalyzable-bash.py` refuses commands that would otherwise have to ask me:
-      - heredocs, `$(...)` or backticks, a leading `cd`, pipes, `&&`/`||`/`;` chains, and globs in arguments
+      - heredocs
+      - `$(...)` or backticks
+      - a leading `cd`
+      - a leading `git -C`
+      - pipes
+      - `&&`/`||`/`;` chains
+      - globs in arguments
+      - a leading `NAME=value`
+      - unquoted parentheses
+      - quoted `[`/`]`/`|` in a `sh scripts/...` call
    - Claude gets told no and writes a script instead, so I don't get a prompt -- it still allows redirection to a named file and plain `$VAR`
 
 2. Allow-list:
@@ -124,7 +144,7 @@ Steps 1 to 4 exist because Claude read the written rules and then broke most of 
    - Three git wrappers: `git-push-agent.sh`, `git-fetch-agent.sh`, `git-clone-agent.sh`.
    - `git-fetch-main.sh` then `git merge origin/main`, `git branch --show-current`, `git add -- <paths>`, `git commit -F <file>`, and read-only git (`status`, `diff`, `log`, `show`, `blame`, `ls-tree`, `check-ignore`)
    - `pytest`, `node --test`, `python3 scripts/verify.py`
-   - The browser harness: `install.sh`, `build.sh`, `serve.sh`, `shoot.sh`, `crop.sh`
+   - The browser harness: `install.sh`, `build.sh`, `serve.sh`, `shoot.sh`, `crop.sh`, `styles.sh`, `gaps.sh`, `click-crop.sh`
    - `gh-write.sh` (open a PR, replace a PR body, comment) and `github-public-status.sh` (the logged-out visibility check)
    - Reading and writing to `/dev/null`, as an exact path
 
@@ -152,21 +172,18 @@ Steps 1 to 4 exist because Claude read the written rules and then broke most of 
    - Commit messages and PR or issue bodies go in files (`-F`, `--body-file`)
    - Anything that builds a path at run time goes in a committed wrapper, so no prompts for Helen
 
-6. Brackets and pipes in quotes triggered prompts even in an allow-listed call:
+6. Brackets and pipes in quotes trigger prompts even in an allow-listed call:
    - Claude Code reads arguments as possible paths, so `--jq '[.state] | @tsv'` harasses me even though `gh-read.sh` is allow-listed
    - `gh-read.sh --fields state,merged_at` (or `--each` for lists) builds the jq inside the script, and `guard-unanalyzable-bash.py` refuses a quoted `[`, `]` or `|` in any `sh scripts/...` call
-   - Every Bash description has to say what the call reads or writes, because I'd stopped reading prompts in the name of a quiet life
+   - Every Bash description has to say what the call reads or writes, because I stopped reading prompts in the name of a quiet life
 
-7. Misc:
+7. At session start, `session-ground-truth.py` reports the branch, whether the tree is cleam, position against origin/main, and whether the drafts clones are present. This reduces Claude hassling me. (No network calls, which would be slow, resulting in me turning this feature off again).
+
+8. Misc:
    - Never `sed` (`guard-sed.py`)
    - Never `awk` (`guard-awk.py`)
    - Scratch files live only in the project's `tmp/`, never the system `/tmp`, `~`, or job directories (written rule)
-   - `blockReadsOutsideWorkingDirectories=true` blocks `Read`, `Grep` and `Glob` outside the project 
-
-But unfortunately:
-
-
-
+   - `blockReadsOutsideWorkingDirectories=true` blocks `Read`, `Grep` and `Glob` outside the project, with one read-only exception for /workspace/.node-runtime because this seems fair enough.
 
 ### Don't print secrets (again)
 
@@ -185,7 +202,7 @@ Mitigations:
 
 ### Don't annihilate my repos (twice and counting)
 
-   - `guard-main-branch.py` refuses `git commit` or `git merge` while on `main`, in any repo, including through `cd` or `git -C`
+   - `guard-main-branch.py` refuses `git commit` or `git merge` while on `main`, in any repo, including through `cd`, and `git -C` is refused by `guard-unanalyzable-bash.py`
    - `guard-destructive-git.py` refuses `reset --hard`, `checkout`/`restore` over changed files, and `clean -fd` when there's uncommitted work, naming what would be lost
    - Deny rules block `pr merge` and `pr review` 
       - `pr merge` is denied in three spellings (`gh`, `.gh-runtime/bin/gh`, `sh scripts/gh-agent.sh`)
@@ -205,7 +222,7 @@ Mitigations:
 ### Don't publish anything I haven't proofread.
 
    - Publish gate (`_plugins/publish_gate.rb`): content goes live only with `proofread: true` and `awaiting_fix: false` -- a missing or misspelled flag blocks it
-   - Tests `test_agent_edited_recipes_are_not_marked_proofread` and `test_agent_edited_drinks_are_not_marked_proofread` reads history -- if Claude's commit is the newest on a recipe or drink, the file must say `proofread: false`
+   - Tests `test_agent_edited_recipes_are_not_marked_proofread` and `test_agent_edited_drinks_are_not_marked_proofread` read history -- if Claude's commit is the newest on a recipe or drink, the file must say `proofread: false`
    - CI runs the tests before deployment
 
 ### Dear future Helen

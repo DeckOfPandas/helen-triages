@@ -133,7 +133,12 @@ anything that touches a slug-keyed entry — that is the whole of #1106, whose
 complaint was that the mistake is found after the merge rather than before.
 
 **`.node-runtime/` and `.gh-runtime/` do not come with a worktree**; they are
-gitignored, like the two drafts repos (§9.1). Use the system `node`. **`gh`
+gitignored, like the two drafts repos (§9.1). Use the system `node`. **Since
+2026-09-21 the file tools MAY read the primary clone's `/workspace/.node-runtime`,
+which is above a worktree and so was refused before** — Helen's grant, read-only
+(`additionalDirectories` plus an `Edit(...)` deny; `CLAUDE.md`'s filesystem
+bullet). It holds node v24.18.1 (measured 2026-09-21). That is for LOOKING at
+it; what you run is still the system `node`. **`gh`
 depends on where you are**: the devcontainer image installs it, so inside the
 container `gh` works from any worktree (`/usr/bin/gh`, measured 2026-09-10);
 a worktree on the host has none — `gh: command not found`, not installable
@@ -165,7 +170,11 @@ as before (gitignored; nothing touches `~` or the system, Helen's grant), and
 `scripts/browser/env.sh` — which `shoot.sh` and `crop.sh` source — prefers that
 local copy when it exists. The version is pinned in the Dockerfile and in
 `install.sh`; `tests/test_browser_harness.py` fails if they differ, and bumping
-it means a rebuild. Then `sh scripts/browser/build.sh` builds exactly what deploys into
+it means a rebuild — which since 2026-09-21 `run.sh` does by itself, because it
+stamps each image with a hash of `.devcontainer/` and rebuilds when that hash no
+longer matches the files on disk (`.devcontainer/README.md`, "Keeping the image
+and the Dockerfile in step"). Editing the pinned version in the Dockerfile is
+therefore the whole of the change; the next `run.sh` notices. Then `sh scripts/browser/build.sh` builds exactly what deploys into
 `tmp/site`, `sh scripts/browser/serve.sh` in the background serves it on the
 first free port from 4010 and writes that port to `tmp/browser/port` (since
 2026-09-11 — one server per worktree, so a session never measures another
@@ -1275,6 +1284,19 @@ a stale glob applies to a whole absent collection: **a green `pytest` in a
 bare worktree says nothing about the drinks or the drafts.** Helen, 2026-09-20,
 on the same arrangement: *"it's not useful to have a situation where we expect
 tests to fail, and we should rearchitect."*
+
+**SINCE 2026-09-22 THE RUN SAYS SO ITSELF, and it will never fail for it.**
+`conftest.py` prints one line before the dots and the same fact in the terminal
+summary — where a green run is actually read — naming each absent clone with
+the command that fetches it, and counting the per-draft checks that produced no
+tests at all. It is SILENT when both clones are present. It is a report and not
+a check because Helen ruled the obvious alternative out: *"I don't want to run
+tests locally with the expectation that some will fail, because a suite with
+failures starts to get ignored...plus it's very annoying"* — and because the
+drafts are legitimately unfinished until she has cooked from them, so their
+state is not a defect a test could sensibly flag (DECISIONS §11). Re-measured
+that day with both clones pulled into a bare worktree: **30,917** collected,
+`tests/test_drafts.py` alone going from 50 to 16,370.
 
 **THE THREE GIT WRAPPERS ARE THE ONLY WAY TO TALK TO A REMOTE OVER HTTPS, AND
 THE REASON IS NOT ONLY THAT THEY KEEP THE TOKEN'S NAME OUT OF THE CALL SITE.**
@@ -2685,6 +2707,27 @@ both ways) and not in `_data/cocktails/` (the site's vocabulary).
 
 ## 10. Validation — run `pytest`, don't read this
 
+**A RED `main` IS A DEPLOY OUTAGE, NOT A RED BUILD, AND NOTHING ON THE SITE
+SAYS SO.** Because the suite gates the deploy (next paragraph), a merge that
+turns the suite red stops every LATER merge from going live too, silently: the
+only signal is GitHub's Actions email. That happened from 2026-09-12 to
+2026-09-15 — PR #996 un-proofread two recipes that two live recipes linked to,
+said in its own message that the link test would go red "until those two are
+reproofread", and about twenty merges then sat undeployed for three days
+(DECISIONS §12). **So: a session that merges, or is told of a merge, checks
+the run went green** — `sh scripts/main-ci-status.sh`, which is allow-listed
+and takes no arguments — **and a red one is the first thing to report, before
+the work it came for.** Never merge over a known-red suite expecting the next
+PR to fix it; #1093 has the options for making this visible without anyone
+having to look.
+
+This paragraph was written on 2026-09-15 and did not reach `main` until
+2026-09-22, because the branch carrying it was never merged — **so for seven
+days the instruction telling sessions to check the deploy was itself
+undeployed.** The wrapper exists because the original form of this check was a
+`--jq` whose brackets and pipe make Claude Code prompt Helen, and a check that
+costs an interruption is a check nobody runs.
+
 **The suite gates the deploy** (#369): `.github/workflows/build-and-deploy.yml`
 has a `test` job and `build` declares `needs: test`, so every guard here is a
 build stop rather than a report. Three things are load-bearing:
@@ -2847,6 +2890,14 @@ each time because it was written when the count was right and not revisited as
 more arrived. It rotted three times, which is the argument for naming the
 members rather than counting them — and for not writing the number at all. `ls .claude/hooks/` settles it. `DECISIONS.md` §11 has why each exists and what each deliberately allows;
 `CLAUDE.md` has the workflow.
+**One of them refuses nothing: `session-ground-truth.py`** (since 2026-09-21)
+is a `SessionStart` hook that REPORTS — the branch, whether the tree is
+already dirty, the position against `origin/main` as last fetched, and whether
+the two private drafts clones are present, with the clone command for each
+that is not. It makes no network call, deliberately, because a hook that waits
+on GitHub delays every session start and a slow hook is one Helen turns off.
+It is listed here because it sits in the same directory as the guards and is
+not one; do not read its silence as a guard having passed.
 
 **Branch names:** `<type>/<what-its-about>`, lowercase, hyphens; one concern;
 deleted after merge, local and remote. **Commit subjects:** `(type) lowercase

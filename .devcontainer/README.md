@@ -29,9 +29,10 @@ install on native Linux/macOS.
 
 ### 2. Run it
 
-`.devcontainer/run.sh` handles the rest: it builds the image on first
-run (skipped on later runs, since it checks whether the image already
-exists), creates the two named volumes that persist your Claude Code
+`.devcontainer/run.sh` handles the rest: it builds the image when there
+isn't one and rebuilds it whenever `.devcontainer/` has changed since the
+last build (see "Keeping the image and the Dockerfile in step" below),
+creates the two named volumes that persist your Claude Code
 login and gem cache across restarts, reads `AGENT_GH_TOKEN` from
 `.claude/settings.local.json` for just that one run, and drops you into
 a shell at `/workspace` as user `helen` (not root), looking at this
@@ -57,6 +58,46 @@ Prefer to do it by hand instead? The equivalent manual steps are:
 Dockerfile only needs `init-firewall.sh` from that folder. Your project
 files are never copied into the image; they're bind-mounted at runtime,
 so editing them doesn't require rebuilding.)
+
+A hand build like that one won't carry the build stamp `run.sh` looks
+for, so the next `run.sh` will rebuild once to put it there. Harmless --
+it's a fully cached rebuild -- but that's why it happens.
+
+### Keeping the image and the Dockerfile in step
+
+The failure this guards against: you add a package to the `Dockerfile`,
+rebuild the image, and containers still come up without it, because the
+thing you rebuilt and the thing you ran were different and nothing
+compared them. **An image that exists is not an image that matches.**
+
+So every build through `run.sh` stamps the image with a label holding a
+SHA-256 of everything in `.devcontainer/`, and every run recomputes that
+hash and compares. It rebuilds when there's no image, when the image
+carries no stamp (built before this existed, or built by hand), or when
+the stamp disagrees with the files on disk.
+
+It compares **content, not timestamps**, which is stricter than "is the
+Dockerfile newer than the image" in both directions: `touch` alone
+doesn't trigger a rebuild, and reverting an edit goes back to the image
+that already matches rather than building a third one. Timestamps also
+have a trap this sidesteps -- a fully cached rebuild keeps the *cached*
+layer's Created date, so an image's timestamp can stay older than the
+Dockerfile forever and an mtime check would never settle.
+
+Every file in `.devcontainer/` counts, not just the `Dockerfile` and the
+`init-firewall.sh` it `COPY`s, so nothing has to be kept in sync by hand
+when a new `COPY` appears. The cost is that editing `run.sh` or this
+README rebuilds once -- with the Dockerfile unchanged that's a cached
+no-op of about a second, needing no network.
+
+What it **can't** see: `ruby:3.3-bookworm` moving upstream, or an
+`apt-get install` resolving to newer packages than last time. Nothing on
+disk changes when those move, so nothing here notices. When that matters,
+rebuild deliberately:
+
+    docker build --pull --no-cache -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
+
+(then let the next `run.sh` re-stamp it).
 
 ### 3. First-time Claude Code login (Max plan, no API key needed)
 

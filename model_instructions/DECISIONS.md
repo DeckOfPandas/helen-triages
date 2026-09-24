@@ -217,9 +217,16 @@ unless stated.
   5000 or something I'll never use."* The old `-p 4001:4001` was not merely
   useless but **actively in her way**: a running container HELD the host's own
   4001, so her `jekyll-local` could not bind it. The inside pair stays 4001/4002
-  because the image's aliases serve there — though nothing listens today, the
-  image carrying no jekyll, which is the same gap that stops `verify.py`
-  running in the container.
+  because the image's aliases serve there. **THE REST OF THIS PARAGRAPH WAS
+  FALSE AND STOOD FOR TWELVE DAYS** — it said "nothing listens today, the image
+  carrying no jekyll, which is the same gap that stops `verify.py` running in
+  the container", and `run.sh` carried the same claim in a comment. Measured
+  2026-09-22 from inside a real container, after Helen asked *"I'm pretty sure
+  the container has Jekyll... Are you not able to check?"*: `bundle exec jekyll
+  --version` prints 4.4.1 and `python3 scripts/verify.py` exits 0 over the full
+  corpus. The image does not BAKE the gem — it arrives from the Gemfile via
+  `bundle install` into the cache volume — but that is a first-run cost, not a
+  gap, and the aliases are exactly how it gets used. See §11.2.
 
   **`REPO_ROOT` comes from `--git-common-dir`, not `--show-toplevel`.** A real
   bug: `run.sh` is a TRACKED file, so a copy sits in every worktree, and
@@ -280,6 +287,42 @@ unless stated.
     `tests/test_browser_harness.py` fails when they differ. Screenshots from
     two Chromium builds are not the same measurement. Bumping means both
     files and a rebuild, which is the cost Helen accepted for the speed.
+
+- **2026-09-21 — `run.sh` asks whether the image MATCHES `.devcontainer/`, not
+  merely whether an image exists.** Helen: *"I'd rebuilt the image to add some
+  packages (via the Dockerfile), but Claudes in the container couldn't find
+  them... I'd rebuilt the image, but my containers were being created from an
+  older one."* The check was a bare `docker image inspect`, which answers a
+  different question from the one that matters. **An image that exists is not
+  an image that matches**, and nothing ever compared the two.
+  - **A label, not a timestamp.** Each build through `run.sh` now passes
+    `--label com.deckofpandas.build-inputs=<sha256 of every file in
+    .devcontainer/>`, and each run recomputes and compares. One comparison
+    covers three cases — no image, an image with no stamp (built before this,
+    or by hand), a stamp that disagrees with disk — and the message says which.
+  - **Why not the mtime test Helen asked for.** She asked for "the Dockerfile
+    is newer than the image, or otherwise inconsistent"; content is the second
+    half and subsumes the first in both directions (`touch` alone does not
+    rebuild; reverting an edit returns to the image that already matches rather
+    than building a third). And mtime has a trap that never settles: **a fully
+    cached rebuild keeps the CACHED layer's `Created` date**, so an image's
+    timestamp can stay older than the Dockerfile forever and the check fires on
+    every single run.
+  - **Every file in `.devcontainer/` is hashed**, not just the `Dockerfile` and
+    the `init-firewall.sh` it `COPY`s — a hand-maintained list of "the files
+    that matter" is one more thing to keep in sync, and the Dockerfile's own
+    note about `requirements-test.txt` records how that goes. The price is that
+    editing `run.sh` or the README rebuilds once, which with the Dockerfile
+    unchanged is a fully cached no-op needing no network. Wrong in the safe
+    direction. A `.dockerignore` would remove even that and was left out.
+  - **What it cannot see:** `ruby:3.3-bookworm` moving upstream, or an
+    `apt-get install` resolving to newer packages. Nothing on disk changes, so
+    nothing here notices; both READMEs give `docker build --pull --no-cache`.
+  - **Measured and unmeasured, stated.** The hash is deterministic across runs,
+    unchanged by `touch`, changed by a one-line edit and restored by reverting
+    it. Docker is not reachable from a worktree, so `docker build --label` and
+    `docker image inspect --format` went in unexercised, and the first `run.sh`
+    after the merge rebuilds once to plant the stamp. PR #1180.
 
 ## §2 The mono-repo shape
 
@@ -5036,6 +5079,280 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   matching `[a-z0-9-]+`) and is proved by `tests/test_agent_wrappers.py`,
   which is why all three could go straight into `REVIEWED_OPEN_RULES`.
 
+- **2026-09-21 — the file tools may read `/workspace/.node-runtime`, and the
+  obvious way to grant that does not work.** Helen: *"Reading
+  /workspace/.node-runtime is fine, please modify your settings to allow it."*
+  It sits above every worktree, so `CLAUDE.md`'s "never read above the folder
+  you're in" covered it until she said otherwise; the rule is hers to relax.
+  **The narrow spelling was tried FIRST and measured to fail.**
+  `Read(//workspace/.node-runtime/**)` in `allow` left the read refused, with
+  `blockReadsOutsideWorkingDirectories` named in the error and `/add-dir`
+  offered as the fix: that setting is a hard block an allow rule does not
+  override. The inert rule was removed rather than left looking effective. So
+  the grant is `additionalDirectories` — which widens read AND write — plus
+  `Edit(//workspace/.node-runtime/**)` in `deny` to narrow it back to what was
+  actually granted, deny beating allow as it does for `pr merge`.
+  **The write was then tested, at Helen's invitation** — *"It's fine with me if
+  you try writing an empty file to /workspace/.node-runtime now, to test the
+  rules"* — and the result is worth more than a pass would have been: **nothing
+  was written, but neither refusal came from the deny rule.** The Write tool
+  was stopped by WORKTREE ISOLATION (*"This session is isolated in the worktree
+  ... Edit the worktree copy of this file instead"*), a different mechanism
+  firing first; a Bash `touch` was then refused at the permission layer, and
+  the error does not say which rule did it. `ls -a` confirmed the directory
+  still holds only `node`. So: writes there are blocked for a worktree session,
+  twice over, and **the `Edit(...)` deny remains the unproven layer** — it
+  would be the only thing standing for a session running in `/workspace`
+  itself, which is not how Helen runs them. Recorded rather than rounded up to
+  "verified", because a test that passes for the wrong reason is the failure
+  mode this file exists to catch. **A settings edit
+  does not reach a RUNNING session** — the same Read failed twice after the
+  file was correct, because the working-directory set is fixed at session
+  start; `/add-dir` made it live, and the file serves every session after.
+  The runtime holds node
+  v24.18.1, and `MANUAL §1`'s "use the system `node`" is unchanged — the grant
+  is for looking at it.
+  - **AND THE SAME SESSION THEN CALLED `Read(//dev/null)` INERT, WRONGLY, BY
+    TESTING THE WRONG THING.** Reasoning from the finding above, it ran the
+    Read TOOL on `/dev/null`, watched the block refuse it, and reported the
+    rule dead. Helen: *"Claude can read and write to /dev/null, so retain
+    whatever means that."* She is right and the pair stays. The measurement
+    was real; the CLAIM drawn from it was several sizes larger.
+    `blockReadsOutsideWorkingDirectories` governs `Read`/`Grep`/`Glob`, and a
+    **Bash redirection is a different path entirely** — `>/dev/null` appears in
+    `run.sh`, in the `git checkout -- x 2>/dev/null` story above, and was used
+    repeatedly by the very session that pronounced the rule useless. The
+    general lesson, and it is the same one as the write test three paragraphs
+    up: **a permission rule and a permission block are different mechanisms,
+    and exercising one says nothing about the other.** Two wrong conclusions in
+    one session from the same habit — proving something narrower than the thing
+    being claimed.
+
+- **2026-09-21 — `git -C <path>` defeats every git allow rule, and a whole
+  session's git calls interrupted Helen for nothing.** She raised it gently —
+  *"There's no need to run git -C for commands like that because you're already
+  in the folder you're targetting (sorry if I'ive misunderstood)"* — and had
+  not misunderstood at all; the cost is larger than the redundancy she named.
+  The Bash tool already runs in the worktree root, and an allow rule is a
+  PREFIX match: `Bash(git status *)` wants a command starting `git status`, so
+  `git -C /path status` matches nothing, and neither do `git add -- *`,
+  `git commit -F *` or the exact `git branch --show-current`. **This is the
+  2026-09-07 `cd` ruling arriving through a flag instead of a command** — the
+  same mechanism, the same cost, and the same fix: write the bare command.
+  `CLAUDE.md`'s `cd` bullet now names `git -C` beside it. **And a hook enforces
+  it, the same day, at her request** — *"Also, yes, please refuse git -C across
+  the board"* — so this is a denial to the session rather than an interruption
+  to her, the principle that guard exists for.
+  `guard-unanalyzable-bash.py` gained shape 10: `git -C` wherever it appears as
+  a command word, not merely leading, because "across the board" is what she
+  asked for and a non-leading one is already inside a chain or pipe.
+  **The `-C`/`-c` distinction is CASE and the pattern is case-sensitive for a
+  concrete reason**: lowercase `git -c key=value` sets config rather than
+  changing directory, and every `scripts/git-*-agent.sh` passes the credential
+  helper that way, so refusing it would have broken pushing outright.
+  `tests/test_agent_wrappers.py` pins both halves — the four real calls that
+  interrupted her plus `git -C .` and a relative path, against
+  `git -c credential.helper=...`, the bare commands, quoted prose and
+  `make -C subdir` — and was proved the way this repository proves a guard:
+  the rule was disabled on purpose, all six refusal tests failed, and the rule
+  was restored. Then the hook was fired live on a real `git -C` call.
+
+- **2026-09-21 — a PR merged mid-session, and the next push went nowhere.**
+  Helen merged #1180 while the session was still working on it; the session
+  then committed a second, unrelated change, pushed it to the same branch, and
+  rewrote #1180's description to describe both. Both were wrong. **A merged
+  PR's branch still accepts a push and the commit reaches nothing** — the
+  #960 lesson of 2026-09-11, repeating — and a merged PR's description should
+  describe what merged, not what someone hoped to add. Caught by reading the
+  state that `gh-write.sh` prints back, which is the argument for it printing
+  the state at all. Recovery: the description was restored, and the stranded
+  commit was cherry-picked onto a fresh branch off `origin/main`.
+  **The rule that would have prevented it is already written** — `CLAUDE.md`
+  says to read a PR's `state` before pushing to a branch you did not open this
+  session — and the gap is that this session HAD opened the branch, so the rule
+  read as not applying. It applies to any branch whose PR you have not checked
+  since you last looked, including your own: **merging is Helen's, so a branch's
+  state can change under you at any moment, and being told is a courtesy rather
+  than a guarantee.** She said so herself in the workflow: if Claude has been
+  told nothing, it should check rather than assume.
+
+- **2026-09-22 — `CLAUDE.md` became the rules, and this file took the reasons.**
+  Helen, of a list of devops suggestions: *"Can we move parts of CLAUDE.md to
+  other docs?"*, then *"please do this next."* It had reached 56,637 bytes —
+  118 bullets averaging ~480 characters — and every byte was loaded into every
+  session before a word of work. Most of it was not rules. It was the HISTORY
+  of each rule: who ruled it, what broke, on what date, and what the previous
+  wording had been. **That is this file's job, and it was being done twice.**
+  The split took it to 24,822 bytes, a 56% cut, with nothing dropped.
+
+  **THE RULE APPLIED, and it is worth stating because it decides every case:**
+  where a HOOK enforces a rule, the story moves here and `CLAUDE.md` keeps the
+  rule, the hook's name and the one non-obvious carve-out. Where only
+  DISCIPLINE enforces a rule, the paragraph explaining it IS the enforcement,
+  and it stays. That is why the spam-flag bullet, the stacked-PR bullet and
+  the `awaiting_fix`/`proofread` gate survive nearly whole, while the token
+  bullets — with `guard-token-expansion.py` behind them — reduce to a
+  sentence. Eight hooks now do what prose used to have to do alone.
+
+  **VERIFIED BY MEASUREMENT, NOT BY READING IT BACK.** Prose can be rewritten
+  freely; a `backticked` token going missing is how an instruction quietly
+  dies. `tmp/check_split_lost_nothing.py` extracted all 311 distinct
+  backticked tokens from the pre-split file and checked each one still appears
+  in `CLAUDE.md`, this file or `MANUAL.md`. **53 did not, and each was judged
+  one at a time rather than counted.** The facts among them were written into
+  the rest of this entry; `git ls-remote --upload-pack=` was a genuine
+  omission and went back into `CLAUDE.md`'s list of options that run a
+  program. (No final figure is quoted, because naming a token in this entry
+  is itself enough to make the checker find it — the number falls every time
+  the entry explains another one, so it measures the writing rather than the
+  loss.) **What remains are illustrations of a banned pattern**
+  (`cat some/*.txt`, `git commit -m "$(cat <<'EOF' ...)"`, `grep ... && node
+  ...`, `ruby <<'RB'`, `python3 -c '<code>'`, `ruby tmp/thing.rb`), near
+  variants of text that is present (`perl -e` and `ruby -e` under the rule
+  naming python/ruby/node/perl; `NAME=value cmd` under "a leading
+  `NAME=value`"), or the worktree names a measurement happened in
+  (`.claude/worktrees/opus-data-model`). The rule each one illustrates
+  survives; the illustration is what went.
+
+  **The checker needed fixing before its output could be trusted**, which is
+  its own small lesson: the first version did a raw substring test, so any
+  token line-wrapped into this file read as lost, and it reported 28 when the
+  truth was 23. A checker that cries wolf gets skimmed, which is the same
+  failure as no checker. It normalises whitespace now.
+
+  - **The chmod story, 2026-08-17.** `.gh-runtime/bin/gh` and
+    `.node-runtime/node/bin/node` had been extracted without their execute
+    bit, which is why the JS test suite had silently not been running. The fix
+    was legitimate and it was still Helen's call to make, not an agent's —
+    which is the whole content of the rule. Both paths are now dead: Claude
+    runs only in the container, where `gh` and `node` are at `/usr/bin`.
+  - **Where the credential lives.** `AGENT_GH_TOKEN` is set under the `env`
+    key of `.claude/settings.local.json`, which is gitignored, and `run.sh`
+    reads `['env']['AGENT_GH_TOKEN']` and passes it into the container.
+    `devcontainer.json` and the devcontainer README were updated alongside
+    `MANUAL.md` and `scripts/ingest_inbox.py` when `GH_TOKEN` was deleted on
+    2026-09-09.
+  - **The four default-value expansions the token hook refuses**, all of which
+    evaluate to the variable's own value when it is set: `${TOK:-x}`,
+    `${TOK:=x}`, `${TOK-x}`, `${TOK=x}`. It also refuses a
+    GitHub-token-shaped string anywhere — `ghp_...`, `gho_...`,
+    `github_pat_...` and siblings — because a token that has reached a
+    transcript is as dangerous pasted back in as expanded fresh. And it
+    refuses a secret in a URL's userinfo (`https://user:${AGENT_GH_TOKEN}@host`)
+    regardless of quoting, because the pattern is what gets stored on disk.
+    Note `echo "$AGENT_GH_TOKEN"` is a real leak wearing quotes, which is why
+    that hook strips single-quoted spans but not double-quoted ones.
+  - **The retired push URL.** Building it by hand as
+    `https://DeckOfPandas-agentic:${AGENT_GH_TOKEN}@github.com/...` worked
+    until a clone stored it in `.git/config` and a routine `git remote -v`
+    printed it. `git config -l`, `git remote show` and some git error messages
+    do the same. Retired 2026-09-10 for the credential helper. The helper is
+    passed per invocation and deliberately NOT written into any repo's config:
+    `/workspace/.git/config` is shared by every worktree, and a helper path
+    that exists on only one branch fails on every other — measured that day as
+    `sh: 0: cannot open scripts/git-credential-agent-token.sh: No such file`,
+    silently tolerated by git while the token was still in the URL, and a hard
+    failure the moment it was not.
+  - **That the agent account was really the author** was confirmed on
+    2026-09-08 by reading `"author":{"login":"DeckOfPandas-agentic"}` off the
+    API, not by a 200.
+  - **The retired `main`-update patterns.** `git checkout main && git pull
+    origin main` went on 2026-08-20 after a commit landed on `main` in the gap
+    it opens. Its replacement, `git fetch origin main:main`, refuses inside a
+    worktree with `fatal: refusing to fetch into branch 'refs/heads/main'
+    checked out at '/home/helen/projects/helen-triages'` — git protecting the
+    same invariant, not an obstacle. `sh scripts/git-fetch-main.sh` superseded
+    both on 2026-09-11.
+  - **The destructive-git hook's blind spot, 2026-08-19.** Its first version
+    patterned `git checkout -- <paths>` alone, so the bare-path form
+    `git checkout <path>` walked straight past it and destroyed a file's
+    uncommitted work the same day. A path cannot be told from a branch by
+    pattern — `git checkout main` is harmless, `git checkout feat/thing` looks
+    exactly like a path — so it now asks the filesystem whether the argument
+    names a real file. The command that started it was
+    `git checkout -- <two files> 2>/dev/null || true`, run to undo an agent's
+    own edit.
+  - **Why a PR description closes issues and a commit trailer does not**
+    (#1112). A keyword covers only the ONE reference after it, so a
+    description reading `Fixes #1051, #1052, …` closed #1051 alone. PR #1113,
+    with one `Closes #N` per line, closed all 22.
+  - **Deleting a merged branch.** `sh scripts/gh-agent.sh pr close
+    --delete-branch ...` works directly on this token, but it prompts;
+    `sh scripts/git-push-agent.sh :<branch>` does not, and still refuses
+    `:main` on `helen-triages`.
+  - **The browser wrappers' one writer** is `click-crop.sh`, and it writes
+    only under `tmp/shots/`.
+  - **`gh pr edit` still fails on this token** — it is GraphQL and wants
+    `read:org`, measured 2026-09-10 — so a PR body changes through
+    `sh scripts/gh-write.sh pr-body <repo> <N> tmp/whatever.md`, which is REST.
+
+- **2026-09-22 — the suite REPORTS what it never looked at, and a failing test
+  was the wrong answer.** Offered a sentinel test that would go red when the
+  private drafts clones are absent, Helen refused it: *"I don't want to run
+  tests locally with the expectation that some will fail, because a suite with
+  failures starts to get ignored...plus it's very annoying."* **That is the
+  same ending as a green that lies, reached from the other side**, and it
+  settles the shape of any future answer to #378's family of problems.
+  - **Her second reason is the one a session would not have guessed.** The
+    drafts are legitimately unfinished until she has cooked from them — the
+    workflow is Claude rewrites, she cooks, she improves, Claude polishes — so
+    *"this isn't worth doing if the recipes turn out to be naff"*. Their
+    untidiness is not a defect to be flagged; it is the state they are
+    supposed to be in. A test cannot tell those apart, which is why this is a
+    report and not a check.
+  - **What the existing machinery could not do.** `DRAFTS_PRESENT`,
+    `NO_DRAFTS_REASON` and `test_suite_hygiene.py`'s two registries already
+    make each draft-reading test say what it did. They work test by test. None
+    can show the AGGREGATE, because a test parametrised per file produces NO
+    TESTS AT ALL when the files are absent — not a failure, not even a skip.
+    The run gets QUIETER rather than noisier and the skip count FALLS as
+    coverage collapses, so a lower skip count reads as better news.
+  - **The shape.** `pytest_report_header` for one line before the dots, and
+    `pytest_terminal_summary` for the same fact at the END, which is where a
+    green run is actually read — a header scrolls away behind several thousand
+    dots. It names each absent clone WITH the command that fetches it, because
+    a caveat that does not say what to do about it is a complaint; it counts
+    the per-draft checks that produced nothing from THIS run rather than
+    quoting a figure that will age (36 in a bare worktree); and it is SILENT
+    when both clones are present, pinned by a test, because a caveat printed
+    on every run is noise and noise gets ignored exactly like a failure.
+  - **Measured, not quoted.** Both clones were pulled into a bare worktree
+    mid-session and the suite re-collected: **30,917** tests against the
+    10,660 a bare worktree collects, with `tests/test_drafts.py` alone going
+    from 50 to 16,370. Fifty green dots and sixteen thousand green dots are
+    the same word. The report went silent the moment the clones landed, which
+    is the half that could not be proved any other way. PR #1185.
+
+- **2026-09-21/22 — the devops session: a hook that tells, five allow rules
+  gone, and two false comments in `run.sh`.** Helen asked what else was worth
+  doing and then took most of it.
+  - **`session-ground-truth.py`, the first hook here that refuses nothing.**
+    Every other one denies something; not one ever told a session a fact, and
+    `CLAUDE.md` had been compensating with prose about *"am I still where I
+    left off"*. Prose can only ask a session to remember to look. It reports
+    branch, dirtiness, position against `origin/main` as last fetched, and the
+    drafts clones — no network call, because a slow hook is one she turns off.
+    Both audiences get the same text and a test pins that they cannot drift.
+  - **Five allow rules pruned**, on the strength of one question and her
+    answer: *"Claude always runs in a container, never on the host (any more).
+    This will be my setup indefinitely."* Four named `.gh-runtime/` and
+    `.node-runtime/` paths that exist only in a host checkout — in the
+    container `which gh node` gives `/usr/bin/gh` and `/usr/bin/node`. The
+    fifth, `Bash(curl -s "https://api.github.com/...*)`, **had been reviewed
+    against the wrong criterion**: the standard recorded in
+    `REVIEWED_OPEN_RULES` is "an option that runs a program", and `curl` has
+    none — but `-o <path>` WRITES A FILE ANYWHERE and the trailing `*`
+    accepted it. **Ask what an option can write as well as what it can run.**
+    The matching DENY rules were deliberately left: a deny on a dead path
+    costs nothing, and removing safety rails is not pruning.
+  - **The bundle volume's name was dead cleverness under a false comment.**
+    `helen-triages-bundle-cache-$(basename "$REPO_ROOT")` promised one volume
+    per worktree, but `REPO_ROOT` comes from `--git-common-dir` and so always
+    resolves to the primary clone; the basename could only ever be
+    `helen-triages`. Nothing was lost — the race it claimed to prevent is
+    already impossible, because `--name` refuses a second container outright.
+  - **And the image-stamp check** that opened the session is at §1.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
@@ -5055,7 +5372,28 @@ verification. Dates are when the correction landed.
   as the guard; §11.0.1's `ln -s`; §9.13's "raises every ratio to a power"
   (three comments, never true); §13.7's "right-aligned, punched" survivors
   line (three weeks, and #615 was written from it). 2026-09-06: DOCS_REVIEW's
-  twenty-five (§0).
+  twenty-five (§0). 2026-09-22: §1's "the image carrying no jekyll, which is
+  the same gap that stops `verify.py` running in the container" — both halves
+  false, twelve days, and `run.sh` carried the same sentence; `jekyll 4.4.1`
+  and `verify.py` exit 0, measured in a real container the moment Helen asked
+  whether it could be checked.
+- **2026-09-22 — two wrong conclusions in ONE session, from one habit: proving
+  something narrower than the thing being claimed.** Neither reached a merge
+  as a false statement, but both were written down as fact first.
+  - A write test into `/workspace/.node-runtime` wrote nothing, and was
+    reported as the `Edit(...)` deny rule working. It was not: the Write tool
+    hit WORKTREE ISOLATION first, and a Bash `touch` was refused at the
+    permission layer without saying which rule did it. The deny remains the
+    unproven layer.
+  - `Read(//dev/null)` was pronounced inert after the Read TOOL was refused —
+    reasoning by analogy from a real measurement about `additionalDirectories`
+    minutes earlier. Helen: *"Claude can read and write to /dev/null, so
+    retain whatever means that."* `blockReadsOutsideWorkingDirectories`
+    governs `Read`/`Grep`/`Glob`; a Bash redirection is a different path, and
+    `>/dev/null` was in use by the same session that called the rule dead.
+  - **The general form, stated once so it need not be learned twice: a
+    permission RULE and a permission BLOCK are different mechanisms, and
+    exercising one says nothing about the other.**
 - **2026-08-30 / 2026-08-31, #600** — An issue rots faster: #600 copied #542's
   "Also outstanding" without re-measuring, four days on, and every claim was
   false (six half-empty disjunctions — zero; Kamaniwanalaya already had the
@@ -5576,6 +5914,49 @@ verification. Dates are when the correction landed.
   branch checked out in another worktree — is therefore permanent and is not a
   problem to solve.
 
+- **A red `main` is a deploy outage, and it ran for three days** — 2026-09-12
+  to 2026-09-15. PR #996 (#982, the amount/item split) un-proofread
+  `grandmas-lemon-curd` and `tomato-tarragon-salad` as the standing rule
+  requires; two live recipes link to them by relative path; the production-
+  build link test went red, exactly as that PR's own commit message said it
+  would, "left for Helen's call rather than guessed at". The suite gates the
+  deploy (#369), so every one of the roughly twenty merges after it — the
+  search for anything, the data rulings, the README, the Docker image — built
+  nothing and shipped nothing, and the only signal was an Actions email per
+  push. Found by the 2026-09-15 design review's orchestrator while wondering
+  why its own PR would carry one red test: `actions/runs` showed every run on
+  `main` since 16:32 on the 12th failing at "Python tests", the last green one
+  being the commit before #996. Two lessons. **A test that is allowed to stay
+  red on `main` is a deploy switch left off**, whatever its message says; the
+  honest options were to hold the two links back in the same PR, or to
+  proofread the two recipes there and then (#1064). And **nobody looks at the
+  Actions tab**: the check is now written into the manual (§10) as the merging
+  session's job, and #1093 lists the ways to make a red `main` visible without
+  anyone looking.
+  - **RECOVERED 2026-09-22, SEVEN DAYS LATE, AND THE DELAY IS PART OF THE
+    LESSON.** This entry and the two below were written on 2026-09-15 on
+    `design/1086-review-batch`, and that branch was never merged. Helen found
+    it herself — *"I think I might have lost work (well, not merged it)"* —
+    looking at branches ahead of `main`. Two other branches ahead of `main`
+    turned out to have lost nothing (their content had been re-applied under
+    different SHAs); this one had lost all 65 lines. **So for seven days the
+    instruction telling sessions to check the deploy was itself undeployed**,
+    and no session ran it. `main` was green when this was recovered — checked,
+    not assumed, all of the last ten runs — so nothing was silently held back
+    in the meantime. `scripts/main-ci-status.sh` exists now so the check is one
+    allow-listed command; the `--jq` the manual originally prescribed has
+    brackets and a pipe in it, which makes Claude Code prompt Helen, and a
+    check that costs an interruption is a check nobody runs.
+- **A double hyphen inside an SVG comment** — 2026-09-15, #1086. The
+  accessibility stream wrote a prose comment into `_includes/icons/ship.svg`
+  with the repo's usual ASCII `--` for a dash; `--` is illegal inside an XML
+  comment, a browser renders nothing at all for a malformed SVG, and the ship
+  mark was one merge from vanishing off every card and drink page.
+  `test_every_shipped_svg_actually_parses` caught it on the integration
+  branch — the stream had run only the rendered-page tests for its own change.
+  The lesson is the old one: run the file that owns what you touched, and an
+  SVG is owned by `test_site_config.py`, not by the page it appears on.
+
 ## §13 The visual design — the road to each value
 
 - **2026-07-31 / 2026-08-01 / 2026-08-02** — Recipe page redesigned; index
@@ -5949,6 +6330,32 @@ verification. Dates are when the correction landed.
     a lone shared tag never outranks a shared ingredient at the same score.
     Built as two extra digits in the Liquid sort key and the same key in
     `scripts/related_recipes.py`.
+- **2026-09-15 — the design review, and how it was run.** Helen asked for "a
+  'standard' review, rather than my blinkered request", of visual design, user
+  flows and general niceness, then added copy (tone, consistency, interest,
+  flair, embarrassment) mid-task. The review is an artifact
+  (https://claude.ai/artifact/Cy5qUxscxk89hBx8MRyexF): seven bugs, fourteen
+  polish items, nine to consider, ten things to keep, and a copy section. Her
+  rulings on the plan, in order: *candidates for the judgement calls, bugs
+  fixed directly*; *"actions row only"* for the drink page's two shortlist
+  buttons; *yes* to phone-header candidates despite the about page's "I cook
+  from my 13-inch iPad"; *one combined PR*. The work ran as five agents in
+  their own worktrees (Opus on the drink title and the candidates pages,
+  Sonnet on print, phone layout and accessibility) merged one at a time into
+  one integration branch, with the full suite run there and one PR opened
+  (#1087, tracking #1086). Her four picks from the candidates pages are the
+  entry below; her mid-task change of brief on the meta card ("stacking the
+  three metadata boxes") is in the phone-layout entry. What was deliberately
+  kept out of the PR, and where it went: the placeholder strings (#1088), the
+  copy findings (#1089), related-picks weighting (#1090), and everything else
+  the review raised (#1093, one issue in sections, because a burst of issues
+  is what flagged the agent account on 2026-09-14). **Two things the round
+  found that were not on its list**: `main` had been red and undeployed for
+  three days (§12), and a `--` in an SVG comment (§12). **And one habit worth
+  keeping**: every stream shipped before/after crop boxes at 360, 390 and
+  1280, so a "nothing changed on desktop" claim was two numbers, not a
+  sentence. (Recovered 2026-09-22 from `design/1086-review-batch`, which was
+  written on 2026-09-15 and never merged — see §12.)
 - **2026-09-15, #1086 (design review) — four candidates pages, four picks.**
   Each question went up as two to five treatments on the real page with the real
   compiled CSS, per §13.11, and Helen chose by looking. Her words, and what each

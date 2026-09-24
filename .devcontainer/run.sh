@@ -8,8 +8,9 @@
 # AGENT_GH_TOKEN is DeckOfPandas-agentic-claude's classic repo-scoped token -- a
 # separate GitHub account, invited as a collaborator on just these three
 # repos, so it can push and open PRs under its own identity without ever
-# touching Helen's SSH keys. Builds the image itself on first run if it
-# doesn't exist yet.
+# touching Helen's SSH keys. Builds the image itself when there isn't one,
+# and rebuilds it whenever .devcontainer/ has changed since the image was
+# built -- see the build-stamp block below.
 #
 # GH_TOKEN WAS READ HERE TOO UNTIL 2026-09-09, when Helen deleted it on
 # GitHub and it stopped existing. It was her own fine-grained token and it
@@ -29,18 +30,69 @@ GIT_COMMON_DIR="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --path-forma
 REPO_ROOT="$(dirname "$GIT_COMMON_DIR")"
 cd "$REPO_ROOT"
 
-if ! docker image inspect helen-triages-devcontainer >/dev/null 2>&1; then
-  echo "Image not found -- building helen-triages-devcontainer (first run only)..."
-  docker build -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
+IMAGE=helen-triages-devcontainer
+
+# IS THE IMAGE BUILT FROM WHAT IS ON DISK RIGHT NOW? -- added 2026-09-21.
+# "Does the image exist" was the old check, and it is a different question.
+# Helen added packages to the Dockerfile, rebuilt, and containers kept
+# coming up without them: the rebuild and the run were of different things
+# and nothing ever compared them. An image that exists is not an image that
+# matches.
+#
+# So the image now carries a LABEL holding a hash of its build inputs, and
+# this rebuilds whenever that hash is missing or no longer matches the
+# files on disk. Three cases, one comparison: no image, an image with no
+# stamp (built before this existed, or built by hand), and a stamp that
+# disagrees with the current .devcontainer/.
+#
+# IT COMPARES CONTENT, NOT TIMESTAMPS, which is stricter than "is the
+# Dockerfile newer than the image" in both directions. `touch` alone does
+# not trigger a rebuild; reverting an edit goes back to the image that
+# matches rather than building a third thing. And mtime-vs-image-Created
+# has a trap this avoids: a fully cached rebuild keeps the CACHED layer's
+# Created date, so the image's timestamp can stay older than the Dockerfile
+# forever and the check never settles.
+#
+# EVERY file in .devcontainer/ is hashed, not just the Dockerfile and the
+# init-firewall.sh it COPYs -- a hand-maintained list of "the files that
+# matter" is one more thing to keep in sync, and the Dockerfile's note
+# about requirements-test.txt says how that goes. The price of the extra
+# breadth is that editing this script or the README rebuilds once; with
+# nothing in the Dockerfile changed that is a fully cached no-op of about a
+# second, and it needs no network. Wrong in the safe direction.
+#
+# What it still cannot see: `ruby:3.3-bookworm` moving upstream, or an
+# `apt-get install` resolving to newer packages than last time. The
+# Dockerfile does not pin those, so nothing on disk changes when they move.
+# `docker build --pull --no-cache` by hand is the answer when that matters.
+STAMP_LABEL=com.deckofpandas.build-inputs
+
+BUILD_INPUTS_HASH="$(find .devcontainer -type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum | cut -d' ' -f1)"
+IMAGE_STAMP="$(docker image inspect --format "{{ index .Config.Labels \"$STAMP_LABEL\" }}" "$IMAGE" 2>/dev/null || true)"
+
+if [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ]; then
+  if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    echo "Image not found -- building $IMAGE (first run)..."
+  elif [ -z "$IMAGE_STAMP" ] || [ "$IMAGE_STAMP" = "<no value>" ]; then
+    echo "Image carries no build stamp (built before this check, or by hand) -- rebuilding $IMAGE..."
+  else
+    echo ".devcontainer/ has changed since $IMAGE was built -- rebuilding..."
+  fi
+  docker build -t "$IMAGE" --label "$STAMP_LABEL=$BUILD_INPUTS_HASH" -f .devcontainer/Dockerfile .devcontainer
 fi
 
-# Bundle cache is per-worktree (named after the worktree's own directory,
-# e.g. "opus-cocktail-data" or "helen-triages" for the primary checkout) so
-# two containers running on two worktrees at once never race each other's
-# `bundle install`. The Claude config volume stays shared across all of
-# them deliberately -- that mirrors how every host-side Claude Code
-# session, across every worktree, already shares one ~/.claude directory.
-BUNDLE_VOLUME="helen-triages-bundle-cache-$(basename "$REPO_ROOT")"
+# ONE BUNDLE CACHE, AND THE NAME NO LONGER VARIES -- corrected 2026-09-21.
+# This was `helen-triages-bundle-cache-$(basename "$REPO_ROOT")`, under a
+# comment promising a volume per worktree ("opus-cocktail-data" or
+# "helen-triages"). That promise stopped being true the moment REPO_ROOT
+# started coming from `--git-common-dir` above: that always resolves to the
+# PRIMARY clone, from anywhere in the worktree set, so the basename could
+# only ever be "helen-triages" and the computation was dead cleverness under
+# a false comment. Nothing is lost -- the race it claimed to prevent is
+# already impossible, because --name below refuses a second container
+# outright. Both volumes are shared across every worktree, deliberately,
+# the same way every host-side Claude Code session shares one ~/.claude.
+BUNDLE_VOLUME=helen-triages-bundle-cache-helen-triages
 
 docker volume create helen-triages-claude-config >/dev/null
 docker volume create "$BUNDLE_VOLUME" >/dev/null
@@ -79,9 +131,17 @@ DOTFILE_MOUNTS=()
 # could not bind it while any container was up.
 #
 # The INSIDE pair stays 4001/4002, because the image's baked-in
-# jekyll-local/jekyll-prod aliases serve there. Nothing listens on them today
-# in any case -- the image carries no jekyll, which is the same gap that stops
-# `scripts/verify.py` running in the container.
+# jekyll-local/jekyll-prod aliases serve there.
+#
+# THIS COMMENT USED TO SAY "the image carries no jekyll, which is the same gap
+# that stops scripts/verify.py running in the container". BOTH HALVES WERE
+# FALSE, and nobody checked for twelve days. Measured inside a real container,
+# 2026-09-21: `bundle exec jekyll --version` prints 4.4.1 and
+# `python3 scripts/verify.py` exits 0. The image does not BAKE the gem -- it
+# comes from the Gemfile via `bundle install` into the cache volume below --
+# but that is a first-run cost, not a gap, and the aliases above are exactly
+# how it gets used. Helen: "I'm pretty sure the container has Jekyll... Are you
+# not able to check?" The answer was yes, all along.
 AGENT_GH_TOKEN="$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['AGENT_GH_TOKEN'])")" \
 docker run -it --rm \
   --name helen-triages-primary \
@@ -93,5 +153,5 @@ docker run -it --rm \
   -p 5998:4001 \
   -p 5999:4002 \
   -w /workspace \
-  helen-triages-devcontainer \
+  "$IMAGE" \
   bash
