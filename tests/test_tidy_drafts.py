@@ -23,6 +23,7 @@ lines is a line the pass must have left exactly alone.
 """
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 import sys
@@ -389,6 +390,200 @@ def test_food_prose_outside_a_qq_is_still_fixed(food):
         "it is untouched the skip has swallowed the whole file:\n"
         + "\n".join(l for l in got.split("\n") if "no more" in l)
     )
+
+
+# =============================================================================
+# THE SIZE WORD, #577 -- excluded 2026-08-29, scripted 2026-09-24
+# =============================================================================
+# One fixture carrying every shape the `size` rule meets on the real corpus, in
+# the proportions that matter: the four it MUST move (quoted, bare, item-first,
+# two-word `extra large`), and every shape it must NOT -- a weight, a fraction,
+# a missing amount, an `or` remainder, `baby`, and a size word behind a `QQ`.
+# The file is otherwise clean, so the count in the report is the rule's alone.
+SIZE_BEFORE = '''---
+title: "Test Recipe"
+tagline: "A test"
+source: "Adapted from Somebody"
+source_type: person
+serves: "4"
+prep_time: "10 mins"
+cook_time: "20 mins"
+main_ingredients: ["onions", "eggs"]
+star_ingredient: "eggs"
+tags: ["carbs party"]
+ingredient_groups:
+  - name: "the lot"
+    items:
+    - amount: "2"
+      item: "large onions, roughly chopped"
+    - amount: "3"
+      item: large eggs
+      note: "at room temperature"
+    - item: "small garlic clove, crushed"
+      amount: "1"
+    - amount: "2"
+      item: "extra large eggs"
+    - amount: "400 g"
+      item: "large open mushrooms"
+    - amount: "½"
+      item: "small bunch of chives, finely chopped"
+    - item: "small handful of parsley, roughly chopped"
+    - amount: "1"
+      item: "large or 2 small onions, roughly chopped"
+    - amount: "2"
+      item: "baby gem lettuces, shredded"
+    - amount: "1"
+      item: "QQ large tin of something"
+method:
+  - "Cook it."
+notes:
+  - label: "Balance"
+    text: "Taste it."
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+---
+'''
+
+# EIGHT LINES DIFFER FROM `SIZE_BEFORE` AND NO OTHERS: the amount and the item
+# of the first four entries. Every other line is copied character for
+# character, including the six entries that carry a size word the rule must
+# leave where it is.
+SIZE_AFTER = '''---
+title: "Test Recipe"
+tagline: "A test"
+source: "Adapted from Somebody"
+source_type: person
+serves: "4"
+prep_time: "10 mins"
+cook_time: "20 mins"
+main_ingredients: ["onions", "eggs"]
+star_ingredient: "eggs"
+tags: ["carbs party"]
+ingredient_groups:
+  - name: "the lot"
+    items:
+    - amount: "2 large"
+      item: "onions, roughly chopped"
+    - amount: "3 large"
+      item: eggs
+      note: "at room temperature"
+    - item: "garlic clove, crushed"
+      amount: "1 small"
+    - amount: "2 extra large"
+      item: "eggs"
+    - amount: "400 g"
+      item: "large open mushrooms"
+    - amount: "½"
+      item: "small bunch of chives, finely chopped"
+    - item: "small handful of parsley, roughly chopped"
+    - amount: "1"
+      item: "large or 2 small onions, roughly chopped"
+    - amount: "2"
+      item: "baby gem lettuces, shredded"
+    - amount: "1"
+      item: "QQ large tin of something"
+method:
+  - "Cook it."
+notes:
+  - label: "Balance"
+    text: "Taste it."
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+---
+'''
+
+
+def test_size_words_report_names_the_moves_and_the_refusals_and_writes_nothing(food):
+    path = food / "test-recipe.md"
+    path.write_text(SIZE_BEFORE, encoding="utf-8")
+    out = run_food(food, "--only", "size")
+
+    assert "would apply 4 mechanical change(s) across 1 file(s)" in out, out
+    assert '[size] 2 / large onions, roughly chopped -> "2 large" / "onions, roughly chopped"' in out, out
+    assert '[size] 2 / extra large eggs -> "2 extra large" / "eggs"' in out, out
+    assert out.count("[size] SKIPPED") == 2, out
+    assert "SKIPPED: a second count inside the item" in out, out
+    assert "SKIPPED: `baby` is a kind as often as a size" in out, out
+    assert "reported, never changed: 1 file(s)" in out, out
+    assert ("size word with no count to carry it, left in the item: "
+            "small handful of parsley") in out, out
+    assert path.read_text(encoding="utf-8") == SIZE_BEFORE, (
+        "report mode wrote to the file."
+    )
+
+
+def test_size_words_apply_moves_exactly_four_and_touches_nothing_else(food):
+    """Byte for byte, as the drink fixture is, and for the same reason.
+
+    The one bug this script has ever had produced a plausible-looking diff on
+    341 files; the size rule rewrites two fields per hit, which is exactly the
+    shape Helen excluded it for on 2026-08-29, so the proof is the whole file.
+    """
+    path = food / "test-recipe.md"
+    path.write_text(SIZE_BEFORE, encoding="utf-8")
+    run_food(food, "--only", "size", "--apply")
+    got = path.read_text(encoding="utf-8")
+    if got != SIZE_AFTER:
+        moved = [f"    line {i}\n      want: {w!r}\n      got:  {g!r}"
+                 for i, (w, g) in enumerate(zip(SIZE_AFTER.split("\n"),
+                                                got.split("\n")), 1)
+                 if w != g]
+        pytest.fail("--apply did not produce the expected recipe:\n"
+                    + "\n".join(moved or ["(line counts differ)"]))
+
+
+def test_size_words_apply_parses_and_satisfies_the_recipe_rule(food):
+    """Parsed both sides, on a copy -- the check that caught the `meta:` bug.
+
+    The recipe rule's own predicate, imported and not retyped, must find
+    nothing left in the file that the script had the standing to move; what
+    remains is the six shapes it refused on purpose, every one of which the
+    rule either does not flag (weight, fraction, no amount, QQ) or was left for
+    an eye (`or`, `baby`).
+    """
+    import yaml
+    sys.path.insert(0, str(ROOT / "tests"))
+    from test_style import _LEADING_SIZE_WORD
+
+    path = food / "test-recipe.md"
+    path.write_text(SIZE_BEFORE, encoding="utf-8")
+    before = yaml.safe_load(SIZE_BEFORE.split("---\n")[1])
+    run_food(food, "--only", "size", "--apply")
+    after = yaml.safe_load(path.read_text(encoding="utf-8").split("---\n")[1])
+
+    items_before = before["ingredient_groups"][0]["items"]
+    items_after = after["ingredient_groups"][0]["items"]
+    assert len(items_before) == len(items_after) == 10
+    for b, a in zip(items_before, items_after):
+        assert set(b) == set(a), (b, a)
+        for key in b:
+            if key not in ("amount", "item"):
+                assert b[key] == a[key], (key, b, a)
+        # The rendered text is unchanged: amount + item reads the same.
+        assert f"{b.get('amount', '')} {b['item']}".strip() == \
+               f"{a.get('amount', '')} {a['item']}".strip(), (b, a)
+
+    still = [i["item"] for i in items_after
+             if re.fullmatch(r"\d+", str(i.get("amount", "")))
+             and _LEADING_SIZE_WORD.match(i["item"])]
+    assert still == ["large or 2 small onions, roughly chopped",
+                     "baby gem lettuces, shredded"], still
+
+
+def test_size_words_never_run_on_a_drink(drinks):
+    """`--only size` on the drinks site changes nothing and says so.
+
+    A drink's `amount` is the recorded harm the module docstring names, and a
+    drink has no `item` since 2026-09-21. The rule is in FOOD_FIXERS alone.
+    """
+    path = write_drink(drinks)
+    out = run(drinks, "--only", "size", "--apply")
+    assert "applied 0 mechanical change(s)" in out, out
+    assert path.read_text(encoding="utf-8") == BEFORE
 
 
 def test_a_range_in_an_amount_is_reported_rather_than_silently_declined(drinks):
