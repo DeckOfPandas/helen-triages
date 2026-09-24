@@ -26,13 +26,13 @@ in this order:
    A ruling changes when I look at the built thing and change my mind, never
    by being argued at.
 
-Then, for anything that moves a recipe or a drink through the system,
+Then, for anything that moves a food or cocktail recipe through the system,
 `model_instructions/PIPELINE.md` — the one map of the whole journey, in,
 out and back — and, depending on the task, the procedure document that owns it:
-`.claude/commands/ingest.md` (getting recipes and drinks in — the boundary is
+`.claude/commands/ingest.md` (getting recipes in — the boundary is
 *is the answer in the source, or in Helen's head?*), `ingest-inbox.md` (when
 they arrived as GitHub issues), `tidy-drafts.md` (the mechanical half of a
-drafts pass), `model_instructions/PUBLISHING_A_DRINK.md` (getting a drink out;
+drafts pass), `model_instructions/PUBLISHING_A_DRINK.md` (getting a cocktail recipe out;
 read it before touching `_cocktail_drafts/to-promote/`),
 `model_instructions/LETTERING.md` (punched-tape type),
 `model_instructions/CLAUDE_WEB_INGEST.md` (the claude.ai Project).
@@ -50,7 +50,7 @@ repository, not for you.
   on. Both are their own repos with their own `main`: branch there too; push
   there without asking.
 - **Every recipe edit sets `meta.proofread: false` in the same commit**, and a
-  drink is gated the same way. `QQ` is my placeholder — never fix it
+  cocktail recipe is gated the same way. `QQ` is my placeholder — never fix it
   or convert it, and never delete a `QQ original` line.
 - **One `pytest` at a time**, never two.
 - **Ask me the decisions as you hit them, inline, not in a batch at the end**,
