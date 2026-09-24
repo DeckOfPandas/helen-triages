@@ -859,6 +859,59 @@ unless stated.
   rewrites the picker's vocabulary but never `data-ingredients`, so the
   collapsed chip would match half the recipes it names.
 
+- **2026-09-21/22 — the field is DERIVABLE IN ORDER AND NOT IN MEMBERSHIP, and
+  three of the four obvious moves were wrong.** Helen asked for it to be
+  auto-generated (*"I've already felt a bit funny about main_ingredients"*),
+  spec: *"Ingredients sort of in order of stars, how much of a game over it
+  would be not to have it, proportion, and sensible larder order."* Cleared on
+  the premise that she would otherwise *"write them all from scratch, which is
+  what I currently expect"*. **That premise did not hold: not one of the 341
+  food drafts is empty**, every one carries a list, median five, and a sample
+  reads better than the derivation — `best-of-the-best-lasagne` already had
+  pancetta and parmesan where the derivation dropped both and added celery and
+  whole milk. So `scripts/derive_main_ingredients.py` REORDERS by default and
+  only derives where there is no list; 302 drafts reordered, **0 members lost,
+  0 gained**, verified as sets against the committed files. The order was
+  genuinely absent: 295 of 430 lists followed not even the ingredient list's own
+  order.
+  - **The index's normaliser cannot be reused, and finding out why is the
+    useful part.** `buildMasterList` gives `egg` where she writes `eggs` and
+    `carrot, grated` where she writes `carrot`. **The index strips exactly what
+    this field keeps** — they are opposite transformations of one string. Worth
+    10 points of agreement.
+  - **The pantry is a red herring.** "How much of a game over it would be not to
+    have it" reads like `pantry.yml`; excluding staples scored WORSE, 0.53 to
+    0.38, because she keeps flour, butter, sugar and eggs — a cake IS its flour.
+    Tagging the bake recovered 0.02. The pantry ranks lower; it never excludes.
+  - **No cut-off beats no cut-off.** Thirteen scored; capping removes true
+    positives about as fast as false ones. Ten was chosen on other grounds.
+  - **A SIZE COMES OFF AND A KIND THAT LOOKS LIKE ONE STAYS**, and this is the
+    cautionary one. Stripping `large|small|medium|big|baby|whole|thick|thin|fat|
+    jumbo|mini|king` scored worse (0.55 → 0.50) and I reported it as "she keeps
+    size words, measured". Helen: *"'large carrot' should appear in ingredients
+    lists where that's what I've stated, but main_ingredients should just have
+    'carrot'."* **The number was right and the reading was wrong**: 28 of the 30
+    hits were `whole`, and `whole milk`, `whole cloves`, `whole duck`, `king
+    prawns`, `baby gem` are KINDS. The list conflated the two and the five
+    points were the kinds being destroyed. Sizes alone cost nothing — 0.55
+    either way. **A measurement that agrees with the code is not the same as one
+    that agrees with the rule**; the corpus was being used as ground truth for a
+    question it had never been asked.
+  - **Egg size lives in the ingredient list and not here**, settled the same
+    way. She: *"surely I specify large eggs for all baking — that's a separate
+    ingredient to medium eggs."* She does: 227 ingredient items carry a size
+    word. `main_ingredients` carried exactly one (`medium eggs`, ajitsuke-tamago)
+    against 81 plain `eggs`. `main_ingredients` is the BROWSE axis and the
+    ingredient list is the shop-and-cook one; distinguishing sizes here would
+    give the index three buttons for one ingredient, which is the split
+    `spring onion`/`spring onions` had just been fixed for.
+  - It scores **0.55** IoU against the 89 published lists, which is not good and
+    is not claimed as good — the mood rules Helen KEPT scored 0.73–1.00 and the
+    four she moved to hand scored 0.23–0.67. The residue is SELECTION: she drops
+    background aromatics and keeps structure, which is "is this what the dish
+    IS" and is not in the ingredient list. `_food_recipes/` is never written to
+    by the script, because those lists are the yardstick.
+
 ## §7 Taxonomy (food)
 
 - **2026-08-01/02** — Reclassified, Helen's calls: `one-pot` and `scalable`
@@ -1586,6 +1639,96 @@ unless stated.
   and an `ingest` issue (§11.0.4).
 
 ### §9.3 The schema
+
+- **2026-09-21 — `QQ` IS A TRIPWIRE, NOT A GRAMMAR, AND THAT SETTLES SIX
+  PREDICATES AT ONCE.** A review had found five spellings of the marker
+  disagreeing on shapes that exist in the corpus (`QQ.`, `QQ, plus 30 mins
+  resting`, `QQ Claude`), and proposed reconciling them. Helen ruled the
+  question away instead: *"QQ just means 'Helen pay attention to this for some
+  reason', then 'QQ CLAUDE' means that Claude rewrote a method step... Honestly
+  we don't need to disambiguate, only to block anything on the site from
+  publishing with a QQ in any context, hence why I use 'QQ' rather than any mark
+  that might appear in real, wanted text."*
+  - **That block existed on food alone.** `test_no_qq_placeholder` runs off the
+    food `recipe` fixture and `conftest.py` names only the two food paths, so
+    the one rule keeping an unfinished marker off the live site covered one of
+    two sites. `test_no_published_drink_carries_a_qq` is the other half,
+    `\bQQ\b` over the raw file, and it REPLACES
+    `test_a_promoted_drink_has_a_real_tagline` — which tested equality with
+    `"QQ"` and so walked past `tagline: "QQ."`, a shape in the drafts today.
+  - **`PLACEHOLDER` was still in the corpus**, eleven method steps in two files,
+    a marker retired 2026-08-10. **Nothing in the repo matched the word**: the
+    publish guard searches `\bQQ\b`, so one would have PUBLISHED, and
+    `conftest._QQ_LINE` missed it too, so house style had already been applied
+    to Tom Kerridge's words (`40–45 mins`, an en dash he never wrote). Helen:
+    *"Let's revise all 'PLACEHOLDER's to QQ... we're only changing history."*
+    Renamed to `QQ original`, the current spelling of a method's source half.
+  - **A tagline an ingest writes always begins `QQ `, on both sites.** Helen:
+    *"a drink without a tagline written by me gets a QQ, so I protect my voice
+    in the public content."* For food the words may stay — *"it's less of a
+    problem for me if source taglines remain, but please QQ at the start of the
+    line"* — which is what 248 draft taglines got. **Which ones were hers is
+    `meta.rewritten`, her own flag, and it is the THIRD signal tried**: the
+    file's last author called 86 of 89 live recipes Claude's, and blaming the
+    tagline LINE still called 47 of 90 Claude's, because a typography pass
+    rewrote the line and blame names the tidier. `meta.rewritten`'s control is
+    perfect — all 89 live recipes `true`, no exceptions.
+  - Together these make the tagline rule need no mechanism of its own: an
+    unwritten tagline says QQ, a QQ cannot publish.
+
+- **2026-09-21 — `item` IS GONE.** Helen: *"'item' needs to go. Kill it with
+  fire. Data can be read straight into generic/suggestion with or without QQs,
+  and anything genuinely unclear added to a page note for me (titled QQ so I
+  definitely find it)."* It held the SOURCE's wording for a pour while the
+  category was unknown, and **nothing rendered it**, so a transcription there
+  was invisible to the page, the cards, the search, costing and ABV alike — a
+  field that hoards rather than holds (23 real bottles came out of it once).
+  What ended it was `QQ <the source's words>`: once the words are in `generic`,
+  a second field holding the same string is read by nothing.
+  - Three whole tests went with it, plus `INGREDIENT_KEYS_RECIPES`, its
+    `VERBATIM_KEYS` entry and the layout's headline fallback — about 150 lines.
+  - **One near-miss worth keeping**: `test_every_ingredient_has_a_generic_or_a_qq`
+    was gated `if item and not generic`, so with the field gone it would have
+    examined an EMPTY SET and passed for ever. The gate was deleted rather than
+    rewritten.
+  - **`suggestion` is now always present, `[]` where nobody has chosen.** *"At
+    ingest, please add a blank suggestion field if there isn't a named
+    suggestion, because that saves me typing YAML when I come to it."*
+    `["QQ"]` was never a shape: it made `test_every_suggested_bottle_resolves`
+    skip the pour, so a real bottle parked behind a QQ would never have
+    resolved, reported or rendered.
+
+- **2026-09-21 — THE BOTTLE RESOLVES THE CATEGORY; THE CHARACTER IS ONLY EVER
+  PROPOSED.** Helen, asked where a Claude's proposed generic should live so she
+  could check it: *"I'd want to make sure Claude doesn't always confidently
+  write 'Gosling's' instead of both."* Her rule: *"If the source says
+  'Gosling's' then the correct thing for Claude to do is give 'moderately aged
+  rum, character: blackstrap'. But if a recipe gives 'blackstrap' Claude
+  shouldn't suggest anything."*
+  - **One correction inside it, from the data.** `bottles.yml` deliberately has
+    NO character column — its own note against Gosling's Black Seal says the
+    bottle is "reached for FOR its blackstrap, which is a `character` on the
+    recipe and never a generic" — and her 2026-09-14 ruling says why: *"having a
+    character is only in a context."* So resolving a bottle gives a generic and
+    a suggestion mechanically and gives no character at all.
+  - Hence `generic_claude` / `suggestion_claude` / `character_claude`, her own
+    flat shape, chosen over a nested block and over a report. A proposal is legal
+    only while the POUR still carries a QQ — in `generic` OR in a `QQ -` note —
+    which means a published drink can carry none, with no second key list.
+  - **`scripts/resolve_pours.py`** does the lookup: exact reads only, with
+    `not_reached_for` bottles and `hers_to_apply` generics excluded outright.
+    Over the collection today it resolves NOTHING — all six untyped pours are
+    Tier 3 — so its tiers are pinned directly against the real dictionaries
+    instead of over a corpus that happens to contain no Tier 1.
+
+- **2026-09-21 — `flavourings` IS `larder`, and 20 generics gained a shelf.**
+  Helen: *"I think the general term 'larder ingredients' as a cook includes
+  fridge to me. Then cream, milk and eggs can go in there."* Six of the twenty
+  were poured by real drinks and landing in an unlabelled trailing group on a
+  real shopping list; `assets/js/shopping-list.js` calls that "a gap in the
+  data" and nothing reported it. Sixteen were mechanical — every shelved member
+  of `brandy_styles`, `gin_styles`, `whisky_styles` and `rum_styles` is on
+  `spirits` — and two stale section counts were corrected on the way past.
 
 - **2026-08-17** — `glass` became a LIST (corrected from scalar). Helen on
   Cherry Heering: *"I'd note my preference as the example not the category"*
