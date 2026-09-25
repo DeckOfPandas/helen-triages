@@ -7509,6 +7509,102 @@ def test_from_fruit_costs_resolve_to_a_yield_and_a_price():
     )
 
 
+COUNTED_AMOUNT = re.compile(r"^\s*([\d.]+)\s+(whole|each|cubes?)\s*$")
+WEIGHED_AMOUNT = re.compile(r"^\s*([\d.]+)\s+g\s*$")
+
+
+def test_fruit_and_weight_price_rows_are_well_formed():
+    """#748. A per-piece or per-kilo row is a pair, ordered, on a real generic.
+
+    `fruit_prices` prices a squeezed juice (through `juice_yields`) AND, since
+    2026-09-24, a counted fruit; `weight_prices` prices a weighed solid. The
+    plugin reads both by generic name and skips a row it cannot read, so a
+    typo'd key or an inverted range fails nothing on its own -- the pour just
+    goes back to being free. This is what notices.
+    """
+    costs = _costs()
+    vocab = _vocab()
+    # A `fruit_prices` key is either a generic a drink counts (pear) or the
+    # fruit a `juice_yields` entry names (lemon, orange, grapefruit -- which are
+    # squeezed, never counted, and are not generics in their own right).
+    declared = _declared_generics(vocab) | {
+        str((y or {}).get("fruit"))
+        for y in (vocab.get("juice_yields") or {}).values()
+    }
+    problems = []
+    for name, row in sorted((costs.get("fruit_prices") or {}).items()):
+        if not isinstance(row, dict):
+            problems.append(f"fruit_prices {name}: not a mapping")
+            continue
+        lo, hi = row.get("gbp_min"), row.get("gbp_max")
+        if not (isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and 0 < lo <= hi):
+            problems.append(f"fruit_prices {name}: gbp_min/gbp_max are {lo!r}/{hi!r}")
+        if row.get("confidence") not in COST_CONFIDENCE:
+            problems.append(f"fruit_prices {name}: confidence {row.get('confidence')!r}")
+        if name not in declared:
+            problems.append(f"fruit_prices {name}: not a generic ingredients.yml declares")
+    for name, row in sorted((costs.get("weight_prices") or {}).items()):
+        if not isinstance(row, dict):
+            problems.append(f"weight_prices {name}: not a mapping")
+            continue
+        lo, hi = row.get("gbp_per_kg_min"), row.get("gbp_per_kg_max")
+        if not (isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and 0 < lo <= hi):
+            problems.append(f"weight_prices {name}: gbp_per_kg_min/max are {lo!r}/{hi!r}")
+        if row.get("confidence") not in COST_CONFIDENCE:
+            problems.append(f"weight_prices {name}: confidence {row.get('confidence')!r}")
+        if not str(row.get("basis") or "").strip():
+            problems.append(f"weight_prices {name}: no basis -- say what shop price the figure came from")
+        if name not in declared:
+            problems.append(f"weight_prices {name}: not a generic ingredients.yml declares")
+    assert not problems, (
+        "Bad rows in _data/cocktails/costs.yml:\n  " + "\n  ".join(problems)
+    )
+
+
+def test_every_counted_fruit_and_weighed_solid_has_a_price(drink_file):
+    """#748, from the drinks. A pear with no row is the Bellini going dark again.
+
+    Helen ruled that whole fruit and weighed solids are priced, so a counted
+    pour of anything in `fruit_and_herbs` and any `N g` pour must find a row --
+    otherwise the plugin silently treats it as the flourish it was before the
+    ruling, and the drink either loses its figure or prints one that is short
+    by the fruit. Runs from the DRINKS because the failure is a drink using a
+    generic the price table has not caught up with.
+
+    A counted pour OUTSIDE `fruit_and_herbs` (a sugar cube, an egg white) is
+    still a flourish by the standing rule and is not asked for here.
+    """
+    _require_drink(drink_file)
+    costs = _costs()
+    vocab = _vocab()
+    fruit = set(vocab.get("fruit_and_herbs") or [])
+    fruit_priced = set(costs.get("fruit_prices") or {})
+    weight_priced = set(costs.get("weight_prices") or {})
+
+    missing = []
+    for ing in drink_file.fm.get("ingredients") or []:
+        if not isinstance(ing, dict):
+            continue
+        amount = str(ing.get("amount", "")).strip()
+        generics = ing.get("generic")
+        generics = generics if isinstance(generics, list) else [generics]
+        generics = [str(g) for g in generics if g]
+        if amount == "half" or COUNTED_AMOUNT.match(amount):
+            for g in generics:
+                if g in fruit and g not in fruit_priced:
+                    missing.append(f"{amount} {g}: no `fruit_prices` row")
+        elif WEIGHED_AMOUNT.match(amount):
+            for g in generics:
+                if g not in weight_priced:
+                    missing.append(f"{amount} {g}: no `weight_prices` row")
+    assert not missing, (
+        f"{_drink_where(drink_file)} pours a counted fruit or a weighed solid "
+        f"that _data/cocktails/costs.yml cannot price, so it is costed as free "
+        f"and the drink's figure is short by it (#748: whole fruit and weighed "
+        f"solids are priced):\n  " + "\n  ".join(missing)
+    )
+
+
 def test_excluded_cost_units_are_real_declared_units():
     """Everything costs.yml refuses to price must be a unit that exists.
 

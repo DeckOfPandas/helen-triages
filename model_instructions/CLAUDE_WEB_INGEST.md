@@ -60,7 +60,7 @@ a deploy.
 ### The loop
 
 1. **Send a dump.** Photos of book pages, screenshots, URLs, pasted text —
-   several recipes in one message is fine, and food and drinks may be mixed.
+   several recipes in one message is fine, and food and cocktails may be mixed.
 2. **Get back one envelope per recipe**, each in a single copyable block, with
    the issue title above it and a one-line index of the whole dump first.
 3. **Two ways home**, and both exist already:
@@ -79,7 +79,7 @@ a deploy.
 
 ### What to expect, and what not to
 
-- **A drink's `generic` is typed only where the printed vocabulary settles it
+- **A cocktail recipe's `generic` is typed only where the printed vocabulary settles it
   outright, and is `QQ` plus the source's own words everywhere else** —
   `generic: "QQ aged Jamaican rum"`. Since 2026-09-21 `INGEST_ONE_COCKTAIL.md`
   §3a prints all 181 declared generics, so an EXACT match is a lookup that
@@ -160,7 +160,7 @@ NEVER INVENT. The files say this in every section and it bears repeating once:
 a silence in the source is written as QQ, never filled from general knowledge.
 A wrong "whole milk" or a wrong glass looks exactly as confident as a right
 one, and Helen would far rather answer a question than find an invention. On a
-drink, a generic is typed only on an EXACT match in the printed vocabulary and
+cocktail recipe, a generic is typed only on an EXACT match in the printed vocabulary and
 is otherwise "QQ" plus the source's own words; every suggestion is []; mood is
 [], ship is "who knows", made_before is false — always, by her standing ruling.
 Every tagline begins "QQ ", on either site: it is her voice on a published page

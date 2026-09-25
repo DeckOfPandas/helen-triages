@@ -1,4 +1,4 @@
-# PIPELINE — how a recipe or drink gets in, gets Helen's words, gets out, and comes back
+# PIPELINE — how a recipe gets in, gets Helen's words, gets out, and comes back
 
 Written 2026-09-14 for #1008, Helen: *"I want this process to be as smooth as
 possible. We've reinvented this hundreds of ways together recently, which is
@@ -38,7 +38,7 @@ flowchart TD
     I -->|"/ingest-inbox"| P
     T -->|"/ingest"| P
 
-    P["THE INTAKE PASS (Claude, one sitting)<br/>save on a branch · derive moods (drinks) ·<br/>tidy · pytest · pre-flight · ONE list for Helen<br/>Tier 1 done unasked · Tier 2 as proposals · Tier 3 never"]:::claude
+    P["THE INTAKE PASS (Claude, one sitting)<br/>save on a branch · derive moods (cocktails) ·<br/>tidy · pytest · pre-flight · ONE list for Helen<br/>Tier 1 done unasked · Tier 2 as proposals · Tier 3 never"]:::claude
 
     P --> POOL
 
@@ -93,11 +93,11 @@ Helen sends material three ways and the difference is TRANSPORT only:
 
 Whichever door, **the same intake pass runs once, in one sitting, and ends in
 ONE list for Helen.** In order: save the file on a branch of the private repo
-(never its `main`); for a drink, `python3 scripts/derive_cocktail_moods.py
+(never its `main`); for a cocktail recipe, `python3 scripts/derive_cocktail_moods.py
 --write`; `/tidy-drafts` if the quoting or typography needs it; `pytest`;
 `python3 scripts/ingest_preflight.py`; then the list — every rejection, every
 probable duplicate, every hand-back bullet, every undeclared bottle, grouped by
-decision. Not a question at a time: a gap found on the fourth drink is one line
+decision. Not a question at a time: a gap found on the fourth recipe is one line
 Helen reads once.
 
 **What is transformed at intake, without asking** (`ingest.md` TIER 1 is the
@@ -111,7 +111,7 @@ authority; this is the summary):
 - the citation per `SOURCE_ATTRIBUTION_SPEC.md`; the slug from the whole title;
 - **food: every method step as a `QQ original` / `QQ Claude` pair** — the
   verbatim line kept untidied, the paraphrase held to house style;
-- **drinks: millilitres, canonical method steps, `serve.ice` rather than a
+- **cocktails: millilitres, canonical method steps, `serve.ice` rather than a
   step, no `Express…` step, `generic` typed only on an exact match in the
   vocabulary and otherwise `QQ` plus the source's own words, `suggestion: []`**,
   moods derived.
@@ -132,13 +132,13 @@ file, which no flag can say. Since 2026-09-14 both sites use the same set,
 **numbered in pipeline order so they sort to the top of her file list in the
 order a file travels** — her ask: *"I'd like each subfolder to appear in order
 at the top of my files list -- small usability tweak for future-Helen. So
-shall we try 1-rewrite, 2-make, and so on?"* Drinks have no `1-rewrite/` and
+shall we try 1-rewrite, 2-make, and so on?"* Cocktails have no `1-rewrite/` and
 keep the same numbers for the rest, so one name means one stage on both sites.
 
-| folder | food | drinks | means |
+| folder | food | cocktails | means |
 |---|---|---|---|
 | pool (the root) | ✓ | ✓ | ingested; nobody has touched it since |
-| `1-rewrite/` | ✓ | — | she has picked it and will rewrite it next. Drinks skip this stage — *"they're not as annoying as food recipes"* (was `to-rewrite/`) |
+| `1-rewrite/` | ✓ | — | she has picked it and will rewrite it next. Cocktails skip this stage — *"they're not as annoying as food recipes"* (was `to-rewrite/`) |
 | `2-make/` | ✓ | ✓ | readable enough to make from (was `to-cook/`) |
 | `3-keep/` | ✓ | ✓ | made and liked, and she is NOT rewriting it yet — the intermediate state #429 said did not exist and now does |
 | `4-promote/` | ✓ | ✓ | her words are in; waiting on the mechanical pass, then her proofread (was `to-promote/`) |
@@ -146,7 +146,7 @@ keep the same numbers for the rest, so one name means one stage on both sites.
 
 **`5-final-proofread/` IS THE ONLY FOLDER AN AGENT PUTS A FILE IN**, and it
 exists because `4-promote/` stopped answering one question. Helen asked for it
-on 2026-09-18, after a seventeen-drink batch came back with ten of them
+on 2026-09-18, after a batch of seventeen cocktail recipes came back with ten of them
 needing a ruling: *"we're going to need a fifth folder in _drafts, something
 like 5-final-proofread, to hold recipes I wanted to promote but you
 (reasonably) bounced back."* It is the same argument that made her delegate
@@ -156,15 +156,15 @@ to find out which I still need to proofread"* — applied one stage earlier.
 goes back to `4-promote/` on `ready ‹slug›` once she has ruled.
 
 **IT IS THE PUBLISHED TENSE, exactly as `4-promote/` is** (`STAGED_DIRS` in
-`tests/test_cocktails.py`): a drink got here BY being staged and goes live the
+`tests/test_cocktails.py`): a cocktail recipe got here BY being staged and goes live the
 moment she rules, so the rules that bite at promotion — a bottle's canonical
 name rather than an alias, and no `QQ` left anywhere — bite here too. Leaving it
 out of that constant would have been silent: those tests would simply have
-stopped applying to the drinks that sit longest in a folder while being edited.
+stopped applying to the cocktail recipes that sit longest in a folder while being edited.
 (The `no item` rule was the third of them until 2026-09-21, when the field was
 retired outright and the whole check with it.)
 
-**Drinks only for now.** Food has not hit the same pile-up, and an empty
+**Cocktails only for now.** Food has not hit the same pile-up, and an empty
 folder on a site that does not use it is clutter Helen sees every day.
 
 **Claude may move a file between folders on her word** (2026-09-14, reversing
@@ -180,7 +180,7 @@ the chat or in an issue, each followed by one or more slugs:
 | `bin ‹slug›` | deletes it from the private repo — made and disliked |
 
 **The fifth folder needs no word of hers, because the move is Claude's.** A
-drink lands in `5-final-proofread/` when the mechanical pass finishes and
+cocktail recipe lands in `5-final-proofread/` when the mechanical pass finishes and
 something in it still needs her — an undeclared garnish, a generic nobody has
 coined, a choice between two shapes. That move goes in the same commit as the
 list of what it is waiting for, so the folder and the list never disagree.
@@ -212,12 +212,14 @@ follow it since 2026-09-14 (food used to have no written procedure for this).
 2. **Claude runs the mechanical pass**: `rewritten: true`; suite green
    (spellings the vocabularies declare, missing keys, dashes, canonical bottle
    names, list-shaped `suggestion`s, no `QQ` left anywhere); never a tagline, a
-   note's words, a method's words or an amount. One list of the non-mechanical things,
+   note's words, a method's words or an amount — except a note that a later
+   ruling of Helen's has made false, which an agent may correct or delete,
+   naming the ruling (#1078, 2026-09-24). One list of the non-mechanical things,
    grouped by decision. Commit, push.
 3. **Claude says `final: ‹slugs›`**, and **moves anything still needing a
-   ruling into `5-final-proofread/`** (drinks). Until that word the served
+   ruling into `5-final-proofread/`** (cocktails). Until that word the served
    pages are work in progress and not for proofreading; after it, the two
-   folders say who each drink is waiting on without anyone having to re-read
+   folders say who each cocktail recipe is waiting on without anyone having to re-read
    the list.
 4. **Helen proofreads the rendered page** at `/…/drafts/4-promote/‹slug›/`
    and sets `proofread: true`, or names the slugs and Claude sets it on her
@@ -244,7 +246,7 @@ in three sizes, hers to rule:
 | a word or a number | **asks first.** She may grant the change WITHOUT the flip — then it lands as a baseline move, in a commit of its own, quoting her, and she is still the last judgement because she granted it. (`HELEN_CLEARED`, the per-recipe exemption list, was deleted 2026-09-20: it matched on filename and so never expired.) |
 | **a DERIVED value, across a batch** | **flips the flags, then tells her what the batch was and offers her the grant.** Added 2026-09-20 (#1127). See below — this is the row that covers a re-derivation, and the one where the pages may never go dark at all |
 | anything else | flips the flag, leaves the file in the public repo (the gate hides it), and **raises ONE issue for the whole batch, labelled `blocked-on-helen`**: title `proofread: ‹N› pages off the site — ‹batch›`, body giving what changed and why, then a checklist of every demoted page with its local URL. She closes it by flipping the flags in a commit with `Fixes #N` |
-| something big is wrong | deletes the file from the public repo and re-adds it to the private repo — `5-final-proofread/` for drinks if it needs a ruling from her, `4-promote/` if it only needs the mechanical pass — with the same issue, so it goes back through §4 |
+| something big is wrong | deletes the file from the public repo and re-adds it to the private repo — `5-final-proofread/` for cocktails if it needs a ruling from her, `4-promote/` if it only needs the mechanical pass — with the same issue, so it goes back through §4 |
 
 **The issue is the signal, and it replaces the build-log line as the thing she
 can see.** `blocked-on-helen` exists on the public repo already.
@@ -282,7 +284,7 @@ checking something else. Pass `origin/main` to ask about the live site rather
 than the working tree, and fetch first.
 
 **A DERIVED VALUE IS THE THIRD SIZE, AND IT ARRIVES FIFTEEN FILES AT A TIME.**
-Added 2026-09-20 (#1127), when `no measuring` landed on 15 published drinks at
+Added 2026-09-20 (#1127), when `no measuring` landed on 15 published cocktail recipes at
 once. The first row's "ask first" does not fit — the change is a re-run of a
 script, not a word, and there is nothing to quote her until it has run. The
 third row fits mechanically — since the batch rule above, one issue covers a
@@ -335,12 +337,12 @@ Listed so the map is honest about which lines are drawn and which are paved.
 - [x] The folders exist in both private repos, always (#1080, 2026-09-15).
       Helen: *"These folders should always be present even if they don't
       contain any drafts."* So each holds a `.gitkeep` (food: `1-rewrite/`,
-      `2-make/`, `3-keep/`, `4-promote/`; drinks: the last three) rather than
+      `2-make/`, `3-keep/`, `4-promote/`; cocktails: the last three) rather than
       appearing on first use, and `tests/test_staging_folders.py` fails locally
       when a clone is missing one (it skips in CI, where the drafts are
       absent). The old `to-rewrite/`, `to-cook/` and `to-promote/` names were
       already gone from both `main`s by then. **`5-final-proofread/` joined on
-      the drinks side 2026-09-18, with its own `.gitkeep`** — so drinks now
+      the cocktails side 2026-09-18, with its own `.gitkeep`** — so cocktails now
       hold four and food still holds four, but not the same four.
 - [x] `scripts/needs_helen.py`: the flip and the issue body, for §5. Built
       2026-09-14, in the same commit that wrote this map; this box was left

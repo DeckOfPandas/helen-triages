@@ -52,6 +52,18 @@
 # the layout declines to print a figure for it. A number known to be wrong is
 # worse than no number -- the same judgement `cocktail-scale.js` made when it
 # deleted the millilitre box rather than fixing it.
+#
+# AND SINCE 2026-09-24 THOSE POURS CAN BE PRICED -- #748, Helen's ruling of
+# 2026-09-06: "Price whole fruit and weighed solids." A COUNTED pour (`1 whole`,
+# `4 whole`, `1.5 each`, `9 each`, `5 cubes`, `half`) of a generic with a row
+# in costs.yml `fruit_prices:` costs that many fruit; a WEIGHED pour (`25 g`)
+# of a generic with a row in `weight_prices:` costs that fraction of a kilo.
+# Both are additive: a count or weight with no row is exactly the flourish it
+# was before, so the sugar-cube punches keep their figures and the completeness
+# rule above is untouched. What changes is that the Bellini's pear and the
+# Caipirinha's lime and sugar are now PRICED pours rather than excluded ones,
+# so both drinks print a figure -- the Bellini's being the cost of its batch
+# syrup plus one top, which its own `portioning` note says is 3-4 orders.
 # =============================================================================
 
 require "set"
@@ -69,6 +81,11 @@ module HelenTriages
     # mint leaf are flourishes; four apricots are lunch. Only these mark a drink
     # incomplete -- see the `cost_complete` note above.
     SUBSTANTIAL = /\A\s*[\d.]+\s*(whole|g|each|cubes?)\b|\Ahalf\z/
+
+    # #748. A pour counted in one of these is priced per PIECE from
+    # `fruit_prices`, when its generic has a row there; `half` is half a piece.
+    COUNTED = /\A\s*([\d.]+)\s+(whole|each|cubes?)\s*\z/
+    WEIGHED = /\A\s*([\d.]+)\s+g\s*\z/
 
     def generate(site)
       @costs  = site.data.dig("cocktails", "costs")
@@ -140,6 +157,16 @@ module HelenTriages
         end,
         "bottles" => @costs["bottles"].keys.each_with_object({}) do |n, h|
           r = bottle_rate(n) and h[n] = r
+        end,
+        # #748. GBP per PIECE and GBP per KILO, so a shopping-list line reading
+        # "2 whole pear" or "50 g honey" can be priced by the same
+        # multiply-and-nothing-else the volumes get. Same shape as `generics`:
+        # a [lo, hi] pair per generic, and a generic absent here has no price.
+        "fruit" => (@costs["fruit_prices"] || {}).each_with_object({}) do |(g, f), h|
+          r = piece_rate(f) and h[g] = r
+        end,
+        "weight" => (@costs["weight_prices"] || {}).each_with_object({}) do |(g, w), h|
+          r = kilo_rate(w) and h[g] = r
         end
       }
       site.data["cocktails"]["rates"] = rates
@@ -157,6 +184,45 @@ module HelenTriages
       c = @costs["bottles"][name]
       return nil unless c && c["gbp"] && c["size_ml"].to_f.positive?
       1000.0 * c["gbp"].to_f / c["size_ml"].to_f
+    end
+
+    # [min, max] GBP per PIECE for a `fruit_prices` row, or nil. #748.
+    def piece_rate(row)
+      return nil unless row.is_a?(Hash) && row["gbp_min"] && row["gbp_max"]
+      [row["gbp_min"].to_f, row["gbp_max"].to_f]
+    end
+
+    # [min, max] GBP per KILO for a `weight_prices` row, or nil. #748.
+    def kilo_rate(row)
+      return nil unless row.is_a?(Hash) && row["gbp_per_kg_min"] && row["gbp_per_kg_max"]
+      [row["gbp_per_kg_min"].to_f, row["gbp_per_kg_max"].to_f]
+    end
+
+    # #748. What a counted or weighed pour of these generics costs, as
+    # [min, max] GBP, or nil when the amount is neither or no generic has a row
+    # -- in which case the caller treats it exactly as it did before this
+    # existed. A generic written as a list spans every member that has a row,
+    # the way `generic_rate` spans a list's members.
+    def solid_cost(amount, generics)
+      if amount == "half"
+        pieces = 0.5
+        table = @costs["fruit_prices"] || {}
+        rate_of = ->(row) { piece_rate(row) }
+      elsif (m = COUNTED.match(amount))
+        pieces = m[1].to_f
+        table = @costs["fruit_prices"] || {}
+        rate_of = ->(row) { piece_rate(row) }
+      elsif (m = WEIGHED.match(amount))
+        pieces = m[1].to_f / 1000.0
+        table = @costs["weight_prices"] || {}
+        rate_of = ->(row) { kilo_rate(row) }
+      else
+        return nil
+      end
+
+      rates = generics.filter_map { |g| rate_of.call(table[g]) }
+      return nil if rates.empty?
+      [pieces * rates.map(&:first).min, pieces * rates.map(&:last).max]
     end
 
     # [min, max] GBP per litre for a generic, or nil if nothing prices it.
@@ -302,6 +368,15 @@ module HelenTriages
         else
           ml = volume_ml(amount)
           if ml.nil?
+            # A COUNTED FRUIT OR A WEIGHED SOLID WITH A PRICE ROW IS A PRICED
+            # POUR -- #748. It has no millilitres and no per-litre rate, so it
+            # is added here rather than through the rate arithmetic below.
+            if (solid = solid_cost(amount, generics))
+              min += solid.first
+              max += solid.last
+              priced += 1
+              next
+            end
             # Excluded. Only an INGREDIENT-sized exclusion is even a candidate
             # for spoiling the total; see `substantial >= priced` below.
             substantial += 1 if SUBSTANTIAL.match?(amount)
@@ -358,10 +433,13 @@ module HelenTriages
         # AND THAT WAS WRONG: it hid 11 of 124, including five punches whose
         # only sin was a dozen sugar cubes (about 7p against a GBP 12 bowl).
         # Losing a good number to protect against a rounding error is the same
-        # trade in reverse. Two drinks fail this test and both deserve to --
-        # the Bellini (2 priced, 4 excluded: a pear, four apricots, 75 g sugar,
-        # 25 g honey) and the Caipirinha (1 priced, 2 excluded: half a lime and
-        # 20 g of palm sugar). In both, what is missing IS the drink.
+        # trade in reverse. Two drinks failed this test until 2026-09-24 and
+        # both deserved to -- the Bellini (2 priced, 4 excluded: a pear, four
+        # apricots, 75 g sugar, 25 g honey) and the Caipirinha (1 priced, 2
+        # excluded: half a lime and 20 g of palm sugar). In both, what was
+        # missing WAS the drink -- which is why #748 priced exactly those pours
+        # (`solid_cost` above), and both now pass. The rule stays for the next
+        # drink whose solids nobody has priced yet.
         "complete" => substantial < priced,
         "priced"   => priced,
         "excluded" => substantial,

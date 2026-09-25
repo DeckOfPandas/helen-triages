@@ -155,7 +155,7 @@ Rules the consumer enforces:
   ingredient order, `|`-separated. The consumer builds the same line from the
   parsed file and from every existing draft, so the duplicate check compares
   formulas, not titles, the way §6 of the cocktail document already demands.
-  A drink whose fingerprint matches an existing draft's is reported as a
+  A recipe whose fingerprint matches an existing draft's is reported as a
   probable duplicate and NOT written; one whose title matches but whose
   fingerprint differs is written under a disambiguated slug and reported as
   the Sazerac case.

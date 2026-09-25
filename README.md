@@ -98,7 +98,7 @@ Three ways in:
 
 Then an intake pass results in ONE list of questions for me. Anything the source doesn't say is `QQ`.
 
-The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/` (food only because cocktails are usually less garbage on the way in), `2-make/`, `3-keep/`, `4-promote/`, and for drinks `5-final-proofread/`.
+The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/` (food only because cocktails are usually less garbage on the way in), `2-make/`, `3-keep/`, `4-promote/`, and for cocktails `5-final-proofread/`.
 
 Then Claude does a mechanical pass on what's in `4-promote`, then I proofread the rendered page, Claude promotes it in a PR, I merge, and the merge deploys.
 
@@ -222,7 +222,7 @@ Mitigations:
 ### Don't publish anything I haven't proofread.
 
    - Publish gate (`_plugins/publish_gate.rb`): content goes live only with `proofread: true` and `awaiting_fix: false` -- a missing or misspelled flag blocks it
-   - Tests `test_agent_edited_recipes_are_not_marked_proofread` and `test_agent_edited_drinks_are_not_marked_proofread` read history -- if Claude's commit is the newest on a recipe or drink, the file must say `proofread: false`
+   - Tests `test_agent_edited_recipes_are_not_marked_proofread` and `test_agent_edited_drinks_are_not_marked_proofread` read history -- if Claude's commit is the newest on a food or cocktail recipe, the file must say `proofread: false`
    - CI runs the tests before deployment
 
 ### Dear future Helen

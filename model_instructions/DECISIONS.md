@@ -2497,6 +2497,28 @@ unless stated.
   subtler line than `costs.yml`'s header currently draws and should be written
   there when this lands.
 
+- **2026-09-24, #748 built, and #747's six unapplied prices.** The 2026-09-06
+  ruling had been recorded as "rows in costs.yml and nothing else" and was not:
+  `volume_ml` returned nil for a count or a weight, so a row alone priced
+  nothing. Built as two new tables read by generic name — `fruit_prices` per
+  PIECE (pear, dried apricots, passion fruit, blackberries, raspberries,
+  cucumber by the wheel, pineapple by the cube; the four citrus rows already
+  there now serve both the squeezed juice and a counted `half`) and a new
+  `weight_prices` per KILO (honey, golden caster sugar, palm sugar) — with
+  `solid_cost` in the plugin, `fruit`/`weight` maps in the shopping list's rate
+  table, and `linePrice` summing whatever parts of a line have a rate.
+  **Additive on purpose**: a count or weight with no row is the flourish it was,
+  so the sugar-cube punches and `cost.complete` are untouched; the Bellini and
+  the Caipirinha simply stop being incomplete. **Two things for Helen to
+  reverse if wrong**: sugar BY WEIGHT is priced (the ruling says "weighed
+  solids"; the 2026-09-05 exclusion was the cube), and the Bellini's figure is
+  its batch syrup plus one top, which its own note says is 3–4 orders. The
+  fruit and weight figures are estimates from UK supermarket prices with a
+  `basis` each; none is hers yet. Her 2026-09-14 prices on #747: six of eight
+  had never been applied (Rooster Reposado 26, Añejo 36, Sapin 40, La Tomato
+  24, Flaggpunsch 21 as the category row's basis, Ceylon Arrack 35 and made
+  the category's default); Pusser's 151 and Ciroc already were.
+
 - **2026-09-07, #818** — **The shopping list's bottle choice is per drink, not
   once for the whole list.** Asked which, given a generic with several declared
   bottles: *"per drink"*. So two drinks that both pour a reposado may choose
@@ -4474,6 +4496,17 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   the generated documents had gone stale. Only `scripts/verify.py` runs those;
   MANUAL §1 calls them "the two checks that get forgotten" and it is right.
   Caught before a push, so it cost a round trip.
+- **2026-09-24, #1078** — **An agent may correct or delete a note that a
+  later ruling of Helen's has made false.** Asked as #745's general question
+  (two notes on `sazerac-death-and-co.md` still said the Ferrand 1840 was a
+  different bottle after her 2026-09-05 ruling that it is the Ambré; the
+  mechanical pass "never touches a note's words", so the page rendered her own
+  ruling's contradiction). Helen: *"#1078: yes."* Written into
+  `PUBLISHING_A_DRINK.md` step 2, `PIPELINE.md` §4 step 2 and MANUAL §11.0.2.
+  The boundary is the RULING: a note she has not ruled on, or a `QQ`, stays
+  hers. By the time this was written the Sazerac notes themselves were already
+  gone (the pour now names the bottle and nothing else), so the ruling lands
+  as policy only.
 - **2026-09-19** — **A gate that fails closed makes a held page look exactly
   like nothing going wrong.** Promoted drinks must be asserted BY NAME in the
   production build, not merely copied and committed. Doing so turned up
