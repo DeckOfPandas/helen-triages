@@ -7236,6 +7236,40 @@ verification. Dates are when the correction landed.
   one-off missing space would have read as this page being slightly wrong rather
   than as a decision.
 
+- **2026-09-24 — the design audit's four rulings, and the diagnosis behind
+  them.** Asked *"I still have design issues, both visual and use flow, but I
+  can't really put my finger on what bothers me any more"*, the session looked
+  at both indexes, a recipe, a drink and about at 390 and 1280 and named three
+  candidates, in order of confidence: **the device count** (the page has a
+  colour budget, §13.2, and no device budget — a five-ingredient recipe carries
+  about thirteen distinct treatments, each chosen alone on its own candidates
+  page, and nobody had looked at the sum); **the fork sits at the control
+  layer, not the content layer** (identical chrome, then chips and inputs that
+  differ in anatomy between sites, so flipping through the header door reads as
+  inconsistency rather than personality); and **phone was not a decided
+  target** (the food panel is 815px tall on a 390px phone before the count
+  line). Her rulings, in her words:
+  - *"That candidates page sounds fascinating, yes please do it."* — the recipe
+    page at three device budgets (all / eight / five), built as an Artifact so
+    she can look. Nothing shipped from it yet.
+  - *"I've given in, and phone does matter to me, I just won't prioritise it
+    over iPad/desktop. But we don't strictly need to prioritise, do we."* —
+    phone is a target; not a priority. Phone issues stay fileable.
+  - *"Let's bump to four related cards for cocktails."* — the drink page's
+    two-column card grid orphaned the third; `limit: 4`, the test and
+    `related_drinks.py` follow, and every published drink's fourth pick still
+    scores above zero (the weakest, Gunmetal Blue, shares 2). Food stays at
+    three.
+  - *"If you think IF YOU LIKED THIS should join INGREDIENTS and METHOD at
+    first level then yes, okay, I hear it, please do it."* — the heading wears
+    the absinthe-over-violette double rule, same as those two; no new hue. It
+    is a sentence, so it takes the last-line variant of the mixin (#920) and
+    joins `last-line-rule.js`'s targets. This reverses the layout comment's
+    "has not earned one" argument, which stood from #927.
+  - *"Keen to hear ideas for styling N survivors."* — asked, not ruled; the
+    ideas were offered in chat and none is built. §13.7's "I liked it bare"
+    stands until she looks at a candidate.
+
 ## §14 Reference pages
 
 - **2026-08-11/12** — Built at Helen's request from 15 draft tables in
