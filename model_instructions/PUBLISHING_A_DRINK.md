@@ -60,7 +60,13 @@ turn that made it.
    a hyphen that should be an en dash, a house name where a bottle belongs, an
    alias where the canonical name belongs, a scalar `suggestion` that should be
    a list — and never
-   touches a tagline, a note's words, a method's words or an amount. Commits and
+   touches a tagline, a note's words, a method's words or an amount. **One
+   exception, Helen's ruling on #1078 (2026-09-24): a note that a LATER ruling
+   of hers has made false may be corrected or deleted by an agent**, naming the
+   ruling in the commit — the case was two notes on a Sazerac draft still
+   saying the Ferrand 1840 was a different bottle after she had ruled it the
+   Ambré (#745). A note that is merely unconfirmed, or that she has not ruled
+   on, is still hers. Commits and
    pushes. **The full boundary is in `ingest.md` under "Fixing a draft the
    suite is complaining about"; the two say the same thing on purpose.**
 3. **Claude lists the non-mechanical things**, one line each, and Helen rules

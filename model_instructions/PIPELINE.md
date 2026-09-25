@@ -212,7 +212,9 @@ follow it since 2026-09-14 (food used to have no written procedure for this).
 2. **Claude runs the mechanical pass**: `rewritten: true`; suite green
    (spellings the vocabularies declare, missing keys, dashes, canonical bottle
    names, list-shaped `suggestion`s, no `QQ` left anywhere); never a tagline, a
-   note's words, a method's words or an amount. One list of the non-mechanical things,
+   note's words, a method's words or an amount — except a note that a later
+   ruling of Helen's has made false, which an agent may correct or delete,
+   naming the ruling (#1078, 2026-09-24). One list of the non-mechanical things,
    grouped by decision. Commit, push.
 3. **Claude says `final: ‹slugs›`**, and **moves anything still needing a
    ruling into `5-final-proofread/`** (drinks). Until that word the served

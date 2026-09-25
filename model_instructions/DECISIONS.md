@@ -4474,6 +4474,17 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   the generated documents had gone stale. Only `scripts/verify.py` runs those;
   MANUAL §1 calls them "the two checks that get forgotten" and it is right.
   Caught before a push, so it cost a round trip.
+- **2026-09-24, #1078** — **An agent may correct or delete a note that a
+  later ruling of Helen's has made false.** Asked as #745's general question
+  (two notes on `sazerac-death-and-co.md` still said the Ferrand 1840 was a
+  different bottle after her 2026-09-05 ruling that it is the Ambré; the
+  mechanical pass "never touches a note's words", so the page rendered her own
+  ruling's contradiction). Helen: *"#1078: yes."* Written into
+  `PUBLISHING_A_DRINK.md` step 2, `PIPELINE.md` §4 step 2 and MANUAL §11.0.2.
+  The boundary is the RULING: a note she has not ruled on, or a `QQ`, stays
+  hers. By the time this was written the Sazerac notes themselves were already
+  gone (the pour now names the bottle and nothing else), so the ruling lands
+  as policy only.
 - **2026-09-19** — **A gate that fails closed makes a held page look exactly
   like nothing going wrong.** Promoted drinks must be asserted BY NAME in the
   production build, not merely copied and committed. Doing so turned up

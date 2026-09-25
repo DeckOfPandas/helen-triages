@@ -3094,6 +3094,14 @@ fifths of a drink's front matter is a closed vocabulary, somebody else's words
 or a number. `tests/test_tidy_drafts.py` asserts the whole output byte for
 byte on a fixture. A title diverging from its slug is NOT a finding on a draft.
 
+**A note that a later ruling has made false may be corrected or deleted by an
+agent** (#1078, Helen's "yes", 2026-09-24). The boundary is the ruling, not the
+note: a `note:` whose claim Helen has since ruled against — a bottle she has
+said is the same bottle, a ratio she has since fixed — is stale prose, and
+leaving it renders her own ruling's contradiction on the page. Name the ruling
+in the commit. A note she has not ruled on, or a `QQ` awaiting her, is still
+hers, and the mechanical pass still never touches those.
+
 ### 11.0.3 `/ingest`
 
 `.claude/commands/ingest.md` over `scripts/ingest_preflight.py`: one list,
