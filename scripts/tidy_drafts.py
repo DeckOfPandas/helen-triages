@@ -8,6 +8,7 @@ report, apply, run pytest, commit there. This file is only the engine.
     python3 scripts/tidy_drafts.py                  # report, change nothing
     python3 scripts/tidy_drafts.py --apply          # write the fixes
     python3 scripts/tidy_drafts.py --only quoting,meta
+    python3 scripts/tidy_drafts.py --only size      # #577's pass, food only
     python3 scripts/tidy_drafts.py --site cocktails # one collection only
 
 WHY A SCRIPT AND NOT AN AGENT EDITING 340 FILES. Three of these rules have a
@@ -41,9 +42,13 @@ WHAT IT WILL NOT DO, AND THIS IS THE LOAD-BEARING HALF.
 SCOPE SETTLED WITH HELEN, 2026-08-29: pure formatting, plus the #429 `meta:`
 migration. It also reported title/slug divergence until 2026-09-01, when she
 ruled that out; the entry above says why. Size words (108 drafts, moving a word
-between `amount:` and `item:`) were considered and excluded -- mechanical in
-shape, but it rewrites two fields per hit and the precedent records real fixes
-that needed an eye.
+between `amount:` and `item:`) were considered and excluded that day --
+mechanical in shape, but it rewrites two fields per hit and the precedent
+records real fixes that needed an eye. THEY JOINED ON 2026-09-24, as #577's
+option 1 -- "Script it with a hand-review of the diff, one commit, before
+promotion" -- Helen's call. The `size` rule below does the move only where the
+suite's own predicate fires, refuses the shapes that needed the eye, and the
+diff of the one commit is the review.
 
 COCKTAIL DRAFTS JOINED THE PASS ON 2026-09-05, at Helen's request: *"Widen
 please -- cocktail drafts passing will save me a lot of time."* They were out
@@ -146,6 +151,10 @@ from conftest import (  # noqa: E402
 from test_cocktails import (  # noqa: E402
     DRINK_SCALAR_FIELDS, VERBATIM_KEYS, _checkable as drink_suite_scope,
 )
+# The size-word pattern is the recipe rule's own (#149, #577). The 2026-09-01
+# re-measurement on #577 already imported it rather than retyping it, for the
+# reason this section's heading gives; the fixer does the same.
+from test_style import _LEADING_SIZE_WORD  # noqa: E402
 
 FLOW_FIELDS = ["main_ingredients", "tags"]
 
@@ -618,6 +627,196 @@ def fix_meta_block(text, path):
     return open_ + "\n".join(lines) + close + body, changed
 
 
+# =============================================================================
+# THE SIZE WORD, #577 -- excluded 2026-08-29, scripted 2026-09-24
+# =============================================================================
+# `amount: "2"` / `item: "large onions"` renders the "2" highlighted and the
+# "large" as part of the ingredient's name; the recipe rule
+# (test_style.test_size_word_is_with_the_count_not_the_item, issue #149) wants
+# `amount: "2 large"` / `item: "onions"`. The 2026-08-29 tidy left it out
+# because it rewrites two fields per hit and #149's own fix needed an eye on
+# five of them. On 2026-09-24 Helen chose the issue's option 1: script it, hand-
+# review the diff, one commit, before promotion. So the script is deliberately
+# CONSERVATIVE: every shape that ever needed the eye is refused and named, and
+# the diff the reviewer reads holds only the moves nobody has yet found wrong.
+#
+# THE PREDICATE IS THE TEST'S, BOTH HALVES. `_LEADING_SIZE_WORD` is imported
+# above; the "bare count" half is inline in the test --
+# `re.fullmatch(r"\d+", amount)` -- and BARE_COUNT spells it character for
+# character. The test stops at a bare integer on purpose (its module comment):
+# `400 g` / `large open mushrooms` reads fine with the size as an adjective,
+# `½` / `small bunch of chives` likewise, and a `small handful of parsley` with
+# no amount at all IS the amount. None of those is moved, and only the last is
+# reported, because it is the one a reader of the diff would otherwise take for
+# a miss.
+#
+# WHAT IT REFUSES, EACH NAMED IN THE REPORT RATHER THAN GUESSED AT:
+#   - no `amount:`, or an empty one: no count to attach the word to. Surfaced
+#     by `report_size_words_with_no_count`, never rewritten. All 38 on
+#     2026-09-24 were the handful/bunch idiom the test calls the amount.
+#   - a remainder starting `or`: `1` / `large or 2 small onions` carries a
+#     second count inside the item, and `1 large` / `or 2 small onions` is
+#     worse than what was there. Three drafts. An eye, not a rule.
+#   - `baby`: the regex has it, and it is a KIND as often as a size -- baby
+#     gem, baby corn, baby spinach, baby plum tomatoes. DECISIONS §6 records
+#     Helen's ruling that `baby gem` is a kind, and a script that strips it
+#     produces `2 baby` / `gem lettuce`, which passes the test and is wrong.
+#     Skipped and named, for the reviewer to move by hand if she wants it.
+#   - an escape or an inner quote in either value, or a bare item whose
+#     remainder would start with a YAML indicator: rewrapping it is a
+#     judgement about the text, the same line fix_scalar_quoting draws.
+#
+# BYTE-PRESERVING BY CONSTRUCTION. It touches exactly two lines per hit, keeps
+# each line's indentation, gap and quote style, and never goes through a
+# dumper. `tests/test_tidy_drafts.py` proves the whole file byte for byte.
+BARE_COUNT = re.compile(r"\d+")
+KEYED_LINE = re.compile(
+    r"^(?P<lead>\s*(?:-\s+)?)(?P<key>amount|item):(?P<gap>[ \t]*)"
+    r"(?P<value>.*?)(?P<trail>[ \t]*)$"
+)
+LIST_ENTRY = re.compile(r"^(?P<dash>\s*-\s+)\S")
+# What a bare (unquoted) scalar may not start with -- the YAML indicators.
+YAML_INDICATORS = set("-?:,[]{}#&*!|>'\"%@`")
+
+
+def _ingredient_pairs(lines):
+    """(item line index, amount line index or None) for every list entry that
+    carries an `item:` key of its own.
+
+    An entry is a `- ` line plus the lines indented deeper than its dash; its
+    own keys sit at the column the dash line's key starts in, so a nested
+    mapping's `item:` (deeper) and the enclosing group's (shallower) are both
+    left to their own entries. `ingredient_groups:` is a list of groups each
+    holding a list of items, and this is what stops the group entry -- which
+    spans every item under it -- from claiming the first item's lines.
+    """
+    for i, line in enumerate(lines):
+        m = LIST_ENTRY.match(line)
+        if not m:
+            continue
+        indent = len(m.group("dash")) - len(m.group("dash").lstrip())
+        col = len(m.group("dash"))
+        found = {}
+        j = i
+        while j < len(lines):
+            probe = lines[j]
+            if j > i and probe.strip() and len(probe) - len(probe.lstrip()) <= indent:
+                break
+            keyed = KEYED_LINE.match(probe)
+            if keyed and len(keyed.group("lead")) == col:
+                found.setdefault(keyed.group("key"), j)
+            j += 1
+        if "item" in found:
+            yield found["item"], found.get("amount")
+
+
+def _unwrap(value):
+    """(inner text, quote char or '') -- or None when rewrapping is not safe."""
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        inner = value[1:-1]
+        if value[0] in inner or "\\" in inner:
+            return None
+        return inner, value[0]
+    if value[:1] in ("\"", "'") or " #" in value:
+        return None
+    return value, ""
+
+
+def _rebuild(keyed, value):
+    return (keyed.group("lead") + keyed.group("key") + ":" + keyed.group("gap")
+            + value + keyed.group("trail"))
+
+
+def fix_size_words(text, path):
+    """`amount: "2"` + `item: "large onions"` -> `amount: "2 large"` + `item: "onions"`.
+
+    Only where the suite's predicate fires -- a bare integer count beside an
+    item starting with a size word -- and never in the shapes the section
+    comment above lists, each of which is SKIPPED and says so.
+    """
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    lines = fm.split("\n")
+    changed = []
+    for item_i, amount_i in _ingredient_pairs(lines):
+        item_line = lines[item_i]
+        if is_qq(item_line):
+            continue
+        item_m = KEYED_LINE.match(item_line)
+        if not _LEADING_SIZE_WORD.match(item_m.group("value").lstrip("\"'")):
+            continue
+        if amount_i is None or is_qq(lines[amount_i]):
+            continue                    # the reporter's, not a fix
+        amount_m = KEYED_LINE.match(lines[amount_i])
+        amount = _unwrap(amount_m.group("value"))
+        if amount is not None and not amount[0].strip():
+            continue                    # empty: the reporter's, not a fix
+        if amount is None or not BARE_COUNT.fullmatch(amount[0]):
+            if amount is None:
+                changed.append(f"SKIPPED: amount cannot be rewrapped safely: "
+                               f"{amount_m.group('value')[:40]}")
+            continue                    # a weight, a fraction: not this bug
+        item = _unwrap(item_m.group("value"))
+        if item is None:
+            changed.append(f"SKIPPED: item cannot be rewrapped safely: "
+                           f"{item_m.group('value')[:50]}")
+            continue
+        inner, quote = item
+        m = _LEADING_SIZE_WORD.match(inner)
+        size, rest = m.group(1), inner[m.end():]
+        if size.lower() == "baby":
+            changed.append(f"SKIPPED: `baby` is a kind as often as a size "
+                           f"(DECISIONS §6), needs an eye: {inner[:50]}")
+            continue
+        if rest.lower().startswith("or "):
+            changed.append(f"SKIPPED: a second count inside the item, needs "
+                           f"an eye: {amount[0]} / {inner[:50]}")
+            continue
+        if not rest or (not quote and rest[0] in YAML_INDICATORS):
+            changed.append(f"SKIPPED: the remainder is not a safe bare "
+                           f"scalar: {inner[:50]}")
+            continue
+        new_amount = f"{amount[0]} {size}"
+        lines[amount_i] = _rebuild(amount_m, f"{amount[1]}{new_amount}{amount[1]}")
+        lines[item_i] = _rebuild(item_m, f"{quote}{rest}{quote}")
+        changed.append(f"{amount[0]} / {inner[:40]} -> \"{new_amount}\" / "
+                       f"\"{rest[:40]}\"")
+    if not any(not c.startswith("SKIPPED") for c in changed):
+        return text, changed
+    return open_ + "\n".join(lines) + close + body, changed
+
+
+def report_size_words_with_no_count(path, text):
+    """A size word on an item with no `amount:` to carry it. Surfaced, never moved.
+
+    Every one measured on 2026-09-24 was `small handful of ...` or `small bunch
+    of ...`, which the recipe rule's own comment says is the amount and not a
+    stray adjective. It is reported anyway because a reader of the pass's diff
+    who knows 108 drafts were the wrong way round would otherwise take a
+    `small handful` that survived it for a miss.
+    """
+    parts = split_front_matter(text)
+    if not parts:
+        return []
+    lines = parts[1].split("\n")
+    found = []
+    for item_i, amount_i in _ingredient_pairs(lines):
+        if is_qq(lines[item_i]):
+            continue
+        value = KEYED_LINE.match(lines[item_i]).group("value")
+        if not _LEADING_SIZE_WORD.match(value.lstrip("\"'")):
+            continue
+        amount = "" if amount_i is None else \
+            KEYED_LINE.match(lines[amount_i]).group("value").strip("\"' ")
+        if amount:
+            continue
+        found.append(f"size word with no count to carry it, left in the "
+                     f"item: {value.strip(chr(34))[:60]}")
+    return found
+
+
 FOOD_FIXERS = [
     ("quoting", fix_scalar_quoting),
     ("quoting", fix_flow_quoting),
@@ -625,14 +824,17 @@ FOOD_FIXERS = [
     ("typography", fix_typography),
     ("accents", fix_accents),
     ("meta", fix_meta_block),
+    ("size", fix_size_words),
 ]
 
-# THE THREE MISSING ENTRIES ARE THE POINT OF HAVING TWO TABLES.
+# THE MISSING ENTRIES ARE THE POINT OF HAVING TWO TABLES.
 # `fix_flow_quoting` reads `main_ingredients` and `tags`, which no drink has;
 # `fix_meta_block` runs the #429 migration over food's three flags, and a
 # drink's `meta:` is a five-key block in its own order that nobody asked to
-# migrate. A single table with an `if site == ...` inside each fixer would have
-# been the same code and a worse place to read the answer.
+# migrate; `fix_size_words` rewrites an `amount`, which on a drink is the
+# recorded harm above, beside an `item`, which a drink retired on 2026-09-21.
+# A single table with an `if site == ...` inside each fixer would have been the
+# same code and a worse place to read the answer.
 DRINK_FIXERS = [
     ("quoting", only_where_editable(
         partial(fix_scalar_quoting, fields=DRINK_SCALAR_FIELDS))),
@@ -707,7 +909,7 @@ def report_drink_faults_left_alone(path, text):
     return found
 
 
-FOOD_REPORTERS = [report_claude_markers]
+FOOD_REPORTERS = [report_claude_markers, report_size_words_with_no_count]
 DRINK_REPORTERS = [report_claude_markers, report_drink_faults_left_alone]
 
 

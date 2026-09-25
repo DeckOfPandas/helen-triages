@@ -1,5 +1,5 @@
 ---
-description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block -- and report everything that needs Helen instead.
+description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577) -- and report everything that needs Helen instead.
 ---
 
 Helen has asked for a drafts tidy-up. Run `scripts/tidy_drafts.py`, which is the
@@ -71,9 +71,31 @@ than an oversight:
   its `°`. Reported, never auto-fixed, on either collection: a spelling is a
   word, not a character.
 
-Food's own two rules stay food's: the `main_ingredients`/`tags` flow quoting and
-the #429 `meta:` migration run on `_food_drafts/` and nowhere else. A cocktail
-recipe's `meta:` is five keys in its own order and nobody asked to migrate it.
+Food's own three rules stay food's: the `main_ingredients`/`tags` flow quoting,
+the #429 `meta:` migration and the #577 `size` rule run on `_food_drafts/` and
+nowhere else. A cocktail recipe's `meta:` is five keys in its own order and
+nobody asked to migrate it; its `amount` is never edited and its `item` was
+retired.
+
+## The size word, since 2026-09-24 (#577, Helen's option 1)
+
+`amount: "2"` / `item: "large onions, chopped"` becomes `amount: "2 large"` /
+`item: "onions, chopped"` — the recipe rule
+`test_size_word_is_with_the_count_not_the_item`, whose regex the script imports.
+It fires **only where that test would**: a bare integer count beside an item
+starting `small`/`medium`/`large`/`extra large`. A weight (`400 g large open
+mushrooms`), a fraction (`½ small bunch of chives`) and a `small handful of
+parsley` with no amount at all are left exactly as they are; the last is
+**reported**, so a survivor is not mistaken for a miss.
+
+It **refuses and names** the shapes that needed an eye when #149 was fixed by
+hand: an item whose remainder starts `or` (`1` / `large or 2 small onions` holds
+a second count), and `baby`, which is a kind as often as a size (`baby gem`,
+DECISIONS §6). Those stay for Helen, in the report, under `SKIPPED`.
+
+Helen's ruling was *"script it with a hand-review of the diff, one commit,
+before promotion"* — so `--only size` is run as its own commit in the drafts
+repo and the diff of that commit is the review.
 
 `tests/test_tidy_drafts.py` is the proof, on a fixture cocktail recipe under `tmp/` and
 never on Helen's files: it asserts the whole output byte for byte, so "fixed the
@@ -108,8 +130,9 @@ six faults" cannot pass while something also happened to the other thirty lines.
    whole safety story is that the diff afterwards shows exactly what the script
    did, and mixed in with Helen's own edits it does not.
 
-   Use `--only quoting,meta,dashes,typography,accents` to do one class at a
-   time if the full pass is too much to review in one go.
+   Use `--only quoting,meta,dashes,typography,accents,size` to do one class at
+   a time if the full pass is too much to review in one go. `size` rewrites
+   two fields per hit and is the one Helen asked to review as its own commit.
 
 5. **Verify, and not by reading the diff.** Run the suite for the half you
    touched:
@@ -151,9 +174,9 @@ six faults" cannot pass while something also happened to the other thirty lines.
   method step, a vocabulary value, an `item` or a `suggestion`. The section
   above lists them with a reason each; the script's report names the ones the
   cocktails suite will still fail on, so a decline never looks like a miss.
-- **Size words** (108 drafts, moving `large`/`medium` from `item:` to
-  `amount:`). Considered and excluded — mechanical in shape, but it rewrites two
-  fields per hit and the precedent records fixes that needed an eye.
+- **A size word the `size` rule refused** — no count to attach it to, an `or`
+  remainder, or `baby`. The section above says why each is Helen's; the
+  report names them.
 - **A draft with no `meta.awaiting_fix`** (the report names them). The flag fails closed, so
   writing `false` in asserts the recipe is fit to publish. That is Helen's to
   say, not a formatting fix.

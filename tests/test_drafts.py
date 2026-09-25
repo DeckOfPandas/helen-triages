@@ -281,7 +281,10 @@ NOT_FOR_DRAFTS = {
         "divergent on purpose -- a bare-string note is correct in a draft "
         "(the recipe rule's own docstring says so); the narrower twin "
         "test_note_dicts_have_label_and_text_when_dict is what applies here",
-    "test_size_word_is_with_the_count_not_the_item": "GAP; 108 drafts",
+    "test_size_word_is_with_the_count_not_the_item":
+        "GAP; 108 drafts, scripted 2026-09-24 as `tidy_drafts.py --only size` "
+        "(#577, option 1); what the script refuses -- an `or` remainder, "
+        "`baby` -- needs an eye",
     "test_internal_recipe_links_resolve": "GAP, mechanical; 7 drafts",
     "test_main_ingredients_egg_count_agrees": "GAP; 3 drafts",
 
