@@ -3,6 +3,11 @@ layout: default
 site_key: cocktails
 title: Glasses on cards
 sitemap: false
+# NO EXCERPT -- #129 (Helen's 2026-09-15 comment). Jekyll builds an excerpt for
+# every page from its first paragraph, and this page opens with a Liquid
+# comment block containing a blank line, so it printed "Excerpt modified in
+# _dev/card-glasses.html!" on every build. Nothing reads a page's excerpt here.
+excerpt_separator: ""
 ---
 
 {% comment %} ─────────────────────────────────────────────────────────────────
