@@ -356,7 +356,7 @@ $card-glass-scale: 10.4rem;
 // interactive content, no JavaScript click handler -- the drink's URL is in the
 // status bar, middle-click and cmd-click open a tab, and a screen reader still
 // hears one link named after the drink.
-// `test_every_published_drink_page_offers_three_other_published_drinks` counts
+// `test_every_published_drink_page_offers_four_other_published_drinks` counts
 // name links and is unmoved by this, which is the test saying the same thing.
 //
 // WHY IT IS SIZED IN vmax AND NOT `inset: 0`. `inset: 0` would be the obvious

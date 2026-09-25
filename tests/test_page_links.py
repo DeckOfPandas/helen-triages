@@ -374,9 +374,9 @@ TRUSTED_DYNAMIC = (
     # or nothing at all.
     #
     # AND IT IS CHECKED, unlike those two, which is the difference worth
-    # recording: test_every_published_drink_page_offers_three_other_published_drinks
+    # recording: test_every_published_drink_page_offers_four_other_published_drinks
     # in tests/test_rendered_pages.py reads the PRODUCTION build and asserts
-    # every one of these three hrefs lands on a published drink page. That is
+    # every one of these four hrefs lands on a published drink page. That is
     # the check `recipe.url` does not need and this one earns anyway -- the row
     # is CHOSEN by a score, so the interesting failure is not a broken URL but
     # the wrong number of them, or a drink offering itself.

@@ -2569,8 +2569,10 @@ so the name auto-placed into the 4.5rem glass column and a long one wrapped to
 five lines with its lettering out over the page. A wrapped name gets the same
 step-then-wrap the cards get (`card-name-fit.js`), now that the fit script has
 the real column to measure against. Meta is a `<dl>` of GLASS / GARNISH / SHIP IT?; mood chips are LINKS
-to the index with `?mood=`. INGREDIENTS / METHOD / NOTES headings are 1.5rem,
-weight 400, absinthe over yvette (NOTES over lagoon); ingredient names carry
+to the index with `?mood=`. INGREDIENTS / METHOD / NOTES / IF YOU LIKED THIS
+headings are 1.5rem, weight 400, absinthe over yvette (NOTES over lagoon; IF
+YOU LIKED THIS joined at first level on 2026-09-24, and being a sentence it is
+the one drink-page heading `last-line-rule.js` splits); ingredient names carry
 no underline (they looked like links). **`make it`** (`cocktail-make.js`, a
 three-part toggle) is one class, `is-making`; nothing leaves the DOM; SHIP IT?,
 the tagline and the chips are read-mode only; **print is the FULL page**,
@@ -2609,8 +2611,10 @@ guessed number kept in step across two files, which cost 41.5px of empty
 column on a phone and still wrapped "1 small pinch". Nothing counts characters
 any more. **Not yet seen on an iPad.**
 
-**"If you liked this, how about …" — three related cocktail recipes after the notes**
-(#927, 2026-09-10). **The score is shared MOODS plus shared ingredient
+**"If you liked this, how about …" — four related cocktail recipes after the notes**
+(#927, 2026-09-10; three until 2026-09-24, Helen: *"Let's bump to four related
+cards for cocktails."* — the cards sit two across, so three orphaned one).
+**The score is shared MOODS plus shared ingredient
 GENERICS, ties broken by title, and nothing else** — Helen: *"Not a full
 recommendation engine!"*, then *"Keep it simple."* No `meta.ship` weighting, no
 per-field weight. It is **Liquid in `_layouts/cocktail.html`**, not a plugin: 48
@@ -2623,9 +2627,10 @@ needed here and none is written; drafts are a different collection and are never
 concatenated in. Only a candidate scoring above zero is offered, and
 `scripts/related_drinks.py` is the derivation — the same scoring in Python, over
 the same corpus, so it doubles as a second implementation to check the template
-against. Today every cocktail recipe's third pick shares at least 3; **re-run it after a
+against. At 65 published cocktail recipes every one's FOURTH pick shares at least 2
+(one recipe; fifteen share 3, most 4); **re-run it after a
 promotion batch or any vocabulary edit that moves moods.**
-**The three are INDEX CARDS since 2026-09-12** — plain `.drink-card`, the same
+**The four are INDEX CARDS since 2026-09-12** — plain `.drink-card`, the same
 markup shape, in a `<section class="cocktail-related-section">` that wears
 `.cocktail-footer`'s rule. **The page ends in Helen's order since #1099**:
 ingredients, scaler, method, to serve, notes, then `.cocktail-footer` (hairline;
@@ -2634,9 +2639,9 @@ cards). The footer came up from under the cards that day, and the units line
 went into it. **Nothing about the card is decided on this page**:
 geometry, fixed height, the three-line clamp, the chip cap, the ship pinned to
 its corner with the clear-ship pass, the hover and the 370px grid floor are all
-`_sass/cocktails/_cards.scss`'s, so the row wraps two-then-one in the 900px
-column exactly as the index wraps an odd count, and un-columns below 400px as
-the index's card does. **Two differences remain and neither is geometry**: the
+`_sass/cocktails/_cards.scss`'s, so the row wraps two-and-two in the 900px
+column (two-then-one when it was three, which is why it is four), and
+un-columns below 400px as the index's card does. **Two differences remain and neither is geometry**: the
 chips are LINKS to the filtered index rather than filter buttons (a chip on a
 cocktail recipe page has nothing to filter — the page's own chip row is the same), and the
 index's `data-*` search attributes are absent. That is why the markup is written
@@ -2651,11 +2656,16 @@ tuned twice (#976), a shortlist corner of its own (#977) and an exemption from
 the title padding that corner costs. **That sequence is the thing to recognise,
 not the card**: six issues about a variant of something the site already had.
 DECISIONS §9.13 has her words and the full list.
-**No new hue**, a plain `.cocktail-section-heading` as "To serve" uses, and the
-whole section is hidden in `make it` and in print. **The heading is a marked
-PLACEHOLDER in Helen's words from the issue.** Food has none of this: *"the
-priority is cocktails."*
-`test_every_published_drink_page_offers_three_other_published_drinks` reads the
+**The heading wears the INGREDIENTS/METHOD mark since 2026-09-24** — Helen:
+*"If you think IF YOU LIKED THIS should join INGREDIENTS and METHOD at first
+level then yes, okay, I hear it, please do it."* `.cocktail-section-heading--related
+> span`, absinthe over violette, no new hue; it is a sentence, so it takes the
+`-last-line` mixin and is in `last-line-rule.js`'s TARGETS (#920's fix). It was
+a plain `.cocktail-section-heading` as "To serve" uses until then. The whole
+section is hidden in `make it` and in print. **The heading text is FINAL** (#1088,
+2026-09-20: *"isn't a placeholder. Final version."*). Food has none of this:
+*"the priority is cocktails."*
+`test_every_published_drink_page_offers_four_other_published_drinks` reads the
 PRODUCTION build and counts the NAME links only, since a card carries chip links
 too.
 

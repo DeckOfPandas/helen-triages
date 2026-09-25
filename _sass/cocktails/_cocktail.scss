@@ -1017,6 +1017,28 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   @include overlapping-rule-double($color-electric-absinthe, $color-luminous-lagoon);
 }
 
+// IF YOU LIKED THIS JOINS INGREDIENTS AND METHOD AT FIRST LEVEL, 2026-09-24 --
+// Helen: "If you think IF YOU LIKED THIS should join INGREDIENTS and METHOD at
+// first level then yes, okay, I hear it, please do it." Until then it was a
+// plain `.cocktail-section-heading`, as "To serve" is, on the argument that the
+// three modifiers above each carry a colour job and this section had not earned
+// one. It is not a fourth pairing: the same absinthe over violette as
+// INGREDIENTS and METHOD, because the ruling is about LEVEL, not about colour.
+//
+// NOT IN THE RULE ABOVE, AND `> span`, FOR ONE REASON: THIS HEADING WRAPS.
+// INGREDIENTS and METHOD are one word and never break; "If you liked this, how
+// about…" is a sentence and goes to two lines at phone width, and
+// `overlapping-rule-double`'s `box-decoration-break: clone` would then paint
+// the mark under both. That is #920 (Helen: "Last line only please, 10000%."),
+// and this is #920's fix as `_reference.scss` carries it: the `-last-line`
+// mixin, `assets/js/last-line-rule.js` splitting the last line out, and the
+// CHILD combinator so the split's own inner spans (`.rule-lines`, whose whole
+// job is to be unmarked) are not handed the mark back by a descendant selector
+// -- see the paragraph in _reference.scss on why the fix was inert without `>`.
+.cocktail-section-heading--related > span {
+  @include overlapping-rule-double-last-line($color-electric-absinthe, $color-ultra-violette);
+}
+
 // =============================================================================
 // THE SCALER — ONE BOX, UNDER THE LIST. Issues #545, #720, #721; 2026-09-05
 // =============================================================================
@@ -2128,8 +2150,13 @@ $amount-gap: 1rem;
 .cocktail-body-content { font-size: 0.97rem; line-height: $line-height-body; }
 
 // =============================================================================
-// IF YOU LIKED THIS, HOW ABOUT … — three related drinks at the foot. #927
+// IF YOU LIKED THIS, HOW ABOUT … — four related drinks at the foot. #927
 // =============================================================================
+// FOUR SINCE 2026-09-24 (three until then) -- Helen: "Let's bump to four
+// related cards for cocktails." The cards sit two across the column, so three
+// always orphaned one on a row of its own. The heading's mark is with the other
+// section headings, above.
+//
 // The scoring, and why it is Liquid rather than a plugin, are in
 // _layouts/cocktail.html's own comment at the block that builds this. This file
 // only lays out what arrives.
@@ -2142,7 +2169,7 @@ $amount-gap: 1rem;
 // SO THIS FILE HAS NOTHING TO SAY ABOUT THE CARDS ANY MORE, only about where
 // the section sits. Every question a card asks -- how wide, how tall, how the
 // glass hangs, how the chips wrap, where the ship sits, what happens under the
-// cursor -- is answered once in _cards.scss, for the index and for these three
+// cursor -- is answered once in _cards.scss, for the index and for these four
 // together. The row below carries a bottom margin and nothing else.
 //
 // WHAT IT REPLACED: from #955 (2026-09-11) each item was
@@ -2156,7 +2183,7 @@ $amount-gap: 1rem;
 // end of the recipe (whether serve or notes or anything else) and 'If you
 // liked this...'". It is `.cocktail-footer`'s own three declarations, so the
 // page's tail is two objects drawn the same way, a hairline above each: the
-// three cards, then the source line. Not a new mark; the one the page has.
+// four cards, then the source line. Not a new mark; the one the page has.
 .cocktail-related-section {
   // 3.5rem and 1.25rem since #1006 (2026-09-14): the half step the section
   // headings took, applied to the hairline's clearance above and below.
@@ -2178,8 +2205,9 @@ $amount-gap: 1rem;
 // A row of three narrower-than-a-card cards is exactly the "new design
 // language" Helen is asking us to stop inventing: with the override gone, the
 // list wraps at the index's own 370px floor, which is two across the 900px
-// column and then one, which is what the index does with an odd number of
-// drinks in it. Nothing here decides it any more.
+// column. Three cards was therefore two and then an orphan, which is what the
+// index does with an odd number of drinks in it and is why the row went to
+// four on 2026-09-24: two and two. Nothing here decides it any more.
 .cocktail-related-section .cocktail-related {
   // THE BOTTOM MARGIN IS NOT DECORATION. `.cocktail-footer` carries
   // `margin-top: $spacing-section-gap`, but a drink with no `source` has no
@@ -2295,7 +2323,7 @@ $amount-gap: 1rem;
   // list it is in.
   .cocktail-ingredient .cocktail-note,
   .cocktail-suggestion,
-  // THREE OTHER DRINKS TO MAKE INSTEAD (#927) IS THE PUREST CASE THERE IS FOR
+  // FOUR OTHER DRINKS TO MAKE INSTEAD (#927) IS THE PUREST CASE THERE IS FOR
   // THIS LIST. `make it` is the state you are in once you have decided; an
   // invitation to consider something else is the last thing wanted with your
   // hands full, and it is a link you are not going to follow mid-build. Same

@@ -1,7 +1,9 @@
 """What "If you liked this, how about …" would offer, and how thin it gets.
 
-THE FEATURE (#927, 2026-09-10) is three related drinks at the foot of every
-drink page, chosen in Liquid by `_layouts/cocktail.html`. The score is:
+THE FEATURE (#927, 2026-09-10) is four related drinks at the foot of every
+drink page, chosen in Liquid by `_layouts/cocktail.html`. It was three until
+2026-09-24 -- Helen: "Let's bump to four related cards for cocktails." -- because
+the cards sit two across and three always orphaned one. The score is:
 
     shared moods  +  shared ingredient generics
 
@@ -11,11 +13,13 @@ engine! But I expect we can do something with coincidental tagging.", and then
 and it exists for one reason:
 
 THE TEMPLATE ONLY OFFERS A DRINK SCORING ABOVE ZERO, so the row would silently
-render two items, or a heading over nothing, for a drink that shares no mood and
-no generic with anything in the collection. That is invisible on every page but
-that drink's. When this was built the answer was comfortable -- 48 published
-drinks, and every one of them had a THIRD pick still sharing 3 or more -- but
-that is a fact about today's collection, not a property of the rule.
+render three items, or a heading over nothing, for a drink that shares no mood
+and no generic with anything in the collection. That is invisible on every page
+but that drink's. When this was built the answer was comfortable -- 48 published
+drinks, and every one of them had a THIRD pick still sharing 3 or more -- and
+when the row went to four (65 published, 2026-09-24) every FOURTH pick still
+shared at least 2, most 4. But that is a fact about today's collection, not a
+property of the rule.
 
     python3 scripts/related_drinks.py            # the distribution, and the tail
     python3 scripts/related_drinks.py negroni    # one drink's picks, with why
@@ -24,8 +28,8 @@ RE-RUN IT AFTER A PROMOTION BATCH, and after any vocabulary edit that moves
 moods (`scripts/derive_cocktail_moods.py` is the one that says whether they
 moved). A new drink whose ingredients and moods are unlike everything else is
 exactly the drink this would find, and
-`test_every_published_drink_page_offers_three_other_published_drinks` is what
-turns that into a red build rather than a quiet row of two.
+`test_every_published_drink_page_offers_four_other_published_drinks` is what
+turns that into a red build rather than a quiet row of three.
 
 It reads `_cocktail_recipes/` directly rather than a build, so it needs no
 `jekyll build` first -- and it applies the publication gate itself
@@ -40,7 +44,9 @@ import yaml
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DRINKS = os.path.join(ROOT, "_cocktail_recipes")
 
-HOW_MANY = 3        # the template's `limit: 3`
+HOW_MANY = 4        # the template's `limit: 4` -- four since 2026-09-24, Helen:
+                    # "Let's bump to four related cards for cocktails." The cards
+                    # sit two across, so three always orphaned one.
 
 
 def front_matter(path):
@@ -126,7 +132,7 @@ def main():
             print(f"\n{doc.get('title')}")
             print("  moods:    ", ", ".join(sorted(doc.get("mood") or [])))
             print("  generics: ", ", ".join(generics(doc)))
-            print("\n  offered (the first three are what the page shows):")
+            print(f"\n  offered (the first {HOW_MANY} are what the page shows):")
             for row in scored_against(slug, doc, corpus)[:8]:
                 print(f"    {row[1]:38s} score={row[0]}  "
                       f"moods={row[3]} generics={row[4]}")
@@ -134,9 +140,9 @@ def main():
         print(f"no published drink called {wanted!r}")
         return 1
 
-    # THE INTERESTING NUMBER IS THE THIRD PICK, not the first. A drink always
+    # THE INTERESTING NUMBER IS THE LAST PICK, not the first. A drink always
     # has something at the top of its list; what says whether the row can be
-    # filled at all is how much the LAST of the three still shares.
+    # filled at all is how much the LAST of the four still shares.
     thin = []
     for slug, doc in corpus:
         rows = scored_against(slug, doc, corpus)
@@ -148,14 +154,14 @@ def main():
                      ", ".join(f"{r[2]} ({r[0]})" for r in rows[:HOW_MANY])))
     thin.sort()
 
-    print(f"\nthe {HOW_MANY}rd pick's score, distribution:")
+    print(f"\nthe {HOW_MANY}th pick's score, distribution:")
     counts = {}
     for score, _, _ in thin:
         counts[score] = counts.get(score, 0) + 1
     for score in sorted(counts):
         print(f"  {score}: {counts[score]} drink(s)")
 
-    print("\nthe ten drinks sharing the least with their third pick:")
+    print(f"\nthe ten drinks sharing the least with their {HOW_MANY}th pick:")
     for score, slug, detail in thin[:10]:
         print(f"  {slug:42s} {detail}")
 
