@@ -82,6 +82,12 @@
 // as long as it did (§12: "a cross-reference to another file's behaviour is a
 // claim nothing re-checks"). At 390px it wraps to two lines and wore the
 // double rule under both, measured by screenshot before this line was added.
+//
+// AND THE DRINK PAGE HAS ONE OF ITS OWN SINCE 2026-09-24: "If you liked this,
+// how about…" joined INGREDIENTS and METHOD at first level on Helen's ruling
+// and took their mark (`.cocktail-section-heading--related > span` in
+// _sass/cocktails/_cocktail.scss). It is the first drink-page section heading
+// that is a sentence rather than a word, so it is the first that can wrap.
 // =============================================================================
 
 (function () {
@@ -101,7 +107,13 @@
   // exactly the trap this file's own history warns about — "a class carries
   // every declaration, not the one you wanted" — so it gets its own selector
   // instead.
-  var TARGETS = '.recipe-title-text, .section-heading-text, .ref-section-heading span';
+  //
+  // `.cocktail-section-heading--related > span` is the drink page's one
+  // wrapping section heading (see the header). The child combinator matches
+  // the stylesheet's selector; it makes no difference here, since this runs
+  // once at load before any split exists, but the two should read the same.
+  var TARGETS = '.recipe-title-text, .section-heading-text, .ref-section-heading span, ' +
+    '.cocktail-section-heading--related > span';
 
   var els = Array.prototype.filter.call(
     document.querySelectorAll(TARGETS),

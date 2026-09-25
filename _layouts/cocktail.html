@@ -1254,7 +1254,7 @@ layout: default
      so the line below those"). That footer is about the PAGE -- where the recipe
      came from, what it costs to stock. This is a fact about the DRINK, and it
      now ends the drink the way the ingredients and the method begin it. Above
-     the related section, so the page still closes on three other drinks and
+     the related section, so the page still closes on four other drinks and
      then its source line.
 
      "NOT TOO CLOSE TO THE METHOD" IS THE MARGIN, and it is the whole of what the
@@ -1417,9 +1417,11 @@ layout: default
      MEASURED BEFORE IT WAS WRITTEN, and the measurement is kept:
      `python3 scripts/related_drinks.py` is this scoring in Python over the same
      corpus. Across the 48 published drinks every drink's THIRD pick still
-     shares at least 3 (nine drinks), most share 4, and the best share 6 -- so
-     `score > 0` never empties the row and the section is never a heading over
-     three arbitrary names. Run it after a promotion batch or a vocabulary edit
+     shared at least 3 (nine drinks), most shared 4, and the best shared 6; at
+     65 published and a row of four (2026-09-24) every drink's FOURTH pick still
+     shares at least 2 (one drink, Gunmetal Blue), fifteen share 3, most share
+     4 -- so `score > 0` never empties the row and the section is never a
+     heading over four arbitrary names. Run it after a promotion batch or a vocabulary edit
      that moves moods; `python3 scripts/related_drinks.py <slug>` prints one
      drink's picks and what each shares, which is also how to check this
      template against a second implementation.
@@ -1492,19 +1494,33 @@ layout: default
        line. The recipe page carries the identical line and lost its marker in
        the same pass.
 
-       A PLAIN `.cocktail-section-heading`, with no modifier and no inner span,
-       exactly as "To serve" above it. The three modifiers carry a colour JOB
-       each (§9.13) and this section has not earned one -- inventing a fourth
-       pairing here would be spending a hue on a heading nobody has ruled on.
+       IT WEARS THE INGREDIENTS/METHOD MARK -- Helen, 2026-09-24: "If you think
+       IF YOU LIKED THIS should join INGREDIENTS and METHOD at first level then
+       yes, okay, I hear it, please do it." Until then this was a plain
+       `.cocktail-section-heading` with no modifier and no inner span, as "To
+       serve" is, on the argument that the three modifiers each carry a colour
+       job (§9.13) and this section had not earned one. The ruling is that it
+       is a first-level section of the page, so it takes the first-level mark
+       -- absinthe over violette, the SAME rule as ingredients and method, not
+       a fourth pairing. The `--related` modifier and the inner `<span>` are
+       what `_sass/cocktails/_cocktail.scss` hangs that on.
+
+       THE ONE DIFFERENCE FROM INGREDIENTS AND METHOD IS THAT THIS ONE WRAPS.
+       Those are one word each; this is a sentence, and at phone width it
+       breaks onto two lines. `overlapping-rule-double` paints on every line
+       fragment, so the span here is also in `assets/js/last-line-rule.js`'s
+       TARGETS and the stylesheet uses the `-last-line` mixin -- the #920 fix
+       the reference page's headings already carry. Helen: "Last line only
+       please, 10000%."
     {% endcomment %}
     {% comment %} A SECTION WITH A RULE ABOVE IT -- Helen on #955, 2026-09-11:
        "Please add some kind of divider between the end of the recipe (whether
        serve or notes or anything else) and 'If you liked this...'". The rule
        is `.cocktail-footer`'s own (margin, padding, hairline), so the page
-       ends with two objects drawn the same way: three other drinks, then the
+       ends with two objects drawn the same way: four other drinks, then the
        source line. {% endcomment %}
     <section class="cocktail-related-section">
-    <h2 class="cocktail-section-heading cocktail-related-heading">If you liked this, how about&hellip;</h2>
+    <h2 class="cocktail-section-heading cocktail-section-heading--related"><span>If you liked this, how about&hellip;</span></h2>
     {% comment %} THE INDEX CARD. NOT A VARIANT OF IT -- #991, Helen,
        2026-09-12: "if you liked this cards should render the same as cards on
        the index list. We are fighting this design, and trying to invent a new
@@ -1546,14 +1562,20 @@ layout: default
        hangs in the index card's own fixed left column at `$card-glass-scale`,
        because it is the index card's own glass. {% endcomment %}
     <ul class="cocktail-related drink-cards">
-      {% for entry in related_sorted limit: 3 %}
+      {% comment %} FOUR, NOT THREE, SINCE 2026-09-24 -- Helen: "Let's bump to
+         four related cards for cocktails." The cards sit two across the
+         column (the index's own 370px floor, see _cards.scss), so three always
+         orphaned one on a row of its own. `HOW_MANY` in
+         scripts/related_drinks.py and the rendered-pages test both say 4 and
+         must move with this. {% endcomment %}
+      {% for entry in related_sorted limit: 4 %}
         {% assign parts = entry | split: "~" %}
         {% assign rel = site.cocktail_recipes | where: "url", parts[2] | first %}
         {% comment %} GLASS IS AN ORDERED LIST, FIRST WITH ARTWORK WINS -- the
            same contract the head of this file and the index card follow, and
            the same empty-string accumulator, tested against "" rather than
            truth-tested. An empty span when there is no drawing, so the tape
-           starts at the same x on all three cards. {% endcomment %}
+           starts at the same x on all four cards. {% endcomment %}
         {% assign rel_icon = "" %}
         {% for g in rel.glass %}
           {% if rel_icon == "" %}

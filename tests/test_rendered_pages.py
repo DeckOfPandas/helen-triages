@@ -2443,8 +2443,11 @@ def test_the_shopping_list_and_the_ingredient_index_agree_on_a_name(site):
 
 
 # =============================================================================
-# "IF YOU LIKED THIS, HOW ABOUT …" — three related drinks. Issue #927
+# "IF YOU LIKED THIS, HOW ABOUT …" — four related drinks. Issue #927
 # =============================================================================
+# FOUR SINCE 2026-09-24 (three from #927 until then) -- Helen: "Let's bump to
+# four related cards for cocktails." The cards sit two across, so three always
+# orphaned one. The food recipe page below stays at three.
 # WHY IT IS CHECKED IN THE PRODUCTION BUILD AND NOT THE LOCAL ONE. The row is
 # built by looping `site.cocktail_recipes` in _layouts/cocktail.html, and that
 # collection is only the PUBLISHED set in production: `_config_local.yml` sets
@@ -2456,8 +2459,8 @@ def test_the_shopping_list_and_the_ingredient_index_agree_on_a_name(site):
 # AND IT IS THE SAME SHAPE AS #235, the bug the `prod_site` fixture exists for:
 # a URL computed for a document that is never written is a correct-looking link
 # to a 404. `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`
-# would catch that much on its own; what it cannot see is a row of two, a row
-# of four, or a drink offering itself.
+# would catch that much on its own; what it cannot see is a row of three, a row
+# of five, or a drink offering itself.
 
 RELATED_SECTION = re.compile(r'<ul class="cocktail-related drink-cards">(.*?)</ul>', re.S)
 # The NAME's link only. Since 2026-09-11 the items are real cards (#955, and
@@ -2478,16 +2481,17 @@ def _drink_pages(built_site):
     return sorted((built_site / "cocktails" / "recipes").rglob("index.html"))
 
 
-def test_every_published_drink_page_offers_three_other_published_drinks(prod_site):
-    """#927. Exactly three, never itself, and every one of them a real page.
+def test_every_published_drink_page_offers_four_other_published_drinks(prod_site):
+    """#927. Exactly four, never itself, and every one of them a real page.
 
-    THE COUNT IS EXACTLY THREE, not "at most three". The template only emits
+    THE COUNT IS EXACTLY FOUR, not "at most four". The template only emits
     a candidate whose score is above zero, so a drink sharing no mood and no
-    ingredient generic with anything would quietly render a row of two, or a
+    ingredient generic with anything would quietly render a row of three, or a
     heading over nothing -- and the failure mode is invisible on any page but
     that drink's. `scripts/related_drinks.py` measured the corpus before the
-    feature was written and still does: every drink's THIRD pick shares at
-    least 3 today. This is what notices when a new drink, or a vocabulary edit
+    feature was written and still does: at 65 published drinks every drink's
+    FOURTH pick shares at least 2 (one drink), and all but sixteen share 4 or
+    more. This is what notices when a new drink, or a vocabulary edit
     that moves moods, changes that -- and that script is where to look when it
     fires, since it names which drink ran out of candidates and what it shares
     with the ones it has.
@@ -2517,8 +2521,8 @@ def test_every_published_drink_page_offers_three_other_published_drinks(prod_sit
             continue
 
         hrefs = RELATED_LINK.findall(section.group(1))
-        if len(hrefs) != 3:
-            problems.append(f"{url}: {len(hrefs)} related drinks, expected 3")
+        if len(hrefs) != 4:
+            problems.append(f"{url}: {len(hrefs)} related drinks, expected 4")
 
         for href in hrefs:
             target = href[len(baseurl):] if href.startswith(baseurl) else href
