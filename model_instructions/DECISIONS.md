@@ -324,6 +324,55 @@ unless stated.
     `docker image inspect --format` went in unexercised, and the first `run.sh`
     after the merge rebuilds once to plant the stamp. PR #1180.
 
+- **2026-09-24, #1191 — the stamp stops counting the files the image does not
+  use, and the hash moves into a file so it can be tested.**
+  `.devcontainer/.dockerignore` now names `README.md`, `run.sh` and
+  `devcontainer.json`; Docker already honoured it for the build context and
+  `.devcontainer/build_inputs_hash.py` now honours it for the hash, so the two
+  agree by construction rather than by someone remembering. Before this, editing
+  either README cost one fully-cached rebuild -- a second and no network, so
+  noise rather than a fault, but noise the stamp did not need to make.
+  - **THE PARSER ONLY UNDERSTANDS EXACT FILENAMES, AND FAILS WIDE.** A line with
+    `*`, `/`, `!` or `?` in it makes it hash the WHOLE directory, ignore file
+    included, with a note on stderr. The two directions are not symmetric: a
+    hash that changes when it need not costs a cached rebuild, while a hash that
+    does NOT change when it should is #1180's original bug returning. So the
+    failure mode is a spurious rebuild, never a missed one.
+  - **Python, and not by preference.** The shell version wanted a temp file to
+    filter and `mktemp` writes to the system `/tmp`, which `CLAUDE.md` forbids
+    outright. Nothing in the Python version writes anywhere.
+  - **`tests/test_devcontainer_hash.py` pins both directions**, including a live
+    guard that nothing in `.dockerignore` is a path the Dockerfile `COPY`s --
+    excluding a real build input is exactly the missed-rebuild case. **That
+    guard's first version was a false positive** and worth recording as one: it
+    substring-matched the whole Dockerfile and failed on `README.md` appearing
+    inside a prose comment. It now reads `COPY`/`ADD` instructions only. A guard
+    that fires on a harmless mention is one you learn to route around, which
+    this repository has already recorded about four hooks.
+  - **Proved by breaking it:** `init-firewall.sh`, which the Dockerfile really
+    does `COPY`, was added to `.dockerignore` on purpose and the guard fired
+    with the right message; then removed.
+
+- **2026-09-24, #1191 — the gems are NOT baked into the image, and the reason
+  the idea died is that its premise was wrong.** The backlog item read "a
+  first-run cost per volume". There is ONE volume:
+  `helen-triages-bundle-cache-helen-triages`, fixed since the dead-basename fix,
+  mounted at `BUNDLE_PATH` and surviving every image rebuild. So `bundle
+  install` runs once, ever -- not once per session and not once per rebuild.
+  Three further reasons, any one of which is enough:
+  - **The build context is `.devcontainer/`, so the Dockerfile cannot `COPY` the
+    repo-root `Gemfile`.** Copying it into `.devcontainer/` duplicates a file
+    that must then be kept in step by hand, which is precisely the burden the
+    Dockerfile's own note about `requirements-test.txt` warns about.
+  - **Widening the context to the repo root would break the stamp.** The
+    build-input hash covers the context, so every recipe edit in the repo would
+    change it and every `run.sh` would rebuild. That trades a one-off
+    `bundle install` for a rebuild on every launch.
+  - **The volume would shadow it anyway.** A named volume mounted over
+    `BUNDLE_PATH` is initialised from the image only when the volume is first
+    created; an existing one keeps what it has, so baked gems would reach a new
+    machine and no current one.
+
 ## §2 The mono-repo shape
 
 - **2026-08-02** — Collections cannot live inside `food/`: Jekyll only
@@ -5529,6 +5578,67 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
     already impossible, because `--name` refuses a second container outright.
   - **And the image-stamp check** that opened the session is at §1.
 
+- **2026-09-24 — THE GROUND-TRUTH HOOK REPORTED THE WRONG REPOSITORY, on its
+  first real outing, and the session it misled was the one that wrote it.** It
+  opened a session in `.claude/worktrees/opus-improve-devops` by announcing
+  `branch: main`, `1 uncommitted change`, `13 behind`. Every word was true of
+  `/workspace` and none of it was true of the session. The session read it,
+  believed it was standing on `main` with someone else's edit underfoot, and
+  stopped to investigate before doing anything -- which is the only part of this
+  that went right.
+  - **The cause is a bug class this file already records, arriving from the
+    other side.** `ROOT` came from `Path(__file__).resolve().parent.parent.parent`
+    -- the checkout the SCRIPT was loaded from. Claude Code invokes the hook as
+    `$CLAUDE_PROJECT_DIR/.claude/hooks/session-ground-truth.py`, and in a
+    worktree session that is the PRIMARY clone. §1's `--show-toplevel` entry is
+    the mirror image: `run.sh` needed the primary and was getting the worktree;
+    this needed the worktree and was getting the primary. **A tracked file
+    cannot learn where it is from its own path.**
+  - **TWO FIXES, AND THE SECOND IS THE ONE THAT MATTERS.** The root now comes
+    from the hook payload's `cwd`, then the process's, and only then the
+    script's own location, with each candidate confirmed by asking git for
+    `--show-toplevel` from it -- so the answer is the one git itself would act
+    on. **And the report now PRINTS THE PATH as the first thing it says.** A
+    fact with no subject attached is what made this misleading rather than
+    merely wrong: `branch: main` is unfalsifiable until you know which
+    repository it is about.
+  - **The general form, and it applies to every reporting hook this repo ever
+    gains: a report must name what it is a report ABOUT.** The measurement was
+    correct; it was correct about the wrong thing, which is the same shape as
+    the two wrong conclusions in §11.2's 2026-09-22 entry.
+  - Pinned by three tests in `tests/test_agent_wrappers.py`, and proved by
+    reinstating the bug on purpose and watching the root-resolution test fail.
+    The probe repository is a throwaway `git init`, deliberately not a
+    `git worktree add` of this repo: an interrupted test would otherwise leave a
+    stale worktree entry that only `git worktree prune` clears, and that is
+    Helen's.
+
+- **2026-09-24, #1191 — the two permission questions, answered and closed.**
+  - **`Read(//dev/null)` and `Edit(//dev/null)` exist for BASH's static path
+    analysis, not for the Read/Edit tools**, which is why the 2026-09-21 test of
+    them gave the wrong answer. The commit that added them, `63cc9b4`, says so
+    outright: Helen, 2026-09-15, after an anonymous `curl -o /dev/null`
+    visibility check prompted her -- *"add to your settings that it's fine to
+    access."* Any command whose static analysis names a path outside the project
+    asks, and `/dev/null` is outside it. They are EXACT paths, not a directory,
+    because `/dev` holds real devices. So the surface they serve is a
+    redirection or an `-o` in a command's own text, and the Read TOOL -- which
+    `blockReadsOutsideWorkingDirectories` governs -- was never the surface at
+    all. Item closed: the rules are load-bearing and now explained.
+  - **`Edit(//workspace/.node-runtime/**)` cannot be exercised from a worktree
+    session, and that is accepted rather than worked around.** Worktree
+    isolation refuses a Write outside the worktree BEFORE any permission rule is
+    consulted, so the deny never gets a turn; a Bash `touch` is refused without
+    naming which rule did it. What is known, and it is documentation rather than
+    measurement: a `permissions` path rule uses `Edit(path)` for every
+    file-writing tool, and a deny cannot be overridden by an allow. So the rule
+    is sound by construction and is belt-and-braces behind worktree isolation.
+    It would be the only thing standing for a session running in `/workspace`
+    itself, which is not how Helen runs them. **Stated as documented-not-measured
+    on purpose**, because the alternative -- attempting a write that succeeds if
+    the rule does not hold -- puts a file in her Node runtime to learn something
+    of no operational value.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
@@ -5570,6 +5680,19 @@ verification. Dates are when the correction landed.
   - **The general form, stated once so it need not be learned twice: a
     permission RULE and a permission BLOCK are different mechanisms, and
     exercising one says nothing about the other.**
+  - **BOTH WERE SETTLED ON 2026-09-24 and neither answer was a measurement.**
+    The `/dev/null` question was answered by reading the commit that added the
+    rules (`63cc9b4`): they serve Bash's static path analysis, so the Read tool
+    was never the surface. The `.node-runtime` deny is accepted as
+    documented-not-measured, because worktree isolation refuses first and the
+    only way past it is to write a file into Helen's Node runtime. §11 has both.
+    **The lesson survives the answers: the fastest route to "what does this
+    rule do" was the commit message of the person who added it, not a probe.**
+- **2026-09-24 — a HOOK reported a true fact about the wrong repository**, and
+  the session it misled was the one that had written it three days earlier. The
+  measurement was right; its subject was not. §11 has the bug, the fix and the
+  general form — **a report must name what it is a report about** — which is the
+  same shape as the two entries above and the reason this one belongs here too.
 - **2026-08-30 / 2026-08-31, #600** — An issue rots faster: #600 copied #542's
   "Also outstanding" without re-measuring, four days on, and every claim was
   false (six half-empty disjunctions — zero; Kamaniwanalaya already had the

@@ -53,13 +53,21 @@ IMAGE=helen-triages-devcontainer
 # Created date, so the image's timestamp can stay older than the Dockerfile
 # forever and the check never settles.
 #
-# EVERY file in .devcontainer/ is hashed, not just the Dockerfile and the
-# init-firewall.sh it COPYs -- a hand-maintained list of "the files that
-# matter" is one more thing to keep in sync, and the Dockerfile's note
-# about requirements-test.txt says how that goes. The price of the extra
-# breadth is that editing this script or the README rebuilds once; with
-# nothing in the Dockerfile changed that is a fully cached no-op of about a
-# second, and it needs no network. Wrong in the safe direction.
+# EVERY file in .devcontainer/ is hashed EXCEPT the ones .dockerignore names,
+# rather than a hand-maintained list of "the files that matter" -- that list is
+# one more thing to keep in sync, and the Dockerfile's note about
+# requirements-test.txt says how that goes. Until 2026-09-24 there was no
+# exception at all, so editing this script or the README cost one rebuild; #1191
+# added `.devcontainer/.dockerignore`, which Docker already honours for the
+# context and this now honours for the hash, so the two agree by construction
+# rather than by someone remembering.
+#
+# AND IT ONLY UNDERSTANDS EXACT FILENAMES. A line in .dockerignore with a `*`,
+# a `/` or a `!` in it makes this fall back to hashing the whole directory,
+# ignore file and all. A half-understood pattern would silently shrink what the
+# stamp covers, and an image NOT rebuilt when it should be is the entire bug
+# this mechanism exists to prevent -- so the failure mode is a spurious cached
+# rebuild, never a missed one.
 #
 # What it still cannot see: `ruby:3.3-bookworm` moving upstream, or an
 # `apt-get install` resolving to newer packages than last time. The
@@ -67,7 +75,7 @@ IMAGE=helen-triages-devcontainer
 # `docker build --pull --no-cache` by hand is the answer when that matters.
 STAMP_LABEL=com.deckofpandas.build-inputs
 
-BUILD_INPUTS_HASH="$(find .devcontainer -type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum | cut -d' ' -f1)"
+BUILD_INPUTS_HASH="$(python3 .devcontainer/build_inputs_hash.py)"
 IMAGE_STAMP="$(docker image inspect --format "{{ index .Config.Labels \"$STAMP_LABEL\" }}" "$IMAGE" 2>/dev/null || true)"
 
 if [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ]; then
