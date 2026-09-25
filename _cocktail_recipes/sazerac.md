@@ -33,10 +33,9 @@ ingredients:
     generic: "aromatic bitters"
     suggestion: ["Angostura"]
 method:
-  - "Ice the glass, then rinse with the diluted absinthe."
-  - "Stir the remaining ingredients with three ice cubes."
-  - step: "Discard the contents of the glass."
+  - step: "Ice the glass, then rinse with the diluted absinthe and discard."
     note: "You don't have to throw this away..."
+  - "Stir the remaining ingredients with three ice cubes."
   - "Strain."
 mood:
   - "strong brown drink"
@@ -54,5 +53,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -9,6 +9,15 @@
 # 585 of the collection's 685 pours are; 99 are dashes, drops, leaves, cubes,
 # pinches and rinses, and they are free.
 #
+# NARROWED ON 2026-09-06 (#748), BUILT 2026-09-24: "Price whole fruit and
+# weighed solids." A solid that IS the drink -- the pear and four apricots the
+# Bellini consists of, the palm sugar the Caipirinha is muddled on -- is not a
+# garnish. So the rule now reads: a pour counts if its unit is a VOLUME, or a
+# COUNT of a fruit priced in `fruit_prices`, or a WEIGHT priced in
+# `weight_prices`; a dash, a leaf, a garnish and ice never count, and a count
+# or weight with no row stays free, as it always was. The two blocks are the
+# whole of the change; `excluded_units` is untouched.
+#
 # THE ONE EXCEPTION SHE ASKED FOR IS `to top`. It is a counted unit, so the rule
 # above would drop it -- but a splash of champagne is the DEAREST thing in the
 # seven glasses that take one, which is noise in no sense at all. Helen,
@@ -289,12 +298,15 @@ bottles:
     size_ml: 700
     gbp: 40
     confidence: high
-  # In the house since 2026-09-06, #782. HELEN'S OWN FIGURE: 37, against the 28
-  # I guessed. The key turned out to be the label after all (#796, 2026-09-14);
-  # what changed that day was its generic, `coconut-flower arrack`.
+  # In the house since 2026-09-06, #782. HELEN'S OWN FIGURE, twice: 37 on
+  # 2026-09-06 against the 28 I guessed, then "Ceylon Arrack: £35 (default
+  # coconut flower arrack)" on 2026-09-14 (#747), which is the figure here and
+  # the reason the bottle is now the category's default in `default_bottles`.
+  # The key turned out to be the label after all (#796, 2026-09-14); what
+  # changed that day was its generic, `coconut-flower arrack`.
   "Ceylon Arrack":
     size_ml: 700
-    gbp: 37
+    gbp: 35
     confidence: high
   # --- gin ---------------------------------------------------------------
   "Beefeater":
@@ -370,17 +382,18 @@ bottles:
     gbp: 26
     confidence: medium
   # THE THREE HELEN NAMED ON 2026-09-05 so her Rooster/Patrón rule could be
-  # written for reposado and añejo as well as blanco. My prices, not hers --
-  # she supplied the NAMES; these figures are the usual UK retail estimate and
-  # are on the check list.
+  # written for reposado and añejo as well as blanco. She supplied the names
+  # that day and the PRICES on 2026-09-14 (#747): "Rooster Reposado: £26 /
+  # Rooster Anejo: £36". The guessed 28 and 32 were within 12%, which is what
+  # `medium` promised.
   "Rooster Rojo Tequila Reposado":
     size_ml: 700
-    gbp: 28
-    confidence: medium
+    gbp: 26
+    confidence: high
   "Rooster Rojo Tequila Añejo":
     size_ml: 700
-    gbp: 32
-    confidence: medium
+    gbp: 36
+    confidence: high
   "Patrón Añejo":
     size_ml: 700
     gbp: 60
@@ -542,20 +555,19 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
-  # BOTTLES NAMED 2026-09-14 (#1012) for two categories that had none. THE
-  # PRICES ARE NOT NEW: each is the figure the category row in `generics:`
-  # carried until that day, moved onto the bottle it now belongs to, still
-  # `low` because nobody has checked it against the bottle. The category rows
-  # are gone -- with a bottle under each, a price there would be a second
-  # answer to the same question.
+  # BOTTLES NAMED 2026-09-14 (#1012) for two categories that had none, at the
+  # figures the category rows in `generics:` had carried -- and PRICED BY HELEN
+  # the same evening (#747): "Briottet Sapin: £40", "La Tomato: £24". The
+  # category rows are gone: with a bottle under each, a price there would be a
+  # second answer to the same question.
   "Briottet Liqueur de Sapin":
     size_ml: 700
-    gbp: 35
-    confidence: low
+    gbp: 40
+    confidence: high
   "La Tomato Liqueur":
     size_ml: 700
-    gbp: 30
-    confidence: low
+    gbp: 24
+    confidence: high
   "Roots Mastiha":
     size_ml: 700
     gbp: 30
@@ -726,11 +738,63 @@ bottles:
 # ml -- so this block moves the numbers more than any bottle does.
 # Prices read 2026-09-05: Tesco loose limes GBP 0.23, Aldi GBP 0.18, lemons from
 # GBP 0.22. The top of each range allows for a bad week and for organic.
+#
+# AND SINCE 2026-09-24 IT PRICES THE FRUIT ITSELF, COUNTED -- #748, Helen's
+# ruling of 2026-09-06: "Price whole fruit and weighed solids." A pour written
+# `1 whole`, `4 whole`, `1.5 each`, `9 each`, `5 cubes` or `half` of a generic
+# with a row here costs that many times the row (half a lime is half a lime's
+# price). A counted pour of anything WITHOUT a row here stays a flourish and is
+# free, exactly as before: a dozen sugar cubes in a punch is still about 7p and
+# still does not spoil a total. The rule the plugin applies is therefore: a pour
+# counts if its unit is a volume, OR a count of a fruit priced here, OR a
+# weight priced in `weight_prices:` below -- and a dash, a leaf, a garnish and
+# ice never count.
+#
+# THE KEY IS THE GENERIC EXACTLY AS A DRINK WRITES IT. For the four citrus
+# fruits that is also what `juice_yields` names, which is how a squeezed juice
+# finds its fruit; the rest are only ever counted.
+#
+# A `basis` says what the figure is PER, where a row is not simply "one fruit":
+# blackberries and raspberries are sold by the punnet and poured by the berry,
+# cucumber is poured by the wheel and pineapple by the cube, so those rows are
+# a punnet or a fruit divided by how many pieces it gives. Those are the rows
+# to overwrite first; the derivation is shown so it can be argued with.
 fruit_prices:
   lime:       { gbp_min: 0.18, gbp_max: 0.30, confidence: high }
   lemon:      { gbp_min: 0.22, gbp_max: 0.35, confidence: high }
   orange:     { gbp_min: 0.35, gbp_max: 0.55, confidence: medium }
   grapefruit: { gbp_min: 0.80, gbp_max: 1.20, confidence: medium }
+  # --- counted whole, #748 (estimates, 2026-09-24; UK supermarket loose/pack) --
+  pear:           { gbp_min: 0.40, gbp_max: 0.70, confidence: medium }
+  passion fruit:  { gbp_min: 0.40, gbp_max: 0.70, confidence: medium }
+  dried apricots: { gbp_min: 0.08, gbp_max: 0.15, basis: "GBP 2-3 / 250 g bag of about 30", confidence: medium }
+  blackberries:   { gbp_min: 0.06, gbp_max: 0.12, basis: "GBP 2-3 / 150 g punnet of about 25-30 berries", confidence: medium }
+  raspberries:    { gbp_min: 0.05, gbp_max: 0.10, basis: "GBP 2-3 / 150 g punnet of about 30-40 berries", confidence: medium }
+  cucumber:       { gbp_min: 0.03, gbp_max: 0.05, basis: "per wheel: GBP 0.60-0.90 a cucumber, about 20 wheels", confidence: low }
+  pineapple:      { gbp_min: 0.03, gbp_max: 0.05, basis: "per cube: GBP 1.00-1.50 a pineapple, about 30-40 cubes", confidence: low }
+
+# --- weighed solids, priced per kilogram ---------------------------------------
+# THE OTHER HALF OF HELEN'S 2026-09-06 RULING (#748): "Price whole fruit and
+# weighed solids." A pour written `N g` of a generic with a row here costs
+# N/1000 of the row; a weight with no row here is a flourish and free, as every
+# `g` pour was until 2026-09-24. `g` STAYS IN `excluded_units` because that list
+# is what the strength and volume arithmetic read, and a spoon of sugar is still
+# not a millilitre of anything.
+#
+# THE SUGARS ARE HERE BECAUSE THEY ARE WEIGHED SOLIDS AND THE RULING SAYS
+# "weighed solids". Helen's earlier word (2026-09-05, "None of these come into
+# the estimated cost") was about ice, salt and the sugar CUBE dropped in a
+# punch, and the cube is still free. 20 g of palm sugar is the Caipirinha's
+# second ingredient and costs about 10p, which is the same order as the lime
+# beside it. If she would rather sugar by weight stayed free, delete the three
+# sugar rows and the drink goes back to withholding its figure.
+#
+# `gbp_per_kg`, unrounded ranges, and a `basis` naming the shop price so the
+# derived figure can be checked against the shelf rather than trusted.
+weight_prices:
+  honey:               { gbp_per_kg_min: 9.00, gbp_per_kg_max: 18.00, basis: "GBP 3-6 / 340 g jar (supermarket clear honey to Acacia)", confidence: medium }
+  golden caster sugar: { gbp_per_kg_min: 1.50, gbp_per_kg_max: 2.50, basis: "GBP 1.50-2.50 / kg", confidence: medium }
+  palm sugar:          { gbp_per_kg_min: 4.00, gbp_per_kg_max: 8.00, basis: "GBP 2-4 / 500 g block", confidence: low }
 
 # --- how much a `to top` actually pours ---------------------------------------
 # HELEN ASKED FOR THIS DIRECTLY, 2026-09-05: "We can calculate top volumes,
@@ -868,6 +932,11 @@ default_bottles:
   cherry liqueur: ["Briottet Crème de Cerise"]
   cherry brandy: ["Cherry Heering"]
 
+  # "Ceylon Arrack: £35 (default coconut flower arrack)" -- Helen, 2026-09-14
+  # (#747). The only bottle under the category today, so this changes no
+  # number; recorded because "default" is a ruling, as orgeat's is above.
+  coconut-flower arrack: ["Ceylon Arrack"]
+
 # --- generics with no bottle behind them --------------------------------------
 # 438 of 685 pours name a generic and no bottle, and this is what prices them.
 # A generic that DOES have bottles is deliberately absent: its range is computed
@@ -908,10 +977,16 @@ generics:
   Amaro Ciociaro:     { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "GBP 36 / 70cl", confidence: high }
   # `liqueur de sapin` and `tomato liqueur` MOVED TO BOTTLES 2026-09-14 (#1012):
   # Briottet Liqueur de Sapin and La Tomato Liqueur, above, at the same prices.
-  Swedish flaggpunsch: { gbp_per_litre_min: 40.00, gbp_per_litre_max: 40.00, basis: "GBP 28 / 70cl", confidence: low }
+  # HELEN'S OWN FIGURE, 2026-09-14 (#747): "Carlshamns Flaggpunsch: £21
+  # (default)". Still a category row rather than a bottle, because bottles.yml
+  # declares no Carlshamns and a bottle nobody pours is a different decision;
+  # the basis names the bottle so the row can become one when she wants it.
+  Swedish flaggpunsch: { gbp_per_litre_min: 30.00, gbp_per_litre_max: 30.00, basis: "Carlshamns Flaggpunsch, GBP 21 / 70cl", confidence: high }
   Plymouth:           { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }
-  # RENAMED 2026-09-14 (#796) from `Ceylon arrack`, with the generic.
-  coconut-flower arrack: { gbp_per_litre_min: 37.33, gbp_per_litre_max: 37.33, basis: "GBP 28 / 75cl", confidence: low }
+  # `coconut-flower arrack` HAD A ROW HERE UNTIL 2026-09-24 (GBP 28 / 75cl,
+  # low). It is gone: the Ceylon Arrack bottle prices the category and is its
+  # default since Helen's "(default coconut flower arrack)" on 2026-09-14
+  # (#747), so a figure here would be a second answer -- see the block header.
   lime cordial:       { gbp_per_litre_min: 7.14,  gbp_per_litre_max: 7.14,  basis: "Rose's, GBP 5 / 70cl", confidence: medium }
   coconut cream:      { gbp_per_litre_min: 5.00,  gbp_per_litre_max: 7.50,  basis: "GBP 2-3 / 400ml tin", confidence: medium }
   # PLACEHOLDER, 2026-09-20, for Clement Mahina Coconut Rhum Liqueur (White
