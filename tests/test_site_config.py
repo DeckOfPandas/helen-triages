@@ -2426,6 +2426,18 @@ def test_no_element_can_force_horizontal_scroll():
 # the head, so the row has been one `minmax(0, 1fr)` track since, and this
 # test only ever asks about rows of two or more.
 MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
+    ".page-actions": (
+        "`auto auto`, filled by column: + SHORTLIST over (0) SEE SHORTLIST, "
+        "PRINT over PDF -- #1182, Helen: two columns at ALL widths, so a "
+        "narrow variant is exactly what she ruled out. The claim: the widest "
+        "label is `(0) SEE SHORTLIST`, 17 characters of 0.78rem Courier caps, "
+        "measured 136px on 2026-09-21 (#1163), plus PRINT at about 45px and a "
+        "1.4rem gap -- about 205px, well inside a 312px phone column. MEASURED "
+        "at 390px on 2026-09-24 (tmp/shots/crop-actions-*-phone.png). Where the "
+        "block shares a row with the drink page's toggle, `.cocktail-controls` "
+        "still wraps, so the pair can never overflow; it drops the block under "
+        "the toggle instead."
+    ),
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
         "of Courier all told, so it is believed to fit a 360px phone -- BELIEVED, "

@@ -1,5 +1,5 @@
 ---
-description: Ingest recipes or drinks from photos, screenshots or pasted text into _food_drafts/ or _cocktail_drafts/ -- transcribe, do everything the source answers, and hand Helen one list of everything it does not.
+description: Ingest recipes from photos, screenshots or pasted text into _food_drafts/ or _cocktail_drafts/ -- transcribe, do everything the source answers, and hand Helen one list of everything it does not.
 ---
 
 Helen has new material to ingest. `scripts/ingest_preflight.py` is the engine
@@ -10,10 +10,10 @@ from photographs) and §9.3 (cocktail schema) before the first file.** This
 command deliberately does not restate them -- two copies of a schema drift, and
 the manual is the one the tests are written against.
 
-**AND `model_instructions/PUBLISHING_A_DRINK.md` IF THE DRINK IS GOING ANYWHERE
-NEAR `4-promote/`.** That file is the six steps a drink goes through, the word
-"final" and what it promises, and the one-working-copy rule. This command gets a
-drink INTO the drafts; that one gets it out.
+**AND `model_instructions/PUBLISHING_A_DRINK.md` IF THE COCKTAIL RECIPE IS GOING
+ANYWHERE NEAR `4-promote/`.** That file is the six steps a cocktail recipe goes
+through, the word "final" and what it promises, and the one-working-copy rule.
+This command gets a cocktail recipe INTO the drafts; that one gets it out.
 
 ## The boundary, in one line
 
@@ -37,7 +37,7 @@ what makes it findable, and there are exactly these:**
 | a `tagline` she has not written | `tagline: "QQ"`, or `QQ ` then the source's line where one is worth keeping. **Never an unprefixed tagline from an ingest, either site** -- Helen, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"* |
 | a `generic` the vocabulary does not settle outright | `generic: "QQ <the source's words>"` -- see the block below |
 | a `suggestion` | `suggestion: []` unless a DECLARED bottle names it; the bottle the source names goes in that pour's `note` |
-| a drink's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (2026-09-05, `test_meta_ship_is_a_rung_or_who_knows`); `meta.made_before: false` beside it says she has not made it |
+| a cocktail recipe's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (2026-09-05, `test_meta_ship_is_a_rung_or_who_knows`); `meta.made_before: false` beside it says she has not made it |
 | a food method step | the PAIR: `QQ original <verbatim>` then `QQ Claude <the rewrite>` |
 | any note an ingest ADDS | `- label: "QQ"` / `text: "QQ - …"` -- **both fields set, both beginning `QQ`**. A note with no label is titled "note" on the page and looks finished, so this is what stops an unread note publishing unnoticed (#1120) |
 | an amount with no unit in the source | the figure as it stands, plus a note whose text says `QQ - no unit in the source` |
@@ -48,10 +48,10 @@ what makes it findable, and there are exactly these:**
 for me to remember how to type YAML every time"*). A note that ALREADY exists
 keeps whatever shape it has.
 
-**A DRINK'S `generic` IS TYPED WHERE THE VOCABULARY SETTLES IT -- Helen, 2026-09-20 -- AND THE SAME RULE NOW HOLDS IN BOTH SESSIONS.** It used to be `QQ`, always, because a bottle's category is not derivable from the ingredient beside it. Her words: *"Surely we're able to fill in generics at ingest, or at least try then review with me"* and *"if it's not obvious write QQ then whatever the source said then I have a chance of being able to fix it myself."* Three tiers, and the boundary between the second and third is the one that matters:
+**A COCKTAIL RECIPE'S `generic` IS TYPED WHERE THE VOCABULARY SETTLES IT -- Helen, 2026-09-20 -- AND THE SAME RULE NOW HOLDS IN BOTH SESSIONS.** It used to be `QQ`, always, because a bottle's category is not derivable from the ingredient beside it. Her words: *"Surely we're able to fill in generics at ingest, or at least try then review with me"* and *"if it's not obvious write QQ then whatever the source said then I have a chance of being able to fix it myself."* Three tiers, and the boundary between the second and third is the one that matters:
 
 1. **A bottle `bottles.yml` declares** -- the dictionary's own generic, plus `suggestion`, mechanically. Look it up in the file with a script; never from recall. A bottle it does NOT declare is not yours to declare (Tier 3): its name goes in the pour's `note`, and `suggestion` stays `[]`.
-2. **An item that names a declared generic exactly** -- `lime juice`, `vodka`, `orgeat`. A near-match is not exact: `agave nectar` beside `agave syrup` is a judgement call, so type it AND put a `QQ` note on the drink saying what you assumed, so that review cannot be skipped.
+2. **An item that names a declared generic exactly** -- `lime juice`, `vodka`, `orgeat`. A near-match is not exact: `agave nectar` beside `agave syrup` is a judgement call, so type it AND put a `QQ` note on the cocktail recipe saying what you assumed, so that review cannot be skipped.
 3. **Everything else** -- `generic: "QQ aged Jamaican rum"`: `QQ`, a space, then the source's own words. **The words go IN `generic` because that is the only field the page, the cards and the search read.** A bare `QQ` left her looking at "90 ml QQ" with nothing to fix it from. Never a guess from general knowledge, and never a bare `QQ` where the source gave you words.
 
 **THE REPO-LESS PROJECT FOLLOWS THE SAME THREE TIERS NOW.** It used to be the exception -- `"QQ"`, always, because that session could not see the vocabulary -- and on 2026-09-21 that stopped being a constraint and became what it had always actually been, a choice: `INGEST_ONE_COCKTAIL.md` §3a PRINTS all 181 declared generics, rendered by `scripts/build_ingest_vocab.py` like the six vocabularies it already printed. So tier 2 is a lookup that session can do, and tier 1 is the only one still out of its reach.
@@ -88,7 +88,7 @@ sites use one set of names:
       4-promote/           (both)           her words are in; waiting on the
                                             mechanical pass, then her proofread,
                                             then the public collection
-      5-final-proofread/   (drinks only)    staged and BOUNCED BACK: something
+      5-final-proofread/   (cocktails only) staged and BOUNCED BACK: something
                                             in it needs Helen (2026-09-18)
 
 Numbered so they sort in pipeline order at the top of her file list (her ask,
@@ -100,7 +100,7 @@ sits below "the prose is mine", and the folders and the flags answer different
 questions.
 
 **`5-final-proofread/` IS THE ONE EXCEPTION TO "ONLY ON HER WORD", because the
-move IS the report.** A drink goes there when the mechanical pass is done and
+move IS the report.** A cocktail recipe goes there when the mechanical pass is done and
 something still needs a ruling only she can give, in the same commit as the
 list of what it is waiting for. `4-promote/` then means *waiting on Claude*
 and this means *waiting on Helen*, which is the distinction it was asked for
@@ -110,22 +110,22 @@ and this means *waiting on Helen*, which is the distinction it was asked for
 >
 > Two rules bite in those three places and nowhere else — Helen's rulings,
 > 2026-09-04, reading Fish House Punch. `5-final-proofread/` joined on
-> 2026-09-18 because a drink gets there BY being staged and goes live the
+> 2026-09-18 because a cocktail recipe gets there BY being staged and goes live the
 > moment she rules, so it is the same tense for the same reason; the folders
 > are `STAGED_DIRS` in `tests/test_cocktails.py`. Both are enforced
 > (`test_a_staged_drink_writes_a_bottles_canonical_name`,
 > `test_a_staged_drink_carries_no_transcription_field`), and both are things to
-> FIX when a drink is moved rather than reasons to refuse the move.
+> FIX when a cocktail recipe is moved rather than reasons to refuse the move.
 >
 > - **Every `suggestion` is a bottle's canonical name, never an alias.**
 >   *"'ED3' isn't a bottle"* — it is a declared alias of `El Dorado 3 year old
 >   rum`, so it resolves, and resolving is not the same as being written down.
 >   Look each one up in `_data/cocktails/bottles.yml` and write the key.
 >   **This does not change the rule for a DRAFT**, which is the opposite one and
->   stays: leave a drink as she spelled it and add the spelling as an alias
+>   stays: leave a cocktail recipe as she spelled it and add the spelling as an alias
 >   (MANUAL §9.3.2). The alias map is what lets an ingest be fast; a finished
->   drink has had time to say the real name.
-> - **No pour still says `QQ`.** A staged drink is one Helen is about to
+>   cocktail recipe has had time to say the real name.
+> - **No pour still says `QQ`.** A staged cocktail recipe is one Helen is about to
 >   publish, and a `QQ` anywhere in `_cocktail_recipes/` fails
 >   `test_no_published_drink_carries_a_qq` outright. Staging is where they get
 >   answered, because the source is still in front of her.
@@ -173,7 +173,7 @@ file say the same things.
 4. **`/tidy-drafts`**, either collection (both since 2026-09-05), if the
    quoting or typography needs it. It never touches a `QQ` line, so the
    transcription is safe.
-5. **DRINKS: `python3 scripts/resolve_pours.py`**, which does tiers 1 and 2 for
+5. **COCKTAILS: `python3 scripts/resolve_pours.py`**, which does tiers 1 and 2 for
    you and refuses to do tier 3. It reads every pour whose `generic` is still a
    `QQ`, looks the source's words up in `bottles.yml` and in the vocabulary, and
    writes only what an EXACT match settles -- `--apply` to write, nothing by
@@ -186,7 +186,7 @@ file say the same things.
    session -- corrected 2026-09-21. After step 5 what remains really is tier 3
    and really is hers: a missing glass, a `tagline`, a category the vocabulary
    does not settle. Ask; never fill in.
-7. **Run `python3 scripts/ingest_preflight.py`** for a drink, which reports the
+7. **Run `python3 scripts/ingest_preflight.py`** for a cocktail recipe, which reports the
    undeclared bottles and near-miss garnishes in the same shape as a photo
    batch.
 8. **FOOD, only if the file arrived with no `main_ingredients`:**
@@ -228,15 +228,15 @@ build exactly that list.
 
 The order to work in:
 
-1. `python3 scripts/resolve_pours.py` -- dry, for a drink; `--apply` to write
+1. `python3 scripts/resolve_pours.py` -- dry, for a cocktail recipe; `--apply` to write
    what `bottles.yml` and the vocabulary settle outright. **Before typing any
    generic by hand.**
-2. `python3 scripts/derive_cocktail_moods.py` -- dry, for a drink; `--write`
+2. `python3 scripts/derive_cocktail_moods.py` -- dry, for a cocktail recipe; `--write`
    only if it reports a difference. After step 1, because the moods read the
    generics it just wrote.
 3. `pytest` (never two sessions at once -- MANUAL §1).
 4. `/tidy-drafts`, either collection, if the quoting or typography needs it.
-5. `python3 scripts/ingest_preflight.py` for a drink.
+5. `python3 scripts/ingest_preflight.py` for a cocktail recipe.
 6. One list to Helen. Then commit.
 
 **A red test is not always yours.** `cd _<site>_drafts && git fetch origin &&
@@ -397,16 +397,16 @@ failure is probably work someone else has already done (MANUAL §9.1).
   nothing. "Top with crushed ice to serve" loses WHEN, so it is a method step.
 - **Run `python3 scripts/derive_cocktail_moods.py --write`** after writing the
   files. It supplies the nine derived moods; **the ten hand-assigned ones are
-  Helen's and no rule produces them**, so a new drink is missing half the browse
-  axes until she looks.
+  Helen's and no rule produces them**, so a new cocktail recipe is missing half the
+  browse axes until she looks.
 
 ## TIER 2 -- fill in, and say plainly they are proposals
 
 `main_ingredients`, `tags`, `star_ingredient`. Cheap for her to correct and
 expensive to originate. **Not a cocktail's `mood`** -- nine moods are DERIVED by
 `derive_cocktail_moods.py --write` and a hand edit is reverted on the next run;
-the ten hand-assigned ones are Helen's alone (MANUAL §9.13), so a new drink is
-missing half its browse axes until she is asked. (This line listed `mood` as a
+the ten hand-assigned ones are Helen's alone (MANUAL §9.13), so a new cocktail
+recipe is missing half its browse axes until she is asked. (This line listed `mood` as a
 proposal until 2026-09-06.) Nothing can be invented -- an undeclared tag
 or star fails the suite. **Be generous with `main_ingredients`**: the cap of
 eight is a guide that has been read as a budget, and her own recipes run to
@@ -422,13 +422,13 @@ on the page ends the same way. **Declaring a bottle in `bottles.yml`** from the
 ingredient beside it.
 
 **THE BOTTLE RULE IS ABOUT INFERENCE, NOT ABOUT TYPING.** What is banned is
-turning an ingredient into a bottle by deduction -- the drink says blanco
-tequila, so presumably she owns one. A bottle Helen NAMES is hers to add and
+turning an ingredient into a bottle by deduction -- the cocktail recipe says
+blanco tequila, so presumably she owns one. A bottle Helen NAMES is hers to add and
 always was: on 2026-09-05 she supplied "Rooster Rojo Tequila Anejo, Rooster Rojo
 Tequila Reposado, Patron Reposado, Patron Anejo -- all need diacritics", and
 those went straight in. Her spelling is the key, her unaccented forms become
-aliases, and the standing rule holds -- the drink keeps her spelling and the
-dictionary learns it, never the other way round.
+aliases, and the standing rule holds -- the cocktail recipe keeps her spelling
+and the dictionary learns it, never the other way round.
 
 **REMOVING A BOTTLE IS ALSO HERS, AND IT IS A MOVE RATHER THAN A DELETE.** It
 goes to `not_reached_for` WITH the reason she gave, which is what stops a later
@@ -442,19 +442,19 @@ bottle with no price, and a price naming no bottle. See MANUAL 9.3.5.
 **THERE IS NO LONGER ANY EXCEPTION TO `meta.rewritten` -- #1137, 2026-09-17.**
 An agent never writes that flag, anywhere, on either site.
 
-The exception this replaces was real and is worth knowing about. A drink Helen
-had MOVED into `_cocktail_drafts/4-promote/` got `rewritten: true` from the
+The exception this replaces was real and is worth knowing about. A cocktail
+recipe Helen had MOVED into `_cocktail_drafts/4-promote/` got `rewritten: true` from the
 mechanical pass, on the grounds that the move WAS her claim to the words (her
 standing instruction, 2026-09-04).
 
 **What killed it is that the flag now GATES PUBLICATION.** #1137 made
-`rewritten: true` the third leg of the drinks gate -- a drink without it does
-not reach the live site -- and a flag that decides whether a page exists cannot
+`rewritten: true` the third leg of the cocktails gate -- a cocktail recipe without
+it does not reach the live site -- and a flag that decides whether a page exists cannot
 be one an agent sets on a folder's say-so. It belongs exactly where `proofread`
 is: hers to type, everywhere, always. So there is no folder shortcut any more.
 
-If a drink staged for promotion still says `rewritten: false`, it will not
-publish: **say so and let her flip it.** That is the one thing to do about it.
+If a cocktail recipe staged for promotion still says `rewritten: false`, it will
+not publish: **say so and let her flip it.** That is the one thing to do about it.
 
 ---
 
@@ -477,7 +477,8 @@ publish: **say so and let her flip it.** That is the one thing to do about it.
    captures Helen did not mean to include.
 
 4. **Check whether it already exists**, and compare the FORMULA, not the title.
-   A drink already in the collection may share a name and be a different drink.
+   A cocktail recipe already in the collection may share a name and be a
+   different drink.
 
 5. **Transcribe.** Tier 1 unasked, tier 2 as proposals, tier 3 never. Say in the
    file where the frame ended if a capture stops mid-recipe -- a screenshot that
@@ -510,7 +511,7 @@ publish: **say so and let her flip it.** That is the one thing to do about it.
   every ingredient the method names; that proves nothing is missing that is
   USED, not that nothing follows. Say so in a note and ask.
 - **The source is the best audit the collection ever gets.** Transcribing a page
-  beside a drink already derived from it has found a missing citation, a wrong
+  beside a cocktail recipe already derived from it has found a missing citation, a wrong
   ice instruction and an amount out by a factor of 24. **Record all of it and
   change none of it** -- the site is canon, her figures stand, the source is
   noted beside them.
@@ -523,11 +524,11 @@ publish: **say so and let her flip it.** That is the one thing to do about it.
   Two files kept their ounces through the 2026-09-01 conversion for exactly
   this reason.
 - **`QQ` is never an error.** Do not flag it, fix it, or convert it.
-- **Resolving a drink's `suggestion` and `generic`, Helen's rulings of
+- **Resolving a cocktail recipe's `suggestion` and `generic`, Helen's rulings of
   2026-09-04** (MANUAL §9.3.2 has the long form; `unresolved_suggestions`
   in bottles.yml is empty and must stay so):
   - a HOUSE is not a bottle: declare the product she owns by its name and
-    retype the drink to it; a house is an alias only where it can mean one
+    retype the cocktail recipe to it; a house is an alias only where it can mean one
     thing in the collection (Luxardo → Luxardo Maraschino);
   - a spirit type beside its own generic is not a suggestion; it goes;
   - a syrup's suggestion may name what it is made from (Acacia honey);
@@ -535,13 +536,13 @@ publish: **say so and let her flip it.** That is the one thing to do about it.
     that spans non-substitutable members; `honey water` is one flat generic
     and bare `honey` is the raw thing you cook with; `lavender-forward
     bitters`, not `lavender bitters`; `bonded rye` and `rye` are distinct;
-  - spelling: **in the POOL**, leave the drink as she wrote it and add the
-    spelling as an alias -- never retype a pooled drink to a canonical bottle
-    name. **In `4-promote/`, `5-final-proofread/` and `_cocktail_recipes/` the
+  - spelling: **in the POOL**, leave the cocktail recipe as she wrote it and add
+    the spelling as an alias -- never retype a pooled cocktail recipe to a
+    canonical bottle name. **In `4-promote/`, `5-final-proofread/` and `_cocktail_recipes/` the
     rule inverts** and every `suggestion` is the canonical name; see the box
     above. The two are
-    not in tension: an alias is a reading convenience, and a finished drink has
-    had time to write the real name.
+    not in tension: an alias is a reading convenience, and a finished cocktail
+    recipe has had time to write the real name.
 - **Every note an ingest ADDS is `{label, text}` with both fields set, each
   beginning `QQ`** — never a bare string. Helen, 2026-09-04: "It's annoying
   for me to remember how to type YAML every time." She searches for `QQ`,

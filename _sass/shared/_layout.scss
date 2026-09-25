@@ -1476,6 +1476,18 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     text-align: center;
   }
 
+  // BOTH ICONS SIT TO THE LEFT OF THEIR WORD ONCE THE COLUMNS STACK -- #1177,
+  // 2026-09-21. Above 600px the second column mirrors the first outward from
+  // the centre (`row-reverse` on its head, so its icon is on the outside
+  // edge), which is right for two columns flanking the hearts. Stacked and
+  // centred there is no outside edge to mirror towards, and the cocktail
+  // column's head read icon-after-word while food's read icon-before -- two
+  // heads, one shape each, and not the same shape. Helen: "both food and
+  // cocktail icons should be to the left of their headings."
+  .site-footer-ref:nth-of-type(2) .site-footer-ref-head {
+    flex-direction: row;
+  }
+
   // #916: THE GRID'S OWN `gap: $space-lg` (1rem) READS AS THE SAME BREATH AS
   // ONE REFERENCE COLUMN'S OWN INTERNAL LINE SPACING ($space-sm, half of it),
   // not as a break between two different sites' material. A phone screenshot

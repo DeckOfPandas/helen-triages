@@ -327,30 +327,65 @@
      the generic is wider and honest, and the generic's own range already spans
      every bottle under it.
 
-     NO RATE MEANS NO PRICE, never a zero. 20 generics in the collection have
-     none: herbs, zest, oil and bitters-by-the-dash, which are free under
-     Helen's rule ("I'm catering for family, not running a bar"), and the whole
-     fruit and weighed solids that #748 ruled should be priced and which nobody
-     has entered yet. A line with no rate prints no figure, the same silence the
-     drink page keeps for an incomplete drink. */
-  function linePrice(mlMin, mlMax, generic, bottleNames, rates) {
-    if (!rates || !(mlMax > 0)) return null;
+     NO RATE MEANS NO PRICE, never a zero. Eleven generics in the collection
+     have none: herbs, zest, oil and bitters-by-the-dash, which are free under
+     Helen's rule ("I'm catering for family, not running a bar"). A line with
+     no rate prints no figure, the same silence the drink page keeps for an
+     incomplete drink.
 
-    var byBottle = rates.bottles || {};
-    var named = asList(bottleNames);
-    var rate = null;
+     A COUNTED FRUIT AND A WEIGHED SOLID ARE PRICED TOO, SINCE #748 (Helen,
+     2026-09-06: "Price whole fruit and weighed solids"). The rate table
+     carries two more maps, `fruit` (GBP per piece) and `weight` (GBP per
+     kilo), resolved by the same plugin from `fruit_prices` and
+     `weight_prices` in costs.yml; a line's `whole`, `each` and `cube` totals
+     are pieces, its `g` total is grams. The named-bottle rule above is a rule
+     about VOLUMES -- nobody names a bottle of pear -- so those two are always
+     read from the generic. Whatever parts of a line have a rate are summed;
+     a line with no priceable part at all is null, as before. */
+  function linePrice(mlMin, mlMax, generic, bottleNames, rates, units) {
+    if (!rates) return null;
 
-    if (named.length) {
-      var found = named.map(function (n) { return byBottle[n]; });
-      if (found.every(function (r) { return typeof r === 'number'; })) {
-        rate = [Math.min.apply(null, found), Math.max.apply(null, found)];
+    var low = 0;
+    var high = 0;
+    var priced = false;
+
+    if (mlMax > 0) {
+      var byBottle = rates.bottles || {};
+      var named = asList(bottleNames);
+      var rate = null;
+
+      if (named.length) {
+        var found = named.map(function (n) { return byBottle[n]; });
+        if (found.every(function (r) { return typeof r === 'number'; })) {
+          rate = [Math.min.apply(null, found), Math.max.apply(null, found)];
+        }
+      }
+      if (!rate) rate = (rates.generics || {})[generic];
+      if (rate && rate.length === 2) {
+        low += mlMin / 1000 * Number(rate[0]);
+        high += mlMax / 1000 * Number(rate[1]);
+        priced = true;
       }
     }
-    if (!rate) rate = (rates.generics || {})[generic];
-    if (!rate || rate.length !== 2) return null;
 
-    var low = mlMin / 1000 * Number(rate[0]);
-    var high = mlMax / 1000 * Number(rate[1]);
+    var totals = units || {};
+    var pieces = (totals.whole || 0) + (totals.each || 0) + (totals.cube || 0);
+    var perPiece = (rates.fruit || {})[generic];
+    if (pieces > 0 && perPiece && perPiece.length === 2) {
+      low += pieces * Number(perPiece[0]);
+      high += pieces * Number(perPiece[1]);
+      priced = true;
+    }
+
+    var grams = totals.g || 0;
+    var perKilo = (rates.weight || {})[generic];
+    if (grams > 0 && perKilo && perKilo.length === 2) {
+      low += grams / 1000 * Number(perKilo[0]);
+      high += grams / 1000 * Number(perKilo[1]);
+      priced = true;
+    }
+
+    if (!priced) return null;
     return {
       min: low,
       max: high,
@@ -612,7 +647,10 @@
    *        a declared volume range (#746); absent, a top stays a count.
    * @param {Object} [options.rates] - {generics: {name: [lo, hi]}, bottles:
    *        {name: rate}}, GBP per litre, resolved at build time by
-   *        _plugins/cocktail_costs.rb (#820). Absent, no row carries a price.
+   *        _plugins/cocktail_costs.rb (#820), plus `fruit: {name: [lo, hi]}`
+   *        (GBP per piece) and `weight: {name: [lo, hi]}` (GBP per kilo) for
+   *        the counted fruit and weighed solids of #748. Absent, no row
+   *        carries a price.
    * @param {Object} [options.shelves] - {order: string[], of: {generic: shelf}},
    *        `shopping_shelves` and `shelf_of` from ingredients.yml (#848).
    *        Absent, rows sort by volume alone as they always did.
@@ -885,7 +923,7 @@
         /* #820. The bottles the drinks actually named, not the group's "or"
            form, because a rate is looked up per bottle. */
         price: linePrice(mlMin, mlMax, group.generic, group.bottleNames,
-                         opts.rates),
+                         opts.rates, group.units),
         /* THE SORT AND THE CALLERS BOTH READ THE LOW END, which is why this
            stays the single number it has always been: an untopped row has
            `millilitres === millilitresMax` and nothing downstream changes.

@@ -195,7 +195,7 @@ four days, so they were dropped on 2026-09-06 — grep the selector.
 | Failure/diagnostic name (`ol > li > strong:first-child`) | `_sass/food/_recipe-notes-body.scss` | 1.06rem | heading — boundary case |
 | `.recipe-group-heading` | `_sass/food/_recipe-notes-body.scss` | 1rem | heading — boundary case |
 | `.about-faq-item h3` (FAQ question) | `_sass/food/_about.scss` | 0.85rem | label |
-| `.cocktail-section-heading` (INGREDIENTS/METHOD/NOTES — the drink page) | `_sass/cocktails/_cocktail.scss` | 1.5rem (1.35rem until 2026-09-05, MANUAL §9.13) | heading |
+| `.cocktail-section-heading` (INGREDIENTS/METHOD/NOTES — the cocktail recipe page) | `_sass/cocktails/_cocktail.scss` | 1.5rem (1.35rem until 2026-09-05, MANUAL §9.13) | heading |
 
 † **The one size in this table that varies by viewport**, as of 2026-09-15
 (#1086, Helen: *"B: mark at two thirds"*). Below 600px the whole wordmark
@@ -254,7 +254,7 @@ a mechanical sweep.
   treatment." It carries its own hand-tuned four-copy shadow
   (`--wordmark-word-shadow`) and no stroke by default. As of 2026-09-02
   (#469), both sites render this same four-copy default — see §8.
-- **`.drink-card-tape-word`** (`_sass/cocktails/_cards.scss`), a drink card's
+- **`.drink-card-tape-word`** (`_sass/cocktails/_cards.scss`), a cocktail recipe card's
   own title-on-tape. Two near-whites, one tight pair, no softening shadow,
   plus the shared heading stroke — deliberately NOT the header tape's
   four-copy version, because at a card title's 1rem the four-copy shadow
@@ -262,7 +262,7 @@ a mechanical sweep.
   on punched tape", #469). The tape block's own comment in `_cards.scss`
   explains all four load-bearing decisions in full; this document doesn't
   repeat them.
-- ~~**`_sass/cocktails/_cocktail.scss`**'s drink-page headings, which called
+- ~~**`_sass/cocktails/_cocktail.scss`**'s cocktail recipe page headings, which called
   `punched(raised, var(--emboss-offset-lg))` directly.~~ **No longer true,
   2026-09-06.** Those headings take `lettering(heading)` from the shared base
   rule and cocktails re-points only `--lettering-heading-*` in its own

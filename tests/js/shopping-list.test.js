@@ -724,6 +724,59 @@ test('a generic with no rate carries no price, never a zero', () => {
   assert.strictEqual(rows[0].price, null);
 });
 
+// --- counted fruit and weighed solids, #748 ----------------------------------
+// Helen, 2026-09-06: "Price whole fruit and weighed solids." The plugin hands
+// over two more maps, per piece and per kilo; this file multiplies them the
+// way it multiplies the litres. The figures are costs.yml's on 2026-09-24.
+
+const SOLID_RATES = {
+  generics: { 'lime juice': [6.0, 15.0] },
+  bottles: {},
+  fruit: { pear: [0.4, 0.7], lime: [0.18, 0.3], raspberries: [0.05, 0.1] },
+  weight: { honey: [9.0, 18.0] }
+};
+
+test('a whole fruit is priced per piece from the fruit table', () => {
+  // Two Bellinis: 2 x 0.40 to 2 x 0.70
+  const rows = SL.build([ing('1 whole', 'pear'), ing('1 whole', 'pear')],
+                        { rates: SOLID_RATES });
+  assert.strictEqual(rows[0].text, '2 whole');
+  assert.strictEqual(rows[0].price.text, '£0.80–£1.40');
+});
+
+test('half a lime is half a lime\'s price, and `each` and `cubes` are pieces', () => {
+  const rows = SL.build([
+    ing('half', 'lime'),
+    ing('15 each', 'raspberries')
+  ], { rates: SOLID_RATES });
+  // 0.5 x 0.18 to 0.5 x 0.30
+  assert.strictEqual(byLabel(rows, 'lime').price.text, '£0.09–£0.15');
+  // 15 x 0.05 to 15 x 0.10
+  assert.strictEqual(byLabel(rows, 'raspberries').price.text, '£0.75–£1.50');
+});
+
+test('a weighed solid is priced per kilo from the weight table', () => {
+  // 25 g of honey at GBP 9-18 a kilo
+  const rows = SL.build([ing('25 g', 'honey')], { rates: SOLID_RATES });
+  assert.strictEqual(rows[0].price.text, '£0.23–£0.45');
+});
+
+test('a counted or weighed line with no row stays unpriced', () => {
+  // A dozen sugar cubes in a punch are still a flourish: no `fruit` row for
+  // `sugar cube`, so no price and no zero, exactly as before #748.
+  const rows = SL.build([ing('12 cubes', 'sugar cube')], { rates: SOLID_RATES });
+  assert.strictEqual(rows[0].price, null);
+  assert.strictEqual(rows[0].text, '12 cubes');
+});
+
+test('the old rate tables, with no fruit or weight map, still price volumes only', () => {
+  // Every caller before #748 handed over {generics, bottles} and nothing else.
+  const rows = SL.build([ing('1 whole', 'pear'), ing('500 ml', 'lime juice')],
+                        { rates: RATES });
+  assert.strictEqual(byLabel(rows, 'pear').price, null);
+  assert.strictEqual(byLabel(rows, 'lime juice').price.text, '£3.00–£7.50');
+});
+
 test('a top-up range widens the price too', () => {
   // The two features meet: 3 x 100-150 ml of a generic priced 1.00-2.00 a litre
   // is 300-450 ml, so 30p to 90p.

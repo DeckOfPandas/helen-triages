@@ -1039,10 +1039,12 @@ permalink: /cocktails/
      no alias map, no bottle-or-generic fallback — which is the same division
      that keeps `cocktail-scale.js` ignorant of prices.
 
-     INCOMPLETE DRINKS ARE OMITTED, not emitted as zero. Two of them (the
-     Bellini and the Caipirinha) have `cost.complete: false` because what the
-     exclusion rule drops IS the drink; the reader below prints no price for a
-     drink it has no entry for, which is the same silence the drink page keeps.
+     INCOMPLETE DRINKS ARE OMITTED, not emitted as zero. A drink has
+     `cost.complete: false` when what the exclusion rule drops IS the drink;
+     the reader below prints no price for a drink it has no entry for, which
+     is the same silence the drink page keeps. None is incomplete today: the
+     two that were (the Bellini and the Caipirinha) had their fruit and sugar
+     priced by #748 on 2026-09-24. The gate stays for the next one.
      {% endcomment %}
   {% comment %} GBP PER LITRE, RESOLVED AT BUILD — #820, #817, #818. Same gate as
      the per-drink costs below, and about 10 KB.
