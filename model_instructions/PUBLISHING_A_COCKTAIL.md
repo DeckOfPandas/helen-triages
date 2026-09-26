@@ -1,6 +1,6 @@
-# Publishing a cocktail recipe — the steps, who does each, and what the words mean
+# Publishing a cocktail — the steps, who does each, and what the words mean
 
-Written 2026-09-04, on the day the first sixteen cocktail recipes went through it, for
+Written 2026-09-04, on the day the first sixteen cocktails went through it, for
 Helen to check and for the next session to follow. It is short on purpose.
 **Since 2026-09-14 (#1008) the same six steps carry a FOOD recipe too, and
 `model_instructions/PIPELINE.md` §4 is the map both sites follow; this file
@@ -12,9 +12,9 @@ promise that "every `to-promote/` below" meant `4-promote/` — a redirection
 note that made sense for a week and had become a thing every reader held in
 their head; the old name is gone from the steps instead.
 **MANUAL §9.1.1 has the gate's mechanics and §4.0 says what the flags MEAN;
-`.claude/commands/ingest.md` is how a cocktail recipe gets INTO the drafts and where the
+`.claude/commands/ingest.md` is how a cocktail gets INTO the drafts and where the
 mechanical/non-mechanical boundary is stated in full.** This is the procedure
-that carries a cocktail recipe from there to the public repo, and it is linked from
+that carries a cocktail from there to the public repo, and it is linked from
 MANUAL §11.
 
 ## The one working copy
@@ -42,7 +42,7 @@ turn that made it.
 
 ## The steps
 
-1. **Helen moves** a cocktail recipe into `_cocktail_drafts/4-promote/`. The move is the
+1. **Helen moves** a cocktail into `_cocktail_drafts/4-promote/`. The move is the
    signal; nothing else is needed. She tells Claude when a round of moves is
    done, because Claude will be editing the same files next.
    - **She sets `rewritten: true` herself — #1137, 2026-09-17.** The move used
@@ -72,7 +72,7 @@ turn that made it.
 3. **Claude lists the non-mechanical things**, one line each, and Helen rules
    on them. Each ruling is written into the vocabularies, the manual and
    the ingest documents the same day, so it is never asked twice.
-   - **Move those cocktail recipes into `5-final-proofread/` in the same commit as the
+   - **Move those cocktails into `5-final-proofread/` in the same commit as the
      list** (PIPELINE.md §3, 2026-09-18). It is the one folder an agent puts a
      file in, and the move IS the report: `4-promote/` then means *waiting on
      Claude* and `5-final-proofread/` means *waiting on Helen*, so neither she
@@ -80,12 +80,12 @@ turn that made it.
      was asked for when a batch of seventeen produced ten bounce-backs and
      `4-promote/` stopped answering the question.
 4. **Claude says "final: <slugs>".** That word means: the suite is green over
-   those cocktail recipes, every open ruling is applied, and Claude will not touch
+   those cocktails, every open ruling is applied, and Claude will not touch
    those files again except to flip a flag Helen asks for or to open an
    `awaiting_fix` round. **Until Helen sees that word, the served pages are
    work in progress and not for proofreading.** (This is the step that was
    missing on the first day.)
-5. **Helen proofreads** by reading each cocktail recipe's built page on her own dev
+5. **Helen proofreads** by reading each cocktail's built page on her own dev
    server — `/cocktails/drafts/<folder>/<slug>/` — and flips `proofread: true`
    in the file, or tells Claude the slugs and Claude flips them on her word.
    Reading the served page *is* the proofread; the flag says "I read this
@@ -94,7 +94,7 @@ turn that made it.
    - **SAY WHICH REPO THE BRANCH IS IN, AND HOW TO GET IT. THE URLs ARE
      USELESS WITHOUT THE FILES.** `_cocktail_drafts/` is a SEPARATE private
      repo, gitignored here (`.gitignore`), so **checking out the public branch
-     brings no cocktail recipe files at all** — not the folder move, not the flag flips,
+     brings no cocktail files at all** — not the folder move, not the flag flips,
      not a single edit from the batch. Her clone stays on its own `main` and
      the pages she is being sent to simply do not exist.
 
@@ -116,26 +116,26 @@ turn that made it.
      does too.
    - **If a public PR depends on a private branch, name the branch in the PR
      description.** A public merge that lands before its private half leaves
-     `main` red with failures naming real cocktail recipes (2026-09-06, the
+     `main` red with failures naming real cocktails (2026-09-06, the
      Caribbean Sazerac's `I want to faff`: `taxonomy.yml` merged, the recipe file's
      correction sat on `data/caribbean-sazerac-faff`), and nothing else says
      which branch fixes it.
 6. **Helen promotes**, herself, always, unless she explicitly asks Claude to:
-   in her own checkouts, copy the proofread cocktail recipe into `_cocktail_recipes/`
+   in her own checkouts, copy the proofread cocktail into `_cocktail_recipes/`
    in the public repo and commit; delete it from the private repo and commit.
    The public commit deploys.
 
    **SHE DELEGATED IT FOR THE FIRST TIME ON 2026-09-09/10, AND THE FIRST 48
-   COCKTAIL RECIPES WENT OUT THAT WAY.** Her reason was not that the step is hard, it
+   COCKTAILS WENT OUT THAT WAY.** Her reason was not that the step is hard, it
    was that the staging folder had become a haystack: *"please move all
    proofread: true files into the public repo. If you do this then I don't
    have to fish through one by one to find out which I still need to
    proofread."* Promotion is what keeps `4-promote/` meaning "waiting for
    Helen" rather than "everything, sorted by nothing".
 
-   **PROMOTE FROM WHICHEVER FOLDER THE COCKTAIL RECIPE IS IN.** Since 2026-09-18 that
+   **PROMOTE FROM WHICHEVER FOLDER THE COCKTAIL IS IN.** Since 2026-09-18 that
    is `4-promote/` or `5-final-proofread/` — both are the published tense
-   (`STAGED_DIRS`), and a bounced-back cocktail recipe that Helen has now passed goes
+   (`STAGED_DIRS`), and a bounced-back cocktail that Helen has now passed goes
    straight out rather than taking a ceremonial hop back through `4-promote/`
    with a commit attached.
 
@@ -145,7 +145,7 @@ turn that made it.
    - **RE-CHECK THE GATE, do not trust the flag as found.** All THREE legs
      since #1137 — `rewritten: true` AND `awaiting_fix: false` AND `proofread:
      true` — read out of the file at copy time, explicitly, failing closed.
-     Copying a cocktail recipe the gate would have hidden is the one mistake no later
+     Copying a cocktail the gate would have hidden is the one mistake no later
      commit undoes, because the file is public the moment it merges.
    - **COPY, COMPARE, THEN DELETE.** Byte-for-byte, asserted. What publishes
      must be what she read, and a silent truncation between two repos is
@@ -159,16 +159,16 @@ turn that made it.
    - **`COCKTAIL_BASELINE_COMMIT` HAS TO MOVE, and that is Helen's to grant.**
      `test_agent_edited_drinks_are_not_marked_proofread` reads the PUBLIC
      repo's history only (#624), so it cannot tell a promotion from an edit:
-     it sees cocktail recipes marked `proofread: true` appearing in an agent's commit.
+     it sees cocktails marked `proofread: true` appearing in an agent's commit.
      Move the constant to the promotion commit, in a commit OF ITS OWN so she
      can revert just that, and prove the guard still bites afterwards by
      breaking it on purpose. See the constant's own comment in
      `tests/test_cocktails.py`.
 
      **The proof is cheap and it is not optional: run the test with the OLD
-     value and read the names.** It should name exactly the cocktail recipes you
+     value and read the names.** It should name exactly the cocktails you
      promoted and nothing else. Four moves went through on 2026-09-18/19 and
-     each one was proved that way; a move that names a cocktail recipe you did
+     each one was proved that way; a move that names a cocktail you did
      not touch is a move that is grandfathering something you have not looked at.
 
    - **CHECK THE PROMOTED PAGES BY NAME IN THE PRODUCTION BUILD.** `sh
@@ -178,11 +178,11 @@ turn that made it.
      nothing going wrong.** Copying the file and committing it proves nothing
      about whether it publishes.
 
-     It is also the only thing that finds a cocktail recipe held back for an unrelated
+     It is also the only thing that finds a cocktail held back for an unrelated
      reason: that check printed 65 files against 64 pages on 2026-09-19 and
      turned up Smokestack Lightning, `proofread: false` since 2026-09-16 and
      off the live site for three days with nobody looking. **Count the files
-     and count the pages; the difference should be exactly the cocktail recipes
+     and count the pages; the difference should be exactly the cocktails
      Helen is deliberately holding.**
 
    - **RUN `scripts/verify.py`, NOT THE SUITE YOU HAVE BEEN RUNNING.** A
@@ -222,12 +222,12 @@ even when it names one bottle**, and every generic is a declared one. Tests in
 forget it.
 
 **`STAGED_DIRS` IS THE LIST, AND IT IS A LIST FOR A REASON.**
-`5-final-proofread/` joined on 2026-09-18 (`PIPELINE.md` §3): a cocktail recipe is
+`5-final-proofread/` joined on 2026-09-18 (`PIPELINE.md` §3): a cocktail is
 there because it was staged and bounced back for a ruling, so it is going live the
 moment Helen answers, and it sits in a folder being edited for longer than
 anything else in the pipeline — which is precisely when a shorthand alias or a
 stray `item` creeps in. Had the constant stayed singular, the two staged rules
-would have stopped applying to exactly those cocktail recipes, quietly and green.
+would have stopped applying to exactly those cocktails, quietly and green.
 
 **`item` IS NO LONGER A PROMOTION CONCERN, since 2026-09-05.** It used to be
 one of the things the staging folder checked for, on the reasoning that the
@@ -252,7 +252,7 @@ recipe is promotable the field went long ago. A fresh ingest still writes it, be
 - Generics, syrups, honey water, the whole-fruit units: `_data/cocktails/ingredients.yml`.
 - Method steps and the automatic twist step: `_data/cocktails/methods.yml`.
 - **The ice and the rim: `_data/cocktails/serve.yml`** — a `serve` block on the
-  cocktail recipe, not prose in a method step. The page COMPOSES "Strain into an old
+  cocktail, not prose in a method step. The page COMPOSES "Strain into an old
   fashioned glass, over a large ice cube." from `method`, `glasses.yml`'s
   `serving` phrase and `serve.yml`'s `in_the_glass` clause, so a promoted cocktail
   recipe stores each fact once. MANUAL §9.10a.

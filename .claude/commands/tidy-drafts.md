@@ -44,11 +44,11 @@ recipe:
 | **fixes** | an unquoted `title`/`tagline`/`source`/`source_url`/`to_serve`; `--` → em dash; `->` → →; `3-4` → `3–4`; accents from `_data/accented_words.yml` |
 | **but only in** | `title`, `tagline`, `to_serve`, a `notes` entry's `label`/`text`, an ingredient's `note` — Helen's own writing and nothing else |
 
-What it will **not** touch on a cocktail recipe, and why each one is a decision rather
+What it will **not** touch on a cocktail, and why each one is a decision rather
 than an oversight:
 
 - **A `QQ` line**, by the *suite's* predicate rather than the food one. On a
-  cocktail recipe the marker sits behind a key — `tagline: "QQ"`, `text: "QQ - ..."` — and
+  cocktail the marker sits behind a key — `tagline: "QQ"`, `text: "QQ - ..."` — and
   the food pattern, which allows only a list dash and a quote in front of it,
   matches none of those. The script asks `conftest.checkable_text`.
 - **`item`, `suggestion`, `source`, `source_url`** — somebody else's words
@@ -59,7 +59,7 @@ than an oversight:
   accent or a dash written into one is a change to the vocabulary, which is a
   question for `_data/`.
 - **A `method` step** — `methods.yml` holds the canonical steps and a
-  `proposals` mechanism for changing one. Editing a step in a cocktail recipe file
+  `proposals` mechanism for changing one. Editing a step in a cocktail file
   quietly de-canonicalises it.
 - **An `amount`** — and this one is a *recorded harm*, not a principle.
   anitas-attitude-adjuster said `amount: "Top (30-45) ml"` with a `QQ` note
@@ -73,7 +73,7 @@ than an oversight:
 
 Food's own three rules stay food's: the `main_ingredients`/`tags` flow quoting,
 the #429 `meta:` migration and the #577 `size` rule run on `_food_drafts/` and
-nowhere else. A cocktail recipe's `meta:` is five keys in its own order and
+nowhere else. A cocktail's `meta:` is five keys in its own order and
 nobody asked to migrate it; its `amount` is never edited and its `item` was
 retired.
 
@@ -97,7 +97,7 @@ Helen's ruling was *"script it with a hand-review of the diff, one commit,
 before promotion"* — so `--only size` is run as its own commit in the drafts
 repo and the diff of that commit is the review.
 
-`tests/test_tidy_drafts.py` is the proof, on a fixture cocktail recipe under `tmp/` and
+`tests/test_tidy_drafts.py` is the proof, on a fixture cocktail under `tmp/` and
 never on Helen's files: it asserts the whole output byte for byte, so "fixed the
 six faults" cannot pass while something also happened to the other thirty lines.
 
@@ -170,7 +170,7 @@ six faults" cannot pass while something also happened to the other thirty lines.
 
 ## What this does not cover
 
-- **Everything on a cocktail recipe that is not Helen's own prose** — an `amount`, a
+- **Everything on a cocktail that is not Helen's own prose** — an `amount`, a
   method step, a vocabulary value, an `item` or a `suggestion`. The section
   above lists them with a reason each; the script's report names the ones the
   cocktails suite will still fail on, so a decline never looks like a miss.
@@ -194,5 +194,5 @@ answers are Helen's (fix it), somebody else's (`VERBATIM_KEYS`, and a `QQ` line
 anywhere), and `_data/cocktails/`'s (a closed vocabulary, or a canonical method
 step — change the declaration, then the files, never one file). A rule that
 cannot be sorted into one of those three is not a formatting rule.
-`model_instructions/PUBLISHING_A_DRINK.md` step 2 remains the human pass over a
-cocktail recipe, and this script does not replace it.
+`model_instructions/PUBLISHING_A_COCKTAIL.md` step 2 remains the human pass over a
+cocktail, and this script does not replace it.
