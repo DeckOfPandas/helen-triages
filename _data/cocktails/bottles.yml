@@ -210,6 +210,15 @@ bottles:
     generic: "moderately aged rum"
     aliases: ["Planteray Barbados 5", "Plantation Barbados 5",
               "Plantation Barbados 5 year old rum"]
+  # NAMED BY HELEN 2026-09-25 (#1108) for Away Colour, whose Punch source
+  # asks for "añejo rum, preferably Ron del Barrilito or Cruzan Single
+  # Barrel": "generic is moderately aged rum, suggestion is Cruzan Single
+  # Barrel, character is blackstrap." A St Croix (US Virgin Islands) rum, so
+  # the origin-free style, like Chairman's Reserve below; the blackstrap is the
+  # drink's `character`, never this file's (#441).
+  "Cruzan Single Barrel":
+    generic: "moderately aged rum"
+    aliases: ["Cruzan Single Barrel rum"]
 
   # --- lightly aged and filtered -------------------------------------------
   "Havana Club 3 year old":
@@ -219,6 +228,16 @@ bottles:
   "Flor de Caña Extra Dry":
     generic: "lightly aged and filtered rum"
     aliases: ["Flor de Caña extra dry white rum"]
+  # NAMED BY HELEN 2026-09-25 (#1108) for Fanny Chu's Piña Colada, whose
+  # Punch source asks for "Panamanian rum, or Planteray Three Star": "generic:
+  # lightly aged and filtered, suggestion Pedro Mandinga Panama silver rum,
+  # character raspadura." The name is hers as written. NOT a pricing input --
+  # `default_bottles` still says Havana 3 or El Dorado 3 for the category --
+  # and `raspadura` is the drink's `character` (rum_characters), not a fact
+  # recorded here.
+  "Pedro Mandinga Panama silver rum":
+    generic: "lightly aged and filtered rum"
+    aliases: ["Pedro Mandinga Silver", "Pedro Mandinga silver rum"]
   # JW SPICERS IS DELIBERATELY ABSENT. Helen, 2026-08-27: "never name Spicers --
   # if I have it skulking at the back of the nonsense shelf then I'll throw it
   # in where I can." Same rule as Long Island Iced Tea's rum: what is cheap and
