@@ -7387,6 +7387,39 @@ def test_every_declared_bottle_carries_a_price():
     )
 
 
+def test_the_price_check_date_is_less_than_two_years_old():
+    """costs.yml's `checked:` date is within the last 730 days -- #749.
+
+    Helen, 2026-09-25: "Build log line always with elapsed time, and also a
+    test that shouts after two years." The plugin's `Costs:` log line carries
+    the elapsed time on every build; this is the shout. `checked:` is the day
+    the `high` rows were read and "everything here decays from this date" (the
+    file's own words), so a figure two years stale is a figure nobody has
+    looked at, printed under "roughly" where nothing else would notice.
+
+    The date is parsed rather than string-compared so that a `checked:` that
+    is not a date at all fails here too, by name, instead of silently never
+    ageing.
+    """
+    import datetime
+
+    raw = _costs().get("checked")
+    try:
+        checked = datetime.date.fromisoformat(str(raw))
+    except ValueError:
+        pytest.fail(
+            f"_data/cocktails/costs.yml `checked:` is {raw!r}, which is not a "
+            f"YYYY-MM-DD date, so the prices cannot be said to be any age."
+        )
+    age = (datetime.date.today() - checked).days
+    assert age <= 730, (
+        f"_data/cocktails/costs.yml says its prices were checked on "
+        f"{checked.isoformat()}, which is {age} days ago -- more than two "
+        f"years. Re-read the `high` rows (Master of Malt, by hand -- see the "
+        f"file's header) and move `checked:` forward."
+    )
+
+
 def test_every_bottle_price_has_a_size_and_a_confidence():
     """A price without a size is not a price.
 
