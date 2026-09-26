@@ -27,6 +27,14 @@
 // are emitted by both page layouts; after chrome, and before the food partials
 // so a site's own file can re-point a hover.
 @import "shared/furniture";
+// The results count's digits and the sticky results bar (Helen, 2026-09-26,
+// "both treatments"). Shared because the count line and its bar are the same
+// object on both indexes, and BEFORE the food partials because
+// food/recipe-list reads its $results-bar-height for the list's
+// scroll-margin. Its one rule that competes with a food rule
+// (`.results-bar .btn-clear` against `.btn-clear` in active-filter-states) is
+// written two classes deep so the import order cannot decide it.
+@import "shared/results-bar";
 // The blocky rule, before the index partials below — they use its mixin,
 // same reason.
 @import "food/rule";

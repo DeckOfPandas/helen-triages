@@ -394,10 +394,29 @@ permalink: /cocktails/
      stylesheet stops being readable. {% endcomment %}
   {% comment %} `id="results"` IS WHERE A SEARCH RESULT LANDS -- #1050; the
      food index carries the same id on its count line and says why. {% endcomment %}
+  {% comment %} `.results-count-number` ON THE DIGITS -- Helen, 2026-09-26,
+     from the "N survivors" candidates page: "both treatments". The number
+     takes the label face (IBM Plex Mono, the same declarations as an
+     ingredient amount; _sass/shared/_results-bar.scss) and the word stays
+     bare. The element stays a <strong> -- the count IS the emphasis of this
+     sentence -- and _filters.scss no longer strips its weight. Food's count
+     took the same two-span shape the same day. {% endcomment %}
   <p class="drink-count" id="results">
-    <strong id="drink-count-n">{{ all_drinks.size }}</strong>
+    <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>
+
+  {% comment %} THE STICKY RESULTS BAR -- Helen, 2026-09-26, "both treatments".
+     food/index.html carries the identical block and the note: a mirror of the
+     count above and of the top `× clear all`, fixed to the top of the viewport
+     once `#results` has scrolled off it, revealed by assets/js/results-bar.js
+     and `hidden` otherwise, so the no-JS page is unchanged. {% endcomment %}
+  <div class="results-bar" data-results-bar hidden>
+    <div class="results-bar-inner">
+      <span class="results-bar-count"><span class="results-count-number" data-results-bar-n></span> <span data-results-bar-word></span></span>
+      <button type="button" class="btn-clear results-bar-clear" data-results-bar-clear>&times; clear all</button>
+    </div>
+  </div>
 
   {% comment %} THE ROW UNDER THE COUNT -- Helen, 2026-09-05: "move the ship mark
      into the same row so it's not hovering above the cards."
@@ -1117,6 +1136,13 @@ permalink: /cocktails/
   <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
+  {% comment %} THE STICKY RESULTS BAR, AFTER cocktail-index.js (2026-09-26).
+     It mirrors the count spans and the top `× clear all` that script builds,
+     wiring itself on DOMContentLoaded; food/index.html has the same tag in
+     the same place for the same reason, and
+     tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes
+     holds both. {% endcomment %}
+  <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
   {% comment %} AFTER cocktail-index.js and, more to the point, before
      _layouts/default.html's own decorations.js -- see universe.js's header
      comment for why that order is load-bearing: it is what lets a cloned,

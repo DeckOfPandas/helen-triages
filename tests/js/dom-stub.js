@@ -222,6 +222,12 @@ class Element {
     (this.listeners[type] = this.listeners[type] || []).push(fn);
   }
 
+  // `el.click()` -- results-bar.js, 2026-09-26. The bar's own `× clear all`
+  // forwards to the index's top button by calling its click(), the DOM method
+  // rather than a custom event, so that the index script's listener runs
+  // exactly as a real click would run it. A click is a dispatched click.
+  click() { this.dispatch('click'); }
+
   // Fire a listener as the browser would, for the tests that need to click.
   dispatch(type, event) {
     const ev = Object.assign({ type: type, target: this, preventDefault() {} }, event || {});

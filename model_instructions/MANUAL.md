@@ -559,6 +559,7 @@ apart from DOM wiring, so Node can test it.
 | `assets.js` | `HTF.escapeHtml`, `HTF.indexMemory`, `HTF.shortlist`, the asset helpers | `escape-html.test.js`, `index-memory.test.js`, `shortlist.test.js` |
 | `filters.js` | DOM wiring, food index | `food-index-startup.test.js` (§10.2) |
 | `cocktail-index.js` | DOM wiring, cocktails index | `tests/js/index-harness.js` (§10.2) |
+| `results-bar.js` | DOM wiring, the sticky results bar on both indexes (§13.7) | `results-bar.test.js` |
 
 **`HTF.filterState` is the MODULE and `HTF.filterState.create(SPEC)` is a
 BINDING of spec-bound functions**, and reading a name off the wrong one throws
@@ -3619,7 +3620,16 @@ or not"*.
 
 **"N survivors"**, left-aligned, plain body text, no punched treatment —
 `.results-heading .category-label` sets every value back to the body default
-on purpose. **Pagination**, 20 per page, prev/next, a status label, `(see
+on purpose. **Since 2026-09-26 the DIGITS alone take `$font-label`** (Helen,
+from a candidates page: "both treatments") — `.results-count-number` in
+`_sass/shared/_results-bar.scss`, `.ingredient-amount`'s declarations plus
+tabular figures at 1.1em, on `#recipe-count-n` / `#drink-count-n`; the WORD
+stays bare. **And a sticky bar**: `.results-bar`, `assets/js/results-bar.js`,
+fixed to the top of the viewport only while `IntersectionObserver` reports
+`#results` above it, mirroring the count spans and the top `× clear all`
+(clones, never recomputes; ships `hidden`; loaded after the index script —
+`test_the_results_bar_loads_after_the_index_script_on_both_indexes`).
+**Pagination**, 20 per page, prev/next, a status label, `(see
 all)`; the maths in `list-view.js`. **Shuffle** (Fisher-Yates) on clear-all
 and on every fresh load; `.recipe-list` starts `visibility: hidden` and is
 revealed after the first render, trading a visible flip for a blank instant.
