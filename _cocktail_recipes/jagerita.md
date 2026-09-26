@@ -27,6 +27,7 @@ mood:
   - "nightcap"
   - "festive"
   - "so wrong it's right"
+  - "no measuring"
 notes: []
 source: "Difford's"
 source_url: ""
@@ -35,5 +36,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
