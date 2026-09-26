@@ -7229,6 +7229,20 @@ verification. Dates are when the correction landed.
   data: it is built from `site.cocktail_recipes` only, so no card in it can ever
   be a draft.
 
+- **2026-09-25 — the recipe page keeps all thirteen devices; a device budget
+  is NOT the itch.** The 2026-09-24 audit's first candidate for *"I can't put
+  my finger on what bothers me"* was that the recipe page has a colour budget
+  (§13.2) and no device budget: about thirteen distinct treatments on a
+  five-ingredient page, each chosen alone. A candidates page showed the Moules
+  and Hollandaise pages at three budgets — all thirteen; eight (the metadata
+  box, the mono source line and the tinted note boxes flattened); five (also
+  no highlighter, dotted-word pills, a hairline stepper). Helen: *"all 13 I'm
+  afraid, I really did try to like EIGHT, sorry."* So the count of devices is a
+  decision the same way the count of hues is, and it is settled at what ships.
+  Do not re-open it with a smaller number; the two remaining candidates from
+  the audit (the fork sitting at the control layer; phone as a target) are
+  still open, and "N survivors" got a candidates page of its own the same day.
+
 - **2026-09-21, #1165 — the card glass clipped between 400 and 720px, and
   #1086's own fix is what broke it.** Helen: *"glasses are too large and are
   overflowing vertically on cocktail cards at medium screen widths."*

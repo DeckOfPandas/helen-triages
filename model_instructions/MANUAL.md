@@ -3513,6 +3513,14 @@ you navigate by, off what you read.** Magenta carries three jobs and doubles as
 "interactive/branded" colour. If a fifth colour is ever proposed, that is the
 point to ask whether an existing hue could do the job.
 
+**The DEVICE count is settled too, at what ships** (2026-09-25). A recipe page
+carries about thirteen distinct treatments — tape, mark, tagline, the tinted
+metadata box, the mono source line, pills, hairlines, caps actions, the
+highlighter, the stepper, list numbers, tinted note boxes, list rows — and
+Helen looked at the same page at eight and at five (DECISIONS §13) and kept
+all thirteen. Do not propose flattening one of them as a tidy-up; a smaller
+count is a design change she has already declined.
+
 ### 13.3 Spacing
 
 A named scale: `$spacing-block-gap` (1.75rem, within a section),
