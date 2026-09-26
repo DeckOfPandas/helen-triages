@@ -359,7 +359,7 @@ canonical_glasses:
 # test_every_glass_in_use_has_a_serving_phrase rather than rendering a step
 # with a hole in it.
 serving:
-  brandy glass: "a brandy glass"
+  brandy glass: "a brandy glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet
   collins: "a collins glass"
   coupe: "a coupe"
   double old fashioned: "a double old fashioned glass"
@@ -370,7 +370,7 @@ serving:
   # into "Strain into ___." and a bare noun would read as a telegram.
   margarita: "a margarita glass"
   martini: "a martini glass"
-  martini glass: "a martini glass"
+  martini glass: "a martini glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet
   mug: "a mug"
   # NEW 2026-09-20, for the Moscow Mule (#1068): the first drink to use it. The
   # source says "copper mug" and `mule mug` is the declared spelling; the icon

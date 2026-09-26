@@ -170,10 +170,16 @@ bottles:
   "Havana Club 7 year old":           { abv: 40,   confidence: high }
   "Planteray 5 Year Old Barbados":             { abv: 40,   confidence: medium }
   "Chairman's Reserve":               { abv: 40,   confidence: high }
+  # Named by Helen 2026-09-25 (#1108) for Away Colour. 40 is the published
+  # strength of the Single Barrel; the category's mode stays 40 with it.
+  "Cruzan Single Barrel":             { abv: 40,   confidence: high }
 
   # --- rum: light, blended and flavoured ---------------------------------
   "Havana Club 3 year old":           { abv: 40,   confidence: high }
   "Flor de Caña Extra Dry":           { abv: 40,   confidence: medium }
+  # Named by Helen 2026-09-25 (#1108) for Fanny Chu's Piña Colada, no strength
+  # given. A GUESS at the usual 40 for a silver rum; `low`, with the question.
+  "Pedro Mandinga Panama silver rum": { abv: 40,   confidence: low, qq: "Helen named the bottle without a strength (#1108). What does the Pedro Mandinga silver label say? 40 is a guess." }
   "Planteray 3 Stars":                { abv: 41.2, confidence: medium }
   "Planteray O.F.T.D.":               { abv: 69,   confidence: high }
   # In the house since 2026-09-06, #782, and CONFIRMED BY HELEN off the bottle
@@ -560,6 +566,9 @@ non_alcoholic:
   - black tea
   - espresso
   - coconut cream
+  # Coco Lopez and coconut milk, 3:1 -- Helen's generic for Fanny Chu's Piña
+  # Colada, 2026-09-25 (#1108). Two tins, neither with any alcohol in it.
+  - "Coco mix (3:1, Coco Lopez to coconut milk)"
   # "Cream is non-alcoholic." -- Helen, 2026-09-14 (#1014). The generic was
   # declared long before anything poured it by volume; the Grasshopper (#984)
   # is the first, and it failed the strength test until this line.

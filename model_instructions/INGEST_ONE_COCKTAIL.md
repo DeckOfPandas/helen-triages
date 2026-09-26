@@ -370,8 +370,9 @@ does not give one you cannot pick: that is a `QQ`.
 `clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
 `coconut rum`
 
-**Gin styles:** `London dry gin` · `Old Tom` · `Plymouth` · `New Western dry` ·
-`genever` · `navy strength gin` · `speciality` · `gin liqueur` · `sloe gin`
+**Gin styles:** `London dry gin` · `Old Tom` · `Plymouth` ·
+`New Western dry gin` · `genever` · `navy strength gin` · `speciality` ·
+`gin liqueur` · `sloe gin`
 
 **Whisky styles:** `rye` · `bonded rye` · `bourbon` · `blended scotch whisky` ·
 `single malt scotch whisky` · `Irish whiskey` · `Japanese whisky`
@@ -436,8 +437,9 @@ does not give one you cannot pick: that is a `QQ`.
 `kaffir lime leaves`
 
 **Other:** `soda water` · `ginger beer` · `water` · `black tea` · `espresso` ·
-`cola` · `coconut cream` · `egg white` · `salt` · `cider vinegar` ·
-`olive oil` · `cream` · `milk` · `whole egg`
+`cola` · `coconut cream` · `Coco mix (3:1, Coco Lopez to coconut milk)` ·
+`egg white` · `salt` · `cider vinegar` · `olive oil` · `cream` · `milk` ·
+`whole egg`
 <!-- vocab:generics end -->
 
 ---
@@ -478,26 +480,25 @@ see the warning in §2. Do not infer one.
 ### `garnish` — the declared vocabulary
 
 <!-- vocab:garnish start -->
-**Citrus peel:** lemon twist · lemon twist (discarded) ·
-lemon twist after expressing over cocktail · orange twist ·
+**Citrus peel:** lemon twist · lemon twist (discarded) · orange twist ·
 orange twist (discarded) · orange or lemon twist · grapefruit twist ·
 flamed orange zest coin · length of lime peel
 
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel ·
 lime wheel or wedge · lemon wheel · lemon slice · orange slice · orange wheel ·
-orange crescent · grapefruit crescents · citrus wheel ·
-dehydrated lime slice wheel · half an empty lime shell
+grapefruit crescents · citrus wheel · dehydrated lime slice wheel ·
+half an empty lime shell
 
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
 blackberry · dried apple slice · banana chip · raspberries · fruit wedges ·
-half an empty passion fruit shell · pineapple and brandied cherry
+half an empty passion fruit shell
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
-skewered maraschino cherry · skewered brandied cherry · cherry flag ·
+skewered maraschino cherry · skewered brandied cherry ·
 fruit stick (skewered pineapple cubes and a maraschino cherry) · fresh cherries
 
-**Herbs and leaves:** mint sprig · mint leaf · mint bouquet · rosemary sprig ·
+**Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
 pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
 edible orchid · mint sprig, mint leaf or grated nutmeg
 
