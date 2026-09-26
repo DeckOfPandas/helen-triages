@@ -6,7 +6,7 @@ laborious and inefficient."* This is the one map. The five documents that used
 to hold pieces of it still hold the DETAIL of their own step and point here for
 the journey: `.claude/commands/ingest.md` (the ingest contract, the tiers, the
 `QQ` shapes), `ingest-inbox.md` (the envelope consumer), `tidy-drafts.md` (the
-formatting pass), `PUBLISHING_A_DRINK.md` (the promotion steps, the word
+formatting pass), `PUBLISHING_A_COCKTAIL.md` (the promotion steps, the word
 "final"), `CLAUDE_WEB_INGEST.md` (the claude.ai Project). MANUAL §4.0 and §9.1.1
 say what the flags MEAN and this file does not restate them.
 
@@ -93,7 +93,7 @@ Helen sends material three ways and the difference is TRANSPORT only:
 
 Whichever door, **the same intake pass runs once, in one sitting, and ends in
 ONE list for Helen.** In order: save the file on a branch of the private repo
-(never its `main`); for a cocktail recipe, `python3 scripts/derive_cocktail_moods.py
+(never its `main`); for a cocktail, `python3 scripts/derive_cocktail_moods.py
 --write`; `/tidy-drafts` if the quoting or typography needs it; `pytest`;
 `python3 scripts/ingest_preflight.py`; then the list — every rejection, every
 probable duplicate, every hand-back bullet, every undeclared bottle, grouped by
@@ -146,7 +146,7 @@ keep the same numbers for the rest, so one name means one stage on both sites.
 
 **`5-final-proofread/` IS THE ONLY FOLDER AN AGENT PUTS A FILE IN**, and it
 exists because `4-promote/` stopped answering one question. Helen asked for it
-on 2026-09-18, after a batch of seventeen cocktail recipes came back with ten of them
+on 2026-09-18, after a batch of seventeen cocktails came back with ten of them
 needing a ruling: *"we're going to need a fifth folder in _drafts, something
 like 5-final-proofread, to hold recipes I wanted to promote but you
 (reasonably) bounced back."* It is the same argument that made her delegate
@@ -156,11 +156,11 @@ to find out which I still need to proofread"* — applied one stage earlier.
 goes back to `4-promote/` on `ready ‹slug›` once she has ruled.
 
 **IT IS THE PUBLISHED TENSE, exactly as `4-promote/` is** (`STAGED_DIRS` in
-`tests/test_cocktails.py`): a cocktail recipe got here BY being staged and goes live the
+`tests/test_cocktails.py`): a cocktail got here BY being staged and goes live the
 moment she rules, so the rules that bite at promotion — a bottle's canonical
 name rather than an alias, and no `QQ` left anywhere — bite here too. Leaving it
 out of that constant would have been silent: those tests would simply have
-stopped applying to the cocktail recipes that sit longest in a folder while being edited.
+stopped applying to the cocktails that sit longest in a folder while being edited.
 (The `no item` rule was the third of them until 2026-09-21, when the field was
 retired outright and the whole check with it.)
 
@@ -180,7 +180,7 @@ the chat or in an issue, each followed by one or more slugs:
 | `bin ‹slug›` | deletes it from the private repo — made and disliked |
 
 **The fifth folder needs no word of hers, because the move is Claude's.** A
-cocktail recipe lands in `5-final-proofread/` when the mechanical pass finishes and
+cocktail lands in `5-final-proofread/` when the mechanical pass finishes and
 something in it still needs her — an undeclared garnish, a generic nobody has
 coined, a choice between two shapes. That move goes in the same commit as the
 list of what it is waiting for, so the folder and the list never disagree.
@@ -203,7 +203,7 @@ this week*, which is the question the index exists for.
 
 ## 4. Out: `4-promote/` to the live site
 
-`PUBLISHING_A_DRINK.md` has each step in full and the word "final"; both sites
+`PUBLISHING_A_COCKTAIL.md` has each step in full and the word "final"; both sites
 follow it since 2026-09-14 (food used to have no written procedure for this).
 
 1. **Helen says `ready ‹slug›`** or moves the file into `4-promote/` herself.
@@ -219,7 +219,7 @@ follow it since 2026-09-14 (food used to have no written procedure for this).
 3. **Claude says `final: ‹slugs›`**, and **moves anything still needing a
    ruling into `5-final-proofread/`** (cocktails). Until that word the served
    pages are work in progress and not for proofreading; after it, the two
-   folders say who each cocktail recipe is waiting on without anyone having to re-read
+   folders say who each cocktail is waiting on without anyone having to re-read
    the list.
 4. **Helen proofreads the rendered page** at `/…/drafts/4-promote/‹slug›/`
    and sets `proofread: true`, or names the slugs and Claude sets it on her
@@ -284,7 +284,7 @@ checking something else. Pass `origin/main` to ask about the live site rather
 than the working tree, and fetch first.
 
 **A DERIVED VALUE IS THE THIRD SIZE, AND IT ARRIVES FIFTEEN FILES AT A TIME.**
-Added 2026-09-20 (#1127), when `no measuring` landed on 15 published cocktail recipes at
+Added 2026-09-20 (#1127), when `no measuring` landed on 15 published cocktails at
 once. The first row's "ask first" does not fit — the change is a re-run of a
 script, not a word, and there is nothing to quote her until it has run. The
 third row fits mechanically — since the batch rule above, one issue covers a
@@ -357,5 +357,5 @@ Listed so the map is honest about which lines are drawn and which are paved.
 - [ ] `scripts/promote.py`: the copy, compare, delete and baseline steps of §4,
       which have been done by hand and got wrong once each.
 - [ ] The `to make (N)` view on both local indexes (§3), if Helen wants it.
-- [ ] Fold `PUBLISHING_A_DRINK.md`'s steps into §4 and leave that file as a
+- [ ] Fold `PUBLISHING_A_COCKTAIL.md`'s steps into §4 and leave that file as a
       pointer, once §4 has carried one batch on both sites.

@@ -1620,7 +1620,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # asserted at copy time -- and the test reads the PUBLIC repo's history only
 # (#624), so all it can see is seven files marked `proofread: true` appearing
 # in an agent's commit. That is indistinguishable from an agent editing seven
-# proofread drinks, and it is exactly what `PUBLISHING_A_DRINK.md` step 6
+# proofread drinks, and it is exactly what `PUBLISHING_A_COCKTAIL.md` step 6
 # warned this constant would have to absorb.
 #
 # HER GRANT, and the read is already done rather than promised, which makes
@@ -1657,7 +1657,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # asserted at copy time -- and this test reads the PUBLIC repo's history only
 # (#624), so all it can see is ten files marked `proofread: true` appearing in an
 # agent's commit. Indistinguishable from an agent editing ten proofread drinks,
-# which is the case `PUBLISHING_A_DRINK.md` step 6 says this constant exists to
+# which is the case `PUBLISHING_A_COCKTAIL.md` step 6 says this constant exists to
 # absorb.
 #
 # HER GRANT: "Those are all fine. Set proofread to true, and fully promote!"

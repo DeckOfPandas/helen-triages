@@ -91,7 +91,11 @@ food:
 cocktails:
   title: Helen Triages Cocktails
   word: COCKTAILS
-  description: What to drink, not how to mix it
+  # "What to drink." -- Helen's #1097 ruling, 2026-09-25, full stop included.
+  # Read by the visually-hidden h1 on cocktails/index.html and by
+  # _layouts/default.html as the fallback <meta description> / og:description
+  # for any cocktails page with no tagline of its own.
+  description: What to drink.
   css: cocktails
   home: /cocktails/
   icon: glass-martini

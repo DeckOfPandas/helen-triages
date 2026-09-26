@@ -30,7 +30,7 @@
 #
 # CLONING IS READING. Nothing here writes to a remote. Writing to the clone
 # follows the Git workflow section of CLAUDE.md: a branch, never `main`, and
-# `PUBLISHING_A_DRINK.md`'s one-working-copy rule while a batch is open.
+# `PUBLISHING_A_COCKTAIL.md`'s one-working-copy rule while a batch is open.
 #
 # EXACTLY TWO ARGUMENTS, SINCE 2026-09-11, WHEN IT BECAME ALLOW-LISTED. It used
 # to pass everything after the repo straight to `git clone`, and `git clone`
