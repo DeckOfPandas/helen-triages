@@ -146,6 +146,17 @@ measures:
     # says when.
     - to top
     - to rinse
+    # A FOURTH ACTION, 2026-09-26 (#1179): the Gin Rickey's soda water. Helen,
+    # asked whether 15 ml of soda in a highball was really a `to top`: "Let's
+    # add 'splash'."
+    #
+    # IT IS NOT A SMALL `to top`, AND THAT IS WHY IT EARNS A WORD. `to top`
+    # means all the room that is left -- the whole of #1179's unfinished sum,
+    # capacity minus the build minus the ice. A splash is a deliberate small
+    # pour that does NOT fill the glass, and writing it as `to top` would have
+    # told the reader, and `top_up_ml`, the opposite of what the drink wants.
+    # Writing it as `15 ml` was the other wrong answer: nobody measures it.
+    - splash
     # A THIRD ACTION, 2026-09-14 (#752): the Ti' Punch. Helen: "let's say 60 ml
     # rum, then lime and sugar to taste -- this drink is typically served as
     # rhum in a glass with lime and sugar on the side so people can roll their

@@ -126,7 +126,21 @@ def test_a_generic_helen_reserved_never_resolves(tables):
     "tequila",            # blanco, reposado or añejo -- the source did not say
     "agave nectar",       # near-miss for `agave syrup`, and a near-miss is a guess
     "Planteray Three Star",   # a real bottle this repo has not declared
-    "Cruzan Single Barrel",   # the same
+    # `Cruzan Single Barrel` WAS HERE AND CAME OFF 2026-09-26, because the
+    # reason it was here was answered. Its comment read "the same" -- a real
+    # bottle this repo has not declared -- and d81d235 declared it, as
+    # `moderately aged rum`, on Helen's #1108 answer. So it resolves at Tier 1
+    # now, correctly, and the entry had become a claim the data contradicts.
+    #
+    # IT TURNED `main` RED AND THAT IS A DEPLOY OUTAGE, not a red build: the
+    # suite gates the deploy, so every merge after it shipped nothing. The two
+    # halves landed in one commit -- the bottle in `_data/`, the list here
+    # untouched -- and nothing in that commit's own review connected them.
+    #
+    # THE TELL, FOR NEXT TIME: this list is the one place in the suite that
+    # asserts a bottle is NOT known, so it is the one place that a declaration
+    # can falsify. Declaring a bottle means checking here. Its sibling stays:
+    # `Planteray Three Star` really is still undeclared.
 ])
 def test_words_nobody_can_resolve_are_left_alone(words, tables):
     """Helen, 2026-09-21: "if a recipe gives 'blackstrap' Claude shouldn't

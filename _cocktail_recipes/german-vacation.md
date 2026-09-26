@@ -28,6 +28,7 @@ method:
   - "Strain."
   - "Top and heap with more crushed ice, then drop the bitters on the top."
 mood:
+  - "sharp"
   - "warming"
   - "sugar craving"
   - "sunny terrace"
@@ -41,5 +42,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

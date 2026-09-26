@@ -19,7 +19,7 @@ ingredients:
     suggestion: ["Rhum Clément Créole Shrubb"]
   - amount: "22.5 ml"
     generic: "lemon juice"
-  - amount: "2 dash"
+  - amount: "2 dashes"
     generic: "Créole bitters"
     suggestion: ["Peychaud's"]
 method:
@@ -39,5 +39,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

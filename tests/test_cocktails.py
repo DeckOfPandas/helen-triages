@@ -736,6 +736,11 @@ WHOLE_COLLECTION_ONLY = {
     "test_the_cross_category_check_is_exercised",
     "test_the_syrup_ratio_check_is_exercised",
     "test_the_amount_table_is_exercised",
+    # ADDED 2026-09-26 with the counted-unit rule. `_exercised` wraps
+    # `_require_whole_collection`, so this is a sixth coverage claim and this
+    # registry caught it the moment it was written -- which is the registry
+    # doing its job rather than a nuisance.
+    "test_the_plural_unit_rule_is_exercised",
     # A correction whose drink is merely ABSENT looks exactly like one whose
     # drink is gone -- see _require_whole_collection.
     "test_every_mood_correction_is_reachable_and_needed",
@@ -3668,6 +3673,106 @@ def test_the_amount_table_is_exercised():
         read, "the amount table",
         "Every amount in the collection failed to parse, or none was found at "
         "all -- `measures:` or the `amount` key has moved.")
+
+
+# THE PAIRS THIS RULE CAN SPEAK ABOUT, and it is deliberately not every unit.
+# Helen, 2026-09-26: "'dashes' throughout please, but 'dash' when it's one."
+#
+# A UNIT NEEDS BOTH FORMS DECLARED IN `non_volumetric` BEFORE IT IS IN SCOPE.
+# `pinch`, `sprig`, `strip` and `each` have no declared plural, so a rule that
+# demanded one would be inventing vocabulary rather than enforcing it -- and
+# `each` never takes one at all ("8 each"). Declaring the plural is what
+# switches enforcement on, the same bargain `measures:` already strikes with
+# test_every_amount_is_readable_as_a_quantity one block up.
+#
+# `half` AND `whole` ARE ABSENT FOR A DIFFERENT REASON: they are units with no
+# number in front of them, so there is no count to agree with.
+PLURAL_UNITS = {"dash": "dashes", "drop": "drops",
+                "cube": "cubes", "leaf": "leaves"}
+
+_COUNTED_AMOUNT = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(.+?)\s*$")
+
+
+def _plural_unit_scan():
+    """(how many counted amounts were checked, the ones whose form is wrong).
+
+    ONE SCAN, TWO TESTS -- see `_character_scan`.
+    """
+    declared = set((_vocab().get("measures") or {}).get("non_volumetric") or [])
+    pairs = {s: p for s, p in PLURAL_UNITS.items()
+             if s in declared and p in declared}
+    singulars, plurals = set(pairs), set(pairs.values())
+
+    checked = 0
+    bad = []
+    for slug, fm in _load():
+        for item in (fm.get("ingredients") or []):
+            if not isinstance(item, dict):
+                continue
+            match = _COUNTED_AMOUNT.match(str(item.get("amount", "")))
+            if not match:
+                continue
+            count, unit = float(match.group(1)), match.group(2)
+            if unit not in singulars | plurals:
+                continue
+            checked += 1
+            wants_plural = count != 1
+            if wants_plural == (unit in plurals):
+                continue
+            want = pairs[unit] if wants_plural else \
+                next(s for s, p in pairs.items() if p == unit)
+            bad.append(f"{slug}: {item['amount']!r} should be "
+                       f"'{match.group(1)} {want}'")
+    return checked, bad
+
+
+def test_a_counted_unit_agrees_with_its_count():
+    """`1 dash`, `2 dashes` -- Helen's rule, 2026-09-26.
+
+    "'dashes' throughout please, but 'dash' when it's one. Yes please to a
+    test." The collection had it both ways: 71 amounts already agreed and six
+    did not, all six of them `2 dash` or `6 dash`, across three published
+    drinks and three drafts.
+
+    IT IS A RENDERED STRING, WHICH IS WHY IT IS WORTH A TEST AND NOT A STYLE
+    NOTE. `amount` prints on the recipe page and on the shopping list exactly as
+    it is written, so "2 dash orange bitters" is a typo the reader sees. Nothing
+    derived reads the form -- `_millilitres` accepts either, since both are
+    declared in `non_volumetric` -- so before this test the two spellings were
+    invisible to every check in the suite and drifted for as long as the
+    collection has existed.
+
+    THE FIX IS ALWAYS THE AMOUNT, NEVER THE VOCABULARY. Both forms stay
+    declared: `1 dash` is right and so is `2 dashes`, and dropping either from
+    `measures:` would make one of them unreadable.
+    """
+    _, bad = _plural_unit_scan()
+    assert not bad, (
+        "Counted amounts whose unit disagrees with their number:\n  "
+        + "\n  ".join(sorted(bad))
+        + "\n\nHelen, 2026-09-26: \"'dashes' throughout please, but 'dash' "
+          "when it's one.\" Fix the `amount`, not `measures:` -- both forms "
+          "are declared on purpose, because both are correct at the right "
+          "count. A unit with no declared plural (pinch, sprig, strip, each) "
+          "is not checked here at all."
+    )
+
+
+def test_the_plural_unit_rule_is_exercised():
+    """Counted amounts are actually being read.
+
+    The scan silently skips an amount whose unit is outside `PLURAL_UNITS`, so
+    a rename in `measures:` -- or a change to how `amount` is spelled -- would
+    empty this check while leaving it green. That is the exact shape MANUAL 10
+    records five guards going quiet in, and counting what got through is the
+    only thing that notices.
+    """
+    checked, _ = _plural_unit_scan()
+    _exercised(
+        checked, "the counted-unit rule",
+        "No counted amount was checked at all -- either `PLURAL_UNITS` no "
+        "longer matches what `measures:` declares, or the `amount` shape has "
+        "moved.")
 
 
 US_UNITS = {"oz", "ounce", "ounces", "tsp", "teaspoon", "teaspoons",
