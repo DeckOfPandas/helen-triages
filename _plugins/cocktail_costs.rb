@@ -66,6 +66,7 @@
 # syrup plus one top, which its own `portioning` note says is 3-4 orders.
 # =============================================================================
 
+require "date"
 require "set"
 
 module HelenTriages
@@ -171,13 +172,34 @@ module HelenTriages
       }
       site.data["cocktails"]["rates"] = rates
 
+      # THE LOG LINE ALWAYS SAYS HOW OLD THE PRICES ARE -- #749, Helen,
+      # 2026-09-25: "Build log line always with elapsed time, and also a test
+      # that shouts after two years." `checked:` is the file's honesty
+      # (MANUAL 9.3.5), and a date on its own asks the reader to do the
+      # subtraction; "21 days ago" does not. The two-year shout is
+      # tests/test_cocktails.py::test_the_price_check_date_is_less_than_two_years_old.
       Jekyll.logger.info "Costs:", "priced #{counted} drinks " \
-        "(prices checked #{@costs['checked']}); " \
+        "(prices checked #{@costs['checked']}#{checked_age}); " \
         "rates for #{rates['generics'].size} generics, " \
         "#{rates['bottles'].size} bottles"
     end
 
     private
+
+    # ", N days ago" for the log line, computed from the build date, or "" if
+    # `checked:` is not a date -- the test above names that, so the build need
+    # not fall over for it.
+    def checked_age
+      checked = Date.parse(@costs["checked"].to_s)
+      days = (Date.today - checked).to_i
+      case days
+      when 0 then ", today"
+      when 1 then ", 1 day ago"
+      else ", #{days} days ago"
+      end
+    rescue ArgumentError, TypeError
+      ""
+    end
 
     # GBP per litre for one declared bottle, or nil if it carries no price.
     def bottle_rate(name)
