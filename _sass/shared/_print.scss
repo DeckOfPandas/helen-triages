@@ -124,6 +124,16 @@
     display: none;
   }
 
+  // THE STICKY RESULTS BAR (shared/_results-bar.scss, 2026-09-26) is
+  // `position: fixed`, and a fixed box prints on EVERY sheet in most
+  // browsers. It is a control -- a count and a `× clear all` -- and on paper
+  // there is nothing to clear. The bar is `hidden` unless the reader has
+  // scrolled past the count line, which is exactly the state a long index is
+  // printed from.
+  .results-bar {
+    display: none;
+  }
+
   // <main>'s padding holds the content off the window edge; @page's margin
   // above does that job on paper, and keeping both would inset the text by
   // roughly 30mm a side. The width cap goes for the same reason — the sheet

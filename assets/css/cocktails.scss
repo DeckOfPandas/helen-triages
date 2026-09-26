@@ -44,6 +44,12 @@
 // actions row (#1005/#1011/#1024). Both page layouts emit the two includes it
 // styles; after chrome, before cocktails/shortlist, which re-points its hovers.
 @import "shared/furniture";
+// The results count's digits and the sticky results bar (Helen, 2026-09-26,
+// "both treatments"), in the same relative position as food.scss. Its one
+// rule that competes with a cocktails rule (`.results-bar .btn-clear` against
+// `.btn-clear` in cocktails/filters) is two classes deep, so this can sit
+// before the site partials as it does on food.
+@import "shared/results-bar";
 @import "cocktails/decoration";
 @import "cocktails/cocktail";
 @import "cocktails/cards";

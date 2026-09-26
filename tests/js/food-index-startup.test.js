@@ -52,6 +52,12 @@ const SCRIPTS = [
   'shopping-list.js',
   'food-shopping-list.js',
   'filters.js',
+  // 2026-09-26. The sticky results bar (tests/js/results-bar.test.js has its
+  // own fixture). It wires itself on DOMContentLoaded, AFTER filters.js's
+  // handler, and returns at once here: this sandbox has no
+  // IntersectionObserver, which is the no-bar path a real browser without the
+  // API takes.
+  'results-bar.js',
   // #849. Nobody's dependency: it reads HTF.shortlist at run time rather than
   // lifting helpers off another module at startup, and it subscribes to
   // `htf:shortlist-change` rather than being called. Listed anyway because the
@@ -164,6 +170,15 @@ function boot(options) {
   // startup block scrolls to WHATEVER `location.hash` names rather than only
   // the literal string "results".
   const results = el('div', 'results-heading', { id: 'results' });
+  // THE COUNT'S REAL SHAPE SINCE 2026-09-26: the number and the word in their
+  // own spans inside `#recipe-count`, so the digits can take the label face
+  // (`.results-count-number`) and the word stay bare. filters.js paints the
+  // two spans and falls back to the outer element's text when they are absent.
+  const countOuter = el('span', 'category-label-text', { id: 'recipe-count' });
+  countOuter.appendChild(el('span', 'results-count-number', { id: 'recipe-count-n' }));
+  countOuter.appendChild(doc.createTextNode(' '));
+  countOuter.appendChild(el('span', '', { id: 'recipe-count-word' }));
+  results.appendChild(countOuter);
   doc.body.appendChild(results);
   const starSection = el('div', 'category category--star', { id: 'filter-star' });
   doc.body.appendChild(starSection);
@@ -289,6 +304,16 @@ test('it still gets to the end with a shortlist to render', () => {
   win.HTF.shortlist.toggle('/food/recipes/a/');
   showTheList(doc);
   assert.strictEqual(list.style.visibility, 'visible');
+});
+
+test('the count paints its number and its word into separate spans', () => {
+  // 2026-09-26: the digits take `.results-count-number` and the word stays
+  // bare, so filters.js writes the two halves separately -- and the outer
+  // element still reads "N survivors" for anything that reads the sentence.
+  const { doc } = boot();
+  assert.strictEqual(doc.getElementById('recipe-count-n').textContent, '3');
+  assert.strictEqual(doc.getElementById('recipe-count-word').textContent, 'survivors');
+  assert.strictEqual(doc.getElementById('recipe-count').textContent, '3 survivors');
 });
 
 test('a page with no shopping list at all still runs', () => {

@@ -1031,10 +1031,16 @@
                                    // .results-heading, 2026-09-02
   padding-top: $space-md;
 
-  // The number keeps its element -- the script writes into it by id, and a
-  // count IS the emphasis of this sentence -- but not a second weight and size
-  // of its own. Food's line is one plain sentence and reads as one.
-  strong { font-weight: inherit; font-size: inherit; color: inherit; }
+  // THE NUMBER HAS ITS OWN FACE, WEIGHT AND SIZE AGAIN -- Helen, 2026-09-26,
+  // from the "N survivors" candidates page: "both treatments". A
+  // `strong { font-weight: inherit; font-size: inherit; color: inherit; }`
+  // stood here from 2026-09-02, so that the count read as one plain sentence
+  // like food's; the digits now take `.results-count-number`
+  // (shared/_results-bar.scss: IBM Plex Mono 600, tabular, 1.1em) on both
+  // sites, the word stays bare, and a rule stripping the <strong>'s weight
+  // would have beaten that class on specificity. The element stays a
+  // <strong>: the script writes into it by id, and the count IS the emphasis
+  // of the sentence.
 }
 
 // THE ROW UNDER THE COUNT -- Helen, 2026-09-05: "move the ship mark into the

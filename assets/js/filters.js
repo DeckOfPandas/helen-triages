@@ -1141,9 +1141,24 @@ function renderResultsPool() {
       if (nameSearchClear) nameSearchClear.style.visibility = state.nameQuery ? 'visible' : 'hidden';
     }
 
+    /* THE NUMBER AND THE WORD ARE TWO SPANS SINCE 2026-09-26 -- Helen, from
+       the "N survivors" candidates page: the digits take the label face
+       (`.results-count-number`, shared/_results-bar.scss) and the word stays
+       bare, which is the shape cocktails' count has always had
+       (`#drink-count-n` / `#drink-count-word`). The outer `#recipe-count`
+       still reads "N survivors" as one sentence. The fallback keeps an older
+       template, or a fixture with only the outer element, painting. */
     var recipeCountEl = document.getElementById('recipe-count');
     if (recipeCountEl) {
-      recipeCountEl.textContent = visibleCount + (visibleCount === 1 ? ' survivor' : ' survivors');
+      var survivorWord = visibleCount === 1 ? 'survivor' : 'survivors';
+      var recipeCountN = document.getElementById('recipe-count-n');
+      var recipeCountWord = document.getElementById('recipe-count-word');
+      if (recipeCountN && recipeCountWord) {
+        recipeCountN.textContent = visibleCount;
+        recipeCountWord.textContent = survivorWord;
+      } else {
+        recipeCountEl.textContent = visibleCount + ' ' + survivorWord;
+      }
     }
 
     // Hidden entirely once showAll is set, not just its prev/next disabled --

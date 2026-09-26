@@ -81,6 +81,13 @@
   list-style: none;
   padding: 0;
   margin: 0 0 $space-xxl;
+  // UNDER THE STICKY RESULTS BAR AFTER A PAGE TURN -- 2026-09-26. filters.js
+  // scrolls this list's top edge into view on prev/next, which leaves
+  // `#results` just above the viewport -- exactly when
+  // shared/_results-bar.scss's fixed bar appears. The bar's own height plus a
+  // step of air, so the first row lands beneath the bar rather than under it.
+  // Cocktails' pager does not scroll, so `.drink-cards` needs no twin of this.
+  scroll-margin-top: calc(#{$results-bar-height} + #{$space-sm});
   // Hidden until filters.js has shuffled and revealed it (removes this
   // inline via style.visibility) -- the alternative is painting the list in
   // its server-rendered alphabetical order first and visibly flipping to the

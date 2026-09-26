@@ -261,8 +261,16 @@ permalink: /food/
    the browser scrolls here on arrival, and filters.js does it again once the
    list is revealed. The same id on the drinks index, so page-search.js knows
    one word for both sites. {% endcomment %}
+{% comment %} THE NUMBER AND THE WORD ARE TWO SPANS SINCE 2026-09-26 -- Helen,
+   from the "N survivors" candidates page: "both treatments". The digits take
+   the label face (`.results-count-number`, _sass/shared/_results-bar.scss --
+   IBM Plex Mono, the same declarations as an ingredient amount) and the word
+   stays bare, §13.7's ruling. Cocktails' count has had this shape since #489
+   (`#drink-count-n` / `#drink-count-word`); this is food catching up.
+   filters.js paints the two spans; `#recipe-count` still reads "N survivors"
+   as one sentence. The Liquid is the resting value for the first render. {% endcomment %}
 <div class="results-heading" id="results">
-  <span class="category-label"><span class="category-label-text" id="recipe-count">{{ _rendered_recipes.size }} survivor{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span>
+  <span class="category-label"><span class="category-label-text" id="recipe-count"><span class="results-count-number" id="recipe-count-n">{{ _rendered_recipes.size }}</span> <span id="recipe-count-word">survivor{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span></span>
 
   {% comment %} THE SHORTLISTED-ONLY VIEW -- GitHub issue #546's second half,
      "see a list of recipes they've shortlisted".
@@ -294,6 +302,23 @@ permalink: /food/
      SHIPS `hidden`. It needs shortlist.js like every other control does, and it
      is revealed by the same pass -- `[data-shortlist-count]` inside it is what
      that pass fills in. {% endcomment %}
+</div>
+
+{% comment %} THE STICKY RESULTS BAR -- Helen, 2026-09-26, "both treatments".
+   One line fixed to the top of the viewport once the count line above has
+   scrolled off it: the live count and a `× clear all`. A MIRROR, never a
+   second count: assets/js/results-bar.js copies the two spans above and the
+   top clear-all's visibility, and its button clicks that one. Ships `hidden`
+   and stays so without JavaScript or without IntersectionObserver, so the
+   no-JS page is unchanged. The identical block sits on cocktails/index.html;
+   _sass/shared/_results-bar.scss styles both. The count spans start empty --
+   a third Liquid copy of the count would be a third thing to keep in step,
+   and the script fills them before the bar is ever shown. {% endcomment %}
+<div class="results-bar" data-results-bar hidden>
+  <div class="results-bar-inner">
+    <span class="results-bar-count"><span class="results-count-number" data-results-bar-n></span> <span data-results-bar-word></span></span>
+    <button type="button" class="btn-clear results-bar-clear" data-results-bar-clear>&times; clear all</button>
+  </div>
 </div>
 
 <div class="results-count-row">
@@ -796,6 +821,12 @@ permalink: /food/
 <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>
+{% comment %} THE STICKY RESULTS BAR, AFTER filters.js AND THE ORDER IS
+   LOAD-BEARING (2026-09-26): both register a DOMContentLoaded handler, and
+   listeners fire in registration order, so the bar's runs after the one that
+   builds the `× clear all` it mirrors. Guarded by
+   tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes. {% endcomment %}
+<script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
 {% comment %} #849. ORDER DOES NOT MATTER for this one, unlike the two above it:
    it reads HTF.shortlist at run time rather than lifting helpers off another
    module at startup, and it subscribes to an event rather than being called by
