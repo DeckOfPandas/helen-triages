@@ -1214,13 +1214,22 @@ layout: default
      IT FALLS BACK TO HERE if there is no strain step to carry it, which no
      drink needs today. Losing a rim silently is worse than an occasional
      duplicate heading. {% endcomment %}
-  {% if page.to_serve or page.serve.rim and rim_shown == false %}
+  {% comment %} AN EMPTY STRING IS TRUTHY -- #1212, Helen: "don't show 'to
+     serve' section if it's blank." The gate tested the bare value, and
+     `to_serve: ""` is how the ingest leaves a drink with nothing to say (ten
+     drafts carried it on 2026-09-26), so each of those drew a "To serve"
+     heading over an empty paragraph. Same property that bit the glass
+     accumulator and the source footer above. `strip` turns nil and "" and
+     whitespace alike into "", and the test is against "" -- the shape the
+     header comment prescribes for every string-gated section. {% endcomment %}
+  {% assign to_serve_text = page.to_serve | strip %}
+  {% if to_serve_text != "" or page.serve.rim and rim_shown == false %}
     <h2 class="cocktail-section-heading">To serve</h2>
     {% if page.serve.rim and rim_shown == false %}
       <p class="cocktail-to-serve cocktail-serve-rim">{{ page.serve.rim | capitalize }}.</p>
     {% endif %}
-    {% if page.to_serve %}
-      <p class="cocktail-to-serve">{{ page.to_serve | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+    {% if to_serve_text != "" %}
+      <p class="cocktail-to-serve">{{ to_serve_text | markdownify | remove: '<p>' | remove: '</p>' }}</p>
     {% endif %}
   {% endif %}
 
