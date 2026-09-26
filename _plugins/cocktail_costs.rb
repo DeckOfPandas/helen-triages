@@ -443,6 +443,15 @@ module HelenTriages
       {
         "min"      => min.round(2),
         "max"      => max.round(2),
+        # THE PRINTED FORM, TWO DECIMALS ALWAYS -- #1215, Helen: "price per
+        # glass should have two decimal places." `round(2)` is a Float and a
+        # Float drops its trailing zero, so 3.2 printed as £3.2 beside a £3.29.
+        # Formatted HERE and not in Liquid because Liquid has no printf: the
+        # layout prints these two strings and nothing else, while `min`/`max`
+        # stay numbers for the data attributes, the index's JSON blob and the
+        # shopping list, which multiply before they round (`toFixed(2)`).
+        "min_text" => format("%.2f", min),
+        "max_text" => format("%.2f", max),
         # True when min and max agree to the penny -- every pour named its
         # bottle, so there is nothing to range over and the page prints one
         # figure. Computed here so the template asks a boolean, not a float.

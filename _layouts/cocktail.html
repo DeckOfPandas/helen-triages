@@ -1384,12 +1384,19 @@ layout: default
           {%- else %} in a serving{% endif %}
           {%- if page.volume %} of {{ page.volume.serve_ml }} ml{% endif %}.</p>
       {% endif %}
+      {% comment %} `min_text` / `max_text` ARE THE PRINTED FIGURES, `min` /
+         `max` THE DATA -- #1215, Helen: "price per glass should have two
+         decimal places." The plugin rounds to a Float, and a Float prints
+         3.2 as "3.2", so this line read "£3.2–£3.29" on Between the Sheets.
+         Liquid cannot pad a number, so the plugin formats the strings and
+         this prints them; the numeric fields stay on the data attributes
+         because scripts multiply those and would choke on a string. {% endcomment %}
       {% if has_cost %}
         <p class="cocktail-cost"
            data-cost-min="{{ page.cost.min }}"
            data-cost-max="{{ page.cost.max }}">Roughly <span class="cocktail-cost-figure">{% if page.cost.exact
-            %}&pound;{{ page.cost.min }}{% else
-            %}&pound;{{ page.cost.min }}&ndash;&pound;{{ page.cost.max }}{% endif %}</span> a glass in ingredients.</p>
+            %}&pound;{{ page.cost.min_text }}{% else
+            %}&pound;{{ page.cost.min_text }}&ndash;&pound;{{ page.cost.max_text }}{% endif %}</span> a glass in ingredients.</p>
       {% endif %}
     </div>
   {% endif %}
