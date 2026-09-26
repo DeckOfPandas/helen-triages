@@ -257,7 +257,11 @@ moods:
     NOT MEASURED, NOT COUNTED: dashes, drops, pinches, a `to top`, a `to taste`
     and half a lime are all ignored, because none of them has a volume to be in
     proportion to. Helen, #1127: "ignore ingredients in drops, dashes, pinches,
-    etc." A drink whose only measured line is one pour of spirit therefore
+    etc." AND A 5 ML POUR, since 2026-09-26 (#1216), Helen: "if any amounts
+    are 5 ml, this is just a bar spoon, and doesn't count as needing to be
+    measured" -- so a bar spoon of syrup neither joins the ratio nor becomes
+    the smallest measure everything else is divided by. Exactly 5 ml, not
+    smaller: 2.5 and 7.5 are quarter- and half-jiggers. A drink whose only measured line is one pour of spirit therefore
     qualifies, and that is right rather than a loophole -- the Caipirinha is
     45 ml of cachaça, half a lime and 20 g of palm sugar, and you measure
     exactly one of those things.
@@ -367,7 +371,7 @@ mood_ingredients:
     - clear blended multi-region rum
     - London dry gin
     - Plymouth
-    - New Western dry
+    - New Western dry gin
     - navy strength gin
     - vodka
     - blanco tequila

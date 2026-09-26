@@ -1625,7 +1625,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # asserted at copy time -- and the test reads the PUBLIC repo's history only
 # (#624), so all it can see is seven files marked `proofread: true` appearing
 # in an agent's commit. That is indistinguishable from an agent editing seven
-# proofread drinks, and it is exactly what `PUBLISHING_A_DRINK.md` step 6
+# proofread drinks, and it is exactly what `PUBLISHING_A_COCKTAIL.md` step 6
 # warned this constant would have to absorb.
 #
 # HER GRANT, and the read is already done rather than promised, which makes
@@ -1662,7 +1662,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # asserted at copy time -- and this test reads the PUBLIC repo's history only
 # (#624), so all it can see is ten files marked `proofread: true` appearing in an
 # agent's commit. Indistinguishable from an agent editing ten proofread drinks,
-# which is the case `PUBLISHING_A_DRINK.md` step 6 says this constant exists to
+# which is the case `PUBLISHING_A_COCKTAIL.md` step 6 says this constant exists to
 # absorb.
 #
 # HER GRANT: "Those are all fine. Set proofread to true, and fully promote!"
@@ -7489,6 +7489,39 @@ def test_every_declared_bottle_carries_a_price():
         "These rows in _data/cocktails/costs.yml name no bottle in "
         "bottles.yml. A renamed bottle needs its price row renamed too -- the "
         "alias list does not cover this file:\n  " + "\n  ".join(orphaned)
+    )
+
+
+def test_the_price_check_date_is_less_than_two_years_old():
+    """costs.yml's `checked:` date is within the last 730 days -- #749.
+
+    Helen, 2026-09-25: "Build log line always with elapsed time, and also a
+    test that shouts after two years." The plugin's `Costs:` log line carries
+    the elapsed time on every build; this is the shout. `checked:` is the day
+    the `high` rows were read and "everything here decays from this date" (the
+    file's own words), so a figure two years stale is a figure nobody has
+    looked at, printed under "roughly" where nothing else would notice.
+
+    The date is parsed rather than string-compared so that a `checked:` that
+    is not a date at all fails here too, by name, instead of silently never
+    ageing.
+    """
+    import datetime
+
+    raw = _costs().get("checked")
+    try:
+        checked = datetime.date.fromisoformat(str(raw))
+    except ValueError:
+        pytest.fail(
+            f"_data/cocktails/costs.yml `checked:` is {raw!r}, which is not a "
+            f"YYYY-MM-DD date, so the prices cannot be said to be any age."
+        )
+    age = (datetime.date.today() - checked).days
+    assert age <= 730, (
+        f"_data/cocktails/costs.yml says its prices were checked on "
+        f"{checked.isoformat()}, which is {age} days ago -- more than two "
+        f"years. Re-read the `high` rows (Master of Malt, by hand -- see the "
+        f"file's header) and move `checked:` forward."
     )
 
 

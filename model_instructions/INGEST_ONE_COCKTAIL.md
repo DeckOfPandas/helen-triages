@@ -40,7 +40,7 @@ Four parts, in this order, and nothing else at the top level:
 the whole of §6's Sazerac trap made mechanical, so the amounts must be the ones
 in the file, in the file's own order.
 
-**If one message holds several cocktail recipes, hand back one of these per
+**If one message holds several cocktails, hand back one of these per
 recipe**, each complete on its own, in the order they appear. One envelope is one
 issue; never fold two recipes into one block.
 
@@ -160,15 +160,15 @@ meta:
 | `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. A step is a string, or a `{step, note}` pair — **used sparingly** (Helen, 2026-09-04), for an aside about how she does the step rather than part of the instruction. |
 | `to_serve` | **Serveware only** — what the drink is served WITH. `"Straw."`, `"Two straws."`, `"Ladle and punch glasses."` A terse noun phrase, or `""`. **Never the ice** — that is `serve.ice`. |
 | `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. A bare string is legal in the schema but not for an ingest. Use one to record what the source could not give you. |
-| `source` / `source_url` | Free text here, unlike food — and `""` is a perfectly good answer, on most cocktail recipes. **But if it IS one of the publications in §6a, spell it the way §6a spells it.** `source_url` may be `""`. |
+| `source` / `source_url` | Free text here, unlike food — and `""` is a perfectly good answer, on most cocktails. **But if it IS one of the publications in §6a, spell it the way §6a spells it.** `source_url` may be `""`. |
 | a tip printed under the source's own label | **Transcribe the tip; drop the label.** A book or a site that runs its asides under a standing rubric is showing you its furniture, and `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence. **Never carry an unexplained abbreviation across** — eight food drafts kept a `gf tip:` prefix that was read as *gluten-free* for weeks by an issue and a test comment alike, and one proposed fix would have printed a false allergen claim. Expand it now, while the source is in front of you, or drop it. |
 | `meta.made_before` | Has Helen made this drink? **Always `false` on a fresh ingest** — unquoted, never `"false"`. A transcription cannot know whether she has poured it, and this is the field that says so. She flips it herself when she makes it. Issue #722. |
 | `meta.ship` | Helen's rating. **Always `"who knows"`, never `"QQ"`** — you have not drunk it and neither has she, and `QQ` is not a ship value. Helen, 2026-09-05: "I think that's clearer than QQ or leaving it unset, because it's a positive presence." The pair reads straight: she has not made it, so she has no idea. |
 | `meta.rewritten` / `meta.awaiting_fix` / `meta.proofread` | **Exactly these three, in this order, all `false`, unquoted.** The same publish gate a food recipe carries (since 2026-09-02). `rewritten` and `proofread` are Helen's own claims about her own work and you never set either `true`; `awaiting_fix: false` is what lets a cocktail recipe publish once she has, and `false` unquoted is the only value that works. Underscore, never a hyphen. |
 
-> ### EVERY COCKTAIL RECIPE MUST NAME A GLASS, and you may not guess one.
+> ### EVERY COCKTAIL MUST NAME A GLASS, and you may not guess one.
 >
-> Helen, 2026-08-27: *"All recipes should have a glass."* On a cocktail recipe page the
+> Helen, 2026-08-27: *"All recipes should have a glass."* On a cocktail page the
 > glass is the hero — it is drawn as tall as the whole title block — so an
 > empty `glass` is not a missing detail, it is a page with a hole where its
 > main image goes. Her suite enforces it.
@@ -273,7 +273,7 @@ has its own field.
 
 **Write the bottle as the source spells it, and do not tidy it.** Helen's
 bottle dictionary resolves spellings by alias, and her standing rule
-(2026-09-04) is that a cocktail recipe keeps her spelling and the dictionary learns it,
+(2026-09-04) is that a cocktail keeps her spelling and the dictionary learns it,
 never the other way round. Two things you can get right from the source
 alone: a HOUSE is not a bottle (Briottet, Monin, Gabriel Boudier make many
 things — if the source names the product, write the product), and a spirit
@@ -370,8 +370,9 @@ does not give one you cannot pick: that is a `QQ`.
 `clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
 `coconut rum`
 
-**Gin styles:** `London dry gin` · `Old Tom` · `Plymouth` · `New Western dry` ·
-`genever` · `navy strength gin` · `speciality` · `gin liqueur` · `sloe gin`
+**Gin styles:** `London dry gin` · `Old Tom` · `Plymouth` ·
+`New Western dry gin` · `genever` · `navy strength gin` · `speciality` ·
+`gin liqueur` · `sloe gin`
 
 **Whisky styles:** `rye` · `bonded rye` · `bourbon` · `blended scotch whisky` ·
 `single malt scotch whisky` · `Irish whiskey` · `Japanese whisky`
@@ -436,8 +437,9 @@ does not give one you cannot pick: that is a `QQ`.
 `kaffir lime leaves`
 
 **Other:** `soda water` · `ginger beer` · `water` · `black tea` · `espresso` ·
-`cola` · `coconut cream` · `egg white` · `salt` · `cider vinegar` ·
-`olive oil` · `cream` · `milk` · `whole egg`
+`cola` · `coconut cream` · `Coco mix (3:1, Coco Lopez to coconut milk)` ·
+`egg white` · `salt` · `cider vinegar` · `olive oil` · `cream` · `milk` ·
+`whole egg`
 <!-- vocab:generics end -->
 
 ---
@@ -478,26 +480,25 @@ see the warning in §2. Do not infer one.
 ### `garnish` — the declared vocabulary
 
 <!-- vocab:garnish start -->
-**Citrus peel:** lemon twist · lemon twist (discarded) ·
-lemon twist after expressing over cocktail · orange twist ·
+**Citrus peel:** lemon twist · lemon twist (discarded) · orange twist ·
 orange twist (discarded) · orange or lemon twist · grapefruit twist ·
 flamed orange zest coin · length of lime peel
 
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel ·
 lime wheel or wedge · lemon wheel · lemon slice · orange slice · orange wheel ·
-orange crescent · grapefruit crescents · citrus wheel ·
-dehydrated lime slice wheel · half an empty lime shell
+grapefruit crescents · citrus wheel · dehydrated lime slice wheel ·
+half an empty lime shell
 
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
 blackberry · dried apple slice · banana chip · raspberries · fruit wedges ·
-half an empty passion fruit shell · pineapple and brandied cherry
+half an empty passion fruit shell
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
-skewered maraschino cherry · skewered brandied cherry · cherry flag ·
+skewered maraschino cherry · skewered brandied cherry ·
 fruit stick (skewered pineapple cubes and a maraschino cherry) · fresh cherries
 
-**Herbs and leaves:** mint sprig · mint leaf · mint bouquet · rosemary sprig ·
+**Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
 pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
 edible orchid · mint sprig, mint leaf or grated nutmeg
 
@@ -535,7 +536,7 @@ Four rules that decide the awkward cases:
 >   placement, and a placement carries information.
 > - **Serveware is `to_serve`.** Umbrellas, straws, stirrers, ladles, plastic
 >   giraffes.
-> - **Do not restate a method step.** One cocktail recipe's garnish read "passion fruit
+> - **Do not restate a method step.** One cocktail's garnish read "passion fruit
 >   shell filled with overproof rum" while its own method already said "Fill
 >   the passion fruit shell with rum and set on top of the drink."
 
@@ -578,7 +579,7 @@ rims the glass.
 think it's implied that glasses should be chilled (except hot drinks
 obviously). I am the user after all."* If the source does something MORE than
 chilling — freezing a glass, rinsing it with absinthe — that is a method step in
-its own right, which is what those cocktail recipes already do.
+its own right, which is what those cocktails already do.
 
 ---
 
@@ -675,7 +676,7 @@ Seven things that will catch you out:
 - **A step may not start with "Express" either, and this one is not obvious.**
   Helen's ruling, 2026-09-04: a garnish of any citrus twist makes the recipe
   page add `Express the twist over the drink then drop it in.` as the last
-  step, on its own — so a cocktail recipe that writes it says one fact twice. If the
+  step, on its own — so a cocktail that writes it says one fact twice. If the
   source's last line expresses a twist, put the twist in `garnish:` and write
   no step. (`orange twist (discarded)` gets `...and discard it.` instead.)
   The two sentences are in the **Express** group above for recognition only;
@@ -693,7 +694,7 @@ Seven things that will catch you out:
 
 ## 6. What the source cannot give you, and the one trap that has bitten
 
-**A COCKTAIL RECIPE ALREADY IN THE COLLECTION MAY SHARE A NAME AND NOT BE THE
+**A COCKTAIL ALREADY IN THE COLLECTION MAY SHARE A NAME AND NOT BE THE
 SAME DRINK.** This is the real hazard, and it caught a session on 2026-08-31.
 Helen's Sazerac splits the spirit three ways across rye, bourbon and cognac and
 pours absinthe and chilled water into the glass. Death & Co's rinses and
@@ -713,7 +714,7 @@ bar or book.
 a screenshot that ends below the ingredients. These do not announce themselves,
 and the sibling recipes on the same page ending the same way is not evidence —
 that is *their* wording. Transcribe what is in frame, write a `QQ` note saying
-where the frame ended, and say so in your list. Two cocktail recipes in her collection
+where the frame ended, and say so in your list. Two cocktails in her collection
 are unmakeable for exactly this reason and are tracked as open issues rather
 than guessed at.
 
@@ -727,7 +728,7 @@ inferable.
 
 ## 6a. `source` — the publications, and how each spells itself
 
-**Most cocktail recipes say `source: ""` and that is right.** Helen, 2026-08-30: *"I sort
+**Most cocktails say `source: ""` and that is right.** Helen, 2026-08-30: *"I sort
 of don't care about this. You can't copyright facts, and I am taking no prose
 from anywhere. Some will be attributable to a big-name inventor, bar or maybe
 hotel, and it's nice to note that, but I'm not going to sweat it."* So this is

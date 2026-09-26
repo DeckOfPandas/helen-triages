@@ -559,6 +559,19 @@ hers_to_apply:
     `moderately aged Jamaican rum` with no suggestion at all. MANUAL 9.3.2
     already said "it is hers to apply: never retype a drink into it from item
     text", in prose, and prose did not hold.
+  # THE SECOND MEMBER, 2026-09-25 (#1186). It meets this list's own definition
+  # -- a bottle (`Acacia honey`, bottles.yml) and no drink -- and was argued in
+  # MANUAL 9.3 prose instead, which is exactly the "unlisted case hard to tell
+  # from an oversight" #1186 was about. Helen: "Please keep all the others."
+  # The flat generic is the DEFAULT for a honey drink whose ratio does not
+  # matter (see `honeys` below); the ratioed pair are ordinary generics and
+  # are NOT reserved. Removing this line is her grant, with the drink.
+  "honey water": >-
+    Acacia honey is a declared bottle for it and no drink pours it -- every
+    honey-water drink today carries a ratio. Kept as the default for a drink
+    where the ratio does not matter, and so that the bottle has a category.
+    Helen, 2026-09-25 (#1186): keep. Hers to apply, never a session's guess
+    at which honey water a source meant.
 
 # GitHub issue #314. `light`, `gold` and `dark` are RETIRED -- see the bottom.
 rum_styles:
@@ -692,6 +705,9 @@ rum_characters:
   # three are Jamaican -- so "Jamaican" cannot carry it and one field cannot
   # hold both. Same shape as `peated` in whisky_characters below.
   - "hogo"
+  # Helen, 2026-09-25 (#1108), for Fanny Chu's Piña Colada: the raw-cane-sugar
+  # (raspadura / panela) note of a Panamanian silver rum, Pedro Mandinga.
+  - "raspadura"
 
 # PEAT IS A CHARACTER, NOT A STYLE -- Helen, 2026-08-27, working it out aloud:
 # "so single malt whisky, character: peated ???" Yes, and for the reason #441
@@ -918,7 +934,7 @@ card_names:
   # NOT collapsed to "gin", deliberately, and the line is Helen's own rum rule:
   # collapse where the difference is a nuance, keep it where it changes the
   # STRENGTH or the drink. Navy strength does; genever is a different drink
-  # altogether. Old Tom, Plymouth, New Western dry and speciality are the
+  # altogether. Old Tom, Plymouth, New Western dry gin and speciality are the
   # genuinely open ones -- see the note in the issue rather than guessing here.
   "navy strength gin": "navy strength gin"
   "genever": "genever"
@@ -1056,11 +1072,22 @@ card_names_may_collide:
 # her direction -- the file's commodity-lowercasing rule wins over the way a
 # style gets capitalised in prose, so `blended Scotch` and `Demerara, aged`
 # keep their shape too.
+#
+# `genever`, `navy strength gin` and `gin liqueur` HAVE NO DRINK AND STAY --
+# Helen, 2026-09-25 (#1186), asked style by style whether the unpoured
+# generics were spec or residue: "Please keep all the others." Vocabulary
+# declared ahead of a drink, which is what this file's header calls a spec
+# rather than an inventory; they are not gaps to fill.
 gin_styles:
   - "London dry gin"
   - "Old Tom"
   - "Plymouth"
-  - "New Western dry"
+  # `New Western dry gin` SINCE 2026-09-25, was `New Western dry` -- Helen,
+  # #1186: "'New Western dry' should become 'New Western dry gin'." The naming
+  # rule above (spirit word on the end: `London dry gin`, `navy strength gin`)
+  # was simply not applied to this one. No drink pours it; the old name is in
+  # `retired_gin_styles`.
+  - "New Western dry gin"
   - "genever"
   - "navy strength gin"
   # REPLACES `flavoured`, which is retired -- see retired_gin_styles. A gin
@@ -1120,6 +1147,10 @@ gin_styles:
 # `scotch` is lowercase for the same reason `cognac`, `champagne` and `calvados`
 # are -- a protected appellation that has become a common noun in English. The
 # demonyms keep their capitals.
+#
+# `bonded rye`, `blended scotch whisky`, `Irish whiskey` and `Japanese whisky`
+# HAVE NO DRINK AND STAY -- Helen, 2026-09-25 (#1186): "Please keep all the
+# others." Declared ahead of a drink, as a spec; not residue.
 whisky_styles:
   - "rye"
   # Bottled-in-bond: 100 proof, one distillery, one season, four years minimum.
@@ -1161,6 +1192,8 @@ agave_styles:
   - "añejo tequila"
   - "mezcal"
 
+# `armagnac` and `grappa` HAVE NO DRINK AND STAY -- Helen, 2026-09-25 (#1186):
+# "Please keep all the others." Declared ahead of a drink, as a spec.
 brandy_styles:
   - "cognac"
   - "armagnac"
@@ -1428,6 +1461,9 @@ amari:
 # of them may mean the other: #569 asks for Corpse Reviver No. 2 to accept
 # either, which only became expressible now. north-sea-oil and
 # voodoo-that-you-do have not been looked at.
+#
+# `americano` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186): "Please keep
+# all the others." Declared ahead of a drink, as a spec.
 fortified_and_aromatised:
   - "sweet vermouth"
   - "dry vermouth"
@@ -1442,6 +1478,8 @@ fortified_and_aromatised:
   - "oloroso sherry"
   - "tawny port"
 
+# `cider` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186): "Please keep all
+# the others." Declared ahead of a drink, as a spec.
 wine_and_sparkling:
   - "champagne"
   - "prosecco"
@@ -1469,6 +1507,11 @@ wine_and_sparkling:
 # different, and both are lavender-forward, so the difference is which bottle
 # you pour -- which is a `suggestion`, and never a generic. `lavender bitters`
 # is in retired_bitters at the bottom; the Bee's Knees is retyped.
+#
+# `margarita bitters` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186):
+# "Please keep all the others." Declared ahead of a drink, as a spec. (Bob's
+# Margarita Bitters, the bottle, sits under `lavender-forward bitters`, which
+# is the category the one drink that pours it asks for.)
 bitters:
   - "aromatic bitters"
   - "orange bitters"
@@ -1713,6 +1756,16 @@ other:
   - "espresso"
   - "cola"
   - "coconut cream"
+  # NEW 2026-09-25 (#1108), FOR FANNY CHU'S PIÑA COLADA, and the name is
+  # Helen's own: asked what the draft's `QQ Coco mix (3:1, Coco Lopez to
+  # coconut milk)` pour should be, she wrote the generic exactly so. It is a
+  # MADE mix -- Coco Lopez (sweetened cream of coconut) loosened with coconut
+  # milk, three to one -- and is not `coconut cream` beside it, which is the
+  # unsweetened tin; the draft's own note says Coco Lopez stands in for half
+  # coconut cream and half 2:1 syrup. The ratio is in the name for the reason
+  # `cane sugar syrup 2:1` carries one: it is a making fact, and a recipe line
+  # may be long. Priced as made-not-bought in costs.yml; 0% in abv.yml.
+  - "Coco mix (3:1, Coco Lopez to coconut milk)"
   - "egg white"
   - "salt"
   - "cider vinegar"
@@ -1723,8 +1776,10 @@ other:
   # that are neither juice nor syrup nor alcohol.
   - "olive oil"
   # THE THREE BELOW HAVE NO DRINK, ON PURPOSE, and they are declared for the
-  # reason this file already declares Plymouth, New Western dry and genever
-  # while owning none of them: it is a SPEC, not an inventory.
+  # reason this file already declares Plymouth, New Western dry gin and genever
+  # while owning none of them: it is a SPEC, not an inventory. (`cream` and
+  # `milk` have drinks since 2026-09-14 and 2026-09-20; `whole egg` still has
+  # none and STAYS -- Helen, 2026-09-25, #1186: "Please keep all the others.")
   #
   # They are what `pudding in a glass` is made of -- taxonomy.yml's
   # `mood_ingredients.rich` -- and that mood is likewise declared with zero
@@ -1765,7 +1820,7 @@ family_of:
   "London dry gin": gin
   "Old Tom": gin
   "Plymouth": gin
-  "New Western dry": gin
+  "New Western dry gin": gin
   "genever": gin
   "speciality": gin
   "gin liqueur": gin
@@ -1875,7 +1930,7 @@ shelf_of:
   Irish whiskey: spirits
   Japanese whisky: spirits
   London dry gin: spirits
-  New Western dry: spirits
+  New Western dry gin: spirits
   Old Tom: spirits
   Plymouth: spirits
   absinthe: spirits
@@ -1988,7 +2043,8 @@ shelf_of:
   apple juice: bottled fruit juice
   cranberry juice: bottled fruit juice
   pineapple juice: bottled fruit juice
-  # fresh produce and larder (29)
+  # fresh produce and larder (30)
+  "Coco mix (3:1, Coco Lopez to coconut milk)": larder
   basil: fresh produce
   black tea: larder
   blackberries: fresh produce
@@ -2278,3 +2334,10 @@ retired_gin_styles:
     substitutable for each other, so as a filter button it read simply
     "flavoured" and told you nothing. Replaced by `speciality`, which carries a
     `character` naming the actual botanical. Helen, 2026-08-26.
+  "New Western dry": >-
+    the spirit word was missing -- this file's own naming rule puts it on the
+    end (`London dry gin`, `navy strength gin`). It is `New Western dry gin`
+    now, Helen, 2026-09-25 (#1186): "'New Western dry' should become 'New
+    Western dry gin'." No drink ever poured the old name, so nothing was
+    retyped; kept here so the old spelling cannot blend into the not-declared
+    pile.

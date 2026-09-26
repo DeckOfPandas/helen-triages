@@ -102,6 +102,14 @@ NOT_A_POUR = {"water"}
 # number the definition's own prose states, and the two must agree.
 MAX_POURS = 8
 
+# A 5 ml POUR IS A BAR SPOON, NOT A MEASURE -- Helen, 2026-09-26 (#1216): "if
+# any amounts are 5 ml, this is just a bar spoon, and doesn't count as needing
+# to be measured." So `pour_count` sets a 5 ml amount aside the way it sets a
+# dash aside: it neither joins the ratio nor becomes the smallest measure the
+# rest are divided by. Exactly 5, not "5 or less": 2.5 ml and 7.5 ml are
+# quarter- and half-jiggers on the page, and she named the spoon.
+BARSPOON_ML = 5
+
 
 def spirit_volumes(entries, measures, family_of, whisky):
     """Millilitres per spirit FAMILY, not per ingredient.
@@ -158,6 +166,11 @@ def pour_count(entries, measures):
     for entry in entries:
         millilitres_ = millilitres(entry.get("amount", ""), measures)
         if millilitres_ is None or millilitres_ == 0:
+            continue
+        # A 5 ML POUR IS A BAR SPOON (#1216, Helen, 2026-09-26) and is set
+        # aside like a dash: it neither joins the ratio nor becomes the
+        # smallest measure the rest are divided by. See BARSPOON_ML.
+        if millilitres_ == BARSPOON_ML:
             continue
         amounts.append(Fraction(str(millilitres_)))
     if not amounts:

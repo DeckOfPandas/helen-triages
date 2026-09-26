@@ -105,6 +105,16 @@ no_garnish: "no garnish"
 # `test_every_declared_garnish_has_exactly_one_group` in
 # tests/test_standalone_docs.py is the guard, and the generator's own test is
 # what keeps the document in step.
+#
+# FIVE ENTRIES NO DRINK USED CAME OFF ON 2026-09-25 -- #1186, Helen: "Fine to
+# delete those garnishes." `cherry flag`, `lemon twist after expressing over
+# cocktail`, `mint leaf`, `orange crescent` and `pineapple and brandied cherry`
+# were declared by the 2026-08-31 census from strings that drinks have since
+# stopped saying, and the ratchet only ever bites on what is declared, so an
+# unused entry was costing a line in the generated ingest document and
+# guarding nothing. `mint sprig, mint leaf or grated nutmeg` is ONE string
+# (see above) and is unaffected. The next drink to want one of the five
+# declares it again, with the drink.
 canonical:
 
   # Peel. The commonest garnish in the collection by a distance.
@@ -116,14 +126,14 @@ canonical:
   # drinks were retyped.
   #
   # THE TAILS SURVIVE THE COLLAPSE because they carry information the head does
-  # not: `(discarded)` says the peel does not stay in the drink, and `after
-  # expressing over cocktail` says the opposite. Only the head form was
-  # normalised. `flamed orange zest coin` keeps its `zest` -- a coin is a
-  # different cut from a twist, not a longer name for one.
+  # not: `(discarded)` says the peel does not stay in the drink. Only the head
+  # form was normalised. `flamed orange zest coin` keeps its `zest` -- a coin
+  # is a different cut from a twist, not a longer name for one. (`lemon twist
+  # after expressing over cocktail`, the tail that said the opposite of
+  # `(discarded)`, was deleted unused on 2026-09-25 -- #1186.)
   citrus_peel:
     - "lemon twist"
     - "lemon twist (discarded)"
-    - "lemon twist after expressing over cocktail"
     - "orange twist"
     - "orange twist (discarded)"
     - "orange or lemon twist"
@@ -150,7 +160,6 @@ canonical:
     - "lemon slice"
     - "orange slice"
     - "orange wheel"
-    - "orange crescent"
     - "grapefruit crescents"
     - "citrus wheel"
     - "dehydrated lime slice wheel"
@@ -208,7 +217,6 @@ canonical:
     # than by any test, because a YAML list happily holds the same string twice.
     - "fruit wedges"
     - "half an empty passion fruit shell"
-    - "pineapple and brandied cherry"
 
   # THE THREE QUALIFIED CHERRIES ALL STAY, ruled 2026-08-31. A Luxardo really is
   # a different object from a bright red cocktail cherry, `skewered` says how it
@@ -228,7 +236,6 @@ canonical:
     # singular like `skewered maraschino cherry` beside it, and "no note", so
     # the count stays out of the garnish the way it does for every other entry.
     - "skewered brandied cherry"
-    - "cherry flag"
     - "fruit stick (skewered pineapple cubes and a maraschino cherry)"
     # NEW 2026-09-20, for Fanny Chu's Piña Colada, whose Punch source garnishes
     # with "cherries" and no kind. Helen: "'Cherries' is just cherries, so maybe
@@ -240,7 +247,6 @@ canonical:
 
   herbs_and_leaves:
     - "mint sprig"
-    - "mint leaf"
     - "mint bouquet"
     - "rosemary sprig"
     # NEW 2026-09-20, for the White Negroni Piña Colada. The source's garnish
@@ -371,5 +377,7 @@ no_article:
   - three coffee beans
   - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"
-  - pineapple and brandied cherry       # two things, not one
+  # `pineapple and brandied cherry` ("two things, not one") left this list
+  # with the garnish on 2026-09-25 (#1186); a list may only name a declared
+  # garnish.
   - no garnish                          # never rendered as a step anyway

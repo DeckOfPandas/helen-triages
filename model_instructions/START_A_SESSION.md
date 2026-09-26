@@ -32,7 +32,7 @@ out and back — and, depending on the task, the procedure document that owns it
 `.claude/commands/ingest.md` (getting recipes in — the boundary is
 *is the answer in the source, or in Helen's head?*), `ingest-inbox.md` (when
 they arrived as GitHub issues), `tidy-drafts.md` (the mechanical half of a
-drafts pass), `model_instructions/PUBLISHING_A_DRINK.md` (getting a cocktail recipe out;
+drafts pass), `model_instructions/PUBLISHING_A_COCKTAIL.md` (getting a cocktail out;
 read it before touching `_cocktail_drafts/to-promote/`),
 `model_instructions/LETTERING.md` (punched-tape type),
 `model_instructions/CLAUDE_WEB_INGEST.md` (the claude.ai Project).

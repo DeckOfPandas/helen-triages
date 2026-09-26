@@ -563,7 +563,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # copies two drafts Helen had rewritten and moved to `to-promote/` into
 # `_food_recipes/` with `proofread: true`, on her word: "Ham and coleslaw are
 # ready to promote to the best of my knowledge... Please do it for me." The
-# same case PUBLISHING_A_DRINK.md step 6 records for the first 48 drinks: this
+# same case PUBLISHING_A_COCKTAIL.md step 6 records for the first 48 drinks: this
 # test reads the public repo's history only, so it cannot tell a promotion
 # from an edit, and sees two proofread recipes appearing in an agent's commit.
 # The public suite then named three mechanical things the drafts suite does

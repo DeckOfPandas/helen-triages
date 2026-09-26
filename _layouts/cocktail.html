@@ -1098,8 +1098,9 @@ layout: default
          What the list was really carrying was the cases a final `s` CANNOT
          reach -- `grated nutmeg` (a mass noun), `half an empty passion fruit
          shell` (brings its own article), `pineapple and brandied cherry` (two
-         things) -- so the list keeps exactly those and stops being the only
-         thing standing between a new plural and the page.
+         things; deleted unused on 2026-09-25, #1186) -- so the list keeps
+         exactly those and stops being the only thing standing between a new
+         plural and the page.
 
          WHY THAT MATTERS MORE THAN IT LOOKS: `no_article` can only name a
          garnish someone has DECLARED, and the failure Helen hit was a draft's
@@ -1214,13 +1215,22 @@ layout: default
      IT FALLS BACK TO HERE if there is no strain step to carry it, which no
      drink needs today. Losing a rim silently is worse than an occasional
      duplicate heading. {% endcomment %}
-  {% if page.to_serve or page.serve.rim and rim_shown == false %}
+  {% comment %} AN EMPTY STRING IS TRUTHY -- #1212, Helen: "don't show 'to
+     serve' section if it's blank." The gate tested the bare value, and
+     `to_serve: ""` is how the ingest leaves a drink with nothing to say (ten
+     drafts carried it on 2026-09-26), so each of those drew a "To serve"
+     heading over an empty paragraph. Same property that bit the glass
+     accumulator and the source footer above. `strip` turns nil and "" and
+     whitespace alike into "", and the test is against "" -- the shape the
+     header comment prescribes for every string-gated section. {% endcomment %}
+  {% assign to_serve_text = page.to_serve | strip %}
+  {% if to_serve_text != "" or page.serve.rim and rim_shown == false %}
     <h2 class="cocktail-section-heading">To serve</h2>
     {% if page.serve.rim and rim_shown == false %}
       <p class="cocktail-to-serve cocktail-serve-rim">{{ page.serve.rim | capitalize }}.</p>
     {% endif %}
-    {% if page.to_serve %}
-      <p class="cocktail-to-serve">{{ page.to_serve | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+    {% if to_serve_text != "" %}
+      <p class="cocktail-to-serve">{{ to_serve_text | markdownify | remove: '<p>' | remove: '</p>' }}</p>
     {% endif %}
   {% endif %}
 
@@ -1384,12 +1394,19 @@ layout: default
           {%- else %} in a serving{% endif %}
           {%- if page.volume %} of {{ page.volume.serve_ml }} ml{% endif %}.</p>
       {% endif %}
+      {% comment %} `min_text` / `max_text` ARE THE PRINTED FIGURES, `min` /
+         `max` THE DATA -- #1215, Helen: "price per glass should have two
+         decimal places." The plugin rounds to a Float, and a Float prints
+         3.2 as "3.2", so this line read "£3.2–£3.29" on Between the Sheets.
+         Liquid cannot pad a number, so the plugin formats the strings and
+         this prints them; the numeric fields stay on the data attributes
+         because scripts multiply those and would choke on a string. {% endcomment %}
       {% if has_cost %}
         <p class="cocktail-cost"
            data-cost-min="{{ page.cost.min }}"
            data-cost-max="{{ page.cost.max }}">Roughly <span class="cocktail-cost-figure">{% if page.cost.exact
-            %}&pound;{{ page.cost.min }}{% else
-            %}&pound;{{ page.cost.min }}&ndash;&pound;{{ page.cost.max }}{% endif %}</span> a glass in ingredients.</p>
+            %}&pound;{{ page.cost.min_text }}{% else
+            %}&pound;{{ page.cost.min_text }}&ndash;&pound;{{ page.cost.max_text }}{% endif %}</span> a glass in ingredients.</p>
       {% endif %}
     </div>
   {% endif %}

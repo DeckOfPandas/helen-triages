@@ -358,6 +358,53 @@ def test_the_food_shopping_scripts_load_in_dependency_order():
     )
 
 
+def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
+    """results-bar.js mirrors what the index script paints, so it loads after it.
+
+    Helen, 2026-09-26, from the "N survivors" candidates page: both treatments,
+    the mono number and the sticky bar, on both indexes. The bar is a MIRROR of
+    the count spans and of the top `× clear all` -- never a second count -- and
+    it wires itself on DOMContentLoaded, after the index script's own handler
+    (filters.js) or its immediate run (cocktail-index.js). Listeners fire in
+    registration order, so the tag has to come after the index script's on
+    each page, or the bar looks for buttons that do not exist yet and finds
+    nothing to mirror.
+
+    Three more facts the same ruling depends on, held here because nothing
+    else sees them: the bar's markup ships `hidden`, so a page without
+    JavaScript is unchanged; the digits carry the shared class on both indexes,
+    so the two counts cannot drift in face; and both stylesheets import the one
+    partial that styles that class, or one site's digits are plain text with a
+    class that means nothing.
+    """
+    for page, index_script in (("food", "filters.js"),
+                               ("cocktails", "cocktail-index.js")):
+        html = read(page, "index.html")
+        index_tag = re.search(r"<script src=[^>]*/" + re.escape(index_script), html)
+        bar_tag = re.search(r"<script src=[^>]*/results-bar\.js", html)
+        assert index_tag, f"{page}/index.html no longer loads assets/js/{index_script}."
+        assert bar_tag, f"{page}/index.html no longer loads assets/js/results-bar.js."
+        assert index_tag.start() < bar_tag.start(), (
+            f"results-bar.js must load AFTER {index_script} on {page}/index.html: "
+            f"it wires itself on DOMContentLoaded and mirrors the `× clear all` "
+            f"that script builds, so loaded first it has nothing to mirror."
+        )
+        assert re.search(r'<div class="results-bar"[^>]*\bhidden\b', html), (
+            f"{page}/index.html's `.results-bar` no longer ships `hidden`. The "
+            f"script reveals it; without JavaScript a bar that is not hidden is "
+            f"an empty fixed strip across the top of every visit."
+        )
+        assert re.search(r'class="results-count-number"[^>]*id="[a-z]+-count-n"', html), (
+            f"{page}/index.html's count number no longer carries "
+            f"`.results-count-number`. That class is what gives the digits the "
+            f"label face on both indexes (shared/_results-bar.scss)."
+        )
+        assert '@import "shared/results-bar";' in read("assets", "css", f"{page}.scss"), (
+            f"assets/css/{page}.scss does not import shared/results-bar, so "
+            f"`.results-count-number` and `.results-bar` have no rule on {page}."
+        )
+
+
 def test_the_card_measurement_passes_are_loaded_in_order():
     """card-name-fit.js, then card-line-budget.js, both from the shared layout.
 

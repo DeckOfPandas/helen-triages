@@ -194,6 +194,14 @@ bottles:
     size_ml: 700
     gbp: 28
     confidence: medium
+  # A GUESS, 2026-09-25, with the bottle (#1108). Helen named it for Away
+  # Colour and gave no price; this is a UK-retail estimate from memory, not a
+  # shop, and is the row to overwrite first. 70cl assumed.
+  "Cruzan Single Barrel":
+    size_ml: 700
+    gbp: 36
+    confidence: low
+    basis: "guess: UK retail for a single-barrel Cruzan, not shop-checked and not Helen's figure"
   # --- rum: light, blended and flavoured ---------------------------------
   "Havana Club 3 year old":
     size_ml: 700
@@ -203,6 +211,15 @@ bottles:
     size_ml: 700
     gbp: 22
     confidence: medium
+  # A GUESS, 2026-09-25, with the bottle (#1108). Helen named it for Fanny
+  # Chu's Piña Colada and gave no price; UK-retail estimate from memory, not a
+  # shop. Not a pricing input for the category (`default_bottles`). 70cl
+  # assumed.
+  "Pedro Mandinga Panama silver rum":
+    size_ml: 700
+    gbp: 30
+    confidence: low
+    basis: "guess: UK retail for a Panamanian silver rum, not shop-checked and not Helen's figure"
   "Planteray 3 Stars":
     size_ml: 700
     gbp: 22
@@ -1107,6 +1124,13 @@ generics:
   # what settled its ratio when the other four went to 2:1 on Helen's word.
   honey water 1:1:    { gbp_per_litre_min: 9.75, gbp_per_litre_max: 13.50, basis: "honey @ GBP 17.60/kg, 1:1", confidence: medium }
   honey water 2:1:    { gbp_per_litre_min: 13.00, gbp_per_litre_max: 18.00, basis: "honey @ GBP 17.60/kg, 2:1", confidence: medium }
+  # NEW 2026-09-25 (#1108), Helen's generic for Fanny Chu's Piña Colada: three
+  # parts Coco Lopez to one part coconut milk. NOT priced off `coconut cream`
+  # above -- Coco Lopez is sweetened cream of coconut, a different tin -- and
+  # neither tin price is shop-checked, which is what `low` says. The sum: Coco
+  # Lopez GBP 3-4 / 425 ml (7.05-9.40/L) x 3, coconut milk GBP 1-1.60 / 400 ml
+  # (2.50-4.00/L) x 1, over 4 -> GBP 5.90-8.05/L. Overwrite when she prices it.
+  "Coco mix (3:1, Coco Lopez to coconut milk)": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
   grenadine:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }

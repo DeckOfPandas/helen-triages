@@ -38,6 +38,11 @@ const PAGE_SCRIPTS = [
   'cocktail-search.js',
   'shopping-list.js',
   'cocktail-index.js',
+  // 2026-09-26. The sticky results bar. Nobody's dependency either: it wires
+  // itself on DOMContentLoaded, which this harness never dispatches, so here
+  // it only has to LOAD without throwing. tests/js/results-bar.test.js drives
+  // it against its own fixture.
+  'results-bar.js',
   // #849. Nobody's dependency -- it reads HTF.shortlist at run time rather than
   // lifting helpers off another module at startup, and it subscribes to
   // `htf:shortlist-change` rather than being called. It is here because the
