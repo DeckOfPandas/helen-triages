@@ -124,6 +124,17 @@ moods:
     Daisy de Santiago, both of which previously answered no mood whatsoever.
     It also no longer depends on the glass data, which is a good property for a
     rule to have while that data is still being filled in (#491).
+    BEING CHURNED INTO A SLUSHY DISQUALIFIES; BEING SERVED OVER CRUSHED ICE
+    DOES NOT -- Helen, 2026-09-26, on the Moscow Mule: "Moscow Mule is sharp.
+    The ginger beer probably supports this, as well as acting as a sweetener.
+    This isn't an exception to the rule -- it is perfectly consistent with how
+    I intend the rule to apply." Until then this mood shared `strong brown
+    drink`'s disqualifier, which reads `serve.ice: crushed` and the words
+    "crushed ice" -- so a mug packed with crushed ice was treated as a swizzle.
+    The two moods want two different questions, exactly as `ice` and `churned`
+    in `mood_step_words` already do: a big block of ice is how you serve a
+    strong brown drink, and crushed ice is how you serve a long sharp one.
+    See `mood_step_words.slushy`, which is this mood's own list.
   warming: >-
     For a cold night. Ginger, cinnamon, allspice, warm-spiced bitters.
     SPICE, NOT TEMPERATURE -- a Penicillin is warming and served cold, and the
@@ -989,6 +1000,52 @@ mood_step_words:
   # says "strain into a glass over a large ice block" and lost the mood
   # outright while the two lists were the same list.
   churned: ["crushed ice", swizzle, churn, blend]
+  # A THIRD LIST, 2026-09-26, AND IT IS `sharp`'s ALONE. Helen, on the Moscow
+  # Mule: "Moscow Mule is sharp. The ginger beer probably supports this, as
+  # well as acting as a sweetener. This isn't an exception to the rule -- it is
+  # perfectly consistent with how I intend the rule to apply."
+  #
+  # It failed on `churned` above, and on both of that rule's limbs: its
+  # `serve.ice` is `crushed`, and its own method step says "Two-thirds fill the
+  # mug with crushed ice." Neither of those is a churn. `sharp`'s reason for
+  # excluding a churned drink, in the deriver's own words, is that blending and
+  # swizzling "turn a drink into a slushy iced one where the ice is the point"
+  # -- and a mug packed with crushed ice is not that. It is how you serve a
+  # long sharp drink.
+  #
+  # SO THE DISQUALIFIER IS THE ACTION, NOT THE ICE, and that is the whole
+  # difference between this list and `churned`. `strong brown drink` keeps the
+  # wider one, where the ice genuinely is the evidence: a big block is how you
+  # serve one, crushed ice is not. Measured before splitting them -- 13 drinks
+  # are churned under the wide rule and not this one, and NOT ONE of them is a
+  # strong brown drink, so the wider rule loses nothing by staying as it is.
+  #
+  # THE SERVE HALF SPLITS THE SAME WAY. The deriver pairs this list with
+  # `serve.ice: blended` alone, where `churned` also takes `crushed`: a blended
+  # drink really is a slushy, which is the one case where the field says the
+  # action without the method having to.
+  #
+  # IT RETIRES NO `mood_include` ENTRY, AND THAT WAS WORTH CHECKING RATHER THAN
+  # ASSUMING. Mai Tai, Carta Switchel and Don's Mai Tai all carry `sharp` by
+  # correction and are all crushed-ice drinks, so this split looked as though
+  # it would make three corrections redundant. It does not: each of the three
+  # pours SIX measured ingredients against a cap of five, which is what their
+  # own `why:` lines have said all along -- "the rule's five-poured-ingredient
+  # cap excludes it", never the ice. Martinique Swizzle keeps its correction
+  # too, and for the honest reason: it is actually swizzled.
+  # `test_every_mood_correction_is_reachable_and_needed` is what settled this,
+  # by staying silent when a draft of this comment claimed otherwise.
+  #
+  # FOUR DRINKS GAIN `sharp`: Bitter Mai Tai, Cobra Effect and Moscow Mule --
+  # all three of which Helen had typed `sharp` on herself, so the rule is
+  # catching up with her rather than overruling her -- and German Vacation,
+  # which is published.
+  #
+  # HALEY TRAUB'S FROZEN MARGARITA DOES NOT, and it is the case that shows the
+  # line is in the right place. Helen typed `sharp` on it too, but its method
+  # blends, so it stays disqualified by this list rather than by its ice. A
+  # frozen margarita IS the slushy the rule is talking about.
+  slushy: [swizzle, churn, blend]
   # Any one makes `on fire`.
   fire: [alight, flame, burn]
 

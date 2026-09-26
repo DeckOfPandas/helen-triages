@@ -1017,6 +1017,29 @@ bottles:
   "Gabriel Boudier Liqueur de Gingembre":
     generic: "ginger liqueur"
     aliases: ["Gabriel Boudier Gingembre"]
+  # THE BOTTLE THE `coconut rhum` GENERIC WAS ADDED FOR, and it took six days
+  # to arrive. ingredients.yml declared the generic on 2026-09-20 on Helen's
+  # word -- "I guess the generic is coconut rhum. Add it for now and I can
+  # review another time" -- for the White Negroni Piña Colada, and that drink
+  # has named this bottle in its `suggestion` ever since with nothing here for
+  # it to resolve to. `test_every_suggested_bottle_resolves` held the drink out
+  # of promotion until Helen supplied the two figures only she can: 2026-09-26,
+  # "18% ABV, £22".
+  #
+  # CANONICAL WITH THE ACCENT, her spelling kept as an alias. Every other
+  # Clément in this file is accented -- `Clément Rhum Agricole Blanc`,
+  # `Clément Rhum Agricole Canne Bleue`, `Rhum Clément Créole Shrubb` -- and
+  # the label is too. Same standing rule as La Favorite and Briottet Cérise:
+  # the label is canonical and everything anyone actually types resolves to it.
+  #
+  # FILED WITH THE LIQUEURS AND NOT WITH THE RUMS, which is ingredients.yml's
+  # ruling on the generic and Créole Shrubb's before it: a rhum-based LIQUEUR,
+  # so "no rum tonight" should not drop it.
+  "Clément Mahina Coconut Rhum Liqueur":
+    generic: "coconut rhum"
+    aliases: ["Clement Mahina Coconut Rhum Liqueur", "Clément Mahina Coco",
+              "Clement Mahina Coco", "Mahina Coco"]
+    origin: "Martinique"
   # BOTTLES FOR TWO CATEGORIES THAT HAD NONE, 2026-09-14 (#1012). Helen named
   # the one on her shelf in each: "Briottet Liqueur de Sapin is 40 %" and
   # "'La Tomato Liqueur' is 25 %, and this is the only tomato liqueur I have

@@ -260,6 +260,16 @@ def derive(drink, sets, step_words, families):
     # the mood outright for one commit when these two lists were the same list.
     churned = (drink.get("serve") or {}).get("ice") in ("crushed", "blended") \
         or bool(hits_in(steps, step_words.get("churned") or []))
+    # `slushy` IS `sharp`'s OWN DISQUALIFIER, AND IT IS NARROWER -- 2026-09-26.
+    # Helen, on the Moscow Mule: "Moscow Mule is sharp ... This isn't an
+    # exception to the rule -- it is perfectly consistent with how I intend the
+    # rule to apply." It was failing `churned` on both limbs, for having
+    # crushed ice in the mug rather than for being churned. The disqualifier
+    # `sharp` wants is the ACTION that turns a drink into a slushy; the one
+    # `strong brown drink` wants reads the ice itself. Two questions, two
+    # lists, exactly as `ice` and `churned` in taxonomy.yml already are.
+    slushy = (drink.get("serve") or {}).get("ice") == "blended" \
+        or bool(hits_in(steps, step_words.get("slushy") or []))
     if by_family and not lengthened and not churned and not has("juice"):
         top = max(by_family.values())
         leaders = [f for f, v in by_family.items() if v == top]
@@ -305,7 +315,7 @@ def derive(drink, sets, step_words, families):
     poured = sum(1 for e in entries
                  if millilitres(e.get("amount", ""), sets["_measures"]) is not None)
     if has("citrus") and has("sweet") and (present & families) and poured <= 5 \
-            and not churned:
+            and not slushy:
         out.append("sharp")
 
     if has("fruity"):
