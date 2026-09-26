@@ -34,6 +34,7 @@ mood:
   - "nightcap"
   - "ice ice baby"
   - "no juicing"
+  - "no measuring"
 notes: []
 source: ""
 source_url: ""
@@ -42,5 +43,5 @@ meta:
   ship: "meh"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
