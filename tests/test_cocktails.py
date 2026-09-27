@@ -1788,7 +1788,35 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first, as every move before it: the test named
 # exactly those four files, every one "last touched by 6fe3ca19", and nothing
 # else. Covers 6fe3ca1 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "6fe3ca1"   # four drinks: three dash plurals and one derived chip
+#
+# MOVED AGAIN 2026-09-27 FOR SEVEN DRINKS, ON TWO GRANTS IN ONE SENTENCE EACH.
+# `9b7aea8` flips `proofread` back on five topped drinks -- airmail,
+# arrack-christmas-punch-wife-3, julien-sorel,
+# pear-apricot-and-rosemary-bellini, tom-collins -- whose amounts became
+# `(top)` under #1217, and on jagerita and vieux-carre, which the #1216
+# bar-spoon rule demoted the day before for one derived `no measuring` chip
+# each.
+#
+# HER GRANTS: "to top: yes please, if those are the only changes then flip the
+# flag back to make them live again", and "Yes please, I grant Jag and VC."
+#
+# THE FIRST IS CONDITIONAL IN HER OWN WORDS, so the condition was checked
+# rather than assumed -- PIPELINE.md 5, and the half easiest to skip.
+# `tmp/prove_only_expected_2.py` on that branch diffs all seven against
+# `origin/main` and requires every changed line to be one of the shapes she was
+# shown: the amount rename and the flag for the five, and THE FLAG ALONE for
+# Jag and VC, whose chip was already on main. It passed with nothing over.
+#
+# WHY THE RENAME IS COVERED BY A PROOFREAD SHE GAVE BEFORE IT. `(top)` is the
+# string Helen typed in the ruling that asked for it, on a line whose content
+# she has read -- the same shape as the 742aa73 move above, "a change she can
+# see whole in the sentence that asked for it", rather than the fifteen-file
+# shape #933 is uneasy about.
+#
+# Proved with the old value first: the test named exactly those seven files,
+# every one "last touched by 9b7aea88", and nothing else. Covers 9b7aea8 and
+# nothing after.
+COCKTAIL_BASELINE_COMMIT = "9b7aea8"   # seven drinks: five `(top)` renames and two derived chips
 
 
 def _newest_commit_per_published_drink():
