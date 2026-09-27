@@ -20,7 +20,7 @@ ingredients:
     generic: "grenadine"
   - amount: "2.5 ml"
     generic: "falernum"
-  - amount: "2 dash"
+  - amount: "2 dashes"
     generic: "orange bitters"
 method:
   - "Rinse the frozen old fashioned glass with the overproof rum, then discard the excess."

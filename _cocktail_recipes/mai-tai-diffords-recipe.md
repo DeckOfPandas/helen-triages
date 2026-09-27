@@ -30,7 +30,7 @@ ingredients:
     suggestion: ["John D Taylor's Velvet Falernum"]
   - amount: "2.5 ml"
     generic: "crème de menthe"
-  - amount: "2 dash"
+  - amount: "2 dashes"
     generic: "absinthe"
   - amount: "0.5 pinch"
     generic: "salt"

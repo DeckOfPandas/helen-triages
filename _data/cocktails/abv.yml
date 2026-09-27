@@ -229,6 +229,11 @@ bottles:
   # at a flat 43%. Ten points, on a spirit poured neat.
   "Clairin Communal":                 { abv: 43,   confidence: high }
   "Rhum Clément Créole Shrubb":       { abv: 40,   confidence: high }
+  # HELEN'S OWN FIGURE, 2026-09-26: "18% ABV, £22". The bottle the `coconut
+  # rhum` generic was declared for on 2026-09-20 and which had no entry
+  # anywhere until she named its strength. Its category row left `generics:`
+  # below in the same commit -- a bottle's figure wins.
+  "Clément Mahina Coconut Rhum Liqueur": { abv: 18, confidence: high }
 
   # --- cachaça and arrack ------------------------------------------------
   "Sagatiba":                         { abv: 38,   confidence: medium }
@@ -494,11 +499,15 @@ generics:
   # overwrite. Peach Me is its only pour today.
   peach schnapps:         { abv: 18,   confidence: medium }
   crème de cassis:        { abv: 20,   confidence: medium }
-  # PLACEHOLDER, 2026-09-20, for Clement Mahina Coconut Rhum Liqueur (White
-  # Negroni Piña Colada). NOT LABEL-CHECKED and Helen has not seen it: 18 is a
-  # working figure for a coconut liqueur of this kind, `low` because nothing here
-  # has read the bottle. She is reviewing the generic itself.
-  coconut rhum:           { abv: 18,   confidence: low, qq: "Working figure for Clement Mahina Coconut Rhum Liqueur, not read off the bottle. What is its strength?" }
+  # `coconut rhum` LEFT THIS BLOCK 2026-09-26, and it is the `liqueur de sapin`
+  # move exactly: the category gained a bottle, and a bottle's figure wins.
+  # Helen named it that day -- "18% ABV, £22" -- so Clément Mahina Coconut Rhum
+  # Liqueur is declared in bottles.yml and carries 18 in `bottles:` above.
+  # The placeholder that stood here from 2026-09-20 guessed 18 and was right,
+  # but it was a guess and said so in a `qq:`.
+  # test_no_generic_gets_its_strength_from_two_places is what requires the
+  # deletion rather than the update, and it is right to: two rows is two
+  # answers, and the one nobody edits is the one that rots.
   # `liqueur de sapin` and `tomato liqueur` LEFT THIS BLOCK 2026-09-14: each
   # gained a bottle (Briottet Liqueur de Sapin, La Tomato Liqueur -- see
   # `other liqueurs` above), and a bottle's figure wins.
