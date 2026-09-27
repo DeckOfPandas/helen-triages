@@ -144,19 +144,69 @@ measures:
     # / `Top with soda water.` / `Rinse the glass with absinthe and dump.` in
     # methods.yml. The amount says how much (all of it, none of it), the step
     # says when.
-    - to top
-    - to rinse
-    # A FOURTH ACTION, 2026-09-26 (#1179): the Gin Rickey's soda water. Helen,
-    # asked whether 15 ml of soda in a highball was really a `to top`: "Let's
-    # add 'splash'."
     #
-    # IT IS NOT A SMALL `to top`, AND THAT IS WHY IT EARNS A WORD. `to top`
-    # means all the room that is left -- the whole of #1179's unfinished sum,
+    # THE SHAPE IS A BRACKETED NOUN SINCE 2026-09-26, AND IT WAS `to top` /
+    # `to rinse` BEFORE. Helen, ruling on #1217 with the candidates page in
+    # front of her: "just use '(top)' as the amount where it's an unspecified
+    # ml top, or '(splash)' for an unspecified splash. A float will be a ml
+    # amount, right (?), as they're usually alcoholic, but if none is given
+    # then again simply '(float)' as the amount please."
+    #
+    # WHY THE BRACKETS EARN THEIR KEEP. The old form was a sentence fragment
+    # sitting in a column of quantities -- "to top" under "45 ml" -- and it
+    # read as prose that had escaped into the data. A bracketed noun reads as
+    # what it is: the slot where a number would be, naming the action instead.
+    # It is also the same mark the ingredient line already uses for `as:`
+    # (#1217's option A, `(float)` after the bottle), so ONE punctuation means
+    # one thing across the line -- a use, rather than a measure.
+    #
+    # `(float)` IS DECLARED THOUGH NOTHING USES IT YET, and that is deliberate
+    # rather than the dead vocabulary #1186 went after. Helen's ruling names
+    # the case in as many words -- a float with no millilitre figure -- and
+    # every float in the collection today HAS one, which is her own "they're
+    # usually alcoholic". Declaring it is what makes the next one writable
+    # without a ruling.
+    #
+    # THE RENAME IS NOT ONLY A DATA CHANGE, which is the thing to know before
+    # touching it again: `to top` was compared as a literal in five places
+    # (cocktail_costs.rb twice, cocktail_units.rb twice, abv_worklist.py) and
+    # parsed by a regex in shopping-list.js. A reader left on the old spelling
+    # does not error -- it silently stops matching, and a topped drink then
+    # costs nothing and counts no units. What makes that safe to change is
+    # THIS list: drop the old string here and every unmigrated file fails
+    # test_every_amount_is_readable_as_a_quantity by name.
+    - (top)
+    - (rinse)
+    # `(splash)` WAS `splash` FOR ABOUT AN HOUR, on 2026-09-26. Helen asked for
+    # the word -- "Let's add 'splash'", for the Gin Rickey's soda water -- and
+    # then bracketed it with the rest when she ruled on #1217.
+    #
+    # IT IS NOT A SMALL `(top)`, AND THAT IS WHY IT EARNS A WORD. A top means
+    # all the room that is left -- the whole of #1179's unfinished sum,
     # capacity minus the build minus the ice. A splash is a deliberate small
-    # pour that does NOT fill the glass, and writing it as `to top` would have
+    # pour that does NOT fill the glass, and writing it as a top would have
     # told the reader, and `top_up_ml`, the opposite of what the drink wants.
     # Writing it as `15 ml` was the other wrong answer: nobody measures it.
-    - splash
+    - (splash)
+    - (float)
+    # TWO MORE THE SAME DAY, from the Milliners Punch, and they are the first
+    # test of whether the bracketed shape generalises. Helen's rewrite wrote
+    # `amount: garnish` and `amount: to sprinkle` -- unquoted, undeclared, and
+    # reaching for exactly this idea before it had a spelling.
+    #
+    # THE RUM AND THE CINNAMON ARE INGREDIENTS, NOT SERVEWARE, and that is her
+    # call rather than a tidy-up. Cobra's Fang puts its flaming passion fruit
+    # shells in `to_serve`, where nothing costs, counts or shops for them. An
+    # overproof rum you set alight is alcohol somebody drinks, so hers is the
+    # better filing: as pours they reach the cost, the unit count and the
+    # shopping list, and the only thing missing is a number -- which is what
+    # these two words supply.
+    #
+    # `(garnish)` RATHER THAN `as: garnish`, on the pairing rule the layout
+    # states: a pour with a measure names its use in `as:`, a pour without one
+    # names it in the amount. Neither of these has a measure.
+    - (garnish)
+    - (sprinkle)
     # A THIRD ACTION, 2026-09-14 (#752): the Ti' Punch. Helen: "let's say 60 ml
     # rum, then lime and sugar to taste -- this drink is typically served as
     # rhum in a glass with lime and sugar on the side so people can roll their
@@ -164,7 +214,16 @@ measures:
     # said, "This obviously doesn't change the units in the drink." It reads by
     # the same whole-string lookup as the two above: cost and units skip it,
     # scale.js passes it through untouched, and the shopping list counts it
-    # the way it counts `to rinse`.
+    # the way it counts `(rinse)`.
+    #
+    # IT KEPT ITS OLD SHAPE WHEN THE OTHERS WERE BRACKETED, 2026-09-26, and the
+    # difference is real rather than an oversight. The bracketed three name
+    # what the MAKER does with a pour whose volume nobody has written down.
+    # `to taste` hands the decision to the DRINKER -- Helen's Ti' Punch is
+    # "served as rhum in a glass with lime and sugar on the side so people can
+    # roll their own" -- and it reads as English in the amount column because
+    # it is an instruction to whoever is holding the glass. Her #1217 ruling
+    # named the top, the splash and the float, and did not name this one.
     - to taste
 
   # Words that may sit between the number and its unit without changing either.

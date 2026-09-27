@@ -338,7 +338,7 @@ module HelenTriages
         amount = ing["amount"].to_s.strip
         generics = Array(ing["generic"]).map(&:to_s)
 
-        if amount == "to top"
+        if amount == "(top)"
           tops = generics.filter_map { |g| @costs["top_up_ml"][g] }
           next if tops.empty?
           lo_ml = tops.map { |t| t["ml_min"].to_f }.min
@@ -382,7 +382,7 @@ module HelenTriages
         generics = Array(ing["generic"]).map(&:to_s)
 
         # --- how much liquid, if any ---------------------------------------
-        if amount == "to top"
+        if amount == "(top)"
           tops = generics.filter_map { |g| @costs["top_up_ml"][g] }
           next if tops.empty?
           lo_ml = tops.map { |t| t["ml_min"].to_f }.min

@@ -97,8 +97,8 @@ test('a bare count keeps its bare number, and grams stay grams', () => {
 // --- the amounts that are not quantities --------------------------------------
 
 test('an amount that is not a quantity passes through untouched', () => {
-  const out = scaler.scale(['to top', 'to rinse', '30 ml'], 4);
-  assert.deepStrictEqual(out.amounts, ['to top', 'to rinse', '120 ml']);
+  const out = scaler.scale(['(top)', '(rinse)', '30 ml'], 4);
+  assert.deepStrictEqual(out.amounts, ['(top)', '(rinse)', '120 ml']);
 });
 
 // --- ranges -------------------------------------------------------------------
@@ -125,7 +125,7 @@ test('the floor is the drink’s own smallest allowed multiple', () => {
   assert.strictEqual(scaler.allowedStep(['50 ml', '5 ml']).value, 0.5);
   // Nothing volumetric: nothing can go under 2.5 ml, so the fallback step is
   // the floor -- halves, as this control offered before the grid existed.
-  assert.strictEqual(scaler.floorMultiple(['2 dashes', 'to top']), 0.5);
+  assert.strictEqual(scaler.floorMultiple(['2 dashes', '(top)']), 0.5);
 });
 
 test('the allowed step is 2.5 ml over the gcd of the amounts', () => {
@@ -206,11 +206,11 @@ test('the total is the poured volumes only, never the dashes', () => {
 
 test('every non-volumetric amount sits outside the total', () => {
   // Helen, 2026-09-04: "Ignore drops and dashes and pinches in target ml."
-  // Grams, leaves, `each`, a bare count and `to top` are outside it for the
+  // Grams, leaves, `each`, a bare count and `(top)` are outside it for the
   // same reason — the total is millilitres, and only millilitres are.
   assert.strictEqual(
     scaler.totalMl(['30 ml', '2 dashes', '1 small pinch', '25 g', '8 leaves',
-                    'to top', '1', 'half'], 1),
+                    '(top)', '1', 'half'], 1),
     30);
 });
 
@@ -315,7 +315,7 @@ test('a target below the floor is refused like any other multiple', () => {
 test('a target with nothing to scale, or no number, is null', () => {
   // Nothing volumetric: there is no total to divide into, so the control has
   // no answer rather than a wrong one.
-  assert.strictEqual(scaler.multipleForTotal(['2 dashes', 'to top'], 50), null);
+  assert.strictEqual(scaler.multipleForTotal(['2 dashes', '(top)'], 50), null);
   [0, -30, '', null, undefined, 'lots'].forEach((bad) => {
     assert.strictEqual(scaler.multipleForTotal(NEGRONI, bad), null, String(bad));
   });

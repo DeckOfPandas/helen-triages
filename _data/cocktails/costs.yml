@@ -101,7 +101,20 @@ excluded_units:
   - g
   - half
   - whole
-  - to rinse
+  # `(rinse)` WAS `to rinse` UNTIL 2026-09-26, when Helen bracketed the
+  # unspecified amounts on #1217. `(top)` is deliberately still absent from
+  # this list, exactly as `to top` was: it is the one excluded-looking unit
+  # that DOES cost, through `top_up_ml` below, and the block header above says
+  # why. `(splash)` and `(float)` are absent for a different reason -- neither
+  # has a declared volume range yet, so neither reaches the arithmetic at all.
+  - (rinse)
+  # `(garnish)` and `(sprinkle)` joined 2026-09-26 with the Milliners Punch.
+  # Excluded for the reason a dash and a leaf are: no volume, so no arithmetic.
+  # Its flaming overproof rum and its cinnamon are real pours she will buy, and
+  # they show on the shopping list as a count -- what they cannot do is add
+  # millilitres to a total.
+  - (garnish)
+  - (sprinkle)
 
 # --- what a bottle costs and how big it is -----------------------------------
 # `size_ml` IS AS LOAD-BEARING AS `gbp` AND IS EASIER TO GET WRONG. A price

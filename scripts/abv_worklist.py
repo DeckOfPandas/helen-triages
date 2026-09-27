@@ -130,7 +130,7 @@ class Resolver:
         if generics and all(g in self.bitters for g in generics):
             return []
 
-        if amount == "to top":
+        if amount == "(top)":
             if not [g for g in generics if g in self.top_up]:
                 return []
         elif self.volume_ml(amount) is None:

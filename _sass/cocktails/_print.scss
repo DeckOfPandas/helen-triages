@@ -192,6 +192,9 @@
     .cocktail-units,
     .cocktail-scale-total,
     .cocktail-optional,
+    // `.cocktail-use` joined 2026-09-26 with #1217. It is `.cocktail-optional`
+    // in every other respect, so it is quiet ink here for the same reason.
+    .cocktail-use,
     .cocktail-style-or,
     .cocktail-character,
     .cocktail-note,

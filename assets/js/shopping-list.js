@@ -433,7 +433,7 @@
      and tolerates case and spacing, and matches nothing else on purpose.
      A phrase this does not recognise keeps the old `(x3)` reading, which is
      the honest fallback for a pour nobody has declared a volume for. */
-  var TOP_UP = /^to\s+top(\s+up)?$/i;
+  var TOP_UP = /^\(top\)$/i;
 
   /* VULGAR FRACTIONS ARE NUMBERS, and food writes a great many of them --
      `½ tsp`, `¼–½ tsp`, `1½ tbsp`, `1¾ cups`, `⅛ tsp`. Every one of these

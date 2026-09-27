@@ -789,10 +789,18 @@ mood_include:
     moods: [sharp]
     why: >-
       she calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  milliners-punch:
-    moods: [on fire]
-    why: >-
-      she sets it alight; the method does not say so.
+  # MILLINERS PUNCH'S `on fire` CAME OFF 2026-09-26, and it is the best kind of
+  # retirement: the entry said "she sets it alight; the method does not say
+  # so", and then Helen rewrote the drink and the method said so. Its fourth
+  # step is "Set the empty lime half-shell on top, pour in the overproof rum,
+  # and set alight", which `mood_step_words.fire` reads for `alight`. Nothing
+  # was argued away -- the fact arrived.
+  #
+  # `test_every_mood_correction_is_reachable_and_needed` is what found it,
+  # within a minute of the rewrite landing, by saying the entry "does nothing
+  # and should go". A correction left standing after its reason is answered
+  # reads as a live judgement while doing nothing, which is the rot that guard
+  # exists for.
   north-sea-oil:
     moods: [strong brown drink]
     why: >-

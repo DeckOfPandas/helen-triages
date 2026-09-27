@@ -711,7 +711,30 @@ layout: default
                  ingredient's name only — never under the bottle suggestion in
                  brackets after it, which is a different colour making a
                  different claim. {% endcomment %}
-              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
+              {% comment %} `as` RENDERS HERE SINCE 2026-09-26 (#1217), and
+                 until then it rendered NOWHERE. The field has existed since
+                 #754 and was read by exactly one thing —
+                 _plugins/cocktail_card_ingredients.rb, for card ORDER — so a
+                 float looked like an ordinary pour on the recipe page and the
+                 issue's title is the whole complaint: "show when something is
+                 a top or a float".
+
+                 OPTION A, from the candidates page. Helen, 2026-09-26, having
+                 looked at four treatments on the real Modern Zombie and Tom
+                 Collins pages: "option A please, certain." It is the
+                 `(optional)` shape, which #1141 already settled as the mark
+                 for a parenthetical about the pour rather than about the
+                 bottle.
+
+                 IT PAIRS WITH THE BRACKETED AMOUNTS rather than duplicating
+                 them, and that is the half worth understanding. An unspecified
+                 pour says it in the AMOUNT column — `(top)`, `(splash)`,
+                 `(float)`, declared in ingredients.yml `non_volumetric`. A
+                 pour that HAS a measure says it here instead, so the Modern
+                 Zombie reads "30 ml … (float)" and the Tom Collins reads
+                 "(top) soda water". The mark appears once either way, which is
+                 what stops "(top) soda water (top)". {% endcomment %}
+              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.as %} <span class="cocktail-use">({{ item.as }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>

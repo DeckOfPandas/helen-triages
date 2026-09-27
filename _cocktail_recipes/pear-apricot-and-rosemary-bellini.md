@@ -23,7 +23,7 @@ ingredients:
     generic: "lemon zest"
   - amount: "10 ml"
     generic: "cider vinegar"
-  - amount: "to top"
+  - amount: "(top)"
     generic: "soda water"
 method:
   - "Heat everything except the soda water and vinegar with 100 ml water."
@@ -53,5 +53,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

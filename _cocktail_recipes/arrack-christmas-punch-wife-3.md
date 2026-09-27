@@ -21,7 +21,7 @@ ingredients:
     generic: "lemon juice"
   - amount: "10 ml"
     generic: "orgeat"
-  - amount: "to top"
+  - amount: "(top)"
     generic: "champagne"
 method:
   - "Shake all ingredients other than the champagne with ice."
@@ -40,5 +40,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

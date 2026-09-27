@@ -18,7 +18,7 @@ ingredients:
     suggestion: ["Luxardo Maraschino"]
   - amount: "15 ml"
     generic: "lemon juice"
-  - amount: "to top"
+  - amount: "(top)"
     generic: "champagne"
 method:
   - "Shake all ingredients other than the champagne with ice."
@@ -39,5 +39,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

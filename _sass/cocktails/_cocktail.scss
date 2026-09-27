@@ -1923,6 +1923,31 @@ $amount-gap: 1rem;
   font-size: 0.84rem;
 }
 
+// HOW A POUR GOES IN — #1217, 2026-09-26. `(float)`, `(rinse)`, `(muddle)`.
+//
+// THE FIELD IS `as:` AND IT RENDERED NOWHERE UNTIL NOW. It has existed since
+// #754 and exactly one thing read it — cocktail_card_ingredients.rb, for card
+// ORDER — so a float looked like an ordinary pour and the issue's title is the
+// whole complaint: "show when something is a top or a float".
+//
+// OPTION A, Helen's pick from the candidates page against three others:
+// "option A please, certain." So it takes `.cocktail-optional`'s shape
+// exactly, and shares its reasoning rather than restating it — a parenthetical
+// about the POUR, sitting where `(optional)` sits, italic and in
+// $color-clear-text because it is not a filter axis either. The index matches
+// nothing against `as`, so spending a hue here would make a promise the index
+// cannot keep.
+//
+// IT CANNOT COLLIDE WITH THE AMOUNT'S OWN BRACKETS, which is the pairing the
+// layout comment sets out: a pour with no measure says `(top)` in the AMOUNT
+// column and carries no `as`, and a pour with a measure says it here. One mark
+// per pour, never "(top) soda water (top)".
+.cocktail-use {
+  font-style: italic;
+  color: $color-clear-text;
+  font-size: 0.84rem;
+}
+
 // WAS THE CLASS LINE, IS NOW THE CHARACTER LINE — #544, 2026-08-29. The generic
 // moved up to be the headline itself, so this rule no longer glosses it; the
 // only thing left below the line is `character`, on the three drinks that carry

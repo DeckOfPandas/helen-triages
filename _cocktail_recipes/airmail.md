@@ -18,7 +18,7 @@ ingredients:
   - amount: "15 ml"
     generic: "honey water 2:1"
     suggestion: ["Acacia honey"]
-  - amount: "to top"
+  - amount: "(top)"
     generic: "champagne"
 method:
   - "Shake all ingredients other than the champagne with ice."
@@ -37,5 +37,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
