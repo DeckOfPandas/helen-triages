@@ -42,5 +42,5 @@ meta:
   ship: "who knows"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 ---
