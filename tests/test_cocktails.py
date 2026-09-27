@@ -1763,7 +1763,32 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # `_cocktail_recipes/biggles-sidecar.md` and
 # `_cocktail_recipes/classic-champagne-cocktail.md`, both "last touched by
 # 742aa738", and nothing else. Covers 742aa73 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "742aa73"   # two source spellings, on Helen's bounded grant
+#
+# MOVED 2026-09-26 FOR FOUR DRINKS, THREE OF THEM A PLURAL. `6fe3ca1` flips
+# `proofread` back to true on accoutrement, caribbean-sazerac,
+# mai-tai-diffords-recipe -- each `2 dash` -> `2 dashes`, on Helen's new rule
+# that day, "'dashes' throughout please, but 'dash' when it's one" -- and on
+# german-vacation, which gained the derived `sharp` chip when `sharp` stopped
+# being disqualified by crushed ice.
+#
+# HER GRANT: "Proofread flag: fine to flip back on those four drinks with
+# dashes. I'll double check, but I'm happy to do that live." Three of the four
+# have dashes and the fourth is german-vacation; read as the four that were
+# demoted together and reported to her as one group, and its change is the
+# #1127 derived-chip case she has already ruled on ("if the only change to
+# those 15 files is the chip appearing, I don't need to proofread").
+#
+# THE CONDITION WAS CHECKED BEFORE THE GRANT WAS ACTED ON, which PIPELINE.md 5
+# requires of a grant of this shape and which is the half easiest to skip.
+# `tmp/prove_only_expected.py` on that branch diffs all four against
+# `origin/main` and requires every changed line to be one of three shapes: the
+# dash pluralisation, the `sharp` chip, the flag. It passed with nothing left
+# over; a reordered mood or a changed amount would have failed it.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly those four files, every one "last touched by 6fe3ca19", and nothing
+# else. Covers 6fe3ca1 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "6fe3ca1"   # four drinks: three dash plurals and one derived chip
 
 
 def _newest_commit_per_published_drink():
