@@ -1,3 +1,45 @@
 # Test dependencies only. The site itself needs nothing from Python.
-pytest>=8.0
-PyYAML>=6.0
+#
+# PINNED EXACTLY, NOT FLOORED (#1203, 2026-09-28). These said `pytest>=8.0` and
+# `PyYAML>=6.0`, so CI installed whatever was newest on the day and the
+# devcontainer image installed whatever was newest when it was last built. The
+# two drifted silently: the image here carries pytest 9.1.1 under a `>=8.0`
+# floor, and nothing anywhere recorded which version the suite is actually
+# green on. A floor says "at least this works"; a pin says "this works", and
+# only the second is a fact somebody measured.
+#
+# THIS FILE IS THE ONE PLACE. .devcontainer/Dockerfile repeats these pins by
+# hand because its build context is `.devcontainer/` itself, not the repo root,
+# so it CANNOT `COPY requirements-test.txt` -- see that file and the
+# devcontainer README for why the context is narrow. Changing the context to the
+# repo root would break the image stamp (#1180), which hashes every file in the
+# build context to decide whether to rebuild: with the repo as context, editing
+# any recipe would trigger a rebuild.
+#
+# So the duplication stays, and
+# tests/test_devcontainer_pins.py::test_the_image_installs_what_this_file_pins
+# fails if the two disagree. That is the same shape as the Playwright version,
+# which is pinned in the Dockerfile and in scripts/browser/install.sh with
+# tests/test_browser_harness.py holding them together. A "keep in sync by hand"
+# comment is a hope; a test is the sync.
+pytest==9.1.1
+PyYAML==6.0.3
+
+# PLAYWRIGHT'S PYTHON BINDING, for the headless smoke test of both indexes
+# (#1200). Separate from the npm playwright@1.47.2 baked into the image for
+# scripts/browser/: that one is for a human or a session to LOOK at a page with,
+# and this one is for a test that needs the suite's own Jekyll build, which
+# tests/test_rendered_pages.py already makes behind a session fixture.
+#
+# THE TWO CANNOT SHARE A VERSION, AND THAT IS FINE. PyPI has no 1.47.2 at all
+# (checked 2026-09-28: 1.47.0 then 1.48.0), so the npm and pip pins differ by a
+# patch and each fetches its own Chromium revision into the shared
+# PLAYWRIGHT_BROWSERS_PATH. Do not try to make them match.
+#
+# INSTALLING THIS PACKAGE DOES NOT INSTALL A BROWSER -- `playwright install
+# chromium` does, and that is a Dockerfile step. So CI gets the binding and no
+# browser, which means any browser test MUST skip on whether a browser can
+# actually LAUNCH, never on whether the import succeeds. Skipping on the import
+# would turn CI red the moment this line landed, which is exactly the
+# "expected to fail" arrangement Helen ruled against on 2026-09-20 (#1191).
+playwright==1.47.0

@@ -1,5 +1,21 @@
 """Sequential-ramp check for the temperature ruler.
 
+REPRODUCES THE NUMBERS THAT KILLED THE RAMP, quoted in
+`_sass/food/_temperature-chart.scss`: the lightest step's 1.27:1 against
+`$color-bg` where a large mark needs 3:1, and the even ~7-point OKLab steps that
+made the ramp look correct right up until that check. The doneness chart ships
+with almost no colour BECAUSE of this output -- the ramp was redundant with the
+position encoding, and chasing the contrast failure is what surfaced that.
+
+So this is the evidence for a shipped decision, not a leftover. #1203's audit
+listed it as one of fourteen measurement scripts with "no test and no caller",
+and it was the only one of the fourteen that nothing in the tree mentioned at
+all -- which made it look like the clear deletion candidate. It is the opposite:
+the stylesheet quotes its output without naming it, so the number had a citation
+and the script had none. MANUAL §13.11 is why it stays -- a derivation lives in
+`scripts/` so it can be reproduced. Re-run it before arguing for a colour ramp
+here again.
+
 The dataviz skill's own validate_palette.js lives outside this project, and
 CLAUDE.md forbids reading or executing above the project folder -- so the
 checks it would run are reimplemented here instead of skipped.

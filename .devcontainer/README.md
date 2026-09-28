@@ -45,11 +45,11 @@ Prefer to do it by hand instead? The equivalent manual steps are:
 
     docker build -t helen-triages-devcontainer -f .devcontainer/Dockerfile .devcontainer
     docker volume create helen-triages-claude-config
-    docker volume create helen-triages-bundle-cache
+    docker volume create helen-triages-bundle-cache-helen-triages
     docker run -it --rm \
       -v "$(pwd):/workspace" \
       -v helen-triages-claude-config:/home/helen/.claude \
-      -v helen-triages-bundle-cache:/home/helen/.bundle-cache \
+      -v helen-triages-bundle-cache-helen-triages:/home/helen/.bundle-cache \
       -w /workspace \
       helen-triages-devcontainer \
       bash
@@ -181,7 +181,7 @@ has passwordless sudo for exactly this one script, nothing else):
     docker run -it --rm --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -v "$(pwd):/workspace" \
       -v helen-triages-claude-config:/home/helen/.claude \
-      -v helen-triages-bundle-cache:/home/helen/.bundle-cache \
+      -v helen-triages-bundle-cache-helen-triages:/home/helen/.bundle-cache \
       -w /workspace \
       helen-triages-devcontainer \
       bash -c "sudo /usr/local/bin/init-firewall.sh && exec bash"

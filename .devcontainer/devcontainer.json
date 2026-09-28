@@ -8,7 +8,7 @@
   "remoteUser": "helen",
   "mounts": [
     "source=helen-triages-claude-config,target=/home/helen/.claude,type=volume",
-    "source=helen-triages-bundle-cache,target=/home/helen/.bundle-cache,type=volume"
+    "source=helen-triages-bundle-cache-helen-triages,target=/home/helen/.bundle-cache,type=volume"
   ],
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/helen/.claude"

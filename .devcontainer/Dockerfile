@@ -44,7 +44,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Node, for the `claude` CLI itself and the project's JS tests.
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+#
+# 24, MATCHING CI (#1203, 2026-09-28). This said 22 while
+# .github/workflows/build-and-deploy.yml's setup-node said 24, so the JS suite
+# ran on two different majors -- here and in the gate that decides whether the
+# site deploys -- for weeks without a difference showing. That is luck, not
+# compatibility, and the version a test passed under is part of what the pass
+# means. Helen chose to move the container up rather than CI down, since the
+# workflow file is hers to edit and this is not.
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
@@ -71,7 +79,9 @@ RUN mkdir -p /opt/playwright \
     && rm -rf /var/lib/apt/lists/* /root/.npm
 
 # GitHub CLI, matching the project's own `gh` usage (read/write on Issues
-# and PRs via GH_TOKEN -- see CLAUDE.md).
+# and PRs via AGENT_GH_TOKEN -- see CLAUDE.md). Said GH_TOKEN until 2026-09-28;
+# that credential was retired on 2026-09-09 and DECISIONS §11 keeps its measured
+# scope tables only as history.
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -86,11 +96,36 @@ RUN npm install -g @anthropic-ai/claude-code
 # Python test dependencies (tests/test_front_matter.py etc., run via pytest).
 # Hardcoded rather than COPYing requirements-test.txt, since the build
 # context here is .devcontainer/ itself, not the repo root where that file
-# lives (see README on why) -- keep this in sync with requirements-test.txt
-# by hand if that file's pins change. --break-system-packages is safe here:
-# this is a disposable, single-purpose container image, not a shared system
-# Python that anything else depends on.
-RUN pip install --break-system-packages --no-cache-dir "pytest>=8.0" "PyYAML>=6.0"
+# lives (see README on why). --break-system-packages is safe here: this is a
+# disposable, single-purpose container image, not a shared system Python that
+# anything else depends on.
+#
+# THE SYNC IS NOW A TEST, NOT A COMMENT (#1203, 2026-09-28). This used to end
+# "keep this in sync with requirements-test.txt by hand if that file's pins
+# change", and the pins had already drifted: both files said `>=`, so this image
+# carries pytest 9.1.1 under a floor of 8.0 and CI installed whatever was newest
+# on the day. Exact pins in requirements-test.txt are the single source, and
+# tests/test_devcontainer_pins.py fails if this line disagrees with them. Same
+# shape as the Playwright version two blocks up, which is pinned twice with
+# tests/test_browser_harness.py holding the two together.
+RUN pip install --break-system-packages --no-cache-dir \
+    "pytest==9.1.1" "PyYAML==6.0.3" "playwright==1.47.0"
+
+# PLAYWRIGHT'S CHROMIUM FOR THE PYTHON BINDING, which the pip install above does
+# NOT fetch -- the package and its browsers are separate downloads (#1200).
+#
+# Into the SAME PLAYWRIGHT_BROWSERS_PATH the npm install uses, deliberately. PyPI
+# has no playwright 1.47.2 (checked 2026-09-28: 1.47.0, then 1.48.0), so the pip
+# pin and the npm pin differ by a patch and want different Chromium revisions.
+# Sharing the directory lets each find its own rather than making one guess at
+# the other's; the cost is at worst a second Chromium in the image, and nothing
+# is fragile. Do not try to make the two versions match.
+#
+# --with-deps is omitted: the npm install above already apt-installed
+# Playwright's system library list, and repeating it would only re-fetch apt
+# indexes this layer then deletes.
+RUN PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright \
+    python3 -m playwright install chromium
 
 # Non-root user matching Helen's host uid/gid (1000), so files the
 # container creates on the bind-mounted project directory come back

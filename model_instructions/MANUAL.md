@@ -303,6 +303,7 @@ _includes/    filter_group.html   recipe_badges.html   cocktails/ship.html
               cocktails/draft-badge.html (§2, local-only draft mark)
               icons/glasses/ (the published glass artwork, §9.11)   food/ (reference partials, §14)
 _plugins/     publish_gate.rb   cocktail_costs.rb   cocktail_units.rb   cocktail_card_ingredients.rb
+              food_shopping.rb
 _sass/        shared/{_tokens,_base,_layout,_rule,_chrome,_fonts}   food/   cocktails/
 _data/        sites.yml   accented_words.yml   chrome.yml   food/*.yml
               cocktails/{taxonomy,ingredients,bottles,glasses,methods,garnish,serve,costs,abv}.yml
@@ -322,12 +323,15 @@ index.html             permalink /        a bare redirect to /food/
 
 `food/` and `cocktails/` hold each site's **pages**, not their collections.
 
-**Plugins.** Four Ruby plugins decide what a built page shows:
+**Plugins.** Five Ruby plugins decide what a built page shows:
 `publish_gate.rb` removes any gated document that does not carry an explicit
 pass (§4.0, §9.1.1); `cocktail_costs.rb` and `cocktail_units.rb` do the price
 and unit arithmetic once at build time (§9.3.5, §9.3.4);
 `cocktail_card_ingredients.rb` builds a card's ordered ingredient line and its
-search pool from one list (§9.10.1). **GitHub Pages' safe mode ignores
+search pool from one list (§9.10.1); and `food_shopping.rb` assigns each food
+ingredient its grocery aisle from `_data/food/aisles.yml` and works out how many
+a recipe feeds, so the browser is handed `{amount, name, aisle}` and never sees
+the table (#801). **GitHub Pages' safe mode ignores
 `_plugins/` entirely, without warning** — the gate would be gone and the build
 green — which is why the workflow runs its own plugin-capable build and
 `tests/test_site_config.py` asserts that it still does.
