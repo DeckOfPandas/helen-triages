@@ -1197,8 +1197,46 @@ moods_by_hand:
   # not. Everything else was her adding. A conservative rule is the right kind
   # of wrong, and the ones that stay derived are gaps to widen rather than
   # judgements to distrust.
+  # `clear` WAS ASKED THE SAME QUESTION AS `tiki` ON 2026-09-28 AND THE ANSWER
+  # WAS NO -- measured, so nobody has to wonder again. Helen: "Let's do
+  # something on tiki and clear."
+  #
+  # Every candidate of the obvious shape -- a spirit from the `clear` set, a
+  # cap on poured ingredients, nothing rich, no tiki marker -- scored between
+  # .26 and .34 against her own 19 tagged drinks, against .67 for the rule that
+  # was retired here. Under the precision test that made `tiki` viable they are
+  # far worse: the best would ADD `clear` to 25 drinks she did not tag, and the
+  # loosest to 45. A rule for a hand mood can only add, so that is 25 wrong
+  # chips, not 25 near misses.
+  #
+  # THE DEFINITION EXPLAINS WHY, and it is above: "glassy mouthfeel, low
+  # complexity, not filling". Brooklyn is brown and IS clear; the Negroni is
+  # transparent and is NOT. None of the three is a property of an ingredient
+  # list, which is exactly what the 2026-08-30 pass concluded and what the
+  # thirteen days of "transparent" got wrong.
   - clear
   - sugar craving
+  # `tiki` IS BOTH, SINCE 2026-09-28 (#1187) -- derived AND hand-assigned, the
+  # second mood to lead that double life after `on fire`. It STAYS on this list
+  # and gains a rule, which is a different thing from coming off it.
+  #
+  # WHY THAT COMBINATION IS SAFE RATHER THAN A FUDGE. `expected_moods`
+  # PRESERVES whatever a drink already carries for a mood on this list, and
+  # folds the derivation in beside it. So a rule for a hand mood can only ADD:
+  # a miss costs nothing and needs no `mood_include`, and the only measurable
+  # cost is a drink tagged that Helen did not tag. That inverts what the rule
+  # has to be good at -- PRECISION, not coverage -- and this block has always
+  # said a conservative rule is the right kind of wrong.
+  #
+  # Helen asked for it: "Let's do something on tiki and clear. I'm sure we used
+  # to have a tiki deriver -- something like more than x ingredients, fewer
+  # than y, and at least two typical tiki ingredients???" She was right that
+  # one existed; `derive_cocktail_moods.py` had kept its COMMENT with the code
+  # deleted since the .53 score above moved the mood here.
+  #
+  # Two markers plus four ingredients, measured over all 140 drinks: it fires
+  # 19 times, 17 of them hers. The deriver carries the marker distribution and
+  # the six she tags with no marker at all.
   - tiki
   - aperitivo
   - nightcap

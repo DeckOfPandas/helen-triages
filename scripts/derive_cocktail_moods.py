@@ -336,11 +336,45 @@ def derive(drink, sets, step_words, families):
     if has("rich"):
         out.append("pudding in a glass")
 
-    # `tiki` -- two markers AND complexity, complexity measured two ways.
-    # Helen: tiki is "a complex drink with lots of ingredients and lots of
-    # taste layers which is why it's not just a jar full of sugar". Count alone
-    # dropped Jungle Bird and Better and Better ("only three ingredients, but
-    # they're bonkers"); intensity recovers them and drags in nothing.
+    # `tiki` -- two markers AND complexity. RESTORED 2026-09-28 (#1187), and
+    # this comment had outlived its code since 2026-08-30: the mood moved to
+    # `moods_by_hand` and the `if` went with it, leaving the explanation
+    # orphaned. Helen remembered it anyway -- "I'm sure we used to have a tiki
+    # deriver -- something like more than x ingredients, fewer than y, and at
+    # least two typical tiki ingredients???" -- which is the shape below.
+    #
+    # Her definition stands: tiki is "a complex drink with lots of ingredients
+    # and lots of taste layers which is why it's not just a jar full of sugar".
+    #
+    # IT ADDS AND NEVER REMOVES, WHICH IS WHY IT CAN BE CONSERVATIVE. `tiki`
+    # STAYS in `moods_by_hand`, so `expected_moods` preserves whatever a drink
+    # already carries and this rule only ever adds -- the same double life
+    # `on fire` has led since 2026-09-09. So a MISS costs nothing at all and
+    # needs no `mood_include`, and the only thing worth measuring is how often
+    # the rule tags a drink Helen did not.
+    #
+    # MEASURED BEFORE CHOOSING, over all 140 drinks (tmp/ in the #1187 branch).
+    # She tags 36. By marker count:
+    #
+    #     markers    tagged tiki    not tagged
+    #        0             6            82
+    #        1            13            19
+    #        2            10             3
+    #        3             7             0
+    #
+    # Two markers is where the signal is: of the 20 drinks carrying two or
+    # more, 17 are hers. Adding the ingredient floor takes it to 19 firings,
+    # 17 of them hers -- and the two it adds are the Chartreuse Swizzle
+    # (falernum, pineapple juice) and the Milliners Punch (overproof Jamaican,
+    # passion fruit syrup, ten ingredients, on fire), neither of which looks
+    # like a wrong answer. `mood_exclude` is there if she disagrees.
+    #
+    # THE SIX SHE TAGS WITH NO MARKER AT ALL are the ceiling on any rule of
+    # this shape -- Daiquiri, Ti' Punch, Chartreuse Daiquiri, Arrack Punch,
+    # Daisy de Santiago, Martinique Swizzle. They keep their hand tag, which is
+    # the whole reason the mood stays in `moods_by_hand`.
+    if count("tiki") >= 2 and n_ingredients >= 4:
+        out.append("tiki")
 
     # `warming` -- ONE COPY OF THIS RULE, and it was two until 2026-09-20
     # (#1147). The duplicate sat eleven lines below, separated by a shorter
