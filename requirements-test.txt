@@ -42,4 +42,4 @@ PyYAML==6.0.3
 # actually LAUNCH, never on whether the import succeeds. Skipping on the import
 # would turn CI red the moment this line landed, which is exactly the
 # "expected to fail" arrangement Helen ruled against on 2026-09-20 (#1191).
-playwright==1.47.0
+playwright==1.63.0
