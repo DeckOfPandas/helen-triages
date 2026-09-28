@@ -1056,6 +1056,26 @@ layout: default
     {% endif %}
   {% endfor %}
   {% assign ice_clause = site.data.cocktails.serve.in_the_glass[page.serve.ice] | default: "" %}
+  {% comment %} HOW FULL, WHICH `ice` DELIBERATELY DOES NOT SAY — 2026-09-28,
+     for the Milliners Punch. Helen's sentence: "Strain into a hurricane glass
+     half-filled with crushed ice."
+
+     `serve.fill` REPLACES THE WORD `filled` in the clause just composed, so
+     " filled with crushed ice" becomes " half-filled with crushed ice". One
+     substitution rather than a table of fill-by-ice, and the word it swaps is
+     declared in serve.yml so the template states none of it.
+
+     It is a SECOND FIELD and not a sixth `ice` value on purpose: serve.yml's
+     own note says the ice field cannot carry quantity, and a new spelling of
+     crushed would have moved three mood rules that test `"crushed"` by
+     string. `ice: crushed` is untouched, so nothing about the moods moves.
+  {% endcomment %}
+  {% if page.serve.fill %}
+    {% assign fill_word = site.data.cocktails.serve.fill[page.serve.fill] %}
+    {% if fill_word %}
+      {% assign ice_clause = ice_clause | replace: "filled", fill_word %}
+    {% endif %}
+  {% endif %}
   {% comment %} THE RIM RIDES ON THE GLASS, BEFORE THE ICE — Helen, 2026-09-05:
      "Given that you can't sugar a rim once the glass is full, let's add that
      line earlier." It was a line under "To serve", which is after the drink is

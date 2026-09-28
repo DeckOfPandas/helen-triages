@@ -124,6 +124,38 @@ in_the_glass:
   large cube: ", over a large ice cube"
   block: ", over a large block of ice"
 
+# --- `fill` -------------------------------------------------------------------
+# HOW FULL, WHICH `ice` DELIBERATELY DOES NOT SAY. Added 2026-09-28 for the
+# Milliners Punch. Helen's sentence: "Strain into a hurricane glass half-filled
+# with crushed ice."
+#
+# WHY A SECOND FIELD RATHER THAN A SIXTH `ice` VALUE. This file already says,
+# of Fish House Punch, that "the thing the field cannot carry is QUANTITY" --
+# `ice` names the KIND, and lots of cubed ice and one cube in a rocks glass
+# both spell `cubed`. A `half crushed` value would be that same overload, and
+# it would cost more than it looks: `derive_cocktail_moods.py` tests
+# `serve.ice in ("crushed", "blended")` in two places and `mood_serve_ice`
+# lists it in a third, so a new spelling of crushed would silently change
+# `ice ice baby`, `strong brown drink` and `sharp` on the drink that used it.
+# A separate field leaves `ice: crushed` exactly as it was, and NOTHING about
+# the moods moves.
+#
+# IT REPLACES THE WORD `filled`, which is why the values read as they do. The
+# clause above is composed first -- " filled with crushed ice" -- and this
+# swaps the one word, giving " half-filled with crushed ice". One substitution,
+# and no combinatorial table of fill-by-ice.
+#
+# SO IT ONLY MEANS ANYTHING WHERE THE CLAUSE SAYS `filled`, which is `cubed`
+# and `crushed`. `large cube` and `block` are ice you pour the drink ONTO --
+# ", over a large ice cube" -- and half of one cube is not a quantity anybody
+# is describing. `test_a_fill_has_something_to_fill` refuses that pairing
+# rather than letting the substitution quietly do nothing.
+#
+# ABSENT MEANS FULL, and that is the ordinary case: 24 drinks say `cubed` or
+# `crushed` and one says how full.
+fill:
+  half: "half-filled"
+
 # --- `rim` -------------------------------------------------------------------
 # FREE TEXT, deliberately. Two drinks rim today and a closed vocabulary for two
 # members would be inventing structure ahead of the data — the mistake

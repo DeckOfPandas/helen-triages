@@ -182,7 +182,14 @@ TOP_LEVEL_KEYS = {
 # step in their own right, so the whole field went rather than the one value and
 # nothing it held was lost. Recorded because a field redundant with a default is
 # exactly the kind of thing that gets re-proposed.
-SERVE_KEYS = {"ice", "rim"}
+# `fill` JOINED 2026-09-28, and it is the quantity `ice` was never allowed to
+# carry. Helen's Milliners Punch sentence is "Strain into a hurricane glass
+# half-filled with crushed ice."; serve.yml's own Fish House Punch note says
+# "the thing the field cannot carry is QUANTITY", so the quantity got a field
+# of its own rather than a sixth spelling of crushed. Keeping `ice: crushed`
+# untouched matters beyond tidiness: the mood deriver tests that exact string
+# in two places and `mood_serve_ice` in a third.
+SERVE_KEYS = {"ice", "rim", "fill"}
 
 # `to_serve` and `serve` are the optional ones -- most drinks have no serveware
 # note, and `serve` is absent where nobody has ruled on the ice. Everything else
@@ -2328,6 +2335,67 @@ def test_serve_block_uses_only_declared_keys_and_values():
           "value is real."
     )
 
+
+def test_every_fill_is_a_declared_one():
+    """`serve.fill` says how full, and serve.yml declares the words.
+
+    Added 2026-09-28 with the field. Same bargain every other closed
+    vocabulary here strikes: declaring a value is what switches enforcement on,
+    and an undeclared one would render the ice clause UNCHANGED -- "filled with
+    crushed ice" where the drink said half -- which is a silent wrong answer
+    rather than a loud one.
+    """
+    vocab = _serve_vocab()
+    declared = set(vocab.get("fill") or {})
+    assert declared, (
+        "serve.yml declares no `fill:` values, so the field enforces nothing. "
+        "If it was retired, delete it from SERVE_KEYS and these tests with it."
+    )
+    bad = []
+    for slug, fm in _load():
+        serve = fm.get("serve")
+        if not isinstance(serve, dict) or "fill" not in serve:
+            continue
+        if serve["fill"] not in declared:
+            bad.append(f"{slug}: fill {serve['fill']!r} is not declared")
+    assert not bad, (
+        "serve `fill` value(s) that are not declared:\n  " + "\n  ".join(bad)
+        + f"\n\nDeclared: {', '.join(sorted(declared))}. The values live in "
+          "_data/cocktails/serve.yml."
+    )
+
+
+def test_a_fill_has_something_to_fill():
+    """A drink saying how full must have ice whose clause says `filled`.
+
+    THE SUBSTITUTION IS THE REASON. `fill` swaps the word `filled` in the
+    composed clause, and only `cubed` and `crushed` produce one -- `large cube`
+    and `block` are ice you pour the drink ONTO (", over a large ice cube"),
+    where half of one cube is not a quantity anybody is describing.
+
+    Paired with `none`, or with no `serve.ice` at all, the substitution finds
+    nothing and does NOTHING, which is the failure worth catching: the drink
+    reads as though somebody recorded how full it is and the page never says
+    so. A silent no-op is worse than a refusal, because it looks recorded.
+    """
+    vocab = _serve_vocab()
+    clauses = vocab.get("in_the_glass") or {}
+    bad = []
+    for slug, fm in _load():
+        serve = fm.get("serve")
+        if not isinstance(serve, dict) or "fill" not in serve:
+            continue
+        clause = clauses.get(serve.get("ice"), "")
+        if "filled" not in clause:
+            bad.append(
+                f"{slug}: fill {serve['fill']!r} with ice "
+                f"{serve.get('ice')!r}, whose clause is {clause!r}")
+    assert not bad, (
+        "serve `fill` on a drink with nothing to fill:\n  " + "\n  ".join(bad)
+        + "\n\n`fill` replaces the word `filled` in the ice clause, so it "
+          "means something only where the clause has one -- `cubed` and "
+          "`crushed`. Either give the drink one of those, or drop `fill`."
+    )
 
 def test_serve_ice_is_not_restated_in_the_method():
     """The ice is recorded once, in `serve`, and not again in prose.
