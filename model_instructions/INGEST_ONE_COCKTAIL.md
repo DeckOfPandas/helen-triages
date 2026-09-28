@@ -439,8 +439,8 @@ does not give one you cannot pick: that is a `QQ`.
 
 **Other:** `soda water` · `ginger beer` · `water` · `black tea` · `espresso` ·
 `cola` · `coconut cream` · `Coco mix (3:1, Coco Lopez to coconut milk)` ·
-`egg white` · `salt` · `cider vinegar` · `olive oil` · `cream` · `milk` ·
-`whole egg`
+`egg white` · `salt` · `ground cinnamon` · `cider vinegar` · `olive oil` ·
+`cream` · `milk` · `whole egg`
 <!-- vocab:generics end -->
 
 ---

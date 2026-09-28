@@ -1195,6 +1195,11 @@ generics:
   palm sugar:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   sugar cube:         { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
   salt:               { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
+  # 2026-09-28, with the Milliners Punch, and zero for the same reason as salt:
+  # Helen's 2026-09-05 ruling that a seasoning is not a cost. A sprinkle of
+  # cinnamon over a lit lime shell is pennies, and the rounding on any drink
+  # here is wider than that.
+  ground cinnamon:    { gbp_per_litre_min: 0, gbp_per_litre_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 
   # --- squeezed, so priced from `fruit_prices` and `juice_yields` -------------
   # NO FIGURE HERE ON PURPOSE. `from_fruit` names the entry in `juice_yields:`

@@ -440,6 +440,10 @@ search:
 not_on_cards:
   - water
   - salt
+  # 2026-09-28, with the Milliners Punch. A sprinkle over a lit lime shell is
+  # seasoning by every test this list applies -- the same reason `salt` is the
+  # entry that most earns its place.
+  - ground cinnamon
   - white sugar
   - raw sugar
   - golden caster sugar
@@ -1827,6 +1831,18 @@ other:
   - "Coco mix (3:1, Coco Lopez to coconut milk)"
   - "egg white"
   - "salt"
+  # HELEN'S ANSWER, 2026-09-28, to the `QQ ground cinnamon` on the Milliners
+  # Punch: "Please add sprinkle!" She sprinkles it over the lit lime shell, so
+  # it is a real pour with a real (unmeasured) amount -- `(sprinkle)` -- and
+  # not a garnish: `grated nutmeg` and `cinnamon stick` are garnishes because
+  # they sit ON the finished drink, and this goes onto a flame.
+  #
+  # FILED BESIDE `salt` IN EVERY RESPECT, because it is the same kind of thing:
+  # a dry larder seasoning, on the `larder` shelf, in `not_on_cards` so it does
+  # not take a slot on a card from a real ingredient, and priced at zero under
+  # Helen's 2026-09-05 ruling that a seasoning is not a cost. Its amount is in
+  # `excluded_units`, so it reaches no arithmetic either way.
+  - "ground cinnamon"
   - "cider vinegar"
   # 2026-09-05, arriving with the Mastiha Mojito, which floats five drops on
   # top. It had been living in `garnish` as "5 drops of olive oil" -- a pour
@@ -2130,6 +2146,7 @@ shelf_of:
   pineapple: fresh produce
   raspberries: fresh produce
   rosemary: fresh produce
+  ground cinnamon: larder
   salt: larder
   water: larder
   whole egg: larder
