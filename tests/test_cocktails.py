@@ -4646,6 +4646,111 @@ def test_no_method_step_restates_to_serve_or_garnish():
     )
 
 
+# =============================================================================
+# THE GLASS GENERATOR -- #1214, 2026-09-28
+# =============================================================================
+# Helen: "Let's write the glass generator now please -- I've come up against
+# this a few times now, notably in the Sazerac on the live site."
+#
+# The strain step has composed its glass since 2026-09-05; nothing else did, so
+# a drink BUILT in the glass named it nowhere. `methods.yml in_the_glass` is
+# the mapping and `_layouts/cocktail.html` fills the slot. These three guard
+# the three ways that can rot: a key that is not a real step, a value that
+# cannot be filled, and a template that stops reading the table.
+
+GLASS_SLOT = "<glass>"
+
+
+def _in_the_glass():
+    return _methods().get("in_the_glass") or {}
+
+
+def test_every_glass_step_key_is_a_canonical_step():
+    """The LEFT side is a step a drink may actually write.
+
+    A key that matches nothing is a rule that never fires, and it fires
+    silently -- the page just keeps saying "Add all ingredients." with no
+    glass, which is the very complaint #1214 was raised about. The same
+    bargain `proposals` strikes one block up.
+    """
+    spec = _methods()
+    table = _in_the_glass()
+    assert table, (
+        "methods.yml declares no `in_the_glass:`, so the glass generator has "
+        "no table and _layouts/cocktail.html composes nothing. If it was "
+        "retired, delete these tests with it."
+    )
+    unknown = sorted(k for k in table if not _is_canonical_step(k, spec))
+    assert not unknown, (
+        "`in_the_glass` key(s) that are not canonical steps:\n  "
+        + "\n  ".join(repr(k) for k in unknown)
+        + "\n\nDeclare the step under `canonical:` first. A key matching no "
+          "real step is a rule that never fires, and nothing else would say so."
+    )
+
+
+def test_every_glass_step_value_has_exactly_one_slot():
+    """The RIGHT side is a sentence with one `<glass>` and a full stop.
+
+    Zero slots is a rewrite that loses the glass -- worse than not composing at
+    all, because it looks done. Two would need the phrase twice in one
+    sentence, which no English here wants. The full stop matters because every
+    other canonical step is a whole sentence and these sit among them.
+
+    `<glass>` AND NOT `shapes:`'s `<X>`, deliberately: that slot is filled by
+    the DRINK with an ingredient it names, this one by the PAGE from a field.
+    Same-looking marker, opposite direction.
+    """
+    table = _in_the_glass()
+    bad = []
+    for key, value in sorted(table.items()):
+        if value.count(GLASS_SLOT) != 1:
+            bad.append(f"{key!r} -> {value!r}: {value.count(GLASS_SLOT)} slots")
+        elif not value.endswith("."):
+            bad.append(f"{key!r} -> {value!r}: no full stop")
+        elif GLASS_SLOT in key:
+            bad.append(f"{key!r}: the KEY carries a slot; only the value may")
+    assert not bad, (
+        "`in_the_glass` value(s) that cannot be filled:\n  " + "\n  ".join(bad)
+    )
+
+
+def test_the_layout_takes_the_glass_sentences_from_methods_yml():
+    """The composed sentences are the data's, not literals in the template.
+
+    EXACTLY THE DRIFT test_the_layout_takes_the_twist_step_from_methods_yml was
+    written for, one field along: the twist sentence lived in both places,
+    Helen changed the wording, and the page kept emitting the old one with
+    nothing watching the pair. So the template must READ `in_the_glass` rather
+    than restate any of it.
+
+    Matching the ASSIGNMENT rather than the sentence, for that test's own
+    reason: a plain scan for the quoted string fires on the template's
+    COMMENTS, which quote the rule while explaining it (MANUAL 12).
+    """
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+
+    assert "in_the_glass" in layout, (
+        "_layouts/cocktail.html never reads `methods.in_the_glass`, so the "
+        "table in methods.yml is dead data and every built-in-the-glass drink "
+        "is back to naming no glass at all -- silently."
+    )
+
+    spelled_out = sorted(
+        v for v in _in_the_glass().values()
+        if re.search(r'assign\s+shown\s*=\s*"' + re.escape(v[:12]), layout)
+    )
+    assert not spelled_out, (
+        "_layouts/cocktail.html assigns a composed glass sentence as a "
+        "literal instead of reading methods.yml:\n  "
+        + "\n  ".join(repr(v) for v in spelled_out)
+    )
+
+    assert GLASS_SLOT in layout, (
+        f"the template never substitutes {GLASS_SLOT!r}, so the slot is "
+        "rendered to the reader verbatim."
+    )
+
 def test_the_layout_takes_the_twist_step_from_methods_yml():
     """The page's twist sentence is methods.yml's, not a string in the template.
 

@@ -624,8 +624,9 @@ that needs two is free text.
 **Build:** `Add all ingredients.` · `Add the remaining ingredients.` ·
 `Fill the pitcher half full with ice cubes.` ·
 `Fill the pitcher three-quarters full with ice cubes.` ·
-`Fill with crushed ice.` · `Top with champagne.` · `Top with soda water.` ·
-`Top with more crushed ice.` · `Heap crushed ice on top.`
+`Fill with crushed ice.` · `Half-fill with crushed ice.` ·
+`Top with champagne.` · `Top with soda water.` · `Top with more crushed ice.` ·
+`Heap crushed ice on top.`
 
 **Rinse and rim:** `Rinse the glass with absinthe and dump.` ·
 `Rinse the glasses with Campari.` ·

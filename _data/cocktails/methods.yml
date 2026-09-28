@@ -142,6 +142,14 @@ canonical:
     # its source did too. A different amount of ice is information.
     - "Fill the pitcher three-quarters full with ice cubes."
     - "Fill with crushed ice."
+    # HALF, 2026-09-28, and it is Helen's own wording from her Chartreuse
+    # Swizzle rewrite ("Half-fill a highball with crushed ice."). HOW FULL IS
+    # THE INFORMATION: "Fill with crushed ice." says the glass is full and this
+    # says there is room left for what comes next, which on a swizzle is the
+    # crushed ice you top it with afterwards. The glass comes off the string
+    # and is composed by `in_the_glass` below, the same trade the strain group
+    # made in 2026-09-05.
+    - "Half-fill with crushed ice."
     - "Top with champagne."
     # SODA WATER, NEVER CLUB SODA -- Helen's ruling, 2026-09-02: she is not in
     # the US and doubts the difference is more than marketing. Eight drinks said
@@ -277,6 +285,60 @@ shapes:
   float:
     - "Float the <X> on top."
     - "Drop the <X> on top."
+
+# =============================================================================
+# THE GLASS GENERATOR -- #1214, 2026-09-28. A step that acts on the glass says
+# WHICH glass, and the sentence is composed rather than typed.
+# =============================================================================
+# Helen: "Let's write the glass generator now please -- I've come up against
+# this a few times now, notably in the Sazerac on the live site."
+#
+# WHAT WAS MISSING. The STRAIN step has composed its glass since 2026-09-05 --
+# "Strain." + glasses.yml `serving` + serve.yml `in_the_glass` -> "Strain into
+# an old fashioned glass, over a large ice cube." Nothing else did. So a drink
+# BUILT in the glass has no strain step to carry it and never names the glass
+# anywhere: every swizzle, the Moscow Mule, the Milliners Punch. #1214 is
+# exactly that, on the Chartreuse Swizzle, and the Sazerac's "Ice the glass"
+# is the same hole from the other end -- it says "the glass" and never says
+# which.
+#
+# LEFT is the canonical step as a drink writes it; RIGHT is the sentence the
+# page composes, with `<glass>` filled from glasses.yml `serving`.
+#
+# `<glass>` AND NOT `<X>`, DELIBERATELY. The slot in `shapes:` above is filled
+# by the DRINK, with an ingredient it names. This one is filled by the PAGE,
+# from a field. Same-looking marker, opposite direction, so it gets its own
+# spelling and nobody has to remember which block they are in.
+#
+# ONLY THE FIRST SUCH STEP IN A DRINK IS COMPOSED, and that rule is why this is
+# a generator rather than a find-and-replace. Measured over both collections
+# before writing it: the Chartreuse Swizzle opens "Add all ingredients." and
+# then "Half-fill with crushed ice.", and the Milliners Punch half-fills and
+# then strains. Composing every match gives "Add all ingredients to a highball.
+# Half-fill a highball with crushed ice." -- the duplication this file's whole
+# strain group exists to have removed. Say it once, on the step that first
+# reaches for the glass.
+#
+# WHAT IS DELIBERATELY ABSENT. "Add the remaining ingredients.", "Top with more
+# crushed ice." and "Heap crushed ice on top." all FOLLOW a step that has
+# already named the glass, so they would only ever be the second mention.
+# "Swizzle until the glass frosts." is left alone because Helen has asked for
+# that step to get SHORTER, not longer (#1214: "Swizzle.").
+#
+# "Rinse the glasses with Campari." IS ABSENT TOO, and the plural is why:
+# tailspin writes it for a batch, and how many glasses are being made is
+# information this file does not collapse.
+#
+# DRAFTS ONLY FOR NOW, AND THE LAYOUT IS WHERE THAT LIVES. Helen, the same day:
+# "this will require re-proofreading everything on the live site, so for now
+# please let's just apply it to drafts (and drafts currently being worked on)
+# and not on the live recipes." See _layouts/cocktail.html; the condition comes
+# off when she has read the published set again.
+in_the_glass:
+  "Add all ingredients.": "Add all ingredients to <glass>."
+  "Fill with crushed ice.": "Fill <glass> with crushed ice."
+  "Half-fill with crushed ice.": "Half-fill <glass> with crushed ice."
+  "Rinse the glass with absinthe and dump.": "Rinse <glass> with absinthe and dump."
 
 # =============================================================================
 # PROPOSALS -- both halves kept, so the choice is Helen's and not mine

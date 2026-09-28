@@ -1081,6 +1081,51 @@ layout: default
     {% endunless %}
   {% endfor %}
 
+  {% comment %} THE GLASS GENERATOR — #1214, 2026-09-28. Helen: "Let's write
+     the glass generator now please — I've come up against this a few times
+     now, notably in the Sazerac on the live site."
+
+     The strain step has composed its glass since 2026-09-05. Nothing else did,
+     so a drink BUILT in the glass — every swizzle, the Moscow Mule, the
+     Milliners Punch — had no strain step to carry it and named the glass
+     nowhere at all.
+
+     methods.yml `in_the_glass` holds the mapping: the canonical step as a
+     drink writes it, against the sentence to compose, with `<glass>` filled
+     from the same `glass_phrase` the strain step uses. THE TABLE IS DATA AND
+     NOT SPELLED OUT HERE, which is
+     test_the_layout_takes_the_twist_step_from_methods_yml's lesson: the twist
+     sentence lived in both places, Helen changed the wording, and the page
+     kept emitting the old one with nothing watching the pair.
+
+     ONLY THE FIRST MATCH IS COMPOSED. The Chartreuse Swizzle opens "Add all
+     ingredients." and then "Half-fill with crushed ice."; composing both gives
+     "Add all ingredients to a highball. Half-fill a highball with crushed
+     ice." — the duplication the strain group exists to have removed. So this
+     pass finds the FIRST step in the drink that the table knows, and only that
+     one is rewritten below.
+
+     DRAFTS ONLY, AND THIS IS THE LINE THAT SAYS SO. Helen, the same day: "this
+     will require re-proofreading everything on the live site, so for now
+     please let's just apply it to drafts (and drafts currently being worked
+     on) and not on the live recipes." A published drink renders exactly as it
+     did. The condition comes off when she has read the published set again —
+     and `page.collection` is the whole of it, so removing it is one word.
+  {% endcomment %}
+  {% assign glass_step = "" %}
+  {% if page.collection == "cocktail_drafts" and glass_phrase != "" %}
+    {% for step in page.method %}
+      {% unless step.step %}
+        {% if glass_step == "" %}
+          {% if site.data.cocktails.methods.in_the_glass[step] %}
+            {% assign glass_step = step %}
+          {% endif %}
+        {% endif %}
+      {% endunless %}
+    {% endfor %}
+  {% endif %}
+  {% assign glass_step_done = false %}
+
   {% if page.method.size > 0 and page.method.first %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <ol class="cocktail-method">
@@ -1091,7 +1136,7 @@ layout: default
          thing; see `.cocktail-note` in _sass/cocktails/_cocktail.scss. The
          string form is still the overwhelmingly normal one and is untouched.
       {% endcomment %}
-      {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}{% assign shown = step %}{% assign bare = step | remove: "." %}{% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}{% if glass_phrase != "" %}{% capture shown %}{{ bare }} into {{ glass_phrase }}{{ rim_clause }}{{ ice_clause }}.{% endcapture %}{% endif %}{% endif %}<li>{{ shown | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
+      {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}{% assign shown = step %}{% assign bare = step | remove: "." %}{% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}{% if glass_phrase != "" %}{% capture shown %}{{ bare }} into {{ glass_phrase }}{{ rim_clause }}{{ ice_clause }}.{% endcapture %}{% endif %}{% elsif glass_step_done == false and step == glass_step %}{% assign shown = site.data.cocktails.methods.in_the_glass[step] | replace: "<glass>", glass_phrase %}{% assign glass_step_done = true %}{% endif %}<li>{{ shown | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
       {% comment %} THE TWIST STEP IS A STEP LIKE ANY OTHER: same list, same
          numbering, same rules, and it is in the DOM in both states, so `make
          it` and print carry it exactly as they carry a written one. {% endcomment %}
