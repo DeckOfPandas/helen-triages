@@ -1816,7 +1816,26 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first: the test named exactly those seven files,
 # every one "last touched by 9b7aea88", and nothing else. Covers 9b7aea8 and
 # nothing after.
-COCKTAIL_BASELINE_COMMIT = "9b7aea8"   # seven drinks: five `(top)` renames and two derived chips
+#
+# MOVED 2026-09-28 FOR A PROMOTION, WHICH IS THE ORDINARY REASON. `17d1638`
+# brings Bitter Mai Tai, Cadillac Margarita, Haley Traub's Frozen Margarita and
+# Minty Pentones out of `_cocktail_drafts/4-promote/` and into this collection,
+# already `proofread: true` because Helen read them there.
+#
+# THIS TEST CANNOT TELL A PROMOTION FROM AN EDIT, which is why the constant
+# exists (#624): it reads the PUBLIC repo's history only, so all it sees is
+# four drinks marked `proofread: true` appearing in an agent's commit. The
+# proofread happened in the other repo, where this test cannot look.
+#
+# Helen's word, on her own PR #75 against the drafts: "if there are any easy
+# fixes here, or any actually ready, then let's buff and promote." Four of the
+# twelve passed the gate; the other eight are held by `proofread` alone and
+# stayed behind.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly those four files, every one "last touched by 17d16384", and nothing
+# else. Covers 17d1638 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "17d1638"   # four drinks promoted from 4-promote/
 
 
 def _newest_commit_per_published_drink():
