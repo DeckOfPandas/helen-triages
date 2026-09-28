@@ -19,7 +19,7 @@
 #   sh scripts/browser/shoot.sh <label> <path>...   # screenshots + overflow report
 #   sh scripts/browser/crop.sh <path> <selector> <name> [width] [type-into] [text]   # one element at 2x, after typing
 set -e
-version=1.47.2
+version=1.63.0
 
 image=/opt/playwright/node_modules/playwright/package.json
 if [ -f "$image" ] && grep -q "\"version\": \"$version\"" "$image"; then

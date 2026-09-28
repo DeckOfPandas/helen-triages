@@ -191,6 +191,16 @@ and `ready` when the words are already hers. A `3-keep/` file can later become
 Every move is a commit on a branch of the private repo, pushed, one line in the
 reply. She can still move files by hand; the words exist so she does not have to.
 
+**RUN `python3 scripts/verify.py` BEFORE EVERY PUSH TO A DRAFTS REPO.** It runs
+the drafts checks, and until the private repos get CI of their own (#1194) it is
+the *only* thing that will ever run them: a drafts-only regression cannot be
+caught by any pipeline, because CI checks out the public repo alone and most
+draft checks are parametrised per file — so without a clone they are never
+created rather than skipped, and the suite reports green while checking nothing.
+#1127's Rosita failed four tests for one honest `QQ` and survived exactly that
+way. This is a habit rather than a mechanism, which is why it is written down:
+a mechanism only speaks after a push, and this speaks before one.
+
 **Testing a recipe is reading its rendered page on the local server.** Every
 staged draft renders at `/food/drafts/‹folder›/‹slug›/` and
 `/cocktails/drafts/‹folder›/‹slug›/` on `jekyll-local`, and the local index

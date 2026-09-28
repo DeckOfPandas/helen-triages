@@ -75,6 +75,14 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
    confirmation for a push (CLAUDE.md, 2026-09-05); only committing to their
    `main` is forbidden.
 
+   **RUN `python3 scripts/verify.py` BEFORE THE PUSH, EVERY TIME.** It runs the
+   drafts checks, and until the private repos get CI of their own (#1194)
+   nothing else ever will: CI checks out the public repo alone, and most draft
+   checks are parametrised per file, so without a clone they are never CREATED
+   rather than skipped -- a green run that examined nothing. An inbox pass
+   writes brand-new files from text Helen pasted off her phone, which is the
+   likeliest source of a schema surprise in the whole pipeline.
+
 7. **Report what is still `QQ` and why**, as `/ingest` does.
 
 ## What this never does

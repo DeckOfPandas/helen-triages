@@ -161,7 +161,14 @@ six faults" cannot pass while something also happened to the other thirty lines.
    does not close or even cross-reference the public issue, so treat closing as
    a separate deliberate step.
 
-8. **Push per `CLAUDE.md`, which changed on 2026-08-29 and this line did not.**
+8. **Run `python3 scripts/verify.py` before the push, every time.** It runs the
+   drafts checks, and until the private repos get CI of their own (#1194)
+   nothing else ever will: CI checks out the public repo alone, and most draft
+   checks are parametrised per file, so without a clone they are never CREATED
+   rather than skipped — a green run that examined nothing. A tidy pass touches
+   many files at once, which is exactly when this matters most.
+
+9. **Push per `CLAUDE.md`, which changed on 2026-08-29 and this line did not.**
    Pushing `main` in the two PRIVATE drafts repos is fine and needs no ask —
    nothing there triggers a build, and a commit sitting unpushed on one disk is
    the real risk. Everything else is unchanged: `helen-triages` itself is never

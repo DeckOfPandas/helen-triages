@@ -26,15 +26,24 @@ pytest==9.1.1
 PyYAML==6.0.3
 
 # PLAYWRIGHT'S PYTHON BINDING, for the headless smoke test of both indexes
-# (#1200). Separate from the npm playwright@1.47.2 baked into the image for
+# (#1200). Its sibling is the npm playwright baked into the image for
 # scripts/browser/: that one is for a human or a session to LOOK at a page with,
 # and this one is for a test that needs the suite's own Jekyll build, which
 # tests/test_rendered_pages.py already makes behind a session fixture.
 #
-# THE TWO CANNOT SHARE A VERSION, AND THAT IS FINE. PyPI has no 1.47.2 at all
-# (checked 2026-09-28: 1.47.0 then 1.48.0), so the npm and pip pins differ by a
-# patch and each fetches its own Chromium revision into the shared
-# PLAYWRIGHT_BROWSERS_PATH. Do not try to make them match.
+# ONE NUMBER FOR BOTH, WHICH IS WHY THIS IS 1.63.0 AND NOT 1.47.x (2026-09-28).
+# The first attempt pinned this at 1.47.0 to sit beside npm 1.47.2 -- and PyPI
+# has no 1.47.2 at all, so the two could not be made to agree and each wanted
+# its own Chromium revision. 1.63.0 exists on npm and PyPI alike, so the npm pin
+# and the pip pin now name one version, resolve to the SAME Chromium, and the
+# image carries one browser instead of two.
+#
+# THE NUMBER LIVES IN FOUR PLACES: here, .devcontainer/Dockerfile twice (the npm
+# install and the pip install) and scripts/browser/install.sh. Two tests hold
+# them together -- tests/test_browser_harness.py and
+# tests/test_devcontainer_pins.py -- and `playwright` is in dependabot.yml's
+# ignore list because a bot can only ever move one of the four. Bump it by hand,
+# as a set, and rebuild the image.
 #
 # INSTALLING THIS PACKAGE DOES NOT INSTALL A BROWSER -- `playwright install
 # chromium` does, and that is a Dockerfile step. So CI gets the binding and no
@@ -42,4 +51,4 @@ PyYAML==6.0.3
 # actually LAUNCH, never on whether the import succeeds. Skipping on the import
 # would turn CI red the moment this line landed, which is exactly the
 # "expected to fail" arrangement Helen ruled against on 2026-09-20 (#1191).
-playwright==1.47.0
+playwright==1.63.0

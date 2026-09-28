@@ -503,6 +503,13 @@ not publish: **say so and let her flip it.** That is the one thing to do about i
    only their `main` is off limits to commit or merge. Report what is still
    `QQ` and why.
 
+   **RUN `python3 scripts/verify.py` FIRST, EVERY TIME.** It runs the drafts
+   checks, and until the private repos get CI of their own (#1194) nothing else
+   ever will: CI checks out the public repo alone, and most draft checks are
+   parametrised per file, so without a clone they are never CREATED rather than
+   skipped -- a green run that examined nothing. A push is the last moment this
+   can be caught before it is somebody else's problem.
+
 ---
 
 ## Traps

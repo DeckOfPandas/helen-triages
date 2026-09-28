@@ -49,6 +49,33 @@ updates:
     groups:
       pip:
         patterns: ["*"]
+    ignore:
+      # PLAYWRIGHT MOVES BY HAND, AS A SET OF FOUR. Learned within a day of
+      # adding this file: Dependabot's very first pip PR (#1233) bumped
+      # `playwright` 1.47.0 -> 1.63.0 in requirements-test.txt and nothing else,
+      # because nothing else is visible to it.
+      #
+      # The number lives in FOUR places -- requirements-test.txt, both
+      # .devcontainer/Dockerfile lines (the npm install and the pip install),
+      # and scripts/browser/install.sh -- and a bot can only ever move the one.
+      # tests/test_browser_harness.py and tests/test_devcontainer_pins.py both
+      # fail on the mismatch, which is correct and was measured: simulating
+      # #1233 turned the suite red. With no `pull_request` CI at the time
+      # (#1195), that red would have landed on `main` rather than on the PR --
+      # a deploy outage, from a dependency bump nobody needed.
+      #
+      # It also needs a devcontainer image rebuild to take effect, which no PR
+      # can perform. So this is not a dependency that can be updated by a
+      # proposal; it is one that is updated by a person doing four edits, a
+      # rebuild and a screenshot. Bumping it is a small deliberate job -- see
+      # the 2026-09-28 move to 1.63.0 for the shape, including re-running
+      # `sh scripts/browser/install.sh` and `shoot.sh` to prove the harness
+      # still drives the new Chromium.
+      #
+      # Ignored outright rather than by update-type: playwright's "minor" is
+      # effectively its major, and there is no patch stream worth taking on its
+      # own.
+      - dependency-name: "playwright"
 
   # GitHub Actions: the thing that had no watcher at all, and the reason this
   # file exists. A pinned-to-major action goes stale silently.

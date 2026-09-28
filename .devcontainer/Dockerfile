@@ -74,7 +74,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
 RUN mkdir -p /opt/playwright \
     && cd /opt/playwright \
     && npm init -y > /dev/null \
-    && npm install --no-audit --no-fund playwright@1.47.2 \
+    && npm install --no-audit --no-fund playwright@1.63.0 \
     && PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright npx playwright install --with-deps chromium \
     && rm -rf /var/lib/apt/lists/* /root/.npm
 
@@ -109,17 +109,32 @@ RUN npm install -g @anthropic-ai/claude-code
 # shape as the Playwright version two blocks up, which is pinned twice with
 # tests/test_browser_harness.py holding the two together.
 RUN pip install --break-system-packages --no-cache-dir \
-    "pytest==9.1.1" "PyYAML==6.0.3" "playwright==1.47.0"
+    "pytest==9.1.1" "PyYAML==6.0.3" "playwright==1.63.0"
 
 # PLAYWRIGHT'S CHROMIUM FOR THE PYTHON BINDING, which the pip install above does
 # NOT fetch -- the package and its browsers are separate downloads (#1200).
 #
-# Into the SAME PLAYWRIGHT_BROWSERS_PATH the npm install uses, deliberately. PyPI
-# has no playwright 1.47.2 (checked 2026-09-28: 1.47.0, then 1.48.0), so the pip
-# pin and the npm pin differ by a patch and want different Chromium revisions.
-# Sharing the directory lets each find its own rather than making one guess at
-# the other's; the cost is at worst a second Chromium in the image, and nothing
-# is fragile. Do not try to make the two versions match.
+# ONE VERSION IN ALL FOUR PLACES, AND THAT IS THE POINT OF 1.63.0 (2026-09-28).
+# The first attempt pinned pip at 1.47.0 to sit beside npm 1.47.2, and PyPI has
+# no 1.47.2 at all -- so the two lines could not be made to agree, each wanted
+# its own Chromium revision, and the image carried two browsers. Moving both to
+# 1.63.0, which exists on npm and PyPI alike, collapses that: the npm pin and the
+# pip pin now name one version and resolve to the SAME Chromium revision, so this
+# step finds what the npm step already downloaded and there is one browser in the
+# image instead of two.
+#
+# (Deliberately no `name@version` string in this comment: tests/test_browser_harness.py
+# counts the npm pins in this file and expects exactly one, which is what makes
+# the pin machine-readable. Writing the version in prose broke that test the
+# first time -- correctly.)
+#
+# The number now lives in four files -- here twice, scripts/browser/install.sh,
+# and requirements-test.txt -- and two tests hold them together:
+# tests/test_browser_harness.py (the npm pins, and now the pip pin against them)
+# and tests/test_devcontainer_pins.py (requirements-test.txt against this
+# Dockerfile). Bumping it means editing all four and rebuilding the image, which
+# is why `playwright` is in dependabot.yml's ignore list: a bot can only ever
+# move one of the four.
 #
 # --with-deps is omitted: the npm install above already apt-installed
 # Playwright's system library list, and repeating it would only re-fetch apt
