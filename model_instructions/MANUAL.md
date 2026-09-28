@@ -1599,6 +1599,10 @@ ingredients:                     # FULL list, untriaged, in build order
 serve:                           # OPTIONAL — omit the key entirely if nobody
   ice: "large cube"              # has decided. `ice: "none"` means served UP — §9.10a
   rim: "sugar half-rim"          # free text, and rare
+  fill: "half"                   # HOW FULL, which `ice` deliberately never says.
+                                 # Declared in serve.yml; replaces the word
+                                 # `filled` in the composed clause, so it means
+                                 # something only with `cubed` or `crushed`.
 serves: 8                        # OPTIONAL, punch bowls only; absent means one
 method:                          # ORDERED LIST — the steps are sequential
   - "Pour absinthe into ice-filled glass."
@@ -1663,16 +1667,33 @@ ingest from the source's own figure; the site is canon (§9.4.1). **A bare
 number is never guessed** — 30/22.5/15/7.5 and 0.75/0.5 are thirty times
 apart — and carries a `QQ - no unit in the source` note that the guard reads.
 
-**Every ingredient has an amount, and for some it is a verb** (#669): a top-up
-is `amount: "to top"`, a rinse `"to rinse"`, salt in the drink `"1 small
-pinch"`, each declared in `measures:` `non_volumetric` and each with a method
-step saying WHEN (`Top with champagne.` / `Top with soda water.` / `Rinse the
-glass with absinthe and dump.`). The strings appear nowhere in the test.
-**`"to taste"` is the third action** (2026-09-14, #752), for a pour the drinker
-decides — the Ti' Punch's lime and syrup, *"served as rhum in a glass with lime
-and sugar on the side so people can roll their own"*. Cost and units skip it,
-the scaler passes it through. Where the drinker adds it at the table, the
-serving goes in `to_serve` ("Lime and syrup on the side, to add to taste."),
+**Every ingredient has an amount, and an unmeasured one is a BRACKETED NOUN**
+(#669, reshaped by #1217 on 2026-09-26): a top-up is `amount: "(top)"`, a rinse
+`"(rinse)"`, a deliberate small pour that does not fill the glass `"(splash)"`,
+a float with no figure `"(float)"`, the Milliners Punch's flaming rum and its
+cinnamon `"(garnish)"` and `"(sprinkle)"`; salt in the drink is still `"1 small
+pinch"`. Each is declared in `measures:` `non_volumetric` and each has a method
+step saying WHEN (`Top with champagne.` / `Rinse the glass with absinthe and
+dump.`).
+
+**THEY WERE `to top` AND `to rinse` UNTIL 2026-09-26**, and Helen's reason is
+worth keeping: a sentence fragment in a column of quantities read as prose that
+had escaped into the data, where a bracketed noun reads as the slot a number
+would occupy. **The rename is not only a data change**: `to top` was compared as
+a LITERAL in five places — `cocktail_costs.rb` twice, `cocktail_units.rb` twice,
+`abv_worklist.py` — and parsed by a regex in `shopping-list.js`. A reader left
+on the old spelling does not error; it silently stops matching, and a topped
+drink then costs nothing and counts no units. What makes such a rename safe is
+dropping the old string from `measures:`, which turns every unmigrated file into
+a named failure of `test_every_amount_is_readable_as_a_quantity`.
+
+**`"to taste"` KEPT ITS OLD SHAPE** (2026-09-14, #752; confirmed 2026-09-26),
+and the line is real rather than an oversight: the bracketed words name what
+the MAKER does with a pour nobody measured, while `to taste` hands the decision
+to the DRINKER — the Ti' Punch's lime and syrup, *"served as rhum in a glass
+with lime and sugar on the side so people can roll their own"*. Cost and units
+skip it, the scaler passes it through. Where the drinker adds it at the table,
+the serving goes in `to_serve` ("Lime and syrup on the side, to add to taste."),
 never a method step opening "Serve" — `test_no_method_step_restates_to_serve_or_garnish`.
 **Soda water, never club soda.** **`half` and `whole` are units** — a whole
 fruit is counted, never measured, because the juice a lime gives is a range.
@@ -2241,6 +2262,7 @@ garnish, the serveware (`to_serve`), and THE ICE IN THE GLASS:
 serve:
   ice: "large cube"   # none | cubed | crushed | large cube | block | blended
   rim: "sugar half-rim"
+  fill: "half"        # HOW FULL — cubed and crushed only
 ```
 
 **Absent means nobody has decided; `ice: "none"` means served UP** — the same
@@ -2253,6 +2275,35 @@ right. **The page COMPOSES the strain step** — `"Strain."` + the glass's
 so each fact is stored once and a cocktail that changes glass gets a corrected
 method for free. Ice you pour ONTO takes a comma and "over"; ice the glass is
 FULL of takes "filled with". **The rim rides on the glass, before the ice.**
+
+**`fill` SAYS HOW FULL, AND IT IS A SECOND FIELD BECAUSE `ice` MAY NOT** —
+2026-09-28, for the Milliners Punch's *"Strain into a hurricane glass
+half-filled with crushed ice."* `serve.yml` already said, of Fish House Punch,
+that the thing the ice field cannot carry is QUANTITY: lots of cubed ice and
+one cube in a rocks glass both spell `cubed`. It **replaces the word `filled`**
+in the clause just composed, so it means something only where the clause has
+one — `cubed` and `crushed` — and `test_a_fill_has_something_to_fill` refuses
+the other pairings rather than letting the substitution silently do nothing.
+**A sixth `ice` value would have been the expensive answer**: the mood deriver
+tests `serve.ice in ("crushed", "blended")` in two places and `mood_serve_ice`
+lists `crushed` in a third, so a new spelling of crushed moves three rules at
+once. With `ice: crushed` untouched, nothing about the moods moves.
+
+**THE GLASS GENERATOR COMPOSES THE BUILD STEP TOO, ON DRAFTS ONLY** — #1214,
+2026-09-28. The strain step had composed its glass since 2026-09-05 and nothing
+else did, so a cocktail BUILT in the glass — every swizzle, the Moscow Mule —
+named the glass nowhere at all. `methods.yml`'s `in_the_glass` maps a canonical
+step to the sentence the page composes (`"Add all ingredients."` → *"Add all
+ingredients to a highball."*), with `<glass>` filled from the same phrase.
+**Only the FIRST such step is composed**, or a drink that both half-fills and
+adds says the glass twice; and **a strain step then drops the glass when one
+above has already named it and there is no ice or rim clause to carry** —
+Helen's ruling on the two cases, 2026-09-28: the Milliners' second mention adds
+"filled with crushed ice" and stays, the Death & Co Sazerac's adds nothing and
+goes. **It runs for `cocktail_drafts` only**, by her instruction, until she has
+re-read the published set; `page.collection` is the whole of the switch. **CI
+therefore cannot exercise any of it** (#1194, #1196) — build with
+`_config_local.yml` and read the pages.
 **A garnish step closes the method** (excluding twists, which have the better
 express step); "To serve" is what happens to a drink that is already
 finished. `test_serve_ice_is_not_restated_in_the_method` and

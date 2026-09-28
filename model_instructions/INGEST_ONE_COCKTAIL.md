@@ -255,9 +255,25 @@ Four things a source prints as if they were units, and what to do instead
   COUNTED, never measured: do not turn half a lime into millilitres, because
   the juice a lime gives is a range and a figure here would be precision the
   fruit does not have. The page prints `half`, `1 whole`, `1½ whole`.
-- **"Top" is not an amount on its own** — the ingredient added by a top-up is
-  `amount: "to top"`, and the method carries a `Top with …` step. Likewise a
-  rinse is `amount: "to rinse"` with a `Rinse …` step.
+- **An unmeasured pour is a BRACKETED NOUN** — Helen's ruling, 2026-09-26,
+  replacing the `to top` / `to rinse` forms this paragraph used to teach. The
+  ingredient added by a top-up is `amount: "(top)"` and the method carries a
+  `Top with …` step; a rinse is `amount: "(rinse)"` with a `Rinse …` step. The
+  others are `"(splash)"` (a deliberate small pour that does NOT fill the
+  glass), `"(float)"` (only where no millilitre figure is given — a float
+  usually has one), `"(garnish)"` and `"(sprinkle)"`.
+
+  The brackets are the point: the old form was a sentence fragment sitting in
+  a column of quantities, and the bracketed noun reads as what it is — the
+  slot where a number would be, naming the action instead. **They are in the
+  measures list above; if it and this paragraph ever disagree, the list is
+  generated and this is not, so the list wins.**
+- **`"to taste"` keeps its old shape**, and is the one that did not get
+  brackets. The bracketed words name what the MAKER does with a pour nobody
+  measured; `to taste` hands the decision to the DRINKER — the Ti' Punch is
+  served with lime and sugar on the side so people can roll their own — so it
+  reads as English in the amount column because it is an instruction to
+  whoever is holding the glass.
 - Anything else the source calls a measure and this list does not know:
   write the source's own words, and say in your list that the unit is
   undeclared — that is a one-line data edit for Helen, and much cheaper than
