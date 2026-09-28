@@ -1,0 +1,130 @@
+# =============================================================================
+# THE DRAFTS HALF OF THE SUITE, RUN SOMEWHERE THAT IS NOT A LAPTOP.
+# GitHub issues #1194 (option B) and #1196 (option 2).
+#
+# THIS FILE BELONGS IN A PRIVATE DRAFTS REPO, NOT IN helen-triages.
+# Copy it to `.github/workflows/drafts.yml` in
+# DeckOfPandas/helen-triages-food-private, and again in
+# DeckOfPandas/helen-triages-cocktails-private, changing DRAFTS_PATH below.
+# =============================================================================
+#
+# THE GAP IT CLOSES. Two thirds of the suite exists only when a private drafts
+# clone is present: about 30,900 tests collected with both, 10,660 without. Most
+# draft checks are parametrised per file, so without a clone they are NEVER
+# CREATED rather than skipped -- the skip count actually falls, 110 to 27. So a
+# drafts-only regression cannot be caught by any pipeline, and #1127's example
+# survived exactly that way: Rosita failed four tests for one honest `QQ`, and
+# none of the four existed in CI.
+#
+# Helen's ruling, 2026-09-20: "it's not useful to have a situation where we
+# expect tests to fail, and we should rearchitect." #1185 made a bare run SAY it
+# is not evidence, which is a mitigation. This is the rearchitecture.
+#
+# WHY THE DEPENDENCY RUNS THIS WAY ROUND, which is the whole design. The obvious
+# version -- give the PUBLIC repo's CI the private clones -- is rejected by #540
+# and again by #1194: it needs a secret in a public repo's Actions, and a failing
+# assertion quotes the file it failed on, so unpublished draft text would land in
+# a public CI log. Inverting it solves the privacy problem for free: a PRIVATE
+# repo's Actions logs are private, and helen-triages is public, so cloning it
+# needs NO CREDENTIAL AT ALL. `secrets` is never read by this file.
+#
+# WHY IT RUNS THE WHOLE SUITE RATHER THAN A LIST OF DRAFT TEST FILES. #1194
+# names test_drafts.py, test_staging_folders.py, test_tidy_drafts.py and
+# test_resolve_pours.py, but that list is incomplete and would drift: seven
+# modules read `_food_drafts/` today (test_taxonomy, test_source_attribution,
+# test_drafts, test_front_matter, test_style, test_site_config,
+# test_suite_hygiene), several read both corpora in one function, and eleven
+# import shared predicates from conftest/drafts_schema. A hand-maintained list
+# of which tests touch drafts is the same class of thing as the "keep in sync by
+# hand" pin comment #1203 removed. Running everything costs a few minutes and
+# cannot go stale. Narrow it later if it proves slow; do not narrow it now.
+#
+# THE SCHEMA HANDSHAKE ALREADY EXISTS and this is what it is for. Each private
+# repo carries a `SCHEMA_VERSION` file; `tests/drafts_schema.py` in the public
+# repo declares the version its rules need. `test_the_cocktail_drafts_clone_is_in_step`
+# and its food twin compare the two and say which side is behind, as the first
+# line of the failure. So when this workflow goes red after a public-repo merge,
+# that test names the cause. MANUAL §9.1.
+#
+# THE SHARP EDGE, NAMED RATHER THAN HIDDEN. This pins the public repo at `main`,
+# so a change to a shared predicate in helen-triages can turn a drafts repo red
+# AFTER it merges. That is a cross-repo red, not a blocked deploy -- it cannot
+# stop the site shipping -- but it is a red Helen will see and did not cause on
+# that repo. #1194 flags this as her call. If it proves annoying, pin `ref:` to a
+# tag instead and move the tag deliberately.
+
+name: Drafts checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# One run per branch; a new push cancels the last, since a full suite is minutes.
+concurrency:
+  group: drafts-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # _food_drafts for helen-triages-food-private.
+  # _cocktail_drafts for helen-triages-cocktails-private. CHANGE THIS.
+  DRAFTS_PATH: _food_drafts
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    steps:
+      # THE RULES LIVE IN THE PUBLIC REPO. No credential: it is public, which is
+      # the reason this workflow is here rather than there.
+      - name: Check out helen-triages (the rules and the suite)
+        uses: actions/checkout@v4
+        with:
+          repository: DeckOfPandas/helen-triages
+          ref: main
+          path: helen-triages
+          # FULL HISTORY, LOAD-BEARING, for the same reason the public workflow
+          # says so: actions/checkout is depth-1 by default, and in a shallow
+          # clone `git log -- <file>` reports one commit for every file. The
+          # proofread guard (#367) reads history to find who last touched each
+          # recipe, so on a shallow clone it examines nothing and passes.
+          fetch-depth: 0
+
+      # THIS repo, checked out where conftest.py expects to find it:
+      # ROOT / "_food_drafts" or ROOT / "_cocktail_drafts".
+      - name: Check out these drafts where the suite looks for them
+        uses: actions/checkout@v4
+        with:
+          path: helen-triages/${{ env.DRAFTS_PATH }}
+          fetch-depth: 0
+
+      # Ruby, because test_rendered_pages.py runs real `jekyll build`s and
+      # checks the OUTPUT -- the only way to catch a link that resolves locally
+      # and 404s in production.
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: helen-triages
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Exact pins, from the public repo's single source (#1203). This installs
+      # `playwright` too, which nothing here needs -- about fifteen seconds and
+      # no browser, since the browsers are a separate download. If that becomes
+      # annoying, split the browser pin into its own requirements file rather
+      # than hand-listing packages here: a third hand-maintained copy of the
+      # pins is the thing #1203 was about.
+      - name: Install test dependencies
+        working-directory: helen-triages
+        run: python3 -m pip install -r requirements-test.txt
+
+      # The complete run: about 30,900 tests instead of 10,660. conftest.py's
+      # end-of-run report will confirm which clones it saw, and with one present
+      # it should name only the OTHER one as absent.
+      - name: The suite, with these drafts present
+        working-directory: helen-triages
+        run: python3 -m pytest -q
