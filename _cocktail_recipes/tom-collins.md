@@ -16,7 +16,7 @@ ingredients:
     generic: "lemon juice"
   - amount: "22.5 ml"
     generic: "cane sugar syrup 1:1"
-  - amount: "to top"
+  - amount: "(top)"
     generic: "soda water"
 method:
   - "Short shake all ingredients other than the soda water with three ice cubes."

@@ -410,7 +410,7 @@ module HelenTriages
         # such a pour instead, which is right there and wrong here (a missing
         # strength costs a fraction of a unit, a missing top is most of the
         # drink).
-        if unit == "to top"
+        if unit == "(top)"
           topped = top_up_ml(Array(ing["generic"]).map(&:to_s))
           return nil if topped.nil?
           total += topped
@@ -476,7 +476,7 @@ module HelenTriages
         # figure available. It only makes the drink approximate if what is
         # being topped with contains alcohol -- see DIFFERENCE 1 above.
         topped = false
-        if amount == "to top"
+        if amount == "(top)"
           ml = top_up_ml(generics)
           next if ml.nil?
           topped = true
