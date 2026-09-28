@@ -3025,8 +3025,14 @@ def test_no_topped_drink_is_also_a_punch(prod_site):
 
     `serve_ml` divides the whole total by `serves:`, the top included. For a
     bowl that is right about alcohol (it is shared out) and wrong about a top:
-    a top fills ONE glass, and four glasses need four tops. scripts/top_up_ml.py
-    found the same thing on the same data and said so.
+    a top fills ONE glass, and four glasses need four tops.
+
+    This used to cite `scripts/top_up_ml.py` as having found the same thing on
+    the same data. That script has never existed in the tree -- `git log
+    --diff-filter=D` finds no deletion of it either, so it was never committed
+    (#1203, checked 2026-09-28). The reasoning above stands on its own; the
+    citation was the only thing wrong with it, and a pointer to a file nobody
+    can open is worse than no pointer.
 
     No topped drink declares `serves:` today, so the two rules have never
     disagreed on a real drink. This is what makes the first topped punch a red

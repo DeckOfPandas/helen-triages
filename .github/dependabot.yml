@@ -1,0 +1,62 @@
+# Dependabot, added 2026-09-28 for #1203. Before this, `.github/` held only
+# `workflows/`, so nothing noticed a dependency going stale: `actions/checkout@v4`
+# and friends would sit on a major until somebody happened to look.
+#
+# MONTHLY, NOT WEEKLY, AND THAT IS THE WHOLE DESIGN. CLAUDE.md's hardest rule
+# about this repository's GitHub account is "NEVER CREATE ISSUES OR PRs IN A
+# BURST" -- twenty issues and two PRs in under an hour got the agent account
+# flagged as spam on 2026-09-14 and GitHub hid everything it had ever written.
+# Dependabot opens PRs as its own app rather than as that account, so it is not
+# at risk itself and cannot put the account at risk. But a weekly schedule across
+# three ecosystems is a steady stream of PRs for Helen to review, and she is the
+# only person who can merge one. Monthly, grouped, is a batch she can sit down
+# with.
+#
+# `open-pull-requests-limit: 3` per ecosystem for the same reason: a cap that
+# keeps the PR list legible is worth more than complete coverage of every bump.
+#
+# THE WORKFLOW FILE IS HELEN'S TO MERGE, AND SO IS EVERY PR THIS OPENS. A
+# github-actions bump edits `.github/workflows/`, which the agent account cannot
+# push to at all (its token is classic `repo`, without `workflow` scope). That is
+# fine and is arguably the point: these PRs are reviewed by a person.
+#
+# A BUMP THAT TOUCHES THE TEST RUNNER NEEDS THE IMAGE REBUILT. `requirements-test.txt`
+# pins pytest, PyYAML and playwright exactly, and `.devcontainer/Dockerfile`
+# repeats those pins by hand because its build context cannot reach the file.
+# `tests/test_devcontainer_pins.py` fails if a pip bump lands in one and not the
+# other -- so a Dependabot PR here goes red until the Dockerfile is edited to
+# match and the image rebuilt. That red is the reminder, and it is deliberate.
+version: 2
+updates:
+  # Ruby: the site itself. A Jekyll or plugin bump changes what gets built, so
+  # these matter most and are the ones the suite actually exercises -- the test
+  # job runs two real `jekyll build`s.
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    groups:
+      bundler:
+        patterns: ["*"]
+
+  # Python: the test suite only. The site needs nothing from Python.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    groups:
+      pip:
+        patterns: ["*"]
+
+  # GitHub Actions: the thing that had no watcher at all, and the reason this
+  # file exists. A pinned-to-major action goes stale silently.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns: ["*"]
