@@ -182,7 +182,14 @@ TOP_LEVEL_KEYS = {
 # step in their own right, so the whole field went rather than the one value and
 # nothing it held was lost. Recorded because a field redundant with a default is
 # exactly the kind of thing that gets re-proposed.
-SERVE_KEYS = {"ice", "rim"}
+# `fill` JOINED 2026-09-28, and it is the quantity `ice` was never allowed to
+# carry. Helen's Milliners Punch sentence is "Strain into a hurricane glass
+# half-filled with crushed ice."; serve.yml's own Fish House Punch note says
+# "the thing the field cannot carry is QUANTITY", so the quantity got a field
+# of its own rather than a sixth spelling of crushed. Keeping `ice: crushed`
+# untouched matters beyond tidiness: the mood deriver tests that exact string
+# in two places and `mood_serve_ice` in a third.
+SERVE_KEYS = {"ice", "rim", "fill"}
 
 # `to_serve` and `serve` are the optional ones -- most drinks have no serveware
 # note, and `serve` is absent where nobody has ruled on the ice. Everything else
@@ -2328,6 +2335,67 @@ def test_serve_block_uses_only_declared_keys_and_values():
           "value is real."
     )
 
+
+def test_every_fill_is_a_declared_one():
+    """`serve.fill` says how full, and serve.yml declares the words.
+
+    Added 2026-09-28 with the field. Same bargain every other closed
+    vocabulary here strikes: declaring a value is what switches enforcement on,
+    and an undeclared one would render the ice clause UNCHANGED -- "filled with
+    crushed ice" where the drink said half -- which is a silent wrong answer
+    rather than a loud one.
+    """
+    vocab = _serve_vocab()
+    declared = set(vocab.get("fill") or {})
+    assert declared, (
+        "serve.yml declares no `fill:` values, so the field enforces nothing. "
+        "If it was retired, delete it from SERVE_KEYS and these tests with it."
+    )
+    bad = []
+    for slug, fm in _load():
+        serve = fm.get("serve")
+        if not isinstance(serve, dict) or "fill" not in serve:
+            continue
+        if serve["fill"] not in declared:
+            bad.append(f"{slug}: fill {serve['fill']!r} is not declared")
+    assert not bad, (
+        "serve `fill` value(s) that are not declared:\n  " + "\n  ".join(bad)
+        + f"\n\nDeclared: {', '.join(sorted(declared))}. The values live in "
+          "_data/cocktails/serve.yml."
+    )
+
+
+def test_a_fill_has_something_to_fill():
+    """A drink saying how full must have ice whose clause says `filled`.
+
+    THE SUBSTITUTION IS THE REASON. `fill` swaps the word `filled` in the
+    composed clause, and only `cubed` and `crushed` produce one -- `large cube`
+    and `block` are ice you pour the drink ONTO (", over a large ice cube"),
+    where half of one cube is not a quantity anybody is describing.
+
+    Paired with `none`, or with no `serve.ice` at all, the substitution finds
+    nothing and does NOTHING, which is the failure worth catching: the drink
+    reads as though somebody recorded how full it is and the page never says
+    so. A silent no-op is worse than a refusal, because it looks recorded.
+    """
+    vocab = _serve_vocab()
+    clauses = vocab.get("in_the_glass") or {}
+    bad = []
+    for slug, fm in _load():
+        serve = fm.get("serve")
+        if not isinstance(serve, dict) or "fill" not in serve:
+            continue
+        clause = clauses.get(serve.get("ice"), "")
+        if "filled" not in clause:
+            bad.append(
+                f"{slug}: fill {serve['fill']!r} with ice "
+                f"{serve.get('ice')!r}, whose clause is {clause!r}")
+    assert not bad, (
+        "serve `fill` on a drink with nothing to fill:\n  " + "\n  ".join(bad)
+        + "\n\n`fill` replaces the word `filled` in the ice clause, so it "
+          "means something only where the clause has one -- `cubed` and "
+          "`crushed`. Either give the drink one of those, or drop `fill`."
+    )
 
 def test_serve_ice_is_not_restated_in_the_method():
     """The ice is recorded once, in `serve`, and not again in prose.
@@ -4645,6 +4713,111 @@ def test_no_method_step_restates_to_serve_or_garnish():
         "has moved."
     )
 
+
+# =============================================================================
+# THE GLASS GENERATOR -- #1214, 2026-09-28
+# =============================================================================
+# Helen: "Let's write the glass generator now please -- I've come up against
+# this a few times now, notably in the Sazerac on the live site."
+#
+# The strain step has composed its glass since 2026-09-05; nothing else did, so
+# a drink BUILT in the glass named it nowhere. `methods.yml in_the_glass` is
+# the mapping and `_layouts/cocktail.html` fills the slot. These three guard
+# the three ways that can rot: a key that is not a real step, a value that
+# cannot be filled, and a template that stops reading the table.
+
+GLASS_SLOT = "<glass>"
+
+
+def _in_the_glass():
+    return _methods().get("in_the_glass") or {}
+
+
+def test_every_glass_step_key_is_a_canonical_step():
+    """The LEFT side is a step a drink may actually write.
+
+    A key that matches nothing is a rule that never fires, and it fires
+    silently -- the page just keeps saying "Add all ingredients." with no
+    glass, which is the very complaint #1214 was raised about. The same
+    bargain `proposals` strikes one block up.
+    """
+    spec = _methods()
+    table = _in_the_glass()
+    assert table, (
+        "methods.yml declares no `in_the_glass:`, so the glass generator has "
+        "no table and _layouts/cocktail.html composes nothing. If it was "
+        "retired, delete these tests with it."
+    )
+    unknown = sorted(k for k in table if not _is_canonical_step(k, spec))
+    assert not unknown, (
+        "`in_the_glass` key(s) that are not canonical steps:\n  "
+        + "\n  ".join(repr(k) for k in unknown)
+        + "\n\nDeclare the step under `canonical:` first. A key matching no "
+          "real step is a rule that never fires, and nothing else would say so."
+    )
+
+
+def test_every_glass_step_value_has_exactly_one_slot():
+    """The RIGHT side is a sentence with one `<glass>` and a full stop.
+
+    Zero slots is a rewrite that loses the glass -- worse than not composing at
+    all, because it looks done. Two would need the phrase twice in one
+    sentence, which no English here wants. The full stop matters because every
+    other canonical step is a whole sentence and these sit among them.
+
+    `<glass>` AND NOT `shapes:`'s `<X>`, deliberately: that slot is filled by
+    the DRINK with an ingredient it names, this one by the PAGE from a field.
+    Same-looking marker, opposite direction.
+    """
+    table = _in_the_glass()
+    bad = []
+    for key, value in sorted(table.items()):
+        if value.count(GLASS_SLOT) != 1:
+            bad.append(f"{key!r} -> {value!r}: {value.count(GLASS_SLOT)} slots")
+        elif not value.endswith("."):
+            bad.append(f"{key!r} -> {value!r}: no full stop")
+        elif GLASS_SLOT in key:
+            bad.append(f"{key!r}: the KEY carries a slot; only the value may")
+    assert not bad, (
+        "`in_the_glass` value(s) that cannot be filled:\n  " + "\n  ".join(bad)
+    )
+
+
+def test_the_layout_takes_the_glass_sentences_from_methods_yml():
+    """The composed sentences are the data's, not literals in the template.
+
+    EXACTLY THE DRIFT test_the_layout_takes_the_twist_step_from_methods_yml was
+    written for, one field along: the twist sentence lived in both places,
+    Helen changed the wording, and the page kept emitting the old one with
+    nothing watching the pair. So the template must READ `in_the_glass` rather
+    than restate any of it.
+
+    Matching the ASSIGNMENT rather than the sentence, for that test's own
+    reason: a plain scan for the quoted string fires on the template's
+    COMMENTS, which quote the rule while explaining it (MANUAL 12).
+    """
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+
+    assert "in_the_glass" in layout, (
+        "_layouts/cocktail.html never reads `methods.in_the_glass`, so the "
+        "table in methods.yml is dead data and every built-in-the-glass drink "
+        "is back to naming no glass at all -- silently."
+    )
+
+    spelled_out = sorted(
+        v for v in _in_the_glass().values()
+        if re.search(r'assign\s+shown\s*=\s*"' + re.escape(v[:12]), layout)
+    )
+    assert not spelled_out, (
+        "_layouts/cocktail.html assigns a composed glass sentence as a "
+        "literal instead of reading methods.yml:\n  "
+        + "\n  ".join(repr(v) for v in spelled_out)
+    )
+
+    assert GLASS_SLOT in layout, (
+        f"the template never substitutes {GLASS_SLOT!r}, so the slot is "
+        "rendered to the reader verbatim."
+    )
 
 def test_the_layout_takes_the_twist_step_from_methods_yml():
     """The page's twist sentence is methods.yml's, not a string in the template.
