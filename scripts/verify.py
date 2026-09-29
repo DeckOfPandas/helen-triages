@@ -62,9 +62,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def js_suite() -> list[str]:
-    """`node --test` over every JS test file there is."""
+    """`node --test` over every JS test file there is.
+
+    THE REPORTER IS PINNED, AND IT HAD TO BE -- 2026-09-29. This check asserts
+    the output contains `# fail 0`, which is TAP. Node's DEFAULT reporter is
+    not a fixed thing: v24 emits the `spec` format (`ℹ fail 0`) where the
+    older runtime emitted TAP, so the moment the devcontainer's Node was
+    upgraded this check began reporting FAIL on a suite that passed 767 of 767.
+
+    A check that says the opposite of the truth is worse than no check: it
+    trains the next reader to skim past a red line. So the format is asked for
+    explicitly rather than inherited, and the next runtime upgrade cannot
+    silently change what this means.
+    """
     files = sorted(glob.glob(os.path.join(ROOT, "tests", "js", "*.test.js")))
-    return ["node", "--test", *files]
+    return ["node", "--test", "--test-reporter=tap", *files]
 
 
 # (name, argv, a string the output must contain for a pass -- or None,
