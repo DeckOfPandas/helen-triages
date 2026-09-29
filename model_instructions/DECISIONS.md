@@ -6256,6 +6256,48 @@ verification. Dates are when the correction landed.
   The lesson is the old one: run the file that owns what you touched, and an
   SVG is owned by `test_site_config.py`, not by the page it appears on.
 
+- **A label from the instructions, pasted into the workflow** — 2026-09-28,
+  #1195, and it took `main` down for thirty-nine minutes. Helen asked for
+  exact UI steps to add the `pull_request` trigger, since an agent cannot push
+  under `.github/workflows/` with a classic `repo` token. The steps were
+  written as `Find:` / `Change to:` blocks with YAML underneath, and the words
+  **`Change to:`** were pasted into the file along with the YAML. At column 0
+  that is a top-level key, so it **ended the `jobs:` mapping**: `build` and
+  `deploy` stopped being jobs, and GitHub rejected the file with "this run
+  likely failed because of a workflow file issue" — a message that names no
+  line and no test. `yaml.safe_load` found it in one read: `jobs: ['test']`,
+  with `build:` and `deploy:` sitting in the raw text a few lines below.
+
+  **The lesson is about the shape of the instructions, not the paste.** A
+  find-and-replace instruction whose labels look like YAML keys is a trap laid
+  for whoever follows it. Give a complete file to replace wholesale, or labels
+  that cannot be valid syntax in the target language — never `Change to:` above
+  a block of YAML.
+
+  - **AND THEN NOTHING COULD MERGE, WHICH IS THE PART WORTH REMEMBERING.** The
+    required status check had gone live in the same hour. With the workflow
+    invalid, GitHub runs no jobs, so `test` never reports, so the required
+    check can never pass — **every open PR was blocked, including any fix.**
+    The escape is that a `pull_request` run reads the workflow from the PR's
+    own branch, so a PR carrying the repaired file runs, reports and merges.
+    Worth knowing before it happens rather than during: a required check plus
+    an unparseable workflow is a deadlock with exactly one exit.
+  - **The mechanism then proved itself on the next PR.** #1239 (Dependabot's
+    five action bumps) ran `test` to SUCCESS with `build` and `deploy`
+    **skipped** by their `if: github.event_name != 'pull_request'` guards —
+    the first pull request in this repository ever tested before merge, and
+    the first evidence that the guards work. Note what a PR run still cannot
+    cover: `build` and `deploy` are skipped, so
+    `actions/upload-pages-artifact` and `actions/deploy-pages` — the matched
+    pair that actually publishes — are exercised only by the merge.
+  - **A Dependabot PR does not re-run when you reopen it.** #1239 was opened
+    while the workflow was broken, so it had no run and sat `BLOCKED` with an
+    empty `statusCheckRollup`. A close-and-reopen, which fires `reopened` for
+    an ordinary PR, produced **no run at all** — checked for eight minutes,
+    and `gh run list` showed nothing queued. `@dependabot rebase` as a comment
+    force-pushes the branch, fires `synchronize`, and runs within three
+    minutes. Reach for the rebase.
+
 ## §13 The visual design — the road to each value
 
 - **2026-07-31 / 2026-08-01 / 2026-08-02** — Recipe page redesigned; index
