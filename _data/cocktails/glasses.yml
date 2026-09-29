@@ -298,15 +298,20 @@ canonical_glasses:
 # this list following. Without the test this would be a lie waiting to happen,
 # which is the whole reason the assertion comes with it rather than after it.
 # =============================================================================
-# REAL-WORLD HEIGHTS IN MILLIMETRES — PROVISIONAL, AND HELEN'S TO CORRECT.
+# REAL-WORLD HEIGHTS IN MILLIMETRES — `heights_mm`, WHAT DRAWS EVERY GLASS.
 # =============================================================================
-# THESE ARE NOT MEASURED. They are typical heights for each glass type, written
-# by Claude on 2026-08-18 so that the relative-scale view on /dev/glasses/ has
-# something honest to size from. This used to say #295 would supersede them
-# with "the glasses Helen actually owns"; since 2026-09-28 it is a spec, not an
-# inventory, and the SOURCED heights now exist -- `typical_height_mm` below,
-# from a 317-product survey (#1238). They have not replaced these yet, on
-# purpose: see that block for why.
+# SOURCED SINCE 2026-09-29. Until then these were typical heights Claude wrote
+# on 2026-08-18, unmeasured, so that the relative-scale view on /dev/glasses/
+# had something honest to size from. Now `heights_mm` is GENERATED, in the
+# marked block below, as each glass's surveyed MEDIAN height (#1238, 317
+# products) -- except where `height_overrides` just below keeps a number on
+# purpose. Helen, shown the two side by side: "I love the side by side view on
+# the ref page, the version based on real glasses. Leave punchbowl as we
+# currently have it -- what we have is perfectly clear." And of the two
+# old fashioneds: "leave them, this isn't important."
+#
+# TO CHANGE A HEIGHT, add or fix a survey row, or add an override with its
+# reason. Never type a number into the generated block.
 #
 # WHY THIS IS NOT THE viewBox HEIGHT, which is the obvious thing to use and is
 # wrong. A viewBox records how the artwork was DRAWN, not how big the glass IS,
@@ -387,45 +392,20 @@ serving:
   tiki mug: "a tiki mug"
   wine: "a wine glass"
 
-heights_mm:
-  shot: 60
+# THE HEIGHTS THAT ARE NOT THE SURVEY'S MEDIAN, each with its reason. Every
+# other glass draws at its surveyed median; see the generated `heights_mm`.
+height_overrides:
+  # 130 AGAINST A SURVEYED 256. The tallest glass is the scale's denominator,
+  # so at its real height the bowl would outrank the flute and shrink every
+  # other glass on the site. Helen: "Leave punchbowl as we currently have it
+  # -- what we have is perfectly clear."
+  punch-bowl: 130
+  # 85 and 100 against surveyed 89 and 98. Helen: "Old fashioned glasses:
+  # leave them, this isn't important." The pair were drawn and sized together
+  # (the double is the single scaled up, #347), and /dev/glasses/ section 5
+  # is the page that measures the one against the other.
   old-fashioned: 85
   old-fashioned-double: 100
-  # Was 105 as a copper Moscow Mule mug. Lowered to a tea mug's height on
-  # 2026-08-26 with the rename, since that is what it actually depicts now.
-  # As unmeasured as every other number here — #295 still supersedes the lot.
-  mug: 95
-  julep-cup: 110
-  # A GUESS, AND FLAGGED AS ONE RATHER THAN QUIETLY AVERAGED IN. Added
-  # 2026-08-31 with the drawing (#528). A drinking coconut is roughly as wide
-  # as it is tall and shorter than any glass here bar the shot and the
-  # old-fashioned; 115 puts it between the julep cup and the punch bowl, which
-  # is where it sits in the hand. Every number in this block is unmeasured
-  # (#295) so this is no worse founded than its neighbours -- but it is the
-  # newest and the least looked at, so check it against a real coconut before
-  # trusting it over them.
-  coconut: 115
-  punch-bowl: 130
-  brandy: 130
-  hot-toddy: 140
-  nick-and-nora: 140
-  sour: 140
-  coupe: 150
-  sherry: 150
-  highball: 150
-  tiki-mug: 150
-  pineapple: 150
-  absinthe: 160
-  martini: 175
-  margarita: 175
-  goblet: 175
-  collins: 180
-  pina-colada: 180
-  wine: 200
-  hurricane: 200
-  sling: 200
-  pilsner: 220
-  flute: 230
 
 # =============================================================================
 # TYPICAL CAPACITY AND HEIGHT — SOURCED, FROM THE SURVEY (#1238)
@@ -447,10 +427,9 @@ heights_mm:
 # test_glass_survey_statistics_are_current fails the moment it is stale. Fix a
 # number in the survey, never here.
 #
-# `heights_mm` ABOVE IS UNCHANGED, AND IT IS STILL WHAT DRAWS THE ICONS. The
-# sourced median heights are here to replace it, but replacing it resizes
-# every glass on the site, so that is Helen's call on a page she can look at
-# rather than a side effect of recording the research.
+# `heights_mm`, WHAT DRAWS THE ICONS, IS GENERATED HERE TOO, since 2026-09-29:
+# the median of `typical_height_mm` for every icon, or its `height_overrides`
+# entry above where one exists.
 #
 # KEYED BY ICON, like `heights_mm`, with ONE exception declared below: a
 # surveyed type that shares another's drawing but not its size. The copper
@@ -522,7 +501,57 @@ typical_height_mm:
   sour:                 {n: 2, min: 146, median: 152, mean: 152, max: 158}
   tiki-mug:             {n: 15, min: 114, median: 165, mean: 168, max: 216}
   wine:                 {n: 12, min: 184, median: 215, mean: 210, max: 235}
+heights_mm:
+  absinthe:             143
+  brandy:               138
+  coconut:              95
+  collins:              152
+  coupe:                152
+  flute:                241
+  goblet:               158
+  highball:             138
+  hot-toddy:            142
+  hurricane:            198
+  julep-cup:            112
+  margarita:            167
+  martini:              164
+  mug:                  91
+  nick-and-nora:        152
+  old-fashioned:        85
+  old-fashioned-double: 100
+  pilsner:              206
+  pina-colada:          178
+  pineapple:            185
+  punch-bowl:           130
+  sherry:               155
+  shot:                 72
+  sling:                200
+  sour:                 152
+  tiki-mug:             165
+  wine:                 215
 # <<< END GENERATED
+
+# =============================================================================
+# WHERE EACH GLASS STANDS — so a label is centred under its base, not its box.
+# =============================================================================
+# Helen, 2026-09-29: "the text under the normal mug is way off to the right,
+# and the text for mule mug and pineapple are slightly right of centre." The
+# labels were centred on each drawing's viewBox, which includes a mug's handle
+# and the pineapple's umbrella. The eye centres a glass on what it stands on.
+#
+# A signed fraction of the drawing's width: the centre of its bottom band of
+# ink, measured from the centre of its viewBox. Negative is left of centre.
+# /cocktails/reference/glasses/ shifts each drawing by minus this. Glasses
+# under 1% are omitted -- that much is the stroke, not the drawing.
+# GENERATED by rasterising the published icons; never typed, because a number
+# read off a screenshot is wrong after the next redraw.
+# >>> GENERATED by scripts/glass_base_centres.py -- do not edit by hand
+base_centre:
+  coconut: 0.038
+  hot-toddy: -0.082
+  mug: -0.127
+  pineapple: -0.089
+# <<< END GENERATED base_centre
 
 # =============================================================================
 # FIT RULES — how much drink a glass takes. SOURCED WHERE A SOURCE EXISTS.

@@ -5629,6 +5629,25 @@ def test_glass_survey_statistics_are_current():
     )
 
 
+def test_glass_base_centres_are_current():
+    """`base_centre` in glasses.yml is what the published drawings measure.
+
+    THE SAME CODE `--check` RUNS. The glasses page centres each label under a
+    drawing's BASE rather than its box (Helen, 2026-09-29: "the text under the
+    normal mug is way off to the right"), and the offsets are rasterised from
+    the icons -- so a redraw that moves a handle or a base goes stale here,
+    rather than leaving a label quietly off-centre again.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from glass_base_centres import check  # noqa: E402
+
+    diff, _ = check()
+    assert not diff, (
+        "a glass drawing's base no longer sits where glasses.yml says:\n\n" + diff
+        + "\nRun: python3 scripts/glass_base_centres.py --write"
+    )
+
+
 def test_every_glass_type_has_a_sourced_capacity_and_height():
     """All 27 icons, plus the survey-only mule mug -- Helen, 2026-09-28: "All
     27 please." An icon with no drink yet still gets its numbers: the page
