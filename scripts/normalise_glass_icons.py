@@ -79,83 +79,28 @@ DST = ROOT / "_includes" / "icons" / "glasses"
 # needed for a file that does not exist -- adding one would be a rule guarding
 # nothing, and the next person would go looking for the source it names.
 #
-# THE SECOND GROUP IS A COLLISION GUARD, added 2026-08-26 with the RENAME
-# entries below, and it is not optional. Once `coupe-3` is renamed to `coupe`,
-# TWO sources want to write coupe.svg -- and `sorted()` decides which wins,
-# on a subtlety: '-' (0x2D) sorts before '.' (0x2E), so glass-coupe-2.svg and
-# glass-coupe-3.svg both come BEFORE glass-coupe.svg, and the superseded
-# original would be written last and win. The new drawing would vanish on the
-# next full regeneration, silently, with the git diff blaming this script.
+# ONE SOURCE PER GLASS SINCE 2026-09-29, SO THE GLASS ENTRIES ARE GONE.
+# This set held twenty superseded drawings, each skipped by name so that a
+# wholesale regeneration could not pick an old version over its redraw -- and
+# it had to, because `sorted()` puts glass-coupe-2.svg BEFORE glass-coupe.svg
+# ('-' is 0x2D, '.' is 0x2E), so the original would be written last and win.
 #
-# So every source a RENAME supersedes is skipped by name. They stay on disk as
-# the record of what was tried -- that is what _design_sources/ is for -- they
-# are simply no longer published.
+# Helen, 2026-09-29: "Shall we clear out the earlier versions of drawings we've
+# updated? ... we're using tiki mug 9 so delete the others." It is the
+# old-fashioned collapse of 2026-08-26 applied to the whole set ("delete all
+# other versions of old fashioned (and rocks) glasses you have anywhere, then
+# add just these two"): the superseded sources were deleted, every live one
+# renamed to its plain published name, and with one file per glass there is
+# nothing to skip and nothing to rename. The best answer to a disambiguation
+# rule is not having anything to disambiguate. GIT HISTORY IS THE RECORD OF
+# WHAT WAS TRIED NOW: `git log --diff-filter=D -- _design_sources/` lists
+# every one, and `git show <sha>^:<path>` brings one back.
+#
+# THE TWO LEFT guard this script's own inbox rather than the archive: a food
+# icon exported into the same folder, and an Inkscape "- Copy" duplicate.
 SKIP = {
     "food-cloche-heart.svg",
     "glass-old-fashioned - Copy.svg",
-    "glass-pineapple-1.svg",
-    "glass-pineapple-2-bad-trace.svg",
-    # superseded by a RENAME target below
-    "glass-coupe.svg",
-    "glass-coupe-2.svg",
-    "glass-hurricane.svg",
-    "glass-tiki-mug.svg",
-    # 2026-08-31, #526/#527: Helen drew a tiki mug and a pineapple to replace
-    # the two she had always called placeholders, and they are superseded by
-    # glass-tiki-mug-3 / glass-pineapple-4 in RENAME. Both stay on disk in
-    # _design_sources as the record -- §9.15, a record you can overwrite is not
-    # one.
-    "glass-tiki-mug-2.svg",
-    "glass-pineapple-3.svg",
-    # 2026-09-05, #525/#307: Helen redrew the pineapple and the coconut as open
-    # LINE ART, replacing the two compound fills. Both predecessors are skipped
-    # and both new drawings are RENAME targets below.
-    #
-    # THIS PAIR IS WHY THE SKIP LIST IS NOT OPTIONAL, more sharply than the
-    # coupe collision the comment above describes. Without these two entries a
-    # wholesale regeneration would not merely pick the wrong file -- it would
-    # publish `pineapple.svg` and `coconut.svg` from the OLD fills (they are
-    # RENAME targets already) AND emit `pineapple-8.svg` and `coconut-4.svg`
-    # as two orphan icons beside them, which then fails
-    # test_all_icons_matches_the_icon_directory. The new drawings would be
-    # reverted and the git diff would blame this script.
-    "glass-pineapple-4.svg",
-    "glass-coconut.svg",
-    # 2026-09-06, #738: and the mug completes the set's move to line art. Its
-    # predecessor was itself a redraw (machine-traced centrelines, 46 paths);
-    # this one is Helen's own, 21 paths, and needs no thinning filter because a
-    # stroke has a width to set.
-    "glass-tiki-mug-3.svg",
-    # 2026-08-31: coupe-3's stroke ends fell short of each other by up to 1.06
-    # user units. Invisible while drawing -- her stroke is ~2.8 units wide and a
-    # round cap bridges one stroke width -- and visible on the page, where
-    # non-scaling-stroke means the cap only spans 0.46. coupe-4 closes all six.
-    "glass-coupe-3.svg",
-    # The same pass, same day: Helen closed the open stroke ends on five more.
-    # Each predecessor is superseded by a RENAME target below.
-    "glass-absinthe.svg",
-    "glass-collins.svg",
-    "glass-goblet.svg",
-    "glass-hot-toddy.svg",
-    "glass-sherry.svg",
-    # These two closed their gaps AND changed shape, both on purpose:
-    # the sour's bowl was redrawn, and the julep cup lost its handle.
-    "glass-julep-cup.svg",
-    "glass-julep-cup-2.svg",
-    "glass-sour.svg",
-    # NO OLD-FASHIONED ENTRIES HERE ANY MORE, and their absence is the fix.
-    # This set briefly held four of them: two version suffixes, a 2-path early
-    # draft, and a never-adopted 12-path candidate, plus a RENAME pointing at
-    # whichever double was live. That machinery was correct and it was
-    # machinery -- #484 exists because a reader could not tell which drawing
-    # published without simulating `sorted()`.
-    #
-    # Helen collapsed it on 2026-08-26: "I have the two files I want to use...
-    # delete all other versions of old fashioned (and rocks) glasses you have
-    # anywhere, then add just these two." Seven sources went, two arrived under
-    # plain names, and with one file per glass there is nothing to skip and
-    # nothing to rename. The best answer to a disambiguation rule is not having
-    # anything to disambiguate.
 }
 
 # FILL-BASED ARTWORK, WHICH THE REST OF THE SET IS NOT. Every glass is drawn as
@@ -253,37 +198,13 @@ SOLID = set()
 #    resurrected `mule-mug.svg` the next time this script ran -- and `mug.svg`
 #    would have vanished with nothing to say why. Rename here, where the
 #    mapping survives a regeneration.
-RENAME = {
-    "pineapple-4": "pineapple",
-    "coupe-4": "coupe",
-    "hurricane-2": "hurricane",
-    "tiki-mug-3": "tiki-mug",
-    "mule-mug": "mug",
-    # 2026-08-31, the open-stroke-ends pass. See the SKIP comment above for what
-    # was wrong and why it was invisible while drawing.
-    "absinthe-2": "absinthe",
-    "collins-4": "collins",
-    "goblet-2": "goblet",
-    "hot-toddy-2": "hot-toddy",
-    "sherry-2": "sherry",
-    # A REDRAW AS WELL AS A REPAIR, both Helen's and both deliberate.
-    # The sour's bowl went from a narrow U (aspect 0.391, NARROWER than the
-    # sherry and a near-twin of the nick-and-nora) to a waisted bowl at 0.499,
-    # which is its own silhouette in a set where four stemmed glasses sit
-    # within 0.1 of each other. The julep cup lost its handle: a real one is a
-    # handleless beaker, and with it gone the three handled vessels are down to
-    # two that no longer read as the same drawing.
-    "julep-cup-3": "julep-cup",
-    "sour-2": "sour",
-    # 2026-09-05. Both replace a compound fill with open line art, so both also
-    # leave SOLID above. Their predecessors are in SKIP.
-    "pineapple-8": "pineapple",
-    "coconut-4": "coconut",
-    # 2026-09-06. Note the source stem is `tiki-9`, not `tiki-mug-9` -- the
-    # published name is not a prefix of it, which is exactly why this map is
-    # explicit rather than a pattern.
-    "tiki-9": "tiki-mug",
-}
+#
+# EMPTY SINCE 2026-09-29, when every live source took its published name (see
+# SKIP above). Thirteen entries went, `tiki-9` -> `tiki-mug` and `mule-mug` ->
+# `mug` among them; `git log -S` on this file has each one's reasoning. The
+# map stays because the next redraw arrives with a working title again -- add
+# its line here, or better, rename the file and delete the one it replaces.
+RENAME = {}
 
 # NOT IN THAT PASS, AND DELIBERATELY: `old-fashioned-double` carries the set's
 # two largest open ends (3.92 units each, on the base) and Helen looked at it

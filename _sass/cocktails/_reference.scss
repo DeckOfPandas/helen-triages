@@ -556,6 +556,113 @@ $ref-list-gutter: 1.3rem;
 // please" -- so nothing emits the class and nothing can.
 
 // =============================================================================
+// THE GLASSES PAGE — #295, cocktails/reference/glasses.html
+// =============================================================================
+// Every glass on one shelf, at relative scale, in the home green. Helen's brief
+// (2026-09-29) is the whole page -- see the template's header -- so this is a
+// heading, a row of drawings, and three short lines under each. Nothing else.
+//
+// THE STAGE IS WHAT MAKES IT A SHELF. Every item reserves the same height, the
+// tallest glass's, and stands its drawing on the bottom of it, so every glass
+// in a row shares one baseline and every name starts on one line. The drawing
+// itself is `--glass-ratio` of that height: its real height over the tallest
+// real glass, set per item by the template. A drawing is never width-capped,
+// because a capped glass would be drawn shorter than it is, and scale is the
+// one thing this page is for.
+$glass-shelf-height: 11rem;
+
+// "Style GLASSES like a heading" -- the drink page's INGREDIENTS/METHOD mark,
+// which `.ref-section-heading` already is. Only the space above changes: it is
+// the first thing on the page rather than a section under a title.
+.glasses-heading {
+  margin-top: 2rem;
+}
+
+.glass-shelf {
+  list-style: none;
+  margin: $space-xl 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-xl $space-lg;
+}
+
+.glass-shelf-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 6.5rem;
+  text-align: center;
+}
+
+.glass-shelf-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: $glass-shelf-height;
+}
+
+// THE GREEN IS THE GLASS'S OWN, the colour every drawing on a card and a drink
+// page already strokes in -- "let's try the glasses in green".
+.glass-shelf-art {
+  display: block;
+  height: calc(var(--glass-ratio) * #{$glass-shelf-height});
+  color: $color-electric-absinthe;
+
+  // THE BASE OVER THE LABEL, NOT THE BOX -- `base_centre` in glasses.yml, set
+  // per item as `--glass-shift`. A translate percentage is of this element's
+  // own width, which is the drawing's, so the measured fraction applies as it
+  // stands. A transform moves the drawing without moving the layout, so the
+  // label and the row keep their places and only a handle reaches a little
+  // further into the gap beside it.
+  transform: translateX(calc(var(--glass-shift, 0) * -100%));
+
+  svg {
+    display: block;
+    height: 100%;
+    width: auto;
+    overflow: visible;
+  }
+
+  // THINNER THAN ANYWHERE ELSE THE SITE DRAWS A GLASS, Helen 2026-09-29: "Can
+  // we make the lines thinner? Thin more for tiki, pineapple and coconut."
+  // `non-scaling-stroke` makes these SCREEN pixels whatever the drawing's
+  // size (see `.glass-icon-line`): the drink page draws at 2 and a card at 1,
+  // and /dev/glasses/ section 2, the view she was looking at, at 4.6. The three
+  // named drawings are the busiest in the set -- carving, a crown of leaves,
+  // husk lines -- so at one width they read darker than their neighbours.
+  .glass-icon-line {
+    stroke-width: 1.5;
+  }
+
+  .glass-icon--tiki-mug .glass-icon-line,
+  .glass-icon--pineapple .glass-icon-line,
+  .glass-icon--coconut .glass-icon-line {
+    stroke-width: 1;
+  }
+}
+
+.glass-shelf-name {
+  margin-top: $space-sm;
+  font-family: $font-label;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: $color-text;
+}
+
+// THE MEAN, AND UNDER IT THE RANGE, quieter. "The range and mean ml for each
+// (given the medians are similar we don't need to give those)."
+.glass-shelf-ml {
+  font-size: $font-size-body-sm;
+  color: $color-text;
+}
+
+.glass-shelf-range {
+  font-size: 0.75rem;
+  color: $color-clear-text;
+}
+
+// =============================================================================
 // NARROW
 // =============================================================================
 // The three-track row cannot hold at phone width — the name column alone wants
@@ -592,5 +699,28 @@ $ref-list-gutter: 1.3rem;
   // The shelves are left alone: they are one or two words and already fit.
   .ref-section-heading--major {
     font-size: 1.5rem;
+  }
+
+  // THREE GLASSES TO A ROW ON A PHONE, NOT TWO. At the desktop's 11rem stage
+  // and 6.5rem items a 390px screen took two, and the page ran to fourteen
+  // screens of mostly empty stage. A shorter stage keeps every ratio -- the
+  // scale is relative, so only the unit shrinks -- and the names are the
+  // widest thing left ("double old fashioned" wraps, which is fine).
+  .glass-shelf {
+    gap: $space-lg $space-sm;
+    justify-content: space-between;
+  }
+
+  .glass-shelf-item {
+    min-width: 0;
+    width: 30%;
+  }
+
+  .glass-shelf-stage {
+    height: 7rem;
+  }
+
+  .glass-shelf-art {
+    height: calc(var(--glass-ratio) * 7rem);
   }
 }

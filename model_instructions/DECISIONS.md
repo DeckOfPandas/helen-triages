@@ -3054,6 +3054,55 @@ unless stated.
     said read too tall on 2026-08-26), coconut 115 → 95, punch bowl 130 → 256.
     Not switched: it resizes every glass, and the punch bowl would become the
     tallest glass and so the scale's denominator.
+- **2026-09-29, #295 — the glasses page, and the heights switched.** Helen, on
+  the sizes: *"I love the side by side view on the ref page, the version based
+  on real glasses. Leave punchbowl as we currently have it -- what we have is
+  perfectly clear."* and *"Old fashioned glasses: leave them, this isn't
+  important."* So `heights_mm` became GENERATED — survey median, or a
+  `height_overrides` entry with its reason — rather than 27 numbers copied
+  across, which would have been a second copy of the survey.
+  - **The page is her brief and nothing more**: *"show all the glasses
+    together, at relative scale, giving the range and mean ml for each (given
+    the medians are similar we don't need to give those). Don't show the
+    heights. Don't show anything else on the page body. Style GLASSES like a
+    heading. And let's try the glasses in green."* The heading is the drink
+    page's INGREDIENTS mark (`.ref-section-heading`); the green is the glass's
+    own absinthe. Ordered by what each holds, shot to punch bowl.
+  - **Thinner lines**: *"Can we make the lines thinner? Thin more for tiki,
+    pineapple and coconut."* 1.5px and 1px, against the 4.6px of the dev
+    view she was looking at. On this page only; the drink page and cards keep
+    theirs.
+  - **The first build sorted the mule mug before the shot glass** and named
+    two glasses by their non-canonical spellings, from one cause: Liquid
+    returns nil for a lookup nested in another. It rendered without complaint,
+    which is why the page has a test counting its rows.
+  - **Her second look, same day: three changes and "no more styling".**
+    *"Please draw them in alphabetical order so the visual effect is nice and
+    messy"* (it shipped in capacity order, shot to punch bowl); *"round all ml
+    measurements to the nearest 10 ml"* (on the page only — the data keeps
+    whole ml); and *"the text under the normal mug is way off to the right,
+    and the text for mule mug and pineapple are slightly right of centre."*
+    Every label WAS centred, on the drawing's box, which holds a mug's handle
+    and the pineapple's umbrella. The eye centres a glass on what it stands
+    on, so the base's centre is now measured from the rasterised icon
+    (`base_centre`, generated and tested) and the drawing shifted by it: mug
+    −12.7% of its width, pineapple −8.9%, hot toddy −8.2%, coconut +3.8%,
+    every other glass under 1%. Hot toddy and coconut were not in her list
+    and are the same fault. The shelf line and hover offered as extra styling
+    were declined: *"No more styling needed, so no shelf or hover."*
+
+- **2026-09-29 — one source per glass; §9.15's "both stay on disk" reversed.**
+  Helen: *"Shall we clear out the earlier versions of drawings we've updated? I
+  don't need to list them, but e.g. we're using tiki mug 9 so delete the
+  others."* The rule had been that `_design_sources/` is the record of what was
+  tried, and the normaliser's SKIP comment put it as "a record you can
+  overwrite is not one". Deleting is not overwriting — git keeps every version
+  — so the record survives in history, and what goes is twenty files and
+  twenty SKIP entries plus thirteen RENAME entries whose only job was stopping
+  `sorted()` from publishing an old drawing over its redraw. It is her own
+  old-fashioned collapse of 2026-08-26 applied to the whole set. Proved by
+  `check_glass_regen.py` before and after: 46 sources → 27, and a wholesale
+  regeneration reproduces all 27 shipped icons byte for byte both times.
 
 ### §9.12 / §9.12.1 Methods and garnishes
 
