@@ -22,7 +22,7 @@
 // this is the thing that proves it did. CSS cannot ask that question.
 //
 // THE WORD NEVER CHANGES; the mark and the colour carry the state. That is
-// #494's finding, quoted in _layouts/cocktail.html: a label that swaps between
+// #494's finding (DECISIONS §9.13): a label that swaps between
 // two words has to be read as either the state or the action, and there is
 // nothing on screen to say which. So the button says `shortlist` in both
 // states, `_sass/*/_shortlist.scss` draws a `+` or a `✓` in front of it via
