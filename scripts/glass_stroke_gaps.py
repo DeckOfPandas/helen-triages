@@ -1,5 +1,8 @@
 """Open stroke ends: where does a drawing have a hole the stroke cannot cover?
 
+REPRODUCES the rendered-pixel gaps MANUAL.md §9.11 sends you here for, and the
+margarita's that became #739 (1.76 units, 3.2px on a card against a 1px stroke).
+
     python3 scripts/glass_stroke_gaps.py
 
 WHAT IT MEASURES. Every unclosed subpath's endpoints, against the nearest other

@@ -1,5 +1,8 @@
 """What "If you liked this, how about …" would offer, and how thin it gets.
 
+REPRODUCES "every drink's fourth pick shares at least 2" in
+`tests/test_rendered_pages.py`, `_layouts/cocktail.html` and MANUAL.md §9.13.
+
 THE FEATURE (#927, 2026-09-10) is four related drinks at the foot of every
 drink page, chosen in Liquid by `_layouts/cocktail.html`. It was three until
 2026-09-24 -- Helen: "Let's bump to four related cards for cocktails." -- because

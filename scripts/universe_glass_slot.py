@@ -1,5 +1,8 @@
 """How wide must the universe line's glass slot be, if every glass is one height?
 
+REPRODUCES `$universe-glass-slot` (2.3rem) in `_sass/cocktails/_universe.scss`,
+and checks it: on 2026-09-29 the punch bowl needs 2.107rem.
+
 THE TWO RULES THAT PULL AGAINST EACH OTHER, both Helen's, both 2026-09-05:
 "don't scale -- all the same height", and "leave a fixed width for the glass so
 the name tape doesn't jump around on redeal". One height across the 27 drawings

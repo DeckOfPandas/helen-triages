@@ -1,5 +1,8 @@
 """Derive real stroke centrelines from FILLED, uniform-width icon artwork.
 
+REPRODUCES NO NUMBER -- a TOOL, named as the method for fill-only artwork by
+MANUAL.md §9.11 and §9.13 and by `_includes/icons/ship.svg`.
+
 Written for the tiki mug (#355) and kept because the problem recurs: stock
 glass artwork is very often fill-only, and a fill cannot take a stroke-width
 because there is no centreline in it to give a width to. Three careful hand

@@ -7761,6 +7761,27 @@ verification. Dates are when the correction landed.
   - *"Keen to hear ideas for styling N survivors."* — asked, not ruled; the
     ideas were offered in chat and none is built. §13.7's "I liked it bare"
     stands until she looks at a candidate.
+- **2026-09-29, #1203 — every derivation in `scripts/` says what it
+  reproduces, and two of the numbers had moved.** The thirteen scripts the
+  2026-09-24 audit listed each gained a `REPRODUCES …` docstring line (§13.11
+  in the manual). None was deleted: every one is named somewhere in the tree.
+  Eight reproduce a quoted number, each re-run today and matched:
+  slot 2.3rem, breakpoint 820px, inset 4.14%, 3.88:1, 27 icons byte for
+  byte, fourth pick ≥ 2, third pick ≥ 1, the ink ratios. Five reproduce no
+  number and say what depends on them instead: two generators, a tracing
+  tool, a discovery aid, and the leopard generator. **Two findings, reported
+  to Helen rather than acted on:**
+  - `_sass/cocktails/_palette.scss` quotes the worst meaning-alone pair as
+    "magenta vs tangerine under tritanopia at dE 22.6". `#FF00C8` against
+    `#F47E25` measures **19.0** today, and the pre-2026-09-01 magenta
+    `#F127A7` gives 14.1, so 22.6 no longer reproduces from the pair it
+    names. Both still clear the bar of 10, so the conclusion stands and only
+    the figure has aged.
+  - `glass_stroke_gaps.py` ranks the **pineapple** first after the day's
+    redraws: a 2.71-unit end-to-end gap, 8.4px on a card and 11.3px on a
+    drink page, against a 1–2px stroke. Its docstring's own first limit
+    applies: the pineapple is many separate strokes, so this may be two tips
+    that really do sit close. It flags; looking at the drawing decides.
 
 ## §14 Reference pages
 

@@ -1,13 +1,17 @@
 """Ink coverage per glass: which drawings read as a smudge at size?
 
+REPRODUCES the density ratios DECISIONS.md §9.11 and MANUAL.md §9.11 cite as
+the redraw targets of #525 and #738 (tiki mug 2.9x the median on 2026-09-29).
+
     python3 scripts/glass_ink_coverage.py
 
 THE MEASUREMENT #525 SET ITS REDRAW TARGET WITH. That issue found the pineapple
 at 5.3x the set median and the tiki mug at 2.7x, with everything else between
 0.6x and 1.6x -- and used it to say that both were dense enough to need
 redrawing rather than restyling. Helen redrew the pineapple on 2026-09-05 and it
-came down to 2.4x; the tiki mug is now the densest in the set at 3.6x, which is
-#738.
+came down to 2.4x; the tiki mug was then the densest in the set at 3.6x, which
+is #738 -- and still is on 2026-09-29, at 2.9x after the glass redraws of that
+day.
 
 RATIOS, NOT PERCENTAGES, ARE THE COMPARABLE THING. The absolute number depends
 on the render height, the stroke and the ink threshold, so two runs made on

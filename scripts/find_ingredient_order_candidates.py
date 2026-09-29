@@ -2,6 +2,9 @@
 """Rank recipes by how much their ingredient order seems to disagree with
 the order the method actually calls for them (GitHub issue #68).
 
+REPRODUCES NO NUMBER -- a DISCOVERY aid. `tests/test_taxonomy.py` cites the
+word-collision false positives it found as why no item-level order test exists.
+
 WHAT THIS IS: a DISCOVERY aid for finding recipes worth a human read, not
 a source of truth. Two rounds of trying to make this fully automated
 (a real test, or an auto-fix) surfaced genuine word-collision bugs --

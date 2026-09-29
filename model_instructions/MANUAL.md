@@ -3935,7 +3935,11 @@ one.
   as base CSS; say which questions are still open.
 - **Derive numbers, do not pick them, and keep the derivation in `scripts/`**
   (`universe_glass_slot.py`, `universe_line_width.py`); a number derived in
-  `tmp/` is one nobody can reproduce.
+  `tmp/` is one nobody can reproduce. **And say where the number went**: a
+  derivation's docstring opens with a `REPRODUCES …` line naming the value
+  and the file that quotes it, or `REPRODUCES NO NUMBER` and what depends on
+  it instead (#1203). `grep -rl '^REPRODUCES' scripts/` lists every one, so
+  an audit never again has to rediscover which scripts are load-bearing.
 - **A worktree has no drafts** — clone, or the index renders nothing.
 - **Delegation**: a precise spec, reviewed by diff. Tell agents to delete only
   what they created.

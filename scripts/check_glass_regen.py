@@ -1,5 +1,9 @@
 """Would regenerating the glass icons reproduce what is shipped, byte for byte?
 
+REPRODUCES DECISIONS.md §9.11's "a wholesale regeneration reproduces all 27
+shipped icons byte for byte" (27 = 27 on 2026-09-29), and
+`scripts/normalise_glass_icons.py` says to run it after touching its registries.
+
     python3 scripts/check_glass_regen.py
 
 WHY THIS EXISTS. `scripts/normalise_glass_icons.py` rebuilds the whole icon set
