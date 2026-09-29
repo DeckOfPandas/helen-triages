@@ -142,6 +142,14 @@ RUN pip install --break-system-packages --no-cache-dir \
 RUN PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright \
     python3 -m playwright install chromium
 
+# AND WHERE TO FIND IT AT RUN TIME, not only at build time (Helen, 2026-09-29,
+# #1200). The two RUN lines above set the path for their own layer and no
+# further, so until this line the Python binding, left alone, looked in
+# ~/.cache/ms-playwright, found nothing and could not launch. Anything that
+# must prefer a worktree's own tmp/browser/ copy still sets the variable itself
+# and wins: scripts/browser/env.sh does, and so does tests/test_browser_smoke.py.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright/ms-playwright
+
 # Non-root user matching Helen's host uid/gid (1000), so files the
 # container creates on the bind-mounted project directory come back
 # owned by her, not root.

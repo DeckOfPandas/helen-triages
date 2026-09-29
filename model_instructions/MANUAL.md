@@ -161,15 +161,23 @@ refuses all of them (`CLAUDE.md`). To find out whether a credential works,
 use it and read the status code.
 
 **A headless browser exists, and looking is cheaper than reasoning.** Since
-2026-09-15 the devcontainer image carries Playwright 1.47.2, its Chromium and
+2026-09-15 the devcontainer image carries Playwright, its Chromium and
 every system library Chromium needs, under `/opt/playwright`, so a fresh
 worktree needs no install: `sh scripts/browser/install.sh` checks the image's
 copy is the pinned version and stops. Outside the image, or in an image built
 before the pin moved, it installs Playwright and Chromium under `tmp/browser/`
 as before (gitignored; nothing touches `~` or the system, Helen's grant), and
 `scripts/browser/env.sh` — which `shoot.sh` and `crop.sh` source — prefers that
-local copy when it exists. The version is pinned in the Dockerfile and in
-`install.sh`; `tests/test_browser_harness.py` fails if they differ, and bumping
+local copy when it exists. **The Python binding is the same version** (#1200),
+for `tests/test_browser_smoke.py`, and resolves to the same Chromium; the image
+sets `PLAYWRIGHT_BROWSERS_PATH` as an `ENV` since 2026-09-29, and the test
+searches `tmp/browser/` then `/opt/playwright` exactly as `env.sh` does, so it
+also works in an older image and on a host. **The version is pinned in FOUR
+places** — the Dockerfile twice (npm and pip), `install.sh` and
+`requirements-test.txt` — deliberately on one number;
+`tests/test_browser_harness.py` and `tests/test_devcontainer_pins.py` fail if
+they differ, `playwright` is in `dependabot.yml`'s ignore list because a bot
+can only ever move one of the four, and bumping
 it means a rebuild — which since 2026-09-21 `run.sh` does by itself, because it
 stamps each image with a hash of `.devcontainer/` and rebuilds when that hash no
 longer matches the files on disk (`.devcontainer/README.md`, "Keeping the image
@@ -2879,6 +2887,23 @@ build stop rather than a report. Three things are load-bearing:
   `test_every_draft_reading_test_says_what_it_does_without_drafts`; a
   draft-reading test in neither set fails. Per-draft parametrised tests need
   no entry (an empty parametrisation is a visible skip).
+- **CI has no browser either, and the browser smoke test says so** (#1200).
+  `tests/test_browser_smoke.py` runs the production build in headless
+  Chromium: both indexes, a recipe and a drink, at 360 and 1280. It **skips
+  on whether Chromium LAUNCHES, never on whether playwright imports** — CI
+  installs the binding and no browser, so an import skip would run, fail and
+  gate the deploy. The `chromium` fixture is the one probe, and
+  `test_every_browser_test_goes_through_the_launch_probe` holds that. Because
+  that skip happens on every CI run, conftest prints **"Not evidence about a
+  real browser"** at the end of any run where it skipped, with the launch
+  error. `HT_REQUIRE_BROWSER=1` turns the skip into a failure; the workflow
+  should set it in the same edit that installs Chromium, which is Helen's
+  (an agent cannot push under `.github/workflows/`).
+- **The two session builds, `site` and `prod_site`, are in `conftest.py`**,
+  not `test_rendered_pages.py`, since #1200: two modules read them, and a
+  session fixture imported into a second module is a second definition that
+  builds again. Add a module that needs a built page by asking for one of
+  those two — never by building an eighth.
 
 **The cocktail corpus is `_cocktail_recipes/` + `_cocktail_drafts/` through
 `_load()`, the only door** (#540; `test_every_drink_reading_test_goes_through_the_loader`).
@@ -2928,6 +2953,7 @@ Counts move — run the suites, don't quote numbers from here.
 | `test_cocktails.py` | the cocktails' own spec, and the glass ARTWORK's |
 | `test_page_links.py` | every `<a href>` in every template, traced to a literal path; `published: false` pages are excluded from BOTH sides |
 | `test_rendered_pages.py` | assertions about BUILT html: the chrome guards, the stylesheet guard, the gate in both directions on both sites, `test_every_icon_partial_class_has_a_styled_base`, `test_every_text_input_on_the_index_has_state_behind_it` |
+| `test_browser_smoke.py` | the production build in real headless Chromium: no console error or uncaught exception, no sideways scroll at 360/1280, rows after each index's script reaches its last line, a filter click moves "N survivors". Skips when Chromium cannot launch — CI today |
 | `test_source_attribution.py` | the citation rules over recipes and drafts |
 | `test_prose_pages.py` | house typography on the non-recipe pages and their data |
 | `test_magic_bag.py` | `_food_magic_bag/`'s own schema |

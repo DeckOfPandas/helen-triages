@@ -4650,6 +4650,44 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   and this half is what gives it the mood meanwhile. The measurement sits
   beside the list so the next reader does not empty it, see nothing move, and
   conclude it is dead again.
+- **2026-09-29, #1200 — the browser smoke test, and four things it would
+  have got wrong as the issue was written.**
+
+  **Helen's two rulings.** *Keep the opt-in*: `HT_REQUIRE_BROWSER=1` turns
+  the no-browser skip into a failure, for the workflow to set in the same edit
+  that installs Chromium. Without it, a browser install that breaks later
+  skips in CI forever, which is `_require_bundler`'s trap, and keying on
+  `CI=true` today would be red because CI has no browser yet. *Add the ENV*:
+  the Dockerfile now sets `PLAYWRIGHT_BROWSERS_PATH`, and the test's own
+  `tmp/browser/` → `/opt/playwright` search still overrides it, as `env.sh`
+  does, because a worktree's own copy exists precisely when the image is older
+  than the pin.
+
+  **The traps.**
+  - **The issue's overflow measure passes an overflowing phone page.**
+    `document.body.scrollWidth <= innerWidth` is vacuous under mobile
+    emulation, which GROWS `innerWidth` to fit the widest content;
+    `scripts/browser/shoot.js` already said so. The test uses `shoot.js`'s
+    measure and compares against the width it ASKED for.
+  - **Importing `prod_site` into a new module would have built it twice.**
+    An imported session fixture is a second FixtureDef with its own cache.
+    Both builds moved to `conftest.py`.
+  - **"Rows after the JS has run" cannot be read off the rows.** Liquid
+    renders every row; a page with no script at all has them. Both index
+    scripts end in `window.addEventListener('pagehide', …)` (MANUAL §10.2's
+    canary), so an init script records that registration and the test waits
+    for the named function — "the script ran to its last line".
+  - **The probe fixture is asked for first**, so CI's shape skips in 0.5s
+    before any build rather than after one.
+
+  **Proved by breaking**, as §10 asks: eleven cases against a mutated copy of
+  the production build — `cocktail-index.js`'s tag removed, a throw on the
+  drink page, a 404 script on the food index, a 600px element (red at 360,
+  green at 1280), every food row hidden, each index's count never repainting;
+  a clean skip in CI's shape; red under `HT_REQUIRE_BROWSER`; the search
+  overriding a wrong path. And five against the new hygiene guards. Scripts
+  in the branch's worktree `tmp/`: `prove_smoke.py`, `prove_probe_guards.py`,
+  `show_browser_caveat.py`.
 
 ---
 
@@ -5763,6 +5801,23 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
     on purpose**, because the alternative -- attempting a write that succeeds if
     the rule does not hold -- puts a file in her Node runtime to learn something
     of no operational value.
+- **2026-09-29 — two read grants, and neither went live by editing settings.**
+  - **`/opt`, read-only** (Helen: *"Reading from /opt is fine, please add that
+    to your settings."* — the image's Playwright lives there). The
+    `Edit(//opt/**)` deny went in; **adding `/opt` to `additionalDirectories`
+    was refused by Claude Code's auto-mode classifier as self-modification**,
+    so a session cannot widen its own read scope, even on Helen's word in the
+    same conversation. The line is hers to add. The deny alone only narrows.
+  - **Other worktrees, read-only** (Helen: *"Fine to read from other
+    worktrees."*). **Already granted**: `/workspace/.claude/worktrees` has been
+    in `additionalDirectories` on `main`, and was there at session start. The
+    Read tool in a worktree session still refused
+    `.claude/worktrees/opus-devops/tmp/prove_pins.py` as outside the working
+    directories. Observed, not diagnosed. It matches the entry above, where
+    worktree isolation refuses a Write before any permission rule gets a turn,
+    but no read was attempted to tell which. **So a settings edit is not the
+    fix for either, and `/add-dir` is the route in a running session**, as
+    `CLAUDE.md` already says for a new grant.
 
 ### §11.2 The record of this file being wrong
 

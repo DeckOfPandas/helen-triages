@@ -11,13 +11,110 @@ came from rather than making you go and find it.
 """
 from __future__ import annotations
 
+import os
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+# =============================================================================
+# THE TWO SESSION BUILDS -- moved here from test_rendered_pages.py for #1200
+# =============================================================================
+# Two modules now load pages out of the same builds: test_rendered_pages.py
+# reads the HTML, and test_browser_smoke.py runs it in Chromium. A session
+# fixture defined in one module and IMPORTED into another is a second fixture
+# definition with its own cache, so it builds twice; defined here it is one
+# definition, one build per run, whoever asks first. The builds are the
+# slowest thing in the suite (~5.5s each), which is the whole reason to share.
+
+BUILD_DIR = ROOT / "tmp" / "_test_site"
+PROD_BUILD_DIR = ROOT / "tmp" / "_test_site_prod"
+
+
+# A SKIP IS A LIE IN CI. Locally, "no bundler on this machine" is a fair reason
+# to stand down: not every contributor has a Ruby toolchain, and the rest of the
+# suite is still worth running. In CI the toolchain is installed on purpose, so
+# a missing bundler means the setup step did not do its job -- and skipping
+# would report green for the two tests that are the only ones checking BUILT
+# output, including the production-only 404s that nothing local can reproduce.
+#
+# GitHub Actions sets CI=true. Fail there, skip here.
+def _require_bundler():
+    if shutil.which("bundle") is not None:
+        return
+    if os.environ.get("CI"):
+        pytest.fail(
+            "No bundler in CI. The Ruby setup step did not take effect, so the "
+            "rendered-output tests cannot build the site -- and skipping them "
+            "here would report green for the only tests that check what is "
+            "actually published."
+        )
+    pytest.skip("no bundler on this machine; skipping rendered-output tests")
+
+
+@pytest.fixture(scope="session")
+def site() -> Path:
+    """Build once per run, into the project's own tmp/ (never /tmp — CLAUDE.md).
+
+    Uses the local config as well as the production one, so drafts build and the
+    output matches what Helen actually looks at.
+    """
+    _require_bundler()
+
+    result = subprocess.run(
+        ["bundle", "exec", "jekyll", "build",
+         "--config", "_config.yml,_config_local.yml",
+         "--destination", str(BUILD_DIR)],
+        cwd=ROOT, capture_output=True, text=True, timeout=600,
+    )
+    if result.returncode != 0:
+        pytest.fail(
+            "jekyll build failed, so nothing below can be trusted:\n"
+            + result.stdout[-2000:] + result.stderr[-2000:]
+        )
+    yield BUILD_DIR
+    shutil.rmtree(BUILD_DIR, ignore_errors=True)
+
+
+@pytest.fixture(scope="session")
+def prod_site() -> Path:
+    """A SECOND build, with the production config alone -- no _config_local.yml.
+
+    Worth the extra four seconds because the `site` fixture above cannot see
+    this entire class of bug, and one of them shipped. Locally, drafts have
+    `output: true`, so every link to one resolves and the page looks right. In
+    production `output: false`, and a link to a draft is a 404 that nothing on
+    a developer's machine can reproduce.
+
+    That is not hypothetical: GitHub issue #235. food/index.html tested
+    `{% if site.food_drafts %}` before concatenating drafts into the list --
+    which is a test of whether the collection is DECLARED, always true, rather
+    than whether it PUBLISHES. Ten drafts with meta.rewritten: true were listed
+    on the live index, each linking to /helen-triages/food_drafts/<slug>.html,
+    Jekyll's default URL for a document it never wrote. Helen found it by
+    looking at the production mockup on :4002.
+    """
+    _require_bundler()
+
+    result = subprocess.run(
+        ["bundle", "exec", "jekyll", "build",
+         "--config", "_config.yml",
+         "--destination", str(PROD_BUILD_DIR)],
+        cwd=ROOT, capture_output=True, text=True, timeout=600,
+    )
+    if result.returncode != 0:
+        pytest.fail(
+            "production jekyll build failed:\n"
+            + result.stdout[-2000:] + result.stderr[-2000:]
+        )
+    yield PROD_BUILD_DIR
+    shutil.rmtree(PROD_BUILD_DIR, ignore_errors=True)
 
 # This is a mono-repo: food and cocktails are built from one Jekyll site, so a
 # collection's source directory carries the site in its name. Jekyll only finds
@@ -302,22 +399,60 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     A header scrolls away behind several thousand dots. This does not.
     """
     try:
-        absent = _absent_drafts()
-        if not absent:
-            return
-        write = terminalreporter.write_line
-        write("")
-        write("Not evidence about the drafts:", bold=True)
-        for name in absent:
-            write(f"  {name} is absent -- {_CLONE[name]}")
-        if UNCREATED:
-            n = len(UNCREATED)
-            write(f"  {n} per-draft check{'s' if n != 1 else ''} in this suite "
-                  f"produced no tests at all, rather than failing or skipping.")
-        write("  Cloning is reading: it needs no ask, and both clones make the "
-              "suite whole.")
+        _report_absent_drafts(terminalreporter.write_line)
     except Exception:
-        return          # a report that breaks a run would be worse than none
+        pass            # a report that breaks a run would be worse than none
+    try:
+        _report_browser_skips(terminalreporter.write_line,
+                              terminalreporter.stats.get("skipped", []))
+    except Exception:
+        pass
+
+
+def _report_absent_drafts(write):
+    absent = _absent_drafts()
+    if not absent:
+        return
+    write("")
+    write("Not evidence about the drafts:", bold=True)
+    for name in absent:
+        write(f"  {name} is absent -- {_CLONE[name]}")
+    if UNCREATED:
+        n = len(UNCREATED)
+        write(f"  {n} per-draft check{'s' if n != 1 else ''} in this suite "
+              f"produced no tests at all, rather than failing or skipping.")
+    write("  Cloning is reading: it needs no ask, and both clones make the "
+          "suite whole.")
+
+
+# THE BROWSER SMOKE TEST'S SKIP, SAID AT THE END (#1200, 2026-09-29). It skips
+# whenever Chromium cannot launch -- in CI today, which installs the Python
+# binding and no browser, and on any machine where the browser has gone
+# missing. A skip that happens on every run is a test that never runs, and one
+# `s` among thirty thousand dots is not a report. So the run says so where the
+# drafts caveat does, with the probe's own reason, and stays silent when the
+# test ran. Computed from THIS run's skip reports, not from state the test
+# module sets, so it cannot claim a skip that did not happen.
+BROWSER_SMOKE = "test_browser_smoke.py"
+
+
+def _report_browser_skips(write, skipped):
+    reasons = []
+    for rep in skipped:
+        if BROWSER_SMOKE not in getattr(rep, "nodeid", ""):
+            continue
+        longrepr = getattr(rep, "longrepr", None)
+        reason = longrepr[2] if isinstance(longrepr, tuple) else str(longrepr)
+        reasons.append(reason.removeprefix("Skipped: "))
+    if not reasons:
+        return
+    n = len(reasons)
+    write("")
+    write("Not evidence about a real browser:", bold=True)
+    write(f"  {n} browser smoke test{'s' if n != 1 else ''} skipped -- "
+          f"{sorted(set(reasons))[0]}")
+    write("  Locally: sh scripts/browser/install.sh. CI installs no browser "
+          "until the workflow does (#1200).")
 
 
 @pytest.fixture(scope="session")

@@ -24,7 +24,6 @@ from __future__ import annotations
 import contextlib
 import html as html_module
 import json
-import os
 import pathlib
 import re
 import shutil
@@ -39,28 +38,14 @@ import yaml
 pytestmark = pytest.mark.shared
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-BUILD_DIR = ROOT / "tmp" / "_test_site"
 
-
-# A SKIP IS A LIE IN CI. Locally, "no bundler on this machine" is a fair reason
-# to stand down: not every contributor has a Ruby toolchain, and the rest of the
-# suite is still worth running. In CI the toolchain is installed on purpose, so
-# a missing bundler means the setup step did not do its job -- and skipping
-# would report green for the two tests that are the only ones checking BUILT
-# output, including the production-only 404s that nothing local can reproduce.
-#
-# GitHub Actions sets CI=true. Fail there, skip here.
-def _require_bundler():
-    if shutil.which("bundle") is not None:
-        return
-    if os.environ.get("CI"):
-        pytest.fail(
-            "No bundler in CI. The Ruby setup step did not take effect, so the "
-            "rendered-output tests cannot build the site -- and skipping them "
-            "here would report green for the only tests that check what is "
-            "actually published."
-        )
-    pytest.skip("no bundler on this machine; skipping rendered-output tests")
+# THE TWO SESSION BUILDS, `site` AND `prod_site`, LIVE IN conftest.py SINCE
+# #1200 (2026-09-29), with `_require_bundler`. tests/test_browser_smoke.py
+# loads pages out of the same production build, and a session fixture IMPORTED
+# into a second module is a second fixture definition with its own cache -- so
+# importing it would have built the site twice. conftest is the one place both
+# modules see the same definition.
+from conftest import _require_bundler  # noqa: E402  (used by built_with_fixtures)
 
 
 # =============================================================================
@@ -145,68 +130,6 @@ def built_with_fixtures(name, files):
     finally:
         shutil.rmtree(src, ignore_errors=True)
         shutil.rmtree(out, ignore_errors=True)
-
-
-@pytest.fixture(scope="session")
-def site() -> pathlib.Path:
-    """Build once per run, into the project's own tmp/ (never /tmp — CLAUDE.md).
-
-    Uses the local config as well as the production one, so drafts build and the
-    output matches what Helen actually looks at.
-    """
-    _require_bundler()
-
-    result = subprocess.run(
-        ["bundle", "exec", "jekyll", "build",
-         "--config", "_config.yml,_config_local.yml",
-         "--destination", str(BUILD_DIR)],
-        cwd=ROOT, capture_output=True, text=True, timeout=600,
-    )
-    if result.returncode != 0:
-        pytest.fail(
-            "jekyll build failed, so nothing below can be trusted:\n"
-            + result.stdout[-2000:] + result.stderr[-2000:]
-        )
-    yield BUILD_DIR
-    shutil.rmtree(BUILD_DIR, ignore_errors=True)
-
-
-PROD_BUILD_DIR = ROOT / "tmp" / "_test_site_prod"
-
-
-@pytest.fixture(scope="session")
-def prod_site() -> pathlib.Path:
-    """A SECOND build, with the production config alone -- no _config_local.yml.
-
-    Worth the extra four seconds because the `site` fixture above cannot see
-    this entire class of bug, and one of them shipped. Locally, drafts have
-    `output: true`, so every link to one resolves and the page looks right. In
-    production `output: false`, and a link to a draft is a 404 that nothing on
-    a developer's machine can reproduce.
-
-    That is not hypothetical: GitHub issue #235. food/index.html tested
-    `{% if site.food_drafts %}` before concatenating drafts into the list --
-    which is a test of whether the collection is DECLARED, always true, rather
-    than whether it PUBLISHES. Ten drafts with meta.rewritten: true were listed
-    on the live index, each linking to /helen-triages/food_drafts/<slug>.html,
-    Jekyll's default URL for a document it never wrote. Helen found it by
-    looking at the production mockup on :4002.
-    """
-    _require_bundler()
-
-    result = subprocess.run(
-        ["bundle", "exec", "jekyll", "build",
-         "--config", "_config.yml",
-         "--destination", str(PROD_BUILD_DIR)],
-        cwd=ROOT, capture_output=True, text=True, timeout=600,
-    )
-    if result.returncode != 0:
-        pytest.fail(
-            "production jekyll build failed:\n"
-            + result.stdout[-2000:] + result.stderr[-2000:]
-        )
-    yield PROD_BUILD_DIR
-    shutil.rmtree(PROD_BUILD_DIR, ignore_errors=True)
 
 
 def test_no_link_in_the_production_build_points_at_a_file_that_isnt_there(prod_site):
