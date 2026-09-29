@@ -150,6 +150,13 @@ canonical:
     # and is composed by `in_the_glass` below, the same trade the strain group
     # made in 2026-09-05.
     - "Half-fill with crushed ice."
+    # TWO THIRDS, 2026-09-29, and it is the Moscow Mule's own wording with the
+    # glass taken off the string. It said "Two-thirds fill the mug with crushed
+    # ice." -- which names a vessel without saying WHICH, the exact complaint
+    # #1214 was raised about, one step further along. HOW FULL IS THE
+    # INFORMATION and is why this is a third fill step rather than a rewording
+    # of `Fill with crushed ice.`
+    - "Two-thirds fill with crushed ice."
     - "Top with champagne."
     # SODA WATER, NEVER CLUB SODA -- Helen's ruling, 2026-09-02: she is not in
     # the US and doubts the difference is more than marketing. Eight drinks said
@@ -338,6 +345,7 @@ in_the_glass:
   "Add all ingredients.": "Add all ingredients to <glass>."
   "Fill with crushed ice.": "Fill <glass> with crushed ice."
   "Half-fill with crushed ice.": "Half-fill <glass> with crushed ice."
+  "Two-thirds fill with crushed ice.": "Two-thirds fill <glass> with crushed ice."
   "Rinse the glass with absinthe and dump.": "Rinse <glass> with absinthe and dump."
 
 # =============================================================================
