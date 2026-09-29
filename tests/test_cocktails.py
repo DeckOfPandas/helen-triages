@@ -1842,7 +1842,22 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first, as every move before it: the test named
 # exactly those four files, every one "last touched by 17d16384", and nothing
 # else. Covers 17d1638 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "17d1638"   # four drinks promoted from 4-promote/
+# MOVED 2026-09-29 FOR THE SECOND PROMOTION OF THE BATCH. `12765a9` brings
+# chartreuse-swizzle, cobra-effect, gin-rickey, kamaniwanalaya, moscow-mule and
+# reef-juice out of `4-promote/`, already `proofread: true` because Helen read
+# them there and pushed.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly those six files, every one "last touched by 12765a92", and nothing
+# else. Covers 12765a9 and nothing after.
+#
+# ONE OF THE SIX WAS EDITED AFTER HER PROOFREAD, and it is worth saying which
+# and why it is still covered. Kamaniwanalaya's strain step read "Strain into a
+# collins glass filled with ice." -- the sentence the LAYOUT composes from
+# `Strain.` plus glasses.yml plus serve.yml -- so the stored form became the
+# bare technique. The rendered page is byte-identical to what she read, which is
+# the only reason that edit did not need a fresh proofread.
+COCKTAIL_BASELINE_COMMIT = "12765a9"   # six drinks promoted from 4-promote/
 
 
 def _newest_commit_per_published_drink():
