@@ -3017,6 +3017,43 @@ unless stated.
   days after the instruction to check by hand was written. Three comments
   had said the card template "raises every ratio to a power"; it never had
   (§12).
+- **2026-09-28, #1238 (towards #295) — what each glass holds, as a spec.**
+  #295 was titled *"a dictionary of glasses I own with their volumes"*; the plan
+  proposed a third list, the cupboard, beside the spec. Helen: ***"I don't want
+  inventory, just spec. I might buy new glasses (okay I certainly will). The
+  'right' glasses might be dirty. I might have more guests than 'right'
+  glasses. Basically, as usual with this site, let's offer rules, then I'll
+  happily break them in the kitchen."*** So there is no inventory, and #295's
+  remaining half is a reference page of the spec. She asked for **mean and
+  median as well as the range**, for all 27 icons, and for sourced heights too.
+  - **317 products surveyed from makers' and retailers' own pages**, admitted
+    only when the page names the type. Six are excluded with a reason (a flat
+    tumbler sold as an "absinthe glass", two tumblers sold as "sling"). About
+    80% of the tall-glass and tumbler rows came from WebstaurantStore, the one retailer that
+    reliably lists heights, whose "approximate maximum capacity" boilerplate is
+    why most rows say `unstated` rather than `brimful`. **Thin types, and said
+    so:** sour (3), sling (4), pineapple (3 manufactured vessels, no fruit),
+    coconut (3).
+  - **The mule mug was surveyed apart and earned it**: median 473 ml against a
+    tea mug's 350, at 95 mm against 91. One drawing, two capacities —
+    `survey_only_types`.
+  - **The first fit report flagged 63 of 137 drinks, a Tom Collins in a
+    highball among them, and the model was wrong, not the drinks.** Every
+    factor had come from the middle of its sourced range, and stacked middles
+    overflow: dilution at Arnold's +55%, ice at 50% of the glass by bulk
+    packing (a glass-specific figure says 31–38%, and floating ice displaces
+    nothing above the waterline). So every factor became a `{low, high}` range
+    and the report reads the forgiving end. Two more faults went with it: a
+    short neat pour in a tumbler is how a Sazerac is MEANT to look, so "under
+    half a glass" applies to stemmed glasses only; and a top fills what the
+    build leaves (#1076's argument), so a topped drink is judged on its build
+    plus the room left for the top. **24 flagged after, 18 items and one
+    grouped punch question.**
+  - **The guessed `heights_mm` were mostly right** — 17 of 27 within 8% of the
+    surveyed median. The ones that are not: Collins 180 → 152 (the glass Helen
+    said read too tall on 2026-08-26), coconut 115 → 95, punch bowl 130 → 256.
+    Not switched: it resizes every glass, and the punch bowl would become the
+    tallest glass and so the scale's denominator.
 
 ### §9.12 / §9.12.1 Methods and garnishes
 

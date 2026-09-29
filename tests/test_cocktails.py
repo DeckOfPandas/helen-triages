@@ -5602,6 +5602,100 @@ def test_drinks_use_the_canonical_glass_spelling():
     )
 
 
+GLASS_SURVEY = ROOT / "_data" / "cocktails" / "glass_survey.yml"
+
+
+def _glass_survey():
+    return yaml.safe_load(GLASS_SURVEY.read_text(encoding="utf-8"))["survey"]
+
+
+def test_glass_survey_statistics_are_current():
+    """`typical_ml` / `typical_height_mm` in glasses.yml ARE the survey's sums.
+
+    THE SAME CODE `--check` RUNS, imported rather than re-implemented (#1238).
+    The survey is the fact -- a figure and a source per product -- and the
+    statistics are its shadow, generated between a marker pair. A hand edit
+    inside the markers would be a number with no product behind it.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from glass_survey_stats import check  # noqa: E402
+
+    diff, problems = check()
+    assert not (diff or problems), (
+        "glasses.yml's surveyed statistics no longer match glass_survey.yml:\n\n"
+        + "\n".join(problems) + ("\n" if problems else "") + diff
+        + "\nRun: python3 scripts/glass_survey_stats.py --write\n"
+          "Fix a figure in the SURVEY, never between the markers."
+    )
+
+
+def test_every_glass_type_has_a_sourced_capacity_and_height():
+    """All 27 icons, plus the survey-only mule mug -- Helen, 2026-09-28: "All
+    27 please." An icon with no drink yet still gets its numbers: the page
+    that states them is a spec, and a spec covers what it declares."""
+    g = _glasses()
+    want = set(g["all_icons"]) | set(g.get("survey_only_types") or {})
+    for block in ("typical_ml", "typical_height_mm"):
+        have = g.get(block) or {}
+        missing = sorted(k for k in want if not have.get(k))
+        extra = sorted(set(have) - want)
+        assert not missing and not extra, (
+            f"`{block}` in glasses.yml: missing {missing}, unexpected {extra}. "
+            "Add survey rows for a missing type; do not type a figure in."
+        )
+
+
+def test_every_survey_row_is_a_sourced_figure():
+    """Each row says what product, whose, what the page said, and where."""
+    bad = []
+    for i, row in enumerate(_glass_survey()):
+        where = f"row {i} ({row.get('product')!r})"
+        for field in ("glass", "product", "maker", "stated", "source"):
+            if not str(row.get(field) or "").strip():
+                bad.append(f"{where}: no `{field}`")
+        for field in ("capacity_ml", "height_mm"):
+            v = row.get(field)
+            if v is not None and not (isinstance(v, int) and v > 0):
+                bad.append(f"{where}: `{field}` is {v!r}, not a positive whole number or null")
+        # A search that came back empty is a finding, and is kept -- but it
+        # must say what was looked for, or it is just an empty row.
+        if row.get("capacity_ml") is None and row.get("height_mm") is None \
+                and not str(row.get("note") or "").strip():
+            bad.append(f"{where}: carries neither a capacity nor a height, and no note why")
+        if "exclude" in row and not str(row["exclude"]).strip():
+            bad.append(f"{where}: `exclude` must say why")
+    assert not bad, "glass_survey.yml:\n  " + "\n  ".join(bad)
+
+
+def test_a_survey_only_type_is_a_spelling_that_draws_another_icon():
+    """`mule-mug` is surveyed apart from `mug` because it holds a third more,
+    and draws AS the mug. If `mule mug` ever gets its own drawing, it becomes an
+    icon and this declaration should go -- this test is what says so."""
+    g = _glasses()
+    bad = []
+    for key, spec in (g.get("survey_only_types") or {}).items():
+        if key in g["all_icons"]:
+            bad.append(f"{key}: is an icon now, so it needs no survey-only entry")
+        for spelling in spec.get("spellings") or []:
+            if g["icons"].get(spelling) != spec.get("draws_as"):
+                bad.append(f"{key}: {spelling!r} draws {g['icons'].get(spelling)!r}, "
+                           f"not {spec.get('draws_as')!r}")
+    assert not bad, "survey_only_types:\n  " + "\n  ".join(bad)
+
+
+def test_every_fit_rule_range_runs_low_to_high():
+    """The report flags on the LOW end of each range (the forgiving one); a
+    reversed pair would quietly make it the harsh one."""
+    rules = _glasses()["fit_rules"]
+    ranges = {f"dilution.{k}": v for k, v in rules["dilution"].items()}
+    ranges |= {f"ice_space.{k}": v for k, v in rules["ice_space"].items()}
+    for k in ("blended_multiplier", "large_cube_ml", "punch_cup_ml"):
+        ranges[k] = rules[k]
+    bad = [f"{k}: {v}" for k, v in ranges.items()
+           if not (isinstance(v, dict) and 0 <= v["low"] <= v["high"])]
+    assert not bad, "fit_rules ranges out of order:\n  " + "\n  ".join(bad)
+
+
 def test_every_mapped_glass_names_an_icon_that_exists():
     """A key pointing at a missing file is worse than a missing key.
 

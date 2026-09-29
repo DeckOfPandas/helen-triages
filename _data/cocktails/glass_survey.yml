@@ -1,0 +1,2956 @@
+# =============================================================================
+# GLASS SURVEY -- what each glass type measures on the market (#1238)
+# =============================================================================
+# One row per DISTINCT product, researched 2026-09-28 by fetching makers' and
+# retailers' own pages. `glasses.yml` carries the statistics (n, min, median,
+# mean, max) GENERATED from this file by scripts/glass_survey_stats.py; fix a
+# figure here, never there.
+#
+# THE RULE FOR A ROW: the maker or retailer itself names the product as that
+# type. Nothing was classified by looks, and the same product sold by two
+# retailers counts once. `stated` is the page's own wording; `capacity_ml` is
+# that converted (US fl oz x 29.574, UK fl oz x 28.413, ml as given) and
+# `height_mm` is overall height (inches x 25.4), null where the page gives
+# none. Nothing is estimated.
+#
+# capacity_basis: `brimful` where the page gives a to-the-brim figure,
+# `nominal` where it gives a pour or a filling line (NOT counted as a
+# capacity -- a design pour is not what the glass holds), `documented` for a
+# fruit vessel's volume from a reference source, `unstated` otherwise. Most
+# rows are `unstated`: WebstaurantStore, the one retailer that reliably lists
+# heights, carries a site-wide line that its capacities are "an approximate
+# maximum capacity based off of an industry standard size", which is not a
+# measurement of the product.
+#
+# A ROW WITH NEITHER FIGURE IS A SEARCH THAT CAME BACK EMPTY, and it is kept on
+# purpose: "no bar source states what a hollowed pineapple holds" is a finding,
+# and its note says what was looked for.
+#
+# exclude: "<why>" -- recorded and NOT counted. The naming rule admits a few
+# products that plainly are not the shape the icon draws; they stay here with
+# the reason, so the judgement is visible and reversible.
+#
+# `mule-mug` IS NOT AN ICON. The `mule mug` spelling draws the plain mug, and
+# rightly (the drawing cannot say "copper"), but a copper mule mug holds about
+# a third more than a tea mug at the same height, so it is surveyed on its own.
+# `survey_only_types` in glasses.yml declares it.
+#
+# THE TWO FRUIT VESSELS ARE THIN. No bar or recipe source states what a real
+# hollowed pineapple holds; the pineapple rows with figures are manufactured
+# pineapple vessels, each marked so in its note. The coconut has one
+# documented fruit figure (a drinking coconut's water) and a few coconut cups.
+# =============================================================================
+
+survey:
+- glass: absinthe
+  product: Pontarlier Reservoir Absinthe Glass (Bistrot 608001)
+  maker: La Rochère
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz, with a 30ml dosing reservoir; height 6.5 inches
+  height_mm: 165
+  source: https://www.absintheonthenet.com/Pontarlier-Reservoir-Absinthe-Glass-p/pii.htm
+  note: Reservoir type. absinthe.de gives height ~16.5 cm (its '1 Liter' capacity is clearly an error).
+    The Whisky Exchange lists it as 10.5oz (29.5cl) but the page returned 403.
+- glass: absinthe
+  product: Absinthe Glass Yvonne (Molded)
+  maker: La Rochère
+  capacity_ml: 163
+  capacity_basis: unstated
+  stated: 5.5 oz; height 6.5 in
+  height_mm: 165
+  source: https://www.absintheonthenet.com/Yvonne-Absinthe-Glass-p/pery.htm
+  note: No reservoir mentioned.
+- glass: absinthe
+  product: Absinthe Glass Lyonnais (Molded) (631701)
+  maker: La Rochère
+  capacity_ml: 229
+  capacity_basis: unstated
+  stated: 7.75 oz; height 6.75 inches
+  height_mm: 171
+  source: https://www.absintheonthenet.com/Lyonnais-Absinthe-Glass-p/lyn.htm
+  note: ''
+- glass: absinthe
+  product: Lyonnais Petite Absinthe Glass (626501)
+  maker: La Rochère
+  capacity_ml: 207
+  capacity_basis: unstated
+  stated: 7 oz; height 4 1/4 inches
+  height_mm: 108
+  source: https://www.absintheonthenet.com/Lyonnais-Absinthe-Glass-p/lynp.htm
+  note: Short-footed version.
+- glass: absinthe
+  product: Absinthe Glass Artois (Molded), Etched
+  maker: La Rochère
+  capacity_ml: 281
+  capacity_basis: unstated
+  stated: 9.5 oz; height 5 inches
+  height_mm: 127
+  source: https://www.absintheonthenet.com/Artois-Absinthe-Glass-Skull-Etched-p/artes.htm
+  note: ''
+- glass: absinthe
+  product: Absinthe glass Solidago
+  maker: DETESK
+  capacity_ml: 250
+  capacity_basis: unstated
+  stated: approximately 250 ml, reservoir approximately 50 ml
+  height_mm: null
+  source: https://www.absinthe.de/en/Absinthe-glass-Solidago
+  note: Hand-blown reservoir glass; no height given.
+- glass: absinthe
+  product: 'Original Absinthe Glass: Vintage Reservoir Pontarlier Style'
+  maker: Amehla Co.
+  capacity_ml: 207
+  capacity_basis: unstated
+  stated: Total glass capacity 7 oz; reservoir 1 oz; height 5.5 inches
+  height_mm: 140
+  source: https://amehlaco.com/products/original-absinthe-glass
+  note: Same product appears to be sold as Educated Barfly / Advanced Mixology / Collins & Coupe 'Original
+    Absinthe Glass'; counted once.
+- glass: absinthe
+  product: Absinthe Pontarlier Bubble Glasses
+  maker: Glassique Cadeau
+  capacity_ml: 192
+  capacity_basis: unstated
+  stated: 6.5 fluid ounces total; height 5.12 inches
+  height_mm: 130
+  source: https://glassiquecadeau.com/products/belle-epoque-absinthe-bubble-glasses-set-of-4-french-pontarlier-reservoir-shape
+  note: Bubble-reservoir type.
+- glass: absinthe
+  product: Pernod Tarragona Etched Bubble Reservoir Absinthe Glass
+  maker: unstated (sold by Absinthe on the Net)
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz., 5 3/4 in.
+  height_mm: 146
+  source: https://www.absintheonthenet.com/Bubble-Reservoir-Glass-Pernod-Tarragona-Etched-p/pbrgtp.htm
+  note: Mouth-blown bubble reservoir; maker not named on the page.
+- glass: absinthe
+  product: Absinthe glass Shetland
+  maker: Arcoroc
+  capacity_ml: 220
+  capacity_basis: unstated
+  stated: 220ml total capacity; height 12.1 cm
+  height_mm: 121
+  source: https://www.barstuff.com/absinthe-glass-shetland-arcoroc-220ml-339G1
+  note: 'FLAG: the retailer names it an absinthe glass but describes a plain stemless tumbler (''a clear
+    and simple shaped long drink glass''), no reservoir. Kept because the naming rule admits it; consider
+    excluding.'
+  exclude: a plain stemless tumbler; the retailer names it an absinthe glass, the shape is not one
+- glass: brandy
+  product: Libbey Embassy 5.5 oz. Brandy Glass (3702)
+  maker: Libbey
+  capacity_ml: 163
+  capacity_basis: unstated
+  stated: 5.5 oz.; 4 1/8 Inches
+  height_mm: 105
+  source: https://www.webstaurantstore.com/libbey-3702-embassy-5-5-oz-brandy-glass-case/5513702.html
+  note: Embassy range has five sizes; four recorded
+- glass: brandy
+  product: Libbey Embassy 11.5 oz. Brandy Glass (3705)
+  maker: Libbey
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 11.5 oz.; 5 Inches
+  height_mm: 127
+  source: https://www.webstaurantstore.com/libbey-3705-embassy-11-5-oz-brandy-glass-case/5513705.html
+  note: ''
+- glass: brandy
+  product: Libbey Embassy 17.5 oz. Brandy Glass (3708)
+  maker: Libbey
+  capacity_ml: 518
+  capacity_basis: unstated
+  stated: 17.5 oz.; 5 1/2 Inches
+  height_mm: 140
+  source: https://www.webstaurantstore.com/libbey-3708-embassy-17-5-oz-brandy-glass-case/5513708.html
+  note: ''
+- glass: brandy
+  product: Libbey Embassy 22 oz. Brandy Glass (3709)
+  maker: Libbey
+  capacity_ml: 651
+  capacity_basis: unstated
+  stated: 22 oz.; 6 Inches
+  height_mm: 152
+  source: https://www.webstaurantstore.com/libbey-3709-embassy-22-oz-brandy-glass-case/5513709.html
+  note: ''
+- glass: brandy
+  product: Arcoroc 71079 Excalibur 12 oz. Brandy Glass
+  maker: Arcoroc
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.; 5 1/4 Inches
+  height_mm: 133
+  source: https://www.webstaurantstore.com/arcoroc-71079-excalibur-12-oz-brandy-glass-by-arc-cardinal-case/55271079.html
+  note: ''
+- glass: brandy
+  product: Schott Zwiesel Mondial 18.3 oz. Brandy Snifter
+  maker: Schott Zwiesel
+  capacity_ml: 541
+  capacity_basis: unstated
+  stated: 18.3 oz.; 5 13/16 Inches
+  height_mm: 148
+  source: https://www.webstaurantstore.com/schott-zwiesel-0008-133948-tritan-mondial-17-3-oz-brandy-snifter-case/5498133948.html
+  note: URL slug says 17.3 oz; page says 18.3 oz
+- glass: brandy
+  product: Stolzle Specialty 14.75 oz. Brandy Snifter
+  maker: Stolzle
+  capacity_ml: 436
+  capacity_basis: unstated
+  stated: 14.75 oz.; 5 1/2 Inches
+  height_mm: 140
+  source: https://www.webstaurantstore.com/stolzle-specialty-from-global-tableware-collective-15-oz-brandy-snifter-pack/5502050018.html
+  note: ''
+- glass: brandy
+  product: Pasabahce Capri 9.25 oz. Brandy Glass
+  maker: Pasabahce
+  capacity_ml: 274
+  capacity_basis: unstated
+  stated: 9.25 oz.; 4 5/8 Inches
+  height_mm: 117
+  source: https://www.webstaurantstore.com/pasabahce-44741-048-capri-9-oz-brandy-glass-case/543P44741.html
+  note: ''
+- glass: brandy
+  product: RAK Connoisseur Essentials Lucent 13.5 oz. Stemmed Brandy Glass
+  maker: RAK Porcelain
+  capacity_ml: 399
+  capacity_basis: unstated
+  stated: 13.5 oz.; 5 7/8 Inches
+  height_mm: 149
+  source: https://www.webstaurantstore.com/rak-connoisseur-essentials-collection-lucent-13-7-oz-brandy-glass-case/550LUCBRN13.html
+  note: ''
+- glass: brandy
+  product: Chef & Sommelier N8172 Specialty 24 oz. Brandy Glass
+  maker: Chef & Sommelier (Arc)
+  capacity_ml: 710
+  capacity_basis: unstated
+  stated: 24 oz.; 6 3/4 Inches
+  height_mm: 171
+  source: https://www.webstaurantstore.com/chef-sommelier-n8172-specialty-24-oz-brandy-glass-by-arc-cardinal-case/552N8172.html
+  note: largest brandy glass found
+- glass: brandy
+  product: Luigi Bormioli Swing Crystal Brandy Snifter Glass 16.5oz 47cl
+  maker: Luigi Bormioli
+  capacity_ml: 470
+  capacity_basis: unstated
+  stated: 16.5oz / 47cl; height 12.70 cm; diameter 9.50 cm
+  height_mm: 127
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Brandy-Glasses/Luigi-Bormioli-Swing-Crystal-Brandy-Snifter-Glass-16-5oz-47cl~p~CF740
+  note: Speakeasy Swing range
+- glass: brandy
+  product: Michelangelo Masterpiece Cognac Glasses
+  maker: Luigi Bormioli
+  capacity_ml: 392
+  capacity_basis: unstated
+  stated: 13.25 fl oz; 5.4 inches
+  height_mm: 137
+  source: https://luigibormioliusa.com/products/michelangelo-brandy
+  note: 'BORDERLINE on the naming rule: the maker''s page title says ''Cognac Glasses'', its URL says
+    ''michelangelo-brandy'', and Amazon sells it as ''Napoleon Brandy''. Drop it if cognac does not count'
+- glass: coconut
+  product: Young coconut, water content at 8-9 months (Malayan Tall)
+  maker: Tetra Pak Coconut Handbook
+  capacity_ml: 518
+  capacity_basis: documented
+  stated: 5-6 months 684 mL; 8-9 months 518 mL; >12 months 332 mL
+  height_mm: null
+  source: https://coconuthandbook.tetrapak.com/chapter/composition
+  note: liquid inside a whole nut, i.e. what a drinking coconut holds before anything is added; the handbook
+    says water peaks at 7-9 months. No dimensions given
+- glass: coconut
+  product: Coconut, water content range
+  maker: Copra Coconuts (FAQ)
+  capacity_ml: null
+  capacity_basis: documented
+  stated: a coconut contains about 200 to 1000 milliliters (7 to 34 ounces) of coconut water, depending
+    on its size and maturity
+  height_mm: null
+  source: https://copracoconuts.com/blogs/faq/how-much-coconut-water-is-inside-a-single-coconut
+  note: a RANGE, 200-1000 ml; not a single figure
+- glass: coconut
+  product: Coco Casa 10 oz Handmade Coconut Cocktail Coconut Cup
+  maker: Coco Casa (Restaurantware)
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10.0 oz; 4" x 4" x 3 1/4"; height 3.37 inches
+  height_mm: 86
+  source: https://www.restaurantware.com/products/coco-casa-10-oz-handmade-coconut-cocktail-coconut-cup-4-x-4-x-3-1-4-40-count-box
+  note: real coconut half-shell cup on a wooden base, sold for cocktails; the title says 3 1/4 in, the
+    spec 3.37 in
+- glass: coconut
+  product: Natural Coconut Shell Wine Cup
+  maker: Ancient Cookware
+  capacity_ml: 237
+  capacity_basis: nominal
+  stated: 8 oz (filled comfortably without overflowing); 4.25 inches
+  height_mm: 108
+  source: https://ancientcookware.com/natural/natural-coconut-shell-wine-cup2114-detail
+  note: real polished coconut shell; sold as a wine cup, may be footed
+- glass: coconut
+  product: 8 Real Coconut Cups
+  maker: OrderHawaiianFood.com
+  capacity_ml: null
+  capacity_basis: unstated
+  stated: Holds 9-12 oz; 3.5-4.5 inches tall
+  height_mm: null
+  source: http://www.orderhawaiianfood.com/shop/p/coconut-cups
+  note: real coconut half-shells; RANGES only (266-355 ml, 89-114 mm) because each shell differs
+- glass: coconut
+  product: Beachbum Berry Coconut Tiki Mug
+  maker: Cocktail Kingdom
+  capacity_ml: 450
+  capacity_basis: unstated
+  stated: Able to hold 450ml; 9.5 cm tall and 11cm wide (at its widest point)
+  height_mm: 95
+  source: https://thetikicove.co.uk/tiki-mugs/coconut-tiki-mug-beachbum-berry
+  note: ceramic coconut mug, not a real shell
+- glass: collins
+  product: 126 Heavy Base 11 oz. Collins / Mojito Glass
+  maker: Libbey
+  capacity_ml: 325
+  capacity_basis: unstated
+  stated: 11 oz.
+  height_mm: 133
+  source: https://www.webstaurantstore.com/libbey-126-heavy-base-11-oz-collins-mojito-glass-case/551126.html
+  note: Height 5 1/4 in.
+- glass: collins
+  product: 53 Straight Sided 10 oz. Collins / Mojito Glass
+  maker: Libbey
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz.
+  height_mm: 121
+  source: https://www.webstaurantstore.com/libbey-53-straight-sided-10-oz-collins-mojito-glass-case/55153.html
+  note: WS max. Height 4 3/4 in.
+- glass: collins
+  product: 259 Esquire 12 oz. Collins / Mojito Glass
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 140
+  source: https://www.webstaurantstore.com/libbey-259-esquire-12-oz-collins-mojito-glass-case/551259.html
+  note: WS max. Height 5 1/2 in.
+- glass: collins
+  product: 226 Esquire 11 oz. Collins / Mojito Glass
+  maker: Libbey
+  capacity_ml: 325
+  capacity_basis: unstated
+  stated: 11 oz.
+  height_mm: 137
+  source: https://www.webstaurantstore.com/libbey-226-esquire-11-oz-collins-mojito-glass-case/551226.html
+  note: WS max. Height 5 3/8 in.
+- glass: collins
+  product: Straight Up 10.5 oz. Collins Glass
+  maker: Acopa
+  capacity_ml: 311
+  capacity_basis: unstated
+  stated: 10.5 oz.
+  height_mm: 152
+  source: https://www.webstaurantstore.com/acopa-straight-up-10-5-oz-collins-glass-case/55356105C.html
+  note: WS max. Height 6 in.
+- glass: collins
+  product: 4508019 Perfect Serve 11.75 oz. Longdrink / Collins Glass
+  maker: Spiegelau
+  capacity_ml: 347
+  capacity_basis: unstated
+  stated: 11.75 oz.
+  height_mm: 152
+  source: https://www.webstaurantstore.com/spiegelau-4508019-perfect-serve-11-75-oz-longdrink-glass-case/5514508019.html
+  note: Height 6 in. Listed as 'Longdrink / Collins'.
+- glass: collins
+  product: 9008012 Classic Bar 12.25 oz. Longdrink / Collins Glass
+  maker: Spiegelau
+  capacity_ml: 362
+  capacity_basis: unstated
+  stated: 12.25 oz.
+  height_mm: 156
+  source: https://www.webstaurantstore.com/spiegelau-9008012-classic-bar-12-25-oz-longdrink-glass-case/5519008012.html
+  note: WS max. Height 6 1/8 in. Listed as 'Longdrink / Collins'.
+- glass: collins
+  product: Noblesse 13.25 oz. Long Drink / Collins Glass (N91703)
+  maker: Nachtmann
+  capacity_ml: 392
+  capacity_basis: unstated
+  stated: 13.25 oz.
+  height_mm: 152
+  source: https://www.webstaurantstore.com/nachtmann-n91703-noblesse-13-25-oz-longdrink-tumbler-case/551N91703.html
+  note: WS max. Height 6 in. Listed as 'Long Drink / Collins'.
+- glass: collins
+  product: New York 11 oz. Collins Glass (Z3500013)
+  maker: Stölzle
+  capacity_ml: 325
+  capacity_basis: unstated
+  stated: 11 oz.
+  height_mm: 165
+  source: https://www.webstaurantstore.com/stolzle-new-york-from-global-tableware-collective-10-5-oz-collins-glass-pack/5503500013.html
+  note: WS max. Height 6 1/2 in. URL slug says 10.5 oz; listing title says 11 oz.
+- glass: collins
+  product: J4226 Islande 13 oz. Collins Glass
+  maker: Arcoroc
+  capacity_ml: 384
+  capacity_basis: unstated
+  stated: 13 oz.
+  height_mm: 171
+  source: https://www.webstaurantstore.com/arcoroc-j4226-islande-13-oz-collins-glass-by-arc-cardinal-case/552J4226.html
+  note: WS max. Height 6 3/4 in.
+- glass: collins
+  product: Essentials 13 oz. Collins Glass (Q1774)
+  maker: Arcoroc
+  capacity_ml: 384
+  capacity_basis: unstated
+  stated: 13 oz.
+  height_mm: 156
+  source: https://www.webstaurantstore.com/arcoroc-essentials-13-oz-collins-glass-by-arc-cardinal-case/552Q1774.html
+  note: Height 6 1/8 in.
+- glass: collins
+  product: Paris 11.7 oz. Collins Glass (577705)
+  maker: Zwiesel Glas
+  capacity_ml: 346
+  capacity_basis: unstated
+  stated: 11.7 oz.
+  height_mm: 156
+  source: https://www.webstaurantstore.com/schott-zwiesel-0017-577705-tritan-paris-11-1-oz-collins-glass-case/54917577705.html
+  note: WS max. Height 6 1/8 in. URL slug says 11.1 oz; listing title says 11.7 oz.
+- glass: collins
+  product: Classico 11.5 oz. Long Drink / Collins Glass (10421/01)
+  maker: Luigi Bormioli
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 11.5 oz.
+  height_mm: 146
+  source: https://www.webstaurantstore.com/luigi-bormioli-classico-11-5-oz-long-drink-collins-glass-case/5671042101.html
+  note: WS max. Height 5 3/4 in. Listed as 'Long Drink / Collins'.
+- glass: coupe
+  product: Speakeasy (SPKSY) Coupe 8.5oz/24.5cl
+  maker: Libbey
+  capacity_ml: 230
+  capacity_basis: brimful
+  stated: Maximum capacity 230 ml; to washline 175 ml
+  height_mm: 152
+  source: https://www.diffordsguide.com/glassware/72/spksy-coupe-85oz-245cl
+  note: ''
+- glass: coupe
+  product: Embassy 5.5 oz. Coupe Glass (3773)
+  maker: Libbey
+  capacity_ml: 163
+  capacity_basis: unstated
+  stated: 5.5 oz.; height 4 1/2 in
+  height_mm: 114
+  source: https://www.webstaurantstore.com/libbey-embassy-5-5-oz-coupe-glass-sample/9993773SMP.html
+  note: Libbey also calls this 'Embassy Champagne' (a saucer); low and small.
+- glass: coupe
+  product: Linear 8.5 oz. Coupe Glass
+  maker: Libbey
+  capacity_ml: 251
+  capacity_basis: unstated
+  stated: 8.5 oz.; height 6 in
+  height_mm: 152
+  source: https://www.webstaurantstore.com/libbey-linear-8-5-oz-coupe-glass-pack/5517401.html
+  note: ''
+- glass: coupe
+  product: Retro Coupe Gold Rim 7.75oz / 22cl (UB2977)
+  maker: Urban Bar
+  capacity_ml: 210
+  capacity_basis: brimful
+  stated: To brim 210 ml; to washline 170 ml
+  height_mm: 144
+  source: https://www.diffordsguide.com/glassware/119/urban-bar-retro-coupe-gold-rim-775oz-22cl
+  note: ''
+- glass: coupe
+  product: Freddo Coupe Glass (UB5458)
+  maker: Urban Bar
+  capacity_ml: 196
+  capacity_basis: brimful
+  stated: Capacity to brim 196 ml
+  height_mm: 140
+  source: https://www.diffordsguide.com/glassware/302/urban-bar-freddo-coupe-glass
+  note: ''
+- glass: coupe
+  product: Coley Coupe Clear 6oz / 17cl (UB2978)
+  maker: Urban Bar
+  capacity_ml: 170
+  capacity_basis: unstated
+  stated: Named 6oz / 17cl; page also says to brim 115 ml, to washline 155 ml
+  height_mm: 140
+  source: https://www.diffordsguide.com/glassware/168/urban-bar-coley-coupe-clear-6oz-17cl
+  note: Page's brim figure (115) is smaller than its washline figure (155), so one is wrong; the nominal
+    17cl from the product name is recorded instead. Weak point.
+- glass: coupe
+  product: Leopold Coupe Glass 7.5oz (225ml)
+  maker: Cocktail Kingdom
+  capacity_ml: 225
+  capacity_basis: unstated
+  stated: 7.5oz (225ml)
+  height_mm: null
+  source: https://cocktailkingdom.com/products/leopold-coupe-glass-75oz-225ml-6-pack
+  note: No height on the maker's page.
+- glass: coupe
+  product: Leopold Coupe Glass 6oz (180ml)
+  maker: Cocktail Kingdom
+  capacity_ml: 180
+  capacity_basis: unstated
+  stated: 6oz (180ml)
+  height_mm: null
+  source: https://cocktailkingdom.com/products/leopold-coupe-glass-6oz-180ml-case-of-24
+  note: Separate, smaller size of the Leopold coupe. No height listed.
+- glass: coupe
+  product: Veritas Coupe / Cocktail (6449/09)
+  maker: Riedel
+  capacity_ml: 310
+  capacity_basis: unstated
+  stated: 31 cl (8.5 fl oz); height 170 mm
+  height_mm: 170
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Cocktail-Glasses/Riedel-Veritas-Crystal-Coupe-Cocktail-Glass-8-5oz-31cl~p~RD0024
+  note: The listing's 8.5 fl oz does not match its 31 cl; ml used per method. Search snippets of Riedel's
+    own EU pages also show 310 ccm / 170 mm. A wine-glass-maker's coupe, large for the type.
+- glass: coupe
+  product: Mixology Cocktail Coupe Glasses (12460)
+  maker: Luigi Bormioli
+  capacity_ml: 222
+  capacity_basis: unstated
+  stated: 7.5 fl oz; height 5.5 in
+  height_mm: 140
+  source: https://luigibormioliusa.com/products/mixology-7-5-oz-coupe-cocktail-glasses-set-of-4
+  note: AU retailers list it as 225 ml.
+- glass: coupe
+  product: Luca Coupe Glass
+  maker: LSA International
+  capacity_ml: 200
+  capacity_basis: unstated
+  stated: '7oz (page title: Coupe Glass 200ml); height 6in'
+  height_mm: 152
+  source: https://www.lsa-international.com/en-us/products/luca-coupe-glass
+  note: ''
+- glass: coupe
+  product: Savage Coupe Glass
+  maker: Nude
+  capacity_ml: 230
+  capacity_basis: brimful
+  stated: 230ml total volume; filling volume 120 ml; height 17.4 cm
+  height_mm: 174
+  source: https://www.barstuff.com/cocktailschale-coupette-savage-nude-220ml.html
+  note: barstuff total-vs-filling spec, total treated as brimful. Difford's also gives 174 mm. The URL
+    slug says 220ml.
+- glass: coupe
+  product: Big Top Coupe Glass
+  maker: Nude
+  capacity_ml: 235
+  capacity_basis: unstated
+  stated: 235ml; height 15.2cm
+  height_mm: 152
+  source: https://www.barstuff.com/cocktailschale-coupe-big-top-nude-235ml.html
+  note: ''
+- glass: coupe
+  product: Elements Black & Gold Coupe 7 3/4 oz (273 92 08)
+  maker: Stölzle Lausitz
+  capacity_ml: 230
+  capacity_basis: unstated
+  stated: 230 ml | 7 3/4 oz; H 147 mm
+  height_mm: 147
+  source: https://stoelzleusa.com/products/elements-black-gold-coupe-7-oz
+  note: ''
+- glass: coupe
+  product: Kyoto Cocktail Coupe Glass (346 00 25)
+  maker: Stölzle Lausitz
+  capacity_ml: 318
+  capacity_basis: unstated
+  stated: 318 ml | 10 3/4 oz; H 172.2 mm
+  height_mm: 172
+  source: https://stoelzleusa.com/products/kyoto-cocktail-glass
+  note: ''
+- glass: flute
+  product: Embassy Flute (3795)
+  maker: Libbey
+  capacity_ml: 177
+  capacity_basis: unstated
+  stated: 6 oz; height 8.13 in
+  height_mm: 207
+  source: https://libbeyfoodservice.com/product/libbey/embassy-flute/3795
+  note: ''
+- glass: flute
+  product: Vina Flute (7500)
+  maker: Libbey
+  capacity_ml: 237
+  capacity_basis: unstated
+  stated: 8 oz; height 9.25 in
+  height_mm: 235
+  source: https://libbeyfoodservice.com/product/libbey/vina-flute/7500
+  note: ''
+- glass: flute
+  product: Virtuoso Flute (1009305)
+  maker: Reserve by Libbey
+  capacity_ml: 237
+  capacity_basis: unstated
+  stated: 8 oz; height 9.71 in
+  height_mm: 247
+  source: https://libbeyfoodservice.com/product/reserve-by-libbey/virtuoso-flute/1009305
+  note: ''
+- glass: flute
+  product: Authentis Champagne Flute (4408029)
+  maker: Spiegelau
+  capacity_ml: 274
+  capacity_basis: unstated
+  stated: 9.25 oz; height 8.68 in
+  height_mm: 220
+  source: https://libbeyfoodservice.com/product/spiegelau/authentis-champagne-flute/4408029
+  note: ''
+- glass: flute
+  product: Vino Grande Champagne Flute (4518029)
+  maker: Spiegelau
+  capacity_ml: 259
+  capacity_basis: unstated
+  stated: 8.75 oz; height 9.0 in
+  height_mm: 229
+  source: https://libbeyfoodservice.com/product/spiegelau/vino-grande-champagne-flute/4518029
+  note: ''
+- glass: flute
+  product: Pure Crystal Champagne Flute 209ml
+  maker: Schott Zwiesel
+  capacity_ml: 209
+  capacity_basis: unstated
+  stated: 7.5 oz / 209 ml; height 252mm
+  height_mm: 252
+  source: https://www.nellacut.com/store/schott-zwiesel-champagne-glass/16283-schott-zwiesel-pure-crystal-champagne-flutes-209ml.html
+  note: A search snippet of zwiesel-glas.com gave 297 ml / 234 mm for a 'Pure' flute (maker page returned
+    403, so not used). Pure may come in more than one size.
+- glass: flute
+  product: Exquisit Champagne Flute 9 oz (147 00 29)
+  maker: Stölzle Lausitz
+  capacity_ml: 265
+  capacity_basis: unstated
+  stated: 265 ml | 9 oz; H 223 mm
+  height_mm: 223
+  source: https://stoelzleusa.com/products/exquisit-champagne-9-oz
+  note: ''
+- glass: flute
+  product: Symphony Champagne Flute 9 3/4 oz (731 00 29)
+  maker: Stölzle Lausitz
+  capacity_ml: 290
+  capacity_basis: unstated
+  stated: 290 ml | 9 3/4 oz; H 260 mm
+  height_mm: 260
+  source: https://stoelzleusa.com/products/symphony-champagne-flute-set-of-six
+  note: ''
+- glass: flute
+  product: Champagne Flute Ultra
+  maker: Stölzle Lausitz
+  capacity_ml: 185
+  capacity_basis: unstated
+  stated: 185ml total capacity; height 21.65cm
+  height_mm: 216
+  source: https://www.barstuff.com/sektkelch-ultra-stolzle-lausitz-185ml.html
+  note: ''
+- glass: flute
+  product: Atelier Champagne Flute (08748)
+  maker: Luigi Bormioli
+  capacity_ml: 274
+  capacity_basis: unstated
+  stated: 9.25 fl oz; height 9.8 in
+  height_mm: 249
+  source: https://luigibormioliusa.com/products/prestige-champagne-flute
+  note: European retailers list it as 27 cl.
+- glass: flute
+  product: Savoy Champagne Flute
+  maker: LSA International
+  capacity_ml: 200
+  capacity_basis: unstated
+  stated: 200ml; height 28cm
+  height_mm: 280
+  source: https://www.lsa-international.com/drinkware/savoy-champagne-flute
+  note: Very tall hand-drawn stem.
+- glass: flute
+  product: Metropolitan Champagne Flute
+  maker: LSA International
+  capacity_ml: 230
+  capacity_basis: unstated
+  stated: '8oz (page title: 230ml); height 9.75in'
+  height_mm: 248
+  source: https://www.lsa-international.com/us/drinkware/metropolitan-champagne-flute
+  note: ''
+- glass: flute
+  product: Glitz Champagne Flute
+  maker: Dartington Crystal
+  capacity_ml: 210
+  capacity_basis: unstated
+  stated: 21cl; height 260mm
+  height_mm: 260
+  source: https://www.dartington.co.uk/glitz-flute.html
+  note: ''
+- glass: flute
+  product: Elisa Fully Toughened Champagne Flute 17cl (CC585)
+  maker: Arcoroc
+  capacity_ml: 170
+  capacity_basis: unstated
+  stated: 17 cl (5.75 fl oz); height 192 mm
+  height_mm: 192
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Champagne-Glasses/Arcoroc-Elisa-Fully-Toughened-Champagne-Flute-17cl~p~CC585
+  note: Unlined version; a 125 ml-lined variant also exists.
+- glass: goblet
+  product: Libbey Embassy 11.5 oz. Goblet (3711)
+  maker: Libbey
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 11.5 oz.; 6 1/8 Inches
+  height_mm: 156
+  source: https://www.webstaurantstore.com/libbey-3711-embassy-11-5-oz-goblet-case/5513711.html
+  note: thick stem, US banquet goblet
+- glass: goblet
+  product: Libbey Vina 16 oz. Goblet (7513)
+  maker: Libbey
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; 6 3/8 Inches
+  height_mm: 162
+  source: https://www.webstaurantstore.com/libbey-7513-vina-16-oz-goblet-case/5517513.html
+  note: wide U-shaped bowl
+- glass: goblet
+  product: Libbey Gibraltar 11.5 oz. Goblet (15247)
+  maker: Libbey
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 11.5 oz.; 6 7/8 Inches
+  height_mm: 175
+  source: https://www.webstaurantstore.com/libbey-15247-gibraltar-11-5-oz-goblet-case/55115247.html
+  note: paneled, footed
+- glass: goblet
+  product: Libbey Chivalry 12 oz. Goblet (3212)
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.; 6 1/2 Inches
+  height_mm: 165
+  source: https://www.webstaurantstore.com/libbey-3212-chivalry-12-oz-goblet-case/5513212.html
+  note: hammered exterior
+- glass: goblet
+  product: Arcoroc Artic 10.5 oz. Goblet (57070)
+  maker: Arcoroc
+  capacity_ml: 311
+  capacity_basis: unstated
+  stated: 10.5 oz.; 5 3/4 Inches; top diameter 3 1/8
+  height_mm: 146
+  source: https://www.webstaurantstore.com/arcoroc-57070-artic-10-5-oz-goblet-by-arc-cardinal-case/55257070.html
+  note: faceted
+- glass: goblet
+  product: Acopa 14 oz. Glass Goblet
+  maker: Acopa
+  capacity_ml: 414
+  capacity_basis: unstated
+  stated: 14 oz.; 6 5/16 Inches
+  height_mm: 160
+  source: https://www.webstaurantstore.com/acopa-14-oz-glass-goblet-case/5535454.html
+  note: ''
+- glass: goblet
+  product: Zwiesel Fortessa Archie 14.2 oz. Goblet
+  maker: Fortessa (Zwiesel)
+  capacity_ml: 420
+  capacity_basis: unstated
+  stated: 14.2 oz.; 6 1/2 Inches; top diameter 3 1/2
+  height_mm: 165
+  source: https://www.webstaurantstore.com/fortessa-archie-14-2-oz-goblet-case/549ARCHIECL1.html
+  note: ''
+- glass: goblet
+  product: Goblet Large 42 cl
+  maker: Urban Bar
+  capacity_ml: 420
+  capacity_basis: unstated
+  stated: 42 cl; 14.5 cm; width 9 cm
+  height_mm: 145
+  source: https://www.urbanbar.com/products/goblet-42-cl-ub
+  note: short stem of two solid glass balls; closest in shape to a chalice
+- glass: goblet
+  product: Goblet 30 cl
+  maker: Urban Bar
+  capacity_ml: 300
+  capacity_basis: unstated
+  stated: 30 cl; 13.5 cm; width 8.5 cm
+  height_mm: 135
+  source: https://www.urbanbar.com/products/goblet-30-cl-ub
+  note: ''
+- glass: goblet
+  product: Misato Recycled Goblet 30cl
+  maker: Urban Bar
+  capacity_ml: 270
+  capacity_basis: unstated
+  stated: name says 30cl, specification says 27cl; 10.5cm
+  height_mm: 105
+  source: https://www.urbanbar.com/products/misato-recycled-goblet-30cl
+  note: the page contradicts itself on capacity; the spec's 27cl recorded
+- glass: highball
+  product: Select 12 oz. Stackable Highball Glass
+  maker: Acopa
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 137
+  source: https://www.webstaurantstore.com/acopa-12-oz-stackable-highball-glass-case/5535713.html
+  note: WS max. Height 5 3/8 in.
+- glass: highball
+  product: Timeless Vintage 12 oz. Stackable Fully Tempered Highball Glass (520045)
+  maker: Pasabahce
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 146
+  source: https://www.webstaurantstore.com/pasabahce-520045-012-timeless-11-5-oz-stackable-longdrink-highball-glass-case/543P520045.html
+  note: WS max. Height 5 3/4 in. URL slug says 11.5 oz; listing title says 12 oz.
+- glass: highball
+  product: New York 12.75 oz. Highball Glass (Z3500010)
+  maker: Stölzle
+  capacity_ml: 377
+  capacity_basis: unstated
+  stated: 12.75 oz.
+  height_mm: 152
+  source: https://www.webstaurantstore.com/stolzle-new-york-from-global-tableware-collective-12-oz-tumbler-pack/5503500010.html
+  note: WS max. Height 6 in.
+- glass: highball
+  product: Arcadie 13.5 oz. Highball Glass (Q2751)
+  maker: Arcoroc
+  capacity_ml: 399
+  capacity_basis: unstated
+  stated: 13.5 oz.
+  height_mm: 127
+  source: https://www.webstaurantstore.com/arcoroc-q2751-arcadie-13-5-oz-highball-glass-by-arc-cardinal-case/552Q2751.html
+  note: WS max. Height 5 in. Short and wide for its capacity.
+- glass: highball
+  product: Starline 12.5 oz. Fully Tempered Stackable Highball Glass (V9572)
+  maker: Arcoroc
+  capacity_ml: 370
+  capacity_basis: unstated
+  stated: 12.5 oz.
+  height_mm: 121
+  source: https://www.webstaurantstore.com/arcoroc-starline-12-5-oz-fully-tempered-stackable-highball-glass-by-arc-cardinal-case/552V9572.html
+  note: WS max. Height 4 3/4 in. Short and wide for its capacity.
+- glass: highball
+  product: Novecento 13.75 oz. Highball Glass
+  maker: Bormioli Rocco
+  capacity_ml: 407
+  capacity_basis: unstated
+  stated: 13.75 oz.
+  height_mm: 137
+  source: https://www.webstaurantstore.com/highball-13-75oz-novecento-borm-rocco-2dz-case/57649170Q906.html
+  note: WS max. Height 5 3/8 in.
+- glass: highball
+  product: Lounge 2.0 8.25 oz. Highball Glass
+  maker: Spiegelau
+  capacity_ml: 244
+  capacity_basis: unstated
+  stated: 8.25 oz.
+  height_mm: 121
+  source: https://www.webstaurantstore.com/spiegelau-lounge-2-0-8-25-oz-highball-glass-case/5512718014.html
+  note: WS max. Height 4 3/4 in. Small for a highball.
+- glass: highball
+  product: Jupiter 10.8 oz. Highball Glass
+  maker: Zwiesel Fortessa
+  capacity_ml: 319
+  capacity_basis: unstated
+  stated: 10.8 oz.
+  height_mm: 152
+  source: https://www.webstaurantstore.com/fortessa-jupiter-10-8-oz-highball-glass-case/549JUPCL10.html
+  note: WS max. Height 6 in.
+- glass: highball
+  product: Cortina 9.5 oz. Highball Glass
+  maker: Bormioli Rocco
+  capacity_ml: 281
+  capacity_basis: unstated
+  stated: 9.5 oz.
+  height_mm: 140
+  source: https://www.webstaurantstore.com/highball-9-5oz-cortina-borm-rocco-4dz-case/5764915Q063.html
+  note: WS max. Height 5 1/2 in.
+- glass: highball
+  product: Dahlia 12 oz. Stackable Highball Glass
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 143
+  source: https://www.webstaurantstore.com/libbey-dahlia-12-oz-stackable-highball-glass-case/5511009458.html
+  note: WS max. Height 5 5/8 in.
+- glass: highball
+  product: Zephyr 12 oz. Highball Glass (FP375)
+  maker: Chef & Sommelier (Arc)
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 127
+  source: https://www.webstaurantstore.com/chef-sommelier-zephyr-12-oz-highball-glass-by-arc-cardinal-case/552FP375.html
+  note: WS max. Height 5 in.
+- glass: highball
+  product: Origins 11.5 oz. Highball Glass
+  maker: Della Luce (Acopa)
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 11.5 oz.
+  height_mm: 165
+  source: https://www.webstaurantstore.com/della-luce-origins-11-5-oz-highball-glass-pack/553HB1003.html
+  note: WS max. Height 6 1/2 in.
+- glass: hot-toddy
+  product: Libbey 5295 8.5 oz. Irish Glass Coffee Mug
+  maker: Libbey
+  capacity_ml: 251
+  capacity_basis: unstated
+  stated: 8.5 oz.; 5 7/8 Inches
+  height_mm: 149
+  source: https://www.webstaurantstore.com/libbey-5295-8-5-oz-irish-glass-coffee-mug-case/5515295.html
+  note: ornate stem and foot, petite handle
+- glass: hot-toddy
+  product: Libbey 5304 10.5 oz. Irish Glass Coffee Mug
+  maker: Libbey
+  capacity_ml: 311
+  capacity_basis: unstated
+  stated: 10.5 oz.; 5 Inches
+  height_mm: 127
+  source: https://www.webstaurantstore.com/libbey-5304-10-5-oz-irish-glass-coffee-mug-case/5515304.html
+  note: short stem, handle near the top
+- glass: hot-toddy
+  product: Libbey 5292 8 oz. Irish Glass Coffee Mug
+  maker: Libbey
+  capacity_ml: 237
+  capacity_basis: unstated
+  stated: 8 oz.; 6 3/8 Inches
+  height_mm: 162
+  source: https://www.webstaurantstore.com/libbey-5292-8-oz-irish-glass-coffee-mug-case/5515292.html
+  note: wide base, short stem, handle
+- glass: hot-toddy
+  product: Libbey 8054 Georgian 6 oz. Irish Coffee Glass
+  maker: Libbey
+  capacity_ml: 177
+  capacity_basis: unstated
+  stated: 6 oz.; 5 3/4 Inches
+  height_mm: 146
+  source: https://www.webstaurantstore.com/libbey-8054-georgian-6-oz-irish-glass-coffee-mug-case/5518054.html
+  note: 'NO HANDLE: stemmed, pedestal foot. The classic San Francisco Irish coffee glass; exclude if the
+    type requires a handle'
+  exclude: no handle, so not the drawn footed handled glass
+- glass: hot-toddy
+  product: Anchor Hocking 308U 8 oz. Irish Coffee Mug
+  maker: Anchor Hocking
+  capacity_ml: 237
+  capacity_basis: unstated
+  stated: 8 oz.; 5 1/4 Inches
+  height_mm: 133
+  source: https://www.webstaurantstore.com/anchor-hocking-308u-8-oz-irish-coffee-mug-case/550308U.html
+  note: high pedestal foot, handle
+- glass: hot-toddy
+  product: Arcoroc 8.5 oz. Fully Tempered Glass Irish Coffee Mug (37684)
+  maker: Arcoroc
+  capacity_ml: 251
+  capacity_basis: unstated
+  stated: 8.5 oz.; 5 1/2 Inches
+  height_mm: 140
+  source: https://www.webstaurantstore.com/arcoroc-37684-8-5-oz-glass-irish-coffee-mug-by-arc-cardinal-case/55237684.html
+  note: foot and handle
+- glass: hot-toddy
+  product: Arcoroc 10 oz. Fully Tempered Glass Irish Coffee Mug (11874)
+  maker: Arcoroc
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz.; 5 5/8"
+  height_mm: 143
+  source: https://www.webstaurantstore.com/arcoroc-11874-10-oz-glass-irish-coffee-mug-by-arc-cardinal-case/55211874.html
+  note: foot and handle
+- glass: hot-toddy
+  product: Acopa Select 8.5 oz. Irish Coffee Mug
+  maker: Acopa
+  capacity_ml: 251
+  capacity_basis: unstated
+  stated: 8.5 oz.; 5 3/8 Inches
+  height_mm: 137
+  source: https://www.webstaurantstore.com/acopa-select-8-5-oz-irish-coffee-mug-pack/5533409C.html
+  note: pedestal foot, handle
+- glass: hot-toddy
+  product: Pasabahce 8.5 oz. Irish Coffee Mug (55141)
+  maker: Pasabahce
+  capacity_ml: 251
+  capacity_basis: unstated
+  stated: 8.5 oz.; 5 3/4 Inches
+  height_mm: 146
+  source: https://www.webstaurantstore.com/pasabahce-55141-024-8-oz-irish-coffee-mug-case/543P55141.html
+  note: handle and a 'decorative stem'; the page says not footed, but a stem on a base is the same silhouette
+- glass: hot-toddy
+  product: Raye Hot Toddy Glasses
+  maker: Viski
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: null
+  source: https://viski.com/products/5061
+  note: the only product found actually named a hot toddy glass; footed glass mug with handle; height
+    not listed
+- glass: hurricane
+  product: 15 oz. Hurricane Glass
+  maker: Acopa
+  capacity_ml: 466
+  capacity_basis: brimful
+  stated: 15 oz.; Rim-Full Capacity 15.75 oz.
+  height_mm: 203
+  source: https://www.webstaurantstore.com/acopa-15-oz-hurricane-glass-case/5530515.html
+  note: Headline size 15 oz (444 ml); the ml value above is the stated rim-full 15.75 oz. Height 8 in.
+- glass: hurricane
+  product: Capri 15 oz. Hurricane Glass (44403)
+  maker: Pasabahce
+  capacity_ml: 444
+  capacity_basis: unstated
+  stated: 15 oz.
+  height_mm: 197
+  source: https://www.webstaurantstore.com/pasabahce-44403-012-specialty-glass-15-75-oz-hurricane-glass-case/543P44403.html
+  note: WS max. Height 7 3/4 in. URL slug says 15.75 oz.
+- glass: hurricane
+  product: 3617 15 oz. Cyclone Hurricane Glass
+  maker: Libbey
+  capacity_ml: 444
+  capacity_basis: unstated
+  stated: 15 oz.
+  height_mm: 210
+  source: https://www.webstaurantstore.com/libbey-3617-15-oz-cyclone-hurricane-glass-case/5513617.html
+  note: WS max. Height 8 1/4 in.
+- glass: hurricane
+  product: 3616 14.5 oz. Squall Hurricane Glass
+  maker: Libbey
+  capacity_ml: 429
+  capacity_basis: unstated
+  stated: 14.5 oz.
+  height_mm: 210
+  source: https://www.webstaurantstore.com/libbey-3616-14-5-oz-squall-hurricane-glass-case/5513616.html
+  note: WS max. Height 8 1/4 in.
+- glass: hurricane
+  product: 524UX 15 oz. Footed Hurricane Glass
+  maker: Anchor Hocking
+  capacity_ml: 444
+  capacity_basis: unstated
+  stated: 15 oz.
+  height_mm: 203
+  source: https://www.webstaurantstore.com/anchor-hocking-524ux-15-oz-footed-hurricane-glass-case/550524U.html
+  note: WS max. Height 8 in.
+- glass: hurricane
+  product: C2172 15 oz. Hurricane Glass
+  maker: Arcoroc
+  capacity_ml: 444
+  capacity_basis: unstated
+  stated: 15 oz.
+  height_mm: 210
+  source: https://www.webstaurantstore.com/arcoroc-c2172-15-oz-hurricane-glass-by-arc-cardinal-case/552C2172.html
+  note: WS max. Height 8 1/4 in.
+- glass: hurricane
+  product: Backdoor '20s 14.2 oz. Tequila Sunrise Hurricane Glass (13795/01)
+  maker: Luigi Bormioli
+  capacity_ml: 420
+  capacity_basis: unstated
+  stated: 14.2 oz.
+  height_mm: 198
+  source: https://www.webstaurantstore.com/hurricane-14-2oz-tequila-sunrise-backdoor-20s-2dz-case/5671379501.html
+  note: WS max. Height 7 13/16 in.
+- glass: hurricane
+  product: Bar Special 17.9 oz. Hurricane Glass (111286)
+  maker: Schott Zwiesel
+  capacity_ml: 529
+  capacity_basis: unstated
+  stated: 17.9 oz.
+  height_mm: 184
+  source: https://www.webstaurantstore.com/schott-zwiesel-0023-111286-tritan-bar-special-17-9-oz-hurricane-glass-case/54923111286.html
+  note: WS max. Height 7 1/4 in.
+- glass: hurricane
+  product: 16 oz. Hurricane Glass (Cobalt Rim; same blank as the Lime/Aqua/Bahia/Meridia/Malibu/Carnival
+    versions)
+  maker: 10 Strawberry Street
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.
+  height_mm: 191
+  source: https://www.webstaurantstore.com/10-strawberry-street-cobalt-rim-16-oz-hurricane-glass-case/8507mcr253.html
+  note: WS max. Height 7 1/2 in. Seven colourways are listed; counted once.
+- glass: hurricane
+  product: SVS by RAK Connoisseur Rayen 15.5 oz. Hurricane Glass
+  maker: RAK (SVS Connoisseur)
+  capacity_ml: 458
+  capacity_basis: unstated
+  stated: 15.5 oz.
+  height_mm: 195
+  source: https://www.webstaurantstore.com/rak-youngstown-firnley-specialty-15-5-oz-hurricane-glass-case/550740593Y.html
+  note: WS max. Height 7 11/16 in.
+- glass: hurricane
+  product: Cuba Hurricane (1522H16)
+  maker: Ocean
+  capacity_ml: 450
+  capacity_basis: unstated
+  stated: 15 3/4 oz (450 ml)
+  height_mm: 188
+  source: https://www.ocean-glassware.com/products/cuba-hurricane-1-2/
+  note: Manufacturer page. It is in Ocean's Cuba range alongside the Cuba Poco Grande and has a 79 mm
+    mouth; named 'Hurricane' by the maker.
+- glass: julep-cup
+  product: Acopa Alchemy 16 oz. Hammered Stainless Steel Mint Julep Cup with Beaded Detailing
+  maker: Acopa
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; 4 1/2 Inches
+  height_mm: 114
+  source: https://www.webstaurantstore.com/acopa-16-oz-stainless-steel-mint-julep-cup-with-hammered-finish-and-beaded-detailing-pack/553JULEPH16.html
+  note: sold in several finishes; counted once
+- glass: julep-cup
+  product: Barfly M37032 12 oz. Stainless Steel Mint Julep Cup with Beaded Trim
+  maker: Barfly (Mercer Culinary)
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.; 4 1/2 Inches; top diameter 3 1/2
+  height_mm: 114
+  source: https://www.webstaurantstore.com/mercer-culinary-m37032-12-oz-stainless-steel-julep-cup/470M37032.html
+  note: footed; also copper, gold, black finishes
+- glass: julep-cup
+  product: Barfly M37168 13.5 oz. Stainless Steel Deluxe Mint Julep Cup
+  maker: Barfly (Mercer Culinary)
+  capacity_ml: 399
+  capacity_basis: unstated
+  stated: 13.5 oz.; 4 5/8 Inches
+  height_mm: 117
+  source: https://www.webstaurantstore.com/barfly-m37168-13-5-oz-stainless-steel-deluxe-mint-julep-cup/470M37168.html
+  note: ''
+- glass: julep-cup
+  product: Libbey JC-25 15 oz. Stainless Steel Mint Julep Cup with Beaded Trim
+  maker: Libbey
+  capacity_ml: 444
+  capacity_basis: unstated
+  stated: 15 oz.; 4 3/4 Inches
+  height_mm: 121
+  source: https://www.webstaurantstore.com/libbey-jc-25-15-oz-stainless-steel-mint-julep-cup-with-beaded-trim-case/959JC25.html
+  note: ''
+- glass: julep-cup
+  product: American Metalcraft JC8 8 oz. Brushed Stainless Steel Mint Julep Cup
+  maker: American Metalcraft
+  capacity_ml: 237
+  capacity_basis: unstated
+  stated: 8 oz.; 3 7/8 inches; top diameter 2 7/8"
+  height_mm: 98
+  source: https://www.webstaurantstore.com/american-metalcraft-jc8-8-oz-mint-julep-cup/124JC8.html
+  note: sold as a smaller portion size
+- glass: julep-cup
+  product: American Metalcraft JC11 11 oz. Brushed Stainless Steel Mint Julep Cup
+  maker: American Metalcraft
+  capacity_ml: 325
+  capacity_basis: unstated
+  stated: 11 oz.; 4 1/4 inches
+  height_mm: 108
+  source: https://www.webstaurantstore.com/american-metalcraft-jc11-11-oz-mint-julep-cup/124JC11.html
+  note: ''
+- glass: julep-cup
+  product: American Metalcraft JC16 16 oz. Mirrored Stainless Steel Mint Julep Cup with Beaded Trim
+  maker: American Metalcraft
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; 5 3/4 Inches; top diameter 3 5/8
+  height_mm: 146
+  source: https://www.webstaurantstore.com/american-metalcraft-jc16-16-oz-mirrored-stainless-steel-mint-julep-cup-with-beaded-trim/124JC16.html
+  note: tallest julep cup found
+- glass: julep-cup
+  product: Modern Mixologist 12 oz. Mint Julep Cup
+  maker: Modern Mixologist (Steelite International)
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.; 4 1/2 Inches
+  height_mm: 114
+  source: https://www.webstaurantstore.com/cup-julep-12-oz-3-1-4-in-x-4-1-2-in-modern-mix-case/5767340MW004.html
+  note: ''
+- glass: julep-cup
+  product: Julep Cup - Stainless Steel / 12oz (360ml)
+  maker: Cocktail Kingdom
+  capacity_ml: 360
+  capacity_basis: unstated
+  stated: 12oz (360ml); 4in (10.2cm)
+  height_mm: 102
+  source: https://cocktailkingdom.com/products/julep-cup-stainless-steel-12oz-360ml
+  note: also silver-, copper-, gold-, gunmetal-plated; counted once
+- glass: julep-cup
+  product: Julep Cup 41cl
+  maker: Urban Bar
+  capacity_ml: 410
+  capacity_basis: unstated
+  stated: 41cl; 11cm
+  height_mm: 110
+  source: https://www.urbanbar.com/products/julep-cup-41cl
+  note: Japanese 18/8 steel; a copper version exists, counted once
+- glass: julep-cup
+  product: Octagonal Stainless Steel Julep Cup 39cl
+  maker: Urban Bar
+  capacity_ml: 390
+  capacity_basis: unstated
+  stated: 39cl; 11cm; width 8.5cm
+  height_mm: 110
+  source: https://www.urbanbar.com/products/octagonal-julep-cup-39cl
+  note: ''
+- glass: julep-cup
+  product: Tiki Stainless Steel Julep Cup 40cl
+  maker: Urban Bar
+  capacity_ml: 400
+  capacity_basis: unstated
+  stated: 40cl; 11cm; width 9cm
+  height_mm: 110
+  source: https://www.urbanbar.com/products/tiki-julep-cup-40cl
+  note: etched version; a 'Tattoo' 40cl variant also exists, not counted
+- glass: margarita
+  product: Margarita glass Misket
+  maker: LAV
+  capacity_ml: 300
+  capacity_basis: brimful
+  stated: Total volume 300ml; filling volume 230ml; height 168mm
+  height_mm: 168
+  source: https://www.barstuff.com/margarita-glass-misket-lav-300ml-9660G
+  note: Described as a 'double-curved goblet' (stepped bowl). barstuff total-vs-filling spec, total treated
+    as brimful.
+- glass: margarita
+  product: Margarita glass Capri
+  maker: Pasabahçe
+  capacity_ml: 305
+  capacity_basis: brimful
+  stated: Total volume 305ml; filling volume 250ml; height 168mm
+  height_mm: 168
+  source: https://www.barstuff.com/capri-margarita-300ml.html
+  note: Also sold as Utopia/Steelite Capri 11 oz. barstuff total-vs-filling spec, total treated as brimful.
+- glass: margarita
+  product: Citation Gourmet Coupette/Margarita 9 oz (8429)
+  maker: Libbey
+  capacity_ml: 266
+  capacity_basis: brimful
+  stated: Total volume 266 ml; filling volume 200 ml; height 156 mm
+  height_mm: 156
+  source: https://www.barstuff.com/coupette-margarita-citation-gourmet-266ml.html
+  note: Named 'Coupette/Margarita' by maker. barstuff total-vs-filling spec, total treated as brimful.
+- glass: margarita
+  product: Citation Gourmet Coupette/Margarita 14 3/4 oz (8430)
+  maker: Libbey
+  capacity_ml: 436
+  capacity_basis: unstated
+  stated: 14.75 oz; height 7.0 in
+  height_mm: 178
+  source: https://libbeyfoodservice.com/product/libbey/citation-gourmet-coupette-margarita/8430
+  note: Larger size in the same Libbey line; distinct product.
+- glass: margarita
+  product: Splash 12 oz. Margarita Glass (3429)
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.; height 7 in
+  height_mm: 178
+  source: https://www.webstaurantstore.com/libbey-3429-splash-12-oz-margarita-glass-case/5513429.html
+  note: ''
+- glass: margarita
+  product: Aruba Margarita (92308)
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz; height 6.25 in
+  height_mm: 159
+  source: https://libbeyfoodservice.com/product/libbey/aruba-margarita/92308
+  note: Handmade Mexican-style margarita; not necessarily stepped-bowl.
+- glass: margarita
+  product: Specialty Glassware Cactus Margarita (3619JS)
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz; height 6.13 in
+  height_mm: 156
+  source: https://libbeyfoodservice.com/product/libbey/specialty-glassware-cactus-margarita/3619js
+  note: Novelty cactus stem.
+- glass: margarita
+  product: Margarita glass Bar Special
+  maker: Schott Zwiesel
+  capacity_ml: 305
+  capacity_basis: unstated
+  stated: 305ml total; height 16.6cm
+  height_mm: 166
+  source: https://www.barstuff.com/margaritaglas-bar-special-schott-zwiesel-305ml.html
+  note: Stepped bowl ('hemispherical lower section with a wider bowl').
+- glass: margarita
+  product: Margarita Glass L Twin
+  maker: Leonardo
+  capacity_ml: 240
+  capacity_basis: unstated
+  stated: 240 ml; height 17.5 cm
+  height_mm: 175
+  source: https://www.barstuff.com/margarita-glass-l-twin-leonardo-240-ml-6-pcs-5035
+  note: ''
+- glass: margarita
+  product: Margarita glass Bar & Liqueur
+  maker: Stölzle Lausitz
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 340ml total capacity; height 172mm
+  height_mm: 172
+  source: https://www.barstuff.com/margarita-bar-liqueur-340ml.html
+  note: ''
+- glass: margarita
+  product: Coupette glass Perfect Serve Collection
+  maker: Spiegelau
+  capacity_ml: 235
+  capacity_basis: brimful
+  stated: Total volume 235ml; filling volume 180ml; height 140mm
+  height_mm: 140
+  source: https://www.barstuff.com/spiegelau-psc-coupette-glass-235ml.html
+  note: 'BORDERLINE: named ''Coupette'', not ''margarita'', but sold for Margaritas and Daiquiris. Included
+    because the type is ''margarita/coupette''. Drop it if coupette-only naming should not count.'
+- glass: margarita
+  product: Elegance Cocktail Glass Margarita 27cl
+  maker: Arcoroc
+  capacity_ml: 270
+  capacity_basis: unstated
+  stated: 27 cl / 9.5 fl oz
+  height_mm: null
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Cocktail-Glasses/Arcoroc-Elegance-Cocktail-Glass-Margarita-27cl-9-5oz~p~C1740
+  note: No height on the page (search snippet elsewhere said 160 mm, not verified).
+- glass: margarita
+  product: Thames Crystal Margarita Glass 9.25oz 26cl (CG641)
+  maker: Utopia
+  capacity_ml: 260
+  capacity_basis: unstated
+  stated: 26 cl (9.25 fl oz); height 161 mm
+  height_mm: 161
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Cocktail-Glasses/Utopia-Thames-Crystal-Margarita-Glass-9-25oz-26cl~p~CG641
+  note: ''
+- glass: martini
+  product: Speakeasy (SPKSY) Martini 5.75oz/16cl (14006)
+  maker: Libbey
+  capacity_ml: 170
+  capacity_basis: brimful
+  stated: Maximum capacity 170 ml; to washline 125 ml
+  height_mm: 164
+  source: https://www.diffordsguide.com/glassware/70/spksy-martini-575oz-16cl
+  note: ''
+- glass: martini
+  product: Embassy 7.5 oz. Martini Glass (3733)
+  maker: Libbey
+  capacity_ml: 222
+  capacity_basis: unstated
+  stated: 7.5 oz.; height 6 3/8 in
+  height_mm: 162
+  source: https://www.webstaurantstore.com/libbey-3733-embassy-7-5-oz-martini-glass-case/5513733.html
+  note: ''
+- glass: martini
+  product: Renewal Inspire Martini Glass (9135/AM8Y8J)
+  maker: Reserve by Libbey
+  capacity_ml: 207
+  capacity_basis: unstated
+  stated: 7 oz; height 6.93 in
+  height_mm: 176
+  source: https://libbeyfoodservice.com/product/reserve-by-libbey/renewal-inspire-martini-glass/9135-am8y8j
+  note: ''
+- glass: martini
+  product: Calabrese Cocktail Martini Glass 18cl
+  maker: Urban Bar
+  capacity_ml: 180
+  capacity_basis: brimful
+  stated: 18cl (to brim)
+  height_mm: 155
+  source: https://www.diffordsguide.com/glassware/274/calabrese-cocktail-martini-glass-18cl
+  note: ''
+- glass: martini
+  product: Verdot Small Martini Glass 12.5cl (UB5160)
+  maker: Urban Bar
+  capacity_ml: 125
+  capacity_basis: unstated
+  stated: 125 ml
+  height_mm: 148
+  source: https://www.diffordsguide.com/glassware/384/urban-bar-verdot-small-martini-glass-125cl
+  note: Sold as a 'smaller version' of the classic martini. Urban Bar's 'mini martini' tasters (45 ml
+    Verdot Mini, 2.4oz Calabrese Mini) deliberately NOT included.
+- glass: martini
+  product: New Era Martini 6.25oz
+  maker: ONIS
+  capacity_ml: 185
+  capacity_basis: unstated
+  stated: 185 ml
+  height_mm: 170
+  source: https://www.diffordsguide.com/glassware/357/new-era-martini
+  note: ''
+- glass: martini
+  product: Extreme Martini
+  maker: Riedel
+  capacity_ml: 250
+  capacity_basis: unstated
+  stated: 250 ml
+  height_mm: 175
+  source: https://www.diffordsguide.com/glassware/300/riedel-extreme-martini
+  note: Difford's review calls it too large.
+- glass: martini
+  product: Basic Bar Selection Martini Contemporary 7.6oz / 226ml
+  maker: Schott Zwiesel
+  capacity_ml: 213
+  capacity_basis: brimful
+  stated: To brim 213 ml; to washline 125 ml; listed size 7.6oz / 226ml
+  height_mm: 129
+  source: https://www.diffordsguide.com/glassware/204/basic-bar-selection-martini-contemporary
+  note: Short-stemmed, so low height for the type.
+- glass: martini
+  product: Bar/Giani Martini Glass
+  maker: Nude
+  capacity_ml: 190
+  capacity_basis: unstated
+  stated: 190 ml
+  height_mm: null
+  source: https://www.diffordsguide.com/glassware/471/nude-bar-giani-martini-glass
+  note: No height listed.
+- glass: martini
+  product: Martini Glass Bartender (Ypsilon, B6)
+  maker: Luigi Bormioli
+  capacity_ml: 245
+  capacity_basis: unstated
+  stated: 24.5 cl / 8 1/4 oz; height 182 mm
+  height_mm: 182
+  source: https://bormioliluigi.com/glassware/en/product/36/martini-glass-bartender
+  note: ''
+- glass: martini
+  product: Mixology Martini Glass 215ml
+  maker: Luigi Bormioli
+  capacity_ml: 215
+  capacity_basis: unstated
+  stated: 215ml; height 172mm
+  height_mm: 172
+  source: https://www.barstuff.com/martini-glass-mixology-luigi-bormioli-215ml-7848G
+  note: Sold in the US as 7.25 oz.
+- glass: martini
+  product: Borough Martini Glass
+  maker: LSA International
+  capacity_ml: 195
+  capacity_basis: unstated
+  stated: 195ml; height 16.5cm
+  height_mm: 165
+  source: https://www.lsa-international.com/drinkware/borough-martini-glass
+  note: ''
+- glass: martini
+  product: Bar Martini Glass
+  maker: LSA International
+  capacity_ml: 180
+  capacity_basis: unstated
+  stated: 180ml; height 12cm
+  height_mm: 120
+  source: https://www.lsa-international.com/drinkware/bar-martini-glass-x-2
+  note: Short hand-drawn stem.
+- glass: mug
+  product: Standard mug
+  maker: mclaggan+co
+  capacity_ml: 300
+  capacity_basis: unstated
+  stated: 300ml; 80mm
+  height_mm: 80
+  source: https://www.msmugs.com/pages/mug-size-guide
+  note: maker's own size guide lists 7 shapes; 4 recorded here to limit one maker's weight
+- glass: mug
+  product: Big mug
+  maker: mclaggan+co
+  capacity_ml: 400
+  capacity_basis: unstated
+  stated: 400ml; 90mm
+  height_mm: 90
+  source: https://www.msmugs.com/pages/mug-size-guide
+  note: ''
+- glass: mug
+  product: Tall mug
+  maker: mclaggan+co
+  capacity_ml: 350
+  capacity_basis: unstated
+  stated: 350ml; 135mm
+  height_mm: 135
+  source: https://www.msmugs.com/pages/mug-size-guide
+  note: 'not recorded: Baby 250/75, Quite Big 350/90, Topaz 265/93, Huggable 350/85'
+- glass: mug
+  product: Huggable mug
+  maker: mclaggan+co
+  capacity_ml: 350
+  capacity_basis: unstated
+  stated: 350ml; 85mm
+  height_mm: 85
+  source: https://www.msmugs.com/pages/mug-size-guide
+  note: ''
+- glass: mug
+  product: Cairngorm 0.48L
+  maker: Dunoon
+  capacity_ml: 480
+  capacity_basis: unstated
+  stated: 'CAPACITY: 0.48L HEIGHT: 104mm DIAMETER: 104mm'
+  height_mm: 104
+  source: https://www.dunoonmugs.co.uk/Cairngorm-0-48L/catalogue/583/
+  note: ''
+- glass: mug
+  product: Lomond 0.32L
+  maker: Dunoon
+  capacity_ml: 320
+  capacity_basis: unstated
+  stated: 'CAPACITY: 0.32L HEIGHT: 93mm DIAMETER: 89mm'
+  height_mm: 93
+  source: https://www.dunoonmugs.co.uk/Lomond-0-32L/catalogue/584/
+  note: ''
+- glass: mug
+  product: Bute 0.3L
+  maker: Dunoon
+  capacity_ml: 300
+  capacity_basis: unstated
+  stated: 'CAPACITY: 0.3L HEIGHT: 87mm DIAMETER: 85mm'
+  height_mm: 87
+  source: https://www.dunoonmugs.co.uk/Bute-0-3L/catalogue/585/
+  note: straight-sided with a flare at the top
+- glass: mug
+  product: Orkney 0.35L
+  maker: Dunoon
+  capacity_ml: 350
+  capacity_basis: unstated
+  stated: 'CAPACITY: 0.35L HEIGHT: 91mm DIAMETER: 88mm'
+  height_mm: 91
+  source: https://www.dunoonmugs.co.uk/Orkney-0-35L/catalogue/588/
+  note: ''
+- glass: mug
+  product: Suffolk 0.31L
+  maker: Dunoon
+  capacity_ml: 310
+  capacity_basis: unstated
+  stated: 'CAPACITY: 0.31L HEIGHT: 107mm DIAMETER: 77mm'
+  height_mm: 107
+  source: https://www.dunoonmugs.co.uk/Suffolk-0-31L/catalogue/595/
+  note: ''
+- glass: mug
+  product: Stoneware Mug 350ml
+  maker: Le Creuset
+  capacity_ml: 350
+  capacity_basis: unstated
+  stated: 350ml; 9.35(H) x 9.15(W) x 12.5(D)cm
+  height_mm: 94
+  source: https://www.hartsofstur.com/le-creuset-holly-thyme-stoneware-350ml-mug-80031351730003.html
+  note: Holly Thyme decoration of the standard 350ml mug. John Lewis lists the same mug as H12.3cm (https://www.johnlewis.com/le-creuset-stoneware-mug-350ml/p1816158),
+    which looks like the handle-to-rim depth; Harts' 9.35cm used
+- glass: mug
+  product: Stoneware Grand Mug
+  maker: Le Creuset
+  capacity_ml: 400
+  capacity_basis: unstated
+  stated: 400ml; L11.4cm x W15.1cm x H8.2cm
+  height_mm: 82
+  source: https://www.hartsofstur.com/le-creuset-bamboo-stoneware-grand-mug-70304404080002.html
+  note: wide, low mug
+- glass: mug
+  product: Studio Craft Walnut Alt Ridged Mug
+  maker: Denby
+  capacity_ml: 400
+  capacity_basis: unstated
+  stated: 400ml; 13cm
+  height_mm: 130
+  source: https://www.hartsofstur.com/denby-studio-craft-walnut-alt-ridged-mug-394010610.html
+  note: discontinued
+- glass: mug
+  product: 1/2 Pint Mug (Wren)
+  maker: Emma Bridgewater
+  capacity_ml: 300
+  capacity_basis: unstated
+  stated: '300ml (1/2 pint); Height: 9cm; Diameter: 8cm'
+  height_mm: 90
+  source: https://www.portmeiriononline.co.uk/emma-bridgewater-wren-12-pint-mug/p123592
+  note: Emma Bridgewater's standard half-pint shape; many decorations, counted once
+- glass: mug
+  product: White Stacking Mug 28CL
+  maker: Churchill
+  capacity_ml: 280
+  capacity_basis: unstated
+  stated: 28cl - 10oz
+  height_mm: null
+  source: https://www.churchill1795.com/en/beverage/mugs/
+  note: capacity from the maker's mug listing; product page would not load
+- glass: mug
+  product: Latte Mug 44CL
+  maker: Churchill
+  capacity_ml: 440
+  capacity_basis: unstated
+  stated: 44cl - 16oz
+  height_mm: null
+  source: https://www.churchill1795.com/en/beverage/mugs/
+  note: capacity from the maker's mug listing; product page would not load
+- glass: mule-mug
+  product: Acopa Alchemy 16 oz. Hammered Copper Moscow Mule Mug
+  maker: Acopa
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; 3 1/2 Inches
+  height_mm: 89
+  source: https://www.webstaurantstore.com/acopa-16-oz-moscow-mule-cup-with-hammered-copper-finish-pack/553CMH16.html
+  note: sold in several finishes; counted once
+- glass: mule-mug
+  product: Acopa Alchemy 14 oz. Straight Sided Hammered Copper Moscow Mule Mug
+  maker: Acopa
+  capacity_ml: 414
+  capacity_basis: unstated
+  stated: 14 oz.; 3 5/8 Inches
+  height_mm: 92
+  source: https://www.webstaurantstore.com/acopa-14-oz-straight-sided-moscow-mule-cup-with-hammered-copper-finish-pack/553CMSTRH14.html
+  note: ''
+- glass: mule-mug
+  product: Libbey MM-100 14 oz. Hammered Antique Copper Moscow Mule Mug
+  maker: Libbey
+  capacity_ml: 414
+  capacity_basis: unstated
+  stated: 14 oz.; 3 3/8 Inches
+  height_mm: 86
+  source: https://www.webstaurantstore.com/libbey-mm-100-14-oz-hammered-antique-copper-moscow-mule-mug-case/959MM100.html
+  note: ''
+- glass: mule-mug
+  product: Libbey CMM-200 12 oz. Straight Sided Copper Moscow Mule Mug
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.; 3 5/8 Inches
+  height_mm: 92
+  source: https://www.webstaurantstore.com/libbey-cmm-200-14-oz-straight-sided-copper-moscow-mule-mug-case/959CMM200.html
+  note: URL slug says 14 oz; page title and spec say 12 oz
+- glass: mule-mug
+  product: American Metalcraft CM16H 16 oz. Hammered Copper Moscow Mule Mug
+  maker: American Metalcraft
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; 4 3/4 Inches; top diameter 3 3/4 Inches
+  height_mm: 121
+  source: https://www.webstaurantstore.com/american-metalcraft-cm16h-16-oz-copper-moscow-mule-mug-with-hammered-finish/124CM16H.html
+  note: tallest mule mug found; site-wide 'approximate maximum capacity' disclaimer
+- glass: mule-mug
+  product: Arcoroc 16 oz. Hammered Copper Moscow Mule Mug by Arc Cardinal
+  maker: Arcoroc
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; 4 Inches
+  height_mm: 102
+  source: https://www.webstaurantstore.com/arcoroc-16-oz-hammered-copper-moscow-mule-mug-by-arc-cardinal-case/552FK368.html
+  note: stainless steel with copper finish; site-wide 'approximate maximum capacity' disclaimer
+- glass: mule-mug
+  product: Franmara 20 oz. Hammered Copper Moscow Mule Mug
+  maker: Franmara
+  capacity_ml: 591
+  capacity_basis: unstated
+  stated: 20 oz.; 4 Inches; top diameter 3 1/2 inches
+  height_mm: 102
+  source: https://www.webstaurantstore.com/franmara-20-oz-hammered-copper-moscow-mule-mug/2088402.html
+  note: ''
+- glass: mule-mug
+  product: Clipper Mill by G.E.T. CPRMUG-02 16 oz. Hammered Copper Moscow Mule Mug
+  maker: G.E.T. Enterprises
+  capacity_ml: 473
+  capacity_basis: nominal
+  stated: 16 oz.; Rim-Full Capacity 19 oz.; 4 Inches
+  height_mm: 102
+  source: https://www.webstaurantstore.com/clipper-mill-by-get-cprmug-02-14-oz-moscow-mule-mug-with-hammered-copper-finish/375CPRMUG02.html
+  note: 'the only mule mug with both figures: brimful 19 oz = 562 ml'
+- glass: mule-mug
+  product: Modern Mixologist 16 oz. Copper Moscow Mule Mug with Brass Handle
+  maker: Modern Mixologist (Steelite International)
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; 4 Inches
+  height_mm: 102
+  source: https://www.webstaurantstore.com/mug-copper-moscow-mule-w-brass-handle-4-3-4-in-x-3-3-4-in-16-oz-modern-mix-case/5767340MW001.html
+  note: URL slug reads '4-3-4-in-x-3-3-4-in' but the spec table says Height 4 Inches, Length 5 1/4; spec
+    table used
+- glass: mule-mug
+  product: Bar Lux 16 oz Copper-Plated Stainless Steel Moscow Mule Mug
+  maker: Bar Lux (Restaurantware)
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16.0 oz; 3 1/2" x 3 1/2" x 3 3/4"; height 3.75 inches
+  height_mm: 95
+  source: https://www.restaurantware.com/products/bar-lux-16-oz-copper-plated-stainless-steel-moscow-mule-mug-3-1-2-x-3-1-2-x-3-3-4-1-count-box
+  note: ''
+- glass: mule-mug
+  product: Moscow Mule Copper Mug
+  maker: Copper H2O
+  capacity_ml: 475
+  capacity_basis: unstated
+  stated: approximately 16 ounces (or 475 ml); approximately 3.75 inches in height
+  height_mm: 95
+  source: https://www.copperh2o.com/products/moscow-mule-copper-mug
+  note: solid copper
+- glass: mule-mug
+  product: Moscow Mule Mug - Copper / Unengraved / 12oz
+  maker: Cocktail Kingdom
+  capacity_ml: 360
+  capacity_basis: unstated
+  stated: 12oz (360ml)
+  height_mm: null
+  source: https://www.urbanbar.com/products/moscow-mule-mug-copper-unengraved-12oz-360ml
+  note: reproduction of the original 1946 Moscow Mule mug; 100% copper; height not listed
+- glass: mule-mug
+  product: Copper Plated Curved Moscow Mule Mug with Brass Handle 500ml
+  maker: Beaumont (Mezclar range)
+  capacity_ml: 500
+  capacity_basis: unstated
+  stated: 500ml; H 9.3cm, W 12.1cm, D 9.4cm
+  height_mm: 93
+  source: https://beaumonttm.co.uk/product/mezclar-copper-plated-500ml-curved-moscow-mule-mug-brass-handle/
+  note: UK trade supplier
+- glass: nick-and-nora
+  product: Nick & Nora Glass 6oz / 17cl (UB3570)
+  maker: Urban Bar
+  capacity_ml: 182
+  capacity_basis: brimful
+  stated: To brim 182 ml; to washline 154 ml (named 6oz / 17cl)
+  height_mm: 151
+  source: https://www.diffordsguide.com/glassware/202/urban-bar-nick-and-nora
+  note: The 1920 (UB3572), Gold Rim and 1910 versions on Difford's share the same blank/dimensions (the
+    1910 page even carries code UB3570), so counted once.
+- glass: nick-and-nora
+  product: Speakeasy (SPKSY) Nick & Nora 4.75oz/14cl
+  maker: Libbey
+  capacity_ml: 130
+  capacity_basis: brimful
+  stated: To brim 130 ml; to washline 100 ml
+  height_mm: 160
+  source: https://www.diffordsguide.com/glassware/81/spksy-nick-and-nora-475oz-14cl
+  note: Libbey item 601329 in US foodservice listings.
+- glass: nick-and-nora
+  product: Nick & Nora Glass 5oz
+  maker: Cocktail Kingdom
+  capacity_ml: 158
+  capacity_basis: brimful
+  stated: To brim 158 ml; to washline 112 ml (sold as 5oz / 150ml)
+  height_mm: 151
+  source: https://www.diffordsguide.com/glassware/203/cocktail-kingdom-nick-and-nora-5oz
+  note: Maker's own listing (cocktailkingdom.com) says 5oz (150ml); Difford's measured brim figure used.
+- glass: nick-and-nora
+  product: New Era Nick & Nora 4.75oz
+  maker: ONIS
+  capacity_ml: 140
+  capacity_basis: unstated
+  stated: 140 ml
+  height_mm: 166
+  source: https://www.diffordsguide.com/glassware/358/new-era-nick-and-nora
+  note: ''
+- glass: nick-and-nora
+  product: Drink Specific Glassware Nick & Nora (6417/05)
+  maker: Riedel
+  capacity_ml: 140
+  capacity_basis: unstated
+  stated: 140 ccm; height 153 mm
+  height_mm: 153
+  source: https://theriedelshop.co.uk/products/riedel-drink-specific-glassware-nick-nora-100037-6417-05
+  note: barstuff.com agrees (140 ml, 153 mm). riedel.com US page shows a placeholder 2.029 oz, ignored.
+- glass: nick-and-nora
+  product: Perfect Serve Nick & Nora Cocktail Glass (4508006)
+  maker: Spiegelau (Libbey Foodservice)
+  capacity_ml: 148
+  capacity_basis: unstated
+  stated: 5 oz; height 6.29 in
+  height_mm: 160
+  source: https://libbeyfoodservice.com/product/spiegelau/perfect-serve-nick-and-nora-cocktail-glass/4508006
+  note: ''
+- glass: nick-and-nora
+  product: Renewal Inspire Nick & Nora (9252/AM8Y8J)
+  maker: Reserve by Libbey
+  capacity_ml: 163
+  capacity_basis: unstated
+  stated: 5.5 oz; height 5.96 in
+  height_mm: 151
+  source: https://libbeyfoodservice.com/product/reserve-by-libbey/renewal-inspire-nick-and-nora/9252-am8y8j
+  note: Circa 5.5 oz Nick & Nora (same 9252 blank, different pattern) not counted separately.
+- glass: nick-and-nora
+  product: Bar Special Nick & Nora Glass (119778)
+  maker: Schott Zwiesel
+  capacity_ml: 166
+  capacity_basis: unstated
+  stated: 5.6 oz (webstaurantstore); height 147 mm (zwieselfortessa)
+  height_mm: 147
+  source: https://www.zwieselfortessa.com/hospitality/products/glassware/restaurant-bar-glasses/cocktail-glasses/2295-bar-special-nick-und-nora-glass/
+  note: Maker page gives height only; capacity from https://www.webstaurantstore.com/schott-zwiesel-bar-special-56-oz-nick-and-nora-glass-by-fortessa-tableware-solutions-case/54923119778.html
+    (which gives 5 3/4 in height).
+- glass: nick-and-nora
+  product: Refine 6 oz Nick and Nora Glass (P67095)
+  maker: Nude (Steelite)
+  capacity_ml: 177
+  capacity_basis: unstated
+  stated: 6 oz; height 5 7/8 in
+  height_mm: 149
+  source: https://www.webstaurantstore.com/nude-refine-6-oz-nick-and-nora-glass-case/543P67095.html
+  note: UK retailers list it as 170ml.
+- glass: nick-and-nora
+  product: Savage Nick & Nora (pony) 135ml
+  maker: Nude
+  capacity_ml: 135
+  capacity_basis: unstated
+  stated: 135ml; height 165mm
+  height_mm: 165
+  source: https://www.barware.com.au/p/cocktail-glass-pony-nude-savage-nick-nora-135ml/CC567276
+  note: ''
+- glass: nick-and-nora
+  product: Boris Nick & Nora Glass
+  maker: LSA International
+  capacity_ml: 180
+  capacity_basis: unstated
+  stated: 6oz (180ml); height 5.25 in
+  height_mm: 133
+  source: https://www.lsa-international.com/us/drinkware/boris-nick-nora-glass
+  note: Cylindrical bowl, heavy base; short for the type.
+- glass: nick-and-nora
+  product: Savoy Nick & Nora Glass
+  maker: LSA International
+  capacity_ml: 210
+  capacity_basis: unstated
+  stated: 210ml; height 19cm
+  height_mm: 190
+  source: https://www.lsa-international.com/drinkware/savoy-nick-nora-glass
+  note: US page gives 7oz / 7.5 in; UK metric figures used.
+- glass: nick-and-nora
+  product: Nick & Nora Cocktail Glass 5 3/4 oz (479 00 05)
+  maker: Stölzle Lausitz
+  capacity_ml: 170
+  capacity_basis: unstated
+  stated: 170 ml | 5 3/4 oz; H 152 mm
+  height_mm: 152
+  source: https://stoelzleusa.com/products/nick-nora-cocktail-glass-5-oz
+  note: ''
+- glass: nick-and-nora
+  product: Nick & Nora Glass Kyoto Bar (3460005)
+  maker: Stölzle Lausitz
+  capacity_ml: 190
+  capacity_basis: brimful
+  stated: 190 mL brimful; height 161.4 mm
+  height_mm: 161
+  source: https://stoelzle-lausitz.com/en-aw/products/nick-nora-glass-kyoto-bar-set-of-6
+  note: ''
+- glass: nick-and-nora
+  product: Mixology Nick & Nora Glasses (12671)
+  maker: Luigi Bormioli
+  capacity_ml: 148
+  capacity_basis: unstated
+  stated: 5 fl oz; height 5.8 in
+  height_mm: 147
+  source: https://luigibormioliusa.com/products/mixology-5-oz-nick-nora-cocktail-glasses-set-of-6
+  note: UK/AU retailers list it as 150 ml.
+- glass: nick-and-nora
+  product: Backdoor '20s Nick & Nora Cocktail Glasses (13801)
+  maker: Luigi Bormioli
+  capacity_ml: 170
+  capacity_basis: unstated
+  stated: 5.75 fl oz; height 5.8 in
+  height_mm: 147
+  source: https://luigibormioliusa.com/products/backdoor-20s-nick-nora
+  note: ''
+- glass: old-fashioned
+  product: Straight Up 10 oz. Rocks / Old Fashioned Glass
+  maker: Acopa
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz.
+  height_mm: 89
+  source: https://www.webstaurantstore.com/acopa-10-oz-rocks-glass-case/5535610.html
+  note: WS max. Height 3 1/2 in.
+- glass: old-fashioned
+  product: 2338 Lexington 10.25 oz. Rocks / Old Fashioned Glass
+  maker: Libbey
+  capacity_ml: 303
+  capacity_basis: unstated
+  stated: 10.25 oz.
+  height_mm: 89
+  source: https://www.webstaurantstore.com/libbey-2338-lexington-10-25-oz-rocks-old-fashioned-glass-case/5512338.html
+  note: WS max. Height 3 1/2 in.
+- glass: old-fashioned
+  product: 4508017 Perfect Serve 9.25 oz. Rocks / Old Fashioned Glass
+  maker: Spiegelau
+  capacity_ml: 274
+  capacity_basis: unstated
+  stated: 9.25 oz.
+  height_mm: 83
+  source: https://www.webstaurantstore.com/spiegelau-4508017-perfect-serve-9-25-oz-rocks-old-fashioned-glass-case/5514508017.html
+  note: WS max. Height 3 1/4 in.
+- glass: old-fashioned
+  product: 3141U Concord 10.5 oz. Rocks / Old Fashioned Glass
+  maker: Anchor Hocking
+  capacity_ml: 311
+  capacity_basis: unstated
+  stated: 10.5 oz.
+  height_mm: 89
+  source: https://www.webstaurantstore.com/anchor-hocking-3141u-concord-10-5-oz-rocks-old-fashioned-glass-case/5503141U.html
+  note: WS max. Height 3 1/2 in.
+- glass: old-fashioned
+  product: 917CD Heavy Base 11 oz. Rocks / Old Fashioned Glass
+  maker: Libbey
+  capacity_ml: 325
+  capacity_basis: unstated
+  stated: 11 oz.
+  height_mm: 89
+  source: https://www.webstaurantstore.com/libbey-917cd-heavy-base-11-oz-rocks-old-fashioned-glass-case/551917CD.html
+  note: WS max. Height 3 1/2 in.
+- glass: old-fashioned
+  product: Noblesse 10 oz. Rocks / Old Fashioned Glass (N91710)
+  maker: Nachtmann
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz.
+  height_mm: 102
+  source: https://www.webstaurantstore.com/nachtmann-n91710-noblesse-9-75-oz-whisky-tumbler-case/551N91710.html
+  note: WS max. Height 4 in. The URL slug says 9.75 oz whisky tumbler; the listing title says 10 oz.
+- glass: old-fashioned
+  product: 15242 Gibraltar 9 oz. Rocks / Old Fashioned Glass
+  maker: Libbey
+  capacity_ml: 266
+  capacity_basis: unstated
+  stated: 9 oz.
+  height_mm: 92
+  source: https://www.webstaurantstore.com/libbey-15242-gibraltar-9-oz-rocks-glass-case/55115242.html
+  note: Height 3 5/8 in.
+- glass: old-fashioned
+  product: Timeless Vintage 12 oz. Stackable Fully Tempered Rocks / Old Fashioned Glass (520074)
+  maker: Pasabahce
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 95
+  source: https://www.webstaurantstore.com/pasabahce-520074-012-timeless-11-75-oz-stackable-rocks-old-fashioned-glass-case/543P520074.html
+  note: WS max. Height 3 3/4 in. The URL slug says 11.75 oz; the listing title says 12 oz.
+- glass: old-fashioned
+  product: Origins 12 oz. Rocks / Old Fashioned Glass
+  maker: Della Luce (Acopa)
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 95
+  source: https://www.webstaurantstore.com/della-luce-origins-12-oz-rocks-old-fashioned-glass-pack/553RK1003.html
+  note: WS max. Height 3 3/4 in. Della Luce is WebstaurantStore's premium brand alongside Acopa.
+- glass: old-fashioned
+  product: 5131 4 oz. Rocks / Old Fashioned Glass
+  maker: Libbey
+  capacity_ml: 118
+  capacity_basis: unstated
+  stated: 4 oz.
+  height_mm: 79
+  source: https://www.webstaurantstore.com/libbey-5131-4-oz-rocks-old-fashioned-glass-case/5515131.html
+  note: WS max. Height 3 1/8 in. A very small outlier; consider excluding from the mean.
+- glass: old-fashioned
+  product: Memphis 7 oz. Rocks / Old Fashioned Glass
+  maker: Acopa
+  capacity_ml: 207
+  capacity_basis: unstated
+  stated: 7 oz.
+  height_mm: 83
+  source: https://www.webstaurantstore.com/acopa-memphis-7-oz-rocks-old-fashioned-glass-case/5535137R.html
+  note: WS max. Height 3 1/4 in.
+- glass: old-fashioned
+  product: Gardenia 11 oz. Rocks / Old Fashioned Glass
+  maker: Acopa
+  capacity_ml: 325
+  capacity_basis: unstated
+  stated: 11 oz.
+  height_mm: 89
+  source: https://www.webstaurantstore.com/acopa-gardenia-11-oz-rocks-old-fashioned-glass-case/5535011G.html
+  note: WS max. Height 3 1/2 in.
+- glass: old-fashioned-double
+  product: Straight Up 12 oz. Rocks / Double Old Fashioned Glass
+  maker: Acopa
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 98
+  source: https://www.webstaurantstore.com/acopa-12-oz-double-rocks-old-fashioned-glass-case/5535611R.html
+  note: Height 3 7/8 in.
+- glass: old-fashioned-double
+  product: Reserve by Libbey Radius 12 oz. Rocks / Double Old Fashioned Glass
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 92
+  source: https://www.webstaurantstore.com/reserve-by-libbey-radius-12-oz-rocks-double-old-fashioned-glass-case/5519183.html
+  note: WS max. Height 3 5/8 in.
+- glass: old-fashioned-double
+  product: Zelda 14 oz. Rocks / Double Old Fashioned Glass
+  maker: Acopa
+  capacity_ml: 414
+  capacity_basis: brimful
+  stated: '14 oz.; Rim-Full Capacity: 14 oz.'
+  height_mm: 98
+  source: https://www.webstaurantstore.com/acopa-zelda-14-oz-rocks-double-old-fashioned-glass-pack/5535014ZE.html
+  note: Height 3 7/8 in.
+- glass: old-fashioned-double
+  product: Dion 13 oz. Rocks / Double Old Fashioned Glass
+  maker: Della Luce (Acopa)
+  capacity_ml: 384
+  capacity_basis: unstated
+  stated: 13 oz.
+  height_mm: 86
+  source: https://www.webstaurantstore.com/della-luce-dion-13-oz-rocks-double-old-fashioned-glass-pack/553DOF1302.html
+  note: WS max. Height 3 3/8 in.
+- glass: old-fashioned-double
+  product: 4508016 Perfect Serve 12.5 oz. Rocks / Double Old Fashioned Glass
+  maker: Spiegelau
+  capacity_ml: 370
+  capacity_basis: unstated
+  stated: 12.5 oz.
+  height_mm: 102
+  source: https://www.webstaurantstore.com/spiegelau-4508016-perfect-serve-12-5-oz-double-rocks-old-fashioned-glass-case/5514508016.html
+  note: WS max. Height 4 in.
+- glass: old-fashioned-double
+  product: Timeless Vintage 11.5 oz. Rocks / Double Old Fashioned Glass (52790)
+  maker: Pasabahce
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 11.5 oz.
+  height_mm: 95
+  source: https://www.webstaurantstore.com/pasabahce-52790-012-timeless-11-5-oz-rocks-old-fashioned-glass-case/543P52790.html
+  note: WS max. Height 3 3/4 in.
+- glass: old-fashioned-double
+  product: Gibraltar 12 oz. Rocks / Double Old Fashioned Glass (15243)
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 98
+  source: https://www.webstaurantstore.com/libbey-15243-gibraltar-12-oz-double-rocks-glass-case/55115243.html
+  note: WS max. Height 3 7/8 in.
+- glass: old-fashioned-double
+  product: Endeavor 12 oz. Stackable Rocks / Double Old Fashioned Glass (15712)
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 105
+  source: https://www.webstaurantstore.com/libbey-15712-endeavor-12-oz-stackable-double-rocks-old-fashioned-glass-case/55115712.html
+  note: WS max. Height 4 1/8 in.
+- glass: old-fashioned-double
+  product: Reserve by Libbey Modernist 12 oz. Rocks / Double Old Fashioned Glass (9036)
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 102
+  source: https://www.webstaurantstore.com/reserve-by-libbey-9036-modernist-12-oz-customizable-rocks-double-old-fashioned-glass-case/5519036.html
+  note: Height 4 in.
+- glass: old-fashioned-double
+  product: Bach 11.25 oz. Rocks / Double Old Fashioned Glass (10823/01)
+  maker: Luigi Bormioli
+  capacity_ml: 333
+  capacity_basis: unstated
+  stated: 11.25 oz.
+  height_mm: 97
+  source: https://www.webstaurantstore.com/luigi-bormioli-10823-01-bach-11-25-oz-rocks-double-old-fashioned-glass-case/5671082301.html
+  note: WS max. Height 3 13/16 in.
+- glass: old-fashioned-double
+  product: Origins 14 oz. Rocks / Double Old Fashioned Glass
+  maker: Della Luce (Acopa)
+  capacity_ml: 414
+  capacity_basis: unstated
+  stated: 14 oz.
+  height_mm: 105
+  source: https://www.webstaurantstore.com/della-luce-origins-14-oz-rocks-double-old-fashioned-glass-pack/553DOF1403.html
+  note: WS max. Height 4 1/8 in.
+- glass: old-fashioned-double
+  product: Memphis 11.5 oz. Rim Tempered Rocks / Double Old Fashioned Glass
+  maker: Acopa
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 11.5 oz.
+  height_mm: 100
+  source: https://www.webstaurantstore.com/acopa-memphis-11-5-oz-rim-tempered-rocks-double-old-fashioned-glass-case/55351312R.html
+  note: WS max. Height 3 15/16 in.
+- glass: pilsner
+  product: 1604 16 oz. Giant Pilsner Glass
+  maker: Libbey
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.
+  height_mm: 206
+  source: https://www.webstaurantstore.com/libbey-1604-16-oz-giant-pilsner-glass-case/5511604.html
+  note: WS max. Height 8 1/8 in.
+- glass: pilsner
+  product: 181 Hourglass 12 oz. Pilsner Glass
+  maker: Libbey
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.
+  height_mm: 152
+  source: https://www.webstaurantstore.com/libbey-181-hourglass-12-oz-pilsner-glass-case/551181.html
+  note: WS max. Height 6 in.
+- glass: pilsner
+  product: 526 Pinnacle 14 oz. Pilsner Glass
+  maker: Libbey
+  capacity_ml: 414
+  capacity_basis: unstated
+  stated: 14 oz.
+  height_mm: 216
+  source: https://www.webstaurantstore.com/libbey-526-pinnacle-14-oz-customizable-beer-glass-case/551526.html
+  note: WS max. Height 8 1/2 in.
+- glass: pilsner
+  product: 16 oz. Pilsner Glass (553436)
+  maker: Acopa
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.
+  height_mm: 206
+  source: https://www.webstaurantstore.com/acopa-16-oz-pilsner-glass-case/553436.html
+  note: WS max. Height 8.125 in.
+- glass: pilsner
+  product: 10 oz. Stemmed Pilsner Glass
+  maker: Acopa
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz.
+  height_mm: 165
+  source: https://www.webstaurantstore.com/acopa-10-oz-stemmed-pilsner-glass-case/5534312S.html
+  note: WS max. Height 6 1/2 in.
+- glass: pilsner
+  product: 7410U Bavarian 10 oz. Pilsner Glass
+  maker: Anchor Hocking
+  capacity_ml: 296
+  capacity_basis: unstated
+  stated: 10 oz.
+  height_mm: null
+  source: https://www.webstaurantstore.com/anchor-hocking-7410u-10-oz-bavarian-pilsner-glass-case/5507410U.html
+  note: WS max. The page gives two heights (5 3/4 in and 5 1/2 in), so none is recorded.
+- glass: pilsner
+  product: 25263 Linz 14 oz. Footed Pilsner Glass
+  maker: Arcoroc
+  capacity_ml: 414
+  capacity_basis: unstated
+  stated: 14 oz.
+  height_mm: 206
+  source: https://www.webstaurantstore.com/arcoroc-25263-14-oz-linz-pilsner-glass-by-arc-cardinal-case/55225263.html
+  note: WS max. Height 8 1/8 in. Sold in Europe as the Linz 39cl pilsner; one UK retailer (Hugh Jordan)
+    calls it a 'sling', but that page did not load and Arcoroc names it a pilsner, so it is counted here
+    only.
+- glass: pilsner
+  product: 19416 20 oz. Grand Pilsner Glass
+  maker: Arcoroc
+  capacity_ml: 591
+  capacity_basis: unstated
+  stated: 20 oz.
+  height_mm: 214
+  source: https://www.webstaurantstore.com/arcoroc-19416-20-oz-grand-pilsner-glass-by-arc-cardinal-case/55219416.html
+  note: WS max. Height 8 7/16 in.
+- glass: pilsner
+  product: Nevis 20 oz. Fully Tempered Pilsner Glass
+  maker: Pasabahce
+  capacity_ml: 591
+  capacity_basis: unstated
+  stated: 20 oz.
+  height_mm: 184
+  source: https://www.webstaurantstore.com/pasabahce-nevis-20-oz-fully-tempered-pilsner-glass-pack/543P420398.html
+  note: WS max. Height 7 1/4 in.
+- glass: pilsner
+  product: 4998050 Beer Classics 14.25 oz. Tall Pilsner Glass
+  maker: Spiegelau
+  capacity_ml: 421
+  capacity_basis: unstated
+  stated: 14.25 oz.
+  height_mm: 219
+  source: https://www.webstaurantstore.com/spiegelau-4998050-beer-classics-14-25-oz-tall-pilsner-glass-case/5514998050.html
+  note: WS max. Height 8 5/8 in.
+- glass: pilsner
+  product: Beer Basic 13.9 oz. Brussels Footed Pilsner Glass
+  maker: Schott Zwiesel
+  capacity_ml: 411
+  capacity_basis: unstated
+  stated: 13.9 oz.
+  height_mm: 206
+  source: https://www.webstaurantstore.com/schott-zwiesel-beer-basic-13-9-oz-brussels-pilsner-glass-by-fortessa-tableware-solutions-case/54922865493.html
+  note: WS max. Height 8 1/8 in.
+- glass: pilsner
+  product: Harmonia 13 oz. Footed Pilsner Glass
+  maker: Bormioli Rocco
+  capacity_ml: 384
+  capacity_basis: unstated
+  stated: 13 oz.
+  height_mm: 203
+  source: https://www.webstaurantstore.com/bormioli-rocco-harmonia-from-steelite-international-13-oz-footed-pilsner-glass-case/5764920Q111.html
+  note: WS max. Height 8 in.
+- glass: pilsner
+  product: Birrateque 18.25 oz. Pilsner Glass (12461/01)
+  maker: Luigi Bormioli
+  capacity_ml: 540
+  capacity_basis: unstated
+  stated: 18.25 oz.
+  height_mm: 203
+  source: https://www.webstaurantstore.com/beer-18-25oz-pilsner-birr-case/5671246101.html
+  note: WS max. Height 8 in.
+- glass: pina-colada
+  product: Embassy 13.25 oz. Poco Grande Glass (3717)
+  maker: Libbey
+  capacity_ml: 392
+  capacity_basis: unstated
+  stated: 13.25 oz.
+  height_mm: 178
+  source: https://www.webstaurantstore.com/libbey-3717-embassy-13-25-oz-poco-grande-glass-case/5513717.html
+  note: WS max. Height 7 in.
+- glass: pina-colada
+  product: Embassy 10.5 oz. Poco Grande Glass (3715)
+  maker: Libbey
+  capacity_ml: 311
+  capacity_basis: unstated
+  stated: 10.5 oz.
+  height_mm: 178
+  source: https://www.webstaurantstore.com/libbey-3715-embassy-10-5-oz-poco-grande-glass-case/5513715.html
+  note: WS max. Height 7 in.
+- glass: pina-colada
+  product: 37179 Z-Stem Poco Grande Tulip Glass
+  maker: Libbey
+  capacity_ml: 399
+  capacity_basis: unstated
+  stated: 13-1/2 oz
+  height_mm: 194
+  source: https://bargreen.com/products/LIB37179
+  note: Height 7-5/8 in.
+- glass: pina-colada
+  product: 11 oz. Poco Glass
+  maker: Acopa
+  capacity_ml: 325
+  capacity_basis: unstated
+  stated: 11 oz.
+  height_mm: 178
+  source: https://www.webstaurantstore.com/acopa-11-oz-poco-glass-case/5530513.html
+  note: WS max. Height 7 in.
+- glass: pina-colada
+  product: 13 oz. Poco Glass
+  maker: Acopa
+  capacity_ml: 384
+  capacity_basis: brimful
+  stated: 13 oz. (Rim-Full Capacity)
+  height_mm: 175
+  source: https://www.webstaurantstore.com/acopa-13-oz-poco-glass-case/5530513p13.html
+  note: Height 6 7/8 in.
+- glass: pina-colada
+  product: Capri 13.25 oz. Poco Glass (44872)
+  maker: Pasabahce
+  capacity_ml: 392
+  capacity_basis: unstated
+  stated: 13.25 oz.
+  height_mm: 178
+  source: https://www.webstaurantstore.com/pasabahce-44872-024-capri-12-75-oz-poco-glass-case/543P44872.html
+  note: WS max. Height 7 in. URL slug says 12.75 oz. Utopia (Steelite) sells a 'Capri Poco Grande 375ml'
+    and drinkstuff a 'Capri Pina Colada 380ml'; these are probably the same Pasabahce glass, so they are
+    not counted again (neither page loaded).
+- glass: pina-colada
+  product: Cuba Poco Grande 350 ml (1522H12)
+  maker: Ocean
+  capacity_ml: 350
+  capacity_basis: unstated
+  stated: 12 1/4 oz (350 ml)
+  height_mm: 176
+  source: https://www.ocean-glassware.com/products/cuba-poco-grande/
+  note: Manufacturer page. Olympia's 'Cocktail Poco Grande 350ml' (Nisbets DC024) has the same 176 x 79
+    mm dimensions and is very likely this glass rebranded, so it is not counted separately.
+- glass: pina-colada
+  product: Fiesta Pina Colada Glass 380ml
+  maker: LAV
+  capacity_ml: 380
+  capacity_basis: unstated
+  stated: 380ml (title); specification table says 390ml
+  height_mm: 180
+  source: https://rinkit.com.au/products/380ml-fiesta-pina-colada-glasses-pack-of-six-by-lav
+  note: H18 x W7.5 cm. The title and the spec table disagree (380 vs 390 ml); the title figure is used
+    here.
+- glass: pineapple
+  product: Hollowed baby pineapple (Pino Pepe, Trader Vic's)
+  maker: Difford's Guide (recipe source)
+  capacity_ml: null
+  capacity_basis: documented
+  stated: 'served in a ''Pineapple shell (frozen) glass''; original Trader Vic recipe: ''hollowed-out
+    fresh baby pineapple or ceramic pineapple'''
+  height_mm: null
+  source: https://www.diffordsguide.com/cocktails/recipe/1554/pino-pepe
+  note: 'no capacity stated. The recipe''s liquid adds up to 172.5 ml before blending with ice: a lower
+    bound for a BABY pineapple only, derived by summing, not a measurement'
+- glass: pineapple
+  product: Hollowed pineapple (Boo Loo, Trader Vic's)
+  maker: Garnishes The Size of Your Head (blog)
+  capacity_ml: null
+  capacity_basis: documented
+  stated: Pour into a 36 ounce snifter -- or a hollowed out pineapple -- that is filled with crushed ice.
+  height_mm: null
+  source: https://garnishesthesizeofyourhead.blogspot.com/2017/04/cocktail-42-boo-loo-in-pineapple.html
+  note: offers the pineapple as an alternative to a 36 oz (1065 ml) snifter full of crushed ice; comparable,
+    not measured
+- glass: pineapple
+  product: Whole pineapple fruit, height without crown
+  maker: Biology Insights (fruit-size article)
+  capacity_ml: null
+  capacity_basis: unstated
+  stated: They stand around 7 to 12 inches (approximately 18 to 30 centimeters) tall, excluding their
+    leafy crown.
+  height_mm: null
+  source: https://biologyinsights.com/how-pineapple-size-varies-and-what-to-look-for/
+  note: a RANGE, 180-300 mm without crown; circumference 38-51 cm; weight 0.9-2.7 kg. Not averaged into
+    height_mm because it is not a single figure
+- glass: pineapple
+  product: Pineapple King Tiki Mug - Blue Edition
+  maker: Tiki Farm
+  capacity_ml: 455
+  capacity_basis: unstated
+  stated: 455ml approx. / 16 fl oz.; 18.5 cm
+  height_mm: 185
+  source: https://thetikicove.co.uk/tiki-mugs/pineapple-king-tiki-mug-by-tiki-farm-blue-edition
+  note: ceramic pineapple mug, not fruit
+- glass: pineapple
+  product: Stainless Steel Pineapple Tiki Glass
+  maker: The Tiki Cove
+  capacity_ml: 500
+  capacity_basis: unstated
+  stated: 500ml; 19.5cm (h)
+  height_mm: 195
+  source: https://thetikicove.co.uk/tiki-mugs/pineapple-tiki-glass-stainless-steel
+  note: stainless steel pineapple cup, not fruit
+- glass: pineapple
+  product: BarConic Gold Pineapple Cup w/Lid and Straw - 24oz
+  maker: BarConic
+  capacity_ml: 710
+  capacity_basis: unstated
+  stated: '24 ounces; Height: 6 inches'
+  height_mm: 152
+  source: https://barproducts.com/products/barconic-gold-pineapple-cup-w-lid-and-straw-24oz
+  note: plastic novelty pineapple cup with screw lid, not fruit
+- glass: pineapple
+  product: BULU Pineapple Bowl - Ceramic / 56oz
+  maker: Cocktail Kingdom
+  capacity_ml: 1656
+  capacity_basis: unstated
+  stated: 56oz; 12.7" x 6.7" x 3.4"
+  height_mm: null
+  source: https://www.cocktailkingdom.com/pineapple-bowl
+  note: ceramic half-pineapple communal bowl, not fruit and not a mug; dimensions unlabelled, so no height
+    recorded (3.4 in is probably it)
+  exclude: a sharing bowl, not a single serve
+- glass: punch-bowl
+  product: Punch Bowl - White Stoneware / 2 Gal (7.57L)
+  maker: Cocktail Kingdom
+  capacity_ml: 7570
+  capacity_basis: unstated
+  stated: 2 gallons (7.57 liters); 5 inches (12.7 cm) high; 13.5 in (34.3 cm) diameter
+  height_mm: 127
+  source: https://cocktailkingdom.com/products/punch-bowl-white-stoneware-2-gal-757l
+  note: David Wondrich signature collection; the only bar-trade punch bowl found
+- glass: punch-bowl
+  product: Tulip Punch Bowl + Spoon 4ltr [140.75oz]
+  maker: Libbey
+  capacity_ml: 4000
+  capacity_basis: unstated
+  stated: 4000.00 ml / 140.75 fl oz; height 24.40 cm; diameter 18.00 cm
+  height_mm: 244
+  source: https://www.artis-uk.com/shop/drinkware/tulip-punch-bowl-spoon-4ltr-140-75oz/
+  note: tall tulip-shaped glass vessel, narrower than tall; discontinued
+- glass: punch-bowl
+  product: Libbey Selene 6 in 1 Multiuse Glass Server (punch bowl)
+  maker: Libbey
+  capacity_ml: 4259
+  capacity_basis: unstated
+  stated: dome 144-ounce; 5.9 inches tall; 10.6 x 10.6 inches
+  height_mm: 150
+  source: https://shop.libbey.com/products/libbey-selene-6-in-1-multiuse-glass-server-punch-bowl-chip-and-dip-bowl-cake-stand
+  note: multi-use piece; maker names the dome a punch bowl among other uses
+- glass: punch-bowl
+  product: LSA BAR Punch Bowl Set dia:26.5cm
+  maker: LSA International
+  capacity_ml: 3100
+  capacity_basis: unstated
+  stated: 3.1L; Height 33cm
+  height_mm: 330
+  source: https://samizstore.com/20-64-300.html
+  note: footed glass bowl; 33cm is listed for the set and may include the foot or ladle, treat with care
+- glass: punch-bowl
+  product: Vollrath 46072 20 Qt. New York, New York Stainless Steel Punch Bowl
+  maker: Vollrath
+  capacity_ml: 18927
+  capacity_basis: unstated
+  stated: 20 qt. (5 gallons); 11 1/2 Inches; top diameter 17 inches
+  height_mm: 292
+  source: https://www.webstaurantstore.com/vollrath-46072-20-qt-new-york-new-york-stainless-steel-punch-bowl/92246072.html
+  note: catering/buffet scale
+- glass: punch-bowl
+  product: American Metalcraft HMPB12 8 Qt. Hammered Punch Bowl
+  maker: American Metalcraft
+  capacity_ml: 7571
+  capacity_basis: unstated
+  stated: up to 8 qt.; 10 7/8 Inches; diameter 17 inches
+  height_mm: 276
+  source: https://www.webstaurantstore.com/american-metalcraft-hmpb12-8-qt-hammered-punch-bowl/124HMPB12.html
+  note: catering scale, footed
+- glass: punch-bowl
+  product: American Metalcraft HMPB20 13 Qt. Hammered Punch Bowl
+  maker: American Metalcraft
+  capacity_ml: 12303
+  capacity_basis: unstated
+  stated: 13 qt.; 12 Inches; diameter 18 1/2"
+  height_mm: 305
+  source: https://www.webstaurantstore.com/american-metalcraft-hmpb20-13-qt-hammered-punch-bowl/124HMPB20.html
+  note: catering scale, footed
+- glass: punch-bowl
+  product: Winco 13.25 Qt. Stainless Steel Mirror Finish Punch Bowl with Handles
+  maker: Winco
+  capacity_ml: 12539
+  capacity_basis: unstated
+  stated: 13.25 qt.; 9 11/16 Inches; top diameter 14 3/8 Inches
+  height_mm: 246
+  source: https://www.webstaurantstore.com/winco-13-25-qt-stainless-steel-mirror-finish-punch-bowl-with-handles/407WSPB35.html
+  note: pedestal base, catering scale
+- glass: punch-bowl
+  product: TableCraft Hive Collection 14 Qt. Round Honeycomb Footed Stainless Steel Punch Bowl 12850
+  maker: TableCraft
+  capacity_ml: 13249
+  capacity_basis: unstated
+  stated: 14 qt.; 10 1/2 Inches; top diameter 15 1/2"
+  height_mm: 267
+  source: https://www.webstaurantstore.com/tablecraft-hive-collection-14-qt-round-honeycomb-footed-stainless-steel-punch-bowl-12850/99912850.html
+  note: footed, catering scale; page repeats the 'approximate maximum capacity' disclaimer
+- glass: punch-bowl
+  product: Visions 8 Qt. Clear Plastic Punch Bowl
+  maker: Visions
+  capacity_ml: 7571
+  capacity_basis: unstated
+  stated: 8 qt.; 5 1/2 Inches; top diameter 12 1/2 inches
+  height_mm: 140
+  source: https://www.webstaurantstore.com/visions-8-qt-clear-plastic-punch-bowl-case/130PUNCH8.html
+  note: disposable polystyrene; 8 qt in a 5.5 x 12.5 in bowl looks generous but is what the page says
+- glass: sherry
+  product: Embassy 3 oz. Sherry Glass (3788)
+  maker: Libbey
+  capacity_ml: 89
+  capacity_basis: unstated
+  stated: 3 oz.; height 4 7/8 in
+  height_mm: 124
+  source: https://www.webstaurantstore.com/libbey-3788-embassy-3-oz-sherry-glass-case/5513788.html
+  note: ''
+- glass: sherry
+  product: Georgian 2 oz. Sherry Glass (8089)
+  maker: Libbey
+  capacity_ml: 59
+  capacity_basis: unstated
+  stated: 2 oz.; height 4 7/8 in
+  height_mm: 124
+  source: https://www.webstaurantstore.com/libbey-8089-2-oz-georgian-sherry-glass-case/5518089.html
+  note: ''
+- glass: sherry
+  product: Bristol Valley 4 oz. Sherry Glass (8588SR)
+  maker: Libbey
+  capacity_ml: 118
+  capacity_basis: unstated
+  stated: 4 oz.; height 5 7/8 in
+  height_mm: 149
+  source: https://www.webstaurantstore.com/libbey-8588sr-bristol-valley-4-oz-sherry-glass-case/5518588SR.html
+  note: ''
+- glass: sherry
+  product: Sherry / Prosecco glass Bar Special
+  maker: Schott Zwiesel
+  capacity_ml: 118
+  capacity_basis: brimful
+  stated: Total capacity 118ml; filling line 10cl; height 188mm
+  height_mm: 188
+  source: https://www.barstuff.com/sherry-glass-bar-special-schott-zwiesel-118ml-10cl-cm-6-pcs-5893
+  note: Named 'Sherry / Prosecco'. barstuff total-vs-filling-line spec, total treated as brimful.
+- glass: sherry
+  product: Tritan Diva Sherry Glass
+  maker: Schott Zwiesel
+  capacity_ml: 104
+  capacity_basis: unstated
+  stated: 3-1/2 oz; height 7-1/2 in
+  height_mm: 191
+  source: https://www.winestuff.com/products/schott-zwiesel-tritan-diva-sherry-glasses-set-of-6
+  note: US retailer, so US fl oz assumed.
+- glass: sherry
+  product: Sherry glass Viticole
+  maker: Arcoroc
+  capacity_ml: 120
+  capacity_basis: brimful
+  stated: Total volume 120ml; filling volume 50ml; height 13.1cm
+  height_mm: 131
+  source: https://www.barstuff.com/sherry-glass-viticole-arcoroc-120ml-9326G
+  note: Also sold as the Viticole tasting glass (ISO-like shape). barstuff total-vs-filling spec, total
+    treated as brimful.
+- glass: sherry
+  product: Glencairn Copita
+  maker: Glencairn Crystal
+  capacity_ml: 170
+  capacity_basis: unstated
+  stated: 170ml; 150 x 60mm (height x diameter)
+  height_mm: 150
+  source: https://glencairn.com/product/glencairn-copita/
+  note: Named both 'sherry glass' and 'copita'; marketed mainly as a whisky nosing glass.
+- glass: sherry
+  product: Sharon Sherry Glass
+  maker: Dartington Crystal
+  capacity_ml: 80
+  capacity_basis: unstated
+  stated: 8cl; height 160mm
+  height_mm: 160
+  source: https://www.dartington.co.uk/sharon-sherry-glass.html
+  note: ''
+- glass: sherry
+  product: Rachael Sherry Glass
+  maker: Dartington Crystal
+  capacity_ml: 160
+  capacity_basis: unstated
+  stated: 16cl; 195mm (h)
+  height_mm: 195
+  source: https://www.dartington.co.uk/sherry-glass.html
+  note: ''
+- glass: sherry
+  product: Wine & Bar Sherry Glass
+  maker: Dartington Crystal
+  capacity_ml: 100
+  capacity_basis: unstated
+  stated: 100ml; 200mm (h)
+  height_mm: 200
+  source: https://www.broadwaycookshop.co.uk/dartington-crystal-wine--bar-sherry-glasses-set-of-2-2868-p.asp
+  note: ''
+- glass: shot
+  product: 2 oz. Fluted Shot Glass (5282U)
+  maker: Anchor Hocking
+  capacity_ml: 59
+  capacity_basis: unstated
+  stated: 2 oz.; height 2 7/8 in
+  height_mm: 73
+  source: https://www.webstaurantstore.com/anchor-hocking-5282u-2-oz-whiskey-shot-glass-pack/5505282U.html
+  note: ''
+- glass: shot
+  product: Shots & Shooters Whiskey (5114)
+  maker: Libbey
+  capacity_ml: 52
+  capacity_basis: unstated
+  stated: 1.75 oz; height 2.38 in
+  height_mm: 60
+  source: https://libbeyfoodservice.com/product/libbey/shots-and-shooters-whiskey/5114
+  note: ''
+- glass: shot
+  product: Shots & Shooters Fluted Whiskey (5127)
+  maker: Libbey
+  capacity_ml: 44
+  capacity_basis: unstated
+  stated: 1.5 oz; height 2.88 in
+  height_mm: 73
+  source: https://libbeyfoodservice.com/product/libbey/shots-and-shooters-fluted-whiskey/5127
+  note: ''
+- glass: shot
+  product: Prism Shot (5277)
+  maker: Libbey
+  capacity_ml: 59
+  capacity_basis: unstated
+  stated: 2 oz; height 2.5 in
+  height_mm: 64
+  source: https://libbeyfoodservice.com/product/libbey/prism-shot/5277
+  note: ''
+- glass: shot
+  product: Shot glass Tall Whiskey, Shooters & Shots 30ml
+  maker: Libbey
+  capacity_ml: 30
+  capacity_basis: unstated
+  stated: 30ml total capacity; height 73mm
+  height_mm: 73
+  source: https://www.barstuff.com/shot-glass-tall-whiskey-shooters-shots-libbey-30ml-1377G
+  note: A 22 ml version of the same line also exists; not counted separately.
+- glass: shot
+  product: Rondo Shot Glass 2.75oz / 8cl (SB1010)
+  maker: Urban Bar
+  capacity_ml: 55
+  capacity_basis: brimful
+  stated: To brim 55ml; to washline 45ml (named 2.75oz / 8cl)
+  height_mm: 65
+  source: https://www.diffordsguide.com/glassware/187/urban-bar-rondo-shot-glass-275oz-8cl
+  note: Name says 8cl but the brim figure is 55 ml; brim figure used.
+- glass: shot
+  product: 1890 Shot 2oz / 6cl (UB600-1)
+  maker: Urban Bar
+  capacity_ml: 60
+  capacity_basis: brimful
+  stated: To brim 60 ml; to washline 50 ml
+  height_mm: 60
+  source: https://www.diffordsguide.com/glassware/177/urban-bar-1890-shot-2oz-6cl
+  note: ''
+- glass: shot
+  product: Shot glass Bach
+  maker: Luigi Bormioli
+  capacity_ml: 70
+  capacity_basis: brimful
+  stated: Total volume 70 ml; filling volume 50 ml; height 66 mm
+  height_mm: 66
+  source: https://www.barstuff.com/shot-glass-bach-luigi-bormioli-70-ml-4-pcs-13461
+  note: barstuff total-vs-filling spec, total treated as brimful.
+- glass: shot
+  product: Shot glass Junior Stamper 30ml, 2cl CM
+  maker: Bormioli Rocco
+  capacity_ml: 30
+  capacity_basis: brimful
+  stated: Total volume 30ml; calibration mark 2cl; height 70mm
+  height_mm: 70
+  source: https://www.barstuff.com/junior-stamper-30ml-2cl-fs-700471.html
+  note: The page names the maker as 'Bormioli Rocco (Bormioli Luigi S.p.A.)'. barstuff total-vs-calibration
+    spec, total treated as brimful.
+- glass: shot
+  product: Shot Glass Perfect Serve Collection 55 ml
+  maker: Spiegelau
+  capacity_ml: 55
+  capacity_basis: unstated
+  stated: 55 ml total volume; height 9.0 cm
+  height_mm: 90
+  source: https://www.barstuff.com/shot-glas-perfect-serve-collection-spiegelau-55ml.html
+  note: Narrow shooter.
+- glass: shot
+  product: Shot glass Paris 50ml
+  maker: Schott Zwiesel
+  capacity_ml: 50
+  capacity_basis: unstated
+  stated: 50ml total capacity (no fill lines); height 72mm
+  height_mm: 72
+  source: https://www.barstuff.com/schott-zwiesel-paris-schnaps-shot-50ml.html
+  note: ''
+- glass: shot
+  product: Shot glass Mode 90ml, 2+4cl CM
+  maker: Rona
+  capacity_ml: 90
+  capacity_basis: brimful
+  stated: Total volume 90ml; filling volume 40ml; marks 2cl and 4cl; height 90mm
+  height_mm: 90
+  source: https://www.barstuff.com/shot-glass-mode-rona-90ml-2-4cl-cm-9252G
+  note: Large for a shot; the marks are at 2 and 4 cl. barstuff total-vs-filling spec, total treated as
+    brimful.
+- glass: shot
+  product: 6 cl Islande shot glass (Q7714)
+  maker: Arcoroc
+  capacity_ml: 60
+  capacity_basis: unstated
+  stated: 6 cl; height 105 mm
+  height_mm: 105
+  source: https://www.latabledarc.com/en/products/verre-a-shooter-6-cl-islande
+  note: Tall shooter shape.
+- glass: shot
+  product: Shot glass / mini-jug Isar 50ml, 4cl CM
+  maker: Stölzle
+  capacity_ml: 50
+  capacity_basis: brimful
+  stated: 50ml total capacity with 4cl calibration mark; height 72mm
+  height_mm: 72
+  source: https://www.barstuff.com/schnapsglas-mini-masskrug-50ml-mit-4clfs.html
+  note: 'FLAG: novelty handled mini beer-mug shape, sold as a shot glass. Consider excluding. Maker named
+    on page as Stölzle Oberglas (Austria), not Stölzle Lausitz.'
+  exclude: a novelty mini beer mug
+- glass: sling
+  product: Sling Glass 11.5oz / 33cl
+  maker: Urban Bar
+  capacity_ml: 350
+  capacity_basis: brimful
+  stated: 350 ml to brim; 330 ml to washline
+  height_mm: 194
+  source: https://www.diffordsguide.com/glassware/132/urban-bar-sling-115oz-33cl
+  note: Barstuff lists the same glass as 'Classic Sling' 330 ml, 20.0 cm (https://www.barstuff.com/longdrinkglas-classic-sling-330ml.html).
+    Urban Bar's own page gives height '6.5cm', which is plainly the width, so not used.
+- glass: sling
+  product: Gatsby Sling Cocktail Glass 11.5oz 33cl (CG792)
+  maker: Utopia
+  capacity_ml: 330
+  capacity_basis: unstated
+  stated: 11.5oz 33cl
+  height_mm: 200
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Cocktail-Glasses/Utopia-Gatsby-Sling-Cocktail-Glass-11-5oz-33cl~p~CG792
+  note: Footed. Cater Supplies Direct gives 330ml / 11.25oz, 200mm x 72mm for the same glass.
+- glass: sling
+  product: Cin Cin Sling glass 405ml
+  maker: Pasabahce
+  capacity_ml: 405
+  capacity_basis: unstated
+  stated: 405ml
+  height_mm: 237
+  source: https://kohrconcept.es/en/ashtray-bistro-glasses-cincin/315-cin-cin-sling-glass-pasabahce-405ml-8693357094086.html
+  note: Height 23.7 cm. WebstaurantStore sells a Cin Cin 14.5 oz 'Footed Pilsner' that may be the same
+    family, so it is left out of pilsner to avoid counting it twice.
+- glass: sling
+  product: Catalina Sling Beer Glass 12oz 34cl (C6347)
+  maker: Libbey
+  capacity_ml: 340
+  capacity_basis: unstated
+  stated: 12 fl oz (34 cl)
+  height_mm: null
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Beer-Glasses/Libbey-Catalina-Sling-Beer-Glass-12oz-34cl~p~C6347
+  note: Height not listed. UK retailers call it a sling; in the US the Catalina line is sold as 'pilsner'
+    (3828, 12 oz, 9 in) and 'footed ale' (3812, 12 oz), and it is not clear which one this is, so no height
+    is recorded. Counted here only, not under pilsner. John Artis sells it as 'Catalina Sling Glass Clear
+    34CL' (same product).
+- glass: sling
+  product: America '20s Sling Cocktail Glass 9.5oz 27.5cl (CG673)
+  maker: Bormioli Rocco
+  capacity_ml: 275
+  capacity_basis: unstated
+  stated: 9.5 fl oz (27.5 cl)
+  height_mm: null
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Cocktail-Glasses/Bormioli-Rocco-America-20-s-Sling-Cocktail-Glass-9-5oz-27-5cl~p~CG673
+  note: FLAT-BOTTOMED faceted tumbler, not footed, and so not the drawn shape; WebstaurantStore calls
+    the America '20s tall size a 'Long Drink Glass'. Included only because the retailer names it a sling.
+    The height field on the page ('65.50 cm') is garbled.
+  exclude: a flat-bottomed tumbler, not the footed sling; the maker calls the range long drink glasses
+- glass: sling
+  product: America '20s Sling Cocktail Glass 13.5oz 40cl (CG674)
+  maker: Bormioli Rocco
+  capacity_ml: 400
+  capacity_basis: unstated
+  stated: 13.5oz / 40cl
+  height_mm: null
+  source: https://www.lockhart.co.uk/Glassware-and-Barware/Cocktail-Glasses/Bormioli-Rocco-America-20-s-Sling-Cocktail-Glass-13-5oz-40cl~p~CG674
+  note: FLAT-BOTTOMED tumbler, not footed; same caveat as the 27.5cl. The height field on the page ('74.50
+    cm') is garbled.
+  exclude: a flat-bottomed tumbler, not the footed sling; the maker calls the range long drink glasses
+- glass: sour
+  product: Drink Specific Glassware Sour (6417/06)
+  maker: Riedel
+  capacity_ml: 217
+  capacity_basis: unstated
+  stated: 217ml total capacity; height 158mm
+  height_mm: 158
+  source: https://www.barstuff.com/sour-glas-drink-specific-glassware-riedel-bar-217ml-2-stk.html
+  note: Bell-shaped bowl with flared lip. Riedel's own US pages carry placeholder capacities. The Optic
+    version (6417/09) was not counted because no reliable capacity was found.
+- glass: sour
+  product: Embassy Whiskey Sour 4.5oz / 133ml (3775)
+  maker: Libbey
+  capacity_ml: 133
+  capacity_basis: unstated
+  stated: 4.5oz / 133ml; height 146mm
+  height_mm: 146
+  source: https://www.diffordsguide.com/glassware/90/libbey-embassy-whiskey-sour-45oz-133ml
+  note: Tulip-shaped stemmed glass; the classic foodservice 'whiskey sour'.
+- glass: sour
+  product: Raye Angled Crystal Sour Glasses
+  maker: Viski
+  capacity_ml: 222
+  capacity_basis: unstated
+  stated: 7.5 oz.
+  height_mm: null
+  source: https://viski.com/products/11371
+  note: No height listed. Coupe-like angled bowl.
+- glass: tiki-mug
+  product: Acopa 21 oz. Green Ceramic Tiki Mug
+  maker: Acopa
+  capacity_ml: 621
+  capacity_basis: unstated
+  stated: 21 oz.; height 7 Inches
+  height_mm: 178
+  source: https://www.webstaurantstore.com/acopa-21-oz-green-ceramic-tiki-mug-case/5537521TSGN.html
+  note: also sold in blue and brown; counted once
+- glass: tiki-mug
+  product: Tuxton GZ3-160 Glacier 16 oz. Ceramic Tiki Mug
+  maker: Tuxton
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.; height 6 1/8 Inches
+  height_mm: 156
+  source: https://www.webstaurantstore.com/tuxton-gz3-160-glacier-16-oz-ceramic-tiki-mug-pack/303GZ3160.html
+  note: same body sold as Pine, Peacock, Lava glazes; counted once
+- glass: tiki-mug
+  product: Cap'n Moai by Derek Yaniger
+  maker: Tiki Farm
+  capacity_ml: 680
+  capacity_basis: unstated
+  stated: holds 23 oz.; stands 8.5" inches high
+  height_mm: 216
+  source: https://www.tikifarm.com/products/capn-moai-by-derek-yaniger
+  note: The Tiki Cove lists it as 'Cap'n Moai Tiki Mug', 680 ml, 21.6 cm
+- glass: tiki-mug
+  product: Rongo-Rongo Tiki Mug
+  maker: Tiki Farm
+  capacity_ml: 355
+  capacity_basis: unstated
+  stated: 12 oz.; 7.5"
+  height_mm: 191
+  source: https://www.tikifarm.com/products/rongo-rongo
+  note: 'The Tiki Cove agrees: 355 ml, 19 cm'
+- glass: tiki-mug
+  product: Kofi Tiki Mug
+  maker: Tiki Farm
+  capacity_ml: 767
+  capacity_basis: unstated
+  stated: 767 ml; 20.3 cm
+  height_mm: 203
+  source: https://thetikicove.co.uk/tiki-mugs/kofi-tiki-mug
+  note: designed by Tank Standing Buffalo
+- glass: tiki-mug
+  product: Medusa Tiki Mug
+  maker: Tiki Farm
+  capacity_ml: 680
+  capacity_basis: unstated
+  stated: 680 ml; 16.5 cm
+  height_mm: 165
+  source: https://thetikicove.co.uk/tiki-mugs
+  note: figures read from the retailer's tiki-mug category listing; product page https://thetikicove.co.uk/tiki-mugs/medusa-tiki-mug
+- glass: tiki-mug
+  product: El Mirador Tiki Mug
+  maker: Tiki Farm
+  capacity_ml: 540
+  capacity_basis: unstated
+  stated: 540 ml; 15 cm
+  height_mm: 150
+  source: https://thetikicove.co.uk/tiki-mugs
+  note: figures read from the retailer's category listing; product page https://thetikicove.co.uk/tiki-mugs/el-mirador-tiki-mug
+- glass: tiki-mug
+  product: Fire Eater Tiki Mug
+  maker: Tiki Farm
+  capacity_ml: 455
+  capacity_basis: unstated
+  stated: 455 ml; 19 cm
+  height_mm: 190
+  source: https://thetikicove.co.uk/tiki-mugs
+  note: figures read from the retailer's category listing; product page https://thetikicove.co.uk/tiki-mugs/fire-eater-tiki-mug-by-tiki-farm
+- glass: tiki-mug
+  product: Vince Ray's Voodoo Idol Tiki Mug
+  maker: Tiki Farm
+  capacity_ml: 562
+  capacity_basis: unstated
+  stated: 19 oz; 6.125 inches
+  height_mm: 156
+  source: https://thetikicove.co.uk/tiki-mugs
+  note: figures read from the retailer's category listing; UK retailer quoting oz, assumed US fl oz as
+    Tiki Farm is a US maker
+- glass: tiki-mug
+  product: Tumuaki Tiki Mug
+  maker: Tiki Farm
+  capacity_ml: 595
+  capacity_basis: unstated
+  stated: 595 ml; 12 cm
+  height_mm: 120
+  source: https://thetikicove.co.uk/tiki-mugs
+  note: figures read from the retailer's category listing; squat bowl-like mug
+- glass: tiki-mug
+  product: Suffering Bastard - Black Edition
+  maker: Trader Vic's
+  capacity_ml: 500
+  capacity_basis: unstated
+  stated: 500 ml approx / 18 fl oz.; 16 cm
+  height_mm: 160
+  source: https://thetikicove.co.uk/tiki-mugs/suffering-bastard-black-edition-trader-vics
+  note: ''
+- glass: tiki-mug
+  product: Thirsty Trio tiki mugs
+  maker: Munktiki Imports
+  capacity_ml: 532
+  capacity_basis: unstated
+  stated: 18 ounces; 7 inches tall
+  height_mm: 178
+  source: https://bgreynolds.com/products/thirsty-trio-tiki-mugs
+  note: three designs on one body; counted once
+- glass: tiki-mug
+  product: Drunkie Shrunkies 28 oz Tiki Mug
+  maker: Munktiki Imports
+  capacity_ml: 828
+  capacity_basis: unstated
+  stated: 28 oz; 7 inches tall
+  height_mm: 178
+  source: https://www.theblacklagoonroom.com/product/drunkie-shrunkies-limited-edition-tiki-mug
+  note: scratch-and-dent listing of a limited edition
+- glass: tiki-mug
+  product: BarConic Drinkware - Tiki Mug - Peacock - 18oz
+  maker: BarConic
+  capacity_ml: 532
+  capacity_basis: unstated
+  stated: 18 ounces; 6 1/2 inches tall
+  height_mm: 165
+  source: https://barproducts.com/products/barconic-drinkware-tiki-mug-peacock-18oz
+  note: ''
+- glass: tiki-mug
+  product: BarConic Dino Egg Tiki Mugs - 14 Ounce
+  maker: BarConic
+  capacity_ml: 414
+  capacity_basis: unstated
+  stated: 14 ounces; 4.5 inches tall
+  height_mm: 114
+  source: https://barproducts.com/products/barconic-dino-egg-tiki-mugs-14-ounce-color-options
+  note: egg-shaped, jagged rim; an outlier on height
+- glass: wine
+  product: Allround 10.25 oz. All-Purpose Wine Glass (4298033)
+  maker: Spiegelau
+  capacity_ml: 303
+  capacity_basis: unstated
+  stated: 10.25 oz.
+  height_mm: 187
+  source: https://www.webstaurantstore.com/spiegelau-allround-10-25-oz-all-purpose-wine-glass-case/5514298033.html
+  note: WS max. Height 7 3/8 in.
+- glass: wine
+  product: 10.5 oz. All-Purpose Wine Glass (5535414)
+  maker: Acopa
+  capacity_ml: 311
+  capacity_basis: unstated
+  stated: 10.5 oz.
+  height_mm: 197
+  source: https://www.webstaurantstore.com/acopa-11-oz-all-purpose-wine-glass-case/5535414.html
+  note: WS max. Height 7 3/4 in.
+- glass: wine
+  product: 14 oz. All-Purpose Wine Glass (5535416)
+  maker: Acopa
+  capacity_ml: 429
+  capacity_basis: brimful
+  stated: '14 oz.; Rim-Full Capacity: 14.5 oz.'
+  height_mm: 208
+  source: https://www.webstaurantstore.com/acopa-14-oz-all-purpose-wine-glass-case/5535416.html
+  note: Headline 14 oz (414 ml); the ml value above is the rim-full 14.5 oz. Height 8 3/16 in.
+- glass: wine
+  product: 12.5 oz. All-Purpose Balloon Wine Glass
+  maker: Acopa
+  capacity_ml: 370
+  capacity_basis: unstated
+  stated: 12.5 oz.
+  height_mm: 187
+  source: https://www.webstaurantstore.com/acopa-12-5-oz-balloon-wine-glass-case/5534440.html
+  note: WS max. Height 7 3/8 in. Sold as 'all-purpose' despite 'balloon' in the name; it is not a specialist
+    Burgundy bowl at this size.
+- glass: wine
+  product: Maia 16 oz. All-Purpose Wine Glass
+  maker: Della Luce (Acopa)
+  capacity_ml: 473
+  capacity_basis: brimful
+  stated: '16 oz.; Rim-Full Capacity: 16 oz.'
+  height_mm: 222
+  source: https://www.webstaurantstore.com/della-luce-maia-16-oz-all-purpose-wine-glass-by-acopa-pack/553APWN1601.html
+  note: Height 8 3/4 in.
+- glass: wine
+  product: 3957 Teardrop 10.75 oz. All Purpose Wine Glass
+  maker: Libbey
+  capacity_ml: 318
+  capacity_basis: unstated
+  stated: 10.75 oz.
+  height_mm: 184
+  source: https://www.webstaurantstore.com/libbey-3957-teardrop-10-75-oz-customizable-all-purpose-wine-glass-case/5513957.html
+  note: WS max. Height 7 1/4 in.
+- glass: wine
+  product: L5633 Sequence 16 oz. Universal Wine Glass
+  maker: Chef & Sommelier (Arc)
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.
+  height_mm: 229
+  source: https://www.webstaurantstore.com/chef-sommelier-l5633-sequence-16-oz-universal-wine-glass-by-arc-cardinal-case/552L5633.html
+  note: WS max. Height 9 in.
+- glass: wine
+  product: FN166 Villeneuve by Daniel Boulud 16 oz. Universal Wine Glass
+  maker: Chef & Sommelier (Arc)
+  capacity_ml: 473
+  capacity_basis: unstated
+  stated: 16 oz.
+  height_mm: 227
+  source: https://www.webstaurantstore.com/chef-sommelier-fn166-villeneuve-by-daniel-boulud-16-oz-universal-wine-glass-by-arc-cardinal-case/552FN166.html
+  note: WS max. Height 8 15/16 in.
+- glass: wine
+  product: Drink Specific Glassware Universal wine glass (Riedel Bar) 350ml
+  maker: Riedel
+  capacity_ml: 350
+  capacity_basis: unstated
+  stated: 350 ml
+  height_mm: 188
+  source: https://www.barstuff.com/universalglas-drink-specific-glassware-riedel-bar-350ml-2-stk.html
+  note: Height 18.8 cm. Riedel sells it as the 'All Purpose Glass' (641700098); a search snippet of riedel.com
+    gave 187 mm, but that page returned 404 here, so the retailer figure is used.
+- glass: wine
+  product: StandArt All Purpose Wine Glass
+  maker: Gabriel-Glas
+  capacity_ml: 510
+  capacity_basis: unstated
+  stated: 510 ml (17.29 fl oz)
+  height_mm: 230
+  source: https://www.mygabrielglas.com/products/standart
+  note: Maker's page.
+- glass: wine
+  product: Denk'Art Universal Glass
+  maker: Zalto
+  capacity_ml: 530
+  capacity_basis: unstated
+  stated: 530 ml
+  height_mm: 235
+  source: https://67wine.com/products/zalto-universal-glass
+  note: Premium mouth-blown universal glass; one of the two largest here.
+- glass: wine
+  product: Jancis Robinson Original Universal Wine Glass
+  maker: Richard Brendon
+  capacity_ml: 125
+  capacity_basis: nominal
+  stated: 'Capacity: 125ml / 4.23 fl oz'
+  height_mm: 224
+  source: https://richardbrendon.com/products/the-original-wine-glass
+  note: 125 ml is the design POUR (a standard pour reaches the widest part of the bowl), not what the
+    glass holds; exclude it from any capacity mean. The page gives '22.4cm / 8.1"', which do not agree;
+    the cm figure is used.

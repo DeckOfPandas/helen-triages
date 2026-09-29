@@ -2365,6 +2365,44 @@ a source's spellings on ingest. The rule governs what is WRITTEN; the alias
 map what can be READ. `martini` vs `martini glass` is deliberately not in the
 map: an alias absent from it is permitted, so silence means "not asked yet".
 
+### 9.11.2 What each glass holds — the survey, the rules, the fit report (#1238)
+
+**A SPEC, NOT AN INVENTORY** — Helen, 2026-09-28: *"I don't want inventory,
+just spec. I might buy new glasses... let's offer rules, then I'll happily
+break them in the kitchen."* Nothing records the cupboard, and nothing should.
+
+- **`_data/cocktails/glass_survey.yml` is the fact**: one row per distinct
+  product, with a capacity and a height as its maker's or a retailer's page
+  states them, the page's own words in `stated`, and the URL. A product gets in
+  only if the page itself NAMES it that type. `capacity_basis: nominal` (a pour
+  or filling line) is recorded and NOT counted as a capacity; `exclude: "<why>"`
+  keeps a row visible and uncounted; a row with neither figure is a search
+  that came back empty, and its note says what was looked for.
+- **`typical_ml` / `typical_height_mm` in `glasses.yml` are its shadow** —
+  n, min, median, mean, max per icon, GENERATED between marker comments by
+  `python3 scripts/glass_survey_stats.py --write`. Fix a number in the survey,
+  never between the markers; `test_glass_survey_statistics_are_current` runs
+  the script's own `check()`.
+- **`survey_only_types`** holds a type that draws another icon but differs in
+  size: `mule-mug` draws the mug and holds a third more.
+- **`heights_mm` still draws the icons.** The sourced medians sit beside it and
+  replace it only when Helen says so, because replacing it resizes every glass.
+  The punch bowl's 256 mm median would outrank the flute as the tallest glass,
+  which is the scale's denominator — so that one needs deciding, not copying.
+- **`fit_rules` are the rules**: dilution per method family, blended volume,
+  wash line, ice space, the large cube, punch cups. Each is a sourced
+  `{low, high}` range, because the sources disagree and a single figure hides
+  which way. The wash line is a single figure because it IS the rule.
+- **`python3 scripts/glass_fit_report.py`** builds the site with the local
+  config (drafts render there), reads each drink's `data-total-ml` — the
+  plugin's own figure, never a second parse — and writes a GitHub checklist to
+  `tmp/glass_fit_report.md`. **It reads the FORGIVING end of every range**, so
+  a flag means the drink does not fit even on the kindest reading of the
+  sources. **A top is judged apart**: it fills what the build leaves, so the
+  report checks the build and says how much room is left for the top. **It is
+  a report and not a test on purpose**: a red `main` is a deploy outage, and
+  every flag is Helen's judgement about one drink.
+
 ### 9.12 The method-step dictionary — `_data/cocktails/methods.yml`
 
 **A closed vocabulary for the mechanical spine, free text for everything
