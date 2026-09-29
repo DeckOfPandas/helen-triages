@@ -2848,6 +2848,28 @@ undeployed.** The wrapper exists because the original form of this check was a
 `--jq` whose brackets and pipe make Claude Code prompt Helen, and a check that
 costs an interruption is a check nobody runs.
 
+**PULL REQUESTS ARE TESTED BEFORE MERGE, SINCE 2026-09-28** (#1195). The
+workflow triggers on `pull_request` as well as `push: main`, and `test` is a
+**required status check** on `main` via a repository ruleset — so a red merge is
+now prevented rather than merely reported. `build` and `deploy` each carry
+`if: github.event_name != 'pull_request'`, so a PR run tests and stops there:
+on a pull request you should see `test` pass with `build` and `deploy`
+**skipped**, which is the shape to expect and not a sign anything went wrong.
+
+Two consequences worth knowing before they surprise you:
+
+- **An invalid workflow file deadlocks everything.** If the YAML will not
+  parse, GitHub runs no jobs at all, so `test` never reports, so the required
+  check can never pass and **nothing can merge — including the fix**. The way
+  out is a PR that repairs the workflow: a `pull_request` run reads the file
+  from the PR's own branch, so the corrected copy runs and reports. Happened
+  within an hour of the trigger landing (DECISIONS §12).
+- **A Dependabot PR opened while CI was broken will not re-run on its own,
+  and closing and reopening it does nothing.** Proved 2026-09-29 on #1239:
+  a close-and-reopen produced no run at all. `@dependabot rebase` as a PR
+  comment force-pushes the branch, which fires `synchronize`, and that does
+  run. Reach for the rebase, not the reopen.
+
 **The suite gates the deploy** (#369): `.github/workflows/build-and-deploy.yml`
 has a `test` job and `build` declares `needs: test`, so every guard here is a
 build stop rather than a report. Three things are load-bearing:
