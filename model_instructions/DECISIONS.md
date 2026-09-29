@@ -3091,6 +3091,19 @@ unless stated.
     and are the same fault. The shelf line and hover offered as extra styling
     were declined: *"No more styling needed, so no shelf or hover."*
 
+- **2026-09-29 — one source per glass; §9.15's "both stay on disk" reversed.**
+  Helen: *"Shall we clear out the earlier versions of drawings we've updated? I
+  don't need to list them, but e.g. we're using tiki mug 9 so delete the
+  others."* The rule had been that `_design_sources/` is the record of what was
+  tried, and the normaliser's SKIP comment put it as "a record you can
+  overwrite is not one". Deleting is not overwriting — git keeps every version
+  — so the record survives in history, and what goes is twenty files and
+  twenty SKIP entries plus thirteen RENAME entries whose only job was stopping
+  `sorted()` from publishing an old drawing over its redraw. It is her own
+  old-fashioned collapse of 2026-08-26 applied to the whole set. Proved by
+  `check_glass_regen.py` before and after: 46 sources → 27, and a wholesale
+  regeneration reproduces all 27 shipped icons byte for byte both times.
+
 ### §9.12 / §9.12.1 Methods and garnishes
 
 - **2026-08-26, #290** — `methods.yml` added: 277 steps across 105 drinks, 144
