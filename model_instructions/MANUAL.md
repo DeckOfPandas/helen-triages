@@ -2385,10 +2385,19 @@ break them in the kitchen."* Nothing records the cupboard, and nothing should.
   the script's own `check()`.
 - **`survey_only_types`** holds a type that draws another icon but differs in
   size: `mule-mug` draws the mug and holds a third more.
-- **`heights_mm` still draws the icons.** The sourced medians sit beside it and
-  replace it only when Helen says so, because replacing it resizes every glass.
-  The punch bowl's 256 mm median would outrank the flute as the tallest glass,
-  which is the scale's denominator — so that one needs deciding, not copying.
+- **`heights_mm` is generated too, since 2026-09-29**: each icon's surveyed
+  median height, or its `height_overrides` entry. Three overrides, each
+  Helen's: the punch bowl stays 130 (its real 256 would outrank the flute as
+  the tallest glass, which is the scale's denominator), and both old
+  fashioneds stay as they were (*"leave them, this isn't important"*).
+- **`/cocktails/reference/glasses/`** is the published relative-scale view:
+  every glass on one shelf in the home green, smallest capacity first, each
+  with its mean and range, and NOTHING else — Helen's brief is the whole page
+  (the template's header quotes it). Lines are thinner than anywhere else the
+  site draws a glass: 1.5px, and 1px for the tiki mug, pineapple and coconut.
+  **Liquid does not resolve a nested lookup** (`g.typical_ml[pair[0]]` is
+  nil): assign the key first. `test_the_glasses_page_shows_every_glass_once_…`
+  exists because the first build got that wrong and still rendered.
 - **`fit_rules` are the rules**: dilution per method family, blended volume,
   wash line, ice space, the large cube, punch cups. Each is a sourced
   `{low, high}` range, because the sources disagree and a single figure hides

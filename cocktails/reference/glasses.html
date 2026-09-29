@@ -1,0 +1,113 @@
+---
+layout: default
+title: "Glasses"
+permalink: /cocktails/reference/glasses/
+---
+
+{% comment %}
+  GLASSES — cocktails' second reference page. Issue #295, from #1238's survey.
+
+  A SPEC, NOT AN INVENTORY. #295 asked for "a dictionary of glasses I own with
+  their volumes"; Helen, 2026-09-28: "I don't want inventory, just spec. I might
+  buy new glasses (okay I certainly will). The 'right' glasses might be dirty. I
+  might have more guests than 'right' glasses. Basically, as usual with this
+  site, let's offer rules, then I'll happily break them in the kitchen." So this
+  is what each glass type holds ON THE MARKET, and nothing about the cupboard.
+
+  HER BRIEF, 2026-09-29, AND IT IS THE WHOLE PAGE: "show all the glasses
+  together, at relative scale, giving the range and mean ml for each (given the
+  medians are similar we don't need to give those). Don't show the heights.
+  Don't show anything else on the page body. Style GLASSES like a heading. And
+  let's try the glasses in green." So: no intro, no notes, no sources line, no
+  links to drinks. The sources live in `_data/cocktails/glass_survey.yml`, one
+  per product, for anyone who asks.
+
+  EVERY NUMBER IS A LOOKUP. The drawing is `_includes/icons/glasses/`, its
+  height `heights_mm` (the surveyed median, or Helen's override), the ml
+  `typical_ml` -- all generated from the survey by
+  scripts/glass_survey_stats.py. Nothing here is typed.
+
+  RELATIVE SCALE IS `_dev/glasses.html` SECTION 2's, the view Helen asked for by
+  name ("I love the side by side view on the ref page, the version based on real
+  glasses"): each glass's real height over the tallest real glass, every glass
+  standing on one baseline per row.
+
+  ORDERED BY WHAT IT HOLDS, smallest first, so the page reads as a scale from
+  the shot to the punch bowl. Liquid cannot sort by a computed number, so each
+  row is a zero-padded key ("000225|coupe|coupe") sorted as a string.
+
+  THE MULE MUG IS HERE AS ITS OWN GLASS, drawn as the mug it shares a drawing
+  with, because it is its own size: `survey_only_types` in glasses.yml.
+
+  THE NAME is the spelling a drink writes -- the first `icons:` key for that
+  drawing that `canonical_glasses` does not correct -- so the page says
+  "double old fashioned" and "brandy glass", exactly the words on a drink page.
+  An icon no drink names yet has no key, and falls back to its file name.
+{% endcomment %}
+
+{% assign g = site.data.cocktails.glasses %}
+
+{% assign tallest_mm = 0 %}
+{% for icon in g.all_icons %}
+  {% assign mm = g.heights_mm[icon] | times: 1.0 %}
+  {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
+{% endfor %}
+
+{% assign rows = "" | split: "" %}
+{% for icon in g.all_icons %}
+  {% capture row %}{{ g.typical_ml[icon].mean | prepend: "000000" | slice: -6, 6 }}|{{ icon }}|{{ icon }}{% endcapture %}
+  {% assign rows = rows | push: row %}
+{% endfor %}
+{% comment %} `pair[0]` is assigned before it is used as a key: Liquid does not
+   resolve a lookup nested inside another (`g.typical_ml[pair[0]]` is nil), and
+   the first build sorted the mule mug before the shot glass because of it. {% endcomment %}
+{% for pair in g.survey_only_types %}
+  {% assign key = pair[0] %}
+  {% capture row %}{{ g.typical_ml[key].mean | prepend: "000000" | slice: -6, 6 }}|{{ key }}|{{ pair[1].draws_as }}{% endcapture %}
+  {% assign rows = rows | push: row %}
+{% endfor %}
+{% assign rows = rows | sort %}
+
+<article class="ref glasses-page" id="top">
+
+  <h1 class="ref-section-heading glasses-heading"><span>Glasses</span></h1>
+
+  <ul class="glass-shelf">
+    {% for row in rows %}
+      {% assign parts = row | split: "|" %}
+      {% assign type = parts[1] %}
+      {% assign draw = parts[2] %}
+      {% assign ml = g.typical_ml[type] %}
+
+      {% assign name = nil %}
+      {% if g.survey_only_types[type] %}
+        {% assign name = g.survey_only_types[type].spellings | first %}
+      {% else %}
+        {% for pair in g.icons %}
+          {% assign spelling = pair[0] %}
+          {% if pair[1] == type and g.canonical_glasses[spelling] == nil %}
+            {% assign name = spelling %}{% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% unless name %}{% assign name = type | replace: "-", " " %}{% endunless %}
+
+      {% assign ratio = g.heights_mm[draw] | times: 1.0 | divided_by: tallest_mm %}
+
+      <li class="glass-shelf-item">
+        <span class="glass-shelf-stage">
+          <span class="glass-shelf-art" style="--glass-ratio: {{ ratio | round: 4 }}">{% include icons/glasses/{{ draw }}.svg %}</span>
+        </span>
+        <span class="glass-shelf-name">{{ name }}</span>
+        {% if ml.mean >= 1000 %}
+          <span class="glass-shelf-ml">{{ ml.mean | divided_by: 1000.0 | round: 1 }} L</span>
+          <span class="glass-shelf-range">{{ ml.min | divided_by: 1000.0 | round: 1 }}–{{ ml.max | divided_by: 1000.0 | round: 1 }} L</span>
+        {% else %}
+          <span class="glass-shelf-ml">{{ ml.mean }} ml</span>
+          <span class="glass-shelf-range">{{ ml.min }}–{{ ml.max }} ml</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+</article>

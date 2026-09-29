@@ -112,3 +112,6 @@ cocktails:
     # in the same commit -- they were always halves of one switch.
     - text: rum categories
       url: /cocktails/reference/rum-categories/
+    # #295, 2026-09-29: what each glass type holds, from #1238's survey.
+    - text: glasses
+      url: /cocktails/reference/glasses/

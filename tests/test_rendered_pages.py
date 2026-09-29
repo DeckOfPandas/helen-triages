@@ -3090,3 +3090,48 @@ def test_the_aviation_prints_the_volume_its_own_amounts_add_up_to(prod_site):
         "Helen's wording is 'Roughly X units of alcohol in a serving of Y ml' "
         f"(#1121). The line now reads: {' '.join(units.group(1).split())!r}"
     )
+
+
+# =============================================================================
+# THE GLASSES PAGE (#295) -- every glass, once, with the survey's own numbers.
+# =============================================================================
+_SHELF_ITEM = re.compile(
+    r'<li class="glass-shelf-item">.*?style="--glass-ratio: ([\d.]+)".*?'
+    r'<span class="glass-shelf-ml">([^<]*)</span>\s*'
+    r'<span class="glass-shelf-range">([^<]*)</span>', re.S)
+
+
+def test_the_glasses_page_shows_every_glass_once_with_its_surveyed_ml(prod_site):
+    """All 27 icons and the survey-only mule mug, each with `typical_ml`'s mean
+    and range, and the tallest drawn at full height.
+
+    WHY THE COUNT MATTERS: the page builds its rows with a Liquid lookup, and a
+    lookup nested inside another (`g.typical_ml[pair[0]]`) silently returns
+    nil -- the first build of this page sorted the mule mug ahead of the shot
+    glass because of exactly that, and it still rendered. A lost row would
+    render too, just as quietly.
+    """
+    g = yaml.safe_load((ROOT / "_data" / "cocktails" / "glasses.yml")
+                       .read_text(encoding="utf-8"))
+    page = (prod_site / "cocktails" / "reference" / "glasses" / "index.html") \
+        .read_text(encoding="utf-8")
+    items = _SHELF_ITEM.findall(page)
+    want = len(g["all_icons"]) + len(g.get("survey_only_types") or {})
+    assert len(items) == want, f"{len(items)} glasses on the page, expected {want}"
+
+    def shown(ml):
+        if ml["mean"] >= 1000:
+            return (f"{round(ml['mean'] / 1000, 1)} L",
+                    f"{round(ml['min'] / 1000, 1)}–{round(ml['max'] / 1000, 1)} L")
+        return f"{ml['mean']} ml", f"{ml['min']}–{ml['max']} ml"
+
+    expected = sorted(shown(g["typical_ml"][k])
+                      for k in list(g["all_icons"]) + list(g.get("survey_only_types") or {}))
+    printed = sorted((m.strip(), r.strip()) for _, m, r in items)
+    assert printed == expected, "the page's ml do not match glasses.yml's typical_ml"
+
+    ratios = [float(r) for r, _, _ in items]
+    assert max(ratios) == 1.0, f"the tallest glass is drawn at {max(ratios)}, not 1"
+    means = [float(m.split()[0]) * (1000 if m.strip().endswith("L") else 1)
+             for _, m, _ in items]
+    assert means == sorted(means), "the glasses are not in order of what they hold"

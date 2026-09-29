@@ -1,4 +1,4 @@
-"""Typical capacity and height per glass type, from the sourced survey (#1238).
+"""Typical capacity and height per glass type, and the heights that draw them.
 
     python3 scripts/glass_survey_stats.py --check    # diff, exit 1 if stale
     python3 scripts/glass_survey_stats.py --write    # rewrite the block
@@ -19,6 +19,12 @@ its design pour, and averaging that in as a capacity would call it a thimble.
 The entry stays in the survey (it is a true fact about the page) and simply is
 not counted. Heights have no such distinction: an overall height is an overall
 height.
+
+`heights_mm` IS WRITTEN HERE TOO, since 2026-09-29 -- the size every icon is
+drawn at, as each icon's median surveyed height, or its `height_overrides`
+entry where Helen kept a number on purpose (the punch bowl, which at its real
+256 mm would become the tallest glass and so the scale's denominator; and the
+two old fashioneds).
 
 `exclude: "<why>"` TAKES A WHOLE ROW OUT OF BOTH, and it is the one place a
 row is judged rather than read. The rule for getting INTO the survey is that
@@ -90,7 +96,16 @@ def statistics_by_type(survey):
     }
 
 
-def render(stats):
+def heights(stats, glasses):
+    """`heights_mm`, what draws every icon: its surveyed median height, or its
+    `height_overrides` entry. Icons only -- a survey-only type draws as another
+    icon and so has no height of its own to draw at."""
+    overrides = glasses.get("height_overrides") or {}
+    return {icon: overrides.get(icon, stats[icon]["height_mm"]["median"])
+            for icon in sorted(glasses["all_icons"])}
+
+
+def render(stats, glasses):
     width = max(len(k) for k in stats) + 1
 
     def line(key, s):
@@ -103,6 +118,8 @@ def render(stats):
     out += [line(k, v["ml"]) for k, v in stats.items()]
     out.append("typical_height_mm:")
     out += [line(k, v["height_mm"]) for k, v in stats.items()]
+    out.append("heights_mm:")
+    out += [f"  {k + ':':<{width}} {v}" for k, v in heights(stats, glasses).items()]
     out.append(END)
     return "\n".join(out) + "\n"
 
@@ -126,6 +143,8 @@ def problems_with(survey, glasses):
     covered = {row["glass"] for row in survey}
     for icon in sorted(icons - covered):
         problems.append(f"icon {icon!r} has no survey rows at all")
+    for icon in sorted(set(glasses.get("height_overrides") or {}) - icons):
+        problems.append(f"height_overrides names {icon!r}, which is not an icon")
     return problems
 
 
@@ -141,10 +160,11 @@ def regenerated():
     """(current glasses.yml text, what --write would make it, problems)."""
     survey = load_survey()
     old = GLASSES.read_text(encoding="utf-8")
-    problems = problems_with(survey, yaml.safe_load(old))
+    glasses = yaml.safe_load(old)
+    problems = problems_with(survey, glasses)
     if problems:
         return old, old, problems
-    return old, regenerate(old, render(statistics_by_type(survey))), []
+    return old, regenerate(old, render(statistics_by_type(survey), glasses)), []
 
 
 def check():
