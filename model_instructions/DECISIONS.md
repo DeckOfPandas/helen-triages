@@ -4737,6 +4737,29 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   overriding a wrong path. And five against the new hygiene guards. Scripts
   in the branch's worktree `tmp/`: `prove_smoke.py`, `prove_probe_guards.py`,
   `show_browser_caveat.py`.
+- **2026-09-29, #1202 — the rulings index is generated and carries NO line
+  numbers.** `scripts/build_decisions_index.py` writes
+  `model_instructions/DECISIONS_INDEX.md`, one line per top-level journal entry,
+  and `tests/test_decisions_index.py` holds it to the journal both ways. The
+  issue proposed line numbers, and a generated, test-enforced file is the one
+  place "name files, never line numbers" could have bent. Helen chose not to
+  bend it, shown the merge cost: nearly every branch adds an entry, one entry
+  near the top renumbers everything below it, so two open branches would
+  conflict in the index on every merge, and an index merged wrong is a red
+  `main`. Without them, a new entry adds one line and merges as the journal
+  does. **The cost it does carry: a journal edit now needs `--write`**, and
+  the test's message says so. The journal itself was not reformatted: the
+  generator reads its five entry shapes as written.
+  #1202's second bullet ("why" paragraphs out of the templates) stays parked:
+  *a week's work across the largest Liquid files*.
+- **2026-09-29 — a proof by mutation can be fooled by Python's bytecode
+  cache.** A `.pyc` is valid while its source's mtime and SIZE match, and
+  both survive a same-length edit (`"- "` → `"* "`) restored within the same
+  second. The next subprocess imported the MUTATED module, and the case after
+  it reported the previous case's fault. Caught only because the message
+  named a fault that case had not made. **Give each run of an in-place
+  mutation proof its own `PYTHONPYCACHEPREFIX` under `tmp/`**
+  (`prove_decisions_index.py` does).
 
 ---
 

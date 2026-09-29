@@ -69,6 +69,7 @@ Run `ls model_instructions/` rather than trusting this list.
 | file | is |
 |---|---|
 | `DECISIONS.md` | the journal — see above |
+| `DECISIONS_INDEX.md` | **GENERATED** (#1202): one line per journal entry — date · section · issues · headline — for grepping before the journal. `scripts/build_decisions_index.py --write` after any journal edit; `tests/test_decisions_index.py` fails until you do. No line numbers, on purpose: the script's docstring says why |
 | `START_A_SESSION.md` | the prompt Helen pastes to start a session; points here, at the journal and at `CLAUDE.md` |
 | `SOURCE_ATTRIBUTION_SPEC.md` | the full `source` / `source_type` contract; §4 summarises and does not repeat it |
 | `INGEST_ONE_RECIPE.md`, `INGEST_ONE_COCKTAIL.md` | for a Claude with NO repository. They stand alone because the closed vocabularies are small enough to print; every vocabulary block in them sits between `<!-- vocab:… -->` markers and is RENDERED from `_data/` by `scripts/build_ingest_vocab.py` (`--check` / `--write`), which `tests/test_standalone_docs.py` enforces. Hand-edit nothing inside a marker pair. Everything outside one is prose and must be kept in step by hand when §4, §5, §7, §9.3 or the attribution spec changes |

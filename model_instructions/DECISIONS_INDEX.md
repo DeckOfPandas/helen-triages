@@ -1,0 +1,564 @@
+# DECISIONS_INDEX
+
+**GENERATED -- do not edit by hand.** `python3 scripts/build_decisions_index.py
+--write` rewrites it from `DECISIONS.md`, and `tests/test_decisions_index.py`
+fails whenever the two disagree. Edit the journal, re-run, commit both.
+
+**One line per journal entry, in journal order**: date · section · issues ·
+headline. Grep this file first, then grep `DECISIONS.md` for a few words of the
+headline to land on the entry. A date of `undated` is an entry that names none.
+
+**No line numbers, deliberately** (Helen, 2026-09-29): one new entry near the
+top would renumber every line below it, so any two branches that each add an
+entry would conflict here on every merge. The script's docstring has the
+argument and the rules each field is read by.
+
+- 2026-08-02 · §0 · HANDOVER v26 written as a rewrite, not a revision, at Helen's request: "precise rather than verbose", "strongly consider deleting rather than automatically appending".
+- 2026-08-10 · §0 · DEV_JOBS_v26.md retired; the backlog is GitHub Issues.
+- 2026-08-11 · §0 · RECIPES_SEEN_v23.md (a slug/publish-status inventory) retired; it saved compute during large photo ingests before the Max plan made that a non-issue.
+- 2026-08-20 · §0 · SOURCE_ATTRIBUTION_SPEC.md became the first companion document (§4).
+- 2026-08-21 · §0 · The "read §12 first" box had said "§10" since the first draft, pointing every reader at the validation section.
+- 2026-09-01 · §0 · INGEST_ONE_RECIPE.md and INGEST_ONE_COCKTAIL.md added at Helen's request for a Claude with no repository.
+- 2026-09-02 · §0 · tests/test_standalone_docs.py became the guard for those two documents, one-directional on purpose: a retired term left in a document teaches a value the suite rejects to a reader …
+- 2026-09-02 · §0 · Fable's architecture audit (ARCHITECTURE_PLAN_2026-09-02.md, retired into this file on 2026-09-06; its rulings D1–D11 are under §9.1.1, §9.3 and §11.0.4 below) and the …
+- 2026-09-03 · §0 · The vocabulary blocks in the two standalone documents became generated (scripts/build_ingest_vocab.py, marker pairs), with a two-way check in test_standalone_docs.py; the prose …
+- 2026-09-04 · §0 · PUBLISHING_A_DRINK.md written on the day the first sixteen drinks went through it.
+- 2026-09-05 · §0 · The header's "THREE slash commands" had said two since /ingest-inbox landed on 2026-09-03.
+- 2026-09-06 · §0 · DOCS_REVIEW read all thirteen documents together: 25 stale or contradictory lines fixed, then the split that produced this file.
+- 2026-09-06 · §0 · later — Helen: rename the handover to MANUAL, "because this is now more accurate".
+- 2026-09-06 · §0 · #787 · within a day — #694, #695, #674, #633, #511 and #612 all closed, and the open count moved 66 → 73 → 71.
+- 2026-09-07 · §0 · the triage that acted on the map's lesson instead of drawing a new one.
+- 2026-09-09 · §0 · a separate ARCHITECTURE log was considered and declined, and the reason is the numbering rather than taste.
+- 2026-08-29 · §1 · .node-runtime/ and .gh-runtime/ do not come with a worktree; cost a session that read "No such file or directory" as a broken checkout.
+- 2026-08-18 · §1 · Two pytest sessions at once: the gate test's zzz-gate- recipes are collected by the other run as 14 real failures.
+- 2026-09-06 · §1 · §1 had said _config_local.yml "overrides two things" since 2026-08-02; it sets seven keys and three collection outputs.
+- 2026-09-07 · §1 · in the devcontainer, git fetch origin fails and it is not a credentials problem.
+- 2026-09-09 · §1 · the devcontainer keeps three fixes and loses the worktree machinery.
+- 2026-09-11 · §1 · the browser harness takes the first free port from 4010, and its own shoot.sh and crop.sh read that port from tmp/browser/port.
+- 2026-09-15 · §1 · Playwright, its Chromium and its system libraries go into the devcontainer image.
+- 2026-09-21 · §1 · run.sh asks whether the image MATCHES .devcontainer/, not merely whether an image exists.
+- 2026-09-24 · §1 · #1191 · the stamp stops counting the files the image does not use, and the hash moves into a file so it can be tested.
+- 2026-09-24 · §1 · #1191 · the gems are NOT baked into the image, and the reason the idea died is that its premise was wrong.
+- 2026-08-02 · §2 · Collections cannot live inside food/: Jekyll only discovers _<name> under the source root.
+- 2026-08-15 · §2 · #204 · The two-door landing page and root.scss deleted; / is a bare redirect to /food/.
+- 2026-08-19 · §2 · §2.2 had said "two stylesheets import shared/, and that is now the whole list"; grep found three (longform-demo.scss).
+- 2026-08-19 · §2 · #374 #288 #289 · (closing #288, #289) — One header, one footer.
+- 2026-08-19 · §2 · about.html moved to the repo root and shipped with no stylesheet: the site_key default stopped applying, a four-sentence comment said the key must be set by hand, the line was …
+- 2026-08-26 · §2 · #487 · Cocktails' $color-accent is $color-electric-absinthe-deep (menthe), the same value as $color-mood-root: the colour that means this is the thing you asked for is the mood filters' …
+- 2026-08-29 · §2 · helen-triages-private renamed helen-triages-food-private so both drafts repos say which site they belong to.
+- 2026-09-06 · §2 · The §2.1 tree omitted _plugins/ (four plugins), three cocktail data files and _cocktail_drafts/; a plugins paragraph added.
+- 2026-09-10 · §2 · THE NAV ROW IS THE DOOR TO THE OTHER SITE, and it is the second thing the shared header varies per site.
+- 2026-09-11 · §2 · #965 · ONCE THE HEADER STACKS, THE ROW GOES TO THE RIGHT-HAND EDGE, AND BOTH ENDS SIT ON THE CARDS' EDGES (#965).
+- 2026-09-11 · §2 · #969 · The hearts moved to the bottom of the footer's centre column, and nothing else in it moved.
+- 2026-09-15 · §2 · #1086 · the link-preview image is the wordmark, one card per site and one for neither.
+- 2026-08-01 · §3 · The ingredient search confirmed as earning its complexity (§8).
+- 2026-08-16 · §3 · back-link.js's first version got the new-tab case wrong within an hour: a recipe opened in a new tab carries the index as referrer while the tab has no history, so back() did …
+- 2026-08-19 · §3 · #374 · HTF.chromeAsset added as a third helper rather than a call to asset(), so test_artwork_fetches_go_through_site_asset can keep banning every image path built through asset() with …
+- 2026-08-29 · §3 · #579 · filter-state.js grew create(spec) and two tables; orderByBand shared as a discipline, not the bands.
+- 2026-08-31 · §3 · #506 · The food index's two DECISIONS moved out of filters.js (rowMatchesFilters, entriesMatchKey); the exclusion stayed a second call at the call site so the excluded COUNT means …
+- 2026-08-31 · §3 · cocktail-index.js read arrivedByGoingBack off the BINDING instead of the MODULE; undefined, and the whole tail of the file stopped running while every JS test stayed green.
+- 2026-09-06 · §3 · #619 · entriesMatchKey matched CONTAINMENT while its comment had said "prefixes" for as long as it existed; Helen found it from the output (salt → twelve recipes whose only salt is …
+- undated · §3 · #686 · escapeHtml and the sessionStorage index memory, duplicated between the two index scripts, moved into assets.js.
+- 2026-08-02 · §4 · Cross-recipe links must be relative (../slug/): a root-relative link was silently broken locally and deployed, because the suite checked only that the slug existed.
+- 2026-08-02 · §4 · Body content below the front matter continues the recipe (Helen's "least jar" of three options): peer headings, Method's reading width, raw HTML for the heading markup.
+- 2026-08-02 · §4 · A bullet list inside one method step needed .method-full li to stop being flex; nested <li>s reset the step counter.
+- 2026-08-03 · §4 · notes: items became {label, text} or a bare string.
+- 2026-08-09 · §4 · #75 · incidental: true: Helen — "It's silly to write '2 tbsp olive oil' for a sear, when people will obviously use as much as they like.
+- 2026-08-10 · §4 · #111 · Five ~-prefixed quantities in thai-green-chicken-curry.md and "zest and juice of N" in two recipes rendered unhighlighted because the quantity sat in item:.
+- 2026-08-12 · §4 · #169 · short_name retired: every recipe carried it, nothing read it.
+- 2026-08-18 · §4 · it fails CLOSED — (Helen's call) — the first version hid a page only on explicit true, so a missing key and "true" in quotes both published.
+- 2026-08-18 · §4 · #331 #367 · THE RULE: every agent edit sets proofread: false in the same commit.
+- 2026-08-18 · §4 · BASELINE_COMMIT moved four times (dc2a7bf → 9c70675 → 366f392 → 9306cef), each time Helen reviewing the change herself: three sweeping and content-free, the last a nine-recipe …
+- 2026-08-20 · §4 · #378 · Which tests read drafts, and what each says in CI (§10).
+- 2026-08-20 · §4 · All three staging subfolders read by the draft suite (rglob): seven staged files had been silently unscanned, and they were the ones closest to publication.
+- 2026-08-20 · §4 · #406 · source_type required; test_source_attribution.py over recipes AND drafts.
+- 2026-08-21 · §4 · #413 · En dashes are scoped by what a reader SEES: Helen on cook_time: "20-25 mins" — "These still render to the user, so correct to en dash please." House style reaches prose pages …
+- 2026-08-21 · §4 · #417 · INVISIBLE_KEYS and HELEN_CLEARED as the two narrower escape hatches beside the baseline; 13 of HELEN_CLEARED's 14 entries from one session where she reviewed 14 en-dash edits line …
+- 2026-08-21 · §4 · #418 · meta.claude_rewritten and the three-stage staging pipeline (to-rewrite/ → to-cook/ → to-promote/), built out by Helen the same day.
+- 2026-08-21 · §4 · #426 · House style stops at a QQ line: correcting the source's dash edits someone else's words about to be deleted.
+- 2026-08-21 · §4 · #428 · meta.rewritten joined INVISIBLE_KEYS once the guard stripped comments per language (a comment in ingredient-search.js using the English word "rewritten" had blocked it for two …
+- 2026-08-21 · §4 · #429 · meta: is exactly three flags in order; cooked_before and date_last_edited retired (both read by nothing; the date was one git already knew).
+- 2026-08-21 · §4 · Generating a QQ original line from a full method's worth of verbatim book prose in one Write triggered "API Error: 400 Output blocked by content filtering policy", twice.
+- 2026-08-21 · §4 · A 34-file ingest copied the old hyphenated flag from a template draft before catching it.
+- 2026-08-26 · §4 · The magic bag (§4.3).
+- 2026-08-29 · §4 · THE INGEST CONTRACT settled with Helen: is the answer in the source document, or in Helen's head?
+- 2026-08-29 · §4 · The main_ingredients cap read as a budget (§6).
+- 2026-08-31 · §4 · #637 · Every draft that can carry a QQ Claude line has one (264 of 267; #637/#638/#639 are sources too corrupt to paraphrase).
+- 2026-09-01 · §4 · Helen keeps to-rewrite/ after the universal rewrite pass, against a session's reading that it was redundant: "with all the love in the world, I'm likely to want to cast my eyes …
+- 2026-09-01 · §4 · The §4 schema block had shown serves: 4, a bare lemon and the retired tag one-pot since 2026-08-02, having been written before the quoting rule; every one of 86 recipes quoted …
+- 2026-09-02 · §4 · #667 · proofread GATES PUBLICATION on both sites (§4.0 entry below).
+- 2026-09-03 · §4 · Slug from the whole title, not the head clause: Helen, "Slug the whole title", so two "with" dishes sharing a head clause do not collide.
+- 2026-09-04 · §4 · Every note an ingest ADDS is {label, text}, both fields set, both beginning QQ: "It's annoying for me to remember how to type YAML every time."
+- 2026-09-05 · §4 · Helen's own rewrite of a QQ Claude line (sticky-squidge-ginger-loaf.md), asked for as a comparison, holds four patterns: don't re-narrate what the ingredient list already says …
+- 2026-09-06 · §4 · §4 had ended with "Cocktails front matter does not exist yet and must not be invented" since 2026-08-02, three weeks after the first drinks were ingested.
+- 2026-09-07 · §4 · #814 · Ingests split the ingredient side and leave the method side flat, and have always done.
+- 2026-08-18 · §4.0 · Hardened (above).
+- 2026-08-26 · §4.0 · food_magic_bag joined GATED_COLLECTIONS with the collection; §4.0 said two until 2026-09-02.
+- 2026-09-01 · §4.0 · What awaiting_fix: true means to Helen: "'awaiting_fix' means I've proofread, but one small thing has been raised as a ticket, meaning that once that's fixed I can look for just …
+- 2026-09-02 · §4.0 · #667 · Five food recipes went off the live site until she reads them
+- 2026-09-02 · §4.0 · meta.rewritten left INVISIBLE_KEYS for one commit (a local-only drinks badge include read it) and returned when the include was reverted; measured ZERO recipes affected both ways.
+- 2026-09-03 · §4.0 · The magic bag must be able to publish, so proofread joins its schema (required, false on a new entry, hers to flip); rewritten stays out — no source to rewrite from.
+- 2026-09-06 · §4.0 · #662 · Tightening the gate took five already-published recipes dark, and nothing noticed.
+- 2026-09-14 · §4.0 · #1008 · what happens AFTER the flip, in three sizes, and an issue as the signal.
+- 2026-09-14 · §4.0 · #1009 · The same trap from the other side: a correct proofread flag took two pages dark AND left the links to them.
+- 2026-09-14 · §4.0 · a food promotion delegated to an agent, asked for directly: "Please promote meringue swans from food drafts to published."
+- 2026-08-26 · §4.3 · #1 · Built: Helen's own name for her brain, answering the README's problem #1 — "what shall I cook, out of everything I already know how to make?" — for the half the site could not …
+- 2026-08-30 · §4.3 · #562 · The three meta filters (and the three-valued data-meta-short they needed — 'true', 'false', 'n/a', because the short-method filter was a PAIR wanting opposite answers) deleted …
+- 2026-09-06 · §4.3 · #507 #508 #509 · #507 (include/exclude the magic bag in production) can no longer be answered "put it in META FILTERS"; Helen: "I need to think about that more." Open: #508 (the word and the …
+- 2026-08-09 · §5 · All nine Estimated N mins an earlier Claude had invented are gone; Helen replaced them by hand rather than have them converted to QQ.
+- 2026-08-21 · §5 · #413 #426 · En-dash scope and the QQ stop (§4 above).
+- 2026-08-31 · §5 · A hole in a guard is proportional to the data flowing through it.
+- 2026-09-07 · §5 · #800 · gf tip: is GOOD FOOD, the magazine, not gluten-free.
+- 2026-09-07 · §5 · #800 · The label is DROPPED, not expanded — Each of the eight notes becomes a plain sentence, capital to full stop, like every other note; source: already carries the attribution on six …
+- 2026-08-15 · §6 · #130 · common_ingredients.yml became pantry.yml, a bare list; the wrapping pantry: key flattened in the same pass.
+- 2026-08-29 · §6 · The cap of eight read as a budget.
+- 2026-09-06 · §6 · #762 · the majority spelling wins — cornflour and beansprouts.
+- 2026-09-21 · §6 · /22 — the field is DERIVABLE IN ORDER AND NOT IN MEMBERSHIP, and three of the four obvious moves were wrong.
+- 2026-08-01 · §7 · Reclassified, Helen's calls: one-pot and scalable retired (guessable from the recipe, and one-pot would honestly cover 57%); breakfast, extras, festive, starter moved mood → …
+- 2026-08-09 · §7 · something unusual retired (culturally relative, not a real craving, barely used); legumes considered and not added (two candidates, both covered).
+- 2026-08-09 · §7 · #72 · Freezable: chicken-cider-stew and chicken-sorrel-potato-stew yes, pancetta-white-bean-stew no — case by case, do not add it to "match the other two".
+- 2026-08-12 · §7 · #187 · eggs reinstated, Helen's explicit call, because eight drafts had star_ingredient: eggs sitting invalid (not blank, as a previous version of §7 had claimed — checked against the …
+- 2026-08-01 · §7 · Splitting "declared" from "filterable" (point recipe_badges.html at taxonomy.tags) proposed and rejected: no user stands in the gap between a fact you read (a note says more) and …
+- 2026-08-01 · §8 · Kept: 600 distinct main ingredients across 300+ files, 54% in exactly one recipe; 26–29% of recipes have no star.
+- 2026-08-16 · §8 · #281 #52 · Why the exclude picker's words are worse: same code, harder input (every ingredient_groups item, chosen deliberately by #52).
+- 2026-08-20 · §8 · Re-affirmed on the identical symptom: Helen — "The synonym collapse on the exclude filter has gone wrong again...
+- 2026-08-19 · §8 · #390 · "One code path" is a claim about the algorithm: the exclude builder took no wordMatch argument, so the flag was computed and dropped.
+- 2026-08-16 · §8 · #365 #403 · The exclude pool's hover: "a lighter shade" became a LIGHTENING once matched candidates rested at the active tone, so $color-exclude-hover is a deeper cut, guarded by relative …
+- undated · §8 · measure_phrases — bicarbonate of and cream of end in "of" and lead real entries; a bare little would turn "little gem lettuce" into "gem lettuce"; can  cannot fire on "cannellini" …
+- 2026-09-07 · §8.2 · The brief, 2026-09-07 — "add scaler and shopping list feature to food recipe shortlist page.
+- 2026-09-07 · §8.2 · PORTIONS, NOT BATCHES, and it follows from her own words.
+- 2026-09-07 · §8.2 · Her answer, 2026-09-07, and it settled the rounding rather than the fork
+- 2026-09-07 · §8.2 · Ten aisles, hers — Offered three sets; she chose produce, meat, fish, dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks, other, in that order, which is a …
+- 2026-09-07 · §8.2 · A KEYWORD table, not a list of ingredients
+- 2026-09-07 · §8.2 · garlic and cloves are the same length — which is the one place the longest-wins rule has nothing to decide with, and the tie sent every clove of garlic in the collection to the …
+- 2026-09-07 · §8.2 · The 44 guesses live in _data/food/servings.yml and NOT in the recipes.
+- 2026-09-07 · §8.2 · Grams and millilitres are the only units totalled in.
+- 2026-09-04 · §8.2 · Alphabetical within an aisle — which departs from the drinks list's descending volume (Helen, 2026-09-04: "the big pours are what you shop for").
+- 2026-09-07 · §8.2 · Open, and deliberately not decided — whether a bare count should round UP for shopping (2.83 onions → 3).
+- 2026-09-07 · §8.2 · ON THE REAL PAGE — the scaler did nothing for a quarter of the drafts.
+- 2026-09-07 · §8.2 · #815 · the batch box lasted a few hours and Helen killed it.
+- 2026-09-07 · §8.2 · "this is all I can see": boxes, no totals, and it was not the code at all.
+- 2026-09-07 · §8.2 · the yield came off the row, and dimming it was not the fix.
+- 2026-09-10 · §8.3 · Helen, having used both indexes for a weekend's planning
+- 2026-09-10 · §8.3 · Every one of those is the same fact — shortlisted was declared as an ordinary filter in filter-state.js and so ANDed with everything else.
+- 2026-09-10 · §8.3 · The rule now, held in two pure functions and generated tests across BOTH field tables (tests/js/shortlist-view.test.js)
+- 2026-09-10 · §8.3 · The alternative not taken — keep composing but say so in the count ("1 of 2 shortlisted match").
+- 2026-09-10 · §8.3 · Walked on the built food index with the browser harness after the change: step 5 shows two, step 10 shows nine ducks with the view off and the button reading (2) unpressed, step …
+- 2026-09-15 · §8.3 · #1093 · a shortlist share link, shown and not saved.
+- 2026-09-15 · §8.3 · #1092 · food's HAS TO HAVE picks several ingredients, AND.
+- 2026-08-16 · §9.1 · The first three drinks ingested (Julien Sorel, Sazerac, Cobra's Fang) and the schema derived from them.
+- 2026-08-22 · §9.1 · "Lost work" after a Windows Terminal crash (eight commits of rum typing) was on a local-only branch checked out in a SEPARATE worktree; git worktree list names the path (§12).
+- 2026-08-29 · §9.1 · One clone is not the repo — Same day, GH_TOKEN probed: contents 403 on both private repos, 200 on the public one.
+- 2026-08-30 · §9.1 · The fetch discipline fires once per MERGE, not per session; it caught one session three times in an afternoon.
+- 2026-09-01 · §9.1 · git checkout --detach origin/main is how a test clone is brought up to date without standing on main (the hook refuses a merge there; fetch main:main refuses on a checked-out …
+- 2026-09-03 · §9.1 · Sixteen files sat on one disk for an evening: the one- working-copy rule (PUBLISHING_A_DRINK.md).
+- 2026-09-05 · §9.1 · §11.0.1 had said ln -s into the main checkout since 2026-08-23 while §9.1 had said since 2026-08-29 that a symlink half-works.
+- 2026-09-06 · §9.1 · §9.1 had said "ask Helen every time" for a private push, a week after CLAUDE.md changed.
+- 2026-09-10 · §9.1 · "Per-repo" lasted an afternoon — the helper is passed per invocation by the three git wrappers and configured nowhere; §11's entry of the same date says why.
+- 2026-09-14 · §9.1 · the push wrapper pushed the public repo at the private one, and only a missing token scope stopped it.
+- 2026-09-17 · §9.1.1 · #1137 · THE SETTLED RULE (third reading, and the two below are what it took to get here). rewritten: true is the drinks gate's THIRD LEG. made_before does not gate.
+- 2026-09-17 · §9.1.1 · #1137 · an unrewritten drink may publish; a drink awaiting a fix may not; and the gate itself does not change at all.
+- 2026-09-02 · §9.1.1 · #668 · rulings D1–D5 (architecture plan §8) — D1: reuse all three of food's flag names, in food's order, after the two drink keys.
+- 2026-09-02 · §9.1.1 · COCKTAIL_BASELINE_COMMIT = "2381444", the tip of origin/main that day; grandfathers nothing while the collection is empty.
+- 2026-09-04 · §9.1.1 · The one place an agent may type rewritten: true: to-promote/, where the move is how Helen claims it.
+- 2026-09-05 · §9.1.1 · 108 drinks with all three false, 16 rewritten: true (all staged), none proofread, 22 staged — a worklist snapshot.
+- 2026-09-09 · §9.1.1 · #864 · the first sixteen are not stranded, and the branch holding them must not be merged (#864).
+- 2026-09-10 · §9.1.1 · THE DEPLOYMENT. 48 DRINKS LIVE, AND to-promote/ EMPTY.
+- 2026-09-10 · §9.1.1 · 61 TAGLINES IN ONE SITTING, AND THE SHAPE THAT DID IT WAS A CSV.
+- 2026-09-09 · §9.1.1 · A PROMOTED DRINK IS INDISTINGUISHABLE FROM AN EDITED ONE, AND THAT IS BY DESIGN.
+- 2026-09-09 · §9.1.1 · /10 — FOUR MOOD RULINGS, AND THE INTERESTING PART IS WHICH ONES BECAME RULES.
+- 2026-09-09 · §9.1.1 · THE MARGARITA'S MOOD WAS A SYMPTOM, NOT A DISAGREEMENT.
+- 2026-09-09 · §9.1.1 · A GARNISH THE METHOD ALREADY PLACES IS NOT A GARNISH.
+- 2026-09-09 · §9.1.1 · TWO MODERN ZOMBIES, AND THE NEWER CONTENT WAS UNDER THE OLDER NAME.
+- 2026-08-16 · §9.2 / §9.2.1 · The CSV (118 drinks over 656 rows): pasted into a chat its empty tabs collapsed and put Cobra's Fang's "Honestly this just gets better and better" in Notes when the file has it in …
+- 2026-08-31 · §9.2 / §9.2.1 · The Death & Co photo batch: ten drinks from fifteen photographs; two caught only a title (dropped on Helen's say); four already here, three gained citations, the fourth was a …
+- 2026-08-31 · §9.2 / §9.2.1 · On the 12 oz, asked again: "we've agreed this twice now, so stop tracking it." A QQ that has been ANSWERED becomes a plain note; only a QQ that was wrong to ask gets deleted.
+- 2026-09-03 · §9.2 / §9.2.1 · The second way in: the standalone document via claude.ai and an ingest issue (§11.0.4).
+- 2026-09-21 · §9.3 · QQ IS A TRIPWIRE, NOT A GRAMMAR, AND THAT SETTLES SIX PREDICATES AT ONCE.
+- 2026-09-21 · §9.3 · item IS GONE — Helen: "'item' needs to go.
+- 2026-09-21 · §9.3 · THE BOTTLE RESOLVES THE CATEGORY; THE CHARACTER IS ONLY EVER PROPOSED.
+- 2026-09-21 · §9.3 · flavourings IS larder, and 20 generics gained a shelf.
+- 2026-08-17 · §9.3 · glass became a LIST (corrected from scalar).
+- 2026-08-26 · §9.3 · #291 · to_serve live and filled by a bulk move of three fragments; two were serveware and one ("Without ice.", Gin Sour) was ice, deleted 2026-09-05 when ice got a field.
+- 2026-08-29 · §9.3 · #335 · generic fully typed: 619 entries, 0 untyped, 0 QQ (parsed, not grepped); #335 closed on the measurement — its "526+ of 594" figure was two passes out of date and the issue one …
+- 2026-08-30 · §9.3 · #571 · ml: retired.
+- 2026-08-31 · §9.3 · "I don't want any US units, just ml, so please convert for me as part of ingestion.
+- 2026-09-02 · §9.3 · #669 · D4 and Helen's second ruling — Eleven entries had no amount.
+- 2026-09-02 · §9.3 · #670 · Every hyphenated range and -- in the collection fixed (2026-09-03).
+- 2026-09-03 · §9.3 · Ruled by Helen: a barspoon is 5 ml; an egg or a sugar cube is an INGREDIENT with amount: "1", not a unit.
+- 2026-09-04 · §9.3 · half and whole are units — (the Caipirinha's amount: "0.5" → "half"; a whole fruit is counted, never measured, because juice_yields says 20–30 ml); a method step may carry a note …
+- 2026-09-05 · §9.3 · #572 · item gone from every pour (§9.10 below); serve (§9.10a); #572: about half the notes in the collection are the ingest-audit trail (QQ - generic values INFERRED, not confirmed) …
+- 2026-09-06 · §9.3 · #297 · serves: added on nine drinks (#297): seven punch bowls, the mulled wine, the Modern Zombie; the scaler does not read it.
+- 2026-09-06 · §9.3 · #754 · as: added to an ingredient — a closed vocabulary of float / rinse / muddle.
+- 2026-09-26 · §9.3 · #1217 · An unmeasured amount is a BRACKETED NOUN
+- 2026-09-26 · §9.3 · "dashes" throughout, "dash" when it is one.
+- 2026-08-21 · §9.3.1 · #441 · generic as a list means OR and only OR.
+- 2026-08-22 · §9.3.1 · #322 #314 · ingredients.yml written (#322 the spec, #314 the rum half).
+- 2026-08-23 · §9.3.1 · #441 · character lives on the recipe, not a bottle table.
+- 2026-08-23 · §9.3.1 · #457 · Six suggestions had drifted into sentences with reasoning ("Beefeater is nice for a brighter drink against the mint"); the reason gets its own per-ingredient note, suggestion goes …
+- 2026-08-24 · §9.3.1 · #314 · "Blackstrap is only ever given as a character for another rum, like this: Moderately aged (character: blackstrap)." Applied 2026-08-26 to Don's Own Grog, Georgetown Punch and …
+- 2026-08-25 · §9.3.1 · #460 · character, note and list-form fields render on the drink page; #460 stayed open for the rest of the page.
+- 2026-08-26 · §9.3.1 · character had been guarded by nothing; sherry and Spanish-style had been passing AS generics.
+- 2026-08-27 · §9.3.1 · #501 · card_names (#501, §9.10.1).
+- 2026-08-27 · §9.3.1 · #561 · Every generic reads as an ingredient: natural word order, spirit word on the end.
+- 2026-08-30 · §9.3.1 · #542 · A session put cobra-effect into caramel-forward Jamaican rum from its own item text, the exact thing the paragraph above forbade.
+- 2026-08-30 · §9.3.1 · #568 · Five vocabulary rulings: Chartreuse Verte / Jaune (agreed earlier and written down NOWHERE — the reason the other four are recorded); sloe gin its own generic (split out of gin …
+- 2026-08-31 · §9.3.1 · Four more, forced by the Death & Co batch: apple brandy (Laird's Bonded is an applejack, not calvados, so named after the FRUIT); Becherovka (Helen: "'Herbal liqueur (Becherovka)' …
+- 2026-09-06 · §9.3.1 · #594 #593 · Syrups: type + ratio, only where the difference is real
+- 2026-09-07 · §9.3.1 · #594 #593 · / #593 — built, and the honey-water half of the entry above was WRONG.
+- 2026-09-06 · §9.3.1 · #781 #780 · over #780 — Overproof first, in the generic and the card name both.
+- 2026-09-08 · §9.3.1 · #848 · A shopping SHELF is not a taxonomy, and gets its own map.
+- 2026-09-14 · §9.3.1 · #984 · Four new generics, all from ingesting seven drinks whose recipe was already written down.
+- 2026-09-14 · §9.3.1 · #984 · peach schnapps and unqualified tequila were left QQ rather than coined
+- 2026-09-15 · §9.3.1 · #1079 · citrus slice becomes orange slice — The entry above coined the muddled slice fruit-agnostic, on the argument that muddling a slice for its oil and juice is the same act whatever …
+- 2026-09-14 · §9.3.1 · #796 #1013 #752 · four vocabulary rulings from one sitting (#796, #1013, #752, and cherry).
+- 2026-09-14 · §9.3.1 · the punches are parked, and why that is not a no.
+- 2026-09-07 · §9.3.2 · #591 · An agricole's origin goes on the BOTTLE, as origin:.
+- 2026-08-27 · §9.3.2 · #529 · Added, rum-only.
+- 2026-08-30 · §9.3.2 · Not rum-only any more, and neither are the two tests that made it worth having: 54 of 91 suggestions had resolved to nothing with no test minding.
+- 2026-08-30 · §9.3.2 · #534 #314 #542 · A suggestion whose bottle sits in a different category than the generic must carry a note, and QQ counts — Helen: "be permissive with the test, but given we're …
+- 2026-09-02 · §9.3.2 · #585 · A bare brand is not a bottle: Planteray names four products, Bulleit a bourbon and a rye.
+- 2026-09-04 · §9.3.2 · unresolved_suggestions emptied: Helen went through every synonym line by line ("I never want to have these conversations more than once").
+- 2026-09-05 · §9.3.2 · Bottles Helen NAMES are hers to add and always were: "Rooster Rojo Tequila Anejo, Rooster Rojo Tequila Reposado, Patron Reposado, Patron Anejo -- all need diacritics".
+- undated · §9.3.2 · #701 · One declared name per bottle: Ophir (Opihr) and Amaro Ciociano (Ciociaro) are misspelt in bottles.yml and are not corrected in abv.yml alone, or the files would disagree.
+- 2026-09-06 · §9.3.2 · #701 · Every drink writes the full declared bottle name.
+- 2026-09-07 · §9.3.2 · #701 · A BOTTLE rename and a GENERIC rename are different operations, and neither is a simple find-and-replace across two repos.
+- 2026-09-06 · §9.3.2 · #702 #701 · 's rename does not fix the JM alias, and must not be allowed to close it.
+- 2026-09-06 · §9.3.2 · #782 · Sipping bottles are declared, with a flag.
+- 2026-09-06 · §9.3.2 · La Favorite, no u, is a STANDING CORRECTION.
+- 2026-09-14 · §9.3.2 · #745 · the Ferrand collapse, reversed by the person who ruled it.
+- 2026-09-14 · §9.3.2 · #984 · a bottle name is unique across the file, and that is what forced a new generic.
+- 2026-09-14 · §9.3.2 · #984 · Monte Carlo, replaced twice, and a real bottle each time.
+- 2026-08-29 · §9.3.3 · #579 · cocktail-index.js (428 lines reusing nothing) became wiring; the search a pure module.
+- 2026-08-31 · §9.3.3 · #603 · a chip found through a name it does not show carries that name.
+- 2026-08-31 · §9.3.3 · "I do want to be able to type 'el d' and see el dorado." A multi-word query matches a hidden name from its start.
+- 2026-08-31 · §9.3.3 · #584 · Three characters: at two, 31% of queries overflow the cap of 8; at three, 3%, median 2; four buys 2% for a keystroke.
+- undated · §9.3.3 · #580 · not_on_cards keeps bare water off a card and out of the search: "never write 'water' on a cocktail card and never return it in a search".
+- 2026-09-06 · §9.3.4 · Helen: "I want the number of units in a drink, not the ABV of the drink, i.e.
+- 2026-09-14 · §9.3.4 · #1001 #1012 · then #1012 — public, and a worklist that knows what shows.
+- 2026-09-14 · §9.3.4 · #1016 #1012 #297 · / #1012 / #297 — the mode, the bitters, and every strength answered in one sitting.
+- 2026-09-06 · §9.3.5 · Helen: "I only want to show price on the locally built site, and only as an incidental — just somewhere on the recipe page." Her original framing — "adding costs to each bottle in …
+- 2026-09-06 · §9.3.5 · #748 · Whole fruit and weighed solids are priced.
+- 2026-09-24 · §9.3.5 · #748 #747 · built, and #747's six unapplied prices — The 2026-09-06 ruling had been recorded as "rows in costs.yml and nothing else" and was not: volume_ml returned nil for a count or a …
+- 2026-09-07 · §9.3.5 · #818 · The shopping list's bottle choice is per drink, not once for the whole list.
+- 2026-09-17 · §9.3.6 · #1121 · the ml line cost the batch note its totals, and the lesson is about what a NEW line does to the ones already there.
+- 2026-09-17 · §9.3.6 · #1121 · two sentences, and the interesting part is the six drinks that get neither.
+- 2026-08-16 · §9.4 / §9.4.1 / §9.5 · Ingredients are additive, never a choose-one (asked directly: guessing wrong would have shaped the whole model).
+- 2026-08-17 · §9.4 / §9.4.1 / §9.5 · The site is canon: "With iPad in hand, I'd rather take the site as canon, then happily break rules from there." Modelling adjustable sugar (a range, a tolerance, an "approximate" …
+- 2026-08-23 · §9.4 / §9.4.1 / §9.5 · A goodness-only filter built in twenty minutes (§9.9 below).
+- 2026-08-29 · §9.4 / §9.4.1 / §9.5 · meta.status retired; its only consumer was chaos's "haven't tried" bucket.
+- 2026-08-31 · §9.4 / §9.4.1 / §9.5 · §9.5 retitled from "Open, and worth deciding out loud": nothing in it was open, and a section promising open questions to a reader looking for them is worse than no section.
+- 2026-09-05 · §9.4 / §9.4.1 / §9.5 · #722 · meta.made_before, a boolean, gates nothing, first in meta:.
+- 2026-09-06 · §9.4 / §9.4.1 / §9.5 · ship_tints deleted from taxonomy.yml with test_every_ship_rung_has_a_tint.
+- 2026-08-16 · §9.7 / §9.8 · Liquid parses tags inside comment; source: "" drew a bare "Source:" line on all three drinks.
+- 2026-08-15 · §9.7 / §9.8 · #223 · Cocktails at PARITY with food's tape, copying across as part of regeneration — after the two directories drifted for five days.
+- 2026-08-23 · §9.9 · Built in twenty minutes from meta.ship's existing words ("oh gods yes" was on 18 drinks).
+- 2026-08-26 · §9.9 · Replaced by §9.13's designed index; _goodness.scss deleted.
+- 2026-08-27 · §9.10 / §9.10.1 · #501 · The card had rendered item, and the problem was ambiguity, not length: Overproof Navy rum named three different rums, White rum two.
+- 2026-08-29 · §9.10 / §9.10.1 · #544 #513 #558 · The drink page's line is the generic with the bottle in brackets (Helen's example: London dry gin (Beefeater)).
+- 2026-08-30 · §9.10 / §9.10.1 · #544 · #544 promoted 61 bottles out of item; coverage 18% → 29%.
+- 2026-09-02 · §9.10 / §9.10.1 · item is a draft-only transcription field, not retired: "ignore everything in item as we'll throw it away." Reversed the "retire it" sentence that stood for a fortnight, on the …
+- 2026-09-03 · §9.10 / §9.10.1 · Ten restating entries deleted; 111 not, because a SUBSTRING test would have deleted brands (Tanqueray London dry gin).
+- 2026-09-04 · §9.10 / §9.10.1 · The deadline moved to the staging folder (§9.3.2 above): "promotion is the deadline" was in the wrong place, because a drink only reaches _cocktail_recipes/ by being moved.
+- 2026-09-04 · §9.10 / §9.10.1 · Which surface reads card_names: "Let's display the full name in the ingredients list please, just the short name on the card." The layout was already doing it; the paragraph …
+- 2026-09-05 · §9.10 / §9.10.1 · 23 were real bottles existing nowhere else
+- 2026-09-06 · §9.10 / §9.10.1 · #567 #640 #691 · The card's ingredient line became a plugin; the 1,400-character Liquid statement doing four jobs could not take a seven-tier sort.
+- 2026-09-05 · §9.10a · The ice had no field, so "strain" was written seventeen ways; collapsing 31 spellings to five surfaced three TRUNCATED steps nobody had read ("Fine strain into a chilled." …
+- 2026-09-28 · §9.10a · #1214 · The glass generator — and it is 2026-09-05's composition finished.
+- 2026-09-28 · §9.10a · A strain step stops repeating the glass when it has nothing to add
+- 2026-09-28 · §9.10a · serve.fill, because serve.ice may not say quantity.
+- 2026-08-25 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #298 · Sized by real height from heights_mm.
+- 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · Scale 2.6rem → 10.4rem when the glass became the drink page's hero; width cap moved in proportion.
+- 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #295 · heights_mm sizes the CANVAS: Helen's redrawn double old-fashioned drew 0.90× the single (75.7% ink fill) despite a 1.29× viewBox.
+- 2026-08-27 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · Helen's Inkscape sources committed to _design_sources/.
+- 2026-08-27 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #491 · any retired: "when someone tells me to use an old fashioned glass I always automatically assume I can use any glass I like, so there's no need to have 'any' as a glass type." …
+- 2026-08-30 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · Sixteen drinks named no glass; Helen named all sixteen in three sittings once shown the TOTAL VOLUME.
+- 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #355 #599 #601 · Three fill-only glasses were traced and Helen stopped it: "you redrew these three new ones, right?
+- 2026-09-05 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #650 #738 · The artwork re-judged on black: the drink page drops to stroke 2, the card keeps 1, the universe line 0.7; the curve untouched ("I can't think of any reason why the glass scaling …
+- 2026-09-28 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #1238 #295 · (towards #295) — what each glass holds, as a spec.
+- 2026-09-29 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #295 · the glasses page, and the heights switched.
+- 2026-09-29 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · one source per glass; §9.15's "both stay on disk" reversed.
+- 2026-08-26 · §9.12 / §9.12.1 · #290 · methods.yml added: 277 steps across 105 drinks, 144 distinct; one instruction 43 uses in three wordings, Strain in eleven.
+- 2026-08-31 · §9.12 / §9.12.1 · garnish.yml at Helen's request: 130 entries, 65 distinct strings, perhaps 35 garnishes; 55 after unambiguous collapse, 49 after her rulings.
+- 2026-09-14 · §9.12 / §9.12.1 · #984 · the "either of these, maker's choice" pattern used a second time, and generalised past two options.
+- 2026-09-02 · §9.12 / §9.12.1 · #630 · The methods pass done: 161 distinct steps → 146, 110 canonical uses → 177, 24 proposals → 0; 65 steps across 64 drinks.
+- 2026-09-04 · §9.12 / §9.12.1 · A "slot for ice pedantry" grew the strain group from eleven to seventeen — a vocabulary that keeps growing is absorbing a fact that belongs in a field.
+- 2026-09-05 · §9.12 / §9.12.1 · Strain group to five (§9.10a).
+- 2026-09-08 · §9.12 / §9.12.1 · #775 #845 · easy peasy, and what her three additions taught.
+- 2026-09-08 · §9.12 / §9.12.1 · #853 · One mood can now cancel another: mood_suppresses.
+- 2026-09-08 · §9.12 / §9.12.1 · #852 · Coney Park Swizzle is Coffey Park Swizzle
+- 2026-09-08 · §9.12 / §9.12.1 · #836 · Nine of the eleven glass questions were already answered correctly, and the value of the ruling was DELETING THE NOTES.
+- 2026-09-10 · §9.12 / §9.12.1 · #894 · An optional flame can make a drink on fire, and the Mai Tai's does not.
+- 2026-09-10 · §9.12 / §9.12.1 · #705 · the second census, and what canonical: could not say.
+- 2026-09-14 · §9.12 / §9.12.1 · #883 · shake or stir, ruled per drink (#883) — The audit listed every drink whose citrus was never shaken, or whose shake had no citrus.
+- 2026-09-14 · §9.12 / §9.12.1 · skewered brandied cherry, and a garnish still carries no count.
+- 2026-09-26 · §9.12 / §9.12.1 · sharp is disqualified by being CHURNED, not by crushed ice
+- 2026-09-15 · §9.13 · #1086 · "actions row only", and the title that was laid out in the glass column.
+- 2026-09-14 · §9.13 · #1000 · the see-all link comes out again, two days old.
+- 2026-09-14 · §9.13 · #1001 · the unit count ends the recipe, and goes public.
+- 2026-09-14 · §9.13 · #998 #999 · and #999 — two spacing rounds on the index, and both are about the same thing.
+- 2026-09-14 · §9.13 · the nav lettering, and the measuring mistake is the reusable part.
+- 2026-09-12 · §9.13 · #991 · the related cards are the index's cards, and the variant is deleted.
+- 2026-09-12 · §9.13 · #994 · a see-all link under the drink page's shortlist button.
+- 2026-09-12 · §9.13 · #993 · the other-site arrow is drawn now, and the bug could not be reproduced.
+- 2026-09-12 · §9.13 · #995 · the phone title tape starts on the column, and the cause was the artwork.
+- 2026-09-11 · §9.13 · #979 · the drink page's metadata ends where the title tape's box ends (#979).
+- 2026-09-11 · §9.13 · #971 #976 #977 · three rulings on the cards, given the same evening the weekend's family visit started (#971, #976, #977).
+- 2026-09-10 · §9.13 · the family-weekend design pass, in one entry.
+- 2026-09-11 · §9.13 · #961 #967 · the second weekend pass: five snags from Helen's phone, and a phone rule that had never rendered (#961–#967).
+- 2026-09-10 · §9.13 · #731 · the scaler grew two buttons, #731 — Helen's sketch: "- [1] x +".
+- 2026-08-26 · §9.13 · #276 · One sitting with Helen against a mockup (_dev/cocktails-design.html, since deleted: eleven card framings, four hovers, six greens, five second accents, three thirds; a page of …
+- 2026-08-27 · §9.13 · print is the FULL page — (#482) — the expectation was confidently wrong the other way; two traps caught reading the built CSS (rules compiled to top level; the class is btn-make …
+- 2026-08-28 · §9.13 · On a card carrying three filled things: "There's just a lot going on… underline the ingredient rather than highlight." Bands and washes, not fills.
+- 2026-08-29 · §9.13 · Five accents, "neon bar sign" (one → three on 08-26 → five).
+- 2026-08-30 · §9.13 · #452 · Nineteen moods, nine derived, ten Helen's.
+- 2026-09-14 · §9.13 · #984 · pudding in a glass's two-drink floor moved by one, and a hand-typed mood was reverted before Helen saw why.
+- 2026-09-19 · §9.13 · #1127 · /20, #1127 — no measuring, the sixth hassle chip, and the first rule that reads AMOUNTS.
+- 2026-08-30 · §9.13 · Index headings to five greens over a shared absinthe bar.
+- 2026-08-31 · §9.13 · #595 · Back-navigation restore on the drinks index, "exactly as the food site does"; cocktails restores SORT KEYS where food restores an array.
+- 2026-09-01 · §9.13 · #469 · Cocktails goes black-on-black; its heading values become what .on-dark had been solving for.
+- 2026-09-02 · §9.13 · #469 · "One thing for sure: we're going black on black.
+- 2026-09-03 · §9.13 · #679 #680 · The title had rendered at twice its stated size (UA h1 { 2em } inside display: contents): "the font is too big", "no space (spare tape) at all either side of the name" were one …
+- 2026-09-04 · §9.13 · (design audit) — The mood chips are bare words, "100% cards take words" (critical #5); the glass column 7.6rem → 6.5rem ("Narrower glass column please.", critical #9); no bottom …
+- 2026-09-05 · §9.13 · whole recipes only — ("Logically I think we can solve the rounding/ratio issue by only allowing integer multiples."); the target-ml box gone (#720, #721 — "it's just baffling.
+- 2026-09-20 · §9.13 · #1088 · the floor message is gone, and the interesting part is that it was WRONG rather than merely unreachable.
+- 2026-09-06 · §9.13 · #552 #756 #757 #710 #695 #694 #732 · Three ingredient lines (#552; "showing three lines is appropriate given the number of tiki drinks I have!"), paid for by the foot (Helen from a screenshot: "we could stand to move …
+- 2026-09-08 · §9.13 · #846 · The chip separator moved to a TRAILING ::after, reversing a decision of 2026-09-05, and that deleted a whole measurement pass.
+- 2026-09-08 · §9.13 · #760 · THE PROPOSED FIX DOES NOT WORK, and the issue had said it would.
+- 2026-09-10 · §9.13 · #942 · the drink page head on a phone, rebuilt from the numbers.
+- 2026-09-10 · §9.13 · #927 · "If you liked this, how about …", three related drinks at the foot of every drink page.
+- 2026-09-10 · §9.13 · #886 · what a drink card does under the cursor.
+- 2026-09-15 · §9.13 · #1086 · the drink page prints pale grey on white; a design review found it, not a ticket.
+- 2026-09-15 · §9.13 · #1086 · design review / #1086 — a single-column card is not a grid row, so it should stop matching one.
+- 2026-09-17 · §9.13 · #1134 · HAS TO HAVE inverts, and so does a matched ingredient on a card. This reverses two of Helen's own rulings, and the reason it is a reversal and not a contradiction is worth keeping.
+- 2026-09-17 · §9.13 · #1134 · round two — the fill came off the card the same day it went on, and the chip kept it. The entry above stands as what was tried.
+- 2026-09-17 · §9.1 · Two ginger garnishes, not one — garnish.yml had no ginger at all and two drinks wanted different ginger.
+- 2026-09-17 · §9.1 · fruit wedges is declared, and is the one garnish that does not name its fruit.
+- 2026-09-17 · §9.1 · Gunmetal Blue pours peach brandy, not crème de pêche.
+- 2026-09-17 · §9.1 · Hurricane gets I want to faff from a mood_include, not a rule change.
+- 2026-09-17 · §9.1 · Ti Punch keeps a method — Her idea was no method at all, just a Serve line reading "Assemblage au choix." test_method_is_a_non_empty_list refuses that — nine drinks had no method …
+- 2026-09-18 · §9.1 · serve.ice cannot carry QUANTITY, and that is what separated two identical-looking corrections.
+- 2026-09-18 · §9.1 · warming from cinnamon is a correction, not a rule change.
+- 2026-09-19 · §9.1 · Check moods_by_hand before reaching for mood_exclude.
+- 2026-09-19 · §9.1 · The passion fruit shell leaves Zombie's garnish
+- 2026-09-19 · §9.1 · half lime shell becomes half an empty lime shell
+- 2026-08-30 · §9.13 · #583 #586 #562 · see §13.4.
+- 2026-08-31 · §9.13 · The narrow-screen table (360px: 157px text column, 39% glass) measured at the 7.6rem column; at 6.5rem it reads 174/189/226px.
+- 2026-08-12 · §10 · Helen: "I'm concerned that issues we closed in the last few days weren't represented as tests...
+- 2026-08-14 · §10 · test_print_neutralises_the_screen_page_background passed while broken: two vacuity bugs stacked (a matcher that could not see body, an early return on "found nothing").
+- 2026-08-18 · §10 · #369 · The suite gates the deploy.
+- 2026-08-20 · §10 · #378 · Which tests read drafts, split by what each reads (SKIPS_WITHOUT_DRAFTS, PARTIAL_IN_CI) and enforced by a registry test that derives the list from source — which flagged ITSELF …
+- 2026-08-21 · §10 · test_no_main_ingredient_spelling_collisions caught "demerara sugar" against four recipes' "Demerara sugar" on a new draft.
+- 2026-08-29 · §10 · #540 · Helen chose option 4 of four: gate at promotion, leave the private drinks out of a runner.
+- 2026-08-31 · §10 · #624 · The garnish vocabulary merged here while the drink-side rename sat on an unmerged private branch: red for anyone with a clone, green in CI.
+- 2026-09-05 · §10 · The schema handshake (SCHEMA_VERSION, tests/drafts_schema.py), Helen's choice among four options; a hand-maintained integer, not a fingerprint; not pytest.exit().
+- 2026-09-06 · §10 · #633 #694 · The stub-DOM harness made permanent (tests/js/dom-stub.js, index-harness.js) after the 08-31 binding fault; it earned itself within the hour (#694 added recipe-list.js and …
+- 2026-09-20 · §10 · #1127 · "It's not useful to have a situation where we expect tests to fail, and we should rearchitect."
+- 2026-09-20 · §10 · #1147 #1153 #1106 #1107 · THE DERIVATION AND HARNESS GROUP: #1147, #1153, #1106, #1107, and they turned out to be one bug four times.
+- 2026-09-29 · §10 · #1200 · the browser smoke test, and four things it would have got wrong as the issue was written.
+- 2026-09-29 · §10 · #1202 · the rulings index is generated and carries NO line numbers.
+- 2026-09-29 · §10 · a proof by mutation can be fooled by Python's bytecode cache.
+- 2026-09-19 · §11 · "Pushed" is not "she can see it", and the drinks half is always the one that needs the extra step.
+- 2026-09-19 · §11 · A narrow suite stops being the right check the moment a commit touches _data/.
+- 2026-09-24 · §11 · #1078 · An agent may correct or delete a note that a later ruling of Helen's has made false.
+- 2026-09-19 · §11 · A gate that fails closed makes a held page look exactly like nothing going wrong.
+- 2026-09-18 · §11 · Helen starts her own dev servers; a session never offers.
+- 2026-09-19 · §11 · .claude/ excluded from the Jekyll build, because exclude: is also listen's ignore list.
+- 2026-09-18 · §11 · COCKTAIL_BASELINE_COMMIT moved four times in two days
+- 2026-08-12 · §11 · Helen: "Did your heading lettering change touch all headings on the whole site?
+- 2026-08-14 · §11 · The four interaction rules written down (show don't describe; symptoms not diagnoses; a structural reason under an aesthetic objection; UAT is first-class — every filled bar on …
+- 2026-08-16 · §11 · "Give me decisions to make as you go." Three rulings mid-way through the exclude vocabulary each removed a class of guesswork; "only 2 of 73 methods have this shape" settled the …
+- 2026-08-17 · §11 · GH_TOKEN widened from read-only to issues read/write on three repos, probed by measurement (§11's paragraph saying "read-only by choice" stood until 08-21, contradicting §10.1).
+- 2026-08-18 · §11 · git reset --hard origin/main to move a stray commit wiped a half-finished handover edit; two commits landed on main directly.
+- 2026-08-19 · §11 · The rule was read and broken the same day (git checkout -- <two files> 2>/dev/null || true), so guard-destructive-git.py was written — the first executable rule about the AGENT.
+- 2026-08-20 · §11 · step 1 widened 2026-09-07, below — Claude opens the PR now
+- 2026-08-21 · §11 · Commit type words counted rather than asserted (content and docs alone were 133 commits and absent from the stated list).
+- 2026-08-22 · §11 · #335 · A Fixes owner/repo#N trailer from a private repo cross-references nothing — measured against #335's timeline after a day of correctly-formed trailers (Towards …
+- 2026-08-23 · §11 · Use a worktree when more than one agent shares the checkout.
+- 2026-08-24 · §11 · "I have a soft limit on deploys per hour, so I prefer larger pull requests where that's practical."
+- 2026-08-29 · §11 · /tidy-drafts at Helen's request ("I also want a way of saying hey, Claude, please tidy up my drafts files."): run for real in three commits — scalar quoting 295 → 0 …
+- 2026-08-31 · §11 · /ingest and scripts/ingest_preflight.py: one list grouped by decision.
+- 2026-09-01 · §11 · Title/slug divergence is NOT a finding on a draft: "let's not run the 'title matches slug'-ish test over drafts." — a draft's title is still the source's (chocolate-fudge-cake …
+- 2026-09-02 · §11 · The round trip for a repo-less file, asked directly: "is this in the case where I get files back from a Claude web and we need to ingest them properly once I'm back at a desk?
+- 2026-09-02 · §11 · D8–D11 (inbox design §9) — D8 item draft-only; D9 label ingest, title ingest: <slug>; D10 Helen pastes the envelope herself — "I am new to this and quite conservative."; D11 every …
+- 2026-09-03 · §11 · #672 #537 · /ingest-inbox built; an absent drafts repo is a refusal, not a clean inbox (#537's lesson).
+- 2026-09-05 · §11 · #670 · Cocktail drafts joined /tidy-drafts: "Widen please — cocktail drafts passing will save me a lot of time."; the first real run found nothing (#670 had cleared every range two days …
+- 2026-09-05 · §11 · Pushing a branch in the private repos needs no ask.
+- 2026-09-06 · §11 · CLAUDE.md: ${GH_TOKEN:-unset} prints the token (it did).
+- 2026-09-07 · §11 · (later the same session) — and then the ask went entirely.
+- 2026-09-07 · §11 · Claude opens the PR, and the ask is bundled with the push.
+- 2026-09-08 · §11 · step 1 splits: in the devcontainer Claude commits and Helen pushes.
+- 2026-09-08 · §11 · the shared checkout, and the second reason to check the branch before committing.
+- 2026-09-08 · §11 · A RENAME THAT SPANS BOTH REPOS MUST MERGE DRAFTS-FIRST, and getting that backwards turned Helen's local pytest red.
+- 2026-09-14 · §11 · #984 · the same rule broken the same way, this time by the session that had just read the entry above.
+- 2026-09-08 · §11 · the token-expansion guard, and the third time is what earned it.
+- 2026-09-09 · §11 · A COMMIT MESSAGE IS A DOCUMENT. THE DIFF IS THE CODE.
+- 2026-09-09 · §11 · THE SAFE PROBE IS BANNED TOO, AND THE REASON IS NOT THAT IT LEAKS.
+- 2026-09-09 · §11 · GH_TOKEN DELETED. ONE CREDENTIAL NOW, AND THE PRIVATE-REPO PR GAP CLOSED WITH IT.
+- 2026-09-09 · §11 · THE INLINE-SCRIPT GUARD, AND THE RULE THAT ACTUALLY BITES IS NOT THE ONE I BUILT FIRST.
+- 2026-09-09 · §11 · "THERE ARE EXACTLY TWO HOOKS" HAD BEEN FALSE FOR A WHILE.
+- 2026-09-09 · §11 · I READ AN EXIT CODE THAT MEANT NOTHING, TWICE, AND REPORTED IT AS GREEN.
+- 2026-09-09 · §11 · I RAN TWO pytest SESSIONS AT ONCE AND DIAGNOSED THE RESULT AS A REGRESSION.
+- 2026-09-09 · §11 · git log --branches --not --remotes REPORTS FALSE POSITIVES IN THE DEVCONTAINER, and §12 recommends it as the sweep for unpushed work.
+- 2026-09-09 · §11 · A GUARD FOOLED BY THE PROSE EXPLAINING IT, ON ITS FIRST RUN.
+- 2026-09-09 · §11 · ONE FACT IN TWO PLACES, FOUND BY CHANGING IT.
+- 2026-09-14 · §11 · #1008 · ONE MAP, PIPELINE.md, and the folders settled for both sites.
+- 2026-09-15 · §11 · what the flag looked like a day later, a new agent account, and the writes get a wrapper.
+- 2026-09-15 · §11 · a leading env assignment asked Helen, and her pick was to refuse it AND add wrappers, not just one or the other.
+- 2026-09-21 · §11 · the file tools may read /workspace/.node-runtime, and the obvious way to grant that does not work.
+- 2026-09-21 · §11 · git -C <path> defeats every git allow rule, and a whole session's git calls interrupted Helen for nothing.
+- 2026-09-21 · §11 · a PR merged mid-session, and the next push went nowhere.
+- 2026-09-22 · §11 · CLAUDE.md became the rules, and this file took the reasons.
+- 2026-09-22 · §11 · the suite REPORTS what it never looked at, and a failing test was the wrong answer.
+- 2026-09-21 · §11 · /22 — the devops session: a hook that tells, five allow rules gone, and two false comments in run.sh.
+- 2026-09-24 · §11 · THE GROUND-TRUTH HOOK REPORTED THE WRONG REPOSITORY, on its first real outing, and the session it misled was the one that wrote it.
+- 2026-09-24 · §11 · #1191 · the two permission questions, answered and closed.
+- 2026-09-29 · §11 · two read grants, and neither went live by editing settings.
+- 2026-08-19 · §11.2 · 2026-08-19: "two stylesheets import shared/" (three).
+- 2026-09-22 · §11.2 · two wrong conclusions in ONE session, from one habit: proving something narrower than the thing being claimed.
+- 2026-09-24 · §11.2 · a HOOK reported a true fact about the wrong repository
+- 2026-08-30 · §11.2 · #600 #542 · An issue rots faster: #600 copied #542's "Also outstanding" without re-measuring, four days on, and every claim was false (six half-empty disjunctions — zero; Kamaniwanalaya …
+- 2026-08-31 · §11.2 · #539 · Do not ship a layout at a size you cannot look at: three narrow layouts shipped behind a switch that neither Helen nor the agent could look at (a desktop will not drag below …
+- 2026-08-12 · §11.2 · #131 #128 · CSS naming: --modifier is real BEM, 8/9 checked had a base class; .ingredient--matched was the ninth and a real bug; a 2026-08-12 architecture review's full migration plan is not …
+- 2026-09-10 · §11.2 · TWO GUARDS LOOSENED BY A FACT NEITHER OF THEM CHECKED: AN ALLOW RULE THAT DOES NOT EXIST.
+- 2026-09-10 · §11.2 · scripts/gh-agent.sh, BECAUSE SAFE IS NOT THE SAME AS CHECKABLE, AND THIS IS THE SECOND TIME THAT DISTINCTION HAS WON.
+- 2026-09-10 · §11.2 · THE SIXTH HOOK, AND THE FIRST ONE THAT ENFORCES A RULE THIS FILE HAD ALREADY WRITTEN IN FULL.
+- 2026-09-10 · §11.2 · THE MERGE DENY, WHICH IS THE PART OF THAT SETTINGS CHANGE WORTH READING TWICE.
+- 2026-09-10 · §11.2 · pr edit IS THE FIRST gh CALL THE CLASSIC TOKEN CANNOT MAKE, AND IT FAILS ON SCOPE, NOT ON PERMISSION.
+- 2026-09-10 · §11.2 · THE TOKEN LEAKED THROUGH THE DOCUMENTED PATTERN, AND THE FIX'S FIRST VERSION BROKE EVERY OTHER WORKTREE.
+- 2026-09-10 · §11.2 · CLOSING ONE HOLE OPENED ANOTHER, IN A DIFFERENT FILE, THE SAME DAY.
+- 2026-09-11 · §11.2 · ALLOW RULES FOR THE WRAPPERS, AND THE THREE PROMPTS THAT TURNED OUT TO BE GUARDS.
+- 2026-09-11 · §11.2 · A STACKED PR MERGES INTO ITS BASE, NOT INTO main, AND A MERGED PR'S BRANCH TAKES PUSHES THAT GO NOWHERE.
+- 2026-09-10 · §11.2 · 2026-09-10: "There is no gh at all in a worktree" (§1) was true of a worktree on the host and false inside the devcontainer, whose image installs it; a session spent a turn …
+- 2026-09-10 · §11.2 · 2026-09-10: §1 gained the headless browser.
+- 2026-09-15 · §11.2 · guard-unanalyzable-bash.py refuses an unquoted ( or ).
+- 2026-09-28 · §12 · origin/<branch> NEVER MOVES, so it cannot answer "is this pushed?"
+- 2026-09-28 · §12 · The handover that crossed two repos and only named one
+- 2026-09-28 · §12 · Two working copies of one batch, again — 2026-09-28.
+- 2026-08-19 · §12 · The rule written instead of followed — 2026-08-19, about.html's site_key (§2.4).
+- 2026-08-19 · §12 · Markup shared, CSS forked — 2026-08-19, #374 (§2.5).
+- 2026-08-31 · §12 · The wrong layer measured — 2026-08-31, the umbrella suppression (§9.3.3).
+- 2026-08-19 · §12 · A source-scanning guard fooled by its own explanation, six times
+- 2026-08-26 · §12 · The parser reading documentation as code
+- undated · §12 · The third link shape — #353's ](#fragment); the ganache tagline pointed at #nonexistent-anchor and 18,886 checks passed; the obvious test failed thirty recipes because #doneness …
+- undated · §12 · The corpus glob that named files — about.html invisible to test_page_links.py's literal list.
+- 2026-08-31 · §12 · The guard scoped by the value it polices
+- 2026-08-31 · §12 · The registry asserted non-empty — 2026-08-31, proposals, wrong within a day.
+- 2026-09-02 · §12 · The exemption that silenced downstream checks
+- undated · §12 · Our own work exempted — QQ Claude, eleven days (§5).
+- 2026-08-31 · §12 · The stale fetch — 2026-08-31, reported branch state from before four tool calls of work; wrong in both directions after Helen said "I thought I'd merged that".
+- 2026-08-10 · §12 · The test that cannot fail — a stale JS_DIR; a non-recursive SCSS glob; garam-masala-powder.md's step: singular with no name: (2026-08-10, test_method_groups_have_name_and_steps) …
+- undated · §12 · Script order — assets.js moved to the end of <head> after weeks of a silent bug; guards for ingredient-search.js/recipe-list.js before filters.js.
+- undated · §12 · Colours moved, numbers stranded — aureolin between filter slots; the category-code bar's -active tokens.
+- 2026-08-02 · §12 · Asymmetric padding — 2026-08-02, .site-logo-top's padding-right: 0.18em doubling the letter-spacing trailing gap, invisible until cocktails' wider word defined the column.
+- undated · §12 · SVG formats — backgrounds-headers/'s 100 Inkscape exports open with <svg\n width=.
+- undated · §12 · The cross-reference nothing re-checks — the "raises every ratio to a power" comments, one of them an instruction.
+- undated · §12 · Rename un-ignores — the plural _cocktails_drafts, 229 files.
+- 2026-08-21 · §12 · The generator that stopped generating — 2026-08-21, cooking_methods.yml: both scripts said "re-run", a re-run would have dropped 166 hand-edited lines; caught by taking a backup …
+- 2026-08-29 · §12 · The unpushed branch — 2026-08-29 (§11).
+- 2026-08-29 · §12 · The patch read as the output — 2026-08-29, the tidy pass's 341 files.
+- undated · §12 · YAML re-serialised — never, across several hundred edits.
+- 2026-08-02 · §12 · The force-push rejection — 2026-08-02, a rebase artefact.
+- undated · §12 · Rejected tooling — jekyll-seo-tag, Stylelint, a bundler, a CSS framework, schema.org/Recipe (it would push adapted magazine recipes into Google's rich results).
+- undated · §12 · Flex for a two-part row — .method-full li (§4.2).
+- undated · §12 · The bare element selector — article.recipe a (caught, #40) and .recipe-row-content a (missed; every index badge took the title's 1rem until Helen's screenshot, #258).
+- undated · §12 · Inheritance into a nested control — .btn-method-toggle wearing its heading's emboss, found by Helen comparing it side by side.
+- 2026-08-16 · §12 · The nested rule voided by a markup move — 2026-08-16, #275, .btn-reveal shipped with no styling while 17,170 tests stayed green.
+- 2026-08-30 · §12 · The :not() that could only add — 2026-08-30, #589: the results pool was 4px TALLER empty than full, and the visible symptom was a chip jumping after a click ("if I click a chip …
+- 2026-08-16 · §12 · Lightness-only state — 2026-08-16, the footer links and the reveal link; Helen's sentence both times: it "doesn't change on mouseover or click".
+- 2026-08-16 · §12 · The generated sweep — nameQuery, isSearching, two rival predicates, then the LEAVE OUT box (#274, 2026-08-16).
+- 2026-08-21 · §12 · The photo batch — 2026-08-21, 43 photos, an ordinal survey, three cookbooks and an AI-chat screenshot; 2026-08-31, two captures that ended mid-recipe ("Stir until cold,").
+- 2026-08-22 · §12 · The worktree with the lost work — 2026-08-22 (§9.1).
+- 2026-08-22 · §12 · The private-repo trailer — 2026-08-22.
+- undated · §12 · The un-emptied collection — #235, twice available.
+- undated · §12 · The row that overflowed — the footer on a phone: 1fr will not shrink below min-content, 240px of hearts plus gaps ≈ 392px against 360.
+- undated · §12 · DOM order and the positioned layer — .site-nav-icons under the rotated tape on a phone; fixed structurally (its own line below 600px), not with a z-index.
+- 2026-08-26 · §12 · The clipping <svg> — 2026-08-26.
+- 2026-09-02 · §12 · Four browser facts — 2026-09-02: the black-on-black inputs (black text on black); the shadow under the search-hit underline; <mark>'s yellow returning an hour after the comment …
+- 2026-09-02 · §12 · Five traps from one design session — 2026-09-02 (§9.13 above): nineteen unbalanced */; --tape-pad-top invalid at computed-value time and computing to zero on all four sides; the …
+- 2026-09-14 · §12 · A generic with exactly one bottle is that bottle, invisibly
+- 2026-09-14 · §12 · The merge-order rule broken by the session that had just read it
+- 2026-09-10 · §12 · A SCRIPT TAG DESCRIBED IN A COMMENT AND NOT WRITTEN, FOR TWO DAYS.
+- 2026-09-15 · §12 · #1112 · TEN FIXED ISSUES LEFT OPEN BY A MERGE THAT SAID IT CLOSED THEM.
+- 2026-09-16 · §12 · an agent's worktree is Helen's to keep, not yours to tidy.
+- 2026-09-12 · §12 · A red main is a deploy outage, and it ran for three days
+- 2026-09-15 · §12 · A double hyphen inside an SVG comment — 2026-09-15, #1086.
+- 2026-09-28 · §12 · A label from the instructions, pasted into the workflow
+- 2026-07-31 · §13 · Recipe page redesigned; index brought onto the same mark, then reworked (row layout, category-code bar, pagination, shuffle).
+- 2026-08-03 · §13 · The category-code bar removed after four rounds of tuning.
+- 2026-08-10 · §13 · #122 · The tape background redesigned (generate_tape.py, seven files: tape-1 30 both_acute, tape-2 32 both_acute, tape-3 33 both_acute, tape-4 35 both_obtuse, tape-5 36 both_obtuse …
+- 2026-08-11 · §13 · The reference pages (§14).
+- 2026-08-12 · §13 · The punched effect on EVERY heading from one base rule; the three fixed stroke tokens retired for $emboss-stroke (0.014em then); the ratios came from where two working elements …
+- 2026-08-16 · §13 · #275 · The reveal link centred under I KNOW WHAT I WANT with the wordmark's grid trick; the first attempt was ~116px too wide because a spanning grid item sizes an intrinsic track.
+- 2026-08-19 · §13 · #387 · Going back restores the index (§13.7).
+- 2026-08-19 · §13 · #389 · Active filter tags shifted their neighbours: two bugs in one placeholder (font-size: 0.74rem, letter-spacing: 0.04em matching neither resting base); the fix a deletion.
+- 2026-08-21 · §13 · #396 · Icon-coverage test checks only the BASE class (31 of 41 icon classes are modifiers).
+- 2026-08-24 · §13 · to 08-26 — $font-label: the recipe list spent two days in IBM Plex Mono and came back; five elements held the face and returned (.category-label on size …
+- 2026-08-26 · §13 · .badge--matched gained the faux-bold so a matched badge and its filter button read as one idea.
+- 2026-08-30 · §13 · #583 #586 #562 · The food index converging on cocktails' shape: HAS TO HAVE was SEARCH MAIN INGREDIENTS (named the mechanism); LEAVE OUT came out from behind its reveal link (the framing was the …
+- 2026-09-02 · §13 · #660 · (design review, PR #660) — The fold: the first recipe sat ~1,200px down; Helen chose "tighten" over three louder candidates (a "more" link — "loses what the page is here for"; a …
+- 2026-09-15 · §13 · #1050 · the search box becomes the search for anything.
+- 2026-09-04 · §13 · (design audit) — Food's universe turned down: "This advice was the only part of the design review I disagreed with.
+- 2026-09-05 · §13 · Leopard tracked as its own issue; Helen holds it (LEOPARD.md: round one L3 sheen — "The sheen really brings it to life"; "Leave leopard with me… don't ship anything.").
+- 2026-09-06 · §13 · META FILTERS gone entirely: "I don't want this block on the index page any more.
+- 2026-09-07 · §13 · #783 · a pinned grid COLUMN does not reserve its cell, and a DATA edit is what exposed it.
+- 2026-09-07 · §13 · #776 · the card's three stacks share one budget.
+- 2026-09-07 · §13 · #823 · grow the TARGET, not the control — The card's shortlist mark was a ~22x25px hit area and padding could not fix it: the title's reservation is computed from the button's own …
+- 2026-09-07 · §13 · #777 · a hover says WHICH question, not just "touchable".
+- 2026-09-07 · §13 · #704 #651 · / #651 — two small ones with a rule in them.
+- 2026-09-10 · §13 · #644 #779 · / #779 — batch offered, pick not yet recorded.
+- 2026-09-11 · §13 · #644 · Helen's pick: fifteen tapes — "From the new set, don't use 1 and 7, but let's keep all the rest.
+- 2026-09-11 · §13 · #779 · random each load — Helen, on the same day, with the fifteen in front of her: "#958/#779: random each page load please." The #956 candidates page had put the two states on the real …
+- 2026-09-14 · §13 · #1005 #1006 #1007 #1011 #1024 · / #1006 / #1007 / #1011 / #1024 — the feature set settled, the placements on two candidates pages.
+- 2026-09-15 · §13 · the design review, and how it was run — Helen asked for "a 'standard' review, rather than my blinkered request", of visual design, user flows and general niceness, then added copy …
+- 2026-09-15 · §13 · #1086 · (design review) — four candidates pages, four picks.
+- 2026-09-15 · §13 · #1086 · design review / #1086 — three phone-layout snags on the recipe page, fixed without touching desktop or tablet.
+- 2026-09-15 · §13 · #1093 · the design review's leftovers, the spacing review Helen added to it, and her recent follow-up issues, in one PR.
+- 2026-09-15 · §13 · #1099 #1093 · Helen's second look at the #1093 branch, six items in one issue (the spam-flag rule), in her words
+- 2026-09-15 · §13 · #1100 · PR #1100 — Helen's review comment, three rulings.
+- 2026-09-15 · §13 · #1097 · the words for content — Helen: "Food recipes / Cocktail recipes.
+- 2026-09-16 · §13 · #1123 · the omnisearch box: 24 → 12 → 22 characters, and the thing that was actually wrong was the COLOUR.
+- 2026-09-20 · §13 · #1148 · ?? sat 9.4px below the row on a phone, and the block that did it was half-written.
+- 2026-09-20 · §13 · #1088 · the drink amount column is sized by the DRINK, and the phone pass is how it was found.
+- 2026-09-21 · §13 · #1148 · round two — aligning the BOXES was not aligning the MARKS, and the one-image rule is what settled it.
+- 2026-09-21 · §13 · #1163 · "as soon as action buttons need to wrap, all should wrap", and my "working as designed" was wrong.
+- 2026-09-21 · §13 · #1161 · padding cannot inset an absolutely positioned child, and the screenshot is what caught it.
+- 2026-09-21 · §13 · #1162 · a DRAFT mark on the local site — Helen: "add a DRAFT badge on the local site for unpublished cocktails", on cards "squished in on the top right" and on a drink page "to the right …
+- 2026-09-25 · §13 · the recipe page keeps all thirteen devices; a device budget is NOT the itch.
+- 2026-09-21 · §13 · #1165 #1086 · the card glass clipped between 400 and 720px, and #1086's own fix is what broke it.
+- 2026-09-21 · §13 · #1164 · the count leads on "see shortlist" — Helen: "swap shortlist and (0) in the button so the structure of the + shortlist is repeated." The button above it is a mark then a word (+ is …
+- 2026-09-20 · §13 · crop.sh / styles.sh / shoot.sh paths are site-relative, and getting it wrong reports the WRONG FAILURE.
+- 2026-09-20 · §13 · #1149 · the footer column head is a door, and it looks like the header's door rather than like the links under it.
+- 2026-09-20 · §13 · #1088 · the placeholder sitting: what Helen wrote, and the two checkboxes that were already done.
+- 2026-09-20 · §13 · #1088 · the 404's ways out left .about-ways, and her sketch is what decided it.
+- 2026-09-24 · §13 · the design audit's four rulings, and the diagnosis behind them.
+- 2026-08-11 · §14 · Built at Helen's request from 15 draft tables in _food_drafts/reference-info/.
+- 2026-08-13 · §14 · "Out at", never "pull at": pull is American.
+- 2026-08-14 · §14 · #183 · The single page split into temperatures and timings (#183/#189/#202).
+- 2026-08-15 · §14 · #224 #218 #213 · sustainability.html removed entirely (#224), never fact-checked; food/reference/index.html deleted (#218); no nav link (#213, won't-do-for-now).
+- 2026-08-16 · §14 · #246 · cook-timer.js opened render() with var doneness = "rare" and shipped no control; only 2 of 73 methods have by_doneness, so both figures render on those two cards and no control …
+- 2026-08-16 · §14 · #272 · Two footer links; deliberately the footer and not the nav — used "when I'm planning out what I've decided to cook, and when I'm in the kitchen about to be covered in raw chicken".
+- 2026-08-19 · §14 · #382 #383 #384 #385 #386 #368 · The methods tables page deleted (nine of twelve sections duplicated the calculator; the steak table dropped — "I know how to cook steak"; fish and shellfish moved onto the …
+- 2026-08-21 · §14 · #400 · groups removed from cooking_methods.yml — but moved first: 35 paragraphs, 1,942 words, 14 links of original sourcing research, invisible for eight days and 30% of the JSON blob …
+- 2026-08-21 · §14 · youvetsi wired to beef.tough_cuts and unwired the same day by Helen, cooking it: "it'll just fall off at the end, being whatever temperature the pan sits at for 3 hours" — the …
+- undated · §14 · Two food-safety gaps (pork medium, fresh ham pink) flagged, not corrected — Helen's call.
+- 2026-09-06 · §14 · #529 #459 · Why it passes #459 when a bare category list would not
+- 2026-09-06 · §14 · no template change — which is what sites.yml's own note had predicted since 2026-08-19: the footer's loop always asked every site rather than food.
+- 2026-09-06 · §14 · .ref-* is a new page anatomy, and that is not a failure to reuse.
+- 2026-09-06 · §14 · Round one of candidates: table, stack or two columns; and the retired words with reasons, words-only, or off.
+- 2026-09-06 · §14 · Round two: column labels, and two headings that were mine.
+- 2026-09-06 · §14 · One rum per line, her call — against a first version that ran them as a comma-separated sentence arguing three-to-eight names are one answer.
+- 2026-09-06 · §14 · rum_groups is DECLARED, not derived, and the page walks the groups rather than rum_styles.
+- 2026-09-06 · §14 · #782 · The sipping shelf is a shelf and not a rule
+- 2026-09-06 · §14 · Helen's own prices and strengths replaced my guesses in the same pass (Pusser's 151 £40 → £52, Ceylon Arrack £28 → £37, and Ceylon arrack's ABV 33 → 40, which cleared a qq: rather …
+- 2026-09-06 · §14 · Local-only is TWO switches because it is two questions.
+- 2026-09-10 · §14 · #784 · Most of the copy came off, and the reasons are not the reader's.
+- 2026-09-10 · §14 · #813 · TREATMENT A: THE COUNTRY GOES INSIDE THE BOTTLES COLUMN, NOT INTO A ROW OF ITS OWN.
+- 2026-09-10 · §14 · "EXAMPLES" WAS PINK BECAUSE OF A GRID TRACK, AND IT READ AS A DECISION FOR FOUR DAYS.
+- 2026-09-10 · §14 · #591 · origin IS BUILT, THREE DAYS AFTER IT WAS RULED, AND THE BUILD FOUND A LIVE BUG IN SOMETHING ELSE.
+- 2026-09-10 · §14 · I SHADOWED A HELPER AND NINE TESTS BLAMED THE DATA.
+- 2026-09-10 · §14 · #784 · AND THEN THERE WERE NO LINES AT ALL. The entry above describes a mechanism that lasted a few hours.
+- 2026-09-10 · §14 · #921 · THE COPY REVIEWED, AND THREE RULINGS OUT OF IT.
+- 2026-09-10 · §14 · #920 · THE MARK WORE TWICE ON A WRAPPED HEADING, AND TWO STALE COMMENTS SAID IT COULDN'T HAPPEN.
+- 2026-09-11 · §14 · #980 · THE PAGE PUBLISHES, AND THAT REVERSES YESTERDAY'S RULING ON HER OWN WORD.
+- 2026-09-15 · §14 · #1086 · THREE ACCESSIBILITY FINDINGS FROM A DESIGN REVIEW, MEASURED WITH AXE-CORE RATHER THAN EYEBALLED.
