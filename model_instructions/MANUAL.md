@@ -2793,17 +2793,24 @@ gitignored inbox that is empty in a fresh worktree, and it emptied the
 published set twice. Recover with `git show HEAD:<path>`, never `git checkout
 --` on a dirty tree.
 
-### 9.15 Never save a redraw over its predecessor
+### 9.15 One source per glass; git history is the record
 
-`_design_sources/` is the record of what was tried; base name is the
-original, a numeric suffix is the redraw, both stay on disk. Which one
-publishes is a NAMED SWITCH in the normaliser — `RENAME` points the suffixed
-name at the published name, `SKIP` holds back the one it supersedes — never
-the highest number and never `sorted()` order (`-` sorts before `.`, so the
-bare name wins by being written last). `python3 scripts/check_glass_regen.py`
-resolves every source through the registries, normalises in memory and diffs
-against the published set without deleting anything; run it after touching
-any registry.
+**Since 2026-09-29 `_design_sources/cocktails/glasses/` holds exactly one
+drawing per published icon, under its plain name** — Helen: *"Shall we clear
+out the earlier versions of drawings we've updated? ... we're using tiki mug 9
+so delete the others."* The superseded ones are in git history, not on disk
+(`git log --diff-filter=D -- _design_sources/`; `git show <sha>^:<path>` brings
+one back). **A redraw still arrives beside its predecessor** — Helen saves a
+new attempt as `-2`, never over the old — and it is published by DELETING the
+old file and renaming the new one to the plain name, in one commit, not by
+adding a `SKIP`/`RENAME` entry: those registries exist in the normaliser, are
+empty of glasses, and were twenty entries of machinery whose only job was
+choosing between versions (`sorted()` puts `-` before `.`, so the bare name
+wins by being written last). `python3 scripts/check_glass_regen.py`
+normalises every source in memory and diffs against the published set
+without deleting anything; run it after any change here, then
+`python3 scripts/build_glass_candidates.py` so the drawer on `/dev/glasses/`
+matches.
 
 ### 9.16 The candidate drawer — `/dev/glasses/` sections 5 and 6
 
