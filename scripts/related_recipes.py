@@ -1,6 +1,9 @@
 """What "If you liked this, how about …" would offer on a RECIPE page, and how
 thin it gets. Food's twin of scripts/related_drinks.py -- #1005, 2026-09-14.
 
+REPRODUCES "every recipe's third pick shares at least 1" in
+`tests/test_rendered_pages.py` and `_layouts/recipe.html`.
+
 THE FEATURE is three related recipes at the foot of every recipe page, chosen
 in Liquid by `_layouts/recipe.html`. The score is:
 

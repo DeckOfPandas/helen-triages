@@ -1,5 +1,8 @@
 """Where does the universe line stop fitting on one row?
 
+REPRODUCES `$universe-stack-width` (820px) in `_sass/cocktails/_universe.scss`,
+and checks it: on 2026-09-29 the 90th-percentile name needs 805px.
+
 THE NUMBER THIS PRODUCED is `$universe-stack-width` (820px) in
 `_sass/cocktails/_universe.scss` -- the width at which the ingredients drop below
 the name. Helen, 2026-09-05: "please allow the line to stack, first line name,

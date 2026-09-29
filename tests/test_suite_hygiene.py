@@ -402,3 +402,80 @@ def test_the_drafts_caveat_can_never_turn_a_run_red(tmp_path):
         conftest.pytest_terminal_summary(_Exploding(), 0, None)
     finally:
         conftest.DRAFTS_DIR, conftest.COCKTAIL_DRAFTS_DIR = original
+
+
+# =============================================================================
+# THE BROWSER SMOKE TEST -- a skip that could happen forever (#1200, 2026-09-29)
+# =============================================================================
+# test_browser_smoke.py skips whenever Chromium cannot launch, which is every
+# CI run until the workflow installs a browser. Two things keep that honest,
+# the same two the drafts have: the skip is DECIDED in one place, and the run
+# SAYS it happened. Both are pinned here.
+
+class _Lines:
+    def __init__(self):
+        self.lines = []
+
+    def __call__(self, text, **kwargs):
+        self.lines.append(text)
+
+
+class _Report:
+    def __init__(self, nodeid, reason):
+        self.nodeid = nodeid
+        self.longrepr = ("file", 1, f"Skipped: {reason}")
+
+
+def test_the_browser_caveat_names_the_skip_and_its_reason():
+    import conftest
+
+    write = _Lines()
+    conftest._report_browser_skips(write, [
+        _Report(f"tests/{conftest.BROWSER_SMOKE}::test_a[x]", "no launchable Chromium: gone"),
+        _Report(f"tests/{conftest.BROWSER_SMOKE}::test_b[y]", "no launchable Chromium: gone"),
+    ])
+    said = "\n".join(write.lines)
+    assert "2 browser smoke tests skipped" in said
+    assert "no launchable Chromium: gone" in said
+    assert "sh scripts/browser/install.sh" in said, "a caveat with no remedy is a complaint"
+
+
+def test_the_browser_caveat_is_silent_when_the_smoke_test_ran():
+    """Another module's skips are not the browser's, and no skip is silence."""
+    import conftest
+
+    write = _Lines()
+    conftest._report_browser_skips(write, [_Report("tests/test_drafts.py::test_x", "no drafts")])
+    conftest._report_browser_skips(write, [])
+    assert write.lines == []
+
+
+def test_every_browser_test_goes_through_the_launch_probe():
+    """Skip on whether Chromium LAUNCHES, never on whether playwright IMPORTS.
+
+    CI installs the binding and no browser, so an import skip there runs, fails
+    to launch, and gates the deploy -- the expected-to-fail arrangement Helen
+    ruled out on 2026-09-20 (DECISIONS §10). The `chromium` fixture is the one
+    probe; every test in the module must ask for it, and nothing in the suite
+    may importorskip playwright instead.
+    """
+    smoke = TESTS_DIR / "test_browser_smoke.py"
+    tests = [n for p, n in _test_functions() if p == smoke]
+    assert tests, f"no tests found in {smoke.name} -- an empty scan passes"
+    unprobed = [n.name for n in tests if "chromium" not in {a.arg for a in n.args.args}]
+    assert not unprobed, (
+        f"{smoke.name}: {unprobed} do not take the `chromium` fixture, so they "
+        f"do not skip when no browser can launch")
+
+    importskips = []
+    for path in sorted(TESTS_DIR.glob("*.py")):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                    and node.func.attr == "importorskip" and node.args
+                    and isinstance(node.args[0], ast.Constant)
+                    and str(node.args[0].value).startswith("playwright")):
+                importskips.append(f"{path.name}:{node.lineno}")
+    assert not importskips, (
+        f"importorskip('playwright...') at {importskips}: CI has the binding "
+        f"and no browser, so this would run and fail there. Take the "
+        f"`chromium` fixture from test_browser_smoke.py instead.")

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """How far each tape SVG insets its black band from its own viewBox ends.
 
+REPRODUCES `$tape-art-inset-x`'s 4.14% in `_sass/cocktails/_cocktail.scss`,
+the modal left inset (10 of 15 tapes on 2026-09-29).
+
     python3 scripts/tape_insets.py
 
 The derivation behind `$tape-art-inset-x` in _sass/cocktails/_cocktail.scss

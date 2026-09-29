@@ -4699,6 +4699,67 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   and this half is what gives it the mood meanwhile. The measurement sits
   beside the list so the next reader does not empty it, see nothing move, and
   conclude it is dead again.
+- **2026-09-29, #1200 — the browser smoke test, and four things it would
+  have got wrong as the issue was written.**
+
+  **Helen's two rulings.** *Keep the opt-in*: `HT_REQUIRE_BROWSER=1` turns
+  the no-browser skip into a failure, for the workflow to set in the same edit
+  that installs Chromium. Without it, a browser install that breaks later
+  skips in CI forever, which is `_require_bundler`'s trap, and keying on
+  `CI=true` today would be red because CI has no browser yet. *Add the ENV*:
+  the Dockerfile now sets `PLAYWRIGHT_BROWSERS_PATH`, and the test's own
+  `tmp/browser/` → `/opt/playwright` search still overrides it, as `env.sh`
+  does, because a worktree's own copy exists precisely when the image is older
+  than the pin.
+
+  **The traps.**
+  - **The issue's overflow measure passes an overflowing phone page.**
+    `document.body.scrollWidth <= innerWidth` is vacuous under mobile
+    emulation, which GROWS `innerWidth` to fit the widest content;
+    `scripts/browser/shoot.js` already said so. The test uses `shoot.js`'s
+    measure and compares against the width it ASKED for.
+  - **Importing `prod_site` into a new module would have built it twice.**
+    An imported session fixture is a second FixtureDef with its own cache.
+    Both builds moved to `conftest.py`.
+  - **"Rows after the JS has run" cannot be read off the rows.** Liquid
+    renders every row; a page with no script at all has them. Both index
+    scripts end in `window.addEventListener('pagehide', …)` (MANUAL §10.2's
+    canary), so an init script records that registration and the test waits
+    for the named function — "the script ran to its last line".
+  - **The probe fixture is asked for first**, so CI's shape skips in 0.5s
+    before any build rather than after one.
+
+  **Proved by breaking**, as §10 asks: eleven cases against a mutated copy of
+  the production build — `cocktail-index.js`'s tag removed, a throw on the
+  drink page, a 404 script on the food index, a 600px element (red at 360,
+  green at 1280), every food row hidden, each index's count never repainting;
+  a clean skip in CI's shape; red under `HT_REQUIRE_BROWSER`; the search
+  overriding a wrong path. And five against the new hygiene guards. Scripts
+  in the branch's worktree `tmp/`: `prove_smoke.py`, `prove_probe_guards.py`,
+  `show_browser_caveat.py`.
+- **2026-09-29, #1202 — the rulings index is generated and carries NO line
+  numbers.** `scripts/build_decisions_index.py` writes
+  `model_instructions/DECISIONS_INDEX.md`, one line per top-level journal entry,
+  and `tests/test_decisions_index.py` holds it to the journal both ways. The
+  issue proposed line numbers, and a generated, test-enforced file is the one
+  place "name files, never line numbers" could have bent. Helen chose not to
+  bend it, shown the merge cost: nearly every branch adds an entry, one entry
+  near the top renumbers everything below it, so two open branches would
+  conflict in the index on every merge, and an index merged wrong is a red
+  `main`. Without them, a new entry adds one line and merges as the journal
+  does. **The cost it does carry: a journal edit now needs `--write`**, and
+  the test's message says so. The journal itself was not reformatted: the
+  generator reads its five entry shapes as written.
+  #1202's second bullet ("why" paragraphs out of the templates) stays parked:
+  *a week's work across the largest Liquid files*.
+- **2026-09-29 — a proof by mutation can be fooled by Python's bytecode
+  cache.** A `.pyc` is valid while its source's mtime and SIZE match, and
+  both survive a same-length edit (`"- "` → `"* "`) restored within the same
+  second. The next subprocess imported the MUTATED module, and the case after
+  it reported the previous case's fault. Caught only because the message
+  named a fault that case had not made. **Give each run of an in-place
+  mutation proof its own `PYTHONPYCACHEPREFIX` under `tmp/`**
+  (`prove_decisions_index.py` does).
 
 ---
 
@@ -5812,6 +5873,23 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
     on purpose**, because the alternative -- attempting a write that succeeds if
     the rule does not hold -- puts a file in her Node runtime to learn something
     of no operational value.
+- **2026-09-29 — two read grants, and neither went live by editing settings.**
+  - **`/opt`, read-only** (Helen: *"Reading from /opt is fine, please add that
+    to your settings."* — the image's Playwright lives there). The
+    `Edit(//opt/**)` deny went in; **adding `/opt` to `additionalDirectories`
+    was refused by Claude Code's auto-mode classifier as self-modification**,
+    so a session cannot widen its own read scope, even on Helen's word in the
+    same conversation. The line is hers to add. The deny alone only narrows.
+  - **Other worktrees, read-only** (Helen: *"Fine to read from other
+    worktrees."*). **Already granted**: `/workspace/.claude/worktrees` has been
+    in `additionalDirectories` on `main`, and was there at session start. The
+    Read tool in a worktree session still refused
+    `.claude/worktrees/opus-devops/tmp/prove_pins.py` as outside the working
+    directories. Observed, not diagnosed. It matches the entry above, where
+    worktree isolation refuses a Write before any permission rule gets a turn,
+    but no read was attempted to tell which. **So a settings edit is not the
+    fix for either, and `/add-dir` is the route in a running session**, as
+    `CLAUDE.md` already says for a new grant.
 
 ### §11.2 The record of this file being wrong
 
@@ -7683,6 +7761,27 @@ verification. Dates are when the correction landed.
   - *"Keen to hear ideas for styling N survivors."* — asked, not ruled; the
     ideas were offered in chat and none is built. §13.7's "I liked it bare"
     stands until she looks at a candidate.
+- **2026-09-29, #1203 — every derivation in `scripts/` says what it
+  reproduces, and two of the numbers had moved.** The thirteen scripts the
+  2026-09-24 audit listed each gained a `REPRODUCES …` docstring line (§13.11
+  in the manual). None was deleted: every one is named somewhere in the tree.
+  Eight reproduce a quoted number, each re-run today and matched:
+  slot 2.3rem, breakpoint 820px, inset 4.14%, 3.88:1, 27 icons byte for
+  byte, fourth pick ≥ 2, third pick ≥ 1, the ink ratios. Five reproduce no
+  number and say what depends on them instead: two generators, a tracing
+  tool, a discovery aid, and the leopard generator. **Two findings, reported
+  to Helen rather than acted on:**
+  - `_sass/cocktails/_palette.scss` quotes the worst meaning-alone pair as
+    "magenta vs tangerine under tritanopia at dE 22.6". `#FF00C8` against
+    `#F47E25` measures **19.0** today, and the pre-2026-09-01 magenta
+    `#F127A7` gives 14.1, so 22.6 no longer reproduces from the pair it
+    names. Both still clear the bar of 10, so the conclusion stands and only
+    the figure has aged.
+  - `glass_stroke_gaps.py` ranks the **pineapple** first after the day's
+    redraws: a 2.71-unit end-to-end gap, 8.4px on a card and 11.3px on a
+    drink page, against a 1–2px stroke. Its docstring's own first limit
+    applies: the pineapple is many separate strokes, so this may be two tips
+    that really do sit close. It flags; looking at the drawing decides.
 
 ## §14 Reference pages
 

@@ -22,7 +22,10 @@ in this order:
 3. **`model_instructions/DECISIONS.md`** — the journal: every ruling I have
    made, dated, with my reason and my words, grouped by the manual's section
    numbers. **Before you propose, reverse or "tidy" anything, find its section
-   there.** A settled question asked again is the thing that annoys me most.
+   there.** It is too long to read whole, so grep
+   **`model_instructions/DECISIONS_INDEX.md`** first — one generated line per
+   entry, date · section · issues · headline — then grep the journal for the
+   headline's words. A settled question asked again is the thing that annoys me most.
    A ruling changes when I look at the built thing and change my mind, never
    by being argued at.
 

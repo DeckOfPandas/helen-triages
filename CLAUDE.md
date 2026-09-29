@@ -6,7 +6,8 @@ The reasoning, the dates, the rulings and the stories of what broke live in
 works today lives in `model_instructions/MANUAL.md`. A `DECISIONS §n` here
 points you at the argument if you need it. **Do not re-open a settled question
 without reading its section there first** — that is the thing Helen least
-wants.
+wants. `model_instructions/DECISIONS_INDEX.md` is how you find it: one
+generated line per entry, to grep before the journal.
 
 Where a rule names a hook, the hook enforces it and the argument has moved.
 Where a rule has no hook, the paragraph explaining it is the only enforcement

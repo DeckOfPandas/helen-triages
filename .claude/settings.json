@@ -53,6 +53,7 @@
     ],
     "deny": [
       "Edit(//workspace/.node-runtime/**)",
+      "Edit(//opt/**)",
       "Bash(chmod *)",
       "Bash(chown *)",
       "Bash(sudo *)",

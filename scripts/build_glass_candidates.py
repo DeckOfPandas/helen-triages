@@ -1,5 +1,8 @@
 """Normalise every source drawing into _includes/icons/glass-candidates/.
 
+REPRODUCES NO NUMBER -- it GENERATES `_data/dev_glass_candidates.yml` (whose
+header names this script) and the drawer on /dev/glasses/, MANUAL.md §9.16.
+
 VIEWING COPIES FOR /dev/glasses/ SECTION 6, and nothing else. Not published
 icons, not in `all_icons`, never referenced by a real page.
 

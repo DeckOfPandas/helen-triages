@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Measure a palette: WCAG contrast, dichromat simulation, CIEDE2000, CIELAB L*.
 
+REPRODUCES the contrast and separation figures quoted in
+`_sass/cocktails/_filters.scss` (#716F74 at 3.88:1), `_sass/cocktails/_palette.scss`
+and `_sass/food/_palette.scss`, each of which names it.
+
 WHY THIS IS IN scripts/ AND NOT tmp/
 ====================================
 Three comments in this repo told their reader to "re-run tmp/neon_values.py" or
