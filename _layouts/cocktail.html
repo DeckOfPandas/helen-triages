@@ -1056,6 +1056,26 @@ layout: default
     {% endif %}
   {% endfor %}
   {% assign ice_clause = site.data.cocktails.serve.in_the_glass[page.serve.ice] | default: "" %}
+  {% comment %} HOW FULL, WHICH `ice` DELIBERATELY DOES NOT SAY — 2026-09-28,
+     for the Milliners Punch. Helen's sentence: "Strain into a hurricane glass
+     half-filled with crushed ice."
+
+     `serve.fill` REPLACES THE WORD `filled` in the clause just composed, so
+     " filled with crushed ice" becomes " half-filled with crushed ice". One
+     substitution rather than a table of fill-by-ice, and the word it swaps is
+     declared in serve.yml so the template states none of it.
+
+     It is a SECOND FIELD and not a sixth `ice` value on purpose: serve.yml's
+     own note says the ice field cannot carry quantity, and a new spelling of
+     crushed would have moved three mood rules that test `"crushed"` by
+     string. `ice: crushed` is untouched, so nothing about the moods moves.
+  {% endcomment %}
+  {% if page.serve.fill %}
+    {% assign fill_word = site.data.cocktails.serve.fill[page.serve.fill] %}
+    {% if fill_word %}
+      {% assign ice_clause = ice_clause | replace: "filled", fill_word %}
+    {% endif %}
+  {% endif %}
   {% comment %} THE RIM RIDES ON THE GLASS, BEFORE THE ICE — Helen, 2026-09-05:
      "Given that you can't sugar a rim once the glass is full, let's add that
      line earlier." It was a line under "To serve", which is after the drink is
@@ -1081,6 +1101,78 @@ layout: default
     {% endunless %}
   {% endfor %}
 
+  {% comment %} THE GLASS GENERATOR — #1214, 2026-09-28. Helen: "Let's write
+     the glass generator now please — I've come up against this a few times
+     now, notably in the Sazerac on the live site."
+
+     The strain step has composed its glass since 2026-09-05. Nothing else did,
+     so a drink BUILT in the glass — every swizzle, the Moscow Mule, the
+     Milliners Punch — had no strain step to carry it and named the glass
+     nowhere at all.
+
+     methods.yml `in_the_glass` holds the mapping: the canonical step as a
+     drink writes it, against the sentence to compose, with `<glass>` filled
+     from the same `glass_phrase` the strain step uses. THE TABLE IS DATA AND
+     NOT SPELLED OUT HERE, which is
+     test_the_layout_takes_the_twist_step_from_methods_yml's lesson: the twist
+     sentence lived in both places, Helen changed the wording, and the page
+     kept emitting the old one with nothing watching the pair.
+
+     ONLY THE FIRST MATCH IS COMPOSED. The Chartreuse Swizzle opens "Add all
+     ingredients." and then "Half-fill with crushed ice."; composing both gives
+     "Add all ingredients to a highball. Half-fill a highball with crushed
+     ice." — the duplication the strain group exists to have removed. So this
+     pass finds the FIRST step in the drink that the table knows, and only that
+     one is rewritten below.
+
+     DRAFTS ONLY, AND THIS IS THE LINE THAT SAYS SO. Helen, the same day: "this
+     will require re-proofreading everything on the live site, so for now
+     please let's just apply it to drafts (and drafts currently being worked
+     on) and not on the live recipes." A published drink renders exactly as it
+     did. The condition comes off when she has read the published set again —
+     and `page.collection` is the whole of it, so removing it is one word.
+  {% endcomment %}
+  {% assign glass_step = "" %}
+  {% if page.collection == "cocktail_drafts" and glass_phrase != "" %}
+    {% for step in page.method %}
+      {% unless step.step %}
+        {% if glass_step == "" %}
+          {% if site.data.cocktails.methods.in_the_glass[step] %}
+            {% assign glass_step = step %}
+          {% endif %}
+        {% endif %}
+      {% endunless %}
+    {% endfor %}
+  {% endif %}
+  {% comment %} ...AND THE STRAIN STEP THEN STOPS REPEATING IT, unless it has
+     something else to say — Helen, 2026-09-28, looking at the two drinks that
+     said it twice and ruling them differently:
+
+       Milliners Punch  "Half-fill a hurricane glass with crushed ice."
+                        "Strain into a hurricane glass filled with crushed ice."
+                        -> "Milliners method is good now."
+
+       Sazerac (D&C)    "Rinse an old fashioned glass with absinthe and dump."
+                        "Strain into an old fashioned glass."
+                        -> "names the glass twice"
+
+     THE DIFFERENCE IS WHETHER THE SECOND MENTION CARRIES ANYTHING. The
+     Milliners' strain step adds "filled with crushed ice", which the rinse did
+     not say; the Sazerac's adds nothing at all, because its `serve.ice` is
+     `none` and it has no rim. So the rule is not "never repeat the glass" —
+     it is "repeat it only when the clause riding on it is new".
+
+     So a strain step drops the glass when the glass has ALREADY been named by
+     a composed step above AND there is no ice clause and no rim clause to
+     carry. It falls back to the stored string, which is the bare "Strain."
+
+     IT CANNOT TOUCH A PUBLISHED DRINK, and that is worth knowing before
+     reading it as a change to the live site: `glass_step` is only ever set for
+     `cocktail_drafts`, so `glass_step_done` is false throughout a published
+     page and the strain step names the glass exactly as it always has.
+  {% endcomment %}
+  {% assign glass_step_done = false %}
+
   {% if page.method.size > 0 and page.method.first %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <ol class="cocktail-method">
@@ -1091,7 +1183,7 @@ layout: default
          thing; see `.cocktail-note` in _sass/cocktails/_cocktail.scss. The
          string form is still the overwhelmingly normal one and is untouched.
       {% endcomment %}
-      {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}{% assign shown = step %}{% assign bare = step | remove: "." %}{% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}{% if glass_phrase != "" %}{% capture shown %}{{ bare }} into {{ glass_phrase }}{{ rim_clause }}{{ ice_clause }}.{% endcapture %}{% endif %}{% endif %}<li>{{ shown | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
+      {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}{% assign shown = step %}{% assign bare = step | remove: "." %}{% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}{% if glass_phrase != "" %}{% assign name_the_glass = true %}{% if glass_step_done and ice_clause == "" and rim_clause == "" %}{% assign name_the_glass = false %}{% endif %}{% if name_the_glass %}{% capture shown %}{{ bare }} into {{ glass_phrase }}{{ rim_clause }}{{ ice_clause }}.{% endcapture %}{% endif %}{% endif %}{% elsif glass_step_done == false and step == glass_step %}{% assign shown = site.data.cocktails.methods.in_the_glass[step] | replace: "<glass>", glass_phrase %}{% assign glass_step_done = true %}{% endif %}<li>{{ shown | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
       {% comment %} THE TWIST STEP IS A STEP LIKE ANY OTHER: same list, same
          numbering, same rules, and it is in the DOM in both states, so `make
          it` and print carry it exactly as they carry a written one. {% endcomment %}

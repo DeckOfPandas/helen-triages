@@ -1864,6 +1864,38 @@ unless stated.
   drink carries it**: `rum_characters` sets the same trap (#530) and the suite
   gates the deploy.
 
+- **2026-09-26, #1217** — **An unmeasured amount is a BRACKETED NOUN**, and
+  `as:` finally renders. Helen, with a candidates page in front of her:
+  *"option A please, certain … just use '(top)' as the amount where it's an
+  unspecified ml top, or '(splash)' for an unspecified splash. A float will be
+  a ml amount, right (?), as they're usually alcoholic, but if none is given
+  then again simply '(float)' as the amount please."*
+  **WHAT #1217 ACTUALLY WAS**: `as:` had existed since #754 and was read by
+  exactly ONE thing — `cocktail_card_ingredients.rb`, for card ORDER — so a
+  float looked like an ordinary pour on the page. Measured across all 140
+  files before changing anything: 11 tops, 5 floats, 21 muddles, 4 rinses.
+  **The two halves pair so the mark appears once**: a pour with no measure says
+  so in the AMOUNT, a pour with one says it in `as:`, which renders after the
+  bottle. That is what stops *"(top) soda water (top)"*.
+  **`to taste` kept its old shape** — the bracketed words name what the MAKER
+  does, `to taste` hands the decision to the DRINKER (#752).
+  **THE DANGEROUS HALF WAS THE CODE, NOT THE DATA**, and it is the lesson to
+  carry to the next rename of a stored string: `to top` was compared as a
+  LITERAL in five places (`cocktail_costs.rb` ×2, `cocktail_units.rb` ×2,
+  `abv_worklist.py`) and parsed by a regex in `shopping-list.js`. A reader left
+  on the old spelling does not error — it silently stops matching, and a topped
+  drink then costs nothing and counts no units. **What made it safe was
+  dropping the old string from `measures:`**, which turns every unmigrated file
+  into a named failure of `test_every_amount_is_readable_as_a_quantity`.
+- **2026-09-26** — **`"dashes"` throughout, `"dash"` when it is one.** Helen:
+  *"Yes please to a test."* Measured first: 71 counted amounts already agreed
+  and six did not, all six `dash`. `test_a_counted_unit_agrees_with_its_count`
+  is scoped to units whose singular AND plural are both declared, so `pinch`,
+  `sprig` and `each` are out of scope rather than quietly wrong. **Nothing
+  derived reads the form** — `_millilitres` accepts either — so before the test
+  the two spellings were invisible to the whole suite and had drifted for as
+  long as the collection existed.
+
 ### §9.3.1 The ingredient vocabulary
 
 - **2026-08-21, #441** — `generic` as a list means OR and only OR. Daisy de
@@ -2875,6 +2907,41 @@ unless stated.
   step? No: "To serve" is what happens to a finished drink. Gin Sour's
   `to_serve: "Without ice."` deleted. Pic-a-de-Crop Punch is the one drink
   left without `serve.ice` — a question for Helen, not a default.
+- **2026-09-28, #1214** — **The glass generator**, and it is 2026-09-05's
+  composition finished. Helen: *"Let's write the glass generator now please —
+  I've come up against this a few times now, notably in the Sazerac on the live
+  site."* The strain step composed its glass; nothing else did, so a drink
+  BUILT in the glass named it nowhere. `methods.yml in_the_glass` maps a
+  canonical step to the composed sentence. **Only the FIRST such step is
+  composed** — measured first: the Chartreuse Swizzle half-fills AND adds, so
+  composing every match says "highball" twice in two lines. **Drafts only**, on
+  her instruction: *"this will require re-proofreading everything on the live
+  site, so for now please let's just apply it to drafts."*
+- **2026-09-28** — **A strain step stops repeating the glass when it has
+  nothing to add**, and Helen ruled the two cases DIFFERENTLY, which is what
+  made the rule findable. Milliners Punch, *"Half-fill a hurricane glass with
+  crushed ice."* then *"Strain into a hurricane glass filled with crushed
+  ice."* — *"Milliners method is good now."* Death & Co Sazerac, *"Rinse an old
+  fashioned glass with absinthe and dump."* then *"Strain into an old fashioned
+  glass."* — *"names the glass twice."* **The difference is whether the second
+  mention carries anything**: the first adds "filled with crushed ice", the
+  second adds nothing because its `serve.ice` is `none`. So the rule is not
+  "never repeat the glass", it is "repeat it only when the clause riding on it
+  is new".
+- **2026-09-28** — **`serve.fill`, because `serve.ice` may not say quantity.**
+  Helen's corrected Milliners method wanted *"Strain into a hurricane glass
+  half-filled with crushed ice."*, and `half-filled` cannot be STORED —
+  `test_serve_ice_is_not_restated_in_the_method` refuses any strain step
+  mentioning ice, which is the guard that ended the seventeen spellings. A
+  sixth `ice` value was the tempting answer and the expensive one: the mood
+  deriver tests `serve.ice in ("crushed", "blended")` in TWO places and
+  `mood_serve_ice` lists `crushed` in a third, so a new spelling of crushed
+  moves three rules at once, silently. A separate field leaves `ice: crushed`
+  untouched and the deriver reported 140 agree, 0 differ. It REPLACES the word
+  `filled` in the composed clause, so it means something only with `cubed` or
+  `crushed`; `test_a_fill_has_something_to_fill` refuses the rest rather than
+  letting the substitution quietly no-op, because a silent no-op reads as
+  though somebody recorded how full it is.
 
 ### §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 Glass icons
 
@@ -3134,6 +3201,27 @@ unless stated.
   count.** The Pink Lady's source garnishes with three brandied cherries on a
   pick, dropped at ingest as presentation. Helen kept the detail, singular like
   `skewered maraschino cherry`, and *"no note"*.
+- **2026-09-26 — `sharp` is disqualified by being CHURNED, not by crushed
+  ice**, and Helen's framing is what made it a rule change rather than a
+  correction: *"Moscow Mule is sharp. The ginger beer probably supports this,
+  as well as acting as a sweetener. **This isn't an exception to the rule** —
+  it is perfectly consistent with how I intend the rule to apply."* It was
+  failing `churned` on BOTH limbs: `serve.ice: crushed`, and its own step
+  *"Two-thirds fill the mug with crushed ice."* Neither is a churn. `sharp` now
+  reads a narrower `mood_step_words.slushy` — swizzle, churn, blend, plus
+  `serve.ice: blended` — while `strong brown drink` keeps the wider one, where
+  the ice genuinely is the evidence.
+  **Measured before splitting them**: 13 drinks are churned under the wide rule
+  and not the narrow one, and NOT ONE is a strong brown drink, so the wider
+  rule lost nothing. Four gained `sharp`; three of them Helen had typed `sharp`
+  on herself, so the rule caught up with her rather than overruling her. Haley
+  Traub's Frozen Margarita did NOT, because it blends — the case that shows the
+  line is in the right place.
+  **A draft of the taxonomy comment claimed this retired three `mood_include`
+  entries. It did not**, and the suite said so by staying silent: Mai Tai,
+  Carta Switchel and Don's Mai Tai each pour SIX measured ingredients against a
+  cap of five, which is what their own `why:` lines had said all along. Check
+  the claim before writing it into the data.
 
 ### §9.13 The visual language — the rounds
 
@@ -6055,6 +6143,34 @@ verification. Dates are when the correction landed.
 
 ## §12 Traps — the stories
 
+- **`origin/<branch>` NEVER MOVES, so it cannot answer "is this pushed?"** —
+  2026-09-28. `scripts/git-push-agent.sh` pushes to a URL rather than to the
+  `origin` remote, so `refs/remotes/origin/...` is not updated by a push and
+  reads as many commits behind for the whole session. A script checking
+  `rev-list --count origin/<branch>..HEAD` before amending a commit message
+  called TWO commits unpushed when one was already on the remote — and had it
+  been trusted the other way round, it would have licensed rewriting a pushed
+  commit. **Answer it by hash against what this session actually sent**, or
+  fetch the ref first (`git-fetch-agent.sh`, which updates it — and detaches).
+- **The handover that crossed two repos and only named one** — 2026-09-28.
+  A glass-composition feature had its DATA in the public repo and its RECIPE
+  FILES in the private drafts repo. Helen was given the drafts checkout
+  commands and not the public ones, so she fetched, checked out, and saw the
+  feature not working — **worse than before**, because the drafts half had
+  deliberately REMOVED a hand-typed glass on the assumption the page would
+  compose it back. `PUBLISHING_A_COCKTAIL.md` already carries this rule from
+  2026-09-19 ("the URLs are useless without the files"); it was written about
+  the drafts half and the miss was the public half. **Both halves, every time,
+  whichever one feels like the obvious one.**
+- **Two working copies of one batch, again** — 2026-09-28. Helen opened PR #75
+  from the drafts repo's `main`, which still held the twelve drinks UNFIXED,
+  and added her proofread copies into `5-final-proofread/` without deleting the
+  originals: TEN slugs existed twice on one branch, one copy fixed and one not.
+  Merging it would have restored a YAML error that breaks the whole suite at
+  collection. `PUBLISHING_A_COCKTAIL.md`'s one-working-copy rule is from the
+  first batch; what made it bite again was an agent leaving the fixes on an
+  unmerged branch while she worked from `main`. **The fixes belong where she
+  is, or she is told plainly which branch to stand on.**
 - **The rule written instead of followed** — 2026-08-19, `about.html`'s
   `site_key` (§2.4).
 - **Markup shared, CSS forked** — 2026-08-19, #374 (§2.5).

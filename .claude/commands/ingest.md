@@ -388,9 +388,16 @@ failure is probably work someone else has already done (MANUAL §9.1).
     so half a lime is `amount: "half"` and never a millilitre figure;
   - **a barspoon is `5 ml`**; an egg or a sugar cube is an INGREDIENT with
     `amount: "1"`, not a unit;
-  - **every ingredient has an amount, and for some it is a verb** -- `to top`,
-    `to rinse`, `1 small pinch`, each declared in `measures:` and each with its
-    matching method step saying WHEN.
+  - **every ingredient has an amount, and an unmeasured one is a BRACKETED
+    NOUN** -- `(top)`, `(rinse)`, `(splash)`, `(float)`, `(garnish)`,
+    `(sprinkle)`, plus counts like `1 small pinch`. Helen's ruling, 2026-09-26,
+    replacing the `to top` / `to rinse` verb forms this line used to teach: a
+    sentence fragment in a column of quantities read as prose that had escaped
+    into the data, and a bracketed noun reads as the slot where a number would
+    be. Each is declared in `measures:` and each carries its matching method
+    step saying WHEN. **`to taste` is the exception and keeps its old shape**,
+    because it hands the decision to the DRINKER rather than naming what the
+    maker does.
 - **`method` / `to_serve` / `garnish`** -- an ACTION in sequence, a NOUN PHRASE
   about how it reaches the table, and a THING on the drink. The test: *can you
   write it as a bare noun and lose nothing?* "with a straw" → `Straw.` loses
