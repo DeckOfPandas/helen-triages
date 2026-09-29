@@ -3076,6 +3076,20 @@ unless stated.
     two glasses by their non-canonical spellings, from one cause: Liquid
     returns nil for a lookup nested in another. It rendered without complaint,
     which is why the page has a test counting its rows.
+  - **Her second look, same day: three changes and "no more styling".**
+    *"Please draw them in alphabetical order so the visual effect is nice and
+    messy"* (it shipped in capacity order, shot to punch bowl); *"round all ml
+    measurements to the nearest 10 ml"* (on the page only — the data keeps
+    whole ml); and *"the text under the normal mug is way off to the right,
+    and the text for mule mug and pineapple are slightly right of centre."*
+    Every label WAS centred, on the drawing's box, which holds a mug's handle
+    and the pineapple's umbrella. The eye centres a glass on what it stands
+    on, so the base's centre is now measured from the rasterised icon
+    (`base_centre`, generated and tested) and the drawing shifted by it: mug
+    −12.7% of its width, pineapple −8.9%, hot toddy −8.2%, coconut +3.8%,
+    every other glass under 1%. Hot toddy and coconut were not in her list
+    and are the same fault. The shelf line and hover offered as extra styling
+    were declined: *"No more styling needed, so no shelf or hover."*
 
 ### §9.12 / §9.12.1 Methods and garnishes
 

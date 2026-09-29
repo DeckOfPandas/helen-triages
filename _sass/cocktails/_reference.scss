@@ -609,6 +609,14 @@ $glass-shelf-height: 11rem;
   height: calc(var(--glass-ratio) * #{$glass-shelf-height});
   color: $color-electric-absinthe;
 
+  // THE BASE OVER THE LABEL, NOT THE BOX -- `base_centre` in glasses.yml, set
+  // per item as `--glass-shift`. A translate percentage is of this element's
+  // own width, which is the drawing's, so the measured fraction applies as it
+  // stands. A transform moves the drawing without moving the layout, so the
+  // label and the row keep their places and only a handle reaches a little
+  // further into the gap beside it.
+  transform: translateX(calc(var(--glass-shift, 0) * -100%));
+
   svg {
     display: block;
     height: 100%;

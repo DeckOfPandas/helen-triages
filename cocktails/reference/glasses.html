@@ -32,9 +32,21 @@ permalink: /cocktails/reference/glasses/
   glasses"): each glass's real height over the tallest real glass, every glass
   standing on one baseline per row.
 
-  ORDERED BY WHAT IT HOLDS, smallest first, so the page reads as a scale from
-  the shot to the punch bowl. Liquid cannot sort by a computed number, so each
-  row is a zero-padded key ("000225|coupe|coupe") sorted as a string.
+  ALPHABETICAL, BY THE NAME PRINTED. It shipped ordered by capacity, shot to
+  punch bowl; Helen, 2026-09-29: "Please draw them in alphabetical order so the
+  visual effect is nice and messy." Each row is a "name|type|drawing" string
+  sorted as a string, which is alphabetical by the name and puts `mug` before
+  `mule mug`.
+
+  EVERY ml IS ROUNDED TO THE NEAREST 10 ON THE PAGE -- Helen, same day: "Please
+  round all ml measurements to the nearest 10 ml." The data keeps whole ml; the
+  rounding is how the page SAYS them, so it happens here and nowhere else.
+
+  EACH DRAWING STANDS ITS BASE OVER ITS LABEL, not its box. `base_centre` in
+  glasses.yml is where the base sits as a fraction of the drawing's width, and
+  `--glass-shift` moves the drawing by minus that: "the text under the normal
+  mug is way off to the right, and the text for mule mug and pineapple are
+  slightly right of centre." The handle is what had pulled the box right.
 
   THE MULE MUG IS HERE AS ITS OWN GLASS, drawn as the mug it shares a drawing
   with, because it is its own size: `survey_only_types` in glasses.yml.
@@ -53,17 +65,30 @@ permalink: /cocktails/reference/glasses/
   {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
 {% endfor %}
 
+{% comment %} ONE ROW PER GLASS, "name|type|drawing", so that sorting the
+   strings sorts by the printed name.
+
+   A lookup key is always ASSIGNED before use: Liquid returns nil for a lookup
+   nested inside another (`g.typical_ml[pair[0]]`), silently -- the first
+   build of this page mis-sorted the mule mug and printed two non-canonical
+   names because of it. {% endcomment %}
 {% assign rows = "" | split: "" %}
 {% for icon in g.all_icons %}
-  {% capture row %}{{ g.typical_ml[icon].mean | prepend: "000000" | slice: -6, 6 }}|{{ icon }}|{{ icon }}{% endcapture %}
+  {% assign name = nil %}
+  {% for pair in g.icons %}
+    {% assign spelling = pair[0] %}
+    {% if pair[1] == icon and g.canonical_glasses[spelling] == nil %}
+      {% assign name = spelling %}{% break %}
+    {% endif %}
+  {% endfor %}
+  {% unless name %}{% assign name = icon | replace: "-", " " %}{% endunless %}
+  {% capture row %}{{ name }}|{{ icon }}|{{ icon }}{% endcapture %}
   {% assign rows = rows | push: row %}
 {% endfor %}
-{% comment %} `pair[0]` is assigned before it is used as a key: Liquid does not
-   resolve a lookup nested inside another (`g.typical_ml[pair[0]]` is nil), and
-   the first build sorted the mule mug before the shot glass because of it. {% endcomment %}
 {% for pair in g.survey_only_types %}
   {% assign key = pair[0] %}
-  {% capture row %}{{ g.typical_ml[key].mean | prepend: "000000" | slice: -6, 6 }}|{{ key }}|{{ pair[1].draws_as }}{% endcapture %}
+  {% assign name = pair[1].spellings | first %}
+  {% capture row %}{{ name }}|{{ key }}|{{ pair[1].draws_as }}{% endcapture %}
   {% assign rows = rows | push: row %}
 {% endfor %}
 {% assign rows = rows | sort %}
@@ -75,36 +100,30 @@ permalink: /cocktails/reference/glasses/
   <ul class="glass-shelf">
     {% for row in rows %}
       {% assign parts = row | split: "|" %}
+      {% assign name = parts[0] %}
       {% assign type = parts[1] %}
       {% assign draw = parts[2] %}
       {% assign ml = g.typical_ml[type] %}
 
-      {% assign name = nil %}
-      {% if g.survey_only_types[type] %}
-        {% assign name = g.survey_only_types[type].spellings | first %}
-      {% else %}
-        {% for pair in g.icons %}
-          {% assign spelling = pair[0] %}
-          {% if pair[1] == type and g.canonical_glasses[spelling] == nil %}
-            {% assign name = spelling %}{% break %}
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-      {% unless name %}{% assign name = type | replace: "-", " " %}{% endunless %}
-
       {% assign ratio = g.heights_mm[draw] | times: 1.0 | divided_by: tallest_mm %}
+      {% assign shift = g.base_centre[draw] | default: 0 %}
+
+      {% comment %} To the nearest 10 ml, then to litres for the bowl. {% endcomment %}
+      {% assign mean = ml.mean | divided_by: 10.0 | round | times: 10 %}
+      {% assign low = ml.min | divided_by: 10.0 | round | times: 10 %}
+      {% assign high = ml.max | divided_by: 10.0 | round | times: 10 %}
 
       <li class="glass-shelf-item">
         <span class="glass-shelf-stage">
-          <span class="glass-shelf-art" style="--glass-ratio: {{ ratio | round: 4 }}">{% include icons/glasses/{{ draw }}.svg %}</span>
+          <span class="glass-shelf-art" style="--glass-ratio: {{ ratio | round: 4 }}; --glass-shift: {{ shift }}">{% include icons/glasses/{{ draw }}.svg %}</span>
         </span>
         <span class="glass-shelf-name">{{ name }}</span>
-        {% if ml.mean >= 1000 %}
-          <span class="glass-shelf-ml">{{ ml.mean | divided_by: 1000.0 | round: 1 }} L</span>
-          <span class="glass-shelf-range">{{ ml.min | divided_by: 1000.0 | round: 1 }}–{{ ml.max | divided_by: 1000.0 | round: 1 }} L</span>
+        {% if mean >= 1000 %}
+          <span class="glass-shelf-ml">{{ mean | divided_by: 1000.0 | round: 1 }} L</span>
+          <span class="glass-shelf-range">{{ low | divided_by: 1000.0 | round: 1 }}–{{ high | divided_by: 1000.0 | round: 1 }} L</span>
         {% else %}
-          <span class="glass-shelf-ml">{{ ml.mean }} ml</span>
-          <span class="glass-shelf-range">{{ ml.min }}–{{ ml.max }} ml</span>
+          <span class="glass-shelf-ml">{{ mean }} ml</span>
+          <span class="glass-shelf-range">{{ low }}–{{ high }} ml</span>
         {% endif %}
       </li>
     {% endfor %}
