@@ -7997,6 +7997,79 @@ verification. Dates are when the correction landed.
     drink page, against a 1–2px stroke. Its docstring's own first limit
     applies: the pineapple is many separate strokes, so this may be two tips
     that really do sit close. It flags; looking at the drawing decides.
+- **2026-09-30, #1210 — the recipe action buttons, redrawn: the question was
+  never the arrangement.** Helen, opening the session: *"The layout/styling
+  of these has always made me unhappy ... please tell me why I hate the
+  current design."* Read back through the issues it was six in two weeks —
+  #1086, #1163, #1164, #1176, #1182, #1210 — each fixing the arrangement in
+  the latest screenshot (two-by-two, one per line, count first, left-aligned,
+  two columns, "don't push INGREDIENTS down"), and #1182 carrying her own
+  verdict on the result: *"I still don't love how this feature looks but I
+  desperately want to keep it."* **The diagnosis offered, and accepted:** four
+  controls of three different kinds (a toggle, a link to another page, a
+  browser command, a download) drawn identically as bare Courier caps; a 2×2
+  grid that read as a table whose rows meant nothing; no order of importance
+  between the one feature she wanted to keep and two occasional ones; a block
+  always two lines tall that lined up with nothing; and four labels that could
+  never fit one phone line, so every fix reflowed. **No rearrangement of four
+  could have settled it, because the four did not belong together.**
+  - **Two candidates pages, and the second was one treatment.** The first
+    (Artifact `XfCF2BGm7SJcmr8pKvLT8X`) put five treatments on the real
+    Daiquiri and moules pages in a frame at 360/390/1280 with the shortlist
+    seeded empty or at 3; her reply was a brief, not a pick: *"I'm still
+    really struggling with this ... Please show me just one thing."* The
+    second (`U5fdMTN1aHPThtmink6ujV`) built that brief and nothing else, and
+    she took it whole: *"I'm sold! No notes. Ship it please!!!!"* §13.11's
+    "one round settles one question" held both times; the lesson is that when
+    the pick is a brief, the next page is the brief alone.
+  - **Print and pdf are things you do WITH the page; they went to the top
+    right,** the right-hand end of the furniture line, *"so where the
+    omnisearch currently is"* — `_includes/page-print.html`, rendered only
+    when a layout passes `actions=true`, which the magic-bag page does not
+    (no PDF beside it: #86's 404). The dot between them is markup, hidden
+    while the print button is.
+  - **The search box is a testing tool now, and sits where one sits:** the
+    header, *"directly under [ FOOD ] ->, to show on the local site only —
+    this is key for me during testing so I'm not clicking about all over the
+    place."* Asked whether it stays at all: *"honestly it's very useful for
+    md proofreading in the local build so it's staying at least for now."*
+    `_includes/page-search.html`, gated on `show_header_search` in
+    `_config_local.yml` alone (the `show_drafts` idiom); the deployed site
+    has no search box anywhere, for the first time since #1024. On an index
+    it is a plain form; `page-search.js` stays a page-layout script.
+  - **The shortlist pair sits on the first line under the rule, at the
+    right, on both sites** — the toggle's line on a drink page, and *"on the
+    same line as INGREDIENTS for Moules where it doesn't have the read it
+    make it toggle."* Food's `.recipe-controls` row is gone; its hairline
+    survives as `<hr class="recipe-head-rule">`, and #1124's
+    rule-to-INGREDIENTS distance was re-measured at 104.9px on the drink
+    page (block gap + the 28.9px pill + 3rem) and matched on food with one
+    6.55rem margin. **Below 600px the pair takes the line above on both
+    pages**: INGREDIENTS is 224px in a 312px column at 360, so the pill
+    cannot share it, and the drink page's `flex-wrap` "safety valve" (#1163)
+    became a column at every phone width — the shape no longer depends on
+    the width or the count, which is what #1210 had asked for and what
+    wrapping could never give.
+  - **The pair is deliberately unmatched.** *"The button for + SHORTLIST
+    then (3) for the see list link just isn't clear to me at all. I've
+    struggled with this the whole time. I can't make them look similar."*
+    They are not similar — one changes this page, the other leaves it — so
+    the button is the one bordered thing on its line (the index's own
+    `.btn-shortlist-only` pill, hover and on taking the border to
+    `currentColor`), and the link is quiet caps: `SEE SHORTLIST (N)`, word
+    first, **reversing #1164** (count first so the pair would repeat the
+    button's shape — a reason that no longer applies), **no arrow** (*"I
+    also dislike the -> arrow so please remove that at least"*), and
+    **absent while N is 0** (`shortlist.js`), so `(0)` never appears.
+  - **Measured, not argued** (`scripts/browser/`, 2026-09-30): nothing
+    scrolls sideways at 360, 390 or 1280 on either page in either shortlist
+    state; the pill-and-link line is 270px in a 312px column; the deployed
+    header carries no `.page-search` and the about page carries none on a
+    local build either. The candidates build (`tmp/action_candidates/`) is
+    in the worktree with every screenshot.
+  - **What the session did NOT do**: touch `main`, merge, or build anything
+    the brief did not name. The first page's other four treatments were
+    offered and are on record; none is on the site.
 
 ## §14 Reference pages
 

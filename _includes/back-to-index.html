@@ -1,10 +1,20 @@
-{% comment %} ── THE PAGE'S FURNITURE LINE: the back arrow, and the search box ──
-  Issue #387 (the arrow), #1024 (the search box, 2026-09-14) and #1050 (the
-  search for anything, 2026-09-15). A row at the top of every recipe and drink
-  page: the arrow at its left end returning to the index it came from, a
-  search box at its right end that searches THIS site. Helen's placement for
-  the box, from the candidates page: "back arrow's line, but on the right not
-  in the centre."
+{% comment %} ── THE PAGE'S FURNITURE LINE: the back arrow, and print · pdf ──
+  Issue #387 (the arrow) and #1210 (print and pdf at its right end,
+  2026-09-30). A row at the top of every recipe and drink page: the arrow at
+  its left end returning to the index it came from, and at its right end the
+  two things you do WITH the page, print and pdf (page-print.html), rendered
+  only when the layout passes `actions=true` -- the two page layouts do, the
+  magic-bag page does not, because no PDF is rendered beside it.
+
+  THE SEARCH BOX HELD THAT RIGHT-HAND END FROM #1024 (2026-09-14) UNTIL #1210.
+  Helen's placement then was "back arrow's line, but on the right not in the
+  centre"; on 2026-09-30 she moved it to the header, directly under the door
+  to the other site, and made it a local-build-only testing tool -- "so I'm not
+  clicking about all over the place" -- and gave its end of this line to print
+  and pdf: "actually on the top right, so where the omnisearch currently is."
+  The box is _includes/page-search.html now, in _layouts/default.html. The
+  paragraphs below that describe the BOX are kept as the record of how it came
+  to be what it is; every one of them is still true of it where it sits now.
 
   THE ARROW IS A REAL LINK FIRST, AND AN ENHANCEMENT SECOND, which is the whole
   design. The href points at this site's own index (from _data/sites.yml, so a
@@ -131,15 +141,6 @@
        furniture line's geometry does not move. {% endcomment %}
     {% include icons/arrow-right.svg class="back-to-index-mark" %}
   </a>
-  <form class="page-search" role="search" method="get" action="{{ back_site.home | relative_url }}"
-        data-search-index="{{ back_site.home | append: 'search.json' | relative_url }}">
-    <input type="search" name="q" class="page-search-input" autocomplete="off"
-           placeholder="I know what I want..."
-           aria-label="I know what I want"
-           role="combobox" aria-autocomplete="list" aria-expanded="false"
-           aria-controls="page-search-results">
-    <button type="submit" class="page-search-go" aria-label="Search {{ back_site.title }}">{% include icons/search.svg class="page-search-mark" %}</button>
-    <div class="page-search-results" id="page-search-results" role="listbox" hidden></div>
-  </form>
+  {% if include.actions %}{% include page-print.html %}{% endif %}
 </div>
 {% endif %}

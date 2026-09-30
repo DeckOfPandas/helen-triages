@@ -435,19 +435,20 @@ $card-shortlist-size: 1.15rem;
 // size. The phone block that did the shrinking is deleted rather than kept
 // for a selector nothing matches.
 //
-// THE THREE CONTROLS BESIDE IT HOVER IN THIS SITE'S "THIS ONE" COLOUR.
+// THE LINK BESIDE IT HOVERS IN THIS SITE'S "THIS ONE" COLOUR.
 // shared/_furniture.scss gives see shortlist / print / pdf the site's accent
 // under the cursor, which on food is the shortlist button's own magenta and
 // on this site is absinthe -- while `.btn-shortlist` above hovers wicked
 // woowoo, §9.13's rule that magenta means "this one" wherever a pointer is.
-// One row, one hover: the three are re-pointed here to match the button.
-.page-actions {
-  .btn-see-shortlist,
-  .btn-print,
-  .btn-pdf {
-    &:hover,
-    &:focus-visible { color: $color-wicked-woowoo; }
-  }
+// One row, one hover: the link is re-pointed here to match the button.
+//
+// PRINT AND PDF ARE NOT RE-POINTED ANY MORE -- #1210, 2026-09-30. They left
+// this row for the furniture line, whose other item is the back arrow, and the
+// arrow hovers in $color-accent (shared/_chrome.scss): absinthe here. Same
+// rule, one row, one hover -- it is just a different row now.
+.page-actions .btn-see-shortlist {
+  &:hover,
+  &:focus-visible { color: $color-wicked-woowoo; }
 }
 
 // =============================================================================

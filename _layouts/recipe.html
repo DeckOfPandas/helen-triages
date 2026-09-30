@@ -2,7 +2,7 @@
 layout: default
 ---
 
-{% include back-to-index.html %}
+{% include back-to-index.html actions=true %}
 
 <article class="recipe">
   <div class="recipe-title">
@@ -112,15 +112,17 @@ layout: default
     {% include recipe_badges.html recipe=page %}
   </div>
 
-  {% comment %} THE ACTIONS ROW, UNDER THE HEAD -- #1005 / #1011, 2026-09-14,
-     Helen's pick from the candidates page: "row under the head". The same
-     include the drink page puts beside its read it / make it toggle, so the
-     two sites offer the same four controls in the same order in the same
-     place: shortlist, see shortlist (N), print, pdf. The head ends here, on a
-     hairline, and INGREDIENTS opens below it at the section's own gap. {% endcomment %}
-  <div class="recipe-controls">
-    {% include page-actions.html %}
-  </div>
+  {% comment %} THE HEAD ENDS ON A HAIRLINE, and the shortlist pair sits on the
+     INGREDIENTS heading's line -- #1210, 2026-09-30. From #1005 (2026-09-14,
+     "row under the head") until this, `.recipe-controls` held the actions
+     include in a row of its own between the hairline and INGREDIENTS; Helen's
+     brief put the shortlist "on the same line as INGREDIENTS for Moules where
+     it doesn't have the read it make it toggle", the same place a drink page
+     has it (the toggle's line), so the row went and the hairline is all that
+     is left of it. Print and pdf moved to the furniture line (page-print.html).
+     The heading row is a flex row: heading at the left, the pair at the right;
+     on a phone the pair takes the line above (_sass/food/_recipe-header.scss). {% endcomment %}
+  <hr class="recipe-head-rule">
 
   {% comment %} `.size > 0` for the same reason the NOTES section below uses it:
      an empty array is truthy in Liquid, so `ingredient_groups: []` would render
@@ -129,9 +131,12 @@ layout: default
      same time rather than left to be found the same way. {% endcomment %}
   {% if page.ingredient_groups.size > 0 %}
     <div class="recipe-section-ingredients">
-      <h2 class="recipe-section-heading">
-        <span class="section-heading-text">Ingredients</span>
-      </h2>
+      <div class="recipe-section-heading-row">
+        <h2 class="recipe-section-heading">
+          <span class="section-heading-text">Ingredients</span>
+        </h2>
+        {% include page-actions.html %}
+      </div>
     </div>
   {% endif %}
 
