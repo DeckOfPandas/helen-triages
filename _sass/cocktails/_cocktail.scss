@@ -380,7 +380,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 
 // THE TAPE, SCALED UP FOR THE PAGE. `.drink-card-name`, `.drink-card-tape` and
 // `.drink-card-tape-word` are _cards.scss's own classes, reused rather than
-// redrawn (see _layouts/cocktail.html's comment on why) — so this page changes
+// redrawn (DECISIONS §9.13, 2026-09-02, has why) — so this page changes
 // only what genuinely differs at page size: the font-size, which is what the
 // tape's own em-based padding and bleed scale against, and the padding itself,
 // which food's own title/tape comparison agreed at 2.2rem to open at.
@@ -859,7 +859,7 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 
 // CHIPS ARE THE CARD'S OWN, AS <span>s — Helen's brief: "Must be the same
 // chips as on the cards." `.drink-card-mood` / `--hassle` reused exactly (see
-// _layouts/cocktail.html's comment for why), so a mood can never look
+// DECISIONS §9.13, 2026-09-05, for why), so a mood can never look
 // different here than it does on the card it came from — only the element
 // changes, because this page has no filter list for a click to narrow.
 // `cursor: pointer` on `.drink-card-mood` assumes a click does something;
@@ -2182,9 +2182,8 @@ $amount-gap: 1rem;
 // always orphaned one on a row of its own. The heading's mark is with the other
 // section headings, above.
 //
-// The scoring, and why it is Liquid rather than a plugin, are in
-// _layouts/cocktail.html's own comment at the block that builds this. This file
-// only lays out what arrives.
+// The scoring, and why it is Liquid rather than a plugin, are in MANUAL §9.13
+// and DECISIONS §9.13 (#927). This file only lays out what arrives.
 //
 // THEY ARE INDEX CARDS -- #991, Helen, 2026-09-12: "if you liked this cards
 // should render the same as cards on the index list. We are fighting this

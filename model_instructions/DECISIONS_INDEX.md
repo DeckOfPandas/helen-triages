@@ -29,6 +29,7 @@ argument and the rules each field is read by.
 - 2026-09-06 · §0 · #787 · within a day — #694, #695, #674, #633, #511 and #612 all closed, and the open count moved 66 → 73 → 71.
 - 2026-09-07 · §0 · the triage that acted on the map's lesson instead of drawing a new one.
 - 2026-09-09 · §0 · a separate ARCHITECTURE log was considered and declined, and the reason is the numbering rather than taste.
+- 2026-09-29 · §0 · #1252 · the drink page's "why" paragraphs left _layouts/cocktail.html for this journal.
 - 2026-08-29 · §1 · .node-runtime/ and .gh-runtime/ do not come with a worktree; cost a session that read "No such file or directory" as a broken checkout.
 - 2026-08-18 · §1 · Two pytest sessions at once: the gate test's zzz-gate- recipes are collected by the other run as 14 real failures.
 - 2026-09-06 · §1 · §1 had said _config_local.yml "overrides two things" since 2026-08-02; it sets seven keys and three collection outputs.
@@ -213,6 +214,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §9.3.1 · #1079 · citrus slice becomes orange slice — The entry above coined the muddled slice fruit-agnostic, on the argument that muddling a slice for its oil and juice is the same act whatever …
 - 2026-09-14 · §9.3.1 · #796 #1013 #752 · four vocabulary rulings from one sitting (#796, #1013, #752, and cherry).
 - 2026-09-14 · §9.3.1 · the punches are parked, and why that is not a no.
+- 2026-09-10 · §9.3.1 · #707 · "fresh" said out loud, and the opposite warning.
 - 2026-09-07 · §9.3.2 · #591 · An agricole's origin goes on the BOTTLE, as origin:.
 - 2026-08-27 · §9.3.2 · #529 · Added, rum-only.
 - 2026-08-30 · §9.3.2 · Not rum-only any more, and neither are the two tests that made it worth having: 54 of 91 suggestions had resolved to nothing with no test minding.
@@ -237,10 +239,12 @@ argument and the rules each field is read by.
 - 2026-09-06 · §9.3.4 · Helen: "I want the number of units in a drink, not the ABV of the drink, i.e.
 - 2026-09-14 · §9.3.4 · #1001 #1012 · then #1012 — public, and a worklist that knows what shows.
 - 2026-09-14 · §9.3.4 · #1016 #1012 #297 · / #1012 / #297 — the mode, the bitters, and every strength answered in one sitting.
+- 2026-09-06 · §9.3.4 · #713 #753 · / #753 — the units line's words are Helen's, and units.exact is kept with nothing reading it.
 - 2026-09-06 · §9.3.5 · Helen: "I only want to show price on the locally built site, and only as an incidental — just somewhere on the recipe page." Her original framing — "adding costs to each bottle in …
 - 2026-09-06 · §9.3.5 · #748 · Whole fruit and weighed solids are priced.
 - 2026-09-24 · §9.3.5 · #748 #747 · built, and #747's six unapplied prices — The 2026-09-06 ruling had been recorded as "rows in costs.yml and nothing else" and was not: volume_ml returned nil for a count or a …
 - 2026-09-07 · §9.3.5 · #818 · The shopping list's bottle choice is per drink, not once for the whole list.
+- 2026-09-26 · §9.3.5 · #1215 · the price per glass has two decimal places.
 - 2026-09-17 · §9.3.6 · #1121 · the ml line cost the batch note its totals, and the lesson is about what a NEW line does to the ones already there.
 - 2026-09-17 · §9.3.6 · #1121 · two sentences, and the interesting part is the six drinks that get neither.
 - 2026-08-16 · §9.4 / §9.4.1 / §9.5 · Ingredients are additive, never a choose-one (asked directly: guessing wrong would have shaped the whole model).
@@ -252,6 +256,8 @@ argument and the rules each field is read by.
 - 2026-09-06 · §9.4 / §9.4.1 / §9.5 · ship_tints deleted from taxonomy.yml with test_every_ship_rung_has_a_tint.
 - 2026-08-16 · §9.7 / §9.8 · Liquid parses tags inside comment; source: "" drew a bare "Source:" line on all three drinks.
 - 2026-08-15 · §9.7 / §9.8 · #223 · Cocktails at PARITY with food's tape, copying across as part of regeneration — after the two directories drifted for five days.
+- 2026-08-16 · §9.7 / §9.8 · to 2026-09-26 — an empty array and an empty string are both TRUTHY in Liquid, and the drink page has been bitten four times.
+- 2026-09-06 · §9.7 / §9.8 · sort_natural, not sort, and the difference was 12 drinks.
 - 2026-08-23 · §9.9 · Built in twenty minutes from meta.ship's existing words ("oh gods yes" was on 18 drinks).
 - 2026-08-26 · §9.9 · Replaced by §9.13's designed index; _goodness.scss deleted.
 - 2026-08-27 · §9.10 / §9.10.1 · #501 · The card had rendered item, and the problem was ambiguity, not length: Overproof Navy rum named three different rums, White rum two.
@@ -263,6 +269,7 @@ argument and the rules each field is read by.
 - 2026-09-04 · §9.10 / §9.10.1 · Which surface reads card_names: "Let's display the full name in the ingredients list please, just the short name on the card." The layout was already doing it; the paragraph …
 - 2026-09-05 · §9.10 / §9.10.1 · 23 were real bottles existing nowhere else
 - 2026-09-06 · §9.10 / §9.10.1 · #567 #640 #691 · The card's ingredient line became a plugin; the 1,400-character Liquid statement doing four jobs could not take a seven-tier sort.
+- 2026-09-17 · §9.10 / §9.10.1 · #1141 · optional renders as "(optional)" after the ingredient, reversing the argument that had stood.
 - 2026-09-05 · §9.10a · The ice had no field, so "strain" was written seventeen ways; collapsing 31 spellings to five surfaced three TRUNCATED steps nobody had read ("Fine strain into a chilled." …
 - 2026-09-28 · §9.10a · #1214 · The glass generator — and it is 2026-09-05's composition finished.
 - 2026-09-28 · §9.10a · A strain step stops repeating the glass when it has nothing to add
@@ -278,6 +285,9 @@ argument and the rules each field is read by.
 - 2026-09-28 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #1238 #295 · (towards #295) — what each glass holds, as a spec.
 - 2026-09-29 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #295 · the glasses page, and the heights switched.
 - 2026-09-29 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · one source per glass; §9.15's "both stay on disk" reversed.
+- 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST glass that has artwork.
+- 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is COMPRESSED, and drawn as a FRACTION of the title block.
+- 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #601 · the card got its own curve, and the drink page's comment had claimed it all along.
 - 2026-08-26 · §9.12 / §9.12.1 · #290 · methods.yml added: 277 steps across 105 drinks, 144 distinct; one instruction 43 uses in three wordings, Strain in eleven.
 - 2026-08-31 · §9.12 / §9.12.1 · garnish.yml at Helen's request: 130 entries, 65 distinct strings, perhaps 35 garnishes; 55 after unambiguous collapse, 49 after her rulings.
 - 2026-09-14 · §9.12 / §9.12.1 · #984 · the "either of these, maker's choice" pattern used a second time, and generalised past two options.
@@ -293,6 +303,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §9.12 / §9.12.1 · #883 · shake or stir, ruled per drink (#883) — The audit listed every drink whose citrus was never shaken, or whose shake had no citrus.
 - 2026-09-14 · §9.12 / §9.12.1 · skewered brandied cherry, and a garnish still carries no count.
 - 2026-09-26 · §9.12 / §9.12.1 · sharp is disqualified by being CHURNED, not by crushed ice
+- 2026-09-17 · §9.12 / §9.12.1 · #1138 #1143 · / #1143 — the garnish step reads as English.
 - 2026-09-15 · §9.13 · #1086 · "actions row only", and the title that was laid out in the glass column.
 - 2026-09-14 · §9.13 · #1000 · the see-all link comes out again, two days old.
 - 2026-09-14 · §9.13 · #1001 · the unit count ends the recipe, and goes public.
@@ -332,6 +343,10 @@ argument and the rules each field is read by.
 - 2026-09-15 · §9.13 · #1086 · design review / #1086 — a single-column card is not a grid row, so it should stop matching one.
 - 2026-09-17 · §9.13 · #1134 · HAS TO HAVE inverts, and so does a matched ingredient on a card. This reverses two of Helen's own rulings, and the reason it is a reversal and not a contradiction is worth keeping.
 - 2026-09-17 · §9.13 · #1134 · round two — the fill came off the card the same day it went on, and the chip kept it. The entry above stands as what was tried.
+- 2026-09-02 · §9.13 · the drink's name went onto the card's Dymo tape.
+- 2026-09-02 · §9.13 · / 2026-09-05 — the meta is a <dl> of three facts: glass, garnish, SHIP IT?.
+- 2026-09-05 · §9.13 · the drink page's mood chips became LINKS to the filtered index.
+- 2026-09-10 · §9.13 · #897 · read it / make it moved under the title block's rule.
 - 2026-09-17 · §9.1 · Two ginger garnishes, not one — garnish.yml had no ginger at all and two drinks wanted different ginger.
 - 2026-09-17 · §9.1 · fruit wedges is declared, and is the one garnish that does not name its fruit.
 - 2026-09-17 · §9.1 · Gunmetal Blue pours peach brandy, not crème de pêche.
