@@ -10,31 +10,66 @@
 // shared/chrome, and names only the ten palette-contract variables.
 //
 // WHAT STAYS PER SITE: the shortlist button's own colours and states
-// (food/_shortlist.scss, cocktails/_shortlist.scss), and the row the actions
-// sit in -- `.recipe-controls` on food, `.cocktail-controls` on a drink page,
-// each already a flex row in its own file. This file styles what is INSIDE
-// the row and the furniture line above the title.
+// (food/_shortlist.scss, cocktails/_shortlist.scss), and the row the shortlist
+// pair sits in -- `.recipe-section-heading-row` on food, `.cocktail-controls`
+// on a drink page, each a flex row in its own file. This file styles what is
+// INSIDE the row and the furniture line above the title.
+//
+// #1210, 2026-09-30, REDREW BOTH ROWS, and the shape of the change is worth
+// one paragraph here because six issues in two weeks (#1086, #1163, #1164,
+// #1176, #1182, #1210) each rearranged four controls without asking whether
+// they belonged together. They did not. Print and pdf are things you do WITH
+// the page and sit on the furniture line now, at its right end where the
+// search box was; the shortlist button and its see-shortlist link are things
+// you do TO the page and sit on the first line under the rule that closes the
+// head -- the toggle's line on a drink page, the INGREDIENTS line on a recipe.
+// The search box went to the header (page-search.html, local builds only).
 
-// --- The furniture line: arrow left, search right -----------------------------
-// `space-between` puts the two at the column's edges; `flex-wrap` lets the box
-// drop under the arrow on a phone rather than squeeze it. The arrow keeps its
-// own rule in shared/_chrome.scss (size, colour, hover); only its bottom margin
-// is taken over by the row, so the two sites' title blocks start the same
-// distance under it (each layout's own rule does that).
+// --- The furniture line: arrow left, print · pdf right -----------------------
+// `space-between` puts the two at the column's edges. The arrow keeps its own
+// rule in shared/_chrome.scss (size, colour, hover); only its bottom margin is
+// taken over by the row, so the two sites' title blocks start the same distance
+// under it (each layout's own rule does that).
+//
+// NO WRAP ANY MORE. The row wrapped while the search box was its right-hand
+// item (#1024), so the box could drop under the arrow on a phone; PRINT · PDF
+// is 11 characters of 0.78rem Courier caps, about 93px beside a 48px arrow,
+// and fits a 312px phone column with room to spare -- measured at 360 on the
+// candidates page (tmp/action_candidates/, 2026-09-30).
 .page-furniture {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $space-lg $space-xxl;
-  flex-wrap: wrap;
+  gap: $space-xxl;
   margin-bottom: $space-lg;
 
   .back-to-index { margin-bottom: 0; }
 }
 
+// Print, a dot, pdf: one quiet group at the line's right end. The dot is
+// markup (page-print.html), not a gap, so the two words read as two controls;
+// it is hidden while the print button still is, so a no-script page shows
+// `pdf` alone and never `· pdf`.
+.page-print-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-sm;
+  white-space: nowrap;
+}
+
+.btn-print[hidden] + .page-print-sep { display: none; }
+
 // THE SEARCH BOX IS THE INDEX'S OWN BOX, DRAWN HERE. Same type mixin, same
 // hairline, same placeholder tone (shared/_rule.scss), so a reader who has used
 // I KNOW WHAT I WANT recognises it.
+//
+// IN THE HEADER SINCE #1210 (2026-09-30), LOCAL BUILDS ONLY -- under the door
+// to the other site, on its right edge; _includes/page-search.html says why,
+// and its place in the header's grid is shared/_layout.scss's. Everything
+// below is about the box itself and is unchanged by the move, bar one line:
+// `.site-header` carries 0.5em of letter-spacing for the wordmark and
+// everything in it inherits that, so the form resets it (the input's own
+// mixin sets its tracking explicitly and needs nothing).
 //
 // THE GLASS ON THE RIGHT, THE TEXT GROWING TOWARDS IT -- #1056 moved the
 // glass from #1050's original left end to the right end (the markup in
@@ -80,6 +115,7 @@
   gap: $space-sm;
   flex: 0 0 auto;
   min-width: 0;
+  letter-spacing: normal;
 }
 
 .page-search-go {
@@ -316,56 +352,59 @@ $page-search-quiet: 45%;
   color: $color-clear-text;
 }
 
-// --- The actions row: shortlist · see shortlist (N) · print · pdf -------------
+// --- The shortlist pair: [ + SHORTLIST ]  SEE SHORTLIST (N) ------------------
 // ONE TYPE FOR EVERY ACTION, Helen 2026-09-14: "let's try all actions in
 // capitals ... to help show they're actions". The drink page's Courier caps
-// at 0.78rem / 0.08em, which its shortlist button already wore; the rest of
-// the row takes the same, and the food shortlist button was matched the same
-// day (food/_shortlist.scss).
+// at 0.78rem / 0.08em, which its shortlist button already wore; every other
+// control here and on the furniture line takes the same, and the food
+// shortlist button was matched the same day (food/_shortlist.scss).
 //
-// THE SHORTLIST BUTTON IS NOT RESTYLED HERE. It has a base rule per site with
-// its own colours and its `+` / `✓` mark, and a row that re-coloured it would
-// be a second answer to what "on" looks like. The three other controls get
-// their resting and hover colours below: the site's quiet UI grey, and its
-// accent under the cursor -- which is the shortlist button's own pair on food.
-// Cocktails hovers its shortlist button in magenta (the site's "this one"),
-// and cocktails/_shortlist.scss re-points these three to match.
-// TWO COLUMNS AT EVERY WIDTH -- #1182, 2026-09-21, superseding #1163's
-// one-per-line phone block the same day and #1086's two-by-two before it.
-// Helen, having looked at both: "Left aligned: + SHORTLIST / (0) SEE SHORTLIST.
-// Right aligned: PRINT / PDF." The shortlist pair is one column, its labels
-// flush left with each other; the print pair is the other, flush right; and
-// the arrangement is the SAME at 360px and at 1280px, which is what #1163's
-// complaint was really about -- not that two rows of two is wrong, but that
-// the shape changed with the width and with the labels' lengths.
+// ONE LINE, TWO CONTROLS, SINCE #1210 (2026-09-30). It was a two-by-two grid
+// of four (#1182: "+ SHORTLIST / (0) SEE SHORTLIST" left, "PRINT / PDF"
+// right), and before that two rows of two (#1086) and one per line (#1163);
+// every one of those was a rearrangement of four controls that did not belong
+// together. Print and pdf are on the furniture line now (page-print.html), and
+// what is left is a pair: the button that marks THIS page, and the link to the
+// list it is marked on. A flex row, the include's DOM order, one gap.
 //
-// A GRID FILLED BY COLUMN, so the include's DOM order (shortlist, see
-// shortlist, print, pdf -- the order Helen fixed in #1005) lands the first two
-// in column one and the last two in column two without any per-control
-// placement. `auto` tracks so each column is as wide as its widest label and
-// no wider; the block as a whole still sits where each site puts it
-// (`.recipe-controls` pushes it right on food, `.cocktail-controls` sets it
-// beside the toggle on a drink page), so nothing outside this rule moved.
+// THE BUTTON IS THE ONE BORDERED THING ON ITS LINE. It wears the pill the
+// index already draws for its shortlist filter (`.btn-shortlist-only`, both
+// sites): the same 1.5px hairline in $color-border on $color-surface, so a
+// reader who has used the index recognises "you can press this". Its type,
+// colours, mark and states are still the per-site base rule's
+// (food/_shortlist.scss, cocktails/_shortlist.scss); this adds the box and
+// nothing about what "on" looks like. Hover and on take the border to
+// `currentColor`, so the box follows whatever colour the site's own rule has
+// already given the words -- no second answer to the same question.
 //
-// THE TWO COLUMNS ALIGN OPPOSITE WAYS, and that is the whole of her spec:
-// `justify-items: start` on the grid for the shortlist column, overridden to
-// `end` on the two print controls by the `grid-column: 2` rule below. A
-// right-aligned right column is what keeps PDF's edge on the block's right
-// edge, where the whole row's edge was before.
+// THE LINK IS DELIBERATELY NOT MADE TO LOOK LIKE THE BUTTON. Helen, having
+// tried for a fortnight to make the pair match: "I can't make them look
+// similar." They are not similar -- one changes this page, the other leaves
+// it -- so the link is quiet caps like print and pdf, no border, no arrow
+// (her "please remove that at least"), the count in brackets after the words.
+// shortlist.js keeps it hidden while the count is zero.
+//
+// THE PADDING IS ASYMMETRIC ON PURPOSE: the `+` mark carries its own 0.25em
+// of margin on its right, so the box needs a shade less on its left to read
+// as centred on the mark-and-word pair. Measured on the candidates page at
+// 2x (tmp/shots/crop-E-*.png, 2026-09-30).
 .page-actions {
-  display: grid;
-  grid-template-columns: auto auto;
-  grid-template-rows: auto auto;
-  grid-auto-flow: column;
-  justify-items: start;
+  display: flex;
   align-items: center;
-  column-gap: 1.4rem;
-  row-gap: $space-sm;
+  gap: $space-lg;
+  white-space: nowrap;
 }
 
-.page-actions .btn-print,
-.page-actions .btn-pdf {
-  justify-self: end;
+.page-actions .btn-shortlist {
+  border: 1.5px solid $color-border;
+  background: $color-surface;
+  padding: 0.45rem 0.8rem 0.45rem 0.65rem;
+  line-height: 1;
+  transition: color 0.12s ease-in-out, border-color 0.12s ease-in-out;
+
+  &:hover,
+  &:focus-visible,
+  &.is-on { border-color: currentColor; }
 }
 
 .btn-see-shortlist,
@@ -394,7 +433,8 @@ $page-search-quiet: 45%;
   &:focus-visible { color: $color-accent; }
 }
 
-// Tabular, so the count changing from 9 to 10 does not move `print`.
+// Tabular, so the count changing from 9 to 10 does not change the link's
+// width by a fraction of a character.
 [data-shortlist-total] {
   font-variant-numeric: tabular-nums;
 }

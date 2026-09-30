@@ -338,6 +338,15 @@
 {%- unless page.site_neutral %}
     <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
     {%- endunless %}
+    {% comment %} THE SEARCH BOX, ON A LOCAL BUILD ONLY -- #1210, 2026-09-30.
+       Directly under the door to the other site, on its right edge (row 3,
+       column 3 of this grid; shared/_layout.scss). Helen: "Move the omnisearch
+       to the navbar, directly under [ FOOD ] ->, to show on the local site
+       only -- this is key for me during testing so I'm not clicking about all
+       over the place." The include renders nothing unless _config_local.yml
+       says `show_header_search: true`, so the deployed header is byte for
+       byte what it was; the include's own comment has the rest. {% endcomment %}
+    {% include page-search.html %}
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>

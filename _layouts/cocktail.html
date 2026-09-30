@@ -16,7 +16,7 @@ layout: default
   MANUAL §9.7 / DECISIONS §9.7.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
-{% include back-to-index.html %}
+{% include back-to-index.html actions=true %}
 
 <article class="cocktail">
 
@@ -128,9 +128,10 @@ layout: default
   </div>
 
   {% comment %} THE CONTROLS ROW, under the head's rule: read it / make it at the
-     left (both labels always visible, the active one bold), every page action
-     at the right -- page-actions.html, the include a recipe page carries.
-     MANUAL §9.13, §13.13 / DECISIONS §9.13 (#897, #1005, #1086). {% endcomment %}
+     left (both labels always visible, the active one bold), the shortlist pair
+     at the right -- page-actions.html, the include a recipe page puts on its
+     INGREDIENTS line. Print and pdf are on the furniture line since #1210.
+     MANUAL §9.13, §13.13 / DECISIONS §9.13 (#897, #1005, #1086), §13 (#1210). {% endcomment %}
   <div class="cocktail-controls">
     <div class="cocktail-toggle" role="group" aria-label="read it or make it">
       <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>

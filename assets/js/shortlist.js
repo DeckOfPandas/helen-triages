@@ -10,8 +10,8 @@
 // FOUR PLACES, ONE SCRIPT, and the placements are Helen's (2026-09-04):
 //   - the right-hand end of a recipe row on the food index
 //   - the top-right corner of a drink card on the cocktail index
-//   - beside `print` on a recipe page
-//   - the top-right of the meta panel on a drink page
+//   - the right-hand end of the INGREDIENTS line on a recipe page (#1210)
+//   - the right-hand end of the read it / make it line on a drink page
 // Every one of them is `.btn-shortlist` carrying `data-shortlist-key`, so this
 // file needs no per-site branch and no list of selectors to keep in step. A
 // fifth placement is markup and a stylesheet rule, and nothing here.
@@ -91,9 +91,18 @@
        this link goes TO the index, so the honest number is everything the
        store holds. A stale key (a renamed page) counts one too many here and
        is the same key #847 chose to leave in the store rather than guess at. */
-    var total = String(HTF.shortlist.count());
+    var total = HTF.shortlist.count();
     Array.prototype.slice.call(document.querySelectorAll('[data-shortlist-total]'))
-      .forEach(function (el) { el.textContent = total; });
+      .forEach(function (el) { el.textContent = String(total); });
+
+    /* THE LINK EXISTS ONLY WHILE THERE IS SOMETHING TO SEE -- #1210,
+       2026-09-30. It ships `hidden` (see wire()), and this is the one place
+       that decides whether it shows: a link reading "see shortlist (0)" goes
+       to an empty list, and Helen's redesign took it off the page rather than
+       leaving it to say so. Re-run on every change, so marking the first
+       recipe reveals it and unmarking the last hides it again. */
+    Array.prototype.slice.call(document.querySelectorAll('.btn-see-shortlist'))
+      .forEach(function (link) { link.hidden = total === 0; });
   }
 
   /* THE WHOLE PAGE, NOT THE BUTTON THAT WAS CLICKED. A row and a card are one
@@ -117,8 +126,7 @@
     });
     // The see-shortlist link ships `hidden` for the same reason: its count is
     // this script's, and a link reading "(0)" for ever is a control that lies.
-    Array.prototype.slice.call(document.querySelectorAll('.btn-see-shortlist'))
-      .forEach(function (link) { link.hidden = false; });
+    // paintCounts() reveals it -- and only while the count is above zero.
     paintCounts();
 
     /* ONE DELEGATED LISTENER, on the document. The food index reorders its rows

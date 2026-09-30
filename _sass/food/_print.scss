@@ -27,9 +27,11 @@
   // _recipe-header.scss), and this rule had to go with it: a print rule
   // matching nothing fails silently and on paper only, which is exactly what
   // test_print_rules_target_classes_that_exist exists to catch. It did.
-  // `.recipe-controls` is the row the actions sit in since #1005; the actions
-  // themselves are hidden by shared/_print.scss on both sites.
-  .recipe-controls,
+  // `.recipe-controls`, the row the actions sat in from #1005, left this rule
+  // with #1210 (2026-09-30): the shortlist pair is on the INGREDIENTS line now
+  // and print/pdf on the furniture line, and shared/_print.scss hides both
+  // groups on both sites. The hairline it carried is `.recipe-head-rule`,
+  // which prints -- it closes the head on paper as it does on screen.
   .btn-method-toggle {
     display: none;
   }

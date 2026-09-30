@@ -2666,10 +2666,11 @@ line since 2026-09-14** (#1005). The shortlist button sat at the title row's
 right end from #963 (2026-09-11) — aligned to the name's first line through
 `:has()`, the `+` alone on a phone — and before that in the controls row
 (#897), under the toggle, and in the meta row: four homes in ten days, which is
-the fact #1005 was raised on. **Every action is in the controls row under the
-head's rule now** (§13.13): the read/make toggle at its left, and at its right
-`_includes/page-actions.html` — shortlist, see shortlist (N), print, pdf — the
-same include a recipe page carries. **#1005 left a SECOND copy of the shortlist
+the fact #1005 was raised on. **The shortlist pair is in the controls row under
+the head's rule** (§13.13): the read/make toggle at its left, and at its right
+`_includes/page-actions.html` — the shortlist pill and see shortlist (N) — the
+same include a recipe page carries on its INGREDIENTS line; print and pdf are
+on the furniture line since #1210. **#1005 left a SECOND copy of the shortlist
 button in the head and it shipped for a day**, so a cocktail page carried two;
 Helen, at the 2026-09-15 design review: *"actions row only"* (#1086), and the
 head's copy is the one that went. **`?shortlist=1` on the index has a caller
@@ -3982,13 +3983,60 @@ Showing her the thing is always allowed, and is how rulings move.
 ### 13.13 The page furniture — the same two rows on both sites
 
 #1005, #1011 and #1024, settled 2026-09-14 from two candidates pages (the real
-cocktail and food recipe pages, one switcher per question). Two shared includes, one
-shared partial (`_sass/shared/_furniture.scss`, names only the ten contract
-variables), and the row each site puts the actions in:
+cocktail and food recipe pages, one switcher per question), **and redrawn by
+#1210 on 2026-09-30** from a third. Three shared includes, one shared partial
+(`_sass/shared/_furniture.scss`, names only the ten contract variables), and
+the row each site puts the shortlist pair in.
+
+**What #1210 changed, in one paragraph.** From #1005 the furniture line was
+the arrow and the search box, and an actions row under the head held four
+controls — shortlist, see shortlist (N), print, pdf — drawn identically; six
+issues in two weeks (#1086, #1163, #1164, #1176, #1182, #1210) rearranged them
+without asking whether they belonged together. Helen's brief, from the
+one-treatment candidates page (`tmp/action_candidates/` in the worktree,
+Artifact `U5fdMTN1aHPThtmink6ujV`): *"Print and PDF actually on the top right,
+so where the omnisearch currently is"*; the search box *"to the navbar,
+directly under [ FOOD ] ->, to show on the local site only"*; the shortlist
+*"in the same place for Moules as Daiquiri, meaning on the same line as
+INGREDIENTS for Moules where it doesn't have the read it make it toggle"*; and
+the pair not made to match — *"I can't make them look similar ... I also
+dislike the -> arrow so please remove that at least."* Then: *"I'm sold! No
+notes."* So now:
 
 - **The furniture line**, `_includes/back-to-index.html`: the back arrow at
-  the left, a search box at the right — *"back arrow's line, but on the right
-  not in the centre."* The box is a plain GET form to this site's index with
+  the left; **print · pdf at the right** (`_includes/page-print.html`, rendered
+  only when a layout passes `actions=true` — the two page layouts do, the
+  magic-bag page does not, because no PDF is rendered beside it). The dot is
+  markup, `aria-hidden`, and hidden by CSS while the print button still is, so
+  a no-script page shows `pdf` alone. The row no longer wraps: 11 characters of
+  caps beside a 48px arrow fit a 312px column.
+- **The shortlist pair**, `_includes/page-actions.html`: `[ + SHORTLIST ]` as
+  a pill — the index's own `.btn-shortlist-only` shape, 1.5px `$color-border`
+  on `$color-surface`, hover and on taking the border to `currentColor` so the
+  site's own state colours drive it — and beside it `SEE SHORTLIST (N)` as a
+  plain quiet-caps link, word first (reversing #1164's count-first, whose
+  reason was to make the pair match), no arrow, **hidden while N is 0**
+  (`shortlist.js`'s `paintCounts()` decides on every change). On a drink page
+  it is the right-hand end of the READ IT / MAKE IT line (`.cocktail-controls`,
+  `nowrap`); on a recipe it is the right-hand end of the INGREDIENTS line
+  (`.recipe-section-heading-row`, a flex row that replaced `.recipe-controls`;
+  the head's hairline is `<hr class="recipe-head-rule">` now). **Below 600px
+  both put the pair on the line above**: the toggle then the pair on a drink
+  page, the pair then INGREDIENTS on a recipe — INGREDIENTS is 224px wide in a
+  312px column, so the pill cannot share its line — and the shape never
+  depends on the width or the count, which was #1210's complaint. Rule to
+  INGREDIENTS is 104.9px on both sites (the drink page's block gap + the pill's
+  28.9px + 3rem; food's row carries it as one 6.55rem margin, #1124 re-measured).
+- **The search box**, `_includes/page-search.html`, **in the header of every
+  page of a site on a LOCAL BUILD ONLY**: row 3, column 3 of
+  `.site-header-inner`, under the door to the other site and on its right
+  edge, gated on `show_header_search`, which only `_config_local.yml` declares
+  (the `show_drafts` idiom). The deployed site has no search box anywhere. On
+  an index page it is a plain form (`page-search.js` is loaded by the two page
+  layouts only; `?q=` lands in the index's own box). Everything below about the
+  box itself is unchanged by the move. Before #1210 it was the right-hand end
+  of the furniture line, live — *"back arrow's line, but on the right not in
+  the centre."* The box is a plain GET form to this site's index with
   `q=`, works with no JavaScript, and submits a NAME search: `HTF.filterState.parseName`
   reads it (kept out of `parseQuery`'s kinds because a title may carry a
   comma) and each index puts the text into its own I KNOW WHAT I WANT box and
@@ -4052,17 +4100,16 @@ variables), and the row each site puts the actions in:
   Helen's second look was #1051–#1059, built on 2026-09-15 (DECISIONS §13);
   read those before changing the matching, the group titles or where a link
   lands.
-- **The actions row**, `_includes/page-actions.html`: shortlist, see shortlist
-  (N), print, pdf, in that order, in Courier caps — *"all actions in
-  capitals"* — with the count from the STORE (`data-shortlist-total`), not the
-  page. Food puts it in `.recipe-controls` under the badges, closed by a
-  hairline; cocktails in `.cocktail-controls` beside the toggle. Her pick: *"row
-  under the head."* The four move together or not at all; a fifth action is a
-  line in the include. **Its type and gaps are the same on both sites** (#1058,
-  measured): SEE SHORTLIST and PDF are `<a>`s, so food's
+- **The actions row as it was, #1005 → #1210** (kept because the rulings in
+  DECISIONS §13 refer to it): `_includes/page-actions.html` held shortlist, see
+  shortlist (N), print, pdf, in that order, in Courier caps — *"all actions in
+  capitals"*, which every control still wears — with the count from the STORE
+  (`data-shortlist-total`), not the page. Food put it in `.recipe-controls`
+  under the badges, closed by a hairline; cocktails in `.cocktail-controls`
+  beside the toggle. Her pick then: *"row under the head."* **Still true**:
+  SEE SHORTLIST and PDF are `<a>`s, so food's
   `article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf)` has to exclude
-  them or they take the prose-link colour; and `.recipe-controls` pads
-  `$spacing-block-gap` under its hairline, cocktails' rule-to-row gap.
+  them or they take the prose-link colour.
 - **Print and pdf reach cocktails with it.** `scripts/generate_pdfs.py` renders
   both collections and the pdf link is `page.url` with its slash swapped for
   `.pdf`, so it points beside the page whatever the permalink.
