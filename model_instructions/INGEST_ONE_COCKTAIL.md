@@ -470,10 +470,10 @@ fits, use the source's own words and flag it in your list.
 
 <!-- vocab:glass start -->
 `coupe` · `sour` · `collins` · `flute` · `highball` · `hurricane` ·
-`nick and nora` · `punch bowl` · `tiki mug` · `mug` · `mule mug` · `martini` ·
-`wine` · `pilsner` · `sling` · `margarita` · `absinthe` · `goblet` · `chalice` ·
-`hollowed pineapple` · `coconut shell` · `old fashioned` ·
-`double old fashioned` · `brandy glass`
+`nick and nora` · `piña colada` · `punch bowl` · `tiki mug` · `mug` ·
+`mule mug` · `martini` · `wine` · `pilsner` · `sling` · `margarita` ·
+`absinthe` · `goblet` · `chalice` · `hollowed pineapple` · `coconut shell` ·
+`old fashioned` · `double old fashioned` · `brandy glass`
 <!-- vocab:glass end -->
 
 **These spellings are WRONG and will be corrected against you** — write the
@@ -489,6 +489,7 @@ right-hand form:
 | martini glass | **martini** |
 | pineapple | **hollowed pineapple** |
 | coconut | **coconut shell** |
+| pina-colada, pina colada | **piña colada** |
 <!-- vocab:glass_corrections end -->
 
 If the source names no glass, use `glass: []` **and lead your list with it** —

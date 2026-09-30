@@ -48,6 +48,17 @@ icons:
   highball: highball
   hurricane: hurricane
   nick and nora: nick-and-nora
+  # DECLARED 2026-09-29, when Helen moved Fanny Chu's Piña Colada off the
+  # hurricane and onto its own glass. EVERYTHING ELSE FOR IT ALREADY EXISTED --
+  # `pina-colada.svg` is drawn, and the survey and `heights_mm` have carried
+  # the slug for weeks -- so this was the one missing key, and without it the
+  # drink rendered NO icon, silently.
+  #
+  # ACCENTED IN THE NAME, PLAIN IN THE SLUG, which is the split this file
+  # already makes for `nick and nora` / `nick-and-nora`: `icons:` and `serving:`
+  # key on the glass NAME, which is prose a reader sees, while the survey and
+  # the heights key on the icon SLUG.
+  piña colada: pina-colada
   punch bowl: punch-bowl
   tiki mug: tiki-mug
 
@@ -231,6 +242,13 @@ canonical_glasses:
   "martini glass": "martini"
   "pineapple": "hollowed pineapple"
   "coconut": "coconut shell"
+  # 2026-09-29. Helen typed the SLUG into the drink -- `glass: "pina-colada"` --
+  # which is the spelling the artwork and the survey use, and a reasonable guess
+  # from looking at either. The canonical name is the prose one, so the slug is
+  # corrected here rather than the drink being retyped: the same service this
+  # map does for `old-fashioned`.
+  "pina-colada": "piña colada"
+  "pina colada": "piña colada"
 
 # THE THREE THAT WERE "NOT IN THE MAP, ON PURPOSE" ARE NOW DECIDED — issue
 # #676, Helen, 2026-09-05: "hollowed pineapple, coconut shell". `martini glass`
@@ -383,6 +401,8 @@ serving:
   # source says "copper mug" and `mule mug` is the declared spelling; the icon
   # is the plain mug's (see the alias above), so only the phrase was missing.
   mule mug: "a mule mug"
+  # NEW 2026-09-29, with the `icons:` key above, for Fanny Chu's Piña Colada.
+  piña colada: "a piña colada glass"
   nick and nora: "a Nick and Nora"
   old fashioned: "an old fashioned glass"
   pilsner: "a pilsner"
