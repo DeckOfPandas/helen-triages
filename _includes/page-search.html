@@ -10,9 +10,6 @@
   site and on the same right edge (shared/_layout.scss places it). It was the
   right-hand end of the back arrow's line on a recipe or drink page from #1024
   (2026-09-14) until this; that end now holds print and pdf (page-print.html).
-  The box's own markup, type, quietness and dropdown are unchanged -- the
-  history of every one of those decisions (#1050, #1056, #1096, #1099, #1123)
-  is in _sass/shared/_furniture.scss, which still styles it.
 
   RENDERED ONLY WHEN `site.show_header_search` IS TRUE, and only
   _config_local.yml declares that key -- the same idiom as show_drafts and
@@ -22,20 +19,82 @@
   search. Everything below reads `page.site_key`, exactly as back-to-index.html
   does, so a food page searches food and a drink page searches cocktails.
 
-  ON AN INDEX PAGE IT IS A PLAIN FORM. page-search.js, which hangs the dropdown
-  under the box, is loaded by the two PAGE layouts only (MANUAL 13.13); the
-  index has its own I KNOW WHAT I WANT box and `?q=` lands in it through
-  filter-state.js's parseName, so Enter still does the right thing there.
+  THE DROPDOWN'S SCRIPT LOADS HERE TOO, since 2026-10-01, under the same gate.
+  page-search.js was a page-layout script from #1050 to #1210 ("page
+  furniture, not chrome"); for a day after #1210 the box was in the header on
+  every page but only a recipe or drink page loaded the script, so the index
+  pages had a plain form with no dropdown -- a testing tool that worked on
+  some pages. The script and the box are one thing and ship together: both
+  only on a local build, and on every page of a site there. It hangs
+  HTF.pageSearch off the namespace assets.js creates in the head and reaches
+  for nothing else, so loading it at the end of the header costs the page
+  nothing it did not already pay.
 
-  THE PLACEHOLDER IS "I know what I want..." ON BOTH SITES -- #1096. It is
-  written here rather than read from sites.yml because it stopped saying where
-  you are, which is that file's test for a key. The input's aria-label carries
-  the same words, so a screen reader hears what a sighted reader sees.
+  THE BOX IS A PLAIN FORM FIRST, AND IT WORKS WITH NO JAVASCRIPT. A GET to the
+  index with `q=<what you typed>`; assets/js/filter-state.js's `parseName`
+  reads it and each index puts the text into its own I KNOW WHAT I WANT box
+  and applies it. Pressing Enter, or the magnifying glass (a real submit
+  button), does exactly that. That was the whole of #1024.
 
-  THE GLASS IS HELEN'S OWN ARTWORK, _includes/icons/search.svg, and comes AFTER
-  the input so it sits at the right end and never moves as the text grows
-  (#1056); the dropdown element is rendered empty and hidden so the no-script
-  page is exactly this page minus the script (#1050). {% endcomment %}
+  THE GLASS MOVED TO THE RIGHT END -- #1056, reversing #1050's own layout on
+  seeing it built. It is AFTER the input in the markup, which is also the
+  natural tab order (type, then reach the submit control).
+
+  THEN assets/js/page-search.js MAKES IT A SEARCH FOR ANYTHING -- #1050. As you
+  type, a dropdown under the box offers what the word could mean on this site,
+  grouped by kind and in the index's own order: a recipe or drink by name
+  first, then the star ingredients, moods, practicalities or hassles, then the
+  ingredients. Each result is a real link -- to the page, or to the index
+  already filtered by that word (`?star=`, `?tag=`, `?mood=`, `?ing=`, the
+  grammar in filter-state.js). What it searches is this site's search.json,
+  fetched the first time the box takes focus; `data-search-index` says where.
+  The dropdown element is rendered here, empty and hidden, so the no-script
+  page is exactly this page minus the script.
+
+  THE GLASS IS HELEN'S OWN ARTWORK, _includes/icons/search.svg -- SVG Repo's
+  "Interface / Search_Magnifying_Glass", pasted into #1050 -- redrawn to the
+  site's icon contract the way icons/arrow-right.svg is: no fixed width or
+  height, `currentColor` for the stroke so it takes the button's colour and
+  hover, and a `class` parameter. The 800px canvas and the black stroke of the
+  original were the repo's export settings, not the design. The partial
+  carries no comment of its own because a Liquid tag inside an SVG file is not
+  XML, and test_every_shipped_svg_actually_parses reads the file as XML.
+
+  THE INPUT IS 22 CHARACTERS WIDE AND RIGHT-ALIGNED -- the width is #1123
+  (2026-09-16) and the alignment is #1099, which reversed #1056's on seeing it
+  built: Helen's own picture of what she wanted is "____r ___rh __rhu _rhum",
+  the word anchored at the glass and growing leftwards. That pairing is what
+  makes a short box safe for TYPING: what scrolls out of sight is the BEGINNING
+  of a long word, never the letters being typed.
+
+  THE WIDTH IS THE PLACEHOLDER'S LENGTH, AND THAT IS THE WHOLE RULE. #1123 went
+  24 -> 12 first ("reduce the width of the omnisearch input text field to 12
+  chars"), and 12 cut the resting box to "i know what": the placeholder is the
+  one string that can never scroll into view, because nobody is typing it.
+  Helen, looking at it: "the omnisearch placeholder needs to all be visible, so
+  I guess our input field needs to be 10 chars wider". "I know what I want..."
+  is 20 characters, which at the box's 0.04em tracking measures about 21.3ch,
+  so the box is 22ch.
+
+  AND THE THING SHE ACTUALLY WANTED WAS QUIET, NOT SMALL -- "to make it less
+  obtrusive, which is what I actually want". That is the colour (the hairline
+  and the placeholder both step towards the page's own ground; see
+  $page-search-quiet in _sass/shared/_furniture.scss), not the width. Worth
+  keeping: a narrow box is not a quiet one.
+
+  THE PLACEHOLDER IS "I know what I want..." ON BOTH SITES -- #1096, Helen's
+  ruling on seeing #1050 built: keep the two searches behaving exactly as
+  built, drop the "search for anything..." placeholder (and any separate
+  written label or title) and give the box no visible words beyond that
+  placeholder and the glass. It is written here rather than read from
+  sites.yml for the same reason #1050's placeholder was: it stopped saying
+  where you are, which is that file's test for a key. The input's aria-label
+  carries the same words, so a screen reader hears what a sighted reader sees.
+
+  TO LOOK AT IT WITH THE BROWSER HARNESS, BUILD WITH THE LOCAL CONFIG.
+  scripts/browser/build.sh builds what deploys, which has no box; the
+  candidates-page build (MANUAL 13.11, `--config _config.yml,_config_local.yml`)
+  is the one that shows it. {% endcomment %}
 {% assign search_site = site.data.sites[page.site_key] %}
 {% if site.show_header_search and search_site and page.site_neutral != true %}
   <form class="page-search" role="search" method="get" action="{{ search_site.home | relative_url }}"
@@ -48,4 +107,5 @@
     <button type="submit" class="page-search-go" aria-label="Search {{ search_site.title }}">{% include icons/search.svg class="page-search-mark" %}</button>
     <div class="page-search-results" id="page-search-results" role="listbox" hidden></div>
   </form>
+  <script src="{{ '/assets/js/page-search.js' | relative_url }}"></script>
 {% endif %}

@@ -4,7 +4,9 @@
 // Two controls, and they are different kinds of thing:
 //
 //   .btn-shortlist       marks ONE recipe. On a row at the right-hand end of the
-//                        index, and on a recipe page beside `print`.
+//                        index, and on a recipe page at the right-hand end of
+//                        the INGREDIENTS line, as a pill (#1210; the pill is
+//                        shared/_furniture.scss's, the colours are below).
 //   .btn-shortlist-only  shows only what is marked. One per index, on the
 //                        results heading beside the count it changes.
 //

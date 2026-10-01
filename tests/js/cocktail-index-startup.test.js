@@ -496,7 +496,8 @@ test('#994: without the query the view stays off', () => {
 });
 
 // --- arriving with a name, #1024 -----------------------------------------------
-// `?q=` is what the search box on a drink page's furniture line sends. The
+// `?q=` is what the search box sends (the header's, on a local build, since
+// #1210; a drink page's furniture line before that). The
 // index must put it into I KNOW WHAT I WANT and apply it, exactly as typing
 // there would, so the two boxes are one control in two places.
 
@@ -621,7 +622,7 @@ test('#994: shortlist=1 beats a mood in the same URL', () => {
 // the cocktails half of the same widening -- any element id named by
 // location.hash, not only the literal string "results" -- since a drink
 // page's own mood chips (_layouts/cocktail.html) end their href in
-// `#filter-mood` or `#filter-hassle`, and the actions row's "see shortlist"
+// `#filter-mood` or `#filter-hassle`, and the drink page's "see shortlist"
 // link ends in `#results` the same way a search result does.
 
 test('#1050/#1057: arriving at #results scrolls the count line into view', () => {

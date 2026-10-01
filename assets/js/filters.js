@@ -1931,8 +1931,9 @@ function renderResultsPool() {
     }
   }
 
-  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box on
-     a recipe page's furniture line. Exactly what typing into the name box does
+  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box
+     (a recipe page's furniture line then; the header, on a local build, since
+     #1210). Exactly what typing into the name box does
      (its `input` handler above): the box shows the text, the query is folded
      the same way, and the list is reordered by title tier. Applied after the
      memory and the shuffle, because a name you just typed is a fresh
@@ -1959,7 +1960,7 @@ function renderResultsPool() {
      list; a badge or chip at the top of a recipe page ends its own link in
      the id of the filter SECTION holding it (`#filter-star`, `#filter-mood`,
      `#filter-practicalities` -- see recipe_badges.html) so the reader lands on
-     the lit chip rather than the top of the page; and the actions row's "see
+     the lit chip rather than the top of the page; and the recipe page's "see
      shortlist" link (page-actions.html) ends in `#results` too, since the
      shortlisted list is the same count line. All three need the same repeat
      scroll: the browser has already jumped to the fragment once, against a

@@ -94,7 +94,7 @@ article.recipe .method-short {
 // `a { color: $color-text }` it exists to beat, and the exclusion is free.
 //
 // `.btn-see-shortlist` and `.btn-pdf` JOIN THE EXCLUSION, issue #1058. Two of
-// the actions row's four controls (_includes/page-actions.html) are `<a>`
+// the actions row's four controls (then _includes/page-actions.html) were `<a>`
 // tags, not `<button>`s, and with no exclusion this rule outranked
 // shared/_furniture.scss's `.btn-see-shortlist, .btn-print, .btn-pdf` (0,1,0)
 // the same way it would have outranked the badges: PDF and SEE SHORTLIST (N)
@@ -105,6 +105,12 @@ article.recipe .method-short {
 // `.cocktail-controls` has no such generic link rule to fight and all four
 // controls already agreed. `:not()`'s specificity is its most specific
 // argument, so adding two more class names here costs nothing.
+//
+// SINCE #1210 (2026-09-30) ONLY `.btn-see-shortlist` IS STILL INSIDE THE
+// ARTICLE -- on the INGREDIENTS line. The pdf link moved to the furniture
+// line above `<article class="recipe">`, where this rule cannot reach it;
+// its name stays in the exclusion because a control that moves back in should
+// not have to rediscover #1058.
 article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   color: $color-recipe-link;
   font-weight: 600;
@@ -567,8 +573,9 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 
 // --- A button that looks like a body link ------------------------------------
 // One consumer since 2026-09-14: .btn-method-toggle (below). .btn-print was the
-// other (#86) until #1005 moved it into the actions row, where it wears the
-// row's Courier caps (shared/_furniture.scss) rather than a body link's sans.
+// other (#86) until #1005 moved it into the actions row -- and #1210 on to the
+// furniture line -- where it wears Courier caps (shared/_furniture.scss)
+// rather than a body link's sans.
 // A <button> rather than a link because it DOES something to this page rather
 // than going anywhere, and it should be indistinguishable from
 // article.recipe a -- Helen's standing rule for anything clickable in the
