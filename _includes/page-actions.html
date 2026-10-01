@@ -1,18 +1,43 @@
-{% comment %} ── THE ACTIONS ROW: the same four controls, in the same order, on
-  both sites -- #1005 and #1011, 2026-09-14. Helen's ruling on the feature
-  set: "back, shortlist, see shortlist (N), print, pdf on both", and her pick
-  from the candidates pages for where they live: "row under the head". A
-  recipe page puts this include in `.recipe-controls` under its badges; a
-  drink page puts it in `.cocktail-controls` beside the read it / make it
-  toggle, under the head's rule. One include, so the order and the markup
-  cannot drift between the two -- the reason the shortlist button alone had
-  moved four times in ten days was that nothing defined where actions live.
+{% comment %} ── THE SHORTLIST PAIR: the same two controls, in the same place, on
+  both sites -- #1005 and #1011 (2026-09-14) for the one include, #1210
+  (2026-09-30) for what is in it. A recipe page puts this on the INGREDIENTS
+  heading's line; a drink page puts it on the READ IT / MAKE IT toggle's line,
+  in `.cocktail-controls`. Both are "the first line under the rule that closes
+  the head, at the right" -- Helen: "Shortlist buttons in the same place for
+  Moules as Daiquiri, meaning on the same line as INGREDIENTS for Moules where
+  it doesn't have the read it make it toggle." One include, so the two cannot
+  drift: the reason the shortlist button alone had moved four times in ten
+  days was that nothing defined where actions live.
+
+  PRINT AND PDF ARE NOT HERE ANY MORE. From #1005 until #1210 this include held
+  four controls -- shortlist, see shortlist (N), print, pdf -- and six issues
+  in two weeks rearranged them (#1086, #1163, #1164, #1176, #1182, #1210)
+  without asking whether they belonged together. They did not: print and pdf
+  are things you do WITH the page and sit on the furniture line now
+  (page-print.html, the top right); these two are things you do TO it.
+  DECISIONS §13 (#1210).
+
+  THE SHORTLIST BUTTON IS A PILL, drawn in shared/_furniture.scss as the
+  index's own `.btn-shortlist-only` shape -- the one bordered control on the
+  line, because it is the one that changes something. THE LINK BESIDE IT IS
+  DELIBERATELY NOT MADE TO LOOK LIKE IT. Helen: "The button for + SHORTLIST
+  then (3) for the see list link just isn't clear to me at all. I've struggled
+  with this the whole time. I can't make them look similar." They are not
+  similar: one is a button that changes this page, the other a link to a
+  different one. So the link is a plain quiet-caps link in the same face as
+  print and pdf, with the count in brackets after the words. NO ARROW -- "I
+  also dislike the -> arrow so please remove that at least."
+
+  "SEE SHORTLIST (N)", WORD FIRST -- which reverses #1164 (2026-09-21, "(0)
+  SEE SHORTLIST"). That ruling put the count first so the pair would repeat
+  `+ SHORTLIST`'s mark-then-word shape; the pair no longer tries to match, so
+  the reason is gone and the words come in reading order.
 
   EVERY CONTROL THAT NEEDS JAVASCRIPT SHIPS `hidden` and is revealed by the
-  script that makes it work: the shortlist button and the see-shortlist link
-  by shortlist.js, the print button by print-link.js. The pdf link is a plain
-  anchor to a real file and needs nothing. The rule is _layouts/recipe.html's
-  own: a control that silently fails is worse than no control.
+  script that makes it work -- both of these by shortlist.js. The rule is
+  _layouts/recipe.html's own: a control that silently fails is worse than no
+  control. AND THE LINK STAYS HIDDEN WHILE THE COUNT IS ZERO: shortlist.js
+  shows it only when there is something to see, so "(0)" is never on the page.
 
   `page.url`, NOT `relative_url`, on the shortlist key -- the same key the
   index row or card for this page emits, which is what makes the two agree.
@@ -30,14 +55,7 @@
   scrolls to `location.hash` again once the shortlisted-only view has
   revealed, the same generalised scroll #1059 needed for a badge or chip's own
   section fragment. Going back (#387) is untouched -- that restore skips the
-  hash scroll entirely, same as it already did for a search result.
-
-  THE PDF PATH IS THE PAGE'S OWN URL WITH THE TRAILING SLASH SWAPPED FOR
-  `.pdf`, which is exactly where scripts/generate_pdfs.py writes it -- beside
-  the page's output directory -- for both collections. Gated on
-  `site.pdf_downloads`, which _config_local.yml turns off because nothing
-  renders the files there (issue #86's finding: a link in the view you work
-  in all day would be a permanent 404). {% endcomment %}
+  hash scroll entirely, same as it already did for a search result. {% endcomment %}
 {% assign actions_site = site.data.sites[page.site_key] %}
 <div class="page-actions">
   <button type="button"
@@ -45,28 +63,7 @@
           data-shortlist-key="{{ page.url }}"
           aria-pressed="false"
           hidden>shortlist</button>
-  {% comment %} THE COUNT LEADS -- #1164, 2026-09-21. Helen: "swap shortlist
-     and (0) in the button so the structure of the + shortlist is repeated",
-     written out as:
-
-         + SHORTLIST
-         (0) SEE SHORTLIST
-         PRINT
-
-     It read "see shortlist (0)" until then. The button above it is a mark and
-     then a word (`+` is a `::before` on `.btn-shortlist`), so putting the
-     count first makes the pair read as one pattern rather than as two
-     differently-built controls that happen to sit together.
-
-     THE SPAN IS UNMOVED, only what surrounds it: shortlist.js paints
-     `[data-shortlist-total]` with `HTF.shortlist.count()` and does not care
-     where in the link it sits. The brackets stay literal text outside it, as
-     they were. {% endcomment %}
   <a class="btn-see-shortlist"
      href="{{ actions_site.home | relative_url }}?shortlist=1#results"
-     hidden>(<span data-shortlist-total>0</span>) see shortlist</a>
-  <button type="button" class="btn-print" hidden>print</button>
-  {% if site.pdf_downloads %}
-    <a class="btn-pdf" href="{{ page.url | append: '.pdf' | replace: '/.pdf', '.pdf' | relative_url }}">pdf</a>
-  {% endif %}
+     hidden>see shortlist (<span data-shortlist-total>0</span>)</a>
 </div>

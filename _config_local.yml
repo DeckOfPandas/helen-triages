@@ -22,6 +22,18 @@ show_source_wording: true
 # (that needs a Chrome or Chromium on PATH -- see the script's --chrome flag).
 pdf_downloads: false
 
+# The search-for-anything box, in the header of every page of a site, directly
+# under the door to the other site. LOCAL ONLY, by Helen's instruction on the
+# day it moved there (2026-09-30, #1210): "to show on the local site only --
+# this is key for me during testing so I'm not clicking about all over the
+# place." It was the right-hand end of the back arrow's line on every recipe
+# and drink page (#1024), on the live site too; print and pdf hold that end
+# now, and the deployed site has no search box anywhere. Same idiom as
+# show_drafts / show_costs: production declares no such key, so
+# _includes/page-search.html renders nothing there, and it must stay out of
+# _config.yml for the same reason.
+show_header_search: true
+
 # Show recipes flagged `meta.awaiting_fix: true`. Production hides them
 # entirely (issue #331); locally they must be visible, because they are the
 # ones being worked on.

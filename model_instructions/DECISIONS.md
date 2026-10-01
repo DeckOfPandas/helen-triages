@@ -183,6 +183,22 @@ unless stated.
   have the same reader as everything else here, so they are not a fourth
   audience; they are more §1.
 
+- **2026-09-29, #1252 — the drink page's "why" paragraphs left
+  `_layouts/cocktail.html` for this journal.** 1,421 of its 1,874 lines were
+  comments, so reading fifty lines of Liquid cost five hundred. Each block is
+  now a few present-tense lines ending in a `MANUAL §n / DECISIONS §n (#N)`
+  pointer, and the code did not change: stripped of comments, both versions
+  are the same 424 lines (`tmp/1252_code_unchanged.py` in the branch's
+  worktree), and the production build's drink pages are identical once
+  whitespace is collapsed. **Most of it was already here**, often at more
+  length, so most blocks were deleted rather than moved. What was NOT here went
+  in as ordinary entries under their own sections and ruling dates (§9.3.1,
+  §9.3.4, §9.3.5, §9.7, §9.10, §9.11, §9.12, §9.13). **One comment was wrong**:
+  it said SHIP IT? shows in `make it` only, but the stylesheet hides it in
+  `make it`, which is what the 2026-09-05 round in §9.13 records (§9.13's
+  2026-09-02 / 2026-09-05 meta entry below has it). `cocktails/index.html` and
+  `_layouts/default.html` are the issue's other two files, one PR each.
+
 ## §1 How to run it
 
 - **2026-08-29** — `.node-runtime/` and `.gh-runtime/` do not come with a
@@ -2270,6 +2286,20 @@ unless stated.
   work this out* — a top fills the glass, so glass capacity less what is already
   poured, less ice. No glass records a capacity today.
 
+- **2026-09-10, #707 — "fresh" said out loud, and the opposite warning.**
+  Freshly squeezed is implied for every juice; Helen wanted four to say so on
+  the drink page — *"they should all display like 'fresh lime juice'"* — and
+  one the other way: *"pineapple juice should always carry the note 'Don't use
+  fresh.'"* So `always_fresh` (lime, lemon, orange, grapefruit; a subset of
+  `juices:`, ruby grapefruit left out because the issue named four and widening
+  it is hers) and `standing_notes`, a mapping keyed by generic. The layout
+  prefixes "fresh " PER GENERIC rather than per line, so a list generic mixing
+  a fresh juice with anything else would still read right (none does today).
+  **The drink's own note always keeps the top slot**: the standing note fills
+  the gap when a pour has none and follows it when it has one — a pineapple pour
+  with its own note about which tin to buy still gets "Don't use fresh."
+  underneath. Cards do not say "fresh" (§9.10.1: nobody filters a card by it).
+
 ### §9.3.2 The bottle dictionary
 
 - **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as
@@ -2633,6 +2663,20 @@ unless stated.
   wrong name live) and, for other reasons, the Arrack Christmas Punch and the
   Singapore Sling. Offered reading them on the branch so nothing left the site,
   she chose *"Let them go dark"*.
+- **2026-09-06, #713 / #753 — the units line's words are Helen's, and
+  `units.exact` is kept with nothing reading it.** Her sentence: *"Roughly X
+  units of alcohol in a serving"*. "Roughly" goes on EVERY drink, exact or not,
+  because how accurately a drink is poured is not something the data knows; it
+  replaced an "About" that `units.exact` had gated. Asked whether to retire
+  `units.exact` with the word, she kept it: a true, computed fact whose obvious
+  readers are a future reference page or an honesty indicator. **Do not delete
+  it because grep finds no reader** — #651's rule is that a value nothing reads
+  is safe only while something says why it is kept, and the layout's footer
+  comment and this entry are that. `exact` means every alcoholic pour named its
+  bottle; a vague 0% pour (soda water) does not spoil it. Punches keep their own
+  tail ("in each of N servings"): asked about "a glass" to match the cost line,
+  she left the mismatch alone. Do not polish the wording or put it into house
+  voice (§13.12).
 
 ### §9.3.5 What a drink costs — #547, built 2026-09-05/06
 
@@ -2692,6 +2736,14 @@ unless stated.
   differently, the buttons sit on the drink's own line, and choosing collapses
   that line's range to the chosen bottle. The range stands until a choice is
   made.
+
+- **2026-09-26, #1215 — the price per glass has two decimal places.** Helen:
+  *"price per glass should have two decimal places."* The plugin rounded to a
+  Float, and a Float prints 3.2 as "3.2", so Between the Sheets read
+  "£3.2–£3.29". Liquid cannot pad a number, so the plugin also writes
+  `min_text` / `max_text` and the page prints those. The numeric `min` / `max`
+  stay on the data attributes, because the scripts read them as numbers and a
+  string would break them.
 
 ### §9.3.6 How much liquid is in a drink — #1121, built 2026-09-17
 
@@ -2889,6 +2941,34 @@ unless stated.
 - **2026-08-15, #223** — Cocktails at PARITY with food's tape, copying across
   as part of regeneration — after the two directories drifted for five days.
   OVERTAKEN 2026-08-19 by #374: one directory.
+- **2026-08-16 to 2026-09-26 — an empty array and an empty string are both
+  TRUTHY in Liquid, and the drink page has been bitten four times.** Only `nil`
+  and `false` are falsy. (1) `source: ""` drew a bare "Source:" line (the entry
+  above). (2) `garnish: []`, real data on 16 drinks with the Caipirinha among
+  them, would draw a GARNISH heading over nothing, so every list-gated section
+  tests `.size > 0` — the bug 49 food drafts' `notes: []` had
+  (`test_list_sections_are_conditioned_on_size_not_truthiness`). (3) The glass
+  accumulator: a drink whose glass loop never ran sent an empty filename to the
+  include tag, a hard build failure — *File contains invalid characters or
+  sequences: icons/glasses/.svg* — so it starts at `""` and is tested against
+  `""`. No drink trips it now that every drink names a glass (#491), which is
+  exactly when a guard looks safe to remove. (4) #1212, 2026-09-26, Helen:
+  *"don't show 'to serve' section if it's blank."* `to_serve: ""` is how an
+  ingest leaves a drink with nothing to say (ten drafts that day), and each
+  drew a heading over an empty paragraph; the value is now `strip`ped and
+  tested against `""`. **The layout's header illustrated the rule with the
+  Sazerac until 2026-08-31**, glossed as "the drink genuinely has no garnish",
+  which was backwards: the Sazerac says `["no garnish"]`, a DECISION that
+  renders, where `[]` means nobody has filled the field in. Two opposite claims,
+  one used to illustrate the other.
+- **2026-09-06 — `sort_natural`, not `sort`, and the difference was 12 drinks.**
+  The drink page's chips were sorted with `sort` on a comment's claim that every
+  mood had been lowercase since #543. `I want to faff` is not, and Liquid's
+  `sort` is ASCII, so a capital sorts before every lowercase letter and that
+  chip jumped ahead of `aperitivo` on every drink carrying it. 18 drinks carried
+  the mood and the two sorts disagreed on 12. The card chips switched in the
+  same commit, and the related-drinks sort uses `sort_natural` for the same
+  reason.
 
 ### §9.9 The goodness filter, and the vocabulary that outlived it
 
@@ -2974,6 +3054,20 @@ unless stated.
   Tai's line). Tier 7 (floats) not built (#754). The `searchable` capture had
   been a near-copy of the card loop with a comment saying "the two must stay
   in step" and nothing making them.
+- **2026-09-17, #1141 — `optional` renders as "(optional)" after the
+  ingredient, reversing the argument that had stood.** `optional:` (#570,
+  2026-08-30) is a bare boolean, absent meaning required; the two drinks that
+  first carried it had both said so inside `item` text, which was #544's point
+  — `item` was holding a fact no field could. It is NOT food's `incidental`
+  despite the matching shape: `incidental` HIDES a line, `optional` SHOWS it
+  and marks it. **The argument against a parenthetical** was that this line's
+  brackets already mean "the bottle", so "sugar syrup (optional)" beside "gin
+  (Beefeater)" makes one mark do two jobs — #441's "(blackstrap)" argument on a
+  different field. **It was about a collision that does not happen**: measured
+  on the published set (`tmp/optional_census.py`), there was exactly one
+  optional ingredient, Corpse Reviver No. 2's cane sugar syrup, and it names no
+  bottle. If the two ever meet it reads "syrup (Monin) (optional)", which is
+  worth asking Helen about then rather than solving in advance.
 
 ### §9.10a `serve`
 
@@ -3190,6 +3284,42 @@ unless stated.
   `check_glass_regen.py` before and after: 46 sources → 27, and a wholesale
   regeneration reproduces all 27 shipped icons byte for byte both times.
 
+- **2026-08-17 — the drink page draws the FIRST glass that has artwork.** Helen's
+  review of the coupe phase made `glass` an ordered list (§9.3): three drinks
+  named two acceptable glasses, and Daisy de Santiago is *"anything, but
+  preferably a Collins"*. So the icon is the first entry with a drawing, and a
+  drink whose preference has none still gets its second choice rather than
+  nothing. Two drinks name a second glass for that reason and two because Helen
+  uses either — the Mai Tai is a double old fashioned *"more often"* and a tiki
+  mug *"sometimes"*. A glass with no entry, or one naming a missing file,
+  renders NOTHING: the absent-means-nothing convention of `sites.yml`'s
+  `reference_links`, so a missing key never becomes a broken image.
+- **2026-08-26 — on the drink page the glass is COMPRESSED, and drawn as a
+  FRACTION of the title block.** Helen: *"let the height of the glass be more
+  similar to the title block, if the glass is tall. For shorter glasses, try
+  half height."* True relative height is correct information and, with one
+  glass on the page, poor drawing — a 60 mm shot at 26% of a flute is a stamp
+  beside a paragraph — so the ratio is mapped onto 0.32–1.0: the tallest glass
+  fills the block, the shortest lands near half of it, and the ORDER is
+  untouched. 0.32 and 0.68 are not tuned constants; they are what puts the shot
+  at about half, and they hold if the tallest or shortest glass changes. Then:
+  *"try drawing the glass as large as the whole title block, including the title
+  line itself. I think the stability of the top edge will help the switch to
+  MAKE IT mode feel less jarring."* So the template emits a fraction
+  (`--glass-fill`) and the block's height does the rest: `make it` hides the
+  tagline, the block shortens, and the glass shrinks from a top edge that never
+  moves. `display_scale` is not applied here; it exists for CARD size, where a
+  Collins is a stripe beside an old-fashioned. `tallest_mm` is counted live
+  over `all_icons`, never hardcoded.
+- **2026-08-31, #601 — the card got its own curve, and the drink page's comment
+  had claimed it all along.** The card maps onto 0.5–1.0 because its short end
+  must read against a grid of NEIGHBOURS rather than a title block, and its
+  headroom lives in `$card-glass-scale`. Until that day the drink page's
+  comment said the card applied "the same compression… with its `spread`
+  curve" when it had none at all, and `display_scale`'s header in `glasses.yml`
+  said the same. **A cross-reference to another file's behaviour is a claim
+  nothing re-checks.**
+
 ### §9.12 / §9.12.1 Methods and garnishes
 
 - **2026-08-26, #290** — `methods.yml` added: 277 steps across 105 drinks, 144
@@ -3394,6 +3524,26 @@ unless stated.
   Carta Switchel and Don's Mai Tai each pour SIX measured ingredients against a
   cap of five, which is what their own `why:` lines had said all along. Check
   the claim before writing it into the data.
+- **2026-09-17, #1138 / #1143 — the garnish step reads as English.** The step
+  (2026-09-05, §9.10a) had joined every garnish with `and`, which gave the
+  Hurricane *"a mint sprig and a fruit wedges and a maraschino cherry"*. #1138,
+  Helen: *"If there are more than two garnishes, separate all with a comma
+  except for the penultimate pair, which get no comma."* — so `A, B and C`, no
+  serial comma. #1143: *"If the garnish is plural, it should not start with
+  'a'."* The layout's comment had said no rule short of a dictionary could tell
+  `raspberries` from `brandied cherry`; a final `s` does, and every plural in
+  the collection with it. `no_article` keeps only what a final `s` cannot
+  reach: `grated nutmeg` (a mass noun), `half an empty passion fruit shell`
+  (brings its own article), and `pineapple and brandied cherry` until it was
+  deleted unused (#1186, 2026-09-25). **Why a rule and not only the list**: the
+  failure Helen hit was a draft's `fruit wedges`, which is not declared at all,
+  and a list-only rule is silent exactly where a new spelling appears first. A
+  singular noun ending in `s` (`lemongrass`, `hibiscus`) would come out wrong;
+  none is declared, and if one arrives it wants an `always_article` list beside
+  `no_article` rather than a cleverer test —
+  `test_no_declared_garnish_needs_an_article_it_cannot_get` will say so. The
+  parts are joined on `|` because Liquid cannot append to an array, and
+  `test_no_garnish_contains_the_join_separator` keeps `|` out of the vocabulary.
 
 ### §9.13 The visual language — the rounds
 
@@ -4560,6 +4710,71 @@ unless stated.
   `linear-gradient` — a background IMAGE, whose `background-size` can shrink the
   painted block inside a box that never changes. **Paint-only is not only about
   neighbours moving; it is also the lever that lets a fill be retuned at all.**
+
+- **2026-09-02 — the drink's name went onto the card's Dymo tape.** Helen's
+  brief: *"worn black Dymo tape with white punched lettering."* Reused rather
+  than redrawn: `.drink-card-name` > `.drink-card-tape` >
+  `.drink-card-tape-bg[data-card-tape]` + `.drink-card-tape-word`, the four
+  classes `_cards.scss` styles and the slot `decorations.js`'s `cardTapes()`
+  fills on any page. **The wrapper is a `<div>`, not the card's `<p>`**: a
+  card's tape wraps an `<a>`, this one wraps a real `<h1>`, and a `<p>` may not
+  contain a heading — the browser would close it early and break the tape's
+  boxes to do it. **The h1 is `display: contents`**: the tape word already
+  carries its own two-copy raised lettering, so `@include lettering(display)`
+  on the h1 would stack a second emboss; dropping only the h1's box gives its
+  text the span's colour, stroke, shadow, size and ellipsis while the DOM keeps
+  a real heading. `data-card-tape`'s VALUE has been unused since #779 (*"All
+  tape."*, every slot rolls its own), and stays a number so this page and the
+  index keep one shape.
+- **2026-09-02 / 2026-09-05 — the meta is a `<dl>` of three facts: glass,
+  garnish, SHIP IT?.** Garnish is a LIST — Cobra's Fang carries a mint sprig
+  AND a lime wheel — joined whole, because the alternatives are equally good
+  serves, not a fallback. **The glass line is the glass and nothing else**: the
+  ice and the rim rode on it for about an hour on 2026-09-05 and Helen killed
+  it — *"I don't think it makes sense to show 'hurricane, blended'"* (blended
+  is not a property of a glass) and *"ice pedantry will be more likely to be
+  seen at the point in the make where it happens."* **SHIP IT? reads the index
+  card's own include** (`_includes/cocktails/ship.html`, factored out
+  2026-09-02) so the two can never name a rung differently, and it is
+  unconditional because an unrated drink prints `???` (#722). It renders in
+  both states and the stylesheet hides it in `make it`: nothing leaves the DOM,
+  so print and a no-JS reader keep the fuller page. **The layout's comment said
+  the opposite until 2026-09-29** — "`make it` ONLY… drop the ship mark from
+  read it mode" — keeping the hour this shipped the wrong way round on a
+  mis-stated instruction (the 2026-09-05 round above); the stylesheet was
+  right. **No control goes in this row.** A shortlist toggle shared it from
+  2026-09-04 (*"the top right of the metadata panel on cocktail pages"*) inside
+  a wrapper rather than as a fourth item: dropped into the flex row it would
+  have inherited the facts' 5rem gap, wrapped with them on a narrow screen and
+  claimed to be a fourth thing the drink IS. The control left in #897; the
+  argument is kept because it is the one to make again.
+- **2026-09-05 — the drink page's mood chips became LINKS to the filtered
+  index.** Helen's first brief: *"Must be the same chips as on the cards."*
+  Then: *"let's wire the chips up to show a filtered index page please, echoing
+  what we do on the food site, which feels lovely."* The old `<span>` with
+  `cursor: default` was saying this page has no filter list for a click to
+  narrow — true, and the wrong conclusion: the word takes you to where the
+  filtering happens. Sharper once the chips took their section colours at rest
+  and hover went to magenta, which here means "you can touch this". An `<a>`
+  with a real href rather than a button and `location.href`, for food's
+  `recipe_badges.html` reason since #40: middle-click, open in a new tab, copy
+  link address and hover all work. **Alphabetical, not as typed** — #710,
+  Helen: *"render cocktail tags on cocktail pages in alphabetical order because
+  no one cares which group they came from."* The typed order clumped by
+  taxonomy group closely enough to look like a claim; the `--hassle` / `--mood`
+  colour already says which group a chip is in.
+- **2026-09-10, #897 — read it / make it moved under the title block's rule.**
+  Helen: *"move read it / make it toggle to the top right of the page main
+  content, just under the section divider that sits between the metadata
+  section and ingredients."* The same day the toggle went to the row's LEFT
+  (the family-weekend pass above). It had sat on the title line since
+  2026-09-02; the shortlist button travelled with it until #963 (2026-09-11) and
+  came back with every other action in #1005 — four homes in ten days, which is
+  what #1005 was raised on. Both labels always show and the active one is bold,
+  so the mode reads from the words and not only the knob — Helen's 2026-09-02
+  brief: *"remake this button as a binary slider/toggle... with 'read it' or
+  'make it' active"*. `assets/js/cocktail-make.js` says why that is not #494's
+  ambiguous-label trap.
 
 ### §9.1 — the September promotion batch, 2026-09-17 to 2026-09-19
 Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
@@ -7868,6 +8083,79 @@ verification. Dates are when the correction landed.
     drink page, against a 1–2px stroke. Its docstring's own first limit
     applies: the pineapple is many separate strokes, so this may be two tips
     that really do sit close. It flags; looking at the drawing decides.
+- **2026-09-30, #1210 — the recipe action buttons, redrawn: the question was
+  never the arrangement.** Helen, opening the session: *"The layout/styling
+  of these has always made me unhappy ... please tell me why I hate the
+  current design."* Read back through the issues it was six in two weeks —
+  #1086, #1163, #1164, #1176, #1182, #1210 — each fixing the arrangement in
+  the latest screenshot (two-by-two, one per line, count first, left-aligned,
+  two columns, "don't push INGREDIENTS down"), and #1182 carrying her own
+  verdict on the result: *"I still don't love how this feature looks but I
+  desperately want to keep it."* **The diagnosis offered, and accepted:** four
+  controls of three different kinds (a toggle, a link to another page, a
+  browser command, a download) drawn identically as bare Courier caps; a 2×2
+  grid that read as a table whose rows meant nothing; no order of importance
+  between the one feature she wanted to keep and two occasional ones; a block
+  always two lines tall that lined up with nothing; and four labels that could
+  never fit one phone line, so every fix reflowed. **No rearrangement of four
+  could have settled it, because the four did not belong together.**
+  - **Two candidates pages, and the second was one treatment.** The first
+    (Artifact `XfCF2BGm7SJcmr8pKvLT8X`) put five treatments on the real
+    Daiquiri and moules pages in a frame at 360/390/1280 with the shortlist
+    seeded empty or at 3; her reply was a brief, not a pick: *"I'm still
+    really struggling with this ... Please show me just one thing."* The
+    second (`U5fdMTN1aHPThtmink6ujV`) built that brief and nothing else, and
+    she took it whole: *"I'm sold! No notes. Ship it please!!!!"* §13.11's
+    "one round settles one question" held both times; the lesson is that when
+    the pick is a brief, the next page is the brief alone.
+  - **Print and pdf are things you do WITH the page; they went to the top
+    right,** the right-hand end of the furniture line, *"so where the
+    omnisearch currently is"* — `_includes/page-print.html`, rendered only
+    when a layout passes `actions=true`, which the magic-bag page does not
+    (no PDF beside it: #86's 404). The dot between them is markup, hidden
+    while the print button is.
+  - **The search box is a testing tool now, and sits where one sits:** the
+    header, *"directly under [ FOOD ] ->, to show on the local site only —
+    this is key for me during testing so I'm not clicking about all over the
+    place."* Asked whether it stays at all: *"honestly it's very useful for
+    md proofreading in the local build so it's staying at least for now."*
+    `_includes/page-search.html`, gated on `show_header_search` in
+    `_config_local.yml` alone (the `show_drafts` idiom); the deployed site
+    has no search box anywhere, for the first time since #1024. On an index
+    it is a plain form; `page-search.js` stays a page-layout script.
+  - **The shortlist pair sits on the first line under the rule, at the
+    right, on both sites** — the toggle's line on a drink page, and *"on the
+    same line as INGREDIENTS for Moules where it doesn't have the read it
+    make it toggle."* Food's `.recipe-controls` row is gone; its hairline
+    survives as `<hr class="recipe-head-rule">`, and #1124's
+    rule-to-INGREDIENTS distance was re-measured at 104.9px on the drink
+    page (block gap + the 28.9px pill + 3rem) and matched on food with one
+    6.55rem margin. **Below 600px the pair takes the line above on both
+    pages**: INGREDIENTS is 224px in a 312px column at 360, so the pill
+    cannot share it, and the drink page's `flex-wrap` "safety valve" (#1163)
+    became a column at every phone width — the shape no longer depends on
+    the width or the count, which is what #1210 had asked for and what
+    wrapping could never give.
+  - **The pair is deliberately unmatched.** *"The button for + SHORTLIST
+    then (3) for the see list link just isn't clear to me at all. I've
+    struggled with this the whole time. I can't make them look similar."*
+    They are not similar — one changes this page, the other leaves it — so
+    the button is the one bordered thing on its line (the index's own
+    `.btn-shortlist-only` pill, hover and on taking the border to
+    `currentColor`), and the link is quiet caps: `SEE SHORTLIST (N)`, word
+    first, **reversing #1164** (count first so the pair would repeat the
+    button's shape — a reason that no longer applies), **no arrow** (*"I
+    also dislike the -> arrow so please remove that at least"*), and
+    **absent while N is 0** (`shortlist.js`), so `(0)` never appears.
+  - **Measured, not argued** (`scripts/browser/`, 2026-09-30): nothing
+    scrolls sideways at 360, 390 or 1280 on either page in either shortlist
+    state; the pill-and-link line is 270px in a 312px column; the deployed
+    header carries no `.page-search` and the about page carries none on a
+    local build either. The candidates build (`tmp/action_candidates/`) is
+    in the worktree with every screenshot.
+  - **What the session did NOT do**: touch `main`, merge, or build anything
+    the brief did not name. The first page's other four treatments were
+    offered and are on record; none is on the site.
 
 ## §14 Reference pages
 

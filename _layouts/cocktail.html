@@ -3,78 +3,27 @@ layout: default
 ---
 
 {% comment %} ─────────────────────────────────────────────────────────────────
-  COCKTAIL PAGE. Deliberately not modelled on recipe.html.
+  COCKTAIL PAGE. Deliberately not modelled on recipe.html: a drink is a
+  FORMULA (a spirit bill, a glass, a garnish, a short build), not a procedure.
+  The page's anatomy is MANUAL §9.13; each block below names where its reasons
+  are in DECISIONS.
 
-  A food recipe is a PROCEDURE: ordered steps, prep and cook time split, a
-  short-method toggle, main_ingredients triaged by the substitution test. A
-  cocktail is closer to a FORMULA — a spirit bill in fixed proportions, a
-  glass, a garnish, a short build — and forcing it into food's decision-support
-  shape is the specific mistake the architecture handover warns against.
-
-  THE SCHEMA THIS RENDERS CAME OUT OF THREE REAL DRINKS (Julien Sorel,
-  Sazerac, Cobra's Fang), the way food's came out of real recipes — not from
-  general knowledge about cocktails. See MANUAL's cocktails section for what
-  each field is for, what is settled and what is still open.
-
-  EMPTY ARRAY IS TRUTHY IN LIQUID. Only nil and false are falsy, so every
-  list-gated section below tests `.size > 0` rather than the bare value. This
-  is not hypothetical here: `garnish: []` is real, live data on 16 drinks
-  (caipirinha among them), and a bare truth test would draw a GARNISH heading
-  over blank space.
-
-  THIS NAMED sazerac.md AS THE EXAMPLE UNTIL 2026-08-31 and glossed it as "the
-  drink genuinely has no garnish", which had drifted into being exactly
-  backwards. That drink states `["no garnish"]` -- a DECISION, which renders --
-  where `[]` means nobody has filled the field in. The two are opposite claims
-  and the comment illustrated one with the other. Same bug as the 49 food drafts with
-  `notes: []` — see tests/test_site_config.py's
-  test_list_sections_are_conditioned_on_size_not_truthiness.
+  EMPTY ARRAY AND EMPTY STRING ARE BOTH TRUTHY IN LIQUID, and this layout has
+  been bitten four times. A list-gated section tests `.size > 0`; a
+  string-gated one tests against "". Never a bare truth test.
+  And tag delimiters are PARSED inside a comment block, so a comment
+  describes a tag in words and never quotes one: it broke this build once.
+  MANUAL §9.7 / DECISIONS §9.7.
 ────────────────────────────────────────────────────────────────────────────{% endcomment %}
 
-{% include back-to-index.html %}
+{% include back-to-index.html actions=true %}
 
 <article class="cocktail">
 
-  {% comment %} The glass icon sits with the title, looked up through
-     _data/cocktails/glasses.yml rather than guessed from the glass string —
-     the spreadsheet spells several glasses more than one way, and the map is
-     where that variance is handled.
-
-     A glass with no entry, or an entry naming a file that is not there,
-     renders NOTHING. That is deliberate. This used to add that `coupe` had no
-     artwork and so the no-icon path was "the normal case today, not an edge
-     one" — the coupe has been drawn since 2026-08-16 and redrawn twice since,
-     so that is no longer true and the path is a genuine edge case again. It
-     still fires, but only for artwork that is missing rather than for a drink
-     that named no glass: EVERY drink names one since #491 closed on
-     2026-08-30, and `any` was retired with it — that value meant "no
-     requirement", which Helen applies to every glass anyway. Same
-     absent-means-nothing convention as
-     _data/sites.yml's `reference_links` — a missing key must never become a
-     broken image. (This used to cite `footer_svg`, retired by issue #374 when
-     the footer became one artefact for the whole repo; the convention it stood
-     for is unchanged, only the example.)
-  {% endcomment %}
-  {% comment %} GLASS IS AN ORDERED LIST, FIRST IS PREFERRED. Helen's review of
-     the coupe phase (2026-08-17) settled it: three drinks name two acceptable
-     glasses, and Daisy de Santiago is "anything, but preferably a Collins".
-     The icon is drawn for the FIRST entry that has one, so a drink whose
-     preference has no artwork still gets its second choice rather than
-     nothing. Two drinks now name a second glass for that reason and two more
-     because Helen genuinely uses either — the Mai Tai is a double old
-     fashioned "more often" and a tiki mug "sometimes".
-  {% endcomment %}
-  {% comment %} The accumulator starts as "" and the final test is against "",
-     NOT a bare truth test. An empty string is TRUTHY in Liquid, so a drink
-     whose loop never runs sent an empty filename to the include tag — a hard
-     build failure reading
-     "File contains invalid characters or sequences: icons/glasses/.svg".
-     Third time this one property has bitten this layout: empty array on the
-     list sections, empty string on the source footer, and now here. NO DRINK
-     TRIGGERS IT TODAY — all 114 name a glass since #491 — so this guard is
-     protecting against a future drink rather than a present one, which is
-     exactly when a removed guard looks safe to remove.
-  {% endcomment %}
+  {% comment %} THE GLASS ICON is the FIRST glass in `page.glass` with artwork in
+     glasses.yml `icons`; none renders nothing, never a broken image. The
+     accumulator starts at "" and is tested against "" (see the header).
+     MANUAL §9.11 / DECISIONS §9.11 (2026-08-17), §9.7. {% endcomment %}
   {% assign glass_icon = "" %}
   {% for g in page.glass %}
     {% if glass_icon == "" %}
@@ -84,74 +33,18 @@ layout: default
   {% endfor %}
   {% capture glass_icon_file %}icons/glasses/{{ glass_icon }}.svg{% endcapture %}
 
-  {% comment %} SIZED BY REAL HEIGHT NOW, NOT A COMMON RENDERED HEIGHT — #298,
-     2026-08-25. Every icon used to render at a flat 2.6rem regardless of the
-     actual glass, which is why a 60mm shot glass and a 230mm flute stood
-     equally tall. `heights_mm` (glasses.yml) already existed for exactly
-     this — its own comment said "the site itself does NOT use these yet" —
-     and `_dev/glasses.html`'s "relative scale" view already proved the
-     calculation looks right; this just brings it to the real page.
-     `tallest_mm` is COUNTED LIVE, not hardcoded, so a new glass with a
-     bigger heights_mm value doesn't need this template touched — same
-     rigor the dev page already holds itself to. A glass with no heights_mm
-     entry falls back to the SCSS default (2.6rem) via the custom property's
-     own fallback, so this can never send a blank height to the page. {% endcomment %}
+  {% comment %} HOW TALL: `heights_mm` against the tallest glass, COUNTED LIVE,
+     compressed onto 0.32–1.0 (the tallest fills the title block, a shot about
+     half of it) and sent as a FRACTION of the block, so `make it` shrinks it
+     from a fixed top edge. No `display_scale` here: that is the card's. A
+     glass with no `heights_mm` falls back to the SCSS default.
+     MANUAL §9.14 / DECISIONS §9.11 (2026-08-26). {% endcomment %}
   {% assign heights_mm = site.data.cocktails.glasses.heights_mm %}
   {% assign tallest_mm = 0 %}
   {% for icon in site.data.cocktails.glasses.all_icons %}
     {% assign mm = heights_mm[icon] | times: 1.0 %}
     {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
   {% endfor %}
-  {% comment %} THE SCALE IS 10.4rem, NOT 2.6rem, since 2026-08-26 — the glass
-     stopped being an icon beside a title and became the page's hero. It is
-     still the same calculation against the same live-counted tallest glass;
-     only the constant moved. `display_scale` from glasses.yml is deliberately
-     NOT applied here: it exists because true relative height reads badly at
-     CARD size, where a Collins is a stripe beside an old-fashioned. At this
-     size the real proportions are the point. {% endcomment %}
-  {% comment %} THE HEIGHT IS COMPRESSED, NOT PROPORTIONAL — Helen, 2026-08-26:
-     "let the height of the glass be more similar to the title block, if the
-     glass is tall. For shorter glasses, try half height."
-
-     True relative height is correct information and, on a page with one glass
-     on it, poor drawing: a 60mm shot rendered at 26% of a flute is a stamp
-     beside a paragraph. So the ratio is mapped onto the range 0.32–1.0 rather
-     than 0–1: the tallest glass fills the title block, the shortest lands near
-     half of it, and the ORDER is untouched — a shot is still shorter than a
-     Collins, just not four times shorter.
-
-     THE CARD HAS ITS OWN CURVE NOW, AND IT IS A DIFFERENT ONE — 2026-08-31,
-     #601. It maps onto 0.5–1.0 where this maps onto 0.32–1.0, because there
-     are ~114 glasses in that grid and the short end has to stay legible
-     against its NEIGHBOURS rather than against a title block. Its headroom
-     lives in `$card-glass-scale`, not in its ratio.
-
-     (This comment claimed the card applied "the same compression... with its
-     `spread` curve" until that day, when the card had none at all. It was
-     wrong for as long as it existed, and `display_scale`'s header in
-     glasses.yml said the same thing — worth knowing as the shape of the error
-     rather than the instance: a cross-reference to another file's behaviour is
-     a claim nothing re-checks.)
-
-     0.32 and 0.68 are not tuned constants to preserve — they are simply what
-     puts the shortest real glass (shot, 60mm of a 230mm tallest) at about half
-     the block. If the tallest or shortest glass changes, they still hold. {% endcomment %}
-  {% comment %} A FRACTION NOW, NOT A HEIGHT. The glass is drawn against the
-     title block rather than against a fixed scale — Helen, 2026-08-26: "try
-     drawing the glass as large as the whole title block, including the title
-     line itself. I think the stability of the top edge will help the switch to
-     MAKE IT mode feel less jarring."
-
-     So the template's job is no longer "how many rem" but "what fraction of
-     the block", and the block's own height decides the rest. That is what
-     makes the two states agree: pressing `make it` hides the tagline, the
-     block gets shorter, and the glass shrinks with it from a top edge that
-     never moves.
-
-     The compression is unchanged (0.32–1.0), so the TALLEST glass fills the
-     block and a shot fills about half of it — relative height survives, which
-     it would not if every glass simply filled the box. See _cocktail.scss for
-     why that trade went this way. {% endcomment %}
   {% assign icon_mm = heights_mm[glass_icon] %}
   {% if icon_mm and tallest_mm > 0 %}
     {% assign ratio = icon_mm | times: 1.0 | divided_by: tallest_mm %}
@@ -159,82 +52,27 @@ layout: default
     {% capture glass_icon_style %} style="--glass-fill: {{ compressed }};"{% endcapture %}
   {% endif %}
 
-  {% comment %} WHERE THE INDEX IS, FROM _data/sites.yml VIA `page.site_key`,
-     never a literal `/cocktails/` -- the same lookup _includes/back-to-index.html
-     makes for the journey in the other direction, so a drink page's back arrow
-     and its two rows of mood chips can never disagree about it. Assigned up
-     here rather than beside the chips since #994; that issue's link, which read
-     it first, is gone (#1000) and the chips are its two readers again. {% endcomment %}
+  {% comment %} WHERE THE INDEX IS, from _data/sites.yml via `page.site_key`,
+     never a literal `/cocktails/` -- the lookup _includes/back-to-index.html
+     makes. Read by the head's chips and the related cards' chips. {% endcomment %}
   {% assign index_home = site.data.sites[page.site_key].home %}
 
-  {% comment %} TWO STATES, ONE PAGE. The toggle adds `is-making` to the
-     article and _sass/cocktails/_cocktail.scss does the rest — nothing leaves
-     the DOM, so this page still prints and still reads with JS off, in the
-     editorial state, which is the one carrying the most information. Same
-     progressive-enhancement contract as the back arrow. {% endcomment %}
+  {% comment %} TWO STATES, ONE PAGE. The toggle adds `is-making` and
+     _sass/cocktails/_cocktail.scss does the rest. Nothing leaves the DOM, so
+     print and a no-JS reader get the read state, which carries the most.
+     MANUAL §9.13. {% endcomment %}
   <div class="cocktail-title-block{% if glass_icon == "" %} cocktail-title-block--no-glass{% endif %}">
     {% if glass_icon != "" %}
       <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}
     <div class="cocktail-head-words">
-      {% comment %} THE NAME SITS ON THE SAME DYMO TAPE AS A CARD'S, 2026-09-02
-         -- Helen's brief: "worn black Dymo tape with white punched lettering."
-         Reused exactly rather than redrawn: `.drink-card-name` >
-         `.drink-card-tape` > `.drink-card-tape-bg[data-card-tape]` +
-         `.drink-card-tape-word`, the same four classes _sass/cocktails/_cards.scss
-         already styles and the same slot assets/js/decorations.js's cardTapes()
-         already fills for any page, not only the index — verified against that
-         function during the fold work (MANUAL §9.13). `data-card-tape` is the
-         selector cardTapes() and universe.js find the slot by; its VALUE has
-         been unused since 2026-09-11 (#779, Helen: "All tape." -- every slot
-         rolls its own random tape per load), and stays a number only so the
-         index's `forloop.index` and this `page.url` length keep one shape.
-
-         THE OUTER WRAPPER IS A `<div>`, NOT THE CARD'S `<p>`. A card's tape
-         wraps an `<a>` and a `<p>` may legally contain one; this page wraps a
-         real `<h1>`, and a `<p>` may not legally contain a heading — the browser
-         would close the paragraph early and break the tape's own box structure
-         to do it. `.drink-card-name` is a class selector regardless of the tag
-         it lands on, so nothing in _cards.scss cares which element carries it.
-
-         THE H1 IS `display: contents`, in _sass/cocktails/_cocktail.scss. The
-         tape word already carries its own two-copy raised lettering (§9.13,
-         "two near-whites, no softening shadow") — giving the h1
-         `@include lettering(display)` on top would be a second emboss stacked
-         on the first. `display: contents` drops only the h1's own box, so its
-         text renders as if it were the tape word's direct content and picks up
-         that span's colour, stroke, shadow, size, line-height and ellipsis for
-         free, while the DOM keeps a real heading for anyone not reading pixels.
-      {% endcomment %}
-      {% comment %} THE NAME IS ALONE IN THE HEAD, AND SINCE 2026-09-15 (#1086)
-         IT HAS NO WRAPPER ROW EITHER. The read it / make it toggle sat on this
-         line from 2026-09-02 to 2026-09-10 (#897), and the shortlist button
-         from 2026-09-11 (#963) -- its fourth home in ten days, which is the
-         fact #1005 was raised on: no rule said where actions live. Helen's
-         pick from the candidates page was "row under the head", and #1005
-         moved every action into _includes/page-actions.html, beside the
-         toggle in `.cocktail-controls` below -- the same include a recipe
-         page carries. A second copy of the shortlist button was left behind
-         HERE by that change, so a drink page carried two of them until the
-         2026-09-15 design review; Helen, on being shown it: "actions row
-         only." The one in the controls row is the one that stays, and
-         `?shortlist=1` on the index (MANUAL 8.9) still has its caller in that
-         row's see-shortlist link.
-
-         THE ROW WENT WITH IT, because a `.cocktail-title-row` at
-         `display: contents` with one child is a wrapper that draws nothing and
-         can still be told to do something -- the phone grid asked it to span
-         both columns, an element with no box could not, and the name was laid
-         out in the 4.5rem GLASS column with its lettering running out over the
-         page (#1086, bug 1). The name is placed on the head's grid directly
-         now, and on a phone on `.cocktail-title-block`'s own grid. {% endcomment %}
-      {% comment %} THE DRAFT MARK SITS INSIDE THE NAME, AFTER THE TAPE --
-         #1162. Helen: "to the right of the name tape, below if needed", which
-         is a flow instruction and not a position: this wrapper becomes a
-         wrapping flex row (_sass/cocktails/_cocktail.scss), so the badge takes
-         the space beside the tape when there is any and drops under it when
-         there is not. The card's own copy of this badge is absolute instead,
-         because there the corner it goes in is already spoken for. {% endcomment %}
+      {% comment %} THE NAME IS ON THE CARD'S DYMO TAPE: the same four classes
+         _cards.scss styles and decorations.js's cardTapes() fills. A `<div>`,
+         not the card's `<p>`, because it holds a real `<h1>`; the h1 is
+         `display: contents` so the tape word's lettering is the only emboss.
+         No wrapper row round it (#1086). The draft badge flows beside the tape,
+         or under it when there is no room (#1162).
+         MANUAL §9.13 / DECISIONS §9.13 (2026-09-02, #1086), §13 (#1162). {% endcomment %}
       <div class="drink-card-name">
         <span class="drink-card-tape">
           <span class="drink-card-tape-bg" data-card-tape="{{ page.url | size }}"></span>
@@ -243,61 +81,19 @@ layout: default
         {% include cocktails/draft-badge.html doc=page %}
       </div>
 
-      {% comment %} `QQ` IS THE INGEST PLACEHOLDER, NOT A REAL TAGLINE — see
-         model_instructions/INGEST_ONE_COCKTAIL.md §"Leave both as QQ": every
-         drink is ingested with `tagline: "QQ"` until Helen writes the real one
-         by hand, since a tagline is voice and nothing in a source photo can
-         supply it. A bare `page.tagline` truth test would print "QQ" as if it
-         were the drink's one line of prose on every draft that has not had one
-         written yet — most of them. {% endcomment %}
+      {% comment %} `QQ` is the ingest placeholder, never a tagline to print --
+         model_instructions/INGEST_ONE_COCKTAIL.md, "Leave both as QQ". {% endcomment %}
       {% if page.tagline and page.tagline != "QQ" %}
         <p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>
       {% endif %}
 
-      {% comment %} META IS A <dl> OF THREE NOW, 2026-09-02 -- glass, garnish,
-         SHIP IT?. Glass is a scalar list; garnish is a LIST — Cobra's Fang
-         carries a mint sprig AND a lime wheel, so the single-value shape the
-         first sketch assumed was wrong the moment real data arrived. `join` on
-         the whole list, not the first entry plus a separate "or" line: the
-         alternatives are equally acceptable serves, not a fallback.
-
-         SHIP IT? IS UNCONDITIONAL, unlike glass and garnish, which still guard
-         themselves individually (belt and braces — #491 means every drink
-         names a glass today, but the guard cost nothing to keep). A ship rating
-         may be off the scale ("who knows"), and the include below renders that
-         as `???` — Helen, 2026-09-05, #722 — so the line always has a word in
-         it and there is nothing to gate here. {% endcomment %}
-      {% comment %} THE META IS THREE FACTS AND NOTHING ELSE. It shared a row
-         with a shortlist toggle from 2026-09-04 (Helen's placement then: "the
-         top right of the metadata panel on cocktail pages"), inside a wrapper
-         rather than as a fourth item in the `<dl>` -- the list is three facts
-         with a 5rem gap between them, and a control dropped into that flex row
-         would inherit the gap, wrap with the facts on a narrow screen, and
-         claim to be a fourth thing the drink IS. The control left in #897 and
-         the wrapper with it; the argument is kept because it is the one to
-         make again if anything is ever proposed for this row. {% endcomment %}
+      {% comment %} THE META IS THREE FACTS AND NOTHING ELSE: glass, garnish, SHIP
+         IT?. No control goes in this row. Glass reads "A, B or C", no Oxford
+         comma ("nick and nora" is one glass). SHIP IT? is the index card's own
+         include, unconditional (an unrated drink says `???`), and hidden in
+         `make it` by the stylesheet.
+         MANUAL §9.13 / DECISIONS §9.13 (2026-09-02 / 2026-09-05), §13 (#704). {% endcomment %}
       <dl class="cocktail-meta">
-        {% comment %} THE GLASS LINE IS THE GLASS AND NOTHING ELSE, 2026-09-05.
-           The ice and the rim rode here for about an hour and Helen killed it:
-           "I don't think it makes sense to show 'hurricane, blended'" — blended
-           is not a property of a glass — and, generally, "ice pedantry will be
-           more likely to be seen at the point in the make where it happens."
-           Both moved to the "To serve" block below the method. {% endcomment %}
-        {% comment %} COMMAS, THEN "or" BEFORE THE LAST -- #704. A plain
-           `join: " or "` reads fine for two and badly for three: the
-           Boulevardier, the only drink naming three, read "old fashioned or
-           coupe or nick and nora". It now reads "old fashioned, coupe or nick
-           and nora". Eight drinks name two and are unaffected -- "flute or
-           coupe" is what both spellings produce.
-
-           NO OXFORD COMMA, which is house style and also the only reading that
-           works here: "coupe, or nick and nora" would suggest the last option
-           is itself a pair, and "nick and nora" is one glass.
-
-           `slice` RATHER THAN A COUNTER. Liquid has no pop, and building the
-           string in a loop with an index test is the version that gets edited
-           wrongly later. `slice: 0, n-1` is the whole head of the list.
-        {% endcomment %}
         {% if page.glass.size > 0 %}
           <div><dt>Glass</dt><dd>
             {%- if page.glass.size == 1 -%}
@@ -312,92 +108,16 @@ layout: default
         {% if page.garnish.size > 0 %}
           <div><dt>Garnish</dt><dd>{{ page.garnish | join: ", " }}</dd></div>
         {% endif %}
-        {% comment %} THE SAME INCLUDE THE INDEX CARD READS —
-           _includes/cocktails/ship.html, factored out 2026-09-02 so the two can
-           never render a different word for the same rung. See
-           cocktails/index.html's own call for the other half of this pair.
-
-           `make it` ONLY, SINCE 2026-09-05 — Helen: "drop the ship mark from
-           read it mode." It renders in both states and the stylesheet hides it
-           in one, rather than the template gating it, for the reason the whole
-           two-state head follows: nothing leaves the DOM, so the page still
-           prints whole and still reads whole with JavaScript off — and the
-           no-JS state is the editorial one, which must carry MORE rather than
-           less. See `.cocktail-meta-ship` in _sass/cocktails/_cocktail.scss.
-        {% endcomment %}
         <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
       </dl>
 
-      {% comment %} CHIPS ARE THE CARD'S MOOD CHIPS, AND NOW THEY GO SOMEWHERE.
-         Helen's original brief: "Must be the same chips as on the cards." Same
-         classes (`.drink-card-mood`, `--hassle` via taxonomy.yml's
-         `mood_groups`) and the identical derivation loop cocktails/index.html
-         runs, so a mood can never look different here than it does on the card
-         it came from.
-
-         AN `<a>` SINCE 2026-09-05, replacing a `<span>` -- Helen: "let's wire
-         the chips up to show a filtered index page please, echoing what we do
-         on the food site, which feels lovely." It echoes it exactly:
-         _includes/recipe_badges.html has been a real link to a pre-filtered
-         index since issue #40, and the argument there holds here word for word
-         -- an `<a>` with a real href is what makes middle-click, open-in-new-tab,
-         copy-link-address and "where does this go" on hover all work, where a
-         button plus `location.href` breaks every one of them.
-
-         This page has no filter list of its own for a click to narrow, which is
-         what the old `<span>` and its `cursor: default` were saying. That was
-         true and was the wrong conclusion: the answer is not that the word does
-         nothing, it is that the word takes you where the filtering happens.
-         Sharper still since the chips took their section colours at rest and
-         hover went back to magenta, which on this site means "you can touch
-         this" -- so a chip that could not be touched was making a promise the
-         page could not keep.
-
-         `url_encode` IS JEKYLL'S `CGI.escape` AND SPELLS A SPACE AS `+`, which
-         assets/js/filter-state.js's `decodeValue` is written to undo -- the same
-         dependency food's badges have, and it matters here for every two-word
-         mood ("sunny terrace", "no juicing", "i want to faff").
-
-         EVERY HREF ENDS IN `#filter-mood` OR `#filter-hassle` -- #1059,
-         2026-09-15, the same argument food's badges make: nothing intercepts
-         this click, so the fragment is what lands the reader on the section
-         holding the lit chip rather than the top of the index. `chip` below is
-         already `"mood"` or `"hassle"`, the same word cocktails/index.html's
-         two section ids use, so a chip and its section can never disagree
-         about the fragment.
-
-         THE HOME URL COMES FROM _data/sites.yml VIA `page.site_key`, not from a
-         literal `/cocktails/`. That is what _includes/back-to-index.html does
-         for the same journey in the other direction, and it means a drink page
-         and its back arrow can never disagree about where the index is.
-      {% endcomment %}
-      {% comment %} `index_home` IS ASSIGNED ABOVE THE TITLE BLOCK now that the
-         see-all link (#994) needs it before this row does; it was `chip_home`
-         and assigned here until 2026-09-12. One lookup, three users on this
-         page -- that link, these chips and the related cards' chips. {% endcomment %}
+      {% comment %} MOOD CHIPS: the card's chips, as LINKS to the index filtered on
+         the word. `url_encode` spells a space `+`, which filter-state.js's
+         `decodeValue` undoes; the fragment lands on the section holding the lit
+         chip (#1059). `sort_natural`, not `sort`: `sort` is ASCII and puts
+         "I want to faff" first.
+         DECISIONS §9.13 (2026-09-05, #710), §9.7 (2026-09-06), §13 (#1059). {% endcomment %}
       {% assign mood_groups = site.data.cocktails.taxonomy.mood_groups %}
-      {% comment %} ALPHABETICAL, NOT AUTHORED -- #710, Helen: "render cocktail
-         tags on cocktail pages in alphabetical order because no one cares which
-         group they came from."
-
-         The authored order carries the order the moods were TYPED, which
-         follows taxonomy.yml's groups closely enough to look like a claim --
-         the hassle moods clump because that is the section they were copied
-         from. Sorting removes a grouping the page was implying and nobody
-         reads. The `--hassle` / `--mood` colour still says which group a chip
-         belongs to, which is the part that carries information; the ORDER was
-         only ever restating it, badly.
-
-         `sort_natural`, NOT `sort`, AND THE DIFFERENCE IS 12 DRINKS. This
-         said `sort` and claimed every mood was lowercase since #543. That is
-         wrong: `I want to faff` is capitalised, and Liquid's `sort` is
-         ASCII -- so a capital I sorts before every lowercase letter and that
-         mood jumped to the front of any card carrying it, ahead of
-         `aperitivo`. Alphabetical is what #710 asked for, and a word out of
-         order is more visible than the grouping it replaced.
-
-         Measured across the collection: 18 drinks carry the mood and the two
-         sorts disagree on 12 of them. {% endcomment %}
       {% if page.mood.size > 0 %}
         {% assign sorted_moods = page.mood | sort_natural %}
         <div class="cocktail-chips">
@@ -407,24 +127,11 @@ layout: default
     </div>
   </div>
 
-  {% comment %} THE CONTROLS ROW: read it / make it, just under the title
-     block's rule -- #897, Helen, 2026-09-10: "move read it / make it toggle to
-     the top right of the page main content, just under the section divider
-     that sits between the metadata section and ingredients." Then, the same
-     day, toggle to the LEFT of the row. The shortlist button travelled with
-     the toggle until 2026-09-11, when #963 put it at the right end of the
-     title row instead; it came back here with the rest of the actions in
-     #1005, and the copy #1005 left in the head was deleted in #1086 ("actions
-     row only") -- so this row holds the only one on the page.
-
-     THE TOGGLE: three elements, one group -- a "read it" label, a track with a
-     knob, a "make it" label (Helen's 2026-09-02 brief: "remake this button as
-     a binary slider/toggle... with 'read it' or 'make it' active"). Both
-     labels are always visible and the active one is bold in
-     $color-electric-absinthe-deep, so which mode the page is in is legible
-     from the words, not only from the knob. See assets/js/cocktail-make.js
-     for why two always-visible labels are not the ambiguous-label trap #494
-     fixed by holding one constant label. {% endcomment %}
+  {% comment %} THE CONTROLS ROW, under the head's rule: read it / make it at the
+     left (both labels always visible, the active one bold), the shortlist pair
+     at the right -- page-actions.html, the include a recipe page puts on its
+     INGREDIENTS line. Print and pdf are on the furniture line since #1210.
+     MANUAL §9.13, §13.13 / DECISIONS §9.13 (#897, #1005, #1086), §13 (#1210). {% endcomment %}
   <div class="cocktail-controls">
     <div class="cocktail-toggle" role="group" aria-label="read it or make it">
       <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
@@ -433,206 +140,39 @@ layout: default
       </button>
       <button type="button" class="cocktail-toggle-label" data-mode="make" aria-pressed="false">make it</button>
     </div>
-    {% comment %} THE ACTIONS, AT THE ROW'S RIGHT END -- #1005 / #1011,
-       2026-09-14. shortlist, see shortlist (N), print, pdf: one include, the
-       same on a recipe page. Print and pdf are new to this page; the print
-       stylesheet (_sass/cocktails/_print.scss) already forces the full
-       editorial page whatever the toggle says, and scripts/generate_pdfs.py
-       renders a drink's pdf beside its page as it does a recipe's. {% endcomment %}
     {% include page-actions.html %}
   </div>
 
-  {% comment %} The ingredient list is FULL, not triaged the way food's
-     main_ingredients is — no completeness/substitution split, no pantry
-     demotion. Keys, each earning its place from the real data:
-
-       amount     the quantity, and the ONLY quantity field — "25 ml",
-                  "0.5 oz", "3 dashes". A `ml:` key sat beside this on every
-                  entry until #571 and is retired: 521 of them restated a
-                  string that already said the same number, and every one
-                  derives exactly from `measures:` in ingredients.yml.
-                  Helen: "Food YAML has this structure, and I'd like cocktails
-                  to match" — one display string, as a food recipe has.
-       item       what the source calls it, brand-led when the source names a
-                  bottle ("Appleton Estate Reserve")
-       generic    what you would ever FILTER by ("Jamaican, moderately aged").
-                  STRING OR LIST — a list means "either would do", never "and".
-       character  a property of THIS RECIPE'S use of the bottle, not of the
-                  bottle in the abstract (#441) — e.g. blackstrap. LIST.
-       suggestion the bottle NAME(S) ONLY, never reasoning (#457). STRING OR
-                  LIST.
-       note       the reasoning that used to get smuggled into `suggestion`
-                  (#457) — its own line, always visible, no interaction.
-       optional   BOOLEAN, absent means required (#570). The drink is still
-                  the drink without this pour. Two entries carry it today —
-                  Espresso Martini's syrup and Gunmetal Blue's Suze — and
-                  both said it inside `item` text before the field existed,
-                  which is #544's point exactly: `item` was holding a fact
-                  no field could.
-
-     `optional` IS NOT FOOD'S `incidental`, DESPITE THE MATCHING SHAPE. Both
-     are a bare boolean on an ingredient item and they do opposite things:
-     `incidental` HIDES the line entirely (a frying oil nobody measures),
-     `optional` SHOWS it and marks it. Do not reason from one to the other.
-
-     THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS, and this paragraph
-     described the OPPOSITE until 2026-08-30. It said "the headline is
-     `suggestion` when present, falling back to `item`" — that was the shape
-     settled on 2026-08-24 and #544 inverted it a week later, leaving the
-     comment describing a layout that no longer existed directly above the code
-     that replaced it. `character` then gets a LINE of its own rather than
-     folding onto the class line, since that line is gone; #441's ban on a bare
-     "(blackstrap)" is unaffected, because a LABELLED line carries none of the
-     "a TYPE of moderately-aged rum" confusion the parenthetical did.
-
-     `generic`/`suggestion` CAN BE A STRING OR A LIST, and Liquid's `for`
-     quietly treats a bare string as a one-item sequence (verified against the
-     real `liquid` gem, not assumed), so the same oxford-join loop handles
-     both shapes with no type check anywhere. Options are separated by a quiet
-     italic "or" rather than a comma, because the internal commas in names like
-     "Demerara, aged" collide with a plain list-join comma. That used to be
-     belt and braces — rum-family names also took a monospace face — and the
-     braces went on 2026-08-26 when Helen asked why some generics were in
-     Courier. The "or" was always the half doing the work.
-     NOT SOLVED HERE, deliberately: no spirit-word ("rum",
-     "gin") is appended after a bare style name, because several families
-     already bake their spirit into the string ("blanco tequila") and others
-     don't ("bourbon" needs no suffix, "London dry" does) — auditing all of
-     that is real, separate work, not a template one-liner.
-  {% endcomment %}
-  {% comment %} `family_of` used to be assigned here for the rum special case
-     below. That case is gone and so is the assignment — an unread variable is
-     the template equivalent of the dead selector it went with. {% endcomment %}
-  {% comment %} "FRESH" MADE EXPLICIT, AND THE OPPOSITE WARNING -- #707.
-     `_data/cocktails/ingredients.yml`'s own comment says freshly squeezed is
-     implied for every juice; these two declared lists are where that
-     implication becomes words on the page for the generics Helen named.
-     Read once here rather than per ingredient — Liquid re-resolves a `site.data`
-     path on every reference, and this loop runs once per pour. {% endcomment %}
+  {% comment %} THE INGREDIENT LIST IS FULL, not triaged like food's
+     main_ingredients. The keys are MANUAL §9.3. `generic` and `suggestion` may
+     be a string or a list: Liquid's `for` treats a bare string as a one-item
+     list, so one loop handles both. `optional` is NOT food's `incidental`:
+     `incidental` hides a line, `optional` shows it and marks it.
+     MANUAL §9.3, §9.10 / DECISIONS §9.10 (#544). {% endcomment %}
+  {% comment %} `always_fresh` and `standing_notes` (#707) are read once here,
+     not per pour: Liquid re-resolves a `site.data` path on every reference.
+     DECISIONS §9.3.1 (#707). {% endcomment %}
   {% assign always_fresh = site.data.cocktails.ingredients.always_fresh %}
   {% assign standing_notes = site.data.cocktails.ingredients.standing_notes %}
   {% if page.ingredients.size > 0 %}
-    {% comment %} THE SCALER IS ONE BOX UNDER THE LIST, 2026-09-05, and this is
-       the third place it has lived. #545 first put it at the FOOT of the page,
-       where you had to scroll past the amounts to reach the thing that changes
-       them; on 2026-09-04 it moved up onto the INGREDIENTS heading's own line.
-       Helen, having used that: "the normal scaler shouldn't get to be at the
-       top of the page. Please simplify it and move underneath the ingredients
-       list, just a single input text box, 2 characters wide, with a small x
-       next to it, no other text at all."
-
-       So it sits after the `</ul>`, which is where a control that RE-READS the
-       list belongs: you look at the amounts, then you change them, then you
-       look again — and the thing you are changing is above the control rather
-       than below it. The heading is a plain `<h2>` again, and the
-       `.cocktail-section-row` flex wrapper that held the two together is gone.
-       That wrapper had a cost nobody had priced: a flex item's margins never
-       collapse, so the heading's own 2.25rem top margin stopped collapsing with
-       the head block's bottom margin and started adding to it. Helen, on #720:
-       "the presence of the scaler has moved the whole page downwards." It had,
-       by about 36px on every drink page, and deleting the wrapper is the fix.
-
-       NO WORDS AT ALL, which is the part to hold. `make [1] × the recipe = 90
-       ml, or [90] ml in total` was five pieces of furniture explaining one
-       number. The box and a `×` say the same thing to anyone who has just read
-       a list of amounts, and say nothing at all to someone who has not looked
-       at the list yet, which is correct — this control is meaningless without
-       it. `aria-label` carries the sentence for a screen reader, where the
-       visual context the `×` leans on is not available. THE TWO STEP BUTTONS
-       ADDED FOR #731 KEEP THIS RULE: `−` and `+` are glyphs, not "fewer" and
-       "more" spelled out, and their own `aria-label`s carry the words instead —
-       see the comment beside them, below.
-
-       THE TARGET-ML BOX IS GONE — #720, #721. It let you type a total and
-       worked the ratios backwards, and Helen: "it's just baffling. Typing some
-       numbers changes nothing, typing others changes the recipe but you can't
-       see it." Both were true and neither was a bug: the drink's amounts have
-       to stay on the 2.5 ml grid, so Aviation can only be poured at multiples
-       of a third and only totals of 30, 60, 90, 120... are reachable. Typing 100
-       snapped silently back to 90. A control whose valid inputs cannot be seen
-       or guessed is not a control, and the multiple box asks the same question
-       in a form where every value you can type is one you can have.
-
-       MULTIPLES OF THE RECIPE AS WRITTEN — Helen, 2026-09-04. ×2 is twice what
-       the page says. `min` and `step` are set here for a reader with no
-       JavaScript-shaped opinion and RESET from the drink's own amounts by
-       cocktail-scale.js, which is the only thing that knows what multiples this
-       particular drink can be poured at.
-
-       THIS SAID "THERE IS NO `serves:` FIELD ON A DRINK AND THIS DOES NOT
-       INVENT ONE" UNTIL 2026-09-06, and half of that is now false: #297 added
-       `serves:` to nine drinks — the seven punch-bowl drinks, the mulled wine,
-       and the Modern Zombie whose own title says "makes 2".
-
-       THE OTHER HALF STILL HOLDS AND IS THE PART THAT MATTERED: this scaler
-       does not read it. ×2 is still twice the recipe as written, on a punch as
-       on anything else, because "how many does this make" and "how much am I
-       making" are different questions and only the second one is the multiple
-       box's. The units line in the footer reads `serves:`; nothing up here
-       does. See tests/test_cocktails.py's note beside TOP_LEVEL_KEYS for why
-       the field is deliberately narrow.
-
-       `hidden` UNTIL THE SCRIPT REVEALS IT, the rule every JS-dependent control
-       on both sites follows — see the shortlist button above, and
-       assets/js/cocktail-scale.js's own header. The wrapper carries the
-       `hidden` for the box and its mark together.
-
-       THE BITTERS CAVEAT IS GONE TOO — #720.1. It was revealed unconditionally
-       at init, so Aperol Spritz — prosecco, Aperol, soda water — was warned
-       that "bitters do not really scale linearly". A caveat that fires where it
-       does not apply teaches you to stop reading caveats. {% endcomment %}
+    {% comment %} THE SCALER sits under the list it re-reads: a box, a word and
+       two step buttons, no other text (the `aria-label`s carry the sentences).
+       Whole multiples of the recipe as written; `serves:` is not read here.
+       `hidden` until assets/js/cocktail-scale.js reveals it.
+       MANUAL §9.13 / DECISIONS §9.13 (#545, #720, #721, #731). {% endcomment %}
     <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
-        {% comment %} THE GATE ASKS FOR THE FIELDS THIS BLOCK ACTUALLY RENDERS,
-           and it has twice asked for one it did not. It named `item.item` until
-           #544 move 1 stopped rendering that field, which left a trap primed:
-           drop `item` from an entry and it falls through to the bare-string
-           branch below, where `{{ item }}` stringifies a Hash. Tried on Aperol
-           Spritz, and the page printed
-
-               {"amount"=>"90 ml", "generic"=>"prosecco"}
-
-           with a clean build and nothing in the log. The gate then named all
-           three until the field was RETIRED on 2026-09-21 (Helen: "'item'
-           needs to go. Kill it with fire"), and this block's `item` fallback
-           for a headline went with it -- an entry with no `generic` fails
-           test_every_ingredient_has_a_generic_or_a_qq, so the fallback was
-           guarding against data the schema already refuses.
-
-           A GATE MUST NAME WHAT THE BRANCH NEEDS, not what the data happened
-           to carry when it was written. The bare-string branch is for an
-           ingredient written as a plain string; there are none today, and a
-           dict arriving there is not that shape, it is this one with a key
-           missing.
-
-           `item` IS STILL THE LOOP VARIABLE, which is unfortunate and is not
-           the retired field: `{% raw %}{% for item in page.ingredients %}{% endraw %}` names each
-           ENTRY. Read `item.generic`, never `item.item`. {% endcomment %}
+        {% comment %} THE GATE NAMES WHAT THIS BRANCH RENDERS. A dict missing
+           both would fall to the bare-string branch and print as a raw hash.
+           `item` is the LOOP variable, not the retired field: read
+           `item.generic`. DECISIONS §9.10 (2026-09-05), §9.3 (2026-09-21). {% endcomment %}
         {% if item.amount or item.generic %}
-          {% comment %} THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS —
-             #544, Helen 2026-08-29: "London dry gin (Beefeater)". `item` does
-             not render at all, which is what makes "prosecco / prosecco" and
-             "fresh lime juice / lime juice" IMPOSSIBLE rather than suppressed:
-             the page printed the source's words and the vocabulary on top of
-             each other, and 385 of 617 pairs restated one another (#513).
-
-             THIS ONLY BECAME READABLE WITH #561. Before the rename, the same
-             change would have produced "moderately aged (Gosling's Black Seal)"
-             and "London dry (Tanqueray)" — a card name may be lossy, a recipe
-             line may not. Ten generics gained their spirit word first.
-
-             A LIST GENERIC joins with the same quiet italic "or" as before —
-             it means "either would do" (#441), never "and".
-
-             "FRESH " IS PREPENDED PER GENERIC, NOT PER LINE -- #707. A list
-             generic could in principle mix an `always_fresh` member with one
-             that isn't (none does today), so each `g` is tested on its own
-             before it joins the headline, the same way each `g` already
-             looks itself up rather than the whole `item.generic` value doing
-             so. `standing_note` is picked up in the same pass, for the same
-             reason `class_html` and `headline` already build inside one loop
-             over the ingredient's fields. {% endcomment %}
+          {% comment %} THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS (#544).
+             A list generic joins with an italic "or" -- either would do, never
+             "and" (#441). "fresh " is prefixed per generic, not per line, and
+             the standing note is picked up in the same pass (#707).
+             DECISIONS §9.10 (#544), §9.3.1 (#707). {% endcomment %}
           {% assign headline = "" %}
           {% assign standing_note = "" %}
           {% for g in item.generic %}
@@ -671,11 +211,8 @@ layout: default
             {% endfor %}
           {% endif %}
 
-          {% comment %} Character gets a LINE, not a parenthetical. #441 banned
-             a bare parenthetical because "moderately aged rum (blackstrap)"
-             reads as a TYPE of moderately aged rum — real confusion with black
-             rum. It folded onto the class line instead; that line is gone, and
-             a labelled line of its own carries none of that risk. {% endcomment %}
+          {% comment %} `character` gets a labelled LINE, never a bare
+             parenthetical (#441). DECISIONS §9.10 (#544). {% endcomment %}
           {% assign class_html = "" %}
           {% if item.character %}
             {% assign character_joined = item.character | join: ", " %}
@@ -685,55 +222,12 @@ layout: default
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
               {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
-              {% comment %} `optional` IS A PARENTHETICAL SINCE #1141
-                 (2026-09-17), and this reverses the paragraph that stood here.
-                 It argued: the brackets on this line already mean "the bottle",
-                 so "sugar syrup (optional)" beside "gin (Beefeater)" would make
-                 one punctuation mark carry two unrelated jobs — #441's argument
-                 about "(blackstrap)" arriving on a different field.
-
-                 THE ARGUMENT WAS ABOUT A COLLISION THAT DOES NOT HAPPEN. It is
-                 only true when ONE ingredient carries both, and measured on the
-                 published collection (tmp/optional_census.py, 2026-09-17) there
-                 is exactly one optional ingredient in the whole of it — Corpse
-                 Reviver No. 2's cane sugar syrup — and it names no bottle. So
-                 the two marks have never yet appeared on one line, and the rule
-                 was protecting a reader nobody has been.
-
-                 IF THEY EVER DO COLLIDE it renders "syrup (Monin) (optional)",
-                 which is two bracket groups in a row and worth asking Helen
-                 about rather than solving in advance. The brackets live in the
-                 markup, beside the suggestion's own, so the words copy and
-                 paste as they read. {% endcomment %}
-              {% comment %} `headline` GETS ITS OWN SPAN, 2026-09-02, so the
-                 double-rule underline (violette over absinthe, Helen's brief:
-                 "yvette showing what is in something") lands under the
-                 ingredient's name only — never under the bottle suggestion in
-                 brackets after it, which is a different colour making a
-                 different claim. {% endcomment %}
-              {% comment %} `as` RENDERS HERE SINCE 2026-09-26 (#1217), and
-                 until then it rendered NOWHERE. The field has existed since
-                 #754 and was read by exactly one thing —
-                 _plugins/cocktail_card_ingredients.rb, for card ORDER — so a
-                 float looked like an ordinary pour on the recipe page and the
-                 issue's title is the whole complaint: "show when something is
-                 a top or a float".
-
-                 OPTION A, from the candidates page. Helen, 2026-09-26, having
-                 looked at four treatments on the real Modern Zombie and Tom
-                 Collins pages: "option A please, certain." It is the
-                 `(optional)` shape, which #1141 already settled as the mark
-                 for a parenthetical about the pour rather than about the
-                 bottle.
-
-                 IT PAIRS WITH THE BRACKETED AMOUNTS rather than duplicating
-                 them, and that is the half worth understanding. An unspecified
-                 pour says it in the AMOUNT column — `(top)`, `(splash)`,
-                 `(float)`, declared in ingredients.yml `non_volumetric`. A
-                 pour that HAS a measure says it here instead, so the Modern
-                 Zombie reads "30 ml … (float)" and the Tom Collins reads
-                 "(top) soda water". The mark appears once either way, which is
-                 what stops "(top) soda water (top)". {% endcomment %}
+              {% comment %} AFTER THE NAME: the bottle in brackets, then `as` --
+                 "(float)", "(top)" -- which pairs with a bracketed AMOUNT so the
+                 mark appears once (#1217), then "(optional)" (#1141). The name
+                 has its own span so nothing aimed at it reaches the brackets.
+                 The brackets are markup, so the words copy as they read.
+                 MANUAL §9.3 / DECISIONS §9.3 (#1217), §9.10 (#1141). {% endcomment %}
               <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.as %} <span class="cocktail-use">({{ item.as }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
@@ -742,12 +236,8 @@ layout: default
             {% if item.note %}
               <p class="cocktail-note">{{ item.note }}</p>
             {% endif %}
-            {% comment %} THE STANDING NOTE, #707: Helen's own on the ingredient
-               ALWAYS wins the top slot when there is one; the standing note
-               never replaces it, it only fills the gap when a pour carries
-               none. Rendering both when both exist (drink's own first) is the
-               brief -- a pineapple pour with its own note about which tin to
-               buy still gets "Don't use fresh." underneath. {% endcomment %}
+            {% comment %} THE STANDING NOTE never replaces the drink's own note: it
+               fills the gap, or follows the drink's own. DECISIONS §9.3.1 (#707). {% endcomment %}
             {% if standing_note != "" %}
               <p class="cocktail-note">{{ standing_note }}</p>
             {% endif %}
@@ -758,193 +248,39 @@ layout: default
       {% endfor %}
     </ul>
     <div class="cocktail-scale-controls" hidden>
-      {% comment %} THE TWO STEP BUTTONS — #731, Helen's sketch: "-  [1] x  +".
-         SHIPPED IN THE SAME `hidden` WRAPPER AS THE BOX, so they appear and
-         disappear with it in one script pass (`control.hidden = false` in
-         cocktail-scale.js) rather than needing a second reveal to keep in step.
-
-         REAL GLYPHS, NOT LETTERS: a hyphen is too short and sits too high for
-         a minus, so this is U+2212 MINUS SIGN, not `-`. THE BUTTONS stay
-         wordless — Helen's brief for the box itself was "no other text at
-         all", and a button that spelled out "fewer" or "more" would be the
-         target-ml box's five words of furniture again, just split two ways.
-
-         THE MARK BETWEEN THEM IS A WORD SINCE 2026-09-15 (#1086, "C: word
-         after the box") and this rule did not change with it. A unit after a
-         figure is what the `×` already was; a VERB on a button is the thing
-         "no other text at all" was refusing, and there is still none.
-
-         EACH CLICK GOES THROUGH `apply()`, THE SAME FUNCTION A TYPED VALUE
-         REACHES — cocktail-scale.js wires `click` to `apply(last ± 1)`, never
-         to writing the box directly, so the floor rule and the ×1 minimum are
-         the same code whether the number arrived by keystroke or by click, and
-         a refusal shows the same note either way. {% endcomment %}
+      {% comment %} THE STEP BUTTONS share the box's `hidden` wrapper, so one reveal
+         shows all three. `−` is U+2212, not a hyphen. Wordless on purpose; each
+         click goes through `apply()`, the function a typed value reaches.
+         DECISIONS §9.13 (#731). {% endcomment %}
       <button type="button" class="cocktail-scale-step cocktail-scale-minus" aria-label="one fewer">−</button>
       <label class="cocktail-scale">
-        {% comment %} WHOLE RECIPES ONLY, since 2026-09-05 — Helen: "logically I
-           think we can solve the rounding/ratio issue by only allowing integer
-           multiples." Every written amount is already on the 2.5 ml grid and an
-           integer multiple of a grid value is on the grid, so no drink can be
-           asked for a pour nobody can measure and no ratio ever moves. The
-           `min`/`step` the script used to compute per drink are gone with it.
-
-           `type="text"`, NOT `type="number"`, and Helen's own word for it was
-           "text box". It kept the field free of the browser's spinner without
-           having to suppress one, which matters at two characters wide; the
-           script rounds and clamps whatever is typed, so the input type is not
-           what is enforcing anything. `inputmode="numeric"` — not `decimal` any
-           more — puts a phone's plain number pad up, which is now exactly the
-           set of characters this box accepts. {% endcomment %}
+        {% comment %} WHOLE RECIPES ONLY. `type="text"` (no spinner at two
+           characters wide) with `inputmode="numeric"`; the script rounds and
+           clamps, so the input type enforces nothing. DECISIONS §9.13 (2026-09-05). {% endcomment %}
         <input type="text" value="1" inputmode="numeric" class="cocktail-scale-multiple" aria-label="make this many times the recipe">
-        {% comment %} A WORD AFTER THE BOX, NOT A MULTIPLICATION SIGN -- #1086,
-           2026-09-15. Helen, picking C from the scaler candidates page:
-           "C: word after the box". The control read `− [1] × +`; it now reads
-           `− [1] drinks +`, which says what the number counts instead of
-           leaving the reader to infer it from the list above.
-
-           "drinks" IS FINAL SINCE #1088, 2026-09-20 -- Helen, confirming the
-           pair: '"drinks" and "portions"'. The recipe page's own scaler says
-           "portions" and was confirmed in the same breath; the two words are
-           #1097's "Sometimes: Portions / Drinks", so this is that vocabulary
-           landing rather than a word chosen here.
-
-           THE WORD WAS PLACEHOLDER COPY AND THE SIGN WAS NOT, which was the
-           whole difference between that round and the four before it, and is
-           worth keeping now the marker has gone. `×` was a TYPOGRAPHIC choice
-           an agent could make (U+00D7 against the letter x, the same call as
-           the `−` on the button above); "drinks" is a word in Helen's voice,
-           and §13.12 says the voice is hers. So it shipped marked, the way the
-           bitters caveat (#713) and the units line (#753) did, and she confirmed
-           it in one place.
-
-           `aria-hidden` STAYS, and for the same reason it was there for the
-           sign: the input's own `aria-label` already says "make this many times
-           the recipe", so a screen reader reaching this span would hear the
-           count named twice. The word is a caption for the eye.
-
-           SHIPPED AS MARKUP, NOT `content:` ON A PSEUDO-ELEMENT. Copy that only
-           exists in a stylesheet cannot be found by anyone looking for the
-           string, cannot be selected or translated, and is reached by a
-           screen reader in some browsers and not others. The element was
-           already here; only what is inside it changed. {% endcomment %}
+        {% comment %} "drinks" is final (#1088). Markup rather than CSS `content:`,
+           so the word can be found, selected and translated; `aria-hidden`
+           because the input's `aria-label` already names the count.
+           MANUAL §9.13 / DECISIONS §13 (#1086, #1088). {% endcomment %}
         <span class="cocktail-scale-mark" aria-hidden="true">drinks</span>
       </label>
       <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
     </div>
-    {% comment %} HOW MUCH THIS COMES TO — #1121, Helen: "add total ml next to
-       recipe scaler to help me choose the right number of glasses... This means
-       I can vary target units of alcohol myself." Her line, in her words:
-       "Approximately X ml". It is not polished, not caveated and not reworded
-       (§13.12: the voice is hers).
-
-       THIS IS THE BATCH AND IT MOVES. It is the ONLY figure on the page that
-       does: the units line below and the cost line beside it are both per glass
-       and both invariant under the multiple box (see their own comments, and
-       cocktail-scale.js's "THE COST LINE DOES NOT MOVE WITH THE SCALER"). So
-       this line and the units line carry two different numbers on purpose, and
-       the same drink says both — ×4 of an Aviation is "Approximately 360 ml"
-       here and "in a serving of 90 ml" down there.
-
-       THE NUMBER COMES FROM THE PLUGIN, NOT FROM `HTF.scale.totalMl`, and the
-       reason is in _plugins/cocktail_units.rb's `volume_for`: scale.js reads
-       the printed strings and counts `ml` and only `ml`, so an `oz` or a `tsp`
-       pour would total differently there than in the footer's own sentence.
-       One figure is computed at build time and the browser multiplies it, so
-       the two lines cannot disagree about the same drink.
-
-       IT RENDERS WITHOUT JAVASCRIPT, unlike the control above it, and that is
-       deliberate rather than an oversight. The `hidden` on the scaler is the
-       rule for a control that silently FAILS — a number box that renumbers
-       nothing. This is a true sentence about the recipe as written whether or
-       not anything ever runs, so it prints, and it is right on paper.
-
-       "Approximately" IS DOING REAL WORK ON A TOPPED DRINK, not just rounding.
-       A `to top` spends the midpoint of a declared range — Helen, 2026-09-17,
-       overruling this line's first shape: "Midpoint please, I'll cope on the
-       spot." So a Tom Collins's 237.5 ml is 112.5 ml of build plus the house
-       100–150 halved, and her word is carrying that 50 ml span. The same
-       expression feeds the units line's figure (`top_up_ml` in the plugin, one
-       expression and two callers), so the two sentences can never disagree
-       about what a top pours.
-
-       A DRINK WITH NO `page.volume` GETS NO LINE, and that is a different kind
-       of thing from an approximate one: two published drinks whose excluded
-       pours ARE the drink, where a figure would be wrong rather than rough.
-       `volume_for`'s header names them and says why. {% endcomment %}
+    {% comment %} "Approximately X ml" -- Helen's words, unpolished (#1121). The
+       BATCH, and the only figure on the page that moves with the multiple box.
+       The figure is the plugin's (`volume_for` in _plugins/cocktail_units.rb),
+       not scale.js's, so this line and the units line cannot disagree. It
+       renders without JavaScript. No `page.volume`, no line.
+       MANUAL §9.3.6 / DECISIONS §9.3.6 (#1121). {% endcomment %}
     {% if page.volume %}
       <p class="cocktail-scale-total" data-total-ml="{{ page.volume.total_ml }}">Approximately
         <span class="cocktail-scale-total-figure">{{ page.volume.total_ml }}</span> ml</p>
     {% endif %}
-    {% comment %} THE FLOOR MESSAGE STOOD HERE UNTIL #1088, 2026-09-20 -- an
-       empty paragraph that a refusal filled with "can't go below ×1 (82.5 ml):
-       the absinthe would be under 2.5 ml". Helen: "We don't go lower than the
-       recipe amounts, because the scaler is an integer and doesn't go below 1."
-       A refusal is silent now; assets/js/cocktail-scale.js's header has why the
-       message could not fire, and why it would have been wrong on the one drink
-       that could ever have made it fire. {% endcomment %}
-    {% comment %} THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, SINCE
-       #1121 (2026-09-17). It was #713 — Helen, 2026-09-06: "Bitters text
-       appearing next to the scaler if it's edited to >1. Cost and units on a
-       note." — and it carried the batch's cost and units totals until she saw
-       them sitting under the new ml line: "I like the line. But the cost and
-       units line below has come back and I don't want it to be there."
-
-       WHAT CHANGED UNDERNEATH #713 IS THIS PAGE. Its totals were the only
-       answer to "what is on the table" when they shipped. #1121 put
-       `Approximately X ml` directly above this note, so the same spot now has a
-       line saying how much liquid the batch is, a footer saying the units in a
-       glass, and this repeating a version of both — three grey sentences where
-       the reader wanted one.
-
-       THE CAVEAT IS NOT A TOTAL, WHICH IS WHY THE ELEMENT SURVIVED. It answers
-       what does NOT scale linearly, and she asked for it in the same breath as
-       the totals rather than as a part of them. Deleting the element would have
-       taken it along with what she actually objected to.
-
-       SO THE GATE IS `has_dashes` ALONE NOW. It used to be
-       `site.show_costs or page.units` — is there a cost line to read, is there
-       a unit count — which was the right question while the note read those two
-       lines. With nothing left but the caveat, the only question is whether
-       this drink pours anything in dashes or drops, and a drink that does not
-       gets no element at all rather than an empty hidden one.
-
-       A SEPARATE ELEMENT FROM THE FLOOR MESSAGE ABOVE, on purpose. That one is
-       a refusal and this one is information about a multiple that WORKED, so
-       they can want to be on screen at the same time, and the refusal's
-       show/hide is the delicately-debugged part of cocktail-scale.js (the
-       backspace bug, the `<= 0` clause). Sharing one element would have meant
-       teaching that logic about a second kind of message.
-
-       WHAT THE TOTALS ARGUED, KEPT because it is the case to make again if the
-       batch figures are ever wanted back. They said TOTALS because totals were
-       the only thing that moved: the cost line and the units line are both PER
-       GLASS and invariant under scaling — Helen, 2026-09-06, "the price per
-       glass you calculate needs to divide by the scaled number", so ×n
-       multiplies and divides and cancels — and what the footer could not tell
-       you was what the whole batch cost and how much alcohol was standing on
-       the table, the question #545 says the scaler exists to answer: "not
-       poisoning my friends".
-
-       THAT WAS TRUE UNTIL THE ml LINE EXISTED. "How much is on the table" now
-       has a better answer directly above this one, in millilitres, at the
-       multiple you actually set — and the alcohol half is a multiplication the
-       reader can do from the footer's per-glass figure if they want it.
-
-       ITS PRODUCTION HISTORY, ALSO KEPT: the note was gated on
-       `show_costs or show_units` (both `_config_local.yml` only) so it could not
-       exist in a production build at all, until #1001 put the units line on the
-       live site and the gate became "is there a cost line, or is there a unit
-       count". Both of those questions are moot now; see the gate above.
-
-       `data-has-dashes` IS WHY THE BITTERS LINE IS NOT UNIVERSAL. #720.1 deleted
-       the last bitters caveat for firing unconditionally — Aperol Spritz, which
-       is prosecco, Aperol and soda water, was told its bitters would not scale.
-       "A caveat that fires where it does not apply teaches you to stop reading
-       caveats." So the flag is computed from the drink's own amounts and the
-       line appears only where something is actually poured in dashes or drops.
-       Helen asked for the trigger (>1) and did not speak to the condition; if
-       she wants it on every drink, delete the `hasDashes` check in
-       cocktail-scale.js and this attribute. {% endcomment %}
+    {% comment %} THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, and only
+       on a drink that pours something in dashes or drops -- a caveat that fires
+       where it does not apply teaches you to stop reading caveats. The floor
+       refusal is silent (#1088). MANUAL §9.13 / DECISIONS §9.3.6 (#1121),
+       §9.13 (#713, #720, #1088). {% endcomment %}
     {% assign has_dashes = false %}
     {% for ingredient in page.ingredients %}
       {% assign amount_text = ingredient.amount | downcase %}
@@ -958,38 +294,13 @@ layout: default
   {% endif %}
 
 
-  {% comment %} Method is an ORDERED LIST, not the single line the original
-     scaffold assumed: the Sazerac's five steps are genuinely sequential
-     (coat the glass, shake the rest, discard the wash, strain in), and get
-     the wrong drink if reordered. The string form is still accepted for a
-     one-step build rather than forcing `- ` on a single line.
-  {% endcomment %}
-  {% comment %} A CITRUS TWIST ADDS ITS OWN LAST STEP, AND NO DRINK WRITES IT —
-     Helen's ruling, 2026-09-04, answering el-presidente's QQ ("Express the
-     orange twist and use it as a garnish. This should become canonical, for
-     each type of citrus twist"): yes, a garnish of any citrus twist adds
-     "Express the twist over the drink then drop it in" at the end of the method.
-
-     WHY THE LAYOUT AND NOT THE FILES. It is one fact — this drink is garnished
-     with a twist — and a drink that states the garnish and then also writes the
-     step states it twice, which is exactly what §9.12 calls variance that looks
-     informative and is not. Three drinks had written it by hand, in three
-     wordings; those are deleted, and `test_no_method_step_opens_with_express`
-     is what stops a fourth being written.
-
-     THE TWIST LIST COMES FROM garnish.yml, not from a bare substring test:
-     `citrus_peel` also holds `flamed orange zest coin`, which is a coin and not
-     a twist, so the members are filtered by the word themselves and the drink's
-     own garnish must MATCH A DECLARED ONE. An undeclared spelling gets no step
-     rather than a guessed one — and `test_every_garnish_is_declared` is what
-     makes that a safe bargain.
-
-     `(discarded)` FLIPS THE TAIL. garnish.yml declares `lemon twist
-     (discarded)` beside `lemon twist` precisely because the tail carries
-     information the head does not: the peel does not stay in the drink. So that
-     drink's step ends "and discard it". A drink whose twist is NOT discarded
-     wins the toss where it carries both, because a twist you keep is one you
-     drop in. {% endcomment %}
+  {% comment %} `method` is an ORDERED LIST; a bare string is still accepted for a
+     one-step build. {% endcomment %}
+  {% comment %} A CITRUS TWIST ADDS THE LAST STEP, and no drink writes it. The
+     garnish must MATCH a twist declared in garnish.yml (a coin is not a twist);
+     an undeclared spelling gets no step. "(discarded)" picks the discard form,
+     and a kept twist wins where a drink carries both.
+     MANUAL §9.12 / DECISIONS §9.3 (2026-09-04). {% endcomment %}
   {% assign declared_twists = "" %}
   {% for group in site.data.cocktails.garnish.canonical %}
     {% for declared in group[1] %}
@@ -1002,14 +313,8 @@ layout: default
   {% for g in page.garnish %}
     {% capture bounded %}|{{ g }}|{% endcapture %}
     {% if declared_twists contains bounded %}
-      {% comment %} READ FROM methods.yml SINCE 2026-09-09, not spelled here.
-         These two sentences were written out in this template AND declared in
-         `methods.yml` under `express`, which is one fact in two places -- and
-         it drifted the moment Helen changed the wording (#880: `and` -> `then`),
-         because editing the declaration left the template emitting the old
-         string with nothing to notice. The declaration is the decision, so the
-         template reads it. `.express` is ordered: drop-in first, discard second,
-         which methods.yml states beside them. {% endcomment %}
+      {% comment %} The sentences are methods.yml `canonical.express`, READ, never
+         spelled here: [0] drop in, [1] discard. DECISIONS §11 (#880). {% endcomment %}
       {% assign express_steps = site.data.cocktails.methods.canonical.express %}
       {% if g contains "discard" %}
         {% if twist_step == "" %}
@@ -1021,27 +326,11 @@ layout: default
     {% endif %}
   {% endfor %}
 
-  {% comment %} THE STRAIN STEP IS COMPOSED HERE, 2026-09-05, out of three
-     fields that each hold their fact once: the technique from `method`, the
-     glass's phrase from glasses.yml `serving`, and the ice clause from
-     serve.yml `in_the_glass`.
-
-         "Strain." + "an old fashioned glass" + ", over a large ice cube"
-             -> "Strain into an old fashioned glass, over a large ice cube."
-
-     HELEN ASKED FOR THE GLASS AND THE ICE BACK IN THE METHOD, and she is
-     right: the method is what you follow while making the drink, and looking
-     up to the metadata for the glass and down to "To serve" for the ice is
-     worse than one sentence. "I'd like to name the glass too where it appears."
-
-     COMPOSED, NOT STORED, WHICH IS THE WHOLE TRICK. Storing these sentences is
-     exactly what produced seventeen spellings of "strain" and two truncated
-     ones. Generating them means the drink keeps ONE copy of each fact and the
-     prose cannot drift from it — change the glass and the method follows.
-
-     ONLY A BARE TECHNIQUE IS REWRITTEN. A step carrying anything else
-     ("Strain, pouring the cola in at the same time.") is left exactly alone:
-     it is saying something no field holds. {% endcomment %}
+  {% comment %} THE STRAIN STEP IS COMPOSED, never stored: the technique from
+     `method`, the glass's phrase from glasses.yml `serving`, the ice clause from
+     serve.yml `in_the_glass` ("filled" swapped for `serve.fill`'s word), and the
+     rim. Only a bare technique is rewritten.
+     MANUAL §9.10a / DECISIONS §9.10a (2026-09-05, 2026-09-28). {% endcomment %}
   {% assign glass_phrase = "" %}
   {% for g in page.glass %}
     {% assign key = g | downcase %}
@@ -1056,37 +345,14 @@ layout: default
     {% endif %}
   {% endfor %}
   {% assign ice_clause = site.data.cocktails.serve.in_the_glass[page.serve.ice] | default: "" %}
-  {% comment %} HOW FULL, WHICH `ice` DELIBERATELY DOES NOT SAY — 2026-09-28,
-     for the Milliners Punch. Helen's sentence: "Strain into a hurricane glass
-     half-filled with crushed ice."
-
-     `serve.fill` REPLACES THE WORD `filled` in the clause just composed, so
-     " filled with crushed ice" becomes " half-filled with crushed ice". One
-     substitution rather than a table of fill-by-ice, and the word it swaps is
-     declared in serve.yml so the template states none of it.
-
-     It is a SECOND FIELD and not a sixth `ice` value on purpose: serve.yml's
-     own note says the ice field cannot carry quantity, and a new spelling of
-     crushed would have moved three mood rules that test `"crushed"` by
-     string. `ice: crushed` is untouched, so nothing about the moods moves.
-  {% endcomment %}
   {% if page.serve.fill %}
     {% assign fill_word = site.data.cocktails.serve.fill[page.serve.fill] %}
     {% if fill_word %}
       {% assign ice_clause = ice_clause | replace: "filled", fill_word %}
     {% endif %}
   {% endif %}
-  {% comment %} THE RIM RIDES ON THE GLASS, BEFORE THE ICE — Helen, 2026-09-05:
-     "Given that you can't sugar a rim once the glass is full, let's add that
-     line earlier." It was a line under "To serve", which is after the drink is
-     built and therefore too late to act on. Here it describes the state the
-     glass is ALREADY in when you strain into it, which is both true and in
-     sequence: "Fine strain into a coupe with a sugar half-rim."
-
-     `rim_shown` IS A FALLBACK, not decoration. A rimmed drink with no strain
-     step to hang the clause on would otherwise lose the rim entirely, so the
-     "To serve" line survives for exactly that case. No drink is in it today;
-     the guard costs one variable and the alternative is a silent loss. {% endcomment %}
+  {% comment %} THE RIM RIDES ON THE GLASS, before the ice. `rim_shown` is the
+     fallback: a rimmed drink with no strain step keeps its rim under "To serve". {% endcomment %}
   {% assign rim_clause = "" %}
   {% if page.serve.rim %}
     {% capture rim_clause %} with a {{ page.serve.rim }}{% endcapture %}
@@ -1101,37 +367,10 @@ layout: default
     {% endunless %}
   {% endfor %}
 
-  {% comment %} THE GLASS GENERATOR — #1214, 2026-09-28. Helen: "Let's write
-     the glass generator now please — I've come up against this a few times
-     now, notably in the Sazerac on the live site."
-
-     The strain step has composed its glass since 2026-09-05. Nothing else did,
-     so a drink BUILT in the glass — every swizzle, the Moscow Mule, the
-     Milliners Punch — had no strain step to carry it and named the glass
-     nowhere at all.
-
-     methods.yml `in_the_glass` holds the mapping: the canonical step as a
-     drink writes it, against the sentence to compose, with `<glass>` filled
-     from the same `glass_phrase` the strain step uses. THE TABLE IS DATA AND
-     NOT SPELLED OUT HERE, which is
-     test_the_layout_takes_the_twist_step_from_methods_yml's lesson: the twist
-     sentence lived in both places, Helen changed the wording, and the page
-     kept emitting the old one with nothing watching the pair.
-
-     ONLY THE FIRST MATCH IS COMPOSED. The Chartreuse Swizzle opens "Add all
-     ingredients." and then "Half-fill with crushed ice."; composing both gives
-     "Add all ingredients to a highball. Half-fill a highball with crushed
-     ice." — the duplication the strain group exists to have removed. So this
-     pass finds the FIRST step in the drink that the table knows, and only that
-     one is rewritten below.
-
-     DRAFTS ONLY, AND THIS IS THE LINE THAT SAYS SO. Helen, the same day: "this
-     will require re-proofreading everything on the live site, so for now
-     please let's just apply it to drafts (and drafts currently being worked
-     on) and not on the live recipes." A published drink renders exactly as it
-     did. The condition comes off when she has read the published set again —
-     and `page.collection` is the whole of it, so removing it is one word.
-  {% endcomment %}
+  {% comment %} THE GLASS GENERATOR (#1214): the FIRST step methods.yml
+     `in_the_glass` knows is rewritten to name the glass. DRAFTS ONLY until Helen
+     has re-read the published set; `page.collection` is the whole condition.
+     MANUAL §9.10a / DECISIONS §9.10a (#1214). {% endcomment %}
   {% assign glass_step = "" %}
   {% if page.collection == "cocktail_drafts" and glass_phrase != "" %}
     {% for step in page.method %}
@@ -1144,105 +383,25 @@ layout: default
       {% endunless %}
     {% endfor %}
   {% endif %}
-  {% comment %} ...AND THE STRAIN STEP THEN STOPS REPEATING IT, unless it has
-     something else to say — Helen, 2026-09-28, looking at the two drinks that
-     said it twice and ruling them differently:
-
-       Milliners Punch  "Half-fill a hurricane glass with crushed ice."
-                        "Strain into a hurricane glass filled with crushed ice."
-                        -> "Milliners method is good now."
-
-       Sazerac (D&C)    "Rinse an old fashioned glass with absinthe and dump."
-                        "Strain into an old fashioned glass."
-                        -> "names the glass twice"
-
-     THE DIFFERENCE IS WHETHER THE SECOND MENTION CARRIES ANYTHING. The
-     Milliners' strain step adds "filled with crushed ice", which the rinse did
-     not say; the Sazerac's adds nothing at all, because its `serve.ice` is
-     `none` and it has no rim. So the rule is not "never repeat the glass" —
-     it is "repeat it only when the clause riding on it is new".
-
-     So a strain step drops the glass when the glass has ALREADY been named by
-     a composed step above AND there is no ice clause and no rim clause to
-     carry. It falls back to the stored string, which is the bare "Strain."
-
-     IT CANNOT TOUCH A PUBLISHED DRINK, and that is worth knowing before
-     reading it as a change to the live site: `glass_step` is only ever set for
-     `cocktail_drafts`, so `glass_step_done` is false throughout a published
-     page and the strain step names the glass exactly as it always has.
-  {% endcomment %}
+  {% comment %} ...and a strain step then drops the glass, unless an ice or rim
+     clause gives it something new to say. `glass_step` is only ever set for a
+     draft, so a published page is untouched.
+     DECISIONS §9.10a (2026-09-28). {% endcomment %}
   {% assign glass_step_done = false %}
 
   {% if page.method.size > 0 and page.method.first %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <ol class="cocktail-method">
-      {% comment %} A STEP IS A STRING OR A `{step, note}` PAIR — Helen,
-         2026-09-04: "separate note field please, although it will be used
-         sparingly." The note renders under its step in the ingredient note's
-         own style, because it is the same kind of remark about the same kind of
-         thing; see `.cocktail-note` in _sass/cocktails/_cocktail.scss. The
-         string form is still the overwhelmingly normal one and is untouched.
-      {% endcomment %}
+      {% comment %} A step is a string or a `{step, note}` pair; the note renders
+         under its step as `.cocktail-note`. DECISIONS §9.3 (2026-09-04). {% endcomment %}
       {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}{% assign shown = step %}{% assign bare = step | remove: "." %}{% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}{% if glass_phrase != "" %}{% assign name_the_glass = true %}{% if glass_step_done and ice_clause == "" and rim_clause == "" %}{% assign name_the_glass = false %}{% endif %}{% if name_the_glass %}{% capture shown %}{{ bare }} into {{ glass_phrase }}{{ rim_clause }}{{ ice_clause }}.{% endcapture %}{% endif %}{% endif %}{% elsif glass_step_done == false and step == glass_step %}{% assign shown = site.data.cocktails.methods.in_the_glass[step] | replace: "<glass>", glass_phrase %}{% assign glass_step_done = true %}{% endif %}<li>{{ shown | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
-      {% comment %} THE TWIST STEP IS A STEP LIKE ANY OTHER: same list, same
-         numbering, same rules, and it is in the DOM in both states, so `make
-         it` and print carry it exactly as they carry a written one. {% endcomment %}
       {% if twist_step != "" %}<li>{{ twist_step }}</li>{% endif %}
-      {% comment %} AND A GARNISH STEP FOR EVERYTHING THAT IS NOT A TWIST.
-         Helen, 2026-09-05: "I'd like to add a garnish step that names the
-         garnish -- I've gone backwards and forwards on this, but garnish is
-         important, and it's easy to miss at the top of the page."
-
-         TWISTS ARE EXCLUDED because the block above already gives them a
-         better step: "Express the twist over the drink then drop it in." says
-         what to DO, where "Garnish with a lemon twist." only says what with.
-         A drink carrying both a twist and something else gets both steps, in
-         that order.
-
-         THE ARTICLE IS A RULE, A PLURAL TEST AND A DECLARED EXCEPTION LIST, in
-         that order of specificity: `a` by default, `an` before a vowel, nothing
-         before a word ending in `s`, and nothing at all for anything in
-         garnish.yml's `no_article`. "Garnish with a raspberries." is the
-         failure this exists to stop.
-
-         THE PLURAL TEST IS NEW -- #1143, 2026-09-17, Helen: "If the garnish is
-         plural, it should not start with 'a'." This paragraph used to say that
-         "no rule short of a dictionary knows that `raspberries` is plural while
-         `brandied cherry` is not", and that was overstated: a final `s` tells
-         those two apart correctly, and every plural in the collection with it.
-         What the list was really carrying was the cases a final `s` CANNOT
-         reach -- `grated nutmeg` (a mass noun), `half an empty passion fruit
-         shell` (brings its own article), `pineapple and brandied cherry` (two
-         things; deleted unused on 2026-09-25, #1186) -- so the list keeps
-         exactly those and stops being the only thing standing between a new
-         plural and the page.
-
-         WHY THAT MATTERS MORE THAN IT LOOKS: `no_article` can only name a
-         garnish someone has DECLARED, and the failure Helen hit was a draft's
-         `fruit wedges`, which is not in the vocabulary at all. A list-only rule
-         is silent on exactly the values nobody has classified yet, which is
-         where a new spelling always appears first.
-
-         A SINGULAR NOUN ENDING IN `s` WOULD BE WRONG HERE -- `lemongrass`,
-         `hibiscus`, `watercress`. None is declared today. If one arrives, it
-         wants an `always_article` list beside `no_article` rather than a
-         cleverer test; `test_no_declared_garnish_needs_an_article_it_cannot_get`
-         is what will say so.
-
-         `no garnish` NEVER RENDERS A STEP. It is the decision that this drink
-         takes none, which is worth recording and not worth instructing.
-
-         THE LIST READS AS ENGLISH -- #1138, 2026-09-17, Helen: "If there are
-         more than two garnishes, separate all with a comma except for the
-         penultimate pair, which get no comma." So one garnish is itself, two
-         are joined by `and`, and three or more are `A, B and C` -- no serial
-         comma. Every garnish was joined by `and` until today, which gave the
-         Hurricane "a mint sprig and a fruit wedges and a maraschino cherry".
-
-         The parts are accumulated into one string and split back into an array,
-         because Liquid has no way to append to one. `|` is the separator: no
-         declared garnish contains it, and `test_no_garnish_contains_the_join_separator`
-         keeps it that way. {% endcomment %}
+      {% comment %} A GARNISH STEP FOR EVERYTHING THAT IS NOT A TWIST (twists have
+         the express step above). Article: "a", "an" before a vowel, none before
+         a final `s`, none for garnish.yml `no_article`. `no garnish` gets no
+         step. Three or more read "A, B and C", no serial comma; the parts are
+         joined on `|` because Liquid cannot append to an array.
+         MANUAL §9.10a / DECISIONS §9.10a (2026-09-05), §9.12 (#1138, #1143). {% endcomment %}
       {% assign garnish_joined = "" %}
       {% for g in page.garnish %}
         {% capture bounded %}|{{ g }}|{% endcapture %}
@@ -1287,57 +446,11 @@ layout: default
     <p class="cocktail-method">{{ page.method | markdownify | remove: '<p>' | remove: '</p>' }}</p>
   {% endif %}
 
-  {% comment %} `to_serve` is PRESENTATION, not a further instruction —
-     "over crushed ice, with a straw" — Helen's call, 2026-08-16. Finishing
-     ACTIONS ("top with champagne", "squeeze the twist over the drink") are
-     method steps and live above, which is where the Sazerac's own data
-     already put them. None of the first three drinks has a real one.
-  {% endcomment %}
-  {% comment %} THREE LINES NOW, 2026-09-05 — the rim, the ice, the serveware —
-     in the order you would do them. Helen moved the first two here from the
-     metadata panel: "things like half-rim should be repeated in the method or
-     serve or wherever, because it's easily missed just on the glass mark in
-     the metadata", and "ice pedantry will be more likely to be seen at the
-     point in the make where it happens".
-
-     THE RIM COMES FIRST because you rim a dry glass before anything else goes
-     near it. Then the ice, then what it is served WITH.
-
-     THE ICE WORDING IS DATA, from `ice_line` in _data/cocktails/serve.yml, and
-     `none` and `blended` are absent from that map on purpose — 79 drinks are
-     served up, and "blended" has no sensible serving sentence, which is what
-     sent this block down here in the first place. Absent from the map means
-     absent from the page while the value stays in the data, where the mood
-     derivation reads it.
-
-     THE HEADING NEEDS ANY OF THE THREE, not `to_serve` alone; guarding on the
-     old single field would have printed a rim with no heading over it.
-  {% endcomment %}
-  {% comment %} THE ICE CAME OUT OF HERE ON 2026-09-05, its third and last home.
-     It was a note on the glass line in the metadata panel, then a line here,
-     and it is now a clause on the strain step itself — which is where Helen
-     wanted it: "ice pedantry will be more likely to be seen at the point in the
-     make where it happens." Keeping a copy here as well would be the same fact
-     twice, which is the thing this whole pass has been undoing.
-
-     THE RIM LEFT TOO, on the same day and for a sharper reason: Helen, "given
-     that you can't sugar a rim once the glass is full, let's add that line
-     earlier." A rim is done to an EMPTY glass, so an instruction sitting after
-     the build is not merely easy to miss, it is out of sequence. It is now a
-     clause on the strain step — "Fine strain into a coupe with a sugar
-     half-rim" — where it describes the glass you are straining into.
-
-     IT FALLS BACK TO HERE if there is no strain step to carry it, which no
-     drink needs today. Losing a rim silently is worse than an occasional
-     duplicate heading. {% endcomment %}
-  {% comment %} AN EMPTY STRING IS TRUTHY -- #1212, Helen: "don't show 'to
-     serve' section if it's blank." The gate tested the bare value, and
-     `to_serve: ""` is how the ingest leaves a drink with nothing to say (ten
-     drafts carried it on 2026-09-26), so each of those drew a "To serve"
-     heading over an empty paragraph. Same property that bit the glass
-     accumulator and the source footer above. `strip` turns nil and "" and
-     whitespace alike into "", and the test is against "" -- the shape the
-     header comment prescribes for every string-gated section. {% endcomment %}
+  {% comment %} TO SERVE: the rim, only when no strain step carried it, then
+     `to_serve`, which is PRESENTATION ("over crushed ice, with a straw"), never
+     an instruction. The ice is a clause on the strain step, not a line here.
+     `to_serve` is stripped and tested against "" (#1212).
+     DECISIONS §9.4 (2026-08-16), §9.10a (2026-09-05), §9.7 (#1212). {% endcomment %}
   {% assign to_serve_text = page.to_serve | strip %}
   {% if to_serve_text != "" or page.serve.rim and rim_shown == false %}
     <h2 class="cocktail-section-heading">To serve</h2>
@@ -1349,9 +462,9 @@ layout: default
     {% endif %}
   {% endif %}
 
-  {% comment %} Notes take food's polymorphic shape — {label, text} or a bare
-     string — for the same reason: a note jotted while the drink is still a
-     draft does not have to carry a label yet.
+  {% comment %} Notes take food's shape, {label, text}, so that a note jotted on
+     a draft has keys to type into. The bare string the shape allowed until
+     2026-10-01 is retired; an empty pair is the placeholder.
 
      AN EMPTY NOTE IS NOT A NOTE, and is counted out before the heading is
      decided. This matches `_layouts/recipe.html`, whose comment carries the
@@ -1398,121 +511,17 @@ layout: default
     <div class="cocktail-body-content">{{ content }}</div>
   {% endif %}
 
-  {% comment %} HOW MANY UNITS — THE LAST LINE OF THE RECIPE, AND ON THE LIVE
-     SITE. #1001, Helen, 2026-09-14: "move units line to just below the notes
-     section if it's there, above if you liked this, and add to live site", and
-     then: "Not too close to the method -- don't let it demand attention."
-
-     WHERE IT WAS: in the footer under the source and cost lines, which is where
-     she put it on 2026-09-06 ("Only in the bottom section with source and cost,
-     so the line below those"). That footer is about the PAGE -- where the recipe
-     came from, what it costs to stock. This is a fact about the DRINK, and it
-     now ends the drink the way the ingredients and the method begin it. Above
-     the related section, so the page still closes on four other drinks and
-     then its source line.
-
-     "NOT TOO CLOSE TO THE METHOD" IS THE MARGIN, and it is the whole of what the
-     stylesheet does differently here: $spacing-section-gap above it, the page's
-     own "below a section" token, so on a drink with no notes and no To serve --
-     where this lands directly under the last method step -- it reads as a
-     separate quiet remark rather than a sixth step. The type is unchanged and
-     deliberately so: same size and same muted colour as the source line, which
-     is the register "don't let it demand attention" asks for.
-
-     THE GATE IS GONE, and that is the "add to live site" half. It was
-     `site.show_units`, declared in _config_local.yml and nowhere else, so
-     production rendered nothing. Helen's 2026-09-06 reason for that gate is
-     still written where the key was: the `qq:` rows in
-     _data/cocktails/abv.yml are strengths nobody could settle without the
-     bottle on her shelf, and "publishing a unit count built partly on those is
-     a different promise from publishing a rough price, and it is hers to make
-     once they are cleared." They are not cleared; this is her making the call
-     anyway, which is hers to make. `python3 scripts/abv_worklist.py` says which
-     of those rows reach a published drink (#1012 is the snapshot).
-
-     `page.units` STILL GUARDS IT. A drink whose ingredients carry no alcohol at
-     all gets no line rather than a confident zero.
-  {% endcomment %}
-  {% comment %} IT IS UNITS, NOT THE DRINK'S ABV, and Helen drew that line
-     herself: "I want the number of units in a drink, not the ABV of the drink,
-     i.e. water etc don't matter." The ABV of a finished drink needs the dilution
-     modelled and nothing records it; the units do not care.
-
-     `units.exact` MEANS EVERY ALCOHOLIC POUR NAMED ITS BOTTLE. Where a pour
-     named only a category the strength is derived from Helen's
-     `default_bottles` ruling, or the mean of that category's bottles. Note that
-     a vague 0% ingredient does NOT spoil exactness: a Collins topped with soda
-     water is still exact, because soda water is 0% however loosely it is
-     described.
-
-     NOTHING RENDERS `units.exact` ANY MORE, AND THAT IS DELIBERATE — #651's
-     rule, that a value nothing reads is only safe while a comment says why it
-     is kept. It used to gate the word "About" on this line. Helen's wording of
-     2026-09-06 says "Roughly" on EVERY drink, exact or not, which reads the
-     honest way round: a unit count is an estimate even when the ABV is exact,
-     because how accurately a drink is poured is not something the data knows.
-     Asked whether to retire `units.exact` with the word, she kept it. It stays
-     a true and computed fact about a drink, and the obvious consumers are a
-     future reference page or an honesty indicator; do not delete it because
-     grep says nothing reads it.
-
-     THE WORDING IS HELEN'S OWN, given 2026-09-06 for #713 and #753: "Roughly X
-     units of alcohol in a serving". Do not polish it, and do not let an agent
-     rewrite it into house voice. Punches keep their own tail — she was asked
-     about "a glass" to match the cost line beside it and chose to leave the
-     mismatch alone.
-
-     AND IT SAYS HOW BIG THE SERVING IS, SINCE #1121 — again her words, again
-     unpolished: "Roughly X units of alcohol in a serving of Y ml". A punch
-     extends the same way ("in each of 8 servings of 160 ml"), which is the
-     minimal reading of her sentence against the tail that was already here.
-
-     Y IS ONE GLASS AND MUST NOT MOVE WITH THE SCALER, exactly as X must not.
-     Both come from `serves:`-divided build-time figures and neither carries a
-     data attribute the scaler could reach: `page.volume.serve_ml` is printed
-     once, and `data-total-ml` — the number that DOES move — lives on
-     `.cocktail-scale-total` up beside the control, where the moving figure
-     belongs. If this line ever moves with the multiple box, that is the bug,
-     and the two elements being different elements is what prevents it.
-
-     THE TAIL IS DROPPED RATHER THAN GUESSED where the volume is unknown, and
-     the sentence falls back to exactly what it said before #1121. One
-     published drink keeps the old wording — the Caipirinha, whose excluded
-     pours ARE the drink. A TOPPED drink is not in that class: since Helen's
-     ruling of 2026-09-17 it spends the declared range's midpoint, the same
-     one this line's own unit figure has always spent. See `volume_for` in
-     _plugins/cocktail_units.rb.
-
-     `data-units-per-serve` AND `data-serves` ARE READ BY cocktail-scale.js for
-     the batch note (#713), which needs the number to compute a TOTAL -- a
-     different quantity that genuinely does scale. This figure is PER SERVING
-     and must never move with the multiple box; that guarantee comes from the
-     scaler never writing to `.cocktail-units`, not from the number being
-     unreachable. If this line ever moves with the scaler, that is the bug, and
-     this is where it came from. {% endcomment %}
-  {% comment %} THE FOOTER CAME UP ABOVE THE RELATED DRINKS -- #1099, Helen,
-     2026-09-15: "ingredients, scaler, method, notes, <hr>, source, roughly X
-     units of alcohol per serving, roughly £x-y in ingredients per serving,
-     <hr>, if you liked this". So the two paragraphs above about WHERE the units
-     line sits describe the order before today; the reasons for its wording and
-     its data attributes still hold. One block, under one hairline
-     (`.cocktail-footer`), in her order: source, units, cost. The related
-     section's own hairline is the second rule. The sentences are unchanged:
-     her list names the lines, it does not reword them.
-
-     AN EMPTY STRING IS TRUTHY TOO, not just an empty array. Three drinks once
-     carried source as a known-unfilled empty string, and gating on the bare
-     value drew a "Source:" line with nothing after it. Test the value against
-     "", not its existence. (Tag delimiters are PARSED inside a comment block,
-     so the bad Liquid is not quoted here: it broke this build once.)
-
-     THE COST LINE IS LOCAL ONLY. `site.show_costs` is declared in
-     _config_local.yml and nowhere else, so production renders nothing (Helen,
-     2026-09-05: "I only want to show price on the locally built site, and only
-     as an incidental"). Never move the key into _config.yml. `cost.complete`
-     false withholds the figure (the Bellini's weighed and counted pours);
-     `cost.exact` prints one figure rather than a range. The figures sit in data
-     attributes because cocktail-scale.js multiplies them. {% endcomment %}
+  {% comment %} THE FOOTER, in Helen's order (#1099): source, units, cost.
+     THE UNITS LINE is units, not ABV, in Helen's words ("Roughly X units of
+     alcohol in a serving of Y ml") -- do not polish them. It is PER SERVING and
+     must never move with the scaler: nothing the scaler writes reaches
+     `.cocktail-units` (the moving figure is `.cocktail-scale-total`).
+     `page.units.exact` is computed and rendered by nothing, on purpose.
+     THE COST LINE IS LOCAL ONLY: `site.show_costs` lives in _config_local.yml
+     and never in _config.yml. `cost.complete` false withholds the figure;
+     `cost.exact` prints one figure rather than a range.
+     MANUAL §9.3.4–§9.3.6 / DECISIONS §9.3.4 (2026-09-06), §9.3.5, §9.3.6
+     (#1121), §9.13 (#1001). {% endcomment %}
   {% assign has_source = false %}
   {% if page.source != "" or page.source_url != "" %}{% assign has_source = true %}{% endif %}
   {% assign has_cost = false %}
@@ -1538,13 +547,9 @@ layout: default
           {%- else %} in a serving{% endif %}
           {%- if page.volume %} of {{ page.volume.serve_ml }} ml{% endif %}.</p>
       {% endif %}
-      {% comment %} `min_text` / `max_text` ARE THE PRINTED FIGURES, `min` /
-         `max` THE DATA -- #1215, Helen: "price per glass should have two
-         decimal places." The plugin rounds to a Float, and a Float prints
-         3.2 as "3.2", so this line read "£3.2–£3.29" on Between the Sheets.
-         Liquid cannot pad a number, so the plugin formats the strings and
-         this prints them; the numeric fields stay on the data attributes
-         because scripts multiply those and would choke on a string. {% endcomment %}
+      {% comment %} `min_text` / `max_text` are the PRINTED figures, to two
+         places; `min` / `max` stay numbers on the data attributes, for the
+         scripts. DECISIONS §9.3.5 (#1215). {% endcomment %}
       {% if has_cost %}
         <p class="cocktail-cost"
            data-cost-min="{{ page.cost.min }}"
@@ -1556,68 +561,19 @@ layout: default
   {% endif %}
 
   {% comment %} ─────────────────────────────────────────────────────────────────
-     IF YOU LIKED THIS, HOW ABOUT … — #927, and Helen's own framing of the
-     scope: "Not a full recommendation engine! But I expect we can do something
-     with coincidental tagging."
+     IF YOU LIKED THIS, HOW ABOUT … -- coincidental tagging and nothing else.
+     Score = shared MOODS + shared ingredient GENERICS, ties broken by title.
+     `python3 scripts/related_drinks.py [slug]` is the same scoring in Python;
+     re-run it after a promotion batch or a vocabulary edit that moves moods.
 
-     So this is coincidental tagging and nothing else. A drink's score against
-     this one is the number of MOODS they share plus the number of ingredient
-     GENERICS they share, and ties break on the title. No weighting, no ship
-     preference, no hand-tuned multipliers -- Helen, asked while it was being
-     built: "Keep it simple." Every knob one could add here is a claim about
-     what makes two drinks alike, and nobody has made that claim yet.
+     `site.cocktail_recipes` is already the published set (publish_gate.rb
+     removes held-back drinks at :post_read). DRAFTS ARE A DIFFERENT COLLECTION
+     and are deliberately not concatenated in, on any config (#235).
 
-     WHY THE TWO FIELDS AND NOT ANY OTHERS. `mood` is the axis the index
-     already browses by, nineteen words across the collection, half of them
-     Helen's own (§9.13) -- it is the closest thing the data has to a statement
-     of what a drink IS. `generic` is what it is MADE of, and is the other
-     thing the index filters on. Adding them is the cheapest possible model and
-     it is the honest one: a drink that shares three moods and two pours with
-     this one really is the nearest thing on the site.
-
-     MEASURED BEFORE IT WAS WRITTEN, and the measurement is kept:
-     `python3 scripts/related_drinks.py` is this scoring in Python over the same
-     corpus. Across the 48 published drinks every drink's THIRD pick still
-     shared at least 3 (nine drinks), most shared 4, and the best shared 6; at
-     65 published and a row of four (2026-09-24) every drink's FOURTH pick still
-     shares at least 2 (one drink, Gunmetal Blue), fifteen share 3, most share
-     4 -- so `score > 0` never empties the row and the section is never a
-     heading over four arbitrary names. Run it after a promotion batch or a vocabulary edit
-     that moves moods; `python3 scripts/related_drinks.py <slug>` prints one
-     drink's picks and what each shares, which is also how to check this
-     template against a second implementation.
-
-     LIQUID, NOT A PLUGIN, AND THAT IS ALSO "KEEP IT SIMPLE". 48 drinks is 48
-     iterations per page with a handful of comparisons in each; a Ruby
-     generator would compute it once instead of 48 times and would cost a file,
-     a hook-order question and a `jekyll serve` that silently serves a site
-     where it never ran (§1). At this size the cheap thing is the template.
-
-     THE COLLECTION IS ALREADY THE PUBLISHED SET, so there is no gate test
-     here. `_plugins/publish_gate.rb` REMOVES a held-back drink from
-     `site.cocktail_recipes` at :post_read, before any URL exists -- so in
-     production this loop can only ever see live drinks. Locally
-     `show_awaiting_fix` switches the gate off and the row offers what the index
-     offers, which is the same bargain every other listing on this site makes.
-     DRAFTS ARE A DIFFERENT COLLECTION and are deliberately not concatenated in:
-     cocktails/index.html needs `site.show_drafts` to reach them and this must
-     never do so, on any config -- #235 is what a private drink name in public
-     HTML costs.
-
-     THE SORT IS A STRING SORT, WHICH IS WHY THE KEY IS INVERTED. Liquid cannot
-     sort an array by a computed number, so each candidate becomes one
-     `rank~title~url` string and the whole list is sorted as text. `rank` is
-     `999 - score`, so ASCENDING text order puts the HIGHEST score first, and
-     within a score the titles then sort A-Z -- which is the deterministic
-     tie-break, falling out of the same sort rather than needing a second pass.
-     Every rank is three digits (score is 1..15 in this collection and would
-     have to reach 100 to shorten it), so the digits compare positionally the
-     way the numbers would.
-
-     `sort_natural` RATHER THAN `sort`, the same choice the mood chips above
-     make and for the same reason: Liquid's `sort` is ASCII, so a capitalised
-     title would sort ahead of every lowercase one. Nothing in the collection
-     hits it today; the drink page's own chip loop has the measurement.
+     Liquid cannot sort by a computed number, so each candidate is a
+     `rank~title~url` string with rank = 999 - score, sorted as text:
+     highest score first, A-Z within a score. `sort_natural`, as for the chips.
+     MANUAL §9.13 / DECISIONS §9.13 (#927).
   ────────────────────────────────────────────────────────────────────────{% endcomment %}
   {% capture my_generics %}{% for ing in page.ingredients %}{% for g in ing.generic %}|{{ g }}|{% endfor %}{% endfor %}{% endcapture %}
   {% assign related_keys = "" %}
@@ -1627,8 +583,7 @@ layout: default
       {% comment %} `contains` ON AN ARRAY IS MEMBERSHIP, not a substring probe,
          so a mood needs no delimiters round it. A generic does: it is compared
          against one flat string of every generic on this page, and `|lime|`
-         must not match inside `|lime juice|`. Same self-delimiting shape the
-         index's `data-ing` uses, for the same reason. {% endcomment %}
+         must not match inside `|lime juice|`. {% endcomment %}
       {% for m in page.mood %}
         {% if other.mood contains m %}{% assign score = score | plus: 1 %}{% endif %}
       {% endfor %}
@@ -1647,96 +602,25 @@ layout: default
   {% assign related_sorted = related_keys | split: ";" | sort_natural %}
 
   {% if related_sorted.size > 0 %}
-    {% comment %} THE HEADING IS FINAL, NOT A PLACEHOLDER -- Helen on #1088,
-       2026-09-20: "The if you like this text isn't a placeholder. Final
-       version." The words were always hers, taken from #927's title so the row
-       could be looked at without an agent inventing a line of voice for it;
-       the marker recorded only that nobody had confirmed they were the shipped
-       line. The recipe page carries the identical line and lost its marker in
-       the same pass.
-
-       IT WEARS THE INGREDIENTS/METHOD MARK -- Helen, 2026-09-24: "If you think
-       IF YOU LIKED THIS should join INGREDIENTS and METHOD at first level then
-       yes, okay, I hear it, please do it." Until then this was a plain
-       `.cocktail-section-heading` with no modifier and no inner span, as "To
-       serve" is, on the argument that the three modifiers each carry a colour
-       job (§9.13) and this section had not earned one. The ruling is that it
-       is a first-level section of the page, so it takes the first-level mark
-       -- absinthe over violette, the SAME rule as ingredients and method, not
-       a fourth pairing. The `--related` modifier and the inner `<span>` are
-       what `_sass/cocktails/_cocktail.scss` hangs that on.
-
-       THE ONE DIFFERENCE FROM INGREDIENTS AND METHOD IS THAT THIS ONE WRAPS.
-       Those are one word each; this is a sentence, and at phone width it
-       breaks onto two lines. `overlapping-rule-double` paints on every line
-       fragment, so the span here is also in `assets/js/last-line-rule.js`'s
-       TARGETS and the stylesheet uses the `-last-line` mixin -- the #920 fix
-       the reference page's headings already carry. Helen: "Last line only
-       please, 10000%."
-    {% endcomment %}
-    {% comment %} A SECTION WITH A RULE ABOVE IT -- Helen on #955, 2026-09-11:
-       "Please add some kind of divider between the end of the recipe (whether
-       serve or notes or anything else) and 'If you liked this...'". The rule
-       is `.cocktail-footer`'s own (margin, padding, hairline), so the page
-       ends with two objects drawn the same way: four other drinks, then the
-       source line. {% endcomment %}
+    {% comment %} The heading is FINAL (#1088) and wears the first-level mark; it
+       wraps on a phone, so its span is in last-line-rule.js's TARGETS (#920).
+       The section's rule above it is `.cocktail-footer`'s (#955).
+       MANUAL §9.13 / DECISIONS §13 (#1088), §9.13 (#955). {% endcomment %}
     <section class="cocktail-related-section">
     <h2 class="cocktail-section-heading cocktail-section-heading--related"><span>If you liked this, how about&hellip;</span></h2>
-    {% comment %} THE INDEX CARD. NOT A VARIANT OF IT -- #991, Helen,
-       2026-09-12: "if you liked this cards should render the same as cards on
-       the index list. We are fighting this design, and trying to invent a new
-       design language, where we should just reuse what we've already made."
-
-       WHAT THAT REPLACED, and why it is worth knowing: from #955 (2026-09-11)
-       these were `.drink-card.drink-card--portrait`, the index card's classes
-       with one modifier that moved geometry -- the glass into a head row beside
-       the tape, the foot back into flow, the height from the content. The
-       modifier was small; what grew around it was not. In one day it needed a
-       rule for the chip rows it had uncapped, a `.drink-card-tail` in this
-       markup to keep the ship out of a row of its own, its own title-size lock
-       (#960), its own grid floor tuned twice (#976), its own shortlist corner
-       and its own cancellation of the title padding that corner costs (#977).
-       Six issues, all of them about a card that was nearly the card we already
-       had. That is the fight Helen is naming, and the way out is not to tune it
-       again.
-
-       SO EVERY ONE OF THOSE IS DELETED, not disabled. The markup below is
-       cocktails/index.html's card with the same classes in the same order --
-       glass, body, foot, button -- and the geometry, the clamps, the chip cap,
-       the ship's pinned corner and its clear-ship pass, the hover, the fixed
-       height and the 370px grid floor are all _cards.scss's, unchanged,
-       because there is no longer anything here that differs from a card.
-
-       TWO DIFFERENCES REMAIN, and neither is geometry. The chips are LINKS to
-       the filtered index rather than filter BUTTONS, because on a drink page a
-       chip has nothing to filter -- which is exactly what this page's own chip
-       row does a few hundred lines up. And the index's `data-*` search
-       attributes are absent, because there is nothing on this page to match
-       against. That is why this is still written out here rather than shared
-       with the index as an include: two flags on a card's worth of markup is a
-       worse object than markup that names the same classes. The STYLESHEET is
-       the shared half, and it is the half that cannot drift by accident.
-
-       THE GLASS IS DRAWN AT THE INDEX'S OWN COMPRESSION -- the ratio mapped
-       onto 0.5-1.0 and `display_scale` applied -- against the same
-       `tallest_mm` this page counts at its top for its hero glass, and it now
-       hangs in the index card's own fixed left column at `$card-glass-scale`,
-       because it is the index card's own glass. {% endcomment %}
+    {% comment %} THE INDEX CARD, NOT A VARIANT OF IT (#991): cocktails/index.html's
+       card, same classes in the same order, every rule _cards.scss's. Two
+       differences, neither geometry: chips are LINKS, and there are no `data-*`
+       search attributes. FOUR cards: `HOW_MANY` in scripts/related_drinks.py and
+       the rendered-pages test must move with this.
+       MANUAL §9.13 / DECISIONS §9.13 (#991). {% endcomment %}
     <ul class="cocktail-related drink-cards">
-      {% comment %} FOUR, NOT THREE, SINCE 2026-09-24 -- Helen: "Let's bump to
-         four related cards for cocktails." The cards sit two across the
-         column (the index's own 370px floor, see _cards.scss), so three always
-         orphaned one on a row of its own. `HOW_MANY` in
-         scripts/related_drinks.py and the rendered-pages test both say 4 and
-         must move with this. {% endcomment %}
       {% for entry in related_sorted limit: 4 %}
         {% assign parts = entry | split: "~" %}
         {% assign rel = site.cocktail_recipes | where: "url", parts[2] | first %}
-        {% comment %} GLASS IS AN ORDERED LIST, FIRST WITH ARTWORK WINS -- the
-           same contract the head of this file and the index card follow, and
-           the same empty-string accumulator, tested against "" rather than
-           truth-tested. An empty span when there is no drawing, so the tape
-           starts at the same x on all four cards. {% endcomment %}
+        {% comment %} The first glass with artwork, the same "" accumulator as the
+           head, drawn at the INDEX card's compression (0.5–1.0, `display_scale`).
+           An empty span when there is none, so the tape starts at the same x. {% endcomment %}
         {% assign rel_icon = "" %}
         {% for g in rel.glass %}
           {% if rel_icon == "" %}
@@ -1759,95 +643,35 @@ layout: default
           {% else %}
             <span class="drink-card-glass"></span>
           {% endif %}
-          {% comment %} THE BODY WRAPPER IS THE INDEX CARD'S OWN, and it is not
-             decoration: `.drink-card-body` is what the card's fixed geometry
-             anchors top-left while the foot is pinned to the bottom, and its
-             `min-width: 0` is what lets a long name's tape shrink so the
-             ellipsis can fire. The portrait card had a `.drink-card-head`
-             instead, holding the glass and the tape in one row; that element is
-             gone with the modifier (#991). {% endcomment %}
+          {% comment %} `.drink-card-body` is what the card's fixed geometry anchors
+             top-left, and its `min-width: 0` lets a long name's tape shrink so the
+             ellipsis can fire. The name is the card's own four tape classes;
+             `forloop.index` need only be stable per page. {% endcomment %}
           <div class="drink-card-body">
-            {% comment %} THE CARD'S OWN FOUR TAPE CLASSES, not a third name for
-               the same device -- `.drink-card-name` > `.drink-card-tape` >
-               `.drink-card-tape-bg[data-card-tape]` + `.drink-card-tape-word`,
-               which is exactly what this page's own title does at the top of the
-               file and what the universe line does on the index.
-               decorations.js's cardTapes() fills any `[data-card-tape]` slot on
-               any page, and card-name-fit.js measures any `.drink-card-name`, so
-               a long name steps and then wraps here the way it does on a card.
-               `forloop.index` only has to be stable per page (1, 2, 3). {% endcomment %}
             <p class="drink-card-name">
               <span class="drink-card-tape">
                 <span class="drink-card-tape-bg" data-card-tape="{{ forloop.index }}"></span>
                 <span class="drink-card-tape-word"><a href="{{ rel.url | relative_url }}">{{ rel.title }}</a></span>
               </span>
             </p>
-            {% comment %} THE INGREDIENT LINE, from `card_ingredients` -- the list
-               _plugins/cocktail_card_ingredients.rb already built and ordered for
-               the card (§9.10.1), so this card cannot show a different set or a
-               different order from the same drink's index card. Clamped to three
-               lines by the card's own rule. No `data-ing` attributes: those exist
-               for the index's match highlighting and there is nothing on this
-               page to match against. No whitespace inside the <p>, per #917. {% endcomment %}
+            {% comment %} `card_ingredients` is the plugin's list, so this card
+               cannot differ from the drink's index card (MANUAL §9.10.1). No
+               whitespace inside the <p> (#917). {% endcomment %}
             {% if rel.card_ingredients.size > 0 %}
               <p class="drink-card-ingredients">{% for ing in rel.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">&middot;</span> {% endunless %}{{ ing.label }}{% endfor %}</p>
             {% endif %}
           </div>
           <div class="drink-card-foot">
-            {% comment %} THE CHIPS ARE THE PAGE'S OWN CHIPS: alphabetical
-               (`sort_natural`, for the capital I in "I want to faff"), grouped
-               through taxonomy.yml's `mood_groups`, and LINKS to the index
-               filtered on the word -- exactly what this drink's own chip row
-               emits above, and for the same reason: on a drink page a chip
-               has nothing to filter, so it takes you where the filter is.
-               `mood_groups` and `index_home` are assigned above.
-
-               `#filter-{{ chip }}` TOO -- #1059, same argument as the chip row
-               above: this is the identical mechanism reused, so it lands on
-               the lit section the same way. {% endcomment %}
-            {% comment %} THE SHIP IS THE FOOT'S SECOND CHILD, OUT OF FLOW, as
-               on the index -- #991. It was inside the chip row, wrapped with the
-               last chip in a `.drink-card-tail` that a flex line could not
-               split, because a portrait card grew and the index's own answer
-               (the ship pinned to the corner, and card-line-budget.js padding
-               the chips clear of it on the one card whose last row collides)
-               cost two chips a row at 13rem. On a 370px card it costs nothing,
-               which is why the index has always done it this way -- so the tail
-               is gone with the modifier and this is the card's own foot. {% endcomment %}
+            {% comment %} The page's own chips: `sort_natural`, `mood_groups`, links
+               to the filtered index. The ship is the foot's second child, pinned
+               out of flow as on the index. DECISIONS §9.13 (#991). {% endcomment %}
             <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}#filter-{{ chip }}">{{ m }}</a>{% endfor %}</span>
             <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>
           </div>
-          {% comment %} THE SHORTLIST `+`, TOP RIGHT AND ABOVE THE TAPE -- #977,
-             Helen, 2026-09-11: "add shortlist button to top right of 'if you
-             liked this' cards. Higher than the tape so it doesn't take up
-             space the name could use."
-
-             THE INDEX CARD'S BUTTON, EXACTLY -- same two classes, same three
-             attributes, same `hidden`. There is no second placement and no
-             second design: `assets/js/shortlist.js` finds every
-             `.btn-shortlist[data-shortlist-key]` on the document, reveals it
-             and wires one delegated listener, so a fifth placement is markup
-             and a stylesheet rule and nothing else. That file's header says so
-             and this is the first time it has been taken up.
-
-             THE KEY IS THE RELATED DRINK'S OWN URL, which is what the index
-             card for that drink uses, so a drink shortlisted from here is the
-             same entry shortlisted from there -- and the button on THIS page's
-             title row, a few hundred lines up, keys on this page's drink and
-             is untouched.
-
-             AND IT IS IN THE CARD'S OWN CORNER SINCE #991, not in a band above
-             the head row. Her ask on #977 was "higher than the tape so it
-             doesn't take up space the name could use", and a portrait card
-             could buy the corner with height because it grew; an index card is
-             a fixed height and buys it with 2.63rem of title, which is the
-             trade every card on the index already makes. One card, one corner,
-             one reservation -- `.drink-cards .drink-card-name` in
-             _sass/cocktails/_shortlist.scss, with no exception carved out of it
-             any more.
-
-             LAST IN THE MARKUP, as on the index, so the tab order runs name,
-             ingredients, chips, then this. {% endcomment %}
+          {% comment %} THE SHORTLIST `+`: the index card's button exactly, keyed on
+             the related drink's own url, so it is the same entry the index
+             shortlists. Last in the markup, so it is last in the tab order.
+             DECISIONS §9.13 (#977, #991). {% endcomment %}
           <button type="button"
                   class="btn-shortlist btn-shortlist--card"
                   data-shortlist-key="{{ rel.url }}"
@@ -1860,44 +684,23 @@ layout: default
     </section>
   {% endif %}
 
-  {% comment %} The source and cost lines lived here, after the related drinks,
-     until #1099 (2026-09-15) moved them into `.cocktail-footer` above it. See
-     that block for their gates. {% endcomment %}
-
 </article>
 
-{% comment %} The back arrow's progressive enhancement -- see
-   _includes/back-to-index.html and assets/js/back-link.js. Loaded here, not in
-   default.html: the arrow is page furniture rather than site chrome, so a page
-   with no arrow loads no script for one. {% endcomment %}
+{% comment %} The back arrow's progressive enhancement. Loaded here, not in
+   default.html: the arrow is page furniture, so a page with no arrow loads no
+   script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
-{% comment %} The search box's dropdown (#1050) -- the other half of the
-   furniture line, loaded beside the arrow's script for the same reason. The
-   same file the recipe page loads; which site it searches comes from the
-   form's own `data-search-index`, never from this layout. {% endcomment %}
+{% comment %} The search box's dropdown (#1050), beside the arrow's script for the
+   same reason. Which site it searches is the form's `data-search-index`. {% endcomment %}
 <script src="{{ '/assets/js/page-search.js' | relative_url }}"></script>
-{% comment %} The print button's reveal and wiring (#1005; food's #86). Site-
-   agnostic: it queries `.btn-print` and does nothing on a page with none. {% endcomment %}
+{% comment %} The print button's reveal and wiring (#1005; food's #86). {% endcomment %}
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
-{% comment %} THE SCALER, IN DEPENDENCY ORDER AND FOR A REASON — issue #545.
-   shopping-list.js is the AMOUNT PARSER (`HTF.shoppingList.parseAmount`, its
-   unit folding and its plural), scale.js is the arithmetic built on it, and
-   cocktail-scale.js is the wiring. Each reads the one before it off `HTF` at
-   parse time, so loaded the wrong way round the page throws once, silently,
-   and the control simply never appears. tests/test_site_config.py guards the
-   order -- the same trap as cook-schedule.js before cook-timer.js.
-
-   THE INDEX'S SHOPPING LIST AND THIS PAGE NOW SHARE THAT PARSER rather than
-   each carrying one, which is the whole reason this page loads a file named
-   after the shopping list. {% endcomment %}
+{% comment %} THE SCALER, IN DEPENDENCY ORDER (#545): shopping-list.js (the amount
+   parser, shared with the index's shopping list), then scale.js, then
+   cocktail-scale.js. Each reads the one before off `HTF` at parse time, so the
+   wrong order leaves the control silently hidden.
+   test_the_scaler_scripts_load_in_dependency_order guards it. {% endcomment %}
 <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/scale.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-scale.js' | relative_url }}"></script>
-{% comment %} The glass-layout comparison switches lived here and are gone,
-   along with their script: both questions are settled (margin, top-aligned)
-   and the answers are the plain layout now. Deleted rather than left in
-   place — a comparison tool that survives the comparison is a second way for
-   the page to render that nobody is watching, which is the same reason
-   _dev/cocktails-design.html was deleted once its candidates had lost.
-{% endcomment %}

@@ -484,6 +484,31 @@ main {
   top: -0.12em;
 }
 
+// THE SEARCH BOX, UNDER THE DOOR TO THE OTHER SITE -- #1210, 2026-09-30, and
+// on a local build only (_includes/page-search.html renders it, gated on
+// `show_header_search`, which _config_local.yml alone declares). Helen:
+// "directly under [ FOOD ] ->". A third row, then, in the door's own column
+// and on its own right edge -- `justify-self: end` is what puts the glass on
+// the cards' edge where the arrow already sits -- and the box itself is
+// shared/_furniture.scss's, unchanged from the furniture line it left.
+//
+// THE ROW IS PAID FOR ONLY WHERE IT EXISTS. Every rule above is `grid-row: 1`
+// or `2` and `grid-template-rows: auto auto` names two; a third `auto` row is
+// created implicitly by this placement and costs the deployed header nothing,
+// because there the element is not in the page at all.
+//
+// `margin-top` IS THE HALF-ROW GAP THE NAV ROW ITSELF USES (0.45rem, the
+// #1086 phone value): the box hangs off the row above it the way that row
+// hangs off the tape, so the header reads as three lines at one rhythm rather
+// than a header with a widget under it. Eyeballed at 1280 and 390 on the
+// candidates page, like the row's own offset, and to be re-eyeballed with it.
+.site-header .page-search {
+  grid-row: 3;
+  grid-column: 3;
+  justify-self: end;
+  margin-top: 0.45rem;
+}
+
 // THE FOOTER IS AS WIDE AS THE ARTICLE, AND ITS OUTER COLUMNS SIT UNDER THE
 // ARTICLE'S EDGES -- #783, settled 2026-09-07 after one wrong turn worth
 // recording.
@@ -1316,6 +1341,15 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   }
 
   .site-about-link {
+    grid-column: 1;
+  }
+
+  // And the local-only search box (#1210) keeps its row and its right edge in
+  // the one column, under the door exactly as at full width. The stacked grid
+  // is `justify-items: center`; the rule above says `justify-self: end`, and
+  // a self-alignment beats the container's, so nothing more is needed here
+  // than the column.
+  .site-header .page-search {
     grid-column: 1;
   }
 

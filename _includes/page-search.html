@@ -1,0 +1,51 @@
+{% comment %} ── THE SEARCH FOR ANYTHING, IN THE HEADER, ON A LOCAL BUILD ONLY ──
+  #1210, 2026-09-30. Helen: "Move the omnisearch to the navbar, directly under
+  [ FOOD ] ->, to show on the local site only -- this is key for me during
+  testing so I'm not clicking about all over the place." And on whether it
+  stays at all: "honestly it's very useful for md proofreading in the local
+  build so it's staying at least for now."
+
+  So the box is a TESTING TOOL now, and it sits where a testing tool sits: in
+  the shared header, on every page of a site, under the door to the other
+  site and on the same right edge (shared/_layout.scss places it). It was the
+  right-hand end of the back arrow's line on a recipe or drink page from #1024
+  (2026-09-14) until this; that end now holds print and pdf (page-print.html).
+  The box's own markup, type, quietness and dropdown are unchanged -- the
+  history of every one of those decisions (#1050, #1056, #1096, #1099, #1123)
+  is in _sass/shared/_furniture.scss, which still styles it.
+
+  RENDERED ONLY WHEN `site.show_header_search` IS TRUE, and only
+  _config_local.yml declares that key -- the same idiom as show_drafts and
+  show_costs, and it must stay out of _config.yml for the same reason: the
+  deployed site has no search box anywhere. `page.site_neutral` (the about
+  page) gets none either: it belongs to no site, so there is no index to
+  search. Everything below reads `page.site_key`, exactly as back-to-index.html
+  does, so a food page searches food and a drink page searches cocktails.
+
+  ON AN INDEX PAGE IT IS A PLAIN FORM. page-search.js, which hangs the dropdown
+  under the box, is loaded by the two PAGE layouts only (MANUAL 13.13); the
+  index has its own I KNOW WHAT I WANT box and `?q=` lands in it through
+  filter-state.js's parseName, so Enter still does the right thing there.
+
+  THE PLACEHOLDER IS "I know what I want..." ON BOTH SITES -- #1096. It is
+  written here rather than read from sites.yml because it stopped saying where
+  you are, which is that file's test for a key. The input's aria-label carries
+  the same words, so a screen reader hears what a sighted reader sees.
+
+  THE GLASS IS HELEN'S OWN ARTWORK, _includes/icons/search.svg, and comes AFTER
+  the input so it sits at the right end and never moves as the text grows
+  (#1056); the dropdown element is rendered empty and hidden so the no-script
+  page is exactly this page minus the script (#1050). {% endcomment %}
+{% assign search_site = site.data.sites[page.site_key] %}
+{% if site.show_header_search and search_site and page.site_neutral != true %}
+  <form class="page-search" role="search" method="get" action="{{ search_site.home | relative_url }}"
+        data-search-index="{{ search_site.home | append: 'search.json' | relative_url }}">
+    <input type="search" name="q" class="page-search-input" autocomplete="off"
+           placeholder="I know what I want..."
+           aria-label="I know what I want"
+           role="combobox" aria-autocomplete="list" aria-expanded="false"
+           aria-controls="page-search-results">
+    <button type="submit" class="page-search-go" aria-label="Search {{ search_site.title }}">{% include icons/search.svg class="page-search-mark" %}</button>
+    <div class="page-search-results" id="page-search-results" role="listbox" hidden></div>
+  </form>
+{% endif %}

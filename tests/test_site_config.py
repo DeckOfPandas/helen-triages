@@ -240,10 +240,41 @@ def test_the_furniture_line_searches_for_anything():
     sitemap. `search_placeholder` is gone from sites.yml: the words are the
     same on both sites now, so the key stopped saying where you are.
     """
-    include = read("_includes", "back-to-index.html")
+    # IN THE HEADER, LOCAL BUILDS ONLY, SINCE #1210 (2026-09-30). The box left
+    # _includes/back-to-index.html for _includes/page-search.html, which
+    # _layouts/default.html includes under the door to the other site and
+    # which renders nothing unless `show_header_search` is set -- a key only
+    # _config_local.yml may declare, Helen's "to show on the local site only".
+    # The markup checks below are the same ones; only the file moved.
+    include = read("_includes", "page-search.html")
     # The include's Liquid comment discusses the markup at length; only the
     # markup after it is asserted on.
     body = re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", include, flags=re.S)
+
+    assert re.search(r"\{%\s*if\s+site\.show_header_search\b", body), (
+        "_includes/page-search.html must gate the box on site.show_header_search "
+        "-- the search is a local-build testing tool since #1210."
+    )
+    assert "page-search.html" in read("_layouts", "default.html"), (
+        "_layouts/default.html no longer includes page-search.html; the box "
+        "lives in the header since #1210."
+    )
+    assert "page-search" not in re.sub(
+        r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "",
+        read("_includes", "back-to-index.html"), flags=re.S,
+    ), (
+        "_includes/back-to-index.html renders a search box again; since #1210 "
+        "that end of the furniture line holds print and pdf, and the box is "
+        "the header's."
+    )
+    assert re.search(r"^show_header_search:\s*true", read("_config_local.yml"), re.M), (
+        "_config_local.yml must declare show_header_search: true, or the local "
+        "site has no search box at all."
+    )
+    assert not re.search(r"^show_header_search:", read("_config.yml"), re.M), (
+        "_config.yml declares show_header_search; the key is local-only by "
+        "Helen's instruction (#1210) and must never reach the deployed site."
+    )
 
     go = re.search(r'<button[^>]*class="page-search-go"[^>]*type="submit"|'
                    r'<button[^>]*type="submit"[^>]*class="page-search-go"', body)
@@ -271,7 +302,8 @@ def test_the_furniture_line_searches_for_anything():
         search = html.find("page-search.js")
         assert back != -1 and search != -1 and back < search, (
             f"_layouts/{layout} must load page-search.js beside (after) "
-            f"back-link.js -- the two halves of the furniture line."
+            f"back-link.js -- the dropdown is a page-layout script; the index "
+            f"has its own box and takes the header's as a plain form."
         )
 
     for site in ("food", "cocktails"):
@@ -299,7 +331,7 @@ def test_the_furniture_line_searches_for_anything():
     sites = read("_data", "sites.yml")
     assert not re.search(r"^\s+search_placeholder:", sites, re.M), (
         "sites.yml still declares search_placeholder; the placeholder lives in "
-        "_includes/back-to-index.html since #1050 (it says the same words on "
+        "_includes/page-search.html since #1050 (it says the same words on "
         "both sites, so it no longer says where you are)."
     )
 
@@ -2341,30 +2373,44 @@ def test_pdf_link_points_where_the_pdfs_are_written():
     # "/food/recipes/:path/" -> "/food/recipes/"
     expected = permalink.split(":")[0]
 
-    # THE LINK IS BUILT FROM `page.url` SINCE #1005 (2026-09-14), in
-    # _includes/page-actions.html, which both page layouts include: the page's
+    # THE LINK IS BUILT FROM `page.url` SINCE #1005 (2026-09-14): the page's
     # own URL with its trailing slash swapped for `.pdf`. That is where the
     # script writes each file -- beside the page's output directory -- for
     # whatever permalink a collection has, so the link cannot point at a
-    # different directory from the page it is on. What is left to check is
-    # that the include still builds it that way, and that the script renders
-    # every collection whose pages carry the include (below).
-    include = read("_includes", "page-actions.html")
+    # different directory from the page it is on. IN _includes/page-print.html
+    # SINCE #1210 (2026-09-30), which back-to-index.html renders only when a
+    # layout passes `actions=true` -- the two page layouts do; the magic-bag
+    # page, which has no PDF beside it, does not. What is left to check is
+    # that the include still builds it that way, that both page layouts ask
+    # for it, and that the script renders every collection whose pages carry
+    # it (below).
+    include = read("_includes", "page-print.html")
     assert re.search(
         r"page\.url\s*\|\s*append:\s*'\.pdf'\s*\|\s*replace:\s*'/\.pdf',\s*'\.pdf'",
         include,
     ), (
-        "_includes/page-actions.html no longer builds the PDF link from "
+        "_includes/page-print.html no longer builds the PDF link from "
         "page.url (`page.url | append: '.pdf' | replace: '/.pdf', '.pdf'`). "
         "If it is built another way now, this check needs to follow it -- it "
         "is the only thing tying the link to where the files are written."
     )
+    furniture = read("_includes", "back-to-index.html")
+    assert re.search(r"\{%\s*if\s+include\.actions\s*%\}\s*\{%\s*include\s+page-print\.html", furniture), (
+        "_includes/back-to-index.html no longer renders page-print.html under "
+        "`include.actions`; the print and pdf controls have moved somewhere "
+        "this test does not read."
+    )
     for layout_name in ("recipe.html", "cocktail.html"):
-        assert "page-actions.html" in read("_layouts", layout_name), (
-            f"_layouts/{layout_name} no longer includes page-actions.html, so "
-            f"its pages have no pdf link -- or have one built somewhere this "
-            f"test does not read."
+        assert re.search(r"\{%\s*include\s+back-to-index\.html\s+actions=true\s*%\}", read("_layouts", layout_name)), (
+            f"_layouts/{layout_name} no longer includes back-to-index.html with "
+            f"actions=true, so its pages have no pdf link -- or have one built "
+            f"somewhere this test does not read."
         )
+    assert not re.search(r"back-to-index\.html\s+actions=true", read("_layouts", "magic_bag.html")), (
+        "_layouts/magic_bag.html asks the furniture line for print and pdf, but "
+        "scripts/generate_pdfs.py renders no PDF beside a magic-bag page, so the "
+        "link would be #86's permanent 404."
+    )
 
     # BOTH COLLECTIONS SINCE #1005 (2026-09-14): the script walks one tuple of
     # directories and this reads that tuple rather than a literal glob, so a
@@ -2472,19 +2518,14 @@ def test_no_element_can_force_horizontal_scroll():
 # button alone (#979)"; #1005 moved every action into the controls row under
 # the head, so the row has been one `minmax(0, 1fr)` track since, and this
 # test only ever asks about rows of two or more.
+#
+# `.page-actions` LEFT IT ON 2026-09-30 (#1210), and like `.cocktail-head-words`
+# it left by ceasing to be a grid rather than by gaining a variant: the two-by-
+# two of four controls (#1182) is a flex row of two -- the shortlist pill and
+# its see-shortlist link -- with print and pdf on the furniture line. The
+# entry's claim ("about 205px, well inside a 312px phone column") was measured
+# and true; the shape it described is simply gone.
 MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
-    ".page-actions": (
-        "`auto auto`, filled by column: + SHORTLIST over (0) SEE SHORTLIST, "
-        "PRINT over PDF -- #1182, Helen: two columns at ALL widths, so a "
-        "narrow variant is exactly what she ruled out. The claim: the widest "
-        "label is `(0) SEE SHORTLIST`, 17 characters of 0.78rem Courier caps, "
-        "measured 136px on 2026-09-21 (#1163), plus PRINT at about 45px and a "
-        "1.4rem gap -- about 205px, well inside a 312px phone column. MEASURED "
-        "at 390px on 2026-09-24 (tmp/shots/crop-actions-*-phone.png). Where the "
-        "block shares a row with the drink page's toggle, `.cocktail-controls` "
-        "still wraps, so the pair can never overflow; it drops the block under "
-        "the toggle instead."
-    ),
     ".recipe-pagination": (
         "`1fr auto 1fr`: prev, a page-status label, next. Roughly 26 characters "
         "of Courier all told, so it is believed to fit a 360px phone -- BELIEVED, "

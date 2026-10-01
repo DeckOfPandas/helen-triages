@@ -634,33 +634,26 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   // modes; it's just unstyled here on purpose now, not a leftover.
 }
 
-// --- The actions row, under the head -----------------------------------------
-// #1005 / #1011, 2026-09-14. `.recipe-actions` -- a flex item of .recipe-title
-// holding print and pdf on the title's bottom edge since 2026-08-14 (#86), and
-// the shortlist button since 2026-09-04 -- is gone, with the phone block that
-// dropped it under the title (#899/#900) and `.btn-print`'s %link-button
-// match. Helen's pick from the candidates page: "row under the head". The
-// controls are _includes/page-actions.html, styled once for both sites in
-// shared/_furniture.scss (Courier caps, her "all actions in capitals"); this
-// rule is only the row they sit in: the head's last line, closed by a hairline
-// and pushed right, with the block gap below so INGREDIENTS opens at the
-// section's own distance. The title is alone on its line again and keeps its
-// 70% cap and its balance; a long one wraps without a control to fight.
+// --- The hairline that closes the head, and the INGREDIENTS line -------------
+// #1210, 2026-09-30. `.recipe-controls` -- the row under the head that held
+// the four actions from #1005 (2026-09-14, "row under the head") -- is gone.
+// Before it, `.recipe-actions` held print and pdf on the title's bottom edge
+// from #86 and the shortlist button from 2026-09-04. Helen's brief this time:
+// print and pdf to the top right of the page (the furniture line,
+// shared/_furniture.scss), and the shortlist "on the same line as INGREDIENTS
+// for Moules where it doesn't have the read it make it toggle" -- the same
+// place a drink page has it, on the first line under the rule. So the row
+// went, the hairline stayed as an `<hr>`, and the pair sits at the right-hand
+// end of the heading's own line.
 //
-// PADDING-TOP IS $spacing-block-gap, NOT $space-md -- issue #1058. Cocktails'
-// equivalent gap (its title block's own `margin-bottom`, between its
-// border-bottom rule and `.cocktail-controls`) is $spacing-block-gap
-// (1.75rem, MANUAL 13.3); this row measured only $space-md (0.75rem) under
-// its own hairline, so the two sites' rows sat at a different distance off
-// the rule that closes the head, even though the row's own contents already
-// matched exactly. Measured before: 13px from the hairline to the row's
-// text on food, 30.6px on cocktails, `tmp/measure_actions_row.js`.
-.recipe-controls {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: $spacing-block-gap;
+// `.recipe-head-rule` IS THE HAIRLINE ALONE. `<hr>` carries browser margins
+// and an inset border of its own, so both are reset; the only thing it draws
+// is the 1px $color-border line `.recipe-controls` used to carry as its top.
+.recipe-head-rule {
+  border: 0;
   border-top: 1px solid $color-border;
-  margin: 0 0 $spacing-block-gap;
+  margin: 0;
+  height: 0;
 }
 
 // THE FIRST SECTION HEADING SITS WHERE A DRINK PAGE'S DOES -- #1124,
@@ -677,26 +670,52 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 // the RULE, the head's height drops out of the question entirely and only one
 // gap has to move.
 //
-// MEASURED, BOTH SITES, AT 1280 (scripts/browser/styles.sh):
+// MEASURED, BOTH SITES, AT 1280 (scripts/browser/styles.sh), #1124:
 //   cocktails  rule y=524.0, INGREDIENTS y=619.2  ->  95.2px
 //   food       rule y=642.4, INGREDIENTS y=757.4  -> 115.0px
-// Food's fixed part after the rule is the controls box, 43px including its own
-// padding, so the gap that closes the 19.8px difference is 95.2 - 43 = 52.2px.
-// 3.25rem is 52px, which lands within a fifth of a pixel of the drink page.
+// Then, food's fixed part after the rule was the 43px controls box, and the
+// gap that closed the difference was 95.2 - 43 = 52.2px, or 3.25rem.
+//
+// RE-MEASURED FOR #1210 (2026-09-30), because the drink page's own distance
+// moved with it: its controls row is the toggle beside the shortlist PILL now,
+// and the pill is the taller of the two at 28.9px, so its rule-to-INGREDIENTS
+// is $spacing-block-gap (28px) + 28.9px + the heading's 3rem (48px) = 104.9px
+// (title block bottom y=531.2, INGREDIENTS y=636.1). Food's controls box is
+// gone, so the whole distance is this one margin: 6.55rem is 104.8px. It lives
+// on the ROW rather than the heading, because the heading is a flex item now
+// and a margin on a flex item would push the pill beside it off the heading's
+// centre. Measured after: food rule y=628.5 -> INGREDIENTS y=734.3, 105.8px
+// from the hr's box top, 104.8px from the line it draws -- the drink page's
+// distance within a pixel.
 //
 // THE FIRST HEADING ONLY, AND MANUAL §13.3 IS WHY. That section records the two
 // sites' heading rhythms as DELIBERATELY different -- 4.5rem/2rem here against
 // 3rem/1.25rem on a drink page (#1006, Helen's "half way") -- and she asked
 // about one gap, not about the scale. So METHOD, NOTES and everything below
 // keep their 4.5rem and this rule reaches exactly one heading: the one directly
-// after the controls row.
+// after the hairline.
 //
 // WHAT IS NOT MATCHED, because it cannot be from here: the two headings are set
 // at different sizes (47.5px tall against 38.4px), so the word's INK sits a
 // little differently inside each box even with the boxes' tops aligned. The box
 // is what a rule can move; the leading is the type's own.
-.recipe-controls + .recipe-section-ingredients .recipe-section-heading {
-  margin-top: 3.25rem;
+//
+// THE ROW: heading at the left, the shortlist pair at the right, centred on
+// each other. The heading's own 4.5rem/2rem margins move to the row -- the top
+// replaced by the 6.55rem above, the bottom kept -- so the ingredient list
+// below opens at exactly the distance it always did.
+.recipe-section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-xl;
+  margin: 0 0 $space-xxl;
+
+  .recipe-section-heading { margin: 0; }
+}
+
+.recipe-head-rule + .recipe-section-ingredients .recipe-section-heading-row {
+  margin-top: 6.55rem;
 }
 
 // ON A PHONE THE TITLE TAKES THE WHOLE WIDTH. #899/#900 wrapped the old action
@@ -706,6 +725,21 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 @media (max-width: 600px) {
   .recipe-main-title {
     max-width: 100%;
+  }
+
+  // THE SHORTLIST PAIR TAKES THE LINE ABOVE INGREDIENTS ON A PHONE -- #1210.
+  // The heading is 224px wide in a 312px column at 360 (measured,
+  // scripts/browser/styles.sh), so the pill cannot share its line; the column
+  // puts the pair first, at the left, and the heading under it -- the same
+  // shape a drink page's controls take on a phone (cocktails/_cocktail.scss).
+  // The row keeps the 6.55rem above it, so the first thing under the hairline
+  // is still where INGREDIENTS was; the heading follows a line lower.
+  .recipe-section-heading-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.1rem;
+
+    .page-actions { order: -1; }
   }
 
   // STACK THE THREE METADATA BOXES ON A PHONE -- design review #1086, from

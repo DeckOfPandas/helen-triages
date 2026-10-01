@@ -1,0 +1,39 @@
+{% comment %} ── PRINT AND PDF: the top right of the page, on the back arrow's line ──
+  #1210, 2026-09-30. Helen, from the candidates page: "Print and PDF actually
+  on the top right, so where the omnisearch currently is." The search box left
+  the furniture line for the header (page-search.html) the same day, and these
+  two took its end of the row. Rendered by back-to-index.html when a layout
+  asks for it with `actions=true`, which the two page layouts do and the
+  magic-bag page does not: its page has no PDF beside it, and a link to a file
+  nobody renders is the #86 404 all over again.
+
+  THEY LEFT THE ACTIONS ROW, which they shared with the shortlist pair from
+  #1005 (2026-09-14) until this, and the split is the point of the redesign:
+  the two rows had four controls of three different kinds drawn identically,
+  and six issues in two weeks (#1086, #1163, #1164, #1176, #1182, #1210) each
+  rearranged them without asking whether they belonged together. Print and pdf
+  are things you do with the page; the shortlist is a thing you do to it.
+  DECISIONS §13 (#1210).
+
+  THE PRINT BUTTON SHIPS `hidden` AND print-link.js REVEALS IT -- the rule
+  _layouts/recipe.html states: a control that silently fails is worse than no
+  control. The pdf link is a plain anchor to a real file and needs nothing.
+
+  THE PDF PATH IS THE PAGE'S OWN URL WITH THE TRAILING SLASH SWAPPED FOR
+  `.pdf`, which is exactly where scripts/generate_pdfs.py writes it -- beside
+  the page's output directory -- for both collections. Gated on
+  `site.pdf_downloads`, which _config_local.yml turns off because nothing
+  renders the files there (issue #86's finding: a link in the view you work in
+  all day would be a permanent 404). test_pdf_links_point_where_the_files_are
+  reads this include for that expression.
+
+  THE DOT BETWEEN THEM IS TEXT, NOT A GAP. Two words at the far end of a line
+  read as one label without something to part them; the separator is
+  `aria-hidden`, so a screen reader hears two controls and no punctuation. {% endcomment %}
+<div class="page-print-actions">
+  <button type="button" class="btn-print" hidden>print</button>
+  {% if site.pdf_downloads %}
+    <span class="page-print-sep" aria-hidden="true">&middot;</span>
+    <a class="btn-pdf" href="{{ page.url | append: '.pdf' | replace: '/.pdf', '.pdf' | relative_url }}">pdf</a>
+  {% endif %}
+</div>
