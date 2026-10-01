@@ -498,22 +498,54 @@ def test_notes_are_sentences(draft):
 
 
 def test_note_dicts_have_label_and_text_when_dict(draft):
-    """Deliberately looser than the recipe version: a bare string note is
-    still allowed here (MANUAL.md §4) -- what's never fine is a note
-    that LOOKS like the dict form but is missing a key, which renders blank
-    or unlabelled with no error anywhere. Caught for real, 2026-08-11, in
-    six *-rewrite.md files: a `note:` key typo instead of `text:` in two of
-    them, and four bare strings sitting in a file whose sibling notes were
-    already `{label, text}` (not itself a bug, but the typo was).
+    """KEYS PRESENT, VALUES MAY BE EMPTY -- the opposite way round from the
+    published version, and for a reason.
+
+    A published note has to SAY something, so `test_note_dicts_have_label_and_text`
+    tests both values for truth. A draft note is a slot Helen has not filled in
+    yet. Helen, 2026-10-01: "I really would like placeholders for labels and
+    text on notes, for both food and cocktails." So a draft note is now always
+    the pair, and an empty string in either half is the placeholder rather than
+    a fault -- 115 food drafts carry one.
+
+    That makes the bare-string form, allowed here since 2026-08-03 and left
+    alone when the published side retired it, the thing to keep out: 298 notes
+    across both drafts repos were migrated to the pair on 2026-10-01, so zero
+    remain, and a new one is drift back rather than history.
+
+    THE FAULT THIS WAS WRITTEN FOR IS STILL CAUGHT, AND CAUGHT BETTER. 2026-08-11,
+    six *-rewrite.md files: a `note:` key typo instead of `text:`, which renders
+    blank with no error anywhere. A typo now fails twice over -- once for the
+    missing `text`, once for the key nobody declared -- where testing the VALUES
+    for truth would have let `{label: "", text: ""}` through only by also letting
+    a half-written pair through.
     """
     for i, note in enumerate(draft.fm.get("notes") or [], 1):
-        if isinstance(note, str):
-            continue
-        assert isinstance(note, dict) and note.get("label") and note.get("text"), (
-            f"{where_draft(draft)} note {i} is a dict but missing `label` "
-            f"and/or `text` (check for a key typo, e.g. `note:` instead of "
-            f"`text:`) -- {note!r}."
+        assert isinstance(note, dict), (
+            f"{where_draft(draft)} note {i} is a "
+            f"{type(note).__name__}, not a `{{label, text}}` mapping -- "
+            f"{note!r}. Every draft note carries both keys, empty if it is "
+            f"still a placeholder, so that there is somewhere to type."
         )
+        missing = sorted({"label", "text"} - set(note))
+        assert not missing, (
+            f"{where_draft(draft)} note {i} is missing "
+            f"{' and '.join('`' + k + '`' for k in missing)} "
+            f"(check for a key typo, e.g. `note:` instead of `text:`) -- "
+            f"{note!r}."
+        )
+        extra = sorted(set(note) - {"label", "text"})
+        assert not extra, (
+            f"{where_draft(draft)} note {i} carries "
+            f"{' and '.join('`' + k + '`' for k in extra)}, which nothing "
+            f"renders -- {note!r}. A note is `label` and `text` and nothing "
+            f"else; a third key is almost always a misspelling of one of them."
+        )
+        for key in ("label", "text"):
+            assert isinstance(note[key], str), (
+                f"{where_draft(draft)} note {i} has `{key}:` as a "
+                f"{type(note[key]).__name__}, not a string -- {note[key]!r}."
+            )
 
 
 def test_method_short_is_a_list(draft):

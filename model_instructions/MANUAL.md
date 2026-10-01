@@ -628,7 +628,7 @@ method:                          # xor method_groups: — never both
 method_short:
   - ""                           # [""] = not written. A block scalar = written.
 notes:                           # always a list, never a blob
-  - label: "Sinking"              # or a bare string
+  - label: "Sinking"              # both keys always; "" while unwritten
     text: "If it sinks, you added too much syrup."
 meta:                            # EXACTLY these three, in this order — §4.0
   rewritten: false
@@ -723,7 +723,15 @@ with it.
 - Cross-recipe links are markdown, **relative**: `[text](../slug/)`. Front
   matter is never run through Liquid, so a root-relative link cannot pick up
   the baseurl. `[[wikilinks]]` are retired.
-- `notes:` items are `{label, text}` or a bare string; four or more is the
+- **`notes:` items are `{label, text}`, both keys always present, on both sites
+  and in both drafts repos.** An empty string in either half is a PLACEHOLDER
+  for Helen to type into — "I really would like placeholders for labels and text
+  on notes, for both food and cocktails", 2026-10-01 — and both layouts count an
+  empty note out before deciding whether to print the NOTES heading at all. The
+  bare-string form was legal in drafts from 2026-08-03 and is now retired
+  everywhere: 298 notes were migrated and `test_note_dicts_have_label_and_text_when_dict`
+  refuses a new one. A published note must have both halves FILLED, which is the
+  stricter `test_note_dicts_have_label_and_text`. Four or more notes is the
   signal to write body content instead (§4.1).
 - `internal_temp_ref` (+ `doneness`) pulls a live figure from
   `_data/food/internal_temperatures.yml` — §14; opt-in, most recipes have
@@ -1639,9 +1647,9 @@ to_serve: ""                     # SERVEWARE, not a further instruction — §9.
 mood:                            # LIST, DERIVED and then stored — see below
   - "sharp"
   - "aperitivo"
-notes:                           # {label, text} or a bare string, as food.
-  - label: "QQ"                  # a note an INGEST adds is always {label, text},
-    text: "QQ - `generic` values INFERRED, not confirmed: ..."   # both beginning QQ
+notes:                           # {label, text}, both keys always, as food.
+  - label: "QQ"                  # "" in either half is a PLACEHOLDER, which
+    text: "QQ - `generic` values INFERRED, not confirmed: ..."   # neither layout prints
 source: ""                       # free text, unlike food
 source_url: ""                   # external; nothing verifies it
 meta:                            # FIVE keys, in this order — §9.1.1

@@ -507,14 +507,30 @@ def fix_typography(text, path):
 # and `40g` 13 times. The spaced form is the house form by a factor of 112, and
 # the thirteen are the drift.
 #
-# `kg` BEFORE `g` IN THE ALTERNATION, or `2kg` becomes `2k g`. The same trap as
-# any longest-match-first list, and the only thing in here that would be silent.
+# IMPERIAL TOO, 2026-10-01: Helen, on finding `9in (23 cm)` in the drafts,
+# "All units need them, including imperial."
+#
+# THE ALTERNATION IS SORTED BY LENGTH IN CODE, NOT BY HAND, and that is the one
+# piece of engineering in this rule. A short-first list turns `2kg` into `2k g`
+# and `5inches` into `5 in ches` -- answers that parse fine and read almost
+# right, so nothing else would catch them. Sorting longest-first makes the whole
+# class impossible rather than tested-for, and adding a unit tomorrow cannot
+# reintroduce it.
 #
 # WHAT IS DELIBERATELY ABSENT. A bare `l` (never measured, and `1ltr` is a real
-# string this would mangle), `mins`, and anything temperature-shaped: `180C`
-# wants a degree sign, which is a DIFFERENT rule and a reported-never-fixed one,
-# so putting it here would quietly half-fix it.
-UNIT_SPACE = re.compile(r"(?<=\d)(kg|g|ml|cl|cm|mm|oz|tsp|tbsp)\b")
+# string this would mangle), `mins` (a duration is not a measure), and anything
+# temperature-shaped: `180C` wants a degree sign, which is a DIFFERENT rule and
+# a reported-never-fixed one, so putting it here would quietly half-fix it.
+UNITS = [
+    # metric
+    "kg", "g", "ml", "cl", "cm", "mm",
+    # imperial
+    "inches", "inch", "in", "lbs", "lb", "fl oz", "oz", "pts", "pt",
+    # spoons
+    "tbsp", "tbs", "tsp",
+]
+UNIT_SPACE = re.compile(
+    r"(?<=\d)(" + "|".join(sorted(UNITS, key=len, reverse=True)) + r")\b")
 
 
 def fix_unit_spacing(text, path):

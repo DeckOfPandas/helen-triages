@@ -299,6 +299,123 @@ def test_the_chart_sits_below_notes_and_out_of_the_metadata(site):
     assert 'href="#doneness"' in html, "nothing links to the chart"
 
 
+# --- notes, and the two ways a note renders as nothing -----------------------
+# THE `site` FIXTURE AND NOT `prod_site`, DELIBERATELY. Both failure modes below
+# only ever appeared on a DRAFT page -- the page Helen proofreads, which builds
+# locally because `_config_local.yml` flips `output` back to true, and which no
+# production build contains at all. A published note is always a filled pair, so
+# the production build is the half of this that was never at risk.
+#
+# What happened, 2026-10-01. 298 bare-string notes became `{label, text}` pairs
+# so that every draft note has keys to type into (Helen: "I really would like
+# placeholders for labels and text on notes"). 115 of them were `- ""`, which
+# became a pair of empty strings -- and both layouts decided which branch to take
+# by testing the VALUE of `text`, so an empty one fell through to the
+# bare-string branch and was rendered as the MAPPING. Both layouts now test the
+# KEYS instead and count the notes that will actually render before printing the
+# heading.
+#
+# WHAT THE MAPPING ACTUALLY RENDERS AS IS NOTHING, which was measured and is not
+# what the session expected. Reverting both notes sections and re-running these
+# tests produced 115 EMPTY NOTE BOXES and not one Ruby hash: markdown eats it,
+# almost certainly because kramdown reads a line that is only braces as an
+# attribute list and consumes it. (That mechanism is inference; the empty box is
+# the measurement.) So the fault is a label sitting beside an empty space --
+# indistinguishable on the page from what the placeholder's old `- ""` spelling
+# did, which is why this was worth fixing rather than migrating around.
+#
+# NO FAULT HERE RAISES ANYTHING. An empty note box is valid HTML, so the build is
+# green, every data test is green, and the only detector is a person reading the
+# page. Hence a test.
+
+HASH_DUMP = re.compile(r'\{(?:&quot;|")(?:label|text)(?:&quot;|")=(?:&gt;|>)')
+NOTE_BLOCK = re.compile(
+    r'<(p|div) class="note">\s*<span class="note-label">(.*?)</span>(.*?)</\1>',
+    re.S)
+NOTES_HEADING = re.compile(r"cocktail-section-heading--notes|recipe-section-notes")
+
+# Measured on the local build, 2026-10-01: 416 notes render, 143 of them on
+# published pages. A floor rather than the figure, because Helen writes notes
+# most days and a test that fails when she writes one is a test she will delete.
+NOTES_FLOOR = 350
+
+
+def _pages_with_notes(site):
+    for path in sorted(site.rglob("index.html")):
+        html = path.read_text(encoding="utf-8")
+        if NOTES_HEADING.search(html) or 'class="note-label"' in html:
+            yield path, html
+
+
+def test_no_page_renders_a_note_as_a_ruby_hash(site):
+    """BELT AND BRACES, AND IT IS NOT THE PIN -- say so, or the next reader will
+    trust it to catch what it does not.
+
+    Reverting both layouts to the pre-2026-10-01 notes section does NOT make this
+    fail: the mapping comes out as nothing, so `test_no_page_renders_an_empty_note_box`
+    is the one that bites, on all 115. This stays because the disappearance is
+    markdown's doing, not Liquid's -- drop a `| markdownify` somewhere, or render
+    a note into an attribute where markdown never runs, and the hash becomes
+    visible. Then this is the test that says so.
+    """
+    dumps = [str(p.relative_to(site)) for p, html in _pages_with_notes(site)
+             if HASH_DUMP.search(html)]
+    assert not dumps, (
+        f"{len(dumps)} page(s) print a note's MAPPING instead of its text, "
+        f"first five: {dumps[:5]}. A layout is testing `note.text` for truth to "
+        f"decide whether the note is a pair or a bare string; an empty `text:` "
+        f"is a placeholder, not a bare string. Test the KEYS -- "
+        f"`note.label == nil and note.text == nil` -- as both layouts do."
+    )
+
+
+def test_no_page_renders_an_empty_note_box(site):
+    """A note with nothing in it is a label floating in the grid with no text
+    beside it. It reads as a bug on the page and as nothing at all to the build.
+    """
+    empty = []
+    for path, html in _pages_with_notes(site):
+        for _tag, label, body in NOTE_BLOCK.findall(html):
+            if not re.sub(r"<[^>]+>", "", body).strip():
+                empty.append(f"{path.relative_to(site)} ({label!r})")
+    assert not empty, (
+        f"{len(empty)} empty note box(es), first five: {empty[:5]}. Both "
+        f"layouts skip a note whose text is empty; something has rendered one."
+    )
+
+
+def test_no_page_prints_a_notes_heading_with_no_note_under_it(site):
+    """The same shape one level up, and it ran for weeks before this: `notes: []`
+    is TRUTHY in Liquid, so 49 drafts printed the NOTES heading over an empty
+    grid. `.size > 0` fixed that; counting the notes that will actually RENDER
+    fixes the placeholder case, where the list is not empty but nothing in it has
+    anything to say.
+    """
+    stray = []
+    for path, html in _pages_with_notes(site):
+        if NOTES_HEADING.search(html) and not NOTE_BLOCK.search(html):
+            stray.append(str(path.relative_to(site)))
+    assert not stray, (
+        f"{len(stray)} page(s) print a NOTES heading with no note to "
+        f"introduce, first five: {stray[:5]}."
+    )
+
+
+def test_the_three_note_tests_above_are_looking_at_notes(site):
+    """Three tests that pass by finding nothing are worth exactly as much as the
+    build having notes in it at all, so this is the pin that says it does.
+    """
+    rendered = sum(len(NOTE_BLOCK.findall(html))
+                   for _p, html in _pages_with_notes(site))
+    assert rendered >= NOTES_FLOOR, (
+        f"only {rendered} notes render across the local build, below the floor "
+        f"of {NOTES_FLOOR} measured on 2026-10-01. Either the build is missing "
+        f"the drafts collections -- in which case the three tests above assert "
+        f"nothing -- or `NOTE_BLOCK` no longer matches the markup the layouts "
+        f"emit, which is the same thing."
+    )
+
+
 # --- the class that isn't there ----------------------------------------------
 
 def test_every_class_we_emit_has_a_rule_in_the_stylesheet(site):

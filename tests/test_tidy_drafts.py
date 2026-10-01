@@ -419,6 +419,8 @@ ingredient_groups:
       item: "pork shoulder, in 3cm chunks"
     - amount: "250 ml"
       item: "stock, dissolved in 100ml water"
+    - amount: "1"
+      item: "tin, in a 9in dish, or 5inches across"
 method:
   - "QQ original Melt 40g of butter and heat the oven to 180C."
   - "QQ Claude Melt 40g of butter and heat the oven to 180°C fan."
@@ -456,23 +458,32 @@ def test_unit_spacing_fixes_an_amount_an_item_and_prose(food):
         )
 
 
-def test_unit_spacing_does_not_turn_2kg_into_2k_g(food):
-    """`kg` must match before `g`, or the fix silently corrupts the unit.
+def test_unit_spacing_matches_the_longest_unit_first(food):
+    """A short-first alternation corrupts the unit, and plausibly.
 
-    The only failure in this rule that produces a PLAUSIBLE wrong answer rather
-    than an obvious one: `2kg` -> `2k g` reads almost right and parses fine. A
-    short-first alternation does exactly that, and nothing else here would say
-    so.
+    THIS IS THE ONLY FAILURE IN THE RULE THAT PRODUCES A WRONG ANSWER WHICH
+    READS ALMOST RIGHT: `2kg` -> `2k g` and `5inches` -> `5 in ches` both parse
+    fine and would survive a skim of the diff. Nothing else here would say so.
+
+    The script sorts `UNITS` by length in code rather than relying on a
+    hand-ordered list, so the class is impossible rather than merely tested
+    against -- and adding a unit tomorrow cannot reintroduce it. This pins the
+    outcome anyway, because the sort is the kind of line somebody "tidies".
     """
     path = food / "test-recipe.md"
     path.write_text(UNITS_BEFORE, encoding="utf-8")
     run_food(food, "--apply")
     got = path.read_text(encoding="utf-8")
+
     assert 'amount: "2 kg"' in got, "2kg should become 2 kg"
-    assert "2k g" not in got, (
-        "`kg` matched as `g`, so the unit is corrupted:\n"
-        + "\n".join(l for l in got.split("\n") if "2k" in l)
-    )
+    assert "9 in dish" in got, "9in should become 9 in"
+    assert "5 inches across" in got, "5inches should become 5 inches"
+
+    for corrupt in ("2k g", "5 in ches", "9 i n"):
+        assert corrupt not in got, (
+            f"a shorter unit matched first and corrupted the string: {corrupt!r}\n"
+            + got
+        )
 
 
 def test_unit_spacing_leaves_a_qq_original_alone_and_fixes_qq_claude(food):

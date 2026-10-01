@@ -327,16 +327,61 @@ layout: default
      build the first time round: Liquid parses tag delimiters inside a comment
      block, so a quoted `if` tag in here is a real tag as far as it is
      concerned. Describe it, do not quote it.) {% endcomment %}
-  {% if page.notes.size > 0 %}
+
+  {% comment %} AN EMPTY NOTE IS NOT A NOTE, so it is counted out before the
+     heading is decided -- the same bug one level down from the one above.
+     Helen, 2026-10-01, asking for placeholder label and text keys on every
+     draft note: a note waiting to be written is now a pair with two empty
+     strings, and 115 food drafts carry one. Without this pass each of those
+     printed a lone label with nothing after it, and a file whose only note was
+     a placeholder printed the whole NOTES heading to introduce it.
+
+     The count is what the heading and the single-note class both key off, so a
+     note that will not render cannot make a heading appear or stop the one-note
+     layout applying.
+
+     The shape test is on the KEYS, not on the value. A note is a mapping of
+     label and text, or a bare string from before that shape existed; a bare
+     string has neither key, and asking a string for one gives nil. The old code
+     tested the value, so a pair whose text was empty fell through to the
+     bare-string branch and was rendered as the MAPPING -- and the mapping
+     renders as nothing at all, measured, not as the Ruby hash you would expect.
+     Markdown almost certainly eats it: kramdown reads a line that is just
+     braces as an attribute list and consumes it. So the failure is a label with
+     an empty box beside it and no error anywhere, which is also exactly what
+     the placeholder's old spelling did. Testing the keys is what lets the skip
+     above work at all -- on the value, a mapping stringifies to something
+     non-empty and the note renders.
+
+     The one shape this cannot tell from a string is a mapping carrying neither
+     key, which exists nowhere in either collection.
+  {% endcomment %}
+  {% assign shown_notes = 0 %}
+  {% for note in page.notes %}
+    {% if note.label == nil and note.text == nil %}
+      {% assign note_body = note | default: "" | strip %}
+    {% else %}
+      {% assign note_body = note.text | default: "" | strip %}
+    {% endif %}
+    {% if note_body != "" %}{% assign shown_notes = shown_notes | plus: 1 %}{% endif %}
+  {% endfor %}
+
+  {% if shown_notes > 0 %}
     <div class="recipe-section-notes">
       <h2 class="recipe-section-heading">
         <span class="section-heading-text">Notes</span>
       </h2>
     </div>
-    <div class="notes{% if page.notes.size == 1 %} notes--single{% endif %}">
+    <div class="notes{% if shown_notes == 1 %} notes--single{% endif %}">
       {% for note in page.notes %}
-        {% if note.text %}<p class="note"><span class="note-label">{{ note.label | default: "note" }}</span>{{ note.text | markdownify | remove: '<p>' | remove: '</p>' }}</p>
-        {% else %}<p class="note"><span class="note-label">note</span>{{ note | markdownify | remove: '<p>' | remove: '</p>' }}</p>
+        {% if note.label == nil and note.text == nil %}
+          {% assign note_body = note | default: "" | strip %}
+          {% assign note_label = "note" %}
+        {% else %}
+          {% assign note_body = note.text | default: "" | strip %}
+          {% assign note_label = note.label | default: "note" %}
+        {% endif %}
+        {% if note_body != "" %}<p class="note"><span class="note-label">{{ note_label }}</span>{{ note_body | markdownify | remove: '<p>' | remove: '</p>' }}</p>
         {% endif %}
       {% endfor %}
     </div>

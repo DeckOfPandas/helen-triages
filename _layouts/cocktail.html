@@ -1352,15 +1352,44 @@ layout: default
   {% comment %} Notes take food's polymorphic shape — {label, text} or a bare
      string — for the same reason: a note jotted while the drink is still a
      draft does not have to carry a label yet.
+
+     AN EMPTY NOTE IS NOT A NOTE, and is counted out before the heading is
+     decided. This matches `_layouts/recipe.html`, whose comment carries the
+     argument in full: the shape test is on the KEYS and not the value, because
+     a pair whose text is empty would otherwise fall through to the bare-string
+     branch, be rendered as the MAPPING, and come out as nothing at all —
+     measured on 115 drafts, and the reason the keys test is what makes the skip
+     work. Placeholder notes — a label and a text that are both empty strings,
+     which is what a draft now carries while it waits to be written — are why
+     any of this has to exist.
   {% endcomment %}
-  {% if page.notes.size > 0 %}
+  {% assign shown_notes = 0 %}
+  {% for note in page.notes %}
+    {% if note.label == nil and note.text == nil %}
+      {% assign note_body = note | default: "" | strip %}
+    {% else %}
+      {% assign note_body = note.text | default: "" | strip %}
+    {% endif %}
+    {% if note_body != "" %}{% assign shown_notes = shown_notes | plus: 1 %}{% endif %}
+  {% endfor %}
+
+  {% if shown_notes > 0 %}
     <h2 class="cocktail-section-heading cocktail-section-heading--notes"><span>Notes</span></h2>
-    <div class="notes {% if page.notes.size == 1 %}notes--single{% endif %}">
+    <div class="notes {% if shown_notes == 1 %}notes--single{% endif %}">
       {% for note in page.notes %}
-        <div class="note">
-          <span class="note-label">{% if note.label %}{{ note.label }}{% else %}note{% endif %}</span>
-          {% if note.text %}{{ note.text | markdownify }}{% else %}{{ note | markdownify }}{% endif %}
-        </div>
+        {% if note.label == nil and note.text == nil %}
+          {% assign note_body = note | default: "" | strip %}
+          {% assign note_label = "note" %}
+        {% else %}
+          {% assign note_body = note.text | default: "" | strip %}
+          {% assign note_label = note.label | default: "note" %}
+        {% endif %}
+        {% if note_body != "" %}
+          <div class="note">
+            <span class="note-label">{{ note_label }}</span>
+            {{ note_body | markdownify }}
+          </div>
+        {% endif %}
       {% endfor %}
     </div>
   {% endif %}
