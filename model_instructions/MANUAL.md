@@ -932,6 +932,20 @@ reads the whole file; ISO dates are blanked first). `→` for arrows. `°C`
 always, **fan oven only** — check which figure of a printed pair *is* the fan
 one before deleting the other. British spellings. Titles use `and`, never `&`.
 
+**A NUMBER AND ITS UNIT TAKE A SPACE** — `15 ml`, not `15ml`. Helen, 2026-10-01:
+*"Please add unit spaces (15ml -> 15 ml) as a mechanical fix to perform at
+ingest, and check when I ask you to check drafts."* `kg`, `g`, `ml`, `cl`, `cm`,
+`mm`, `oz`, `tsp`, `tbsp`; `scripts/tidy_drafts.py --only units` is the pass and
+`.claude/commands/ingest.md` carries it as a TIER 1 ingest fix.
+**Measured before it was written**: `amount:` reads `40 g` 1,461 times across the
+food collections and `40g` 13 times, so the spaced form is the house form by a
+factor of 112. **A temperature is NOT one of the units** — `180C` wants a degree
+sign, which the tidy pass reports and never fixes, and spacing it to `180 C`
+would half-fix it and hide the real fault. **On a DRINK the rule reaches Helen's
+prose only**, so an `amount` is untouched (the recorded harm on
+anitas-attitude-adjuster, where editing an amount desynchronised a `QQ` note
+quoting it back).
+
 **It reaches prose pages, not just recipes** (`tests/test_prose_pages.py`):
 the about page, the index pages and the reference pages, including the words
 those pages render out of `_data/food/*.yml`.

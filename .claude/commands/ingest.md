@@ -290,7 +290,13 @@ failure is probably work someone else has already done (MANUAL §9.1).
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
-- **House style** -- en dashes, `°C`, unicode fractions, quoting, accents.
+- **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
+  **a space between a number and its unit** (`15ml` -> `15 ml`). Helen,
+  2026-10-01: "Please add unit spaces (15ml -> 15 ml) as a mechanical fix to
+  perform at ingest, and check when I ask you to check drafts." The units are
+  `kg`, `g`, `ml`, `cl`, `cm`, `mm`, `oz`, `tsp`, `tbsp`; a temperature is NOT
+  one of them, because `180C` wants a degree sign and spacing it would half-fix
+  it. `scripts/tidy_drafts.py --only units` is the same rule for a drafts pass.
   Outside `QQ` lines, always.
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
   food that is `source` + `source_type`; a dated magazine is a `publication`, an

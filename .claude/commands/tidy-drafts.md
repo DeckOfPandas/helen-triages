@@ -41,7 +41,7 @@ recipe:
 
 | | |
 |---|---|
-| **fixes** | an unquoted `title`/`tagline`/`source`/`source_url`/`to_serve`; `--` → em dash; `->` → →; `3-4` → `3–4`; accents from `_data/accented_words.yml` |
+| **fixes** | an unquoted `title`/`tagline`/`source`/`source_url`/`to_serve`; `--` → em dash; `->` → →; `3-4` → `3–4`; `15ml` → `15 ml`; accents from `_data/accented_words.yml` |
 | **but only in** | `title`, `tagline`, `to_serve`, a `notes` entry's `label`/`text`, an ingredient's `note` — Helen's own writing and nothing else |
 
 What it will **not** touch on a cocktail, and why each one is a decision rather
@@ -76,6 +76,42 @@ the #429 `meta:` migration and the #577 `size` rule run on `_food_drafts/` and
 nowhere else. A cocktail's `meta:` is five keys in its own order and
 nobody asked to migrate it; its `amount` is never edited and its `item` was
 retired.
+
+## The unit space, since 2026-10-01
+
+`15ml` → `15 ml`. Helen: *"Please add unit spaces (15ml -> 15 ml) as a
+mechanical fix to perform at ingest, and check when I ask you to check
+drafts."*
+
+**Measured before it was written**, which is what makes it a fix and not a
+preference: across both food collections `amount:` reads `40 g` **1,461** times
+and `40g` **13** times. The spaced form is the house form by a factor of 112.
+
+The units are `kg`, `g`, `ml`, `cl`, `cm`, `mm`, `oz`, `tsp`, `tbsp`.
+
+**`units` IS IN BOTH RULE TABLES AND MEANS TWO DIFFERENT THINGS.** On **food** it
+runs over the whole file, so an `amount: "40g"` and an `item: "…3cm chunks"` are
+both fixed. On a **drink** it is wrapped in `only_where_editable`, so it reaches
+Helen's own prose and **a drink's `amount` is never touched** — the recorded harm
+this file already describes, where editing an amount desynchronised a `QQ` note
+quoting it back. A drink cannot carry `15ml` in an amount anyway: `measures:`
+declares the unit and not the glue, so it would fail
+`test_every_amount_is_readable_as_a_quantity` first.
+
+**Three things deliberately out of the pattern**, each because including them
+would be silent rather than wrong:
+
+- **a bare `l`** — never measured in either collection, and `1ltr` is a real
+  string this would mangle;
+- **`mins`** — a duration is not a measure and reads fine closed up nowhere in
+  the corpus;
+- **anything temperature-shaped.** `180C` wants a **degree sign**, which this
+  script reports and never fixes. Spacing it to `180 C` would half-fix it and
+  make the real fault harder to see.
+
+`kg` matches **before** `g` in the alternation. A short-first list turns `2kg`
+into `2k g`, which parses fine and reads almost right — the only failure in this
+rule that produces a plausible wrong answer, and the one its test pins.
 
 ## The size word, since 2026-09-24 (#577, Helen's option 1)
 
@@ -130,7 +166,7 @@ six faults" cannot pass while something also happened to the other thirty lines.
    whole safety story is that the diff afterwards shows exactly what the script
    did, and mixed in with Helen's own edits it does not.
 
-   Use `--only quoting,meta,dashes,typography,accents,size` to do one class at
+   Use `--only quoting,meta,dashes,typography,units,accents,size` to do one class at
    a time if the full pass is too much to review in one go. `size` rewrites
    two fields per hit and is the one Helen asked to review as its own commit.
 

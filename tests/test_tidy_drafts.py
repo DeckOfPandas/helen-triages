@@ -393,6 +393,161 @@ def test_food_prose_outside_a_qq_is_still_fixed(food):
 
 
 # =============================================================================
+# THE UNIT SPACE -- Helen, 2026-10-01
+# =============================================================================
+# "Please add unit spaces (15ml -> 15 ml) as a mechanical fix to perform at
+# ingest, and check when I ask you to check drafts."
+#
+# One fixture carrying every shape the rule meets on the real corpus: a food
+# `amount:` (the 13 that drifted from 1,461), an `item:` with a unit mid-phrase,
+# a `QQ Claude` line that MUST be fixed, a `QQ original` line that must not, and
+# the three near-misses that would be silent if the pattern were loose -- `2kg`
+# (which a short-first alternation turns into `2k g`), an already-spaced amount,
+# and a temperature, which wants a degree sign from a different rule.
+UNITS_BEFORE = '''---
+title: "Test Recipe"
+tagline: "A test"
+source: "Adapted from Somebody"
+source_type: person
+serves: 4
+ingredient_groups:
+  - name: ""
+    items:
+    - amount: "40g"
+      item: butter
+    - amount: "2kg"
+      item: "pork shoulder, in 3cm chunks"
+    - amount: "250 ml"
+      item: "stock, dissolved in 100ml water"
+method:
+  - "QQ original Melt 40g of butter and heat the oven to 180C."
+  - "QQ Claude Melt 40g of butter and heat the oven to 180°C fan."
+notes:
+  - "Use 15ml of it and keep the rest."
+meta:
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+---
+'''
+
+
+def test_unit_spacing_fixes_an_amount_an_item_and_prose(food):
+    """The three places food carries a unit, all fixed.
+
+    THE AMOUNT IS THE ONE WORTH A TEST. Measured 2026-10-01 across both food
+    collections: `amount:` reads `40 g` 1,461 times and `40g` 13 times, so the
+    spaced form is the house form by a factor of 112 and the thirteen are drift.
+    On a DRINK the same rule must not reach an amount at all -- see
+    test_unit_spacing_never_touches_a_drinks_amount.
+    """
+    path = food / "test-recipe.md"
+    path.write_text(UNITS_BEFORE, encoding="utf-8")
+    run_food(food, "--apply")
+    got = path.read_text(encoding="utf-8")
+
+    for want in ('amount: "40 g"',
+                 'item: "pork shoulder, in 3 cm chunks"',
+                 'dissolved in 100 ml water',
+                 '"Use 15 ml of it and keep the rest."'):
+        assert want in got, (
+            f"{want!r} is missing, so the unit space did not land there:\n"
+            + got
+        )
+
+
+def test_unit_spacing_does_not_turn_2kg_into_2k_g(food):
+    """`kg` must match before `g`, or the fix silently corrupts the unit.
+
+    The only failure in this rule that produces a PLAUSIBLE wrong answer rather
+    than an obvious one: `2kg` -> `2k g` reads almost right and parses fine. A
+    short-first alternation does exactly that, and nothing else here would say
+    so.
+    """
+    path = food / "test-recipe.md"
+    path.write_text(UNITS_BEFORE, encoding="utf-8")
+    run_food(food, "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert 'amount: "2 kg"' in got, "2kg should become 2 kg"
+    assert "2k g" not in got, (
+        "`kg` matched as `g`, so the unit is corrupted:\n"
+        + "\n".join(l for l in got.split("\n") if "2k" in l)
+    )
+
+
+def test_unit_spacing_leaves_a_qq_original_alone_and_fixes_qq_claude(food):
+    """The pair, in one test, because they are one decision.
+
+    A `QQ original` line is the source's own wording awaiting Helen's rewrite,
+    and respacing it is editing someone else's text (MANUAL 5). `QQ Claude` is
+    OUR paraphrase and is held to house style. A skip wide enough to swallow
+    both would pass every other test in this file.
+    """
+    path = food / "test-recipe.md"
+    path.write_text(UNITS_BEFORE, encoding="utf-8")
+    run_food(food, "--apply")
+    got = path.read_text(encoding="utf-8")
+
+    assert '"QQ original Melt 40g of butter and heat the oven to 180C."' in got, (
+        "the QQ original line was edited:\n"
+        + "\n".join(l for l in got.split("\n") if "QQ original" in l)
+    )
+    assert "QQ Claude Melt 40 g of butter" in got, (
+        "the QQ Claude line is ours and must be fixed:\n"
+        + "\n".join(l for l in got.split("\n") if "QQ Claude" in l)
+    )
+
+
+def test_unit_spacing_leaves_a_temperature_to_its_own_rule(food):
+    """`180C` is not this rule's business.
+
+    It wants a DEGREE SIGN, which this script reports and never fixes -- "a
+    spelling is a word, not a character". Spacing it to `180 C` would half-fix
+    it and make the real fault harder to see, so `C` is deliberately absent from
+    the unit list.
+    """
+    path = food / "test-recipe.md"
+    path.write_text(UNITS_BEFORE, encoding="utf-8")
+    run_food(food, "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert "180 C" not in got, (
+        "a temperature was spaced by the unit rule, which hides the missing "
+        "degree sign:\n"
+        + "\n".join(l for l in got.split("\n") if "180" in l)
+    )
+    assert "180°C fan" in got, "the already-correct temperature was disturbed"
+
+
+def test_unit_spacing_never_touches_a_drinks_amount(drinks):
+    """On a drink the rule reaches Helen's prose and nothing else.
+
+    THE RECORDED HARM, from this script's own doc:
+    anitas-attitude-adjuster said `amount: "Top (30-45) ml"` beside a QQ note
+    quoting that string back verbatim, so editing the amount desynchronised the
+    note from the value it describes. Food has no such pairing and is fixed.
+
+    A drink cannot actually carry `15ml` -- `measures:` declares the unit and
+    not the glue, so it would fail test_every_amount_is_readable_as_a_quantity
+    first -- which is why this pins the WIRING rather than waiting for a drink
+    to prove it.
+    """
+    path = write_drink(drinks)
+    before = path.read_text(encoding="utf-8")
+    assert "amount:" in before, "the drinks fixture has no amount to protect"
+
+    run(drinks, "--apply", "--only", "units")
+    got = path.read_text(encoding="utf-8")
+
+    before_amounts = [l for l in before.split("\n") if "amount:" in l]
+    after_amounts = [l for l in got.split("\n") if "amount:" in l]
+    assert before_amounts == after_amounts, (
+        "a drink's amount was rewritten by the unit rule:\n"
+        + "\n".join(f"  {b}  ->  {a}"
+                     for b, a in zip(before_amounts, after_amounts) if a != b)
+    )
+
+
+# =============================================================================
 # THE SIZE WORD, #577 -- excluded 2026-08-29, scripted 2026-09-24
 # =============================================================================
 # One fixture carrying every shape the `size` rule meets on the real corpus, in
