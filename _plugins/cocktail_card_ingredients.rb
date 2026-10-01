@@ -156,9 +156,10 @@ module HelenTriages
     # `as:` values that mean "after everything else on the card" -- #567's tier
     # 7, and Helen's 2026-09-07 ruling that a rinse joins the floats there.
     # `muddle` is deliberately NOT here: it is a GROUPING, handled before the
-    # tier, not a place in the order.
+    # tier, not a place in the order. `shell` joined 2026-10-01 (#1256): the
+    # rum set alight in a fruit shell is added outside the main build too.
     LAST_TIER = 7
-    SORTS_LAST = %w[float rinse].freeze
+    SORTS_LAST = %w[float rinse shell].freeze
 
     def generate(site)
       vocab = site.data.dig("cocktails", "ingredients")

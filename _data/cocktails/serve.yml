@@ -174,3 +174,51 @@ fill:
 # A rim is an ACTION, and an action filed only as metadata is an action that
 # does not happen.
 rim: "free text"
+
+# --- `to_serve` --------------------------------------------------------------
+# A DECLARED VOCABULARY SINCE 2026-10-01 (#1256, #1249), AND FREE TEXT BEFORE.
+# Helen asked for "canonical language for fun presentation decorations like
+# plastic giraffes". The field had 12 non-empty values across live and drafts
+# and they had already drifted the way every free-text field here has: Blue
+# Hawaiian's "Cocktail umbrella." beside Cobra's Fang's "paper umbrella", and
+# two drinks (Cobra's Fang, Tiki Max) describing a shell of flaming rum in
+# prose, where nothing counted the rum.
+#
+# THE FIELD IS STILL ONE STRING, because test_to_serve_is_a_string and the
+# layout's `markdownify` both depend on that. What is declared is the ITEMS:
+# the string is split on full stops and commas, and each piece, lowercased,
+# must be one of these. So "Straw. Zero umbrellas." and "Plastic giraffes,
+# paper umbrella." are both legal, and neither separator had to be migrated
+# onto the live site to get the vocabulary.
+#
+# `fire` HOLDS THE FLOURISHES AND NOT THE RUM. Helen, 2026-10-01: "Fire is to
+# serve!" -- so the Mai Tai's optional flame stays here, uncounted. The rum a
+# drink DOES call for is an ingredient line with `as: "shell"`
+# (ingredients.yml), and the method lights it; what this field may then add is
+# MORE: "more fire", and "more cinnamon sparkles", her addition the same day.
+#
+# NOT HERE: the ice (`serve.ice` above), a garnish, or a pour. Porn Star
+# Martini's "Champagne on the side." left on 2026-10-01 -- Helen: "It's an
+# ingredient not an optional serving suggestion." It was already a measured
+# ingredient line; the `to_serve` copy was the second statement of one fact.
+#
+# ADDING A MEMBER IS HELEN'S, as with every closed vocabulary in this folder.
+# test_every_to_serve_item_is_declared holds it.
+to_serve:
+  serveware:
+    - "straw"
+    - "two straws"
+    - "stirrer"
+    - "ladle and punch glasses"
+  decorations:
+    - "plastic giraffes"
+    - "paper umbrella"
+    - "teeny flamingos"
+    - "zero umbrellas"
+  fire:
+    - "more fire"
+    - "more cinnamon sparkles"
+    - "optional fire if tiki mug"
+  on_the_side:
+    - "lime and sugar on the side"
+    - "assemblage au choix"

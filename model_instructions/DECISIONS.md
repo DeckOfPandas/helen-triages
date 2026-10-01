@@ -4770,6 +4770,38 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   flag flip: *"Those rewords are fine for Mai Tais, no need to flip the
   flag."* PIPELINE.md §5's first row, and the cheapest shape the baseline
   constant has taken — the words she would re-read are the words she supplied.
+- **2026-10-01, #1256 / #1249** — **A flaming shell is `as: "shell"`, 25 ml,
+  and three steps; `to_serve` gets a declared vocabulary.** One act had five
+  spellings on five drinks: `as: float` (Zombie Intoxica), no role (Modern
+  Zombie), `amount: "(garnish)"` (Milliners Punch), and `to_serve` prose on
+  Cobra's Fang and Tiki Max, where the rum was in no unit count. Her rulings,
+  in one message: *"let's do real ml. Default to 25 ml, nice and tidy. Use
+  that for all my cocktail recipes unless otherwise stated, and retroapply
+  this. But Cobra's Fang should be 25 ml too."* — *"Fire is to serve!"* —
+  *"Cinnamon sparkles can sit in method. We could add 'more cinnamon sparkles'
+  to our dictionary?"*
+  - **Real ml retires `(garnish)`**, by the pairing rule ingredients.yml
+    already stated: a measured pour names its use in `as:`. #1249 had floated
+    a `(garnish)` amount line; a word amount counts no units, which was the
+    reason for moving the rum into the ingredients at all.
+  - **"Retroapply" was read as: the two Zombies' 20 ml becomes 25 ml.** Every
+    existing shell pour already stated a figure, so the word has no other
+    meaning — but it changes a published amount, so it was flagged to her
+    rather than assumed settled.
+  - **Fire is `to_serve`, the rum is an ingredient.** The Mai Tai's "Optional
+    fire if tiki mug" stays an uncounted flourish; #894's `on fire` rulings
+    are untouched.
+  - **The `to_serve` STRING was left alone and its ITEMS were closed**, split
+    on `.` and `,`. Forcing one separator would have pulled Mai Tai,
+    Caipirinha, Mastiha Mojito and Ti' Punch off the live site for
+    punctuation.
+  - **Porn Star Martini's "Champagne on the side." left `to_serve`**: *"It's
+    an ingredient not an optional serving suggestion."* It was already a
+    measured 60 ml line, so the units had it; the serve line was the second
+    statement.
+  - **The cinnamon is listed wherever it is sprinkled**, extending her
+    2026-09-28 "Please add sprinkle!" from Milliners Punch to every shell
+    drink. Hers to reverse.
 
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.

@@ -27,7 +27,6 @@ method:
   - "Shake all ingredients other than the champagne with ice."
   - "Double strain."
   - "Float the passion fruit shell on top."
-to_serve: "Champagne on the side."
 mood:
   - "sharp"
   - "fruity"
@@ -41,5 +40,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

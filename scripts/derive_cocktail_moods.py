@@ -325,8 +325,15 @@ def derive(drink, sets, step_words, families):
     # a disguise: those turn a drink into a slushy iced one where the ice is
     # the point, which is what `ice ice baby` is for. Allowing them too takes
     # this from 42 of 114 to 51, at which point it stops narrowing anything.
+    #
+    # A SHELL POUR IS NOT COUNTED EITHER -- 2026-10-01, #1256. The rum set
+    # alight in a fruit shell became a measured line that day (it had been
+    # `to_serve` prose, or nothing), and Arrack Punch lost `sharp` on the spot:
+    # five pours became six. The drink in the bowl had not changed. This cap is
+    # about how simple the BUILD is, and the shell sits on top of it.
     poured = sum(1 for e in entries
-                 if millilitres(e.get("amount", ""), sets["_measures"]) is not None)
+                 if e.get("as") != "shell"
+                 and millilitres(e.get("amount", ""), sets["_measures"]) is not None)
     if has("citrus") and has("sweet") and (present & families) and poured <= 5 \
             and not slushy:
         out.append("sharp")

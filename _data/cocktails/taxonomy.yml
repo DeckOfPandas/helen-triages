@@ -677,10 +677,6 @@ mood_include:
     moods: [warming]
     why: >-
       she calls it warming and it carries no declared warm spice.
-  arrack-punch:
-    moods: [I want to faff, on fire]
-    why: >-
-      one muddle or one long prep, where the rule wants two; she sets it alight; the method does not say so.
   better-and-better:
     moods: [strong brown drink, warming]
     why: >-
@@ -821,10 +817,9 @@ mood_include:
     moods: [sharp]
     why: >-
       she calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  tiki-max:
-    moods: [on fire]
-    why: >-
-      she sets it alight; the method does not say so.
+  # `arrack-punch` AND `tiki-max` LEFT ON 2026-10-01 (#1256). Both were here for
+  # "she sets it alight; the method does not say so" -- and the method says so
+  # now, because the shell of rum became an ingredient and three steps.
 
   south-sider:
     moods: [strong brown drink]

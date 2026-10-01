@@ -1683,9 +1683,10 @@ apart — and carries a `QQ - no unit in the source` note that the guard reads.
 **Every ingredient has an amount, and an unmeasured one is a BRACKETED NOUN**
 (#669, reshaped by #1217 on 2026-09-26): a top-up is `amount: "(top)"`, a rinse
 `"(rinse)"`, a deliberate small pour that does not fill the glass `"(splash)"`,
-a float with no figure `"(float)"`, the Milliners Punch's flaming rum and its
-cinnamon `"(garnish)"` and `"(sprinkle)"`; salt in the drink is still `"1 small
-pinch"`. Each is declared in `measures:` `non_volumetric` and each has a method
+a float with no figure `"(float)"`, cinnamon onto a flame `"(sprinkle)"`; salt
+in the drink is still `"1 small pinch"`. (`"(garnish)"` was the Milliners
+Punch's flaming rum until 2026-10-01; that is a measured `as: "shell"` line
+now — §9.4.) Each is declared in `measures:` `non_volumetric` and each has a method
 step saying WHEN (`Top with champagne.` / `Rinse the glass with absinthe and
 dump.`).
 
@@ -2129,6 +2130,21 @@ rather than a quietly wrong number.
   `test_to_serve_is_a_string`, and `test_no_method_step_restates_to_serve_or_garnish`
   (keyed on the leading VERB: "Serve"/"Garnish" steps go; "Float the…" /
   "Express…" instruct and stay).
+- **`to_serve`'s ITEMS are a declared vocabulary** (#1256, 2026-10-01):
+  `serve.yml` `to_serve`, four groups — serveware, decorations, fire, on the
+  side. The field is still one string; it is split on `.` and `,` and each
+  piece must be declared (`test_every_to_serve_item_is_declared`). The house
+  decoration line is "Plastic giraffes, paper umbrella, teeny flamingos, more
+  fire, more cinnamon sparkles."
+- **A flaming shell is one ingredient and three steps** (#1256, 2026-10-01).
+  The rum is a measured line with `as: "shell"` — **25 ml unless Helen says
+  otherwise for that drink** — written last, with only a `(sprinkle)` of
+  `ground cinnamon` after it. The method ends on `shapes.shell` ("Fill the
+  passion fruit shell with the <X> and set on top of the drink.", or "the lime
+  shell"), then `canonical.fire`'s "Set alight." and "Sprinkle the flame with
+  cinnamon." The shell is not also a garnish. **Fire itself is `to_serve`**
+  ("more fire", "optional fire if tiki mug") and counts nothing; the RUM is
+  the ingredient. `test_a_shell_pour_is_written_one_way`.
 - **Both brand and generic** are stored per ingredient.
 
 ### 9.4.1 The site is canon. Deviation happens in the kitchen.
@@ -2244,10 +2260,10 @@ syrups, then everything else, then bitters; largest volume first inside a
 tier; the recipe's own order breaks ties. **The sections of `ingredients.yml`
 are the classifier**; a generic in no section warns at build and fails a test.
 **Tier 7 is built** (#754, 2026-09-07): `as:` on an ingredient records how a
-pour is USED — `float`, `rinse` or `muddle`, a closed vocabulary in
-`ingredient_as`, guarded the way `rum_characters` is. `float` and `rinse` both
-sort last, Helen's ruling that a rinse joins the floats; **`muddle` sorts
-nothing**. #567's muddle clause was built, looked at and dropped — grouping
+pour is USED — `float`, `rinse`, `muddle` or `shell`, a closed vocabulary in
+`ingredient_as`, guarded the way `rum_characters` is. `float`, `rinse` and
+`shell` sort last, Helen's ruling that a rinse joins the floats and the shell
+(#1256) added outside the build like both; **`muddle` sorts nothing**. #567's muddle clause was built, looked at and dropped — grouping
 muddled ingredients first put Ti' Punch's rhum last on a rhum drink, because a
 muddle covers both expressing a lime and dissolving a sugar. The value is still
 recorded because it is true; the plugin header has the finding.

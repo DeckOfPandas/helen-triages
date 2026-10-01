@@ -22,9 +22,6 @@ ingredients:
       - "Appleton Estate 8 Year Reserve"
       - "Appleton Estate 12 Rare Casks"
   - amount: "20 ml"
-    generic: "overproof Demerara rum, lightly aged"
-    as: "float"
-  - amount: "20 ml"
     generic: "lemon juice"
   - amount: "20 ml"
     generic: "lime juice"
@@ -34,12 +31,18 @@ ingredients:
     generic: "passion fruit syrup"
   - amount: "3 drops"
     generic: "tiki bitters"
+  - amount: "25 ml"
+    generic: "overproof Demerara rum, lightly aged"
+    as: "shell"
+  - amount: "(sprinkle)"
+    generic: "ground cinnamon"
 method:
-  - "Shake all the ingredients except the rum float with one cup of crushed ice."
+  - "Shake all the ingredients except the overproof Demerara rum with one cup of crushed ice."
   - "Dirty dump into a tiki mug filled with crushed ice, then top and heap with crushed ice."
-  - "Fill the passion fruit shell with the rum float, and set on top of the drink."
+  - "Fill the passion fruit shell with the overproof Demerara rum and set on top of the drink."
   - "Set alight."
   - "Sprinkle the flame with cinnamon."
+to_serve: "Plastic giraffes, paper umbrella, teeny flamingos, more fire, more cinnamon sparkles."
 mood:
   - "fruity"
   - "sugar craving"
@@ -56,5 +59,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

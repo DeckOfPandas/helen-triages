@@ -357,6 +357,7 @@ argument and the rules each field is read by.
 - 2026-09-19 · §9.1 · Check moods_by_hand before reaching for mood_exclude.
 - 2026-09-19 · §9.1 · The passion fruit shell leaves Zombie's garnish
 - 2026-09-19 · §9.1 · half lime shell becomes half an empty lime shell
+- 2026-10-01 · §9.1 · #1256 #1249 · A flaming shell is as: "shell", 25 ml, and three steps; to_serve gets a declared vocabulary.
 - 2026-08-30 · §9.13 · #583 #586 #562 · see §13.4.
 - 2026-08-31 · §9.13 · The narrow-screen table (360px: 157px text column, 39% glass) measured at the 7.6rem column; at 6.5rem it reads 174/189/226px.
 - 2026-08-12 · §10 · Helen: "I'm concerned that issues we closed in the last few days weren't represented as tests...

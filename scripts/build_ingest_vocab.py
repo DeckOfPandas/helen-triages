@@ -305,6 +305,15 @@ def _serve_ice() -> str:
     return "\n".join(f"- {r}" for r in rows)
 
 
+def _to_serve() -> str:
+    """The `to_serve` items, grouped as serve.yml groups them -- #1256.
+
+    Declared 2026-10-01 and printed the same day, so this vocabulary never had
+    the declared-but-unprinted gap `_serve_ice` and `_generics` closed late.
+    """
+    return _grouped(_serve_vocab().get("to_serve") or {}, tick=True)
+
+
 def _sources() -> str:
     """The publications a drink's `source` names, and their canonical spelling.
 
@@ -398,6 +407,7 @@ def renderers() -> dict:
         "measures": _measures,
         "generics": _generics,
         "serve_ice": _serve_ice,
+        "to_serve": _to_serve,
         "sources": _sources,
     }
     for group in _food_taxonomy()["tags"]:
@@ -419,7 +429,7 @@ def required_blocks() -> dict:
         FOOD_DOC: tags | {"stars", "source_types", "accents", "no_accent"},
         COCKTAIL_DOC: {
             "glass", "glass_corrections", "garnish", "method", "measures",
-            "accents", "generics", "serve_ice", "sources",
+            "accents", "generics", "serve_ice", "to_serve", "sources",
         },
     }
 
