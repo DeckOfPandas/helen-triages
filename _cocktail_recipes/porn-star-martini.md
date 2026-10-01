@@ -24,9 +24,9 @@ ingredients:
     generic: "champagne"
     note: "On the side."
 method:
+  - "Scoop out the seeds and flesh from three passion fruit halves into a shaker."
   - "Shake all ingredients other than the champagne with ice."
   - "Double strain."
-  - "Float the passion fruit shell on top."
 mood:
   - "sharp"
   - "fruity"
