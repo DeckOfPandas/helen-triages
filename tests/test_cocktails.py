@@ -7710,8 +7710,13 @@ def test_a_shell_pour_is_written_one_way(drink_file):
       * it comes last, with only a `(sprinkle)` allowed after it;
       * the method ENDS on the three canonical steps -- a filled
         `shapes.shell` sentence naming that rum, then `canonical.fire`'s two;
-      * the shell is not ALSO in `garnish`, because the method places it
-        (DECISIONS §9.1.1, 2026-09-09).
+      * the shell IS in `garnish`, once, and it is the fruit the method fills.
+        The first version of this test said the opposite, after DECISIONS
+        §9.1.1 (2026-09-09), and Helen read the result: "(shell)" after the
+        rum and "Fill the passion fruit shell" in the method, on a page that
+        had not mentioned a shell. The garnish line is what introduces it;
+        the LAYOUT drops the generated "Garnish with ..." for a filled shell,
+        which is the repetition that ruling was about.
 
     AND THE CONVERSE, which is what stops a sixth spelling: a method that
     fills a shell has an ingredient that says so.
@@ -7760,9 +7765,18 @@ def test_a_shell_pour_is_written_one_way(drink_file):
                     f"the shell step pours {last.group(1)!r} but the "
                     f"`as: \"shell\"` ingredient is {generic!r}")
 
-        if any("shell" in str(g).lower() for g in (fm.get("garnish") or [])):
+        shell_garnishes = [str(g) for g in (fm.get("garnish") or [])
+                           if "shell" in str(g).lower()]
+        if len(shell_garnishes) != 1:
             problems.append(
-                "the shell is also in `garnish`, and the method already places it")
+                f"`garnish` names {len(shell_garnishes)} shells; it must name "
+                "the one the rum goes in, so the page mentions the shell "
+                "before the ingredients say \"(shell)\"")
+        elif last is not None and \
+                shell_garnishes[0].replace("half an empty ", "") not in tail[0]:
+            problems.append(
+                f"`garnish` says {shell_garnishes[0]!r} but the method fills "
+                "a different shell")
 
     assert not problems, (
         f"{_drink_where(drink_file)} writes its flaming shell its own way:\n  "

@@ -401,11 +401,19 @@ layout: default
          a final `s`, none for garnish.yml `no_article`. `no garnish` gets no
          step. Three or more read "A, B and C", no serial comma; the parts are
          joined on `|` because Liquid cannot append to an array.
-         MANUAL §9.10a / DECISIONS §9.10a (2026-09-05), §9.12 (#1138, #1143). {% endcomment %}
+         MANUAL §9.10a / DECISIONS §9.10a (2026-09-05), §9.12 (#1138, #1143).
+         A FILLED SHELL GETS NO STEP EITHER (#1256, 2026-10-01): where an
+         ingredient says `as: "shell"`, the method's own "Fill the ... shell"
+         step places it, exactly as the express step places a twist. The shell
+         stays in `garnish:` so the meta line names it before the ingredients
+         say "(shell)". A shell with no rum (Mai Tai) keeps its step. {% endcomment %}
+      {% assign shell_pours = page.ingredients | where: "as", "shell" %}
       {% assign garnish_joined = "" %}
       {% for g in page.garnish %}
         {% capture bounded %}|{{ g }}|{% endcapture %}
-        {% unless declared_twists contains bounded or g == "no garnish" %}
+        {% assign placed_shell = false %}
+        {% if shell_pours.size > 0 and g contains "shell" %}{% assign placed_shell = true %}{% endif %}
+        {% unless declared_twists contains bounded or g == "no garnish" or placed_shell %}
           {% assign first = g | slice: 0 | downcase %}
           {% assign article = "a " %}
           {% if first == "a" or first == "e" or first == "i" or first == "o" or first == "u" %}

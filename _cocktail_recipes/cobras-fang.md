@@ -6,6 +6,7 @@ glass:
 garnish:
   - "mint sprig"
   - "lime wheel"
+  - "half an empty passion fruit shell"
 serve:
   ice: "cubed"
 ingredients:

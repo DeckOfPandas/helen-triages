@@ -3,7 +3,7 @@ title: "Zombie Intoxica"
 tagline: "You might think you only need one on-fire Zombie recipe. You would be wrong."
 glass:
   - "tiki mug"
-garnish: ["mint sprig", "fruit wedges", "maraschino cherry"]
+garnish: ["mint sprig", "fruit wedges", "maraschino cherry", "half an empty passion fruit shell"]
 serve:
   ice: "crushed"
 ingredients:

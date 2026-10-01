@@ -268,7 +268,10 @@ Four things a source prints as if they were units, and what to do instead
   `ground cinnamon` may follow it). The method then ENDS on exactly three
   steps: `Fill the passion fruit shell with the <rum> and set on top of the
   drink.` (or `the lime shell`), `Set alight.`, `Sprinkle the flame with
-  cinnamon.` The shell does NOT also go in `garnish`. Never write the rum as
+  cinnamon.` **The shell itself goes in `garnish`** — `half an empty passion
+  fruit shell` or `half an empty lime shell`, whichever the method fills — so
+  the page names it before the ingredients say "(shell)"; the page does not
+  add a "Garnish with…" step for it. Never write the rum as
   `"(garnish)"`, as a float, or as prose in `to_serve` — none of those counts
   its alcohol.
 
@@ -565,7 +568,9 @@ Four rules that decide the awkward cases:
 >   giraffes.
 > - **Do not restate a method step.** One cocktail's garnish read "passion fruit
 >   shell filled with overproof rum" while its own method already said "Fill
->   the passion fruit shell with rum and set on top of the drink."
+>   the passion fruit shell with rum and set on top of the drink." The garnish
+>   is the OBJECT — `half an empty passion fruit shell` — never what is done
+>   to it.
 
 ### `to_serve` — the declared items
 

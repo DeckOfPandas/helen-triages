@@ -4802,6 +4802,18 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   - **The cinnamon is listed wherever it is sprinkled**, extending her
     2026-09-28 "Please add sprinkle!" from Milliners Punch to every shell
     drink. Hers to reverse.
+  - **THE SHELL WENT BACK INTO `garnish` THE SAME DAY, and the first pass
+    was wrong to keep it out.** It followed §9.1.1's 2026-09-09 ruling ("a
+    garnish the method already places is not a garnish") to the letter, and
+    Helen read the pages: *"all say (shell) after the final rum, but haven't
+    mentioned a shell yet. Then the method step says 'Fill the passion fruit
+    shell with...', and, again, we haven't mentioned one."* Offered garnish
+    or ingredient, she took garnish. **What the September ruling objected to
+    was the generated "Garnish with…" STEP, not the meta line** — so the
+    layout now drops that step for a shell an `as: "shell"` pour fills, the
+    way it swaps a twist's for the express step, and Modern Zombie's
+    `no garnish` becomes the shell. A shell with no rum (Mai Tai) is an
+    ordinary garnish and keeps its step.
 
 ### §9.13 — the index and drink page, earlier
 - **2026-08-30, #583 / #586 / #562** — see §13.4.

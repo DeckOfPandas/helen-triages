@@ -5,7 +5,7 @@ glass:
   - "tiki mug"
   - "collins"
 garnish:
-  - "no garnish"
+  - "half an empty passion fruit shell"
 serve:
   ice: "none"
 serves: 2

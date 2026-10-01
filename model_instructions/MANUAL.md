@@ -2142,7 +2142,10 @@ rather than a quietly wrong number.
   `ground cinnamon` after it. The method ends on `shapes.shell` ("Fill the
   passion fruit shell with the <X> and set on top of the drink.", or "the lime
   shell"), then `canonical.fire`'s "Set alight." and "Sprinkle the flame with
-  cinnamon." The shell is not also a garnish. **Fire itself is `to_serve`**
+  cinnamon." **The shell itself is in `garnish`**, so the meta line names it
+  before the ingredients say "(shell)"; the layout drops the generated
+  "Garnish with…" for a shell an `as: "shell"` pour fills (a shell with no
+  rum, the Mai Tai's, keeps its step). **Fire itself is `to_serve`**
   ("more fire", "optional fire if tiki mug") and counts nothing; the RUM is
   the ingredient. `test_a_shell_pour_is_written_one_way`.
 - **Both brand and generic** are stored per ingredient.
