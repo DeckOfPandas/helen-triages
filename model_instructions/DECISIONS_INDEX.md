@@ -549,6 +549,7 @@ argument and the rules each field is read by.
 - 2026-09-24 · §13 · the design audit's four rulings, and the diagnosis behind them.
 - 2026-09-29 · §13 · #1203 · every derivation in scripts/ says what it reproduces, and two of the numbers had moved.
 - 2026-09-30 · §13 · #1210 · the recipe action buttons, redrawn: the question was never the arrangement.
+- 2026-10-01 · §13 · the search box's script ships with the box, and the documentation pass that found it.
 - 2026-08-11 · §14 · Built at Helen's request from 15 draft tables in _food_drafts/reference-info/.
 - 2026-08-13 · §14 · "Out at", never "pull at": pull is American.
 - 2026-08-14 · §14 · #183 · The single page split into temperatures and timings (#183/#189/#202).

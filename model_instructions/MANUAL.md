@@ -193,7 +193,10 @@ pages at 360, 390 and 1280 and **names every element past the viewport**, and
 crops one element at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`,
 `right`), so an alignment question is answered by comparing two numbers, not
 two images; the last two arguments type text into a box first, for a control
-that only shows itself once somebody has typed (the search dropdown, #1050).
+that only shows itself once somebody has typed (the search dropdown, #1050 —
+**local builds only since #1210**, so `build.sh`'s deploy build has no box to
+type into; build with `--config _config.yml,_config_local.yml -d tmp/site`
+first, §13.11's command pointed at the harness's directory).
 **A BOX IS NOT INK, AND TWO CROPS ARE NOT ONE IMAGE — and when the marks you
 are comparing sit in an element that also holds the tape, hide the tape.**
 `tmp/nav_candidate.py` (#1148, 2026-09-21) is the pattern: `visibility: hidden`
@@ -505,7 +508,13 @@ so a 900px header sat 24px outside the cards over 948px. Once the header stacks
 site the way the wordmark does, and by the same rule: one template, no
 per-site key; `test_the_header_and_footer_are_identical_on_every_page`
 compares the row within a site and requires each site's row to name the other
-and not itself. **The footer's reference block is a column PER SITE, gated on
+and not itself. **On a local build the header has a third row: the search
+box, directly under the door** (#1210, 2026-09-30, `_includes/page-search.html`,
+row 3 column 3 of the same grid, gated on `show_header_search` from
+`_config_local.yml` — §13.13 has the box; this is the one piece of page
+furniture that crossed into the chrome, and it did so as a testing tool: *"so
+I'm not clicking about all over the place."* The deployed header is byte for
+byte what it was.) **The footer's reference block is a column PER SITE, gated on
 having material** — food's two links appear on a cocktail page, and since
 2026-09-06 (#529) a `[ COCKTAILS ]` column appears beside them, which cost no
 template change: the loop always asked every site rather than food. The hearts
@@ -1218,8 +1227,9 @@ ended that.
 calling the same `enterShortlistView()` the button calls — so the two doors land
 in one state, and the view's "clears everything else" rule holds for both. It
 runs after the other query blocks and replaces rather than narrows, and drops
-the remembered scroll with the remembered list. The actions row's `see
-shortlist (N)` links to it, ending `#results` since #1057.
+the remembered scroll with the remembered list. The `SEE SHORTLIST (N)` link
+beside a page's shortlist pill links to it, ending `#results` since #1057, and
+since #1210 is on the page only while N is above zero.
 
 **`?shortlist=slug,slug` is a shortlist someone SENT** (#1093, 2026-09-15), and
 the index SHOWS it without saving any of it — Helen: *"Show it, don't save it"*.
@@ -4031,12 +4041,14 @@ notes."* So now:
   page of a site on a LOCAL BUILD ONLY**: row 3, column 3 of
   `.site-header-inner`, under the door to the other site and on its right
   edge, gated on `show_header_search`, which only `_config_local.yml` declares
-  (the `show_drafts` idiom). The deployed site has no search box anywhere. On
-  an index page it is a plain form (`page-search.js` is loaded by the two page
-  layouts only; `?q=` lands in the index's own box). Everything below about the
-  box itself is unchanged by the move. Before #1210 it was the right-hand end
-  of the furniture line, live — *"back arrow's line, but on the right not in
-  the centre."* The box is a plain GET form to this site's index with
+  (the `show_drafts` idiom). The deployed site has no search box anywhere.
+  **The include loads `page-search.js` beside the form, under the same gate**
+  (since 2026-10-01; it was a page-layout script from #1050), so every page
+  that has the box has the dropdown and no deployed page loads a script for a
+  box it lacks. Everything below about the box itself is unchanged by the
+  move. Before #1210 it was the right-hand end of the furniture line, live —
+  *"back arrow's line, but on the right not in the centre."* The box is a
+  plain GET form to this site's index with
   `q=`, works with no JavaScript, and submits a NAME search: `HTF.filterState.parseName`
   reads it (kept out of `parseQuery`'s kinds because a title may carry a
   comma) and each index puts the text into its own I KNOW WHAT I WANT box and

@@ -426,14 +426,16 @@ $card-shortlist-size: 1.15rem;
 // about how narrow a card may be, not about who pays -- and the index card's
 // own 370px floor is the answer to it.
 
-// --- The drink page's button: in the actions row since 2026-09-14 (#1005) ---
+// --- The drink page's button: on the toggle's line since 2026-09-14 (#1005) --
 // It sat beside the FIRST LINE of the name from #963 (2026-09-11), and on a
 // phone shrank to the `+` alone ("B: + mark only on phones", chosen at 390px)
 // because the word took 110px of a 342px column from the name. Both went with
-// the move: the button is one of four in `.cocktail-controls` now, under the
-// head's rule, with nothing to take width from, so it keeps its word at every
-// size. The phone block that did the shrinking is deleted rather than kept
-// for a selector nothing matches.
+// the move: the button is in `.cocktail-controls` now, under the head's rule,
+// with nothing to take width from, so it keeps its word at every size. The
+// phone block that did the shrinking is deleted rather than kept for a
+// selector nothing matches. A PILL SINCE #1210 (2026-09-30): the box is
+// shared/_furniture.scss's and takes its border from `currentColor` on hover
+// and on, so the colours below are still the whole of what "on" means here.
 //
 // THE LINK BESIDE IT HOVERS IN THIS SITE'S "THIS ONE" COLOUR.
 // shared/_furniture.scss gives see shortlist / print / pdf the site's accent

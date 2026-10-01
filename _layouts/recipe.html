@@ -13,12 +13,11 @@ layout: default
     {% comment %} THE ACTIONS LEFT THIS LINE ON 2026-09-14 (#1005). From
        2026-08-14 the print and pdf controls sat here beside the title,
        bottom-aligned, and the shortlist button joined them on 2026-09-04 with
-       Helen's note that the row "needs a redesign anyway". The redesign is
-       _includes/page-actions.html in `.recipe-controls` under the badges --
-       "row under the head", her pick from the candidates page -- the same
-       include in the same place the drink page has it. The title is alone on
-       its line again, which is also what lets a long one wrap without a control
-       to negotiate with. {% endcomment %}
+       Helen's note that the row "needs a redesign anyway". #1005 moved all of
+       them to a row under the badges; #1210 (2026-09-30) split them -- print
+       and pdf to the furniture line above the title, the shortlist pair to the
+       INGREDIENTS line. The title is alone on its line, which is also what
+       lets a long one wrap without a control to negotiate with. {% endcomment %}
   </div>
 
   {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
@@ -535,11 +534,10 @@ layout: default
 </article>
 
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
-{% comment %} The search box's dropdown (#1050) -- the other half of the
-   furniture line, loaded beside the arrow's script for the same reason: page
-   furniture, not chrome. It hangs HTF.pageSearch off the namespace assets.js
-   creates in the head and reaches for nothing else. {% endcomment %}
-<script src="{{ '/assets/js/page-search.js' | relative_url }}"></script>
+{% comment %} page-search.js, the search box's dropdown, loaded here beside the
+   arrow's script from #1050 until 2026-10-01: the box left the furniture line
+   for the header (#1210, local builds only) and its script went with it --
+   _includes/page-search.html loads both under one gate. {% endcomment %}
 <script src="{{ '/assets/js/method-toggle.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 {% comment %} THE SCALER, IN DEPENDENCY ORDER -- #1005. shopping-list.js is the

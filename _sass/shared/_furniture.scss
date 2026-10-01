@@ -1,13 +1,16 @@
 // =============================================================================
-// PAGE FURNITURE — the back arrow's line and the actions row, on both sites
+// PAGE FURNITURE — the back arrow's line, the shortlist pair, and the search
+// box, on both sites
 // =============================================================================
-// #1005 / #1011 / #1024, 2026-09-14. Two rows every recipe and drink page
-// carries, styled once because they are the same object on both sites and
-// Helen's complaint (#1005) was precisely that they were not: "I always find
-// myself surprised by the locations of the back, shortlist, print and pdf
-// buttons." The markup is _includes/back-to-index.html and
-// _includes/page-actions.html; each site's stylesheet imports this after
-// shared/chrome, and names only the ten palette-contract variables.
+// #1005 / #1011 / #1024, 2026-09-14, redrawn by #1210, 2026-09-30. The rows
+// every recipe and drink page carries, styled once because they are the same
+// object on both sites and Helen's complaint (#1005) was precisely that they
+// were not: "I always find myself surprised by the locations of the back,
+// shortlist, print and pdf buttons." The markup is _includes/back-to-index.html
+// (the arrow and, via page-print.html, print · pdf), _includes/page-actions.html
+// (the shortlist pair) and _includes/page-search.html (the box, in the header,
+// local builds only); each site's stylesheet imports this after shared/chrome,
+// and names only the ten palette-contract variables.
 //
 // WHAT STAYS PER SITE: the shortlist button's own colours and states
 // (food/_shortlist.scss, cocktails/_shortlist.scss), and the row the shortlist
@@ -73,7 +76,7 @@
 //
 // THE GLASS ON THE RIGHT, THE TEXT GROWING TOWARDS IT -- #1056 moved the
 // glass from #1050's original left end to the right end (the markup in
-// _includes/back-to-index.html now puts `.page-search-input` before
+// _includes/page-search.html puts `.page-search-input` before
 // `.page-search-go`, so this is simply the row's DOM order -- no `order:`
 // needed). The input is RIGHT-aligned, so typing grows the word leftwards
 // from the glass -- Helen, #1099: "____r ___rh __rhu _rhum". (#1056's first
@@ -237,9 +240,9 @@ $page-search-quiet: 45%;
 // --- The dropdown: everything the word could mean here, grouped by kind ------
 // #1050. Hangs from the box's right edge so it lines up with the GLASS,
 // which is the box's right edge now (#1056, the input having moved to the
-// left of it); on a phone the furniture line has wrapped and the box sits at
-// the column's right, so the panel's left edge is what has to stay on screen
-// -- `max-width` against the viewport does that, and the options ellipsise
+// left of it); the box sits on the header's right edge at every width
+// (#1210), so the panel's left edge is what has to stay on screen --
+// `max-width` against the viewport does that, and the options ellipsise
 // rather than wrap so the panel keeps one row per result.
 //
 // A SURFACE ON THE PAGE, not a floating widget: the site's card surface and

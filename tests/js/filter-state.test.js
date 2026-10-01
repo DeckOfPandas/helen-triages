@@ -114,7 +114,8 @@ test('arity is the caller\'s business -- two stars both come back', () => {
 });
 
 // --- the name query, #1024 -----------------------------------------------------
-// `?q=` arrives from the search box on a recipe or drink page's furniture line.
+// `?q=` arrives from the search box (the header's on a local build since
+// #1210; a recipe or drink page's furniture line before that).
 // It is NOT a kind: it is one string, whole, and a title may carry a comma, so
 // it stays out of parseQuery's return shape (which every test above reads as
 // exactly three keys) and has a reader of its own.

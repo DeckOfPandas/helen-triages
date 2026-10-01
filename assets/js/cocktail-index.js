@@ -1743,10 +1743,11 @@
      Helen: "Currently it's hard to figure out how to see your shortlist once
      you've added something to it from the separate page."
 
-     THE ACTIONS ROW LINKS TO IT. #1000 removed the drink page's see-all link
-     on 2026-09-14, and the same day #1005 put `see shortlist (N)` in the
-     shared actions row (_includes/page-actions.html) on both sites, pointing
-     here; it ends `#results` since #1057. Food has the same query (#1011).
+     THE DRINK PAGE'S SEE-SHORTLIST LINK POINTS HERE. #1000 removed the drink
+     page's see-all link on 2026-09-14, and the same day #1005 put `see
+     shortlist (N)` in the shared actions include (_includes/page-actions.html)
+     on both sites, pointing here; it ends `#results` since #1057, and since
+     #1210 it shows only while N is above zero. Food has the same query (#1011).
 
      IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
      `enterShortlistView()` plus `resetControls()` is exactly what pressing
@@ -1784,8 +1785,9 @@
     restored = null;
   }
 
-  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box on
-     a drink page's furniture line. Exactly what typing into I KNOW WHAT I WANT
+  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box
+     (a drink page's furniture line then; the header, on a local build, since
+     #1210). Exactly what typing into I KNOW WHAT I WANT
      does (`nameInput`'s handler above): the box shows the text and
      `state.nameQuery` is the same lowercased string. `HTF.filterState`, the
      MODULE, for the same reason the mood block reads it there: the grammar is
@@ -1813,7 +1815,7 @@
      filtered link in `#results`; its mood chips (_layouts/cocktail.html) end
      their own link in the id of the filter section holding that mood --
      `#filter-mood` or `#filter-hassle` -- so the reader lands on the lit chip;
-     and the actions row's "see shortlist" link ends in `#results` too. The
+     and the drink page's "see shortlist" link ends in `#results` too. The
      browser has landed at the fragment once already, against a page whose
      hidden cards were all still standing; after apply() the page has its real
      height and this puts the reader on the answer. Reading `location.hash`

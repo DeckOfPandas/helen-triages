@@ -545,9 +545,11 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   // ingredients list. Then top right for a save this feels more natural."
   // `space-between` on a two-item row is exactly that. The right-hand item was
   // the shortlist button alone until #963 (2026-09-11) moved it up to the title
-  // row; since #1005 (2026-09-14) it is the whole actions row --
-  // _includes/page-actions.html, the same four controls a recipe page has --
-  // which is her "top right for a save" with the save's neighbours beside it.
+  // row; from #1005 (2026-09-14) it was the whole actions row of four; since
+  // #1210 (2026-09-30) it is the shortlist pair -- _includes/page-actions.html,
+  // the pill and SEE SHORTLIST (N), the same include a recipe page puts on its
+  // INGREDIENTS line -- which is her "top right for a save" exactly, print and
+  // pdf having gone to the furniture line above the title.
   justify-content: space-between;
   // CENTRED: the toggle and the shortlist pill are one line above 600px, and
   // centring is what puts the two on the same optical line -- measured,

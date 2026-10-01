@@ -8036,7 +8036,8 @@ verification. Dates are when the correction landed.
     `_includes/page-search.html`, gated on `show_header_search` in
     `_config_local.yml` alone (the `show_drafts` idiom); the deployed site
     has no search box anywhere, for the first time since #1024. On an index
-    it is a plain form; `page-search.js` stays a page-layout script.
+    it was a plain form for one day: `page-search.js` stayed a page-layout
+    script until the documentation pass of 2026-10-01 (below).
   - **The shortlist pair sits on the first line under the rule, at the
     right, on both sites** — the toggle's line on a drink page, and *"on the
     same line as INGREDIENTS for Moules where it doesn't have the read it
@@ -8070,6 +8071,21 @@ verification. Dates are when the correction landed.
   - **What the session did NOT do**: touch `main`, merge, or build anything
     the brief did not name. The first page's other four treatments were
     offered and are on record; none is on the site.
+- **2026-10-01 — the search box's script ships with the box, and the
+  documentation pass that found it.** Helen: *"Please update documentation
+  where needed, including deleting/updating as well as appending."* A sweep
+  (`tmp/stale_sweep.py`, a pattern list over every doc, template, partial,
+  script and test) found some forty lines still describing the four-control
+  row or a search box on the furniture line; each was rewritten to say what is
+  true now and what was true when, and the box's whole record moved out of
+  `back-to-index.html` into `page-search.html`, where the box is. **One of the
+  stale lines was code, not prose**: `page-search.js` was still loaded by the
+  two page layouts, so on a local build the header's box had its dropdown on
+  a recipe page and was a plain form on the index — a testing tool that worked
+  on some pages. The include loads the script after its form now, under the
+  same gate, and the test that pinned the script to the layouts pins it to
+  the include instead. Net effect on the deployed site: one script tag fewer
+  on every recipe and drink page, for a box they did not have.
 
 ## §14 Reference pages
 

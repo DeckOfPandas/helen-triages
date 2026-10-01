@@ -349,14 +349,15 @@ TRUSTED_DYNAMIC = (
     # published-page set for EVERY site, so this href is covered by that rather
     # than being unchecked.
     re.compile(r"^\{\{\s*back_site\.home\s*\|\s*relative_url\s*\}\}$"),
-    # The see-shortlist link in the actions row (#1005/#1011, 2026-09-14,
-    # _includes/page-actions.html): the same site `home` as the back arrow,
-    # checked the same way by test_site_nav_links_resolve_to_real_pages, with
-    # `?shortlist=1` appended -- a query both indexes read (MANUAL 8.9), and a
-    # query is not a path, so the target page is the home page either way.
-    # `#results` since #1057 (2026-09-15): both indexes carry that id on the
-    # count line above their list (test_the_furniture_line_searches_for_anything
-    # in tests/test_site_config.py), so this is the same fragment #1050's
+    # The see-shortlist link beside the shortlist pill (#1005/#1011,
+    # 2026-09-14, _includes/page-actions.html): the same site `home` as the
+    # back arrow, checked the same way by
+    # test_site_nav_links_resolve_to_real_pages, with `?shortlist=1` appended
+    # -- a query both indexes read (MANUAL 8.9), and a query is not a path, so
+    # the target page is the home page either way. `#results` since #1057
+    # (2026-09-15): both indexes carry that id on the count line above their
+    # list (test_the_search_box_searches_for_anything_on_a_local_build in
+    # tests/test_site_config.py), so this is the same fragment #1050's
     # search-dropdown links already end in, checked the same way.
     re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1#results$"),
     # The footer's reference links, added 2026-08-16. Same shape and same

@@ -659,9 +659,10 @@ layout: default
    default.html: the arrow is page furniture, so a page with no arrow loads no
    script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
-{% comment %} The search box's dropdown (#1050), beside the arrow's script for the
-   same reason. Which site it searches is the form's `data-search-index`. {% endcomment %}
-<script src="{{ '/assets/js/page-search.js' | relative_url }}"></script>
+{% comment %} page-search.js, the search box's dropdown, was loaded here beside
+   the arrow's script from #1050 until 2026-10-01; the box is the header's now
+   (#1210, local builds only) and _includes/page-search.html loads the script
+   with it. {% endcomment %}
 {% comment %} The print button's reveal and wiring (#1005; food's #86). {% endcomment %}
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>

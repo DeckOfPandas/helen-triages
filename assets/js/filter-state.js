@@ -154,7 +154,8 @@
   }
 
   // THE NAME QUERY IS NOT A KIND -- #1024, 2026-09-14. `?q=<text>` arrives from
-  // the search box on a recipe or drink page's furniture line and is what the
+  // the search box (page-search.html; the header on a local build since
+  // #1210, a recipe or drink page's furniture line before) and is what the
   // reader typed, whole: a title may carry a comma ("Pear, apricot and rosemary
   // Bellini"), so it must not go through the comma-split above, and it is one
   // string rather than a list. Kept OUT of parseQuery's return shape, which

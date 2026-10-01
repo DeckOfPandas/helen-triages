@@ -226,9 +226,10 @@ def test_the_scaler_scripts_load_in_dependency_order():
     )
 
 
-def test_the_furniture_line_searches_for_anything():
-    """#1050. The search box on the back arrow's line, as Helen specified it,
-    and the plumbing it needs to be more than a name search.
+def test_the_search_box_searches_for_anything_on_a_local_build():
+    """#1050. The search box -- on the back arrow's line as Helen first
+    specified it, in the header on a local build since #1210 -- and the
+    plumbing it needs to be more than a name search.
 
     THE ORDER IN THE MARKUP IS THE LAYOUT: the input is BEFORE the glass
     (#1056 moved the glass to the right end, reversing #1050's own layout),
@@ -296,14 +297,22 @@ def test_the_furniture_line_searches_for_anything():
     )
     assert "icons/search.svg" in body, "the glass is _includes/icons/search.svg."
 
-    for layout in ("recipe.html", "cocktail.html"):
-        html = read("_layouts", layout)
-        back = html.find("back-link.js")
-        search = html.find("page-search.js")
-        assert back != -1 and search != -1 and back < search, (
-            f"_layouts/{layout} must load page-search.js beside (after) "
-            f"back-link.js -- the dropdown is a page-layout script; the index "
-            f"has its own box and takes the header's as a plain form."
+    # THE SCRIPT SHIPS WITH THE BOX, since 2026-10-01: page-search.html loads
+    # page-search.js after the form, inside the same gate, so every page that
+    # has the box has the dropdown and no deployed page loads a script for a
+    # box it does not have. It was a page-layout script from #1050 to #1210.
+    assert body.find("page-search.js") > body.find('class="page-search"'), (
+        "_includes/page-search.html must load page-search.js AFTER the form "
+        "it wires (the script binds on run, not on DOMContentLoaded)."
+    )
+    for layout in ("recipe.html", "cocktail.html", "default.html"):
+        assert "page-search.js" not in re.sub(
+            r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "",
+            read("_layouts", layout), flags=re.S,
+        ), (
+            f"_layouts/{layout} loads page-search.js itself; since 2026-10-01 "
+            f"only _includes/page-search.html does, under show_header_search, "
+            f"so the deployed site never loads a script for a box it lacks."
         )
 
     for site in ("food", "cocktails"):
