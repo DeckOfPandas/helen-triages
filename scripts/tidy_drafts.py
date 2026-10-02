@@ -1136,7 +1136,9 @@ def print_collection(root, verb, files, skipped, fixed, reports, total):
             print(f"    ... and {len(found) - 6} more")
 
 
-def main():
+def main(argv=None):
+    # `argv` is for tests/test_tidy_drafts.py, which calls this in its own
+    # process (#1271). None means the command line, as it always did.
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--apply", action="store_true",
                     help="write the fixes; without it nothing is changed")
@@ -1153,7 +1155,7 @@ def main():
                          "at Helen's real drafts -- see the command doc. "
                          "Needs --site, because a directory does not say "
                          "which collection's rules it wants.")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     sites = [args.site] if args.site else sorted(SITES)
     if args.drafts_dir and not args.site:
