@@ -2010,6 +2010,18 @@ unless stated.
   `(in the shell)` would be clearer. Not `shell float`: #1256 ruled it is not a
   float. Offered `(flame)` as the short alternative if it still reads unclear
   on the page; no change made.
+- **2026-10-02, #1273** — **#1217's rename missed a seventh `to top`, in the
+  suite itself, and it did not fail.** `TOP_UP_POUR` in
+  `tests/test_rendered_pages.py` still matched `to top`, so `_topped_pages`
+  returned nothing and `test_no_topped_drink_is_also_a_punch` passed for a week
+  without reading a page. Nothing was wrong on the site: five published drinks
+  top up and none declares `serves:`. What was lost was the guard that turns
+  the first topped punch red. Fixed to `(top)`, and **`_topped_pages` now
+  asserts it found at least one page**, so the next rename fails by name
+  instead of going quiet. `(splash)` is deliberately not matched: the volume
+  sum spends a midpoint for `(top)` alone. The #1217 entry's lesson holds one
+  step further: dropping the old string from `measures:` catches unmigrated
+  DATA, and nothing catches an unmigrated MATCHER except a non-empty check.
 - **2026-09-26** — **`"dashes"` throughout, `"dash"` when it is one.** Helen:
   *"Yes please to a test."* Measured first: 71 counted amounts already agreed
   and six did not, all six `dash`. `test_a_counted_unit_agrees_with_its_count`

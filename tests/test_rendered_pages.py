@@ -3157,13 +3157,33 @@ def test_a_pours_direction_sits_under_its_amount(prod_site):
     )
 
 
-TOP_UP_POUR = re.compile(r'<span class="cocktail-amount">\s*to top\s*</span>')
+# `(top)`, NOT `to top`, SINCE #1217 (2026-09-26) -- AND THIS LINE WAS THE ONE
+# THE RENAME MISSED (#1273). DECISIONS §9.3 lists five literals and a regex it
+# reached; this was a seventh, in the suite itself, and it did not fail. A
+# matcher left on the old spelling matches nothing, `_topped_pages` returned an
+# empty list, and `test_no_topped_drink_is_also_a_punch` passed for a week
+# without reading a page. `(splash)` is deliberately not here: the volume sum
+# spends a midpoint for `(top)` alone (`cocktail_units.rb`), so only a top can
+# be divided by `serves:`.
+TOP_UP_POUR = re.compile(r'<span class="cocktail-amount">\s*\(top\)\s*</span>')
 
 
 def _topped_pages(built_site):
-    """Every built drink page that prints a `to top` in its amounts."""
-    return [p for p in _drink_pages(built_site)
-            if TOP_UP_POUR.search(p.read_text(encoding="utf-8"))]
+    """Every built drink page that prints a `(top)` in its amounts.
+
+    NEVER EMPTY, and that is asserted here rather than in each caller: the
+    published set has had a topped drink since the Tom Collins, so finding
+    none means this matcher has gone stale again, not that the drinks have.
+    """
+    pages = [p for p in _drink_pages(built_site)
+             if TOP_UP_POUR.search(p.read_text(encoding="utf-8"))]
+    assert pages, (
+        "no built drink page prints a `(top)` amount, so every check on topped "
+        "drinks would pass without reading one. Either the amount's spelling "
+        "or the layout's markup around `.cocktail-amount` has changed -- fix "
+        "TOP_UP_POUR to match what the page prints now (#1273)."
+    )
+    return pages
 
 
 def test_a_topped_drink_spends_the_midpoint_of_its_declared_range(prod_site):
