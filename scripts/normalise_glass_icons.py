@@ -204,6 +204,12 @@ SOLID = set()
 # `mug` among them; `git log -S` on this file has each one's reasoning. The
 # map stays because the next redraw arrives with a working title again -- add
 # its line here, or better, rename the file and delete the one it replaces.
+#
+# `mule-mug` IS A REAL PUBLISHED NAME AGAIN SINCE 2026-10-02, and that is not
+# the old entry coming back: Helen drew the Moscow Mule its own mug (a barrel
+# body, nine dimples), so `glass-mule-mug.svg` in the archive publishes as
+# `mule-mug.svg` under its own name, beside `mug.svg`. Paragraph 2 above is
+# the history of the PLAIN mug's source, which once carried that working title.
 RENAME = {}
 
 # NOT IN THAT PASS, AND DELIBERATELY: `old-fashioned-double` carries the set's

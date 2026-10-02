@@ -436,6 +436,7 @@ argument and the rules each field is read by.
 - 2026-09-24 · §11 · THE GROUND-TRUTH HOOK REPORTED THE WRONG REPOSITORY, on its first real outing, and the session it misled was the one that wrote it.
 - 2026-09-24 · §11 · #1191 · the two permission questions, answered and closed.
 - 2026-09-29 · §11 · two read grants, and neither went live by editing settings.
+- 2026-10-02 · §11 · a public issue drew a stranger's pull request within seven minutes.
 - 2026-08-19 · §11.2 · 2026-08-19: "two stylesheets import shared/" (three).
 - 2026-09-22 · §11.2 · two wrong conclusions in ONE session, from one habit: proving something narrower than the thing being claimed.
 - 2026-09-24 · §11.2 · a HOOK reported a true fact about the wrong repository
@@ -506,6 +507,7 @@ argument and the rules each field is read by.
 - 2026-09-12 · §12 · A red main is a deploy outage, and it ran for three days
 - 2026-09-15 · §12 · A double hyphen inside an SVG comment — 2026-09-15, #1086.
 - 2026-09-28 · §12 · A label from the instructions, pasted into the workflow
+- 2026-10-02 · §12 · a PR check cancels a waiting deploy, and it reads as cancelled, not red.
 - 2026-07-31 · §13 · Recipe page redesigned; index brought onto the same mark, then reworked (row layout, category-code bar, pagination, shuffle).
 - 2026-08-03 · §13 · The category-code bar removed after four rounds of tuning.
 - 2026-08-10 · §13 · #122 · The tape background redesigned (generate_tape.py, seven files: tape-1 30 both_acute, tape-2 32 both_acute, tape-3 33 both_acute, tape-4 35 both_obtuse, tape-5 36 both_obtuse …

@@ -158,7 +158,9 @@ measures:
     # what it is: the slot where a number would be, naming the action instead.
     # It is also the same mark the ingredient line already uses for `as:`
     # (#1217's option A, `(float)` after the bottle), so ONE punctuation means
-    # one thing across the line -- a use, rather than a measure.
+    # one thing across the line -- a use, rather than a measure. SINCE #1263
+    # (2026-10-02) THE TWO ALSO SHARE A PLACE: `as:` renders under the amount,
+    # in the amount's type, so every direction is read in the amount column.
     #
     # `(float)` IS DECLARED THOUGH NOTHING USES IT YET, and that is deliberate
     # rather than the dead vocabulary #1186 went after. Helen's ruling names
