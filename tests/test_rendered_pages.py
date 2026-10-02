@@ -47,6 +47,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # importing it would have built the site twice. conftest is the one place both
 # modules see the same definition.
 from conftest import _require_bundler  # noqa: E402  (used by built_with_fixtures)
+from conftest import _absent_drafts  # noqa: E402  (the notes floor, below)
 
 
 # =============================================================================
@@ -339,6 +340,17 @@ NOTES_HEADING = re.compile(r"cocktail-section-heading--notes|recipe-section-note
 # most days and a test that fails when she writes one is a test she will delete.
 NOTES_FLOOR = 350
 
+# THE SAME PIN WHERE THE DRAFTS ARE NOT CLONED -- CI, and a fresh worktree.
+# The first version of this test had one floor, and it failed #1265's own
+# checks with "only 143 notes render": exactly the published figure above,
+# because `_food_drafts/` and `_cocktail_drafts/` are private repos a CI
+# checkout does not have (#378). NOTE_BLOCK was matching every note there was.
+# A floor of 350 could only ever pass on Helen's machine.
+#
+# Lower than 143 by a margin, because a published recipe leaves the build the
+# moment an agent edits it (`proofread: false`) and takes its notes with it.
+NOTES_FLOOR_PUBLISHED = 100
+
 
 def _pages_with_notes(site):
     for path in sorted(site.rglob("index.html")):
@@ -404,15 +416,24 @@ def test_no_page_prints_a_notes_heading_with_no_note_under_it(site):
 def test_the_three_note_tests_above_are_looking_at_notes(site):
     """Three tests that pass by finding nothing are worth exactly as much as the
     build having notes in it at all, so this is the pin that says it does.
+
+    TWO FLOORS, BY WHETHER THE DRAFTS ARE HERE. Without them the build holds
+    only published notes, and the three tests above are checking the half that
+    was never at risk -- said in this message rather than hidden in a skip,
+    because what still matters there is that NOTE_BLOCK matches the markup.
     """
+    absent = _absent_drafts()
+    floor = NOTES_FLOOR_PUBLISHED if absent else NOTES_FLOOR
     rendered = sum(len(NOTE_BLOCK.findall(html))
                    for _p, html in _pages_with_notes(site))
-    assert rendered >= NOTES_FLOOR, (
+    assert rendered >= floor, (
         f"only {rendered} notes render across the local build, below the floor "
-        f"of {NOTES_FLOOR} measured on 2026-10-01. Either the build is missing "
-        f"the drafts collections -- in which case the three tests above assert "
-        f"nothing -- or `NOTE_BLOCK` no longer matches the markup the layouts "
-        f"emit, which is the same thing."
+        f"of {floor} ("
+        + (f"published pages only: {', '.join(absent)} not cloned"
+           if absent else "drafts included, measured on 2026-10-01")
+        + "). Either the build is missing pages it should have -- in which "
+        "case the three tests above assert nothing -- or `NOTE_BLOCK` no "
+        "longer matches the markup the layouts emit, which is the same thing."
     )
 
 
