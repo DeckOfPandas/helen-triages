@@ -1848,7 +1848,8 @@ other:
   # coconut cream and half 2:1 syrup. The ratio is in the name for the reason
   # `cane sugar syrup 2:1` carries one: it is a making fact, and a recipe line
   # may be long. Priced as made-not-bought in costs.yml; 0% in abv.yml.
-  - "Coco mix (3:1, Coco Lopez to coconut milk)"
+  # THE COMMA AFTER `3:1` WENT ON 2026-10-02 (#1255), Helen's respelling.
+  - "Coco mix (3:1 Coco Lopez to coconut milk)"
   - "egg white"
   - "salt"
   # HELEN'S ANSWER, 2026-09-28, to the `QQ ground cinnamon` on the Milliners
@@ -2139,7 +2140,7 @@ shelf_of:
   cranberry juice: bottled fruit juice
   pineapple juice: bottled fruit juice
   # fresh produce and larder (30)
-  "Coco mix (3:1, Coco Lopez to coconut milk)": larder
+  "Coco mix (3:1 Coco Lopez to coconut milk)": larder
   basil: fresh produce
   black tea: larder
   blackberries: fresh produce

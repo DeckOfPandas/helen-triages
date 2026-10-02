@@ -2044,7 +2044,7 @@ def test_qq_followed_by_the_sources_words_is_still_a_qq():
     """
     assert _is_qq("QQ")
     assert _is_qq("QQ aged Jamaican rum")
-    assert _is_qq("  QQ  Coco mix (3:1, Coco Lopez to coconut milk)")
+    assert _is_qq("  QQ  Coco mix (3:1 Coco Lopez to coconut milk)")
     assert _unanswered(["QQ", "QQ simple syrup"])
 
     assert not _is_qq("QQuince liqueur")

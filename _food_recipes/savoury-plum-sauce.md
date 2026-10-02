@@ -1,6 +1,6 @@
 ---
-title: "Plum Sauce for Duck"
-tagline: "This is plum sauce...for duck. This recipe for [slow-cooked duck legs confit](../slow-cooked-duck-legs-confit/) likes plum sauce."
+title: "Savoury Plum Sauce"
+tagline: "This recipe for [slow-cooked duck legs confit](../slow-cooked-duck-legs-confit/) likes plum sauce."
 source: "Henry"
 source_type: person
 serves: "2"
@@ -36,6 +36,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---
