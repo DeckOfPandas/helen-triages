@@ -548,6 +548,45 @@ def test_note_dicts_have_label_and_text_when_dict(draft):
             )
 
 
+def test_a_draft_has_a_notes_slot_and_no_unlabelled_note(draft):
+    """#1258: "leave me with a notes placeholder I don't have to retype".
+
+    TWO THINGS THE 2026-10-01 MIGRATION LEFT, both ruled on by Helen on
+    2026-10-02.
+
+    AN EMPTY `notes: []` IS NOT ALLOWED ON A DRAFT. That migration left 77 alone
+    on the grounds that an empty list says the ingest found nothing and
+    "inventing 77 blank slots is not what was asked for". It was: "yes, thank
+    god, yes yes yes please fix the notes: []". Every draft carries at least the
+    empty pair, which neither layout prints.
+
+    A NOTE WITH TEXT HAS A LABEL, and for imported text that label is `QQ`. The
+    same migration wrote `label: ""` over 182 bare strings. Her reason for
+    `QQ`: "this will stop them being published by accident (i.e. without me
+    having spotted and fixed the imported text)" -- `test_no_qq_placeholder`
+    holds a recipe with a `QQ` in it back, and an empty label held nothing.
+
+    `scripts/tidy_drafts.py --only notes` does both, so a draft that fails this
+    is fixed by the tidy pass and not by hand.
+    """
+    notes = draft.fm.get("notes")
+    assert notes, (
+        f"{where_draft(draft)} has `notes: {notes!r}`, so there is nowhere to "
+        f"type a note without recalling the YAML shape. Write the empty pair "
+        f'-- `- label: ""` / `text: ""` -- or run '
+        f"`python3 scripts/tidy_drafts.py --only notes --apply`."
+    )
+    for i, note in enumerate(notes, 1):
+        if not isinstance(note, dict):
+            continue                    # the test above names this one
+        assert not note.get("text") or note.get("label"), (
+            f"{where_draft(draft)} note {i} has text and an empty label -- "
+            f"{note!r}. Imported text Helen has not read is labelled `\"QQ\"` "
+            f"so that it cannot publish unnoticed; "
+            f"`python3 scripts/tidy_drafts.py --only notes --apply` writes it."
+        )
+
+
 def test_method_short_is_a_list(draft):
     ms = draft.fm.get("method_short")
     if ms is None:

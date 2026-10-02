@@ -830,7 +830,30 @@ unless stated.
   **`notes: []` was left alone**, on 77 food drafts. An empty LIST says the
   ingest found nothing worth a note; an empty NOTE says Helen has a note to
   write. They are different statements and inventing 77 blank slots is not what
-  was asked for.
+  was asked for. **Reversed the next day — see the entry below.**
+- **2026-10-02, #1258** — **Every draft has a notes slot, and imported text is
+  labelled `QQ`. Both reverse a choice the 2026-10-01 migration made.** #1258
+  asked for both in so many words and the migration did neither: it left
+  `notes: []` alone (above), and it wrote `label: ""` over the bare strings it
+  converted where the issue says `label: "QQ"`. Asked which she wanted, Helen:
+  *"Yes please, mark empty labels with QQ, because this will stop them being
+  published by accident (i.e. without me having spotted and fixed the imported
+  text). Then yes, thank god, yes yes yes please fix the notes: [] !!!!"*
+
+  So: 182 notes with text and an empty label became `label: "QQ"` (148 food, 34
+  cocktails), text untouched, and 75 empty lists became the empty pair (50 food,
+  25 cocktails). It is a `tidy_drafts.py` rule, `--only notes`, so the next
+  ingest that writes either shape is fixed by the tidy pass;
+  `test_a_draft_has_a_notes_slot_and_no_unlabelled_note` and its drinks twin
+  refuse both. **Drafts only**: a published page with no notes still writes
+  `notes: []`.
+
+  **`QQ` on a label now means "Helen has not read this", whatever the text
+  says.** `test_a_qq_note_carries_a_qq_label` used to refuse a `QQ` label over
+  text that did not itself begin `QQ`; that half is retired, because prefixing
+  the text would be editing imported words to satisfy a scanner. The other half
+  stands: text that begins `QQ` must be labelled `QQ`. An ingest's OWN notes
+  are unchanged — both halves `QQ`, and `ingest_inbox.py` still demands it.
 
 ### §4.0 The gate flags
 
@@ -6326,6 +6349,23 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
     but no read was attempted to tell which. **So a settings edit is not the
     fix for either, and `/add-dir` is the route in a running session**, as
     `CLAUDE.md` already says for a new grant.
+- **2026-10-02 — `scripts/git-drafts.sh`: local git inside a drafts clone,
+  allow-listed.** The two hooks that refuse a leading `cd` and `git -C` left a
+  drafts pass with no sanctioned way to branch, read a diff or commit there,
+  while `tidy-drafts.md` still taught `cd _food_drafts && git checkout -b`.
+  #1258's pass used a throwaway `tmp/` script, which asks Helen on every call.
+  Shown that, Helen: *"gotcha, thanks. Yes please do it."* The wrapper takes
+  the two drafts folders and a fixed list — `status`, `diff`, `log`, `show`,
+  `branch --show-current`, `checkout -b`, `add --`, `commit -F tmp/<file>` —
+  and refuses the rest. **What the prompt was the last guard of, verb by
+  verb:** `diff --output=` writes a file anywhere and `--no-index` reads any
+  two files on the disk, so `diff` takes five named options and plain refs;
+  `checkout` of an existing branch is how a session ends up on `main`, and
+  `checkout -- <path>` discards work, so only `-b <new>`; `commit` on that
+  repo's `main` is not seen by `guard-main-branch.py`, which reads the command
+  text and finds no `-C`, so the wrapper refuses it itself. That last refusal
+  needs a real clone and is NOT covered by `tests/test_agent_wrappers.py`; it
+  was exercised by hand.
 
 ### §11.2 The record of this file being wrong
 

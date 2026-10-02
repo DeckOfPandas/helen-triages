@@ -50,7 +50,12 @@ now unconditional: 298 bare strings across both drafts repos became pairs on
 2026-10-01 and `test_note_dicts_have_label_and_text_when_dict` refuses a new one,
 so a note you find in an existing file is already a pair. **An empty pair is the
 placeholder** — `label: ""` with `text: ""` — and neither layout prints it, so
-leaving one costs nothing and gives Helen somewhere to type.
+leaving one costs nothing and gives Helen somewhere to type. **A draft with no
+notes carries exactly that pair, never `notes: []`** (#1258, 2026-10-02), and
+text with an empty label is not a shape either: imported text is labelled
+`"QQ"`. `scripts/ingest_inbox.py` writes the pair itself when an envelope says
+`notes: []`, and `python3 scripts/tidy_drafts.py --only notes --apply` writes
+both for a file that arrived any other way.
 
 **A COCKTAIL'S `generic` IS TYPED WHERE THE VOCABULARY SETTLES IT -- Helen, 2026-09-20 -- AND THE SAME RULE NOW HOLDS IN BOTH SESSIONS.** It used to be `QQ`, always, because a bottle's category is not derivable from the ingredient beside it. Her words: *"Surely we're able to fill in generics at ingest, or at least try then review with me"* and *"if it's not obvious write QQ then whatever the source said then I have a chance of being able to fix it myself."* Three tiers, and the boundary between the second and third is the one that matters:
 
