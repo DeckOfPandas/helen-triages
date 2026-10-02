@@ -778,6 +778,69 @@ def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
             )
 
 
+SHELL_DRINK = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "tiki mug"\ngarnish:\n{garnish}'
+    'ingredients:\n  - amount: "50 ml"\n    generic: "London dry gin"\n'
+    '  - amount: "25 ml"\n    generic: "lime juice"\n{shell}'
+    'method:\n  - "Shake all ingredients with ice."\n'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  made_before: true\n  ship: "yes"\n'
+    '  rewritten: true\n  awaiting_fix: false\n  proofread: true\n---\n'
+)
+SHELL_POUR = ('  - amount: "25 ml"\n    generic: "overproof Jamaican rum, unaged"\n'
+              '    as: "shell"\n')
+
+
+def test_a_filled_shell_is_named_in_the_meta_and_gets_no_garnish_step():
+    """The shell is in `garnish:` and the page does not say it twice -- #1256.
+
+    Helen, 2026-10-01, reading the first pass: the ingredients said "(shell)"
+    and the method said "Fill the passion fruit shell", and nothing had
+    mentioned a shell. So the shell went back into `garnish`, where the meta
+    line names it first -- and the generated "Garnish with half an empty
+    passion fruit shell." had to go, because that repetition is what she
+    deleted from Modern Zombie on 2026-09-09.
+
+    THE THIRD CASE IS THE ONE THAT KEEPS THIS HONEST: a shell with no rum in
+    it (the Mai Tai's lime shell) is an ordinary garnish and keeps its step.
+    """
+    def lines(items):
+        return "".join(f'  - "{g}"\n' for g in items)
+
+    shell = "half an empty passion fruit shell"
+    cases = {
+        # slug: (garnishes, has a shell pour, the garnish step or None)
+        "zzz-shell-with-others": (["mint sprig", shell], True,
+                                  "Garnish with a mint sprig."),
+        "zzz-shell-alone": ([shell], True, None),
+        "zzz-shell-no-rum": ([shell], False, f"Garnish with {shell}."),
+    }
+    files = {f"_cocktail_recipes/{slug}.md": SHELL_DRINK.format(
+                 t=slug, garnish=lines(garnishes),
+                 shell=SHELL_POUR if pour else "")
+             for slug, (garnishes, pour, _) in cases.items()}
+
+    with built_with_fixtures("shell", files) as out:
+        for slug, (_, _, expected) in cases.items():
+            page = out / "cocktails" / "recipes" / slug / "index.html"
+            assert page.exists(), f"{slug} did not build"
+            html = page.read_text(encoding="utf-8")
+            assert re.search(r"<dt>Garnish</dt>\s*<dd>[^<]*" + re.escape(shell), html), (
+                f"{slug}: the meta line does not name the shell, so the page "
+                "reaches \"(shell)\" without having mentioned one.")
+            found = re.search(r"<li>Garnish with (.*?)\.</li>", html, re.S)
+            got = None if not found else "Garnish with " + " ".join(
+                re.sub(r"<[^>]+>", "", found.group(1)).split()) + "."
+            assert got == expected, (
+                f"{slug}\n  expected: {expected}\n  got:      {got}\n\n"
+                "A shell an `as: \"shell\"` pour fills is placed by the method "
+                "and gets no generated step; a shell with no rum is an "
+                "ordinary garnish. The garnish-step block of "
+                "_layouts/cocktail.html decides."
+            )
+
+
 def test_no_garnish_contains_the_join_separator():
     """The garnish step joins its parts with `|` and splits them back.
 

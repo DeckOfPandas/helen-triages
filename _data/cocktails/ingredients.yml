@@ -205,7 +205,13 @@ measures:
     # `(garnish)` RATHER THAN `as: garnish`, on the pairing rule the layout
     # states: a pour with a measure names its use in `as:`, a pour without one
     # names it in the amount. Neither of these has a measure.
-    - (garnish)
+    #
+    # `(garnish)` IS RETIRED, 2026-10-01 (#1256), BY THAT SAME PAIRING RULE.
+    # Helen gave the shell rum a measure -- "let's do real ml. Default to 25
+    # ml, nice and tidy" -- so it names its use in `as: "shell"` (see
+    # `ingredient_as` below) and the word amount has no user left. A word
+    # amount counted no units, which was the whole reason for moving the rum
+    # into the ingredients. `(sprinkle)` stays: nobody measures the cinnamon.
     - (sprinkle)
     # A THIRD ACTION, 2026-09-14 (#752): the Ti' Punch. Helen: "let's say 60 ml
     # rum, then lime and sugar to taste -- this drink is typically served as
@@ -482,10 +488,24 @@ not_on_cards:
 # a sugar. Helen: don't let a muddle reorder at all. The VALUE stays because it
 # is a true fact about the pour and the drink page may want it; the card simply
 # does not read it. See the plugin's header for the full finding.
+#
+# `shell` JOINED 2026-10-01 (#1256, #1249): the overproof rum poured into a
+# fruit half-shell and set alight. It had been written five ways on five drinks
+# -- `as: float`, no role at all, `amount: "(garnish)"`, and twice as prose in
+# `to_serve` where nothing counted it. Helen: "let's do real ml. Default to 25
+# ml, nice and tidy. Use that for all my cocktail recipes unless otherwise
+# stated, and retroapply this." So a shell pour is ALWAYS a measured line, 25 ml
+# unless she says otherwise for that drink, and the method's three shell steps
+# (methods.yml `shapes.shell`, `canonical.fire`) are what place and light it.
+#
+# IT SORTS LAST, with the float and the rinse and for their reason: it is added
+# outside the main build. It is NOT a float -- Zombie Intoxica called it one,
+# and a float goes on the drink where this goes in a shell on top of it.
 ingredient_as:
   - "float"
   - "rinse"
   - "muddle"
+  - "shell"
 
 # --- other names for a family ------------------------------------------------
 # A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a

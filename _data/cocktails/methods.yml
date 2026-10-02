@@ -258,6 +258,22 @@ canonical:
     - "Express the twist over the drink then drop it in."
     - "Express the twist over the drink then discard it."
 
+  # THE FLAMING SHELL'S LAST TWO STEPS, 2026-10-01 (#1256). The same act had
+  # been written "Set alight." on the two Zombies, "...and set alight." inside a
+  # longer step on Milliners Punch, and as `to_serve` prose ("filled with
+  # Overproof rum and fire") on Cobra's Fang and Tiki Max, where it was not an
+  # instruction at all. These are the Zombies' own two sentences, which Helen
+  # proofread onto the live site, so nothing here is new wording.
+  #
+  # THEY FOLLOW `shapes.shell` BELOW AND ARE ALWAYS THE DRINK'S LAST STEPS, in
+  # this order. test_a_shell_pour_is_written_one_way holds all three.
+  #
+  # THE CINNAMON LIVES HERE, in the method -- Helen, same day: "Cinnamon
+  # sparkles can sit in method." What `to_serve` may add is MORE of them.
+  fire:
+    - "Set alight."
+    - "Sprinkle the flame with cinnamon."
+
 # =============================================================================
 # SHAPES -- a canonical sentence with ONE slot, 2026-09-10
 # =============================================================================
@@ -292,6 +308,17 @@ shapes:
   float:
     - "Float the <X> on top."
     - "Drop the <X> on top."
+  # THE SHELL STEP, 2026-10-01 (#1256). `<X>` is the rum, as the recipe names
+  # it -- the ingredient carrying `as: "shell"`. The sentence is Modern
+  # Zombie's, unchanged.
+  #
+  # TWO SENTENCES RATHER THAN A SECOND SLOT FOR THE FRUIT. The one-slot rule
+  # above is what keeps this file a dictionary, and there are exactly two
+  # shells in the collection -- garnish.yml's `half an empty passion fruit
+  # shell` and `half an empty lime shell`. A third fruit is a third line.
+  shell:
+    - "Fill the passion fruit shell with the <X> and set on top of the drink."
+    - "Fill the lime shell with the <X> and set on top of the drink."
 
 # =============================================================================
 # THE GLASS GENERATOR -- #1214, 2026-09-28. A step that acts on the glass says

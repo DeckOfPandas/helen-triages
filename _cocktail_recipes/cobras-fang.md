@@ -6,6 +6,7 @@ glass:
 garnish:
   - "mint sprig"
   - "lime wheel"
+  - "half an empty passion fruit shell"
 serve:
   ice: "cubed"
 ingredients:
@@ -37,11 +38,19 @@ ingredients:
   - amount: "1 dash"
     generic: "warm-spiced bitters"
     suggestion: ["Bittermens Elemakule Tiki Bitters"]
+  - amount: "25 ml"
+    generic: "overproof Jamaican rum, unaged"
+    as: "shell"
+  - amount: "(sprinkle)"
+    generic: "ground cinnamon"
 method:
-  - "Short shake all ingredients other than the bitters with three ice cubes."
+  - "Short shake all ingredients other than the bitters and the overproof Jamaican rum with three ice cubes."
   - "Strain."
   - "Drop the bitters on top."
-to_serve: "Plastic giraffes, paper umbrella, teeny flamingos, passion fruit shells filled with Overproof rum and fire, cinnamon sparkles."
+  - "Fill the passion fruit shell with the overproof Jamaican rum and set on top of the drink."
+  - "Set alight."
+  - "Sprinkle the flame with cinnamon."
+to_serve: "Plastic giraffes, paper umbrella, teeny flamingos, more fire, more cinnamon sparkles."
 mood:
   - "warming"
   - "fruity"
@@ -62,5 +71,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

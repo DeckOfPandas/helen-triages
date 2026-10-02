@@ -7686,6 +7686,144 @@ def test_a_method_that_floats_or_rinses_says_so_in_a_field(drink_file):
     )
 
 
+def _shell_patterns():
+    """The `shapes.shell` sentences as regexes, `<X>` capturing the rum."""
+    return [rx for shape, rx in _shape_patterns(_methods())
+            if shape in ((_methods().get("shapes") or {}).get("shell") or [])]
+
+
+def test_a_shell_pour_is_written_one_way(drink_file):
+    """A fruit shell of flaming rum is one ingredient line and three steps --
+    #1256, Helen's rulings of 2026-10-01.
+
+    IT HAD BEEN WRITTEN FIVE WAYS ON FIVE DRINKS: `as: float` (Zombie
+    Intoxica), no role at all (Modern Zombie), `amount: "(garnish)"` (Milliners
+    Punch), and as `to_serve` prose on Cobra's Fang and Tiki Max, where the rum
+    was in no ingredient list and so in no unit count. Each was a reasonable
+    thing to write on the day, which is why it needed a rule and not a tidy-up.
+
+    THE RULE, all of it checkable:
+
+      * the rum is ONE ingredient with `as: "shell"` and a millilitre amount
+        ("let's do real ml") -- 25 ml by default, which is hers to vary per
+        drink and therefore NOT asserted here;
+      * it comes last, with only a `(sprinkle)` allowed after it;
+      * the method ENDS on the three canonical steps -- a filled
+        `shapes.shell` sentence naming that rum, then `canonical.fire`'s two;
+      * the shell IS in `garnish`, once, and it is the fruit the method fills.
+        The first version of this test said the opposite, after DECISIONS
+        §9.1.1 (2026-09-09), and Helen read the result: "(shell)" after the
+        rum and "Fill the passion fruit shell" in the method, on a page that
+        had not mentioned a shell. The garnish line is what introduces it;
+        the LAYOUT drops the generated "Garnish with ..." for a filled shell,
+        which is the repetition that ruling was about.
+
+    AND THE CONVERSE, which is what stops a sixth spelling: a method that
+    fills a shell has an ingredient that says so.
+    """
+    _require_drink(drink_file)
+    fm = drink_file.fm
+    items = [i for i in (fm.get("ingredients") or []) if isinstance(i, dict)]
+    shells = [i for i in items if str(i.get("as") or "") == "shell"]
+    steps = _steps(fm)
+    patterns = _shell_patterns()
+    assert patterns, "methods.yml declares no `shapes.shell`, so this guards nothing."
+    filled = [m for s in steps for rx in patterns for m in [rx.match(s)] if m]
+
+    assert shells or not filled, (
+        f"{_drink_where(drink_file)}'s method fills a shell but no "
+        "ingredient carries `as: \"shell\"`. The rum is a pour: give it "
+        "its own line, a millilitre amount (25 ml unless Helen says "
+        "otherwise) and the role."
+    )
+
+    problems = []
+    if len(shells) > 1:
+        problems.append(f"{len(shells)} ingredients say `as: \"shell\"`; one shell, one line")
+    for shell in shells[:1]:
+        amount = str(shell.get("amount") or "")
+        if not re.fullmatch(r"\d+(\.\d+)? ml", amount):
+            problems.append(f"the shell pour's amount is {amount!r}, not millilitres")
+        after = items[items.index(shell) + 1:]
+        if any(str(i.get("amount")) != "(sprinkle)" for i in after):
+            problems.append("the shell pour is not the last measured ingredient")
+
+        fire = (_methods().get("canonical") or {}).get("fire") or []
+        tail = steps[-(len(fire) + 1):]
+        last = next((rx.match(tail[0]) for rx in patterns if rx.match(tail[0])), None) \
+            if len(tail) == len(fire) + 1 else None
+        if last is None or tail[1:] != fire:
+            problems.append(
+                "the method does not END on the three shell steps: "
+                + " / ".join(["Fill the <fruit> shell with the <rum> and set on "
+                              "top of the drink."] + fire))
+        else:
+            generic = shell.get("generic")
+            generic = str(generic[0] if isinstance(generic, list) else generic)
+            if not generic.lower().startswith(last.group(1).lower()):
+                problems.append(
+                    f"the shell step pours {last.group(1)!r} but the "
+                    f"`as: \"shell\"` ingredient is {generic!r}")
+
+        shell_garnishes = [str(g) for g in (fm.get("garnish") or [])
+                           if "shell" in str(g).lower()]
+        if len(shell_garnishes) != 1:
+            problems.append(
+                f"`garnish` names {len(shell_garnishes)} shells; it must name "
+                "the one the rum goes in, so the page mentions the shell "
+                "before the ingredients say \"(shell)\"")
+        elif last is not None and \
+                shell_garnishes[0].replace("half an empty ", "") not in tail[0]:
+            problems.append(
+                f"`garnish` says {shell_garnishes[0]!r} but the method fills "
+                "a different shell")
+
+    assert not problems, (
+        f"{_drink_where(drink_file)} writes its flaming shell its own way:\n  "
+        + "\n  ".join(problems)
+        + "\n\nSee `ingredient_as` in ingredients.yml and `shapes.shell` / "
+          "`canonical.fire` in methods.yml."
+    )
+
+
+def _to_serve_items(text):
+    """A `to_serve` string as its lowercased items, split on `.` and `,`."""
+    return [p.strip().lower() for p in re.split(r"[.,]", text) if p.strip()]
+
+
+def test_every_to_serve_item_is_declared(drink_file):
+    """Each thing a drink is served with is a declared item -- #1256, #1249.
+
+    THE FIELD STAYS ONE STRING AND THE ITEMS ARE WHAT IS CLOSED. Helen asked
+    for "canonical language for fun presentation decorations like plastic
+    giraffes"; serve.yml's `to_serve` block is that language and its header
+    says why the separators were left alone.
+
+    WHAT THIS CATCHES THAT NOTHING DID: "Cocktail umbrella." beside "paper
+    umbrella", and a pour described in prose -- "passion fruit shells filled
+    with Overproof rum and fire" is not an item, so a drink writing it is told
+    to put the rum in its ingredients, where the units are counted.
+    """
+    _require_drink(drink_file)
+    text = drink_file.fm.get("to_serve")
+    text = text if isinstance(text, str) else ""
+    groups = _serve_vocab().get("to_serve") or {}
+    declared = {i for members in groups.values() for i in members}
+    assert declared, "serve.yml declares no `to_serve` vocabulary."
+
+    # An empty `to_serve` has no items and nothing to punctuate.
+    bad = [i for i in _to_serve_items(text) if i not in declared]
+    assert not bad and (not text.strip() or text.strip().endswith(".")), (
+        f"{_drink_where(drink_file)} has `to_serve: {text!r}`"
+        + (", with undeclared item(s): " + ", ".join(repr(b) for b in bad)
+           if bad else ", which does not end on a full stop")
+        + "\n\nDeclared: " + ", ".join(sorted(declared))
+        + ".\n\nA POUR is not serveware: rum in a shell is an ingredient with "
+          "`as: \"shell\"`. Adding an item is a vocabulary decision -- "
+          "_data/cocktails/serve.yml."
+    )
+
+
 def test_drink_notes_are_sentences(drink_file):
     """A note starts with a capital and ends with a full stop -- #711.
 

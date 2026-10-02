@@ -236,8 +236,8 @@ test rather than rendering:
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
 `small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` · `half` ·
-`whole` · `(top)` · `(rinse)` · `(splash)` · `(float)` · `(garnish)` ·
-`(sprinkle)` · `to taste`
+`whole` · `(top)` · `(rinse)` · `(splash)` · `(float)` · `(sprinkle)` ·
+`to taste`
 <!-- vocab:measures end -->
 
 Four things a source prints as if they were units, and what to do instead
@@ -261,7 +261,19 @@ Four things a source prints as if they were units, and what to do instead
   `Top with …` step; a rinse is `amount: "(rinse)"` with a `Rinse …` step. The
   others are `"(splash)"` (a deliberate small pour that does NOT fill the
   glass), `"(float)"` (only where no millilitre figure is given — a float
-  usually has one), `"(garnish)"` and `"(sprinkle)"`.
+  usually has one) and `"(sprinkle)"` (cinnamon onto a flame).
+- **Rum set alight in a fruit shell is a MEASURED pour with `as: "shell"`** —
+  Helen's ruling, 2026-10-01. `amount: "25 ml"` unless the source gives its own
+  figure, written as the LAST ingredient (only a `"(sprinkle)"` of
+  `ground cinnamon` may follow it). The method then ENDS on exactly three
+  steps: `Fill the passion fruit shell with the <rum> and set on top of the
+  drink.` (or `the lime shell`), `Set alight.`, `Sprinkle the flame with
+  cinnamon.` **The shell itself goes in `garnish`** — `half an empty passion
+  fruit shell` or `half an empty lime shell`, whichever the method fills — so
+  the page names it before the ingredients say "(shell)"; the page does not
+  add a "Garnish with…" step for it. Never write the rum as
+  `"(garnish)"`, as a float, or as prose in `to_serve` — none of those counts
+  its alcohol.
 
   The brackets are the point: the old form was a sentence fragment sitting in
   a column of quantities, and the bracketed noun reads as what it is — the
@@ -556,7 +568,33 @@ Four rules that decide the awkward cases:
 >   giraffes.
 > - **Do not restate a method step.** One cocktail's garnish read "passion fruit
 >   shell filled with overproof rum" while its own method already said "Fill
->   the passion fruit shell with rum and set on top of the drink."
+>   the passion fruit shell with rum and set on top of the drink." The garnish
+>   is the OBJECT — `half an empty passion fruit shell` — never what is done
+>   to it.
+
+### `to_serve` — the declared items
+
+One string, made of these items, separated by commas or full stops and ending
+on a full stop: `"Straw."`, `"Plastic giraffes, paper umbrella, teeny
+flamingos, more fire, more cinnamon sparkles."` Capitalise the first word;
+the match ignores case. If the source serves the drink with something not
+listed, write the source's words and flag it in your list.
+
+<!-- vocab:to_serve start -->
+**Serveware:** `straw` · `two straws` · `stirrer` · `ladle and punch glasses`
+
+**Decorations:** `plastic giraffes` · `paper umbrella` · `teeny flamingos` ·
+`zero umbrellas`
+
+**Fire:** `more fire` · `more cinnamon sparkles` · `optional fire if tiki mug`
+
+**On the side:** `lime and sugar on the side` · `assemblage au choix`
+<!-- vocab:to_serve end -->
+
+**A pour is never a `to_serve` item.** "Shell filled with overproof rum" is an
+ingredient with `as: "shell"` (§3); "champagne on the side" is an ingredient
+with a `note`. What `to_serve` may say about fire is the flourish — `more
+fire`, `optional fire if tiki mug` — never the rum.
 
 ---
 
@@ -653,6 +691,8 @@ that needs two is free text.
 **Express:** `Express the twist over the drink then drop it in.` ·
 `Express the twist over the drink then discard it.`
 
+**Fire:** `Set alight.` · `Sprinkle the flame with cinnamon.`
+
 **With a slot exclusion:**
 `Shake all ingredients other than the <X> with ice.` ·
 `Stir all ingredients other than the <X> with ice.` ·
@@ -664,6 +704,10 @@ that needs two is free text.
 **With a slot top:** `Top with <X>.`
 
 **With a slot float:** `Float the <X> on top.` · `Drop the <X> on top.`
+
+**With a slot shell:**
+`Fill the passion fruit shell with the <X> and set on top of the drink.` ·
+`Fill the lime shell with the <X> and set on top of the drink.`
 <!-- vocab:method end -->
 
 Seven things that will catch you out:

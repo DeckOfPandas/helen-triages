@@ -5,7 +5,7 @@ glass:
   - "tiki mug"
   - "collins"
 garnish:
-  - "no garnish"
+  - "half an empty passion fruit shell"
 serve:
   ice: "none"
 serves: 2
@@ -36,16 +36,20 @@ ingredients:
     generic: "lime juice"
   - amount: "20 ml"
     generic: "grenadine"
-  - amount: "20 ml"
+  - amount: "25 ml"
     generic: "overproof Jamaican rum, unaged"
+    as: "shell"
     suggestion:
       - "Wray & Nephew"
       - "Rum Fire"
+  - amount: "(sprinkle)"
+    generic: "ground cinnamon"
 method:
   - "Shake all ingredients other than the overproof Jamaican rum with ice."
   - "Fill the passion fruit shell with the overproof Jamaican rum and set on top of the drink."
   - "Set alight."
   - "Sprinkle the flame with cinnamon."
+to_serve: "Plastic giraffes, paper umbrella, teeny flamingos, more fire, more cinnamon sparkles."
 mood:
   - "fruity"
   - "sugar craving"
@@ -65,5 +69,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -108,12 +108,11 @@ excluded_units:
   # why. `(splash)` and `(float)` are absent for a different reason -- neither
   # has a declared volume range yet, so neither reaches the arithmetic at all.
   - (rinse)
-  # `(garnish)` and `(sprinkle)` joined 2026-09-26 with the Milliners Punch.
-  # Excluded for the reason a dash and a leaf are: no volume, so no arithmetic.
-  # Its flaming overproof rum and its cinnamon are real pours she will buy, and
-  # they show on the shopping list as a count -- what they cannot do is add
-  # millilitres to a total.
-  - (garnish)
+  # `(sprinkle)` joined 2026-09-26 with the Milliners Punch. Excluded for the
+  # reason a dash and a leaf are: no volume, so no arithmetic. The cinnamon is
+  # a real pour she will buy, and it shows on the shopping list as a count --
+  # what it cannot do is add millilitres to a total. `(garnish)` joined with it
+  # and left on 2026-10-01 (#1256): the shell rum is a measured 25 ml now.
   - (sprinkle)
 
 # --- what a bottle costs and how big it is -----------------------------------
