@@ -803,6 +803,63 @@ def test_a_drink_in_a_staging_subfolder_is_reached(drinks):
     assert path.read_text(encoding="utf-8") == BEFORE
 
 
+# =============================================================================
+# THE NOTES SLOT, #1258
+# =============================================================================
+# Three notes, one of each kind the rule has to tell apart: imported text with
+# an empty label (labelled), the empty pair (a slot, left exactly alone), and a
+# note Helen has already headed (hers, left exactly alone).
+NOTES_BEFORE = '''  - label: ""
+    text: "Serves 4 -- as the source has it."
+  - label: ""
+    text: ""
+  - label: "Balance"
+    text: "Give it 2-3 stirs more than you think."
+'''
+NOTES_AFTER = NOTES_BEFORE.replace(
+    '  - label: ""\n    text: "Serves 4', '  - label: "QQ"\n    text: "Serves 4')
+STOCK_NOTES = BEFORE[BEFORE.index("notes:\n") + len("notes:\n"):
+                     BEFORE.index('source: ""')]
+
+
+@pytest.mark.parametrize("site", ["cocktails", "food"])
+def test_notes_rule_labels_imported_text_and_nothing_else(drinks, site):
+    """Byte for byte, on both sites, with the text of every note untouched."""
+    before = BEFORE.replace(STOCK_NOTES, NOTES_BEFORE)
+    path = write_drink(drinks, text=before)
+    runner = run if site == "cocktails" else run_food
+    out = runner(drinks, "--only", "notes", "--apply")
+    assert "applied 1 mechanical change(s) across 1 file(s)" in out, out
+    assert path.read_text(encoding="utf-8") == \
+        BEFORE.replace(STOCK_NOTES, NOTES_AFTER)
+
+
+@pytest.mark.parametrize("empty", ["notes: []\n", "notes:\n", "notes:  [ ]\n"])
+def test_notes_rule_turns_an_empty_list_into_a_slot(drinks, empty):
+    """`notes: []` -> the empty pair, and the file still parses to exactly that.
+
+    PARSED AS WELL AS COMPARED, because the one bug this script has had wrote a
+    plausible diff and an unparseable file.
+    """
+    import yaml
+    path = write_drink(drinks, text=BEFORE.replace("notes:\n" + STOCK_NOTES,
+                                                   empty))
+    run(drinks, "--only", "notes", "--apply")
+    got = path.read_text(encoding="utf-8")
+    assert got == BEFORE.replace(STOCK_NOTES,
+                                 '  - label: ""\n    text: ""\n'), got
+    assert yaml.safe_load(got.split("---\n")[1])["notes"] == \
+        [{"label": "", "text": ""}]
+
+
+def test_notes_rule_is_idempotent_and_leaves_a_finished_file_alone(drinks):
+    """The stock fixture has a headed note and a `QQ` one: nothing to do."""
+    path = write_drink(drinks)
+    out = run(drinks, "--only", "notes", "--apply")
+    assert "applied 0 mechanical change(s)" in out, out
+    assert path.read_text(encoding="utf-8") == BEFORE
+
+
 def test_food_only_rules_do_not_run_on_a_drink(drinks):
     """`--only meta` on the drinks site changes nothing, and says so.
 

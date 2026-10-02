@@ -742,6 +742,14 @@ with it.
   refuses a new one. A published note must have both halves FILLED, which is the
   stricter `test_note_dicts_have_label_and_text`. Four or more notes is the
   signal to write body content instead (§4.1).
+- **A DRAFT never says `notes: []`, and a draft note with text never has an
+  empty label** (#1258, 2026-10-02). A draft with nothing to say carries one
+  empty pair, so there is always somewhere to type; text nobody has headed is
+  labelled `"QQ"`, which is what stops it publishing unread.
+  `python3 scripts/tidy_drafts.py --only notes --apply` writes both, and
+  `test_a_draft_has_a_notes_slot_and_no_unlabelled_note` (food) and
+  `test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note` refuse either.
+  A PUBLISHED page with no notes still writes `notes: []`.
 - `internal_temp_ref` (+ `doneness`) pulls a live figure from
   `_data/food/internal_temperatures.yml` — §14; opt-in, most recipes have
   neither.
@@ -1360,6 +1368,18 @@ clone's `origin` is a plain URL, and `git remote -v` can print it all day.
 `dir` on the push wrapper is the checkout to push FROM — a nested drafts clone,
 say — and defaults to the current directory. A bare `git -C _cocktail_drafts
 fetch origin` has no credential and fails; that is correct, use the wrapper.
+
+**Local git inside a drafts clone has its own wrapper, `scripts/git-drafts.sh`.**
+The three above talk to GitHub; this one never does. It takes one of the two
+drafts folders and a fixed list of verbs — `status`, `diff`, `log`, `show`,
+`branch --show-current`, `checkout -b <new>`, `add -- <paths>`,
+`commit -F tmp/<file>` — and refuses everything else, including a commit on
+that repo's `main`. It exists because a leading `cd` and `git -C` are both
+refused by `guard-unanalyzable-bash.py`, which left a drafts pass with no way
+to branch or commit that did not ask Helen on every call.
+
+    sh scripts/git-drafts.sh _food_drafts checkout -b tidy/<what>
+    sh scripts/git-drafts.sh _food_drafts commit -F tmp/commit-msg.txt
 
 **NAMING A PRIVATE `repo` IS NOT ENOUGH — GIVE ITS `dir` TOO, EVERY TIME.**
 Without `dir` the wrapper pushes the CURRENT checkout's branch to whatever repo

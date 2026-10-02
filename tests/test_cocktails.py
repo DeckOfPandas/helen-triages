@@ -601,6 +601,22 @@ def _load_published_files():
     return out
 
 
+def _load_draft_files():
+    """Only the drinks in `_cocktail_drafts/`, whole -- the unpublished tense.
+
+    THE MIRROR OF `_load_published_files`, for a rule that is true of a draft
+    and deliberately NOT of a published drink (#1258: a draft always carries a
+    notes slot, a published drink with nothing to say writes `notes: []`). It
+    filters `_load_files()` rather than scanning the root, so the skip and the
+    loud failure are that door's and not a copy of them. Absent drafts skip:
+    the private repo not being cloned is the ordinary state of CI.
+    """
+    out = [d for d in _load_files() if DRAFTS in d.path.parents]
+    if not out:
+        pytest.skip(NO_DRINKS_REASON)
+    return out
+
+
 def _load_staged():
     """The published tense: `_cocktail_recipes/` plus every staging folder in STAGED_DIRS.
 
@@ -1857,7 +1873,21 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # `Strain.` plus glasses.yml plus serve.yml -- so the stored form became the
 # bare technique. The rendered page is byte-identical to what she read, which is
 # the only reason that edit did not need a fresh proofread.
-COCKTAIL_BASELINE_COMMIT = "12765a9"   # six drinks promoted from 4-promote/
+#
+# MOVED 2026-10-02 FOR ONE DRINK AND ONE LINE, ON HELEN'S EXPLICIT GRANT.
+# `4f3621b` adds `I want to faff` to Porn Star Martini's `mood:` (#1268) -- the
+# tag she asked for in the issue's own words, "Scooping out three passion fruit
+# half-shells definitely counts", written by the deriver from a `mood_include`
+# entry. Nothing else in the file changed.
+#
+# HER GRANT, asked for the tag: "No need to flip the proofread flag, this is an
+# explicit grant." It is the 742aa73 shape again: a change she can see whole in
+# the sentence that asked for it.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly one file, `_cocktail_recipes/porn-star-martini.md`, "last touched by
+# 4f3621bc", and nothing else. Covers 4f3621b and nothing after.
+COCKTAIL_BASELINE_COMMIT = "4f3621b"   # Porn Star Martini gains one mood (#1268)
 
 
 def _newest_commit_per_published_drink():
@@ -4613,6 +4643,15 @@ def test_a_qq_note_carries_a_qq_label():
     the string, and every `grep -rn QQ` in this repo's history has found these
     by their text. Moving the marker into the label alone would fail in the
     direction where a future scanner silently stops seeing them.
+
+    THE CONVERSE WAS ASSERTED TOO, UNTIL 2026-10-02, AND #1258 RETIRED IT. A
+    `QQ` label over text that did not itself begin `QQ` used to fail here. The
+    2026-10-01 migration turned 34 bare-string drink notes into `label: ""`,
+    and Helen asked for those to be labelled `QQ` with the imported text left
+    as it stands: "this will stop them being published by accident (i.e.
+    without me having spotted and fixed the imported text)". So `QQ` on the
+    label now means "Helen has not read this yet", whatever the text says;
+    `test_no_published_drink_carries_a_qq` is what turns that into a gate.
     """
     checked = 0
     bad = []
@@ -4629,21 +4668,45 @@ def test_a_qq_note_carries_a_qq_label():
             label = note.get("label")
             if text.strip().startswith("QQ") and label != "QQ":
                 bad.append(f"{slug}: QQ note labelled {label!r}, not 'QQ'")
-            if label == "QQ" and not text.strip().startswith("QQ"):
-                bad.append(f"{slug}: labelled QQ but the text does not say so: "
-                           f"{text[:60]!r}")
     assert not bad, (
         "QQ notes and their labels disagree:\n  " + "\n  ".join(bad)
         + "\n\nA note whose text begins `QQ` is written as:\n"
           '  - label: "QQ"\n    text: "QQ - ..."\n\n'
           "Both halves, on purpose: the label is what the page shows, the "
-          "prefix is what every QQ scanner in this repo matches on. A note "
-          "that is Helen's own remark stays a bare string and renders as "
-          "\"note\"."
+          "prefix is what every QQ scanner in this repo matches on."
     )
     assert checked, (
         "No drink notes were scanned at all, so this compared nothing -- the "
         "collection had 170 when this was written."
+    )
+
+
+def test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note():
+    """#1258, the drinks half: somewhere to type, and no imported text unlabelled.
+
+    `tests/test_drafts.py::test_a_draft_has_a_notes_slot_and_no_unlabelled_note`
+    is the food half and carries the argument. DRAFTS ONLY -- a published drink
+    with nothing to say still writes `notes: []`, and its notes are held to the
+    stricter filled-pair rule.
+    """
+    bad = []
+    for drink in _load_draft_files():
+        notes = drink.fm.get("notes")
+        if not notes:
+            bad.append(f"{drink.slug}: `notes` is {notes!r}, with no slot to "
+                       f"type into")
+            continue
+        for i, note in enumerate(notes, 1):
+            if isinstance(note, dict) and note.get("text") \
+                    and not note.get("label"):
+                bad.append(f"{drink.slug}: note {i} has text and no label")
+    assert not bad, (
+        "Draft drink(s) Helen would have to retype YAML for:\n  "
+        + "\n  ".join(bad)
+        + "\n\n`python3 scripts/tidy_drafts.py --only notes --apply` writes "
+          'the empty `{label: "", text: ""}` pair into an empty `notes:` and '
+          'labels an unlabelled note `"QQ"`. See .claude/commands/'
+          "tidy-drafts.md."
     )
 
 

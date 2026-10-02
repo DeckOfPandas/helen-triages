@@ -487,6 +487,108 @@ def test_git_fetch_agent_fetches_one_branch(args, ref):
     assert lines[-1] == f"+refs/heads/{ref}:refs/remotes/origin/{ref}"
 
 
+# --- git-drafts.sh: a fixed list of local git, in the two drafts clones -------
+
+@pytest.mark.parametrize("args", [
+    [],
+    ["_food_drafts"],
+    # Only the two drafts folders, spelled exactly.
+    [".", "status"],
+    ["/etc", "status"],
+    ["../elsewhere", "status"],
+    ["_food_recipes", "status"],
+    ["_food_drafts/../..", "status"],
+    # Verbs that discard work, talk to a remote, or change configuration.
+    ["_food_drafts", "reset", "--hard"],
+    ["_food_drafts", "restore", "."],
+    ["_food_drafts", "clean", "-fd"],
+    ["_food_drafts", "stash"],
+    ["_food_drafts", "push", "origin", "main"],
+    ["_food_drafts", "fetch", "--upload-pack=x"],
+    ["_food_drafts", "merge", "main"],
+    ["_food_drafts", "config", "core.pager", "x"],
+    ["_food_drafts", "-c", "core.pager=x", "status"],
+    # Options that write or read outside the folder, or run a program.
+    ["_food_drafts", "diff", "--output=/etc/x"],
+    ["_food_drafts", "diff", "--no-index", "/etc/passwd", "a.md"],
+    ["_food_drafts", "diff", "--ext-diff"],
+    ["_food_drafts", "diff", "/etc/passwd"],
+    ["_food_drafts", "diff", "../../README.md"],
+    ["_food_drafts", "log", "--output=x"],
+    ["_food_drafts", "log", "--format=%H"],
+    ["_food_drafts", "show", "--textconv"],
+    ["_food_drafts", "status", "--ignored"],
+    # `branch` reads; it does not delete, rename or create.
+    ["_food_drafts", "branch"],
+    ["_food_drafts", "branch", "-D", "x"],
+    ["_food_drafts", "branch", "--show-current", "x"],
+    # `checkout` makes a NEW branch and does nothing else.
+    ["_food_drafts", "checkout", "main"],
+    ["_food_drafts", "checkout", "--", "."],
+    ["_food_drafts", "checkout", "-b", "main"],
+    ["_food_drafts", "checkout", "-b", "--orphan"],
+    ["_food_drafts", "checkout", "-b", "x", "origin/main"],
+    ["_food_drafts", "checkout", "-B", "x"],
+    # `add` needs its `--`, and only plain paths after it.
+    ["_food_drafts", "add", "."],
+    ["_food_drafts", "add", "--"],
+    ["_food_drafts", "add", "--", "--chmod=+x"],
+    ["_food_drafts", "add", "--", "/etc/passwd"],
+    ["_food_drafts", "add", "--", "../README.md"],
+    # `commit` takes a message file under tmp/ and nothing else.
+    ["_food_drafts", "commit"],
+    ["_food_drafts", "commit", "-m", "x"],
+    ["_food_drafts", "commit", "-a", "-F", BODY_FOR_DRAFTS := "tmp/test-git-drafts-msg.txt"],
+    ["_food_drafts", "commit", "--amend", "-F", BODY_FOR_DRAFTS],
+    ["_food_drafts", "commit", "-F", "/etc/passwd"],
+    ["_food_drafts", "commit", "-F", "CLAUDE.md"],
+    ["_food_drafts", "commit", "-F", "tmp/../CLAUDE.md"],
+    ["_food_drafts", "commit", "-F", "tmp/no-such-file.txt"],
+])
+def test_git_drafts_refuses_everything_off_its_list(args):
+    _assert_refused("git-drafts.sh", args)
+
+
+@pytest.mark.parametrize("args", [
+    ["_food_drafts", "status"],
+    ["_cocktail_drafts", "status", "--short"],
+    ["_food_drafts", "branch", "--show-current"],
+    ["_food_drafts", "checkout", "-b", "tidy/1258-notes-slot"],
+    ["_food_drafts", "diff", "--stat"],
+    ["_food_drafts", "diff", "--cached", "--name-only", "main", "age-dashi.md"],
+    ["_cocktail_drafts", "log", "--oneline", "-5", "origin/main"],
+    ["_food_drafts", "show", "--stat", "HEAD~1"],
+    ["_food_drafts", "add", "--", "."],
+    ["_food_drafts", "add", "--", "age-dashi.md", "4-promote/x.md"],
+])
+def test_git_drafts_runs_its_list_inside_the_named_clone(args):
+    lines = _accepted_lines("git-drafts.sh", args)
+    assert lines == ["git", "-C", args[0], *args[1:]]
+
+
+def test_git_drafts_commits_from_a_message_file_under_tmp():
+    """The path is rewritten one level up, because git runs inside the clone."""
+    message = ROOT / BODY_FOR_DRAFTS
+    message.parent.mkdir(exist_ok=True)
+    message.write_text("a message\n", encoding="utf-8")
+    try:
+        lines = _accepted_lines(
+            "git-drafts.sh", ["_food_drafts", "commit", "-F", BODY_FOR_DRAFTS])
+        assert lines == ["git", "-C", "_food_drafts", "commit", "-F",
+                         f"../{BODY_FOR_DRAFTS}"]
+        link = ROOT / "tmp" / "test-git-drafts-link.txt"
+        link.unlink(missing_ok=True)
+        link.symlink_to(ROOT / "CLAUDE.md")
+        try:
+            _assert_refused("git-drafts.sh",
+                            ["_food_drafts", "commit", "-F",
+                             "tmp/test-git-drafts-link.txt"])
+        finally:
+            link.unlink()
+    finally:
+        message.unlink()
+
+
 # --- git-clone-agent.sh: a repo and a folder, nothing else --------------------
 
 @pytest.mark.parametrize("args", [
@@ -913,6 +1015,12 @@ REVIEWED_OPEN_RULES = {
     "Bash(sh scripts/git-push-agent.sh *)",
     "Bash(sh scripts/git-fetch-agent.sh *)",
     "Bash(sh scripts/git-clone-agent.sh *)",
+    # Added 2026-10-02 (Helen: "Yes please do it"). Local git inside the two
+    # drafts clones and nowhere else, from a fixed list of verbs and options;
+    # checked for `diff --output=` and `--no-index`, `checkout` of anything but
+    # a new branch, `commit` of anything but `-F tmp/<file>`, and every verb
+    # that discards work or talks to a remote. The refusals are tested above.
+    "Bash(sh scripts/git-drafts.sh *)",
     "Bash(sh scripts/browser/shoot.sh *)",
     "Bash(sh scripts/browser/crop.sh *)",
     # Added 2026-09-15, alongside guard-unanalyzable-bash.py's env-assignment

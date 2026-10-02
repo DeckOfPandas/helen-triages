@@ -27,6 +27,13 @@ rewrite, and correcting its dash or its degree sign is editing someone else's
 words (MANUAL §5, issue #426). Two thirds of the corpus-wide en-dash hits are
 inside `QQ` text, so this is not a technicality.
 
+**The `notes` rule (#1258, 2026-10-02) is the one that writes a line Helen did
+not.** On both collections, `--only notes` turns an empty `notes: []` into one
+empty `{label: "", text: ""}` pair, so she never has to recall the YAML shape,
+and labels a note that has text and an empty label `"QQ"`, so imported text
+cannot publish unread. It never changes a note's `text`, and never touches a
+note that already has a label.
+
 ## Both collections, since 2026-09-05
 
 `python3 scripts/tidy_drafts.py` covers `_food_drafts/` **and**
@@ -158,8 +165,14 @@ six faults" cannot pass while something also happened to the other thirty lines.
 
 3. **Branch in the drafts repo**, never commit to its `main`:
 
-       cd _food_drafts && git checkout -b tidy/<what-this-pass-is>
-       cd _cocktail_drafts && git checkout -b tidy/<what-this-pass-is>
+       sh scripts/git-drafts.sh _food_drafts checkout -b tidy/<what-this-pass-is>
+       sh scripts/git-drafts.sh _cocktail_drafts checkout -b tidy/<what-this-pass-is>
+
+   `scripts/git-drafts.sh` is how every git command in a drafts repo is run —
+   `status`, `diff`, `log`, `show`, `branch --show-current`, `checkout -b`,
+   `add --` and `commit -F tmp/<file>`. A leading `cd` and `git -C` are both
+   refused by the hook, and the wrapper is allow-listed, so it does not ask
+   Helen. It refuses a commit on the drafts repo's `main`.
 
 4. **Apply**: `python3 scripts/tidy_drafts.py --apply`. It refuses on a dirty
    tree unless you pass `--allow-dirty`, and that refusal is deliberate: the

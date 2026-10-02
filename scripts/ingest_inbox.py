@@ -181,6 +181,8 @@ def _reject_unlabelled_notes(fm: dict) -> None:
             problem = "is a bare string"
         elif not isinstance(note, dict):
             problem = f"is a {type(note).__name__}, not a `{{label, text}}` pair"
+        elif note == {"label": "", "text": ""}:
+            continue    # the empty pair: a slot for Helen, not a note (#1258)
         elif note.get("label") != "QQ":
             problem = f"is labelled {note.get('label')!r}, not 'QQ'"
         elif not (isinstance(note.get("text"), str)
@@ -458,12 +460,26 @@ def write(plan: Plan) -> None:
     A dumper would lose comment placement, key order and the exact `[""]` shape
     `method_short` depends on -- `tidy_drafts.py` refuses one for the same
     reason. What the browser wrote is what Helen proofreads.
+
+    ONE EXCEPTION, AND IT IS A LINE NOBODY WROTE: an empty `notes:` becomes the
+    empty `{label, text}` pair (#1258 -- "at ingest ... leave me with a notes
+    placeholder I don't have to retype"). A source that answers everything has
+    no note to carry, and a draft with `notes: []` has nowhere to type one. The
+    rule is `tidy_drafts.fix_notes_slot`, imported rather than retyped, and its
+    other half -- labelling unlabelled text `QQ` -- cannot fire here, because
+    `_reject_unlabelled_notes` has already refused any such envelope.
     """
     if not plan.ok:
         raise ValueError("refusing to write a rejected or duplicate envelope")
     if plan.path.exists():
         raise FileExistsError(f"{plan.path} exists; this script never overwrites")
-    plan.path.write_bytes(plan.envelope.block.encode("utf-8"))
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from tidy_drafts import fix_notes_slot
+    text, changed = fix_notes_slot(plan.envelope.block, plan.path)
+    if changed:
+        plan.notes.append("the envelope had no notes, so the draft carries an "
+                          "empty {label, text} pair to type into")
+    plan.path.write_bytes(text.encode("utf-8"))
     plan.written = True
 
 

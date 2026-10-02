@@ -809,6 +809,10 @@ mood_include:
     moods: [sharp]
     why: >-
       she calls it sharp; the rule's five-poured-ingredient cap excludes it.
+  porn-star-martini:
+    moods: [I want to faff]
+    why: >-
+      Helen, 2026-10-02 (#1268): "Scooping out three passion fruit half-shells definitely counts." The rule scores it zero: six ingredients where nine is the threshold, and its method says "Scoop out the seeds and flesh from three passion fruit halves", which carries none of the faff words -- `shell` is in the list, but the word is in this drink's GARNISH, and the rule reads method steps. A PER-DRINK CORRECTION AND NOT A NEW FAFF WORD: `scoop` would be one hit where the rule wants two, so adding it would not reach this drink.
   smokestack-lightning:
     moods: [warming]
     why: >-
