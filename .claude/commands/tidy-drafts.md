@@ -27,6 +27,13 @@ rewrite, and correcting its dash or its degree sign is editing someone else's
 words (MANUAL §5, issue #426). Two thirds of the corpus-wide en-dash hits are
 inside `QQ` text, so this is not a technicality.
 
+**The `notes` rule (#1258, 2026-10-02) is the one that writes a line Helen did
+not.** On both collections, `--only notes` turns an empty `notes: []` into one
+empty `{label: "", text: ""}` pair, so she never has to recall the YAML shape,
+and labels a note that has text and an empty label `"QQ"`, so imported text
+cannot publish unread. It never changes a note's `text`, and never touches a
+note that already has a label.
+
 ## Both collections, since 2026-09-05
 
 `python3 scripts/tidy_drafts.py` covers `_food_drafts/` **and**

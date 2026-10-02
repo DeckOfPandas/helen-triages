@@ -94,6 +94,7 @@ argument and the rules each field is read by.
 - 2026-09-06 · §4 · §4 had ended with "Cocktails front matter does not exist yet and must not be invented" since 2026-08-02, three weeks after the first drinks were ingested.
 - 2026-09-07 · §4 · #814 · Ingests split the ingredient side and leave the method side flat, and have always done.
 - 2026-10-01 · §4 · a note is always {label, text}, and an empty one is a placeholder nothing prints.
+- 2026-10-02 · §4 · #1258 · Every draft has a notes slot, and imported text is labelled QQ. Both reverse a choice the 2026-10-01 migration made.
 - 2026-08-18 · §4.0 · Hardened (above).
 - 2026-08-26 · §4.0 · food_magic_bag joined GATED_COLLECTIONS with the collection; §4.0 said two until 2026-09-02.
 - 2026-09-01 · §4.0 · What awaiting_fix: true means to Helen: "'awaiting_fix' means I've proofread, but one small thing has been raised as a ticket, meaning that once that's fixed I can look for just …

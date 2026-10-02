@@ -881,7 +881,82 @@ def report_size_words_with_no_count(path, text):
     return found
 
 
+# =============================================================================
+# THE NOTES SLOT, #1258 -- somewhere to type, and a label Helen cannot miss
+# =============================================================================
+# Helen, #1258: "at ingest, or draft check, leave me with a notes placeholder I
+# don't have to retype". Two moves, both on a draft's `notes:` and nothing else.
+#
+#   1. `notes: []` (or a bare `notes:`) BECOMES THE EMPTY PAIR. The 2026-10-01
+#      migration left 77 of these alone on the grounds that an empty list says
+#      the ingest found nothing; Helen, 2026-10-02, on being asked: "yes, thank
+#      god, yes yes yes please fix the notes: []". An empty pair renders as
+#      nothing in either layout, so the slot costs the page nothing.
+#   2. A NOTE WITH TEXT AND AN EMPTY LABEL IS LABELLED `QQ`. Those are the 182
+#      bare strings the same migration turned into `label: ""`. Her reason,
+#      2026-10-02: "this will stop them being published by accident (i.e.
+#      without me having spotted and fixed the imported text)" -- a published
+#      recipe may not contain `QQ`, so the label is the gate.
+#
+# THE TEXT IS NEVER TOUCHED. It is imported wording; the label is the only
+# thing this writes. And a published recipe never passes through here, so
+# `notes: []` stays the right spelling for a finished page with no notes.
+NOTES_KEY = re.compile(r"^notes:[ \t]*(?P<value>\[\s*\])?[ \t]*$")
+NOTE_EMPTY_LABEL = re.compile(
+    r"^(?P<lead>\s*(?:-\s+)?)label:[ \t]*(?:\"\"|'')?[ \t]*$")
+NOTE_TEXT = re.compile(r"^\s*(?:-\s+)?text:[ \t]*(?P<value>.*?)[ \t]*$")
+NOTES_PLACEHOLDER = ['notes:', '  - label: ""', '    text: ""']
+
+
+def fix_notes_slot(text, path):
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    lines = fm.split("\n")
+
+    start = next((i for i, l in enumerate(lines) if NOTES_KEY.match(l)), None)
+    if start is None:
+        return text, []
+    # The block is every following line that is indented or a list dash; the
+    # next top-level key ends it. The trailing "" that split leaves is neither,
+    # which is the lesson fix_meta_block's comment records.
+    end = start + 1
+    while end < len(lines) and re.match(r"^(\s+\S|-\s)", lines[end]):
+        end += 1
+
+    if end == start + 1:
+        lines[start:end] = NOTES_PLACEHOLDER
+        return (open_ + "\n".join(lines) + close + body,
+                ["empty `notes:` -> an empty {label, text} pair to type into"])
+    if NOTES_KEY.match(lines[start]).group("value"):
+        return text, ["SKIPPED: `notes: []` with lines under it -- left alone "
+                      "rather than guessed at"]
+
+    # One note at a time: a list dash opens it, the next dash or the end of the
+    # block closes it.
+    opens = [i for i in range(start + 1, end)
+             if re.match(r"^\s*-\s", lines[i])] + [end]
+    changed = []
+    for a, b in zip(opens, opens[1:]):
+        label_i = next((i for i in range(a, b)
+                        if NOTE_EMPTY_LABEL.match(lines[i])), None)
+        text_m = next((m for m in map(NOTE_TEXT.match, lines[a:b]) if m), None)
+        if label_i is None or text_m is None:
+            continue
+        if text_m.group("value") in ("", '""', "''"):
+            continue                    # the empty pair: a slot, not a note
+        lead = NOTE_EMPTY_LABEL.match(lines[label_i]).group("lead")
+        lines[label_i] = f'{lead}label: "QQ"'
+        changed.append(f"unlabelled note -> label \"QQ\": "
+                       f"{text_m.group('value').strip(chr(34))[:50]}")
+    if not changed:
+        return text, []
+    return open_ + "\n".join(lines) + close + body, changed
+
+
 FOOD_FIXERS = [
+    ("notes", fix_notes_slot),
     ("quoting", fix_scalar_quoting),
     ("quoting", fix_flow_quoting),
     ("dashes", fix_en_dashes),
@@ -907,7 +982,12 @@ FOOD_FIXERS = [
 # A drink cannot carry an unspaced amount anyway (`15ml` fails
 # test_every_amount_is_readable_as_a_quantity, because `measures:` declares the
 # unit and not the glue), so the wrap costs nothing and states the rule.
+# `notes` IS UNWRAPPED ON A DRINK, the one fixer here that is. It changes the
+# line count (which `only_where_editable` refuses) and it has to see a
+# `text: "QQ - ..."` line to know the note has text, which the wrap would blank.
+# It writes a `label:` line and a fresh empty pair, never anybody's words.
 DRINK_FIXERS = [
+    ("notes", fix_notes_slot),
     ("quoting", only_where_editable(
         partial(fix_scalar_quoting, fields=DRINK_SCALAR_FIELDS))),
     ("dashes", only_where_editable(fix_en_dashes)),

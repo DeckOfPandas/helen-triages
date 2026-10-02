@@ -742,6 +742,14 @@ with it.
   refuses a new one. A published note must have both halves FILLED, which is the
   stricter `test_note_dicts_have_label_and_text`. Four or more notes is the
   signal to write body content instead (§4.1).
+- **A DRAFT never says `notes: []`, and a draft note with text never has an
+  empty label** (#1258, 2026-10-02). A draft with nothing to say carries one
+  empty pair, so there is always somewhere to type; text nobody has headed is
+  labelled `"QQ"`, which is what stops it publishing unread.
+  `python3 scripts/tidy_drafts.py --only notes --apply` writes both, and
+  `test_a_draft_has_a_notes_slot_and_no_unlabelled_note` (food) and
+  `test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note` refuse either.
+  A PUBLISHED page with no notes still writes `notes: []`.
 - `internal_temp_ref` (+ `doneness`) pulls a live figure from
   `_data/food/internal_temperatures.yml` — §14; opt-in, most recipes have
   neither.

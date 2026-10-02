@@ -830,7 +830,30 @@ unless stated.
   **`notes: []` was left alone**, on 77 food drafts. An empty LIST says the
   ingest found nothing worth a note; an empty NOTE says Helen has a note to
   write. They are different statements and inventing 77 blank slots is not what
-  was asked for.
+  was asked for. **Reversed the next day — see the entry below.**
+- **2026-10-02, #1258** — **Every draft has a notes slot, and imported text is
+  labelled `QQ`. Both reverse a choice the 2026-10-01 migration made.** #1258
+  asked for both in so many words and the migration did neither: it left
+  `notes: []` alone (above), and it wrote `label: ""` over the bare strings it
+  converted where the issue says `label: "QQ"`. Asked which she wanted, Helen:
+  *"Yes please, mark empty labels with QQ, because this will stop them being
+  published by accident (i.e. without me having spotted and fixed the imported
+  text). Then yes, thank god, yes yes yes please fix the notes: [] !!!!"*
+
+  So: 182 notes with text and an empty label became `label: "QQ"` (148 food, 34
+  cocktails), text untouched, and 75 empty lists became the empty pair (50 food,
+  25 cocktails). It is a `tidy_drafts.py` rule, `--only notes`, so the next
+  ingest that writes either shape is fixed by the tidy pass;
+  `test_a_draft_has_a_notes_slot_and_no_unlabelled_note` and its drinks twin
+  refuse both. **Drafts only**: a published page with no notes still writes
+  `notes: []`.
+
+  **`QQ` on a label now means "Helen has not read this", whatever the text
+  says.** `test_a_qq_note_carries_a_qq_label` used to refuse a `QQ` label over
+  text that did not itself begin `QQ`; that half is retired, because prefixing
+  the text would be editing imported words to satisfy a scanner. The other half
+  stands: text that begins `QQ` must be labelled `QQ`. An ingest's OWN notes
+  are unchanged — both halves `QQ`, and `ingest_inbox.py` still demands it.
 
 ### §4.0 The gate flags
 
