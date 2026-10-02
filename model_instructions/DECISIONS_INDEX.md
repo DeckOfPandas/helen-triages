@@ -288,6 +288,7 @@ argument and the rules each field is read by.
 - 2026-09-28 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #1238 #295 · (towards #295) — what each glass holds, as a spec.
 - 2026-09-29 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #295 · the glasses page, and the heights switched.
 - 2026-09-29 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · one source per glass; §9.15's "both stay on disk" reversed.
+- 2026-10-02 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the mule mug has its own drawing, and the normaliser learned <circle>.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST glass that has artwork.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is COMPRESSED, and drawn as a FRACTION of the title block.
 - 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #601 · the card got its own curve, and the drink page's comment had claimed it all along.

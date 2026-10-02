@@ -5664,9 +5664,10 @@ def test_glass_base_centres_are_current():
 
 
 def test_every_glass_type_has_a_sourced_capacity_and_height():
-    """All 27 icons, plus the survey-only mule mug -- Helen, 2026-09-28: "All
-    27 please." An icon with no drink yet still gets its numbers: the page
-    that states them is a spec, and a spec covers what it declares."""
+    """Every icon, plus any survey-only type -- Helen, 2026-09-28: "All 27
+    please." (28 since the mule mug got its own drawing, 2026-10-02.) An icon
+    with no drink yet still gets its numbers: the page that states them is a
+    spec, and a spec covers what it declares."""
     g = _glasses()
     want = set(g["all_icons"]) | set(g.get("survey_only_types") or {})
     for block in ("typical_ml", "typical_height_mm"):
@@ -5702,9 +5703,10 @@ def test_every_survey_row_is_a_sourced_figure():
 
 
 def test_a_survey_only_type_is_a_spelling_that_draws_another_icon():
-    """`mule-mug` is surveyed apart from `mug` because it holds a third more,
-    and draws AS the mug. If `mule mug` ever gets its own drawing, it becomes an
-    icon and this declaration should go -- this test is what says so."""
+    """`mule-mug` WAS surveyed apart from `mug` because it holds a third more,
+    and drew AS the mug. It got its own drawing on 2026-10-02, became an icon,
+    and its declaration went -- which this test would have demanded. The map
+    is empty now and the test guards the next type that borrows a drawing."""
     g = _glasses()
     bad = []
     for key, spec in (g.get("survey_only_types") or {}).items():
@@ -5991,6 +5993,43 @@ def test_the_icon_parser_applies_nested_transforms():
         f"ancestor transform into the path data and must report none left to "
         f"apply, or a caller adds the outer offset a second time."
     )
+
+
+def test_the_normaliser_keeps_a_circle_and_refuses_a_shape_it_cannot_read():
+    """A <circle> in a source drawing is artwork, and it used to vanish.
+
+    Helen's mule mug, 2026-10-02, has nine dimples drawn as <circle>. The
+    normaliser read <path> only, so all nine were dropped and no guard fired:
+    each one counts paths and transforms, and a circle is neither. The mug
+    would have published smooth, with nothing to say why.
+
+    SYNTHETIC ON PURPOSE, for the reason the transform test above gives. Three
+    claims: a filled circle comes out as a path carrying `glass-icon-dot`
+    beside the line class; an unfilled one comes out as a plain line; and a
+    shape the script does not read stops it by name instead of being dropped.
+    """
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import normalise_glass_icons as N  # inert on import: see its __main__ guard
+
+    def drawing(shape):
+        return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">'
+                '<g transform="translate(1,1)">'
+                '<path d="M 2,2 L 18,18" style="fill:none" />'
+                f'{shape}</g></svg>')
+
+    dot = N.normalise(drawing(
+        '<circle style="fill:#4c4c4d;stroke:#4c4c4d" cx="10" cy="5" r="1" />'), "t")
+    assert dot.count("<path") == 2, f"the circle did not survive:\n{dot}"
+    assert 'class="glass-icon-line glass-icon-dot" d="M 9.00000,5.00000 a 1,1' in dot, (
+        f"a FILLED circle should be a two-arc path marked as a dot:\n{dot}")
+
+    ring = N.normalise(drawing(
+        '<circle style="fill:none;stroke:#4c4c4d" cx="10" cy="5" r="3" />'), "t")
+    assert ring.count("<path") == 2 and "glass-icon-dot" not in ring, (
+        f"an UNFILLED circle is a line, not a dot:\n{ring}")
+
+    with pytest.raises(SystemExit, match="<rect>"):
+        N.normalise(drawing('<rect x="1" y="1" width="3" height="3" />'), "t")
 
 
 # The margin scripts/normalise_glass_icons.py pads a fitted canvas with, in
