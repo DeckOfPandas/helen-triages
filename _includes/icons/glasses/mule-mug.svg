@@ -1,0 +1,27 @@
+<svg viewBox="0.0138 0.0110 105.2598 81.1070" class="glass-icon glass-icon--mule-mug"
+     role="img" aria-hidden="true" focusable="false">
+  <g transform="translate(-204.10995,-93.607228)">
+    <path class="glass-icon-line" d="m 215.60847,167.21402 c -8.10825,-7.31169 -10.57197,-18.81615 -10.01197,-33.12432 0.56,-14.3082 5.82076,-31.15944 10.01197,-33.23217" />
+    <path class="glass-icon-line" d="m 271.15133,167.12459 v 3.21954 c 0,1.63958 -1.92266,2.98107 -4.27252,2.98107 h -46.99782 c -2.34988,0 -4.27252,-1.34149 -4.27252,-2.98107 v -3.13011 -0.0894" />
+    <path class="glass-icon-line" d="m 271.29216,167.21402 c 18.29703,-16.4995 7.52659,-62.63426 0,-66.35649" />
+    <path class="glass-icon-line" d="m 276.16582,97.872762 c 0,1.587881 -2.26982,2.887068 -5.04398,2.887068 h -55.48388 c -2.77418,0 -5.04398,-1.299187 -5.04398,-2.887068" />
+    <path class="glass-icon-line" d="m 276.16582,97.905296 c 0,-1.587881 -2.26982,-2.887068 -5.04398,-2.887068 h -55.48388 c -2.77418,0 -5.04398,1.299187 -5.04398,2.887068" />
+    <path class="glass-icon-line" d="M 271.29216,167.21402 H 215.60847" />
+    <path class="glass-icon-line" d="m 276.33398,106.22633 c 5.18524,-4.64069 10.33089,-9.24594 17.49978,-8.175983 7.16888,1.069958 16.14352,7.782563 13.75799,18.904643 -2.38553,11.12208 -16.20009,26.6011 -30.01493,42.08043" />
+    <g transform="translate(0,-4.1194421)">
+      <path class="glass-icon-line glass-icon-dot" d="M 242.45032,138.65446 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+      <path class="glass-icon-line glass-icon-dot" d="M 214.08589,138.65446 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+      <path class="glass-icon-line glass-icon-dot" d="M 270.81473,138.65446 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+    </g>
+    <g transform="translate(0,1.0583333)">
+      <path class="glass-icon-line glass-icon-dot" d="M 242.45032,155.58759 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+      <path class="glass-icon-line glass-icon-dot" d="M 220.64641,155.58759 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+      <path class="glass-icon-line glass-icon-dot" d="M 264.14612,155.58759 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+    </g>
+    <g transform="translate(0,-1.0583333)">
+      <path class="glass-icon-line glass-icon-dot" d="M 242.50435,113.48246 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+      <path class="glass-icon-line glass-icon-dot" d="M 220.70044,113.48246 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+      <path class="glass-icon-line glass-icon-dot" d="M 264.20016,113.48246 a 1,1 0 1,0 2,0 a 1,1 0 1,0 -2,0 z" />
+    </g>
+  </g>
+</svg>

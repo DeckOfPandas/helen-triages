@@ -1589,6 +1589,16 @@ $glass-top:          $title-half-leading + $title-cap-inset;
   vector-effect: non-scaling-stroke;
 }
 
+// A DOT — 2026-10-02, the mule mug's nine dimples. A path that carries this
+// BESIDE `.glass-icon-line` was a filled <circle> in Helen's source
+// (scripts/normalise_glass_icons.py, `circles_to_paths`). It keeps the line's
+// stroke, so it thickens with the line everywhere the line is restyled, and
+// takes back the fill the rule above removes — without it a dimple is a solid
+// speck on a card and a hollow ring on the reference page.
+.glass-icon-dot {
+  fill: currentColor;
+}
+
 // FILL-BASED ARTWORK. NOTHING IN THE SET USES THIS TODAY, AND IT STAYS ANYWAY.
 //
 // All 27 glasses are open line art as of 2026-09-06: Helen redrew the pineapple

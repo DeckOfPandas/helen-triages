@@ -274,6 +274,65 @@ RENAME = {}
 # =============================================================================
 
 
+# =============================================================================
+# A <circle> IS ARTWORK TOO, AND IT USED TO VANISH WITHOUT A WORD -- 2026-10-02.
+# =============================================================================
+# Helen's mule mug carries nine dimples, each a <circle>. Everything here reads
+# <path> and nothing else: `_emit` fell through to its "defs, metadata" branch
+# and dropped all nine, and no guard noticed, because each guard counts paths
+# and transforms and a circle is neither. The mug would have published smooth.
+#
+# So a circle becomes the equivalent two-arc <path> BEFORE anything else looks
+# at the text, and from there every existing guard covers it. Her source file
+# is not touched. svgrender reads <path> only as well, so this is also what
+# lets the canvas fit, the base centre and the gap check see the dimples.
+#
+# A FILLED circle is a DOT, and gets `glass-icon-dot` beside the line class.
+# The site draws at a thin fixed stroke and `.glass-icon-line` is `fill: none`,
+# so a dot of radius 1 renders as a solid speck on a card and as a hollow ring
+# on anything larger. The class restores the fill she drew.
+#
+# ANY OTHER SHAPE IS REFUSED BY NAME rather than dropped. The next drawing that
+# uses a <rect> or an <ellipse> should stop here and say so.
+CIRCLE = re.compile(r"<circle\b((?:\"[^\"]*\"|[^>\"])*?)/?>(?:\s*</circle>)?", re.S)
+UNREAD_SHAPES = re.compile(
+    r"<(?:svg:)?(ellipse|rect|line|polyline|polygon|text|use|image)\b")
+DOT_MARK = "data-glass-dot"
+
+
+def circles_to_paths(text, name):
+    def convert(match):
+        attrs = match.group(1)
+
+        def number(key, default=None):
+            found = re.search(rf'(?<![\w:-]){key}="([^"]+)"', attrs)
+            if not found:
+                if default is None:
+                    raise SystemExit(f"{name}: a <circle> has no `{key}`")
+                return default
+            return float(found.group(1))
+
+        cx, cy, r = number("cx", 0.0), number("cy", 0.0), number("r")
+        d = (f"M {cx - r:.5f},{cy:.5f} a {r:g},{r:g} 0 1,0 {2 * r:g},0 "
+             f"a {r:g},{r:g} 0 1,0 {-2 * r:g},0 z")
+        transform = re.search(r'\btransform="[^"]*"', attrs)
+        fill = re.search(r'(?<![\w-])fill\s*[:=]\s*"?\s*([^;"\s]+)', attrs)
+        dot = f' {DOT_MARK}="1"' if fill and fill.group(1) != "none" else ""
+        extra = f" {transform.group(0)}" if transform else ""
+        return f'<path{dot}{extra} d="{d}" />'
+
+    text = CIRCLE.sub(convert, text)
+    unread = UNREAD_SHAPES.search(text)
+    if unread:
+        raise SystemExit(
+            f"{name}: the drawing uses <{unread.group(1)}>, which this script "
+            f"does not read and would drop without saying so. Convert it to a "
+            f"path in Inkscape (Path > Object to Path), or teach "
+            f"circles_to_paths() the shape."
+        )
+    return text
+
+
 def _emit(el, out, indent, line_class, seen_paths):
     """Re-emit the artwork tree, keeping <g transform> nesting exactly as found."""
     for child in el:
@@ -304,7 +363,10 @@ def _emit(el, out, indent, line_class, seen_paths):
                 # for -- it fired before anything was published.
                 transform = child.get("transform")
                 attr = f' transform="{transform}"' if transform else ""
-                out.append(f'{indent}<path class="{line_class}"{attr} d="{d}" />')
+                # A filled <circle> in the source: see circles_to_paths.
+                cls = (f"{line_class} glass-icon-dot"
+                       if child.get(DOT_MARK) else line_class)
+                out.append(f'{indent}<path class="{cls}"{attr} d="{d}" />')
                 seen_paths.append(d)
         else:
             # defs, sodipodi:namedview, metadata: no artwork, dropped on purpose.
@@ -341,6 +403,9 @@ def normalise(text, name, line_class="glass-icon-line"):
     vb = re.search(r'viewBox="([^"]+)"', text)
     if not vb:
         raise SystemExit(f"{name}: no viewBox, cannot scale without one")
+
+    # Before anything counts a path: see circles_to_paths.
+    text = circles_to_paths(text, name)
 
     paths = re.findall(r"<path\b[^>]*?\bd=\"([^\"]+)\"[^>]*/?>", text, re.S)
     if not paths:

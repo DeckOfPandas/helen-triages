@@ -3303,6 +3303,29 @@ unless stated.
   `check_glass_regen.py` before and after: 46 sources → 27, and a wholesale
   regeneration reproduces all 27 shipped icons byte for byte both times.
 
+- **2026-10-02 — the mule mug has its own drawing, and the normaliser learned
+  `<circle>`.** Helen redrew it (`glass-mule-mug-2.svg`: a barrel body, a
+  looped handle, nine dimples) and asked: *"I'm not sure about the dimples --
+  or tell me they're effective/fine! If you're on board, please wave your magic
+  wand to bring it into line with the rest of the set, and add it to our
+  glasses ref page."* **The dimples stay**: rendered beside the plain mug at
+  three sizes, without them it is a round mug, and with them it reads as
+  hammered metal — the thing the 2026-08-26 entry said a line icon could not
+  say about copper. Nine stay distinct down to card size.
+  **So `mule mug` draws `mule-mug`, the 28th icon**, and `survey_only_types`
+  is empty: it held the mule mug only because it borrowed the mug's drawing
+  while being a third bigger. Its height (95), base centre and capacity
+  figures are the generated ones.
+  **THE FINDING: the dimples would have been dropped in silence.** They are
+  `<circle>` elements; the normaliser and `svgrender` read `<path>` only, and
+  every guard counts paths and transforms, so nine circles vanished with
+  nothing red. Now a circle becomes a two-arc path on the way in, a FILLED one
+  carries `glass-icon-dot` (which restores the fill `.glass-icon-line`
+  removes — otherwise a dimple is a speck on a card and a hollow ring at
+  size), and any other shape stops the script by name. Her source is committed
+  as she drew it. `check_glass_regen.py`: 28 sources, 28 shipped, exact. Stroke
+  gaps measured: worst 0.167 units, under the line at every size.
+
 - **2026-08-17 — the drink page draws the FIRST glass that has artwork.** Helen's
   review of the coupe phase made `glass` an ordered list (§9.3): three drinks
   named two acceptable glasses, and Daisy de Santiago is *"anything, but

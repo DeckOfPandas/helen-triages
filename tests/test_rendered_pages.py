@@ -3242,8 +3242,10 @@ def _to_ten(ml):
 
 
 def test_the_glasses_page_shows_every_glass_once_with_its_surveyed_ml(prod_site):
-    """All 27 icons and the survey-only mule mug, alphabetically, each with
+    """Every icon and any survey-only type, alphabetically, each with
     `typical_ml`'s mean and range to the nearest 10 ml, standing on its base.
+    (28 icons and no survey-only type since 2026-10-02, when the mule mug got
+    its own drawing; it was 27 and one before.)
 
     WHY THE COUNT MATTERS: the page builds its rows with a Liquid lookup, and a
     lookup nested inside another (`g.typical_ml[pair[0]]`) silently returns
