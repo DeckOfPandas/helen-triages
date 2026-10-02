@@ -273,6 +273,7 @@ argument and the rules each field is read by.
 - 2026-09-05 · §9.10 / §9.10.1 · 23 were real bottles existing nowhere else
 - 2026-09-06 · §9.10 / §9.10.1 · #567 #640 #691 · The card's ingredient line became a plugin; the 1,400-character Liquid statement doing four jobs could not take a seven-tier sort.
 - 2026-09-17 · §9.10 / §9.10.1 · #1141 · optional renders as "(optional)" after the ingredient, reversing the argument that had stood.
+- 2026-10-02 · §9.10 / §9.10.1 · #1226 · The character line is a labelled fact: CHARACTER: in Plex Mono, the words upright in full-strength text.
 - 2026-09-05 · §9.10a · The ice had no field, so "strain" was written seventeen ways; collapsing 31 spellings to five surfaced three TRUNCATED steps nobody had read ("Fine strain into a chilled." …
 - 2026-09-28 · §9.10a · #1214 · The glass generator — and it is 2026-09-05's composition finished.
 - 2026-09-28 · §9.10a · A strain step stops repeating the glass when it has nothing to add

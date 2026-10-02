@@ -3108,6 +3108,22 @@ unless stated.
   optional ingredient, Corpse Reviver No. 2's cane sugar syrup, and it names no
   bottle. If the two ever meet it reads "syrup (Monin) (optional)", which is
   worth asking Helen about then rather than solving in advance.
+- **2026-10-02, #1226** — **The character line is a labelled fact: `CHARACTER:`
+  in Plex Mono, the words upright in full-strength text.** It was small dim
+  grey directly above a small grey italic note, and the two read as one block.
+  Helen: *"Let's allow it to look different from a note"*, and choosing:
+  *"Option 1 I like. I like conserving the plex-as-fact design idea."* Seven
+  published drinks carry a character. #441's label stays, colon included.
+  **NO HUE, and the reasons are hers**: absinthe is *"wrong language"*, lagoon
+  is *"already a page subheading level"*, woowoo picks out a bottle, and the
+  mood corals would be *"mixing messages"*.
+  **Rejected**: chips (*"might be too much, even for me"*; they also look
+  clickable); moving it beside the name (*"the lines are already long"*); an
+  icon (*"would disrupt the hierarchy"*). **The heading rule under the label
+  was BUILT and dropped**: `overlapping-rule-single` is tuned for heading-sized
+  Courier and at 0.72rem cuts through the letters like a strikethrough; it
+  would also be the first violet rule in the ingredient list since the name
+  underlines went on 2026-09-05 for looking like links.
 
 ### §9.10a `serve`
 
