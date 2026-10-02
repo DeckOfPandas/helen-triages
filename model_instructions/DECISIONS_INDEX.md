@@ -433,6 +433,7 @@ argument and the rules each field is read by.
 - 2026-09-24 · §11 · THE GROUND-TRUTH HOOK REPORTED THE WRONG REPOSITORY, on its first real outing, and the session it misled was the one that wrote it.
 - 2026-09-24 · §11 · #1191 · the two permission questions, answered and closed.
 - 2026-09-29 · §11 · two read grants, and neither went live by editing settings.
+- 2026-10-02 · §11 · scripts/git-drafts.sh: local git inside a drafts clone, allow-listed.
 - 2026-08-19 · §11.2 · 2026-08-19: "two stylesheets import shared/" (three).
 - 2026-09-22 · §11.2 · two wrong conclusions in ONE session, from one habit: proving something narrower than the thing being claimed.
 - 2026-09-24 · §11.2 · a HOOK reported a true fact about the wrong repository

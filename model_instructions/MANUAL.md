@@ -1369,6 +1369,18 @@ clone's `origin` is a plain URL, and `git remote -v` can print it all day.
 say — and defaults to the current directory. A bare `git -C _cocktail_drafts
 fetch origin` has no credential and fails; that is correct, use the wrapper.
 
+**Local git inside a drafts clone has its own wrapper, `scripts/git-drafts.sh`.**
+The three above talk to GitHub; this one never does. It takes one of the two
+drafts folders and a fixed list of verbs — `status`, `diff`, `log`, `show`,
+`branch --show-current`, `checkout -b <new>`, `add -- <paths>`,
+`commit -F tmp/<file>` — and refuses everything else, including a commit on
+that repo's `main`. It exists because a leading `cd` and `git -C` are both
+refused by `guard-unanalyzable-bash.py`, which left a drafts pass with no way
+to branch or commit that did not ask Helen on every call.
+
+    sh scripts/git-drafts.sh _food_drafts checkout -b tidy/<what>
+    sh scripts/git-drafts.sh _food_drafts commit -F tmp/commit-msg.txt
+
 **NAMING A PRIVATE `repo` IS NOT ENOUGH — GIVE ITS `dir` TOO, EVERY TIME.**
 Without `dir` the wrapper pushes the CURRENT checkout's branch to whatever repo
 you named. On 2026-09-14 `sh scripts/git-push-agent.sh <branch>:<branch>

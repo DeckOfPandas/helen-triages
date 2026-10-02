@@ -6277,6 +6277,23 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
     but no read was attempted to tell which. **So a settings edit is not the
     fix for either, and `/add-dir` is the route in a running session**, as
     `CLAUDE.md` already says for a new grant.
+- **2026-10-02 — `scripts/git-drafts.sh`: local git inside a drafts clone,
+  allow-listed.** The two hooks that refuse a leading `cd` and `git -C` left a
+  drafts pass with no sanctioned way to branch, read a diff or commit there,
+  while `tidy-drafts.md` still taught `cd _food_drafts && git checkout -b`.
+  #1258's pass used a throwaway `tmp/` script, which asks Helen on every call.
+  Shown that, Helen: *"gotcha, thanks. Yes please do it."* The wrapper takes
+  the two drafts folders and a fixed list — `status`, `diff`, `log`, `show`,
+  `branch --show-current`, `checkout -b`, `add --`, `commit -F tmp/<file>` —
+  and refuses the rest. **What the prompt was the last guard of, verb by
+  verb:** `diff --output=` writes a file anywhere and `--no-index` reads any
+  two files on the disk, so `diff` takes five named options and plain refs;
+  `checkout` of an existing branch is how a session ends up on `main`, and
+  `checkout -- <path>` discards work, so only `-b <new>`; `commit` on that
+  repo's `main` is not seen by `guard-main-branch.py`, which reads the command
+  text and finds no `-C`, so the wrapper refuses it itself. That last refusal
+  needs a real clone and is NOT covered by `tests/test_agent_wrappers.py`; it
+  was exercised by hand.
 
 ### §11.2 The record of this file being wrong
 

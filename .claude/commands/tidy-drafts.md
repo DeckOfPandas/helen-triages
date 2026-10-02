@@ -165,8 +165,14 @@ six faults" cannot pass while something also happened to the other thirty lines.
 
 3. **Branch in the drafts repo**, never commit to its `main`:
 
-       cd _food_drafts && git checkout -b tidy/<what-this-pass-is>
-       cd _cocktail_drafts && git checkout -b tidy/<what-this-pass-is>
+       sh scripts/git-drafts.sh _food_drafts checkout -b tidy/<what-this-pass-is>
+       sh scripts/git-drafts.sh _cocktail_drafts checkout -b tidy/<what-this-pass-is>
+
+   `scripts/git-drafts.sh` is how every git command in a drafts repo is run —
+   `status`, `diff`, `log`, `show`, `branch --show-current`, `checkout -b`,
+   `add --` and `commit -F tmp/<file>`. A leading `cd` and `git -C` are both
+   refused by the hook, and the wrapper is allow-listed, so it does not ask
+   Helen. It refuses a commit on the drafts repo's `main`.
 
 4. **Apply**: `python3 scripts/tidy_drafts.py --apply`. It refuses on a dirty
    tree unless you pass `--allow-dirty`, and that refusal is deliberate: the
