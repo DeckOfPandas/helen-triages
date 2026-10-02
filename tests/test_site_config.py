@@ -2869,6 +2869,101 @@ def test_deploy_workflow_still_runs_a_plugin_capable_build():
     )
 
 
+def _needs(job) -> list[str]:
+    needs = (job or {}).get("needs")
+    return [needs] if isinstance(needs, str) else list(needs or [])
+
+
+# Any of these in a job's `if` replaces the implicit success() check, so the
+# job runs even when a job it needs FAILED. `!cancelled()` contains
+# `cancelled()`, so it needs no entry of its own.
+_STATUS_FUNCTIONS = ("always()", "failure()", "cancelled()")
+
+
+def _why_a_red_suite_could_deploy(jobs) -> str | None:
+    """None if `deploy` can only run after `test` succeeded; else the reason.
+
+    THE INVARIANT, NOT ONE SPELLING OF IT -- #1271. This used to assert that
+    `build` declares `needs: test`, which was the only shape the workflow had
+    ever had. That shape makes every merge wait for the suite and THEN for the
+    build and the PDFs; running the two side by side with `deploy` needing
+    both is the same guarantee about two minutes sooner, and the old assertion
+    would have refused it.
+
+    What actually has to hold is two things. `test` is among the jobs `deploy`
+    needs, directly or through another job. And no job on the way from `deploy`
+    back to `test` has an `if` that calls a status function: a job with `needs`
+    is skipped when a needed job fails ONLY while its `if` leaves the implicit
+    success() in place, so `if: always()` on `deploy` (or on a `build` that
+    stands between it and `test`) deploys a red suite with `needs` intact.
+    """
+    if "deploy" not in jobs:
+        return "The deploy workflow has no `deploy` job, so this gate is unread."
+
+    # Every chain of `needs` from `deploy` that reaches `test`.
+    def chains(name, seen):
+        if name == "test":
+            return [[name]]
+        return [[name] + rest
+                for parent in _needs(jobs.get(name)) if parent not in seen
+                for rest in chains(parent, seen | {name})]
+
+    routes = chains("deploy", frozenset())
+    if not routes:
+        return (
+            "Nothing `deploy` needs leads back to the `test` job. Without that "
+            "the jobs run side by side and a failing suite deploys anyway -- "
+            "the test job becomes a report nobody is gated on. `deploy` must "
+            "declare `needs: test`, or need a job that does."
+        )
+    for route in routes:
+        for name in route[:-1]:
+            condition = str(jobs[name].get("if", ""))
+            for fn in _STATUS_FUNCTIONS:
+                if fn in condition:
+                    return (
+                        f"The `{name}` job's `if` calls {fn}, which replaces "
+                        "the implicit success() check: it runs even when a job "
+                        "it needs has FAILED, so a red suite deploys with "
+                        "`needs` intact. Drop the status function."
+                    )
+    return None
+
+
+def test_the_deploy_gate_check_refuses_every_way_round_it():
+    """The check above is only worth having if the broken shapes fail it."""
+    def job(needs=None, cond=None):
+        out = {}
+        if needs is not None:
+            out["needs"] = needs
+        if cond is not None:
+            out["if"] = cond
+        return out
+
+    pr = "github.event_name != 'pull_request'"
+    ok = [
+        # the shape until #1271: build waits for test, deploy waits for build
+        {"test": job(), "build": job("test", pr), "deploy": job("build", pr)},
+        # #1271: side by side, and deploy waits for both
+        {"test": job(), "build": job(cond=pr), "deploy": job(["test", "build"], pr)},
+    ]
+    broken = [
+        # side by side with nothing gating on test
+        {"test": job(), "build": job(), "deploy": job("build")},
+        {"test": job(), "build": job()},
+        # `needs` intact, and a status function that ignores it
+        {"test": job(), "build": job(), "deploy": job(["test", "build"], "always()")},
+        {"test": job(), "build": job(), "deploy": job(["test", "build"], f"!cancelled() && {pr}")},
+        {"test": job(), "build": job("test", "failure() || success()"), "deploy": job("build")},
+    ]
+    for jobs in ok:
+        assert _why_a_red_suite_could_deploy(jobs) is None, jobs
+    for jobs in broken:
+        assert _why_a_red_suite_could_deploy(jobs) is not None, (
+            f"this workflow shape can deploy a red suite and was accepted: {jobs}"
+        )
+
+
 def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
     """CI must run the suite, and refuse to build if it is red. Issue #369.
 
@@ -2883,8 +2978,9 @@ def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
     state quietly:
 
       - a `test` job exists at all;
-      - `build` declares `needs: test`, without which the two jobs simply run
-        in parallel and a red suite deploys anyway;
+      - `deploy` cannot run unless `test` succeeded -- see
+        `_why_a_red_suite_could_deploy`, which states the invariant rather than
+        one spelling of it (#1271);
       - `fetch-depth: 0`, because actions/checkout is shallow by default and
         #367's history-reading test would then examine nothing;
       - the JS suite is invoked with a GLOB. `node --test tests/js/` treats the
@@ -2901,13 +2997,8 @@ def test_the_deploy_workflow_runs_the_tests_and_gates_on_them():
         "red suite from deploying -- which was the state this repository was "
         "in until 2026-08-18 (#369)."
     )
-    needs = jobs.get("build", {}).get("needs")
-    needs = [needs] if isinstance(needs, str) else (needs or [])
-    assert "test" in needs, (
-        "The `build` job does not declare `needs: test`. Without it the jobs "
-        "run in parallel and a failing suite deploys anyway -- the test job "
-        "becomes a report nobody is gated on."
-    )
+    problem = _why_a_red_suite_could_deploy(jobs)
+    assert problem is None, problem
     steps = jobs["test"].get("steps") or []
     checkout = [s for s in steps if "actions/checkout" in str(s.get("uses", ""))]
     assert checkout, "The test job never checks the repository out."
