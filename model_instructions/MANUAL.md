@@ -3024,6 +3024,21 @@ build stop rather than a report. Three things are load-bearing:
   session fixture imported into a second module is a second definition that
   builds again. Add a module that needs a built page by asking for one of
   those two — never by building an eighth.
+- **A test that needs throwaway pages adds its files to the one shared
+  fixture build** (#1271): `_in_the_fixture_build({...})` at import in
+  `test_rendered_pages.py`, then ask for `fixture_site`. It is a production
+  build of a copy of the tree plus every test's `zzz-` files, so assert only
+  on your own pages by name. A test that asks about the WHOLE build, or needs
+  one without the other fixtures in it, calls `built_with_fixtures` itself
+  and pays for a build.
+- **The cocktail data files and the drink collections are parsed once per
+  run and shared** (#1271): `_parsed` and `_scan` in `test_cocktails.py`. Copy
+  before changing anything a loader returned; a guard at the end of the module
+  names the file if a test did not.
+- **Do not start a Python per test for a script that imports from `tests/`.**
+  The import alone reads every recipe, draft and drink. `test_tidy_drafts.py`
+  calls `tidy_drafts.main(argv)` in-process and keeps one subprocess test for
+  the command line itself.
 
 **The cocktail corpus is `_cocktail_recipes/` + `_cocktail_drafts/` through
 `_load()`, the only door** (#540; `test_every_drink_reading_test_goes_through_the_loader`).

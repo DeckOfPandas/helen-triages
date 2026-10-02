@@ -382,6 +382,7 @@ argument and the rules each field is read by.
 - 2026-09-29 · §10 · #1200 · the browser smoke test, and four things it would have got wrong as the issue was written.
 - 2026-09-29 · §10 · #1202 · the rulings index is generated and carries NO line numbers.
 - 2026-09-29 · §10 · a proof by mutation can be fooled by Python's bytecode cache.
+- 2026-10-02 · §10 · #1271 · the suite was slow in three places, not everywhere, and skipping tests by changed path was the wrong lever.
 - 2026-09-19 · §11 · "Pushed" is not "she can see it", and the drinks half is always the one that needs the extra step.
 - 2026-09-19 · §11 · A narrow suite stops being the right check the moment a commit touches _data/.
 - 2026-09-24 · §11 · #1078 · An agent may correct or delete a note that a later ruling of Helen's has made false.
