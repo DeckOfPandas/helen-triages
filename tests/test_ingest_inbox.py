@@ -239,6 +239,35 @@ def test_an_envelope_with_no_notes_is_not_a_rejection(name, site):
     swapped = text.replace("notes:\n" + old, "notes: []\n")
     assert swapped != text
     assert inbox.parse_envelope(swapped, site).fm["notes"] == []
+    # The empty pair is what both documents now ask for in that case (#1258),
+    # and it is a slot rather than a note, so the `QQ` rule does not apply.
+    slot = text.replace(old, '  - label: ""\n    text: ""\n')
+    assert inbox.parse_envelope(slot, site).fm["notes"] == \
+        [{"label": "", "text": ""}]
+
+
+@pytest.mark.parametrize("name,site", [
+    ("valid_cocktail", "cocktail"),
+    ("valid_food", "food"),
+])
+def test_an_envelope_with_no_notes_is_written_with_a_slot(name, site, drafts):
+    """#1258: the draft gets the empty pair, and nothing else in it moves.
+
+    The one place `write` is not byte for byte. Compared against the envelope's
+    own block with that single line swapped, so a rule that leaked onto any
+    other line fails here.
+    """
+    text = envelope_text(name)
+    old = COCKTAIL_NOTE if site == "cocktail" else FOOD_NOTE
+    swapped = text.replace("notes:\n" + old, "notes: []\n")
+    plan = inbox.plan_for(swapped, site, [], drafts)
+    inbox.write(plan)
+    got = plan.path.read_text(encoding="utf-8")
+    assert got == plan.envelope.block.replace(
+        "notes: []\n", 'notes:\n  - label: ""\n    text: ""\n')
+    assert yaml.safe_load(re.match(r"\A---\n(.*?)\n---", got, re.S).group(1)
+                          )["notes"] == [{"label": "", "text": ""}]
+    assert any("empty {label, text} pair" in n for n in plan.notes)
 
 
 def test_a_rejection_never_reaches_the_writing_half(drafts):
