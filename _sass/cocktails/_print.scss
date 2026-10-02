@@ -88,13 +88,8 @@
   // JavaScript never had one, and one that did gets it hidden by
   // shared/_print.scss along with every other control.
   //
-  // `.cocktail-scale-total` IS NOT IN THIS LIST, AND THAT IS ON PURPOSE —
-  // #1121. Everything hidden here is a CONTROL or a remark about pressing one;
-  // "Approximately 360 ml" is the sum of the amounts printed above it, and it
-  // is true of the sheet in the reader's hand whatever multiple was in the box
-  // when they hit print. The argument above — a printed page is the recipe as
-  // written — is about not inviting the reader to change paper, and a figure
-  // invites nothing. It takes $print-ink-quiet with the other quiet lines below.
+  // `.cocktail-scale-total` (#1121's "Approximately X ml") printed, on purpose,
+  // until the line itself was removed on 2026-10-02 (#1257).
   // `.cocktail-scale-note` was in this list until #1088 deleted the floor
   // message it styled.
   .cocktail-scale-controls,
@@ -190,7 +185,6 @@
     .cocktail-source,
     .cocktail-cost,
     .cocktail-units,
-    .cocktail-scale-total,
     .cocktail-optional,
     // `.cocktail-use` joined 2026-09-26 with #1217. It is `.cocktail-optional`
     // in every other respect, so it is quiet ink here for the same reason.

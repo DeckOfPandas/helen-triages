@@ -246,6 +246,7 @@ argument and the rules each field is read by.
 - 2026-09-24 · §9.3.5 · #748 #747 · built, and #747's six unapplied prices — The 2026-09-06 ruling had been recorded as "rows in costs.yml and nothing else" and was not: volume_ml returned nil for a count or a …
 - 2026-09-07 · §9.3.5 · #818 · The shopping list's bottle choice is per drink, not once for the whole list.
 - 2026-09-26 · §9.3.5 · #1215 · the price per glass has two decimal places.
+- 2026-10-02 · §9.3.6 · #1257 · "Approximately X ml" is REMOVED, thirteen days after she asked for it and liked it.
 - 2026-09-17 · §9.3.6 · #1121 · the ml line cost the batch note its totals, and the lesson is about what a NEW line does to the ones already there.
 - 2026-09-17 · §9.3.6 · #1121 · two sentences, and the interesting part is the six drinks that get neither.
 - 2026-08-16 · §9.4 / §9.4.1 / §9.5 · Ingredients are additive, never a choose-one (asked directly: guessing wrong would have shaped the whole model).
