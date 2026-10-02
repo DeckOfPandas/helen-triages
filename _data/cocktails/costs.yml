@@ -1142,7 +1142,7 @@ generics:
   # neither tin price is shop-checked, which is what `low` says. The sum: Coco
   # Lopez GBP 3-4 / 425 ml (7.05-9.40/L) x 3, coconut milk GBP 1-1.60 / 400 ml
   # (2.50-4.00/L) x 1, over 4 -> GBP 5.90-8.05/L. Overwrite when she prices it.
-  "Coco mix (3:1, Coco Lopez to coconut milk)": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
+  "Coco mix (3:1 Coco Lopez to coconut milk)": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
   grenadine:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
