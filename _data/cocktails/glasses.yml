@@ -62,7 +62,7 @@ icons:
   punch bowl: punch-bowl
   tiki mug: tiki-mug
 
-  # --- one drawing, two mugs -------------------------------------------------
+  # --- two mugs: one drawing until 2026-10-02, two since ----------------------
   # `mule-mug.svg` was renamed `mug.svg` on 2026-08-26 and both spellings point
   # at it. The drawing is a plain tapered mug with a handle; the only thing that
   # ever made it a MULE mug is that a real one is copper, which a monochrome
@@ -171,7 +171,8 @@ icons:
 #          check by eye.
 #   mug    Apple and Ginger Mulled Wine, and the answer was neither of the two
 #          candidates guessed at here. See the mug/mule-mug entry above: one
-#          drawing, renamed, serving both.
+#          drawing, renamed, serving both -- until 2026-10-02, when the mule
+#          mug got a drawing of its own and the plain mug kept this one.
 #   long   Long Island Iced Tea. It did read as a serve rather than a glass,
 #          and Helen's call was `highball`. `long` is NOT kept as an alias —
 #          it is not a glass name, and mapping it would make it look like one.

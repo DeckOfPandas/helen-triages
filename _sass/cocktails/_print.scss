@@ -174,15 +174,18 @@
     // does not reach these, because each already paints its own colour.
     // `.cocktail-use` moved up here from the quiet list with #1263: it sits
     // under the amount in the amount's own type, so it takes the amount's ink.
+    // `.cocktail-character` followed with #1226: the character words are a
+    // labelled fact in full ink, and only their Plex label stays quiet below.
     .cocktail-tagline,
     .cocktail-amount,
-    .cocktail-use {
+    .cocktail-use,
+    .cocktail-character {
       color: $print-ink;
     }
 
     // Explicit $color-clear-text -- the de-emphasised ink used for the
     // units line, the source and cost lines, an optional ingredient, the
-    // bottle's character aside, the "or" between alternatives, an
+    // CHARACTER label, the "or" between alternatives, an
     // ingredient or method-step note, and the GLASS/GARNISH/SHIP IT?
     // labels and method numerals.
     .cocktail-source,
@@ -190,7 +193,7 @@
     .cocktail-units,
     .cocktail-optional,
     .cocktail-style-or,
-    .cocktail-character,
+    .cocktail-character-label,
     .cocktail-note,
     .cocktail-meta dt,
     .cocktail-method li::marker {
@@ -212,12 +215,6 @@
     .cocktail-type-line {
       color: $print-suggestion;
     }
-
-    // THE CHARACTER LINE IS A LABELLED FACT SINCE #1226: the words in full
-    // ink, its Plex label in quiet ink. Declared AFTER the quiet list above,
-    // which still names `.cocktail-character`, so this wins on source order.
-    .cocktail-character { color: $print-ink; }
-    .cocktail-character-label { color: $print-ink-quiet; }
 
     // SHIP IT? -- the icon and the word's underline, both reposado.
     .drink-card-ship-icon { color: $print-ship; }

@@ -2988,6 +2988,22 @@ Two consequences worth knowing before they surprise you:
   a close-and-reopen produced no run at all. `@dependabot rebase` as a PR
   comment force-pushes the branch, which fires `synchronize`, and that does
   run. Reach for the rebase, not the reopen.
+- **A PR check can CANCEL a waiting deploy, and `main` then reads `cancelled`,
+  not red.** Every run, deploys and PR checks alike, shares one concurrency
+  group (`pages`, `cancel-in-progress: false`). GitHub keeps one waiting run
+  per group, so a deploy queued behind another is dropped the moment any PR
+  opens or updates. Nothing is lost for long — the next push to `main` builds
+  everything — but **the last merge of a sitting can stay undeployed until the
+  next one**. `main-ci-status.sh` says so in those words — *"CANCELLED -- that
+  merge is NOT DEPLOYED"*, exit 1, and no longer "DEPLOY OUTAGE", which it is
+  not; the way out is Helen re-running it in the Actions tab, or any later
+  merge. Happened three times on 2026-10-02 (DECISIONS §12); the cause is
+  unfixed by her choice.
+- **`main-ci-status.sh` judges pushes to this repository only.** Its endpoint
+  filters on `branch=main`, which also matches a pull request FROM a branch
+  called `main` — every fork that never branched. Such a run is listed,
+  marked *"a pull request, not a deploy"*, and kept out of the verdict; before
+  2026-10-02 a failing fork PR as the newest row would have read as an outage.
 
 **The suite gates the deploy** (#369): `.github/workflows/build-and-deploy.yml`
 has a `test` job and `build` declares `needs: test`, so every guard here is a
