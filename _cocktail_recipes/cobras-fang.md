@@ -61,7 +61,7 @@ mood:
   - "on fire"
 notes:
   - label: "Pool?"
-    text: "This even tastes nice when it's warmed up (see also: on fire)."
+    text: "This even tastes nice when accidentally warmed up by the pool. (See also: on fire)."
   - label: "Apricot"
     text: "The original doesn't call for apricot liquer, but more is more and this is delicious."
 source: ""
@@ -71,5 +71,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 ---
