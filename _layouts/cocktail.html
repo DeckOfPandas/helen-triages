@@ -212,11 +212,13 @@ layout: default
           {% endif %}
 
           {% comment %} `character` gets a labelled LINE, never a bare
-             parenthetical (#441). DECISIONS §9.10 (#544). {% endcomment %}
+             parenthetical (#441). DECISIONS §9.10 (#544). The label has its
+             own span since #1226 so it can be set in Plex Mono; the colon
+             stays in the markup so the line copies as it reads. {% endcomment %}
           {% assign class_html = "" %}
           {% if item.character %}
             {% assign character_joined = item.character | join: ", " %}
-            {% capture class_html %}<span class="cocktail-character">character: {{ character_joined }}</span>{% endcapture %}
+            {% capture class_html %}<span class="cocktail-character"><span class="cocktail-character-label">character:</span> {{ character_joined }}</span>{% endcapture %}
           {% endif %}
 
           <li class="cocktail-ingredient">

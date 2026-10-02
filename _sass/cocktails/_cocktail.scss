@@ -2006,10 +2006,27 @@ $amount-gap: 1rem;
 // parenthetical like "moderately aged rum (blackstrap)" reads as if
 // blackstrap were a TYPE of moderately-aged rum, which is real, live
 // confusion with actual black rum.
-// A step quieter than the class line it sits inside, so the parenthetical
-// reads as an aside within an aside rather than as a second fact.
+//
+// A LABELLED FACT, NOT AN ASIDE — #1226, 2026-10-02. It was a step quieter
+// than a note and sat directly above one in small grey, so the two read as one
+// block. Helen: "Let's allow it to look different from a note", and of the
+// options: "I like conserving the plex-as-fact design idea." So the label is
+// Plex Mono, the face an amount is set in, and the words are upright in
+// $color-text where a note is italic and grey. NO HUE, on her reasoning: every
+// colour on this page already means something (absinthe, lagoon, woowoo, the
+// mood corals), and a new one here would mix messages.
 .cocktail-character {
-  color: mix($color-clear-text, $color-bg, 70%);
+  color: $color-text;
+}
+
+.cocktail-character-label {
+  font-family: $font-label;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $color-clear-text;
+  margin-right: 0.35em;
 }
 
 // The note — #457's fix for reasoning that used to get smuggled into

@@ -2245,12 +2245,17 @@ green in isolation.
 ### 9.10 The cocktail page's ingredient line
 
 **The line is the GENERIC, with the bottle in brackets**, then `character` on
-its own quiet line, then `note`:
+its own labelled line, then `note`:
 
     45 ml   London dry gin (Tanqueray)
     15 ml   moderately aged rum (Gosling's Black Seal)
-              character: blackstrap
+            CHARACTER: blackstrap
     22.5 ml lime juice
+
+**The character line is a labelled fact, not an aside** (#1226, 2026-10-02):
+the label is Plex Mono caps in quiet grey, the words upright in full-strength
+text, so it cannot be mistaken for the italic grey `note` under it. No hue —
+every colour on the page already means something (DECISIONS §9.10).
 
 **The line is `generic` plus the bottle, and nothing else** — that was the whole
 fix for #513, where `item` and `generic` restated each other on two lines, and

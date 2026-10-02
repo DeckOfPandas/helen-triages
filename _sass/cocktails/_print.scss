@@ -213,6 +213,12 @@
       color: $print-suggestion;
     }
 
+    // THE CHARACTER LINE IS A LABELLED FACT SINCE #1226: the words in full
+    // ink, its Plex label in quiet ink. Declared AFTER the quiet list above,
+    // which still names `.cocktail-character`, so this wins on source order.
+    .cocktail-character { color: $print-ink; }
+    .cocktail-character-label { color: $print-ink-quiet; }
+
     // SHIP IT? -- the icon and the word's underline, both reposado.
     .drink-card-ship-icon { color: $print-ship; }
     .drink-card-ship-word { text-decoration-color: $print-ship; }
