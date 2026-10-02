@@ -44,9 +44,13 @@ what makes it findable, and there are exactly these:**
 | a citation nobody has established | `source: "QQ"` with `source_type: unknown` |
 | a truncated step, a missing infusion, a frame that ended | a note saying where it stopped -- **never a reconstruction** |
 
-**Never a bare string note from an ingest** (Helen, 2026-09-04: *"It's annoying
-for me to remember how to type YAML every time"*). A note that ALREADY exists
-keeps whatever shape it has.
+**Never a bare string note, from an ingest or anywhere else** (Helen, 2026-09-04:
+*"It's annoying for me to remember how to type YAML every time"*). The shape is
+now unconditional: 298 bare strings across both drafts repos became pairs on
+2026-10-01 and `test_note_dicts_have_label_and_text_when_dict` refuses a new one,
+so a note you find in an existing file is already a pair. **An empty pair is the
+placeholder** — `label: ""` with `text: ""` — and neither layout prints it, so
+leaving one costs nothing and gives Helen somewhere to type.
 
 **A COCKTAIL'S `generic` IS TYPED WHERE THE VOCABULARY SETTLES IT -- Helen, 2026-09-20 -- AND THE SAME RULE NOW HOLDS IN BOTH SESSIONS.** It used to be `QQ`, always, because a bottle's category is not derivable from the ingredient beside it. Her words: *"Surely we're able to fill in generics at ingest, or at least try then review with me"* and *"if it's not obvious write QQ then whatever the source said then I have a chance of being able to fix it myself."* Three tiers, and the boundary between the second and third is the one that matters:
 
@@ -290,7 +294,13 @@ failure is probably work someone else has already done (MANUAL §9.1).
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
-- **House style** -- en dashes, `°C`, unicode fractions, quoting, accents.
+- **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
+  **a space between a number and its unit** (`15ml` -> `15 ml`). Helen,
+  2026-10-01: "Please add unit spaces (15ml -> 15 ml) as a mechanical fix to
+  perform at ingest, and check when I ask you to check drafts." The units are
+  `kg`, `g`, `ml`, `cl`, `cm`, `mm`, `oz`, `tsp`, `tbsp`; a temperature is NOT
+  one of them, because `180C` wants a degree sign and spacing it would half-fix
+  it. `scripts/tidy_drafts.py --only units` is the same rule for a drafts pass.
   Outside `QQ` lines, always.
 - **The citation**, per `model_instructions/SOURCE_ATTRIBUTION_SPEC.md`. For
   food that is `source` + `source_type`; a dated magazine is a `publication`, an
@@ -562,7 +572,8 @@ not publish: **say so and let her flip it.** That is the one thing to do about i
   for me to remember how to type YAML every time." She searches for `QQ`,
   replaces the label with a real heading and the text with her words, and
   never has to recall the shape. Both sites, both standalone documents say
-  the same. A note that already exists keeps whatever shape it has.
+  the same, and since 2026-10-01 so does every file: the bare string is retired
+  and the empty pair is the placeholder.
 - **A source's own label on a tip is the source's furniture. Transcribe the
   tip; drop the label.** Both sites. Good Food prints its asides under a
   standing `gf tip` rubric, and eight food drafts carry that prefix verbatim

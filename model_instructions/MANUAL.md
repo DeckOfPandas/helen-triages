@@ -637,7 +637,7 @@ method:                          # xor method_groups: — never both
 method_short:
   - ""                           # [""] = not written. A block scalar = written.
 notes:                           # always a list, never a blob
-  - label: "Sinking"              # or a bare string
+  - label: "Sinking"              # both keys always; "" while unwritten
     text: "If it sinks, you added too much syrup."
 meta:                            # EXACTLY these three, in this order — §4.0
   rewritten: false
@@ -732,7 +732,15 @@ with it.
 - Cross-recipe links are markdown, **relative**: `[text](../slug/)`. Front
   matter is never run through Liquid, so a root-relative link cannot pick up
   the baseurl. `[[wikilinks]]` are retired.
-- `notes:` items are `{label, text}` or a bare string; four or more is the
+- **`notes:` items are `{label, text}`, both keys always present, on both sites
+  and in both drafts repos.** An empty string in either half is a PLACEHOLDER
+  for Helen to type into — "I really would like placeholders for labels and text
+  on notes, for both food and cocktails", 2026-10-01 — and both layouts count an
+  empty note out before deciding whether to print the NOTES heading at all. The
+  bare-string form was legal in drafts from 2026-08-03 and is now retired
+  everywhere: 298 notes were migrated and `test_note_dicts_have_label_and_text_when_dict`
+  refuses a new one. A published note must have both halves FILLED, which is the
+  stricter `test_note_dicts_have_label_and_text`. Four or more notes is the
   signal to write body content instead (§4.1).
 - `internal_temp_ref` (+ `doneness`) pulls a live figure from
   `_data/food/internal_temperatures.yml` — §14; opt-in, most recipes have
@@ -940,6 +948,20 @@ scoped by what a READER SEES, so `cook_time` counts (`test_number_ranges_use_en_
 reads the whole file; ISO dates are blanked first). `→` for arrows. `°C`
 always, **fan oven only** — check which figure of a printed pair *is* the fan
 one before deleting the other. British spellings. Titles use `and`, never `&`.
+
+**A NUMBER AND ITS UNIT TAKE A SPACE** — `15 ml`, not `15ml`. Helen, 2026-10-01:
+*"Please add unit spaces (15ml -> 15 ml) as a mechanical fix to perform at
+ingest, and check when I ask you to check drafts."* `kg`, `g`, `ml`, `cl`, `cm`,
+`mm`, `oz`, `tsp`, `tbsp`; `scripts/tidy_drafts.py --only units` is the pass and
+`.claude/commands/ingest.md` carries it as a TIER 1 ingest fix.
+**Measured before it was written**: `amount:` reads `40 g` 1,461 times across the
+food collections and `40g` 13 times, so the spaced form is the house form by a
+factor of 112. **A temperature is NOT one of the units** — `180C` wants a degree
+sign, which the tidy pass reports and never fixes, and spacing it to `180 C`
+would half-fix it and hide the real fault. **On a DRINK the rule reaches Helen's
+prose only**, so an `amount` is untouched (the recorded harm on
+anitas-attitude-adjuster, where editing an amount desynchronised a `QQ` note
+quoting it back).
 
 **It reaches prose pages, not just recipes** (`tests/test_prose_pages.py`):
 the about page, the index pages and the reference pages, including the words
@@ -1635,9 +1657,9 @@ to_serve: ""                     # SERVEWARE, not a further instruction — §9.
 mood:                            # LIST, DERIVED and then stored — see below
   - "sharp"
   - "aperitivo"
-notes:                           # {label, text} or a bare string, as food.
-  - label: "QQ"                  # a note an INGEST adds is always {label, text},
-    text: "QQ - `generic` values INFERRED, not confirmed: ..."   # both beginning QQ
+notes:                           # {label, text}, both keys always, as food.
+  - label: "QQ"                  # "" in either half is a PLACEHOLDER, which
+    text: "QQ - `generic` values INFERRED, not confirmed: ..."   # neither layout prints
 source: ""                       # free text, unlike food
 source_url: ""                   # external; nothing verifies it
 meta:                            # FIVE keys, in this order — §9.1.1

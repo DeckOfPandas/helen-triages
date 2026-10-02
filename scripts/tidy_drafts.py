@@ -498,6 +498,70 @@ def fix_typography(text, path):
     return "\n".join(out), changed
 
 
+# A NUMBER AND ITS UNIT TAKE A SPACE -- Helen, 2026-10-01: "Please add unit
+# spaces (15ml -> 15 ml) as a mechanical fix to perform at ingest, and check
+# when I ask you to check drafts."
+#
+# MEASURED BEFORE IT WAS WRITTEN, which is what makes it a fix and not a
+# preference: across both food collections, `amount:` reads `40 g` 1461 times
+# and `40g` 13 times. The spaced form is the house form by a factor of 112, and
+# the thirteen are the drift.
+#
+# IMPERIAL TOO, 2026-10-01: Helen, on finding `9in (23 cm)` in the drafts,
+# "All units need them, including imperial."
+#
+# THE ALTERNATION IS SORTED BY LENGTH IN CODE, NOT BY HAND, and that is the one
+# piece of engineering in this rule. A short-first list turns `2kg` into `2k g`
+# and `5inches` into `5 in ches` -- answers that parse fine and read almost
+# right, so nothing else would catch them. Sorting longest-first makes the whole
+# class impossible rather than tested-for, and adding a unit tomorrow cannot
+# reintroduce it.
+#
+# WHAT IS DELIBERATELY ABSENT. A bare `l` (never measured, and `1ltr` is a real
+# string this would mangle), `mins` (a duration is not a measure), and anything
+# temperature-shaped: `180C` wants a degree sign, which is a DIFFERENT rule and
+# a reported-never-fixed one, so putting it here would quietly half-fix it.
+UNITS = [
+    # metric
+    "kg", "g", "ml", "cl", "cm", "mm",
+    # imperial
+    "inches", "inch", "in", "lbs", "lb", "fl oz", "oz", "pts", "pt",
+    # spoons
+    "tbsp", "tbs", "tsp",
+]
+UNIT_SPACE = re.compile(
+    r"(?<=\d)(" + "|".join(sorted(UNITS, key=len, reverse=True)) + r")\b")
+
+
+def fix_unit_spacing(text, path):
+    """`15ml` -> `15 ml`, skipping QQ lines.
+
+    THE QQ SKIP IS THE SAME ONE `fix_en_dashes` MAKES and for the same reason:
+    a `QQ original` line is the source's own wording awaiting Helen's rewrite,
+    and respacing it is editing someone else's text (MANUAL §5). `QQ Claude` is
+    NOT skipped -- `is_qq` encodes `QQ\\b(?!\\s+Claude\\b)` -- because that half
+    of the pair is ours and is held to house style like any other prose.
+
+    ON A DRINK THIS RUNS ONLY WHERE HELEN WRITES, through
+    `only_where_editable`, so a cocktail's `amount` is never touched. That is
+    the recorded harm this script's own doc describes: anitas-attitude-adjuster
+    said `amount: "Top (30-45) ml"` with a QQ note quoting the string back, and
+    editing the amount desynchronised the note from the value. Food's amounts
+    have no such pairing and are fixed.
+    """
+    out, changed = [], []
+    for line in text.split("\n"):
+        if is_qq(line):
+            out.append(line)
+            continue
+        if UNIT_SPACE.search(line):
+            new = UNIT_SPACE.sub(r" \1", line)
+            changed.append(f"unit space in: {line.strip()[:60]}")
+            line = new
+        out.append(line)
+    return "\n".join(out), changed
+
+
 def _accent_map():
     """The curated unaccented->accented map, and the words that keep no accent.
 
@@ -822,6 +886,7 @@ FOOD_FIXERS = [
     ("quoting", fix_flow_quoting),
     ("dashes", fix_en_dashes),
     ("typography", fix_typography),
+    ("units", fix_unit_spacing),
     ("accents", fix_accents),
     ("meta", fix_meta_block),
     ("size", fix_size_words),
@@ -835,11 +900,19 @@ FOOD_FIXERS = [
 # recorded harm above, beside an `item`, which a drink retired on 2026-09-21.
 # A single table with an `if site == ...` inside each fixer would have been the
 # same code and a worse place to read the answer.
+# `units` IS IN BOTH TABLES AND MEANS TWO DIFFERENT THINGS, which is exactly
+# what the two tables are for. On FOOD it runs over the whole file, so an
+# `amount: "40g"` is fixed. On a DRINK it is wrapped, so it reaches only Helen's
+# own prose and a drink's `amount` stays untouched -- the recorded harm above.
+# A drink cannot carry an unspaced amount anyway (`15ml` fails
+# test_every_amount_is_readable_as_a_quantity, because `measures:` declares the
+# unit and not the glue), so the wrap costs nothing and states the rule.
 DRINK_FIXERS = [
     ("quoting", only_where_editable(
         partial(fix_scalar_quoting, fields=DRINK_SCALAR_FIELDS))),
     ("dashes", only_where_editable(fix_en_dashes)),
     ("typography", only_where_editable(fix_typography)),
+    ("units", only_where_editable(fix_unit_spacing)),
     ("accents", only_where_editable(fix_accents)),
 ]
 

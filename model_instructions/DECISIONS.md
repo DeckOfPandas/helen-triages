@@ -588,7 +588,8 @@ unless stated.
 - **2026-08-02** — A bullet list inside one method step needed `.method-full
   li` to stop being flex; nested `<li>`s reset the step counter. Verified
   against `beef-wellington.md`'s grouped method rather than assumed.
-- **2026-08-03** — `notes:` items became `{label, text}` or a bare string.
+- **2026-08-03** — `notes:` items became `{label, text}` or a bare string. The
+  bare string half was retired on 2026-10-01 — see the entry there.
 - **2026-08-09, #75** — `incidental: true`: Helen — *"It's silly to write '2
   tbsp olive oil' for a sear, when people will obviously use as much as they
   like. Whereas in a salad dressing, an amount is needed."* Her interactive
@@ -745,6 +746,91 @@ unless stated.
   **The known failure mode**: a step saying *"add the remaining ingredients"*
   names nothing, so nothing lands in it. An ingredient no step mentions is the
   signal, and those get flagged rather than assigned.
+
+- **2026-10-01 — a note is always `{label, text}`, and an empty one is a
+  placeholder nothing prints.** Helen: *"I really would like placeholders for
+  labels and text on notes, for both food and cocktails."* She was writing notes
+  into drafts and having to recall the YAML each time, which is the same
+  complaint that produced the 2026-09-04 ingest rule; this finishes it by making
+  the shape unconditional rather than preferred. 298 bare-string notes migrated
+  across both drafts repos — 263 food, 35 cocktails, in 275 files. Zero remain.
+
+  **THE LAYOUTS HAD TO CHANGE FIRST.** 115 food drafts carried `- ""`, a note
+  waiting to be written. Turned into a pair, that is `label: ""` plus `text: ""`
+  — and both layouts tested the VALUE to decide which branch to take, so an empty
+  `text:` fell through to the bare-string branch and was rendered as the MAPPING.
+  The fix is the same one §4's `notes.size` story records one level up: test the
+  KEYS, not the value. A bare string has neither key and asking a string for one
+  gives nil, so the branch is decided by shape and the value is then free to be
+  empty. Testing the keys is also what makes the skip possible at all: on the
+  value, a mapping stringifies to something non-empty and the note renders.
+
+  **AND THE SESSION WAS WRONG ABOUT WHAT THAT RENDERED AS, WHICH IS THE PART
+  WORTH KEEPING.** It said throughout — to Helen, in the layout comments, in the
+  first draft of this entry — that a mapping would print as a visible Ruby hash
+  on 115 pages. The mutation proof says otherwise: with both notes sections
+  reverted, the three new tests report **115 empty note boxes and not one hash**.
+  A mapping through `markdownify` renders as NOTHING. Almost certainly kramdown,
+  which reads a line that is only braces as an attribute list and consumes it —
+  that mechanism is inference, the empty box is the measurement.
+
+  So the real fault was a label beside an empty space, which is *exactly* what
+  the placeholder's old `- ""` spelling already did. The migration would not have
+  made anything worse; it would have carried a years-old cosmetic fault forward
+  under a new spelling. **Which is the lesson: the prediction was confident, it
+  was repeated into three files, and it was only checked because the test was
+  mutated to prove it bites.** A fault you have reasoned your way to is not a
+  fault you have seen.
+
+  While they were open, both layouts learned to count the notes that will
+  actually render BEFORE deciding whether to print the NOTES heading and the
+  one-note class. An empty note used to print a lone "note" label with nothing
+  after it, and a file whose only note was a placeholder printed the whole
+  heading to introduce it.
+
+  **Nothing on either live site moved, and that was measured, not hoped for.**
+  All 143 published notes — 106 food, 37 cocktails — were already filled pairs,
+  so no page changed and no proofread was invalidated. That is why the migration
+  could be done in one pass rather than file by file behind Helen's reading.
+
+  **The drafts test inverted, deliberately.** `test_note_dicts_have_label_and_text`
+  (published) tests both values for TRUTH, because a published note has to say
+  something. `test_note_dicts_have_label_and_text_when_dict` (drafts) now tests
+  that the keys are PRESENT, that there is no third key, and that both values are
+  strings — so a placeholder passes while the fault the test was written for in
+  August, a `note:` key typo for `text:`, fails twice over. Proved by running it
+  against five hand-built notes and watching it refuse four of them; a test
+  rewritten to go green over 275 changed files says nothing until it has been
+  shown biting.
+
+  **Three new rendered-page tests, on the `site` fixture and not `prod_site`,**
+  because both failure modes only ever existed on a draft page — the page Helen
+  proofreads, which builds locally and which no production build contains. 416
+  notes render across that build, which is the floor the fourth test pins so that
+  three tests passing by finding nothing cannot pass by finding no notes.
+
+  **The first mutation proof was itself wrong, and that is the second lesson.**
+  It reverted only the inner render branch, left the new counting pre-pass above
+  it, and the tests passed — because the pre-pass skips the section entirely when
+  every note is a placeholder, and no file in either repo carries a placeholder
+  ALONGSIDE a real note. A coincidence of today's content, not a property of the
+  layout: the first time Helen adds a second note to one of those 115 files it
+  would appear. **A half-mutation that passes is not evidence the test is weak;
+  it is evidence the mutation was not the fault.**
+
+  The migration was proved against COPIES of both trees first, as
+  `/tidy-drafts` requires of any bulk pass: body below the front matter
+  byte-identical, front matter parsing on both sides, every key but `notes`
+  unchanged, and the line count up by exactly one per converted note. The value
+  was carried across by parsing the item line and re-emitting it through
+  `json.dumps`, whose output is a valid YAML double-quoted scalar — which is what
+  gets an apostrophe, an embedded quote and a leading `-` right where
+  hand-rolled quoting does not.
+
+  **`notes: []` was left alone**, on 77 food drafts. An empty LIST says the
+  ingest found nothing worth a note; an empty NOTE says Helen has a note to
+  write. They are different statements and inventing 77 blank slots is not what
+  was asked for.
 
 ### §4.0 The gate flags
 
