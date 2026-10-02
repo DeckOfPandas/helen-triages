@@ -3109,11 +3109,11 @@ def test_the_volume_attribute_agrees_with_the_footer_and_nothing_else_carries_it
     )
 
 
-TOP_UP_POUR = re.compile(r'<span class="cocktail-amount">\s*to top\s*</span>')
+TOP_UP_POUR = re.compile(r'<span class="cocktail-amount">\s*\(top\)\s*</span>')
 
 
 def _topped_pages(built_site):
-    """Every built drink page that prints a `to top` in its amounts."""
+    """Every built drink page that prints a `(top)` in its amounts."""
     return [p for p in _drink_pages(built_site)
             if TOP_UP_POUR.search(p.read_text(encoding="utf-8"))]
 
