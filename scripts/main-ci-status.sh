@@ -26,6 +26,12 @@
 # the latest run on `main` succeeded, 1 when it did not, and 2 on a refusal,
 # so a caller can branch on it without parsing the text.
 #
+# "DID NOT" COVERS THREE DIFFERENT THINGS, and the verdict line says which:
+# still running, CANCELLED (that merge is not deployed, nothing is broken), and
+# red (the deploy outage this file was written for). `branch=main` in the URL
+# also matches a fork's pull request from a branch called `main`; the parser
+# keeps those out of the verdict. scripts/main_ci_status.py has both stories.
+#
 # The repo is public, so no credential is sent: `gh-read.sh` is not used here
 # precisely because this must work as a plain unauthenticated read.
 #

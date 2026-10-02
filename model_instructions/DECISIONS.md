@@ -6399,6 +6399,23 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   needs a real clone and is NOT covered by `tests/test_agent_wrappers.py`; it
   was exercised by hand.
 
+- **2026-10-02 — a public issue drew a stranger's pull request within seven
+  minutes.** #1273 was raised at 20:05 UTC; at 20:12 the account `Jah-yee`,
+  a first-time contributor, opened #1274 from its own fork with "Fixes #1273".
+  The diff was two harmless lines in one test file — the first checkbox of the
+  issue and none of the rest — and the body restated the issue. Almost
+  certainly an automated agent watching new issues; which one cannot be told
+  from the PR. Helen: *"I love some community, but this repo was only ever
+  intended to serve me, and I don't want to keep track of a community at the
+  moment."* The fix shipped as #1278 from the agent account instead.
+  **What to carry**: (1) a new PR number is not evidence the session opened
+  it — read `.user.login`, as CLAUDE.md says of writes; (2) a fork's PR run
+  waits on *"action_required"*, and approving it runs the fork's code as it
+  stands at that moment; (3) every public issue is an invitation, so an issue
+  about the workflow or anything security-shaped is better raised as a PR, or
+  not publicly at all; (4) restricting PRs to collaborators, or interaction
+  limits, are repository settings and therefore Helen's. No rule was changed.
+
 ### §11.2 The record of this file being wrong
 
 Each is a lesson in §11.2's one sentence: an instruction to verify is not
@@ -7085,6 +7102,38 @@ verification. Dates are when the correction landed.
     and `gh run list` showed nothing queued. `@dependabot rebase` as a comment
     force-pushes the branch, fires `synchronize`, and runs within three
     minutes. Reach for the rebase.
+
+- **2026-10-02 — a PR check cancels a waiting deploy, and it reads as
+  `cancelled`, not red.** Three deploy runs were cancelled in one day: #1265's
+  at 09:12, #1276's at 20:39 and #1275's at 20:54. **Measured, not guessed**,
+  from the Actions run list: #1276's push run was queued behind #1272's, which
+  was still running; at 20:39:56 a `pull_request` run started for another
+  session's branch, and the waiting deploy was cancelled at 20:39:57. The
+  cause is the workflow's single concurrency group, `pages`, shared by push
+  and pull-request runs with `cancel-in-progress: false`: GitHub keeps one
+  WAITING run per group and drops the older when a newer arrives. (#1275's was
+  the benign form — dropped by #1278's own push run, which carried it. #1265's
+  fits the pattern and was not traced.)
+  **Nothing was lost**: #1278's run deployed #1272, #1275 and #1276 together.
+  **What it costs** is that a merge can sit undeployed until the next push,
+  and since 2026-09-28 (#1195) every PR is such an arrival, so it is far
+  likelier than when only pushes shared the group.
+  **The fix is one line** — give pull-request runs their own group per ref —
+  **and it is NOT made**: the workflow file is the nearest thing in the repo
+  to the Actions settings CLAUDE.md puts off limits, so it was offered to
+  Helen as a PR and she said *"Leave the rest for now please."* MANUAL §10 has
+  the symptom and the way out.
+  **`main-ci-status.sh` WAS WRONG ABOUT BOTH HALVES OF THAT EVENING, AND IS
+  FIXED** — Helen: *"do what we need to do with scripts/main-ci-status.sh"*.
+  (1) It called the cancelled run *"A DEPLOY OUTAGE ... every later merge
+  builds nothing"*, which is true of a red suite and false of a cancellation;
+  it now says the merge is NOT DEPLOYED, that nothing needs fixing, and how it
+  gets deployed. Still exit 1: an undeployed merge is not a green.
+  (2) Its `branch=main` filter matched #1274's run from `Jah-yee:main`, a
+  fork's pull request, which sat in the list as `failure`. As the newest row
+  it would have been reported as this repository's deploy being down. Only a
+  `push` from this repository counts now; the others are listed and marked.
+  Two tests in `test_agent_wrappers.py` pin them, with that evening's rows.
 
 ## §13 The visual design — the road to each value
 

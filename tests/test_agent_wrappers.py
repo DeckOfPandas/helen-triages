@@ -802,6 +802,57 @@ def test_main_ci_status_calls_a_failure_a_deploy_outage():
     assert "DEPLOY OUTAGE" in result.stdout
 
 
+def _main_ci_verdict(runs):
+    return subprocess.run(
+        ["python3", str(ROOT / "scripts" / "main_ci_status.py")],
+        input=json.dumps({"workflow_runs": runs}),
+        cwd=ROOT, capture_output=True, text=True, timeout=30,
+    )
+
+
+_PUSH = {"event": "push",
+         "head_repository": {"full_name": "DeckOfPandas/helen-triages"}}
+
+
+def test_main_ci_status_calls_a_cancelled_run_undeployed_and_not_an_outage():
+    """2026-10-02: #1276's deploy run was cancelled by a pull-request check
+    that joined the same concurrency group while it waited. The suite was not
+    red and the next merge deployed it, so "every later merge ships nothing"
+    was false -- but the merge WAS undeployed, so it is still not a green."""
+    result = _main_ci_verdict([
+        {**_PUSH, "conclusion": "cancelled", "created_at": "2026-10-02T20:37:23Z",
+         "display_title": "Merge pull request #1276"},
+        {**_PUSH, "conclusion": "success", "created_at": "2026-10-02T20:31:00Z",
+         "display_title": "Merge pull request #1272"},
+    ])
+    assert result.returncode == 1, result.stdout
+    assert "NOT DEPLOYED" in result.stdout
+    assert "DEPLOY OUTAGE" not in result.stdout
+
+
+def test_main_ci_status_ignores_a_fork_whose_branch_is_called_main():
+    """`branch=main` also matches a pull request FROM a branch called `main`,
+    which is what a fork that never branched sends. #1274's run from
+    `Jah-yee:main` sat in this list as a failure; as the newest row it would
+    have been reported as this repository's deploy being down."""
+    fork = {"event": "pull_request", "conclusion": "failure",
+            "head_repository": {"full_name": "Jah-yee/helen-triages"},
+            "created_at": "2026-10-02T20:59:00Z", "display_title": "fix test"}
+    green = {**_PUSH, "conclusion": "success",
+             "created_at": "2026-10-02T20:54:14Z",
+             "display_title": "Merge pull request #1278"}
+
+    result = _main_ci_verdict([fork, green])
+    assert result.returncode == 0, result.stdout
+    assert "main is GREEN" in result.stdout
+    assert "not a deploy" in result.stdout, "the ignored run should still be listed"
+
+    # And a list holding ONLY such runs has not answered the question.
+    only_fork = _main_ci_verdict([fork])
+    assert only_fork.returncode == 2, only_fork.stdout
+    assert "NOT a green result" in only_fork.stderr
+
+
 # --- scripts/browser/styles.sh, gaps.sh, click-crop.sh: arguments only -------
 #
 # Added 2026-09-15 alongside guard-unanalyzable-bash.py's new env-assignment

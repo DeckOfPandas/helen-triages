@@ -1601,10 +1601,12 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 
 // FILL-BASED ARTWORK. NOTHING IN THE SET USES THIS TODAY, AND IT STAYS ANYWAY.
 //
-// All 27 glasses are open line art as of 2026-09-06: Helen redrew the pineapple
-// and the coconut (#525, #307) and then the tiki mug (#738), and each redraw
-// took a compound fill out of the set. This rule's last consumer went with the
-// mug.
+// Every glass is open line art as of 2026-09-06 (27 then, 28 with the mule mug
+// on 2026-10-02): Helen redrew the pineapple and the coconut (#525, #307) and
+// then the tiki mug (#738), and each redraw took a compound fill out of the
+// set. This rule's last consumer went with the tiki mug. The mule mug's
+// dimples are NOT this: they are stroked paths that also fill, `.glass-icon-dot`
+// above, and a whole drawing published as a fill is still what this is for.
 //
 // KEPT DELIBERATELY, AND NOT AS THE KIND OF ORPHAN #651 COMPLAINS ABOUT -- that
 // issue's rule is that "a value nothing reads is only safe while a comment says
@@ -1920,7 +1922,9 @@ $amount-gap: 1rem;
   font-size: 0.84rem;
 }
 
-// HOW A POUR GOES IN — #1217, 2026-09-26. `(float)`, `(rinse)`, `(muddle)`.
+// HOW A POUR GOES IN — #1217, 2026-09-26. `(float)`, `(rinse)`, `(muddle)`,
+// `(shell)`. THIS NOTE IS ABOUT `.cocktail-use` AND NO RULE FOLLOWS IT: since
+// #1263 the class is declared alongside `.cocktail-amount`, further up.
 //
 // THE FIELD IS `as:` AND IT RENDERED NOWHERE UNTIL NOW. It has existed since
 // #754 and exactly one thing read it — cocktail_card_ingredients.rb, for card
@@ -1951,6 +1955,13 @@ $amount-gap: 1rem;
 // only thing left below the line is `character`, on the three drinks that carry
 // one. Kept rather than renamed because the position, indent and quiet tone are
 // all still exactly right for what sits here.
+//
+// THE TONE IS NO LONGER QUIET, AND THE VIOLET BELOW NO LONGER SHOWS — #1226,
+// 2026-10-02. Seven drinks carry a character now, and `.cocktail-character`
+// (further down) sets its own colours: the words in $color-text, the label in
+// grey Plex. This rule still supplies the position, the indent and the size.
+// Its colour is inherited by nothing today and is left in place so that a
+// future sub-line which is NOT a character still ties back to the index.
 //
 // Indented past the amount column so the amounts keep their clean left edge.
 // VIOLET, and it is the palette's own logic rather than decoration — Helen,
