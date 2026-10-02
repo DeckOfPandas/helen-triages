@@ -1873,7 +1873,21 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # `Strain.` plus glasses.yml plus serve.yml -- so the stored form became the
 # bare technique. The rendered page is byte-identical to what she read, which is
 # the only reason that edit did not need a fresh proofread.
-COCKTAIL_BASELINE_COMMIT = "12765a9"   # six drinks promoted from 4-promote/
+#
+# MOVED 2026-10-02 FOR ONE DRINK AND ONE LINE, ON HELEN'S EXPLICIT GRANT.
+# `4f3621b` adds `I want to faff` to Porn Star Martini's `mood:` (#1268) -- the
+# tag she asked for in the issue's own words, "Scooping out three passion fruit
+# half-shells definitely counts", written by the deriver from a `mood_include`
+# entry. Nothing else in the file changed.
+#
+# HER GRANT, asked for the tag: "No need to flip the proofread flag, this is an
+# explicit grant." It is the 742aa73 shape again: a change she can see whole in
+# the sentence that asked for it.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly one file, `_cocktail_recipes/porn-star-martini.md`, "last touched by
+# 4f3621bc", and nothing else. Covers 4f3621b and nothing after.
+COCKTAIL_BASELINE_COMMIT = "4f3621b"   # Porn Star Martini gains one mood (#1268)
 
 
 def _newest_commit_per_published_drink():

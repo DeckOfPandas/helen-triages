@@ -4926,6 +4926,18 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   gives it to all five drinks that blend, including the four-ingredient
   frozen-fruit-daiquiri. She sits at exactly `sazerac`'s coordinates, and that
   drink needed an entry too.
+- **2026-10-02, #1268** — **Porn Star Martini gets `I want to faff` from a
+  `mood_include` too.** Helen: *"Scooping out three passion fruit half-shells
+  definitely counts."* She had not added the tag herself *"in case there's a
+  deriver"*, and there is: a tag typed into the recipe fails
+  `test_every_drinks_moods_match_the_derivation`. The rule scores the drink
+  zero — six ingredients, and "Scoop out the seeds and flesh" carries no faff
+  word; `shell` is on the list but sits in this drink's GARNISH, which the
+  rule does not read. Not a new faff word: `scoop` would be one hit where two
+  are wanted. The dry run named this one drink of 140.
+  **`proofread` stayed `true`**: *"No need to flip the proofread flag, this is
+  an explicit grant."* `COCKTAIL_BASELINE_COMMIT` moved to `4f3621b` in a
+  commit of its own, proved with the old value first.
 - **2026-09-17** — **Ti Punch keeps a method.** Her idea was no method at all,
   just a Serve line reading *"Assemblage au choix."*
   `test_method_is_a_non_empty_list` refuses that — nine drinks had no method

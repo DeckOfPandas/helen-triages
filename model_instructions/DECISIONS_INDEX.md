@@ -358,6 +358,7 @@ argument and the rules each field is read by.
 - 2026-09-17 · §9.1 · fruit wedges is declared, and is the one garnish that does not name its fruit.
 - 2026-09-17 · §9.1 · Gunmetal Blue pours peach brandy, not crème de pêche.
 - 2026-09-17 · §9.1 · Hurricane gets I want to faff from a mood_include, not a rule change.
+- 2026-10-02 · §9.1 · #1268 · Porn Star Martini gets I want to faff from a mood_include too.
 - 2026-09-17 · §9.1 · Ti Punch keeps a method — Her idea was no method at all, just a Serve line reading "Assemblage au choix." test_method_is_a_non_empty_list refuses that — nine drinks had no method …
 - 2026-09-18 · §9.1 · serve.ice cannot carry QUANTITY, and that is what separated two identical-looking corrections.
 - 2026-09-18 · §9.1 · warming from cinnamon is a correction, not a rule change.
