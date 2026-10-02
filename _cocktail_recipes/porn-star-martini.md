@@ -32,6 +32,7 @@ mood:
   - "fruity"
   - "sugar craving"
   - "brunch"
+  - "I want to faff"
 notes: []
 source: ""
 source_url: ""
