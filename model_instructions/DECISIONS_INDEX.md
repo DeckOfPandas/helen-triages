@@ -193,6 +193,7 @@ argument and the rules each field is read by.
 - 2026-09-06 · §9.3 · #297 · serves: added on nine drinks (#297): seven punch bowls, the mulled wine, the Modern Zombie; the scaler does not read it.
 - 2026-09-06 · §9.3 · #754 · as: added to an ingredient — a closed vocabulary of float / rinse / muddle.
 - 2026-09-26 · §9.3 · #1217 · An unmeasured amount is a BRACKETED NOUN
+- 2026-10-02 · §9.3 · #1263 · A pour's direction renders UNDER its amount, in the amount's own type.
 - 2026-09-26 · §9.3 · "dashes" throughout, "dash" when it is one.
 - 2026-08-21 · §9.3.1 · #441 · generic as a list means OR and only OR.
 - 2026-08-22 · §9.3.1 · #322 #314 · ingredients.yml written (#322 the spec, #314 the rum half).

@@ -177,8 +177,11 @@
 
     // Explicit $color-text on this page -- inheriting the override above
     // does not reach these, because each already paints its own colour.
+    // `.cocktail-use` moved up here from the quiet list with #1263: it sits
+    // under the amount in the amount's own type, so it takes the amount's ink.
     .cocktail-tagline,
-    .cocktail-amount {
+    .cocktail-amount,
+    .cocktail-use {
       color: $print-ink;
     }
 
@@ -192,9 +195,6 @@
     .cocktail-units,
     .cocktail-scale-total,
     .cocktail-optional,
-    // `.cocktail-use` joined 2026-09-26 with #1217. It is `.cocktail-optional`
-    // in every other respect, so it is quiet ink here for the same reason.
-    .cocktail-use,
     .cocktail-style-or,
     .cocktail-character,
     .cocktail-note,

@@ -1722,6 +1722,14 @@ now — §9.4.) Each is declared in `measures:` `non_volumetric` and each has a 
 step saying WHEN (`Top with champagne.` / `Rinse the glass with absinthe and
 dump.`).
 
+**A MEASURED pour says its direction in `as:`, and the drink page prints it
+UNDER the amount, in the amount's own type** (#1263, 2026-10-02): `25 ml` with
+`(shell)` on the line below. So every direction, measured or not, is read in
+the amount column. In `_layouts/cocktail.html` the two sit side by side in a
+`.cocktail-measure` cell; **`.cocktail-use` must stay a sibling of
+`.cocktail-amount`, never inside it**, because `cocktail-scale.js` parses that
+span's whole text. `test_a_pours_direction_sits_under_its_amount` pins it.
+
 **THEY WERE `to top` AND `to rinse` UNTIL 2026-09-26**, and Helen's reason is
 worth keeping: a sentence fragment in a column of quantities read as prose that
 had escaped into the data, where a bracketed noun reads as the slot a number

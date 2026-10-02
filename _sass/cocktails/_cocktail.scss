@@ -1817,7 +1817,24 @@ $amount-gap: 1rem;
   grid-column: 2;
 }
 
-.cocktail-amount {
+// THE AMOUNT AND THE DIRECTION UNDER IT — #1263. One cell in the amount track,
+// holding `.cocktail-amount` and, on a pour that carries `as:`, `.cocktail-use`
+// on a line of its own beneath. Placed in the first track for the reason the
+// name is placed in the second. The row aligns on baselines and a cell's
+// baseline is its FIRST line, so the amount still sits level with the name and
+// the direction hangs below both.
+.cocktail-ingredient-top > .cocktail-measure {
+  grid-column: 1;
+}
+
+.cocktail-measure > .cocktail-amount,
+.cocktail-measure > .cocktail-use {
+  display: block;
+}
+
+// `.cocktail-use` SHARES THIS RULE ON PURPOSE (#1263) -- see its own note below.
+.cocktail-amount,
+.cocktail-use {
   // PLEX MONO, 2026-09-02: a drink amount is a number you act on, the same
   // fact food's .ingredient-amount was already built on -- see
   // cocktails/_palette.scss's $font-label comment.
@@ -1922,23 +1939,24 @@ $amount-gap: 1rem;
 // ORDER — so a float looked like an ordinary pour and the issue's title is the
 // whole complaint: "show when something is a top or a float".
 //
-// OPTION A, Helen's pick from the candidates page against three others:
-// "option A please, certain." So it takes `.cocktail-optional`'s shape
-// exactly, and shares its reasoning rather than restating it — a parenthetical
-// about the POUR, sitting where `(optional)` sits, italic and in
-// $color-clear-text because it is not a filter axis either. The index matches
-// nothing against `as`, so spending a hue here would make a promise the index
-// cannot keep.
+// IT WAS `.cocktail-optional`'S SHAPE, AFTER THE BOTTLE, UNTIL #1263. That was
+// option A of #1217's candidates page ("option A please, certain"): a quiet
+// italic parenthetical at the end of the line. Helen, 2026-10-02, raising
+// #1263: 'having "(float)" at the end of the ingredient line as it is is easy
+// to miss' — and a float poured into the shaker is a different drink.
 //
-// IT CANNOT COLLIDE WITH THE AMOUNT'S OWN BRACKETS, which is the pairing the
-// layout comment sets out: a pour with no measure says `(top)` in the AMOUNT
-// column and carries no `as`, and a pour with a measure says it here. One mark
-// per pour, never "(top) soda water (top)".
-.cocktail-use {
-  font-style: italic;
-  color: $color-clear-text;
-  font-size: 0.84rem;
-}
+// SO IT SITS UNDER THE AMOUNT, IN THE AMOUNT'S OWN TYPE. Her words: "Match font
+// styling with the ingredient amount, just to be crystal clear." It has no
+// declarations of its own for that reason — it is a selector on
+// `.cocktail-amount`'s rule above, and on the "make it" and print rules that
+// restate the amount, so the two cannot drift. It also puts a measured
+// direction where an unmeasured one already was: `(sprinkle)` and `(top)` ARE
+// amounts, so every direction on the page is now read in one column.
+//
+// IT STILL CANNOT COLLIDE WITH THE AMOUNT'S OWN BRACKETS, which is the pairing
+// the layout comment sets out: a pour with no measure says `(top)` as the
+// amount and carries no `as`, and a pour with a measure says it on the line
+// below. One mark per pour, never "(top)" over "(top)".
 
 // WAS THE CLASS LINE, IS NOW THE CHARACTER LINE — #544, 2026-08-29. The generic
 // moved up to be the headline itself, so this rule no longer glosses it; the
@@ -2489,7 +2507,8 @@ $amount-gap: 1rem;
   // part of the old block that was never arithmetic about characters.
   --amount-gap: #{$amount-gap * 1.37};
 
-  .cocktail-amount { font-size: 1.3rem; font-weight: 600; }
+  .cocktail-amount,
+  .cocktail-use { font-size: 1.3rem; font-weight: 600; }
   .cocktail-item { font-size: 1.15rem; }
   // 1.15rem/1.85, Helen's brief -- up from the base rule's 1rem/1.6, same
   // "bigger for your hands being full" logic as the amount and item above.
