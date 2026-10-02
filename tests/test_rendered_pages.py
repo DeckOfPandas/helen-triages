@@ -2915,16 +2915,18 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
 #   under the scaler   "Approximately 360 ml"   -- the BATCH, and it moves
 #   in the footer      "...in a serving of 90 ml." -- ONE GLASS, and it must not
 #
-# The second guarantee is structural rather than remembered: the moving figure
-# lives on `.cocktail-scale-total`, which carries `data-total-ml`, and the units
-# line carries no attribute any of this could reach. These tests are what says
-# so about BUILT HTML, which is the only place the two sentences meet.
+# THE FIRST SENTENCE IS GONE -- #1257, 2026-10-02. Helen removed the line under
+# the scaler, so ONE sentence about volume is left, the footer's, and nothing
+# moves. The plugin's figure is still on the page as `data-total-ml` on
+# `.cocktail-scale-controls`: scripts/glass_fit_report.py reads it, and these
+# tests read it to check the footer against the plugin's own sum.
+# `test_no_drink_page_prints_a_batch_volume` is the pin that the line stays off.
 #
-# BOTH LINES ARE PRODUCTION, so `prod_site`. The units line went live with #1001
-# and the volume line is ungated for the same reason: neither is a price.
+# PRODUCTION, so `prod_site`. The units line went live with #1001.
 
+# group(1) is the figure. group(2) used to be the sentence's body.
 SCALE_TOTAL = re.compile(
-    r'<p class="cocktail-scale-total" data-total-ml="([^"]*)">(.*?)</p>', re.S)
+    r'<div class="cocktail-scale-controls" data-total-ml="([^"]*)"')
 UNITS_LINE = re.compile(r'<p class="cocktail-units"(.*?)</p>', re.S)
 SERVING_OF = re.compile(r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml\.")
 
@@ -3044,14 +3046,33 @@ def test_a_drink_with_no_volume_keeps_the_units_sentence_it_had_before(prod_site
     )
 
 
-def test_only_the_scaler_line_carries_a_figure_the_scaler_can_reach(prod_site):
-    """THE ONE THING THAT KEEPS THE UNITS LINE STILL.
+def test_no_drink_page_prints_a_batch_volume(prod_site):
+    """#1257, Helen, 2026-09-30: remove the "approximately X ml" line from
+    under the cocktail recipe scaler.
 
-    cocktail-scale.js writes to `.cocktail-scale-total-figure` and to nothing
-    else on this subject; it finds that element by `data-total-ml`. If that
-    attribute ever appears on `.cocktail-units`, the per-serving figure becomes
-    reachable by the multiple box, which is the bug the layout's own comment
-    says to come here for. Cheap to check and impossible to notice by eye.
+    It was #1121's line, asked for and liked on 2026-09-17, so it is exactly
+    the kind of thing a later session restores in good faith from the older
+    ruling. This is what tells that session the newer one exists.
+    """
+    offenders = []
+    for page in _drink_pages(prod_site):
+        html = page.read_text(encoding="utf-8")
+        if "cocktail-scale-total" in html or re.search(r"Approximately\s", html):
+            offenders.append(page.parent.name)
+    assert not offenders, (
+        "these drink pages print a batch volume line again: "
+        f"{sorted(offenders)[:10]}\nHelen removed it (#1257). The figure "
+        "lives on as `data-total-ml` on `.cocktail-scale-controls`, unprinted."
+    )
+
+
+def test_the_volume_attribute_agrees_with_the_footer_and_nothing_else_carries_it(prod_site):
+    """THE ONE THING THAT KEEPS THE UNITS LINE STILL, and the footer honest.
+
+    `data-total-ml` sits on the scaler's controls and no script reads it
+    (#1257). If it ever appears on `.cocktail-units`, a per-serving figure is
+    one line of JavaScript from moving with the multiple box. Cheap to check
+    and impossible to notice by eye.
     """
     problems = []
     for page in _drink_pages(prod_site):
@@ -3066,29 +3087,21 @@ def test_only_the_scaler_line_carries_a_figure_the_scaler_can_reach(prod_site):
         if not total:
             continue
 
-        attr, body = total.group(1), " ".join(total.group(2).split())
+        attr = total.group(1)
         assert re.fullmatch(r"[\d.]+", attr), f"{slug}: data-total-ml={attr!r}"
         figure = float(attr)
         assert figure > 0, f"{slug}: a volume of {figure}"
 
-        # THE PRINTED FIGURE IS THE ATTRIBUTE. The browser multiplies the
-        # attribute; the reader reads the text. At x1 they are the same number,
-        # and the day they are not, the line lies the moment anyone touches it.
-        expected = ("Approximately "
-                    f'<span class="cocktail-scale-total-figure">{attr}</span> ml')
-        if expected not in " ".join(total.group(0).split()):
-            problems.append(f"{slug}: {body!r} does not print {attr} ml")
-
-        # AND WHERE A DRINK IS ONE GLASS, THE FOOTER SAYS THE SAME NUMBER --
-        # the batch at x1 IS the serving. A punch divides by `serves:` and is
+        # WHERE A DRINK IS ONE GLASS, THE FOOTER SAYS THE SAME NUMBER --
+        # the recipe as written IS the serving. A punch divides by `serves:` and is
         # left out of this comparison rather than given a second sum here.
         units = UNITS_LINE.search(html)
         if units and "each of" not in units.group(1):
             said = SERVING_OF.search(units.group(1))
             if said and float(said.group(1)) != figure:
                 problems.append(
-                    f"{slug}: the scaler says {figure} ml and the units line "
-                    f"says {said.group(1)} ml for the same single glass")
+                    f"{slug}: data-total-ml says {figure} ml and the units "
+                    f"line says {said.group(1)} ml for the same single glass")
 
     assert not problems, (
         "the two volume figures on a drink page have come apart:\n  "
@@ -3199,14 +3212,10 @@ def test_the_aviation_prints_the_volume_its_own_amounts_add_up_to(prod_site):
     html = page.read_text(encoding="utf-8")
 
     total = SCALE_TOTAL.search(html)
-    assert total, "no volume line on the Aviation"
+    assert total, "no `data-total-ml` on the Aviation's scaler controls"
     assert total.group(1) == "90", (
         f"the Aviation totals {total.group(1)} ml; its amounts are "
         "52.5 + 15 + 7.5 + 15 = 90"
-    )
-    assert "Approximately" in total.group(2), (
-        "Helen's wording is 'Approximately X ml' (#1121, §13.12: the voice is "
-        f"hers). The line now reads: {' '.join(total.group(2).split())!r}"
     )
 
     units = UNITS_LINE.search(html)

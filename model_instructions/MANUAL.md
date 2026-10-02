@@ -2104,31 +2104,33 @@ this file matches the wrong block.
 
 ### 9.3.6 How much liquid is in a drink — #1121
 
-**Two sentences, two numbers, and confusing them is the whole risk.** Helen:
-*"add total ml next to recipe scaler to help me choose the right number of
-glasses... This means I can vary target units of alcohol myself."* Under the
-scaler, **"Approximately X ml"** — the BATCH, and the only figure on a cocktail recipe
-page that moves with the multiple box. In the footer, the units line's new
+**ONE SENTENCE NOW, and it does not move.** In the footer, the units line's
 tail, **"in a serving of Y ml"** — ONE GLASS, invariant, exactly as the unit
-count beside it is. Both wordings are hers and ship unpolished (§13.12).
+count beside it is. The wording is Helen's and ships unpolished (§13.12).
+
+**THERE WAS A SECOND SENTENCE AND SHE REMOVED IT — #1257, 2026-10-02.** #1121
+put **"Approximately X ml"** under the scaler: the BATCH, the one figure on the
+page that moved with the multiple box, asked for on 2026-09-17 (*"add total ml
+next to recipe scaler to help me choose the right number of glasses"*). **Do
+not restore it from that older ruling**;
+`test_no_drink_page_prints_a_batch_volume` fails if the line comes back.
 
 `page.volume` (`total_ml`, `serve_ml`, `serves`, `pours`) is computed by
 `volume_for` in `_plugins/cocktail_units.rb` — the same generator, because a
 unit IS millilitres times a strength and a second parse of the amounts is a
-second answer waiting to disagree. **The browser does no volume arithmetic**:
-`data-total-ml` carries the ×1 figure and `HTF.scale.batchTotalMl` multiplies
-it. `HTF.scale.totalMl` is deliberately NOT used — it reads the printed strings
-and counts `ml` and only `ml`, so an `oz` or `tsp` pour totals differently
-there than in the footer.
+second answer waiting to disagree. **The browser does no volume arithmetic and
+reads no volume**: `data-total-ml` carries the ×1 figure as an unprinted
+attribute on `.cocktail-scale-controls`, for `scripts/glass_fit_report.py` and
+the volume tests. `HTF.scale.batchTotalMl`, which multiplied it, is deleted.
 
 **A `to top` SPENDS ITS DECLARED RANGE'S MIDPOINT** — Helen, 2026-09-17:
 *"Midpoint please, I'll cope on the spot."* One expression, `top_up_ml` in the
 plugin, asked by both the unit count (which has spent it since #297) and the
 volume, so the two sentences on a topped drink can never disagree about what
 the top pours. Tom Collins: 112.5 ml of build plus soda water's 100–150 halved
-= **"Approximately 237.5 ml"**. **"Approximately" is doing real work there**,
-carrying a declared 50 ml span rather than rounding — which is why her word
-fits and why the change was safe. The argument she overruled is kept in
+= 237.5 ml. The line that printed it said "Approximately", which carried the
+declared 50 ml span; since #1257 the figure reaches the reader only through
+the footer's "Roughly … in a serving of 237.5 ml". The argument she overruled is kept in
 `volume_for`'s header: `top_up_ml` is one range per topper whatever the drink,
 and #1076 showed it is a stand-in for a sum this repo cannot run (capacity −
 build − room for the ice; no glass records a capacity, #295). Make it again

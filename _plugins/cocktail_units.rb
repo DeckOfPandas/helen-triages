@@ -348,6 +348,12 @@ module HelenTriages
     # the whole trade -- a figure to work from beats a blank, for a reader who
     # is standing at the counter with the bottle in her hand.
     #
+    # THAT LINE IS GONE -- #1257, 2026-10-02. Helen removed "Approximately X
+    # ml" from under the scaler. The midpoint still feeds the footer's "in a
+    # serving of Y ml" (whose own hedge is "Roughly") and the unprinted
+    # `data-total-ml` the glass-fit report reads, so the rule stands; only the
+    # sentence this paragraph argues from does not.
+    #
     # WHEN `capacity_ml:` LANDS IN glasses.yml, `top_up_ml` stops being a house
     # range and this stops being an approximation. Nothing here has to change;
     # the figure simply gets better.

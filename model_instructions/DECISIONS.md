@@ -2747,6 +2747,25 @@ unless stated.
 
 ### §9.3.6 How much liquid is in a drink — #1121, built 2026-09-17
 
+- **2026-10-02, #1257 — "Approximately X ml" is REMOVED, thirteen days after
+  she asked for it and liked it.** The issue is its title and nothing else:
+  *"remove 'approximately X ml' line from under cocktail recipe scaler."* No
+  reason was given and none was asked for; the entries below are the argument
+  for a line that no longer exists, kept because they explain the footer's
+  "in a serving of Y ml", which stays.
+  - **The figure stayed and the sentence went.** `data-total-ml` moved from
+    the deleted `<p>` to `.cocktail-scale-controls`, unprinted, because
+    `scripts/glass_fit_report.py` and five volume tests read the plugin's sum
+    off the built page — the alternative was a second parse of the amounts,
+    which is the thing §9.3.6 exists to prevent.
+  - **`HTF.scale.batchTotalMl` was deleted, not left for its tests.** Its only
+    caller was the line. Nothing on a drink page moves with the scaler now but
+    the amounts.
+  - **A pin, because the older ruling is the louder one.** Everything below
+    this entry says the line is wanted, in her words.
+    `test_no_drink_page_prints_a_batch_volume` is what tells a session reading
+    those entries that a newer one exists.
+
 - **2026-09-17, #1121 — the ml line cost the batch note its totals, and the
   lesson is about what a NEW line does to the ones already there.** Helen, on
   the built branch: *"I like the line. But the cost and units line below has

@@ -247,7 +247,15 @@ layout: default
         {% endif %}
       {% endfor %}
     </ul>
-    <div class="cocktail-scale-controls" hidden>
+    {% comment %} `data-total-ml` IS THE RECIPE AS WRITTEN, IN ML, AND NOTHING ON
+       THE PAGE PRINTS IT (#1257, 2026-10-02). It was "Approximately X ml", a
+       line under the scaler that moved with the box (#1121); Helen took the
+       line off. The figure stays as an attribute because
+       scripts/glass_fit_report.py and the volume tests read it -- the plugin's
+       sum (`volume_for` in _plugins/cocktail_units.rb), never a second one.
+       No script reads it. No `page.volume`, no attribute.
+       MANUAL §9.3.6 / DECISIONS §9.3.6. {% endcomment %}
+    <div class="cocktail-scale-controls"{% if page.volume %} data-total-ml="{{ page.volume.total_ml }}"{% endif %} hidden>
       {% comment %} THE STEP BUTTONS share the box's `hidden` wrapper, so one reveal
          shows all three. `−` is U+2212, not a hyphen. Wordless on purpose; each
          click goes through `apply()`, the function a typed value reaches.
@@ -266,16 +274,6 @@ layout: default
       </label>
       <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
     </div>
-    {% comment %} "Approximately X ml" -- Helen's words, unpolished (#1121). The
-       BATCH, and the only figure on the page that moves with the multiple box.
-       The figure is the plugin's (`volume_for` in _plugins/cocktail_units.rb),
-       not scale.js's, so this line and the units line cannot disagree. It
-       renders without JavaScript. No `page.volume`, no line.
-       MANUAL §9.3.6 / DECISIONS §9.3.6 (#1121). {% endcomment %}
-    {% if page.volume %}
-      <p class="cocktail-scale-total" data-total-ml="{{ page.volume.total_ml }}">Approximately
-        <span class="cocktail-scale-total-figure">{{ page.volume.total_ml }}</span> ml</p>
-    {% endif %}
     {% comment %} THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, and only
        on a drink that pours something in dashes or drops -- a caveat that fires
        where it does not apply teaches you to stop reading caveats. The floor
@@ -523,7 +521,7 @@ layout: default
      THE UNITS LINE is units, not ABV, in Helen's words ("Roughly X units of
      alcohol in a serving of Y ml") -- do not polish them. It is PER SERVING and
      must never move with the scaler: nothing the scaler writes reaches
-     `.cocktail-units` (the moving figure is `.cocktail-scale-total`).
+     `.cocktail-units`. Since #1257 no volume figure moves at all.
      `page.units.exact` is computed and rendered by nothing, on purpose.
      THE COST LINE IS LOCAL ONLY: `site.show_costs` lives in _config_local.yml
      and never in _config.yml. `cost.complete` false withholds the figure;

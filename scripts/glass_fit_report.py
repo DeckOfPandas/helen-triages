@@ -13,7 +13,7 @@ kitchen"). A test would force an answer; a checklist asks the question.
 
 THE VOLUME IS THE SITE'S OWN, READ OFF THE BUILT PAGE. `volume_for` in
 `_plugins/cocktail_units.rb` computes it at build time and the drink page
-prints it as `data-total-ml`; a second parse of the amounts here would be a
+carries it as `data-total-ml`; a second parse of the amounts here would be a
 second answer to "how big is this drink" waiting to disagree with the page. So
 this builds the site with the local config (drafts render there) and reads the
 attribute. A drink the plugin withholds a figure for is listed as unchecked
@@ -44,7 +44,9 @@ DATA = ROOT / "_data" / "cocktails"
 BUILD = ROOT / "tmp" / "_glass_fit_site"
 OUT = ROOT / "tmp" / "glass_fit_report.md"
 
-TOTAL_ML = re.compile(r'class="cocktail-scale-total" data-total-ml="([\d.]+)"')
+# On the scaler's controls since #1257 (2026-10-02), when the visible
+# "Approximately X ml" line that used to carry it was removed.
+TOTAL_ML = re.compile(r'class="cocktail-scale-controls" data-total-ml="([\d.]+)"')
 
 
 def front_matter(path):

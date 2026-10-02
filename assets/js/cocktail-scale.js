@@ -295,46 +295,17 @@
        `max-content` track re-measures on the text change, so the line that
        used to follow this loop has nothing left to do. */
     put(input, box(last));
-    drawTotal(n);
     batch(n);
   }
 
-  /* THE LINE UNDER THE SCALER -- #1121, Helen: "add total ml next to recipe
-     scaler to help me choose the right number of glasses". It is the one figure
-     on this page that MOVES: the cost line and the units line are both per
-     glass and both invariant (see the long comment below, and the units line's
-     own in _layouts/cocktail.html), and this is the batch.
+  /* THERE WAS A LINE UNDER THE SCALER, AND IT IS GONE -- #1257, 2026-10-02.
+     "Approximately X ml" (#1121) was the batch total and the one figure on the
+     page that moved with this box. Helen took it off, so nothing here draws a
+     total any more and `HTF.scale.batchTotalMl` went with it. The page still
+     carries the recipe's volume as `data-total-ml` on the controls, for the
+     glass-fit report and the tests; no script reads it.
 
-     THE PER-RECIPE VOLUME IS READ OFF THE PAGE, NOT COMPUTED FROM THE AMOUNTS.
-     _plugins/cocktail_units.rb works it out once at build time and writes it
-     into `data-total-ml`; `HTF.scale.batchTotalMl` only multiplies. Its own doc
-     comment says why `HTF.scale.totalMl` is the wrong tool for this particular
-     number -- in short, it counts `ml` and only `ml`, and the footer's "in a
-     serving of Y ml" is computed the other way. Two sentences about the size of
-     one drink must not be able to disagree.
-
-     ABSENT IS NORMAL. A drink whose volume the repo cannot state renders no
-     element at all -- five published drinks, every one of them topped up
-     (#1076). `totalFigure` is then null and nothing here runs, exactly as
-     `batchNote` is null in a production build. */
-  var totalLine = article.querySelector('.cocktail-scale-total');
-  var totalFigure = totalLine
-    && totalLine.querySelector('.cocktail-scale-total-figure');
-  var perRecipeMl = totalLine
-    ? parseFloat(totalLine.getAttribute('data-total-ml'))
-    : NaN;
-
-  function drawTotal(n) {
-    if (!totalFigure) return;
-    var ml = HTF.scale.batchTotalMl(perRecipeMl, n);
-    /* A MISSING OR UNREADABLE ATTRIBUTE LEAVES THE SERVER'S OWN SENTENCE
-       STANDING. It was right at ×1 before this script ran, and a blanked figure
-       would be worse than a stale one. */
-    if (ml === null) return;
-    totalFigure.textContent = String(ml);
-  }
-
-  /* THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, SINCE #1121
+     THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, SINCE #1121
      (2026-09-17). It carried the batch's cost and units totals from #713 until
      then -- Helen's request of 2026-09-06: "Bitters text appearing next to the
      scaler if it's edited to >1. Cost and units on a note."
@@ -355,9 +326,8 @@
      SO THE COST AND UNITS LOOKUPS ARE GONE, and with them `money()`. The cost
      line is gated on `show_costs` (local only) and never reached production
      anyway; the units line is per glass and stays exactly where #1001 put it.
-     Nothing on this page multiplies a per-glass figure any more -- the one
-     number that scales is the ml total, which has its own element and its own
-     build-time figure (see `total`, above).
+     Nothing on this page multiplies a per-glass figure any more -- and since
+     #1257 nothing scales but the amounts themselves.
 
      ONLY ABOVE x1, unchanged: bitters are worth a word when you are making
      several and not when you are making one.
