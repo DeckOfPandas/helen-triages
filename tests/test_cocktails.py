@@ -96,11 +96,69 @@ STAGED_DIRS = (DRAFTS / "4-promote", DRAFTS / "5-final-proofread")
 # test is how a test comes to read the collection without the loader. It caught
 # this on the day the folder was added, which is the guard doing its job.
 STAGED_NAMES = ", ".join(f"`{d.name}/`" for d in STAGED_DIRS)
+# The collections as they are on disk, fixed at import: `_scan` reads each of
+# these once per run. A test that monkeypatches RECIPES or DRAFTS points them
+# somewhere that is not in this tuple, and so is always read afresh.
+_REAL_ROOTS = (RECIPES, DRAFTS) + STAGED_DIRS
 VOCAB = ROOT / "_data" / "cocktails" / "ingredients.yml"
 TAXONOMY = ROOT / "_data" / "cocktails" / "taxonomy.yml"
 BOTTLES = ROOT / "_data" / "cocktails" / "bottles.yml"
 
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
+
+
+# =============================================================================
+# ONE PARSE PER DATA FILE PER RUN -- #1271
+# =============================================================================
+# Every loader below (`_vocab`, `_bottles`, `_costs`, `_abv`, ...) used to
+# parse its YAML afresh on every call, and the per-drink tests call them once
+# per drink. Measured 2026-10-02 with both drafts clones: seven per-drink tests
+# cost 0.06-0.19s a drink over 140 drinks, about 112 of this module's 147
+# seconds, nearly all of it PyYAML reading the same few files 140 times each.
+#
+# THE PRICE IS THAT EVERY TEST NOW SHARES ONE OBJECT PER FILE, so a test that
+# edits what a loader returned changes the data for every test after it, and
+# the symptom would be a failure that depends on test order. Nothing did when
+# this went in. `_the_shared_data_is_as_parsed` below is the guard: it
+# re-parses every file once at the end of the module and fails if a shared
+# copy no longer matches. Copy before you change one.
+_PARSED = {}
+_SCANNED = {}       # the drink collections themselves -- see `_scan`
+
+
+def _parsed(path):
+    if path not in _PARSED:
+        _PARSED[path] = yaml.safe_load(path.read_text(encoding="utf-8"))
+    return _PARSED[path]
+
+
+def _shared_data_that_changed():
+    """Every shared file whose in-memory copy no longer matches the disk.
+
+    Walks the caches themselves rather than a second list of paths: a list
+    kept by hand is one a new loader would be missing from.
+    """
+    changed = [
+        str(path.relative_to(ROOT)) for path, held in _PARSED.items()
+        if held != yaml.safe_load(path.read_text(encoding="utf-8"))
+    ]
+    for root, held in _SCANNED.items():
+        fresh = {d.path: d.fm for d in _scan_afresh(root)}
+        changed += [str(d.path.relative_to(ROOT)) for d in held
+                    if d.fm != fresh.get(d.path)]
+    return changed
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _the_shared_data_is_as_parsed():
+    yield
+    changed = _shared_data_that_changed()
+    assert not changed, (
+        f"A test changed the shared parsed copy of {', '.join(changed)} in "
+        "place. `_parsed` hands every test the same object (#1271), so every "
+        "test that ran after it read the edited data. Find the test that "
+        "mutates what a loader returned and make it copy first."
+    )
 
 # =============================================================================
 # THE DRINK SCHEMA -- issue #669. What a drink file may and must contain.
@@ -509,7 +567,23 @@ def _scan(root):
     `glob` and silently stopped seeing seven files the moment a staging pipeline
     appeared under it (MANUAL §4) -- and those seven were the ones closest to
     promotion. Costs nothing to not repeat.
+
+    THE REAL COLLECTIONS ARE READ ONCE PER RUN -- #1271. Some eighty
+    whole-corpus tests each re-read and re-parsed all 140 drinks, about 0.3s a
+    time. The roots this module names at import are scanned once and the
+    drinks shared; any other root (a test's own `tmp_path`, which it writes to
+    and scans again) is read afresh every time. Same bargain and same guard as
+    `_parsed`: the caller gets its own LIST, but the drinks in it are shared,
+    so copy a front matter before changing it.
     """
+    if root in _REAL_ROOTS:
+        if root not in _SCANNED:
+            _SCANNED[root] = _scan_afresh(root)
+        return list(_SCANNED[root])
+    return _scan_afresh(root)
+
+
+def _scan_afresh(root):
     out = []
     if not root.is_dir():
         return out
@@ -1991,7 +2065,7 @@ def test_agent_edited_drinks_are_not_marked_proofread():
 def _vocab():
     if not VOCAB.exists():
         pytest.skip("_data/cocktails/ingredients.yml does not exist yet.")
-    return yaml.safe_load(VOCAB.read_text(encoding="utf-8")) or {}
+    return _parsed(VOCAB) or {}
 
 
 def _retired(vocab):
@@ -2257,7 +2331,7 @@ SERVE = ROOT / "_data" / "cocktails" / "serve.yml"
 def _serve_vocab():
     if not SERVE.exists():
         pytest.skip("_data/cocktails/serve.yml does not exist yet.")
-    return yaml.safe_load(SERVE.read_text(encoding="utf-8")) or {}
+    return _parsed(SERVE) or {}
 
 
 SOURCES = ROOT / "_data" / "cocktails" / "sources.yml"
@@ -2266,7 +2340,7 @@ SOURCES = ROOT / "_data" / "cocktails" / "sources.yml"
 def _sources_data():
     if not SOURCES.exists():
         pytest.skip("_data/cocktails/sources.yml does not exist yet.")
-    return yaml.safe_load(SOURCES.read_text(encoding="utf-8")) or {}
+    return _parsed(SOURCES) or {}
 
 
 def test_every_source_spelling_is_canonical():
@@ -3246,7 +3320,7 @@ def test_every_card_name_join_is_reachable():
 def _bottles():
     if not BOTTLES.exists():
         pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
-    return yaml.safe_load(BOTTLES.read_text(encoding="utf-8")) or {}
+    return _parsed(BOTTLES) or {}
 
 
 def _bottle_index(data):
@@ -5454,7 +5528,7 @@ GARNISH = ROOT / "_data" / "cocktails" / "garnish.yml"
 
 
 def _garnish_vocab():
-    return yaml.safe_load(GARNISH.read_text(encoding="utf-8"))
+    return _parsed(GARNISH)
 
 
 def _declared_garnishes(vocab):
@@ -5629,9 +5703,7 @@ def test_no_garnish_is_stated_as_no_garnish_and_nothing_else():
 
 
 def _glasses():
-    return yaml.safe_load(
-        (ROOT / "_data" / "cocktails" / "glasses.yml").read_text(encoding="utf-8")
-    )
+    return _parsed(ROOT / "_data" / "cocktails" / "glasses.yml")
 
 
 GLASS_ICON_DIR = ROOT / "_includes" / "icons" / "glasses"
@@ -5684,7 +5756,7 @@ GLASS_SURVEY = ROOT / "_data" / "cocktails" / "glass_survey.yml"
 
 
 def _glass_survey():
-    return yaml.safe_load(GLASS_SURVEY.read_text(encoding="utf-8"))["survey"]
+    return _parsed(GLASS_SURVEY)["survey"]
 
 
 def test_glass_survey_statistics_are_current():
@@ -6721,7 +6793,7 @@ METHODS = ROOT / "_data" / "cocktails" / "methods.yml"
 def _methods():
     if not METHODS.exists():
         pytest.skip("_data/cocktails/methods.yml does not exist yet.")
-    return yaml.safe_load(METHODS.read_text(encoding="utf-8")) or {}
+    return _parsed(METHODS) or {}
 
 
 def _canonical_steps(spec):
@@ -6904,7 +6976,7 @@ def test_every_proposal_still_matches_a_real_step():
 def _taxonomy():
     if not TAXONOMY.exists():
         pytest.skip("_data/cocktails/taxonomy.yml does not exist yet.")
-    return yaml.safe_load(TAXONOMY.read_text(encoding="utf-8")) or {}
+    return _parsed(TAXONOMY) or {}
 
 
 def test_every_mood_is_declared():
@@ -8066,13 +8138,13 @@ COST_CONFIDENCE = {"high", "medium", "low"}
 def _costs():
     if not COSTS.exists():
         pytest.skip("_data/cocktails/costs.yml does not exist yet.")
-    return yaml.safe_load(COSTS.read_text(encoding="utf-8")) or {}
+    return _parsed(COSTS) or {}
 
 
 def _declared_bottles():
     if not BOTTLES.exists():
         pytest.skip("_data/cocktails/bottles.yml does not exist yet.")
-    return (yaml.safe_load(BOTTLES.read_text(encoding="utf-8")) or {}).get(
+    return (_parsed(BOTTLES) or {}).get(
         "bottles"
     ) or {}
 
@@ -8590,7 +8662,7 @@ ML_PER_UNIT = 1000.0
 def _abv():
     if not ABV.exists():
         pytest.skip("_data/cocktails/abv.yml does not exist yet.")
-    return yaml.safe_load(ABV.read_text(encoding="utf-8")) or {}
+    return _parsed(ABV) or {}
 
 
 def _generics_with_bottles():
