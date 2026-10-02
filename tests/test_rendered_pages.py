@@ -3109,6 +3109,54 @@ def test_the_volume_attribute_agrees_with_the_footer_and_nothing_else_carries_it
     )
 
 
+POUR_USE = re.compile(r'<span class="cocktail-use">')
+# The direction's one legal home: the LAST child of the amount cell, straight
+# after the amount span's closing tag and never inside it.
+POUR_USE_UNDER_AMOUNT = re.compile(
+    r'<span class="cocktail-measure">'
+    r'(?:<span class="cocktail-amount">[^<]*</span>)?'
+    r'<span class="cocktail-use">\([a-z]+\)</span></span>'
+)
+
+
+def test_a_pours_direction_sits_under_its_amount(prod_site):
+    """#1263. `(float)`, `(shell)`, `(rinse)`, `(muddle)` go UNDER the amount.
+
+    Helen, 2026-10-02: 'having "(float)" at the end of the ingredient line as
+    it is is easy to miss'. It rendered after the bottle from #1217 until then,
+    in `.cocktail-optional`'s quiet italic. Now it is the second line of the
+    amount cell, in the amount's own type.
+
+    A SIBLING OF THE AMOUNT, NEVER A CHILD, and that is the half a restyle
+    could break without anyone seeing: cocktail-scale.js reads the whole text
+    of every `.cocktail-amount` as a quantity, so "(float)" inside that span
+    would make the pour unscalable -- silently, on four drinks.
+    """
+    pages = _drink_pages(prod_site)
+    assert len(pages) > 20, f"only {len(pages)} drink pages were built"
+
+    problems, seen = [], 0
+    for page in pages:
+        html = page.read_text(encoding="utf-8")
+        marks = len(POUR_USE.findall(html))
+        placed = len(POUR_USE_UNDER_AMOUNT.findall(html))
+        seen += marks
+        if marks != placed:
+            problems.append(
+                f"{page.parent.name}: {marks} direction(s), {placed} of them "
+                "directly under an amount")
+
+    assert seen, (
+        "no built drink page carries a `.cocktail-use` at all, so this checked "
+        "nothing. Either no published drink has an `as:` pour any more or the "
+        "layout stopped rendering it."
+    )
+    assert not problems, (
+        "a pour's direction is not the last child of its `.cocktail-measure` "
+        "cell (_layouts/cocktail.html):\n  " + "\n  ".join(problems)
+    )
+
+
 TOP_UP_POUR = re.compile(r'<span class="cocktail-amount">\s*to top\s*</span>')
 
 

@@ -1989,6 +1989,27 @@ unless stated.
   drink then costs nothing and counts no units. **What made it safe was
   dropping the old string from `measures:`**, which turns every unmigrated file
   into a named failure of `test_every_amount_is_readable_as_a_quantity`.
+- **2026-10-02, #1263** — **A pour's direction renders UNDER its amount, in the
+  amount's own type.** Reverses the PLACEMENT half of #1217's "option A"; the
+  pairing rule above is untouched. Helen, raising it: *"having "(float)" at the
+  end of the ingredient line as it is is easy to miss"*, and choosing from five
+  options: *"Option 1 please, let's do it. Match font styling with the
+  ingredient amount, just to be crystal clear."* So `25 ml` has `(shell)` on
+  the line beneath it, Plex Mono 600 in `$color-text` — `.cocktail-use` has no
+  declarations of its own and is a selector on `.cocktail-amount`'s rules
+  (base, "make it", print) so the two cannot drift.
+  **Measured first**: 12 `as:` lines on 8 drinks — 4 float, 4 shell, 2 rinse,
+  2 muddle. The unmeasured directions (`(top)` ×5, `(sprinkle)` ×4, `(splash)`
+  ×1) were already in that column because they ARE the amount, so every
+  direction is now read in one place.
+  **The direction is a SIBLING of the amount span, inside a new
+  `.cocktail-measure` cell, never a child of it**: `cocktail-scale.js` reads
+  each `.cocktail-amount`'s whole text as a quantity.
+  `test_a_pours_direction_sits_under_its_amount` holds both halves.
+  **`(shell)` stays `(shell)`.** Helen asked whether `(shell float)` or
+  `(in the shell)` would be clearer. Not `shell float`: #1256 ruled it is not a
+  float. Offered `(flame)` as the short alternative if it still reads unclear
+  on the page; no change made.
 - **2026-09-26** — **`"dashes"` throughout, `"dash"` when it is one.** Helen:
   *"Yes please to a test."* Measured first: 71 counted amounts already agreed
   and six did not, all six `dash`. `test_a_counted_unit_agrees_with_its_count`

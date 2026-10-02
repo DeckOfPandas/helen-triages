@@ -221,14 +221,20 @@ layout: default
 
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
-              {% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}
-              {% comment %} AFTER THE NAME: the bottle in brackets, then `as` --
-                 "(float)", "(top)" -- which pairs with a bracketed AMOUNT so the
-                 mark appears once (#1217), then "(optional)" (#1141). The name
-                 has its own span so nothing aimed at it reaches the brackets.
-                 The brackets are markup, so the words copy as they read.
-                 MANUAL §9.3 / DECISIONS §9.3 (#1217), §9.10 (#1141). {% endcomment %}
-              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.as %} <span class="cocktail-use">({{ item.as }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
+              {% comment %} `as` -- "(float)", "(shell)" -- SITS UNDER THE AMOUNT
+                 since #1263; it was after the bottle (#1217) and easy to miss
+                 there. It still pairs with a bracketed AMOUNT so the mark
+                 appears once: a pour with no measure says "(top)" as the
+                 amount, a pour with one says it on the line below. It is a
+                 SIBLING of `.cocktail-amount`, never inside it, because
+                 cocktail-scale.js reads that span's whole text as a quantity.
+                 MANUAL §9.3 / DECISIONS §9.3 (#1263). {% endcomment %}
+              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}{% if item.as %}<span class="cocktail-use">({{ item.as }})</span>{% endif %}</span>{% endif %}
+              {% comment %} AFTER THE NAME: the bottle in brackets, then
+                 "(optional)" (#1141). The name has its own span so nothing
+                 aimed at it reaches the brackets. The brackets are markup, so
+                 the words copy as they read. DECISIONS §9.10 (#1141). {% endcomment %}
+              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>
