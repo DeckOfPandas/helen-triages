@@ -134,6 +134,44 @@ def built_with_fixtures(name, files):
         shutil.rmtree(out, ignore_errors=True)
 
 
+# ONE FIXTURE BUILD FOR ALL SIX TESTS THAT NEED ONE -- #1271.
+#
+# Each of them used to call `built_with_fixtures` itself, so the suite ran six
+# production builds to look at seventeen throwaway pages. Measured 2026-10-02:
+# 16-17s each with both drafts clones, about 100s of a 404s run, and 5.5s each
+# in CI. They now share one build holding every test's files.
+#
+# THAT IS SAFE BECAUSE NO TEST HERE ASKS A QUESTION ABOUT THE WHOLE BUILD. Each
+# asserts on its own `zzz-` pages by name, on one real control recipe, and on
+# whether the drinks index names its own two drinks -- so another test's
+# fixtures sitting in the same output cannot change an answer. A test that
+# needs to count pages, or needs the build WITHOUT some other fixture in it,
+# does not belong in the shared build: call `built_with_fixtures` directly.
+#
+# THE FILES ARE DECLARED AT IMPORT, beside the test that reads them, because
+# the build has to know all of them before the first test runs. Two tests
+# naming one path would silently overwrite each other, so that is refused.
+_FIXTURE_FILES = {}
+
+
+def _in_the_fixture_build(files):
+    """Add `files` (repo-relative path -> text) to the shared fixture build."""
+    clash = sorted(set(files) & set(_FIXTURE_FILES))
+    assert not clash, (
+        f"Two tests put a fixture at the same path: {', '.join(clash)}. One "
+        "would overwrite the other in the shared build and its test would be "
+        "reading the wrong file. Give each its own `zzz-` slug."
+    )
+    _FIXTURE_FILES.update(files)
+    return files
+
+
+@pytest.fixture(scope="module")
+def fixture_site():
+    with built_with_fixtures("shared", _FIXTURE_FILES) as out:
+        yield out
+
+
 def test_no_link_in_the_production_build_points_at_a_file_that_isnt_there(prod_site):
     """Every internal link in the built PRODUCTION site resolves to something.
 
@@ -705,7 +743,30 @@ def test_the_awaiting_fix_gate_fires_in_the_production_build(prod_site):
     )
 
 
-def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
+# `proofread: true` ON A FIXTURE, DELIBERATELY, and it is not a claim about
+# anything Helen has read -- these two files exist inside one throwaway copy of
+# the tree and never touch the real collection. Since #667 the gate has two
+# legs, and a fixture that fails both proves nothing about either:
+# `proofread: false` here would hold the page back on its own and the
+# awaiting_fix assertion would pass whatever the plugin did with the key it is
+# named for. The one leg under test is the only one allowed to fail.
+FAIL_CLOSED_FIXTURE = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
+    'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  proofread: true\n{flag}  cooked_before: false\n'
+    '---\n')
+FAIL_CLOSED_CASES = {
+    "zzz-gate-no-flag": "",                             # field absent entirely
+    "zzz-gate-old-key": "  awaiting-fix: false\n",      # only the old spelling
+}
+_in_the_fixture_build({
+    f"_food_recipes/{slug}.md": FAIL_CLOSED_FIXTURE.format(t=slug, flag=flag)
+    for slug, flag in FAIL_CLOSED_CASES.items()})
+
+
+def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag(fixture_site):
     """A recipe with no `awaiting_fix`, or only the old `awaiting-fix`, does not
     publish. GitHub issue #331, Helen's call 2026-08-18.
 
@@ -714,7 +775,7 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
     key, the old hyphenated key, a quoted "true". The gate decides what the
     world sees, so it now publishes only on an explicit `false`.
 
-    This builds its own site because the condition cannot exist in the real
+    This reads the fixture build because the condition cannot exist in the real
     collection: tests/test_front_matter.py forbids both a missing flag and the
     old spelling, so by the time the suite is green there is nothing left to
     observe. Two throwaway recipes go into a COPY of the tree (#1153) -- see
@@ -724,38 +785,19 @@ def test_the_gate_fails_closed_on_a_missing_or_misspelled_flag():
     a gate that hid everything, would satisfy "the flagged ones are absent"
     perfectly -- so a known-good recipe must be present in the same output.
     """
-    body = ('---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
-            'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
-            'tags: []\ningredient_groups:\n  - items:\n    - item: salt\n'
-            'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
-            '  proofread: true\n{flag}  cooked_before: false\n'
-            '---\n')
-    # `proofread: true` ON A FIXTURE, DELIBERATELY, and it is not a claim about
-    # anything Helen has read -- these two files exist inside one throwaway
-    # copy of the tree and never touch the real collection. Since #667 the gate
-    # has two legs, and a fixture that fails both proves nothing about either:
-    # `proofread: false` here would hold the page back on its own and the
-    # awaiting_fix assertion would pass whatever the plugin did with the key it
-    # is named for. The one leg under test is the only one allowed to fail.
-    cases = {
-        "zzz-gate-no-flag": "",                             # field absent entirely
-        "zzz-gate-old-key": "  awaiting-fix: false\n",      # only the old spelling
-    }
-    files = {f"_food_recipes/{slug}.md": body.format(t=slug, flag=flag)
-             for slug, flag in cases.items()}
-
-    with built_with_fixtures("failclosed", files) as out:
-        published = [s for s in cases if (out / "food" / "recipes" / s / "index.html").exists()]
-        assert not published, (
-            "The gate FAILED OPEN for:\n  " + "\n  ".join(published)
-            + "\n\n_plugins/publish_gate.rb must publish only on an "
-              "explicit `awaiting_fix: false`. A missing key and the old "
-              "hyphenated key must both hold the page back."
-        )
-        assert (out / "food" / "recipes" / "caramel" / "index.html").exists(), (
-            "The control recipe is missing too, so this build proves nothing "
-            "about the gate -- it either failed or is hiding everything."
-        )
+    out = fixture_site
+    published = [s for s in FAIL_CLOSED_CASES
+                 if (out / "food" / "recipes" / s / "index.html").exists()]
+    assert not published, (
+        "The gate FAILED OPEN for:\n  " + "\n  ".join(published)
+        + "\n\n_plugins/publish_gate.rb must publish only on an "
+          "explicit `awaiting_fix: false`. A missing key and the old "
+          "hyphenated key must both hold the page back."
+    )
+    assert (out / "food" / "recipes" / "caramel" / "index.html").exists(), (
+        "The control recipe is missing too, so this build proves nothing "
+        "about the gate -- it either failed or is hiding everything."
+    )
 
 
 # =============================================================================
@@ -802,7 +844,13 @@ DRINK_GATE_FIXTURE = (
 )
 
 
-def test_an_unproofread_recipe_does_not_reach_the_production_build():
+_in_the_fixture_build({
+    f"_food_recipes/{slug}.md": FOOD_GATE_FIXTURE.format(t=slug, proofread=value)
+    for slug, value in {"zzz-gate-unproofread": "false",
+                        "zzz-gate-proofread": "true"}.items()})
+
+
+def test_an_unproofread_recipe_does_not_reach_the_production_build(fixture_site):
     """`awaiting_fix: false, proofread: false` is held back; `proofread: true`
     publishes. GitHub issue #667, Helen's ruling 2026-09-02: proofread "is the
     very last touch that I, the human, make to the file".
@@ -813,28 +861,23 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build():
     key, so the only thing that can explain one URL existing and the other not
     is the flag under test.
 
-    It builds its own site rather than using `prod_site`, because the two
+    It reads the fixture build rather than `prod_site`, because the two
     states must be manufactured -- the real collection cannot hold a recipe
     whose only defect is being unproofread AND stay the corpus the rest of the
     suite reasons about.
     """
-    cases = {"zzz-gate-unproofread": "false", "zzz-gate-proofread": "true"}
-    files = {f"_food_recipes/{slug}.md":
-             FOOD_GATE_FIXTURE.format(t=slug, proofread=value)
-             for slug, value in cases.items()}
-
-    with built_with_fixtures("proofread_gate", files) as out:
-        assert not (out / "food" / "recipes" / "zzz-gate-unproofread" / "index.html").exists(), (
-            "A recipe with `meta.proofread: false` was PUBLISHED. The gate's "
-            "second leg has failed open -- _plugins/publish_gate.rb must "
-            "publish only when `awaiting_fix == false` AND `proofread == "
-            "true` (#667). Everything Helen has not read is now live."
-        )
-        assert (out / "food" / "recipes" / "zzz-gate-proofread" / "index.html").exists(), (
-            "The control recipe -- identical but for `meta.proofread: true` -- "
-            "is missing too, so this build proves nothing about the gate. It "
-            "is over-firing, or the build dropped everything."
-        )
+    out = fixture_site
+    assert not (out / "food" / "recipes" / "zzz-gate-unproofread" / "index.html").exists(), (
+        "A recipe with `meta.proofread: false` was PUBLISHED. The gate's "
+        "second leg has failed open -- _plugins/publish_gate.rb must "
+        "publish only when `awaiting_fix == false` AND `proofread == "
+        "true` (#667). Everything Helen has not read is now live."
+    )
+    assert (out / "food" / "recipes" / "zzz-gate-proofread" / "index.html").exists(), (
+        "The control recipe -- identical but for `meta.proofread: true` -- "
+        "is missing too, so this build proves nothing about the gate. It "
+        "is over-firing, or the build dropped everything."
+    )
 
 
 # =============================================================================
@@ -853,7 +896,33 @@ GARNISH_DRINK = (
 )
 
 
-def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
+def _garnish_lines(items):
+    return "".join(f'  - "{g}"\n' for g in items)
+
+
+GARNISH_CASES = {
+    # slug: (garnishes, the sentence it must render)
+    "zzz-garnish-one": (
+        ["brandied cherry"],
+        "Garnish with a brandied cherry."),
+    "zzz-garnish-two": (
+        ["brandied cherry", "lemon wheel"],
+        "Garnish with a brandied cherry and a lemon wheel."),
+    "zzz-garnish-three": (
+        ["mint sprig", "fruit wedges", "maraschino cherry"],
+        "Garnish with a mint sprig, fruit wedges and a maraschino cherry."),
+    "zzz-garnish-four": (
+        ["mint sprig", "raspberries", "lemon wheel", "brandied cherry"],
+        "Garnish with a mint sprig, raspberries, a lemon wheel "
+        "and a brandied cherry."),
+}
+_in_the_fixture_build({
+    f"_cocktail_recipes/{slug}.md":
+    GARNISH_DRINK.format(t=slug, garnish=_garnish_lines(garnishes))
+    for slug, (garnishes, _) in GARNISH_CASES.items()})
+
+
+def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural(fixture_site):
     """`A, B and C`, and no `a` before a plural. Issues #1138 and #1143.
 
     Helen, 2026-09-17, on the Hurricane: "I think we still have 'Garnish with a
@@ -874,46 +943,23 @@ def test_the_garnish_step_punctuates_a_list_and_drops_the_article_on_a_plural():
     the old list-only rule could not reach, which is a garnish nobody has
     classified yet — where a new spelling always appears first.
     """
-    def lines(items):
-        return "".join(f'  - "{g}"\n' for g in items)
-
-    cases = {
-        # slug: (garnishes, the sentence it must render)
-        "zzz-garnish-one": (
-            ["brandied cherry"],
-            "Garnish with a brandied cherry."),
-        "zzz-garnish-two": (
-            ["brandied cherry", "lemon wheel"],
-            "Garnish with a brandied cherry and a lemon wheel."),
-        "zzz-garnish-three": (
-            ["mint sprig", "fruit wedges", "maraschino cherry"],
-            "Garnish with a mint sprig, fruit wedges and a maraschino cherry."),
-        "zzz-garnish-four": (
-            ["mint sprig", "raspberries", "lemon wheel", "brandied cherry"],
-            "Garnish with a mint sprig, raspberries, a lemon wheel "
-            "and a brandied cherry."),
-    }
-    files = {f"_cocktail_recipes/{slug}.md":
-             GARNISH_DRINK.format(t=slug, garnish=lines(garnishes))
-             for slug, (garnishes, _) in cases.items()}
-
-    with built_with_fixtures("garnish", files) as out:
-        for slug, (_, expected) in cases.items():
-            page = out / "cocktails" / "recipes" / slug / "index.html"
-            assert page.exists(), f"{slug} did not build"
-            html = page.read_text(encoding="utf-8")
-            found = re.search(r"<li>Garnish with (.*?)\.</li>", html, re.S)
-            assert found, f"{slug} rendered no garnish step at all"
-            got = "Garnish with " + " ".join(
-                re.sub(r"<[^>]+>", "", found.group(1)).split()) + "."
-            assert got == expected, (
-                f"{slug}\n  expected: {expected}\n  got:      {got}\n\n"
-                "#1138 is the punctuation (one garnish is itself, two are joined "
-                "by `and`, three or more are `A, B and C` with no serial comma) "
-                "and #1143 is the article (nothing before a word ending in `s`, "
-                "whether or not it is declared in garnish.yml's `no_article`). "
-                "Both live in the garnish-step block of _layouts/cocktail.html."
-            )
+    out = fixture_site
+    for slug, (_, expected) in GARNISH_CASES.items():
+        page = out / "cocktails" / "recipes" / slug / "index.html"
+        assert page.exists(), f"{slug} did not build"
+        html = page.read_text(encoding="utf-8")
+        found = re.search(r"<li>Garnish with (.*?)\.</li>", html, re.S)
+        assert found, f"{slug} rendered no garnish step at all"
+        got = "Garnish with " + " ".join(
+            re.sub(r"<[^>]+>", "", found.group(1)).split()) + "."
+        assert got == expected, (
+            f"{slug}\n  expected: {expected}\n  got:      {got}\n\n"
+            "#1138 is the punctuation (one garnish is itself, two are joined "
+            "by `and`, three or more are `A, B and C` with no serial comma) "
+            "and #1143 is the article (nothing before a word ending in `s`, "
+            "whether or not it is declared in garnish.yml's `no_article`). "
+            "Both live in the garnish-step block of _layouts/cocktail.html."
+        )
 
 
 SHELL_DRINK = (
@@ -930,7 +976,22 @@ SHELL_POUR = ('  - amount: "25 ml"\n    generic: "overproof Jamaican rum, unaged
               '    as: "shell"\n')
 
 
-def test_a_filled_shell_is_named_in_the_meta_and_gets_no_garnish_step():
+SHELL = "half an empty passion fruit shell"
+SHELL_CASES = {
+    # slug: (garnishes, has a shell pour, the garnish step or None)
+    "zzz-shell-with-others": (["mint sprig", SHELL], True,
+                              "Garnish with a mint sprig."),
+    "zzz-shell-alone": ([SHELL], True, None),
+    "zzz-shell-no-rum": ([SHELL], False, f"Garnish with {SHELL}."),
+}
+_in_the_fixture_build({
+    f"_cocktail_recipes/{slug}.md": SHELL_DRINK.format(
+        t=slug, garnish=_garnish_lines(garnishes),
+        shell=SHELL_POUR if pour else "")
+    for slug, (garnishes, pour, _) in SHELL_CASES.items()})
+
+
+def test_a_filled_shell_is_named_in_the_meta_and_gets_no_garnish_step(fixture_site):
     """The shell is in `garnish:` and the page does not say it twice -- #1256.
 
     Helen, 2026-10-01, reading the first pass: the ingredients said "(shell)"
@@ -943,40 +1004,24 @@ def test_a_filled_shell_is_named_in_the_meta_and_gets_no_garnish_step():
     THE THIRD CASE IS THE ONE THAT KEEPS THIS HONEST: a shell with no rum in
     it (the Mai Tai's lime shell) is an ordinary garnish and keeps its step.
     """
-    def lines(items):
-        return "".join(f'  - "{g}"\n' for g in items)
-
-    shell = "half an empty passion fruit shell"
-    cases = {
-        # slug: (garnishes, has a shell pour, the garnish step or None)
-        "zzz-shell-with-others": (["mint sprig", shell], True,
-                                  "Garnish with a mint sprig."),
-        "zzz-shell-alone": ([shell], True, None),
-        "zzz-shell-no-rum": ([shell], False, f"Garnish with {shell}."),
-    }
-    files = {f"_cocktail_recipes/{slug}.md": SHELL_DRINK.format(
-                 t=slug, garnish=lines(garnishes),
-                 shell=SHELL_POUR if pour else "")
-             for slug, (garnishes, pour, _) in cases.items()}
-
-    with built_with_fixtures("shell", files) as out:
-        for slug, (_, _, expected) in cases.items():
-            page = out / "cocktails" / "recipes" / slug / "index.html"
-            assert page.exists(), f"{slug} did not build"
-            html = page.read_text(encoding="utf-8")
-            assert re.search(r"<dt>Garnish</dt>\s*<dd>[^<]*" + re.escape(shell), html), (
-                f"{slug}: the meta line does not name the shell, so the page "
-                "reaches \"(shell)\" without having mentioned one.")
-            found = re.search(r"<li>Garnish with (.*?)\.</li>", html, re.S)
-            got = None if not found else "Garnish with " + " ".join(
-                re.sub(r"<[^>]+>", "", found.group(1)).split()) + "."
-            assert got == expected, (
-                f"{slug}\n  expected: {expected}\n  got:      {got}\n\n"
-                "A shell an `as: \"shell\"` pour fills is placed by the method "
-                "and gets no generated step; a shell with no rum is an "
-                "ordinary garnish. The garnish-step block of "
-                "_layouts/cocktail.html decides."
-            )
+    out = fixture_site
+    for slug, (_, _, expected) in SHELL_CASES.items():
+        page = out / "cocktails" / "recipes" / slug / "index.html"
+        assert page.exists(), f"{slug} did not build"
+        html = page.read_text(encoding="utf-8")
+        assert re.search(r"<dt>Garnish</dt>\s*<dd>[^<]*" + re.escape(SHELL), html), (
+            f"{slug}: the meta line does not name the shell, so the page "
+            "reaches \"(shell)\" without having mentioned one.")
+        found = re.search(r"<li>Garnish with (.*?)\.</li>", html, re.S)
+        got = None if not found else "Garnish with " + " ".join(
+            re.sub(r"<[^>]+>", "", found.group(1)).split()) + "."
+        assert got == expected, (
+            f"{slug}\n  expected: {expected}\n  got:      {got}\n\n"
+            "A shell an `as: \"shell\"` pour fills is placed by the method "
+            "and gets no generated step; a shell with no rum is an "
+            "ordinary garnish. The garnish-step block of "
+            "_layouts/cocktail.html decides."
+        )
 
 
 def test_no_garnish_contains_the_join_separator():
@@ -1003,7 +1048,13 @@ def test_no_garnish_contains_the_join_separator():
     )
 
 
-def test_the_gate_covers_a_promoted_drink():
+_in_the_fixture_build({
+    f"_cocktail_recipes/{slug}.md": DRINK_GATE_FIXTURE.format(t=slug, proofread=value)
+    for slug, value in {"zzz-gate-drink-unproofread": "false",
+                        "zzz-gate-drink-proofread": "true"}.items()})
+
+
+def test_the_gate_covers_a_promoted_drink(fixture_site):
     """The cocktail collection is gated too, and this proves it on a bare CI
     checkout. GitHub issues #667, #668 and #624.
 
@@ -1020,47 +1071,41 @@ def test_the_gate_covers_a_promoted_drink():
     the fixtures live in a copy of the tree, so a directory created there is
     gone with the copy and cannot be seen by anything.
     """
-    cases = {"zzz-gate-drink-unproofread": "false",
-             "zzz-gate-drink-proofread": "true"}
-    files = {f"_cocktail_recipes/{slug}.md":
-             DRINK_GATE_FIXTURE.format(t=slug, proofread=value)
-             for slug, value in cases.items()}
+    out = fixture_site
+    held = out / "cocktails" / "recipes" / "zzz-gate-drink-unproofread" / "index.html"
+    live = out / "cocktails" / "recipes" / "zzz-gate-drink-proofread" / "index.html"
 
-    with built_with_fixtures("drink_gate", files) as out:
-        held = out / "cocktails" / "recipes" / "zzz-gate-drink-unproofread" / "index.html"
-        live = out / "cocktails" / "recipes" / "zzz-gate-drink-proofread" / "index.html"
+    assert not held.exists(), (
+        "A promoted drink with `meta.proofread: false` was PUBLISHED. "
+        "`cocktail_recipes` is in GATED_COLLECTIONS, so the gate is "
+        "failing open on the collection the whole of #668 exists to "
+        "protect."
+    )
+    assert live.exists(), (
+        "The control drink -- identical but for `meta.proofread: true` -- "
+        "is missing too, so this build proves nothing. Either the gate is "
+        "over-firing on drinks, or the cocktail collection is not being "
+        "written at all."
+    )
 
-        assert not held.exists(), (
-            "A promoted drink with `meta.proofread: false` was PUBLISHED. "
-            "`cocktail_recipes` is in GATED_COLLECTIONS, so the gate is "
-            "failing open on the collection the whole of #668 exists to "
-            "protect."
-        )
-        assert live.exists(), (
-            "The control drink -- identical but for `meta.proofread: true` -- "
-            "is missing too, so this build proves nothing. Either the gate is "
-            "over-firing on drinks, or the cocktail collection is not being "
-            "written at all."
-        )
-
-        # AND THE INDEX AGREES WITH THE GATE. The drinks index reads
-        # `site.cocktail_recipes`, which the plugin has already emptied of the
-        # held-back drink at :post_read -- so the page cannot list it even by
-        # accident. This is the half issue #276 taught: a URL that exists and a
-        # listing that mentions it are two separate leaks.
-        index = (out / "cocktails" / "index.html").read_text(encoding="utf-8")
-        assert "zzz-gate-drink-unproofread" not in index, (
-            "The production drinks index names a drink the gate held back. "
-            "The listing and the URL are separate leaks (#276) and this is "
-            "the listing one."
-        )
-        assert "zzz-gate-drink-proofread" in index, (
-            "The production drinks index does not list a published drink. "
-            "cocktails/index.html must read `site.cocktail_recipes` in every "
-            "build and concatenate the drafts only under `site.show_drafts` "
-            "-- an index gated on `show_drafts` alone shows nothing the day a "
-            "drink is promoted."
-        )
+    # AND THE INDEX AGREES WITH THE GATE. The drinks index reads
+    # `site.cocktail_recipes`, which the plugin has already emptied of the
+    # held-back drink at :post_read -- so the page cannot list it even by
+    # accident. This is the half issue #276 taught: a URL that exists and a
+    # listing that mentions it are two separate leaks.
+    index = (out / "cocktails" / "index.html").read_text(encoding="utf-8")
+    assert "zzz-gate-drink-unproofread" not in index, (
+        "The production drinks index names a drink the gate held back. "
+        "The listing and the URL are separate leaks (#276) and this is "
+        "the listing one."
+    )
+    assert "zzz-gate-drink-proofread" in index, (
+        "The production drinks index does not list a published drink. "
+        "cocktails/index.html must read `site.cocktail_recipes` in every "
+        "build and concatenate the drafts only under `site.show_drafts` "
+        "-- an index gated on `show_drafts` alone shows nothing the day a "
+        "drink is promoted."
+    )
 
 
 # =============================================================================
@@ -1091,7 +1136,21 @@ GATE_FOOD_UNREWRITTEN = (
 )
 
 
-def test_an_unrewritten_drink_is_held_back_but_an_unmade_one_publishes():
+_in_the_fixture_build({
+    **{f"_cocktail_recipes/{slug}.md":
+       GATE_DRINK_ANY.format(t=slug, rewritten=rw, made_before=mb)
+       for slug, (rw, mb) in {
+           # slug: (rewritten, made_before)
+           "zzz-1137-rewritten-unmade":     ("true",  "false"),
+           "zzz-1137-unrewritten-made":     ("false", "true"),
+           "zzz-1137-unrewritten-unmade":   ("false", "false"),
+       }.items()},
+    "_food_recipes/zzz-1137-food-unrewritten.md":
+        GATE_FOOD_UNREWRITTEN.format(t="zzz-1137-food-unrewritten"),
+})
+
+
+def test_an_unrewritten_drink_is_held_back_but_an_unmade_one_publishes(fixture_site):
     """`rewritten: true` gates a drink; `made_before` does not. Issue #1137,
     Helen's ruling 2026-09-17.
 
@@ -1124,47 +1183,36 @@ def test_an_unrewritten_drink_is_held_back_but_an_unmade_one_publishes():
     It cost nothing on the day it landed: all 47 drinks then live already said
     `rewritten: true` (tmp/rewritten_census.py), so no page went dark.
     """
-    drinks = {
-        # slug: (rewritten, made_before)
-        "zzz-1137-rewritten-unmade":     ("true",  "false"),
-        "zzz-1137-unrewritten-made":     ("false", "true"),
-        "zzz-1137-unrewritten-unmade":   ("false", "false"),
-    }
-    files = {f"_cocktail_recipes/{slug}.md":
-             GATE_DRINK_ANY.format(t=slug, rewritten=rw, made_before=mb)
-             for slug, (rw, mb) in drinks.items()}
-    files["_food_recipes/zzz-1137-food-unrewritten.md"] = (
-        GATE_FOOD_UNREWRITTEN.format(t="zzz-1137-food-unrewritten"))
+    out = fixture_site
 
-    with built_with_fixtures("1137_rewritten", files) as out:
-        def drink_live(slug):
-            return (out / "cocktails" / "recipes" / slug / "index.html").exists()
+    def drink_live(slug):
+        return (out / "cocktails" / "recipes" / slug / "index.html").exists()
 
-        assert drink_live("zzz-1137-rewritten-unmade"), (
-            "A drink with `rewritten: true` and `made_before: false` was HELD "
-            "BACK. An unmade drink must publish -- #722, and #1137 restates it: "
-            "the live site is where Helen picks what to try next and reads it "
-            "while making it. `made_before` must not be a leg of the gate."
-        )
-        assert not drink_live("zzz-1137-unrewritten-made"), (
-            "A drink with `rewritten: false` was PUBLISHED. #1137 makes that "
-            "flag the third leg of the gate for `cocktail_recipes`: the prose "
-            "on a published drink is Helen's, and until this leg existed the "
-            "only thing checking was the promotion procedure remembering to."
-        )
-        assert not drink_live("zzz-1137-unrewritten-unmade"), (
-            "An unrewritten, unmade drink was PUBLISHED. The two flags are "
-            "separate questions: being unmade is fine, being unrewritten is "
-            "not, and this row is what stops the pair being read as one."
-        )
-        assert (out / "food" / "recipes" / "zzz-1137-food-unrewritten"
-                / "index.html").exists(), (
-            "A FOOD recipe with `rewritten: false` was HELD BACK. #1137 is "
-            "drinks only -- Helen ruled on cocktails, and food keeps its two "
-            "legs. The new leg must be scoped to the `cocktail_recipes` "
-            "collection; unscoped, it takes every unrewritten recipe off the "
-            "live site."
-        )
+    assert drink_live("zzz-1137-rewritten-unmade"), (
+        "A drink with `rewritten: true` and `made_before: false` was HELD "
+        "BACK. An unmade drink must publish -- #722, and #1137 restates it: "
+        "the live site is where Helen picks what to try next and reads it "
+        "while making it. `made_before` must not be a leg of the gate."
+    )
+    assert not drink_live("zzz-1137-unrewritten-made"), (
+        "A drink with `rewritten: false` was PUBLISHED. #1137 makes that "
+        "flag the third leg of the gate for `cocktail_recipes`: the prose "
+        "on a published drink is Helen's, and until this leg existed the "
+        "only thing checking was the promotion procedure remembering to."
+    )
+    assert not drink_live("zzz-1137-unrewritten-unmade"), (
+        "An unrewritten, unmade drink was PUBLISHED. The two flags are "
+        "separate questions: being unmade is fine, being unrewritten is "
+        "not, and this row is what stops the pair being read as one."
+    )
+    assert (out / "food" / "recipes" / "zzz-1137-food-unrewritten"
+            / "index.html").exists(), (
+        "A FOOD recipe with `rewritten: false` was HELD BACK. #1137 is "
+        "drinks only -- Helen ruled on cocktails, and food keeps its two "
+        "legs. The new leg must be scoped to the `cocktail_recipes` "
+        "collection; unscoped, it takes every unrewritten recipe off the "
+        "live site."
+    )
 
 
 # =============================================================================

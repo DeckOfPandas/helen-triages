@@ -5231,6 +5231,26 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   named a fault that case had not made. **Give each run of an in-place
   mutation proof its own `PYTHONPYCACHEPREFIX` under `tmp/`**
   (`prove_decisions_index.py` does).
+- **2026-10-02, #1271 — the suite was slow in three places, not everywhere,
+  and skipping tests by changed path was the wrong lever.** Helen asked
+  whether gates could skip irrelevant tests on a small merge. Measured with
+  both drafts clones: 31,961 tests in 404s, and four modules held 90% of it
+  while the other 29,000 tests cost about 36s between them. So a path gate
+  would have saved seconds, on exactly the cheap per-file tests, and added a
+  way to be green without looking — which the 2026-09-19 entry under §11
+  already records going wrong with a narrow suite. Three causes, fixed
+  instead: `test_cocktails.py` re-parsed its data files once per drink and
+  the whole collection once per corpus test (147s to 9s, now parsed once and
+  shared, with a guard that fails if a test edits a shared copy);
+  `test_rendered_pages.py` ran six production builds for six tests' throwaway
+  pages (now one shared `fixture_site`); `test_tidy_drafts.py` started a
+  Python per test, each re-importing the suite and so re-reading every recipe
+  (now in-process, with one real command-line test kept). 404s to 128s, same
+  results. **A subprocess that imports from `tests/` pays for the whole
+  corpus at import** — that is the general trap. The workflow half (build
+  alongside the tests, PR runs out of the `pages` queue) is #1281 and is
+  Helen's to apply; the deploy-gate test now asserts the invariant so that it
+  can land.
 
 ---
 

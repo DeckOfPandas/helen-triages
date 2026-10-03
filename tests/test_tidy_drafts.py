@@ -23,6 +23,8 @@ lines is a line the pass must have left exactly alone.
 """
 from __future__ import annotations
 
+import contextlib
+import io
 import re
 import shutil
 import subprocess
@@ -167,18 +169,58 @@ def drinks():
     shutil.rmtree(root)
 
 
+# CALLED IN THIS PROCESS, NOT AS A SUBPROCESS -- #1271.
+#
+# Every test here used to start a fresh Python for the script, and the script
+# imports its rules from the suite (conftest, test_front_matter,
+# test_cocktails, test_style), so each start re-read and re-parsed every
+# recipe, draft and drink before looking at the one fixture file. Measured
+# 2026-10-02: about 1.7s a test, 54s for the module. This process has those
+# modules loaded already, so `main(argv)` costs milliseconds.
+#
+# THE COMMAND LINE ITSELF STILL HAS ONE TEST,
+# `test_the_command_line_runs_as_helen_types_it`, because an in-process call
+# cannot see a script that no longer starts: a broken import at the top, a
+# `main()` that stopped reading `sys.argv`, the `__main__` guard going missing.
+sys.path.insert(0, str(ROOT / "scripts"))
+import tidy_drafts  # noqa: E402
+
+
+def _tidy(site, root, *extra):
+    out = io.StringIO()
+    with contextlib.redirect_stdout(out):
+        try:
+            tidy_drafts.main(["--site", site, "--drafts-dir", str(root),
+                              "--allow-dirty", *extra])
+        except SystemExit as exc:
+            raise AssertionError(
+                f"the script exited {exc.code!r}:\n{out.getvalue()}") from exc
+    return out.getvalue()
+
+
 def run(root, *extra):
-    """The script as Helen runs it, on a copy, with the drinks rules."""
+    """The script's own `main`, on a copy, with the drinks rules."""
+    return _tidy("cocktails", root, *extra)
+
+
+def test_the_command_line_runs_as_helen_types_it(drinks):
+    """One real subprocess, and it must say what the in-process call says."""
+    path = write_drink(drinks)
     result = subprocess.run(
         [sys.executable, str(SCRIPT), "--site", "cocktails",
-         "--drafts-dir", str(root), "--allow-dirty", *extra],
+         "--drafts-dir", str(drinks), "--allow-dirty"],
         cwd=ROOT, capture_output=True, text=True,
     )
     assert result.returncode == 0, (
         f"the script exited {result.returncode}:\n{result.stdout}\n"
         f"{result.stderr}"
     )
-    return result.stdout
+    assert result.stdout == run(drinks), (
+        "The command line and the in-process call disagree about the same "
+        "file, so the rest of this module is no longer testing what Helen "
+        "runs."
+    )
+    assert path.read_text(encoding="utf-8") == BEFORE
 
 
 def write_drink(root, name="test-drink.md", text=BEFORE):
@@ -318,15 +360,7 @@ def food():
 
 
 def run_food(root, *extra):
-    result = subprocess.run(
-        [sys.executable, str(SCRIPT), "--site", "food",
-         "--drafts-dir", str(root), "--allow-dirty", *extra],
-        cwd=ROOT, capture_output=True, text=True,
-    )
-    assert result.returncode == 0, (
-        f"the script exited {result.returncode}:\n{result.stdout}\n{result.stderr}"
-    )
-    return result.stdout
+    return _tidy("food", root, *extra)
 
 
 @pytest.mark.parametrize("line", [
