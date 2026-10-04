@@ -52,7 +52,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # checkout to be satisfiable. Bump one of these in the same commit as the rule
 # that requires it, and say why in the changelog below.
 REQUIRED = {
-    "_cocktail_drafts": 1,
+    "_cocktail_drafts": 2,
     "_food_drafts": 1,
 }
 
@@ -64,8 +64,7 @@ CHANGELOG = {
         1: "2026-09-05, #722/#712 -- every drink carries `meta.made_before` as "
            "a real boolean, `meta.ship` is a rung or \"who knows\" (`QQ` is no "
            "longer a ship value), and `meta.date_last_edited` is gone.",
-        # WRITTEN BEFORE IT IS REQUIRED, ON PURPOSE -- see PENDING below.
-        2: "#1213 -- every draft's top-level keys are in the order the page "
+        2: "2026-10-04, #1213 -- every draft's top-level keys are in the order the page "
            "prints them (`TOP_LEVEL_KEYS_IN_ORDER` in tests/test_cocktails.py), "
            "written by `python3 scripts/tidy_drafts.py --site cocktails --only "
            "order --apply`.",
@@ -75,24 +74,6 @@ CHANGELOG = {
            "No migration; this is the baseline every later bump is measured "
            "from.",
     },
-}
-
-# A RULE THAT HAS LANDED HERE AHEAD OF ITS MIGRATION. #1213, 2026-10-04.
-#
-# The key-order rule and its fixer are in this repo; the pass over
-# `_cocktail_drafts/` is not run, because Helen asked for one draft first:
-# "Start with altering one test draft and wait for Helen to confirm it's
-# correct." Bumping REQUIRED now would turn every local run red for a migration
-# she has deliberately not approved, and leaving the rule out would let the
-# order regrow the day after the pass. So the rule is WRITTEN and DORMANT: its
-# test asks `migrated_to` and skips, saying so, until the clone says 2.
-#
-# TO FINISH IT, once she has confirmed the draft: run the pass in the drafts
-# repo and bump its SCHEMA_VERSION to 2 in that commit; here, move
-# REQUIRED["_cocktail_drafts"] to 2 and delete this entry. The handshake then
-# reports whichever merge is late, which is what it is for.
-PENDING = {
-    "_cocktail_drafts": 2,
 }
 
 VERSION_FILE = "SCHEMA_VERSION"
@@ -122,16 +103,6 @@ def present(repo: str) -> bool:
     weakened something.
     """
     return (ROOT / repo).is_dir()
-
-
-def migrated_to(repo: str, version: int) -> bool:
-    """Has this clone been migrated at least as far as `version`?
-
-    For a rule that is dormant until its migration has run -- see PENDING. An
-    absent clone, or one with no readable version, has not.
-    """
-    have = _read(repo)
-    return have is not None and have >= version
 
 
 def mismatch(repo: str) -> str | None:

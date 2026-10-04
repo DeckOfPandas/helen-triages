@@ -1282,10 +1282,6 @@ def test_the_declared_key_order_is_the_order_the_page_prints():
     )
 
 
-# The drafts schema version at which every draft has been through the pass.
-KEY_ORDER_SCHEMA = 2
-
-
 def test_a_draft_drinks_keys_are_in_page_order():
     """A cocktail DRAFT's top-level keys are in page order. #1213.
 
@@ -1293,25 +1289,15 @@ def test_a_draft_drinks_keys_are_in_page_order():
     to published recipes", so `_cocktail_recipes/` is never read here and a
     drink keeps whatever order it was promoted in.
 
-    DORMANT UNTIL THE PASS HAS RUN, AND IT SAYS SO. Her instruction on the
-    issue was "Start with altering one test draft and wait for Helen to confirm
-    it's correct", so on the day this was written one draft was in order and
-    the rest were not. The pass bumps the clone's `SCHEMA_VERSION` to
-    `KEY_ORDER_SCHEMA` in the commit that reorders them; until the clone says
-    so this skips rather than failing on a migration she has not approved.
-    `tests/drafts_schema.py`'s `PENDING` is the other half of this note.
+    THE PASS RAN ON 2026-10-04, all 62 drafts, after she had read one:
+    "Billingsley: looks great! Deep breath, please do the same for all our
+    drafts a) now, and b) at ingest". It is drafts schema 2
+    (`tests/drafts_schema.py`), so a clone that predates it fails
+    `test_the_cocktail_drafts_clone_is_in_step` first, and that message says
+    this one is its fault.
     """
-    drinks = _load_draft_files()
-    if not drafts_schema.migrated_to("_cocktail_drafts", KEY_ORDER_SCHEMA):
-        pytest.skip(
-            f"The key-order rule (#1213) is written and not yet in force: "
-            f"`_cocktail_drafts/SCHEMA_VERSION` is below {KEY_ORDER_SCHEMA}, "
-            f"which means the pass has not been run over the drafts. Helen "
-            f"asked to confirm one draft first. `python3 scripts/tidy_drafts.py "
-            f"--site cocktails --only order` reports what it would change."
-        )
     bad = []
-    for drink in drinks:
+    for drink in _load_draft_files():
         problem = keys_out_of_page_order(list(drink.fm))
         if problem:
             bad.append(f"{_drink_where(drink)}\n      has:  "

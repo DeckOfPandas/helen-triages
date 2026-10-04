@@ -181,7 +181,11 @@ file say the same things.
    accents, an undeclared tag, a missing glass.
 4. **`/tidy-drafts`**, either collection (both since 2026-09-05), if the
    quoting or typography needs it. It never touches a `QQ` line, so the
-   transcription is safe.
+   transcription is safe. **A COCKTAIL ALWAYS GETS `--only order`** (#1213):
+   `python3 scripts/tidy_drafts.py --site cocktails --only order --apply` puts
+   its keys in page order, moving whole blocks and editing no line. A file
+   from a Project that has not been re-uploaded arrives in the old order, and
+   `test_a_draft_drinks_keys_are_in_page_order` fails on it until this runs.
 5. **COCKTAILS: `python3 scripts/resolve_pours.py`**, which does tiers 1 and 2 for
    you and refuses to do tier 3. It reads every pour whose `generic` is still a
    `QQ`, looks the source's words up in `bottles.yml` and in the vocabulary, and
@@ -223,7 +227,8 @@ Not an ingest, and the commonest job after one. The boundary is the same one
 **MECHANICAL -- fix it, silently, and say what you fixed.** A spelling one of
 the vocabularies already declares (a glass, a garnish, a generic, a canonical
 method step, a bottle alias). A missing required key. A hyphen that should be an
-en dash. A quoted boolean. A `meta:` block out of order. `mood:` disagreeing
+en dash. A quoted boolean. A `meta:` block out of order. A cocktail draft's
+top-level keys out of page order (`tidy_drafts.py --only order`). `mood:` disagreeing
 with the derivation. A US unit. **The test names the value it wanted; the data
 file holds the spelling.** Look it up -- never a guess that merely turns the
 test green.

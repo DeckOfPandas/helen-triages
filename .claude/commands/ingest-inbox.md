@@ -54,7 +54,11 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
       the file.
    2. **`pytest`.** Once, and never two sessions at a time.
    3. **`/tidy-drafts`**, both collections since 2026-09-05, if the quoting or
-      typography needs it. It never touches a `QQ` line.
+      typography needs it. It never touches a `QQ` line. **A cocktail always
+      gets `python3 scripts/tidy_drafts.py --site cocktails --only order
+      --apply`** (#1213): an envelope written from an older copy of
+      `INGEST_ONE_COCKTAIL.md` arrives with its keys in the old order, and
+      `test_a_draft_drinks_keys_are_in_page_order` fails until this runs.
    4. **`python3 scripts/ingest_preflight.py`** -- undeclared bottles,
       near-miss garnishes, unstated times, in the same shape a photo batch
       gets.

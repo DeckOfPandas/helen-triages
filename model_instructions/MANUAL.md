@@ -1720,11 +1720,13 @@ it was promoted in. Food was not asked and has no such rule.
   `KEYS_THE_LAYOUT_NEVER_NAMES`, with the reason: directly after `serve`.
 - **The fixer is `python3 scripts/tidy_drafts.py --site cocktails --only
   order`** — §11.0.2.
-- **THE DRAFTS RULE IS WRITTEN AND DORMANT.**
-  `test_a_draft_drinks_keys_are_in_page_order` skips, saying why, until
-  `_cocktail_drafts/SCHEMA_VERSION` says 2. Helen asked to see one draft
-  before the pass is run over the rest; `tests/drafts_schema.py`'s `PENDING`
-  says how to finish it.
+- **The drafts rule is `test_a_draft_drinks_keys_are_in_page_order`, and it is
+  drafts schema 2** (`tests/drafts_schema.py`, §9.1). The pass ran over all 62
+  drafts on 2026-10-04, so a clone still at schema 1 fails the handshake test
+  first, which says the key-order failures under it are its fault.
+- **A new file is put in order the same way**: the default `/tidy-drafts` pass
+  includes `order`, so the return journey for a file from a repo-less session
+  (§11.0.3) fixes one that arrived in the old order.
 
 **`mood` is derived and then stored.** `scripts/derive_cocktail_moods.py
 --write` computes it from generics, characters, glass, amounts and method

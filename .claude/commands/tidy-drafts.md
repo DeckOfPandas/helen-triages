@@ -164,10 +164,10 @@ a read of the diff.
 
 It **refuses and names** an undeclared key, a key written twice, and a
 column-0 comment, which belongs to no block. As with `size`, run it as its own
-commit in the drafts repo. **The first full pass also bumps
-`_cocktail_drafts/SCHEMA_VERSION` to 2 in that commit**, which is what switches
-`test_a_draft_drinks_keys_are_in_page_order` on; `tests/drafts_schema.py`'s
-`PENDING` has the other half.
+commit in the drafts repo. **The first full pass ran on 2026-10-04, all 62
+drafts, and is drafts schema 2**; `test_a_draft_drinks_keys_are_in_page_order`
+keeps it that way, so a draft that arrives or is hand-edited out of order
+fails until this rule is run again.
 
 `tests/test_tidy_drafts.py` is the proof, on a fixture cocktail under `tmp/` and
 never on Helen's files: it asserts the whole output byte for byte, so "fixed the
