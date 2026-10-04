@@ -2325,7 +2325,7 @@ this reason that `default_bottles` sets the unbottled pour's PRICE too. Per serv
 reads its two data attributes for the BATCH note's total only and never writes
 to the line, which is what keeps a per-serving figure from moving with the
 multiple box. **Since #1121 the line also says how big the serving is** —
-"Roughly X units of alcohol in a serving of Y ml", her words again — and Y is
+"Roughly X units of alcohol in a serving of Y ml (undiluted)", her words again — and Y is
 §9.3.6's `page.volume.serve_ml`, printed once and carrying no attribute the
 scaler could reach. Where a volume would be wrong the tail is DROPPED and the
 sentence is exactly #753's — one published cocktail, the Caipirinha.
@@ -2386,8 +2386,13 @@ this file matches the wrong block.
 ### 9.3.6 How much liquid is in a drink — #1121
 
 **ONE SENTENCE NOW, and it does not move.** In the footer, the units line's
-tail, **"in a serving of Y ml"** — ONE GLASS, invariant, exactly as the unit
-count beside it is. The wording is Helen's and ships unpolished (§13.12).
+tail, **"in a serving of Y ml (undiluted)"** — ONE GLASS, invariant, exactly
+as the unit count beside it is. The wording is Helen's and ships unpolished
+(§13.12). **"(undiluted)" is #1291, 2026-10-04**: *"I just want to make it
+clear that 120 ml of drink won't end up in a 120-ml glass."* It follows the
+millilitres rather than preceding "serving" because her first try, "in an
+(undiluted) serving", leaves "an serving" outside the brackets. A drink that
+states no volume still says "in a serving." with no bracket.
 
 **THERE WAS A SECOND SENTENCE AND SHE REMOVED IT — #1257, 2026-10-02.** #1121
 put **"Approximately X ml"** under the scaler: the BATCH, the one figure on the
@@ -3100,7 +3105,14 @@ write one either: **that note is the bitters caveat and nothing else since #1121
 saw them under the new `Approximately X ml` line — *"the cost and units line
 below has come back and I don't want it to be there"*. The element now renders
 only for a cocktail that pours a dash or a drop, 15 of the 47 built pages, and
-says only *"Don't scale bitters linearly — add to taste."*)
+says only *"\* Don't scale bitters linearly — add to taste."* **The star is
+#1293, 2026-10-04**: above ×1 a pour in dashes or drops has its scaled amount
+struck through with a `*` beside it, and the note opens with the same `*`.
+Helen: *"make it more obvious that bitters shouldn't be scaled by updating the
+ingredient line as well as showing the note under the scaler."* The layout
+marks the amount `data-dashes` and prints the star hidden;
+`cocktail-scale.js` sets `data-struck` and reveals it. The figure under the
+line is still the multiplied one.)
 **Whole recipes only** (integer multiples, clamped at ×1
 — every written amount is on the 2.5 ml grid, so nothing ever needs
 rounding); counts multiply and re-pluralise, `to top` / `to rinse` pass

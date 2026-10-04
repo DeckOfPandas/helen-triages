@@ -3425,7 +3425,12 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
 SCALE_TOTAL = re.compile(
     r'<div class="cocktail-scale-controls" data-total-ml="([^"]*)"')
 UNITS_LINE = re.compile(r'<p class="cocktail-units"(.*?)</p>', re.S)
-SERVING_OF = re.compile(r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml\.")
+# "(undiluted)" since #1291, 2026-10-04 -- Helen: "I just want to make it clear
+# that 120 ml of drink won't end up in a 120-ml glass." The word is REQUIRED
+# here, so a page that states millilitres without it fails every test that
+# reads this pattern.
+SERVING_OF = re.compile(
+    r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml \(undiluted\)\.")
 
 # THE DRINKS THAT STATE NO VOLUME, PINNED BY NAME -- see `volume_for` in
 # _plugins/cocktail_units.rb for the rule and the argument.
@@ -3531,7 +3536,7 @@ def test_a_drink_with_no_volume_keeps_the_units_sentence_it_had_before(prod_site
         units = UNITS_LINE.search(page.read_text(encoding="utf-8"))
         if not units:
             continue
-        if SERVING_OF.search(units.group(1)):
+        if SERVING_OF.search(units.group(1)) or " ml." in units.group(1):
             problems.append(f"{slug}: states a serving volume it cannot know")
         elif "in a serving." not in units.group(1) \
                 and "servings." not in units.group(1):
@@ -3974,9 +3979,10 @@ def test_the_aviation_prints_the_volume_its_own_amounts_add_up_to(prod_site):
 
     units = UNITS_LINE.search(html)
     assert units, "no units line on the Aviation"
-    assert "of alcohol in a serving of 90 ml." in " ".join(units.group(1).split()), (
-        "Helen's wording is 'Roughly X units of alcohol in a serving of Y ml' "
-        f"(#1121). The line now reads: {' '.join(units.group(1).split())!r}"
+    assert "of alcohol in a serving of 90 ml (undiluted)." in " ".join(units.group(1).split()), (
+        "Helen's wording is 'Roughly X units of alcohol in a serving of Y ml "
+        "(undiluted)' (#1121, and #1291 for the bracket). The line now "
+        f"reads: {' '.join(units.group(1).split())!r}"
     )
 
 

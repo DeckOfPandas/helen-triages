@@ -3267,6 +3267,25 @@ unless stated.
   the build does none of those. What is asserted across them is the one thing
   that must hold: where both read a number, it is the same number.
 
+- **2026-10-04, #1291 — the units line says "(undiluted)", after the
+  millilitres.** Helen: *"I just want to make it clear that 120 ml of drink
+  won't end up in a 120-ml glass."* Her title proposed "in an (undiluted)
+  serving of 120 ml" and she caught it herself an hour later: *"isn't correct,
+  because it leaves 'an serving' outside the brackets. What do you think about
+  'a serving of 120 ml (undiluted)'"*. That is what ships: the article stays
+  right and the word sits against the figure it qualifies. A drink that states
+  no volume still says "in a serving." with no bracket.
+- **2026-10-04, #1293 — a pour in dashes is struck through and starred above
+  ×1.** Helen: *"make it more obvious that bitters shouldn't be scaled by
+  updating the ingredient line as well as showing the note under the
+  scaler... e.g. strikethrough text for the amount, then a \*, and a \* before"*
+  the note. The note (#713) was right and a paragraph away from the figure it
+  warned about. **The amount still scales**: the line says "not this", the
+  note says "add to taste", and the multiplied figure under the line shows
+  which way to err from. Same trigger as the note (`dash` or `drop` in the
+  amount), so the star and the sentence it points at appear together or not
+  at all.
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16** — Ingredients are additive, never a choose-one (asked

@@ -281,7 +281,23 @@ layout: default
                  SIBLING of `.cocktail-amount`, never inside it, because
                  cocktail-scale.js reads that span's whole text as a quantity.
                  MANUAL §9.3 / DECISIONS §9.3 (#1263). {% endcomment %}
-              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}>{{ amount_shown }}</span>{% endif %}{% if item.as %}<span class="cocktail-use">({{ item.as }})</span>{% endif %}</span>{% endif %}
+              {% comment %} A POUR IN DASHES OR DROPS IS MARKED, #1293. Above x1 the
+                 scaler still multiplies it, and the note under the scaler has
+                 said since #713 that it should not be trusted. Helen,
+                 2026-10-04: "make it more obvious that bitters shouldn't be
+                 scaled by updating the ingredient line as well as showing the
+                 note under the scaler... e.g. strikethrough text for the
+                 amount, then a *, and a * before" the note. So the amount
+                 carries `data-dashes`, and a `*` sits beside it, hidden until
+                 cocktail-scale.js goes above x1. THE SAME TEST AS
+                 `has_dashes` BELOW, on purpose: the star and the note it
+                 points at appear together or not at all. The star is a
+                 SIBLING of `.cocktail-amount`, never inside it, for the
+                 reason `.cocktail-use` is. {% endcomment %}
+              {% assign amount_lower = item.amount | append: "" | downcase %}
+              {% assign in_dashes = false %}
+              {% if amount_lower contains "dash" or amount_lower contains "drop" %}{% assign in_dashes = true %}{% endif %}
+              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}{% if in_dashes %} data-dashes{% endif %}>{{ amount_shown }}</span>{% if in_dashes %}<span class="cocktail-amount-star" aria-hidden="true" hidden>*</span>{% endif %}{% endif %}{% if item.as %}<span class="cocktail-use">({{ item.as }})</span>{% endif %}</span>{% endif %}
               {% comment %} AFTER THE NAME: the bottle in brackets, then
                  "(optional)" (#1141). The name has its own span so nothing
                  aimed at it reaches the brackets. The brackets are markup, so
@@ -605,6 +621,16 @@ layout: default
           {% endif %}
         </p>
       {% endif %}
+      {% comment %} "(undiluted)" FOLLOWS THE MILLILITRES AND APPEARS ONLY WITH
+         THEM -- #1291, 2026-10-04. Helen: "I just want to make it clear that
+         120 ml of drink won't end up in a 120-ml glass." Her first wording
+         was "in an (undiluted) serving of 120 ml", and she caught it herself:
+         that "leaves 'an serving' outside the brackets". So: "in a serving of
+         120 ml (undiluted)." -- the article stays right and the word sits
+         against the figure it qualifies. The figure is the recipe as poured
+         into the shaker; shaking adds a quarter again and the ice takes room
+         (§9.11.2). A drink that states no volume says "in a serving." as
+         before: there is no figure for the word to qualify. {% endcomment %}
       {% if page.units %}
         <p class="cocktail-units"
            data-units-per-serve="{{ page.units.per_serve }}"
@@ -613,7 +639,7 @@ layout: default
           {%- if page.units.per_serve == 1.0 %} unit{% else %} units{% endif %} of alcohol
           {%- if page.units.serves > 1 %} in each of {{ page.units.serves }} servings
           {%- else %} in a serving{% endif %}
-          {%- if page.volume %} of {{ page.volume.serve_ml }} ml{% endif %}.</p>
+          {%- if page.volume %} of {{ page.volume.serve_ml }} ml (undiluted){% endif %}.</p>
       {% endif %}
       {% comment %} `min_text` / `max_text` are the PRINTED figures, to two
          places; `min` / `max` stay numbers on the data attributes, for the

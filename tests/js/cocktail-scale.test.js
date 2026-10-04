@@ -62,6 +62,7 @@ function el(cls, text) {
     hasAttribute(name) { return name in this.attrs; },
     getAttribute(name) { return this.attrs[name]; },
     setAttribute(name, value) { this.attrs[name] = String(value); },
+    removeAttribute(name) { delete this.attrs[name]; },
     add(child) { child.parent = this; this.children.push(child); return child; },
     descendants() {
       return this.children.reduce(
@@ -150,9 +151,18 @@ function page(pours, opts) {
      `data-amount` while printing the number alone; `slot` is the unit it
      moved to the end of the name, absent for an `each` row. */
   const slots = [];
-  const spans = pours.map(([amount, name, quiet]) => {
+  /* A FOURTH ELEMENT, `'dashes'`, IS A ROW THE LAYOUT MARKED -- #1293. The
+     layout puts `data-dashes` on the amount and a hidden `*` beside it. */
+  const stars = [];
+  const spans = pours.map(([amount, name, quiet, dashes]) => {
     const li = list.add(el('cocktail-ingredient'));
     const span = li.add(el('cocktail-amount', amount));
+    if (dashes) {
+      span.setAttribute('data-dashes', '');
+      const star = li.add(el('cocktail-amount-star', '*'));
+      star.hidden = true;
+      stars.push(star);
+    }
     const item = li.add(el('cocktail-item-name', name));
     if (quiet) {
       span.setAttribute('data-amount', quiet.written);
@@ -180,7 +190,7 @@ function page(pours, opts) {
   }
 
   return {
-    sandbox, control, input, minus, plus, spans, list, batch, cost, units, slots,
+    sandbox, control, input, minus, plus, spans, list, batch, cost, units, slots, stars,
     amounts: () => spans.map((s) => s.textContent),
     /** Type into a box the way a browser does: focus it, then `input`. */
     type(box, text) {
@@ -491,7 +501,7 @@ test('above ×1 the note says the bitters caveat and nothing else', () => {
   p.type(p.input, '3');
   assert.strictEqual(p.batch.hidden, false);
   assert.strictEqual(p.batch.textContent,
-    'Don’t scale bitters linearly — add to taste.',
+    '* Don’t scale bitters linearly — add to taste.',
     'the cost and units totals came off in #1121; only the caveat is left');
 });
 
@@ -582,6 +592,69 @@ test('a bitters-only drink still gets its caveat with no figures to show', () =>
   const p = page(AVIATION, { hasDashes: true });
   p.type(p.input, '2');
   assert.strictEqual(p.batch.textContent,
-    'Don’t scale bitters linearly — add to taste.',
+    '* Don’t scale bitters linearly — add to taste.',
     'no leading "×2:" with nothing after it');
+});
+
+// =============================================================================
+// THE LINE THE NOTE IS ABOUT SAYS SO TOO — #1293, 2026-10-04.
+//
+// Helen: "make it more obvious that bitters shouldn't be scaled by updating the
+// ingredient line as well as showing the note under the scaler... e.g.
+// strikethrough text for the amount, then a *, and a * before" the note.
+//
+// Above ×1 a pour in dashes has its scaled amount struck through with a star
+// beside it, and the note opens with the same star. The amount still scales:
+// the figure under the line is the multiplied one.
+// =============================================================================
+
+const OLD_FASHIONED = [
+  ['60 ml', 'bourbon'],
+  ['5 ml', 'sugar syrup'],
+  ['2 dashes', 'aromatic bitters', null, 'dashes'],
+];
+
+/** The amount spans the fixture built, and the stars beside the dashed ones. */
+function marks(p) {
+  return { spans: p.spans, stars: p.stars };
+}
+
+test('at the recipe as written nothing is struck and no star shows', () => {
+  const p = page(OLD_FASHIONED, { hasDashes: true });
+  const { spans, stars } = marks(p);
+  assert.strictEqual(stars.length, 1, 'the fixture marked one pour');
+  assert.ok(spans.every((s) => !s.hasAttribute('data-struck')));
+  assert.strictEqual(stars[0].hidden, true);
+});
+
+test('above ×1 the dashes are struck and starred, and only the dashes', () => {
+  const p = page(OLD_FASHIONED, { hasDashes: true });
+  p.type(p.input, '4');
+  const { spans, stars } = marks(p);
+  assert.deepStrictEqual(spans.map((s) => s.hasAttribute('data-struck')),
+    [false, false, true], 'the millilitre pours are not struck');
+  assert.strictEqual(stars[0].hidden, false);
+  assert.deepStrictEqual(p.amounts(), ['240 ml', '20 ml', '8 dashes'],
+    'the struck figure is still the multiplied one');
+  assert.ok(p.batch.textContent.startsWith('* '),
+    'the note opens with the star the amount carries: ' + p.batch.textContent);
+});
+
+test('the strike and the star come off again at ×1', () => {
+  const p = page(OLD_FASHIONED, { hasDashes: true });
+  p.type(p.input, '3');
+  p.type(p.input, '1');
+  const { spans, stars } = marks(p);
+  assert.ok(spans.every((s) => !s.hasAttribute('data-struck')), 'a state, not a ratchet');
+  assert.strictEqual(stars[0].hidden, true);
+});
+
+test('a page with no batch note still strikes and stars its dashes', () => {
+  // The note is one element and the marks are others; losing the first must
+  // not silently lose the second.
+  const p = page(OLD_FASHIONED, { batch: false });
+  p.type(p.input, '2');
+  const { spans, stars } = marks(p);
+  assert.strictEqual(spans[2].hasAttribute('data-struck'), true);
+  assert.strictEqual(stars[0].hidden, false);
 });
