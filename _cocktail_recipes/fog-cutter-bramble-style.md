@@ -2,7 +2,7 @@
 title: "Fog Cutter (Bramble style)"
 tagline: "Also causes fog."
 glass:
-  - "collins"
+  - "tiki mug"
 garnish:
   - "mint sprig"
 serve:

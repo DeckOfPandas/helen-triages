@@ -2127,7 +2127,34 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first, as every move before it: the test named
 # exactly one file, `_cocktail_recipes/porn-star-martini.md`, "last touched by
 # 4f3621bc", and nothing else. Covers 4f3621b and nothing after.
-COCKTAIL_BASELINE_COMMIT = "4f3621b"   # Porn Star Martini gains one mood (#1268)
+#
+# MOVED 2026-10-04 FOR THREE DRINKS, ON HELEN'S EXPLICIT GRANT (#1244).
+# `b3d2a03` moves Reef Juice and Fog Cutter (Bramble style) from a collins to a
+# tiki mug and scales the Arrack Christmas Punch from 135 ml to 87.5 ml
+# (22.5 / 22.5 / 12.5 / 22.5 / 7.5); `5f89c5e` puts their flags back.
+#
+# HER GRANT, told the three had been set `proofread: false` and would leave the
+# live site: "Reef, Fog and Arrack punch can stay proofread: true, so make that
+# happen please." Every change is one she dictated on the issue -- "Reef Juice
+# and Fog Cutter to tiki mug please", "Arrack Christmas Punch option B please",
+# the amounts chosen from a table put in front of her. The 742aa73 shape.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly those three files, every one "last touched by 5f89c5e3", and nothing
+# else. Covers 5f89c5e and nothing after.
+#
+# MOVED AGAIN THE SAME DAY FOR LITA GREY, WHICH THE GRANT ABOVE DID NOT NAME
+# and so was committed `proofread: false`. `6271217` scales it to two thirds
+# (5 x 15 ml shaken, 40 ml champagne -- her "option C") and drops the coupe;
+# `6481f2a` puts the flag back.
+#
+# HER GRANT, told it would leave the live site: "Lita Grey proofread: true too
+# please, and flute only, dropping the amounts to what we agreed."
+#
+# Proved with the old value first: the test named exactly one file,
+# `_cocktail_recipes/lita-grey.md`, "last touched by 6481f2af", and nothing
+# else. Covers 6481f2a and nothing after.
+COCKTAIL_BASELINE_COMMIT = "6481f2a"   # four drinks answer the glass-fit list (#1244)
 
 
 def _newest_commit_per_published_drink():

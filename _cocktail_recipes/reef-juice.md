@@ -2,7 +2,7 @@
 title: "Reef Juice"
 tagline: "Tastes like that bar I used to go to where you could order \"A pint of fun\"."
 glass:
-  - "collins"
+  - "tiki mug"
 garnish:
   - "pineapple wedge"
 serve:

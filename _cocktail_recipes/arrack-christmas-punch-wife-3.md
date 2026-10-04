@@ -8,18 +8,18 @@ garnish:
 serve:
   ice: "none"
 ingredients:
-  - amount: "35 ml"
+  - amount: "22.5 ml"
     generic: "Créole Shrubb"
     suggestion: ["Rhum Clément Créole Shrubb"]
-  - amount: "35 ml"
+  - amount: "22.5 ml"
     generic: "rhum agricole vieux"
     suggestion: ["Rhum JM Ambré"]
-  - amount: "20 ml"
+  - amount: "12.5 ml"
     generic: "coconut-flower arrack"
     suggestion: ["Ceylon Arrack"]
-  - amount: "35 ml"
+  - amount: "22.5 ml"
     generic: "lemon juice"
-  - amount: "10 ml"
+  - amount: "7.5 ml"
     generic: "orgeat"
   - amount: "(top)"
     generic: "champagne"
