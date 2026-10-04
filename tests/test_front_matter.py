@@ -649,7 +649,28 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #
 # Proved with the old value first, as every move before it. Covers da31a37 and
 # nothing after.
-BASELINE_COMMIT = "da31a37"   # ajitsuke-tamago's `eggs`, on Helen's word
+#
+# MOVED 2026-10-04 FOR ONE WORD ON ONE RECIPE, WITHOUT THE FLAG EVER FLIPPING.
+# `d1cde707` changes Delia's Classic Pancakes from `makes: "about 8"` to
+# `makes: "about 8 pancakes"`, and leaves `proofread: true`.
+#
+# SHE ASKED FOR THE WORD ITSELF. #1286 made a `makes:` recipe's scaler count
+# the thing made, and this yield named nothing to count: "Can Delia's pancakes
+# please scale as "8 pancakes", "16 pancakes"." Told that the edit would take
+# the page off the live site unless she read it on the branch first:
+#
+# HER GRANT: "Delia's pancakes: fine to make the update and not flip the flag.
+# Explicit grant."
+#
+# A DIFFERENT SHAPE FROM THE THREE-COMMIT ONE ABOVE, and hers to choose: no
+# flip to `false`, no read on the branch, because the change is a word she
+# dictated. What it covers is that word. The ingredients and the method are
+# untouched.
+#
+# NOTHING ELSE IS SILENCED BY IT: run against `da31a37` this test named
+# `_food_recipes/delias-classic-pancakes.md (last touched by d1cde707)` and
+# nothing else. Covers d1cde707 and nothing after.
+BASELINE_COMMIT = "d1cde707"   # Delia's `pancakes`, on Helen's explicit grant
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
