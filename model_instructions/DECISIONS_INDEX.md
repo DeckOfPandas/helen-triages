@@ -311,6 +311,8 @@ argument and the rules each field is read by.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST glass that has artwork.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is COMPRESSED, and drawn as a FRACTION of the title block.
 - 2026-08-31 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #601 · the card got its own curve, and the drink page's comment had claimed it all along.
+- 2026-10-04 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #1179 · THE DILUTION FIGURES ARE HELEN'S: stirred 20%, shaken 27.5%, short shake 15%.
+- 2026-10-04 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #1244 · the fit list was audited line by line, and 10 of its 22 flags were the model's.
 - 2026-08-26 · §9.12 / §9.12.1 · #290 · methods.yml added: 277 steps across 105 drinks, 144 distinct; one instruction 43 uses in three wordings, Strain in eleven.
 - 2026-08-31 · §9.12 / §9.12.1 · garnish.yml at Helen's request: 130 entries, 65 distinct strings, perhaps 35 garnishes; 55 after unambiguous collapse, 49 after her rulings.
 - 2026-09-14 · §9.12 / §9.12.1 · #984 · the "either of these, maker's choice" pattern used a second time, and generalised past two options.

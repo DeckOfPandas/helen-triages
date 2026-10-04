@@ -3794,6 +3794,51 @@ unless stated.
   said the same. **A cross-reference to another file's behaviour is a claim
   nothing re-checks.**
 
+- **2026-10-04, #1179 — THE DILUTION FIGURES ARE HELEN'S: stirred 20%, shaken
+  27.5%, short shake 15%.** Her words: ***"Let's use these figures for dilution
+  please: stirred: 20%. Shaken: 27.5%. Short shake 15%."*** Given on seeing
+  what a `(top)` would pour once it was sized from the glass, which was the
+  first time these figures DECIDED something on the site rather than merely
+  flagging it. Each is a share of the RECIPE volume (Arnold's denominator),
+  added as water by the ice. They replace the sourced ranges from #1238 —
+  shake 0.33–0.60, short shake 0.15–0.30, stir 0.25–0.50 — and are written on
+  BOTH ends of each `{low, high}` pair in `fit_rules.dilution`
+  (`_data/cocktails/glasses.yml`), so every reader keeps working and none can
+  pick a different end. A build, a swizzle and a dry shake stay at 0; a
+  blended drink keeps its sourced ×1.9–2.1. **Do not put the research's
+  ranges back, and do not average her figure with them**: she chose against
+  them, knowing them. It is also in §9.3.6's #1179 entry; this is its own
+  entry so the index lists it.
+- **2026-10-04, #1244 — the fit list was audited line by line, and 10 of its
+  22 flags were the model's.** Helen: *"could you audit the list in #1244? You
+  have the context"*, then *"Yes please, those four"*. Each flag was checked
+  against the recipe it came from:
+  - **It watered things that were never shaken.** The Dark 'n' Stormy's 90 ml
+    of ginger beer and Lita Grey's 60 ml of champagne are added after the
+    strain; the report multiplied the whole recipe by the shake's dilution.
+    The first fits; the second fits a large flute. `added_after_ml` in the
+    plugin now tells the report what was held back ("other than the X") or
+    floated, and what sits in a fruit shell and not in the glass.
+  - **It flagged noise.** Four lines were over by 2.5% to 7.5% on figures
+    built from a survey median, a wash line and an ice allowance.
+    `fit_rules.tolerance` is 10%.
+  - **Its top flag compared against a number nothing spends.** "Less room than
+    the house range" stopped meaning anything when #1179 sized the top from
+    the glass. It fires now only under a quarter of the range's minimum
+    (`top_room_min`): the Arrack Christmas Punch.
+  - **It misread one method.** "Shake all ingredients with a few pebbles of
+    crushed ice" is a short shake; the pattern wanted the words adjacent.
+  - **What is left is 7 drinks and one question**: the six punches say
+    `serves:` 3, 4 or 5 beside notes recording "Serves 4 to 6", and at 6 they
+    all fit a punch cup.
+  - **A held-back amount that the method never mentions again is still
+    counted in the glass.** The first cut called it "served beside", true of
+    the Porn Star Martini's champagne and false of the La Fée Noir Punch,
+    whose method is cut off in the source. The reading that cannot hide a
+    too-big drink won.
+  - **A report nobody audits reads as findings.** The first list was posted
+    as 24 questions for her; a third were not questions about drinks at all.
+
 ### §9.12 / §9.12.1 Methods and garnishes
 
 - **2026-08-26, #290** — `methods.yml` added: 277 steps across 105 drinks, 144

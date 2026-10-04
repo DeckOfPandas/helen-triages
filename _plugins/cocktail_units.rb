@@ -180,6 +180,10 @@ module HelenTriages
             # scripts/glass_fit_report.py -- one reading of a method, here,
             # rather than a second one in Python.
             volume["method_family"] = method_family(doc.data["method"])
+            # What was never shaken or stirred, for the same reader -- #1244.
+            after, aside = added_after_ml(doc.data)
+            volume["after_ml"] = tidy_ml(after) if after.positive?
+            volume["aside_ml"] = tidy_ml(aside) if aside.positive?
             doc.data["volume"] = volume
             measured += 1
           else
@@ -388,7 +392,9 @@ module HelenTriages
 
       family = method_family(data["method"])
       room = glass_room(stats["median"].to_f, ice, family, key, serve["fill"])
-      top = room - served_ml(build, family)
+      # Only what went through the shaker is watered -- `added_after_ml`.
+      after, aside = added_after_ml(data)
+      top = room - (served_ml(build - after - aside, family) + after)
       rounded = (top / 5.0).round * 5
       rounded.positive? ? rounded.to_f : nil
     end
@@ -414,15 +420,103 @@ module HelenTriages
     # or a shake "with a few pieces" of ice is the light one. A shake whose
     # every mention is `dry` has no wet dilution and gets its own family. A
     # pitcher filled with ice and stirred is a stir.
+    #
+    # "WITH A FEW" MAY SIT ANYWHERE IN THE SHAKE'S OWN SENTENCE, since #1244's
+    # audit (2026-10-04). Fanny Chu's Piña Colada says "Shake all ingredients
+    # with a few pebbles of crushed ice" and was read as a full shake, because
+    # the pattern wanted the words adjacent.
     def method_family(steps)
       text = Array(steps).map { |s| s.to_s.downcase }.join(" ")
       return "blended" if text.include?("blend")
-      return "short_shake" if text.match?(/short shake|whip|shake with (a few|three)/)
+      return "short_shake" if text.match?(/short shake|whip|shake\b[^.]*\bwith (a few|three)/)
       return "shake" if text.match?(/(?<!dry )shake/)
       return "dry_shake_only" if text.include?("dry shake")
       return "stir" if text.match?(/stir[^.]*with ice|pitcher[^.]*ice/)
       return "swizzle" if text.include?("swizzle")
       "build"
+    end
+
+    # =========================================================================
+    # WHAT WAS NEVER SHAKEN -- #1244's audit, 2026-10-04.
+    # =========================================================================
+    # Dilution is water the ICE gives the drink while it is shaken or stirred.
+    # An amount added afterwards takes none, and the fit report was watering
+    # all of it: the Dark 'n' Stormy's 90 ml of ginger beer, Lita Grey's 60 ml
+    # of champagne. Both were flagged as too big for their glass; the first
+    # fits and the second fits a large flute.
+    #
+    # Returns [after, aside] in millilitres.
+    #
+    #   after -- in the glass, undiluted: an `as: "float"` amount, or one a
+    #            step holds back ("Shake all ingredients other than the
+    #            champagne with ice.").
+    #   aside -- not in the glass at all: an `as: "shell"` rum, which sits in
+    #            a fruit shell on top.
+    #
+    # AN AMOUNT HELD BACK AND NEVER MENTIONED AGAIN IS STILL COUNTED IN THE
+    # GLASS. The first version of this called it "served beside" -- which is
+    # true of the Porn Star Martini's champagne and false of the La Fée Noir
+    # Punch, whose method is cut off mid-sentence in the source and never
+    # reaches "top with the remaining soda". A truncated method and a drink
+    # served in two glasses look the same from here, so the reading that
+    # cannot hide a too-big drink is the one taken.
+    #
+    # A `(top)` is neither: it has no measure, and `fitted_top_ml` is what
+    # sizes it.
+    #
+    # THE NAME A METHOD USES IS SHORTER THAN THE GENERIC ("the sherry" for
+    # `oloroso sherry`, "the rest of the soda water"), so an amount is held
+    # back when either contains the other. A punch that muddles part of its
+    # soda and tops with the rest has ALL of it counted as added after; that
+    # understates the stirred part by a few millilitres in a bowl of 700.
+    #
+    # THE VOLUME THE PAGE PRINTS IS UNTOUCHED. `total_ml` is the recipe, and a
+    # glass of champagne on the side is still alcohol in the serving. These
+    # two figures are for the question "does it fit the glass" and nothing
+    # else.
+    def added_after_ml(data)
+      ingredients = data["ingredients"]
+      return [0.0, 0.0] unless ingredients.is_a?(Array)
+
+      steps = Array(data["method"]).map do |s|
+        (s.is_a?(Hash) ? s["step"] : s).to_s.downcase
+      end
+      held = []
+      steps.each_with_index do |step, index|
+        m = /other than (.*?)(?: with |\.|\z)/.match(step) or next
+        m[1].split(/,| and /).each do |phrase|
+          phrase = phrase.strip.sub(/\Athe /, "").sub(/\Arest of the /, "")
+          held << [phrase, index] unless phrase.empty?
+        end
+      end
+
+      after = 0.0
+      aside = 0.0
+      ingredients.each do |ing|
+        next unless ing.is_a?(Hash)
+        number, unit = unit_named(ing["amount"].to_s.strip)
+        next unless number && @per_ml.key?(unit)
+        ml = number * @per_ml[unit].to_f
+
+        case ing["as"].to_s
+        when "float"
+          after += ml
+          next
+        when "shell"
+          aside += ml
+          next
+        end
+
+        generics = Array(ing["generic"]).map { |g| g.to_s.downcase }
+                                        .reject(&:empty?)
+        hit = held.find do |phrase, _|
+          generics.any? { |g| g.include?(phrase) || phrase.include?(g) }
+        end
+        next unless hit
+
+        after += ml
+      end
+      [after, aside]
     end
 
     # Millilitres of drink a glass of this capacity takes, on the forgiving
