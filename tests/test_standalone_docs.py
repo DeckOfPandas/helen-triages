@@ -472,7 +472,20 @@ def _drink_problems(fm: dict) -> list[str]:
         # reader copies, so they carry the flags -- read from the schema's own
         # list rather than re-typed, the same rule every block in this file
         # follows -- and all three are False on a new file, as on a recipe.
-        from test_cocktails import META_KEYS_IN_ORDER  # noqa: E402
+        from test_cocktails import (  # noqa: E402
+            META_KEYS_IN_ORDER, keys_out_of_page_order,
+        )
+        # PAGE ORDER, #1213 -- "Please apply to new ingests." A repo-less
+        # reader copies these blocks, so a block out of order teaches every
+        # file it produces to arrive out of order. The predicate is the
+        # suite's own, the one the drafts test and the tidy pass ask.
+        out_of_order = keys_out_of_page_order(list(fm))
+        if out_of_order:
+            problems.append(
+                f"top-level keys are not in page order: "
+                f"{' '.join(out_of_order[0])} -- want "
+                f"{' '.join(out_of_order[1])}"
+            )
         meta = fm.get("meta") or {}
         if list(meta) != META_KEYS_IN_ORDER:
             problems.append(f"meta keys/order: {list(meta)} != {META_KEYS_IN_ORDER}")

@@ -99,6 +99,13 @@ glass:
   - "old fashioned"
 garnish:
   - "lime wedge"
+meta:
+  made_before: false
+  ship: "who knows"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+mood: []
 ingredients:
   - amount: "52.5 ml"
     generic: "QQ Patron Reposado tequila"   # a BOTTLE; the category is a
@@ -126,23 +133,23 @@ method:
   #   - step: "Muddle the lime chunks hard with the sugar."
   #     note: "my giant spiky muddler not the polite smooth one"
 to_serve: ""
-mood: []
 notes:
   - label: "QQ"
     text: "QQ - three of the four pours carry the source's words behind a `QQ`; the source names bottles, not categories. No `suggestion` is filled in."
 source: "Difford's"
 source_url: "https://..."
-meta:
-  made_before: false
-  ship: "who knows"
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 ```
 
 **The filename** is the drink's name, lowercased, hyphenated, ASCII only:
 `smokestack-lightning.md`. Accents are stripped in a filename, kept in a title.
+
+**Write the keys in the order above, which is the order the page prints them,
+top to bottom** (Helen, #1213): `title`, `tagline`, `glass`, `garnish`, `meta`,
+`mood`, `ingredients`, `serve`, `serves`, `method`, `to_serve`, `notes`,
+`source`, `source_url`. `meta` sits fifth because the page prints her rating
+beside the glass and garnish. Leave out a key you are told to omit; never move
+one.
 
 | Field | Rule |
 |---|---|
@@ -925,6 +932,13 @@ glass:
   - "double old fashioned"
 garnish:
   - "pineapple wedge"
+meta:
+  made_before: false
+  ship: "who knows"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+mood: []
 ingredients:
   - amount: "45 ml"
     generic: "QQ blackstrap rum"
@@ -947,18 +961,11 @@ method:
   - "Shake all ingredients with ice."
   - "Strain."
 to_serve: "Straw."
-mood: []
 notes:
   - label: "QQ"
     text: "QQ - two pours carry the source's words behind a `QQ`. `blackstrap` is a character rather than a category, and `simple syrup` does not say which sugar or what ratio. No `suggestion` is filled in."
 source: "QQ"
 source_url: ""
-meta:
-  made_before: false
-  ship: "who knows"
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 ```
 

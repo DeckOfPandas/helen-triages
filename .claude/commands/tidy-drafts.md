@@ -1,5 +1,5 @@
 ---
-description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577) -- and report everything that needs Helen instead.
+description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577), a cocktail's key order (#1213) -- and report everything that needs Helen instead.
 ---
 
 Helen has asked for a drafts tidy-up. Run `scripts/tidy_drafts.py`, which is the
@@ -140,6 +140,35 @@ Helen's ruling was *"script it with a hand-review of the diff, one commit,
 before promotion"* — so `--only size` is run as its own commit in the drafts
 repo and the diff of that commit is the review.
 
+## Key order, cocktails only (#1213)
+
+Helen: *"yaml fields should be rewritten in the order they appear on the page,
+top to bottom."* Drafts and new ingests; *"Do not apply this retrospectively to
+published recipes."* `--only order` re-deals a cocktail draft's top-level keys
+into `TOP_LEVEL_KEYS_IN_ORDER` (`tests/test_cocktails.py`, derived from
+`_layouts/cocktail.html` by a test): `title`, `tagline`, `glass`, `garnish`,
+`meta`, `mood`, `ingredients`, `serve`, `serves`, `method`, `to_serve`,
+`notes`, `source`, `source_url`.
+
+**It moves whole blocks and edits no line**, so it is the one cocktail rule
+that is not confined to Helen's prose and does not need to be: an `amount`, a
+method step and a `QQ` line each travel inside their block exactly as written.
+It checks its own output before returning it — the same lines, the same parsed
+data, the declared order — and raises instead of writing if any fails.
+
+**The diff of a reorder cannot be reviewed by eye**: every moved block shows as
+a deletion and an insertion. The evidence is the fixer's own three checks, and
+a run on a COPY first (`--drafts-dir <copy> --site cocktails --only order
+--apply`) with both sides parsed and compared — the 2026-08-29 lesson — never
+a read of the diff.
+
+It **refuses and names** an undeclared key, a key written twice, and a
+column-0 comment, which belongs to no block. As with `size`, run it as its own
+commit in the drafts repo. **The first full pass ran on 2026-10-04, all 62
+drafts, and is drafts schema 2**; `test_a_draft_drinks_keys_are_in_page_order`
+keeps it that way, so a draft that arrives or is hand-edited out of order
+fails until this rule is run again.
+
 `tests/test_tidy_drafts.py` is the proof, on a fixture cocktail under `tmp/` and
 never on Helen's files: it asserts the whole output byte for byte, so "fixed the
 six faults" cannot pass while something also happened to the other thirty lines.
@@ -179,9 +208,11 @@ six faults" cannot pass while something also happened to the other thirty lines.
    whole safety story is that the diff afterwards shows exactly what the script
    did, and mixed in with Helen's own edits it does not.
 
-   Use `--only quoting,meta,dashes,typography,units,accents,size` to do one class at
-   a time if the full pass is too much to review in one go. `size` rewrites
-   two fields per hit and is the one Helen asked to review as its own commit.
+   Use `--only quoting,meta,dashes,typography,units,accents,size,order` to do
+   one class at a time if the full pass is too much to review in one go. `size`
+   rewrites two fields per hit and is the one Helen asked to review as its own
+   commit; `order` (cocktails) moves every block in a file and is its own
+   commit for the same reason.
 
 5. **Verify, and not by reading the diff.** Run the suite for the half you
    touched:
