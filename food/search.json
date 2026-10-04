@@ -33,6 +33,18 @@ sitemap: false
   built from what the items carry. Labels are the index's own, from
   _data/food/filter_sections.yml, so the dropdown's headings are the panel's.
 
+  THE INGREDIENT GROUP CARRIES THE PICKER'S VOCABULARY -- #1289, 2026-10-04.
+  `ing` is main_ingredients as the recipes wrote them, and the index's HAS TO
+  HAVE picker does not offer those words: it reads them through
+  _data/food/ingredient_words.yml (modifiers stripped, aliases applied,
+  plurals folded). The dropdown hands its word to that picker, so it has to
+  offer the picker's entries -- it was offering "sweet potato" and "sweet
+  potatoes" as two things. `vocabulary` is the same object food/index.html
+  hands filters.js, and `reader` is the script that reads it, which
+  page-search.js fetches on first focus where the page has not loaded it.
+  cocktails/search.json has neither: its words are already the card's
+  declared labels.
+
   `items_label` IS "food" HERE AND "cocktails" ON THE OTHER SITE -- Helen on
   #1088, 2026-09-20: 'Search dropdown group labels: "food" and "cocktails"'.
   It was "recipes" on both from #1097 (2026-09-15) and placeholder copy before
@@ -73,7 +85,7 @@ sitemap: false
     {%- for group in sections.tag_groups %}
     {"kind": {{ group.name | jsonify }}, "label": {{ group.label | jsonify }}, "param": "tag", "field": "tags", "values": {{ taxonomy.tags[group.name] | jsonify }}},
     {%- endfor %}
-    {"kind": "ingredient", "label": {{ sections.ingredients.label | jsonify }}, "param": "ing", "field": "ing"}
+    {"kind": "ingredient", "label": {{ sections.ingredients.label | jsonify }}, "param": "ing", "field": "ing", "vocabulary": {{ site.data.food.ingredient_words | jsonify }}, "reader": {{ '/assets/js/ingredient-search.js' | relative_url | jsonify }}}
   ],
   "items": [
     {%- for r in _rendered_recipes %}

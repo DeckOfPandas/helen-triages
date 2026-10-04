@@ -27,8 +27,10 @@
   some pages. The script and the box are one thing and ship together: both
   only on a local build, and on every page of a site there. It hangs
   HTF.pageSearch off the namespace assets.js creates in the head and reaches
-  for nothing else, so loading it at the end of the header costs the page
-  nothing it did not already pay.
+  for nothing else while the page loads, so loading it at the end of the
+  header costs the page nothing it did not already pay. (On first focus it
+  fetches the JSON and, on food, ingredient-search.js if the page has not
+  loaded it -- #1289, so the ingredient words are the index picker's own.)
 
   THE BOX IS A PLAIN FORM FIRST, AND IT WORKS WITH NO JAVASCRIPT. A GET to the
   index with `q=<what you typed>`; assets/js/filter-state.js's `parseName`

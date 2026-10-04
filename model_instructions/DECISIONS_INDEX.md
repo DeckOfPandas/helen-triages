@@ -158,6 +158,7 @@ argument and the rules each field is read by.
 - 2026-09-10 · §8.3 · Walked on the built food index with the browser harness after the change: step 5 shows two, step 10 shows nine ducks with the view off and the button reading (2) unpressed, step …
 - 2026-09-15 · §8.3 · #1093 · a shortlist share link, shown and not saved.
 - 2026-09-15 · §8.3 · #1092 · food's HAS TO HAVE picks several ingredients, AND.
+- 2026-10-04 · §8.3 · #1289 · the search-for-anything box offers the PICKER'S ingredient words, not the recipes'.
 - 2026-08-16 · §9.1 · The first three drinks ingested (Julien Sorel, Sazerac, Cobra's Fang) and the schema derived from them.
 - 2026-08-22 · §9.1 · "Lost work" after a Windows Terminal crash (eight commits of rum typing) was on a local-only branch checked out in a SEPARATE worktree; git worktree list names the path (§12).
 - 2026-08-29 · §9.1 · One clone is not the repo — Same day, GH_TOKEN probed: contents 403 on both private repos, 200 on the public one.

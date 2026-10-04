@@ -70,8 +70,10 @@
 
   // The same fold ingredient-search.js uses (accents stripped, a hyphen read
   // as a space), written here rather than borrowed because a recipe page does
-  // not load that module and a search box is not a reason to start. A test
-  // holds the two equal, so they cannot drift apart unnoticed.
+  // not load that module with the page and the names have to be searchable
+  // without it (since #1289 it arrives on first focus, for food's ingredient
+  // words only -- withPicker below). A test holds the two equal, so they
+  // cannot drift apart unnoticed.
   function fold(str) {
     return String(str == null ? '' : str)
       .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/-/g, ' ');
@@ -144,9 +146,13 @@
    *                                     order: {kind, label, param, field,
    *                                     values?}
    * @param {Array}  data.items          {t, u, ...fields}
+   * @param {object} [ingredientSearch]  ingredient-search.js's api, for a group
+   *                                     that carries a `vocabulary`; defaults
+   *                                     to HTF.ingredientSearch when loaded
    */
-  function create(data) {
+  function create(data, ingredientSearch) {
     var d = data || {};
+    var pickerApi = ingredientSearch || (root.HTF && root.HTF.ingredientSearch) || null;
     var home = String(d.home || '');
     var items = (d.items || []).map(function (it) {
       return { item: it, title: String(it.t || ''), folded: foldByCharacter(it.t || '') };
@@ -158,41 +164,85 @@
        built from what the items actually carry, alphabetically. Either way a
        word with NO item is dropped: the index renders no button for an empty
        mood (`pudding in a glass`, taxonomy.yml), and a search result that
-       leads to an empty index would be a promise the page cannot keep. */
+       leads to an empty index would be a promise the page cannot keep.
+
+       A GROUP WITH A `vocabulary` IS READ THROUGH THE INDEX'S OWN PICKER --
+       #1289. Food's HAS TO HAVE words are main_ingredients as the recipes
+       wrote them, and the picker they are handed to (`?ing=`) does not offer
+       those: it strips a modifier, applies an alias and folds a plural, so
+       "sweet potatoes" is "sweet potato" there and "fresh garlic cloves" is
+       "garlic". Offering the raw text showed one ingredient two or three
+       times (56 of them, measured over every recipe and draft), and a click on
+       the form the picker had renamed landed on a half-finished search. So
+       each value goes through ingredient-search.js's buildMasterList, values
+       sharing an entryKey are ONE word, and the label is the first of them in
+       the picker's own alphabetical order -- the entry its pool would show.
+       `id` is what a word is counted and merged on; `key` stays the folded
+       LABEL, because the highlight indexes into the label.
+
+       IT FAILS OPEN. No vocabulary (cocktails, whose words are already a
+       declared list), or the picker's module not loaded: every value is its
+       own word, which is exactly what this did before. */
     var groups = (d.groups || []).map(function (g) {
+      var picker = (g.vocabulary && pickerApi) ? pickerApi.create(g.vocabulary) : null;
+
+      function entriesOf(v) {
+        if (!picker) return [{ id: foldByCharacter(v), label: String(v) }];
+        return picker.buildMasterList([String(v)]).map(function (entry) {
+          return { id: picker.entryKey(entry), label: entry };
+        });
+      }
+
       var counts = Object.create(null);
-      var display = Object.create(null);
+      var labels = Object.create(null);
       items.forEach(function (entry) {
         var raw = entry.item[g.field];
         var list = Array.isArray(raw) ? raw : (raw == null || raw === '' ? [] : [raw]);
+        var counted = Object.create(null);   // a page listing "egg" AND "eggs" is one page
         list.forEach(function (v) {
-          var key = foldByCharacter(v);
-          if (!key.trim()) return;
-          counts[key] = (counts[key] || 0) + 1;
-          if (!display[key]) display[key] = String(v);
+          entriesOf(v).forEach(function (e) {
+            if (!e.id.trim()) return;
+            if (!labels[e.id]) labels[e.id] = [];
+            if (labels[e.id].indexOf(e.label) === -1) labels[e.id].push(e.label);
+            if (counted[e.id]) return;
+            counted[e.id] = true;
+            counts[e.id] = (counts[e.id] || 0) + 1;
+          });
         });
+      });
+      var display = Object.create(null);
+      Object.keys(labels).forEach(function (id) {
+        // buildMasterList's own comparator, so the label is the entry the
+        // picker's pool keeps when it meets the same two.
+        display[id] = picker ? labels[id].slice().sort(function (a, b) {
+          return a.toLowerCase().localeCompare(b.toLowerCase());
+        })[0] : labels[id][0];
       });
       var order;
       if (Array.isArray(g.values)) {
         order = g.values.map(function (v) { return foldByCharacter(v); });
         g.values.forEach(function (v) {
-          var key = foldByCharacter(v);
-          if (!display[key]) display[key] = String(v);
+          var id = foldByCharacter(v);
+          if (!display[id]) display[id] = String(v);
         });
       } else {
-        order = Object.keys(counts).sort();
+        order = Object.keys(counts).sort(function (a, b) {
+          var ka = foldByCharacter(display[a]), kb = foldByCharacter(display[b]);
+          return ka < kb ? -1 : (ka > kb ? 1 : 0);
+        });
       }
       var seen = Object.create(null);
       var vocab = [];
-      order.forEach(function (key) {
-        if (seen[key] || !counts[key]) return;
-        seen[key] = true;
-        vocab.push({ key: key, label: display[key], count: counts[key] });
+      order.forEach(function (id) {
+        if (seen[id] || !counts[id]) return;
+        seen[id] = true;
+        vocab.push({ id: id, key: foldByCharacter(display[id]), label: display[id], count: counts[id] });
       });
       return {
         kind: String(g.kind || ''),
         label: String(g.label || ''),
         param: String(g.param || ''),
+        picker: picker,
         vocab: vocab
       };
     });
@@ -253,9 +303,23 @@
 
       // --- then the words, one group per kind, in the index's order -----------
       groups.forEach(function (g) {
+        /* A MERGED WORD STILL ANSWERS TO THE FORM THAT WAS MERGED AWAY --
+           #1289. "cherries" and "cherry" are one word labelled "cherries", and
+           "potatoes" is labelled "potato"; typing either spelling in full has
+           to find it. So the query is also read exactly as the picker reads an
+           entry -- the same rename, then each word to its singular -- and
+           tried against the word's `id`. The label is tried first and wins the
+           tier when both match. */
+        var pickerQueries = !g.picker ? [] : g.picker.buildMasterList([query])
+          .map(function (entry) { return g.picker.entryKey(entry); })
+          .filter(Boolean);
         var bands = [[], [], []];
         g.vocab.forEach(function (v) {
           var tier = tierOf(v.key, query);
+          pickerQueries.forEach(function (pq) {
+            var t = tierOf(v.id, pq);
+            if (t && (!tier || t < tier)) tier = t;
+          });
           if (tier) bands[tier].push(v);
         });
         var matched = bands[1].concat(bands[2]);
@@ -334,12 +398,34 @@
     if (loading) return;
     loading = true;
     root.HTF.fetchJson(indexUrl, function (json) {
-      if (json) searcher = create(json);
-      loading = false;
-      var fns = waiting;
-      waiting = [];
-      fns.forEach(function (fn) { fn(); });
+      withPicker(json, function () {
+        if (json) searcher = create(json);
+        loading = false;
+        var fns = waiting;
+        waiting = [];
+        fns.forEach(function (fn) { fn(); });
+      });
     });
+  }
+
+  /* THE PICKER'S MODULE, FETCHED ONLY WHEN THE JSON ASKS FOR IT -- #1289. A
+     group that carries a `vocabulary` names the script that reads it
+     (`reader`, food's ingredient-search.js). The food index has already loaded
+     that for its own picker; a recipe page has not and gets it here, on first
+     focus, beside the JSON -- so no page pays for it until the box is used and
+     none loads it twice. A script that fails to load is not an error: create()
+     then offers the words unmerged, as it did before. */
+  function withPicker(json, then) {
+    var src = null;
+    ((json && json.groups) || []).forEach(function (g) {
+      if (g.vocabulary && g.reader) src = String(g.reader);
+    });
+    if (!src || root.HTF.ingredientSearch) { then(); return; }
+    var script = document.createElement('script');
+    script.src = src;
+    script.onload = then;
+    script.onerror = then;
+    document.head.appendChild(script);
   }
 
   function el(tag, cls) {

@@ -195,6 +195,83 @@ test('a word is offered once however many pages carry it, with its count', () =>
   assert.strictEqual(soup.count, 2);
 });
 
+// --- food's ingredients are the PICKER'S entries, not the recipes' text -- #1289 ---
+
+/* The shape food/search.json gives the ingredient group: the picker's own
+   vocabulary beside it. Small, but one of each thing the picker does to an
+   entry -- an irregular plural folded per word, a whole-entry alias, a
+   modifier stripped. */
+const PICKER_VOCAB = {
+  search: { family_button_min_chars: 3 },
+  singulars: { potatoes: 'potato', cherries: 'cherry', eggs: 'egg', cloves: 'clove' },
+  aliases: { carrots: 'carrot', 'sweet potatoes': 'sweet potato', 'garlic cloves': 'garlic' },
+  modifiers: ['fresh', 'chopped'],
+  stopwords: ['and', 'of']
+};
+const PLURALS = {
+  home: '/helen-triages/food/',
+  items_label: 'food',
+  groups: [
+    { kind: 'ingredient', label: 'Has to have', param: 'ing', field: 'ing', vocabulary: PICKER_VOCAB }
+  ],
+  items: [
+    { t: 'Sweet potato curry', u: '/a/', ing: ['sweet potato', 'fresh garlic cloves', 'carrots'] },
+    { t: 'Sweet potato wedges', u: '/b/', ing: ['sweet potatoes', 'sweetcorn', 'garlic'] },
+    { t: 'Clafoutis', u: '/c/', ing: ['cherries', 'eggs', 'egg'] },
+    { t: 'Cherry pie', u: '/d/', ing: ['cherry', 'carrot'] }
+  ]
+};
+const ingredientsOf = (found) => found.groups.find((g) => g.kind === 'ingredient').results;
+
+test('a plural and its singular are one word, counted once per page -- #1289', () => {
+  // Helen's screenshot: "swee" offered "sweet potato" AND "sweet potatoes".
+  const swee = ingredientsOf(PS.create(PLURALS, IS).search('swee'));
+  assert.deepStrictEqual(swee.map((r) => r.label), ['sweet potato', 'sweetcorn']);
+  assert.strictEqual(swee[0].count, 2);
+
+  // One page lists "eggs" and "egg": one word, and that page counted once.
+  const egg = ingredientsOf(PS.create(PLURALS, IS).search('eg'));
+  assert.deepStrictEqual(egg.map((r) => [r.label, r.count]), [['egg', 1]]);
+});
+
+test('the word offered is the entry the index picker offers', () => {
+  // What the dropdown hands to `?ing=` has to be a button the picker has, or
+  // the index is left on a half-finished search (filters.js, applyQueryString).
+  const picker = IS.create(PICKER_VOCAB);
+  const master = picker.buildMasterList(PLURALS.items.flatMap((it) => it.ing));
+  const s = PS.create(PLURALS, IS);
+  ['swee', 'gar', 'car', 'cher', 'eg'].forEach((q) => {
+    const offered = picker.search(q, master).results.map((r) => r.ing);
+    assert.deepStrictEqual(ingredientsOf(s.search(q)).map((r) => r.label), offered, q);
+  });
+  // The modifier and the alias both went: three spellings, one garlic.
+  assert.deepStrictEqual(ingredientsOf(s.search('gar')).map((r) => [r.label, r.count]), [['garlic', 2]]);
+  assert.deepStrictEqual(s.search('fresh').groups, [], 'a stripped modifier names nothing');
+});
+
+test('a merged word still answers to the spelling that was merged away', () => {
+  const s = PS.create(PLURALS, IS);
+  // Labelled "cherries" (first alphabetically, as in the picker's pool); the
+  // singular typed in full prefixes no word of that label and must still find it.
+  assert.deepStrictEqual(ingredientsOf(s.search('cherry')).map((r) => r.label), ['cherries']);
+  // Labelled "sweet potato"; the plural typed in full finds it too.
+  assert.deepStrictEqual(ingredientsOf(s.search('potatoes')).map((r) => r.label), ['sweet potato']);
+  assert.deepStrictEqual(ingredientsOf(s.search('carrots')).map((r) => r.label), ['carrot']);
+});
+
+test('without the picker, or without a vocabulary, every value is its own word', () => {
+  // Fails open: ingredient-search.js not loaded is the pre-#1289 dropdown,
+  // not an empty one.
+  const bare = ingredientsOf(PS.create(PLURALS).search('swee'));
+  assert.deepStrictEqual(bare.map((r) => r.label), ['sweet potato', 'sweet potatoes', 'sweetcorn']);
+  // And a group with no vocabulary is untouched even when the picker is there
+  // -- the drinks' words are a declared list already.
+  const plain = { home: '/x/', items_label: 'x', items: PLURALS.items,
+    groups: [{ kind: 'ingredient', label: 'Has to have', param: 'ing', field: 'ing' }] };
+  assert.deepStrictEqual(ingredientsOf(PS.create(plain, IS).search('swee')).map((r) => r.label),
+    ['sweet potato', 'sweet potatoes', 'sweetcorn']);
+});
+
 // --- every link is one the index reads -------------------------------------------
 
 test('a word\'s link carries the parameter the index grammar reads', () => {

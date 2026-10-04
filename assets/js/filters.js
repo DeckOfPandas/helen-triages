@@ -1849,11 +1849,17 @@ function renderResultsPool() {
        same function a keystroke calls, which already chooses the result when
        it is the only one. When the vocabulary offers several, the one whose
        name IS the word is chosen through its own button, so the choice takes
-       the click handler's path and not a second copy of it. When none is --
-       the picker renamed the entry (a modifier stripped, an alias applied) --
+       the click handler's path and not a second copy of it. When none is,
        the pool is left on screen for the reader to pick from: a half-finished
        search, which is a truthful state and the one the box would be in had
-       they typed it. Last value wins, as with the star. */
+       they typed it. THAT CASE IS RARE SINCE #1289: the dropdown used to
+       offer the recipes' raw text, so every entry this picker renames (a
+       modifier stripped, an alias applied, a plural folded) arrived with no
+       button of its name -- 81 of its 740 words. It now reads its words
+       through IS.buildMasterList and IS.entryKey, as this file does, and what
+       is left is a hand-typed or stale link, and an entry the picker's own
+       multi-word search cannot reach (one with a stopword or an accent in
+       it). Last value wins, as with the star. */
     if (wanted.ing.length && searchBox && resultsPool) {
       var wantedIng = wanted.ing[wanted.ing.length - 1];
       searchBox.value = wantedIng;
