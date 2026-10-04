@@ -73,20 +73,45 @@ IMAGE=helen-triages-devcontainer
 # `apt-get install` resolving to newer packages than last time. The
 # Dockerfile does not pin those, so nothing on disk changes when they move.
 # `docker build --pull --no-cache` by hand is the answer when that matters.
+# (Claude Code was a third until 2026-10-04; it has its own check below.)
 STAMP_LABEL=com.deckofpandas.build-inputs
 
 BUILD_INPUTS_HASH="$(python3 .devcontainer/build_inputs_hash.py)"
 IMAGE_STAMP="$(docker image inspect --format "{{ index .Config.Labels \"$STAMP_LABEL\" }}" "$IMAGE" 2>/dev/null || true)"
 
-if [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ]; then
+# AND IS IT CARRYING THE CURRENT CLAUDE CODE? -- added 2026-10-04.
+# The second thing the hash above cannot see, and the one that moves most days.
+# The Dockerfile takes the version as a build argument; this asks npm what the
+# newest is, and a second label records what the image was built with. One more
+# comparison, same shape as the stamp.
+#
+# NOT KNOWING IS NOT A REASON TO REBUILD, OR TO STOP. Offline, or the registry
+# slow, the lookup prints nothing -- and then the wanted version is whatever the
+# image already has, so the comparison passes and the container starts. Only
+# with no image at all does it fall through to `latest`, where the build needs
+# the network regardless.
+CLAUDE_CODE_LABEL=com.deckofpandas.claude-code-version
+
+IMAGE_CLAUDE_CODE="$(docker image inspect --format "{{ index .Config.Labels \"$CLAUDE_CODE_LABEL\" }}" "$IMAGE" 2>/dev/null || true)"
+[ "$IMAGE_CLAUDE_CODE" = "<no value>" ] && IMAGE_CLAUDE_CODE=""
+CLAUDE_CODE_VERSION="$(python3 .devcontainer/claude_code_latest.py || true)"
+[ -z "$CLAUDE_CODE_VERSION" ] && CLAUDE_CODE_VERSION="${IMAGE_CLAUDE_CODE:-latest}"
+
+if [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ] || [ "$IMAGE_CLAUDE_CODE" != "$CLAUDE_CODE_VERSION" ]; then
   if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
     echo "Image not found -- building $IMAGE (first run)..."
   elif [ -z "$IMAGE_STAMP" ] || [ "$IMAGE_STAMP" = "<no value>" ]; then
     echo "Image carries no build stamp (built before this check, or by hand) -- rebuilding $IMAGE..."
-  else
+  elif [ "$IMAGE_STAMP" != "$BUILD_INPUTS_HASH" ]; then
     echo ".devcontainer/ has changed since $IMAGE was built -- rebuilding..."
+  else
+    echo "Claude Code $CLAUDE_CODE_VERSION is out and $IMAGE has ${IMAGE_CLAUDE_CODE:-an unrecorded version} -- rebuilding..."
   fi
-  docker build -t "$IMAGE" --label "$STAMP_LABEL=$BUILD_INPUTS_HASH" -f .devcontainer/Dockerfile .devcontainer
+  docker build -t "$IMAGE" \
+    --build-arg "CLAUDE_CODE_VERSION=$CLAUDE_CODE_VERSION" \
+    --label "$STAMP_LABEL=$BUILD_INPUTS_HASH" \
+    --label "$CLAUDE_CODE_LABEL=$CLAUDE_CODE_VERSION" \
+    -f .devcontainer/Dockerfile .devcontainer
 fi
 
 # ONE BUNDLE CACHE, AND THE NAME NO LONGER VARIES -- corrected 2026-09-21.

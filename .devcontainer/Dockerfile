@@ -91,7 +91,8 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     && apt-get install -y --no-install-recommends gh \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g @anthropic-ai/claude-code
+# (Claude Code itself is installed at the BOTTOM of this file, not here -- see
+# the note there on why it wants to be the last expensive layer.)
 
 # Python test dependencies (tests/test_front_matter.py etc., run via pytest).
 # Hardcoded rather than COPYing requirements-test.txt, since the build
@@ -184,6 +185,31 @@ RUN echo '' >> /home/helen/.bashrc \
     && echo '[ -f "$HOME/.host-bash_aliases" ] && . "$HOME/.host-bash_aliases"' >> /home/helen/.bashrc \
     && echo '[ -f "$HOME/.host-bash_profile" ] && . "$HOME/.host-bash_profile"' >> /home/helen/.bashrc \
     && chown helen:helen /home/helen/.bashrc
+
+# CLAUDE CODE, AT WHATEVER VERSION run.sh FOUND ON NPM THIS MORNING (2026-10-04).
+# This was a bare `npm install -g` with no version, which reads as "latest" and
+# is not: Docker caches a RUN by its text, the text never changed, so the image
+# kept the version from the day the layer was first built. And the CLI could not
+# repair that itself -- it runs as helen, the global npm folder is root's, and
+# every session opened with "auto-update failed: no write permission".
+#
+# So the version is an ARGUMENT. run.sh asks the registry
+# (claude_code_latest.py), passes the number in, and labels the image with it;
+# a new release changes this RUN's text and nothing above it.
+#
+# LAST ON PURPOSE. Everything after a changed layer is rebuilt, and this one
+# changes most days. Down here a new release costs one npm install; at its old
+# place above the pip and Chromium steps it would have re-run those too.
+#
+# The default is for a build that passes no argument -- by hand, or VS Code's
+# Dev Containers. It works, and it has the old cache problem: `--no-cache`, or
+# `--build-arg CLAUDE_CODE_VERSION=<number>`, is how to move it.
+ARG CLAUDE_CODE_VERSION=latest
+RUN npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+
+# The image is the update mechanism, so the CLI is told not to try: an update
+# written inside a `--rm` container would be gone at the next start anyway.
+ENV DISABLE_AUTOUPDATER=1
 
 USER helen
 WORKDIR /workspace
