@@ -1991,11 +1991,12 @@ family_of:
 # sits under `tops` here because that is what you do with it, and the sugars
 # share a shelf with the syrups because they do the same job in a drink.
 #
-# EVERY GENERIC IN USE HAS A ROW. A generic with none falls to the end of the
+# EVERY DECLARED GENERIC HAS A ROW. A generic with none falls to the end of the
 # list rather than breaking it -- the sort treats an unknown shelf as "last" --
-# but that is a silent degradation, so a new generic should gain a row here in
-# the same commit that introduces it. There is no test for this yet; see the
-# note on #848.
+# but that is a silent degradation, so a new generic gains a row here in the
+# same commit that introduces it. tests/test_cocktails.py refuses a declared
+# generic with no row, a row for an undeclared one, and a shelf that
+# `shopping_shelves` does not list (#1175).
 #
 # FRESH PRODUCE EARNED ITS OWN SHELF ON THE FIRST READING -- Helen, 2026-09-08:
 # "Fresh produce should get its own shelf, I agree." It was the soft edge of the
