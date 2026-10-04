@@ -73,6 +73,153 @@ test('an amount with no number comes back as written, and says so', () => {
   assert.strictEqual(scaleAmount('', 2).text, '');
 });
 
+// -----------------------------------------------------------------------------
+// #1125 -- a measure taken by hand has no fraction, and the note names the
+// INGREDIENT. Helen: "Currently some recipes scale 1 handful to e.g. 1.17
+// handfuls, which is obvious nonsense."
+//
+// THE LIST IS READ FROM THE REAL DATA FILE, not restated here, so a word taken
+// out of _data/food/scaling.yml fails these by name. The file is a flat YAML
+// list and node has no YAML parser; the reader below takes the `  - word`
+// lines under the one key and nothing cleverer.
+// -----------------------------------------------------------------------------
+const fs = require('node:fs');
+const path = require('node:path');
+
+function yamlList(file, key) {
+  const lines = fs.readFileSync(
+    path.join(__dirname, '..', '..', '_data', 'food', file), 'utf8').split('\n');
+  const start = lines.indexOf(key + ':');
+  assert.notStrictEqual(start, -1, `${file} has no top-level ${key}: key`);
+  const out = [];
+  for (const line of lines.slice(start + 1)) {
+    if (/^\S/.test(line) && !line.startsWith('#')) break;
+    const item = /^\s+-\s+(.+?)\s*$/.exec(line);
+    if (item) out.push(item[1]);
+  }
+  return out;
+}
+
+const WORDS = {
+  unscaled: yamlList('scaling.yml', 'unscaled_measures'),
+  trailing: yamlList('ingredient_words.yml', 'trailing_phrases')
+};
+
+test('the two word lists were actually read', () => {
+  assert.ok(WORDS.unscaled.includes('handful'), WORDS.unscaled.join());
+  assert.ok(WORDS.trailing.includes('to taste'), WORDS.trailing.join());
+});
+
+test('a handful is not scaled -- 1.17 handfuls is "obvious nonsense"', () => {
+  // Seven portions of a recipe for six: the case in the issue.
+  const r = scaleAmount('1 handful', 7 / 6, WORDS);
+  assert.strictEqual(r.text, '1 handful');
+  assert.strictEqual(r.scaled, false);
+});
+
+test('every way the collection writes a hand measure stays as written', () => {
+  // Each of these is a real `amount:` in _food_recipes/ or _food_drafts/.
+  ['1 handful', '2 handfuls', '1 small handful', '1 large handful each',
+    '1 small handful each', '1 pinch', '1 splash', '1 knob', '2 pats',
+    '2 large pats'].forEach((amount) => {
+    const r = scaleAmount(amount, 2, WORDS);
+    assert.strictEqual(r.text, amount);
+    assert.strictEqual(r.scaled, false, amount);
+  });
+});
+
+test('a plural in -es is the same measure', () => {
+  assert.strictEqual(scaleAmount('2 pinches', 2, WORDS).scaled, false);
+  assert.strictEqual(scaleAmount('3 dashes', 2, WORDS).scaled, false);
+  assert.strictEqual(scaleAmount('2 splashes', 2, WORDS).scaled, false);
+});
+
+test('the measure is a whole word, so nothing else is caught by it', () => {
+  // `pat` must not hold back a pâté tin, nor `dash` a dashi sachet.
+  assert.strictEqual(scaleAmount('2 patties', 2, WORDS).text, '4 patties');
+  assert.strictEqual(scaleAmount('1 dashi sachet', 2, WORDS).scaled, true);
+  assert.strictEqual(scaleAmount('200 g', 2, WORDS).text, '400 g');
+});
+
+test('"2 large" still scales with the list in hand', () => {
+  // Helen, #1005: "Things like '2 large' can scale, surely". scaling.yml says
+  // why a size word must never join the list; this is what would notice.
+  assert.strictEqual(scaleAmount('2 large', 2, WORDS).text, '4 large');
+  assert.strictEqual(scaleAmount('4 medium', 0.5, WORDS).text, '2 medium');
+  assert.strictEqual(scaleAmount('1 small', 3, WORDS).text, '3 small');
+});
+
+test('counts of things you can pick up still scale', () => {
+  // Deliberately NOT in the list -- scaling.yml has the argument. If Helen
+  // rules that a sprig or a bunch is a hand measure too, these change with it.
+  assert.strictEqual(scaleAmount('4 sprigs', 2, WORDS).text, '8 sprigs');
+  assert.strictEqual(scaleAmount('1 bunch', 2, WORDS).text, '2 bunches');
+});
+
+test('with no list given, a handful scales as it did before #1125', () => {
+  // The list is passed in, never assumed: a caller that hands none over gets
+  // the old arithmetic rather than a guess at what the data says.
+  assert.strictEqual(scaleAmount('1 handful', 2).scaled, true);
+  assert.strictEqual(scaleAmount('1 handful', 2, {}).scaled, true);
+  assert.strictEqual(scaleAmount('1 handful', 2, { unscaled: [] }).scaled, true);
+});
+
+test('the note names the ingredient -- Helen\'s two examples, verbatim', () => {
+  const { noteName } = foodScale;
+  // "few dashes of Tabasco sauce to taste, unless feeding Helen" ->
+  // "Not scaled: Tabasco sauce"
+  assert.strictEqual(
+    noteName('few dashes of Tabasco sauce to taste, unless feeding Helen', WORDS),
+    'Tabasco sauce');
+  // "a handful of fresh parsley" -> "Not scaled: fresh parsley"
+  assert.strictEqual(noteName('a handful of fresh parsley', WORDS), 'fresh parsley');
+});
+
+test('the note name drops the preparation and the aside', () => {
+  const { noteName } = foodScale;
+  // Real `item:` lines, as the row prints them once the amount is taken out.
+  assert.strictEqual(noteName('fresh flat-leaf parsley, chopped', WORDS),
+    'fresh flat-leaf parsley');
+  assert.strictEqual(noteName('paprika, unless feeding Helen', WORDS), 'paprika');
+  assert.strictEqual(noteName('coriander, torn (optional)', WORDS), 'coriander');
+  assert.strictEqual(noteName('milk (any kind), to glaze', WORDS), 'milk');
+  assert.strictEqual(noteName('salt, to taste', WORDS), 'salt');
+  assert.strictEqual(noteName('lemongrass paste to taste', WORDS), 'lemongrass paste');
+  assert.strictEqual(noteName('  sultanas \n ', WORDS), 'sultanas');
+});
+
+test('the note name drops a measure written into the item', () => {
+  const { noteName } = foodScale;
+  assert.strictEqual(noteName('a few dashes of Tabasco sauce to taste', WORDS),
+    'Tabasco sauce');
+  assert.strictEqual(noteName('a few handfuls of wild rocket leaves', WORDS),
+    'wild rocket leaves');
+  assert.strictEqual(noteName('A large handful of fresh coriander, to serve', WORDS),
+    'fresh coriander');
+  assert.strictEqual(noteName('a good pinch of salt', WORDS), 'salt');
+  assert.strictEqual(noteName('pinch of salt', WORDS), 'salt');
+  assert.strictEqual(noteName('a pat of salted butter, to finish', WORDS),
+    'salted butter');
+});
+
+test('"of" inside a name is not a measure phrase', () => {
+  // ingredient_words.yml's own trap: stripping up to any "of" would hand back
+  // "tartar" and "soda". Only a DECLARED measure before the "of" is cut.
+  const { noteName } = foodScale;
+  assert.strictEqual(noteName('cream of tartar', WORDS), 'cream of tartar');
+  assert.strictEqual(noteName('bicarbonate of soda', WORDS), 'bicarbonate of soda');
+  assert.strictEqual(noteName('a glass of robust red wine, preferably Cab or Merlot', WORDS),
+    'a glass of robust red wine');
+});
+
+test('a note name is never cut to nothing', () => {
+  const { noteName } = foodScale;
+  assert.strictEqual(noteName('to taste', WORDS), 'to taste');
+  assert.strictEqual(noteName('(optional) capers', WORDS), '(optional) capers');
+  assert.strictEqual(noteName('', WORDS), '');
+  assert.strictEqual(noteName('sea salt, to taste'), 'sea salt');
+});
+
 test('a scaled amount says it moved', () => {
   assert.strictEqual(scaleAmount('200 g', 2).scaled, true);
 });

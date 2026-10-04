@@ -175,7 +175,9 @@ layout: default
              DECISIONS §9.10 (#544), §9.3.1 (#707). {% endcomment %}
           {% assign headline = "" %}
           {% assign standing_note = "" %}
+          {% assign g_count = 0 %}
           {% for g in item.generic %}
+            {% assign g_count = g_count | plus: 1 %}
             {% assign g_display = g %}
             {% if always_fresh contains g %}
               {% capture g_display %}fresh {{ g }}{% endcapture %}
@@ -189,6 +191,54 @@ layout: default
               {% assign standing_note = standing_notes[g] %}
             {% endif %}
           {% endfor %}
+
+          {% comment %} A UNIT THE NAME ALREADY SAYS IS NOT SAID TWICE -- #1132,
+             Helen's whole report: "1 cube sugar cube". The data is right
+             (`amount: "1 cube"`, `generic: "sugar cube"` -- the unit is
+             required, and the generic is the thing she will not make the drink
+             without), so the fix is here, in what the line PRINTS.
+
+             TWO CASES, one mark. `each` is never printed: "1.5 each passion
+             fruit" reads "1.5 passion fruit". And a unit that is the name's
+             own last word MOVES INTO THE NAME: "1 cube" + "sugar cube" prints
+             "1" + "sugar cube", "12 cubes" prints "12" + "sugar cubes", "8
+             leaves" + "kaffir lime leaves" prints "8" + "kaffir lime leaves".
+             The name's last word is REPLACED by the unit as the amount wrote
+             it, so the plural is the amount's and nothing here pluralises.
+
+             THE COMPARISON FOLDS BOTH WORDS TO A SINGULAR by the `|` trick
+             below (cube/cubes, leaf/leaves, dash/dashes), because Liquid has
+             no regex. Only a ONE-WORD unit after the number, and only a
+             single generic -- "30 ml X or Y" is left exactly as written.
+
+             `data-amount` KEEPS THE WRITTEN AMOUNT FOR THE SCALER, which has
+             always preferred that attribute to the span's text;
+             `data-unit-quiet` tells cocktail-scale.js to print the number
+             alone and put the unit in `.cocktail-unit-in-name` if the row has
+             one. assets/js/shopping-list.js applies the same rule to the
+             index's shopping list (`quietUnit`). MANUAL §9.10. {% endcomment %}
+          {% assign amount_shown = item.amount %}
+          {% assign unit_quiet = false %}
+          {% assign unit_in_name = "" %}
+          {% assign a_parts = item.amount | append: "" | split: " " %}
+          {% if a_parts.size == 2 %}
+            {% assign a_unit = a_parts[1] %}
+            {% if a_unit == "each" %}
+              {% assign unit_quiet = true %}
+            {% elsif g_count == 1 %}
+              {% assign name_words = headline | split: " " %}
+              {% if name_words.size > 1 %}
+                {% assign unit_folded = a_unit | downcase | append: "|" | replace: "leaves|", "leaf|" | replace: "shes|", "sh|" | replace: "ches|", "ch|" | replace: "s|", "|" %}
+                {% assign name_folded = name_words | last | downcase | append: "|" | replace: "leaves|", "leaf|" | replace: "shes|", "sh|" | replace: "ches|", "ch|" | replace: "s|", "|" %}
+                {% if unit_folded == name_folded %}
+                  {% assign unit_quiet = true %}
+                  {% assign unit_in_name = a_unit %}
+                  {% assign headline = name_words | pop | join: " " %}
+                {% endif %}
+              {% endif %}
+            {% endif %}
+            {% if unit_quiet %}{% assign amount_shown = a_parts[0] %}{% endif %}
+          {% endif %}
 
           {% comment %} The bottle, oxford-joined, in brackets after the class.
              `suggestion` is name(s) only since #457, so it needs no shaping. {% endcomment %}
@@ -231,12 +281,12 @@ layout: default
                  SIBLING of `.cocktail-amount`, never inside it, because
                  cocktail-scale.js reads that span's whole text as a quantity.
                  MANUAL §9.3 / DECISIONS §9.3 (#1263). {% endcomment %}
-              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount">{{ item.amount }}</span>{% endif %}{% if item.as %}<span class="cocktail-use">({{ item.as }})</span>{% endif %}</span>{% endif %}
+              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}>{{ amount_shown }}</span>{% endif %}{% if item.as %}<span class="cocktail-use">({{ item.as }})</span>{% endif %}</span>{% endif %}
               {% comment %} AFTER THE NAME: the bottle in brackets, then
                  "(optional)" (#1141). The name has its own span so nothing
                  aimed at it reaches the brackets. The brackets are markup, so
                  the words copy as they read. DECISIONS §9.10 (#1141). {% endcomment %}
-              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
+              <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}{% if unit_in_name != "" %} <span class="cocktail-unit-in-name">{{ unit_in_name }}</span>{% endif %}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
               <p class="cocktail-type-line">{{ class_html }}</p>

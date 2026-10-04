@@ -3309,9 +3309,85 @@ POUR_USE = re.compile(r'<span class="cocktail-use">')
 # after the amount span's closing tag and never inside it.
 POUR_USE_UNDER_AMOUNT = re.compile(
     r'<span class="cocktail-measure">'
-    r'(?:<span class="cocktail-amount">[^<]*</span>)?'
+    r'(?:<span class="cocktail-amount"[^>]*>[^<]*</span>)?'
     r'<span class="cocktail-use">\([a-z]+\)</span></span>'
 )
+
+# #1132. One ingredient row's amount and name, as the page prints them. The
+# amount span may carry attributes (a quiet row does), the name may hold the
+# `.cocktail-unit-in-name` slot, and the bottle and "(optional)" that can
+# follow the name are deliberately outside the second group.
+POUR_AMOUNT_AND_NAME = re.compile(
+    r'<span class="cocktail-amount"(?P<attrs>[^>]*)>(?P<amount>[^<]*)</span>'
+    r'(?:<span class="cocktail-use">[^<]*</span>)?</span>\s*'
+    r'<span class="cocktail-item"><span class="cocktail-item-name">'
+    r'(?P<name>(?:[^<]|<span class="cocktail-(?:style-or|unit-in-name)">[^<]*</span>)*)</span>'
+)
+
+
+def _fold_word(word):
+    """`cubes` and `cube`, `leaves` and `leaf`: one word. For the check below."""
+    w = word.lower()
+    if w == "leaves":
+        return "leaf"
+    if re.search(r"(sh|ch)es$", w):
+        return w[:-2]
+    return w[:-1] if w.endswith("s") and not w.endswith("ss") else w
+
+
+def test_no_drink_page_says_a_unit_twice(prod_site):
+    """#1132, Helen's whole report: "1 cube sugar cube".
+
+    `amount: "1 cube"` beside `generic: "sugar cube"` -- each right, and the
+    page printing the word twice. The layout now prints the number alone and
+    the unit as the last word of the NAME, and never prints `each` at all
+    ("1.5 each passion fruit"). The recipes are untouched: `data-amount`
+    still holds what the file says, which is what the scaler reads.
+
+    EVERY BUILT PAGE IS READ, so the next drink written this way is covered
+    without anyone naming it; and the Classic Champagne Cocktail is checked
+    by name, so a matcher that has stopped matching cannot pass by finding
+    nothing wrong.
+    """
+    pages = _drink_pages(prod_site)
+    assert len(pages) > 20, f"only {len(pages)} drink pages were built"
+
+    problems, rows, quiet = [], 0, {}
+    for page in pages:
+        html = page.read_text(encoding="utf-8")
+        for match in POUR_AMOUNT_AND_NAME.finditer(html):
+            rows += 1
+            amount = match.group("amount").split()
+            name = re.sub(r"<[^>]+>", " ", match.group("name")).split()
+            if "data-unit-quiet" in match.group("attrs"):
+                quiet[page.parent.name] = (
+                    " ".join(amount), " ".join(name), match.group("attrs").strip())
+            if len(amount) != 2 or not name:
+                continue
+            if amount[1] == "each":
+                problems.append(f"{page.parent.name}: '{' '.join(amount)}' prints `each`")
+            elif len(name) > 1 and _fold_word(amount[1]) == _fold_word(name[-1]):
+                problems.append(
+                    f"{page.parent.name}: '{' '.join(amount)} {' '.join(name)}' "
+                    f"says '{amount[1]}' twice")
+
+    assert rows > 200, (
+        f"only {rows} ingredient rows were matched across {len(pages)} drink "
+        f"pages, so POUR_AMOUNT_AND_NAME has drifted from the layout's markup "
+        f"and this test is reading almost nothing."
+    )
+    assert not problems, (
+        "a drink page prints a unit its ingredient's name already says, or "
+        "prints `each` (#1132). _layouts/cocktail.html decides which rows are "
+        "quiet:\n  " + "\n  ".join(problems)
+    )
+    assert quiet.get("classic-champagne-cocktail") == (
+        "1", "sugar cube", 'data-amount="1 cube" data-unit-quiet'
+    ), (
+        "the Classic Champagne Cocktail should print '1' beside 'sugar cube' "
+        "and keep the written '1 cube' in data-amount for the scaler; got "
+        f"{quiet.get('classic-champagne-cocktail')}"
+    )
 
 
 def test_a_pours_direction_sits_under_its_amount(prod_site):

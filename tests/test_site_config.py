@@ -368,6 +368,55 @@ def test_the_recipe_scaler_scripts_load_in_dependency_order():
     )
 
 
+def test_the_recipe_scaler_is_handed_the_unscaled_measures():
+    """#1125. A handful does not scale, and WHICH words mean that is data.
+
+    `unscaled_measures` in _data/food/scaling.yml reaches the page by one
+    route: _layouts/recipe.html joins it onto the scaler control as
+    `data-unscaled`, and recipe-scale.js reads that attribute. Break either
+    end and nothing errors -- food-scale.js treats a missing list as an empty
+    one -- so "1 handful" quietly goes back to scaling to "1.17 handfuls",
+    which is the bug the issue was raised for. `trailing_phrases` travels the
+    same way for the name on the "(Not scaled: ...)" line.
+    """
+    scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
+    measures = scaling.get("unscaled_measures")
+    assert measures and "handful" in measures, (
+        "_data/food/scaling.yml has no `unscaled_measures` list naming "
+        "`handful`; the recipe scaler will scale handfuls again."
+    )
+    not_plain = [m for m in measures
+                 if not isinstance(m, str) or not re.fullmatch(r"[a-z]+", m)]
+    assert not not_plain, (
+        f"unscaled_measures entries must be one lowercase word each, singular; "
+        f"got {not_plain}. The layout joins the list with `|` and "
+        f"food-scale.js adds the plural itself."
+    )
+    sizes = sorted({"large", "medium", "small"} & set(measures))
+    assert not sizes, (
+        f"{sizes} must never be an unscaled measure: Helen ruled that "
+        f"'2 large' scales (#1005), and 240 amounts are written that way."
+    )
+
+    html = read("_layouts", "recipe.html")
+    wiring = {
+        "data-unscaled": "site.data.food.scaling.unscaled_measures",
+        "data-trailing": "site.data.food.ingredient_words.trailing_phrases",
+    }
+    script = read("assets", "js", "recipe-scale.js")
+    for attribute, source in wiring.items():
+        assert re.search(
+            re.escape(attribute) + r'="\{\{\s*' + re.escape(source) + r"\s*\|\s*join:\s*'\|'",
+            html,
+        ), (
+            f"_layouts/recipe.html no longer emits {attribute} from {source} "
+            f"joined with `|`, so recipe-scale.js is handed no list."
+        )
+        assert f"'{attribute}'" in script, (
+            f"assets/js/recipe-scale.js no longer reads {attribute}."
+        )
+
+
 def test_the_food_shopping_scripts_load_in_dependency_order():
     """food-shopping-list.js reads HTF.shoppingList, and filters.js reads both.
 

@@ -1252,7 +1252,42 @@ a missing glasses entry is one glass, a missing portions entry is *however many
 this recipe makes*, which only the build knows — so `1` is a real, storable
 answer here.
 
-**Where it is tested.** `food-shopping-list.test.js` (the arithmetic),
+**THE RECIPE PAGE HAS A SCALER TOO, AND A HANDFUL DOES NOT SCALE** (#1005,
+#1125). `assets/js/food-scale.js` is one amount at a factor, through this same
+parser and `totalText`; `assets/js/recipe-scale.js` is the wiring. Three kinds
+of line stay as written when the portions move, and each is NAMED on Helen's
+line under the control — `(Not scaled: fresh flat-leaf parsley, Tabasco
+sauce)`, parenthesised, comma-joined, no full stop (#1088): an ingredient with
+no amount, an amount with no number in it, and a numbered amount in a measure
+taken by hand.
+
+**Which measures those are is data: `unscaled_measures` in
+`_data/food/scaling.yml`** — `handful`, `pinch`, `dash`, `splash`, `knob`,
+`pat`. `_layouts/recipe.html` joins the list onto the control as
+`data-unscaled` and the script passes it in, so adding one is a line of YAML;
+`food-scale.js` names no measure, and handed no list it holds nothing back.
+The word is matched whole, anywhere after the number, singular or plural
+(`1 small handful`, `2 handfuls`, `1 large handful each`). **`large`, `medium`
+and `small` must never join it** — Helen: *"Things like '2 large' can scale,
+surely"* — and a test refuses them. `sprig`, `bunch`, `drop` and `twist` are
+deliberately absent: counts of a thing you can pick up, which still scale; the
+file has the counts and the argument.
+
+**The NAME on that line is the ingredient, not the recipe's sentence about
+it** (`noteName`): a leading measure phrase written into `item:` is dropped
+("a few dashes of", only where the phrase holds a declared measure and ends in
+`of`, so `cream of tartar` survives), then everything from the first comma or
+open bracket — the cut `_plugins/food_shopping.rb` makes for the list above —
+then a trailing `to taste`/`to serve` from `trailing_phrases` in
+`ingredient_words.yml`. **The comma cut is what makes the comma-joined line
+safe**, and its cost is that an item which is itself a list (`fresh parsley,
+thyme and sage`) is named by its first member. **The index's shopping list
+does NOT apply `unscaled_measures`**: it still totals `1 handful` at ⅔.
+
+**Where it is tested.** `food-scale.test.js` (the recipe page's scaler, reading
+the real `scaling.yml`), `test_the_recipe_scaler_is_handed_the_unscaled_measures`
+in `tests/test_site_config.py` (the data reaching the page),
+`food-shopping-list.test.js` (the arithmetic),
 `shopping-list.test.js` (the parser, including the no-change-for-cocktails
 claim), `food-index-startup.test.js` (the wiring, §10.2),
 `tests/test_food_shopping.py` (the two data files),
@@ -2325,6 +2360,34 @@ for. `generic`/`suggestion` may be a string or a list — Liquid's `for` treats 
 bare string as a one-item sequence — and a list `generic` joins with a quiet
 italic "or". `optional: true` renders as a plain word after the name; it is
 not food's `incidental` (that HIDES a line; this shows and marks it).
+
+**A unit the name already says is not printed twice** (#1132, Helen's whole
+report: *"1 cube sugar cube"*). The data is right and stays as it is —
+`amount: "1 cube"`, `generic: "sugar cube"` — and the line is fixed where it
+is PRINTED, in three places that share one rule:
+
+    1 cube + sugar cube            →  1    sugar cube
+    12 cubes + sugar cube          →  12   sugar cubes
+    8 leaves + kaffir lime leaves  →  8    kaffir lime leaves
+    1.5 each + passion fruit       →  1.5  passion fruit
+
+**The unit MOVES INTO THE NAME** when it is the name's own last word (compared
+folded to a singular), replacing that word as the amount wrote it — so the
+plural is always the amount's and nothing pluralises a generic. **`each` is
+never printed.** Only a one-word unit after the number, only a single
+`generic`, and never a one-word name. `16 cubes raw sugar` and `3 leaves basil`
+repeat nothing and are untouched.
+
+| where | how |
+|---|---|
+| `_layouts/cocktail.html` | decides at build: prints the number in `.cocktail-amount`, marks it `data-unit-quiet`, keeps the written amount in `data-amount`, and puts the unit in `.cocktail-unit-in-name` |
+| `assets/js/cocktail-scale.js` | obeys the mark and decides nothing: scales `data-amount` as ever, then writes the number to the amount and the unit to the slot (`HTF.scale.splitUnit`) |
+| `assets/js/shopping-list.js` | `quietUnit` — the same rule for the index's shopping list, where the label takes the plural (`13` `sugar cubes`); `generic` and each total's `unit` are unchanged |
+
+**The rule is stated twice, in Liquid and in `shopping-list.js`**, because the
+drink page is built before any script runs. `test_no_drink_page_says_a_unit_twice`
+reads every built page; `shopping-list.test.js` has the same pours. The cards
+print no amounts, so `_plugins/cocktail_card_ingredients.rb` is not involved.
 
 ### 9.10.1 Cards and search read the VOCABULARY, never the transcription
 
