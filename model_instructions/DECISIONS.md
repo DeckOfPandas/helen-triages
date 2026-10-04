@@ -854,6 +854,40 @@ unless stated.
   the text would be editing imported words to satisfy a scanner. The other half
   stands: text that begins `QQ` must be labelled `QQ`. An ingest's OWN notes
   are unchanged — both halves `QQ`, and `ingest_inbox.py` still demands it.
+- **2026-10-04, #814 — the retro-fit ran, and the yield was lopsided: 103 of
+  142, then 18 of 174.** Every one of the 316 drafts was read; the grouping is
+  a per-draft judgement, and a script did only the line surgery and the proof
+  (flattened step list, ingredient multiset and every other key identical to
+  `main`, 121 of 121). Food-private PR #43.
+  - **The 142 mostly grouped; the 174 mostly did not, and that is the
+    finding.** A draft whose ingest left one unnamed ingredient list is, 85%
+    of the time, genuinely one phase. "Ingredient groups → method groups" was
+    the real backlog; "neither" was mostly not a backlog at all.
+  - **Contiguity is what stops a method being grouped, not naming.** 35 drafts
+    stay flat because a component is made part-way through another. Method
+    groups must be runs of the original steps, so those cannot be grouped
+    without reordering or splitting a step, which is rewriting.
+  - **Inheriting ingredient names costs a home for the last step.** In batch 1
+    no name could be invented, so 36 drafts carry an assemble/bake/serve step
+    under the last component's heading. Batch 2, free to name, used
+    `assembly` or `to serve` for that tail.
+  - **First-use assignment misplaces a split ingredient**:
+    `blackcurrant-cheesecake`'s 275 g of sugar sits under the sauce that uses
+    25 g.
+  - **`to serve` is the only group name the layout special-cases; any other
+    `to …` name renders as "For the to finish:".** New names were kept to bare
+    nouns for that reason.
+- **2026-10-04, #577 — re-measured: 6 items in 6 drafts, all of them refusals.**
+  A session was briefed to script the size-word pass from the issue body's
+  "109 drafts, 141 items" and found it done: `640834a` in the food drafts repo
+  (PR #40, 2026-09-24) moved 131 items in 102 drafts with `tidy_drafts.py
+  --only size`. What remains is exactly what that rule refuses: three `N` /
+  `large or M small …` (a second count in the item) and three `baby gem` /
+  `baby plum` (a kind, §6). **The issue still carried the old number and no
+  comment recording the pass, because a trailer from a private repo neither
+  closes nor cross-references a public issue.** Measure before briefing:
+  `python3 scripts/tidy_drafts.py --site food --only size` answers it in one
+  call.
 
 ### §4.0 The gate flags
 
@@ -975,6 +1009,29 @@ unless stated.
   longer be answered "put it in META FILTERS"; Helen: *"I need to think about
   that more."* Open: #508 (the word and the permalink), #509 (the README, in
   her voice).
+- **2026-10-04, #1201, #507** — **The magic bag is filled, not retired, and it
+  gets a mark, not a filter.** Helen ticked "Fill it" and wrote (2026-09-28):
+  *"I don't need to filter by this. Let's just give it a quiet mark, where
+  "draft" is on the live site, and next to it on the local site."* That closes
+  #507. The span was already in the `draft` slot (`.badge-group-meta`), ahead
+  of `draft`; what was wrong was the look. `.badge-draft` had declared a tint
+  and a lighter text colour since the first commit and `.badge-magic-bag`
+  nothing, so `magic bag` was the LOUDER of the pair, while `_badges.scss` had
+  said since #562 that they were identical "because neither declares
+  anything". One rule styles both now, and a rendered test reads the compiled
+  css. **A comment asserting two things look the same is not a check.** No row
+  carries both marks: a row comes from one collection.
+- **2026-10-04, #1201** — **The spec had tested nothing for four weeks.** Every
+  test in `test_magic_bag.py` is per-entry; the collection emptied on
+  2026-09-07 and the file collected zero cases and read green. The issue's own
+  fix, "assert the collection is non-empty", was not shipped: the dishes come
+  from Helen's head, and that assertion would hold `main` red, and so every
+  deploy, until she wrote one. Instead a committed fixture entry
+  (`tests/fixtures/magic_bag/`) is parametrised ahead of the real ones, a
+  second test breaks it one way per rule and requires the rule to fail, and an
+  empty collection prints "Not evidence about the magic bag" at the end of the
+  run. **An empty collection is not a defect; a schema nothing runs is.**
+  Still owed: the dishes themselves; #508, #509.
 
 ---
 
@@ -1312,6 +1369,30 @@ unless stated.
   this row must open with a number. Moved into the input's `title` and
   `aria-label`. The `×` on a batch box survives because it is a MARK and not a
   second number, which is the whole distinction.
+- **2026-10-04, #1125** — **A handful does not scale, and which measures
+  those are is DATA.** Helen: *"find a way to parameterise ingredient lines
+  that won't scale ... The scaler line should say: 'Not scaled: Tabasco sauce'
+  / 'Not scaled: fresh parsley'"* and *"Currently some recipes scale 1 handful
+  to e.g. 1.17 handfuls, which is obvious nonsense."* The recipe page's scaler
+  already left alone an amount with no number and an ingredient with no
+  amount; `1 handful` has a number, so it parsed and the arithmetic ran.
+  `unscaled_measures` in the new `_data/food/scaling.yml` — handful, pinch,
+  dash, splash, knob, pat — reaches the page as `data-unscaled` on the
+  control. Measured first: 23 numbered amounts in 19 files (14 published).
+  **`large`/`medium`/`small` can never join the list** (her #1005 ruling, a
+  test refuses them). **Left scaling, unruled:** sprig, bunch, drop, twist,
+  lot — counts of a thing you can pick up. **The name on the line is the
+  ingredient**: a leading measure phrase in `item:` goes, then everything from
+  the first comma or bracket (the cut `food_shopping.rb` makes), then a
+  trailing `to taste` from `trailing_phrases`. The comma cut is also what
+  makes #1088's comma-joined line actually safe: `recipe-scale.js` had said
+  the names came from `.recipe-item-name` and so held no comma; no such class
+  ever existed, the names were the whole `item:` text, and dozens of published
+  lines had one. **A comment that explains why something is safe is a claim,
+  and this one was never checked.** Cost of the cut, knowingly taken: an item
+  that is itself a list (`fresh parsley, thyme and sage`) is named by its
+  first member. **Not done: the index's shopping list still totals
+  `1 handful` at ⅔.**
 
 ---
 
@@ -3199,6 +3280,24 @@ unless stated.
   Courier and at 0.72rem cuts through the letters like a strikethrough; it
   would also be the first violet rule in the ingredient list since the name
   underlines went on 2026-09-05 for looking like links.
+- **2026-10-04, #1132** — **A unit the name already says is not printed
+  twice.** Helen's whole report: *"1 cube sugar cube"*. The data is right
+  (`amount: "1 cube"`, `generic: "sugar cube"` — the unit is required, and the
+  generic is the thing she will not make the drink without), so it is fixed in
+  what the line PRINTS and no recipe is touched. Measured first: 9 of 765
+  pours across both collections, two shapes — the unit is the name's own last
+  word, or the unit is `each`. **The unit MOVES INTO THE NAME**, replacing the
+  name's last word as the amount wrote it ("12 cubes" + "sugar cube" → "12" +
+  "sugar cubes"), so the plural is always the amount's and nothing pluralises
+  a generic; `each` is simply not printed. **What was tried and dropped:**
+  trimming the NAME instead ("1 cube" + "sugar") prints a generic the drink
+  does not have; a bare number beside an unchanged name gives "2 sugar cube"
+  the first time the scaler is pressed. The layout decides and marks the
+  amount `data-unit-quiet`, keeping the written amount in `data-amount`;
+  `cocktail-scale.js` only obeys the mark, and `shopping-list.js` applies the
+  same rule to the index list (`quietUnit`). **The rule is stated twice, in
+  Liquid and in JS**, because the page is built before any script runs; the
+  rendered-page test and the node tests use the same pours.
 
 ### §9.10a `serve`
 
