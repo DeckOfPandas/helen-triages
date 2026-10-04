@@ -1636,7 +1636,12 @@ unless stated.
   entry's words are not). **Two pairs the picker itself still offers twice**,
   because nothing in the vocabulary joins them: `plum`/`plums` and
   `almond`/`almonds`. Not added on Claude's say-so; which form wins is
-  Helen's. A typed plural still finds its merged word (`potatoes`, `cherry`,
+  Helen's. **She ruled the same day: *"Plum. Almonds."*** — `plums: plum`
+  and `almond: almonds` joined `aliases`, the second against the list's
+  singular-wins habit because the plural is what 23 recipes write. **And the
+  15 are fine as they are**: offered an issue for the picker's multi-word
+  search missing a stopword or an accent, *"No need to raise the issue as I
+  think that behaviour is fine."* A typed plural still finds its merged word (`potatoes`, `cherry`,
   `carrots`): the query is read through the same two steps and tried against
   the merged key. The module is fetched on first focus where the page has not
   loaded it, and the box fails open to the raw words without it. Cocktails
