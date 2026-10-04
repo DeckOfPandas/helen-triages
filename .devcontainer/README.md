@@ -99,6 +99,26 @@ rebuild deliberately:
 
 (then let the next `run.sh` re-stamp it).
 
+### Keeping Claude Code current
+
+Claude Code can't update itself in here: it runs as `helen`, the global
+npm folder belongs to root, and anything it did manage to write would be
+gone when the `--rm` container exits. So the image is the update
+mechanism, and `DISABLE_AUTOUPDATER=1` stops the CLI trying (and warning
+that it failed).
+
+Every `run.sh` asks npm which version is newest
+(`claude_code_latest.py`), and rebuilds if the image was built with a
+different one. The version goes in as a build argument, so only the
+Claude Code layer -- the last one in the Dockerfile -- is rebuilt: one
+`npm install`, not the whole image. A second label,
+`com.deckofpandas.claude-code-version`, records what the image carries.
+
+If the lookup fails (offline, registry slow) the container starts on the
+image it has. A hand build passes no version and gets `latest`, which
+Docker will happily serve from cache; add
+`--build-arg CLAUDE_CODE_VERSION=<number>` to move it.
+
 ### 3. First-time Claude Code login (Max plan, no API key needed)
 
 Inside the container:
