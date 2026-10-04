@@ -1335,6 +1335,7 @@ was ×1.2 of two eggs.
 |---|---|---|---|
 | `4–6 waffles, depending on …` | `5` waffles — the midpoint | `10` waffles | *"Take the midpoint"* |
 | a figure that lands on a half (`4–7`) | `5–6` — a range of one | `11` | *"Midpoints that land on a half can become a range of one."* |
+| `about 8 pancakes` | about `8` pancakes | about `16` pancakes | *'Can Delia's pancakes please scale as "8 pancakes", "16 pancakes".'* |
 | `64+ tiny macarons` | `64+` tiny macarons | `128+` | *"64+ tiny macarons, 128+ tiny macarons"* |
 | `one 8-inch cake` — a number WORD | `1` × 8-inch cake | `2` × 8-inch cakes | *"Two 8-inch cakes"* |
 | `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies | *'"1 dozen" doubled can be "two dozen".'* |
@@ -1363,16 +1364,40 @@ conservative — one line that will not halve refuses the recipe:
 | the amount is | it halves |
 |---|---|
 | a weight, volume or length (`divisible_units`) | always |
-| a spoon, cup or imperial measure (`quarter_units`) | if it is a multiple of ¼ — an eighth is the smallest fraction the page prints, so `⅛ tsp` and `⅓ cup` refuse |
+| a spoon or imperial measure (`quarter_units`) | if it is a multiple of ¼ — an eighth is the smallest fraction the page prints, so `⅛ tsp` refuses |
+| a cup (`half_units`) | if it is a multiple of ½ — a cup goes down to a quarter and no further |
 | a by-eye measure (`half_step_measures`) | always; it has its own rule |
-| a count of things — `3` eggs, `2 large`, `1 sprig`, `1 x 400 g` tin | if it is EVEN, or the thing is on the `halvable` list (lemon, lime, orange, onion, shallot, garlic, clove, chilli, cinnamon stick, vanilla pod) |
+| a count of things — `3` eggs, `2 large`, `1 sprig`, `1 x 400 g` tin | if it is EVEN, or the thing is on the `halvable` list (lemon, lime, orange, onion, shallot, garlic, clove, chilli, cinnamon stick, vanilla pod, leaf, star anise, nutmeg, stock cube, sachet, tin, jar) |
 | no number, or no amount | cannot object: it does not scale |
 
 and the yield must halve to at least one of itself: `one 8-inch cake`,
-`1 jar`, `1 dozen` and `1 litre` refuse; `5 waffles` halves to `2–3`, `64+` to
-`32+`, `125 ml` to `62–63 ml`; a portions box halves only an even number. All
-four lists are data, `half_recipe:` in `_data/food/scaling.yml`. **`egg` is
-not `halvable`, on purpose**, and that one word decides most refusals.
+`1 jar`, `1 dozen` and `1 litre` refuse; an odd count halves to a range of one,
+`64+` to `32+`, `125 ml` to `62–63 ml`; a portions box halves only an even
+number. All the lists are data, `half_recipe:` in `_data/food/scaling.yml`.
+
+**What Helen ruled on the judge, 2026-10-04.** *"Eggs: not halvable for food
+recipes."* — `egg` is off the list on purpose, and that one word decides most
+refusals. *"Neither mince pies nor sweet cream base halve"* — `1 dozen` and
+`1 lot` of another recipe stay refused. *"In: leaf, star anise, nutmeg, stock
+cube, sachet, tin, jar. Rest correct."* And **the waffles have no half step**:
+shown "⅞ cups whole milk", *"Please take the half step off the waffles. 2-3
+waffles isn't enough!!!!"* — done by the cup rule (1¾ cups is not a multiple of
+½), never by naming a recipe. A yield of `1 jar` still does not halve: the
+`halvable` list is about ingredients.
+
+**"1 large egg", not "1 large eggs".** *"Going from 1x to 0.5x eggs will be
+the only kind of occasion where a plural reduces to a single. Can we fix
+please?"* When a bare count or a size-word amount (`2`, `2 large`) written for
+more than one comes down to exactly one, `scaleAmount` says so (`one`) and
+`recipe-scale.js` rewrites the item's first text node through `singularItem`:
+the last word before the first comma, bracket, or `of`/`in`/`like`. The
+singular is the house's own — `singulars` in `ingredient_words.yml` first
+(`potatoes`, `leaves`), handed to the page as `data-singulars`, then
+`foldUnit`. **Left as written where it cannot be done safely**: a head naming
+two things, a capitalised noun, an `-oes`/`-ies` word the map does not hold,
+and a word with no plural (`star anise`). A `serves:` recipe reaches one too
+(two eggs for four, shown for two) and gets the same answer. Back at the
+recipe's own count the written text returns byte for byte.
 
 **Three things this does NOT do.** `makes:` is still never read as PEOPLE:
 `portions_for` is untouched and `page.portions` is still the

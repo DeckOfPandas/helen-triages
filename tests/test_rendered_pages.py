@@ -1014,10 +1014,22 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
     )
 
     # THE HALF STEP IS THE BUILD'S VERDICT, carried as one attribute. The
-    # waffles halve (2 eggs, 5 waffles -> "2–3"); "one 8-inch cake" does not.
-    assert "data-half-recipe" in waffles, (
-        "the waffles should be offered a half recipe -- "
-        f"_plugins/food_half_recipe.rb's verdict has not reached the page:\n{waffles}"
+    # fairy cakes halve (2 large eggs, 12 cakes -> 6). The waffles do NOT --
+    # Helen: "Please take the half step off the waffles" -- because 1¾ cups
+    # of milk would halve to ⅞. And "one 8-inch cake" has no half.
+    fairy = _scale_control(prod_site, "grandmas-fairy-cakes") or ""
+    assert "data-made=" in fairy and "data-half-recipe" in fairy, (
+        "the fairy cakes should be offered a half recipe -- "
+        f"_plugins/food_half_recipe.rb's verdict has not reached the page:\n{fairy}"
+    )
+    assert "data-half-recipe" not in waffles, (
+        f"the waffles are offered a half recipe again (⅞ cups of milk):\n{waffles}"
+    )
+    page = (prod_site / "food" / "recipes" / "grandmas-fairy-cakes" / "index.html").read_text(encoding="utf-8")
+    assert "data-singulars=" in page and "&quot;leaves&quot;:&quot;leaf&quot;" in page, (
+        "the scaler is not handed ingredient_words.yml's `singulars`, so a "
+        "count that comes down to one keeps its plural where a trailing `s` "
+        "does not explain it (#1286)."
     )
     cake = _scale_control(prod_site, "beetroot-chocolate-cake") or ""
     assert "data-made=" in cake and "data-half-recipe" not in cake, (

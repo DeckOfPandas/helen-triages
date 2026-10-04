@@ -51,6 +51,11 @@ CASES = {
     "4 eggs": dict(kind=COUNT, base=4, stem="eggs"),
     "Estimated 24 cookies": dict(kind=COUNT, base=24, prefix="Estimated", stem="cookies"),
     "about 15 squares": dict(kind=COUNT, base=15, prefix="about", stem="squares"),
+    # Helen: 'Can Delia\'s pancakes please scale as "8 pancakes", "16 pancakes".'
+    # The file says "about 8" today, which names nothing (below); THIS is the
+    # line it needs.
+    "about 8 pancakes":
+        dict(kind=COUNT, base=8, prefix="about", stem="pancakes", box="8", plus=False),
     # The thing ends at a comma, a bracket or an alternative.
     "1 large jar, or several small ones":
         dict(kind=COUNT, base=1, stem="large jar", singular=True),
@@ -295,7 +300,15 @@ HALF_CASES = {
     # --- spoons halve down to an eighth, no further --------------------------
     "quarter tsp": (_recipe("12 buns", [("¼ tsp", "salt"), ("1½ tbsp", "oil")]), True, None),
     "eighth tsp": (_recipe("12 buns", [("⅛ tsp", "black pepper")]), False, "eighth"),
-    "third cup": (_recipe("12 buns", [("⅓ cup", "milk")]), False, "eighth"),
+    "third cup": (_recipe("12 buns", [("⅓ cup", "milk")]), False, "quarter cup"),
+    # --- a cup goes down to a quarter and no further -------------------------
+    # The waffles: 1¾ cups halved is "⅞ cups". "Please take the half step off
+    # the waffles. 2-3 waffles isn't enough!!!!"
+    "one and three quarter cups": (_recipe("12 buns", [("1¾ cups", "milk")]), False, "quarter cup"),
+    "quarter cup": (_recipe("12 buns", [("¼ cup", "oil")]), False, "quarter cup"),
+    "half cup": (_recipe("12 buns", [("½ cup", "oil"), ("2 cups", "flour")]), True, None),
+    "the waffles": (_recipe("4–6 waffles", [("2 large", "eggs"), ("1¾ cups", "whole milk"),
+                                            ("½ cup", "groundnut oil")]), False, "1¾ cups"),
     "heaped tbsp": (_recipe("12 buns", [("1 heaped tbsp", "tomato purée")]), True, None),
     "bracket restates": (_recipe("12 buns", [("1 tbsp (6 g)", "cloves")]), True, None),
     # --- a count halves only if even, or halvable ----------------------------
@@ -305,9 +318,19 @@ HALF_CASES = {
     "one lemon": (_recipe("12 buns", [("1", "lemon, zest and juice")]), True, None),
     "one large onion": (_recipe("12 buns", [("1 large", "onion, diced")]), True, None),
     "three garlic cloves": (_recipe("12 buns", [("3 cloves", "garlic")]), True, None),
-    "half a nutmeg": (_recipe("12 buns", [("½ small", "whole nutmeg")]), False, "does not halve"),
+    # --- "In: leaf, star anise, nutmeg, stock cube, sachet, tin, jar." -------
+    "half a nutmeg": (_recipe("12 buns", [("½ small", "whole nutmeg")]), True, None),
+    "one star anise": (_recipe("12 buns", [("1 large", "star anise")]), True, None),
+    "three bay leaves": (_recipe("12 buns", [("3", "dried bay leaves, torn")]), True, None),
+    "one stock cube": (_recipe("12 buns", [("1", "chicken stock cube")]), True, None),
+    "one sachet": (_recipe("12 buns", [("1 x 7 g sachet", "dried yeast")]), True, None),
+    "one jar of an ingredient": (_recipe("12 buns", [("1 jar", "roasted peppers")]), True, None),
+    # --- "Eggs: not halvable for food recipes." and the lot of another recipe -
+    "one lot": (_recipe("950 ml", [("1 lot", "[sweet cream base](../x/)")]), False, "does not halve"),
+    "three cardamom pods": (_recipe("12 buns", [("3 (3 g)", "black cardamom pods")]), False, "does not halve"),
     "one sprig": (_recipe("12 buns", [("1 sprig", "rosemary")]), False, "does not halve"),
-    "one tin": (_recipe("12 buns", [("1 x 400 g", "tin tomatoes")]), False, "does not halve"),
+    "one tin": (_recipe("12 buns", [("1 x 400 g", "tin tomatoes")]), True, None),
+    "one can": (_recipe("12 buns", [("1 x 400 g can", "chickpeas")]), False, "does not halve"),
     "two tins": (_recipe("12 buns", [("2 x 400 g cans", "chickpeas")]), True, None),
     "a range of eggs": (_recipe("12 buns", [("2–3", "eggs")]), False, "does not halve"),
     # --- what does not scale cannot object -----------------------------------
@@ -326,6 +349,10 @@ HALF_CASES = {
     "some, five": (_recipe("Some", [("200 g", "sugar")], estimate=5), False, "odd"),
 }
 
+# NOT HERE, AND HELEN'S OWN CALL: henrys-sunday-waffles. "Please take the half
+# step off the waffles. 2-3 waffles isn't enough!!!!" -- it goes by the cup
+# rule (1¾ cups would halve to ⅞), not by naming the recipe.
+#
 # The published `makes:` recipes that ARE offered a half step. Named, because
 # this is the list Helen was given to check against recipes she knows; the
 # rest of the published `makes:` recipes are not offered one.
@@ -334,8 +361,9 @@ GETS_A_HALF_STEP = {
     "ben-jerrys-sweet-cream-base-3", "bens-chocolate-ice-cream", "cherry-glaze",
     "chocolate-ganache", "delias-classic-pancakes", "five-spice-powder",
     "gluten-free-crumble-topping", "grandmas-fairy-cakes",
-    "henrys-dark-chocolate-almond-truffles", "henrys-sunday-waffles",
-    "jerrys-chocolate-ice-cream", "macarons", "mrs-nicholsons-creme-patissiere",
+    "henrys-dark-chocolate-almond-truffles",
+    "jerrys-chocolate-ice-cream", "macarons", "mixed-spice-powder",
+    "mrs-nicholsons-creme-patissiere",
     "mrs-nicholsons-yorkshire-puddings", "slow-cooked-duck-legs-confit",
     "sweet-potato-chocolate-brownies", "teriyaki-sauce", "wagamama-teriyaki-sauce",
     "wagamama-yakitori-sauce",

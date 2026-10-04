@@ -23,7 +23,10 @@
 #   a SPOON, CUP or IMPERIAL measure (`quarter_units`)   halves if the amount
 #       is a multiple of a quarter, because an eighth is the smallest fraction
 #       the page has a glyph for: ¼ tsp -> ⅛ tsp is fine, ⅛ tsp -> 0.06 tsp is
-#       not, and neither is ⅓ cup -> 0.17 cup.
+#       not.
+#   a CUP (`half_units`)   halves only if the amount is a multiple of a HALF,
+#       so it never goes below a quarter cup. Helen, on "⅞ cups whole milk":
+#       "Please take the half step off the waffles."
 #   a BY-EYE measure (`half_step_measures`: handful, pinch ...)   always: it
 #       has its own rule and never prints less than a half.
 #   anything else is a COUNT of things -- "3" eggs, "2 large", "1 sprig",
@@ -116,6 +119,10 @@ module HelenTriages
       unless packaged
         return nil if (words & list(vocab, "divisible_units")).any?
         return nil if words.any? { |w| by_eye.include?(w) || by_eye.include?(w.sub(/e?s\z/, "")) }
+        if (words & list(vocab, "half_units")).any?
+          return nil if numbers.all? { |n| whole?(n * 2) }
+          return "half of it is less than a quarter cup, or not a quarter at all"
+        end
         if (words & list(vocab, "quarter_units")).any?
           return nil if numbers.all? { |n| whole?(n * 4) }
           return "half of it is smaller than an eighth, or is not a fraction the page can print"
