@@ -368,39 +368,44 @@ def test_the_recipe_scaler_scripts_load_in_dependency_order():
     )
 
 
-def test_the_recipe_scaler_is_handed_the_unscaled_measures():
-    """#1125. A handful does not scale, and WHICH words mean that is data.
+def test_the_recipe_scaler_is_handed_the_half_step_measures():
+    """#1125. A handful scales in half steps, and WHICH words do is data.
 
-    `unscaled_measures` in _data/food/scaling.yml reaches the page by one
+    `half_step_measures` in _data/food/scaling.yml reaches the page by one
     route: _layouts/recipe.html joins it onto the scaler control as
-    `data-unscaled`, and recipe-scale.js reads that attribute. Break either
-    end and nothing errors -- food-scale.js treats a missing list as an empty
-    one -- so "1 handful" quietly goes back to scaling to "1.17 handfuls",
-    which is the bug the issue was raised for. `trailing_phrases` travels the
-    same way for the name on the "(Not scaled: ...)" line.
+    `data-half-step-measures`, and recipe-scale.js reads that attribute.
+    Break either end and nothing errors -- food-scale.js treats a missing
+    list as an empty one -- so "1 handful" quietly goes back to scaling to
+    "1.17 handfuls", which is the bug the issue was raised for.
+    `trailing_phrases` travels the same way for the name on the "(Not scaled:
+    ...)" line.
     """
     scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
-    measures = scaling.get("unscaled_measures")
+    measures = scaling.get("half_step_measures")
     assert measures and "handful" in measures, (
-        "_data/food/scaling.yml has no `unscaled_measures` list naming "
-        "`handful`; the recipe scaler will scale handfuls again."
+        "_data/food/scaling.yml has no `half_step_measures` list naming "
+        "`handful`; the recipe scaler will print 1.17 handfuls again."
+    )
+    assert "pat" not in measures, (
+        "`pat` is in half_step_measures. Helen, 2026-10-04: '\"pat\" is a "
+        "correct term, and should be scaled linearly as \"pats\"'."
     )
     not_plain = [m for m in measures
                  if not isinstance(m, str) or not re.fullmatch(r"[a-z]+", m)]
     assert not not_plain, (
-        f"unscaled_measures entries must be one lowercase word each, singular; "
+        f"half_step_measures entries must be one lowercase word each, singular; "
         f"got {not_plain}. The layout joins the list with `|` and "
         f"food-scale.js adds the plural itself."
     )
     sizes = sorted({"large", "medium", "small"} & set(measures))
     assert not sizes, (
-        f"{sizes} must never be an unscaled measure: Helen ruled that "
+        f"{sizes} must never be a half-step measure: Helen ruled that "
         f"'2 large' scales (#1005), and 240 amounts are written that way."
     )
 
     html = read("_layouts", "recipe.html")
     wiring = {
-        "data-unscaled": "site.data.food.scaling.unscaled_measures",
+        "data-half-step-measures": "site.data.food.scaling.half_step_measures",
         "data-trailing": "site.data.food.ingredient_words.trailing_phrases",
     }
     script = read("assets", "js", "recipe-scale.js")

@@ -240,15 +240,17 @@ layout: default
      as placeholder copy from her "copy tbc, just put in a placeholder";
      assets/js/recipe-scale.js builds it.
 
-     A HANDFUL DOES NOT SCALE EITHER -- #1125, 2026-10-04. "1 handful" has a
-     number, so it used to come out as "1.17 handfuls". `data-unscaled` hands
-     the script _data/food/scaling.yml's `unscaled_measures`; an amount using
-     one stays as written and its ingredient joins the note. `data-trailing`
-     is ingredient_words.yml's `trailing_phrases`, so the note says "Tabasco
-     sauce" and not "Tabasco sauce to taste". Both are data: adding a measure
-     is a line of YAML. {% endcomment %}
+     A HANDFUL SCALES IN HALF STEPS -- #1125, 2026-10-04. "1 handful" used
+     to come out as "1.17 handfuls"; three times the recipe is now "3
+     handfuls", half as much again "1½ handfuls", and seven-sixths of it is
+     still "1 handful".
+     `data-half-step-measures` hands the script _data/food/scaling.yml's
+     `half_step_measures`. `data-trailing` is ingredient_words.yml's
+     `trailing_phrases`, so the note says "Tabasco sauce" and not "Tabasco
+     sauce to taste". Both are data: adding a measure is a line of YAML.
+     MANUAL 8.2. {% endcomment %}
   {% if page.portions and page.ingredient_groups.size > 0 %}
-    <div class="recipe-scale-controls" hidden data-unscaled="{{ site.data.food.scaling.unscaled_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}">
+    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
       <label class="recipe-scale">
         {% if page.portions_estimated %}<span class="recipe-scale-approx" title="an estimate -- the recipe does not say how many it serves">~</span>{% endif %}
