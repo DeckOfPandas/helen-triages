@@ -881,6 +881,153 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build(fixture_site)
 
 
 # =============================================================================
+# THE MAGIC BAG MARK -- #1201, which settled #507 (2026-10-04)
+# =============================================================================
+# Helen, 2026-09-28: "I don't need to filter by this. Let's just give it a
+# quiet mark, where 'draft' is on the live site, and next to it on the local
+# site."
+#
+# A FIXTURE DISH, BECAUSE THE REAL COLLECTION IS HERS TO FILL and was empty
+# when this was written -- the index had been carrying a `magic bag` mark that
+# no build had rendered for four weeks. Two entries, differing in one key, in
+# the copy of the tree and never in `_food_magic_bag/` itself.
+MAGIC_BAG_MARK_FIXTURE = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'main_ingredients: ["salt"]\ningredients:\n  - "salt"\n'
+    'meta:\n  awaiting_fix: false\n  proofread: {proofread}\n---\n'
+)
+MAGIC_BAG_MARK = '<span class="badge badge-magic-bag">magic bag</span>'
+DRAFT_MARK = '<span class="badge badge-draft">draft</span>'
+MARK_SLOT = re.compile(r'<div class="badge-group-meta">(.*?)</div>', re.S)
+
+_in_the_fixture_build({
+    f"_food_magic_bag/{slug}.md":
+        MAGIC_BAG_MARK_FIXTURE.format(t=slug, proofread=value)
+    for slug, value in {"zzz-magic-bag-mark": "true",
+                        "zzz-magic-bag-unread": "false"}.items()})
+
+
+def _index_rows(html: str) -> dict[str, str]:
+    """url -> that row's markup, off a built food index."""
+    rows = {}
+    for chunk in html.split('<li data-url="')[1:]:
+        url, _, rest = chunk.partition('"')
+        rows[url] = rest
+    return rows
+
+
+def _mark_slot(row: str) -> str:
+    """What a row holds where `draft` goes, with the whitespace taken out."""
+    match = MARK_SLOT.search(row)
+    assert match, "an index row has no .badge-group-meta at all."
+    return "".join(match.group(1).split())
+
+
+def test_a_magic_bag_dish_carries_the_quiet_mark_where_draft_goes(fixture_site):
+    """On the live site a magic-bag row has the mark in the `draft` slot, and
+    nothing else is there.
+
+    THE CONTROLS ARE THREE. A recipe's row must have the slot EMPTY, or "the
+    mark is present" would be satisfied by a template that prints it on every
+    row. The unproofread twin must have no page and no row, or the mark would
+    be advertising a link the gate withheld (#235's shape). And no row on a
+    production index may say `draft`, which is the half of Helen's sentence
+    that makes the slot the magic bag's own there.
+    """
+    out = fixture_site
+    assert (out / "food" / "magic-bag" / "zzz-magic-bag-mark" / "index.html").exists(), (
+        "The proofread magic-bag fixture built no page, so nothing below is "
+        "about the mark: the collection, its permalink or the gate has changed."
+    )
+    assert not (out / "food" / "magic-bag" / "zzz-magic-bag-unread" / "index.html").exists(), (
+        "A magic-bag entry with `meta.proofread: false` was PUBLISHED."
+    )
+
+    html = (out / "food" / "index.html").read_text(encoding="utf-8")
+    rows = _index_rows(html)
+
+    assert "/food/magic-bag/zzz-magic-bag-unread/" not in rows, (
+        "The production index lists a magic-bag dish the gate held back, "
+        "linking to a page that was never written."
+    )
+    assert "/food/magic-bag/zzz-magic-bag-mark/" in rows, (
+        "The proofread magic-bag fixture has no row on the production index. "
+        "The magic bag joins the index unconditionally (MANUAL §4.3); a dish "
+        "hidden from the index is a dish forgotten."
+    )
+    want = "".join(MAGIC_BAG_MARK.split())
+    got = _mark_slot(rows["/food/magic-bag/zzz-magic-bag-mark/"])
+    assert got == want, (
+        "A magic-bag row should hold exactly the `magic bag` mark in "
+        f".badge-group-meta, where `draft` goes. It holds: {got!r}"
+    )
+
+    control = _mark_slot(rows["/food/recipes/caramel/"])
+    assert control == "", (
+        "A recipe's row has something in the mark slot on the live site: "
+        f"{control!r}. Only a magic-bag dish is marked there."
+    )
+    assert "badge-draft" not in html, (
+        "The PRODUCTION index carries a `draft` mark. Drafts do not publish, "
+        "so a row saying so is a row that should not be there (#235)."
+    )
+
+
+def test_the_magic_bag_mark_is_the_draft_marks_look_and_sits_beside_it(fixture_site):
+    """One CSS rule for both marks, and one container, magic bag first.
+
+    "QUIET" IS HELEN'S WORD and the draft mark is the look she pointed at, so
+    this reads the COMPILED stylesheet: every rule that styles one mark must
+    name the other. _badges.scss said for a month that the two looked identical
+    because neither declared anything, while `.badge-draft` declared a tint and
+    a text colour and `.badge-magic-bag` did not. A comment is not a check.
+
+    THE LOCAL HALF IS READ FROM THE TEMPLATE, NOT A BUILD. "Next to it on the
+    local site" needs a draft, and the drafts are a private clone a CI
+    checkout does not have; the fixture build is production, where no row is
+    a draft. What can be pinned everywhere is that both marks are written into
+    the one slot, in that order.
+    """
+    css = (fixture_site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
+    styled = [{s.strip() for s in selector.split(",")}
+              for selector, _ in _rules(css)
+              if ".badge-draft" in selector or ".badge-magic-bag" in selector]
+    assert styled, (
+        "No rule in the built food.css names `.badge-draft` or "
+        "`.badge-magic-bag`, so neither mark has the quiet look."
+    )
+    apart = [sorted(s) for s in styled
+             if not {".badge-draft", ".badge-magic-bag"} <= s]
+    assert not apart, (
+        "The two marks no longer share their styling -- these rules name one "
+        f"and not the other: {apart}. Helen's ruling on #1201 gives the magic "
+        "bag the draft mark's own look; style both in one rule."
+    )
+
+    template = (ROOT / "food" / "index.html").read_text(encoding="utf-8")
+    slots = [m for m in MARK_SLOT.findall(template) if "badge" in m]
+    assert len(slots) == 1, (
+        f"food/index.html has {len(slots)} .badge-group-meta slots holding a "
+        "mark; there should be exactly one."
+    )
+    slot = slots[0]
+    assert MAGIC_BAG_MARK in slot and DRAFT_MARK in slot, (
+        "The `magic bag` and `draft` marks are no longer written into the same "
+        ".badge-group-meta on food/index.html, so they cannot sit side by side."
+    )
+    assert slot.index(MAGIC_BAG_MARK) < slot.index(DRAFT_MARK), (
+        "`draft` is now written before `magic bag` in the slot."
+    )
+    row_tags = [line for line in template.splitlines() if "<li data-url=" in line]
+    assert len(row_tags) == 1, "food/index.html no longer has exactly one row tag."
+    assert "magic" not in row_tags[0] and "data-meta" not in row_tags[0], (
+        "The index row carries an attribute about the magic bag. Nothing may "
+        "filter on it: the mark is a mark and not a filter (#1201, settling "
+        f"#507). The row tag is: {row_tags[0].strip()}"
+    )
+
+
+# =============================================================================
 # THE GARNISH STEP READS AS ENGLISH — #1138 and #1143, 2026-09-17
 # =============================================================================
 

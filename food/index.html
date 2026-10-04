@@ -590,7 +590,22 @@ permalink: /food/
              anything: `is_draft` can only be true for a row from
              `food_drafts`, and that collection is only built locally. One fact
              deciding it, rather than a flag that has to agree with the
-             build. {% endcomment %}
+             build.
+
+             THE MAGIC BAG MARK IS A MARK AND NEVER A FILTER -- #1201, which
+             settled #507. Helen, 2026-09-28: "I don't need to filter by this.
+             Let's just give it a quiet mark, where 'draft' is on the live
+             site, and next to it on the local site." So it lives in this one
+             container with `draft`, written first: on the live site no row is
+             a draft and it has the slot to itself, and locally it is the same
+             slot `draft` uses, in the same look (one rule for both in
+             _sass/food/_badges.scss). Do not add a control that reads it.
+
+             NO ROW CARRIES BOTH TODAY. A row comes from exactly one
+             collection, and each mark is decided by which. The order below is
+             what "next to it" means if that ever stops being true.
+             tests/test_rendered_pages.py pins all of it against a fixture
+             dish. {% endcomment %}
           <div class="badge-group-meta">
             {% if is_magic_bag %}<span class="badge badge-magic-bag">magic bag</span>{% endif %}
             {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}

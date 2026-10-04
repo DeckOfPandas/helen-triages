@@ -20,8 +20,9 @@ oversight:
     up", which is the correct answer here rather than a gap in the spec.
   - no `meta.rewritten`. There is nothing to rewrite FROM. See
     test_no_recipe_only_keys below, which actively rejects it.
-  - no `meta.proofread`. That flag records Helen being the last judgement before
-    someone else's words publish. These words are hers on the way in.
+  - `meta.proofread` IS required, since 2026-09-02 (#667). This bullet said the
+    opposite for a month after the code changed; META_KEYS below is the schema
+    and has the argument.
   - no completeness rule on `ingredients`. The list is incomplete BY DEFINITION,
     and this module is what makes that true rather than merely stated: there is
     nowhere to put a method and test_no_recipe_only_keys rejects one. A test
@@ -35,15 +36,35 @@ oversight:
     conftest's `ingredient_items` DOES now see magic-bag ingredients, so the
     day that call is reversed the rules can be pointed at this fixture without
     any other change.
+
+THIS MODULE CAN NO LONGER TEST NOTHING -- #1201, 2026-10-04. Every test here is
+parametrised per entry, and the collection was empty from 2026-09-07, so for
+four weeks the whole file collected zero cases and reported green. Two things
+close that, and the bottom of this file holds both:
+
+  - the `magic_bag` fixture always includes one committed FIXTURE entry
+    (tests/fixtures/magic_bag/, see conftest's MAGIC_BAG_FIXTURE_PATH), so
+    every rule runs on every run;
+  - `test_each_rule_rejects_what_it_exists_to_reject` breaks that fixture one
+    way per rule and requires the rule to fail. A rule that passes a good
+    entry proves little; a rule that passes a bad one is the hole.
+
+It does NOT assert the real collection is non-empty. The dishes come out of
+Helen's head; a test that is red until she writes one would turn `main` red,
+which stops every deploy. conftest says "not evidence about the magic bag" at
+the end of a run while the collection is empty, and nothing fails.
 """
 from __future__ import annotations
 
+import copy
 import re
+import types
 
 import pytest
 import yaml
 
-from conftest import where
+import conftest
+from conftest import MAGIC_BAG_FIXTURE, where
 from test_style import ISO_DATE, NUMBER_RANGE, SPELLINGS, TYPOGRAPHY
 
 # Suite marker, so `pytest -m food` runs this half. test_suite_hygiene.py
@@ -415,4 +436,182 @@ def test_temperatures_use_degree_c(magic_bag):
     assert not bad, (
         f"{where(magic_bag)} writes temperature(s) {bad} without the degree "
         f"sign. Always °C, e.g. 200°C."
+    )
+
+
+# =============================================================================
+# THE SPEC CANNOT TEST NOTHING -- #1201, 2026-10-04
+# =============================================================================
+# See the module docstring for what went wrong. Everything above takes the
+# `magic_bag` argument and so runs against the committed fixture entry as well
+# as every real one. What follows proves the two things that a green run of
+# the above cannot: that each rule can FAIL, and that the run says so when the
+# real collection is empty.
+
+
+def _broken(fm=None, raw=None):
+    """The fixture entry with one thing wrong with it.
+
+    `fm` mutates a deep copy of the parsed front matter; `raw` rewrites the
+    file's text. A stand-in rather than a Recipe, because a Recipe is read from
+    disk and none of these states may ever be written to one.
+    """
+    data = copy.deepcopy(MAGIC_BAG_FIXTURE.fm)
+    if fm is not None:
+        fm(data)
+    text = MAGIC_BAG_FIXTURE.raw if raw is None else raw(MAGIC_BAG_FIXTURE.raw)
+    return types.SimpleNamespace(
+        fm=data, raw=text, path=MAGIC_BAG_FIXTURE.path,
+        slug=MAGIC_BAG_FIXTURE.slug)
+
+
+def _meta(**changes):
+    def mutate(fm):
+        fm["meta"] = changes
+    return mutate
+
+
+# id -> (how the fixture is broken, the rule that must refuse it). The rule is
+# called with the broken entry and the real taxonomy.
+BREAKAGES = {
+    "no title": (
+        _broken(fm=lambda fm: fm.pop("title")),
+        lambda e, t: test_required_field_present(e, "title")),
+    "no tagline line": (
+        _broken(fm=lambda fm: fm.pop("tagline")),
+        lambda e, t: test_tagline_key_is_present_even_when_empty(e)),
+    "a tagline that is not a string": (
+        _broken(fm=lambda fm: fm.update(tagline=None)),
+        lambda e, t: test_tagline_key_is_present_even_when_empty(e)),
+    "a method": (
+        _broken(fm=lambda fm: fm.update(method=["Fry it."])),
+        lambda e, t: test_no_recipe_only_keys(e)),
+    "a source": (
+        _broken(fm=lambda fm: fm.update(source="a book")),
+        lambda e, t: test_no_recipe_only_keys(e)),
+    "meta with rewritten": (
+        _broken(fm=_meta(rewritten=True, awaiting_fix=False, proofread=False)),
+        lambda e, t: test_meta_is_exactly_the_publish_gate(e)),
+    "meta without proofread": (
+        _broken(fm=_meta(awaiting_fix=False)),
+        lambda e, t: test_meta_is_exactly_the_publish_gate(e)),
+    "meta in the wrong order": (
+        _broken(fm=_meta(proofread=False, awaiting_fix=False)),
+        lambda e, t: test_meta_is_exactly_the_publish_gate(e)),
+    "a quoted awaiting_fix": (
+        _broken(fm=_meta(awaiting_fix="false", proofread=False)),
+        lambda e, t: test_awaiting_fix_is_a_real_boolean(e)),
+    "an empty ingredients list": (
+        _broken(fm=lambda fm: fm.update(ingredients=[])),
+        lambda e, t: test_ingredients_is_a_non_empty_list(e)),
+    "an ingredient dict with no item": (
+        _broken(fm=lambda fm: fm["ingredients"].append({"note": "which one?"})),
+        lambda e, t: test_ingredient_items_are_strings_or_labelled_dicts(e)),
+    "an ingredient with an amount": (
+        _broken(fm=lambda fm: fm["ingredients"].append(
+            {"item": "butter", "amount": "50 g"})),
+        lambda e, t: test_ingredient_items_are_strings_or_labelled_dicts(e)),
+    "the same ingredient twice": (
+        _broken(fm=lambda fm: fm["ingredients"].append("Cold cooked rice")),
+        lambda e, t: test_no_duplicate_ingredient_lines(e)),
+    "a bare-string note": (
+        _broken(fm=lambda fm: fm.update(notes=["Has to be cold."])),
+        lambda e, t: test_notes_are_labelled_dicts(e)),
+    "no main ingredients": (
+        _broken(fm=lambda fm: fm.update(main_ingredients=[])),
+        lambda e, t: test_main_ingredients_is_a_non_empty_list(e)),
+    "an undeclared star": (
+        _broken(fm=lambda fm: fm.update(star_ingredient="zzz-not-a-star")),
+        lambda e, t: test_star_ingredient_is_declared(e, t)),
+    "an undeclared tag": (
+        _broken(fm=lambda fm: fm.update(tags=["zzz-not-a-tag"])),
+        lambda e, t: test_tags_are_declared(e, t)),
+    "a duplicated key": (
+        _broken(raw=lambda raw: raw.replace(
+            "\nmeta:", '\ntitle: "Again"\nmeta:', 1)),
+        lambda e, t: test_front_matter_has_no_duplicate_keys(e)),
+    "a hyphenated number range": (
+        _broken(raw=lambda raw: raw.replace(
+            "cold cooked rice", "cold cooked rice, 3-4 handfuls", 1)),
+        lambda e, t: test_number_ranges_use_en_dashes(e)),
+    "a temperature with no degree sign": (
+        _broken(raw=lambda raw: raw.replace(
+            "cold cooked rice", "rice, baked at 200C", 1)),
+        lambda e, t: test_temperatures_use_degree_c(e)),
+}
+
+
+@pytest.mark.parametrize("case", BREAKAGES)
+def test_each_rule_rejects_what_it_exists_to_reject(case, taxonomy):
+    """Break the fixture one way; the rule for that breakage must fail.
+
+    THIS IS THE HALF A FIXTURE ALONE CANNOT GIVE. Running every rule against
+    one well-formed entry shows the rules execute. It does not show that any of
+    them can say no -- and a rule that cannot say no is the same hole #1201
+    was raised about, one level in: green, and checking nothing.
+
+    Typography and spellings are not broken here. Their patterns are
+    test_style.py's own, imported rather than restated, and that module holds
+    the cases that prove them.
+    """
+    entry, rule = BREAKAGES[case]
+    with pytest.raises(AssertionError):
+        rule(entry, taxonomy)
+
+
+def test_the_fixture_entry_is_always_among_the_cases():
+    """The fixture is parametrised in, and is not counted as a real dish.
+
+    Both halves matter. Out of the parametrisation, this module is back to
+    collecting nothing while the collection is empty. Inside ALL_MAGIC_BAG, the
+    cross-collection sweeps (test_style.py, test_taxonomy.py) and the
+    empty-collection report below would all treat a test file as one of
+    Helen's dishes.
+    """
+    class _Metafunc:
+        fixturenames = ["magic_bag"]
+
+        def parametrize(self, name, values, ids):
+            self.name, self.values, self.ids = name, values, ids
+
+    metafunc = _Metafunc()
+    conftest.pytest_generate_tests(metafunc)
+    assert metafunc.values and metafunc.values[0] is MAGIC_BAG_FIXTURE, (
+        "conftest no longer parametrises `magic_bag` with the fixture entry "
+        "first, so an empty _food_magic_bag/ means this whole module collects "
+        "zero cases and reports green. That is #1201."
+    )
+    assert len(metafunc.values) == len(metafunc.ids)
+    assert MAGIC_BAG_FIXTURE not in conftest.ALL_MAGIC_BAG, (
+        "The fixture entry is in ALL_MAGIC_BAG, so it is being counted and "
+        "swept as a real dish."
+    )
+    assert conftest.MAGIC_BAG_DIR not in MAGIC_BAG_FIXTURE.path.parents, (
+        "The fixture entry lives inside _food_magic_bag/, where Jekyll would "
+        "build it into a page on the live site."
+    )
+
+
+def test_an_empty_magic_bag_is_reported_and_a_filled_one_is_not():
+    """The run says when it was not evidence about a real dish, and only then.
+
+    Honest in both directions, as the drafts caveat is
+    (test_suite_hygiene.py): it must speak while the collection is empty, and
+    be silent once it is not -- a caveat printed on every run is noise, and
+    noise is ignored exactly like a failure. It never fails the run.
+    """
+    lines = []
+
+    def write(text, **_):
+        lines.append(text)
+
+    conftest._report_empty_magic_bag(write, entries=[])
+    said = "\n".join(lines)
+    assert "Not evidence about the magic bag" in said
+    assert "tests/fixtures/magic_bag/" in said
+
+    lines.clear()
+    conftest._report_empty_magic_bag(write, entries=[MAGIC_BAG_FIXTURE])
+    assert lines == [], (
+        "The empty-magic-bag caveat printed for a collection that has an entry."
     )
