@@ -39,6 +39,6 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
   
 ---
