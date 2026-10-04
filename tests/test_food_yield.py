@@ -238,8 +238,10 @@ KEEPS_PORTIONS = {
     "slow-cooked-duck-legs-confit": "however many you make",
     "the-one-true-chocolate-brownies":
         "enough for that edge-brownie tin I made James buy me",
-    # a count, but of nothing named -- NOT ruled; reported to Helen
-    "delias-classic-pancakes": "about 8",
+    # `delias-classic-pancakes` WAS HERE as `about 8`, a count of nothing
+    # named. Helen, 2026-10-04: "Can Delia's pancakes please scale as "8
+    # pancakes", "16 pancakes"." The fix was the data, not a rule for unnamed
+    # counts: the recipe says `about 8 pancakes` now and is read like any other.
 }
 
 

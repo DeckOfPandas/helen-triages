@@ -1508,8 +1508,31 @@ unless stated.
     and 22 of 42 published `makes:` recipes get it. `egg` is deliberately not
     halvable and decides most refusals. The lists are data, under
     `half_recipe:` in `_data/food/scaling.yml`. **The waffles' own range is
-    now unreachable** ("Makes 4–6", and the box shows 2–3, 5, 10), which is
-    the price of never printing a fraction of an egg.
+    now unreachable** ("Makes 4–6", and the box shows 5, 10), which is the
+    price of never printing a fraction of an egg; she called that *"Fine"*.
+  - **She looked at the half step and ruled on it the same day.** *"at 0.5x,
+    that should read '1 large egg' not 'eggs'."* The noun is in the ITEM, so
+    the amount's plural rule never reached it; a count that comes down to
+    exactly one now makes the item's leading noun singular, by the house's own
+    `singulars` map and `foldUnit`, and leaves it as written where that is not
+    safe. It is not only ×½: a `serves:` recipe shown for half its people
+    reaches one too.
+  - **The waffles have no half step, by rule and not by name**: shown "⅞ cups
+    whole milk", *"Please take the half step off the waffles. 2-3 waffles
+    isn't enough!!!!"* — a cup halves only from a multiple of ½. **Never
+    special-case a recipe in the judge; find the line that makes it insane and
+    write the rule for that line.**
+  - **The `halvable` list is hers now**: *"In: leaf, star anise, nutmeg, stock
+    cube, sachet, tin, jar. Rest correct."*; *"Eggs: not halvable for food
+    recipes. Given by ml or weight for cocktails so irrelevant."*; *"Neither
+    mince pies nor sweet cream base halve"*. The list is about ingredients: a
+    yield of "1 jar" still does not halve.
+  - **Delia's pancakes** read `makes: "about 8"`, a count of nothing named,
+    and kept the portions box. *'Can Delia's pancakes please scale as "8
+    pancakes", "16 pancakes".'* The fix is the data (`about 8 pancakes`), not
+    a rule for unnamed counts, and the flag did not flip: *"fine to make the
+    update and not flip the flag. Explicit grant."* (§4.0's baseline moved to
+    cover that one commit.)
 
 ---
 
