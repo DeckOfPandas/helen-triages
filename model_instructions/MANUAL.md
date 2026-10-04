@@ -1231,7 +1231,42 @@ a missing glasses entry is one glass, a missing portions entry is *however many
 this recipe makes*, which only the build knows — so `1` is a real, storable
 answer here.
 
-**Where it is tested.** `food-shopping-list.test.js` (the arithmetic),
+**THE RECIPE PAGE HAS A SCALER TOO, AND A HANDFUL DOES NOT SCALE** (#1005,
+#1125). `assets/js/food-scale.js` is one amount at a factor, through this same
+parser and `totalText`; `assets/js/recipe-scale.js` is the wiring. Three kinds
+of line stay as written when the portions move, and each is NAMED on Helen's
+line under the control — `(Not scaled: fresh flat-leaf parsley, Tabasco
+sauce)`, parenthesised, comma-joined, no full stop (#1088): an ingredient with
+no amount, an amount with no number in it, and a numbered amount in a measure
+taken by hand.
+
+**Which measures those are is data: `unscaled_measures` in
+`_data/food/scaling.yml`** — `handful`, `pinch`, `dash`, `splash`, `knob`,
+`pat`. `_layouts/recipe.html` joins the list onto the control as
+`data-unscaled` and the script passes it in, so adding one is a line of YAML;
+`food-scale.js` names no measure, and handed no list it holds nothing back.
+The word is matched whole, anywhere after the number, singular or plural
+(`1 small handful`, `2 handfuls`, `1 large handful each`). **`large`, `medium`
+and `small` must never join it** — Helen: *"Things like '2 large' can scale,
+surely"* — and a test refuses them. `sprig`, `bunch`, `drop` and `twist` are
+deliberately absent: counts of a thing you can pick up, which still scale; the
+file has the counts and the argument.
+
+**The NAME on that line is the ingredient, not the recipe's sentence about
+it** (`noteName`): a leading measure phrase written into `item:` is dropped
+("a few dashes of", only where the phrase holds a declared measure and ends in
+`of`, so `cream of tartar` survives), then everything from the first comma or
+open bracket — the cut `_plugins/food_shopping.rb` makes for the list above —
+then a trailing `to taste`/`to serve` from `trailing_phrases` in
+`ingredient_words.yml`. **The comma cut is what makes the comma-joined line
+safe**, and its cost is that an item which is itself a list (`fresh parsley,
+thyme and sage`) is named by its first member. **The index's shopping list
+does NOT apply `unscaled_measures`**: it still totals `1 handful` at ⅔.
+
+**Where it is tested.** `food-scale.test.js` (the recipe page's scaler, reading
+the real `scaling.yml`), `test_the_recipe_scaler_is_handed_the_unscaled_measures`
+in `tests/test_site_config.py` (the data reaching the page),
+`food-shopping-list.test.js` (the arithmetic),
 `shopping-list.test.js` (the parser, including the no-change-for-cocktails
 claim), `food-index-startup.test.js` (the wiring, §10.2),
 `tests/test_food_shopping.py` (the two data files),

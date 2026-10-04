@@ -26,7 +26,9 @@
 // handfuls", "some", "to taste" -- comes back untouched with `scaled: false`,
 // and the page names it under the control (Helen: "let's add a note to
 // bitters and handfuls"). `parseAmount` returning null is a real answer, not
-// a failure, exactly as the shopping list treats it.
+// a failure, exactly as the shopping list treats it. SO DOES A NUMBERED
+// AMOUNT IN A MEASURE TAKEN BY HAND -- "1 handful", "1 pinch" -- since #1125:
+// see `isUnscaledMeasure` below, and `noteName` for what the page calls it.
 //
 // "2 large" SCALES, because `large` is a unit to the parser and a SYMBOL to
 // the labeller (no plural), so it prints "4 large" -- Helen: "Things like
@@ -63,19 +65,57 @@
     cl: { unit: 'ml', factor: 10 }
   };
 
+  /* A MEASURE TAKEN BY HAND OR EYE HAS NO FRACTION -- #1125, 2026-10-04.
+     Helen: "Currently some recipes scale 1 handful to e.g. 1.17 handfuls,
+     which is obvious nonsense." `1 handful` has a number in it, so the parser
+     reads it and, before this, the arithmetic ran.
+
+     THE WORDS ARE DATA, `unscaled_measures` in _data/food/scaling.yml, and
+     are PASSED IN -- the layout emits them, recipe-scale.js hands them over,
+     and this file names none of them. With no list given nothing is held
+     back, which is what every caller before #1125 gets.
+
+     MATCHED AS A WHOLE WORD ANYWHERE IN THE AMOUNT, singular or plural, so
+     `1 small handful`, `2 handfuls`, `1 large handful each` and `2 pinches`
+     are all caught and `1 handfulness` is not. */
+  function escapeRegExp(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function measureWords(measures) {
+    return (measures || [])
+      .map(function (m) { return String(m).trim().toLowerCase(); })
+      .filter(function (m) { return m !== ''; })
+      .map(escapeRegExp)
+      .join('|');
+  }
+
+  function isUnscaledMeasure(amount, measures) {
+    var words = measureWords(measures);
+    if (!words) return false;
+    return new RegExp('(^|[^a-z])(?:' + words + ')(?:e?s)?(?![a-z])', 'i')
+      .test(String(amount || ''));
+  }
+
   /**
    * One written amount at a factor.
    *
    * @param {string} amount - as the recipe wrote it: "200 g", "1½ tbsp",
    *        "30–50 g", "2 large", "1 tbsp (6 g)", "a few handfuls"
    * @param {number} factor - portions wanted over portions the recipe makes
+   * @param {{unscaled?: string[]}} [options] - `unscaled` is
+   *        _data/food/scaling.yml's `unscaled_measures`
    * @returns {{text: string, scaled: boolean}} the amount to show, and
-   *        whether it moved. An unparseable amount comes back as written.
+   *        whether it moved. An unparseable amount, and one in a measure that
+   *        does not scale, come back as written.
    */
-  function scaleAmount(amount, factor) {
+  function scaleAmount(amount, factor, options) {
     var written = String(amount === undefined || amount === null ? '' : amount);
     var parsed = parseAmount(written);
     if (!parsed || !(factor > 0)) {
+      return { text: written, scaled: false };
+    }
+    if (isUnscaledMeasure(written, options && options.unscaled)) {
       return { text: written, scaled: false };
     }
 
@@ -107,7 +147,69 @@
     return { text: totalText(total), scaled: true };
   }
 
+  /* THE NAME ON HELEN'S "(Not scaled: ...)" LINE -- #1125. Her two examples
+     are the specification: "few dashes of Tabasco sauce to taste, unless
+     feeding Helen" is listed as "Tabasco sauce", and "a handful of fresh
+     parsley" as "fresh parsley". The line names the INGREDIENT, not the
+     recipe's whole sentence about it. Three cuts, in this order:
+
+     1. A LEADING MEASURE PHRASE, where the recipe wrote the quantity into
+        `item:` -- "a few dashes of", "A large handful of", "a good pinch of".
+        Only a phrase holding one of the declared measures AND ending in `of`
+        is taken, so "cream of tartar" and "leg of lamb" are untouched: the
+        trap _data/food/ingredient_words.yml's `measure_phrases` header names.
+     2. EVERYTHING FROM THE FIRST COMMA OR OPEN BRACKET -- the preparation
+        ("parsley, chopped"), the aside ("paprika, unless feeding Helen"). The
+        same cut _plugins/food_shopping.rb makes for the shopping list, and it
+        is what makes her comma-joined line safe: #1088 gave up the semicolon
+        knowing "a name containing a comma would read as two", and after this
+        cut no name contains one. THE COST: an item that is itself a list
+        ("fresh parsley, thyme and sage") is named by its first member.
+     3. A TRAILING INSTRUCTION -- "to taste", "to serve" -- from
+        `trailing_phrases` in ingredient_words.yml, passed in like the
+        measures. Only at the END, which is that list's own rule.
+
+     Never cuts a name to nothing: if a step would leave an empty string, the
+     text before that step stands. */
+  var QUANTIFIER = '(?:(?:an?|one|two|a\\s+few|few|some|a\\s+couple\\s+of|several)\\s+)?';
+  var SIZE = '(?:(?:small|large|big|good|generous|little)\\s+)?';
+
+  function keep(candidate, fallback) {
+    var trimmed = candidate.replace(/\s+/g, ' ').trim();
+    return trimmed === '' ? fallback : trimmed;
+  }
+
+  /**
+   * @param {string} text - the ingredient row's text, amount and note removed
+   * @param {{unscaled?: string[], trailing?: string[]}} [options]
+   * @returns {string} the ingredient's name, for the note under the control
+   */
+  function noteName(text, options) {
+    var opts = options || {};
+    var name = keep(String(text === undefined || text === null ? '' : text), '');
+
+    var words = measureWords(opts.unscaled);
+    if (words) {
+      var leading = new RegExp(
+        '^' + QUANTIFIER + SIZE + '(?:' + words + ')(?:e?s)?(?:\\s+each)?\\s+of\\s+', 'i');
+      name = keep(name.replace(leading, ''), name);
+    }
+
+    name = keep(name.split(/[,(]/)[0], name);
+
+    (opts.trailing || []).forEach(function (phrase) {
+      var p = String(phrase).trim().toLowerCase();
+      if (p === '') return;
+      if (name.toLowerCase().slice(-(p.length + 1)) === ' ' + p) {
+        name = keep(name.slice(0, name.length - p.length - 1), name);
+      }
+    });
+
+    return name;
+  }
+
   return {
-    scaleAmount: scaleAmount
+    scaleAmount: scaleAmount,
+    noteName: noteName
   };
 });
