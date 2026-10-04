@@ -7135,6 +7135,26 @@ verification. Dates are when the correction landed.
   `push` from this repository counts now; the others are listed and marked.
   Two tests in `test_agent_wrappers.py` pin them, with that evening's rows.
 
+- **2026-10-04, #1281 — the one-line fix above is made, and the build stops
+  waiting for the suite.** Helen added the `workflow` scope to the agent
+  account's token and pointed a session at #1281: *"I've added workflow
+  permissions to your GitHub token, so please also look at #1281"*. That
+  supersedes *"Leave the rest for now please"* for this file and no further:
+  the change went up as a PR for her to merge, like any other, and repository
+  settings, secrets and the Actions settings stay off limits. Two changes.
+  Pull-request runs leave the `pages` group for `pr-<number>`, where a newer
+  push cancels the run it supersedes, so a PR can no longer drop a waiting
+  deploy. And `build` no longer declares `needs: test`; `deploy` declares
+  `needs: [test, build]`, which is the same gate about two minutes sooner
+  (187s + 8s against 187s + 113s + 8s, measured 2026-10-02).
+  **What a session could and could not verify before the merge**: the YAML
+  parses and the deploy-gate test passes on it locally, and the PR's own run
+  exercises the pull-request half. The push half — the parallel build, and
+  `deploy` waiting on both — runs for the first time on the merge itself.
+  `.github/ci-staging/pull-request-trigger.md` went in the same PR: #1195 was
+  applied on 2026-09-28 and the folder's own README says to delete a staged
+  file once it is live.
+
 ## §13 The visual design — the road to each value
 
 - **2026-07-31 / 2026-08-01 / 2026-08-02** — Recipe page redesigned; index

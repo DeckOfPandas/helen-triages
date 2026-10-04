@@ -2988,17 +2988,17 @@ Two consequences worth knowing before they surprise you:
   a close-and-reopen produced no run at all. `@dependabot rebase` as a PR
   comment force-pushes the branch, which fires `synchronize`, and that does
   run. Reach for the rebase, not the reopen.
-- **A PR check can CANCEL a waiting deploy, and `main` then reads `cancelled`,
-  not red.** Every run, deploys and PR checks alike, shares one concurrency
-  group (`pages`, `cancel-in-progress: false`). GitHub keeps one waiting run
-  per group, so a deploy queued behind another is dropped the moment any PR
-  opens or updates. Nothing is lost for long — the next push to `main` builds
-  everything — but **the last merge of a sitting can stay undeployed until the
-  next one**. `main-ci-status.sh` says so in those words — *"CANCELLED -- that
-  merge is NOT DEPLOYED"*, exit 1, and no longer "DEPLOY OUTAGE", which it is
-  not; the way out is Helen re-running it in the Actions tab, or any later
-  merge. Happened three times on 2026-10-02 (DECISIONS §12); the cause is
-  unfixed by her choice.
+- **A waiting deploy can be CANCELLED, and `main` then reads `cancelled`, not
+  red.** Deploys share one concurrency group (`pages`,
+  `cancel-in-progress: false`), and GitHub keeps one waiting run per group, so
+  a deploy queued behind another is dropped when a newer push to `main`
+  arrives. That form is benign: the newer run carries the older merge.
+  **Pull-request runs are no longer in that group** (#1281): each PR has its
+  own, `pr-<number>`, where a new push cancels the run it supersedes. Until
+  then any PR opening or updating could drop a waiting deploy, which happened
+  three times on 2026-10-02 (DECISIONS §12). `main-ci-status.sh` still reports
+  a cancelled push run as *"CANCELLED -- that merge is NOT DEPLOYED"*, exit 1;
+  the way out is Helen re-running it in the Actions tab, or any later merge.
 - **`main-ci-status.sh` judges pushes to this repository only.** Its endpoint
   filters on `branch=main`, which also matches a pull request FROM a branch
   called `main` — every fork that never branched. Such a run is listed,
@@ -3006,8 +3006,10 @@ Two consequences worth knowing before they surprise you:
   2026-10-02 a failing fork PR as the newest row would have read as an outage.
 
 **The suite gates the deploy** (#369): `.github/workflows/build-and-deploy.yml`
-has a `test` job and `build` declares `needs: test`, so every guard here is a
-build stop rather than a report. Three things are load-bearing:
+has a `test` job and `deploy` declares `needs: [test, build]`, so every guard
+here is a deploy stop rather than a report. `build` runs alongside `test`
+since #1281 and no longer waits for it: a red suite builds an artifact that is
+never deployed. Three things are load-bearing:
 
 - **`fetch-depth: 0`** — in a shallow clone `git log -- <file>` reports one
   commit for every file and §4.0's provenance test would pass over nothing.

@@ -21,9 +21,10 @@ would have announced a deploy outage over a stranger's fork. So a run counts
 only if it is a `push` from this repository; the rest are listed, marked, and
 kept out of the verdict.
 
-A CANCELLED RUN IS NOT A RED ONE, and the old message said it was. Every run
-shares one concurrency group, so a deploy waiting behind another is dropped
-when a newer run arrives (DECISIONS §12). That merge is then NOT DEPLOYED --
+A CANCELLED RUN IS NOT A RED ONE, and the old message said it was. Deploys
+share one concurrency group, so a deploy waiting behind another is dropped
+when a newer one arrives -- and until #1281 pull-request runs shared it too
+(DECISIONS §12). That merge is then NOT DEPLOYED --
 which needs saying -- but nothing is broken and the next push deploys it, so
 "every later merge ships nothing" was false and, worse, cried outage over
 something a re-run fixes.

@@ -512,6 +512,7 @@ argument and the rules each field is read by.
 - 2026-09-15 · §12 · A double hyphen inside an SVG comment — 2026-09-15, #1086.
 - 2026-09-28 · §12 · A label from the instructions, pasted into the workflow
 - 2026-10-02 · §12 · a PR check cancels a waiting deploy, and it reads as cancelled, not red.
+- 2026-10-04 · §12 · #1281 · the one-line fix above is made, and the build stops waiting for the suite.
 - 2026-07-31 · §13 · Recipe page redesigned; index brought onto the same mark, then reworked (row layout, category-code bar, pagination, shuffle).
 - 2026-08-03 · §13 · The category-code bar removed after four rounds of tuning.
 - 2026-08-10 · §13 · #122 · The tape background redesigned (generate_tape.py, seven files: tape-1 30 both_acute, tape-2 32 both_acute, tape-3 33 both_acute, tape-4 35 both_obtuse, tape-5 36 both_obtuse …
