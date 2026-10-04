@@ -39,9 +39,21 @@
 // Clip-path shape — now for .badge only. Two consumers, and BOTH say what a
 // row IS rather than what state it is in: `.badge-magic-bag` (there is no
 // method on the other side of this link) and `.badge-draft` (this row is not
-// on the live site). Neither declares anything of its own, which is why they
-// look identical -- Helen asked for exactly that on #562, "styled exactly as
-// 'magic bag' which is already in place", and it needed no rule to deliver.
+// on the live site).
+//
+// ONE RULE FOR BOTH, SINCE #1201 (2026-10-04) -- `&-draft, &-magic-bag` below.
+// Helen's ruling on the magic bag, 2026-09-28: "Let's just give it a quiet
+// mark, where 'draft' is on the live site, and next to it on the local site."
+// So the magic bag takes the draft mark's own look, and nothing new was
+// designed for it.
+//
+// THIS COMMENT USED TO SAY SOMETHING THAT WAS NOT TRUE, and it is worth the
+// two lines. From #562 it read "neither declares anything of its own, which is
+// why they look identical". `&-draft` has declared a tint and a lighter text
+// colour since the first commit; `.badge-magic-bag` declared nothing, so the
+// two were never identical -- `magic bag` was bare text in the row's own
+// colour, the louder of the pair. tests/test_rendered_pages.py now reads the
+// COMPILED css and fails if the two marks stop sharing one rule.
 //
 // `.badge-meta-rewrite` and `.badge-meta-proofread` were named here too, and
 // went with #562: a work-state note on every unfinished row is a to-do list
@@ -74,7 +86,7 @@
   padding: $space-xxs 0.65rem $space-xxs $space-sm;
   transition: all 0.1s ease-in-out;
 
-  &-draft {
+  &-draft, &-magic-bag {
     background-color: rgba($color-text, 0.05);
     color: lighten($color-clear-text, 12%);
   }

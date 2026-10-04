@@ -932,15 +932,36 @@ the magic bag is exempted in both places (the row `if` and the survivor
 count), not papered over with a fake `rewritten`; the derived ingredient
 index reads `ingredient_groups`, so a second loop reads `ingredients` (an
 empty vocabulary would hand back every dish on an exclusion — *fine to include
-ON, dangerous to exclude BY*); a `magic bag` badge on the row, shown in
+ON, dangerous to exclude BY*); a `magic bag` mark on the row, shown in
 production, because it says what you are about to CLICK. `test_no_recipe_only_keys`
 catches the halfway state of a dish being written up in place — promotion
 means moving it to `_food_drafts/` and taking the recipe schema.
 
-**Open**: whether the index needs a way to include or exclude the magic bag in
-production (#507 — Helen: *"I need to think about that more"*); whether
-`magic bag` is the right reader-facing word and permalink (#508); the README
-still describes two collections (#509, her voice).
+**The mark, and no filter** (#1201, settling #507). Helen: *"I don't need to
+filter by this. Let's just give it a quiet mark, where "draft" is on the live
+site, and next to it on the local site."* The `magic bag` mark is written into
+the row's `.badge-group-meta` — the slot the `draft` mark uses — ahead of
+`draft`, and `_sass/food/_badges.scss` styles the two in ONE rule, so it has
+the draft mark's look and nothing of its own. On the live site no row is a
+draft, so the slot is the magic bag's; locally it is the same slot, and since
+a row comes from exactly one collection no row carries both today. Nothing on
+the index filters on it and no row attribute records it: do not add one. The
+mark is on the index row only — the dish page has none, and neither does a
+food draft's page. `tests/test_rendered_pages.py` pins the slot, the gate and
+the shared rule against a fixture dish.
+
+**The spec always runs.** Every test in `test_magic_bag.py` is per-entry, so
+an empty collection would collect zero cases and read green. `conftest.py`
+parametrises `magic_bag` with a committed fixture entry
+(`tests/fixtures/magic_bag/`, outside Jekyll's build and outside
+`ALL_MAGIC_BAG`) ahead of the real ones, and `test_magic_bag.py` breaks that
+fixture one way per rule to prove each rule can fail. There is deliberately no
+"collection must be non-empty" assertion — it would hold `main` red until
+Helen writes a dish; an empty collection prints *"Not evidence about the magic
+bag"* at the end of the run instead.
+
+**Open**: whether `magic bag` is the right reader-facing word and permalink
+(#508); the README still describes two collections (#509, her voice).
 
 `.recipe--magic-bag` exists for one spacing consequence (the badges would
 otherwise sit against the tagline on a page with no metadata grid) and is not
