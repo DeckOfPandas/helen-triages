@@ -940,15 +940,29 @@ means moving it to `_food_drafts/` and taking the recipe schema.
 **The mark, and no filter** (#1201, settling #507). Helen: *"I don't need to
 filter by this. Let's just give it a quiet mark, where "draft" is on the live
 site, and next to it on the local site."* The `magic bag` mark is written into
-the row's `.badge-group-meta` — the slot the `draft` mark uses — ahead of
-`draft`, and `_sass/food/_badges.scss` styles the two in ONE rule, so it has
-the draft mark's look and nothing of its own. On the live site no row is a
-draft, so the slot is the magic bag's; locally it is the same slot, and since
-a row comes from exactly one collection no row carries both today. Nothing on
-the index filters on it and no row attribute records it: do not add one. The
-mark is on the index row only — the dish page has none, and neither does a
-food draft's page. `tests/test_rendered_pages.py` pins the slot, the gate and
-the shared rule against a fixture dish.
+the row's `.badge-group-meta` — the slot the `draft` mark uses — and
+`_sass/food/_badges.scss` styles the two in ONE rule, so it has the draft
+mark's look and nothing of its own. Nothing on the index filters on it and no
+row attribute records it: do not add one. The mark is on the index row only —
+the dish page has none, and neither does a food draft's page.
+
+**A magic-bag dish can be a draft, and `magic bag` is always on the right.**
+Helen: *"a recipe can have magic bag AND draft. Always sit magic bag on the
+right."* `draft` on a row means *this row is not on the live site*. For a
+recipe that is its collection (`food_drafts`); a magic-bag dish never lives
+there, so for it the same fact is the publish gate's — it is a draft until it
+says `awaiting_fix: false` AND `proofread: true` (§4.0), and `food/index.html`
+derives `is_draft` the gate's way round, failing closed. So every new dish
+starts out marked `draft` locally and loses the mark when Helen sets
+`proofread: true`. Production never shows the pair: the gate has removed a
+held-back dish before the index renders, so there a magic-bag row carries
+`magic bag` alone. The slot is a flex row packed to its right-hand end and
+`magic bag` is written LAST, which is what puts it on the right in both cases.
+A held-back recipe in `_food_recipes/` is NOT marked `draft`; her ruling was
+about the magic bag. `tests/test_rendered_pages.py` pins all of this against
+fixture dishes, in the shared production fixture build and in one local
+fixture build (`built_with_fixtures(..., local=True)`), which exists because
+no production build can contain the pair.
 
 **The spec always runs.** Every test in `test_magic_bag.py` is per-entry, so
 an empty collection would collect zero cases and read green. `conftest.py`
