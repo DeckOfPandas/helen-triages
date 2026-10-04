@@ -111,6 +111,7 @@ argument and the rules each field is read by.
 - 2026-08-30 · §4.3 · #562 · The three meta filters (and the three-valued data-meta-short they needed — 'true', 'false', 'n/a', because the short-method filter was a PAIR wanting opposite answers) deleted …
 - 2026-09-06 · §4.3 · #507 #508 #509 · #507 (include/exclude the magic bag in production) can no longer be answered "put it in META FILTERS"; Helen: "I need to think about that more." Open: #508 (the word and the …
 - 2026-10-04 · §4.3 · #1201 #507 · The magic bag is filled, not retired, and it gets a mark, not a filter.
+- 2026-10-04 · §4.3 · #1201 · A magic-bag dish can be a draft, and magic bag is always on the right.
 - 2026-10-04 · §4.3 · #1201 · The spec had tested nothing for four weeks.
 - 2026-08-09 · §5 · All nine Estimated N mins an earlier Claude had invented are gone; Helen replaced them by hand rather than have them converted to QQ.
 - 2026-08-21 · §5 · #413 #426 · En-dash scope and the QQ stop (§4 above).
@@ -202,6 +203,7 @@ argument and the rules each field is read by.
 - 2026-10-02 · §9.3 · #1263 · A pour's direction renders UNDER its amount, in the amount's own type.
 - 2026-10-02 · §9.3 · #1273 #1217 · 's rename missed a seventh to top, in the suite itself, and it did not fail.
 - 2026-09-26 · §9.3 · "dashes" throughout, "dash" when it is one.
+- 2026-10-04 · §9.3 · #1213 · A cocktail DRAFT's top-level keys are in the order the page prints them.
 - 2026-08-21 · §9.3.1 · #441 · generic as a list means OR and only OR.
 - 2026-08-22 · §9.3.1 · #322 #314 · ingredients.yml written (#322 the spec, #314 the rum half).
 - 2026-08-23 · §9.3.1 · #441 · character lives on the recipe, not a bottle table.

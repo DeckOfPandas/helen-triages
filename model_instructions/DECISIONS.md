@@ -1019,8 +1019,22 @@ unless stated.
   nothing, so `magic bag` was the LOUDER of the pair, while `_badges.scss` had
   said since #562 that they were identical "because neither declares
   anything". One rule styles both now, and a rendered test reads the compiled
-  css. **A comment asserting two things look the same is not a check.** No row
-  carries both marks: a row comes from one collection.
+  css. **A comment asserting two things look the same is not a check.**
+- **2026-10-04, #1201** — **A magic-bag dish can be a draft, and `magic bag`
+  is always on the right.** Helen, on seeing the first build (which said no
+  row could carry both marks): *"a recipe can have magic bag AND draft. Always
+  sit magic bag on the right."* So `draft` on a magic-bag row is decided by
+  the publish gate, not the collection: a dish is a draft until it says
+  `awaiting_fix: false` AND `proofread: true`, derived in `food/index.html`
+  the gate's way round so it fails closed. Every new dish therefore starts out
+  marked `draft` locally and loses the mark when she proofreads it; production
+  never shows the pair, because the gate has removed a held-back dish before
+  the index renders. `magic bag` is written last in a slot packed to its
+  right-hand end, which is what puts it on the right, alone or beside `draft`.
+  A held-back recipe in `_food_recipes/` is still not marked: her ruling was
+  about the magic bag. **The first build said no row could carry both because
+  that was what the code did; the code's answer was not hers, and she moved it
+  by looking.**
 - **2026-10-04, #1201** — **The spec had tested nothing for four weeks.** Every
   test in `test_magic_bag.py` is per-entry; the collection emptied on
   2026-09-07 and the file collected zero cases and read green. The issue's own
@@ -2134,6 +2148,37 @@ unless stated.
   derived reads the form** — `_millilitres` accepts either — so before the test
   the two spellings were invisible to the whole suite and had drifted for as
   long as the collection existed.
+- **2026-10-04, #1213** — **A cocktail DRAFT's top-level keys are in the
+  order the page prints them.** Helen: *"yaml fields should be rewritten in
+  the order they appear on the page, top to bottom"*; scope *"Do not apply
+  this retrospectively to published recipes / Please apply to drafts / Please
+  apply to new ingests"*; cocktails only. The order is
+  `TOP_LEVEL_KEYS_IN_ORDER` in `tests/test_cocktails.py` and is derived from
+  `_layouts/cocktail.html` by a test, starting below the glass icon: title,
+  tagline, glass, garnish, meta, mood, ingredients, serve, serves, method,
+  to_serve, notes, source, source_url. `meta` is fifth because SHIP IT? is;
+  `serve` follows `ingredients` because the ice prints on the strain step;
+  `serves` is placed by hand because the layout never names it.
+  - **She asked for one draft first** (*"Start with altering one test draft
+    and wait for Helen to confirm it's correct"*), and `billingsley-punch`
+    alone was reordered. Her answer, the same day: ***"Billingsley: looks
+    great! Deep breath, please do the same for all our drafts a) now, and b)
+    at ingest, so update those docs. 1. meta placement is correct -- so much
+    easier for me to read. 2. My list is wrong! The agent is correct. 3.
+    Great. Serve should go after ingredients so my brain doesn't turn inside
+    out."*** Her own example on the issue had put moods before ship; the
+    layout prints ship first, and the layout won on her word.
+  - **The pass ran over all 62 drafts as drafts schema 2**
+    (cocktails-private PR #84). `tidy_drafts.py --only order` moves whole
+    blocks, edits no line, and carries the 2026-08-29 lesson inside the fixer
+    — same lines, same parsed data, declared order, or it raises. **A
+    reorder's diff is unreadable by construction, so the proof is the parse,
+    never the read.**
+  - **At ingest the finishing pass ALWAYS runs `--only order` on a cocktail**,
+    because the repo-less Project writes the old order until
+    `INGEST_ONE_COCKTAIL.md` is re-uploaded.
+  - **The public and private halves must merge together.** CI has no drafts
+    and stays green on a mismatch; only a local run shows it.
 
 ### §9.3.1 The ingredient vocabulary
 
