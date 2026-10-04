@@ -1643,7 +1643,11 @@ unless stated.
   search missing a stopword or an accent, *"No need to raise the issue as I
   think that behaviour is fine."* A typed plural still finds its merged word (`potatoes`, `cherry`,
   `carrots`): the query is read through the same two steps and tried against
-  the merged key. The module is fetched on first focus where the page has not
+  the merged key. **Such a word has its shared STEM highlighted** (`potato`
+  for `potatoes`, `cherr` of `cherries` for `cherry`; `stemHitOf`), added the
+  same evening on Helen's yes: it first shipped with no mark at all, because
+  what was typed is not in the label, and a plain row among marked ones read
+  as a mistake. The module is fetched on first focus where the page has not
   loaded it, and the box fails open to the raw words without it. Cocktails
   untouched — its words are the card's declared labels already.
 

@@ -132,6 +132,35 @@
     return at === -1 ? null : [at, at + query.length];
   }
 
+  /* THE HIGHLIGHT FOR A WORD FOUND THROUGH ITS MERGED SPELLING -- #1289's
+     follow-up. "potatoes" finds the word labelled "potato" and "cherry" the
+     one labelled "cherries"; what was typed is not in the label, so hitOf has
+     nothing to mark and the result sat there plain, looking like a mistake.
+     What the two DO share is a stem, so that is what is marked: the longest
+     run that begins a word of the label and also begins a word of the query
+     ("potato", "cherr"; "gar" for "fresh gar" on "garlic"). The earliest such
+     run wins a tie, and under MIN_QUERY_CHARS is no run at all. */
+  function stemHitOf(folded, query) {
+    function starts(str) {
+      var out = [];
+      for (var i = 0; i < str.length; i++) {
+        if (!/\s/.test(str.charAt(i)) && (i === 0 || /\s/.test(str.charAt(i - 1)))) out.push(i);
+      }
+      return out;
+    }
+    var best = null;
+    starts(folded).forEach(function (p) {
+      starts(query).forEach(function (q) {
+        var n = 0;
+        while (p + n < folded.length && q + n < query.length &&
+               folded.charAt(p + n) === query.charAt(q + n)) n++;
+        while (n > 0 && /\s/.test(folded.charAt(p + n - 1))) n--;
+        if (n >= MIN_QUERY_CHARS && (!best || n > best[1] - best[0])) best = [p, p + n];
+      });
+    });
+    return best;
+  }
+
   function encode(value) {
     return encodeURIComponent(String(value));
   }
@@ -331,7 +360,9 @@
             return {
               label: v.label,
               href: hrefForWord(g, v.label),
-              hit: hitOf(v.key, query),
+              // By its label when the label matched; otherwise it was found
+              // through its merged spelling, and the shared stem is marked.
+              hit: tierOf(v.key, query) ? hitOf(v.key, query) : stemHitOf(v.key, query),
               count: v.count
             };
           }),
@@ -354,6 +385,7 @@
     foldByCharacter: foldByCharacter,
     tierOf: tierOf,
     hitOf: hitOf,
+    stemHitOf: stemHitOf,
     create: create
   };
 

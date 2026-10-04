@@ -259,6 +259,24 @@ test('a merged word still answers to the spelling that was merged away', () => {
   assert.deepStrictEqual(ingredientsOf(s.search('carrots')).map((r) => r.label), ['carrot']);
 });
 
+test('a word found through its merged spelling has the shared stem marked', () => {
+  const s = PS.create(PLURALS, IS);
+  const marked = (q) => ingredientsOf(s.search(q)).map((r) => [r.label, r.hit && r.label.slice(r.hit[0], r.hit[1])]);
+  // What was typed is not in the label; the stem the two share is.
+  assert.deepStrictEqual(marked('potatoes'), [['sweet potato', 'potato']]);
+  assert.deepStrictEqual(marked('cherry'), [['cherries', 'cherr']]);
+  assert.deepStrictEqual(marked('carrots'), [['carrot', 'carrot']]);
+  // Across words, and never ending on the space between them.
+  assert.deepStrictEqual(marked('sweet potatoes'), [['sweet potato', 'sweet potato']]);
+  // A stripped modifier in front of the query: the stem is the other word's.
+  assert.deepStrictEqual(marked('fresh gar'), [['garlic', 'gar']]);
+  // A label that matched as typed is marked as it always was.
+  assert.deepStrictEqual(marked('swee')[0], ['sweet potato', 'swee']);
+  // Nothing shared from a word start is no mark, not a guess.
+  assert.strictEqual(PS.stemHitOf('garlic', 'fresh'), null);
+  assert.strictEqual(PS.stemHitOf('potato', 'p'), null);
+});
+
 test('without the picker, or without a vocabulary, every value is its own word', () => {
   // Fails open: ingredient-search.js not loaded is the pre-#1289 dropdown,
   // not an empty one.
