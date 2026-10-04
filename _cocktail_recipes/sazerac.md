@@ -45,7 +45,7 @@ mood:
   - "no juicing"
 notes:
   - label: "Choice of whiskey"
-    text: "Bulleit rye and Bulleit bourbon are actually pretty good here, but can we ignore the allegations of homophobic abuse? Best to just pick something else."
+    text: "Bulleit rye and Bulleit bourbon are both pretty good here as a pair, but you might prefer to pick something else anyway."
 source: ""
 source_url: ""
 meta:
