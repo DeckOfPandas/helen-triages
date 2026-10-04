@@ -29,7 +29,7 @@ mood:
   - "signature"
   - "no measuring"
 notes:
-  - label: ""
+  - label: "fun flavouring"
     text: "To flavour, add 15 ml more lemon juice and 30 ml of another juice, and switch the syrup if appropriate."
   - label: "egg whites"
     text: "A UK large egg contains 35–40 ml of white, which weighs 38–42 g."

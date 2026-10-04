@@ -4851,14 +4851,6 @@ def test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note():
     )
 
 
-# Published drinks whose note has text and no label, on the day the rule below
-# was written. SHRINK-ONLY: Helen writes the label at her next proofread of the
-# drink and the entry goes. Nothing may be added -- a new drink meets the rule.
-# The label is her word for what the note is about, so it was not invented for
-# her, and writing one would also have taken the drink off the site (#367).
-UNLABELLED_NOTE_ON_2026_10_04 = {"gin-sour"}
-
-
 def _published_note_problem(note) -> str | None:
     """Why this note is not a filled `{label, text}` pair, or None if it is."""
     if not isinstance(note, dict):
@@ -4899,20 +4891,19 @@ def test_a_published_drink_note_is_a_filled_pair():
     Helen, 2026-10-04, asked which of these a published drink may do: "Require
     a real label". PUBLISHED ONLY, through `_load_published`, so it runs in CI:
     a draft's empty halves are placeholders and the test above owns those.
+
+    ONE DRINK FAILED IT THE DAY IT WAS WRITTEN: `gin-sour`, promoted two days
+    earlier with `label: ""`. The word is hers -- "fun flavouring" -- and it
+    was written in the same PR, so the rule started with no exceptions.
     """
     bad = []
-    excused = set()
     checked = 0
     for slug, fm in _load_published():
         for i, note in enumerate(fm.get("notes") or [], 1):
             checked += 1
             problem = _published_note_problem(note)
-            if problem is None:
-                continue
-            if slug in UNLABELLED_NOTE_ON_2026_10_04 and problem == "has an empty `label`":
-                excused.add(slug)
-                continue
-            bad.append(f"{slug} note {i} {problem} -- {note!r}")
+            if problem is not None:
+                bad.append(f"{slug} note {i} {problem} -- {note!r}")
     assert checked, (
         "No published drink carries a note, so this compared nothing -- there "
         "were 39 on 78 drinks when it was written."
@@ -4922,12 +4913,6 @@ def test_a_published_drink_note_is_a_filled_pair():
         + "\n  ".join(bad)
         + "\n\nThe label is the word on the note's tab and is Helen's to write. "
           "A drink with nothing to say writes `notes: []`."
-    )
-    stale = sorted(UNLABELLED_NOTE_ON_2026_10_04 - excused)
-    assert not stale, (
-        f"UNLABELLED_NOTE_ON_2026_10_04 still excuses {stale}, which no longer "
-        f"has an unlabelled note. Delete the entry: an exception that excuses "
-        f"nothing is where the next one hides."
     )
 
 

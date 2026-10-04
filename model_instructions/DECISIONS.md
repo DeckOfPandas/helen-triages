@@ -5291,8 +5291,9 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   VANISH from the page with no error, and an empty label or a bare string
   prints under the literal word "note". Helen: *"Require a real label"*.
   `test_a_published_drink_note_is_a_filled_pair` is the rule, published only.
-  One live case, `gin-sour`, whose label is hers to write: it is the single
-  entry in a shrink-only list and goes at her next proofread. **A docstring
+  One drink failed it, `gin-sour`, promoted on 2026-10-02 with `label: ""`
+  and still `proofread: false`, so never live. Her word for it: *"fun
+  flavouring"*, written in the same PR, so the rule has no exceptions. **A docstring
   naming a rule is not the rule** — the claim had been true of food for two
   months and was copied across as though it travelled.
 
