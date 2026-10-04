@@ -84,6 +84,7 @@
 # =============================================================================
 
 require "set"
+require_relative "amount"
 
 module HelenTriages
   class CocktailUnits < Jekyll::Generator
@@ -265,11 +266,9 @@ module HelenTriages
     def volume_ml(amount)
       a = amount.to_s.strip
       return nil if @excluded.include?(a)
-      m = /\A([\d.]+)\s+(.*)\z/.match(a) or return nil
-      unit = m[2].strip
-      @ignored.each { |w| unit = unit.sub(/\A#{Regexp.escape(w)}\s+/, "") }
-      return nil if @excluded.include?(unit) || !@per_ml.key?(unit)
-      m[1].to_f * @per_ml[unit].to_f
+      number, unit = Amount.parse(a, @ignored)
+      return nil if number.nil? || @excluded.include?(unit) || !@per_ml.key?(unit)
+      number * @per_ml[unit].to_f
     end
 
     # (number, unit) for an amount string -- `[52.5, "ml"]`, `[1, "whole"]`,
@@ -282,13 +281,11 @@ module HelenTriages
     # has to tell those apart -- the first is deliberately outside a total, the
     # second means there is no total to print -- so it needs the unit itself
     # rather than the nil.
+    #
+    # THE SPLIT ITSELF IS `Amount.parse` SINCE #1199 -- _plugins/amount.rb,
+    # one reading shared with the costs and card generators.
     def unit_named(amount)
-      a = amount.to_s.strip
-      m = /\A([\d.]+)\s+(.*)\z/.match(a)
-      return [nil, a] unless m
-      unit = m[2].strip
-      @ignored.each { |w| unit = unit.sub(/\A#{Regexp.escape(w)}\s+/, "") }
-      [m[1].to_f, unit]
+      Amount.parse(amount, @ignored)
     end
 
     # WHAT A `to top` POURS: the midpoint of the declared range, or nil when

@@ -3080,6 +3080,21 @@ unless stated.
     plugin**, and the report reads `data-method-family` and `data-top-ml` off
     the page: the top needs the reading at build time, and two readings of one
     method in two languages is the drift this section keeps writing about.
+- **2026-10-04, #1199 — one Ruby amount parser, and a golden file both
+  languages read.** The regex that splits `"22.5 ml"` was typed out in
+  `cocktail_costs.rb`, twice in `cocktail_units.rb` and in
+  `cocktail_card_ingredients.rb`; it is `HelenTriages::Amount.parse` in
+  `_plugins/amount.rb` now and each generator keeps only its own VERDICT on
+  the result (nil, 0, or declared-non-volume), which are three different
+  questions. Done after #1179 and #1132 on purpose: the 2026-09-28 triage
+  left it until the amount grammar had stopped moving, so the fixture is a
+  regression net and not a snapshot of a migration's middle.
+  `tests/fixtures/amounts.json` is every distinct amount in the PUBLISHED
+  collection (draft amounts stay out of a public file) with what each parser
+  reads. **The two grammars differ and the file records where**: the browser
+  folds `dashes` to `dash`, reads a bare `15` as a count and `half` as 0.5;
+  the build does none of those. What is asserted across them is the one thing
+  that must hold: where both read a number, it is the same number.
 
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 

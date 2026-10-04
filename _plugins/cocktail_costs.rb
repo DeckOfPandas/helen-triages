@@ -68,6 +68,7 @@
 
 require "date"
 require "set"
+require_relative "amount"
 
 module HelenTriages
   class CocktailCosts < Jekyll::Generator
@@ -297,11 +298,9 @@ module HelenTriages
     def volume_ml(amount)
       a = amount.to_s.strip
       return nil if @excluded.include?(a)
-      m = /\A([\d.]+)\s+(.*)\z/.match(a) or return nil
-      unit = m[2].strip
-      @ignored.each { |w| unit = unit.sub(/\A#{Regexp.escape(w)}\s+/, "") }
-      return nil if @excluded.include?(unit) || !@per_ml.key?(unit)
-      m[1].to_f * @per_ml[unit].to_f
+      number, unit = Amount.parse(a, @ignored)
+      return nil if number.nil? || @excluded.include?(unit) || !@per_ml.key?(unit)
+      number * @per_ml[unit].to_f
     end
 
     # WHERE A DRINK OFFERS A CHOICE OF BOTTLE, AND WHAT EACH ONE WOULD COST --

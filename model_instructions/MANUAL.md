@@ -2913,6 +2913,15 @@ message it used to show could only ever have fired on a drink's own written
 recipe; ONE parser
 (`shoppingList.parseAmount`) across `shopping-list.js` → `scale.js` →
 `cocktail-scale.js`, guarded by `test_the_scaler_scripts_load_in_dependency_order`.
+**One in the BROWSER. The build has its own, and since #1199 it is also one**:
+`HelenTriages::Amount` in `_plugins/amount.rb`, shared by the costs, units and
+card generators, which each used to retype the regex. Its grammar is narrower
+on purpose (cocktail amounts only; the unit as written, nothing folded).
+`tests/fixtures/amounts.json` holds every distinct amount a published drink
+writes with what each parser reads; `tests/test_amount_parser.py` runs the Ruby
+side through `scripts/parse_amounts.rb` with no Jekyll build, and
+`tests/js/shopping-list.test.js` reads the same rows. A new amount shape in a
+published drink fails until it has a row.
 `serves:` exists on nine punch-bowl cocktails and the scaler does not read it —
 *how many does this make* and *how much am I making* are different questions.
 A `{step, note}` pair renders the note under its step and stays visible in

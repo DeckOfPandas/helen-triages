@@ -1000,3 +1000,26 @@ test('no topUpMl at all leaves every existing answer alone', () => {
   assert.strictEqual(rows[0].text, '(top) (×2)');
   assert.strictEqual(rows[0].millilitres, 0);
 });
+
+// =============================================================================
+// THE GOLDEN FILE BOTH LANGUAGES READ -- #1199
+// =============================================================================
+// tests/fixtures/amounts.json holds every distinct amount a published drink
+// writes, with what `_plugins/amount.rb` reads and what `parseAmount` reads.
+// tests/test_amount_parser.py runs the Ruby side over the same rows and checks
+// that wherever both read a number it is the same number. This is the other
+// half: `parseAmount` still reads each row as the file says it does.
+//
+// The two grammars differ on purpose (this one folds `dashes` to `dash`, reads
+// a bare `15` as a count and `half` as 0.5), and the rows record that rather
+// than hide it.
+test('parseAmount reads every amount in the shared fixture as the fixture says', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const rows = JSON.parse(fs.readFileSync(
+    path.join(__dirname, '..', 'fixtures', 'amounts.json'), 'utf8'));
+  assert.ok(rows.length > 40, 'the fixture is all but empty');
+  rows.forEach((row) => {
+    assert.deepStrictEqual(SL.parseAmount(row.amount), row.js, JSON.stringify(row.amount));
+  });
+});

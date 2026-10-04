@@ -99,6 +99,8 @@
 # it would have been making the judgement she declined to hand over.
 # =============================================================================
 
+require_relative "amount"
+
 module HelenTriages
   class CocktailCardIngredients < Jekyll::Generator
     safe true
@@ -207,12 +209,7 @@ module HelenTriages
     # of the glass, not of the recipe, so ranking it against a measured pour
     # would be comparing two different kinds of number.
     def volume_ml(amount)
-      a = amount.to_s.strip
-      m = /\A([\d.]+)\s+(.*)\z/.match(a) or return 0.0
-      unit = m[2].strip
-      @ignored.each { |w| unit = unit.sub(/\A#{Regexp.escape(w)}\s+/, "") }
-      return 0.0 unless @per_ml.key?(unit)
-      m[1].to_f * @per_ml[unit].to_f
+      Amount.millilitres(amount, @per_ml, @ignored) || 0.0
     end
 
     # SUBSTITUTE ONLY IF EVERY GENERIC HAS A CARD NAME. A list generic means
