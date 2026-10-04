@@ -4525,7 +4525,13 @@ notes."* So now:
   only when EVERY typed word is a prefix of a whole word in it, in any order,
   and there is no substring match at all), then star / mood / practicalities on
   food, mood / hassle on cocktails, then the ingredients (main_ingredients on
-  food, the card's ingredient labels on cocktails, never a label joining two
+  food **read through the index picker's own vocabulary since #1289** —
+  `food/search.json`'s ingredient group carries `ingredient_words.yml` as
+  `vocabulary` and `page-search.js` runs each value through
+  `ingredient-search.js`'s `buildMasterList` and `entryKey`, fetched on first
+  focus where the page lacks it, so the box offers `sweet potato` once and
+  every word it offers is a button the picker has; the card's ingredient
+  labels on cocktails, never a label joining two
   generics, "X or Y", #1051: `card_ingredients` rows carry a `generics` count
   and `cocktails/search.json` leaves out only rows counting two or more. **It
   fails open on purpose**: its first version kept `generics == 1`, which on a

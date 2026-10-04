@@ -396,6 +396,23 @@
       });
     }
 
+    // An entry's words as search() compares them: stopwords out, each word to
+    // its singular, folded. Joined, they are the key search() deduplicates on,
+    // which is what makes "cherries" and "cherry" one button.
+    function matchKeyWords(ing) {
+      return getMatchWords(ing).map(normaliseIngredientWord).map(fold);
+    }
+
+    // WHICH PICKER ENTRY A STRING IS -- #1289. Exported for page-search.js,
+    // whose dropdown hands a word to this picker through `?ing=` and so has to
+    // offer the picker's entries, not the recipes' raw text: it was offering
+    // "sweet potato" and "sweet potatoes" as two things. buildMasterList
+    // below says what an entry is renamed to; this says which of the renamed
+    // entries are one button.
+    function entryKey(ing) {
+      return matchKeyWords(ing).join(' ');
+    }
+
     // Takes the raw ingredient strings as they appear on the page (one per
     // recipe, splitting already done by the caller), returns the
     // deduplicated, normalised, alphabetically sorted master list. Both
@@ -448,11 +465,10 @@
       var wordToEntries = {};
       masterIngredientsList.forEach(function (ing) {
         if (familyExceptionSet.has(fold(ing.toLowerCase()))) return;
-        var normWords = getMatchWords(ing).map(normaliseIngredientWord).map(fold);
-        var entryKey = normWords.join(' ');
+        var normWords = matchKeyWords(ing);
         var headWord = normWords[0];
         if (!wordToEntries[headWord]) wordToEntries[headWord] = new Set();
-        wordToEntries[headWord].add(entryKey);
+        wordToEntries[headWord].add(normWords.join(' '));
       });
 
       // Whether the query is a genuine prefix of ANY head word at all,
@@ -520,7 +536,7 @@
 
       masterIngredientsList.forEach(function (ing) {
         var ingWords = getMatchWords(ing);
-        var normWords = ingWords.map(normaliseIngredientWord).map(fold);
+        var normWords = matchKeyWords(ing);
         var normKey = normWords.join(' ');
 
         // Checks each word's normalised form as well as its raw text. Most
@@ -613,6 +629,7 @@
       getSynonymWords: getSynonymWords,
       entriesMatchKey: entriesMatchKey,
       buildMasterList: buildMasterList,
+      entryKey: entryKey,
       search: search
     };
   }

@@ -1614,6 +1614,34 @@ unless stated.
   said so. The agent's browser re-runs used an env-prefixed `node` command
   that asked Helen twice; that shape is what #1098's guard refuses.
 
+- **2026-10-04, #1289 — the search-for-anything box offers the PICKER'S
+  ingredient words, not the recipes'.** Raised as a screenshot: typing `swee`
+  in the header box offered `sweet potato` and `sweet potatoes`. The picker on
+  the index has collapsed that pair since the aliases list was written; the
+  box never went through it. `page-search.js` built its HAS TO HAVE group from
+  `main_ingredients` exactly as written, with no vocabulary at all. Measured
+  over 431 recipes and drafts: 740 raw words against the picker's 677, **56
+  ingredients offered two or three times** (`fresh garlic cloves`, `garlic
+  cloves`, `garlic`), and **81 of the 740 landed on a half-finished search**
+  when clicked, because `?ing=` looks for a button of that exact name and the
+  picker had renamed it. So the plural was the visible tenth of it. The fix is
+  not a plural rule in the box: `food/search.json`'s ingredient group now
+  carries `ingredient_words.yml` (`vocabulary`) and names the script that
+  reads it (`reader`), and the box runs each value through
+  `buildMasterList` and merges on `entryKey` — the picker's own two steps,
+  exported, not copied. 677 words, and 15 of them still find no exact button.
+  **Those 15 are the picker's, not the box's, and are left**: its multi-word
+  search cannot reach an entry with a stopword in it (`rib of beef`, `salmon
+  or trout`) or an accent (`crème fraîche` — the query is folded and the
+  entry's words are not). **Two pairs the picker itself still offers twice**,
+  because nothing in the vocabulary joins them: `plum`/`plums` and
+  `almond`/`almonds`. Not added on Claude's say-so; which form wins is
+  Helen's. A typed plural still finds its merged word (`potatoes`, `cherry`,
+  `carrots`): the query is read through the same two steps and tried against
+  the merged key. The module is fetched on first focus where the page has not
+  loaded it, and the box fails open to the raw words without it. Cocktails
+  untouched — its words are the card's declared labels already.
+
 ## §9 Cocktails
 
 ### §9.1 Privacy, the clone, the fetch discipline
