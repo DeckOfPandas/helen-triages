@@ -2636,6 +2636,22 @@ unless stated.
   with its own note about which tin to buy still gets "Don't use fresh."
   underneath. Cards do not say "fresh" (§9.10.1: nobody filters a card by it).
 
+- **2026-10-04, #838 — crème de cacao is two generics, brown and white.**
+  One `crème de cacao` had carried both, the colour in a pour's note, which a
+  Brandy Alexander pouring both had to say twice. Helen, asked whether that
+  typing was right: *"Brown and white CdC should each be a generic, then no
+  notes are needed. Drop the Giffard suggestion (I hate it!)"* So `brown crème
+  de cacao` and `white crème de cacao`, and the unqualified word is no longer
+  a generic: a source that does not say which is a question for her. Briottet
+  Crème de Cacao Blanc is the white's bottle; the brown has none, and its
+  strength and price are category figures carried across from the white —
+  *"I don't own a brown CdC, so fine to leave as-is."* **Giffard is now
+  refused twice**, for crème de menthe (2026-09-14) and here: do not suggest
+  the house. The same sitting answered thirteen of #838's one-off questions,
+  and one of them is her own answer to this section's warning about punches:
+  Pic-a-de-Crop Punch IS served over a block, chosen by her, not inferred from
+  its siblings.
+
 ### §9.3.2 The bottle dictionary
 
 - **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as

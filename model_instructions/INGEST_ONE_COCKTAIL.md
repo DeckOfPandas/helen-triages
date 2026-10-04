@@ -428,11 +428,11 @@ does not give one you cannot pick: that is a `QQ`.
 **Liqueurs:** `triple sec` · `orange Curaçao` · `dry orange Curaçao` ·
 `Grand Marnier` · `blue Curaçao` · `Créole Shrubb` · `maraschino liqueur` ·
 `crème de mûre` · `crème de cassis` · `crème de pêche` · `crème de banane` ·
-`crème de violette` · `crème de cacao` · `coconut rhum` · `crème de menthe` ·
-`cherry liqueur` · `cherry brandy` · `apricot liqueur` · `coffee liqueur` ·
-`ginger liqueur` · `passion fruit liqueur` · `gentian liqueur` ·
-`apple schnapps` · `peach schnapps` · `mastiha liqueur` · `tomato liqueur` ·
-`amaretto`
+`crème de violette` · `brown crème de cacao` · `white crème de cacao` ·
+`coconut rhum` · `crème de menthe` · `cherry liqueur` · `cherry brandy` ·
+`apricot liqueur` · `coffee liqueur` · `ginger liqueur` ·
+`passion fruit liqueur` · `gentian liqueur` · `apple schnapps` ·
+`peach schnapps` · `mastiha liqueur` · `tomato liqueur` · `amaretto`
 
 **Herbal liqueurs:** `Chartreuse Verte` · `Chartreuse Jaune` · `Bénédictine` ·
 `Galliano` · `Strega` · `Jägermeister` · `liqueur de sapin` ·

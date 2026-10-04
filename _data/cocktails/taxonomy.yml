@@ -459,7 +459,8 @@ mood_ingredients:
   # wrongly pulled in the Aviation) and the fruit liqueurs, which are `fruity`.
   pudding_flavour:
     - coffee liqueur
-    - crème de cacao
+    - brown crème de cacao
+    - white crème de cacao
     - amaretto
     - crème de banane
     - crème de menthe
