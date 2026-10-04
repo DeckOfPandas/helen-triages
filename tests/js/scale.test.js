@@ -94,6 +94,23 @@ test('a bare count keeps its bare number, and grams stay grams', () => {
   assert.deepStrictEqual(out.amounts, ['2', '50 g']);
 });
 
+test('#1132: a printed amount splits into its number and its one-word unit', () => {
+  // For the rows the layout marks quiet ("1 cube" of "sugar cube"): the drink
+  // page prints the number in the amount and the unit, if at all, in the name.
+  assert.deepStrictEqual({ ...scaler.splitUnit('2 cubes') }, { number: '2', unit: 'cubes' });
+  assert.deepStrictEqual({ ...scaler.splitUnit('3 each') }, { number: '3', unit: 'each' });
+  assert.deepStrictEqual({ ...scaler.splitUnit('1.5 each') }, { number: '1.5', unit: 'each' });
+  // The LAST space: a range is all number.
+  assert.deepStrictEqual({ ...scaler.splitUnit('1 to 2 cubes') },
+    { number: '1 to 2', unit: 'cubes' });
+  // No unit at all is not an error.
+  assert.deepStrictEqual({ ...scaler.splitUnit('3') }, { number: '3', unit: '' });
+  assert.deepStrictEqual({ ...scaler.splitUnit('') }, { number: '', unit: '' });
+  // ...and it is what the scaler itself prints that gets split.
+  assert.deepStrictEqual({ ...scaler.splitUnit(scaler.scale(['1 cube'], 12).amounts[0]) },
+    { number: '12', unit: 'cubes' });
+});
+
 // --- the amounts that are not quantities --------------------------------------
 
 test('an amount that is not a quantity passes through untouched', () => {

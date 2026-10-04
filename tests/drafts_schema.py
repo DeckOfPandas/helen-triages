@@ -52,7 +52,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # checkout to be satisfiable. Bump one of these in the same commit as the rule
 # that requires it, and say why in the changelog below.
 REQUIRED = {
-    "_cocktail_drafts": 1,
+    "_cocktail_drafts": 2,
     "_food_drafts": 1,
 }
 
@@ -64,6 +64,10 @@ CHANGELOG = {
         1: "2026-09-05, #722/#712 -- every drink carries `meta.made_before` as "
            "a real boolean, `meta.ship` is a rung or \"who knows\" (`QQ` is no "
            "longer a ship value), and `meta.date_last_edited` is gone.",
+        2: "2026-10-04, #1213 -- every draft's top-level keys are in the order the page "
+           "prints them (`TOP_LEVEL_KEYS_IN_ORDER` in tests/test_cocktails.py), "
+           "written by `python3 scripts/tidy_drafts.py --site cocktails --only "
+           "order --apply`.",
     },
     "_food_drafts": {
         1: "2026-09-05, #624 -- the state on the day the handshake was added. "

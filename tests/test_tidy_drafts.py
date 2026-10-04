@@ -73,6 +73,12 @@ SCRIPT = ROOT / "scripts" / "tidy_drafts.py"
 # was: `item` was excluded by being named in a key list, while this line is
 # excluded twice over, by `generic` being a closed vocabulary AND by the QQ
 # predicate. Both mechanisms have to fail for the `--` in it to be "corrected".
+#
+# THE KEYS ARE IN PAGE ORDER, since #1213 added the `order` rule to the default
+# pass: `meta` and `mood` sit under `garnish`, where the page prints SHIP IT?
+# and the mood chips. So the stock fixture gives that rule nothing to do, and
+# every count below is still the count of the prose faults alone. The rule's own
+# fixture is `ORDER_BEFORE`, further down.
 BEFORE = '''---
 title: "Test Drink"
 tagline: Sharp -- and bright, 2-3 dashes of it
@@ -80,6 +86,13 @@ glass:
   - "old fashioned"
 garnish:
   - "lemon twist"
+meta:
+  ship: "meh"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+mood:
+  - "clear"
 ingredients:
   - amount: "30-45 ml"
     generic: "QQ Somebody Else's Rum -- as printed on the label"
@@ -94,8 +107,6 @@ ingredients:
 method:
   - "Stir all ingredients with ice."
   - "Strain."
-mood:
-  - "clear"
 notes:
   - label: "Balance"
     text: "Give it 2-3 stirs more than you think."
@@ -103,11 +114,6 @@ notes:
     text: "QQ - the source said 2-3 dashes -- reproduce, do not correct"
 source: ""
 source_url: ""
-meta:
-  ship: "meh"
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 '''
 
@@ -122,6 +128,13 @@ glass:
   - "old fashioned"
 garnish:
   - "lemon twist"
+meta:
+  ship: "meh"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+mood:
+  - "clear"
 ingredients:
   - amount: "30-45 ml"
     generic: "QQ Somebody Else's Rum -- as printed on the label"
@@ -136,8 +149,6 @@ ingredients:
 method:
   - "Stir all ingredients with ice."
   - "Strain."
-mood:
-  - "clear"
 notes:
   - label: "Balance"
     text: "Give it 2–3 stirs more than you think."
@@ -145,11 +156,6 @@ notes:
     text: "QQ - the source said 2-3 dashes -- reproduce, do not correct"
 source: ""
 source_url: ""
-meta:
-  ship: "meh"
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 '''
 
@@ -894,6 +900,183 @@ def test_notes_rule_is_idempotent_and_leaves_a_finished_file_alone(drinks):
     assert path.read_text(encoding="utf-8") == BEFORE
 
 
+# =============================================================================
+# KEY ORDER, #1213
+# =============================================================================
+# A drink in the order every draft was in before the rule: body first, `mood`
+# after the method, `meta` last. It carries every optional key (`serve`,
+# `serves`, `to_serve`), a comment INSIDE a block, a nested mapping, a flow
+# list, a `{step, note}` pair and a `QQ` line with a `--` in it -- each a thing
+# that must arrive in its new place exactly as it left the old one. The prose
+# is otherwise clean, so `--only order` and the full pass must agree.
+ORDER_BEFORE = '''---
+title: "Test Punch"
+tagline: "QQ"
+glass:
+  - "punch bowl"
+garnish: []
+ingredients:
+  - amount: "30-45 ml"            # a range the pass must not touch
+    generic: "QQ Somebody Else's Rum -- as printed"
+    suggestion: []
+  - amount: "(top)"
+    generic: "soda water"
+    suggestion: ["Fever-Tree"]
+    optional: true
+serve:
+  ice: "block"
+  # a comment inside the block travels with it
+  fill: "half"
+serves: 8
+method:
+  - "Stir all ingredients with ice."
+  - step: "Strain."
+    note: "slowly"
+to_serve: "Ladle and punch glasses."
+mood:
+  - "clear"
+notes:
+  - label: "QQ"
+    text: "QQ - the source said 2-3 dashes -- reproduce, do not correct"
+source: ""
+source_url: ""
+meta:
+  made_before: false
+  ship: "who knows"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+---
+Body text under the front matter, left exactly alone.
+'''
+
+ORDER_AFTER = '''---
+title: "Test Punch"
+tagline: "QQ"
+glass:
+  - "punch bowl"
+garnish: []
+meta:
+  made_before: false
+  ship: "who knows"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+mood:
+  - "clear"
+ingredients:
+  - amount: "30-45 ml"            # a range the pass must not touch
+    generic: "QQ Somebody Else's Rum -- as printed"
+    suggestion: []
+  - amount: "(top)"
+    generic: "soda water"
+    suggestion: ["Fever-Tree"]
+    optional: true
+serve:
+  ice: "block"
+  # a comment inside the block travels with it
+  fill: "half"
+serves: 8
+method:
+  - "Stir all ingredients with ice."
+  - step: "Strain."
+    note: "slowly"
+to_serve: "Ladle and punch glasses."
+notes:
+  - label: "QQ"
+    text: "QQ - the source said 2-3 dashes -- reproduce, do not correct"
+source: ""
+source_url: ""
+---
+Body text under the front matter, left exactly alone.
+'''
+
+
+def _front_matter(text):
+    import yaml
+    return yaml.safe_load(text.split("---\n")[1])
+
+
+def test_key_order_report_names_the_move_and_writes_nothing(drinks):
+    path = write_drink(drinks, text=ORDER_BEFORE)
+    out = run(drinks, "--only", "order")
+    assert "would apply 1 mechanical change(s) across 1 file(s)" in out, out
+    assert "[order] top-level keys reordered, no line edited" in out, out
+    assert path.read_text(encoding="utf-8") == ORDER_BEFORE
+
+
+@pytest.mark.parametrize("only", [("--only", "order"), ()],
+                         ids=["only-order", "the-full-pass"])
+def test_key_order_apply_moves_whole_blocks_and_edits_no_line(drinks, only):
+    """Byte for byte, and then the three claims the 2026-08-29 lesson asks for.
+
+    THE DIFF OF A REORDER IS UNREADABLE BY CONSTRUCTION -- every moved block is
+    a deletion in one place and an insertion in another -- so "read the diff"
+    is worth even less here than it was for the `meta:` rewrite that broke 341
+    drafts behind a plausible one. Hence: the same lines as a multiset, the
+    same parsed data, and the declared order, each asserted separately so a
+    failure says which.
+    """
+    from test_cocktails import TOP_LEVEL_KEYS_IN_ORDER
+
+    path = write_drink(drinks, text=ORDER_BEFORE)
+    run(drinks, "--apply", *only)
+    got = path.read_text(encoding="utf-8")
+
+    assert sorted(got.split("\n")) == sorted(ORDER_BEFORE.split("\n")), (
+        "the reorder edited, added or dropped a line"
+    )
+    assert _front_matter(got) == _front_matter(ORDER_BEFORE), (
+        "the reorder changed what the file parses to"
+    )
+    assert list(_front_matter(got)) == TOP_LEVEL_KEYS_IN_ORDER, (
+        "the fixture carries every declared key, so after the pass its keys "
+        f"are the declared list exactly: {list(_front_matter(got))}"
+    )
+    if got != ORDER_AFTER:
+        moved = [f"    line {i}\n      want: {w!r}\n      got:  {g!r}"
+                 for i, (w, g) in enumerate(zip(ORDER_AFTER.split("\n"),
+                                                got.split("\n")), 1)
+                 if w != g]
+        pytest.fail("--only order did not produce the expected drink:\n"
+                    + "\n".join(moved or ["(line counts differ)"]))
+
+
+def test_key_order_is_idempotent(drinks):
+    path = write_drink(drinks, text=ORDER_AFTER)
+    out = run(drinks, "--only", "order", "--apply")
+    assert "applied 0 mechanical change(s)" in out, out
+    assert path.read_text(encoding="utf-8") == ORDER_AFTER
+
+
+@pytest.mark.parametrize("before, why", [
+    (ORDER_BEFORE.replace('source: ""\n', '# where it came from\nsource: ""\n'),
+     "a column-0 line that is not a key"),
+    (ORDER_BEFORE.replace("serves: 8\n", "servings: 8\n"),
+     "undeclared key(s) ['servings']"),
+    (ORDER_BEFORE.replace('source_url: ""\n', 'source_url: ""\nserves: 8\n'),
+     "a top-level key appears twice"),
+], ids=["column-0-comment", "undeclared-key", "duplicate-key"])
+def test_key_order_refuses_what_needs_an_eye_and_says_so(drinks, before, why):
+    """Each is left byte for byte as it was, and named under SKIPPED."""
+    assert before != ORDER_BEFORE, "the fixture edit did not land"
+    path = write_drink(drinks, text=before)
+    out = run(drinks, "--only", "order", "--apply")
+    assert "applied 0 mechanical change(s)" in out, out
+    assert "[order] SKIPPED: " + why in out, out
+    assert path.read_text(encoding="utf-8") == before
+
+
+def test_key_order_never_runs_on_food(food):
+    """`--only order` on the food site changes nothing. Helen asked for
+    cocktails; a food recipe's order is not this rule's."""
+    path = food / "test-recipe.md"
+    path.write_text(FOOD_BEFORE, encoding="utf-8")
+    out = run_food(food, "--only", "order", "--apply")
+    assert "applied 0 mechanical change(s)" in out, out
+    assert path.read_text(encoding="utf-8") == FOOD_BEFORE
+
+
 def test_food_only_rules_do_not_run_on_a_drink(drinks):
     """`--only meta` on the drinks site changes nothing, and says so.
 
@@ -911,4 +1094,74 @@ def test_food_only_rules_do_not_run_on_a_drink(drinks):
     assert path.read_text(encoding="utf-8") == BEFORE, (
         "food's `meta:` migration ran over a drink. Check that DRINK_FIXERS "
         "still omits fix_meta_block."
+    )
+
+# =============================================================================
+# A FOOD GROUP'S NAME IS QUOTED -- Helen, 2026-10-04
+# =============================================================================
+# "Let's make future recipes quote group titles, so add that to the tidy pass
+# instructions, and ingestion instructions." Asked after #814 left
+# `- name: cake` beside `- name: "Make the batter"` in one file.
+
+GROUP_NAMES_BEFORE = (
+    "---\n"
+    'title: "Fixture"\n'
+    "ingredient_groups:\n"
+    "  - name: cake\n"
+    "    items:\n"
+    '      - amount: "100 g"\n'
+    '        item: "plain flour"\n'
+    '  - name: "lemon curd"\n'
+    "    items:\n"
+    '      - item: "name: not a group"\n'
+    "method_groups:\n"
+    "  - name: Make the cake\n"
+    "    steps:\n"
+    '      - "Mix."\n'
+    "  - name: 'to serve'\n"
+    "    steps:\n"
+    '      - "Serve."\n'
+    '  - name: the "good" one\n'
+    "    steps:\n"
+    '      - "Eat."\n'
+    "---\n"
+    "Body with - name: prose in it\n"
+)
+
+
+def test_group_names_are_quoted_and_nothing_else_moves():
+    new, changed = tidy_drafts.fix_group_name_quoting(GROUP_NAMES_BEFORE, "fixture.md")
+    expected = (GROUP_NAMES_BEFORE
+                .replace("  - name: cake\n", '  - name: "cake"\n')
+                .replace("  - name: Make the cake\n", '  - name: "Make the cake"\n'))
+    assert new == expected, (
+        "only the two bare group names should gain quotes: an already quoted "
+        "name (either quote), an `item:` that merely contains `name:`, the "
+        "body, and a name holding a double quote are all left exactly as "
+        "written."
+    )
+    assert [c for c in changed if c.startswith("SKIPPED")] == [
+        'SKIPPED group name: contains a double quote: the "good" one'
+    ], "a name containing a double quote is reported, never escaped"
+
+    import yaml
+    before = yaml.safe_load(GROUP_NAMES_BEFORE.split("---", 2)[1])
+    after = yaml.safe_load(new.split("---", 2)[1])
+    assert before == after, "quoting a name changed what the file parses to"
+
+    again, changed_again = tidy_drafts.fix_group_name_quoting(new, "fixture.md")
+    assert again == new and not [c for c in changed_again if not c.startswith("SKIPPED")], (
+        "the rule is not idempotent"
+    )
+
+
+def test_group_name_quoting_is_a_food_rule_under_quoting():
+    food = [(n, f) for n, f in tidy_drafts.FOOD_FIXERS
+            if f is tidy_drafts.fix_group_name_quoting]
+    assert [n for n, _ in food] == ["quoting"], (
+        "`--only quoting` on food must include the group names."
+    )
+    drink_fixers = [getattr(f, "func", f) for _, f in tidy_drafts.DRINK_FIXERS]
+    assert tidy_drafts.fix_group_name_quoting not in drink_fixers, (
+        "a drink has no groups; this rule has nothing to do there."
     )

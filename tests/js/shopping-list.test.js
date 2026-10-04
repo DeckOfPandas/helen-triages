@@ -766,7 +766,86 @@ test('a counted or weighed line with no row stays unpriced', () => {
   // `sugar cube`, so no price and no zero, exactly as before #748.
   const rows = SL.build([ing('12 cubes', 'sugar cube')], { rates: SOLID_RATES });
   assert.strictEqual(rows[0].price, null);
-  assert.strictEqual(rows[0].text, '12 cubes');
+  // "12 cubes" until #1132: the row printed "12 cubes sugar cube". The unit is
+  // still on the total; it is only the printed text that lost it.
+  assert.strictEqual(rows[0].text, '12');
+  assert.strictEqual(rows[0].totals[0].unit, 'cube');
+});
+
+// -----------------------------------------------------------------------------
+// #1132 -- "1 cube sugar cube". Helen's whole report was that line. The amount
+// and the generic are each right; printing them side by side said the word
+// twice. Every pour below is a real one, from the survey of both collections
+// on 2026-10-04 (9 of 765 pours read wrongly, and these are the shapes).
+// -----------------------------------------------------------------------------
+
+test('#1132: a unit the name already says is not printed, and the name takes its plural', () => {
+  // classic-champagne-cocktail
+  let rows = SL.build([ing('1 cube', 'sugar cube')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '1 sugar cube');
+
+  // kill-devil-punch, and the same drink shortlisted beside the champagne one
+  rows = SL.build([ing('12 cubes', 'sugar cube'), ing('1 cube', 'sugar cube')]);
+  assert.strictEqual(rows.length, 1);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '13 sugar cubes');
+
+  // east-river-underground: the name is already the plural
+  rows = SL.build([ing('8 leaves', 'kaffir lime leaves')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '8 kaffir lime leaves');
+  rows = SL.build([ing('1 leaf', 'kaffir lime leaves')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '1 kaffir lime leaf');
+});
+
+test('#1132: the generic is the key and never changes, whatever the label says', () => {
+  const rows = SL.build([ing('12 cubes', 'sugar cube')]);
+  assert.strictEqual(rows[0].label, 'sugar cubes');
+  assert.strictEqual(rows[0].generic, 'sugar cube');
+});
+
+test('#1132: `each` is never printed beside a name', () => {
+  // porn-star-martini, kill-devil-punch, pink-lady
+  let rows = SL.build([ing('1.5 each', 'passion fruit')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '1.5 passion fruit');
+  rows = SL.build([ing('15 each', 'raspberries')], { multiplier: 2 });
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '30 raspberries');
+  rows = SL.build([ing('1 each', 'egg white')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '1 egg white');
+  assert.strictEqual(rows[0].totals[0].unit, 'each');
+});
+
+test('#1132: a unit the name does NOT say is printed as it always was', () => {
+  // arrack-punch and el-mediterraneo: the same units, beside a name that does
+  // not repeat them. These are the lines the fix must leave alone.
+  let rows = SL.build([ing('16 cubes', 'raw sugar')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '16 cubes raw sugar');
+  rows = SL.build([ing('3 leaves', 'basil')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '3 leaves basil');
+  rows = SL.build([ing('2 dashes', 'aromatic bitters')]);
+  assert.strictEqual(rows[0].text, '2 dashes');
+  rows = SL.build([ing('1 whole', 'pear')]);
+  assert.strictEqual(rows[0].text + ' ' + rows[0].label, '1 whole pear');
+});
+
+test('#1132: a one-word name never loses its unit to a bare number', () => {
+  // Hypothetical, and the guard in unitRepeatsName: "2 sprigs" of a generic
+  // called "sprig" would otherwise print "2" beside "sprigs" -- two words that
+  // say nothing about what to buy.
+  assert.strictEqual(SL.quietUnit('sprig', 'sprig'), false);
+  assert.strictEqual(SL.quietUnit('cube', 'sugar cube'), true);
+  assert.strictEqual(SL.quietUnit('leaf', 'Kaffir Lime Leaves'), true);
+  assert.strictEqual(SL.quietUnit('each', 'anything'), true);
+  assert.strictEqual(SL.quietUnit('ml', 'ml'), false);
+  assert.strictEqual(SL.quietUnit('', 'sugar cube'), false);
+});
+
+test('#1132: a row with two totals keeps its name, and each amount its own rule', () => {
+  // Nothing in either collection does this today. If one ever pours the same
+  // generic by volume AND by the leaf, the name has two amounts leaning on it
+  // and stays as written; the leaf total still drops its repeated word.
+  const rows = SL.build([ing('30 ml', 'kaffir lime leaves'),
+                         ing('2 leaves', 'kaffir lime leaves')]);
+  assert.strictEqual(rows[0].label, 'kaffir lime leaves');
+  assert.strictEqual(rows[0].text, '30 ml + 2');
 });
 
 test('the old rate tables, with no fruit or weight map, still price volumes only', () => {
@@ -920,4 +999,27 @@ test('no topUpMl at all leaves every existing answer alone', () => {
   ]);
   assert.strictEqual(rows[0].text, '(top) (×2)');
   assert.strictEqual(rows[0].millilitres, 0);
+});
+
+// =============================================================================
+// THE GOLDEN FILE BOTH LANGUAGES READ -- #1199
+// =============================================================================
+// tests/fixtures/amounts.json holds every distinct amount a published drink
+// writes, with what `_plugins/amount.rb` reads and what `parseAmount` reads.
+// tests/test_amount_parser.py runs the Ruby side over the same rows and checks
+// that wherever both read a number it is the same number. This is the other
+// half: `parseAmount` still reads each row as the file says it does.
+//
+// The two grammars differ on purpose (this one folds `dashes` to `dash`, reads
+// a bare `15` as a count and `half` as 0.5), and the rows record that rather
+// than hide it.
+test('parseAmount reads every amount in the shared fixture as the fixture says', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const rows = JSON.parse(fs.readFileSync(
+    path.join(__dirname, '..', 'fixtures', 'amounts.json'), 'utf8'));
+  assert.ok(rows.length > 40, 'the fixture is all but empty');
+  rows.forEach((row) => {
+    assert.deepStrictEqual(SL.parseAmount(row.amount), row.js, JSON.stringify(row.amount));
+  });
 });

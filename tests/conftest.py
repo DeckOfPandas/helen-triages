@@ -141,7 +141,24 @@ DRAFTS_DIR = ROOT / "_food_drafts"
 # equivalent here: CI sees the whole collection. If that ever changes, this
 # needs the same treatment issue #378 gave drafts, and test_suite_hygiene.py's
 # registries are where it would have to be declared.
+#
+# "CI SEES THE WHOLE COLLECTION" WAS TRUE AND WAS NOT ENOUGH -- #1201. The
+# whole collection was EMPTY from 2026-09-07 (its one entry was a placeholder
+# Helen had deleted), the folder left the checkout with it, and every
+# `magic_bag`-parametrised test collected zero cases for four weeks and
+# reported green. So the fixture below is parametrised alongside the real
+# entries: the schema is exercised on every run whatever the collection holds.
+# It lives under tests/, which Jekyll excludes, so it can never become a page,
+# and it is NOT in ALL_MAGIC_BAG -- the cross-collection sweeps in
+# test_style.py and test_taxonomy.py read real dishes only.
+#
+# WHY NOT "THE COLLECTION MUST BE NON-EMPTY", which is what #1201 first asked
+# for. The dishes come out of Helen's head, on her time. An assertion that is
+# red until she writes one turns `main` red, and a red `main` stops every
+# deploy (CLAUDE.md). An empty magic bag is not a defect; a schema nothing
+# runs is. `_report_empty_magic_bag` below says so at the end of the run.
 MAGIC_BAG_DIR = ROOT / "_food_magic_bag"
+MAGIC_BAG_FIXTURE_PATH = ROOT / "tests" / "fixtures" / "magic_bag" / "zzz-fixture-dish.md"
 
 # Food's own vocabulary: taxonomy, filter sections, pantry, ingredient words.
 DATA_DIR = ROOT / "_data" / "food"
@@ -281,6 +298,9 @@ def _load(directory: Path) -> list[Recipe]:
 ALL_RECIPES = _load(RECIPES_DIR)
 ALL_DRAFTS = _load(DRAFTS_DIR)
 ALL_MAGIC_BAG = _load(MAGIC_BAG_DIR)
+# Raises at import if the file is gone, which is the point: the fixture is what
+# stands between this spec and testing nothing.
+MAGIC_BAG_FIXTURE = Recipe(MAGIC_BAG_FIXTURE_PATH)
 
 # ARE THE PRIVATE DRAFTS EVEN HERE? -- GitHub issue #378.
 #
@@ -335,8 +355,12 @@ def pytest_generate_tests(metafunc):
             UNCREATED.append(metafunc.definition.name)
         metafunc.parametrize("draft", ALL_DRAFTS, ids=[d.slug for d in ALL_DRAFTS])
     if "magic_bag" in metafunc.fixturenames:
-        metafunc.parametrize("magic_bag", ALL_MAGIC_BAG,
-                             ids=[m.slug for m in ALL_MAGIC_BAG])
+        # The fixture first, then every real entry -- so this is never an empty
+        # list. See MAGIC_BAG_FIXTURE_PATH above (#1201).
+        metafunc.parametrize(
+            "magic_bag", [MAGIC_BAG_FIXTURE] + ALL_MAGIC_BAG,
+            ids=["fixture:" + MAGIC_BAG_FIXTURE.slug]
+                + [m.slug for m in ALL_MAGIC_BAG])
 
 
 # =============================================================================
@@ -407,6 +431,27 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
                               terminalreporter.stats.get("skipped", []))
     except Exception:
         pass
+    try:
+        _report_empty_magic_bag(terminalreporter.write_line)
+    except Exception:
+        pass
+
+
+# THE MAGIC BAG, WHEN IT IS EMPTY, SAID AT THE END (#1201, 2026-10-04). The
+# schema tests always run, against the fixture. What they cannot be while the
+# collection holds nothing is evidence about a real dish, and a green run
+# should not read as one. Reports, never fails, for the reason the drafts
+# caveat gives above; silent the moment the collection has an entry.
+def _report_empty_magic_bag(write, entries=None):
+    entries = ALL_MAGIC_BAG if entries is None else entries
+    if entries:
+        return
+    write("")
+    write("Not evidence about the magic bag:", bold=True)
+    write("  _food_magic_bag/ has no entries, so tests/test_magic_bag.py ran "
+          "against its fixture only")
+    write(f"  ({MAGIC_BAG_FIXTURE_PATH.relative_to(ROOT).as_posix()}). The "
+          "schema is tested; no real dish is.")
 
 
 def _report_absent_drafts(write):

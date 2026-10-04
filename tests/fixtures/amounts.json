@@ -1,0 +1,517 @@
+[
+ {
+  "amount": "",
+  "number": null,
+  "unit": "",
+  "ml": null,
+  "js": null
+ },
+ {
+  "amount": "(splash)",
+  "number": null,
+  "unit": "(splash)",
+  "ml": null,
+  "js": null
+ },
+ {
+  "amount": "(sprinkle)",
+  "number": null,
+  "unit": "(sprinkle)",
+  "ml": null,
+  "js": null
+ },
+ {
+  "amount": "(top)",
+  "number": null,
+  "unit": "(top)",
+  "ml": null,
+  "js": null
+ },
+ {
+  "amount": "0.5 oz",
+  "number": 0.5,
+  "unit": "oz",
+  "ml": 15.0,
+  "js": {
+   "quantity": 0.5,
+   "unit": "oz"
+  }
+ },
+ {
+  "amount": "0.5 pinch",
+  "number": 0.5,
+  "unit": "pinch",
+  "ml": null,
+  "js": {
+   "quantity": 0.5,
+   "unit": "pinch"
+  }
+ },
+ {
+  "amount": "1 cube",
+  "number": 1.0,
+  "unit": "cube",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "cube"
+  }
+ },
+ {
+  "amount": "1 dash",
+  "number": 1.0,
+  "unit": "dash",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "dash"
+  }
+ },
+ {
+  "amount": "1 heaping oz",
+  "number": 1.0,
+  "unit": "oz",
+  "ml": 30.0,
+  "js": {
+   "quantity": 1,
+   "unit": "heaping oz"
+  }
+ },
+ {
+  "amount": "1 pinch",
+  "number": 1.0,
+  "unit": "pinch",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "pinch"
+  }
+ },
+ {
+  "amount": "1 small pinch",
+  "number": 1.0,
+  "unit": "small pinch",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "small pinch"
+  }
+ },
+ {
+  "amount": "1 sprig",
+  "number": 1.0,
+  "unit": "sprig",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "sprig"
+  }
+ },
+ {
+  "amount": "1 strip",
+  "number": 1.0,
+  "unit": "strip",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "strip"
+  }
+ },
+ {
+  "amount": "1 whole",
+  "number": 1.0,
+  "unit": "whole",
+  "ml": null,
+  "js": {
+   "quantity": 1,
+   "unit": "whole"
+  }
+ },
+ {
+  "amount": "1.5 each",
+  "number": 1.5,
+  "unit": "each",
+  "ml": null,
+  "js": {
+   "quantity": 1.5,
+   "unit": "each"
+  }
+ },
+ {
+  "amount": "10 ml",
+  "number": 10.0,
+  "unit": "ml",
+  "ml": 10.0,
+  "js": {
+   "quantity": 10,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "100 ml",
+  "number": 100.0,
+  "unit": "ml",
+  "ml": 100.0,
+  "js": {
+   "quantity": 100,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "12 leaves",
+  "number": 12.0,
+  "unit": "leaves",
+  "ml": null,
+  "js": {
+   "quantity": 12,
+   "unit": "leaf"
+  }
+ },
+ {
+  "amount": "12.5 ml",
+  "number": 12.5,
+  "unit": "ml",
+  "ml": 12.5,
+  "js": {
+   "quantity": 12.5,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "15",
+  "number": null,
+  "unit": "15",
+  "ml": null,
+  "js": {
+   "quantity": 15,
+   "unit": ""
+  }
+ },
+ {
+  "amount": "15 ml",
+  "number": 15.0,
+  "unit": "ml",
+  "ml": 15.0,
+  "js": {
+   "quantity": 15,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "150 ml",
+  "number": 150.0,
+  "unit": "ml",
+  "ml": 150.0,
+  "js": {
+   "quantity": 150,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "2 dashes",
+  "number": 2.0,
+  "unit": "dashes",
+  "ml": null,
+  "js": {
+   "quantity": 2,
+   "unit": "dash"
+  }
+ },
+ {
+  "amount": "2 drops",
+  "number": 2.0,
+  "unit": "drops",
+  "ml": null,
+  "js": {
+   "quantity": 2,
+   "unit": "drop"
+  }
+ },
+ {
+  "amount": "2.5 ml",
+  "number": 2.5,
+  "unit": "ml",
+  "ml": 2.5,
+  "js": {
+   "quantity": 2.5,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "20 g",
+  "number": 20.0,
+  "unit": "g",
+  "ml": null,
+  "js": {
+   "quantity": 20,
+   "unit": "g"
+  }
+ },
+ {
+  "amount": "20 ml",
+  "number": 20.0,
+  "unit": "ml",
+  "ml": 20.0,
+  "js": {
+   "quantity": 20,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "200 ml",
+  "number": 200.0,
+  "unit": "ml",
+  "ml": 200.0,
+  "js": {
+   "quantity": 200,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "22.5 ml",
+  "number": 22.5,
+  "unit": "ml",
+  "ml": 22.5,
+  "js": {
+   "quantity": 22.5,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "25 g",
+  "number": 25.0,
+  "unit": "g",
+  "ml": null,
+  "js": {
+   "quantity": 25,
+   "unit": "g"
+  }
+ },
+ {
+  "amount": "25 ml",
+  "number": 25.0,
+  "unit": "ml",
+  "ml": 25.0,
+  "js": {
+   "quantity": 25,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "3 dashes",
+  "number": 3.0,
+  "unit": "dashes",
+  "ml": null,
+  "js": {
+   "quantity": 3,
+   "unit": "dash"
+  }
+ },
+ {
+  "amount": "3 drops",
+  "number": 3.0,
+  "unit": "drops",
+  "ml": null,
+  "js": {
+   "quantity": 3,
+   "unit": "drop"
+  }
+ },
+ {
+  "amount": "3 leaves",
+  "number": 3.0,
+  "unit": "leaves",
+  "ml": null,
+  "js": {
+   "quantity": 3,
+   "unit": "leaf"
+  }
+ },
+ {
+  "amount": "30 ml",
+  "number": 30.0,
+  "unit": "ml",
+  "ml": 30.0,
+  "js": {
+   "quantity": 30,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "300 ml",
+  "number": 300.0,
+  "unit": "ml",
+  "ml": 300.0,
+  "js": {
+   "quantity": 300,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "35 ml",
+  "number": 35.0,
+  "unit": "ml",
+  "ml": 35.0,
+  "js": {
+   "quantity": 35,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "4 drops",
+  "number": 4.0,
+  "unit": "drops",
+  "ml": null,
+  "js": {
+   "quantity": 4,
+   "unit": "drop"
+  }
+ },
+ {
+  "amount": "4 whole",
+  "number": 4.0,
+  "unit": "whole",
+  "ml": null,
+  "js": {
+   "quantity": 4,
+   "unit": "whole"
+  }
+ },
+ {
+  "amount": "40 ml",
+  "number": 40.0,
+  "unit": "ml",
+  "ml": 40.0,
+  "js": {
+   "quantity": 40,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "45 ml",
+  "number": 45.0,
+  "unit": "ml",
+  "ml": 45.0,
+  "js": {
+   "quantity": 45,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "5 drops",
+  "number": 5.0,
+  "unit": "drops",
+  "ml": null,
+  "js": {
+   "quantity": 5,
+   "unit": "drop"
+  }
+ },
+ {
+  "amount": "5 ml",
+  "number": 5.0,
+  "unit": "ml",
+  "ml": 5.0,
+  "js": {
+   "quantity": 5,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "50 ml",
+  "number": 50.0,
+  "unit": "ml",
+  "ml": 50.0,
+  "js": {
+   "quantity": 50,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "52.5 ml",
+  "number": 52.5,
+  "unit": "ml",
+  "ml": 52.5,
+  "js": {
+   "quantity": 52.5,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "6 dashes",
+  "number": 6.0,
+  "unit": "dashes",
+  "ml": null,
+  "js": {
+   "quantity": 6,
+   "unit": "dash"
+  }
+ },
+ {
+  "amount": "60 ml",
+  "number": 60.0,
+  "unit": "ml",
+  "ml": 60.0,
+  "js": {
+   "quantity": 60,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "7.5 ml",
+  "number": 7.5,
+  "unit": "ml",
+  "ml": 7.5,
+  "js": {
+   "quantity": 7.5,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "75 g",
+  "number": 75.0,
+  "unit": "g",
+  "ml": null,
+  "js": {
+   "quantity": 75,
+   "unit": "g"
+  }
+ },
+ {
+  "amount": "75 ml",
+  "number": 75.0,
+  "unit": "ml",
+  "ml": 75.0,
+  "js": {
+   "quantity": 75,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "90 ml",
+  "number": 90.0,
+  "unit": "ml",
+  "ml": 90.0,
+  "js": {
+   "quantity": 90,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "half",
+  "number": null,
+  "unit": "half",
+  "ml": null,
+  "js": {
+   "quantity": 0.5,
+   "unit": "whole"
+  }
+ },
+ {
+  "amount": "to taste",
+  "number": null,
+  "unit": "to taste",
+  "ml": null,
+  "js": null
+ }
+]

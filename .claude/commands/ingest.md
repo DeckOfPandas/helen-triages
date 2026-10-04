@@ -181,7 +181,11 @@ file say the same things.
    accents, an undeclared tag, a missing glass.
 4. **`/tidy-drafts`**, either collection (both since 2026-09-05), if the
    quoting or typography needs it. It never touches a `QQ` line, so the
-   transcription is safe.
+   transcription is safe. **A COCKTAIL ALWAYS GETS `--only order`** (#1213):
+   `python3 scripts/tidy_drafts.py --site cocktails --only order --apply` puts
+   its keys in page order, moving whole blocks and editing no line. A file
+   from a Project that has not been re-uploaded arrives in the old order, and
+   `test_a_draft_drinks_keys_are_in_page_order` fails on it until this runs.
 5. **COCKTAILS: `python3 scripts/resolve_pours.py`**, which does tiers 1 and 2 for
    you and refuses to do tier 3. It reads every pour whose `generic` is still a
    `QQ`, looks the source's words up in `bottles.yml` and in the vocabulary, and
@@ -223,7 +227,8 @@ Not an ingest, and the commonest job after one. The boundary is the same one
 **MECHANICAL -- fix it, silently, and say what you fixed.** A spelling one of
 the vocabularies already declares (a glass, a garnish, a generic, a canonical
 method step, a bottle alias). A missing required key. A hyphen that should be an
-en dash. A quoted boolean. A `meta:` block out of order. `mood:` disagreeing
+en dash. A quoted boolean. A `meta:` block out of order. A cocktail draft's
+top-level keys out of page order (`tidy_drafts.py --only order`). `mood:` disagreeing
 with the derivation. A US unit. **The test names the value it wanted; the data
 file holds the spelling.** Look it up -- never a guess that merely turns the
 test green.
@@ -299,6 +304,22 @@ failure is probably work someone else has already done (MANUAL §9.1).
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
+  - **AN INGREDIENT GROUP'S NAME IS READ AFTER "For the", SO SAY IT THAT WAY
+    BEFORE WRITING IT** (#814). `dressing` prints "For the dressing:". **The
+    one shape that prints as itself is a name opening with `to `**: `to
+    serve`, `to finish`, `to decorate`, `to garnish` read "To finish:" with no
+    "For the" -- Helen, 2026-10-04: *"Can we fix all 'for the to finish' cases?
+    Both existing and when we ingest."* So keep the source's "To finish" as
+    `to finish`, lowercase, and never nounify it. A bare verb is the other
+    trap: `assemble` prints "For the assemble:", so a block the source heads
+    that way is `to assemble`. A method group prints its name bare, with no
+    prefix at all, which is why a narrative phase is fine there.
+  - **QUOTE EVERY GROUP NAME, on both sides**: `- name: "dressing"`,
+    `- name: "Make the dressing"`. Helen, 2026-10-04: *"Let's make future
+    recipes quote group titles, so add that to the tidy pass instructions, and
+    ingestion instructions."* Quoted and bare parse to the same string, so
+    this is only about every file reading the same way; `/tidy-drafts`
+    (`--only quoting`) fixes a bare one.
 - **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
   **a space between a number and its unit** (`15ml` -> `15 ml`). Helen,
   2026-10-01: "Please add unit spaces (15ml -> 15 ml) as a mechanical fix to
@@ -372,6 +393,16 @@ failure is probably work someone else has already done (MANUAL §9.1).
 
 ### Cocktails only
 
+- **WRITE THE KEYS IN THE ORDER THE PAGE PRINTS THEM, top to bottom** (Helen,
+  #1213): `title`, `tagline`, `glass`, `garnish`, `meta`, `mood`,
+  `ingredients`, `serve`, `serves`, `method`, `to_serve`, `notes`, `source`,
+  `source_url`. The list is `TOP_LEVEL_KEYS_IN_ORDER` in
+  `tests/test_cocktails.py`, which a test derives from `_layouts/cocktail.html`
+  -- look it up there, do not retype it from here. `meta` is fifth because the
+  page prints SHIP IT? beside the glass and garnish. A file that arrives in
+  another order is fixed by `python3 scripts/tidy_drafts.py --site cocktails
+  --only order --apply`, which moves whole blocks and edits no line. Drafts
+  only: never reorder a file in `_cocktail_recipes/`.
 - **MILLILITRES. NEVER A US UNIT.** Helen, 2026-09-01: *"I don't want any US
   units, just ml."* 1 oz = 30 ml, 1 tsp = 5 ml, from `measures:` in
   `ingredients.yml`. Transcribe the DRINK, not the page's units.

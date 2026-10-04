@@ -178,10 +178,38 @@ def _the_shared_data_is_as_parsed():
 # `<family>_characters` lists all strike. A typo'd key name is otherwise a
 # silent no-op: nothing reads it, nothing renders it, nothing fails.
 
-TOP_LEVEL_KEYS = {
-    "title", "tagline", "glass", "garnish", "ingredients", "method", "mood",
-    "notes", "source", "source_url", "meta", "to_serve", "serve", "serves",
+# THE LIST IS IN PAGE ORDER, AND THE ORDER IS A RULE FOR DRAFTS -- #1213.
+# Helen: "yaml fields should be rewritten in the order they appear on the page,
+# top to bottom", scoped in her words to drafts and new ingests and "not
+# retrospectively to published recipes". So this one list is both the closed set
+# (`TOP_LEVEL_KEYS` below is derived from it, never typed again) and the order
+# `scripts/tidy_drafts.py --only order` writes.
+#
+# THE ORDER IS NOT CHOSEN HERE, IT IS READ OFF `_layouts/cocktail.html`:
+# `test_the_declared_key_order_is_the_order_the_page_prints` derives it from the
+# layout and fails when the two disagree, so moving a section on the page moves
+# this list or goes red.
+#
+# `meta` IS FIFTH BECAUSE SHIP IT? IS: the head's meta row prints glass,
+# garnish, then `meta.ship`, and the mood chips come under it. The four other
+# `meta` keys print nothing and travel with the block.
+TOP_LEVEL_KEYS_IN_ORDER = [
+    "title", "tagline", "glass", "garnish", "meta", "mood", "ingredients",
+    "serve", "serves", "method", "to_serve", "notes", "source", "source_url",
+]
+
+# A KEY THE LAYOUT NEVER NAMES has no place the page can give it, so its place
+# is declared here, with the reason. The derivation test refuses an entry the
+# layout HAS started to name, so this cannot outlive its excuse.
+KEYS_THE_LAYOUT_NEVER_NAMES = {
+    "serves":
+        "read by `_plugins/cocktail_units.rb`, which hands the page "
+        "`page.units.serves`; the layout never says `page.serves`. Placed "
+        "directly after `serve`, where MANUAL 9.3's example has always had it: "
+        "it is the last fact about the pour before the build starts.",
 }
+
+TOP_LEVEL_KEYS = set(TOP_LEVEL_KEYS_IN_ORDER)
 
 # `serves` ARRIVED 2026-09-06 with the unit count (#297) and is DELIBERATELY
 # NARROW: it is on nine drinks and absent on the other 115.
@@ -1143,6 +1171,144 @@ def test_required_top_level_keys_present():
         + "\n\nWrite the key with an empty value rather than leaving it out: "
           "`notes: []`, `garnish: []`, `source: \"\"`. `to_serve` is the one "
           "genuinely optional key and is not asked for here."
+    )
+
+
+# =============================================================================
+# KEY ORDER -- #1213. A draft is written in the order the page prints it.
+# =============================================================================
+# Helen: "yaml fields should be rewritten in the order they appear on the page,
+# top to bottom ... 1. Do not apply this retrospectively to published recipes.
+# 2. Please apply to drafts. 3. Please apply to new ingests."
+#
+# TWO TESTS, AND THEY ANSWER DIFFERENT QUESTIONS. The first is about this repo
+# alone and runs everywhere, CI included: is the declared order still the
+# page's? The second is about the private drafts and is DRAFTS ONLY -- a
+# published drink is never asked, which is her scope 1.
+
+COCKTAIL_LAYOUT = ROOT / "_layouts" / "cocktail.html"
+_LIQUID_COMMENT = re.compile(
+    r"\{%-?\s*comment\s*-?%\}.*?\{%-?\s*endcomment\s*-?%\}", re.S)
+_PAGE_FIELD = re.compile(r"\bpage\.([a-z_]+)")
+# WHERE THE PAGE'S WORDS BEGIN. Everything above this in the layout is the glass
+# ICON -- a picture drawn beside the title block, looked up from `page.glass`
+# before the name is printed. Counting it would put `glass` first, above the
+# title, and Helen's own example of the order opens "title, tagline, glass".
+# The order is the order of the WORDS, so the derivation starts at the element
+# that holds them.
+_WORDS_BEGIN = 'class="cocktail-head-words"'
+
+
+def page_order_from_the_layout():
+    """Top-level keys in the order `_layouts/cocktail.html` first names them.
+
+    Comments are removed first: a Liquid comment that says `page.glass` in
+    prose is not the page printing a glass. What is left is read from
+    `_WORDS_BEGIN` down, and each declared key is placed at its FIRST mention.
+    `page.url`, `page.units`, `page.cost` and the like are not front matter and
+    are dropped by the membership test.
+    """
+    text = _LIQUID_COMMENT.sub("", COCKTAIL_LAYOUT.read_text(encoding="utf-8"))
+    assert text.count(_WORDS_BEGIN) == 1, (
+        f"`_layouts/cocktail.html` no longer has exactly one {_WORDS_BEGIN}, "
+        f"which is where the key-order derivation starts reading (#1213). "
+        f"Point `_WORDS_BEGIN` at whatever now opens the page's words; do not "
+        f"let this read the whole file, or the glass icon's lookup puts "
+        f"`glass` above `title`."
+    )
+    order = []
+    for key in _PAGE_FIELD.findall(text[text.index(_WORDS_BEGIN):]):
+        if key in TOP_LEVEL_KEYS and key not in order:
+            order.append(key)
+    return order
+
+
+def keys_out_of_page_order(keys):
+    """`(have, want)` when these top-level keys are out of order, else None.
+
+    Only declared keys are compared; an undeclared one is
+    `test_no_unknown_top_level_keys`'s to report, and a key that is absent is
+    simply not in either list. `scripts/tidy_drafts.py` and
+    `tests/test_standalone_docs.py` both ask this, so the rule has one
+    definition.
+    """
+    have = [k for k in keys if k in TOP_LEVEL_KEYS]
+    want = [k for k in TOP_LEVEL_KEYS_IN_ORDER if k in have]
+    return None if have == want else (have, want)
+
+
+def test_the_declared_key_order_is_the_order_the_page_prints():
+    """`TOP_LEVEL_KEYS_IN_ORDER` equals the order read off the layout. #1213.
+
+    THE LIST IS DATA AND THE LAYOUT IS THE AUTHORITY, so neither can move alone.
+    Reorder two sections of the page and this names the two keys; add a key to
+    the schema and it must either be printed by the layout or be given a place
+    and a reason in `KEYS_THE_LAYOUT_NEVER_NAMES`.
+    """
+    derived = page_order_from_the_layout()
+    assert len(derived) >= 10, (
+        f"Only {len(derived)} top-level keys were found in the layout: "
+        f"{derived}. The scan has stopped matching -- an order derived from "
+        f"almost nothing would agree with almost anything."
+    )
+
+    by_hand = set(KEYS_THE_LAYOUT_NEVER_NAMES)
+    excused_but_printed = sorted(by_hand & set(derived))
+    assert not excused_but_printed, (
+        f"`KEYS_THE_LAYOUT_NEVER_NAMES` lists {excused_but_printed}, and the "
+        f"layout names it now. Delete the entry: the page has given the key a "
+        f"place, and the place is where it is first printed."
+    )
+    unplaced = sorted(TOP_LEVEL_KEYS - set(derived) - by_hand)
+    assert not unplaced, (
+        f"Declared key(s) the layout never names, with no place given: "
+        f"{unplaced}. Add each to `KEYS_THE_LAYOUT_NEVER_NAMES` with the "
+        f"reason it sits where it does."
+    )
+
+    declared = [k for k in TOP_LEVEL_KEYS_IN_ORDER if k not in by_hand]
+    assert declared == derived, (
+        "`TOP_LEVEL_KEYS_IN_ORDER` is not the order `_layouts/cocktail.html` "
+        "prints the fields in (#1213):\n"
+        f"  declared: {declared}\n"
+        f"  the page: {derived}\n\n"
+        "The page is the authority. If a section really has moved, move the "
+        "key in the list at the top of this file -- and then the drafts are "
+        "out of order too: `python3 scripts/tidy_drafts.py --site cocktails "
+        "--only order` reports them."
+    )
+    assert len(TOP_LEVEL_KEYS_IN_ORDER) == len(TOP_LEVEL_KEYS), (
+        "`TOP_LEVEL_KEYS_IN_ORDER` names a key twice."
+    )
+
+
+def test_a_draft_drinks_keys_are_in_page_order():
+    """A cocktail DRAFT's top-level keys are in page order. #1213.
+
+    DRAFTS ONLY. Helen's first scope line is "Do not apply this retrospectively
+    to published recipes", so `_cocktail_recipes/` is never read here and a
+    drink keeps whatever order it was promoted in.
+
+    THE PASS RAN ON 2026-10-04, all 62 drafts, after she had read one:
+    "Billingsley: looks great! Deep breath, please do the same for all our
+    drafts a) now, and b) at ingest". It is drafts schema 2
+    (`tests/drafts_schema.py`), so a clone that predates it fails
+    `test_the_cocktail_drafts_clone_is_in_step` first, and that message says
+    this one is its fault.
+    """
+    bad = []
+    for drink in _load_draft_files():
+        problem = keys_out_of_page_order(list(drink.fm))
+        if problem:
+            bad.append(f"{_drink_where(drink)}\n      has:  "
+                       f"{', '.join(problem[0])}\n      want: "
+                       f"{', '.join(problem[1])}")
+    assert not bad, (
+        "Draft drink(s) whose top-level keys are not in page order:\n  "
+        + "\n  ".join(bad)
+        + "\n\n`python3 scripts/tidy_drafts.py --site cocktails --only order "
+          "--apply` reorders them and changes nothing else. See "
+          ".claude/commands/tidy-drafts.md."
     )
 
 
@@ -8621,7 +8787,10 @@ def test_top_up_volumes_cover_every_to_top_pour(drink_file):
     declared = _costs().get("top_up_ml") or {}
     missing = []
     for ing in drink_file.fm.get("ingredients") or []:
-        if not isinstance(ing, dict) or str(ing.get("amount", "")).strip() != "to top":
+        # `(top)` SINCE #1217. This compared against `to top` until 2026-10-04
+        # and so had examined no pour at all since the rename -- the same
+        # fault as #1273, in the one test `top_up_ml`'s fallback rests on.
+        if not isinstance(ing, dict) or str(ing.get("amount", "")).strip() != "(top)":
             continue
         generics = ing.get("generic")
         generics = generics if isinstance(generics, list) else [generics]
@@ -8680,7 +8849,7 @@ def test_every_priceable_pour_has_a_price(drink_file):
         if not isinstance(ing, dict):
             continue
         amount = str(ing.get("amount", "")).strip()
-        if amount in excluded or amount == "to top":
+        if amount in excluded or amount == "(top)":
             continue
         match = re.match(r"^([\d.]+)\s+(.*)$", amount)
         if not match:
@@ -9062,7 +9231,12 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
         if generics and all(str(g) in bitters for g in generics):
             continue
 
-        if amount == "to top":
+        # `(top)`, NOT `to top`, SINCE #1217. This was an EIGHTH literal the
+        # rename missed (#1273 found the seventh), found on 2026-10-04 while
+        # #1179 was changing what a top pours: on the old spelling a top fell
+        # through to the regex below, matched nothing and was skipped, so no
+        # topper was ever asked for a strength.
+        if amount == "(top)":
             if not any(str(g) in top_up for g in generics):
                 continue  # not a topped-up volume we model; contributes nothing
         else:

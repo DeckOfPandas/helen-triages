@@ -95,6 +95,10 @@ argument and the rules each field is read by.
 - 2026-09-07 · §4 · #814 · Ingests split the ingredient side and leave the method side flat, and have always done.
 - 2026-10-01 · §4 · a note is always {label, text}, and an empty one is a placeholder nothing prints.
 - 2026-10-02 · §4 · #1258 · Every draft has a notes slot, and imported text is labelled QQ. Both reverse a choice the 2026-10-01 migration made.
+- 2026-10-04 · §4 · #814 · the retro-fit ran, and the yield was lopsided: 103 of 142, then 18 of 174.
+- 2026-10-04 · §4 · #577 · re-measured: 6 items in 6 drafts, all of them refusals.
+- 2026-10-04 · §4 · #814 · a group named to finish printed "For the to finish:".
+- 2026-10-04 · §4 · #814 #43 · Helen's rulings on the retro-fit (food-private PR #43).
 - 2026-08-18 · §4.0 · Hardened (above).
 - 2026-08-26 · §4.0 · food_magic_bag joined GATED_COLLECTIONS with the collection; §4.0 said two until 2026-09-02.
 - 2026-09-01 · §4.0 · What awaiting_fix: true means to Helen: "'awaiting_fix' means I've proofread, but one small thing has been raised as a ticket, meaning that once that's fixed I can look for just …
@@ -108,6 +112,9 @@ argument and the rules each field is read by.
 - 2026-08-26 · §4.3 · #1 · Built: Helen's own name for her brain, answering the README's problem #1 — "what shall I cook, out of everything I already know how to make?" — for the half the site could not …
 - 2026-08-30 · §4.3 · #562 · The three meta filters (and the three-valued data-meta-short they needed — 'true', 'false', 'n/a', because the short-method filter was a PAIR wanting opposite answers) deleted …
 - 2026-09-06 · §4.3 · #507 #508 #509 · #507 (include/exclude the magic bag in production) can no longer be answered "put it in META FILTERS"; Helen: "I need to think about that more." Open: #508 (the word and the …
+- 2026-10-04 · §4.3 · #1201 #507 · The magic bag is filled, not retired, and it gets a mark, not a filter.
+- 2026-10-04 · §4.3 · #1201 · A magic-bag dish can be a draft, and magic bag is always on the right.
+- 2026-10-04 · §4.3 · #1201 · The spec had tested nothing for four weeks.
 - 2026-08-09 · §5 · All nine Estimated N mins an earlier Claude had invented are gone; Helen replaced them by hand rather than have them converted to QQ.
 - 2026-08-21 · §5 · #413 #426 · En-dash scope and the QQ stop (§4 above).
 - 2026-08-31 · §5 · A hole in a guard is proportional to the data flowing through it.
@@ -142,6 +149,8 @@ argument and the rules each field is read by.
 - 2026-09-07 · §8.2 · #815 · the batch box lasted a few hours and Helen killed it.
 - 2026-09-07 · §8.2 · "this is all I can see": boxes, no totals, and it was not the code at all.
 - 2026-09-07 · §8.2 · the yield came off the row, and dimming it was not the fix.
+- 2026-10-04 · §8.2 · #1125 · A handful scales in HALF STEPS, and the first build of this was the opposite.
+- 2026-10-04 · §8.2 · #1286 · On a makes: recipe the scaler counts the thing made.
 - 2026-09-10 · §8.3 · Helen, having used both indexes for a weekend's planning
 - 2026-09-10 · §8.3 · Every one of those is the same fact — shortlisted was declared as an ordinary filter in filter-state.js and so ANDed with everything else.
 - 2026-09-10 · §8.3 · The rule now, held in two pure functions and generated tests across BOTH field tables (tests/js/shortlist-view.test.js)
@@ -197,6 +206,7 @@ argument and the rules each field is read by.
 - 2026-10-02 · §9.3 · #1263 · A pour's direction renders UNDER its amount, in the amount's own type.
 - 2026-10-02 · §9.3 · #1273 #1217 · 's rename missed a seventh to top, in the suite itself, and it did not fail.
 - 2026-09-26 · §9.3 · "dashes" throughout, "dash" when it is one.
+- 2026-10-04 · §9.3 · #1213 · A cocktail DRAFT's top-level keys are in the order the page prints them.
 - 2026-08-21 · §9.3.1 · #441 · generic as a list means OR and only OR.
 - 2026-08-22 · §9.3.1 · #322 #314 · ingredients.yml written (#322 the spec, #314 the rum half).
 - 2026-08-23 · §9.3.1 · #441 · character lives on the recipe, not a bottle table.
@@ -252,6 +262,11 @@ argument and the rules each field is read by.
 - 2026-10-02 · §9.3.6 · #1257 · "Approximately X ml" is REMOVED, thirteen days after she asked for it and liked it.
 - 2026-09-17 · §9.3.6 · #1121 · the ml line cost the batch note its totals, and the lesson is about what a NEW line does to the ones already there.
 - 2026-09-17 · §9.3.6 · #1121 · two sentences, and the interesting part is the six drinks that get neither.
+- 2026-10-04 · §9.3.6 · #1179 #1116 · a (top) is sized from its glass, and the midpoint is what it falls back to.
+- 2026-10-04 · §9.3.6 · #1199 · one Ruby amount parser, and a golden file both languages read.
+- 2026-10-04 · §9.3.6 · #1291 · the units line says "(undiluted)", after the millilitres.
+- 2026-10-04 · §9.3.6 · #1293 · a pour in dashes is struck through and starred above ×1.
+- 2026-10-04 · §9.3.6 · #1294 · one spirit poured twice is "the first" and "the second".
 - 2026-08-16 · §9.4 / §9.4.1 / §9.5 · Ingredients are additive, never a choose-one (asked directly: guessing wrong would have shaped the whole model).
 - 2026-08-17 · §9.4 / §9.4.1 / §9.5 · The site is canon: "With iPad in hand, I'd rather take the site as canon, then happily break rules from there." Modelling adjustable sugar (a range, a tolerance, an "approximate" …
 - 2026-08-23 · §9.4 / §9.4.1 / §9.5 · A goodness-only filter built in twenty minutes (§9.9 below).
@@ -276,6 +291,7 @@ argument and the rules each field is read by.
 - 2026-09-06 · §9.10 / §9.10.1 · #567 #640 #691 · The card's ingredient line became a plugin; the 1,400-character Liquid statement doing four jobs could not take a seven-tier sort.
 - 2026-09-17 · §9.10 / §9.10.1 · #1141 · optional renders as "(optional)" after the ingredient, reversing the argument that had stood.
 - 2026-10-02 · §9.10 / §9.10.1 · #1226 · The character line is a labelled fact: CHARACTER: in Plex Mono, the words upright in full-strength text.
+- 2026-10-04 · §9.10 / §9.10.1 · #1132 · A unit the name already says is not printed twice.
 - 2026-09-05 · §9.10a · The ice had no field, so "strain" was written seventeen ways; collapsing 31 spellings to five surfaced three TRUNCATED steps nobody had read ("Fine strain into a chilled." …
 - 2026-09-28 · §9.10a · #1214 · The glass generator — and it is 2026-09-05's composition finished.
 - 2026-09-28 · §9.10a · A strain step stops repeating the glass when it has nothing to add

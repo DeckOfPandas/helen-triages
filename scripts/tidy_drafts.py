@@ -9,6 +9,7 @@ report, apply, run pytest, commit there. This file is only the engine.
     python3 scripts/tidy_drafts.py --apply          # write the fixes
     python3 scripts/tidy_drafts.py --only quoting,meta
     python3 scripts/tidy_drafts.py --only size      # #577's pass, food only
+    python3 scripts/tidy_drafts.py --only order     # #1213's pass, cocktails only
     python3 scripts/tidy_drafts.py --site cocktails # one collection only
 
 WHY A SCRIPT AND NOT AN AGENT EDITING 340 FILES. Three of these rules have a
@@ -89,6 +90,11 @@ closed vocabulary, somebody else's words, or a number.
     have desynchronised the note from the value it describes. The drinks suite
     checks amounts and is right to -- they render -- so this script REPORTS a
     range in one and leaves it, which is what the section below is for.
+  - **It reorders a drink's TOP-LEVEL KEYS into page order (#1213), and that
+    is the one thing it does outside her prose.** Whole blocks move and no
+    line is edited, so none of the entries above is touched by it: a `method`
+    step, an `amount` and a `QQ` line all travel inside their block exactly as
+    written. See `fix_key_order`.
 
 Food's own rules stay food's: `main_ingredients` and `tags` flow quoting, and
 the #429 `meta:` migration, run on `_food_drafts/` and on nothing else. A drink's
@@ -104,6 +110,10 @@ import sys
 from functools import partial
 from pathlib import Path
 from types import SimpleNamespace
+
+# Read-only, and only by `fix_key_order`, to PARSE both sides of a reorder and
+# compare them. Nothing here is ever written through a dumper.
+import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 FOOD_DRAFTS = ROOT / "_food_drafts"
@@ -149,7 +159,8 @@ from conftest import (  # noqa: E402
     checkable_text, degreeless_temperatures, spelling_problems,
 )
 from test_cocktails import (  # noqa: E402
-    DRINK_SCALAR_FIELDS, VERBATIM_KEYS, _checkable as drink_suite_scope,
+    DRINK_SCALAR_FIELDS, TOP_LEVEL_KEYS_IN_ORDER, VERBATIM_KEYS,
+    _checkable as drink_suite_scope, keys_out_of_page_order,
 )
 # The size-word pattern is the recipe rule's own (#149, #577). The 2026-09-01
 # re-measurement on #577 already imported it rather than retyping it, for the
@@ -401,6 +412,42 @@ def fix_scalar_quoting(text, path, fields=None):
                 else:
                     line = f"{field}:{gap}\"{val}\"{trailing}"
                     changed.append(f"{field}: {val} -> \"{val}\"")
+        out.append(line)
+    return open_ + "\n".join(out) + close + body, changed
+
+
+def fix_group_name_quoting(text, path):
+    """A food group's `- name:` is quoted, like every other string in the file.
+
+    Helen, 2026-10-04, shown that `- name: cake` and `- name: "Make the
+    batter"` sat side by side after #814: "Let's make future recipes quote
+    group titles, so add that to the tidy pass instructions, and ingestion
+    instructions." Both spellings parse to the same string and render the
+    same heading, so this is tidiness and nothing else -- which is exactly
+    what this script is for.
+
+    `- name:` at the start of a list item is a group and nothing else in a
+    food file: notes are `label`/`text`, ingredients are `amount`/`item`. A
+    value already quoted either way is left alone, and one containing a
+    double quote is reported rather than escaped, the line
+    `fix_scalar_quoting` draws.
+    """
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    changed, out = [], []
+    for line in fm.split("\n"):
+        m = re.match(r"^([ \t]*- name:)([ \t]*)(.+)$", line)
+        if m:
+            val = m.group(3).rstrip()
+            trailing = m.group(3)[len(val):]
+            if val and not val.startswith(('"', "'")):
+                if '"' in val:
+                    changed.append(f"SKIPPED group name: contains a double quote: {val}")
+                else:
+                    line = f"{m.group(1)}{m.group(2)}\"{val}\"{trailing}"
+                    changed.append(f"group name: {val} -> \"{val}\"")
         out.append(line)
     return open_ + "\n".join(out) + close + body, changed
 
@@ -955,10 +1002,104 @@ def fix_notes_slot(text, path):
     return open_ + "\n".join(lines) + close + body, changed
 
 
+# =============================================================================
+# KEY ORDER, #1213 -- a drink's keys in the order the page prints them
+# =============================================================================
+# Helen: "yaml fields should be rewritten in the order they appear on the page,
+# top to bottom". Drafts and new ingests, her words; never a published recipe,
+# which this script cannot reach anyway. Cocktails only -- food was not asked.
+#
+# THE ORDER IS THE SUITE'S, `test_cocktails.TOP_LEVEL_KEYS_IN_ORDER`, which a
+# test there derives from `_layouts/cocktail.html`. Nothing is named here.
+#
+# IT MOVES WHOLE BLOCKS AND EDITS NO LINE. A top-level key's block is its own
+# line and every line under it up to the next top-level key; the blocks are
+# re-dealt in the declared order and each is written back byte for byte --
+# indentation, quoting, comments inside the block, all of it. No dumper.
+#
+# IT CHECKS ITS OWN WORK BEFORE RETURNING IT, which is the 2026-08-29 lesson
+# (DECISIONS §11: the `meta:` rewrite broke 341 of 342 drafts behind a diff
+# that looked plausible, and was caught only by parsing both sides). Three
+# claims, and a failure of any is a raised error rather than a written file:
+# the same lines, as a multiset; the same parsed data; and the declared order.
+#
+# WHAT IT REFUSES, EACH NAMED IN THE REPORT RATHER THAN GUESSED AT:
+#   - a key the schema does not declare: it has no place to be put;
+#   - the same key twice: which block is the real one is not a formatting fix;
+#   - a column-0 comment, or any other column-0 line that is not a key: it
+#     belongs to no block, and whether a comment describes the key above it or
+#     the key below it is something only its author knows.
+TOP_LEVEL_KEY = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(?:[ \t]|$)")
+
+
+def _top_level_blocks(lines):
+    """`[(key, [lines])]` in file order, or a string saying why not."""
+    blocks = []
+    for line in lines:
+        key = TOP_LEVEL_KEY.match(line)
+        if key:
+            blocks.append((key.group(1), [line]))
+        elif line[:1] in (" ", "\t") or (line.startswith("- ") and blocks) \
+                or not line.strip():
+            if not blocks:
+                if line.strip():
+                    return "an indented line before the first key"
+                return "a blank line before the first key"
+            blocks[-1][1].append(line)
+        else:
+            return (f"a column-0 line that is not a key, which belongs to no "
+                    f"block: {line[:50]}")
+    return blocks
+
+
+def fix_key_order(text, path):
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    # `fm` always ends in a newline (the pattern demands it), so the last
+    # element of the split is "" and is not a line. Dropping it here and
+    # restoring the newline below is what keeps it out of the final block.
+    lines = fm.split("\n")[:-1]
+    blocks = _top_level_blocks(lines)
+    if isinstance(blocks, str):
+        return text, [f"SKIPPED: {blocks}"]
+
+    keys = [k for k, _ in blocks]
+    unknown = [k for k in keys if k not in TOP_LEVEL_KEYS_IN_ORDER]
+    if unknown:
+        return text, [f"SKIPPED: undeclared key(s) {unknown} have no place in "
+                      f"the order -- left alone rather than guessed at"]
+    if len(set(keys)) != len(keys):
+        return text, ["SKIPPED: a top-level key appears twice"]
+    problem = keys_out_of_page_order(keys)
+    if not problem:
+        return text, []
+
+    by_key = dict(blocks)
+    new_lines = [l for k in problem[1] for l in by_key[k]]
+    new_fm = "\n".join(new_lines) + "\n"
+
+    if sorted(new_lines) != sorted(lines):
+        raise AssertionError(f"fix_key_order changed a line of {path}")
+    if yaml.safe_load(new_fm) != yaml.safe_load(fm):
+        raise AssertionError(
+            f"fix_key_order changed what {path} parses to. Nothing was "
+            f"written. A block boundary has been drawn in the wrong place."
+        )
+    if list(yaml.safe_load(new_fm)) != problem[1]:
+        raise AssertionError(f"fix_key_order did not reach the declared "
+                             f"order in {path}")
+    return (open_ + new_fm + close + body,
+            [f"top-level keys reordered, no line edited: "
+             f"{' '.join(problem[0])} -> {' '.join(problem[1])}"])
+
+
 FOOD_FIXERS = [
     ("notes", fix_notes_slot),
     ("quoting", fix_scalar_quoting),
     ("quoting", fix_flow_quoting),
+    ("quoting", fix_group_name_quoting),
     ("dashes", fix_en_dashes),
     ("typography", fix_typography),
     ("units", fix_unit_spacing),
@@ -994,6 +1135,10 @@ DRINK_FIXERS = [
     ("typography", only_where_editable(fix_typography)),
     ("units", only_where_editable(fix_unit_spacing)),
     ("accents", only_where_editable(fix_accents)),
+    # LAST, and unwrapped: it moves blocks and edits no line, so there is
+    # nothing for `only_where_editable` to protect, and running after `notes`
+    # means the slot that rule writes is dealt into place with the rest.
+    ("order", fix_key_order),
 ]
 
 RULE_NAMES = sorted({n for n, _ in FOOD_FIXERS} | {n for n, _ in DRINK_FIXERS})
@@ -1144,7 +1289,8 @@ def main(argv=None):
                     help="write the fixes; without it nothing is changed")
     ap.add_argument("--only", default="",
                     help="comma-separated subset of: " + ",".join(RULE_NAMES)
-                         + " (meta is food's alone)")
+                         + " (meta and size are food's alone, order is "
+                           "cocktails' alone)")
     ap.add_argument("--site", choices=sorted(SITES), default=None,
                     help="one collection only; the default is both")
     ap.add_argument("--allow-dirty", action="store_true",

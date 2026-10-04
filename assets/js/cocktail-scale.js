@@ -260,6 +260,29 @@
     put(input, box(last));
   }
 
+  /* A UNIT THE NAME ALREADY SAYS IS NOT SAID TWICE -- #1132, "1 cube sugar
+     cube". The layout prints such a row as "1" beside "sugar cube", marks the
+     amount `data-unit-quiet`, and keeps the written "1 cube" in `data-amount`
+     -- which is what `original` above has always read first. So the
+     arithmetic is untouched and scales "1 cube" to "2 cubes" as ever; what
+     changes is only where the two halves are WRITTEN: the number in the
+     amount, the unit in the name's `.cocktail-unit-in-name` slot, giving "2"
+     beside "sugar cubes". An `each` row has no slot and its unit is dropped.
+
+     THE LAYOUT DECIDES WHICH ROWS, this only obeys the mark -- one rule, in
+     one place. Every unmarked row is written exactly as before. */
+  function show(span, text) {
+    if (!span.hasAttribute('data-unit-quiet')) {
+      span.textContent = text;
+      return;
+    }
+    var parts = HTF.scale.splitUnit(text);
+    span.textContent = parts.number;
+    var row = span.closest ? span.closest('.cocktail-ingredient') : null;
+    var slot = row && row.querySelector('.cocktail-unit-in-name');
+    if (slot && parts.unit) slot.textContent = parts.unit;
+  }
+
   /**
    * Render the drink at the nearest multiple it can actually be poured at.
    *
@@ -289,7 +312,7 @@
 
     last = n;
     spans.forEach(function (span, index) {
-      span.textContent = verdict.amounts[index];
+      show(span, verdict.amounts[index]);
     });
     /* Writing the amounts IS the column resize now (#1088): the list's
        `max-content` track re-measures on the text change, so the line that
@@ -344,15 +367,47 @@
      only for a drink that pours something in dashes or drops. */
   var batchNote = article.querySelector('.cocktail-scale-batch');
 
+  /* AND THE LINE IT IS ABOUT SAYS SO TOO -- #1293, 2026-10-04. Helen: "make it
+     more obvious that bitters shouldn't be scaled by updating the ingredient
+     line as well as showing the note under the scaler... e.g. strikethrough
+     text for the amount, then a *, and a * before" the note.
+
+     The note was right and a paragraph away from the figure it was warning
+     about: at x4 the list still said "8 dashes" in the same ink as "200 ml".
+     So above x1 a pour in dashes or drops has its scaled amount STRUCK
+     THROUGH with a `*` beside it, and the note opens with the same `*`.
+
+     THE AMOUNT STILL SCALES. Striking a figure through says "not this"; it
+     does not say what instead, and nothing here knows -- "add to taste" is the
+     whole answer. Leaving the multiplied figure visible under the line is what
+     tells the reader which direction to err from.
+
+     THE LAYOUT DECIDES WHICH ROWS (`data-dashes`, the same test as the note's
+     own `data-has-dashes`), and prints the star hidden. This only flips two
+     attributes, so a row the layout did not mark is never touched. */
+  var dashed = spans.filter(function (span) {
+    return span.hasAttribute('data-dashes');
+  });
+  var stars = Array.prototype.slice.call(
+    article.querySelectorAll('.cocktail-amount-star')
+  );
+
   function batch(n) {
+    var above = n > 1;
+    dashed.forEach(function (span) {
+      if (above) span.setAttribute('data-struck', '');
+      else span.removeAttribute('data-struck');
+    });
+    stars.forEach(function (star) { star.hidden = !above; });
+
     if (!batchNote) return;
-    if (n <= 1) {
+    if (!above) {
       batchNote.hidden = true;
       return;
     }
 
     var text = batchNote.getAttribute('data-has-dashes') === 'true'
-      ? 'Don’t scale bitters linearly — add to taste.'
+      ? '* Don’t scale bitters linearly — add to taste.'
       : '';
 
     batchNote.textContent = text;

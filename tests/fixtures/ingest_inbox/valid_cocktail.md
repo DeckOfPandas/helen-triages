@@ -8,6 +8,13 @@ glass:
   - "double old fashioned"
 garnish:
   - "pineapple wedge"
+meta:
+  made_before: false
+  ship: "who knows"
+  rewritten: false
+  awaiting_fix: false
+  proofread: false
+mood: []
 ingredients:
   - amount: "45 ml"
     generic: "QQ blackstrap rum"
@@ -28,18 +35,11 @@ method:
   - "Shake all ingredients with ice."
   - "Strain over crushed ice."
 to_serve: "Straw."
-mood: []
 notes:
   - label: "QQ"
     text: "QQ - `generic` and `suggestion` not filled in. The source names one bottle (Campari) and otherwise gives categories, and a category is not derivable from a bottle name."
 source: "QQ"
 source_url: ""
-meta:
-  made_before: false
-  ship: "who knows"
-  rewritten: false
-  awaiting_fix: false
-  proofread: false
 ---
 ```
 

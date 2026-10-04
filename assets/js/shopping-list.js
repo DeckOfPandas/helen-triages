@@ -275,6 +275,33 @@
     return String(Math.round(n * factor) / factor);
   }
 
+  /* A UNIT THE NAME ALREADY SAYS IS NOT SAID TWICE -- #1132. Helen's whole
+     report was the line "1 cube sugar cube": `amount: "1 cube"` beside
+     `generic: "sugar cube"`, each right on its own, and the page printing the
+     word twice. Two shapes, measured over both collections on 2026-10-04
+     (765 pours): the unit is the name's own last word (sugar cube by the
+     `cube`, kaffir lime leaves by the `leaf`), or the unit is `each`, which
+     only ever meant "this is a count" ("1.5 each passion fruit").
+
+     THE RULE IS STATED TWICE, HERE AND IN _layouts/cocktail.html, because the
+     drink page is built before any script runs. Both fold the two words to a
+     singular and compare them; a name of ONE word never matches, so "2 sprigs"
+     of something called "sprig" would keep its unit rather than print a bare
+     number beside nothing.
+
+     @param {string} unit - FOLDED, as parseAmount returns it: `cube`, `leaf`
+     @param {string} name - the generic as written */
+  function unitRepeatsName(unit, name) {
+    if (!unit || SYMBOL_UNITS[unit]) return false;
+    var words = foldKey(name).split(' ');
+    if (words.length < 2) return false;
+    return foldUnit(words[words.length - 1]) === foldUnit(unit);
+  }
+
+  function quietUnit(unit, name) {
+    return unit === 'each' || unitRepeatsName(unit, name);
+  }
+
   /** One quantity and its unit, as a line of the list prints them. */
   function amountText(quantity, unit) {
     if (unit === 'whole') return wholeText(quantity);
@@ -887,9 +914,22 @@
           quantity: quantity,
           quantityMax: quantity,
           unit: unit,
-          text: amountText(quantity, unit)
+          /* #1132: "13 cubes sugar cube" and "3 each passion fruit" lose the
+             unit the line does not need. The `unit` field keeps it. */
+          text: quietUnit(unit, group.generic) ? String(quantity)
+                                               : amountText(quantity, unit)
         };
       });
+
+      /* ...AND THE NAME TAKES THE PLURAL THE UNIT WOULD HAVE CARRIED, so the
+         row reads "13" + "sugar cubes" rather than "13 sugar cube". Only when
+         that unit is the row's ONE total: a line totalling "30 ml + 2 leaves"
+         has two amounts leaning on one name, and the name stays as written.
+         `generic` is untouched -- it is the key callers look things up by. */
+      if (totals.length === 1 && !group.unquantifiedOrder.length &&
+          unitRepeatsName(totals[0].unit, label)) {
+        label = replaceLastWord(label, unitLabel(totals[0].unit, totals[0].quantity));
+      }
 
       var unquantified = group.unquantifiedOrder.map(function (text) {
         return { text: text, drinks: group.unquantified[text] };
@@ -978,6 +1018,8 @@
     wholeText: wholeText,
     amountText: amountText,
     amountRangeText: amountRangeText,
+    // #1132. What build() asks before printing a unit beside a name.
+    quietUnit: quietUnit,
     // #801. Used by food-shopping-list.js only; see their own headers.
     splitParenthetical: splitParenthetical,
     fractionText: fractionText,

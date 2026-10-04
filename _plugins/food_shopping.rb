@@ -104,6 +104,8 @@ module HelenTriages
         [/(?<![a-z0-9])#{Regexp.escape(word)}(?![a-z0-9])/, aisle]
       end
 
+      yields = site.data.dig("food", "scaling", "yields")
+
       counted = 0
       guessed = 0
       COLLECTIONS.each do |key|
@@ -112,6 +114,14 @@ module HelenTriages
           portions, estimated = portions_for(doc)
           doc.data["portions"] = portions
           doc.data["portions_estimated"] = estimated
+          doc.data["made"] = made_for(doc, yields)
+          doc.data["whole_recipes"] = whole_recipes?(doc)
+          doc.data["half_recipe"] = doc.data["whole_recipes"] &&
+            HelenTriages::HalfRecipe.judge(
+              doc.data["ingredient_groups"], doc.data["made"], portions,
+              site.data.dig("food", "scaling", "half_recipe"),
+              site.data.dig("food", "scaling", "half_step_measures")
+            )["ok"]
           doc.data["shopping"] = shopping_for(doc)
           counted += 1
           guessed += 1 if estimated
@@ -155,6 +165,45 @@ module HelenTriages
 
       [nil, false]
     end
+
+    # WHAT THE RECIPE MAKES, FOR THE RECIPE PAGE'S SCALER -- #1286. `page.made`
+    # is _plugins/food_yield.rb's reading of `makes:`: a count of a named
+    # thing ("4–6 waffles"), a measure ("950 ml"), or nil. Helen: "Never tell
+    # me how many cookies are in a portion!!!" -- so where this is set, the
+    # recipe page's box counts the thing made and the word "portions" is not
+    # printed.
+    #
+    # THIS IS NOT `makes:` BEING READ AS PEOPLE. `portions_for` above is
+    # unchanged and still refuses to; `page.portions` is still the
+    # `serves_estimate`, and the INDEX's shopping list still scales by it.
+    # Two figures, two questions: how many it feeds, and how many it makes.
+    #
+    # A recipe that states `serves:` never gets one, whatever else it says:
+    # a number Helen wrote about people wins. No file carries both today.
+    def made_for(doc, yields)
+      return nil if doc.data["serves"].to_s[LEADING_NUMBER, 1]
+      makes = doc.data["makes"]
+      return nil if makes.nil? || makes.to_s.strip.empty?
+      HelenTriages::FoodYield.parse(makes.to_s, yields)
+    end
+
+    # A `makes:` RECIPE IS SCALED IN WHOLE RECIPES, whatever its box counts --
+    # #1286. Helen: "the buttons should still multiply the recipe in integers",
+    # and, for a yield with no number to show: 'if "some" is originally guessed
+    # to be 4 portions, 2x should be 8 portions'. So this is true for every
+    # recipe whose yield is `makes:`, including the ones `made_for` cannot read
+    # and which therefore keep the portions box. A recipe that states `serves:`
+    # is scaled a portion at a time, as it always was (#1005).
+    def whole_recipes?(doc)
+      return false if doc.data["serves"].to_s[LEADING_NUMBER, 1]
+      !doc.data["makes"].to_s.strip.empty?
+    end
+
+    # ONE STEP BELOW A WHOLE RECIPE, x½, WHERE THE NUMBERS ARE NOT INSANE --
+    # Helen's phrase. `page.half_recipe` is _plugins/food_half_recipe.rb's
+    # verdict, and that file has the rule. Only ever asked of a recipe that
+    # steps in whole recipes; a `serves:` recipe already goes down a portion
+    # at a time.
 
     # Both shapes, in one pass. A recipe has `ingredient_groups` and no
     # `ingredients`; a magic-bag entry has `ingredients` and no

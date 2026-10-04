@@ -729,6 +729,23 @@ with it.
 - `method` **xor** `method_groups`; both present means the second is dropped.
   Group names are bare nouns (`dressing`); method group names may be
   narrative phases; the page uppercases both.
+- **How an ingredient group's name becomes its heading** — `_layouts/recipe.html`,
+  and only when a recipe has more than one group:
+
+  | `name:` | heading |
+  |---|---|
+  | `dressing` | For the dressing: |
+  | opens with `to ` — `to serve`, `to finish`, `to decorate`, `to garnish` | To serve: / To finish: — itself, capitalised, no "For the" (#814) |
+  | `variation: chocolate chip` | Variation: chocolate chip — no colon after (#329) |
+  | absent | For the base: |
+
+  **Any name opening with `to `, not a list of them**: `to serve` was
+  special-cased alone until 2026-10-04 and `to finish` printed "For the to
+  finish:". So a name must read after "For the" or open with `to `; a bare
+  verb (`assemble`) does neither. **A method group's name is printed bare** —
+  no prefix, no colon, no capital added — so `Make the sauce` is fine there
+  and `to serve` prints lowercase in the markup (the CSS uppercases it).
+  `test_a_group_named_to_something_is_its_own_heading` pins the table.
 - Cross-recipe links are markdown, **relative**: `[text](../slug/)`. Front
   matter is never run through Liquid, so a root-relative link cannot pick up
   the baseurl. `[[wikilinks]]` are retired.
@@ -932,15 +949,50 @@ the magic bag is exempted in both places (the row `if` and the survivor
 count), not papered over with a fake `rewritten`; the derived ingredient
 index reads `ingredient_groups`, so a second loop reads `ingredients` (an
 empty vocabulary would hand back every dish on an exclusion — *fine to include
-ON, dangerous to exclude BY*); a `magic bag` badge on the row, shown in
+ON, dangerous to exclude BY*); a `magic bag` mark on the row, shown in
 production, because it says what you are about to CLICK. `test_no_recipe_only_keys`
 catches the halfway state of a dish being written up in place — promotion
 means moving it to `_food_drafts/` and taking the recipe schema.
 
-**Open**: whether the index needs a way to include or exclude the magic bag in
-production (#507 — Helen: *"I need to think about that more"*); whether
-`magic bag` is the right reader-facing word and permalink (#508); the README
-still describes two collections (#509, her voice).
+**The mark, and no filter** (#1201, settling #507). Helen: *"I don't need to
+filter by this. Let's just give it a quiet mark, where "draft" is on the live
+site, and next to it on the local site."* The `magic bag` mark is written into
+the row's `.badge-group-meta` — the slot the `draft` mark uses — and
+`_sass/food/_badges.scss` styles the two in ONE rule, so it has the draft
+mark's look and nothing of its own. Nothing on the index filters on it and no
+row attribute records it: do not add one. The mark is on the index row only —
+the dish page has none, and neither does a food draft's page.
+
+**A magic-bag dish can be a draft, and `magic bag` is always on the right.**
+Helen: *"a recipe can have magic bag AND draft. Always sit magic bag on the
+right."* `draft` on a row means *this row is not on the live site*. For a
+recipe that is its collection (`food_drafts`); a magic-bag dish never lives
+there, so for it the same fact is the publish gate's — it is a draft until it
+says `awaiting_fix: false` AND `proofread: true` (§4.0), and `food/index.html`
+derives `is_draft` the gate's way round, failing closed. So every new dish
+starts out marked `draft` locally and loses the mark when Helen sets
+`proofread: true`. Production never shows the pair: the gate has removed a
+held-back dish before the index renders, so there a magic-bag row carries
+`magic bag` alone. The slot is a flex row packed to its right-hand end and
+`magic bag` is written LAST, which is what puts it on the right in both cases.
+A held-back recipe in `_food_recipes/` is NOT marked `draft`; her ruling was
+about the magic bag. `tests/test_rendered_pages.py` pins all of this against
+fixture dishes, in the shared production fixture build and in one local
+fixture build (`built_with_fixtures(..., local=True)`), which exists because
+no production build can contain the pair.
+
+**The spec always runs.** Every test in `test_magic_bag.py` is per-entry, so
+an empty collection would collect zero cases and read green. `conftest.py`
+parametrises `magic_bag` with a committed fixture entry
+(`tests/fixtures/magic_bag/`, outside Jekyll's build and outside
+`ALL_MAGIC_BAG`) ahead of the real ones, and `test_magic_bag.py` breaks that
+fixture one way per rule to prove each rule can fail. There is deliberately no
+"collection must be non-empty" assertion — it would hold `main` red until
+Helen writes a dish; an empty collection prints *"Not evidence about the magic
+bag"* at the end of the run instead.
+
+**Open**: whether `magic bag` is the right reader-facing word and permalink
+(#508); the README still describes two collections (#509, her voice).
 
 `.recipe--magic-bag` exists for one spacing consequence (the badges would
 otherwise sit against the tagline on a page with no metadata grid) and is not
@@ -1231,7 +1283,176 @@ a missing glasses entry is one glass, a missing portions entry is *however many
 this recipe makes*, which only the build knows — so `1` is a real, storable
 answer here.
 
-**Where it is tested.** `food-shopping-list.test.js` (the arithmetic),
+**THE RECIPE PAGE HAS A SCALER TOO, AND A HANDFUL SCALES IN HALF STEPS**
+(#1005, #1125). `assets/js/food-scale.js` is one amount at a factor, through
+this same parser and `totalText`; `assets/js/recipe-scale.js` is the wiring.
+
+**A measure taken by hand or eye scales to the nearest half, never less than
+a half.** Helen, 2026-10-04, three sentences in order: *"some recipes scale 1
+handful to e.g. 1.17 handfuls, which is obvious nonsense"*; *'If a recipe
+calls for "a handful of parsley", three orders of that recipe should call for
+"3 handfuls of parsley"'*; *"Handfuls can scale in half steps."*
+
+    1 handful   ×3    →  3 handfuls
+    1 handful   ×1.5  →  1½ handfuls
+    1 handful   ×7/6  →  1 handful
+    1 handful   ×2/3  →  ½ handfuls
+
+**The rounding is ONE function, `halfStep` in `food-scale.js`.** The plural is
+not a new rule: `unitLabel` in `shopping-list.js` gives the singular at exactly
+one and the plural otherwise, so `½ handfuls` reads as `½ pats` already did.
+Her sentence names handfuls; the rule is applied to the whole list as one.
+
+**Which measures is data: `half_step_measures` in `_data/food/scaling.yml`**
+— `handful`, `pinch`, `dash`, `splash`, `knob`. `_layouts/recipe.html` joins
+the list onto the control as `data-half-step-measures` and the script passes
+it in, so adding one is a line of YAML; `food-scale.js` names no measure, and
+handed no list it scales a handful linearly like any count. The word is
+matched whole, anywhere after the number, singular or plural (`1 small
+handful`, `2 handfuls`, `1 large handful each`), and the plural is written
+back to suit the new number.
+
+**The same measure written with NO number scales too** — Helen's own example
+is `item: "a handful of fresh parsley"`, no `amount:` at all, and 96 items in
+the two collections open that way (5 published). `a`, `an`, `one` or nothing
+before a singular measure is ONE; a size word between is kept (`A large
+handful of fresh coriander` ×3 is `3 large handfuls of fresh coriander`); at a
+result of one the recipe's own words stand. `scaleLeadingMeasure` does it, and
+`recipe-scale.js` writes ONLY the row's first text node — the one place it
+writes outside an amount span — so an item that opens with a link is not
+scaled. **"a few", "some" and "a couple of" are not numbers**: those lines do
+not scale.
+
+**What does not scale is NAMED on Helen's line under the control** — `(Not
+scaled: Tabasco sauce, salt)`, parenthesised, comma-joined, no full stop
+(#1088): an ingredient with no amount (`salt, to taste`), and an amount or an
+opening with no count in it (`a few dashes of Tabasco sauce to taste`,
+`some`). **`large`, `medium` and `small` must never join the list** — Helen: *"Things like '2 large' can scale,
+surely"* — and a test refuses them. **What is absent is RULED, not left**
+(Helen, 2026-10-04): `sprig`, `bunch`, `drop`, `twist` and `lot` are counts of
+a thing you can pick up and scale — *"Yes, 4 sprigs double is 8, and so on."*
+— and **`pat` scales too**: *'"pat" is a correct term, and should be scaled
+linearly as "pats"'*, so `2 large pats` doubled is `4 large pats`. Do not add
+any of the six.
+
+**The NAME on that line is the ingredient, not the recipe's sentence about
+it** (`noteName`): a leading measure phrase that could not scale is dropped
+("a few dashes of", only where the phrase holds a declared measure and ends in
+`of`, so `cream of tartar` survives), then everything from the first comma or
+open bracket — the cut `_plugins/food_shopping.rb` makes for the list above —
+then a trailing `to taste`/`to serve` from `trailing_phrases` in
+`ingredient_words.yml`. **The comma cut is what makes the comma-joined line
+safe**, and its cost is that an item which is itself a list (`fresh parsley,
+thyme and sage`) is named by its first member — accepted: *"doesn't state an
+amount, so scaling is by common sense."* **The index's shopping list does NOT
+apply `half_step_measures`**: `food-shopping-list.js` totals for itself and
+never calls `halfStep`, so a handful there is still linear (`⅔ handfuls`,
+`1.17 handfuls`). Reported to Helen, not decided.
+
+**ON A `makes:` RECIPE THE RECIPE PAGE'S BOX COUNTS THE THING MADE, NEVER
+PORTIONS, AND STEPS IN WHOLE RECIPES** (#1286, 2026-10-04). Helen: *"the scaler
+giving the number of items made ... would be clearest to me. Never tell me how
+many cookies are in a portion!!!"* Henry's waffles said "Makes 4–6 waffles" up
+top and "~2 portions" under the list. `_plugins/food_yield.rb` reads the
+`makes:` line — only its START, after an optional `about`/`approx.` — and
+`food_shopping.rb` hangs the reading on the page as `page.made`;
+`_layouts/recipe.html` prints the control from it, and `yieldMode` in
+`food-scale.js` does the stepping and the plural.
+
+**Plus and minus multiply the RECIPE by whole numbers, and the box shows what
+that many recipes make.** *"the buttons should still multiply the recipe in
+integers, just showing number of waffles. So 1x is 5 waffles, 2x is 10
+waffles. Otherwise we'll need to start showing eggs in units of 1/27 or
+something."* It stepped one waffle at a time for a few hours, and six waffles
+was ×1.2 of two eggs.
+
+| `makes:` | ×1 | ×2 | her words |
+|---|---|---|---|
+| `4–6 waffles, depending on …` | `5` waffles — the midpoint | `10` waffles | *"Take the midpoint"* |
+| a figure that lands on a half (`4–7`) | `5–6` — a range of one | `11` | *"Midpoints that land on a half can become a range of one."* |
+| `about 8 pancakes` | about `8` pancakes | about `16` pancakes | *'Can Delia's pancakes please scale as "8 pancakes", "16 pancakes".'* |
+| `64+ tiny macarons` | `64+` tiny macarons | `128+` | *"64+ tiny macarons, 128+ tiny macarons"* |
+| `one 8-inch cake` — a number WORD | `1` × 8-inch cake | `2` × 8-inch cakes | *"Two 8-inch cakes"* |
+| `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies | *'"1 dozen" doubled can be "two dozen".'* |
+| `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml | *"950 ml for one order of a recipe becomes 1900 ml for 2"* |
+| `Some`, `Plenty for two people` — no count at the start | `~4` portions, the `serves_estimate` | `~8` portions | *'if "some" is originally guessed to be 4 portions, 2x should be 8 portions'* |
+
+**So every `makes:` recipe is one shape** (`wholeRecipes` in `food-scale.js`,
+`page.whole_recipes` from the plugin), including the ones that keep the word
+"portions" and the `~` because their yield has no count to show. **Only a
+`serves:` recipe steps a portion at a time** (#1005). The box is an input
+showing a DERIVED figure: a typed number goes to the nearest whole recipe (8
+on the waffles is 10), and its `aria-label` names the thing ("waffles to
+make"). The noun agrees with the number, the plural being `unitLabel`'s;
+`dozen …` never changes; a thing that opens with a digit gets a `×`, because
+"2 8-inch cakes" is unreadable and a number box cannot spell "two".
+
+**ONE STEP BELOW ONE RECIPE, ×½, WHERE THE NUMBERS ARE NOT INSANE.** Helen:
+*"Half a recipe would be great where the numbers aren't insane! Can we judge
+that?"* and *"not having half recipes in between integers, just between 0 and
+1"*. So the steps are ½, 1, 2, 3 — never 1½, stepped or typed. **The BUILD
+judges** (`_plugins/food_half_recipe.rb`, `page.half_recipe`,
+`data-half-recipe` on the input); the browser only reads the mark, and without
+it minus at one recipe does nothing, with no message. The judge is
+conservative — one line that will not halve refuses the recipe:
+
+| the amount is | it halves |
+|---|---|
+| a weight, volume or length (`divisible_units`) | always |
+| a spoon or imperial measure (`quarter_units`) | if it is a multiple of ¼ — an eighth is the smallest fraction the page prints, so `⅛ tsp` refuses |
+| a cup (`half_units`) | if it is a multiple of ½ — a cup goes down to a quarter and no further |
+| a by-eye measure (`half_step_measures`) | always; it has its own rule |
+| a count of things — `3` eggs, `2 large`, `1 sprig`, `1 x 400 g` tin | if it is EVEN, or the thing is on the `halvable` list (lemon, lime, orange, onion, shallot, garlic, clove, chilli, cinnamon stick, vanilla pod, leaf, star anise, nutmeg, stock cube, sachet, tin, jar) |
+| no number, or no amount | cannot object: it does not scale |
+
+and the yield must halve to at least one of itself: `one 8-inch cake`,
+`1 jar`, `1 dozen` and `1 litre` refuse; an odd count halves to a range of one,
+`64+` to `32+`, `125 ml` to `62–63 ml`; a portions box halves only an even
+number. All the lists are data, `half_recipe:` in `_data/food/scaling.yml`.
+
+**What Helen ruled on the judge, 2026-10-04.** *"Eggs: not halvable for food
+recipes."* — `egg` is off the list on purpose, and that one word decides most
+refusals. *"Neither mince pies nor sweet cream base halve"* — `1 dozen` and
+`1 lot` of another recipe stay refused. *"In: leaf, star anise, nutmeg, stock
+cube, sachet, tin, jar. Rest correct."* And **the waffles have no half step**:
+shown "⅞ cups whole milk", *"Please take the half step off the waffles. 2-3
+waffles isn't enough!!!!"* — done by the cup rule (1¾ cups is not a multiple of
+½), never by naming a recipe. A yield of `1 jar` still does not halve: the
+`halvable` list is about ingredients.
+
+**"1 large egg", not "1 large eggs".** *"Going from 1x to 0.5x eggs will be
+the only kind of occasion where a plural reduces to a single. Can we fix
+please?"* When a bare count or a size-word amount (`2`, `2 large`) written for
+more than one comes down to exactly one, `scaleAmount` says so (`one`) and
+`recipe-scale.js` rewrites the item's first text node through `singularItem`:
+the last word before the first comma, bracket, or `of`/`in`/`like`. The
+singular is the house's own — `singulars` in `ingredient_words.yml` first
+(`potatoes`, `leaves`), handed to the page as `data-singulars`, then
+`foldUnit`. **Left as written where it cannot be done safely**: a head naming
+two things, a capitalised noun, an `-oes`/`-ies` word the map does not hold,
+and a word with no plural (`star anise`). A `serves:` recipe reaches one too
+(two eggs for four, shown for two) and gets the same answer. Back at the
+recipe's own count the written text returns byte for byte.
+
+**Three things this does NOT do.** `makes:` is still never read as PEOPLE:
+`portions_for` is untouched and `page.portions` is still the
+`serves_estimate`. **The index's shopping list still scales these recipes by
+portions, one at a time** — it reads `page.portions` and knows nothing of
+`page.made`, whole recipes or halves. And **a count of nothing named (`makes:
+"about 8"`) keeps the portions box**, because there is no word to put after
+the number; that one is not ruled.
+
+**The vocabulary is data**, `yields:` in `_data/food/scaling.yml`: the approx
+words, the number words, the measures, and `dozen`. Both readers are plain
+Ruby with no Jekyll in them so that `scripts/food_yield.rb` can run them:
+`tests/test_food_yield.py` asks about every shape both collections write, in
+two subprocesses and no build, and NAMES the published recipes that keep the
+portions box and the ones offered a half step.
+
+**Where it is tested.** `food-scale.test.js` (the recipe page's scaler, reading
+the real `scaling.yml`), `test_the_recipe_scaler_is_handed_the_half_step_measures`
+in `tests/test_site_config.py` (the data reaching the page),
+`food-shopping-list.test.js` (the arithmetic),
 `shopping-list.test.js` (the parser, including the no-change-for-cocktails
 claim), `food-index-startup.test.js` (the wiring, §10.2),
 `tests/test_food_shopping.py` (the two data files),
@@ -1641,6 +1862,16 @@ glass:                           # LIST, not scalar
   - "old fashioned"              # canonical spelling; `rocks` fails a test — §9.11.1
 garnish: []                      # LIST, declared vocabulary — §9.12.1
   # ["no garnish"] = decided, [] = unfilled.
+meta:                            # FIVE keys, in this order — §9.1.1
+  made_before: true              # BOOLEAN, gates nothing; first because you
+                                 # make a drink and then have an opinion — #722
+  ship: "oh gods yes"            # a closed ordered vocabulary — §9.5
+  rewritten: false               # the three gate flags, food's names, food's
+  awaiting_fix: false            # order. §4.0 is what they MEAN.
+  proofread: false
+mood:                            # LIST, DERIVED and then stored — see below
+  - "sharp"
+  - "aperitivo"
 ingredients:                     # FULL list, untriaged, in build order
   - amount: "15 ml"              # the ONLY quantity field, NO US UNITS, and
                                  # NEVER a bare number — the unit is required
@@ -1674,27 +1905,49 @@ method:                          # ORDERED LIST — the steps are sequential
   - step: "Muddle the lime chunks hard with the sugar."  # a step is a string OR
     note: "my giant spiky muddler not the polite smooth one"   # a {step, note} pair
 to_serve: ""                     # SERVEWARE, not a further instruction — §9.4
-mood:                            # LIST, DERIVED and then stored — see below
-  - "sharp"
-  - "aperitivo"
 notes:                           # {label, text}, both keys always, as food.
   - label: "QQ"                  # "" in either half is a PLACEHOLDER, which
     text: "QQ - `generic` values INFERRED, not confirmed: ..."   # neither layout prints
 source: ""                       # free text, unlike food
 source_url: ""                   # external; nothing verifies it
-meta:                            # FIVE keys, in this order — §9.1.1
-  made_before: true              # BOOLEAN, gates nothing; first because you
-                                 # make a drink and then have an opinion — #722
-  ship: "oh gods yes"            # a closed ordered vocabulary — §9.5
-  rewritten: false               # the three gate flags, food's names, food's
-  awaiting_fix: false            # order. §4.0 is what they MEAN.
-  proofread: false
 ```
 
-`TOP_LEVEL_KEYS`, `REQUIRED_TOP_LEVEL`, `INGREDIENT_KEYS_*` and
-`META_KEYS_IN_ORDER` at the top of `tests/test_cocktails.py` are the schema;
-a key not listed there fails `test_no_unknown_top_level_keys`, and having to
-write that line is the point.
+`TOP_LEVEL_KEYS_IN_ORDER` (from which `TOP_LEVEL_KEYS` is derived),
+`REQUIRED_TOP_LEVEL`, `INGREDIENT_KEYS_*` and `META_KEYS_IN_ORDER` at the top
+of `tests/test_cocktails.py` are the schema; a key not listed there fails
+`test_no_unknown_top_level_keys`, and having to write that line is the point.
+
+**A DRAFT'S TOP-LEVEL KEYS ARE IN THE ORDER THE PAGE PRINTS THEM** (#1213), and
+the block above is in that order. Helen's scope, in her words: drafts and new
+ingests, and *"Do not apply this retrospectively to published recipes"* — so
+`_cocktail_recipes/` is never checked or rewritten, and a drink keeps the order
+it was promoted in. Food was not asked and has no such rule.
+
+- **The order is read off `_layouts/cocktail.html`, not chosen.**
+  `test_the_declared_key_order_is_the_order_the_page_prints` strips the Liquid
+  comments, starts at the element that holds the page's words
+  (`cocktail-head-words`) and places each key at its first mention. Move a
+  section on the page and the list must move with it.
+- **It starts below the glass icon on purpose.** The icon is looked up from
+  `page.glass` before the title is printed; counting it puts `glass` above
+  `title`, and Helen's own example opens *"title, tagline, glass"*.
+- **`meta` is fifth because SHIP IT? is**: the head prints glass, garnish and
+  `meta.ship` in one row, with the mood chips under it. The other four `meta`
+  keys print nothing and travel with the block.
+- **`serve` follows `ingredients`** because the page prints the ice as a clause
+  on the strain step. Until this rule the drafts wrote it above `ingredients`.
+- **`serves` is the one key the layout never names** (the units plugin reads it
+  and hands the page `page.units.serves`), so its place is declared by hand in
+  `KEYS_THE_LAYOUT_NEVER_NAMES`, with the reason: directly after `serve`.
+- **The fixer is `python3 scripts/tidy_drafts.py --site cocktails --only
+  order`** — §11.0.2.
+- **The drafts rule is `test_a_draft_drinks_keys_are_in_page_order`, and it is
+  drafts schema 2** (`tests/drafts_schema.py`, §9.1). The pass ran over all 62
+  drafts on 2026-10-04, so a clone still at schema 1 fails the handshake test
+  first, which says the key-order failures under it are its fault.
+- **A new file is put in order the same way**: the default `/tidy-drafts` pass
+  includes `order`, so the return journey for a file from a repo-less session
+  (§11.0.3) fixes one that arrived in the old order.
 
 **`mood` is derived and then stored.** `scripts/derive_cocktail_moods.py
 --write` computes it from generics, characters, glass, amounts and method
@@ -2072,7 +2325,7 @@ this reason that `default_bottles` sets the unbottled pour's PRICE too. Per serv
 reads its two data attributes for the BATCH note's total only and never writes
 to the line, which is what keeps a per-serving figure from moving with the
 multiple box. **Since #1121 the line also says how big the serving is** —
-"Roughly X units of alcohol in a serving of Y ml", her words again — and Y is
+"Roughly X units of alcohol in a serving of Y ml (undiluted)", her words again — and Y is
 §9.3.6's `page.volume.serve_ml`, printed once and carrying no attribute the
 scaler could reach. Where a volume would be wrong the tail is DROPPED and the
 sentence is exactly #753's — one published cocktail, the Caipirinha.
@@ -2133,8 +2386,13 @@ this file matches the wrong block.
 ### 9.3.6 How much liquid is in a drink — #1121
 
 **ONE SENTENCE NOW, and it does not move.** In the footer, the units line's
-tail, **"in a serving of Y ml"** — ONE GLASS, invariant, exactly as the unit
-count beside it is. The wording is Helen's and ships unpolished (§13.12).
+tail, **"in a serving of Y ml (undiluted)"** — ONE GLASS, invariant, exactly
+as the unit count beside it is. The wording is Helen's and ships unpolished
+(§13.12). **"(undiluted)" is #1291, 2026-10-04**: *"I just want to make it
+clear that 120 ml of drink won't end up in a 120-ml glass."* It follows the
+millilitres rather than preceding "serving" because her first try, "in an
+(undiluted) serving", leaves "an serving" outside the brackets. A drink that
+states no volume still says "in a serving." with no bracket.
 
 **THERE WAS A SECOND SENTENCE AND SHE REMOVED IT — #1257, 2026-10-02.** #1121
 put **"Approximately X ml"** under the scaler: the BATCH, the one figure on the
@@ -2151,18 +2409,25 @@ reads no volume**: `data-total-ml` carries the ×1 figure as an unprinted
 attribute on `.cocktail-scale-controls`, for `scripts/glass_fit_report.py` and
 the volume tests. `HTF.scale.batchTotalMl`, which multiplied it, is deleted.
 
-**A `to top` SPENDS ITS DECLARED RANGE'S MIDPOINT** — Helen, 2026-09-17:
-*"Midpoint please, I'll cope on the spot."* One expression, `top_up_ml` in the
-plugin, asked by both the unit count (which has spent it since #297) and the
-volume, so the two sentences on a topped drink can never disagree about what
-the top pours. Tom Collins: 112.5 ml of build plus soda water's 100–150 halved
-= 237.5 ml. The line that printed it said "Approximately", which carried the
-declared 50 ml span; since #1257 the figure reaches the reader only through
-the footer's "Roughly … in a serving of 237.5 ml". The argument she overruled is kept in
-`volume_for`'s header: `top_up_ml` is one range per topper whatever the drink,
-and #1076 showed it is a stand-in for a sum this repo cannot run (capacity −
-build − room for the ice; no glass records a capacity, #295). Make it again
-only if a figure looks silly on a real glass.
+**A `(top)` IS SIZED FROM ITS GLASS — #1179, 2026-10-04.** Helen: *"find
+typical capacities… Then use those to estimate top amounts? It really doesn't
+need to be exact, let's say +- 50 ml would be fine."* `fitted_top_ml` in the
+plugin: the first glass listed, at its surveyed median, filled to the wash
+line, less the room `serve.ice` takes, less the build once the method has
+watered it (§9.11.2's `fit_rules`, the same reading the fit report takes),
+rounded to 5 ml. Tom Collins: 112.5 ml short-shaken over cubes in a highball
+leaves 90, so 202.5 ml. Asked once per drink and handed to both the unit count
+and the volume, so the two can never disagree about what the top pours.
+
+**IT FALLS BACK TO THE DECLARED RANGE'S MIDPOINT** (Helen, 2026-09-17:
+*"Midpoint please, I'll cope on the spot."*) wherever that sum has no answer:
+no `serve.ice` (absent means undecided), no surveyed glass, a punch bowl,
+`serves:` above 1, more than one `(top)`, or a build that already fills the
+glass. So `top_up_ml` in `costs.yml` still has to declare every topper, and
+`test_top_up_volumes_cover_every_to_top_pour` still says so. The page carries
+which it did as `data-top-from="glass|range"` beside `data-top-ml`, unprinted.
+**Costing and the shopping list still spend the declared range**, not the
+glass's figure: a price is already a range and nobody asked for it to move.
 
 **IT STILL WITHHOLDS WHERE A FIGURE WOULD BE WRONG RATHER THAN ROUGH, and two
 published cocktails say nothing.** The Caipirinha — 45 ml of cachaça, half a lime,
@@ -2297,6 +2562,34 @@ for. `generic`/`suggestion` may be a string or a list — Liquid's `for` treats 
 bare string as a one-item sequence — and a list `generic` joins with a quiet
 italic "or". `optional: true` renders as a plain word after the name; it is
 not food's `incidental` (that HIDES a line; this shows and marks it).
+
+**A unit the name already says is not printed twice** (#1132, Helen's whole
+report: *"1 cube sugar cube"*). The data is right and stays as it is —
+`amount: "1 cube"`, `generic: "sugar cube"` — and the line is fixed where it
+is PRINTED, in three places that share one rule:
+
+    1 cube + sugar cube            →  1    sugar cube
+    12 cubes + sugar cube          →  12   sugar cubes
+    8 leaves + kaffir lime leaves  →  8    kaffir lime leaves
+    1.5 each + passion fruit       →  1.5  passion fruit
+
+**The unit MOVES INTO THE NAME** when it is the name's own last word (compared
+folded to a singular), replacing that word as the amount wrote it — so the
+plural is always the amount's and nothing pluralises a generic. **`each` is
+never printed.** Only a one-word unit after the number, only a single
+`generic`, and never a one-word name. `16 cubes raw sugar` and `3 leaves basil`
+repeat nothing and are untouched.
+
+| where | how |
+|---|---|
+| `_layouts/cocktail.html` | decides at build: prints the number in `.cocktail-amount`, marks it `data-unit-quiet`, keeps the written amount in `data-amount`, and puts the unit in `.cocktail-unit-in-name` |
+| `assets/js/cocktail-scale.js` | obeys the mark and decides nothing: scales `data-amount` as ever, then writes the number to the amount and the unit to the slot (`HTF.scale.splitUnit`) |
+| `assets/js/shopping-list.js` | `quietUnit` — the same rule for the index's shopping list, where the label takes the plural (`13` `sugar cubes`); `generic` and each total's `unit` are unchanged |
+
+**The rule is stated twice, in Liquid and in `shopping-list.js`**, because the
+drink page is built before any script runs. `test_no_drink_page_says_a_unit_twice`
+reads every built page; `shopping-list.test.js` has the same pours. The cards
+print no amounts, so `_plugins/cocktail_card_ingredients.rb` is not involved.
 
 ### 9.10.1 Cards and search read the VOCABULARY, never the transcription
 
@@ -2512,7 +2805,16 @@ break them in the kitchen."* Nothing records the cupboard, and nothing should.
 - **`fit_rules` are the rules**: dilution per method family, blended volume,
   wash line, ice space, the large cube, punch cups. Each is a sourced
   `{low, high}` range, because the sources disagree and a single figure hides
-  which way. The wash line is a single figure because it IS the rule.
+  which way. The wash line is a single figure because it IS the rule. **The
+  three wet dilutions are Helen's own figures since 2026-10-04** — stirred
+  20%, shaken 27.5%, short shake 15% — written on both ends of the pair; the
+  sourced ranges she chose against are in the file's comment and do not come
+  back from the research.
+- **The rules now DECIDE something as well as flag it**: a `(top)` is sized
+  from them (§9.3.6, #1179). So the reading of a method into a dilution
+  family lives in the plugin (`method_family`), and the report reads it off
+  the page as `data-method-family`, with `data-top-ml` for how much of the
+  total is the top.
 - **`python3 scripts/glass_fit_report.py`** builds the site with the local
   config (drafts render there), reads each drink's `data-total-ml` — the
   plugin's own figure, never a second parse — and writes a GitHub checklist to
@@ -2803,7 +3105,14 @@ write one either: **that note is the bitters caveat and nothing else since #1121
 saw them under the new `Approximately X ml` line — *"the cost and units line
 below has come back and I don't want it to be there"*. The element now renders
 only for a cocktail that pours a dash or a drop, 15 of the 47 built pages, and
-says only *"Don't scale bitters linearly — add to taste."*)
+says only *"\* Don't scale bitters linearly — add to taste."* **The star is
+#1293, 2026-10-04**: above ×1 a pour in dashes or drops has its scaled amount
+struck through with a `*` beside it, and the note opens with the same `*`.
+Helen: *"make it more obvious that bitters shouldn't be scaled by updating the
+ingredient line as well as showing the note under the scaler."* The layout
+marks the amount `data-dashes` and prints the star hidden;
+`cocktail-scale.js` sets `data-struck` and reveals it. The figure under the
+line is still the multiplied one.)
 **Whole recipes only** (integer multiples, clamped at ×1
 — every written amount is on the 2.5 ml grid, so nothing ever needs
 rounding); counts multiply and re-pluralise, `to top` / `to rinse` pass
@@ -2813,6 +3122,15 @@ message it used to show could only ever have fired on a drink's own written
 recipe; ONE parser
 (`shoppingList.parseAmount`) across `shopping-list.js` → `scale.js` →
 `cocktail-scale.js`, guarded by `test_the_scaler_scripts_load_in_dependency_order`.
+**One in the BROWSER. The build has its own, and since #1199 it is also one**:
+`HelenTriages::Amount` in `_plugins/amount.rb`, shared by the costs, units and
+card generators, which each used to retype the regex. Its grammar is narrower
+on purpose (cocktail amounts only; the unit as written, nothing folded).
+`tests/fixtures/amounts.json` holds every distinct amount a published drink
+writes with what each parser reads; `tests/test_amount_parser.py` runs the Ruby
+side through `scripts/parse_amounts.rb` with no Jekyll build, and
+`tests/js/shopping-list.test.js` reads the same rows. A new amount shape in a
+published drink fails until it has a row.
 `serves:` exists on nine punch-bowl cocktails and the scaler does not read it —
 *how many does this make* and *how much am I making* are different questions.
 A `{step, note}` pair renders the note under its step and stays visible in
@@ -3417,6 +3735,15 @@ touches only Helen's own prose fields (`title`, `tagline`, `to_serve`, a note's
 fifths of a cocktail's front matter is a closed vocabulary, somebody else's words
 or a number. `tests/test_tidy_drafts.py` asserts the whole output byte for
 byte on a fixture. A title diverging from its slug is NOT a finding on a draft.
+
+**`--only order` (#1213) is the one cocktail rule that reaches outside her
+prose, and it edits no line.** It re-deals a draft's top-level blocks into page
+order (§9.3) and writes each back byte for byte; before returning it checks
+that the lines are the same multiset, that both sides parse to the same data,
+and that the declared order was reached, and raises rather than writes if any
+of the three fails. It refuses, and names under `SKIPPED`, an undeclared key, a
+key written twice, and a column-0 comment — which belongs to no block.
+Cocktails only; `--site food --only order` does nothing.
 
 **A note that a later ruling has made false may be corrected or deleted by an
 agent** (#1078, Helen's "yes", 2026-09-24). The boundary is the ruling, not the

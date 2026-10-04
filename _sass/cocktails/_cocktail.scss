@@ -1839,6 +1839,42 @@ $amount-gap: 1rem;
   overflow-wrap: break-word;
 }
 
+// A POUR IN DASHES OR DROPS, ABOVE x1 — #1293, 2026-10-04. Helen: "make it more
+// obvious that bitters shouldn't be scaled by updating the ingredient line as
+// well as showing the note under the scaler... e.g. strikethrough text for the
+// amount, then a *, and a * before" the note.
+//
+// The layout marks the amount `data-dashes` and prints the star hidden;
+// cocktail-scale.js sets `data-struck` and reveals the star once the multiple
+// passes one. The figure under the line is still the multiplied one: the line
+// says "not this", the note says "add to taste", and the reader can see which
+// way to err from.
+//
+// INLINE, WHERE EVERY OTHER AMOUNT IS A BLOCK. The amount and the direction
+// under it are blocks so the direction takes its own line (#1263); a star has
+// to sit ON the amount's line, so a marked amount is inline and the star
+// follows it. `.cocktail-use` stays a block and still drops beneath both.
+.cocktail-measure > .cocktail-amount[data-dashes] {
+  display: inline;
+}
+
+.cocktail-amount[data-struck] {
+  text-decoration: line-through;
+  text-decoration-thickness: 0.09em;
+}
+
+// The same face and weight as the amount it marks, so it reads as part of the
+// figure. `[hidden]` is restated because an author `display` would beat the
+// user-agent sheet's (§9.11's trap).
+.cocktail-amount-star {
+  font-family: $font-label;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: $color-text;
+
+  &[hidden] { display: none; }
+}
+
 .cocktail-item {
   font-size: 1rem;
 }

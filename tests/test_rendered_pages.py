@@ -95,15 +95,21 @@ _COPY_IGNORE = shutil.ignore_patterns(
 
 
 @contextlib.contextmanager
-def built_with_fixtures(name, files):
+def built_with_fixtures(name, files, local=False):
     """Build the PRODUCTION site from a copy of the tree, plus `files`.
 
     `files` maps a repo-relative path to its text. Yields the output directory;
     removes the copy and the output afterwards whatever happens.
 
-    PRODUCTION CONFIG ALONE (`_config.yml`), because every caller is testing
-    the publish gate or the rendered drink page as the world sees it. A local
-    build would publish drafts and answer a different question.
+    PRODUCTION CONFIG ALONE (`_config.yml`) UNLESS ASKED, because nearly every
+    caller is testing the publish gate or the rendered drink page as the world
+    sees it. A local build would publish drafts and answer a different question.
+
+    `local=True` ADDS `_config_local.yml`, FOR THE ONE QUESTION THAT IS ABOUT
+    THE LOCAL BUILD (#1201): what a row says about a dish the gate holds back.
+    Production cannot answer it -- the gate has removed the dish before the
+    index renders -- and the `site` session build cannot either, because it is
+    the real tree and may hold no fixture.
     """
     _require_bundler()
     src = ROOT / "tmp" / f"_fixture_src_{name}"
@@ -117,10 +123,13 @@ def built_with_fixtures(name, files):
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(text, encoding="utf-8")
 
+        configs = [src / "_config.yml"]
+        if local:
+            configs.append(src / "_config_local.yml")
         result = subprocess.run(
             ["bundle", "exec", "jekyll", "build",
              "--source", str(src),
-             "--config", str(src / "_config.yml"),
+             "--config", ",".join(str(c) for c in configs),
              "--destination", str(out)],
             cwd=ROOT, capture_output=True, text=True, timeout=600,
         )
@@ -877,6 +886,446 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build(fixture_site)
         "The control recipe -- identical but for `meta.proofread: true` -- "
         "is missing too, so this build proves nothing about the gate. It "
         "is over-firing, or the build dropped everything."
+    )
+
+
+# =============================================================================
+# THE MAGIC BAG MARK -- #1201, which settled #507 (2026-10-04)
+# =============================================================================
+# Helen, 2026-09-28: "I don't need to filter by this. Let's just give it a
+# quiet mark, where 'draft' is on the live site, and next to it on the local
+# site."
+#
+# A FIXTURE DISH, BECAUSE THE REAL COLLECTION IS HERS TO FILL and was empty
+# when this was written -- the index had been carrying a `magic bag` mark that
+# no build had rendered for four weeks. Three entries, differing only in the
+# two gate flags, in the copy of the tree and never in `_food_magic_bag/`.
+#
+# AND A SECOND RULING, 2026-10-04, after she had looked at the first build: "a
+# recipe can have magic bag AND draft. Always sit magic bag on the right." A
+# magic-bag dish the publish gate holds back is a draft -- it is not on the
+# live site, which is what `draft` on a row has always meant -- so locally its
+# row says `draft` then `magic bag`. One held-back fixture per gate leg, because
+# a dish failing both would pass whichever leg the template forgot to read.
+MAGIC_BAG_MARK_FIXTURE = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'main_ingredients: ["salt"]\ningredients:\n  - "salt"\n'
+    'meta:\n  awaiting_fix: {awaiting_fix}\n  proofread: {proofread}\n---\n'
+)
+MAGIC_BAG_MARK = '<span class="badge badge-magic-bag">magic bag</span>'
+DRAFT_MARK = '<span class="badge badge-draft">draft</span>'
+MARK_SLOT = re.compile(r'<div class="badge-group-meta">(.*?)</div>', re.S)
+
+MAGIC_BAG_LIVE = "zzz-magic-bag-mark"
+MAGIC_BAG_HELD_BACK = {                     # slug -> (awaiting_fix, proofread)
+    "zzz-magic-bag-unread": ("false", "false"),
+    "zzz-magic-bag-awaiting": ("true", "true"),
+}
+MAGIC_BAG_MARK_FILES = {
+    f"_food_magic_bag/{slug}.md": MAGIC_BAG_MARK_FIXTURE.format(
+        t=slug, awaiting_fix=awaiting_fix, proofread=proofread)
+    for slug, (awaiting_fix, proofread) in
+    {MAGIC_BAG_LIVE: ("false", "true"), **MAGIC_BAG_HELD_BACK}.items()}
+
+_in_the_fixture_build(MAGIC_BAG_MARK_FILES)
+
+
+@pytest.fixture(scope="module")
+def local_fixture_site():
+    """The LOCAL build of a copy of the tree holding the magic-bag fixtures.
+
+    ONE MORE BUILD, AND IT IS THE ONLY WAY TO SEE THIS. #1271 took this module
+    from six fixture builds to one, so a second is not added lightly. But the
+    shared build is production, where the gate removes a held-back dish before
+    the index renders, and `draft` beside `magic bag` exists only where the
+    gate is skipped. Reading the template instead is what the first version of
+    these tests did, and it pinned the ORDER of two spans while saying nothing
+    about which rows get both.
+
+    Its own files and nobody else's: the other fixtures in the shared build
+    are gate fixtures, and a local build would publish every one of them.
+    """
+    with built_with_fixtures("local", MAGIC_BAG_MARK_FILES, local=True) as out:
+        yield out
+
+
+def _index_rows(html: str) -> dict[str, str]:
+    """url -> that row's markup, off a built food index."""
+    rows = {}
+    for chunk in html.split('<li data-url="')[1:]:
+        url, _, rest = chunk.partition('"')
+        rows[url] = rest
+    return rows
+
+
+def _mark_slot(row: str) -> str:
+    """What a row holds where `draft` goes, with the whitespace taken out."""
+    match = MARK_SLOT.search(row)
+    assert match, "an index row has no .badge-group-meta at all."
+    return "".join(match.group(1).split())
+
+
+def test_a_magic_bag_dish_carries_the_quiet_mark_where_draft_goes(fixture_site):
+    """On the live site a magic-bag row has the mark in the `draft` slot, and
+    nothing else is there.
+
+    THE CONTROLS ARE THREE. A recipe's row must have the slot EMPTY, or "the
+    mark is present" would be satisfied by a template that prints it on every
+    row. The held-back twins must have no page and no row, or the mark would
+    be advertising a link the gate withheld (#235's shape). And no row on a
+    production index may say `draft`, which is the half of Helen's sentence
+    that makes the slot the magic bag's own there.
+    """
+    out = fixture_site
+    assert (out / "food" / "magic-bag" / "zzz-magic-bag-mark" / "index.html").exists(), (
+        "The proofread magic-bag fixture built no page, so nothing below is "
+        "about the mark: the collection, its permalink or the gate has changed."
+    )
+    published = [slug for slug in MAGIC_BAG_HELD_BACK
+                 if (out / "food" / "magic-bag" / slug / "index.html").exists()]
+    assert not published, (
+        "Magic-bag entries the gate should hold back were PUBLISHED: "
+        f"{published}."
+    )
+
+    html = (out / "food" / "index.html").read_text(encoding="utf-8")
+    rows = _index_rows(html)
+
+    listed = [slug for slug in MAGIC_BAG_HELD_BACK
+              if f"/food/magic-bag/{slug}/" in rows]
+    assert not listed, (
+        "The production index lists magic-bag dishes the gate held back, "
+        f"linking to pages that were never written: {listed}."
+    )
+    assert "/food/magic-bag/zzz-magic-bag-mark/" in rows, (
+        "The proofread magic-bag fixture has no row on the production index. "
+        "The magic bag joins the index unconditionally (MANUAL §4.3); a dish "
+        "hidden from the index is a dish forgotten."
+    )
+    want = "".join(MAGIC_BAG_MARK.split())
+    got = _mark_slot(rows["/food/magic-bag/zzz-magic-bag-mark/"])
+    assert got == want, (
+        "A magic-bag row should hold exactly the `magic bag` mark in "
+        f".badge-group-meta, where `draft` goes. It holds: {got!r}"
+    )
+
+    control = _mark_slot(rows["/food/recipes/caramel/"])
+    assert control == "", (
+        "A recipe's row has something in the mark slot on the live site: "
+        f"{control!r}. Only a magic-bag dish is marked there."
+    )
+    assert "badge-draft" not in html, (
+        "The PRODUCTION index carries a `draft` mark. Drafts do not publish, "
+        "so a row saying so is a row that should not be there (#235)."
+    )
+
+
+def test_a_held_back_magic_bag_dish_says_draft_then_magic_bag_locally(local_fixture_site):
+    """Locally, a dish the gate holds back carries BOTH marks, `magic bag` on
+    the right; a publishable one carries `magic bag` alone.
+
+    Helen, 2026-10-04: "a recipe can have magic bag AND draft. Always sit magic
+    bag on the right." `.badge-group-meta` is a flex row packed to its
+    right-hand end, so the mark written LAST is the rightmost, and the order
+    of the spans in the built row is the order on the screen.
+
+    ONE FIXTURE PER GATE LEG. `draft` here means what the publish gate means:
+    not `awaiting_fix: false` AND `proofread: true`. A template that read only
+    `proofread` would mark the unread dish and miss the one awaiting a fix,
+    which is the dish Helen is most certainly still working on.
+
+    THE CONTROLS: the publishable dish must NOT say `draft`, or a template
+    that marks every magic-bag row passes; and a real recipe's slot must be
+    empty, or one that marks every row does.
+    """
+    out = local_fixture_site
+    html = (out / "food" / "index.html").read_text(encoding="utf-8")
+    rows = _index_rows(html)
+
+    both = "".join((DRAFT_MARK + MAGIC_BAG_MARK).split())
+    for slug in MAGIC_BAG_HELD_BACK:
+        url = f"/food/magic-bag/{slug}/"
+        assert (out / "food" / "magic-bag" / slug / "index.html").exists(), (
+            f"The local build wrote no page for {slug}. The local build skips "
+            "the gate so that the dishes being worked on can be read."
+        )
+        assert url in rows, f"{slug} has no row on the LOCAL index."
+        got = _mark_slot(rows[url])
+        assert got == both, (
+            f"{slug} is held back by the publish gate, so locally its row "
+            "should say `draft` then `magic bag` -- magic bag on the right. "
+            f"It holds: {got!r}"
+        )
+
+    live = _mark_slot(rows[f"/food/magic-bag/{MAGIC_BAG_LIVE}/"])
+    assert live == "".join(MAGIC_BAG_MARK.split()), (
+        "A magic-bag dish that passes the gate should carry `magic bag` alone "
+        f"on the local index too. It holds: {live!r}"
+    )
+    control = _mark_slot(rows["/food/recipes/caramel/"])
+    assert control == "", (
+        f"A published recipe's row is marked on the local index: {control!r}."
+    )
+
+
+def test_the_magic_bag_mark_is_the_draft_marks_look_and_is_written_last(fixture_site):
+    """One CSS rule for both marks, and one container, magic bag LAST.
+
+    "QUIET" IS HELEN'S WORD and the draft mark is the look she pointed at, so
+    this reads the COMPILED stylesheet: every rule that styles one mark must
+    name the other. _badges.scss said for a month that the two looked identical
+    because neither declared anything, while `.badge-draft` declared a tint and
+    a text colour and `.badge-magic-bag` did not. A comment is not a check.
+
+    THE TEMPLATE HALF IS THE CHEAP TWIN of the local-build test above, and
+    says why when that one goes red: both marks in the one slot, `magic bag`
+    after `draft`, and the slot still packed to its right-hand end -- which is
+    what turns "written last" into "on the right".
+    """
+    css = (fixture_site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
+    styled = [{s.strip() for s in selector.split(",")}
+              for selector, _ in _rules(css)
+              if ".badge-draft" in selector or ".badge-magic-bag" in selector]
+    assert styled, (
+        "No rule in the built food.css names `.badge-draft` or "
+        "`.badge-magic-bag`, so neither mark has the quiet look."
+    )
+    apart = [sorted(s) for s in styled
+             if not {".badge-draft", ".badge-magic-bag"} <= s]
+    assert not apart, (
+        "The two marks no longer share their styling -- these rules name one "
+        f"and not the other: {apart}. Helen's ruling on #1201 gives the magic "
+        "bag the draft mark's own look; style both in one rule."
+    )
+
+    template = (ROOT / "food" / "index.html").read_text(encoding="utf-8")
+    slots = [m for m in MARK_SLOT.findall(template) if "badge" in m]
+    assert len(slots) == 1, (
+        f"food/index.html has {len(slots)} .badge-group-meta slots holding a "
+        "mark; there should be exactly one."
+    )
+    slot = slots[0]
+    assert MAGIC_BAG_MARK in slot and DRAFT_MARK in slot, (
+        "The `magic bag` and `draft` marks are no longer written into the same "
+        ".badge-group-meta on food/index.html, so they cannot sit side by side."
+    )
+    assert slot.index(DRAFT_MARK) < slot.index(MAGIC_BAG_MARK), (
+        "`magic bag` is written before `draft` in the slot, which puts it on "
+        "the LEFT. Helen, 2026-10-04: \"Always sit magic bag on the right.\""
+    )
+    packed_right = [body for selector, body in _rules(css)
+                    if selector.split(",")[-1].strip().endswith(".badge-group-meta")
+                    and re.search(r"justify-content:\s*flex-end", body)]
+    assert packed_right, (
+        "`.badge-group-meta` is no longer `justify-content: flex-end` in the "
+        "built food.css, so the last mark written is not at the right-hand "
+        "end of the row and a lone `magic bag` has moved."
+    )
+    row_tags = [line for line in template.splitlines() if "<li data-url=" in line]
+    assert len(row_tags) == 1, "food/index.html no longer has exactly one row tag."
+    assert "magic" not in row_tags[0] and "data-meta" not in row_tags[0], (
+        "The index row carries an attribute about the magic bag. Nothing may "
+        "filter on it: the mark is a mark and not a filter (#1201, settling "
+        f"#507). The row tag is: {row_tags[0].strip()}"
+    )
+
+
+# =============================================================================
+# "FOR THE TO FINISH:" — #814, 2026-10-04
+# =============================================================================
+# One recipe carrying every kind of ingredient-group name the layout tells
+# apart: a bare noun, three names that open with "to ", and a variation.
+
+GROUP_HEADING_FIXTURE = (
+    '---\ntitle: "zzz-814-group-headings"\n'
+    'tagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
+    'tags: []\ningredient_groups:\n'
+    '  - name: dressing\n    items:\n    - item: salt\n'
+    '  - name: to finish\n    items:\n    - item: salt\n'
+    '  - name: to decorate\n    items:\n    - item: salt\n'
+    '  - name: to serve\n    items:\n    - item: salt\n'
+    '  - name: "variation: plain"\n    items:\n    - item: salt\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n  cooked_before: false\n'
+    '---\n'
+)
+
+_in_the_fixture_build(
+    {"_food_recipes/zzz-814-group-headings.md": GROUP_HEADING_FIXTURE})
+
+GROUP_HEADING = re.compile(r'<h3 class="recipe-group-heading">([^<]*)</h3>')
+
+
+def test_a_group_named_to_something_is_its_own_heading(fixture_site):
+    """#814. `to finish` rendered "For the to finish:".
+
+    Helen: "Can we fix all 'for the to finish' cases? Both existing and when
+    we ingest." The layout special-cased `to serve` and nothing else, so every
+    other name of that shape got the "For the" a bare noun wants. ANY name
+    opening with "to " now prints as itself, capitalised, with the colon --
+    and `to serve` reads exactly as it did.
+
+    A FIXTURE, because the published collection holds only `to serve`: the
+    `to finish`, `to decorate` and `to garnish` groups are all in drafts, so
+    the production build could not show the bug or the fix.
+    """
+    page = fixture_site / "food" / "recipes" / "zzz-814-group-headings" / "index.html"
+    assert page.exists(), "the #814 fixture recipe was not built"
+    headings = GROUP_HEADING.findall(page.read_text(encoding="utf-8"))
+    assert headings == [
+        "For the dressing:", "To finish:", "To decorate:", "To serve:",
+        "Variation: plain",
+    ], (
+        "ingredient-group headings are not what _layouts/recipe.html should "
+        f"print for [dressing, to finish, to decorate, to serve, variation: "
+        f"plain]: {headings}"
+    )
+
+
+def test_no_built_food_page_says_for_the_to(site):
+    """#814, over everything that builds locally -- drafts included.
+
+    The fixture test above proves the rule; this reads the real pages, where
+    the names actually are, so a name the rule does not reach shows up by
+    file. `site` and not `prod_site`: all six "to finish / to decorate / to
+    garnish" groups are in `_food_drafts/`, which only the local build renders.
+    """
+    problems, seen = [], 0
+    for page in sorted((site / "food").rglob("index.html")):
+        for heading in GROUP_HEADING.findall(page.read_text(encoding="utf-8")):
+            seen += 1
+            if re.match(r"for the (to|for|the) ", heading, re.I):
+                problems.append(f"{page.parent.name}: {heading!r}")
+    assert seen > 50, (
+        f"only {seen} group headings were found under food/, so GROUP_HEADING "
+        f"no longer matches the layout's markup and this test reads nothing."
+    )
+    assert not problems, (
+        'a food page prints a group heading that opens "For the to/for/the '
+        '..." (#814):\n  ' + "\n  ".join(problems)
+    )
+
+
+# =============================================================================
+# THE SCALER COUNTS THE THING MADE — #1286, 2026-10-04
+# =============================================================================
+SCALE_CONTROL = re.compile(
+    r'<div class="recipe-scale-controls"[^>]*>(.*?)</div>', re.S)
+
+
+def _scale_control(site_dir, slug):
+    page = site_dir / "food" / "recipes" / slug / "index.html"
+    assert page.exists(), f"{slug} was not built"
+    match = SCALE_CONTROL.search(page.read_text(encoding="utf-8"))
+    return match.group(1) if match else None
+
+
+def _what_the_control_says(control):
+    """The control's markup WITHOUT its class attributes, lowercased.
+
+    The input keeps the class `recipe-scale-portions` on a `makes:` recipe --
+    one control, one set of hooks for the script and the stylesheet -- and a
+    class name is not something the page SAYS. Everything a reader or a
+    screen reader meets is left in: the text, `title`, `aria-label`, `value`.
+    """
+    return re.sub(r'\sclass="[^"]*"', "", control).lower()
+
+
+def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
+    """#1286. Helen: "Never tell me how many cookies are in a portion!!!"
+
+    Henry's Sunday Waffles says "Makes 4–6 waffles" at the top and said
+    "~2 portions" under the ingredients. The box now starts at the midpoint,
+    5, and the word after it is the thing made. tests/test_food_yield.py
+    checks the reading of every `makes:` line without a build; this checks
+    that the reading reaches the page, on one recipe of each kind.
+
+    AND THAT THE REST IS UNTOUCHED. A `makes:` with no count at its start
+    ("Some") keeps the portions box and its "~" -- her ruling -- and a recipe
+    that states `serves:` was never part of this.
+    """
+    waffles = _scale_control(prod_site, "henrys-sunday-waffles")
+    assert waffles is not None, "the waffles page has no scaler control"
+    assert 'value="5"' in waffles and "data-made=" in waffles, (
+        "the waffles' box should start at 5, the midpoint of 4–6, and carry "
+        f"the build's reading in data-made:\n{waffles}"
+    )
+    assert re.search(r'<span class="recipe-scale-word">\s*waffles\s*</span>', waffles), (
+        f"the word after the waffles' box should be `waffles`:\n{waffles}"
+    )
+    assert 'aria-label="waffles to make"' in waffles, (
+        "the waffles' box shows a derived figure (what N recipes make), so "
+        f"its label must name the thing:\n{waffles}"
+    )
+    assert "portion" not in _what_the_control_says(waffles), (
+        "the waffles' scaler still says portions somewhere -- in the word, "
+        f"the `~` title or an aria-label:\n{waffles}"
+    )
+
+    # THE HALF STEP IS THE BUILD'S VERDICT, carried as one attribute. The
+    # fairy cakes halve (2 large eggs, 12 cakes -> 6). The waffles do NOT --
+    # Helen: "Please take the half step off the waffles" -- because 1¾ cups
+    # of milk would halve to ⅞. And "one 8-inch cake" has no half.
+    fairy = _scale_control(prod_site, "grandmas-fairy-cakes") or ""
+    assert "data-made=" in fairy and "data-half-recipe" in fairy, (
+        "the fairy cakes should be offered a half recipe -- "
+        f"_plugins/food_half_recipe.rb's verdict has not reached the page:\n{fairy}"
+    )
+    assert "data-half-recipe" not in waffles, (
+        f"the waffles are offered a half recipe again (⅞ cups of milk):\n{waffles}"
+    )
+    page = (prod_site / "food" / "recipes" / "grandmas-fairy-cakes" / "index.html").read_text(encoding="utf-8")
+    assert "data-singulars=" in page and "&quot;leaves&quot;:&quot;leaf&quot;" in page, (
+        "the scaler is not handed ingredient_words.yml's `singulars`, so a "
+        "count that comes down to one keeps its plural where a trailing `s` "
+        "does not explain it (#1286)."
+    )
+    cake = _scale_control(prod_site, "beetroot-chocolate-cake") or ""
+    assert "data-made=" in cake and "data-half-recipe" not in cake, (
+        f"half of one 8-inch cake is not offered; the page says it is:\n{cake}"
+    )
+
+    expected = {
+        # slug: (box, the word after it)
+        "bens-chocolate-ice-cream": ("950", "ml"),
+        "beetroot-chocolate-cake": ("1", "× 8-inch cake"),
+        "sweet-shortcrust-pastry-mince-pies": ("1", "dozen mince pies"),
+        "macarons": ("64+", "tiny macarons"),
+        "grandmas-scones": ("2", "large rounds of 4"),
+    }
+    problems = []
+    for slug, (box, word) in expected.items():
+        control = _scale_control(prod_site, slug) or ""
+        said = re.search(r'<span class="recipe-scale-word">(.*?)</span>', control, re.S)
+        got = (
+            (re.search(r'<input[^>]*\bvalue="([^"]*)"', control) or [None, None])[1],
+            " ".join(said.group(1).split()) if said else None,
+        )
+        if got != (box, word) or "portion" in _what_the_control_says(control):
+            problems.append(f"{slug}: wanted {(box, word)}, the page has {got}")
+    assert not problems, (
+        "a `makes:` recipe's scaler does not count what it makes (#1286):\n  "
+        + "\n  ".join(problems)
+    )
+
+    some = _scale_control(prod_site, "cherry-glaze") or ""
+    assert "data-portions=" in some and "portions</span>" in some and "data-made" not in some, (
+        "cherry-glaze (`makes: Some`) should keep the portions box, word and "
+        f"`~` -- Helen: 'retain the previous guess':\n{some}"
+    )
+    assert "data-whole-recipes" in some, (
+        "cherry-glaze should step in WHOLE RECIPES -- Helen: 'if \"some\" is "
+        "originally guessed to be 4 portions, 2x should be 8 portions' -- "
+        f"and its input no longer says so:\n{some}"
+    )
+    served = _scale_control(prod_site, "moules-mariniere") or ""
+    assert 'data-portions="4"' in served and "data-made" not in served, (
+        f"a `serves:` recipe's scaler should be untouched:\n{served}"
+    )
+    assert "data-whole-recipes" not in served, (
+        "a `serves:` recipe steps a portion at a time (#1005); moules "
+        f"marinière has been marked for whole-recipe steps:\n{served}"
     )
 
 
@@ -2976,7 +3425,12 @@ def test_every_published_recipe_page_offers_three_other_published_recipes(prod_s
 SCALE_TOTAL = re.compile(
     r'<div class="cocktail-scale-controls" data-total-ml="([^"]*)"')
 UNITS_LINE = re.compile(r'<p class="cocktail-units"(.*?)</p>', re.S)
-SERVING_OF = re.compile(r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml\.")
+# "(undiluted)" since #1291, 2026-10-04 -- Helen: "I just want to make it clear
+# that 120 ml of drink won't end up in a 120-ml glass." The word is REQUIRED
+# here, so a page that states millilitres without it fails every test that
+# reads this pattern.
+SERVING_OF = re.compile(
+    r"in (?:a serving|each of \d+ servings) of ([\d.]+) ml \(undiluted\)\.")
 
 # THE DRINKS THAT STATE NO VOLUME, PINNED BY NAME -- see `volume_for` in
 # _plugins/cocktail_units.rb for the rule and the argument.
@@ -3082,7 +3536,7 @@ def test_a_drink_with_no_volume_keeps_the_units_sentence_it_had_before(prod_site
         units = UNITS_LINE.search(page.read_text(encoding="utf-8"))
         if not units:
             continue
-        if SERVING_OF.search(units.group(1)):
+        if SERVING_OF.search(units.group(1)) or " ml." in units.group(1):
             problems.append(f"{slug}: states a serving volume it cannot know")
         elif "in a serving." not in units.group(1) \
                 and "servings." not in units.group(1):
@@ -3162,9 +3616,85 @@ POUR_USE = re.compile(r'<span class="cocktail-use">')
 # after the amount span's closing tag and never inside it.
 POUR_USE_UNDER_AMOUNT = re.compile(
     r'<span class="cocktail-measure">'
-    r'(?:<span class="cocktail-amount">[^<]*</span>)?'
+    r'(?:<span class="cocktail-amount"[^>]*>[^<]*</span>)?'
     r'<span class="cocktail-use">\([a-z]+\)</span></span>'
 )
+
+# #1132. One ingredient row's amount and name, as the page prints them. The
+# amount span may carry attributes (a quiet row does), the name may hold the
+# `.cocktail-unit-in-name` slot, and the bottle and "(optional)" that can
+# follow the name are deliberately outside the second group.
+POUR_AMOUNT_AND_NAME = re.compile(
+    r'<span class="cocktail-amount"(?P<attrs>[^>]*)>(?P<amount>[^<]*)</span>'
+    r'(?:<span class="cocktail-use">[^<]*</span>)?</span>\s*'
+    r'<span class="cocktail-item"><span class="cocktail-item-name">'
+    r'(?P<name>(?:[^<]|<span class="cocktail-(?:style-or|unit-in-name)">[^<]*</span>)*)</span>'
+)
+
+
+def _fold_word(word):
+    """`cubes` and `cube`, `leaves` and `leaf`: one word. For the check below."""
+    w = word.lower()
+    if w == "leaves":
+        return "leaf"
+    if re.search(r"(sh|ch)es$", w):
+        return w[:-2]
+    return w[:-1] if w.endswith("s") and not w.endswith("ss") else w
+
+
+def test_no_drink_page_says_a_unit_twice(prod_site):
+    """#1132, Helen's whole report: "1 cube sugar cube".
+
+    `amount: "1 cube"` beside `generic: "sugar cube"` -- each right, and the
+    page printing the word twice. The layout now prints the number alone and
+    the unit as the last word of the NAME, and never prints `each` at all
+    ("1.5 each passion fruit"). The recipes are untouched: `data-amount`
+    still holds what the file says, which is what the scaler reads.
+
+    EVERY BUILT PAGE IS READ, so the next drink written this way is covered
+    without anyone naming it; and the Classic Champagne Cocktail is checked
+    by name, so a matcher that has stopped matching cannot pass by finding
+    nothing wrong.
+    """
+    pages = _drink_pages(prod_site)
+    assert len(pages) > 20, f"only {len(pages)} drink pages were built"
+
+    problems, rows, quiet = [], 0, {}
+    for page in pages:
+        html = page.read_text(encoding="utf-8")
+        for match in POUR_AMOUNT_AND_NAME.finditer(html):
+            rows += 1
+            amount = match.group("amount").split()
+            name = re.sub(r"<[^>]+>", " ", match.group("name")).split()
+            if "data-unit-quiet" in match.group("attrs"):
+                quiet[page.parent.name] = (
+                    " ".join(amount), " ".join(name), match.group("attrs").strip())
+            if len(amount) != 2 or not name:
+                continue
+            if amount[1] == "each":
+                problems.append(f"{page.parent.name}: '{' '.join(amount)}' prints `each`")
+            elif len(name) > 1 and _fold_word(amount[1]) == _fold_word(name[-1]):
+                problems.append(
+                    f"{page.parent.name}: '{' '.join(amount)} {' '.join(name)}' "
+                    f"says '{amount[1]}' twice")
+
+    assert rows > 200, (
+        f"only {rows} ingredient rows were matched across {len(pages)} drink "
+        f"pages, so POUR_AMOUNT_AND_NAME has drifted from the layout's markup "
+        f"and this test is reading almost nothing."
+    )
+    assert not problems, (
+        "a drink page prints a unit its ingredient's name already says, or "
+        "prints `each` (#1132). _layouts/cocktail.html decides which rows are "
+        "quiet:\n  " + "\n  ".join(problems)
+    )
+    assert quiet.get("classic-champagne-cocktail") == (
+        "1", "sugar cube", 'data-amount="1 cube" data-unit-quiet'
+    ), (
+        "the Classic Champagne Cocktail should print '1' beside 'sugar cube' "
+        "and keep the written '1 cube' in data-amount for the scaler; got "
+        f"{quiet.get('classic-champagne-cocktail')}"
+    )
 
 
 def test_a_pours_direction_sits_under_its_amount(prod_site):
@@ -3234,43 +3764,156 @@ def _topped_pages(built_site):
     return pages
 
 
-def test_a_topped_drink_spends_the_midpoint_of_its_declared_range(prod_site):
-    """Helen, 2026-09-17: "Midpoint please, I'll cope on the spot."
+# =============================================================================
+# A `(top)` IS SIZED FROM ITS GLASS -- #1179, 2026-10-04
+# =============================================================================
+# Helen, 2026-10-01: "find typical capacities... Then use those to estimate top
+# amounts? It really doesn't need to be exact, let's say +- 50 ml would be
+# fine." `fitted_top_ml` in _plugins/cocktail_units.rb is the rule; these read
+# what it printed. Until then a top spent the midpoint of its declared range
+# whatever it was poured into ("Midpoint please, I'll cope on the spot",
+# 2026-09-17), and that midpoint is still what a top falls back to.
 
-    THE MIDPOINT, NOT EITHER END, and that is the whole of what this checks.
-    `top_up_ml` declares 100-150 for soda water; the Tom Collins pours
-    60 + 30 + 22.5 = 112.5 ml before it, so the three answers a plausible bug
-    could give are 212.5 (`ml_min`), 237.5 (the midpoint) and 262.5 (`ml_max`).
-    Read out of costs.yml rather than typed here, so changing the house range
-    changes this test's expectation with it -- the claim is about the RULE.
+SCALE_ATTRS = re.compile(r'<div class="cocktail-scale-controls"([^>]*)>')
 
-    It is also, quietly, the check that both callers still share one
-    expression: the footer's unit count has spent this midpoint since #297, and
-    `top_up_ml` in the plugin is now the one place either of them asks.
+
+def _scale_attrs(html):
+    found = SCALE_ATTRS.search(html)
+    assert found, "the page has no `.cocktail-scale-controls`"
+    return dict(re.findall(r'data-([a-z-]+)="([^"]*)"', found.group(1)))
+
+
+def _glass_top(icon, ice, family, build):
+    """What the glass leaves for a top, worked here from glasses.yml.
+
+    DELIBERATELY A SECOND WRITING OF THE SUM, in another language, from the
+    same data: the test is whether the plugin's arithmetic is the arithmetic
+    its header describes. The FIGURES are read, never typed, so a change to a
+    wash line or to Helen's dilutions moves the expectation with it.
     """
+    glasses = yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "glasses.yml").read_text(encoding="utf-8"))
+    rules = glasses["fit_rules"]
+    capacity = glasses["typical_ml"][icon]["median"]
+    wash = capacity * rules["washline"]["stemmed" if icon in rules["stemmed"] else "tumbler"]
+    if ice in rules["ice_space"]:
+        wash *= 1 - rules["ice_space"][ice]["low"]
+    served = build * (1 + rules["dilution"][family]["low"])
+    return 5 * round((wash - served) / 5)
+
+
+def _midpoint(generic):
     costs = yaml.safe_load(
         (ROOT / "_data" / "cocktails" / "costs.yml").read_text(encoding="utf-8"))
-    soda = (costs.get("top_up_ml") or {}).get("soda water")
-    assert soda, "costs.yml declares no `top_up_ml` for soda water"
-    midpoint = (float(soda["ml_min"]) + float(soda["ml_max"])) / 2
+    row = (costs.get("top_up_ml") or {}).get(generic)
+    assert row, f"costs.yml declares no `top_up_ml` for {generic}"
+    return (float(row["ml_min"]) + float(row["ml_max"])) / 2
 
+
+TOP_DRINK = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "{glass}"\ngarnish:\n  - "no garnish"\n{serve}'
+    'ingredients:\n  - amount: "{gin} ml"\n    generic: "London dry gin"\n'
+    '  - amount: "(top)"\n    generic: "{topper}"\n'
+    'method:\n  - "{method}"\n  - "Top up."\n'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  made_before: true\n  ship: "yes"\n'
+    '  rewritten: true\n  awaiting_fix: false\n  proofread: true\n---\n'
+)
+SHAKE = "Shake the gin with ice."
+STIR = "Stir the gin with ice."
+
+TOP_CASES = {
+    # slug: (glass, serve block, gin ml, topper, method,
+    #        (icon, ice, family) when the glass answers, else None)
+    "zzz-top-flute": ("flute", 'serve:\n  ice: "none"\n', 60, "champagne", SHAKE,
+                      ("flute", "none", "shake")),
+    "zzz-top-highball-cubed": ("highball", 'serve:\n  ice: "cubed"\n', 50,
+                               "soda water", STIR, ("highball", "cubed", "stir")),
+    # THE THREE WAYS BACK TO THE HOUSE RANGE that a fixture can show.
+    "zzz-top-no-serve": ("flute", "", 60, "champagne", SHAKE, None),
+    "zzz-top-full-glass": ("flute", 'serve:\n  ice: "none"\n', 150, "champagne",
+                           SHAKE, None),
+    "zzz-top-punch-bowl": ("punch bowl", 'serve:\n  ice: "none"\n', 60,
+                           "champagne", SHAKE, None),
+}
+_in_the_fixture_build({
+    f"_cocktail_recipes/{slug}.md": TOP_DRINK.format(
+        t=slug, glass=glass, serve=serve, gin=gin, topper=topper, method=method)
+    for slug, (glass, serve, gin, topper, method, _) in TOP_CASES.items()})
+
+
+def test_a_top_is_sized_from_its_glass_and_falls_back_to_the_house_range(fixture_site):
+    """#1179. Capacity to the wash line, less the ice, less the watered build.
+
+    AND THE MIDPOINT WHEREVER THAT SUM HAS NO ANSWER: no `serve.ice` (absent
+    means undecided), a build that already fills the glass (150 ml shaken into
+    a flute is a question about the glass, not a drink topped with nothing),
+    and a punch bowl (which holds a batch). The page says which it did, in
+    `data-top-from`, so scripts/glass_fit_report.py and this test never have
+    to work it out again.
+
+    FIXTURES, because only the Tom Collins and three flute drinks are topped
+    AND published, none of them falls back, and a draft is something a public
+    test may never require (#624).
+    """
+    problems = []
+    for slug, (_, _, gin, topper, _, fits) in TOP_CASES.items():
+        page = fixture_site / "cocktails" / "recipes" / slug / "index.html"
+        assert page.exists(), f"{slug} did not build"
+        attrs = _scale_attrs(page.read_text(encoding="utf-8"))
+        if fits:
+            want_top, want_from = _glass_top(*fits, build=gin), "glass"
+            assert want_top > 0, f"{slug}: this fixture was meant to fit its glass"
+        else:
+            want_top, want_from = _midpoint(topper), "range"
+        got = (float(attrs.get("top-ml", "nan")), attrs.get("top-from"),
+               float(attrs.get("total-ml", "nan")))
+        want = (float(want_top), want_from, float(gin + want_top))
+        if got != want:
+            problems.append(f"{slug}: (top, from, total) is {got}, expected {want}")
+    assert not problems, (
+        "a `(top)` is not what its glass leaves room for (`fitted_top_ml`, "
+        "_plugins/cocktail_units.rb):\n  " + "\n  ".join(problems)
+    )
+
+
+def test_the_tom_collins_tops_with_what_a_highball_leaves(prod_site):
+    """ONE REAL DRINK WITH A REAL NUMBER IN IT -- and the units beside it.
+
+    60 + 30 + 22.5 = 112.5 ml, short-shaken, over cubed ice in a highball. The
+    day this landed that left 90 ml for the soda and a total of 202.5, against
+    the 125 and 237.5 the midpoint of soda water's 100-150 had printed since
+    2026-09-17. The expectation is worked from glasses.yml, so re-surveying the
+    highball moves it; what it pins is that the PAGE and the rule agree.
+
+    It replaces `test_a_topped_drink_spends_the_midpoint_of_its_declared_range`
+    and keeps that test's second job: the footer's "in a serving of Y ml" is
+    read here too, so the unit count's sentence and the volume cannot have
+    asked two different questions about the top.
+    """
     page = prod_site / "cocktails" / "recipes" / "tom-collins" / "index.html"
     assert page.exists(), "the Tom Collins is not in the production build"
     html = page.read_text(encoding="utf-8")
+    attrs = _scale_attrs(html)
 
-    total = SCALE_TOTAL.search(html)
-    assert total, (
-        "the Tom Collins prints no volume. Since 2026-09-17 a topped drink "
-        "takes the midpoint of its declared range rather than withholding."
+    build = 60 + 30 + 22.5
+    top = _glass_top("highball", "cubed", "short_shake", build)
+    assert attrs.get("top-from") == "glass", (
+        "the Tom Collins' top came from the house range, not its glass: "
+        f"{attrs}. It has a highball, `serve.ice: cubed` and a build that fits."
     )
-    expected = 60 + 30 + 22.5 + midpoint
-    assert float(total.group(1)) == expected, (
-        f"the Tom Collins totals {total.group(1)} ml; its build is "
-        f"60 + 30 + 22.5 = 112.5 and soda water's declared "
-        f"{soda['ml_min']}-{soda['ml_max']} ml has midpoint {midpoint}, so it "
-        f"should be {expected}. `ml_min` would give "
-        f"{112.5 + float(soda['ml_min'])} and `ml_max` "
-        f"{112.5 + float(soda['ml_max'])}."
+    assert float(attrs["total-ml"]) == build + top, (
+        f"the Tom Collins totals {attrs['total-ml']} ml; its build is {build} "
+        f"and a highball leaves {top} ml for the soda, so it should be "
+        f"{build + top}. The old midpoint would give {build + _midpoint('soda water')}."
+    )
+    units = UNITS_LINE.search(html)
+    serving = units and SERVING_OF.search(" ".join(units.group(1).split()))
+    assert serving and float(serving.group(1)) == build + top, (
+        "the units line's serving is not the volume the scaler carries: "
+        f"{serving.group(1) if serving else 'no serving printed'} against "
+        f"{build + top}."
     )
 
 
@@ -3336,9 +3979,10 @@ def test_the_aviation_prints_the_volume_its_own_amounts_add_up_to(prod_site):
 
     units = UNITS_LINE.search(html)
     assert units, "no units line on the Aviation"
-    assert "of alcohol in a serving of 90 ml." in " ".join(units.group(1).split()), (
-        "Helen's wording is 'Roughly X units of alcohol in a serving of Y ml' "
-        f"(#1121). The line now reads: {' '.join(units.group(1).split())!r}"
+    assert "of alcohol in a serving of 90 ml (undiluted)." in " ".join(units.group(1).split()), (
+        "Helen's wording is 'Roughly X units of alcohol in a serving of Y ml "
+        "(undiluted)' (#1121, and #1291 for the bracket). The line now "
+        f"reads: {' '.join(units.group(1).split())!r}"
     )
 
 

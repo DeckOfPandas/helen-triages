@@ -358,6 +358,32 @@ permalink: /food/
       {% assign is_draft = false %}
       {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
 
+      {% comment %} A MAGIC-BAG DISH CAN BE A DRAFT TOO -- Helen, 2026-10-04, on
+         #1201: "a recipe can have magic bag AND draft. Always sit magic bag on
+         the right."
+
+         WHAT `draft` MEANS HERE IS WHAT IT ALREADY MEANT: this row is not on
+         the live site. For a recipe that is decided by its collection. A
+         magic-bag dish never lives in the drafts collection, so for it the
+         same fact is decided by the publish gate: it is a draft until it says
+         awaiting_fix false AND proofread true, which is the exact test
+         _plugins/publish_gate.rb applies. Written the gate's way round --
+         start as a draft, clear it only on an explicit pass of both flags --
+         so a missing flag or a quoted one reads as held back here exactly as
+         it does there.
+
+         STILL LOCAL-ONLY WITHOUT BEING GATED ON ANYTHING. In production the
+         plugin has already removed a held-back dish from the collection
+         before this page renders, so no row reaches this line with a failing
+         flag; only the local build, which skips the gate, has one to mark.
+
+         A HELD-BACK RECIPE IN THE PUBLISHED COLLECTION IS NOT MARKED, and
+         that is unchanged: her sentence was about the magic bag. {% endcomment %}
+      {% if is_magic_bag %}
+        {% assign is_draft = true %}
+        {% if recipe.meta.awaiting_fix == false and recipe.meta.proofread == true %}{% assign is_draft = false %}{% endif %}
+      {% endif %}
+
       {% comment %} `is_draft` IS A BADGE NOW AND NOT A FILTER -- 2026-09-06.
          It is still derived here and still renders a `draft` pill below, so a
          row that does not exist on the live site says so. What went with the
@@ -588,12 +614,28 @@ permalink: /food/
 
              `draft` is still local-only in practice without being gated on
              anything: `is_draft` can only be true for a row from
-             `food_drafts`, and that collection is only built locally. One fact
-             deciding it, rather than a flag that has to agree with the
-             build. {% endcomment %}
+             `food_drafts`, which is only built locally, or for a magic-bag
+             dish the publish gate holds back, which production never renders
+             (see where `is_draft` is derived, above).
+
+             THE MAGIC BAG MARK IS A MARK AND NEVER A FILTER -- #1201, which
+             settled #507. Helen, 2026-09-28: "I don't need to filter by this.
+             Let's just give it a quiet mark, where 'draft' is on the live
+             site, and next to it on the local site." So it lives in this one
+             container with `draft`, in the same look (one rule for both in
+             _sass/food/_badges.scss). Do not add a control that reads it.
+
+             MAGIC BAG IS WRITTEN LAST, SO IT IS ALWAYS ON THE RIGHT -- her
+             words, 2026-10-04: "a recipe can have magic bag AND draft. Always
+             sit magic bag on the right." The container is a flex row packed
+             to its right-hand end, so the last mark written is the rightmost:
+             `draft` then `magic bag` on a held-back dish locally, and `magic
+             bag` alone at that same right-hand end on the live site.
+             tests/test_rendered_pages.py pins all of it against fixture
+             dishes, in a production build and a local one. {% endcomment %}
           <div class="badge-group-meta">
-            {% if is_magic_bag %}<span class="badge badge-magic-bag">magic bag</span>{% endif %}
             {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}
+            {% if is_magic_bag %}<span class="badge badge-magic-bag">magic bag</span>{% endif %}
           </div>
         </div>
         </div>

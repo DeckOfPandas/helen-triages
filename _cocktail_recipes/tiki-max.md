@@ -40,8 +40,8 @@ ingredients:
 method:
   - "Shake everything except the float with ice."
   - "Strain."
-  - "Float the blended overproof rum."
-  - "Fill the lime shell with the blended overproof rum and set on top of the drink."
+  - "Float the first blended overproof rum."
+  - "Fill the lime shell with the second blended overproof rum and set on top of the drink."
   - "Set alight."
   - "Sprinkle the flame with cinnamon."
 to_serve: "Plastic giraffes, paper umbrella, teeny flamingos, more fire, more cinnamon sparkles."
