@@ -299,6 +299,16 @@ failure is probably work someone else has already done (MANUAL §9.1).
   - The converse still holds and is not a licence: one phase means one unnamed
     ingredient group and a flat `method:`. Do not split a sequence the source
     ran as one.
+  - **AN INGREDIENT GROUP'S NAME IS READ AFTER "For the", SO SAY IT THAT WAY
+    BEFORE WRITING IT** (#814). `dressing` prints "For the dressing:". **The
+    one shape that prints as itself is a name opening with `to `**: `to
+    serve`, `to finish`, `to decorate`, `to garnish` read "To finish:" with no
+    "For the" -- Helen, 2026-10-04: *"Can we fix all 'for the to finish' cases?
+    Both existing and when we ingest."* So keep the source's "To finish" as
+    `to finish`, lowercase, and never nounify it. A bare verb is the other
+    trap: `assemble` prints "For the assemble:", so a block the source heads
+    that way is `to assemble`. A method group prints its name bare, with no
+    prefix at all, which is why a narrative phase is fine there.
 - **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
   **a space between a number and its unit** (`15ml` -> `15 ml`). Helen,
   2026-10-01: "Please add unit spaces (15ml -> 15 ml) as a mechanical fix to

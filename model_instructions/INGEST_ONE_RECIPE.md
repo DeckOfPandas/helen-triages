@@ -172,6 +172,19 @@ Three things to get right, in descending order of how much they cost if wrong:
   expensive afterwards. One unnamed group is fine if the recipe genuinely has
   one phase — use `name: ""` or omit `name`.
 
+**How a group's `name` is printed, which is what decides how to write it.**
+The page puts "For the " in front and a colon after, so `name: dressing` reads
+"For the dressing:". Say the name after those two words before you write it.
+
+- **A bare noun for a component**: `dressing`, `filling`, `white sauce`. Never
+  `for the dressing` (it prints "For the for the dressing:").
+- **`to …` for what happens at the end, and it is the one shape that prints as
+  itself**: `to serve`, `to finish`, `to decorate`, `to garnish` read "To
+  serve:", "To finish:", with no "For the". Use it where the source does
+  ("To finish", "To decorate"), all lowercase. Do not turn it into a noun.
+- **Not a bare verb.** `assemble` prints "For the assemble:". If the source
+  heads a block of ingredients that way, `to assemble` is the name.
+
 **Write every qualifier the source states.** Sugar type, egg size, butter salted
 or unsalted, flour type, milk type, garlic form, ginger form, soy dark or light,
 vinegar type, mustard type, chocolate percentage. Two thirds of the drafts

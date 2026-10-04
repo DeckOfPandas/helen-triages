@@ -881,6 +881,83 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build(fixture_site)
 
 
 # =============================================================================
+# "FOR THE TO FINISH:" — #814, 2026-10-04
+# =============================================================================
+# One recipe carrying every kind of ingredient-group name the layout tells
+# apart: a bare noun, three names that open with "to ", and a variation.
+
+GROUP_HEADING_FIXTURE = (
+    '---\ntitle: "zzz-814-group-headings"\n'
+    'tagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
+    'tags: []\ningredient_groups:\n'
+    '  - name: dressing\n    items:\n    - item: salt\n'
+    '  - name: to finish\n    items:\n    - item: salt\n'
+    '  - name: to decorate\n    items:\n    - item: salt\n'
+    '  - name: to serve\n    items:\n    - item: salt\n'
+    '  - name: "variation: plain"\n    items:\n    - item: salt\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n  cooked_before: false\n'
+    '---\n'
+)
+
+_in_the_fixture_build(
+    {"_food_recipes/zzz-814-group-headings.md": GROUP_HEADING_FIXTURE})
+
+GROUP_HEADING = re.compile(r'<h3 class="recipe-group-heading">([^<]*)</h3>')
+
+
+def test_a_group_named_to_something_is_its_own_heading(fixture_site):
+    """#814. `to finish` rendered "For the to finish:".
+
+    Helen: "Can we fix all 'for the to finish' cases? Both existing and when
+    we ingest." The layout special-cased `to serve` and nothing else, so every
+    other name of that shape got the "For the" a bare noun wants. ANY name
+    opening with "to " now prints as itself, capitalised, with the colon --
+    and `to serve` reads exactly as it did.
+
+    A FIXTURE, because the published collection holds only `to serve`: the
+    `to finish`, `to decorate` and `to garnish` groups are all in drafts, so
+    the production build could not show the bug or the fix.
+    """
+    page = fixture_site / "food" / "recipes" / "zzz-814-group-headings" / "index.html"
+    assert page.exists(), "the #814 fixture recipe was not built"
+    headings = GROUP_HEADING.findall(page.read_text(encoding="utf-8"))
+    assert headings == [
+        "For the dressing:", "To finish:", "To decorate:", "To serve:",
+        "Variation: plain",
+    ], (
+        "ingredient-group headings are not what _layouts/recipe.html should "
+        f"print for [dressing, to finish, to decorate, to serve, variation: "
+        f"plain]: {headings}"
+    )
+
+
+def test_no_built_food_page_says_for_the_to(site):
+    """#814, over everything that builds locally -- drafts included.
+
+    The fixture test above proves the rule; this reads the real pages, where
+    the names actually are, so a name the rule does not reach shows up by
+    file. `site` and not `prod_site`: all six "to finish / to decorate / to
+    garnish" groups are in `_food_drafts/`, which only the local build renders.
+    """
+    problems, seen = [], 0
+    for page in sorted((site / "food").rglob("index.html")):
+        for heading in GROUP_HEADING.findall(page.read_text(encoding="utf-8")):
+            seen += 1
+            if re.match(r"for the (to|for|the) ", heading, re.I):
+                problems.append(f"{page.parent.name}: {heading!r}")
+    assert seen > 50, (
+        f"only {seen} group headings were found under food/, so GROUP_HEADING "
+        f"no longer matches the layout's markup and this test reads nothing."
+    )
+    assert not problems, (
+        'a food page prints a group heading that opens "For the to/for/the '
+        '..." (#814):\n  ' + "\n  ".join(problems)
+    )
+
+
+# =============================================================================
 # THE GARNISH STEP READS AS ENGLISH — #1138 and #1143, 2026-09-17
 # =============================================================================
 

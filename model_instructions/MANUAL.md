@@ -729,6 +729,23 @@ with it.
 - `method` **xor** `method_groups`; both present means the second is dropped.
   Group names are bare nouns (`dressing`); method group names may be
   narrative phases; the page uppercases both.
+- **How an ingredient group's name becomes its heading** — `_layouts/recipe.html`,
+  and only when a recipe has more than one group:
+
+  | `name:` | heading |
+  |---|---|
+  | `dressing` | For the dressing: |
+  | opens with `to ` — `to serve`, `to finish`, `to decorate`, `to garnish` | To serve: / To finish: — itself, capitalised, no "For the" (#814) |
+  | `variation: chocolate chip` | Variation: chocolate chip — no colon after (#329) |
+  | absent | For the base: |
+
+  **Any name opening with `to `, not a list of them**: `to serve` was
+  special-cased alone until 2026-10-04 and `to finish` printed "For the to
+  finish:". So a name must read after "For the" or open with `to `; a bare
+  verb (`assemble`) does neither. **A method group's name is printed bare** —
+  no prefix, no colon, no capital added — so `Make the sauce` is fine there
+  and `to serve` prints lowercase in the markup (the CSS uppercases it).
+  `test_a_group_named_to_something_is_its_own_heading` pins the table.
 - Cross-recipe links are markdown, **relative**: `[text](../slug/)`. Front
   matter is never run through Liquid, so a root-relative link cannot pick up
   the baseurl. `[[wikilinks]]` are retired.

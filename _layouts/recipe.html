@@ -157,11 +157,21 @@ layout: default
 
          No trailing colon on this one, deliberately. The others end in a colon
          because they are a fragment introducing a list; "Variation: X:" would
-         carry two colons doing different jobs. {% endcomment %}
+         carry two colons doing different jobs.
+
+         A NAME THAT OPENS WITH "to " IS ITS OWN HEADING -- #814. `to serve`
+         was the one name special-cased here, so `to finish` rendered "For the
+         to finish:". Helen: "Can we fix all 'for the to finish' cases? Both
+         existing and when we ingest." Any such name now prints as itself,
+         capitalised, with the colon: "To finish:", "To decorate:", "To
+         garnish:" -- and "To serve:" exactly as before. The test is on the
+         first three characters, lowercased, because Liquid has no
+         starts-with. MANUAL 4. {% endcomment %}
       {% assign _is_variation = false %}
       {% if group.name contains "variation:" %}{% assign _is_variation = true %}{% endif %}
-      {% if group.name == "to serve" %}
-        <h3 class="recipe-group-heading">To serve:</h3>
+      {% assign _name_opening = group.name | append: "" | slice: 0, 3 | downcase %}
+      {% if _name_opening == "to " %}
+        <h3 class="recipe-group-heading">{{ group.name | capitalize }}:</h3>
       {% elsif _is_variation %}
         <h3 class="recipe-group-heading">{{ group.name | capitalize }}</h3>
       {% elsif group.name %}
