@@ -5268,10 +5268,34 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   `verify.py` step already narrow. She closed it and the staged
   `.github/ci-staging/drafts-checks.yml` was deleted. **This does not reverse
   2026-09-20's "we should rearchitect"** (#1127): that ruling is about guards
-  that fire on correct data, and it stands. **Not audited**: whether every
-  drafts check has a published-side twin. The same day's #1175 guards were
+  that fire on correct data, and it stands. **Not audited when she closed
+  it**: whether every drafts check has a published-side twin — the next entry
+  is that audit. The same day's #1175 guards were
   written over DECLARED vocabulary rather than poured drinks for this reason:
   a check that needs the drafts does not exist in CI.
+
+- **2026-10-04, #1194 — the audit that entry owed: every drafts check has a
+  published-side twin except one, and that one was a rule nobody enforced.**
+  Closing #1194 rested on "a draft meets the published checks when it is
+  promoted", which was asserted and not checked. Checked the same day.
+  **Food holds by construction**: 28 of `test_drafts.py`'s tests are a
+  two-line call into the recipe rule, the other nine each have a named recipe
+  twin that is as strict or stricter, and
+  `test_every_recipe_rule_is_adopted_or_declined` keeps the two lists in step.
+  **Drinks hold by construction too**, since every test reads both
+  collections through `_load()` — with one test that reads drafts only, the
+  notes slot (#1258), whose docstring said a published drink's notes "are
+  held to the stricter filled-pair rule". **No such rule existed for drinks.**
+  Found by breaking a published drink's note four ways and watching
+  `test_cocktails.py` stay green: `note:` typed for `text:` makes the note
+  VANISH from the page with no error, and an empty label or a bare string
+  prints under the literal word "note". Helen: *"Require a real label"*.
+  `test_a_published_drink_note_is_a_filled_pair` is the rule, published only.
+  One drink failed it, `gin-sour`, promoted on 2026-10-02 with `label: ""`
+  and still `proofread: false`, so never live. Her word for it: *"fun
+  flavouring"*, written in the same PR, so the rule has no exceptions. **A docstring
+  naming a rule is not the rule** — the claim had been true of food for two
+  months and was copied across as though it travelled.
 
 ---
 
