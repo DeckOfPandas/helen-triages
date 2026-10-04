@@ -22,13 +22,15 @@
 // `totalText` promotes a total of a thousand or more back up, so 1.2 kg at x1
 // is still 1.2 kg and at x0.5 is 600 g.
 //
-// WHAT CANNOT SCALE SAYS SO. An amount with no number in it -- "a few
+// WHAT CANNOT SCALE SAYS SO. An amount with no COUNT in it -- "a few
 // handfuls", "some", "to taste" -- comes back untouched with `scaled: false`,
 // and the page names it under the control (Helen: "let's add a note to
 // bitters and handfuls"). `parseAmount` returning null is a real answer, not
-// a failure, exactly as the shopping list treats it. SO DOES A NUMBERED
-// AMOUNT IN A MEASURE TAKEN BY HAND -- "1 handful", "1 pinch" -- since #1125:
-// see `isUnscaledMeasure` below, and `noteName` for what the page calls it.
+// a failure, exactly as the shopping list treats it.
+//
+// A MEASURE TAKEN BY HAND SCALES IN HALF STEPS -- #1125. "1 handful" for
+// three times the people is "3 handfuls", and never "1.17 handfuls": see
+// `halfStep` below, the one place the rounding is decided.
 //
 // "2 large" SCALES, because `large` is a unit to the parser and a SYMBOL to
 // the labeller (no plural), so it prints "4 large" -- Helen: "Things like
@@ -54,6 +56,7 @@
 
   var parseAmount = shoppingList.parseAmount;
   var splitParenthetical = shoppingList.splitParenthetical;
+  var unitLabel = shoppingList.unitLabel;
   var totalText = foodShoppingList.totalText;
 
   /* The same fold food-shopping-list.js applies on the way in, restated here
@@ -65,19 +68,44 @@
     cl: { unit: 'ml', factor: 10 }
   };
 
-  /* A MEASURE TAKEN BY HAND OR EYE HAS NO FRACTION -- #1125, 2026-10-04.
-     Helen: "Currently some recipes scale 1 handful to e.g. 1.17 handfuls,
-     which is obvious nonsense." `1 handful` has a number in it, so the parser
-     reads it and, before this, the arithmetic ran.
+  /* =========================================================================
+     THE HALF-STEP RULE, AND THE ONE PLACE IT IS DECIDED -- #1125, 2026-10-04
+     =========================================================================
+     Helen, raising the issue: "Currently some recipes scale 1 handful to e.g.
+     1.17 handfuls, which is obvious nonsense." Asked what should happen
+     instead: 'If a recipe calls for "a handful of parsley", three orders of
+     that recipe should call for "3 handfuls of parsley".' And, shown what
+     whole steps did at x1.5: "Handfuls can scale in half steps."
 
-     THE WORDS ARE DATA, `unscaled_measures` in _data/food/scaling.yml, and
-     are PASSED IN -- the layout emits them, recipe-scale.js hands them over,
-     and this file names none of them. With no list given nothing is held
-     back, which is what every caller before #1125 gets.
+     So a measure taken by hand or eye SCALES, but only to a figure a person
+     could act on: THE NEAREST HALF, AND NEVER LESS THAN A HALF.
 
-     MATCHED AS A WHOLE WORD ANYWHERE IN THE AMOUNT, singular or plural, so
-     `1 small handful`, `2 handfuls`, `1 large handful each` and `2 pinches`
-     are all caught and `1 handfulness` is not. */
+         1 handful  x3    -> 3 handfuls
+         1 handful  x1.5  -> 1½ handfuls
+         1 handful  x7/6  -> 1 handful      (not 1.17)
+         1 handful  x2/3  -> ½ handfuls     (0.67 is nearer a half than one)
+
+     THE PLURAL IS THE SITE'S EXISTING RULE, not a new one: shopping-list.js's
+     `unitLabel` gives the singular for exactly one and the plural for every
+     other quantity, a half included -- "½ tsp" has no plural to show it, but
+     "½ pats" and "1½ sachets" are what the scaler already prints. "½
+     handfuls" follows that; changing it is `unitLabel`'s business.
+
+     HER SENTENCE NAMES HANDFULS. It is applied to the whole by-eye list as
+     one rule; a measure she wants treated differently comes out of the list.
+
+     WHICH MEASURES is data: `half_step_measures` in _data/food/scaling.yml,
+     PASSED IN -- the layout emits the list, recipe-scale.js hands it over,
+     and this file names no measure. With no list given, a handful scales
+     like any other count, which is what every caller before #1125 gets. */
+  function halfStep(quantity) {
+    return Math.max(0.5, Math.round(quantity * 2) / 2);
+  }
+
+  function numberText(n) {
+    return shoppingList.fractionText(n);
+  }
+
   function escapeRegExp(text) {
     return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
@@ -90,34 +118,122 @@
       .join('|');
   }
 
-  function isUnscaledMeasure(amount, measures) {
-    var words = measureWords(measures);
-    if (!words) return false;
-    return new RegExp('(^|[^a-z])(?:' + words + ')(?:e?s)?(?![a-z])', 'i')
-      .test(String(amount || ''));
+  /* The measure as a WHOLE WORD, singular or plural, anywhere in a unit:
+     `handful`, `handfuls`, `small handful`, `large handful each`, `pinches`.
+     `handfulness`, `dashi` and `pinchos` are not caught. */
+  function measurePattern(words) {
+    return new RegExp('(^|[^a-z])(' + words + ')(?:e?s)?(?![a-z])', 'i');
+  }
+
+  /* A numbered amount in a half-step measure: "1 handful", "~2 handfuls",
+     "1–2 pinches", "1 large handful each". The number is stepped, and the
+     measure word -- wherever it sits in the unit -- takes the plural of the
+     number it ends up beside. Null when the unit holds no such measure. */
+  function scaleHalfStepMeasure(parsed, factor, words) {
+    if (!words) return null;
+    var pattern = measurePattern(words);
+    if (!pattern.test(parsed.unit)) return null;
+
+    var lo = halfStep(parsed.quantity * factor);
+    var hi = parsed.max === undefined ? lo : halfStep(parsed.max * factor);
+    var unit = parsed.unit.replace(pattern, function (all, before, measure) {
+      return before + unitLabel(measure.toLowerCase(), hi);
+    });
+    var number = hi > lo ? numberText(lo) + '–' + numberText(hi) : numberText(lo);
+    return { text: (parsed.approx ? '~' : '') + number + ' ' + unit, scaled: true };
+  }
+
+  /* =========================================================================
+     THE SAME MEASURE WRITTEN WITH NO NUMBER -- "a handful of fresh parsley"
+     =========================================================================
+     Helen's own example has no `amount:` at all; the measure is the opening
+     of the `item:` text. 96 items in the two collections are written that
+     way (5 published), and 5 draft amounts are a bare "pinch" or "a handful".
+
+     WHAT COUNTS AS ONE: `a`, `an`, `one`, or nothing at all before a
+     SINGULAR measure ("pinch of salt"). A digit counts as itself. A size word
+     may sit between ("a large handful of", "small pinch of") and is kept.
+
+     WHAT IS NOT A NUMBER AND IS LEFT ALONE: "a few", "some", "a couple of",
+     "several", and a bare plural ("handfuls of rocket"). "a few dashes of
+     Tabasco sauce to taste" therefore does not scale, and is named on the
+     Not-scaled line -- which is what Helen asked that line to say.
+
+     AT ONE, THE WORDS ARE THE RECIPE'S OWN. A result that equals what was
+     written gives back the text untouched -- "a handful of" stays "a handful
+     of", not "1 handful of". Anything else is a number: "½ handfuls of",
+     "1½ handfuls of", "3 handfuls of".
+
+     `tail` is what must follow the measure: " of " inside an item's text, or
+     the end of the string for an `amount:` that is only the measure. */
+  var COUNT_OF_ONE = '(?:(an?|one|\\d+)\\s+)?';
+  var SIZE_WORD = '((?:small|large|big|good|generous|little)\\s+)?';
+
+  function scaleMeasurePhrase(text, factor, words, tail) {
+    var written = String(text === undefined || text === null ? '' : text);
+    var unmoved = { text: written, scaled: false };
+    if (!words || !(factor > 0)) return unmoved;
+
+    var match = new RegExp(
+      '^(\\s*)' + COUNT_OF_ONE + SIZE_WORD + '(' + words + ')(e?s)?' +
+      '((?:\\s+each)?' + tail + ')', 'i').exec(written);
+    if (!match) return unmoved;
+
+    var counted = /^\d+$/.test(match[2] || '');
+    if (match[5] && !counted) return unmoved;        // a bare plural is no count
+
+    var base = counted ? parseInt(match[2], 10) : 1;
+    var n = halfStep(base * factor);
+    if (n === base) return { text: written, scaled: true };
+
+    return {
+      text: match[1] + numberText(n) + ' ' + (match[3] || '') +
+        unitLabel(match[4].toLowerCase(), n) + match[6] +
+        written.slice(match[0].length),
+      scaled: true
+    };
+  }
+
+  /**
+   * The opening of an ingredient's own text, at a factor -- for a row with no
+   * amount: "a handful of fresh parsley" x3 is "3 handfuls of fresh parsley".
+   *
+   * @param {string} text - the item's text as the page prints it
+   * @param {number} factor
+   * @param {{halfStep?: string[]}} [options]
+   * @returns {{text: string, scaled: boolean}} `scaled: false` and the text
+   *          untouched when it does not open with a countable by-eye measure
+   */
+  function scaleLeadingMeasure(text, factor, options) {
+    return scaleMeasurePhrase(text, factor,
+      measureWords(options && options.halfStep), '\\s+of\\s+');
   }
 
   /**
    * One written amount at a factor.
    *
    * @param {string} amount - as the recipe wrote it: "200 g", "1½ tbsp",
-   *        "30–50 g", "2 large", "1 tbsp (6 g)", "a few handfuls"
+   *        "30–50 g", "2 large", "1 tbsp (6 g)", "1 handful", "a few handfuls"
    * @param {number} factor - portions wanted over portions the recipe makes
-   * @param {{unscaled?: string[]}} [options] - `unscaled` is
-   *        _data/food/scaling.yml's `unscaled_measures`
+   * @param {{halfStep?: string[]}} [options] - `halfStep` is
+   *        _data/food/scaling.yml's `half_step_measures`
    * @returns {{text: string, scaled: boolean}} the amount to show, and
-   *        whether it moved. An unparseable amount, and one in a measure that
-   *        does not scale, come back as written.
+   *        whether it was scaled. An amount with no count in it comes back as
+   *        written with `scaled: false`.
    */
   function scaleAmount(amount, factor, options) {
     var written = String(amount === undefined || amount === null ? '' : amount);
+    if (!(factor > 0)) return { text: written, scaled: false };
+
+    var words = measureWords(options && options.halfStep);
     var parsed = parseAmount(written);
-    if (!parsed || !(factor > 0)) {
-      return { text: written, scaled: false };
+    if (!parsed) {
+      // "pinch", "a handful", "small handful": the measure and nothing else.
+      return scaleMeasurePhrase(written, factor, words, '\\s*$');
     }
-    if (isUnscaledMeasure(written, options && options.unscaled)) {
-      return { text: written, scaled: false };
-    }
+
+    var stepped = scaleHalfStepMeasure(parsed, factor, words);
+    if (stepped) return stepped;
 
     var split = splitParenthetical(parsed.unit);
     var unitWritten = split.lo === undefined ? parsed.unit : split.unit;
@@ -147,24 +263,25 @@
     return { text: totalText(total), scaled: true };
   }
 
-  /* THE NAME ON HELEN'S "(Not scaled: ...)" LINE -- #1125. Her two examples
-     are the specification: "few dashes of Tabasco sauce to taste, unless
-     feeding Helen" is listed as "Tabasco sauce", and "a handful of fresh
-     parsley" as "fresh parsley". The line names the INGREDIENT, not the
-     recipe's whole sentence about it. Three cuts, in this order:
+  /* THE NAME ON HELEN'S "(Not scaled: ...)" LINE -- #1125. Her example is the
+     specification: "few dashes of Tabasco sauce to taste, unless feeding
+     Helen" is listed as "Tabasco sauce". The line names the INGREDIENT, not
+     the recipe's whole sentence about it. Three cuts, in this order:
 
      1. A LEADING MEASURE PHRASE, where the recipe wrote the quantity into
-        `item:` -- "a few dashes of", "A large handful of", "a good pinch of".
-        Only a phrase holding one of the declared measures AND ending in `of`
-        is taken, so "cream of tartar" and "leg of lamb" are untouched: the
-        trap _data/food/ingredient_words.yml's `measure_phrases` header names.
+        `item:` -- "a few dashes of", "a few handfuls of". Only a phrase
+        holding one of the declared measures AND ending in `of` is taken, so
+        "cream of tartar" and "leg of lamb" are untouched: the trap
+        _data/food/ingredient_words.yml's `measure_phrases` header names.
      2. EVERYTHING FROM THE FIRST COMMA OR OPEN BRACKET -- the preparation
         ("parsley, chopped"), the aside ("paprika, unless feeding Helen"). The
         same cut _plugins/food_shopping.rb makes for the shopping list, and it
         is what makes her comma-joined line safe: #1088 gave up the semicolon
         knowing "a name containing a comma would read as two", and after this
         cut no name contains one. THE COST: an item that is itself a list
-        ("fresh parsley, thyme and sage") is named by its first member.
+        ("fresh parsley, thyme and sage") is named by its first member --
+        accepted, Helen: "doesn't state an amount, so scaling is by common
+        sense."
      3. A TRAILING INSTRUCTION -- "to taste", "to serve" -- from
         `trailing_phrases` in ingredient_words.yml, passed in like the
         measures. Only at the END, which is that list's own rule.
@@ -181,14 +298,14 @@
 
   /**
    * @param {string} text - the ingredient row's text, amount and note removed
-   * @param {{unscaled?: string[], trailing?: string[]}} [options]
+   * @param {{halfStep?: string[], trailing?: string[]}} [options]
    * @returns {string} the ingredient's name, for the note under the control
    */
   function noteName(text, options) {
     var opts = options || {};
     var name = keep(String(text === undefined || text === null ? '' : text), '');
 
-    var words = measureWords(opts.unscaled);
+    var words = measureWords(opts.halfStep);
     if (words) {
       var leading = new RegExp(
         '^' + QUANTIFIER + SIZE + '(?:' + words + ')(?:e?s)?(?:\\s+each)?\\s+of\\s+', 'i');
@@ -208,8 +325,123 @@
     return name;
   }
 
+  /* =========================================================================
+     WHAT THE SCALER'S BOX COUNTS -- portions, or the thing made (#1286)
+     =========================================================================
+     A MODE is four small answers the wiring asks for, and recipe-scale.js
+     holds no arithmetic of its own for either kind:
+
+       base        the figure the recipe is written for; factor = value / base
+       clamp(n)    a typed or stepped value, made into one the box can hold
+       step(n, d)  one press of minus (-1) or plus (+1)
+       box(n)      what the input shows
+       word(n)     what follows the input, or null to leave the markup alone
+
+     THE BOX IS AN INTEGER THROUGHOUT -- Helen: "Our scaler is integer." It
+     never shows a fraction of the count. */
+
+  /* PORTIONS -- #1005, unchanged: whole people, never fewer than one. */
+  function portionsMode(base) {
+    return {
+      base: base,
+      clamp: function (n) { return Math.max(1, Math.round(n)); },
+      step: function (n, delta) { return n + delta; },
+      box: function (n) { return String(n); },
+      word: function () { return null; }
+    };
+  }
+
+  /* A MIDPOINT ON A HALF IS SHOWN AS A RANGE OF ONE -- Helen: "Midpoints that
+     land on a half can become a range of one." 4–7 is 5.5 and reads "5–6";
+     the ingredients still scale against the true 5.5. _plugins/food_yield.rb
+     `box` is this rule for the page as built. */
+  function yieldBox(value) {
+    if (value === Math.floor(value)) return String(value);
+    return Math.floor(value) + '–' + Math.ceil(value);
+  }
+
+  function replaceLast(text, change) {
+    var words = String(text).split(' ');
+    words[words.length - 1] = change(words[words.length - 1]);
+    return words.join(' ');
+  }
+
+  /* THE THING MADE, AGREEING WITH THE NUMBER BESIDE IT. The line was written
+     for the recipe's own count, so the noun only has to move when the number
+     crosses one: "one 8-inch cake" is written for one and takes a plural at
+     two; "12 fairy cakes" is written for several and loses it at one. A range
+     of one ("5–6") is several.
+
+     THE NOUN IS THE LAST WORD OF THE STEM -- the part before any " of " --
+     and the plural is shopping-list.js's (`unitLabel`, `foldUnit`), the rule
+     every amount on the page already uses. `dozen mince pies` is INVARIABLE:
+     it is the dozen that is counted ('"1 dozen" doubled can be "two dozen"').
+
+     `× ` IN FRONT OF A THING THAT OPENS WITH A DIGIT -- Helen: a digit
+     directly before "8-inch" is unreadable. The box is a number, so the count
+     cannot be spelled as a word; "2 × 8-inch cakes" is the form shown. */
+  function thingText(spec, value) {
+    var stem = String(spec.stem || '');
+    if (!spec.invariable) {
+      var one = value === 1;
+      if (spec.singular && !one) {
+        stem = replaceLast(stem, function (w) { return unitLabel(w, 2); });
+      } else if (!spec.singular && one) {
+        stem = replaceLast(stem, function (w) { return shoppingList.foldUnit(w); });
+      }
+    }
+    return (spec.times ? '× ' : '') + stem + String(spec.rest || '');
+  }
+
+  /**
+   * The scaler's mode for a recipe whose `makes:` line opens with a count.
+   *
+   * @param {Object} spec - `page.made`, as _plugins/food_yield.rb wrote it
+   * @returns {Object|null} a mode (see above), or null for a spec it cannot use
+   */
+  function yieldMode(spec) {
+    if (!spec || !(Number(spec.base) > 0)) return null;
+    var base = Number(spec.base);
+
+    /* A MEASURE SCALES BY WHOLE ORDERS OF THE RECIPE -- Helen: "950 ml for one
+       order of a recipe becomes 1900 ml for 2". Plus adds one order; a typed
+       figure goes to the nearest whole order; one order is the floor, because
+       half a batch is not a figure the box can hold. */
+    if (spec.kind === 'measure') {
+      var unit = shoppingList.foldUnit(String(spec.unit || ''));
+      return {
+        base: base,
+        clamp: function (n) { return Math.max(1, Math.round(n / base)) * base; },
+        step: function (n, delta) { return n + delta * base; },
+        box: function (n) { return String(n); },
+        word: function (n) { return unitLabel(unit, n); }
+      };
+    }
+
+    /* A COUNT STEPS BY ONE, and a midpoint on a half keeps its half: 5.5
+       ("5–6") plus one is 6.5 ("6–7"). A typed whole number is taken as
+       itself. The floor is the smallest value of the same kind: 1, or "1–2". */
+    var half = base !== Math.floor(base);
+    var floor = half ? 1.5 : 1;
+    return {
+      base: base,
+      clamp: function (n) {
+        var onHalf = half && (n * 2) % 2 === 1;
+        return Math.max(onHalf ? floor : 1, onHalf ? n : Math.round(n));
+      },
+      step: function (n, delta) { return n + delta; },
+      box: yieldBox,
+      word: function (n) { return thingText(spec, n); }
+    };
+  }
+
   return {
     scaleAmount: scaleAmount,
-    noteName: noteName
+    scaleLeadingMeasure: scaleLeadingMeasure,
+    noteName: noteName,
+    halfStep: halfStep,
+    portionsMode: portionsMode,
+    yieldMode: yieldMode,
+    yieldBox: yieldBox
   };
 });

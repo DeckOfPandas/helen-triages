@@ -25,13 +25,20 @@
 // replaced; the slot is left alone, so the yellow stays under the number.
 //
 // THE NOTE NAMES WHAT DID NOT MOVE. Helen: "let's add a note to bitters and
-// handfuls (copy tbc, just put in a placeholder)". Three kinds of line do not
-// scale: an amount with no number in it ("a few handfuls", "some"), an
-// ingredient with no amount at all, and -- #1125 -- a numbered amount in a
-// measure taken by hand ("1 handful", "1 pinch"), which used to come out as
-// 1.17 handfuls. When the portions differ from the
-// recipe's own, both kinds are listed by name under the control; at the
-// recipe's own count the note is hidden, because nothing has moved.
+// handfuls (copy tbc, just put in a placeholder)". Two kinds of line cannot
+// scale: an amount with no count in it ("a few handfuls", "some") and an
+// ingredient with no amount at all ("salt, to taste"). When the portions
+// differ from the recipe's own, both kinds are listed by name under the
+// control; at the recipe's own count the note is hidden, because nothing has
+// moved.
+//
+// A HANDFUL SCALES, IN HALF STEPS -- #1125. "1 handful" for three times the
+// people is "3 handfuls", for half as many again "1½ handfuls"; seven for six
+// used to come out as 1.17 and is now still 1. And a row with NO
+// amount whose text opens with such a measure scales too: Helen's own example
+// is `item: "a handful of fresh parsley"`, which becomes "3 handfuls of fresh
+// parsley". That is the one place this file writes outside an amount span --
+// see `leadFor` below. The rounding is HTF.foodScale's, in one function.
 // HELEN'S WORDS SINCE #1088, 2026-09-20 -- "(Not scaled: salt, black pepper;
 // olive oil)", settled as commas throughout. See `apply` below.
 //
@@ -58,8 +65,29 @@
   var note = article.querySelector('.recipe-scale-note');
   if (!control || !input || !minus || !plus || !note) return;
 
-  var base = parseInt(input.getAttribute('data-portions'), 10);
-  if (!(base > 0)) return;
+  /* PORTIONS, OR THE THING MADE -- #1286. A `makes:` recipe's control carries
+     `data-made`, the build's reading of that line as JSON, and the box then
+     counts waffles (or millilitres, or 8-inch cakes) and never portions --
+     Helen: "Never tell me how many cookies are in a portion!!!" Everything
+     that differs between the two is in the MODE, which is HTF.foodScale's:
+     this file asks it what a press of plus means and what the box should
+     say, and holds no arithmetic for either. A `data-made` that cannot be
+     read leaves the control hidden, which is the rule for any control here
+     that cannot work. */
+  var word = control.querySelector('.recipe-scale-word');
+  var mode = null;
+  if (input.hasAttribute('data-made')) {
+    try {
+      mode = HTF.foodScale.yieldMode(JSON.parse(input.getAttribute('data-made')));
+    } catch (e) {
+      mode = null;
+    }
+  } else {
+    var people = parseInt(input.getAttribute('data-portions'), 10);
+    if (people > 0) mode = HTF.foodScale.portionsMode(people);
+  }
+  if (!mode) return;
+  var base = mode.base;
 
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.ingredient-amount-number')
@@ -86,9 +114,9 @@
 
   var original = spans.map(textOf);
 
-  /* THE TWO WORD LISTS ARE THE BUILD'S, #1125 -- `data-unscaled` is
-     _data/food/scaling.yml's `unscaled_measures` (a handful, a pinch: measures
-     that have no fraction) and `data-trailing` is ingredient_words.yml's
+  /* THE TWO WORD LISTS ARE THE BUILD'S, #1125 -- `data-half-step-measures` is
+     _data/food/scaling.yml's `half_step_measures` (a handful, a pinch: measures
+     that scale in half steps) and `data-trailing` is ingredient_words.yml's
      `trailing_phrases` ("to taste"). _layouts/recipe.html joins each with `|`
      onto the control. Absent, both are empty and the scaler behaves as it did
      before the issue. */
@@ -99,9 +127,38 @@
   }
 
   var words = {
-    unscaled: listFrom('data-unscaled'),
+    halfStep: listFrom('data-half-step-measures'),
     trailing: listFrom('data-trailing')
   };
+
+  /* A ROW WITH NO AMOUNT, AND THE TEXT NODE ITS WORDS START IN. "a handful of
+     fresh parsley" has no span to rewrite: the measure is the opening of the
+     item's own text. `leadFor` finds the row's FIRST text, and only if it is
+     a bare text node directly inside the <li> -- an item that opens with a
+     link or any other element has no lead and is simply not scaled. The
+     node's original value is stashed here, once, for the same reason the
+     amounts are: every redraw scales from what the recipe wrote.
+
+     ONLY THAT ONE NODE IS EVER WRITTEN, so a link, an emphasis or the
+     annotation later in the row is never touched. */
+  function leadFor(row) {
+    for (var i = 0; i < row.childNodes.length; i += 1) {
+      var node = row.childNodes[i];
+      if (node.nodeType === 3) {
+        if (node.nodeValue.trim() !== '') return node;
+      } else if (node.nodeType === 1) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  var bare = rows.filter(function (row) {
+    return !row.querySelector('.ingredient-amount-number');
+  }).map(function (row) {
+    var lead = leadFor(row);
+    return { row: row, lead: lead, written: lead ? lead.nodeValue : '' };
+  });
 
   /** The ingredient's own name: the row's text with its amount and its note
       taken out, then cut down to the ingredient by HTF.foodScale.noteName --
@@ -122,7 +179,7 @@
   }
 
   function apply(wanted) {
-    var n = Math.max(1, Math.round(wanted));
+    var n = mode.clamp(wanted);
     var factor = n / base;
     var still = [];
 
@@ -139,15 +196,30 @@
       }
     });
 
-    // An ingredient with no amount at all is as written whatever the box says.
-    if (n !== base) {
-      rows.forEach(function (row) {
-        if (!row.querySelector('.ingredient-amount-number')) still.push(nameFor(row));
-      });
-    }
+    /* An ingredient with no amount is as written whatever the box says --
+       UNLESS its text opens with a countable by-eye measure ("a handful of",
+       "pinch of"), which scales in place. The name for the note is taken
+       after the text is put back, so it is always the recipe's own words. */
+    bare.forEach(function (item) {
+      if (item.lead) item.lead.nodeValue = item.written;
+      if (n === base) return;
+      var result = item.lead
+        ? HTF.foodScale.scaleLeadingMeasure(item.written, factor, words)
+        : { scaled: false };
+      if (result.scaled) {
+        item.lead.nodeValue = result.text;
+      } else {
+        still.push(nameFor(item.row));
+      }
+    });
 
     last = n;
-    put(input, String(n));
+    put(input, mode.box(n));
+    /* The word after the box agrees with the number in it -- "1 waffle",
+       "2 × 8-inch cakes", "2 litres". Portions returns null: that word is the
+       markup's and never changes. */
+    var said = mode.word(n);
+    if (word && said !== null) word.textContent = said;
 
     /* HELEN'S LINE, #1088, 2026-09-20: "(Not scaled: salt, black pepper;
        olive oil)". Parenthesised, no full stop, and COMMAS between the names
@@ -189,14 +261,14 @@
   }
 
   function settle() {
-    input.value = String(last);
+    input.value = mode.box(last);
   }
 
   function step(delta) {
-    return function () { apply(last + delta); };
+    return function () { apply(mode.step(last, delta)); };
   }
 
-  input.value = String(base);
+  input.value = mode.box(base);
   control.hidden = false;
 
   input.addEventListener('input', redraw);

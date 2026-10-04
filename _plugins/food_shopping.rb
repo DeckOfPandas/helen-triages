@@ -104,6 +104,8 @@ module HelenTriages
         [/(?<![a-z0-9])#{Regexp.escape(word)}(?![a-z0-9])/, aisle]
       end
 
+      yields = site.data.dig("food", "scaling", "yields")
+
       counted = 0
       guessed = 0
       COLLECTIONS.each do |key|
@@ -112,6 +114,7 @@ module HelenTriages
           portions, estimated = portions_for(doc)
           doc.data["portions"] = portions
           doc.data["portions_estimated"] = estimated
+          doc.data["made"] = made_for(doc, yields)
           doc.data["shopping"] = shopping_for(doc)
           counted += 1
           guessed += 1 if estimated
@@ -154,6 +157,27 @@ module HelenTriages
       return [estimate.to_i, true] if estimate.is_a?(Numeric) && estimate.to_i > 0
 
       [nil, false]
+    end
+
+    # WHAT THE RECIPE MAKES, FOR THE RECIPE PAGE'S SCALER -- #1286. `page.made`
+    # is _plugins/food_yield.rb's reading of `makes:`: a count of a named
+    # thing ("4–6 waffles"), a measure ("950 ml"), or nil. Helen: "Never tell
+    # me how many cookies are in a portion!!!" -- so where this is set, the
+    # recipe page's box counts the thing made and the word "portions" is not
+    # printed.
+    #
+    # THIS IS NOT `makes:` BEING READ AS PEOPLE. `portions_for` above is
+    # unchanged and still refuses to; `page.portions` is still the
+    # `serves_estimate`, and the INDEX's shopping list still scales by it.
+    # Two figures, two questions: how many it feeds, and how many it makes.
+    #
+    # A recipe that states `serves:` never gets one, whatever else it says:
+    # a number Helen wrote about people wins. No file carries both today.
+    def made_for(doc, yields)
+      return nil if doc.data["serves"].to_s[LEADING_NUMBER, 1]
+      makes = doc.data["makes"]
+      return nil if makes.nil? || makes.to_s.strip.empty?
+      HelenTriages::FoodYield.parse(makes.to_s, yields)
     end
 
     # Both shapes, in one pass. A recipe has `ingredient_groups` and no

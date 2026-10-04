@@ -1131,6 +1131,169 @@ def test_the_magic_bag_mark_is_the_draft_marks_look_and_is_written_last(fixture_
 
 
 # =============================================================================
+# "FOR THE TO FINISH:" — #814, 2026-10-04
+# =============================================================================
+# One recipe carrying every kind of ingredient-group name the layout tells
+# apart: a bare noun, three names that open with "to ", and a variation.
+
+GROUP_HEADING_FIXTURE = (
+    '---\ntitle: "zzz-814-group-headings"\n'
+    'tagline: "Temporary fixture, deleted by the test."\n'
+    'source: "test"\nmain_ingredients: ["salt"]\nstar_ingredient: "salt"\n'
+    'tags: []\ningredient_groups:\n'
+    '  - name: dressing\n    items:\n    - item: salt\n'
+    '  - name: to finish\n    items:\n    - item: salt\n'
+    '  - name: to decorate\n    items:\n    - item: salt\n'
+    '  - name: to serve\n    items:\n    - item: salt\n'
+    '  - name: "variation: plain"\n    items:\n    - item: salt\n'
+    'method:\n  - "Nothing."\nmethod_short:\n  - ""\nmeta:\n  rewritten: true\n'
+    '  awaiting_fix: false\n  proofread: true\n  cooked_before: false\n'
+    '---\n'
+)
+
+_in_the_fixture_build(
+    {"_food_recipes/zzz-814-group-headings.md": GROUP_HEADING_FIXTURE})
+
+GROUP_HEADING = re.compile(r'<h3 class="recipe-group-heading">([^<]*)</h3>')
+
+
+def test_a_group_named_to_something_is_its_own_heading(fixture_site):
+    """#814. `to finish` rendered "For the to finish:".
+
+    Helen: "Can we fix all 'for the to finish' cases? Both existing and when
+    we ingest." The layout special-cased `to serve` and nothing else, so every
+    other name of that shape got the "For the" a bare noun wants. ANY name
+    opening with "to " now prints as itself, capitalised, with the colon --
+    and `to serve` reads exactly as it did.
+
+    A FIXTURE, because the published collection holds only `to serve`: the
+    `to finish`, `to decorate` and `to garnish` groups are all in drafts, so
+    the production build could not show the bug or the fix.
+    """
+    page = fixture_site / "food" / "recipes" / "zzz-814-group-headings" / "index.html"
+    assert page.exists(), "the #814 fixture recipe was not built"
+    headings = GROUP_HEADING.findall(page.read_text(encoding="utf-8"))
+    assert headings == [
+        "For the dressing:", "To finish:", "To decorate:", "To serve:",
+        "Variation: plain",
+    ], (
+        "ingredient-group headings are not what _layouts/recipe.html should "
+        f"print for [dressing, to finish, to decorate, to serve, variation: "
+        f"plain]: {headings}"
+    )
+
+
+def test_no_built_food_page_says_for_the_to(site):
+    """#814, over everything that builds locally -- drafts included.
+
+    The fixture test above proves the rule; this reads the real pages, where
+    the names actually are, so a name the rule does not reach shows up by
+    file. `site` and not `prod_site`: all six "to finish / to decorate / to
+    garnish" groups are in `_food_drafts/`, which only the local build renders.
+    """
+    problems, seen = [], 0
+    for page in sorted((site / "food").rglob("index.html")):
+        for heading in GROUP_HEADING.findall(page.read_text(encoding="utf-8")):
+            seen += 1
+            if re.match(r"for the (to|for|the) ", heading, re.I):
+                problems.append(f"{page.parent.name}: {heading!r}")
+    assert seen > 50, (
+        f"only {seen} group headings were found under food/, so GROUP_HEADING "
+        f"no longer matches the layout's markup and this test reads nothing."
+    )
+    assert not problems, (
+        'a food page prints a group heading that opens "For the to/for/the '
+        '..." (#814):\n  ' + "\n  ".join(problems)
+    )
+
+
+# =============================================================================
+# THE SCALER COUNTS THE THING MADE — #1286, 2026-10-04
+# =============================================================================
+SCALE_CONTROL = re.compile(
+    r'<div class="recipe-scale-controls"[^>]*>(.*?)</div>', re.S)
+
+
+def _scale_control(site_dir, slug):
+    page = site_dir / "food" / "recipes" / slug / "index.html"
+    assert page.exists(), f"{slug} was not built"
+    match = SCALE_CONTROL.search(page.read_text(encoding="utf-8"))
+    return match.group(1) if match else None
+
+
+def _what_the_control_says(control):
+    """The control's markup WITHOUT its class attributes, lowercased.
+
+    The input keeps the class `recipe-scale-portions` on a `makes:` recipe --
+    one control, one set of hooks for the script and the stylesheet -- and a
+    class name is not something the page SAYS. Everything a reader or a
+    screen reader meets is left in: the text, `title`, `aria-label`, `value`.
+    """
+    return re.sub(r'\sclass="[^"]*"', "", control).lower()
+
+
+def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
+    """#1286. Helen: "Never tell me how many cookies are in a portion!!!"
+
+    Henry's Sunday Waffles says "Makes 4–6 waffles" at the top and said
+    "~2 portions" under the ingredients. The box now starts at the midpoint,
+    5, and the word after it is the thing made. tests/test_food_yield.py
+    checks the reading of every `makes:` line without a build; this checks
+    that the reading reaches the page, on one recipe of each kind.
+
+    AND THAT THE REST IS UNTOUCHED. A `makes:` with no count at its start
+    ("Some") keeps the portions box and its "~" -- her ruling -- and a recipe
+    that states `serves:` was never part of this.
+    """
+    waffles = _scale_control(prod_site, "henrys-sunday-waffles")
+    assert waffles is not None, "the waffles page has no scaler control"
+    assert 'value="5"' in waffles and "data-made=" in waffles, (
+        "the waffles' box should start at 5, the midpoint of 4–6, and carry "
+        f"the build's reading in data-made:\n{waffles}"
+    )
+    assert re.search(r'<span class="recipe-scale-word">\s*waffles\s*</span>', waffles), (
+        f"the word after the waffles' box should be `waffles`:\n{waffles}"
+    )
+    assert "portion" not in _what_the_control_says(waffles), (
+        "the waffles' scaler still says portions somewhere -- in the word, "
+        f"the `~` title or an aria-label:\n{waffles}"
+    )
+
+    expected = {
+        # slug: (box, the word after it)
+        "bens-chocolate-ice-cream": ("950", "ml"),
+        "beetroot-chocolate-cake": ("1", "× 8-inch cake"),
+        "sweet-shortcrust-pastry-mince-pies": ("1", "dozen mince pies"),
+        "macarons": ("64", "tiny macarons"),
+        "grandmas-scones": ("2", "large rounds of 4"),
+    }
+    problems = []
+    for slug, (box, word) in expected.items():
+        control = _scale_control(prod_site, slug) or ""
+        said = re.search(r'<span class="recipe-scale-word">(.*?)</span>', control, re.S)
+        got = (
+            (re.search(r'<input[^>]*\bvalue="([^"]*)"', control) or [None, None])[1],
+            " ".join(said.group(1).split()) if said else None,
+        )
+        if got != (box, word) or "portion" in _what_the_control_says(control):
+            problems.append(f"{slug}: wanted {(box, word)}, the page has {got}")
+    assert not problems, (
+        "a `makes:` recipe's scaler does not count what it makes (#1286):\n  "
+        + "\n  ".join(problems)
+    )
+
+    some = _scale_control(prod_site, "cherry-glaze") or ""
+    assert "data-portions=" in some and "portions</span>" in some and "data-made" not in some, (
+        "cherry-glaze (`makes: Some`) should keep the portions box exactly "
+        f"as it was -- Helen: 'retain the previous guess':\n{some}"
+    )
+    served = _scale_control(prod_site, "moules-mariniere") or ""
+    assert 'data-portions="4"' in served and "data-made" not in served, (
+        f"a `serves:` recipe's scaler should be untouched:\n{served}"
+    )
+
+
+# =============================================================================
 # THE GARNISH STEP READS AS ENGLISH — #1138 and #1143, 2026-09-17
 # =============================================================================
 

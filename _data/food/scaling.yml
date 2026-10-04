@@ -1,60 +1,139 @@
 # =============================================================================
-# WHAT THE RECIPE PAGE'S PORTION SCALER LEAVES ALONE -- GitHub issue #1125
+# HOW THE RECIPE PAGE'S PORTION SCALER TREATS A MEASURE TAKEN BY HAND -- #1125
 #
-# Helen: "find a way to parameterise ingredient lines that won't scale ... a
-# handful of fresh parsley ... The scaler line should say: 'Not scaled: fresh
-# parsley'." And: "Currently some recipes scale 1 handful to e.g. 1.17
-# handfuls, which is obvious nonsense."
+# Helen, raising it: "Currently some recipes scale 1 handful to e.g. 1.17
+# handfuls, which is obvious nonsense." And, 2026-10-04, asked what should
+# happen instead: 'If a recipe calls for "a handful of parsley", three orders
+# of that recipe should call for "3 handfuls of parsley".' And then: "Handfuls
+# can scale in half steps."
 #
 # _layouts/recipe.html emits this list onto the scaler control as
-# `data-unscaled`, assets/js/recipe-scale.js hands it to
+# `data-half-step-measures`, assets/js/recipe-scale.js hands it to
 # assets/js/food-scale.js, and that is the whole route: adding a measure is a
 # line here and no code.
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# Unscaled measures -- a measure taken by HAND OR EYE, which has no fraction.
+# Half-step measures -- a measure taken by HAND OR EYE. It SCALES, but only to
+# a figure a person could act on: the nearest half, never less than a half.
 #
-# An amount whose words include one of these stays exactly as written whatever
-# the portions box says, and its ingredient is named on the "(Not scaled: ...)"
-# line under the control. `1 handful`, `2 handfuls`, `1 small handful`,
-# `1 large handful each` and `1 pinch` are all caught: the word is matched
-# whole, anywhere after the number, singular or plural (`s` or `es`).
+#     1 handful   x3    ->  3 handfuls
+#     1 handful   x1.5  ->  1½ handfuls
+#     1 handful   x7/6  ->  1 handful        (not 1.17)
+#     1 handful   x2/3  ->  ½ handfuls
+#
+# THE ROUNDING IS NOT HERE. It is `halfStep` in assets/js/food-scale.js, one
+# function, so that changing it is one line. This file only says WHICH
+# measures get it.
+#
+# HER SENTENCE NAMES HANDFULS; the rule is applied to the whole list below as
+# one. A measure she wants treated differently comes out of the list, and
+# then scales linearly like a pat.
+#
+# The word is matched whole, anywhere after the number, singular or plural
+# (`s` or `es`): `1 handful`, `2 handfuls`, `1 small handful`,
+# `1 large handful each` and `1 pinch` are all caught, and the plural is
+# written back to match the new number.
 #
 # SINGULAR, LOWERCASE, ONE WORD EACH.
 #
-# THE SAME WORDS ALSO CLEAN THE NAME on that line. A recipe that wrote the
-# measure into `item:` instead -- "a few dashes of Tabasco sauce to taste",
-# "A large handful of fresh coriander, to serve" -- is listed as "Tabasco
-# sauce" and "fresh coriander", which is what Helen's own example of the line
-# reads like.
+# THE SAME WORDS SCALE A MEASURE WRITTEN WITH NO NUMBER. A recipe that wrote
+# it into `item:` -- "a handful of fresh parsley", "pinch of salt", "A large
+# handful of fresh coriander, to serve" -- has `a`, `an`, `one` or nothing
+# read as ONE, and scales in place: "3 handfuls of fresh parsley". "a few",
+# "some" and "a couple of" are not numbers; those lines stay as written and
+# are named on the "(Not scaled: ...)" line, with the measure phrase cut from
+# the name: "a few dashes of Tabasco sauce to taste" is listed as "Tabasco
+# sauce", which is what Helen's own example of the line reads like.
 #
 # EVERY WORD HERE WAS IN THE COLLECTION WHEN IT WAS ADDED (2026-10-04, counted
-# over _food_recipes/ and _food_drafts/, amounts that open with a number):
+# over _food_recipes/ and _food_drafts/):
 #
-#   handful   15 amounts in 13 files   "1 handful", "2 handfuls",
-#                                      "1 small handful", "1 large handful each"
-#   pinch      4 amounts in  3 files   "1 pinch"
-#   splash     1                       "1 splash" of red wine vinegar
-#   knob       1                       "1 knob" of salted butter
-#   pat        2 amounts in  2 files   "2 pats", "2 large pats" of salted butter
-#   dash       0 with a number; it is here for Helen's own example, which the
-#              collection writes inside `item:` ("a few dashes of Tabasco ...")
+#   handful   15 numbered amounts in 13 files, and the opening of 51 items
+#   pinch      4 numbered amounts in  3 files, and the opening of 37 items
+#   splash     1 numbered amount ("1 splash" of red wine vinegar), 2 items
+#   knob       1 numbered amount ("1 knob" of salted butter), 4 items
+#   dash       0 numbered; it opens 2 items, one of them Helen's own example
+#              ("a few dashes of Tabasco sauce to taste")
 #
-# WHAT IS DELIBERATELY ABSENT, because each is a COUNT of a thing you can pick
-# up rather than a measure by eye, and whether a count should scale is a
-# different question from whether a handful should: `sprig` (3), `bunch` (5),
-# `drop` (1, "3–4 drops" of vanilla), `twist` (1, "5 twists" of black pepper),
-# `lot` (2, batches of another recipe). They scale today as they always have.
-# Adding one is one line below; it is Helen's call, not a tidy-up.
+# WHAT IS ABSENT IS RULED, NOT FORGOTTEN -- Helen, 2026-10-04, asked about
+# each. A COUNT of a thing you can pick up scales like any other number: "Yes,
+# 4 sprigs double is 8, and so on." So `sprig` (3 amounts), `bunch` (5),
+# `drop` (1, "3–4 drops" of vanilla), `twist` (1, "5 twists" of black pepper)
+# and `lot` (2, batches of another recipe) are not here. They can print a
+# fraction (5 twists at two thirds is 3⅓ twists); that is known and reported,
+# not an oversight.
+#
+# `pat` WAS HERE FOR A FEW HOURS AND CAME OUT ON HER WORD: '"pat" is a correct
+# term, and should be scaled linearly as "pats"'. "2 large pats" doubled is
+# "4 large pats". (2 amounts in 2 published recipes.)
 #
 # `large`, `medium` and `small` MUST NEVER BE ADDED. Helen, on #1005: "Things
 # like '2 large' can scale, surely" -- "2 large eggs" doubled is "4 large".
 # They are sizes of a counted thing, and 240 amounts use them.
-unscaled_measures:
+half_step_measures:
   - handful
   - pinch
   - dash
   - splash
   - knob
-  - pat
+
+# -----------------------------------------------------------------------------
+# Yields -- the words _plugins/food_yield.rb needs to read a `makes:` line, so
+# that the scaler on a `makes:` recipe counts THE THING MADE. GitHub issue
+# #1286, Helen, 2026-10-04: "Never tell me how many cookies are in a portion!!!"
+#
+# The plugin's header has the rules and her words for each. These four lists
+# are everything in it that is vocabulary rather than rule.
+# -----------------------------------------------------------------------------
+yields:
+  # A word in front of the number that says it is not exact. Kept on the page,
+  # as written, in front of the box ("about 300 ml" -> "about 600 ml"). Every
+  # one of these opens a real `makes:` line except `approximately`, `roughly`
+  # and bare `approx`, which are here so the next recipe does not fall through
+  # to the portions box for the sake of a spelling.
+  approx_words:
+    - about
+    - approx.
+    - approx
+    - approximately
+    - around
+    - estimated
+    - roughly
+
+  # A count written as a word. ONLY AT THE START of the line: "Plenty for two
+  # people" and "Enough for one normal lemon meringue pie" are not counts, and
+  # the 8 of "one 8-inch cake" is never read at all. `one` is the only one the
+  # collection writes today (7 lines: six cakes and a pie, one tin); the rest
+  # are here because "two 8-inch cakes" is the very next thing anyone would
+  # write. NOT `a` or `an`: "a batch" is prose, and nothing writes it.
+  number_words:
+    one: 1
+    two: 2
+    three: 3
+    four: 4
+    five: 5
+    six: 6
+    seven: 7
+    eight: 8
+    nine: 9
+    ten: 10
+    eleven: 11
+    twelve: 12
+
+  # A yield measured rather than counted. It scales by WHOLE ORDERS of the
+  # recipe: "950 ml for one order of a recipe becomes 1900 ml for 2". As
+  # written in the collection: ml (15 lines), g (3), litre (3), kg (1).
+  measures:
+    - ml
+    - l
+    - litre
+    - litres
+    - g
+    - kg
+
+  # A word that is itself the thing counted and does not change with the
+  # number: '"1 dozen" doubled can be "two dozen"'. The count stays in dozens
+  # and is never turned into 12.
+  group_words:
+    - dozen

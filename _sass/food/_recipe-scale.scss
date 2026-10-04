@@ -62,6 +62,22 @@
   }
 }
 
+// ON A `makes:` RECIPE THE BOX HOLDS WHAT IS MADE -- #1286 -- and that is not
+// always two characters: "950" of millilitres, "2850" three orders on, "5–6"
+// where a midpoint lands on a half, "64" macarons. Five characters and the
+// caret, by the same formula as above. A WIDTH NOBODY HAS RULED ON: it is the
+// smallest that holds every figure the published collection can show at three
+// times the recipe, and it is here to be looked at.
+.recipe-scale--made input {
+  width: calc(5ch + 1.6ch);
+}
+
+// "about", "approx." -- the yield's own word, kept in front of the figure it
+// qualifies. The word's register, not the `~` mark's: this one is the recipe's.
+.recipe-scale-prefix {
+  text-transform: lowercase;
+}
+
 // The word is the unit. Lowercase Plex in the control's grey, the register the
 // shopping list's "set all to" label already speaks in.
 .recipe-scale-word {

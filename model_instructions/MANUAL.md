@@ -729,6 +729,23 @@ with it.
 - `method` **xor** `method_groups`; both present means the second is dropped.
   Group names are bare nouns (`dressing`); method group names may be
   narrative phases; the page uppercases both.
+- **How an ingredient group's name becomes its heading** — `_layouts/recipe.html`,
+  and only when a recipe has more than one group:
+
+  | `name:` | heading |
+  |---|---|
+  | `dressing` | For the dressing: |
+  | opens with `to ` — `to serve`, `to finish`, `to decorate`, `to garnish` | To serve: / To finish: — itself, capitalised, no "For the" (#814) |
+  | `variation: chocolate chip` | Variation: chocolate chip — no colon after (#329) |
+  | absent | For the base: |
+
+  **Any name opening with `to `, not a list of them**: `to serve` was
+  special-cased alone until 2026-10-04 and `to finish` printed "For the to
+  finish:". So a name must read after "For the" or open with `to `; a bare
+  verb (`assemble`) does neither. **A method group's name is printed bare** —
+  no prefix, no colon, no capital added — so `Make the sauce` is fine there
+  and `to serve` prints lowercase in the markup (the CSS uppercases it).
+  `test_a_group_named_to_something_is_its_own_heading` pins the table.
 - Cross-recipe links are markdown, **relative**: `[text](../slug/)`. Front
   matter is never run through Liquid, so a root-relative link cannot pick up
   the baseurl. `[[wikilinks]]` are retired.
@@ -1266,40 +1283,115 @@ a missing glasses entry is one glass, a missing portions entry is *however many
 this recipe makes*, which only the build knows — so `1` is a real, storable
 answer here.
 
-**THE RECIPE PAGE HAS A SCALER TOO, AND A HANDFUL DOES NOT SCALE** (#1005,
-#1125). `assets/js/food-scale.js` is one amount at a factor, through this same
-parser and `totalText`; `assets/js/recipe-scale.js` is the wiring. Three kinds
-of line stay as written when the portions move, and each is NAMED on Helen's
-line under the control — `(Not scaled: fresh flat-leaf parsley, Tabasco
-sauce)`, parenthesised, comma-joined, no full stop (#1088): an ingredient with
-no amount, an amount with no number in it, and a numbered amount in a measure
-taken by hand.
+**THE RECIPE PAGE HAS A SCALER TOO, AND A HANDFUL SCALES IN HALF STEPS**
+(#1005, #1125). `assets/js/food-scale.js` is one amount at a factor, through
+this same parser and `totalText`; `assets/js/recipe-scale.js` is the wiring.
 
-**Which measures those are is data: `unscaled_measures` in
-`_data/food/scaling.yml`** — `handful`, `pinch`, `dash`, `splash`, `knob`,
-`pat`. `_layouts/recipe.html` joins the list onto the control as
-`data-unscaled` and the script passes it in, so adding one is a line of YAML;
-`food-scale.js` names no measure, and handed no list it holds nothing back.
-The word is matched whole, anywhere after the number, singular or plural
-(`1 small handful`, `2 handfuls`, `1 large handful each`). **`large`, `medium`
-and `small` must never join it** — Helen: *"Things like '2 large' can scale,
-surely"* — and a test refuses them. `sprig`, `bunch`, `drop` and `twist` are
-deliberately absent: counts of a thing you can pick up, which still scale; the
-file has the counts and the argument.
+**A measure taken by hand or eye scales to the nearest half, never less than
+a half.** Helen, 2026-10-04, three sentences in order: *"some recipes scale 1
+handful to e.g. 1.17 handfuls, which is obvious nonsense"*; *'If a recipe
+calls for "a handful of parsley", three orders of that recipe should call for
+"3 handfuls of parsley"'*; *"Handfuls can scale in half steps."*
+
+    1 handful   ×3    →  3 handfuls
+    1 handful   ×1.5  →  1½ handfuls
+    1 handful   ×7/6  →  1 handful
+    1 handful   ×2/3  →  ½ handfuls
+
+**The rounding is ONE function, `halfStep` in `food-scale.js`.** The plural is
+not a new rule: `unitLabel` in `shopping-list.js` gives the singular at exactly
+one and the plural otherwise, so `½ handfuls` reads as `½ pats` already did.
+Her sentence names handfuls; the rule is applied to the whole list as one.
+
+**Which measures is data: `half_step_measures` in `_data/food/scaling.yml`**
+— `handful`, `pinch`, `dash`, `splash`, `knob`. `_layouts/recipe.html` joins
+the list onto the control as `data-half-step-measures` and the script passes
+it in, so adding one is a line of YAML; `food-scale.js` names no measure, and
+handed no list it scales a handful linearly like any count. The word is
+matched whole, anywhere after the number, singular or plural (`1 small
+handful`, `2 handfuls`, `1 large handful each`), and the plural is written
+back to suit the new number.
+
+**The same measure written with NO number scales too** — Helen's own example
+is `item: "a handful of fresh parsley"`, no `amount:` at all, and 96 items in
+the two collections open that way (5 published). `a`, `an`, `one` or nothing
+before a singular measure is ONE; a size word between is kept (`A large
+handful of fresh coriander` ×3 is `3 large handfuls of fresh coriander`); at a
+result of one the recipe's own words stand. `scaleLeadingMeasure` does it, and
+`recipe-scale.js` writes ONLY the row's first text node — the one place it
+writes outside an amount span — so an item that opens with a link is not
+scaled. **"a few", "some" and "a couple of" are not numbers**: those lines do
+not scale.
+
+**What does not scale is NAMED on Helen's line under the control** — `(Not
+scaled: Tabasco sauce, salt)`, parenthesised, comma-joined, no full stop
+(#1088): an ingredient with no amount (`salt, to taste`), and an amount or an
+opening with no count in it (`a few dashes of Tabasco sauce to taste`,
+`some`). **`large`, `medium` and `small` must never join the list** — Helen: *"Things like '2 large' can scale,
+surely"* — and a test refuses them. **What is absent is RULED, not left**
+(Helen, 2026-10-04): `sprig`, `bunch`, `drop`, `twist` and `lot` are counts of
+a thing you can pick up and scale — *"Yes, 4 sprigs double is 8, and so on."*
+— and **`pat` scales too**: *'"pat" is a correct term, and should be scaled
+linearly as "pats"'*, so `2 large pats` doubled is `4 large pats`. Do not add
+any of the six.
 
 **The NAME on that line is the ingredient, not the recipe's sentence about
-it** (`noteName`): a leading measure phrase written into `item:` is dropped
+it** (`noteName`): a leading measure phrase that could not scale is dropped
 ("a few dashes of", only where the phrase holds a declared measure and ends in
 `of`, so `cream of tartar` survives), then everything from the first comma or
 open bracket — the cut `_plugins/food_shopping.rb` makes for the list above —
 then a trailing `to taste`/`to serve` from `trailing_phrases` in
 `ingredient_words.yml`. **The comma cut is what makes the comma-joined line
 safe**, and its cost is that an item which is itself a list (`fresh parsley,
-thyme and sage`) is named by its first member. **The index's shopping list
-does NOT apply `unscaled_measures`**: it still totals `1 handful` at ⅔.
+thyme and sage`) is named by its first member — accepted: *"doesn't state an
+amount, so scaling is by common sense."* **The index's shopping list does NOT
+apply `half_step_measures`**: `food-shopping-list.js` totals for itself and
+never calls `halfStep`, so a handful there is still linear (`⅔ handfuls`,
+`1.17 handfuls`). Reported to Helen, not decided.
+
+**ON A `makes:` RECIPE THE RECIPE PAGE'S BOX COUNTS THE THING MADE, NEVER
+PORTIONS** (#1286, 2026-10-04). Helen: *"the scaler giving the number of items
+made ... would be clearest to me. Never tell me how many cookies are in a
+portion!!!"* Henry's waffles said "Makes 4–6 waffles" up top and "~2 portions"
+under the list. `_plugins/food_yield.rb` reads the `makes:` line — only its
+START, after an optional `about`/`approx.` — and `food_shopping.rb` hangs the
+reading on the page as `page.made`; `_layouts/recipe.html` prints the control
+from it, and `yieldMode` in `food-scale.js` does the stepping and the plural.
+
+| `makes:` | the box starts at | plus gives | her words |
+|---|---|---|---|
+| `4–6 waffles, depending on …` | `5` waffles — the midpoint | `6` waffles | *"Take the midpoint"* |
+| a range whose midpoint is a half (`4–7`) | `5–6` — a range of one | `6–7` | *"Midpoints that land on a half can become a range of one."* |
+| `64+ tiny macarons` | `64` tiny macarons | `65` | *'"64+" can be treated as "64".'* |
+| `one 8-inch cake` — a number WORD | `1` × 8-inch cake | `2` × 8-inch cakes | *"Two 8-inch cakes"* |
+| `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies | *'"1 dozen" doubled can be "two dozen".'* |
+| `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml — a whole ORDER of the recipe | *"950 ml for one order of a recipe becomes 1900 ml for 2"* |
+| `Some`, `Plenty for two people` — no count at the start | the portions box, `~` and all, unchanged | | *'for "some" we can retain the previous guess we made at portions'* |
+
+**The box is an integer throughout** — *"Our scaler is integer."* The
+ingredients scale by the box over the starting figure (six waffles is ×1.2;
+against the TRUE midpoint where it is a half). A count never goes below one, a
+measure never below one order. The noun agrees with the number (`1 waffle`),
+the plural being `unitLabel`'s; `dozen …` never changes; a thing that opens
+with a digit gets a `×`, because "2 8-inch cakes" is unreadable and a number
+box cannot spell "two".
+
+**Three things this does NOT do.** `makes:` is still never read as PEOPLE:
+`portions_for` is untouched and `page.portions` is still the
+`serves_estimate`. **The index's shopping list still scales these recipes by
+portions** — it reads `page.portions` and knows nothing of `page.made`. And
+**a count of nothing named (`makes: "about 8"`) keeps the portions box**,
+because there is no word to put after the number; that one is not ruled.
+
+**The vocabulary is data**, `yields:` in `_data/food/scaling.yml`: the approx
+words, the number words, the measures, and `dozen`. The parser is plain Ruby
+with no Jekyll in it so that `scripts/food_yield.rb` can run it over a list of
+strings: `tests/test_food_yield.py` asks it about every shape both collections
+write, in one subprocess and no build, and names the published recipes that
+keep the portions box.
 
 **Where it is tested.** `food-scale.test.js` (the recipe page's scaler, reading
-the real `scaling.yml`), `test_the_recipe_scaler_is_handed_the_unscaled_measures`
+the real `scaling.yml`), `test_the_recipe_scaler_is_handed_the_half_step_measures`
 in `tests/test_site_config.py` (the data reaching the page),
 `food-shopping-list.test.js` (the arithmetic),
 `shopping-list.test.js` (the parser, including the no-change-for-cocktails
