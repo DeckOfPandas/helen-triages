@@ -372,6 +372,16 @@ failure is probably work someone else has already done (MANUAL §9.1).
 
 ### Cocktails only
 
+- **WRITE THE KEYS IN THE ORDER THE PAGE PRINTS THEM, top to bottom** (Helen,
+  #1213): `title`, `tagline`, `glass`, `garnish`, `meta`, `mood`,
+  `ingredients`, `serve`, `serves`, `method`, `to_serve`, `notes`, `source`,
+  `source_url`. The list is `TOP_LEVEL_KEYS_IN_ORDER` in
+  `tests/test_cocktails.py`, which a test derives from `_layouts/cocktail.html`
+  -- look it up there, do not retype it from here. `meta` is fifth because the
+  page prints SHIP IT? beside the glass and garnish. A file that arrives in
+  another order is fixed by `python3 scripts/tidy_drafts.py --site cocktails
+  --only order --apply`, which moves whole blocks and edits no line. Drafts
+  only: never reorder a file in `_cocktail_recipes/`.
 - **MILLILITRES. NEVER A US UNIT.** Helen, 2026-09-01: *"I don't want any US
   units, just ml."* 1 oz = 30 ml, 1 tsp = 5 ml, from `measures:` in
   `ingredients.yml`. Transcribe the DRINK, not the page's units.

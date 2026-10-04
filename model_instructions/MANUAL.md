@@ -1641,6 +1641,16 @@ glass:                           # LIST, not scalar
   - "old fashioned"              # canonical spelling; `rocks` fails a test — §9.11.1
 garnish: []                      # LIST, declared vocabulary — §9.12.1
   # ["no garnish"] = decided, [] = unfilled.
+meta:                            # FIVE keys, in this order — §9.1.1
+  made_before: true              # BOOLEAN, gates nothing; first because you
+                                 # make a drink and then have an opinion — #722
+  ship: "oh gods yes"            # a closed ordered vocabulary — §9.5
+  rewritten: false               # the three gate flags, food's names, food's
+  awaiting_fix: false            # order. §4.0 is what they MEAN.
+  proofread: false
+mood:                            # LIST, DERIVED and then stored — see below
+  - "sharp"
+  - "aperitivo"
 ingredients:                     # FULL list, untriaged, in build order
   - amount: "15 ml"              # the ONLY quantity field, NO US UNITS, and
                                  # NEVER a bare number — the unit is required
@@ -1674,27 +1684,47 @@ method:                          # ORDERED LIST — the steps are sequential
   - step: "Muddle the lime chunks hard with the sugar."  # a step is a string OR
     note: "my giant spiky muddler not the polite smooth one"   # a {step, note} pair
 to_serve: ""                     # SERVEWARE, not a further instruction — §9.4
-mood:                            # LIST, DERIVED and then stored — see below
-  - "sharp"
-  - "aperitivo"
 notes:                           # {label, text}, both keys always, as food.
   - label: "QQ"                  # "" in either half is a PLACEHOLDER, which
     text: "QQ - `generic` values INFERRED, not confirmed: ..."   # neither layout prints
 source: ""                       # free text, unlike food
 source_url: ""                   # external; nothing verifies it
-meta:                            # FIVE keys, in this order — §9.1.1
-  made_before: true              # BOOLEAN, gates nothing; first because you
-                                 # make a drink and then have an opinion — #722
-  ship: "oh gods yes"            # a closed ordered vocabulary — §9.5
-  rewritten: false               # the three gate flags, food's names, food's
-  awaiting_fix: false            # order. §4.0 is what they MEAN.
-  proofread: false
 ```
 
-`TOP_LEVEL_KEYS`, `REQUIRED_TOP_LEVEL`, `INGREDIENT_KEYS_*` and
-`META_KEYS_IN_ORDER` at the top of `tests/test_cocktails.py` are the schema;
-a key not listed there fails `test_no_unknown_top_level_keys`, and having to
-write that line is the point.
+`TOP_LEVEL_KEYS_IN_ORDER` (from which `TOP_LEVEL_KEYS` is derived),
+`REQUIRED_TOP_LEVEL`, `INGREDIENT_KEYS_*` and `META_KEYS_IN_ORDER` at the top
+of `tests/test_cocktails.py` are the schema; a key not listed there fails
+`test_no_unknown_top_level_keys`, and having to write that line is the point.
+
+**A DRAFT'S TOP-LEVEL KEYS ARE IN THE ORDER THE PAGE PRINTS THEM** (#1213), and
+the block above is in that order. Helen's scope, in her words: drafts and new
+ingests, and *"Do not apply this retrospectively to published recipes"* — so
+`_cocktail_recipes/` is never checked or rewritten, and a drink keeps the order
+it was promoted in. Food was not asked and has no such rule.
+
+- **The order is read off `_layouts/cocktail.html`, not chosen.**
+  `test_the_declared_key_order_is_the_order_the_page_prints` strips the Liquid
+  comments, starts at the element that holds the page's words
+  (`cocktail-head-words`) and places each key at its first mention. Move a
+  section on the page and the list must move with it.
+- **It starts below the glass icon on purpose.** The icon is looked up from
+  `page.glass` before the title is printed; counting it puts `glass` above
+  `title`, and Helen's own example opens *"title, tagline, glass"*.
+- **`meta` is fifth because SHIP IT? is**: the head prints glass, garnish and
+  `meta.ship` in one row, with the mood chips under it. The other four `meta`
+  keys print nothing and travel with the block.
+- **`serve` follows `ingredients`** because the page prints the ice as a clause
+  on the strain step. Until this rule the drafts wrote it above `ingredients`.
+- **`serves` is the one key the layout never names** (the units plugin reads it
+  and hands the page `page.units.serves`), so its place is declared by hand in
+  `KEYS_THE_LAYOUT_NEVER_NAMES`, with the reason: directly after `serve`.
+- **The fixer is `python3 scripts/tidy_drafts.py --site cocktails --only
+  order`** — §11.0.2.
+- **THE DRAFTS RULE IS WRITTEN AND DORMANT.**
+  `test_a_draft_drinks_keys_are_in_page_order` skips, saying why, until
+  `_cocktail_drafts/SCHEMA_VERSION` says 2. Helen asked to see one draft
+  before the pass is run over the rest; `tests/drafts_schema.py`'s `PENDING`
+  says how to finish it.
 
 **`mood` is derived and then stored.** `scripts/derive_cocktail_moods.py
 --write` computes it from generics, characters, glass, amounts and method
@@ -3417,6 +3447,15 @@ touches only Helen's own prose fields (`title`, `tagline`, `to_serve`, a note's
 fifths of a cocktail's front matter is a closed vocabulary, somebody else's words
 or a number. `tests/test_tidy_drafts.py` asserts the whole output byte for
 byte on a fixture. A title diverging from its slug is NOT a finding on a draft.
+
+**`--only order` (#1213) is the one cocktail rule that reaches outside her
+prose, and it edits no line.** It re-deals a draft's top-level blocks into page
+order (§9.3) and writes each back byte for byte; before returning it checks
+that the lines are the same multiset, that both sides parse to the same data,
+and that the declared order was reached, and raises rather than writes if any
+of the three fails. It refuses, and names under `SKIPPED`, an undeclared key, a
+key written twice, and a column-0 comment — which belongs to no block.
+Cocktails only; `--site food --only order` does nothing.
 
 **A note that a later ruling has made false may be corrected or deleted by an
 agent** (#1078, Helen's "yes", 2026-09-24). The boundary is the ruling, not the
