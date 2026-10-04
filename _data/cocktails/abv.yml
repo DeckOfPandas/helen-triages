@@ -499,6 +499,11 @@ generics:
   # overwrite. Peach Me is its only pour today.
   peach schnapps:         { abv: 18,   confidence: medium }
   crème de cassis:        { abv: 20,   confidence: medium }
+  # NEW 2026-10-04 (#838), when Helen split `crème de cacao` by colour. The
+  # white derives from Briottet Crème de Cacao Blanc above; the brown has no
+  # bottle declared, and Brandy Alexander is its only pour. 25 is that same
+  # bottle's figure carried across, a category figure and NOT one Helen gave.
+  brown crème de cacao:   { abv: 25,   confidence: medium }
   # `coconut rhum` LEFT THIS BLOCK 2026-09-26, and it is the `liqueur de sapin`
   # move exactly: the category gained a bottle, and a bottle's figure wins.
   # Helen named it that day -- "18% ABV, £22" -- so Clément Mahina Coconut Rhum

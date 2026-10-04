@@ -11,7 +11,7 @@ ingredients:
   - amount: "45 ml"
     generic: "Batavia arrack"
   - amount: "22.5 ml"
-    generic: "crème de cacao"
+    generic: "white crème de cacao"
     suggestion: ["Briottet Crème de Cacao Blanc"]
   - amount: "22.5 ml"
     generic: "sweet vermouth"
@@ -36,5 +36,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

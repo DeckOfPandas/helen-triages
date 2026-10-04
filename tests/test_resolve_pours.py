@@ -89,7 +89,7 @@ def test_a_bottle_helen_does_not_buy_never_resolves(tables):
     ("Campari", "Campari"),
     ("LIME JUICE", "lime juice"),          # folded
     ("  lime   juice  ", "lime juice"),    # whitespace collapsed
-    ("creme de cacao", "crème de cacao"),  # accents flattened on the way in
+    ("white creme de cacao", "white crème de cacao"),  # accents flattened on the way in
 ])
 def test_an_exact_vocabulary_match_resolves(words, expected, tables):
     got = rp.resolve(words, *tables)

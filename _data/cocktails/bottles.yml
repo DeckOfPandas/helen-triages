@@ -952,7 +952,9 @@ bottles:
   # blanc", so the white expressions are what those drinks pour and the bottles
   # are named for them. Briottet's own labels read Blanc and Blanche
   # respectively. A brown cacao or a green menthe would be a second entry, not a
-  # wider alias -- the `Bulleit` rule.
+  # wider alias -- the `Bulleit` rule. SINCE 2026-10-04 THE CACAO'S COLOUR IS IN
+  # ITS GENERIC TOO (#838): Helen split `crème de cacao` into brown and white,
+  # so this bottle is a `white crème de cacao`.
   "Briottet Crème de Pêche":
     generic: "crème de pêche"
     # Briottet calls it Pêche de Vigne, which is how Fish House Punch writes its
@@ -960,7 +962,7 @@ bottles:
     # kept as it stands: Helen's ruling names the product she owns, and this is
     # already it.
   "Briottet Crème de Cacao Blanc":
-    generic: "crème de cacao"
+    generic: "white crème de cacao"
   "Briottet Crème de Violette":
     generic: "crème de violette"
   "Briottet Crème de Menthe Blanche":

@@ -1093,6 +1093,11 @@ generics:
   # pineapple-vodka case: she named the thing she buys.
   peach schnapps:     { gbp_per_litre_min: 17.14, gbp_per_litre_max: 17.14, basis: "GBP 12 / 70cl", confidence: high }
   crème de cassis:    { gbp_per_litre_min: 22.86, gbp_per_litre_max: 34.29, basis: "GBP 16-24 / 70cl", confidence: medium }
+  # NEW 2026-10-04 (#838), when Helen split `crème de cacao` by colour. The
+  # white is priced from Briottet Crème de Cacao Blanc (GBP 17 / 70cl); the
+  # brown has no bottle declared. The range starts at that bottle's price and
+  # is a guess above it, NOT a figure Helen gave -- hence `low`.
+  brown crème de cacao: { gbp_per_litre_min: 24.29, gbp_per_litre_max: 34.29, basis: "GBP 17-24 / 70cl, from the white's price; not checked", confidence: low }
   # HELEN'S OWN FIGURE, 2026-09-09: "I have Ciroc, GBP 31, 37.5%." My guess was
   # GBP 20-26, so the range was about 20% under. 70cl assumed -- the size she
   # did not state and the one every other row here uses.
