@@ -3286,6 +3286,22 @@ unless stated.
   amount), so the star and the sentence it points at appear together or not
   at all.
 
+- **2026-10-04, #1294 — one spirit poured twice is "the first" and "the
+  second".** Tiki Max floats 15 ml of blended overproof rum and fills a lime
+  shell with 25 ml more, and its method called both "the blended overproof
+  rum". Helen proposed "Float the first 15 ml..." / "...the other 25 ml...";
+  that failed `test_a_shell_pour_is_written_one_way`, because the shell step
+  is a `shapes:` sentence with one slot for the rum's NAME, and a figure in a
+  method is wrong at ×2 (the scaler does not rewrite steps). Offered "the
+  first pour of" / "the second pour of", she refused the word: *'"pour" is a
+  highly American word and I don't want to use it because it doesn't mean
+  much to me.'* Hers instead: *'"Float the first blended overproof rum" and
+  "fill ... with the second"? That implies the two could be different, which
+  I well might do actually, so it's honest.'* Two new `shapes:` lines in
+  `methods.yml`, the "second" one ABOVE the plain lime line because the plain
+  one also matches it and the first match is where the test reads the rum's
+  name from. **Do not write "pour" as a noun in anything she reads.**
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16** — Ingredients are additive, never a choose-one (asked

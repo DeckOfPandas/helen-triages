@@ -710,10 +710,12 @@ that needs two is free text.
 
 **With a slot top:** `Top with <X>.`
 
-**With a slot float:** `Float the <X> on top.` · `Drop the <X> on top.`
+**With a slot float:** `Float the <X> on top.` · `Drop the <X> on top.` ·
+`Float the first <X>.`
 
 **With a slot shell:**
 `Fill the passion fruit shell with the <X> and set on top of the drink.` ·
+`Fill the lime shell with the second <X> and set on top of the drink.` ·
 `Fill the lime shell with the <X> and set on top of the drink.`
 <!-- vocab:method end -->
 

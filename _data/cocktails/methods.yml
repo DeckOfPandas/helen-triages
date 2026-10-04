@@ -308,6 +308,16 @@ shapes:
   float:
     - "Float the <X> on top."
     - "Drop the <X> on top."
+    # ONE SPIRIT, POURED TWICE -- #1294, 2026-10-04. Tiki Max floats 15 ml of
+    # blended overproof rum and fills a lime shell with 25 ml more, and its
+    # method said "the blended overproof rum" both times. Helen's wording, for
+    # this line and its partner under `shell`: "Float the first blended
+    # overproof rum" and "fill ... with the second" -- "That implies the two
+    # could be different, which I well might do actually, so it's honest."
+    # NO MILLILITRES IN THE SENTENCE, on purpose: the scaler does not rewrite
+    # a method, so a figure here would be wrong at x2. And not "pour", which
+    # she called "a highly American word" that "doesn't mean much to me".
+    - "Float the first <X>."
   # THE SHELL STEP, 2026-10-01 (#1256). `<X>` is the rum, as the recipe names
   # it -- the ingredient carrying `as: "shell"`. The sentence is Modern
   # Zombie's, unchanged.
@@ -318,6 +328,12 @@ shapes:
   # shell` and `half an empty lime shell`. A third fruit is a third line.
   shell:
     - "Fill the passion fruit shell with the <X> and set on top of the drink."
+    # The partner of `float`'s "Float the first <X>." (#1294): the same spirit
+    # a second time. A third line for a third case, as the note above says.
+    # ABOVE THE PLAIN LIME LINE ON PURPOSE: the plain sentence also matches
+    # this one (with "second ..." as the rum), and the first match is the one
+    # test_a_shell_pour_is_written_one_way reads the rum's name out of.
+    - "Fill the lime shell with the second <X> and set on top of the drink."
     - "Fill the lime shell with the <X> and set on top of the drink."
 
 # =============================================================================

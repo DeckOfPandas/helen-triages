@@ -266,6 +266,7 @@ argument and the rules each field is read by.
 - 2026-10-04 · §9.3.6 · #1199 · one Ruby amount parser, and a golden file both languages read.
 - 2026-10-04 · §9.3.6 · #1291 · the units line says "(undiluted)", after the millilitres.
 - 2026-10-04 · §9.3.6 · #1293 · a pour in dashes is struck through and starred above ×1.
+- 2026-10-04 · §9.3.6 · #1294 · one spirit poured twice is "the first" and "the second".
 - 2026-08-16 · §9.4 / §9.4.1 / §9.5 · Ingredients are additive, never a choose-one (asked directly: guessing wrong would have shaped the whole model).
 - 2026-08-17 · §9.4 / §9.4.1 / §9.5 · The site is canon: "With iPad in hand, I'd rather take the site as canon, then happily break rules from there." Modelling adjustable sugar (a range, a tolerance, an "approximate" …
 - 2026-08-23 · §9.4 / §9.4.1 / §9.5 · A goodness-only filter built in twenty minutes (§9.9 below).
