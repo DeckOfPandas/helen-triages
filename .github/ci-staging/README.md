@@ -5,33 +5,28 @@ workflows in `.github/workflows/`, and these are deliberately not there.
 
 ## Why they are staged rather than applied
 
-The agent account's credential is a classic `repo`-scoped PAT. It has no
-`workflow` scope, so **GitHub refuses any push that creates or modifies a file
-under `.github/workflows/`**, in any of the three repos. That is not a rule this
-project invented and not one to route around — CLAUDE.md's line is "if something
-genuinely needs a permission not covered here, say so and stop".
-
-So the work an agent *can* do is write the exact text, check every fact in it,
-and explain what it changes. The part that needs a person is the pasting.
+Until 2026-10-04 the agent account's token had no `workflow` scope, so GitHub
+refused any push that created or modified a file under `.github/workflows/`,
+and the work an agent could do was write the exact text for Helen to paste.
+She has since added the scope (DECISIONS §12, #1281), so a workflow change in
+this repo now goes up as an ordinary PR. What is left here is waiting on a
+decision, not on a permission.
 
 ## What is here
 
 | file | issue | where it goes |
 |---|---|---|
-| `pull-request-trigger.md` | #1195 | edits to `.github/workflows/build-and-deploy.yml` in **this** repo, plus one repository setting |
 | `drafts-checks.yml` | #1194 (option B), #1196 (option 2) | `.github/workflows/drafts.yml` in **each private drafts repo** |
 
-## The order to do them in
+`pull-request-trigger.md` (#1195) was applied on 2026-09-28 and has been
+deleted.
 
-1. **`pull-request-trigger.md` first.** It is two small edits plus a settings
-   change, and it closes the hole that caused the three-day silent deploy outage
-   in September — the suite currently runs only *after* a merge, so nothing can
-   stop a red merge, only report one.
-2. **`drafts-checks.yml` second**, and it wants a decision from you before it is
-   worth pasting: #1194 lays out four options and recommends B, which is what
-   this file implements. If you would rather do C (make a local run complete by
-   default) or D (explicit markers), this file is the wrong answer and should be
-   deleted rather than applied.
+## Before applying it
+
+**`drafts-checks.yml` wants a decision from Helen first**: #1194 lays out four
+options and recommends B, which is what this file implements. If she would
+rather do C (make a local run complete by default) or D (explicit markers),
+this file is the wrong answer and should be deleted rather than applied.
 
 ## Once applied
 
