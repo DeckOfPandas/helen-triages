@@ -381,10 +381,13 @@ bottles:
     # behind a QQ admitting the value was inferred. Under Helen's ruling that
     # typing is CORRECT -- so those two QQ notes can be deleted rather than
     # answered, which is two rows off #837.
-  "Clairin Communal":
-    generic: "clairin"
-    aliases: []
-    origin: "Haiti"
+  # `Clairin Communal` WAS HERE AND IS A GENERIC NOW, 2026-10-04 (#1108). Helen:
+  # "Each type of clairin should be a generic because they are not
+  # interchangeable." A bottle under a generic of the same name would print
+  # "Clairin Communal (Clairin Communal)" -- the Punt e Mes fault -- so it is
+  # the Campari shape instead: one product, declared once, in ingredients.yml,
+  # with its strength and price under `generics:` in abv.yml and costs.yml.
+  # Its `origin: "Haiti"` went with it; clairin is Haitian by definition.
   "Sagatiba":
     generic: "cachaça"
     aliases: []

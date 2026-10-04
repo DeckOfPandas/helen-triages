@@ -2139,7 +2139,7 @@ Swizzle says `rhum agricole blanc` and is Martinican only because its
 suggestions are; `island-of-martinique` is named after an origin it cannot
 state. Helen chose that shape knowing so. **Two mechanisms for origin coexist
 deliberately** — in the generic where it changes the CATEGORY (the three
-Jamaicans, both Demeraras, `clairin`, both arracks), on the bottle where it
+Jamaicans, both Demeraras, the four clairins, both arracks), on the bottle where it
 changes the FLAVOUR.
 
 **ANY NEW TOP-LEVEL LIST IN `ingredients.yml` DECLARES POURABLE GENERICS UNLESS
