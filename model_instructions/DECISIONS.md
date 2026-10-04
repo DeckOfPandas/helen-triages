@@ -913,8 +913,22 @@ unless stated.
     halves. Where no amount is stated: *'Lemon can be split into "the juice of
     1 lemon" and "the zest of one lemon". Can we cleverly reunite those for
     the shopping list, though? "a little" or "most of" can have "the rest of"
-    in their other part.'* The shopping-list reunion is public-repo work and
-    was not built the day she asked.
+    in their other part.'* **Her literal wording was measured against the
+    shopping list and not used**: `item: "juice of 1 lemon"` plus `item:
+    "zest of 1 lemon"` prints two rows, neither in the lemon total and
+    neither scaling; `amount: "1"` on both halves prints 2 lemons. The list
+    names an ingredient by its `item` text up to the first comma or bracket
+    and sums every `amount` that parses, so the shape applied is: both halves
+    open with the same words, ONE keeps the `amount`, and the other has no
+    `amount` key and says which part it is — `1` + `"lemon, juiced"` and
+    `"lemon, the zest of the one juiced for the pears"`; `85 ml` + `"olive
+    oil (a little for frying, the rest for the dressing)"` and `"olive oil,
+    the rest of the oil above"`. The list built from each draft is identical
+    before and after. What it leaves: two such drafts shortlisted together
+    gain a trailing `×2` on that row, and the fix (in `food_shopping.rb`) must
+    key on the pointer's own words, because published lines such as "salted
+    butter, extra, for greasing" share a name with an amounted line and mean
+    extra. Not built the day she asked.
   - **Interleaved phases take narrative names, and Claude suggests them.**
     *"We use narrative phase names already, good spot, so yes please suggest
     some. It'll be easier for me to edit than generate."* A component-named
@@ -1474,6 +1488,28 @@ unless stated.
   ruled:** a count of nothing named (`makes: "about 8"`); whether the top
   "Makes" line moves with the box; the index shopping list, which still
   scales these by portions.
+  - **It stepped one waffle at a time for a few hours and she turned it round
+    on seeing it**: *"the buttons should still multiply the recipe in
+    integers, just showing number of waffles. So 1x is 5 waffles, 2x is 10
+    waffles. Otherwise we'll need to start showing eggs in units of 1/27 or
+    something."* So every `makes:` recipe steps ×1, ×2, ×3 and the box shows
+    what that makes — the shape volumes, dozens and "one 8-inch cake" already
+    had — including the ones that keep the portions box (*'if "some" is
+    originally guessed to be 4 portions, 2x should be 8 portions'*); "64+"
+    keeps its plus (*"64+ tiny macarons, 128+ tiny macarons"*, replacing
+    "treat 64+ as 64"). Only a `serves:` recipe still steps one portion at a
+    time.
+  - **One step below, ×½, judged by the BUILD**: *"Half a recipe would be
+    great where the numbers aren't insane! Can we judge that?"* and *"not
+    having half recipes in between integers, just between 0 and 1"*.
+    `_plugins/food_half_recipe.rb` refuses a recipe on the first line that
+    will not halve — an odd count of anything not on the `halvable` list, a
+    spoon measure that is not a multiple of ¼, a yield that halves below one —
+    and 22 of 42 published `makes:` recipes get it. `egg` is deliberately not
+    halvable and decides most refusals. The lists are data, under
+    `half_recipe:` in `_data/food/scaling.yml`. **The waffles' own range is
+    now unreachable** ("Makes 4–6", and the box shows 2–3, 5, 10), which is
+    the price of never printing a fraction of an egg.
 
 ---
 
