@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 import subprocess
+import unicodedata
 from pathlib import Path
 
 import pytest
@@ -79,6 +80,82 @@ def test_filters_js_holds_no_literal_threshold():
         "FAMILY_BUTTON_MIN_CHARS. The threshold should be read from the "
         "vocabulary, not inlined."
     )
+
+
+# --- an alias resolves one hop ----------------------------------------------
+
+def _fold_like_the_matcher(text) -> str:
+    """`fold(key.toLowerCase())` from assets/js/ingredient-search.js: lower
+    case, diacritics stripped, hyphens to spaces. The alias map is keyed on
+    this, so two spellings that fold alike are one key to the matcher."""
+    decomposed = unicodedata.normalize("NFD", str(text).lower())
+    return "".join(c for c in decomposed
+                   if not unicodedata.combining(c)).replace("-", " ")
+
+
+def _alias_chains(aliases) -> list[str]:
+    """Every alias whose target is itself an alias key, as `a -> b -> c`.
+
+    An alias naming ITSELF among its targets is not a chain: `applyAlias`
+    returns the list as written and never looks the target up again.
+    """
+    keys = {_fold_like_the_matcher(k): v for k, v in aliases.items()}
+    out = []
+    for key, becomes in aliases.items():
+        for target in (becomes if isinstance(becomes, list) else [becomes]):
+            folded = _fold_like_the_matcher(target)
+            if folded in keys and folded != _fold_like_the_matcher(key):
+                out.append(f"{key} -> {target} -> {keys[folded]}")
+    return out
+
+
+def test_no_food_alias_points_at_another_alias():
+    """An alias must name where the chain ENDS, because nothing follows it.
+
+    `applyAlias` in assets/js/ingredient-search.js returns `aliasMap[key]`
+    without resolving the result again. So `spring onions in thin strips ->
+    spring onions` stopped at the plural, although `spring onions -> spring
+    onion` was two lines away, and the index grew a second button for one
+    ingredient. Three entries did it on 2026-09-21 (#1175), and
+    `citrus-soy-salmon-sticky-rice` did it to itself: its `item:` gave `spring
+    onions` and its `main_ingredients` gave `spring onion`.
+
+    They were fixed in the data and the rule was left as a comment above the
+    list. A comment is read by whoever is already looking; the next chain is
+    added by somebody who is not.
+    """
+    path = DATA / "ingredient_words.yml"
+    aliases = yaml.safe_load(path.read_text(encoding="utf-8")).get("aliases") or {}
+    assert aliases, (
+        "_data/food/ingredient_words.yml declares no `aliases`, so this check "
+        "examined nothing. Either the block was renamed or the file changed "
+        "shape."
+    )
+    chains = _alias_chains(aliases)
+    assert not chains, (
+        "Alias(es) pointing at a key that is itself aliased:\n  "
+        + "\n  ".join(chains)
+        + "\n\nThe matcher resolves ONE hop, so the first target is where the "
+          "ingredient lands and the index gets two buttons for it. Point the "
+          "alias at the last name in its line."
+    )
+
+
+def test_the_alias_chain_check_sees_a_chain():
+    """The check above passes on today's data, so prove it can fail.
+
+    The three shapes are the three it has to tell apart: a chain through a
+    bare name, a chain through a list, and a spelling that only matches a key
+    once it is folded the way the matcher folds it.
+    """
+    assert _alias_chains({"onions": "onion", "shallots or onions": ["shallots", "onions"]})
+    assert _alias_chains({"spring onions": "spring onion",
+                          "spring onions in thin strips": "spring onions"})
+    assert _alias_chains({"five spice": "spice", "chinese five-spice": "Five-Spice"})
+
+    assert not _alias_chains({"spring onions": "spring onion",
+                              "spring onions in thin strips": "spring onion"})
+    assert not _alias_chains({"salt and pepper": ["salt and pepper", "pepper"]})
 
 
 def test_vocabulary_is_emitted_to_the_page():

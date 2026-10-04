@@ -5451,6 +5451,27 @@ Seventeen drinks staged in one go (`5beea41`); `_cocktail_recipes/` went from
   Helen's to apply; the deploy-gate test now asserts the invariant so that it
   can land.
 
+- **2026-10-04, #1194 — the drafts get no CI of their own, and the question is
+  closed.** #1194 offered four ways to stop CI and a local run checking
+  different corpora (B: a workflow in each private drafts repo; C: every
+  session fetches the clones; D: named markers). Helen: *"I understand B. I
+  honestly don't understand C or D. All I want to achieve here is not
+  publishing embarrassing broken design or placeholder text."* **None of the
+  four serves that, because a draft cannot reach the site.** CI builds from
+  the public repo alone; a draft publishes only by moving into
+  `_food_recipes/` or `_cocktail_recipes/` through a PR, and that PR meets
+  `test_no_qq_placeholder`, `test_no_published_drink_carries_a_qq`, the
+  two-flag publish gate and the rendered-page tests, with `test` a required
+  check (#1195). What the asymmetry costs is a session finding a broken draft
+  late, which the session-start hook, the end-of-run report and the written
+  `verify.py` step already narrow. She closed it and the staged
+  `.github/ci-staging/drafts-checks.yml` was deleted. **This does not reverse
+  2026-09-20's "we should rearchitect"** (#1127): that ruling is about guards
+  that fire on correct data, and it stands. **Not audited**: whether every
+  drafts check has a published-side twin. The same day's #1175 guards were
+  written over DECLARED vocabulary rather than poured drinks for this reason:
+  a check that needs the drafts does not exist in CI.
+
 ---
 
 ## §11 Working practices
@@ -7352,7 +7373,8 @@ verification. Dates are when the correction landed.
   `deploy` waiting on both — runs for the first time on the merge itself.
   `.github/ci-staging/pull-request-trigger.md` went in the same PR: #1195 was
   applied on 2026-09-28 and the folder's own README says to delete a staged
-  file once it is live.
+  file once it is live. The folder itself went later the same day, with
+  `drafts-checks.yml`, when #1194 was closed (§10).
 
 ## §13 The visual design — the road to each value
 
