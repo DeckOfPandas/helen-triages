@@ -2154,7 +2154,22 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first: the test named exactly one file,
 # `_cocktail_recipes/lita-grey.md`, "last touched by 6481f2af", and nothing
 # else. Covers 6481f2a and nothing after.
-COCKTAIL_BASELINE_COMMIT = "6481f2a"   # four drinks answer the glass-fit list (#1244)
+#
+# MOVED ONCE MORE THAT DAY FOR #1290's FOUR DRINKS, WHICH HELEN PROOFREAD.
+# gin-sour, sazerac and white-negroni-pina-colada she ticked on the issue;
+# tiki-max she held for #1294, fixed in `2f1c123`. Sazerac's note was reworded
+# to the text she gave there (`5d68720`), and `db62ad1` sets the four flags.
+#
+# HER WORD: "#1290 are all good to go! Tiki Max was addressed."
+#
+# Proved with the old value first: the test named exactly gin-sour.md,
+# sazerac.md, tiki-max.md and white-negroni-pina-colada.md, each "last touched
+# by db62ad14", and nothing else. Covers db62ad1 and nothing after.
+#
+# NOT A GRANT FOR 18th-century-cocktail, which `13406a2` retyped to `white
+# crème de cacao` earlier on the same branch. It is an ancestor of this
+# baseline and says `proofread: false`; it stays that way until she reads it.
+COCKTAIL_BASELINE_COMMIT = "db62ad1"   # four proofread drinks go live (#1290)
 
 
 def _newest_commit_per_published_drink():
