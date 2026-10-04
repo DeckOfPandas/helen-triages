@@ -1254,9 +1254,24 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
     assert re.search(r'<span class="recipe-scale-word">\s*waffles\s*</span>', waffles), (
         f"the word after the waffles' box should be `waffles`:\n{waffles}"
     )
+    assert 'aria-label="waffles to make"' in waffles, (
+        "the waffles' box shows a derived figure (what N recipes make), so "
+        f"its label must name the thing:\n{waffles}"
+    )
     assert "portion" not in _what_the_control_says(waffles), (
         "the waffles' scaler still says portions somewhere -- in the word, "
         f"the `~` title or an aria-label:\n{waffles}"
+    )
+
+    # THE HALF STEP IS THE BUILD'S VERDICT, carried as one attribute. The
+    # waffles halve (2 eggs, 5 waffles -> "2–3"); "one 8-inch cake" does not.
+    assert "data-half-recipe" in waffles, (
+        "the waffles should be offered a half recipe -- "
+        f"_plugins/food_half_recipe.rb's verdict has not reached the page:\n{waffles}"
+    )
+    cake = _scale_control(prod_site, "beetroot-chocolate-cake") or ""
+    assert "data-made=" in cake and "data-half-recipe" not in cake, (
+        f"half of one 8-inch cake is not offered; the page says it is:\n{cake}"
     )
 
     expected = {
@@ -1264,7 +1279,7 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
         "bens-chocolate-ice-cream": ("950", "ml"),
         "beetroot-chocolate-cake": ("1", "× 8-inch cake"),
         "sweet-shortcrust-pastry-mince-pies": ("1", "dozen mince pies"),
-        "macarons": ("64", "tiny macarons"),
+        "macarons": ("64+", "tiny macarons"),
         "grandmas-scones": ("2", "large rounds of 4"),
     }
     problems = []
@@ -1284,12 +1299,21 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
 
     some = _scale_control(prod_site, "cherry-glaze") or ""
     assert "data-portions=" in some and "portions</span>" in some and "data-made" not in some, (
-        "cherry-glaze (`makes: Some`) should keep the portions box exactly "
-        f"as it was -- Helen: 'retain the previous guess':\n{some}"
+        "cherry-glaze (`makes: Some`) should keep the portions box, word and "
+        f"`~` -- Helen: 'retain the previous guess':\n{some}"
+    )
+    assert "data-whole-recipes" in some, (
+        "cherry-glaze should step in WHOLE RECIPES -- Helen: 'if \"some\" is "
+        "originally guessed to be 4 portions, 2x should be 8 portions' -- "
+        f"and its input no longer says so:\n{some}"
     )
     served = _scale_control(prod_site, "moules-mariniere") or ""
     assert 'data-portions="4"' in served and "data-made" not in served, (
         f"a `serves:` recipe's scaler should be untouched:\n{served}"
+    )
+    assert "data-whole-recipes" not in served, (
+        "a `serves:` recipe steps a portion at a time (#1005); moules "
+        f"marinière has been marked for whole-recipe steps:\n{served}"
     )
 
 

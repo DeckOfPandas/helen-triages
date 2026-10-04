@@ -328,8 +328,8 @@
   /* =========================================================================
      WHAT THE SCALER'S BOX COUNTS -- portions, or the thing made (#1286)
      =========================================================================
-     A MODE is four small answers the wiring asks for, and recipe-scale.js
-     holds no arithmetic of its own for either kind:
+     A MODE is five small answers the wiring asks for, and recipe-scale.js
+     holds no arithmetic of its own for any kind:
 
        base        the figure the recipe is written for; factor = value / base
        clamp(n)    a typed or stepped value, made into one the box can hold
@@ -337,24 +337,77 @@
        box(n)      what the input shows
        word(n)     what follows the input, or null to leave the markup alone
 
-     THE BOX IS AN INTEGER THROUGHOUT -- Helen: "Our scaler is integer." It
-     never shows a fraction of the count. */
+     TWO WAYS OF STEPPING, and which one a recipe gets is the whole of #1286:
 
-  /* PORTIONS -- #1005, unchanged: whole people, never fewer than one. */
-  function portionsMode(base) {
+     A `serves:` RECIPE STEPS ONE PORTION AT A TIME (#1005, unchanged): four
+     portions of a recipe for six is x0.67.
+
+     EVERY `makes:` RECIPE STEPS IN WHOLE RECIPES -- x1, x2, x3 -- and the box
+     shows what that many recipes make. Helen, 2026-10-04: "the buttons should
+     still multiply the recipe in integers, just showing number of waffles. So
+     1x is 5 waffles, 2x is 10 waffles. Otherwise we'll need to start showing
+     eggs in units of 1/27 or something." And for a yield with no number: 'if
+     "some" is originally guessed to be 4 portions, 2x should be 8 portions.'
+     So waffles, millilitres, dozens, 8-inch cakes and guessed portions are
+     ONE shape: `wholeRecipes` below. A typed figure goes to the nearest
+     whole multiple (8 on the waffles is 10).
+
+     AND ONE STEP BELOW ONE RECIPE: x½, WHERE THE BUILD ALLOWS IT. Helen:
+     "Half a recipe would be great where the numbers aren't insane! Can we
+     judge that?" and, on the shape, "not having half recipes in between
+     integers, just between 0 and 1". So the steps are ½, 1, 2, 3 ... and
+     never 1½. `half` is the build's verdict (_plugins/food_half_recipe.rb,
+     `data-half-recipe`); this file does not judge. With it, minus at one
+     recipe gives a half, and a typed figure under three quarters of a recipe
+     is a half. Without it the floor is one recipe and minus there does
+     nothing, with no message. */
+  function wholeRecipes(base, box, word, half) {
+    function multiple(n) {
+      var m = n / base;
+      if (half && m < 0.75) return 0.5;
+      return Math.max(1, Math.round(m));
+    }
+    return {
+      base: base,
+      clamp: function (n) { return multiple(n) * base; },
+      step: function (n, delta) {
+        var m = multiple(n);
+        if (m === 0.5) return (delta > 0 ? 1 : 0.5) * base;
+        if (m === 1 && delta < 0) return (half ? 0.5 : 1) * base;
+        return (m + delta) * base;
+      },
+      box: box,
+      word: word
+    };
+  }
+
+  /**
+   * The mode for a control that says "portions".
+   *
+   * @param {number} base - how many the recipe feeds
+   * @param {boolean} [whole] - true on a `makes:` recipe whose yield has no
+   *        count to show ("Some"): the box still says portions, and steps in
+   *        whole recipes -- 4, 8, 12
+   * @param {boolean} [half] - the build's verdict that x½ is offered
+   */
+  function portionsMode(base, whole, half) {
+    var box = function (n) { return String(n); };
+    var word = function () { return null; };       // the markup's word stands
+    if (whole) return wholeRecipes(base, box, word, half);
     return {
       base: base,
       clamp: function (n) { return Math.max(1, Math.round(n)); },
       step: function (n, delta) { return n + delta; },
-      box: function (n) { return String(n); },
-      word: function () { return null; }
+      box: box,
+      word: word
     };
   }
 
-  /* A MIDPOINT ON A HALF IS SHOWN AS A RANGE OF ONE -- Helen: "Midpoints that
+  /* A FIGURE ON A HALF IS SHOWN AS A RANGE OF ONE -- Helen: "Midpoints that
      land on a half can become a range of one." 4–7 is 5.5 and reads "5–6";
-     the ingredients still scale against the true 5.5. _plugins/food_yield.rb
-     `box` is this rule for the page as built. */
+     two recipes are 11 and read "11"; three are 16.5 and read "16–17". The
+     ingredients scale by the whole multiple, so the half never reaches them.
+     _plugins/food_yield.rb `box` is this rule for the page as built. */
   function yieldBox(value) {
     if (value === Math.floor(value)) return String(value);
     return Math.floor(value) + '–' + Math.ceil(value);
@@ -366,29 +419,25 @@
     return words.join(' ');
   }
 
-  /* THE THING MADE, AGREEING WITH THE NUMBER BESIDE IT. The line was written
-     for the recipe's own count, so the noun only has to move when the number
-     crosses one: "one 8-inch cake" is written for one and takes a plural at
-     two; "12 fairy cakes" is written for several and loses it at one. A range
-     of one ("5–6") is several.
+  /* THE THING MADE, AGREEING WITH THE NUMBER BESIDE IT. A line written for
+     ONE takes a plural at two ("one 8-inch cake"); a line written for several
+     loses it only at exactly one, which a half recipe can reach ("2 burgers"
+     halved is "1 burger").
 
      THE NOUN IS THE LAST WORD OF THE STEM -- the part before any " of " --
-     and the plural is shopping-list.js's (`unitLabel`, `foldUnit`), the rule
-     every amount on the page already uses. `dozen mince pies` is INVARIABLE:
-     it is the dozen that is counted ('"1 dozen" doubled can be "two dozen"').
+     and the plural is shopping-list.js's `unitLabel`, the rule every amount
+     on the page already uses. `dozen mince pies` is INVARIABLE: it is the
+     dozen that is counted ('"1 dozen" doubled can be "two dozen"').
 
      `× ` IN FRONT OF A THING THAT OPENS WITH A DIGIT -- Helen: a digit
      directly before "8-inch" is unreadable. The box is a number, so the count
      cannot be spelled as a word; "2 × 8-inch cakes" is the form shown. */
   function thingText(spec, value) {
     var stem = String(spec.stem || '');
-    if (!spec.invariable) {
-      var one = value === 1;
-      if (spec.singular && !one) {
-        stem = replaceLast(stem, function (w) { return unitLabel(w, 2); });
-      } else if (!spec.singular && one) {
-        stem = replaceLast(stem, function (w) { return shoppingList.foldUnit(w); });
-      }
+    if (!spec.invariable && spec.singular && value !== 1) {
+      stem = replaceLast(stem, function (w) { return unitLabel(w, 2); });
+    } else if (!spec.invariable && !spec.singular && value === 1) {
+      stem = replaceLast(stem, function (w) { return shoppingList.foldUnit(w); });
     }
     return (spec.times ? '× ' : '') + stem + String(spec.rest || '');
   }
@@ -397,42 +446,29 @@
    * The scaler's mode for a recipe whose `makes:` line opens with a count.
    *
    * @param {Object} spec - `page.made`, as _plugins/food_yield.rb wrote it
+   * @param {boolean} [half] - the build's verdict that x½ is offered
    * @returns {Object|null} a mode (see above), or null for a spec it cannot use
    */
-  function yieldMode(spec) {
+  function yieldMode(spec, half) {
     if (!spec || !(Number(spec.base) > 0)) return null;
     var base = Number(spec.base);
 
-    /* A MEASURE SCALES BY WHOLE ORDERS OF THE RECIPE -- Helen: "950 ml for one
-       order of a recipe becomes 1900 ml for 2". Plus adds one order; a typed
-       figure goes to the nearest whole order; one order is the floor, because
-       half a batch is not a figure the box can hold. */
+    /* A MEASURE -- Helen: "950 ml for one order of a recipe becomes 1900 ml
+       for 2". */
     if (spec.kind === 'measure') {
       var unit = shoppingList.foldUnit(String(spec.unit || ''));
-      return {
-        base: base,
-        clamp: function (n) { return Math.max(1, Math.round(n / base)) * base; },
-        step: function (n, delta) { return n + delta * base; },
-        box: function (n) { return String(n); },
-        word: function (n) { return unitLabel(unit, n); }
-      };
+      /* Half of an odd measure is shown as a range of one, like a count:
+         125 ml halved reads "62–63 ml". */
+      return wholeRecipes(base, yieldBox,
+        function (n) { return unitLabel(unit, n); }, half);
     }
 
-    /* A COUNT STEPS BY ONE, and a midpoint on a half keeps its half: 5.5
-       ("5–6") plus one is 6.5 ("6–7"). A typed whole number is taken as
-       itself. The floor is the smallest value of the same kind: 1, or "1–2". */
-    var half = base !== Math.floor(base);
-    var floor = half ? 1.5 : 1;
-    return {
-      base: base,
-      clamp: function (n) {
-        var onHalf = half && (n * 2) % 2 === 1;
-        return Math.max(onHalf ? floor : 1, onHalf ? n : Math.round(n));
-      },
-      step: function (n, delta) { return n + delta; },
-      box: yieldBox,
-      word: function (n) { return thingText(spec, n); }
-    };
+    /* A COUNT. THE `+` OF "64+" TRAVELS WITH THE FIGURE -- Helen: "64+ tiny
+       macarons, 128+ tiny macarons". */
+    var more = spec.plus ? '+' : '';
+    return wholeRecipes(base,
+      function (n) { return yieldBox(n) + more; },
+      function (n) { return thingText(spec, n); }, half);
   }
 
   return {

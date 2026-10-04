@@ -8,6 +8,12 @@
 # of items made ... would be clearest to me. Never tell me how many cookies
 # are in a portion!!!" and then "Take the midpoint".
 #
+# THE BOX THEN STEPS IN WHOLE RECIPES, not waffle by waffle -- Helen: "the
+# buttons should still multiply the recipe in integers, just showing number of
+# waffles. So 1x is 5 waffles, 2x is 10 waffles. Otherwise we'll need to start
+# showing eggs in units of 1/27 or something." That is food-scale.js's job;
+# what it needs from here is the figure one recipe makes.
+#
 # THIS FILE ONLY READS THE LINE. It turns the text of `makes:` into what is
 # being counted, or into nil. _plugins/food_shopping.rb hangs the answer on
 # the document as `page.yield`, _layouts/recipe.html prints the control from
@@ -32,7 +38,9 @@
 #
 #   "4–6 waffles, depending on ..."  count 4..6, base 5         thing: waffles
 #   "12 fairy cakes"                 count 12                   thing: fairy cakes
-#   "64+ tiny macarons"              count 64 ('"64+" can be treated as "64"')
+#   "64+ tiny macarons"              count 64, and the `+` is kept: two recipes
+#                                    read "128+" ("64+ tiny macarons, 128+
+#                                    tiny macarons")
 #   "one 8-inch cake"                count 1, a NUMBER WORD     thing: 8-inch cake
 #   "1 dozen mince pies"             count 1, thing "dozen mince pies" -- the
 #                                    count stays in dozens ('"1 dozen" doubled
@@ -81,7 +89,7 @@ module HelenTriages
         end
       end
 
-      low, high, rest = leading_count(rest, vocab["number_words"] || {})
+      low, high, rest, plus = leading_count(rest, vocab["number_words"] || {})
       return nil if low.nil?
 
       measure = leading_measure(rest, Array(vocab["measures"]))
@@ -124,7 +132,9 @@ module HelenTriages
         "singular" => (low == 1 && high == 1),
         # "2 8-inch cakes" is unreadable -- Helen. The page puts a × between.
         "times" => stem.match?(/\A\d/),
-        "box" => box(base)
+        # "64+": at least this many. The mark stays on the figure as it scales.
+        "plus" => plus,
+        "box" => box(base) + (plus ? "+" : "")
       }
     end
 
@@ -137,27 +147,27 @@ module HelenTriages
       "#{value.floor}–#{value.ceil}"
     end
 
-    # [low, high, remainder] or [nil, nil, text].
+    # [low, high, remainder, plus] or [nil, nil, text, false].
     def leading_count(text, number_words)
       range = /\A(#{NUMBER})\s*(?:–|—|-|\s+to\s+)\s*(#{NUMBER})(?=\s|\z)/
       if (m = range.match(text))
         low, high = m[1].to_f, m[2].to_f
-        return [low, high, m.post_match.lstrip] if high >= low
+        return [low, high, m.post_match.lstrip, false] if high >= low
       end
 
       # A NUMBER MUST END AT A SPACE, A `+`, OR THE END. "8-inch cake" opens
       # with a digit and is not a count of anything: the hyphen says so.
       if (m = /\A(#{NUMBER})(\+)?(?=\s|\z)/.match(text))
         n = m[1].to_f
-        return [n, n, m.post_match.lstrip]
+        return [n, n, m.post_match.lstrip, !m[2].nil?]
       end
 
       number_words.each do |word, value|
         next unless (m = /\A#{Regexp.escape(word.to_s)}(?=\s)\s+/i.match(text))
-        return [value.to_f, value.to_f, m.post_match]
+        return [value.to_f, value.to_f, m.post_match, false]
       end
 
-      [nil, nil, text]
+      [nil, nil, text, false]
     end
 
     # The unit as written, if the line's count is of a declared measure.

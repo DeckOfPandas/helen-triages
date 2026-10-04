@@ -68,7 +68,8 @@
   /* PORTIONS, OR THE THING MADE -- #1286. A `makes:` recipe's control carries
      `data-made`, the build's reading of that line as JSON, and the box then
      counts waffles (or millilitres, or 8-inch cakes) and never portions --
-     Helen: "Never tell me how many cookies are in a portion!!!" Everything
+     Helen: "Never tell me how many cookies are in a portion!!!" It steps in
+     WHOLE RECIPES and shows what that many make: 5 waffles, 10, 15. Everything
      that differs between the two is in the MODE, which is HTF.foodScale's:
      this file asks it what a press of plus means and what the box should
      say, and holds no arithmetic for either. A `data-made` that cannot be
@@ -78,13 +79,22 @@
   var mode = null;
   if (input.hasAttribute('data-made')) {
     try {
-      mode = HTF.foodScale.yieldMode(JSON.parse(input.getAttribute('data-made')));
+      mode = HTF.foodScale.yieldMode(
+        JSON.parse(input.getAttribute('data-made')),
+        input.hasAttribute('data-half-recipe'));
     } catch (e) {
       mode = null;
     }
   } else {
     var people = parseInt(input.getAttribute('data-portions'), 10);
-    if (people > 0) mode = HTF.foodScale.portionsMode(people);
+    /* `data-whole-recipes`: a `makes:` recipe with no count to show keeps
+       the word "portions" and steps 4, 8, 12 -- whole recipes, like every
+       other `makes:` recipe. A `serves:` recipe has no such mark. */
+    if (people > 0) {
+      mode = HTF.foodScale.portionsMode(people,
+        input.hasAttribute('data-whole-recipes'),
+        input.hasAttribute('data-half-recipe'));
+    }
   }
   if (!mode) return;
   var base = mode.base;
