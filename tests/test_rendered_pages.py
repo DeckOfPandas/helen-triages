@@ -3234,43 +3234,156 @@ def _topped_pages(built_site):
     return pages
 
 
-def test_a_topped_drink_spends_the_midpoint_of_its_declared_range(prod_site):
-    """Helen, 2026-09-17: "Midpoint please, I'll cope on the spot."
+# =============================================================================
+# A `(top)` IS SIZED FROM ITS GLASS -- #1179, 2026-10-04
+# =============================================================================
+# Helen, 2026-10-01: "find typical capacities... Then use those to estimate top
+# amounts? It really doesn't need to be exact, let's say +- 50 ml would be
+# fine." `fitted_top_ml` in _plugins/cocktail_units.rb is the rule; these read
+# what it printed. Until then a top spent the midpoint of its declared range
+# whatever it was poured into ("Midpoint please, I'll cope on the spot",
+# 2026-09-17), and that midpoint is still what a top falls back to.
 
-    THE MIDPOINT, NOT EITHER END, and that is the whole of what this checks.
-    `top_up_ml` declares 100-150 for soda water; the Tom Collins pours
-    60 + 30 + 22.5 = 112.5 ml before it, so the three answers a plausible bug
-    could give are 212.5 (`ml_min`), 237.5 (the midpoint) and 262.5 (`ml_max`).
-    Read out of costs.yml rather than typed here, so changing the house range
-    changes this test's expectation with it -- the claim is about the RULE.
+SCALE_ATTRS = re.compile(r'<div class="cocktail-scale-controls"([^>]*)>')
 
-    It is also, quietly, the check that both callers still share one
-    expression: the footer's unit count has spent this midpoint since #297, and
-    `top_up_ml` in the plugin is now the one place either of them asks.
+
+def _scale_attrs(html):
+    found = SCALE_ATTRS.search(html)
+    assert found, "the page has no `.cocktail-scale-controls`"
+    return dict(re.findall(r'data-([a-z-]+)="([^"]*)"', found.group(1)))
+
+
+def _glass_top(icon, ice, family, build):
+    """What the glass leaves for a top, worked here from glasses.yml.
+
+    DELIBERATELY A SECOND WRITING OF THE SUM, in another language, from the
+    same data: the test is whether the plugin's arithmetic is the arithmetic
+    its header describes. The FIGURES are read, never typed, so a change to a
+    wash line or to Helen's dilutions moves the expectation with it.
     """
+    glasses = yaml.safe_load(
+        (ROOT / "_data" / "cocktails" / "glasses.yml").read_text(encoding="utf-8"))
+    rules = glasses["fit_rules"]
+    capacity = glasses["typical_ml"][icon]["median"]
+    wash = capacity * rules["washline"]["stemmed" if icon in rules["stemmed"] else "tumbler"]
+    if ice in rules["ice_space"]:
+        wash *= 1 - rules["ice_space"][ice]["low"]
+    served = build * (1 + rules["dilution"][family]["low"])
+    return 5 * round((wash - served) / 5)
+
+
+def _midpoint(generic):
     costs = yaml.safe_load(
         (ROOT / "_data" / "cocktails" / "costs.yml").read_text(encoding="utf-8"))
-    soda = (costs.get("top_up_ml") or {}).get("soda water")
-    assert soda, "costs.yml declares no `top_up_ml` for soda water"
-    midpoint = (float(soda["ml_min"]) + float(soda["ml_max"])) / 2
+    row = (costs.get("top_up_ml") or {}).get(generic)
+    assert row, f"costs.yml declares no `top_up_ml` for {generic}"
+    return (float(row["ml_min"]) + float(row["ml_max"])) / 2
 
+
+TOP_DRINK = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "{glass}"\ngarnish:\n  - "no garnish"\n{serve}'
+    'ingredients:\n  - amount: "{gin} ml"\n    generic: "London dry gin"\n'
+    '  - amount: "(top)"\n    generic: "{topper}"\n'
+    'method:\n  - "{method}"\n  - "Top up."\n'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  made_before: true\n  ship: "yes"\n'
+    '  rewritten: true\n  awaiting_fix: false\n  proofread: true\n---\n'
+)
+SHAKE = "Shake the gin with ice."
+STIR = "Stir the gin with ice."
+
+TOP_CASES = {
+    # slug: (glass, serve block, gin ml, topper, method,
+    #        (icon, ice, family) when the glass answers, else None)
+    "zzz-top-flute": ("flute", 'serve:\n  ice: "none"\n', 60, "champagne", SHAKE,
+                      ("flute", "none", "shake")),
+    "zzz-top-highball-cubed": ("highball", 'serve:\n  ice: "cubed"\n', 50,
+                               "soda water", STIR, ("highball", "cubed", "stir")),
+    # THE THREE WAYS BACK TO THE HOUSE RANGE that a fixture can show.
+    "zzz-top-no-serve": ("flute", "", 60, "champagne", SHAKE, None),
+    "zzz-top-full-glass": ("flute", 'serve:\n  ice: "none"\n', 150, "champagne",
+                           SHAKE, None),
+    "zzz-top-punch-bowl": ("punch bowl", 'serve:\n  ice: "none"\n', 60,
+                           "champagne", SHAKE, None),
+}
+_in_the_fixture_build({
+    f"_cocktail_recipes/{slug}.md": TOP_DRINK.format(
+        t=slug, glass=glass, serve=serve, gin=gin, topper=topper, method=method)
+    for slug, (glass, serve, gin, topper, method, _) in TOP_CASES.items()})
+
+
+def test_a_top_is_sized_from_its_glass_and_falls_back_to_the_house_range(fixture_site):
+    """#1179. Capacity to the wash line, less the ice, less the watered build.
+
+    AND THE MIDPOINT WHEREVER THAT SUM HAS NO ANSWER: no `serve.ice` (absent
+    means undecided), a build that already fills the glass (150 ml shaken into
+    a flute is a question about the glass, not a drink topped with nothing),
+    and a punch bowl (which holds a batch). The page says which it did, in
+    `data-top-from`, so scripts/glass_fit_report.py and this test never have
+    to work it out again.
+
+    FIXTURES, because only the Tom Collins and three flute drinks are topped
+    AND published, none of them falls back, and a draft is something a public
+    test may never require (#624).
+    """
+    problems = []
+    for slug, (_, _, gin, topper, _, fits) in TOP_CASES.items():
+        page = fixture_site / "cocktails" / "recipes" / slug / "index.html"
+        assert page.exists(), f"{slug} did not build"
+        attrs = _scale_attrs(page.read_text(encoding="utf-8"))
+        if fits:
+            want_top, want_from = _glass_top(*fits, build=gin), "glass"
+            assert want_top > 0, f"{slug}: this fixture was meant to fit its glass"
+        else:
+            want_top, want_from = _midpoint(topper), "range"
+        got = (float(attrs.get("top-ml", "nan")), attrs.get("top-from"),
+               float(attrs.get("total-ml", "nan")))
+        want = (float(want_top), want_from, float(gin + want_top))
+        if got != want:
+            problems.append(f"{slug}: (top, from, total) is {got}, expected {want}")
+    assert not problems, (
+        "a `(top)` is not what its glass leaves room for (`fitted_top_ml`, "
+        "_plugins/cocktail_units.rb):\n  " + "\n  ".join(problems)
+    )
+
+
+def test_the_tom_collins_tops_with_what_a_highball_leaves(prod_site):
+    """ONE REAL DRINK WITH A REAL NUMBER IN IT -- and the units beside it.
+
+    60 + 30 + 22.5 = 112.5 ml, short-shaken, over cubed ice in a highball. The
+    day this landed that left 90 ml for the soda and a total of 202.5, against
+    the 125 and 237.5 the midpoint of soda water's 100-150 had printed since
+    2026-09-17. The expectation is worked from glasses.yml, so re-surveying the
+    highball moves it; what it pins is that the PAGE and the rule agree.
+
+    It replaces `test_a_topped_drink_spends_the_midpoint_of_its_declared_range`
+    and keeps that test's second job: the footer's "in a serving of Y ml" is
+    read here too, so the unit count's sentence and the volume cannot have
+    asked two different questions about the top.
+    """
     page = prod_site / "cocktails" / "recipes" / "tom-collins" / "index.html"
     assert page.exists(), "the Tom Collins is not in the production build"
     html = page.read_text(encoding="utf-8")
+    attrs = _scale_attrs(html)
 
-    total = SCALE_TOTAL.search(html)
-    assert total, (
-        "the Tom Collins prints no volume. Since 2026-09-17 a topped drink "
-        "takes the midpoint of its declared range rather than withholding."
+    build = 60 + 30 + 22.5
+    top = _glass_top("highball", "cubed", "short_shake", build)
+    assert attrs.get("top-from") == "glass", (
+        "the Tom Collins' top came from the house range, not its glass: "
+        f"{attrs}. It has a highball, `serve.ice: cubed` and a build that fits."
     )
-    expected = 60 + 30 + 22.5 + midpoint
-    assert float(total.group(1)) == expected, (
-        f"the Tom Collins totals {total.group(1)} ml; its build is "
-        f"60 + 30 + 22.5 = 112.5 and soda water's declared "
-        f"{soda['ml_min']}-{soda['ml_max']} ml has midpoint {midpoint}, so it "
-        f"should be {expected}. `ml_min` would give "
-        f"{112.5 + float(soda['ml_min'])} and `ml_max` "
-        f"{112.5 + float(soda['ml_max'])}."
+    assert float(attrs["total-ml"]) == build + top, (
+        f"the Tom Collins totals {attrs['total-ml']} ml; its build is {build} "
+        f"and a highball leaves {top} ml for the soda, so it should be "
+        f"{build + top}. The old midpoint would give {build + _midpoint('soda water')}."
+    )
+    units = UNITS_LINE.search(html)
+    serving = units and SERVING_OF.search(" ".join(units.group(1).split()))
+    assert serving and float(serving.group(1)) == build + top, (
+        "the units line's serving is not the volume the scaler carries: "
+        f"{serving.group(1) if serving else 'no serving printed'} against "
+        f"{build + top}."
     )
 
 

@@ -2960,6 +2960,46 @@ unless stated.
   figures diverge the instant the scaler is touched, which is the point of
   having both.
 
+- **2026-10-04, #1179 #1116 — a `(top)` is sized from its glass, and the
+  midpoint is what it falls back to.** Helen, on #1179, 2026-10-01: *"We have
+  researched typical heights for all our kinds of glasses. Can we add to that
+  data, and find typical capacities? Then use those to estimate top amounts?
+  It really doesn't need to be exact, let's say +- 50 ml would be fine."* #1238
+  had already landed the capacities, so this is the sum #1076 said the repo
+  could not run: the first listed glass at its surveyed median, to the wash
+  line, less the serving ice, less the watered build, rounded to 5 ml
+  (`fitted_top_ml`, `_plugins/cocktail_units.rb`). It reads the same end of
+  every `fit_rules` range the fit report reads, so the report's "room left for
+  the top" and the top the site counts are one number.
+  - **She set the dilutions herself on seeing the first figures**: *"Let's use
+    these figures for dilution please: stirred: 20%. Shaken: 27.5%. Short
+    shake 15%."* They replace the sourced ranges (0.25–0.50, 0.33–0.60,
+    0.15–0.30) on both ends of each pair in `glasses.yml`. The fit report
+    went from 24 flagged to 22 with them.
+  - **What moved, published**: Airmail and Julien Sorel 87.5 → 100 ml of
+    champagne; Tom Collins 125 → 90 ml of soda (237.5 → 202.5 ml);
+    **Arrack Christmas Punch 87.5 → 5 ml, and 4.8 → 3.8 units**, which is
+    #1116. Its 135 ml build, shaken, is 172 ml in a flute that takes 176: the
+    3.7 units of spirit were always most of the figure, and the champagne was
+    the part the glass has no room for. Whether that is the glass or the
+    recipe is #1244's question, and hers.
+  - **The 2026-09-17 ruling is narrowed, not reversed.** *"Midpoint please,
+    I'll cope on the spot"* still decides every top the glass cannot answer
+    for: no `serve.ice`, no surveyed glass, a punch bowl, `serves:` above 1,
+    two tops, or a build that leaves nothing. Bicicletta (a draft with no
+    `serve` block) is the one drink on it today.
+  - **Costing and the shopping list were left on the declared range**, said
+    here so it is not found as a bug: a price is already a range.
+  - **Two more `to top` literals the #1217 rename missed, in the suite**
+    (#1273 found the seventh): `test_top_up_volumes_cover_every_to_top_pour`
+    and `test_every_counted_pour_can_reach_a_strength` both compared against
+    the old spelling and had examined no topped pour since 2026-09-26. Both
+    pass on the real data now that they read it.
+  - **`method_family` moved from `scripts/glass_fit_report.py` into the
+    plugin**, and the report reads `data-method-family` and `data-top-ml` off
+    the page: the top needs the reading at build time, and two readings of one
+    method in two languages is the drift this section keeps writing about.
+
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
 - **2026-08-16** — Ingredients are additive, never a choose-one (asked

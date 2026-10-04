@@ -118,6 +118,15 @@ module HelenTriages
       @top_up   = costs["top_up_ml"] || {}
       @defaults = costs["default_bottles"] || {}
 
+      # WHAT EACH GLASS HOLDS, AND THE RULES FOR FILLING ONE -- #1179. Read for
+      # `fitted_top_ml` below and for nothing else. Absent (a fixture site with
+      # no glasses.yml) simply means every top falls back to its house range.
+      glasses   = site.data.dig("cocktails", "glasses") || {}
+      @icons    = glasses["icons"] || {}
+      @survey_only = glasses["survey_only_types"] || {}
+      @typical  = glasses["typical_ml"] || {}
+      @fit      = glasses["fit_rules"]
+
       @non_alcoholic = (@abv["non_alcoholic"] || []).to_set
       # READ FROM THE VOCABULARY, NOT RESTATED -- DIFFERENCE 5 above. The list
       # a bitters is declared in is the list that excludes it.
@@ -144,18 +153,32 @@ module HelenTriages
       approximate = 0
       measured = 0
       withheld = 0
+      from_glass = 0
+      from_range = 0
       COLLECTIONS.each do |key|
         next unless site.collections[key]
         site.collections[key].docs.each do |doc|
-          units = units_for(doc.data["ingredients"], doc.data["serves"])
+          # ASKED ONCE PER DRINK AND HANDED TO BOTH SUMS, so the unit count and
+          # the volume cannot disagree about what the top pours.
+          fitted = fitted_top_ml(doc.data)
+
+          units = units_for(doc.data["ingredients"], doc.data["serves"], fitted)
           if units
             doc.data["units"] = units
             counted += 1
             approximate += 1 unless units["exact"]
           end
 
-          volume = volume_for(doc.data["ingredients"], doc.data["serves"])
+          volume = volume_for(doc.data["ingredients"], doc.data["serves"], fitted)
           if volume
+            if volume["top_ml"]
+              volume["top_from"] = fitted ? "glass" : "range"
+              fitted ? from_glass += 1 : from_range += 1
+            end
+            # The dilution family the method reads as, for
+            # scripts/glass_fit_report.py -- one reading of a method, here,
+            # rather than a second one in Python.
+            volume["method_family"] = method_family(doc.data["method"])
             doc.data["volume"] = volume
             measured += 1
           else
@@ -165,6 +188,8 @@ module HelenTriages
       end
       Jekyll.logger.info "Units:", "counted #{counted} drinks " \
         "(#{approximate} approximate, abv filled #{@abv['filled']})"
+      Jekyll.logger.info "Tops:", "#{from_glass} sized from the glass, " \
+        "#{from_range} from the house range (no glass, no serve, or no room)"
       # NAMED SEPARATELY FROM THE UNIT COUNT because the two withhold for
       # different reasons and a session reading one log line should not have to
       # work out which. `withheld` is the honest half of #1121 -- see
@@ -282,10 +307,148 @@ module HelenTriages
     # the collection is a single generic today, so this has never been
     # exercised; it is kept because deleting it would be a silent change of
     # rule rather than a simplification.)
-    def top_up_ml(generics)
+    #
+    # `fitted` IS THE GLASS'S ANSWER, WHEN IT HAS ONE -- #1179, and see
+    # `fitted_top_ml`. It replaces the midpoint; it does not replace the
+    # DECLARATION. A topper with no declared range is still a gap and still
+    # returns nil, so test_top_up_volumes_cover_every_to_top_pour keeps its
+    # meaning and the fallback is always there to fall back to.
+    def top_up_ml(generics, fitted = nil)
       tops = Array(generics).filter_map { |g| @top_up[g] }
       return nil if tops.empty?
+      return fitted if fitted
       tops.map { |t| (t["ml_min"].to_f + t["ml_max"].to_f) / 2.0 }.max
+    end
+
+    # =========================================================================
+    # WHAT A `(top)` POURS, FROM THE GLASS IT IS POURED INTO -- #1179.
+    # =========================================================================
+    # Helen, 2026-10-01: "We have researched typical heights for all our kinds
+    # of glasses. Can we add to that data, and find typical capacities? Then
+    # use those to estimate top amounts? It really doesn't need to be exact,
+    # let's say +- 50 ml would be fine."
+    #
+    # THIS IS THE SUM #1076 SAID THE REPO COULD NOT RUN, and #1238 is what made
+    # it runnable: a top fills the glass, so it is
+    #
+    #     the glass to its wash line, less the room the serving ice takes,
+    #     less the build once shaking or stirring has watered it
+    #
+    # Every figure is `fit_rules` and `typical_ml` in glasses.yml -- the
+    # surveyed MEDIAN glass and the FORGIVING (low) end of each sourced range,
+    # which is the reading scripts/glass_fit_report.py takes, on purpose: the
+    # report's "room left for the top" and the top the site counts are now the
+    # same number, where stacked middles flagged a Tom Collins in a highball
+    # (DECISIONS §9.11, 2026-09-28).
+    #
+    # ROUNDED TO THE NEAREST 5 ml. The inputs are a median across a dozen
+    # glasses and a dilution read off the method's verbs; "91.08 ml" would
+    # claim a precision she explicitly did not ask for.
+    #
+    # IT ANSWERS nil, AND THE HOUSE RANGE'S MIDPOINT STANDS ("Midpoint please,
+    # I'll cope on the spot", 2026-09-17), WHEREVER THE SUM HAS NOTHING TO SAY:
+    #
+    #   - no `serve.ice`. Absent means undecided (#838), and the ice is a third
+    #     of a tumbler -- guessing it is guessing the answer.
+    #   - no glass, a glass nobody surveyed, or a punch bowl (which holds a
+    #     batch and is not what a top fills).
+    #   - `serves:` above 1 -- the primed trap in `volume_for`'s header.
+    #   - more than one `(top)` pour: they share the room and nothing says how.
+    #   - THE BUILD ALREADY FILLS THE GLASS. The Arrack Christmas Punch shakes
+    #     135 ml into a flute that takes about 176, and that is a question
+    #     about the glass or the recipe (#1244 asks it), not a drink topped
+    #     with nothing.
+    #
+    # THE FIRST GLASS LISTED IS THE GLASS. A second is an alternative Helen
+    # picks at the cupboard, and the page has one figure to print.
+    def fitted_top_ml(data)
+      return nil unless @fit
+      ingredients = data["ingredients"]
+      return nil unless ingredients.is_a?(Array)
+      return nil if data["serves"].to_i > 1
+
+      serve = data["serve"]
+      return nil unless serve.is_a?(Hash) && serve["ice"]
+      ice = serve["ice"].to_s
+
+      glass = Array(data["glass"]).first.to_s.downcase
+      key = glass_key(glass)
+      return nil if key.nil? || key == "punch-bowl"
+      stats = @typical[key] or return nil
+
+      tops = 0
+      build = 0.0
+      ingredients.each do |ing|
+        next unless ing.is_a?(Hash)
+        number, unit = unit_named(ing["amount"].to_s.strip)
+        if unit == "(top)"
+          tops += 1
+        elsif number && @per_ml.key?(unit)
+          build += number * @per_ml[unit].to_f
+        end
+      end
+      return nil unless tops == 1
+
+      family = method_family(data["method"])
+      room = glass_room(stats["median"].to_f, ice, family, key, serve["fill"])
+      top = room - served_ml(build, family)
+      rounded = (top / 5.0).round * 5
+      rounded.positive? ? rounded.to_f : nil
+    end
+
+    # The key `typical_ml` files a glass under: its icon, or a
+    # `survey_only_types` entry where one drawing has two sizes.
+    def glass_key(glass)
+      @survey_only.each do |key, spec|
+        return key if Array(spec && spec["spellings"]).include?(glass)
+      end
+      @icons[glass]
+    end
+
+    # THE DILUTION FAMILY A METHOD READS AS. First match wins. A heuristic
+    # over the method's own verbs, and it says so.
+    #
+    # MOVED HERE FROM scripts/glass_fit_report.py (#1179), which now reads
+    # this answer off the built page as `data-method-family` instead of
+    # keeping its own: the report and the top must read a method the same way,
+    # and one reading in one language is how.
+    #
+    # Blend first (a frozen drink may be shaken too). A short shake, a whip,
+    # or a shake "with a few pieces" of ice is the light one. A shake whose
+    # every mention is `dry` has no wet dilution and gets its own family. A
+    # pitcher filled with ice and stirred is a stir.
+    def method_family(steps)
+      text = Array(steps).map { |s| s.to_s.downcase }.join(" ")
+      return "blended" if text.include?("blend")
+      return "short_shake" if text.match?(/short shake|whip|shake with (a few|three)/)
+      return "shake" if text.match?(/(?<!dry )shake/)
+      return "dry_shake_only" if text.include?("dry shake")
+      return "stir" if text.match?(/stir[^.]*with ice|pitcher[^.]*ice/)
+      return "swizzle" if text.include?("swizzle")
+      "build"
+    end
+
+    # Millilitres of drink a glass of this capacity takes, on the forgiving
+    # end. The same sum as `room` in scripts/glass_fit_report.py, which keeps
+    # its own because it asks it of three capacities (min, median, max) and
+    # this asks it of one.
+    def glass_room(capacity, ice, family, key, fill)
+      return capacity if family == "blended"
+      stemmed = Array(@fit["stemmed"]).include?(key)
+      wash = capacity * @fit["washline"][stemmed ? "stemmed" : "tumbler"].to_f
+      if @fit["ice_space"].key?(ice)
+        space = @fit["ice_space"][ice]["low"].to_f
+        space *= @fit["half_fill"].to_f if fill.to_s == "half"
+        return wash * (1 - space)
+      end
+      return wash - @fit["large_cube_ml"]["low"].to_f if ice == "large cube"
+      wash
+    end
+
+    # What the build becomes in the glass, on the forgiving end.
+    def served_ml(build, family)
+      return build * @fit["blended_multiplier"]["low"].to_f if family == "blended"
+      build * (1 + @fit["dilution"][family]["low"].to_f)
     end
 
     # One decimal place, AND AN INTEGER WHERE THE FIGURE IS A WHOLE NUMBER OF
@@ -354,9 +517,11 @@ module HelenTriages
     # `data-total-ml` the glass-fit report reads, so the rule stands; only the
     # sentence this paragraph argues from does not.
     #
-    # WHEN `capacity_ml:` LANDS IN glasses.yml, `top_up_ml` stops being a house
-    # range and this stops being an approximation. Nothing here has to change;
-    # the figure simply gets better.
+    # THE CAPACITIES LANDED (#1238) AND THE TOP IS NOW SIZED FROM THE GLASS --
+    # #1179, 2026-10-04, `fitted_top_ml`. The midpoint above is what a top
+    # falls back to where the glass has no answer, so her ruling still decides
+    # those drinks and the argument she overruled is no longer needed for the
+    # rest.
     #
     # --- AND WHEN THERE IS NO FIGURE TO PRINT AT ALL -------------------------
     # TWO REMAINING WAYS, AND THEY ARE A DIFFERENT KIND OF THING FROM THE TOP.
@@ -397,10 +562,11 @@ module HelenTriages
     # No topped drink declares `serves:` today, so the two rules have never
     # disagreed on a real drink -- and a test asserts exactly that, so the
     # first topped punch is a red build rather than a quietly wrong number.
-    def volume_for(ingredients, serves)
+    def volume_for(ingredients, serves, fitted = nil)
       return nil unless ingredients.is_a?(Array) && !ingredients.empty?
 
       total = 0.0
+      top = nil
       pours = 0
       substantial = 0
 
@@ -416,10 +582,14 @@ module HelenTriages
         # such a pour instead, which is right there and wrong here (a missing
         # strength costs a fraction of a unit, a missing top is most of the
         # drink).
+        #
+        # SINCE #1179 THE GLASS ANSWERS FIRST and the midpoint is the fallback:
+        # see `fitted_top_ml`. Either way it is `top_up_ml` that is asked.
         if unit == "(top)"
-          topped = top_up_ml(Array(ing["generic"]).map(&:to_s))
+          topped = top_up_ml(Array(ing["generic"]).map(&:to_s), fitted)
           return nil if topped.nil?
           total += topped
+          top = (top || 0.0) + topped
           pours += 1
           next
         end
@@ -450,6 +620,10 @@ module HelenTriages
       n = 1 if n < 1
 
       {
+        # How much of the total is a `(top)`, or nil on a drink with none.
+        # Unprinted: scripts/glass_fit_report.py takes it back out of the
+        # total to judge the build on its own.
+        "top_ml"   => top && tidy_ml(top),
         # The recipe as written. The scaler multiplies this and nothing else.
         "total_ml" => tidy_ml(total),
         # One glass, and the figure the units line prints beside a per-serving
@@ -460,7 +634,7 @@ module HelenTriages
       }
     end
 
-    def units_for(ingredients, serves)
+    def units_for(ingredients, serves, fitted = nil)
       return nil unless ingredients.is_a?(Array) && !ingredients.empty?
 
       total = 0.0
@@ -478,12 +652,13 @@ module HelenTriages
         next if !generics.empty? && generics.all? { |g| @bitters.include?(g) }
 
         # --- how much liquid, if any ---------------------------------------
-        # A `to top` is a declared RANGE, so its midpoint is the best single
-        # figure available. It only makes the drink approximate if what is
-        # being topped with contains alcohol -- see DIFFERENCE 1 above.
+        # A `(top)` is what the glass leaves room for (#1179), or its declared
+        # range's midpoint where the glass cannot say. An estimate either way:
+        # it only makes the drink approximate if what is being topped with
+        # contains alcohol -- see DIFFERENCE 1 above.
         topped = false
         if amount == "(top)"
-          ml = top_up_ml(generics)
+          ml = top_up_ml(generics, fitted)
           next if ml.nil?
           topped = true
         else

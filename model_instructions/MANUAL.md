@@ -2151,18 +2151,25 @@ reads no volume**: `data-total-ml` carries the ×1 figure as an unprinted
 attribute on `.cocktail-scale-controls`, for `scripts/glass_fit_report.py` and
 the volume tests. `HTF.scale.batchTotalMl`, which multiplied it, is deleted.
 
-**A `to top` SPENDS ITS DECLARED RANGE'S MIDPOINT** — Helen, 2026-09-17:
-*"Midpoint please, I'll cope on the spot."* One expression, `top_up_ml` in the
-plugin, asked by both the unit count (which has spent it since #297) and the
-volume, so the two sentences on a topped drink can never disagree about what
-the top pours. Tom Collins: 112.5 ml of build plus soda water's 100–150 halved
-= 237.5 ml. The line that printed it said "Approximately", which carried the
-declared 50 ml span; since #1257 the figure reaches the reader only through
-the footer's "Roughly … in a serving of 237.5 ml". The argument she overruled is kept in
-`volume_for`'s header: `top_up_ml` is one range per topper whatever the drink,
-and #1076 showed it is a stand-in for a sum this repo cannot run (capacity −
-build − room for the ice; no glass records a capacity, #295). Make it again
-only if a figure looks silly on a real glass.
+**A `(top)` IS SIZED FROM ITS GLASS — #1179, 2026-10-04.** Helen: *"find
+typical capacities… Then use those to estimate top amounts? It really doesn't
+need to be exact, let's say +- 50 ml would be fine."* `fitted_top_ml` in the
+plugin: the first glass listed, at its surveyed median, filled to the wash
+line, less the room `serve.ice` takes, less the build once the method has
+watered it (§9.11.2's `fit_rules`, the same reading the fit report takes),
+rounded to 5 ml. Tom Collins: 112.5 ml short-shaken over cubes in a highball
+leaves 90, so 202.5 ml. Asked once per drink and handed to both the unit count
+and the volume, so the two can never disagree about what the top pours.
+
+**IT FALLS BACK TO THE DECLARED RANGE'S MIDPOINT** (Helen, 2026-09-17:
+*"Midpoint please, I'll cope on the spot."*) wherever that sum has no answer:
+no `serve.ice` (absent means undecided), no surveyed glass, a punch bowl,
+`serves:` above 1, more than one `(top)`, or a build that already fills the
+glass. So `top_up_ml` in `costs.yml` still has to declare every topper, and
+`test_top_up_volumes_cover_every_to_top_pour` still says so. The page carries
+which it did as `data-top-from="glass|range"` beside `data-top-ml`, unprinted.
+**Costing and the shopping list still spend the declared range**, not the
+glass's figure: a price is already a range and nobody asked for it to move.
 
 **IT STILL WITHHOLDS WHERE A FIGURE WOULD BE WRONG RATHER THAN ROUGH, and two
 published cocktails say nothing.** The Caipirinha — 45 ml of cachaça, half a lime,
@@ -2512,7 +2519,16 @@ break them in the kitchen."* Nothing records the cupboard, and nothing should.
 - **`fit_rules` are the rules**: dilution per method family, blended volume,
   wash line, ice space, the large cube, punch cups. Each is a sourced
   `{low, high}` range, because the sources disagree and a single figure hides
-  which way. The wash line is a single figure because it IS the rule.
+  which way. The wash line is a single figure because it IS the rule. **The
+  three wet dilutions are Helen's own figures since 2026-10-04** — stirred
+  20%, shaken 27.5%, short shake 15% — written on both ends of the pair; the
+  sourced ranges she chose against are in the file's comment and do not come
+  back from the research.
+- **The rules now DECIDE something as well as flag it**: a `(top)` is sized
+  from them (§9.3.6, #1179). So the reading of a method into a dilution
+  family lives in the plugin (`method_family`), and the report reads it off
+  the page as `data-method-family`, with `data-top-ml` for how much of the
+  total is the top.
 - **`python3 scripts/glass_fit_report.py`** builds the site with the local
   config (drafts render there), reads each drink's `data-total-ml` — the
   plugin's own figure, never a second parse — and writes a GitHub checklist to

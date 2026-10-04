@@ -262,8 +262,12 @@ layout: default
        scripts/glass_fit_report.py and the volume tests read it -- the plugin's
        sum (`volume_for` in _plugins/cocktail_units.rb), never a second one.
        No script reads it. No `page.volume`, no attribute.
+       `data-top-ml` (how much of that total is a `(top)`, #1179) and
+       `data-method-family` (the dilution family the plugin read the method
+       as) ride beside it for the same reader, the fit report, and are as
+       unprinted as it is.
        MANUAL §9.3.6 / DECISIONS §9.3.6. {% endcomment %}
-    <div class="cocktail-scale-controls"{% if page.volume %} data-total-ml="{{ page.volume.total_ml }}"{% endif %} hidden>
+    <div class="cocktail-scale-controls"{% if page.volume %} data-total-ml="{{ page.volume.total_ml }}"{% if page.volume.top_ml %} data-top-ml="{{ page.volume.top_ml }}" data-top-from="{{ page.volume.top_from }}"{% endif %} data-method-family="{{ page.volume.method_family }}"{% endif %} hidden>
       {% comment %} THE STEP BUTTONS share the box's `hidden` wrapper, so one reveal
          shows all three. `−` is U+2212, not a hyphen. Wordless on purpose; each
          click goes through `apply()`, the function a typed value reaches.

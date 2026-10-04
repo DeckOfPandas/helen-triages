@@ -648,11 +648,21 @@ base_centre:
 #                         STEMMED glass filling under half its wash line reads
 #                         as a mistake. Tumblers are exempt: a short neat pour
 #                         in a rocks glass is how a Sazerac is meant to look.
+#
+# THE THREE WET DILUTIONS ARE HELEN'S FIGURES SINCE 2026-10-04 (#1179), and no
+# longer a range: "Let's use these figures for dilution please: stirred: 20%.
+# Shaken: 27.5%. Short shake 15%." She gave them on seeing what a `(top)`
+# would pour once it was sized from the glass, which is the first thing on the
+# site these figures decide rather than merely flag. Both ends carry her
+# number, so every reader of {low, high} keeps working and none can pick a
+# different one. The sourced ranges above are what she chose against, kept as
+# the record of what the sources say: shake 0.33-0.60, short shake 0.15-0.30,
+# stir 0.25-0.50. Do not put them back from the research.
 fit_rules:
   dilution:
-    shake:          {low: 0.33, high: 0.60}
-    short_shake:    {low: 0.15, high: 0.30}
-    stir:           {low: 0.25, high: 0.50}
+    shake:          {low: 0.275, high: 0.275}
+    short_shake:    {low: 0.15, high: 0.15}
+    stir:           {low: 0.20, high: 0.20}
     build:          {low: 0, high: 0}
     swizzle:        {low: 0, high: 0}
     dry_shake_only: {low: 0, high: 0}

@@ -8474,7 +8474,10 @@ def test_top_up_volumes_cover_every_to_top_pour(drink_file):
     declared = _costs().get("top_up_ml") or {}
     missing = []
     for ing in drink_file.fm.get("ingredients") or []:
-        if not isinstance(ing, dict) or str(ing.get("amount", "")).strip() != "to top":
+        # `(top)` SINCE #1217. This compared against `to top` until 2026-10-04
+        # and so had examined no pour at all since the rename -- the same
+        # fault as #1273, in the one test `top_up_ml`'s fallback rests on.
+        if not isinstance(ing, dict) or str(ing.get("amount", "")).strip() != "(top)":
             continue
         generics = ing.get("generic")
         generics = generics if isinstance(generics, list) else [generics]
@@ -8533,7 +8536,7 @@ def test_every_priceable_pour_has_a_price(drink_file):
         if not isinstance(ing, dict):
             continue
         amount = str(ing.get("amount", "")).strip()
-        if amount in excluded or amount == "to top":
+        if amount in excluded or amount == "(top)":
             continue
         match = re.match(r"^([\d.]+)\s+(.*)$", amount)
         if not match:
@@ -8915,7 +8918,12 @@ def test_every_counted_pour_can_reach_a_strength(drink_file):
         if generics and all(str(g) in bitters for g in generics):
             continue
 
-        if amount == "to top":
+        # `(top)`, NOT `to top`, SINCE #1217. This was an EIGHTH literal the
+        # rename missed (#1273 found the seventh), found on 2026-10-04 while
+        # #1179 was changing what a top pours: on the old spelling a top fell
+        # through to the regex below, matched nothing and was skipped, so no
+        # topper was ever asked for a strength.
+        if amount == "(top)":
             if not any(str(g) in top_up for g in generics):
                 continue  # not a topped-up volume we model; contributes nothing
         else:

@@ -27,8 +27,12 @@ twice beats two. THIS REPORT READS THE FORGIVING END OF EVERY RANGE, so a flag
 means the drink does not fit even on the kindest reading of the sources; the
 first run took the middles and flagged a Tom Collins in a highball.
 
-What this file owns is only the READING of a drink's method into a dilution
-family, which is a heuristic over the method steps and says so.
+THE READING OF A METHOD INTO A DILUTION FAMILY IS THE PLUGIN'S TOO, since
+#1179: `method_family` in `_plugins/cocktail_units.rb`, carried on the page as
+`data-method-family`. It was here until a `(top)` began to be sized from the
+glass, which needs the same reading at build time -- and two readings of one
+method, in two languages, is the disagreement this file's second paragraph is
+about. It is still a heuristic over the method's verbs and still says so.
 """
 import argparse
 import html
@@ -47,6 +51,11 @@ OUT = ROOT / "tmp" / "glass_fit_report.md"
 # On the scaler's controls since #1257 (2026-10-02), when the visible
 # "Approximately X ml" line that used to carry it was removed.
 TOTAL_ML = re.compile(r'class="cocktail-scale-controls" data-total-ml="([\d.]+)"')
+# Beside it since #1179: how much of that total is a `(top)`, and the dilution
+# family the plugin read the method as. Both are the plugin's answers, so this
+# report and the site cannot read one drink two ways.
+TOP_ML = re.compile(r'class="cocktail-scale-controls"[^>]* data-top-ml="([\d.]+)"')
+FAMILY = re.compile(r'class="cocktail-scale-controls"[^>]* data-method-family="([a-z_]+)"')
 
 
 def front_matter(path):
@@ -70,38 +79,15 @@ def drinks():
             pathlib.Path("cocktails/drafts") / rel / "index.html"
 
 
-def method_family(steps):
-    """The dilution family a drink's method reads as. First match wins.
+def top_least(ingredients, top_up):
+    """The least the declared range allows a `(top)` to pour.
 
-    Blend first (a frozen drink may be shaken too). A short shake, a whip, or a
-    shake "with a few pieces" of ice is the light one. A shake whose every
-    mention is `dry` has no wet dilution and gets its own family so the report
-    can say so. A pitcher filled with ice and stirred is a stir.
+    That is what a glass must leave room for. What the top actually SPENDS is
+    no longer worked out here: since #1179 the plugin sizes it from the glass
+    (or falls back to the range's midpoint) and the page says which figure is
+    inside its total, as `data-top-ml`.
     """
-    text = " ".join(str(s).lower() for s in steps or [])
-    if "blend" in text:
-        return "blended"
-    if re.search(r"short shake|whip|shake with (a few|three)", text):
-        return "short_shake"
-    if re.search(r"(?<!dry )shake", text):
-        return "shake"
-    if "dry shake" in text:
-        return "dry_shake_only"
-    if re.search(r"stir[^.]*with ice|pitcher[^.]*ice", text):
-        return "stir"
-    if "swizzle" in text:
-        return "swizzle"
-    return "build"
-
-
-def top_ml(ingredients, top_up):
-    """(midpoint, ml_min) of what the `(top)` pours spend.
-
-    The midpoint is what the plugin's `top_up_ml` spends, so it is what is
-    inside the page's total and has to come back out of it. `ml_min` is the
-    least the declared range allows, which is what a glass must leave room for.
-    """
-    mid = least = 0.0
+    least = 0.0
     for ing in ingredients or []:
         if str(ing.get("amount", "")).strip() != "(top)":
             continue
@@ -109,9 +95,8 @@ def top_ml(ingredients, top_up):
         generics = generics if isinstance(generics, list) else [generics]
         tops = [top_up[g] for g in generics if g in top_up]
         if tops:
-            mid += max((t["ml_min"] + t["ml_max"]) / 2 for t in tops)
             least += max(t["ml_min"] for t in tops)
-    return mid, least
+    return least
 
 
 def stats_key(glass, glasses):
@@ -158,14 +143,16 @@ HOW = {
 }
 
 
-def check(fm, total, glasses, rules, top_up):
-    """(context line, [(glass, verdict, detail)]) for one drink."""
+def check(fm, total, top, family, glasses, rules, top_up):
+    """(context line, [(glass, verdict, detail)]) for one drink.
+
+    `total`, `top` and `family` are the plugin's, read off the built page.
+    """
     serve = fm.get("serve") or {}
     ice = serve.get("ice") or "none"
     fill = serve.get("fill")
-    family = method_family(fm.get("method"))
     serves = int(fm.get("serves") or 1)
-    top, top_least = top_ml(fm.get("ingredients"), top_up)
+    least = top_least(fm.get("ingredients"), top_up)
     served = served_ml(total - top, family, rules)
     per_glass = served / serves
 
@@ -199,7 +186,7 @@ def check(fm, total, glasses, rules, top_up):
             verdict = "over"
         elif per_glass > typical:
             verdict = "tight"
-        elif top and typical - per_glass < top_least:
+        elif top and typical - per_glass < least:
             verdict = "top"
         elif up_in_a_stem and per_glass + top < rules["lost_below"] * smallest:
             verdict = "lost"
@@ -213,7 +200,8 @@ def check(fm, total, glasses, rules, top_up):
                 f"{s['min']}–{s['max']})")
         if top:
             note += (f"; that leaves ~{max(typical - per_glass, 0):.0f} ml for a top "
-                     f"the site counts as {top:g} ml (at least {top_least:g})")
+                     f"the site counts as {top:g} ml (the house range says "
+                     f"at least {least:g})")
         results.append((glass, verdict, note))
 
     how = HOW[family].format(d=rules["dilution"].get(family, {}).get("low", 0),
@@ -229,7 +217,7 @@ WORDS = {
     "tight": "too big for a typical one",
     "lost": "**lost even in the smallest surveyed glass**",
     "small": "under half a typical one",
-    "top": "no room for the top the site counts",
+    "top": "less room for a top than the house range expects",
     "cup": "a big pour for a punch cup",
     "unchecked": "not checked",
 }
@@ -270,7 +258,16 @@ def main(argv=None) -> int:
         if not m:
             unchecked.append(f"- {label} ({where}): the site withholds its volume")
             continue
-        context, results = check(fm, float(m.group(1)), glasses, rules,
+        text = built.read_text(encoding="utf-8")
+        top = TOP_ML.search(text)
+        family = FAMILY.search(text)
+        if not family:
+            unchecked.append(f"- {label} ({where}): the page carries no "
+                             "`data-method-family`; is the build stale?")
+            continue
+        context, results = check(fm, float(m.group(1)),
+                                 float(top.group(1)) if top else 0.0,
+                                 family.group(1), glasses, rules,
                                  costs.get("top_up_ml") or {})
         # A drink with several glasses is fine if ANY of them fits: the list is
         # alternatives, and Helen picks at the cupboard.
