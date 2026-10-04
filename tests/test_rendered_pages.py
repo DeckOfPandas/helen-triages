@@ -95,15 +95,21 @@ _COPY_IGNORE = shutil.ignore_patterns(
 
 
 @contextlib.contextmanager
-def built_with_fixtures(name, files):
+def built_with_fixtures(name, files, local=False):
     """Build the PRODUCTION site from a copy of the tree, plus `files`.
 
     `files` maps a repo-relative path to its text. Yields the output directory;
     removes the copy and the output afterwards whatever happens.
 
-    PRODUCTION CONFIG ALONE (`_config.yml`), because every caller is testing
-    the publish gate or the rendered drink page as the world sees it. A local
-    build would publish drafts and answer a different question.
+    PRODUCTION CONFIG ALONE (`_config.yml`) UNLESS ASKED, because nearly every
+    caller is testing the publish gate or the rendered drink page as the world
+    sees it. A local build would publish drafts and answer a different question.
+
+    `local=True` ADDS `_config_local.yml`, FOR THE ONE QUESTION THAT IS ABOUT
+    THE LOCAL BUILD (#1201): what a row says about a dish the gate holds back.
+    Production cannot answer it -- the gate has removed the dish before the
+    index renders -- and the `site` session build cannot either, because it is
+    the real tree and may hold no fixture.
     """
     _require_bundler()
     src = ROOT / "tmp" / f"_fixture_src_{name}"
@@ -117,10 +123,13 @@ def built_with_fixtures(name, files):
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(text, encoding="utf-8")
 
+        configs = [src / "_config.yml"]
+        if local:
+            configs.append(src / "_config_local.yml")
         result = subprocess.run(
             ["bundle", "exec", "jekyll", "build",
              "--source", str(src),
-             "--config", str(src / "_config.yml"),
+             "--config", ",".join(str(c) for c in configs),
              "--destination", str(out)],
             cwd=ROOT, capture_output=True, text=True, timeout=600,
         )
@@ -889,22 +898,55 @@ def test_an_unproofread_recipe_does_not_reach_the_production_build(fixture_site)
 #
 # A FIXTURE DISH, BECAUSE THE REAL COLLECTION IS HERS TO FILL and was empty
 # when this was written -- the index had been carrying a `magic bag` mark that
-# no build had rendered for four weeks. Two entries, differing in one key, in
-# the copy of the tree and never in `_food_magic_bag/` itself.
+# no build had rendered for four weeks. Three entries, differing only in the
+# two gate flags, in the copy of the tree and never in `_food_magic_bag/`.
+#
+# AND A SECOND RULING, 2026-10-04, after she had looked at the first build: "a
+# recipe can have magic bag AND draft. Always sit magic bag on the right." A
+# magic-bag dish the publish gate holds back is a draft -- it is not on the
+# live site, which is what `draft` on a row has always meant -- so locally its
+# row says `draft` then `magic bag`. One held-back fixture per gate leg, because
+# a dish failing both would pass whichever leg the template forgot to read.
 MAGIC_BAG_MARK_FIXTURE = (
     '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
     'main_ingredients: ["salt"]\ningredients:\n  - "salt"\n'
-    'meta:\n  awaiting_fix: false\n  proofread: {proofread}\n---\n'
+    'meta:\n  awaiting_fix: {awaiting_fix}\n  proofread: {proofread}\n---\n'
 )
 MAGIC_BAG_MARK = '<span class="badge badge-magic-bag">magic bag</span>'
 DRAFT_MARK = '<span class="badge badge-draft">draft</span>'
 MARK_SLOT = re.compile(r'<div class="badge-group-meta">(.*?)</div>', re.S)
 
-_in_the_fixture_build({
-    f"_food_magic_bag/{slug}.md":
-        MAGIC_BAG_MARK_FIXTURE.format(t=slug, proofread=value)
-    for slug, value in {"zzz-magic-bag-mark": "true",
-                        "zzz-magic-bag-unread": "false"}.items()})
+MAGIC_BAG_LIVE = "zzz-magic-bag-mark"
+MAGIC_BAG_HELD_BACK = {                     # slug -> (awaiting_fix, proofread)
+    "zzz-magic-bag-unread": ("false", "false"),
+    "zzz-magic-bag-awaiting": ("true", "true"),
+}
+MAGIC_BAG_MARK_FILES = {
+    f"_food_magic_bag/{slug}.md": MAGIC_BAG_MARK_FIXTURE.format(
+        t=slug, awaiting_fix=awaiting_fix, proofread=proofread)
+    for slug, (awaiting_fix, proofread) in
+    {MAGIC_BAG_LIVE: ("false", "true"), **MAGIC_BAG_HELD_BACK}.items()}
+
+_in_the_fixture_build(MAGIC_BAG_MARK_FILES)
+
+
+@pytest.fixture(scope="module")
+def local_fixture_site():
+    """The LOCAL build of a copy of the tree holding the magic-bag fixtures.
+
+    ONE MORE BUILD, AND IT IS THE ONLY WAY TO SEE THIS. #1271 took this module
+    from six fixture builds to one, so a second is not added lightly. But the
+    shared build is production, where the gate removes a held-back dish before
+    the index renders, and `draft` beside `magic bag` exists only where the
+    gate is skipped. Reading the template instead is what the first version of
+    these tests did, and it pinned the ORDER of two spans while saying nothing
+    about which rows get both.
+
+    Its own files and nobody else's: the other fixtures in the shared build
+    are gate fixtures, and a local build would publish every one of them.
+    """
+    with built_with_fixtures("local", MAGIC_BAG_MARK_FILES, local=True) as out:
+        yield out
 
 
 def _index_rows(html: str) -> dict[str, str]:
@@ -929,7 +971,7 @@ def test_a_magic_bag_dish_carries_the_quiet_mark_where_draft_goes(fixture_site):
 
     THE CONTROLS ARE THREE. A recipe's row must have the slot EMPTY, or "the
     mark is present" would be satisfied by a template that prints it on every
-    row. The unproofread twin must have no page and no row, or the mark would
+    row. The held-back twins must have no page and no row, or the mark would
     be advertising a link the gate withheld (#235's shape). And no row on a
     production index may say `draft`, which is the half of Helen's sentence
     that makes the slot the magic bag's own there.
@@ -939,16 +981,21 @@ def test_a_magic_bag_dish_carries_the_quiet_mark_where_draft_goes(fixture_site):
         "The proofread magic-bag fixture built no page, so nothing below is "
         "about the mark: the collection, its permalink or the gate has changed."
     )
-    assert not (out / "food" / "magic-bag" / "zzz-magic-bag-unread" / "index.html").exists(), (
-        "A magic-bag entry with `meta.proofread: false` was PUBLISHED."
+    published = [slug for slug in MAGIC_BAG_HELD_BACK
+                 if (out / "food" / "magic-bag" / slug / "index.html").exists()]
+    assert not published, (
+        "Magic-bag entries the gate should hold back were PUBLISHED: "
+        f"{published}."
     )
 
     html = (out / "food" / "index.html").read_text(encoding="utf-8")
     rows = _index_rows(html)
 
-    assert "/food/magic-bag/zzz-magic-bag-unread/" not in rows, (
-        "The production index lists a magic-bag dish the gate held back, "
-        "linking to a page that was never written."
+    listed = [slug for slug in MAGIC_BAG_HELD_BACK
+              if f"/food/magic-bag/{slug}/" in rows]
+    assert not listed, (
+        "The production index lists magic-bag dishes the gate held back, "
+        f"linking to pages that were never written: {listed}."
     )
     assert "/food/magic-bag/zzz-magic-bag-mark/" in rows, (
         "The proofread magic-bag fixture has no row on the production index. "
@@ -973,8 +1020,56 @@ def test_a_magic_bag_dish_carries_the_quiet_mark_where_draft_goes(fixture_site):
     )
 
 
-def test_the_magic_bag_mark_is_the_draft_marks_look_and_sits_beside_it(fixture_site):
-    """One CSS rule for both marks, and one container, magic bag first.
+def test_a_held_back_magic_bag_dish_says_draft_then_magic_bag_locally(local_fixture_site):
+    """Locally, a dish the gate holds back carries BOTH marks, `magic bag` on
+    the right; a publishable one carries `magic bag` alone.
+
+    Helen, 2026-10-04: "a recipe can have magic bag AND draft. Always sit magic
+    bag on the right." `.badge-group-meta` is a flex row packed to its
+    right-hand end, so the mark written LAST is the rightmost, and the order
+    of the spans in the built row is the order on the screen.
+
+    ONE FIXTURE PER GATE LEG. `draft` here means what the publish gate means:
+    not `awaiting_fix: false` AND `proofread: true`. A template that read only
+    `proofread` would mark the unread dish and miss the one awaiting a fix,
+    which is the dish Helen is most certainly still working on.
+
+    THE CONTROLS: the publishable dish must NOT say `draft`, or a template
+    that marks every magic-bag row passes; and a real recipe's slot must be
+    empty, or one that marks every row does.
+    """
+    out = local_fixture_site
+    html = (out / "food" / "index.html").read_text(encoding="utf-8")
+    rows = _index_rows(html)
+
+    both = "".join((DRAFT_MARK + MAGIC_BAG_MARK).split())
+    for slug in MAGIC_BAG_HELD_BACK:
+        url = f"/food/magic-bag/{slug}/"
+        assert (out / "food" / "magic-bag" / slug / "index.html").exists(), (
+            f"The local build wrote no page for {slug}. The local build skips "
+            "the gate so that the dishes being worked on can be read."
+        )
+        assert url in rows, f"{slug} has no row on the LOCAL index."
+        got = _mark_slot(rows[url])
+        assert got == both, (
+            f"{slug} is held back by the publish gate, so locally its row "
+            "should say `draft` then `magic bag` -- magic bag on the right. "
+            f"It holds: {got!r}"
+        )
+
+    live = _mark_slot(rows[f"/food/magic-bag/{MAGIC_BAG_LIVE}/"])
+    assert live == "".join(MAGIC_BAG_MARK.split()), (
+        "A magic-bag dish that passes the gate should carry `magic bag` alone "
+        f"on the local index too. It holds: {live!r}"
+    )
+    control = _mark_slot(rows["/food/recipes/caramel/"])
+    assert control == "", (
+        f"A published recipe's row is marked on the local index: {control!r}."
+    )
+
+
+def test_the_magic_bag_mark_is_the_draft_marks_look_and_is_written_last(fixture_site):
+    """One CSS rule for both marks, and one container, magic bag LAST.
 
     "QUIET" IS HELEN'S WORD and the draft mark is the look she pointed at, so
     this reads the COMPILED stylesheet: every rule that styles one mark must
@@ -982,11 +1077,10 @@ def test_the_magic_bag_mark_is_the_draft_marks_look_and_sits_beside_it(fixture_s
     because neither declared anything, while `.badge-draft` declared a tint and
     a text colour and `.badge-magic-bag` did not. A comment is not a check.
 
-    THE LOCAL HALF IS READ FROM THE TEMPLATE, NOT A BUILD. "Next to it on the
-    local site" needs a draft, and the drafts are a private clone a CI
-    checkout does not have; the fixture build is production, where no row is
-    a draft. What can be pinned everywhere is that both marks are written into
-    the one slot, in that order.
+    THE TEMPLATE HALF IS THE CHEAP TWIN of the local-build test above, and
+    says why when that one goes red: both marks in the one slot, `magic bag`
+    after `draft`, and the slot still packed to its right-hand end -- which is
+    what turns "written last" into "on the right".
     """
     css = (fixture_site / "assets" / "css" / "food.css").read_text(encoding="utf-8")
     styled = [{s.strip() for s in selector.split(",")}
@@ -1015,8 +1109,17 @@ def test_the_magic_bag_mark_is_the_draft_marks_look_and_sits_beside_it(fixture_s
         "The `magic bag` and `draft` marks are no longer written into the same "
         ".badge-group-meta on food/index.html, so they cannot sit side by side."
     )
-    assert slot.index(MAGIC_BAG_MARK) < slot.index(DRAFT_MARK), (
-        "`draft` is now written before `magic bag` in the slot."
+    assert slot.index(DRAFT_MARK) < slot.index(MAGIC_BAG_MARK), (
+        "`magic bag` is written before `draft` in the slot, which puts it on "
+        "the LEFT. Helen, 2026-10-04: \"Always sit magic bag on the right.\""
+    )
+    packed_right = [body for selector, body in _rules(css)
+                    if selector.split(",")[-1].strip().endswith(".badge-group-meta")
+                    and re.search(r"justify-content:\s*flex-end", body)]
+    assert packed_right, (
+        "`.badge-group-meta` is no longer `justify-content: flex-end` in the "
+        "built food.css, so the last mark written is not at the right-hand "
+        "end of the row and a lone `magic bag` has moved."
     )
     row_tags = [line for line in template.splitlines() if "<li data-url=" in line]
     assert len(row_tags) == 1, "food/index.html no longer has exactly one row tag."
