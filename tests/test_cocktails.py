@@ -4828,7 +4828,7 @@ def test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note():
     `tests/test_drafts.py::test_a_draft_has_a_notes_slot_and_no_unlabelled_note`
     is the food half and carries the argument. DRAFTS ONLY -- a published drink
     with nothing to say still writes `notes: []`, and its notes are held to the
-    stricter filled-pair rule.
+    stricter filled-pair rule, `test_a_published_drink_note_is_a_filled_pair`.
     """
     bad = []
     for drink in _load_draft_files():
@@ -4849,6 +4849,101 @@ def test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note():
           'labels an unlabelled note `"QQ"`. See .claude/commands/'
           "tidy-drafts.md."
     )
+
+
+# Published drinks whose note has text and no label, on the day the rule below
+# was written. SHRINK-ONLY: Helen writes the label at her next proofread of the
+# drink and the entry goes. Nothing may be added -- a new drink meets the rule.
+# The label is her word for what the note is about, so it was not invented for
+# her, and writing one would also have taken the drink off the site (#367).
+UNLABELLED_NOTE_ON_2026_10_04 = {"gin-sour"}
+
+
+def _published_note_problem(note) -> str | None:
+    """Why this note is not a filled `{label, text}` pair, or None if it is."""
+    if not isinstance(note, dict):
+        return f"is a bare {type(note).__name__}, not a `{{label, text}}` mapping"
+    missing = sorted({"label", "text"} - set(note))
+    if missing:
+        return ("is missing " + " and ".join(f"`{k}`" for k in missing)
+                + " (check for a key typo, e.g. `note:` for `text:`)")
+    extra = sorted(set(note) - {"label", "text"})
+    if extra:
+        return ("carries " + " and ".join(f"`{k}`" for k in extra)
+                + ", which nothing renders")
+    for key in ("label", "text"):
+        if not (isinstance(note[key], str) and note[key].strip()):
+            return f"has an empty `{key}`"
+    return None
+
+
+def test_a_published_drink_note_is_a_filled_pair():
+    """Every note on a published drink is `{label, text}`, both written.
+
+    THE RULE WAS STATED AND NOTHING ENFORCED IT. The test above has said since
+    2026-10-02 that a published drink's notes "are held to the stricter
+    filled-pair rule". Food has that rule (`test_note_dicts_have_label_and_text`);
+    drinks did not, and it was found on 2026-10-04 by breaking a published
+    drink's note four ways and watching this module stay green each time.
+
+    WHAT EACH SHAPE DOES ON THE PAGE, read off `_layouts/cocktail.html`:
+
+      - `note:` typed for `text:` -- the body is empty, so the layout skips the
+        note. It VANISHES from the page with no error anywhere. This is the one
+        that matters, and the same typo the food rule was written for.
+      - an empty `label`, or a bare string -- the note prints under the literal
+        word "note".
+      - the draft placeholder `{label: "", text: ""}` left in at promotion --
+        prints nothing, and is noise in the file.
+
+    Helen, 2026-10-04, asked which of these a published drink may do: "Require
+    a real label". PUBLISHED ONLY, through `_load_published`, so it runs in CI:
+    a draft's empty halves are placeholders and the test above owns those.
+    """
+    bad = []
+    excused = set()
+    checked = 0
+    for slug, fm in _load_published():
+        for i, note in enumerate(fm.get("notes") or [], 1):
+            checked += 1
+            problem = _published_note_problem(note)
+            if problem is None:
+                continue
+            if slug in UNLABELLED_NOTE_ON_2026_10_04 and problem == "has an empty `label`":
+                excused.add(slug)
+                continue
+            bad.append(f"{slug} note {i} {problem} -- {note!r}")
+    assert checked, (
+        "No published drink carries a note, so this compared nothing -- there "
+        "were 39 on 78 drinks when it was written."
+    )
+    assert not bad, (
+        "Published drink note(s) that are not a filled `{label, text}` pair:\n  "
+        + "\n  ".join(bad)
+        + "\n\nThe label is the word on the note's tab and is Helen's to write. "
+          "A drink with nothing to say writes `notes: []`."
+    )
+    stale = sorted(UNLABELLED_NOTE_ON_2026_10_04 - excused)
+    assert not stale, (
+        f"UNLABELLED_NOTE_ON_2026_10_04 still excuses {stale}, which no longer "
+        f"has an unlabelled note. Delete the entry: an exception that excuses "
+        f"nothing is where the next one hides."
+    )
+
+
+def test_the_published_note_check_sees_each_broken_shape():
+    """The check above passes on today's drinks, so prove each shape fails it."""
+    assert _published_note_problem({"label": "Rum", "text": "Any aged rum works."}) is None
+    for broken in (
+        "Any aged rum works.",
+        {"label": "Rum", "note": "Any aged rum works."},
+        {"label": "Rum", "text": "Any aged rum works.", "note": "x"},
+        {"label": "", "text": "Any aged rum works."},
+        {"label": "Rum", "text": ""},
+        {"label": "", "text": ""},
+        {"label": "Rum", "text": None},
+    ):
+        assert _published_note_problem(broken), broken
 
 
 def test_no_method_step_restates_to_serve_or_garnish():

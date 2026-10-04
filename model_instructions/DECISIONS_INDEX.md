@@ -384,6 +384,7 @@ argument and the rules each field is read by.
 - 2026-09-29 · §10 · a proof by mutation can be fooled by Python's bytecode cache.
 - 2026-10-02 · §10 · #1271 · the suite was slow in three places, not everywhere, and skipping tests by changed path was the wrong lever.
 - 2026-10-04 · §10 · #1194 · the drafts get no CI of their own, and the question is closed.
+- 2026-10-04 · §10 · #1194 · the audit that entry owed: every drafts check has a published-side twin except one, and that one was a rule nobody enforced.
 - 2026-09-19 · §11 · "Pushed" is not "she can see it", and the drinks half is always the one that needs the extra step.
 - 2026-09-19 · §11 · A narrow suite stops being the right check the moment a commit touches _data/.
 - 2026-09-24 · §11 · #1078 · An agent may correct or delete a note that a later ruling of Helen's has made false.
