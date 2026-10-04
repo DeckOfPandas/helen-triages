@@ -227,7 +227,8 @@ bottles:
   # move batch to batch, which is where the old guess came from. `Communal` is
   # the BLEND of four of them, deliberately made approachable, and it is bottled
   # at a flat 43%. Ten points, on a spirit poured neat.
-  "Clairin Communal":                 { abv: 43,   confidence: high }
+  # MOVED TO `generics:` BELOW ON 2026-10-04 (#1108), when each clairin became
+  # a generic of its own and this stopped being a bottle. The figure is the same.
   "Rhum Clément Créole Shrubb":       { abv: 40,   confidence: high }
   # HELEN'S OWN FIGURE, 2026-09-26: "18% ABV, £22". The bottle the `coconut
   # rhum` generic was declared for on 2026-09-20 and which had no entry
@@ -463,6 +464,11 @@ generics:
   Amaro Nonino:       { abv: 35,   confidence: high }
   # 30 CONFIRMED for Paolucci Amaro Ciociaro, bottled at 30% since 1873.
   Amaro Ciociaro:     { abv: 30,   confidence: high }
+  # A GENERIC SINCE 2026-10-04 (#1108); it was a bottle under `clairin` until
+  # then, at this same 43 (see the note where it stood, above). The other three
+  # clairins are declared and unpoured, and get a figure when a drink pours one:
+  # the single-village ones run into the fifties and move batch to batch.
+  Clairin Communal:   { abv: 43,   confidence: high }
 
   # --- genuinely a category, no bottle declared yet ----------------------
   Plymouth:               { abv: 41.2, confidence: high }

@@ -2657,6 +2657,21 @@ unless stated.
   Pic-a-de-Crop Punch IS served over a block, chosen by her, not inferred from
   its siblings.
 
+- **2026-10-04, #1108 — each clairin is its own generic; plain `clairin` is
+  retired.** Helen had first answered that Voodoo That You Do's generic was
+  `clairin` with Clairin Communal suggested, then reversed it on the issue:
+  *"I've changed my mind: Each type of clairin should be a generic because
+  they are not interchangeable. Clairin Vaval, Clairin Casimir, Clairin
+  Communal, Clairin Sajous (three of those aren't used yet but will be)."*
+  Asked how to apply it, she chose four generics with the unqualified word
+  gone. **Clairin Communal stopped being a bottle in the same change**: a
+  bottle under a generic of its own name prints "Clairin Communal (Clairin
+  Communal)", the Punt e Mes fault, so it is the Campari shape — one product,
+  declared once, its 43% and GBP 42 / 70cl moved unchanged to `generics:` in
+  `abv.yml` and `costs.yml`. The other three have no strength or price until a
+  drink pours one; do not guess them, the single-village clairins run into the
+  fifties and move batch to batch.
+
 ### §9.3.2 The bottle dictionary
 
 - **2026-09-07, #591** — **An agricole's origin goes on the BOTTLE, as

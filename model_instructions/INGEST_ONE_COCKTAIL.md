@@ -402,7 +402,8 @@ does not give one you cannot pick: that is a `QQ`.
 `caramel-forward Jamaican rum` · `lightly aged and filtered rum` ·
 `moderately aged rum` · `aged Demerara rum` ·
 `overproof Demerara rum, lightly aged` · `overproof Jamaican rum, unaged` ·
-`rhum agricole blanc` · `rhum agricole vieux` · `clairin` ·
+`rhum agricole blanc` · `rhum agricole vieux` · `Clairin Vaval` ·
+`Clairin Casimir` · `Clairin Communal` · `Clairin Sajous` ·
 `clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
 `coconut rum`
 

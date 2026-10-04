@@ -671,7 +671,17 @@ rum_styles:
   - "rhum agricole vieux"
   # Added to #314 after the first transcription. Haitian cane-juice spirit; a
   # category like cachaca or mezcal, so lowercase under the proper-noun rule.
-  - "clairin"
+  #
+  # FOUR GENERICS, ONE PER CLAIRIN, since 2026-10-04 (#1108), and the plain
+  # `clairin` is retired. Helen: "I've changed my mind: Each type of clairin
+  # should be a generic because they are not interchangeable... (three of
+  # those aren't used yet but will be)". Capitalised because each is a
+  # product's name, the `Chartreuse Jaune` case, not a category. Voodoo That
+  # You Do pours Communal and is the only drink using any of them today.
+  - "Clairin Vaval"
+  - "Clairin Casimir"
+  - "Clairin Communal"
+  - "Clairin Sajous"
   - "clear blended multi-region rum"
   # #314's amendment, 2026-08-29 -- were brand-generics in `rum_untyped`.
   # `blended overproof rum` is Guyana/Jamaica/Barbados at 69%, and it also gives
@@ -726,7 +736,10 @@ rum_groups:
     styles:
       - "rhum agricole blanc"
       - "rhum agricole vieux"
-      - "clairin"
+      - "Clairin Vaval"
+      - "Clairin Casimir"
+      - "Clairin Communal"
+      - "Clairin Sajous"
   - name: "Non-geographical"
     styles:
       - "clear blended multi-region rum"
@@ -961,7 +974,10 @@ card_names:
   # already the case for eight others (`clairin`, `coconut rum`, `cachaça`...).
   "rhum agricole blanc": "rhum agricole blanc"
   "rhum agricole vieux": "rhum agricole vieux"
-  "clairin": "clairin"
+  "Clairin Vaval": "Clairin Vaval"
+  "Clairin Casimir": "Clairin Casimir"
+  "Clairin Communal": "Clairin Communal"
+  "Clairin Sajous": "Clairin Sajous"
   # The brand-generics #314 permits because nothing generalises them. O.F.T.D.
   # earns its place: its item strings are `Overproof Navy rum` and `Navy rum
   # (float)`, both of which name other rums elsewhere in the collection.
@@ -1915,7 +1931,10 @@ family_of:
   "overproof Jamaican rum, unaged": rum
   "rhum agricole blanc": rum
   "rhum agricole vieux": rum
-  "clairin": rum
+  "Clairin Vaval": rum
+  "Clairin Casimir": rum
+  "Clairin Communal": rum
+  "Clairin Sajous": rum
   "clear blended multi-region rum": rum
   "pineapple rum": rum
   "blended overproof rum": rum
@@ -2033,6 +2052,10 @@ shopping_shelves:
 shelf_of:
   # spirits (52)
   Batavia arrack: spirits
+  Clairin Casimir: spirits
+  Clairin Communal: spirits
+  Clairin Sajous: spirits
+  Clairin Vaval: spirits
   Irish whiskey: spirits
   Japanese whisky: spirits
   London dry gin: spirits
@@ -2054,7 +2077,6 @@ shelf_of:
   cachaça: spirits
   calvados: spirits
   caramel-forward Jamaican rum: spirits
-  clairin: spirits
   clear blended multi-region rum: spirits
   coconut rum: spirits
   coconut-flower arrack: spirits
