@@ -640,8 +640,33 @@
     return totalFor(here.entries, here.step, k);
   }
 
+  /**
+   * A printed amount, split into its number and its one-word unit -- #1132.
+   *
+   * FOR THE ROWS THE LAYOUT MARKS `data-unit-quiet`, and only those: a pour
+   * whose unit the ingredient's name already says ("1 cube" of "sugar cube")
+   * or whose unit is `each`. The drink page prints the number alone and, for
+   * the first kind, the unit as the last word of the name; this is how
+   * cocktail-scale.js keeps doing that at a multiple. WHICH rows are quiet is
+   * _layouts/cocktail.html's decision and this function has no opinion on it.
+   *
+   * THE LAST SPACE, NOT THE FIRST: a range prints as "1 to 2 cubes", and the
+   * unit on a quiet row is one word by the layout's own rule. An amount with
+   * no space in it is all number.
+   *
+   * @param {string} text - "2 cubes", "3 each", "1 to 2 cubes", "3"
+   * @returns {{number: string, unit: string}}
+   */
+  function splitUnit(text) {
+    var shown = String(text === undefined || text === null ? '' : text).trim();
+    var at = shown.lastIndexOf(' ');
+    if (at === -1) return { number: shown, unit: '' };
+    return { number: shown.slice(0, at).trim(), unit: shown.slice(at + 1) };
+  }
+
   return {
     scale: scale,
+    splitUnit: splitUnit,
     floorMultiple: floorMultiple,
     totalMl: totalMl,
     multipleForTotal: multipleForTotal,

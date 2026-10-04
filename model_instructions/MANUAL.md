@@ -2333,6 +2333,34 @@ bare string as a one-item sequence — and a list `generic` joins with a quiet
 italic "or". `optional: true` renders as a plain word after the name; it is
 not food's `incidental` (that HIDES a line; this shows and marks it).
 
+**A unit the name already says is not printed twice** (#1132, Helen's whole
+report: *"1 cube sugar cube"*). The data is right and stays as it is —
+`amount: "1 cube"`, `generic: "sugar cube"` — and the line is fixed where it
+is PRINTED, in three places that share one rule:
+
+    1 cube + sugar cube            →  1    sugar cube
+    12 cubes + sugar cube          →  12   sugar cubes
+    8 leaves + kaffir lime leaves  →  8    kaffir lime leaves
+    1.5 each + passion fruit       →  1.5  passion fruit
+
+**The unit MOVES INTO THE NAME** when it is the name's own last word (compared
+folded to a singular), replacing that word as the amount wrote it — so the
+plural is always the amount's and nothing pluralises a generic. **`each` is
+never printed.** Only a one-word unit after the number, only a single
+`generic`, and never a one-word name. `16 cubes raw sugar` and `3 leaves basil`
+repeat nothing and are untouched.
+
+| where | how |
+|---|---|
+| `_layouts/cocktail.html` | decides at build: prints the number in `.cocktail-amount`, marks it `data-unit-quiet`, keeps the written amount in `data-amount`, and puts the unit in `.cocktail-unit-in-name` |
+| `assets/js/cocktail-scale.js` | obeys the mark and decides nothing: scales `data-amount` as ever, then writes the number to the amount and the unit to the slot (`HTF.scale.splitUnit`) |
+| `assets/js/shopping-list.js` | `quietUnit` — the same rule for the index's shopping list, where the label takes the plural (`13` `sugar cubes`); `generic` and each total's `unit` are unchanged |
+
+**The rule is stated twice, in Liquid and in `shopping-list.js`**, because the
+drink page is built before any script runs. `test_no_drink_page_says_a_unit_twice`
+reads every built page; `shopping-list.test.js` has the same pours. The cards
+print no amounts, so `_plugins/cocktail_card_ingredients.rb` is not involved.
+
 ### 9.10.1 Cards and search read the VOCABULARY, never the transcription
 
 `card_names` in `ingredients.yml` maps a generic to its card name; the

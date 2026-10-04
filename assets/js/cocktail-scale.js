@@ -260,6 +260,29 @@
     put(input, box(last));
   }
 
+  /* A UNIT THE NAME ALREADY SAYS IS NOT SAID TWICE -- #1132, "1 cube sugar
+     cube". The layout prints such a row as "1" beside "sugar cube", marks the
+     amount `data-unit-quiet`, and keeps the written "1 cube" in `data-amount`
+     -- which is what `original` above has always read first. So the
+     arithmetic is untouched and scales "1 cube" to "2 cubes" as ever; what
+     changes is only where the two halves are WRITTEN: the number in the
+     amount, the unit in the name's `.cocktail-unit-in-name` slot, giving "2"
+     beside "sugar cubes". An `each` row has no slot and its unit is dropped.
+
+     THE LAYOUT DECIDES WHICH ROWS, this only obeys the mark -- one rule, in
+     one place. Every unmarked row is written exactly as before. */
+  function show(span, text) {
+    if (!span.hasAttribute('data-unit-quiet')) {
+      span.textContent = text;
+      return;
+    }
+    var parts = HTF.scale.splitUnit(text);
+    span.textContent = parts.number;
+    var row = span.closest ? span.closest('.cocktail-ingredient') : null;
+    var slot = row && row.querySelector('.cocktail-unit-in-name');
+    if (slot && parts.unit) slot.textContent = parts.unit;
+  }
+
   /**
    * Render the drink at the nearest multiple it can actually be poured at.
    *
@@ -289,7 +312,7 @@
 
     last = n;
     spans.forEach(function (span, index) {
-      span.textContent = verdict.amounts[index];
+      show(span, verdict.amounts[index]);
     });
     /* Writing the amounts IS the column resize now (#1088): the list's
        `max-content` track re-measures on the text change, so the line that
