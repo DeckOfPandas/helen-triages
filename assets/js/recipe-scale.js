@@ -65,8 +65,29 @@
   var note = article.querySelector('.recipe-scale-note');
   if (!control || !input || !minus || !plus || !note) return;
 
-  var base = parseInt(input.getAttribute('data-portions'), 10);
-  if (!(base > 0)) return;
+  /* PORTIONS, OR THE THING MADE -- #1286. A `makes:` recipe's control carries
+     `data-made`, the build's reading of that line as JSON, and the box then
+     counts waffles (or millilitres, or 8-inch cakes) and never portions --
+     Helen: "Never tell me how many cookies are in a portion!!!" Everything
+     that differs between the two is in the MODE, which is HTF.foodScale's:
+     this file asks it what a press of plus means and what the box should
+     say, and holds no arithmetic for either. A `data-made` that cannot be
+     read leaves the control hidden, which is the rule for any control here
+     that cannot work. */
+  var word = control.querySelector('.recipe-scale-word');
+  var mode = null;
+  if (input.hasAttribute('data-made')) {
+    try {
+      mode = HTF.foodScale.yieldMode(JSON.parse(input.getAttribute('data-made')));
+    } catch (e) {
+      mode = null;
+    }
+  } else {
+    var people = parseInt(input.getAttribute('data-portions'), 10);
+    if (people > 0) mode = HTF.foodScale.portionsMode(people);
+  }
+  if (!mode) return;
+  var base = mode.base;
 
   var spans = Array.prototype.slice.call(
     article.querySelectorAll('.ingredient-amount-number')
@@ -158,7 +179,7 @@
   }
 
   function apply(wanted) {
-    var n = Math.max(1, Math.round(wanted));
+    var n = mode.clamp(wanted);
     var factor = n / base;
     var still = [];
 
@@ -193,7 +214,12 @@
     });
 
     last = n;
-    put(input, String(n));
+    put(input, mode.box(n));
+    /* The word after the box agrees with the number in it -- "1 waffle",
+       "2 × 8-inch cakes", "2 litres". Portions returns null: that word is the
+       markup's and never changes. */
+    var said = mode.word(n);
+    if (word && said !== null) word.textContent = said;
 
     /* HELEN'S LINE, #1088, 2026-09-20: "(Not scaled: salt, black pepper;
        olive oil)". Parenthesised, no full stop, and COMMAS between the names
@@ -235,14 +261,14 @@
   }
 
   function settle() {
-    input.value = String(last);
+    input.value = mode.box(last);
   }
 
   function step(delta) {
-    return function () { apply(last + delta); };
+    return function () { apply(mode.step(last, delta)); };
   }
 
-  input.value = String(base);
+  input.value = mode.box(base);
   control.hidden = false;
 
   input.addEventListener('input', redraw);

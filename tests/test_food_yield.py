@@ -1,0 +1,272 @@
+"""What a `makes:` line counts -- GitHub issue #1286.
+
+On a recipe whose yield is `makes:`, the recipe page's scaler counts THE THING
+MADE. Helen, 2026-10-04: "the scaler giving the number of items made ... would
+be clearest to me. Never tell me how many cookies are in a portion!!!"
+
+`_plugins/food_yield.rb` reads the line; this file asks it about every shape
+the collection writes. The parser is Ruby, and the house rule (MANUAL §11.2,
+and tests/test_food_shopping.py's own header) is that a Python copy of a Ruby
+rule is drift that passes while the site is wrong. So nothing here re-implements
+it: `scripts/food_yield.rb` runs the REAL module over a list of strings and
+prints what it made of each, and one subprocess answers the whole file.
+
+NO JEKYLL BUILD. The module is plain Ruby with no Jekyll in it, on purpose, so
+this is a tenth of a second and not twenty.
+"""
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+from pathlib import Path
+
+import pytest
+import yaml
+
+# Suite marker, so `pytest -m food` can run this half alone.
+# tests/test_suite_hygiene.py asserts every module declares one.
+pytestmark = pytest.mark.food
+
+ROOT = Path(__file__).resolve().parent.parent
+
+# -----------------------------------------------------------------------------
+# Every shape, with Helen's ruling beside the ones she ruled on. The value is
+# what the parser must return for the fields named; None means "no reading",
+# which keeps the portions box exactly as it was.
+# -----------------------------------------------------------------------------
+COUNT = "count"
+MEASURE = "measure"
+
+CASES = {
+    # --- a count of a named thing: the midpoint, "Take the midpoint" ---------
+    "4–6 waffles, depending on your waffle iron":
+        dict(kind=COUNT, base=5, low=4, high=6, stem="waffles", box="5"),
+    "20–24 truffles": dict(kind=COUNT, base=22, stem="truffles", box="22"),
+    "10–12 swans": dict(kind=COUNT, base=11, stem="swans", box="11"),
+    "12 fairy cakes": dict(kind=COUNT, base=12, stem="fairy cakes", singular=False),
+    "12 normal Yorkshire puddings":
+        dict(kind=COUNT, base=12, stem="normal Yorkshire puddings"),
+    "4 eggs": dict(kind=COUNT, base=4, stem="eggs"),
+    "Estimated 24 cookies": dict(kind=COUNT, base=24, prefix="Estimated", stem="cookies"),
+    "about 15 squares": dict(kind=COUNT, base=15, prefix="about", stem="squares"),
+    # The thing ends at a comma, a bracket or an alternative.
+    "1 large jar, or several small ones":
+        dict(kind=COUNT, base=1, stem="large jar", singular=True),
+    "2 pies (to serve 6)": dict(kind=COUNT, base=2, stem="pies"),
+    "3 batches (total around 2.2 kg)": dict(kind=COUNT, base=3, stem="batches"),
+    # The noun that takes the plural is the one before "of".
+    "2 large rounds of 4": dict(kind=COUNT, base=2, stem="large rounds", rest=" of 4"),
+
+    # --- "Midpoints that land on a half can become a range of one." ----------
+    "4–7 buns": dict(kind=COUNT, base=5.5, low=4, high=7, box="5–6"),
+    "24–28 rolls": dict(kind=COUNT, base=26, box="26"),
+    "4 to 7 buns": dict(kind=COUNT, base=5.5, box="5–6"),
+
+    # --- '"64+" can be treated as "64".' -------------------------------------
+    "64+ tiny macarons": dict(kind=COUNT, base=64, stem="tiny macarons", box="64"),
+
+    # --- a number WORD at the start is a count: "Two 8-inch cakes" -----------
+    "one 8-inch cake":
+        dict(kind=COUNT, base=1, stem="8-inch cake", singular=True, times=True),
+    "one double-layer 8-inch cake":
+        dict(kind=COUNT, base=1, stem="double-layer 8-inch cake", times=False),
+    "one 7-inch round cake": dict(kind=COUNT, base=1, stem="7-inch round cake", times=True),
+    "one pie": dict(kind=COUNT, base=1, stem="pie", singular=True, times=False),
+    'one 9"-square tin': dict(kind=COUNT, base=1, stem='9"-square tin', times=True),
+    "Two 8-inch cakes": dict(kind=COUNT, base=2, stem="8-inch cakes", singular=False),
+
+    # --- '"1 dozen" doubled can be "two dozen". Our scaler is integer.' ------
+    "1 dozen mince pies":
+        dict(kind=COUNT, base=1, stem="dozen mince pies", invariable=True),
+    "about 3 dozen": dict(kind=COUNT, base=3, prefix="about", stem="dozen", invariable=True),
+
+    # --- "950 ml for one order of a recipe becomes 1900 ml for 2" ------------
+    "950 ml": dict(kind=MEASURE, base=950, unit="ml", prefix="", box="950"),
+    "about 300 ml": dict(kind=MEASURE, base=300, unit="ml", prefix="about"),
+    "approx. 75 g": dict(kind=MEASURE, base=75, unit="g", prefix="approx."),
+    "approx. 140 g": dict(kind=MEASURE, base=140, unit="g", prefix="approx."),
+    "About 750 ml": dict(kind=MEASURE, base=750, unit="ml", prefix="About"),
+    "1 litre": dict(kind=MEASURE, base=1, unit="litre"),
+    "about 2 kg (3 meals)": dict(kind=MEASURE, base=2, unit="kg"),
+    "250 g, enough for approximately 8 ramen dishes": dict(kind=MEASURE, base=250, unit="g"),
+
+    # --- no count at the START: the portions box stays -----------------------
+    # 'for "some" we can retain the previous guess we made at portions'
+    "Some": None,
+    "some": None,
+    "I mean, who cares, make double anyway": None,
+    "N/A, bring a spoon": None,
+    "however many you make": None,
+    "QQ": None,
+    # A number word that is NOT the yield's count, because it is not first.
+    "Plenty for two people": None,
+    "Enough for one normal lemon meringue pie": None,
+    "Enough to top my 1.5-l Pyrex dish (22 x 17 cm) — about one food processor bowl full": None,
+    "slightly more than half as much as my spice blender will fit, hmph": None,
+    "enough for that edge-brownie tin I made James buy me": None,
+    # "8-inch" is never the count: a digit that runs into a hyphen is a name.
+    "8-inch cake": None,
+    # `a` is not a number word here.
+    "a batch": None,
+
+    # --- a count of NOTHING NAMED: no word to put after the box --------------
+    # Not ruled. "portions" is the one word it must not become, so these keep
+    # today's control until Helen says what the word is.
+    "about 8": None,
+    "18": None,
+    "12–16": None,
+    "around 10": None,
+    "9 or 16": None,
+    # --- shapes nobody writes, which the integer box could not hold ----------
+    "1.5 litres": None,
+    "300–400 ml": None,
+    "2.5 loaves": None,
+}
+
+
+def _ask(texts):
+    """Run the real parser over `texts`. One subprocess, however many."""
+    if shutil.which("ruby") is None:
+        if os.environ.get("CI"):
+            pytest.fail(
+                "No ruby in CI, so _plugins/food_yield.rb cannot be asked "
+                "anything and skipping would report green for the only check "
+                "of what the scaler counts on a `makes:` recipe (#1286)."
+            )
+        pytest.skip("no ruby on this machine; the yield parser is Ruby")
+    result = subprocess.run(
+        ["ruby", "scripts/food_yield.rb", *texts],
+        cwd=ROOT, capture_output=True, text=True, timeout=120,
+    )
+    assert result.returncode == 0, (
+        "scripts/food_yield.rb failed:\n" + result.stdout[-2000:] + result.stderr[-2000:]
+    )
+    return json.loads(result.stdout)
+
+
+def _front_matter(path: Path) -> dict:
+    try:
+        return yaml.safe_load(path.read_text(encoding="utf-8").split("---", 2)[1]) or {}
+    except (IndexError, yaml.YAMLError):
+        return {}
+
+
+def _makes(folder):
+    out = {}
+    for path in sorted((ROOT / folder).rglob("*.md")):
+        if ".git" in path.parts or path.name == "README.md":
+            continue
+        makes = _front_matter(path).get("makes")
+        if makes not in (None, ""):
+            out[path.stem] = str(makes)
+    return out
+
+
+PUBLISHED = _makes("_food_recipes")
+DRAFTS = _makes("_food_drafts") if (ROOT / "_food_drafts").is_dir() else {}
+
+
+@pytest.fixture(scope="module")
+def readings():
+    return _ask(sorted(set(CASES) | set(PUBLISHED.values()) | set(DRAFTS.values())))
+
+
+@pytest.mark.parametrize("text", sorted(CASES))
+def test_a_makes_line_is_read_as_what_it_counts(readings, text):
+    """Each shape, against the fields that matter for it."""
+    want, got = CASES[text], readings[text]
+    if want is None:
+        assert got is None, (
+            f"`makes: {text!r}` must have NO reading, so the page keeps the "
+            f"portions box; the parser returned {got}."
+        )
+    else:
+        assert got is not None, f"`makes: {text!r}` was not read at all."
+        wrong = {k: (got.get(k), v) for k, v in want.items() if got.get(k) != v}
+        assert not wrong, (
+            f"`makes: {text!r}` was misread. field: (got, wanted) -> {wrong}"
+        )
+
+
+def test_makes_is_never_read_as_people():
+    """The rule #1286 must not weaken: 950 ml is not 950 portions.
+
+    `portions_for` in _plugins/food_shopping.rb decides how many a recipe
+    FEEDS, from `serves:` and then `serves_estimate:`, and must not look at
+    `makes:` at all. What is new is `made_for`, a second and separate answer.
+    Checked in the source because the alternative is a build, and what would
+    go wrong is exactly one line.
+    """
+    source = (ROOT / "_plugins" / "food_shopping.rb").read_text(encoding="utf-8")
+    start = source.index("def portions_for(doc)")
+    body = source[start:source.index("\n    end\n", start)]
+    code = "\n".join(line.split("#", 1)[0] for line in body.splitlines())
+    assert "makes" not in code, (
+        "`portions_for` in _plugins/food_shopping.rb now reads `makes:`. A "
+        "yield is never a head count -- that is what `serves_estimate:` is for."
+    )
+    assert 'doc.data["made"] = made_for(doc, yields)' in source, (
+        "_plugins/food_shopping.rb no longer hangs `made` on each recipe, so "
+        "every `makes:` recipe is back to saying portions (#1286)."
+    )
+
+
+# The published recipes whose `makes:` has no count of a named thing at its
+# start. THESE KEEP THE PORTIONS BOX, "~" and all. Named one by one because
+# this is the list Helen was shown, and a recipe joining or leaving it is a
+# change to what her page says.
+KEEPS_PORTIONS = {
+    # no number at all -- 'for "some" we can retain the previous guess'
+    "caramel": "I mean, who cares, make double anyway",
+    "cherry-glaze": "Some",
+    "chocolate-ganache": "N/A, bring a spoon",
+    "five-spice-powder": "some",
+    "gluten-free-crumble-topping":
+        "Enough to top my 1.5-l Pyrex dish (22 x 17 cm) — about one food processor bowl full",
+    "goats-cheese-squash-rosemary-griddle-cakes": "Plenty for two people",
+    "grandmas-lemon-curd": "Enough for one normal lemon meringue pie",
+    "mixed-spice-powder":
+        "slightly more than half as much as my spice blender will fit, hmph",
+    "slow-cooked-duck-legs-confit": "however many you make",
+    "the-one-true-chocolate-brownies":
+        "enough for that edge-brownie tin I made James buy me",
+    # a count, but of nothing named -- NOT ruled; reported to Helen
+    "delias-classic-pancakes": "about 8",
+}
+
+
+def test_the_published_recipes_that_keep_the_portions_box_are_the_listed_ones(readings):
+    unread = {slug: text for slug, text in PUBLISHED.items() if readings[text] is None}
+    assert unread == KEEPS_PORTIONS, (
+        "The published `makes:` recipes with no reading -- the ones whose "
+        "scaler still says portions -- are not the listed set.\n"
+        f"  now unread, not listed: {sorted(set(unread) - set(KEEPS_PORTIONS))}\n"
+        f"  listed, now read:       {sorted(set(KEEPS_PORTIONS) - set(unread))}\n"
+        f"  text changed:           "
+        f"{sorted(s for s in set(unread) & set(KEEPS_PORTIONS) if unread[s] != KEEPS_PORTIONS[s])}\n"
+        "If that is intended, move the recipe in KEEPS_PORTIONS and tell Helen "
+        "which page changed what it counts."
+    )
+
+
+def test_every_reading_starts_from_a_whole_number_or_a_range_of_one(readings):
+    """'Our scaler is integer.' Over every real line, published and drafts.
+
+    The box shows a whole number, or -- only where a range's midpoint lands on
+    a half -- a range of one ("5–6"). No reading may start anywhere else.
+    """
+    problems = []
+    for text in sorted(set(PUBLISHED.values()) | set(DRAFTS.values())):
+        got = readings[text]
+        if got is None:
+            continue
+        base = got["base"]
+        if base < 1 or (base * 2) != int(base * 2):
+            problems.append(f"{text!r}: base {base}")
+        elif base != int(base) and got["box"] != f"{int(base)}–{int(base) + 1}":
+            problems.append(f"{text!r}: base {base} shown as {got['box']!r}")
+        elif base == int(base) and got["box"] != str(int(base)):
+            problems.append(f"{text!r}: base {base} shown as {got['box']!r}")
+    assert not problems, "a `makes:` reading the integer box cannot hold:\n  " + "\n  ".join(problems)

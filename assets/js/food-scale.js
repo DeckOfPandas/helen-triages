@@ -325,10 +325,123 @@
     return name;
   }
 
+  /* =========================================================================
+     WHAT THE SCALER'S BOX COUNTS -- portions, or the thing made (#1286)
+     =========================================================================
+     A MODE is four small answers the wiring asks for, and recipe-scale.js
+     holds no arithmetic of its own for either kind:
+
+       base        the figure the recipe is written for; factor = value / base
+       clamp(n)    a typed or stepped value, made into one the box can hold
+       step(n, d)  one press of minus (-1) or plus (+1)
+       box(n)      what the input shows
+       word(n)     what follows the input, or null to leave the markup alone
+
+     THE BOX IS AN INTEGER THROUGHOUT -- Helen: "Our scaler is integer." It
+     never shows a fraction of the count. */
+
+  /* PORTIONS -- #1005, unchanged: whole people, never fewer than one. */
+  function portionsMode(base) {
+    return {
+      base: base,
+      clamp: function (n) { return Math.max(1, Math.round(n)); },
+      step: function (n, delta) { return n + delta; },
+      box: function (n) { return String(n); },
+      word: function () { return null; }
+    };
+  }
+
+  /* A MIDPOINT ON A HALF IS SHOWN AS A RANGE OF ONE -- Helen: "Midpoints that
+     land on a half can become a range of one." 4–7 is 5.5 and reads "5–6";
+     the ingredients still scale against the true 5.5. _plugins/food_yield.rb
+     `box` is this rule for the page as built. */
+  function yieldBox(value) {
+    if (value === Math.floor(value)) return String(value);
+    return Math.floor(value) + '–' + Math.ceil(value);
+  }
+
+  function replaceLast(text, change) {
+    var words = String(text).split(' ');
+    words[words.length - 1] = change(words[words.length - 1]);
+    return words.join(' ');
+  }
+
+  /* THE THING MADE, AGREEING WITH THE NUMBER BESIDE IT. The line was written
+     for the recipe's own count, so the noun only has to move when the number
+     crosses one: "one 8-inch cake" is written for one and takes a plural at
+     two; "12 fairy cakes" is written for several and loses it at one. A range
+     of one ("5–6") is several.
+
+     THE NOUN IS THE LAST WORD OF THE STEM -- the part before any " of " --
+     and the plural is shopping-list.js's (`unitLabel`, `foldUnit`), the rule
+     every amount on the page already uses. `dozen mince pies` is INVARIABLE:
+     it is the dozen that is counted ('"1 dozen" doubled can be "two dozen"').
+
+     `× ` IN FRONT OF A THING THAT OPENS WITH A DIGIT -- Helen: a digit
+     directly before "8-inch" is unreadable. The box is a number, so the count
+     cannot be spelled as a word; "2 × 8-inch cakes" is the form shown. */
+  function thingText(spec, value) {
+    var stem = String(spec.stem || '');
+    if (!spec.invariable) {
+      var one = value === 1;
+      if (spec.singular && !one) {
+        stem = replaceLast(stem, function (w) { return unitLabel(w, 2); });
+      } else if (!spec.singular && one) {
+        stem = replaceLast(stem, function (w) { return shoppingList.foldUnit(w); });
+      }
+    }
+    return (spec.times ? '× ' : '') + stem + String(spec.rest || '');
+  }
+
+  /**
+   * The scaler's mode for a recipe whose `makes:` line opens with a count.
+   *
+   * @param {Object} spec - `page.made`, as _plugins/food_yield.rb wrote it
+   * @returns {Object|null} a mode (see above), or null for a spec it cannot use
+   */
+  function yieldMode(spec) {
+    if (!spec || !(Number(spec.base) > 0)) return null;
+    var base = Number(spec.base);
+
+    /* A MEASURE SCALES BY WHOLE ORDERS OF THE RECIPE -- Helen: "950 ml for one
+       order of a recipe becomes 1900 ml for 2". Plus adds one order; a typed
+       figure goes to the nearest whole order; one order is the floor, because
+       half a batch is not a figure the box can hold. */
+    if (spec.kind === 'measure') {
+      var unit = shoppingList.foldUnit(String(spec.unit || ''));
+      return {
+        base: base,
+        clamp: function (n) { return Math.max(1, Math.round(n / base)) * base; },
+        step: function (n, delta) { return n + delta * base; },
+        box: function (n) { return String(n); },
+        word: function (n) { return unitLabel(unit, n); }
+      };
+    }
+
+    /* A COUNT STEPS BY ONE, and a midpoint on a half keeps its half: 5.5
+       ("5–6") plus one is 6.5 ("6–7"). A typed whole number is taken as
+       itself. The floor is the smallest value of the same kind: 1, or "1–2". */
+    var half = base !== Math.floor(base);
+    var floor = half ? 1.5 : 1;
+    return {
+      base: base,
+      clamp: function (n) {
+        var onHalf = half && (n * 2) % 2 === 1;
+        return Math.max(onHalf ? floor : 1, onHalf ? n : Math.round(n));
+      },
+      step: function (n, delta) { return n + delta; },
+      box: yieldBox,
+      word: function (n) { return thingText(spec, n); }
+    };
+  }
+
   return {
     scaleAmount: scaleAmount,
     scaleLeadingMeasure: scaleLeadingMeasure,
     noteName: noteName,
-    halfStep: halfStep
+    halfStep: halfStep,
+    portionsMode: portionsMode,
+    yieldMode: yieldMode,
+    yieldBox: yieldBox
   };
 });

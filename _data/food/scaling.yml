@@ -77,3 +77,63 @@ half_step_measures:
   - dash
   - splash
   - knob
+
+# -----------------------------------------------------------------------------
+# Yields -- the words _plugins/food_yield.rb needs to read a `makes:` line, so
+# that the scaler on a `makes:` recipe counts THE THING MADE. GitHub issue
+# #1286, Helen, 2026-10-04: "Never tell me how many cookies are in a portion!!!"
+#
+# The plugin's header has the rules and her words for each. These four lists
+# are everything in it that is vocabulary rather than rule.
+# -----------------------------------------------------------------------------
+yields:
+  # A word in front of the number that says it is not exact. Kept on the page,
+  # as written, in front of the box ("about 300 ml" -> "about 600 ml"). Every
+  # one of these opens a real `makes:` line except `approximately`, `roughly`
+  # and bare `approx`, which are here so the next recipe does not fall through
+  # to the portions box for the sake of a spelling.
+  approx_words:
+    - about
+    - approx.
+    - approx
+    - approximately
+    - around
+    - estimated
+    - roughly
+
+  # A count written as a word. ONLY AT THE START of the line: "Plenty for two
+  # people" and "Enough for one normal lemon meringue pie" are not counts, and
+  # the 8 of "one 8-inch cake" is never read at all. `one` is the only one the
+  # collection writes today (7 lines: six cakes and a pie, one tin); the rest
+  # are here because "two 8-inch cakes" is the very next thing anyone would
+  # write. NOT `a` or `an`: "a batch" is prose, and nothing writes it.
+  number_words:
+    one: 1
+    two: 2
+    three: 3
+    four: 4
+    five: 5
+    six: 6
+    seven: 7
+    eight: 8
+    nine: 9
+    ten: 10
+    eleven: 11
+    twelve: 12
+
+  # A yield measured rather than counted. It scales by WHOLE ORDERS of the
+  # recipe: "950 ml for one order of a recipe becomes 1900 ml for 2". As
+  # written in the collection: ml (15 lines), g (3), litre (3), kg (1).
+  measures:
+    - ml
+    - l
+    - litre
+    - litres
+    - g
+    - kg
+
+  # A word that is itself the thing counted and does not change with the
+  # number: '"1 dozen" doubled can be "two dozen"'. The count stays in dozens
+  # and is never turned into 12.
+  group_words:
+    - dozen
