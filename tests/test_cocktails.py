@@ -2192,6 +2192,73 @@ def test_every_generic_is_declared():
     )
 
 
+def _shelf_problems(vocab) -> list[str]:
+    """Every way `shelf_of` and the declared generics disagree, one per line."""
+    declared = _declared_generics(vocab)
+    shelf_of = vocab.get("shelf_of") or {}
+    shelves = set(vocab.get("shopping_shelves") or [])
+    out = [f"{g!r} is a declared generic with no row in `shelf_of`"
+           for g in sorted(declared - set(shelf_of))]
+    out += [f"`shelf_of` has a row for {g!r}, which is not a declared generic"
+            for g in sorted(set(shelf_of) - declared)]
+    out += [f"{g!r} is filed under {shelf!r}, which `shopping_shelves` does not list"
+            for g, shelf in sorted(shelf_of.items()) if shelf not in shelves]
+    return out
+
+
+def test_every_declared_generic_is_on_a_shopping_shelf():
+    """`shelf_of` has exactly one row per declared generic, on a real shelf.
+
+    A generic with no row is not an error anywhere else: the shopping list
+    sorts an unknown shelf last and carries on, so the only person who finds
+    out is whoever builds a list with that drink in it. On 2026-09-21 that was
+    20 of 181 generics, six of them poured and two of those by published
+    drinks (`molasses sugar`, `peach brandy`), and `milk` had been given a
+    cost and a strength the day before and no shelf (#1175). The rows were
+    added and the comment above `shelf_of` went on saying "there is no test
+    for this yet".
+
+    DECLARED, NOT POURED, so it runs in CI. The drafts are absent there, and a
+    check over what is poured would cover the published drinks alone. Every
+    declared generic having a row is the stronger statement and needs no
+    drink to read.
+
+    The other two directions are what keep the map honest as it is edited: a
+    row for a generic that was renamed or retired, and a row filed under a
+    shelf nobody declared, which sorts last exactly as a missing row does.
+    """
+    vocab = _vocab()
+    assert _declared_generics(vocab) and vocab.get("shelf_of"), (
+        "_data/cocktails/ingredients.yml has no declared generics or no "
+        "`shelf_of` map, so this check compared nothing with nothing."
+    )
+    problems = _shelf_problems(vocab)
+    assert not problems, (
+        "The shopping shelves and the vocabulary disagree:\n  "
+        + "\n  ".join(problems)
+        + "\n\nWhich shelf a generic belongs on is Helen's call. Add or remove "
+          "the row in `shelf_of`, in the commit that declares or retires the "
+          "generic."
+    )
+
+
+def test_the_shelf_check_sees_each_way_the_map_can_be_wrong():
+    """The check above passes on today's data, so prove each half can fail."""
+    def vocab(shelf_of):
+        return {"sugars": ["molasses sugar"], "other": ["milk"],
+                "shopping_shelves": ["larder", "sugar syrup"],
+                "shelf_of": shelf_of}
+
+    assert not _shelf_problems(vocab({"molasses sugar": "sugar syrup", "milk": "larder"}))
+    assert _shelf_problems(vocab({"molasses sugar": "sugar syrup"}))
+    assert _shelf_problems(vocab({"molasses sugar": "sugar syrup", "milk": "larder",
+                                  "cream": "larder"}))
+    assert _shelf_problems(vocab({"molasses sugar": "sugar syrup", "milk": "dairy"}))
+    # the aisle names are a list in the same file and must not count as generics
+    assert not any("larder" in line for line in
+                   _shelf_problems(vocab({"molasses sugar": "sugar syrup"})))
+
+
 def test_a_claude_proposal_only_sits_beside_an_open_question():
     """A `_claude` key is legal only while the POUR still carries a `QQ`.
 

@@ -880,6 +880,7 @@ aliases:
   # giving `spring onions` and its `main_ingredients` giving `spring onion`.
   # Measured against the real matcher, not inferred. Never alias to a key that
   # is itself aliased; write the target the chain ends at.
+  # tests/test_site_config.py refuses the next one (#1175).
   extra virgin olive oil: olive oil
   freshly ground black peppercorns: black peppercorns
   freshly ground szechuan peppercorns: szechuan peppercorns
