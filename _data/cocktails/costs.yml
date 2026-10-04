@@ -807,6 +807,13 @@ fruit_prices:
   raspberries:    { gbp_min: 0.05, gbp_max: 0.10, basis: "GBP 2-3 / 150 g punnet of about 30-40 berries", confidence: medium }
   cucumber:       { gbp_min: 0.03, gbp_max: 0.05, basis: "per wheel: GBP 0.60-0.90 a cucumber, about 20 wheels", confidence: low }
   pineapple:      { gbp_min: 0.03, gbp_max: 0.05, basis: "per cube: GBP 1.00-1.50 a pineapple, about 30-40 cubes", confidence: low }
+  # NEW 2026-10-04 (#1302), for Peach Me, which muddles one of each. They were
+  # written as a bare `1` until Helen confirmed the counts, and a bare number is
+  # not a counted pour, so nothing asked for a price. ESTIMATES, not her figures:
+  # the slice is the `orange` row above divided by eight; the cherry runs from a
+  # supermarket cocktail cherry to a Luxardo one.
+  orange slice:      { gbp_min: 0.04, gbp_max: 0.07, basis: "per slice: GBP 0.35-0.55 an orange, about 8 slices", confidence: low }
+  maraschino cherry: { gbp_min: 0.05, gbp_max: 0.25, basis: "per cherry: GBP 2 / jar of about 40 to GBP 10-12 / 400 g Luxardo jar of about 50", confidence: low }
 
 # --- weighed solids, priced per kilogram ---------------------------------------
 # THE OTHER HALF OF HELEN'S 2026-09-06 RULING (#748): "Price whole fruit and
