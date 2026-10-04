@@ -434,65 +434,73 @@ function reads(mode, n) {
 
 // "4–6 waffles, depending on your waffle iron" -- Henry's Sunday Waffles.
 const WAFFLES = { kind: 'count', base: 5, stem: 'waffles', rest: '',
-  invariable: false, singular: false, times: false };
+  invariable: false, singular: false, times: false, plus: false };
 
-test('#1286: the waffles start at the midpoint and step by one waffle', () => {
+test('#1286: the waffles step in WHOLE RECIPES -- 5 waffles, 10 waffles, 15', () => {
+  // Helen: "the buttons should still multiply the recipe in integers, just
+  // showing number of waffles. So 1x is 5 waffles, 2x is 10 waffles.
+  // Otherwise we'll need to start showing eggs in units of 1/27".
   const mode = yieldMode(WAFFLES);
   assert.strictEqual(mode.base, 5);
   assert.strictEqual(reads(mode, mode.base), '5 waffles');
-  assert.strictEqual(reads(mode, press(mode, 5, 1)), '6 waffles');
-  assert.strictEqual(reads(mode, press(mode, 5, -1)), '4 waffles');
-  // The ingredients scale by the box over the midpoint: six waffles is x1.2.
-  assert.strictEqual(press(mode, 5, 1) / mode.base, 1.2);
+  assert.strictEqual(reads(mode, press(mode, 5, 1)), '10 waffles');
+  assert.strictEqual(reads(mode, press(mode, 5, 1, 2)), '15 waffles');
+  // The ingredients scale by a whole number, always.
+  assert.strictEqual(press(mode, 5, 1) / mode.base, 2);
+  assert.strictEqual(press(mode, 5, 1, 2) / mode.base, 3);
+  assert.strictEqual(reads(mode, press(mode, 10, -1)), '5 waffles');
 });
 
-test('#1286: one of a thing written for several loses its plural, and never goes below one', () => {
+test('#1286: a typed figure goes to the nearest whole recipe, and never to a part of one', () => {
+  // The box shows a derived figure, so what is typed is a request, not a
+  // value: 8 waffles is nearer two recipes than one. Helen: "not having half
+  // recipes in between integers" -- 7 or 8 waffles is never x1½.
   const mode = yieldMode(WAFFLES);
-  assert.strictEqual(reads(mode, press(mode, 5, -1, 4)), '1 waffle');
-  assert.strictEqual(reads(mode, press(mode, 5, -1, 9)), '1 waffle');
-  const puddings = yieldMode({ kind: 'count', base: 12, stem: 'normal Yorkshire puddings',
-    rest: '', invariable: false, singular: false, times: false });
-  assert.strictEqual(reads(puddings, 1), '1 normal Yorkshire pudding');
-  assert.strictEqual(reads(puddings, 13), '13 normal Yorkshire puddings');
+  assert.strictEqual(mode.clamp(8), 10);
+  assert.strictEqual(mode.clamp(7), 5);
+  assert.strictEqual(mode.clamp(7.5), 10);
+  assert.strictEqual(mode.clamp(12), 10);
+  assert.strictEqual(mode.clamp(13), 15);
+  [6, 7, 8, 9, 11, 12, 13, 14, 23].forEach((typed) => {
+    const multiple = mode.clamp(typed) / mode.base;
+    assert.strictEqual(multiple, Math.round(multiple), `typing ${typed} gave x${multiple}`);
+  });
 });
 
-test('#1286: a typed number is taken as itself, rounded to a whole one', () => {
-  const mode = yieldMode(WAFFLES);
-  assert.strictEqual(mode.clamp(8), 8);
-  assert.strictEqual(mode.clamp(7.4), 7);
-  assert.strictEqual(mode.clamp(0.2), 1);
-});
-
-test('#1286: a midpoint on a half is a range of one -- "5–6", and plus gives "6–7"', () => {
+test('#1286: a figure on a half is a range of one -- "5–6", then "11", then "16–17"', () => {
   // Helen: "Midpoints that land on a half can become a range of one."
   // "4–7 buns" is 5.5. Nothing published is this shape; the rule is hers.
   const mode = yieldMode({ kind: 'count', base: 5.5, stem: 'buns', rest: '',
-    invariable: false, singular: false, times: false });
+    invariable: false, singular: false, times: false, plus: false });
   assert.strictEqual(reads(mode, mode.base), '5–6 buns');
-  assert.strictEqual(reads(mode, press(mode, 5.5, 1)), '6–7 buns');
-  assert.strictEqual(reads(mode, press(mode, 5.5, -1)), '4–5 buns');
-  // The floor is the smallest range of one, never "0–1".
-  assert.strictEqual(reads(mode, press(mode, 5.5, -1, 9)), '1–2 buns');
-  // The ingredients scale against the TRUE midpoint.
-  assert.strictEqual(press(mode, 5.5, 1) / mode.base, 6.5 / 5.5);
-  // A whole number typed in is a whole number: the range was the recipe's.
-  assert.strictEqual(reads(mode, mode.clamp(8)), '8 buns');
+  assert.strictEqual(reads(mode, press(mode, 5.5, 1)), '11 buns');
+  assert.strictEqual(reads(mode, press(mode, 5.5, 1, 2)), '16–17 buns');
+  assert.strictEqual(press(mode, 5.5, 1) / mode.base, 2);
   assert.strictEqual(foodScale.yieldBox(5.5), '5–6');
   assert.strictEqual(foodScale.yieldBox(5), '5');
+});
+
+test('#1286: "64+" keeps its plus -- 64+ tiny macarons, 128+ tiny macarons', () => {
+  // Helen's own words, replacing her earlier '"64+" can be treated as "64"'.
+  const mode = yieldMode({ kind: 'count', base: 64, stem: 'tiny macarons', rest: '',
+    invariable: false, singular: false, times: false, plus: true });
+  assert.strictEqual(reads(mode, mode.base), '64+ tiny macarons');
+  assert.strictEqual(reads(mode, press(mode, 64, 1)), '128+ tiny macarons');
+  assert.strictEqual(reads(mode, press(mode, 64, 1, 2)), '192+ tiny macarons');
 });
 
 test('#1286: "one 8-inch cake" is one; two read "2 × 8-inch cakes"', () => {
   // Helen: "Two 8-inch cakes". A digit straight before "8-inch" is
   // unreadable and the box is a number, so a × stands between them.
   const mode = yieldMode({ kind: 'count', base: 1, stem: '8-inch cake', rest: '',
-    invariable: false, singular: true, times: true });
+    invariable: false, singular: true, times: true, plus: false });
   assert.strictEqual(reads(mode, mode.base), '1 × 8-inch cake');
   assert.strictEqual(reads(mode, press(mode, 1, 1)), '2 × 8-inch cakes');
-  assert.strictEqual(reads(mode, press(mode, 1, -1)), '1 × 8-inch cake');
+  assert.strictEqual(reads(mode, press(mode, 2, -1)), '1 × 8-inch cake');
   assert.strictEqual(press(mode, 1, 1) / mode.base, 2);
 
   const pie = yieldMode({ kind: 'count', base: 1, stem: 'pie', rest: '',
-    invariable: false, singular: true, times: false });
+    invariable: false, singular: true, times: false, plus: false });
   assert.strictEqual(reads(pie, 1), '1 pie');
   assert.strictEqual(reads(pie, 3), '3 pies');
 });
@@ -500,19 +508,18 @@ test('#1286: "one 8-inch cake" is one; two read "2 × 8-inch cakes"', () => {
 test('#1286: a dozen stays a dozen -- "1 dozen" doubled is "2 dozen"', () => {
   // Helen: '"1 dozen" doubled can be "two dozen". Our scaler is integer.'
   const mode = yieldMode({ kind: 'count', base: 1, stem: 'dozen mince pies', rest: '',
-    invariable: true, singular: true, times: false });
+    invariable: true, singular: true, times: false, plus: false });
   assert.strictEqual(reads(mode, mode.base), '1 dozen mince pies');
   assert.strictEqual(reads(mode, press(mode, 1, 1)), '2 dozen mince pies');
   assert.strictEqual(press(mode, 1, 1) / mode.base, 2);
 });
 
-test('#1286: the noun before "of" is the one that moves', () => {
-  // grandmas-scones: "2 large rounds of 4".
+test('#1286: a yield written with "of" carries the rest along', () => {
+  // grandmas-scones: "2 large rounds of 4". Two recipes make four rounds.
   const mode = yieldMode({ kind: 'count', base: 2, stem: 'large rounds', rest: ' of 4',
-    invariable: false, singular: false, times: false });
+    invariable: false, singular: false, times: false, plus: false });
   assert.strictEqual(reads(mode, 2), '2 large rounds of 4');
-  assert.strictEqual(reads(mode, 1), '1 large round of 4');
-  assert.strictEqual(reads(mode, 3), '3 large rounds of 4');
+  assert.strictEqual(reads(mode, press(mode, 2, 1)), '4 large rounds of 4');
 });
 
 test('#1286: a volume scales by whole orders -- 950 ml, 1900 ml, 2850 ml', () => {
@@ -522,12 +529,9 @@ test('#1286: a volume scales by whole orders -- 950 ml, 1900 ml, 2850 ml', () =>
   assert.strictEqual(reads(mode, press(mode, 950, 1)), '1900 ml');
   assert.strictEqual(reads(mode, press(mode, 950, 1, 2)), '2850 ml');
   assert.strictEqual(press(mode, 950, 1) / mode.base, 2);
-  // One order is the floor: the box cannot hold half a batch.
-  assert.strictEqual(reads(mode, press(mode, 950, -1)), '950 ml');
   // A typed figure goes to the nearest whole order.
   assert.strictEqual(mode.clamp(2000), 1900);
   assert.strictEqual(mode.clamp(2500), 2850);
-  assert.strictEqual(mode.clamp(100), 950);
 });
 
 test('#1286: a litre takes its plural, a gram does not', () => {
@@ -538,7 +542,7 @@ test('#1286: a litre takes its plural, a gram does not', () => {
   assert.strictEqual(reads(grams, press(grams, 75, 1)), '150 g');
 });
 
-test('#1286: portions are what they were -- whole people, never fewer than one', () => {
+test('#1286: a `serves:` recipe steps a portion at a time, as it always did', () => {
   const mode = portionsMode(6);
   assert.strictEqual(mode.base, 6);
   assert.strictEqual(mode.box(7), '7');
@@ -547,6 +551,97 @@ test('#1286: portions are what they were -- whole people, never fewer than one',
   assert.strictEqual(mode.clamp(2.6), 3);
   // The word "portions" is the markup's; the mode never rewrites it.
   assert.strictEqual(mode.word(7), null);
+});
+
+test('#1286: guessed portions on a `makes:` recipe step in whole recipes -- 4, 8, 12', () => {
+  // Helen: 'if "some" is originally guessed to be 4 portions, 2x should be 8
+  // portions'. cherry-glaze: `makes: "Some"`, `serves_estimate: 4`.
+  const mode = portionsMode(4, true);
+  assert.strictEqual(mode.box(mode.base), '4');
+  assert.strictEqual(press(mode, 4, 1), 8);
+  assert.strictEqual(press(mode, 4, 1, 2), 12);
+  assert.strictEqual(press(mode, 4, 1) / mode.base, 2);
+  assert.strictEqual(mode.clamp(6), 8);
+  assert.strictEqual(mode.clamp(5), 4);
+  // It still says portions: the markup's word is left alone.
+  assert.strictEqual(mode.word(8), null);
+});
+
+// --- the one step below a whole recipe ----------------------------------------
+// Helen: "Half a recipe would be great where the numbers aren't insane!" and
+// "not having half recipes in between integers, just between 0 and 1". The
+// BUILD decides which recipes get it (tests/test_food_yield.py); the second
+// argument here is that verdict.
+
+test('#1286: with the half step, the waffles go ½, 1, 2, 3 -- "2–3 waffles", 5, 10, 15', () => {
+  const mode = yieldMode(WAFFLES, true);
+  const half = press(mode, 5, -1);
+  assert.strictEqual(half / mode.base, 0.5);
+  assert.strictEqual(reads(mode, half), '2–3 waffles');
+  // Minus again stays at a half: there is nothing below it.
+  assert.strictEqual(press(mode, half, -1), half);
+  // Plus from a half is ONE recipe, not one and a half.
+  assert.strictEqual(reads(mode, press(mode, half, 1)), '5 waffles');
+  assert.strictEqual(reads(mode, press(mode, half, 1, 2)), '10 waffles');
+});
+
+test('#1286: there is no half recipe BETWEEN whole ones, stepped or typed', () => {
+  const mode = yieldMode(WAFFLES, true);
+  const seen = new Set();
+  let n = press(mode, 5, -1, 3);
+  for (let i = 0; i < 6; i += 1) { seen.add(n / mode.base); n = press(mode, n, 1); }
+  assert.deepStrictEqual([...seen], [0.5, 1, 2, 3, 4, 5]);
+  // Typed: every whole number of waffles from 1 to 40 lands on ½ or a whole
+  // multiple -- 7 or 8 waffles is never x1½.
+  for (let typed = 1; typed <= 40; typed += 1) {
+    const m = mode.clamp(typed) / mode.base;
+    assert.ok(m === 0.5 || m === Math.round(m), `typing ${typed} gave x${m}`);
+  }
+  // Under three quarters of a recipe is a half; from there up it is one.
+  assert.strictEqual(mode.clamp(3) / mode.base, 0.5);
+  assert.strictEqual(mode.clamp(4) / mode.base, 1);
+  assert.strictEqual(mode.clamp(0.1) / mode.base, 0.5);
+});
+
+test('#1286: WITHOUT the half step, one recipe is the floor and minus does nothing', () => {
+  const mode = yieldMode(WAFFLES, false);
+  assert.strictEqual(press(mode, 5, -1), 5);
+  assert.strictEqual(press(mode, 5, -1, 5), 5);
+  assert.strictEqual(mode.clamp(1), 5);
+  assert.strictEqual(mode.clamp(0.1), 5);
+  // ...and the same for a caller that passes no verdict at all.
+  assert.strictEqual(press(yieldMode(WAFFLES), 5, -1), 5);
+  const cream = yieldMode({ kind: 'measure', base: 950, unit: 'ml', prefix: '' });
+  assert.strictEqual(reads(cream, press(cream, 950, -1)), '950 ml');
+  assert.strictEqual(cream.clamp(100), 950);
+});
+
+test('#1286: what half a recipe makes, by shape', () => {
+  const half = (mode) => reads(mode, press(mode, mode.base, -1));
+  // 12 fairy cakes -> 6
+  assert.strictEqual(half(yieldMode({ kind: 'count', base: 12, stem: 'fairy cakes', rest: '',
+    invariable: false, singular: false, times: false, plus: false }, true)), '6 fairy cakes');
+  // 64+ tiny macarons -> 32+
+  assert.strictEqual(half(yieldMode({ kind: 'count', base: 64, stem: 'tiny macarons', rest: '',
+    invariable: false, singular: false, times: false, plus: true }, true)), '32+ tiny macarons');
+  // 2 burgers -> 1 burger: the one place a plural line reaches one.
+  assert.strictEqual(half(yieldMode({ kind: 'count', base: 2, stem: 'burgers', rest: '',
+    invariable: false, singular: false, times: false, plus: false }, true)), '1 burger');
+  // 950 ml -> 475 ml; an odd measure is a range of one.
+  assert.strictEqual(half(yieldMode({ kind: 'measure', base: 950, unit: 'ml' }, true)), '475 ml');
+  assert.strictEqual(half(yieldMode({ kind: 'measure', base: 125, unit: 'ml' }, true)), '62–63 ml');
+  // Guessed portions: 4 -> 2, and still the markup's word.
+  const some = portionsMode(4, true, true);
+  assert.strictEqual(some.box(press(some, 4, -1)), '2');
+  assert.strictEqual(press(some, 4, -1) / some.base, 0.5);
+  assert.strictEqual(press(portionsMode(5, true, false), 5, -1), 5);
+});
+
+test('#1286: a `serves:` recipe is never given whole-recipe or half steps', () => {
+  // The half verdict means nothing without whole-recipe stepping.
+  const mode = portionsMode(6, false, true);
+  assert.strictEqual(press(mode, 6, -1), 5);
+  assert.strictEqual(press(mode, 6, 1), 7);
 });
 
 test('#1286: a reading the box cannot use gives no mode at all', () => {

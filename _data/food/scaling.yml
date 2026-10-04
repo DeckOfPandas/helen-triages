@@ -137,3 +137,60 @@ yields:
   # and is never turned into 12.
   group_words:
     - dozen
+
+# -----------------------------------------------------------------------------
+# Half a recipe -- the words _plugins/food_half_recipe.rb judges by. A `makes:`
+# recipe steps x1, x2, x3; it is offered ONE step below, x½, only where
+# halving gives figures a person could act on. Helen, #1286: "Half a recipe
+# would be great where the numbers aren't insane! Can we judge that?"
+#
+# The plugin's header has the rule. One ingredient that will not halve refuses
+# the whole recipe; an amount in a unit on NONE of these lists is a count of
+# things and halves only if it is even.
+# -----------------------------------------------------------------------------
+half_recipe:
+  # Always halves, whatever the number: the scaler already prints 31 g.
+  divisible_units:
+    - g
+    - kg
+    - ml
+    - l
+    - cl
+    - litre
+    - litres
+    - cm
+    - mm
+    - inch
+    - inches
+
+  # Halves when the amount is a multiple of a QUARTER, because an eighth is
+  # the smallest fraction the page has a glyph for (¼ tsp -> ⅛ tsp).
+  quarter_units:
+    - tsp
+    - tbsp
+    - cup
+    - cups
+    - oz
+    - lb
+    - pint
+    - pints
+
+  # A counted thing of which HALF IS A REAL THING, so an odd count is fine:
+  # half a lemon, half an onion. STARTED SMALL ON PURPOSE -- every word here
+  # lets a recipe through, and the judge is meant to refuse when unsure.
+  #
+  # IN: fruit and alliums you cut anyway, and the two sticks you snap.
+  # LEFT OUT, deliberately, and each refuses real recipes today: `egg` (and
+  # yolk, white), `sprig`, `bunch`, `leaf`/`leaves`, `star anise`, `nutmeg`,
+  # `stock cube`, `sachet`, `tin`/`can`, `jar`, `pack`. Helen's to add.
+  halvable:
+    - lemon
+    - lime
+    - orange
+    - onion
+    - shallot
+    - garlic
+    - clove
+    - chilli
+    - cinnamon stick
+    - vanilla pod

@@ -1315,45 +1315,79 @@ never calls `halfStep`, so a handful there is still linear (`⅔ handfuls`,
 `1.17 handfuls`). Reported to Helen, not decided.
 
 **ON A `makes:` RECIPE THE RECIPE PAGE'S BOX COUNTS THE THING MADE, NEVER
-PORTIONS** (#1286, 2026-10-04). Helen: *"the scaler giving the number of items
-made ... would be clearest to me. Never tell me how many cookies are in a
-portion!!!"* Henry's waffles said "Makes 4–6 waffles" up top and "~2 portions"
-under the list. `_plugins/food_yield.rb` reads the `makes:` line — only its
-START, after an optional `about`/`approx.` — and `food_shopping.rb` hangs the
-reading on the page as `page.made`; `_layouts/recipe.html` prints the control
-from it, and `yieldMode` in `food-scale.js` does the stepping and the plural.
+PORTIONS, AND STEPS IN WHOLE RECIPES** (#1286, 2026-10-04). Helen: *"the scaler
+giving the number of items made ... would be clearest to me. Never tell me how
+many cookies are in a portion!!!"* Henry's waffles said "Makes 4–6 waffles" up
+top and "~2 portions" under the list. `_plugins/food_yield.rb` reads the
+`makes:` line — only its START, after an optional `about`/`approx.` — and
+`food_shopping.rb` hangs the reading on the page as `page.made`;
+`_layouts/recipe.html` prints the control from it, and `yieldMode` in
+`food-scale.js` does the stepping and the plural.
 
-| `makes:` | the box starts at | plus gives | her words |
+**Plus and minus multiply the RECIPE by whole numbers, and the box shows what
+that many recipes make.** *"the buttons should still multiply the recipe in
+integers, just showing number of waffles. So 1x is 5 waffles, 2x is 10
+waffles. Otherwise we'll need to start showing eggs in units of 1/27 or
+something."* It stepped one waffle at a time for a few hours, and six waffles
+was ×1.2 of two eggs.
+
+| `makes:` | ×1 | ×2 | her words |
 |---|---|---|---|
-| `4–6 waffles, depending on …` | `5` waffles — the midpoint | `6` waffles | *"Take the midpoint"* |
-| a range whose midpoint is a half (`4–7`) | `5–6` — a range of one | `6–7` | *"Midpoints that land on a half can become a range of one."* |
-| `64+ tiny macarons` | `64` tiny macarons | `65` | *'"64+" can be treated as "64".'* |
+| `4–6 waffles, depending on …` | `5` waffles — the midpoint | `10` waffles | *"Take the midpoint"* |
+| a figure that lands on a half (`4–7`) | `5–6` — a range of one | `11` | *"Midpoints that land on a half can become a range of one."* |
+| `64+ tiny macarons` | `64+` tiny macarons | `128+` | *"64+ tiny macarons, 128+ tiny macarons"* |
 | `one 8-inch cake` — a number WORD | `1` × 8-inch cake | `2` × 8-inch cakes | *"Two 8-inch cakes"* |
 | `1 dozen mince pies` | `1` dozen mince pies | `2` dozen mince pies | *'"1 dozen" doubled can be "two dozen".'* |
-| `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml — a whole ORDER of the recipe | *"950 ml for one order of a recipe becomes 1900 ml for 2"* |
-| `Some`, `Plenty for two people` — no count at the start | the portions box, `~` and all, unchanged | | *'for "some" we can retain the previous guess we made at portions'* |
+| `950 ml`, `approx. 75 g` — a measure | `950` ml | `1900` ml | *"950 ml for one order of a recipe becomes 1900 ml for 2"* |
+| `Some`, `Plenty for two people` — no count at the start | `~4` portions, the `serves_estimate` | `~8` portions | *'if "some" is originally guessed to be 4 portions, 2x should be 8 portions'* |
 
-**The box is an integer throughout** — *"Our scaler is integer."* The
-ingredients scale by the box over the starting figure (six waffles is ×1.2;
-against the TRUE midpoint where it is a half). A count never goes below one, a
-measure never below one order. The noun agrees with the number (`1 waffle`),
-the plural being `unitLabel`'s; `dozen …` never changes; a thing that opens
-with a digit gets a `×`, because "2 8-inch cakes" is unreadable and a number
-box cannot spell "two".
+**So every `makes:` recipe is one shape** (`wholeRecipes` in `food-scale.js`,
+`page.whole_recipes` from the plugin), including the ones that keep the word
+"portions" and the `~` because their yield has no count to show. **Only a
+`serves:` recipe steps a portion at a time** (#1005). The box is an input
+showing a DERIVED figure: a typed number goes to the nearest whole recipe (8
+on the waffles is 10), and its `aria-label` names the thing ("waffles to
+make"). The noun agrees with the number, the plural being `unitLabel`'s;
+`dozen …` never changes; a thing that opens with a digit gets a `×`, because
+"2 8-inch cakes" is unreadable and a number box cannot spell "two".
+
+**ONE STEP BELOW ONE RECIPE, ×½, WHERE THE NUMBERS ARE NOT INSANE.** Helen:
+*"Half a recipe would be great where the numbers aren't insane! Can we judge
+that?"* and *"not having half recipes in between integers, just between 0 and
+1"*. So the steps are ½, 1, 2, 3 — never 1½, stepped or typed. **The BUILD
+judges** (`_plugins/food_half_recipe.rb`, `page.half_recipe`,
+`data-half-recipe` on the input); the browser only reads the mark, and without
+it minus at one recipe does nothing, with no message. The judge is
+conservative — one line that will not halve refuses the recipe:
+
+| the amount is | it halves |
+|---|---|
+| a weight, volume or length (`divisible_units`) | always |
+| a spoon, cup or imperial measure (`quarter_units`) | if it is a multiple of ¼ — an eighth is the smallest fraction the page prints, so `⅛ tsp` and `⅓ cup` refuse |
+| a by-eye measure (`half_step_measures`) | always; it has its own rule |
+| a count of things — `3` eggs, `2 large`, `1 sprig`, `1 x 400 g` tin | if it is EVEN, or the thing is on the `halvable` list (lemon, lime, orange, onion, shallot, garlic, clove, chilli, cinnamon stick, vanilla pod) |
+| no number, or no amount | cannot object: it does not scale |
+
+and the yield must halve to at least one of itself: `one 8-inch cake`,
+`1 jar`, `1 dozen` and `1 litre` refuse; `5 waffles` halves to `2–3`, `64+` to
+`32+`, `125 ml` to `62–63 ml`; a portions box halves only an even number. All
+four lists are data, `half_recipe:` in `_data/food/scaling.yml`. **`egg` is
+not `halvable`, on purpose**, and that one word decides most refusals.
 
 **Three things this does NOT do.** `makes:` is still never read as PEOPLE:
 `portions_for` is untouched and `page.portions` is still the
 `serves_estimate`. **The index's shopping list still scales these recipes by
-portions** — it reads `page.portions` and knows nothing of `page.made`. And
-**a count of nothing named (`makes: "about 8"`) keeps the portions box**,
-because there is no word to put after the number; that one is not ruled.
+portions, one at a time** — it reads `page.portions` and knows nothing of
+`page.made`, whole recipes or halves. And **a count of nothing named (`makes:
+"about 8"`) keeps the portions box**, because there is no word to put after
+the number; that one is not ruled.
 
 **The vocabulary is data**, `yields:` in `_data/food/scaling.yml`: the approx
-words, the number words, the measures, and `dozen`. The parser is plain Ruby
-with no Jekyll in it so that `scripts/food_yield.rb` can run it over a list of
-strings: `tests/test_food_yield.py` asks it about every shape both collections
-write, in one subprocess and no build, and names the published recipes that
-keep the portions box.
+words, the number words, the measures, and `dozen`. Both readers are plain
+Ruby with no Jekyll in them so that `scripts/food_yield.rb` can run them:
+`tests/test_food_yield.py` asks about every shape both collections write, in
+two subprocesses and no build, and NAMES the published recipes that keep the
+portions box and the ones offered a half step.
 
 **Where it is tested.** `food-scale.test.js` (the recipe page's scaler, reading
 the real `scaling.yml`), `test_the_recipe_scaler_is_handed_the_half_step_measures`

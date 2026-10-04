@@ -42,7 +42,7 @@ MEASURE = "measure"
 CASES = {
     # --- a count of a named thing: the midpoint, "Take the midpoint" ---------
     "4–6 waffles, depending on your waffle iron":
-        dict(kind=COUNT, base=5, low=4, high=6, stem="waffles", box="5"),
+        dict(kind=COUNT, base=5, low=4, high=6, stem="waffles", box="5", plus=False),
     "20–24 truffles": dict(kind=COUNT, base=22, stem="truffles", box="22"),
     "10–12 swans": dict(kind=COUNT, base=11, stem="swans", box="11"),
     "12 fairy cakes": dict(kind=COUNT, base=12, stem="fairy cakes", singular=False),
@@ -64,8 +64,9 @@ CASES = {
     "24–28 rolls": dict(kind=COUNT, base=26, box="26"),
     "4 to 7 buns": dict(kind=COUNT, base=5.5, box="5–6"),
 
-    # --- '"64+" can be treated as "64".' -------------------------------------
-    "64+ tiny macarons": dict(kind=COUNT, base=64, stem="tiny macarons", box="64"),
+    # --- "64+ tiny macarons, 128+ tiny macarons": the plus is kept ------------
+    "64+ tiny macarons":
+        dict(kind=COUNT, base=64, stem="tiny macarons", box="64+", plus=True),
 
     # --- a number WORD at the start is a count: "Two 8-inch cakes" -----------
     "one 8-inch cake":
@@ -267,6 +268,139 @@ def test_every_reading_starts_from_a_whole_number_or_a_range_of_one(readings):
             problems.append(f"{text!r}: base {base}")
         elif base != int(base) and got["box"] != f"{int(base)}–{int(base) + 1}":
             problems.append(f"{text!r}: base {base} shown as {got['box']!r}")
-        elif base == int(base) and got["box"] != str(int(base)):
+        elif base == int(base) and got["box"].rstrip("+") != str(int(base)):
             problems.append(f"{text!r}: base {base} shown as {got['box']!r}")
     assert not problems, "a `makes:` reading the integer box cannot hold:\n  " + "\n  ".join(problems)
+
+
+# =============================================================================
+# THE HALF STEP -- "Half a recipe would be great where the numbers aren't
+# insane! Can we judge that?" (Helen, 2026-10-04)
+# =============================================================================
+# _plugins/food_half_recipe.rb judges it at build time. As above, the REAL
+# judge is asked, through scripts/food_yield.rb --half, once.
+
+def _recipe(makes, items, estimate=4, serves=None):
+    return {"makes": makes, "serves": serves, "serves_estimate": estimate,
+            "ingredient_groups": [{"items": [
+                {"amount": a, "item": i} if a is not None else {"item": i}
+                for a, i in items]}]}
+
+
+# name: (recipe, offered a half?, a word the reason must contain or None)
+HALF_CASES = {
+    # --- weights and volumes always halve ------------------------------------
+    "grams and ml": (_recipe("12 buns", [("125 g", "butter"), ("313 ml", "milk"),
+                                         ("1.2 kg", "flour"), ("1 litre", "stock")]), True, None),
+    # --- spoons halve down to an eighth, no further --------------------------
+    "quarter tsp": (_recipe("12 buns", [("¼ tsp", "salt"), ("1½ tbsp", "oil")]), True, None),
+    "eighth tsp": (_recipe("12 buns", [("⅛ tsp", "black pepper")]), False, "eighth"),
+    "third cup": (_recipe("12 buns", [("⅓ cup", "milk")]), False, "eighth"),
+    "heaped tbsp": (_recipe("12 buns", [("1 heaped tbsp", "tomato purée")]), True, None),
+    "bracket restates": (_recipe("12 buns", [("1 tbsp (6 g)", "cloves")]), True, None),
+    # --- a count halves only if even, or halvable ----------------------------
+    "two eggs": (_recipe("12 buns", [("2 large", "eggs")]), True, None),
+    "three eggs": (_recipe("12 buns", [("3 large", "eggs")]), False, "3 large eggs"),
+    "one egg": (_recipe("12 buns", [("1", "egg yolk")]), False, "does not halve"),
+    "one lemon": (_recipe("12 buns", [("1", "lemon, zest and juice")]), True, None),
+    "one large onion": (_recipe("12 buns", [("1 large", "onion, diced")]), True, None),
+    "three garlic cloves": (_recipe("12 buns", [("3 cloves", "garlic")]), True, None),
+    "half a nutmeg": (_recipe("12 buns", [("½ small", "whole nutmeg")]), False, "does not halve"),
+    "one sprig": (_recipe("12 buns", [("1 sprig", "rosemary")]), False, "does not halve"),
+    "one tin": (_recipe("12 buns", [("1 x 400 g", "tin tomatoes")]), False, "does not halve"),
+    "two tins": (_recipe("12 buns", [("2 x 400 g cans", "chickpeas")]), True, None),
+    "a range of eggs": (_recipe("12 buns", [("2–3", "eggs")]), False, "does not halve"),
+    # --- what does not scale cannot object -----------------------------------
+    "no amount": (_recipe("12 buns", [(None, "salt, to taste"), ("some", "pepper")]), True, None),
+    "by-eye measures": (_recipe("12 buns", [("1 handful", "parsley"), ("1 pinch", "salt")]), True, None),
+    # --- the yield has to halve too ------------------------------------------
+    "one cake": (_recipe("one 8-inch cake", [("200 g", "flour")]), False, "less than one"),
+    "one jar": (_recipe("1 jar", [("200 g", "sugar")]), False, "less than one"),
+    "one dozen": (_recipe("1 dozen mince pies", [("200 g", "flour")]), False, "less than one"),
+    "one litre": (_recipe("1 litre", [("200 g", "bones")]), False, "less than one"),
+    "five waffles": (_recipe("4–6 waffles", [("2 large", "eggs")]), True, None),
+    "two burgers": (_recipe("2 burgers", [("200 g", "mince")]), True, None),
+    "odd ml": (_recipe("125 ml", [("50 ml", "soy sauce")]), True, None),
+    # --- the portions box: even halves, odd does not -------------------------
+    "some, four": (_recipe("Some", [("200 g", "sugar")], estimate=4), True, "4 portions"),
+    "some, five": (_recipe("Some", [("200 g", "sugar")], estimate=5), False, "odd"),
+}
+
+# The published `makes:` recipes that ARE offered a half step. Named, because
+# this is the list Helen was given to check against recipes she knows; the
+# rest of the published `makes:` recipes are not offered one.
+GETS_A_HALF_STEP = {
+    "ajitsuke-tamago", "ben-jerrys-sweet-cream-base-1", "ben-jerrys-sweet-cream-base-2",
+    "ben-jerrys-sweet-cream-base-3", "bens-chocolate-ice-cream", "cherry-glaze",
+    "chocolate-ganache", "delias-classic-pancakes", "five-spice-powder",
+    "gluten-free-crumble-topping", "grandmas-fairy-cakes",
+    "henrys-dark-chocolate-almond-truffles", "henrys-sunday-waffles",
+    "jerrys-chocolate-ice-cream", "macarons", "mrs-nicholsons-creme-patissiere",
+    "mrs-nicholsons-yorkshire-puddings", "slow-cooked-duck-legs-confit",
+    "sweet-potato-chocolate-brownies", "teriyaki-sauce", "wagamama-teriyaki-sauce",
+    "wagamama-yakitori-sauce",
+}
+
+
+@pytest.fixture(scope="module")
+def verdicts():
+    if shutil.which("ruby") is None:
+        if os.environ.get("CI"):
+            pytest.fail("No ruby in CI, so the half-recipe judge cannot be asked (#1286).")
+        pytest.skip("no ruby on this machine; the half-recipe judge is Ruby")
+    recipes = [dict(recipe, key="case:" + name) for name, (recipe, _ok, _why) in HALF_CASES.items()]
+    for path in sorted((ROOT / "_food_recipes").glob("*.md")):
+        fm = _front_matter(path)
+        if fm.get("makes") in (None, ""):
+            continue
+        recipes.append({"key": "published:" + path.stem, "makes": str(fm["makes"]),
+                        "serves": fm.get("serves"),
+                        "serves_estimate": fm.get("serves_estimate"),
+                        "ingredient_groups": fm.get("ingredient_groups")})
+    scratch = ROOT / "tmp"
+    scratch.mkdir(exist_ok=True)
+    handoff = scratch / f"half-recipe-{os.getpid()}.json"
+    handoff.write_text(json.dumps(recipes, ensure_ascii=False, default=str), encoding="utf-8")
+    try:
+        result = subprocess.run(
+            ["ruby", "scripts/food_yield.rb", "--half", str(handoff.relative_to(ROOT))],
+            cwd=ROOT, capture_output=True, text=True, timeout=120,
+        )
+    finally:
+        handoff.unlink(missing_ok=True)
+    assert result.returncode == 0, (
+        "scripts/food_yield.rb --half failed:\n" + result.stdout[-2000:] + result.stderr[-2000:]
+    )
+    return json.loads(result.stdout)
+
+
+@pytest.mark.parametrize("name", sorted(HALF_CASES))
+def test_the_half_step_is_offered_only_where_halving_is_sane(verdicts, name):
+    _recipe_, want, reason = HALF_CASES[name]
+    got = verdicts["case:" + name]["half"]
+    assert got["ok"] is want, (
+        f"{name}: the judge said {'yes' if got['ok'] else 'no'} to a half "
+        f"recipe ({got['why']}); it should say {'yes' if want else 'no'}."
+    )
+    assert reason is None or reason in got["why"], (
+        f"{name}: the judge's reason should mention {reason!r}; it gave {got['why']!r}."
+    )
+
+
+def test_the_published_recipes_offered_a_half_step_are_the_listed_ones(verdicts):
+    offered = {key.split(":", 1)[1] for key, v in verdicts.items()
+               if key.startswith("published:") and v["half"]["ok"]}
+    refused = {key.split(":", 1)[1]: v["half"]["why"] for key, v in verdicts.items()
+               if key.startswith("published:") and not v["half"]["ok"]}
+    assert len(offered) + len(refused) > 30, (
+        f"only {len(offered) + len(refused)} published `makes:` recipes were "
+        f"judged; the scan has stopped finding them."
+    )
+    assert offered == GETS_A_HALF_STEP, (
+        "The published recipes offered a half step are not the listed set.\n"
+        f"  now offered, not listed: {sorted(offered - GETS_A_HALF_STEP)}\n"
+        f"  listed, now refused:     "
+        f"{sorted((s, refused.get(s)) for s in GETS_A_HALF_STEP - offered)}\n"
+        "If that is intended, update GETS_A_HALF_STEP and tell Helen which "
+        "page gained or lost its ½."
+    )
