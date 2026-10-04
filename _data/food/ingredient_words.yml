@@ -624,6 +624,13 @@ aliases:
   sweet potatoes: sweet potato
   thyme sprigs: thyme sprig
   tomatoes: tomato
+  # TWO MORE, FOUND BY #1289 AND RULED BY HELEN, 2026-10-04: "Plum. Almonds."
+  # Both pairs were on screen in the picker and in the header search box.
+  # `plums` follows the list above. ALMOND GOES THE OTHER WAY, on purpose: the
+  # plural is what 23 recipes write and what "ground almonds" and "flaked
+  # almonds" already read as, so the one recipe saying "almond" joins them.
+  plums: plum
+  almond: almonds
   # "baby" IS NOT A MODIFIER and these are not an argument that it should be.
   # Baby corn and corn are different things on a shelf and in a stir-fry, so the
   # word cannot be stripped sight unseen -- but baby carrots ARE carrots to
