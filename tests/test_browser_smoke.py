@@ -255,6 +255,22 @@ def test_the_page_runs_clean_and_fits(chromium, visit, prod_site, which, width):
         f"{url} at {width}px reported {len(v.errors)} error(s) in a real "
         f"browser:\n  " + "\n  ".join(v.errors)
     )
+    # MEASURE THE SETTLED PAGE -- #1295, 2026-10-04. This failed about one run
+    # in four on the cocktails index at 360px ("376px wide", "398px wide", a
+    # `drink-card-name--fitted` at right=397) and passed when run again with
+    # nothing changed. assets/js/card-name-fit.js fits the card names once at
+    # load and AGAIN on `document.fonts.ready`, "because until the real" face
+    # is in, the widths it measured are the fallback's. `networkidle` and the
+    # index script's canary say nothing about that second pass, so the width
+    # could be read between the font arriving and the names being refitted.
+    # Waiting for the fonts, then two frames for the refit to lay out, reads
+    # the page a visitor ends up with.
+    #
+    # NOT PROVEN TO BE THE CAUSE: the failure is too rare to reproduce on
+    # demand. If this test flakes again with this wait in place, the overflow
+    # is real at some moment a visitor can see and the fitting is what to fix.
+    v.page.evaluate("""() => document.fonts.ready.then(() => new Promise(
+        done => requestAnimationFrame(() => requestAnimationFrame(done))))""")
     wide = v.overflow()
     assert wide is None, (
         f"{url} is {wide['docW']}px wide in a {width}px viewport -- it scrolls "
