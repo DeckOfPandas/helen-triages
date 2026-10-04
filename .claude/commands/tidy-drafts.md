@@ -78,6 +78,13 @@ than an oversight:
   its `°`. Reported, never auto-fixed, on either collection: a spelling is a
   word, not a character.
 
+**A food group's `- name:` is quoted** (`fix_group_name_quoting`, under
+`--only quoting`): `- name: cake` becomes `- name: "cake"`, on the ingredient
+side and the method side. Helen, 2026-10-04: *"Let's make future recipes quote
+group titles, so add that to the tidy pass instructions, and ingestion
+instructions."* Nothing renders differently; a name that itself contains a
+double quote is reported, never escaped.
+
 Food's own three rules stay food's: the `main_ingredients`/`tags` flow quoting,
 the #429 `meta:` migration and the #577 `size` rule run on `_food_drafts/` and
 nowhere else. A cocktail's `meta:` is five keys in its own order and

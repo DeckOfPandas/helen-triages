@@ -314,6 +314,12 @@ failure is probably work someone else has already done (MANUAL §9.1).
     trap: `assemble` prints "For the assemble:", so a block the source heads
     that way is `to assemble`. A method group prints its name bare, with no
     prefix at all, which is why a narrative phase is fine there.
+  - **QUOTE EVERY GROUP NAME, on both sides**: `- name: "dressing"`,
+    `- name: "Make the dressing"`. Helen, 2026-10-04: *"Let's make future
+    recipes quote group titles, so add that to the tidy pass instructions, and
+    ingestion instructions."* Quoted and bare parse to the same string, so
+    this is only about every file reading the same way; `/tidy-drafts`
+    (`--only quoting`) fixes a bare one.
 - **House style** -- en dashes, `°C`, unicode fractions, quoting, accents, and
   **a space between a number and its unit** (`15ml` -> `15 ml`). Helen,
   2026-10-01: "Please add unit spaces (15ml -> 15 ml) as a mechanical fix to

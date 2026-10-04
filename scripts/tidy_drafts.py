@@ -416,6 +416,42 @@ def fix_scalar_quoting(text, path, fields=None):
     return open_ + "\n".join(out) + close + body, changed
 
 
+def fix_group_name_quoting(text, path):
+    """A food group's `- name:` is quoted, like every other string in the file.
+
+    Helen, 2026-10-04, shown that `- name: cake` and `- name: "Make the
+    batter"` sat side by side after #814: "Let's make future recipes quote
+    group titles, so add that to the tidy pass instructions, and ingestion
+    instructions." Both spellings parse to the same string and render the
+    same heading, so this is tidiness and nothing else -- which is exactly
+    what this script is for.
+
+    `- name:` at the start of a list item is a group and nothing else in a
+    food file: notes are `label`/`text`, ingredients are `amount`/`item`. A
+    value already quoted either way is left alone, and one containing a
+    double quote is reported rather than escaped, the line
+    `fix_scalar_quoting` draws.
+    """
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    changed, out = [], []
+    for line in fm.split("\n"):
+        m = re.match(r"^([ \t]*- name:)([ \t]*)(.+)$", line)
+        if m:
+            val = m.group(3).rstrip()
+            trailing = m.group(3)[len(val):]
+            if val and not val.startswith(('"', "'")):
+                if '"' in val:
+                    changed.append(f"SKIPPED group name: contains a double quote: {val}")
+                else:
+                    line = f"{m.group(1)}{m.group(2)}\"{val}\"{trailing}"
+                    changed.append(f"group name: {val} -> \"{val}\"")
+        out.append(line)
+    return open_ + "\n".join(out) + close + body, changed
+
+
 def _split_flow(inner):
     """Split a flow sequence on commas that are not inside quotes."""
     parts, buf, quote = [], "", None
@@ -1063,6 +1099,7 @@ FOOD_FIXERS = [
     ("notes", fix_notes_slot),
     ("quoting", fix_scalar_quoting),
     ("quoting", fix_flow_quoting),
+    ("quoting", fix_group_name_quoting),
     ("dashes", fix_en_dashes),
     ("typography", fix_typography),
     ("units", fix_unit_spacing),

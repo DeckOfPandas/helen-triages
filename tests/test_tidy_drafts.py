@@ -1095,3 +1095,73 @@ def test_food_only_rules_do_not_run_on_a_drink(drinks):
         "food's `meta:` migration ran over a drink. Check that DRINK_FIXERS "
         "still omits fix_meta_block."
     )
+
+# =============================================================================
+# A FOOD GROUP'S NAME IS QUOTED -- Helen, 2026-10-04
+# =============================================================================
+# "Let's make future recipes quote group titles, so add that to the tidy pass
+# instructions, and ingestion instructions." Asked after #814 left
+# `- name: cake` beside `- name: "Make the batter"` in one file.
+
+GROUP_NAMES_BEFORE = (
+    "---\n"
+    'title: "Fixture"\n'
+    "ingredient_groups:\n"
+    "  - name: cake\n"
+    "    items:\n"
+    '      - amount: "100 g"\n'
+    '        item: "plain flour"\n'
+    '  - name: "lemon curd"\n'
+    "    items:\n"
+    '      - item: "name: not a group"\n'
+    "method_groups:\n"
+    "  - name: Make the cake\n"
+    "    steps:\n"
+    '      - "Mix."\n'
+    "  - name: 'to serve'\n"
+    "    steps:\n"
+    '      - "Serve."\n'
+    '  - name: the "good" one\n'
+    "    steps:\n"
+    '      - "Eat."\n'
+    "---\n"
+    "Body with - name: prose in it\n"
+)
+
+
+def test_group_names_are_quoted_and_nothing_else_moves():
+    new, changed = tidy_drafts.fix_group_name_quoting(GROUP_NAMES_BEFORE, "fixture.md")
+    expected = (GROUP_NAMES_BEFORE
+                .replace("  - name: cake\n", '  - name: "cake"\n')
+                .replace("  - name: Make the cake\n", '  - name: "Make the cake"\n'))
+    assert new == expected, (
+        "only the two bare group names should gain quotes: an already quoted "
+        "name (either quote), an `item:` that merely contains `name:`, the "
+        "body, and a name holding a double quote are all left exactly as "
+        "written."
+    )
+    assert [c for c in changed if c.startswith("SKIPPED")] == [
+        'SKIPPED group name: contains a double quote: the "good" one'
+    ], "a name containing a double quote is reported, never escaped"
+
+    import yaml
+    before = yaml.safe_load(GROUP_NAMES_BEFORE.split("---", 2)[1])
+    after = yaml.safe_load(new.split("---", 2)[1])
+    assert before == after, "quoting a name changed what the file parses to"
+
+    again, changed_again = tidy_drafts.fix_group_name_quoting(new, "fixture.md")
+    assert again == new and not [c for c in changed_again if not c.startswith("SKIPPED")], (
+        "the rule is not idempotent"
+    )
+
+
+def test_group_name_quoting_is_a_food_rule_under_quoting():
+    food = [(n, f) for n, f in tidy_drafts.FOOD_FIXERS
+            if f is tidy_drafts.fix_group_name_quoting]
+    assert [n for n, _ in food] == ["quoting"], (
+        "`--only quoting` on food must include the group names."
+    )
+    drink_fixers = [getattr(f, "func", f) for _, f in tidy_drafts.DRINK_FIXERS]
+    assert tidy_drafts.fix_group_name_quoting not in drink_fixers, (
+        "a drink has no groups; this rule has nothing to do there."
+    )

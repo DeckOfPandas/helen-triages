@@ -90,7 +90,7 @@ main_ingredients: ["cavolo nero", "butter beans", "lemon"]
 star_ingredient: "greens"
 tags: ["soup"]
 ingredient_groups:
-  - name: soup
+  - name: "soup"
     items:
     - amount: "400 g"
       item: "butter beans, drained"
@@ -151,7 +151,7 @@ key, or `"false"` in quotes, holds the page back silently. Write
 
 ```yaml
 ingredient_groups:
-  - name: dressing              # a bare noun. NOT "for the dressing"
+  - name: "dressing"              # a bare noun. NOT "for the dressing"
     items:
     - amount: "2 tbsp"          # the quantity ALWAYS goes here
       item: "red wine vinegar"  # never "2 tbsp red wine vinegar"
@@ -260,11 +260,11 @@ as they do above:
 
 ```yaml
 method_groups:
-  - name: custard
+  - name: "custard"
     steps:
     - "QQ original Whisk the yolks and sugar together until pale, then pour on the hot milk in a thin stream, whisking all the time."
     - "QQ Claude Whisk the yolks and sugar pale. Pour on the hot milk in a thin stream, whisking."
-  - name: assembly
+  - name: "assemble"
     steps:
     - "QQ original Spoon the custard over the sponge and leave it to set in the fridge for at least four hours."
     - "QQ Claude Spoon the custard over the sponge. Set in the fridge, 4 hours."
@@ -444,7 +444,9 @@ website). Keep one that points into the same book the recipe came from.
 - **Quote every scalar string, and every list member.** `serves: "4"`, not
   `serves: 4`. `tags: ["soup"]`, not `tags: [soup]`. This applies to `title`,
   `tagline`, `source`, `prep_time`, `cook_time`, `star_ingredient`, `makes`,
-  `serves`, and to every entry in `main_ingredients` and `tags`. It does not
+  `serves`, to every entry in `main_ingredients` and `tags`, **and to every
+  group's `name`** on both sides — `- name: "dressing"`, `- name: "Make the
+  custard"`, never `- name: dressing`. It does not
   apply to `source_type`, or to the three booleans under `meta:` — quoting a
   boolean turns it into the *string* `"false"`, which breaks the publish gate.
 - **En dash for a number range**: `3–4 mins`, `170–180°C`, `36–40% fat`. Not a

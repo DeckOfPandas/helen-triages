@@ -888,6 +888,56 @@ unless stated.
   closes nor cross-references a public issue.** Measure before briefing:
   `python3 scripts/tidy_drafts.py --site food --only size` answers it in one
   call.
+- **2026-10-04, #814 — a group named `to finish` printed "For the to
+  finish:".** Helen: *"Can we fix all 'for the to finish' cases? Both existing
+  and when we ingest."* The layout special-cased `to serve` alone; any
+  ingredient-group name opening with "to " now prints as itself, capitalised,
+  with the colon. Measured: four such names — to serve 30, to decorate 3, to
+  garnish 2, to finish 1 — and the six wrong headings were all in drafts,
+  which is why nobody had seen it on the live site. Method groups print their
+  name bare and never had the fault. Left alone: `assemble` ("For the
+  assemble:") and `finishing`, the second on a published recipe.
+- **2026-10-04, #814 — Helen's rulings on the retro-fit (food-private PR
+  #43).**
+  - **The closing METHOD group is `assemble`, the verb.** *"We use "assemble"
+    for some published food recipes I believe. Let's stick with that."* Never
+    `assembly` on the method side; an INGREDIENT group called `assembly` is
+    left alone, because that side names components. Where the closing step
+    only serves it is `to serve` (*'"to serve" please'*, over `Serve`); where
+    it bakes, *'"layer and bake" is nice where relevant. "assemble and bake"
+    too.'*
+  - **An ingredient used in two phases is split where the method states the
+    amount.** Of the cheesecake's 275 g of sugar: *"25g under sauce, rest
+    where it's used."* Split only when the method states the amount for one
+    phase and the remainder is arithmetic; item text identical on both
+    halves. Where no amount is stated: *'Lemon can be split into "the juice of
+    1 lemon" and "the zest of one lemon". Can we cleverly reunite those for
+    the shopping list, though? "a little" or "most of" can have "the rest of"
+    in their other part.'* The shopping-list reunion is public-repo work and
+    was not built the day she asked.
+  - **Interleaved phases take narrative names, and Claude suggests them.**
+    *"We use narrative phase names already, good spot, so yes please suggest
+    some. It'll be easier for me to edit than generate."* A component-named
+    group cannot hold steps that leave a component and return to it; "Brown
+    the beef", "Build the stew", "Finish and bake" can.
+  - **Imperatives, as a trial.** Shown `cake`, `lemon curd`, `assemble` on one
+    draft: *'Can we try "Make the cake", "Make the lemon curd", and "Assemble"
+    here? Imperatives are nice, and I like verbs.'* Applied to the 21 drafts
+    where the mixed register showed, not to every batch-1 draft.
+  - **A component with ingredients and no method gets a `QQ - MISSING:` step,
+    not silence**: *'Leave a QQ in there for me please under e.g. "Make the
+    treacle topping"'*.
+  - **Group names are quoted from now on.** The retro-fit left `- name: cake`
+    beside `- name: "Make the batter"`; told that the difference was only how
+    the name is typed, never how it prints: *"Let's make future recipes quote
+    group titles, so add that to the tidy pass instructions, and ingestion
+    instructions."* `fix_group_name_quoting` in `tidy_drafts.py` (food,
+    `--only quoting`), and both ingest documents say so.
+  - **The first proof script was lost when its agent's worktree was
+    auto-removed** (it held no tracked change, so the harness tidied it — the
+    one way a worktree goes that `CLAUDE.md`'s rule does not reach). **A proof
+    script's text belongs in the report that cites it**, and a helper whose
+    work is all in a gitignored clone should push after every commit.
 
 ### §4.0 The gate flags
 
@@ -1383,30 +1433,47 @@ unless stated.
   this row must open with a number. Moved into the input's `title` and
   `aria-label`. The `×` on a batch box survives because it is a MARK and not a
   second number, which is the whole distinction.
-- **2026-10-04, #1125** — **A handful does not scale, and which measures
-  those are is DATA.** Helen: *"find a way to parameterise ingredient lines
-  that won't scale ... The scaler line should say: 'Not scaled: Tabasco sauce'
-  / 'Not scaled: fresh parsley'"* and *"Currently some recipes scale 1 handful
-  to e.g. 1.17 handfuls, which is obvious nonsense."* The recipe page's scaler
-  already left alone an amount with no number and an ingredient with no
-  amount; `1 handful` has a number, so it parsed and the arithmetic ran.
-  `unscaled_measures` in the new `_data/food/scaling.yml` — handful, pinch,
-  dash, splash, knob, pat — reaches the page as `data-unscaled` on the
-  control. Measured first: 23 numbered amounts in 19 files (14 published).
-  **`large`/`medium`/`small` can never join the list** (her #1005 ruling, a
-  test refuses them). **Left scaling, unruled:** sprig, bunch, drop, twist,
-  lot — counts of a thing you can pick up. **The name on the line is the
-  ingredient**: a leading measure phrase in `item:` goes, then everything from
-  the first comma or bracket (the cut `food_shopping.rb` makes), then a
-  trailing `to taste` from `trailing_phrases`. The comma cut is also what
-  makes #1088's comma-joined line actually safe: `recipe-scale.js` had said
-  the names came from `.recipe-item-name` and so held no comma; no such class
-  ever existed, the names were the whole `item:` text, and dozens of published
-  lines had one. **A comment that explains why something is safe is a claim,
-  and this one was never checked.** Cost of the cut, knowingly taken: an item
-  that is itself a list (`fresh parsley, thyme and sage`) is named by its
-  first member. **Not done: the index's shopping list still totals
-  `1 handful` at ⅔.**
+- **2026-10-04, #1125** — **A handful scales in HALF STEPS, and the first
+  build of this was the opposite.** Helen, three sentences in order: *"some
+  recipes scale 1 handful to e.g. 1.17 handfuls, which is obvious nonsense"*;
+  *'If a recipe calls for "a handful of parsley", three orders of that recipe
+  should call for "3 handfuls of parsley"'*; *"Handfuls can scale in half
+  steps."* The first build read the issue as "hold it still and name it on the
+  Not-scaled line", shipped a list called `unscaled_measures`, and was wrong:
+  she wanted it to move, to a figure a person could act on. **The issue's own
+  example said what to stop, not what to do instead; the second sentence had
+  to be asked for.** Now: nearest half, never less than a half, in ONE
+  function (`halfStep`, `food-scale.js`); the list is `half_step_measures` in
+  `_data/food/scaling.yml` (handful, pinch, dash, splash, knob). Her sentence
+  names handfuls and the rule was applied to the whole list. **A measure
+  written with no number scales too** — her example has no `amount:` — where
+  `a`/`an`/`one`/nothing is one; 96 items open that way, 5 published. "a few"
+  is not a number, stays as written and is named on the Not-scaled line.
+  **Ruled the same day:** sprig, bunch, drop, twist and lot scale linearly
+  (*"Yes, 4 sprigs double is 8, and so on."*); `pat` scales linearly (*'"pat"
+  is a correct term, and should be scaled linearly as "pats"'*); a list item
+  named by its first member is fine (*"doesn't state an amount, so scaling is
+  by common sense."*). The name on the Not-scaled line is the ingredient: a
+  leading measure phrase goes, then everything from the first comma or
+  bracket, then a trailing `to taste`. **Not done:** the index's shopping list
+  does not go through `halfStep` and still prints "1.17 handfuls". **Open:**
+  "½ handfuls" follows the scaler's existing plural rule (singular only at
+  exactly one).
+- **2026-10-04, #1286** — **On a `makes:` recipe the scaler counts the thing
+  made.** Helen: *"Never tell me how many cookies are in a portion!!!"*, then
+  *"Take the midpoint, no candidate page needed"*. Henry's waffles said "Makes
+  4–6 waffles" at the top and "~2 portions" under the ingredients. Her
+  rulings, one per shape: a half midpoint is *"a range of one"*; *'"64+" can
+  be treated as "64"'*; a number word is a count (*"Two 8-inch cakes"*); *'"1
+  dozen" doubled can be "two dozen". Our scaler is integer.'*; *"950 ml for
+  one order of a recipe becomes 1900 ml for 2"*; and *'for "some" we can
+  retain the previous guess we made at portions'*. `makes:` is still never
+  read as people — `page.made` (`_plugins/food_yield.rb`) is a second answer
+  beside `page.portions`, not a replacement. 31 of 42 published `makes:`
+  recipes changed; 11 keep the portions box and a test names them. **Not
+  ruled:** a count of nothing named (`makes: "about 8"`); whether the top
+  "Makes" line moves with the box; the index shopping list, which still
+  scales these by portions.
 
 ---
 

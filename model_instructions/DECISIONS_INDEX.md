@@ -97,6 +97,8 @@ argument and the rules each field is read by.
 - 2026-10-02 · §4 · #1258 · Every draft has a notes slot, and imported text is labelled QQ. Both reverse a choice the 2026-10-01 migration made.
 - 2026-10-04 · §4 · #814 · the retro-fit ran, and the yield was lopsided: 103 of 142, then 18 of 174.
 - 2026-10-04 · §4 · #577 · re-measured: 6 items in 6 drafts, all of them refusals.
+- 2026-10-04 · §4 · #814 · a group named to finish printed "For the to finish:".
+- 2026-10-04 · §4 · #814 #43 · Helen's rulings on the retro-fit (food-private PR #43).
 - 2026-08-18 · §4.0 · Hardened (above).
 - 2026-08-26 · §4.0 · food_magic_bag joined GATED_COLLECTIONS with the collection; §4.0 said two until 2026-09-02.
 - 2026-09-01 · §4.0 · What awaiting_fix: true means to Helen: "'awaiting_fix' means I've proofread, but one small thing has been raised as a ticket, meaning that once that's fixed I can look for just …
@@ -147,7 +149,8 @@ argument and the rules each field is read by.
 - 2026-09-07 · §8.2 · #815 · the batch box lasted a few hours and Helen killed it.
 - 2026-09-07 · §8.2 · "this is all I can see": boxes, no totals, and it was not the code at all.
 - 2026-09-07 · §8.2 · the yield came off the row, and dimming it was not the fix.
-- 2026-10-04 · §8.2 · #1125 · A handful does not scale, and which measures those are is DATA.
+- 2026-10-04 · §8.2 · #1125 · A handful scales in HALF STEPS, and the first build of this was the opposite.
+- 2026-10-04 · §8.2 · #1286 · On a makes: recipe the scaler counts the thing made.
 - 2026-09-10 · §8.3 · Helen, having used both indexes for a weekend's planning
 - 2026-09-10 · §8.3 · Every one of those is the same fact — shortlisted was declared as an ordinary filter in filter-state.js and so ANDed with everything else.
 - 2026-09-10 · §8.3 · The rule now, held in two pure functions and generated tests across BOTH field tables (tests/js/shortlist-view.test.js)
