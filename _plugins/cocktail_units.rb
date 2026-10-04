@@ -351,10 +351,11 @@ module HelenTriages
     #     batch and is not what a top fills).
     #   - `serves:` above 1 -- the primed trap in `volume_for`'s header.
     #   - more than one `(top)` pour: they share the room and nothing says how.
-    #   - THE BUILD ALREADY FILLS THE GLASS. The Arrack Christmas Punch shakes
-    #     135 ml into a flute that takes about 176, and that is a question
-    #     about the glass or the recipe (#1244 asks it), not a drink topped
-    #     with nothing.
+    #   - THE BUILD ALREADY FILLS THE GLASS. The Arrack Christmas Punch shook
+    #     135 ml into a flute that takes about 176, and that was a question
+    #     about the glass or the recipe, not a drink topped with nothing.
+    #     Helen answered it on #1244 by scaling the recipe to 87.5 ml
+    #     (2026-10-04), so no drink is in this case today.
     #
     # THE FIRST GLASS LISTED IS THE GLASS. A second is an alternative Helen
     # picks at the cupboard, and the page has one figure to print.

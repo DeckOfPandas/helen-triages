@@ -2,7 +2,7 @@
 title: "Fog Cutter (Bramble style)"
 tagline: "Also causes fog."
 glass:
-  - "collins"
+  - "tiki mug"
 garnish:
   - "mint sprig"
 serve:
@@ -43,5 +43,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
