@@ -2139,13 +2139,22 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # and Fog Cutter to tiki mug please", "Arrack Christmas Punch option B please",
 # the amounts chosen from a table put in front of her. The 742aa73 shape.
 #
-# LITA GREY, SCALED IN THE SAME SITTING, IS NOT COVERED: she named three drinks
-# and it was not one of them, so it is committed after this and says false.
-#
 # Proved with the old value first, as every move before it: the test named
 # exactly those three files, every one "last touched by 5f89c5e3", and nothing
 # else. Covers 5f89c5e and nothing after.
-COCKTAIL_BASELINE_COMMIT = "5f89c5e"   # three drinks answer the glass-fit list (#1244)
+#
+# MOVED AGAIN THE SAME DAY FOR LITA GREY, WHICH THE GRANT ABOVE DID NOT NAME
+# and so was committed `proofread: false`. `6271217` scales it to two thirds
+# (5 x 15 ml shaken, 40 ml champagne -- her "option C") and drops the coupe;
+# `6481f2a` puts the flag back.
+#
+# HER GRANT, told it would leave the live site: "Lita Grey proofread: true too
+# please, and flute only, dropping the amounts to what we agreed."
+#
+# Proved with the old value first: the test named exactly one file,
+# `_cocktail_recipes/lita-grey.md`, "last touched by 6481f2af", and nothing
+# else. Covers 6481f2a and nothing after.
+COCKTAIL_BASELINE_COMMIT = "6481f2a"   # four drinks answer the glass-fit list (#1244)
 
 
 def _newest_commit_per_published_drink():
