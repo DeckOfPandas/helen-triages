@@ -37,16 +37,19 @@
 #   pinch      4 amounts in  3 files   "1 pinch"
 #   splash     1                       "1 splash" of red wine vinegar
 #   knob       1                       "1 knob" of salted butter
-#   pat        2 amounts in  2 files   "2 pats", "2 large pats" of salted butter
 #   dash       0 with a number; it is here for Helen's own example, which the
 #              collection writes inside `item:` ("a few dashes of Tabasco ...")
 #
-# WHAT IS DELIBERATELY ABSENT, because each is a COUNT of a thing you can pick
-# up rather than a measure by eye, and whether a count should scale is a
-# different question from whether a handful should: `sprig` (3), `bunch` (5),
-# `drop` (1, "3–4 drops" of vanilla), `twist` (1, "5 twists" of black pepper),
-# `lot` (2, batches of another recipe). They scale today as they always have.
-# Adding one is one line below; it is Helen's call, not a tidy-up.
+# WHAT IS ABSENT IS RULED, NOT FORGOTTEN -- Helen, 2026-10-04, asked about
+# each. A COUNT of a thing you can pick up scales: "Yes, 4 sprigs double is 8,
+# and so on." So `sprig` (3 amounts), `bunch` (5), `drop` (1, "3–4 drops" of
+# vanilla), `twist` (1, "5 twists" of black pepper) and `lot` (2, batches of
+# another recipe) are not here and must not be added.
+#
+# `pat` WAS HERE FOR A FEW HOURS AND CAME OUT ON HER WORD: '"pat" is a correct
+# term, and should be scaled linearly as "pats"'. A pat of butter is a thing
+# you cut, not a measure by eye; "2 large pats" doubled is "4 large pats".
+# (2 amounts in 2 published recipes.) `knob` stays; her answer did not name it.
 #
 # `large`, `medium` and `small` MUST NEVER BE ADDED. Helen, on #1005: "Things
 # like '2 large' can scale, surely" -- "2 large eggs" doubled is "4 large".
@@ -57,4 +60,3 @@ unscaled_measures:
   - dash
   - splash
   - knob
-  - pat

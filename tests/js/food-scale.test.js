@@ -120,8 +120,7 @@ test('a handful is not scaled -- 1.17 handfuls is "obvious nonsense"', () => {
 test('every way the collection writes a hand measure stays as written', () => {
   // Each of these is a real `amount:` in _food_recipes/ or _food_drafts/.
   ['1 handful', '2 handfuls', '1 small handful', '1 large handful each',
-    '1 small handful each', '1 pinch', '1 splash', '1 knob', '2 pats',
-    '2 large pats'].forEach((amount) => {
+    '1 small handful each', '1 pinch', '1 splash', '1 knob'].forEach((amount) => {
     const r = scaleAmount(amount, 2, WORDS);
     assert.strictEqual(r.text, amount);
     assert.strictEqual(r.scaled, false, amount);
@@ -135,8 +134,8 @@ test('a plural in -es is the same measure', () => {
 });
 
 test('the measure is a whole word, so nothing else is caught by it', () => {
-  // `pat` must not hold back a pâté tin, nor `dash` a dashi sachet.
-  assert.strictEqual(scaleAmount('2 patties', 2, WORDS).text, '4 patties');
+  // `dash` must not hold back a dashi sachet, nor `pinch` a pinchos stick.
+  assert.strictEqual(scaleAmount('2 pinchos', 2, WORDS).scaled, true);
   assert.strictEqual(scaleAmount('1 dashi sachet', 2, WORDS).scaled, true);
   assert.strictEqual(scaleAmount('200 g', 2, WORDS).text, '400 g');
 });
@@ -149,11 +148,44 @@ test('"2 large" still scales with the list in hand', () => {
   assert.strictEqual(scaleAmount('1 small', 3, WORDS).text, '3 small');
 });
 
-test('counts of things you can pick up still scale', () => {
-  // Deliberately NOT in the list -- scaling.yml has the argument. If Helen
-  // rules that a sprig or a bunch is a hand measure too, these change with it.
+test('counts of things you can pick up scale -- Helen: "4 sprigs double is 8, and so on"', () => {
+  // RULED, 2026-10-04, not merely left: sprig, bunch, drop, twist and lot are
+  // absent from scaling.yml on her word. Each amount is a real one.
   assert.strictEqual(scaleAmount('4 sprigs', 2, WORDS).text, '8 sprigs');
   assert.strictEqual(scaleAmount('1 bunch', 2, WORDS).text, '2 bunches');
+  assert.strictEqual(scaleAmount('3–4 drops', 2, WORDS).text, '6–8 drops');
+  assert.strictEqual(scaleAmount('5 twists', 2, WORDS).text, '10 twists');
+  assert.strictEqual(scaleAmount('2 lots', 2, WORDS).text, '4 lots');
+});
+
+test('a pat scales, and reads "pats" -- Helen: "scaled linearly as pats"', () => {
+  // `pat` was in the list for a few hours and came out on her word: '"pat" is
+  // a correct term, and should be scaled linearly as "pats"'.
+  assert.ok(!WORDS.unscaled.includes('pat'), 'pat is back in scaling.yml');
+  assert.strictEqual(scaleAmount('1 pat', 2, WORDS).text, '2 pats');
+  assert.strictEqual(scaleAmount('2 pats', 2, WORDS).text, '4 pats');
+  assert.strictEqual(scaleAmount('2 pats', 0.5, WORDS).text, '1 pat');
+  // The size word stays where it was: pan-seared venison's own amount.
+  assert.strictEqual(scaleAmount('2 large pats', 2, WORDS).text, '4 large pats');
+  assert.strictEqual(scaleAmount('2 large pats', 0.5, WORDS).text, '1 large pat');
+  assert.strictEqual(scaleAmount('2 pats', 2, WORDS).scaled, true);
+});
+
+test('the index shopping list still scales a handful -- Helen: "1 handful can become 2 handfuls"', () => {
+  // `unscaled_measures` is the RECIPE PAGE's rule. The shortlist's shopping
+  // list totals a handful like any other count, on her word, and this pins
+  // what it prints so that a later change to it is a decision, not a drift.
+  const FSL = require('../../assets/js/food-shopping-list.js');
+  const row = (amount, scale) => FSL.build(
+    [{ amount: amount, name: 'fresh flat-leaf parsley', aisle: 'produce', scale: scale }],
+    { aisles: [{ key: 'produce', label: 'Produce' }] })[0].items[0].text;
+  assert.strictEqual(row('1 handful', 2), '2 handfuls');
+  assert.strictEqual(row('2 handfuls', 0.5), '1 handful');
+  assert.strictEqual(row('1 small handful', 2), '2 small handfuls');
+  // WHAT A FRACTION OF A HANDFUL PRINTS IS DELIBERATELY NOT PINNED. Today it
+  // is "⅔ handfuls" (the plural follows any number that is not exactly 1) and
+  // "1.17 handfuls" at seven for six; both were reported to Helen rather than
+  // decided here, so no assertion freezes either answer.
 });
 
 test('with no list given, a handful scales as it did before #1125', () => {
@@ -198,8 +230,9 @@ test('the note name drops a measure written into the item', () => {
     'fresh coriander');
   assert.strictEqual(noteName('a good pinch of salt', WORDS), 'salt');
   assert.strictEqual(noteName('pinch of salt', WORDS), 'salt');
+  // `pat` is not a declared measure (it scales), so its phrase is left alone.
   assert.strictEqual(noteName('a pat of salted butter, to finish', WORDS),
-    'salted butter');
+    'a pat of salted butter');
 });
 
 test('"of" inside a name is not a measure phrase', () => {
