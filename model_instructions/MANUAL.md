@@ -2824,6 +2824,17 @@ break them in the kitchen."* Nothing records the cupboard, and nothing should.
   report checks the build and says how much room is left for the top. **It is
   a report and not a test on purpose**: a red `main` is a deploy outage, and
   every flag is Helen's judgement about one drink.
+- **What a flag takes, since the first list was audited line by line (#1244,
+  2026-10-04; 10 of its 22 lines were the model's fault).** Only what was
+  shaken is watered: the plugin's `added_after_ml` gives the report
+  `data-after-ml` (in the glass undiluted: a float, or an amount a step holds
+  back with "other than the …") and `data-aside-ml` (the rum in a fruit
+  shell, not in the glass). A drink must be over by more than
+  `fit_rules.tolerance` (10%) to be flagged. The top flag fires only when the
+  build leaves under `fit_rules.top_room_min` (a quarter) of the house
+  range's minimum — "hardly any room for a top". Both are judgements, not
+  sourced, and say so in `glasses.yml`. `tests/test_glass_fit_report.py` pins
+  the arithmetic in `check` with no build.
 
 ### 9.12 The method-step dictionary — `_data/cocktails/methods.yml`
 

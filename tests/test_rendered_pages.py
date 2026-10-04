@@ -3878,6 +3878,77 @@ def test_a_top_is_sized_from_its_glass_and_falls_back_to_the_house_range(fixture
     )
 
 
+# WHAT WAS NEVER SHAKEN -- #1244's audit, 2026-10-04. `added_after_ml` in
+# _plugins/cocktail_units.rb: an amount a step holds back ("other than the
+# ginger beer") or an `as: "float"` is in the glass undiluted; an
+# `as: "shell"` rum is not in the glass at all. The fit report watered all of
+# it and flagged a Dark 'n' Stormy for its ginger beer.
+AFTER_DRINK = (
+    '---\ntitle: "{t}"\ntagline: "Temporary fixture, deleted by the test."\n'
+    'glass:\n  - "collins"\ngarnish:\n  - "no garnish"\nserve:\n  ice: "cubed"\n'
+    'ingredients:\n  - amount: "50 ml"\n    generic: "London dry gin"\n{pours}'
+    'method:\n{steps}'
+    'mood:\n  - "sharp"\nnotes: []\nsource: ""\nsource_url: ""\n'
+    'meta:\n  made_before: true\n  ship: "yes"\n'
+    '  rewritten: true\n  awaiting_fix: false\n  proofread: true\n---\n'
+)
+
+AFTER_CASES = {
+    # slug: (extra pours, method steps, {attribute: expected or None for absent})
+    "zzz-after-held-back": (
+        '  - amount: "90 ml"\n    generic: "ginger beer"\n',
+        ["Shake all ingredients other than the ginger beer with ice.",
+         "Strain while also pouring in the ginger beer."],
+        {"after-ml": "90", "aside-ml": None, "method-family": "shake"}),
+    "zzz-after-short-name": (
+        '  - amount: "15 ml"\n    generic: "oloroso sherry"\n',
+        ["Shake all ingredients other than the sherry with ice.", "Strain."],
+        {"after-ml": "15", "aside-ml": None, "method-family": "shake"}),
+    "zzz-after-float-and-shell": (
+        '  - amount: "15 ml"\n    generic: "blended overproof rum"\n    as: "float"\n'
+        '  - amount: "25 ml"\n    generic: "blended overproof rum"\n    as: "shell"\n',
+        ["Shake everything except the float with ice.", "Strain."],
+        {"after-ml": "15", "aside-ml": "25", "method-family": "shake"}),
+    "zzz-after-nothing": (
+        "", ["Shake all ingredients with ice.", "Strain."],
+        {"after-ml": None, "aside-ml": None, "method-family": "shake"}),
+    # "with a few" anywhere in the shake's own sentence is a short shake.
+    "zzz-after-few-pebbles": (
+        "", ["Shake all ingredients with a few pebbles of crushed ice.", "Strain."],
+        {"after-ml": None, "aside-ml": None, "method-family": "short_shake"}),
+}
+_in_the_fixture_build({
+    f"_cocktail_recipes/{slug}.md": AFTER_DRINK.format(
+        t=slug, pours=pours, steps="".join(f'  - "{s}"\n' for s in steps))
+    for slug, (pours, steps, _) in AFTER_CASES.items()})
+
+
+def test_the_page_says_what_was_never_shaken_and_how_the_method_reads(fixture_site):
+    """#1244. Only what went through the shaker is watered.
+
+    The page carries the plugin's answer for scripts/glass_fit_report.py, as
+    it carries the total: `data-after-ml` for what is in the glass undiluted,
+    `data-aside-ml` for what is in the recipe and not in the glass. A method
+    names an ingredient more shortly than the data does ("the sherry"), so a
+    held-back amount is matched when either name contains the other.
+
+    FIXTURES, because the drinks that showed the fault are a draft (the Dark
+    'n' Stormy) and three published drinks whose recipes Helen may change.
+    """
+    problems = []
+    for slug, (_, _, want) in AFTER_CASES.items():
+        page = fixture_site / "cocktails" / "recipes" / slug / "index.html"
+        assert page.exists(), f"{slug} did not build"
+        attrs = _scale_attrs(page.read_text(encoding="utf-8"))
+        got = {key: attrs.get(key) for key in want}
+        if got != want:
+            problems.append(f"{slug}: {got}, expected {want}")
+    assert not problems, (
+        "`added_after_ml` or `method_family` (_plugins/cocktail_units.rb) read "
+        "a fixture drink wrongly:\n  " + "\n  ".join(problems)
+    )
+
+
 def test_the_tom_collins_tops_with_what_a_highball_leaves(prod_site):
     """ONE REAL DRINK WITH A REAL NUMBER IN IT -- and the units beside it.
 

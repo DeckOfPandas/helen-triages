@@ -695,6 +695,24 @@ fit_rules:
   large_cube_ml: {low: 120, high: 131}
   punch_cup_ml: {low: 90, high: 120}
   lost_below: 0.5
+  # TWO MORE JUDGEMENTS, NOT SOURCED, from auditing the first list line by
+  # line (#1244, 2026-10-04). Both are the report's alone; nothing on the site
+  # reads them.
+  #
+  # tolerance      A drink is flagged only when it is over by more than this
+  #                share. Every figure the report compares is a survey median
+  #                times a wash line times an ice allowance, and four of the
+  #                first list's 22 lines were over by 2.5% to 7.5%. That is
+  #                the model's noise, not a finding about a drink.
+  # top_room_min   "Hardly any room for a top": the room a build leaves, as a
+  #                share of the least the house range says a top pours. The
+  #                flag used to fire below the WHOLE minimum, which stopped
+  #                meaning anything when a top began to be sized from the
+  #                glass (#1179) -- a Tom Collins with 91 ml of room against a
+  #                range starting at 100 was flagged. A quarter keeps the one
+  #                case it is for: a build that fills its glass.
+  tolerance: 0.10
+  top_room_min: 0.25
 
 # =============================================================================
 # DISPLAY SCALE — the cheat, and it is a cheat on purpose.

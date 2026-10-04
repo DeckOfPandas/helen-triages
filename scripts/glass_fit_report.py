@@ -56,6 +56,10 @@ TOTAL_ML = re.compile(r'class="cocktail-scale-controls" data-total-ml="([\d.]+)"
 # report and the site cannot read one drink two ways.
 TOP_ML = re.compile(r'class="cocktail-scale-controls"[^>]* data-top-ml="([\d.]+)"')
 FAMILY = re.compile(r'class="cocktail-scale-controls"[^>]* data-method-family="([a-z_]+)"')
+# And since #1244's audit: what is in the glass but was added AFTER the shake
+# (so never watered), and what is in the recipe but not in the glass at all.
+AFTER_ML = re.compile(r'class="cocktail-scale-controls"[^>]* data-after-ml="([\d.]+)"')
+ASIDE_ML = re.compile(r'class="cocktail-scale-controls"[^>]* data-aside-ml="([\d.]+)"')
 
 
 def front_matter(path):
@@ -143,17 +147,37 @@ HOW = {
 }
 
 
-def check(fm, total, top, family, glasses, rules, top_up):
+def check(fm, total, top, family, glasses, rules, top_up, after=0.0, aside=0.0):
     """(context line, [(glass, verdict, detail)]) for one drink.
 
-    `total`, `top` and `family` are the plugin's, read off the built page.
+    `total`, `top`, `family`, `after` and `aside` are the plugin's, read off
+    the built page.
+
+    FOUR THINGS CHANGED AFTER THE FIRST LIST WAS AUDITED LINE BY LINE (#1244,
+    2026-10-04), and each removed flags that were the model's fault:
+
+      1. ONLY WHAT WAS SHAKEN IS WATERED. `after` is in the glass undiluted (a
+         float, a measured champagne added after the strain); `aside` is not
+         in the glass at all (the rum in a fruit shell). The first list
+         watered both and flagged a Dark 'n' Stormy for its ginger beer.
+      2. A FLAG NEEDS A MARGIN. `tolerance` in fit_rules: a drink over by less
+         than that share is not flagged. Every figure here is a survey median
+         times a wash line times an ice allowance; 3% over is not a finding.
+      3. THE TOP FLAG FIRES ONLY WHEN THERE IS HARDLY ANY ROOM. It compared the
+         room with the house range's minimum, which the site stopped spending
+         when a top began to be sized from the glass (#1179). It now fires
+         when the room is under `top_room_min` of that minimum -- the Arrack
+         Christmas Punch, whose build fills its flute.
+      4. (In the plugin) "shake ... with a few" is a short shake wherever the
+         words fall in the sentence.
     """
     serve = fm.get("serve") or {}
     ice = serve.get("ice") or "none"
     fill = serve.get("fill")
     serves = int(fm.get("serves") or 1)
     least = top_least(fm.get("ingredients"), top_up)
-    served = served_ml(total - top, family, rules)
+    over_by = 1 + rules["tolerance"]
+    served = served_ml(total - top - after - aside, family, rules) + after
     per_glass = served / serves
 
     results = []
@@ -170,7 +194,7 @@ def check(fm, total, top, family, glasses, rules, top_up):
             batch = served + top
             verdict = ("over" if batch > s["max"] * limit
                        else "tight" if batch > s["median"] * limit else "ok")
-            if serves > 1 and per_glass > cup["high"]:
+            if serves > 1 and per_glass > cup["high"] * over_by:
                 verdict = "cup" if verdict == "ok" else verdict
             note = (f"batch ~{batch:.0f} ml in a bowl typically {s['median']} ml "
                     f"(surveyed {s['min']}–{s['max']})")
@@ -182,11 +206,11 @@ def check(fm, total, top, family, glasses, rules, top_up):
         typical, smallest, largest = (room(c, ice, family, key, rules, fill)
                                       for c in (s["median"], s["min"], s["max"]))
         up_in_a_stem = ice == "none" and family != "blended" and key in rules["stemmed"]
-        if per_glass > largest:
+        if per_glass > largest * over_by:
             verdict = "over"
-        elif per_glass > typical:
+        elif per_glass > typical * over_by:
             verdict = "tight"
-        elif top and typical - per_glass < least:
+        elif top and typical - per_glass < least * rules["top_room_min"]:
             verdict = "top"
         elif up_in_a_stem and per_glass + top < rules["lost_below"] * smallest:
             verdict = "lost"
@@ -207,6 +231,8 @@ def check(fm, total, top, family, glasses, rules, top_up):
     how = HOW[family].format(d=rules["dilution"].get(family, {}).get("low", 0),
                              m=rules["blended_multiplier"]["low"])
     context = (f"recipe {total:g} ml" + (f" incl. ~{top:g} ml top" if top else "")
+               + (f", {after:g} ml of it added after and not watered" if after else "")
+               + (f", {aside:g} ml of it not in the glass" if aside else "")
                + f"; {how}; ice: {ice}" + (f", {fill}" if fill else "")
                + (f"; serves {serves}" if serves > 1 else ""))
     return context, results
@@ -217,8 +243,8 @@ WORDS = {
     "tight": "too big for a typical one",
     "lost": "**lost even in the smallest surveyed glass**",
     "small": "under half a typical one",
-    "top": "less room for a top than the house range expects",
-    "cup": "a big pour for a punch cup",
+    "top": "hardly any room for a top",
+    "cup": "more than a punch cup holds",
     "unchecked": "not checked",
 }
 ORDER = ["over", "lost", "tight", "top", "small", "cup", "unchecked"]
@@ -261,6 +287,8 @@ def main(argv=None) -> int:
         text = built.read_text(encoding="utf-8")
         top = TOP_ML.search(text)
         family = FAMILY.search(text)
+        after = AFTER_ML.search(text)
+        aside = ASIDE_ML.search(text)
         if not family:
             unchecked.append(f"- {label} ({where}): the page carries no "
                              "`data-method-family`; is the build stale?")
@@ -268,7 +296,9 @@ def main(argv=None) -> int:
         context, results = check(fm, float(m.group(1)),
                                  float(top.group(1)) if top else 0.0,
                                  family.group(1), glasses, rules,
-                                 costs.get("top_up_ml") or {})
+                                 costs.get("top_up_ml") or {},
+                                 after=float(after.group(1)) if after else 0.0,
+                                 aside=float(aside.group(1)) if aside else 0.0)
         # A drink with several glasses is fine if ANY of them fits: the list is
         # alternatives, and Helen picks at the cupboard.
         if any(v == "ok" for _, v, _ in results):
@@ -290,7 +320,7 @@ def main(argv=None) -> int:
     body = [f"{count} drinks flagged, {fine} fit, {len(unchecked)} not checked.", ""]
     body += [line for _, _, lines in flagged for line in lines]
     if cups:
-        body += [f"- [ ] **{len(cups)} punches pour more a cup than a punch cup holds** "
+        body += [f"- [ ] **{len(cups)} punches make a bigger cup than a punch cup holds** "
                  f"(usual {rules['punch_cup_ml']['low']}–{rules['punch_cup_ml']['high']} ml). "
                  "The bowls are fine; the question is `serves:`, or whether these are "
                  "served in bigger glasses than punch cups."] + cups
