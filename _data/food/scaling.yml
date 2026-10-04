@@ -168,21 +168,35 @@ half_recipe:
   quarter_units:
     - tsp
     - tbsp
-    - cup
-    - cups
     - oz
     - lb
     - pint
     - pints
 
+  # Halves when the amount is a multiple of a HALF: a cup goes down to a
+  # quarter and no further. Helen saw "⅞ cups whole milk" on half a batch of
+  # waffles (1¾ cups, halved) and took the half step off them: "2-3 waffles
+  # isn't enough!!!!" Nobody measures seven eighths of a cup.
+  half_units:
+    - cup
+    - cups
+
   # A counted thing of which HALF IS A REAL THING, so an odd count is fine:
   # half a lemon, half an onion. STARTED SMALL ON PURPOSE -- every word here
   # lets a recipe through, and the judge is meant to refuse when unsure.
   #
-  # IN: fruit and alliums you cut anyway, and the two sticks you snap.
-  # LEFT OUT, deliberately, and each refuses real recipes today: `egg` (and
-  # yolk, white), `sprig`, `bunch`, `leaf`/`leaves`, `star anise`, `nutmeg`,
-  # `stock cube`, `sachet`, `tin`/`can`, `jar`, `pack`. Helen's to add.
+  # IN: fruit and alliums you cut anyway, the two sticks you snap, and the
+  # seven Helen added on 2026-10-04: "In: leaf, star anise, nutmeg, stock
+  # cube, sachet, tin, jar. Rest correct." (`leaves` is `leaf` written twice:
+  # the judge adds `s` or `es` to a word and that does not reach it.)
+  #
+  # OUT, AND RULED: `egg` (and so yolk, white) -- "Eggs: not halvable for food
+  # recipes." Also out, as she left them: `sprig`, `bunch`, `can`, `pack`,
+  # and a `lot` of another recipe ("Neither mince pies nor sweet cream base
+  # halve").
+  #
+  # THIS LIST IS ABOUT INGREDIENTS. A YIELD of "1 jar" still does not halve:
+  # that is the yield rule, which asks for at least one of the thing made.
   halvable:
     - lemon
     - lime
@@ -194,3 +208,11 @@ half_recipe:
     - chilli
     - cinnamon stick
     - vanilla pod
+    - leaf
+    - leaves
+    - star anise
+    - nutmeg
+    - stock cube
+    - sachet
+    - tin
+    - jar

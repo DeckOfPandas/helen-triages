@@ -573,7 +573,11 @@ test('#1286: guessed portions on a `makes:` recipe step in whole recipes -- 4, 8
 // BUILD decides which recipes get it (tests/test_food_yield.py); the second
 // argument here is that verdict.
 
-test('#1286: with the half step, the waffles go ½, 1, 2, 3 -- "2–3 waffles", 5, 10, 15', () => {
+test('#1286: with the half step, a count of five goes ½, 1, 2, 3 -- "2–3", 5, 10, 15', () => {
+  // THE REAL WAFFLES ARE NOT OFFERED THIS -- Helen: "Please take the half step
+  // off the waffles. 2-3 waffles isn't enough!!!!" (the cup rule refuses
+  // them). The spec is kept because an odd count is the case that shows the
+  // range of one; the verdict passed in is what a recipe that halves gets.
   const mode = yieldMode(WAFFLES, true);
   const half = press(mode, 5, -1);
   assert.strictEqual(half / mode.base, 0.5);
@@ -642,6 +646,101 @@ test('#1286: a `serves:` recipe is never given whole-recipe or half steps', () =
   const mode = portionsMode(6, false, true);
   assert.strictEqual(press(mode, 6, -1), 5);
   assert.strictEqual(press(mode, 6, 1), 7);
+});
+
+// --- "1 large egg", not "1 large eggs" -----------------------------------------
+// Helen: "at 0.5x, that should read '1 large egg' not 'eggs'. Going from 1x to
+// 0.5x eggs will be the only kind of occasion where a plural reduces to a
+// single. Can we fix please?"
+
+/** ingredient_words.yml's `singulars`, read as the flat map it is. */
+function yamlMap(file, key) {
+  const lines = fs.readFileSync(
+    path.join(__dirname, '..', '..', '_data', 'food', file), 'utf8').split('\n');
+  const start = lines.indexOf(key + ':');
+  assert.notStrictEqual(start, -1, `${file} has no top-level ${key}: key`);
+  const out = {};
+  for (const line of lines.slice(start + 1)) {
+    if (/^\S/.test(line) && !line.startsWith('#')) break;
+    const pair = /^\s+([^#:\s][^:]*):\s+(.+?)\s*$/.exec(line);
+    if (pair) out[pair[1]] = pair[2];
+  }
+  return out;
+}
+
+const SINGULARS = yamlMap('ingredient_words.yml', 'singulars');
+
+test('#1286: the singulars map was actually read', () => {
+  assert.strictEqual(SINGULARS.potatoes, 'potato');
+  assert.strictEqual(SINGULARS.leaves, 'leaf');
+});
+
+test('#1286: an amount that comes down to exactly one says so, and only then', () => {
+  // grandmas-fairy-cakes: `amount: "2 large"`, `item: "eggs"`, at half a recipe.
+  const r = scaleAmount('2 large', 0.5, WORDS);
+  assert.strictEqual(r.text, '1 large');
+  assert.strictEqual(r.one, true);
+  assert.strictEqual(scaleAmount('2', 0.5, WORDS).one, true);
+  assert.strictEqual(scaleAmount('4 medium', 0.25, WORDS).one, true);
+  // Not one; or one already; or a unit that carries its own noun.
+  assert.strictEqual(scaleAmount('4 large', 0.5, WORDS).one, false);
+  assert.strictEqual(scaleAmount('2 large', 2, WORDS).one, false);
+  assert.strictEqual(scaleAmount('1 large', 1, WORDS).one, false);
+  assert.strictEqual(scaleAmount('2 cloves', 0.5, WORDS).one, false);
+  assert.strictEqual(scaleAmount('2 cloves', 0.5, WORDS).text, '1 clove');
+  assert.strictEqual(scaleAmount('2 tbsp', 0.5, WORDS).one, false);
+  assert.strictEqual(scaleAmount('2 g', 0.5, WORDS).one, false);
+  assert.strictEqual(scaleAmount('1–2', 0.5, WORDS).one, false);
+});
+
+test('#1286: "1 large egg, separated" -- the item\'s leading noun goes singular', () => {
+  const one = (item) => foodScale.singularItem(item, SINGULARS);
+  // The waffles' own line, and the other shapes the published collection writes.
+  assert.strictEqual(one('eggs, separated'), 'egg, separated');
+  assert.strictEqual(one('eggs'), 'egg');
+  assert.strictEqual(one('egg yolks'), 'egg yolk');
+  assert.strictEqual(one('free-range eggs, separated'), 'free-range egg, separated');
+  assert.strictEqual(one('onions, peeled and halved'), 'onion, peeled and halved');
+  assert.strictEqual(one('soft-boiled eggs, halved (optional)'), 'soft-boiled egg, halved (optional)');
+  // The house's own irregulars, from the data.
+  assert.strictEqual(one('bay leaves'), 'bay leaf');
+  assert.strictEqual(one('tomatoes, quartered'), 'tomato, quartered');
+  assert.strictEqual(one('sweet potatoes'), 'sweet potato');
+  assert.strictEqual(one('dried juniper berries'), 'dried juniper berry');
+  // The noun is before "of" / "in" / "like".
+  assert.strictEqual(one('rashers of streaky bacon'), 'rasher of streaky bacon');
+  assert.strictEqual(one('spring onions in thin strips'), 'spring onion in thin strips');
+  // The page's text node carries the template's whitespace; kept exactly.
+  assert.strictEqual(one('\n            eggs, separated\n          '),
+    '\n            egg, separated\n          ');
+});
+
+test('#1286: an item that cannot be made singular safely is left as written', () => {
+  const same = (item) => assert.strictEqual(foodScale.singularItem(item, SINGULARS), item);
+  same('star anise');                       // no plural to remove (3 published lines)
+  same('shallots or 1 onion, peeled');      // two things
+  same('chives and/or parsley');
+  same('chillies, sliced');                 // -ies, and not in the map
+  same('mangoes');                          // -oes, and not in the map: never "mangoe"
+  same('watercress');                       // -ss
+  same('Jersey Royals');                    // a capital in the noun
+  same('egg');
+  same('');
+  // With no map, the irregulars are left alone rather than guessed.
+  assert.strictEqual(foodScale.singularItem('tomatoes'), 'tomatoes');
+  assert.strictEqual(foodScale.singularItem('eggs'), 'egg');
+});
+
+test('#1286: Delia\'s pancakes -- "about 8 pancakes" is 8 pancakes, then 16', () => {
+  // Helen: 'Can Delia\'s pancakes please scale as "8 pancakes", "16 pancakes".'
+  // The spec is what _plugins/food_yield.rb returns for `makes: "about 8
+  // pancakes"` (tests/test_food_yield.py pins that); the "about" is printed
+  // by the layout in front of the box, as it is for "about 300 ml".
+  const mode = yieldMode({ kind: 'count', base: 8, prefix: 'about', stem: 'pancakes', rest: '',
+    invariable: false, singular: false, times: false, plus: false }, false);
+  assert.strictEqual(reads(mode, mode.base), '8 pancakes');
+  assert.strictEqual(reads(mode, press(mode, 8, 1)), '16 pancakes');
+  assert.strictEqual(reads(mode, press(mode, 8, 1, 2)), '24 pancakes');
 });
 
 test('#1286: a reading the box cannot use gives no mode at all', () => {

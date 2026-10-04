@@ -61,6 +61,10 @@
 
   /* The same fold food-shopping-list.js applies on the way in, restated here
      because that file keeps it private. Same four units, same factors. */
+  /* A size standing in for a noun nobody writes -- shopping-list.js's own
+     SYMBOL_UNITS says the same of them. "2 large" counts the item. */
+  var SIZE_UNITS = { large: true, medium: true, small: true };
+
   var CANONICAL = {
     kg: { unit: 'g', factor: 1000 },
     l: { unit: 'ml', factor: 1000 },
@@ -260,7 +264,76 @@
       };
     }
 
-    return { text: totalText(total), scaled: true };
+    /* `one` SAYS THE NOUN IN THE ITEM MUST NOW BE SINGULAR. "2 large eggs" at
+       half a recipe is "1 large egg": the amount holds no noun of its own (it
+       is a bare count or a size word), it was written for more than one, and
+       it has come down to exactly one. "2 cloves" of garlic is not this case:
+       its noun is the unit and `totalText` already prints "1 clove". */
+    var bareCount = unit === '' || SIZE_UNITS[unit] === true;
+    var one = bareCount && split.lo === undefined &&
+      Math.abs(total.lo - 1) < 1e-9 && Math.abs(total.hi - 1) < 1e-9 &&
+      hiQuantity > 1;
+
+    return { text: totalText(total), scaled: true, one: one };
+  }
+
+  /* =========================================================================
+     "1 large egg", NOT "1 large eggs" -- #1286, Helen, 2026-10-04
+     =========================================================================
+     "Waffles: at 0.5x, that should read '1 large egg' not 'eggs'. Going from
+     1x to 0.5x eggs will be the only kind of occasion where a plural reduces
+     to a single. Can we fix please?"
+
+     THE NOUN IS IN THE ITEM, not the amount, so the amount's own plural rule
+     never reached it. This takes the item's text and makes its LEADING NOUN
+     singular: the last word before the first comma or bracket -- "eggs,
+     separated" -> "egg, separated", "egg yolks" -> "egg yolk", "free-range
+     eggs" -> "free-range egg". Everything after is untouched.
+
+     THE HOUSE'S OWN SINGULARS, not a new rule: first the `singulars` map in
+     _data/food/ingredient_words.yml (potatoes -> potato, leaves -> leaf),
+     passed in; then shopping-list.js's `foldUnit`, which is what
+     food-shopping-list.js's `foldName` already uses to make "onions" and
+     "onion" one line.
+
+     LEFT AS WRITTEN WHEN IT CANNOT BE DONE SAFELY, because a wrong singular
+     is worse than a plural: a head that names two things ("shallots or 1
+     onion"), a word with a capital in it, a word ending -oes or -ies that
+     the map does not hold (`foldUnit` would give "tomatoe"), and a word
+     ending -ss or with no plural to remove.
+
+     (She expected this only at half a recipe. A `serves:` recipe reaches it
+     too -- two eggs for four people, shown for two -- and gets the same
+     answer.) */
+  function singularItem(text, singulars) {
+    var written = String(text === undefined || text === null ? '' : text);
+    var match = /^(\s*)([^,(]*?)(\s*(?:[,(][\s\S]*)?)$/.exec(written);
+    if (!match || match[2] === '') return written;
+    /* THE NOUN IS BEFORE ANY "of", "in", "like" ...: "rashers of streaky
+       bacon" is a rasher, "spring onions in thin strips" a spring onion. The
+       rest of the head is carried along untouched. */
+    var cut = /\s(?:of|in|for|with|like|from)\s/i.exec(match[2]);
+    var head = cut ? match[2].slice(0, cut.index) : match[2];
+    var after = cut ? match[2].slice(cut.index) : '';
+    if (/\s(?:or|and)\s|\//i.test(head)) return written;
+
+    var words = head.split(' ');
+    var noun = words[words.length - 1];
+    if (noun !== noun.toLowerCase() || !/^[a-zà-ÿ'’-]+$/.test(noun)) return written;
+
+    var map = singulars || {};
+    var single;
+    if (Object.prototype.hasOwnProperty.call(map, noun)) {
+      single = String(map[noun]);
+    } else if (/(?:oes|ies|ss|us|is)$/.test(noun) || !/s$/.test(noun)) {
+      return written;
+    } else {
+      single = shoppingList.foldUnit(noun);
+    }
+    if (!single || single === noun) return written;
+
+    words[words.length - 1] = single;
+    return match[1] + words.join(' ') + after + match[3];
   }
 
   /* THE NAME ON HELEN'S "(Not scaled: ...)" LINE -- #1125. Her example is the
@@ -475,6 +548,7 @@
     scaleAmount: scaleAmount,
     scaleLeadingMeasure: scaleLeadingMeasure,
     noteName: noteName,
+    singularItem: singularItem,
     halfStep: halfStep,
     portionsMode: portionsMode,
     yieldMode: yieldMode,

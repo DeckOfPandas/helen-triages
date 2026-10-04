@@ -141,6 +141,43 @@
     trailing: listFrom('data-trailing')
   };
 
+  /* "1 large egg", NOT "1 large eggs" -- #1286. When a counted ingredient
+     comes down to exactly one, the noun in its ITEM goes singular
+     (HTF.foodScale.singularItem has Helen's words and the rule).
+     `data-singulars` is ingredient_words.yml's `singulars` map, for the
+     plurals a trailing `s` does not explain.
+
+     THE ITEM'S FIRST TEXT NODE IS THE ONLY THING WRITTEN, and its written
+     value is stashed here once, so going back to the recipe's own count puts
+     back exactly what the recipe said. An item that opens with a link has no
+     such node and is left alone. */
+  var singulars = {};
+  try {
+    singulars = JSON.parse(control.getAttribute('data-singulars') || '{}') || {};
+  } catch (e) {
+    singulars = {};
+  }
+
+  function itemNodeFor(span) {
+    var row = span.closest ? span.closest('li.ingredient') : null;
+    if (!row) return null;
+    for (var i = 0; i < row.childNodes.length; i += 1) {
+      var node = row.childNodes[i];
+      if (node.nodeType === 3) {
+        if (node.nodeValue.trim() !== '') return node;
+      } else if (node.nodeType === 1) {
+        var cls = ' ' + (node.className || '') + ' ';
+        if (cls.indexOf(' ingredient-amount ') === -1) return null;
+      }
+    }
+    return null;
+  }
+
+  var items = spans.map(function (span) {
+    var node = itemNodeFor(span);
+    return { node: node, written: node ? node.nodeValue : '' };
+  });
+
   /* A ROW WITH NO AMOUNT, AND THE TEXT NODE ITS WORDS START IN. "a handful of
      fresh parsley" has no span to rewrite: the measure is the opening of the
      item's own text. `leadFor` finds the row's FIRST text, and only if it is
@@ -194,12 +231,17 @@
     var still = [];
 
     spans.forEach(function (span, index) {
+      var item = items[index];
+      if (item.node) item.node.nodeValue = item.written;
       if (n === base) {
         write(span, original[index]);
         return;
       }
       var result = HTF.foodScale.scaleAmount(original[index], factor, words);
       write(span, result.text);
+      if (result.one && item.node) {
+        item.node.nodeValue = HTF.foodScale.singularItem(item.written, singulars);
+      }
       if (!result.scaled) {
         var row = span.closest ? span.closest('li.ingredient') : null;
         if (row) still.push(nameFor(row));

@@ -269,7 +269,9 @@ layout: default
      ONE STEP BELOW ONE RECIPE, x½, AND ONLY WHERE THE BUILD SAYS SO --
      `data-half-recipe`. Helen: "Half a recipe would be great where the
      numbers aren't insane!" and "not having half recipes in between
-     integers, just between 0 and 1". _plugins/food_half_recipe.rb judges it;
+     integers, just between 0 and 1". "1 large egg", not "1 large eggs", when
+     a count comes down to one: `data-singulars` is ingredient_words.yml's
+     map for the script. _plugins/food_half_recipe.rb judges the half step;
      the script only reads the mark. Without it, minus at one recipe does
      nothing, silently.
 
@@ -283,7 +285,7 @@ layout: default
      `serves:` recipe steps a portion at a time. MANUAL 8.2.
      {% endcomment %}
   {% if page.made and page.ingredient_groups.size > 0 %}
-    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}">
+    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="make fewer">&minus;</button>
       <label class="recipe-scale recipe-scale--made">
         {% if page.made.prefix != "" %}<span class="recipe-scale-prefix">{{ page.made.prefix }}</span>{% endif %}
@@ -295,7 +297,7 @@ layout: default
     </div>
     <p class="recipe-scale-note" hidden></p>
   {% elsif page.portions and page.ingredient_groups.size > 0 %}
-    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}">
+    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
       <label class="recipe-scale">
         {% if page.portions_estimated %}<span class="recipe-scale-approx" title="an estimate -- the recipe does not say how many it serves">~</span>{% endif %}
