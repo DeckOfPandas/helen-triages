@@ -1,6 +1,6 @@
 ---
 title: "Man O' War"
-tagline: "Big Red derby-skippin' daisy."
+tagline: "Naming a cocktail after a racehorse could be a reach, but it isn't."
 glass:
   - "coupe"
 garnish:
@@ -38,5 +38,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

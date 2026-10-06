@@ -1,6 +1,6 @@
 ---
 title: "Apple Cart"
-tagline: "Oh, Autumn! Rosy-cheeked and tousled-haired, I am your biggest fan."
+tagline: "Oh, Autumn! Rosy-cheeked and tousled-haired, I am your biggest fan. And grandiloquent when tipsy."
 glass:
   - "coupe"
 garnish:
@@ -37,5 +37,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

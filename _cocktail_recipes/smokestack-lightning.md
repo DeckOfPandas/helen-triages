@@ -1,6 +1,6 @@
 ---
 title: "Smokestack Lightning"
-tagline: "A Margarita at a ceilidh. Note to self: arrange a ceilidh with Margaritas."
+tagline: "A ceilidh with Margaritas. Note to self: arrange a ceilidh with Margaritas."
 glass:
   - "old fashioned"
 garnish:
@@ -40,5 +40,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

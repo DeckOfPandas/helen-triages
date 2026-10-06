@@ -1,5 +1,5 @@
 ---
-title: "Planteray Pineapple Daiquiri"
+title: "Planteray Daiquiri"
 tagline: "Scene: Jon, pulling a you're-a-dickhead face, but then, \"You know what, this IS perfectly balanced\"."
 glass:
   - "coupe"
@@ -30,5 +30,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

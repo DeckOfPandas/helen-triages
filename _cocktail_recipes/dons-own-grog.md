@@ -1,6 +1,6 @@
 ---
 title: "Don's Own Grog"
-tagline: "Blackberries, blackberries always."
+tagline: "Blackberries make everything better, even rum, which is already the best."
 glass:
   - "old fashioned"
 garnish:
@@ -49,5 +49,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

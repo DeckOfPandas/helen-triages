@@ -1,6 +1,6 @@
 ---
 title: "Gin Mezcal Sour"
-tagline: "Mezcal is pineapple's favourite colour."
+tagline: "Pineapple is mezcal's favourite colour."
 glass:
   - "old fashioned"
 garnish:
@@ -39,5 +39,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

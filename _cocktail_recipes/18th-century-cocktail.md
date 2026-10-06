@@ -1,6 +1,6 @@
 ---
 title: "18th Century Cocktail"
-tagline: "Reading that ingredients list is a ride, isn't it."
+tagline: "Read the ingredients list — it's a ride."
 glass:
   - "coupe"
 garnish:

@@ -1,6 +1,6 @@
 ---
-title: "Mai Tai (Difford's recipe)"
-tagline: "You think it's going to be like drinking orange juice after brushing your teeth. In fact it's very much like that, except really really nice."
+title: "Mai Tai (Difford's)"
+tagline: "A bit like drinking orange juice after brushing your teeth, but if your toothpaste were mostly rum."
 glass:
   - "double old fashioned"
   - "tiki mug"
@@ -52,5 +52,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

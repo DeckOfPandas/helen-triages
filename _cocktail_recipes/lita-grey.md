@@ -1,6 +1,6 @@
 ---
 title: "Lita Grey"
-tagline: "All excess and drama, and entirely too pleased with herself."
+tagline: "All excess and drama."
 glass:
   - "flute"
 garnish:
@@ -39,6 +39,6 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
   
 ---
