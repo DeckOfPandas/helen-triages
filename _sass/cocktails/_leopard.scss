@@ -9,7 +9,7 @@
 //   the FUR tile, on the PAGE GROUND, with the NAP texture under it;
 //   the darkest ground (`$color-paper`, in _palette.scss);
 //   the repeat OFFSET, so a big splodge is not seen twice at one height;
-//   header and footer "same as the page", PLAIN -- no print on either;
+//   header and footer FLAT bands a step lighter than the page, no print;
 //   cards untouched: "I like the cards sitting light on the leopard."
 //
 // TWO FILES, AND NEITHER HAS A COLOUR IN IT. Both are white at very low alpha,
@@ -37,13 +37,14 @@ body {
   background-size: 2880px 960px, 480px 480px;
 }
 
-// THE HEADER AND FOOTER ARE PLAIN BANDS IN THE PAGE'S OWN BLACK. They are flat:
-// no print, and no nap either -- a band is where the fur stops.
+// THE HEADER AND FOOTER ARE PLAIN BANDS IN `$color-chrome-ground`. They are
+// flat: no print, and no nap either -- a band is where the fur stops. Helen,
+// asked: "I prefer the flat."
 //
 // The header was `$color-surface`, a card's colour, and against a darker page
-// it stopped reading as dark; Helen picked "same as the page" from four.
-// shared/_layout.scss reads both properties and falls back to what it always
-// did, so food is untouched.
+// it stopped reading as dark. The palette has the value and how she came to
+// it. shared/_layout.scss reads both properties and falls back to what it
+// always did, so food is untouched.
 //
 // THE FOOTER HAD NO GROUND AT ALL before this, so the print showed through it.
 // The band is a gradient used as a border-image with a 100vw outset: its first
@@ -51,6 +52,6 @@ body {
 // footer's dashed, column-width top border with a solid full-width one, which
 // is what Helen saw and chose.
 :root {
-  --chrome-ground: #{$color-bg};
-  --footer-band: linear-gradient(#{$color-border} 0 1px, #{$color-bg} 0) fill 0 / 0 / 0 100vw;
+  --chrome-ground: #{$color-chrome-ground};
+  --footer-band: linear-gradient(#{$color-border} 0 1px, #{$color-chrome-ground} 0) fill 0 / 0 / 0 100vw;
 }

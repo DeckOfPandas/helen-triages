@@ -9,7 +9,10 @@ LOCKED into the page: fur crinkle, the darkest ground (#060607), nap texture,
 on the page ground; the footer a plain band with no print; cards not touched.
 ON THE BAR: how dark the header and footer bands should be, whether the repeat
 is offset, and whether the header carries the print. She chose "same as the
-page", offset, plain. All of that is on the live site now, so a NEW round
+page", offset, plain -- then, seeing the built bands were flat where this page
+has the nap on them, "darker still" (b2). THIS PAGE'S BANDS STILL CARRY THE
+NAP AND THE LIVE ONES DO NOT; fix that before asking about a band again.
+All of that is on the live site now, so a NEW round
 starts by changing GROUPS and the rules below to whatever the new question is;
 the overrides here sit on top of the built stylesheet.
 

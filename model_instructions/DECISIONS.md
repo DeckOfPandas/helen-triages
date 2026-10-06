@@ -9093,11 +9093,12 @@ verification. Dates are when the correction landed.
   - **The bands**: *"should we try darkening the header and footer background
     colour? They seemed dark before, but now they really don't."* Four
     values offered, from the card's `#17171a` down; ***"Same as the page,
-    offset, and plain. Sold."*** So the header leaves `$color-surface` for the
-    page's own black, and carries no print — a leopard header was her own ask
-    in round one, was on the bar, and she chose plain. *"Please take it off the
-    footer"*: the footer had no ground of its own, so the print showed through
-    it; it is now a full-width band in the page's black. **That replaced the
+    offset, and plain. Sold."*** So the header leaves `$color-surface` for a
+    darker band (the value moved once more, below), and carries no print — a
+    leopard header was her own ask in round one, was on the bar, and she chose
+    plain. *"Please take it off the footer"*: the footer had no ground of its
+    own, so the print showed through it; it is now a full-width band in the
+    header's colour. **That replaced the
     footer's dashed column-width rule with a solid full-width one**, which is
     what was on the page she said "sold" to, and is a change to shared chrome
     that food does not get: both bands are custom properties with the old
@@ -9109,11 +9110,20 @@ verification. Dates are when the correction landed.
     the same height. The tile now repeats on a slanted lattice, each repeat a
     third of a tile lower than the one to its left; she chose it over the
     straight repeat with both on the bar.
-  - **Two things shipped that she did not look at**, both said to her: the
-    bands are FLAT (the candidates page had the nap on them; a border-image
-    cannot carry a second image, and the difference is three levels of
-    streak on `#060607`), and the print's draw time on a real phone is
-    unmeasured. The tile is 155 KB gzipped, heavier than the fonts.
+  - **"Same as the page" lasted one build, and the reason is worth keeping.**
+    The candidates page had the nap texture on its two bands; the built bands
+    were flat, because a border-image cannot carry a second image. That was
+    written off here as "three levels of streak" and told to her as a
+    footnote. It was the whole of what made a same-colour band visible. Helen,
+    before merging: *"Ahhh right, I had noticed the napping, but thought I
+    could get an idea of the background colour anyway. I prefer the flat.
+    Let's lift to 'darker still' please."* So the bands are
+    `$color-chrome-ground: #0c0c0d`, round five's third option, and flat by
+    her choice rather than by a constraint. **A candidate that differs from
+    what will be built in ANY way is a different candidate**; say so on the
+    page, not after.
+  - **Still not looked at**: the print's draw time on a real phone. The tile
+    is 155 KB gzipped, heavier than the fonts.
   - **The trap this feature had already sprung once did not recur** — the
     switcher was parsed before every publish — but a new one nearly did: the
     obvious test for a generated asset is "regenerate and compare bytes", and

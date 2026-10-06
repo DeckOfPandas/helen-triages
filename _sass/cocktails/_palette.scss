@@ -401,10 +401,18 @@ $color-border:     $color-grey-light;
 // THE PAGE WENT DARKER UNDER IT ON 2026-10-06 (#733, $color-paper above) AND
 // THE CARD DID NOT MOVE. Helen: "I like the cards sitting light on the leopard,
 // so don't touch those." So the gap is wider than the 3.84 above, and the
-// header and footer, which had shared this value, left it for the page's own
-// (--chrome-ground in _leopard.scss): "They seemed dark before, but now they
-// really don't."
+// header and footer, which had shared this value, left it for a darker one of
+// their own, below: "They seemed dark before, but now they really don't."
 $color-surface:    #17171a;
+
+// THE HEADER AND FOOTER BANDS, on cocktails only -- #733, 2026-10-06. Not one
+// of the ten: shared/_layout.scss reads it through a custom property that
+// _leopard.scss sets, and falls back to $color-surface where none is set.
+// Between the page (#060607) and a card (#17171a), and Helen's second answer.
+// From four on a candidates page she first took "same as the page"; that page
+// had the nap texture on its bands, which the shipped bands do not, and once
+// she knew: "I prefer the flat. Let's lift to 'darker still' please."
+$color-chrome-ground: #0c0c0d;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
 // STAYS WHITE, and it is the one value the inversion must not touch: this is
 // the wordmark's lettering sitting on BLACK TAPE, which was already

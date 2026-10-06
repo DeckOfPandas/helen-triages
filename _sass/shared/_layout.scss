@@ -57,7 +57,7 @@ main {
   padding: $space-xl;
   border-bottom: 1px solid $color-border;
   // A CUSTOM PROPERTY WITH THE PALETTE'S VALUE AS ITS FALLBACK -- #733,
-  // 2026-10-06. Cocktails re-points it to its page ground
+  // 2026-10-06. Cocktails re-points it to a darker band of its own
   // (_sass/cocktails/_leopard.scss); food sets nothing and compiles to the
   // $color-surface it always had. The same shape as the emboss tiers in
   // shared/_rule.scss, for the same reason: one header, and a site that
