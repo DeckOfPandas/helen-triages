@@ -332,6 +332,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §9.12 / §9.12.1 · skewered brandied cherry, and a garnish still carries no count.
 - 2026-09-26 · §9.12 / §9.12.1 · sharp is disqualified by being CHURNED, not by crushed ice
 - 2026-09-17 · §9.12 / §9.12.1 · #1138 #1143 · / #1143 — the garnish step reads as English.
+- 2026-10-06 · §9.13 · #1292 · THE TAGLINE TAKES THE CARD: A REVEAL, NOT A RETURN.
 - 2026-10-06 · §9.13 · #1292 · THE DRINK PAGE'S TAGLINE IS TYPEWRITTEN, AND SPACE IS ITS SEPARATOR.
 - 2026-09-15 · §9.13 · #1086 · "actions row only", and the title that was laid out in the glass column.
 - 2026-09-14 · §9.13 · #1000 · the see-all link comes out again, two days old.

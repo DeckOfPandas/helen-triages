@@ -612,6 +612,50 @@ def test_the_card_measurement_passes_are_loaded_in_order():
     )
 
 
+def test_a_drink_cards_tagline_is_a_reveal_and_never_shown_at_rest():
+    """#1292: the tagline is on a card's markup again, and hidden until asked for.
+
+    #512 took the tagline off the index card, and Helen confirmed it on
+    2026-10-04 with the spare room measured: "no taglines back on the index
+    cards." What she chose instead is a REVEAL -- pointing at a card, or
+    pressing its `?` where there is no hover. So three things have to stay
+    true together, and each fails quietly on its own:
+
+    - the line's base rule is `display: none`, or every card shows it at rest
+      and #512 is undone without anyone deciding to;
+    - both card templates emit it through the one include, or the index card
+      and a drink page's related card stop being the same card (#991);
+    - the shared layout loads card-tagline.js, or the `?` ships `hidden` and
+      stays hidden, and a phone has no way to see a tagline at all.
+    """
+    scss = read("_sass", "cocktails", "_cards.scss")
+    base = re.search(r"^\.drink-card-tagline \{(.*?)^\}", scss, re.S | re.M)
+    assert base, "_cards.scss has no base `.drink-card-tagline` rule."
+    assert re.search(r"^\s*display:\s*none;", base.group(1), re.M), (
+        "`.drink-card-tagline` must be `display: none` at rest. Shown by "
+        "default it is the tagline back on every index card, which #512 "
+        "removed and Helen declined again on 2026-10-04."
+    )
+
+    for parts in (("cocktails", "index.html"), ("_layouts", "cocktail.html")):
+        html = read(*parts)
+        for part in ("line", "mark"):
+            assert re.search(
+                r'include cocktails/card-tagline\.html doc=\w+ part="' + part + '"', html
+            ), (
+                f"{'/'.join(parts)} no longer includes cocktails/card-tagline.html "
+                f'with part="{part}". The index card and the related card must '
+                "both carry the tagline and its mark, through the one include."
+            )
+
+    layout = read("_layouts", "default.html")
+    assert re.search(r"<script src=[^>]*/card-tagline\.js", layout), (
+        "_layouts/default.html no longer loads assets/js/card-tagline.js. The "
+        "`?` mark ships `hidden` and only that script un-hides it, so without "
+        "the tag a device with no hover cannot see a tagline on a card."
+    )
+
+
 def test_the_shopping_list_reads_the_aisles_from_the_data_file():
     """The aisle headings are emitted from _data/food/aisles.yml, not written out.
 

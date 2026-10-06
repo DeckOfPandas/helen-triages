@@ -4134,6 +4134,45 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-10-06, #1292 — THE TAGLINE TAKES THE CARD: A REVEAL, NOT A RETURN.**
+  The same sitting that confirmed #512 (the entry below) chose what to do
+  instead. Three rounds of a candidates page on the real index, every drink
+  carrying its own tagline.
+  Round 1, four reveals (hover replacing the ingredient lines; hover taking the
+  card; a mark on each card; one switch for the whole page): *"hover takes the
+  card is fantastic! I'd like the top line of the tagline to align in some more
+  convincing way with where the top line of the ingredients list was. Either
+  the top of lowercase letters should align, or the line base, I can't tell
+  which. Can we do this just for computers, then try something else with a
+  mark for devices with no hover? Like a simple question mark to the left of
+  the + icon, or directly below it."*
+  Round 2, both alignments and both positions: *"Baselines match, ? next to +,
+  but the active colour needs to be woowoo."*
+  Round 3, four sizes with the lines that clear the ship mark counted for
+  each: *"I like 0.90 rem. Decision made, phew!"*
+  **WHAT 0.9rem BUYS AND COSTS.** On the grid's 370px minimum card: 26
+  characters a line, five lines clear the ship under a one-line name (2.6px to
+  spare) and three under a two-line name. 0.94rem was the comfortable one —
+  four lines with 21px under the last — and she took the fifth line over the
+  air. Nine of 113 written taglines (drafts included) were too long for that
+  card on the day; she is cutting them: *"I can cut some characters. I expect
+  that should be my position anyway."* The working limits are about 105
+  characters, and about 65 where the name wraps on the card. A line still over
+  is clamped with an ellipsis on a desktop card and shown whole on a phone,
+  where a card is as tall as its content.
+  **TWO TRAPS FROM BUILDING IT.** (1) Headless Chromium on Linux snaps a
+  monospace advance to whole pixels — 15.68px Courier Prime lays out at 10px a
+  character, 14.4px at 8px — so line breaks in a screenshot from the container
+  are not the line breaks on her screen, and the first character counts were
+  wrong in both directions. The limits above are computed from the face's
+  0.6em advance. It snaps a line's BASELINE to a whole pixel too, which is why
+  `scripts/card_tagline_baseline.py` lays its two lines out a hundred times too
+  big. (2) The keyboard's way in is the name's link only. The candidates page
+  used the card-wide `:has(:focus-visible)` the hover colour uses; on the real
+  card that hides a mood chip at the moment it takes focus.
+  **NOT DONE, AND NOT ASKED FOR:** a test holding taglines to the limit. It was
+  offered and she did not take it up.
+
 - **2026-10-06, #1292 — THE DRINK PAGE'S TAGLINE IS TYPEWRITTEN, AND SPACE IS
   ITS SEPARATOR.** #1292 asked how to "make more of taglines on the cocktail
   site", *"the main avenue for personal voice for most uses of the site."* Two

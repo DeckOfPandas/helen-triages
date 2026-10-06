@@ -1,0 +1,30 @@
+{%- comment -%}
+  A CARD'S TAGLINE, AND THE MARK THAT SHOWS IT WHERE THERE IS NO HOVER -- #1292.
+  One include, two parts, because a card needs them in two places: the line
+  inside `.drink-card-body` after the ingredients, and the control last in the
+  card beside the shortlist `+`. Both the index card and a drink page's related
+  card call it, so the two cannot differ (#991).
+
+    include cocktails/card-tagline.html doc=drink part="line"
+    include cocktails/card-tagline.html doc=drink part="mark"
+
+  NOTHING AT ALL FOR A DRINK WITH NO WRITTEN TAGLINE. The test is the drink
+  page's own (_layouts/cocktail.html): `QQ` is the ingest placeholder, never a
+  line to print. The card's `drink-card--tagline` class asks the same question
+  in the template that calls this.
+
+  THE MARK IS `hidden` UNTIL card-tagline.js WIRES IT, the shortlist button's
+  habit: with no script it would be a control that does nothing.
+  MANUAL §9.13 / DECISIONS §9.13 (2026-10-06, #1292).
+{%- endcomment -%}
+{%- if include.doc.tagline and include.doc.tagline != "QQ" -%}
+  {%- if include.part == "line" -%}
+    <p class="drink-card-tagline">{{ include.doc.tagline | markdownify | remove: '<p>' | remove: '</p>' | strip }}</p>
+  {%- elsif include.part == "mark" -%}
+    <button type="button"
+            class="btn-card-tagline"
+            aria-label="tagline for {{ include.doc.title }}"
+            aria-pressed="false"
+            hidden></button>
+  {%- endif -%}
+{%- endif -%}

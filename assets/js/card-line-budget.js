@@ -82,9 +82,17 @@
     return Math.round(el.getBoundingClientRect().height / lh);
   }
 
+  // A CARD SHOWING ITS TAGLINE IS LEFT AS IT WAS -- #1292. Its ingredient line
+  // is `display: none` while the tagline has the card (card-tagline.js, where
+  // there is no hover), so it would measure zero lines and lose a class it had
+  // earned; the chips would then get a third row back the moment the card
+  // flipped. Whatever the last honest measurement said still stands.
+  var TAGLINE_SHOWN = 'is-tagline-shown';
+
   function apply(card) {
     var line = card.querySelector('.drink-card-ingredients');
     if (!line) return;
+    if (card.classList.contains(TAGLINE_SHOWN)) return;
     // Reset first, so a re-run at a new width can take the class OFF again --
     // the bug card-name-fit.js's step 1 exists to prevent.
     card.classList.remove(THREE_LINES);

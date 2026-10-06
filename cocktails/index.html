@@ -563,7 +563,7 @@ permalink: /cocktails/
          reservation belongs to the CARD and the word belongs to the badge.
          Both ask `collection`, which is food/index.html's idiom (#562).
          {% endcomment %}
-      <li class="drink-card{% if drink.collection == 'cocktail_drafts' %} drink-card--draft{% endif %}"
+      <li class="drink-card{% if drink.collection == 'cocktail_drafts' %} drink-card--draft{% endif %}{% if drink.tagline and drink.tagline != 'QQ' %} drink-card--tagline{% endif %}"
           data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
@@ -643,13 +643,19 @@ permalink: /cocktails/
               <span class="drink-card-tape-word"><a href="{{ drink.url | relative_url }}">{{ drink.title }}</a></span>
             </span>
           </p>
-          {% comment %} NO TAGLINE HERE — #512. It was two clamped lines of
-             italic between the name and the ingredients, and the ingredients
-             are what the card is for: they tell you what the drink IS and they
-             are what the search matches against. The tagline is the drink
-             page's voice and reads as preamble at card size. Removed from the
-             MARKUP rather than hidden in CSS, so the clamped text is not
-             sitting in the DOM of 115 cards being ignored. {% endcomment %}
+          {% comment %} NO TAGLINE HERE — #512, and that still holds AT REST.
+             It was two clamped lines of italic between the name and the
+             ingredients, and the ingredients are what the card is for: they
+             tell you what the drink IS and they are what the search matches
+             against. Helen was asked again on 2026-10-04 with the spare room
+             measured, and said "no taglines back on the index cards."
+
+             IT IS IN THE MARKUP AGAIN, AFTER THE INGREDIENTS, AS A REVEAL —
+             #1292. #512 took it out of the markup "so the clamped text is not
+             sitting in the DOM of 115 cards being ignored"; it is not ignored
+             now. Pointing at a card, or pressing its `?` where there is no
+             hover, lets the tagline take the card. The include is below the
+             ingredient line and _cards.scss has the rest. {% endcomment %}
           {% if drink.ingredients.size > 0 %}
             {% comment %} Items only. Amounts are noise at this distance, and
                Helen knows how to make drinks.
@@ -722,6 +728,7 @@ permalink: /cocktails/
                their text", per that fix's own words. {% endcomment %}
             <p class="drink-card-ingredients">{% for ing in drink.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">·</span> {% endunless %}<span class="drink-card-ing" data-ing="{{ ing.search }}">{{ ing.label }}</span>{% endfor %}</p>
           {% endif %}
+          {% include cocktails/card-tagline.html doc=drink part="line" %}
         </div>
 
         <div class="drink-card-foot">
@@ -818,6 +825,11 @@ permalink: /cocktails/
                 aria-label="shortlist {{ drink.title }}"
                 aria-pressed="false"
                 hidden></button>
+        {% comment %} THE TAGLINE MARK, LEFT OF THE `+` -- #1292. Only where
+           there is no hover, and only on a card with a written tagline; the
+           include emits nothing otherwise. After the `+` in the markup so the
+           tab order is name, chips, shortlist, then this. {% endcomment %}
+        {% include cocktails/card-tagline.html doc=drink part="mark" %}
         {% comment %} THE DRAFT MARK, BESIDE THE SHORTLIST BUTTON -- #1162.
            Helen asked for it "squished in on the top right", and that corner
            already belongs to the `+` (#823 gave it there on purpose, and it
