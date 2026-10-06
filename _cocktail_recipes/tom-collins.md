@@ -1,6 +1,6 @@
 ---
 title: "Tom Collins"
-tagline: "A gin-based Skinny Bitch."
+tagline: "Still Skinny. Is gin less Bitchy than vodka? Not in my hands, it's not."
 glass:
   - "highball"
 garnish:
@@ -36,5 +36,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

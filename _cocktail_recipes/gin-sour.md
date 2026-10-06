@@ -1,6 +1,6 @@
 ---
 title: "Gin Sour"
-tagline: "The one where it all began."
+tagline: "Gentle but sassy."
 glass:
   - "sour"
 garnish:
@@ -40,5 +40,5 @@ meta:
   ship: "yes"
   rewritten: false
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
