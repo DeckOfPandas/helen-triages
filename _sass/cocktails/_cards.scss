@@ -1584,10 +1584,60 @@ $card-tagline-top: 0.584rem;
   padding: 0.22em 0.42em;
 }
 
-// ON A CARD IT IS POSITIONED IN _shortlist.scss, NOT HERE, and that is an
-// import-order fact rather than a filing preference: the offset is derived from
-// `$card-shortlist-size`, which that file declares, and this one is imported
-// first. Putting it here fails the build outright -- which is how it was found.
+// --- on a card: top left, over the glass -------------------------------------
+// MOVED HERE ON 2026-10-06, from beside the shortlist `+`. Helen: "Do you think
+// we could put the DRAFT label anywhere else? I actually already find it hard
+// to spot", offering "top left, smaller", and then "Option 1".
+//
+// WHAT THE OLD SPOT COST. #1162 put it "squished in on the top right", left of
+// the `+`, and it paid for that out of the title the way the `+` does: 3.1rem
+// off every draft's name. When #1292 gave that same spot to the tagline's `?`,
+// a draft card had to draw the `?` somewhere else. Top left takes nothing from
+// the title and leaves that corner to the two controls.
+//
+// THERE IS ROOM ABOVE 720px, AND THE FLUTE IS THE CASE THAT PROVES IT. A card
+// there is 206.4px tall and the tallest drawing, the flute, is 166.4px centred
+// in it, so 20px is clear above the rim; every other glass is shorter. The
+// badge is 47x16px and starts 6px from the card's top and left. Measured over
+// the 62 draft cards of 2026-10-06 at 1280px and 760px: none touches its
+// drawing, and the two flutes clear by 0.3px. Below 400px the glass is a band
+// across the top and the badge sits beside it.
+//
+// BETWEEN 401px AND 720px IT DOES OVERLAP, AND THE BACKGROUND IS FOR THAT. A
+// card there is as tall as its content (#1086), often shorter than 206px, and
+// the drawing fills it: at 600px, 15 of the 62 drafts put some rim behind the
+// badge, 14 of them 1 to 4px and one 10px. `background-color: inherit` gives the
+// badge the card's own field, hover wash included, so it reads as a label
+// over the drawing rather than as lettering scribbled through it. Helen's
+// brief for this move: "It's for my eyes only ... so we don't need to fuss too
+// much." A second position for that band was not worth a breakpoint.
+//
+// NOT SMALLER, AND BRIGHTER WITHOUT A HUE. Smaller was her first thought and
+// the opposite of her complaint. The paragraph above on spending no hue still
+// holds, so on a card the word and its hairline take $color-text where they
+// took the quiet grey: the same mark, legible against a dark card, still
+// making no claim about the drink. The drink page's badge keeps the grey; it
+// sits on the title's own line there and was not the one she could not find.
+//
+// `z-index` WITH THE CONTROLS, because the whole card is a link drawn as a
+// pseudo-element and anything not lifted past it is painted underneath.
+// `pointer-events: none` because it is a label, not a control: that patch of
+// the card still opens the drink.
+//
+// IT USED TO BE POSITIONED IN _shortlist.scss, for an import-order reason: the
+// old offset was derived from `$card-shortlist-size`, which that file declares
+// and this one cannot see. Nothing here depends on the button any more.
+.drink-cards .drink-draft-badge {
+  position: absolute;
+  z-index: $card-z-controls;
+  top: $space-xs;
+  left: $space-xs;
+  pointer-events: none;
+  color: $color-text;
+  border-color: $color-text;
+  background-color: inherit;
+}
+
 //
 // --- on a drink page: to the right of the tape, below if needed --------------
 // Helen's words again, and the second half of them is why this is flow rather
