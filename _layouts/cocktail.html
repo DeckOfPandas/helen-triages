@@ -726,7 +726,7 @@ layout: default
           {% endif %}
         {% endfor %}
         {% assign rel_ship = rel.meta.ship | default: "who knows" %}
-        <li class="drink-card">
+        <li class="drink-card{% if rel.tagline and rel.tagline != 'QQ' %} drink-card--tagline{% endif %}">
           {% if rel_icon != "" %}
             {% assign rel_mm = heights_mm[rel_icon] %}
             {% assign rel_ratio = 1.0 %}
@@ -757,6 +757,8 @@ layout: default
             {% if rel.card_ingredients.size > 0 %}
               <p class="drink-card-ingredients">{% for ing in rel.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">&middot;</span> {% endunless %}{{ ing.label }}{% endfor %}</p>
             {% endif %}
+            {% comment %} The tagline as a reveal, the index card's own (#1292). {% endcomment %}
+            {% include cocktails/card-tagline.html doc=rel part="line" %}
           </div>
           <div class="drink-card-foot">
             {% comment %} The page's own chips: `sort_natural`, `mood_groups`, links
@@ -775,6 +777,7 @@ layout: default
                   aria-label="shortlist {{ rel.title }}"
                   aria-pressed="false"
                   hidden></button>
+          {% include cocktails/card-tagline.html doc=rel part="mark" %}
         </li>
       {% endfor %}
     </ul>

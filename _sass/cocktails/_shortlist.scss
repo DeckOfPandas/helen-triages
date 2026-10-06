@@ -368,8 +368,13 @@ $card-shortlist-size: 1.15rem;
 // duplicate of the four terms above, and the reason that matters is written
 // three paragraphs up -- card-name-fit.js measures whatever box this leaves, so
 // there must only ever be one idea of how wide a title may be.
+//
+// AND SO DOES A CARD WITH A TAGLINE MARK -- #1292, 2026-10-06, the third term,
+// by the same argument. `--card-tagline-reserve` is 0 wherever there is hover,
+// so a card on a computer is byte for byte what it was. Its rule is with the
+// mark, below.
 .drink-cards .drink-card-name {
-  padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right} + var(--card-draft-reserve, 0px));
+  padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right} + var(--card-draft-reserve, 0px) + var(--card-tagline-reserve, 0px));
 }
 
 // --- the draft mark's own corner, beside the button --------------------------
@@ -402,6 +407,79 @@ $card-shortlist-size: 1.15rem;
   top: $card-pad-y;
   right: calc(#{$card-pad-x} + 0.85 * #{$card-shortlist-size} + 2 * #{$space-xs} + #{$space-sm});
   pointer-events: none;
+}
+
+// --- the tagline mark, left of the button, where there is no hover -----------
+// #1292. On a computer, pointing at a card shows its tagline (_cards.scss). A
+// phone or a tablet has nothing to point with, so Helen asked for a mark: "a
+// simple question mark to the left of the + icon, or directly below it", and,
+// shown both, "? next to +, but the active colour needs to be woowoo."
+//
+// IT IS THE `+` AGAIN, ONE STEP LEFT: the same size, the same 0.85em box, the
+// same padding and top anchor, grey off and wicked woowoo on -- this file's own
+// language for "a thing the user is choosing" (top of file). The offset is one
+// button's box and its padding on both sides, with no further gap: the two
+// paddings already stand between the glyphs, and that is the spacing she
+// looked at on the candidates page.
+//
+// ONLY UNDER `(hover: none)`, and `hidden` until card-tagline.js wires it, so a
+// device that can point never sees it and a page with no script has no dead
+// control.
+//
+// WHAT IT COSTS THE TITLE, AND WHERE. The same reservation the `+` and the
+// draft badge pay, through the same one calc: `--card-tagline-reserve` is the
+// mark's own box. Above 400px only -- below that the glass is a band
+// across the top with the `+` and this in it, and the name has the full width
+// of its own row beneath.
+//
+// A DRAFT CARD PUTS IT BELOW THE `+` INSTEAD. The badge is in the spot to the
+// left and the name already pays for the badge. Drafts are on local builds
+// only (`show_drafts`), so the live site never draws this arrangement.
+$card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs});
+
+.btn-card-tagline { display: none; }
+
+@media (hover: none) {
+  .btn-card-tagline:not([hidden]) {
+    display: block;
+    position: absolute;
+    z-index: $card-z-controls;
+    top: calc(#{$card-pad-y} - #{$space-xs});
+    right: calc(#{$card-pad-x} - #{$space-xs} + #{$card-tagline-mark-step});
+    padding: $space-xs;
+
+    font-family: $font-headings;
+    font-weight: 700;
+    font-size: $card-shortlist-size;
+    line-height: 1;
+
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: $color-clear-text;
+    transition: color 0.12s ease-in-out;
+
+    &::before {
+      content: '?';
+      display: block;
+      width: 0.85em;
+      height: 1em;
+      text-align: center;
+    }
+
+    &[aria-pressed="true"] { color: $color-wicked-woowoo-deep; }
+  }
+
+  .drink-card--draft .btn-card-tagline:not([hidden]) {
+    top: calc(#{$card-pad-y} - #{$space-xs} + #{$card-shortlist-size} + 2 * #{$space-xs});
+    right: calc(#{$card-pad-x} - #{$space-xs});
+  }
+}
+
+@media (hover: none) and (min-width: 401px) {
+  .drink-card--tagline:not(.drink-card--draft) {
+    --card-tagline-reserve: #{$card-tagline-mark-step};
+  }
 }
 
 // --- IT APPLIES TO EVERY CARD IN EVERY LIST, INCLUDING THE RELATED ONES ------

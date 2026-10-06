@@ -827,6 +827,96 @@ $card-name-step: 0.86;
 
 .drink-card-sep { color: mix($color-text, $color-surface, 25%); }
 
+// =============================================================================
+// THE TAGLINE TAKES THE CARD -- #1292, Helen, 2026-10-04 to 2026-10-06
+// =============================================================================
+// #512 took the tagline off the card and that still holds AT REST: asked again
+// with the spare room measured, "no taglines back on the index cards." What she
+// wanted instead was the tagline as a REVEAL, chosen from four on the real
+// index: "hover takes the card is fantastic!" Pointing at a card, the
+// ingredient line and the mood chips step out and the tagline has their room.
+// The name, the glass, the ship mark and the `+` do not move, which is this
+// file's one rule for a card under the cursor ("Colour only, and nothing
+// moves") bent as little as it can be: what changes is which WORDS are in the
+// box, never where a box is.
+//
+// TYPEWRITTEN, LIKE THE DRINK PAGE'S -- the same $font-headings upright she
+// chose there the same week, so the line is recognisably the same line in both
+// places.
+//
+// 0.9rem IS HER PICK FROM FOUR (0.98, 0.94, 0.90, 0.86), and it is the size
+// at which a FIFTH line clears the ship mark under a one-line name. What that
+// buys, measured on the grid's minimum 370px card where the text column is
+// 230px: 26 characters a line and five lines, so 130 if every line were full
+// and about 105 in practice, since words do not fill lines (of her own lines
+// one of 120 fits and one of 118 does not); three lines and about 65 under a
+// two-line name. The numbers are here because the script that measured them
+// was scratch: 9 of 113 written taglines were over on that card. She is cutting
+// the long ones to fit rather than having the type shrink for them: "I know I
+// need to fix some tagline lengths."
+//
+// THE FIRST BASELINE IS THE INGREDIENTS' FIRST BASELINE. "I'd like the top
+// line of the tagline to align in some more convincing way with where the top
+// line of the ingredients list was", and shown both ways, "Baselines match."
+// Two faces at two sizes do not share a baseline by sharing a top margin, so
+// the margin is derived: scripts/card_tagline_baseline.py lays both lines out
+// and reads the difference (9.35px at a 16px root). Re-run it if either rule's
+// size, line height or face moves.
+$card-tagline-top: 0.584rem;
+
+.drink-card-tagline {
+  display: none;
+  margin: $card-tagline-top 0 0;
+  font-family: $font-headings;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: $color-text;
+}
+
+// ONE STATE, TWO WAYS IN. `drink-card--tagline` is on a card whose drink has a
+// written tagline (the template asks the drink page's own question), so a card
+// with nothing to say never changes at all.
+@mixin drink-card-tagline-shown {
+  .drink-card-ingredients { display: none; }
+
+  // `visibility`, NOT `display`: the foot keeps its box, so the ship mark it
+  // anchors stays in its corner. An invisible chip takes no click and no focus.
+  .drink-card-moods { visibility: hidden; }
+
+  // CLAMPED AT WHAT CLEARS THE SHIP, so a line that is still too long is cut
+  // with an ellipsis rather than printed across the mark. A wrapped name takes
+  // two lines of the budget, as it does from the ingredients (#776).
+  .drink-card-tagline {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
+  }
+  .drink-card-name--wrap ~ .drink-card-tagline { -webkit-line-clamp: 3; }
+
+  // BELOW THE TWO-COLUMN BREAKPOINT A CARD IS AS TALL AS ITS CONTENT (#1086),
+  // so there is nothing to clear and nothing is cut.
+  @media (max-width: 720px) {
+    .drink-card-tagline,
+    .drink-card-name--wrap ~ .drink-card-tagline { -webkit-line-clamp: unset; }
+  }
+}
+
+// WHERE THERE IS A POINTER THAT HOVERS. The keyboard's way in is the NAME'S
+// link and only that: `:has(:focus-visible)` on the whole card, which is what
+// the rule above uses for the card's colour, would hide a mood chip at the
+// moment it took focus.
+@media (hover: hover) {
+  .drink-card--tagline:hover,
+  .drink-card--tagline:has(.drink-card-tape-word a:focus-visible) {
+    @include drink-card-tagline-shown;
+  }
+}
+
+// WHERE THERE IS NOT, the card's `?` sets this (card-tagline.js; the mark
+// itself is in _shortlist.scss, beside the `+` it sits next to).
+.drink-card--tagline.is-tagline-shown { @include drink-card-tagline-shown; }
+
 // The matched ingredient, in the colour of the field that matched it.
 .drink-card-hit {
   // A BAND UNDER THE WORDS, NOT A BLOCK BEHIND THEM. Helen, 2026-08-28, on a

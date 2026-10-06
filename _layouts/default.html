@@ -710,6 +710,13 @@
      {% endcomment %}
   <script src="{{ '/assets/js/card-line-budget.js' | relative_url }}"></script>
 
+  {% comment %} card-tagline.js wires a drink card's `?`, the tagline mark for
+     a device with no hover (#1292). HERE, in the shell, for card-name-fit.js's
+     reason: the index card and a drink page's related card are the same card
+     (#991), and a page with neither finds nothing. It measures nothing, so its
+     place among the passes above does not matter. {% endcomment %}
+  <script src="{{ '/assets/js/card-tagline.js' | relative_url }}"></script>
+
   {% comment %} shortlist.js wires every `.btn-shortlist` on the page — GitHub
      issue #546. HERE, in the shell, because the four placements are spread
      across two layouts and two index pages and there is nothing site-specific

@@ -3030,7 +3030,23 @@ positioned ancestor is the tape word and that cannot change. The chips and the
 `+` are lifted above it (`$card-z-link` / `-controls` / `-ship` in
 `_cards.scss`, with the card isolated), and the ship is lifted above the CHIPS
 because it masks them, then declines pointer events so its corner still opens
-the cocktail. **The title sits on punched
+the cocktail. **The tagline is never on a card at rest (#512) and takes the
+card when asked (#1292)**: pointing at a card whose drink has a written
+tagline hides the ingredient line and the mood chips and draws the tagline in
+their room — `$font-headings` upright at 0.9rem, its first baseline on the
+ingredients' own (`$card-tagline-top`, derived by
+`scripts/card_tagline_baseline.py`), clamped at five lines, three under a
+wrapped name; the name, glass, ship mark and `+` do not move. The keyboard's
+way in is the name's link alone, since a card-wide `:has(:focus-visible)`
+would hide a chip as it took focus. Where there is no hover the same state is
+`is-tagline-shown`, toggled by a `?` left of the `+` (`.btn-card-tagline`,
+grey off and wicked woowoo on; `card-tagline.js` un-hides and wires it, and
+`card-line-budget.js` skips a card in that state). The mark is paid for out of
+the title like the `+` is, through `--card-tagline-reserve`, above 400px only.
+One include, `_includes/cocktails/card-tagline.html`, emits both the line and
+the mark for the index card and the related card alike. **A tagline wants to
+stay under about 105 characters, or 65 for a drink whose name wraps on its
+card**; a longer one is cut with an ellipsis on a desktop card. **The title sits on punched
 tape** (§13.4.1's device at card size): two near-whites, one tight pair, no
 softening; the band is centred by moving the ARTWORK (`top: -1.765%`), the
 geometry solved for the name's width (padding costs the name twice, a bleed

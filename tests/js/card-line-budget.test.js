@@ -121,6 +121,21 @@ test('the class is removed again when a re-run no longer earns it', () => {
   assert.strictEqual(c.capped(), false, 'it is a state, not a ratchet');
 });
 
+test('a card showing its tagline keeps the cap it had', () => {
+  // #1292. While the tagline has the card the ingredient line is
+  // `display: none` and measures zero. Without the guard a re-run would take
+  // the cap away, and the chips would get a third row back when the card
+  // flipped to ingredients again.
+  const c = card(LH * 3, LH, true);
+  run([c]);
+  assert.strictEqual(c.capped(), true);
+
+  c.classList.add('is-tagline-shown');
+  c._line.getBoundingClientRect = () => ({ height: 0 });
+  run([c]);
+  assert.strictEqual(c.capped(), true, 'a hidden line is not a measurement');
+});
+
 test('a card with no ingredient line is left alone', () => {
   const c = card(0, LH, false);
   run([c]);
