@@ -411,8 +411,10 @@ $color-surface:    #17171a;
 // Between the page (#060607) and a card (#17171a), and Helen's second answer.
 // From four on a candidates page she first took "same as the page"; that page
 // had the nap texture on its bands, which the shipped bands do not, and once
-// she knew: "I prefer the flat. Let's lift to 'darker still' please."
-$color-chrome-ground: #0c0c0d;
+// she knew: "I prefer the flat. Let's lift to 'darker still' please." That
+// was #0c0c0d, and it was live for less than an hour: "I prefer #111113 for
+// header and footer", the option called "darker", a step lighter again.
+$color-chrome-ground: #111113;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
 // STAYS WHITE, and it is the one value the inversion must not touch: this is
 // the wordmark's lettering sitting on BLACK TAPE, which was already
