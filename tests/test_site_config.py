@@ -3881,44 +3881,102 @@ def test_the_unmade_filter_reads_made_before_and_not_ship():
 # THE LEOPARD ON THE COCKTAILS PAGE GROUND — GitHub issue #733
 # =============================================================================
 
-def test_the_leopard_tiles_are_laid_at_their_own_size():
-    """_leopard.scss must lay each tile at the size its SVG says it is.
+def test_the_leopard_picture_is_laid_at_the_fur_tile_s_own_size():
+    """_leopard.scss must lay the ground picture at the size the fur SVG says it is.
 
-    The two tiles are CSS backgrounds, and `background-size` is written by hand
-    beside them. If the generator's tile changes size -- another column in the
-    offset, a bigger cell -- and the stylesheet does not follow, nothing fails:
-    the browser scales the print to fit, the rosettes grow or shrink, and the
-    seams stay perfect. LEOPARD.md section 5: a print has a real size, like fur
-    does, and is never scaled.
+    assets/js/ground-print.js draws the picture at the fur tile's natural size,
+    and `background-size` is written by hand in the stylesheet. If the
+    generator's tile changes size -- another column in the offset, a bigger
+    cell -- and the stylesheet does not follow, nothing fails: the browser
+    scales the picture to fit, the rosettes grow or shrink, and the seams stay
+    perfect. LEOPARD.md: a print has a real size, like fur does, and is never
+    scaled.
 
     This deliberately does NOT regenerate the tiles and compare bytes
     (`scripts/build_leopard.py --check` does, by hand). Ten thousand rounded
     sines are one libm away from differing, and a red suite stops the deploy.
     """
-    img = ROOT / "assets" / "img" / "cocktails"
     scss = (SASS_DIR / "cocktails" / "_leopard.scss").read_text(encoding="utf-8")
-    declared = re.search(r"background-size:\s*(\d+)px (\d+)px,\s*(\d+)px (\d+)px;", scss)
+    declared = re.search(r"background-size:\s*(\d+)px (\d+)px;", scss)
     assert declared, (
-        "_sass/cocktails/_leopard.scss no longer has a two-layer `background-size` "
-        "in px. This test reads it to compare with the tiles' own sizes; if the "
-        "rule changed shape, change the pattern here with it."
+        "_sass/cocktails/_leopard.scss no longer has a one-layer `background-size` "
+        "in px. This test reads it to compare with the fur tile's own size; if "
+        "the rule changed shape, change the pattern here with it."
     )
-    sizes = [int(n) for n in declared.groups()]
-    for name, want in (("leopard-fur.svg", sizes[:2]), ("leopard-nap.svg", sizes[2:])):
-        path = img / name
-        assert path.exists(), (
-            f"assets/img/cocktails/{name} is missing, and _leopard.scss names it. "
+    want = [int(n) for n in declared.groups()]
+    head = (ROOT / "assets" / "img" / "cocktails" / "leopard-fur.svg").read_text(encoding="utf-8")[:300]
+    got = re.search(r'<svg[^>]* width="(\d+)" height="(\d+)"', head)
+    assert got and [int(got.group(1)), int(got.group(2))] == want, (
+        f"leopard-fur.svg is {got.groups() if got else 'of unknown size'} but "
+        f"_leopard.scss lays the picture at {want[0]}px by {want[1]}px. The "
+        f"browser will scale the print to fit and nothing will look broken -- "
+        f"only wrong-sized. Make `background-size` say the file's own size."
+    )
+
+
+def test_the_leopard_files_the_stylesheet_declares_exist_and_are_never_loaded_by_it():
+    """The stylesheet NAMES the two SVGs for ground-print.js and must not load them itself.
+
+    Two ways to break the leopard that leave everything else green:
+
+      - A NAME WITH NO FILE. `--ground-print` and `--ground-nap` are strings
+        the script turns into fetches. A typo, or a renamed file, is a 404 the
+        build never makes, and the page simply has a plain ground.
+      - A `url()` TO THE SVG. That is how it first shipped, on 2026-10-06, and
+        Helen's phone and laptop juddered: an SVG background is redrawn for
+        every strip of page that scrolls into view. It is the obvious
+        "simplification" of this partial and it is the regression.
+    """
+    scss = _strip_comments((SASS_DIR / "cocktails" / "_leopard.scss").read_text(encoding="utf-8"), ".scss")
+    img = ROOT / "assets" / "img" / "cocktails"
+    for prop in ("--ground-print", "--ground-nap"):
+        named = re.search(re.escape(prop) + r':\s*"(/[^"]+\.svg)";', scss)
+        assert named, (
+            f"_sass/cocktails/_leopard.scss does not declare `{prop}` as a quoted "
+            f"path under the site's artwork directory. assets/js/ground-print.js "
+            f"reads it; without it there is no print (or no nap) and no error."
+        )
+        assert (img / named.group(1).lstrip("/")).exists(), (
+            f"_leopard.scss declares {prop}: \"{named.group(1)}\", and "
+            f"assets/img/cocktails{named.group(1)} does not exist. "
             f"`python3 scripts/build_leopard.py --write` regenerates both tiles."
         )
-        assert f'url("#{{$leopard-dir}}/{name}")' in scss, (
-            f"_leopard.scss does not reference {name} in the form this test "
-            f"expects, so it cannot tell which size belongs to which tile."
-        )
-        head = path.read_text(encoding="utf-8")[:300]
-        got = re.search(r'<svg[^>]* width="(\d+)" height="(\d+)"', head)
-        assert got and [int(got.group(1)), int(got.group(2))] == want, (
-            f"{name} is {got.groups() if got else 'of unknown size'} but "
-            f"_leopard.scss lays it at {want[0]}px by {want[1]}px. The browser "
-            f"will scale the print to fit and nothing will look broken -- only "
-            f"wrong-sized. Make `background-size` say the file's own size."
-        )
+    assert ".svg\")" not in scss and ".svg)" not in scss, (
+        "_sass/cocktails/_leopard.scss loads an SVG with url(). The leopard must "
+        "reach the page as the picture assets/js/ground-print.js draws once "
+        "(`--ground-picture`): as a CSS background the SVG is redrawn on every "
+        "scroll, which is the judder of 2026-10-06. See that script's header."
+    )
+
+
+def test_the_leopard_version_is_the_hash_of_the_committed_files():
+    """_leopard-version.scss must be the hash of the two SVGs as committed.
+
+    A browser keeps the picture it drew under this version and redraws only
+    when the version changes. So if the artwork is regenerated and the version
+    is not, every browser that has visited keeps showing the OLD leopard,
+    indefinitely, while a fresh browser shows the new one -- the kind of bug
+    that cannot be reproduced by whoever goes looking for it.
+
+    `scripts/build_leopard.py --write` writes all three together; this catches
+    a hand edit to an SVG, or a commit that took two of the three. It hashes
+    committed bytes, so unlike regenerating the tiles it cannot differ by
+    platform.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        import build_leopard
+    finally:
+        sys.path.pop(0)
+    img = ROOT / "assets" / "img" / "cocktails"
+    files = {name: (img / name).read_text(encoding="utf-8")
+             for name in ("leopard-fur.svg", "leopard-nap.svg")}
+    want = build_leopard.version_scss(build_leopard.version_of(files))
+    got = (SASS_DIR / "cocktails" / "_leopard-version.scss").read_text(encoding="utf-8")
+    assert got == want, (
+        "_sass/cocktails/_leopard-version.scss is not the hash of the two "
+        "leopard SVGs as committed. Browsers that have already kept a picture "
+        "will go on showing the old artwork. Run "
+        "`python3 scripts/build_leopard.py --write` and commit all three files."
+    )

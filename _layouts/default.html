@@ -149,6 +149,17 @@
      guards the order.
   {% endcomment %}
   <script src="{{ '/assets/js/assets.js' | relative_url }}"></script>
+  {% comment %} ── the page ground's print, and why it is in the head too ──
+     ground-print.js puts cocktails' leopard on the page ground by handing the
+     stylesheet a picture it has drawn or kept (#733; the script's header has
+     the argument). It is here rather than at the end of <body> because the
+     common case is a picture already kept: the sooner it asks for it, the
+     shorter the moment a page shows a plain ground. It reads custom
+     properties off the root element and touches nothing in the body, so the
+     head is safe, and on a site whose stylesheet declares no print (food) it
+     returns on its fourth line. AFTER assets.js, which it calls.
+  {% endcomment %}
+  <script src="{{ '/assets/js/ground-print.js' | relative_url }}"></script>
 </head>
 <body>
 
