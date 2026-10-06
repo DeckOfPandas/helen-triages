@@ -661,13 +661,27 @@ $glass-top:          $title-half-leading + $title-cap-inset;
 // so the one-trick wrapper that pushed it right and pulled it up under the
 // toggle has nothing left to do.
 
+// TYPEWRITTEN, AND SET WELL CLEAR OF THE NAME, 2026-10-06 (#1292) — Helen, off
+// two rounds of a candidates page on the real Classic Champagne Cocktail page.
+// Round 1 offered six treatments (bigger, a green bar, a hung quote mark, sized
+// by length, this one): "I like the typewriter font version. I think this
+// needs some more vertical space between title and tagline, otherwise some
+// kind of separator." Round 2 offered three gaps and three separators: "more
+// space still is working for me really nicely."
+//
+// So the italic is gone — $font-headings upright is the voice now, the same
+// face the tape and the section headings are in — and the gap above is
+// $space-xxl where it was $space-sm. No rule, no dash: space was the separator
+// she chose. 1.1rem and 36rem are the values she looked at; the measure is a
+// little wider than the old 60% column because a monospace line holds fewer
+// characters for its width.
 .cocktail-tagline {
-  font-style: italic;
-  font-size: 1.05rem;
-  line-height: 1.55;
+  font-family: $font-headings;
+  font-size: 1.1rem;
+  line-height: 1.5;
   color: $color-text;
-  margin: $space-sm 0 $spacing-block-gap;
-  max-width: $width-content * 0.6;
+  margin: $space-xxl 0 $spacing-block-gap;
+  max-width: 36rem;
 }
 
 // META IS A <dl> OF THREE NOW, 2026-09-02 — GLASS, GARNISH, SHIP IT? — up from
