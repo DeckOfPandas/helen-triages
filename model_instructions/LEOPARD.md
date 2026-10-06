@@ -22,8 +22,8 @@ too loud. The glasses stay the line work; the print is the fur they sit on.
 | the print | `assets/img/cocktails/leopard-fur.svg`, 2880 × 960px | `body`, in `_sass/cocktails/_leopard.scss` |
 | the ground's texture | `assets/img/cocktails/leopard-nap.svg`, 480 × 480px | under the print, same rule |
 | the page ground | `$color-paper: #060607` (was `#0e0e10`) | `_sass/cocktails/_palette.scss` |
-| header | `$color-chrome-ground: #0c0c0d`, flat, no print | `--chrome-ground`, read by `shared/_layout.scss` |
-| footer | a full-width band in the same `#0c0c0d`, flat, no print | `--footer-band`, read by `shared/_layout.scss` |
+| header | `$color-chrome-ground: #111113`, flat, no print | `--chrome-ground`, read by `shared/_layout.scss` |
+| footer | a full-width band in the same `#111113`, flat, no print | `--footer-band`, read by `shared/_layout.scss` |
 | cards | untouched, `$color-surface: #17171a` | — |
 
 **Neither SVG has a colour in it.** Both are white at very low alpha, so the
@@ -118,9 +118,13 @@ a real drink page, the real compiled CSS, a bar of switches.
   had the nap texture on its two bands; the built bands are flat, and she was
   told. "Ahhh right, I had noticed the napping, but thought I could get an
   idea of the background colour anyway. **I prefer the flat. Let's lift to
-  'darker still' please.**" So the bands are `#0c0c0d`, round five's third
+  'darker still' please.**" So the bands became `#0c0c0d`, round five's third
   option, not the page's `#060607`: a flat band in the page's own black had
   nothing to tell it from the page but a hairline.
+- **After it was live (2026-10-06, the same evening).** `#0c0c0d` merged in
+  #1314, and afterwards: **"I prefer #111113 for header and footer."** That is
+  round five's "darker", one step lighter again, and it is what the bands are
+  now. Three values in one day, each a step lighter than the last.
 
 ### The rule that went
 

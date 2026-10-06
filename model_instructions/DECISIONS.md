@@ -9117,11 +9117,16 @@ verification. Dates are when the correction landed.
     footnote. It was the whole of what made a same-colour band visible. Helen,
     before merging: *"Ahhh right, I had noticed the napping, but thought I
     could get an idea of the background colour anyway. I prefer the flat.
-    Let's lift to 'darker still' please."* So the bands are
+    Let's lift to 'darker still' please."* So the bands became
     `$color-chrome-ground: #0c0c0d`, round five's third option, and flat by
     her choice rather than by a constraint. **A candidate that differs from
     what will be built in ANY way is a different candidate**; say so on the
     page, not after.
+  - **And `#0c0c0d` lasted one merge.** It went live in #1314; the same
+    evening, having asked what "darker" had been: *"I prefer #111113 for
+    header and footer."* `$color-chrome-ground` is `#111113` — round five's
+    second option. Three values in a day, each one step lighter than the last
+    (`#060607` → `#0c0c0d` → `#111113`; a card is `#17171a`).
   - **Still not looked at**: the print's draw time on a real phone. The tile
     is 155 KB gzipped, heavier than the fonts.
   - **The trap this feature had already sprung once did not recur** — the

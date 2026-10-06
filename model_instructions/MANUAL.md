@@ -2897,7 +2897,7 @@ or serveware (`to_serve`), and must not restate a method step.
 L* 18 that holds its shape. **The page carries a black-on-black leopard print
 and a card sits light on it** (#733, 2026-10-06; `LEOPARD.md`): the paper was
 `#0e0e10` until that day, and the header and footer are flat bands in
-`$color-chrome-ground` (`#0c0c0d`, between the page and a card) — the header
+`$color-chrome-ground` (`#111113`, between the page and a card) — the header
 was a card's colour, and the footer had no ground at all. #469's "a card is DARKER
 than the page — it recedes rather than floats" is what the palette's comments
 still argue and is no longer the arrangement; Helen: *"I like the cards
