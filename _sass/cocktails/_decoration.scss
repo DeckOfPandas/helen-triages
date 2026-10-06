@@ -9,6 +9,11 @@
 // fake it: this site's PAGE decoration is still empty, and nothing here
 // attempts a fetch, so the console stays clean.
 //
+// EXCEPT THE LEOPARD, since 2026-10-06 (#733): the black-on-black print on the
+// page ground is this site's own artwork, in assets/img/cocktails/, and it has
+// a partial of its own -- _leopard.scss -- because it is CSS backgrounds, not
+// injected SVG.
+//
 // THE TAPE AND THE FOOTER HEARTS ARE NOT THIS FILE'S BUSINESS ANY MORE — issue
 // #374, 2026-08-19. They are header and footer chrome, one set for the whole
 // repo, in assets/img/chrome/. This file used to explain at length that

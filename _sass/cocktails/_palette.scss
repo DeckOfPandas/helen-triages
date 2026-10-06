@@ -84,9 +84,15 @@
 // between the two sites through `$color-accent`, which is exactly what §2.3's
 // palette contract exists to allow. Food is untouched.
 $color-ink:          #e8e6e2;   // was #1b1b1f
-$color-paper:        #0e0e10;   // was #fbfbfa
-$color-grey-mid:     #97959a;   // 6.50:1 on the ground -- de-emphasised UI text
-$color-grey-light:   #2c2c31;   // borders; L* 18.2 against the ground's 4.0
+// DARKER SINCE 2026-10-06, #733: #0e0e10 became #060607 when the leopard went
+// on the page ground (_leopard.scss). Helen, choosing between three grounds
+// with the print on them: "darkest". Every figure in this file that was
+// measured "on the ground" or "against the page" was measured on #0e0e10; a
+// darker ground only widens each of them, so none is a floor that moved the
+// wrong way, and none has been re-measured.
+$color-paper:        #060607;   // was #0e0e10 until 2026-10-06, and #fbfbfa before the inversion
+$color-grey-mid:     #97959a;   // 6.50:1 on the old ground -- de-emphasised UI text
+$color-grey-light:   #2c2c31;   // borders; L* 18.2 against the old ground's 4.0
 
 // --- THE FIVE ACCENTS. "Neon bar sign", chosen by Helen 2026-08-27. ----------
 //
@@ -391,6 +397,13 @@ $color-border:     $color-grey-light;
 //
 // L* 7.85 against the page's 4.02, a difference of 3.84, where the border sits
 // at 18.18 and holds the card's shape however close the two fills get.
+//
+// THE PAGE WENT DARKER UNDER IT ON 2026-10-06 (#733, $color-paper above) AND
+// THE CARD DID NOT MOVE. Helen: "I like the cards sitting light on the leopard,
+// so don't touch those." So the gap is wider than the 3.84 above, and the
+// header and footer, which had shared this value, left it for the page's own
+// (--chrome-ground in _leopard.scss): "They seemed dark before, but now they
+// really don't."
 $color-surface:    #17171a;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
 // STAYS WHITE, and it is the one value the inversion must not touch: this is

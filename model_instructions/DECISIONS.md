@@ -9059,6 +9059,67 @@ verification. Dates are when the correction landed.
   same gate, and the test that pinned the script to the layouts pins it to
   the include instead. Net effect on the deployed site: one script tag fewer
   on every recipe and drink page, for a box they did not have.
+- **2026-10-06, #733 — THE LEOPARD SHIPS: furry splodges on the darkest
+  ground, and the rule that kept it parked is gone.** Parked since 2026-09-05
+  with round two undecided. Helen re-opened it herself — *"I'd like to revisit
+  the idea"* — and it took five rounds in one session, each on a candidates
+  page over the real index and a real drink page (§13.11). `LEOPARD.md` has
+  every round; what matters here is what was ruled and what it reversed.
+  - **Round two, rebuilt, decided nothing, and that was the answer.** The
+    ring-and-sheen generator's five patterns went back in front of her on
+    today's pages. She did not pick one. She came back with two pictures she
+    had had Shutterstock's generator draw — *"it turns out I'd need to pay to
+    licence them on an ongoing basis which isn't what I want"* — and asked
+    *"Are you able to draw something like these? ... If this is out of reach,
+    could you still copy the shapes of some of the splodges?"* **Nothing was
+    copied or traced.** A second generator (`scripts/leopard_splodge.py`)
+    draws its own blobs from a seed; what came from her pictures was the
+    recipe, not a shape.
+  - ***"Splodge quiet is great! Let's try relaxing the rule about the cards
+    being darkest. I'd like to see the whole thing darker."*** The first
+    `LEOPARD.md` had exactly one tonal rule — a card stays the darkest thing
+    on the page — and #469's palette argues at length for a card that recedes.
+    **Both are reversed by this, by looking**: `$color-paper` goes `#0e0e10` →
+    `#060607` (*"darkest"*, from three), the card does not move, and *"I like
+    the cards sitting light on the leopard, so don't touch those."* The
+    palette's contrast figures were measured on the old ground and are not
+    re-measured; a darker ground only widens them.
+  - **The pattern**: *"it's so ...furry!!!!! Cracking job. I choose furry,
+    darkest and nap from these, in the page ground."* Fur crinkle over
+    scribble and contour loops; the nap ground texture over grain and flat
+    (her ask was to vary the ground *"not in blobs, across the whole thing"*,
+    which killed the first attempt's clouds); tufted edges and a different
+    strength per splodge were her asks and are in every tile.
+  - **The bands**: *"should we try darkening the header and footer background
+    colour? They seemed dark before, but now they really don't."* Four
+    values offered, from the card's `#17171a` down; ***"Same as the page,
+    offset, and plain. Sold."*** So the header leaves `$color-surface` for the
+    page's own black, and carries no print — a leopard header was her own ask
+    in round one, was on the bar, and she chose plain. *"Please take it off the
+    footer"*: the footer had no ground of its own, so the print showed through
+    it; it is now a full-width band in the page's black. **That replaced the
+    footer's dashed column-width rule with a solid full-width one**, which is
+    what was on the page she said "sold" to, and is a change to shared chrome
+    that food does not get: both bands are custom properties with the old
+    values as fallbacks (§2.5's one-header rule holds; the palette contract is
+    still ten).
+  - **The repeat**: *"sometimes some of the larger splodges can be seen
+    either side of the card grid which makes it clear they're repeated."*
+    A 960px tile puts the same splodge in both gutters of a 900px column at
+    the same height. The tile now repeats on a slanted lattice, each repeat a
+    third of a tile lower than the one to its left; she chose it over the
+    straight repeat with both on the bar.
+  - **Two things shipped that she did not look at**, both said to her: the
+    bands are FLAT (the candidates page had the nap on them; a border-image
+    cannot carry a second image, and the difference is three levels of
+    streak on `#060607`), and the print's draw time on a real phone is
+    unmeasured. The tile is 155 KB gzipped, heavier than the fonts.
+  - **The trap this feature had already sprung once did not recur** — the
+    switcher was parsed before every publish — but a new one nearly did: the
+    obvious test for a generated asset is "regenerate and compare bytes", and
+    that puts ten thousand rounded sines between a libm upgrade and a red
+    `main`. The suite checks the tile SIZES against the stylesheet instead;
+    the byte check is `scripts/build_leopard.py --check`, by hand.
 
 ## §14 Reference pages
 
