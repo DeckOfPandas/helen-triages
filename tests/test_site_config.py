@@ -3875,3 +3875,50 @@ def test_the_unmade_filter_reads_made_before_and_not_ship():
         "the `unmade` filter no longer reads `madeBefore`. Reading `chaos` or "
         "`ship` gives the same answer today and the wrong one later."
     )
+
+
+# =============================================================================
+# THE LEOPARD ON THE COCKTAILS PAGE GROUND — GitHub issue #733
+# =============================================================================
+
+def test_the_leopard_tiles_are_laid_at_their_own_size():
+    """_leopard.scss must lay each tile at the size its SVG says it is.
+
+    The two tiles are CSS backgrounds, and `background-size` is written by hand
+    beside them. If the generator's tile changes size -- another column in the
+    offset, a bigger cell -- and the stylesheet does not follow, nothing fails:
+    the browser scales the print to fit, the rosettes grow or shrink, and the
+    seams stay perfect. LEOPARD.md section 5: a print has a real size, like fur
+    does, and is never scaled.
+
+    This deliberately does NOT regenerate the tiles and compare bytes
+    (`scripts/build_leopard.py --check` does, by hand). Ten thousand rounded
+    sines are one libm away from differing, and a red suite stops the deploy.
+    """
+    img = ROOT / "assets" / "img" / "cocktails"
+    scss = (SASS_DIR / "cocktails" / "_leopard.scss").read_text(encoding="utf-8")
+    declared = re.search(r"background-size:\s*(\d+)px (\d+)px,\s*(\d+)px (\d+)px;", scss)
+    assert declared, (
+        "_sass/cocktails/_leopard.scss no longer has a two-layer `background-size` "
+        "in px. This test reads it to compare with the tiles' own sizes; if the "
+        "rule changed shape, change the pattern here with it."
+    )
+    sizes = [int(n) for n in declared.groups()]
+    for name, want in (("leopard-fur.svg", sizes[:2]), ("leopard-nap.svg", sizes[2:])):
+        path = img / name
+        assert path.exists(), (
+            f"assets/img/cocktails/{name} is missing, and _leopard.scss names it. "
+            f"`python3 scripts/build_leopard.py --write` regenerates both tiles."
+        )
+        assert f'url("#{{$leopard-dir}}/{name}")' in scss, (
+            f"_leopard.scss does not reference {name} in the form this test "
+            f"expects, so it cannot tell which size belongs to which tile."
+        )
+        head = path.read_text(encoding="utf-8")[:300]
+        got = re.search(r'<svg[^>]* width="(\d+)" height="(\d+)"', head)
+        assert got and [int(got.group(1)), int(got.group(2))] == want, (
+            f"{name} is {got.groups() if got else 'of unknown size'} but "
+            f"_leopard.scss lays it at {want[0]}px by {want[1]}px. The browser "
+            f"will scale the print to fit and nothing will look broken -- only "
+            f"wrong-sized. Make `background-size` say the file's own size."
+        )

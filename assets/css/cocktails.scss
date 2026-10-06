@@ -51,6 +51,10 @@
 // before the site partials as it does on food.
 @import "shared/results-bar";
 @import "cocktails/decoration";
+// The leopard on the page ground (#733), and the two custom properties that
+// make the header and footer plain bands over it. After shared/base, whose
+// `body { background }` shorthand would otherwise reset the images.
+@import "cocktails/leopard";
 @import "cocktails/cocktail";
 @import "cocktails/cards";
 @import "cocktails/filters";

@@ -56,7 +56,13 @@ main {
   position: relative;   // anchors .site-header-inner's inset:0, below
   padding: $space-xl;
   border-bottom: 1px solid $color-border;
-  background: $color-surface;
+  // A CUSTOM PROPERTY WITH THE PALETTE'S VALUE AS ITS FALLBACK -- #733,
+  // 2026-10-06. Cocktails re-points it to a darker band of its own
+  // (_sass/cocktails/_leopard.scss); food sets nothing and compiles to the
+  // $color-surface it always had. The same shape as the emboss tiers in
+  // shared/_rule.scss, for the same reason: one header, and a site that
+  // differs says so in one declaration rather than in a competing rule.
+  background: var(--chrome-ground, #{$color-surface});
 
   .site-title {
     font-family: $font-headings;
@@ -526,6 +532,13 @@ main {
   margin: 0 auto;
   padding: 1.5rem 1.5rem calc(1.5rem * 2) 1.5rem;
   border-top: 1px dashed $color-border;
+  // AN OPTIONAL FULL-WIDTH BAND BEHIND THE FOOTER -- #733, 2026-10-06. `none`
+  // unless a site sets it, and with `none` the dashed border above draws as it
+  // always did, so food is unchanged. Cocktails sets it
+  // (_sass/cocktails/_leopard.scss) because its page ground carries a print
+  // the footer must not. A border-image and not a 100vw pseudo-element: its
+  // outset is paint, not layout, so it cannot give the page a sideways scroll.
+  border-image: var(--footer-band, none);
   text-align: center;
   font-family: $font-headings;
   font-size: 0.75rem;

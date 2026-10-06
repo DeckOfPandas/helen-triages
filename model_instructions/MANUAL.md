@@ -78,7 +78,7 @@ Run `ls model_instructions/` rather than trusting this list.
 | `PIPELINE.md` | **the one map** (#1008, 2026-09-14): the three doors in, the intake pass, Helen's folders and the four words that move a file, the way out, and the way back when an agent touches a published file. Read it before any of the four procedure documents |
 | `PUBLISHING_A_COCKTAIL.md` | the six steps a cocktail goes through from Helen's rewrite to the public repo, the word "final", the one-working-copy rule -- §4 of `PIPELINE.md` is the same journey for both sites |
 | `LETTERING.md` | the four tiers of punched-tape type; supersedes §13.4.1 and §13.10.2 |
-| `LEOPARD.md` | the black-on-black print: generator, tones, Helen's rounds. **She holds it; ship nothing** |
+| `LEOPARD.md` | the black-on-black print on the cocktails page ground, **live since 2026-10-06** (#733): what ships, the generator, Helen's five rounds, where it must never go |
 
 **Three project slash commands, all in `.claude/commands/`**: `/tidy-drafts`
 (§11.0.2), `/ingest` (§11.0.3), `/ingest-inbox` (§11.0.4). Each is a procedure
@@ -2893,9 +2893,15 @@ or serveware (`to_serve`), and must not restate a method step.
 ### 9.13 The cocktails visual language, and the index and recipe page built from it
 
 **"Ink, paper and glass"**, and **the paper is black** (#469): `$color-paper`
-`#0e0e10`, `$color-ink` `#e8e6e2`, and **a card is DARKER than the page**
-(`#17171a`) — it recedes rather than floats; the border at L* 18 holds its
-shape however close the fills get. The names keep their jobs, not their
+`#060607`, `$color-ink` `#e8e6e2`, and a card is `#17171a` with a border at
+L* 18 that holds its shape. **The page carries a black-on-black leopard print
+and a card sits light on it** (#733, 2026-10-06; `LEOPARD.md`): the paper was
+`#0e0e10` until that day, and the header and footer are flat bands in
+`$color-chrome-ground` (`#0c0c0d`, between the page and a card) — the header
+was a card's colour, and the footer had no ground at all. #469's "a card is DARKER
+than the page — it recedes rather than floats" is what the palette's comments
+still argue and is no longer the arrangement; Helen: *"I like the cards
+sitting light on the leopard."* The names keep their jobs, not their
 literal meanings. Every `-deep` and `-wash` was re-solved for the inversion
 (on black a hue is LIGHTENED to carry text; washes are 14% over a card); the
 emboss is re-pointed in `_sass/cocktails/_rule.scss` (`LETTERING.md`);
@@ -4434,7 +4440,11 @@ one.
 Build these when she rules; do not decide them, and do not re-open a ruling by
 re-arguing it.
 
-- **Leopard.** `LEOPARD.md`; she holds it. Ship nothing.
+- **Leopard.** Live on the cocktails page ground (`LEOPARD.md`, #733). Every
+  value in it — the pattern, its seed, how dark the page is, where the print
+  stops — is one she chose by looking, over five rounds. A change to any of
+  them is a new round on a candidates page (`scripts/leopard_candidates.py`),
+  not an edit.
 - **Any new hue.** Both palettes argue at length that the COUNT is the design.
 - **The voice.** Do not touch a word of copy; where a feature needs a string,
   ship a marked PLACEHOLDER — the bitters caveat (#713) is the pattern, the
