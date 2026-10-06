@@ -304,7 +304,8 @@ _cocktail_recipes/   output: true    permalink /cocktails/recipes/:path/ empty u
 _cocktail_drafts/    output: false   permalink /cocktails/drafts/:path/  local only; its own private repo
 
 **A DRAFT SAYS SO, ON THE LOCAL SITE ONLY** (#1162, 2026-09-21): a `draft`
-badge on its index card, squished in beside the shortlist `+`, and beside the
+badge on its index card, top left over the glass (since 2026-10-06; it was
+beside the shortlist `+` and took room from the title), and beside the
 name tape on its own page. `_includes/cocktails/draft-badge.html`, emitted by
 `collection` the way food's own draft pill is (#562). Nothing gates it, because
 nothing needs to — a production build has no draft in the loop to mark.

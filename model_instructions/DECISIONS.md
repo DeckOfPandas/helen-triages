@@ -4134,6 +4134,32 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-10-06 — THE DRAFT BADGE MOVES TO THE CARD'S TOP LEFT.** Raised by
+  Helen while reading #1292's reveal, where a draft card had to draw the
+  tagline's `?` below the `+` because the badge was in the way: *"Do you think
+  we could put the DRAFT label anywhere else? I actually already find it hard
+  to spot. I only use the feature on my local build, but I do want to use it.
+  How about: 1: top left, smaller. Flute looks like the tallest glass to me,
+  and I think there's space. 2. Directly above the left-hand edge of the
+  lettering in the title."* Asked for opinions and no drawing, she chose
+  *"Option 1"*, with the brief *"It's for my eyes only (and I guess for any
+  keen beans who build from the repo, for whatever reason), so we don't need
+  to fuss too much."*
+  **NOT SMALLER, AND NO HUE.** Smaller was the opposite of her complaint, so it
+  keeps its 0.62rem; and #1162's argument that a draft mark should not spend a
+  hue still stands, so on a card it takes `$color-text` for the word and the
+  hairline where it took the quiet grey. The drink page's badge is unchanged.
+  **OPTION 2 WAS TURNED DOWN ON GEOMETRY**: the tape starts 17px from the
+  card's top and the badge is 16px tall, so it would have meant moving the
+  title on draft cards.
+  **WHAT IT FREED.** `--card-draft-reserve` (3.1rem off every draft's title) is
+  deleted, and a draft card draws the `?` left of the `+` like every other.
+  **MEASURED, 62 draft cards:** no overlap with the drawing at 1280px or 760px
+  (the two flutes clear by 0.3px) or at 390px. Between 401px and 720px, where a
+  card is as tall as its content, 15 put some rim behind the badge (14 of them
+  1 to 4px, one 10px); the badge takes the card's own background there rather than a
+  second position, on her "don't fuss".
+
 - **2026-10-06, #1292 — THE TAGLINE TAKES THE CARD: A REVEAL, NOT A RETURN.**
   The same sitting that confirmed #512 (the entry below) chose what to do
   instead. Three rounds of a candidates page on the real index, every drink
