@@ -36,7 +36,8 @@
 // THE CLASS GOES ON THE CARD, not the paragraph, because what it governs lives
 // in a different subtree -- the chips are inside `.drink-card-foot`. The
 // stylesheet keeps every decision about what it MEANS; this file measures and
-// has no opinion about chips.
+// had no opinion about chips -- until #1308, when it gained exactly one: the
+// ORDER they are drawn in. See `packChips` below.
 //
 // IT RUNS AFTER card-name-fit.js, AND IS NOW THE LAST PASS IN THE CHAIN.
 // The name decides how much room the ingredients get, and the ingredients
@@ -118,14 +119,23 @@
   // SO THE ORDER IS CHOSEN FOR THE CARD'S WIDTH. Of every order the chips could
   // take, this keeps the ones that (1) show the most chips inside the row cap,
   // (2) in the fewest rows, (3) with the row on the ship's line stopping short
-  // of the ship, so no padding is needed -- and of those takes the one closest
-  // to alphabetical. A card whose alphabetical order already does all three is
-  // not touched, which is most of them.
+  // of the ship, so no padding is needed -- and of those (4) fills the first
+  // row as full as it will go, then the second, and so on down. Whatever is
+  // still tied is settled alphabetically, which is why a row reads in order.
+  //
+  // (4) IS HELEN'S PICK, 2026-10-06, from three on the real index: alphabetical
+  // as it was, packed but alphabetical wherever that packed as well, and this.
+  // "Option C, chef's kiss!" The middle one fixed the same cards -- 13 padded
+  // and 5 clipped chips at 1280px against 27 and 30 -- and moved chips on 18 of
+  // 76; this moves them on 59, and that is the point of it: the rows step down
+  // from full to short on every card, not only on the ones that were broken.
+  // So ALPHABETICAL IS NO LONGER THE ORDER ON A CARD, only the tie-break. #710
+  // still holds on the drink page's own chip row, which nothing packs.
   //
   // IT IS A SEARCH, NOT A HEURISTIC, because a card has at most ten chips and
   // usually four: every state is (which chips are placed, which row, how full),
   // remembered once. It walks the chips in alphabetical order and keeps the
-  // FIRST best answer, which is what "closest to alphabetical" means here.
+  // FIRST best answer, which is the tie-break.
   //
   // IT LAYS THE ROWS OUT THE WAY THE BROWSER WILL -- greedily, a chip joining
   // the current row whenever it fits -- rather than choosing sets of chips per
@@ -140,7 +150,6 @@
   //   o.W         the width of a row
   //   o.lastW     how far the row on the ship's line may run
   //   o.cap       how many rows the stylesheet shows
-  //   o.full      also fill the upper rows as full as they will go
   //
   // Returns { order, visible } -- indices into `adv` -- or null when no order
   // keeps the ship's row short enough.
@@ -163,16 +172,15 @@
     }
 
     /* The score of the best finish from here: [chips still to be shown,
-       -(rows in the end)], and in `full` mode the final width of this row and
-       each row after it. Bigger is better, read left to right. */
+       -(rows in the end)], then the final width of this row and of each row
+       after it. Bigger is better, read left to right. */
     function solve(mask, placed, r, fill) {
       var key = mask + ':' + r + ':' + Math.round(fill * 10);
       if (key in memo) return memo[key];
       var best = null;
       if (mask === ALL) {
         if (fill <= o.lastW + FITS) {
-          best = { s: [0, -(r + 1)], next: -1, done: true };
-          if (o.full) best.s.push(fill);
+          best = { s: [0, -(r + 1), fill], next: -1, done: true };
         }
         memo[key] = best;
         return best;
@@ -188,16 +196,13 @@
           // This chip starts a row past the cap: it and everything after it
           // are clipped, and row `r` is the one on the ship's line.
           if (fill > o.lastW + FITS) continue;
-          cand = { s: [0, -(r + 1)], next: i, done: true };
-          if (o.full) cand.s.push(fill);
+          cand = { s: [0, -(r + 1), fill], next: i, done: true };
         } else {
           var sub = solve(mask + bit, placed + 1, stays ? r : r + 1, stays ? fill + w : w);
           if (!sub) continue;
           var s = [sub.s[0] + 1, sub.s[1]];
-          if (o.full) {
-            if (!stays) s.push(fill);
-            for (var k = 2; k < sub.s.length; k++) s.push(sub.s[k]);
-          }
+          if (!stays) s.push(fill);
+          for (var k = 2; k < sub.s.length; k++) s.push(sub.s[k]);
           cand = { s: s, next: i, done: false };
         }
         if (better(cand.s, best && best.s)) best = cand;
@@ -230,15 +235,6 @@
     return { order: order, visible: visible };
   }
 
-  /* THE CANDIDATES SWITCH -- #1308, and it goes when Helen has picked. The
-     candidates page sets `data-chip-order` on <html>: `alpha` leaves the chips
-     as the template sorted them, `full` also fills the upper rows. Absent, the
-     chips are packed and otherwise alphabetical. */
-  function chipOrderMode() {
-    var root = document.documentElement;
-    return (root && root.getAttribute && root.getAttribute('data-chip-order')) || 'least';
-  }
-
   function px(v) {
     var n = parseFloat(v);
     return isFinite(n) ? n : 0;
@@ -252,15 +248,14 @@
      layout to read, or a card it has no business rearranging -- in which case
      the caller's own measurement decides, as it did before #1308. */
   function arrangeChips(card, moods, ship) {
-    var mode = chipOrderMode();
     if (!moods.appendChild || !moods.getBoundingClientRect || !card.style) return null;
     var els = Array.prototype.slice.call(moods.querySelectorAll('.drink-card-mood'));
     if (els.length < 2 || els.length > 12) return null;
     var m = moods.getBoundingClientRect();
     if (!m.width) return null;   // hidden card
 
-    // ALPHABETICAL IS THE BASE, read off the labels rather than the DOM, which
-    // an earlier pass of this very function may have rearranged. Lowercased,
+    // ALPHABETICAL IS WHERE IT STARTS, read off the labels rather than the DOM,
+    // which an earlier pass of this very function has rearranged. Lowercased,
     // for `sort_natural`'s reason: `I want to faff` is capitalised.
     function label(el) {
       return String((el.dataset && el.dataset.mood) || el.textContent || '').toLowerCase();
@@ -272,10 +267,6 @@
       return x < y ? -1 : (x > y ? 1 : 0);
     });
     var pinned = base.filter(isMatch).length;
-    if (mode === 'alpha') {
-      reorderChips(moods, els, base);
-      return null;
-    }
 
     // WHAT A CHIP COSTS depends on whether another follows it: every chip but
     // the last carries the separator -- a dot inside its box, or on a matched
@@ -320,18 +311,17 @@
     var cap = chipH ? Math.round((px(cs.maxHeight) + rowGap) / (chipH + rowGap)) : 0;
     if (!cap || cap < 1) return null;
 
-    var sig = [mode, pinned, W.toFixed(1), lastW.toFixed(1), paddedW.toFixed(1), cap,
+    var sig = [pinned, W.toFixed(1), lastW.toFixed(1), paddedW.toFixed(1), cap,
       base.map(label).join('|'), adv.map(function (x) { return x.toFixed(1); }).join('|')].join('/');
     var plan = planned && planned.get(moods);
     if (!plan || plan.sig !== sig) {
-      var opts = { W: W, lastW: lastW, cap: cap, full: mode === 'full' };
-      var open = packChips(adv, lastAdv, pinned, opts);
+      var open = packChips(adv, lastAdv, pinned, { W: W, lastW: lastW, cap: cap });
       plan = { sig: sig, order: open && open.order, padded: false };
       if (hasShip && (!open || open.visible < base.length)) {
         // Nothing keeps the ship's row short, or something is still clipped:
         // see what the padded width shows, and take it only if it shows more.
         var shut = packChips(adv, lastAdv, pinned,
-          { W: paddedW, lastW: Infinity, cap: cap, full: opts.full });
+          { W: paddedW, lastW: Infinity, cap: cap });
         if (shut && (!open || shut.visible > open.visible)) {
           plan.order = shut.order;
           plan.padded = true;
@@ -411,7 +401,17 @@
   } else {
     run();
   }
-  window.addEventListener('resize', run);
+  // AFTER THE NAME FIT'S OWN RESIZE PASS, NOT ON THE EVENT -- #1308. This ran
+  // straight off `resize`, while card-name-fit.js waits 120ms for the dragging
+  // to stop; so at a new width this pass read the cards before their names had
+  // been refitted. A wrapped name takes a row from the chips, and now that the
+  // chips are ORDERED to fit their rows, an order made for the wrong number of
+  // rows clips a chip it need not. The longer wait puts this behind that one.
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(run, 160);
+  });
 
   // AND AGAIN ONCE THE REAL FACE ARRIVES -- 2026-09-10, found by the ship
   // pass. At DOMContentLoaded the chips are set in the fallback Courier, which

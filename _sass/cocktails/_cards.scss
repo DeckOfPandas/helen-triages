@@ -1038,6 +1038,12 @@ $card-tagline-top: 0.584rem;
 // rule below pads its chips clear. Every other card keeps the full width #760
 // bought. A chip pushed to a fourth row by the padding is hidden whole by the
 // row cap, which is the lesser loss.
+//
+// AND IT IS THE LAST RESORT SINCE #1308, 2026-10-06. The padding narrowed
+// EVERY row of the cards that earned it -- 27 of 76 at 1280px -- which was the
+// empty right-hand side Helen raised. card-line-budget.js now orders the chips
+// so the row on the ship's line stops short of it, and this rule is left for
+// the cards no order can free (13 of 76).
 .drink-card--chips-clear-ship .drink-card-moods {
   padding-right: calc(var(--ship-w, 0px) + #{$card-gutter});
 }

@@ -884,6 +884,14 @@
      built by walking it -- so the matched chips are alphabetical among
      themselves and so are the rest.
 
+     AND THEN card-line-budget.js PACKS THE REST -- #1308, 2026-10-06. This
+     function still decides WHICH chips lead, and that pass keeps them leading
+     (it pins every `is-match` chip, in this order) while it arranges the
+     others to fill the rows. So on a card whose chips it moves, the order set
+     here lasts until HTF.cardLineBudget() runs at the end of the same pass,
+     and "the rest" is whatever order that pass left at startup, not
+     alphabetical. Neither matters: it sorts by label itself.
+
      REORDERED ONLY WHEN IT CHANGES, the same guard `reorder()` above applies to
      the cards: moving ~600 nodes on every keystroke is wasteful, and the row is
      usually already in the order this wants. */
@@ -1051,8 +1059,18 @@
 
        STILL REDONE UNCONDITIONALLY, for its own reason rather than that one:
        `chipsMoved` is about chip CONTENT, and this is about which cards are
-       VISIBLE. A plain page turn moves no chips and still needs the budget. */
-    if (HTF.cardLineBudget) HTF.cardLineBudget();
+       VISIBLE. A plain page turn moves no chips and still needs the budget.
+
+       THE CALL ITSELF IS BELOW THE NAME FIT SINCE #1308, 2026-10-06. It stood
+       here, ahead of it, which is the opposite of the order card-line-budget.js
+       asks for and of the order the two run in on load and on resize. That was
+       survivable while this pass only set a class: the stylesheet's own
+       `.drink-card-name--wrap ~` rule capped the chips the moment the name
+       wrapped, whichever ran first. It is not survivable now that the pass
+       ORDERS the chips to fit the row cap, because a card turned to for the
+       first time had its chips packed for three rows and then lost one when
+       its name wrapped -- Apple and ginger mulled wine clipped a chip on some
+       loads and not others. */
 
     /* AND THE NAME FIT WITH IT, FOR THE SAME REASON AND THE SAME BUG -- #1115,
        2026-09-16. Helen: "names on cocktail cards aren't wrapping but should
@@ -1076,6 +1094,7 @@
        script list and a page that somehow loaded without it must still filter.
        Same guard, same shape, as the budget's. */
     if (HTF.fitCardNames) HTF.fitCardNames();
+    if (HTF.cardLineBudget) HTF.cardLineBudget();
 
     /* Each clear appears only when its own section has something to clear.
        Driven from the same pass that filters, so a clear can never be visible
