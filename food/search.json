@@ -5,12 +5,12 @@ sitemap: false
 {%- comment -%}
   WHAT THE "SEARCH FOR ANYTHING" BOX SEARCHES -- GitHub issue #1050, 2026-09-15.
   Fetched by assets/js/page-search.js the first time the box takes focus
-  (_includes/page-search.html -- in the header of every food page on a local
-  build since #1210, 2026-09-30; a recipe page's furniture line before that).
+  (_includes/page-search.html -- in the header of every food page, on the
+  live site since #1288, 2026-10-06; local builds only from #1210, and a
+  recipe page's furniture line before that).
   One file per site, because the search is per site: this is food's, and
-  cocktails/search.json is the drinks'. STILL BUILT ON THE DEPLOYED SITE,
-  where nothing fetches it: it is a page, not a switch, and
-  test_the_search_box_searches_for_anything_on_a_local_build expects it.
+  cocktails/search.json is the drinks'.
+  test_the_search_box_searches_for_anything_on_every_build expects it.
 
   THE SAME LIST THE INDEX SHOWS, BY CONSTRUCTION. `site.food_recipes` has
   already been through _plugins/publish_gate.rb at :post_read, so a held-back

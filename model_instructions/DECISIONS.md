@@ -8967,6 +8967,58 @@ verification. Dates are when the correction landed.
   same gate, and the test that pinned the script to the layouts pins it to
   the include instead. Net effect on the deployed site: one script tag fewer
   on every recipe and drink page, for a box they did not have.
+- **2026-10-06, #1288 — the omnisearch box goes live in the header, the door
+  goes back to the middle, and I KNOW WHAT I WANT stays.** Helen's issue:
+  *"how about having an omnisearch box in the navbar for both live sites, as
+  it is for the local sites now? This would replace the I KNOW WHAT I WANT
+  section in the filter groups."* For: a shorter filter panel, *"Top right is
+  where I'd expect to find this kind of thing"*, and *"Omnisearch box is
+  undoubtedly useful to me, and I've found this over and over again"*.
+  Against, in her words: *"More stuff is more bad in general, especially right
+  at the top of the page in prime real estate."* *"I'm genuinely open to
+  options!"*
+  - **What decided whether the section could go was what she types a name
+    for.** The two boxes do different jobs (#1096): the section narrows the
+    list in place, the header box jumps. Asked which she would want after
+    choosing filters: *"I wouldn't expect to type anything in this box after
+    selecting filters....but I reckon if I did then it'd be because I'd given
+    up on filtering and wanted to jump to a recipe."*
+  - **The candidates page was the two DEPLOYED indexes** (89 food recipes, 76
+    drinks), with the box put back in — Artifact `K64WWrCzTTRaYxGZrgmpG5`,
+    built by `tmp/omni/build.py` in the worktree. Three headers (live; box
+    under the door, as local; door centred with the box at the right of its
+    row) and the section kept or removed, one switch per question. The third
+    header was her own idea mid-build: *"how about the [ FOOD ] -> door
+    centered under the main header image?"*
+  - **Rulings, in order.** *"At 1280, option C it is."* The phone: *"At 390
+    and 360, can we try the ?? link vertically aligned with the omnisearch,
+    both in the second line, with the door still centered under the title in
+    the first line"* — built, and *"I like it! At least, I like it more than I
+    want to drop the omnibox, ha."* **The section: *"The I KNOW WHAT I WANT
+    sections should probably go, but I'm not ready to drop their colours from
+    my palette, and I am the main/only user here, so they stay!"*** So the
+    issue's stated trade (box in, section out) was NOT made, and its first
+    advantage was not bought. Do not remove the sections on the strength of
+    the issue's title; the reason they stay is the palette (§13.12, the count
+    of hues is the design), not the search.
+  - **The door has now been centred twice.** 2026-09-10 centred; 2026-09-11
+    to the right-hand end after *"seeing the centred design on mobile"*
+    (#965); centred again here. What changed is the phone layout it was
+    judged in: the door has its line to itself now, and `??` sits a line down
+    opposite the box. #965's *"Both on the cards' edge"* still holds for the
+    two ends, with the box holding the right one.
+  - **`show_header_search` is retired, not set true in both configs** — the
+    `show_units` precedent (#1001). The include renders on every page that
+    belongs to a site; /about/ has no box and keeps its two doors at the
+    right, as picked in #1086.
+  - **Measured on the deployed build:** the header is 195.5px at 1280, the
+    same as without the box. **At 390 it is 196.8px against 161.2px without
+    it: the third line costs every phone page 35.6px**, on a header #1086
+    shrank on purpose (*"B: mark at two thirds"*). She picked the phone layout
+    at 360 and 390 with that line in it; the number was reported to her
+    afterwards. At 821px, the narrowest three-column width, `[ COCKTAILS ]`
+    stays centred (x 166.1, width 488.8) and the box ends on the cards' edge
+    at 797.
 
 ## §14 Reference pages
 

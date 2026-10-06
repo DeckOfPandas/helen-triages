@@ -356,7 +356,7 @@ TRUSTED_DYNAMIC = (
     # -- a query both indexes read (MANUAL 8.9), and a query is not a path, so
     # the target page is the home page either way. `#results` since #1057
     # (2026-09-15): both indexes carry that id on the count line above their
-    # list (test_the_search_box_searches_for_anything_on_a_local_build in
+    # list (test_the_search_box_searches_for_anything_on_every_build in
     # tests/test_site_config.py), so this is the same fragment #1050's
     # search-dropdown links already end in, checked the same way.
     re.compile(r"^\{\{\s*actions_site\.home\s*\|\s*relative_url\s*\}\}\?shortlist=1#results$"),

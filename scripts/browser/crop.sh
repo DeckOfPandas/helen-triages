@@ -7,10 +7,8 @@
 # shot (2026-09-15, #1050) -- for a control that only shows itself once
 # somebody has typed, such as the search box's dropdown:
 #   sh scripts/browser/crop.sh /food/recipes/caramel/ .page-search dropdown 1280 .page-search-input ch
-# THAT BOX IS LOCAL-BUILD ONLY SINCE #1210 (2026-09-30), in the header, and
-# build.sh builds what deploys, which has none -- so to look at it, build with
-# `--config _config.yml,_config_local.yml` into tmp/site instead (MANUAL 13.11
-# has the command), then serve and crop as usual.
+# That box is in the header of every page, on the deployed build too since
+# #1288 (2026-10-06), so build.sh's build shows it.
 #
 # The port comes from tmp/browser/port, written by this worktree's serve.sh
 # (2026-09-11) -- see shoot.sh for why. 4010 only when no server is running here.

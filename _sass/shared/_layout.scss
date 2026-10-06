@@ -106,8 +106,9 @@ main {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   // TWO ROWS SINCE 2026-09-10: the wordmark, then a second row with `??` at
-  // its left end and the door to the other site at its right end (since
-  // 2026-09-11, #965; centred under the wordmark for the day before that).
+  // its left end, the door to the other site centred under the wordmark, and
+  // the search box at its right end (#1288, 2026-10-06). The door was at the
+  // right end from 2026-09-11 (#965) until the box came to take that end.
   grid-template-rows: auto auto;
   align-items: end;
   // THE CARDS' WIDTH, NOT MAIN'S, SINCE 2026-09-11. The comment above says this
@@ -143,26 +144,29 @@ main {
 // tape SVGs", so if that height or the SVG's margins change, re-eyeball this by
 // hand rather than expecting it to follow.
 .site-nav-icons {
-  // AT THE RIGHT-HAND END OF ROW 2, ON THE CARDS' RIGHT EDGE, SINCE 2026-09-11
-  // -- column 3, `justify-self: end`, and the header's column is the cards'
-  // width (`.site-header-inner`, above). Helen, having seen the centred row on
-  // her phone: "the design I would like is for the link to the other site (and
-  // icon and arrow) to be on the right-hand side at desktop width. I have
-  // changed my mind since seeing the centred design on mobile." It was centred
-  // under the wordmark in column 2 from 2026-09-10 (her idea then, picked by
-  // looking), and in row 1 column 3 from #551 before that.
+  // CENTRED UNDER THE WORDMARK AGAIN, SINCE 2026-10-06 -- #1288. Column 2,
+  // `justify-self: center`. Helen, with the search box coming back to the live
+  // site and wanting the top right: "how about the [ FOOD ] -> door centered
+  // under the main header image?", and from the candidates page, "At 1280,
+  // option C it is." The door gave its end of the row to the box
+  // (`.site-header .page-search`, below).
   //
-  // COLUMN 3 IS WIDE ENOUGH AT EVERY WIDTH ABOVE THE STACK, measured: the
-  // widest wordmark, `[ COCKTAILS ]`, is 488.8px, which at 821px leaves 142px of
-  // each side track for a 141px row.
+  // THIS IS THE THIRD PLACE IT HAS BEEN, AND THE SECOND TIME HERE. Centred in
+  // column 2 on 2026-09-10 (her idea then, picked by looking); at the
+  // right-hand end of row 2 from 2026-09-11 (#965), after seeing the centred
+  // row on her phone: "I have changed my mind since seeing the centred design
+  // on mobile"; row 1 column 3 from #551 before either. What differs this time
+  // is the phone: there the door now has its line to itself and `??` has gone
+  // down a line to sit opposite the box (the stack block, below), which is the
+  // arrangement she asked for and picked at 360 and 390.
   //
   // WHAT IS IN THE ROW: the OTHER site's icon, its bracketed word and an arrow
   // -- Helen: "D: the other site, icon and word, arrow on." The site you are on
   // is on the tape above and is not repeated here (default.html has the
   // reasoning). On the about page, which belongs to no site, both appear.
   grid-row: 2;
-  grid-column: 3;
-  justify-self: end;
+  grid-column: 2;
+  justify-self: center;
   align-self: start;
   margin: 0.9rem 0 0;
   display: flex;
@@ -177,8 +181,8 @@ main {
   // own two groups wider than the column even though neither group alone
   // would be. `flex-wrap: wrap` lets the second group drop to a line of its
   // own instead of forcing the row wider than the page. `justify-content:
-  // flex-end` (since 2026-09-11; `center` while the row was centred) hangs a
-  // wrapped line from the right edge, like the row itself. Harmless everywhere
+  // center` (again since #1288; `flex-end` while the row was on the right
+  // edge) centres a wrapped line, like the row itself. Harmless everywhere
   // else: one group never has reason to wrap.
   //
   // AND ON /about/ IT NO LONGER FIRES, SINCE 2026-09-15 (#1086). This comment
@@ -196,7 +200,7 @@ main {
   // way round: a new site_neutral page, or a third site, gets the safe
   // behaviour by default and has to ask for the other one.
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 // =============================================================================
@@ -237,9 +241,14 @@ main {
 // a flex child, so removing it never made this row narrower -- which is why the
 // candidates page showed no change on a phone. `shoot.sh` reports OVERFLOW at
 // 360 and 390 if that ever stops being true.
+// STILL AT THE RIGHT-HAND END AFTER #1288, which centred the ordinary page's
+// one door: this page has no `??` and no search box (page-search.html renders
+// none on a site_neutral page), so nothing asked for its end, and "C" was
+// picked with the doors there. `justify-self: end` is what keeps them.
 .site-neutral .site-nav-icons {
   grid-column: 1 / -1;
   justify-self: end;
+  justify-content: flex-end;
   flex-wrap: nowrap;
 }
 
@@ -484,29 +493,27 @@ main {
   top: -0.12em;
 }
 
-// THE SEARCH BOX, UNDER THE DOOR TO THE OTHER SITE -- #1210, 2026-09-30, and
-// on a local build only (_includes/page-search.html renders it, gated on
-// `show_header_search`, which _config_local.yml alone declares). Helen:
-// "directly under [ FOOD ] ->". A third row, then, in the door's own column
-// and on its own right edge -- `justify-self: end` is what puts the glass on
-// the cards' edge where the arrow already sits -- and the box itself is
-// shared/_furniture.scss's, unchanged from the furniture line it left.
+// THE SEARCH BOX, AT THE RIGHT-HAND END OF THE DOOR'S ROW, ON BOTH LIVE SITES
+// -- #1288, 2026-10-06. Helen: "Top right is where I'd expect to find this
+// kind of thing", and from the candidates page, "At 1280, option C it is."
+// Row 2, column 3, `justify-self: end`, so the glass sits on the cards' right
+// edge where the door's arrow sat from #965 until the door went back to the
+// middle to make room. The box itself is shared/_furniture.scss's, unchanged.
 //
-// THE ROW IS PAID FOR ONLY WHERE IT EXISTS. Every rule above is `grid-row: 1`
-// or `2` and `grid-template-rows: auto auto` names two; a third `auto` row is
-// created implicitly by this placement and costs the deployed header nothing,
-// because there the element is not in the page at all.
+// IT WAS ON A THIRD ROW, UNDER THE DOOR, AND LOCAL-ONLY, from #1210
+// (2026-09-30: "directly under [ FOOD ] ->") until this. That third row
+// survives below the stack width, where the box shares it with `??`.
 //
-// `margin-top` IS THE HALF-ROW GAP THE NAV ROW ITSELF USES (0.45rem, the
-// #1086 phone value): the box hangs off the row above it the way that row
-// hangs off the tape, so the header reads as three lines at one rhythm rather
-// than a header with a widget under it. Eyeballed at 1280 and 390 on the
+// `align-self: center` AND THE DOOR'S OWN 0.9rem: the box is taller than the
+// door's lettering, and centring it in the row with the same top margin is
+// what puts the placeholder on the door's line. Eyeballed at 1280 on the
 // candidates page, like the row's own offset, and to be re-eyeballed with it.
 .site-header .page-search {
-  grid-row: 3;
+  grid-row: 2;
   grid-column: 3;
   justify-self: end;
-  margin-top: 0.45rem;
+  align-self: center;
+  margin-top: 0.9rem;
 }
 
 // THE FOOTER IS AS WIDE AS THE ARTICLE, AND ITS OUTER COLUMNS SIT UNDER THE
@@ -1329,28 +1336,34 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     grid-column: 1;
   }
 
-  // ONCE THE HEADER STACKS, the row and `??` share the one column there is:
-  // `??` at its start and the row at its end, both on the cards' edges, as at
-  // full width (the rules above) -- #965, Helen: "on mobile, please move the
-  // icon, other site name and arrow to the right-hand edge of the page, in line
-  // with the edge of the cocktail cards which is symmetrical with the about ??
-  // link", and, asked which when the two edges were 12px apart, "Both on the
-  // cards' edge". Only the column changes here; the ends come from above.
+  // ONCE THE HEADER STACKS, THREE LINES -- #1288, 2026-10-06. The wordmark;
+  // the door alone, centred under it; then `??` and the search box sharing a
+  // third, on the cards' left and right edges. Helen, from the candidates
+  // page: "At 390 and 360, can we try the ?? link vertically aligned with the
+  // omnisearch, both in the second line, with the door still centered under
+  // the title in the first line", and on seeing it, "I like it!"
+  //
+  // WHY `??` MOVED DOWN RATHER THAN THE BOX MOVING UP: `??`, a centred door and
+  // a 22-character box do not fit one 312px line, and the first candidate put
+  // the box alone on the third line under a `??`-and-door second, which left
+  // one thing on each of two edges at two heights.
+  //
+  // THE EDGES ARE STILL #965's -- "Both on the cards' edge" -- with the box now
+  // holding the right-hand one the door held from then until this.
   .site-nav-icons {
     grid-column: 1;
   }
 
-  .site-about-link {
-    grid-column: 1;
-  }
-
-  // And the local-only search box (#1210) keeps its row and its right edge in
-  // the one column, under the door exactly as at full width. The stacked grid
-  // is `justify-items: center`; the rule above says `justify-self: end`, and
-  // a self-alignment beats the container's, so nothing more is needed here
-  // than the column.
+  // Row 3 for both, centred on each other, and ONE top margin written here so
+  // the pair cannot drift the way #1148 found the row and `??` had: 0.45rem at
+  // every stacked width, which is the value picked at 360 and 390 and looked
+  // at at 700. `??` keeps its own -0.12em ink correction from the base rule.
+  .site-about-link,
   .site-header .page-search {
+    grid-row: 3;
     grid-column: 1;
+    align-self: center;
+    margin-top: 0.45rem;
   }
 
 }

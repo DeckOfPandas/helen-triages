@@ -303,10 +303,11 @@ def test_the_scaler_scripts_load_in_dependency_order():
     )
 
 
-def test_the_search_box_searches_for_anything_on_a_local_build():
+def test_the_search_box_searches_for_anything_on_every_build():
     """#1050. The search box -- on the back arrow's line as Helen first
-    specified it, in the header on a local build since #1210 -- and the
-    plumbing it needs to be more than a name search.
+    specified it, in the header on a local build since #1210, and in the
+    header of both live sites since #1288 -- and the plumbing it needs to be
+    more than a name search.
 
     THE ORDER IN THE MARKUP IS THE LAYOUT: the input is BEFORE the glass
     (#1056 moved the glass to the right end, reversing #1050's own layout),
@@ -318,20 +319,27 @@ def test_the_search_box_searches_for_anything_on_a_local_build():
     sitemap. `search_placeholder` is gone from sites.yml: the words are the
     same on both sites now, so the key stopped saying where you are.
     """
-    # IN THE HEADER, LOCAL BUILDS ONLY, SINCE #1210 (2026-09-30). The box left
-    # _includes/back-to-index.html for _includes/page-search.html, which
-    # _layouts/default.html includes under the door to the other site and
-    # which renders nothing unless `show_header_search` is set -- a key only
-    # _config_local.yml may declare, Helen's "to show on the local site only".
-    # The markup checks below are the same ones; only the file moved.
+    # IN THE HEADER SINCE #1210 (2026-09-30), ON EVERY BUILD SINCE #1288
+    # (2026-10-06). The box left _includes/back-to-index.html for
+    # _includes/page-search.html, which _layouts/default.html includes in the
+    # header. From #1210 it rendered only when `show_header_search` was set,
+    # a key only _config_local.yml declared ("to show on the local site
+    # only"); #1288 is Helen asking for it on "both live sites", and the key
+    # was retired rather than set true twice. So the check is inverted: the
+    # key must be read and declared NOWHERE, or a build can lose the box.
     include = read("_includes", "page-search.html")
     # The include's Liquid comment discusses the markup at length; only the
     # markup after it is asserted on.
     body = re.sub(r"\{%\s*comment\s*%\}.*?\{%\s*endcomment\s*%\}", "", include, flags=re.S)
 
-    assert re.search(r"\{%\s*if\s+site\.show_header_search\b", body), (
-        "_includes/page-search.html must gate the box on site.show_header_search "
-        "-- the search is a local-build testing tool since #1210."
+    assert "show_header_search" not in body, (
+        "_includes/page-search.html reads site.show_header_search again; the "
+        "box is on both live sites since #1288 and the key is retired."
+    )
+    assert re.search(r"\{%\s*if\s+search_site\s+and\s+page\.site_neutral\s*!=\s*true\s*%\}", body), (
+        "_includes/page-search.html must render the box on every page that "
+        "belongs to a site and on no site_neutral page (/about/ has no index "
+        "to search)."
     )
     assert "page-search.html" in read("_layouts", "default.html"), (
         "_layouts/default.html no longer includes page-search.html; the box "
@@ -345,14 +353,11 @@ def test_the_search_box_searches_for_anything_on_a_local_build():
         "that end of the furniture line holds print and pdf, and the box is "
         "the header's."
     )
-    assert re.search(r"^show_header_search:\s*true", read("_config_local.yml"), re.M), (
-        "_config_local.yml must declare show_header_search: true, or the local "
-        "site has no search box at all."
-    )
-    assert not re.search(r"^show_header_search:", read("_config.yml"), re.M), (
-        "_config.yml declares show_header_search; the key is local-only by "
-        "Helen's instruction (#1210) and must never reach the deployed site."
-    )
+    for config in ("_config.yml", "_config_local.yml"):
+        assert not re.search(r"^show_header_search:", read(config), re.M), (
+            f"{config} declares show_header_search; nothing reads it since "
+            f"#1288, and a switch nothing reads looks like a live fact."
+        )
 
     go = re.search(r'<button[^>]*class="page-search-go"[^>]*type="submit"|'
                    r'<button[^>]*type="submit"[^>]*class="page-search-go"', body)
@@ -375,9 +380,9 @@ def test_the_search_box_searches_for_anything_on_a_local_build():
     assert "icons/search.svg" in body, "the glass is _includes/icons/search.svg."
 
     # THE SCRIPT SHIPS WITH THE BOX, since 2026-10-01: page-search.html loads
-    # page-search.js after the form, inside the same gate, so every page that
-    # has the box has the dropdown and no deployed page loads a script for a
-    # box it does not have. It was a page-layout script from #1050 to #1210.
+    # page-search.js after the form, inside the same condition, so every page
+    # that has the box has the dropdown and no page loads a script for a box
+    # it does not have. It was a page-layout script from #1050 to #1210.
     assert body.find("page-search.js") > body.find('class="page-search"'), (
         "_includes/page-search.html must load page-search.js AFTER the form "
         "it wires (the script binds on run, not on DOMContentLoaded)."
@@ -388,8 +393,8 @@ def test_the_search_box_searches_for_anything_on_a_local_build():
             read("_layouts", layout), flags=re.S,
         ), (
             f"_layouts/{layout} loads page-search.js itself; since 2026-10-01 "
-            f"only _includes/page-search.html does, under show_header_search, "
-            f"so the deployed site never loads a script for a box it lacks."
+            f"only _includes/page-search.html does, beside the form it wires, "
+            f"so no page loads it twice or without its box."
         )
 
     for site in ("food", "cocktails"):

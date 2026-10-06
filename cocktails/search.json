@@ -7,7 +7,7 @@ sitemap: false
   #1050, 2026-09-15. The drinks' half of food/search.json; read that file's
   comment for the shape and the reasoning, which are the same. Fetched by
   assets/js/page-search.js from the box _includes/page-search.html renders
-  (the header, local builds only, since #1210).
+  (the header since #1210, on both live sites since #1288).
 
   THE SAME LIST THE INDEX SHOWS. `all_drinks` is assembled exactly as
   cocktails/index.html assembles it -- the gated public collection, plus the

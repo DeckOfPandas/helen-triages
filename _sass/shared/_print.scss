@@ -118,8 +118,8 @@
 
   // THE PAGE FURNITURE, #1005/#1024/#1210: the back arrow's line (the arrow
   // and print · pdf), the shortlist pair, and the search box (in the header
-  // on a local build only, so this reaches nothing on the deployed site and
-  // keeps a local print honest). All of it is a way of getting somewhere else
+  // of every page since #1288, so this rule is what keeps it off every
+  // printed sheet and PDF). All of it is a way of getting somewhere else
   // or doing something to the screen; none of it is the recipe.
   .page-furniture,
   .page-actions,

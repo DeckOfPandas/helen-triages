@@ -1,13 +1,13 @@
 // =============================================================================
 // PAGE SEARCH — the "search for anything" box in the header of every page of
-// a site on a LOCAL BUILD, and its dropdown. GitHub issue #1050; in the header
-// and local-only since #1210 (2026-09-30), when it was a recipe or drink
-// page's furniture line and live.
+// a site, and its dropdown. GitHub issue #1050. On a recipe or drink page's
+// furniture line, live, until #1210 (2026-09-30) moved it to the header on
+// local builds only; on both live sites again since #1288 (2026-10-06).
 // =============================================================================
 // _includes/page-search.html renders the box as a plain GET form to this
 // site's index carrying `q=`, which is the name search the index already has
 // (#1024) and works with no JavaScript at all, and loads this file beside it
-// under the same `show_header_search` gate. This file upgrades it: as you
+// on every page that has the box. This file upgrades it: as you
 // type, a dropdown under the box offers everything the word could mean on THIS
 // site -- a recipe or drink by name, a star ingredient, a mood, a practicality,
 // a hassle, an ingredient -- grouped by kind, and choosing one takes you either

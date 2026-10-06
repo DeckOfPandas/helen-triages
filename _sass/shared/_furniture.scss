@@ -8,8 +8,8 @@
 // were not: "I always find myself surprised by the locations of the back,
 // shortlist, print and pdf buttons." The markup is _includes/back-to-index.html
 // (the arrow and, via page-print.html, print · pdf), _includes/page-actions.html
-// (the shortlist pair) and _includes/page-search.html (the box, in the header,
-// local builds only); each site's stylesheet imports this after shared/chrome,
+// (the shortlist pair) and _includes/page-search.html (the box, in the header
+// of every page, live since #1288); each site's stylesheet imports this after shared/chrome,
 // and names only the ten palette-contract variables.
 //
 // WHAT STAYS PER SITE: the shortlist button's own colours and states
@@ -26,7 +26,8 @@
 // search box was; the shortlist button and its see-shortlist link are things
 // you do TO the page and sit on the first line under the rule that closes the
 // head -- the toggle's line on a drink page, the INGREDIENTS line on a recipe.
-// The search box went to the header (page-search.html, local builds only).
+// The search box went to the header (page-search.html) -- on local builds only
+// until #1288 (2026-10-06) put it on both live sites.
 
 // --- The furniture line: arrow left, print · pdf right -----------------------
 // `space-between` puts the two at the column's edges. The arrow keeps its own
@@ -66,8 +67,9 @@
 // hairline, same placeholder tone (shared/_rule.scss), so a reader who has used
 // I KNOW WHAT I WANT recognises it.
 //
-// IN THE HEADER SINCE #1210 (2026-09-30), LOCAL BUILDS ONLY -- under the door
-// to the other site, on its right edge; _includes/page-search.html says why,
+// IN THE HEADER SINCE #1210 (2026-09-30), AND ON BOTH LIVE SITES SINCE #1288
+// (2026-10-06) -- at the right-hand end of the door's row;
+// _includes/page-search.html says why,
 // and its place in the header's grid is shared/_layout.scss's. Everything
 // below is about the box itself and is unchanged by the move, bar one line:
 // `.site-header` carries 0.5em of letter-spacing for the wordmark and

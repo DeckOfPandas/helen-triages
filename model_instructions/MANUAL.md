@@ -194,9 +194,7 @@ crops one element at 2x **and prints its box in CSS px** (`x`, `y`, `w`, `h`,
 `right`), so an alignment question is answered by comparing two numbers, not
 two images; the last two arguments type text into a box first, for a control
 that only shows itself once somebody has typed (the search dropdown, #1050 —
-**local builds only since #1210**, so `build.sh`'s deploy build has no box to
-type into; build with `--config _config.yml,_config_local.yml -d tmp/site`
-first, §13.11's command pointed at the harness's directory).
+in the header of every page, and on `build.sh`'s deploy build since #1288).
 **A BOX IS NOT INK, AND TWO CROPS ARE NOT ONE IMAGE — and when the marks you
 are comparing sit in an element that also holds the tape, hide the tape.**
 `tmp/nav_candidate.py` (#1148, 2026-09-21) is the pattern: `visibility: hidden`
@@ -482,11 +480,16 @@ line (2026-09-14). That number is measured, and the rule says how to re-measure
 it — **crop the whole LINK and read the ink bands in that ONE image**, because
 an element screenshot pads its box by about a pixel and cropping the word and
 the icon separately makes that padding most of the answer. A `site_neutral`
-page (about) shows every site. **It sits at the RIGHT-HAND end of the header's
-second row and the `??` about link (a literal `/about/`) at the LEFT end, both
-on the cards' edges, at every width** (2026-09-11, #965 and Helen's desktop
-ruling the same afternoon; it was centred under the wordmark for one day) —
-**on every page except /about/, which is the exception below.**
+page (about) shows every site. **It sits CENTRED under the wordmark, in the
+header's second row, with the `??` about link (a literal `/about/`) at the
+row's LEFT end and the search box at its RIGHT end, both on the cards' edges**
+(#1288, 2026-10-06: *"how about the [ FOOD ] -> door centered under the main
+header image?"*, then *"At 1280, option C it is"*). It was at the right-hand
+end from 2026-09-11 (#965) until the box took that end, and centred for the
+one day before that. **Once the header stacks it is three lines**: the
+wordmark, the door alone and centred, then `??` and the box sharing the third
+on the two card edges — **on every page except /about/, which is the exception
+below.**
 
 **/about/ IS THE ONE PAGE WITH TWO DOORS, AND SINCE 2026-09-15 IT IS LAID OUT
 FOR THEM** (#1086, Helen: *"C: doors on one line, no ??"*). Two doors measure
@@ -508,13 +511,12 @@ so a 900px header sat 24px outside the cards over 948px. Once the header stacks
 site the way the wordmark does, and by the same rule: one template, no
 per-site key; `test_the_header_and_footer_are_identical_on_every_page`
 compares the row within a site and requires each site's row to name the other
-and not itself. **On a local build the header has a third row: the search
-box, directly under the door** (#1210, 2026-09-30, `_includes/page-search.html`,
-row 3 column 3 of the same grid, gated on `show_header_search` from
-`_config_local.yml` — §13.13 has the box; this is the one piece of page
-furniture that crossed into the chrome, and it did so as a testing tool: *"so
-I'm not clicking about all over the place."* The deployed header is byte for
-byte what it was.) **The footer's reference block is a column PER SITE, gated on
+and not itself. **The search box is in the header of every page of a site, on
+both live sites** (#1288, 2026-10-06, `_includes/page-search.html`, row 2
+column 3 of the same grid — §13.13 has the box; this is the one piece of page
+furniture that crossed into the chrome. It did so on 2026-09-30 as a
+local-only testing tool under the door, #1210, behind a `show_header_search`
+key that #1288 retired.) **The footer's reference block is a column PER SITE, gated on
 having material** — food's two links appear on a cocktail page, and since
 2026-09-06 (#529) a `[ COCKTAILS ]` column appears beside them, which cost no
 template change: the loop always asked every site rather than food. The hearts
@@ -4495,15 +4497,21 @@ notes."* So now:
   INGREDIENTS is 104.9px on both sites (the drink page's block gap + the pill's
   28.9px + 3rem; food's row carries it as one 6.55rem margin, #1124 re-measured).
 - **The search box**, `_includes/page-search.html`, **in the header of every
-  page of a site on a LOCAL BUILD ONLY**: row 3, column 3 of
-  `.site-header-inner`, under the door to the other site and on its right
-  edge, gated on `show_header_search`, which only `_config_local.yml` declares
-  (the `show_drafts` idiom). The deployed site has no search box anywhere.
-  **The include loads `page-search.js` beside the form, under the same gate**
+  page of a site, ON BOTH LIVE SITES since #1288 (2026-10-06)**: row 2,
+  column 3 of `.site-header-inner`, at the right-hand end of the door's row
+  with the door centred beside it (§2.5); once the header stacks, on a third
+  line opposite `??`. No config key gates it: `show_header_search`, which
+  made it local-only from #1210 (2026-09-30), is retired, and the include
+  renders the box on every page that belongs to a site (not /about/).
+  **The indexes keep I KNOW WHAT I WANT as well** — #1288 proposed the box
+  replacing that section, and Helen kept both: *"I'm not ready to drop their
+  colours from my palette, and I am the main/only user here, so they stay!"*
+  So Enter in the header box still fills the index's own name box.
+  **The include loads `page-search.js` beside the form**
   (since 2026-10-01; it was a page-layout script from #1050), so every page
-  that has the box has the dropdown and no deployed page loads a script for a
-  box it lacks. Everything below about the box itself is unchanged by the
-  move. Before #1210 it was the right-hand end of the furniture line, live —
+  that has the box has the dropdown. Everything below about the box itself is
+  unchanged by either move. Before #1210 it was the right-hand end of the
+  furniture line, live —
   *"back arrow's line, but on the right not in the centre."* The box is a
   plain GET form to this site's index with
   `q=`, works with no JavaScript, and submits a NAME search: `HTF.filterState.parseName`

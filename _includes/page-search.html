@@ -1,31 +1,38 @@
-{% comment %} ── THE SEARCH FOR ANYTHING, IN THE HEADER, ON A LOCAL BUILD ONLY ──
-  #1210, 2026-09-30. Helen: "Move the omnisearch to the navbar, directly under
-  [ FOOD ] ->, to show on the local site only -- this is key for me during
-  testing so I'm not clicking about all over the place." And on whether it
-  stays at all: "honestly it's very useful for md proofreading in the local
-  build so it's staying at least for now."
+{% comment %} ── THE SEARCH FOR ANYTHING, IN THE HEADER, ON BOTH LIVE SITES ─────
+  #1288, 2026-10-06. Helen: "how about having an omnisearch box in the navbar
+  for both live sites, as it is for the local sites now?" -- "Top right is
+  where I'd expect to find this kind of thing", and "Omnisearch box is
+  undoubtedly useful to me, and I've found this over and over again". Against
+  it she put "more stuff is more bad in general, especially right at the top
+  of the page", looked at it on a candidates page, and settled it: "I like it
+  more than I want to drop the omnibox."
 
-  So the box is a TESTING TOOL now, and it sits where a testing tool sits: in
-  the shared header, on every page of a site, under the door to the other
-  site and on the same right edge (shared/_layout.scss places it). It was the
-  right-hand end of the back arrow's line on a recipe or drink page from #1024
-  (2026-09-14) until this; that end now holds print and pdf (page-print.html).
+  So it is in the shared header on every page of a site, at the right-hand
+  end of the door's row, with the door centred under the wordmark to make
+  room; below the stack width it shares a third line with `??`
+  (shared/_layout.scss places all of it). THE INDEXES KEEP THEIR OWN I KNOW
+  WHAT I WANT SECTION: the issue proposed this box replacing it, and Helen
+  kept both -- "I'm not ready to drop their colours from my palette".
 
-  RENDERED ONLY WHEN `site.show_header_search` IS TRUE, and only
-  _config_local.yml declares that key -- the same idiom as show_drafts and
-  show_costs, and it must stay out of _config.yml for the same reason: the
-  deployed site has no search box anywhere. `page.site_neutral` (the about
-  page) gets none either: it belongs to no site, so there is no index to
-  search. Everything below reads `page.site_key`, exactly as back-to-index.html
-  does, so a food page searches food and a drink page searches cocktails.
+  WHERE IT HAS BEEN: the right-hand end of the back arrow's line on a recipe
+  or drink page, live, from #1024 (2026-09-14); the header, under the door,
+  on a LOCAL BUILD ONLY from #1210 (2026-09-30), as a testing tool ("key for
+  me during testing so I'm not clicking about all over the place"), gated on
+  a `show_header_search` key only _config_local.yml declared. That key is
+  gone rather than set true in both configs: a switch nothing reads is the
+  thing the local-only idiom depends on not existing.
 
-  THE DROPDOWN'S SCRIPT LOADS HERE TOO, since 2026-10-01, under the same gate.
-  page-search.js was a page-layout script from #1050 to #1210 ("page
-  furniture, not chrome"); for a day after #1210 the box was in the header on
-  every page but only a recipe or drink page loaded the script, so the index
-  pages had a plain form with no dropdown -- a testing tool that worked on
-  some pages. The script and the box are one thing and ship together: both
-  only on a local build, and on every page of a site there. It hangs
+  `page.site_neutral` (the about page) gets none: it belongs to no site, so
+  there is no index to search. Everything below reads `page.site_key`, exactly
+  as back-to-index.html does, so a food page searches food and a drink page
+  searches cocktails.
+
+  THE DROPDOWN'S SCRIPT LOADS HERE TOO, since 2026-10-01, so every page that
+  has the box has the dropdown. page-search.js was a page-layout script from
+  #1050 to #1210 ("page furniture, not chrome"); for a day after #1210 the
+  box was in the header on every page but only a recipe or drink page loaded
+  the script, so the index pages had a plain form with no dropdown. The
+  script and the box are one thing and ship together. It hangs
   HTF.pageSearch off the namespace assets.js creates in the head and reaches
   for nothing else while the page loads, so loading it at the end of the
   header costs the page nothing it did not already pay. (On first focus it
@@ -93,12 +100,10 @@
   where you are, which is that file's test for a key. The input's aria-label
   carries the same words, so a screen reader hears what a sighted reader sees.
 
-  TO LOOK AT IT WITH THE BROWSER HARNESS, BUILD WITH THE LOCAL CONFIG.
-  scripts/browser/build.sh builds what deploys, which has no box; the
-  candidates-page build (MANUAL 13.11, `--config _config.yml,_config_local.yml`)
-  is the one that shows it. {% endcomment %}
+  THE BROWSER HARNESS SEES IT WITH NO SPECIAL BUILD since #1288:
+  scripts/browser/build.sh builds what deploys, and what deploys has the box. {% endcomment %}
 {% assign search_site = site.data.sites[page.site_key] %}
-{% if site.show_header_search and search_site and page.site_neutral != true %}
+{% if search_site and page.site_neutral != true %}
   <form class="page-search" role="search" method="get" action="{{ search_site.home | relative_url }}"
         data-search-index="{{ search_site.home | append: 'search.json' | relative_url }}">
     <input type="search" name="q" class="page-search-input" autocomplete="off"
