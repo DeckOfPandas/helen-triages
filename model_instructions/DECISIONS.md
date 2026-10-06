@@ -4134,6 +4134,33 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-10-06, #1292 — THE DRINK PAGE'S TAGLINE IS TYPEWRITTEN, AND SPACE IS
+  ITS SEPARATOR.** #1292 asked how to "make more of taglines on the cocktail
+  site", *"the main avenue for personal voice for most uses of the site."* Two
+  rounds of a candidates page on the real Classic Champagne Cocktail page, each
+  switchable across five of her own lines from 16 to 162 characters. Round 1,
+  six treatments (as it was, bigger and wider, a green bar, typewritten, a hung
+  quote mark, sized by length): *"I like the typewriter font version. I think
+  this needs some more vertical space between title and tagline, otherwise some
+  kind of separator."* Round 2, three gaps and three separators (a short green
+  rule, a grey hairline, a leading dash): *"more space still is working for me
+  really nicely."* So `.cocktail-tagline` is `$font-headings` upright at 1.1rem
+  with `$space-xxl` above it, and the italic of 2026-09-05 is retired.
+  **THE LENGTHS ARE HERS TO CUT, NOT THE STYLESHEET'S TO ABSORB.** The 78 live
+  lines ran 16 / 35 / 50 / 70 / 162 characters (min, quartiles, max), two of
+  them past 140. "Sized by length" was offered for exactly that and passed
+  over: *"I can cut some characters. I expect that should be my position
+  anyway."*
+  **RULED OUT IN THE SAME SITTING, so nobody proposes them again:** a tagline
+  of the day on the index (*"Too much even for me."*); a sign-off at the foot
+  of `make it` (*"It feels messy"*); a page of nothing but taglines (*"not now,
+  not ever"*); a share image carrying the line; and **the tagline back on the
+  index card at rest** — asked as a challenge to #512, measured (17 of 20 cards
+  have a spare line at desktop width, none on a phone, and one line holds about
+  half her taglines whole), and answered: *"no taglines back on the index
+  cards."* #512 stands. What she did want is the tagline as a REVEAL on a card,
+  which is its own piece of work under the same issue.
+
 - **2026-09-15, #1086 — "actions row only", and the title that was laid out in
   the glass column.** From the design review. Helen, shown a drink page carrying
   two shortlist buttons: *"actions row only."* So the `.btn-shortlist` inside
