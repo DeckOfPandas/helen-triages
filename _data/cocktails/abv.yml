@@ -222,6 +222,9 @@ bottles:
   "Rhum JM Ambré":                    { abv: 45,   confidence: medium }
   "Trois Rivières Cuvée de l'Océan":  { abv: 42,   confidence: high }
   "Barbancourt 3 Star":               { abv: 43,   confidence: high }
+  # Named by Helen 2026-10-07 without a strength. 43 is the 3 Star's figure
+  # carried across; `low`, with the question.
+  "Barbancourt 5 Star":               { abv: 43,   confidence: low, qq: "Helen named the bottle without a strength. Does the Barbancourt 8-year (5 Star) label say 43, like the 3 Star?" }
   # 43, NOT 53.5, AND THE WORD `COMMUNAL` IS THE WHOLE POINT. A single-village
   # clairin -- Sajous, Vaval, Casimir -- really does run into the fifties and
   # move batch to batch, which is where the old guess came from. `Communal` is
@@ -310,6 +313,9 @@ bottles:
   # Pineapple Flavoured Vodka", 37.5%. Same figure the `pineapple vodka`
   # generic carried, which is now deleted in favour of this row.
   "Ciroc Pineapple Flavoured Vodka":  { abv: 37.5, confidence: high }
+  # HELEN'S OWN FIGURE, 2026-10-07: "Lemon vodka: 40% abv, default is Absolut
+  # Citron".
+  "Absolut Citron":                   { abv: 40,   confidence: high }
 
   # --- absinthe ----------------------------------------------------------
   "Vieux Pontarlier":                 { abv: 65,   confidence: high }
@@ -329,6 +335,9 @@ bottles:
   "Cocchi Vermouth di Torino":        { abv: 16,   confidence: high }
   "Punt e Mes":                       { abv: 16,   confidence: high }
   "Lillet Blanc":                     { abv: 17,   confidence: high }
+  # Named by Helen 2026-10-07 for Picotin and North Sea Oil, no strength given.
+  # 16.5 is what the bottle usually says; `low`, with the question.
+  "Cocchi Americano":                 { abv: 16.5, confidence: low, qq: "Helen named the bottle without a strength. Does the Cocchi Americano label say 16.5?" }
   "Lustau Amontillado":               { abv: 18.5, confidence: medium }
   "Barbadillo Principe":              { abv: 19,   confidence: medium }
   "Lustau Don Nuño Oloroso":          { abv: 20,   confidence: medium }
@@ -542,13 +551,10 @@ generics:
   # its first pour. A GUESS, `low`, with the question -- not a label Helen has
   # read.
   Japanese whisky:        { abv: 43,   confidence: low, qq: "No bottle declared. 43 is a common strength for a blended Japanese whisky; which bottle is on the shelf, and what does it say?" }
-  # `americano` HAD A ROW HERE FOR AN HOUR and lost it the same day: Helen typed
-  # Cocchi Americano as a `quinquina` with `character: "americano"`, so the
-  # generic is unpoured again and a guessed figure for it would be read by
-  # nothing.
-  # NEW 2026-10-07 with the generic (Lemon Drop Martini, Zakuski Cocktail). A
-  # GUESS at the usual 40 for a citrus vodka, `low`, with the question.
-  lemon vodka:            { abv: 40,   confidence: low, qq: "No bottle declared. Difford's pours Ketel One Citroen, usually 40; is that the bottle, and does the label agree?" }
+  # `americano` AND `lemon vodka` EACH HAD A ROW HERE FOR AN HOUR and lost it
+  # the same day, when Helen named a bottle for each (Cocchi Americano, Absolut
+  # Citron -- both in `bottles:` above). A bottle's figure wins, and
+  # test_no_generic_gets_its_strength_from_two_places requires the deletion.
   # NEW 2026-10-07, for Autumn Leaves -- the first pour of this generic with no
   # bottle beside it. NOT A GUESS: bottled-in-bond is 100 proof by definition,
   # and the drink's Difford's source says so in the line itself, "Straight rye

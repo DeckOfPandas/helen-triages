@@ -843,27 +843,14 @@ rum_characters:
 whisky_characters:
   - "peated"
 
-# AN AMERICANO IS A QUINQUINA WITH A CHARACTER -- Helen, 2026-10-07, deciding
-# how to type Cocchi Americano in Picotin and in North Sea Oil: "Cocchi
-# Americano is traditionally an americano but acts functionally as a
-# quinquina ... My own rum principles say I care about how something works in
-# a drink far more than what it technically is, so let's say americano
-# character quinquina."
-#
-# So both drinks say `generic: "quinquina"` with `character: "americano"`, the
-# shape a hogo rum and a peated malt already have: the generic is what you
-# reach for, the character is what this particular drink wants from it.
-#
-# THIS DECLARES A LIST FOR THE `fortified` FAMILY, which switches the
-# declared-character check on for every vermouth, sherry and port too. That
-# is wanted: a character on one of them should be a ruling, not a typo.
-#
-# THE `americano` GENERIC BELOW IS UNPOURED AGAIN and this ruling is the
-# reason. It was split from `quinquina` on 2026-08-30 (#568) and kept on
-# 2026-09-25 (#1186); whether it stays now is hers to say, and it has not
-# been asked.
-fortified_characters:
-  - "americano"
+# NO `fortified_characters` LIST, AND ONE STOOD HERE FOR AN HOUR ON 2026-10-07.
+# Helen typed Cocchi Americano as a `quinquina` with `character: "americano"`
+# ("I care about how something works in a drink far more than what it
+# technically is"), and then the same afternoon turned it round: "I think
+# Cocchi Americano is an americano." So Picotin and North Sea Oil pour the
+# `americano` generic -- its first two drinks -- and suggest the bottle. HOW
+# TO SAY "and a quinquina works in its place" was still open when this was
+# written; see the note at `americano` in `fortified_and_aromatised` below.
 
 # =============================================================================
 # WHERE A BOTTLE IS FROM -- #591, Helen's ruling 2026-09-07
@@ -1613,6 +1600,12 @@ amari:
 #
 # `americano` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186): "Please keep
 # all the others." Declared ahead of a drink, as a spec.
+#
+# IT HAS TWO DRINKS SINCE 2026-10-07: Picotin, from Difford's, and North Sea
+# Oil, which is one of the three this block says "have not been looked at" and
+# said `quinquina` until then. Both pour Difford's "Americano bianco". Helen:
+# "I think Cocchi Americano is an americano", with `Cocchi Americano` as the
+# suggestion -- declared in bottles.yml the same day.
 fortified_and_aromatised:
   - "sweet vermouth"
   - "dry vermouth"

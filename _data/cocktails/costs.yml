@@ -306,6 +306,12 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: medium
+  # A PLACEHOLDER, 2026-10-07. Helen named the bottle and not its price; GBP 38
+  # for 70cl is a rough shelf figure, NOT SHOP-CHECKED, and she has not seen it.
+  "Barbancourt 5 Star":
+    size_ml: 700
+    gbp: 38
+    confidence: low
   "Sagatiba":
     size_ml: 700
     gbp: 22
@@ -471,6 +477,11 @@ bottles:
   "Ciroc Pineapple Flavoured Vodka":
     size_ml: 700
     gbp: 31
+    confidence: high
+  # HELEN'S OWN FIGURE, 2026-10-07: "Absolut Citron at £25 for 70 cl."
+  "Absolut Citron":
+    size_ml: 700
+    gbp: 25
     confidence: high
   # NEW 2026-09-09 with the bottle. 75cl, like every other vermouth here and
   # unlike the 70cl default -- the header calls that out as the thing easiest
@@ -640,6 +651,12 @@ bottles:
     size_ml: 750
     gbp: 18
     confidence: high
+  # A PLACEHOLDER, 2026-10-07. Helen named the bottle and not its price; GBP 22
+  # for 75cl is a rough shelf figure, NOT SHOP-CHECKED, and she has not seen it.
+  "Cocchi Americano":
+    size_ml: 750
+    gbp: 22
+    confidence: low
   "Carpano Antica Formula":
     size_ml: 1000
     gbp: 28
@@ -1183,16 +1200,15 @@ generics:
 
   # --- TWO MORE PLACEHOLDERS, 2026-10-07, the Difford's batch ------------------
   # `Japanese whisky` was declared ahead of any drink (#1186) and so had no
-  # price; `lemon vodka` is new that day. Typing Geisha Martini's whisky and the
-  # Ketel One Citroen in Lemon Drop Martini and Zakuski Cocktail is what made
-  # the price test ask. NOT SHOP-CHECKED, and Helen has not seen these figures:
-  # a range wide enough to be true and nothing more. Replace each with a real
-  # bottle's price -- or declare the bottle, which wins over the row.
-  # (`americano` had a row here for an hour: Cocchi Americano is typed as a
-  # `quinquina` with `character: "americano"`, so nothing pours the generic.)
+  # price. Typing Geisha Martini's whisky is what made the price test ask. NOT
+  # SHOP-CHECKED, and Helen has not seen this figure: a range wide enough to be
+  # true and nothing more. Replace it with a real bottle's price -- or declare
+  # the bottle, which wins over the row.
+  # (`americano` and `lemon vodka` each had a row here for an hour, until Helen
+  # named a bottle for each -- Cocchi Americano, Absolut Citron -- and a
+  # category with a bottle is priced from the bottle.)
   Japanese whisky:    { gbp_per_litre_min: 40.00, gbp_per_litre_max: 80.00, basis: "PLACEHOLDER, a blended Japanese whisky's shelf range, not shop-checked", confidence: low }
-  lemon vodka:        { gbp_per_litre_min: 28.00, gbp_per_litre_max: 42.00, basis: "PLACEHOLDER, a citrus vodka's rough 70cl shelf range, not shop-checked", confidence: low }
-  # A THIRD, the same day: Autumn Leaves pours `bonded rye` with no bottle named.
+  # ANOTHER, the same day: Autumn Leaves pours `bonded rye` with no bottle named.
   bonded rye:         { gbp_per_litre_min: 45.00, gbp_per_litre_max: 70.00, basis: "PLACEHOLDER, a 100-proof rye's rough 70cl shelf range, not shop-checked", confidence: low }
 
   # --- free -------------------------------------------------------------------
