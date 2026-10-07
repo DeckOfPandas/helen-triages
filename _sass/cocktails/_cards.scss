@@ -1049,6 +1049,16 @@ $card-tagline-top: 0.584rem;
   padding-right: calc(var(--ship-w, 0px) + #{$card-gutter});
 }
 
+// ONE ROW UP, AND THE SHIP'S LINE LEFT TO THE SHIP. One chip row's pitch --
+// the line and the gap between rows -- as bottom padding, so the chips' last
+// row sits on the line above the verdict. NO 2px FOR BORDERS: a chip has been
+// a bare word since 2026-09-04 and draws none, and with them a card as tall as
+// its content (720px and below) grew 2px when its chips were lifted. The
+// block's `max-height` is border-box and so still counts this as a row.
+.drink-card--chips-above-ship .drink-card-moods {
+  padding-bottom: calc(#{$chip-line} + 0.28rem);
+}
+
 .drink-card-foot {
   position: absolute;
   // Same gutter as the body above, so the title and the foot share one left

@@ -72,6 +72,9 @@
   // then falls to a fourth row is hidden whole by the row cap, which is the
   // lesser thing to lose.
   var CLEAR_SHIP = 'drink-card--chips-clear-ship';
+  // The chips' last row sits one line up, leaving the ship's line to the
+  // ship. See `o.lift` at packChips.
+  var ABOVE_SHIP = 'drink-card--chips-above-ship';
 
   function lineCount(el) {
     var style = window.getComputedStyle(el);
@@ -198,6 +201,10 @@
       if (mask === ALL) {
         if (fill <= o.lastW + FITS) {
           best = { s: [0, -(r + 1), fill], next: -1, done: true };
+        } else if (o.lift && r + 1 < o.cap) {
+          // Too long to sit beside the ship, and a row to spare: this row
+          // stays whole and the ship's line is left empty beneath it.
+          best = { s: [0, -(r + 2), fill, 0], next: -1, done: true, lift: true };
         }
         memo[key] = best;
         return best;
@@ -266,7 +273,7 @@
     for (var j = 0; j < n; j++) {
       if (order.indexOf(j) < 0) order.push(j);
     }
-    return { order: order, visible: visible, breaks: breaks };
+    return { order: order, visible: visible, breaks: breaks, lift: !!(node && node.lift) };
   }
 
   function px(v) {
@@ -349,12 +356,17 @@
     var cap = chipH ? Math.round((px(cs.maxHeight) + rowGap) / (chipH + rowGap)) : 0;
     if (!cap || cap < 1) return null;
 
-    var sig = [pinned, W.toFixed(1), lastW.toFixed(1), paddedW.toFixed(1), cap,
+    // THE CANDIDATES SWITCH, and it goes when Helen has picked:
+    // `data-chip-lift="off"` on <html> is the cards as they were.
+    var root = document.documentElement;
+    var lift = !(root && root.getAttribute && root.getAttribute('data-chip-lift') === 'off');
+    var sig = [lift, pinned, W.toFixed(1), lastW.toFixed(1), paddedW.toFixed(1), cap,
       base.map(label).join('|'), adv.map(function (x) { return x.toFixed(1); }).join('|')].join('/');
     var plan = planned && planned.get(moods);
     if (!plan || plan.sig !== sig) {
-      var open = packChips(adv, lastAdv, pinned, { W: W, lastW: lastW, cap: cap });
-      plan = { sig: sig, order: open && open.order, breaks: open ? open.breaks : [], padded: false };
+      var open = packChips(adv, lastAdv, pinned, { W: W, lastW: lastW, cap: cap, lift: lift && hasShip });
+      plan = { sig: sig, order: open && open.order, breaks: open ? open.breaks : [], padded: false,
+        lift: !!(open && open.lift) };
       if (hasShip && (!open || open.visible < base.length)) {
         // Nothing keeps the ship's row short, or something is still clipped:
         // see what the padded width shows, and take it only if it shows more.
@@ -364,6 +376,7 @@
           plan.order = shut.order;
           plan.breaks = shut.breaks;
           plan.padded = true;
+          plan.lift = false;
         }
       }
       if (planned) planned.set(moods, plan);
@@ -377,6 +390,7 @@
       if (!el.style) return;
       el.style.marginRight = ((isMatch(el) ? 0.9 * rootSize : 0) + b[1]) + 'px';
     });
+    if (plan.lift) card.classList.add(ABOVE_SHIP);
     return plan.padded;
   }
 
@@ -408,6 +422,7 @@
     var ship = card.querySelector('.drink-card-ship');
     var moods = card.querySelector('.drink-card-moods');
     card.classList.remove(CLEAR_SHIP);
+    card.classList.remove(ABOVE_SHIP);
     if (card.style) card.style.removeProperty('--ship-w');
     if (!moods) return;
     var padded = arrangeChips(card, moods, ship);
