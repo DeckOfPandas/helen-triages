@@ -583,6 +583,7 @@ apart from DOM wiring, so Node can test it.
 | `filters.js` | DOM wiring, food index | `food-index-startup.test.js` (§10.2) |
 | `cocktail-index.js` | DOM wiring, cocktails index | `tests/js/index-harness.js` (§10.2) |
 | `results-bar.js` | DOM wiring, the sticky results bar on both indexes (§13.7) | `results-bar.test.js` |
+| `ground-print.js` | draws a site's page-ground print ONCE into a picture on the device and keeps it in IndexedDB; a stylesheet opts in with `--ground-print` (cocktails' leopard, `LEOPARD.md` §7) | `ground-print.test.js` for the two pure pieces; the drawing is looked at in a browser |
 
 **`HTF.filterState` is the MODULE and `HTF.filterState.create(SPEC)` is a
 BINDING of spec-bound functions**, and reading a name off the wrong one throws

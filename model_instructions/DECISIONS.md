@@ -9176,6 +9176,42 @@ verification. Dates are when the correction landed.
     that puts ten thousand rounded sines between a libm upgrade and a red
     `main`. The suite checks the tile SIZES against the stylesheet instead;
     the byte check is `scripts/build_leopard.py --check`, by hand.
+- **2026-10-06, #733 — THE LEOPARD JUDDERED ON A REAL PHONE, AND THE FIX KEEPS
+  THE SITE AT ZERO IMAGES.** #1314 shipped the print as two SVG `url()`s on
+  `body`, with "draw time on a real phone is unmeasured" written beside it as
+  a caveat. Helen merged because *"that's the only way I can test on a phone"*,
+  and: *"the page is slow to load, even top to bottom, and scrolling is juddery
+  even after lots of scrolling up and down. I think we're going to need to
+  optimise that gorgeous SVG you drew."* Her laptop too — *"assumed it's just
+  overheating, ha."* An SVG background is redrawn for every strip that scrolls
+  into view; nothing in the suite, and nothing a headless desktop browser can
+  show, measures that.
+  - **The recommended fix was to bake a bitmap, and she caught what it cost
+    before it was built**: *"one of the very coolest things I wanted to achieve
+    here was great styling with zero images -- basically no annoying
+    dependencies, meaning fewer device/software/network bugs. But also cool
+    points!!!! Do I need to choose between leopard and being cool!?!"* The
+    earlier answer to her had called "no raster images" in `LEOPARD.md` "a
+    note about cost, not a ruling of yours". **It is a ruling, and an old
+    one.** She does not have to choose: the device draws the SVG into a
+    picture once (`assets/js/ground-print.js`) and nothing but SVG ships.
+  - **Chosen on a speed-test page on the phone, five ways of drawing the same
+    leopard**: *"Drawn once on device, nap on (but this would be next to go on
+    mobile), scrolls with the page. I quite like the softness of drawn once on
+    a mobile. Slim isn't going to work, at least not as we have devised...it
+    all looks like spiders."* So: not sharpened for dense screens, on purpose;
+    the slimmed vector removed from the generator; pinning the fur to the
+    screen, offered, not taken.
+  - ***"Can drawn once not be saved page to page...?"*** Yes — the picture is
+    kept in IndexedDB under a hash of the artwork
+    (`_sass/cocktails/_leopard-version.scss`, written by the build script and
+    checked by a test), so the drawing is paid for once per change of artwork.
+    On the local build the fur is back about 100–170 ms after navigation when
+    kept, and the ground is plain until then.
+  - **She could not test before merging, and that was fixable all along.** A
+    bundle of the real build published as an Artifact opens on a phone with no
+    deploy; the second round of this went to her that way first. `LEOPARD.md`
+    §8 has it as a standing rule for anything that paints a lot.
 
 ## §14 Reference pages
 

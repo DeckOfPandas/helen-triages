@@ -115,7 +115,8 @@ def _inside(poly, x, y):
 
 
 def _tufts(rnd, poly, lean, amount, length):
-    """Short strokes leaning out of the outline: 'Mx,yl dx,dy' pieces in local coords."""
+    """Short strokes leaning out of the outline, as (x, y, nx, ny, dx, dy) in local
+    coords: a point on the edge, the outward normal there, and the stroke."""
     area = sum(poly[i][0] * poly[(i + 1) % len(poly)][1] - poly[(i + 1) % len(poly)][0] * poly[i][1] for i in range(len(poly)))
     sign = 1 if area > 0 else -1
     out = []
@@ -131,8 +132,8 @@ def _tufts(rnd, poly, lean, amount, length):
         if dx * nx + dy * ny < 0.15:                                # the pile lies INTO the blob here: no overhang
             continue
         ln = rnd.uniform(*length)
-        out.append(f"M{x - nx:.0f},{y - ny:.0f}l{dx * ln:.1f},{dy * ln:.1f}")
-    return "".join(out)
+        out.append((x, y, nx, ny, dx * ln, dy * ln))
+    return out
 
 
 def splodge_tile(seed=7, size=960, count=90, spots=40, crinkle="fur", ground=None,
@@ -179,7 +180,11 @@ def splodge_tile(seed=7, size=960, count=90, spots=40, crinkle="fur", ground=Non
             d = "M" + "L".join(f"{px:.1f},{py:.1f}" for px, py in local) + "Z"
             inner = f'<path d="{d}"/>'
             if tuft:
-                inner += (f'<path d="{_tufts(rnd, local, lean, tuft, tuft_length)}" fill="none" stroke="#fff" '
+                # Each tuft starts a pixel INSIDE the blob; the group's opacity,
+                # below, is what flattens the overlap into one tone.
+                tufts = "".join(f"M{tx - nx:.0f},{ty - ny:.0f}l{dx:.1f},{dy:.1f}"
+                                for tx, ty, nx, ny, dx, dy in _tufts(rnd, local, lean, tuft, tuft_length))
+                inner += (f'<path d="{tufts}" fill="none" stroke="#fff" '
                           f'stroke-width="{rnd.uniform(2.2, 3.2):.1f}" stroke-linecap="round"/>')
             marks = []
             if crinkle in ("fur", "scribble"):
@@ -191,14 +196,15 @@ def splodge_tile(seed=7, size=960, count=90, spots=40, crinkle="fur", ground=Non
                         continue
                     if crinkle == "fur":
                         a, ln = lean + rnd.uniform(-0.38, 0.38), rnd.uniform(3.5, 8.0)
-                        marks.append((px, py, f"l{math.cos(a) * ln:.1f},{math.sin(a) * ln:.1f}"))
+                        ex, ey = math.cos(a) * ln, math.sin(a) * ln
+                        marks.append((px, py, f"l{ex:.1f},{ey:.1f}", ex, ey))
                     else:
                         a, ln, bend = rnd.uniform(0, 2 * math.pi), rnd.uniform(5.0, 11.0), rnd.uniform(-4.5, 4.5)
                         ex, ey = math.cos(a) * ln, math.sin(a) * ln
-                        marks.append((px, py, f"q{ex / 2 - math.sin(a) * bend:.1f},{ey / 2 + math.cos(a) * bend:.1f} {ex:.1f},{ey:.1f}"))
+                        marks.append((px, py, f"q{ex / 2 - math.sin(a) * bend:.1f},{ey / 2 + math.cos(a) * bend:.1f} {ex:.1f},{ey:.1f}", ex, ey))
             for ox, oy in offsets:
                 blobs.append(f'<g transform="translate({x + ox:.1f},{y + oy:.1f})" opacity="{strength:.2f}">{inner}</g>')
-                for px, py, tail in marks:
+                for px, py, tail, _ex, _ey in marks:
                     strokes[rnd.choice(list(strokes))].append(f"M{x + ox + px:.0f},{y + oy + py:.0f}{tail}")
 
     width = size * columns

@@ -19,7 +19,7 @@ too loud. The glasses stay the line work; the print is the fur they sit on.
 
 | what | value | where |
 |---|---|---|
-| the print | `assets/img/cocktails/leopard-fur.svg`, 2880 × 960px | `body`, in `_sass/cocktails/_leopard.scss` |
+| the print | `assets/img/cocktails/leopard-fur.svg`, 2880 × 960px | drawn once into a picture by `assets/js/ground-print.js` (§7), which `_sass/cocktails/_leopard.scss` lays on `body` |
 | the ground's texture | `assets/img/cocktails/leopard-nap.svg`, 480 × 480px | under the print, same rule |
 | the page ground | `$color-paper: #060607` (was `#0e0e10`) | `_sass/cocktails/_palette.scss` |
 | header | `$color-chrome-ground: #111113`, flat, no print | `--chrome-ground`, read by `shared/_layout.scss` |
@@ -32,14 +32,16 @@ darkness is one palette variable. Both files are **generated**:
 `python3 scripts/build_leopard.py --write`, never a hand edit. `--check`
 compares the committed files with what the generator draws; run it by hand
 after touching the generator (the suite does not, on purpose — the script's
-docstring says why). The suite does check that the stylesheet lays each tile at
-the file's own size
-(`test_the_leopard_tiles_are_laid_at_their_own_size`).
+docstring says why). The same command writes
+`_sass/cocktails/_leopard-version.scss`, a hash of the two files; **commit all
+three together**. The suite checks three things in `test_site_config.py`: the
+stylesheet lays the picture at the fur file's own size, the files it names
+exist and it never loads one with `url()`, and the version is the hash of the
+committed files.
 
 The fur tile is 495 KB as written and about 155 KB gzipped, which is more than
 all eight font faces together. It is the single heaviest thing a cocktails
-page loads. Helen has not been asked to trade any of the look for weight;
-§7 says where the weight is if that is ever wanted.
+page loads, once; §8 says where the weight is if that is ever wanted.
 
 ## 3. The generator — `scripts/leopard_splodge.py`
 
@@ -151,8 +153,8 @@ the 2026-10-06 rebuild derived them by adding the ground's own step (+9, +9,
 
 ## 5. Where it goes, and where it never goes
 
-- **On `body`, and only there.** `background-repeat: repeat`, each tile at its
-  own size in px. **Never scale it with the viewport**; a print has a real
+- **On `body`, and only there.** `background-repeat: repeat`, the picture at
+  the fur tile's own size in px. **Never scale it with the viewport**; a print has a real
   size, like fur does.
 - **Not on the header or the footer.** Helen tried a leopard header in round
   five and chose plain. The two bands are flat: no print, and no nap — "I
@@ -183,10 +185,71 @@ pseudo-element because an outset is paint, not layout, and cannot give the
 page a sideways scroll. It **replaces the footer's dashed, column-width top
 border with a solid full-width one**; that is what Helen saw and chose.
 
-## 7. Traps
+## 7. How it reaches the screen — drawn once on the device, and kept
+
+**The stylesheet does not load the SVGs.** It did, for the first afternoon
+(#1314): two `url()`s on `body`. Helen merged to try it on her phone, and:
+"the page is slow to load, even top to bottom, and scrolling is juddery even
+after lots of scrolling up and down." Her laptop too. An SVG used as a CSS
+background is not a picture the browser slides about; it is redrawn for every
+strip of page that scrolls into view, and this one is many thousands of
+strokes behind a mask, six times over for the offset.
+
+The ordinary fix is to ship a bitmap, and that ran into the oldest principle
+on the site. Helen: "one of the very coolest things I wanted to achieve here
+was great styling with zero images — basically no annoying dependencies,
+meaning fewer device/software/network bugs. But also cool points!!!! Do I need
+to choose between leopard and being cool!?!" She does not.
+`assets/js/ground-print.js`:
+
+1. reads four custom properties `_leopard.scss` declares on `:root` — the two
+   file names, the ground colour, the version;
+2. asks IndexedDB for a picture kept under that version, and if there is one,
+   hands it to the stylesheet as `--ground-picture` and stops;
+3. otherwise waits for the page to finish loading, draws ground, nap and fur
+   into a canvas **once**, at the fur tile's own size in CSS pixels, turns
+   that into a PNG **in memory**, hands it over, and keeps it.
+
+So the repo still ships no image, and a browser draws the leopard once per
+change of artwork, not once per scroll.
+
+**How it was chosen** — a speed-test page on her phone, the same leopard five
+ways. In headless Chromium at phone size, the time to paint one screenful
+above a page with no fur was about 1,160 ms as first shipped, 350 ms for a
+slimmed vector (no mask, no group opacity, half the strokes), 230 ms for that
+without the offset, and 40–60 ms drawn once. Those are a desktop's numbers and
+a proxy; her phone was the judge. **"Drawn once on device, nap on (but this
+would be next to go on mobile), scrolls with the page. I quite like the
+softness of drawn once on a mobile. Slim isn't going to work, at least not as
+we have devised...it all looks like spiders."** And then: "Can drawn once not
+be saved page to page...?" — which is step 2.
+
+What follows from that, and should not be "fixed":
+
+- **The picture is deliberately not sharpened for a dense screen.** One CSS
+  pixel per picture pixel. She preferred the softer one, and three times the
+  pixels each way is nine times the memory.
+- **The slim vector is gone from the generator.** It was the same splodges
+  with every tuft drawn clear of its blob, and that is what read as spiders.
+- **The ground is plain until the picture arrives**: for a moment on every
+  page (about 100–170 ms after navigation on the local build, kept), for a
+  second or so on the first visit, and for good with scripts off or a canvas
+  that will not draw. None of those is an error.
+- **The nap is baked into the picture.** If it ever comes off on phones — she
+  has said it is next to go — that is a media query on `--ground-nap` and a
+  different key for the kept picture, not a second background layer.
+- **A browser with no IndexedDB** (private mode, blocked site data) draws on
+  every page load instead, and pays for the drawing each time.
+- **Never bump `--ground-print-version` by hand.** It is the build script's
+  hash. If it does not change when the artwork does, every browser that has
+  visited goes on showing the old leopard.
+
+## 8. Traps
 
 - **Do not hand-edit an SVG.** Change the generator, run the build script,
-  commit both.
+  commit the two SVGs and the version partial together.
+- **Do not put the SVG back in a `url()`.** It is the obvious simplification
+  of `_leopard.scss` and it is the judder of §7; a test refuses it.
 - **`min_gap`** below ~0.85 lets rosettes touch and the print turns to
   camouflage; above ~1.2 it turns to polka dots.
 - **`count` and `radius` fight over the same cell.** The sampler gives up
@@ -200,7 +263,9 @@ border with a solid full-width one**; that is what Helen saw and chose.
   none, was 256 KB against 497). Fewer strokes per blob
   (`box / 26` in `splodge_tile`) is the cheapest saving and the one most
   likely to be invisible; she has not seen a lighter one.
-- **What has not been measured:** how long a phone takes to draw the tile. It
-  is one SVG with a mask, rasterised once per page. It drew without trouble
-  in headless Chromium at 360, 390 and 1280px wide; no real phone has been
-  timed.
+- **"It drew without trouble in headless Chromium" was this document's whole
+  evidence that the first version was fast enough, and it was wrong on the
+  first real phone.** A headless desktop browser taking a screenshot says
+  nothing about scrolling on a phone. For anything that paints a lot, put it in
+  front of Helen's phone before it merges: a bundle of the real build
+  published as an Artifact does that without a deploy.
