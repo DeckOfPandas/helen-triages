@@ -268,14 +268,21 @@ function chipWidths(bare) {
  * test's own copy of the rule, so the search is checked against the browser's
  * behaviour rather than against itself.
  */
-function draw(order, chips, W, cap) {
+function draw(order, chips, W, cap, breaks) {
+  // `breaks` is the search's own [chip, margin] list (#1331): a right margin
+  // the browser counts as part of that chip when it decides what fits next,
+  // and which is not part of how far the row's ink runs.
+  const margin = {};
+  (breaks || []).forEach((b) => { margin[b[0]] = b[1]; });
   const rows = [[]];
   let fill = 0;
+  let taken = 0;
   order.forEach((i, at) => {
     const w = at === order.length - 1 ? chips.lastAdv[i] : chips.adv[i];
-    if (fill > 0 && fill + w > W + 0.02) { rows.push([]); fill = 0; }
+    if (taken > 0 && taken + w > W + 0.02) { rows.push([]); fill = 0; taken = 0; }
     rows[rows.length - 1].push(i);
-    fill += w;
+    fill = taken + w;
+    taken = fill + (margin[i] || 0);
     rows[rows.length - 1].fill = fill;
   });
   const shown = rows.slice(0, cap);
@@ -312,7 +319,7 @@ test('an order is found that frees the rows from the ship', () => {
 
   const got = packer()(chips.adv, chips.lastAdv, 0,
     { W: W, lastW: lastW, cap: 3 });
-  const drawn = draw(Array.from(got.order), chips, W, 3);
+  const drawn = draw(Array.from(got.order), chips, W, 3, got.breaks);
   assert.strictEqual(drawn.visible, 6, 'every chip is shown');
   assert.strictEqual(drawn.rows.length, 2, 'in two rows, not three');
   assert.ok(drawn.shipRow <= lastW, 'and the last row stops short of the ship');
@@ -331,7 +338,7 @@ test('the upper rows are filled as full as they will go', () => {
   const got = packer()(chips.adv, chips.lastAdv, 0,
     { W: W, lastW: 216.9, cap: 3 });
   assert.deepStrictEqual(Array.from(got.order), [1, 2, 3, 0]);
-  const drawn = draw(Array.from(got.order), chips, W, 3);
+  const drawn = draw(Array.from(got.order), chips, W, 3, got.breaks);
   assert.strictEqual(drawn.rows.length, 2, 'no more rows than it had');
   // Within a row the tie is alphabetical, which is why it still reads in order.
   assert.deepStrictEqual(drawn.rows[0], [1, 2, 3]);
@@ -344,7 +351,7 @@ test('a chip is not clipped when another order shows it', () => {
   const W = 278.4, lastW = 209.3;
   const got = packer()(chips.adv, chips.lastAdv, 0,
     { W: W, lastW: lastW, cap: 2 });
-  const drawn = draw(Array.from(got.order), chips, W, 2);
+  const drawn = draw(Array.from(got.order), chips, W, 2, got.breaks);
   assert.strictEqual(drawn.visible, 6);
   assert.ok(drawn.shipRow <= lastW);
 });
@@ -361,12 +368,61 @@ test('chips matching a filter keep the front of the row', () => {
 });
 
 test('no order is offered when none keeps the ship\'s row short', () => {
-  // One row allowed and two chips that both fit on it: the row is what it is,
-  // and the caller falls back to padding the chips clear.
-  const chips = chipWidths([100, 100]);
+  // One chip, wider than the room left of the ship: there is nothing to
+  // arrange, and the caller falls back to padding the chips clear.
+  const chips = chipWidths([200]);
   const got = packer()(chips.adv, chips.lastAdv, 0,
     { W: 250, lastW: 150, cap: 1 });
   assert.strictEqual(got, null);
+});
+
+// -----------------------------------------------------------------------------
+// A ROW MAY BE ENDED EARLY -- #1331, 2026-10-07. Helen: "sometimes chips on
+// cards don't wrap properly -- varies with screen width", seen between about
+// 822px and 915px. The widths below are the real ones at 830px, where a card's
+// foot is 243.4px and the ship starts 174.3px along it.
+// -----------------------------------------------------------------------------
+
+test('chips that fit one full row but not beside the ship split in two', () => {
+  // Jungle Bird: aperitivo, fruity, sharp, tiki. All four fit the foot's full
+  // width, so greedy wrapping draws one row -- into the ship -- whatever the
+  // order. Before this the only way out was the padding, which drew
+  // `aperitivo, fruity / sharp, tiki` in a block 159px wide.
+  const chips = chipWidths([63, 42, 35, 28]);
+  const W = 243.4, lastW = 174.3;
+  const oneRow = draw([0, 1, 2, 3], chips, W, 3);
+  assert.strictEqual(oneRow.rows.length, 1, 'left alone, it is one row');
+  assert.ok(oneRow.shipRow > lastW, 'and that row reaches the ship');
+
+  const got = packer()(chips.adv, chips.lastAdv, 0, { W: W, lastW: lastW, cap: 3 });
+  const drawn = draw(Array.from(got.order), chips, W, 3, got.breaks);
+  assert.deepStrictEqual(drawn.rows, [[0, 1, 2], [3]],
+    'aperitivo, fruity, sharp / tiki: the first row as full as it will go');
+  assert.ok(drawn.shipRow <= lastW);
+  assert.strictEqual(got.breaks.length, 1);
+  assert.strictEqual(got.breaks[0][0], 2, 'the row is closed off after sharp');
+});
+
+test('no row is ended early where wrapping alone does the job', () => {
+  // German Vacation at 1280px, from #1308: its chips do not fit one row, so
+  // the order is enough and nothing needs a margin.
+  const chips = chipWidths([49, 84, 35, 91, 91, 49]);
+  const got = packer()(chips.adv, chips.lastAdv, 0,
+    { W: 278.4, lastW: 216.9, cap: 3 });
+  assert.strictEqual(got.breaks.length, 0);
+});
+
+test('a chip is clipped rather than drawn into the ship on a one-row card', () => {
+  // One row allowed and two chips that both fit it but not beside the ship.
+  // The second is closed off, not left to be drawn under the verdict; the
+  // caller then asks whether the padded width would show more.
+  const chips = chipWidths([100, 100]);
+  const W = 250, lastW = 150;
+  const got = packer()(chips.adv, chips.lastAdv, 0, { W: W, lastW: lastW, cap: 1 });
+  assert.strictEqual(got.visible, 1);
+  const drawn = draw(Array.from(got.order), chips, W, 1, got.breaks);
+  assert.strictEqual(drawn.visible, 1);
+  assert.ok(drawn.shipRow <= lastW);
 });
 
 test('the chips past the cap are the ones that cannot come back', () => {
@@ -377,7 +433,7 @@ test('the chips past the cap are the ones that cannot come back', () => {
   const W = 278.4, lastW = 209.3;
   const got = packer()(chips.adv, chips.lastAdv, 0,
     { W: W, lastW: lastW, cap: 3 });
-  const drawn = draw(Array.from(got.order), chips, W, 3);
+  const drawn = draw(Array.from(got.order), chips, W, 3, got.breaks);
   assert.strictEqual(drawn.visible, got.visible,
     'what the search counted as shown is what the browser would draw');
   assert.ok(drawn.shipRow <= lastW);

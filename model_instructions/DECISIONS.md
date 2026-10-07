@@ -4134,6 +4134,37 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-10-07, #1331 — THE CHIP SEARCH MAY END A ROW EARLY, AND THE PADDING
+  HAS NO CARD LEFT.** Helen, the morning #1308 went live, first seen on her
+  phone: *"sometimes chips on cards don't wrap properly -- varies with screen
+  width"*, with a picture from about 822px to 870px; *"Above that, 'sharp'
+  moves up a line, but 'tiki' is still on the line below, only forming a single
+  line above about 915 px."*
+  **WHAT #1308 COULD NOT DO.** It chose an ORDER and let `flex-wrap` draw it,
+  and greedy wrapping cannot stop a row that still has room. A card whose chips
+  all fit one row at the foot's full width, but not the part of it left of the
+  verdict, therefore had no order that helped: every order drew the same single
+  row into the ship, the search gave up, and the card fell back to the padding
+  — the narrow block #1308 was raised about, now on fewer cards. Jungle Bird at
+  830px drew `aperitivo, fruity / sharp, tiki` in a block 159px wide inside a
+  243px foot. That is the whole of her description: the padded block widens
+  with the card until `sharp` fits it, and one line only happens once all four
+  clear the ship.
+  **THE FIX**: the search may break before a chip that would have fitted, and
+  `arrangeChips` closes that row off with an inline right margin on its last
+  chip, reset on every pass like every other state the file sets. An early
+  break costs the row its fullness in the score, so it is taken only where the
+  ship's row needs it. Jungle Bird is `aperitivo, fruity, sharp / tiki`.
+  **MEASURED, 76 cards, production build**: cards padded clear of the verdict
+  went from 13 to 0 at 1280px, 20 to 0 at 390px and 11 to 0 at 360px; clipped
+  chips are unchanged (5, 1, 6); no chip is drawn under the verdict at any of
+  800, 830, 860, 890 or 920px.
+  **WHAT IS STILL TRUE AND IS NOT A BUG**: `tiki` stays on the line below until
+  the whole row clears the verdict (about 915px on that card). The row has room
+  for it; the verdict is in that room.
+  **THIS SCREENSHOT WAS NOT READ EITHER**, for #1308's reason; the case was
+  found by measuring every card from 800px to 930px.
+
 - **2026-10-06, #1308 — A CARD'S CHIPS ARE PACKED, FULLEST ROW FIRST, AND
   ALPHABETICAL IS ONLY THE TIE-BREAK.** Helen, with a screenshot of the index:
   *"it feels like there's a lots of space on the right-hand size of the tag
