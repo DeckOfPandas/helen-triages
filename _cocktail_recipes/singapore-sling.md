@@ -1,6 +1,6 @@
 ---
 title: "Singapore Sling"
-tagline: "Gin cosplaying as punch."
+tagline: "Bright pink? Yep. Super sweet? Absolutely. \"Unsophisticated\"? Absolutely not."
 glass:
   - "sling"
 garnish:
@@ -45,5 +45,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

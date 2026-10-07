@@ -1,6 +1,6 @@
 ---
 title: "Reef Juice"
-tagline: "Tastes like that bar I used to go to where you could order \"A pint of fun\"."
+tagline: "That bar we used to go to, the one where you could order \"a pint of fun\", yeah, that."
 glass:
   - "tiki mug"
 garnish:
@@ -41,5 +41,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

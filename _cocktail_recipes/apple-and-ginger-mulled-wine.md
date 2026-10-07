@@ -1,6 +1,6 @@
 ---
 title: "Apple and ginger mulled wine"
-tagline: "Remember to tell Gemma's dad this is a cocktail, not a glass of wine."
+tagline: "Remind Gemma's dad this is a cocktail, not a glass of wine."
 glass:
   - "mug"
 garnish:
@@ -47,5 +47,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Pear, apricot and rosemary Bellini"
-tagline: "You can use champagne instead of soda water if you insist."
+tagline: "If you insist on champagne over soda water, at least call it brunch."
 glass:
   - "flute"
 garnish:
@@ -53,5 +53,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

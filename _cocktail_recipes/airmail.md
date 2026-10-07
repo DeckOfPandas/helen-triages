@@ -1,6 +1,6 @@
 ---
 title: "Airmail"
-tagline: "Special delivery to the beach, please."
+tagline: "Special delivery."
 glass:
   - "flute"
 garnish:
@@ -37,5 +37,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

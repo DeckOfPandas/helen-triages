@@ -1,6 +1,6 @@
 ---
 title: "Caribbean Sazerac"
-tagline: "I counted the rums: three. Promising."
+tagline: "How many rums? Three, you say? I'm listening."
 glass:
   - "old fashioned"
 garnish:
@@ -42,5 +42,5 @@ meta:
   ship: "who knows"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

@@ -1,6 +1,6 @@
 ---
 title: "Jungle Bird"
-tagline: "You're at Milan fashion week, but succumb to the lure of a tiki bar before 6pm."
+tagline: "Front row seats at Milan fashion week, but you still sneak off to a tiki bar by mid-afternoon."
 glass:
   - "old fashioned"
 garnish:
@@ -38,5 +38,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
