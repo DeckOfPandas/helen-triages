@@ -113,6 +113,13 @@ measures:
     # into the shaker. Helen: "1 wedge should be allowed as a unit." A cut of
     # fruit you pick up, like `half` below, and no more a millilitre figure.
     - wedge
+    # NEW 2026-10-07, for Zakuski Cocktail, whose Difford's source asks for "1
+    # inch" of cucumber and calls it a log. Helen: "2.5-cm cucumber log, or
+    # 2.5-cm log of cucumber." The amount is `2.5 cm log` and the line reads
+    # "2.5 cm log cucumber". A TWO-WORD UNIT, like `small pinch` above, because
+    # the amount is the only field that can say both how long and what shape --
+    # and centimetres, since the house writes no imperial measure.
+    - cm log
     - g
 
     # HALF A LIME -- Helen's ruling, 2026-09-04, on caipirinha's `amount: "0.5"`
@@ -1775,6 +1782,12 @@ juices:
   # separately -- "no grapefruit tonight" has to name both.
   - "ruby grapefruit juice"
   - "cranberry juice"
+  # NEW 2026-10-07, for Woo Woo and Mexico City, whose Difford's source pours
+  # "cranberry juice drink". Offered `cranberry juice`, Helen: "cranberry juice
+  # drink needs to be a new generic." It is the sweetened, diluted carton --
+  # the bottle declared under `cranberry juice` is Biona's UNSWEETENED juice,
+  # and the two are not substitutes in a drink that counts on the sugar.
+  - "cranberry juice drink"
   - "apple juice"
 
 # "FRESH" MADE EXPLICIT ON THE PAGE -- #707. The comment above says freshly
@@ -2172,9 +2185,10 @@ shelf_of:
   lime juice: freshly squeezed fruit juice
   orange juice: freshly squeezed fruit juice
   ruby grapefruit juice: freshly squeezed fruit juice
-  # bottled fruit juice (3)
+  # bottled fruit juice (4)
   apple juice: bottled fruit juice
   cranberry juice: bottled fruit juice
+  cranberry juice drink: bottled fruit juice
   pineapple juice: bottled fruit juice
   # fresh produce and larder (30)
   "Coco mix (3:1 Coco Lopez to coconut milk)": larder

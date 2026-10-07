@@ -242,9 +242,9 @@ test rather than rendering:
 
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
-`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `wedge` · `g` ·
-`half` · `whole` · `(top)` · `(rinse)` · `(splash)` · `(float)` · `(sprinkle)` ·
-`to taste`
+`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `wedge` ·
+`cm log` · `g` · `half` · `whole` · `(top)` · `(rinse)` · `(splash)` ·
+`(float)` · `(sprinkle)` · `to taste`
 <!-- vocab:measures end -->
 
 Four things a source prints as if they were units, and what to do instead
@@ -466,7 +466,8 @@ does not give one you cannot pick: that is a `QQ`.
 `molasses sugar` · `palm sugar` · `sugar cube`
 
 **Juices:** `lime juice` · `lemon juice` · `orange juice` · `pineapple juice` ·
-`grapefruit juice` · `ruby grapefruit juice` · `cranberry juice` · `apple juice`
+`grapefruit juice` · `ruby grapefruit juice` · `cranberry juice` ·
+`cranberry juice drink` · `apple juice`
 
 **Fruit and herbs:** `lime` · `pineapple` · `passion fruit` · `raspberries` ·
 `blackberries` · `pear` · `dried apricots` · `lemon zest` · `mint` · `basil` ·

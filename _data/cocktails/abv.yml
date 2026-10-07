@@ -537,6 +537,12 @@ generics:
   # deleting the first row also closes #831, since it was the twelve-character
   # overhang breaking this block's alignment.
   tawny port:             { abv: 20,   confidence: high }
+  # TWO PLACEHOLDERS, 2026-10-07, the Difford's batch. Both generics were
+  # declared ahead of a drink and had no figure; Geisha Martini (2.5 ml) and
+  # Picotin (15 ml) are their first pours. GUESSES, `low`, each with the
+  # question -- neither is a label Helen has read.
+  Japanese whisky:        { abv: 43,   confidence: low, qq: "No bottle declared. 43 is a common strength for a blended Japanese whisky; which bottle is on the shelf, and what does it say?" }
+  americano:              { abv: 16.5, confidence: low, qq: "No bottle declared. 16.5 is what Cocchi Americano Bianco is usually bottled at; is that the bottle, and does the label agree?" }
 
   # --- wine and sparkling -------------------------------------------------
   # THE TWO SPARKLING ROWS ARE ALSO `to top` POURS, so they reach the total
@@ -565,6 +571,7 @@ non_alcoholic:
   - ruby grapefruit juice
   - pineapple juice
   - apple juice
+  - cranberry juice drink
   - cane sugar syrup 1:1
   - demerara sugar syrup 2:1
   - turbinado sugar syrup 2:1

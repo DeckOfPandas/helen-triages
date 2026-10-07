@@ -433,6 +433,7 @@ mood_ingredients:
     - pineapple juice
     - orange juice
     - cranberry juice
+    - cranberry juice drink
     - apple juice
     - passion fruit
     - pineapple
@@ -596,6 +597,7 @@ mood_ingredients:
   juice:
     - apple juice
     - cranberry juice
+    - cranberry juice drink
     - pineapple juice
     - orange juice
     - grapefruit juice

@@ -1176,7 +1176,19 @@ generics:
   milk:               { gbp_per_litre_min: 1.00, gbp_per_litre_max: 1.60, basis: "PLACEHOLDER, supermarket range, not shop-checked", confidence: low }
   pineapple juice:    { gbp_per_litre_min: 1.20, gbp_per_litre_max: 2.00, basis: "carton", confidence: medium }
   apple juice:        { gbp_per_litre_min: 1.00, gbp_per_litre_max: 1.80, basis: "carton", confidence: medium }
+  # A PLACEHOLDER, 2026-10-07, with the generic itself (Woo Woo, Mexico City).
+  # NOT SHOP-CHECKED, and Helen has not seen this figure.
+  cranberry juice drink: { gbp_per_litre_min: 1.00, gbp_per_litre_max: 2.20, basis: "PLACEHOLDER, supermarket range, not shop-checked", confidence: low }
   cider vinegar:      { gbp_per_litre_min: 3.00, gbp_per_litre_max: 6.00, basis: "supermarket", confidence: medium }
+
+  # --- TWO MORE PLACEHOLDERS, 2026-10-07, the Difford's batch ------------------
+  # Both generics were declared ahead of any drink (#1186) and so had no price.
+  # Typing Geisha Martini's whisky and Picotin's Cocchi Americano is what made
+  # the price test ask. NOT SHOP-CHECKED, and Helen has not seen these figures:
+  # a range wide enough to be true and nothing more. Replace each with a real
+  # bottle's price -- or declare the bottle, which wins over the row.
+  Japanese whisky:    { gbp_per_litre_min: 40.00, gbp_per_litre_max: 80.00, basis: "PLACEHOLDER, a blended Japanese whisky's shelf range, not shop-checked", confidence: low }
+  americano:          { gbp_per_litre_min: 24.00, gbp_per_litre_max: 34.00, basis: "PLACEHOLDER, Cocchi Americano's rough 75cl shelf range, not shop-checked", confidence: low }
 
   # --- free -------------------------------------------------------------------
   # `water` is already kept off cards and out of the shopping list by
