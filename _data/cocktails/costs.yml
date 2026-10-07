@@ -1182,13 +1182,18 @@ generics:
   cider vinegar:      { gbp_per_litre_min: 3.00, gbp_per_litre_max: 6.00, basis: "supermarket", confidence: medium }
 
   # --- TWO MORE PLACEHOLDERS, 2026-10-07, the Difford's batch ------------------
-  # Both generics were declared ahead of any drink (#1186) and so had no price.
-  # Typing Geisha Martini's whisky and Picotin's Cocchi Americano is what made
+  # `Japanese whisky` was declared ahead of any drink (#1186) and so had no
+  # price; `lemon vodka` is new that day. Typing Geisha Martini's whisky and the
+  # Ketel One Citroen in Lemon Drop Martini and Zakuski Cocktail is what made
   # the price test ask. NOT SHOP-CHECKED, and Helen has not seen these figures:
   # a range wide enough to be true and nothing more. Replace each with a real
   # bottle's price -- or declare the bottle, which wins over the row.
+  # (`americano` had a row here for an hour: Cocchi Americano is typed as a
+  # `quinquina` with `character: "americano"`, so nothing pours the generic.)
   Japanese whisky:    { gbp_per_litre_min: 40.00, gbp_per_litre_max: 80.00, basis: "PLACEHOLDER, a blended Japanese whisky's shelf range, not shop-checked", confidence: low }
-  americano:          { gbp_per_litre_min: 24.00, gbp_per_litre_max: 34.00, basis: "PLACEHOLDER, Cocchi Americano's rough 75cl shelf range, not shop-checked", confidence: low }
+  lemon vodka:        { gbp_per_litre_min: 28.00, gbp_per_litre_max: 42.00, basis: "PLACEHOLDER, a citrus vodka's rough 70cl shelf range, not shop-checked", confidence: low }
+  # A THIRD, the same day: Autumn Leaves pours `bonded rye` with no bottle named.
+  bonded rye:         { gbp_per_litre_min: 45.00, gbp_per_litre_max: 70.00, basis: "PLACEHOLDER, a 100-proof rye's rough 70cl shelf range, not shop-checked", confidence: low }
 
   # --- free -------------------------------------------------------------------
   # `water` is already kept off cards and out of the shopping list by
@@ -1235,3 +1240,4 @@ generics:
   # and the yield is identical. The generic is separate because the FLAVOUR
   # differs, not the cost.
   ruby grapefruit juice: { from_fruit: grapefruit juice }
+  pink grapefruit juice: { from_fruit: grapefruit juice }

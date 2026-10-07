@@ -298,6 +298,10 @@ juice_yields:
     fruit: grapefruit
     ml_min: 180
     ml_max: 240
+  pink grapefruit juice:
+    fruit: grapefruit
+    ml_min: 180
+    ml_max: 240
 
 # --- what the index's ingredient pickers do with all this --------------------
 # THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
@@ -838,6 +842,28 @@ rum_characters:
 # that retypes them, not before.
 whisky_characters:
   - "peated"
+
+# AN AMERICANO IS A QUINQUINA WITH A CHARACTER -- Helen, 2026-10-07, deciding
+# how to type Cocchi Americano in Picotin and in North Sea Oil: "Cocchi
+# Americano is traditionally an americano but acts functionally as a
+# quinquina ... My own rum principles say I care about how something works in
+# a drink far more than what it technically is, so let's say americano
+# character quinquina."
+#
+# So both drinks say `generic: "quinquina"` with `character: "americano"`, the
+# shape a hogo rum and a peated malt already have: the generic is what you
+# reach for, the character is what this particular drink wants from it.
+#
+# THIS DECLARES A LIST FOR THE `fortified` FAMILY, which switches the
+# declared-character check on for every vermouth, sherry and port too. That
+# is wanted: a character on one of them should be a ruling, not a typo.
+#
+# THE `americano` GENERIC BELOW IS UNPOURED AGAIN and this ruling is the
+# reason. It was split from `quinquina` on 2026-08-30 (#568) and kept on
+# 2026-09-25 (#1186); whether it stays now is hers to say, and it has not
+# been asked.
+fortified_characters:
+  - "americano"
 
 # =============================================================================
 # WHERE A BOTTLE IS FROM -- #591, Helen's ruling 2026-09-07
@@ -1385,6 +1411,10 @@ other_base_spirits:
   # the next one the same way rather than a licence to guess at a range.
   - "vanilla vodka"
   - "pineapple vodka"
+  # THE THIRD, 2026-10-07, "the same way": Lemon Drop Martini and Zakuski
+  # Cocktail pour Ketel One Citroen. Offered `lemon vodka` or `citron vodka`,
+  # Helen: "lemon vodka."
+  - "lemon vodka"
   - "absinthe"
   - "aquavit"
 
@@ -1781,6 +1811,11 @@ juices:
   # she took it knowingly, is that the index filters and excludes the two
   # separately -- "no grapefruit tonight" has to name both.
   - "ruby grapefruit juice"
+  # A THIRD GRAPEFRUIT, 2026-10-07, for Pompanski Martini and Smoky Tears.
+  # Asked which of the two above a pink one is, Helen: "pink grapefruit juice
+  # is a new thing." The cost she accepted for ruby applies again: "no
+  # grapefruit tonight" now has to name three.
+  - "pink grapefruit juice"
   - "cranberry juice"
   # NEW 2026-10-07, for Woo Woo and Mexico City, whose Difford's source pours
   # "cranberry juice drink". Offered `cranberry juice`, Helen: "cranberry juice
@@ -1993,6 +2028,7 @@ family_of:
   "vodka": vodka
   "vanilla vodka": vodka
   "pineapple vodka": vodka
+  "lemon vodka": vodka
   "Campari": amaro
   "Aperol": amaro
   "Cynar": amaro
@@ -2113,6 +2149,7 @@ shelf_of:
   peach brandy: spirits
   pineapple rum: spirits
   pineapple vodka: spirits
+  lemon vodka: spirits
   pisco: spirits
   reposado tequila: spirits
   rhum agricole blanc: spirits
@@ -2185,6 +2222,7 @@ shelf_of:
   lime juice: freshly squeezed fruit juice
   orange juice: freshly squeezed fruit juice
   ruby grapefruit juice: freshly squeezed fruit juice
+  pink grapefruit juice: freshly squeezed fruit juice
   # bottled fruit juice (4)
   apple juice: bottled fruit juice
   cranberry juice: bottled fruit juice

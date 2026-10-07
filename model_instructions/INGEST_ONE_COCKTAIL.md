@@ -424,7 +424,7 @@ does not give one you cannot pick: that is a `QQ`.
 `coconut-flower arrack`
 
 **Other base spirits:** `vodka` · `vanilla vodka` · `pineapple vodka` ·
-`absinthe` · `aquavit`
+`lemon vodka` · `absinthe` · `aquavit`
 
 **Liqueurs:** `triple sec` · `orange Curaçao` · `dry orange Curaçao` ·
 `Grand Marnier` · `blue Curaçao` · `Créole Shrubb` · `maraschino liqueur` ·
@@ -466,8 +466,8 @@ does not give one you cannot pick: that is a `QQ`.
 `molasses sugar` · `palm sugar` · `sugar cube`
 
 **Juices:** `lime juice` · `lemon juice` · `orange juice` · `pineapple juice` ·
-`grapefruit juice` · `ruby grapefruit juice` · `cranberry juice` ·
-`cranberry juice drink` · `apple juice`
+`grapefruit juice` · `ruby grapefruit juice` · `pink grapefruit juice` ·
+`cranberry juice` · `cranberry juice drink` · `apple juice`
 
 **Fruit and herbs:** `lime` · `pineapple` · `passion fruit` · `raspberries` ·
 `blackberries` · `pear` · `dried apricots` · `lemon zest` · `mint` · `basil` ·
