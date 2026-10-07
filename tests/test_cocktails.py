@@ -2184,11 +2184,21 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # exactly those thirty files, every one "last touched by 6de7c97e", and
 # nothing else. Covers 6de7c97 and nothing after.
 #
-# STILL NOT A GRANT FOR 18th-century-cocktail. The branch changed its tagline
-# too, but it was already `proofread: false` on main for `13406a2`, so it was
-# not among the thirty and its flag was left alone. Its newest commit is an
-# ancestor of this baseline; it still says false, and still waits for her.
-COCKTAIL_BASELINE_COMMIT = "6de7c97"   # thirty proofread taglines go live (#1321)
+# 18th-century-cocktail WAS NOT AMONG THE THIRTY. The branch changed its
+# tagline too, but it was already `proofread: false` on main for `13406a2`, so
+# its flag was left alone and she was asked whether her read covered the page.
+#
+# MOVED AGAIN THE SAME DAY FOR THAT ONE DRINK, ON HER ANSWER. `c654809` sets
+# its flag and changes nothing else.
+#
+# HER WORD, asked whether her proofread of #1321 covered the whole page,
+# the `white crème de cacao` retype included: "18th century is good to go too".
+#
+# Proved with the old value first: the test named exactly one file,
+# `_cocktail_recipes/18th-century-cocktail.md`, "last touched by c6548095", and
+# nothing else. Covers c654809 and nothing after. The "NOT A GRANT" note
+# further up is history now: that drink has since been read and granted.
+COCKTAIL_BASELINE_COMMIT = "c654809"   # 31 proofread taglines go live (#1321)
 
 
 def _newest_commit_per_published_drink():
