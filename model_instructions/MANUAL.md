@@ -2643,8 +2643,9 @@ ingredients and the chips at two, and three rendered ingredient lines cap the
 chips. Half of it is CSS — `.drink-card-name--wrap` is a sibling — and half is
 `card-line-budget.js`, because CSS can ask how many lines are ALLOWED and never
 how many rendered. **A hidden card measures zero**, so anything measuring cards
-must re-run when pagination changes what is visible; `cocktail-index.js` does,
-ahead of `markChipRows()`.
+must re-run when pagination changes what is visible; `cocktail-index.js` does.
+The same pass orders the chips (#1308, §9.13), because the cap it sets is one
+of the things the order depends on.
 
 ### 9.10a `serve` — where the ice lives
 
@@ -3069,7 +3070,14 @@ on the PRECEDING chip's `::after`, so a chip ending a line keeps its dot and
 none can ever lead a row (#846, which satisfies #698 by construction and
 deleted the `chip-rows.js` measurement pass that used to); they are real
 `<button>`s that filter the index through one delegated listener, painted from
-state. **The goodness
+state. **Their order on a card is packed, not alphabetical** (#1308):
+`card-line-budget.js` measures the chips and puts them in the order that shows
+the most inside the row cap, in the fewest rows, with the verdict's row stopping
+short of the verdict, and each row from the top as full as it will go;
+alphabetical is the tie-break, the order the template emits, and what a card
+shows with no script. Chips matching a filter stay at the front (#757). The
+drink page's own chip row is not packed and stays alphabetical (#710). Only a
+card no order can free still has its chips padded clear of the ship. **The goodness
 mark is a ship and a word** (`_includes/cocktails/ship.html`, the same include
 the cocktail page calls; the card passes `short=true` for `ship_card_names`, the
 page says the rung's own words). **How tall a glass is drawn**: the curve

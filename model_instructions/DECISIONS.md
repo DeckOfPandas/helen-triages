@@ -4134,6 +4134,47 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-10-06, #1308 — A CARD'S CHIPS ARE PACKED, FULLEST ROW FIRST, AND
+  ALPHABETICAL IS ONLY THE TIE-BREAK.** Helen, with a screenshot of the index:
+  *"it feels like there's a lots of space on the right-hand size of the tag
+  block"*, under the title *"let's try allowing tags to wrap if we tweak the
+  order rather than requiring them to be alphabetical."*
+  **WHERE THE SPACE CAME FROM, WHICH WAS NOT THE WRAPPING.** Alphabetical order
+  (#710) breaks rows wherever the alphabet does. When the last row then reaches
+  the verdict, the 2026-09-10 rule pads the whole block clear of it and every
+  row loses the ship's width; and rows past the cap are clipped. Measured on
+  the production build's 76 cards at 1280px: 27 padded, 30 chips clipped on 11
+  cards (390px: 28 and 14; 360px: 22 and 28).
+  **THREE CANDIDATES ON THE REAL INDEX** (Artifact `MVffF6XFdoxNaWTHruF4xG`,
+  `tmp/chips/` in the worktree): A, alphabetical as it was; B, packed, but
+  alphabetical wherever that already packed as well; C, packed with every upper
+  row as full as it will go. B and C mend the same cards and differ in how many
+  they touch: B moved chips on 18 of 76, C on 59. As shipped, C leaves 13
+  padded and 5 chips clipped at 1280px, 1 clipped at 390px and 6 at 360px. *"Option C, chef's
+  kiss!"* So the stepped shape is wanted on every card, not only the broken
+  ones, and **#710's alphabetical order no longer holds on a card.** It still
+  holds on the drink page's own chip row, which nothing packs, and it is the
+  order the template emits, so it is what a card shows with no script.
+  **WHAT THE ORDER IS**, in `card-line-budget.js`'s `packChips`: the most chips
+  shown inside the row cap, then the fewest rows, with the verdict's row
+  stopping short of the verdict, then the first row as full as it will go, then
+  the second; alphabetical settles what is left. A search rather than a rule of
+  thumb — at most ten chips on a card. Chips matching a filter keep the front
+  of the row (#757). The padding rule stays for the cards no order can free.
+  **WHICH CHIP IS CLIPPED, where one still is, is now decided by fit** and not
+  by the alphabet; nobody has ruled on that and it is the thing to raise if a
+  card hides the wrong word.
+  **AND THE PASS HAD BEEN RUNNING BEFORE THE NAME FIT, WHICH NOW MATTERED.**
+  `cocktail-index.js` called the budget pass ahead of `fitCardNames()` on every
+  filter pass, and on `resize` the budget ran at once while the name fit waits
+  120ms. Harmless while the pass only set a class; once it ordered chips to fit
+  the row cap, a card whose name then wrapped had been packed for one row too
+  many — Apple and ginger mulled wine clipped a chip on some loads and not
+  others, which is how it was found. The call moved below the name fit and the
+  resize run waits 160ms.
+  **THE ISSUE'S SCREENSHOT WAS NOT READ**: it downloaded under `~`, which
+  `CLAUDE.md` bars, so the case was reproduced from the build instead.
+
 - **2026-10-06 — THE DRAFT BADGE MOVES TO THE CARD'S TOP LEFT.** Raised by
   Helen while reading #1292's reveal, where a draft card had to draw the
   tagline's `?` below the `+` because the badge was in the way: *"Do you think
