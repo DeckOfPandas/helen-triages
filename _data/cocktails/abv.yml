@@ -546,6 +546,10 @@ generics:
   # deleting the first row also closes #831, since it was the twelve-character
   # overhang breaking this block's alignment.
   tawny port:             { abv: 20,   confidence: high }
+  # NEW 2026-10-07 with the generic (Roman Punch, a 5 ml float). The tawny's
+  # figure carried across -- a ruby is bottled in the same 19-20 band -- and
+  # `medium`: a category figure, no label read.
+  ruby port:              { abv: 20,   confidence: medium }
   # A PLACEHOLDER, 2026-10-07, the Difford's batch. `Japanese whisky` was
   # declared ahead of a drink and had no figure; Geisha Martini (2.5 ml) is
   # its first pour. A GUESS, `low`, with the question -- not a label Helen has
@@ -606,6 +610,7 @@ non_alcoholic:
   # which is not what this list is asking: it is a soft drink for the strength
   # test, like cola beside it.
   - ginger beer
+  - coconut water
   - water
   - cola
   - black tea

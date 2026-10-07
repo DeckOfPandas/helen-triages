@@ -996,6 +996,14 @@ default_bottles:
   # number; recorded because "default" is a ruling, as orgeat's is above.
   coconut-flower arrack: ["Ceylon Arrack"]
 
+  # THE SAME TEST, 2026-10-07: declaring Barbancourt 5 Star left this category
+  # two bottles at 43 and two at 45. Shown the four and asked which is the
+  # default, Helen answered with the strength rather than a bottle: "45%." So
+  # BOTH 45s are named -- a two-bottle default, like the tequilas above -- and
+  # an unbottled pour is 45% and priced across the pair. The two Barbancourts
+  # stay declared and are what a drink gets by naming one.
+  rhum agricole vieux: ["La Favorite L'Authentique Ambré", "Rhum JM Ambré"]
+
 # --- generics with no bottle behind them --------------------------------------
 # 438 of 685 pours name a generic and no bottle, and this is what prices them.
 # A generic that DOES have bottles is deliberately absent: its range is computed
@@ -1085,6 +1093,8 @@ generics:
   # 22.5 ml with nothing to price it from. A 10-year tawny is not scarce the way
   # an overproof Demerara is, so this range is ordinary rather than punitive.
   tawny port:         { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 15-30 / 75cl", confidence: low }
+  # NEW 2026-10-07 with the generic. NOT SHOP-CHECKED; Helen has not seen it.
+  ruby port:          { gbp_per_litre_min: 13.00, gbp_per_litre_max: 24.00, basis: "PLACEHOLDER, a ruby port's rough 75cl shelf range, not shop-checked", confidence: low }
   # HELEN'S OWN FIGURE, 2026-09-05: "Let's say champage is GBP 20 -- I buy
   # crates of Heidsieck Blue Top on sale at Christmas!!!!!" A POINT PRICE, not a
   # range, because she buys ONE THING at ONE PRICE rather than shopping the
@@ -1197,6 +1207,9 @@ generics:
   # NOT SHOP-CHECKED, and Helen has not seen this figure.
   cranberry juice drink: { gbp_per_litre_min: 1.00, gbp_per_litre_max: 2.20, basis: "PLACEHOLDER, supermarket range, not shop-checked", confidence: low }
   cider vinegar:      { gbp_per_litre_min: 3.00, gbp_per_litre_max: 6.00, basis: "supermarket", confidence: medium }
+  # A PLACEHOLDER, 2026-10-07, with the generic (Electro Batida, Dead Parrot
+  # Colada). NOT SHOP-CHECKED, and Helen has not seen this figure.
+  coconut water:      { gbp_per_litre_min: 2.00, gbp_per_litre_max: 4.50, basis: "PLACEHOLDER, supermarket carton range, not shop-checked", confidence: low }
 
   # --- TWO MORE PLACEHOLDERS, 2026-10-07, the Difford's batch ------------------
   # `Japanese whisky` was declared ahead of any drink (#1186) and so had no

@@ -1619,6 +1619,9 @@ fortified_and_aromatised:
   - "amontillado sherry"
   - "oloroso sherry"
   - "tawny port"
+  # NEW 2026-10-07, for Roman Punch, which floats 5 ml of Cockburn's ruby.
+  # Offered as a second port beside the tawny, Helen: "yes".
+  - "ruby port"
 
 # `cider` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186): "Please keep all
 # the others." Declared ahead of a drink, as a spec.
@@ -1668,6 +1671,15 @@ bitters:
   - "tiki bitters"
   - "lavender-forward bitters"
   - "peppermint bitters"
+  # THREE MORE, 2026-10-07, the Difford's batch -- each asked of Helen as "add
+  # it the way `margarita bitters` is?" and each answered "yes". All three are
+  # optional in their drinks. `daiquiri bitters` is Difford's own product
+  # (French Daiquiri, Scandinavian Daiquiri) and is named for the drink it is
+  # made for, as `margarita bitters` is; `grapefruit bitters` (Pompanski
+  # Martini) and `peach bitters` (Woo Woo) are named by flavour.
+  - "daiquiri bitters"
+  - "grapefruit bitters"
+  - "peach bitters"
   - "wood smoke bitters"
   - "warm-spiced bitters"
   - "margarita bitters"
@@ -1904,6 +1916,10 @@ other:
   # (`ginger syrup`, `ginger liqueur`, a cordial) are all different pours. A
   # top, like `soda water` and `cola`, so it shelves with them.
   - "ginger beer"
+  # NEW 2026-10-07, for Electro Batida (90 ml) and Dead Parrot Colada (45 ml),
+  # both Difford's. Helen: "yes". A measured pour in both, not a top, so it
+  # shelves in the larder beside the coconut cream rather than with the tops.
+  - "coconut water"
   - "water"
   - "black tea"
   - "espresso"
@@ -2036,6 +2052,7 @@ family_of:
   "amontillado sherry": fortified
   "oloroso sherry": fortified
   "tawny port": fortified
+  "ruby port": fortified
   "aquavit": aquavit
   "Chartreuse Verte": herbal
   "Chartreuse Jaune": herbal
@@ -2165,6 +2182,7 @@ shelf_of:
   white wine: fortified
   sweet vermouth: fortified
   tawny port: fortified
+  ruby port: fortified
   # liqueurs (42)
   Amaro Ciociaro: liqueurs
   Amaro Nonino: liqueurs
@@ -2228,6 +2246,7 @@ shelf_of:
   blackberries: fresh produce
   cider vinegar: larder
   coconut cream: larder
+  coconut water: larder
   cream: larder
   cucumber: fresh produce
   dried apricots: larder
@@ -2276,10 +2295,13 @@ shelf_of:
   "turbinado sugar syrup 2:1": sugar syrup
   vanilla syrup: sugar syrup
   white sugar: sugar syrup
-  # bitters (12)
+  # bitters (15)
   Créole bitters: bitters
   aromatic bitters: bitters
   chocolate bitters: bitters
+  daiquiri bitters: bitters
+  grapefruit bitters: bitters
+  peach bitters: bitters
   lavender-forward bitters: bitters
   margarita bitters: bitters
   orange bitters: bitters

@@ -444,14 +444,15 @@ does not give one you cannot pick: that is a `QQ`.
 
 **Fortified and aromatised:** `sweet vermouth` · `dry vermouth` ·
 `blanc vermouth` · `quinquina` · `americano` · `amontillado sherry` ·
-`oloroso sherry` · `tawny port`
+`oloroso sherry` · `tawny port` · `ruby port`
 
 **Wine and sparkling:** `champagne` · `prosecco` · `red wine` · `white wine` ·
 `cider`
 
 **Bitters:** `aromatic bitters` · `orange bitters` · `orange-forward bitters` ·
 `Créole bitters` · `chocolate bitters` · `tiki bitters` ·
-`lavender-forward bitters` · `peppermint bitters` · `wood smoke bitters` ·
+`lavender-forward bitters` · `peppermint bitters` · `daiquiri bitters` ·
+`grapefruit bitters` · `peach bitters` · `wood smoke bitters` ·
 `warm-spiced bitters` · `margarita bitters` · `pimento bitters`
 
 **Syrups:** `cane sugar syrup 1:1` · `cane sugar syrup 2:1` ·
@@ -474,10 +475,11 @@ does not give one you cannot pick: that is a `QQ`.
 `rosemary` · `fruit purée` · `maraschino cherry` · `orange slice` · `cucumber` ·
 `kaffir lime leaves`
 
-**Other:** `soda water` · `ginger beer` · `water` · `black tea` · `espresso` ·
-`cola` · `coconut cream` · `Coco mix (3:1 Coco Lopez to coconut milk)` ·
-`egg white` · `salt` · `ground cinnamon` · `cider vinegar` · `olive oil` ·
-`cream` · `milk` · `whole egg`
+**Other:** `soda water` · `ginger beer` · `coconut water` · `water` ·
+`black tea` · `espresso` · `cola` · `coconut cream` ·
+`Coco mix (3:1 Coco Lopez to coconut milk)` · `egg white` · `salt` ·
+`ground cinnamon` · `cider vinegar` · `olive oil` · `cream` · `milk` ·
+`whole egg`
 <!-- vocab:generics end -->
 
 ---
