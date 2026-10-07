@@ -2169,7 +2169,20 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # NOT A GRANT FOR 18th-century-cocktail, which `13406a2` retyped to `white
 # crème de cacao` earlier on the same branch. It is an ancestor of this
 # baseline and says `proofread: false`; it stays that way until she reads it.
-COCKTAIL_BASELINE_COMMIT = "db62ad1"   # four proofread drinks go live (#1290)
+#
+# MOVED 2026-10-07 FOR THE CHRISTMAS DAIQUIRI, ON HELEN'S EXPLICIT GRANT.
+# `f5dd435` changes one line: `garnish` from `no garnish` to `star anise
+# (floated)`, which is what its Difford's source says and what she noticed
+# while ruling on the Scandinavian Daiquiri's garnish from the same page.
+#
+# HER GRANT, told the edit would otherwise take the page off the live site:
+# "Add the floating star anise, keep it live, explicit grant." The 742aa73
+# shape: a change she can see whole in the sentence that asked for it.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly one file, `_cocktail_recipes/christmas-daiquiri.md`, "last touched by
+# f5dd4350", and nothing else. Covers f5dd435 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "f5dd435"   # Christmas Daiquiri's garnish, her grant
 
 
 def _newest_commit_per_published_drink():
