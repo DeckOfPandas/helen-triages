@@ -4134,6 +4134,35 @@ unless stated.
 
 ### §9.13 The visual language — the rounds
 
+- **2026-10-07, #1323 — A FLIPPED CARD KEEPS ITS HEIGHT ON A PHONE.** Helen,
+  with two phone screenshots: *"Sometimes when the card turns over, there's
+  lots of space under the tagline, and cutting it would allow the card not to
+  change size on flipping."* Below 720px a card is as tall as its content
+  (#1086), and #1292's reveal took the ingredient line out of the flow and put
+  the tagline in its place while the foot kept the height of its invisible
+  chips. So a long tagline grew the card over a band of nothing, and a short
+  one shrank it.
+  **MEASURED, 111 tagline cards at 390px.** Before: none kept its height; the
+  change ran from 37px shorter to 86px taller. After: 98 keep it exactly, 13
+  grow, none shrinks. The 13 are taglines longer than the ingredients and chips
+  together, and they grow by the difference; the longest, at 162 characters,
+  by 82px. At 360px it is 96 and 15; at 600px, 90 and 21. The name does not
+  move on any card and no tagline reaches the ship mark.
+  **HOW.** While the tagline shows, the card is a one-column grid of three
+  rows — name, ingredients, foot. The body is `display: contents`, the
+  ingredient line and chips turn invisible in their own boxes, and the tagline
+  spans rows two and three, stopping one chip line above the foot's edge so it
+  clears the ship. A resting card is laid out exactly as it was.
+  **TWO TRAPS, BOTH MET.** (1) Left to auto-placement, the ingredients and the
+  foot find column one taken by the spanning tagline and open a second column:
+  the first build gave a tagline a few characters wide and cards up to 626px
+  taller. Every item names column one. (2) Margins do not collapse between
+  grid items, so the name's 0.3rem and the ingredient line's 0.5rem added
+  where they used to collapse, and every card came out 4.8px taller. The name
+  drops its bottom margin in that state.
+  **ABOVE 720px NOTHING CHANGED**: a card there is a fixed height and the
+  reveal already stayed inside it.
+
 - **2026-10-06, #1308 — A CARD'S CHIPS ARE PACKED, FULLEST ROW FIRST, AND
   ALPHABETICAL IS ONLY THE TIE-BREAK.** Helen, with a screenshot of the index:
   *"it feels like there's a lots of space on the right-hand size of the tag

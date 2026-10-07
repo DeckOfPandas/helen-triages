@@ -332,6 +332,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §9.12 / §9.12.1 · skewered brandied cherry, and a garnish still carries no count.
 - 2026-09-26 · §9.12 / §9.12.1 · sharp is disqualified by being CHURNED, not by crushed ice
 - 2026-09-17 · §9.12 / §9.12.1 · #1138 #1143 · / #1143 — the garnish step reads as English.
+- 2026-10-07 · §9.13 · #1323 · A FLIPPED CARD KEEPS ITS HEIGHT ON A PHONE.
 - 2026-10-06 · §9.13 · #1308 · A CARD'S CHIPS ARE PACKED, FULLEST ROW FIRST, AND ALPHABETICAL IS ONLY THE TIE-BREAK.
 - 2026-10-06 · §9.13 · THE DRAFT BADGE MOVES TO THE CARD'S TOP LEFT.
 - 2026-10-06 · §9.13 · #1292 · THE TAGLINE TAKES THE CARD: A REVEAL, NOT A RETURN.
