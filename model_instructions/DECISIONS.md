@@ -1533,6 +1533,18 @@ unless stated.
     a rule for unnamed counts, and the flag did not flip: *"fine to make the
     update and not flip the flag. Explicit grant."* (§4.0's baseline moved to
     cover that one commit.)
+- **2026-10-07** — **A `makes:` range starts from its lower number; the
+  midpoint above is REVERSED, three days on.** Helen, during the Difford's and
+  Good Food ingest: *"where 'makes' is a range I want to use the lower
+  number."* Told that she had ruled *"Take the midpoint"* on 2026-10-04 and
+  asked whether this replaced it: *"lower number please, new ruling."* So "4–6
+  waffles" shows 4 and steps 4, 8, 12 (it was 5, 10, 15); the truffles start
+  at 20 and the swans at 10. It is the rule `serves:` has had since 2026-09-07
+  (§4, *"under-catering is worse for me than over-catering"*), so the two
+  kinds of recipe now agree. One line in `_plugins/food_yield.rb`. **Her
+  "range of one" ruling is not withdrawn, only unreachable from a `makes:`
+  line**: the lower number is always whole, and `yieldBox` still shows half a
+  recipe of an odd count as "2–3". No issue tracks it.
 
 ---
 

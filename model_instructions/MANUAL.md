@@ -719,7 +719,9 @@ with it.
   over-catering."* This sounds backwards and is not: the scale is portions
   wanted OVER portions made, so a smaller base gives a bigger multiplier and
   more food. It governs `serves: "4–6"` (the plugin already takes 4) and any
-  `serves_estimate:` written from a range.
+  `serves_estimate:` written from a range. **And `makes:` too, since
+  2026-10-07** — "4–6 waffles" is 4 on the recipe page's box (§8.2), where it
+  was the midpoint for three days.
 - **A COMPONENT RECIPE CANNOT ALWAYS BE ONE NUMBER, and the truth goes in a
   note.** `chocolate-ganache` glazes an 8-inch cake, drips a tall one, fills
   another, tops a Millionaire's shortbread, ices 12 cupcakes or makes 16
@@ -1370,8 +1372,8 @@ was ×1.2 of two eggs.
 
 | `makes:` | ×1 | ×2 | her words |
 |---|---|---|---|
-| `4–6 waffles, depending on …` | `5` waffles — the midpoint | `10` waffles | *"Take the midpoint"* |
-| a figure that lands on a half (`4–7`) | `5–6` — a range of one | `11` | *"Midpoints that land on a half can become a range of one."* |
+| `4–6 waffles, depending on …` | `4` waffles — the lower number | `8` waffles | *"lower number please, new ruling"* (2026-10-07; the midpoint, `5`, for three days before) |
+| any other range (`4–7`, `20–24`) | `4`, `20` — the lower number | `8`, `40` | the same ruling; a range no longer starts as `5–6` |
 | `about 8 pancakes` | about `8` pancakes | about `16` pancakes | *'Can Delia's pancakes please scale as "8 pancakes", "16 pancakes".'* |
 | `64+ tiny macarons` | `64+` tiny macarons | `128+` | *"64+ tiny macarons, 128+ tiny macarons"* |
 | `one 8-inch cake` — a number WORD | `1` × 8-inch cake | `2` × 8-inch cakes | *"Two 8-inch cakes"* |
@@ -1383,8 +1385,8 @@ was ×1.2 of two eggs.
 `page.whole_recipes` from the plugin), including the ones that keep the word
 "portions" and the `~` because their yield has no count to show. **Only a
 `serves:` recipe steps a portion at a time** (#1005). The box is an input
-showing a DERIVED figure: a typed number goes to the nearest whole recipe (8
-on the waffles is 10), and its `aria-label` names the thing ("waffles to
+showing a DERIVED figure: a typed number goes to the nearest whole recipe (7
+on the waffles is 8), and its `aria-label` names the thing ("waffles to
 make"). The noun agrees with the number, the plural being `unitLabel`'s;
 `dozen …` never changes; a thing that opens with a digit gets a `×`, because
 "2 8-inch cakes" is unreadable and a number box cannot spell "two".

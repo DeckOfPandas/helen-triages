@@ -8,6 +8,13 @@
 # of items made ... would be clearest to me. Never tell me how many cookies
 # are in a portion!!!" and then "Take the midpoint".
 #
+# A RANGE STARTS FROM ITS LOWER NUMBER SINCE 2026-10-07, AND THE MIDPOINT IS
+# GONE. Helen, three days on: "where 'makes' is a range I want to use the
+# lower number", and asked whether that replaced the midpoint: "lower number
+# please, new ruling." "4–6 waffles" is 4, then 8, then 12. It is the rule a
+# `serves:` range has had since 2026-09-07 ("under-catering is worse for me
+# than over-catering"), so the two kinds of recipe now agree.
+#
 # THE BOX THEN STEPS IN WHOLE RECIPES, not waffle by waffle -- Helen: "the
 # buttons should still multiply the recipe in integers, just showing number of
 # waffles. So 1x is 5 waffles, 2x is 10 waffles. Otherwise we'll need to start
@@ -17,8 +24,7 @@
 # THIS FILE ONLY READS THE LINE. It turns the text of `makes:` into what is
 # being counted, or into nil. _plugins/food_shopping.rb hangs the answer on
 # the document as `page.yield`, _layouts/recipe.html prints the control from
-# it, and assets/js/food-scale.js does every sum. No arithmetic here beyond
-# the midpoint.
+# it, and assets/js/food-scale.js does every sum. No arithmetic here at all.
 #
 # `makes:` IS STILL NEVER READ AS PEOPLE. That rule (food_shopping.rb,
 # `portions_for`) is untouched: 950 ml is not 950 portions. What is new is
@@ -36,7 +42,7 @@
 # number words that are NOT the yield's count; "one 8-inch cake" must never
 # have its 8 read as one.
 #
-#   "4–6 waffles, depending on ..."  count 4..6, base 5         thing: waffles
+#   "4–6 waffles, depending on ..."  count 4..6, base 4         thing: waffles
 #   "12 fairy cakes"                 count 12                   thing: fairy cakes
 #   "64+ tiny macarons"              count 64, and the `+` is kept: two recipes
 #                                    read "128+" ("64+ tiny macarons, 128+
@@ -117,7 +123,8 @@ module HelenTriages
       groups = Array(vocab["group_words"]).map { |w| w.to_s.downcase }
       first_word = stem.split(/\s+/).first.to_s.downcase
 
-      base = (low + high) / 2.0
+      # The lower end of a range, never its midpoint (2026-10-07, above).
+      base = low
       {
         "kind" => "count",
         "base" => (base == base.to_i ? base.to_i : base),
@@ -138,10 +145,12 @@ module HelenTriages
       }
     end
 
-    # The box is an INTEGER or, where the midpoint lands on a half, a RANGE OF
-    # ONE: 4–7 is 5.5 and shows "5–6". Helen: "Midpoints that land on a half
-    # can become a range of one." assets/js/food-scale.js `yieldBox` is the
-    # same rule for every later value.
+    # The box is an INTEGER or, where a figure lands on a half, a RANGE OF ONE:
+    # 5.5 shows "5–6". Helen, of the midpoints this file used to take:
+    # "Midpoints that land on a half can become a range of one." NO `makes:`
+    # LINE STARTS ON A HALF ANY MORE, since a range reads as its lower number;
+    # the rule lives on in assets/js/food-scale.js `yieldBox`, where half a
+    # recipe of an odd count still lands on one (5 buns halved is "2–3").
     def box(value)
       return value.to_i.to_s if value == value.to_i
       "#{value.floor}–#{value.ceil}"

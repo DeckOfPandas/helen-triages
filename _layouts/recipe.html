@@ -255,8 +255,10 @@ layout: default
      waffles said "Makes 4–6 waffles" up top and "~2 portions" down here.
      `page.made` is _plugins/food_yield.rb's reading of the `makes:` line; where
      it is set, this branch prints the control and the word "portions" appears
-     nowhere in it. The box starts at the MIDPOINT ("Take the midpoint") and
-     the word after it is the thing: "5 waffles", "950 ml", "1 × 8-inch cake".
+     nowhere in it. The box starts at the figure the line gives -- THE LOWER
+     NUMBER OF A RANGE since 2026-10-07 ("lower number please, new ruling";
+     the midpoint before) -- and the word after it is the thing: "4 waffles",
+     "950 ml", "1 × 8-inch cake".
      The whole reading goes to the script as JSON in `data-made`, and
      assets/js/food-scale.js `yieldMode` does the stepping and the plural.
 

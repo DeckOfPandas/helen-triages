@@ -40,11 +40,13 @@ COUNT = "count"
 MEASURE = "measure"
 
 CASES = {
-    # --- a count of a named thing: the midpoint, "Take the midpoint" ---------
+    # --- a count of a named thing. A RANGE READS AS ITS LOWER NUMBER since
+    # 2026-10-07 -- Helen: "lower number please, new ruling." It was the
+    # midpoint ("Take the midpoint") for the three days before.
     "4–6 waffles, depending on your waffle iron":
-        dict(kind=COUNT, base=5, low=4, high=6, stem="waffles", box="5", plus=False),
-    "20–24 truffles": dict(kind=COUNT, base=22, stem="truffles", box="22"),
-    "10–12 swans": dict(kind=COUNT, base=11, stem="swans", box="11"),
+        dict(kind=COUNT, base=4, low=4, high=6, stem="waffles", box="4", plus=False),
+    "20–24 truffles": dict(kind=COUNT, base=20, stem="truffles", box="20"),
+    "10–12 swans": dict(kind=COUNT, base=10, stem="swans", box="10"),
     "12 fairy cakes": dict(kind=COUNT, base=12, stem="fairy cakes", singular=False),
     "12 normal Yorkshire puddings":
         dict(kind=COUNT, base=12, stem="normal Yorkshire puddings"),
@@ -64,10 +66,12 @@ CASES = {
     # The noun that takes the plural is the one before "of".
     "2 large rounds of 4": dict(kind=COUNT, base=2, stem="large rounds", rest=" of 4"),
 
-    # --- "Midpoints that land on a half can become a range of one." ----------
-    "4–7 buns": dict(kind=COUNT, base=5.5, low=4, high=7, box="5–6"),
-    "24–28 rolls": dict(kind=COUNT, base=26, box="26"),
-    "4 to 7 buns": dict(kind=COUNT, base=5.5, box="5–6"),
+    # --- these three read 5–6, 26 and 5–6 while a range took its midpoint
+    # ("Midpoints that land on a half can become a range of one."). The lower
+    # number never lands on a half, so no reading starts as a range of one.
+    "4–7 buns": dict(kind=COUNT, base=4, low=4, high=7, box="4"),
+    "24–28 rolls": dict(kind=COUNT, base=24, box="24"),
+    "4 to 7 buns": dict(kind=COUNT, base=4, box="4"),
 
     # --- "64+ tiny macarons, 128+ tiny macarons": the plus is kept ------------
     "64+ tiny macarons":
@@ -262,8 +266,10 @@ def test_the_published_recipes_that_keep_the_portions_box_are_the_listed_ones(re
 def test_every_reading_starts_from_a_whole_number_or_a_range_of_one(readings):
     """'Our scaler is integer.' Over every real line, published and drafts.
 
-    The box shows a whole number, or -- only where a range's midpoint lands on
-    a half -- a range of one ("5–6"). No reading may start anywhere else.
+    The box shows a whole number, or a range of one ("5–6") for a figure on a
+    half. Since 2026-10-07 a `makes:` range reads as its lower number, so no
+    real line starts on a half; the half branch is kept so that a reading
+    which ever does is still held to the shape the page can show.
     """
     problems = []
     for text in sorted(set(PUBLISHED.values()) | set(DRAFTS.values())):
@@ -343,7 +349,7 @@ HALF_CASES = {
     "one jar": (_recipe("1 jar", [("200 g", "sugar")]), False, "less than one"),
     "one dozen": (_recipe("1 dozen mince pies", [("200 g", "flour")]), False, "less than one"),
     "one litre": (_recipe("1 litre", [("200 g", "bones")]), False, "less than one"),
-    "five waffles": (_recipe("4–6 waffles", [("2 large", "eggs")]), True, None),
+    "four waffles": (_recipe("4–6 waffles", [("2 large", "eggs")]), True, None),
     "two burgers": (_recipe("2 burgers", [("200 g", "mince")]), True, None),
     "odd ml": (_recipe("125 ml", [("50 ml", "soy sauce")]), True, None),
     # --- the portions box: even halves, odd does not -------------------------
