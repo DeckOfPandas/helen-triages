@@ -1,5 +1,5 @@
 ---
-title: "Planteray Pineapple Daiquiri"
+title: "Planteray Daiquiri"
 tagline: "Scene: Jon, pulling a you're-a-dickhead face, but then, \"You know what, this IS perfectly balanced\"."
 glass:
   - "coupe"

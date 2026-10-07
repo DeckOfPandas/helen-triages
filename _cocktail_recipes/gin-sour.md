@@ -1,6 +1,6 @@
 ---
 title: "Gin Sour"
-tagline: "The one where it all began."
+tagline: "Gentle but sassy."
 glass:
   - "sour"
 garnish:

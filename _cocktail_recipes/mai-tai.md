@@ -1,6 +1,6 @@
 ---
 title: "Mai Tai"
-tagline: "If someone offers you a Mai Tai featuring fruit juice and an umbrella then take it, as long as you don't want a Mai Tai."
+tagline: "If offered a Mai Tai featuring fruit juice and an umbrella, take it, as long as you don't want a Mai Tai."
 glass:
   - "old fashioned"
   - "tiki mug"

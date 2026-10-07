@@ -1,6 +1,6 @@
 ---
 title: "Sazerac"
-tagline: "This drink doesn't require the ritual sacrifice of expensive absinthe into a swamp, but it does request it."
+tagline: "Doesn't require the ritual sacrifice of pricey absinthe into an alligator-y swamp, but does request it."
 glass:
   - "old fashioned"
 garnish:

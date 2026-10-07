@@ -1,6 +1,6 @@
 ---
 title: "Airmail"
-tagline: "Special delivery to the beach, please."
+tagline: "Special delivery."
 glass:
   - "flute"
 garnish:

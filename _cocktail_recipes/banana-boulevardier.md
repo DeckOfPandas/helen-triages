@@ -1,6 +1,6 @@
 ---
 title: "Banana Boulevardier"
-tagline: "The Boulevardier's unhinged cousin."
+tagline: "A little unhinged, but who isn't."
 glass:
   - "double old fashioned"
   - "coupe"
