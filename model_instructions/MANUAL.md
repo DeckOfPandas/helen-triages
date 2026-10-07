@@ -3084,8 +3084,12 @@ the most inside the row cap, in the fewest rows, with the verdict's row stopping
 short of the verdict, and each row from the top as full as it will go;
 alphabetical is the tie-break, the order the template emits, and what a card
 shows with no script. Chips matching a filter stay at the front (#757). The
-drink page's own chip row is not packed and stays alphabetical (#710). Only a
-card no order can free still has its chips padded clear of the ship. **The goodness
+drink page's own chip row is not packed and stays alphabetical (#710). **It may
+also end a row early** (#1331): greedy wrapping cannot stop a row that still has
+room, so where a card's chips all fit one full row but not the part left of the
+ship, the script closes the row off with a right margin on its last chip (an
+inline `margin-right`, reset on every pass). The padding clear of the ship is
+left for a card nothing else can free, which on the present book is none. **The goodness
 mark is a ship and a word** (`_includes/cocktails/ship.html`, the same include
 the cocktail page calls; the card passes `short=true` for `ship_card_names`, the
 page says the rung's own words). **How tall a glass is drawn**: the curve

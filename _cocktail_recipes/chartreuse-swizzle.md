@@ -1,6 +1,6 @@
 ---
 title: "Chartreuse Swizzle"
-tagline: "The Chartreuse Daiquiri's happy green cousin."
+tagline: "If anyone says that chartreuse can't be tiki, make them one of these. And buy them Minimalist Tiki."
 glass:
   - "highball"
 garnish:

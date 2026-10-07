@@ -1,6 +1,6 @@
 ---
 title: "Moscow Mule"
-tagline: "I'll hold back from saying this cocktail has a kick. ...wait."
+tagline: "I'd hold back from saying this cocktail has a kick, but I'm pretty stubborn."
 glass:
   - "mule mug"
 garnish:

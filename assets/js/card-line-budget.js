@@ -141,6 +141,22 @@
   // the current row whenever it fits -- rather than choosing sets of chips per
   // row, so what it scores is what `flex-wrap` then draws.
   //
+  // AND IT MAY END A ROW EARLY -- #1331, 2026-10-07. Helen, the day after #1308
+  // shipped: "sometimes chips on cards don't wrap properly -- varies with
+  // screen width", with a card between about 822px and 915px wide of viewport.
+  // Greedy wrapping has one thing it cannot do: stop a row that still has room.
+  // So a card whose chips ALL fitted one row at the card's full width, but not
+  // the part of it left of the ship, had no order that helped -- every order
+  // drew the same single row into the ship -- and fell back to the padding,
+  // which is the narrow block #1308 was raised about. Jungle Bird at 830px:
+  // `aperitivo, fruity / sharp, tiki` in a block 159px wide inside a 243px
+  // foot, where `aperitivo, fruity, sharp / tiki` fits with nothing padded.
+  // The search may now break before a chip that would have fitted, and says
+  // which chip ends such a row and how much room to close off after it
+  // (`breaks`); arrangeChips sets that as the chip's right margin, so the row
+  // is full as far as `flex-wrap` can tell. It costs the row its fullness in
+  // the score, so it is only taken where the ship's row needs it.
+  //
   // A CHIP MATCHING A FILTER STAYS AT THE FRONT (#757): `pinned` leading chips
   // are placed first, in the order given, and only the rest are arranged.
   //
@@ -151,8 +167,9 @@
   //   o.lastW     how far the row on the ship's line may run
   //   o.cap       how many rows the stylesheet shows
   //
-  // Returns { order, visible } -- indices into `adv` -- or null when no order
-  // keeps the ship's row short enough.
+  // Returns { order, visible, breaks } -- indices into `adv`, and for each row
+  // ended early a [chip, margin] pair -- or null when no order keeps the
+  // ship's row short enough.
   var FITS = 0.02;   // layout is in 1/64px; this is rounding, not slack
 
   function packChips(adv, lastAdv, pinned, o) {
@@ -190,22 +207,28 @@
         if (Math.floor(mask / bit) % 2) continue;
         if (placed < pinned && i !== placed) continue;
         var w = (mask + bit === ALL) ? lastAdv[i] : adv[i];
-        var stays = fill === 0 || fill + w <= o.W + FITS;
-        var cand;
-        if (!stays && r + 1 >= o.cap) {
-          // This chip starts a row past the cap: it and everything after it
-          // are clipped, and row `r` is the one on the ship's line.
-          if (fill > o.lastW + FITS) continue;
-          cand = { s: [0, -(r + 1), fill], next: i, done: true };
-        } else {
-          var sub = solve(mask + bit, placed + 1, stays ? r : r + 1, stays ? fill + w : w);
-          if (!sub) continue;
-          var s = [sub.s[0] + 1, sub.s[1]];
-          if (!stays) s.push(fill);
-          for (var k = 2; k < sub.s.length; k++) s.push(sub.s[k]);
-          cand = { s: s, next: i, done: false };
+        var fits = fill === 0 || fill + w <= o.W + FITS;
+        // Twice round for a chip that fits: once joining the row, and once
+        // with the row ended before it (#1331). A chip that does not fit only
+        // ever starts the next row.
+        for (var forced = 0; forced < (fits && fill > 0 ? 2 : 1); forced++) {
+          var stays = fits && !forced;
+          var cand;
+          if (!stays && r + 1 >= o.cap) {
+            // This chip starts a row past the cap: it and everything after it
+            // are clipped, and row `r` is the one on the ship's line.
+            if (fill > o.lastW + FITS) continue;
+            cand = { s: [0, -(r + 1), fill], next: i, done: true, forced: !!forced };
+          } else {
+            var sub = solve(mask + bit, placed + 1, stays ? r : r + 1, stays ? fill + w : w);
+            if (!sub) continue;
+            var s = [sub.s[0] + 1, sub.s[1]];
+            if (!stays) s.push(fill);
+            for (var k = 2; k < sub.s.length; k++) s.push(sub.s[k]);
+            cand = { s: s, next: i, done: false, forced: !!forced };
+          }
+          if (better(cand.s, best && best.s)) best = cand;
         }
-        if (better(cand.s, best && best.s)) best = cand;
       }
       memo[key] = best;
       return best;
@@ -214,25 +237,36 @@
     var node = solve(0, 0, 0, 0);
     if (!node) return null;
     var order = [];
+    var breaks = [];
     var mask = 0, r = 0, fill = 0;
     var visible = node.s[0];
+    /* A row ended early is closed off after its last chip: all the room left
+       but half a pixel, so that chip still fits and nothing else can. */
+    function endRowHere() {
+      if (order.length) breaks.push([order[order.length - 1], Math.max(0, o.W - fill - 0.5)]);
+    }
     while (node && !node.done) {
       var i = node.next;
       var bit = Math.pow(2, i);
       var w = (mask + bit === ALL) ? lastAdv[i] : adv[i];
-      var stays = fill === 0 || fill + w <= o.W + FITS;
+      var stays = !node.forced && (fill === 0 || fill + w <= o.W + FITS);
+      if (node.forced) endRowHere();
       order.push(i);
       mask += bit;
       if (stays) { fill += w; } else { r += 1; fill = w; }
       node = solve(mask, order.length, r, fill);
     }
     // The clipped chips: the one that broke the row first, so nothing smaller
-    // slips back onto the ship's line, then the rest as they were.
-    if (node && node.next >= 0) order.push(node.next);
+    // slips back onto the ship's line, then the rest as they were. If that
+    // chip would have fitted, the row is closed off ahead of it instead.
+    if (node && node.next >= 0) {
+      if (node.forced) endRowHere();
+      order.push(node.next);
+    }
     for (var j = 0; j < n; j++) {
       if (order.indexOf(j) < 0) order.push(j);
     }
-    return { order: order, visible: visible };
+    return { order: order, visible: visible, breaks: breaks };
   }
 
   function px(v) {
@@ -253,6 +287,10 @@
     if (els.length < 2 || els.length > 12) return null;
     var m = moods.getBoundingClientRect();
     if (!m.width) return null;   // hidden card
+
+    // RESET BEFORE MEASURING, like every state this file sets: a margin left
+    // by the last pass to end a row early (#1331) is not part of the chip.
+    els.forEach(function (el) { if (el.style) el.style.marginRight = ''; });
 
     // ALPHABETICAL IS WHERE IT STARTS, read off the labels rather than the DOM,
     // which an earlier pass of this very function has rearranged. Lowercased,
@@ -316,7 +354,7 @@
     var plan = planned && planned.get(moods);
     if (!plan || plan.sig !== sig) {
       var open = packChips(adv, lastAdv, pinned, { W: W, lastW: lastW, cap: cap });
-      plan = { sig: sig, order: open && open.order, padded: false };
+      plan = { sig: sig, order: open && open.order, breaks: open ? open.breaks : [], padded: false };
       if (hasShip && (!open || open.visible < base.length)) {
         // Nothing keeps the ship's row short, or something is still clipped:
         // see what the padded width shows, and take it only if it shows more.
@@ -324,6 +362,7 @@
           { W: paddedW, lastW: Infinity, cap: cap });
         if (shut && (!open || shut.visible > open.visible)) {
           plan.order = shut.order;
+          plan.breaks = shut.breaks;
           plan.padded = true;
         }
       }
@@ -331,6 +370,13 @@
     }
     if (!plan.order) return null;
     reorderChips(moods, els, plan.order.map(function (i) { return base[i]; }));
+    // A matched chip already has the separator's 0.9rem as its right margin
+    // (the stylesheet hangs its dot there), and that was counted in its width.
+    plan.breaks.forEach(function (b) {
+      var el = base[b[0]];
+      if (!el.style) return;
+      el.style.marginRight = ((isMatch(el) ? 0.9 * rootSize : 0) + b[1]) + 'px';
+    });
     return plan.padded;
   }
 

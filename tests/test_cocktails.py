@@ -2169,7 +2169,36 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # NOT A GRANT FOR 18th-century-cocktail, which `13406a2` retyped to `white
 # crème de cacao` earlier on the same branch. It is an ancestor of this
 # baseline and says `proofread: false`; it stays that way until she reads it.
-COCKTAIL_BASELINE_COMMIT = "db62ad1"   # four proofread drinks go live (#1290)
+#
+# MOVED 2026-10-07 FOR THIRTY DRINKS, WHICH HELEN PROOFREAD ON THE BRANCH
+# (#1321). The branch wrote her own new taglines into thirty published drinks
+# (and four shorter titles), from the worksheet she and Claude worked through
+# for #1292; every one flipped to `proofread: false` in the commit that wrote
+# it, as #367 requires. `6de7c97` puts the thirty flags back and changes
+# nothing else.
+#
+# HER WORD, having read the pages on her local build of that branch: "I've
+# proofread 1321, please commit the proofread true and I'll merge."
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly those thirty files, every one "last touched by 6de7c97e", and
+# nothing else. Covers 6de7c97 and nothing after.
+#
+# 18th-century-cocktail WAS NOT AMONG THE THIRTY. The branch changed its
+# tagline too, but it was already `proofread: false` on main for `13406a2`, so
+# its flag was left alone and she was asked whether her read covered the page.
+#
+# MOVED AGAIN THE SAME DAY FOR THAT ONE DRINK, ON HER ANSWER. `c654809` sets
+# its flag and changes nothing else.
+#
+# HER WORD, asked whether her proofread of #1321 covered the whole page,
+# the `white crème de cacao` retype included: "18th century is good to go too".
+#
+# Proved with the old value first: the test named exactly one file,
+# `_cocktail_recipes/18th-century-cocktail.md`, "last touched by c6548095", and
+# nothing else. Covers c654809 and nothing after. The "NOT A GRANT" note
+# further up is history now: that drink has since been read and granted.
+COCKTAIL_BASELINE_COMMIT = "c654809"   # 31 proofread taglines go live (#1321)
 
 
 def _newest_commit_per_published_drink():

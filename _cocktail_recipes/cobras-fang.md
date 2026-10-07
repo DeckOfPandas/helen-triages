@@ -1,6 +1,6 @@
 ---
 title: "Cobra's Fang"
-tagline: "Sweet enough for people who like sweet things, weird enough for people who like absinthe, and 11/10 tiki."
+tagline: "Sweet enough for a sweet tooth, weird enough for an absinthe tooth, and 11/10 tiki."
 glass:
   - "tiki mug"
 garnish:

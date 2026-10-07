@@ -1,6 +1,6 @@
 ---
 title: "Cadillac Margarita"
-tagline: "I'm a Cointreau gal, but this is still pretty nice."
+tagline: "I'm a Cointreau gal, but I'll never kick Grand Marnier out of bed."
 glass:
   - "old fashioned"
 garnish:
