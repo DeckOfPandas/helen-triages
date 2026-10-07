@@ -670,7 +670,23 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # NOTHING ELSE IS SILENCED BY IT: run against `da31a37` this test named
 # `_food_recipes/delias-classic-pancakes.md (last touched by d1cde707)` and
 # nothing else. Covers d1cde707 and nothing after.
-BASELINE_COMMIT = "d1cde707"   # Delia's `pancakes`, on Helen's explicit grant
+#
+# MOVED 2026-10-07 FOR ONE LETTER ON FIVE RECIPES, WITHOUT THE FLAG FLIPPING.
+# `1747b85b` lowercases the d of `Demerara sugar` in dark-chocolate-souffles,
+# old-fashioned-cherry-cake, peanut-butter-cookies, grandmas-spice-cake and
+# gluten-free-crumble-topping -- eleven changes, each that letter and nothing
+# else. Her rule the same day: lowercase when the word has become the thing
+# (maraschino cherry, parmesan, demerara sugar), a capital when it still names
+# the place (`Demerara rum`, Dijon mustard).
+#
+# HER GRANT, told the change needed one to stay live: "Lower case d for sugar.
+# Please fix live...carefully!" The Delia shape above: no flip, because the
+# change is one she dictated and can see whole.
+#
+# NOTHING ELSE IS SILENCED BY IT: run against `d1cde707` this test named
+# exactly those five files, each "last touched by 1747b85b", and nothing else.
+# Covers 1747b85b and nothing after.
+BASELINE_COMMIT = "1747b85b"   # demerara sugar's lowercase d, on Helen's grant
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
