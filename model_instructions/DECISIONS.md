@@ -9031,6 +9031,42 @@ verification. Dates are when the correction landed.
   one-off missing space would have read as this page being slightly wrong rather
   than as a decision.
 
+- **2026-10-07, #1088 — the second sitting: the parked lines had been deleted
+  under the issue, and the strings nobody had marked.** Re-read against the
+  code, nothing on the original checklist was still open. Both PARKED lines
+  (the shortlist panel and the restore sentences) named strings #1100
+  removed (her ruling of 2026-09-15); what replaced them,
+  "Share or save the shortlist" and "Loading this shows recipes without saving
+  them.", is hers. The only markers left were two the issue never listed
+  because #1093 wrote them after it: the shared-list note and "keep these".
+
+  **The grep for `PLACEHOLDER COPY` finds what an agent MARKED, which is not
+  what an agent WROTE.** An inventory of every reader-visible string in the
+  layouts, both indexes and `assets/js` turned up sentences with no marker and
+  no ruling. Put to her, her words:
+
+  - **The food LEAVE OUT line is "hiding peas"** — *'"hiding peas" please.'*
+    It said "hiding 1 recipe that lists peas", with a count and a separate
+    sentence for zero. The count is gone and so is the counting. **Two or more
+    read "hiding peas and ham"; the "and" is the agent's**, since her example
+    had one ingredient, and it replaced an "or" that belonged to "recipes that
+    list peas or ham".
+  - **A capped list says "+3 more"** — *'"+3 more" is fine, then that's it.'*
+    The "— keep typing" came off the page search dropdown and the cocktail
+    ingredient pool.
+  - **The food index with nothing chosen says "(select something)"**, where it
+    said "Select something to see a list."
+  - **The estimated-portions mark's tooltip is "(estimated)"**, read literally:
+    the `title` on the recipe scaler's `~`. It was a sentence with a double
+    hyphen in it.
+  - **"copy link" / "copied" are fine**, and the lines that only a local build
+    prints (the cost line, the shopping total's "no price") are hers to fix or
+    not. The cooking-times tool's sentences belong to an issue of her own.
+
+  Two stale markers went with it: `_sass/food/_recipe-scale.scss` and
+  `_sass/cocktails/_cocktail.scss` still called the not-scaled note and
+  "drinks" placeholder copy, three weeks after she ruled both final.
+
 - **2026-09-24 — the design audit's four rulings, and the diagnosis behind
   them.** Asked *"I still have design issues, both visual and use flow, but I
   can't really put my finger on what bothers me any more"*, the session looked

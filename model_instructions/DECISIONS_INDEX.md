@@ -589,6 +589,7 @@ argument and the rules each field is read by.
 - 2026-09-20 · §13 · #1149 · the footer column head is a door, and it looks like the header's door rather than like the links under it.
 - 2026-09-20 · §13 · #1088 · the placeholder sitting: what Helen wrote, and the two checkboxes that were already done.
 - 2026-09-20 · §13 · #1088 · the 404's ways out left .about-ways, and her sketch is what decided it.
+- 2026-10-07 · §13 · #1088 · the second sitting: the parked lines had been deleted under the issue, and the strings nobody had marked.
 - 2026-09-24 · §13 · the design audit's four rulings, and the diagnosis behind them.
 - 2026-09-29 · §13 · #1203 · every derivation in scripts/ says what it reproduces, and two of the numbers had moved.
 - 2026-09-30 · §13 · #1210 · the recipe action buttons, redrawn: the question was never the arrangement.

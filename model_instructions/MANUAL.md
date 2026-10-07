@@ -4483,9 +4483,12 @@ re-arguing it.
   the marker recorded only that nobody had confirmed them; `drinks` and
   `portions` came back confirmed unchanged. So a marker says *she has not
   ruled*, not *these words are wrong*. **The only markers left on the live site
-  are the shortlist panel's, parked pending a feature change.** Grep
+  are the shared-shortlist note's and its "keep these" (§8.9).** Grep
   `PLACEHOLDER COPY` rather than trusting any list of them: two of #1088's own
-  checkboxes were already stale when it was worked.
+  checkboxes were already stale when it was worked. **And the grep finds only
+  what was marked**: the second sitting (2026-10-07) found unmarked agent
+  sentences by listing every visible string instead, so a copy audit reads
+  the strings, not the markers.
 - **Whether the recipe title takes the tape.** Offered and declined.
 - **Which cocktails are faffy, rich, or otherwise judged.** Moods are DERIVED; a
   disagreement goes in `mood_include` / `mood_exclude` with its reason.
