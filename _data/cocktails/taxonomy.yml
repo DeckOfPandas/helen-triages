@@ -449,6 +449,7 @@ mood_ingredients:
     - peach schnapps
     - fruit purée
     - passion fruit syrup
+    - pineapple syrup
     - crème de mûre
     - crème de cassis
     - crème de pêche
@@ -503,6 +504,7 @@ mood_ingredients:
     - honey water
     - honey water 1:1
     - honey water 2:1
+    - honey water 3:1
     - orgeat
     - falernum
     - grenadine
@@ -515,6 +517,8 @@ mood_ingredients:
     - vanilla syrup
     - cinnamon syrup
     - ginger syrup
+    - pineapple syrup
+    - hazelnut syrup
     - triple sec
     - orange Curaçao
     - maraschino liqueur

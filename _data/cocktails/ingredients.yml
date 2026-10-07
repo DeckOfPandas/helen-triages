@@ -1101,6 +1101,7 @@ card_names:
   # do: a ratio is a MAKING fact, not a CHOOSING fact.
   "honey water 1:1": "honey water"
   "honey water 2:1": "honey water"
+  "honey water 3:1": "honey water"
 
 # HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
 #
@@ -1722,6 +1723,12 @@ syrups:
   - "ginger syrup"
   - "passion fruit syrup"
   - "cinnamon syrup"
+  # TWO MORE FLAVOURED SYRUPS, 2026-10-07, the Difford's batch. Both are Monin
+  # bottles in the source. `pineapple syrup` (Cyrano): "yes". `hazelnut syrup`
+  # (Electro Batida) is Difford's "roasted hazelnut syrup" -- asked whether to
+  # keep the "roasted", Helen: "hazelnut syrup".
+  - "pineapple syrup"
+  - "hazelnut syrup"
   - "agave syrup"
   - "vanilla syrup"
   - "orgeat"
@@ -1780,6 +1787,10 @@ honeys:
   - "honey water"
   - "honey water 1:1"
   - "honey water 2:1"
+  # A THIRD RATIO, 2026-10-07, for Three Dots and a Dash, whose Difford's source
+  # says "honey syrup (3 parts honey to 1 water by weight)". Offered the flat
+  # `honey water` with the ratio in a note instead, Helen: "yes, add 3:1".
+  - "honey water 3:1"
 
 # DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
 # than a purity one -- Helen: "if I don't have a sugar cube I won't make a
@@ -2286,6 +2297,9 @@ shelf_of:
   honey water: sugar syrup
   "honey water 1:1": sugar syrup
   "honey water 2:1": sugar syrup
+  "honey water 3:1": sugar syrup
+  hazelnut syrup: sugar syrup
+  pineapple syrup: sugar syrup
   molasses sugar: sugar syrup
   orgeat: sugar syrup
   palm sugar: sugar syrup

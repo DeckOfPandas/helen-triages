@@ -457,11 +457,12 @@ does not give one you cannot pick: that is a `QQ`.
 
 **Syrups:** `cane sugar syrup 1:1` · `cane sugar syrup 2:1` ·
 `demerara sugar syrup 2:1` · `turbinado sugar syrup 2:1` · `grenadine` ·
-`ginger syrup` · `passion fruit syrup` · `cinnamon syrup` · `agave syrup` ·
-`vanilla syrup` · `orgeat` · `falernum` · `lime cordial` ·
-`ginger and lemongrass cordial`
+`ginger syrup` · `passion fruit syrup` · `cinnamon syrup` · `pineapple syrup` ·
+`hazelnut syrup` · `agave syrup` · `vanilla syrup` · `orgeat` · `falernum` ·
+`lime cordial` · `ginger and lemongrass cordial`
 
-**Honeys:** `honey` · `honey water` · `honey water 1:1` · `honey water 2:1`
+**Honeys:** `honey` · `honey water` · `honey water 1:1` · `honey water 2:1` ·
+`honey water 3:1`
 
 **Sugars:** `white sugar` · `raw sugar` · `golden caster sugar` ·
 `molasses sugar` · `palm sugar` · `sugar cube`
