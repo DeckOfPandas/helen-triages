@@ -922,10 +922,25 @@ $card-tagline-top: 0.584rem;
   // carries no box of its own to lose -- `min-width: 0` is its whole rule, and
   // that moves to the column (`minmax(0, 1fr)`) and the name.
   //
-  // THE TAGLINE STOPS SHORT OF THE SHIP. The ship mark sits at the foot's
-  // bottom right and the tagline now reaches down beside it, so the tagline's
-  // box ends one chip line above the card's foot edge. Only a tagline that
-  // fills the whole room pays for that, with a little growth.
+  // THE LAST LINE SHARES THE SHIP'S ROW, AND KEEPS CLEAR OF IT BY WRAPPING.
+  // The ship mark sits at the foot's bottom right and the tagline now reaches
+  // down beside it. The first build kept them apart with padding under the
+  // whole tagline, one chip line and a gap. Helen, with that build in front
+  // of her at about half a laptop's width: each of five cards "increases the
+  // height of the cocktail card ... BUT there is at least one clear line
+  // between tagline and ship mark each time. I suspect there are others the
+  // same." There were: 24 of 111 at 640px grew by a line with the text ending
+  // 13px above the ship, and on all but one the last line stopped well short
+  // of the ship anyway. The padding charged every tagline for a collision
+  // almost none of them had.
+  //
+  // SO THE ROOM IS RESERVED IN THE LINE, NOT UNDER IT. An empty inline box as
+  // wide as the ship follows the tagline's last word. Where the last line has
+  // that much room to spare, the box sits at its end, under the ship, and
+  // costs nothing. Where it has not, the box wraps to a line of its own, and
+  // that line is the one beside the ship -- which is exactly the case that
+  // needed clearing. 4.6rem is the widest ship drawn (`yes²`, 69px) and
+  // $space-sm is the gap.
   //
   // ONLY WHILE SHOWN. A resting card is laid out exactly as before; the grid
   // exists for the flipped state alone, and produces the same boxes for the
@@ -972,7 +987,13 @@ $card-tagline-top: 0.584rem;
       overflow: visible;
       grid-column: 1;
       grid-row: 2 / 4;
-      padding-bottom: calc(#{$chip-line} + #{$space-sm});
+    }
+
+    .drink-card-tagline::after {
+      content: '';
+      display: inline-block;
+      width: calc(4.6rem + #{$space-sm});
+      height: 1px;
     }
   }
 }

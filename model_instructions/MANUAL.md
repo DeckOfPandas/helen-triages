@@ -3059,7 +3059,9 @@ height** (#1323): while the tagline shows, the card is a one-column grid of
 name / ingredients / foot, the ingredient line and chips stay in their boxes
 invisible, and the tagline lies across the last two rows, so the card grows
 only when the tagline is longer than the room they leave — and then by exactly
-the difference. Every grid item names column one, and the name drops its
+the difference. Its last line shares the ship mark's row: an empty inline box
+the ship's width follows the last word, so the text wraps clear of the mark
+only where it would have reached it. Every grid item names column one, and the name drops its
 bottom margin, because grid margins do not collapse. **A tagline wants to
 stay under about 105 characters, or 65 for a drink whose name wraps on its
 card**; a longer one is cut with an ellipsis on a desktop card. **The title sits on punched
