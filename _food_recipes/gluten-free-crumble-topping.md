@@ -7,7 +7,7 @@ makes: "Enough to top my 1.5-l Pyrex dish (22 x 17 cm) — about one food proces
 serves_estimate: 6
 prep_time: "5 mins"
 cook_time: "None"
-main_ingredients: ["gluten-free flour", "rice flour", "ground almonds", "Demerara sugar", "unsalted butter"]
+main_ingredients: ["gluten-free flour", "rice flour", "ground almonds", "demerara sugar", "unsalted butter"]
 star_ingredient:
 tags: ["no-cook", "extras"]
 ingredient_groups:
@@ -21,7 +21,7 @@ ingredient_groups:
     - amount: "50 g"
       item: "ground almonds"
     - amount: "125 g"
-      item: "Demerara sugar (or light brown soft sugar, or a half-and-half mix of the two)"
+      item: "demerara sugar (or light brown soft sugar, or a half-and-half mix of the two)"
     - item: "salt, to taste"
       note: "don't hold back, more likely to under-do it than over-do it"
 method:

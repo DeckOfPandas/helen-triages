@@ -29,14 +29,14 @@ ingredient_groups:
       item: "egg, room temperature"
     - amount: "1 tsp"
       item: vanilla extract
-    - item: Extra Demerara sugar to coat
+    - item: Extra demerara sugar to coat
     - amount: "¼–½ tsp"
       item: sea salt, to taste
 method:
   - Sift the flour, baking powder and salt.
   - "Cream the butter with the sugars, then mix in the peanut butter, then the egg and vanilla extract."
   - Stir in the flour mixture.
-  - step: "Roll into 1-inch balls, coat in Demerara sugar, arrange on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
+  - step: "Roll into 1-inch balls, coat in demerara sugar, arrange on a baking sheet lined with greaseproof paper, then flatten with a fork in a criss-cross pattern."
     note: "Leave plenty of space in between because they'll spread."
   - step: "Bake at 165°C fan for 8–12 mins until they look done."
     note: "They shouldn't be quite set — they firm up on the tray as they cool."
