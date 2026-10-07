@@ -4143,16 +4143,30 @@ unless stated.
   chips. So a long tagline grew the card over a band of nothing, and a short
   one shrank it.
   **MEASURED, 111 tagline cards at 390px.** Before: none kept its height; the
-  change ran from 37px shorter to 86px taller. After: 98 keep it exactly, 13
-  grow, none shrinks. The 13 are taglines longer than the ingredients and chips
-  together, and they grow by the difference; the longest, at 162 characters,
-  by 82px. At 360px it is 96 and 15; at 600px, 90 and 21. The name does not
-  move on any card and no tagline reaches the ship mark.
+  change ran from 37px shorter to 86px taller, on the taglines of that day.
+  As merged, on the shorter taglines of #1321: 107 keep it exactly, 4 grow,
+  none shrinks, and the most any grows is 35px. At 360px it is 106 and 5; at
+  600px, 104 and 7; at 720px all 111 keep it. The name does not move on any
+  card and no tagline reaches the ship mark.
   **HOW.** While the tagline shows, the card is a one-column grid of three
   rows — name, ingredients, foot. The body is `display: contents`, the
   ingredient line and chips turn invisible in their own boxes, and the tagline
-  spans rows two and three, stopping one chip line above the foot's edge so it
-  clears the ship. A resting card is laid out exactly as it was.
+  spans rows two and three. A resting card is laid out exactly as it was.
+  **THE FIRST BUILD STILL GREW CARDS IT HAD NO NEED TO, AND SHE SAW IT.** It
+  kept the tagline clear of the ship mark with padding under the whole
+  tagline. Helen, on a narrowed desktop window: each of the five #1312 drinks
+  *"increases the height of the cocktail card at about half a laptop width,
+  BUT there is at least one clear line between tagline and ship mark each
+  time. I suspect there are others the same."* There were: 24 of 111 at 640px,
+  each a line taller with the text ending 13px above the ship, and on all but
+  one the last line stopped short of the ship anyway. The room is now reserved
+  IN the last line: an empty inline box as wide as the ship follows the last
+  word, so it costs nothing where the line has room and wraps to a line of its
+  own only where the text would have reached the mark. Growing cards at 560 /
+  640 / 700 / 720px went from 19 / 24 / 24 / 24 to 8 / 3 / 2 / 0, and on a
+  touch phone at 360 / 390px from 15 / 13 to 5 / 4. No tagline touches the
+  ship at any of them. What still grows is a tagline with more lines than the
+  ingredients and chips had.
   **TWO TRAPS, BOTH MET.** (1) Left to auto-placement, the ingredients and the
   foot find column one taken by the spanning tagline and open a second column:
   the first build gave a tagline a few characters wide and cards up to 626px
