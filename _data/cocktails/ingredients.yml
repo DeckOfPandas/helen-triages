@@ -1326,6 +1326,9 @@ brandy_styles:
   - "calvados"
   - "pisco"
   - "grappa"
+  # NEW 2026-10-07, for Ramos Greek Fizz, where it is the base spirit: "yes".
+  # A Greek pomace brandy, so it sits beside the grappa.
+  - "tsipouro"
   # Helen, 2026-08-31, on Pink Lady's Laird's Bonded: applejack's generic is
   # `apple brandy`. It is NOT `calvados`, which names a French appellation --
   # the same distinction the two Demeraras turn on, where the category is a
@@ -1508,6 +1511,21 @@ liqueurs:
   # different fruit): its own thing, at 18%. Peach Me is its only pour.
   - "peach schnapps"
   - "mastiha liqueur"
+  # THREE MORE LIQUEURS, 2026-10-07, the Difford's batch, each a "yes" from
+  # Helen to a named proposal.
+  #
+  # `black raspberry liqueur` (French Daiquiri; Difford's adds "e.g. Chambord").
+  # NOT `crème de mûre` above, which is blackberry.
+  - "black raspberry liqueur"
+  # `crème de myrtille` (Myrtle Martini, Giffard). BILBERRY, named like the
+  # other crèmes. Difford's own ingredient index files this drink under
+  # "Myrtle/Mirto liqueur", which is a different thing; the recipe pours
+  # myrtille and the drink follows the recipe. Helen, told of the mismatch:
+  # "disjoint is fine, no one else knows this anyway".
+  - "crème de myrtille"
+  # `kümmel` (The Dante). Its sibling Mezcal Dante swaps it for aquavit, on
+  # Helen's own note on the Difford's page.
+  - "kümmel"
   - "tomato liqueur"
   - "amaretto"
 
@@ -1631,6 +1649,9 @@ wine_and_sparkling:
   - "prosecco"
   - "red wine"
   - "white wine"
+  # NEW 2026-10-07, for Geisha Martini: "yes". ONE generic for sake; the
+  # source's style (a daiginjo genshu) stays in the pour's note.
+  - "sake"
   - "cider"
 
 # Every flavour by name, Helen's call -- consistent with crème de X.
@@ -2036,6 +2057,7 @@ family_of:
   "calvados": brandy
   "pisco": brandy
   "grappa": brandy
+  "tsipouro": brandy
   "eau de vie": brandy
   "aguardiente": brandy
   "kirschwasser": brandy
@@ -2159,6 +2181,7 @@ shelf_of:
   genever: spirits
   gin liqueur: spirits
   grappa: spirits
+  tsipouro: spirits
   kirschwasser: spirits
   lightly aged and filtered rum: spirits
   mezcal: spirits
@@ -2191,6 +2214,7 @@ shelf_of:
   quinquina: fortified
   red wine: fortified
   white wine: fortified
+  sake: fortified
   sweet vermouth: fortified
   tawny port: fortified
   ruby port: fortified
@@ -2223,6 +2247,9 @@ shelf_of:
   crème de cassis: liqueurs
   crème de menthe: liqueurs
   crème de mûre: liqueurs
+  crème de myrtille: liqueurs
+  black raspberry liqueur: liqueurs
+  kümmel: liqueurs
   crème de pêche: liqueurs
   crème de violette: liqueurs
   dry orange Curaçao: liqueurs

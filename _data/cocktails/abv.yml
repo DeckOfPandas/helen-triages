@@ -514,6 +514,15 @@ generics:
   # overwrite. Peach Me is its only pour today.
   peach schnapps:         { abv: 18,   confidence: medium }
   crème de cassis:        { abv: 20,   confidence: medium }
+  # FIVE PLACEHOLDERS, 2026-10-07, with their generics -- the Difford's batch.
+  # No bottle is declared for any of them and none is a label Helen has read:
+  # each is the figure the category is usually bottled at, `low`, with the
+  # question. Declaring the bottle she pours replaces the row.
+  black raspberry liqueur: { abv: 16.5, confidence: low, qq: "No bottle declared. Difford's names Chambord, usually 16.5; is that the bottle, and does the label agree?" }
+  crème de myrtille:      { abv: 16,   confidence: low, qq: "No bottle declared. Difford's pours Giffard Crème de Myrtille, usually 16; is that the bottle, and does the label agree?" }
+  kümmel:                 { abv: 38,   confidence: low, qq: "No bottle declared. A kümmel is usually 35 to 40; which bottle, and what does it say?" }
+  sake:                   { abv: 16,   confidence: low, qq: "No bottle declared. Difford's pours a daiginjo GENSHU, which is undiluted and can run to 17 or 18; which bottle, and what does it say?" }
+  tsipouro:               { abv: 42,   confidence: low, qq: "No bottle declared. Tsipouro runs 40 to 45; which bottle, and what does it say?" }
   # NEW 2026-10-04 (#838), when Helen split `crème de cacao` by colour. The
   # white derives from Briottet Crème de Cacao Blanc above; the brown has no
   # bottle declared, and Brandy Alexander is its only pour. 25 is that same

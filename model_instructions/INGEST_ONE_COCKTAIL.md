@@ -418,7 +418,8 @@ does not give one you cannot pick: that is a `QQ`.
 `mezcal`
 
 **Brandy styles:** `cognac` · `armagnac` · `calvados` · `pisco` · `grappa` ·
-`apple brandy` · `eau de vie` · `aguardiente` · `kirschwasser` · `peach brandy`
+`tsipouro` · `apple brandy` · `eau de vie` · `aguardiente` · `kirschwasser` ·
+`peach brandy`
 
 **Cane and palm spirits:** `cachaça` · `Batavia arrack` ·
 `coconut-flower arrack`
@@ -433,7 +434,8 @@ does not give one you cannot pick: that is a `QQ`.
 `coconut rhum` · `crème de menthe` · `cherry liqueur` · `cherry brandy` ·
 `apricot liqueur` · `coffee liqueur` · `ginger liqueur` ·
 `passion fruit liqueur` · `gentian liqueur` · `apple schnapps` ·
-`peach schnapps` · `mastiha liqueur` · `tomato liqueur` · `amaretto`
+`peach schnapps` · `mastiha liqueur` · `black raspberry liqueur` ·
+`crème de myrtille` · `kümmel` · `tomato liqueur` · `amaretto`
 
 **Herbal liqueurs:** `Chartreuse Verte` · `Chartreuse Jaune` · `Bénédictine` ·
 `Galliano` · `Strega` · `Jägermeister` · `liqueur de sapin` ·
@@ -447,7 +449,7 @@ does not give one you cannot pick: that is a `QQ`.
 `oloroso sherry` · `tawny port` · `ruby port`
 
 **Wine and sparkling:** `champagne` · `prosecco` · `red wine` · `white wine` ·
-`cider`
+`sake` · `cider`
 
 **Bitters:** `aromatic bitters` · `orange bitters` · `orange-forward bitters` ·
 `Créole bitters` · `chocolate bitters` · `tiki bitters` ·
