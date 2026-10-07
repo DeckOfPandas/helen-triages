@@ -109,6 +109,10 @@ measures:
     - leaves
     - sprig
     - strip
+    # NEW 2026-10-07, for Fay Wray: `1 wedge` of lime, squeezed and dropped
+    # into the shaker. Helen: "1 wedge should be allowed as a unit." A cut of
+    # fruit you pick up, like `half` below, and no more a millilitre figure.
+    - wedge
     - g
 
     # HALF A LIME -- Helen's ruling, 2026-09-04, on caipirinha's `amount: "0.5"`

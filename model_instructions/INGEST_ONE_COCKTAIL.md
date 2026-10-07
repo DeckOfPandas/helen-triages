@@ -242,8 +242,8 @@ test rather than rendering:
 
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
-`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `g` · `half` ·
-`whole` · `(top)` · `(rinse)` · `(splash)` · `(float)` · `(sprinkle)` ·
+`small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `wedge` · `g` ·
+`half` · `whole` · `(top)` · `(rinse)` · `(splash)` · `(float)` · `(sprinkle)` ·
 `to taste`
 <!-- vocab:measures end -->
 
@@ -520,28 +520,41 @@ see the warning in §2. Do not infer one.
 <!-- vocab:garnish start -->
 **Citrus peel:** lemon twist · lemon twist (discarded) · orange twist ·
 orange twist (discarded) · orange or lemon twist · grapefruit twist ·
-flamed orange zest coin · length of lime peel
+flamed orange zest coin · length of lime peel · lime twist ·
+lime twist (discarded) · flamed orange twist · lemon spiral ·
+lemon spiral or mint bouquet ·
+orange peel over the rim (cut to look like a beak)
 
 **Citrus cut:** lime wedge · lime wedge on rim · lime wheel ·
 lime wheel or wedge · lemon wheel · lemon slice · orange slice · orange wheel ·
 grapefruit crescents · citrus wheel · dehydrated lime slice wheel ·
-half an empty lime shell
+half an empty lime shell · grapefruit wedge ·
+dehydrated blood orange slice wheel ·
+lemon wheel and skewered maraschino cherry (like a sail)
 
 **Fruit:** pineapple wedge ·
-pineapple wedge (cut to resemble a bird's plumage) · pineapple wheel ·
-blackberry · dried apple slice · banana chip · raspberries · fruit wedges ·
-half an empty passion fruit shell
+pineapple wedge (cut to resemble a bird's plumage) · pineapple wedge on rim ·
+apricot wedge on rim · pineapple wheel · blackberry · dried apple slice ·
+apple slice · banana chip · skewered raspberry ·
+three skewered blueberries and a long slice of pineapple · raspberries ·
+fruit wedges · half an empty passion fruit shell
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
 skewered maraschino cherry · skewered brandied cherry ·
-fruit stick (skewered pineapple cubes and a maraschino cherry) · fresh cherries
+fruit stick (skewered pineapple cubes and a maraschino cherry) ·
+fruit stick (skewered pineapple cube, raspberry and Luxardo maraschino cherry) ·
+fresh cherries
 
 **Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
 pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
-edible orchid · mint sprig, mint leaf or grated nutmeg
+edible orchid · mint sprig, mint leaf or grated nutmeg · thyme sprig ·
+basil leaf (floated) · thin cucumber slice (floated) · length of cucumber peel
 
 **Spice and other:** grated nutmeg · Angostura bitters · whipped cream ·
-cinnamon stick · ginger wheel · stem ginger slice · three coffee beans
+cinnamon stick · ginger wheel · stem ginger slice ·
+skewered crystallised ginger · desiccated coconut · star anise (floated) ·
+skewered green olive · skewered black olives · small stuffed dead parrot ·
+three coffee beans
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:
@@ -589,7 +602,8 @@ the match ignores case. If the source serves the drink with something not
 listed, write the source's words and flag it in your list.
 
 <!-- vocab:to_serve start -->
-**Serveware:** `straw` · `two straws` · `stirrer` · `ladle and punch glasses`
+**Serveware:** `straw` · `two straws` · `straws` · `stirrer` ·
+`ladle and punch glasses`
 
 **Decorations:** `plastic giraffes` · `paper umbrella` · `teeny flamingos` ·
 `zero umbrellas`

@@ -2921,7 +2921,10 @@ def test_a_garnish_is_not_an_ingredient_or_a_rim():
     `lime wedge on rim` PASSES AND MUST. garnish.yml rules that a placement
     carries information -- "lime wedge on rim says where to put it" -- so the
     test looks for a rim being MADE ("half-rim of sugar"), not for one being
-    used as an address.
+    used as an address. `over the rim` is the same address in other words:
+    Golden Bird's `orange peel over the rim (cut to look like a beak)` is
+    Helen's own wording, 2026-10-07, written to finish the sentence "Garnish
+    with ...".
 
     TWO LIVE VALUES STILL FAIL THIS SHAPE AND ARE HELEN'S CALL, not a machine's:
     german-vacation's "3 dashes red creole-style bitters" and mastiha-mojito's
@@ -2941,7 +2944,8 @@ def test_a_garnish_is_not_an_ingredient_or_a_rim():
                 continue
             if quantity.search(g):
                 bad.append(f"{slug}: {g!r} -- a quantity, so it is a pour")
-            elif rimming.search(g) and not re.search(r"\bon rim\b", g, re.I):
+            elif rimming.search(g) and not re.search(
+                    r"\b(on|over) (the )?rim\b", g, re.I):
                 bad.append(f"{slug}: {g!r} -- a rim, so it is `serve.rim`")
     assert not bad, (
         "Not a garnish:\n  " + "\n  ".join(sorted(bad))

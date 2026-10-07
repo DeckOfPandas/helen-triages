@@ -146,6 +146,34 @@ canonical:
     # source never says to express anything. It is not a second spelling of a
     # twist and must not be collapsed into one.
     - "length of lime peel"
+    # NEW 2026-10-07, the Difford's batch of 73 -- Helen ruled on all 28
+    # undeclared garnishes in one sitting, and the ones that extend a pattern
+    # already here she took as a list: "Your add new list is great."
+    #
+    # `lime twist` and its `(discarded)` tail complete the set the lemon and
+    # orange already have. Six drinks between them, and every source says to
+    # express it, so the layout's "Express the twist..." step is right.
+    - "lime twist"
+    - "lime twist (discarded)"
+    # NOT `flamed orange zest coin` above: a coin is a different cut from a
+    # twist (this file's own rule), and Eeyore's Requiem asks for the twist.
+    - "flamed orange twist"
+    # A SPIRAL IS NOT A TWIST, and the word is what keeps the express step off.
+    # Helen, 2026-10-07: "lemon spiral, no express step" -- Rum Daisy's source
+    # never says to express it.
+    - "lemon spiral"
+    # Gold Florin, maker's choice, ONE string by the convention at the top of
+    # this file. The source says "lemon spiral or mint sprigs bouquet pegged to
+    # rim"; the second half is written as the declared `mint bouquet`, and the
+    # peg is gone on her word: "no note, just drop".
+    - "lemon spiral or mint bouquet"
+    # Golden Bird. The source says only "orange 'beak' on rim" and not what the
+    # beak is cut from; the words are Helen's, 2026-10-07, on the pattern of
+    # `pineapple wedge (cut to resemble a bird's plumage)` in `fruit`. In
+    # `no_article` below, because the string is written to complete the
+    # sentence she asked for: "Garnish with orange peel over the rim (cut to
+    # look like a beak)".
+    - "orange peel over the rim (cut to look like a beak)"
 
   citrus_cut:
     - "lime wedge"
@@ -173,14 +201,41 @@ canonical:
     # the lime has been juiced into the drink and the husk is what is left.
     # Both Mai Tais retyped in the same commit.
     - "half an empty lime shell"
+    # NEW 2026-10-07, the Difford's batch.
+    - "grapefruit wedge"
+    - "dehydrated blood orange slice wheel"
+    # The Tolerance Foundation. ONE garnish you build, not two to split --
+    # splitting it into `lemon wheel` and `skewered maraschino cherry` loses
+    # the sail, which is the point. Helen's words, 2026-10-07.
+    - "lemon wheel and skewered maraschino cherry (like a sail)"
 
   fruit:
     - "pineapple wedge"
     - "pineapple wedge (cut to resemble a bird's plumage)"
+    # NEW 2026-10-07: `on rim` says where to put it, the reason `lime wedge on
+    # rim` was kept apart from `lime wedge` above.
+    - "pineapple wedge on rim"
+    - "apricot wedge on rim"
+    # Cannonball's source says "quarter pineapple slice wheel" and it was
+    # proposed as a `pineapple wedge`. Helen, 2026-10-07: "a quarter of a wheel
+    # is a quarter of a disc, not a wedge, but let's just call that garnish
+    # 'pineapple wheel'". So the quarter is not recorded, on purpose.
     - "pineapple wheel"
     - "blackberry"
     - "dried apple slice"
+    # NOT a second spelling of the dried one. All Jacked Up's source says
+    # "fresh or dehydrated"; Helen, 2026-10-07: "Apple slice is a new garnish."
+    - "apple slice"
+    # Fay Wray's "speared dehydrated banana chips" is this entry: a banana chip
+    # is already dehydrated and the spear is presentation.
     - "banana chip"
+    # One on a pick, not the scatter `raspberries` below names.
+    - "skewered raspberry"
+    # Three Dots and a Dash. THE COUNT IS THE SPEC, as with `three coffee
+    # beans`: three dots, one dash. Spelled out because a garnish that opens
+    # with a digit reads as a pour to
+    # test_a_garnish_is_not_an_ingredient_or_a_rim. Agreed by Helen 2026-10-07.
+    - "three skewered blueberries and a long slice of pineapple"
     # `12 raspberries` until 2026-08-31. A COUNT STAYS ONLY WHERE THE COUNT IS
     # THE SPEC -- Helen's rule, settling this and `three coffee beans` together.
     # Twelve is how many that punch happened to want; three coffee beans is the
@@ -237,6 +292,10 @@ canonical:
     # the count stays out of the garnish the way it does for every other entry.
     - "skewered brandied cherry"
     - "fruit stick (skewered pineapple cubes and a maraschino cherry)"
+    # Roman Punch's stick adds a raspberry and names the cherry. Offered the
+    # collapse onto the one above, Helen kept it: "second fruit stick"
+    # (2026-10-07).
+    - "fruit stick (skewered pineapple cube, raspberry and Luxardo maraschino cherry)"
     # NEW 2026-09-20, for Fanny Chu's Piña Colada, whose Punch source garnishes
     # with "cherries" and no kind. Helen: "'Cherries' is just cherries, so maybe
     # 'fresh cherries'". The word says what the source does not say outright and
@@ -265,6 +324,26 @@ canonical:
     # or lemon twist" above, generalised past two options (see that entry's
     # own comment).
     - "mint sprig, mint leaf or grated nutmeg"
+    # NEW 2026-10-07, the Difford's batch. The three below the thyme are
+    # near-misses Helen ruled on, each offered beside what it might have
+    # collapsed onto.
+    - "thyme sprig"
+    # A FLOATED GARNISH CARRIES `(floated)` AS A TAIL, the way `(discarded)`
+    # does on a twist: the bracket says how the thing is handled and the head
+    # stays the thing. Settled 2026-10-07 after two other shapes. `floated
+    # basil leaf` read well and `floated thin cucumber slice` did not (Helen:
+    # "awkward"); `X, floated` puts a comma inside a list the page joins with
+    # commas. Three entries, here and in spice_and_other.
+    #
+    # Both Dantes. The source's "basil leaf boat floated on surface" arrived
+    # spelled two ways; the boat is dropped.
+    - "basil leaf (floated)"
+    # Geisha Martini's "wafer thin cucumber slice". NOT `cucumber wheels`
+    # above, which is plural and sits on the rim of a long drink.
+    - "thin cucumber slice (floated)"
+    # Zakuski Cocktail's "cucumber peel", named to match `length of lime peel`
+    # in citrus_peel -- and like it, never expressed.
+    - "length of cucumber peel"
 
   spice_and_other:
     - "grated nutmeg"
@@ -299,6 +378,25 @@ canonical:
     # next cut gets its own entry here rather than widening one of these two.
     - "ginger wheel"
     - "stem ginger slice"
+    # THE THIRD GINGER, 2026-10-07, as "and counting" said there would be:
+    # crystallised, on a pick, for Mon Dernier Mot and When The Smoke Cleared.
+    - "skewered crystallised ginger"
+    # NEW 2026-10-07, the Difford's batch. A mass noun, so it is in
+    # `no_article` below.
+    - "desiccated coconut"
+    # Scandinavian Daiquiri, and the Christmas Daiquiri from the same source,
+    # which said `no garnish` until Helen corrected it the same day. The
+    # `(floated)` tail is explained at `basil leaf (floated)` above.
+    - "star anise (floated)"
+    # TWO OLIVES, because the colour is the garnish: green on Obituario, black
+    # on Curtain Call. Singular and plural as each source has it; the plural's
+    # final `s` drops the article without a `no_article` entry (#1143).
+    - "skewered green olive"
+    - "skewered black olives"
+    # Dead Parrot Colada. Difford's garnish line is the whole Monty Python
+    # speech; Helen, 2026-10-07, kept the short form here and put "the full
+    # thing in a note, labelled 'Norwegian Blue'" on the drink.
+    - "small stuffed dead parrot"
     # THE COUNT IS THE SPEC HERE, which is why it survives where `12
     # raspberries` did not. Three coffee beans is the Espresso Martini, not an
     # arbitrary number of beans.
@@ -374,7 +472,10 @@ no_article:
   - cucumber wheels
   - grated nutmeg
   - whipped cream                       # a mass noun
+  - desiccated coconut                  # a mass noun
   - three coffee beans
+  - three skewered blueberries and a long slice of pineapple
+  - orange peel over the rim (cut to look like a beak)
   - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"
   # `pineapple and brandied cherry` ("two things, not one") left this list
