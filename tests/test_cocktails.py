@@ -8520,9 +8520,8 @@ def test_drink_titles_are_title_case(drink_file):
     """
     _require_drink(drink_file)
     title = drink_file.fm.get("title")
-    if not isinstance(title, str) or is_qq(title):
-        return
-    assert title == title_cased(title), (
+    checked = isinstance(title, str) and not is_qq(title)
+    assert not checked or title == title_cased(title), (
         f"{_drink_where(drink_file)} is titled {title!r}; in Title Case that "
         f"is {title_cased(title)!r}. A qualifier in brackets keeps its own "
         f"case. `python3 scripts/tidy_drafts.py --site cocktails --only "
