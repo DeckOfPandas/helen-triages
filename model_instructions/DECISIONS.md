@@ -1191,6 +1191,11 @@ unless stated.
   build then failed five tests: caramel is the gate test's control recipe,
   and other pages link to the ones that vanished. So an agent's copy fix to a
   published recipe cannot merge on its own; it waits for the §4.0 grant.
+  **The grant came the same day** — *"#1341 is proofread! Let's go."* — after
+  she read the pages on the branch: `3df50ce4` put fifteen flags back, and
+  both baselines moved to it in a commit of their own, the old values having
+  named exactly those fifteen files first. Nothing left the live site. The
+  plum sauce stayed `false`; it was unproofread on `main` before the branch.
 
 ## §6 `main_ingredients`
 
