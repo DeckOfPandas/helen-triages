@@ -670,7 +670,23 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # NOTHING ELSE IS SILENCED BY IT: run against `da31a37` this test named
 # `_food_recipes/delias-classic-pancakes.md (last touched by d1cde707)` and
 # nothing else. Covers d1cde707 and nothing after.
-BASELINE_COMMIT = "d1cde707"   # Delia's `pancakes`, on Helen's explicit grant
+#
+# MOVED AGAIN, 2026-10-08 -- #1089's COPY SITTING, THE THREE-COMMIT SHAPE. It
+# was `d1cde707`, the grant above, which is history now. `3df50ce4` sets
+# `proofread: true` on eight recipes and changes nothing else: caramel,
+# chocolate ganache, five-spice crispy duck legs, macarons, pineapple and
+# ginger spatchcock chicken, and the three Ben & Jerry's sweet cream bases.
+# Each had been edited on the branch to her own wording from #1089 and set to
+# `false` in the same commit.
+#
+# HER GRANT, having read the rendered pages on the branch before it merged:
+# "#1341 is proofread! Let's go."
+#
+# Proved with the old value first: against `d1cde707` this test named exactly
+# those eight files, each "last touched by 3df50ce4", and nothing else.
+# Covers 3df50ce4 and nothing after. Savoury plum sauce is NOT among them: it
+# was `proofread: false` on `main` before the branch touched it and still is.
+BASELINE_COMMIT = "3df50ce4"   # #1089's eight recipes, read by Helen on the branch
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato

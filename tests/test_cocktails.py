@@ -2204,7 +2204,21 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # `_cocktail_recipes/18th-century-cocktail.md`, "last touched by c6548095", and
 # nothing else. Covers c654809 and nothing after. The "NOT A GRANT" note
 # further up is history now: that drink has since been read and granted.
-COCKTAIL_BASELINE_COMMIT = "c654809"   # 31 proofread taglines go live (#1321)
+#
+# MOVED AGAIN, 2026-10-08 -- #1089's COPY SITTING. It was `c654809`, above.
+# `3df50ce4` sets `proofread: true` on seven drinks and changes nothing else:
+# the caipirinha, El Presidente and Cobra's Fang (a typo each), the Negroni
+# (its new `snippet:` line), and the mulled wine, the Bellini and the frozen
+# fruit daiquiri (their titles in Title Case). Each was edited on the branch
+# and set to `false` in the same commit.
+#
+# HER GRANT, having read the rendered pages on the branch before it merged:
+# "#1341 is proofread! Let's go."
+#
+# Proved with the old value first: against `c654809` the test named exactly
+# those seven files, each "last touched by 3df50ce4", and nothing else.
+# Covers 3df50ce4 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "3df50ce4"   # #1089's seven drinks, read by Helen on the branch
 
 
 def _newest_commit_per_published_drink():
