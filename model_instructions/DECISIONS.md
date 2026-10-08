@@ -9324,6 +9324,45 @@ verification. Dates are when the correction landed.
     instead. And the local-only search box keeps its 0.45rem under the door
     but lost the grid gap above it below 820px; not re-eyeballed, hers to
     ask for.
+- **2026-10-08, #1288 — THE OMNISEARCH BOX STAYS LOCAL-ONLY. Built for the
+  live header, looked at four ways, and not done.** Helen's issue asked for
+  *"an omnisearch box in the navbar for both live sites, as it is for the local
+  sites now"*, replacing the I KNOW WHAT I WANT sections; her own case against
+  was *"More stuff is more bad in general, especially right at the top of the
+  page in prime real estate."* Her ruling after two days of looking: *"I've
+  decided not to have this feature on the live site -- I'll keep it on the
+  local build. The live filtering from the IKWIW fields is cuter. ... I will
+  return to this if I miss it."* So §13.13 stands exactly as #1210 left it:
+  the box in the header on a local build only, behind `show_header_search`.
+  - **It was built whole first.** PR #1310 (hers to close unmerged; branch
+    `search/1288-header-omnisearch`, commit `e940f771`) put the box in the
+    header on both sites with the door centred under the wordmark to make
+    room, and passed the suite. That PR's closing comment has the
+    measurements and everything worth salvaging; read it before starting
+    again. The candidates page is Artifact `K64WWrCzTTRaYxGZrgmpG5`.
+  - **What she ruled on the way, each by looking, and each only as part of
+    that design:** at 1280, door centred with the box at the right (*"option
+    C it is"*); on a phone, `??` and the box sharing a line under a centred
+    door (*"I like it! At least, I like it more than I want to drop the
+    omnibox"*). Neither is on the site, and neither is a standing ruling
+    about the door: it stays at the right-hand end, #965.
+  - **The sections were never going.** *"The I KNOW WHAT I WANT sections
+    should probably go, but I'm not ready to drop their colours from my
+    palette, and I am the main/only user here, so they stay!"* — and then
+    the live filtering is what she preferred to the box.
+  - **What turned it was the phone.** An always-there box costs every phone
+    page a third header line: 196.8px against 161.2px at 390. Her next idea
+    was a grey glass at the top right, closed by default — *"With no
+    omnisearch visible, the [ FOOD ] -> door would never need to be
+    centered"* — which showed two glasses at once when open (*"a bit of a
+    surprise, which I didn't predict"*); a version with one glass at a time
+    (a `×` while open, the box beside it above 820px and on a line under the
+    door when stacked) was built and not ruled on. Her own summary: *"all
+    this wrangling is happening because this is a poor idea from a normal
+    usability POV"*.
+  - **If it comes back, the questions still open** are whether the glass
+    remembers being open per browser, and what iPad portrait gets (it is
+    already a stacked header at 768px).
 
 ## §14 Reference pages
 
