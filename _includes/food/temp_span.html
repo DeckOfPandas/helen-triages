@@ -6,7 +6,8 @@
   Parameters
     label     the protein's name
     doneness  a doneness hash from _data/food/internal_temperatures.yml
-    tip       hover text
+
+  No hover text since 2026-10-08 (#1326) -- see temp_row.html.
 
   WHY THIS ISN'T `| map: "out_at_min" | sort | first`, WHICH IS THE OBVIOUS WAY.
   `doneness` is a HASH, and iterating a hash in Liquid yields [key, value]
@@ -36,7 +37,5 @@
   <div class="tc-track">
     <div class="tc-out-at" style="--a:{{ lo }}; --b:{{ hi }};"></div>
     <div class="tc-value" style="--b:{{ hi }};">{{ lo }}–{{ hi }}°C</div>
-    <div class="tc-hit" tabindex="0" style="--a:{{ lo }}; --b:{{ hi }};"
-         data-tip="{{ include.label }}: {{ lo }}–{{ hi }}°C across every doneness level in the data.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
   </div>
 </div>

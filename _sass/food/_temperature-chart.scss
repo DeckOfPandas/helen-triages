@@ -294,39 +294,6 @@ $tc-threshold-height: 1.35rem;
   line-height: 1.25;
 }
 
-// --- Hover -------------------------------------------------------------------
-// An HTML chart is interactive by default, per the skill. No JS: the tooltip is
-// a ::after on the row, fed from a data attribute, so it works on a static page
-// and cannot fall out of sync with the mark it describes.
-.tc-hit {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  // Hit target deliberately wider than the marks it covers -- from the start of
-  // the pull bar to the end of the rested one, plus slack.
-  left: calc((var(--a) - #{$tc-min}) / #{$tc-max - $tc-min} * 100% - 0.4rem);
-  width: calc((var(--b) - var(--a)) / #{$tc-max - $tc-min} * 100% + 0.8rem);
-  cursor: help;
-
-  &:hover::after,
-  &:focus-visible::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    z-index: 5;
-    width: max-content;
-    max-width: 22rem;
-    padding: $space-sm $space-md;
-    background: $color-text;
-    color: $color-bg;
-    font-size: 0.78rem;
-    line-height: 1.45;
-    border-radius: $radius-sm;
-    white-space: normal;
-  }
-}
-
 // --- Key, one per chart -----------------------------------------------------
 // Was a single legend at the top of the page covering nine charts below it,
 // which asked the reader to hold four definitions in their head while scrolling

@@ -4,7 +4,11 @@
   Parameters
     label   the row's name, already human-readable
     spec    a node holding out_at_min/out_at_max, and optionally rested_min/max
-    tip     extra hover text (optional)
+
+  NO HOVER TEXT, SINCE 2026-10-08 (#1326). Each row used to carry a `tip`
+  parameter and an invisible hit target whose ::after printed a sentence on
+  hover. Helen: "remove all mouseover text... they're nonsense to me." On a
+  phone they never showed at all. Anything a row has to say is on the page.
 
   WHY AN INCLUDE. Every row is the same four marks at different coordinates, and
   the arithmetic that turns °C into a position lives in the stylesheet, not
@@ -82,8 +86,7 @@
 {% assign has_rested = false %}
 {% if spec.rested_min %}{% assign has_rested = true %}{% endif %}
 
-{% comment %} The rightmost point the row reaches — where the direct label hangs
-   and where the hover target ends. {% endcomment %}
+{% comment %} The rightmost point the row reaches — where the direct label hangs. {% endcomment %}
 {% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
 
 <div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}">
@@ -103,7 +106,5 @@
       {{ prefix }}{{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
     </div>
 
-    <div class="tc-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"
-         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. {% if spec.out_at %}Out at{% else %}Reaches{% endif %} {{ shown }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
   </div>
 </div>
