@@ -877,6 +877,47 @@ unless stated.
   - **`to serve` is the only group name the layout special-cases; any other
     `to …` name renders as "For the to finish:".** New names were kept to bare
     nouns for that reason.
+- **2026-10-07/08 — 91 recipes came in from two claude.ai chats, and what they
+  taught the ingest documents.** Helen gave each chat the documents by GitHub
+  URL instead of the Project (*"I couldn't remember how to run the ingest
+  project"*) and asked for the envelopes as files, which she dropped into
+  `tmp/inbox/`; `ingest_inbox.py --from-file` parsed all 93, and the suite
+  failed 62 tests on them in about a dozen causes. **The cause behind most was
+  rulings she had made in those chats that the documents forbade**, baked into
+  every file. Asked which she meant as standing rules:
+  - **A cocktail tagline is a bare `QQ` and nothing is drafted.** *"Let's stop
+    Claude drafting taglines. It turns out me doing them in batches works the
+    best."* 73 arrived as `QQ Claude <a line>`.
+  - **A food tagline is the method's pair on one line**, where the source has
+    an intro: *"QQ original yes, then QQ claude rewrite, then I'll do my own
+    and delete the other two."* A REWRITE of the intro, not a quip.
+  - **Unspecified butter is `QQ butter`**, replacing the chat's "salted, or
+    plain in precise bakes": *"Write QQ butter in the ingredients list where
+    it isn't specified."*
+  - **A source step holding several actions is split**, its original cut into
+    verbatim segments: *"The split steps has been easier for me -- recipes
+    often stick loads together which makes it hard, even when just testing."*
+    Reverses "one source step, one pair".
+  - **Also standing, each a yes**: a source's bottle goes in the pour's note
+    as "Originally X." and never in `suggestion`; an ingredient the method
+    names with a quantity joins the ingredient list, a bare "season" does not;
+    a `QQ Claude` line gives the fan figure alone; a `makes:` recipe always has
+    a `serves_estimate` (two each for biscuits); her own recipes are `source:
+    "Henry"`, `person`; and four rulings for Difford's alone (saline is a small
+    pinch of salt, "rich" syrup is `cane sugar syrup 2:1`, the glass is the
+    "Select and pre-chill" line, drop "freshly squeezed" and its kin).
+  - **NOT rules**: "one question per recipe" (*"I don't know how it got in
+    there"*); hand-assigned moods at ingest (*"we don't add moods at first
+    ingest -- just leave me a QQ"*, the marker still to be designed);
+    alternative paths as method groups, until she has read the two pages that
+    have them.
+  - **The issue route stays** (*"let's retain the feature"*) beside the new
+    bulk route. What does not happen is a Claude Code session filing a batch
+    of issues: the first chat wrote a prompt asking for 39.
+  - **`CLAUDE_WEB_INGEST.md` §2 now tells the chat that a ruling made there is
+    for that recipe and not for the contract** — to follow the file, say so,
+    and pass her instruction on in the hand-back list. That paragraph is the
+    session's proposal, drawn from the above, and not her words.
 - **2026-10-04, #577 — re-measured: 6 items in 6 drafts, all of them refusals.**
   A session was briefed to script the size-word pass from the issue body's
   "109 drafts, 141 items" and found it done: `640834a` in the food drafts repo

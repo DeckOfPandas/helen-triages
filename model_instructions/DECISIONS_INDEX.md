@@ -96,6 +96,7 @@ argument and the rules each field is read by.
 - 2026-10-01 · §4 · a note is always {label, text}, and an empty one is a placeholder nothing prints.
 - 2026-10-02 · §4 · #1258 · Every draft has a notes slot, and imported text is labelled QQ. Both reverse a choice the 2026-10-01 migration made.
 - 2026-10-04 · §4 · #814 · the retro-fit ran, and the yield was lopsided: 103 of 142, then 18 of 174.
+- 2026-10-07 · §4 · /08 — 91 recipes came in from two claude.ai chats, and what they taught the ingest documents.
 - 2026-10-04 · §4 · #577 · re-measured: 6 items in 6 drafts, all of them refusals.
 - 2026-10-04 · §4 · #814 · a group named to finish printed "For the to finish:".
 - 2026-10-04 · §4 · #814 #43 · Helen's rulings on the retro-fit (food-private PR #43).

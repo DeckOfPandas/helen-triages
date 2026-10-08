@@ -80,7 +80,7 @@ ended.
 ```yaml
 ---
 title: "Lemony Cavolo Nero and Butter Bean Soup"
-tagline: "QQ It's fun to have a one-pot stew that is bright and acidic."
+tagline: "QQ original If you love a one-pot stew, this bright and acidic number is a fun one to have up your sleeve. QQ Claude A one-pot stew that is bright and acidic."
 source: "Adapted from Good Food, January 2026"
 source_type: publication
 serves: "4"
@@ -125,7 +125,7 @@ name you give is a courtesy rather than a contract.
 | Field | Rule |
 |---|---|
 | `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. |
-| `tagline` | One line of prose, **and it always begins `QQ `, because it is never yours.** If the source has an intro sentence worth keeping, adapt it and prefix it — `"QQ A saucy, slow-cooked ragù…"`. If there is nothing worth keeping, write `"QQ"` alone. Do **not** invent enthusiasm. **The tagline is Helen's voice on a published page**, and a `QQ` is what stops somebody else's marketing copy reaching it under her name. Her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*, and for food: *"it's less of a problem for me if source taglines remain, but please QQ at the start of the line."* |
+| `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen, 2026-10-08: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. |
 | `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **If the source does not support an estimate, ASK Helen rather than guess** -- her rule: "Claudes can check with me if unsure." |
@@ -192,6 +192,23 @@ already in her collection are missing one of these, every answer was printed on
 the page they came from, and every one now costs her a trip back to a source she
 may no longer have. If the source is silent, write what it says and no more.
 
+**BUTTER IS THE ONE QUALIFIER WHOSE SILENCE YOU MARK.** Where the source says
+"butter" and not which, the item is `QQ butter` — Helen, 2026-10-08: *"Write QQ
+butter in the ingredients list where it isn't specified."* Salted or unsalted
+changes a bake and she always has to decide it, so the `QQ` puts the question
+where she will see it. **Never choose for her**, in either direction: not
+"salted" because it is a savoury dish, not plain "butter" because it is a
+precise bake. Where the source does say — "unsalted butter", "slightly salted
+butter" — that is reading, and you write it.
+
+**AN INGREDIENT THE METHOD NAMES WITH A QUANTITY GOES IN THE INGREDIENT LIST**,
+even when the source's own list leaves it out — Helen, 2026-10-07. "Pour over
+75 ml boiling water" in step 1 is `amount: "75 ml"`, `item: "boiling water"`,
+in the group that step belongs to; "a pinch of salt" is `amount: "1 pinch"`,
+`item: "salt"`. Say in your list which ones you added. **A bare "season" or
+"some seasoning" is NOT one**: it names no quantity and no ingredient, and
+adding salt and pepper for it would be filling a silence.
+
 ---
 
 ## 3. The method — the half Helen actually cares about
@@ -244,6 +261,30 @@ scaffolding. What goes is the explanation of why, the reassurance, and the
 remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
+
+### Split a step that holds several — one pair per thing you would stop at
+
+**A source packs several actions into one numbered step, and you unpack them.**
+Helen, 2026-10-08: *"The split steps has been easier for me -- recipes often
+stick loads together which makes it hard, even when just testing."* So a step
+that makes a dough, proves it, and lines a tin is three pairs, not one.
+
+- **The `QQ original` lines are the source's step CUT INTO SEGMENTS**, each
+  verbatim, in order, so that read one after another they rejoin into exactly
+  what the source printed. Cut at a sentence end where you can; where one
+  sentence holds two actions, cut at the comma or the "then" and leave each
+  half as it stands, small letter and all. Nothing is reworded, dropped or
+  repeated.
+- **Each segment gets its own `QQ Claude` line**, straight after it.
+- **Where to cut: at a point a cook might actually pause.** Her own edits draw
+  the line there — whisking the dry ingredients and then pouring the wet in is
+  one continuous action and stays one pair; cooling a loaf and then wrapping
+  it to store are two things you do at two times, and are two.
+- **Never the other direction, and never a new order.** Two source steps are
+  never merged into one pair, and a segment is never moved ahead of the one
+  the source put before it.
+- **Say in your list that you split**, and which source steps, so she can find
+  the seams.
 
 ### `method_groups` — split the phases here, or nobody ever will
 
@@ -300,13 +341,17 @@ is correct for plenty of recipes.
 - **Never invent a temperature, a time or a quantity the source does not give.**
   If the source says only "heat the oven", your rewrite says only "heat the
   oven", and you note it in your list.
-- **Never convert a temperature.** Whatever pair the source prints, keep. If it
-  gives 170°C and gas 3, keep both as it has them. If it gives 350°F, keep
-  350°F. Guessing which figure of a pair is the fan one needs the original, and
-  they are not always in the same order.
+- **Never convert a temperature, and never guess which figure is the fan
+  one.** The `QQ original` line keeps whatever the source prints, all of it.
+  **The `QQ Claude` line gives the FAN figure alone, where the source LABELS
+  one** — "200C/180C fan/gas 6" becomes "180°C fan" (Helen, 2026-10-07). Where
+  the pair is not labelled ("180C/160C/gas 4"), or there is only one figure,
+  or it is 350°F, the rewrite keeps what the source has and your list says so:
+  the figures are not always in the same order, and picking one is a guess.
 - **Weights: old-style recipes and almost all baking keep their ounces.**
   Helen's ruling. Delia in particular. Do not convert a baking recipe to metric.
-- **Never merge or reorder steps.** One source step, one pair.
+- **Never merge or reorder steps.** A source step becomes one pair, or several
+  where it is split as above — never fewer, and never out of order.
 - **A step that is really a note stays a step.** Freezer guidance mid-method is
   arguably misfiled, but moving it is restructuring somebody else's recipe.
 
@@ -453,9 +498,11 @@ website). Keep one that points into the same book the recipe came from.
   hyphen. This one is by far the most common thing to get wrong.
 - **Unicode fractions**: `½`, `¼`, `¾`. Not `1/2`.
 - `°C` with the degree sign. Em dash for `--` in prose. `→` for arrows.
-- **British spellings** throughout.
+- **British spellings** throughout, and `yoghurt` with its h.
 - **Times**: `20 mins`, `1 hr 30 mins`, `2 hrs` in the metadata fields;
   `mins` / `hours` / `seconds` in prose. Only numeric quantities abbreviate.
+  **So a `QQ Claude` line says "1 hour 30 mins" and never "1 hr 30 mins"** —
+  nine of seventeen files in one batch carried the metadata form into a step.
 - Cross-recipe links, if you write one at all, are relative markdown:
   `[display text](../other-slug/)`. Never root-relative.
 - **Accents on food words** — the two lists below. In prose only, never in the
@@ -496,6 +543,9 @@ agonising over.** Get it right where it is easy; do not let it slow down section
 - **Never remove a `QQ`**, of any kind, or delete a `QQ original` line.
 - **Never coin a tag or a star ingredient.**
 - **Never fill a silence in the source from general cooking knowledge.**
+- **Never draft a tagline of your own.** An intro becomes the `QQ original` /
+  `QQ Claude` pair; no intro is a bare `QQ`.
+- **Never decide which butter.** Unstated is `QQ butter`.
 - **Never reconstruct a truncated method**, even when the pattern is obvious.
 - **Never convert a baking recipe's ounces to grams**, or a source's
   temperature to a different scale.
@@ -572,8 +622,10 @@ ingredient_groups:
 method:
   - "QQ original Bring a large pot of water to the boil and add plenty of salt. Add the gnocchi and cook according to the packet instructions, usually about 2 to 3 minutes — they are done when they float to the surface. Drain them well."
   - "QQ Claude Boil the gnocchi in well-salted water, 2–3 mins, until they float. Drain well."
-  - "QQ original Meanwhile, melt the butter in a large frying pan over medium heat. Once the butter has melted and is foaming, add the sage leaves and fry them for 30 seconds or so until they are crisp, then remove them to a plate lined with kitchen paper."
-  - "QQ Claude Meanwhile melt the butter over medium heat. Fry the sage in the foaming butter, 30 seconds, until crisp. Drain on kitchen paper."
+  - "QQ original Meanwhile, melt the butter in a large frying pan over medium heat."
+  - "QQ Claude Meanwhile melt the butter over medium heat."
+  - "QQ original Once the butter has melted and is foaming, add the sage leaves and fry them for 30 seconds or so until they are crisp, then remove them to a plate lined with kitchen paper."
+  - "QQ Claude Fry the sage in the foaming butter, 30 seconds, until crisp. Drain on kitchen paper."
   - "QQ original Add the minced garlic to the butter and cook for about 30 seconds until fragrant, being careful not to let it burn or it will turn bitter."
   - "QQ Claude Add the garlic and cook 30 seconds, until fragrant."
 method_short:
@@ -593,8 +645,11 @@ meta:
 - **The recipe is cut off.** The source ends mid-build: the gnocchi are drained,
   the butter is made, and no step brings them together or uses the parmesan.
   Flagged in a note rather than finished.
-- **No `tagline` worth keeping.** The source's intro was marketing copy with
-  nothing in it, so a bare `QQ` rather than a `QQ ` plus its words.
+- **No `tagline`.** The source has no intro, so a bare `QQ` and nothing
+  drafted in its place.
+- **Source step 2 is split in two**, at its full stop: melting the butter, then
+  frying the sage in it. The two `QQ original` lines rejoin into the source's
+  step. Step 1 stays whole — boil, cook and drain is one run at the hob.
 - **No `star_ingredient`.** Gnocchi is not one of the fourteen and nothing else
   is the hero.
 - **`carbs party` is a proposal.** `cheese-tastic` is arguable on 30 g of
