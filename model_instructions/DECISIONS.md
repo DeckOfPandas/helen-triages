@@ -1345,6 +1345,39 @@ unless stated.
   `recipe_badges.html` at `taxonomy.tags`) proposed and rejected: no user
   stands in the gap between a fact you read (a note says more) and a fact you
   browse by (needs the filter).
+- **2026-10-08 — FOOD GETS NO TAG DERIVER; IT GETS A REPORT.** Helen, after
+  the cocktail moods were measured the same day (§9.3): *"Let's do this now
+  please."* The same search — every one- and two-feature rule, scored on
+  recipes held out of the search and against shuffled tags — over 90 published
+  recipes and 359 drafts, with one extra test because most draft tags are an
+  ingest's proposals and not hers: the rule is found on drafts alone and
+  scored on her published recipes.
+  - **What the data can see is what the title says.** `salad` .91, `bakes`
+    .87 and the `chocolate` .95, `poultry` .86 and `beef` .75 stars on her
+    own recipes; `soup`, `ice cream`, `duck`, `lamb`, `white fish` and
+    `shellfish` fit the drafts as well with too few published to confirm.
+  - **At or below chance:** `virtuous`, `carbs party`, `cheese-tastic`, `hot
+    snack`, `nibbles`, `breakfast`, `extras`, `festive`, `starter`; the
+    `fruit`, `greens` and `root veg` stars. `showstopper`, `make-ahead`,
+    `fakeaway`, `dessert` and `one-handed food` have some signal and no rule.
+  - **So a deriver would write only what the ingest already proposes
+    correctly.** The useful direction is the opposite one:
+    `scripts/check_food_tags.py` reads `tag_hints` in the food taxonomy and
+    lists recipes whose tag or star disagrees with the title. It writes
+    nothing, fails nothing and is not in `verify.py`. Helen: *"Great idea,
+    yes, please build the checker first."*
+  - **`no-cook` IS in the data, and the first measurement said it was not.**
+    That was the measurement's fault twice over: it counted the 42 `"QQ"`
+    cook times as "no cook time", and it read `method` without
+    `method_groups`, which half the collection uses. Measured properly,
+    `cook_time: "None"` and the tag agree on all 17 recipes, and
+    `test_no_cook_tag_implies_no_cook_time` already holds one direction.
+  - **`freezable` is not in the data because there is nowhere for it to be.**
+    It is a claim made in prose: 39 of the 51 tagged recipes mention freezing
+    in a step, a note or the tagline, and 12 are tagged from knowing a stew
+    freezes. The checker reads the phrases that are a claim (`freezes well`,
+    `frozen for up to`) and not bare `frozen`, which is peas. It found 15
+    recipes that say they freeze and do not carry the tag.
 
 ## §8 Ingredient search
 
