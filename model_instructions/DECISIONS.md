@@ -9652,6 +9652,46 @@ verification. Dates are when the correction landed.
   `NO_TEMPERATURE_BECAUSE` entry.
 - Two food-safety gaps (pork medium, fresh ham pink) flagged, not corrected —
   Helen's call.
+- **2026-10-08, #1326, #1327, #1329, #1330 — THREE RULINGS BEFORE ROUND ONE
+  OF THE REFERENCE PAGES' REDESIGN, AND WHAT THE PAGES LOOKED LIKE ON A PHONE.**
+  Helen opened with *"these pages need some urgent content design love, and I
+  think they could also be visually WOW... Literally every time I e.g. roast a
+  ham I look up my own notes on times and options then google on top of
+  that."* Measured at 390px before anything changed: the charts page is
+  16,400px tall, each row three lines of ink for a ten-pixel bar; the methods
+  table wraps names to four lines and shows no oven setting anywhere since the
+  cards went (#873); the fish table is 453px wide in a 390px screen and
+  5,000px tall. Three questions put to her with the fact behind each, three
+  answers:
+
+  1. **The oven setting comes back onto a method row.** Asked whether the
+     missing oven setting was what sent her to Google: *"Do you mean e.g.
+     200° fan for 10 mins then 180° fan for an hour? If so then yes."* The
+     cards had carried it; the table never did.
+  2. **The charts stay one scroll, with better navigation** — against a
+     per-protein picker like the methods page's. *"Honestly I don't know.
+     Immediate reaction is 1, with good nav."*
+  3. **Every tooltip is gone (#1326), and nothing is rehomed.** The four
+     facts that lived only in a hover (cured ham's packaging caveat, duck
+     breast off the bone, tough cuts' fork test, tuna served rare) were named
+     and offered: *"Lose all, they're nonsense to me!"*
+
+  **The structural move that made the chart candidates possible** is in its
+  own commit: a row's value label left `.tc-track` to become a sibling, and
+  the row carries its own `--a`/`--b`. Inside the track, in flow, a figure
+  could only ever sit UNDER its bar on a phone. No pixel moved at any width
+  (crop heights identical before and after), and the first build put the
+  figure ABOVE the bar because only the value named its grid row and the
+  track auto-placed under it — every cell is placed explicitly now.
+
+  **Round one is `scripts/reference_candidates.py`**, kept in `scripts/` so
+  round two does not start from a `tmp/` that is gone. On the bar: chart row
+  (today / one line / thermometer), navigation (today / sticky jump bar),
+  method rows (table with oven / stacked), order (shortest first / by cut),
+  fish (table / list / list without notes), plus `phone.html` with both pages
+  at 390px three treatments abreast (§11.2.1). Not re-opened, on purpose: the
+  split pages, no nav link, no cards, one axis for the whole page, the WHAT
+  box above its heading.
 
 ### The cocktails reference layer, #529
 
