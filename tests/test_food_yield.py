@@ -360,7 +360,10 @@ HALF_CASES = {
 # rest of the published `makes:` recipes are not offered one.
 GETS_A_HALF_STEP = {
     "ajitsuke-tamago", "ben-jerrys-sweet-cream-base-1", "ben-jerrys-sweet-cream-base-2",
-    "ben-jerrys-sweet-cream-base-3", "bens-chocolate-ice-cream", "cherry-glaze",
+    "ben-jerrys-sweet-cream-base-3", "bens-chocolate-ice-cream",
+    # caramel: since 2026-10-08, when Helen moved its estimate from 5 to 6
+    # (#1089). Five was refused as odd; six halves to three.
+    "caramel", "cherry-glaze",
     "chocolate-ganache", "delias-classic-pancakes", "five-spice-powder",
     "gluten-free-crumble-topping", "grandmas-fairy-cakes",
     "henrys-dark-chocolate-almond-truffles",
