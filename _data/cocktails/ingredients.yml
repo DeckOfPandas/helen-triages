@@ -120,6 +120,9 @@ measures:
     # the amount is the only field that can say both how long and what shape --
     # and centimetres, since the house writes no imperial measure.
     - cm log
+    # NEW 2026-10-07, for Cyrano's lime: `1 thick coin` of `lime zest with
+    # flesh`, Helen's own wording. A coin is a cut, like `strip` and `wedge`.
+    - thick coin
     - g
 
     # HALF A LIME -- Helen's ruling, 2026-09-04, on caipirinha's `amount: "0.5"`
@@ -286,6 +289,11 @@ juice_yields:
   # "Medium oranges", Helen's word, and the size that matters: a large one is
   # nearer a small grapefruit and would make this range a fiction.
   orange juice:
+    fruit: orange
+    ml_min: 60
+    ml_max: 80
+  # A blood orange is priced and yielded as an orange: only the variety differs.
+  blood orange juice:
     fruit: orange
     ml_min: 60
     ml_max: 80
@@ -1839,6 +1847,9 @@ juices:
   - "lime juice"
   - "lemon juice"
   - "orange juice"
+  # NEW 2026-10-07, for Succulent Blood: "yes", on the precedent of the three
+  # grapefruits -- a variety earns a name when it changes what you are making.
+  - "blood orange juice"
   - "pineapple juice"
   - "grapefruit juice"
   # RUBY IS A SECOND GENERIC, NOT A NOTE -- Helen, 2026-09-07, settling how
@@ -1910,6 +1921,12 @@ fruit_and_herbs:
   - "pear"
   - "dried apricots"
   - "lemon zest"
+  # NEW 2026-10-07, for Cyrano, which muddles "a large coin-sized lime zest
+  # twist, thick cut with some of the fruit's flesh on the skin (Ti'
+  # Punch-style)" in the glass. Helen's line for it, whole: "1 thick coin, lime
+  # zest with flesh" -- so `thick coin` is the unit (`measures:` above) and the
+  # flesh is in the name, because it is what makes this not a twist.
+  - "lime zest with flesh"
   - "mint"
   - "basil"
   - "rosemary"
@@ -1952,6 +1969,11 @@ other:
   # both Difford's. Helen: "yes". A measured pour in both, not a top, so it
   # shelves in the larder beside the coconut cream rather than with the tops.
   - "coconut water"
+  # TWO MORE, 2026-10-07, the Difford's batch. `birch water` (Eccentrica
+  # Daiquiri, 30 ml): "yes". `natural yoghurt` (Ramos Greek Fizz, two barspoons)
+  # -- offered `yoghurt`, Helen: "natural yoghurt".
+  - "birch water"
+  - "natural yoghurt"
   - "water"
   - "black tea"
   - "espresso"
@@ -2270,6 +2292,7 @@ shelf_of:
   lemon juice: freshly squeezed fruit juice
   lime juice: freshly squeezed fruit juice
   orange juice: freshly squeezed fruit juice
+  blood orange juice: freshly squeezed fruit juice
   ruby grapefruit juice: freshly squeezed fruit juice
   pink grapefruit juice: freshly squeezed fruit juice
   # bottled fruit juice (4)
@@ -2285,6 +2308,8 @@ shelf_of:
   cider vinegar: larder
   coconut cream: larder
   coconut water: larder
+  birch water: larder
+  natural yoghurt: larder
   cream: larder
   cucumber: fresh produce
   dried apricots: larder
@@ -2294,6 +2319,7 @@ shelf_of:
   ginger and lemongrass cordial: larder
   kaffir lime leaves: fresh produce
   lemon zest: fresh produce
+  lime zest with flesh: fresh produce
   lime: fresh produce
   lime cordial: larder
   maraschino cherry: fresh produce

@@ -243,8 +243,8 @@ test rather than rendering:
 <!-- vocab:measures start -->
 `dash` · `dashes` · `drop` · `drops` · `cube` · `cubes` · `pinch` ·
 `small pinch` · `each` · `leaf` · `leaves` · `sprig` · `strip` · `wedge` ·
-`cm log` · `g` · `half` · `whole` · `(top)` · `(rinse)` · `(splash)` ·
-`(float)` · `(sprinkle)` · `to taste`
+`cm log` · `thick coin` · `g` · `half` · `whole` · `(top)` · `(rinse)` ·
+`(splash)` · `(float)` · `(sprinkle)` · `to taste`
 <!-- vocab:measures end -->
 
 Four things a source prints as if they were units, and what to do instead
@@ -469,19 +469,20 @@ does not give one you cannot pick: that is a `QQ`.
 **Sugars:** `white sugar` · `raw sugar` · `golden caster sugar` ·
 `molasses sugar` · `palm sugar` · `sugar cube`
 
-**Juices:** `lime juice` · `lemon juice` · `orange juice` · `pineapple juice` ·
-`grapefruit juice` · `ruby grapefruit juice` · `pink grapefruit juice` ·
-`cranberry juice` · `cranberry juice drink` · `apple juice`
+**Juices:** `lime juice` · `lemon juice` · `orange juice` ·
+`blood orange juice` · `pineapple juice` · `grapefruit juice` ·
+`ruby grapefruit juice` · `pink grapefruit juice` · `cranberry juice` ·
+`cranberry juice drink` · `apple juice`
 
 **Fruit and herbs:** `lime` · `pineapple` · `passion fruit` · `raspberries` ·
-`blackberries` · `pear` · `dried apricots` · `lemon zest` · `mint` · `basil` ·
-`rosemary` · `fruit purée` · `maraschino cherry` · `orange slice` · `cucumber` ·
-`kaffir lime leaves`
+`blackberries` · `pear` · `dried apricots` · `lemon zest` ·
+`lime zest with flesh` · `mint` · `basil` · `rosemary` · `fruit purée` ·
+`maraschino cherry` · `orange slice` · `cucumber` · `kaffir lime leaves`
 
-**Other:** `soda water` · `ginger beer` · `coconut water` · `water` ·
-`black tea` · `espresso` · `cola` · `coconut cream` ·
-`Coco mix (3:1 Coco Lopez to coconut milk)` · `egg white` · `salt` ·
-`ground cinnamon` · `cider vinegar` · `olive oil` · `cream` · `milk` ·
+**Other:** `soda water` · `ginger beer` · `coconut water` · `birch water` ·
+`natural yoghurt` · `water` · `black tea` · `espresso` · `cola` ·
+`coconut cream` · `Coco mix (3:1 Coco Lopez to coconut milk)` · `egg white` ·
+`salt` · `ground cinnamon` · `cider vinegar` · `olive oil` · `cream` · `milk` ·
 `whole egg`
 <!-- vocab:generics end -->
 

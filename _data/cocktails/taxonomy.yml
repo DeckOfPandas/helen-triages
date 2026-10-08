@@ -434,6 +434,7 @@ mood_ingredients:
   fruity:
     - pineapple juice
     - orange juice
+    - blood orange juice
     - cranberry juice
     - cranberry juice drink
     - apple juice
@@ -608,6 +609,7 @@ mood_ingredients:
     - cranberry juice drink
     - pineapple juice
     - orange juice
+    - blood orange juice
     - grapefruit juice
     - ruby grapefruit juice
     - pink grapefruit juice

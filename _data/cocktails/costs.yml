@@ -1226,6 +1226,9 @@ generics:
   # A PLACEHOLDER, 2026-10-07, with the generic (Electro Batida, Dead Parrot
   # Colada). NOT SHOP-CHECKED, and Helen has not seen this figure.
   coconut water:      { gbp_per_litre_min: 2.00, gbp_per_litre_max: 4.50, basis: "PLACEHOLDER, supermarket carton range, not shop-checked", confidence: low }
+  # Two more the same day, the same shape (Eccentrica Daiquiri, Ramos Greek Fizz).
+  birch water:        { gbp_per_litre_min: 5.00, gbp_per_litre_max: 12.00, basis: "PLACEHOLDER, a small-bottle shelf range, not shop-checked", confidence: low }
+  natural yoghurt:    { gbp_per_litre_min: 1.50, gbp_per_litre_max: 4.00, basis: "PLACEHOLDER, supermarket tub range, not shop-checked", confidence: low }
 
   # --- TWO MORE PLACEHOLDERS, 2026-10-07, the Difford's batch ------------------
   # `Japanese whisky` was declared ahead of any drink (#1186) and so had no
@@ -1280,6 +1283,7 @@ generics:
   lime juice:         { from_fruit: lime juice }
   lemon juice:        { from_fruit: lemon juice }
   orange juice:       { from_fruit: orange juice }
+  blood orange juice: { from_fruit: blood orange juice }
   grapefruit juice:   { from_fruit: grapefruit juice }
   # Priced off the same fruit: a ruby grapefruit is not dearer than a white one
   # and the yield is identical. The generic is separate because the FLAVOUR
