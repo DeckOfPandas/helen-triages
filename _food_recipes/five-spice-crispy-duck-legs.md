@@ -1,6 +1,6 @@
 ---
 title: "Five-Spice Crispy Duck Legs"
-tagline: "These go with anything, including [five-spice crispy duck legs](../five-spice-crispy-duck-legs/)."
+tagline: "These go with anything, including more five-spice crispy duck legs."
 source: "Henry"
 source_type: person
 serves: "4"

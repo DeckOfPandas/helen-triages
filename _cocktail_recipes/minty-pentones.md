@@ -1,6 +1,6 @@
 ---
 title: "Minty Pentones"
-tagline: "Herbs and mint get cosy, while cranberry wishes it had gone home early."
+tagline: "Cranberry wishes it had gone home early."
 glass:
   - "old fashioned"
 garnish: ["mint sprig"]

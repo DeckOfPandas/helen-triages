@@ -1187,6 +1187,56 @@ unless stated.
   disposes of the two the capitalisation question could never have covered —
   `gf tips:` and `gf tip on stock cubes:` — because with the rubric gone there
   is no varying prefix to have a house form for.
+- **2026-10-08, #1089** — **Cocktail titles are Title Case, and a qualifier in
+  brackets is not.** Helen: *"Title case for all titles. Qualifiers in brackets
+  don't get capital letters, unless they're a proper noun, e.g. 'Margarita
+  (classic)' and 'Fog Cutter (Bramble style)'"*, and then *"Put all cocktail
+  titles in title case please"*. Three published titles moved: Apple and Ginger
+  Mulled Wine; Pear, Apricot and Rosemary Bellini; Frozen Fruit Daiquiri — the
+  last was not on the review's list and turned up when all 78 were read. Small
+  words stay small ("and", "the"), as "Naked and Famous" and "Between the
+  Sheets" already had it. **The drafts follow, and a test holds both**: *"Add
+  title case to cocktail drafts too please, why not. Add that to our
+  draft-tidying script."* `title_cased` in `tests/test_cocktails.py` is the
+  rule, `test_drink_titles_are_title_case` applies it to every drink, and
+  `scripts/tidy_drafts.py --only titles` writes it to a draft. **It only ever
+  RAISES a letter** — nothing is lowered and nothing in brackets is touched —
+  because that is the half of her rule a script can apply without deciding
+  what a proper noun is. One draft of 61 needed it (Frozen Ginger Daiquiri).
+- **2026-10-08, #1089** — **`snippet` is a tagline for somewhere that is not
+  the page.** A drink's tagline is also its meta description and link preview,
+  and the Negroni's is fine on its page and not in a search result. Asked to
+  decide, Helen wrote a second line rather than soften the first, and left the
+  Planteray one alone (*"can stay"*). So `snippet:` is an OPTIONAL key, read
+  only by `_layouts/default.html`, on one drink; a page without it describes
+  itself with its tagline as before. It is not in the ingest documents: nobody
+  ingests a snippet, she writes one when a tagline needs it.
+- **2026-10-08, #1089 — the rest of the design review's copy sitting.** Her
+  rulings, each applied as written: the five-spice duck legs' tagline gains
+  "more" and loses its link to itself (*"tagline was supposed to be a joke"*);
+  the caramel and ganache yield notes are both labelled "Examples of how much
+  this makes" (her second wording, the same day; the first was "How much this
+  actually makes", on caramel alone), the caramel with her sentence and the
+  ganache without its `serves_estimate` one; the plum
+  sauce's "Pairs with" note and the three Ben & Jerry's bases' "This is not
+  ice cream" note are deleted; the about page's sentence gets its verb; the
+  rum page's "Addendum: Rum Characters" is "A final thought: rum characters".
+  Five typos fixed. **Two things the issue described had already been done by
+  her, and asking was what showed it**: the Sazerac note no longer mentions
+  the distillery (*"I deleted the controversial part!"*), and the Cobra's Fang
+  note keeps its "Pool?" label with text she had rewritten (*"I consider the
+  point settled"*). Kept as they are, by her word: the "Some"/"some" serves
+  lines.
+  **EDITING A PUBLISHED RECIPE UNPUBLISHES IT, AND THE SUITE NOTICES.** Fourteen
+  recipes went to `proofread: false` with these edits, and the production
+  build then failed five tests: caramel is the gate test's control recipe,
+  and other pages link to the ones that vanished. So an agent's copy fix to a
+  published recipe cannot merge on its own; it waits for the §4.0 grant.
+  **The grant came the same day** — *"#1341 is proofread! Let's go."* — after
+  she read the pages on the branch: `3df50ce4` put fifteen flags back, and
+  both baselines moved to it in a commit of their own, the old values having
+  named exactly those fifteen files first. Nothing left the live site. The
+  plum sauce stayed `false`; it was unproofread on `main` before the branch.
 
 ## §6 `main_ingredients`
 
@@ -4238,6 +4288,80 @@ unless stated.
   `test_no_garnish_contains_the_join_separator` keeps `|` out of the vocabulary.
 
 ### §9.13 The visual language — the rounds
+
+- **2026-10-07, #1323 — A FLIPPED CARD KEEPS ITS HEIGHT ON A PHONE.** Helen,
+  with two phone screenshots: *"Sometimes when the card turns over, there's
+  lots of space under the tagline, and cutting it would allow the card not to
+  change size on flipping."* Below 720px a card is as tall as its content
+  (#1086), and #1292's reveal took the ingredient line out of the flow and put
+  the tagline in its place while the foot kept the height of its invisible
+  chips. So a long tagline grew the card over a band of nothing, and a short
+  one shrank it.
+  **MEASURED, 111 tagline cards at 390px.** Before: none kept its height; the
+  change ran from 37px shorter to 86px taller, on the taglines of that day.
+  As merged, on the shorter taglines of #1321: 107 keep it exactly, 4 grow,
+  none shrinks, and the most any grows is 35px. At 360px it is 106 and 5; at
+  600px, 104 and 7; at 720px all 111 keep it. The name does not move on any
+  card and no tagline reaches the ship mark.
+  **HOW.** While the tagline shows, the card is a one-column grid of three
+  rows — name, ingredients, foot. The body is `display: contents`, the
+  ingredient line and chips turn invisible in their own boxes, and the tagline
+  spans rows two and three. A resting card is laid out exactly as it was.
+  **THE FIRST BUILD STILL GREW CARDS IT HAD NO NEED TO, AND SHE SAW IT.** It
+  kept the tagline clear of the ship mark with padding under the whole
+  tagline. Helen, on a narrowed desktop window: each of the five #1312 drinks
+  *"increases the height of the cocktail card at about half a laptop width,
+  BUT there is at least one clear line between tagline and ship mark each
+  time. I suspect there are others the same."* There were: 24 of 111 at 640px,
+  each a line taller with the text ending 13px above the ship, and on all but
+  one the last line stopped short of the ship anyway. The room is now reserved
+  IN the last line: an empty inline box as wide as the ship follows the last
+  word, so it costs nothing where the line has room and wraps to a line of its
+  own only where the text would have reached the mark. Growing cards at 560 /
+  640 / 700 / 720px went from 19 / 24 / 24 / 24 to 8 / 3 / 2 / 0, and on a
+  touch phone at 360 / 390px from 15 / 13 to 5 / 4. No tagline touches the
+  ship at any of them. What still grows is a tagline with more lines than the
+  ingredients and chips had.
+  **TWO TRAPS, BOTH MET.** (1) Left to auto-placement, the ingredients and the
+  foot find column one taken by the spanning tagline and open a second column:
+  the first build gave a tagline a few characters wide and cards up to 626px
+  taller. Every item names column one. (2) Margins do not collapse between
+  grid items, so the name's 0.3rem and the ingredient line's 0.5rem added
+  where they used to collapse, and every card came out 4.8px taller. The name
+  drops its bottom margin in that state.
+  **ABOVE 720px NOTHING CHANGED**: a card there is a fixed height and the
+  reveal already stayed inside it.
+
+- **2026-10-07, #1331 — THE CHIP SEARCH MAY END A ROW EARLY, AND THE PADDING
+  HAS NO CARD LEFT.** Helen, the morning #1308 went live, first seen on her
+  phone: *"sometimes chips on cards don't wrap properly -- varies with screen
+  width"*, with a picture from about 822px to 870px; *"Above that, 'sharp'
+  moves up a line, but 'tiki' is still on the line below, only forming a single
+  line above about 915 px."*
+  **WHAT #1308 COULD NOT DO.** It chose an ORDER and let `flex-wrap` draw it,
+  and greedy wrapping cannot stop a row that still has room. A card whose chips
+  all fit one row at the foot's full width, but not the part of it left of the
+  verdict, therefore had no order that helped: every order drew the same single
+  row into the ship, the search gave up, and the card fell back to the padding
+  — the narrow block #1308 was raised about, now on fewer cards. Jungle Bird at
+  830px drew `aperitivo, fruity / sharp, tiki` in a block 159px wide inside a
+  243px foot. That is the whole of her description: the padded block widens
+  with the card until `sharp` fits it, and one line only happens once all four
+  clear the ship.
+  **THE FIX**: the search may break before a chip that would have fitted, and
+  `arrangeChips` closes that row off with an inline right margin on its last
+  chip, reset on every pass like every other state the file sets. An early
+  break costs the row its fullness in the score, so it is taken only where the
+  ship's row needs it. Jungle Bird is `aperitivo, fruity, sharp / tiki`.
+  **MEASURED, 76 cards, production build**: cards padded clear of the verdict
+  went from 13 to 0 at 1280px, 20 to 0 at 390px and 11 to 0 at 360px; clipped
+  chips are unchanged (5, 1, 6); no chip is drawn under the verdict at any of
+  800, 830, 860, 890 or 920px.
+  **WHAT IS STILL TRUE AND IS NOT A BUG**: `tiki` stays on the line below until
+  the whole row clears the verdict (about 915px on that card). The row has room
+  for it; the verdict is in that room.
+  **THIS SCREENSHOT WAS NOT READ EITHER**, for #1308's reason; the case was
+  found by measuring every card from 800px to 930px.
 
 - **2026-10-06, #1308 — A CARD'S CHIPS ARE PACKED, FULLEST ROW FIRST, AND
   ALPHABETICAL IS ONLY THE TIE-BREAK.** Helen, with a screenshot of the index:
@@ -9062,6 +9186,42 @@ verification. Dates are when the correction landed.
   one-off missing space would have read as this page being slightly wrong rather
   than as a decision.
 
+- **2026-10-07, #1088 — the second sitting: the parked lines had been deleted
+  under the issue, and the strings nobody had marked.** Re-read against the
+  code, nothing on the original checklist was still open. Both PARKED lines
+  (the shortlist panel and the restore sentences) named strings #1100
+  removed (her ruling of 2026-09-15); what replaced them,
+  "Share or save the shortlist" and "Loading this shows recipes without saving
+  them.", is hers. The only markers left were two the issue never listed
+  because #1093 wrote them after it: the shared-list note and "keep these".
+
+  **The grep for `PLACEHOLDER COPY` finds what an agent MARKED, which is not
+  what an agent WROTE.** An inventory of every reader-visible string in the
+  layouts, both indexes and `assets/js` turned up sentences with no marker and
+  no ruling. Put to her, her words:
+
+  - **The food LEAVE OUT line is "hiding peas"** — *'"hiding peas" please.'*
+    It said "hiding 1 recipe that lists peas", with a count and a separate
+    sentence for zero. The count is gone and so is the counting. **Two or more
+    read "hiding peas and ham"; the "and" is the agent's**, since her example
+    had one ingredient, and it replaced an "or" that belonged to "recipes that
+    list peas or ham".
+  - **A capped list says "+3 more"** — *'"+3 more" is fine, then that's it.'*
+    The "— keep typing" came off the page search dropdown and the cocktail
+    ingredient pool.
+  - **The food index with nothing chosen says "(select something)"**, where it
+    said "Select something to see a list."
+  - **The estimated-portions mark's tooltip is "(estimated)"**, read literally:
+    the `title` on the recipe scaler's `~`. It was a sentence with a double
+    hyphen in it.
+  - **"copy link" / "copied" are fine**, and the lines that only a local build
+    prints (the cost line, the shopping total's "no price") are hers to fix or
+    not. The cooking-times tool's sentences belong to an issue of her own.
+
+  Two stale markers went with it: `_sass/food/_recipe-scale.scss` and
+  `_sass/cocktails/_cocktail.scss` still called the not-scaled note and
+  "drinks" placeholder copy, three weeks after she ruled both final.
+
 - **2026-09-24 — the design audit's four rulings, and the diagnosis behind
   them.** Asked *"I still have design issues, both visual and use flow, but I
   can't really put my finger on what bothers me any more"*, the session looked
@@ -9316,7 +9476,121 @@ verification. Dates are when the correction landed.
   - **She could not test before merging, and that was fixable all along.** A
     bundle of the real build published as an Artifact opens on a phone with no
     deploy; the second round of this went to her that way first. `LEOPARD.md`
+    §9 has it as a standing rule for anything that paints a lot.
+- **2026-10-08, #733 — THE FUR IS DRAWN AT 1.5, AND THE PAGE, THE BANDS AND
+  THE CARDS ALL DROP TOWARDS BLACK.** With the speed fixed, Helen on her phone:
+  *"Disaster! The leopard doesn't show up well on a phone ... it's a shame not
+  to make more of the feature. Its loading time is fine though, yay. Can we use
+  a different drawing just on phones? One of the lighter versions."* Three
+  candidates pages in a day, each the real build with `ground-print.js` doing
+  the drawing (the bar set custom properties and called its `refresh()`).
+  - **No second drawing was needed, and no phone-only fur was chosen.** The
+    artwork is white at a few percent alpha, so the script draws the same file
+    in more than one pass to make it stronger. From six strengths: *"I love
+    the 1.5 and even the 2 ... it's 1.5, and nap on, for all: mobile, ipad and
+    desktop."*
+  - ***"This might be a deranged question -- can we still have the print
+    visible, while darkening the whole thing? So the base colour of
+    everything ... Basically what I'm aiming for is 'black on black', ish."***
+    It was not deranged: the print is drawn OVER whatever the ground is, so
+    the ground can fall without the print going with it. Page `#060607` →
+    `#030304` (pure black offered, not taken), bands `#111113` → `#060607`,
+    **cards `#17171a` → `#0d0d0f`**. That last reverses *"I like the cards
+    sitting light on the leopard, so don't touch those"* of two days earlier
+    in its letter and not its point: a card is still lighter than the page.
+    `$color-surface` is every surface on the site, and its washes follow.
+  - **She asked for the fur strengths again once the base had dropped** —
+    *"it's different with the lower base"* — and chose 1.5 a second time. One
+    switch at a time would have missed that the two interact; the second
+    page put them side by side.
+  - **The one thing a phone gets differently is half the nap**: *"nap half for
+    phone, everything else is the same. Ipad is same as desktop."* A phone is
+    600px and under, the shared layout's own phone block. Her *"or darker
+    nap"* is the same request: the nap is white fibres, and three steps above
+    pure black there is nothing darker to draw them in.
+  - **A bug the round found before it shipped**: the kept picture's key was
+    the site and the artwork version only. The ground colour is painted into
+    the picture, so this very change would have left every returning browser
+    with the old black under the new page. The key now carries the fur
+    strength, the nap and its strength, and the ground colour.
     §8 has it as a standing rule for anything that paints a lot.
+- **2026-10-08, #1322 — THE HEADER HAS NOTHING OVER THE DOOR'S ROW AND 15px
+  UNDER IT, AT EVERY WIDTH.** Helen's issue: *"mobile: navbar has too much
+  padding to its bottom edge"*, suspected of coming from the #1288 work. It
+  did not: PR #1310 never merged, and the header's spacing rules had not
+  changed since #1148 (2026-09-20).
+  - **What had changed was what the space was seen against.** #733
+    (2026-10-06) gave cocktails' header a flat band of its own, so the space
+    under the row stopped reading as page and started reading as the bottom
+    of a band. The imbalance itself was three weeks old: #1086 halved the gap
+    OVER the row on phones and left the header's 24px bottom padding alone,
+    so a phone had 15.2px over the row and 31.4px under it — and so did
+    desktop (14.4 over, 31.4 under), which nobody had remarked on.
+  - **Three rounds on one candidates page** (Artifact
+    `KTVp6yvneuvhkfpD61R2a8`, the deployed build of both indexes at 360, 390,
+    700 and 1280; `tmp/nav/build.py` in the worktree). Round 1, the space
+    under the row at 31, 19 or 15: *"Option C is great. BUT it's great at
+    360, 390 and 1280, but at 700 the space is still too wide."* 700 had been
+    left alone because 601–820px was the one range already balanced (30.4
+    over, 31.4 under), so it was the real page and not the candidates page.
+    Round 2 offered 30/15 and 15/15 there. Round 3 was her own: *"Can we
+    actually drop the 'over' space too? Please show me a 0/15 option. It
+    particularly feels like the food site has too much space, with all that
+    plain white."* **Ruling: *"0 over, 15 under. The clearance for the
+    cocktails tape is fine!"*** — the last being the tilted tape's low corner
+    over `??` on a phone, which she was shown.
+  - **It is one value at every width now.** No top margin on the row or
+    `??`, no gap in the stacked grid, `$space-sm` under. #1086's *"gap under
+    them halved"* and #1148's matching 0.45rem for `??` are deleted, not
+    zeroed: there is nothing left to halve, and nothing for the pair to
+    disagree about by width. #1086's *"mark at two thirds"* stands.
+  - **Header heights, measured on the deployed build:** 161.2 → 130px at 390;
+    211.5 → 165.1px at 700; 195.5 → 165.1px at 1280.
+  - **Two things done without asking, both to keep her 15.** /about/ has no
+    `??`, whose height is 6.4px of that 15, so its doors would have sat 9px
+    from the edge; `.site-neutral .site-nav-icons` carries the 0.4rem
+    instead. And the local-only search box keeps its 0.45rem under the door
+    but lost the grid gap above it below 820px; not re-eyeballed, hers to
+    ask for.
+- **2026-10-08, #1288 — THE OMNISEARCH BOX STAYS LOCAL-ONLY. Built for the
+  live header, looked at four ways, and not done.** Helen's issue asked for
+  *"an omnisearch box in the navbar for both live sites, as it is for the local
+  sites now"*, replacing the I KNOW WHAT I WANT sections; her own case against
+  was *"More stuff is more bad in general, especially right at the top of the
+  page in prime real estate."* Her ruling after two days of looking: *"I've
+  decided not to have this feature on the live site -- I'll keep it on the
+  local build. The live filtering from the IKWIW fields is cuter. ... I will
+  return to this if I miss it."* So §13.13 stands exactly as #1210 left it:
+  the box in the header on a local build only, behind `show_header_search`.
+  - **It was built whole first.** PR #1310 (hers to close unmerged; branch
+    `search/1288-header-omnisearch`, commit `e940f771`) put the box in the
+    header on both sites with the door centred under the wordmark to make
+    room, and passed the suite. That PR's closing comment has the
+    measurements and everything worth salvaging; read it before starting
+    again. The candidates page is Artifact `K64WWrCzTTRaYxGZrgmpG5`.
+  - **What she ruled on the way, each by looking, and each only as part of
+    that design:** at 1280, door centred with the box at the right (*"option
+    C it is"*); on a phone, `??` and the box sharing a line under a centred
+    door (*"I like it! At least, I like it more than I want to drop the
+    omnibox"*). Neither is on the site, and neither is a standing ruling
+    about the door: it stays at the right-hand end, #965.
+  - **The sections were never going.** *"The I KNOW WHAT I WANT sections
+    should probably go, but I'm not ready to drop their colours from my
+    palette, and I am the main/only user here, so they stay!"* — and then
+    the live filtering is what she preferred to the box.
+  - **What turned it was the phone.** An always-there box costs every phone
+    page a third header line: 196.8px against 161.2px at 390. Her next idea
+    was a grey glass at the top right, closed by default — *"With no
+    omnisearch visible, the [ FOOD ] -> door would never need to be
+    centered"* — which showed two glasses at once when open (*"a bit of a
+    surprise, which I didn't predict"*); a version with one glass at a time
+    (a `×` while open, the box beside it above 820px and on a line under the
+    door when stacked) was built and not ruled on. Her own summary: *"all
+    this wrangling is happening because this is a poor idea from a normal
+    usability POV"*.
+  - **If it comes back, the questions still open** are whether the glass
+    remembers being open per browser, and what iPad portrait gets (it is
+    already a stacked header at 768px).
 
 ## §14 Reference pages
 

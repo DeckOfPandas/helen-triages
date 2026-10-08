@@ -27,9 +27,7 @@ method:
   - "Pour in the cream and milk then whisk to finish."
 method_short:
   - "It's three whisks."
-notes:
-  - label: "This is not ice cream"
-    text: "This is a base recipe used to build ice creams, not a standalone dessert."
+notes: []
 meta:
   rewritten: true
   awaiting_fix: false

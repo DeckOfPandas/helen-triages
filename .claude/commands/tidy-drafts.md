@@ -1,5 +1,5 @@
 ---
-description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577), a cocktail's key order (#1213) -- and report everything that needs Helen instead.
+description: Tidy the mechanical half of _food_drafts/ and _cocktail_drafts/ -- quoting, dashes, typography, accents, the #429 meta block, a size word stranded in item: (#577), a cocktail's key order (#1213) and Title Case (#1089) -- and report everything that needs Helen instead.
 ---
 
 Helen has asked for a drafts tidy-up. Run `scripts/tidy_drafts.py`, which is the
@@ -48,7 +48,7 @@ recipe:
 
 | | |
 |---|---|
-| **fixes** | an unquoted `title`/`tagline`/`source`/`source_url`/`to_serve`; `--` → em dash; `->` → →; `3-4` → `3–4`; `15ml` → `15 ml`; accents from `_data/accented_words.yml` |
+| **fixes** | an unquoted `title`/`tagline`/`source`/`source_url`/`to_serve`; `--` → em dash; `->` → →; `3-4` → `3–4`; `15ml` → `15 ml`; accents from `_data/accented_words.yml`; a `title` not in Title Case (#1089) |
 | **but only in** | `title`, `tagline`, `to_serve`, a `notes` entry's `label`/`text`, an ingredient's `note` — Helen's own writing and nothing else |
 
 What it will **not** touch on a cocktail, and why each one is a decision rather
@@ -176,6 +176,22 @@ drafts, and is drafts schema 2**; `test_a_draft_drinks_keys_are_in_page_order`
 keeps it that way, so a draft that arrives or is hand-edited out of order
 fails until this rule is run again.
 
+## Title Case, cocktails only (#1089)
+
+Helen, 2026-10-08: *"Title case for all titles. Qualifiers in brackets don't
+get capital letters, unless they're a proper noun, e.g. 'Margarita (classic)'
+and 'Fog Cutter (Bramble style)'"*, and for the drafts: *"Add that to our
+draft-tidying script."* `--only titles` puts a cocktail draft's `title` in
+Title Case by the suite's own `title_cased` (`tests/test_cocktails.py`).
+
+**It only ever raises a letter.** A word outside brackets gains its first
+capital unless it is a small word (`and`, `the`, `of`, `de`, `au` and the rest
+of `TITLE_SMALL_WORDS`); nothing is lowered, and nothing inside brackets is
+touched, because whether a bracketed word is a proper noun is a judgement. So
+the words never change — this is not retitling — and a `QQ` title is left
+alone. `test_drink_titles_are_title_case` holds published cocktails and drafts
+to the same rule; a published one is fixed by hand, with `proofread: false`.
+
 `tests/test_tidy_drafts.py` is the proof, on a fixture cocktail under `tmp/` and
 never on Helen's files: it asserts the whole output byte for byte, so "fixed the
 six faults" cannot pass while something also happened to the other thirty lines.
@@ -215,7 +231,7 @@ six faults" cannot pass while something also happened to the other thirty lines.
    whole safety story is that the diff afterwards shows exactly what the script
    did, and mixed in with Helen's own edits it does not.
 
-   Use `--only quoting,meta,dashes,typography,units,accents,size,order` to do
+   Use `--only quoting,meta,dashes,typography,units,accents,titles,size,order` to do
    one class at a time if the full pass is too much to review in one go. `size`
    rewrites two fields per hit and is the one Helen asked to review as its own
    commit; `order` (cocktails) moves every block in a file and is its own

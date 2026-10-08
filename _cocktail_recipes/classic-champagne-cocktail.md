@@ -1,6 +1,6 @@
 ---
-title: "Classic Champagne Cocktail"
-tagline: "Dear future Helen. Next time you order one of these in a fancy hotel bar, don't be both a) dialled in to a giant internal meeting and b) accidentally not on mute."
+title: "Champagne Cocktail"
+tagline: "Dear future Helen. Next time you order this in a fancy hotel bar, don't be accidentally not on mute."
 glass:
   - "flute"
 garnish:

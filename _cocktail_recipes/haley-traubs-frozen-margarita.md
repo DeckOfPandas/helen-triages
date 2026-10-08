@@ -1,6 +1,6 @@
 ---
 title: "Haley Traub's Frozen Margarita"
-tagline: "I bet this will make me want to acquire a slushie machine."
+tagline: "I wonder if Rob will lend me his Ninja Slushi machine thing."
 glass:
   - "double old fashioned"
 garnish: []

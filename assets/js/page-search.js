@@ -530,7 +530,8 @@
 
       if (group.hidden > 0) {
         var more = el('p', 'page-search-more');
-        more.textContent = '+' + group.hidden + ' more — keep typing';
+        // Helen on #1088, 2026-10-07: '"+3 more" is fine, then that's it.'
+        more.textContent = '+' + group.hidden + ' more';
         section.appendChild(more);
       }
       panel.appendChild(section);

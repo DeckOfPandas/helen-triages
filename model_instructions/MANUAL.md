@@ -487,7 +487,12 @@ page (about) shows every site. **It sits at the RIGHT-HAND end of the header's
 second row and the `??` about link (a literal `/about/`) at the LEFT end, both
 on the cards' edges, at every width** (2026-09-11, #965 and Helen's desktop
 ruling the same afternoon; it was centred under the wordmark for one day) —
-**on every page except /about/, which is the exception below.**
+**on every page except /about/, which is the exception below.** **The row
+starts where the wordmark's box ends and has 15px under it, at every width**
+(#1322, 2026-10-08, *"0 over, 15 under"*): no top margin on the row or `??`,
+no gap in the stacked grid, and `$space-sm` of bottom padding on
+`.site-header`, the rest of the 15 being the row's own grid line and the
+border. The header is 130px tall at 390 and 165.1px at 700 and 1280.
 
 **/about/ IS THE ONE PAGE WITH TWO DOORS, AND SINCE 2026-09-15 IT IS LAID OUT
 FOR THEM** (#1086, Helen: *"C: doors on one line, no ??"*). Two doors measure
@@ -2897,12 +2902,16 @@ or serveware (`to_serve`), and must not restate a method step.
 ### 9.13 The cocktails visual language, and the index and recipe page built from it
 
 **"Ink, paper and glass"**, and **the paper is black** (#469): `$color-paper`
-`#060607`, `$color-ink` `#e8e6e2`, and a card is `#17171a` with a border at
+`#030304`, `$color-ink` `#e8e6e2`, and a card is `#0d0d0f` with a border at
 L* 18 that holds its shape. **The page carries a black-on-black leopard print
 and a card sits light on it** (#733, 2026-10-06; `LEOPARD.md`): the paper was
 `#0e0e10` until that day, and the header and footer are flat bands in
-`$color-chrome-ground` (`#111113`, between the page and a card) — the header
-was a card's colour, and the footer had no ground at all. #469's "a card is DARKER
+`$color-chrome-ground` (`#060607`, between the page and a card) — the header
+was a card's colour, and the footer had no ground at all. **All three dropped
+together on 2026-10-08** (page `#060607` → `#030304`, bands `#111113` →
+`#060607`, cards `#17171a` → `#0d0d0f`), Helen aiming for *"'black on black',
+ish"*; the order page-then-band-then-card is what must survive any further
+change. #469's "a card is DARKER
 than the page — it recedes rather than floats" is what the palette's comments
 still argue and is no longer the arrangement; Helen: *"I like the cards
 sitting light on the leopard."* The names keep their jobs, not their
@@ -3055,7 +3064,16 @@ grey off and wicked woowoo on; `card-tagline.js` un-hides and wires it, and
 `card-line-budget.js` skips a card in that state). The mark is paid for out of
 the title like the `+` is, through `--card-tagline-reserve`, above 400px only.
 One include, `_includes/cocktails/card-tagline.html`, emits both the line and
-the mark for the index card and the related card alike. **A tagline wants to
+the mark for the index card and the related card alike. **At 720px and below,
+where a card is as tall as its content, a flipped card keeps its resting
+height** (#1323): while the tagline shows, the card is a one-column grid of
+name / ingredients / foot, the ingredient line and chips stay in their boxes
+invisible, and the tagline lies across the last two rows, so the card grows
+only when the tagline is longer than the room they leave — and then by exactly
+the difference. Its last line shares the ship mark's row: an empty inline box
+the ship's width follows the last word, so the text wraps clear of the mark
+only where it would have reached it. Every grid item names column one, and the name drops its
+bottom margin, because grid margins do not collapse. **A tagline wants to
 stay under about 105 characters, or 65 for a drink whose name wraps on its
 card**; a longer one is cut with an ellipsis on a desktop card. **The title sits on punched
 tape** (§13.4.1's device at card size): two near-whites, one tight pair, no
@@ -3079,8 +3097,12 @@ the most inside the row cap, in the fewest rows, with the verdict's row stopping
 short of the verdict, and each row from the top as full as it will go;
 alphabetical is the tie-break, the order the template emits, and what a card
 shows with no script. Chips matching a filter stay at the front (#757). The
-drink page's own chip row is not packed and stays alphabetical (#710). Only a
-card no order can free still has its chips padded clear of the ship. **The goodness
+drink page's own chip row is not packed and stays alphabetical (#710). **It may
+also end a row early** (#1331): greedy wrapping cannot stop a row that still has
+room, so where a card's chips all fit one full row but not the part left of the
+ship, the script closes the row off with a right margin on its last chip (an
+inline `margin-right`, reset on every pass). The padding clear of the ship is
+left for a card nothing else can free, which on the present book is none. **The goodness
 mark is a ship and a word** (`_includes/cocktails/ship.html`, the same include
 the cocktail page calls; the card passes `short=true` for `ship_card_names`, the
 page says the rung's own words). **How tall a glass is drawn**: the curve
@@ -4482,9 +4504,12 @@ re-arguing it.
   the marker recorded only that nobody had confirmed them; `drinks` and
   `portions` came back confirmed unchanged. So a marker says *she has not
   ruled*, not *these words are wrong*. **The only markers left on the live site
-  are the shortlist panel's, parked pending a feature change.** Grep
+  are the shared-shortlist note's and its "keep these" (§8.9).** Grep
   `PLACEHOLDER COPY` rather than trusting any list of them: two of #1088's own
-  checkboxes were already stale when it was worked.
+  checkboxes were already stale when it was worked. **And the grep finds only
+  what was marked**: the second sitting (2026-10-07) found unmarked agent
+  sentences by listing every visible string instead, so a copy audit reads
+  the strings, not the markers.
 - **Whether the recipe title takes the tape.** Offered and declined.
 - **Which cocktails are faffy, rich, or otherwise judged.** Moods are DERIVED; a
   disagreement goes in `mood_include` / `mood_exclude` with its reason.

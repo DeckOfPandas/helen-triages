@@ -1403,7 +1403,8 @@
       if (result.hidden > 0) {
         var more = document.createElement('span');
         more.className = 'drink-pool-more';
-        more.textContent = '+' + result.hidden + ' more — keep typing';
+        // Helen on #1088, 2026-10-07: '"+3 more" is fine, then that's it.'
+        more.textContent = '+' + result.hidden + ' more';
         poolEl.appendChild(more);
       }
     }

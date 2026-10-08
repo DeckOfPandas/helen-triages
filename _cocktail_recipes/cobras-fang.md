@@ -1,6 +1,6 @@
 ---
 title: "Cobra's Fang"
-tagline: "Sweet enough for people who like sweet things, weird enough for people who like absinthe, and 11/10 tiki."
+tagline: "Sweet enough for a sweet tooth, weird enough for an absinthe tooth, and 11/10 tiki."
 glass:
   - "tiki mug"
 garnish:
@@ -63,7 +63,7 @@ notes:
   - label: "Pool?"
     text: "This even tastes nice when accidentally warmed up by the pool. (See also: on fire)."
   - label: "Apricot"
-    text: "The original doesn't call for apricot liquer, but more is more and this is delicious."
+    text: "The original doesn't call for apricot liqueur, but more is more and this is delicious."
 source: ""
 source_url: ""
 meta:

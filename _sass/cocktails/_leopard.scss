@@ -51,6 +51,27 @@
   --ground-nap: "/leopard-nap.svg";
   --ground-print-ground: #{$color-bg};
   --ground-print-version: "#{$leopard-version}";
+  // HOW STRONGLY EACH IS DRAWN -- 2026-10-08. 1 is the artwork as generated.
+  // The fur at 1 "doesn't show up well on a phone"; from six strengths Helen
+  // "love[d] the 1.5 and even the 2", and after the base colours dropped (the
+  // palette has that) chose again with 1.5, 2 and 2.5 in front of her: 1.5,
+  // "for all: mobile, ipad and desktop". The script draws the same file more
+  // than once to get there, so this is a number here and not new artwork.
+  --ground-print-strength: 1.5;
+  --ground-nap-strength: 1;
+}
+
+// THE ONE THING A PHONE GETS DIFFERENTLY: half the nap. Helen: "nap half for
+// phone, everything else is the same. Ipad is same as desktop." The nap is
+// faint white fibres, so less of it is a darker ground, and on a small screen
+// held close the full nap greyed the black she was after.
+//
+// 600px is shared/_layout.scss's phone block, used here so "a phone" means one
+// thing on this site; the narrowest iPad is 744px wide. A desktop window
+// dragged narrower than this gets the phone's nap at its next page load, and
+// the script keeps the two pictures under different keys.
+@media (max-width: 600px) {
+  :root { --ground-nap-strength: 0.5; }
 }
 
 body {

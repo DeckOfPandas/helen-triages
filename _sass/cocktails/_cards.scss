@@ -895,10 +895,106 @@ $card-tagline-top: 0.584rem;
   .drink-card-name--wrap ~ .drink-card-tagline { -webkit-line-clamp: 3; }
 
   // BELOW THE TWO-COLUMN BREAKPOINT A CARD IS AS TALL AS ITS CONTENT (#1086),
-  // so there is nothing to clear and nothing is cut.
+  // so nothing is cut -- AND THE CARD SHOULD NOT CHANGE SIZE WHEN IT FLIPS.
+  // #1323, Helen, 2026-10-07, with two phone screenshots: "Sometimes when the
+  // card turns over, there's lots of space under the tagline, and cutting it
+  // would allow the card not to change size on flipping."
+  //
+  // WHAT WAS HAPPENING. The ingredient line left the flow and the tagline took
+  // its place, so the card was the tagline's height plus the foot's -- and the
+  // foot was still as tall as its invisible chips. A long tagline over three
+  // rows of hidden chips made the card grow by a line or two while leaving a
+  // band of nothing underneath; a short one made it shrink. Measured on the
+  // 111 tagline cards of the day at 390px: not one kept its height, and the
+  // change ran from 37px shorter to 86px taller.
+  //
+  // THE TAGLINE NOW LIES OVER THE INGREDIENTS AND THE CHIPS, IN THEIR ROOM.
+  // The card becomes a one-column grid of three rows -- name, ingredients,
+  // foot -- which is the order it already stacks in. The ingredient line and
+  // the chips keep their boxes and turn invisible; the tagline is placed
+  // across rows two and three. A grid sizes spanned rows to the taller of what
+  // is in them, so the card is its resting height unless the tagline is
+  // longer than the ingredients and chips together, and then it grows by
+  // exactly the difference and no more.
+  //
+  // `display: contents` ON THE BODY is what lets its three children be rows of
+  // the CARD's grid beside the foot, which is the body's sibling. The body
+  // carries no box of its own to lose -- `min-width: 0` is its whole rule, and
+  // that moves to the column (`minmax(0, 1fr)`) and the name.
+  //
+  // THE LAST LINE SHARES THE SHIP'S ROW, AND KEEPS CLEAR OF IT BY WRAPPING.
+  // The ship mark sits at the foot's bottom right and the tagline now reaches
+  // down beside it. The first build kept them apart with padding under the
+  // whole tagline, one chip line and a gap. Helen, with that build in front
+  // of her at about half a laptop's width: each of five cards "increases the
+  // height of the cocktail card ... BUT there is at least one clear line
+  // between tagline and ship mark each time. I suspect there are others the
+  // same." There were: 24 of 111 at 640px grew by a line with the text ending
+  // 13px above the ship, and on all but one the last line stopped well short
+  // of the ship anyway. The padding charged every tagline for a collision
+  // almost none of them had.
+  //
+  // SO THE ROOM IS RESERVED IN THE LINE, NOT UNDER IT. An empty inline box as
+  // wide as the ship follows the tagline's last word. Where the last line has
+  // that much room to spare, the box sits at its end, under the ship, and
+  // costs nothing. Where it has not, the box wraps to a line of its own, and
+  // that line is the one beside the ship -- which is exactly the case that
+  // needed clearing. 4.6rem is the widest ship drawn (`yes²`, 69px) and
+  // $space-sm is the gap.
+  //
+  // ONLY WHILE SHOWN. A resting card is laid out exactly as before; the grid
+  // exists for the flipped state alone, and produces the same boxes for the
+  // name and the foot, so nothing moves at the moment of the flip.
   @media (max-width: 720px) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+
+    .drink-card-body { display: contents; }
+
+    // EVERY ITEM NAMES COLUMN ONE. Left to auto-placement, the ingredients and
+    // the foot find column one of their rows already taken by the tagline and
+    // open a second column beside it -- which is what the first build of this
+    // did: a tagline a few characters wide and a card 470px taller.
+    // THE NAME'S BOTTOM MARGIN GOES, BECAUSE MARGINS DO NOT COLLAPSE IN A GRID.
+    // In block flow the name's 0.3rem and the ingredient line's 0.5rem collapse
+    // to the larger; as grid items they add, and every card came out 4.8px
+    // taller when flipped. The ingredient line's own margin is the whole gap,
+    // as it always was in effect.
+    .drink-card-name {
+      grid-column: 1;
+      grid-row: 1;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    .drink-card-ingredients {
+      display: -webkit-box;
+      visibility: hidden;
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .drink-card-foot {
+      grid-column: 1;
+      grid-row: 3;
+    }
+
     .drink-card-tagline,
-    .drink-card-name--wrap ~ .drink-card-tagline { -webkit-line-clamp: unset; }
+    .drink-card-name--wrap ~ .drink-card-tagline {
+      display: block;
+      -webkit-line-clamp: unset;
+      overflow: visible;
+      grid-column: 1;
+      grid-row: 2 / 4;
+    }
+
+    .drink-card-tagline::after {
+      content: '';
+      display: inline-block;
+      width: calc(4.6rem + #{$space-sm});
+      height: 1px;
+    }
   }
 }
 
@@ -1043,7 +1139,8 @@ $card-tagline-top: 0.584rem;
 // EVERY row of the cards that earned it -- 27 of 76 at 1280px -- which was the
 // empty right-hand side Helen raised. card-line-budget.js now orders the chips
 // so the row on the ship's line stops short of it, and this rule is left for
-// the cards no order can free (13 of 76).
+// the cards no order can free. That was 13 of 76 until #1331, 2026-10-07, let
+// the script end a row early as well; on the present book it is none.
 .drink-card--chips-clear-ship .drink-card-moods {
   padding-right: calc(var(--ship-w, 0px) + #{$card-gutter});
 }
