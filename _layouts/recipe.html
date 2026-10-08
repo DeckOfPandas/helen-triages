@@ -300,7 +300,7 @@ layout: default
     <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
       <label class="recipe-scale">
-        {% if page.portions_estimated %}<span class="recipe-scale-approx" title="an estimate -- the recipe does not say how many it serves">~</span>{% endif %}
+        {% if page.portions_estimated %}<span class="recipe-scale-approx" title="(estimated)">~</span>{% endif %}
         <input type="text" value="{{ page.portions }}" inputmode="numeric" class="recipe-scale-portions" data-portions="{{ page.portions }}"{% if page.whole_recipes %} data-whole-recipes{% endif %}{% if page.half_recipe %} data-half-recipe{% endif %} aria-label="portions to make">
         <span class="recipe-scale-word">portions</span>
       </label>
