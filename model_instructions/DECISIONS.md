@@ -9323,6 +9323,44 @@ verification. Dates are when the correction landed.
     with the old black under the new page. The key now carries the fur
     strength, the nap and its strength, and the ground colour.
     §8 has it as a standing rule for anything that paints a lot.
+- **2026-10-08, #1322 — THE HEADER HAS NOTHING OVER THE DOOR'S ROW AND 15px
+  UNDER IT, AT EVERY WIDTH.** Helen's issue: *"mobile: navbar has too much
+  padding to its bottom edge"*, suspected of coming from the #1288 work. It
+  did not: PR #1310 never merged, and the header's spacing rules had not
+  changed since #1148 (2026-09-20).
+  - **What had changed was what the space was seen against.** #733
+    (2026-10-06) gave cocktails' header a flat band of its own, so the space
+    under the row stopped reading as page and started reading as the bottom
+    of a band. The imbalance itself was three weeks old: #1086 halved the gap
+    OVER the row on phones and left the header's 24px bottom padding alone,
+    so a phone had 15.2px over the row and 31.4px under it — and so did
+    desktop (14.4 over, 31.4 under), which nobody had remarked on.
+  - **Three rounds on one candidates page** (Artifact
+    `KTVp6yvneuvhkfpD61R2a8`, the deployed build of both indexes at 360, 390,
+    700 and 1280; `tmp/nav/build.py` in the worktree). Round 1, the space
+    under the row at 31, 19 or 15: *"Option C is great. BUT it's great at
+    360, 390 and 1280, but at 700 the space is still too wide."* 700 had been
+    left alone because 601–820px was the one range already balanced (30.4
+    over, 31.4 under), so it was the real page and not the candidates page.
+    Round 2 offered 30/15 and 15/15 there. Round 3 was her own: *"Can we
+    actually drop the 'over' space too? Please show me a 0/15 option. It
+    particularly feels like the food site has too much space, with all that
+    plain white."* **Ruling: *"0 over, 15 under. The clearance for the
+    cocktails tape is fine!"*** — the last being the tilted tape's low corner
+    over `??` on a phone, which she was shown.
+  - **It is one value at every width now.** No top margin on the row or
+    `??`, no gap in the stacked grid, `$space-sm` under. #1086's *"gap under
+    them halved"* and #1148's matching 0.45rem for `??` are deleted, not
+    zeroed: there is nothing left to halve, and nothing for the pair to
+    disagree about by width. #1086's *"mark at two thirds"* stands.
+  - **Header heights, measured on the deployed build:** 161.2 → 130px at 390;
+    211.5 → 165.1px at 700; 195.5 → 165.1px at 1280.
+  - **Two things done without asking, both to keep her 15.** /about/ has no
+    `??`, whose height is 6.4px of that 15, so its doors would have sat 9px
+    from the edge; `.site-neutral .site-nav-icons` carries the 0.4rem
+    instead. And the local-only search box keeps its 0.45rem under the door
+    but lost the grid gap above it below 820px; not re-eyeballed, hers to
+    ask for.
 - **2026-10-08, #1288 — THE OMNISEARCH BOX STAYS LOCAL-ONLY. Built for the
   live header, looked at four ways, and not done.** Helen's issue asked for
   *"an omnisearch box in the navbar for both live sites, as it is for the local
