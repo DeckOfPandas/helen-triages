@@ -1154,8 +1154,14 @@ unless stated.
   Mulled Wine; Pear, Apricot and Rosemary Bellini; Frozen Fruit Daiquiri — the
   last was not on the review's list and turned up when all 78 were read. Small
   words stay small ("and", "the"), as "Naked and Famous" and "Between the
-  Sheets" already had it. **Nothing enforces this yet**, and the drafts were
-  not swept.
+  Sheets" already had it. **The drafts follow, and a test holds both**: *"Add
+  title case to cocktail drafts too please, why not. Add that to our
+  draft-tidying script."* `title_cased` in `tests/test_cocktails.py` is the
+  rule, `test_drink_titles_are_title_case` applies it to every drink, and
+  `scripts/tidy_drafts.py --only titles` writes it to a draft. **It only ever
+  RAISES a letter** — nothing is lowered and nothing in brackets is touched —
+  because that is the half of her rule a script can apply without deciding
+  what a proper noun is. One draft of 61 needed it (Frozen Ginger Daiquiri).
 - **2026-10-08, #1089** — **`snippet` is a tagline for somewhere that is not
   the page.** A drink's tagline is also its meta description and link preview,
   and the Negroni's is fine on its page and not in a search result. Asked to
@@ -1174,10 +1180,12 @@ unless stated.
   sauce's "Pairs with" note and the three Ben & Jerry's bases' "This is not
   ice cream" note are deleted; the about page's sentence gets its verb; the
   rum page's "Addendum: Rum Characters" is "A final thought: rum characters".
-  Four typos fixed. **Two things the issue described were not in the files**:
-  the Sazerac note no longer mentions the distillery at all, and the Cobra's
-  Fang note she said she had updated still read "Pool?" on `main`, so that
-  file was left alone rather than edited under her.
+  Five typos fixed. **Two things the issue described had already been done by
+  her, and asking was what showed it**: the Sazerac note no longer mentions
+  the distillery (*"I deleted the controversial part!"*), and the Cobra's Fang
+  note keeps its "Pool?" label with text she had rewritten (*"I consider the
+  point settled"*). Kept as they are, by her word: the "Some"/"some" serves
+  lines.
   **EDITING A PUBLISHED RECIPE UNPUBLISHES IT, AND THE SUITE NOTICES.** Fourteen
   recipes went to `proofread: false` with these edits, and the production
   build then failed five tests: caramel is the gate test's control recipe,

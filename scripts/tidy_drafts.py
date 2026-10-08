@@ -10,6 +10,7 @@ report, apply, run pytest, commit there. This file is only the engine.
     python3 scripts/tidy_drafts.py --only quoting,meta
     python3 scripts/tidy_drafts.py --only size      # #577's pass, food only
     python3 scripts/tidy_drafts.py --only order     # #1213's pass, cocktails only
+    python3 scripts/tidy_drafts.py --only titles    # #1089's pass, cocktails only
     python3 scripts/tidy_drafts.py --site cocktails # one collection only
 
 WHY A SCRIPT AND NOT AN AGENT EDITING 340 FILES. Three of these rules have a
@@ -95,6 +96,11 @@ closed vocabulary, somebody else's words, or a number.
     line is edited, so none of the entries above is touched by it: a `method`
     step, an `amount` and a `QQ` line all travel inside their block exactly as
     written. See `fix_key_order`.
+  - **It puts a drink's `title` in Title Case (#1089).** Capitals only: a
+    word outside brackets gains its first capital unless it is a small word,
+    nothing is lowered, and a qualifier in brackets is left as written. The
+    words do not change, so this is not the retitling ruled out above, and a
+    `QQ` title is never touched. Cocktails only. See `fix_title_case`.
 
 Food's own rules stay food's: `main_ingredients` and `tags` flow quoting, and
 the #429 `meta:` migration, run on `_food_drafts/` and on nothing else. A drink's
@@ -160,7 +166,7 @@ from conftest import (  # noqa: E402
 )
 from test_cocktails import (  # noqa: E402
     DRINK_SCALAR_FIELDS, TOP_LEVEL_KEYS_IN_ORDER, VERBATIM_KEYS,
-    _checkable as drink_suite_scope, keys_out_of_page_order,
+    _checkable as drink_suite_scope, keys_out_of_page_order, title_cased,
 )
 # The size-word pattern is the recipe rule's own (#149, #577). The 2026-09-01
 # re-measurement on #577 already imported it rather than retyping it, for the
@@ -1095,6 +1101,38 @@ def fix_key_order(text, path):
              f"{' '.join(problem[0])} -> {' '.join(problem[1])}"])
 
 
+# =============================================================================
+# TITLE CASE, COCKTAILS ONLY -- #1089
+# =============================================================================
+# Helen, 2026-10-08: "Add title case to cocktail drafts too please, why not.
+# Add that to our draft-tidying script." The rule is the suite's `title_cased`,
+# imported above: it raises the first letter of a word outside brackets and
+# never lowers one, so it changes capitals and no words. That is why this is
+# not the RETITLING the docstring rules out -- the title still says what the
+# source called the drink.
+#
+# FOOD IS NOT IN IT. Her ruling is about cocktail titles, and a food draft's
+# title is the source's own until it is promoted.
+TITLE_LINE = re.compile(r'^(?P<head>title:[ \t]*")(?P<title>[^"]*)(?P<tail>"[ \t]*)$')
+
+
+def fix_title_case(text, path):
+    """Line-wise, and wrapped: a `title: "QQ ..."` line never reaches it."""
+    parts = split_front_matter(text)
+    if not parts:
+        return text, []
+    open_, fm, close, body = parts
+    changed, out = [], []
+    for line in fm.split("\n"):
+        m = TITLE_LINE.match(line)
+        if m and title_cased(m.group("title")) != m.group("title"):
+            new = title_cased(m.group("title"))
+            changed.append(f"title: {m.group('title')} -> {new}")
+            line = m.group("head") + new + m.group("tail")
+        out.append(line)
+    return open_ + "\n".join(out) + close + body, changed
+
+
 FOOD_FIXERS = [
     ("notes", fix_notes_slot),
     ("quoting", fix_scalar_quoting),
@@ -1135,6 +1173,9 @@ DRINK_FIXERS = [
     ("typography", only_where_editable(fix_typography)),
     ("units", only_where_editable(fix_unit_spacing)),
     ("accents", only_where_editable(fix_accents)),
+    # After `quoting`, which is what gives an unquoted title the quotes
+    # TITLE_LINE looks for.
+    ("titles", only_where_editable(fix_title_case)),
     # LAST, and unwrapped: it moves blocks and edits no line, so there is
     # nothing for `only_where_editable` to protect, and running after `notes`
     # means the slot that rule writes is dealt into place with the rest.

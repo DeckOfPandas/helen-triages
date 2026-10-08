@@ -1044,6 +1044,53 @@ def test_key_order_apply_moves_whole_blocks_and_edits_no_line(drinks, only):
                     + "\n".join(moved or ["(line counts differ)"]))
 
 
+# =============================================================================
+# TITLE CASE, #1089
+# =============================================================================
+
+def _titled(title, tagline='"A test"'):
+    return BEFORE_CLEAN.replace('title: "Test Drink"', f"title: {title}") \
+                       .replace('tagline: "A test"', f"tagline: {tagline}")
+
+
+# `AFTER` is the tidied fixture, so it has no other fault for the full pass to
+# find: whatever changes below is the title rule's doing and nothing else's.
+BEFORE_CLEAN = AFTER.replace(
+    'tagline: "Sharp — and bright, 2–3 dashes of it"', 'tagline: "A test"')
+
+
+def test_titles_report_and_apply_change_the_title_line_only(drinks):
+    before = _titled('"Frozen ginger Daiquiri (bramble style)"')
+    path = write_drink(drinks, text=before)
+
+    out = run(drinks, "--only", "titles")
+    assert "[titles] title: Frozen ginger Daiquiri (bramble style) -> " \
+           "Frozen Ginger Daiquiri (bramble style)" in out, out
+    assert path.read_text(encoding="utf-8") == before, "report mode wrote"
+
+    run(drinks, "--apply")
+    assert path.read_text(encoding="utf-8") == \
+        _titled('"Frozen Ginger Daiquiri (bramble style)"'), (
+            "the full pass should change the title's capitals and nothing "
+            "else; the bracketed qualifier keeps its own case"
+        )
+
+
+def test_titles_leave_a_qq_title_alone(drinks):
+    """The source's own title, awaiting a rewrite, is not Helen's to restyle."""
+    before = _titled('"QQ frozen ginger daiquiri"')
+    path = write_drink(drinks, text=before)
+    out = run(drinks, "--only", "titles", "--apply")
+    assert "applied 0 mechanical change(s)" in out, out
+    assert path.read_text(encoding="utf-8") == before
+
+
+def test_titles_are_a_cocktail_rule_only():
+    """A food draft's title is the source's until promotion; not in scope."""
+    names = [name for name, _ in tidy_drafts.FOOD_FIXERS]
+    assert "titles" not in names
+
+
 def test_key_order_is_idempotent(drinks):
     path = write_drink(drinks, text=ORDER_AFTER)
     out = run(drinks, "--only", "order", "--apply")
