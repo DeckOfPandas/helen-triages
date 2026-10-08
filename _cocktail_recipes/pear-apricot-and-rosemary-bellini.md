@@ -1,5 +1,5 @@
 ---
-title: "Pear, apricot and rosemary Bellini"
+title: "Pear, Apricot and Rosemary Bellini"
 tagline: "If you insist on champagne over soda water, at least call it brunch."
 glass:
   - "flute"

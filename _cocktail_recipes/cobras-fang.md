@@ -63,7 +63,7 @@ notes:
   - label: "Pool?"
     text: "This even tastes nice when accidentally warmed up by the pool. (See also: on fire)."
   - label: "Apricot"
-    text: "The original doesn't call for apricot liquer, but more is more and this is delicious."
+    text: "The original doesn't call for apricot liqueur, but more is more and this is delicious."
 source: ""
 source_url: ""
 meta:

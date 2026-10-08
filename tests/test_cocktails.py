@@ -194,14 +194,20 @@ def _the_shared_data_is_as_parsed():
 # garnish, then `meta.ship`, and the mood chips come under it. The four other
 # `meta` keys print nothing and travel with the block.
 TOP_LEVEL_KEYS_IN_ORDER = [
-    "title", "tagline", "glass", "garnish", "meta", "mood", "ingredients",
-    "serve", "serves", "method", "to_serve", "notes", "source", "source_url",
+    "title", "tagline", "snippet", "glass", "garnish", "meta", "mood",
+    "ingredients", "serve", "serves", "method", "to_serve", "notes", "source",
+    "source_url",
 ]
 
 # A KEY THE LAYOUT NEVER NAMES has no place the page can give it, so its place
 # is declared here, with the reason. The derivation test refuses an entry the
 # layout HAS started to name, so this cannot outlive its excuse.
 KEYS_THE_LAYOUT_NEVER_NAMES = {
+    "snippet":
+        "read by `_layouts/default.html` for the meta description and the "
+        "link preview, never by the drink's own layout (#1089). OPTIONAL, and "
+        "on one drink: it is the tagline rewritten for a search result. "
+        "Placed directly after `tagline`, the line it stands in for.",
     "serves":
         "read by `_plugins/cocktail_units.rb`, which hands the page "
         "`page.units.serves`; the layout never says `page.serves`. Placed "
@@ -282,7 +288,7 @@ SERVE_KEYS = {"ice", "rim", "fill"}
 # is on every file today, including `source`/`source_url` where the value is the
 # empty string: "nobody has recorded a source" and "the key is missing" must not
 # look alike.
-REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
+REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves", "snippet"}
 
 # `item` IS GONE, AND #544'S MIGRATION IS OVER -- Helen, 2026-09-21: "'item'
 # needs to go. Kill it with fire. Data can be read straight into
@@ -2198,7 +2204,21 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # `_cocktail_recipes/18th-century-cocktail.md`, "last touched by c6548095", and
 # nothing else. Covers c654809 and nothing after. The "NOT A GRANT" note
 # further up is history now: that drink has since been read and granted.
-COCKTAIL_BASELINE_COMMIT = "c654809"   # 31 proofread taglines go live (#1321)
+#
+# MOVED AGAIN, 2026-10-08 -- #1089's COPY SITTING. It was `c654809`, above.
+# `3df50ce4` sets `proofread: true` on seven drinks and changes nothing else:
+# the caipirinha, El Presidente and Cobra's Fang (a typo each), the Negroni
+# (its new `snippet:` line), and the mulled wine, the Bellini and the frozen
+# fruit daiquiri (their titles in Title Case). Each was edited on the branch
+# and set to `false` in the same commit.
+#
+# HER GRANT, having read the rendered pages on the branch before it merged:
+# "#1341 is proofread! Let's go."
+#
+# Proved with the old value first: against `c654809` the test named exactly
+# those seven files, each "last touched by 3df50ce4", and nothing else.
+# Covers 3df50ce4 and nothing after.
+COCKTAIL_BASELINE_COMMIT = "3df50ce4"   # #1089's seven drinks, read by Helen on the branch
 
 
 def _newest_commit_per_published_drink():
@@ -7926,7 +7946,8 @@ def _prose_fields(drink):
 # nor false and which holds the drink back for ever (test_the_gate_flags_are_
 # real_booleans above). `meta.ship` is the one quoted scalar under `meta:`, and
 # test_meta_ship_is_a_rung_or_who_knows is what checks it.
-DRINK_SCALAR_FIELDS = ["title", "tagline", "source", "source_url", "to_serve"]
+DRINK_SCALAR_FIELDS = ["title", "tagline", "snippet", "source", "source_url",
+                       "to_serve"]
 
 
 def test_the_quoted_scalar_list_names_real_drink_fields():
@@ -8435,6 +8456,91 @@ def test_drink_typography(drink_file, name, pattern, fix):
         f"{name}: "
         f"{sorted(set(h if isinstance(h, str) else h[0] for h in hits))[:5]}. "
         f"Fix: {fix}."
+    )
+
+
+# TITLE CASE -- #1089, Helen, 2026-10-08: "Title case for all titles. Qualifiers
+# in brackets don't get capital letters, unless they're a proper noun, e.g.
+# 'Margarita (classic)' and 'Fog Cutter (Bramble style)'", and then "Add title
+# case to cocktail drafts too please ... Add that to our draft-tidying script."
+#
+# THE RULE ONLY EVER RAISES A LETTER, and that is what makes it mechanical. A
+# word outside brackets that opens with a lowercase letter is capitalised
+# unless it is one of the small words below; nothing is ever lowered, so
+# "Voodoo That You Do" and "The Last Wall Highball" are left as written. Inside
+# brackets nothing is touched at all: whether "Bramble" or "Difford's" is a
+# proper noun is a judgement, and "Del Famoso (The Famous)" is hers to keep.
+# Only the FIRST letter of a spaced word is looked at, so "Pic-a-de-Crop" and
+# "Kill-Devil" are untouched, and a word opening with a digit, a quote or a
+# `#` ("6th", "'n'", "#2") is not a word this rule has a view on.
+TITLE_SMALL_WORDS = frozenset(
+    "a an and as at au aux by de del des di du el en for from in la le les "
+    "of on or the to with y".split()
+)
+_TITLE_BRACKETS = re.compile(r"(\([^)]*\))")
+
+
+def title_cased(title):
+    """`title` in the house's Title Case; the same string when it already is.
+
+    `scripts/tidy_drafts.py` imports this, so the fixer and the test cannot
+    disagree about a title.
+    """
+    out, first = [], True
+    for chunk in _TITLE_BRACKETS.split(title):
+        if chunk.startswith("("):
+            out.append(chunk)
+            continue
+        words = re.split(r"(\s+)", chunk)
+        for i, word in enumerate(words):
+            if not word or word.isspace():
+                continue
+            if word[0].islower() and (first or word.lower() not in TITLE_SMALL_WORDS):
+                words[i] = word[0].upper() + word[1:]
+            first = False
+        out.append("".join(words))
+    return "".join(out)
+
+
+@pytest.mark.parametrize("title,want", [
+    ("Apple and ginger mulled wine", "Apple and Ginger Mulled Wine"),
+    ("Pear, apricot and rosemary Bellini", "Pear, Apricot and Rosemary Bellini"),
+    ("Frozen fruit Daiquiri", "Frozen Fruit Daiquiri"),
+    ("the last wall highball", "The Last Wall Highball"),
+    # Already right, and each one a way to get it wrong.
+    ("Margarita (classic)", "Margarita (classic)"),
+    ("Fog Cutter (Bramble style)", "Fog Cutter (Bramble style)"),
+    ("Del Famoso (The Famous)", "Del Famoso (The Famous)"),
+    ("Dark 'n' Stormy (Difford's recipe)", "Dark 'n' Stormy (Difford's recipe)"),
+    ("Naked and Famous", "Naked and Famous"),
+    ("Between the Sheets", "Between the Sheets"),
+    ("Voodoo That You Do", "Voodoo That You Do"),
+    ("Daisy de Santiago", "Daisy de Santiago"),
+    ("Port au Prince", "Port au Prince"),
+    ("Pic-a-de-Crop Punch", "Pic-a-de-Crop Punch"),
+    ("Corpse Reviver #2", "Corpse Reviver #2"),
+    ("6th Street Swizzle", "6th Street Swizzle"),
+    ("Man O' War", "Man O' War"),
+    ("L'Isle Martinique", "L'Isle Martinique"),
+])
+def test_title_case_raises_a_letter_and_never_lowers_one(title, want):
+    assert title_cased(title) == want
+
+
+def test_drink_titles_are_title_case(drink_file):
+    """Every drink's title, published or draft, is in Title Case. #1089.
+
+    A `QQ` title is the source's and is left alone, as everywhere else.
+    """
+    _require_drink(drink_file)
+    title = drink_file.fm.get("title")
+    checked = isinstance(title, str) and not is_qq(title)
+    assert not checked or title == title_cased(title), (
+        f"{_drink_where(drink_file)} is titled {title!r}; in Title Case that "
+        f"is {title_cased(title)!r}. A qualifier in brackets keeps its own "
+        f"case. `python3 scripts/tidy_drafts.py --site cocktails --only "
+        f"titles` fixes a draft; a published drink is edited by hand, with "
+        f"`proofread: false`."
     )
 
 

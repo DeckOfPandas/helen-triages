@@ -46,7 +46,12 @@
     {% if page.site_neutral %}{% assign page_title = page.title %}
     {% else %}{% assign page_title = page.title | append: " | " | append: site_title %}{% endif %}
   {% endif %}
-  {% assign page_description = page.tagline | default: site_desc | strip_newlines %}
+  {% comment %} `snippet` IS THE TAGLINE FOR SOMEWHERE THAT IS NOT THE PAGE --
+     #1089, 2026-10-08. The description below is what a search result and a
+     pasted link show, and the Negroni's tagline is fine on its own page and
+     not fine there; Helen wrote a second line for it. A page with no
+     `snippet` describes itself with its tagline, as every page did. {% endcomment %}
+  {% assign page_description = page.snippet | default: page.tagline | default: site_desc | strip_newlines %}
 
   <title>{{ page_title }}</title>
   <meta name="description" content="{{ page_description | escape }}">

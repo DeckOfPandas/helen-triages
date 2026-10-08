@@ -1,5 +1,5 @@
 ---
-title: "Frozen fruit Daiquiri"
+title: "Frozen Fruit Daiquiri"
 tagline: "There is no bad fruit for this. I haven't tested durian."
 glass:
   - "hurricane"

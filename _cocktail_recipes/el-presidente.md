@@ -19,7 +19,7 @@ ingredients:
     note: "NEVER Dolin Blanc."
   - amount: "10 ml"
     generic: "dry orange Curaçao"
-    note: "NEVER sweet Curacao."
+    note: "NEVER sweet Curaçao."
     suggestion: ["Pierre Ferrand Dry Curaçao"]
   - amount: "2.5 ml"
     generic: "cane sugar syrup 2:1"

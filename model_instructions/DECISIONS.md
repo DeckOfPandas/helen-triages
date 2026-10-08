@@ -1146,6 +1146,56 @@ unless stated.
   disposes of the two the capitalisation question could never have covered —
   `gf tips:` and `gf tip on stock cubes:` — because with the rubric gone there
   is no varying prefix to have a house form for.
+- **2026-10-08, #1089** — **Cocktail titles are Title Case, and a qualifier in
+  brackets is not.** Helen: *"Title case for all titles. Qualifiers in brackets
+  don't get capital letters, unless they're a proper noun, e.g. 'Margarita
+  (classic)' and 'Fog Cutter (Bramble style)'"*, and then *"Put all cocktail
+  titles in title case please"*. Three published titles moved: Apple and Ginger
+  Mulled Wine; Pear, Apricot and Rosemary Bellini; Frozen Fruit Daiquiri — the
+  last was not on the review's list and turned up when all 78 were read. Small
+  words stay small ("and", "the"), as "Naked and Famous" and "Between the
+  Sheets" already had it. **The drafts follow, and a test holds both**: *"Add
+  title case to cocktail drafts too please, why not. Add that to our
+  draft-tidying script."* `title_cased` in `tests/test_cocktails.py` is the
+  rule, `test_drink_titles_are_title_case` applies it to every drink, and
+  `scripts/tidy_drafts.py --only titles` writes it to a draft. **It only ever
+  RAISES a letter** — nothing is lowered and nothing in brackets is touched —
+  because that is the half of her rule a script can apply without deciding
+  what a proper noun is. One draft of 61 needed it (Frozen Ginger Daiquiri).
+- **2026-10-08, #1089** — **`snippet` is a tagline for somewhere that is not
+  the page.** A drink's tagline is also its meta description and link preview,
+  and the Negroni's is fine on its page and not in a search result. Asked to
+  decide, Helen wrote a second line rather than soften the first, and left the
+  Planteray one alone (*"can stay"*). So `snippet:` is an OPTIONAL key, read
+  only by `_layouts/default.html`, on one drink; a page without it describes
+  itself with its tagline as before. It is not in the ingest documents: nobody
+  ingests a snippet, she writes one when a tagline needs it.
+- **2026-10-08, #1089 — the rest of the design review's copy sitting.** Her
+  rulings, each applied as written: the five-spice duck legs' tagline gains
+  "more" and loses its link to itself (*"tagline was supposed to be a joke"*);
+  the caramel and ganache yield notes are both labelled "Examples of how much
+  this makes" (her second wording, the same day; the first was "How much this
+  actually makes", on caramel alone), the caramel with her sentence and the
+  ganache without its `serves_estimate` one; the plum
+  sauce's "Pairs with" note and the three Ben & Jerry's bases' "This is not
+  ice cream" note are deleted; the about page's sentence gets its verb; the
+  rum page's "Addendum: Rum Characters" is "A final thought: rum characters".
+  Five typos fixed. **Two things the issue described had already been done by
+  her, and asking was what showed it**: the Sazerac note no longer mentions
+  the distillery (*"I deleted the controversial part!"*), and the Cobra's Fang
+  note keeps its "Pool?" label with text she had rewritten (*"I consider the
+  point settled"*). Kept as they are, by her word: the "Some"/"some" serves
+  lines.
+  **EDITING A PUBLISHED RECIPE UNPUBLISHES IT, AND THE SUITE NOTICES.** Fourteen
+  recipes went to `proofread: false` with these edits, and the production
+  build then failed five tests: caramel is the gate test's control recipe,
+  and other pages link to the ones that vanished. So an agent's copy fix to a
+  published recipe cannot merge on its own; it waits for the §4.0 grant.
+  **The grant came the same day** — *"#1341 is proofread! Let's go."* — after
+  she read the pages on the branch: `3df50ce4` put fifteen flags back, and
+  both baselines moved to it in a commit of their own, the old values having
+  named exactly those fifteen files first. Nothing left the live site. The
+  plum sauce stayed `false`; it was unproofread on `main` before the branch.
 
 ## §6 `main_ingredients`
 

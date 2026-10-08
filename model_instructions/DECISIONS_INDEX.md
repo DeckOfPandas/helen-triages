@@ -120,6 +120,9 @@ argument and the rules each field is read by.
 - 2026-08-31 · §5 · A hole in a guard is proportional to the data flowing through it.
 - 2026-09-07 · §5 · #800 · gf tip: is GOOD FOOD, the magazine, not gluten-free.
 - 2026-09-07 · §5 · #800 · The label is DROPPED, not expanded — Each of the eight notes becomes a plain sentence, capital to full stop, like every other note; source: already carries the attribution on six …
+- 2026-10-08 · §5 · #1089 · Cocktail titles are Title Case, and a qualifier in brackets is not.
+- 2026-10-08 · §5 · #1089 · snippet is a tagline for somewhere that is not the page.
+- 2026-10-08 · §5 · #1089 · the rest of the design review's copy sitting.
 - 2026-08-15 · §6 · #130 · common_ingredients.yml became pantry.yml, a bare list; the wrapping pantry: key flattened in the same pass.
 - 2026-08-29 · §6 · The cap of eight read as a budget.
 - 2026-09-06 · §6 · #762 · the majority spelling wins — cornflour and beansprouts.

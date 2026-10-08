@@ -41,7 +41,7 @@ mood:
 notes:
   - label: "Fruit option"
     text: "Add 10 blueberries and 3 basil leaves after first muddle."
-  - label: "Cachaca ranking"
+  - label: "Cachaça ranking"
     text: "Leblon = Sagatiba > Viero Barriero > Abelho > Yaguara Organic."
 source: "Having tried five cachacas and every reasonable sugar in every combination"
 source_url: ""
