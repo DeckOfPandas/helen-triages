@@ -89,7 +89,13 @@
 {% comment %} The rightmost point the row reaches — where the direct label hangs. {% endcomment %}
 {% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
 
-<div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}">
+{% comment %} THE ROW CARRIES ITS OWN SPAN, --a to --b, from the start of the
+   out-at bar to the far end of whatever the row reaches, since 2026-10-08.
+   Custom properties inherit, so the value label below reads the row's --b
+   without a style of its own, and anything that lays the row out differently
+   -- a phone, a vertical scale -- can place the row's words from the row
+   rather than from a bar inside it. The bars still carry their own pair. {% endcomment %}
+<div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}" style="--a:{{ from }}; --b:{{ right }};">
   <div class="tc-row-label">{{ include.label }}{% if include.suggested %}<span class="tc-suggested" title="What this recipe suggests">this recipe</span>{% endif %}</div>
   <div class="tc-track">
     <div class="tc-out-at" style="--a:{{ from }}; --b:{{ to }};"></div>
@@ -101,10 +107,16 @@
     {% if has_rested %}
       <div class="tc-rested" style="--a:{{ spec.rested_min }}; --b:{{ spec.rested_max }};"></div>
     {% endif %}
+  </div>
 
-    <div class="tc-value" style="--b:{{ right }};">
-      {{ prefix }}{{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
-    </div>
-
+  {% comment %} THE VALUE IS THE ROW'S, NOT THE TRACK'S, since 2026-10-08. It
+     sat inside .tc-track and was positioned against it, which meant that on a
+     phone -- where it leaves the track and sits in flow -- it could only ever
+     be UNDER the bar. As a sibling of the label and the track it can be laid
+     out against either: beside the bar on a wide screen, on the label's own
+     line on a narrow one. The stylesheet measures its desktop position from
+     the row, with the same label-column arithmetic .tc-unsafe uses. {% endcomment %}
+  <div class="tc-value">
+    {{ prefix }}{{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
   </div>
 </div>

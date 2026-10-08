@@ -101,6 +101,13 @@ $tc-threshold-height: 1.35rem;
   align-items: center;
   min-height: $tc-row-height;
   column-gap: var(--tc-label-gap);
+  // The row is the positioned context for its VALUE since 2026-10-08 (the
+  // track stays the context for the bars). The value is a sibling of the
+  // track now, not a child -- see temp_row.html -- so a phone can put it on
+  // the label's line rather than only under the bar. Being a third grid item
+  // it would otherwise take a cell of its own; absolute positioning takes it
+  // out of the grid on a wide screen.
+  position: relative;
 }
 
 .tc-row-label {
@@ -282,10 +289,14 @@ $tc-threshold-height: 1.35rem;
 // out-at/rested readout itself ("48-50°C -> ~52-54°C"), the number the whole
 // chart exists to show, not a name beside it -- .tc-row-label (the row's own
 // name, RARE/MEDIUM RARE/...) stays Courier because it isn't one.
+// MEASURED AGAINST THE ROW, since 2026-10-08, with the same label-column
+// arithmetic .tc-unsafe uses: the value no longer lives inside the track, so
+// a bare percentage would be a percentage of the row and land 9.5rem left of
+// the bar it names -- the exact bug .tc-unsafe had. --b is the ROW's, inherited.
 .tc-value {
   position: absolute;
   top: calc(50% - 0.62rem);
-  left: calc((var(--b) - #{$tc-min}) / #{$tc-max - $tc-min} * 100% + 0.5rem);
+  left: calc(#{$tc-track-start} + #{$tc-track-width} * (var(--b) - #{$tc-min}) / #{$tc-max - $tc-min} + 0.5rem);
   font-family: $font-label;
   font-weight: 600;
   font-size: 0.76rem;
@@ -633,22 +644,42 @@ article.recipe .recipe-section-heading {
     grid-template-columns: 1fr;
   }
 
+  // EVERY CELL PLACED EXPLICITLY, because the value below is. Explicitly
+  // placed items go first, so with only the value naming its row the label
+  // auto-placed into row 1 and the track skipped the occupied row 2 and
+  // landed in row 3 -- under the value it was meant to share a cell with.
   .tc-row-label {
+    grid-row: 1;
+    grid-column: 1;
     text-align: left;
   }
 
   .tc-track {
+    grid-row: 2;
+    grid-column: 1;
     // The bars are positioned against this box's height; the value below is
     // outside it, so the box stays the bars' own height.
     height: $tc-row-height;
   }
 
+  // IN THE TRACK'S OWN GRID ROW, hugging its bottom edge, since the value
+  // became a sibling (2026-10-08). Inside the track it was a static block
+  // overflowing a fixed-height box, which cost the row no height at all --
+  // the value spilled into the space beside the NEXT row's label, and the two
+  // never met because one is left-aligned and the other right. As a grid item
+  // of its own it would take a real row and open every chart up by a line, so
+  // it shares the track's cell and pulls down past it by about the same
+  // overflow the old layout had.
   .tc-value {
     position: static;
+    grid-row: 2;
+    grid-column: 1;
+    align-self: end;
+    justify-self: end;
     display: block;
     text-align: right;
     white-space: normal;
-    margin-top: -0.35rem;
+    margin-bottom: -0.75rem;
     padding-bottom: $space-xs;
   }
 

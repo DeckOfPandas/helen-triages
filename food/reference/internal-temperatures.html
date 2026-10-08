@@ -348,36 +348,36 @@ permalink: /food/reference/internal-temperatures/
         {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness %}
         {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness %}
 
-        <div class="tc-row">
+        <div class="tc-row" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};">
           <div class="tc-row-label">Fish, general</div>
           <div class="tc-track">
             <div class="tc-out-at" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.fish.general.endpoint_max }};">{{ t.fish.general.endpoint }}</div>
           </div>
+          <div class="tc-value">{{ t.fish.general.endpoint }}</div>
         </div>
 
-        <div class="tc-row">
+        <div class="tc-row" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};">
           <div class="tc-row-label">Poultry</div>
           <div class="tc-track">
             <div class="tc-out-at" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.poultry.chicken.endpoint_max }};">{{ t.poultry.chicken.endpoint }}</div>
           </div>
+          <div class="tc-value">{{ t.poultry.chicken.endpoint }}</div>
         </div>
 
-        <div class="tc-row">
+        <div class="tc-row" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};">
           <div class="tc-row-label">Cured ham</div>
           <div class="tc-track">
             <div class="tc-out-at" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.ham.cured.target_max }};">{{ t.ham.cured.target }}</div>
           </div>
+          <div class="tc-value">{{ t.ham.cured.target }}</div>
         </div>
 
-        <div class="tc-row">
+        <div class="tc-row" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};">
           <div class="tc-row-label">Slow-cooked</div>
           <div class="tc-track">
             <div class="tc-out-at" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.beef.tough_cuts.tender_at_max }};">tender at {{ t.beef.tough_cuts.tender_at }}</div>
           </div>
+          <div class="tc-value">tender at {{ t.beef.tough_cuts.tender_at }}</div>
         </div>
       </div>
       {{ axis }}
