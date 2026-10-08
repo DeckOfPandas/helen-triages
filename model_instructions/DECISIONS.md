@@ -2445,6 +2445,70 @@ unless stated.
     `INGEST_ONE_COCKTAIL.md` is re-uploaded.
   - **The public and private halves must merge together.** CI has no drafts
     and stays green on a mismatch; only a local run shows it.
+- **2026-10-08 — the moods after 73 Difford's drinks: water is invisible, two
+  rules widen, and six hand moods are measured to be beyond any rule.** Helen
+  asked which new drinks nearly earned a mood, and whether more of her own
+  tags could be derived *"or if I should simply give up on some because they
+  turn out to be statistically nonsense"*.
+  - **Water is dropped before any rule counts anything.** *"Dilution water just
+    isn't something I care about ... let's say dilution water should be
+    excluded from every mood derivation rule."* Difford's writes dilution as a
+    measured line. Three drinks gained `no measuring` and one `sharp`.
+  - **Egg white still counts toward `sharp`'s cap of five, and does not
+    disqualify.** She thought it made a drink not sharp and asked to be
+    checked: Gin Sour (her `signature`) and Pink Lady both carry egg white and
+    both are sharp. No change either way.
+  - **`sharp` was not widened, and it cannot be by much.** It is on 45% of 212
+    drinks and the suite refuses 50%. Not counting a 5 ml spoon, counting two
+    spirits of one family once, a cap of six, and any liqueur as the sweetener
+    each tag about as many older drinks she did not as corrections they
+    retire; the cap of six and the liqueurs reach 50% on their own. She called
+    the four drinks the spoon variant would add *"not sharp, which I'm saying
+    in a spiritual sense."*
+  - **`tiki`: one marker is enough in eight ingredients or more.** *"Three dots,
+    and fog are absolutely tiki, so if we need to change the rules to rule
+    them in then so be it."* Three more of hers among the older drinks, one
+    she had never tagged (P-Five Punch, a draft with no hand moods at all),
+    and exactly those two among the new. Steel Drum stays out on the data, as
+    she allowed.
+  - **`sugar craving` gets a rule for one slice**: two tiki markers in 90 ml or
+    more. 16 of her 46, one false alarm (Jungle Bird, excluded by name). It
+    stays hand-assigned and the rule only adds.
+  - **The search.** Every one- and two-feature rule (about 52,000) per hand
+    mood over the 139 drinks she had tagged, scored on drinks held out of the
+    search and against the same search on shuffled tags:
+
+        mood                 tagged  held-out  shuffled
+        on fire                   6     1.00      .49
+        clear                    19      .71      .44
+        signature                21      .70      .47   (her own rating)
+        tiki                     38      .65      .50
+        sugar craving            46      .60      .54
+        nightcap                 20      .49      .41
+        sunny terrace            38      .44      .49
+        aperitivo                32      .41      .47
+        festive                  13      .31      .42
+        brunch                   24      .27      .43
+        easy peasy               16      .26      .40
+        so wrong it's right      22      .19      .42
+
+    **At or below the shuffled column, the data cannot see the mood.** That is
+    six of them, and it says no rule will be found, not that the tag is
+    meaningless. **`clear` has real signal and still gets no rule**: its best
+    (`no juicing` and a clear spirit) carries six false alarms, and Helen:
+    *"Don't add things I'll need to remove -- easier for me to notice the
+    gaps."* **That sentence is the test for any rule on a hand mood.**
+  - **A hand mood Helen names in the ingest chat is written at ingest.** The
+    web session had typed six on five drinks; the instructions said never,
+    and my own §2 paragraph said *"whatever she says in the chat"*. She had
+    asked for every one. Now: `[]` unless she names one of hers for that
+    drink; never offered, inferred or derived.
+  - **Corrections:** All Jacked Up is a strong brown drink (*"feel strong and
+    brown"*; 62% of it is from the aged list but unaged mezcal leads), and
+    Three Dots and a Dash is faff (*"yes yes"*; the Hurricane's coordinates).
+  - **`ice ice baby` already covers every swizzle, crushed-ice and blended
+    drink** bar Mastiha Mojito, which she excluded herself. Ginger beer is not
+    warming.
 
 ### §9.3.1 The ingredient vocabulary
 

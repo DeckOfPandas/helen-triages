@@ -205,7 +205,20 @@ def derive(drink, sets, step_words, families):
             return []
         return value if isinstance(value, list) else [value]
 
-    entries = [e for e in (drink.get("ingredients") or []) if isinstance(e, dict)]
+    # WATER IS NOT AN INGREDIENT TO ANY RULE HERE -- Helen, 2026-10-08:
+    # "dilution water just isn't something I care about ... let's say dilution
+    # water should be excluded from every mood derivation rule." Difford's
+    # writes dilution as a measured line ("10 ml water, omit if using wet
+    # ice"), and that line was costing Clergyman's Lapse, Princess Marina and
+    # Última Palabra `no measuring` for an amount nobody measures, and Última
+    # Palabra `sharp` for being a sixth ingredient. Dropped HERE, once, so no
+    # rule below can count it by accident: not toward a volume, a ratio, the
+    # smallest measure, or how many ingredients a drink has. The Sazerac's
+    # 60 ml of chilled water goes the same way, which is what `NOT_A_POUR`
+    # already said about its volume.
+    entries = [e for e in (drink.get("ingredients") or [])
+               if isinstance(e, dict)
+               and not ({str(g) for g in _listed(e.get("generic"))} & NOT_A_POUR)]
 
     # GENERICS AND CHARACTERS TOGETHER. `blackstrap` is a character since #314
     # and appears in the `tiki` and `loud` sets; reading generics alone was one
@@ -380,8 +393,37 @@ def derive(drink, sets, step_words, families):
     # this shape -- Daiquiri, Ti' Punch, Chartreuse Daiquiri, Arrack Punch,
     # Daisy de Santiago, Martinique Swizzle. They keep their hand tag, which is
     # the whole reason the mood stays in `moods_by_hand`.
-    if count("tiki") >= 2 and n_ingredients >= 4:
+    #
+    # ONE MARKER IS ENOUGH IN EIGHT INGREDIENTS OR MORE -- Helen, 2026-10-08:
+    # "three dots, and fog are absolutely tiki, so if we need to change the
+    # rules to rule them in then so be it." Three Dots and a Dash (falernum)
+    # and the Difford's Fog Cutter (orgeat) each carry one marker in eight
+    # ingredients. Measured over the 139 drinks she had tagged before that
+    # batch: the second limb fires on four more, three of them hers, and the
+    # fourth is P-Five Punch, a draft she has never hand-tagged at all. On the
+    # 73 new drinks it adds exactly the two she named.
+    #
+    # STEEL DRUM STAYS OUT, AND SHE SAID IT COULD: "I could go either way, so
+    # if the data says No then so be it." It has one marker in six
+    # ingredients, and reaching six tags eleven older drinks she did not --
+    # Pink Lady and the Porn Star Martini among them.
+    n_markers = count("tiki")
+    if (n_markers >= 2 and n_ingredients >= 4) \
+            or (n_markers >= 1 and n_ingredients >= 8):
         out.append("tiki")
+
+    # `sugar craving` -- THE ONE SLICE OF IT THE DATA CAN SEE, 2026-10-08.
+    # Two tiki markers in a drink of 90 ml or more: the long, syrupy tiki
+    # drink. Helen tags 46 of 139 older drinks; this finds 16 of them and one
+    # she did not (Jungle Bird, which carries a `mood_exclude`). The other 30
+    # share nothing an ingredient list shows -- the 2026-08-30 score of .23
+    # stands -- so the mood STAYS in `moods_by_hand` and this only ever adds,
+    # exactly as `tiki` above does. The 90 ml floor is what keeps the short
+    # ones out: Caribbean Sazerac and Nuclear Daiquiri have two markers each
+    # and she tagged neither.
+    measured = [millilitres(e.get("amount", ""), sets["_measures"]) for e in entries]
+    if n_markers >= 2 and sum(v for v in measured if v) >= 90:
+        out.append("sugar craving")
 
     # `warming` -- ONE COPY OF THIS RULE, and it was two until 2026-09-20
     # (#1147). The duplicate sat eleven lines below, separated by a shorter

@@ -473,9 +473,10 @@ failure is probably work someone else has already done (MANUAL §9.1).
   write it as a bare noun and lose nothing?* "with a straw" → `Straw.` loses
   nothing. "Top with crushed ice to serve" loses WHEN, so it is a method step.
 - **Run `python3 scripts/derive_cocktail_moods.py --write`** after writing the
-  files. It supplies the nine derived moods; **the ten hand-assigned ones are
-  Helen's and no rule produces them**, so a new cocktail is missing half the
-  browse axes until she looks.
+  files. It supplies the derived moods and **keeps a hand-assigned one already
+  in the file**: an envelope carries one only where Helen named it in the chat
+  (2026-10-08), so leave it. No rule produces most of hers, so a new cocktail
+  is missing half the browse axes until she looks.
 
 ## TIER 2 -- fill in, and say plainly they are proposals
 

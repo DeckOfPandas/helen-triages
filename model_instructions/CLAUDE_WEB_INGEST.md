@@ -110,7 +110,8 @@ a deploy.
   session can do; a bottle, a brand or a near-miss is still a judgement it
   cannot. **Every `suggestion` will be `[]`** — it does not have the bottle
   dictionary — with the bottle the source names in that pour's `note:` as
-  "Originally X." Every `mood: []`, every `ship: "who knows"`: moods are
+  "Originally X." Every `ship: "who knows"`, and `mood: []` unless she named
+  one of her own hand-assigned moods for that drink in the chat: the rest are
   derived by a script it does not have, and a rating means she drank it.
 - **A cocktail's untyped pours carry the source's own words exactly**, and
   `scripts/resolve_pours.py` then types the ones Helen has ruled on before
@@ -194,8 +195,11 @@ one, and Helen would far rather answer a question than find an invention. On a
 cocktail, a generic is typed only on an EXACT match in the printed vocabulary and
 is otherwise "QQ" plus the source's own words, exactly as printed; every
 suggestion is [], with the source's bottle in that pour's note as "Originally
-X."; mood is [], ship is "who knows", made_before is false — always, by her
-standing ruling, and whatever she says in the chat about any of them. A tagline
+X."; ship is "who knows" and made_before is false — always, by her standing
+ruling, and whatever she says in the chat about either. Mood is [] unless she
+names, for that drink, one of the moods only she assigns (the cocktail document
+lists them): that one goes in as she said it, and you never offer, infer or
+derive one. A tagline
 is her voice on a published page and it is never the ingest's: on a cocktail it
 is a bare "QQ"; on a dish it is "QQ original <the source's intro> QQ Claude
 <your plain rewrite of it>" where the source has an intro, and a bare "QQ"
