@@ -54,7 +54,20 @@ main {
 
 .site-header {
   position: relative;   // anchors .site-header-inner's inset:0, below
-  padding: $space-xl;
+  // $space-sm UNDER THE DOOR'S ROW, AND NOTHING OVER IT -- #1322, 2026-10-08.
+  // Helen: "mobile: navbar has too much padding to its bottom edge", and from
+  // the candidates page, "0 over, 15 under." The bottom was $space-xl like the
+  // other three sides, which put 31.4px under the row at every width; since
+  // #733 gave cocktails' header a band of its own that space reads as the
+  // band's bottom, not as page, and food's was "all that plain white".
+  //
+  // THE 15 IS 0.5rem + 6.4px + THE 1px BORDER, measured: the row's grid line is
+  // as tall as `??` (26.9px), which is 6.4px taller than the door's lettering.
+  // So "15 under" is the door's box to the header's edge, 15.4px, and the
+  // other half of the ruling -- nothing over the row -- is the zero margins on
+  // `.site-nav-icons` and `.site-about-link` and the stacked grid's missing
+  // gap, below. One value at every width; there is no phone variant of either.
+  padding: $space-xl $space-xl $space-sm;
   border-bottom: 1px solid $color-border;
   // A CUSTOM PROPERTY WITH THE PALETTE'S VALUE AS ITS FALLBACK -- #733,
   // 2026-10-06. Cocktails re-points it to a darker band of its own
@@ -148,6 +161,14 @@ main {
 // own call was "approximately level ... does not need to change with different
 // tape SVGs", so if that height or the SVG's margins change, re-eyeball this by
 // hand rather than expecting it to follow.
+//
+// AND THE OFFSET IS ZERO SINCE #1322 (2026-10-08): the row starts where the
+// wordmark's box ends, at every width. It was 0.9rem (0.45rem under 600px,
+// #1086). Helen, from the candidates page: "0 over, 15 under", and of the
+// tilted tape's low corner coming close over `??` on a phone, "The clearance
+// for the cocktails tape is fine!" The tape's ink stops short of its box, so
+// zero box-to-box still shows a few pixels of ground. `.site-header`'s
+// padding, above, has the other half.
 .site-nav-icons {
   // AT THE RIGHT-HAND END OF ROW 2, ON THE CARDS' RIGHT EDGE, SINCE 2026-09-11
   // -- column 3, `justify-self: end`, and the header's column is the cards'
@@ -170,7 +191,7 @@ main {
   grid-column: 3;
   justify-self: end;
   align-self: start;
-  margin: 0.9rem 0 0;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 1.6rem;
@@ -243,10 +264,18 @@ main {
 // a flex child, so removing it never made this row narrower -- which is why the
 // candidates page showed no change on a phone. `shoot.sh` reports OVERFLOW at
 // 360 and 390 if that ever stops being true.
+//
+// `margin-bottom: 0.4rem` IS THE `??` THIS PAGE DOES NOT HAVE -- #1322,
+// 2026-10-08. On every other page the row's grid line is as tall as `??`
+// (26.9px), 6.4px taller than the doors' lettering, and that 6.4px is part of
+// the 15px Helen picked under the row. Here there is no `??`, so without this
+// the doors sat 9px from the header's edge where every other page has 15.
+// Nobody saw the difference while the padding under them was 24px.
 .site-neutral .site-nav-icons {
   grid-column: 1 / -1;
   justify-self: end;
   flex-wrap: nowrap;
+  margin-bottom: 0.4rem;
 }
 
 // The row's own word and arrow. Courier in the site's own bracket device --
@@ -441,8 +470,9 @@ main {
   // ON THE CARDS' LEFT EDGE, SINCE 2026-09-11: no side margin, now that the
   // header's column is the cards' width. It carried "the same $space-md of air
   // from the page edge the row used to carry" until then, which put it 12px
-  // inside the cards; Helen, on #965: "Both on the cards' edge".
-  margin: 0.9rem 0 0;
+  // inside the cards; Helen, on #965: "Both on the cards' edge". And no top
+  // margin since #1322, the same zero as the row beside it.
+  margin: 0;
   font-family: $font-body;
   font-size: 1.05rem;
   font-weight: 400;
@@ -503,11 +533,12 @@ main {
 // created implicitly by this placement and costs the deployed header nothing,
 // because there the element is not in the page at all.
 //
-// `margin-top` IS THE HALF-ROW GAP THE NAV ROW ITSELF USES (0.45rem, the
-// #1086 phone value): the box hangs off the row above it the way that row
-// hangs off the tape, so the header reads as three lines at one rhythm rather
-// than a header with a widget under it. Eyeballed at 1280 and 390 on the
-// candidates page, like the row's own offset, and to be re-eyeballed with it.
+// `margin-top` WAS THE HALF-ROW GAP THE NAV ROW ITSELF USED (0.45rem, the
+// #1086 phone value), eyeballed at 1280 and 390 on #1210's candidates page.
+// The row's own offset went to zero with #1322 and this was NOT re-eyeballed
+// with it: it is still 0.45rem under the door at every width, and below the
+// stack width it lost the grid gap that used to sit on top of that. Local
+// builds only, so nobody but Helen sees it; hers to ask for.
 .site-header .page-search {
   grid-row: 3;
   grid-column: 3;
@@ -1321,10 +1352,12 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   // spill over -- the reason `min-width: 0` is refused for the centre track --
   // so the track keeps the container's width and the wordmark overhangs by
   // under a pixel each side, inside the page padding.
+  // NO `gap` SINCE #1322 (2026-10-08): it was $space-lg here ($space-sm under
+  // 600px, #1086) and was the larger half of the space over the door's row,
+  // which Helen took to zero at every width.
   .site-header-inner {
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
-    gap: $space-lg;
   }
 
   // EXPLICIT ROWS, RELEASING THE ONES THE WIDE LAYOUT PINS. Both items carry
@@ -1431,53 +1464,20 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     margin-top: -$space-lg * $wordmark-phone-scale;
   }
 
-  // AND THE GAP UNDER THE MARK IS HALVED, WHICH IS A SECOND NUMBER AND NOT THE
-  // SAME ONE. Helen's phrase was "mark at two thirds, gap under them halved":
-  // the lockup shrinks by a third, the air under it by a half. $space-sm is
-  // exactly half $space-lg, so the tokens say the halving themselves.
-  .site-header-inner {
-    gap: $space-sm;
-  }
-
-  // The nav row's own top margin is the other half of that gap. 0.45rem is the
-  // 0.9rem above it halved -- written out rather than derived on purpose: the
-  // rule up at .site-nav-icons says in so many words that this offset is
-  // eyeballed against the tape's bottom ink line and must be re-eyeballed by
-  // hand if the tape's height changes, which is exactly what has just happened
-  // here. It was re-eyeballed on the candidates page at 390px, and 0.45rem is
-  // what Helen picked; it is not 0.9rem times two thirds and should not become
-  // it.
-  .site-nav-icons {
-    margin-top: 0.45rem;
-  }
-
-  // AND `??` TAKES THE SAME HALVING -- #1148, 2026-09-19. Helen: "On narrower
-  // screens, ?? renders lower than [ COCKTAILS ]."
+  // THE GAP UNDER THE MARK WAS HALVED HERE, AND IS NOW GONE AT EVERY WIDTH --
+  // #1322, 2026-10-08. #1086's other half was "mark at two thirds, gap under
+  // them halved": this block set the grid's gap to $space-sm and the row's top
+  // margin to 0.45rem, and #1148 (2026-09-19) added the same 0.45rem for `??`
+  // after the block was found half-written -- the row halved and `??` not, so
+  // under 600px they sat 7.2px apart. All three rules are deleted, not zeroed:
+  // the base rules carry no gap and no margin now, so there is nothing here to
+  // halve, and nothing left for the pair to disagree about by width.
   //
-  // THE BUG WAS THIS BLOCK BEING HALF-WRITTEN. `.site-about-link` and
-  // `.site-nav-icons` both carry `margin: 0.9rem 0 0` in the base rules, which
-  // is what puts them on one line at desktop width; #1086 halved the row's here
-  // and left the `??` at 0.9rem, so below 600px they sat 7.2px apart. Measured
-  // on the real page at 390px before the fix: the row's ink centre 120.3, the
-  // `??`'s 129.7.
-  //
-  // WHY THE ANSWER IS THE SAME NUMBER AND NOT A TUNED ONE. The pair is not
-  // perfectly level at ANY width -- the two boxes are top-aligned and their ink
-  // sits differently inside them, because `[ COCKTAILS ]` is 0.8rem
-  // $font-headings and `??` is 1.05rem $font-body, so the `??` reads 2.2px low
-  // on desktop too. That residual is old, nobody has minded it, and it is not
-  // what #1148 reported. Halving this margin restores the desktop relationship
-  // exactly; correcting the 2.2px would be a change to every width and is
-  // Helen's to ask for (§13.12).
-  //
-  // To re-measure after any change to either face or size:
+  // To re-measure the pair after any change to either face or size:
   // `sh scripts/browser/crop.sh /food/ ".site-nav-icons" ink-row 390` and
   // `... ".site-about-link" ink-about 390`, then
   // `python3 scripts/browser/inkbox.py` on each -- the BRACKETS bound the row's
   // object, so its ink centre is theirs, not the capitals'.
-  .site-about-link {
-    margin-top: 0.45rem;
-  }
 
 }
 

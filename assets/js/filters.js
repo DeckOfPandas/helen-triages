@@ -742,21 +742,22 @@ function renderResultsPool() {
      so anything painted at click time would survive a clear that emptied the
      state underneath it.
 
-     THE COPY IS ABOUT WHAT IS LISTED, never about what a recipe is free of.
-     This index is derived from what each recipe happens to write down, so
-     "hiding 1 recipe that lists peas" is a true statement about the data and
-     "1 pea-free recipe" is not a claim this page is in any position to make.
-     Helen will settle the fuller wording once she has seen it working — do not
-     grow this into a paragraph of caveats in the meantime. */
-  function renderExcludeActive(excludedCount) {
+     THE LINE IS "hiding peas" -- Helen on #1088, 2026-10-07: '"hiding peas"
+     please.' It said "hiding 1 recipe that lists peas", with a count and a
+     separate sentence for zero ("hiding nothing from the recipes left"); the
+     count is gone, so there is one line whatever the exclusion removed, and it
+     makes no claim about how many recipes list the thing. Still about the
+     INGREDIENT and never about what a recipe is free of: this index is derived
+     from what each recipe happens to write down. */
+  function renderExcludeActive() {
     if (!excludeActive) return;
     excludeActive.innerHTML = '';
     if (!state.excludedIngredients.size) return;
 
     /* NO "leaving out" LABEL ANY MORE -- GitHub issue #363. The struck-through
-       pill already says it, and the count sentence after it ("hiding 1 recipe
-       that lists peas") says it again in full, so the words were the third
-       telling of the same fact and the only one that could not also be clicked.
+       pill already says it, and the line after it ("hiding peas") says it
+       again, so the words were the third telling of the same fact and the
+       only one that could not also be clicked.
 
        The aria-label on each pill still says "stop leaving out <value>", and
        that is deliberate rather than an oversight: a screen reader gets no
@@ -764,28 +765,18 @@ function renderResultsPool() {
        came out is the redundant VISIBLE copy, not the accessible name. */
     var names = [];
     state.excludedIngredients.forEach(function (value) {
-      // The sentence reads about the ingredient, so the "(all)" that qualifies
-      // the BUTTON comes off here -- "recipes that list chicken (all)" is not
-      // a sentence. The pill keeps it, because there it is the control's name.
+      // The line reads about the ingredient, so the "(all)" that qualifies
+      // the BUTTON comes off here -- "hiding chicken (all)" is not a
+      // sentence. The pill keeps it, because there it is the control's name.
       names.push(value.replace(FAMILY_SUFFIX, ''));
       excludeActive.appendChild(makeActiveExcludeButton(value));
     });
 
+    // The class keeps its name though the line no longer counts: it is the
+    // hook food/_search.scss styles.
     var count = document.createElement('span');
     count.className = 'exclude-count';
-    var listed = names.join(' or ');
-    if (excludedCount === 0) {
-      /* Says nothing about the collection, deliberately. excludedCount counts
-         rows this exclusion removed FROM THE CURRENT RESULTS, so zero can mean
-         "nothing lists peas" or it can mean "the tag filter had already taken
-         the one that does" -- and "no recipe lists peas" would be a flat
-         untruth in the second case. */
-      count.textContent = 'hiding nothing from the recipes left';
-    } else if (excludedCount === 1) {
-      count.textContent = 'hiding 1 recipe that lists ' + listed;
-    } else {
-      count.textContent = 'hiding ' + excludedCount + ' recipes that list ' + listed;
-    }
+    count.textContent = 'hiding ' + names.join(' and ');
     excludeActive.appendChild(count);
   }
 
@@ -984,7 +975,6 @@ function renderResultsPool() {
     // rows while you're still picking an ingredient search result is a
     // separate, open design question Helen hasn't resolved yet.
     var matchingLis = [];
-    var excludedCount = 0;
 
     items.forEach(function(li) {
       /* THE ROW, AS THE PREDICATE NEEDS IT. Every rule that used to be spelled
@@ -1023,15 +1013,10 @@ function renderResultsPool() {
       var visible = FilterState.rowMatchesFilters(row, state, entriesMatchKey);
 
       /* LAST, deliberately. Everything above decides whether this row is one
-         you asked for; this decides whether it is one you can't serve. Running
-         it last is what makes excludedCount meaningful: it counts rows that
-         survived every other filter and were dropped only for what they list,
-         which is the number the panel reports back. Two calls rather than one
-         merged predicate for exactly that reason. */
-      if (visible && rowIsExcluded(li)) {
-        visible = false;
-        excludedCount += 1;
-      }
+         you asked for; this decides whether it is one you can't serve. It
+         used to count what it dropped, for a line that said how many; the
+         line is "hiding peas" since #1088 and nothing reads a count. */
+      if (visible && rowIsExcluded(li)) visible = false;
 
       if (visible) matchingLis.push(li);
       else if (!suppressList) li.style.display = 'none';
@@ -1186,7 +1171,7 @@ function renderResultsPool() {
     renderShoppingList();
     updateInlineLabels();
     updateIngredientClear();
-    renderExcludeActive(excludedCount);
+    renderExcludeActive();
     syncAriaPressed();
   }
 

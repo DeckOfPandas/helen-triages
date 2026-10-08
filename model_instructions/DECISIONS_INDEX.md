@@ -592,6 +592,7 @@ argument and the rules each field is read by.
 - 2026-09-20 · §13 · #1149 · the footer column head is a door, and it looks like the header's door rather than like the links under it.
 - 2026-09-20 · §13 · #1088 · the placeholder sitting: what Helen wrote, and the two checkboxes that were already done.
 - 2026-09-20 · §13 · #1088 · the 404's ways out left .about-ways, and her sketch is what decided it.
+- 2026-10-07 · §13 · #1088 · the second sitting: the parked lines had been deleted under the issue, and the strings nobody had marked.
 - 2026-09-24 · §13 · the design audit's four rulings, and the diagnosis behind them.
 - 2026-09-29 · §13 · #1203 · every derivation in scripts/ says what it reproduces, and two of the numbers had moved.
 - 2026-09-30 · §13 · #1210 · the recipe action buttons, redrawn: the question was never the arrangement.
@@ -599,6 +600,7 @@ argument and the rules each field is read by.
 - 2026-10-06 · §13 · #733 · THE LEOPARD SHIPS: furry splodges on the darkest ground, and the rule that kept it parked is gone.
 - 2026-10-06 · §13 · #733 · THE LEOPARD JUDDERED ON A REAL PHONE, AND THE FIX KEEPS THE SITE AT ZERO IMAGES.
 - 2026-10-08 · §13 · #733 · THE FUR IS DRAWN AT 1.5, AND THE PAGE, THE BANDS AND THE CARDS ALL DROP TOWARDS BLACK.
+- 2026-10-08 · §13 · #1322 · THE HEADER HAS NOTHING OVER THE DOOR'S ROW AND 15px UNDER IT, AT EVERY WIDTH.
 - 2026-10-08 · §13 · #1288 · THE OMNISEARCH BOX STAYS LOCAL-ONLY. Built for the live header, looked at four ways, and not done.
 - 2026-08-11 · §14 · Built at Helen's request from 15 draft tables in _food_drafts/reference-info/.
 - 2026-08-13 · §14 · "Out at", never "pull at": pull is American.

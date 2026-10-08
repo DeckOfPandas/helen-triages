@@ -106,7 +106,8 @@
 .btn-clear--bottom { @include index-clear-all-bottom; }
 .btn-clear--empty  { @include index-clear-all-empty; }
 
-// "Nothing to see here." and "Select something to see a list." -- Helen,
+// "Blank canvas." and "(select something)" (their words since #1088; they
+// were "Nothing to see here." and "Select something to see a list.") -- Helen,
 // 2026-08-26: both are "doing the same job" as a recipe row title, so they are
 // typed as one. Each stands exactly where the list of titles would be, and
 // saying the same thing in a different voice made them read as system messages

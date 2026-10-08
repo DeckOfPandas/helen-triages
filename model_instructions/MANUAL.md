@@ -487,7 +487,12 @@ page (about) shows every site. **It sits at the RIGHT-HAND end of the header's
 second row and the `??` about link (a literal `/about/`) at the LEFT end, both
 on the cards' edges, at every width** (2026-09-11, #965 and Helen's desktop
 ruling the same afternoon; it was centred under the wordmark for one day) —
-**on every page except /about/, which is the exception below.**
+**on every page except /about/, which is the exception below.** **The row
+starts where the wordmark's box ends and has 15px under it, at every width**
+(#1322, 2026-10-08, *"0 over, 15 under"*): no top margin on the row or `??`,
+no gap in the stacked grid, and `$space-sm` of bottom padding on
+`.site-header`, the rest of the 15 being the row's own grid line and the
+border. The header is 130px tall at 390 and 165.1px at 700 and 1280.
 
 **/about/ IS THE ONE PAGE WITH TWO DOORS, AND SINCE 2026-09-15 IT IS LAID OUT
 FOR THEM** (#1086, Helen: *"C: doors on one line, no ??"*). Two doors measure
@@ -4487,9 +4492,12 @@ re-arguing it.
   the marker recorded only that nobody had confirmed them; `drinks` and
   `portions` came back confirmed unchanged. So a marker says *she has not
   ruled*, not *these words are wrong*. **The only markers left on the live site
-  are the shortlist panel's, parked pending a feature change.** Grep
+  are the shared-shortlist note's and its "keep these" (§8.9).** Grep
   `PLACEHOLDER COPY` rather than trusting any list of them: two of #1088's own
-  checkboxes were already stale when it was worked.
+  checkboxes were already stale when it was worked. **And the grep finds only
+  what was marked**: the second sitting (2026-10-07) found unmarked agent
+  sentences by listing every visible string instead, so a copy audit reads
+  the strings, not the markers.
 - **Whether the recipe title takes the tape.** Offered and declined.
 - **Which cocktails are faffy, rich, or otherwise judged.** Moods are DERIVED; a
   disagreement goes in `mood_include` / `mood_exclude` with its reason.
