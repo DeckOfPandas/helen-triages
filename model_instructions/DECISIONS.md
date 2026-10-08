@@ -9285,6 +9285,43 @@ verification. Dates are when the correction landed.
   - **She could not test before merging, and that was fixable all along.** A
     bundle of the real build published as an Artifact opens on a phone with no
     deploy; the second round of this went to her that way first. `LEOPARD.md`
+    §9 has it as a standing rule for anything that paints a lot.
+- **2026-10-08, #733 — THE FUR IS DRAWN AT 1.5, AND THE PAGE, THE BANDS AND
+  THE CARDS ALL DROP TOWARDS BLACK.** With the speed fixed, Helen on her phone:
+  *"Disaster! The leopard doesn't show up well on a phone ... it's a shame not
+  to make more of the feature. Its loading time is fine though, yay. Can we use
+  a different drawing just on phones? One of the lighter versions."* Three
+  candidates pages in a day, each the real build with `ground-print.js` doing
+  the drawing (the bar set custom properties and called its `refresh()`).
+  - **No second drawing was needed, and no phone-only fur was chosen.** The
+    artwork is white at a few percent alpha, so the script draws the same file
+    in more than one pass to make it stronger. From six strengths: *"I love
+    the 1.5 and even the 2 ... it's 1.5, and nap on, for all: mobile, ipad and
+    desktop."*
+  - ***"This might be a deranged question -- can we still have the print
+    visible, while darkening the whole thing? So the base colour of
+    everything ... Basically what I'm aiming for is 'black on black', ish."***
+    It was not deranged: the print is drawn OVER whatever the ground is, so
+    the ground can fall without the print going with it. Page `#060607` →
+    `#030304` (pure black offered, not taken), bands `#111113` → `#060607`,
+    **cards `#17171a` → `#0d0d0f`**. That last reverses *"I like the cards
+    sitting light on the leopard, so don't touch those"* of two days earlier
+    in its letter and not its point: a card is still lighter than the page.
+    `$color-surface` is every surface on the site, and its washes follow.
+  - **She asked for the fur strengths again once the base had dropped** —
+    *"it's different with the lower base"* — and chose 1.5 a second time. One
+    switch at a time would have missed that the two interact; the second
+    page put them side by side.
+  - **The one thing a phone gets differently is half the nap**: *"nap half for
+    phone, everything else is the same. Ipad is same as desktop."* A phone is
+    600px and under, the shared layout's own phone block. Her *"or darker
+    nap"* is the same request: the nap is white fibres, and three steps above
+    pure black there is nothing darker to draw them in.
+  - **A bug the round found before it shipped**: the kept picture's key was
+    the site and the artwork version only. The ground colour is painted into
+    the picture, so this very change would have left every returning browser
+    with the old black under the new page. The key now carries the fur
+    strength, the nap and its strength, and the ground colour.
     §8 has it as a standing rule for anything that paints a lot.
 - **2026-10-08, #1322 — THE HEADER HAS NOTHING OVER THE DOOR'S ROW AND 15px
   UNDER IT, AT EVERY WIDTH.** Helen's issue: *"mobile: navbar has too much

@@ -19,12 +19,15 @@ too loud. The glasses stay the line work; the print is the fur they sit on.
 
 | what | value | where |
 |---|---|---|
-| the print | `assets/img/cocktails/leopard-fur.svg`, 2880 × 960px | drawn once into a picture by `assets/js/ground-print.js` (§7), which `_sass/cocktails/_leopard.scss` lays on `body` |
-| the ground's texture | `assets/img/cocktails/leopard-nap.svg`, 480 × 480px | under the print, same rule |
-| the page ground | `$color-paper: #060607` (was `#0e0e10`) | `_sass/cocktails/_palette.scss` |
-| header | `$color-chrome-ground: #111113`, flat, no print | `--chrome-ground`, read by `shared/_layout.scss` |
-| footer | a full-width band in the same `#111113`, flat, no print | `--footer-band`, read by `shared/_layout.scss` |
-| cards | untouched, `$color-surface: #17171a` | — |
+| the print | `assets/img/cocktails/leopard-fur.svg`, 2880 × 960px, **drawn at strength 1.5** | drawn once into a picture by `assets/js/ground-print.js` (§7), which `_sass/cocktails/_leopard.scss` lays on `body` |
+| the ground's texture | `assets/img/cocktails/leopard-nap.svg`, 480 × 480px, **at full strength, half on a phone** (600px and under) | under the print, same rule |
+| the page ground | `$color-paper: #030304` (was `#060607`, and `#0e0e10` before the leopard) | `_sass/cocktails/_palette.scss` |
+| header | `$color-chrome-ground: #060607`, flat, no print | `--chrome-ground`, read by `shared/_layout.scss` |
+| footer | a full-width band in the same `#060607`, flat, no print | `--footer-band`, read by `shared/_layout.scss` |
+| cards | `$color-surface: #0d0d0f` (was `#17171a`) | every surface on the site, not only cards |
+
+The three colours are always in that order, each lighter than the one before:
+page, band, card.
 
 **Neither SVG has a colour in it.** Both are white at very low alpha, so the
 print keeps the same distance from whatever is under it and the page's
@@ -41,7 +44,7 @@ committed files.
 
 The fur tile is 495 KB as written and about 155 KB gzipped, which is more than
 all eight font faces together. It is the single heaviest thing a cocktails
-page loads, once; §8 says where the weight is if that is ever wanted.
+page loads, once; §9 says where the weight is if that is ever wanted.
 
 ## 3. The generator — `scripts/leopard_splodge.py`
 
@@ -235,16 +238,50 @@ What follows from that, and should not be "fixed":
   page (about 100–170 ms after navigation on the local build, kept), for a
   second or so on the first visit, and for good with scripts off or a canvas
   that will not draw. None of those is an error.
-- **The nap is baked into the picture.** If it ever comes off on phones — she
-  has said it is next to go — that is a media query on `--ground-nap` and a
-  different key for the kept picture, not a second background layer.
+- **The nap is baked into the picture**, and a phone's picture has half of it
+  (§8). That is `--ground-nap-strength` in a media query, and the kept
+  picture's key carries it, the fur's strength and the ground colour.
 - **A browser with no IndexedDB** (private mode, blocked site data) draws on
   every page load instead, and pays for the drawing each time.
 - **Never bump `--ground-print-version` by hand.** It is the build script's
   hash. If it does not change when the artwork does, every browser that has
   visited goes on showing the old leopard.
 
-## 8. Traps
+## 8. Stronger fur, darker everything — 2026-10-08
+
+With the speed fixed, Helen looked at it on her phone: "Disaster! The leopard
+doesn't show up well on a phone. Screens are less good than computers, right,
+but it's a shame not to make more of the feature." She asked for a different,
+lighter drawing on phones. It did not need one. Both files are white at a few
+percent alpha, so drawing the same file twice is very nearly twice as light;
+`ground-print.js` takes a strength and draws that many passes (1.5 is one full
+and one at half). Three candidates pages, each the real build with the real
+script doing the drawing:
+
+- **Strength.** Six, from 1 to 4. "I love the 1.5 and even the 2 ... From
+  these, though, it's 1.5, and nap on, for all: mobile, ipad and desktop." So
+  no phone-only fur, in the end.
+- **Darkness.** "Can we still have the print visible, while darkening the
+  whole thing? So the base colour of everything ... what I'm aiming for is
+  'black on black', ish." A row each for the page, the bands and the cards,
+  and then, at her asking, the fur strengths again ("it's different with the
+  lower base") and a nap row. **"Fur 1.5, nap full, page darker, header/footer
+  darker still, cards darker still! But then nap half for phone, everything
+  else is the same. Ipad is same as desktop."** Pure black for the page was on
+  the row and she did not take it.
+
+What that settled, beyond the values in §2:
+
+- **The cards moved**, two days after "don't touch those". What she kept is
+  what that sentence was about: a card is still lighter than the page.
+- **A phone is 600px wide and under**, `shared/_layout.scss`'s own phone
+  block. The narrowest iPad is 744px. The only thing it changes is the nap.
+- **"A darker nap" is a fainter nap.** The nap is white fibres; with the
+  ground three steps from pure black there is nothing below it to draw.
+- **The darkness page could not move the washes** (colours Sass mixes over
+  the card colour at build time) and said so; the built site moves them.
+
+## 9. Traps
 
 - **Do not hand-edit an SVG.** Change the generator, run the build script,
   commit the two SVGs and the version partial together.

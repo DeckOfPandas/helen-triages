@@ -2900,12 +2900,16 @@ or serveware (`to_serve`), and must not restate a method step.
 ### 9.13 The cocktails visual language, and the index and recipe page built from it
 
 **"Ink, paper and glass"**, and **the paper is black** (#469): `$color-paper`
-`#060607`, `$color-ink` `#e8e6e2`, and a card is `#17171a` with a border at
+`#030304`, `$color-ink` `#e8e6e2`, and a card is `#0d0d0f` with a border at
 L* 18 that holds its shape. **The page carries a black-on-black leopard print
 and a card sits light on it** (#733, 2026-10-06; `LEOPARD.md`): the paper was
 `#0e0e10` until that day, and the header and footer are flat bands in
-`$color-chrome-ground` (`#111113`, between the page and a card) — the header
-was a card's colour, and the footer had no ground at all. #469's "a card is DARKER
+`$color-chrome-ground` (`#060607`, between the page and a card) — the header
+was a card's colour, and the footer had no ground at all. **All three dropped
+together on 2026-10-08** (page `#060607` → `#030304`, bands `#111113` →
+`#060607`, cards `#17171a` → `#0d0d0f`), Helen aiming for *"'black on black',
+ish"*; the order page-then-band-then-card is what must survive any further
+change. #469's "a card is DARKER
 than the page — it recedes rather than floats" is what the palette's comments
 still argue and is no longer the arrangement; Helen: *"I like the cards
 sitting light on the leopard."* The names keep their jobs, not their
