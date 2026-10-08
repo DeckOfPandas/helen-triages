@@ -165,7 +165,9 @@ moods:
     Pudding flavours: coffee, cacao, amaretto, banana, menthe, coconut,
     vanilla, cola, chocolate bitters. About what the drink TASTES of, not how
     much sugar is in it -- "has a sweetener" covers 68% of the book and means
-    nothing.
+    nothing. HAND-ASSIGNED, WITH ONE SLICE DERIVED SINCE 2026-10-08: two tiki
+    markers in a drink of 90 ml or more gets it by rule, which finds 16 of her
+    46 and adds to them only. The rest stay hers to type.
   pudding in a glass: >-
     Rich and thick rather than merely sweet: cream, a whole egg, coconut cream.
     A White Russian, a flip, an Alexander. DECLARED WITH ZERO MEMBERS ON
@@ -189,6 +191,12 @@ moods:
     And it made the threshold FIRMER, which is counterintuitive: on markers
     alone, 25 drinks sat one ingredient from flipping in; with both bars, one
     does. Few drinks sit at two edges at once.
+    THE RULE THAT RUNS TODAY IS SIMPLER THAN THE PARAGRAPHS ABOVE, which are
+    the 2026-08-17 definition and are kept for the reasoning. Since #1187: two
+    markers and four or more ingredients. Since 2026-10-08: OR one marker and
+    eight or more -- Helen, on Three Dots and a Dash and the Difford's Fog
+    Cutter: "absolutely tiki, so if we need to change the rules to rule them in
+    then so be it." HAND-ASSIGNED AS WELL, so the rule only ever adds.
   nightcap: >-
     The last one. HAND-ASSIGNED.
   brunch: >-
@@ -261,7 +269,9 @@ moods:
     are 5 ml, this is just a bar spoon, and doesn't count as needing to be
     measured" -- so a bar spoon of syrup neither joins the ratio nor becomes
     the smallest measure everything else is divided by. Exactly 5 ml, not
-    smaller: 2.5 and 7.5 are quarter- and half-jiggers. A drink whose only measured line is one pour of spirit therefore
+    smaller: 2.5 and 7.5 are quarter- and half-jiggers. AND WATER, since
+    2026-10-08, here and in every other rule -- Helen: "dilution water just
+    isn't something I care about." A drink whose only measured line is one pour of spirit therefore
     qualifies, and that is right rather than a loophole -- the Caipirinha is
     45 ml of cachaça, half a lime and 20 g of palm sugar, and you measure
     exactly one of those things.
@@ -851,6 +861,23 @@ mood_include:
       to give it honorary membership." That is a fact about who she pours it
       for, which is exactly the kind of thing no rule reads and an override
       exists to hold.
+  all-jacked-up:
+    moods: [strong brown drink]
+    why: >-
+      Helen, 2026-10-08: "All Jacked Up feel strong and brown -- is my feeling
+      backed up in the data?" Mostly. It is stirred, served on a block, has no
+      citrus and nothing lengthens it, and 60 of its 97.5 ml come from the
+      `aged` list -- sweet vermouth, calvados and fernet. What the rule
+      refuses is the LEAD: mezcal and vermouth tie at 30 ml, mezcal is not an
+      aged spirit, and vermouth is a modifier, so no aged BASE leads. The same
+      line north-sea-oil and better-and-better sit on.
+  three-dots-and-a-dash:
+    moods: [I want to faff]
+    why: >-
+      Helen, 2026-10-08: "Three Dots: yes yes, faff." Eight ingredients where
+      nine is the threshold, and one `blend` where two faff words are wanted
+      -- exactly the coordinates hurricane-classic had when she ruled that
+      one in, and a per-drink correction for the reasons given there.
   rosita:
     moods: [aperitivo, clear]
     why: >-
@@ -919,6 +946,16 @@ mood_exclude:
       `churn` left `mood_step_words.faff` and this line was no longer doing
       anything. A correction that has been overtaken by a rule is a correction
       that lies about why a drink is tagged, so it goes.
+  jungle-bird:
+    moods: [sugar craving]
+    why: >-
+      The one drink the 2026-10-08 `sugar craving` rule reaches that she did
+      not tag on her own pass: pineapple juice and blackstrap are two tiki
+      markers and it is over 90 ml, but the Campari is the point of it.
+      Helen, the same day, on rules that add: "Don't add things I'll need to
+      remove." So the rule is kept off the one drink where it is known to
+      disagree with her, rather than loosened or dropped for the sixteen
+      where it agrees.
   gunmetal-blue:
     moods: [warming]
     why: >-
@@ -1253,6 +1290,18 @@ moods_by_hand:
   # Two markers plus four ingredients, measured over all 140 drinks: it fires
   # 19 times, 17 of them hers. The deriver carries the marker distribution and
   # the six she tags with no marker at all.
+  #
+  # `sugar craving` JOINED IT ON 2026-10-08, the third mood with a rule that
+  # only adds. EVERY HAND MOOD WAS SEARCHED THAT DAY for any one- or
+  # two-feature rule, scored on drinks held out of the search and against the
+  # same search run on shuffled tags. `clear` and `signature` have real signal
+  # (.71 and .70 against .44 and .47 shuffled); `sugar craving` and `nightcap`
+  # are weak; `sunny terrace`, `aperitivo`, `festive`, `brunch`, `easy peasy`
+  # and `so wrong it's right` score AT OR BELOW the shuffled search, which is
+  # to say the data cannot see them at all. That is a statement about rules,
+  # not about the tags. `clear` got no rule anyway -- its best one has six
+  # false alarms, and Helen: "Don't add things I'll need to remove -- easier
+  # for me to notice the gaps." DECISIONS has the table.
   - tiki
   - aperitivo
   - nightcap

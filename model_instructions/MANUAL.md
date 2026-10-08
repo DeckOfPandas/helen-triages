@@ -1969,9 +1969,14 @@ cocktail, so a hand-edited mood cannot outlive the rule. Helen's own rulings
 override the derivation through `mood_include` / `mood_exclude`, each naming
 the single mood it is about. Of 21 declared moods ten are derived and **twelve
 are hers alone** (`moods_by_hand`) — `on fire` is both, hand-assigned on a
-cocktail whose fire is in the SERVE rather than the METHOD — and no rule produces
-the other eleven, so a newly ingested cocktail is missing half its browse axes
-until she is asked (§9.13). **Re-count rather than quoting those numbers**:
+cocktail whose fire is in the SERVE rather than the METHOD. `tiki` (#1187) and
+one slice of `sugar craving` (2026-10-08) are both as well: each has a rule
+that only ever ADDS beside whatever she typed. No rule produces the other nine,
+so a newly ingested cocktail is missing half its browse axes until she is asked
+(§9.13) — unless she named one in the ingest chat, which the ingest writes and
+the deriver keeps. **A `water` line is invisible to every rule** (Helen,
+2026-10-08: dilution "just isn't something I care about"); the deriver drops
+it before anything is counted. **Re-count rather than quoting those numbers**:
 `moods_by_hand` in `taxonomy.yml` and the `out.append` lines in the deriver
 are the two lists, and this sentence had been stale on both counts since
 `easy peasy` and `on fire` joined the first one.

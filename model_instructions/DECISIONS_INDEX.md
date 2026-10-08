@@ -213,6 +213,7 @@ argument and the rules each field is read by.
 - 2026-10-02 · §9.3 · #1273 #1217 · 's rename missed a seventh to top, in the suite itself, and it did not fail.
 - 2026-09-26 · §9.3 · "dashes" throughout, "dash" when it is one.
 - 2026-10-04 · §9.3 · #1213 · A cocktail DRAFT's top-level keys are in the order the page prints them.
+- 2026-10-08 · §9.3 · the moods after 73 Difford's drinks: water is invisible, two rules widen, and six hand moods are measured to be beyond any rule.
 - 2026-08-21 · §9.3.1 · #441 · generic as a list means OR and only OR.
 - 2026-08-22 · §9.3.1 · #322 #314 · ingredients.yml written (#322 the spec, #314 the rum half).
 - 2026-08-23 · §9.3.1 · #441 · character lives on the recipe, not a bottle table.

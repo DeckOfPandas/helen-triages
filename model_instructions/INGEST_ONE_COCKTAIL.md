@@ -164,7 +164,7 @@ one.
 | `title` | The drink's name. **If the source is a specific bar or book's version, say so in the title** — `"Sazerac (Death & Co)"`. See §6. |
 | `tagline` | **A bare `"QQ"`, and you draft nothing.** This is Helen's voice about a drink she has not made yet, on a page that carries her name. Her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content."* A batch of 73 arrived with a line drafted for every one, and on 2026-10-08 she ended that: *"Let's stop Claude drafting taglines. It turns out me doing them in batches works the best."* **The one exception is HER OWN line, if she gives you one in the chat for that drink**: write it exactly as she gave it, with no `QQ` — `"A Manhattan in a woolly jumper."` — because it is already hers, and add nothing after it. Never the source's line, and never yours. |
 | `glass` | **A LIST, not a scalar**, even for one glass. **Required — see the warning below.** Canonical spellings in §4. |
-| `mood` | **Always `mood: []`.** The key is required and the value is DERIVED in her repo by a script. Never write a mood yourself. |
+| `mood` | **`mood: []`, unless Helen names a mood for that drink in the chat.** The key is required. Most moods are DERIVED in her repo by a script and you never write one of those. The rest are hers alone, and one she gives you goes in exactly as she said it. Never one of your own. See below. |
 | `garnish` | **A LIST.** `[]` means nobody has filled it in; `["no garnish"]` means the drink genuinely takes none. Vocabulary in §4. |
 | `ingredients` | The FULL list, untriaged, **in build order**. §3. |
 | `ingredients[].amount` | The ONLY quantity field, and **every ingredient has one**. No US units, never a bare number. §3. |
@@ -200,7 +200,7 @@ one.
 > not know" list** — that one answer is what stands between the file and being
 > complete, and it is a ten-second question for her.
 
-**`mood: []`, always — and it is not a gap.** Moods are derived from the
+**`mood: []` — and it is not a gap.** Most moods are derived from the
 ingredients by rule and then STORED, so that Helen can override one. The rules
 live in her `taxonomy.yml` and a script applies them:
 
@@ -208,10 +208,22 @@ live in her `taxonomy.yml` and a script applies them:
 python3 scripts/derive_cocktail_moods.py --write
 ```
 
-That is one command in her repo and it fills the field in. **Writing a mood
-yourself is worse than leaving it empty**, because the next run silently
+That is one command in her repo and it fills the field in. **Writing a derived
+mood yourself is worse than leaving it empty**, because the next run silently
 reverts it — and a hand-typed mood that happens to match hides the fact that
 nobody derived it. The key must be present; `[]` is the right value.
+
+**THE ONE EXCEPTION IS A MOOD HELEN GIVES YOU, IN THE CHAT, FOR THAT DRINK.**
+Twelve moods describe an occasion or a judgement rather than the liquid, and
+only she assigns them: `clear`, `sugar craving`, `tiki`, `aperitivo`,
+`nightcap`, `brunch`, `sunny terrace`, `festive`, `signature`,
+`so wrong it's right`, `easy peasy`, `on fire`. If she says "Roman Punch is a
+sunny terrace drink", write `mood: ["sunny terrace"]`, spelled exactly as in
+that list. Her script keeps a mood from that list and adds the derived ones
+beside it. **Never offer one, never infer one from the recipe, and never write
+a mood that is not in that list** — the same rule as the tagline: hers if she
+gave it, otherwise empty. A batch of 73 carried six of these on five drinks
+(2026-10-07), and they were kept because she had asked for every one.
 
 ---
 
@@ -979,7 +991,7 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
   `QQ` is not in the ship vocabulary at all.
 - **Never write `meta.made_before: true`** — same reason, one step earlier. A
   transcription cannot know whether she has poured the drink.
-- **Never write a `mood:`** — derived or hers.
+- **Never write a `mood:` of your own** — not a derived one, and not one of hers unless she named it in the chat for that drink (§2).
 - **Never write a `character:`** — it hangs off a `generic` you are not writing.
 - **Never leave a US unit**, and never convert a non-volumetric one.
 - **Never write a bare number as an amount** without flagging it.
