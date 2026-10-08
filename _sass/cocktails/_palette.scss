@@ -90,7 +90,15 @@ $color-ink:          #e8e6e2;   // was #1b1b1f
 // measured "on the ground" or "against the page" was measured on #0e0e10; a
 // darker ground only widens each of them, so none is a floor that moved the
 // wrong way, and none has been re-measured.
-$color-paper:        #060607;   // was #0e0e10 until 2026-10-06, and #fbfbfa before the inversion
+//
+// AND DARKER AGAIN ON 2026-10-08: #060607 became #030304. Helen, once the fur
+// was drawn stronger: "can we still have the print visible, while darkening
+// the whole thing? So the base colour of everything ... what I'm aiming for is
+// 'black on black', ish." The page, the two bands and the cards all dropped
+// together, each chosen from its own row of a candidates page; the fur is
+// white at low alpha over whatever is here, so it lost nothing. She had pure
+// black on that row and did not take it.
+$color-paper:        #030304;   // was #060607 until 2026-10-08, #0e0e10 until 2026-10-06, and #fbfbfa before the inversion
 $color-grey-mid:     #97959a;   // 6.50:1 on the old ground -- de-emphasised UI text
 $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the old ground's 4.0
 
@@ -403,7 +411,15 @@ $color-border:     $color-grey-light;
 // so don't touch those." So the gap is wider than the 3.84 above, and the
 // header and footer, which had shared this value, left it for a darker one of
 // their own, below: "They seemed dark before, but now they really don't."
-$color-surface:    #17171a;
+//
+// THEN THE CARD DID MOVE, ON 2026-10-08: #17171a became #0d0d0f, "darker
+// still" from three, in the same round that dropped the page to #030304
+// ($color-paper above has her words). It is still LIGHTER than the page, so a
+// card still sits light on the leopard; everything is simply nearer black.
+// This is every surface on the site, not only cards -- buttons, the notes box,
+// and each `-wash`, which Sass mixes over this value and so follows it. The
+// candidates page could not move the washes; the built site does.
+$color-surface:    #0d0d0f;
 
 // THE HEADER AND FOOTER BANDS, on cocktails only -- #733, 2026-10-06. Not one
 // of the ten: shared/_layout.scss reads it through a custom property that
@@ -414,7 +430,11 @@ $color-surface:    #17171a;
 // she knew: "I prefer the flat. Let's lift to 'darker still' please." That
 // was #0c0c0d, and it was live for less than an hour: "I prefer #111113 for
 // header and footer", the option called "darker", a step lighter again.
-$color-chrome-ground: #111113;
+//
+// 2026-10-08: #060607, with the page and the cards (see $color-paper). The
+// order is unchanged -- page, then band, then card, each lighter than the
+// last -- and all three moved down together.
+$color-chrome-ground: #060607;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
 // STAYS WHITE, and it is the one value the inversion must not touch: this is
 // the wordmark's lettering sitting on BLACK TAPE, which was already

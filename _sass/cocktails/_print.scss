@@ -220,7 +220,7 @@
     .drink-card-ship-icon { color: $print-ship; }
     .drink-card-ship-word { text-decoration-color: $print-ship; }
 
-    // A note card. $color-surface (#17171a) is near-black and paints
+    // A note card. $color-surface (#0d0d0f) is near-black and paints
     // opaque -- only html/body go transparent (shared/_print.scss) -- so
     // dark ink on an unpainted note card would be invisible, not merely
     // grey. Ground goes to paper; the border and the left accent, both
