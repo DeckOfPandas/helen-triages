@@ -1,5 +1,5 @@
 ---
-title: "Pear, apricot and rosemary Bellini"
+title: "Pear, Apricot and Rosemary Bellini"
 tagline: "If you insist on champagne over soda water, at least call it brunch."
 glass:
   - "flute"
@@ -53,5 +53,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

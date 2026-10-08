@@ -1,5 +1,5 @@
 ---
-title: "Apple and ginger mulled wine"
+title: "Apple and Ginger Mulled Wine"
 tagline: "Remind Gemma's dad this is a cocktail, not a glass of wine."
 glass:
   - "mug"
@@ -47,5 +47,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

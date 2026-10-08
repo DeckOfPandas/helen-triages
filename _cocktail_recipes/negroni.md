@@ -1,6 +1,7 @@
 ---
 title: "Negroni"
 tagline: "Don't fuck with it. Wait, I fucked with the Campari. I was right though."
+snippet: "Don't mess with it. Wait, I messed with the Campari. I was right though."
 glass:
   - "old fashioned"
 garnish:
@@ -36,5 +37,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

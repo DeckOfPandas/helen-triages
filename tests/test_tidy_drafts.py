@@ -912,6 +912,7 @@ def test_notes_rule_is_idempotent_and_leaves_a_finished_file_alone(drinks):
 ORDER_BEFORE = '''---
 title: "Test Punch"
 tagline: "QQ"
+snippet: "A line for the search result"
 glass:
   - "punch bowl"
 garnish: []
@@ -953,6 +954,7 @@ Body text under the front matter, left exactly alone.
 ORDER_AFTER = '''---
 title: "Test Punch"
 tagline: "QQ"
+snippet: "A line for the search result"
 glass:
   - "punch bowl"
 garnish: []

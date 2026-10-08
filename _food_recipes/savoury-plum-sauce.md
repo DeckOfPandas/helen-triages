@@ -29,8 +29,6 @@ method:
 method_short:
   - ""
 notes:
-  - label: "Pairs with"
-    text: "Great with [slow-cooked duck legs confit](../slow-cooked-duck-legs-confit/)."
   - label: "Freezing"
     text: "Freezable before the butter goes in."
 meta:

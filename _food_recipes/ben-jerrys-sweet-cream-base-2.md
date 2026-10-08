@@ -25,8 +25,6 @@ method:
 method_short:
   - "Whisk and then whisk."
 notes:
-  - label: "This is not ice cream"
-    text: "This is a base recipe used to build ice creams, not a standalone dessert."
   - label: "Storage"
     text: "This doesn't store well in home freezers because it doesn't contain eggs."
   - label: "US half-and-half"
@@ -34,6 +32,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

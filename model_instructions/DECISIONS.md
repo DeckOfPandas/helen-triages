@@ -1146,6 +1146,41 @@ unless stated.
   disposes of the two the capitalisation question could never have covered —
   `gf tips:` and `gf tip on stock cubes:` — because with the rubric gone there
   is no varying prefix to have a house form for.
+- **2026-10-08, #1089** — **Cocktail titles are Title Case, and a qualifier in
+  brackets is not.** Helen: *"Title case for all titles. Qualifiers in brackets
+  don't get capital letters, unless they're a proper noun, e.g. 'Margarita
+  (classic)' and 'Fog Cutter (Bramble style)'"*, and then *"Put all cocktail
+  titles in title case please"*. Three published titles moved: Apple and Ginger
+  Mulled Wine; Pear, Apricot and Rosemary Bellini; Frozen Fruit Daiquiri — the
+  last was not on the review's list and turned up when all 78 were read. Small
+  words stay small ("and", "the"), as "Naked and Famous" and "Between the
+  Sheets" already had it. **Nothing enforces this yet**, and the drafts were
+  not swept.
+- **2026-10-08, #1089** — **`snippet` is a tagline for somewhere that is not
+  the page.** A drink's tagline is also its meta description and link preview,
+  and the Negroni's is fine on its page and not in a search result. Asked to
+  decide, Helen wrote a second line rather than soften the first, and left the
+  Planteray one alone (*"can stay"*). So `snippet:` is an OPTIONAL key, read
+  only by `_layouts/default.html`, on one drink; a page without it describes
+  itself with its tagline as before. It is not in the ingest documents: nobody
+  ingests a snippet, she writes one when a tagline needs it.
+- **2026-10-08, #1089 — the rest of the design review's copy sitting.** Her
+  rulings, each applied as written: the five-spice duck legs' tagline gains
+  "more" and loses its link to itself (*"tagline was supposed to be a joke"*);
+  the caramel yield note is relabelled "How much this actually makes" with her
+  sentence, and the ganache one loses its `serves_estimate` sentence; the plum
+  sauce's "Pairs with" note and the three Ben & Jerry's bases' "This is not
+  ice cream" note are deleted; the about page's sentence gets its verb; the
+  rum page's "Addendum: Rum Characters" is "A final thought: rum characters".
+  Four typos fixed. **Two things the issue described were not in the files**:
+  the Sazerac note no longer mentions the distillery at all, and the Cobra's
+  Fang note she said she had updated still read "Pool?" on `main`, so that
+  file was left alone rather than edited under her.
+  **EDITING A PUBLISHED RECIPE UNPUBLISHES IT, AND THE SUITE NOTICES.** Fourteen
+  recipes went to `proofread: false` with these edits, and the production
+  build then failed five tests: caramel is the gate test's control recipe,
+  and other pages link to the ones that vanished. So an agent's copy fix to a
+  published recipe cannot merge on its own; it waits for the §4.0 grant.
 
 ## §6 `main_ingredients`
 

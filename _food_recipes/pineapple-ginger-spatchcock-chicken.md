@@ -1,6 +1,6 @@
 ---
 title: "Pineapple and Ginger Spatchcock Chicken"
-tagline: "Pineapple and ginger instead of the normal pimento and Scoth bonnets in jerk, with Szechuan pepper because we all need to feel something."
+tagline: "Pineapple and ginger instead of the normal pimento and Scotch bonnets in jerk, with Szechuan pepper because we all need to feel something."
 source: "Adapted from delicious. magazine"
 source_type: website
 serves: "6"
@@ -57,6 +57,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

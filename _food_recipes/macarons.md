@@ -70,11 +70,11 @@ notes:
   - label: "Chocolate version"
     text: "The method above is primarily for the vanilla version — for chocolate, use those ingredients accordingly."
   - label: "egg white best practice" 
-    text: "As for all egg-white recipe, eggs more than a week old work best. The bowl must be perfectly clean and dry before starting. Wipe it out with lemon juice if in doubt."
+    text: "As for all egg-white recipes, eggs more than a week old work best. The bowl must be perfectly clean and dry before starting. Wipe it out with lemon juice if in doubt."
 
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 
 ---

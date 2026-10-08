@@ -194,14 +194,20 @@ def _the_shared_data_is_as_parsed():
 # garnish, then `meta.ship`, and the mood chips come under it. The four other
 # `meta` keys print nothing and travel with the block.
 TOP_LEVEL_KEYS_IN_ORDER = [
-    "title", "tagline", "glass", "garnish", "meta", "mood", "ingredients",
-    "serve", "serves", "method", "to_serve", "notes", "source", "source_url",
+    "title", "tagline", "snippet", "glass", "garnish", "meta", "mood",
+    "ingredients", "serve", "serves", "method", "to_serve", "notes", "source",
+    "source_url",
 ]
 
 # A KEY THE LAYOUT NEVER NAMES has no place the page can give it, so its place
 # is declared here, with the reason. The derivation test refuses an entry the
 # layout HAS started to name, so this cannot outlive its excuse.
 KEYS_THE_LAYOUT_NEVER_NAMES = {
+    "snippet":
+        "read by `_layouts/default.html` for the meta description and the "
+        "link preview, never by the drink's own layout (#1089). OPTIONAL, and "
+        "on one drink: it is the tagline rewritten for a search result. "
+        "Placed directly after `tagline`, the line it stands in for.",
     "serves":
         "read by `_plugins/cocktail_units.rb`, which hands the page "
         "`page.units.serves`; the layout never says `page.serves`. Placed "
@@ -282,7 +288,7 @@ SERVE_KEYS = {"ice", "rim", "fill"}
 # is on every file today, including `source`/`source_url` where the value is the
 # empty string: "nobody has recorded a source" and "the key is missing" must not
 # look alike.
-REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves"}
+REQUIRED_TOP_LEVEL = TOP_LEVEL_KEYS - {"to_serve", "serve", "serves", "snippet"}
 
 # `item` IS GONE, AND #544'S MIGRATION IS OVER -- Helen, 2026-09-21: "'item'
 # needs to go. Kill it with fire. Data can be read straight into
@@ -7926,7 +7932,8 @@ def _prose_fields(drink):
 # nor false and which holds the drink back for ever (test_the_gate_flags_are_
 # real_booleans above). `meta.ship` is the one quoted scalar under `meta:`, and
 # test_meta_ship_is_a_rung_or_who_knows is what checks it.
-DRINK_SCALAR_FIELDS = ["title", "tagline", "source", "source_url", "to_serve"]
+DRINK_SCALAR_FIELDS = ["title", "tagline", "snippet", "source", "source_url",
+                       "to_serve"]
 
 
 def test_the_quoted_scalar_list_names_real_drink_fields():

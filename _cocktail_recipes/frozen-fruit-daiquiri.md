@@ -1,5 +1,5 @@
 ---
-title: "Frozen fruit Daiquiri"
+title: "Frozen Fruit Daiquiri"
 tagline: "There is no bad fruit for this. I haven't tested durian."
 glass:
   - "hurricane"
@@ -36,5 +36,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
