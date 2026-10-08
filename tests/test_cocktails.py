@@ -2234,7 +2234,19 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first: against `c654809` the test named exactly
 # those seven files, each "last touched by 3df50ce4", and nothing else.
 # Covers 3df50ce4 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "3df50ce4"   # #1089's seven drinks, read by Helen on the branch
+#
+# MOVED TO A MERGE, 2026-10-08, TO HOLD GRANTS MADE IN PARALLEL. The Christmas
+# Daiquiri move above (`f5dd435`) was made on `worktree-opus-misc-ingest` while
+# #1321's and #1341's were made on their own branches and merged first.
+# Neither `f5dd435` nor `3df50ce4` is an ancestor of the other, so neither
+# value covers both. `91431cf6` is the merge of `main` into that branch and
+# has all of them behind it.
+#
+# NO NEW GRANT IS IN THIS MOVE, only those already quoted above. Proved in the
+# merge itself, with `3df50ce4` still in place: the test named exactly one
+# file, `_cocktail_recipes/christmas-daiquiri.md`, "last touched by f5dd4350",
+# and nothing else.
+COCKTAIL_BASELINE_COMMIT = "91431cf6"   # the merge holding main's grants and the Christmas Daiquiri's
 
 
 def _newest_commit_per_published_drink():

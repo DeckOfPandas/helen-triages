@@ -704,7 +704,18 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # those eight files, each "last touched by 3df50ce4", and nothing else.
 # Covers 3df50ce4 and nothing after. Savoury plum sauce is NOT among them: it
 # was `proofread: false` on `main` before the branch touched it and still is.
-BASELINE_COMMIT = "3df50ce4"   # #1089's eight recipes, read by Helen on the branch
+#
+# MOVED TO A MERGE, 2026-10-08, TO HOLD TWO GRANTS MADE IN PARALLEL. The
+# demerara move above (`1747b85b`) was made on `worktree-opus-misc-ingest`
+# while #1341's (`3df50ce4`) was made on its own branch and merged first.
+# Neither commit is an ancestor of the other, so neither value covers both.
+# `91431cf6` is the merge of `main` into that branch and has both behind it.
+#
+# NO NEW GRANT IS IN THIS MOVE, only the two already quoted above. Proved in
+# the merge itself, with `3df50ce4` still in place: this test named exactly the
+# five demerara recipes, each "last touched by 1747b85b", and nothing else. So
+# the merge covers her eight, her five, and no page besides.
+BASELINE_COMMIT = "91431cf6"   # the merge holding #1341's eight and demerara's five
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
