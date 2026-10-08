@@ -671,6 +671,24 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # `_food_recipes/delias-classic-pancakes.md (last touched by d1cde707)` and
 # nothing else. Covers d1cde707 and nothing after.
 #
+# MOVED 2026-10-07 FOR ONE LETTER ON FIVE RECIPES, WITHOUT THE FLAG FLIPPING.
+# `1747b85b` lowercases the d of `Demerara sugar` in dark-chocolate-souffles,
+# old-fashioned-cherry-cake, peanut-butter-cookies, grandmas-spice-cake and
+# gluten-free-crumble-topping -- eleven changes, each that letter and nothing
+# else. Her rule the same day: lowercase when the word has become the thing
+# (maraschino cherry, parmesan, demerara sugar), a capital when it still names
+# the place (`Demerara rum`, Dijon mustard).
+#
+# HER GRANT, told the change needed one to stay live: "Lower case d for sugar.
+# Please fix live...carefully!" The Delia shape above: no flip, because the
+# change is one she dictated and can see whole.
+#
+# NOTHING ELSE IS SILENCED BY IT: run against `d1cde707` this test named
+# exactly those five files, each "last touched by 1747b85b", and nothing else.
+# Covers 1747b85b and nothing after. (That move was made on the branch
+# `worktree-opus-misc-ingest`, in parallel with the one below, which reached
+# `main` first; the two are reconciled at the foot of this block.)
+#
 # MOVED AGAIN, 2026-10-08 -- #1089's COPY SITTING, THE THREE-COMMIT SHAPE. It
 # was `d1cde707`, the grant above, which is history now. `3df50ce4` sets
 # `proofread: true` on eight recipes and changes nothing else: caramel,
@@ -686,7 +704,18 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # those eight files, each "last touched by 3df50ce4", and nothing else.
 # Covers 3df50ce4 and nothing after. Savoury plum sauce is NOT among them: it
 # was `proofread: false` on `main` before the branch touched it and still is.
-BASELINE_COMMIT = "3df50ce4"   # #1089's eight recipes, read by Helen on the branch
+#
+# MOVED TO A MERGE, 2026-10-08, TO HOLD TWO GRANTS MADE IN PARALLEL. The
+# demerara move above (`1747b85b`) was made on `worktree-opus-misc-ingest`
+# while #1341's (`3df50ce4`) was made on its own branch and merged first.
+# Neither commit is an ancestor of the other, so neither value covers both.
+# `91431cf6` is the merge of `main` into that branch and has both behind it.
+#
+# NO NEW GRANT IS IN THIS MOVE, only the two already quoted above. Proved in
+# the merge itself, with `3df50ce4` still in place: this test named exactly the
+# five demerara recipes, each "last touched by 1747b85b", and nothing else. So
+# the merge covers her eight, her five, and no page besides.
+BASELINE_COMMIT = "91431cf6"   # the merge holding #1341's eight and demerara's five
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato

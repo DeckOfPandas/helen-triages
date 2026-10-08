@@ -433,35 +433,37 @@ function reads(mode, n) {
 }
 
 // "4–6 waffles, depending on your waffle iron" -- Henry's Sunday Waffles.
-const WAFFLES = { kind: 'count', base: 5, stem: 'waffles', rest: '',
+// BASE 4, THE LOWER NUMBER, SINCE 2026-10-07 (Helen: "lower number please, new
+// ruling"); it was 5, the midpoint, for the three days before.
+const WAFFLES = { kind: 'count', base: 4, stem: 'waffles', rest: '',
   invariable: false, singular: false, times: false, plus: false };
 
-test('#1286: the waffles step in WHOLE RECIPES -- 5 waffles, 10 waffles, 15', () => {
+test('#1286: the waffles step in WHOLE RECIPES -- 4 waffles, 8 waffles, 12', () => {
   // Helen: "the buttons should still multiply the recipe in integers, just
   // showing number of waffles. So 1x is 5 waffles, 2x is 10 waffles.
-  // Otherwise we'll need to start showing eggs in units of 1/27".
+  // Otherwise we'll need to start showing eggs in units of 1/27". (Her fives
+  // are the midpoint's; the stepping is the ruling, and it is unchanged.)
   const mode = yieldMode(WAFFLES);
-  assert.strictEqual(mode.base, 5);
-  assert.strictEqual(reads(mode, mode.base), '5 waffles');
-  assert.strictEqual(reads(mode, press(mode, 5, 1)), '10 waffles');
-  assert.strictEqual(reads(mode, press(mode, 5, 1, 2)), '15 waffles');
+  assert.strictEqual(mode.base, 4);
+  assert.strictEqual(reads(mode, mode.base), '4 waffles');
+  assert.strictEqual(reads(mode, press(mode, 4, 1)), '8 waffles');
+  assert.strictEqual(reads(mode, press(mode, 4, 1, 2)), '12 waffles');
   // The ingredients scale by a whole number, always.
-  assert.strictEqual(press(mode, 5, 1) / mode.base, 2);
-  assert.strictEqual(press(mode, 5, 1, 2) / mode.base, 3);
-  assert.strictEqual(reads(mode, press(mode, 10, -1)), '5 waffles');
+  assert.strictEqual(press(mode, 4, 1) / mode.base, 2);
+  assert.strictEqual(press(mode, 4, 1, 2) / mode.base, 3);
+  assert.strictEqual(reads(mode, press(mode, 8, -1)), '4 waffles');
 });
 
 test('#1286: a typed figure goes to the nearest whole recipe, and never to a part of one', () => {
   // The box shows a derived figure, so what is typed is a request, not a
-  // value: 8 waffles is nearer two recipes than one. Helen: "not having half
-  // recipes in between integers" -- 7 or 8 waffles is never x1½.
+  // value: 7 waffles is nearer two recipes than one. Helen: "not having half
+  // recipes in between integers" -- 5 or 7 waffles is never x1½.
   const mode = yieldMode(WAFFLES);
-  assert.strictEqual(mode.clamp(8), 10);
-  assert.strictEqual(mode.clamp(7), 5);
-  assert.strictEqual(mode.clamp(7.5), 10);
-  assert.strictEqual(mode.clamp(12), 10);
-  assert.strictEqual(mode.clamp(13), 15);
-  [6, 7, 8, 9, 11, 12, 13, 14, 23].forEach((typed) => {
+  assert.strictEqual(mode.clamp(7), 8);
+  assert.strictEqual(mode.clamp(5), 4);
+  assert.strictEqual(mode.clamp(9), 8);
+  assert.strictEqual(mode.clamp(11), 12);
+  [5, 6, 7, 9, 10, 11, 13, 14, 23].forEach((typed) => {
     const multiple = mode.clamp(typed) / mode.base;
     assert.strictEqual(multiple, Math.round(multiple), `typing ${typed} gave x${multiple}`);
   });
@@ -573,12 +575,18 @@ test('#1286: guessed portions on a `makes:` recipe step in whole recipes -- 4, 8
 // BUILD decides which recipes get it (tests/test_food_yield.py); the second
 // argument here is that verdict.
 
+// A COUNT OF FIVE, which is what the waffles were while a range read as its
+// midpoint. They read 4 since 2026-10-07; these three tests are about an ODD
+// count -- the one case that halves to a range of one -- so they keep the five
+// and stop borrowing the real recipe's line for it.
+const FIVE_WAFFLES = { ...WAFFLES, base: 5 };
+
 test('#1286: with the half step, a count of five goes ½, 1, 2, 3 -- "2–3", 5, 10, 15', () => {
   // THE REAL WAFFLES ARE NOT OFFERED THIS -- Helen: "Please take the half step
   // off the waffles. 2-3 waffles isn't enough!!!!" (the cup rule refuses
   // them). The spec is kept because an odd count is the case that shows the
   // range of one; the verdict passed in is what a recipe that halves gets.
-  const mode = yieldMode(WAFFLES, true);
+  const mode = yieldMode(FIVE_WAFFLES, true);
   const half = press(mode, 5, -1);
   assert.strictEqual(half / mode.base, 0.5);
   assert.strictEqual(reads(mode, half), '2–3 waffles');
@@ -590,7 +598,7 @@ test('#1286: with the half step, a count of five goes ½, 1, 2, 3 -- "2–3", 5,
 });
 
 test('#1286: there is no half recipe BETWEEN whole ones, stepped or typed', () => {
-  const mode = yieldMode(WAFFLES, true);
+  const mode = yieldMode(FIVE_WAFFLES, true);
   const seen = new Set();
   let n = press(mode, 5, -1, 3);
   for (let i = 0; i < 6; i += 1) { seen.add(n / mode.base); n = press(mode, n, 1); }
@@ -608,13 +616,13 @@ test('#1286: there is no half recipe BETWEEN whole ones, stepped or typed', () =
 });
 
 test('#1286: WITHOUT the half step, one recipe is the floor and minus does nothing', () => {
-  const mode = yieldMode(WAFFLES, false);
+  const mode = yieldMode(FIVE_WAFFLES, false);
   assert.strictEqual(press(mode, 5, -1), 5);
   assert.strictEqual(press(mode, 5, -1, 5), 5);
   assert.strictEqual(mode.clamp(1), 5);
   assert.strictEqual(mode.clamp(0.1), 5);
   // ...and the same for a caller that passes no verdict at all.
-  assert.strictEqual(press(yieldMode(WAFFLES), 5, -1), 5);
+  assert.strictEqual(press(yieldMode(FIVE_WAFFLES), 5, -1), 5);
   const cream = yieldMode({ kind: 'measure', base: 950, unit: 'ml', prefix: '' });
   assert.strictEqual(reads(cream, press(cream, 950, -1)), '950 ml');
   assert.strictEqual(cream.clamp(100), 950);

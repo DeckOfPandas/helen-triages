@@ -208,6 +208,9 @@ to_serve:
   serveware:
     - "straw"
     - "two straws"
+    # NEW 2026-10-07, for Dead Parrot Colada, whose Difford's source says
+    # "Serve with straws" and gives no count. Helen: "Add straws."
+    - "straws"
     - "stirrer"
     - "ladle and punch glasses"
   decorations:

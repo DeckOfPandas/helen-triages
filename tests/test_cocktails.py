@@ -2176,6 +2176,22 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # crème de cacao` earlier on the same branch. It is an ancestor of this
 # baseline and says `proofread: false`; it stays that way until she reads it.
 #
+# MOVED 2026-10-07 FOR THE CHRISTMAS DAIQUIRI, ON HELEN'S EXPLICIT GRANT.
+# `f5dd435` changes one line: `garnish` from `no garnish` to `star anise
+# (floated)`, which is what its Difford's source says and what she noticed
+# while ruling on the Scandinavian Daiquiri's garnish from the same page.
+#
+# HER GRANT, told the edit would otherwise take the page off the live site:
+# "Add the floating star anise, keep it live, explicit grant." The 742aa73
+# shape: a change she can see whole in the sentence that asked for it.
+#
+# Proved with the old value first, as every move before it: the test named
+# exactly one file, `_cocktail_recipes/christmas-daiquiri.md`, "last touched by
+# f5dd4350", and nothing else. Covers f5dd435 and nothing after. (That move was
+# made on the branch `worktree-opus-misc-ingest`, in parallel with the three
+# below, which reached `main` first; they are reconciled at the foot of this
+# block.)
+#
 # MOVED 2026-10-07 FOR THIRTY DRINKS, WHICH HELEN PROOFREAD ON THE BRANCH
 # (#1321). The branch wrote her own new taglines into thirty published drinks
 # (and four shorter titles), from the worksheet she and Claude worked through
@@ -2218,7 +2234,19 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # Proved with the old value first: against `c654809` the test named exactly
 # those seven files, each "last touched by 3df50ce4", and nothing else.
 # Covers 3df50ce4 and nothing after.
-COCKTAIL_BASELINE_COMMIT = "3df50ce4"   # #1089's seven drinks, read by Helen on the branch
+#
+# MOVED TO A MERGE, 2026-10-08, TO HOLD GRANTS MADE IN PARALLEL. The Christmas
+# Daiquiri move above (`f5dd435`) was made on `worktree-opus-misc-ingest` while
+# #1321's and #1341's were made on their own branches and merged first.
+# Neither `f5dd435` nor `3df50ce4` is an ancestor of the other, so neither
+# value covers both. `91431cf6` is the merge of `main` into that branch and
+# has all of them behind it.
+#
+# NO NEW GRANT IS IN THIS MOVE, only those already quoted above. Proved in the
+# merge itself, with `3df50ce4` still in place: the test named exactly one
+# file, `_cocktail_recipes/christmas-daiquiri.md`, "last touched by f5dd4350",
+# and nothing else.
+COCKTAIL_BASELINE_COMMIT = "91431cf6"   # the merge holding main's grants and the Christmas Daiquiri's
 
 
 def _newest_commit_per_published_drink():
@@ -2970,7 +2998,10 @@ def test_a_garnish_is_not_an_ingredient_or_a_rim():
     `lime wedge on rim` PASSES AND MUST. garnish.yml rules that a placement
     carries information -- "lime wedge on rim says where to put it" -- so the
     test looks for a rim being MADE ("half-rim of sugar"), not for one being
-    used as an address.
+    used as an address. `over the rim` is the same address in other words:
+    Golden Bird's `orange peel over the rim (cut to look like a beak)` is
+    Helen's own wording, 2026-10-07, written to finish the sentence "Garnish
+    with ...".
 
     TWO LIVE VALUES STILL FAIL THIS SHAPE AND ARE HELEN'S CALL, not a machine's:
     german-vacation's "3 dashes red creole-style bitters" and mastiha-mojito's
@@ -2990,7 +3021,8 @@ def test_a_garnish_is_not_an_ingredient_or_a_rim():
                 continue
             if quantity.search(g):
                 bad.append(f"{slug}: {g!r} -- a quantity, so it is a pour")
-            elif rimming.search(g) and not re.search(r"\bon rim\b", g, re.I):
+            elif rimming.search(g) and not re.search(
+                    r"\b(on|over) (the )?rim\b", g, re.I):
                 bad.append(f"{slug}: {g!r} -- a rim, so it is `serve.rim`")
     assert not bad, (
         "Not a garnish:\n  " + "\n  ".join(sorted(bad))

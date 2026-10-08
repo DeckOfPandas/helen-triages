@@ -367,6 +367,16 @@ bottles:
     generic: "rhum agricole vieux"
     aliases: ["JM Rhum Agricole ambre"]
     origin: "Martinique"
+  # THE EIGHT-YEAR, NAMED 2026-10-07 for Port au Prince (Smuggler's Cove), which
+  # sits beside the `port-au-prince` draft that pours the 3 Star below. Asked
+  # whether it types the same way: "Yes, and bottle as suggestion." Keyed to
+  # match its sibling; the label's full name, which is how Difford's prints
+  # it, is an alias.
+  "Barbancourt 5 Star":
+    generic: "rhum agricole vieux"
+    aliases: ["Barbancourt Five Star Reserve Speciale 8yo Rum",
+              "Barbancourt Five Star Réserve Spéciale", "Barbancourt 8 year old"]
+    origin: "Haiti"
   "Barbancourt 3 Star":
     generic: "rhum agricole vieux"
     aliases: ["Barbancourt Three Star rum", "Barbancourt 3-star rum"]
@@ -596,6 +606,13 @@ bottles:
   "Ciroc Pineapple Flavoured Vodka":
     generic: "pineapple vodka"
     aliases: ["Ciroc Pineapple", "Cîroc Pineapple", "Ciroc pineapple vodka"]
+  # NAMED BY HELEN, 2026-10-07, with the generic. `lemon vodka` was coined that
+  # day for the Ketel One Citroen that Difford's pours in Lemon Drop Martini and
+  # Zakuski Cocktail, and stood on placeholder figures for an hour: "Lemon
+  # vodka: 40% abv, default is Absolut Citron at £25 for 70 cl."
+  "Absolut Citron":
+    generic: "lemon vodka"
+    aliases: ["Absolut Citron Vodka"]
 
   # --- whisky ---------------------------------------------------------------
   # Brown Derby's bourbon, from its own `item`. The 12 is the age statement and
@@ -845,6 +862,13 @@ bottles:
   # The Corpse Reviver #2's quinquina, 2026-09-04, first publication batch.
   # Kina Lillet is the bottle the 1930 recipe named and no longer exists;
   # Lillet Blanc is what Helen pours in its place.
+  #
+  # NAMED BY HELEN, 2026-10-07, for Picotin and North Sea Oil: "I think Cocchi
+  # Americano is an americano ... suggest Cocchi Americano." The `americano`
+  # generic's first bottle. Difford's writes it "Americano bianco".
+  "Cocchi Americano":
+    generic: "americano"
+    aliases: ["Cocchi Americano Bianco", "Americano bianco"]
   "Lillet Blanc":
     generic: "quinquina"
     aliases: ["Lillet", "Lillet blanc"]

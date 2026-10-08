@@ -392,6 +392,11 @@ canonical_glasses:
 serving:
   brandy glass: "a brandy glass"   # kept, Helen 2026-09-25 (#1186): no drink uses it yet
   collins: "a collins glass"
+  # NEW 2026-10-07, for Electro Batida: the FIRST drink to use the coconut
+  # Helen drew on 2026-08-31 (#528, "we might not use it, but why not try").
+  # The icon and the canonical name were declared then; only this phrase was
+  # missing, exactly as with `mule mug` below.
+  coconut shell: "a coconut shell"
   coupe: "a coupe"
   double old fashioned: "a double old fashioned glass"
   flute: "a flute"

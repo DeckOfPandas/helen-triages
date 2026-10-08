@@ -34,6 +34,22 @@ files, by design (MANUAL header, "companion documents").
    `INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md`. Nothing else.
 3. **Project instructions: paste §2 below**, exactly as written.
 
+**OR SKIP THE PROJECT AND GIVE A CHAT THE THREE URLS.** This is what Helen
+actually did on 2026-10-07, for 91 recipes, because she could not remember how
+the Project was set up — and it worked. The repository is public, so any
+claude.ai chat that can fetch a page can read the documents straight from it:
+
+    https://github.com/DeckOfPandas/helen-triages/blob/main/model_instructions/CLAUDE_WEB_INGEST.md
+    https://github.com/DeckOfPandas/helen-triages/blob/main/model_instructions/INGEST_ONE_RECIPE.md
+    https://github.com/DeckOfPandas/helen-triages/blob/main/model_instructions/INGEST_ONE_COCKTAIL.md
+
+Say "follow §2 of the first, and the other two are the contract", then send the
+recipes. **It always reads what is on `main`, so there is nothing to re-upload**
+— which is the one thing the Project cannot do. The cost is that a long chat
+drops the documents from its memory and has to fetch them again, and that it
+cannot read the two PRIVATE drafts repos, so it still cannot check for
+duplicates.
+
 ### Refreshing — and the line that makes it a mechanism
 
 The two files carry generated vocabulary blocks (`<!-- vocab:… -->`) and
@@ -63,7 +79,15 @@ a deploy.
    several recipes in one message is fine, and food and cocktails may be mixed.
 2. **Get back one envelope per recipe**, each in a single copyable block, with
    the issue title above it and a one-line index of the whole dump first.
-3. **Two ways home**, and both exist already:
+3. **Three ways home**, and all three exist:
+   - **In bulk, at a desk:** ask the chat for the envelopes AS FILES — one
+     `.md` per recipe, each file being the whole envelope, zipped. Unzip them
+     into `tmp/inbox/` in a Claude Code session and say so. That session runs
+     `scripts/ingest_inbox.py --from-file` over each, which is the same parser
+     the issue route uses, and no issue is raised. This is how the 91 of
+     2026-10-07 came in, and it is the route for a big batch: **never ask a
+     Claude Code session to file dozens of issues for you** — twenty in an hour
+     got the agent account flagged as spam once (CLAUDE.md).
    - **From a phone:** paste each envelope into a new issue on the matching
      private repo, title as given, label `ingest`. Later, at a desk,
      `/ingest-inbox` writes the files, derives the moods, runs the suite and
@@ -85,12 +109,19 @@ a deploy.
   §3a prints all 181 declared generics, so an EXACT match is a lookup that
   session can do; a bottle, a brand or a near-miss is still a judgement it
   cannot. **Every `suggestion` will be `[]`** — it does not have the bottle
-  dictionary — with the bottle the source names in that pour's `note:`. Every
-  `mood: []`, every `ship: "who knows"`: moods are derived by a script it does
-  not have, and a rating means she drank it.
+  dictionary — with the bottle the source names in that pour's `note:` as
+  "Originally X." Every `mood: []`, every `ship: "who knows"`: moods are
+  derived by a script it does not have, and a rating means she drank it.
+- **A cocktail's untyped pours carry the source's own words exactly**, and
+  `scripts/resolve_pours.py` then types the ones Helen has ruled on before
+  (`_data/cocktails/source_wordings.yml`): 60 of 79 on a replay of the
+  2026-10-07 batch.
 - **Every food method step arrives as a pair** (`QQ original` verbatim, then
-  `QQ Claude`), **every tagline prefixed `QQ `** whether or not the source gave
-  it words, every time and temperature only if printed.
+  `QQ Claude`), and a source step that held several actions arrives as several
+  pairs. **A food tagline is the same pair on one line** where the source had
+  an intro, and a bare `QQ` where it had none; **a cocktail's tagline is a
+  bare `QQ`**, since 2026-10-08. Butter the source did not specify is `QQ
+  butter`. Every time and temperature only if printed.
 - **It will not deduplicate against your collection.** It cannot see it. The
   local consumer compares a fingerprint of the amounts against every existing
   draft, which is how a second Sazerac is told apart from a duplicate.
@@ -161,16 +192,36 @@ a silence in the source is written as QQ, never filled from general knowledge.
 A wrong "whole milk" or a wrong glass looks exactly as confident as a right
 one, and Helen would far rather answer a question than find an invention. On a
 cocktail, a generic is typed only on an EXACT match in the printed vocabulary and
-is otherwise "QQ" plus the source's own words; every suggestion is []; mood is
-[], ship is "who knows", made_before is false — always, by her standing ruling.
-Every tagline begins "QQ ", on either site: it is her voice on a published page
-and it is never the ingest's.
+is otherwise "QQ" plus the source's own words, exactly as printed; every
+suggestion is [], with the source's bottle in that pour's note as "Originally
+X."; mood is [], ship is "who knows", made_before is false — always, by her
+standing ruling, and whatever she says in the chat about any of them. A tagline
+is her voice on a published page and it is never the ingest's: on a cocktail it
+is a bare "QQ"; on a dish it is "QQ original <the source's intro> QQ Claude
+<your plain rewrite of it>" where the source has an intro, and a bare "QQ"
+where it has none. Never draft a line of your own for either.
 
 IF HELEN ASKS FOR A FILE INSTEAD OF AN ENVELOPE, the yaml block inside the
 envelope is the file: give exactly that content under the filename the file's
 rules produce, and nothing else. The envelope is the default because it
 carries the fingerprint and the hand-back list, and it pastes into an issue
 from a phone.
+
+IF HELEN ASKS FOR THE WHOLE BATCH AS FILES, write one file per recipe, named
+<slug>.md, each holding that recipe's COMPLETE ENVELOPE (marker, yaml block,
+"What I could not know", fingerprint) and nothing else, and offer them as one
+download. She unzips them into her repository's tmp/inbox/ and a session there
+parses them. Do not write her a prompt asking that session to file GitHub
+issues: it does not, and a batch of issues from an automated account is the
+one thing her repository forbids.
+
+A RULING HELEN MAKES IN THE CHAT IS FOR THAT RECIPE, NOT FOR THE CONTRACT. If
+she tells you to do something the files forbid — put the source's bottles in
+suggestion, draft a tagline, leave a required key out — do what the FILE says,
+tell her in the index that the file says otherwise, and put her instruction in
+that recipe's hand-back list so the session with her repository sees it. Her
+repository is where a rule changes; a chat cannot change one, and a batch of 73
+arrived on 2026-10-07 with four such rulings baked into every file.
 
 THE VERSION MARKER on the first line of every envelope is whatever §0 of the
 project file says. If the two files ever disagree about it, use each file's

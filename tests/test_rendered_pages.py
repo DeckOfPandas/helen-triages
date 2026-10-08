@@ -1236,8 +1236,9 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
     """#1286. Helen: "Never tell me how many cookies are in a portion!!!"
 
     Henry's Sunday Waffles says "Makes 4–6 waffles" at the top and said
-    "~2 portions" under the ingredients. The box now starts at the midpoint,
-    5, and the word after it is the thing made. tests/test_food_yield.py
+    "~2 portions" under the ingredients. The box now starts at 4, the lower
+    number of the range (the midpoint, 5, until 2026-10-07: "lower number
+    please, new ruling"), and the word after it is the thing made. tests/test_food_yield.py
     checks the reading of every `makes:` line without a build; this checks
     that the reading reaches the page, on one recipe of each kind.
 
@@ -1247,8 +1248,8 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
     """
     waffles = _scale_control(prod_site, "henrys-sunday-waffles")
     assert waffles is not None, "the waffles page has no scaler control"
-    assert 'value="5"' in waffles and "data-made=" in waffles, (
-        "the waffles' box should start at 5, the midpoint of 4–6, and carry "
+    assert 'value="4"' in waffles and "data-made=" in waffles, (
+        "the waffles' box should start at 4, the lower number of 4–6, and carry "
         f"the build's reading in data-made:\n{waffles}"
     )
     assert re.search(r'<span class="recipe-scale-word">\s*waffles\s*</span>', waffles), (

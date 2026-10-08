@@ -7,7 +7,7 @@ makes: "one 7-inch round cake"
 serves_estimate: 8
 prep_time: "10 mins"
 cook_time: "35 mins"
-main_ingredients: ["salted butter", "Demerara sugar", "golden syrup", "self-raising flour", "ground ginger", "mixed spice powder"]
+main_ingredients: ["salted butter", "demerara sugar", "golden syrup", "self-raising flour", "ground ginger", "mixed spice powder"]
 star_ingredient:
 tags: ["bakes"]
 ingredient_groups:
@@ -15,7 +15,7 @@ ingredient_groups:
     - amount: "4 oz"
       item: salted butter
     - amount: "4 oz"
-      item: Demerara sugar
+      item: demerara sugar
     - amount: "1 large"
       item: egg
     - amount: "1 tbsp"

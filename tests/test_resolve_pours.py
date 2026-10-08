@@ -113,6 +113,98 @@ def test_a_generic_helen_reserved_never_resolves(tables):
 
 
 # =============================================================================
+# TIER 2, THE THIRD DICTIONARY -- a source's wording Helen has ruled on
+# =============================================================================
+# `_data/cocktails/source_wordings.yml`, 2026-10-07. Seventy-three Difford's
+# drinks arrived with 79 untyped pours and the two dictionaries above settled
+# none of them. Helen answered them and agreed to keep the answers.
+
+@pytest.mark.parametrize("words,expected", [
+    # As Difford's prints them, and as an ingest trims them.
+    ("Light white rum (charcoal-filtered 1-4 years old)", "lightly aged and filtered rum"),
+    ("light white rum", "lightly aged and filtered rum"),
+    ("Rosso vermouth", "sweet vermouth"),
+    ("Green Chartreuse", "Chartreuse Verte"),
+    ("Aperitivo Luxardo (Aperol-style liqueur)", "Aperol"),
+    ("Red bitter (Campari-style liqueur)", "Campari"),
+    ("Dry Curaçao liqueur", "dry orange Curaçao"),
+    ("dry curacao liqueur", "dry orange Curaçao"),      # folded
+    ("Kummel liqueur", "kümmel"),
+    ("Sugar cane syrup (from juice)", "cane sugar syrup 2:1"),
+])
+def test_a_wording_helen_ruled_on_resolves(words, expected, tables):
+    got = rp.resolve(words, *tables)
+    assert got, f"{words!r} is in source_wordings.yml and must resolve"
+    assert got["tier"] == 2
+    assert got["generic"] == expected
+    assert got["suggestion"] == [], (
+        "a wording names a CATEGORY. A source's name for a bottle is an alias "
+        "on that bottle in bottles.yml, which Tier 1 reads"
+    )
+    assert got.get("via"), (
+        "the report must say this came from her rulings and not from the "
+        "vocabulary, so a wrong entry can be traced to the file that holds it"
+    )
+
+
+def test_every_wording_lands_on_a_generic_the_vocabulary_declares(tables):
+    """The file is only as good as its values, and a typo in one would type
+    a pour with a generic no drink may carry.
+
+    AND NEVER A RESERVED ONE. `hers_to_apply` is excluded from
+    `declared_generics()`, so a wording that pointed at a style Helen applies
+    herself fails here too -- which is the right answer, not a side effect.
+    """
+    _, generics = tables
+    declared = set(generics.values())
+    wordings = rp.source_wordings()
+    assert wordings, (
+        "source_wordings.yml loaded no entries, so every test of it above is "
+        "checking an empty table"
+    )
+    import yaml
+    raw = yaml.safe_load((rp.DATA / "source_wordings.yml").read_text(encoding="utf-8"))
+    bad = sorted(f"{words!r} -> {generic!r}"
+                 for words, generic in raw["wordings"].items()
+                 if generic not in declared)
+    assert not bad, (
+        "source_wordings.yml points at generic(s) ingredients.yml does not "
+        "declare:\n  " + "\n  ".join(bad)
+    )
+
+
+def test_no_wording_shadows_a_dictionary_that_already_answers(tables):
+    """A key that is ALREADY a bottle or a generic can never be reached.
+
+    The resolver reads the two dictionaries first, so such an entry is dead --
+    and worse, it reads as though the file were doing work. If a wording here
+    becomes a declared generic or a bottle's alias later, delete it from the
+    file in the same commit; this is what says so.
+    """
+    bottles, generics = tables
+    shadowed = sorted(key for key in rp.source_wordings()
+                      if key in bottles or key in generics)
+    assert not shadowed, (
+        "source_wordings.yml holds wording(s) the dictionaries already "
+        "answer, so the entry is never read:\n  " + "\n  ".join(shadowed)
+    )
+
+
+def test_two_wordings_do_not_fold_to_one_key_with_two_answers():
+    """`fold` flattens case and accents, so two entries can collide."""
+    import yaml
+    raw = yaml.safe_load((rp.DATA / "source_wordings.yml").read_text(encoding="utf-8"))
+    seen = {}
+    clash = []
+    for words, generic in raw["wordings"].items():
+        key = rp.fold(words)
+        if key in seen and seen[key] != generic:
+            clash.append(f"{words!r}: {generic!r} against {seen[key]!r}")
+        seen[key] = generic
+    assert not clash, "one wording, two answers:\n  " + "\n  ".join(clash)
+
+
+# =============================================================================
 # TIER 3 -- everything else, and this is the half Helen asked for
 # =============================================================================
 
@@ -126,6 +218,11 @@ def test_a_generic_helen_reserved_never_resolves(tables):
     "tequila",            # blanco, reposado or añejo -- the source did not say
     "agave nectar",       # near-miss for `agave syrup`, and a near-miss is a guess
     "Planteray Three Star",   # a real bottle this repo has not declared
+    # THREE THE 2026-10-07 DIFFORD'S BATCH MET AND DELIBERATELY LEFT OUT OF
+    # source_wordings.yml, each for a reason that file's header gives:
+    "Cherry (brandy) liqueur",   # ruled drink by drink, "one by one" -- not a rule
+    "Cuban rum",                 # an ingest's own word for Havana Club 3, not a source's
+    "port",                      # tawny or ruby? the source's BOTTLE says, the word does not
     # `Cruzan Single Barrel` WAS HERE AND CAME OFF 2026-09-26, because the
     # reason it was here was answered. Its comment read "the same" -- a real
     # bottle this repo has not declared -- and d81d235 declared it, as

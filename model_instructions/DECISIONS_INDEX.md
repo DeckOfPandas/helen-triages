@@ -96,6 +96,7 @@ argument and the rules each field is read by.
 - 2026-10-01 · §4 · a note is always {label, text}, and an empty one is a placeholder nothing prints.
 - 2026-10-02 · §4 · #1258 · Every draft has a notes slot, and imported text is labelled QQ. Both reverse a choice the 2026-10-01 migration made.
 - 2026-10-04 · §4 · #814 · the retro-fit ran, and the yield was lopsided: 103 of 142, then 18 of 174.
+- 2026-10-07 · §4 · /08 — 91 recipes came in from two claude.ai chats, and what they taught the ingest documents.
 - 2026-10-04 · §4 · #577 · re-measured: 6 items in 6 drafts, all of them refusals.
 - 2026-10-04 · §4 · #814 · a group named to finish printed "For the to finish:".
 - 2026-10-04 · §4 · #814 #43 · Helen's rulings on the retro-fit (food-private PR #43).
@@ -154,6 +155,7 @@ argument and the rules each field is read by.
 - 2026-09-07 · §8.2 · the yield came off the row, and dimming it was not the fix.
 - 2026-10-04 · §8.2 · #1125 · A handful scales in HALF STEPS, and the first build of this was the opposite.
 - 2026-10-04 · §8.2 · #1286 · On a makes: recipe the scaler counts the thing made.
+- 2026-10-07 · §8.2 · A makes: range starts from its lower number; the midpoint above is REVERSED, three days on.
 - 2026-09-10 · §8.3 · Helen, having used both indexes for a weekend's planning
 - 2026-09-10 · §8.3 · Every one of those is the same fact — shortlisted was declared as an ordinary filter in filter-state.js and so ANDed with everything else.
 - 2026-09-10 · §8.3 · The rule now, held in two pure functions and generated tests across BOTH field tables (tests/js/shortlist-view.test.js)
@@ -235,6 +237,8 @@ argument and the rules each field is read by.
 - 2026-09-10 · §9.3.1 · #707 · "fresh" said out loud, and the opposite warning.
 - 2026-10-04 · §9.3.1 · #838 · crème de cacao is two generics, brown and white.
 - 2026-10-04 · §9.3.1 · #1108 · each clairin is its own generic; plain clairin is retired.
+- 2026-10-07 · §9.3.1 · 73 Difford's drinks, 79 untyped pours, and the vocabulary they left behind.
+- 2026-10-07 · §9.3.1 · lowercase when the word has become the thing.
 - 2026-09-07 · §9.3.2 · #591 · An agricole's origin goes on the BOTTLE, as origin:.
 - 2026-08-27 · §9.3.2 · #529 · Added, rum-only.
 - 2026-08-30 · §9.3.2 · Not rum-only any more, and neither are the two tests that made it worth having: 54 of 91 suggestions had resolved to nothing with no test minding.

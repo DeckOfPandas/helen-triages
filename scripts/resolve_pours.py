@@ -31,6 +31,19 @@ So there are exactly three outcomes for a pour whose `generic` is still a QQ:
   TIER 3  anything else
           -> leave `generic: "QQ <the source's words>"` exactly as it is.
 
+AND, SINCE 2026-10-07, A THIRD DICTIONARY THAT TIER 2 READS:
+`_data/cocktails/source_wordings.yml`. Seventy-three Difford's drinks arrived
+with 79 untyped pours and this script settled none, because Difford's never
+writes a category the way this collection does -- "Rosso vermouth" for `sweet
+vermouth`, "Light white rum (charcoal-filtered 1-4 years old)" for `lightly
+aged and filtered rum`. Helen answered them an afternoon at a time and then
+agreed to keep the answers ("Agree to the mapping"). So:
+
+  TIER 2  ...or the source's words are a WORDING HELEN HAS RULED ON
+          -> write the generic she gave it. Still a dictionary read, still
+             exact: the file holds her rulings and nothing an ingest inferred,
+             which is what keeps "will not guess" true below.
+
 AND THE ONE INFERENCE IT WILL MAKE, ONLY AS A PROPOSAL. `bottles.yml` has no
 character column, deliberately -- its own note against Gosling's Black Seal says
 the bottle is "reached for FOR its blackstrap, which is a `character` on the
@@ -125,8 +138,28 @@ def declared_generics() -> dict:
     return out
 
 
-def resolve(words: str, bottles: dict, generics: dict) -> dict | None:
-    """Tier 1, Tier 2, or None for Tier 3. Exact reads only."""
+def source_wordings() -> dict:
+    """Folded source wording -> the generic Helen ruled it is.
+
+    `_data/cocktails/source_wordings.yml`. Her rulings only -- that file's
+    header says what may and may not go in it, and tests/test_resolve_pours.py
+    holds every value to the declared vocabulary.
+    """
+    path = DATA / "source_wordings.yml"
+    if not path.exists():
+        return {}
+    wordings = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("wordings") or {}
+    return {fold(words): generic for words, generic in wordings.items()}
+
+
+def resolve(words: str, bottles: dict, generics: dict,
+            wordings: dict | None = None) -> dict | None:
+    """Tier 1, Tier 2, or None for Tier 3. Exact reads only.
+
+    `wordings` is `source_wordings()`; it is read from the data file when a
+    caller does not pass it, so the two-table call the tests have always made
+    still sees the third dictionary.
+    """
     key = fold(words)
     if key in bottles:
         name, generic = bottles[key]
@@ -137,6 +170,11 @@ def resolve(words: str, bottles: dict, generics: dict) -> dict | None:
         return got
     if key in generics:
         return {"tier": 2, "generic": generics[key], "suggestion": []}
+    if wordings is None:
+        wordings = source_wordings()
+    if key in wordings:
+        return {"tier": 2, "generic": wordings[key], "suggestion": [],
+                "via": "a wording Helen has ruled on"}
     return None
 
 
@@ -186,7 +224,8 @@ def rewrite(text: str, found: list) -> str:
     return "\n".join(lines)
 
 
-def scan(path: pathlib.Path, bottles: dict, generics: dict) -> tuple[list, list]:
+def scan(path: pathlib.Path, bottles: dict, generics: dict,
+         wordings: dict | None = None) -> tuple[list, list]:
     text = path.read_text(encoding="utf-8")
     m = FRONT_MATTER.match(text)
     if not m:
@@ -197,7 +236,7 @@ def scan(path: pathlib.Path, bottles: dict, generics: dict) -> tuple[list, list]
         if not hit:
             continue
         words = hit.group("words")
-        got = resolve(words, bottles, generics)
+        got = resolve(words, bottles, generics, wordings)
         if got:
             got.update(line=n, indent=hit.group("indent"), words=words)
             found.append(got)
@@ -219,6 +258,7 @@ def main(argv=None) -> int:
         return 2
 
     bottles, generics = bottle_index(), declared_generics()
+    wordings = source_wordings()
     paths = sorted(DRAFTS.rglob("*.md"))
     if args.only:
         paths = [p for p in paths if p.stem == args.only]
@@ -230,12 +270,13 @@ def main(argv=None) -> int:
     for path in paths:
         if path.name == "README.md":
             continue
-        found, left = scan(path, bottles, generics)
+        found, left = scan(path, bottles, generics, wordings)
         if not found and not left:
             continue
         print(f"\n{path.relative_to(DRAFTS)}")
         for hit in found:
-            print(f"  TIER {hit['tier']}  {hit['words']!r}")
+            via = f"   ({hit['via']})" if hit.get("via") else ""
+            print(f"  TIER {hit['tier']}  {hit['words']!r}{via}")
             print(f"       -> generic: {hit['generic']!r}")
             if hit["suggestion"]:
                 print(f"          suggestion: {hit['suggestion']}")

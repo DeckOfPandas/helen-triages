@@ -353,6 +353,7 @@ mood_ingredients:
     - añejo tequila
     - sweet vermouth
     - tawny port
+    - ruby port
     - amontillado sherry
     - Campari
     - Aperol
@@ -410,6 +411,7 @@ mood_ingredients:
     - lemon juice
     - grapefruit juice
     - ruby grapefruit juice
+    - pink grapefruit juice
     - orange juice
 
   # Non-citrus fruit.
@@ -432,7 +434,9 @@ mood_ingredients:
   fruity:
     - pineapple juice
     - orange juice
+    - blood orange juice
     - cranberry juice
+    - cranberry juice drink
     - apple juice
     - passion fruit
     - pineapple
@@ -446,7 +450,10 @@ mood_ingredients:
     - peach schnapps
     - fruit purée
     - passion fruit syrup
+    - pineapple syrup
     - crème de mûre
+    - crème de myrtille
+    - black raspberry liqueur
     - crème de cassis
     - crème de pêche
     - apricot liqueur
@@ -500,6 +507,7 @@ mood_ingredients:
     - honey water
     - honey water 1:1
     - honey water 2:1
+    - honey water 3:1
     - orgeat
     - falernum
     - grenadine
@@ -512,6 +520,8 @@ mood_ingredients:
     - vanilla syrup
     - cinnamon syrup
     - ginger syrup
+    - pineapple syrup
+    - hazelnut syrup
     - triple sec
     - orange Curaçao
     - maraschino liqueur
@@ -596,10 +606,13 @@ mood_ingredients:
   juice:
     - apple juice
     - cranberry juice
+    - cranberry juice drink
     - pineapple juice
     - orange juice
+    - blood orange juice
     - grapefruit juice
     - ruby grapefruit juice
+    - pink grapefruit juice
 
   # LOUD: ingredients carrying a whole flavour layer alone. Helen's insight,
   # and the thing that rescues `tiki` from being a headcount — "Better and

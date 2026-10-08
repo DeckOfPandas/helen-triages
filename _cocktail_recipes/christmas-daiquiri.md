@@ -4,7 +4,7 @@ tagline: "A reindeer jumper on the beach."
 glass:
   - "coupe"
 garnish:
-  - "no garnish"
+  - "star anise (floated)"
 serve:
   ice: "none"
 ingredients:

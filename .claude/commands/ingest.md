@@ -34,9 +34,11 @@ what makes it findable, and there are exactly these:**
 
 | where | what to write |
 |---|---|
-| a `tagline` she has not written | `tagline: "QQ"`, or `QQ ` then the source's line where one is worth keeping. **Never an unprefixed tagline from an ingest, either site** -- Helen, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"* |
+| a COCKTAIL's `tagline` | `tagline: "QQ"`, bare, and **nothing drafted** -- Helen, 2026-10-08, after a batch of 73 arrived with a line written for each: *"Let's stop Claude drafting taglines. It turns out me doing them in batches works the best."* Her own line, if she gives one for that drink, goes in as she gave it with no `QQ`. Her standing reason, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"* |
+| a FOOD `tagline` | where the source has an intro, the PAIR on one line: `"QQ original <the intro, verbatim> QQ Claude <a plain rewrite of it>"` -- Helen, 2026-10-08: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* Where it has none, `"QQ"` alone. Never a line of the ingest's own |
+| butter the source does not specify | `item: "QQ butter"` -- Helen, 2026-10-08: *"Write QQ butter in the ingredients list where it isn't specified."* Never "salted" by default and never plain "butter" |
 | a `generic` the vocabulary does not settle outright | `generic: "QQ <the source's words>"` -- see the block below |
-| a `suggestion` | `suggestion: []` unless a DECLARED bottle names it; the bottle the source names goes in that pour's `note` |
+| a `suggestion` | `suggestion: []` unless a DECLARED bottle names it; the bottle the source names goes in that pour's `note` as `"Originally <bottle>."` (Helen, 2026-10-07) |
 | a cocktail's `meta.ship` | `"who knows"`, never `"QQ"` -- `QQ` is not a ship value (2026-09-05, `test_meta_ship_is_a_rung_or_who_knows`); `meta.made_before: false` beside it says she has not made it |
 | a food method step | the PAIR: `QQ original <verbatim>` then `QQ Claude <the rewrite>` |
 | any note an ingest ADDS | `- label: "QQ"` / `text: "QQ - …"` -- **both fields set, both beginning `QQ`**. A note with no label is titled "note" on the page and looks finished, so this is what stops an unread note publishing unnoticed (#1120) |
@@ -190,7 +192,11 @@ file say the same things.
    you and refuses to do tier 3. It reads every pour whose `generic` is still a
    `QQ`, looks the source's words up in `bottles.yml` and in the vocabulary, and
    writes only what an EXACT match settles -- `--apply` to write, nothing by
-   default. **Run this before you type a generic by hand**: the batch of
+   default. **It also reads `_data/cocktails/source_wordings.yml`** (2026-10-07):
+   a source's wording for a category that Helen has already ruled is one of her
+   generics, such as Difford's "Rosso vermouth" for `sweet vermouth`. When she
+   answers a "which category?" and the answer is a rule rather than a call about
+   one drink, add the wording to that file in the same commit. **Run this before you type a generic by hand**: the batch of
    2026-09-20 resolved nine bottles from recall and got them right, which is
    nine chances to have been confidently wrong.
 6. **Work whatever is LEFT against the three tiers, not as one pile.** It used
@@ -265,7 +271,14 @@ failure is probably work someone else has already done (MANUAL §9.1).
   garlic, ginger, chocolate, mustard, vinegar. Source silent → `QQ`, never a
   default.
 - **The fan oven temperature**, from the printed pair. Check WHICH is the fan
-  figure; they are not always in the same order.
+  figure; they are not always in the same order. **A `QQ Claude` line gives the
+  fan figure alone; its `QQ original` keeps everything the source printed**
+  (Helen, 2026-10-07). Where the pair is not labelled, the rewrite keeps the
+  pair and the question goes on her list.
+- **An ingredient the method names with a quantity goes in the ingredient
+  list**, in the group that step belongs to, even when the source's own list
+  leaves it out: "pour over 75 ml boiling water", "a pinch of salt" (Helen,
+  2026-10-07). A bare "season" names nothing and adds nothing.
 - **Quantities in their own `amount:` key**, never inside `item:` text. The
   highlighter reads `item.amount` and never scans text, so a quantity in the
   wrong field renders unstyled with no error anywhere.
@@ -351,6 +364,17 @@ failure is probably work someone else has already done (MANUAL §9.1).
   to house style like any other prose.
 
   She keeps both so she can judge the rewrite rather than trust it blind.
+
+  **A SOURCE STEP THAT HOLDS SEVERAL ACTIONS BECOMES SEVERAL PAIRS** -- Helen,
+  2026-10-08, of the batch that first did it: *"The split steps has been easier
+  for me -- recipes often stick loads together which makes it hard, even when
+  just testing."* The `QQ original` lines are the source's step cut into
+  segments, each verbatim and in order, so that read together they are exactly
+  what the source printed; each segment gets its own `QQ Claude`. Cut where a
+  cook would actually pause (see her own rewrite patterns below). Never merge
+  two source steps, never reorder, and say on her list which steps were split.
+  This replaces "one source step, one pair", which both standalone documents
+  taught until that day.
 
   **WHAT HER OWN REWRITE LOOKS LIKE, once she's actually cooked from a `QQ
   Claude` line -- 2026-09-05, `sticky-squidge-ginger-loaf.md`.** She asked for

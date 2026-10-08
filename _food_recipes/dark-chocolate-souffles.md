@@ -6,7 +6,7 @@ source_type: book
 serves: "6"
 prep_time: "15 mins"
 cook_time: "10–15 mins"
-main_ingredients: ["dark chocolate", "cocoa powder", "egg whites", "salted butter", "golden caster sugar", "Demerara sugar"]
+main_ingredients: ["dark chocolate", "cocoa powder", "egg whites", "salted butter", "golden caster sugar", "demerara sugar"]
 star_ingredient: "chocolate"
 tags: ["dessert", "showstopper"]
 ingredient_groups:
@@ -19,7 +19,7 @@ ingredient_groups:
       item: egg whites
     - amount: "60 g"
       item: golden caster sugar
-    - item: salted butter, Demerara sugar and cocoa powder to coat the ramekins
+    - item: salted butter, demerara sugar and cocoa powder to coat the ramekins
 method:
   - "Melt the chocolate over a bain-marie."
   - "Wipe the insides of the ramekins upwards with melted salted butter to encourage the soufflés to rise."

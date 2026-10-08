@@ -877,6 +877,47 @@ unless stated.
   - **`to serve` is the only group name the layout special-cases; any other
     `to …` name renders as "For the to finish:".** New names were kept to bare
     nouns for that reason.
+- **2026-10-07/08 — 91 recipes came in from two claude.ai chats, and what they
+  taught the ingest documents.** Helen gave each chat the documents by GitHub
+  URL instead of the Project (*"I couldn't remember how to run the ingest
+  project"*) and asked for the envelopes as files, which she dropped into
+  `tmp/inbox/`; `ingest_inbox.py --from-file` parsed all 93, and the suite
+  failed 62 tests on them in about a dozen causes. **The cause behind most was
+  rulings she had made in those chats that the documents forbade**, baked into
+  every file. Asked which she meant as standing rules:
+  - **A cocktail tagline is a bare `QQ` and nothing is drafted.** *"Let's stop
+    Claude drafting taglines. It turns out me doing them in batches works the
+    best."* 73 arrived as `QQ Claude <a line>`.
+  - **A food tagline is the method's pair on one line**, where the source has
+    an intro: *"QQ original yes, then QQ claude rewrite, then I'll do my own
+    and delete the other two."* A REWRITE of the intro, not a quip.
+  - **Unspecified butter is `QQ butter`**, replacing the chat's "salted, or
+    plain in precise bakes": *"Write QQ butter in the ingredients list where
+    it isn't specified."*
+  - **A source step holding several actions is split**, its original cut into
+    verbatim segments: *"The split steps has been easier for me -- recipes
+    often stick loads together which makes it hard, even when just testing."*
+    Reverses "one source step, one pair".
+  - **Also standing, each a yes**: a source's bottle goes in the pour's note
+    as "Originally X." and never in `suggestion`; an ingredient the method
+    names with a quantity joins the ingredient list, a bare "season" does not;
+    a `QQ Claude` line gives the fan figure alone; a `makes:` recipe always has
+    a `serves_estimate` (two each for biscuits); her own recipes are `source:
+    "Henry"`, `person`; and four rulings for Difford's alone (saline is a small
+    pinch of salt, "rich" syrup is `cane sugar syrup 2:1`, the glass is the
+    "Select and pre-chill" line, drop "freshly squeezed" and its kin).
+  - **NOT rules**: "one question per recipe" (*"I don't know how it got in
+    there"*); hand-assigned moods at ingest (*"we don't add moods at first
+    ingest -- just leave me a QQ"*, the marker still to be designed);
+    alternative paths as method groups, until she has read the two pages that
+    have them.
+  - **The issue route stays** (*"let's retain the feature"*) beside the new
+    bulk route. What does not happen is a Claude Code session filing a batch
+    of issues: the first chat wrote a prompt asking for 39.
+  - **`CLAUDE_WEB_INGEST.md` §2 now tells the chat that a ruling made there is
+    for that recipe and not for the contract** — to follow the file, say so,
+    and pass her instruction on in the hand-back list. That paragraph is the
+    session's proposal, drawn from the above, and not her words.
 - **2026-10-04, #577 — re-measured: 6 items in 6 drafts, all of them refusals.**
   A session was briefed to script the size-word pass from the issue body's
   "109 drafts, 141 items" and found it done: `640834a` in the food drafts repo
@@ -1583,6 +1624,18 @@ unless stated.
     a rule for unnamed counts, and the flag did not flip: *"fine to make the
     update and not flip the flag. Explicit grant."* (§4.0's baseline moved to
     cover that one commit.)
+- **2026-10-07** — **A `makes:` range starts from its lower number; the
+  midpoint above is REVERSED, three days on.** Helen, during the Difford's and
+  Good Food ingest: *"where 'makes' is a range I want to use the lower
+  number."* Told that she had ruled *"Take the midpoint"* on 2026-10-04 and
+  asked whether this replaced it: *"lower number please, new ruling."* So "4–6
+  waffles" shows 4 and steps 4, 8, 12 (it was 5, 10, 15); the truffles start
+  at 20 and the swans at 10. It is the rule `serves:` has had since 2026-09-07
+  (§4, *"under-catering is worse for me than over-catering"*), so the two
+  kinds of recipe now agree. One line in `_plugins/food_yield.rb`. **Her
+  "range of one" ruling is not withdrawn, only unreachable from a `makes:`
+  line**: the lower number is always whole, and `yieldBox` still shows half a
+  recipe of an odd count as "2–3". No issue tracks it.
 
 ---
 
@@ -2725,6 +2778,58 @@ unless stated.
   `abv.yml` and `costs.yml`. The other three have no strength or price until a
   drink pours one; do not guess them, the single-village clairins run into the
   fifties and move batch to batch.
+- **2026-10-07 — 73 Difford's drinks, 79 untyped pours, and the vocabulary they
+  left behind.** A claude.ai session built the envelopes from Helen's pastes;
+  they landed in a Claude Code session with her, and `resolve_pours.py`
+  settled none of the 79, because Difford's never writes a category her way.
+  She ruled on them a few at a time. What that produced, so nobody re-asks:
+  - **Difford's bottles do not go in `suggestion`.** The web session had put
+    them there on a ruling of hers in that chat; 148 failed to resolve, most
+    of them Difford's sponsors (Strucchi, Eager, Three Cents, Monin) rather
+    than her shelf. *"Move all the suggestions to notes, and I can add my own
+    suggestions where I have them or drop if not. For notes, just write
+    'Originally X'."* A suggestion stands only where she names one.
+  - **`_data/cocktails/source_wordings.yml` is new**: a source's wording for a
+    category she has ruled is one of her generics. *"Agree to the mapping."*
+    Replayed over the original envelopes it settles 60 of the 79. Her rulings
+    only; a call she made about one drink is not a rule and stays out
+    (`cherry (brandy) liqueur` was `cherry liqueur` five times, asked *"one by
+    one"*).
+  - **Twenty new generics**, each a "yes" to a named proposal or her own
+    word: `cranberry juice drink` (*"needs to be a new generic"* — the declared
+    cranberry bottle is unsweetened), `lemon vodka`, `pink grapefruit juice`
+    (*"is a new thing"*), `blood orange juice`, `daiquiri bitters`,
+    `grapefruit bitters`, `peach bitters`, `coconut water`, `birch water`,
+    `natural yoghurt`, `ruby port`, `pineapple syrup`, `hazelnut syrup`,
+    `honey water 3:1`, `black raspberry liqueur`, `crème de myrtille`,
+    `kümmel`, `sake`, `tsipouro`, `lime zest with flesh`. Most carry
+    PLACEHOLDER prices and strengths at `confidence: low`.
+  - **Declined:** a generic for pressed-cane syrup (*"I don't do that, ha, cane
+    syrup 2:1 is good enough for me"*); wider generics for the Aperol and
+    Campari families (Aperitivo Luxardo is `Aperol`, Strucchi Red Bitter is
+    `Campari`).
+  - **Cocchi Americano, three answers in one afternoon, and the third stands.**
+    First a `quinquina` with `character: "americano"` (*"I care about how
+    something works in a drink far more than what it technically is"*); then
+    *"I think Cocchi Americano is an americano"* with `character: quinquina`;
+    then, shown that a character names a flavour trait and that the Singapore
+    Sling already says "either works" as a list, *"I agree with you, thanks,
+    your way"*: `generic: ["americano", "quinquina"]`, suggesting `Cocchi
+    Americano`. Picotin and North Sea Oil. **No `fortified_characters` list
+    exists**; one was declared and removed the same day.
+  - **Three units**: `wedge` (Fay Wray's lime), `cm log` (Zakuski's cucumber,
+    *"2.5-cm cucumber log"* — centimetres, the source said an inch) and `thick
+    coin` (Cyrano's lime, *"1 thick coin, lime zest with flesh"*).
+  - **Open:** Fay Wray's Havana Club Añejo Especial, #1335, at her request.
+- **2026-10-07 — lowercase when the word has become the thing.** Asked what
+  the collection does about Maraschino and Demerara, Helen offered the rule
+  herself: *"Something like when the word has become the thing we use
+  lowercase?"* A census agreed nearly everywhere (maraschino cherry, parmesan,
+  muscovado, `demerara sugar` in every cocktail); the outlier was published
+  food's `Demerara sugar`, lowercased in five recipes on her grant (*"Lower
+  case d for sugar. Please fix live...carefully!"*). **A capital stays where
+  the word still names the place or a brand**: `Demerara rum`, Dijon mustard,
+  `Luxardo maraschino cherry`.
 
 ### §9.3.2 The bottle dictionary
 
