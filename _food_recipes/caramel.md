@@ -36,8 +36,8 @@ notes:
     text: The salt is crucial, and this can take a lot depending on your taste.
   - label: "Hey Andrew"
     text: If you make this for brother Andrew, take care to call it "sea-salted caramel".
-  - label: "How much this actually makes"
-    text: "5 servings as a sauce, or as filling for Millionaire's shortbread made in a 16-cm square tin."
+  - label: "Examples of how much this makes"
+    text: "About six servings as a sauce, or enough for a 16-cm square tin as Millionaire's filling."
 meta:
   rewritten: true
   awaiting_fix: false

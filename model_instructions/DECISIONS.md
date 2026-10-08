@@ -1167,8 +1167,10 @@ unless stated.
 - **2026-10-08, #1089 — the rest of the design review's copy sitting.** Her
   rulings, each applied as written: the five-spice duck legs' tagline gains
   "more" and loses its link to itself (*"tagline was supposed to be a joke"*);
-  the caramel yield note is relabelled "How much this actually makes" with her
-  sentence, and the ganache one loses its `serves_estimate` sentence; the plum
+  the caramel and ganache yield notes are both labelled "Examples of how much
+  this makes" (her second wording, the same day; the first was "How much this
+  actually makes", on caramel alone), the caramel with her sentence and the
+  ganache without its `serves_estimate` one; the plum
   sauce's "Pairs with" note and the three Ben & Jerry's bases' "This is not
   ice cream" note are deleted; the about page's sentence gets its verb; the
   rum page's "Addendum: Rum Characters" is "A final thought: rum characters".
