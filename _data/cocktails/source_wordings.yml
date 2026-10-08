@@ -101,7 +101,58 @@ wordings:
   "Roasted hazelnut syrup": "hazelnut syrup"
   "Honey syrup (3 parts honey to 1 water by weight)": "honey water 3:1"
 
+  # Havana Club 7 in Three Dots and a Dash ("Yes"), and Havana Club Añejo
+  # Especial in Fay Wray -- parked as #1335 and answered there on 2026-10-08:
+  # "Moderately Aged Rum".
+  "Aged rum (6-10yr)": "moderately aged rum"
+  "Blended light 3-5yo rum": "moderately aged rum"
+
   "Kummel liqueur": "kümmel"
   "Crème de myrtille liqueur": "crème de myrtille"
   # Offered `yoghurt`: "natural yoghurt".
   "Yoghurt (natural)": "natural yoghurt"
+
+  # --- Difford's, the plain ones ------------------------------------------------
+  # A SECOND KIND OF ENTRY, AND HELEN APPROVED IT AS A LIST, 2026-10-08. Each of
+  # these is one of her generics with a word or a bracket added that says
+  # nothing new -- "liqueur" after a liqueur, "(freshly squeezed)" after a
+  # juice. The claude.ai session typed them on its own reading for the batch of
+  # 73, which is a near-miss by the standalone document's rule and would arrive
+  # as `QQ` from a session that followed it. Asked whether to put about a dozen
+  # in here "for you to approve as a list": "Yes please, let's get a list in
+  # and avoid the work." The list was shown to her in the same reply.
+  #
+  # THE BAR FOR ONE OF THESE: strip what the source added and what is left is
+  # EXACTLY a declared generic, and nothing stripped says which category. That
+  # is why "Cherry (brandy) liqueur" is not here (the bracket is the question)
+  # and "Straight rye whiskey (100 proof /50% alc./vol.)" is above with her
+  # ruling beside it (the proof is the answer).
+  "Triple sec liqueur (40% alc./vol.)": "triple sec"
+  "Triple sec liqueur": "triple sec"
+  "Cognac (brandy)": "cognac"
+  "Bourbon whiskey": "bourbon"
+  "Akvavit / Aquavit": "aquavit"
+  "Falernum liqueur": "falernum"
+  "Peach schnapps liqueur": "peach schnapps"
+  "Añejo tequila (100% agave)": "añejo tequila"
+  "Reposado tequila (100% agave)": "reposado tequila"
+  "Cachaça (unaged)": "cachaça"
+  "Agricole vieux rhum/Cane juice rum (min 3yo)": "rhum agricole vieux"
+  "Yellow Chartreuse": "Chartreuse Jaune"
+  "Yellow Chartreuse (or génépy liqueur)": "Chartreuse Jaune"
+  "Lime juice (freshly squeezed)": "lime juice"
+  "Lemon juice (freshly squeezed)": "lemon juice"
+  "Orange juice (freshly squeezed)": "orange juice"
+  "Pink grapefruit juice (freshly squeezed)": "pink grapefruit juice"
+  "Pineapple juice (chilled)": "pineapple juice"
+  "Lime cordial (sweetened lime juice)": "lime cordial"
+  "Agave syrup (agave nectar)": "agave syrup"
+  "Egg white (pasteurised)": "egg white"
+  "Egg white (pasteurised) or Vegg White vegan egg white alternative": "egg white"
+  "Chilled water/mineral water": "water"
+  "Brut champagne/sparkling wine": "champagne"
+  # Her Difford's-only ruling, 2026-10-07: the "rich" syrup is `cane sugar
+  # syrup 2:1`, the Brix and the Monin brand both dropped, and no "Originally".
+  "Sugar syrup 'rich' (2 sugar to 1 water) 65.0°Brix": "cane sugar syrup 2:1"
+  "Sugar syrup 'rich' (2 sugar to 1 water)": "cane sugar syrup 2:1"
+  "Monin Pure Cane sugar syrup (65.0°brix, equivalent to 2 sugar to 1 water)": "cane sugar syrup 2:1"
