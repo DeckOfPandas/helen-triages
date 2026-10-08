@@ -9486,6 +9486,25 @@ verification. Dates are when the correction landed.
   - **If it comes back, the questions still open** are whether the glass
     remembers being open per browser, and what iPad portrait gets (it is
     already a stacked header at 768px).
+- **2026-10-08, #1322 again — 15px OVER THE DOOR'S ROW AS WELL AS UNDER IT.
+  The "0 over" above lasted an afternoon.** Helen, with the zero merged and
+  live (PR #1345): *"Sorry, changed my mind, 15 over 15 under please!"* That
+  is option E of the same candidates page, which she had looked at in round 2
+  and passed over for the zero.
+  - **Still one value at every width.** The row and `??` carry `0.9rem` of
+    top margin again, and that margin is the WHOLE of the space over the row:
+    the stacked grid's gap and the under-600px variants that #1345 deleted
+    stay deleted. So 601–820px, which had 30.4px over the row before #1322,
+    gets the same 14.4px as everything else.
+  - **The 15 under is untouched**, and so is /about/'s 0.4rem.
+  - **Measured on the deployed build:** 14.4px from the wordmark's box to the
+    row and 15.4px from the row to the header's edge, on both indexes and
+    /about/ at 390, 700 and 1280. Header 144.4px tall at 390 and 179.5px at
+    700 and 1280 (130 and 165.1 with the zero; 161.2, 211.5 and 195.5 before
+    #1322).
+  - **Not put on a candidates page a second time**: she had seen this option
+    there. The one difference from what she saw is 0.8px on a phone, where
+    option E still had the old gap-plus-margin (15.2px).
 
 ## §14 Reference pages
 
