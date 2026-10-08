@@ -930,20 +930,25 @@ def test_a_threshold_actually_excludes_something(internal_temperatures):
 def test_the_safety_zone_shares_the_bars_coordinate_space():
     """The shaded zone must be measured against the same thing the bars are.
 
-    A chart row is a grid — a label column, then `1fr` — so a bar's percentage
-    resolves against that `1fr`. The zone is absolutely positioned on .tc-plot,
-    which is the WHOLE row width including the label column, so the same number
-    means two different places. Salmon's 63°C line drew at roughly 54°C, about
-    100px left of the figure it was labelled with.
+    The zone is absolutely positioned on .tc-plot; a bar is positioned on
+    .tc-track. From 2026-08-14 a chart row was a grid — a 9.5rem label column,
+    then `1fr` — so the plot was wider than the track by the column, and the
+    same percentage meant two different places. Salmon's 63°C line drew at
+    roughly 54°C, about 100px left of the figure it was labelled with.
 
     That under-stated the hazard in the only direction that matters: medium and
     medium-well sat to the right of a line they don't clear, on a chart added
     specifically to stop a low figure reading as an unqualified option.
 
-    Checked in the SOURCE rather than by measuring a render, because there is no
-    browser here — but the thing being asserted is the actual cause, not a
-    symptom: if the zone's geometry doesn't mention the label column, it isn't
-    working in the track's coordinate space and it is wrong again.
+    SINCE 2026-10-08 THE TRACK SPANS THE WHOLE ROW (#1327: the label and the
+    figure share a line above the bar, and the label column is gone), so the
+    plot and the track have one left edge and one width, and the zone's bare
+    percentage IS the bars' percentage. That is the invariant now, and it is
+    checked in the SOURCE rather than by measuring a render, because there is
+    no browser here: the track must declare `grid-column: 1 / -1`, and the
+    zone and its label must measure from 0 at 100%. If a column ever comes
+    back to the left of the track, both halves of this go red together, which
+    is the point.
     """
     scss = (pathlib.Path(__file__).resolve().parent.parent
             / "_sass" / "food" / "_temperature-chart.scss")
@@ -951,19 +956,31 @@ def test_the_safety_zone_shares_the_bars_coordinate_space():
         pytest.skip("the chart stylesheet has gone")
     text = scss.read_text(encoding="utf-8")
 
-    problems = []
-    for selector in (".tc-unsafe", ".tc-threshold-label"):
+    def block(selector):
         start = text.index(selector + " {")
-        block = text[start:text.index("\n}", start)]
-        geometry = " ".join(
-            line for line in block.splitlines()
-            if line.strip().startswith(("left:", "width:"))
+        return text[start:text.index("\n}", start)]
+
+    def declarations(selector, *props):
+        return " ".join(
+            line.strip() for line in block(selector).splitlines()
+            if line.strip().startswith(props)
         )
-        if "tc-track-start" not in geometry and "tc-track-width" not in geometry:
+
+    problems = []
+    track = declarations(".tc-track", "grid-column:")
+    if "grid-column: 1 / -1" not in track:
+        problems.append(
+            f".tc-track no longer spans every column of its row ({track!r}). The "
+            f"zone on .tc-plot and the bars on .tc-track then measure against "
+            f"different widths, and a °C figure lands in two different places."
+        )
+    for selector in (".tc-unsafe", ".tc-threshold-label"):
+        geometry = declarations(selector, "left:", "width:")
+        if "100%" not in geometry or re.search(r"left:\s*calc\([^)]*rem", geometry):
             problems.append(
-                f"{selector} positions itself without the label column: {geometry.strip()!r}. "
-                f"It shares .tc-plot with the bars but not their origin, so its "
-                f"°C figure will land at a different place from theirs."
+                f"{selector} measures from something other than the plot's own "
+                f"edge at the plot's own width: {geometry!r}. The bars measure "
+                f"against the track, which is the whole row; so must this."
             )
     assert not problems, "\n  ".join(problems)
 

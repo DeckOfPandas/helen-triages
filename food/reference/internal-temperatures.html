@@ -32,7 +32,6 @@ permalink: /food/reference/internal-temperatures/
 
 {% capture axis %}
   <div class="tc-axis">
-    <div></div>
     <div class="tc-axis-scale">
       <div class="tc-tick" style="--t:40;">40°C</div>
       <div class="tc-tick" style="--t:50;">50</div>
@@ -45,17 +44,24 @@ permalink: /food/reference/internal-temperatures/
   </div>
 {% endcapture %}
 
-<article class="recipe" id="top">
+<article class="recipe">
   <div class="recipe-title">
     <h1 class="recipe-main-title"><span class="recipe-title-text">Internal Temperatures</span></h1>
   </div>
 
   <div class="recipe-body-content">
 
-    {% comment %} Contents, following the pattern internal-temperatures.html
-       already uses -- an id on each h2 and a plain list of anchors. The
+    {% comment %} Contents: an id on each h2 and a plain list of anchors. The
        sections are alphabetical; the overview is last because it is a summary
-       of the others, not a protein of its own. {% endcomment %}
+       of the others, not a protein of its own.
+
+       THE LIST IS THE PAGE'S NAVIGATION, STUCK TO THE TOP, since 2026-10-08
+       (#1327): _sass/food/_temperature-chart.scss draws it as a sticky row of
+       chips that scrolls sideways. It was a two-column list at the top of the
+       page, and the way back up was a "↑ top" link under every chart -- eleven
+       of them, gone the same day, because the chips are always on screen.
+       Helen, on whether the page should stay one scroll rather than one
+       protein at a time: "Immediate reaction is 1, with good nav." {% endcomment %}
     <ul class="tc-contents">
       <li><a href="#beef-steak">Beef: steak</a></li>
       <li><a href="#beef-tender-roasting-cuts">Beef: tender roasting cuts</a></li>
@@ -95,7 +101,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
@@ -114,7 +119,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
@@ -131,7 +135,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}#fish">cooking methods &rarr;</a></p>
@@ -154,7 +157,6 @@ permalink: /food/reference/internal-temperatures/
     </div>
 
     <p class="tc-note">FSA advice is a minimum serving temperature of {{ t.fish.general.endpoint_min }}°C.</p>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=ham">cooking methods and timings &rarr;</a></p>
@@ -174,7 +176,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=lamb">cooking methods and timings &rarr;</a></p>
@@ -192,7 +193,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=pork">cooking methods and timings &rarr;</a></p>
@@ -227,7 +227,6 @@ permalink: /food/reference/internal-temperatures/
        of that vocabulary. The full note stays in internal_temperatures.yml.
        {% endcomment %}
     <p class="tc-note">FSA wants pork <em>held</em> at 60°C for 45&nbsp;min, 65°C for 10&nbsp;min, 70°C for 2&nbsp;min, or 75°C for 30&nbsp;sec — held, not passed through as it cools. Only the well-done figure clears that.</p>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=chicken">cooking methods and timings &rarr;</a></p>
@@ -250,7 +249,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     {% comment %} VENISON'S CROSSLINKS REACH THE CALCULATOR NOW, like every
        other section that has timings behind it. They used to stop at
@@ -304,7 +302,6 @@ permalink: /food/reference/internal-temperatures/
        venison is fine; mince is the exception) sat here until 2026-09-10 and
        Helen deleted it (#872): the chart says it, and the mince case is not a
        question a thermometer answers. {% endcomment %}
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="venison-slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Venison: slow-cooked cuts</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a></p>
@@ -321,7 +318,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}">cooking methods and timings &rarr;</a></p>
@@ -382,7 +378,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
   </div>
 </article>

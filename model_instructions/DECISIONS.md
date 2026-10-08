@@ -9693,6 +9693,44 @@ verification. Dates are when the correction landed.
   split pages, no nav link, no cards, one axis for the whole page, the WHAT
   box above its heading.
 
+- **2026-10-08, #1327, #1329, #1330 — ROUND ONE SETTLED IN ONE LOOK, AND
+  BUILT THE SAME DAY.** Helen: *"Internal temp: one line sticky jump bar.
+  Cooking methods: stacked, by cut, fish and shellfish list no notes. Any
+  more questions? If not then please go go go, build!!!"* So:
+
+  **The charts.** A row is its label and its figure on one line, the bar
+  under them at the column's full width, at EVERY width — the 9.5rem label
+  column and the figure hung off the bar's end are gone, and with them the
+  phone-only block #903 added, the "↑ top" link under every chart (eleven)
+  and the empty label-column cell in the axis. The contents list is the
+  navigation: stuck to the top as a row of chips that scrolls sideways. The
+  thermometer lost; it is in `reference_candidates.py` if it is ever wanted
+  back. **Two things the build found that the candidate had not**: the body's
+  own list rule (`article.recipe .recipe-body-content ul li`, (0,2,3)) beat a
+  one-class-lighter override and drew a dash before every chip and every
+  method, so both lists are scoped under `.recipe-body-content`; and
+  `minmax(0, 1fr) auto` let turkey's sixty-character figure squeeze the label
+  column to nothing and print over TURKEY — the label is `max-content` and the
+  figure is what wraps.
+
+  **The methods.** `cook-timer.js` writes one `<section>` per cut group in
+  the data's own order, each a `<ul>` of method blocks: name and time on the
+  first line, the oven setting under them, the outcome last and italic.
+  Shortest-first order holds within a group. A range breaks only at its dash
+  (`.ct-t`), and only on a phone is the time column capped; on a desktop the
+  cap only broke ranges that fit. The decision table (#253) is gone, so the
+  methods page holds no `<table>` either.
+
+  **Fish and shellfish.** Definition lists, one `<dt>` per fish and a `<dd>`
+  per form, the notes deleted rather than hidden. Still hand-written in the
+  page: nothing in them reconciles against the data.
+
+  **Not re-asked, and worth a look from her**: on a desktop the figure sits
+  at the far right of an 852px row, a long way from its bar. That is the
+  candidate as she saw it at full size; `justify-self: start` on `.tc-value`
+  would put the figure beside its label instead, and is a one-line change if
+  she wants it.
+
 ### The cocktails reference layer, #529
 
 - **2026-09-06, #529** — Cocktails gets its first reference page,

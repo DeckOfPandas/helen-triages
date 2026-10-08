@@ -4678,7 +4678,7 @@ correct rather than unfinished.
 
 `food/reference/` holds two pages: `internal-temperatures.html` (the charts)
 and `cooking-methods-and-timings.html` (a weight → schedule calculator plus
-the fish and shellfish tables, which are ON the page but not OF it — no
+the fish and shellfish lists, which are ON the page but not OF it — no
 weight to schedule from, and the page says so in a line of its own). No
 `index.html` and no nav link — Helen's call; the two footer links
 (`reference_links` in `sites.yml`) are the way in, because these pages are
@@ -4688,9 +4688,17 @@ look-up material for someone who already cooks, not a peer of the two sites.
 data as dead JSON, moved before they were deleted.
 
 Page pattern: `.recipe` / `.recipe-body-content`, the same wrapper as
-`about.html`. Tables are `<table>` markup — `food/*.html` is not run through
-kramdown. The charts page holds no `<table>` at all: every figure is a
-div-based chart drawn by `_includes/food/temp_row.html` from the data.
+`about.html`. Neither page holds a `<table>` since 2026-10-08. Every figure
+on the charts page is a div-based chart drawn by `_includes/food/temp_row.html`
+from the data: a row is its label and its figure on one line and the bar
+under them at the column's full width, the same at every width, with the
+contents list stuck to the top as a row of chips. The methods page's
+calculator writes one section per cut group (the data's `group`), each a
+list of method blocks — name and time on one line, the oven setting under
+them, the outcome last — and the fish and shellfish are definition lists,
+one entry per fish, its forms as lines, no notes. All three are Helen's
+choices from a candidates page (`scripts/reference_candidates.py`, DECISIONS
+§14, 2026-10-08). There is no hover text anywhere on the charts (#1326).
 
 ### The data layer — two datasets
 
@@ -4709,9 +4717,10 @@ which keys exist on the resolved node.
 hand.** `scripts/build_cooking_methods.py` and
 `build_cooking_methods_prose.py` are MIGRATION TOOLS pinned to an old commit;
 **do not re-run them** — the data has been hand-edited since (the whole
-`venison` section) and a re-run overwrites 166 lines. Steak, fish and
-shellfish stay hand-written tables (eleven rowspans a generic loop would
-flatten).
+`venison` section) and a re-run overwrites 166 lines. Fish and shellfish
+stay hand-written in the page (lists since 2026-10-08; they carry no timings
+to reconcile against the data). Steak has no methods entry at all (#382).
+Every method row carries `oven` and `outcome`, and the page renders both.
 
 ### Recipe wiring
 

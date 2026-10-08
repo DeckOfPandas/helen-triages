@@ -213,26 +213,163 @@
   max-width: 62ch;
 }
 
-#ct-table {
+// =============================================================================
+// THE METHODS, STACKED AND GROUPED BY CUT -- 2026-10-08, #1329, #1330
+// =============================================================================
+// The decision table (Method / What you get / Time, #253) is gone. On a phone
+// its three columns wrapped a method name to four lines and a time to three,
+// and it had never shown the oven setting at all: the cards that carried it
+// went in #873 because they repeated the table, and the table had not picked
+// it up. Helen, asked whether that was what sent her to Google after her own
+// notes: "Do you mean e.g. 200° fan for 10 mins then 180° fan for an hour? If
+// so then yes." Then, from the candidates page: "stacked, by cut".
+//
+// So cook-timer.js writes one <section> per cut group, in the data's own
+// order, each a list of methods -- and a method is a block: its name and its
+// time on the first line, the oven setting under them, the outcome last and
+// quiet. The arithmetic and the shortest-first order within a group are
+// unchanged (HTF.cookSchedule.orderMethods); only the shape is new.
+#ct-methods {
   margin-bottom: $spacing-section-gap;
 }
 
-// THE TABLE'S OWN TIME COLUMN, 2026-09-02. No class exists in the markup for
-// it -- cook-timer.js (see timeHtml()/render()) writes a plain `<td>` and
-// leans on the site's generic `article.recipe .recipe-body-content table`
-// rule (_recipe-notes-body.scss) for everything else, which is body-font
-// prose sizing. That is right for "Method" and "What you get", both names,
-// and wrong for "Time", which is the same figure .ct-total shows on the
-// card below -- a number you act on, per food/_palette.scss's $font-label
-// rule. `:last-child` rather than a new class: the table always renders
-// exactly three cells per row (Method, What you get, Time), in that order,
-// so position is as reliable a selector as a class would be and needs no
-// markup change. `.ct-doneness-label` inside a by-doneness row's cell
-// already names its own font (above), so this does not need to carve out an
-// exception for it.
-#ct-table td:last-child {
+.ct-group + .ct-group {
+  margin-top: $spacing-block-gap;
+}
+
+// The cut group's name, in the data's words ("Tender roasting cuts"), with the
+// cuts it covers trailing in the body face. Label tier, like the row labels
+// on the charts and the WHAT/WEIGHT labels above: a name, not a number.
+.ct-group-name {
+  font-family: $font-headings;
+  font-size: 0.74rem;
+  font-weight: 400;
+  letter-spacing: $letter-spacing-label;
+  text-transform: uppercase;
+  color: $color-text;
+  @include lettering(label);
+  line-height: 1.4;
+  margin: 0;
+  padding: 0 0 $space-sm 0;
+  border-bottom: 2px solid $color-border;
+}
+
+.ct-group-cuts {
+  font-family: $font-body;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  color: $color-clear-text;
+  margin-left: $space-sm;
+}
+
+// Scoped under article.recipe .recipe-body-content for the same reason the
+// charts' contents list is: the body's own list rule gives every li a dash
+// and an indent at (0,2,3), and anything less specific than this loses to it.
+article.recipe .recipe-body-content .ct-methods {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    padding: 0;
+    margin: 0;
+    max-width: none;
+
+    &::before { content: none; }
+  }
+}
+
+// One method. A two-column grid with the name and the time on the first row;
+// the oven setting and the outcome each span both columns beneath. On a
+// phone the time column is capped so a long range wraps -- at its dash only,
+// see .ct-t -- rather than squeezing the name into one word a line; on a
+// wide screen there is room for both and the cap would only break ranges
+// that fit.
+.ct-method {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "name time" "oven oven" "outcome outcome";
+  column-gap: $space-lg;
+  row-gap: $space-xxs;
+  padding: $space-md 0;
+  border-bottom: 1px solid $color-border;
+}
+
+.ct-method-name {
+  grid-area: name;
+  font-size: 1rem;
+}
+
+// The figure. Plex Mono, per food/_palette.scss's $font-label rule: a number
+// you act on.
+.ct-method-time {
+  grid-area: time;
+  text-align: right;
   font-family: $font-label;
   font-weight: 600;
+
+  @media (max-width: 600px) {
+    max-width: 10.5rem;
+  }
+}
+
+// Each half of a range is unbreakable, so "2 hrs 20 mins – 3 hrs 15 mins"
+// can break only at its dash: "1 hr 40" split across two lines reads as two
+// numbers.
+.ct-t {
+  white-space: nowrap;
+}
+
+.ct-method-oven {
+  grid-area: oven;
+  font-size: 0.86rem;
+}
+
+.ct-method-outcome {
+  grid-area: outcome;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: $color-clear-text;
+}
+
+// --- Fish and shellfish -------------------------------------------------------
+// Lists, not tables, since 2026-10-08 (#1330): one entry per fish, each form
+// a line of its own with the methods after it. The tables were a fish-by-form
+// matrix drawn with eleven rowspans, 453px wide in a 390px screen and 5,000px
+// tall, with a Notes column that was mostly empty. The notes are gone with
+// the column -- Helen chose the list "no notes" on the candidates page; git
+// history has them.
+.fish-list {
+  margin: 0 0 $space-xl 0;
+  max-width: 62ch;
+}
+
+.fish-item {
+  padding: $space-sm 0;
+  border-bottom: 1px solid $color-border;
+
+  dt {
+    font-family: $font-headings;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 $space-xxs 0;
+  }
+
+  dd {
+    margin: 0 0 $space-xxs 0;
+    font-size: $font-size-body-sm;
+    line-height: 1.45;
+  }
+
+  b {
+    font-weight: 600;
+    margin-right: $space-xs;
+  }
 }
 
 // The one line left of what used to be four paragraphs of explanation.
@@ -245,8 +382,9 @@
 // `.ct-card`, `.ct-card-head`, `.ct-card-name`, `.ct-total`, `.ct-settings`,
 // `.ct-declined`, `.ct-stages`, `.ct-aside` and `.ct-notes` were the rules; the
 // table above the cards was already the answer, and cook-timer.js stopped
-// rendering them the same day. What survives below is the by-doneness block,
-// which the TABLE's time cell still emits.
+// rendering them the same day. The table went in its turn on 2026-10-08
+// (above). What survives below is the by-doneness block, which a method's
+// time cell still emits.
 
 // A method whose rate depends on doneness shows every level rather than one --
 // GitHub issue #246, beef's standard roast and venison's haunch, the only two
@@ -281,13 +419,6 @@
   // readable against the card -- this is the word that says which time you
   // are looking at, so it is not decoration.
   font-size: 0.85em;
-}
-
-// In the decision table the same block sits in a cell that is NOT flex, so the
-// column alignment comes from the cell rather than from align-items above.
-.ct-table .ct-doneness,
-.table-scroll .ct-doneness {
-  align-items: flex-start;
 }
 
 

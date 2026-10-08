@@ -63,29 +63,11 @@ $tc-hue: $color-blinging-blackberry;
 // Bar geometry. Thin marks, per the skill -- the row is mostly air, and the
 // axis does the work.
 $tc-bar-height: 0.85rem;
-$tc-row-height: 2.4rem;
-$tc-label-width: 9.5rem;
-// The label gutter's own breathing room. Widened from $space-lg once the axis
-// floor was fixed -- the clipping was the real cause of the collision, but a
-// bar that starts at the very first tick still sits uncomfortably close to the
-// word naming it.
-$tc-label-gap: $space-xl;
-// Where the plot's TRACK begins, and how wide it is. The rows are a grid --
-// label column, then 1fr -- so a bar's percentage is measured against that 1fr
-// and nothing else. Anything else drawn on the plot has to use the same basis
-// or it lands somewhere else entirely; see .tc-unsafe for what that cost.
-// CUSTOM PROPERTIES SINCE 2026-09-10 (#903), so a phone can zero them. Every
-// rule that measures against the label gutter reads these two, and the narrow
-// block at the end of this file sets both to 0 and stacks the label above the
-// track -- one change, and the bars, the threshold and the axis all agree.
-$tc-track-start: calc(var(--tc-label-w) + var(--tc-label-gap));
-$tc-track-width: calc(100% - var(--tc-label-w) - var(--tc-label-gap));
+$tc-track-height: 1.5rem;
 // Headroom above the rows for the threshold's own label.
 $tc-threshold-height: 1.35rem;
 
 .tc {
-  --tc-label-w: #{$tc-label-width};
-  --tc-label-gap: #{$tc-label-gap};
   font-family: $font-body;
   font-weight: 300;
   color: $color-text;
@@ -93,24 +75,46 @@ $tc-threshold-height: 1.35rem;
 }
 
 // --- The plot area -----------------------------------------------------------
-// A label gutter and a track, side by side. The track is the positioned
-// context every bar measures itself against, so it must not move.
+// ONE LINE OF WORDS, THEN THE BAR, since 2026-10-08 (#1327). A row is two grid
+// rows: the label at the left and the figure at the right share the first,
+// and the track takes the whole of the second. Helen chose it on the
+// candidates page (scripts/reference_candidates.py) against the layout that
+// shipped from 2026-08-14 to then -- a 9.5rem label column beside the track,
+// the figure hung off the bar's right end -- and against a vertical
+// thermometer.
+//
+// WHAT IT BUYS. The label column is gone, so the track is the column's full
+// width everywhere: a fifth wider on a desktop, and on a phone the whole 342px
+// instead of the 120px that #903 found the ticks crammed into. The figure can
+// wrap (sixty characters for turkey) without dragging the page wide, because
+// it is an ordinary grid cell and not a nowrap label hung off a coordinate.
+// And the stylesheet has ONE layout rather than a wide one and a narrow one
+// stacked under a media query: the phone block that #903 added is gone with
+// the column it zeroed.
+//
+// THE TRACK SPANS EVERY COLUMN, and that is the invariant .tc-unsafe depends
+// on: the zone is drawn on .tc-plot and the bars on .tc-track, and the two
+// share an origin and a width only because nothing sits to the left of the
+// track. tests/test_reference_data.py pins it.
+// THE LABEL KEEPS ITS WIDTH AND THE FIGURE WRAPS, not the other way round.
+// `minmax(0, 1fr) auto` was the first build, and `auto` let turkey's
+// sixty-character figure claim the whole row and print over the word TURKEY
+// in a label column squeezed to nothing. A label is three words at most
+// ("DUCK BREAST SEPARATE"); the figure is the thing with room to give.
 .tc-row {
   display: grid;
-  grid-template-columns: var(--tc-label-w) 1fr;
-  align-items: center;
-  min-height: $tc-row-height;
-  column-gap: var(--tc-label-gap);
-  // The row is the positioned context for its VALUE since 2026-10-08 (the
-  // track stays the context for the bars). The value is a sibling of the
-  // track now, not a child -- see temp_row.html -- so a phone can put it on
-  // the label's line rather than only under the bar. Being a third grid item
-  // it would otherwise take a cell of its own; absolute positioning takes it
-  // out of the grid on a wide screen.
-  position: relative;
+  grid-template-columns: max-content minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: $space-md;
+  // Top-aligned, so a figure that wraps (turkey's runs to two lines on a
+  // phone) starts on the label's line and runs down towards the bar, rather
+  // than hanging a first line above the label with nothing beside it.
+  align-items: start;
 }
 
 .tc-row-label {
+  grid-row: 1;
+  grid-column: 1;
   font-family: $font-headings;
   font-size: 0.78rem;
   letter-spacing: 0.04em;
@@ -119,13 +123,14 @@ $tc-threshold-height: 1.35rem;
   // Label tier, 2026-09-02: 0.78rem, under the 1rem line, stroke only. See
   // LETTERING.md.
   @include lettering(label);
-  text-align: right;
   line-height: 1.3;
 }
 
 .tc-track {
+  grid-row: 2;
+  grid-column: 1 / -1;
   position: relative;
-  height: $tc-row-height;
+  height: $tc-track-height;
 }
 
 // --- The gridlines -----------------------------------------------------------
@@ -209,23 +214,26 @@ $tc-threshold-height: 1.35rem;
 // Hatched rather than filled so it reads as "struck through" rather than as a
 // series, and so it survives greyscale and forced-colors, which a tint would
 // not.
-// MEASURED AGAINST THE TRACK, NOT THE PLOT, and this was a genuine safety bug
-// rather than a cosmetic one. The zone used to take its width as a percentage
-// of .tc-plot -- which includes the 9.5rem label column and the gap -- while
-// every bar takes its position from .tc-track, the 1fr beside that column. Same
-// number, two different bases: salmon's 63°C line rendered at about 54°C, some
-// 100px left of the figure it claimed.
+// MEASURED IN THE BARS' OWN COORDINATE SPACE, and from 2026-08-14 to
+// 2026-10-08 that took arithmetic: the zone is drawn on .tc-plot, the bars on
+// .tc-track, and the track then sat beside a 9.5rem label column. The zone
+// first shipped as a bare percentage of the plot, so salmon's 63°C line drew
+// at about 54°C, 100px left of the figure it claimed -- a genuine safety bug,
+// under-stating the hazard in the only direction that matters: medium and
+// medium-well sat to the RIGHT of a line they do not clear. The fix measured
+// the zone from the track's start at the track's width.
 //
-// It under-stated the hazard in the only direction that matters. Medium and
-// medium-well sat to the RIGHT of a line they do not actually clear, so a chart
-// added specifically to stop 43°C reading as an unqualified option was telling
-// the same lie about two more levels.
+// Since 2026-10-08 the track spans the whole row (.tc-track, grid-column
+// 1 / -1), so the plot and the track have the same left edge and the same
+// width and a percentage of one IS a percentage of the other. The arithmetic
+// is gone because the column is; if a column ever comes back to the left of
+// the track, it comes back here too.
 .tc-unsafe {
   position: absolute;
   top: $tc-threshold-height;
   bottom: 0;
-  left: $tc-track-start;
-  width: calc(#{$tc-track-width} * (var(--t) - #{$tc-min}) / #{$tc-max - $tc-min});
+  left: 0;
+  width: calc(100% * (var(--t) - #{$tc-min}) / #{$tc-max - $tc-min});
   background-image: repeating-linear-gradient(
     135deg,
     rgba($color-text, 0.07) 0 2px,
@@ -238,7 +246,7 @@ $tc-threshold-height: 1.35rem;
 .tc-threshold-label {
   position: absolute;
   top: 0;
-  left: calc(#{$tc-track-start} + #{$tc-track-width} * (var(--t) - #{$tc-min}) / #{$tc-max - $tc-min});
+  left: calc(100% * (var(--t) - #{$tc-min}) / #{$tc-max - $tc-min});
   transform: translateX(-100%);
   padding-right: $space-xs;
   font-family: $font-headings;
@@ -250,10 +258,10 @@ $tc-threshold-height: 1.35rem;
 }
 
 // --- The axis ----------------------------------------------------------------
+// The scale alone, the full width of the plot, since the label column went
+// (2026-10-08). It was a two-column grid with an empty first cell that kept
+// the ticks aligned with the track beside the labels.
 .tc-axis {
-  display: grid;
-  grid-template-columns: var(--tc-label-w) 1fr;
-  column-gap: var(--tc-label-gap);
   margin-top: $space-xs;
 }
 
@@ -289,20 +297,23 @@ $tc-threshold-height: 1.35rem;
 // out-at/rested readout itself ("48-50°C -> ~52-54°C"), the number the whole
 // chart exists to show, not a name beside it -- .tc-row-label (the row's own
 // name, RARE/MEDIUM RARE/...) stays Courier because it isn't one.
-// MEASURED AGAINST THE ROW, since 2026-10-08, with the same label-column
-// arithmetic .tc-unsafe uses: the value no longer lives inside the track, so
-// a bare percentage would be a percentage of the row and land 9.5rem left of
-// the bar it names -- the exact bug .tc-unsafe had. --b is the ROW's, inherited.
+// ON THE LABEL'S LINE, AT THE RIGHT, since 2026-10-08. It hung off the bar's
+// right end at a computed coordinate from 2026-08-14 until then, which is why
+// it could not wrap and why a phone could only ever put it under the bar
+// (#903). It is a grid cell now, in flow: it wraps at the column's edge, and
+// it sits level with the label so the two read as one line about the bar
+// beneath them. The row still carries --a/--b for anything that wants the
+// span; nothing in this file reads them off the row any more.
 .tc-value {
-  position: absolute;
-  top: calc(50% - 0.62rem);
-  left: calc(#{$tc-track-start} + #{$tc-track-width} * (var(--b) - #{$tc-min}) / #{$tc-max - $tc-min} + 0.5rem);
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
+  text-align: right;
   font-family: $font-label;
   font-weight: 600;
   font-size: 0.76rem;
   color: $color-clear-text;
-  white-space: nowrap;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 // --- Key, one per chart -----------------------------------------------------
@@ -464,16 +475,59 @@ $tc-threshold-height: 1.35rem;
 
 
 // --- Navigation ---------------------------------------------------------------
-// The charts runs to eight protein sections; without a contents list you scroll
-// past the one you want. Anchors follow the pattern internal-temperatures.html
-// already uses (an id on each h2, a plain list of links) rather than a new one.
-.tc-contents {
-  columns: 2;
-  column-gap: $space-xxl;
+// THE CONTENTS LIST IS A STICKY ROW OF CHIPS, since 2026-10-08 (#1327). The
+// charts page runs to eleven sections and 16,000px on a phone; a two-column
+// list at the top of it was a way in and never a way around. Helen, asked
+// whether the page should stay one scroll: "Immediate reaction is 1, with
+// good nav." This is the nav: the same <ul> of anchors, stuck to the top of
+// the viewport, one chip per section, scrolling sideways where it does not
+// fit. The "↑ top" link under every chart went with it -- the way back is
+// always on screen now.
+//
+// It is scoped under article.recipe .recipe-body-content because the body's
+// own list rule (_recipe-notes-body.scss, `article.recipe .recipe-body-content
+// ul li`) gives every li a dash and an indent at (0,2,3), and this list has
+// neither: a chip is its own marker. One class fewer here and the dash wins;
+// the first build drew one before every chip.
+article.recipe .recipe-body-content .tc-contents {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: $space-xs;
+  overflow-x: auto;
   margin: 0 0 $spacing-section-gap 0;
-  max-width: 34rem;
+  padding: $space-sm 0;
+  max-width: none;
+  background: $color-bg;
+  border-bottom: 1px solid $color-border;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 
-  li { break-inside: avoid; }
+  &::-webkit-scrollbar { display: none; }
+
+  li {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+
+    &::before { content: none; }
+  }
+
+  a {
+    display: inline-block;
+    font-family: $font-headings;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: $color-text;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: 999px;
+    padding: $space-xs 0.65rem;
+    white-space: nowrap;
+  }
 }
 
 // SCROLL-MARGIN IS NOT COSMETIC HERE. There is no scroll-margin anywhere else on
@@ -484,6 +538,13 @@ $tc-threshold-height: 1.35rem;
 // is roughly the gap the heading would have had if you'd scrolled to it.
 article.recipe .recipe-section-heading {
   scroll-margin-top: $space-xxl;
+}
+
+// And on a page with the sticky chips, the chips' own height on top of that,
+// or an anchor jump lands the heading under the bar. Every section heading
+// after the list is a sibling of it.
+article.recipe .tc-contents ~ .recipe-section-heading {
+  scroll-margin-top: calc(#{$space-xxl} + 2.8rem);
 }
 
 // INGREDIENTS, METHOD and NOTES are the page's spine at 1.8rem with the
@@ -500,41 +561,6 @@ article.recipe .recipe-section-heading {
   .section-heading-text {
     @include overlapping-rule-single($color-section-underline-2);
   }
-}
-
-// "↑ top", now after the chart rather than beside the heading (issue #215
-// -- Helen: the control that gets a section's own contents was offered
-// before you'd read anything, buried in the one place you land first). Its
-// own margin is left at 0 deliberately: the chart above it already carries
-// $spacing-section-gap as ITS bottom margin (or, where a .tc-note follows
-// the chart instead, that note carries $space-xl), and the next heading
-// already carries $spacing-section-top as its own top margin. Adjacent
-// sibling margins collapse to the larger of the pair either side of this
-// link, so those two existing tokens are what actually place it -- adding a
-// margin here would only add a second, uncoordinated gap on top of them.
-//
-// Right-aligned with text-align rather than float or absolute positioning:
-// it is the only thing on its own line, so there is nothing to lay out
-// against, and the site's own preference (MANUAL §13.3) is for the
-// simplest layout tool that reaches the result, not the most general one.
-// Font stays body, not the heading's Courier: it is a control, not a
-// second heading.
-.tc-totop {
-  display: block;
-  text-align: right;
-  font-family: $font-body;
-  font-size: 0.72rem;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  -webkit-text-stroke: 0;
-  text-shadow: none;
-  color: $color-clear-text;
-
-  // Issue #199: was $color-recipe-link (the darker resting link colour) --
-  // the one hover on the page going darker instead of lighter, against the
-  // "lighter on hover" rule article.recipe a and %link-button both follow.
-  &:hover { color: $color-recipe-link-hover; }
 }
 
 // Each protein's way through to its own timings or methods table. Sits on
@@ -597,93 +623,4 @@ article.recipe .recipe-section-heading {
 // have one.
 .tc-crosslink-line {
   margin: 0;
-}
-
-// --- On a phone ---------------------------------------------------------------
-// #903 and #900 item 9, Helen: "the whole page is much much wider than my
-// screen, but mostly blank space" and "all the x axis numbers are crammed into
-// the final three blocks, written over each other."
-//
-// ONE CAUSE, TWO SYMPTOMS. The label gutter is a fixed 9.5rem plus a 1.5rem gap
-// -- 176px of a 296px column -- so the track every bar and tick is measured
-// against was 120px wide: the ticks bunched, and the value labels
-// (`white-space: nowrap`, hung off the bar's right end) ran up to 430px past
-// the track and dragged the whole page out to 740px. Nothing was wrong with
-// the arithmetic; the axis had no room.
-//
-// SO THE LABEL GOES ABOVE THE TRACK. Both custom properties go to zero, the
-// two grids become one column (label on its own line, left-aligned, then the
-// track at the column's full width), and the threshold and the unsafe zone --
-// which measure from the same two properties -- follow without a rule of their
-// own. Only the axis's empty first cell is left over, and it is zero height.
-//
-// THE VALUE COMES OUT OF THE TRACK AND SITS UNDER IT, IN FLOW. Beside the bar
-// it hangs off the bar's right end and cannot wrap, so on a hot protein it ran
-// off the screen -- and the longest value on the site is sixty characters
-// ("74–75°C in the thickest part of the thigh, not touching bone", 430px), which
-// no clamp along the bar could hold. Under the track it is an ordinary line of
-// text that wraps at the column's width, right-aligned so the figure still
-// reads as belonging to the bar above it. The track keeps its fixed height for
-// the bars; the row's height is the track plus however many lines the value
-// takes. Ticks keep `translateX(-50%)`: the 100°C tick's right half hangs 15px
-// past the track, inside the page's own padding.
-@media (max-width: 600px) {
-  .tc {
-    --tc-label-w: 0px;
-    --tc-label-gap: 0px;
-  }
-
-  // Two rules rather than one selector list: test_a_multi_track_row_can_become_one
-  // reads the variant per selector, and a shared block only credits the last.
-  .tc-row {
-    grid-template-columns: 1fr;
-    row-gap: 0;
-  }
-
-  .tc-axis {
-    grid-template-columns: 1fr;
-  }
-
-  // EVERY CELL PLACED EXPLICITLY, because the value below is. Explicitly
-  // placed items go first, so with only the value naming its row the label
-  // auto-placed into row 1 and the track skipped the occupied row 2 and
-  // landed in row 3 -- under the value it was meant to share a cell with.
-  .tc-row-label {
-    grid-row: 1;
-    grid-column: 1;
-    text-align: left;
-  }
-
-  .tc-track {
-    grid-row: 2;
-    grid-column: 1;
-    // The bars are positioned against this box's height; the value below is
-    // outside it, so the box stays the bars' own height.
-    height: $tc-row-height;
-  }
-
-  // IN THE TRACK'S OWN GRID ROW, hugging its bottom edge, since the value
-  // became a sibling (2026-10-08). Inside the track it was a static block
-  // overflowing a fixed-height box, which cost the row no height at all --
-  // the value spilled into the space beside the NEXT row's label, and the two
-  // never met because one is left-aligned and the other right. As a grid item
-  // of its own it would take a real row and open every chart up by a line, so
-  // it shares the track's cell and pulls down past it by about the same
-  // overflow the old layout had.
-  .tc-value {
-    position: static;
-    grid-row: 2;
-    grid-column: 1;
-    align-self: end;
-    justify-self: end;
-    display: block;
-    text-align: right;
-    white-space: normal;
-    margin-bottom: -0.75rem;
-    padding-bottom: $space-xs;
-  }
-
-  .tc-contents {
-    columns: 1;
-  }
 }
