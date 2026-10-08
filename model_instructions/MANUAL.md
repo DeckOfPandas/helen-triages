@@ -487,7 +487,12 @@ page (about) shows every site. **It sits at the RIGHT-HAND end of the header's
 second row and the `??` about link (a literal `/about/`) at the LEFT end, both
 on the cards' edges, at every width** (2026-09-11, #965 and Helen's desktop
 ruling the same afternoon; it was centred under the wordmark for one day) —
-**on every page except /about/, which is the exception below.**
+**on every page except /about/, which is the exception below.** **The row
+starts where the wordmark's box ends and has 15px under it, at every width**
+(#1322, 2026-10-08, *"0 over, 15 under"*): no top margin on the row or `??`,
+no gap in the stacked grid, and `$space-sm` of bottom padding on
+`.site-header`, the rest of the 15 being the row's own grid line and the
+border. The header is 130px tall at 390 and 165.1px at 700 and 1280.
 
 **/about/ IS THE ONE PAGE WITH TWO DOORS, AND SINCE 2026-09-15 IT IS LAID OUT
 FOR THEM** (#1086, Helen: *"C: doors on one line, no ??"*). Two doors measure
