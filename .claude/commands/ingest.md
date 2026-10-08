@@ -190,7 +190,11 @@ file say the same things.
    you and refuses to do tier 3. It reads every pour whose `generic` is still a
    `QQ`, looks the source's words up in `bottles.yml` and in the vocabulary, and
    writes only what an EXACT match settles -- `--apply` to write, nothing by
-   default. **Run this before you type a generic by hand**: the batch of
+   default. **It also reads `_data/cocktails/source_wordings.yml`** (2026-10-07):
+   a source's wording for a category that Helen has already ruled is one of her
+   generics, such as Difford's "Rosso vermouth" for `sweet vermouth`. When she
+   answers a "which category?" and the answer is a rule rather than a call about
+   one drink, add the wording to that file in the same commit. **Run this before you type a generic by hand**: the batch of
    2026-09-20 resolved nine bottles from recall and got them right, which is
    nine chances to have been confidently wrong.
 6. **Work whatever is LEFT against the three tiers, not as one pile.** It used

@@ -233,6 +233,8 @@ argument and the rules each field is read by.
 - 2026-09-10 · §9.3.1 · #707 · "fresh" said out loud, and the opposite warning.
 - 2026-10-04 · §9.3.1 · #838 · crème de cacao is two generics, brown and white.
 - 2026-10-04 · §9.3.1 · #1108 · each clairin is its own generic; plain clairin is retired.
+- 2026-10-07 · §9.3.1 · 73 Difford's drinks, 79 untyped pours, and the vocabulary they left behind.
+- 2026-10-07 · §9.3.1 · lowercase when the word has become the thing.
 - 2026-09-07 · §9.3.2 · #591 · An agricole's origin goes on the BOTTLE, as origin:.
 - 2026-08-27 · §9.3.2 · #529 · Added, rum-only.
 - 2026-08-30 · §9.3.2 · Not rum-only any more, and neither are the two tests that made it worth having: 54 of 91 suggestions had resolved to nothing with no test minding.

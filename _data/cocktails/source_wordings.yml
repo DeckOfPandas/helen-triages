@@ -1,0 +1,107 @@
+# =============================================================================
+# WHAT A SOURCE CALLS IT -> WHAT HELEN CALLS IT. Started 2026-10-07.
+# =============================================================================
+# WHY THIS EXISTS. On 2026-10-07 seventy-three Difford's drinks arrived from a
+# claude.ai session with 79 pours left as `QQ` plus Difford's own words, and
+# `scripts/resolve_pours.py` settled NONE of them: it reads exactly, and
+# Difford's never writes a category the way this collection does. "Light white
+# rum (charcoal-filtered 1-4 years old)" is `lightly aged and filtered rum`;
+# "Rosso vermouth" is `sweet vermouth`; "Green Chartreuse" is `Chartreuse
+# Verte`. Helen answered them one at a time over an afternoon, and nine drinks
+# asked the same first question.
+#
+# So the answers are kept. Helen, shown the first seventeen as a table and
+# asked whether to keep them where the resolver could read them: "Agree to the
+# mapping." The next Difford's batch asks only what is new.
+#
+# WHAT MAY GO IN HERE, AND IT IS NARROW. A source's wording for a CATEGORY that
+# Helen has ruled is one of her generics -- her ruling, in her words or as a
+# "yes" to a named proposal. NOT a reading an ingest made by itself, however
+# obvious: the resolver's whole specification is that it "will not match
+# loosely, stem, fuzzy-match or guess", and an entry here is the one way a
+# near-miss becomes an exact read. That is only honest while every entry is
+# hers.
+#
+# WHAT DOES NOT GO IN HERE.
+#   - A BOTTLE. A source's name for a bottle is an `aliases:` entry on that
+#     bottle in bottles.yml, which the resolver already reads (Tier 1).
+#   - A wording that IS a declared generic. The resolver already reads those
+#     (Tier 2); a second copy here would be shadowed, and a test refuses it.
+#   - A ruling about ONE DRINK. "Cherry (brandy) liqueur" was `cherry liqueur`
+#     in all five drinks that poured it on 2026-10-07, but Helen asked to see
+#     them "one by one" and answered for those five, so it is not a rule and
+#     the sixth still gets asked. A `character` is the same: `hogo` went on
+#     Illegal Margarita's overproof rum because she said so for that drink.
+#   - The 2026-10-07 answer for Cocchi Americano, which is a LIST --
+#     `generic: ["americano", "quinquina"]` -- and this file writes one
+#     generic. Difford's "Americano bianco" is an alias of the bottle instead,
+#     so it resolves to `americano` suggesting Cocchi Americano, and the "or
+#     quinquina" is added by hand.
+#
+# HOW IT IS READ. `scripts/resolve_pours.py`, after the two dictionaries: a
+# pour whose `generic` is `QQ <words>` and whose words, folded (case, accents
+# and spacing), are a key below, is typed as the value. Exact, like everything
+# else that script does. tests/test_resolve_pours.py holds every value to the
+# declared vocabulary.
+#
+# THE KEYS ARE WRITTEN AS THE SOURCE PRINTS THEM, and where an ingest has been
+# trimming the source's bracket into the pour's note, the trimmed form is a
+# key too. Both arrive; neither is clever.
+# =============================================================================
+
+wordings:
+
+  # --- Difford's Guide ---------------------------------------------------------
+  # Every entry below: Helen, 2026-10-07, on the batch of 73.
+
+  # Nine drinks. "Is that your `lightly aged and filtered rum`?" -- yes.
+  "Light white rum (charcoal-filtered 1-4 years old)": "lightly aged and filtered rum"
+  "Light white rum": "lightly aged and filtered rum"
+
+  "Agricole blanc/cane juice rhum (unaged)": "rhum agricole blanc"
+  # `hogo` went on the one drink that poured this, on her word for that drink.
+  # A character is not this file's to write.
+  "Overproof white rum (unaged Jamaican/funky)": "overproof Jamaican rum, unaged"
+
+  "Rosso vermouth": "sweet vermouth"
+  "Bianco vermouth": "blanc vermouth"
+
+  # "Your agreed name" -- ingredients.yml's own note on the two Chartreuses.
+  "Green Chartreuse": "Chartreuse Verte"
+  "Green Chartreuse (or alternative herbal liqueur)": "Chartreuse Verte"
+
+  "Swedish Punsch liqueur": "Swedish flaggpunsch"
+  "Swedish Punsch": "Swedish flaggpunsch"
+  "Dry Curaçao liqueur": "dry orange Curaçao"
+
+  # Aperitivo Luxardo and Strucchi Red Bitter, which Difford's prints with the
+  # category in brackets. Offered a wider generic for each family instead:
+  # "agree" to `Aperol` and `Campari`, the bottle kept in the pour's note.
+  "Aperitivo Luxardo (Aperol-style liqueur)": "Aperol"
+  "Aperol-style liqueur": "Aperol"
+  "Strucchi Red Bitter (Campari-style liqueur)": "Campari"
+  "Red bitter (Campari-style liqueur)": "Campari"
+
+  # Ketel One Citroen. "lemon vodka."
+  "Citroen vodka": "lemon vodka"
+
+  # "great, phew, yes, bonded rye."
+  "Straight rye whiskey (100 proof /50% alc./vol.)": "bonded rye"
+  "Straight rye whiskey 100 proof": "bonded rye"
+
+  "Japanese blended whisky": "Japanese whisky"
+
+  "Demerara/Muscovado/brown sugar syrup (2 sugar to 1 water)": "demerara sugar syrup 2:1"
+  "Demerara/Muscovado/brown sugar syrup 2:1": "demerara sugar syrup 2:1"
+  "Grenadine/pomegranate syrup": "grenadine"
+  # The pressed-cane kind. "Yeah I don't do that, ha, cane syrup 2:1 is good
+  # enough for me." The source's words go in the pour's note.
+  "Sugar cane syrup (from juice)": "cane sugar syrup 2:1"
+  # "hazelnut syrup" -- asked whether to keep the "roasted".
+  "Roasted hazelnut syrup": "hazelnut syrup"
+  "Honey syrup (3 parts honey to 1 water by weight)": "honey water 3:1"
+
+  "Kummel liqueur": "kümmel"
+  "Crème de myrtille liqueur": "crème de myrtille"
+  # Offered `yoghurt`: "natural yoghurt".
+  "Yoghurt (natural)": "natural yoghurt"

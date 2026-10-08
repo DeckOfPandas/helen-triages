@@ -2687,6 +2687,58 @@ unless stated.
   `abv.yml` and `costs.yml`. The other three have no strength or price until a
   drink pours one; do not guess them, the single-village clairins run into the
   fifties and move batch to batch.
+- **2026-10-07 — 73 Difford's drinks, 79 untyped pours, and the vocabulary they
+  left behind.** A claude.ai session built the envelopes from Helen's pastes;
+  they landed in a Claude Code session with her, and `resolve_pours.py`
+  settled none of the 79, because Difford's never writes a category her way.
+  She ruled on them a few at a time. What that produced, so nobody re-asks:
+  - **Difford's bottles do not go in `suggestion`.** The web session had put
+    them there on a ruling of hers in that chat; 148 failed to resolve, most
+    of them Difford's sponsors (Strucchi, Eager, Three Cents, Monin) rather
+    than her shelf. *"Move all the suggestions to notes, and I can add my own
+    suggestions where I have them or drop if not. For notes, just write
+    'Originally X'."* A suggestion stands only where she names one.
+  - **`_data/cocktails/source_wordings.yml` is new**: a source's wording for a
+    category she has ruled is one of her generics. *"Agree to the mapping."*
+    Replayed over the original envelopes it settles 60 of the 79. Her rulings
+    only; a call she made about one drink is not a rule and stays out
+    (`cherry (brandy) liqueur` was `cherry liqueur` five times, asked *"one by
+    one"*).
+  - **Twenty new generics**, each a "yes" to a named proposal or her own
+    word: `cranberry juice drink` (*"needs to be a new generic"* — the declared
+    cranberry bottle is unsweetened), `lemon vodka`, `pink grapefruit juice`
+    (*"is a new thing"*), `blood orange juice`, `daiquiri bitters`,
+    `grapefruit bitters`, `peach bitters`, `coconut water`, `birch water`,
+    `natural yoghurt`, `ruby port`, `pineapple syrup`, `hazelnut syrup`,
+    `honey water 3:1`, `black raspberry liqueur`, `crème de myrtille`,
+    `kümmel`, `sake`, `tsipouro`, `lime zest with flesh`. Most carry
+    PLACEHOLDER prices and strengths at `confidence: low`.
+  - **Declined:** a generic for pressed-cane syrup (*"I don't do that, ha, cane
+    syrup 2:1 is good enough for me"*); wider generics for the Aperol and
+    Campari families (Aperitivo Luxardo is `Aperol`, Strucchi Red Bitter is
+    `Campari`).
+  - **Cocchi Americano, three answers in one afternoon, and the third stands.**
+    First a `quinquina` with `character: "americano"` (*"I care about how
+    something works in a drink far more than what it technically is"*); then
+    *"I think Cocchi Americano is an americano"* with `character: quinquina`;
+    then, shown that a character names a flavour trait and that the Singapore
+    Sling already says "either works" as a list, *"I agree with you, thanks,
+    your way"*: `generic: ["americano", "quinquina"]`, suggesting `Cocchi
+    Americano`. Picotin and North Sea Oil. **No `fortified_characters` list
+    exists**; one was declared and removed the same day.
+  - **Three units**: `wedge` (Fay Wray's lime), `cm log` (Zakuski's cucumber,
+    *"2.5-cm cucumber log"* — centimetres, the source said an inch) and `thick
+    coin` (Cyrano's lime, *"1 thick coin, lime zest with flesh"*).
+  - **Open:** Fay Wray's Havana Club Añejo Especial, #1335, at her request.
+- **2026-10-07 — lowercase when the word has become the thing.** Asked what
+  the collection does about Maraschino and Demerara, Helen offered the rule
+  herself: *"Something like when the word has become the thing we use
+  lowercase?"* A census agreed nearly everywhere (maraschino cherry, parmesan,
+  muscovado, `demerara sugar` in every cocktail); the outlier was published
+  food's `Demerara sugar`, lowercased in five recipes on her grant (*"Lower
+  case d for sugar. Please fix live...carefully!"*). **A capital stays where
+  the word still names the place or a brand**: `Demerara rum`, Dijon mustard,
+  `Luxardo maraschino cherry`.
 
 ### §9.3.2 The bottle dictionary
 

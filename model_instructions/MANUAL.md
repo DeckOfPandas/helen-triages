@@ -3824,6 +3824,16 @@ by construction** — the lookup is an exact read, so `blackstrap rum` names no
 bottle and is left alone, which is the case Helen raised. Moods run AFTER it,
 because they read the generics it just wrote. DECISIONS §9.3.
 
+**Tier 2 reads a third dictionary, `_data/cocktails/source_wordings.yml`:** a
+source's wording for a CATEGORY that Helen has ruled is one of her generics —
+Difford's "Rosso vermouth" is `sweet vermouth`, its "Light white rum
+(charcoal-filtered 1-4 years old)" is `lightly aged and filtered rum`. Still an
+exact read. **When she answers a tier 3 "which category?" and the answer is a
+rule rather than a call about one drink, add the wording there in the same
+commit**, so the next batch from that source does not ask again; a source's
+name for a BOTTLE is an alias in `bottles.yml` instead. The file's header says
+what may not go in it.
+
 **`derive_main_ingredients.py` is FOOD's, and is a reorder unless you ask
 otherwise.** Default: Helen's own members in her stated order (star, then how
 much of a game over it would be, then proportion, then larder order), membership
