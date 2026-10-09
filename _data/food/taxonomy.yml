@@ -215,6 +215,76 @@ co_tags:
     - make-ahead
 
 # -----------------------------------------------------------------------------
+# Tag hints — what `scripts/check_food_tags.py` reads. A REPORT, NEVER A RULE.
+#
+# Measured 2026-10-08, when Helen asked whether food tags could be derived the
+# way cocktail moods are. Every one- and two-feature rule was searched over 90
+# published recipes and 359 drafts, and scored on recipes held out of the
+# search. The answer was no deriver: the only tags the data can see are the
+# ones the TITLE already says, and the ingest proposal gets those right anyway.
+# What the same rules are good for is the opposite job -- noticing a draft
+# whose tag and whose title disagree, for her to look at when she proofreads.
+#
+# So nothing here writes a tag, and no test fails a recipe on one. A hint that
+# fires says "worth an eye", and the recipe may well be right: a chicken and
+# chorizo stew can be about the pork.
+#
+# ONLY THE ONES THAT HELD UP ARE HERE. `salad`, `bakes` and the `chocolate`,
+# `poultry` and `beef` stars scored .75 to .95 against her own published
+# recipes with the rule found on drafts alone; `soup`, `ice cream`, `duck`,
+# `lamb`, `white fish` and `shellfish` fit the drafts as well and have too few
+# published recipes to confirm. `virtuous`, `carbs party`, `showstopper`,
+# `festive`, `starter` and the other judgement tags scored at or below a
+# search run on shuffled tags and have no hint, because there is none to find.
+#
+# SHAPE. `title:` is any of these as a whole word in the title, with or
+# without a plural `s`. `ingredients_all:` is every one of these as a whole
+# word somewhere in the ingredient items. `text_any:` is any of these phrases
+# anywhere in the tagline, the method or the notes.
+#
+# `no-cook` HAS NO HINT BECAUSE IT ALREADY HAS A TEST. `cook_time: "None"` is
+# the fact and the tag is the filter (test_no_cook_tag_matches_cook_time); on
+# 2026-10-08 all 17 recipes with one had the other.
+# -----------------------------------------------------------------------------
+tag_hints:
+  tags:
+    salad:     { title: [salad] }
+    soup:      { title: [soup] }
+    ice cream: { title: [ice cream] }
+    bakes:     { ingredients_all: [flour, sugar] }
+    # `freezable` IS A CLAIM THE RECIPE MAKES IN ITS OWN WORDS, and there is no
+    # field for it: 39 of the 51 recipes that carry the tag mention freezing
+    # in a step, a note or the tagline, and the other 12 are stews and bakes
+    # tagged from knowing they freeze. So the hint reads the prose, for the
+    # phrases that are a CLAIM. Bare `frozen` and `freeze` are deliberately
+    # absent: they are frozen peas, frozen cherries and every ice cream's
+    # last step.
+    freezable:
+      text_any:
+        - freezes well
+        - freeze well
+        - freezable
+        - frozen for up to
+        - freeze for up to
+        - keep frozen
+        - in the freezer for up to
+        - months in the freezer
+        - can be frozen
+        - freeze in portions
+  star_ingredient:
+    chocolate:  { title: [chocolate] }
+    poultry:    { title: [chicken, turkey] }
+    duck:       { title: [duck] }
+    lamb:       { title: [lamb] }
+    # `steak` WAS HERE FOR ONE RUN and fired on cauliflower steaks and venison
+    # steaks. A cut is not an animal.
+    beef:       { title: [beef] }
+    pork:       { title: [pork] }
+    oily fish:  { title: [salmon, mackerel] }
+    white fish: { title: [cod, haddock] }
+    shellfish:  { title: [prawn] }
+
+# -----------------------------------------------------------------------------
 # Proper nouns
 #
 # GitHub issue #71: ingredient tips/notes are lower case except for proper

@@ -121,6 +121,14 @@ cocktail. Sessions have run the two test suites, called the work verified, and
 missed the first two. One command, five lines of output, non-zero exit if
 anything fails.
 
+**`python3 scripts/check_food_tags.py` is a REPORT and is deliberately not in
+`verify.py`** (2026-10-08). It lists food recipes whose tags or star disagree
+with what the title says — "salad" in the title and no `salad` tag — from
+`tag_hints` in `_data/food/taxonomy.yml`. It writes nothing and fails nothing:
+food has no tag deriver, because the only tags the data can see are the ones
+the title already states (DECISIONS §7). `--drafts` is the list to have open
+while proofreading.
+
 **A CHECK MAY SAY `SKIP`, WHICH IS NEITHER A PASS NOR A FAILURE**, and
 `check_slug_keys.py` is the one that does. `mood_include` / `mood_exclude` live
 in the PUBLIC taxonomy and are keyed by slug, but most of the cocktails they name
