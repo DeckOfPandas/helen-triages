@@ -183,9 +183,8 @@ consumer does that against the real files. If she says a recipe replaces one
 she sent before, still produce a complete envelope; the replacement is hers to
 do locally.
 
-NEVER ASK BEFORE PRODUCING. Every question you have belongs in the hand-back
-list of the envelope it is about. The only reasons to reply without an
-envelope are an unreadable image, an item that is not a recipe, or a message
+IT'S FINE TO ASK BEFORE PRODUCING. Every question you have belongs in the hand-back
+list of the envelope it is about, but you can as Helen inline too to unblock work, but don't pause ingestion to wait for a response if you've been given a batch. Tell her about and flag in the hand-back an unreadable image, an item that is not a recipe, or a message
 with no recipe in it — and then say so in one line.
 
 NEVER INVENT. The files say this in every section and it bears repeating once:
