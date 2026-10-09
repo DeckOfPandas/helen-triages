@@ -137,9 +137,14 @@ permalink: /food/reference/internal-temperatures/
     </div>
 
     <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}#fish">cooking methods &rarr;</a></p>
+    {% comment %} ?protein=fish, not #fish, since 2026-10-09. The fish list
+       on the methods page sits inside the block the dropdown swaps in, hidden
+       until "Fish and shellfish" is picked -- so a bare anchor landed on a
+       page showing beef with nothing scrolled to. cook-timer.js reads
+       ?protein=fish as that dropdown entry. {% endcomment %}
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=fish">cooking methods &rarr;</a></p>
 
-    {% include food/temp_key.html rested=true unsafe=true %}
+    {% include food/temp_key.html rested=true %}
     <div class="tc">
       <div class="tc-plot">
         <div class="tc-unsafe" style="--t:{{ t.fish.salmon.safety_min }};"></div>
@@ -156,12 +161,17 @@ permalink: /food/reference/internal-temperatures/
       {{ axis }}
     </div>
 
-    <p class="tc-note">FSA advice is a minimum serving temperature of {{ t.fish.general.endpoint_min }}°C.</p>
+    {% comment %} NO NOTE UNDER ANY CHART, since 2026-10-09. Salmon's said
+       "FSA advice is a minimum serving temperature of 63°C" and pork's spelt
+       out the FSA held-temperature equivalences; Helen: "delete all extra
+       notes below all tables... all of them." The shaded zone and its label
+       on the plot carry the figure; the full safety notes stay in
+       internal_temperatures.yml. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=ham">cooking methods and timings &rarr;</a></p>
 
-    {% include food/temp_key.html rested=true unsafe=true %}
+    {% include food/temp_key.html rested=true %}
     <div class="tc">
       <div class="tc-plot">
         <div class="tc-unsafe" style="--t:{{ t.ham.fresh.safety_min }};"></div>
@@ -197,15 +207,16 @@ permalink: /food/reference/internal-temperatures/
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=pork">cooking methods and timings &rarr;</a></p>
 
-    {% include food/temp_key.html rested=true carry=true unsafe=true %}
+    {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
       <div class="tc-plot">
         {% comment %} The FSA line at 70°C is the whole reason this section
            earns a drawing. internal_temperatures.yml flags pork's "medium" as
            not clearing UK guidance, in a safety_note nobody reads until after
-           they've cooked. Here the shading says it before the sentence does --
-           and note that medium's RESTED figure clears nothing either, because
-           FSA's table is about temperature HELD, not passed through. {% endcomment %}
+           they've cooked. Here the shading says it -- and note that medium's
+           RESTED figure clears nothing either, because FSA's table is about
+           temperature HELD, not passed through. A sentence under the chart
+           said so until 2026-10-09 (see the note above the ham heading). {% endcomment %}
         <div class="tc-unsafe" style="--t:{{ t.pork.roasting.safety_min }};"></div>
         <div class="tc-threshold-label" style="--t:{{ t.pork.roasting.safety_min }};">{{ t.pork.roasting.safety_label }} &rarr;</div>
         {% for level in t.pork.roasting.doneness %}
@@ -219,18 +230,13 @@ permalink: /food/reference/internal-temperatures/
       {{ axis }}
     </div>
 
-    {% comment %} The data's own safety_note runs to ~150 words, written for
-       someone auditing the figure. This is the version for someone cooking: the
-       FSA equivalences it turns on, and nothing else. HELD, not passed through
-       on the way past — which is exactly why the medium figure doesn't clear it,
-       and the one thing this sentence has to carry. "Pull" is gone with the rest
-       of that vocabulary. The full note stays in internal_temperatures.yml.
-       {% endcomment %}
-    <p class="tc-note">FSA wants pork <em>held</em> at 60°C for 45&nbsp;min, 65°C for 10&nbsp;min, 70°C for 2&nbsp;min, or 75°C for 30&nbsp;sec — held, not passed through as it cools. Only the well-done figure clears that.</p>
-
     <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=chicken">cooking methods and timings &rarr;</a></p>
-    <p class="recipe-section-subtitle">by the thigh, not the breast</p>
+    {% comment %} "by the thigh, not the breast" sat here as a subtitle until
+       2026-10-09, and went with "in the thigh" on every row's figure -- the
+       same instruction, and Helen asked for all of it off the charts. The
+       data's endpoint strings still say where to probe, on a recipe page's
+       meta line and the calculator's "Done at". {% endcomment %}
 
     {% include food/temp_key.html solid="reaches" %}
     <div class="tc">
@@ -284,7 +290,11 @@ permalink: /food/reference/internal-temperatures/
       {{ axis }}
     </div>
 
-    <p class="recipe-section-subtitle">Haunch &mdash; rest {{ t.venison.haunch.rest_min }} minutes</p>
+    {% comment %} "Haunch — rest 20 minutes" until 2026-10-09; the rest time
+       went with the other notes (Helen named this one). The subtitle stays
+       because two charts share one heading and this is how you tell them
+       apart. {% endcomment %}
+    <p class="recipe-section-subtitle">Haunch</p>
     <div class="tc">
       <div class="tc-plot">
         {% for level in t.venison.haunch.doneness %}
@@ -344,37 +354,18 @@ permalink: /food/reference/internal-temperatures/
         {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness %}
         {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness %}
 
-        <div class="tc-row" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};">
-          <div class="tc-row-label">Fish, general</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"></div>
-          </div>
-          <div class="tc-value">{{ t.fish.general.endpoint }}</div>
-        </div>
-
-        <div class="tc-row" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};">
-          <div class="tc-row-label">Poultry</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"></div>
-          </div>
-          <div class="tc-value">{{ t.poultry.chicken.endpoint }}</div>
-        </div>
-
-        <div class="tc-row" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};">
-          <div class="tc-row-label">Cured ham</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"></div>
-          </div>
-          <div class="tc-value">{{ t.ham.cured.target }}</div>
-        </div>
-
-        <div class="tc-row" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};">
-          <div class="tc-row-label">Slow-cooked</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"></div>
-          </div>
-          <div class="tc-value">tender at {{ t.beef.tough_cuts.tender_at }}</div>
-        </div>
+        {% comment %} The four single-figure rows go through temp_row.html
+           like every other row, since 2026-10-09. They were written out by
+           hand, printing the data's display strings -- "~63°C, opaque and
+           flaking", "70–75°C at the thickest point" -- and the include now
+           builds its figure from the numbers, which is how those words came
+           off this chart with the rest. temp_row finds the figure each node
+           carries (endpoint, target, tender_at) and says "tender at" for the
+           last. {% endcomment %}
+        {% include food/temp_row.html label="Fish, general" spec=t.fish.general %}
+        {% include food/temp_row.html label="Poultry" spec=t.poultry.chicken %}
+        {% include food/temp_row.html label="Cured ham" spec=t.ham.cured %}
+        {% include food/temp_row.html label="Slow-cooked" spec=t.beef.tough_cuts %}
       </div>
       {{ axis }}
     </div>

@@ -2756,8 +2756,8 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "the oven setting and the outcome spanning both beneath (2026-10-08, "
         "#1329). The name is wrapping prose; the time is capped at 10.5rem and "
         "breaks at its dash (.ct-t), so its floor is one half of a range, "
-        "'3 hrs 15 mins' at most, about 110px of Plex Mono. Verified at 360 "
-        "and 390 with shoot.sh."
+        "'4h50m' at most since the compact format (2026-10-09), about 50px of "
+        "Plex Mono. Verified at 360 and 390 with shoot.sh."
     ),
 }
 

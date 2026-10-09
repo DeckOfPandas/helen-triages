@@ -135,21 +135,40 @@ $tc-threshold-height: 1.35rem;
 
 // --- The gridlines -----------------------------------------------------------
 // Recessive, per the skill: the grid is scaffolding, not content. Drawn as a
-// repeating gradient on the plot's own background so it costs no elements, at
-// 10°C intervals across the 60° span.
+// gradient on the plot's own background so it costs no elements.
+//
+// ONE LINE AT EVERY MULTIPLE OF TEN, since 2026-10-09. From 2026-08-14 the
+// lines were a repeating gradient with a 10°C period measured from the plot's
+// LEFT EDGE, and the left edge is $tc-min, 35°C -- so they fell at 35, 45,
+// 55 ... while the ticks under them read 40, 50, 60, five degrees to the
+// right of every line. Helen: "The scientist in me is upset by the x axis
+// lines: please redraw the figures so the x= lines are on integer multiples
+// of ten." Each line is now its own pair of stops at the position the ticks
+// and the bars compute for the same figure, so the three cannot disagree
+// again; the loop reads $tc-min/$tc-max so a re-scaled axis re-draws them.
+// The line at $tc-max is drawn one pixel inside the edge, where a line AT
+// the edge would be clipped.
+$tc-gridlines: ();
+@for $tens from 0 through 30 {
+  $deg: $tens * 10;
+  @if $deg >= $tc-min and $deg <= $tc-max {
+    $at: if($deg == $tc-max,
+             "100% - 1px",
+             "100% * #{$deg - $tc-min} / #{$tc-max - $tc-min}");
+    $tc-gridlines: append($tc-gridlines, transparent calc(#{$at}), comma);
+    $tc-gridlines: append($tc-gridlines, $color-border calc(#{$at}), comma);
+    $tc-gridlines: append($tc-gridlines, $color-border calc(#{$at} + 1px), comma);
+    $tc-gridlines: append($tc-gridlines, transparent calc(#{$at} + 1px), comma);
+  }
+}
+
 .tc-plot {
   position: relative;
   // Room for the threshold label, which sits above the first row rather than on
   // top of it. It was at top: 0 with nothing reserved, so it overprinted the
   // first doneness level and was clipped by the container edge.
   padding-top: $tc-threshold-height;
-  background-image: repeating-linear-gradient(
-    to right,
-    $color-border 0,
-    $color-border 1px,
-    transparent 1px,
-    transparent calc(100% * 10 / #{$tc-max - $tc-min})
-  );
+  background-image: linear-gradient(to right, $tc-gridlines);
   background-position: 0 0;
   background-size: 100% 100%;
 }
@@ -362,11 +381,10 @@ $tc-threshold-height: 1.35rem;
     background: repeating-linear-gradient(to right,
       rgba($tc-hue, 0.9) 0 3px, transparent 3px 6px);
   }
-  .tc-key-unsafe {
-    background-image: repeating-linear-gradient(135deg,
-      rgba($color-text, 0.07) 0 2px, transparent 2px 7px);
-    border-right: 2px dashed rgba($color-text, 0.45);
-  }
+  // No key entry for the shaded zone since 2026-10-09. It read "below the
+  // cited safety figure" and Helen asked for it to go with the rest of the
+  // words on the figures; the line's own label ("FSA/USDA 63°C →") is what
+  // says what the hatch is.
 }
 
 

@@ -6,7 +6,12 @@
              is an endpoint rather than a moment you act on)
     rested   true if this chart draws the open rested bar
     carry    true if this chart draws the carryover connector
-    unsafe   true if this chart shades a zone below a safety figure
+
+  NO ENTRY FOR THE SHADED ZONE, since 2026-10-09. There was an `unsafe`
+  parameter and a hatched swatch reading "below the cited safety figure";
+  Helen asked for that label to go, with every other run of words on the
+  figures. The zone still has a label of its own on the plot, at the line
+  ("FSA/USDA 63°C →"), which is where the reader's eye is when they want it.
 
   WHY IT MOVED OUT OF THE PAGE HEADER. There was one key at the top covering
   every chart below it, which is the arrangement that requires the reader to
@@ -25,5 +30,4 @@
   <span><i class="tc-key-out-at"></i> {{ include.solid | default: "out at" }}</span>
   {% if include.carry %}<span><i class="tc-key-carry"></i> carryover</span>{% endif %}
   {% if include.rested %}<span><i class="tc-key-rested"></i> rests to</span>{% endif %}
-  {% if include.unsafe %}<span><i class="tc-key-unsafe"></i> below the cited safety figure</span>{% endif %}
 </div>

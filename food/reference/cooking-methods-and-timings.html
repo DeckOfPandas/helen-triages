@@ -76,23 +76,35 @@ permalink: /food/reference/cooking-methods-and-timings/
        round -- the page announced BEEF and then offered a box that turned out
        to change what it had just announced.
 
-       It is deliberately NOT in .ct-controls with the weight any more. The two
-       boxes do different jobs now: this one chooses the subject, the weight
-       one refines the answer, and the heading between them is the seam.
-       {% endcomment %}
-    <div class="ct-protein-pick">
-      <label class="ct-field">
-        <span>What</span>
-        <select id="ct-protein"></select>
-      </label>
+       AND THE WEIGHT SITS DIRECTLY UNDER IT, since 2026-10-09. From #253 the
+       weight box lived in a band of its own under the protein heading, a
+       section away from the dropdown; Helen: "move the weight input field to
+       just below the protein selector dropdown, so the user is saying 'I have
+       chicken, 3 kg'." So the two inputs are one form again, stacked, and
+       the heading below retitles itself from the first of them.
+
+       The weight is outside #ct-calculator but is put away with it:
+       cook-timer.js hides this one field when the dropdown says fish, since
+       fish are not cooked by weight. The dropdown itself is never hidden,
+       because it is how you get back. {% endcomment %}
+    <div class="ct-inputs">
+      <div class="ct-form">
+        <label class="ct-field">
+          <span>What</span>
+          <select id="ct-protein"></select>
+        </label>
+        <label class="ct-field" id="ct-weight-field">
+          <span>Weight (kg)</span>
+          <input id="ct-weight" type="number" min="0.3" max="15" step="0.1" value="2.4" inputmode="decimal">
+        </label>
+      </div>
     </div>
 
     {% comment %} EVERYTHING FROM HERE TO </div id=ct-calculator> IS THE
-       INSTRUMENT, and it is wrapped so the dropdown can put it away. Issue #412
-       gives fish and shellfish their own entry in that dropdown; picking it
-       swaps this whole block for the section below rather than showing a
-       weight box that cannot answer anything. The dropdown itself stays outside
-       the wrapper, because it is how you get back. {% endcomment %}
+       INSTRUMENT'S ANSWER, and it is wrapped so the dropdown can put it away.
+       Issue #412 gives fish and shellfish their own entry in that dropdown;
+       picking it swaps this whole block for the section below rather than
+       showing a schedule that cannot answer anything. {% endcomment %}
     <div id="ct-calculator">
     {% comment %} `data-last-line-rule="skip"` because THIS heading's text is
        cook-timer.js's, rewritten every time the dropdown changes.
@@ -124,24 +136,9 @@ permalink: /food/reference/cooking-methods-and-timings/
        {% endcomment %}
     <p class="ct-doneat" id="ct-doneat"></p>
 
-    {% comment %} The calculator line: what, and how heavy. Two boxes now, and
-       the wrapper's bottom border is the second of the sketch's two rules --
-       kept because it closes a band of INPUTS before a band of answers, which
-       is a different job from separating two labelled sections. It lives on
-       the wrapper rather than on the form so the rule still draws whatever the
-       form ends up containing. {% endcomment %}
-    {% comment %} The weight, alone now, and its wrapper's bottom border is the
-       horizontal line issue #253 asks for after this field. Kept on the
-       wrapper rather than the form so the rule still draws whatever the form
-       ends up containing. {% endcomment %}
-    <div class="ct-controls">
-      <div class="ct-form">
-        <label class="ct-field">
-          <span>Weight (kg)</span>
-          <input id="ct-weight" type="number" min="0.3" max="15" step="0.1" value="2.4" inputmode="decimal">
-        </label>
-      </div>
-    </div>
+    {% comment %} The weight box sat here, in a .ct-controls band closed by a
+       rule (#253's horizontal line), from 2026-08-16 to 2026-10-09. It is
+       under the dropdown now, above the heading -- see there. {% endcomment %}
 
     {% comment %} One heading over the methods, replacing "Details" -- issue
        #253. THE CARDS THAT SAT UNDER THE TABLE ARE GONE, #873, Helen

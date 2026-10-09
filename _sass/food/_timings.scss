@@ -14,14 +14,6 @@
 @import "shared/tokens";
 @import "shared/rule";
 @import "food/rule";
-// --- Demo page furniture, not part of the proposal ---------------------------
-.tc-note {
-  font-size: 0.85rem;
-  font-style: italic;
-  color: $color-clear-text;
-  max-width: 62ch;
-  margin: 0 0 $space-xl 0;
-}
 
 // =============================================================================
 // THE TIMING CALCULATOR
@@ -48,40 +40,30 @@
   margin: $space-xl 0 0 0;
 }
 
-// TWO GRID ROWS, NOT FOUR FLEX COLUMNS. Helen: "the time calculator box labels
-// are misaligned vertically." They were: the fields were flex columns aligned
-// at their BOTTOM edge, which lines the inputs up perfectly and lets the labels
-// float to wherever their own height puts them -- so "Eating at (optional)",
-// being the one label that wrapped to two lines, sat a line higher than its
-// neighbours.
-//
-// That label is gone with its box (#244) and there are two fields left, both
-// one-liners, so nothing is currently misaligned -- but the grid stays. Fixing
-// the symptom (a min-height on the label) would only have held until someone
-// wrote a longer label, and that is still true of the next field anyone adds. A
-// grid with an explicit label row and input row makes the alignment structural:
-// every label is in row 1 and every input in row 2, however many lines either
-// takes. `display: contents` on the field lets the label and its input become
-// grid items directly while keeping the <label> wrapping its own <input>, so
-// the two stay associated without a `for`.
+// THE TWO INPUTS, STACKED: WHAT, THEN HOW HEAVY -- 2026-10-09. Helen: "move
+// the weight input field to just below the protein selector dropdown, so the
+// user is saying 'I have chicken, 3 kg'." Until then the weight sat in its
+// own band under the protein heading (#253), a section away from the box it
+// refines, and this form was a two-row grid of side-by-side fields with
+// `display: contents` on each -- built for four boxes (#244) whose labels
+// had to share a baseline. Two boxes one above the other have no baseline
+// to share, so each field is a small grid of its own: label over control.
 .ct-form {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  grid-template-rows: auto auto;
-  // Row gap between the labels and their inputs, column gap between fields.
-  gap: $space-sm $space-xl;
-  // No bottom margin: .ct-controls owns the gap between the last input and the
-  // rule that closes the band.
+  justify-items: start;
+  gap: $space-md;
   margin: 0;
 }
 
 .ct-field {
-  display: contents;
+  display: grid;
+  gap: $space-xs;
 
-  // Labels sit on the row's bottom edge, so a one-line and a two-line label
-  // share a baseline immediately above their inputs.
-  > span { align-self: end; }
+  // The weight is put away with the calculator when the dropdown says fish
+  // (cook-timer.js). An author `display` beats the browser's own
+  // `[hidden] { display: none }`, so it is restated here, as everywhere on
+  // the site that hides a grid or flex box.
+  &[hidden] { display: none; }
 
   > span {
     font-family: $font-headings;
@@ -155,48 +137,23 @@
   }
 }
 
-// The calculator line, closed by a rule. This is the second of the two rules
-// issue #243's sketch asks for, and the only one drawn: the first, between the
-// strapline and the protein heading, is already carried by the heading's own
-// treatment. This one earns a line because it separates a band of INPUTS from
-// the answers below, which no heading is labelling -- a different job from
-// separating two titled sections.
+// THE RULE UNDER THE WEIGHT BOX IS GONE WITH THE BAND, 2026-10-09. From #243
+// the weight sat in a `.ct-controls` band under the protein heading, closed
+// by a border that separated the inputs from the answers; now both inputs
+// sit above the heading, and the heading's own double rule is the seam.
 //
-// The border is on this wrapper rather than on .ct-form so it still draws
-// whatever the form ends up holding; that is how it survived losing two of its
-// four fields without moving.
-//
-// THE TOP OF THE PAGE NEEDED AIR. Helen: "we need more vertical space at the
-// top... or at least some change to help me breathe." Title, summary, "Done
-// at", four labels and four inputs used to arrive at one rhythm inside about
-// 300px, so nothing had a chance to read as a separate step. Two boxes fewer
-// and a heading in the middle of it help; the section-sized gap below the rule
-// is the rest of it.
-.ct-controls {
-  padding: 0 0 $spacing-block-gap 0;
-  border-bottom: 1px solid $color-border;
-  margin: 0 0 $spacing-section-top 0;
-}
-
-// The "What" selector, lifted out of .ct-controls by issue #253 to sit above
-// the heading it retitles. No border and no section-sized gap on its BOTTOM:
-// the heading immediately below already brings $spacing-section-top with it,
-// and a second value there would fight one that is already correct -- the
-// same adjacent-margin reasoning .tc-totop and .tc-crosslink-line follow on
-// the temperature charts.
+// The inputs, above the heading they retitle (#253 put the WHAT box there;
+// the weight joined it on 2026-10-09). No border and no section-sized gap on
+// the BOTTOM: the heading immediately below already brings
+// $spacing-section-top with it, and a second value there would fight one
+// that is already correct -- the same adjacent-margin reasoning
+// .tc-crosslink-line follows on the temperature charts.
 //
 // The TOP is a different question, and nothing else answers it: .ct-
 // strapline's own margin is top-only (it opens the page under the h1), so
 // without a value here the strapline's last line and the "What" box sit
 // flush. Issue #254, Helen: air above the input, not just below it.
-// $spacing-block-gap matches the one other place this file makes the same
-// move -- prose immediately above a control -- which is .ct-doneat's own
-// bottom margin, clearing space before the WEIGHT label the same way.
-//
-// It keeps .ct-field for the label-above-control shape, so the two boxes still
-// look like one family despite now sitting either side of a heading. If they
-// ever stop matching, that is the thing to preserve.
-.ct-protein-pick {
+.ct-inputs {
   margin: $spacing-block-gap 0 0 0;
 }
 
@@ -288,7 +245,9 @@ article.recipe .recipe-body-content .ct-methods {
 // phone the time column is capped so a long range wraps -- at its dash only,
 // see .ct-t -- rather than squeezing the name into one word a line; on a
 // wide screen there is room for both and the cap would only break ranges
-// that fit.
+// that fit. Since the compact time format (2026-10-09, "4h50m – 5h30m" for
+// what was "4 hrs 50 mins – 5 hrs 30 mins") no range reaches the cap; it
+// stays as the guard it was.
 .ct-method {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -317,9 +276,8 @@ article.recipe .recipe-body-content .ct-methods {
   }
 }
 
-// Each half of a range is unbreakable, so "2 hrs 20 mins – 3 hrs 15 mins"
-// can break only at its dash: "1 hr 40" split across two lines reads as two
-// numbers.
+// Each half of a range is unbreakable, so "2h20m – 3h15m" can break only at
+// its dash: a figure split across two lines reads as two numbers.
 .ct-t {
   white-space: nowrap;
 }

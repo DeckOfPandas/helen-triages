@@ -55,8 +55,12 @@
 # complete and verbatim including the 14 outbound links buried inside those
 # notes. Read it there before assuming any timing here is unsourced.
 
+# "(whole)" ON CHICKEN, DUCK AND GOOSE, 2026-10-09 -- Helen: "Update the
+# chicken line in the dropdown to 'chicken (whole)', and the same for duck and
+# goose." Every method under the three is a whole-bird method. The label is
+# also the heading the calculator writes over the methods.
 chicken:
-  label: Chicken
+  label: Chicken (whole)
   internal_temp_ref: poultry.chicken
   chart_anchor: poultry
   methods:
@@ -272,7 +276,7 @@ turkey:
     rate_max: 16
     notes: Rarely done above ~6.5 kg — too large to lie flat in most ovens
 goose:
-  label: Goose
+  label: Goose (whole)
   internal_temp_ref: poultry.goose
   chart_anchor: poultry
   methods:
@@ -357,7 +361,7 @@ goose:
     rate_max: 30
     notes: Traditional method — renders fat and tightens skin before roasting
 duck:
-  label: Duck
+  label: Duck (whole)
   internal_temp_ref: poultry.duck
   chart_anchor: poultry
   methods:

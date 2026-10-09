@@ -619,6 +619,7 @@ argument and the rules each field is read by.
 - undated · §14 · Two food-safety gaps (pork medium, fresh ham pink) flagged, not corrected — Helen's call.
 - 2026-10-08 · §14 · #1326 #1327 #1329 #1330 · THREE RULINGS BEFORE ROUND ONE OF THE REFERENCE PAGES' REDESIGN, AND WHAT THE PAGES LOOKED LIKE ON A PHONE.
 - 2026-10-08 · §14 · #1327 #1329 #1330 · ROUND ONE SETTLED IN ONE LOOK, AND BUILT THE SAME DAY.
+- 2026-10-09 · §14 · ROUND TWO: HELEN'S LIST AFTER LOOKING AT ROUND ONE.
 - 2026-09-06 · §14 · #529 #459 · Why it passes #459 when a bare category list would not
 - 2026-09-06 · §14 · no template change — which is what sites.yml's own note had predicted since 2026-08-19: the footer's loop always asked every site rather than food.
 - 2026-09-06 · §14 · .ref-* is a new page anatomy, and that is not a failure to reuse.

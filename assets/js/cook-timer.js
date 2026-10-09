@@ -72,6 +72,9 @@
   var els = {
     protein: root.querySelector("#ct-protein"),
     weight: root.querySelector("#ct-weight"),
+    // The weight's own field, under the dropdown since 2026-10-09 and so
+    // outside #ct-calculator; hidden on its own when the dropdown says fish.
+    weightField: root.querySelector("#ct-weight-field"),
     heading: root.querySelector("#ct-protein-name"),
     doneat: root.querySelector("#ct-doneat"),
     methods: root.querySelector("#ct-methods"),
@@ -140,6 +143,7 @@
        absent value. */
     var showingFish = els.protein.value === FISH_KEY;
     if (els.calculator) els.calculator.hidden = showingFish;
+    if (els.weightField) els.weightField.hidden = showingFish;
     if (els.fish) els.fish.hidden = !showingFish;
     if (showingFish) return;
 
@@ -272,9 +276,17 @@
      protein you were just looking at rather than to whatever the dropdown
      happens to open on. Ignored silently if it names something this page
      doesn't have -- a bad query string is not worth an error message on a
-     page that works perfectly well without it. */
+     page that works perfectly well without it.
+
+     ?protein=fish is the fish-and-shellfish entry, since 2026-10-09. The
+     salmon chart linked here with #fish, an anchor inside the block this
+     page hides until that entry is picked -- so the link opened the page on
+     beef with nothing scrolled to. The spelling is "fish" rather than the
+     entry's own key because it is the word the charts page uses, and a URL
+     is read by people. */
   var wanted = (location.search.match(/[?&]protein=([a-z]+)/) || [])[1];
-  if (wanted && METHODS[wanted]) els.protein.value = wanted;
+  if (wanted === "fish") els.protein.value = FISH_KEY;
+  else if (wanted && METHODS[wanted]) els.protein.value = wanted;
 
   ["input", "change"].forEach(function (evt) {
     root.addEventListener(evt, render);

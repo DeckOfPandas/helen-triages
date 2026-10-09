@@ -64,15 +64,17 @@
    parameter as a bare name instead of include.x, noted above: the include
    looks self-contained and isn't. {% endcomment %}
 {% assign prefix = "" %}
+{% assign open = false %}
 
 {% if spec.out_at_min %}
-  {% assign from = spec.out_at_min %}{% assign to = spec.out_at_max %}{% assign shown = spec.out_at %}
+  {% assign from = spec.out_at_min %}{% assign to = spec.out_at_max %}
+  {% if spec.out_at_open %}{% assign open = true %}{% endif %}
 {% elsif spec.endpoint_min %}
-  {% assign from = spec.endpoint_min %}{% assign to = spec.endpoint_max %}{% assign shown = spec.endpoint %}
+  {% assign from = spec.endpoint_min %}{% assign to = spec.endpoint_max %}
 {% elsif spec.target_min %}
-  {% assign from = spec.target_min %}{% assign to = spec.target_max %}{% assign shown = spec.target %}
+  {% assign from = spec.target_min %}{% assign to = spec.target_max %}
 {% elsif spec.tender_at_min %}
-  {% assign from = spec.tender_at_min %}{% assign to = spec.tender_at_max %}{% assign shown = spec.tender_at %}
+  {% assign from = spec.tender_at_min %}{% assign to = spec.tender_at_max %}
   {% comment %} A tough cut's figure says what KIND of figure it is, in the
      value itself. It is the one shape here that isn't a temperature you take
      something off the heat at -- collagen breakdown, tested with a fork -- and
@@ -82,6 +84,19 @@
      including pork's and lamb's slow-cooked rows. {% endcomment %}
   {% assign prefix = "tender at " %}
 {% endif %}
+
+{% comment %} THE FIGURE IS BUILT FROM THE NUMBERS, NOT PRINTED FROM THE
+   DISPLAY STRING, since 2026-10-09. The data's strings carry words beside the
+   figure -- "74–75°C in the thickest part of the thigh, not touching bone",
+   "54–57°C for pink meat, then rested", "70–75°C at the thickest point" --
+   and Helen asked for every one of them off the charts: "remove all extra
+   text from figures... All of it." The strings stay in the data for the
+   recipe meta line and the calculator's "Done at", which still print them;
+   here the figure is the two numbers the bar is drawn from, so the words
+   and the bar can never say different things. The one open-ended figure
+   ("70°C+", steak's well done) keeps its plus from the data's own flag.
+   {% endcomment %}
+{% capture shown %}{% if from == to %}{{ from }}°C{% if open %}+{% endif %}{% else %}{{ from }}–{{ to }}°C{% endif %}{% endcapture %}
 
 {% assign has_rested = false %}
 {% if spec.rested_min %}{% assign has_rested = true %}{% endif %}

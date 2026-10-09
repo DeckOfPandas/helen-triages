@@ -9731,6 +9731,57 @@ verification. Dates are when the correction landed.
   would put the figure beside its label instead, and is a one-line change if
   she wants it.
 
+- **2026-10-09 — ROUND TWO: HELEN'S LIST AFTER LOOKING AT ROUND ONE.** *"These
+  look great!"*, then six points on the charts, four on the methods and one
+  bug. Built the same day, the ones that were instructions:
+
+  **The gridlines sit on multiples of ten.** They were a repeating gradient
+  with a 10°C period from the plot's left edge, and the edge is 35°C, so the
+  lines fell at 35, 45, 55 while the ticks read 40, 50, 60. *"The scientist
+  in me is upset by the x axis lines."* Each line is its own stop now, from
+  the same `$tc-min`/`$tc-max` arithmetic as the ticks and the bars.
+
+  **No words on a figure.** *"Remove all extra text from figures, e.g. 'in
+  the thickest part of the thigh', 'for pink meat then rested', 'at the
+  thickest point'. All of it."* `temp_row.html` builds the figure from the
+  numeric fields instead of printing the data's display string; the strings
+  are untouched in the data, where the recipe meta line and the calculator's
+  "Done at" still print them. The four hand-written rows on the All chart go
+  through the include like every other row. The key's "below the cited
+  safety figure" entry is gone (she named it on salmon; it was one include,
+  so it is gone from every chart and the recipe pages too), and so is the
+  poultry subtitle "by the thigh, not the breast" — the same instruction as
+  the words she struck from the rows.
+
+  **No notes under a chart.** Salmon's FSA line, pork's held-temperature
+  sentence, and "rest 20 minutes" off the haunch subtitle: *"delete all extra
+  notes below all tables... all of them."* The cut-list subtitles ("brisket,
+  chuck, short rib, pot roast") stay: they say what a chart covers, which is
+  not a note.
+
+  **The weight sits under the dropdown.** *"So the user is saying 'I have
+  chicken, 3 kg'."* The `.ct-controls` band under the protein heading (#253)
+  is gone with its rule; the two inputs are one stacked form above the
+  heading, and `cook-timer.js` hides the weight on its own when the dropdown
+  says fish. **Chicken, duck and goose read "(whole)"** in the dropdown and
+  therefore in the heading. **Times are compact**: `4h50m – 5h30m` for what
+  was `4 hrs 50 mins – 5 hrs 30 mins`, en dash kept. MANUAL §5's "mins,
+  never min" is about the recipe pages' time lines and is not re-opened;
+  this is a column of figures.
+
+  **The bug.** The salmon chart's "cooking methods" link went to `#fish`, an
+  anchor inside the block the methods page hides until "Fish and shellfish"
+  is picked, so it opened on beef. It is `?protein=fish` now, and the page
+  reads that as the fish entry.
+
+  **Put to her in text, as she asked, and not built**: which words belong to
+  which bar (the caption line and the bar it sits over are symmetric with the
+  next row's caption); whether the slow-cooked rows should leave the roasting
+  charts for one section of their own; how the sticky chips can say there
+  are more of them off to the side; and what would make a method block
+  readable for *"I'm holding a 3-kg venison haunch and want to decide how to
+  cook it. I'm most interested in what I'd get."*
+
 ### The cocktails reference layer, #529
 
 - **2026-09-06, #529** — Cocktails gets its first reference page,

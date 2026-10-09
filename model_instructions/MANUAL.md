@@ -4700,13 +4700,28 @@ one entry per fish, its forms as lines, no notes. All three are Helen's
 choices from a candidates page (`scripts/reference_candidates.py`, DECISIONS
 §14, 2026-10-08). There is no hover text anywhere on the charts (#1326).
 
+**Since 2026-10-09 (DECISIONS §14, round two)**: a chart's figure is the two
+numbers its bar is drawn from (`48–50°C`, `70°C+`, `tender at 90–96°C`) and
+never the data's display string, so no row says where to probe; the key has
+no entry for the shaded zone (the line's own label names the figure); there
+is no note under any chart and no rest time in a subtitle; and the gridlines
+sit on 40, 50 … 100, generated from `$tc-min`/`$tc-max` in
+`_temperature-chart.scss`. On the methods page the WHAT dropdown and the
+weight box are one stacked form above the protein heading (the weight is
+hidden on its own when the dropdown says fish), chicken, duck and goose read
+"(whole)", and a time prints as `4h50m – 5h30m`. The salmon chart reaches the
+fish list with `?protein=fish`, which `cook-timer.js` reads as the dropdown's
+fish entry.
+
 ### The data layer — two datasets
 
 `_data/food/internal_temperatures.yml` is the single source for out-at
 temperatures, endpoints and carryover — VOCABULARY layer. **"Out at", never
 "pull at"** (pull is American; `test_style.py` knows the phrase). Every figure
 is numeric AND a display string, because the strings carry words a number
-cannot ("74–75°C in the thigh"); `tests/test_reference_data.py` holds the
+cannot ("74–75°C in the thigh") — the recipe meta line and the calculator's
+"Done at" print the string, the charts print the numbers (2026-10-09);
+`tests/test_reference_data.py` holds the
 invariants, axis bounds, safety-threshold spec and note integrity. Four
 shapes: `endpoint` + `carryover` (whole poultry); `doneness: {level: {out_at,
 rested}}` + `carryover` (tender roasts, steak, salmon, tuna); `tender_at`
