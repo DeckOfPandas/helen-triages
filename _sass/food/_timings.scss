@@ -195,32 +195,45 @@
 }
 
 // The cut group's name, in the data's words ("Tender roasting cuts"), with the
-// cuts it covers trailing in the body face. Label tier, like the row labels
-// on the charts and the WHAT/WEIGHT labels above: a name, not a number.
-.ct-group-name {
-  font-family: $font-headings;
-  font-size: 0.74rem;
-  font-weight: 400;
+// cuts it covers on a line under it in the body face.
+//
+// JOLLIER, 2026-10-09. It was a 0.74rem Courier label over a grey border;
+// Helen: "Could the table headings on the methods pages please be jollier
+// too, e.g. WHOLE BIRD, ROASTING METHODS." So it wears what the site already
+// has for a name one tier below a section heading: the heading-tier
+// lettering at 1.15rem and the single violet rule (overlapping-rule-single,
+// the same mark the troubleshooting names and the recipe page's DONENESS
+// heading carry). The rule sits on the title span, not the h3, because it is
+// an inline background that measures the lettering, and the cuts line must
+// not be under it.
+//
+// SCOPED, because the body's quiet sub-level rule (`article.recipe
+// .recipe-body-content h3`, _recipe-notes-body.scss, 0.78rem and grey at
+// (0,2,1)) otherwise wins and the heading comes out as the label it was.
+article.recipe .recipe-body-content h3.ct-group-name {
+  @extend %heading-base;
+  font-size: 1.15rem;
   letter-spacing: $letter-spacing-label;
-  text-transform: uppercase;
   color: $color-text;
-  @include lettering(label);
-  line-height: 1.4;
-  margin: 0;
-  padding: 0 0 $space-sm 0;
-  border-bottom: 2px solid $color-border;
+  @include lettering(heading);
+  line-height: 1.3;
+  margin: 0 0 $space-md 0;
+}
+
+.ct-group-title {
+  @include overlapping-rule-single($color-section-underline-2);
 }
 
 .ct-group-cuts {
+  display: block;
   font-family: $font-body;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
-  -webkit-text-stroke: 0;
-  text-shadow: none;
+  @include lettering(plain);
   color: $color-clear-text;
-  margin-left: $space-sm;
+  margin: $space-sm 0 0 0;
 }
 
 // Scoped under article.recipe .recipe-body-content for the same reason the
@@ -241,17 +254,26 @@ article.recipe .recipe-body-content .ct-methods {
 }
 
 // One method. A two-column grid with the name and the time on the first row;
-// the oven setting and the outcome each span both columns beneath. On a
+// the outcome and the oven setting each span both columns beneath. On a
 // phone the time column is capped so a long range wraps -- at its dash only,
 // see .ct-t -- rather than squeezing the name into one word a line; on a
 // wide screen there is room for both and the cap would only break ranges
 // that fit. Since the compact time format (2026-10-09, "4h50m – 5h30m" for
 // what was "4 hrs 50 mins – 5 hrs 30 mins") no range reaches the cap; it
 // stays as the guard it was.
+//
+// THE OUTCOME IS THE SECOND LINE AND IT IS THE LOUD ONE, since 2026-10-09.
+// It was the last line, small, italic and grey, under the oven setting.
+// Helen's case: "I'm holding a 3-kg venison haunch and want to decide how to
+// cook it. I'm most interested in what I'd get." She chose this shape over
+// the outcome as the headline, "but I'm close to picking B, so please make
+// the outcome sing even in second place" -- so it is the body face at 600,
+// in the site's violet, a strapline under the name; the oven setting drops
+// to third, small and quiet.
 .ct-method {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "name time" "oven oven" "outcome outcome";
+  grid-template-areas: "name time" "outcome outcome" "oven oven";
   column-gap: $space-lg;
   row-gap: $space-xxs;
   padding: $space-md 0;
@@ -271,8 +293,11 @@ article.recipe .recipe-body-content .ct-methods {
   font-family: $font-label;
   font-weight: 600;
 
+  // 12rem since 2026-10-09: "medium 1h20m – 1h50m", the widest by-doneness
+  // line, is about 11.5rem, and at the old 10.5rem its last figure dropped
+  // to a line of its own.
   @media (max-width: 600px) {
-    max-width: 10.5rem;
+    max-width: 12rem;
   }
 }
 
@@ -282,15 +307,16 @@ article.recipe .recipe-body-content .ct-methods {
   white-space: nowrap;
 }
 
-.ct-method-oven {
-  grid-area: oven;
-  font-size: 0.86rem;
-}
-
 .ct-method-outcome {
   grid-area: outcome;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $color-blinging-blackberry;
+}
+
+.ct-method-oven {
+  grid-area: oven;
   font-size: 0.82rem;
-  font-style: italic;
   color: $color-clear-text;
 }
 
@@ -307,15 +333,24 @@ article.recipe .recipe-body-content .ct-methods {
 }
 
 .fish-item {
-  padding: $space-sm 0;
+  padding: $space-md 0;
   border-bottom: 1px solid $color-border;
 
   dt {
-    font-family: $font-headings;
-    font-size: 0.78rem;
+    margin: 0 0 $space-xs 0;
+  }
+
+  // The fish's name, jollier since 2026-10-09 (Helen: "the headings like COD
+  // / HADDOCK, HALIBUT / TURBOT and so on"): the same heading-tier lettering
+  // and single violet rule as .ct-group-name above, a step smaller. On a
+  // span inside the <dt> because the rule is an inline background that
+  // measures the lettering, and a <dt> is a block.
+  .fish-name {
+    @extend %heading-base;
+    font-size: 1rem;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin: 0 0 $space-xxs 0;
+    @include lettering(heading);
+    @include overlapping-rule-single($color-section-underline-2);
   }
 
   dd {

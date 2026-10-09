@@ -4700,18 +4700,25 @@ one entry per fish, its forms as lines, no notes. All three are Helen's
 choices from a candidates page (`scripts/reference_candidates.py`, DECISIONS
 §14, 2026-10-08). There is no hover text anywhere on the charts (#1326).
 
-**Since 2026-10-09 (DECISIONS §14, round two)**: a chart's figure is the two
-numbers its bar is drawn from (`48–50°C`, `70°C+`, `tender at 90–96°C`) and
-never the data's display string, so no row says where to probe; the key has
-no entry for the shaded zone (the line's own label names the figure); there
-is no note under any chart and no rest time in a subtitle; and the gridlines
-sit on 40, 50 … 100, generated from `$tc-min`/`$tc-max` in
-`_temperature-chart.scss`. On the methods page the WHAT dropdown and the
-weight box are one stacked form above the protein heading (the weight is
-hidden on its own when the dropdown says fish), chicken, duck and goose read
-"(whole)", and a time prints as `4h50m – 5h30m`. The salmon chart reaches the
-fish list with `?protein=fish`, which `cook-timer.js` reads as the dropdown's
-fish entry.
+**Since 2026-10-09 (DECISIONS §14, rounds two and three)**: a chart's figure
+is the two numbers its bar is drawn from (`48–50°C`, `70°C+`, `tender at
+90–96°C`) and never the data's display string, so no row says where to
+probe; the key has no entry for the shaded zone (the line's own label names
+the figure); there is no note under any chart and no rest time in a
+subtitle; the gridlines sit on 40, 50 … 100, generated from
+`$tc-min`/`$tc-max` in `_temperature-chart.scss`; a row's label and figure
+share a baseline with the bar tight under them and all the air below it;
+and the ten one-word chips wrap (two rows on a phone) rather than scroll.
+**The slow-cooked cuts are one section** (`#slow-cooked-cuts`: beef, lamb,
+pork, venison, one `tender at` figure each) and every roasting chart that
+used to hold one links to it; the other section ids are unchanged. On the
+methods page the WHAT dropdown and the weight box are one stacked form above
+the protein heading (the weight is hidden on its own when the dropdown says
+fish), the four birds read "(whole)", a time prints as `4h50m – 5h30m`, a
+method block runs name and time / outcome (violet, 600) / oven setting, and
+the cut-group and fish names wear the heading-tier lettering with the single
+violet rule. The salmon chart reaches the fish list with `?protein=fish`,
+which `cook-timer.js` reads as the dropdown's fish entry.
 
 ### The data layer — two datasets
 

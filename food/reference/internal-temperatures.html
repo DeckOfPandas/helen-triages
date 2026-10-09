@@ -61,18 +61,25 @@ permalink: /food/reference/internal-temperatures/
        page, and the way back up was a "↑ top" link under every chart -- eleven
        of them, gone the same day, because the chips are always on screen.
        Helen, on whether the page should stay one scroll rather than one
-       protein at a time: "Immediate reaction is 1, with good nav." {% endcomment %}
+       protein at a time: "Immediate reaction is 1, with good nav."
+
+       ONE WORD A CHIP, AND EVERY CHIP ON SCREEN, since 2026-10-09. The row
+       scrolled sideways with nothing to say that it did -- Helen: "it's not
+       clear at any point, even when the user is at the top of the page, that
+       there are more options scrolled away to the side." So the names are
+       short enough to wrap to two rows on a phone and one on a desktop, with
+       nothing hidden. Two of the long ones went when the slow-cooked cuts
+       became one section (below). {% endcomment %}
     <ul class="tc-contents">
-      <li><a href="#beef-steak">Beef: steak</a></li>
-      <li><a href="#beef-tender-roasting-cuts">Beef: tender roasting cuts</a></li>
-      <li><a href="#beef-tough-cuts">Beef: tough cuts</a></li>
-      <li><a href="#fish-salmon">Fish: salmon</a></li>
+      <li><a href="#beef-steak">Steak</a></li>
+      <li><a href="#beef-tender-roasting-cuts">Beef</a></li>
+      <li><a href="#fish-salmon">Salmon</a></li>
       <li><a href="#ham">Ham</a></li>
       <li><a href="#lamb">Lamb</a></li>
       <li><a href="#pork">Pork</a></li>
       <li><a href="#poultry">Poultry</a></li>
-      <li><a href="#venison-tender-roasting-cuts">Venison: tender roasting cuts</a></li>
-      <li><a href="#venison-slow-cooked-cuts">Venison: slow-cooked cuts</a></li>
+      <li><a href="#venison-tender-roasting-cuts">Venison</a></li>
+      <li><a href="#slow-cooked-cuts">Slow-cooked</a></li>
       <li><a href="#all">All</a></li>
     </ul>
 
@@ -102,8 +109,17 @@ permalink: /food/reference/internal-temperatures/
       {{ axis }}
     </div>
 
+    {% comment %} THE SLOW-COOKED CUTS HAVE ONE SECTION OF THEIR OWN, near the
+       foot of the page, since 2026-10-09. Beef's tough cuts had a section
+       here, venison's slow-cooked cuts had one after its roasting cuts, and
+       lamb and pork each carried one slow-cooked row at the right-hand end of
+       their roasting chart. Helen, asked whether pulling them out would feel
+       messier: "okay great, let's do it." Every roasting chart that lost a
+       row or a section carries a second link on its crosslink line, to the
+       slow-cooked section. {% endcomment %}
+
     <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -116,22 +132,6 @@ permalink: /food/reference/internal-temperatures/
           {% assign spec = level[1] %}
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
-      </div>
-      {{ axis }}
-    </div>
-
-    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
-    <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast</p>
-
-    {% comment %} No key on this chart. It draws one bar, and that bar's own
-       value now reads "tender at 90–96°C" -- a key saying "tender at" beside it
-       would be the same three words twice. Helen: "remove the key as it's not
-       helpful." {% endcomment %}
-    <div class="tc">
-      <div class="tc-plot">
-        {% assign tough = t.beef.tough_cuts %}
-        {% include food/temp_row.html label="Tough cuts" spec=tough %}
       </div>
       {{ axis }}
     </div>
@@ -188,7 +188,7 @@ permalink: /food/reference/internal-temperatures/
     </div>
 
     <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=lamb">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=lamb">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -198,14 +198,12 @@ permalink: /food/reference/internal-temperatures/
           {% assign spec = level[1] %}
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
-        {% assign lslow = t.lamb.slow_cooked %}
-        {% include food/temp_row.html label="Slow-cooked" spec=lslow %}
       </div>
       {{ axis }}
     </div>
 
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=pork">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=pork">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -224,8 +222,6 @@ permalink: /food/reference/internal-temperatures/
           {% assign spec = level[1] %}
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
-        {% assign slow = t.pork.slow_cooked %}
-        {% include food/temp_row.html label="Slow-cooked" spec=slow %}
       </div>
       {{ axis }}
     </div>
@@ -265,7 +261,7 @@ permalink: /food/reference/internal-temperatures/
        where the rest go, with the wording the rest use. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="venison-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Venison: tender roasting cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
 
@@ -313,18 +309,25 @@ permalink: /food/reference/internal-temperatures/
        Helen deleted it (#872): the chart says it, and the mince case is not a
        question a thermometer answers. {% endcomment %}
 
-    <h2 class="recipe-section-heading" id="venison-slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Venison: slow-cooked cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a></p>
-    <p class="recipe-section-subtitle">shoulder, neck and shank</p>
+    <h2 class="recipe-section-heading" id="slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Slow-cooked cuts</span></h2>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}">cooking methods and timings &rarr;</a></p>
+    <p class="recipe-section-subtitle">beef brisket, chuck and short rib; lamb and pork shoulder, breast and belly; venison shoulder, neck and shank</p>
 
-    {% comment %} No key, for the same reason beef's tough cuts chart has none:
-       one bar, whose own value already reads "tender at 90–95°C". Shoulder,
-       neck and shank all carry that one figure, so they draw as one row rather
-       than as three identical ones. {% endcomment %}
+    {% comment %} FOUR ANIMALS, ONE FIGURE. Every row here is a tenderness
+       threshold rather than a doneness -- collagen giving way, tested with a
+       fork -- and the four sit within a degree of each other, which is the
+       fact this chart makes visible and the reason it is one section rather
+       than a row at the far end of four roasting charts (2026-10-09, see the
+       comment above the beef heading). No key: each value already reads
+       "tender at", and a key saying it beside them would be the same words
+       twice. The methods link carries no ?protein= because the slow-cooked
+       groups live under four of the dropdown's proteins. {% endcomment %}
     <div class="tc">
       <div class="tc-plot">
-        {% assign vslow = t.venison.shoulder %}
-        {% include food/temp_row.html label="Slow-cooked" spec=vslow %}
+        {% include food/temp_row.html label="Beef" spec=t.beef.tough_cuts %}
+        {% include food/temp_row.html label="Lamb" spec=t.lamb.slow_cooked %}
+        {% include food/temp_row.html label="Pork" spec=t.pork.slow_cooked %}
+        {% include food/temp_row.html label="Venison" spec=t.venison.shoulder %}
       </div>
       {{ axis }}
     </div>

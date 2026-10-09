@@ -2745,11 +2745,10 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "one line, the bar in a second grid row spanning both (2026-10-08, "
         "#1327). The first track is a Courier label of at most three words "
         "('DUCK BREAST SEPARATE', about 150px, the widest in the data); the "
-        "second is the figure, which WRAPS in whatever is left -- the "
-        "sixty-character turkey endpoint is the longest value on the site and "
-        "it is ordinary text now, not the nowrap label hung off a coordinate "
-        "that #903 found 430px past the track. Verified at 360 and 390 with "
-        "shoot.sh."
+        "second is the figure, which WRAPS in whatever is left -- and since "
+        "2026-10-09 it is built from the numbers ('70°C+ → ~72–74°C' is the "
+        "longest, under 20 characters), not the data's display string, so it "
+        "no longer needs to. Verified at 360 and 390 with shoot.sh."
     ),
     ".ct-method": (
         "`minmax(0, 1fr) auto` -- a method's name and its time on one line, "

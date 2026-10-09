@@ -9782,6 +9782,57 @@ verification. Dates are when the correction landed.
   readable for *"I'm holding a 3-kg venison haunch and want to decide how to
   cook it. I'm most interested in what I'd get."*
 
+- **2026-10-09, later — ROUND THREE: THE FOUR ANSWERS, CHOSEN AND BUILT.**
+
+  **Which words belong to which bar: proximity.** The track was 1.5rem with
+  the bar centred, so a bar sat as far below its own caption as above the
+  next one; and Courier and Plex Mono top-aligned put the figure a pixel
+  above the word beside it. Now label and figure share a baseline, the bar
+  starts 0.2rem under them, and the row's air (0.95rem) is all below the
+  bar: 3px above, 16px below, measured. Nothing new is drawn. (Option A of
+  three; B would also have moved the figure beside the label, C was
+  banding.)
+
+  **The slow-cooked cuts are one section.** Asked whether pulling them out
+  would read as scattered: *"okay great, let's do it."* Beef's tough cuts
+  and venison's slow-cooked cuts lose their sections, lamb and pork lose
+  their lone row at the right-hand end, and all four draw as one chart near
+  the foot of the page — one figure (90–96°C) under four names, which is the
+  fact. Same axis for the whole page, unchanged: the empty right third of a
+  roasting chart is the information that nothing roasts past 75. Each
+  roasting chart that lost something carries a second link on its crosslink
+  line, to the section. Six `chart_anchor` values moved to
+  `slow-cooked-cuts`; the ids of the other sections did not change, so no
+  recipe link moved.
+
+  **The chips wrap.** *"Option A please, perfect."* Ten one-word chips, two
+  rows at 390px (5.2rem) and one at 1280 (3rem), every one on screen; the
+  headings' scroll-margin carries both heights under a 700px media query,
+  and the bar's ground is copied 2rem into each gutter so the axis's end
+  ticks, which overhang the column, stop showing beside the chips. Packing
+  into two rows rather than three took 0.5rem of chip padding and 0.04em of
+  tracking.
+
+  **The outcome is the second line, and it sings.** *"Let's try option A,
+  but I'm close to picking B, so please make the outcome sing even in second
+  place."* The body face at 600 in the site's violet, 0.95rem, under the
+  method's name; the oven setting drops to third, 0.82rem and grey. The
+  by-doneness time column's phone cap went from 10.5rem to 12rem so
+  "medium 1h20m – 1h50m" holds one line.
+
+  **Jollier headings on the methods page.** The cut-group name is the
+  heading-tier lettering at 1.15rem with the single violet rule, the mark the
+  site already has one tier below a section heading; the fish and shellfish
+  names the same at 1rem. It needed scoping under `.recipe-body-content
+  h3.ct-group-name`: the body's quiet-h3 rule (0.78rem, grey) out-specified
+  the bare class and the first build showed the label it was replacing.
+  Each fish name sits in a `.fish-name` span because the rule is an inline
+  background that measures the lettering and a `<dt>` is a block.
+
+  **Two small ones.** Turkey reads "(whole)" with the other birds, and its
+  endpoint string is "74–75°C in the thigh" like theirs, the probing
+  instruction ("thickest part, not touching bone") moved into its note.
+
 ### The cocktails reference layer, #529
 
 - **2026-09-06, #529** — Cocktails gets its first reference page,

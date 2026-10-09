@@ -55,10 +55,10 @@
 # complete and verbatim including the 14 outbound links buried inside those
 # notes. Read it there before assuming any timing here is unsourced.
 
-# "(whole)" ON CHICKEN, DUCK AND GOOSE, 2026-10-09 -- Helen: "Update the
-# chicken line in the dropdown to 'chicken (whole)', and the same for duck and
-# goose." Every method under the three is a whole-bird method. The label is
-# also the heading the calculator writes over the methods.
+# "(whole)" ON THE FOUR BIRDS, 2026-10-09 -- Helen: "Update the chicken line
+# in the dropdown to 'chicken (whole)', and the same for duck and goose", then
+# "Turkey should get (whole) too." Every method under the four is a whole-bird
+# method. The label is also the heading the calculator writes over the methods.
 chicken:
   label: Chicken (whole)
   internal_temp_ref: poultry.chicken
@@ -160,7 +160,7 @@ chicken:
     total_max: 40
     notes: Much faster and more even than trussed roasting; not "whole" in shape but often grouped with whole-bird methods
 turkey:
-  label: Turkey
+  label: Turkey (whole)
   internal_temp_ref: poultry.turkey
   chart_anchor: poultry
   methods:

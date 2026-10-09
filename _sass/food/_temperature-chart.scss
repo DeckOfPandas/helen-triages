@@ -63,7 +63,16 @@ $tc-hue: $color-blinging-blackberry;
 // Bar geometry. Thin marks, per the skill -- the row is mostly air, and the
 // axis does the work.
 $tc-bar-height: 0.85rem;
-$tc-track-height: 1.5rem;
+// THE AIR IS UNDER THE BAR, NOT AROUND IT, since 2026-10-09. The track was
+// 1.5rem with the bar centred in it, so a bar sat the same distance below
+// its own caption as above the next row's -- and Helen could not tell which
+// words went with which bar: "It's not clear, even on small screens, which
+// labels belong with the data bar." The bar now starts at the top of its
+// track, a hair under its caption, and all the air is below it. Proximity
+// does the grouping; nothing new is drawn.
+$tc-bar-gap-below: 0.95rem;
+$tc-track-height: $tc-bar-height + $tc-bar-gap-below;
+$tc-track-gap-above: 0.2rem;
 // Headroom above the rows for the threshold's own label.
 $tc-threshold-height: 1.35rem;
 
@@ -106,10 +115,15 @@ $tc-threshold-height: 1.35rem;
   grid-template-columns: max-content minmax(0, 1fr);
   grid-template-rows: auto auto;
   column-gap: $space-md;
-  // Top-aligned, so a figure that wraps (turkey's runs to two lines on a
-  // phone) starts on the label's line and runs down towards the bar, rather
-  // than hanging a first line above the label with nothing beside it.
-  align-items: start;
+  // ON ONE BASELINE, since 2026-10-09. Courier (the label) and Plex Mono (the
+  // figure) have different ascents, so top-aligned the figure sat visibly
+  // higher than the word beside it -- Helen: "the data label e.g. RARE sits
+  // higher than the bar, then the numbers labelling it e.g. 48-50 sit higher
+  // again." Baseline alignment makes the two one line of caption. It was
+  // `start` so that a wrapping figure (turkey's sixty characters) ran down
+  // from the label's line; a figure is two numbers now (temp_row.html) and
+  // never wraps.
+  align-items: baseline;
 }
 
 .tc-row-label {
@@ -130,6 +144,7 @@ $tc-threshold-height: 1.35rem;
   grid-row: 2;
   grid-column: 1 / -1;
   position: relative;
+  margin-top: $tc-track-gap-above;
   height: $tc-track-height;
 }
 
@@ -187,9 +202,11 @@ $tc-gridlines: ();
 }
 
 // PULL: solid. This is the number you act on, so it is the heavier mark.
+// At the TOP of the track (as is the rested bar, and the carryover line
+// through their middle): the track's height below the bar is the row's air.
 .tc-out-at {
   @include tc-span;
-  top: calc(50% - #{$tc-bar-height * 0.5});
+  top: 0;
   height: $tc-bar-height;
   background: $tc-hue;
   // 4px rounded data-ends, per the skill's mark spec.
@@ -200,7 +217,7 @@ $tc-gridlines: ();
 // hue would say "different thing" when the truth is "same thing, later".
 .tc-rested {
   @include tc-span;
-  top: calc(50% - #{$tc-bar-height * 0.5});
+  top: 0;
   height: $tc-bar-height;
   border: 2px solid rgba($tc-hue, 0.55);
   border-radius: 4px;
@@ -215,7 +232,7 @@ $tc-gridlines: ();
 // start of the rested one, so the distance is a THING rather than an absence.
 .tc-carry {
   @include tc-span;
-  top: calc(50% - 1px);
+  top: calc(#{$tc-bar-height * 0.5} - 1px);
   height: 2px;
   background: repeating-linear-gradient(
     to right,
@@ -502,6 +519,15 @@ $tc-gridlines: ();
 // fit. The "↑ top" link under every chart went with it -- the way back is
 // always on screen now.
 //
+// IT WRAPS, since 2026-10-09, and nothing scrolls sideways. One scrolling
+// row showed about six chips on a phone and gave no sign of the five past
+// the edge; Helen: "it's not clear at any point, even when the user is at
+// the top of the page, that there are more options scrolled away to the
+// side." The names are one word each now (the page's own markup), so the
+// ten chips wrap to two rows at 390px and sit on one row at 1280, every one
+// of them on screen. The scroll-margin on the headings below is sized for
+// both.
+//
 // It is scoped under article.recipe .recipe-body-content because the body's
 // own list rule (_recipe-notes-body.scss, `article.recipe .recipe-body-content
 // ul li`) gives every li a dash and an indent at (0,2,3), and this list has
@@ -512,17 +538,20 @@ article.recipe .recipe-body-content .tc-contents {
   top: 0;
   z-index: 20;
   display: flex;
+  flex-wrap: wrap;
   gap: $space-xs;
-  overflow-x: auto;
   margin: 0 0 $spacing-section-gap 0;
   padding: $space-sm 0;
   max-width: none;
   background: $color-bg;
   border-bottom: 1px solid $color-border;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar { display: none; }
+  // The bar's ground, copied 2rem to each side so it covers the page's
+  // gutters too: the axis's end ticks ("40°C", "100°C") are centred on the
+  // column's edges and overhang into the gutter, and a chart scrolling under
+  // the bar showed half a tick beside the chips. Two offset copies rather
+  // than a spread, so nothing paints below the bar's own border; a shadow is
+  // ink overflow, not scrollable overflow, so the page does not widen.
+  box-shadow: 2rem 0 0 $color-bg, -2rem 0 0 $color-bg;
 
   li {
     flex: 0 0 auto;
@@ -532,18 +561,22 @@ article.recipe .recipe-body-content .tc-contents {
     &::before { content: none; }
   }
 
+  // Padding and tracking trimmed on 2026-10-09 so the ten one-word chips
+  // pack into TWO rows at 390px rather than three: at 0.65rem of side
+  // padding and 0.06em of tracking they ran to three, and a sticky bar
+  // three chips deep is 120px of a phone's screen.
   a {
     display: inline-block;
     font-family: $font-headings;
     font-size: 0.68rem;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     text-decoration: none;
     color: $color-text;
     background: $color-surface;
     border: 1px solid $color-border;
     border-radius: 999px;
-    padding: $space-xs 0.65rem;
+    padding: $space-xs 0.5rem;
     white-space: nowrap;
   }
 }
@@ -560,9 +593,15 @@ article.recipe .recipe-section-heading {
 
 // And on a page with the sticky chips, the chips' own height on top of that,
 // or an anchor jump lands the heading under the bar. Every section heading
-// after the list is a sibling of it.
+// after the list is a sibling of it. Two rows of chips on a phone, one on a
+// desktop (see .tc-contents): the bar measures 3rem as one row and about
+// 5.2rem as two, read off the served build at 1280 and 390.
 article.recipe .tc-contents ~ .recipe-section-heading {
-  scroll-margin-top: calc(#{$space-xxl} + 2.8rem);
+  scroll-margin-top: calc(#{$space-xxl} + 3rem);
+
+  @media (max-width: 700px) {
+    scroll-margin-top: calc(#{$space-xxl} + 5.3rem);
+  }
 }
 
 // INGREDIENTS, METHOD and NOTES are the page's spine at 1.8rem with the
@@ -641,4 +680,11 @@ article.recipe .tc-contents ~ .recipe-section-heading {
 // have one.
 .tc-crosslink-line {
   margin: 0;
+}
+
+// Two links on one line, since 2026-10-09: the roasting charts that lost
+// their slow-cooked row or section (beef, lamb, pork, venison) point at the
+// one slow-cooked section as well as at the calculator.
+.tc-crosslink + .tc-crosslink {
+  margin-left: $space-lg;
 }

@@ -112,25 +112,28 @@
     }).join("") + "</span>";
   }
 
-  /* One method, as a block: name and time on the first line, the oven
-     setting under them, the outcome last. Every row in cooking_methods.yml
-     carries all four (tests/test_reference_data.py). */
+  /* One method, as a block: name and time on the first line, the outcome
+     under them (second since 2026-10-09 -- "I'm most interested in what I'd
+     get"), the oven setting last. Every row in cooking_methods.yml carries
+     all four (tests/test_reference_data.py). */
   function methodHtml(method, r) {
     return "<li class='ct-method'>" +
       "<span class='ct-method-name'>" + method.name + "</span>" +
       "<span class='ct-method-time'>" + (r.ok ? timeHtml(r) : "<em>won’t guess</em>") + "</span>" +
-      "<span class='ct-method-oven'>" + method.oven + "</span>" +
       "<span class='ct-method-outcome'>" + method.outcome + "</span>" +
+      "<span class='ct-method-oven'>" + method.oven + "</span>" +
     "</li>";
   }
 
   /* A cut group's heading. The data writes a group as
      "Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin
      roast": the name, then the cuts it covers. The two halves wear different
-     faces, so they are split on the dash here. */
+     faces, so they are split on the dash here; the name sits in its own span
+     because the violet rule under it is an inline background that measures
+     the lettering (_timings.scss, .ct-group-title). */
   function groupHtml(name) {
     var bits = name.split(" — ");
-    return "<h3 class='ct-group-name'>" + bits[0] +
+    return "<h3 class='ct-group-name'><span class='ct-group-title'>" + bits[0] + "</span>" +
       (bits[1] ? "<span class='ct-group-cuts'>" + bits[1] + "</span>" : "") +
     "</h3>";
   }
