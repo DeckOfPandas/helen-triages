@@ -174,7 +174,13 @@ $head-pad-bottom: 1.4rem;
 // would emit the literal text `$title-size` and the title would fall back to
 // the calc's 1rem.
 $title-size:         2.6rem;   // the tape's size, emitted as `--card-name-size` below
-$title-size-phone:   2rem;     // the same, at <= 600px -- see the phone block
+// 1.6rem SINCE 2026-10-10 (#1357), down from 2rem. Helen: "We can reduce font
+// size a little for cocktail titles on mobile to reduce the linebreaking", with
+// Haley Traub's Frozen Margarita over four lines. The tape's padding is em of
+// the title, so a smaller title gains twice -- narrower letters and more box:
+// 12 characters a line at 390px became 17. `scripts/title_phone_lines.py`
+// counts every title's lines at each size; re-run it when a long name arrives.
+$title-size-phone:   1.6rem;   // the same, at <= 600px -- see the phone block
 // The tape's padding above and below one line of lettering, as a fraction of
 // the lettering's size: (0.7059 x 2em - 1em) / 2, derived where it is used in
 // the tape-band block. Named because the title row's shortlist button (#963)

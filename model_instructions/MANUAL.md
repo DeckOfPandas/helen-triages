@@ -281,7 +281,10 @@ live site and the key was retired rather than left at `true`.)
 Production declares none of these keys, which is the whole mechanism (§9.1):
 a template gates on the key existing, so it can never be true on the live
 site. Never put a baseurl in it, and never move one of these keys into
-`_config.yml`.
+`_config.yml`. **`show_drafts` also puts a `hide drafts` / `show drafts` pill
+under SHORTLISTED on both indexes** (#1358, `#drafts-toggle`): it narrows the
+list to what the live site holds, is not part of the filter state, and resets
+on every load.
 
 **Never write to machine `/tmp`.** Use this repo's gitignored `tmp/`. See
 `CLAUDE.md`.
@@ -513,10 +516,10 @@ explicitly; the row still ends on the cards' right edge. **And the `??` is not
 emitted there at all** — not hidden: a hidden element is still in the tab
 order, and on /about/ that link points at the page you are already on. So that
 one page has no `??` and its row is not in column 3; every other page is
-exactly as the paragraph above describes. Nothing changed on a phone, where the
-two doors already shared one line (268.6px in the 312px a 360px viewport
-gives them) — the `??` is a grid SIBLING of the row, not a flex child, so
-removing it never made the row narrower. **`.site-header-inner` is the CARDS' width**,
+exactly as the paragraph above describes. **Below `$header-stack-width` the
+two doors take an edge each** (#1328): the row stretches across the one
+column with the space between them, and the first door is mirrored — arrow
+first, turned round — so both arrows point away from the wordmark. **`.site-header-inner` is the CARDS' width**,
 `$width-content` minus `main`'s padding — `main`'s 900px includes its padding,
 so a 900px header sat 24px outside the cards over 948px. Once the header stacks
 (`$header-stack-width`, 820px) the two share its one column. So the row varies by
@@ -534,6 +537,8 @@ having material** — food's two links appear on a cocktail page, and since
 2026-09-06 (#529) a `[ COCKTAILS ]` column appears beside them, which cost no
 template change: the loop always asked every site rather than food. The hearts
 are pinned to grid column 2 so a second column cannot push them off centre.
+Once the footer stacks (600px) a 2rem hairline sits over `about`, so it does
+not read as the last reference column's third page (#1354).
 
 **A link may be `local_only: true`, and it gates the LINK, not the page.** The
 template drops such a link unless `show_local_reference_links` is set, which
@@ -3200,6 +3205,11 @@ are the bottles** (#555).
   mark, no mood chips, no square brackets, no full width — each Helen's call.
   `data-universe-parts` names the child classes so the glass can sit on
   either side of the tape. Food turned the feature down (§13.4).
+  **Below 820px, where the line stacks, the name is capped to the width left
+  beside the glass** and may shrink (#1324), so a long one steps or wraps on
+  its tape as a card's does instead of dropping under the glass.
+  **A drink page's title is 2.6rem, and 1.6rem at 600px and under** (#1357;
+  `scripts/title_phone_lines.py` counts every title's lines at each size).
   **It closes on the cocktail page's own absinthe rule**, with `$space-xl` of
   clearance under the tape since #998 (2026-09-14, from `$space-md`, which put
   the rule 12px under the tape and read as underlining it). The rule must stay
@@ -4784,8 +4794,11 @@ notes."* So now:
   page, the pair then INGREDIENTS on a recipe — INGREDIENTS is 224px wide in a
   312px column, so the pill cannot share its line — and the shape never
   depends on the width or the count, which was #1210's complaint. Rule to
-  INGREDIENTS is 104.9px on both sites (the drink page's block gap + the pill's
-  28.9px + 3rem; food's row carries it as one 6.55rem margin, #1124 re-measured).
+  INGREDIENTS is 104.9px on a drink page (block gap + the pill's 28.9px +
+  3rem) and **72px on a recipe since #1325** — `$spacing-section-top`, the
+  4.5rem every other food heading has over it, because food has nothing in
+  that gap; on a phone the pill sits `$spacing-block-gap` under the rule and
+  INGREDIENTS 74.5px under it. #1124's match between the two sites is let go.
 - **The search box**, `_includes/page-search.html`, **in the header of every
   page of a site on a LOCAL BUILD ONLY**: row 3, column 3 of
   `.site-header-inner`, under the door to the other site and on its right

@@ -432,6 +432,33 @@ $universe-stack-width: 820px;
   .universe-pick .drink-card-ingredients {
     max-width: calc(100% - 0.65rem);
   }
+
+  // A LONG NAME STAYS BESIDE ITS GLASS -- #1324, 2026-10-10. Helen: "the
+  // universe section line breaks for longer titles. The glass is on its own
+  // line with the rest below." It is #917's fault again, one item along: the
+  // name is `flex: none` at max-content, so once the pick may wrap, a tape
+  // wider than the column less the glass slot cannot be collected onto the
+  // glass's line and takes the next one, leaving the glass alone above it.
+  //
+  // CAPPED TO WHAT IS LEFT OF THE GLASS'S LINE, AND ALLOWED TO SHRINK INTO IT.
+  // The tape then gets its `max-width` back (the base rule above lifts it; the
+  // left bleed is added because the tape starts that far left of the name's
+  // box), so the word has a box narrower than its content and
+  // card-name-fit.js answers as it does on a card: one step of 0.86, or a
+  // two-line tape. That file's note that the pick "is measured and never
+  // classified" was true only while this element could not shrink.
+  //
+  // ONLY BELOW THE STACK WIDTH. On one row the name keeps `flex: none` -- the
+  // ingredients are what give way there, and nothing wraps.
+  .universe-pick .drink-card-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: calc(100% - #{$universe-glass-slot} - #{$space-xs + 0.15rem});
+  }
+
+  .universe-pick .drink-card-tape {
+    max-width: calc(100% + #{$card-tape-bleed});
+  }
 }
 
 // STAGE TWO. The label and the control keep a line of their own and the offer

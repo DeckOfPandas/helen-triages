@@ -88,6 +88,14 @@ document.addEventListener('DOMContentLoaded', function () {
      filter half exists. */
   var shortlistOnlyBtn = document.getElementById('shortlist-only');
 
+  /* HIDE THE DRAFTS, ON A LOCAL BUILD ONLY -- #1358, 2026-10-10; the twin of
+     cocktail-index.js's, which has Helen's words and why this is not a field
+     of `state`. The button exists only where the template is built with
+     `show_drafts`, so on the deployed index this is null. A row is a draft if
+     it wears the `draft` pill, which is the one mark the template gives it. */
+  var draftsBtn = document.getElementById('drafts-toggle');
+  var hideDrafts = false;
+
   /* A SHORTLIST SOMEONE SENT -- #1093, `?shortlist=slug,slug`. Helen's
      rulings, 2026-09-15: opening the link SHOWS the list and saves none of it
      ("Show it, don't save it"); the shopping list hides while it is showing,
@@ -1018,6 +1026,9 @@ function renderResultsPool() {
          line is "hiding peas" since #1088 and nothing reads a count. */
       if (visible && rowIsExcluded(li)) visible = false;
 
+      /* The local-only drafts switch, #1358. */
+      if (visible && hideDrafts && li.querySelector('.badge-draft')) visible = false;
+
       if (visible) matchingLis.push(li);
       else if (!suppressList) li.style.display = 'none';
     });
@@ -1905,6 +1916,19 @@ function renderResultsPool() {
         state = FilterState.enterShortlistView();
         resetFilterControls();
       }
+      update();
+    });
+  }
+
+  /* #1358. The label names what a press will do, and `is-on` says the list is
+     currently narrowed, as it does on the button above. */
+  if (draftsBtn) {
+    draftsBtn.hidden = false;
+    draftsBtn.addEventListener('click', function () {
+      hideDrafts = !hideDrafts;
+      draftsBtn.textContent = hideDrafts ? 'show drafts' : 'hide drafts';
+      draftsBtn.classList.toggle('is-on', hideDrafts);
+      draftsBtn.setAttribute('aria-pressed', hideDrafts ? 'true' : 'false');
       update();
     });
   }

@@ -9861,6 +9861,51 @@ verification. Dates are when the correction landed.
   - **Not put on a candidates page a second time**: she had seen this option
     there. The one difference from what she saw is 0.8px on a phone, where
     option E still had the old gap-plus-margin (15.2px).
+- **2026-10-10, #1324, #1325, #1328, #1354, #1357, #1358 — SIX SMALL DESIGN
+  JOBS IN ONE PR, AND NONE OF THEM WENT ON A CANDIDATES PAGE.** Helen's brief
+  was "the handful of minor design jobs on the github issue backlog". Each
+  issue named its own fix, so each was built once and measured; **every value
+  below is the session's reading of her sentence, not a pick of hers**, and
+  the first one she looks at and dislikes is a one-line change.
+  - **#1325 reverses #1124's number, on her say.** *"there's too much space
+    under the metadata section for food recipes"*, with a phone and a desktop
+    screenshot of the gap under the head's hairline. #1124 (2026-09-17) had
+    matched food's rule-to-INGREDIENTS distance to a drink page's, 104.9px —
+    but a drink page has its controls row IN that distance and food has had
+    nothing in it since #1210. Now `$spacing-section-top` (72px), the same
+    4.5rem every other food heading has over it; on a phone the shortlist
+    pill sits `$spacing-block-gap` (28px) under the line as a drink page's
+    controls do, which lands INGREDIENTS 74.5px under it (was 151px).
+  - **#1357: `$title-size-phone` 2rem → 1.6rem.** *"We can reduce font size a
+    little for cocktail titles on mobile to reduce the linebreaking"* — Haley
+    Traub's Frozen Margarita took four lines. `scripts/title_phone_lines.py`
+    counts every title at each size: at 390px, 16 of 212 took three or four
+    lines at 2rem; at 1.6rem one takes three and none four. The tape's
+    padding is em of the title, so the smaller size gains twice (12
+    characters a line became 17). 1.75rem was the gentler candidate: no
+    four-liners, eight three-liners.
+  - **#1324: a long name in the universe line stays beside its glass.** *"The
+    glass is on its own line with the rest below."* Below 820px the pick
+    wraps, and a `flex: none` tape wider than the column less the glass slot
+    took the next line — and ran 7px past a phone's edge, a sideways scroll
+    nobody had reported. The name is capped to what is left of the glass's
+    line and may shrink, so `card-name-fit.js` steps or wraps it as on a
+    card. Measured with the longest dealable name at 360, 390, 700 and 1280.
+  - **#1328: below the header's stack width, /about/'s two doors take an edge
+    each, and the first one's arrow points outwards.** *"to be symmetrical"*,
+    then *"Possibly with the arrows both pointing outwards???"* and *"OR
+    allow them to stack"*. Built as the first two; the stack was not built.
+    The mirrored arrow is the tentative half — her three question marks —
+    and is two declarations to take back out.
+  - **#1354: a 2rem hairline over `about` once the footer stacks.** *"whether
+    space, a dot, a short hairline, anything"*. A line and not more space
+    because #916 already spent the larger gap on the break between the two
+    sites' columns.
+  - **#1358: `hide drafts` / `show drafts` under SHORTLISTED on both indexes,
+    local builds only** (gated on `show_drafts`). Not a field of filter
+    state: clear-all leaves it alone and nothing remembers it across a load.
+    The universe line may still deal a hidden draft. Both labels are the
+    issue's own words.
 
 ## §14 Reference pages
 

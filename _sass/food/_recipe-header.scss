@@ -721,8 +721,16 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   .recipe-section-heading { margin: 0; }
 }
 
+//
+// AND THE MATCH IS LET GO -- #1325, 2026-10-10. Helen, with a phone and a
+// desktop screenshot of the gap under the hairline: "there's too much space
+// under the metadata section for food recipes". The drink page's 104.9px has a
+// row of controls IN it; food's has had nothing in it since #1210 took
+// `.recipe-controls` away, so the same distance read as a hole here. The
+// heading now takes the 4.5rem every other heading on this page has over it
+// ($spacing-section-top, MANUAL §13.3): 72px from the line, where it was 104.8.
 .recipe-head-rule + .recipe-section-ingredients .recipe-section-heading-row {
-  margin-top: 6.55rem;
+  margin-top: $spacing-section-top;
 }
 
 // ON A PHONE THE TITLE TAKES THE WHOLE WIDTH. #899/#900 wrapped the old action
@@ -739,14 +747,22 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   // scripts/browser/styles.sh), so the pill cannot share its line; the column
   // puts the pair first, at the left, and the heading under it -- the same
   // shape a drink page's controls take on a phone (cocktails/_cocktail.scss).
-  // The row keeps the 6.55rem above it, so the first thing under the hairline
-  // is still where INGREDIENTS was; the heading follows a line lower.
+  // THE PAIR SITS A BLOCK GAP UNDER THE HAIRLINE SINCE #1325 (2026-10-10), as
+  // a drink page's controls do under its own rule. The row kept the full
+  // 6.55rem until then, which on a phone put 105px of nothing over the pill
+  // and INGREDIENTS 151px under the line. $spacing-block-gap + the pill's
+  // 28.9px + the 1.1rem below lands the heading 74.5px under the line, within
+  // 3px of the 4.5rem it has above 600px.
   .recipe-section-heading-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 1.1rem;
 
     .page-actions { order: -1; }
+  }
+
+  .recipe-head-rule + .recipe-section-ingredients .recipe-section-heading-row {
+    margin-top: $spacing-block-gap;
   }
 
   // STACK THE THREE METADATA BOXES ON A PHONE -- design review #1086, from
