@@ -757,7 +757,24 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 #
 # Proved in the merge, with `c89d3ae9` still in place: this test named exactly
 # those eight files, each "last touched by 92a132f6", and nothing else.
-BASELINE_COMMIT = "efe55b56"   # the merge holding #1356's three and the eight of #1343/#1348
+#
+# MOVED AGAIN THE SAME DAY, 2026-10-10, FOR THE TAG REVIEW -- NINETEEN RECIPES.
+# Helen asked for every published food recipe to be read against the tag
+# meanings written down that afternoon, and ruled on each proposal. `f7f6f1f1`
+# (eight files) and `135e4487` (eleven) hold what she took: seventeen tag
+# lines -- among them the rename of `sweets` to `sweet snack` -- and two
+# `cook_time` values she gave ("B&J: yes please, fix the cooking time", "Creme
+# Pat: cook time is 15 mins"). One line changes in each file and nothing else.
+#
+# HER GRANT, asked for before the first edit: "You have the grant -- edit the
+# live files without flipping the flag please -- this is under the 'life is
+# too short' test..."
+#
+# `135e4487` is the later of the two and has `f7f6f1f1` and `efe55b56` behind
+# it, so no merge is needed this time. Proved with `efe55b56` still in place:
+# this test named exactly those nineteen files, eight "last touched by
+# f7f6f1f1" and eleven "by 135e4487", and nothing else.
+BASELINE_COMMIT = "135e4487"   # the tag review of the published recipes, on Helen's grant
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
