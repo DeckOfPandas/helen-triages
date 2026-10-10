@@ -1393,6 +1393,25 @@ unless stated.
   will be very hit and miss, so tags there should not be used as data"*, and
   *"Crab pot pies with salad is not a salad"* — the checker's `salad` hint
   fires on that title and the recipe is right.
+  - **`sweets` IS RENAMED `sweet snack`, the same afternoon.** Hers: *"what
+    if we rename 'sweets' to 'sweet snacks', or something else with the word
+    'sweet' in it? Biscuits should be in there, but every single time I have
+    to remind myself why it's not just toffee and chocolate truffles."*
+    Singular, as `hot snack`'s twin. The name was doing the damage: an hour
+    earlier, under `sweets`, she ruled fairy cakes out; under the new name,
+    *"Fairy cakes are in again now"*, with the test *"would I serve it on a
+    cake plate at 4 o clock after a long improving walk?"* One published
+    recipe and five drafts carried the old word. A saved link filtering on
+    `sweets` no longer matches anything, which was judged a fair price.
+  - **What `bakes` is NOT**, from the review of the 90 published recipes
+    that followed: a soufflé, a beef Wellington, meringue swans (*"No one
+    gets in cosy baking mode and makes ad hoc swans with creme diplomat"*).
+    What it is: a quiche, a baked cheesecake, pizza dough, fondants,
+    puddings, crumbles, burger buns.
+  - **The published review changed 17 of 90**, in two batches of proposals;
+    every other tag and star was read and left. `proofread: true` kept on
+    all of them on her grant: *"edit the live files without flipping the
+    flag please -- this is under the 'life is too short' test"*.
 - **2026-10-08 — FOOD GETS NO TAG DERIVER; IT GETS A REPORT.** Helen, after
   the cocktail moods were measured the same day (§9.3): *"Let's do this now
   please."* The same search — every one- and two-feature rule, scored on

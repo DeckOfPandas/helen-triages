@@ -9,7 +9,7 @@ prep_time: "10 mins"
 cook_time: "20–25 mins"
 main_ingredients: ["dark chocolate", "unsalted butter", "eggs", "golden granulated sugar", "plain flour"]
 star_ingredient: "chocolate"
-tags: ["bakes"]
+tags: ["bakes", "sweet snack"]
 ingredient_groups:
   - items:
     - amount: "300 g"

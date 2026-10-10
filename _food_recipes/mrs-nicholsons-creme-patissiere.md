@@ -6,7 +6,7 @@ source_type: person
 makes: "about 600 ml"
 serves_estimate: 8
 prep_time: "20 mins"
-cook_time: "None"
+cook_time: "15 mins"
 main_ingredients: ["whole milk", "egg yolks", "golden caster sugar", "plain flour", "vanilla pod"]
 star_ingredient:
 tags: ["extras"]

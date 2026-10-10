@@ -1110,7 +1110,7 @@ declared".
 
 **Mood** — *what you feel like eating, a craving*: bakes, carbs party,
 cheese-tastic, dessert, drinks, fakeaway, hot snack, ice cream, nibbles,
-one-handed food, salad, showstopper, soup, sweets, virtuous.
+one-handed food, salad, showstopper, soup, sweet snack, virtuous.
 **Practicalities** — *what the occasion demands of you, regardless*: breakfast,
 extras, festive, freezable, make-ahead, no-cook, starter.
 
@@ -1131,7 +1131,9 @@ a wine or citrus sauce doing the work.
 record): `bakes` — a baked good out of the oven (cake, biscuit, bread, pastry),
 not anything that merely goes in it; Helen's test is *"would this appear on
 Great British Bake Off?"*. `dessert` — a pudding course served at the table.
-`sweets` — small sweet things eaten by hand outside a meal. `carbs party` —
+`sweet snack` (it was `sweets` until that afternoon) — small sweet things
+eaten by hand outside a meal; her test is *"would I serve it on a cake plate
+at 4 o clock after a long improving walk?"*. `carbs party` —
 the starch is the point. `cheese-tastic` — cheese is the pleasure of the dish,
 not a garnish. `fakeaway` — a home version of something you would order in.
 `hot snack` — small, hot, between meals. `nibbles` — finger food to pass

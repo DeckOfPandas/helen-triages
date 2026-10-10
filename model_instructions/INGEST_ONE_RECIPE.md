@@ -401,7 +401,7 @@ term.
 <!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
 `hot snack`, `ice cream`, `nibbles`, `one-handed food`, `salad`, `showstopper`,
-`soup`, `sweets`, `virtuous`
+`soup`, `sweet snack`, `virtuous`
 <!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
@@ -434,8 +434,10 @@ And the plainer ones, as Helen means them (agreed 2026-10-10):
   Not anything that merely goes in the oven. Her test: *"would this appear on
   Great British Bake Off?"*
 - **`dessert`** — a pudding course you serve at the table.
-- **`sweets`** — small sweet things eaten by hand outside a meal: brownies,
-  biscuits, fudge.
+- **`sweet snack`** — small sweet things eaten by hand outside a meal:
+  brownies, biscuits, fudge, truffles, a fairy cake, a scone. Her test:
+  *"would I serve it on a cake plate at 4 o clock after a long improving
+  walk?"* (This tag was called `sweets` until 2026-10-10.)
 - **`carbs party`** — the starch is the point: pasta, rice, potatoes, pies,
   dumplings.
 - **`cheese-tastic`** — cheese is the pleasure of the dish, not a garnish.

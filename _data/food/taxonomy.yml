@@ -156,7 +156,8 @@ retired_star_ingredients:
 # THE TWELVE THAT HAD NO WRITTEN MEANING -- AGREED 2026-10-10. Until then
 # these were names in a list, which is why an ingest's proposals for them were
 # hit and miss. A session drafted one line each and Helen answered "Agree on
-# all", adding the test for `bakes` in her own words.
+# all", adding the test for `bakes` in her own words. (One of the twelve was
+# then renamed the same day: `sweets` became `sweet snack`.)
 #
 #   bakes          a baked good out of the oven: cake, biscuit, bread, pastry.
 #                  Not anything that merely goes in the oven. HER TEST: "would
@@ -168,10 +169,21 @@ retired_star_ingredients:
 #                  burger buns are in too, though they "gave me a moment".
 #                  NOT bakes, also hers: a soufflé, and a beef Wellington
 #                  ("10 is not a bake"), pastry or no pastry. A quiche is.
+#                  Nor meringue swans, which gave the second half of the
+#                  test: "No one gets in cosy baking mode and makes ad hoc
+#                  swans with creme diplomat..." A BAKE IS WHAT YOU MAKE IN
+#                  COSY BAKING MODE.
 #   dessert        a pudding course you serve at the table.
-#   sweets         small sweet things eaten by hand outside a meal: brownies,
-#                  biscuits, fudge. NOT a fairy cake, which is a bake and
-#                  nothing more (Helen, 2026-10-10).
+#   sweet snack    small sweet things eaten by hand outside a meal: brownies,
+#                  biscuits, fudge, truffles, a fairy cake, a scone. HER
+#                  TEST: "would I serve it on a cake plate at 4 o clock after
+#                  a long improving walk?"
+#                  THIS TAG WAS `sweets` UNTIL 2026-10-10, and the name was
+#                  the fault: "every single time I have to remind myself why
+#                  it's not just toffee and chocolate truffles." Under the
+#                  old name she ruled fairy cakes OUT; under the new one,
+#                  the same afternoon, "Fairy cakes are in again now." It
+#                  is `hot snack`'s twin, singular like it.
 #   carbs party    the starch is the point: pasta, rice, potatoes, pies,
 #                  dumplings.
 #   cheese-tastic  cheese is the pleasure of the dish, not a garnish.
@@ -203,7 +215,7 @@ tags:
     - salad
     - showstopper
     - soup
-    - sweets
+    - sweet snack
     - virtuous
 
   practicalities:

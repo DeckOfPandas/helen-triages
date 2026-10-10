@@ -9,7 +9,7 @@ prep_time: "10 mins"
 cook_time: "Until done"
 main_ingredients: ["salted butter", "golden caster sugar", "eggs", "self-raising flour", "sultanas"]
 star_ingredient:
-tags: ["bakes"]
+tags: ["bakes", "sweet snack"]
 ingredient_groups:
   - items:
     - amount: "4 oz"
