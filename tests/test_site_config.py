@@ -592,6 +592,69 @@ def test_the_results_bar_loads_after_the_index_script_on_both_indexes():
         )
 
 
+def test_the_phone_fold_is_wired_on_both_indexes():
+    """filter-fold.js, its partial and its markup, on both indexes -- #1219.
+
+    Helen, 2026-10-10, from a candidates page of four phone-panel treatments:
+    "The mobile view is simplest: sections fold." Each chip section folds to
+    its label row at phone width. Four facts nothing else sees:
+
+    the script loads AFTER the index script, because both wire themselves on
+    DOMContentLoaded and the first chosen-chip count has to include a filter
+    the index script set from the URL; both stylesheets import the partial
+    AFTER their own filter rules, since `.is-folded [data-fold-body]` beats
+    the site's `display: flex` only by coming later; each index has exactly
+    its three chip sections marked, and none of the text inputs; and the mark
+    and the count ship `hidden`, so a page without JavaScript offers no
+    control that cannot work.
+    """
+    for page, index_script, filter_partial in (
+            ("food", "filters.js", "food/search"),
+            ("cocktails", "cocktail-index.js", "cocktails/filters")):
+        html = read(page, "index.html")
+        index_tag = re.search(r"<script src=[^>]*/" + re.escape(index_script), html)
+        fold_tag = re.search(r"<script src=[^>]*/filter-fold\.js", html)
+        assert fold_tag, f"{page}/index.html no longer loads assets/js/filter-fold.js."
+        assert index_tag.start() < fold_tag.start(), (
+            f"filter-fold.js must load AFTER {index_script} on {page}/index.html."
+        )
+        scss = read("assets", "css", f"{page}.scss")
+        assert '@import "shared/filter-fold";' in scss, (
+            f"assets/css/{page}.scss does not import shared/filter-fold."
+        )
+        assert scss.index(f'@import "{filter_partial}";') < scss.index('@import "shared/filter-fold";'), (
+            f"shared/filter-fold must be imported AFTER {filter_partial} in "
+            f"assets/css/{page}.scss, or a folded section's chips stay on screen."
+        )
+
+    group = read("_includes", "filter_group.html")
+    drinks = read("cocktails", "index.html")
+    for name, src, sections in (("_includes/filter_group.html", group, 1),
+                                ("cocktails/index.html", drinks, 3)):
+        # `data-fold>` and `data-fold-head>` close a tag; the comment that
+        # explains them in filter_group.html never does.
+        assert len(re.findall(r"\bdata-fold>", src)) == sections, (
+            f"{name} should mark {sections} chip section(s) with `data-fold`."
+        )
+        for attr in ("data-fold-head", "data-fold-body", "data-fold-label"):
+            assert len(re.findall(r"\b" + attr + r">", src)) == sections, (
+                f"{name}: every foldable section needs one `{attr}`."
+            )
+        for attr in ("data-fold-count", "data-fold-mark"):
+            tags = re.findall(r"<[a-z]+\b[^>]*\b" + attr + r"\b[^>]*>", src)
+            assert len(tags) == sections, f"{name}: one `{attr}` per foldable section."
+            assert all(re.search(r"\bhidden\b", t) for t in tags), (
+                f"{name}: `{attr}` no longer ships `hidden`. Without JavaScript "
+                f"it would be a control that does nothing."
+            )
+    # food's three chip sections all come from the one include; its text
+    # inputs are written in food/index.html and must not fold.
+    assert "data-fold" not in read("food", "index.html"), (
+        "food/index.html marks something `data-fold` itself. Only the chip "
+        "sections fold, and those come from _includes/filter_group.html."
+    )
+
+
 def test_the_card_measurement_passes_are_loaded_in_order():
     """card-name-fit.js, then card-line-budget.js, both from the shared layout.
 

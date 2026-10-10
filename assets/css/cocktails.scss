@@ -69,6 +69,10 @@
 // ($color-surface, $font-label) and so must come after cocktails/palette,
 // which it does. See _sass/shared/_shortlist-export.scss's own header.
 @import "shared/shortlist-export";
+// The phone fold (#1219). After cocktails/filters: its
+// `.is-folded [data-fold-body]` has to beat `.drink-btns`'s `display: flex`,
+// and later wins.
+@import "shared/filter-fold";
 // Universe sits right after filters: it draws the panel it dealt above, and
 // its three cloned parts (.drink-card-name, .drink-card-ingredients,
 // .drink-card-moods) are styled by rules cards already defines.

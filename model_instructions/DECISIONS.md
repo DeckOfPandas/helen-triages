@@ -9274,6 +9274,47 @@ verification. Dates are when the correction landed.
   the audit (the fork sitting at the control layer; phone as a target) are
   still open, and "N survivors" got a candidates page of its own the same day.
 
+- **2026-10-10, #1219 — THE PHONE PANEL FOLDS; THE THREE BOXES ON ONE ROW
+  WERE DECLINED; THE CONTROL LAYER IS STILL OPEN.** The audit's two remaining
+  candidates went up as two candidates pages, each on both indexes with one
+  switcher, the header door re-pointed so flipping sites kept the treatment.
+  **What the ticket said that was no longer true**, checked before building:
+  the two sites' text inputs had already converged (same face, size and
+  weight; a pixel or two of padding apart) and their clear-all controls were
+  one rule; the phone header was 144px, not 160; and cocktails' panel was not
+  "the same shape" but worse, 985px plus the universe line against food's
+  815px. Chips and section labels still differed as written. **And one thing
+  it did not say**: each site's filter chips match its own results, torn tags
+  on food's rows and bare coloured words on a drink card, so converging the
+  filters breaks a match inside each site.
+  - **The phone, four treatments at 390px** (as shipped; sections fold; the
+    three text inputs on one row with their labels as placeholders; both).
+    Helen: *"The mobile view is simplest: sections fold. Your three boxes is
+    nice looking, but I don't think it's clear enough."* Built the same day:
+    `_sass/shared/_filter-fold.scss`, `assets/js/filter-fold.js`, MANUAL
+    §13.4. Food 815 → 567px, first recipe 1128 → 880px down; cocktails 985 →
+    639px, first drink 1433 → 1087px. **Three things in it she saw on the
+    candidate and did not rule on separately**: the `+` / `−` mark at the
+    row's end, the chosen-chip count after the label, and the first section
+    starting open (YOLO? on cocktails, standing in for STAR). A section a
+    `#filter-…` link names opens too, which the candidate did not have: #1059
+    lands a reader on the lit chip, and folded it would be hidden. **600px,
+    not `$index-stack-width`**, for the reason #1086's header gives: a size
+    judgement about phones, where 720px is a layout limit.
+  - **The control layer, five treatments** (as shipped; food's torn chips on
+    both; cocktails' bare words on both; labels and inputs at food's size; at
+    cocktails'). Helen: *"I expected to agree to dropping the tape backgrounds
+    from food tag chips. In fact, I find myself wanting to add the tape to the
+    cocktail tags....wow."* She asked for a sixth: cocktails' chip as it ships
+    with the tape added, and the same chip on food. Published as F and **not
+    yet ruled on**; nothing of the control layer is built.
+  - **The candidates' builder is not committed.** It is `tmp/c1219/` in the
+    `opus-design-handful` worktree (`build.py`, `switcher.js`, three
+    stylesheets). The phone pages force the 390px layout on any screen by
+    rewriting every width query in the compiled CSS to its answer at 390px,
+    and their panel heights matched the real page at 390px to the pixel,
+    which is worth reusing for the next phone question.
+
 - **2026-09-21, #1165 — the card glass clipped between 400 and 720px, and
   #1086's own fix is what broke it.** Helen: *"glasses are too large and are
   overflowing vertically on cocktail cards at medium screen widths."*

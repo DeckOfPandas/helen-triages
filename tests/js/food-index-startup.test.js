@@ -58,6 +58,10 @@ const SCRIPTS = [
   // IntersectionObserver, which is the no-bar path a real browser without the
   // API takes.
   'results-bar.js',
+  // #1219, 2026-10-10. The phone fold (tests/js/filter-fold.test.js has its
+  // own fixture). This fixture has no `[data-fold]` section, so its handler
+  // finds nothing and returns.
+  'filter-fold.js',
   // #849. Nobody's dependency: it reads HTF.shortlist at run time rather than
   // lifting helpers off another module at startup, and it subscribes to
   // `htf:shortlist-change` rather than being called. Listed anyway because the
