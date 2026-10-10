@@ -9,7 +9,7 @@ prep_time: "2 mins"
 cook_time: "10 mins"
 main_ingredients: ["black peppercorns", "green cardamom pods", "cinnamon stick", "whole cloves", "ground ginger", "whole fennel seeds", "black cardamom pods", "star anise", "whole nutmeg"]
 star_ingredient:
-tags: []
+tags: ["extras"]
 ingredient_groups:
   - name: spices
     items:

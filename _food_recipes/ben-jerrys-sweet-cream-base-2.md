@@ -9,7 +9,7 @@ prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["whipping cream", "single cream", "golden caster sugar"]
 star_ingredient:
-tags: ["extras", "no-cook"]
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "480 ml"
