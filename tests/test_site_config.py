@@ -2690,11 +2690,17 @@ def test_no_element_can_force_horizontal_scroll():
 # deleting its entry, and an entry for a row that HAS one fails too, so it
 # cannot rot into a list of things that were fixed years ago.
 #
-# `.tc-row` AND `.tc-axis` LEFT THIS LIST ON 2026-09-10 (#903): the label sits
-# above the bar on a phone now -- exactly the redesign their entries said it
-# would take, done once the charts were finally looked at on one. The two
-# rows share one `@media` block in _sass/food/_temperature-chart.scss, so they
-# still move together, which was the point of the second entry.
+# `.tc-row` AND `.tc-axis` LEFT THIS LIST ON 2026-09-10 (#903): the label sat
+# above the bar on a phone from then -- exactly the redesign their entries said
+# it would take, done once the charts were finally looked at on one. The two
+# rows shared one `@media` block in _sass/food/_temperature-chart.scss, so they
+# moved together, which was the point of the second entry.
+#
+# `.tc-row` IS BACK ON 2026-10-08 (#1327), and `.tc-axis` is not: the axis is
+# one column now, and the row is label-and-figure on one line at EVERY width,
+# Helen's choice from the candidates page, so there is no narrow variant to
+# have. Its entry below makes the claim the old one could not: the figure
+# wraps.
 #
 # `.cocktail-head-words` LEFT IT ON 2026-09-15 (#1086), and it left by losing
 # the second track rather than by gaining a variant. The entry claimed
@@ -2730,9 +2736,27 @@ MULTI_TRACK_ROWS_WITHOUT_A_NARROW_VARIANT = {
         "label or a flat-width image the way the footer's hearts were: its "
         "min-content is the width of its single longest WORD, and every "
         "ingredient name and bottle suggestion in the data is comfortably under "
-        "a 360px phone one word at a time. Unlike .tc-row, there is no unbroken "
-        "string here that could grow past that. Verified at 360 and 390 with "
-        "shoot.sh, which reported no element past the viewport."
+        "a 360px phone one word at a time. There is no unbroken string here "
+        "that could grow past that. Verified at 360 and 390 with shoot.sh, "
+        "which reported no element past the viewport."
+    ),
+    ".tc-row": (
+        "`max-content minmax(0, 1fr)` -- a chart row's label and its figure on "
+        "one line, the bar in a second grid row spanning both (2026-10-08, "
+        "#1327). The first track is a Courier label of at most three words "
+        "('DUCK BREAST SEPARATE', about 150px, the widest in the data); the "
+        "second is the figure, which WRAPS in whatever is left -- and since "
+        "2026-10-09 it is built from the numbers ('70°C+ → ~72–74°C' is the "
+        "longest, under 20 characters), not the data's display string, so it "
+        "no longer needs to. Verified at 360 and 390 with shoot.sh."
+    ),
+    ".ct-method": (
+        "`minmax(0, 1fr) auto` -- a method's name and its time on one line, "
+        "the oven setting and the outcome spanning both beneath (2026-10-08, "
+        "#1329). The name is wrapping prose; the time is capped at 10.5rem and "
+        "breaks at its dash (.ct-t), so its floor is one half of a range, "
+        "'4h50m' at most since the compact format (2026-10-09), about 50px of "
+        "Plex Mono. Verified at 360 and 390 with shoot.sh."
     ),
 }
 

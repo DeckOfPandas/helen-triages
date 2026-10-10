@@ -72,9 +72,12 @@
   var els = {
     protein: root.querySelector("#ct-protein"),
     weight: root.querySelector("#ct-weight"),
+    // The weight's own field, under the dropdown since 2026-10-09 and so
+    // outside #ct-calculator; hidden on its own when the dropdown says fish.
+    weightField: root.querySelector("#ct-weight-field"),
     heading: root.querySelector("#ct-protein-name"),
     doneat: root.querySelector("#ct-doneat"),
-    table: root.querySelector("#ct-table"),
+    methods: root.querySelector("#ct-method-groups"),
     summary: root.querySelector("#ct-summary"),
     // The two halves the dropdown swaps between -- issue #412.
     calculator: root.querySelector("#ct-calculator"),
@@ -83,20 +86,62 @@
 
   /* --- render -------------------------------------------------------------- */
 
-  /* One method's time, as the table cell and the card headline both want it.
-     A by_doneness method (issue #246) shows EVERY level rather than the one
-     the page happens to have asked for -- see HTF.cookSchedule.resolve for why
-     both figures and not a control. Everything else is a single span, exactly
-     as before. */
+  /* A range may break only at its dash. HTF.cookSchedule.span gives
+     "2 hrs 20 mins – 3 hrs 15 mins"; each half goes in a nowrap span so the
+     time column can wrap without "1 hr 40" splitting into two numbers. */
+  function spanHtml(lo, hi) {
+    return CS.span(lo, hi).split(" – ").map(function (half) {
+      return "<span class='ct-t'>" + half + "</span>";
+    }).join(" – ");
+  }
+
+  /* One method's time. A by_doneness method (issue #246) shows EVERY level
+     rather than the one the page happens to have asked for -- see
+     HTF.cookSchedule.resolve for why both figures and not a control.
+     Everything else is a single span. */
   function timeHtml(r) {
     if (!r.ok) return null;
-    if (!r.levels || r.levels.length < 2) return CS.span(r.lo, r.hi);
+    if (!r.levels || r.levels.length < 2) return spanHtml(r.lo, r.hi);
     return "<span class='ct-doneness'>" + r.levels.map(function (lv) {
+      /* A space between the word and the figure, so a capped time column
+         can break there rather than overflow. */
       return "<span class='ct-doneness-level'>" +
-               "<span class='ct-doneness-label'>" + lv.label + "</span>" +
-               CS.span(lv.lo, lv.hi) +
+               "<span class='ct-doneness-label'>" + lv.label + "</span> " +
+               spanHtml(lv.lo, lv.hi) +
              "</span>";
     }).join("") + "</span>";
+  }
+
+  /* One method, as a block, 2026-10-10: the outcome and the time on the
+     first line ("I'm most interested in what I'd get"), the method's name
+     under them, then the oven setting a line per stage. Every row in
+     cooking_methods.yml carries all four (tests/test_reference_data.py);
+     `oven` is a list of short lines since 2026-10-10 -- Helen: "hardly any
+     extra text, instructions not buried" -- and the markup gives each its
+     own span so a stage never wraps into the next. */
+  function methodHtml(method, r) {
+    var oven = [].concat(method.oven).map(function (line) {
+      return "<span class='ct-oven-line'>" + line + "</span>";
+    }).join("");
+    return "<li class='ct-method'>" +
+      "<span class='ct-method-outcome'>" + method.outcome + "</span>" +
+      "<span class='ct-method-time'>" + (r.ok ? timeHtml(r) : "<em>won’t guess</em>") + "</span>" +
+      "<span class='ct-method-name'>" + method.name + "</span>" +
+      "<span class='ct-method-oven'>" + oven + "</span>" +
+    "</li>";
+  }
+
+  /* A cut group's heading. The data writes a group as
+     "Tender roasting cuts — rib roast, ribeye roast, round/topside, sirloin
+     roast": the name, then the cuts it covers. The two halves wear different
+     faces, so they are split on the dash here; the name sits in its own span
+     because the violet rule under it is an inline background that measures
+     the lettering (_timings.scss, .ct-group-title). */
+  function groupHtml(name) {
+    var bits = name.split(" — ");
+    return "<h3 class='ct-group-name'><span class='ct-group-title'>" + bits[0] + "</span>" +
+      (bits[1] ? "<span class='ct-group-cuts'>" + bits[1] + "</span>" : "") +
+    "</h3>";
   }
 
   function render() {
@@ -107,6 +152,7 @@
        absent value. */
     var showingFish = els.protein.value === FISH_KEY;
     if (els.calculator) els.calculator.hidden = showingFish;
+    if (els.weightField) els.weightField.hidden = showingFish;
     if (els.fish) els.fish.hidden = !showingFish;
     if (showingFish) return;
 
@@ -114,7 +160,7 @@
     var kg = parseFloat(els.weight.value);
     var doneness = "rare";
 
-    els.table.innerHTML = "";
+    els.methods.innerHTML = "";
 
     /* THE HEADING AND THE FINISHING TEMPERATURE ARE ABOUT THE PROTEIN, NOT THE
        WEIGHT, so both are written before the weight is even checked -- an
@@ -162,36 +208,37 @@
        method takes" above a filled table. */
     els.summary.textContent = "";
 
-    /* --- the decision table ------------------------------------------------
-       What you get, and what it costs you in time, at a length you can scan.
-       Uses the site's existing table styles (article.recipe
-       .recipe-body-content table) and the .table-scroll wrapper that already
-       exists for wide tables -- no new CSS.
+    /* --- the methods, by cut -----------------------------------------------
+       One section per cut group in the data's own order (roasting cuts before
+       slow-cooked, fresh ham before cured), each a list of methods, each
+       method a block with its oven setting -- 2026-10-08, #1329, Helen's
+       choice from the candidates page: "stacked, by cut". See
+       _sass/food/_timings.scss for the shape and why.
 
-       THE CARDS UNDER IT ARE GONE -- #873, Helen, 2026-09-09: "I realised
-       thanks to the design audit that they're not adding information beyond
-       the table, and remain a little hard to read." One card per method sat
-       below this table repeating its name and time with the oven setting, the
-       stages of a multi-stage method, and the caveats; the table is the answer
-       now. HTF.cookSchedule.resolve still returns `stages`, `aside` and `why`
-       for anything that wants them; nothing on this page reads them today.
+       It replaced a three-column decision table (Method / What you get /
+       Time, #253) that wrapped badly on a phone and never showed the oven
+       setting, and before that the cards (#873). HTF.cookSchedule.resolve
+       still returns `stages`, `aside` and `why` for anything that wants them;
+       nothing on this page reads them today.
 
-       Shortest first, decliners last -- see HTF.cookSchedule.orderMethods for
-       why that order and not alphabetical. */
+       Shortest first within a group, decliners last -- see
+       HTF.cookSchedule.orderMethods for why that order and not alphabetical.
+       The groups themselves keep the data's order, which is the order a cook
+       thinks in: the quick roast before the long braise. */
     var ordered = CS.orderMethods(protein.methods, kg, doneness);
+    var groups = [];
+    protein.methods.forEach(function (method) {
+      if (groups.indexOf(method.group) < 0) groups.push(method.group);
+    });
 
-    var rows = ordered.map(function (method) {
-      var r = CS.resolve(method, kg, doneness, protein.methods);
-      return "<tr>" +
-        "<td>" + method.name + "</td>" +
-        "<td>" + (method.outcome || "—") + "</td>" +
-        "<td>" + (r.ok ? timeHtml(r) : "<em>won’t guess</em>") + "</td>" +
-        "</tr>";
+    els.methods.innerHTML = groups.map(function (group) {
+      var items = ordered.filter(function (method) { return method.group === group; })
+        .map(function (method) {
+          return methodHtml(method, CS.resolve(method, kg, doneness, protein.methods));
+        }).join("");
+      return "<section class='ct-group'>" + groupHtml(group) +
+        "<ul class='ct-methods'>" + items + "</ul></section>";
     }).join("");
-
-    els.table.innerHTML =
-      "<table><thead><tr><th>Method</th><th>What you get</th><th>Time</th>" +
-      "</tr></thead><tbody>" + rows + "</tbody></table>";
   }
 
   /* THE REST BOX AND ITS TOOLTIP WERE HERE. The box carried the selected
@@ -238,9 +285,17 @@
      protein you were just looking at rather than to whatever the dropdown
      happens to open on. Ignored silently if it names something this page
      doesn't have -- a bad query string is not worth an error message on a
-     page that works perfectly well without it. */
+     page that works perfectly well without it.
+
+     ?protein=fish is the fish-and-shellfish entry, since 2026-10-09. The
+     salmon chart linked here with #fish, an anchor inside the block this
+     page hides until that entry is picked -- so the link opened the page on
+     beef with nothing scrolled to. The spelling is "fish" rather than the
+     entry's own key because it is the word the charts page uses, and a URL
+     is read by people. */
   var wanted = (location.search.match(/[?&]protein=([a-z]+)/) || [])[1];
-  if (wanted && METHODS[wanted]) els.protein.value = wanted;
+  if (wanted === "fish") els.protein.value = FISH_KEY;
+  else if (wanted && METHODS[wanted]) els.protein.value = wanted;
 
   ["input", "change"].forEach(function (evt) {
     root.addEventListener(evt, render);

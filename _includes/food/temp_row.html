@@ -4,7 +4,11 @@
   Parameters
     label   the row's name, already human-readable
     spec    a node holding out_at_min/out_at_max, and optionally rested_min/max
-    tip     extra hover text (optional)
+
+  NO HOVER TEXT, SINCE 2026-10-08 (#1326). Each row used to carry a `tip`
+  parameter and an invisible hit target whose ::after printed a sentence on
+  hover. Helen: "remove all mouseover text... they're nonsense to me." On a
+  phone they never showed at all. Anything a row has to say is on the page.
 
   WHY AN INCLUDE. Every row is the same four marks at different coordinates, and
   the arithmetic that turns °C into a position lives in the stylesheet, not
@@ -60,15 +64,17 @@
    parameter as a bare name instead of include.x, noted above: the include
    looks self-contained and isn't. {% endcomment %}
 {% assign prefix = "" %}
+{% assign open = false %}
 
 {% if spec.out_at_min %}
-  {% assign from = spec.out_at_min %}{% assign to = spec.out_at_max %}{% assign shown = spec.out_at %}
+  {% assign from = spec.out_at_min %}{% assign to = spec.out_at_max %}
+  {% if spec.out_at_open %}{% assign open = true %}{% endif %}
 {% elsif spec.endpoint_min %}
-  {% assign from = spec.endpoint_min %}{% assign to = spec.endpoint_max %}{% assign shown = spec.endpoint %}
+  {% assign from = spec.endpoint_min %}{% assign to = spec.endpoint_max %}
 {% elsif spec.target_min %}
-  {% assign from = spec.target_min %}{% assign to = spec.target_max %}{% assign shown = spec.target %}
+  {% assign from = spec.target_min %}{% assign to = spec.target_max %}
 {% elsif spec.tender_at_min %}
-  {% assign from = spec.tender_at_min %}{% assign to = spec.tender_at_max %}{% assign shown = spec.tender_at %}
+  {% assign from = spec.tender_at_min %}{% assign to = spec.tender_at_max %}
   {% comment %} A tough cut's figure says what KIND of figure it is, in the
      value itself. It is the one shape here that isn't a temperature you take
      something off the heat at -- collagen breakdown, tested with a fork -- and
@@ -79,14 +85,32 @@
   {% assign prefix = "tender at " %}
 {% endif %}
 
+{% comment %} THE FIGURE IS BUILT FROM THE NUMBERS, NOT PRINTED FROM THE
+   DISPLAY STRING, since 2026-10-09. The data's strings carry words beside the
+   figure -- "74–75°C in the thickest part of the thigh, not touching bone",
+   "54–57°C for pink meat, then rested", "70–75°C at the thickest point" --
+   and Helen asked for every one of them off the charts: "remove all extra
+   text from figures... All of it." The strings stay in the data for the
+   recipe meta line and the calculator's "Done at", which still print them;
+   here the figure is the two numbers the bar is drawn from, so the words
+   and the bar can never say different things. The one open-ended figure
+   ("70°C+", steak's well done) keeps its plus from the data's own flag.
+   {% endcomment %}
+{% capture shown %}{% if from == to %}{{ from }}°C{% if open %}+{% endif %}{% else %}{{ from }}–{{ to }}°C{% endif %}{% endcapture %}
+
 {% assign has_rested = false %}
 {% if spec.rested_min %}{% assign has_rested = true %}{% endif %}
 
-{% comment %} The rightmost point the row reaches — where the direct label hangs
-   and where the hover target ends. {% endcomment %}
+{% comment %} The rightmost point the row reaches — where the direct label hangs. {% endcomment %}
 {% if has_rested %}{% assign right = spec.rested_max %}{% else %}{% assign right = to %}{% endif %}
 
-<div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}">
+{% comment %} THE ROW CARRIES ITS OWN SPAN, --a to --b, from the start of the
+   out-at bar to the far end of whatever the row reaches, since 2026-10-08.
+   Custom properties inherit, so the value label below reads the row's --b
+   without a style of its own, and anything that lays the row out differently
+   -- a phone, a vertical scale -- can place the row's words from the row
+   rather than from a bar inside it. The bars still carry their own pair. {% endcomment %}
+<div class="tc-row{% if include.suggested %} tc-row--suggested{% endif %}" style="--a:{{ from }}; --b:{{ right }};">
   <div class="tc-row-label">{{ include.label }}{% if include.suggested %}<span class="tc-suggested" title="What this recipe suggests">this recipe</span>{% endif %}</div>
   <div class="tc-track">
     <div class="tc-out-at" style="--a:{{ from }}; --b:{{ to }};"></div>
@@ -98,12 +122,16 @@
     {% if has_rested %}
       <div class="tc-rested" style="--a:{{ spec.rested_min }}; --b:{{ spec.rested_max }};"></div>
     {% endif %}
+  </div>
 
-    <div class="tc-value" style="--b:{{ right }};">
-      {{ prefix }}{{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
-    </div>
-
-    <div class="tc-hit" tabindex="0" style="--a:{{ from }}; --b:{{ right }};"
-         data-tip="{{ include.label }}{% if spec.description %} — {{ spec.description }}{% endif %}. {% if spec.out_at %}Out at{% else %}Reaches{% endif %} {{ shown }}{% if has_rested %}, rests to {{ spec.rested }}{% endif %}.{% if include.tip %} {{ include.tip }}{% endif %}"></div>
+  {% comment %} THE VALUE IS THE ROW'S, NOT THE TRACK'S, since 2026-10-08. It
+     sat inside .tc-track and was positioned against it, which meant that on a
+     phone -- where it leaves the track and sits in flow -- it could only ever
+     be UNDER the bar. As a sibling of the label and the track it can be laid
+     out against either: beside the bar on a wide screen, on the label's own
+     line on a narrow one. The stylesheet measures its desktop position from
+     the row, with the same label-column arithmetic .tc-unsafe uses. {% endcomment %}
+  <div class="tc-value">
+    {{ prefix }}{{ shown }}{% if has_rested %} &rarr; {{ spec.rested }}{% endif %}
   </div>
 </div>

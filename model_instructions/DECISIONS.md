@@ -9749,6 +9749,240 @@ verification. Dates are when the correction landed.
   `NO_TEMPERATURE_BECAUSE` entry.
 - Two food-safety gaps (pork medium, fresh ham pink) flagged, not corrected —
   Helen's call.
+- **2026-10-08, #1326, #1327, #1329, #1330 — THREE RULINGS BEFORE ROUND ONE
+  OF THE REFERENCE PAGES' REDESIGN, AND WHAT THE PAGES LOOKED LIKE ON A PHONE.**
+  Helen opened with *"these pages need some urgent content design love, and I
+  think they could also be visually WOW... Literally every time I e.g. roast a
+  ham I look up my own notes on times and options then google on top of
+  that."* Measured at 390px before anything changed: the charts page is
+  16,400px tall, each row three lines of ink for a ten-pixel bar; the methods
+  table wraps names to four lines and shows no oven setting anywhere since the
+  cards went (#873); the fish table is 453px wide in a 390px screen and
+  5,000px tall. Three questions put to her with the fact behind each, three
+  answers:
+
+  1. **The oven setting comes back onto a method row.** Asked whether the
+     missing oven setting was what sent her to Google: *"Do you mean e.g.
+     200° fan for 10 mins then 180° fan for an hour? If so then yes."* The
+     cards had carried it; the table never did.
+  2. **The charts stay one scroll, with better navigation** — against a
+     per-protein picker like the methods page's. *"Honestly I don't know.
+     Immediate reaction is 1, with good nav."*
+  3. **Every tooltip is gone (#1326), and nothing is rehomed.** The four
+     facts that lived only in a hover (cured ham's packaging caveat, duck
+     breast off the bone, tough cuts' fork test, tuna served rare) were named
+     and offered: *"Lose all, they're nonsense to me!"*
+
+  **The structural move that made the chart candidates possible** is in its
+  own commit: a row's value label left `.tc-track` to become a sibling, and
+  the row carries its own `--a`/`--b`. Inside the track, in flow, a figure
+  could only ever sit UNDER its bar on a phone. No pixel moved at any width
+  (crop heights identical before and after), and the first build put the
+  figure ABOVE the bar because only the value named its grid row and the
+  track auto-placed under it — every cell is placed explicitly now.
+
+  **Round one is `scripts/reference_candidates.py`**, kept in `scripts/` so
+  round two does not start from a `tmp/` that is gone. On the bar: chart row
+  (today / one line / thermometer), navigation (today / sticky jump bar),
+  method rows (table with oven / stacked), order (shortest first / by cut),
+  fish (table / list / list without notes), plus `phone.html` with both pages
+  at 390px three treatments abreast (§11.2.1). Not re-opened, on purpose: the
+  split pages, no nav link, no cards, one axis for the whole page, the WHAT
+  box above its heading.
+
+- **2026-10-08, #1327, #1329, #1330 — ROUND ONE SETTLED IN ONE LOOK, AND
+  BUILT THE SAME DAY.** Helen: *"Internal temp: one line sticky jump bar.
+  Cooking methods: stacked, by cut, fish and shellfish list no notes. Any
+  more questions? If not then please go go go, build!!!"* So:
+
+  **The charts.** A row is its label and its figure on one line, the bar
+  under them at the column's full width, at EVERY width — the 9.5rem label
+  column and the figure hung off the bar's end are gone, and with them the
+  phone-only block #903 added, the "↑ top" link under every chart (eleven)
+  and the empty label-column cell in the axis. The contents list is the
+  navigation: stuck to the top as a row of chips that scrolls sideways. The
+  thermometer lost; it is in `reference_candidates.py` if it is ever wanted
+  back. **Two things the build found that the candidate had not**: the body's
+  own list rule (`article.recipe .recipe-body-content ul li`, (0,2,3)) beat a
+  one-class-lighter override and drew a dash before every chip and every
+  method, so both lists are scoped under `.recipe-body-content`; and
+  `minmax(0, 1fr) auto` let turkey's sixty-character figure squeeze the label
+  column to nothing and print over TURKEY — the label is `max-content` and the
+  figure is what wraps.
+
+  **The methods.** `cook-timer.js` writes one `<section>` per cut group in
+  the data's own order, each a `<ul>` of method blocks: name and time on the
+  first line, the oven setting under them, the outcome last and italic.
+  Shortest-first order holds within a group. A range breaks only at its dash
+  (`.ct-t`), and only on a phone is the time column capped; on a desktop the
+  cap only broke ranges that fit. The decision table (#253) is gone, so the
+  methods page holds no `<table>` either.
+
+  **Fish and shellfish.** Definition lists, one `<dt>` per fish and a `<dd>`
+  per form, the notes deleted rather than hidden. Still hand-written in the
+  page: nothing in them reconciles against the data.
+
+  **Not re-asked, and worth a look from her**: on a desktop the figure sits
+  at the far right of an 852px row, a long way from its bar. That is the
+  candidate as she saw it at full size; `justify-self: start` on `.tc-value`
+  would put the figure beside its label instead, and is a one-line change if
+  she wants it.
+
+- **2026-10-09 — ROUND TWO: HELEN'S LIST AFTER LOOKING AT ROUND ONE.** *"These
+  look great!"*, then six points on the charts, four on the methods and one
+  bug. Built the same day, the ones that were instructions:
+
+  **The gridlines sit on multiples of ten.** They were a repeating gradient
+  with a 10°C period from the plot's left edge, and the edge is 35°C, so the
+  lines fell at 35, 45, 55 while the ticks read 40, 50, 60. *"The scientist
+  in me is upset by the x axis lines."* Each line is its own stop now, from
+  the same `$tc-min`/`$tc-max` arithmetic as the ticks and the bars.
+
+  **No words on a figure.** *"Remove all extra text from figures, e.g. 'in
+  the thickest part of the thigh', 'for pink meat then rested', 'at the
+  thickest point'. All of it."* `temp_row.html` builds the figure from the
+  numeric fields instead of printing the data's display string; the strings
+  are untouched in the data, where the recipe meta line and the calculator's
+  "Done at" still print them. The four hand-written rows on the All chart go
+  through the include like every other row. The key's "below the cited
+  safety figure" entry is gone (she named it on salmon; it was one include,
+  so it is gone from every chart and the recipe pages too), and so is the
+  poultry subtitle "by the thigh, not the breast" — the same instruction as
+  the words she struck from the rows.
+
+  **No notes under a chart.** Salmon's FSA line, pork's held-temperature
+  sentence, and "rest 20 minutes" off the haunch subtitle: *"delete all extra
+  notes below all tables... all of them."* The cut-list subtitles ("brisket,
+  chuck, short rib, pot roast") stay: they say what a chart covers, which is
+  not a note.
+
+  **The weight sits under the dropdown.** *"So the user is saying 'I have
+  chicken, 3 kg'."* The `.ct-controls` band under the protein heading (#253)
+  is gone with its rule; the two inputs are one stacked form above the
+  heading, and `cook-timer.js` hides the weight on its own when the dropdown
+  says fish. **Chicken, duck and goose read "(whole)"** in the dropdown and
+  therefore in the heading. **Times are compact**: `4h50m – 5h30m` for what
+  was `4 hrs 50 mins – 5 hrs 30 mins`, en dash kept. MANUAL §5's "mins,
+  never min" is about the recipe pages' time lines and is not re-opened;
+  this is a column of figures.
+
+  **The bug.** The salmon chart's "cooking methods" link went to `#fish`, an
+  anchor inside the block the methods page hides until "Fish and shellfish"
+  is picked, so it opened on beef. It is `?protein=fish` now, and the page
+  reads that as the fish entry.
+
+  **Put to her in text, as she asked, and not built**: which words belong to
+  which bar (the caption line and the bar it sits over are symmetric with the
+  next row's caption); whether the slow-cooked rows should leave the roasting
+  charts for one section of their own; how the sticky chips can say there
+  are more of them off to the side; and what would make a method block
+  readable for *"I'm holding a 3-kg venison haunch and want to decide how to
+  cook it. I'm most interested in what I'd get."*
+
+- **2026-10-09, later — ROUND THREE: THE FOUR ANSWERS, CHOSEN AND BUILT.**
+
+  **Which words belong to which bar: proximity.** The track was 1.5rem with
+  the bar centred, so a bar sat as far below its own caption as above the
+  next one; and Courier and Plex Mono top-aligned put the figure a pixel
+  above the word beside it. Now label and figure share a baseline, the bar
+  starts 0.2rem under them, and the row's air (0.95rem) is all below the
+  bar: 3px above, 16px below, measured. Nothing new is drawn. (Option A of
+  three; B would also have moved the figure beside the label, C was
+  banding.)
+
+  **The slow-cooked cuts are one section.** Asked whether pulling them out
+  would read as scattered: *"okay great, let's do it."* Beef's tough cuts
+  and venison's slow-cooked cuts lose their sections, lamb and pork lose
+  their lone row at the right-hand end, and all four draw as one chart near
+  the foot of the page — one figure (90–96°C) under four names, which is the
+  fact. Same axis for the whole page, unchanged: the empty right third of a
+  roasting chart is the information that nothing roasts past 75. Each
+  roasting chart that lost something carries a second link on its crosslink
+  line, to the section. Six `chart_anchor` values moved to
+  `slow-cooked-cuts`; the ids of the other sections did not change, so no
+  recipe link moved.
+
+  **The chips wrap.** *"Option A please, perfect."* Ten one-word chips, two
+  rows at 390px (5.2rem) and one at 1280 (3rem), every one on screen; the
+  headings' scroll-margin carries both heights under a 700px media query,
+  and the bar's ground is copied 2rem into each gutter so the axis's end
+  ticks, which overhang the column, stop showing beside the chips. Packing
+  into two rows rather than three took 0.5rem of chip padding and 0.04em of
+  tracking.
+
+  **The outcome is the second line, and it sings.** *"Let's try option A,
+  but I'm close to picking B, so please make the outcome sing even in second
+  place."* The body face at 600 in the site's violet, 0.95rem, under the
+  method's name; the oven setting drops to third, 0.82rem and grey. The
+  by-doneness time column's phone cap went from 10.5rem to 12rem so
+  "medium 1h20m – 1h50m" holds one line.
+
+  **Jollier headings on the methods page.** The cut-group name is the
+  heading-tier lettering at 1.15rem with the single violet rule, the mark the
+  site already has one tier below a section heading; the fish and shellfish
+  names the same at 1rem. It needed scoping under `.recipe-body-content
+  h3.ct-group-name`: the body's quiet-h3 rule (0.78rem, grey) out-specified
+  the bare class and the first build showed the label it was replacing.
+  Each fish name sits in a `.fish-name` span because the rule is an inline
+  background that measures the lettering and a `<dt>` is a block.
+
+  **Two small ones.** Turkey reads "(whole)" with the other birds, and its
+  endpoint string is "74–75°C in the thigh" like theirs, the probing
+  instruction ("thickest part, not touching bone") moved into its note.
+
+- **2026-10-10 — ROUND FOUR IS A CANDIDATES PAGE, NOT A BUILD.** Helen on
+  round three: *"I love most of this! It's just the 'jollier headings'
+  request. There is a LOT going on now. Perhaps some extra vertical space
+  between sections (particularly above the top rows) would help. Perhaps
+  giving in and swapping the outcome to be first place would help. Maybe a
+  different font for the method (e.g. 'sugar-rubbed roast') would help?"*
+  Three perhapses are three switches, so `scripts/methods_candidates.py`
+  puts them on the real page (spacing today / more air; first line method /
+  outcome; method name body / courier / italic) with a phone view of four
+  combinations, and ships nothing until she picks. Built on round one's
+  bundle and switcher; the live `cook-timer.js` renders, only CSS moves.
+
+  **Found on the way: the methods page had two elements with
+  `id="ct-methods"`** — the JSON data block from the start, and the div the
+  round-one build (2026-10-08) added for the groups. `getElementById` found
+  the script first and the page worked by accident; a Playwright locator
+  refused the ambiguity. The div is `#ct-method-groups`.
+
+- **2026-10-10 — THE METHOD BLOCK, STARTED AGAIN, AND WHY THE ROWS WERE
+  TOO CLOSE.** Helen, on the candidates: *"It's that the rows are all too
+  close together. The e.g. 160-180 fan at the bottom of one row is so close
+  to the bottom of the row it can barely be seen. Then the top line of the
+  row below is so close to that I can't tell which row is which. The new
+  cacophony of font styles is absolutely not helping visual cohesion... My
+  favourite from your current candidates page is outcome first, method next
+  in courier... let's try using [Plex] for the e.g. '190-200°C fan'
+  instructions. Lines like this one should break more helpfully... Basically
+  hardly any extra text, instructions not buried... I think the violet
+  colour for outcome is going to have to go as well... I like the timings
+  on their own on the right, and their styling, so keep those!"*
+
+  **The rows were too close because the block had no padding at all.**
+  `.ct-method { padding }` at (0,1,0) had lost to the list reset's `padding:
+  0` at (0,2,3) since round one; round three's "taller blocks" and round
+  four's "more air" both moved a value nothing read. The padding is on the
+  li reset now (1.25rem above and below). Found by reading the compiled CSS
+  for the two rules together, which is where a specificity loss shows and a
+  stylesheet does not.
+
+  **Three faces, one job each**: body for the outcome (first line, 600, ink,
+  the violet gone); Courier, small and grey, for the method's name under it
+  (a label, like the group heading and the chart rows); Plex Mono at 600 for
+  the time at the right and the oven stages under the name — the site's
+  face for a figure you act on (`$font-label`). No fourth.
+
+  **The oven setting is a list of short stage lines in the data**, one per
+  setting in order: `"220°C fan for 20 min"` then `"180°C fan for the
+  rest"` for what was `"Start 220°C fan for 15–20 min, drop to 180°C fan"`;
+  73 fields rewritten by `tmp/rewrite_oven.py`, line-by-line text
+  replacement keyed by protein and id, not a YAML round-trip. A relative
+  row says what it follows and what it adds ("As the plain method" / "Rub on
+  for last 20–30 min"). `test_every_oven_temperature_says_fan` reads the
+  lines joined. A section's worth of air between cut groups.
 
 ### The cocktails reference layer, #529
 
