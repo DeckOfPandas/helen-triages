@@ -715,7 +715,28 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # the merge itself, with `3df50ce4` still in place: this test named exactly the
 # five demerara recipes, each "last touched by 1747b85b", and nothing else. So
 # the merge covers her eight, her five, and no page besides.
-BASELINE_COMMIT = "91431cf6"   # the merge holding #1341's eight and demerara's five
+#
+# MOVED 2026-10-10 FOR THREE LINES, ONE IN EACH OF THREE RECIPES -- #1356.
+# `c89d3ae9` adds `incidental: true` to a greasing butter in the parsnip,
+# cranberry and chestnut loaf, a greasing butter in the raspberry baked
+# cheesecake, and the frying oil in the youvetsi, and changes nothing else in
+# any of them. The flag hides the line from the recipe page's ingredients and
+# from the shopping list, so it is NOT an invisible key and this is the
+# exception, not INVISIBLE_KEYS.
+#
+# HER GRANT, asked for before the edit and given for exactly this: "Incidentals:
+# agree, thanks. I grant an exception for those six live and 71 drafts-- no
+# great shakes to be wrong, and you won't be! You can grant incidental here,
+# and you don't need to flip the proofread flag."
+#
+# THREE OF HER SIX, NOT SIX. The other three lines the survey had shown her are
+# untouched and so need no cover: icing sugar to dust (meringue swans, mince
+# pies) and Dijon mustard to brush (beef wellington) are bought for the dish.
+#
+# Proved with the old value first: against `91431cf6` this test named exactly
+# those three files, each "last touched by c89d3ae9", and nothing else. Covers
+# c89d3ae9 and nothing after.
+BASELINE_COMMIT = "c89d3ae9"   # #1356: three incidental flags, on Helen's grant
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
