@@ -774,7 +774,15 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # it, so no merge is needed this time. Proved with `efe55b56` still in place:
 # this test named exactly those nineteen files, eight "last touched by
 # f7f6f1f1" and eleven "by 135e4487", and nothing else.
-BASELINE_COMMIT = "135e4487"   # the tag review of the published recipes, on Helen's grant
+#
+# AND ONCE MORE THAT DAY, FOR A TAG THAT DID NOT EXIST AT BREAKFAST. `d563db61`
+# declares the mood `fiddly and fun` and adds it to twelve published recipes,
+# one tag appended to one line in each and nothing else. She was shown the
+# twelve by name and answered "Yes! Great! Let's do it -- declare the tag". The
+# grant is the one above, for editing the live files in this tag review without
+# flipping the flag. Proved with `135e4487` still in place: this test named
+# exactly those twelve, each "last touched by d563db61", and nothing else.
+BASELINE_COMMIT = "d563db61"   # `fiddly and fun` on twelve published recipes, on Helen's grant
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
