@@ -7,7 +7,7 @@ serves: "8"
 prep_time: "10 mins"
 cook_time: "35–40 mins"
 main_ingredients: ["cream cheese", "raspberries", "lemon", "biscuits", "salted butter", "golden caster sugar", "eggs", "plain flour"]
-tags: ["dessert"]
+tags: ["bakes", "dessert"]
 ingredient_groups:
   - name: "base"
     items:

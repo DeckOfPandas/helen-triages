@@ -9,7 +9,7 @@ prep_time: "5 mins"
 cook_time: "15 mins"
 main_ingredients: ["dark chocolate", "double cream", "unsalted butter"]
 star_ingredient: "chocolate"
-tags: ["extras"]
+tags: ["extras", "fiddly and fun"]
 ingredient_groups:
   - items:
     - amount: "150 ml"

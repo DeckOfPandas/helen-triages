@@ -1,6 +1,6 @@
 ---
 title: "Lemon Feather Sponge"
-tagline: "A genuine delight."
+tagline: "This is the cake angels eat."
 source: "Adapted from Delia Smith's Book of Cakes"
 source_type: book
 makes: "one 7-inch round cake"

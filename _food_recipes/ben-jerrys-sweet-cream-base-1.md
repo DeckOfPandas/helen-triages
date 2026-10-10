@@ -6,7 +6,7 @@ source_type: book
 makes: "950 ml"
 serves_estimate: 6
 prep_time: "10 mins"
-cook_time: "none"
+cook_time: "None"
 main_ingredients: ["eggs", "golden caster sugar", "whipping cream", "whole milk"]
 star_ingredient:
 tags: ["extras", "freezable"]

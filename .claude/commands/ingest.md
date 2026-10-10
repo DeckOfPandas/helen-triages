@@ -275,10 +275,19 @@ failure is probably work someone else has already done (MANUAL §9.1).
   fan figure alone; its `QQ original` keeps everything the source printed**
   (Helen, 2026-10-07). Where the pair is not labelled, the rewrite keeps the
   pair and the question goes on her list.
-- **An ingredient the method names with a quantity goes in the ingredient
-  list**, in the group that step belongs to, even when the source's own list
-  leaves it out: "pour over 75 ml boiling water", "a pinch of salt" (Helen,
-  2026-10-07). A bare "season" names nothing and adds nothing.
+- **The ingredient list is the source's own list; never add to it from the
+  method.** Helen, 2026-10-10 (#1356): *"We shouldn't list incidentals. We can
+  trust the cook."* "Pour over 75 ml boiling water", "a pinch of salt", flour
+  for dusting: none becomes a line, with a quantity or without. Reverses the
+  2026-10-07 rule that lifted them in. The one exception is a source with no
+  ingredient list at all, where the method's quantities are lifted into one
+  group and her list says so.
+- **A fat or flour the source's list prints only for the tin or the pan keeps
+  its line and gains `incidental: true`** ("butter, for greasing", "oil, for
+  frying", "flour, for dusting"). Only those: icing sugar to dust and mustard
+  to brush stay ordinary lines, and so does a real ingredient with the use
+  tacked on ("175 g butter, plus extra for the tin"). Helen, 2026-10-10. This
+  moved out of TIER 3 that day, for exactly this list and nothing wider.
 - **Quantities in their own `amount:` key**, never inside `item:` text. The
   highlighter reads `item.amount` and never scans text, so a quantity in the
   wrong field renders unstyled with no error anywhere.
@@ -365,16 +374,14 @@ failure is probably work someone else has already done (MANUAL §9.1).
 
   She keeps both so she can judge the rewrite rather than trust it blind.
 
-  **A SOURCE STEP THAT HOLDS SEVERAL ACTIONS BECOMES SEVERAL PAIRS** -- Helen,
-  2026-10-08, of the batch that first did it: *"The split steps has been easier
-  for me -- recipes often stick loads together which makes it hard, even when
-  just testing."* The `QQ original` lines are the source's step cut into
-  segments, each verbatim and in order, so that read together they are exactly
-  what the source printed; each segment gets its own `QQ Claude`. Cut where a
-  cook would actually pause (see her own rewrite patterns below). Never merge
-  two source steps, never reorder, and say on her list which steps were split.
-  This replaces "one source step, one pair", which both standalone documents
-  taught until that day.
+  **ONE SOURCE STEP IS ONE PAIR, HOWEVER MANY ACTIONS IT HOLDS** -- Helen's
+  ruling, 2026-10-10. The `QQ original` line is the source's whole step,
+  verbatim; the `QQ Claude` line rewrites all of it, in several short
+  sentences where it needs them. Never split a step, never merge two, never
+  reorder. **This is the rule's second reversal in three days**: it was "one
+  step, one pair" until 2026-10-08, when she said of the first split batch
+  *"The split steps has been easier for me"*; having worked through more of
+  them she found the split files harder to read. DECISIONS §4 has both.
 
   **WHAT HER OWN REWRITE LOOKS LIKE, once she's actually cooked from a `QQ
   Claude` line -- 2026-09-05, `sticky-squidge-ginger-loaf.md`.** She asked for
@@ -492,7 +499,8 @@ fourteen.
 
 ## TIER 3 -- never, at ingest or after
 
-Rewriting a method step into her voice. `incidental:`. The case-by-case tags
+Rewriting a method step into her voice. `incidental:` on anything but the
+tin-and-pan fats and flour TIER 1 names. The case-by-case tags
 (`freezable`, `virtuous`, `one-handed food`). Inventing a time or temperature --
 `Estimated N mins` is banned outright. `meta.rewritten`, `meta.proofread`,
 `meta.ship`. **Reconstructing a truncated step**, even when every sibling recipe

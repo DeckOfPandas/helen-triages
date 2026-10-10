@@ -8,7 +8,7 @@ serves_estimate: 20
 prep_time: "None"
 cook_time: "10 mins"
 main_ingredients: ["bay leaves", "green cardamom pods", "whole cloves", "black peppercorns", "cinnamon sticks", "whole nutmeg", "star anise", "black cardamom pods", "mace", "cumin seeds", "coriander seeds", "fennel seeds"]
-tags: []
+tags: ["extras"]
 ingredient_groups:
   - name: spices
     items:

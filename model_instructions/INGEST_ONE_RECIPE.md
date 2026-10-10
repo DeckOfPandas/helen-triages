@@ -170,7 +170,11 @@ Three things to get right, in descending order of how much they cost if wrong:
 - **Split the groups if the source does.** A custard, then a meringue, then the
   assembly. This is cheap while you have the whole recipe in front of you and
   expensive afterwards. One unnamed group is fine if the recipe genuinely has
-  one phase — use `name: ""` or omit `name`.
+  one phase — use `name: ""` or omit `name`. **With more than one group,
+  EVERY group needs a name, the first included**: a main block left unnamed
+  above a `to serve` prints as an unlabelled list followed by labelled ones,
+  and her suite refuses it (8 of 23 files in the batch of 2026-10-10). Name
+  the main block for the dish: `curry`, `pie`, `salad`.
 
 **How a group's `name` is printed, which is what decides how to write it.**
 The page puts "For the " in front and a colon after, so `name: dressing` reads
@@ -201,13 +205,36 @@ where she will see it. **Never choose for her**, in either direction: not
 precise bake. Where the source does say — "unsalted butter", "slightly salted
 butter" — that is reading, and you write it.
 
-**AN INGREDIENT THE METHOD NAMES WITH A QUANTITY GOES IN THE INGREDIENT LIST**,
-even when the source's own list leaves it out — Helen, 2026-10-07. "Pour over
-75 ml boiling water" in step 1 is `amount: "75 ml"`, `item: "boiling water"`,
-in the group that step belongs to; "a pinch of salt" is `amount: "1 pinch"`,
-`item: "salt"`. Say in your list which ones you added. **A bare "season" or
-"some seasoning" is NOT one**: it names no quantity and no ingredient, and
-adding salt and pepper for it would be filling a silence.
+**THE INGREDIENT LIST IS THE SOURCE'S OWN LIST. NEVER ADD TO IT FROM THE
+METHOD.** Helen, 2026-10-10: *"We shouldn't list incidentals. We can trust the
+cook."* "Pour over 75 ml boiling water" in step 1, "a pinch of salt", flour for
+dusting the worktop, a bare "season": none of them becomes an ingredient line,
+with a quantity or without one. The step still says it, in both halves of its
+pair, and that is where the cook reads it. (This reverses the rule of
+2026-10-07, which lifted any quantity the method named into the list.)
+Everything the source's own list prints is still kept.
+
+- **The one exception is a source with no ingredient list at all**, where the
+  quantities exist only in the method. Lift them into one group, in the order
+  the method meets them, and say in your list that you did.
+- **A fat or flour the source's own list prints only for the tin or the pan
+  keeps its line and gains `incidental: true`**: "butter, for greasing", "oil,
+  for frying", "flour, for dusting".
+
+  ```yaml
+  ingredient_groups:
+    - name: ""
+      items:
+      - item: "QQ butter, for greasing"
+        incidental: true
+  ```
+
+  Her page and her shopping list then leave it out, while a reader avoiding
+  butter can still find the dish. **Only those**: icing sugar to dust and
+  mustard to brush are things a cook may have to buy, and they stay ordinary
+  lines. A real ingredient with the use tacked on ("175 g butter, plus extra
+  for the tin") is an ordinary line too. Never put a flagged item in
+  `main_ingredients`.
 
 ---
 
@@ -262,29 +289,25 @@ remedy for a problem the instruction already prevents.
 
 A step may be two short sentences. It is often better as two.
 
-### Split a step that holds several — one pair per thing you would stop at
+### One source step, one pair — never split a step
 
-**A source packs several actions into one numbered step, and you unpack them.**
-Helen, 2026-10-08: *"The split steps has been easier for me -- recipes often
-stick loads together which makes it hard, even when just testing."* So a step
-that makes a dough, proves it, and lines a tin is three pairs, not one.
+**A source step is ONE pair, however many actions it holds.** Helen's ruling,
+2026-10-10, after working through a batch that had been split: the split
+files were harder for her to read, not easier. So a step that makes a dough, proves
+it and lines a tin is one `QQ original` line holding the whole step, verbatim,
+and one `QQ Claude` line rewriting all of it. (This reverses the rule of
+2026-10-08, which cut a step into one pair per action.)
 
-- **The `QQ original` lines are the source's step CUT INTO SEGMENTS**, each
-  verbatim, in order, so that read one after another they rejoin into exactly
-  what the source printed. Cut at a sentence end where you can; where one
-  sentence holds two actions, cut at the comma or the "then" and leave each
-  half as it stands, small letter and all. Nothing is reworded, dropped or
-  repeated.
-- **Each segment gets its own `QQ Claude` line**, straight after it.
-- **Where to cut: at a point a cook might actually pause.** Her own edits draw
-  the line there — whisking the dry ingredients and then pouring the wet in is
-  one continuous action and stays one pair; cooling a loaf and then wrapping
-  it to store are two things you do at two times, and are two.
+- **The `QQ original` line is the source's whole step**, exactly as printed,
+  however long.
+- **The `QQ Claude` line may run to several short sentences**, one per action.
+  That is where a long step is made readable: in the rewrite, not by cutting
+  the original.
 - **Never the other direction, and never a new order.** Two source steps are
-  never merged into one pair, and a segment is never moved ahead of the one
-  the source put before it.
-- **Say in your list that you split**, and which source steps, so she can find
-  the seams.
+  never merged into one pair, and nothing moves ahead of what the source put
+  before it.
+- **`method_groups` is grouping, not splitting.** A step sits whole inside the
+  group it belongs to.
 
 ### `method_groups` — split the phases here, or nobody ever will
 
@@ -350,8 +373,8 @@ is correct for plenty of recipes.
   the figures are not always in the same order, and picking one is a guess.
 - **Weights: old-style recipes and almost all baking keep their ounces.**
   Helen's ruling. Delia in particular. Do not convert a baking recipe to metric.
-- **Never merge or reorder steps.** A source step becomes one pair, or several
-  where it is split as above — never fewer, and never out of order.
+- **Never merge, split or reorder steps.** A source step becomes exactly one
+  pair — never fewer, never more, and never out of order.
 - **A step that is really a note stays a step.** Freezer guidance mid-method is
   arguably misfiled, but moving it is restructuring somebody else's recipe.
 
@@ -372,13 +395,13 @@ An undeclared tag or star ingredient fails her test suite. These lists are the
 whole vocabulary. If nothing fits, **leave the field out** rather than coin a
 term.
 
-### `tags` — pick from these 22 and no others
+### `tags` — pick from these 23 and no others
 
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
-`hot snack`, `ice cream`, `nibbles`, `one-handed food`, `salad`, `showstopper`,
-`soup`, `sweets`, `virtuous`
+`fiddly and fun`, `hot snack`, `ice cream`, `nibbles`, `one-handed food`,
+`salad`, `showstopper`, `soup`, `sweet snack`, `virtuous`
 <!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
@@ -404,6 +427,41 @@ Meanings you would not guess:
 - **`virtuous`** is narrow: lean protein, or genuinely veg-forward with a wine
   or citrus sauce doing the work. Not "contains a vegetable".
 - **`ice cream`** implies `dessert` and `make-ahead` — write all three.
+
+And the plainer ones, as Helen means them (agreed 2026-10-10):
+
+- **`bakes`** — a baked good out of the oven: cake, biscuit, bread, pastry.
+  Not anything that merely goes in the oven. Her tests: *"would this appear on
+  Great British Bake Off?"*, and is it what you make in cosy baking mode. A
+  quiche, a tarte tatin, a baked cheesecake, a baked pudding, a crumble and
+  pizza dough are in. A soufflé, a Wellington, a microwave mug cake and
+  anything set in the fridge are not.
+- **`dessert`** — a pudding course you serve at the table.
+- **`sweet snack`** — small sweet things eaten by hand outside a meal:
+  brownies, biscuits, fudge, truffles, a fairy cake, a scone, a muffin. Her
+  test: *"would I serve it on a cake plate at 4 o clock after a long
+  improving walk?"* **It has to be made as individual pieces: a whole cake
+  served in slices is not one.** (This tag was called `sweets` until
+  2026-10-10.)
+- **`fiddly and fun`** — you make it because you want to potter: several
+  components or stages, hands-on work, some precision. The PROCESS is the
+  point. Pastry from scratch, anything piped, rolled or filled one at a time,
+  an emulsion you have to mind. Slow is not fiddly: a six-hour stew is not.
+- **`showstopper`** — it makes people gasp when it lands on the table. The
+  RESULT, however little work it took. A dish may be this, `fiddly and fun`,
+  both or neither.
+- **`carbs party`** — the starch is the point: pasta, rice, potatoes, pies,
+  dumplings.
+- **`cheese-tastic`** — cheese is the pleasure of the dish, not a garnish.
+  Feta does not count; burrata does.
+- **`fakeaway`** — a home version of something you would order in.
+- **`hot snack`** — small, hot and eaten between meals: toasties, fritters,
+  things on toast.
+- **`nibbles`** — finger food to pass round with drinks.
+- **`breakfast`** — eaten in the morning.
+- **`extras`** — not a dish by itself: sides, sauces, stocks, pickles, doughs.
+- **`festive`** — Christmas, or another named feast.
+- **`starter`** — works as a first course at a dinner party.
 
 **Two or three tags is normal. None is legitimate.** Being wrong here is cheap
 for her to fix, so propose rather than agonise — but propose only from the list.
@@ -546,6 +604,8 @@ agonising over.** Get it right where it is easy; do not let it slow down section
 - **Never draft a tagline of your own.** An intro becomes the `QQ original` /
   `QQ Claude` pair; no intro is a bare `QQ`.
 - **Never decide which butter.** Unstated is `QQ butter`.
+- **Never split a source step into several pairs**, and never add an
+  ingredient line the source's own list does not print.
 - **Never reconstruct a truncated method**, even when the pattern is obvious.
 - **Never convert a baking recipe's ounces to grams**, or a source's
   temperature to a different scale.
@@ -622,10 +682,8 @@ ingredient_groups:
 method:
   - "QQ original Bring a large pot of water to the boil and add plenty of salt. Add the gnocchi and cook according to the packet instructions, usually about 2 to 3 minutes — they are done when they float to the surface. Drain them well."
   - "QQ Claude Boil the gnocchi in well-salted water, 2–3 mins, until they float. Drain well."
-  - "QQ original Meanwhile, melt the butter in a large frying pan over medium heat."
-  - "QQ Claude Meanwhile melt the butter over medium heat."
-  - "QQ original Once the butter has melted and is foaming, add the sage leaves and fry them for 30 seconds or so until they are crisp, then remove them to a plate lined with kitchen paper."
-  - "QQ Claude Fry the sage in the foaming butter, 30 seconds, until crisp. Drain on kitchen paper."
+  - "QQ original Meanwhile, melt the butter in a large frying pan over medium heat. Once the butter has melted and is foaming, add the sage leaves and fry them for 30 seconds or so until they are crisp, then remove them to a plate lined with kitchen paper."
+  - "QQ Claude Meanwhile melt the butter over medium heat. Fry the sage in the foaming butter, 30 seconds, until crisp. Drain on kitchen paper."
   - "QQ original Add the minced garlic to the butter and cook for about 30 seconds until fragrant, being careful not to let it burn or it will turn bitter."
   - "QQ Claude Add the garlic and cook 30 seconds, until fragrant."
 method_short:
@@ -647,9 +705,9 @@ meta:
   Flagged in a note rather than finished.
 - **No `tagline`.** The source has no intro, so a bare `QQ` and nothing
   drafted in its place.
-- **Source step 2 is split in two**, at its full stop: melting the butter, then
-  frying the sage in it. The two `QQ original` lines rejoin into the source's
-  step. Step 1 stays whole — boil, cook and drain is one run at the hob.
+- **The salted water in step 1 is not an ingredient line.** The method names
+  it and the source's list does not, so it stays in the step. "Salt and
+  pepper" is in the source's list, and is kept.
 - **No `star_ingredient`.** Gnocchi is not one of the fourteen and nothing else
   is the hero.
 - **`carbs party` is a proposal.** `cheese-tastic` is arguable on 30 g of

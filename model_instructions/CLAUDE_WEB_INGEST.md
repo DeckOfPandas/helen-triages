@@ -118,8 +118,9 @@ a deploy.
   (`_data/cocktails/source_wordings.yml`): 60 of 79 on a replay of the
   2026-10-07 batch.
 - **Every food method step arrives as a pair** (`QQ original` verbatim, then
-  `QQ Claude`), and a source step that held several actions arrives as several
-  pairs. **A food tagline is the same pair on one line** where the source had
+  `QQ Claude`), one pair per source step however much the step holds (since
+  2026-10-10; it was several pairs for two days before that). **Nothing the
+  method alone names is added to the ingredient list.** **A food tagline is the same pair on one line** where the source had
   an intro, and a bare `QQ` where it had none; **a cocktail's tagline is a
   bare `QQ`**, since 2026-10-08. Butter the source did not specify is `QQ
   butter`. Every time and temperature only if printed.

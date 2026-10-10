@@ -139,6 +139,13 @@ retired_star_ingredients:
 #   planning rather than a reduction in the work on the day, which is the
 #   opposite of what someone browsing this tag wants.
 #
+#   THE EXCEPTION SHE DREW ON 2026-10-10, of a BBQ spatchcock duck rubbed a day
+#   ahead: "keep make ahead -- the rub is the thing here, and roasting on the
+#   day is trivial." So the test is where the WORK is, not whether heat is
+#   applied on the day: if what is left for serving time is trivial, the dish
+#   is make-ahead. A Christmas turkey buttered the day before is not, because
+#   the roast is the work.
+#
 #   A BASE RECIPE OR CONDIMENT DOES NOT CARRY IT. A spice blend, a curry paste,
 #   a dukkah, a lemon curd, a cranberry sauce: these have no "serving" to be
 #   ahead of, so the tag tells you nothing you did not already know from what
@@ -151,6 +158,98 @@ retired_star_ingredients:
 # a rule that quietly overturns two others is worse than no rule. `freezable`
 # answers "can I keep the leftovers", `make-ahead` answers "can I do this on
 # Saturday". A dish may be either, both or neither.
+#
+# -----------------------------------------------------------------------------
+# THE TWELVE THAT HAD NO WRITTEN MEANING -- AGREED 2026-10-10. Until then
+# these were names in a list, which is why an ingest's proposals for them were
+# hit and miss. A session drafted one line each and Helen answered "Agree on
+# all", adding the test for `bakes` in her own words. (One of the twelve was
+# then renamed the same day: `sweets` became `sweet snack`.)
+#
+#   bakes          a baked good out of the oven: cake, biscuit, bread, pastry.
+#                  Not anything that merely goes in the oven. HER TEST: "would
+#                  this appear on Great British Bake Off?" -- so chocolate
+#                  mousse tartlets, with their baked pastry cases, are in.
+#                  And, the same day: "Pizza dough, fondants, cheesecake (if
+#                  the baked kind of cheesecake not the set kind of
+#                  cheesecake), puddings and crumbles are all 'bakes'." The
+#                  burger buns are in too, though they "gave me a moment".
+#                  NOT bakes, also hers: a soufflé, and a beef Wellington
+#                  ("10 is not a bake"), pastry or no pastry. A quiche is.
+#                  Nor meringue swans, which gave the second half of the
+#                  test: "No one gets in cosy baking mode and makes ad hoc
+#                  swans with creme diplomat..." A BAKE IS WHAT YOU MAKE IN
+#                  COSY BAKING MODE.
+#   dessert        a pudding course you serve at the table.
+#   sweet snack    small sweet things eaten by hand outside a meal: brownies,
+#                  biscuits, fudge, truffles, a fairy cake, a scone. HER
+#                  TEST: "would I serve it on a cake plate at 4 o clock after
+#                  a long improving walk?"
+#                  THIS TAG WAS `sweets` UNTIL 2026-10-10, and the name was
+#                  the fault: "every single time I have to remind myself why
+#                  it's not just toffee and chocolate truffles." Under the
+#                  old name she ruled fairy cakes OUT; under the new one,
+#                  the same afternoon, "Fairy cakes are in again now." It
+#                  is `hot snack`'s twin, singular like it.
+#                  A WHOLE CAKE SERVED IN SLICES IS NOT ONE. Asked outright,
+#                  since the cake-plate test would let every loaf and sponge
+#                  in: "No." It has to be made as individual pieces -- a
+#                  biscuit, a bun, a muffin, a brownie square.
+#   carbs party    the starch is the point: pasta, rice, potatoes, pies,
+#                  dumplings.
+#   cheese-tastic  cheese is the pleasure of the dish, not a garnish. FETA
+#                  DOES NOT COUNT, even a whole baked block of it ("oooh,
+#                  yeah, feta doesn't count for cheese-tastic"). Burrata
+#                  does.
+#   fakeaway       a home version of something you would order in.
+#   hot snack      small, hot and eaten between meals: toasties, fritters,
+#                  things on toast.
+#   nibbles        finger food to pass round with drinks.
+#   breakfast      eaten in the morning.
+#   extras         not a dish by itself: sides, sauces, stocks, pickles, doughs.
+#   festive        Christmas, or another named feast. The dish has to BE the
+#                  feast's: a chicken that uses up the Seder horseradish is
+#                  not festive, though a Rosh Hashanah honey cake is.
+#   starter        works as a first course at a dinner party.
+#
+# -----------------------------------------------------------------------------
+# `fiddly and fun` -- A NEW MOOD, 2026-10-10, AND WHAT IT TAKES OFF
+# `showstopper`'s SHOULDERS.
+#
+# Helen: "I wonder if we need a 'I want to faff' tag ... Sometimes when I want
+# to faff I choose to make fiddly desserts, but I honestly prefer savoury
+# things, so remembering about e.g. tomato tarte tatin would scratch the itch
+# for sure."
+#
+# `showstopper` was MEANT to be this -- the group note above has her calling it
+# "let's make something unnecessarily complicated" -- but the name pulled it
+# towards the RESULT, and it came to sit on a beef fillet that is seared and
+# roasted and a venison loin that takes 15 minutes. She agreed it had drifted.
+# So there are two tags now, one for each half:
+#
+#   fiddly and fun   you make it because you want to potter. Several
+#                    components or stages, hands-on work, some precision. The
+#                    PROCESS is the point, whatever it looks like at the end.
+#   showstopper      it makes people gasp when it lands on the table. About
+#                    the RESULT, however little work it took.
+#
+# A dish may carry both (macarons, a Wellington), the first alone (a quiche
+# with pastry from scratch, a ganache, wontons) or the second alone (a roast
+# fillet, a goose). Slow is not fiddly: a stew that sits in the oven for six
+# hours is neither. Nor is threading skewers (the chicken satay: "isn't
+# fiddly"). AND THE FIDDLE HAS TO BE ONE SHE WOULD ACTUALLY DO: the crab salad
+# with homemade crispbreads is out, "because, come on, who's going to be
+# making those crispbreads from scratch!!!"
+#
+# The name is hers, chosen over "make me think". It is a MOOD by this file's
+# own test -- wanting to faff is a craving, not something an occasion demands
+# -- which also puts it beside `dessert` and `bakes` in the filter, so picking
+# it without them finds the savoury faff she was after.
+# -----------------------------------------------------------------------------
+#
+# The other eight already had hers: `make-ahead` and `freezable` above,
+# `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
+# group note above, `no-cook`, `virtuous` and `ice cream` in MANUAL §7.
 # -----------------------------------------------------------------------------
 tags:
   mood:
@@ -160,6 +259,7 @@ tags:
     - dessert
     - drinks
     - fakeaway
+    - fiddly and fun
     - hot snack
     - ice cream
     - nibbles
@@ -167,7 +267,7 @@ tags:
     - salad
     - showstopper
     - soup
-    - sweets
+    - sweet snack
     - virtuous
 
   practicalities:
@@ -204,6 +304,14 @@ tags:
 #       be chased or picked out disqualifies itself. Thick spoonable soups still
 #       carry the tag; noodle soups, pho, wontons and tom kha gai no longer do.
 #       Tagged by hand now, on the eating mechanics rather than the category.
+#
+#       A MEATBALL ON ITS OWN IS ONE-HANDED; IT IS THE COMPANY THAT DISQUALIFIES
+#       IT. Helen, 2026-10-10, when a session proposed taking the tag off
+#       Bronte's Swedish meatballs as "the chasing-with-a-fork case": "I think
+#       chasing meatballs is funny, and I'd call that one-handed food if I
+#       didn't also have to deal with e.g. spaghetti, or fish the meatballs
+#       out of a soup." So the Swedish meatballs keep it; meatballs on
+#       spaghetti or in a broth do not.
 # -----------------------------------------------------------------------------
 # `drinks` covers anything you make to drink that is not a cocktail — the frappé,
 # a cordial, a hot chocolate. Cocktails proper belong to the sibling cocktails

@@ -35,7 +35,7 @@ notes: []
 source: "Punch"
 source_url: "https://punchdrink.com/recipes/white-negroni-pina-colada/"
 meta:
-  made_before: false
+  made_before: true
   ship: "who knows"
   rewritten: true
   awaiting_fix: false

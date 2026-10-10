@@ -38,7 +38,7 @@ notes: []
 source: "Difford's"
 source_url: ""
 meta:
-  made_before: false
+  made_before: true
   ship: "who knows"
   rewritten: true
   awaiting_fix: false

@@ -9,7 +9,7 @@ prep_time: "1 hr"
 cook_time: "1 hr 15 mins plus at least 1 hr cooling"
 main_ingredients: ["egg whites", "white caster sugar", "icing sugar", "whole milk", "egg yolks", "cornflour", "gelatine", "double cream", "vanilla pod"]
 star_ingredient: "eggs"
-tags: ["dessert", "showstopper", "make-ahead"]
+tags: ["dessert", "showstopper", "make-ahead", "fiddly and fun"]
 ingredient_groups:
   - name: meringue
     items:

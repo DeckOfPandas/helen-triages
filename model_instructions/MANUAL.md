@@ -1114,8 +1114,9 @@ makes a retired value fail with its reason rather than blend into "not
 declared".
 
 **Mood** — *what you feel like eating, a craving*: bakes, carbs party,
-cheese-tastic, dessert, drinks, fakeaway, hot snack, ice cream, nibbles,
-one-handed food, salad, showstopper, soup, sweets, virtuous.
+cheese-tastic, dessert, drinks, fakeaway, fiddly and fun, hot snack, ice
+cream, nibbles,
+one-handed food, salad, showstopper, soup, sweet snack, virtuous.
 **Practicalities** — *what the occasion demands of you, regardless*: breakfast,
 extras, festive, freezable, make-ahead, no-cook, starter.
 
@@ -1131,6 +1132,27 @@ bake that merely keeps is not, and an overnight marinade is not. `freezable`
 and `make-ahead` are separate axes. `drinks` is anything drinkable that is not
 a cocktail. `virtuous` is narrow: lean protein, or genuinely veg-forward with
 a wine or citrus sauce doing the work.
+
+**The other twelve, agreed 2026-10-10** (`_data/food/taxonomy.yml` has the
+record): `bakes` — a baked good out of the oven (cake, biscuit, bread, pastry),
+not anything that merely goes in it; Helen's test is *"would this appear on
+Great British Bake Off?"*. `dessert` — a pudding course served at the table.
+`sweet snack` (it was `sweets` until that afternoon) — small sweet things
+eaten by hand outside a meal; her test is *"would I serve it on a cake plate
+at 4 o clock after a long improving walk?"*. `carbs party` —
+the starch is the point. `cheese-tastic` — cheese is the pleasure of the dish,
+not a garnish. `fakeaway` — a home version of something you would order in.
+`hot snack` — small, hot, between meals. `nibbles` — finger food to pass
+round with drinks. `breakfast` — eaten in the morning. `extras` — not a dish
+by itself: sides, sauces, stocks, pickles, doughs. `festive` — Christmas, or
+another named feast. `starter` — works as a first course at a dinner party.
+
+**`fiddly and fun` and `showstopper` are a pair** (2026-10-10, when the first
+was added). `fiddly and fun` — you make it because you want to potter:
+several components, hands-on work, some precision; the PROCESS is the point.
+`showstopper` — it makes people gasp at the table; the RESULT, however little
+work it took. Either, both or neither. Slow is not fiddly. `showstopper` had
+been carrying both meanings and had drifted to the second.
 
 **Standing per-recipe calls, not to be "fixed" for consistency**: the
 lemony cavolo nero soup is not tagged `soup` (its own tagline calls it a
@@ -1728,7 +1750,8 @@ shortlisted; `[data-shortlist-share]` built by `shortlist-export.js` from
 clear button** since #1100 — Helen: *"Remove the rest of the apparatus: no JSON
 export or import, no clear."* A link carries no portions or glasses; nothing
 does now. The panel's two lines are Helen's words; the shared-view note and
-"keep these" are still PLACEHOLDER COPY. Tests:
+"keep these" were an agent's, and she kept both as written on #1342
+(2026-10-10: *"Both good, thanks!"*). Tests:
 `tests/js/shortlist-share.test.js` (the store), `filter-state.test.js` (the
 grammar), and both index startup harnesses (the wiring).
 

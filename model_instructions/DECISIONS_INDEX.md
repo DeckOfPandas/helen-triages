@@ -96,6 +96,7 @@ argument and the rules each field is read by.
 - 2026-10-01 · §4 · a note is always {label, text}, and an empty one is a placeholder nothing prints.
 - 2026-10-02 · §4 · #1258 · Every draft has a notes slot, and imported text is labelled QQ. Both reverse a choice the 2026-10-01 migration made.
 - 2026-10-04 · §4 · #814 · the retro-fit ran, and the yield was lopsided: 103 of 142, then 18 of 174.
+- 2026-10-10 · §4 · #1356 · two of the 2026-10-07/08 ingest rulings are REVERSED: a source step is one pair again, and nothing joins the ingredient list from the method.
 - 2026-10-07 · §4 · /08 — 91 recipes came in from two claude.ai chats, and what they taught the ingest documents.
 - 2026-10-04 · §4 · #577 · re-measured: 6 items in 6 drafts, all of them refusals.
 - 2026-10-04 · §4 · #814 · a group named to finish printed "For the to finish:".
@@ -133,6 +134,7 @@ argument and the rules each field is read by.
 - 2026-08-09 · §7 · #72 · Freezable: chicken-cider-stew and chicken-sorrel-potato-stew yes, pancetta-white-bean-stew no — case by case, do not add it to "match the other two".
 - 2026-08-12 · §7 · #187 · eggs reinstated, Helen's explicit call, because eight drafts had star_ingredient: eggs sitting invalid (not blank, as a previous version of §7 had claimed — checked against the …
 - 2026-08-01 · §7 · Splitting "declared" from "filterable" (point recipe_badges.html at taxonomy.tags) proposed and rejected: no user stands in the gap between a fact you read (a note says more) and …
+- 2026-10-10 · §7 · TWELVE TAGS GET A WRITTEN MEANING, AND TAGS ARE PROPOSED BY READING.
 - 2026-10-08 · §7 · FOOD GETS NO TAG DERIVER; IT GETS A REPORT.
 - 2026-08-01 · §8 · Kept: 600 distinct main ingredients across 300+ files, 54% in exactly one recipe; 26–29% of recipes have no star.
 - 2026-08-16 · §8 · #281 #52 · Why the exclude picker's words are worse: same code, harder input (every ingredient_groups item, chosen deliberately by #52).

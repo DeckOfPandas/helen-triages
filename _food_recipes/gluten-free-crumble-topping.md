@@ -9,7 +9,7 @@ prep_time: "5 mins"
 cook_time: "None"
 main_ingredients: ["gluten-free flour", "rice flour", "ground almonds", "demerara sugar", "unsalted butter"]
 star_ingredient:
-tags: ["no-cook", "extras"]
+tags: ["extras"]
 ingredient_groups:
   - items:
     - amount: "125 g"
