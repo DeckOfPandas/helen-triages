@@ -214,3 +214,13 @@
     }
   }
 }
+
+// THE LOCAL-ONLY DRAFTS SWITCH -- #1358, 2026-10-10. The pill above, on a line
+// of its own under it ("Under the SHORTLISTED button is fine"), pulled up by
+// half the count row's gap so the two read as a pair. Only a local build emits
+// the element (food/index.html); the rule is inert on the deployed site.
+.btn-drafts-toggle { @extend .btn-shortlist-only; }
+
+.drafts-toggle-row {
+  margin: (-$space-sm) 0 $space-lg;
+}

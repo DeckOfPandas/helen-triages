@@ -459,6 +459,17 @@ permalink: /cocktails/
        {% endcomment %}
     <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
   </p>
+  {% comment %} HIDE / SHOW DRAFTS, ON A LOCAL BUILD ONLY -- #1358, 2026-10-10.
+     Helen: "I'd like a 'show drafts' (or hide) button on the local build.
+     Under the SHORTLISTED button is fine". Inside the same gate that lets a
+     draft into `all_drinks` at all, so the deployed index has no such element.
+     Ships `hidden`; cocktail-index.js reveals and wires it. The identical
+     block is on food/index.html. {% endcomment %}
+  {% if site.show_drafts %}
+  <p class="drafts-toggle-row">
+    <button type="button" class="btn-drafts-toggle" id="drafts-toggle" aria-pressed="false" hidden>hide drafts</button>
+  </p>
+  {% endif %}
   {% comment %} A SHORTLIST SOMEONE SENT -- #1093, food/index.html has the
      note. Its own line under the count row rather than inside it: that row
      is a <p>, and this is a second sentence with a button in it.
