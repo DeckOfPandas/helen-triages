@@ -293,17 +293,40 @@ article.recipe .recipe-body-content .ct-methods {
 // more -- so a block's last line is not against its rule and the next
 // block's first line is not against it either.
 //
-// The two-column grid: the first row is the outcome and the time; the
-// name and the oven stages each span both columns beneath. On a phone the
-// time column is capped so a long range wraps -- at its dash only, see
+// The two-column grid: the outcome, the name and the oven stages down the
+// first column, the time in the second. THE TIME SPANS ALL THREE ROWS AND
+// SITS AT THE TOP (2026-10-10, the last note of the round): when it shared
+// only the first row, a by-doneness method's two stacked times ("rare
+// 1h55m" / "medium 2h25m") made that row two lines tall and pushed the name
+// and the oven stages down with it -- Helen: "let's not allow the extra
+// line to push the left-column content down too." Spanning the column, its
+// height is the block's and the left column flows on its own. On a phone
+// the time column is capped so a long range wraps -- at its dash only, see
 // .ct-t -- rather than squeezing the outcome into one word a line.
+//
+// ON A PHONE THE TIME CANNOT HAVE A COLUMN OF ITS OWN: a two-line time is
+// 12rem wide and the column is 21, so spanning the block would fold every
+// name and every oven stage beside it ("100–120°C fan for most of / cook").
+// So below 600px the time shares only the first row, as it did, and the two
+// methods whose time is two lines (beef's standard roast, venison's haunch,
+// the by-doneness shape) give the time a row of its own under the outcome
+// instead -- nothing pushed, nothing narrowed, and only those two blocks
+// look any different.
 .ct-method {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "outcome time" "name name" "oven oven";
+  grid-template-areas: "outcome time" "name time" "oven time";
   column-gap: $space-lg;
   row-gap: $space-xs;
   border-bottom: 1px solid $color-border;
+
+  @media (max-width: 600px) {
+    grid-template-areas: "outcome time" "name name" "oven oven";
+
+    &:has(.ct-doneness) {
+      grid-template-areas: "outcome outcome" "time time" "name name" "oven oven";
+    }
+  }
 }
 
 .ct-method-outcome {
@@ -327,6 +350,8 @@ article.recipe .recipe-body-content .ct-methods {
 // you act on.
 .ct-method-time {
   grid-area: time;
+  align-self: start;
+  justify-self: end;
   text-align: right;
   font-family: $font-label;
   font-weight: 600;
