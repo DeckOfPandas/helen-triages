@@ -621,6 +621,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §14 · #1327 #1329 #1330 · ROUND ONE SETTLED IN ONE LOOK, AND BUILT THE SAME DAY.
 - 2026-10-09 · §14 · ROUND TWO: HELEN'S LIST AFTER LOOKING AT ROUND ONE.
 - 2026-10-09 · §14 · later — ROUND THREE: THE FOUR ANSWERS, CHOSEN AND BUILT.
+- 2026-10-10 · §14 · ROUND FOUR IS A CANDIDATES PAGE, NOT A BUILD.
 - 2026-09-06 · §14 · #529 #459 · Why it passes #459 when a bare category list would not
 - 2026-09-06 · §14 · no template change — which is what sites.yml's own note had predicted since 2026-08-19: the footer's loop always asked every site rather than food.
 - 2026-09-06 · §14 · .ref-* is a new page anatomy, and that is not a failure to reuse.

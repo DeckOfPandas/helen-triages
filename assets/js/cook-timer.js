@@ -77,7 +77,7 @@
     weightField: root.querySelector("#ct-weight-field"),
     heading: root.querySelector("#ct-protein-name"),
     doneat: root.querySelector("#ct-doneat"),
-    methods: root.querySelector("#ct-methods"),
+    methods: root.querySelector("#ct-method-groups"),
     summary: root.querySelector("#ct-summary"),
     // The two halves the dropdown swaps between -- issue #412.
     calculator: root.querySelector("#ct-calculator"),

@@ -160,7 +160,12 @@ permalink: /food/reference/cooking-methods-and-timings/
 
     {% comment %} The methods, by cut: which method, at what oven setting,
        for how long. Populated by cook-timer.js. {% endcomment %}
-    <div id="ct-methods"></div>
+    {% comment %} ct-method-groups, not ct-methods: the JSON block at the top
+       of this file already carries id="ct-methods", and the round-one build
+       gave this div the same id (2026-10-08). document.getElementById found
+       the script first and the page worked by accident; the duplicate was
+       caught by a locator on 2026-10-09. {% endcomment %}
+    <div id="ct-method-groups"></div>
     </div>{%- comment -%} /#ct-calculator {%- endcomment -%}
 
     {% comment %} The long explanation of why some rows decline used to live

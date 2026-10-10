@@ -9833,6 +9833,24 @@ verification. Dates are when the correction landed.
   endpoint string is "74–75°C in the thigh" like theirs, the probing
   instruction ("thickest part, not touching bone") moved into its note.
 
+- **2026-10-10 — ROUND FOUR IS A CANDIDATES PAGE, NOT A BUILD.** Helen on
+  round three: *"I love most of this! It's just the 'jollier headings'
+  request. There is a LOT going on now. Perhaps some extra vertical space
+  between sections (particularly above the top rows) would help. Perhaps
+  giving in and swapping the outcome to be first place would help. Maybe a
+  different font for the method (e.g. 'sugar-rubbed roast') would help?"*
+  Three perhapses are three switches, so `scripts/methods_candidates.py`
+  puts them on the real page (spacing today / more air; first line method /
+  outcome; method name body / courier / italic) with a phone view of four
+  combinations, and ships nothing until she picks. Built on round one's
+  bundle and switcher; the live `cook-timer.js` renders, only CSS moves.
+
+  **Found on the way: the methods page had two elements with
+  `id="ct-methods"`** — the JSON data block from the start, and the div the
+  round-one build (2026-10-08) added for the groups. `getElementById` found
+  the script first and the page worked by accident; a Playwright locator
+  refused the ambiguity. The div is `#ct-method-groups`.
+
 ### The cocktails reference layer, #529
 
 - **2026-09-06, #529** — Cocktails gets its first reference page,
