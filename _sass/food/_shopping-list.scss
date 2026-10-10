@@ -143,6 +143,9 @@
 // -- Helen's form, #1297. The quiet grey of the Not-scaled line: it is a note
 // on the row, and the number to act on is the one in the amount column.
 .shopping-list-aside {
+  // Its own gap: at phone width the name and the bracket share a line as
+  // inline text, where the row's flex gap does not reach.
+  margin-left: $space-xs;
   font-size: 0.85rem;
   color: $color-clear-text;
 }

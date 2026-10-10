@@ -1780,12 +1780,17 @@ unless stated.
     that afternoon, nearest and no bracket (*"round up ... is inaccurate"*);
     2026-10-10, up with the recipes' fraction in brackets. **The bracket is
     what answers "inaccurate"**: the list says what to buy and what is used.
-    - **Two readings in it are a session's, and both were put to her.** Her
-      example says handfuls and 1¼; a handful steps in halves and cannot be
-      1¼, so the bracket quotes each measure in its own recipe-page step (a
-      sprig can read 1¼, a handful 1½). And the rounding up is of that
-      figure, not of the raw sum: 1.17 handfuls is "1 handful" on the recipe
-      page and the list buys one, where her words taken literally buy two.
+    - **The first build of it under-bought, and she corrected it within the
+      hour.** Her example says handfuls at 1¼. A handful steps in halves on
+      the recipe page, so the build quoted that page's figure in the bracket
+      and rounded THAT up: 1.17 handfuls was "1 handful", bought as one. Put
+      to her as a reading, with the literal alternative named: *"1.17
+      handfuls should buy 2, again giving the bracketed requested number."*
+      So on the list every stepped measure is quoted to the nearest quarter
+      and bought as the next whole one — her example to the digit. **When her
+      example and a tidy rule disagree, the example was the specification.**
+      The list and the recipe page may now differ on a handful (1¼ asked for;
+      "1 handful" to use), which follows from her two rulings and is not a bug.
   - **Drops, twists, lots and pats step in halves, replacing "scaled
     linearly" of 2026-10-04**: *"Drops, twists, lots etc, please round to the
     nearest 1/2 -- these are smaller than handfuls and sprigs."* `pat` is

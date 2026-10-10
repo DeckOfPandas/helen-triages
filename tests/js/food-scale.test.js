@@ -361,11 +361,12 @@ test('drops, twists, lots and pats step in halves -- Helen: "round to the neares
   assert.strictEqual(scaleAmount('2 pats', 2, WORDS).scaled, true);
 });
 
-test('the index shopping list buys whole ones and quotes this page\'s figure', () => {
-  // The same measures, two jobs. This page says what to USE, in halves; the
-  // shortlist's shopping list says what to BUY, rounded up to a whole one, and
-  // puts this page's figure in brackets -- Helen, 2026-10-10: "2 handfuls
-  // fresh parsley (1 1/4 in the recipes)".
+test('the index shopping list buys whole ones, and does NOT borrow this page\'s half step', () => {
+  // The same measures, two jobs. This page says what to USE, a handful in
+  // halves; the shortlist's shopping list says what to BUY, the next whole
+  // one, with the amount asked for in brackets to the nearest QUARTER --
+  // Helen, 2026-10-10: "2 handfuls fresh parsley (1 1/4 in the recipes)", and
+  // then "1.17 handfuls should buy 2".
   const FSL = require('../../assets/js/food-shopping-list.js');
   const row = (amount, scale) => {
     const item = FSL.build(
@@ -377,17 +378,12 @@ test('the index shopping list buys whole ones and quotes this page\'s figure', (
   assert.strictEqual(row('1 handful', 2), '2 handfuls');
   assert.strictEqual(row('2 handfuls', 0.5), '1 handful');
   assert.strictEqual(row('1 small handful', 2), '2 small handfuls');
-  // What this page prints for the same amount is what the bracket quotes.
-  [['1 handful', 1.5], ['1 handful', 7 / 6], ['1 sprig', 7 / 6], ['5 twists', 2 / 3],
-    ['2 pats', 2 / 3], ['1 bunch', 2 / 3]].forEach(([amount, factor]) => {
-    const here = scaleAmount(amount, factor, WORDS).text;
-    const there = row(amount, factor);
-    const quoted = /\((.*) in the recipes\)/.exec(there);
-    const number = here.split(' ')[0];
-    if (quoted) assert.strictEqual(quoted[1], number, amount + ' x' + factor);
-    else assert.strictEqual(there.split(' ')[0], number, amount + ' x' + factor);
-  });
+  // Seven portions of a recipe for six: one handful here, two to buy there.
+  assert.strictEqual(scaleAmount('1 handful', 7 / 6, WORDS).text, '1 handful');
+  assert.strictEqual(row('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(row('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
+  // A sprig is in quarters on both, so the bracket is this page's figure.
+  assert.strictEqual(scaleAmount('1 sprig', 7 / 6, WORDS).text, '1¼ sprigs');
   assert.strictEqual(row('1 sprig', 7 / 6), '2 sprigs (1¼ in the recipes)');
 });
 

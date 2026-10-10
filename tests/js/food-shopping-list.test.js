@@ -335,30 +335,35 @@ const bought = (entries, label, options) => {
 const eye = (amount, scale) => bought(
   [{ amount: amount, name: 'parsley', aisle: 'produce', scale: scale }], 'parsley');
 
-test('#1297: a stepped measure is bought whole, rounded UP, with the recipes\' figure beside it', () => {
+test('#1297: a stepped measure is bought whole, rounded UP, with what the recipes ask for beside it', () => {
   // Helen, 2026-10-10: "I'd like the shopping list not to write 1.17 sprigs
   // either, so please round that upwards to the next integer like this: '2
   // handfuls fresh parsley (1 1/4 in the recipes)'."
+  assert.strictEqual(eye('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(eye('1 sprig', 7 / 6), '2 sprigs (1¼ in the recipes)');
   assert.strictEqual(eye('1 bunch', 7 / 6), '2 bunches (1¼ in the recipes)');
   assert.strictEqual(eye('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
   assert.strictEqual(eye('1 sprig', 2 / 3), '1 sprig (¾ in the recipes)');
-  assert.strictEqual(eye('1 handful', 2 / 3), '1 handful (½ in the recipes)');
-  assert.strictEqual(eye('5 twists', 2 / 3), '4 twists (3½ in the recipes)');
-  assert.strictEqual(eye('2 pats', 2 / 3), '2 pats (1½ in the recipes)');
+  assert.strictEqual(eye('1 handful', 2 / 3), '1 handful (¾ in the recipes)');
+  assert.strictEqual(eye('5 twists', 2 / 3), '4 twists (3¼ in the recipes)');
+  assert.strictEqual(eye('2 pats', 2 / 3), '2 pats (1¼ in the recipes)');
 });
 
-test('#1297: no bracket when what to buy is what the recipes use', () => {
+test('#1297: 1.17 handfuls buys TWO -- the list does not borrow the recipe page\'s half step', () => {
+  // The first build quoted the recipe page's own figure ("1 handful") and so
+  // bought one. Helen: "1.17 handfuls should buy 2, again giving the
+  // bracketed requested number."
+  assert.strictEqual(eye('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
+  assert.strictEqual(eye('2 handfuls', 7 / 6), '3 handfuls (2¼ in the recipes)');
+  assert.strictEqual(eye('1 pinch', 7 / 6), '2 pinches (1¼ in the recipes)');
+});
+
+test('#1297: no bracket when what to buy is what the recipes ask for', () => {
   assert.strictEqual(eye('1 handful', 3), '3 handfuls');
   assert.strictEqual(eye('4 sprigs', 2), '8 sprigs');
   assert.strictEqual(eye('2 handfuls', 0.5), '1 handful');
-});
-
-test('#1297: the rounding up is of the recipes\' figure, never of the raw sum', () => {
-  // Seven portions' worth of one handful is 1.17. The recipe page calls that
-  // "1 handful", and the list does not buy a second for the sake of 0.17.
-  assert.strictEqual(eye('1 handful', 7 / 6), '1 handful');
-  assert.strictEqual(eye('2 handfuls', 7 / 6), '3 handfuls (2½ in the recipes)');
+  // Within an eighth of a whole number is that number: 0.02 buys nothing.
+  assert.strictEqual(eye('1 handful', 1.02), '1 handful');
   assert.strictEqual(eye('4 sprigs', 1.02), '4 sprigs');
 });
 
@@ -374,8 +379,9 @@ test('#1297: no figure in either place is ever a decimal', () => {
 
 test('#1297: a size word, a range and a tilde survive', () => {
   assert.strictEqual(eye('1 small handful', 2.4), '3 small handfuls (2½ in the recipes)');
+  assert.strictEqual(eye('1 small handful', 2.2), '3 small handfuls (2¼ in the recipes)');
   assert.strictEqual(eye('1–2 sprigs', 7 / 6), '2–3 sprigs (1¼–2¼ in the recipes)');
-  assert.strictEqual(eye('~1 handful', 2.2), '~2 handfuls');
+  assert.strictEqual(eye('~1 handful', 2.2), '~3 handfuls (2¼ in the recipes)');
 });
 
 test('#1297: the TOTAL is stepped once, never each recipe on its own', () => {

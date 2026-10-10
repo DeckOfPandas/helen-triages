@@ -1339,19 +1339,23 @@ shopping list not to write 1.17 sprigs either, so please round that upwards to
 the next integer like this: '2 handfuls fresh parsley (1 1/4 in the
 recipes)'."*
 
-    1 sprig, seven portions of a recipe for six    2 sprigs   (1¼ in the recipes)
-    1 handful ×1.5                                 2 handfuls (1½ in the recipes)
-    5 twists ×⅔                                    4 twists   (3½ in the recipes)
-    1 handful, seven for six                       1 handful
-    4 sprigs ×2                                    8 sprigs
+    1 handful, seven portions of a recipe for six   2 handfuls (1¼ in the recipes)
+    1 sprig, seven for six                          2 sprigs   (1¼ in the recipes)
+    5 twists ×⅔                                     4 twists   (3¼ in the recipes)
+    1 handful ×1.5                                  2 handfuls (1½ in the recipes)
+    4 sprigs ×2                                     8 sprigs
 
 - **Two figures, each honest about what it is.** The amount column is what to
-  BUY, a whole number. The bracket is what the recipes USE, in the recipe
-  page's own steps — halves for `half_step_measures` and `half_step_counts`,
-  quarters for `quarter_step_measures` — always a fraction, never a decimal.
-- **The rounding up is of the recipes' figure, not the raw sum.** 1.17
-  handfuls is "1 handful" on the recipe page, and the list does not buy a
-  second for 0.17. No bracket when the two agree.
+  BUY, a whole number. The bracket is what the recipes ASK FOR, to the nearest
+  quarter — always a fraction, never a decimal.
+- **Quarters for every stepped measure HERE, whatever its step on the recipe
+  page.** The first build quoted the recipe page's own figure, so 1.17
+  handfuls (a half-step measure, "1 handful" there) bought one. Helen, the
+  same day: *"1.17 handfuls should buy 2, again giving the bracketed requested
+  number."* So the list and the recipe page can show different figures for a
+  handful — 1¼ asked for here, "1 handful" to use there — and that is ruled.
+- **No bracket when the two agree**, which includes a total within an eighth
+  of a whole number (1.02 handfuls is one).
 - **The TOTAL is stepped, once** — never each recipe's share.
 - **A row with a second total names the unit**: `2 sprigs + 10 g thyme (1¼
   sprigs in the recipes)`.
@@ -1363,7 +1367,7 @@ recipes)'."*
 - **This was her third answer in two days**, and DECISIONS §8.2 has all three:
   up with a decimal in brackets, nearest with no bracket (*"round up ... is
   inaccurate"*), then up with the fraction in brackets. Do not "restore" either
-  earlier one.
+  earlier one, and do not make the bracket quote the recipe page's step.
 
 Grams, spoons and counts are untouched — seven portions of a six-portion roast
 chicken is a chicken a sixth bigger. **A measure written into the item with no

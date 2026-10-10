@@ -32,8 +32,8 @@
 // three times the people is "3 handfuls", and never "1.17 handfuls": see
 // `halfStep` below, the one place the rounding is decided. (The INDEX's
 // shopping list buys the same measures in WHOLE ones, rounded up, and says
-// this page's figure beside them, #1297 -- food-shopping-list.js does that
-// for itself and never calls this.)
+// the amount asked for beside them to the nearest QUARTER, #1297 --
+// food-shopping-list.js does that for itself and never calls this.)
 //
 // "2 large" SCALES, because `large` is a unit to the parser and a SYMBOL to
 // the labeller (no plural), so it prints "4 large" -- Helen: "Things like

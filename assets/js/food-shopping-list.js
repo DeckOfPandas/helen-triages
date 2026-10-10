@@ -235,20 +235,25 @@
 
      TWO FIGURES, AND EACH IS HONEST ABOUT WHAT IT IS. The one in the amount
      column is what to BUY: a whole number, rounded up, because nobody buys a
-     quarter of a sprig. The one in brackets is what the recipes USE, in the
-     same steps the recipe page prints -- the nearest half for a handful,
-     pinch, dash, splash, knob, drop, twist, lot or pat, the nearest quarter
-     for a sprig or bunch -- always a fraction, never a decimal.
+     quarter of a sprig. The one in brackets is what the recipes ASK FOR, to
+     the nearest quarter and always as a fraction, never a decimal.
 
-         1 sprig, seven portions of a recipe for six    2 sprigs  (1¼ in the recipes)
-         1 handful at x1.5                              2 handfuls (1½ in the recipes)
-         1 handful, seven for six                       1 handful
-         4 sprigs doubled                               8 sprigs
+         1 handful, seven portions of a recipe for six   2 handfuls (1¼ in the recipes)
+         1 sprig, seven for six                          2 sprigs   (1¼ in the recipes)
+         1 handful at x1.5                               2 handfuls (1½ in the recipes)
+         4 sprigs doubled                                8 sprigs
 
-     THE ROUNDING UP IS OF THE RECIPE FIGURE, not of the raw sum: seven
-     portions' worth of one handful is 1.17, which the recipe page calls
-     "1 handful", and the list does not buy a second for the sake of 0.17.
-     NO BRACKET WHEN THE TWO AGREE.
+     QUARTERS FOR EVERY ONE OF THEM, HERE. The recipe page steps a handful in
+     halves and would call 1.17 "1 handful"; the first build of this quoted
+     that figure and so bought one. Helen, the same day: "1.17 handfuls should
+     buy 2, again giving the bracketed requested number." Her example had
+     said so already -- a handful at 1¼ -- and a bracket reading "(1 in the
+     recipes)" beside a 2 would have explained nothing. So the list does not
+     borrow the recipe page's step: it says the amount asked for as finely as
+     a fraction reads, and buys the next whole one above it.
+
+     NO BRACKET WHEN THE TWO AGREE, which includes a total within an eighth
+     of a whole number: 1.02 handfuls is one.
 
      THE TOTAL IS STEPPED, ONCE, never each recipe's share.
 
@@ -259,9 +264,11 @@
      a cook can read.
 
      WHICH MEASURES is data, handed in: `options.wholeMeasures` are the
-     half-step ones (`half_step_measures` and `half_step_counts` in
-     _data/food/scaling.yml) and `options.quarterMeasures` the quarter-step
-     ones. With neither, nothing is rounded -- every caller before #1297. */
+     recipe page's half-step ones (`half_step_measures` and `half_step_counts`
+     in _data/food/scaling.yml) and `options.quarterMeasures` its quarter-step
+     ones. The two are treated alike here; they arrive apart because that is
+     how the data keeps them. With neither, nothing is rounded -- every
+     caller before #1297. */
   function wholeMeasurePattern(measures) {
     var words = (measures || [])
       .map(function (m) { return String(m).trim().toLowerCase(); })
@@ -271,10 +278,6 @@
     // A WHOLE WORD, singular or plural, anywhere in the unit: `handful`,
     // `small handfuls`, `pinches`. `dashi` and `handfulness` are not caught.
     return words ? new RegExp('(^|[^a-z])(' + words + ')(?:e?s)?(?![a-z])', 'i') : null;
-  }
-
-  function inHalves(quantity) {
-    return Math.max(0.5, Math.round(tidy(quantity) * 2) / 2);
   }
 
   function inQuarters(quantity) {
@@ -569,10 +572,10 @@
       var usedUnit = {};
       var totals = group.unitOrder.map(function (unit) {
         var total = group.units[unit];
-        // A stepped measure is bought in whole ones, rounded up from the
-        // figure the recipes use; see the note above `wholeMeasurePattern`.
-        var step = (byEye && byEye.test(unit)) ? inHalves
-          : (byQuarter && byQuarter.test(unit)) ? inQuarters : null;
+        // A stepped measure is bought in whole ones, rounded up from what
+        // the recipes ask for; see the note above `wholeMeasurePattern`.
+        var step = ((byEye && byEye.test(unit)) ||
+          (byQuarter && byQuarter.test(unit))) ? inQuarters : null;
         var used = null;
         if (step) {
           var usedLo = step(total.lo);
