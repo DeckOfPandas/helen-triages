@@ -367,9 +367,31 @@ test('#1297: nothing else is rounded -- grams, spoons, counts and sprigs are as 
   assert.strictEqual(other('200 g', 2 / 3), '133 g');
   assert.strictEqual(other('1 tsp', 2 / 3), '⅔ tsp');
   assert.strictEqual(other('1', 7 / 6), '1.17', 'a chicken a sixth bigger');
-  // Ruled linear on 2026-10-04 ("4 sprigs double is 8"), and not in the list.
+  // Not a by-eye measure: a sprig is never rounded to a whole one.
   assert.strictEqual(other('4 sprigs', 2), '8 sprigs');
   assert.strictEqual(other('3 sprigs', 0.5), '1½ sprigs');
+});
+
+test('#1297: a sprig and a bunch are totalled to the nearest quarter', () => {
+  // Helen, 2026-10-10: "Sprigs: Let's round to 1/4 please, and express in
+  // fractions not decimals."
+  const sprig = (amount, scale) => line(
+    [{ amount: amount, name: 'thyme', aisle: 'produce', scale: scale }],
+    'thyme', { wholeMeasures: BY_EYE, quarterMeasures: ['sprig', 'bunch'] });
+  assert.strictEqual(sprig('1 sprig', 7 / 6), '1¼ sprigs');
+  assert.strictEqual(sprig('1 bunch', 7 / 6), '1¼ bunches');
+  assert.strictEqual(sprig('1 sprig', 2 / 3), '¾ sprigs');
+  assert.strictEqual(sprig('4 sprigs', 2), '8 sprigs');
+  assert.strictEqual(sprig('1 sprig', 0.05), '¼ sprigs');
+  // The total, once: 1.17 and 1.17 are 2.33, which is 2¼ and not 2½.
+  assert.strictEqual(line([
+    { amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6, recipe: 'x' },
+    { amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6, recipe: 'y' }
+  ], 'thyme', { quarterMeasures: ['sprig'] }), '2¼ sprigs');
+  // With no list, as before.
+  assert.strictEqual(line(
+    [{ amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6 }],
+    'thyme'), '1.17 sprigs');
 });
 
 test('#1297: with no list of measures handed over, a handful totals as before', () => {

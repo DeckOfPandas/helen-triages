@@ -1474,7 +1474,26 @@ surely"* — and a test refuses them. **What is absent is RULED, not left**
 a thing you can pick up and scale — *"Yes, 4 sprigs double is 8, and so on."*
 — and **`pat` scales too**: *'"pat" is a correct term, and should be scaled
 linearly as "pats"'*, so `2 large pats` doubled is `4 large pats`. Do not add
-any of the six.
+any of the six to `half_step_measures`.
+
+**A SPRIG AND A BUNCH GO TO THE NEAREST QUARTER** (#1297, Helen, 2026-10-10,
+shown "1.17 sprigs" at seven portions for six: *"Sprigs: Let's round to 1/4
+please, and express in fractions not decimals."*). Never less than a quarter.
+
+    1 sprig    ×7/6  →  1¼ sprigs
+    1 sprig    ×2/3  →  ¾ sprigs
+    4 sprigs   ×2    →  8 sprigs
+    1 bunch    ×7/6  →  1¼ bunches
+
+`quarter_step_measures` in `_data/food/scaling.yml` (`sprig`, `bunch`), joined
+onto the control as `data-quarter-step-measures`; `quarterStep` in
+`food-scale.js`, through the same `scaleSteppedMeasure` the half step uses.
+**Her sentence names sprigs; `bunch` rides with it because the question put to
+her showed the two figures together.** `drop`, `twist`, `lot` and `pat` are
+untouched and can still print a third (`3⅓ twists`). **The index's shopping
+list rounds the TOTAL of a sprig or bunch the same way** (`data-quarter-measures`,
+`quarterMeasures`), since it printed the same decimal. The half-recipe judge
+is unchanged: an odd count of sprigs still refuses a half recipe.
 
 **The NAME on that line is the ingredient, not the recipe's sentence about
 it** (`noteName`): a leading measure phrase that could not scale is dropped

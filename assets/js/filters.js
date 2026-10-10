@@ -1422,6 +1422,11 @@ function renderResultsPool() {
     (shoppingEl && shoppingEl.getAttribute('data-whole-measures')) || '')
     .split(',').filter(Boolean);
 
+  // A sprig, a bunch: totals to the nearest quarter. `quarter_step_measures`.
+  var QUARTER_MEASURES = String(
+    (shoppingEl && shoppingEl.getAttribute('data-quarter-measures')) || '')
+    .split(',').filter(Boolean);
+
   /* THE NOUNS BOUGHT BY COUNT, so two recipes' lemons read "2 lemons" (#1297):
      `count_nouns` from the same file, by the same route. Absent, a row keeps
      the spelling a recipe wrote. */
@@ -1756,7 +1761,8 @@ function renderResultsPool() {
     }
 
     var aisles = HTF.foodShoppingList.build(entries, {
-      aisles: AISLES, wholeMeasures: WHOLE_MEASURES, countNouns: COUNT_NOUNS
+      aisles: AISLES, wholeMeasures: WHOLE_MEASURES,
+      quarterMeasures: QUARTER_MEASURES, countNouns: COUNT_NOUNS
     });
 
     /* WHAT THE NUMBERS ABOVE DID NOT REACH -- Helen, 2026-10-10: the recipe

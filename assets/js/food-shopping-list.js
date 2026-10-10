@@ -264,6 +264,16 @@
     return Math.max(1, Math.round(tidy(quantity)));
   }
 
+  /* A SPRIG AND A BUNCH ARE TOTALLED TO THE NEAREST QUARTER -- Helen,
+     2026-10-10: "Sprigs: Let's round to 1/4 please, and express in fractions
+     not decimals." Her sentence was about the recipe page (food-scale.js,
+     `quarterStep`); the list carries the same total and printed the same
+     "1.17 sprigs", so it follows the same rule rather than keeping the
+     decimal. `quarter_step_measures`, handed in as `options.quarterMeasures`. */
+  function quarters(quantity) {
+    return Math.max(0.25, Math.round(tidy(quantity) * 4) / 4);
+  }
+
   /* =========================================================================
      ONE FRUIT, TWO PARTS; AND A LINE THAT ONLY POINTS -- #1297, 2026-10-09
      =========================================================================
@@ -430,6 +440,8 @@
    * @param {Object} [options]
    * @param {Array} [options.wholeMeasures] - by-eye measures, whose totals go
    *        to the nearest whole one: `half_step_measures` in scaling.yml.
+   * @param {Array} [options.quarterMeasures] - measures whose totals go to
+   *        the nearest quarter: `quarter_step_measures` in scaling.yml.
    * @param {Array} [options.countNouns] - nouns bought by count, whose row
    *        label may be made plural or singular: `count_nouns` in scaling.yml.
    * @param {Array} [options.aisles] - [{key, label}] in the order they should
@@ -449,6 +461,7 @@
     var fallback = aisles[aisles.length - 1].key;
 
     var byEye = wholeMeasurePattern(opts.wholeMeasures);
+    var byQuarter = wholeMeasurePattern(opts.quarterMeasures);
     var countNouns = {};
     (opts.countNouns || []).forEach(function (noun) {
       countNouns[String(noun).trim().toLowerCase()] = true;
@@ -551,6 +564,9 @@
         if (byEye && byEye.test(unit)) {
           total.lo = wholeOnes(total.lo);
           total.hi = wholeOnes(total.hi);
+        } else if (byQuarter && byQuarter.test(unit)) {
+          total.lo = quarters(total.lo);
+          total.hi = quarters(total.hi);
         }
         return {
           unit: unit,

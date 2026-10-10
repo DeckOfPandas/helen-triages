@@ -483,6 +483,7 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
     html = read("_layouts", "recipe.html")
     wiring = {
         "data-half-step-measures": "site.data.food.scaling.half_step_measures",
+        "data-quarter-step-measures": "site.data.food.scaling.quarter_step_measures",
         "data-trailing": "site.data.food.ingredient_words.trailing_phrases",
     }
     script = read("assets", "js", "recipe-scale.js")
@@ -4089,3 +4090,40 @@ def test_the_index_shopping_list_is_handed_the_count_nouns():
         "food/index.html has lost the `(Not scaled: ...)` line's element; "
         "filters.js fills it and says nothing when it is missing."
     )
+
+
+def test_the_quarter_step_measures_reach_both_scalers():
+    """#1297, Helen, 2026-10-10: "Sprigs: Let's round to 1/4 please, and
+    express in fractions not decimals."
+
+    `quarter_step_measures` in _data/food/scaling.yml is read in two places:
+    the recipe page (checked with the half-step list, above) and the index's
+    shopping list, where food/index.html joins it onto the panel as
+    `data-quarter-measures` and filters.js hands it to build(). Lose either
+    and that page prints "1.17 sprigs" again with nothing failing.
+    """
+    scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
+    quarter = scaling.get("quarter_step_measures")
+    assert quarter and "sprig" in quarter, (
+        "_data/food/scaling.yml has no `quarter_step_measures` naming `sprig`."
+    )
+    assert all(isinstance(m, str) and re.fullmatch(r"[a-z]+", m) for m in quarter), quarter
+    both = sorted(set(quarter) & set(scaling["half_step_measures"]))
+    assert not both, (
+        f"{both} are in both step lists; the half-step rule would win and "
+        "the quarter never apply."
+    )
+    ruled_linear = sorted({"drop", "twist", "lot", "pat"} & set(quarter))
+    assert not ruled_linear, (
+        f"{ruled_linear}: ruled to scale like any number on 2026-10-04, and "
+        "her 2026-10-10 sentence names sprigs."
+    )
+    index = read("food", "index.html")
+    assert re.search(
+        r'data-quarter-measures="\{\{\s*site\.data\.food\.scaling\.'
+        r'quarter_step_measures\s*\|\s*join:\s*\',\'', index), (
+        "food/index.html no longer joins quarter_step_measures onto the panel."
+    )
+    filters = read("assets", "js", "filters.js")
+    assert "getAttribute('data-quarter-measures')" in filters
+    assert "quarterMeasures: QUARTER_MEASURES" in filters

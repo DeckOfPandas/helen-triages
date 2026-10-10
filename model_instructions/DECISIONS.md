@@ -1752,6 +1752,25 @@ unless stated.
     arithmetic**: batch rows already multiplied their recipe from the day
     before, and she had been told so in words but had not seen the page. Said
     back to her plainly rather than assumed.
+  - **Sprigs and bunches go to the nearest quarter, replacing "scale like any
+    number" for those two.** Asked whether the recipe page's "1.17 sprigs" and
+    "1.17 bunches" should round like handfuls or stay as ruled on 2026-10-04:
+    *"Sprigs: Let's round to 1/4 please, and express in fractions not
+    decimals."* Her answer names sprigs; `bunch` was changed with it because
+    the question showed both figures, and that reading is a session's. Drop,
+    twist, lot and pat are as ruled. The shopping list's totals follow, which
+    she did not ask for in words: it printed the same decimal.
+  - **Incidentals are a data question, and became #1356.** The Not-scaled line
+    named "salted butter" beside a 319 g total, for a no-amount greasing line.
+    Helen: *"let's fix the data so we never have 'butter for greasing' etc in
+    the ingredients list. We shouldn't list incidentals. We can trust the
+    cook. I think this is a fix in the data layer (at transform)."* Agreed and
+    raised, with what the issue needs her to rule first: `incidental: true`
+    already exists and hides a line (#75) but `ingest.md` forbids agents from
+    setting it; "icing sugar, to dust" is not a fat the cook already has; and
+    the six published lines sit in proofread files.
+  - **She closed the issue with this work**: *"Please close #1297 with this
+    work when we're done, phew!"*
 
 ---
 

@@ -104,6 +104,7 @@ function yamlList(file, key) {
 
 const WORDS = {
   halfStep: yamlList('scaling.yml', 'half_step_measures'),
+  quarterStep: yamlList('scaling.yml', 'quarter_step_measures'),
   trailing: yamlList('ingredient_words.yml', 'trailing_phrases')
 };
 
@@ -296,13 +297,42 @@ test('"2 large" still scales with the list in hand', () => {
 });
 
 test('counts of things you can pick up scale -- Helen: "4 sprigs double is 8, and so on"', () => {
-  // RULED, 2026-10-04, not merely left: sprig, bunch, drop, twist and lot are
-  // absent from scaling.yml on her word. Each amount is a real one.
+  // RULED, 2026-10-04, not merely left: drop, twist and lot are absent from
+  // both step lists on her word. Sprig and bunch still double to 8 and 2; what
+  // changed for them on 2026-10-10 is the fractions, in the test below.
   assert.strictEqual(scaleAmount('4 sprigs', 2, WORDS).text, '8 sprigs');
   assert.strictEqual(scaleAmount('1 bunch', 2, WORDS).text, '2 bunches');
   assert.strictEqual(scaleAmount('3–4 drops', 2, WORDS).text, '6–8 drops');
   assert.strictEqual(scaleAmount('5 twists', 2, WORDS).text, '10 twists');
   assert.strictEqual(scaleAmount('2 lots', 2, WORDS).text, '4 lots');
+});
+
+test('a sprig and a bunch go to the nearest quarter, in fractions -- never 1.17', () => {
+  // Helen, 2026-10-10, shown "1.17 sprigs" and "1.17 bunches" at seven for
+  // six: "Sprigs: Let's round to 1/4 please, and express in fractions not
+  // decimals."
+  assert.deepStrictEqual(WORDS.quarterStep, ['sprig', 'bunch']);
+  assert.strictEqual(scaleAmount('1 sprig', 7 / 6, WORDS).text, '1¼ sprigs');
+  assert.strictEqual(scaleAmount('1 bunch', 7 / 6, WORDS).text, '1¼ bunches');
+  assert.strictEqual(scaleAmount('1 sprig', 2 / 3, WORDS).text, '¾ sprigs');
+  assert.strictEqual(scaleAmount('1 sprig', 4 / 3, WORDS).text, '1¼ sprigs');
+  assert.strictEqual(scaleAmount('3 sprigs', 0.5, WORDS).text, '1½ sprigs');
+  assert.strictEqual(scaleAmount('2 sprigs', 0.5, WORDS).text, '1 sprig');
+  assert.strictEqual(scaleAmount('1 sprig', 0.1, WORDS).text, '¼ sprigs',
+    'never less than a quarter');
+  assert.strictEqual(scaleAmount('2 large sprigs', 7 / 6, WORDS).text, '2¼ large sprigs');
+  assert.strictEqual(scaleAmount('2–3 sprigs', 7 / 6, WORDS).text, '2¼–3½ sprigs');
+  // Nothing printed for either measure is ever a decimal.
+  [7 / 6, 5 / 6, 2 / 3, 1.1, 0.37, 3.3].forEach((factor) => {
+    ['1 sprig', '3 sprigs', '1 bunch', '2 small bunches'].forEach((amount) => {
+      assert.ok(!/\d\.\d/.test(scaleAmount(amount, factor, WORDS).text),
+        amount + ' x' + factor + ' -> ' + scaleAmount(amount, factor, WORDS).text);
+    });
+  });
+  // The four she left linear are untouched: a third is still a third.
+  assert.strictEqual(scaleAmount('5 twists', 2 / 3, WORDS).text, '3⅓ twists');
+  // And handed no list, a sprig scales as it did before.
+  assert.strictEqual(scaleAmount('1 sprig', 4 / 3, {}).text, '1⅓ sprigs');
 });
 
 test('a pat scales, and reads "pats" -- Helen: "scaled linearly as pats"', () => {

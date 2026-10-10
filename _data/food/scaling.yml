@@ -62,7 +62,8 @@
 # `drop` (1, "3–4 drops" of vanilla), `twist` (1, "5 twists" of black pepper)
 # and `lot` (2, batches of another recipe) are not here. They can print a
 # fraction (5 twists at two thirds is 3⅓ twists); that is known and reported,
-# not an oversight.
+# not an oversight. (`sprig` and `bunch` moved to `quarter_step_measures`
+# below on 2026-10-10; they are still not half-step measures.)
 #
 # `pat` WAS HERE FOR A FEW HOURS AND CAME OUT ON HER WORD: '"pat" is a correct
 # term, and should be scaled linearly as "pats"'. "2 large pats" doubled is
@@ -77,6 +78,25 @@ half_step_measures:
   - dash
   - splash
   - knob
+
+# -----------------------------------------------------------------------------
+# Measures that scale in QUARTER steps. Helen, 2026-10-10, shown that the
+# recipe page printed "1.17 sprigs" and "1.17 bunches" at seven portions for
+# six: "Sprigs: Let's round to 1/4 please, and express in fractions not
+# decimals."
+#
+# The nearest quarter, never less than a quarter: 1 sprig for seven where it
+# was written for six is 1¼ sprigs, 4 sprigs doubled is still 8. This REPLACES
+# "scales like any other number" for these two (2026-10-04, above) and leaves
+# `drop`, `twist`, `lot` and `pat` exactly as they were ruled.
+#
+# Read by the recipe page's scaler (food-scale.js, `quarterStep`) and by the
+# index's shopping list, which rounds the TOTAL the same way. One lowercase
+# word each, singular, and never also in `half_step_measures`.
+# -----------------------------------------------------------------------------
+quarter_step_measures:
+  - sprig
+  - bunch
 
 # -----------------------------------------------------------------------------
 # Yields -- the words _plugins/food_yield.rb needs to read a `makes:` line, so

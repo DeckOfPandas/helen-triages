@@ -108,6 +108,16 @@
     return Math.max(0.5, Math.round(quantity * 2) / 2);
   }
 
+  /* A SPRIG AND A BUNCH SCALE IN QUARTERS -- #1297, Helen, 2026-10-10, shown
+     "1.17 sprigs" on this page: "Sprigs: Let's round to 1/4 please, and
+     express in fractions not decimals." The nearest quarter, never less than
+     one: 1 sprig x7/6 is 1¼ sprigs, x2/3 is ¾ sprigs, and 4 sprigs doubled is
+     still 8. `quarter_step_measures` in scaling.yml, passed in as
+     `options.quarterStep` exactly as the half-step list is. */
+  function quarterStep(quantity) {
+    return Math.max(0.25, Math.round(quantity * 4) / 4);
+  }
+
   function numberText(n) {
     return shoppingList.fractionText(n);
   }
@@ -135,13 +145,13 @@
      "1–2 pinches", "1 large handful each". The number is stepped, and the
      measure word -- wherever it sits in the unit -- takes the plural of the
      number it ends up beside. Null when the unit holds no such measure. */
-  function scaleHalfStepMeasure(parsed, factor, words) {
+  function scaleSteppedMeasure(parsed, factor, words, step) {
     if (!words) return null;
     var pattern = measurePattern(words);
     if (!pattern.test(parsed.unit)) return null;
 
-    var lo = halfStep(parsed.quantity * factor);
-    var hi = parsed.max === undefined ? lo : halfStep(parsed.max * factor);
+    var lo = step(parsed.quantity * factor);
+    var hi = parsed.max === undefined ? lo : step(parsed.max * factor);
     var unit = parsed.unit.replace(pattern, function (all, before, measure) {
       return before + unitLabel(measure.toLowerCase(), hi);
     });
@@ -221,8 +231,9 @@
    * @param {string} amount - as the recipe wrote it: "200 g", "1½ tbsp",
    *        "30–50 g", "2 large", "1 tbsp (6 g)", "1 handful", "a few handfuls"
    * @param {number} factor - portions wanted over portions the recipe makes
-   * @param {{halfStep?: string[]}} [options] - `halfStep` is
-   *        _data/food/scaling.yml's `half_step_measures`
+   * @param {{halfStep?: string[], quarterStep?: string[]}} [options] -
+   *        _data/food/scaling.yml's `half_step_measures` and
+   *        `quarter_step_measures`
    * @returns {{text: string, scaled: boolean}} the amount to show, and
    *        whether it was scaled. An amount with no count in it comes back as
    *        written with `scaled: false`.
@@ -238,7 +249,9 @@
       return scaleMeasurePhrase(written, factor, words, '\\s*$');
     }
 
-    var stepped = scaleHalfStepMeasure(parsed, factor, words);
+    var stepped = scaleSteppedMeasure(parsed, factor, words, halfStep) ||
+      scaleSteppedMeasure(parsed, factor,
+        measureWords(options && options.quarterStep), quarterStep);
     if (stepped) return stepped;
 
     var split = splitParenthetical(parsed.unit);
@@ -552,6 +565,7 @@
     noteName: noteName,
     singularItem: singularItem,
     halfStep: halfStep,
+    quarterStep: quarterStep,
     portionsMode: portionsMode,
     yieldMode: yieldMode,
     yieldBox: yieldBox

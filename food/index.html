@@ -733,7 +733,7 @@ permalink: /food/
 
    `min=1` and no maximum beyond 99, matching the drinks list. Zero portions of
    everything is an empty list with extra steps. {% endcomment %}
-<section class="shopping-list" id="shopping-list" hidden aria-live="polite" data-whole-measures="{{ site.data.food.scaling.half_step_measures | join: ',' | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: ',' | escape }}">
+<section class="shopping-list" id="shopping-list" hidden aria-live="polite" data-whole-measures="{{ site.data.food.scaling.half_step_measures | join: ',' | escape }}" data-quarter-measures="{{ site.data.food.scaling.quarter_step_measures | join: ',' | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: ',' | escape }}">
   <div class="shopping-list-head">
     <h2 class="shopping-list-title">Shopping list</h2>
     {% comment %} SET ALL, NOT A MULTIPLIER -- cocktails/index.html's own note
