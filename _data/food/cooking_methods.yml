@@ -55,8 +55,21 @@
 # complete and verbatim including the 14 outbound links buried inside those
 # notes. Read it there before assuming any timing here is unsourced.
 
+# "(whole)" ON THE FOUR BIRDS, 2026-10-09 -- Helen: "Update the chicken line
+# in the dropdown to 'chicken (whole)', and the same for duck and goose", then
+# "Turkey should get (whole) too." Every method under the four is a whole-bird
+# method. The label is also the heading the calculator writes over the methods.
+#
+# `oven` IS A LIST OF SHORT STAGE LINES, 2026-10-10, one per oven setting in
+# the order they happen: "220°C fan for 20 min", then "180°C fan for the
+# rest". It was one sentence per method ("Start 220°C fan for 15–20 min,
+# drop to 180°C fan"), and Helen asked for the figures unburied: "hardly any
+# extra text, instructions not buried." A one-setting method is a one-line
+# list. A relative row says what it follows ("As the plain method") and what
+# it adds ("Rub on for last 20–30 min"). The calculator writes each line on a
+# line of its own; test_every_oven_temperature_says_fan reads them joined.
 chicken:
-  label: Chicken
+  label: Chicken (whole)
   internal_temp_ref: poultry.chicken
   chart_anchor: poultry
   methods:
@@ -68,7 +81,8 @@ chicken:
     covering: Uncovered
     temp_change: None
     outcome: Reliable default
-    oven: 180°C fan
+    oven:
+    - 180°C fan
     oven_basis: stated
     rate_min: 40
     rate_max: 40
@@ -82,7 +96,9 @@ chicken:
     covering: Uncovered
     temp_change: One step down
     outcome: Crisp skin, moist meat
-    oven: Start 220°C fan, drop to 180°C fan after 20 min
+    oven:
+    - 220°C fan for 20 min
+    - 180°C fan for the rest
     oven_basis: inferred
     rate_min: 40
     rate_max: 40
@@ -96,7 +112,9 @@ chicken:
     covering: Uncovered until final blast
     temp_change: One step up near the end
     outcome: Juiciest meat
-    oven: 150–160°C fan for most of cook, then up to 220°C fan for last 15–20 min
+    oven:
+    - 150–160°C fan for most of cook
+    - 220°C fan for last 15–20 min
     oven_basis: inferred
     rate_min: 90
     rate_max: 105
@@ -109,7 +127,8 @@ chicken:
     covering: Foil loosely over breast for first ⅔ of cook, removed for last 20–30 min
     temp_change: None
     outcome: Protects the breast
-    oven: 190–200°C fan
+    oven:
+    - 190–200°C fan
     oven_basis: inferred
     rate_min: 40
     rate_max: 40
@@ -123,7 +142,8 @@ chicken:
     covering: Fully wrapped, then opened at the end
     temp_change: None
     outcome: Very moist, pale skin
-    oven: 180°C fan
+    oven:
+    - 180°C fan
     oven_basis: inferred
     rate_min: 40
     rate_max: 40
@@ -137,7 +157,8 @@ chicken:
     covering: Sealed in bag throughout, slit open for last 10–15 min if you want colour
     temp_change: None
     outcome: Fast, least mess
-    oven: 190–200°C fan (check bag manufacturer's max)
+    oven:
+    - 190–200°C fan, or the bag's max
     oven_basis: inferred
     rate_min: 33
     rate_max: 44
@@ -150,13 +171,14 @@ chicken:
     covering: Uncovered
     temp_change: None
     outcome: Fastest, most even
-    oven: 220°C fan
+    oven:
+    - 220°C fan
     oven_basis: inferred
     total_min: 40
     total_max: 40
     notes: Much faster and more even than trussed roasting; not "whole" in shape but often grouped with whole-bird methods
 turkey:
-  label: Turkey
+  label: Turkey (whole)
   internal_temp_ref: poultry.turkey
   chart_anchor: poultry
   methods:
@@ -168,7 +190,8 @@ turkey:
     covering: Uncovered
     temp_change: None
     outcome: Reliable default
-    oven: 160–170°C fan
+    oven:
+    - 160–170°C fan
     oven_basis: stated
     weight_range: 4–8 kg
     weight_min: 4
@@ -183,7 +206,9 @@ turkey:
     covering: Uncovered
     temp_change: One step down
     outcome: Browned skin, gentle finish
-    oven: Start 220°C fan for 20–30 min, drop to 160–170°C fan
+    oven:
+    - 220°C fan for 20–30 min
+    - 160–170°C fan for the rest
     oven_basis: inferred
     weight_range: 4–8 kg
     weight_min: 4
@@ -199,7 +224,8 @@ turkey:
     covering: Loosely tented whole time, foil off for last 30–45 min
     temp_change: None
     outcome: For the biggest birds
-    oven: 160–180°C fan
+    oven:
+    - 160–180°C fan
     oven_basis: inferred
     weight_range: 4–10 kg
     weight_min: 4
@@ -215,7 +241,8 @@ turkey:
     covering: Fully wrapped, opened at end
     temp_change: None
     outcome: Very moist, pale skin
-    oven: 160–180°C fan
+    oven:
+    - 160–180°C fan
     oven_basis: inferred
     weight_range: 4–8 kg
     weight_min: 4
@@ -231,7 +258,8 @@ turkey:
     covering: Sealed, slit open last 20–30 min for colour
     temp_change: None
     outcome: Fastest enclosed method
-    oven: 180–190°C fan (check bag max)
+    oven:
+    - 180–190°C fan, or the bag's max
     oven_basis: inferred
     weight_range: 4–8 kg
     weight_min: 4
@@ -247,7 +275,9 @@ turkey:
     covering: Uncovered
     temp_change: One step up at the end
     outcome: Most tender, long haul
-    oven: 120–140°C fan for most of cook, up to 220°C fan for final 20–30 min
+    oven:
+    - 120–140°C fan for most of cook
+    - 220°C fan for last 20–30 min
     oven_basis: inferred
     weight_range: 4–7 kg
     weight_min: 4
@@ -263,7 +293,8 @@ turkey:
     covering: Uncovered
     temp_change: None
     outcome: Fastest overall
-    oven: 200–220°C fan
+    oven:
+    - 200–220°C fan
     oven_basis: inferred
     weight_range: 3–6.5 kg
     weight_min: 3
@@ -272,7 +303,7 @@ turkey:
     rate_max: 16
     notes: Rarely done above ~6.5 kg — too large to lie flat in most ovens
 goose:
-  label: Goose
+  label: Goose (whole)
   internal_temp_ref: poultry.goose
   chart_anchor: poultry
   methods:
@@ -284,7 +315,8 @@ goose:
     covering: Uncovered
     temp_change: None
     outcome: Reliable default
-    oven: 160–170°C fan
+    oven:
+    - 160–170°C fan
     oven_basis: inferred
     weight_range: 3.5–6 kg
     weight_min: 3.5
@@ -300,7 +332,9 @@ goose:
     covering: Uncovered
     temp_change: One step down
     outcome: Crisp skin first
-    oven: Start 220°C fan for 20–30 min, drop to 170°C fan
+    oven:
+    - 220°C fan for 20–30 min
+    - 170°C fan for the rest
     oven_basis: inferred
     weight_range: 3.5–6 kg
     weight_min: 3.5
@@ -316,7 +350,9 @@ goose:
     covering: Uncovered
     temp_change: One step up at the end
     outcome: Best fat render
-    oven: 140–150°C fan for bulk of cook, up to 220°C fan for last 20 min
+    oven:
+    - 140–150°C fan for most of cook
+    - 220°C fan for last 20 min
     oven_basis: inferred
     weight_range: 3.5–5.5 kg
     weight_min: 3.5
@@ -332,7 +368,8 @@ goose:
     covering: Tented for first ⅔, off for last 30 min
     temp_change: None
     outcome: Protects the breast
-    oven: 160–170°C fan
+    oven:
+    - 160–170°C fan
     oven_basis: inferred
     weight_range: 4–6.5 kg
     weight_min: 4
@@ -348,7 +385,9 @@ goose:
     covering: Uncovered during roast
     temp_change: None
     outcome: Traditional, crispest skin
-    oven: Steam or simmer briefly before roasting at 180–200°C fan
+    oven:
+    - Steam or simmer briefly first
+    - 180–200°C fan
     oven_basis: inferred
     weight_range: 3.5–5.5 kg
     weight_min: 3.5
@@ -357,7 +396,7 @@ goose:
     rate_max: 30
     notes: Traditional method — renders fat and tightens skin before roasting
 duck:
-  label: Duck
+  label: Duck (whole)
   internal_temp_ref: poultry.duck
   chart_anchor: poultry
   methods:
@@ -369,7 +408,8 @@ duck:
     covering: Uncovered
     temp_change: None
     outcome: Reliable default
-    oven: 200–220°C fan
+    oven:
+    - 200–220°C fan
     oven_basis: inferred
     weight_range: 1.5–3 kg
     weight_min: 1.5
@@ -386,7 +426,9 @@ duck:
     covering: Uncovered
     temp_change: One step down
     outcome: Fast crisp skin
-    oven: Start 220°C fan for 15–20 min, drop to 180°C fan
+    oven:
+    - 220°C fan for 15–20 min
+    - 180°C fan for the rest
     oven_basis: inferred
     weight_range: 1.5–3 kg
     weight_min: 1.5
@@ -402,7 +444,9 @@ duck:
     covering: Uncovered
     temp_change: One step up at the end
     outcome: Maximum fat render
-    oven: 150–160°C fan for bulk, up to 220°C fan for last 15 min
+    oven:
+    - 150–160°C fan for most of cook
+    - 220°C fan for last 15 min
     oven_basis: inferred
     weight_range: 1.5–2.5 kg
     weight_min: 1.5
@@ -418,7 +462,9 @@ duck:
     covering: Uncovered during roast
     temp_change: None
     outcome: Crispest skin
-    oven: Steam briefly, then roast at 200°C fan
+    oven:
+    - Steam briefly first
+    - 200°C fan
     oven_basis: inferred
     weight_range: 1.5–3 kg
     weight_min: 1.5
@@ -434,7 +480,8 @@ duck:
     covering: Uncovered
     temp_change: None
     outcome: Even breast and leg
-    oven: 200–220°C fan
+    oven:
+    - 200–220°C fan
     oven_basis: inferred
     weight_range: 1.5–2.5 kg
     weight_min: 1.5
@@ -455,7 +502,8 @@ beef:
     covering: Uncovered
     temp_change: None
     outcome: Reliable default
-    oven: 160–180°C fan
+    oven:
+    - 160–180°C fan
     oven_basis: inferred
     by_doneness:
       rare:
@@ -475,7 +523,9 @@ beef:
     covering: Uncovered
     temp_change: One step down
     outcome: Crusted outside
-    oven: Start 220–230°C fan for 20 min, drop to 160°C fan
+    oven:
+    - 220–230°C fan for 20 min
+    - 160°C fan for the rest
     oven_basis: inferred
     rate_min: 33
     rate_max: 33
@@ -489,7 +539,8 @@ beef:
     covering: Uncovered
     temp_change: None
     outcome: Evenest colour throughout
-    oven: 100–120°C fan throughout
+    oven:
+    - 100–120°C fan throughout
     oven_basis: inferred
     rate_min: 55
     rate_max: 75
@@ -502,7 +553,9 @@ beef:
     covering: Uncovered
     temp_change: One step up at the end
     outcome: Even, with a crust
-    oven: 100–120°C fan, then up to 230°C fan for last 10–15 min
+    oven:
+    - 100–120°C fan for most of cook
+    - 230°C fan for last 10–15 min
     oven_basis: inferred
     rate_min: 55
     rate_max: 75
@@ -517,7 +570,8 @@ beef:
     liquid: None (self-bastes)
     covering: Tightly foil-wrapped throughout
     outcome: Roast-like brisket
-    oven: 150–160°C fan
+    oven:
+    - 150–160°C fan
     oven_basis: inferred
     rate_min: 60
     rate_max: 75
@@ -530,7 +584,8 @@ beef:
     liquid: None or a splash of water/stock
     covering: Covered (foil or lidded pan)
     outcome: Most tender brisket
-    oven: 120–140°C fan
+    oven:
+    - 120–140°C fan
     oven_basis: inferred
     rate_min: 132
     rate_max: 198
@@ -544,7 +599,8 @@ beef:
     liquid: Fully or half-submerged
     covering: Covered (lidded pot)
     outcome: Wet braise
-    oven: 150–160°C fan
+    oven:
+    - 150–160°C fan
     oven_basis: inferred
     rate_min: 60
     rate_max: 90
@@ -557,7 +613,8 @@ beef:
     liquid: Half-submerged
     covering: Covered
     outcome: Falls off the bone
-    oven: 140–150°C fan
+    oven:
+    - 140–150°C fan
     oven_basis: inferred
     total_min: 150
     total_max: 210
@@ -570,7 +627,8 @@ beef:
     liquid: None
     covering: Tightly covered
     outcome: Sliceable, not shreddy
-    oven: 140–150°C fan
+    oven:
+    - 140–150°C fan
     oven_basis: inferred
     rate_min: 75
     rate_max: 90
@@ -589,7 +647,8 @@ pork:
     covering: Uncovered
     temp_change: None
     outcome: Reliable for loin
-    oven: 175–180°C fan
+    oven:
+    - 175–180°C fan
     oven_basis: inferred
     rate_min: 40
     rate_max: 40
@@ -603,7 +662,8 @@ pork:
     covering: Uncovered
     temp_change: None
     outcome: Leg with crackling
-    oven: 180°C fan
+    oven:
+    - 180°C fan
     oven_basis: inferred
     rate_min: 60
     rate_max: 60
@@ -616,7 +676,9 @@ pork:
     covering: Uncovered
     temp_change: One step down
     outcome: Crackling early
-    oven: Start 220°C fan for 20–25 min, drop to 180°C fan
+    oven:
+    - 220°C fan for 20–25 min
+    - 180°C fan for the rest
     oven_basis: inferred
     rate_min: 55
     rate_max: 60
@@ -629,7 +691,8 @@ pork:
     covering: Uncovered
     temp_change: None
     outcome: Evenest, most forgiving
-    oven: 120–140°C fan throughout
+    oven:
+    - 120–140°C fan throughout
     oven_basis: inferred
     rate_min: 50
     rate_max: 60
@@ -642,7 +705,9 @@ pork:
     covering: Uncovered
     temp_change: One step up at the end
     outcome: Even, with a crisp finish
-    oven: 120–140°C fan, then up to 230°C fan for last 15–20 min
+    oven:
+    - 120–140°C fan for most of cook
+    - 230°C fan for last 15–20 min
     oven_basis: inferred
     rate_min: 50
     rate_max: 60
@@ -657,7 +722,8 @@ pork:
     covering: Loosely tented for first ⅔, off for last 25–30 min
     temp_change: None
     outcome: Stops the outside drying
-    oven: 180°C fan
+    oven:
+    - 180°C fan
     oven_basis: inferred
     rate_min: 35
     rate_max: 40
@@ -671,7 +737,8 @@ pork:
     covering: Uncovered
     temp_change: None
     outcome: Quickest, easy to overshoot
-    oven: 200–220°C fan
+    oven:
+    - 200–220°C fan
     oven_basis: inferred
     rate_min: 40
     rate_max: 60
@@ -683,7 +750,8 @@ pork:
     group: Slow-cooked cuts — shoulder/pork butt, belly
     covering: Uncovered (or loosely tented if browning too fast)
     outcome: Pulled pork
-    oven: 140–150°C fan
+    oven:
+    - 140–150°C fan
     oven_basis: inferred
     rate_min: 60
     rate_max: 75
@@ -695,7 +763,8 @@ pork:
     group: Slow-cooked cuts — shoulder/pork butt, belly
     covering: Uncovered
     outcome: Most tender, most forgiving
-    oven: 110–120°C fan
+    oven:
+    - 110–120°C fan
     oven_basis: inferred
     rate_min: 90
     rate_max: 120
@@ -707,7 +776,9 @@ pork:
     group: Slow-cooked cuts — shoulder/pork butt, belly
     covering: Covered for bulk of cook, uncovered at the end
     outcome: Moist, crisp at the end
-    oven: 150°C fan covered, then 220°C fan uncovered for last 20–30 min
+    oven:
+    - 150°C fan, covered
+    - 220°C fan, uncovered, for last 20–30 min
     oven_basis: inferred
     rate_min: 60
     rate_max: 75
@@ -719,7 +790,9 @@ pork:
     group: Slow-cooked cuts — shoulder/pork butt, belly
     covering: Uncovered throughout
     outcome: Crackling on belly
-    oven: 140–150°C fan for bulk, up to 220°C fan for last 20–30 min
+    oven:
+    - 140–150°C fan for most of cook
+    - 220°C fan for last 20–30 min
     oven_basis: inferred
     rate_min: 50
     rate_max: 60
@@ -737,7 +810,8 @@ lamb:
     covering: Uncovered
     temp_change: None
     outcome: Reliable for leg
-    oven: 180°C fan
+    oven:
+    - 180°C fan
     oven_basis: inferred
     rate_min: 25
     rate_max: 30
@@ -751,7 +825,9 @@ lamb:
     covering: Uncovered
     temp_change: One step down
     outcome: Browned early, gentle finish
-    oven: Start 220°C fan for 20 min, drop to 180°C fan
+    oven:
+    - 220°C fan for 20 min
+    - 180°C fan for the rest
     oven_basis: inferred
     rate_min: 20
     rate_max: 25
@@ -765,7 +841,8 @@ lamb:
     covering: Uncovered
     temp_change: None
     outcome: Evenest colour throughout
-    oven: 120–140°C fan throughout
+    oven:
+    - 120–140°C fan throughout
     oven_basis: inferred
     rate_min: 40
     rate_max: 50
@@ -778,7 +855,9 @@ lamb:
     covering: Uncovered
     temp_change: One step up at the end
     outcome: Even, with a crisp finish
-    oven: 120–140°C fan, then up to 230°C fan for last 15 min
+    oven:
+    - 120–140°C fan for most of cook
+    - 230°C fan for last 15 min
     oven_basis: inferred
     rate_min: 40
     rate_max: 50
@@ -792,7 +871,8 @@ lamb:
     covering: Uncovered
     temp_change: None
     outcome: Quickest, for a rack
-    oven: 200–220°C fan
+    oven:
+    - 200–220°C fan
     oven_basis: inferred
     total_min: 15
     total_max: 25
@@ -805,7 +885,9 @@ lamb:
     covering: Uncovered
     temp_change: None
     outcome: Restaurant method
-    oven: Sear on stove, then 200°C fan oven
+    oven:
+    - Sear on the stove first
+    - 200°C fan
     oven_basis: inferred
     total_min: 10
     total_max: 15
@@ -817,7 +899,8 @@ lamb:
     group: Slow-cooked cuts — shoulder, breast
     covering: Uncovered (or loosely tented if browning too fast)
     outcome: Pulled lamb
-    oven: 140–150°C fan
+    oven:
+    - 140–150°C fan
     oven_basis: inferred
     rate_min: 60
     rate_max: 75
@@ -829,7 +912,8 @@ lamb:
     group: Slow-cooked cuts — shoulder, breast
     covering: Uncovered
     outcome: Most tender, most forgiving
-    oven: 110–120°C fan
+    oven:
+    - 110–120°C fan
     oven_basis: inferred
     rate_min: 90
     rate_max: 120
@@ -841,7 +925,9 @@ lamb:
     group: Slow-cooked cuts — shoulder, breast
     covering: Covered for bulk, uncovered at the end
     outcome: Moist, crisp at the end
-    oven: 150°C fan covered, then 220°C fan uncovered for last 20–30 min
+    oven:
+    - 150°C fan, covered
+    - 220°C fan, uncovered, for last 20–30 min
     oven_basis: inferred
     rate_min: 60
     rate_max: 75
@@ -853,7 +939,9 @@ lamb:
     group: Slow-cooked cuts — shoulder, breast
     covering: Uncovered throughout
     outcome: Self-basting, crisp finish
-    oven: 140–150°C fan for bulk, up to 220°C fan for last 20 min
+    oven:
+    - 140–150°C fan for most of cook
+    - 220°C fan for last 20 min
     oven_basis: inferred
     rate_min: 60
     rate_max: 75
@@ -871,7 +959,8 @@ ham:
     covering: Uncovered
     temp_change: None
     outcome: Reliable default
-    oven: 180°C fan
+    oven:
+    - 180°C fan
     oven_basis: inferred
     rate_min: 35
     rate_max: 40
@@ -885,7 +974,9 @@ ham:
     covering: Uncovered
     temp_change: One step down
     outcome: Crackling early
-    oven: Start 220°C fan for 20–25 min, drop to 180°C fan
+    oven:
+    - 220°C fan for 20–25 min
+    - 180°C fan for the rest
     oven_basis: inferred
     rate_min: 30
     rate_max: 35
@@ -898,7 +989,9 @@ ham:
     covering: Uncovered
     temp_change: One step up at the end
     outcome: Evenest, most tender
-    oven: 120–140°C fan, then up to 230°C fan for last 15–20 min
+    oven:
+    - 120–140°C fan for most of cook
+    - 230°C fan for last 15–20 min
     oven_basis: inferred
     rate_min: 50
     rate_max: 60
@@ -913,7 +1006,9 @@ ham:
     covering: Uncovered for final 20–30 min so sugar can caramelise
     temp_change: As per chosen base method
     outcome: Caramelised crust
-    oven: 180°C fan, or 220°C fan then drop
+    oven:
+    - As the plain method
+    - Rub on for last 20–30 min
     oven_basis: inferred
     relative_to: Same as plain equivalent
     notes: Rub applied for the last third of cooking, not from the start, or it burns
@@ -925,7 +1020,9 @@ ham:
     covering: Glaze brushed on for last 20–30 min only, uncovered
     temp_change: As per chosen base method
     outcome: Glazed finish
-    oven: 180°C fan, or 220°C fan then drop
+    oven:
+    - As the plain method
+    - Glaze on for last 20–30 min
     oven_basis: inferred
     relative_to: Same as plain equivalent
     notes: Sugar burns if applied too early; scoring fat first helps glaze adhere
@@ -937,7 +1034,8 @@ ham:
     covering: Same as bone-in equivalents
     temp_change: Same as bone-in equivalents
     outcome: Boneless, denser
-    oven: Same as bone-in equivalents
+    oven:
+    - As the bone-in method
     oven_basis: inferred
     relative_to: Add ~10% to time vs. same-weight bone-in
     notes: Denser without the bone conducting heat
@@ -949,7 +1047,9 @@ ham:
     covering: Uncovered during roast
     temp_change: None during roast phase
     outcome: Less salty, traditional
-    oven: Simmer in water first, then oven at 180°C fan
+    oven:
+    - Simmer in water first
+    - 180°C fan
     oven_basis: inferred
     stages:
     - name: simmer
@@ -967,7 +1067,8 @@ ham:
     covering: Loosely covered for the bulk, uncovered last 20–30 min
     temp_change: None
     outcome: Simplest for cured ham
-    oven: 160–170°C fan
+    oven:
+    - 160–170°C fan
     oven_basis: stated
     rate_min: 60
     rate_max: 60
@@ -982,7 +1083,9 @@ ham:
     covering: Uncovered for the sugar-crisping stage
     temp_change: One step up at the very end
     outcome: Caramelised crust
-    oven: As per base method, uncovered at 200–220°C fan for last 15–20 min
+    oven:
+    - As the base method
+    - 200–220°C fan, uncovered, for last 15–20 min
     oven_basis: inferred
     relative_to: Base method + final uncovered stage
     notes: Applied only at the very end
@@ -994,7 +1097,9 @@ ham:
     covering: Uncovered for the glazing stage
     temp_change: One step up at the very end
     outcome: Glazed finish
-    oven: As per base method, uncovered at 200–220°C fan for last 15–20 min
+    oven:
+    - As the base method
+    - 200–220°C fan, uncovered, for last 15–20 min
     oven_basis: inferred
     relative_to: Base method + final glazing stage
     notes: Glaze goes on right before the final high-heat stage
@@ -1006,7 +1111,8 @@ ham:
     covering: Same as bone-in equivalents
     temp_change: Same as bone-in equivalents
     outcome: Boneless, denser
-    oven: Same as bone-in cured equivalents
+    oven:
+    - As the bone-in method
     oven_basis: inferred
     relative_to: Add ~10% to time vs. same-weight bone-in
     notes: Same adjustment as fresh ham
@@ -1023,7 +1129,9 @@ venison:
     covering: Uncovered
     temp_change: One step down
     outcome: Crusted outside, pink centre
-    oven: Start 200°C fan for 20 mins, drop to 140–160°C fan
+    oven:
+    - 200°C fan for 20 min
+    - 140–160°C fan for the rest
     oven_basis: stated
     by_doneness:
       rare:
@@ -1043,7 +1151,8 @@ venison:
     covering: Uncovered
     temp_change: None
     outcome: Simplest haunch roast
-    oven: 160°C fan
+    oven:
+    - 160°C fan
     oven_basis: inferred
     rate_min: 30
     rate_max: 30
@@ -1056,7 +1165,8 @@ venison:
     covering: Wrapped in foil throughout, foil replaced to rest
     temp_change: None
     outcome: Moist, no crust
-    oven: 160°C fan
+    oven:
+    - 160°C fan
     oven_basis: inferred
     rate_min: 33
     rate_max: 33
@@ -1069,7 +1179,8 @@ venison:
     covering: Uncovered
     temp_change: None
     outcome: Quickest, for a rack
-    oven: 200°C fan
+    oven:
+    - 200°C fan
     oven_basis: inferred
     total_min: 10
     total_max: 15
@@ -1082,7 +1193,9 @@ venison:
     covering: Uncovered
     temp_change: None
     outcome: Restaurant method, for loin
-    oven: Sear on the stove, then 160°C fan
+    oven:
+    - Sear on the stove first
+    - 160°C fan
     oven_basis: inferred
     total_min: 5
     total_max: 7
@@ -1095,7 +1208,8 @@ venison:
     liquid: None or a splash of stock
     covering: Covered for the whole cook
     outcome: Pulled venison
-    oven: 150°C fan
+    oven:
+    - 150°C fan
     oven_basis: stated
     rate_min: 80
     rate_max: 96
@@ -1108,7 +1222,8 @@ venison:
     liquid: Half-submerged
     covering: Covered (lidded pot)
     outcome: Wet braise
-    oven: 130°C fan
+    oven:
+    - 130°C fan
     oven_basis: inferred
     rate_min: 60
     rate_max: 90
@@ -1121,7 +1236,8 @@ venison:
     liquid: Half-submerged
     covering: Covered (lid or foil)
     outcome: Falls off the bone
-    oven: 130–160°C fan
+    oven:
+    - 130–160°C fan
     oven_basis: inferred
     total_min: 120
     total_max: 180

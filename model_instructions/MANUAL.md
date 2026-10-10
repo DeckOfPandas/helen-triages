@@ -712,7 +712,13 @@ with it.
   the Ingredients section skips and `main_ingredients` must not list
   (`test_incidental_not_in_main_ingredients`). Whether an oil is core is a
   judgement (unusual oil, stated smoke point, finishing drizzle → core), so it
-  is an explicit flag. No published recipe uses it today; the mechanism stays.
+  is an explicit flag. Three published recipes carry it since 2026-10-10
+  (#1356: two greasing butters and the youvetsi's frying oil), set on Helen's
+  one-off grant; `.claude/commands/ingest.md` still lists it as hers to set.
+  **A flagged line may share its name with a real one**: the cheesecake
+  greases with salted butter and bakes with it, and `main_ingredients` is
+  right to say butter. The test objects only where nothing but an incidental
+  line accounts for a main ingredient.
 - **An ingredient's quantity is its own `amount:` key, never inside `item:`
   text.** The highlighter is driven by `{% if item.amount %}` and never scans
   text, so `item: "~1 tbsp tamarind paste"` renders unstyled with no error.
@@ -1213,8 +1219,9 @@ cocktails' shopping list, class for class, because Helen's brief was *"I would
 like all the same features"*. **Costing is the one feature not copied**: she
 ruled it out for food.
 
-**THE SCALER COUNTS PORTIONS, NOT BATCHES**, and that is the difference from
-the cocktails site. A cocktail recipe's box counts glasses; a food recipe's counts PEOPLE, so four
+**A `serves:` RECIPE'S BOX COUNTS PORTIONS; A `makes:` RECIPE'S COUNTS BATCHES**
+(the second since #1297, 2026-10-09 — see "the list's rows" below). A cocktail
+recipe's box counts glasses; a `serves:` food recipe's counts PEOPLE, so four
 portions of a recipe that serves six is ×0.67 and the fractional multiplier the
 cocktails scaler refuses (§9.13, whole recipes only) is ordinary here. That is what
 makes the serving size Helen asked to be guessed load-bearing: it is the number
@@ -1252,14 +1259,151 @@ conversion `shopping-list.js` refuses — that rule is about units with no
 defined relationship (a dash is not some number of ml). `tbsp`, `oz` and every
 bare count are left where they are, because those would need inventing.
 
-**EVERY RECIPE COUNTS PEOPLE, and that took two goes.** The box is portions:
-four portions of a recipe that serves six is ×0.67. A recipe whose `serves:`
-states no number carries **`serves_estimate:`** in its own front matter (§4),
-produced at ingest from the recipe's own words — 129 of 423 files. An estimate
-is printed with a `~`, which is the only thing saying a figure was reasoned
-rather than written down.
+**EVERY RECIPE CARRIES A PORTION COUNT, and that took two goes.** A recipe whose
+`serves:` states no number carries **`serves_estimate:`** in its own front
+matter (§4), produced at ingest from the recipe's own words — 129 of 423
+files. An estimate is printed with a `~`, which is the only thing saying a
+figure was reasoned rather than written down. **On the shopping list only a
+`serves:` recipe's box reads it since #1297**; a `makes:` recipe still carries
+its estimate and the list no longer shows or uses it.
 
-**WHAT STOOD HERE FOR A FORTNIGHT, so you do not rebuild it.** A recipe with no
+**THE LIST'S ROWS — ONE RECIPE PER LINE, AND EACH SAYS WHAT ITS NUMBER COUNTS**
+(#1297, Helen, 2026-10-09: *'The shopping list scaler could show e.g. "X
+batches of 18 Peanut Butter Cookies", allowing half-batches where that doesn't
+split eggs ... That stops us saying 2 cookies is a portion -- not out of
+principle, but because that's meaningless.'*).
+
+    [7]   portions of Moules Marinière             serves:, one person at a time
+    [2]   batches of 12 Grandma's Fairy Cakes      makes: a count above one
+    [0.5] batch of Ben's Chocolate Ice Cream       makes: a measure; ½ offered
+    [1]   batch of Beetroot Chocolate Cake         makes: "one 8-inch cake"
+
+- **The three figures are the recipe page's own** (#1286, below): the blob
+  carries `w` (`page.whole_recipes`), `h` (`page.half_recipe`) and `m`
+  (`page.made`) for a `makes:` recipe, so the box steps ½ (only where
+  `_plugins/food_half_recipe.rb` allows), 1, 2, 3 and never 1½ — the same
+  steps as that recipe's own page.
+- **The figure after "of" is what ONE batch makes and never moves.** It is
+  shown only for a count above one: "2 batches of 1 Lemon Drizzle Cake" and
+  "2 batches of 750 ml Gelato" read worse than the name alone, and a yield
+  that is itself "3 batches" shows none. `batchThing` in `filters.js`.
+- **"Set all to N portions" sets the `serves:` rows and skips the batch
+  rows.** Converting would have to decide how many cookies a portion is. This
+  is the skip #815 removed; it is back because the row it skips now says
+  "batches" in words, where the old batch box looked like a portions box.
+- **Batches live in their own store**, `HTF.shortlist.batches` /
+  `setBatches`, key `htf-shortlist-batches-<site>-v1` — a FOURTH key. A stored
+  6 cannot say whether it meant people or batches, so the portions entries
+  `makes:` recipes had before #1297 are never read again. A half is storable;
+  whether THIS recipe may have one is `filters.js`'s question.
+- **The number input steps in halves where ½ is offered**, so its spinner
+  lands on 1½; `batchCount` sends that to the next whole batch in the
+  direction of travel and rewrites the box. A typed figure is tidied on
+  `change`, never under the cursor.
+- **The batch rows come LAST, under a hairline** (Helen, 2026-10-10: *"If we
+  group the batched recipes at the bottom of the shopping list scaler section,
+  it's clear the portions scaler multiplies portions whereas the batches are
+  manual. Maybe just a little vertical space and a soft hairline
+  separator?"*). Each group keeps shortlist order. The rule is on the first
+  batch row (`.shopping-list-recipe--first-batch`) and is drawn only when
+  there are portions rows above it.
+
+**WHAT THE NUMBERS DID NOT REACH IS NAMED UNDER THE ROWS** — `(Not scaled:
+crème fraîche or double cream, salted butter, pinch of salt, salt)`, in
+`.shopping-list-note`, the recipe page's line and format (#1088) on Helen's
+ask of 2026-10-10: *"Adding this to the shopping list page would at least show
+the user in what ways the list is incomplete."* A row is named when ANY line
+behind it had no amount to scale — so "salted butter" can be named beside a
+total of 319 g, for the no-amount line that greases the tin. The row stays on
+the list below; the names are the list's own labels, in aisle order, and are
+not run through the recipe page's `noteName`.
+
+**"2 lemons", NOT "2 lemon"** (Helen, 2026-10-10). A row that is ONE BARE
+COUNT ("2", "2 large", "½") with nothing unquantified beside it takes a label
+that agrees with its number: plural above one, singular at one or less.
+`countedLabel` in `food-shopping-list.js`. **A spelling some recipe on the row
+actually wrote is always used first.** A form nobody wrote is made only for a
+noun in **`count_nouns`** (`_data/food/scaling.yml`, joined onto the panel as
+`data-count-nouns`) — the LAST word of the name, with a regular plural.
+**Do not widen that to "any last word"**: measured on 2026-10-10 it was wrong
+for about a quarter of 251 real names ("sprigs thyme" → "sprigs thymes",
+"goose" → "gooses", "skinless" → "skinlesses"). A name opening with a by-eye
+measure ("pinch cayenne chilli pepper") is left alone, as is anything with a
+unit, a mixed row ("4 + 2 large"), and a name that is a choice or a phrase.
+The aisle's alphabetical order is by the FOLDED name, so a label changing
+number moves nothing.
+
+**A STEPPED MEASURE IS BOUGHT IN WHOLE ONES, ROUNDED UP, AND THE LIST SAYS
+WHAT THE RECIPES CALL FOR** (#1297). Helen, 2026-10-10: *"I'd like the
+shopping list not to write 1.17 sprigs either, so please round that upwards to
+the next integer like this: '2 handfuls fresh parsley (1 1/4 in the
+recipes)'."*
+
+    1 handful, seven portions of a recipe for six   2 handfuls (1¼ in the recipes)
+    1 sprig, seven for six                          2 sprigs   (1¼ in the recipes)
+    5 twists ×⅔                                     4 twists   (3¼ in the recipes)
+    1 handful ×1.5                                  2 handfuls (1½ in the recipes)
+    4 sprigs ×2                                     8 sprigs
+
+- **Two figures, each honest about what it is.** The amount column is what to
+  BUY, a whole number. The bracket is what the recipes ASK FOR, to the nearest
+  quarter — always a fraction, never a decimal.
+- **Quarters for every stepped measure HERE, whatever its step on the recipe
+  page.** The first build quoted the recipe page's own figure, so 1.17
+  handfuls (a half-step measure, "1 handful" there) bought one. Helen, the
+  same day: *"1.17 handfuls should buy 2, again giving the bracketed requested
+  number."* So the list and the recipe page can show different figures for a
+  handful — 1¼ asked for here, "1 handful" to use there — and that is ruled.
+- **No bracket when the two agree**, which includes a total within an eighth
+  of a whole number (1.02 handfuls is one).
+- **The TOTAL is stepped, once** — never each recipe's share.
+- **A row with a second total names the unit**: `2 sprigs + 10 g thyme (1¼
+  sprigs in the recipes)`.
+- `build()` returns it as `aside` on the row; `filters.js` prints it in
+  `.shopping-list-aside` after the name. The lists reach it as
+  `data-whole-measures` (both half-step lists, joined) and
+  `data-quarter-measures` on `#shopping-list`. With neither, nothing is
+  rounded.
+- **This was her third answer in two days**, and DECISIONS §8.2 has all three:
+  up with a decimal in brackets, nearest with no bracket (*"round up ... is
+  inaccurate"*), then up with the fraction in brackets. Do not "restore" either
+  earlier one, and do not make the bracket quote the recipe page's step.
+
+Grams, spoons and counts are untouched — seven portions of a six-portion roast
+chicken is a chicken a sixth bigger. **A measure written into the item with no
+amount** (`item: "a handful of fresh parsley"`) is still an unquantified line
+here, and is named on the Not-scaled line.
+
+**ONE FRUIT, TWO PARTS** (#1297). Helen: *'I would like to cleverly combine
+e.g. "zest of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the
+shopping list.'* `mark_fruit` in `_plugins/food_shopping.rb` MARKS a line and
+`reunite` in `food-shopping-list.js` does the sums, each inside ONE recipe —
+which is why an entry now says which recipe it came from:
+
+| the recipe writes | the blob carries | the list does |
+|---|---|---|
+| `item: "juice of 1 lemon"` | `f: "lemon"`, `c: "1"`, `pt: ["juice"]` | totals it as 1 lemon; it was a row with no figure |
+| `amount: "1"`, `item: "lemon, zested and juiced"` | `pt: ["zest","juice"]` | as before, and now mergeable |
+| `amount: "1 tbsp"`, `item: "lemon juice"` | nothing | nothing: a spoonful is not some number of lemons |
+| `item: "olive oil, the rest of the oil above"` | `x: true` | drops it beside an amounted line of the same name |
+
+**Different parts of the same fruit are the same fruit; the same part twice
+adds.** Each part is summed, the part needing the most fruit decides, and
+lines that do not use that part are dropped: juice of 1 + zest of 1 is 1; four
+zested with 2½ juiced is 4 (the pound cake printed "4½ + 2 large"). A line
+naming no part ("lemon, cut into wedges") is always added. Two recipes add.
+**A bracket after the note is an aside, not the part** — "lemons, juiced (use
+the ones you've zested)" is juice only. **The name `n` is never changed**,
+because the exclusion index and the list must agree on it; the fruit travels
+beside it. **A pointer is keyed on its own words** (`pointers:` in the data,
+or "the zest of the one juiced…"), never on "no amount, same name": "salted
+butter, extra, for greasing" is extra and stays counted. The vocabulary is
+`whole_fruit:` in `_data/food/scaling.yml`; the fruit must be the LAST word of
+the name, so "unwaxed lemons" is a lemon and "watermelon" and "parmesan rind"
+are not.
+
+**WHAT STOOD HERE FOR A FORTNIGHT IN SEPTEMBER, and how today's batch row
+differs from it.** A recipe with no
 portion count got a box counting BATCHES (×1, ×2) with a `×` beside it, on the
 reasoning that `makes: "About 750 ml"` cannot become people without inventing a
 portion size. Helen killed it: *"increasing it to 50+ does nothing either and
@@ -1269,7 +1413,9 @@ means something different on some rows is worse than a guessed number.
 **Batches were a workaround for missing data, and the fix was the data.**
 `_data/food/servings.yml`, which held the estimates outside the recipes for the
 same fortnight, is deleted: one home for the figure, beside the words it
-estimates from.
+estimates from. **#1297 brought batches back for `makes:` recipes on Helen's
+own wording**, and the two differences are the lesson kept: the row says
+"batches of" in words, and the data it needed (`page.made`) now exists.
 
 **A recipe with NO portion count gets no box at all** — not a box that does
 nothing. That is what a new recipe looks like between being written and being
@@ -1296,14 +1442,38 @@ a cross-recipe link (`[grandma's lemon curd](../…)`) is KEPT here and forced t
 `other`, where §12's exclusion index drops it — different questions, different
 answers, stated in both files.
 
-**`HTF.shortlist.portions` is a THIRD localStorage key**, not `glasses` renamed:
+**`HTF.shortlist.portions` is a THIRD localStorage key** (and `batches` a
+fourth, above), not `glasses` renamed:
 a missing glasses entry is one glass, a missing portions entry is *however many
 this recipe makes*, which only the build knows — so `1` is a real, storable
 answer here.
 
-**THE RECIPE PAGE HAS A SCALER TOO, AND A HANDFUL SCALES IN HALF STEPS**
-(#1005, #1125). `assets/js/food-scale.js` is one amount at a factor, through
-this same parser and `totalText`; `assets/js/recipe-scale.js` is the wiring.
+**THE RECIPE PAGE HAS A SCALER TOO, AND A MEASURE TAKEN BY HAND SCALES IN
+STEPS** (#1005, #1125). `assets/js/food-scale.js` is one amount at a factor,
+through this same parser and `totalText`; `assets/js/recipe-scale.js` is the
+wiring.
+
+**WHICH STEP, TODAY — three lists in `_data/food/scaling.yml`, and a word is
+on exactly one:**
+
+| list | words | step | 1 at seven portions for six |
+|---|---|---|---|
+| `quarter_step_measures` | handful, sprig, bunch | nearest ¼, never below ¼ | `1¼ handfuls` |
+| `half_step_measures` | pinch, dash, splash, knob | nearest ½, never below ½ | `1 pinch` |
+| `half_step_counts` | drop, twist, lot, pat | nearest ½, never below ½ | `1 drop` |
+
+**THE HANDFUL STARTED THE HALF-STEP LIST AND LEFT IT ON 2026-10-10** (Helen:
+*"Recipe page handfuls and sprigs in 1/4 too please."*), once the shopping
+list had been ruled to quote a handful in quarters. **So the paragraphs and
+the table below describe the half step with the handful as their example, as
+it was ruled on 2026-10-04; read "handful" there as "pinch".** The mechanism
+is unchanged — `halfStep`, the plural, the measure with no number, the
+Not-scaled line — and a quarter-step measure goes through the same code with
+`quarterStep` (`eitherStep` for a measure written with no number, so `a
+handful of parsley` and `a sprig of thyme` scale as `a pinch of salt` does).
+**The half-recipe judge still lets a handful halve always**: it is handed
+`half_step_measures` plus `half_recipe.by_eye_also` (`handful`), and a test
+pins both.
 
 **A measure taken by hand or eye scales to the nearest half, never less than
 a half.** Helen, 2026-10-04, three sentences in order: *"some recipes scale 1
@@ -1351,7 +1521,38 @@ surely"* — and a test refuses them. **What is absent is RULED, not left**
 a thing you can pick up and scale — *"Yes, 4 sprigs double is 8, and so on."*
 — and **`pat` scales too**: *'"pat" is a correct term, and should be scaled
 linearly as "pats"'*, so `2 large pats` doubled is `4 large pats`. Do not add
-any of the six.
+any of the six to `half_step_measures`. **Four of them step in halves all the
+same since 2026-10-10, from a list of their own** — the next paragraph but one.
+
+**A SPRIG AND A BUNCH GO TO THE NEAREST QUARTER** (#1297, Helen, 2026-10-10,
+shown "1.17 sprigs" at seven portions for six: *"Sprigs: Let's round to 1/4
+please, and express in fractions not decimals."*). Never less than a quarter.
+
+    1 sprig    ×7/6  →  1¼ sprigs
+    1 sprig    ×2/3  →  ¾ sprigs
+    4 sprigs   ×2    →  8 sprigs
+    1 bunch    ×7/6  →  1¼ bunches
+
+`quarter_step_measures` in `_data/food/scaling.yml` (`sprig`, `bunch`), joined
+onto the control as `data-quarter-step-measures`; `quarterStep` in
+`food-scale.js`, through the same `scaleSteppedMeasure` the half step uses.
+**Her sentence names sprigs; `bunch` rides with it because the question put to
+her showed the two figures together.** The half-recipe judge is unchanged: an
+odd count of sprigs still refuses a half recipe.
+
+**A DROP, A TWIST, A LOT AND A PAT GO TO THE NEAREST HALF** (Helen,
+2026-10-10: *"Drops, twists, lots etc, please round to the nearest 1/2 --
+these are smaller than handfuls and sprigs."*). `5 twists` ×⅔ is `3½ twists`
+(it was `3⅓`); `2 pats` ×⅔ is `1½ pats`. It replaces "scaled linearly" for all
+four, `pat` included: her "etc" answered a sentence listing drops, twists,
+lots and pats. **They are `half_step_counts`, NOT entries in
+`half_step_measures`, and the reason is the half-recipe judge**: it is handed
+`half_step_measures` and lets those halve always, and `1 lot` of another
+recipe must go on refusing a half recipe (*"Neither mince pies nor sweet cream
+base halve"*). So `_layouts/recipe.html` and `food/index.html` `concat` the
+two lists for the scalers, `_plugins/food_shopping.rb` hands the judge only
+the first, and a test refuses a word in both. A pat written into the item
+(`a pat of salted butter`) now scales like a handful written there.
 
 **The NAME on that line is the ingredient, not the recipe's sentence about
 it** (`noteName`): a leading measure phrase that could not scale is dropped
@@ -1362,10 +1563,9 @@ then a trailing `to taste`/`to serve` from `trailing_phrases` in
 `ingredient_words.yml`. **The comma cut is what makes the comma-joined line
 safe**, and its cost is that an item which is itself a list (`fresh parsley,
 thyme and sage`) is named by its first member — accepted: *"doesn't state an
-amount, so scaling is by common sense."* **The index's shopping list does NOT
-apply `half_step_measures`**: `food-shopping-list.js` totals for itself and
-never calls `halfStep`, so a handful there is still linear (`⅔ handfuls`,
-`1.17 handfuls`). Reported to Helen, not decided.
+amount, so scaling is by common sense."* **The index's shopping list reads the
+same `half_step_measures` and rounds to a WHOLE one, not a half** (#1297,
+above): `food-shopping-list.js` totals for itself and never calls `halfStep`.
 
 **ON A `makes:` RECIPE THE RECIPE PAGE'S BOX COUNTS THE THING MADE, NEVER
 PORTIONS, AND STEPS IN WHOLE RECIPES** (#1286, 2026-10-04). Helen: *"the scaler
@@ -1452,13 +1652,14 @@ and a word with no plural (`star anise`). A `serves:` recipe reaches one too
 (two eggs for four, shown for two) and gets the same answer. Back at the
 recipe's own count the written text returns byte for byte.
 
-**Three things this does NOT do.** `makes:` is still never read as PEOPLE:
+**Two things this does NOT do.** `makes:` is still never read as PEOPLE:
 `portions_for` is untouched and `page.portions` is still the
-`serves_estimate`. **The index's shopping list still scales these recipes by
-portions, one at a time** — it reads `page.portions` and knows nothing of
-`page.made`, whole recipes or halves. And **a count of nothing named (`makes:
-"about 8"`) keeps the portions box**, because there is no word to put after
-the number; that one is not ruled.
+`serves_estimate`. And **a count of nothing named (`makes: "about 8"`) keeps
+the portions box** on the recipe page, because there is no word to put after
+the number; that one is not ruled. (**The index's shopping list** scaled these
+recipes by portions until #1297; it now counts batches from the same three
+figures — "the list's rows", above — and for a count of nothing named its row
+reads "batches of" the title.)
 
 **The vocabulary is data**, `yields:` in `_data/food/scaling.yml`: the approx
 words, the number words, the measures, and `dozen`. Both readers are plain
@@ -1470,9 +1671,13 @@ portions box and the ones offered a half step.
 **Where it is tested.** `food-scale.test.js` (the recipe page's scaler, reading
 the real `scaling.yml`), `test_the_recipe_scaler_is_handed_the_half_step_measures`
 in `tests/test_site_config.py` (the data reaching the page),
-`food-shopping-list.test.js` (the arithmetic),
-`shopping-list.test.js` (the parser, including the no-change-for-cocktails
-claim), `food-index-startup.test.js` (the wiring, §10.2),
+`food-shopping-list.test.js` (the arithmetic, and #1297's rounding, fruit
+and pointer rules), `shopping-list.test.js` (the parser, including the
+no-change-for-cocktails claim), `food-index-startup.test.js` (the wiring and
+the batch rows, §10.2), `shortlist.test.js` (the batches store),
+`test_the_index_shopping_list_is_handed_the_by_eye_measures` and
+`test_the_whole_fruit_vocabulary_is_the_shape_the_plugin_reads` in
+`tests/test_site_config.py`,
 `tests/test_food_shopping.py` (the two data files),
 `tests/test_rendered_pages.py` (the **only** place the Ruby matcher can be
 checked — it caught `garlic cloves` landing on the spice rack).
@@ -4692,7 +4897,7 @@ correct rather than unfinished.
 
 `food/reference/` holds two pages: `internal-temperatures.html` (the charts)
 and `cooking-methods-and-timings.html` (a weight → schedule calculator plus
-the fish and shellfish tables, which are ON the page but not OF it — no
+the fish and shellfish lists, which are ON the page but not OF it — no
 weight to schedule from, and the page says so in a line of its own). No
 `index.html` and no nav link — Helen's call; the two footer links
 (`reference_links` in `sites.yml`) are the way in, because these pages are
@@ -4702,9 +4907,42 @@ look-up material for someone who already cooks, not a peer of the two sites.
 data as dead JSON, moved before they were deleted.
 
 Page pattern: `.recipe` / `.recipe-body-content`, the same wrapper as
-`about.html`. Tables are `<table>` markup — `food/*.html` is not run through
-kramdown. The charts page holds no `<table>` at all: every figure is a
-div-based chart drawn by `_includes/food/temp_row.html` from the data.
+`about.html`. Neither page holds a `<table>` since 2026-10-08. Every figure
+on the charts page is a div-based chart drawn by `_includes/food/temp_row.html`
+from the data: a row is its label and its figure on one line and the bar
+under them at the column's full width, the same at every width, with the
+contents list stuck to the top as a row of chips. The methods page's
+calculator writes one section per cut group (the data's `group`), each a
+list of method blocks — name and time on one line, the oven setting under
+them, the outcome last — and the fish and shellfish are definition lists,
+one entry per fish, its forms as lines, no notes. All three are Helen's
+choices from a candidates page (`scripts/reference_candidates.py`, DECISIONS
+§14, 2026-10-08). There is no hover text anywhere on the charts (#1326).
+
+**Since 2026-10-09 (DECISIONS §14, rounds two and three)**: a chart's figure
+is the two numbers its bar is drawn from (`48–50°C`, `70°C+`, `tender at
+90–96°C`) and never the data's display string, so no row says where to
+probe; the key has no entry for the shaded zone (the line's own label names
+the figure); there is no note under any chart and no rest time in a
+subtitle; the gridlines sit on 40, 50 … 100, generated from
+`$tc-min`/`$tc-max` in `_temperature-chart.scss`; a row's label and figure
+share a baseline with the bar tight under them and all the air below it;
+and the ten one-word chips wrap (two rows on a phone) rather than scroll.
+**The slow-cooked cuts are one section** (`#slow-cooked-cuts`: beef, lamb,
+pork, venison, one `tender at` figure each) and every roasting chart that
+used to hold one links to it; the other section ids are unchanged. On the
+methods page the WHAT dropdown and the weight box are one stacked form above
+the protein heading (the weight is hidden on its own when the dropdown says
+fish), the four birds read "(whole)", a time prints as `4h50m – 5h30m`, and
+the cut-group and fish names wear the heading-tier lettering with the single
+violet rule. **A method block (2026-10-10, started again)** runs the outcome
+and the time on its first line (body face at 600 / Plex Mono), the method's
+name in small grey Courier under them, then the oven setting a line per
+stage in Plex Mono; the data's `oven` is a list of short stage lines
+("220°C fan for 20 min", "180°C fan for the rest"). The block's vertical
+padding is declared on the `.ct-methods li` reset, because that rule
+out-specifies `.ct-method` and a padding on the block itself never applied. The salmon chart reaches the fish list with `?protein=fish`,
+which `cook-timer.js` reads as the dropdown's fish entry.
 
 ### The data layer — two datasets
 
@@ -4712,7 +4950,9 @@ div-based chart drawn by `_includes/food/temp_row.html` from the data.
 temperatures, endpoints and carryover — VOCABULARY layer. **"Out at", never
 "pull at"** (pull is American; `test_style.py` knows the phrase). Every figure
 is numeric AND a display string, because the strings carry words a number
-cannot ("74–75°C in the thigh"); `tests/test_reference_data.py` holds the
+cannot ("74–75°C in the thigh") — the recipe meta line and the calculator's
+"Done at" print the string, the charts print the numbers (2026-10-09);
+`tests/test_reference_data.py` holds the
 invariants, axis bounds, safety-threshold spec and note integrity. Four
 shapes: `endpoint` + `carryover` (whole poultry); `doneness: {level: {out_at,
 rested}}` + `carryover` (tender roasts, steak, salmon, tuna); `tender_at`
@@ -4723,9 +4963,11 @@ which keys exist on the resolved node.
 hand.** `scripts/build_cooking_methods.py` and
 `build_cooking_methods_prose.py` are MIGRATION TOOLS pinned to an old commit;
 **do not re-run them** — the data has been hand-edited since (the whole
-`venison` section) and a re-run overwrites 166 lines. Steak, fish and
-shellfish stay hand-written tables (eleven rowspans a generic loop would
-flatten).
+`venison` section) and a re-run overwrites 166 lines. Fish and shellfish
+stay hand-written in the page (lists since 2026-10-08; they carry no timings
+to reconcile against the data). Steak has no methods entry at all (#382).
+Every method row carries `oven` (a list of short stage lines since
+2026-10-10) and `outcome`, and the page renders both.
 
 ### Recipe wiring
 

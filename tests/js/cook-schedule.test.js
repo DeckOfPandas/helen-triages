@@ -31,6 +31,7 @@
 // asserts the corrected behaviour and says when it changed:
 //
 //   hhmm    emitted a singular "min" against house style          (2026-08-15)
+//           (and prints the compact "2h5m" since 2026-10-09, Helen's ask)
 //   clock   said "the day before" however far back it wrapped     (2026-08-15)
 //   resolve dropped flat_add_max from by_doneness' upper bound    (#245)
 //
@@ -138,36 +139,40 @@ test('round5 rounds to the nearest five minutes, both directions', () => {
   assert.strictEqual(CS.round5(0), 0);
 });
 
-test('hhmm: under an hour is minutes alone, with no "0 hrs"', () => {
-  assert.strictEqual(CS.hhmm(44), '45 mins');
-  assert.strictEqual(CS.hhmm(0), '0 mins');
+// COMPACT SINCE 2026-10-09. Helen: "Collapse timing display to e.g. '2h -
+// 3h', '4h - 4h50m', '10m - 15 m'. En dashes." These printed '45 mins',
+// '2 hrs 5 mins' and '1 hr – 2 hrs' from 2026-08-15 to then; the house's
+// "mins, never min" rule (MANUAL §5) is about the recipe pages' own time
+// lines and is not what this column is.
+
+test('hhmm: under an hour is minutes alone, with no "0h"', () => {
+  assert.strictEqual(CS.hhmm(44), '45m');
+  assert.strictEqual(CS.hhmm(0), '0m');
 });
 
-test('hhmm: a whole number of hours drops the minutes, and pluralises past one', () => {
-  assert.strictEqual(CS.hhmm(60), '1 hr');
-  assert.strictEqual(CS.hhmm(120), '2 hrs');
+test('hhmm: a whole number of hours drops the minutes', () => {
+  assert.strictEqual(CS.hhmm(60), '1h');
+  assert.strictEqual(CS.hhmm(120), '2h');
   // 62 rounds down to 60 first, so it is a whole hour by the time it prints.
-  assert.strictEqual(CS.hhmm(62), '1 hr');
+  assert.strictEqual(CS.hhmm(62), '1h');
 });
 
-test('hhmm: hours and minutes together, and the tail is always "mins"', () => {
-  // The singular "min" was a real house-style violation (MANUAL §5: a
-  // numeric quantity is "mins" in both the metadata and prose registers).
-  // Found by the refactor that extracted this module, fixed straight after it
-  // rather than inside it -- a behaviour change hidden in a commit claiming to
-  // make none is how a refactor stops being safe.
-  assert.strictEqual(CS.hhmm(125), '2 hrs 5 mins');
-  assert.strictEqual(CS.hhmm(85), '1 hr 25 mins');
+test('hhmm: hours and minutes together, run on with no space', () => {
+  assert.strictEqual(CS.hhmm(125), '2h5m');
+  assert.strictEqual(CS.hhmm(85), '1h25m');
+  assert.strictEqual(CS.hhmm(290), '4h50m');
 });
 
 test('span collapses to a single figure when the ends round together', () => {
   // 95 and 97 are one answer once you have decided five minutes is the
-  // resolution; "1 hr 35 mins – 1 hr 35 mins" would be the arithmetic showing.
-  assert.strictEqual(CS.span(95, 97), '1 hr 35 mins');
+  // resolution; "1h35m – 1h35m" would be the arithmetic showing.
+  assert.strictEqual(CS.span(95, 97), '1h35m');
 });
 
-test('span prints both ends when they genuinely differ', () => {
-  assert.strictEqual(CS.span(60, 120), '1 hr – 2 hrs');
+test('span prints both ends when they genuinely differ, joined by an en dash', () => {
+  assert.strictEqual(CS.span(60, 120), '1h – 2h');
+  assert.strictEqual(CS.span(240, 290), '4h – 4h50m');
+  assert.strictEqual(CS.span(10, 15), '10m – 15m');
 });
 
 // --- clock arithmetic -------------------------------------------------------

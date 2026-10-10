@@ -4124,3 +4124,100 @@ def test_the_glasses_page_shows_every_glass_once_with_its_surveyed_ml(prod_site)
     assert shifts["mug"] == g["base_centre"]["mug"] != 0, (
         "the mug is not shifted by its base_centre, so its label is centred on "
         "its handle again")
+
+
+# =============================================================================
+# #1297 — the index's shopping list: batches, whole fruit, pointers
+# =============================================================================
+
+def test_every_makes_recipe_reaches_the_shopping_list_as_a_batch_row(prod_site):
+    """A `makes:` recipe's box on the shopping list counts BATCHES.
+
+    Helen, 2026-10-09: 'The shopping list scaler could show e.g. "X batches of
+    18 Peanut Butter Cookies", allowing half-batches where that doesn't split
+    eggs.' The blob says so with `w`, and carries `h` (half offered) and `m`
+    (what one batch makes) beside it -- the same three figures the recipe
+    page's scaler reads, so the two controls step alike. A `serves:` recipe
+    carries none of them and still counts people.
+    """
+    blob = _shopping_blob(prod_site)
+    makes = {u: r for u, r in blob.items() if r["k"] == "makes"}
+    serves = {u: r for u, r in blob.items() if r["k"] == "serves"}
+    assert len(makes) >= 30, f"only {len(makes)} `makes:` recipes in the blob."
+
+    not_batch = sorted(u for u, r in makes.items() if r.get("w") is not True)
+    assert not not_batch, (
+        "these `makes:` recipes reached the shopping list without `w`, so "
+        f"their box counts portions again: {not_batch}"
+    )
+    wrong = sorted(u for u, r in makes.items()
+                   if not isinstance(r.get("h"), bool) or "m" not in r)
+    assert not wrong, f"`h` or `m` is missing beside `w` on: {wrong}"
+    stray = sorted(u for u, r in serves.items() if "w" in r or "m" in r)
+    assert not stray, f"a `serves:` recipe is marked as a batch row: {stray}"
+
+    waffles = blob["/food/recipes/henrys-sunday-waffles/"]
+    assert waffles["m"]["box"] == "4" and waffles["h"] is False, (
+        "Henry's waffles should read 'batches of 4' with no half batch "
+        f"(2026-10-04: '2-3 waffles isn't enough!!!!'); got {waffles['m']!r}, "
+        f"h={waffles['h']!r}"
+    )
+
+
+def test_a_fruit_written_as_its_juice_or_zest_is_marked_for_the_list(prod_site):
+    """'zest of 1 lemon' reaches the list as one lemon's zest -- #1297.
+
+    The matcher is Ruby inside Jekyll (_plugins/food_shopping.rb,
+    `mark_fruit`), so the built page is the only place it can be checked.
+    Three real lines, one per shape:
+
+      item: "finely grated zest of 1 lemon"      the count is in the item
+      amount: "1", item: "lemon, juiced"         the part is after the comma
+      amount: "1 tbsp", item: "lemon juice"      NOT a lemon: never marked
+    """
+    blob = _shopping_blob(prod_site)
+
+    def line(url, name):
+        found = [i for i in blob[url]["i"] if i["n"] == name]
+        assert len(found) == 1, f"{url} has {len(found)} lines named {name!r}"
+        return found[0]
+
+    zest = line("/food/recipes/raspberry-baked-cheesecake/",
+                "finely grated zest of 1 lemon")
+    assert (zest.get("f"), zest.get("c"), zest.get("pt")) == ("lemon", "1", ["zest"]), zest
+    assert zest["s"] == "produce", zest
+
+    juiced = line("/food/recipes/apple-coleslaw/", "lemon")
+    assert juiced.get("pt") == ["juice"] and "f" not in juiced, juiced
+
+    both = line("/food/recipes/cranberry-sauce/", "orange")
+    assert sorted(both.get("pt", [])) == ["juice", "zest"], both
+
+    bottled = line("/food/recipes/smoked-mackerel-pate/", "lemon juice")
+    assert not ({"pt", "f", "x"} & set(bottled)), (
+        f"45 ml of lemon juice was read as some number of lemons: {bottled}"
+    )
+
+
+def test_only_a_fruit_is_ever_marked_with_a_part(site):
+    """The marks stay on citrus, across the drafts too -- #1297.
+
+    "watermelon, rind kept on", "belly of pork, rind and bones removed" and
+    "parmesan rind" all hold a part WORD. None is a fruit in `whole_fruit`,
+    and a mark on one would let the list drop it as "the same fruit".
+    """
+    fruits = set(yaml.safe_load(
+        (ROOT / "_data" / "food" / "scaling.yml").read_text(encoding="utf-8")
+    )["whole_fruit"]["fruits"])
+    blob = _shopping_blob(site)
+
+    problems = []
+    for url, recipe in blob.items():
+        for ing in recipe["i"]:
+            if "pt" not in ing and "f" not in ing:
+                continue
+            name = (ing.get("f") or ing["n"]).lower()
+            last = name.split()[-1].rstrip("s")
+            if last not in fruits:
+                problems.append(f"{url}: {ing['n']!r} marked {ing.get('pt')}")
+    assert not problems, "not a fruit, and marked as one:\n  " + "\n  ".join(problems)

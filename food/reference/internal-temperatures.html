@@ -32,7 +32,6 @@ permalink: /food/reference/internal-temperatures/
 
 {% capture axis %}
   <div class="tc-axis">
-    <div></div>
     <div class="tc-axis-scale">
       <div class="tc-tick" style="--t:40;">40°C</div>
       <div class="tc-tick" style="--t:50;">50</div>
@@ -45,28 +44,42 @@ permalink: /food/reference/internal-temperatures/
   </div>
 {% endcapture %}
 
-<article class="recipe" id="top">
+<article class="recipe">
   <div class="recipe-title">
     <h1 class="recipe-main-title"><span class="recipe-title-text">Internal Temperatures</span></h1>
   </div>
 
   <div class="recipe-body-content">
 
-    {% comment %} Contents, following the pattern internal-temperatures.html
-       already uses -- an id on each h2 and a plain list of anchors. The
+    {% comment %} Contents: an id on each h2 and a plain list of anchors. The
        sections are alphabetical; the overview is last because it is a summary
-       of the others, not a protein of its own. {% endcomment %}
+       of the others, not a protein of its own.
+
+       THE LIST IS THE PAGE'S NAVIGATION, STUCK TO THE TOP, since 2026-10-08
+       (#1327): _sass/food/_temperature-chart.scss draws it as a sticky row of
+       chips that scrolls sideways. It was a two-column list at the top of the
+       page, and the way back up was a "↑ top" link under every chart -- eleven
+       of them, gone the same day, because the chips are always on screen.
+       Helen, on whether the page should stay one scroll rather than one
+       protein at a time: "Immediate reaction is 1, with good nav."
+
+       ONE WORD A CHIP, AND EVERY CHIP ON SCREEN, since 2026-10-09. The row
+       scrolled sideways with nothing to say that it did -- Helen: "it's not
+       clear at any point, even when the user is at the top of the page, that
+       there are more options scrolled away to the side." So the names are
+       short enough to wrap to two rows on a phone and one on a desktop, with
+       nothing hidden. Two of the long ones went when the slow-cooked cuts
+       became one section (below). {% endcomment %}
     <ul class="tc-contents">
-      <li><a href="#beef-steak">Beef: steak</a></li>
-      <li><a href="#beef-tender-roasting-cuts">Beef: tender roasting cuts</a></li>
-      <li><a href="#beef-tough-cuts">Beef: tough cuts</a></li>
-      <li><a href="#fish-salmon">Fish: salmon</a></li>
+      <li><a href="#beef-steak">Steak</a></li>
+      <li><a href="#beef-tender-roasting-cuts">Beef</a></li>
+      <li><a href="#fish-salmon">Salmon</a></li>
       <li><a href="#ham">Ham</a></li>
       <li><a href="#lamb">Lamb</a></li>
       <li><a href="#pork">Pork</a></li>
       <li><a href="#poultry">Poultry</a></li>
-      <li><a href="#venison-tender-roasting-cuts">Venison: tender roasting cuts</a></li>
-      <li><a href="#venison-slow-cooked-cuts">Venison: slow-cooked cuts</a></li>
+      <li><a href="#venison-tender-roasting-cuts">Venison</a></li>
+      <li><a href="#slow-cooked-cuts">Slow-cooked</a></li>
       <li><a href="#all">All</a></li>
     </ul>
 
@@ -95,10 +108,18 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
+
+    {% comment %} THE SLOW-COOKED CUTS HAVE ONE SECTION OF THEIR OWN, near the
+       foot of the page, since 2026-10-09. Beef's tough cuts had a section
+       here, venison's slow-cooked cuts had one after its roasting cuts, and
+       lamb and pork each carried one slow-cooked row at the right-hand end of
+       their roasting chart. Helen, asked whether pulling them out would feel
+       messier: "okay great, let's do it." Every roasting chart that lost a
+       row or a section carries a second link on its crosslink line, to the
+       slow-cooked section. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="beef-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tender roasting cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -109,34 +130,21 @@ permalink: /food/reference/internal-temperatures/
              build-crashing syntax error, not a silent nil. {% endcomment %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
-          {% include food/temp_row.html label=label spec=spec tip="The dotted stretch is the carryover — widest here, because a large joint carries more hot mass out of the oven with it." %}
+          {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
-
-    <h2 class="recipe-section-heading" id="beef-tough-cuts"><span class="section-heading-text section-heading-text--reference">Beef: tough cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=beef">cooking methods and timings &rarr;</a></p>
-    <p class="recipe-section-subtitle">brisket, chuck, short rib, pot roast</p>
-
-    {% comment %} No key on this chart. It draws one bar, and that bar's own
-       value now reads "tender at 90–96°C" -- a key saying "tender at" beside it
-       would be the same three words twice. Helen: "remove the key as it's not
-       helpful." {% endcomment %}
-    <div class="tc">
-      <div class="tc-plot">
-        {% assign tough = t.beef.tough_cuts %}
-        {% include food/temp_row.html label="Tough cuts" spec=tough tip="Brisket, chuck, short rib, pot roast. These pass through 60-70°C while still tough and only give up around 90-96°C -- which is why they sit so far right of every doneness figure above." %}
-      </div>
-      {{ axis }}
-    </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="fish-salmon"><span class="section-heading-text section-heading-text--reference">Fish: salmon</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}#fish">cooking methods &rarr;</a></p>
+    {% comment %} ?protein=fish, not #fish, since 2026-10-09. The fish list
+       on the methods page sits inside the block the dropdown swaps in, hidden
+       until "Fish and shellfish" is picked -- so a bare anchor landed on a
+       page showing beef with nothing scrolled to. cook-timer.js reads
+       ?protein=fish as that dropdown entry. {% endcomment %}
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=fish">cooking methods &rarr;</a></p>
 
-    {% include food/temp_key.html rested=true unsafe=true %}
+    {% include food/temp_key.html rested=true %}
     <div class="tc">
       <div class="tc-plot">
         <div class="tc-unsafe" style="--t:{{ t.fish.salmon.safety_min }};"></div>
@@ -153,13 +161,17 @@ permalink: /food/reference/internal-temperatures/
       {{ axis }}
     </div>
 
-    <p class="tc-note">FSA advice is a minimum serving temperature of {{ t.fish.general.endpoint_min }}°C.</p>
-    <a class="tc-totop" href="#top">&uarr; top</a>
+    {% comment %} NO NOTE UNDER ANY CHART, since 2026-10-09. Salmon's said
+       "FSA advice is a minimum serving temperature of 63°C" and pork's spelt
+       out the FSA held-temperature equivalences; Helen: "delete all extra
+       notes below all tables... all of them." The shaded zone and its label
+       on the plot carry the figure; the full safety notes stay in
+       internal_temperatures.yml. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="ham"><span class="section-heading-text section-heading-text--reference">Ham</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=ham">cooking methods and timings &rarr;</a></p>
 
-    {% include food/temp_key.html rested=true unsafe=true %}
+    {% include food/temp_key.html rested=true %}
     <div class="tc">
       <div class="tc-plot">
         <div class="tc-unsafe" style="--t:{{ t.ham.fresh.safety_min }};"></div>
@@ -170,14 +182,13 @@ permalink: /food/reference/internal-temperatures/
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
         {% assign cured = t.ham.cured %}
-        {% include food/temp_row.html label="Cured" spec=cured tip="Check the packaging first: 'cook before eating' and 'ready to eat' are handled differently, and this figure is for a raw-cured ham that still needs cooking." %}
+        {% include food/temp_row.html label="Cured" spec=cured %}
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="lamb"><span class="section-heading-text section-heading-text--reference">Lamb</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=lamb">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=lamb">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
@@ -187,25 +198,23 @@ permalink: /food/reference/internal-temperatures/
           {% assign spec = level[1] %}
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
-        {% assign lslow = t.lamb.slow_cooked %}
-        {% include food/temp_row.html label="Slow-cooked" spec=lslow tip="Shoulder and breast. Same logic as pork's slow-cooked cuts -- tested by fork, not thermometer alone." %}
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="pork"><span class="section-heading-text section-heading-text--reference">Pork</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=pork">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=pork">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
-    {% include food/temp_key.html rested=true carry=true unsafe=true %}
+    {% include food/temp_key.html rested=true carry=true %}
     <div class="tc">
       <div class="tc-plot">
         {% comment %} The FSA line at 70°C is the whole reason this section
            earns a drawing. internal_temperatures.yml flags pork's "medium" as
            not clearing UK guidance, in a safety_note nobody reads until after
-           they've cooked. Here the shading says it before the sentence does --
-           and note that medium's RESTED figure clears nothing either, because
-           FSA's table is about temperature HELD, not passed through. {% endcomment %}
+           they've cooked. Here the shading says it -- and note that medium's
+           RESTED figure clears nothing either, because FSA's table is about
+           temperature HELD, not passed through. A sentence under the chart
+           said so until 2026-10-09 (see the note above the ham heading). {% endcomment %}
         <div class="tc-unsafe" style="--t:{{ t.pork.roasting.safety_min }};"></div>
         <div class="tc-threshold-label" style="--t:{{ t.pork.roasting.safety_min }};">{{ t.pork.roasting.safety_label }} &rarr;</div>
         {% for level in t.pork.roasting.doneness %}
@@ -213,25 +222,17 @@ permalink: /food/reference/internal-temperatures/
           {% assign spec = level[1] %}
           {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
-        {% assign slow = t.pork.slow_cooked %}
-        {% include food/temp_row.html label="Slow-cooked" spec=slow tip="Shoulder and belly, cooked well past done until fat and collagen render. Go by how easily a fork twists, not by a doneness figure." %}
       </div>
       {{ axis }}
     </div>
 
-    {% comment %} The data's own safety_note runs to ~150 words, written for
-       someone auditing the figure. This is the version for someone cooking: the
-       FSA equivalences it turns on, and nothing else. HELD, not passed through
-       on the way past — which is exactly why the medium figure doesn't clear it,
-       and the one thing this sentence has to carry. "Pull" is gone with the rest
-       of that vocabulary. The full note stays in internal_temperatures.yml.
-       {% endcomment %}
-    <p class="tc-note">FSA wants pork <em>held</em> at 60°C for 45&nbsp;min, 65°C for 10&nbsp;min, 70°C for 2&nbsp;min, or 75°C for 30&nbsp;sec — held, not passed through as it cools. Only the well-done figure clears that.</p>
-    <a class="tc-totop" href="#top">&uarr; top</a>
-
     <h2 class="recipe-section-heading" id="poultry"><span class="section-heading-text section-heading-text--reference">Poultry</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=chicken">cooking methods and timings &rarr;</a></p>
-    <p class="recipe-section-subtitle">by the thigh, not the breast</p>
+    {% comment %} "by the thigh, not the breast" sat here as a subtitle until
+       2026-10-09, and went with "in the thigh" on every row's figure -- the
+       same instruction, and Helen asked for all of it off the charts. The
+       data's endpoint strings still say where to probe, on a recipe page's
+       meta line and the calculator's "Done at". {% endcomment %}
 
     {% include food/temp_key.html solid="reaches" %}
     <div class="tc">
@@ -250,7 +251,6 @@ permalink: /food/reference/internal-temperatures/
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     {% comment %} VENISON'S CROSSLINKS REACH THE CALCULATOR NOW, like every
        other section that has timings behind it. They used to stop at
@@ -261,7 +261,7 @@ permalink: /food/reference/internal-temperatures/
        where the rest go, with the wording the rest use. {% endcomment %}
 
     <h2 class="recipe-section-heading" id="venison-tender-roasting-cuts"><span class="section-heading-text section-heading-text--reference">Venison: tender roasting cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a></p>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a> <a class="tc-crosslink" href="#slow-cooked-cuts">slow-cooked cuts &rarr;</a></p>
 
     {% include food/temp_key.html rested=true carry=true %}
 
@@ -280,19 +280,23 @@ permalink: /food/reference/internal-temperatures/
              build-crashing syntax error, not a silent nil. {% endcomment %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
-          {% include food/temp_row.html label=label spec=spec tip="A loin is small and lean, so it carries very little heat off the pan -- and goes from rare to overcooked in a minute or two." %}
+          {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
       </div>
       {{ axis }}
     </div>
 
-    <p class="recipe-section-subtitle">Haunch &mdash; rest {{ t.venison.haunch.rest_min }} minutes</p>
+    {% comment %} "Haunch — rest 20 minutes" until 2026-10-09; the rest time
+       went with the other notes (Helen named this one). The subtitle stays
+       because two charts share one heading and this is how you tell them
+       apart. {% endcomment %}
+    <p class="recipe-section-subtitle">Haunch</p>
     <div class="tc">
       <div class="tc-plot">
         {% for level in t.venison.haunch.doneness %}
           {% assign label = level[0] | replace: "_", " " | capitalize %}
           {% assign spec = level[1] %}
-          {% include food/temp_row.html label=label spec=spec tip="The dotted stretch is the carryover, and it is wider here than on the loin above for the same reason a beef joint's is wide: a big lean haunch takes a lot of hot mass out of the oven with it." %}
+          {% include food/temp_row.html label=label spec=spec %}
         {% endfor %}
       </div>
       {{ axis }}
@@ -304,24 +308,29 @@ permalink: /food/reference/internal-temperatures/
        venison is fine; mince is the exception) sat here until 2026-09-10 and
        Helen deleted it (#872): the chart says it, and the mince case is not a
        question a thermometer answers. {% endcomment %}
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
-    <h2 class="recipe-section-heading" id="venison-slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Venison: slow-cooked cuts</span></h2>
-    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}?protein=venison">cooking methods and timings &rarr;</a></p>
-    <p class="recipe-section-subtitle">shoulder, neck and shank</p>
+    <h2 class="recipe-section-heading" id="slow-cooked-cuts"><span class="section-heading-text section-heading-text--reference">Slow-cooked cuts</span></h2>
+    <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}">cooking methods and timings &rarr;</a></p>
+    <p class="recipe-section-subtitle">beef brisket, chuck and short rib; lamb and pork shoulder, breast and belly; venison shoulder, neck and shank</p>
 
-    {% comment %} No key, for the same reason beef's tough cuts chart has none:
-       one bar, whose own value already reads "tender at 90–95°C". Shoulder,
-       neck and shank all carry that one figure, so they draw as one row rather
-       than as three identical ones. {% endcomment %}
+    {% comment %} FOUR ANIMALS, ONE FIGURE. Every row here is a tenderness
+       threshold rather than a doneness -- collagen giving way, tested with a
+       fork -- and the four sit within a degree of each other, which is the
+       fact this chart makes visible and the reason it is one section rather
+       than a row at the far end of four roasting charts (2026-10-09, see the
+       comment above the beef heading). No key: each value already reads
+       "tender at", and a key saying it beside them would be the same words
+       twice. The methods link carries no ?protein= because the slow-cooked
+       groups live under four of the dropdown's proteins. {% endcomment %}
     <div class="tc">
       <div class="tc-plot">
-        {% assign vslow = t.venison.shoulder %}
-        {% include food/temp_row.html label="Slow-cooked" spec=vslow tip="Shoulder, neck and shank. Braised until the collagen gives, tested by fork rather than by thermometer alone -- no UK venison source publishes a figure for this at all, so 90-95°C is the same collagen figure this site uses for pork and lamb shoulder." %}
+        {% include food/temp_row.html label="Beef" spec=t.beef.tough_cuts %}
+        {% include food/temp_row.html label="Lamb" spec=t.lamb.slow_cooked %}
+        {% include food/temp_row.html label="Pork" spec=t.pork.slow_cooked %}
+        {% include food/temp_row.html label="Venison" spec=t.venison.shoulder %}
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
     <h2 class="recipe-section-heading" id="all"><span class="section-heading-text section-heading-text--reference">All</span></h2>
     <p class="tc-crosslink-line"><a class="tc-crosslink" href="{{ '/food/reference/cooking-methods-and-timings/' | relative_url }}">cooking methods and timings &rarr;</a></p>
@@ -332,7 +341,7 @@ permalink: /food/reference/internal-temperatures/
         {% comment %} Every span below is COMPUTED from the data, not typed --
            see _includes/food/temp_span.html for why the obvious
            `| map: "out_at_min" | sort | first` silently returns nils here. {% endcomment %}
-        {% include food/temp_span.html label="Tuna" doneness=t.fish.tuna.doneness tip="The widest range of anything here, and served rare by default." %}
+        {% include food/temp_span.html label="Tuna" doneness=t.fish.tuna.doneness %}
         {% include food/temp_span.html label="Salmon" doneness=t.fish.salmon.doneness %}
         {% include food/temp_span.html label="Steak" doneness=t.steak.doneness %}
         {% include food/temp_span.html label="Beef roast" doneness=t.beef.tender_roast.doneness %}
@@ -341,56 +350,28 @@ permalink: /food/reference/internal-temperatures/
            generally rather than per cut -- and this chart plots out-at spans, so
            a second row would draw a bar exactly on top of the first. What
            actually separates the two cuts is carryover (2-3°C against 4-6°C),
-           which this overview doesn't show at all; the section above does, which
-           is where the tip sends you. Sits here because the list runs by lower
-           bound and venison's 48°C ties with beef's. {% endcomment %}
-        {% include food/temp_span.html label="Venison roast" doneness=t.venison.loin.doneness tip="Loin and haunch share these figures; what differs is carryover, so see the venison section for the two side by side. No shaded zone: FSA treats a whole cut of venison as it treats beef." %}
-        {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness tip="UK guidance treats pink lamb like pink beef." %}
-        {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness tip="The medium figure is the one flagged against FSA guidance." %}
+           which this overview doesn't show at all; the section above does.
+           Sits here because the list runs by lower bound and venison's 48°C
+           ties with beef's. {% endcomment %}
+        {% include food/temp_span.html label="Venison roast" doneness=t.venison.loin.doneness %}
+        {% include food/temp_span.html label="Lamb roast" doneness=t.lamb.roasting.doneness %}
+        {% include food/temp_span.html label="Pork roast" doneness=t.pork.roasting.doneness %}
 
-        <div class="tc-row">
-          <div class="tc-row-label">Fish, general</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.fish.general.endpoint_max }};">{{ t.fish.general.endpoint }}</div>
-            <div class="tc-hit" tabindex="0" style="--a:{{ t.fish.general.endpoint_min }}; --b:{{ t.fish.general.endpoint_max }};"
-                 data-tip="Everything that isn't salmon or tuna: one endpoint, {{ t.fish.general.endpoint }}. No doneness spectrum worth codifying."></div>
-          </div>
-        </div>
-
-        <div class="tc-row">
-          <div class="tc-row-label">Poultry</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.poultry.chicken.endpoint_max }};">{{ t.poultry.chicken.endpoint }}</div>
-            <div class="tc-hit" tabindex="0" style="--a:{{ t.poultry.chicken.endpoint_min }}; --b:{{ t.poultry.chicken.endpoint_max }};"
-                 data-tip="Chicken, turkey, goose and whole duck all share one endpoint: {{ t.poultry.chicken.endpoint }} -- the thigh, not the breast, because it's the last part to come up."></div>
-          </div>
-        </div>
-
-        <div class="tc-row">
-          <div class="tc-row-label">Cured ham</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.ham.cured.target_max }};">{{ t.ham.cured.target }}</div>
-            <div class="tc-hit" tabindex="0" style="--a:{{ t.ham.cured.target_min }}; --b:{{ t.ham.cured.target_max }};"
-                 data-tip="Cured ham that still needs cooking: {{ t.ham.cured.target }}. Check the packaging first -- 'cook before eating' and 'ready to eat' are different things."></div>
-          </div>
-        </div>
-
-        <div class="tc-row">
-          <div class="tc-row-label">Slow-cooked</div>
-          <div class="tc-track">
-            <div class="tc-out-at" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"></div>
-            <div class="tc-value" style="--b:{{ t.beef.tough_cuts.tender_at_max }};">tender at {{ t.beef.tough_cuts.tender_at }}</div>
-            <div class="tc-hit" tabindex="0" style="--a:{{ t.beef.tough_cuts.tender_at_min }}; --b:{{ t.beef.tough_cuts.tender_at_max }};"
-                 data-tip="Brisket, chuck, short rib, pork shoulder, lamb shoulder. Not a temperature you take it out at -- collagen breakdown. These pass through {{ t.beef.tough_cuts.passes_through }}. Test with a fork, not a thermometer alone."></div>
-          </div>
-        </div>
+        {% comment %} The four single-figure rows go through temp_row.html
+           like every other row, since 2026-10-09. They were written out by
+           hand, printing the data's display strings -- "~63°C, opaque and
+           flaking", "70–75°C at the thickest point" -- and the include now
+           builds its figure from the numbers, which is how those words came
+           off this chart with the rest. temp_row finds the figure each node
+           carries (endpoint, target, tender_at) and says "tender at" for the
+           last. {% endcomment %}
+        {% include food/temp_row.html label="Fish, general" spec=t.fish.general %}
+        {% include food/temp_row.html label="Poultry" spec=t.poultry.chicken %}
+        {% include food/temp_row.html label="Cured ham" spec=t.ham.cured %}
+        {% include food/temp_row.html label="Slow-cooked" spec=t.beef.tough_cuts %}
       </div>
       {{ axis }}
     </div>
-    <a class="tc-totop" href="#top">&uarr; top</a>
 
   </div>
 </article>

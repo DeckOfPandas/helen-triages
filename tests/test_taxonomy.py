@@ -399,13 +399,32 @@ def test_incidental_not_in_main_ingredients(recipe):
     main = {_fold(str(m)) for m in (recipe.fm.get("main_ingredients") or [])}
     if not main:
         return
+
+    def named(item):
+        return _fold(str(item.get("item", "")).split(",")[0].strip())
+
+    # WHAT THE RECIPE REALLY USES, by name: every line that is NOT incidental.
+    # #1356, 2026-10-10: the raspberry cheesecake greases its tin with salted
+    # butter and also puts butter in the base. `main_ingredients` says "salted
+    # butter" for the base, and the greasing line carrying the flag does not
+    # make that wrong. A main ingredient is an offence only when nothing but
+    # an incidental line accounts for it.
+    core = {named(item)
+            for group in recipe.fm.get("ingredient_groups") or []
+            for item in group.get("items") or []
+            if isinstance(item, dict) and not item.get("incidental")}
+
+    def accounted_for(m):
+        return any(c and (c in m or m in c) for c in core)
+
     offenders = []
     for group in recipe.fm.get("ingredient_groups") or []:
         for item in group.get("items") or []:
             if not isinstance(item, dict) or not item.get("incidental"):
                 continue
-            name = _fold(str(item.get("item", "")).split(",")[0].strip())
-            hits = [m for m in main if name and (name in m or m in name)]
+            name = named(item)
+            hits = [m for m in main
+                    if name and (name in m or m in name) and not accounted_for(m)]
             if hits:
                 offenders.append((item.get("item"), hits))
     assert not offenders, (

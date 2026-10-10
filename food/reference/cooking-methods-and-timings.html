@@ -76,23 +76,35 @@ permalink: /food/reference/cooking-methods-and-timings/
        round -- the page announced BEEF and then offered a box that turned out
        to change what it had just announced.
 
-       It is deliberately NOT in .ct-controls with the weight any more. The two
-       boxes do different jobs now: this one chooses the subject, the weight
-       one refines the answer, and the heading between them is the seam.
-       {% endcomment %}
-    <div class="ct-protein-pick">
-      <label class="ct-field">
-        <span>What</span>
-        <select id="ct-protein"></select>
-      </label>
+       AND THE WEIGHT SITS DIRECTLY UNDER IT, since 2026-10-09. From #253 the
+       weight box lived in a band of its own under the protein heading, a
+       section away from the dropdown; Helen: "move the weight input field to
+       just below the protein selector dropdown, so the user is saying 'I have
+       chicken, 3 kg'." So the two inputs are one form again, stacked, and
+       the heading below retitles itself from the first of them.
+
+       The weight is outside #ct-calculator but is put away with it:
+       cook-timer.js hides this one field when the dropdown says fish, since
+       fish are not cooked by weight. The dropdown itself is never hidden,
+       because it is how you get back. {% endcomment %}
+    <div class="ct-inputs">
+      <div class="ct-form">
+        <label class="ct-field">
+          <span>What</span>
+          <select id="ct-protein"></select>
+        </label>
+        <label class="ct-field" id="ct-weight-field">
+          <span>Weight (kg)</span>
+          <input id="ct-weight" type="number" min="0.3" max="15" step="0.1" value="2.4" inputmode="decimal">
+        </label>
+      </div>
     </div>
 
     {% comment %} EVERYTHING FROM HERE TO </div id=ct-calculator> IS THE
-       INSTRUMENT, and it is wrapped so the dropdown can put it away. Issue #412
-       gives fish and shellfish their own entry in that dropdown; picking it
-       swaps this whole block for the section below rather than showing a
-       weight box that cannot answer anything. The dropdown itself stays outside
-       the wrapper, because it is how you get back. {% endcomment %}
+       INSTRUMENT'S ANSWER, and it is wrapped so the dropdown can put it away.
+       Issue #412 gives fish and shellfish their own entry in that dropdown;
+       picking it swaps this whole block for the section below rather than
+       showing a schedule that cannot answer anything. {% endcomment %}
     <div id="ct-calculator">
     {% comment %} `data-last-line-rule="skip"` because THIS heading's text is
        cook-timer.js's, rewritten every time the dropdown changes.
@@ -124,45 +136,36 @@ permalink: /food/reference/cooking-methods-and-timings/
        {% endcomment %}
     <p class="ct-doneat" id="ct-doneat"></p>
 
-    {% comment %} The calculator line: what, and how heavy. Two boxes now, and
-       the wrapper's bottom border is the second of the sketch's two rules --
-       kept because it closes a band of INPUTS before a band of answers, which
-       is a different job from separating two labelled sections. It lives on
-       the wrapper rather than on the form so the rule still draws whatever the
-       form ends up containing. {% endcomment %}
-    {% comment %} The weight, alone now, and its wrapper's bottom border is the
-       horizontal line issue #253 asks for after this field. Kept on the
-       wrapper rather than the form so the rule still draws whatever the form
-       ends up containing. {% endcomment %}
-    <div class="ct-controls">
-      <div class="ct-form">
-        <label class="ct-field">
-          <span>Weight (kg)</span>
-          <input id="ct-weight" type="number" min="0.3" max="15" step="0.1" value="2.4" inputmode="decimal">
-        </label>
-      </div>
-    </div>
+    {% comment %} The weight box sat here, in a .ct-controls band closed by a
+       rule (#253's horizontal line), from 2026-08-16 to 2026-10-09. It is
+       under the dropdown now, above the heading -- see there. {% endcomment %}
 
-    {% comment %} One heading over the table, replacing "Details" -- issue
+    {% comment %} One heading over the methods, replacing "Details" -- issue
        #253. THE CARDS THAT SAT UNDER THE TABLE ARE GONE, #873, Helen
        2026-09-09: "they're not adding information beyond the table, and
-       remain a little hard to read." cook-timer.js no longer renders them
-       and _sass/food/_timings.scss no longer styles them.
+       remain a little hard to read." AND THE TABLE WENT ON 2026-10-08
+       (#1329): cook-timer.js writes one section per cut group now, each a
+       list of method blocks carrying the oven setting -- see
+       _sass/food/_timings.scss for the shape and Helen's words.
 
        #ct-summary is kept but no longer carries the count. "7 ways to cook
-       2.4 kg of beef" duplicated a table sitting immediately beneath it that
-       says the same thing at more use. What is left is the prompt when there
-       is no usable weight, which is the one thing the table cannot say for
-       itself -- it is empty at exactly that moment. role="status" so a
-       recalculation is announced rather than only seen. {% endcomment %}
+       2.4 kg of beef" duplicated what sat immediately beneath it. What is
+       left is the prompt when there is no usable weight, which is the one
+       thing the list cannot say for itself -- it is empty at exactly that
+       moment. role="status" so a recalculation is announced rather than only
+       seen. {% endcomment %}
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Cooking Methods</span></h2>
 
     <p class="ct-summary" id="ct-summary" role="status"></p>
 
-    {% comment %} The decision table: which method, before how long. Populated
-       by cook-timer.js; .table-scroll is the site's existing wrapper for a
-       table too wide for the column. {% endcomment %}
-    <div class="table-scroll" id="ct-table"></div>
+    {% comment %} The methods, by cut: which method, at what oven setting,
+       for how long. Populated by cook-timer.js. {% endcomment %}
+    {% comment %} ct-method-groups, not ct-methods: the JSON block at the top
+       of this file already carries id="ct-methods", and the round-one build
+       gave this div the same id (2026-10-08). document.getElementById found
+       the script first and the page worked by accident; the duplicate was
+       caught by a locator on 2026-10-09. {% endcomment %}
+    <div id="ct-method-groups"></div>
     </div>{%- comment -%} /#ct-calculator {%- endcomment -%}
 
     {% comment %} The long explanation of why some rows decline used to live
@@ -188,14 +191,17 @@ permalink: /food/reference/cooking-methods-and-timings/
        below says so. The protein dropdown lists nine roasting proteins and will
        never list these: fish is governed by THICKNESS and shellfish by the
        shell opening, so there is no weight-driven schedule to compute. Without
-       a line saying that, two tables sitting under an instrument read as a
+       a line saying that, two lists sitting under an instrument read as a
        section of it whose controls have gone missing.
 
-       The tables stay hand-written rather than moving into cooking_methods.yml.
-       They carry no timings to reconcile against the data, and fish's uses
-       eleven rowspans and several empty cells that a generic rows-loop would
-       flatten into a different table. Same reasoning as when they were left
-       hand-written on the old page.
+       LISTS, NOT TABLES, SINCE 2026-10-08 (#1330). They were two hand-written
+       tables -- fish by form with eleven rowspans, and a Notes column that was
+       mostly empty -- 453px wide in a 390px screen and 5,000px tall. Helen
+       chose "list, no notes" on the candidates page, so each fish is a <dt>
+       and each of its forms a <dd>, and the notes are deleted rather than
+       hidden (git history has them). Still hand-written rather than data:
+       they carry no timings to reconcile against cooking_methods.yml, and a
+       list this plain is as easy to edit here as anywhere.
     {% endcomment %}
     <div id="ct-fish-shellfish" hidden>
 
@@ -205,43 +211,81 @@ permalink: /food/reference/cooking-methods-and-timings/
 
     <h2 class="recipe-section-heading" id="fish"><span class="section-heading-text section-heading-text--reference">Fish</span></h2>
 
-    <div class="table-scroll">
-      <table>
-        <thead>
-          <tr><th>Fish</th><th>Form</th><th>Best methods</th><th>Notes</th></tr>
-        </thead>
-        <tbody>
-          <tr><td rowspan="2">Cod / haddock</td><td>Fillet</td><td>Pan-fry with dredge (flour/breadcrumb); oven-bake; poach; steam</td><td>Thick fillets suit baking over pan-frying alone</td></tr>
-          <tr><td>Whole</td><td>Oven-bake (less common form for these species)</td><td></td></tr>
-          <tr><td rowspan="3">Halibut / turbot</td><td>Steak</td><td>Pan-fry + oven finish; poach</td><td>Lean and dense — gentle finish avoids drying out</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry + oven finish; poach; oven-roast</td><td></td></tr>
-          <tr><td>Whole (turbot)</td><td>Whole roast</td><td>Large flatfish, roasted much like a small joint</td></tr>
-          <tr><td rowspan="2">Herring</td><td>Whole</td><td>Pan-fry (often dredged in oatmeal); grill/BBQ; soused/pickled (no heat)</td><td>Oily fish, similar logic to mackerel</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td rowspan="2">John Dory</td><td>Whole</td><td>Roast</td><td></td></tr>
-          <tr><td>Fillet</td><td>Pan-fry; steam</td><td>Delicate flesh, restrained methods preferred</td></tr>
-          <tr><td rowspan="2">Mackerel</td><td>Whole</td><td>Grill/BBQ (classic); oven-bake; smoke</td><td>Oily flesh copes well with fierce direct heat</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td>Monkfish</td><td>Fillet/tail</td><td>Pan-fry + oven finish; roast whole tail; poach</td><td>Firm, meat-like texture</td></tr>
-          <tr><td rowspan="2">Plaice / sole</td><td>Whole</td><td>Pan-fry, dredged ("meunière" style); grill</td><td>Classic preparation for both</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td>Cooks very quickly given thinness</td></tr>
-          <tr><td rowspan="2">Red mullet</td><td>Whole</td><td>Pan-fry; grill/BBQ; oven-bake</td><td></td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td rowspan="3">Salmon</td><td>Fillet</td><td>Pan-fry (skin-down first); oven-roast</td><td>Fatty enough to tolerate most methods well</td></tr>
-          <tr><td>Whole</td><td>Whole roast; poach</td><td>Poaching a whole side is classic</td></tr>
-          <tr><td>Steak/cutlet</td><td>Poach; grill/BBQ; pan-fry</td><td></td></tr>
-          <tr><td rowspan="2">Sea bass</td><td>Whole</td><td>Roast; steam (esp. Chinese-style); grill/BBQ</td><td></td></tr>
-          <tr><td>Fillet</td><td>Pan-fry, skin-down</td><td>Skin crisps very well</td></tr>
-          <tr><td rowspan="2">Sea bream</td><td>Whole</td><td>Roast; grill/BBQ; salt-baked</td><td>Salt-crust baking is a well-known bream-specific method</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td>Skate</td><td>Wing</td><td>Pan-fry; poach; steam</td><td>Its own cut — neither fillet nor steak</td></tr>
-          <tr><td>Swordfish</td><td>Steak</td><td>Grill/BBQ; pan-fry + finish; sear</td><td>Dense, meaty — copes with high direct heat</td></tr>
-          <tr><td rowspan="2">Trout</td><td>Whole</td><td>Pan-fry (classic "amandine" style); oven-bake; grill/BBQ; poach</td><td>Whole pan-frying is unusually common for trout given its small size</td></tr>
-          <tr><td>Fillet</td><td>Pan-fry</td><td></td></tr>
-          <tr><td>Tuna</td><td>Steak</td><td>Sear (pan or grill), often left rare/blue centre</td><td>Intentionally undercooked in the centre — not a shortcut</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <dl class="fish-list">
+      <div class="fish-item">
+        <dt><span class="fish-name">Cod / haddock</span></dt>
+        <dd><b>Fillet</b> Pan-fry with dredge (flour/breadcrumb); oven-bake; poach; steam</dd>
+        <dd><b>Whole</b> Oven-bake (less common form for these species)</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Halibut / turbot</span></dt>
+        <dd><b>Steak</b> Pan-fry + oven finish; poach</dd>
+        <dd><b>Fillet</b> Pan-fry + oven finish; poach; oven-roast</dd>
+        <dd><b>Whole (turbot)</b> Whole roast</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Herring</span></dt>
+        <dd><b>Whole</b> Pan-fry (often dredged in oatmeal); grill/BBQ; soused/pickled (no heat)</dd>
+        <dd><b>Fillet</b> Pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">John Dory</span></dt>
+        <dd><b>Whole</b> Roast</dd>
+        <dd><b>Fillet</b> Pan-fry; steam</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Mackerel</span></dt>
+        <dd><b>Whole</b> Grill/BBQ (classic); oven-bake; smoke</dd>
+        <dd><b>Fillet</b> Pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Monkfish</span></dt>
+        <dd><b>Fillet/tail</b> Pan-fry + oven finish; roast whole tail; poach</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Plaice / sole</span></dt>
+        <dd><b>Whole</b> Pan-fry, dredged ("meunière" style); grill</dd>
+        <dd><b>Fillet</b> Pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Red mullet</span></dt>
+        <dd><b>Whole</b> Pan-fry; grill/BBQ; oven-bake</dd>
+        <dd><b>Fillet</b> Pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Salmon</span></dt>
+        <dd><b>Fillet</b> Pan-fry (skin-down first); oven-roast</dd>
+        <dd><b>Whole</b> Whole roast; poach</dd>
+        <dd><b>Steak/cutlet</b> Poach; grill/BBQ; pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Sea bass</span></dt>
+        <dd><b>Whole</b> Roast; steam (esp. Chinese-style); grill/BBQ</dd>
+        <dd><b>Fillet</b> Pan-fry, skin-down</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Sea bream</span></dt>
+        <dd><b>Whole</b> Roast; grill/BBQ; salt-baked</dd>
+        <dd><b>Fillet</b> Pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Skate</span></dt>
+        <dd><b>Wing</b> Pan-fry; poach; steam</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Swordfish</span></dt>
+        <dd><b>Steak</b> Grill/BBQ; pan-fry + finish; sear</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Trout</span></dt>
+        <dd><b>Whole</b> Pan-fry (classic "amandine" style); oven-bake; grill/BBQ; poach</dd>
+        <dd><b>Fillet</b> Pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Tuna</span></dt>
+        <dd><b>Steak</b> Sear (pan or grill), often left rare/blue centre</dd>
+      </div>
+    </dl>
 
     {% comment %} NO <strong> AT THE START OF THESE <li>s, and that is the whole
        of "no courier font" in issue #412. _sass/food/_recipe-notes-body.scss has
@@ -285,29 +329,64 @@ permalink: /food/reference/cooking-methods-and-timings/
 
     <h2 class="recipe-section-heading" id="shellfish"><span class="section-heading-text section-heading-text--reference">Shellfish</span></h2>
 
-    <div class="table-scroll">
-      <table>
-        <thead>
-          <tr><th>Shellfish</th><th>Best methods</th><th>Notes</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Abalone</td><td>Pan-fry, briefly; braise slowly</td><td>Like squid, has a narrow window — quick sear or long slow cook, nothing in between</td></tr>
-          <tr><td>Clams</td><td>Steam; pan-fry/sauté briefly</td><td>Same open-shell rule as mussels</td></tr>
-          <tr><td>Cockles</td><td>Steam; boil briefly</td><td>Similar to mussels/clams, cooked until open</td></tr>
-          <tr><td>Crab</td><td>Boil whole, then pick; steam whole</td><td>Usually cooked whole first, then meat extracted</td></tr>
-          <tr><td>Crawfish</td><td>Boil (classic, often spiced); steam</td><td>Common in Cajun-style boils</td></tr>
-          <tr><td>Langoustine (Dublin Bay prawn/scampi)</td><td>Grill/BBQ; poach/boil; pan-fry</td><td>Often split and grilled in the shell for extra flavour</td></tr>
-          <tr><td>Lobster</td><td>Boil whole; steam whole; split and grill/BBQ; split and oven-roast</td><td>Often boiled/steamed first then finished on the grill or under a broiler</td></tr>
-          <tr><td>Mussels</td><td>Steam (classic, e.g. white wine); pan-fry/sauté briefly</td><td>Cook just until shells open; discard any that stay shut</td></tr>
-          <tr><td>Octopus</td><td>Braise/simmer low and slow first, then char on a very hot grill/pan to finish</td><td>Almost always needs slow tenderising before a hot, fast finishing step</td></tr>
-          <tr><td>Oysters</td><td>Raw/shucked; grill/BBQ briefly; steam</td><td>Many prefer raw; if cooking, keep it brief to avoid toughening</td></tr>
-          <tr><td>Prawns/shrimp</td><td>Pan-fry/sauté; grill/BBQ; poach/boil; steam</td><td>Cooks in minutes; ready when opaque and curled</td></tr>
-          <tr><td>Scallops</td><td>Pan-sear (very hot, short); grill/BBQ; poach</td><td>Sear only 1–2 min per side — easy to overcook to rubberiness</td></tr>
-          <tr><td>Squid</td><td>Pan-fry/sauté, very hot and fast; deep-fry (classic "calamari"); grill/BBQ; braise slowly</td><td>Two good zones only — very fast high heat, or long slow braise; the middle ground turns it rubbery</td></tr>
-          <tr><td>Winkles</td><td>Boil briefly, then pick out with a pin</td><td>Traditionally eaten cold after boiling</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <dl class="fish-list">
+      <div class="fish-item">
+        <dt><span class="fish-name">Abalone</span></dt>
+        <dd>Pan-fry, briefly; braise slowly</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Clams</span></dt>
+        <dd>Steam; pan-fry/sauté briefly</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Cockles</span></dt>
+        <dd>Steam; boil briefly</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Crab</span></dt>
+        <dd>Boil whole, then pick; steam whole</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Crawfish</span></dt>
+        <dd>Boil (classic, often spiced); steam</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Langoustine (Dublin Bay prawn/scampi)</span></dt>
+        <dd>Grill/BBQ; poach/boil; pan-fry</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Lobster</span></dt>
+        <dd>Boil whole; steam whole; split and grill/BBQ; split and oven-roast</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Mussels</span></dt>
+        <dd>Steam (classic, e.g. white wine); pan-fry/sauté briefly</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Octopus</span></dt>
+        <dd>Braise/simmer low and slow first, then char on a very hot grill/pan to finish</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Oysters</span></dt>
+        <dd>Raw/shucked; grill/BBQ briefly; steam</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Prawns/shrimp</span></dt>
+        <dd>Pan-fry/sauté; grill/BBQ; poach/boil; steam</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Scallops</span></dt>
+        <dd>Pan-sear (very hot, short); grill/BBQ; poach</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Squid</span></dt>
+        <dd>Pan-fry/sauté, very hot and fast; deep-fry (classic "calamari"); grill/BBQ; braise slowly</dd>
+      </div>
+      <div class="fish-item">
+        <dt><span class="fish-name">Winkles</span></dt>
+        <dd>Boil briefly, then pick out with a pin</dd>
+      </div>
+    </dl>
 
     {% comment %} The bottom "See also: internal temperatures" line went with
        issue #412. It is not the loss it looks like: the fish section above still

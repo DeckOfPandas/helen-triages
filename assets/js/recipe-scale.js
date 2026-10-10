@@ -138,6 +138,8 @@
 
   var words = {
     halfStep: listFrom('data-half-step-measures'),
+    // A sprig, a bunch: the nearest quarter (#1297). Same route, same file.
+    quarterStep: listFrom('data-quarter-step-measures'),
     trailing: listFrom('data-trailing')
   };
 

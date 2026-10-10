@@ -488,6 +488,59 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
+    /* --- HOW MANY BATCHES — GitHub issue #1297 -----------------------------
+       A FOURTH KEY, and not the portions map with halves let in. On the
+       shopping list a `makes:` recipe's box counts BATCHES since 2026-10-09
+       (Helen: 'X batches of 18 Peanut Butter Cookies'), and a `serves:`
+       recipe's still counts people. A stored `6` cannot say which it was, and
+       every `makes:` recipe had a portions entry until that day -- so the two
+       are kept apart rather than one reinterpreted, the lesson `-v2` above
+       already paid for. The old portions entries of `makes:` recipes are
+       simply never read again.
+
+       A HALF IS STORABLE HERE and nothing else below one is: half a batch is
+       offered where the build judges it sane (page.half_recipe). Whether THIS
+       recipe may have one is the caller's question; the store only refuses
+       what no recipe can have. A missing entry is one batch. */
+    var BATCHES_PREFIX = 'htf-shortlist-batches-';
+    var batchCounts = null;
+
+    function batchesKey() {
+      return HTF.site ? BATCHES_PREFIX + HTF.site + '-v1' : '';
+    }
+
+    function wholeOrHalf(n) {
+      var value = Number(n);
+      if (!isFinite(value) || value <= 0) return null;
+      if (value < 0.75) return 0.5;
+      return Math.max(1, Math.round(value));
+    }
+
+    function readBatches() {
+      if (batchCounts) return batchCounts;
+      batchCounts = {};
+      var key = batchesKey();
+      if (!key) return batchCounts;
+      try {
+        var raw = JSON.parse(localStorage.getItem(key));
+        if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+          Object.keys(raw).forEach(function (url) {
+            var n = typeof raw[url] === 'number' ? wholeOrHalf(raw[url]) : null;
+            if (n !== null) batchCounts[url] = n;
+          });
+        }
+      } catch (e) { /* every recipe at one batch, and the page works */ }
+      return batchCounts;
+    }
+
+    function writeBatches() {
+      var key = batchesKey();
+      if (!key) return;
+      try {
+        localStorage.setItem(key, JSON.stringify(batchCounts));
+      } catch (e) { /* this visit still has it; tomorrow will not */ }
+    }
+
     /* A KEY'S SLUG: the last non-empty path segment, lowercased.
        `/food/recipes/dal/` and `/food/drafts/dal/` both answer `dal`. A key
        with no segment at all ("/") answers '', and is nobody. Shared by
@@ -541,7 +594,7 @@ window.HTF = window.HTF || {};
         return at === -1;
       },
 
-      /** Empty it — the marks and both count maps together. @returns {void} */
+      /** Empty it — the marks and all three count maps together. @returns {void} */
       clear: function () {
         entries = [];
         write();
@@ -549,6 +602,8 @@ window.HTF = window.HTF || {};
         writeGlasses();
         servings = {};
         writePortions();
+        batchCounts = {};
+        writeBatches();
       },
 
       /* --- HOW MANY OF EACH — GitHub issue #546, Helen 2026-09-04 ------------
@@ -623,6 +678,39 @@ window.HTF = window.HTF || {};
         return value;
       },
 
+      /**
+       * How many batches of this `makes:` recipe are wanted — #1297.
+       *
+       * @param {string} url
+       * @returns {number|null} a whole number or 0.5; `null` means nobody has
+       *          said, which is one batch
+       */
+      batches: function (url) {
+        var n = readBatches()[url];
+        return typeof n === 'number' && n > 0 ? n : null;
+      },
+
+      /**
+       * @param {string} url
+       * @param {number|null} n - batches: goes to the nearest whole number, or
+       *        to a half below three quarters; nothing or zero forgets the
+       *        entry, which puts the recipe back to one batch
+       * @returns {number|null} what it ended up as
+       */
+      setBatches: function (url, n) {
+        if (!url) return null;
+        var all = readBatches();
+        var value = wholeOrHalf(n);
+        if (value === null) {
+          delete all[url];
+          writeBatches();
+          return null;
+        }
+        all[url] = value;
+        writeBatches();
+        return value;
+      },
+
       /* `snapshot()` (the JSON export, #849) and `restore()` (pasting one back,
          #850) lived here until #1100, 2026-09-15 -- Helen: "Remove the rest of
          the apparatus: no JSON export or import, no clear." The share link is
@@ -689,7 +777,7 @@ window.HTF = window.HTF || {};
       /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module
          reads localStorage once and caches; a test that wants a second scenario
          in the same page needs to say so. */
-      _forget: function () { entries = null; counts = null; servings = null; }
+      _forget: function () { entries = null; counts = null; servings = null; batchCounts = null; }
     };
   })();
 

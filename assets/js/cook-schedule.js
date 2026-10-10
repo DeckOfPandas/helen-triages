@@ -52,8 +52,8 @@
   'use strict';
 
   /* --- formatting ---------------------------------------------------------
-     Minutes are the working unit throughout and only ever become words at the
-     edge. "2 hrs 5 mins" rather than "125 mins": you read this while planning a
+     Minutes are the working unit throughout and only ever become a figure at
+     the edge. "2h5m" rather than "125 mins": you read this while planning a
      meal, not while timing an experiment. */
   /* FIVE-MINUTE GRANULARITY, applied once here and reused by the clock
      arithmetic below so a duration and the time it implies can never disagree.
@@ -66,24 +66,28 @@
     return Math.round(mins / 5) * 5;
   }
 
-  /* "mins", never "min" -- MANUAL §5. A numeric quantity takes the plural
-     form in both the metadata register (`mins`/`hrs`) and the prose one
-     (`mins`/`hours`); only a bare English "a minute" stays singular, and
-     there are none of those here. This emitted "45 min" and "2 hrs 5 min"
-     until 2026-08-15. `hrs` was right all along, which is probably why the
-     singular next to it never looked wrong. */
+  /* COMPACT, SINCE 2026-10-09: "4h50m", "2h", "10m". Helen: "Collapse timing
+     display to e.g. '2h - 3h', '4h - 4h50m', '10m - 15 m'. En dashes." It
+     printed "4 hrs 50 mins" from 2026-08-15 to then, in the house's metadata
+     register (MANUAL §5: "mins", never "min" -- and before 2026-08-15 it
+     emitted the singular, which was a real violation). That register is for
+     a recipe's Prep and Cook lines, read as words; this is a column of
+     figures read against each other, and the words were most of its width
+     -- a range took three lines of a phone's time column. The §5 rule is
+     untouched for the recipe pages. */
   function hhmm(mins) {
     mins = round5(mins);
     var h = Math.floor(mins / 60), m = mins % 60;
-    if (!h) return m + " mins";
-    if (!m) return h + " hr" + (h > 1 ? "s" : "");
-    return h + " hr" + (h > 1 ? "s" : "") + " " + m + " mins";
+    if (!h) return m + "m";
+    if (!m) return h + "h";
+    return h + "h" + m + "m";
   }
 
   function span(lo, hi) {
     /* Compared AFTER rounding: 95 and 97 minutes are one answer once you've
-       decided five minutes is the resolution, and printing "1 hr 35 – 1 hr 35"
-       would be the arithmetic showing through. */
+       decided five minutes is the resolution, and printing "1h35m – 1h35m"
+       would be the arithmetic showing through. An en dash with a space each
+       side, which is where cook-timer.js lets a range break. */
     return round5(lo) === round5(hi)
       ? hhmm(lo) : hhmm(lo) + " – " + hhmm(hi);
   }
