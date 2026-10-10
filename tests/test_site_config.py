@@ -459,9 +459,19 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
     """
     scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
     measures = scaling.get("half_step_measures")
-    assert measures and "handful" in measures, (
-        "_data/food/scaling.yml has no `half_step_measures` list naming "
-        "`handful`; the recipe scaler will print 1.17 handfuls again."
+    # `handful` was the word this list was made for and left it on 2026-10-10
+    # for the quarter-step list: "Recipe page handfuls and sprigs in 1/4 too
+    # please." It must be on exactly one of them, or 1.17 handfuls is back.
+    assert measures and "pinch" in measures, (
+        "_data/food/scaling.yml has no `half_step_measures` list naming `pinch`."
+    )
+    assert "handful" in scaling.get("quarter_step_measures", []), (
+        "`handful` is on neither step list; the recipe scaler will print "
+        "1.17 handfuls again."
+    )
+    assert "handful" not in measures, (
+        "`handful` is back in half_step_measures. Helen, 2026-10-10: 'Recipe "
+        "page handfuls and sprigs in 1/4 too please.'"
     )
     assert "pat" not in measures, (
         "`pat` is in half_step_measures. Helen, 2026-10-04: '\"pat\" is a "
@@ -480,9 +490,14 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
         f"'2 large' scales (#1005), and 240 amounts are written that way."
     )
 
+    # Drops, twists, lots and pats step in halves too since 2026-10-10 ("please
+    # round to the nearest 1/2"), from their own list -- see the test below for
+    # why they are not simply in `half_step_measures`.
     html = read("_layouts", "recipe.html")
     wiring = {
-        "data-half-step-measures": "site.data.food.scaling.half_step_measures",
+        "data-half-step-measures": "site.data.food.scaling.half_step_measures | "
+                                   "concat: site.data.food.scaling.half_step_counts",
+        "data-quarter-step-measures": "site.data.food.scaling.quarter_step_measures",
         "data-trailing": "site.data.food.ingredient_words.trailing_phrases",
     }
     script = read("assets", "js", "recipe-scale.js")
@@ -4004,3 +4019,176 @@ def test_the_leopard_version_is_the_hash_of_the_committed_files():
         "will go on showing the old artwork. Run "
         "`python3 scripts/build_leopard.py --write` and commit all three files."
     )
+
+
+def test_the_index_shopping_list_is_handed_the_by_eye_measures():
+    """#1297. The shopping list totals a handful to a WHOLE one, and which
+    words do is the same data the recipe page uses.
+
+    Helen, 2026-10-09: "please make the shopping list only round to whole
+    numbers for handfuls and other similar units." `half_step_measures`
+    reaches the index by one route: food/index.html joins it onto the panel as
+    `data-whole-measures`, filters.js reads the attribute and hands it to
+    `build()` as `wholeMeasures`. Break any link and nothing errors -- with no
+    list, nothing is rounded -- so the list quietly prints "1.17 handfuls"
+    again, which is the figure the issue was raised about.
+    """
+    index = read("food", "index.html")
+    assert re.search(
+        r'id="shopping-list"[^>]*data-whole-measures="\{\{\s*'
+        r'site\.data\.food\.scaling\.half_step_measures\s*\|\s*concat:\s*'
+        r'site\.data\.food\.scaling\.half_step_counts\s*\|\s*join:\s*\',\'',
+        index), (
+        "food/index.html no longer joins half_step_measures and "
+        "half_step_counts onto #shopping-list as data-whole-measures."
+    )
+    filters = read("assets", "js", "filters.js")
+    assert "getAttribute('data-whole-measures')" in filters, (
+        "filters.js no longer reads data-whole-measures off the panel."
+    )
+    assert "wholeMeasures: WHOLE_MEASURES" in filters, (
+        "filters.js reads the by-eye measures and does not hand them to "
+        "HTF.foodShoppingList.build(), so no total is rounded."
+    )
+
+
+def test_the_whole_fruit_vocabulary_is_the_shape_the_plugin_reads():
+    """#1297. `whole_fruit:` in _data/food/scaling.yml is what lets "zest of 1
+    lemon" and "juice of 1 lemon" total as one lemon.
+
+    _plugins/food_shopping.rb compiles five lists into its patterns and marks
+    nothing at all if `fruits` or `parts` is missing -- silently, the list
+    simply stops combining. So the shape is pinned here.
+    """
+    vocab = yaml.safe_load(read("_data", "food", "scaling.yml")).get("whole_fruit")
+    assert isinstance(vocab, dict), "_data/food/scaling.yml has no `whole_fruit:`."
+    for key in ("fruits", "preparations", "sizes", "pointers"):
+        words = vocab.get(key)
+        assert words and all(isinstance(w, str) and w == w.lower() for w in words), (
+            f"whole_fruit.{key} must be a list of lowercase strings; got {words!r}"
+        )
+    assert {"lemon", "lime", "orange"} <= set(vocab["fruits"])
+    parts = vocab.get("parts")
+    assert isinstance(parts, dict) and {"juice", "zest"} <= set(parts), (
+        f"whole_fruit.parts must name at least juice and zest; got {parts!r}"
+    )
+    plural = [f for f in vocab["fruits"] if f.endswith("s")]
+    assert not plural, (
+        f"whole_fruit.fruits are singular -- the plugin adds the plural: {plural}"
+    )
+
+
+def test_the_index_shopping_list_is_handed_the_count_nouns():
+    """#1297, 2026-10-10: 'Can we fix the "2 lemon" thing?'
+
+    A row that is one bare count takes a label agreeing with its number. A
+    form no recipe wrote is made only for a noun in `count_nouns`
+    (_data/food/scaling.yml), which reaches build() the way the by-eye
+    measures do: joined onto #shopping-list as `data-count-nouns`, read by
+    filters.js, handed over as `countNouns`. Break a link and nothing errors;
+    the list goes back to "2 lemon".
+
+    THE ENTRIES ARE PINNED BECAUSE THE PLURAL IS MADE BY RULE. Each is the
+    last word of a name, and `unitLabel` gives it an `s` (or `es` after a
+    sibilant). A word whose plural is anything else must not be here, and the
+    six below were each measured as wrong before the list existed.
+    """
+    nouns = yaml.safe_load(read("_data", "food", "scaling.yml")).get("count_nouns")
+    assert nouns and {"lemon", "onion", "egg"} <= set(nouns), (
+        "_data/food/scaling.yml has no `count_nouns` list naming lemon, onion "
+        "and egg."
+    )
+    not_plain = [n for n in nouns
+                 if not isinstance(n, str) or not re.fullmatch(r"[a-z]+", n)]
+    assert not not_plain, (
+        f"count_nouns entries are one lowercase word each, singular: {not_plain}"
+    )
+    irregular = sorted(
+        n for n in nouns
+        if n.endswith(("y", "i", "f", "s"))
+        or n in {"tomato", "potato", "mango", "goose", "fish", "thyme",
+                 "butter", "garlic", "anise", "bread", "bacon"})
+    assert not irregular, (
+        f"these take no plain plural, or are not bought by count: {irregular}. "
+        "The list is for words where adding an `s` is always right."
+    )
+
+    index = read("food", "index.html")
+    assert re.search(
+        r'id="shopping-list"[^>]*data-count-nouns="\{\{\s*'
+        r'site\.data\.food\.scaling\.count_nouns\s*\|\s*join:\s*\',\'', index), (
+        "food/index.html no longer joins site.data.food.scaling.count_nouns "
+        "onto #shopping-list as data-count-nouns."
+    )
+    filters = read("assets", "js", "filters.js")
+    assert "getAttribute('data-count-nouns')" in filters
+    assert "countNouns: COUNT_NOUNS" in filters, (
+        "filters.js reads the count nouns and does not hand them to build()."
+    )
+    assert 'class="shopping-list-note"' in index, (
+        "food/index.html has lost the `(Not scaled: ...)` line's element; "
+        "filters.js fills it and says nothing when it is missing."
+    )
+
+
+def test_the_quarter_step_measures_reach_both_scalers():
+    """#1297, Helen, 2026-10-10: "Sprigs: Let's round to 1/4 please, and
+    express in fractions not decimals."
+
+    `quarter_step_measures` in _data/food/scaling.yml is read in two places:
+    the recipe page (checked with the half-step list, above) and the index's
+    shopping list, where food/index.html joins it onto the panel as
+    `data-quarter-measures` and filters.js hands it to build(). Lose either
+    and that page prints "1.17 sprigs" again with nothing failing.
+    """
+    scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
+    quarter = scaling.get("quarter_step_measures")
+    assert quarter and "sprig" in quarter, (
+        "_data/food/scaling.yml has no `quarter_step_measures` naming `sprig`."
+    )
+    assert all(isinstance(m, str) and re.fullmatch(r"[a-z]+", m) for m in quarter), quarter
+    both = sorted(set(quarter) & set(scaling["half_step_measures"]))
+    assert not both, (
+        f"{both} are in both step lists; the half-step rule would win and "
+        "the quarter never apply."
+    )
+    counts = scaling.get("half_step_counts")
+    assert counts == ["drop", "twist", "lot", "pat"], (
+        "half_step_counts should be drop, twist, lot, pat -- Helen, "
+        f"2026-10-10: 'please round to the nearest 1/2'. Got {counts!r}."
+    )
+    misplaced = sorted(set(counts) & (set(quarter) | set(scaling["half_step_measures"])))
+    assert not misplaced, (
+        f"{misplaced} must stay OUT of half_step_measures and "
+        "quarter_step_measures. The half-recipe judge is handed "
+        "half_step_measures and lets those halve always; '1 lot' of another "
+        "recipe must go on refusing a half recipe ('Neither mince pies nor "
+        "sweet cream base halve')."
+    )
+    # THE JUDGE'S OWN LIST: the half-step measures plus `by_eye_also`, which
+    # holds `handful` now that it steps in quarters. A handful halves always;
+    # a sprig is a count and an odd one refuses.
+    also = scaling["half_recipe"].get("by_eye_also")
+    assert also == ["handful"], (
+        f"half_recipe.by_eye_also should be just `handful`; got {also!r}. "
+        "Without it an odd handful refuses a half recipe; with `sprig` in it "
+        "an odd sprig stops refusing."
+    )
+    # The judge adds `by_eye_also` itself, so its two callers (the build and
+    # scripts/food_yield.rb) cannot disagree about it.
+    assert 'vocab["by_eye_also"]' in read("_plugins", "food_half_recipe.rb")
+    plugin = read("_plugins", "food_shopping.rb")
+    assert 'dig("food", "scaling", "half_step_measures")' in plugin
+    assert "half_step_counts" not in plugin, (
+        "_plugins/food_shopping.rb now hands half_step_counts to the "
+        "half-recipe judge, which would let an odd count of pats or lots halve."
+    )
+    index = read("food", "index.html")
+    assert re.search(
+        r'data-quarter-measures="\{\{\s*site\.data\.food\.scaling\.'
+        r'quarter_step_measures\s*\|\s*join:\s*\',\'', index), (
+        "food/index.html no longer joins quarter_step_measures onto the panel."
+    )
+    filters = read("assets", "js", "filters.js")
+    assert "getAttribute('data-quarter-measures')" in filters
+    assert "quarterMeasures: QUARTER_MEASURES" in filters

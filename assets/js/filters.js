@@ -1385,6 +1385,7 @@ function renderResultsPool() {
   var shoppingRecipes = shoppingEl && shoppingEl.querySelector('.shopping-list-recipes');
   var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
+  var shoppingNote = shoppingEl && shoppingEl.querySelector('.shopping-list-note');
   var setAllInput = document.getElementById('shopping-list-setall');
 
   /* WHAT EVERY RECIPE IS MADE OF AND HOW MANY IT FEEDS, emitted by index.html
@@ -1414,6 +1415,25 @@ function renderResultsPool() {
     }
   })();
 
+  /* THE HALF-STEP MEASURES, bought in whole ones (#1297): `half_step_measures`
+     and `half_step_counts` from _data/food/scaling.yml, joined onto the panel
+     by food/index.html. Absent, nothing is rounded -- the list as it was. */
+  var WHOLE_MEASURES = String(
+    (shoppingEl && shoppingEl.getAttribute('data-whole-measures')) || '')
+    .split(',').filter(Boolean);
+
+  // A sprig, a bunch: bought whole, used in quarters. `quarter_step_measures`.
+  var QUARTER_MEASURES = String(
+    (shoppingEl && shoppingEl.getAttribute('data-quarter-measures')) || '')
+    .split(',').filter(Boolean);
+
+  /* THE NOUNS BOUGHT BY COUNT, so two recipes' lemons read "2 lemons" (#1297):
+     `count_nouns` from the same file, by the same route. Absent, a row keeps
+     the spelling a recipe wrote. */
+  var COUNT_NOUNS = String(
+    (shoppingEl && shoppingEl.getAttribute('data-count-nouns')) || '')
+    .split(',').filter(Boolean);
+
   /* The row's own title, read off the DOM once. `dataset.titleText` is the
      UNMARKED title stashed at load, so a recipe found by a name search still
      lists under its real name rather than one carrying <mark> tags -- the same
@@ -1439,7 +1459,11 @@ function renderResultsPool() {
     });
   }
 
-  /* --- EVERY RECIPE COUNTS PEOPLE ------------------------------------------
+  /* --- EVERY `serves:` RECIPE COUNTS PEOPLE ---------------------------------
+     (A `makes:` recipe counts BATCHES again since #1297: see isBatch() below,
+     which says what is different about this batch box from the one this
+     comment buries.)
+
      #815, Helen: "clearly 750 ml of gelato doesn't feed 50. We need estimate
      the number of people served by 750 ml, then add that to the front matter
      somehow."
@@ -1497,8 +1521,72 @@ function renderResultsPool() {
      before learning it. A CONTROL THAT SILENTLY FAILS IS WORSE THAN NO
      CONTROL. */
   function scaleFor(url) {
+    if (isBatch(url)) return batchesFor(url);
     if (!hasPortions(url)) return 1;
     return portionsFor(url) / RECIPES[url].p;
+  }
+
+  /* --- A `makes:` RECIPE COUNTS BATCHES -------------------------------------
+     #1297, Helen, 2026-10-09: 'The shopping list scaler could show e.g. "X
+     batches of 18 Peanut Butter Cookies", allowing half-batches where that
+     doesn't split eggs. ... That stops us saying 2 cookies is a portion -- not
+     out of principle, but because that's meaningless.'
+
+     THIS IS THE BATCH BOX #815 REMOVED, BACK ON PURPOSE, and what is different
+     is that the row now SAYS so. The old one was a number box that looked
+     exactly like the portions boxes beside it and meant something else; this
+     one reads "2 batches of 18 Peanut Butter Cookies" in words. A `serves:`
+     recipe is untouched and still counts people, one at a time.
+
+     THE THREE FIGURES ARE THE RECIPE PAGE'S OWN (#1286) -- `w` whole recipes,
+     `h` half offered, `m` what one makes -- so the box here and the scaler on
+     the recipe's page step the same way: ½ where the build allows it, then
+     1, 2, 3, and never 1½. The count lives in its own store
+     (`HTF.shortlist.batches`), because a stored 6 cannot say whether it meant
+     people or batches. */
+  function isBatch(url) {
+    var recipe = RECIPES[url];
+    return !!(recipe && recipe.w);
+  }
+
+  function halfOffered(url) {
+    return isBatch(url) && !!RECIPES[url].h;
+  }
+
+  /* One batch until she says otherwise. A stored half is honoured only while
+     the build still offers one: a preference is not a capability. */
+  function batchesFor(url) {
+    var n = HTF.shortlist.batches(url) || 1;
+    return (n < 1 && !halfOffered(url)) ? 1 : n;
+  }
+
+  /* A typed or stepped figure, made into one the box can hold. The spinner
+     moves in halves so that it can reach ½, which means it also lands on 1½:
+     that goes on to the next whole batch in the direction it was travelling. */
+  function batchCount(url, raw, previous) {
+    var n = Number(raw);
+    if (!isFinite(n) || n <= 0) return null;
+    if (n < 1) return halfOffered(url) ? 0.5 : 1;
+    if (n % 1 !== 0) return n > previous ? Math.ceil(n) : Math.floor(n);
+    return n;
+  }
+
+  /* "18 Peanut Butter Cookies", or the title alone. THE FIGURE IS SHOWN ONLY
+     FOR A COUNT ABOVE ONE: "2 batches of 1 Lemon Drizzle Cake" and "2 batches
+     of 750 ml Blackberry Gelato" both read worse than the name by itself. */
+  function batchThing(url, title) {
+    var made = RECIPES[url].m;
+    // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
+    if (made && made.kind === 'count' && Number(made.base) > 1 && made.box &&
+        !/^batch/i.test(String(made.stem || ''))) {
+      return made.box + ' ' + title;
+    }
+    return title;
+  }
+
+  function countWord(url, n) {
+    if (isBatch(url)) return n > 1 ? 'batches of' : 'batch of';
+    return n === 1 ? 'portion of' : 'portions of';
   }
 
   /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
@@ -1531,8 +1619,21 @@ function renderResultsPool() {
        while one of its own inputs has focus, because replacing the node under
        a typing cursor loses the caret and the keystroke. `renderTotals()` is
        called on its own from the input handler for exactly that reason. */
+    /* THE BATCH ROWS GO LAST, UNDER A HAIRLINE -- Helen, 2026-10-10: "If we
+       group the batched recipes at the bottom of the shopping list scaler
+       section, it's clear the portions scaler multiplies portions whereas the
+       batches are manual. Maybe just a little vertical space and a soft
+       hairline separator?" So "set all to N portions" sits over the rows it
+       sets, and the rows it leaves alone are visibly a second group. Each
+       group keeps the order its recipes were shortlisted in; the rule is
+       drawn on the first batch row, and only when there are portions rows
+       above it to be separated from. */
+    var portionRows = urls.filter(function (url) { return !isBatch(url); });
+    var batchRows = urls.filter(isBatch);
+    var firstBatch = portionRows.length ? batchRows[0] : null;
+
     if (shoppingRecipes) {
-      shoppingRecipes.innerHTML = urls.map(function (url) {
+      shoppingRecipes.innerHTML = portionRows.concat(batchRows).map(function (url) {
         var title = titleByUrl[url] || url;
         var yielded = yieldText(url);
         /* NO PORTION COUNT, NO BOX -- asked of the RECIPE, never of the store.
@@ -1544,6 +1645,26 @@ function renderResultsPool() {
            at x1 and says why it cannot be scaled, rather than offering a
            control that would do nothing. That rule cost this feature two bug
            reports before it was learned. */
+        /* A `makes:` RECIPE: "2 batches of 18 Peanut Butter Cookies" -- #1297.
+           The figure after "of" is what ONE batch makes and never moves; the
+           number in the box is the only one that does, and the words between
+           them are why the two cannot be read as one expression. */
+        if (isBatch(url)) {
+          var batches = batchesFor(url);
+          var floor = halfOffered(url) ? '0.5' : '1';
+          var makes = RECIPES[url].y ? ', which makes ' + RECIPES[url].y : '';
+          return (url === firstBatch
+            ? '<li class="shopping-list-recipe--first-batch">' : '<li>') +
+            '<input type="number" class="shopping-list-portions" min="' + floor +
+            '" max="99" step="' + floor + '" inputmode="decimal" value="' + batches + '" ' +
+            'data-url="' + HTF.escapeHtml(url) + '" data-batches ' +
+            'title="' + HTF.escapeHtml(title + makes) + '" ' +
+            'aria-label="batches of ' + HTF.escapeHtml(title + makes) + '">' +
+            '<span><span class="shopping-list-count-word">' + countWord(url, batches) +
+            '</span> ' + HTF.escapeHtml(batchThing(url, title)) + '</span>' +
+            '</li>';
+        }
+
         if (!hasPortions(url)) {
           return '<li class="shopping-list-recipe--unscalable">' +
             '<span>' + HTF.escapeHtml(title) +
@@ -1576,7 +1697,12 @@ function renderResultsPool() {
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'title="' + HTF.escapeHtml(title + relative) + '" ' +
           'aria-label="portions of ' + HTF.escapeHtml(title + relative) + '">' +
-          '<span>' + HTF.escapeHtml(title) + '</span>' +
+          /* "7 portions of Moules Marinière" -- #1297. The word is what the
+             number counts, so the row reads as a sentence and the batch rows
+             beside it are visibly a different kind of number. */
+          '<span><span class="shopping-list-count-word">' +
+          countWord(url, portionsFor(url)) + '</span> ' +
+          HTF.escapeHtml(title) + '</span>' +
           '</li>';
       }).join('');
     }
@@ -1592,7 +1718,12 @@ function renderResultsPool() {
     shortlisted.forEach(function (url) {
       var scale = scaleFor(url);
       ((RECIPES[url] || {}).i || []).forEach(function (ing) {
-        entries.push({ amount: ing.a, name: ing.n, aisle: ing.s, scale: scale });
+        // `recipe` and the four marks are #1297's: see `reunite` in
+        // food-shopping-list.js for what each one does to the total.
+        entries.push({
+          amount: ing.a, name: ing.n, aisle: ing.s, scale: scale,
+          recipe: url, parts: ing.pt, fruit: ing.f, count: ing.c, pointer: ing.x
+        });
       });
     });
 
@@ -1629,7 +1760,32 @@ function renderResultsPool() {
       return;
     }
 
-    var aisles = HTF.foodShoppingList.build(entries, { aisles: AISLES });
+    var aisles = HTF.foodShoppingList.build(entries, {
+      aisles: AISLES, wholeMeasures: WHOLE_MEASURES,
+      quarterMeasures: QUARTER_MEASURES, countNouns: COUNT_NOUNS
+    });
+
+    /* WHAT THE NUMBERS ABOVE DID NOT REACH -- Helen, 2026-10-10: the recipe
+       page says "(Not scaled: extra teriyaki sauce, ...)" under its scaler
+       (#1088), and "adding this to the shopping list page would at least show
+       the user in what ways the list is incomplete."
+
+       A row is named when any line behind it had no amount to scale: "salt, to
+       taste", "some", a magic-bag item. Its own row below still lists it --
+       it has to be bought -- this says its quantity is the cook's to judge.
+       Her format, as on the recipe page: bracketed, comma-joined, no full
+       stop; in the list's own order, aisle by aisle. */
+    if (shoppingNote) {
+      var unscaled = [];
+      aisles.forEach(function (aisle) {
+        aisle.items.forEach(function (row) {
+          if (row.unquantified.length) unscaled.push(row.label);
+        });
+      });
+      shoppingNote.textContent = unscaled.length
+        ? '(Not scaled: ' + unscaled.join(', ') + ')' : '';
+      shoppingNote.hidden = unscaled.length === 0;
+    }
 
     /* REBUILT WHOLE, not patched -- a couple of dozen rows that change only
        when the shortlist or a number does, where a diffing render would be
@@ -1642,6 +1798,10 @@ function renderResultsPool() {
           return '<li>' +
             '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
             '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + '</span>' +
+            /* "(1¼ in the recipes)" -- Helen's own form, #1297: the amount
+               is what to buy, this is what the recipes use. */
+            (row.aside ? '<span class="shopping-list-aside">(' +
+              HTF.escapeHtml(row.aside) + ')</span>' : '') +
             '</li>';
         }).join('') +
         '</ul></section>';
@@ -1653,10 +1813,34 @@ function renderResultsPool() {
     shoppingRecipes.addEventListener('input', function (ev) {
       var input = ev.target;
       if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
-      HTF.shortlist.setPortions(input.dataset.url, input.value);
+      var url = input.dataset.url;
+      var shown;
+      if (isBatch(url)) {
+        var typed = Number(input.value);
+        shown = HTF.shortlist.setBatches(url,
+          batchCount(url, input.value, batchesFor(url))) || 1;
+        // Only the spinner's 1½ is rewritten under the cursor; anything else
+        // waits for `change`, so a figure half typed is not snatched away.
+        if (typed > 1 && typed % 1 !== 0) input.value = String(shown);
+      } else {
+        shown = HTF.shortlist.setPortions(url, input.value) || portionsFor(url);
+      }
+      /* "1 batch of", "2 batches of". The word is patched in place: the row
+         cannot be re-rendered from here (the caret rule below). */
+      var word = input.parentNode && input.parentNode.querySelector &&
+        input.parentNode.querySelector('.shopping-list-count-word');
+      if (word) word.textContent = countWord(url, shown);
       // Totals only. Re-rendering the recipe list would replace the very input
       // being typed into and take the caret with it.
       renderTotals();
+    });
+
+    /* ONCE SHE HAS FINISHED TYPING, a batch box shows what it was taken as:
+       "0.2" where no half is offered is one batch, and says so. */
+    shoppingRecipes.addEventListener('change', function (ev) {
+      var input = ev.target;
+      if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
+      if (isBatch(input.dataset.url)) input.value = String(batchesFor(input.dataset.url));
     });
   }
 
@@ -1670,17 +1854,23 @@ function renderResultsPool() {
        so a box showing `1` would be claiming a state the list is not in. Empty
        says nothing until she says something.
 
-       IT REACHES EVERY SHORTLISTED RECIPE SINCE #815, and it did not before.
-       A recipe with no portion count used to get a box counting batches,
-       which this control could not honestly write into -- so it skipped one,
-       Helen typed 50 and watched the gelato ignore her. Every recipe carries
-       a `serves_estimate:` now, so "set all to 6 portions" means the same
-       thing on every row and there is nothing left to skip. */
+       IT REACHED EVERY SHORTLISTED RECIPE FROM #815 TO #1297. Before #815 a
+       recipe with no portion count got a box counting batches, which this
+       control could not honestly write into -- so it skipped one, Helen
+       typed 50 and watched the gelato ignore her. #815 gave every recipe a
+       `serves_estimate:`; #1297 gave `makes:` recipes their batches back,
+       and the skip with them -- see the loop below for why that is safe
+       this time. */
     setAllInput.addEventListener('input', function () {
       var n = parseInt(setAllInput.value, 10);
       if (!isFinite(n) || n < 1) return;
+      /* A BATCH ROW IS LEFT ALONE -- #1297. "Set all to 6 portions" has no
+         answer for a recipe that makes 18 cookies without deciding how many
+         cookies a portion is, which is the figure Helen wants gone. This is
+         the skip #815 removed, and it is safe to have back for one reason:
+         the row it skips now says "batches" in words. */
       shortlistedRecipes().forEach(function (url) {
-        HTF.shortlist.setPortions(url, n);
+        if (!isBatch(url)) HTF.shortlist.setPortions(url, n);
       });
       renderShoppingList();
     });

@@ -718,16 +718,22 @@ permalink: /food/
    the same reason: that is what makes it "my shortlist listing" rather than a
    running total under a browse.
 
-   THE SCALER IS PORTIONS, NOT BATCHES. A drink's box counts glasses, because a
-   drink is a drink; a recipe's counts PEOPLE, because "we are four tonight" is
-   the question a food shortlist is being asked. That is what makes the serving
-   size Helen asked to be guessed load-bearing rather than decorative: it is
-   the number the portions are divided by. _plugins/food_shopping.rb resolves
-   it and _data/food/servings.yml holds the 44 guesses.
+   A `serves:` RECIPE'S BOX COUNTS PORTIONS. A drink's box counts glasses,
+   because a drink is a drink; a recipe's counts PEOPLE, because "we are four
+   tonight" is the question a food shortlist is being asked. That is what
+   makes the serving size Helen asked to be guessed load-bearing rather than
+   decorative: it is the number the portions are divided by.
+   _plugins/food_shopping.rb resolves it, from `serves:` or the recipe's own
+   `serves_estimate:`.
+
+   A `makes:` RECIPE'S BOX COUNTS BATCHES since #1297 (Helen, 2026-10-09: "X
+   batches of 18 Peanut Butter Cookies"), which is why "set all to N portions"
+   below leaves those rows alone. `data-whole-measures` on the section is the
+   same issue: the by-eye measures whose totals are bought in whole ones.
 
    `min=1` and no maximum beyond 99, matching the drinks list. Zero portions of
    everything is an empty list with extra steps. {% endcomment %}
-<section class="shopping-list" id="shopping-list" hidden aria-live="polite">
+<section class="shopping-list" id="shopping-list" hidden aria-live="polite" data-whole-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: ',' | escape }}" data-quarter-measures="{{ site.data.food.scaling.quarter_step_measures | join: ',' | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: ',' | escape }}">
   <div class="shopping-list-head">
     <h2 class="shopping-list-title">Shopping list</h2>
     {% comment %} SET ALL, NOT A MULTIPLIER -- cocktails/index.html's own note
@@ -747,6 +753,10 @@ permalink: /food/
      written -- which is the answer you want before you have said anything.
      {% endcomment %}
   <ul class="shopping-list-recipes"></ul>
+  {% comment %} "(Not scaled: salt, olive oil)" -- the ingredients the numbers
+     above could not reach, named as the recipe page names them (#1088). Filled
+     by filters.js; hidden while there are none. {% endcomment %}
+  <p class="shopping-list-note" hidden></p>
 
   <div class="shopping-list-aisles"></div>
   <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
@@ -798,6 +808,19 @@ permalink: /food/
    its yield, `k` WHICH KEY those words came from, `i` the ingredients -- `a`
    amount, `n` name, `s` shelf.
 
+   A `makes:` RECIPE ALSO CARRIES `w`, `h` AND `m` -- #1297. `w` says its box
+   counts BATCHES (page.whole_recipes), `h` that half a batch is offered
+   (page.half_recipe, _plugins/food_half_recipe.rb's verdict), and `m` what
+   one batch makes (page.made), for the row's words: "2 batches of 18 Peanut
+   Butter Cookies". They are the three figures the recipe page's own scaler
+   already reads, so the two controls cannot disagree about a recipe.
+
+   AN INGREDIENT MAY CARRY `pt`, `f`/`c` AND `x` -- #1297 again. `pt` the
+   parts of a fruit the line uses (juice, zest), `f` and `c` the fruit and
+   the count where both are written inside the item ("juice of 1 lemon"), `x`
+   a line that only points at another ("the rest of the oil above"). Marked
+   by _plugins/food_shopping.rb, merged by food-shopping-list.js.
+
    `k` EXISTS BECAUSE `y` ALONE IS A TRAP. `serves` and `makes` are exclusive
    (MANUAL 4) and `y` takes whichever is there, so a page printing `y` behind
    a fixed word gets it right for half the collection and wrong for the other
@@ -819,9 +842,9 @@ permalink: /food/
 {%- if recipe.collection == "food_magic_bag" %}{% assign _mb = true %}{% endif -%}
 {%- if recipe.meta.rewritten or site.show_source_wording or _mb -%}
 {%- unless _first_recipe %},{% endunless %}{%- assign _first_recipe = false %}
-{{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"e":{{ recipe.portions_estimated | default: false }},"y":{{ recipe.serves | default: recipe.makes | jsonify }},"k":{% if recipe.serves %}"serves"{% else %}"makes"{% endif %},"i":[
+{{ recipe.url | jsonify }}:{"p":{% if recipe.portions %}{{ recipe.portions }}{% else %}null{% endif %},"e":{{ recipe.portions_estimated | default: false }},"y":{{ recipe.serves | default: recipe.makes | jsonify }},"k":{% if recipe.serves %}"serves"{% else %}"makes"{% endif %}{% if recipe.whole_recipes %},"w":true,"h":{% if recipe.half_recipe %}true{% else %}false{% endif %},"m":{% if recipe.made %}{{ recipe.made | jsonify }}{% else %}null{% endif %}{% endif %},"i":[
 {%- for ing in recipe.shopping -%}
-{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}}
+{% unless forloop.first %},{% endunless %}{"a":{{ ing.amount | jsonify }},"n":{{ ing.name | jsonify }},"s":{{ ing.aisle | jsonify }}{% if ing.parts %},"pt":{{ ing.parts | jsonify }}{% endif %}{% if ing.fruit %},"f":{{ ing.fruit | jsonify }},"c":{{ ing.count | jsonify }}{% endif %}{% if ing.pointer %},"x":true{% endif %}}
 {%- endfor -%}
 ]}
 {%- endif -%}

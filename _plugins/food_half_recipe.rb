@@ -69,6 +69,12 @@ module HelenTriages
     # @return [Hash] {"ok" => true/false, "why" => the line that decided it}
     def judge(groups, made, portions, vocab, by_eye)
       vocab ||= {}
+      # `handful` STEPS IN QUARTERS since 2026-10-10 and so left
+      # `half_step_measures`, but it is as much a by-eye measure as it ever
+      # was: `half_recipe.by_eye_also` names it. Added HERE, not by the
+      # callers, because there are two of them (_plugins/food_shopping.rb and
+      # scripts/food_yield.rb) and the first attempt changed only one.
+      by_eye = Array(by_eye) + Array(vocab["by_eye_also"]).map(&:to_s)
       verdict = yield_halves(made, portions)
       return verdict unless verdict["ok"]
 

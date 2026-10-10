@@ -30,7 +30,10 @@
 //
 // A MEASURE TAKEN BY HAND SCALES IN HALF STEPS -- #1125. "1 handful" for
 // three times the people is "3 handfuls", and never "1.17 handfuls": see
-// `halfStep` below, the one place the rounding is decided.
+// `halfStep` below, the one place the rounding is decided. (The INDEX's
+// shopping list buys the same measures in WHOLE ones, rounded up, and says
+// the amount asked for beside them to the nearest QUARTER, #1297 --
+// food-shopping-list.js does that for itself and never calls this.)
 //
 // "2 large" SCALES, because `large` is a unit to the parser and a SYMBOL to
 // the labeller (no plural), so it prints "4 large" -- Helen: "Things like
@@ -98,12 +101,29 @@
      HER SENTENCE NAMES HANDFULS. It is applied to the whole by-eye list as
      one rule; a measure she wants treated differently comes out of the list.
 
-     WHICH MEASURES is data: `half_step_measures` in _data/food/scaling.yml,
+     WHICH MEASURES is data: `half_step_measures` in _data/food/scaling.yml
+     -- and, since 2026-10-10, `half_step_counts` beside it (drop, twist,
+     lot, pat: "please round to the nearest 1/2"), joined on by the layout --
      PASSED IN -- the layout emits the list, recipe-scale.js hands it over,
      and this file names no measure. With no list given, a handful scales
      like any other count, which is what every caller before #1125 gets. */
   function halfStep(quantity) {
     return Math.max(0.5, Math.round(quantity * 2) / 2);
+  }
+
+  /* A HANDFUL, A SPRIG AND A BUNCH SCALE IN QUARTERS. The handful joined on
+     2026-10-10 ("Recipe page handfuls and sprigs in 1/4 too please"), which
+     REPLACES the half step above for it: 1 handful x7/6 is 1¼ handfuls, where
+     it was 1. Pinch, dash, splash and knob keep the half step.
+
+     For the sprig and the bunch -- #1297, Helen, the same day, shown
+     "1.17 sprigs" on this page: "Sprigs: Let's round to 1/4 please, and
+     express in fractions not decimals." The nearest quarter, never less than
+     one: 1 sprig x7/6 is 1¼ sprigs, x2/3 is ¾ sprigs, and 4 sprigs doubled is
+     still 8. `quarter_step_measures` in scaling.yml, passed in as
+     `options.quarterStep` exactly as the half-step list is. */
+  function quarterStep(quantity) {
+    return Math.max(0.25, Math.round(quantity * 4) / 4);
   }
 
   function numberText(n) {
@@ -133,13 +153,13 @@
      "1–2 pinches", "1 large handful each". The number is stepped, and the
      measure word -- wherever it sits in the unit -- takes the plural of the
      number it ends up beside. Null when the unit holds no such measure. */
-  function scaleHalfStepMeasure(parsed, factor, words) {
+  function scaleSteppedMeasure(parsed, factor, words, step) {
     if (!words) return null;
     var pattern = measurePattern(words);
     if (!pattern.test(parsed.unit)) return null;
 
-    var lo = halfStep(parsed.quantity * factor);
-    var hi = parsed.max === undefined ? lo : halfStep(parsed.max * factor);
+    var lo = step(parsed.quantity * factor);
+    var hi = parsed.max === undefined ? lo : step(parsed.max * factor);
     var unit = parsed.unit.replace(pattern, function (all, before, measure) {
       return before + unitLabel(measure.toLowerCase(), hi);
     });
@@ -173,7 +193,7 @@
   var COUNT_OF_ONE = '(?:(an?|one|\\d+)\\s+)?';
   var SIZE_WORD = '((?:small|large|big|good|generous|little)\\s+)?';
 
-  function scaleMeasurePhrase(text, factor, words, tail) {
+  function scaleMeasurePhrase(text, factor, words, tail, step) {
     var written = String(text === undefined || text === null ? '' : text);
     var unmoved = { text: written, scaled: false };
     if (!words || !(factor > 0)) return unmoved;
@@ -187,7 +207,7 @@
     if (match[5] && !counted) return unmoved;        // a bare plural is no count
 
     var base = counted ? parseInt(match[2], 10) : 1;
-    var n = halfStep(base * factor);
+    var n = (step || halfStep)(base * factor);
     if (n === base) return { text: written, scaled: true };
 
     return {
@@ -204,13 +224,25 @@
    *
    * @param {string} text - the item's text as the page prints it
    * @param {number} factor
-   * @param {{halfStep?: string[]}} [options]
+   * @param {{halfStep?: string[], quarterStep?: string[]}} [options]
    * @returns {{text: string, scaled: boolean}} `scaled: false` and the text
    *          untouched when it does not open with a countable by-eye measure
    */
   function scaleLeadingMeasure(text, factor, options) {
+    return eitherStep(text, factor, options, '\\s+of\\s+');
+  }
+
+  /* A MEASURE WITH NO NUMBER, IN WHICHEVER STEP IT TAKES. "a pinch of salt"
+     is a half-step measure and "a handful of parsley" a quarter-step one
+     since 2026-10-10 ("Recipe page handfuls and sprigs in 1/4 too please");
+     each list is tried with its own rounding, and a word is on one list only
+     (tests/test_site_config.py refuses one on both). */
+  function eitherStep(text, factor, options, tail) {
+    var halves = scaleMeasurePhrase(text, factor,
+      measureWords(options && options.halfStep), tail, halfStep);
+    if (halves.scaled) return halves;
     return scaleMeasurePhrase(text, factor,
-      measureWords(options && options.halfStep), '\\s+of\\s+');
+      measureWords(options && options.quarterStep), tail, quarterStep);
   }
 
   /**
@@ -219,8 +251,9 @@
    * @param {string} amount - as the recipe wrote it: "200 g", "1½ tbsp",
    *        "30–50 g", "2 large", "1 tbsp (6 g)", "1 handful", "a few handfuls"
    * @param {number} factor - portions wanted over portions the recipe makes
-   * @param {{halfStep?: string[]}} [options] - `halfStep` is
-   *        _data/food/scaling.yml's `half_step_measures`
+   * @param {{halfStep?: string[], quarterStep?: string[]}} [options] -
+   *        _data/food/scaling.yml's `half_step_measures` and
+   *        `quarter_step_measures`
    * @returns {{text: string, scaled: boolean}} the amount to show, and
    *        whether it was scaled. An amount with no count in it comes back as
    *        written with `scaled: false`.
@@ -233,10 +266,12 @@
     var parsed = parseAmount(written);
     if (!parsed) {
       // "pinch", "a handful", "small handful": the measure and nothing else.
-      return scaleMeasurePhrase(written, factor, words, '\\s*$');
+      return eitherStep(written, factor, options, '\\s*$');
     }
 
-    var stepped = scaleHalfStepMeasure(parsed, factor, words);
+    var stepped = scaleSteppedMeasure(parsed, factor, words, halfStep) ||
+      scaleSteppedMeasure(parsed, factor,
+        measureWords(options && options.quarterStep), quarterStep);
     if (stepped) return stepped;
 
     var split = splitParenthetical(parsed.unit);
@@ -371,14 +406,16 @@
 
   /**
    * @param {string} text - the ingredient row's text, amount and note removed
-   * @param {{halfStep?: string[], trailing?: string[]}} [options]
+   * @param {{halfStep?: string[], quarterStep?: string[], trailing?: string[]}} [options]
    * @returns {string} the ingredient's name, for the note under the control
    */
   function noteName(text, options) {
     var opts = options || {};
     var name = keep(String(text === undefined || text === null ? '' : text), '');
 
-    var words = measureWords(opts.halfStep);
+    // Every stepped measure, half or quarter: "a few handfuls of" goes as
+    // "a few dashes of" does.
+    var words = measureWords((opts.halfStep || []).concat(opts.quarterStep || []));
     if (words) {
       var leading = new RegExp(
         '^' + QUANTIFIER + SIZE + '(?:' + words + ')(?:e?s)?(?:\\s+each)?\\s+of\\s+', 'i');
@@ -550,6 +587,7 @@
     noteName: noteName,
     singularItem: singularItem,
     halfStep: halfStep,
+    quarterStep: quarterStep,
     portionsMode: portionsMode,
     yieldMode: yieldMode,
     yieldBox: yieldBox

@@ -1669,6 +1669,160 @@ unless stated.
   "range of one" ruling is not withdrawn, only unreachable from a `makes:`
   line**: the lower number is always whole, and `yieldBox` still shows half a
   recipe of an odd count as "2–3". No issue tracks it.
+- **2026-10-09, #1297** — **On the shopping list a `makes:` recipe counts
+  BATCHES, and a handful is bought in whole ones.** Three rulings in one
+  conversation, each replacing something written above.
+  - **Batches are back, on her wording, and #815 is reversed for `makes:`
+    recipes only.** Helen: *'The shopping list scaler could show e.g. "X
+    batches of 18 Peanut Butter Cookies", allowing half-batches where that
+    doesn't split eggs. Is that doable? That stops us saying 2 cookies is a
+    portion -- not out of principle, but because that's meaningless.'* Told
+    the plan — `serves:` rows unchanged and worded "7 portions of Moules
+    Marinière"; one recipe per line; the figure dropped where it reads badly
+    ("2 batches of 1 Lemon Drizzle Cake", "750 ml Blackberry Gelato"); "set
+    all" skipping batch rows — she answered: *"All of group 2 and 3 are
+    perfect."* **What made the September batch box wrong was that it looked
+    like a portions box**; this one says which it is in words, which is also
+    why "set all" may skip it again. The half step is the build's existing
+    judge (#1286), not a second one. Her first sketch that morning, *"2
+    batches of 12 cookies (24 cookies)"*, was superseded by this one: the
+    figure after "of" is one batch's and does not multiply.
+  - **A handful on the LIST goes to the nearest whole one; she changed her
+    mind twice in a day and this is where it landed.** That morning's comment
+    on the issue asked for rounding UP with the true figure in brackets (*"2
+    handfuls parsley (1.17 handfuls)"*). By the afternoon: *"I've changed my
+    mind: please make the shopping list only round to whole numbers for
+    handfuls and other similar units. Recipes should NOT say 1.17 handfuls, or
+    round up, because the first is meaningless and the second is
+    inaccurate."* Her worry was that this forced whole multiples of `serves:`
+    (*"if I have a whole chicken, I should be allowed to just buy a bigger
+    chicken rather than have to cook two"*). **It does not, and the reason is
+    worth keeping: a handful is only accurate to about a third either way, so
+    rounding it to the nearest one loses nothing measurable — the recipe
+    scales freely and only the by-eye lines are rounded.** Nearest, never
+    below one, the TOTAL rounded once rather than each recipe (a session's
+    call, stated to her and not objected to). No bracket.
+  - **The recipe page was NOT changed**, and she was told why: *"I don't want
+    1.17 handfuls on a recipe page"* — it does not print one; a handful there
+    goes to the nearest half (2026-10-04, above), measured again on the day
+    (`1 handful` ×7/6 → `1 handful`). **What the page still prints is "1.17
+    sprigs" and "1.17 bunches"**, because sprig, bunch, drop, twist, lot and
+    pat were ruled linear on 2026-10-04. Put to her as a question; **not
+    ruled** at the time of writing.
+  - **Whole fruit.** Her comment: *'I would like to cleverly combine e.g.
+    "zest of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping
+    list.'* The issue had measured her literal wording and not used it (two
+    rows with no figure); this builds the reading instead of changing the
+    recipes. **The rule within one recipe — different parts take the larger,
+    the same part adds — is a session's, stated to her before building and
+    not objected to.** 26 recipes' citrus rows changed on the dev build, one
+    of them published (the raspberry cheesecake: "finely grated zest of 1
+    lemon" → 1 lemon). The pound cake read "4½ + 2 large lemons" and reads 4.
+  - **Two things found while measuring, neither changed that day.** A
+    fruit's row is labelled by the first spelling seen, so one lemon from each
+    of two recipes can read "2 lemon" — the plural-fold's existing behaviour
+    for every ingredient (fixed the next day, below). And "0.5" is what a
+    number box shows for half a batch; it cannot show "½".
+- **2026-10-10, #1297** — **Round two, on reading the summary: "2 lemons", a
+  Not-scaled line, and the batch rows grouped.** Helen: *'Can we fix the "2
+  lemon" thing? And for individual, we add a note to the scaler: "(Not scaled:
+  extra teriyaki sauce, juice of ½ lime, a few coriander sprigs, a few sprigs
+  Thai basil)" Adding this to the shopping list page would at least show the
+  user in what ways the list is incomplete. Next: we really should scale
+  batches. ... If we group the batched recipes at the bottom of the shopping
+  list scaler section, it's clear the portions scaler multiplies portions
+  whereas the batches are manual. Maybe just a little vertical space and a
+  soft hairline separator?'*
+  - **The plural is made from a LIST, and the first build of it was not.** A
+    rule on "the name's last word" was run over every bare-count line in both
+    collections before it shipped: 251 names changed, about a quarter wrongly
+    — the counted noun is often the first word ("sprigs thyme", "spoons
+    butter", "rashers smoked streaky bacon"), some plurals are irregular
+    ("goose"), some names are cut at their comma ("skinless", "firm"). So: a
+    spelling a recipe wrote is used where one exists, and a made form only for
+    `count_nouns` in `_data/food/scaling.yml`. **Measure a wording rule on the
+    real names before believing it; four fixtures said it was fine.** Known
+    and accepted: "pounds yellow onions" at one or less reads "pounds yellow
+    onion" (one draft).
+  - **The Not-scaled line names a row when any line behind it had no
+    amount.** Her example is the recipe page's; one of its four items ("juice
+    of ½ lime") is no longer unscaled on the list, since the whole-fruit
+    reading of the day before totals it as half a lime.
+  - **"We really should scale batches" was read as the grouping, not as new
+    arithmetic**: batch rows already multiplied their recipe from the day
+    before, and she had been told so in words but had not seen the page. Said
+    back to her plainly rather than assumed.
+  - **Sprigs and bunches go to the nearest quarter, replacing "scale like any
+    number" for those two.** Asked whether the recipe page's "1.17 sprigs" and
+    "1.17 bunches" should round like handfuls or stay as ruled on 2026-10-04:
+    *"Sprigs: Let's round to 1/4 please, and express in fractions not
+    decimals."* Her answer names sprigs; `bunch` was changed with it because
+    the question showed both figures, and that reading is a session's. Drop,
+    twist, lot and pat are as ruled. The shopping list's totals follow, which
+    she did not ask for in words: it printed the same decimal.
+  - **Incidentals are a data question, and became #1356.** The Not-scaled line
+    named "salted butter" beside a 319 g total, for a no-amount greasing line.
+    Helen: *"let's fix the data so we never have 'butter for greasing' etc in
+    the ingredients list. We shouldn't list incidentals. We can trust the
+    cook. I think this is a fix in the data layer (at transform)."* Agreed and
+    raised, with what the issue needs her to rule first: `incidental: true`
+    already exists and hides a line (#75) but `ingest.md` forbids agents from
+    setting it; "icing sugar, to dust" is not a fat the cook already has; and
+    the six published lines sit in proofread files.
+  - **She closed the issue with this work**: *"Please close #1297 with this
+    work when we're done, phew!"*
+  - **The list rounds UP again, with the fraction in brackets — her third
+    answer and the one that stands.** Told the list now printed "1¼ sprigs":
+    *"I'd like the shopping list not to write 1.17 sprigs either, so please
+    round that upwards to the next integer like this: '2 handfuls fresh
+    parsley (1 1/4 in the recipes)'."* The three, in order: 2026-10-09 a.m.,
+    up with the decimal in brackets (*"2 handfuls parsley (1.17 handfuls)"*);
+    that afternoon, nearest and no bracket (*"round up ... is inaccurate"*);
+    2026-10-10, up with the recipes' fraction in brackets. **The bracket is
+    what answers "inaccurate"**: the list says what to buy and what is used.
+    - **The first build of it under-bought, and she corrected it within the
+      hour.** Her example says handfuls at 1¼. A handful steps in halves on
+      the recipe page, so the build quoted that page's figure in the bracket
+      and rounded THAT up: 1.17 handfuls was "1 handful", bought as one. Put
+      to her as a reading, with the literal alternative named: *"1.17
+      handfuls should buy 2, again giving the bracketed requested number."*
+      So on the list every stepped measure is quoted to the nearest quarter
+      and bought as the next whole one — her example to the digit. **When her
+      example and a tidy rule disagree, the example was the specification.**
+      The list and the recipe page may now differ on a handful (1¼ asked for;
+      "1 handful" to use), which follows from her two rulings and is not a bug.
+  - **And then the recipe page's handful went to quarters too, which undoes
+    "Handfuls can scale in half steps" (2026-10-04) for the handful.** Told
+    that the list would now say 1¼ where the recipe page said "1 handful":
+    *"Recipe page handfuls and sprigs in 1/4 too please."* `handful` moved to
+    `quarter_step_measures`. **Pinch, dash, splash and knob were left in
+    halves: her sentence names the handful, and that reading is a session's**
+    — the 2026-10-04 rule had been spread from "handfuls" to all five, and
+    this one was not spread back. So a pinch can still differ between the two
+    pages (1 pinch to use; 2 to buy, 1¼ asked for). The half-recipe judge
+    keeps treating a handful as by-eye, through `half_recipe.by_eye_also`.
+  - **Drops, twists, lots and pats step in halves, replacing "scaled
+    linearly" of 2026-10-04**: *"Drops, twists, lots etc, please round to the
+    nearest 1/2 -- these are smaller than handfuls and sprigs."* `pat` is
+    included on the strength of "etc". They sit in `half_step_counts`, apart
+    from `half_step_measures`, so that the half-recipe judge still treats
+    them as counts: adding `lot` to the judge's list would have offered half
+    a recipe of the sweet cream bases she ruled out.
+  - **#1356, her grant, and what was done with it.** *"Incidentals: agree,
+    thanks. I grant an exception for those six live and 71 drafts-- no great
+    shakes to be wrong, and you won't be! You can grant incidental here, and
+    you don't need to flip the proofread flag."* **Read as a grant for THIS
+    pass, not as moving `incidental:` out of ingest's Tier 3.** 26 lines were
+    flagged of the 77 the wording survey found — 3 published, 23 in drafts —
+    each one read: a fat to grease or fry with, or flour or semolina to dust
+    with. Left alone, and why: 42 amounted lines, nearly all "plus extra for
+    the tin" on a real ingredient (flagging hides the 175 g of butter too);
+    icing sugar to dust and mustard to brush (bought for the dish); a
+    finishing drizzle (core by MANUAL §4); oil for deep-frying (a bottle to
+    buy); the flour and butter of a meunière (they are the dish). The
+    proofread baseline moved for the three published files in a commit of its
+    own. `test_incidental_not_in_main_ingredients` learned that a flagged line
+    may share its name with a real one.
 
 ---
 

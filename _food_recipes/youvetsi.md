@@ -17,6 +17,7 @@ ingredient_groups:
     - amount: "800 ml"
       item: beef stock
     - item: "olive oil, for frying"
+      incidental: true
     - amount: "2"
       item: "onions, finely chopped"
     - amount: "2"
