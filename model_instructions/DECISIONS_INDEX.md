@@ -499,6 +499,7 @@ argument and the rules each field is read by.
 - 2026-09-10 · §11.2 · 2026-09-10: "There is no gh at all in a worktree" (§1) was true of a worktree on the host and false inside the devcontainer, whose image installs it; a session spent a turn …
 - 2026-09-10 · §11.2 · 2026-09-10: §1 gained the headless browser.
 - 2026-09-15 · §11.2 · guard-unanalyzable-bash.py refuses an unquoted ( or ).
+- 2026-10-10 · §11.2 · guard-unanalyzable-bash.py refuses $[ outside single quotes, its eleventh shape.
 - 2026-09-28 · §12 · origin/<branch> NEVER MOVES, so it cannot answer "is this pushed?"
 - 2026-09-28 · §12 · The handover that crossed two repos and only named one
 - 2026-09-28 · §12 · Two working copies of one batch, again — 2026-09-28.

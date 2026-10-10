@@ -302,6 +302,38 @@ def test_the_hook_leaves_lowercase_dash_c_and_bare_git_alone(command):
     assert not _unanalyzable_denies(command), f"refused {command!r}"
 
 
+# --- guard-unanalyzable-bash.py shape 11: `$[` outside single quotes ---------
+#
+# Helen, 2026-10-10, having declined the first command below: "Can we adjust
+# settings to allow non-scary requests of this sort?" Settings cannot: the
+# checker's parser reads `$[` in double quotes as legacy arithmetic and asks
+# her whatever the allow list says. So the shape is refused, and the same
+# pattern in single quotes -- which is inert -- goes through.
+
+@pytest.mark.parametrize("command", [
+    # the exact call she was asked about
+    'grep -n -E "max-width: *\\\\$|^\\\\$[a-z-]*(phone|stack|width)[a-z-]*:" -r _sass/shared/_tokens.scss',
+    'grep -n "^$[a-z]" _sass/shared/_tokens.scss',
+    "echo $[1+2]",
+])
+def test_the_hook_refuses_legacy_arithmetic_outside_single_quotes(command):
+    assert _unanalyzable_denies(command), f"allowed {command!r}"
+
+
+@pytest.mark.parametrize("command", [
+    # the same pattern in single quotes, which is what to write instead
+    "grep -n -E 'max-width: *\\$|^\\$[a-z-]*(phone|stack|width)[a-z-]*:' -r _sass/shared/_tokens.scss",
+    # an ESCAPED dollar is not a live one, in double quotes or bare
+    'grep -n "^\\$[a-z]" _sass/shared/_tokens.scss',
+    "grep -n ^\\$[a-z] _sass/shared/_tokens.scss",
+    # a dollar that no bracket follows, and a bracket that no dollar precedes
+    'grep -n "x$" _sass/shared/_tokens.scss',
+    'grep -n "[a-z]$" _sass/shared/_tokens.scss',
+])
+def test_the_hook_leaves_single_quoted_and_escaped_dollar_brackets_alone(command):
+    assert not _unanalyzable_denies(command), f"refused {command!r}"
+
+
 # --- session-ground-truth.py: the one hook that TELLS rather than refuses ----
 #
 # Added 2026-09-21. Every other hook here refuses something; this one reports
