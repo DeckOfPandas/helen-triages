@@ -1518,7 +1518,8 @@ shortlisted; `[data-shortlist-share]` built by `shortlist-export.js` from
 clear button** since #1100 — Helen: *"Remove the rest of the apparatus: no JSON
 export or import, no clear."* A link carries no portions or glasses; nothing
 does now. The panel's two lines are Helen's words; the shared-view note and
-"keep these" are still PLACEHOLDER COPY. Tests:
+"keep these" were an agent's, and she kept both as written on #1342
+(2026-10-10: *"Both good, thanks!"*). Tests:
 `tests/js/shortlist-share.test.js` (the store), `filter-state.test.js` (the
 grammar), and both index startup harnesses (the wiring).
 
