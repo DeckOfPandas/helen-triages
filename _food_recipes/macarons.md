@@ -1,6 +1,6 @@
 ---
 title: "Macarons"
-tagline: "Really not as hard as you think."
+tagline: "Sneaky, almond-y bastards, but ahhhh look how cute they are."
 source: "Adapted from Gordon Ramsay's Desserts"
 source_type: book
 makes: "64+ tiny macarons"

@@ -1,6 +1,6 @@
 ---
 title: "Chicken à la King"
-tagline: "American loveliness."
+tagline: "Good enough for me, good enough for royalty."
 source: "Adapted from The Cozy Cook"
 source_type: website
 serves: "6"

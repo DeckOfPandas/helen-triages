@@ -1,6 +1,6 @@
 ---
 title: "The One True Chocolate Brownies"
-tagline: "Perfect and foolproof."
+tagline: "Buy an Edge Brownie tin and never look back."
 source: "Adapted from Green & Black's recipe book"
 source_type: book
 makes: "enough for that edge-brownie tin I made James buy me"

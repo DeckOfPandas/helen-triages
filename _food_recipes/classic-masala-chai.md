@@ -1,6 +1,6 @@
 ---
 title: "Classic Masala Chai"
-tagline: "Just perfect."
+tagline: "You'll still find me gazing longingly at the door of Caffè Nero, but less now I can make this."
 source: "Adapted from delicious. magazine"
 source_type: website
 serves: "4"

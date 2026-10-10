@@ -1,6 +1,6 @@
 ---
 title: "Teriyaki Salmon"
-tagline: "It's teriyaki salmon."
+tagline: "Absolutely unbeatable for sticky, proteinaceous joy."
 source: "Adapted from The Daring Gourmet, recipe Kimberly Killebrew"
 source_type: website
 serves: "4"
