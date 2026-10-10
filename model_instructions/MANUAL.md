@@ -1127,6 +1127,18 @@ and `make-ahead` are separate axes. `drinks` is anything drinkable that is not
 a cocktail. `virtuous` is narrow: lean protein, or genuinely veg-forward with
 a wine or citrus sauce doing the work.
 
+**The other twelve, agreed 2026-10-10** (`_data/food/taxonomy.yml` has the
+record): `bakes` — a baked good out of the oven (cake, biscuit, bread, pastry),
+not anything that merely goes in it; Helen's test is *"would this appear on
+Great British Bake Off?"*. `dessert` — a pudding course served at the table.
+`sweets` — small sweet things eaten by hand outside a meal. `carbs party` —
+the starch is the point. `cheese-tastic` — cheese is the pleasure of the dish,
+not a garnish. `fakeaway` — a home version of something you would order in.
+`hot snack` — small, hot, between meals. `nibbles` — finger food to pass
+round with drinks. `breakfast` — eaten in the morning. `extras` — not a dish
+by itself: sides, sauces, stocks, pickles, doughs. `festive` — Christmas, or
+another named feast. `starter` — works as a first course at a dinner party.
+
 **Standing per-recipe calls, not to be "fixed" for consistency**: the
 lemony cavolo nero soup is not tagged `soup` (its own tagline calls it a
 stew); `pancetta-white-bean-stew` is not `freezable` though its two sibling

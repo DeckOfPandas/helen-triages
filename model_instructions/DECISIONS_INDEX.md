@@ -134,6 +134,7 @@ argument and the rules each field is read by.
 - 2026-08-09 · §7 · #72 · Freezable: chicken-cider-stew and chicken-sorrel-potato-stew yes, pancetta-white-bean-stew no — case by case, do not add it to "match the other two".
 - 2026-08-12 · §7 · #187 · eggs reinstated, Helen's explicit call, because eight drafts had star_ingredient: eggs sitting invalid (not blank, as a previous version of §7 had claimed — checked against the …
 - 2026-08-01 · §7 · Splitting "declared" from "filterable" (point recipe_badges.html at taxonomy.tags) proposed and rejected: no user stands in the gap between a fact you read (a note says more) and …
+- 2026-10-10 · §7 · TWELVE TAGS GET A WRITTEN MEANING, AND TAGS ARE PROPOSED BY READING.
 - 2026-10-08 · §7 · FOOD GETS NO TAG DERIVER; IT GETS A REPORT.
 - 2026-08-01 · §8 · Kept: 600 distinct main ingredients across 300+ files, 54% in exactly one recipe; 26–29% of recipes have no star.
 - 2026-08-16 · §8 · #281 #52 · Why the exclude picker's words are worse: same code, harder input (every ingredient_groups item, chosen deliberately by #52).

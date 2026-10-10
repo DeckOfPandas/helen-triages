@@ -151,6 +151,35 @@ retired_star_ingredients:
 # a rule that quietly overturns two others is worse than no rule. `freezable`
 # answers "can I keep the leftovers", `make-ahead` answers "can I do this on
 # Saturday". A dish may be either, both or neither.
+#
+# -----------------------------------------------------------------------------
+# THE TWELVE THAT HAD NO WRITTEN MEANING -- AGREED 2026-10-10. Until then
+# these were names in a list, which is why an ingest's proposals for them were
+# hit and miss. A session drafted one line each and Helen answered "Agree on
+# all", adding the test for `bakes` in her own words.
+#
+#   bakes          a baked good out of the oven: cake, biscuit, bread, pastry.
+#                  Not anything that merely goes in the oven. HER TEST: "would
+#                  this appear on Great British Bake Off?" -- so chocolate
+#                  mousse tartlets, with their baked pastry cases, are in.
+#   dessert        a pudding course you serve at the table.
+#   sweets         small sweet things eaten by hand outside a meal: brownies,
+#                  biscuits, fudge.
+#   carbs party    the starch is the point: pasta, rice, potatoes, pies,
+#                  dumplings.
+#   cheese-tastic  cheese is the pleasure of the dish, not a garnish.
+#   fakeaway       a home version of something you would order in.
+#   hot snack      small, hot and eaten between meals: toasties, fritters,
+#                  things on toast.
+#   nibbles        finger food to pass round with drinks.
+#   breakfast      eaten in the morning.
+#   extras         not a dish by itself: sides, sauces, stocks, pickles, doughs.
+#   festive        Christmas, or another named feast.
+#   starter        works as a first course at a dinner party.
+#
+# The other eight already had hers: `make-ahead` and `freezable` above,
+# `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
+# group note above, `no-cook`, `virtuous` and `ice cream` in MANUAL §7.
 # -----------------------------------------------------------------------------
 tags:
   mood:

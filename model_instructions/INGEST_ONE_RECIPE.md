@@ -428,6 +428,26 @@ Meanings you would not guess:
   or citrus sauce doing the work. Not "contains a vegetable".
 - **`ice cream`** implies `dessert` and `make-ahead` — write all three.
 
+And the plainer ones, as Helen means them (agreed 2026-10-10):
+
+- **`bakes`** — a baked good out of the oven: cake, biscuit, bread, pastry.
+  Not anything that merely goes in the oven. Her test: *"would this appear on
+  Great British Bake Off?"*
+- **`dessert`** — a pudding course you serve at the table.
+- **`sweets`** — small sweet things eaten by hand outside a meal: brownies,
+  biscuits, fudge.
+- **`carbs party`** — the starch is the point: pasta, rice, potatoes, pies,
+  dumplings.
+- **`cheese-tastic`** — cheese is the pleasure of the dish, not a garnish.
+- **`fakeaway`** — a home version of something you would order in.
+- **`hot snack`** — small, hot and eaten between meals: toasties, fritters,
+  things on toast.
+- **`nibbles`** — finger food to pass round with drinks.
+- **`breakfast`** — eaten in the morning.
+- **`extras`** — not a dish by itself: sides, sauces, stocks, pickles, doughs.
+- **`festive`** — Christmas, or another named feast.
+- **`starter`** — works as a first course at a dinner party.
+
 **Two or three tags is normal. None is legitimate.** Being wrong here is cheap
 for her to fix, so propose rather than agonise — but propose only from the list.
 

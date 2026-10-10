@@ -1378,6 +1378,21 @@ unless stated.
   `recipe_badges.html` at `taxonomy.tags`) proposed and rejected: no user
   stands in the gap between a fact you read (a note says more) and a fact you
   browse by (needs the filter).
+- **2026-10-10 — TWELVE TAGS GET A WRITTEN MEANING, AND TAGS ARE PROPOSED BY
+  READING.** The entry below stands: nothing derives a food tag. What Helen
+  asked for instead is a session that reads a draft against what each tag
+  means and proposes, for her yes or no — she had skipped most proposals at
+  ingest (*"I was somewhere where I needed to minimise typing"*). Eight tags
+  had her meaning on record; `bakes`, `dessert`, `sweets`, `carbs party`,
+  `cheese-tastic`, `fakeaway`, `hot snack`, `nibbles`, `breakfast`, `extras`,
+  `festive` and `starter` were names in a list. A session drafted a line for
+  each and she answered *"Agree on all"*, adding the test for `bakes`:
+  *"would this appear on Great British Bake Off?"* — which puts chocolate
+  mousse tartlets in. The twelve lines are in `_data/food/taxonomy.yml`,
+  MANUAL §7 and `INGEST_ONE_RECIPE.md` §4. Also hers, the same day: *"Drafts
+  will be very hit and miss, so tags there should not be used as data"*, and
+  *"Crab pot pies with salad is not a salad"* — the checker's `salad` hint
+  fires on that title and the recipe is right.
 - **2026-10-08 — FOOD GETS NO TAG DERIVER; IT GETS A REPORT.** Helen, after
   the cocktail moods were measured the same day (§9.3): *"Let's do this now
   please."* The same search — every one- and two-feature rule, scored on
