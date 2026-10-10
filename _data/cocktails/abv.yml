@@ -178,8 +178,8 @@ bottles:
   "Havana Club 3 year old":           { abv: 40,   confidence: high }
   "Flor de Caña Extra Dry":           { abv: 40,   confidence: medium }
   # Named by Helen 2026-09-25 (#1108) for Fanny Chu's Piña Colada, no strength
-  # given. A GUESS at the usual 40 for a silver rum; `low`, with the question.
-  "Pedro Mandinga Panama silver rum": { abv: 40,   confidence: low, qq: "Helen named the bottle without a strength (#1108). What does the Pedro Mandinga silver label say? 40 is a guess." }
+  # given. The 40 was a guess; she ticked it as right on #1351, 2026-10-10.
+  "Pedro Mandinga Panama silver rum": { abv: 40,   confidence: medium }
   "Planteray 3 Stars":                { abv: 41.2, confidence: medium }
   "Planteray O.F.T.D.":               { abv: 69,   confidence: high }
   # In the house since 2026-09-06, #782, and CONFIRMED BY HELEN off the bottle
@@ -223,8 +223,8 @@ bottles:
   "Trois Rivières Cuvée de l'Océan":  { abv: 42,   confidence: high }
   "Barbancourt 3 Star":               { abv: 43,   confidence: high }
   # Named by Helen 2026-10-07 without a strength. 43 is the 3 Star's figure
-  # carried across; `low`, with the question.
-  "Barbancourt 5 Star":               { abv: 43,   confidence: low, qq: "Helen named the bottle without a strength. Does the Barbancourt 8-year (5 Star) label say 43, like the 3 Star?" }
+  # carried across; she ticked it as right on #1351, 2026-10-10.
+  "Barbancourt 5 Star":               { abv: 43,   confidence: medium }
   # 43, NOT 53.5, AND THE WORD `COMMUNAL` IS THE WHOLE POINT. A single-village
   # clairin -- Sajous, Vaval, Casimir -- really does run into the fifties and
   # move batch to batch, which is where the old guess came from. `Communal` is
@@ -336,8 +336,9 @@ bottles:
   "Punt e Mes":                       { abv: 16,   confidence: high }
   "Lillet Blanc":                     { abv: 17,   confidence: high }
   # Named by Helen 2026-10-07 for Picotin and North Sea Oil, no strength given.
-  # 16.5 is what the bottle usually says; `low`, with the question.
-  "Cocchi Americano":                 { abv: 16.5, confidence: low, qq: "Helen named the bottle without a strength. Does the Cocchi Americano label say 16.5?" }
+  # 16.5 is what the bottle usually says; she ticked it as right on #1351,
+  # 2026-10-10.
+  "Cocchi Americano":                 { abv: 16.5, confidence: medium }
   "Lustau Amontillado":               { abv: 18.5, confidence: medium }
   "Barbadillo Principe":              { abv: 19,   confidence: medium }
   "Lustau Don Nuño Oloroso":          { abv: 20,   confidence: medium }
@@ -518,11 +519,15 @@ generics:
   # No bottle is declared for any of them and none is a label Helen has read:
   # each is the figure the category is usually bottled at, `low`, with the
   # question. Declaring the bottle she pours replaces the row.
-  black raspberry liqueur: { abv: 16.5, confidence: low, qq: "No bottle declared. Difford's names Chambord, usually 16.5; is that the bottle, and does the label agree?" }
-  crème de myrtille:      { abv: 16,   confidence: low, qq: "No bottle declared. Difford's pours Giffard Crème de Myrtille, usually 16; is that the bottle, and does the label agree?" }
-  kümmel:                 { abv: 38,   confidence: low, qq: "No bottle declared. A kümmel is usually 35 to 40; which bottle, and what does it say?" }
-  sake:                   { abv: 16,   confidence: low, qq: "No bottle declared. Difford's pours a daiginjo GENSHU, which is undiluted and can run to 17 or 18; which bottle, and what does it say?" }
-  tsipouro:               { abv: 42,   confidence: low, qq: "No bottle declared. Tsipouro runs 40 to 45; which bottle, and what does it say?" }
+  # HELEN'S FIGURES, 2026-10-10 (#1351), each with the bottle a pour defaults
+  # to: Chambord 16.5, Briottet myrtille 18 (it was a guessed 16), Mentzendorff
+  # kümmel 38, Akashi-Tai Daiginjo Genshu 17 (it was a guessed 16). The
+  # tsipouro's 42 she ticked as right without naming a bottle.
+  black raspberry liqueur: { abv: 16.5, confidence: high }
+  crème de myrtille:      { abv: 18,   confidence: high }
+  kümmel:                 { abv: 38,   confidence: high }
+  sake:                   { abv: 17,   confidence: high }
+  tsipouro:               { abv: 42,   confidence: medium }
   # NEW 2026-10-04 (#838), when Helen split `crème de cacao` by colour. The
   # white derives from Briottet Crème de Cacao Blanc above; the brown has no
   # bottle declared, and Brandy Alexander is its only pour. 25 is that same
@@ -558,12 +563,15 @@ generics:
   # NEW 2026-10-07 with the generic (Roman Punch, a 5 ml float). The tawny's
   # figure carried across -- a ruby is bottled in the same 19-20 band -- and
   # `medium`: a category figure, no label read.
-  ruby port:              { abv: 20,   confidence: medium }
+  # Helen, 2026-10-10 (#1351): "Ruby port can default to Taylor's Fine, 20%".
+  ruby port:              { abv: 20,   confidence: high }
   # A PLACEHOLDER, 2026-10-07, the Difford's batch. `Japanese whisky` was
   # declared ahead of a drink and had no figure; Geisha Martini (2.5 ml) is
   # its first pour. A GUESS, `low`, with the question -- not a label Helen has
   # read.
-  Japanese whisky:        { abv: 43,   confidence: low, qq: "No bottle declared. 43 is a common strength for a blended Japanese whisky; which bottle is on the shelf, and what does it say?" }
+  # ANSWERED 2026-10-10 (#1351): "Japanese whisky can default to Suntory Toki
+  # Blended, 43%". The guess stood; it is hers now.
+  Japanese whisky:        { abv: 43,   confidence: high }
   # `americano` AND `lemon vodka` EACH HAD A ROW HERE FOR AN HOUR and lost it
   # the same day, when Helen named a bottle for each (Cocchi Americano, Absolut
   # Citron -- both in `bottles:` above). A bottle's figure wins, and
