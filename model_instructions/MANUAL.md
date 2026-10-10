@@ -1448,9 +1448,32 @@ a missing glasses entry is one glass, a missing portions entry is *however many
 this recipe makes*, which only the build knows — so `1` is a real, storable
 answer here.
 
-**THE RECIPE PAGE HAS A SCALER TOO, AND A HANDFUL SCALES IN HALF STEPS**
-(#1005, #1125). `assets/js/food-scale.js` is one amount at a factor, through
-this same parser and `totalText`; `assets/js/recipe-scale.js` is the wiring.
+**THE RECIPE PAGE HAS A SCALER TOO, AND A MEASURE TAKEN BY HAND SCALES IN
+STEPS** (#1005, #1125). `assets/js/food-scale.js` is one amount at a factor,
+through this same parser and `totalText`; `assets/js/recipe-scale.js` is the
+wiring.
+
+**WHICH STEP, TODAY — three lists in `_data/food/scaling.yml`, and a word is
+on exactly one:**
+
+| list | words | step | 1 at seven portions for six |
+|---|---|---|---|
+| `quarter_step_measures` | handful, sprig, bunch | nearest ¼, never below ¼ | `1¼ handfuls` |
+| `half_step_measures` | pinch, dash, splash, knob | nearest ½, never below ½ | `1 pinch` |
+| `half_step_counts` | drop, twist, lot, pat | nearest ½, never below ½ | `1 drop` |
+
+**THE HANDFUL STARTED THE HALF-STEP LIST AND LEFT IT ON 2026-10-10** (Helen:
+*"Recipe page handfuls and sprigs in 1/4 too please."*), once the shopping
+list had been ruled to quote a handful in quarters. **So the paragraphs and
+the table below describe the half step with the handful as their example, as
+it was ruled on 2026-10-04; read "handful" there as "pinch".** The mechanism
+is unchanged — `halfStep`, the plural, the measure with no number, the
+Not-scaled line — and a quarter-step measure goes through the same code with
+`quarterStep` (`eitherStep` for a measure written with no number, so `a
+handful of parsley` and `a sprig of thyme` scale as `a pinch of salt` does).
+**The half-recipe judge still lets a handful halve always**: it is handed
+`half_step_measures` plus `half_recipe.by_eye_also` (`handful`), and a test
+pins both.
 
 **A measure taken by hand or eye scales to the nearest half, never less than
 a half.** Helen, 2026-10-04, three sentences in order: *"some recipes scale 1

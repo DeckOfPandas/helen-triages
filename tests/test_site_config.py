@@ -459,9 +459,19 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
     """
     scaling = yaml.safe_load(read("_data", "food", "scaling.yml"))
     measures = scaling.get("half_step_measures")
-    assert measures and "handful" in measures, (
-        "_data/food/scaling.yml has no `half_step_measures` list naming "
-        "`handful`; the recipe scaler will print 1.17 handfuls again."
+    # `handful` was the word this list was made for and left it on 2026-10-10
+    # for the quarter-step list: "Recipe page handfuls and sprigs in 1/4 too
+    # please." It must be on exactly one of them, or 1.17 handfuls is back.
+    assert measures and "pinch" in measures, (
+        "_data/food/scaling.yml has no `half_step_measures` list naming `pinch`."
+    )
+    assert "handful" in scaling.get("quarter_step_measures", []), (
+        "`handful` is on neither step list; the recipe scaler will print "
+        "1.17 handfuls again."
+    )
+    assert "handful" not in measures, (
+        "`handful` is back in half_step_measures. Helen, 2026-10-10: 'Recipe "
+        "page handfuls and sprigs in 1/4 too please.'"
     )
     assert "pat" not in measures, (
         "`pat` is in half_step_measures. Helen, 2026-10-04: '\"pat\" is a "
@@ -4131,6 +4141,18 @@ def test_the_quarter_step_measures_reach_both_scalers():
         "recipe must go on refusing a half recipe ('Neither mince pies nor "
         "sweet cream base halve')."
     )
+    # THE JUDGE'S OWN LIST: the half-step measures plus `by_eye_also`, which
+    # holds `handful` now that it steps in quarters. A handful halves always;
+    # a sprig is a count and an odd one refuses.
+    also = scaling["half_recipe"].get("by_eye_also")
+    assert also == ["handful"], (
+        f"half_recipe.by_eye_also should be just `handful`; got {also!r}. "
+        "Without it an odd handful refuses a half recipe; with `sprig` in it "
+        "an odd sprig stops refusing."
+    )
+    # The judge adds `by_eye_also` itself, so its two callers (the build and
+    # scripts/food_yield.rb) cannot disagree about it.
+    assert 'vocab["by_eye_also"]' in read("_plugins", "food_half_recipe.rb")
     plugin = read("_plugins", "food_shopping.rb")
     assert 'dig("food", "scaling", "half_step_measures")' in plugin
     assert "half_step_counts" not in plugin, (

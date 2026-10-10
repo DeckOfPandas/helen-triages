@@ -1791,6 +1791,16 @@ unless stated.
       example and a tidy rule disagree, the example was the specification.**
       The list and the recipe page may now differ on a handful (1¼ asked for;
       "1 handful" to use), which follows from her two rulings and is not a bug.
+  - **And then the recipe page's handful went to quarters too, which undoes
+    "Handfuls can scale in half steps" (2026-10-04) for the handful.** Told
+    that the list would now say 1¼ where the recipe page said "1 handful":
+    *"Recipe page handfuls and sprigs in 1/4 too please."* `handful` moved to
+    `quarter_step_measures`. **Pinch, dash, splash and knob were left in
+    halves: her sentence names the handful, and that reading is a session's**
+    — the 2026-10-04 rule had been spread from "handfuls" to all five, and
+    this one was not spread back. So a pinch can still differ between the two
+    pages (1 pinch to use; 2 to buy, 1¼ asked for). The half-recipe judge
+    keeps treating a handful as by-eye, through `half_recipe.by_eye_also`.
   - **Drops, twists, lots and pats step in halves, replacing "scaled
     linearly" of 2026-10-04**: *"Drops, twists, lots etc, please round to the
     nearest 1/2 -- these are smaller than handfuls and sprigs."* `pat` is

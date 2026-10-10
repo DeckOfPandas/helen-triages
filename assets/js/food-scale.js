@@ -111,7 +111,12 @@
     return Math.max(0.5, Math.round(quantity * 2) / 2);
   }
 
-  /* A SPRIG AND A BUNCH SCALE IN QUARTERS -- #1297, Helen, 2026-10-10, shown
+  /* A HANDFUL, A SPRIG AND A BUNCH SCALE IN QUARTERS. The handful joined on
+     2026-10-10 ("Recipe page handfuls and sprigs in 1/4 too please"), which
+     REPLACES the half step above for it: 1 handful x7/6 is 1¼ handfuls, where
+     it was 1. Pinch, dash, splash and knob keep the half step.
+
+     For the sprig and the bunch -- #1297, Helen, the same day, shown
      "1.17 sprigs" on this page: "Sprigs: Let's round to 1/4 please, and
      express in fractions not decimals." The nearest quarter, never less than
      one: 1 sprig x7/6 is 1¼ sprigs, x2/3 is ¾ sprigs, and 4 sprigs doubled is
@@ -188,7 +193,7 @@
   var COUNT_OF_ONE = '(?:(an?|one|\\d+)\\s+)?';
   var SIZE_WORD = '((?:small|large|big|good|generous|little)\\s+)?';
 
-  function scaleMeasurePhrase(text, factor, words, tail) {
+  function scaleMeasurePhrase(text, factor, words, tail, step) {
     var written = String(text === undefined || text === null ? '' : text);
     var unmoved = { text: written, scaled: false };
     if (!words || !(factor > 0)) return unmoved;
@@ -202,7 +207,7 @@
     if (match[5] && !counted) return unmoved;        // a bare plural is no count
 
     var base = counted ? parseInt(match[2], 10) : 1;
-    var n = halfStep(base * factor);
+    var n = (step || halfStep)(base * factor);
     if (n === base) return { text: written, scaled: true };
 
     return {
@@ -219,13 +224,25 @@
    *
    * @param {string} text - the item's text as the page prints it
    * @param {number} factor
-   * @param {{halfStep?: string[]}} [options]
+   * @param {{halfStep?: string[], quarterStep?: string[]}} [options]
    * @returns {{text: string, scaled: boolean}} `scaled: false` and the text
    *          untouched when it does not open with a countable by-eye measure
    */
   function scaleLeadingMeasure(text, factor, options) {
+    return eitherStep(text, factor, options, '\\s+of\\s+');
+  }
+
+  /* A MEASURE WITH NO NUMBER, IN WHICHEVER STEP IT TAKES. "a pinch of salt"
+     is a half-step measure and "a handful of parsley" a quarter-step one
+     since 2026-10-10 ("Recipe page handfuls and sprigs in 1/4 too please");
+     each list is tried with its own rounding, and a word is on one list only
+     (tests/test_site_config.py refuses one on both). */
+  function eitherStep(text, factor, options, tail) {
+    var halves = scaleMeasurePhrase(text, factor,
+      measureWords(options && options.halfStep), tail, halfStep);
+    if (halves.scaled) return halves;
     return scaleMeasurePhrase(text, factor,
-      measureWords(options && options.halfStep), '\\s+of\\s+');
+      measureWords(options && options.quarterStep), tail, quarterStep);
   }
 
   /**
@@ -249,7 +266,7 @@
     var parsed = parseAmount(written);
     if (!parsed) {
       // "pinch", "a handful", "small handful": the measure and nothing else.
-      return scaleMeasurePhrase(written, factor, words, '\\s*$');
+      return eitherStep(written, factor, options, '\\s*$');
     }
 
     var stepped = scaleSteppedMeasure(parsed, factor, words, halfStep) ||
@@ -389,14 +406,16 @@
 
   /**
    * @param {string} text - the ingredient row's text, amount and note removed
-   * @param {{halfStep?: string[], trailing?: string[]}} [options]
+   * @param {{halfStep?: string[], quarterStep?: string[], trailing?: string[]}} [options]
    * @returns {string} the ingredient's name, for the note under the control
    */
   function noteName(text, options) {
     var opts = options || {};
     var name = keep(String(text === undefined || text === null ? '' : text), '');
 
-    var words = measureWords(opts.halfStep);
+    // Every stepped measure, half or quarter: "a few handfuls of" goes as
+    // "a few dashes of" does.
+    var words = measureWords((opts.halfStep || []).concat(opts.quarterStep || []));
     if (words) {
       var leading = new RegExp(
         '^' + QUANTIFIER + SIZE + '(?:' + words + ')(?:e?s)?(?:\\s+each)?\\s+of\\s+', 'i');

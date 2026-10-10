@@ -72,8 +72,11 @@
 # `large`, `medium` and `small` MUST NEVER BE ADDED. Helen, on #1005: "Things
 # like '2 large' can scale, surely" -- "2 large eggs" doubled is "4 large".
 # They are sizes of a counted thing, and 240 amounts use them.
+# `handful` WAS THE FIRST WORD ON THIS LIST AND LEFT IT ON 2026-10-10 for
+# `quarter_step_measures` below ("Recipe page handfuls and sprigs in 1/4 too
+# please"). It is still a by-eye measure to the half-recipe judge: see
+# `half_recipe.by_eye_also`.
 half_step_measures:
-  - handful
   - pinch
   - dash
   - splash
@@ -116,7 +119,14 @@ half_step_counts:
 # beside them: "2 sprigs thyme (1¼ in the recipes)". One lowercase
 # word each, singular, and never also in `half_step_measures`.
 # -----------------------------------------------------------------------------
+#
+# `handful` JOINED THEM THE SAME DAY. The shopping list had just been ruled to
+# quote a handful in quarters ("1.17 handfuls should buy 2", bracket 1¼), which
+# left the recipe page saying "1 handful" for the same amount. Told so:
+# "Recipe page handfuls and sprigs in 1/4 too please." Her sentence names the
+# handful; pinch, dash, splash and knob stay in halves.
 quarter_step_measures:
+  - handful
   - sprig
   - bunch
 
@@ -191,6 +201,14 @@ yields:
 # things and halves only if it is even.
 # -----------------------------------------------------------------------------
 half_recipe:
+  # A by-eye measure that is NOT in `half_step_measures` and must still halve
+  # ALWAYS. The judge is handed `half_step_measures` and adds this itself. `handful`
+  # moved to quarter steps on 2026-10-10, which changed how it is printed and
+  # nothing about whether half a recipe of it is sane. `sprig` and `bunch` are
+  # deliberately NOT here: they are counts to the judge, and an odd one
+  # refuses.
+  by_eye_also:
+    - handful
   # Always halves, whatever the number: the scaler already prints 31 g.
   divisible_units:
     - g

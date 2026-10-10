@@ -111,7 +111,8 @@ const WORDS = {
 };
 
 test('the two word lists were actually read', () => {
-  assert.ok(WORDS.halfStep.includes('handful'), WORDS.halfStep.join());
+  assert.ok(WORDS.halfStep.includes('pinch'), WORDS.halfStep.join());
+  assert.ok(WORDS.quarterStep.includes('handful'), WORDS.quarterStep.join());
   assert.ok(WORDS.trailing.includes('to taste'), WORDS.trailing.join());
 });
 
@@ -121,29 +122,42 @@ test('three orders of a handful is three handfuls -- Helen\'s own example', () =
   assert.strictEqual(r.scaled, true);
 });
 
-test('a handful never prints a fraction -- 1.17 handfuls is "obvious nonsense"', () => {
-  // Seven portions of a recipe for six: the case in the issue. It SCALED -- to
-  // the nearest half handful, which is the one it started with -- so it is
-  // not named on the Not-scaled line.
+test('a handful never prints a decimal -- 1.17 handfuls is "obvious nonsense"', () => {
+  // Seven portions of a recipe for six: the case in #1125. From 2026-10-04 it
+  // went to the nearest HALF and read "1 handful"; since 2026-10-10 a handful
+  // steps in quarters ("Recipe page handfuls and sprigs in 1/4 too please")
+  // and reads 1¼ -- the figure the shopping list's bracket quotes.
   const r = scaleAmount('1 handful', 7 / 6, WORDS);
-  assert.strictEqual(r.text, '1 handful');
+  assert.strictEqual(r.text, '1¼ handfuls');
   assert.strictEqual(r.scaled, true);
 });
 
-test('THE ROUNDING: the nearest half, and never less than a half', () => {
-  // Helen, 2026-10-04: "Handfuls can scale in half steps." `halfStep` in
-  // food-scale.js is the one function that decides this; this test is the one
-  // to change with it.
+test('THE ROUNDING, HANDFULS: the nearest quarter, and never less than a quarter', () => {
+  // `quarterStep` in food-scale.js decides this; this test changes with it.
   assert.strictEqual(at('1 handful', 1.5, WORDS), '1½ handfuls');
-  assert.strictEqual(at('1 handful', 7 / 6, WORDS), '1 handful');
-  assert.strictEqual(at('1 handful', 4 / 3, WORDS), '1½ handfuls');
-  assert.strictEqual(at('1 handful', 1.2, WORDS), '1 handful');
-  assert.strictEqual(at('2 handfuls', 2 / 3, WORDS), '1½ handfuls');
-  assert.strictEqual(at('2 handfuls', 7 / 6, WORDS), '2½ handfuls');
-  assert.strictEqual(at('2 handfuls', 1.1, WORDS), '2 handfuls');
+  assert.strictEqual(at('1 handful', 7 / 6, WORDS), '1¼ handfuls');
+  assert.strictEqual(at('1 handful', 4 / 3, WORDS), '1¼ handfuls');
+  assert.strictEqual(at('1 handful', 1.1, WORDS), '1 handful');
+  assert.strictEqual(at('2 handfuls', 2 / 3, WORDS), '1¼ handfuls');
+  assert.strictEqual(at('2 handfuls', 7 / 6, WORDS), '2¼ handfuls');
+  assert.strictEqual(at('2 handfuls', 1.05, WORDS), '2 handfuls');
+  assert.strictEqual(at('1 handful', 2 / 3, WORDS), '¾ handfuls');
+  assert.strictEqual(at('1 handful', 1 / 12, WORDS), '¼ handfuls');
+  assert.strictEqual(foodScale.quarterStep(1.17), 1.25);
+  assert.strictEqual(foodScale.quarterStep(0.1), 0.25);
+});
+
+test('THE ROUNDING, PINCHES AND THE REST: the nearest half, and never less than a half', () => {
+  // Helen, 2026-10-04: "Handfuls can scale in half steps." The handful has
+  // moved on; pinch, dash, splash and knob keep the rule it left behind, and
+  // `halfStep` is still the one function that decides it.
+  assert.strictEqual(at('1 pinch', 1.5, WORDS), '1½ pinches');
+  assert.strictEqual(at('1 pinch', 7 / 6, WORDS), '1 pinch');
+  assert.strictEqual(at('1 pinch', 4 / 3, WORDS), '1½ pinches');
+  assert.strictEqual(at('2 dashes', 7 / 6, WORDS), '2½ dashes');
   // Two thirds is nearer a half than one; a twelfth still leaves a half.
-  assert.strictEqual(at('1 handful', 2 / 3, WORDS), '½ handfuls');
-  assert.strictEqual(at('1 handful', 1 / 12, WORDS), '½ handfuls');
+  assert.strictEqual(at('1 knob', 2 / 3, WORDS), '½ knobs');
+  assert.strictEqual(at('1 splash', 1 / 12, WORDS), '½ splashes');
   assert.strictEqual(foodScale.halfStep(1.17), 1);
   assert.strictEqual(foodScale.halfStep(0.1), 0.5);
   assert.strictEqual(foodScale.halfStep(1.25), 1.5);
@@ -191,8 +205,9 @@ test('a range and a tilde survive the whole step', () => {
   assert.strictEqual(at('1–2 handfuls', 3, WORDS), '3–6 handfuls');
   assert.strictEqual(at('~1 handful', 3, WORDS), '~3 handfuls');
   assert.strictEqual(at('1–2 handfuls', 0.5, WORDS), '½–1 handful');
-  // Both ends landing on the same step is one number, not "½–½".
-  assert.strictEqual(at('1–2 handfuls', 0.1, WORDS), '½ handfuls');
+  // Both ends landing on the same step is one number, not "¼–¼".
+  assert.strictEqual(at('1–2 handfuls', 0.1, WORDS), '¼ handfuls');
+  assert.strictEqual(at('1–2 pinches', 0.1, WORDS), '½ pinches');
 });
 
 test('an amount that is only the measure counts as one of it', () => {
@@ -203,8 +218,11 @@ test('an amount that is only the measure counts as one of it', () => {
   assert.strictEqual(at('a handful', 3, WORDS), '3 handfuls');
   assert.strictEqual(at('small handful', 3, WORDS), '3 small handfuls');
   // At a factor that rounds back to one, the recipe's own words stand.
-  assert.strictEqual(at('a handful', 7 / 6, WORDS), 'a handful');
-  assert.strictEqual(scaleAmount('a handful', 7 / 6, WORDS).scaled, true);
+  assert.strictEqual(at('a handful', 1.1, WORDS), 'a handful');
+  assert.strictEqual(scaleAmount('a handful', 1.1, WORDS).scaled, true);
+  assert.strictEqual(at('pinch', 7 / 6, WORDS), 'pinch');
+  // A handful with no number steps in quarters like one with a number.
+  assert.strictEqual(at('a handful', 7 / 6, WORDS), '1¼ handfuls');
   // "a few" is not a number. Unscaled, and named on the line.
   assert.strictEqual(scaleAmount('a few handfuls', 3, WORDS).scaled, false);
   assert.strictEqual(scaleAmount('a few sprigs each', 3, WORDS).scaled, false);
@@ -249,13 +267,22 @@ test('a leading measure: a, an, one or nothing is ONE, and a size word is kept',
 });
 
 test('at one, a leading measure keeps the recipe\'s own words', () => {
-  const r = foodScale.scaleLeadingMeasure('a handful of fresh parsley', 7 / 6, WORDS);
+  const r = foodScale.scaleLeadingMeasure('a handful of fresh parsley', 1.1, WORDS);
   assert.strictEqual(r.text, 'a handful of fresh parsley');
   assert.strictEqual(r.scaled, true, 'it scaled, to the one it started with');
+  assert.strictEqual(
+    foodScale.scaleLeadingMeasure('a pinch of salt', 7 / 6, WORDS).text, 'a pinch of salt');
+  // A handful in the item steps in quarters, as one in the amount does.
+  assert.strictEqual(
+    foodScale.scaleLeadingMeasure('a handful of fresh parsley', 7 / 6, WORDS).text,
+    '1¼ handfuls of fresh parsley');
+  assert.strictEqual(
+    foodScale.scaleLeadingMeasure('a sprig of thyme', 7 / 6, WORDS).text,
+    '1¼ sprigs of thyme');
   // Anything but one is a number, in the same glyphs the amounts use.
   assert.strictEqual(
     foodScale.scaleLeadingMeasure('a handful of fresh parsley', 2 / 3, WORDS).text,
-    '½ handfuls of fresh parsley');
+    '¾ handfuls of fresh parsley');
   assert.strictEqual(
     foodScale.scaleLeadingMeasure('a handful of fresh parsley', 1.5, WORDS).text,
     '1½ handfuls of fresh parsley');
@@ -314,11 +341,12 @@ test('counts of things you can pick up scale -- Helen: "4 sprigs double is 8, an
   assert.strictEqual(scaleAmount('2 lots', 2, WORDS).text, '4 lots');
 });
 
-test('a sprig and a bunch go to the nearest quarter, in fractions -- never 1.17', () => {
+test('a handful, a sprig and a bunch go to the nearest quarter, in fractions -- never 1.17', () => {
   // Helen, 2026-10-10, shown "1.17 sprigs" and "1.17 bunches" at seven for
   // six: "Sprigs: Let's round to 1/4 please, and express in fractions not
   // decimals."
-  assert.deepStrictEqual(WORDS.quarterStep, ['sprig', 'bunch']);
+  // "Recipe page handfuls and sprigs in 1/4 too please" put the handful first.
+  assert.deepStrictEqual(WORDS.quarterStep, ['handful', 'sprig', 'bunch']);
   assert.strictEqual(scaleAmount('1 sprig', 7 / 6, WORDS).text, '1¼ sprigs');
   assert.strictEqual(scaleAmount('1 bunch', 7 / 6, WORDS).text, '1¼ bunches');
   assert.strictEqual(scaleAmount('1 sprig', 2 / 3, WORDS).text, '¾ sprigs');
@@ -361,9 +389,9 @@ test('drops, twists, lots and pats step in halves -- Helen: "round to the neares
   assert.strictEqual(scaleAmount('2 pats', 2, WORDS).scaled, true);
 });
 
-test('the index shopping list buys whole ones, and does NOT borrow this page\'s half step', () => {
-  // The same measures, two jobs. This page says what to USE, a handful in
-  // halves; the shortlist's shopping list says what to BUY, the next whole
+test('the index shopping list buys whole ones, and quotes quarters whatever this page\'s step', () => {
+  // The same measures, two jobs. This page says what to USE; the shortlist's
+  // shopping list says what to BUY, the next whole
   // one, with the amount asked for in brackets to the nearest QUARTER --
   // Helen, 2026-10-10: "2 handfuls fresh parsley (1 1/4 in the recipes)", and
   // then "1.17 handfuls should buy 2".
@@ -378,11 +406,15 @@ test('the index shopping list buys whole ones, and does NOT borrow this page\'s 
   assert.strictEqual(row('1 handful', 2), '2 handfuls');
   assert.strictEqual(row('2 handfuls', 0.5), '1 handful');
   assert.strictEqual(row('1 small handful', 2), '2 small handfuls');
-  // Seven portions of a recipe for six: one handful here, two to buy there.
-  assert.strictEqual(scaleAmount('1 handful', 7 / 6, WORDS).text, '1 handful');
+  // Seven portions of a recipe for six: 1¼ here, and the list buys two and
+  // quotes this page's figure -- the two agree since 2026-10-10.
+  assert.strictEqual(scaleAmount('1 handful', 7 / 6, WORDS).text, '1¼ handfuls');
   assert.strictEqual(row('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(row('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
-  // A sprig is in quarters on both, so the bracket is this page's figure.
+  // A pinch is in HALVES here and quarters there, so those two can differ.
+  assert.strictEqual(scaleAmount('1 pinch', 7 / 6, WORDS).text, '1 pinch');
+  assert.strictEqual(row('1 pinch', 7 / 6), '2 pinches (1¼ in the recipes)');
+  // A sprig is in quarters on both.
   assert.strictEqual(scaleAmount('1 sprig', 7 / 6, WORDS).text, '1¼ sprigs');
   assert.strictEqual(row('1 sprig', 7 / 6), '2 sprigs (1¼ in the recipes)');
 });
