@@ -736,7 +736,28 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Proved with the old value first: against `91431cf6` this test named exactly
 # those three files, each "last touched by c89d3ae9", and nothing else. Covers
 # c89d3ae9 and nothing after.
-BASELINE_COMMIT = "c89d3ae9"   # #1356: three incidental flags, on Helen's grant
+#
+# MOVED TO A MERGE, 2026-10-10, FOR EIGHT RECIPES -- #1343 AND #1348.
+# `92a132f6` replaces the tagline of seven recipes with Helen's own words,
+# verbatim from her comments on #1343 (classic masala chai, lemon feather
+# sponge, the one true chocolate brownies, dark chocolate soufflés, macarons,
+# chicken à la king, teriyaki salmon), and sets `proofread: true` on the
+# savoury plum sauce, which she proofread on 2026-10-08 (#1348). Nothing else
+# in any of the eight changes.
+#
+# HER GRANT, asked for before the edit ("I'd want your grant up front to move
+# the baseline for these") and given 2026-10-10: "Explicit grant now to update
+# all those files, including the live ones -- I'll need to reproofread anyway
+# (argh), and these changes are minor so I trust you!"
+#
+# A MERGE, FOR THE REASON `91431cf6` WAS: `c89d3ae9` above reached `main`
+# through #1355 while `92a132f6` was made on its own branch, and neither is an
+# ancestor of the other. `efe55b56` is the merge of `main` into that branch and
+# has both behind it. The branch's other commits touch no recipe.
+#
+# Proved in the merge, with `c89d3ae9` still in place: this test named exactly
+# those eight files, each "last touched by 92a132f6", and nothing else.
+BASELINE_COMMIT = "efe55b56"   # the merge holding #1356's three and the eight of #1343/#1348
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato

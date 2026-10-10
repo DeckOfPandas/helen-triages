@@ -901,7 +901,8 @@ unless stated.
     recommendations, put to her as one reading and answered *"Yes, your
     interpretation of #1356 is correct."* (spelling tidied).
   - **Not done here, still open on #1356**: the word list in data, the pass
-    over the 71 existing draft lines and the six published ones, and the test.
+    over the 71 existing draft lines, and the test. The three published fats
+    were flagged the same day by another session (#1355, `c89d3ae9`).
   - **What the batch itself showed**: 8 of its 23 files had a second group
     (`to serve`, a sauce) under an unnamed first one, which the suite refuses
     and `INGEST_ONE_RECIPE.md` had never said. It says so now.
