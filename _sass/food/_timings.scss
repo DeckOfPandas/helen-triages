@@ -190,8 +190,11 @@
   margin-bottom: $spacing-section-gap;
 }
 
+// A section's worth between one cut group and the next (2026-10-10, with
+// the block restyle): the groups are the page's sections within a protein,
+// and a block gap read as one more row.
 .ct-group + .ct-group {
-  margin-top: $spacing-block-gap;
+  margin-top: $spacing-section-gap;
 }
 
 // The cut group's name, in the data's words ("Tender roasting cuts"), with the
@@ -239,13 +242,21 @@ article.recipe .recipe-body-content h3.ct-group-name {
 // Scoped under article.recipe .recipe-body-content for the same reason the
 // charts' contents list is: the body's own list rule gives every li a dash
 // and an indent at (0,2,3), and anything less specific than this loses to it.
+//
+// THE BLOCK'S OWN PADDING LIVES HERE, ON THE li, since 2026-10-10 -- and
+// this is the finding behind "the rows are all too close together". From
+// round one `.ct-method` declared `padding: $space-md 0` at (0,1,0), and
+// this reset's `padding: 0` at (0,2,3) beat it on every block: the rows
+// had NO vertical padding at all, two rounds of "more air" moved a value
+// nothing read, and the last line of each block sat on its rule. Found by
+// reading the compiled food.css for the two rules side by side.
 article.recipe .recipe-body-content .ct-methods {
   list-style: none;
   margin: 0;
   padding: 0;
 
   li {
-    padding: 0;
+    padding: 1.25rem 0;
     margin: 0;
     max-width: none;
 
@@ -253,36 +264,63 @@ article.recipe .recipe-body-content .ct-methods {
   }
 }
 
-// One method. A two-column grid with the name and the time on the first row;
-// the outcome and the oven setting each span both columns beneath. On a
-// phone the time column is capped so a long range wraps -- at its dash only,
-// see .ct-t -- rather than squeezing the name into one word a line; on a
-// wide screen there is room for both and the cap would only break ranges
-// that fit. Since the compact time format (2026-10-09, "4h50m – 5h30m" for
-// what was "4 hrs 50 mins – 5 hrs 30 mins") no range reaches the cap; it
-// stays as the guard it was.
+// One method, as a block -- RESTYLED FROM SCRATCH ON 2026-10-10, after two
+// rounds. Round three put the outcome second in violet at 600 and the oven
+// setting third in small grey, and Helen's read was: "the rows are all too
+// close together. The e.g. 160-180 fan at the bottom of one row is so close
+// to the bottom of the row it can barely be seen. Then the top line of the
+// row below is so close to that I can't tell which row is which. The new
+// cacophony of font styles is absolutely not helping visual cohesion... I'm
+// very open to you just starting this table styling again from scratch."
+// Her choices from the round-four candidates: outcome first, method next in
+// Courier; the timings as they were ("I like the timings on their own on
+// the right, and their styling, so keep those!"); the violet off the
+// outcome; and the oven setting in Plex Mono, the site's face for a figure
+// you act on (food/_palette.scss, $font-label).
 //
-// THE OUTCOME IS THE SECOND LINE AND IT IS THE LOUD ONE, since 2026-10-09.
-// It was the last line, small, italic and grey, under the oven setting.
-// Helen's case: "I'm holding a 3-kg venison haunch and want to decide how to
-// cook it. I'm most interested in what I'd get." She chose this shape over
-// the outcome as the headline, "but I'm close to picking B, so please make
-// the outcome sing even in second place" -- so it is the body face at 600,
-// in the site's violet, a strapline under the name; the oven setting drops
-// to third, small and quiet.
+// THREE FACES, EACH WITH ONE JOB, and no fourth:
+//   body      the outcome -- a description, read ("Crusted outside, pink
+//             centre"), 600 so it is the line the eye lands on, ink colour
+//   Courier   the method's name -- a label, like the cut-group heading above
+//             it and the row labels on the charts, small and grey
+//   Plex Mono the time and the oven stages -- figures you act on, both at
+//             600, the time large at the right and the stages small under
+//             the name, one line per stage
+//
+// THE AIR IS THE OTHER HALF OF THE FIX. 1.25rem above and below each block
+// (declared on the li reset above, where it can win), a clear row gap
+// between its lines, and the oven stages set off from the name by a little
+// more -- so a block's last line is not against its rule and the next
+// block's first line is not against it either.
+//
+// The two-column grid: the first row is the outcome and the time; the
+// name and the oven stages each span both columns beneath. On a phone the
+// time column is capped so a long range wraps -- at its dash only, see
+// .ct-t -- rather than squeezing the outcome into one word a line.
 .ct-method {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "name time" "outcome outcome" "oven oven";
+  grid-template-areas: "outcome time" "name name" "oven oven";
   column-gap: $space-lg;
-  row-gap: $space-xxs;
-  padding: $space-md 0;
+  row-gap: $space-xs;
   border-bottom: 1px solid $color-border;
+}
+
+.ct-method-outcome {
+  grid-area: outcome;
+  font-size: 1rem;
+  font-weight: 600;
+  color: $color-text;
+  line-height: 1.35;
 }
 
 .ct-method-name {
   grid-area: name;
-  font-size: 1rem;
+  font-family: $font-headings;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: $color-clear-text;
+  line-height: 1.4;
 }
 
 // The figure. Plex Mono, per food/_palette.scss's $font-label rule: a number
@@ -307,17 +345,23 @@ article.recipe .recipe-body-content .ct-methods {
   white-space: nowrap;
 }
 
-.ct-method-outcome {
-  grid-area: outcome;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: $color-blinging-blackberry;
-}
-
+// The oven setting: a line per stage, in the face for a figure you act on.
+// The data writes each stage as a short line ("220°C fan for 20 min", "180°C
+// fan for the rest"), since 2026-10-10 -- it was one sentence per method
+// ("Start 220°C fan for 15–20 min, drop to 180°C fan"), which buried the
+// two figures in the words around them.
 .ct-method-oven {
   grid-area: oven;
-  font-size: 0.82rem;
-  color: $color-clear-text;
+  margin-top: $space-xs;
+  font-family: $font-label;
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: $color-text;
+  line-height: 1.5;
+}
+
+.ct-oven-line {
+  display: block;
 }
 
 // --- Fish and shellfish -------------------------------------------------------

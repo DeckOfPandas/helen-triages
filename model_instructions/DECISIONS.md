@@ -9851,6 +9851,42 @@ verification. Dates are when the correction landed.
   the script first and the page worked by accident; a Playwright locator
   refused the ambiguity. The div is `#ct-method-groups`.
 
+- **2026-10-10 — THE METHOD BLOCK, STARTED AGAIN, AND WHY THE ROWS WERE
+  TOO CLOSE.** Helen, on the candidates: *"It's that the rows are all too
+  close together. The e.g. 160-180 fan at the bottom of one row is so close
+  to the bottom of the row it can barely be seen. Then the top line of the
+  row below is so close to that I can't tell which row is which. The new
+  cacophony of font styles is absolutely not helping visual cohesion... My
+  favourite from your current candidates page is outcome first, method next
+  in courier... let's try using [Plex] for the e.g. '190-200°C fan'
+  instructions. Lines like this one should break more helpfully... Basically
+  hardly any extra text, instructions not buried... I think the violet
+  colour for outcome is going to have to go as well... I like the timings
+  on their own on the right, and their styling, so keep those!"*
+
+  **The rows were too close because the block had no padding at all.**
+  `.ct-method { padding }` at (0,1,0) had lost to the list reset's `padding:
+  0` at (0,2,3) since round one; round three's "taller blocks" and round
+  four's "more air" both moved a value nothing read. The padding is on the
+  li reset now (1.25rem above and below). Found by reading the compiled CSS
+  for the two rules together, which is where a specificity loss shows and a
+  stylesheet does not.
+
+  **Three faces, one job each**: body for the outcome (first line, 600, ink,
+  the violet gone); Courier, small and grey, for the method's name under it
+  (a label, like the group heading and the chart rows); Plex Mono at 600 for
+  the time at the right and the oven stages under the name — the site's
+  face for a figure you act on (`$font-label`). No fourth.
+
+  **The oven setting is a list of short stage lines in the data**, one per
+  setting in order: `"220°C fan for 20 min"` then `"180°C fan for the
+  rest"` for what was `"Start 220°C fan for 15–20 min, drop to 180°C fan"`;
+  73 fields rewritten by `tmp/rewrite_oven.py`, line-by-line text
+  replacement keyed by protein and id, not a YAML round-trip. A relative
+  row says what it follows and what it adds ("As the plain method" / "Rub on
+  for last 20–30 min"). `test_every_oven_temperature_says_fan` reads the
+  lines joined. A section's worth of air between cut groups.
+
 ### The cocktails reference layer, #529
 
 - **2026-09-06, #529** — Cocktails gets its first reference page,

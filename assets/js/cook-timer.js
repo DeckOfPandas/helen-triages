@@ -112,16 +112,22 @@
     }).join("") + "</span>";
   }
 
-  /* One method, as a block: name and time on the first line, the outcome
-     under them (second since 2026-10-09 -- "I'm most interested in what I'd
-     get"), the oven setting last. Every row in cooking_methods.yml carries
-     all four (tests/test_reference_data.py). */
+  /* One method, as a block, 2026-10-10: the outcome and the time on the
+     first line ("I'm most interested in what I'd get"), the method's name
+     under them, then the oven setting a line per stage. Every row in
+     cooking_methods.yml carries all four (tests/test_reference_data.py);
+     `oven` is a list of short lines since 2026-10-10 -- Helen: "hardly any
+     extra text, instructions not buried" -- and the markup gives each its
+     own span so a stage never wraps into the next. */
   function methodHtml(method, r) {
+    var oven = [].concat(method.oven).map(function (line) {
+      return "<span class='ct-oven-line'>" + line + "</span>";
+    }).join("");
     return "<li class='ct-method'>" +
-      "<span class='ct-method-name'>" + method.name + "</span>" +
-      "<span class='ct-method-time'>" + (r.ok ? timeHtml(r) : "<em>won’t guess</em>") + "</span>" +
       "<span class='ct-method-outcome'>" + method.outcome + "</span>" +
-      "<span class='ct-method-oven'>" + method.oven + "</span>" +
+      "<span class='ct-method-time'>" + (r.ok ? timeHtml(r) : "<em>won’t guess</em>") + "</span>" +
+      "<span class='ct-method-name'>" + method.name + "</span>" +
+      "<span class='ct-method-oven'>" + oven + "</span>" +
     "</li>";
   }
 

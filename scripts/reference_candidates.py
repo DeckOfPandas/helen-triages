@@ -284,7 +284,7 @@ CAND_TIMER = r"""
   function rowHtml(method, r) {
     return "<tr>" +
       "<td class='ct-m-name'>" + method.name + "</td>" +
-      "<td class='ct-m-oven'>" + (method.oven || "—") + "</td>" +
+      "<td class='ct-m-oven'>" + ([].concat(method.oven || "—").join("; ")) + "</td>" +
       "<td class='ct-m-out'>" + (method.outcome || "—") + "</td>" +
       "<td class='ct-m-time'>" + (r.ok ? timeHtml(r) : "<em>won’t guess</em>") + "</td></tr>";
   }

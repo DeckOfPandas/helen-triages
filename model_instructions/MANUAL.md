@@ -4714,10 +4714,15 @@ pork, venison, one `tender at` figure each) and every roasting chart that
 used to hold one links to it; the other section ids are unchanged. On the
 methods page the WHAT dropdown and the weight box are one stacked form above
 the protein heading (the weight is hidden on its own when the dropdown says
-fish), the four birds read "(whole)", a time prints as `4h50m – 5h30m`, a
-method block runs name and time / outcome (violet, 600) / oven setting, and
+fish), the four birds read "(whole)", a time prints as `4h50m – 5h30m`, and
 the cut-group and fish names wear the heading-tier lettering with the single
-violet rule. The salmon chart reaches the fish list with `?protein=fish`,
+violet rule. **A method block (2026-10-10, started again)** runs the outcome
+and the time on its first line (body face at 600 / Plex Mono), the method's
+name in small grey Courier under them, then the oven setting a line per
+stage in Plex Mono; the data's `oven` is a list of short stage lines
+("220°C fan for 20 min", "180°C fan for the rest"). The block's vertical
+padding is declared on the `.ct-methods li` reset, because that rule
+out-specifies `.ct-method` and a padding on the block itself never applied. The salmon chart reaches the fish list with `?protein=fish`,
 which `cook-timer.js` reads as the dropdown's fish entry.
 
 ### The data layer — two datasets
@@ -4742,7 +4747,8 @@ hand.** `scripts/build_cooking_methods.py` and
 `venison` section) and a re-run overwrites 166 lines. Fish and shellfish
 stay hand-written in the page (lists since 2026-10-08; they carry no timings
 to reconcile against the data). Steak has no methods entry at all (#382).
-Every method row carries `oven` and `outcome`, and the page renders both.
+Every method row carries `oven` (a list of short stage lines since
+2026-10-10) and `outcome`, and the page renders both.
 
 ### Recipe wiring
 

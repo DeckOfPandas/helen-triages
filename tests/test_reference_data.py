@@ -433,6 +433,11 @@ def test_every_oven_temperature_says_fan(cooking_methods):
         oven = m.get("oven")
         if not oven:
             continue
+        # A LIST OF STAGE LINES SINCE 2026-10-10 ("220°C fan for 20 min",
+        # "180°C fan for the rest"), one sentence before. Joined here so the
+        # checks below read the same text either way.
+        if isinstance(oven, list):
+            oven = "; ".join(oven)
         if "conventional" in oven.lower():
             problems.append(f"{protein}/{m['id']}: still names a conventional "
                             f"temperature — {oven!r}")
