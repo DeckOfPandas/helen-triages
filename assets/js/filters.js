@@ -1385,6 +1385,7 @@ function renderResultsPool() {
   var shoppingRecipes = shoppingEl && shoppingEl.querySelector('.shopping-list-recipes');
   var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
   var shoppingEmpty = shoppingEl && shoppingEl.querySelector('.shopping-list-empty');
+  var shoppingNote = shoppingEl && shoppingEl.querySelector('.shopping-list-note');
   var setAllInput = document.getElementById('shopping-list-setall');
 
   /* WHAT EVERY RECIPE IS MADE OF AND HOW MANY IT FEEDS, emitted by index.html
@@ -1419,6 +1420,13 @@ function renderResultsPool() {
      food/index.html. Absent, nothing is rounded -- the list as it was. */
   var WHOLE_MEASURES = String(
     (shoppingEl && shoppingEl.getAttribute('data-whole-measures')) || '')
+    .split(',').filter(Boolean);
+
+  /* THE NOUNS BOUGHT BY COUNT, so two recipes' lemons read "2 lemons" (#1297):
+     `count_nouns` from the same file, by the same route. Absent, a row keeps
+     the spelling a recipe wrote. */
+  var COUNT_NOUNS = String(
+    (shoppingEl && shoppingEl.getAttribute('data-count-nouns')) || '')
     .split(',').filter(Boolean);
 
   /* The row's own title, read off the DOM once. `dataset.titleText` is the
@@ -1606,8 +1614,21 @@ function renderResultsPool() {
        while one of its own inputs has focus, because replacing the node under
        a typing cursor loses the caret and the keystroke. `renderTotals()` is
        called on its own from the input handler for exactly that reason. */
+    /* THE BATCH ROWS GO LAST, UNDER A HAIRLINE -- Helen, 2026-10-10: "If we
+       group the batched recipes at the bottom of the shopping list scaler
+       section, it's clear the portions scaler multiplies portions whereas the
+       batches are manual. Maybe just a little vertical space and a soft
+       hairline separator?" So "set all to N portions" sits over the rows it
+       sets, and the rows it leaves alone are visibly a second group. Each
+       group keeps the order its recipes were shortlisted in; the rule is
+       drawn on the first batch row, and only when there are portions rows
+       above it to be separated from. */
+    var portionRows = urls.filter(function (url) { return !isBatch(url); });
+    var batchRows = urls.filter(isBatch);
+    var firstBatch = portionRows.length ? batchRows[0] : null;
+
     if (shoppingRecipes) {
-      shoppingRecipes.innerHTML = urls.map(function (url) {
+      shoppingRecipes.innerHTML = portionRows.concat(batchRows).map(function (url) {
         var title = titleByUrl[url] || url;
         var yielded = yieldText(url);
         /* NO PORTION COUNT, NO BOX -- asked of the RECIPE, never of the store.
@@ -1627,7 +1648,8 @@ function renderResultsPool() {
           var batches = batchesFor(url);
           var floor = halfOffered(url) ? '0.5' : '1';
           var makes = RECIPES[url].y ? ', which makes ' + RECIPES[url].y : '';
-          return '<li>' +
+          return (url === firstBatch
+            ? '<li class="shopping-list-recipe--first-batch">' : '<li>') +
             '<input type="number" class="shopping-list-portions" min="' + floor +
             '" max="99" step="' + floor + '" inputmode="decimal" value="' + batches + '" ' +
             'data-url="' + HTF.escapeHtml(url) + '" data-batches ' +
@@ -1734,8 +1756,30 @@ function renderResultsPool() {
     }
 
     var aisles = HTF.foodShoppingList.build(entries, {
-      aisles: AISLES, wholeMeasures: WHOLE_MEASURES
+      aisles: AISLES, wholeMeasures: WHOLE_MEASURES, countNouns: COUNT_NOUNS
     });
+
+    /* WHAT THE NUMBERS ABOVE DID NOT REACH -- Helen, 2026-10-10: the recipe
+       page says "(Not scaled: extra teriyaki sauce, ...)" under its scaler
+       (#1088), and "adding this to the shopping list page would at least show
+       the user in what ways the list is incomplete."
+
+       A row is named when any line behind it had no amount to scale: "salt, to
+       taste", "some", a magic-bag item. Its own row below still lists it --
+       it has to be bought -- this says its quantity is the cook's to judge.
+       Her format, as on the recipe page: bracketed, comma-joined, no full
+       stop; in the list's own order, aisle by aisle. */
+    if (shoppingNote) {
+      var unscaled = [];
+      aisles.forEach(function (aisle) {
+        aisle.items.forEach(function (row) {
+          if (row.unquantified.length) unscaled.push(row.label);
+        });
+      });
+      shoppingNote.textContent = unscaled.length
+        ? '(Not scaled: ' + unscaled.join(', ') + ')' : '';
+      shoppingNote.hidden = unscaled.length === 0;
+    }
 
     /* REBUILT WHOLE, not patched -- a couple of dozen rows that change only
        when the shortlist or a number does, where a diffing render would be

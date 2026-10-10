@@ -127,6 +127,28 @@
   color: $color-clear-text;
 }
 
+// THE BATCH ROWS, SET APART -- Helen, 2026-10-10: "Maybe just a little
+// vertical space and a soft hairline separator?" The first batch row carries
+// the rule, so it exists only when there are portions rows above it. It is
+// the section's own border colour and stops short of the full width: a
+// division inside the list, not a second section.
+.shopping-list-recipes li.shopping-list-recipe--first-batch {
+  margin-top: $space-sm;
+  padding-top: $space-md;
+  border-top: 1px solid $color-border;
+  max-width: 65ch;
+}
+
+// "(Not scaled: salt, olive oil)" -- the recipe page's `.recipe-scale-note`,
+// value for value, so the same sentence looks the same in both places. The
+// rows' own bottom margin is taken back so it sits with them.
+.shopping-list-note {
+  margin: (-$space-sm) 0 $space-lg;
+  max-width: 65ch;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
 .shopping-list-yield-missing {
   margin-left: $space-xs;
   font-family: $font-label;

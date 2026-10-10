@@ -218,6 +218,78 @@ half_recipe:
     - jar
 
 # -----------------------------------------------------------------------------
+# Nouns bought by count -- the INDEX's shopping list. GitHub issue #1297,
+# Helen, 2026-10-10: 'Can we fix the "2 lemon" thing?'
+#
+# A row is labelled with the first spelling a recipe used, so one lemon from
+# each of two recipes read "2 lemon". For a row that is one bare count, the
+# label now agrees with the number: plural above one, singular at one or less.
+# A spelling some recipe actually wrote is used where there is one; a form
+# nobody wrote is made ONLY for a noun on this list.
+#
+# WHY A LIST. Making a plural from any name's last word was measured against
+# both collections and was wrong for about a quarter of 251 names: "sprigs
+# thyme" -> "sprigs thymes", "spoons butter" -> "spoons butters", "goose" ->
+# "gooses", "skinless" (a name cut at its comma) -> "skinlesses".
+#
+# WHAT GOES ON IT: the LAST word of an ingredient's name, singular, lowercase,
+# whose plural is regular -- an `s`, or `es` after a sibilant ("peach"). Not
+# `leaf` (the plural is made, the singular is not), `tomato` or `potato`
+# (`es`), `chilli`, `goose`, or anything sold by weight.
+# -----------------------------------------------------------------------------
+count_nouns:
+  - lemon
+  - lime
+  - orange
+  - grapefruit
+  - clementine
+  - apple
+  - pear
+  - banana
+  - peach
+  - plum
+  - pineapple
+  - pomegranate
+  - watermelon
+  - avocado
+  - onion
+  - shallot
+  - carrot
+  - leek
+  - courgette
+  - aubergine
+  - cucumber
+  - pepper
+  - beetroot
+  - cauliflower
+  - swede
+  - cabbage
+  - lettuce
+  - egg
+  - yolk
+  - chicken
+  - duck
+  - breast
+  - thigh
+  - leg
+  - fillet
+  - steak
+  - chop
+  - sausage
+  - bun
+  - croissant
+  - flatbread
+  - teabag
+  - sprig
+  - stick
+  - stalk
+  - pod
+  - cube
+  - clove
+  - bulb
+  - wedge
+
+# -----------------------------------------------------------------------------
 # One fruit, two parts -- the INDEX's shopping list. GitHub issue #1297, Helen,
 # 2026-10-09: 'I would like to cleverly combine e.g. "zest of 1 lemon" and
 # "juice of 1 lemon" to make "1 lemon" in the shopping list.'

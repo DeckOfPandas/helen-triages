@@ -1294,6 +1294,38 @@ principle, but because that's meaningless.'*).
   lands on 1½; `batchCount` sends that to the next whole batch in the
   direction of travel and rewrites the box. A typed figure is tidied on
   `change`, never under the cursor.
+- **The batch rows come LAST, under a hairline** (Helen, 2026-10-10: *"If we
+  group the batched recipes at the bottom of the shopping list scaler section,
+  it's clear the portions scaler multiplies portions whereas the batches are
+  manual. Maybe just a little vertical space and a soft hairline
+  separator?"*). Each group keeps shortlist order. The rule is on the first
+  batch row (`.shopping-list-recipe--first-batch`) and is drawn only when
+  there are portions rows above it.
+
+**WHAT THE NUMBERS DID NOT REACH IS NAMED UNDER THE ROWS** — `(Not scaled:
+crème fraîche or double cream, salted butter, pinch of salt, salt)`, in
+`.shopping-list-note`, the recipe page's line and format (#1088) on Helen's
+ask of 2026-10-10: *"Adding this to the shopping list page would at least show
+the user in what ways the list is incomplete."* A row is named when ANY line
+behind it had no amount to scale — so "salted butter" can be named beside a
+total of 319 g, for the no-amount line that greases the tin. The row stays on
+the list below; the names are the list's own labels, in aisle order, and are
+not run through the recipe page's `noteName`.
+
+**"2 lemons", NOT "2 lemon"** (Helen, 2026-10-10). A row that is ONE BARE
+COUNT ("2", "2 large", "½") with nothing unquantified beside it takes a label
+that agrees with its number: plural above one, singular at one or less.
+`countedLabel` in `food-shopping-list.js`. **A spelling some recipe on the row
+actually wrote is always used first.** A form nobody wrote is made only for a
+noun in **`count_nouns`** (`_data/food/scaling.yml`, joined onto the panel as
+`data-count-nouns`) — the LAST word of the name, with a regular plural.
+**Do not widen that to "any last word"**: measured on 2026-10-10 it was wrong
+for about a quarter of 251 real names ("sprigs thyme" → "sprigs thymes",
+"goose" → "gooses", "skinless" → "skinlesses"). A name opening with a by-eye
+measure ("pinch cayenne chilli pepper") is left alone, as is anything with a
+unit, a mixed row ("4 + 2 large"), and a name that is a choice or a phrase.
+The aisle's alphabetical order is by the FOLDED name, so a label changing
+number moves nothing.
 
 **A BY-EYE MEASURE IS TOTALLED TO THE NEAREST WHOLE ONE, NEVER BELOW ONE**
 (#1297). Helen, 2026-10-09: *"please make the shopping list only round to

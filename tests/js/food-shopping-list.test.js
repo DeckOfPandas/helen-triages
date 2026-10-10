@@ -132,8 +132,10 @@ test('a plural and its singular are the same shopping', () => {
   ]);
   assert.strictEqual(built.length, 1);
   assert.strictEqual(built[0].text, '3');
-  // The label is the FIRST spelling seen, never the folded key.
-  assert.strictEqual(built[0].label, 'onion');
+  // Never the folded key. Three is more than one, and a recipe wrote the
+  // plural, so the row takes it (#1297); with nothing to choose between, the
+  // label is the first spelling seen -- the Parma ham below.
+  assert.strictEqual(built[0].label, 'onions');
 });
 
 test('the label is the first spelling, and case does not split a total', () => {
@@ -493,3 +495,78 @@ test('#1297: a pointer with nothing to point at stays a line', () => {
   assert.strictEqual(line([oil('pasta', '', true)], 'olive oil'), '');
 });
 
+// --- "2 lemons", not "2 lemon" -- #1297, Helen, 2026-10-10 ----------------------
+
+const NOUNS = ['lemon', 'lime', 'apple', 'peach', 'avocado'];
+const labelOf = (entries, nouns) => {
+  const built = F.build(entries, { aisles: PRODUCE, countNouns: nouns || NOUNS });
+  assert.strictEqual(built[0].items.length, 1);
+  return built[0].items[0].text + ' ' + built[0].items[0].label;
+};
+const count = (amount, name, recipe) =>
+  ({ amount: amount, name: name, aisle: 'produce', scale: 1, recipe: recipe });
+
+test('#1297: a count of more than one takes the plural, whichever spelling came first', () => {
+  // One lemon from each of two recipes printed "2 lemon".
+  assert.strictEqual(labelOf([count('1', 'lemon', 'a'), count('1', 'lemon', 'b')]), '2 lemons');
+  assert.strictEqual(labelOf([count('1', 'lemon', 'a'), count('2', 'lemons', 'b')]), '3 lemons');
+  assert.strictEqual(labelOf([count('1', 'sharp green apple', 'a'),
+    count('1', 'sharp green apple', 'b')]), '2 sharp green apples');
+  assert.strictEqual(labelOf([count('1 large', 'lemon', 'a'),
+    count('1 large', 'lemon', 'b')]), '2 large lemons');
+});
+
+test('#1297: one or less takes the singular', () => {
+  assert.strictEqual(labelOf([count('½', 'lemons', 'a'), count('½', 'lemons', 'b')]), '1 lemon');
+  assert.strictEqual(labelOf([count('½', 'limes', 'a')]), '½ lime');
+  assert.strictEqual(labelOf([count('1½', 'lemon', 'a')]), '1½ lemons');
+});
+
+test('#1297: a spelling a recipe used is taken with no list at all', () => {
+  // The two were folded onto one row, so they are the same noun.
+  assert.strictEqual(labelOf([count('1', 'onion', 'a'), count('2', 'onions', 'b')], []),
+    '3 onions');
+  assert.strictEqual(labelOf([count('½', 'onions', 'a'), count('½', 'onion', 'b')], []),
+    '1 onion');
+});
+
+test('#1297: a form nobody wrote is made only for a noun on the list', () => {
+  assert.strictEqual(labelOf([count('1', 'ripe peach', 'a'), count('1', 'ripe peach', 'b')]),
+    '2 ripe peaches');
+  assert.strictEqual(labelOf([count('2', 'avocado', 'a')]), '2 avocados');
+  // Real names from the collection, 2026-10-10, each of which a rule about
+  // "the last word" got wrong.
+  [['sprigs thyme', '2 sprigs thyme'], ['goose', '2 goose'],
+    ['spoons butter', '2 spoons butter'], ['skinless', '2 skinless'],
+    ['star anise', '2 star anise'], ['red chilli', '2 red chilli']
+  ].forEach(([name, expected]) => {
+    assert.strictEqual(labelOf([count('2', name, 'a')]), expected);
+  });
+  assert.strictEqual(labelOf([count('1', 'black peppercorns', 'a')]), '1 black peppercorns');
+  // The count is of pinches, whatever the last word is.
+  assert.strictEqual(F.build(
+    [{ amount: '2', name: 'pinch ground lime', aisle: 'produce', scale: 1 }],
+    { aisles: PRODUCE, countNouns: NOUNS, wholeMeasures: BY_EYE })[0].items[0].label,
+    'pinch ground lime');
+  assert.strictEqual(labelOf([count('1', 'lemon', 'a'), count('1', 'lemon', 'b')], []),
+    '2 lemon', 'and with no list handed over, nothing is made');
+});
+
+test('#1297: only a bare count is touched -- a unit already agrees', () => {
+  assert.strictEqual(labelOf([count('200 g', 'lemon', 'a'), count('300 g', 'lemon', 'b')]),
+    '500 g lemon');
+  assert.strictEqual(labelOf([count('2 cloves', 'garlic', 'a')]), '2 cloves garlic');
+  assert.strictEqual(labelOf([count('2 tbsp', 'olive oil', 'a')]), '2 tbsp olive oil');
+});
+
+test('#1297: a name that cannot be made safely is left as written', () => {
+  assert.strictEqual(labelOf([count('2', 'lemon or 30 ml lemon juice', 'a')]),
+    '2 lemon or 30 ml lemon juice');
+  assert.strictEqual(labelOf([count('2', 'Little Gem', 'a')]), '2 Little Gem');
+  // No singular is invented for "tomatoes" or "hummus".
+  assert.strictEqual(labelOf([count('1', 'tomatoes', 'a')]), '1 tomatoes');
+  assert.strictEqual(labelOf([count('8', 'Parma ham', 'a')]), '8 Parma ham');
+  // A mixed row is two totals, and is not one count.
+  assert.strictEqual(labelOf([count('4', 'lemon', 'a'), count('2 large', 'lemon', 'b')]),
+    '4 + 2 large lemon');
+});

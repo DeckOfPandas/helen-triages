@@ -353,6 +353,68 @@
     return list.filter(function (l) { return !l.drop; });
   }
 
+  /* =========================================================================
+     "2 lemons", NOT "2 lemon" -- #1297, Helen, 2026-10-10
+     =========================================================================
+     The row is labelled with the first spelling seen, which is right for
+     "500 g plain flour" and wrong for a COUNT: one lemon from each of two
+     recipes printed "2 lemon", and two half "lemons" printed "1 lemons".
+
+     ONLY A ROW THAT IS ONE BARE COUNT is touched -- "2", "2 large", "½" -- with
+     nothing unquantified beside it. Anything with a unit already agrees
+     ("2 cloves garlic" is the unit's plural), and a mixed row ("4 + 2 large")
+     is left as written.
+
+     MORE THAN ONE IS PLURAL; ONE OR LESS IS SINGULAR ("½ lemon", "1½ lemons").
+
+     A SPELLING A RECIPE ACTUALLY USED IS ALWAYS SAFE, and is tried first: the
+     two were folded onto one row, so they are the same noun.
+
+     A FORM NO RECIPE WROTE IS MADE ONLY FOR A NOUN ON A LIST -- `count_nouns`
+     in _data/food/scaling.yml, handed in as `options.countNouns`. Making one
+     from any last word was measured against the collection on 2026-10-10 and
+     was wrong for about a quarter of 251 names: the counted noun is often the
+     FIRST word ("sprigs thyme" -> "sprigs thymes", "spoons butter" ->
+     "spoons butters"), some plurals are not regular ("goose" -> "gooses"),
+     and some names are cut short at a comma ("skinless" -> "skinlesses").
+     The plural is shopping-list.js's `unitLabel` and the singular its
+     `foldUnit`. With no list given, only a used spelling is ever chosen.
+
+     LEFT AS WRITTEN OTHERWISE, and where the name is itself a choice or a
+     phrase ("lemon or 30 ml lemon juice", "rashers of bacon"). */
+  var SIZE_UNITS = { large: true, medium: true, small: true };
+
+  function isPluralName(name) {
+    var key = foldKey(name);
+    return foldUnit(key) !== key;
+  }
+
+  function countedLabel(group, totals, unquantified, countNouns, byEye) {
+    var label = group.label;
+    if (totals.length !== 1 || unquantified.length) return label;
+    // "pinch cayenne chilli pepper": the count is of pinches, not of peppers.
+    if (byEye && byEye.test(label.split(' ')[0])) return label;
+    var total = totals[0];
+    if (total.unit !== '' && !SIZE_UNITS[total.unit]) return label;
+    if (/\s(?:or|and|of|in|for|with)\s|\//i.test(label)) return label;
+
+    var many = total.hi > 1;
+    if (isPluralName(label) === many) return label;
+
+    var used = group.spellings.filter(function (s) {
+      return isPluralName(s) === many;
+    })[0];
+    if (used) return used;
+
+    var words = label.split(' ');
+    var noun = words[words.length - 1];
+    var single = many ? noun : foldUnit(noun);
+    if (!countNouns[single]) return label;
+    if (many) return unitLabel(label, 2);
+    words[words.length - 1] = single;
+    return words.join(' ');
+  }
+
   /**
    * Total up a shortlist of recipes, grouped by aisle.
    *
@@ -368,6 +430,8 @@
    * @param {Object} [options]
    * @param {Array} [options.wholeMeasures] - by-eye measures, whose totals go
    *        to the nearest whole one: `half_step_measures` in scaling.yml.
+   * @param {Array} [options.countNouns] - nouns bought by count, whose row
+   *        label may be made plural or singular: `count_nouns` in scaling.yml.
    * @param {Array} [options.aisles] - [{key, label}] in the order they should
    *        appear. An aisle with nothing in it is not returned; an entry whose
    *        aisle is not in the list falls to the last one.
@@ -385,6 +449,10 @@
     var fallback = aisles[aisles.length - 1].key;
 
     var byEye = wholeMeasurePattern(opts.wholeMeasures);
+    var countNouns = {};
+    (opts.countNouns || []).forEach(function (noun) {
+      countNouns[String(noun).trim().toLowerCase()] = true;
+    });
 
     var groups = {};
     var order = [];
@@ -400,6 +468,8 @@
              and "parma ham", or "onion" and "onions", being two lines of the
              same shopping. Whichever recipe was shortlisted first names it. */
           label: name,
+          // Every spelling used, for `countedLabel`: "lemon", then "lemons".
+          spellings: [],
           aisle: null,
           units: {},
           unitOrder: [],
@@ -409,6 +479,7 @@
         order.push(key);
       }
       var group = groups[key];
+      if (group.spellings.indexOf(name) === -1) group.spellings.push(name);
 
       /* THE FIRST AISLE WINS, and it cannot honestly be otherwise: the aisle
          is derived from the name at build time, so two entries sharing a
@@ -505,7 +576,7 @@
         }).filter(Boolean));
 
       return {
-        label: group.label,
+        label: countedLabel(group, totals, unquantified, countNouns, byEye),
         aisle: group.aisle || fallback,
         totals: totals,
         unquantified: unquantified,
@@ -522,9 +593,10 @@
        cloves and bare counts, and ranking 500 g against 2 cloves would need
        the conversion this codebase refuses to invent. */
     return aisles.map(function (aisle) {
+      // Sorted on the FOLDED name, so "lemon" becoming "lemons" moves nothing.
       var items = rows.filter(function (row) { return row.aisle === aisle.key; })
         .sort(function (a, b) {
-          return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
+          return foldName(a.label).localeCompare(foldName(b.label));
         });
       return { key: aisle.key, label: aisle.label, items: items };
     }).filter(function (aisle) { return aisle.items.length > 0; });

@@ -4036,3 +4036,56 @@ def test_the_whole_fruit_vocabulary_is_the_shape_the_plugin_reads():
     assert not plural, (
         f"whole_fruit.fruits are singular -- the plugin adds the plural: {plural}"
     )
+
+
+def test_the_index_shopping_list_is_handed_the_count_nouns():
+    """#1297, 2026-10-10: 'Can we fix the "2 lemon" thing?'
+
+    A row that is one bare count takes a label agreeing with its number. A
+    form no recipe wrote is made only for a noun in `count_nouns`
+    (_data/food/scaling.yml), which reaches build() the way the by-eye
+    measures do: joined onto #shopping-list as `data-count-nouns`, read by
+    filters.js, handed over as `countNouns`. Break a link and nothing errors;
+    the list goes back to "2 lemon".
+
+    THE ENTRIES ARE PINNED BECAUSE THE PLURAL IS MADE BY RULE. Each is the
+    last word of a name, and `unitLabel` gives it an `s` (or `es` after a
+    sibilant). A word whose plural is anything else must not be here, and the
+    six below were each measured as wrong before the list existed.
+    """
+    nouns = yaml.safe_load(read("_data", "food", "scaling.yml")).get("count_nouns")
+    assert nouns and {"lemon", "onion", "egg"} <= set(nouns), (
+        "_data/food/scaling.yml has no `count_nouns` list naming lemon, onion "
+        "and egg."
+    )
+    not_plain = [n for n in nouns
+                 if not isinstance(n, str) or not re.fullmatch(r"[a-z]+", n)]
+    assert not not_plain, (
+        f"count_nouns entries are one lowercase word each, singular: {not_plain}"
+    )
+    irregular = sorted(
+        n for n in nouns
+        if n.endswith(("y", "i", "f", "s"))
+        or n in {"tomato", "potato", "mango", "goose", "fish", "thyme",
+                 "butter", "garlic", "anise", "bread", "bacon"})
+    assert not irregular, (
+        f"these take no plain plural, or are not bought by count: {irregular}. "
+        "The list is for words where adding an `s` is always right."
+    )
+
+    index = read("food", "index.html")
+    assert re.search(
+        r'id="shopping-list"[^>]*data-count-nouns="\{\{\s*'
+        r'site\.data\.food\.scaling\.count_nouns\s*\|\s*join:\s*\',\'', index), (
+        "food/index.html no longer joins site.data.food.scaling.count_nouns "
+        "onto #shopping-list as data-count-nouns."
+    )
+    filters = read("assets", "js", "filters.js")
+    assert "getAttribute('data-count-nouns')" in filters
+    assert "countNouns: COUNT_NOUNS" in filters, (
+        "filters.js reads the count nouns and does not hand them to build()."
+    )
+    assert 'class="shopping-list-note"' in index, (
+        "food/index.html has lost the `(Not scaled: ...)` line's element; "
+        "filters.js fills it and says nothing when it is missing."
+    )

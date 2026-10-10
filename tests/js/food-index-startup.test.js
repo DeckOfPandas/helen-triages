@@ -221,12 +221,14 @@ function boot(options) {
   doc.dispatchEvent = (ev) => doc.dispatch(ev.type, ev);
 
   const panel = el('section', 'shopping-list', {
-    id: 'shopping-list', 'data-whole-measures': 'handful,pinch'
+    id: 'shopping-list', 'data-whole-measures': 'handful,pinch',
+    'data-count-nouns': 'onion,lemon'
   });
   const head = el('div', 'shopping-list-head');
   head.appendChild(el('input', '', { id: 'shopping-list-setall', type: 'number' }));
   panel.appendChild(head);
   panel.appendChild(el('ul', 'shopping-list-recipes'));
+  panel.appendChild(el('p', 'shopping-list-note'));
   panel.appendChild(el('div', 'shopping-list-aisles'));
   panel.appendChild(el('p', 'shopping-list-empty'));
   doc.body.appendChild(panel);
@@ -408,8 +410,10 @@ test('the totals are grouped by aisle, in the declared order', () => {
   assert.ok(html.indexOf('produce') < html.indexOf('store cupboard'));
   // 200 g + 300 g, from two recipes, on one line.
   assert.match(html, /<span class="shopping-list-amount">500 g<\/span>/);
-  // `onion` and `onions` are the same shopping.
-  assert.match(html, /<span class="shopping-list-amount">3<\/span>/);
+  // `onion` and `onions` are the same shopping, and three of them are onions
+  // -- the plural reaching build() through `data-count-nouns` (#1297).
+  assert.match(html,
+    /<span class="shopping-list-amount">3<\/span><span class="shopping-list-name">onions<\/span>/);
 });
 
 test('typing into "set all to" rescales every recipe', () => {
@@ -1113,4 +1117,74 @@ test('this harness loads what food/index.html actually loads', () => {
   assert.deepStrictEqual(SCRIPTS.slice(1), inTemplate,
     'tests/js/food-index-startup.test.js loads a different set of scripts from '
     + 'food/index.html. Update SCRIPTS to match the template.');
+});
+
+// --- round two of #1297, Helen, 2026-10-10 --------------------------------------
+
+const noteOf = (panel) => panel.querySelector('.shopping-list-note');
+
+test('#1297: the batch rows come last, under a rule, whatever order they were shortlisted in', () => {
+  // "If we group the batched recipes at the bottom of the shopping list scaler
+  // section, it's clear the portions scaler multiplies portions whereas the
+  // batches are manual."
+  const { win, doc, panel } = boot();
+  ['/food/recipes/cookies/', '/food/recipes/a/', '/food/recipes/gelato/',
+    '/food/recipes/b/'].forEach((url) => win.HTF.shortlist.toggle(url));
+  showTheList(doc);
+
+  const html = recipesHtml(panel);
+  const at = (slug) => html.indexOf('data-url="/food/recipes/' + slug + '/"');
+  assert.ok(at('a') < at('b') && at('b') < at('cookies') && at('cookies') < at('gelato'),
+    'portions rows first, then batch rows, each in shortlist order');
+  assert.strictEqual(html.split('shopping-list-recipe--first-batch').length - 1, 1,
+    'exactly one row carries the rule');
+  assert.ok(html.indexOf('shopping-list-recipe--first-batch') < at('cookies') &&
+    html.indexOf('shopping-list-recipe--first-batch') > at('b'),
+    'and it is the first batch row');
+});
+
+test('#1297: with no portions rows above them, the batch rows have no rule', () => {
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  win.HTF.shortlist.toggle('/food/recipes/gelato/');
+  showTheList(doc);
+  assert.ok(!recipesHtml(panel).includes('shopping-list-recipe--first-batch'));
+});
+
+test('#1297: what was not scaled is named under the rows, in her format', () => {
+  // "(Not scaled: salt, black pepper)" -- bracketed, comma-joined, no full stop.
+  const { win, doc, panel } = boot({
+    recipes: {
+      '/food/recipes/a/': {
+        p: 4, e: false, y: '4', k: 'serves',
+        i: [{ a: '200 g', n: 'plain flour', s: 'cupboard' },
+          { a: '', n: 'olive oil', s: 'cupboard' },
+          { a: 'some', n: 'salt', s: 'cupboard' },
+          { a: '', n: 'coriander sprigs', s: 'produce' }]
+      }
+    }
+  });
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  showTheList(doc);
+  assert.strictEqual(noteOf(panel).textContent,
+    '(Not scaled: coriander sprigs, olive oil, salt)');
+  assert.strictEqual(noteOf(panel).hidden, false);
+  // Still on the list below: it has to be bought.
+  assert.match(aislesHtml(panel), /<span class="shopping-list-name">olive oil<\/span>/);
+});
+
+test('#1297: with everything scaled there is no note', () => {
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  showTheList(doc);
+  assert.strictEqual(noteOf(panel).textContent, '');
+  assert.strictEqual(noteOf(panel).hidden, true);
+});
+
+test('#1297: a page without the note element still totals', () => {
+  const { win, doc, panel } = boot();
+  const note = noteOf(panel);
+  note.parentNode.removeChild(note);
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  assert.doesNotThrow(() => showTheList(doc));
 });

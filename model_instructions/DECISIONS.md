@@ -1718,11 +1718,40 @@ unless stated.
     not objected to.** 26 recipes' citrus rows changed on the dev build, one
     of them published (the raspberry cheesecake: "finely grated zest of 1
     lemon" → 1 lemon). The pound cake read "4½ + 2 large lemons" and reads 4.
-  - **Two things found while measuring, neither changed.** A fruit's row is
-    labelled by the first spelling seen, so one lemon from each of two recipes
-    can read "2 lemon" — the plural-fold's existing behaviour for every
-    ingredient. And "0.5" is what a number box shows for half a batch; it
-    cannot show "½".
+  - **Two things found while measuring, neither changed that day.** A
+    fruit's row is labelled by the first spelling seen, so one lemon from each
+    of two recipes can read "2 lemon" — the plural-fold's existing behaviour
+    for every ingredient (fixed the next day, below). And "0.5" is what a
+    number box shows for half a batch; it cannot show "½".
+- **2026-10-10, #1297** — **Round two, on reading the summary: "2 lemons", a
+  Not-scaled line, and the batch rows grouped.** Helen: *'Can we fix the "2
+  lemon" thing? And for individual, we add a note to the scaler: "(Not scaled:
+  extra teriyaki sauce, juice of ½ lime, a few coriander sprigs, a few sprigs
+  Thai basil)" Adding this to the shopping list page would at least show the
+  user in what ways the list is incomplete. Next: we really should scale
+  batches. ... If we group the batched recipes at the bottom of the shopping
+  list scaler section, it's clear the portions scaler multiplies portions
+  whereas the batches are manual. Maybe just a little vertical space and a
+  soft hairline separator?'*
+  - **The plural is made from a LIST, and the first build of it was not.** A
+    rule on "the name's last word" was run over every bare-count line in both
+    collections before it shipped: 251 names changed, about a quarter wrongly
+    — the counted noun is often the first word ("sprigs thyme", "spoons
+    butter", "rashers smoked streaky bacon"), some plurals are irregular
+    ("goose"), some names are cut at their comma ("skinless", "firm"). So: a
+    spelling a recipe wrote is used where one exists, and a made form only for
+    `count_nouns` in `_data/food/scaling.yml`. **Measure a wording rule on the
+    real names before believing it; four fixtures said it was fine.** Known
+    and accepted: "pounds yellow onions" at one or less reads "pounds yellow
+    onion" (one draft).
+  - **The Not-scaled line names a row when any line behind it had no
+    amount.** Her example is the recipe page's; one of its four items ("juice
+    of ½ lime") is no longer unscaled on the list, since the whole-fruit
+    reading of the day before totals it as half a lime.
+  - **"We really should scale batches" was read as the grouping, not as new
+    arithmetic**: batch rows already multiplied their recipe from the day
+    before, and she had been told so in words but had not seen the page. Said
+    back to her plainly rather than assumed.
 
 ---
 
