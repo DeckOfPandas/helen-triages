@@ -139,6 +139,13 @@ retired_star_ingredients:
 #   planning rather than a reduction in the work on the day, which is the
 #   opposite of what someone browsing this tag wants.
 #
+#   THE EXCEPTION SHE DREW ON 2026-10-10, of a BBQ spatchcock duck rubbed a day
+#   ahead: "keep make ahead -- the rub is the thing here, and roasting on the
+#   day is trivial." So the test is where the WORK is, not whether heat is
+#   applied on the day: if what is left for serving time is trivial, the dish
+#   is make-ahead. A Christmas turkey buttered the day before is not, because
+#   the roast is the work.
+#
 #   A BASE RECIPE OR CONDIMENT DOES NOT CARRY IT. A spice blend, a curry paste,
 #   a dukkah, a lemon curd, a cranberry sauce: these have no "serving" to be
 #   ahead of, so the tag tells you nothing you did not already know from what
@@ -184,17 +191,58 @@ retired_star_ingredients:
 #                  old name she ruled fairy cakes OUT; under the new one,
 #                  the same afternoon, "Fairy cakes are in again now." It
 #                  is `hot snack`'s twin, singular like it.
+#                  A WHOLE CAKE SERVED IN SLICES IS NOT ONE. Asked outright,
+#                  since the cake-plate test would let every loaf and sponge
+#                  in: "No." It has to be made as individual pieces -- a
+#                  biscuit, a bun, a muffin, a brownie square.
 #   carbs party    the starch is the point: pasta, rice, potatoes, pies,
 #                  dumplings.
-#   cheese-tastic  cheese is the pleasure of the dish, not a garnish.
+#   cheese-tastic  cheese is the pleasure of the dish, not a garnish. FETA
+#                  DOES NOT COUNT, even a whole baked block of it ("oooh,
+#                  yeah, feta doesn't count for cheese-tastic"). Burrata
+#                  does.
 #   fakeaway       a home version of something you would order in.
 #   hot snack      small, hot and eaten between meals: toasties, fritters,
 #                  things on toast.
 #   nibbles        finger food to pass round with drinks.
 #   breakfast      eaten in the morning.
 #   extras         not a dish by itself: sides, sauces, stocks, pickles, doughs.
-#   festive        Christmas, or another named feast.
+#   festive        Christmas, or another named feast. The dish has to BE the
+#                  feast's: a chicken that uses up the Seder horseradish is
+#                  not festive, though a Rosh Hashanah honey cake is.
 #   starter        works as a first course at a dinner party.
+#
+# -----------------------------------------------------------------------------
+# `fiddly and fun` -- A NEW MOOD, 2026-10-10, AND WHAT IT TAKES OFF
+# `showstopper`'s SHOULDERS.
+#
+# Helen: "I wonder if we need a 'I want to faff' tag ... Sometimes when I want
+# to faff I choose to make fiddly desserts, but I honestly prefer savoury
+# things, so remembering about e.g. tomato tarte tatin would scratch the itch
+# for sure."
+#
+# `showstopper` was MEANT to be this -- the group note above has her calling it
+# "let's make something unnecessarily complicated" -- but the name pulled it
+# towards the RESULT, and it came to sit on a beef fillet that is seared and
+# roasted and a venison loin that takes 15 minutes. She agreed it had drifted.
+# So there are two tags now, one for each half:
+#
+#   fiddly and fun   you make it because you want to potter. Several
+#                    components or stages, hands-on work, some precision. The
+#                    PROCESS is the point, whatever it looks like at the end.
+#   showstopper      it makes people gasp when it lands on the table. About
+#                    the RESULT, however little work it took.
+#
+# A dish may carry both (macarons, a Wellington), the first alone (a quiche
+# with pastry from scratch, a ganache, wontons) or the second alone (a roast
+# fillet, a goose). Slow is not fiddly: a stew that sits in the oven for six
+# hours is neither.
+#
+# The name is hers, chosen over "make me think". It is a MOOD by this file's
+# own test -- wanting to faff is a craving, not something an occasion demands
+# -- which also puts it beside `dessert` and `bakes` in the filter, so picking
+# it without them finds the savoury faff she was after.
+# -----------------------------------------------------------------------------
 #
 # The other eight already had hers: `make-ahead` and `freezable` above,
 # `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
@@ -208,6 +256,7 @@ tags:
     - dessert
     - drinks
     - fakeaway
+    - fiddly and fun
     - hot snack
     - ice cream
     - nibbles

@@ -1109,7 +1109,8 @@ makes a retired value fail with its reason rather than blend into "not
 declared".
 
 **Mood** — *what you feel like eating, a craving*: bakes, carbs party,
-cheese-tastic, dessert, drinks, fakeaway, hot snack, ice cream, nibbles,
+cheese-tastic, dessert, drinks, fakeaway, fiddly and fun, hot snack, ice
+cream, nibbles,
 one-handed food, salad, showstopper, soup, sweet snack, virtuous.
 **Practicalities** — *what the occasion demands of you, regardless*: breakfast,
 extras, festive, freezable, make-ahead, no-cook, starter.
@@ -1140,6 +1141,13 @@ not a garnish. `fakeaway` — a home version of something you would order in.
 round with drinks. `breakfast` — eaten in the morning. `extras` — not a dish
 by itself: sides, sauces, stocks, pickles, doughs. `festive` — Christmas, or
 another named feast. `starter` — works as a first course at a dinner party.
+
+**`fiddly and fun` and `showstopper` are a pair** (2026-10-10, when the first
+was added). `fiddly and fun` — you make it because you want to potter:
+several components, hands-on work, some precision; the PROCESS is the point.
+`showstopper` — it makes people gasp at the table; the RESULT, however little
+work it took. Either, both or neither. Slow is not fiddly. `showstopper` had
+been carrying both meanings and had drifted to the second.
 
 **Standing per-recipe calls, not to be "fixed" for consistency**: the
 lemony cavolo nero soup is not tagged `soup` (its own tagline calls it a

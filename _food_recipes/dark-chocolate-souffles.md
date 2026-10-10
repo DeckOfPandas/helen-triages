@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "10–15 mins"
 main_ingredients: ["dark chocolate", "cocoa powder", "egg whites", "salted butter", "golden caster sugar", "demerara sugar"]
 star_ingredient: "chocolate"
-tags: ["dessert", "showstopper"]
+tags: ["dessert", "showstopper", "fiddly and fun"]
 ingredient_groups:
   - items:
     - amount: "100 g"

@@ -9,7 +9,7 @@ prep_time: "20 mins plus time to set"
 cook_time: "5 mins"
 main_ingredients: ["dark chocolate", "ground almonds", "salted butter", "icing sugar"]
 star_ingredient: "chocolate"
-tags: ["make-ahead", "nibbles", "sweet snack"]
+tags: ["make-ahead", "nibbles", "sweet snack", "fiddly and fun"]
 ingredient_groups:
   - items:
     - amount: "175 g"

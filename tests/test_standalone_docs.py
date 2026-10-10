@@ -3,7 +3,7 @@
 `model_instructions/INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` are
 handed to claude.ai when Helen finds a recipe or a drink in the wild. They have
 no access to `_data/`, so each one PRINTS the closed vocabularies as literal
-text -- 22 tags, 14 star ingredients, 42 garnishes, 23 glasses, 28 canonical
+text -- 23 tags, 14 star ingredients, 42 garnishes, 23 glasses, 28 canonical
 method steps -- and carries a worked example showing the file shape.
 
 THAT IS THE ONLY DELIBERATE DUPLICATION OF DATA IN THIS REPOSITORY, and it is

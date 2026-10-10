@@ -8,7 +8,7 @@ prep_time: "30 mins plus 30 mins resting"
 cook_time: "1 hr"
 main_ingredients: ["asparagus", "gruyère", "eggs", "double cream", "parmesan", "onion"]
 star_ingredient:
-tags: ["bakes", "cheese-tastic", "make-ahead", "one-handed food"]
+tags: ["bakes", "cheese-tastic", "make-ahead", "one-handed food", "fiddly and fun"]
 ingredient_groups:
   - name: pastry
     items:

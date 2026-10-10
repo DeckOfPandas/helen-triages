@@ -395,13 +395,13 @@ An undeclared tag or star ingredient fails her test suite. These lists are the
 whole vocabulary. If nothing fits, **leave the field out** rather than coin a
 term.
 
-### `tags` — pick from these 22 and no others
+### `tags` — pick from these 23 and no others
 
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
 `bakes`, `carbs party`, `cheese-tastic`, `dessert`, `drinks`, `fakeaway`,
-`hot snack`, `ice cream`, `nibbles`, `one-handed food`, `salad`, `showstopper`,
-`soup`, `sweet snack`, `virtuous`
+`fiddly and fun`, `hot snack`, `ice cream`, `nibbles`, `one-handed food`,
+`salad`, `showstopper`, `soup`, `sweet snack`, `virtuous`
 <!-- vocab:tags:mood end -->
 
 **Practicalities** — *what the occasion demands of you, regardless:*
@@ -431,16 +431,29 @@ Meanings you would not guess:
 And the plainer ones, as Helen means them (agreed 2026-10-10):
 
 - **`bakes`** — a baked good out of the oven: cake, biscuit, bread, pastry.
-  Not anything that merely goes in the oven. Her test: *"would this appear on
-  Great British Bake Off?"*
+  Not anything that merely goes in the oven. Her tests: *"would this appear on
+  Great British Bake Off?"*, and is it what you make in cosy baking mode. A
+  quiche, a tarte tatin, a baked cheesecake, a baked pudding, a crumble and
+  pizza dough are in. A soufflé, a Wellington, a microwave mug cake and
+  anything set in the fridge are not.
 - **`dessert`** — a pudding course you serve at the table.
 - **`sweet snack`** — small sweet things eaten by hand outside a meal:
-  brownies, biscuits, fudge, truffles, a fairy cake, a scone. Her test:
-  *"would I serve it on a cake plate at 4 o clock after a long improving
-  walk?"* (This tag was called `sweets` until 2026-10-10.)
+  brownies, biscuits, fudge, truffles, a fairy cake, a scone, a muffin. Her
+  test: *"would I serve it on a cake plate at 4 o clock after a long
+  improving walk?"* **It has to be made as individual pieces: a whole cake
+  served in slices is not one.** (This tag was called `sweets` until
+  2026-10-10.)
+- **`fiddly and fun`** — you make it because you want to potter: several
+  components or stages, hands-on work, some precision. The PROCESS is the
+  point. Pastry from scratch, anything piped, rolled or filled one at a time,
+  an emulsion you have to mind. Slow is not fiddly: a six-hour stew is not.
+- **`showstopper`** — it makes people gasp when it lands on the table. The
+  RESULT, however little work it took. A dish may be this, `fiddly and fun`,
+  both or neither.
 - **`carbs party`** — the starch is the point: pasta, rice, potatoes, pies,
   dumplings.
 - **`cheese-tastic`** — cheese is the pleasure of the dish, not a garnish.
+  Feta does not count; burrata does.
 - **`fakeaway`** — a home version of something you would order in.
 - **`hot snack`** — small, hot and eaten between meals: toasties, fritters,
   things on toast.

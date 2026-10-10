@@ -1403,6 +1403,23 @@ unless stated.
     cake plate at 4 o clock after a long improving walk?"* One published
     recipe and five drafts carried the old word. A saved link filtering on
     `sweets` no longer matches anything, which was judged a fair price.
+  - **`fiddly and fun` IS A NEW MOOD, AND `showstopper` IS NARROWED TO THE
+    RESULT.** Hers, mid-review: *"I wonder if we need a 'I want to faff' tag
+    ... Sometimes when I want to faff I choose to make fiddly desserts, but I
+    honestly prefer savoury things, so remembering about e.g. tomato tarte
+    tatin would scratch the itch for sure."* `showstopper` was meant to be
+    that (*"let's make something unnecessarily complicated"*) and had
+    drifted to "impresses at the table": it sat on a seared beef fillet and a
+    15-minute venison loin. She agreed (*"I agree that showstopper has
+    drifted"*) and named the new one over "make me think". So: `fiddly and
+    fun` is the PROCESS, `showstopper` the RESULT, a dish may be either, both
+    or neither, and slow is not fiddly. It is a mood, not a practicality as
+    she first put it — a craving by the taxonomy's own test, and so it sits
+    beside `dessert` and `bakes` where she can pick it without them. Twelve
+    published recipes took it the same day, six of which had no `showstopper`
+    and so no way to be found by someone wanting to potter. No `showstopper`
+    was removed from a published recipe: read against the narrowed meaning
+    they all still impress.
   - **What `bakes` is NOT**, from the review of the 90 published recipes
     that followed: a soufflé, a beef Wellington, meringue swans (*"No one
     gets in cosy baking mode and makes ad hoc swans with creme diplomat"*).

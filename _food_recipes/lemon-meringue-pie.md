@@ -9,7 +9,7 @@ prep_time: "30 mins in stages"
 cook_time: "55 mins plus cooling"
 main_ingredients: ["plain flour", "unsalted butter", "egg yolk", "lemon curd", "egg whites"]
 star_ingredient:
-tags: ["bakes", "dessert", "showstopper"]
+tags: ["bakes", "dessert", "showstopper", "fiddly and fun"]
 ingredient_groups:
   - name: pastry base
     items:
