@@ -157,6 +157,7 @@ argument and the rules each field is read by.
 - 2026-10-04 · §8.2 · #1125 · A handful scales in HALF STEPS, and the first build of this was the opposite.
 - 2026-10-04 · §8.2 · #1286 · On a makes: recipe the scaler counts the thing made.
 - 2026-10-07 · §8.2 · A makes: range starts from its lower number; the midpoint above is REVERSED, three days on.
+- 2026-10-09 · §8.2 · #1297 · On the shopping list a makes: recipe counts BATCHES, and a handful is bought in whole ones.
 - 2026-09-10 · §8.3 · Helen, having used both indexes for a weekend's planning
 - 2026-09-10 · §8.3 · Every one of those is the same fact — shortlisted was declared as an ordinary filter in filter-state.js and so ANDed with everything else.
 - 2026-09-10 · §8.3 · The rule now, held in two pure functions and generated tests across BOTH field tables (tests/js/shortlist-view.test.js)

@@ -30,7 +30,9 @@
 //
 // A MEASURE TAKEN BY HAND SCALES IN HALF STEPS -- #1125. "1 handful" for
 // three times the people is "3 handfuls", and never "1.17 handfuls": see
-// `halfStep` below, the one place the rounding is decided.
+// `halfStep` below, the one place the rounding is decided. (The INDEX's
+// shopping list takes the same measures to the nearest WHOLE one, #1297 --
+// that is food-shopping-list.js's `wholeOnes`, and it never calls this.)
 //
 // "2 large" SCALES, because `large` is a unit to the parser and a SYMBOL to
 // the labeller (no plural), so it prints "4 large" -- Helen: "Things like

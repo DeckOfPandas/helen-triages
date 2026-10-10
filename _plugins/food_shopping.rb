@@ -105,6 +105,7 @@ module HelenTriages
       end
 
       yields = site.data.dig("food", "scaling", "yields")
+      @fruit = fruit_vocabulary(site.data.dig("food", "scaling", "whole_fruit"))
 
       counted = 0
       guessed = 0
@@ -175,8 +176,9 @@ module HelenTriages
     #
     # THIS IS NOT `makes:` BEING READ AS PEOPLE. `portions_for` above is
     # unchanged and still refuses to; `page.portions` is still the
-    # `serves_estimate`, and the INDEX's shopping list still scales by it.
-    # Two figures, two questions: how many it feeds, and how many it makes.
+    # `serves_estimate`. Two figures, two questions: how many it feeds, and
+    # how many it makes. (The INDEX's shopping list scaled these recipes by
+    # the first until #1297; it counts batches from the second now.)
     #
     # A recipe that states `serves:` never gets one, whatever else it says:
     # a number Helen wrote about people wins. No file carries both today.
@@ -234,9 +236,93 @@ module HelenTriages
         name, aisle = name_and_aisle(raw.to_s)
         next if name.nil?
 
-        rows << { "amount" => amount.to_s, "name" => name, "aisle" => aisle }
+        row = { "amount" => amount.to_s, "name" => name, "aisle" => aisle }
+        mark_fruit(row, raw.to_s) unless raw.to_s.strip.match?(LINK)
+        rows << row
       end
       rows
+    end
+
+    # ONE FRUIT, TWO PARTS, AND A LINE THAT ONLY POINTS -- #1297. Helen,
+    # 2026-10-09: 'I would like to cleverly combine e.g. "zest of 1 lemon" and
+    # "juice of 1 lemon" to make "1 lemon" in the shopping list.'
+    #
+    # THIS ONLY MARKS THE ROW. The merging is arithmetic and belongs to
+    # assets/js/food-shopping-list.js, like every other sum; what it needs
+    # from here is which part of which fruit a line uses. The vocabulary is
+    # `whole_fruit:` in _data/food/scaling.yml, and its header has the rule.
+    #
+    # `name` IS NEVER CHANGED, because the exclusion index and this list must
+    # agree on it (test_the_shopping_list_and_the_ingredient_index_agree_on_a
+    # _name). "juice of 1 lemon" keeps that name and gains `fruit` and `count`
+    # beside it, which is what the list groups and totals by instead.
+    #
+    #   "parts"   => ["juice", "zest"]   the parts this line uses
+    #   "fruit"   => "lemon"             only where the count is in the item
+    #   "count"   => "1"                 the amount read out of the item
+    #   "pointer" => true                buys nothing: "the rest of the oil above"
+    def mark_fruit(row, raw)
+      vocab = @fruit
+      return if vocab.nil?
+      head, note = raw.strip.split(/[,(]/, 2)
+      # A BRACKET AFTER THE NOTE IS AN ASIDE, NOT THE PART. "lemons, juiced
+      # (use the ones you've zested)" is juice: read as zest too, it added
+      # two lemons to a cake that had already zested four.
+      note = note.to_s.split("(", 2).first if raw.strip[head.to_s.length] == ","
+      head = fold(head)
+      note = fold(note)
+      unstated = row["amount"].strip.empty?
+
+      if unstated && (vocab[:pointer].match?(note) || vocab[:pointer].match?(head))
+        row["pointer"] = true
+        return
+      end
+
+      if unstated && (m = vocab[:literal].match(head))
+        count = m[:count]
+        count = "1" if %w[a an one].include?(count)
+        count = "½" if count == "half"
+        size = m[:size].to_s.strip
+        # As written, plural and all: "juice of 2 limes" is "2 limes".
+        row["fruit"] = "#{m[:fruit]}#{m[:plural]}"
+        row["count"] = size.empty? || size == "juicy" || size == "unwaxed" ? count : "#{count} #{size}"
+        row["parts"] = [m[:first], m[:second]].compact.map { |w| vocab[:part_of][w] }.uniq
+        row["aisle"] = aisle_for(m[:fruit])
+        return
+      end
+
+      return unless vocab[:named].match?(head)
+      parts = note.scan(vocab[:part_word]).flatten.map { |w| vocab[:part_of][w] }.uniq
+      row["parts"] = parts unless parts.empty?
+    end
+
+    # Compiled once per build from `whole_fruit:`; nil when the data is absent,
+    # and then no row is marked and the list totals as it did before #1297.
+    def fruit_vocabulary(data)
+      return nil unless data.is_a?(Hash)
+      fruits = Array(data["fruits"]).map { |w| fold(w) }.reject(&:empty?)
+      part_of = {}
+      (data["parts"] || {}).each do |part, words|
+        Array(words).each { |w| part_of[fold(w)] = part.to_s }
+      end
+      return nil if fruits.empty? || part_of.empty?
+
+      any = ->(words) { words.sort_by { |w| -w.length }.map { |w| Regexp.escape(w) }.join("|") }
+      fruit = any.call(fruits)
+      part = any.call(part_of.keys)
+      preps = any.call(Array(data["preparations"]).map { |w| fold(w) })
+      sizes = any.call(Array(data["sizes"]).map { |w| fold(w) })
+      pointers = any.call(Array(data["pointers"]).map { |w| fold(w) })
+      count = '\d+(?:\.\d+)?(?:\s*[½¼¾⅓⅔])?|[½¼¾⅓⅔]|an?|one|half'
+
+      {
+        part_of: part_of,
+        part_word: /(?<![a-z])(#{part})(?![a-z])/,
+        # The fruit is the LAST word of the name: "unwaxed lemons", not "lemon juice".
+        named: /(?<![a-z])(?:#{fruit})s?\z/,
+        literal: /\A(?:(?:#{preps})\s+)*(?<first>#{part})(?:\s+and\s+(?<second>#{part}))?\s+(?:of\s+)?(?<count>#{count})\s+(?:an?\s+)?(?<size>(?:(?:#{sizes})\s+)*)(?<fruit>#{fruit})(?<plural>s)?\z/,
+        pointer: /\A(?:(?:#{pointers})(?![a-z])|the\s+(?:#{part})\s+of\s+the\s+ones?(?![a-z]))/
+      }
     end
 
     # A cross-recipe link, or an ordinary name truncated at its first comma or

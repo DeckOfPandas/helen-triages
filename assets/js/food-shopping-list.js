@@ -33,7 +33,9 @@
 // read an amount this repo has written down (MANUAL 9.13's one-parser rule).
 //
 // -----------------------------------------------------------------------------
-// THE SCALER IS PORTIONS, NOT BATCHES
+// THE SCALER IS PORTIONS FOR A `serves:` RECIPE (and batches for a `makes:`
+// one since #1297 -- that choice is filters.js's; this file is only ever
+// handed a `scale`)
 // -----------------------------------------------------------------------------
 // Helen asked for a serving-size guess for every recipe in the same breath as
 // the scaler, which only earns its keep if the number on screen is people
@@ -223,15 +225,149 @@
     return total.approx ? '~' + text : text;
   }
 
+  /* =========================================================================
+     A MEASURE TAKEN BY HAND IS BOUGHT IN WHOLE ONES -- #1297, 2026-10-09
+     =========================================================================
+     Helen: "please make the shopping list only round to whole numbers for
+     handfuls and other similar units. Recipes should NOT say 1.17 handfuls, or
+     round up, because the first is meaningless and the second is inaccurate."
+
+     So a total in a by-eye measure goes to THE NEAREST WHOLE ONE, AND NEVER
+     BELOW ONE -- an ingredient on the list is an ingredient to buy:
+
+         1 handful, seven portions of a recipe for six   1.17  ->  1 handful
+         1 handful at x1.5                               1.5   ->  2 handfuls
+         1 handful at x2/3                               0.67  ->  1 handful
+         1.17 from one recipe and 1.5 from another       2.67  ->  3 handfuls
+
+     THE TOTAL IS ROUNDED, ONCE, never each recipe's share: two recipes
+     wanting a handful and a half between them want three, and rounding each
+     first would say four.
+
+     NOT THE RECIPE PAGE'S RULE, which is the nearest HALF (`halfStep` in
+     food-scale.js, #1125): a cook can take half a handful, and nobody buys
+     one. Same measures, though -- `half_step_measures` in
+     _data/food/scaling.yml, handed in as `options.wholeMeasures`. With no list
+     given nothing is rounded, which is what every caller before #1297 gets. */
+  function wholeMeasurePattern(measures) {
+    var words = (measures || [])
+      .map(function (m) { return String(m).trim().toLowerCase(); })
+      .filter(function (m) { return m !== ''; })
+      .map(function (m) { return m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); })
+      .join('|');
+    // A WHOLE WORD, singular or plural, anywhere in the unit: `handful`,
+    // `small handfuls`, `pinches`. `dashi` and `handfulness` are not caught.
+    return words ? new RegExp('(^|[^a-z])(' + words + ')(?:e?s)?(?![a-z])', 'i') : null;
+  }
+
+  function wholeOnes(quantity) {
+    return Math.max(1, Math.round(tidy(quantity)));
+  }
+
+  /* =========================================================================
+     ONE FRUIT, TWO PARTS; AND A LINE THAT ONLY POINTS -- #1297, 2026-10-09
+     =========================================================================
+     Helen: 'I would like to cleverly combine e.g. "zest of 1 lemon" and "juice
+     of 1 lemon" to make "1 lemon" in the shopping list.'
+
+     _plugins/food_shopping.rb MARKS the lines; this does the sums. Three
+     things happen, each inside ONE RECIPE and never across two -- which is
+     why an entry now says which recipe it came from:
+
+     1. THE COUNT WRITTEN INSIDE AN ITEM IS READ. `item: "juice of 1 lemon"`
+        arrives with `fruit: "lemon"` and `count: "1"`, and is totalled as one
+        lemon rather than printed as a row with no figure.
+
+     2. DIFFERENT PARTS OF THE SAME FRUIT ARE THE SAME FRUIT. The juice of one
+        lemon and the zest of one lemon is one lemon; four zested and two and
+        a half juiced is four. Each part is summed, the part that needs the
+        most fruit decides, and the lines that do not use that part are
+        dropped. THE SAME PART TWICE STILL ADDS: two lines of juice are two
+        lemons' worth of juice. A line naming no part ("lemon, cut into
+        wedges") is always added -- that one is a different lemon.
+
+     3. A POINTER BUYS NOTHING. "olive oil, the rest of the oil above" beside
+        an amounted line of olive oil is dropped, where it used to add a stray
+        "×2" to the row. Keyed on the pointer's own words and never on "no
+        amount, same name": "salted butter, extra, for greasing" really is
+        extra. A pointer with nothing beside it to point at stays a line.
+
+     AN ENTRY WITH NO `recipe` IS LEFT EXACTLY AS IT WAS, so nothing merges
+     unless the caller says which lines share a recipe. */
+  function reunite(entries) {
+    var list = [];
+    var byRecipe = {};
+
+    (entries || []).forEach(function (entry) {
+      if (!entry) return;
+      var name = String(entry.fruit || entry.name || '').trim();
+      if (!name) return;
+      var item = {
+        amount: entry.fruit ? entry.count : entry.amount,
+        name: name,
+        aisle: entry.aisle,
+        scale: entry.scale,
+        parts: Array.isArray(entry.parts) ? entry.parts : [],
+        pointer: !!entry.pointer,
+        drop: false
+      };
+      list.push(item);
+      if (entry.recipe === undefined || entry.recipe === null) return;
+      var key = String(entry.recipe) + '\u0000' + foldName(name);
+      (byRecipe[key] = byRecipe[key] || []).push(item);
+    });
+
+    Object.keys(byRecipe).forEach(function (key) {
+      var lines = byRecipe[key];
+
+      var pointed = lines.filter(function (l) { return !l.pointer; });
+      if (pointed.length) {
+        lines.forEach(function (l) { if (l.pointer) l.drop = true; });
+      }
+
+      var counted = pointed.filter(function (l) {
+        if (!l.parts.length) return false;
+        l.parsed = parseAmount(l.amount);
+        return !!l.parsed;
+      });
+      if (counted.length < 2) return;
+
+      var needs = {};
+      var order = [];
+      counted.forEach(function (l) {
+        var most = l.parsed.max === undefined ? l.parsed.quantity : l.parsed.max;
+        l.parts.forEach(function (part) {
+          if (needs[part] === undefined) { needs[part] = 0; order.push(part); }
+          needs[part] += most;
+        });
+      });
+      // The first part named wins a tie, so the row keeps the first line's words.
+      var deciding = order.reduce(function (best, part) {
+        return needs[part] > needs[best] + 1e-9 ? part : best;
+      }, order[0]);
+      counted.forEach(function (l) {
+        if (l.parts.indexOf(deciding) === -1) l.drop = true;
+      });
+    });
+
+    return list.filter(function (l) { return !l.drop; });
+  }
+
   /**
    * Total up a shortlist of recipes, grouped by aisle.
    *
    * @param {Array} entries - one per ingredient of every shortlisted recipe:
-   *        { amount: string, name: string, aisle: string, scale: number }
+   *        { amount: string, name: string, aisle: string, scale: number,
+   *          recipe?: string, parts?: string[], fruit?: string,
+   *          count?: string, pointer?: boolean }
    *        `scale` is portions wanted over portions the recipe makes; absent
    *        or not a positive number means x1, which is also what a recipe with
-   *        no resolved portion count gets.
+   *        no resolved portion count gets. `recipe` says which lines share a
+   *        recipe, and the last four are _plugins/food_shopping.rb's marks --
+   *        see `reunite` above.
    * @param {Object} [options]
+   * @param {Array} [options.wholeMeasures] - by-eye measures, whose totals go
+   *        to the nearest whole one: `half_step_measures` in scaling.yml.
    * @param {Array} [options.aisles] - [{key, label}] in the order they should
    *        appear. An aisle with nothing in it is not returned; an entry whose
    *        aisle is not in the list falls to the last one.
@@ -248,13 +384,13 @@
     aisles.forEach(function (a) { known[a.key] = true; });
     var fallback = aisles[aisles.length - 1].key;
 
+    var byEye = wholeMeasurePattern(opts.wholeMeasures);
+
     var groups = {};
     var order = [];
 
-    (entries || []).forEach(function (entry) {
-      if (!entry) return;
-      var name = String(entry.name || '').trim();
-      if (!name) return;
+    reunite(entries).forEach(function (entry) {
+      var name = entry.name;
 
       var key = foldName(name);
       if (!groups[key]) {
@@ -340,6 +476,11 @@
 
       var totals = group.unitOrder.map(function (unit) {
         var total = group.units[unit];
+        // A by-eye measure is bought in whole ones; see `wholeMeasurePattern`.
+        if (byEye && byEye.test(unit)) {
+          total.lo = wholeOnes(total.lo);
+          total.hi = wholeOnes(total.hi);
+        }
         return {
           unit: unit,
           lo: tidy(total.lo),

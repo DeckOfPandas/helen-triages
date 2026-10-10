@@ -3980,3 +3980,59 @@ def test_the_leopard_version_is_the_hash_of_the_committed_files():
         "will go on showing the old artwork. Run "
         "`python3 scripts/build_leopard.py --write` and commit all three files."
     )
+
+
+def test_the_index_shopping_list_is_handed_the_by_eye_measures():
+    """#1297. The shopping list totals a handful to a WHOLE one, and which
+    words do is the same data the recipe page uses.
+
+    Helen, 2026-10-09: "please make the shopping list only round to whole
+    numbers for handfuls and other similar units." `half_step_measures`
+    reaches the index by one route: food/index.html joins it onto the panel as
+    `data-whole-measures`, filters.js reads the attribute and hands it to
+    `build()` as `wholeMeasures`. Break any link and nothing errors -- with no
+    list, nothing is rounded -- so the list quietly prints "1.17 handfuls"
+    again, which is the figure the issue was raised about.
+    """
+    index = read("food", "index.html")
+    assert re.search(
+        r'id="shopping-list"[^>]*data-whole-measures="\{\{\s*'
+        r'site\.data\.food\.scaling\.half_step_measures\s*\|\s*join:\s*\',\'',
+        index), (
+        "food/index.html no longer joins site.data.food.scaling."
+        "half_step_measures onto #shopping-list as data-whole-measures."
+    )
+    filters = read("assets", "js", "filters.js")
+    assert "getAttribute('data-whole-measures')" in filters, (
+        "filters.js no longer reads data-whole-measures off the panel."
+    )
+    assert "wholeMeasures: WHOLE_MEASURES" in filters, (
+        "filters.js reads the by-eye measures and does not hand them to "
+        "HTF.foodShoppingList.build(), so no total is rounded."
+    )
+
+
+def test_the_whole_fruit_vocabulary_is_the_shape_the_plugin_reads():
+    """#1297. `whole_fruit:` in _data/food/scaling.yml is what lets "zest of 1
+    lemon" and "juice of 1 lemon" total as one lemon.
+
+    _plugins/food_shopping.rb compiles five lists into its patterns and marks
+    nothing at all if `fruits` or `parts` is missing -- silently, the list
+    simply stops combining. So the shape is pinned here.
+    """
+    vocab = yaml.safe_load(read("_data", "food", "scaling.yml")).get("whole_fruit")
+    assert isinstance(vocab, dict), "_data/food/scaling.yml has no `whole_fruit:`."
+    for key in ("fruits", "preparations", "sizes", "pointers"):
+        words = vocab.get(key)
+        assert words and all(isinstance(w, str) and w == w.lower() for w in words), (
+            f"whole_fruit.{key} must be a list of lowercase strings; got {words!r}"
+        )
+    assert {"lemon", "lime", "orange"} <= set(vocab["fruits"])
+    parts = vocab.get("parts")
+    assert isinstance(parts, dict) and {"juice", "zest"} <= set(parts), (
+        f"whole_fruit.parts must name at least juice and zest; got {parts!r}"
+    )
+    plural = [f for f in vocab["fruits"] if f.endswith("s")]
+    assert not plural, (
+        f"whole_fruit.fruits are singular -- the plugin adds the plural: {plural}"
+    )

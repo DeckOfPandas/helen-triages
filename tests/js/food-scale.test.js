@@ -319,22 +319,23 @@ test('a pat scales, and reads "pats" -- Helen: "scaled linearly as pats"', () =>
   assert.strictEqual(scaleAmount('2 pats', 2, WORDS).scaled, true);
 });
 
-test('the index shopping list totals a handful linearly, and is NOT half-stepped', () => {
-  // `half_step_measures` is the RECIPE PAGE's rule. The shortlist's shopping
-  // list has its own totalling in food-shopping-list.js and does not go
-  // through `halfStep`; it was left alone and reported. The whole-number cases
-  // are pinned so that a later change there is a decision, not a drift.
+test('the index shopping list totals a handful to a WHOLE one, where this page takes halves', () => {
+  // `half_step_measures` names the measures for both. The recipe page takes
+  // the nearest half (`halfStep`, above); the shortlist's shopping list takes
+  // the nearest whole one since #1297 -- Helen, 2026-10-09: "please make the
+  // shopping list only round to whole numbers for handfuls and other similar
+  // units." A cook can take half a handful; nobody buys one.
   const FSL = require('../../assets/js/food-shopping-list.js');
   const row = (amount, scale) => FSL.build(
     [{ amount: amount, name: 'fresh flat-leaf parsley', aisle: 'produce', scale: scale }],
-    { aisles: [{ key: 'produce', label: 'Produce' }] })[0].items[0].text;
+    { aisles: [{ key: 'produce', label: 'Produce' }],
+      wholeMeasures: WORDS.halfStep })[0].items[0].text;
   assert.strictEqual(row('1 handful', 2), '2 handfuls');
   assert.strictEqual(row('2 handfuls', 0.5), '1 handful');
   assert.strictEqual(row('1 small handful', 2), '2 small handfuls');
-  // WHAT A FRACTION OF A HANDFUL PRINTS IS DELIBERATELY NOT PINNED. Today it
-  // is "⅔ handfuls" (the plural follows any number that is not exactly 1) and
-  // "1.17 handfuls" at seven for six; both were reported to Helen rather than
-  // decided here, so no assertion freezes either answer.
+  assert.strictEqual(row('1 handful', 7 / 6), '1 handful');
+  assert.strictEqual(row('1 handful', 1.5), '2 handfuls');
+  assert.strictEqual(scaleAmount('1 handful', 1.5, WORDS).text, '1½ handfuls');
 });
 
 test('with no list given, a handful scales as it did before #1125', () => {

@@ -88,18 +88,19 @@
 }
 
 // --- one count per recipe ----------------------------------------------------
-// A wrapping row of number-and-name pairs rather than a column: a week's
-// shortlist is a handful of recipes, and a column of six would push the
-// totals — the thing the panel is FOR — below the fold on a phone. Recipe
-// titles are longer than drink names, so the gap between pairs is the larger
-// one and a pair is allowed to take a whole line.
+// ONE RECIPE PER LINE since #1297 -- Helen, 2026-10-09: "recipes on the
+// shopping list should appear 1 per line to make it easier for the user to
+// scan". It was a wrapping row of number-and-name pairs until then, to keep
+// the totals above the fold on a phone; each row is now a sentence ("2
+// batches of 18 Peanut Butter Cookies"), and sentences side by side do not
+// scan.
 .shopping-list-recipes {
   list-style: none;
   margin: 0 0 $space-lg;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: $space-sm $space-xl;
+  flex-direction: column;
+  gap: $space-sm;
 
   li {
     display: flex;
@@ -115,8 +116,9 @@
 // `.shopping-list-times` AND `.shopping-list-batch-note` STOOD HERE and are
 // gone with #815. For a fortnight a recipe with no portion count got a box
 // counting BATCHES, marked with a x, plus a line explaining why "set all to"
-// could not reach it. Every recipe carries a `serves_estimate:` now, so there
-// is one kind of number in this panel and nothing to explain.
+// could not reach it. BATCHES ARE BACK since #1297, for every `makes:`
+// recipe, and need neither class: the row says "batches of" in its own words
+// (`.shopping-list-count-word`, unstyled -- it is part of the sentence).
 //
 // What is left is the case where a NEW recipe has not been given its estimate
 // yet: no box at all, and a note saying which key to add. A control that

@@ -1669,6 +1669,60 @@ unless stated.
   "range of one" ruling is not withdrawn, only unreachable from a `makes:`
   line**: the lower number is always whole, and `yieldBox` still shows half a
   recipe of an odd count as "2–3". No issue tracks it.
+- **2026-10-09, #1297** — **On the shopping list a `makes:` recipe counts
+  BATCHES, and a handful is bought in whole ones.** Three rulings in one
+  conversation, each replacing something written above.
+  - **Batches are back, on her wording, and #815 is reversed for `makes:`
+    recipes only.** Helen: *'The shopping list scaler could show e.g. "X
+    batches of 18 Peanut Butter Cookies", allowing half-batches where that
+    doesn't split eggs. Is that doable? That stops us saying 2 cookies is a
+    portion -- not out of principle, but because that's meaningless.'* Told
+    the plan — `serves:` rows unchanged and worded "7 portions of Moules
+    Marinière"; one recipe per line; the figure dropped where it reads badly
+    ("2 batches of 1 Lemon Drizzle Cake", "750 ml Blackberry Gelato"); "set
+    all" skipping batch rows — she answered: *"All of group 2 and 3 are
+    perfect."* **What made the September batch box wrong was that it looked
+    like a portions box**; this one says which it is in words, which is also
+    why "set all" may skip it again. The half step is the build's existing
+    judge (#1286), not a second one. Her first sketch that morning, *"2
+    batches of 12 cookies (24 cookies)"*, was superseded by this one: the
+    figure after "of" is one batch's and does not multiply.
+  - **A handful on the LIST goes to the nearest whole one; she changed her
+    mind twice in a day and this is where it landed.** That morning's comment
+    on the issue asked for rounding UP with the true figure in brackets (*"2
+    handfuls parsley (1.17 handfuls)"*). By the afternoon: *"I've changed my
+    mind: please make the shopping list only round to whole numbers for
+    handfuls and other similar units. Recipes should NOT say 1.17 handfuls, or
+    round up, because the first is meaningless and the second is
+    inaccurate."* Her worry was that this forced whole multiples of `serves:`
+    (*"if I have a whole chicken, I should be allowed to just buy a bigger
+    chicken rather than have to cook two"*). **It does not, and the reason is
+    worth keeping: a handful is only accurate to about a third either way, so
+    rounding it to the nearest one loses nothing measurable — the recipe
+    scales freely and only the by-eye lines are rounded.** Nearest, never
+    below one, the TOTAL rounded once rather than each recipe (a session's
+    call, stated to her and not objected to). No bracket.
+  - **The recipe page was NOT changed**, and she was told why: *"I don't want
+    1.17 handfuls on a recipe page"* — it does not print one; a handful there
+    goes to the nearest half (2026-10-04, above), measured again on the day
+    (`1 handful` ×7/6 → `1 handful`). **What the page still prints is "1.17
+    sprigs" and "1.17 bunches"**, because sprig, bunch, drop, twist, lot and
+    pat were ruled linear on 2026-10-04. Put to her as a question; **not
+    ruled** at the time of writing.
+  - **Whole fruit.** Her comment: *'I would like to cleverly combine e.g.
+    "zest of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the shopping
+    list.'* The issue had measured her literal wording and not used it (two
+    rows with no figure); this builds the reading instead of changing the
+    recipes. **The rule within one recipe — different parts take the larger,
+    the same part adds — is a session's, stated to her before building and
+    not objected to.** 26 recipes' citrus rows changed on the dev build, one
+    of them published (the raspberry cheesecake: "finely grated zest of 1
+    lemon" → 1 lemon). The pound cake read "4½ + 2 large lemons" and reads 4.
+  - **Two things found while measuring, neither changed.** A fruit's row is
+    labelled by the first spelling seen, so one lemon from each of two recipes
+    can read "2 lemon" — the plural-fold's existing behaviour for every
+    ingredient. And "0.5" is what a number box shows for half a batch; it
+    cannot show "½".
 
 ---
 

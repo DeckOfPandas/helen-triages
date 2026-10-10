@@ -373,3 +373,57 @@ test('a failed portions write does not lose the number just typed', () => {
   assert.strictEqual(HTF.shortlist.setPortions('/a/', 6), 6);
   assert.strictEqual(HTF.shortlist.portions('/a/'), 6);
 });
+
+// --- how many BATCHES -- #1297 --------------------------------------------------
+// On the shopping list a `makes:` recipe's box counts batches since 2026-10-09
+// (Helen: "X batches of 18 Peanut Butter Cookies"). A FOURTH map, because a
+// stored 6 cannot say whether it meant people or batches.
+
+test('#1297: an unset recipe has no batch count, which the caller reads as one', () => {
+  const { HTF } = pageWith();
+  assert.strictEqual(HTF.shortlist.batches('/food/recipes/cookies/'), null);
+});
+
+test('#1297: a batch count is stored under its own key and survives a reload', () => {
+  const { HTF, storage } = pageWith();
+  assert.strictEqual(HTF.shortlist.setBatches('/a/', 3), 3);
+  HTF.shortlist._forget();
+  assert.strictEqual(HTF.shortlist.batches('/a/'), 3);
+  assert.strictEqual(
+    JSON.parse(storage.getItem('htf-shortlist-batches-food-v1'))['/a/'], 3);
+});
+
+test('#1297: half a batch is storable, and nothing else below one is', () => {
+  const { HTF } = pageWith();
+  assert.strictEqual(HTF.shortlist.setBatches('/a/', 0.5), 0.5);
+  assert.strictEqual(HTF.shortlist.setBatches('/a/', 0.2), 0.5);
+  // No batch and a half: the nearest whole one.
+  assert.strictEqual(HTF.shortlist.setBatches('/a/', 1.2), 1);
+  assert.strictEqual(HTF.shortlist.setBatches('/a/', 2.6), 3);
+});
+
+test('#1297: nothing, zero or nonsense forgets the entry', () => {
+  const { HTF } = pageWith();
+  [0, -3, 'nonsense', null, undefined, ''].forEach((value) => {
+    HTF.shortlist.setBatches('/a/', 4);
+    assert.strictEqual(HTF.shortlist.setBatches('/a/', value), null, String(value));
+    assert.strictEqual(HTF.shortlist.batches('/a/'), null, String(value));
+  });
+});
+
+test('#1297: batches and portions are separate maps', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.setPortions('/a/', 6);
+  assert.strictEqual(HTF.shortlist.batches('/a/'), null,
+    'six PEOPLE was read back as six batches');
+  HTF.shortlist.setBatches('/a/', 2);
+  assert.strictEqual(HTF.shortlist.portions('/a/'), 6);
+});
+
+test('#1297: clear() empties the batches too', () => {
+  const { HTF } = pageWith();
+  HTF.shortlist.setBatches('/a/', 2);
+  HTF.shortlist.clear();
+  HTF.shortlist._forget();
+  assert.strictEqual(HTF.shortlist.batches('/a/'), null);
+});

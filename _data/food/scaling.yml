@@ -216,3 +216,64 @@ half_recipe:
     - sachet
     - tin
     - jar
+
+# -----------------------------------------------------------------------------
+# One fruit, two parts -- the INDEX's shopping list. GitHub issue #1297, Helen,
+# 2026-10-09: 'I would like to cleverly combine e.g. "zest of 1 lemon" and
+# "juice of 1 lemon" to make "1 lemon" in the shopping list.'
+#
+# _plugins/food_shopping.rb reads these to mark an ingredient line with the
+# PART of the fruit it uses; assets/js/food-shopping-list.js does the merging.
+# Both forms the collection writes are read:
+#
+#   item: "juice of 1 lemon"                      the count is in the item
+#   amount: "1", item: "lemon, zested and juiced" the part is after the comma
+#
+# WITHIN ONE RECIPE, different parts of the same fruit are the same fruit: the
+# juice of 1 and the zest of 1 is 1 lemon, and 4 zested with 2½ juiced is 4.
+# The same part twice adds up, and so do two recipes.
+#
+# `fruits` is matched as the LAST word of the ingredient's name, singular or
+# plural, so "unwaxed lemons" is a lemon and "lemon juice" is not: a spoonful
+# of juice is not some number of lemons, and nothing here converts one.
+# -----------------------------------------------------------------------------
+whole_fruit:
+  fruits:
+    - lemon
+    - lime
+    - orange
+    - grapefruit
+    - clementine
+  # The words for each part, as a recipe writes them.
+  parts:
+    juice:
+      - juice
+      - juiced
+    zest:
+      - zest
+      - zested
+      - rind
+  # What may sit in front of the part in the item's own text ("finely grated
+  # zest of 1 lemon"), and between the count and the fruit ("1 small orange").
+  preparations:
+    - finely
+    - freshly
+    - coarsely
+    - grated
+    - squeezed
+  sizes:
+    - small
+    - medium
+    - large
+    - big
+    - juicy
+    - unwaxed
+  # A line with NO amount whose note opens this way points at another line of
+  # the same ingredient and buys nothing more: "olive oil, the rest of the oil
+  # above". "the zest of the one juiced for the pears" is the same and is read
+  # from `parts`. NOT every no-amount line: "salted butter, extra, for
+  # greasing" and "olive oil, to drizzle" really are extra, and stay counted.
+  pointers:
+    - the rest of
+    - the remainder of
+    - the remaining
