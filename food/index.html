@@ -905,6 +905,12 @@ permalink: /food/
    builds the `× clear all` it mirrors. Guarded by
    tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes. {% endcomment %}
 <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
+{% comment %} THE PHONE FOLD -- #1219, 2026-10-10. After the index script for
+   the reason results-bar.js is: it wires itself on DOMContentLoaded, and the
+   first chosen-chip count it paints has to include a filter the index script
+   set from the URL. Guarded by
+   tests/test_site_config.py::test_the_phone_fold_is_wired_on_both_indexes. {% endcomment %}
+<script src="{{ '/assets/js/filter-fold.js' | relative_url }}"></script>
 {% comment %} #849. ORDER DOES NOT MATTER for this one, unlike the two above it:
    it reads HTF.shortlist at run time rather than lifting helpers off another
    module at startup, and it subscribes to an event rather than being called by

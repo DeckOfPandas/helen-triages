@@ -12,9 +12,16 @@
    (recipe_badges.html) without re-deriving it from a class string. Optional,
    so a filter_group.html call this issue never touched (there are none today)
    costs nothing by omitting it.
+
+   THE `data-fold` ATTRIBUTES -- #1219, 2026-10-10. At phone width this
+   section folds to its label row (_sass/shared/_filter-fold.scss,
+   assets/js/filter-fold.js). The count of chosen chips and the + / - mark
+   ship `hidden`; the script reveals them, so without JavaScript the section
+   is simply open. The mark is LAST in the row, after `x clear`, so it sits at
+   the row's far end.
 {% endcomment %}
-<div class="category {{ include.group_class }}"{% if include.section_id %} id="{{ include.section_id }}"{% endif %}>
-  <div class="category-label-row">
+<div class="category {{ include.group_class }}"{% if include.section_id %} id="{{ include.section_id }}"{% endif %} data-fold>
+  <div class="category-label-row" data-fold-head>
     {% comment %} The label text is wrapped rather than bare because the blocky
        rule is a per-line background on an INLINE box, and .category-label is a
        flex item — flex items are blockified, so `display: inline` on it would
@@ -25,11 +32,13 @@
        are the WORDMARK's device, where [ FOOD ] really is a variable in a slot.
        That is why the labels in _data/food/filter_sections.yml have none. {% endcomment %}
     <span class="category-label">
-      <span class="category-label-text">{{ include.label }}</span>
+      <span class="category-label-text" data-fold-label>{{ include.label }}</span>
     </span>
+    <span class="filter-fold-count results-count-number" data-fold-count hidden></span>
     <button type="button" class="btn-clear-inline" style="display:none;">&times; clear</button>
+    <button type="button" class="filter-fold-mark" data-fold-mark aria-expanded="true" hidden></button>
   </div>
-  <div class="category-buttons">
+  <div class="category-buttons" data-fold-body>
     {% for item in include.items %}
       <button type="button" class="{{ include.btn_class }}" aria-pressed="false" {{ include.data_attr }}="{{ item }}"><span class="tag-shape" aria-hidden="true"></span>{{ item }}</button>
     {% endfor %}

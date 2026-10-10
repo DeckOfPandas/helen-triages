@@ -43,6 +43,9 @@ const PAGE_SCRIPTS = [
   // it only has to LOAD without throwing. tests/js/results-bar.test.js drives
   // it against its own fixture.
   'results-bar.js',
+  // #1219, 2026-10-10. The phone fold. It wires itself on DOMContentLoaded
+  // too, so here it only has to load; tests/js/filter-fold.test.js drives it.
+  'filter-fold.js',
   // #849. Nobody's dependency -- it reads HTF.shortlist at run time rather than
   // lifting helpers off another module at startup, and it subscribes to
   // `htf:shortlist-change` rather than being called. It is here because the

@@ -594,6 +594,7 @@ argument and the rules each field is read by.
 - 2026-09-21 · §13 · #1161 · padding cannot inset an absolutely positioned child, and the screenshot is what caught it.
 - 2026-09-21 · §13 · #1162 · a DRAFT mark on the local site — Helen: "add a DRAFT badge on the local site for unpublished cocktails", on cards "squished in on the top right" and on a drink page "to the right …
 - 2026-09-25 · §13 · the recipe page keeps all thirteen devices; a device budget is NOT the itch.
+- 2026-10-10 · §13 · #1219 · THE PHONE PANEL FOLDS; THE THREE BOXES ON ONE ROW WERE DECLINED; THE CONTROL LAYER IS STILL OPEN.
 - 2026-09-21 · §13 · #1165 #1086 · the card glass clipped between 400 and 720px, and #1086's own fix is what broke it.
 - 2026-09-21 · §13 · #1164 · the count leads on "see shortlist" — Helen: "swap shortlist and (0) in the button so the structure of the + shortlist is repeated." The button above it is a mark then a word (+ is …
 - 2026-09-20 · §13 · crop.sh / styles.sh / shoot.sh paths are site-relative, and getting it wrong reports the WRONG FAILURE.

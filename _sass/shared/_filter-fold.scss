@@ -1,0 +1,82 @@
+// =============================================================================
+// THE PHONE FOLD -- a chip section folds to its label at phone width
+// =============================================================================
+// #1219, Helen, 2026-10-10, from a candidates page of four phone-panel
+// treatments on both indexes: "The mobile view is simplest: sections fold."
+// At 390px the food panel was 815px tall and the first recipe 1128px down the
+// page; cocktails' was 985px and 1433px. Folded, with the first section open,
+// they are 567px / 880px and 639px / 1087px.
+//
+// WHAT FOLDS. The sections that hold CHIPS: STAR INGREDIENT, MOOD and
+// PRACTICALITIES on food; YOLO?, MOOD and HASSLE on cocktails. The three text
+// inputs do not -- a box folded to its label saves a line and hides the box.
+// The first section starts open, the rest folded; assets/js/filter-fold.js
+// decides that, and opens the section a `#filter-...` link points at.
+//
+// NOTHING IS REMOVED, AND NOTHING CHANGES ABOVE 600px. §13.4's "the panel of
+// choices IS the fold" was ruled on desktop and stands there: the mark and
+// the count are `display: none` outside the query, and `.is-folded` has no
+// rule outside it, so a section folded on a phone and then seen wide is
+// simply open.
+//
+// 600px, NOT $index-stack-width. It is the size judgement about phones every
+// other phone block in the tree is written at (the header's two thirds, #1086);
+// 720px is where the two ingredient boxes stop fitting on one line, which is a
+// layout limit, and a tablet at 700px has room for the whole panel.
+//
+// THE MARKUP IS data-ATTRIBUTES, so one partial and one script serve both
+// sites without knowing either's class names: `[data-fold]` on the section,
+// `[data-fold-head]` on its label row, `[data-fold-body]` on its chips,
+// `[data-fold-count]` and `[data-fold-mark]` inside the row. Both of those
+// ship `hidden`; the script reveals them, so a page without JavaScript has no
+// control that cannot work and no section it cannot open.
+//
+// IMPORTED AFTER EACH SITE'S FILTER PARTIAL: `.is-folded [data-fold-body]`
+// has to beat the site's own `display: flex` on its chip row at equal
+// specificity, and later wins.
+//
+// WHICH VARIABLES IT MAY USE: $font-headings, which both palettes declare
+// under the one name (Courier Prime, the face of the labels the mark sits
+// beside), and the spacing scale from shared/_tokens.scss.
+
+.filter-fold-mark,
+.filter-fold-count { display: none; }
+
+@media (max-width: 600px) {
+  [data-fold-head] {
+    width: 100%;
+    cursor: pointer;
+  }
+
+  // The chosen-chip count, after the label. Its face is
+  // `.results-count-number`'s (shared/_results-bar.scss), which the markup
+  // gives it: it is the same kind of number as "N survivors".
+  .filter-fold-count:not([hidden]) {
+    display: inline;
+    font-size: 0.9rem;
+  }
+
+  // + and -, at the row's far end. A real button, so the fold is reachable
+  // from a keyboard; the whole row answers a tap as well.
+  .filter-fold-mark:not([hidden]) {
+    display: inline-block;
+    margin-left: auto;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-family: $font-headings;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: inherit;
+    padding: 0.2rem 0.1rem 0.2rem 0.6rem;
+  }
+
+  .filter-fold-mark:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  [data-fold].is-folded [data-fold-body] { display: none; }
+  [data-fold].is-folded { margin-bottom: $space-lg; }
+}

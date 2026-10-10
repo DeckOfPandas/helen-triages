@@ -78,6 +78,10 @@
 // $font-label) and so must come after food/palette, which it does: that is
 // line 11 of this file. See _sass/shared/_shortlist-export.scss's own header.
 @import "shared/shortlist-export";
+// The phone fold (#1219). After food/category-labels and food/search: its
+// `.is-folded [data-fold-body]` has to beat `.category .category-buttons`'s
+// `display: flex` at equal specificity, and later wins.
+@import "shared/filter-fold";
 // The shopping list (#801), after shortlist: it is the shortlist's own panel
 // and is read as part of that feature, and it defines its own
 // %food-number-input rather than extending anything above, so this is the only

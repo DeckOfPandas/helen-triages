@@ -4485,6 +4485,20 @@ triage website to click on a random recipe"*); it stays on cocktails.
 `_tokens.scss`), tightened for the fold: the index is a control panel, the
 recipe page a document.
 
+**At phone width the chip sections fold** (#1219; at or below 600px, on both
+indexes). STAR INGREDIENT, MOOD and PRACTICALITIES on food, and YOLO?, MOOD
+and HASSLE on cocktails, each fold to their label row: a tap on the row or on
+the `+` / `−` at its end opens and closes it, and a count of the chips chosen
+in it sits after the label in the count's own face. The first section starts
+open, as does one a `#filter-…` link names; the three text inputs never fold.
+Above 600px nothing changes and "the panel IS the fold" stands. One partial
+and one script for both sites, `_sass/shared/_filter-fold.scss` and
+`assets/js/filter-fold.js`, reading `data-fold` attributes and neither
+site's class names; the mark and the count ship `hidden`, so without
+JavaScript every section is open. At 390px the food panel is 567px and the
+first recipe 880px down (815 and 1128 before); cocktails' is 639px and 1087px
+(985 and 1433).
+
 #### 13.4.1 The punched-tape effect
 
 **`model_instructions/LETTERING.md` is the reference**: the physics (stroke

@@ -221,10 +221,12 @@ permalink: /cocktails/
        includes all drinks, not just not-known-to-be-definitely-good drinks."
        `open` is therefore a visible state that applies NO filter, rather than
        a second filter. {% endcomment %}
-    <div class="drink-filter drink-filter--chaos">
-      <div class="drink-label-row">
-        <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
+    <div class="drink-filter drink-filter--chaos" data-fold>
+      <div class="drink-label-row" data-fold-head>
+        <h2 class="drink-field-label"><span class="drink-field-label-text" data-fold-label>YOLO?</span></h2>
+        <span class="filter-fold-count results-count-number" data-fold-count hidden></span>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
+        <button type="button" class="filter-fold-mark" data-fold-mark aria-expanded="true" hidden></button>
       </div>
       {% comment %} THE THIRD BUTTON NARROWS, AND THE OTHER TWO DO NOT — #732,
          split out of #722 whose other three bullets landed on 2026-09-05. It is
@@ -255,7 +257,7 @@ permalink: /cocktails/
          WHAT IT NARROWS TO IS UNCHANGED: `meta.made_before: false`, 20 drinks.
          The words moved; nothing behind them did, and no test reads them --
          every one goes through `data-chaos="unmade"`. {% endcomment %}
-      <div class="drink-btns">
+      <div class="drink-btns" data-fold-body>
         <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false">no chaos please</button>
         <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false">I&rsquo;m open to chaos</button>
         <button type="button" class="btn-chaos" data-chaos="unmade" aria-pressed="false">chaos only</button>
@@ -278,12 +280,14 @@ permalink: /cocktails/
        mood chips (_layouts/cocktail.html) end their `?mood=` link in this
        fragment when the mood belongs to this group, so the reader lands on
        the section holding the lit chip rather than the top of the page. {% endcomment %}
-    <div class="drink-filter drink-filter--mood" id="filter-mood">
-      <div class="drink-label-row">
-        <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
+    <div class="drink-filter drink-filter--mood" id="filter-mood" data-fold>
+      <div class="drink-label-row" data-fold-head>
+        <h2 class="drink-field-label"><span class="drink-field-label-text" data-fold-label>Mood</span></h2>
+        <span class="filter-fold-count results-count-number" data-fold-count hidden></span>
         <button type="button" class="btn-clear-filter" id="clear-mood" hidden>&times; clear</button>
+        <button type="button" class="filter-fold-mark" data-fold-mark aria-expanded="true" hidden></button>
       </div>
-      <div class="drink-btns">
+      <div class="drink-btns" data-fold-body>
         {% for name in groups.mood %}
           {% assign members = all_drinks | where_exp: "d", "d.mood contains name" %}
           {% if members.size > 0 %}
@@ -295,12 +299,14 @@ permalink: /cocktails/
 
     {% comment %} `id="filter-hassle"` -- #1059, same argument as MOOD above,
        for a chip whose mood is in the hassle group instead. {% endcomment %}
-    <div class="drink-filter drink-filter--hassle" id="filter-hassle">
-      <div class="drink-label-row">
-        <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
+    <div class="drink-filter drink-filter--hassle" id="filter-hassle" data-fold>
+      <div class="drink-label-row" data-fold-head>
+        <h2 class="drink-field-label"><span class="drink-field-label-text" data-fold-label>Hassle</span></h2>
+        <span class="filter-fold-count results-count-number" data-fold-count hidden></span>
         <button type="button" class="btn-clear-filter" id="clear-hassle" hidden>&times; clear</button>
+        <button type="button" class="filter-fold-mark" data-fold-mark aria-expanded="true" hidden></button>
       </div>
-      <div class="drink-btns">
+      <div class="drink-btns" data-fold-body>
         {% for name in groups.hassle %}
           {% assign members = all_drinks | where_exp: "d", "d.mood contains name" %}
           {% if members.size > 0 %}
@@ -1169,6 +1175,12 @@ permalink: /cocktails/
      tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes
      holds both. {% endcomment %}
   <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
+{% comment %} THE PHONE FOLD -- #1219, 2026-10-10. After the index script for
+   the reason results-bar.js is: it wires itself on DOMContentLoaded, and the
+   first chosen-chip count it paints has to include a filter the index script
+   set from the URL. Guarded by
+   tests/test_site_config.py::test_the_phone_fold_is_wired_on_both_indexes. {% endcomment %}
+<script src="{{ '/assets/js/filter-fold.js' | relative_url }}"></script>
   {% comment %} AFTER cocktail-index.js and, more to the point, before
      _layouts/default.html's own decorations.js -- see universe.js's header
      comment for why that order is load-bearing: it is what lets a cloned,
