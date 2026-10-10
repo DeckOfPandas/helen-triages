@@ -80,6 +80,27 @@ half_step_measures:
   - knob
 
 # -----------------------------------------------------------------------------
+# COUNTS that scale in half steps. Helen, 2026-10-10: "Drops, twists, lots etc,
+# please round to the nearest 1/2 -- these are smaller than handfuls and
+# sprigs." This REPLACES "scale like any other number" (2026-10-04) for the
+# four below, `pat` among them: her "etc" answered a sentence that listed
+# drops, twists, lots and pats. "5 twists" at two thirds was 3⅓ and is 3½.
+#
+# WHY THEY ARE NOT SIMPLY ADDED TO `half_step_measures`. That list is also
+# handed to the half-recipe judge (_plugins/food_half_recipe.rb), which lets a
+# by-eye measure halve ALWAYS. These are counts of things: "1 lot" of another
+# recipe must go on refusing a half recipe (Helen, 2026-10-04: "Neither mince
+# pies nor sweet cream base halve"), and an odd count of anything here still
+# does. So the SCALERS read both lists as one and the judge reads only the
+# first. _layouts/recipe.html and food/index.html do the joining.
+# -----------------------------------------------------------------------------
+half_step_counts:
+  - drop
+  - twist
+  - lot
+  - pat
+
+# -----------------------------------------------------------------------------
 # Measures that scale in QUARTER steps. Helen, 2026-10-10, shown that the
 # recipe page printed "1.17 sprigs" and "1.17 bunches" at seven portions for
 # six: "Sprigs: Let's round to 1/4 please, and express in fractions not
@@ -91,7 +112,8 @@ half_step_measures:
 # `drop`, `twist`, `lot` and `pat` exactly as they were ruled.
 #
 # Read by the recipe page's scaler (food-scale.js, `quarterStep`) and by the
-# index's shopping list, which rounds the TOTAL the same way. One lowercase
+# index's shopping list, which buys whole ones and says the quarter figure
+# beside them: "2 sprigs thyme (1¼ in the recipes)". One lowercase
 # word each, singular, and never also in `half_step_measures`.
 # -----------------------------------------------------------------------------
 quarter_step_measures:

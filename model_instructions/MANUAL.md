@@ -712,7 +712,13 @@ with it.
   the Ingredients section skips and `main_ingredients` must not list
   (`test_incidental_not_in_main_ingredients`). Whether an oil is core is a
   judgement (unusual oil, stated smoke point, finishing drizzle → core), so it
-  is an explicit flag. No published recipe uses it today; the mechanism stays.
+  is an explicit flag. Three published recipes carry it since 2026-10-10
+  (#1356: two greasing butters and the youvetsi's frying oil), set on Helen's
+  one-off grant; `.claude/commands/ingest.md` still lists it as hers to set.
+  **A flagged line may share its name with a real one**: the cheesecake
+  greases with salted butter and bakes with it, and `main_ingredients` is
+  right to say butter. The test objects only where nothing but an incidental
+  line accounts for a main ingredient.
 - **An ingredient's quantity is its own `amount:` key, never inside `item:`
   text.** The highlighter is driven by `{% if item.amount %}` and never scans
   text, so `item: "~1 tbsp tamarind paste"` renders unstyled with no error.
@@ -1327,28 +1333,42 @@ unit, a mixed row ("4 + 2 large"), and a name that is a choice or a phrase.
 The aisle's alphabetical order is by the FOLDED name, so a label changing
 number moves nothing.
 
-**A BY-EYE MEASURE IS TOTALLED TO THE NEAREST WHOLE ONE, NEVER BELOW ONE**
-(#1297). Helen, 2026-10-09: *"please make the shopping list only round to
-whole numbers for handfuls and other similar units. Recipes should NOT say
-1.17 handfuls, or round up, because the first is meaningless and the second is
-inaccurate."* A handful is only accurate to about a third either way, so
-rounding it loses nothing a cook could measure — which is why a `serves:`
-recipe can still scale by any number of portions.
+**A STEPPED MEASURE IS BOUGHT IN WHOLE ONES, ROUNDED UP, AND THE LIST SAYS
+WHAT THE RECIPES CALL FOR** (#1297). Helen, 2026-10-10: *"I'd like the
+shopping list not to write 1.17 sprigs either, so please round that upwards to
+the next integer like this: '2 handfuls fresh parsley (1 1/4 in the
+recipes)'."*
 
-    1 handful, seven portions of a recipe for six   1.17  →  1 handful
-    1 handful ×1.5                                  1.5   →  2 handfuls
-    1 handful ×⅔                                    0.67  →  1 handful
-    1.17 from one recipe + 1.5 from another         2.67  →  3 handfuls
+    1 sprig, seven portions of a recipe for six    2 sprigs   (1¼ in the recipes)
+    1 handful ×1.5                                 2 handfuls (1½ in the recipes)
+    5 twists ×⅔                                    4 twists   (3½ in the recipes)
+    1 handful, seven for six                       1 handful
+    4 sprigs ×2                                    8 sprigs
 
-**The TOTAL is rounded, once** — never each recipe's share. The measures are
-the recipe page's `half_step_measures` (handful, pinch, dash, splash, knob),
-joined onto `#shopping-list` as `data-whole-measures` and handed to `build()`
-as `wholeMeasures`; with no list nothing is rounded. **The recipe page keeps
-the nearest HALF** (`halfStep`, below): a cook can take half a handful and
-nobody buys one. Grams, spoons and counts are untouched — seven portions of a
-six-portion roast chicken is a chicken a sixth bigger. **A measure written
-into the item with no amount** (`item: "a handful of fresh parsley"`) is still
-an unquantified line here, as it always was.
+- **Two figures, each honest about what it is.** The amount column is what to
+  BUY, a whole number. The bracket is what the recipes USE, in the recipe
+  page's own steps — halves for `half_step_measures` and `half_step_counts`,
+  quarters for `quarter_step_measures` — always a fraction, never a decimal.
+- **The rounding up is of the recipes' figure, not the raw sum.** 1.17
+  handfuls is "1 handful" on the recipe page, and the list does not buy a
+  second for 0.17. No bracket when the two agree.
+- **The TOTAL is stepped, once** — never each recipe's share.
+- **A row with a second total names the unit**: `2 sprigs + 10 g thyme (1¼
+  sprigs in the recipes)`.
+- `build()` returns it as `aside` on the row; `filters.js` prints it in
+  `.shopping-list-aside` after the name. The lists reach it as
+  `data-whole-measures` (both half-step lists, joined) and
+  `data-quarter-measures` on `#shopping-list`. With neither, nothing is
+  rounded.
+- **This was her third answer in two days**, and DECISIONS §8.2 has all three:
+  up with a decimal in brackets, nearest with no bracket (*"round up ... is
+  inaccurate"*), then up with the fraction in brackets. Do not "restore" either
+  earlier one.
+
+Grams, spoons and counts are untouched — seven portions of a six-portion roast
+chicken is a chicken a sixth bigger. **A measure written into the item with no
+amount** (`item: "a handful of fresh parsley"`) is still an unquantified line
+here, and is named on the Not-scaled line.
 
 **ONE FRUIT, TWO PARTS** (#1297). Helen: *'I would like to cleverly combine
 e.g. "zest of 1 lemon" and "juice of 1 lemon" to make "1 lemon" in the
@@ -1474,7 +1494,8 @@ surely"* — and a test refuses them. **What is absent is RULED, not left**
 a thing you can pick up and scale — *"Yes, 4 sprigs double is 8, and so on."*
 — and **`pat` scales too**: *'"pat" is a correct term, and should be scaled
 linearly as "pats"'*, so `2 large pats` doubled is `4 large pats`. Do not add
-any of the six to `half_step_measures`.
+any of the six to `half_step_measures`. **Four of them step in halves all the
+same since 2026-10-10, from a list of their own** — the next paragraph but one.
 
 **A SPRIG AND A BUNCH GO TO THE NEAREST QUARTER** (#1297, Helen, 2026-10-10,
 shown "1.17 sprigs" at seven portions for six: *"Sprigs: Let's round to 1/4
@@ -1489,11 +1510,22 @@ please, and express in fractions not decimals."*). Never less than a quarter.
 onto the control as `data-quarter-step-measures`; `quarterStep` in
 `food-scale.js`, through the same `scaleSteppedMeasure` the half step uses.
 **Her sentence names sprigs; `bunch` rides with it because the question put to
-her showed the two figures together.** `drop`, `twist`, `lot` and `pat` are
-untouched and can still print a third (`3⅓ twists`). **The index's shopping
-list rounds the TOTAL of a sprig or bunch the same way** (`data-quarter-measures`,
-`quarterMeasures`), since it printed the same decimal. The half-recipe judge
-is unchanged: an odd count of sprigs still refuses a half recipe.
+her showed the two figures together.** The half-recipe judge is unchanged: an
+odd count of sprigs still refuses a half recipe.
+
+**A DROP, A TWIST, A LOT AND A PAT GO TO THE NEAREST HALF** (Helen,
+2026-10-10: *"Drops, twists, lots etc, please round to the nearest 1/2 --
+these are smaller than handfuls and sprigs."*). `5 twists` ×⅔ is `3½ twists`
+(it was `3⅓`); `2 pats` ×⅔ is `1½ pats`. It replaces "scaled linearly" for all
+four, `pat` included: her "etc" answered a sentence listing drops, twists,
+lots and pats. **They are `half_step_counts`, NOT entries in
+`half_step_measures`, and the reason is the half-recipe judge**: it is handed
+`half_step_measures` and lets those halve always, and `1 lot` of another
+recipe must go on refusing a half recipe (*"Neither mince pies nor sweet cream
+base halve"*). So `_layouts/recipe.html` and `food/index.html` `concat` the
+two lists for the scalers, `_plugins/food_shopping.rb` hands the judge only
+the first, and a test refuses a word in both. A pat written into the item
+(`a pat of salted butter`) now scales like a handful written there.
 
 **The NAME on that line is the ingredient, not the recipe's sentence about
 it** (`noteName`): a leading measure phrase that could not scale is dropped

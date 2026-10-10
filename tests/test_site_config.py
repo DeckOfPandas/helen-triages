@@ -480,9 +480,13 @@ def test_the_recipe_scaler_is_handed_the_half_step_measures():
         f"'2 large' scales (#1005), and 240 amounts are written that way."
     )
 
+    # Drops, twists, lots and pats step in halves too since 2026-10-10 ("please
+    # round to the nearest 1/2"), from their own list -- see the test below for
+    # why they are not simply in `half_step_measures`.
     html = read("_layouts", "recipe.html")
     wiring = {
-        "data-half-step-measures": "site.data.food.scaling.half_step_measures",
+        "data-half-step-measures": "site.data.food.scaling.half_step_measures | "
+                                   "concat: site.data.food.scaling.half_step_counts",
         "data-quarter-step-measures": "site.data.food.scaling.quarter_step_measures",
         "data-trailing": "site.data.food.ingredient_words.trailing_phrases",
     }
@@ -3998,10 +4002,11 @@ def test_the_index_shopping_list_is_handed_the_by_eye_measures():
     index = read("food", "index.html")
     assert re.search(
         r'id="shopping-list"[^>]*data-whole-measures="\{\{\s*'
-        r'site\.data\.food\.scaling\.half_step_measures\s*\|\s*join:\s*\',\'',
+        r'site\.data\.food\.scaling\.half_step_measures\s*\|\s*concat:\s*'
+        r'site\.data\.food\.scaling\.half_step_counts\s*\|\s*join:\s*\',\'',
         index), (
-        "food/index.html no longer joins site.data.food.scaling."
-        "half_step_measures onto #shopping-list as data-whole-measures."
+        "food/index.html no longer joins half_step_measures and "
+        "half_step_counts onto #shopping-list as data-whole-measures."
     )
     filters = read("assets", "js", "filters.js")
     assert "getAttribute('data-whole-measures')" in filters, (
@@ -4113,10 +4118,24 @@ def test_the_quarter_step_measures_reach_both_scalers():
         f"{both} are in both step lists; the half-step rule would win and "
         "the quarter never apply."
     )
-    ruled_linear = sorted({"drop", "twist", "lot", "pat"} & set(quarter))
-    assert not ruled_linear, (
-        f"{ruled_linear}: ruled to scale like any number on 2026-10-04, and "
-        "her 2026-10-10 sentence names sprigs."
+    counts = scaling.get("half_step_counts")
+    assert counts == ["drop", "twist", "lot", "pat"], (
+        "half_step_counts should be drop, twist, lot, pat -- Helen, "
+        f"2026-10-10: 'please round to the nearest 1/2'. Got {counts!r}."
+    )
+    misplaced = sorted(set(counts) & (set(quarter) | set(scaling["half_step_measures"])))
+    assert not misplaced, (
+        f"{misplaced} must stay OUT of half_step_measures and "
+        "quarter_step_measures. The half-recipe judge is handed "
+        "half_step_measures and lets those halve always; '1 lot' of another "
+        "recipe must go on refusing a half recipe ('Neither mince pies nor "
+        "sweet cream base halve')."
+    )
+    plugin = read("_plugins", "food_shopping.rb")
+    assert 'dig("food", "scaling", "half_step_measures")' in plugin
+    assert "half_step_counts" not in plugin, (
+        "_plugins/food_shopping.rb now hands half_step_counts to the "
+        "half-recipe judge, which would let an odd count of pats or lots halve."
     )
     index = read("food", "index.html")
     assert re.search(

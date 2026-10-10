@@ -139,6 +139,14 @@
   max-width: 65ch;
 }
 
+// "(1¼ in the recipes)" beside an amount that was rounded up to a whole one
+// -- Helen's form, #1297. The quiet grey of the Not-scaled line: it is a note
+// on the row, and the number to act on is the one in the amount column.
+.shopping-list-aside {
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
 // "(Not scaled: salt, olive oil)" -- the recipe page's `.recipe-scale-note`,
 // value for value, so the same sentence looks the same in both places. The
 // rows' own bottom margin is taken back so it sits with them.

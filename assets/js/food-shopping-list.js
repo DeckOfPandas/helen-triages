@@ -226,29 +226,42 @@
   }
 
   /* =========================================================================
-     A MEASURE TAKEN BY HAND IS BOUGHT IN WHOLE ONES -- #1297, 2026-10-09
+     A STEPPED MEASURE IS BOUGHT IN WHOLE ONES, ROUNDED UP, AND THE LIST SAYS
+     WHAT THE RECIPES CALL FOR -- #1297, Helen, 2026-10-10
      =========================================================================
-     Helen: "please make the shopping list only round to whole numbers for
-     handfuls and other similar units. Recipes should NOT say 1.17 handfuls, or
-     round up, because the first is meaningless and the second is inaccurate."
+     "I'd like the shopping list not to write 1.17 sprigs either, so please
+     round that upwards to the next integer like this: '2 handfuls fresh
+     parsley (1 1/4 in the recipes)'."
 
-     So a total in a by-eye measure goes to THE NEAREST WHOLE ONE, AND NEVER
-     BELOW ONE -- an ingredient on the list is an ingredient to buy:
+     TWO FIGURES, AND EACH IS HONEST ABOUT WHAT IT IS. The one in the amount
+     column is what to BUY: a whole number, rounded up, because nobody buys a
+     quarter of a sprig. The one in brackets is what the recipes USE, in the
+     same steps the recipe page prints -- the nearest half for a handful,
+     pinch, dash, splash, knob, drop, twist, lot or pat, the nearest quarter
+     for a sprig or bunch -- always a fraction, never a decimal.
 
-         1 handful, seven portions of a recipe for six   1.17  ->  1 handful
-         1 handful at x1.5                               1.5   ->  2 handfuls
-         1 handful at x2/3                               0.67  ->  1 handful
-         1.17 from one recipe and 1.5 from another       2.67  ->  3 handfuls
+         1 sprig, seven portions of a recipe for six    2 sprigs  (1¼ in the recipes)
+         1 handful at x1.5                              2 handfuls (1½ in the recipes)
+         1 handful, seven for six                       1 handful
+         4 sprigs doubled                               8 sprigs
 
-     THE TOTAL IS ROUNDED, ONCE, never each recipe's share: two recipes
-     wanting a handful and a half between them want three, and rounding each
-     first would say four.
+     THE ROUNDING UP IS OF THE RECIPE FIGURE, not of the raw sum: seven
+     portions' worth of one handful is 1.17, which the recipe page calls
+     "1 handful", and the list does not buy a second for the sake of 0.17.
+     NO BRACKET WHEN THE TWO AGREE.
 
-     NOT THE RECIPE PAGE'S RULE, which is the nearest HALF (`halfStep` in
-     food-scale.js, #1125): a cook can take half a handful, and nobody buys
-     one. Same measures, though -- `half_step_measures` in
-     _data/food/scaling.yml, handed in as `options.wholeMeasures`. With no list
-     given nothing is rounded, which is what every caller before #1297 gets. */
+     THE TOTAL IS STEPPED, ONCE, never each recipe's share.
+
+     THIS IS HER THIRD ANSWER IN TWO DAYS AND IT IS THE FIRST ONE AGAIN, with
+     the fraction where the decimal was: up-with-a-bracket (2026-10-09, a.m.),
+     nearest-with-no-bracket ("round up ... is inaccurate", p.m.), and this.
+     What changed is that the bracket now says the accurate figure in a form
+     a cook can read.
+
+     WHICH MEASURES is data, handed in: `options.wholeMeasures` are the
+     half-step ones (`half_step_measures` and `half_step_counts` in
+     _data/food/scaling.yml) and `options.quarterMeasures` the quarter-step
+     ones. With neither, nothing is rounded -- every caller before #1297. */
   function wholeMeasurePattern(measures) {
     var words = (measures || [])
       .map(function (m) { return String(m).trim().toLowerCase(); })
@@ -260,17 +273,11 @@
     return words ? new RegExp('(^|[^a-z])(' + words + ')(?:e?s)?(?![a-z])', 'i') : null;
   }
 
-  function wholeOnes(quantity) {
-    return Math.max(1, Math.round(tidy(quantity)));
+  function inHalves(quantity) {
+    return Math.max(0.5, Math.round(tidy(quantity) * 2) / 2);
   }
 
-  /* A SPRIG AND A BUNCH ARE TOTALLED TO THE NEAREST QUARTER -- Helen,
-     2026-10-10: "Sprigs: Let's round to 1/4 please, and express in fractions
-     not decimals." Her sentence was about the recipe page (food-scale.js,
-     `quarterStep`); the list carries the same total and printed the same
-     "1.17 sprigs", so it follows the same rule rather than keeping the
-     decimal. `quarter_step_measures`, handed in as `options.quarterMeasures`. */
-  function quarters(quantity) {
+  function inQuarters(quantity) {
     return Math.max(0.25, Math.round(tidy(quantity) * 4) / 4);
   }
 
@@ -438,17 +445,18 @@
    *        recipe, and the last four are _plugins/food_shopping.rb's marks --
    *        see `reunite` above.
    * @param {Object} [options]
-   * @param {Array} [options.wholeMeasures] - by-eye measures, whose totals go
-   *        to the nearest whole one: `half_step_measures` in scaling.yml.
-   * @param {Array} [options.quarterMeasures] - measures whose totals go to
-   *        the nearest quarter: `quarter_step_measures` in scaling.yml.
+   * @param {Array} [options.wholeMeasures] - half-step measures, bought in
+   *        whole ones: `half_step_measures` and `half_step_counts`.
+   * @param {Array} [options.quarterMeasures] - quarter-step measures, bought
+   *        in whole ones too: `quarter_step_measures`.
    * @param {Array} [options.countNouns] - nouns bought by count, whose row
    *        label may be made plural or singular: `count_nouns` in scaling.yml.
    * @param {Array} [options.aisles] - [{key, label}] in the order they should
    *        appear. An aisle with nothing in it is not returned; an entry whose
    *        aisle is not in the list falls to the last one.
-   * @returns {Array} [{ key, label, items: [{ label, text, totals,
-   *        unquantified }] }]
+   * @returns {Array} [{ key, label, items: [{ label, text, aside, totals,
+   *        unquantified }] }] -- `aside` is "1¼ in the recipes" where the
+   *        amount was rounded up to a whole one, and '' otherwise
    */
   function build(entries, options) {
     var opts = options || {};
@@ -558,17 +566,27 @@
     var rows = order.map(function (key) {
       var group = groups[key];
 
+      var usedUnit = {};
       var totals = group.unitOrder.map(function (unit) {
         var total = group.units[unit];
-        // A by-eye measure is bought in whole ones; see `wholeMeasurePattern`.
-        if (byEye && byEye.test(unit)) {
-          total.lo = wholeOnes(total.lo);
-          total.hi = wholeOnes(total.hi);
-        } else if (byQuarter && byQuarter.test(unit)) {
-          total.lo = quarters(total.lo);
-          total.hi = quarters(total.hi);
+        // A stepped measure is bought in whole ones, rounded up from the
+        // figure the recipes use; see the note above `wholeMeasurePattern`.
+        var step = (byEye && byEye.test(unit)) ? inHalves
+          : (byQuarter && byQuarter.test(unit)) ? inQuarters : null;
+        var used = null;
+        if (step) {
+          var usedLo = step(total.lo);
+          var usedHi = step(total.hi);
+          total.lo = Math.ceil(usedLo);
+          total.hi = Math.ceil(usedHi);
+          if (usedLo !== total.lo || usedHi !== total.hi) {
+            used = fractionText(usedLo) +
+              (usedHi > usedLo ? '–' + fractionText(usedHi) : '');
+            usedUnit[unit] = unitLabel(unit, usedHi);
+          }
         }
         return {
+          used: used,
           unit: unit,
           lo: tidy(total.lo),
           hi: tidy(total.hi),
@@ -591,7 +609,16 @@
           return u.recipes > 1 ? u.text + ' (×' + u.recipes + ')' : u.text;
         }).filter(Boolean));
 
+      /* "(1¼ in the recipes)". The unit is said only when the row has more
+         than one total to tell apart: "2 sprigs + 10 g thyme (1¼ sprigs in the
+         recipes)". */
+      var asides = totals.filter(function (t) { return t.used; })
+        .map(function (t) {
+          return totals.length > 1 ? t.used + ' ' + usedUnit[t.unit] : t.used;
+        });
+
       return {
+        aside: asides.length ? asides.join(' + ') + ' in the recipes' : '',
         label: countedLabel(group, totals, unquantified, countNouns, byEye),
         aisle: group.aisle || fallback,
         totals: totals,

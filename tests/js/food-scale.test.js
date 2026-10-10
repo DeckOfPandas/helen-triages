@@ -103,7 +103,9 @@ function yamlList(file, key) {
 }
 
 const WORDS = {
-  halfStep: yamlList('scaling.yml', 'half_step_measures'),
+  // Both half-step lists as one, which is how _layouts/recipe.html joins them.
+  halfStep: yamlList('scaling.yml', 'half_step_measures')
+    .concat(yamlList('scaling.yml', 'half_step_counts')),
   quarterStep: yamlList('scaling.yml', 'quarter_step_measures'),
   trailing: yamlList('ingredient_words.yml', 'trailing_phrases')
 };
@@ -277,7 +279,7 @@ test('"a few" is not a number: Tabasco stays as written and is named', () => {
 
 test('an item that does not open with a whole measure is not touched', () => {
   const { scaleLeadingMeasure } = foodScale;
-  ['salt, to taste', 'cream of tartar', 'a pat of salted butter, to finish',
+  ['salt, to taste', 'cream of tartar', 'a slab of salted butter, to finish',
     'a glass of robust red wine', 'fresh parsley, a handful of it',
     'handful fresh parsley', ''].forEach((text) => {
     const r = scaleLeadingMeasure(text, 3, WORDS);
@@ -286,6 +288,11 @@ test('an item that does not open with a whole measure is not touched', () => {
   });
   // No list, no scaling: the caller that hands nothing over changes nothing.
   assert.strictEqual(scaleLeadingMeasure('a handful of parsley', 3).scaled, false);
+  // A pat IS a stepped measure since 2026-10-10, so one written into the item
+  // scales like a handful written there: it was left alone until then.
+  assert.strictEqual(
+    scaleLeadingMeasure('a pat of salted butter, to finish', 3, WORDS).text,
+    '3 pats of salted butter, to finish');
 });
 
 test('"2 large" still scales with the list in hand', () => {
@@ -329,43 +336,59 @@ test('a sprig and a bunch go to the nearest quarter, in fractions -- never 1.17'
         amount + ' x' + factor + ' -> ' + scaleAmount(amount, factor, WORDS).text);
     });
   });
-  // The four she left linear are untouched: a third is still a third.
-  assert.strictEqual(scaleAmount('5 twists', 2 / 3, WORDS).text, '3⅓ twists');
+  // A twist is a half-step count, not a quarter one (the test below).
+  assert.strictEqual(scaleAmount('5 twists', 2 / 3, WORDS).text, '3½ twists');
   // And handed no list, a sprig scales as it did before.
   assert.strictEqual(scaleAmount('1 sprig', 4 / 3, {}).text, '1⅓ sprigs');
 });
 
-test('a pat scales, and reads "pats" -- Helen: "scaled linearly as pats"', () => {
-  // `pat` was in the list for a few hours and came out on her word: '"pat" is
-  // a correct term, and should be scaled linearly as "pats"'.
-  assert.ok(!WORDS.halfStep.includes('pat'), 'pat is back in scaling.yml');
-  assert.strictEqual(scaleAmount('2 pats', 2 / 3, WORDS).text, '1⅓ pats');
+test('drops, twists, lots and pats step in halves -- Helen: "round to the nearest 1/2"', () => {
+  // 2026-10-10: "Drops, twists, lots etc, please round to the nearest 1/2 --
+  // these are smaller than handfuls and sprigs." It replaces "scaled linearly"
+  // (2026-10-04) for the four, `pat` among them.
+  assert.deepStrictEqual(yamlList('scaling.yml', 'half_step_counts'),
+    ['drop', 'twist', 'lot', 'pat']);
+  assert.strictEqual(scaleAmount('5 twists', 2 / 3, WORDS).text, '3½ twists');
+  assert.strictEqual(scaleAmount('2 pats', 2 / 3, WORDS).text, '1½ pats');
+  assert.strictEqual(scaleAmount('3–4 drops', 7 / 6, WORDS).text, '3½–4½ drops');
+  assert.strictEqual(scaleAmount('1 lot', 7 / 6, WORDS).text, '1 lot');
+  assert.strictEqual(scaleAmount('1 drop', 0.1, WORDS).text, '½ drops');
+  // Whole multiples are what they always were.
   assert.strictEqual(scaleAmount('1 pat', 2, WORDS).text, '2 pats');
-  assert.strictEqual(scaleAmount('2 pats', 2, WORDS).text, '4 pats');
   assert.strictEqual(scaleAmount('2 pats', 0.5, WORDS).text, '1 pat');
-  // The size word stays where it was: pan-seared venison's own amount.
   assert.strictEqual(scaleAmount('2 large pats', 2, WORDS).text, '4 large pats');
   assert.strictEqual(scaleAmount('2 large pats', 0.5, WORDS).text, '1 large pat');
   assert.strictEqual(scaleAmount('2 pats', 2, WORDS).scaled, true);
 });
 
-test('the index shopping list totals a handful to a WHOLE one, where this page takes halves', () => {
-  // `half_step_measures` names the measures for both. The recipe page takes
-  // the nearest half (`halfStep`, above); the shortlist's shopping list takes
-  // the nearest whole one since #1297 -- Helen, 2026-10-09: "please make the
-  // shopping list only round to whole numbers for handfuls and other similar
-  // units." A cook can take half a handful; nobody buys one.
+test('the index shopping list buys whole ones and quotes this page\'s figure', () => {
+  // The same measures, two jobs. This page says what to USE, in halves; the
+  // shortlist's shopping list says what to BUY, rounded up to a whole one, and
+  // puts this page's figure in brackets -- Helen, 2026-10-10: "2 handfuls
+  // fresh parsley (1 1/4 in the recipes)".
   const FSL = require('../../assets/js/food-shopping-list.js');
-  const row = (amount, scale) => FSL.build(
-    [{ amount: amount, name: 'fresh flat-leaf parsley', aisle: 'produce', scale: scale }],
-    { aisles: [{ key: 'produce', label: 'Produce' }],
-      wholeMeasures: WORDS.halfStep })[0].items[0].text;
+  const row = (amount, scale) => {
+    const item = FSL.build(
+      [{ amount: amount, name: 'fresh flat-leaf parsley', aisle: 'produce', scale: scale }],
+      { aisles: [{ key: 'produce', label: 'Produce' }],
+        wholeMeasures: WORDS.halfStep, quarterMeasures: WORDS.quarterStep })[0].items[0];
+    return item.text + (item.aside ? ' (' + item.aside + ')' : '');
+  };
   assert.strictEqual(row('1 handful', 2), '2 handfuls');
   assert.strictEqual(row('2 handfuls', 0.5), '1 handful');
   assert.strictEqual(row('1 small handful', 2), '2 small handfuls');
-  assert.strictEqual(row('1 handful', 7 / 6), '1 handful');
-  assert.strictEqual(row('1 handful', 1.5), '2 handfuls');
-  assert.strictEqual(scaleAmount('1 handful', 1.5, WORDS).text, '1½ handfuls');
+  // What this page prints for the same amount is what the bracket quotes.
+  [['1 handful', 1.5], ['1 handful', 7 / 6], ['1 sprig', 7 / 6], ['5 twists', 2 / 3],
+    ['2 pats', 2 / 3], ['1 bunch', 2 / 3]].forEach(([amount, factor]) => {
+    const here = scaleAmount(amount, factor, WORDS).text;
+    const there = row(amount, factor);
+    const quoted = /\((.*) in the recipes\)/.exec(there);
+    const number = here.split(' ')[0];
+    if (quoted) assert.strictEqual(quoted[1], number, amount + ' x' + factor);
+    else assert.strictEqual(there.split(' ')[0], number, amount + ' x' + factor);
+  });
+  assert.strictEqual(row('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
+  assert.strictEqual(row('1 sprig', 7 / 6), '2 sprigs (1¼ in the recipes)');
 });
 
 test('with no list given, a handful scales as it did before #1125', () => {
@@ -408,9 +431,12 @@ test('the note name drops a measure written into the item', () => {
     'fresh coriander');
   assert.strictEqual(noteName('a good pinch of salt', WORDS), 'salt');
   assert.strictEqual(noteName('pinch of salt', WORDS), 'salt');
-  // `pat` is not a declared measure (it scales), so its phrase is left alone.
-  assert.strictEqual(noteName('a pat of salted butter, to finish', WORDS),
-    'a pat of salted butter');
+  // `pat` is a declared measure since 2026-10-10, so its phrase goes too.
+  assert.strictEqual(noteName('a few pats of salted butter, to finish', WORDS),
+    'salted butter');
+  // A word that is on neither list is left alone.
+  assert.strictEqual(noteName('a slab of salted butter, to finish', WORDS),
+    'a slab of salted butter');
 });
 
 test('"of" inside a name is not a measure phrase', () => {

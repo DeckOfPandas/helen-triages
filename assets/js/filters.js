@@ -1415,14 +1415,14 @@ function renderResultsPool() {
     }
   })();
 
-  /* THE BY-EYE MEASURES, whose totals are bought in whole ones (#1297):
-     `half_step_measures` from _data/food/scaling.yml, joined onto the panel by
-     food/index.html. Absent, nothing is rounded -- the list as it was. */
+  /* THE HALF-STEP MEASURES, bought in whole ones (#1297): `half_step_measures`
+     and `half_step_counts` from _data/food/scaling.yml, joined onto the panel
+     by food/index.html. Absent, nothing is rounded -- the list as it was. */
   var WHOLE_MEASURES = String(
     (shoppingEl && shoppingEl.getAttribute('data-whole-measures')) || '')
     .split(',').filter(Boolean);
 
-  // A sprig, a bunch: totals to the nearest quarter. `quarter_step_measures`.
+  // A sprig, a bunch: bought whole, used in quarters. `quarter_step_measures`.
   var QUARTER_MEASURES = String(
     (shoppingEl && shoppingEl.getAttribute('data-quarter-measures')) || '')
     .split(',').filter(Boolean);
@@ -1798,6 +1798,10 @@ function renderResultsPool() {
           return '<li>' +
             '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
             '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + '</span>' +
+            /* "(1¼ in the recipes)" -- Helen's own form, #1297: the amount
+               is what to buy, this is what the recipes use. */
+            (row.aside ? '<span class="shopping-list-aside">(' +
+              HTF.escapeHtml(row.aside) + ')</span>' : '') +
             '</li>';
         }).join('') +
         '</ul></section>';

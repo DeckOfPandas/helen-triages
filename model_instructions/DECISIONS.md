@@ -1771,6 +1771,43 @@ unless stated.
     the six published lines sit in proofread files.
   - **She closed the issue with this work**: *"Please close #1297 with this
     work when we're done, phew!"*
+  - **The list rounds UP again, with the fraction in brackets — her third
+    answer and the one that stands.** Told the list now printed "1¼ sprigs":
+    *"I'd like the shopping list not to write 1.17 sprigs either, so please
+    round that upwards to the next integer like this: '2 handfuls fresh
+    parsley (1 1/4 in the recipes)'."* The three, in order: 2026-10-09 a.m.,
+    up with the decimal in brackets (*"2 handfuls parsley (1.17 handfuls)"*);
+    that afternoon, nearest and no bracket (*"round up ... is inaccurate"*);
+    2026-10-10, up with the recipes' fraction in brackets. **The bracket is
+    what answers "inaccurate"**: the list says what to buy and what is used.
+    - **Two readings in it are a session's, and both were put to her.** Her
+      example says handfuls and 1¼; a handful steps in halves and cannot be
+      1¼, so the bracket quotes each measure in its own recipe-page step (a
+      sprig can read 1¼, a handful 1½). And the rounding up is of that
+      figure, not of the raw sum: 1.17 handfuls is "1 handful" on the recipe
+      page and the list buys one, where her words taken literally buy two.
+  - **Drops, twists, lots and pats step in halves, replacing "scaled
+    linearly" of 2026-10-04**: *"Drops, twists, lots etc, please round to the
+    nearest 1/2 -- these are smaller than handfuls and sprigs."* `pat` is
+    included on the strength of "etc". They sit in `half_step_counts`, apart
+    from `half_step_measures`, so that the half-recipe judge still treats
+    them as counts: adding `lot` to the judge's list would have offered half
+    a recipe of the sweet cream bases she ruled out.
+  - **#1356, her grant, and what was done with it.** *"Incidentals: agree,
+    thanks. I grant an exception for those six live and 71 drafts-- no great
+    shakes to be wrong, and you won't be! You can grant incidental here, and
+    you don't need to flip the proofread flag."* **Read as a grant for THIS
+    pass, not as moving `incidental:` out of ingest's Tier 3.** 26 lines were
+    flagged of the 77 the wording survey found — 3 published, 23 in drafts —
+    each one read: a fat to grease or fry with, or flour or semolina to dust
+    with. Left alone, and why: 42 amounted lines, nearly all "plus extra for
+    the tin" on a real ingredient (flagging hides the 175 g of butter too);
+    icing sugar to dust and mustard to brush (bought for the dish); a
+    finishing drizzle (core by MANUAL §4); oil for deep-frying (a bottle to
+    buy); the flour and butter of a meunière (they are the dish). The
+    proofread baseline moved for the three published files in a commit of its
+    own. `test_incidental_not_in_main_ingredients` learned that a flagged line
+    may share its name with a real one.
 
 ---
 

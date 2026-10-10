@@ -320,78 +320,87 @@ const line = (entries, label, options) => {
   return found[0].text;
 };
 
-const eye = (amount, scale) => line(
-  [{ amount: amount, name: 'parsley', aisle: 'produce', scale: scale }],
-  'parsley', { wholeMeasures: BY_EYE });
+const QUARTERS = ['sprig', 'bunch'];
+const STEPPED = { wholeMeasures: BY_EYE.concat(['drop', 'twist', 'lot', 'pat']),
+  quarterMeasures: QUARTERS };
 
-test('#1297: a handful is totalled to the nearest whole one -- never 1.17', () => {
-  // Helen: "Recipes should NOT say 1.17 handfuls, or round up, because the
-  // first is meaningless and the second is inaccurate."
-  assert.strictEqual(eye('1 handful', 7 / 6), '1 handful');
-  assert.strictEqual(eye('1 handful', 4 / 3), '1 handful', 'nearest, not up');
-  assert.strictEqual(eye('1 handful', 1.5), '2 handfuls');
+// "2 sprigs (1¼ in the recipes)": the amount, and the bracket where there is one.
+const bought = (entries, label, options) => {
+  const built = F.build(entries, Object.assign({ aisles: PRODUCE }, options || STEPPED));
+  const found = built.reduce((acc, aisle) => acc.concat(aisle.items), [])
+    .filter((row) => row.label === label);
+  assert.strictEqual(found.length, 1, 'one "' + label + '" row');
+  return found[0].text + (found[0].aside ? ' (' + found[0].aside + ')' : '');
+};
+const eye = (amount, scale) => bought(
+  [{ amount: amount, name: 'parsley', aisle: 'produce', scale: scale }], 'parsley');
+
+test('#1297: a stepped measure is bought whole, rounded UP, with the recipes\' figure beside it', () => {
+  // Helen, 2026-10-10: "I'd like the shopping list not to write 1.17 sprigs
+  // either, so please round that upwards to the next integer like this: '2
+  // handfuls fresh parsley (1 1/4 in the recipes)'."
+  assert.strictEqual(eye('1 sprig', 7 / 6), '2 sprigs (1¼ in the recipes)');
+  assert.strictEqual(eye('1 bunch', 7 / 6), '2 bunches (1¼ in the recipes)');
+  assert.strictEqual(eye('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
+  assert.strictEqual(eye('1 sprig', 2 / 3), '1 sprig (¾ in the recipes)');
+  assert.strictEqual(eye('1 handful', 2 / 3), '1 handful (½ in the recipes)');
+  assert.strictEqual(eye('5 twists', 2 / 3), '4 twists (3½ in the recipes)');
+  assert.strictEqual(eye('2 pats', 2 / 3), '2 pats (1½ in the recipes)');
+});
+
+test('#1297: no bracket when what to buy is what the recipes use', () => {
   assert.strictEqual(eye('1 handful', 3), '3 handfuls');
-  assert.strictEqual(eye('2 handfuls', 7 / 6), '2 handfuls');
+  assert.strictEqual(eye('4 sprigs', 2), '8 sprigs');
+  assert.strictEqual(eye('2 handfuls', 0.5), '1 handful');
 });
 
-test('#1297: a by-eye total is never less than one', () => {
-  // It is on the list, so it is something to buy.
-  assert.strictEqual(eye('1 handful', 2 / 3), '1 handful');
-  assert.strictEqual(eye('1 pinch', 0.25), '1 pinch');
+test('#1297: the rounding up is of the recipes\' figure, never of the raw sum', () => {
+  // Seven portions' worth of one handful is 1.17. The recipe page calls that
+  // "1 handful", and the list does not buy a second for the sake of 0.17.
+  assert.strictEqual(eye('1 handful', 7 / 6), '1 handful');
+  assert.strictEqual(eye('2 handfuls', 7 / 6), '3 handfuls (2½ in the recipes)');
+  assert.strictEqual(eye('4 sprigs', 1.02), '4 sprigs');
 });
 
-test('#1297: every by-eye measure follows it, with a size word or a range', () => {
-  assert.strictEqual(eye('1 pinch', 7 / 6), '1 pinch');
-  assert.strictEqual(eye('2 dashes', 1.25), '3 dashes');
-  assert.strictEqual(eye('1 small handful', 2.4), '2 small handfuls');
-  assert.strictEqual(eye('1–2 handfuls', 7 / 6), '1–2 handfuls');
+test('#1297: no figure in either place is ever a decimal', () => {
+  [7 / 6, 5 / 6, 2 / 3, 1.1, 0.37, 3.3].forEach((factor) => {
+    ['1 sprig', '3 sprigs', '1 bunch', '1 handful', '2 pinches', '5 twists', '1 pat']
+      .forEach((amount) => {
+        assert.ok(!/\d\.\d/.test(eye(amount, factor)),
+          amount + ' x' + factor + ' -> ' + eye(amount, factor));
+      });
+  });
+});
+
+test('#1297: a size word, a range and a tilde survive', () => {
+  assert.strictEqual(eye('1 small handful', 2.4), '3 small handfuls (2½ in the recipes)');
+  assert.strictEqual(eye('1–2 sprigs', 7 / 6), '2–3 sprigs (1¼–2¼ in the recipes)');
   assert.strictEqual(eye('~1 handful', 2.2), '~2 handfuls');
 });
 
-test('#1297: the TOTAL is rounded once, never each recipe on its own', () => {
-  // 1.17 and 1.5 are 2.67 between them: three handfuls. Rounded apart they
-  // would be 1 + 2, and 0.75 + 0.75 would be 2 where the answer is also 2 --
-  // but 1.4 + 1.4 rounded apart is 2, and the list needs 3.
-  const two = (a, b) => line([
-    { amount: '1 handful', name: 'parsley', aisle: 'produce', scale: a, recipe: 'x' },
-    { amount: '1 handful', name: 'parsley', aisle: 'produce', scale: b, recipe: 'y' }
-  ], 'parsley', { wholeMeasures: BY_EYE });
-  assert.strictEqual(two(7 / 6, 1.5), '3 handfuls');
-  assert.strictEqual(two(1.4, 1.4), '3 handfuls');
+test('#1297: the TOTAL is stepped once, never each recipe on its own', () => {
+  // 1.17 and 1.17 sprigs are 2.33 between them: 2¼ in the recipes, 3 to buy.
+  // Stepped apart they would be 1¼ + 1¼, which is 2½.
+  assert.strictEqual(bought([
+    { amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6, recipe: 'x' },
+    { amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6, recipe: 'y' }
+  ], 'thyme'), '3 sprigs (2¼ in the recipes)');
 });
 
-test('#1297: nothing else is rounded -- grams, spoons, counts and sprigs are as they were', () => {
-  const other = (amount, scale) => line(
-    [{ amount: amount, name: 'thing', aisle: 'produce', scale: scale }],
-    'thing', { wholeMeasures: BY_EYE });
+test('#1297: a row with a second total says which unit the bracket is about', () => {
+  assert.strictEqual(bought([
+    { amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6, recipe: 'x' },
+    { amount: '10 g', name: 'thyme', aisle: 'produce', scale: 1, recipe: 'y' }
+  ], 'thyme'), '2 sprigs + 10 g (1¼ sprigs in the recipes)');
+});
+
+test('#1297: nothing else is rounded -- grams, spoons and counts are as they were', () => {
+  const other = (amount, scale) => bought(
+    [{ amount: amount, name: 'thing', aisle: 'produce', scale: scale }], 'thing');
   assert.strictEqual(other('200 g', 2 / 3), '133 g');
   assert.strictEqual(other('1 tsp', 2 / 3), '⅔ tsp');
   assert.strictEqual(other('1', 7 / 6), '1.17', 'a chicken a sixth bigger');
-  // Not a by-eye measure: a sprig is never rounded to a whole one.
-  assert.strictEqual(other('4 sprigs', 2), '8 sprigs');
-  assert.strictEqual(other('3 sprigs', 0.5), '1½ sprigs');
-});
-
-test('#1297: a sprig and a bunch are totalled to the nearest quarter', () => {
-  // Helen, 2026-10-10: "Sprigs: Let's round to 1/4 please, and express in
-  // fractions not decimals."
-  const sprig = (amount, scale) => line(
-    [{ amount: amount, name: 'thyme', aisle: 'produce', scale: scale }],
-    'thyme', { wholeMeasures: BY_EYE, quarterMeasures: ['sprig', 'bunch'] });
-  assert.strictEqual(sprig('1 sprig', 7 / 6), '1¼ sprigs');
-  assert.strictEqual(sprig('1 bunch', 7 / 6), '1¼ bunches');
-  assert.strictEqual(sprig('1 sprig', 2 / 3), '¾ sprigs');
-  assert.strictEqual(sprig('4 sprigs', 2), '8 sprigs');
-  assert.strictEqual(sprig('1 sprig', 0.05), '¼ sprigs');
-  // The total, once: 1.17 and 1.17 are 2.33, which is 2¼ and not 2½.
-  assert.strictEqual(line([
-    { amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6, recipe: 'x' },
-    { amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6, recipe: 'y' }
-  ], 'thyme', { quarterMeasures: ['sprig'] }), '2¼ sprigs');
-  // With no list, as before.
-  assert.strictEqual(line(
-    [{ amount: '1 sprig', name: 'thyme', aisle: 'produce', scale: 7 / 6 }],
-    'thyme'), '1.17 sprigs');
+  assert.strictEqual(other('3 cloves', 0.5), '1½ cloves');
 });
 
 test('#1297: with no list of measures handed over, a handful totals as before', () => {

@@ -287,7 +287,7 @@ layout: default
      `serves:` recipe steps a portion at a time. MANUAL 8.2.
      {% endcomment %}
   {% if page.made and page.ingredient_groups.size > 0 %}
-    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
+    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="make fewer">&minus;</button>
       <label class="recipe-scale recipe-scale--made">
         {% if page.made.prefix != "" %}<span class="recipe-scale-prefix">{{ page.made.prefix }}</span>{% endif %}
@@ -299,7 +299,7 @@ layout: default
     </div>
     <p class="recipe-scale-note" hidden></p>
   {% elsif page.portions and page.ingredient_groups.size > 0 %}
-    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
+    <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="one fewer portion">&minus;</button>
       <label class="recipe-scale">
         {% if page.portions_estimated %}<span class="recipe-scale-approx" title="(estimated)">~</span>{% endif %}

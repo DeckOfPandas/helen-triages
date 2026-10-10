@@ -31,8 +31,9 @@
 // A MEASURE TAKEN BY HAND SCALES IN HALF STEPS -- #1125. "1 handful" for
 // three times the people is "3 handfuls", and never "1.17 handfuls": see
 // `halfStep` below, the one place the rounding is decided. (The INDEX's
-// shopping list takes the same measures to the nearest WHOLE one, #1297 --
-// that is food-shopping-list.js's `wholeOnes`, and it never calls this.)
+// shopping list buys the same measures in WHOLE ones, rounded up, and says
+// this page's figure beside them, #1297 -- food-shopping-list.js does that
+// for itself and never calls this.)
 //
 // "2 large" SCALES, because `large` is a unit to the parser and a SYMBOL to
 // the labeller (no plural), so it prints "4 large" -- Helen: "Things like
@@ -100,7 +101,9 @@
      HER SENTENCE NAMES HANDFULS. It is applied to the whole by-eye list as
      one rule; a measure she wants treated differently comes out of the list.
 
-     WHICH MEASURES is data: `half_step_measures` in _data/food/scaling.yml,
+     WHICH MEASURES is data: `half_step_measures` in _data/food/scaling.yml
+     -- and, since 2026-10-10, `half_step_counts` beside it (drop, twist,
+     lot, pat: "please round to the nearest 1/2"), joined on by the layout --
      PASSED IN -- the layout emits the list, recipe-scale.js hands it over,
      and this file names no measure. With no list given, a handful scales
      like any other count, which is what every caller before #1125 gets. */
