@@ -20,6 +20,7 @@ ingredient_groups:
   - name: "filling"
     items:
     - item: "salted butter, for greasing"
+      incidental: true
     - amount: "550 g"
       item: "cream cheese, at room temperature"
     - amount: "160 g"

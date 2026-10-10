@@ -46,6 +46,7 @@ ingredient_groups:
     - amount: "2 tbsp"
       item: "salted butter"
     - item: "salted butter, extra, for greasing"
+      incidental: true
 method_groups:
   - name: "Make the nut mixture"
     steps:
