@@ -336,6 +336,17 @@ permalink: /food/
   {% comment %} The "export list as JSON →" jump link sat here from 2026-09-09
      to 2026-09-10; cocktails/index.html has the note on why it went. {% endcomment %}
 </div>
+{% comment %} HIDE / SHOW DRAFTS, ON A LOCAL BUILD ONLY -- #1358, 2026-10-10.
+   Helen: "I'd like a 'show drafts' (or hide) button on the local build. Under
+   the SHORTLISTED button is fine". Gated on `site.show_drafts`, which only
+   _config_local.yml declares, so the deployed index has no such element.
+   Ships `hidden`; filters.js reveals and wires it. The identical block is on
+   cocktails/index.html. {% endcomment %}
+{% if site.show_drafts %}
+<p class="drafts-toggle-row">
+  <button type="button" class="btn-drafts-toggle" id="drafts-toggle" aria-pressed="false" hidden>hide drafts</button>
+</p>
+{% endif %}
 
 {% comment %} A SHORTLIST SOMEONE SENT -- #1093. Shown only while the index is
    showing a `?shortlist=slug,slug` link, which it does without saving anything

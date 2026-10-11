@@ -354,6 +354,19 @@
      index carries the twin of this on its own results heading. */
   var shortlistOnlyBtn = document.getElementById('shortlist-only');
 
+  /* HIDE THE DRAFTS, ON A LOCAL BUILD ONLY -- #1358, 2026-10-10. Helen: "I'd
+     like a 'show drafts' (or hide) button on the local build. Under the
+     SHORTLISTED button is fine". The button exists only where the template is
+     built with `show_drafts`, so on the deployed index this is null and
+     `hideDrafts` can never be true.
+
+     NOT A FIELD OF `state`, deliberately. It is not a question about a drink
+     and not a view: clear-all does not reset it, the shortlist view does not
+     give way to it, and nothing remembers it across a load. It answers "what
+     does the live index hold" while the filters are being tested. */
+  var draftsBtn = document.getElementById('drafts-toggle');
+  var hideDrafts = false;
+
   /* A SHORTLIST SOMEONE SENT -- #1093, `?shortlist=slug,slug`. The same three
      rulings filters.js carries at its own copy of this (Helen, 2026-09-15):
      the link SHOWS the list and saves none of it, the shopping list hides
@@ -404,6 +417,8 @@
          JavaScript value and coercing it here would make every drink look
          made. Compared against `'false'` in matches() for the same reason. */
       madeBefore: card.dataset.madeBefore || '',
+      /* #1358. The class the template has always put on a draft's card. */
+      draft: card.classList.contains('drink-card--draft'),
       /* The shortlist's key -- #546, `drink.url` written by the template. Read
          once here with everything else; whether it IS shortlisted is asked in
          matches(), because that answer can change under the page while this one
@@ -509,6 +524,9 @@
   }
 
   function matches(d) {
+    /* The local-only drafts switch, #1358. */
+    if (hideDrafts && d.draft) return false;
+
     /* SHORTLISTED -- #546, and first because it is the cheapest test here and
        the most narrowing one anybody turns on: one lookup against a list that
        is usually a handful of drinks long, in front of four ingredient walks.
@@ -1286,6 +1304,19 @@
         state = FilterState.enterShortlistView();
         resetControls();
       }
+      apply();
+    });
+  }
+
+  /* #1358. The label names what a press will do, and `is-on` says the list is
+     currently narrowed, as it does on the button above. */
+  if (draftsBtn) {
+    draftsBtn.hidden = false;
+    draftsBtn.addEventListener('click', function () {
+      hideDrafts = !hideDrafts;
+      draftsBtn.textContent = hideDrafts ? 'show drafts' : 'hide drafts';
+      draftsBtn.classList.toggle('is-on', hideDrafts);
+      draftsBtn.setAttribute('aria-pressed', hideDrafts ? 'true' : 'false');
       apply();
     });
   }

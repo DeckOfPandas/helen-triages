@@ -1410,6 +1410,36 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     grid-column: 1;
   }
 
+  // THE ABOUT PAGE'S TWO DOORS TAKE AN EDGE EACH ONCE THE HEADER STACKS --
+  // #1328, 2026-10-10. Helen: "about page on a phone should have the two site
+  // doors left and right on the navbar, to be symmetrical", and "Possibly with
+  // the arrows both pointing outwards???" The row ended on the cards' right
+  // edge and started wherever 268.6px left it, so under a centred wordmark the
+  // pair hung off to one side. Stretched across the one column with the space
+  // between them, the first door starts on the cards' left edge -- where `??`
+  // sits on every other page -- and the second still ends on the right.
+  //
+  // THE FIRST DOOR IS MIRRORED, NOT REDRAWN: `row-reverse` puts its arrow
+  // before its word and `scaleX(-1)` turns the one drawn arrow round, so both
+  // point away from the wordmark. One include, one shape in the markup.
+  //
+  // ABOVE THE STACK WIDTH NOTHING CHANGES: the row is still #1086's, both
+  // doors together at the right-hand end.
+  .site-neutral .site-nav-icons {
+    justify-self: stretch;
+    justify-content: space-between;
+  }
+
+  .site-neutral .site-nav-icon-link:first-child {
+    flex-direction: row-reverse;
+
+    .site-nav-arrow {
+      margin-left: 0;
+      margin-right: 0.55rem;
+      transform: scaleX(-1);
+    }
+  }
+
 }
 
 // =============================================================================
@@ -1567,6 +1597,25 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
 
   .site-footer-hearts {
     grid-column: 1;
+  }
+
+  // A SHORT HAIRLINE BETWEEN THE LAST REFERENCE LIST AND `about` -- #1354,
+  // 2026-10-10. Helen: "add some separation between the cocktails ref pages
+  // list and the about link, whether space, a dot, a short hairline, anything".
+  // Stacked, `about` sat one grid gap under `glasses` in the same face and the
+  // same underline, and read as the cocktails column's third page.
+  //
+  // A LINE RATHER THAN MORE SPACE, because #916 already spent the bigger gap
+  // on the break between the two sites' columns: a third, larger one would be
+  // a ladder of gaps to tell apart by eye. The centre column is a grid, so the
+  // pseudo-element is its first item; $space-sm of margin on top of the grid's
+  // own $space-sm puts `about` as far under the line as the line is under the
+  // list. No markup, so the identical-footer guard has nothing new to compare.
+  .site-footer-centre::before {
+    content: "";
+    width: 2rem;
+    border-top: 1px solid $color-border;
+    margin-bottom: $space-sm;
   }
 
 }

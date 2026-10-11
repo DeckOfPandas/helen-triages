@@ -85,6 +85,10 @@
 // own, so at max-content the tape word cannot overflow and neither class is
 // ever added. The pass still has to run over it — the pick is re-cloned on
 // every deal and nothing else would clear a stale class if that ever changed.
+// AND IT CHANGED ON 2026-10-10 (#1324), BELOW 820px ONLY: once the pick wraps,
+// _universe.scss caps the name to the width left beside the glass and lets it
+// shrink, so a long name there steps or wraps like any card's. On one row it
+// is still `flex: none` and still never classified.
 // =============================================================================
 
 (function () {

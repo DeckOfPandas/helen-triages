@@ -212,8 +212,11 @@ test('the fixture uses the ids the script actually reaches for', () => {
   // page and the null path is the one most readers get. `drink-top-ups` is
   // deliberately NOT here — it is emitted ungated, so a page missing it is a
   // real anomaly and the fixture carries the real rows (#746).
+  //
+  // `drafts-toggle` (#1358) is absent in production for the same reason: it
+  // sits behind `site.show_drafts`, so the null path is the deployed page.
   const NOT_BUILT = ['drink-costs', 'drink-rates', 'shopping-list',
-                     'shopping-list-setall'];
+                     'shopping-list-setall', 'drafts-toggle'];
   const unexpected = missing.filter(function (id) { return NOT_BUILT.indexOf(id) === -1; });
   assert.deepStrictEqual(unexpected, [],
     'cocktail-index.js reaches for these ids and the fixture has none: ' +
