@@ -1124,7 +1124,10 @@ extras, festive, freezable, main, make-ahead, no-cook, starter.
 words). It is the one tag with a rule behind its proposal: never with
 `dessert`, `sweet snack`, `ice cream`, `drinks` or `nibbles`; a main with none
 of those and none of `bakes`, `extras`, `starter`, `breakfast`, `hot snack`;
-and a question to her with one of that second five. The collection was seeded
+and a question to her with one of that second five — **except that eggs and
+fritters are breakfast or a snack, never dinner** (omelette, frittata, baked
+eggs, savoury pancakes, griddle cakes, fritters; her rule, from eight noes in
+a row). The collection was seeded
 by that rule the day after the tag review, and `INGEST_ONE_RECIPE.md` §4 asks
 a new recipe the same thing. Still a proposal, never a deriver.
 
