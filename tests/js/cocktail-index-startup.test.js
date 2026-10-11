@@ -581,6 +581,48 @@ test('#1050: an ingredient no card names is dropped in silence', () => {
   assert.deepStrictEqual(on, []);
 });
 
+// --- the two pools' chosen chips, 2026-10-11 ------------------------------------
+// Helen, with #1219: "match the styling of the chips in the has to have and
+// leave out search results -- match cocktails to food", and "the food site
+// shows e.g. 'hiding cranberries' when using the leave out filter. Please do
+// the same for the cocktail site's leave out filter."
+
+function chooseFrom(r, inputId, poolId, typed) {
+  const input = r.doc.getElementById(inputId);
+  input.value = typed;
+  input.dispatch('input');
+  const pool = r.doc.getElementById(poolId);
+  pool.querySelectorAll('.btn-pool').filter((b) => !b.classList.contains('is-on'))[0].click();
+  return r.doc.getElementById(poolId);
+}
+
+test('a chosen HAS TO HAVE chip carries a slot for the tape', () => {
+  const r = boot({ drinks: DRINKS, search: '?ing=gin' });
+  const on = r.doc.getElementById('drink-include-pool').querySelectorAll('.btn-pool')
+    .filter((b) => b.classList.contains('is-on'));
+  assert.strictEqual(on.length, 1);
+  assert.strictEqual(on[0].querySelectorAll('.tag-shape').length, 1,
+    'without the slot decorations.js has nothing to fill and the chip is a flat block.');
+});
+
+test('a chosen LEAVE OUT chip gets no tape, and the pool says what it is hiding', () => {
+  const r = boot({ drinks: DRINKS });
+  const pool = chooseFrom(r, 'drink-exclude', 'drink-exclude-pool', 'gin');
+  const on = pool.querySelectorAll('.btn-pool').filter((b) => b.classList.contains('is-on'));
+  assert.strictEqual(on.length, 1);
+  assert.strictEqual(on[0].querySelectorAll('.tag-shape').length, 0,
+    'LEAVE OUT is a struck-through word on both sites.');
+  const lines = pool.querySelectorAll('.drink-pool-hiding');
+  assert.strictEqual(lines.length, 1);
+  assert.strictEqual(lines[0].textContent, 'hiding ' + on[0].querySelector('.btn-pool-label').textContent);
+});
+
+test('HAS TO HAVE says nothing about hiding, and an empty LEAVE OUT says nothing at all', () => {
+  const r = boot({ drinks: DRINKS, search: '?ing=gin' });
+  assert.strictEqual(r.doc.getElementById('drink-include-pool').querySelectorAll('.drink-pool-hiding').length, 0);
+  assert.strictEqual(r.doc.getElementById('drink-exclude-pool').querySelectorAll('.drink-pool-hiding').length, 0);
+});
+
 // --- a shortlist someone sent, #1093 ------------------------------------------------
 // food-index-startup.test.js carries the full set, including "keep these"
 // (this harness's store is a no-op, see above). These are the wiring: the

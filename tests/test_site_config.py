@@ -3359,7 +3359,7 @@ def test_both_indexes_filter_chips_wear_the_shared_tape():
     decorations = (JS_DIR / "decorations.js").read_text(encoding="utf-8")
     hosts = re.search(r"slot\.closest\('(\.badge, [^']+)'\)", decorations)
     assert hosts, "decorations.js's tagShapes() no longer finds a slot's host with closest()."
-    for cls in (".btn-tag", ".btn-star", ".btn-chaos", ".btn-mood"):
+    for cls in (".btn-tag", ".btn-star", ".btn-chaos", ".btn-mood", ".btn-pool"):
         assert cls in hosts.group(1).split(", "), (
             f"{cls} is not in tagShapes()'s host list, so its slots are skipped.")
     assert "HTF.chromeAsset('/tag-shapes/' + shape + '.svg')" in decorations, (

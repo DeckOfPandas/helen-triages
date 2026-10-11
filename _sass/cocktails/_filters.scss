@@ -624,8 +624,8 @@
 // editing". The fills she found too loud then were ten solid boxes; this is
 // 15% of the text colour at rest.
 //
-// FOOD'S THREE STEPS, IN THIS SITE'S COLOURS: 15% of the text colour at rest,
-// 40% under the pointer, the section's own hue when chosen -- the same three
+// FOOD'S STEPS, IN THIS SITE'S COLOURS: 15% of the text colour at rest, the
+// section's own hue under the pointer and when chosen -- the same three
 // variables the block used, so a chosen chip still answers its heading.
 //
 // THE BLOCK ABOVE STAYS AS THE FALLBACK, AND `:has()` IS WHAT RETIRES IT. A
@@ -644,7 +644,18 @@
 
   .tag-shape { color: rgba($color-text, 0.15); }
 
-  &:hover:not(.is-on) .tag-shape { color: rgba($color-text, 0.4); }
+  // UNDER THE POINTER THE TAPE TAKES THE SECTION'S HUE -- Helen, the same day,
+  // asking for food's row-badge hover on both sites: "using the section
+  // colours for the tape on hover and active". The word cannot stay in the
+  // hue (#777) on a tape of the same hue, so it goes dark, as food's does.
+  // Gated on the shape having loaded for the same reason as the block: until
+  // then the #777 hover above still applies, a hued word on the bare ground.
+  &:hover:not(.is-on):has(.tag-shape svg),
+  &:focus-visible:not(.is-on):has(.tag-shape svg) {
+    color: var(--drink-btn-hover-word, #{$color-bg});
+
+    .tag-shape { color: var(--drink-btn-hover, #{$color-wicked-woowoo}); }
+  }
 
   &.is-on:has(.tag-shape svg) { background: none; }
 }
@@ -699,9 +710,21 @@
   &:focus-visible:not(.is-on) { color: var(--drink-btn-hover, #{$color-wicked-woowoo}); }
 }
 
-.drink-filter--chaos  { --drink-btn-hover: #{$color-heading-yolo}; }
-.drink-filter--mood   { --drink-btn-hover: #{$color-heading-mood}; }
-.drink-filter--hassle { --drink-btn-hover: #{$color-heading-hassle}; }
+// `-word` IS THE HOVERED WORD ONCE THE TAPE HAS LIT (#1219, below): the hue
+// taken most of the way to the page's ground, which is this site's version
+// of food's dark-of-the-hue on its lightened tape.
+.drink-filter--chaos {
+  --drink-btn-hover: #{$color-heading-yolo};
+  --drink-btn-hover-word: #{mix($color-heading-yolo, $color-bg, 20%)};
+}
+.drink-filter--mood {
+  --drink-btn-hover: #{$color-heading-mood};
+  --drink-btn-hover-word: #{mix($color-heading-mood, $color-bg, 20%)};
+}
+.drink-filter--hassle {
+  --drink-btn-hover: #{$color-heading-hassle};
+  --drink-btn-hover-word: #{mix($color-heading-hassle, $color-bg, 20%)};
+}
 
 // --- the two ingredient fields -----------------------------------------------
 // NO RULE ABOVE IT -- #548 point 3. A full-width border sat here, separating
@@ -808,6 +831,25 @@
   font-size: 0.74rem;
   color: $color-clear-text;
   font-style: italic;
+}
+
+// "hiding lime juice", after the chosen LEAVE OUT chips -- food's own line
+// (`.exclude-count`, #1088), asked for here on 2026-10-11. Quiet prose, not
+// a control: the chips are the only thing in the row you can click.
+.drink-pool-hiding {
+  font-size: 0.78rem;
+  color: $color-clear-text;
+}
+
+// The line ends its row, so the candidates start on the next one: food keeps
+// its chosen pills and this sentence in a row of their own, and a sentence
+// running straight into the first candidate read as one list. Nothing after
+// it, nothing to break.
+.drink-pool-break {
+  flex-basis: 100%;
+  height: 0;
+
+  &:last-child { display: none; }
 }
 
 .btn-pool {
@@ -936,6 +978,31 @@
 // LONGHANDS RATHER THAN THE SHORTHAND, because `background-color` now has to be
 // reset explicitly: %drink-btn-base sets `background: $color-surface` and the
 // shorthand used to clear it for free.
+//
+// THE BLOCK IS A TAPE NOW, AND THE GRADIENT IS ITS FALLBACK -- 2026-10-11,
+// with #1219. Helen: "match the styling of the chips in the has to have and
+// leave out search results -- match cocktails to food. So add the tape on has
+// to have, and drop the outline on leave out." Food's chosen HAS TO HAVE
+// chip wears the torn shape in its section's hue; so does this one, in the
+// same hue the gradient painted. The slot is put in by cocktail-index.js's
+// chip() and inset to the box the paragraphs above measured, so the tape is
+// cut as tight to the word as the block was. Until the shape has loaded the
+// gradient still paints: the word is the page's dark ground.
+.drink-search--include .btn-pool.is-on {
+  position: relative;
+  isolation: isolate;
+
+  .tag-shape {
+    top: calc(0.15em + 0.12em);
+    left: 0.35em;
+    width: calc(100% - 0.7em);
+    height: calc(100% - 0.3em);
+    color: $color-heading-include;
+  }
+
+  &:has(.tag-shape svg) { background-image: none; }
+}
+
 .drink-search--include .btn-pool.is-on {
   background-color: transparent;
   background-image: linear-gradient($color-heading-include, $color-heading-include);
@@ -962,18 +1029,22 @@
   // word you had merely typed towards looked like a word you had already
   // excluded: the control was reporting an action you had not taken. The
   // dashed border still marks the whole section as the negative one.
+  // NO OUTLINE, AT REST OR CHOSEN -- 2026-10-11, Helen: "drop the outline on
+  // leave out", matching food, whose LEAVE OUT candidates and chosen pills
+  // are bare words. It was a dashed box. The border stays in the box model
+  // and goes transparent, so nothing moves; the words come up to ink under
+  // the pointer, which is the hover a boxless chip has left.
   .btn-pool {
     color: $color-clear-text;
-    border-style: dashed;
+    border-color: transparent;
+    background: none;
 
     &:hover,
-    &:focus-visible { color: $color-text; border-color: $color-text; }
+    &:focus-visible { color: $color-text; border-color: transparent; }
 
     // Struck through only once chosen, which is also the moment it becomes
     // literally true of the results.
     &.is-on {
-      background: transparent;
-      border-color: $color-text;
       color: $color-text;
       font-weight: 600;
 

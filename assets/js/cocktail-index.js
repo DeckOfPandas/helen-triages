@@ -1379,6 +1379,32 @@
         poolEl.appendChild(chip(word, true, false));
       });
 
+      /* "hiding lime juice" -- food's line, word for word (filters.js's
+         renderExcludeActive(), Helen on #1088: '"hiding peas" please'), and
+         asked for here on 2026-10-11: "Please do the same for the cocktail
+         site's leave out filter." After the chosen chips and before the
+         candidates, which is where food's sits. The (all) that qualifies a
+         family's BUTTON comes off, as it does there: "hiding rum (all)" is
+         not a sentence. Painted from state on every redraw, so clear-all
+         takes it away with the chips. */
+      if (field === 'exclude' && state[field].size) {
+        var hidingNames = [];
+        state[field].forEach(function (word) {
+          hidingNames.push(CS.isFamilyValue(word)
+            ? word.slice(0, -FAMILY_SUFFIX.length) : word);
+        });
+        var hiding = document.createElement('span');
+        hiding.className = 'drink-pool-hiding';
+        hiding.textContent = 'hiding ' + hidingNames.join(' and ');
+        poolEl.appendChild(hiding);
+        // Ends the row, so the candidates start below the sentence
+        // (_filters.scss hides it when nothing follows).
+        var rowBreak = document.createElement('span');
+        rowBreak.className = 'drink-pool-break';
+        rowBreak.setAttribute('aria-hidden', 'true');
+        poolEl.appendChild(rowBreak);
+      }
+
       var result = Search.search(input.value, pool, chosen(field));
 
       /* THE (all) BUTTONS COME FIRST, as food's do: an umbrella is a different
@@ -1438,6 +1464,10 @@
         more.textContent = '+' + result.hidden + ' more';
         poolEl.appendChild(more);
       }
+
+      // Fill any tape slot chip() just made. Cached by URL, so a redraw
+      // that made none costs nothing.
+      if (state[field].size && window.HTF && HTF.tagShapes) HTF.tagShapes();
     }
 
     /* `wordMatch` marks the candidates you actually meant — #549 point 3, and
@@ -1473,6 +1503,16 @@
       b.setAttribute('aria-pressed', on ? 'true' : 'false');
 
       if (on) {
+        /* A chosen HAS TO HAVE chip wears food's tape (2026-10-11, with
+           #1219): the slot goes in here and decorations.js's tagShapes()
+           fills it, called at the end of redraw(). LEAVE OUT's chosen chip
+           is a struck-through word on both sites and gets none. */
+        if (field === 'include') {
+          var shape = document.createElement('span');
+          shape.className = 'tag-shape';
+          shape.setAttribute('aria-hidden', 'true');
+          b.appendChild(shape);
+        }
         var label = document.createElement('span');
         label.className = 'btn-pool-label';
         label.textContent = word;

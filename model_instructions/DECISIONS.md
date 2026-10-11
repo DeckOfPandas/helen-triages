@@ -9922,11 +9922,21 @@ verification. Dates are when the correction landed.
     be an exercise in editing...but at least the sites will be consistent now
     even if I'm leaning even further into more is more"*. So both sites'
     chips are 0.9rem bold lowercase at full strength on a torn shape: 15% of
-    the text colour at rest, 40% under the pointer, the section's hue when
+    the text colour at rest, the section's hue under the pointer and when
     chosen. **This reverses two earlier rulings and she knew it**: cocktails'
     *"just not the background shape"* (2026-08-30), and food's capitals on a
     chosen chip — cocktails' chosen chip never changed case, and F is
     cocktails' chip.
+  - **Hover was 40% of the ink for a few hours, and she changed it on
+    seeing it:** *"the darkened text on the darkened tape is hard to read,
+    plus I'd just like some more colour. I like the hover behaviour we use
+    for the chips on the recipe list below, so please match that -- bringing
+    the background to the section's colour on hover and active. Match the
+    text colour too on hover. Then keep the text colour black for active."*
+    And for cocktails, *"the same"*. So hover is food's `a.badge-*:hover`
+    on both: the tape in the hue, the word in a dark of it. On cocktails
+    that retires #777's hued word, which cannot sit on a tape of its own
+    hue; the dark is the hue mixed 20% into the ground.
   - **What each site keeps:** its colours. Food's chosen tape is its section
     hue lightened as before, with the dark of the hue on a hovered word
     (lime and yellow cannot be read as words on paper). Cocktails' chosen
@@ -9949,6 +9959,22 @@ verification. Dates are when the correction landed.
   - **The cost is all food's.** Panel at 1280px: 476 to 558px, first recipe
     824 to 906px down. At 390px: 815 to 1033px, first recipe 1128 to 1346px.
     Cocktails measures exactly as before (517 / 953px; 985 / 1433px).
+  - **Cocktails' two search pools, the same day, matched to food.** *"add
+    the tape on has to have, and drop the outline on leave out."* A chosen
+    HAS TO HAVE chip wears the tape in its heading's magenta, inset to the
+    tight box #1134 measured for the block it replaces. LEAVE OUT's chips
+    lose their dashed box at rest and chosen. **Read literally: HAS TO
+    HAVE's candidates keep their outline**, because she named leave out's
+    and the 2026-09-02 hover ruling (*"mouseover outlines the box"*)
+    depends on the box. Food's candidates have none; ask before taking it.
+    *"The styling for the three search groups is perfect"* is about food's.
+  - **"hiding gin" under cocktails' LEAVE OUT**, food's #1088 line word for
+    word, after the chosen chips and ending its row.
+  - **Cocktails' pickers answer from the first character**
+    (`min_query_chars` 3 to 1), reversing #584. *"Mostly because I think
+    this is very very cute in a static site, but also because seeing a list
+    provides inspiration."* The cap of eight is unchanged, so one letter
+    gives eight chips and a "+43 more"; the name box never had a minimum.
   - **The fold.** Four phone-panel treatments went on a second candidates
     page on the 10th; she chose *"sections fold"* and declined three boxes on
     one row (*"nice looking, but I don't think it's clear enough"*). It was

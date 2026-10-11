@@ -345,7 +345,7 @@
       // .btn-chaos and .btn-mood added 2026-10-11, #1219: cocktails' filter
       // chips wear the tape too. Same silent skip as above if a host is
       // missing from this list.
-      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood');
+      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood, .btn-pool');
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
 

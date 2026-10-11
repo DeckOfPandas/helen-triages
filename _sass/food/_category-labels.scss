@@ -316,8 +316,8 @@
   // pointer the WORD takes its section's colour, as cocktails' does -- the
   // dark of each hue, the one the section's own clear link uses, because
   // lime and yellow cannot be read as words on paper. The tape keeps food's
-  // three colours: 15% of the ink at rest, 40% under the pointer
-  // (_buttons.scss), the section's hue when chosen (above).
+  // colours: 15% of the ink at rest (_buttons.scss), the section's hue under
+  // the pointer and when chosen.
   //
   // `:not(.search)` IS THE SCOPE: the ingredient pool's candidates are
   // .btn-tag too and stay as they were, as cocktails' own pool chips did
@@ -334,13 +334,32 @@
       line-height: 1.2;
       color: $color-text;
 
-      &:hover:not(.active) { color: var(--chip-hover, #{$color-text}); }
+      // THE TAPE LIGHTS UNDER THE POINTER TOO -- Helen, the same day, on the
+      // first build: "the darkened text on the darkened tape is hard to
+      // read, plus I'd just like some more colour. I like the hover
+      // behaviour we use for the chips on the recipe list below, so please
+      // match that". So this is `a.badge-star:hover` (_badges.scss): the
+      // word in the dark of its hue on the tape in the lightened hue, which
+      // is also the tape a chosen chip wears. Chosen keeps its black word.
+      &:hover:not(.active) {
+        color: var(--chip-hover, #{$color-text});
+        .tag-shape { color: var(--chip-tape, #{rgba($color-text, 0.4)}); }
+      }
     }
   }
 
-  &.category--star           { --chip-hover: #{$color-star-active}; }
-  &.category--mood           { --chip-hover: #{$color-mood-active}; }
-  &.category--practicalities { --chip-hover: #{$color-practicalities-active}; }
+  &.category--star {
+    --chip-hover: #{$color-star-active};
+    --chip-tape: #{mix($color-star-root, $color-white, 82%)};
+  }
+  &.category--mood {
+    --chip-hover: #{$color-mood-active};
+    --chip-tape: #{mix($color-mood-root, $color-white, 82%)};
+  }
+  &.category--practicalities {
+    --chip-hover: #{$color-practicalities-active};
+    --chip-tape: #{mix($color-practicalities-root, $color-white, 82%)};
+  }
 
   .category-buttons {
     display: flex;

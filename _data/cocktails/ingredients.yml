@@ -352,12 +352,21 @@ juice_yields:
 # Changing it needs no code touched, and `test_the_cocktail_search_config_is_
 # not_hardcoded` keeps it that way.
 #
+# AND IT IS 1 SINCE 2026-10-11, WHICH IS FOOD'S RULE AFTER ALL. Helen: "please
+# make the three cocktail search filters start filtering from the first
+# character, as we do for food. Mostly because I think this is very very cute
+# in a static site, but also because seeing a list provides inspiration."
+# Everything above is still true as measurement -- one and two letters
+# mostly overflow the cap, so the pool is eight chips and a "+N more" -- and
+# she has chosen the list over the tidy answer. The name box never had a
+# minimum. `family_button_min_chars` is untouched.
+#
 # `pool_cap` is how many candidates are shown at once. The remainder is always
 # COUNTED and said out loud ("+16 more -- keep typing"), never silently
 # dropped: a pool that stops at eight looks like a complete answer, and the one
 # you wanted may be the ninth.
 search:
-  min_query_chars: 3
+  min_query_chars: 1
   family_button_min_chars: 3
   pool_cap: 8
 

@@ -2514,9 +2514,11 @@ the pool, ranking, families and the two matching rules (pure, tested);
 - **One chip per category, wearing the card's name**; a bottle is a way IN to
   its category, not a chip beside it, which needs the pool built PER
   INGREDIENT from `data-ing`.
-- **Three characters before the picker answers** (`min_query_chars` in
-  `ingredients.yml`); food keeps no minimum because its picker sits above a
-  list that stays on screen.
+- **The picker answers from the first character** (`min_query_chars: 1` in
+  `ingredients.yml`) since 2026-10-11, as food's always has. It was three
+  (#584), on a measurement that still holds: short queries overflow the
+  cap. Helen chose the list anyway — *"seeing a list provides
+  inspiration"*.
 - **Prose is not a bottle name** (`search.prose_words` / `prose_marks`; `and`
   deliberately absent — Wray and Nephew is one bottle). `family_aliases` /
   `family_labels` make a family reachable however it is spelled (`whisk(e)y`).
@@ -4487,9 +4489,10 @@ recipe page a document.
 
 **The filter chips are ONE chip on both sites since #1219 (2026-10-11):
 cocktails' type, food's tape.** 0.9rem bold lowercase at full strength, on a
-torn shape at 15% of the text colour; under the pointer the word takes its
-section's colour and the shape goes to 40%; chosen, the shape takes the
-section's hue and the word does NOT change case. The slot is `.tag-shape`
+torn shape at 15% of the text colour; under the pointer the shape takes the
+section's hue and the word a dark of it (food's row-badge hover); chosen,
+the shape keeps the hue, the word is the site's near-black and does NOT
+change case. The slot is `.tag-shape`
 (`_sass/shared/_tag-shape.scss`), the artwork is
 `assets/img/chrome/tag-shapes/`, and `decorations.js`'s `tagShapes()` fills
 it by a hash of the chip's words — **a new chip class must be added to its
