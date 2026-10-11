@@ -462,7 +462,7 @@ and is only true when all three hold (§12).
 | The one header and the one footer | `_layouts/default.html` — **no `site_key` branch anywhere in either** |
 | Their structure | `_sass/shared/_layout.scss` |
 | Their colour | `_sass/shared/_chrome.scss` — the only shared partial naming `$color-accent` |
-| Their artwork | `assets/img/chrome/` (`tape/`, `hearts/`) |
+| Their artwork | `assets/img/chrome/` (`tape/`, `hearts/`) — and, since #1219, `tag-shapes/`: not chrome, but the one other artwork both sites wear, so it lives in the one shared set |
 | What is left of chrome config | `_data/chrome.yml` — `tape_count`, and nothing else |
 | How a script fetches it | `HTF.chromeAsset(path)` (§3) |
 
@@ -2537,9 +2537,12 @@ the pool, ranking, families and the two matching rules (pure, tested);
 - **One chip per category, wearing the card's name**; a bottle is a way IN to
   its category, not a chip beside it, which needs the pool built PER
   INGREDIENT from `data-ing`.
-- **Three characters before the picker answers** (`min_query_chars` in
-  `ingredients.yml`); food keeps no minimum because its picker sits above a
-  list that stays on screen.
+- **The picker answers from the first character** (`min_query_chars: 1` in
+  `ingredients.yml`) since 2026-10-11, as food's always has. It was three
+  (#584), on a measurement that still holds: short queries overflow the
+  cap. Helen chose the list anyway — *"seeing a list provides
+  inspiration"*. **There is no cap either**, since the same day: every
+  candidate is offered, as on food.
 - **Prose is not a bottle name** (`search.prose_words` / `prose_marks`; `and`
   deliberately absent — Wray and Nephew is one bottle). `family_aliases` /
   `family_labels` make a family reachable however it is spelled (`whisk(e)y`).
@@ -4508,6 +4511,30 @@ triage website to click on a random recipe"*); it stays on cocktails.
 `_tokens.scss`), tightened for the fold: the index is a control panel, the
 recipe page a document.
 
+**The filter chips are ONE chip on both sites since #1219 (2026-10-11):
+cocktails' type, food's tape.** 0.9rem bold lowercase at full strength, on a
+torn shape at 15% of the text colour; under the pointer the shape takes the
+section's hue and the word a dark of it (food's row-badge hover); chosen,
+the shape keeps the hue, the word is the site's near-black and does NOT
+change case. The slot is `.tag-shape`
+(`_sass/shared/_tag-shape.scss`), the artwork is
+`assets/img/chrome/tag-shapes/`, and `decorations.js`'s `tagShapes()` fills
+it by a hash of the chip's words — **a new chip class must be added to its
+host list or it silently gets no shape**. Each site keeps its own colours.
+Food's section headings are cocktails' SIZE (1.4rem) and keep their own
+weight and tracking, which on cocktails are corrections for a dark ground.
+**The chips in the two search pools are one chip too, and it is food's**:
+`@mixin index-chip` and its three companions in `shared/_rule.scss`,
+included by food's `.btn-tag` and cocktails' `.btn-pool`, colours as
+arguments. A HAS TO HAVE hit takes the section's colour; a LEAVE OUT hit is
+the resting grey, heavier. Chosen chips sit above the candidates on both,
+carry an x, keep their case, and choosing one clears the search. **Every clear is `@mixin index-clear-link`: text colour, magenta
+under the pointer, never a section's hue.**
+**The panel does not fold on a phone, and that was tried**: Helen chose a
+fold from a candidates page and took it back the next day — *"The site is
+for me, and on my iPad I can see everything at the same time just fine,
+which is what I want."* DECISIONS §13 has the numbers.
+
 #### 13.4.1 The punched-tape effect
 
 **`model_instructions/LETTERING.md` is the reference**: the physics (stroke
@@ -4535,8 +4562,9 @@ Courier Prime ships only Regular and Bold, so `font-weight: 900` is already
 Bold and a same-colour stroke is the only way to get "heavier than bold" —
 which is what an active filter button needs. They set `text-shadow: none`
 explicitly: the punched treatment means "landmark" everywhere else. **An
-active filter rule may change colour, a fill (`.tag-shape` on food, a
-`background` on cocktails since #1086) and stroke, and
+active filter rule may change colour, a fill (`.tag-shape` on both sites
+since #1219; cocktails' #1086 `background` block survives only as the
+fallback until the shape has loaded) and stroke, and
 nothing that changes a box's size** (#389 — letter-spacing on the active
 state shifted every tag to its right);
 `test_no_active_filter_button_changes_its_own_width` reads BOTH sites'

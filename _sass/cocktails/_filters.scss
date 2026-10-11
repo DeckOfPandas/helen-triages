@@ -391,10 +391,12 @@
   // no-op at small sizes -- it works here only because the gap is 6.50:1 to
   // 15.47:1 against the ground, which is not a 12% nudge but most of the
   // available range.
-  color: $color-clear-text;
-
-  &:hover,
-  &:focus-visible { color: $color-text; }
+  //
+  // AND THAT COLOUR IS THE PAGE'S TEXT, MAGENTA UNDER THE POINTER, SINCE
+  // 2026-10-11 -- @mixin index-clear-link, one rule for every clear on both
+  // sites. It was grey to ink. Helen: "normal link colours... Normal base
+  // text, site colour on hover (both woo woo)."
+  @include index-clear-link($color-wicked-woowoo);
 
   &[hidden] { display: none; }
 }
@@ -612,6 +614,58 @@
 .drink-filter--mood   .btn-mood.is-on  { background: $color-heading-mood; }
 .drink-filter--hassle .btn-mood.is-on  { background: $color-heading-hassle; }
 
+// THE TAPE, ON EVERY CHIP -- #1219, 2026-10-11. Helen, from the control-layer
+// candidates page: "I find myself wanting to add the tape to the cocktail
+// tags", then "I'm leaning towards F -- cocktail chips, and tape on both
+// sites!" Everything about the chip above is unchanged; what is new is the
+// torn shape behind it, which is food's (`.tag-shape`, shared/_tag-shape.scss,
+// one set of artwork for both sites).
+//
+// THIS REVERSES "JUST NOT THE BACKGROUND SHAPE" (2026-08-30, above), and
+// she said so herself: "I do know this was supposed to be an exercise in
+// editing". The fills she found too loud then were ten solid boxes; this is
+// 15% of the text colour at rest.
+//
+// FOOD'S STEPS, IN THIS SITE'S COLOURS: 15% of the text colour at rest, the
+// section's own hue under the pointer and when chosen -- the same three
+// variables the block used, so a chosen chip still answers its heading.
+//
+// THE BLOCK ABOVE STAYS AS THE FALLBACK, AND `:has()` IS WHAT RETIRES IT. A
+// chosen chip's word is the page's dark ground; if the artwork has not
+// arrived, with no block it would be dark on dark and unreadable, which food
+// never risks because its word is dark on paper either way. So the flat block
+// shows until the slot actually holds a shape, and then gives way to it.
+//
+// `isolation: isolate` because the slot sits at z-index -1: without a
+// stacking context of the chip's own it would paint behind the panel.
+.btn-mood,
+.btn-chaos {
+  position: relative;
+  isolation: isolate;
+  white-space: nowrap;
+
+  .tag-shape { color: rgba($color-text, 0.15); }
+
+  // UNDER THE POINTER THE TAPE TAKES THE SECTION'S HUE -- Helen, the same day,
+  // asking for food's row-badge hover on both sites: "using the section
+  // colours for the tape on hover and active". The word cannot stay in the
+  // hue (#777) on a tape of the same hue, so it goes dark, as food's does.
+  // Gated on the shape having loaded for the same reason as the block: until
+  // then the #777 hover above still applies, a hued word on the bare ground.
+  &:hover:not(.is-on):has(.tag-shape svg),
+  &:focus-visible:not(.is-on):has(.tag-shape svg) {
+    color: var(--drink-btn-hover-word, #{$color-bg});
+
+    .tag-shape { color: var(--drink-btn-hover, #{$color-wicked-woowoo}); }
+  }
+
+  &.is-on:has(.tag-shape svg) { background: none; }
+}
+
+.drink-filter--chaos  .btn-chaos.is-on .tag-shape { color: $color-heading-yolo; }
+.drink-filter--mood   .btn-mood.is-on  .tag-shape { color: $color-heading-mood; }
+.drink-filter--hassle .btn-mood.is-on  .tag-shape { color: $color-heading-hassle; }
+
 // BIGGER, WHITE, AND HOVERING TO MAGENTA — Helen's settings, 2026-09-02.
 //
 // THE REST STATE GOING TO WHITE IS WHAT FORCES THE HOVER TO CHANGE, and the two
@@ -658,9 +712,21 @@
   &:focus-visible:not(.is-on) { color: var(--drink-btn-hover, #{$color-wicked-woowoo}); }
 }
 
-.drink-filter--chaos  { --drink-btn-hover: #{$color-heading-yolo}; }
-.drink-filter--mood   { --drink-btn-hover: #{$color-heading-mood}; }
-.drink-filter--hassle { --drink-btn-hover: #{$color-heading-hassle}; }
+// `-word` IS THE HOVERED WORD ONCE THE TAPE HAS LIT (#1219, below): the hue
+// taken most of the way to the page's ground, which is this site's version
+// of food's dark-of-the-hue on its lightened tape.
+.drink-filter--chaos {
+  --drink-btn-hover: #{$color-heading-yolo};
+  --drink-btn-hover-word: #{mix($color-heading-yolo, $color-bg, 20%)};
+}
+.drink-filter--mood {
+  --drink-btn-hover: #{$color-heading-mood};
+  --drink-btn-hover-word: #{mix($color-heading-mood, $color-bg, 20%)};
+}
+.drink-filter--hassle {
+  --drink-btn-hover: #{$color-heading-hassle};
+  --drink-btn-hover-word: #{mix($color-heading-hassle, $color-bg, 20%)};
+}
 
 // --- the two ingredient fields -----------------------------------------------
 // NO RULE ABOVE IT -- #548 point 3. A full-width border sat here, separating
@@ -753,158 +819,100 @@
 // and the rule is gone rather than restating the value it inherits.
 
 
+// No gap: the chips carry food's own margins now (@mixin index-chip), as
+// food's pool does.
 .drink-pool {
   display: flex;
   flex-wrap: wrap;
-  gap: $space-xs;
   align-items: center;
 }
 
-// The "+N more" note. Quiet, and not a button: it is telling you the pool is
-// truncated, not offering to untruncate it — the way to see the rest is to
-// type another letter, which is what it says.
-.drink-pool-more {
-  font-size: 0.74rem;
+// `.drink-pool-more`, the "+N more" note, stood here until 2026-10-11. The
+// pool is not capped any more, so there is no remainder to announce.
+
+// "hiding lime juice", after the chosen LEAVE OUT chips -- food's own line
+// (`.exclude-count`, #1088), asked for here on 2026-10-11. Quiet prose, not
+// a control: the chips are the only thing in the row you can click.
+.drink-pool-hiding {
+  font-size: 0.78rem;
   color: $color-clear-text;
-  font-style: italic;
 }
 
+// The line ends its row, so the candidates start on the next one: food keeps
+// its chosen pills and this sentence in a row of their own, and a sentence
+// running straight into the first candidate read as one list. Nothing after
+// it, nothing to break.
+.drink-pool-break {
+  flex-basis: 100%;
+  height: 0;
+
+  &:last-child { display: none; }
+}
+
+// BOTH POOLS' CHIPS ARE FOOD'S, FROM FOOD'S OWN CODE -- 2026-10-11. Helen: "I
+// would like the cocktail has to have and leave out search results to take all
+// their styling from food's. So the tape in has to have should be the same
+// size with the same spacing (can we reuse the code? if not then why not?),
+// search results appear in courier with the same spacing and the analogous woo
+// woo (start with this even if we then need to tune for visibility), no
+// outline or underline at rest, all of it. Same for leave out."
+//
+// So every rule below is an @include of a mixin in shared/_rule.scss that
+// food's `.btn-tag` includes too, and what is written here is only this site's
+// colours:
+//
+//   rest        the text colour taken 27% towards the ground -- food's chip
+//               rests at its ink lightened 22%, the same softening
+//   hover       the full text colour
+//   a hit       HAS TO HAVE: the hot magenta, with the stroke. Food's is the
+//               DARK of its section hue because it sits on paper; on this
+//               ground the hue itself is the readable one. UNTUNED, at her
+//               word. LEAVE OUT: the resting colour with the stroke, weight
+//               and no hue, as food's is since the same day
+//   chosen      HAS TO HAVE: on the tape in the heading's magenta,
+//               the word in the page's ground. LEAVE OUT: struck through
+//
+// WHAT THIS REPLACED, all of it Helen's own earlier rulings and all in git: a
+// 1.5px box in the body face (2026-08-30), the box moving on hover rather than
+// the text (2026-09-02), a band then a block for chosen (#1134, cut tight and
+// centred on the word), a dashed box for LEAVE OUT, and a magenta underline on
+// a hit (#549). The tight block lasted one more build as an inset tape.
+//
+// WHAT IS STILL THIS SITE'S: a chosen HAS TO HAVE chip keeps its x, the "(via
+// a name it does not show)" bracket.
+$pool-chip-rest: mix($color-text, $color-bg, 73%);
+
 .btn-pool {
-  @extend %drink-btn-base;
-  font-size: 0.8rem;
-  padding: 0.25rem 0.65rem;
+  @include index-chip($pool-chip-rest);
 
-  // LOWERCASED IN CSS, NOT IN THE MARKUP -- #543/#553's rule, and the chips
-  // needed it the moment they started wearing card names (2026-08-29). The
-  // pool used to be built from the downcased attribute, so every chip was
-  // lowercase by accident of the data; a chip now carries the card's own name,
-  // capitals and all, which would have put `Demerara rum` beside `gin` and
-  // `coconut rum`. The DOM keeps its capitals so copy-paste and screen readers
-  // are untouched, exactly as on the cards.
-  text-transform: lowercase;
-
-  // THE BOX MOVES AND THE TEXT DOES NOT -- Helen, 2026-09-02: "for has to have,
-  // I think the mouseover text being pink is a bit much... make it behave like
-  // the leave out, where mouseover outlines the box but leaves the text styling
-  // alone."
-  //
-  // The text had been changing colour ON TOP OF the border, so a hovered chip
-  // whose words already carried magenta word-match underlines went almost
-  // entirely magenta -- three uses of one colour on one small object. LEAVE OUT
-  // had it right by accident of being colourless: a chip HAS a box, which is a
-  // change available to it and not to a bare filter word, so the box is the
-  // thing to move.
-  &:hover,
-  &:focus-visible { border-color: $color-wicked-woowoo; }
-
-  // WHAT A CHOSEN CHIP SHARES WITH EVERY OTHER SECTION'S. The fill itself is
-  // per section, below: HAS TO HAVE inverts (#1134) and LEAVE OUT deliberately
-  // does not, so the two cannot be stated here.
-  //
-  // THIS BLOCK USED TO BAND RATHER THAN FILL, and the reversal is Helen's own,
-  // twice over. She ruled the band in on 2026-08-30 ("has to have chips should
-  // show magenta underline on select rather than fill in on select", when the
-  // fills on this page "were beginning to become too loud"), and narrowed it on
-  // 2026-09-02 ("the has to have selected button should lose its pink underline
-  // when it gains its pink box"). What changed underneath both is that every
-  // OTHER chip on the site has since become a filled block -- the filter
-  // buttons in #1086 ("B: filled block") and the cards' own matched chips in
-  // #1099/#1100 ("Chip option B please") -- so by 2026-09-17 the band was not
-  // the quiet choice any more, it was the odd one out. #1134 is her closing
-  // that gap: "HAS TO HAVE chips should also invert when active, same as YOLO,
-  // MOOD and HASSLE."
-  &.is-on {
-    font-weight: 600;
-    text-decoration: none;
+  &:focus-visible {
+    outline: 2px solid $color-wicked-woowoo;
+    outline-offset: 2px;
   }
 }
 
-// HAS TO HAVE INVERTS, AND IT IS THE FILTER BUTTONS' OWN `.is-on` -- #1134,
-// 2026-09-17. Helen: "I'm keen you copy as much of the styling as possible from
-// the existing active chips because I love them!" So this is
-// `%drink-btn-naked`'s active state (above) with nothing invented: the fill
-// carries the section's hue, the letter goes to the PAGE'S OWN GROUND so it
-// reads as punched out of the block, and the faux-bold stroke flips to the
-// letter's colour with it.
-//
-// SELECTED BY SECTION, exactly as `.drink-filter--mood .btn-mood.is-on` is, and
-// that is load-bearing rather than stylistic: `.btn-pool` is BOTH pickers'
-// chip, and LEAVE OUT's chosen state is deliberately colourless (below). A bare
-// `.btn-pool.is-on` carrying the stroke would hollow out every excluded chip in
-// $color-bg on a dark page -- the section wrapper is what keeps the two apart.
-//
-// $color-heading-include IS THE SAME VARIABLE THE HEADING USES, so the block and
-// the words HAS TO HAVE cannot drift; it resolves to the hot magenta, which
-// already means MATCHED everywhere on a card. Measured before copying the
-// treatment across (tmp/chip_contrast.py): the dark letter reads 5.59:1 on this
-// magenta, beside 6.66:1 on MOOD's coral and 6.19:1 on HASSLE's pink -- the
-// same family, and clear of 4.5:1. The palette's old note that a DEEP magenta
-// "has to go almost to black before it clears 4.5" was about ink ON magenta at
-// text sizes; this is the page's near-black, which is that black.
-//
-// THE BORDER TAKES THE FILL'S COLOUR rather than staying $color-border: these
-// chips have a 1.5px outline where `.btn-mood` is naked, and a chosen chip
-// should read as one solid block, not as a block inside a grey frame. It is a
-// colour change only -- the border-WIDTH is untouched, so the box measures
-// exactly what it measured at rest and the chips beside it do not move
-// (§13.4.2, and test_no_active_filter_button_changes_its_own_width).
-// CUT TIGHT TO THE WORDS, AND PAINTED RATHER THAN PADDED -- #1134 round two,
-// 2026-09-17. Helen, on the first version: "please cut the active chip
-// background in the HAS TO HAVE filter section tighter to the words. Because
-// the lettering is (rightly) smaller here than for the other chips, the
-// background looks enormous."
-//
-// SHE IS DESCRIBING A REAL RATIO AND IT MEASURES. At 1280 a chosen chip here
-// and a chosen MOOD chip draw almost exactly the same block -- 26.6px tall
-// against 26.9px -- around lettering of 12.8px and 14.4px. The padding is the
-// same in `em`; what differs is that this chip's type is a sixth smaller, so
-// the same block holds visibly less ink. Filling the whole padding box was
-// right for `.btn-mood` and too much here.
-//
-// THE BOX MUST NOT MOVE, WHICH IS WHY THIS IS A GRADIENT AND NOT LESS PADDING.
-// #389: a chosen filter may not resize itself, or every chip after it on the
-// row slides along -- and these chips WRAP, so a resize would reflow the pool.
-// (`test_no_active_filter_button_changes_its_own_width` scans `btn-mood` and
-// `btn-chaos`, not `btn-pool`, so the rule here is kept by construction: this
-// declares no layout property at all.) A one-colour `linear-gradient` is a
-// background IMAGE, so `background-size` can shrink the painted block inside a
-// box that does not change -- paint only, §13.4.2.
-//
-// THE TWO NUMBERS, in `em` so they follow this chip's own smaller type: 0.7em
-// off the width and 0.3em off the height, centred. Against the padding box
-// that leaves about 5.9px of block each side of the word rather than 10.4px,
-// and about 2px above and below the line box -- a block that hugs the word,
-// with the chip's own hit area unchanged around it.
-//
-// THE BORDER GOES TRANSPARENT rather than taking the fill's colour. Tracing the
-// full box in magenta would restore exactly the shape this change removes, and
-// a grey frame around a magenta block reads as two objects. Transparent keeps
-// the 1.5px the box has always reserved, so again nothing moves.
-// CENTRED ON THE WORD, NOT ON THE BOX -- Helen, 2026-09-17: "please centre the
-// box on the word vertically." `center` centres the block in the PADDING BOX,
-// and a line box is not centred on its own ink: the face's ascent and descent
-// are asymmetric and the leading is split evenly above and below, so the glyphs
-// sit high inside it and the block hangs low.
-//
-// 0.12em IS MEASURED, NOT NUDGED (tmp/chip_centring.py, which reads the block's
-// edges and the ink's edges out of a 2x crop of the real page): the block's
-// centre sat 3 device pixels -- 1.5 CSS px -- above the ink's centre, and
-// 0.12em of this chip's 12.8px type is that 1.5px. In `em` so it holds if the
-// chip's size ever moves.
-//
-// LONGHANDS RATHER THAN THE SHORTHAND, because `background-color` now has to be
-// reset explicitly: %drink-btn-base sets `background: $color-surface` and the
-// shorthand used to clear it for free.
+// Two classes, so it outranks the hit rules below whichever comes first. The
+// stroke follows the fill: a hit carries one in its resting colour.
+.drink-pool .btn-pool:not(.is-on) {
+  &:hover,
+  &:focus-visible {
+    color: $color-text;
+    -webkit-text-stroke-color: $color-text;
+  }
+}
+
+// THE BLOCK IS THE FALLBACK AND `:has()` RETIRES IT, as on the filter chips
+// above: the chosen word is the page's dark ground, so until the artwork has
+// arrived it needs something behind it. The slot is put in by
+// cocktail-index.js's chip().
 .drink-search--include .btn-pool.is-on {
-  background-color: transparent;
-  background-image: linear-gradient($color-heading-include, $color-heading-include);
-  background-repeat: no-repeat;
-  background-size: calc(100% - 0.7em) calc(100% - 0.3em);
-  background-position: center calc(50% + 0.12em);
-  border-color: transparent;
-  color: $color-bg;
-  -webkit-text-stroke: 0.05em $color-bg;
-  text-shadow: none;
+  @include index-chip-chosen($color-bg);
+  isolation: isolate;
+  background: $color-heading-include;
+
+  .tag-shape { color: $color-heading-include; }
+
+  &:has(.tag-shape svg) { background: none; }
 }
 
 // LEAVE OUT IS DELIBERATELY COLOURLESS. Violet lived here for one revision and
@@ -916,39 +924,10 @@
   .drink-field-label { color: $color-clear-text; }
   .drink-search-input { border-bottom-style: dashed; border-bottom-color: $color-border; }
 
-  // THE STRIKETHROUGH IS A STATE, NOT A DECORATION — #522, and it was more
-  // than cosmetic. Every candidate in this pool rendered pre-struck, so a
-  // word you had merely typed towards looked like a word you had already
-  // excluded: the control was reporting an action you had not taken. The
-  // dashed border still marks the whole section as the negative one.
-  .btn-pool {
-    color: $color-clear-text;
-    border-style: dashed;
-
-    &:hover,
-    &:focus-visible { color: $color-text; border-color: $color-text; }
-
-    // Struck through only once chosen, which is also the moment it becomes
-    // literally true of the results.
-    &.is-on {
-      background: transparent;
-      border-color: $color-text;
-      color: $color-text;
-      font-weight: 600;
-
-      // THE STRIKE RUNS THROUGH THE INGREDIENT, NOT THROUGH THE ×, and that is
-      // why the chip's word sits in a span of its own. This declaration was on
-      // the button until 2026-08-30; the moment a chosen chip gained a trailing
-      // × (Helen: "add an x for a clear button to the right of selected chips
-      // on the cocktail site, same as food"), a button-level line-through
-      // struck the × too -- which reads as "this control is disabled" rather
-      // than "this ingredient is out".
-      //
-      // Food met this first and fixed it identically: its own rule strikes only
-      // .btn-exclude-label. Same bug, same shape, same answer -- worth noting
-      // because the two pickers are separate code and arrived at it separately.
-      .btn-pool-label { text-decoration: line-through; }
-    }
+  // THE STRIKETHROUGH IS A STATE, NOT A DECORATION -- #522: only a chosen chip
+  // is struck, and only its word, not its x. Food's rule, from food's mixin.
+  .btn-pool.is-on {
+    @include index-chip-struck($color-text, $color-clear-text, '.btn-pool-label');
   }
 }
 
@@ -1159,18 +1138,11 @@
 // what the vocabulary brought along. An (all) button is always marked, by
 // construction: a family only forms when its own name starts with the query.
 //
-// A BAND UNDER THE TEXT, NOT A FILL, and that is the language this site already
-// speaks (MANUAL §9.13). Helen, on a card carrying three filled things:
-// "There's just a lot going on... underline the ingredient rather than
-// highlight." A pool of eight candidates with two of them filled would be that
-// complaint again, one control higher. `text-decoration` rather than the
-// headings' inset box-shadow because a chip's text can wrap and a box-shadow
-// gives a wrapped fragment an odd stub.
+// COLOUR AND WEIGHT, NOT A BAND, SINCE 2026-10-11 -- food's treatment, from
+// food's mixin. It was a magenta underline ("underline the ingredient rather
+// than highlight", when the alternative was a fill).
 .btn-pool--word-match {
-  text-decoration: underline;
-  text-decoration-thickness: 0.16em;
-  text-underline-offset: 0.16em;
-  text-decoration-color: $color-wicked-woowoo;
+  @include index-chip-word-match($color-wicked-woowoo);
 }
 
 // --- why this chip is here — #603 --------------------------------------------
@@ -1191,6 +1163,8 @@
   font-size: 0.86em;
   color: $color-clear-text;
   text-decoration: none;
+  // A hit's stroke inherits; the bracket is not part of the hit.
+  -webkit-text-stroke: 0;
 }
 
 // LEAVE OUT KEEPS ITS COLOURLESSNESS HERE TOO. It has no hue by decision --
@@ -1211,11 +1185,10 @@
 // picker DOES with it -- and `test_both_ingredient_pickers_mark_their_word_matches`
 // is food's guard against the identical fault.
 //
-// The colour lift stays. This section rests at $color-clear-text so its
-// candidates read as the quieter pool, and a marked one still wants to be the
-// brighter of the two.
+// WEIGHT AND NO HUE SINCE 2026-10-11: the resting colour with the stroke,
+// which is what food's LEAVE OUT does from the same day.
 .drink-search--exclude .btn-pool--word-match {
-  color: $color-text;
+  @include index-chip-word-match($pool-chip-rest);
 }
 
 // --- the matched run of a drink name — #564 ----------------------------------
@@ -1334,7 +1307,7 @@
 // with `margin-left: auto`, at its own size and colour; food's is pinned to the
 // panel's top-right corner. Helen: "I'd expect the clear all button to look the
 // same and be in the same place too."
-.btn-clear { @include index-clear-all; }
+.btn-clear { @include index-clear-all($color-wicked-woowoo); }
 
 // Shared -- @mixin index-clear-all-bottom.
 .btn-clear--bottom { @include index-clear-all-bottom; }

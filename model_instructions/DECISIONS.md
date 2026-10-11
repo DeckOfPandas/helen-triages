@@ -10005,6 +10005,127 @@ verification. Dates are when the correction landed.
     The universe line may still deal a hidden draft. Both labels are the
     issue's own words.
 
+- **2026-10-11, #1219 — ONE CHIP ON BOTH INDEXES: COCKTAILS' TYPE, FOOD'S
+  TAPE. FOOD'S HEADINGS AT COCKTAILS' SIZE. AND THE PHONE FOLD, CHOSEN ON THE
+  10TH, IS NOT BUILT.** The issue was the design review's "the two indexes'
+  controls differ" finding. Checked against the code first, because work had
+  moved on: the text inputs had already converged and clear-all was identical;
+  the chips and the section labels still differed.
+  - **The chips.** Five treatments went on a candidates page. Helen: *"I
+    expected to agree to dropping the tape backgrounds from food tag chips. In
+    fact, I find myself wanting to add the tape to the cocktail tags"*, and
+    asked for a sixth — *"keeping cocktail tag styling otherwise, just adding
+    the tape, meaning same for the food site"*. Then: *"I'm leaning towards F
+    -- cocktail chips, and tape on both sites! I do know this was supposed to
+    be an exercise in editing...but at least the sites will be consistent now
+    even if I'm leaning even further into more is more"*. So both sites'
+    chips are 0.9rem bold lowercase at full strength on a torn shape: 15% of
+    the text colour at rest, the section's hue under the pointer and when
+    chosen. **This reverses two earlier rulings and she knew it**: cocktails'
+    *"just not the background shape"* (2026-08-30), and food's capitals on a
+    chosen chip — cocktails' chosen chip never changed case, and F is
+    cocktails' chip.
+  - **Hover was 40% of the ink for a few hours, and she changed it on
+    seeing it:** *"the darkened text on the darkened tape is hard to read,
+    plus I'd just like some more colour. I like the hover behaviour we use
+    for the chips on the recipe list below, so please match that -- bringing
+    the background to the section's colour on hover and active. Match the
+    text colour too on hover. Then keep the text colour black for active."*
+    And for cocktails, *"the same"*. So hover is food's `a.badge-*:hover`
+    on both: the tape in the hue, the word in a dark of it. On cocktails
+    that retires #777's hued word, which cannot sit on a tape of its own
+    hue; the dark is the hue mixed 20% into the ground.
+  - **What each site keeps:** its colours. Food's chosen tape is its section
+    hue lightened as before, with the dark of the hue on a hovered word
+    (lime and yellow cannot be read as words on paper). Cocktails' chosen
+    tape is the heading's own variable, the one the #1086 block used. That
+    block stays as a fallback behind `:has(.tag-shape svg)`, because a chosen
+    word there is the page's dark ground and would vanish if the artwork had
+    not arrived.
+  - **Not changed, and worth knowing:** the candidates in both search pools,
+    and the badges on food's recipe rows, which are still 0.75rem and still
+    go to capitals when a filter matches them. The chip and the row badge
+    for one tag are no longer the same size.
+  - **The artwork moved** to `assets/img/chrome/tag-shapes/` and is fetched
+    with `HTF.chromeAsset`. It is not chrome; it is the only other artwork
+    both sites wear, and a per-site copy is the drift #223 records.
+  - **Food's headings: 1.05rem to 1.4rem.** *"Please increase the size of
+    food's headings to match cocktails' as well, because they're a bit lost
+    amongst the newly chunky chips."* Size only — cocktails' weight 400 and
+    0.14em tracking are #680's corrections for light type on a dark ground.
+    This undoes the 2026-09-02 fold tightening for these labels.
+  - **The cost is all food's.** Panel at 1280px: 476 to 558px, first recipe
+    824 to 906px down. At 390px: 815 to 1033px, first recipe 1128 to 1346px.
+    Cocktails measures exactly as before (517 / 953px; 985 / 1433px).
+  - **Cocktails' two search pools are food's, from food's code — two passes
+    the same day.** First: *"add the tape on has to have, and drop the outline
+    on leave out"*, which I read literally and built as an inset tape with HAS
+    TO HAVE's candidates still boxed. She corrected the reading: *"I would
+    like the cocktail has to have and leave out search results to take all
+    their styling from food's. So the tape in has to have should be the same
+    size with the same spacing (can we reuse the code? if not then why not?),
+    search results appear in courier with the same spacing and the analogous
+    woo woo (start with this even if we then need to tune for visibility), no
+    outline or underline at rest, all of it. Same for leave out."* **When she
+    says match, she means all of it; do not ration it against an older
+    ruling.** The code is reused: four mixins in `shared/_rule.scss`
+    (`index-chip`, `-word-match`, `-chosen`, `-struck`) that food's `.btn-tag`
+    and cocktails' `.btn-pool` both include, with colours as arguments. That
+    retires the 1.5px box, the box-moves-on-hover ruling, #1134's tight
+    block and #549's magenta underline. A HAS TO HAVE hit is the hot magenta,
+    **untuned at her word**. Cocktails keeps the × on a chosen HAS TO HAVE
+    chip, the "(via)" bracket and "+N more".
+  - **A LEAVE OUT hit is the base grey, heavier, on both sites.** *"For the
+    food leave out search, hit search results should be a normal base grey
+    (just heavier for hits, as currently), rather than taking their colour
+    from the section."* It had borrowed HAS TO HAVE's tone since 2026-09-04.
+    Both pickers still mark a hit (#390); only HAS TO HAVE spends a hue.
+  - **Food's chosen LEAVE OUT pills sit above the candidates**, as
+    cocktails' do: *"retains selected terms at the top of the list when
+    further searches are made, which I prefer"*.
+  - **Every clear, on both sites, is the text colour and goes magenta under
+    the pointer.** *"I'm fed up with the clear and clear all buttons! Please
+    show each one in normal link colours, so not derived from the section
+    colour. Normal base text, site colour on hover (both woo woo)."* One
+    mixin, `index-clear-link`. This ends the per-section clear colours on
+    food and the grey on cocktails (2026-09-02) and on both clear-alls.
+  - **"hiding gin" under cocktails' LEAVE OUT**, food's #1088 line word for
+    word, after the chosen chips and ending its row.
+  - **Cocktails' pickers answer from the first character**
+    (`min_query_chars` 3 to 1), reversing #584. *"Mostly because I think
+    this is very very cute in a static site, but also because seeing a list
+    provides inspiration."* The name box never had a minimum.
+  - **And cocktails' pools are not capped** (`pool_cap` was 8, with a
+    counted "+N more"). *"I don't want to have the 'N more' behaviour for
+    cocktails -- please remove it. It's helpful to see the list when e.g.
+    rum has so many results. (Plus super cute, as I said!)"* One letter
+    now offers about fifty chips. The key, the count and the note are gone
+    from the data, the module and the page.
+  - **Choosing a HAS TO HAVE candidate on food clears the search**, so the
+    chip joins the chosen ones and the rest go, as on cocktails and as
+    food's LEAVE OUT already did. This trades away #1092's picking several
+    from one search; the requirement is still AND. She asked whether it
+    was a regression: it was not, it was #1092 as built.
+  - **A chosen HAS TO HAVE chip on food carries an x**, as cocktails' does.
+  - **Nothing chosen changes case, on either index.** *"Let's stop
+    capitalising selected search result tags, both sites please."*
+  - **Asked and answered, not built: should a matched mood chip on a
+    cocktail card take the tape?** She could argue it either way. My
+    answer was no: the card chip is cut tight to a small word, and the
+    tear needs the filter chip's padding to read; the cards are laid out
+    by measurement; and the block already answers the filter in its hue.
+  - **The fold.** Four phone-panel treatments went on a second candidates
+    page on the 10th; she chose *"sections fold"* and declined three boxes on
+    one row (*"nice looking, but I don't think it's clear enough"*). It was
+    built and opened as PR #1363 (food's panel 815 to 567px at 390). The next
+    day: *"I'm afraid I've changed my mind: I don't want to fold the sections.
+    The site is for me, and on my iPad I can see everything at the same time
+    just fine, which is what I want. It's even fine on my phone too,
+    honestly."* **Do not offer it again on the grounds that the panel is
+    tall**: it is taller now than when she said that, and she chose both in
+    the same message. The branch `design/1219-phone-fold` holds the build if
+    it is ever wanted.
+
 ## §14 Reference pages
 
 - **2026-08-11/12** — Built at Helen's request from 15 draft tables in

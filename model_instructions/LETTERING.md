@@ -184,7 +184,7 @@ four days, so they were dropped on 2026-09-06 — grep the selector.
 | `.recipe-title-text` | `_sass/food/_recipe-header.scss` | 2.2rem | display (offset-lg) — Helen, later the same day: "recipe title goes hard like the wordmark" |
 | `.recipe-section-heading` | `_sass/food/_recipe-header.scss` | 1.8rem | heading (offset-lg) |
 | `.recipe-meta li strong` (SERVES/PREP/COOK) | `_sass/food/_recipe-header.scss` | 0.85rem | label |
-| `.category-label` (index filter heading) | `_sass/food/_category-labels.scss` | 1.05rem | heading |
+| `.category-label` (index filter heading) | `_sass/food/_category-labels.scss` | 1.4rem | heading |
 | `.ct-field > span` (timings field label) | `_sass/food/_timings.scss` | 0.7rem | label |
 | `.ct-card-name` | `_sass/food/_timings.scss` | 1rem | heading — boundary case, see §5.1 |
 | `.tc-row-label` (temperature chart row) | `_sass/food/_temperature-chart.scss` | 0.78rem | label |

@@ -88,13 +88,7 @@
 }
 
 // --- Global clear-all button (JS-created, prepended to .controls) -----
-.btn-clear {
-  @include index-clear-all;
-
-  &:hover {
-    color: $color-star-root;
-  }
-}
+.btn-clear { @include index-clear-all($color-accent); }
 
 // Issue #67: the same button repeated after the last filter section, so
 // clearing doesn't mean scrolling back past all five. Overrides the base

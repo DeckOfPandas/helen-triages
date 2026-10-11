@@ -139,7 +139,7 @@
     var cfg = voc.search || {};
     var bottles = bottleData || {};
 
-    /* Three numbers, and none of them is written down in this file. They live
+    /* Two numbers, and neither is written down in this file. They live
        in _data/cocktails/ingredients.yml beside the vocabulary they govern,
        the same rule food's `family_button_min_chars` follows and
        test_the_cocktail_search_config_is_not_hardcoded enforces. #549 point 4
@@ -148,7 +148,6 @@
        question about this algorithm. */
     var MIN_QUERY_CHARS = cfg.min_query_chars;
     var FAMILY_BUTTON_MIN_CHARS = cfg.family_button_min_chars;
-    var POOL_CAP = cfg.pool_cap;
 
     var families = (voc.families || []).map(String);
     var familyOfGeneric = voc.family_of || {};
@@ -605,16 +604,16 @@
     // THE SEARCH
     // ------------------------------------------------------------------------
 
-    /* Returns { familyButtons, results, hidden }.
+    /* Returns { familyButtons, results }.
 
-       `hidden` is a COUNT, not a silence. A pool that quietly stops at eight
-       looks like a complete answer and the one you wanted may be the ninth --
-       the same rule the rest of this repo holds itself to. Family buttons are
-       not counted against the cap: they are a different offer, and capping an
-       umbrella to make room for the things it stands over is backwards. */
+       EVERY CANDIDATE, NOT THE FIRST EIGHT -- Helen, 2026-10-11: "I don't
+       want to have the 'N more' behaviour for cocktails -- please remove
+       it. It's helpful to see the list when e.g. rum has so many results."
+       There was a `pool_cap` and a counted remainder ("+16 more"); food's
+       picker never had either. */
     function search(rawQuery, pool, chosen) {
       var typed = String(rawQuery == null ? '' : rawQuery).trim();
-      var empty = { familyButtons: [], results: [], hidden: 0 };
+      var empty = { familyButtons: [], results: [] };
       if (typed.length < MIN_QUERY_CHARS) return empty;
 
       var query = normalise(typed);
@@ -861,8 +860,7 @@
          day this rule was ported, the same session had just shipped a startup
          crash that lived in DOM wiring and that every pure-module test passed
          straight over. A rule with a reason is a decision, and decisions belong
-         where they can be asked a question. Filtered BEFORE the cap, so the
-         "+N more" count never counts a chip nobody will be shown. */
+         where they can be asked a question. */
       // The buttons array holds BARE labels -- the index appends the suffix
       // when it draws them -- so there is nothing to strip here. Slicing the
       // suffix off anyway turned `gin` into an empty string and suppressed
@@ -874,8 +872,7 @@
 
       return {
         familyButtons: familyButtons,
-        results: offered.slice(0, POOL_CAP),
-        hidden: Math.max(0, offered.length - POOL_CAP)
+        results: offered
       };
     }
 

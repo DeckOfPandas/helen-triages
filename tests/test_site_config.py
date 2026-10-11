@@ -3334,6 +3334,50 @@ def test_no_site_holds_a_copy_of_the_chrome_artwork():
     )
 
 
+def test_both_indexes_filter_chips_wear_the_shared_tape():
+    """#1219: one chip on both sites, and three places it can silently come apart.
+
+    Helen, 2026-10-11, from the control-layer candidates page: "cocktail chips,
+    and tape on both sites!" The tape is a `.tag-shape` slot in the markup,
+    filled by decorations.js's tagShapes() from one set of artwork. Each of
+    these fails without a console message: a chip with no slot is a bare word;
+    a chip class missing from tagShapes()'s host list is skipped (the bug its
+    own comment records for `.ingredient-pill`); and a shape missing from the
+    shared folder is a slot that stays empty -- on cocktails, behind a chosen
+    chip whose word is the page's own dark ground.
+    """
+    cocktails = (ROOT / "cocktails" / "index.html").read_text(encoding="utf-8")
+    chips = re.findall(r'<button type="button" class="btn-(?:chaos|mood)"[^>]*>(.*?)</button>', cocktails)
+    assert chips, "cocktails/index.html emits no .btn-chaos or .btn-mood buttons."
+    bare = [c for c in chips if not c.startswith('<span class="tag-shape" aria-hidden="true"></span>')]
+    assert not bare, f"Cocktail filter chips with no .tag-shape slot: {bare}"
+
+    group = (ROOT / "_includes" / "filter_group.html").read_text(encoding="utf-8")
+    assert '<span class="tag-shape" aria-hidden="true"></span>{{ item }}' in group, (
+        "_includes/filter_group.html no longer puts a .tag-shape slot in food's chips.")
+
+    decorations = (JS_DIR / "decorations.js").read_text(encoding="utf-8")
+    hosts = re.search(r"slot\.closest\('(\.badge, [^']+)'\)", decorations)
+    assert hosts, "decorations.js's tagShapes() no longer finds a slot's host with closest()."
+    for cls in (".btn-tag", ".btn-star", ".btn-chaos", ".btn-mood", ".btn-pool"):
+        assert cls in hosts.group(1).split(", "), (
+            f"{cls} is not in tagShapes()'s host list, so its slots are skipped.")
+    assert "HTF.chromeAsset('/tag-shapes/' + shape + '.svg')" in decorations, (
+        "tagShapes() must fetch from the shared set: siteAsset() would look in "
+        "assets/img/cocktails/, which holds no shapes.")
+
+    pool = re.search(r"var POOL = \[(.*?)\];", decorations, re.S)
+    assert pool, "decorations.js's tagShapes() no longer declares POOL."
+    shapes = re.findall(r"'(tag-shape-[^']+)'", pool.group(1))
+    missing = [s for s in shapes
+               if not (ROOT / "assets" / "img" / "chrome" / "tag-shapes" / f"{s}.svg").is_file()]
+    assert shapes and not missing, f"Shapes in POOL with no file in assets/img/chrome/tag-shapes/: {missing}"
+
+    for entry in ("food.scss", "cocktails.scss"):
+        assert '@import "shared/tag-shape";' in (ROOT / "assets" / "css" / entry).read_text(encoding="utf-8"), (
+            f"assets/css/{entry} does not import the tape slot.")
+
+
 # =============================================================================
 # THE COCKTAIL INDEX — GitHub issue #579
 # =============================================================================
@@ -3434,7 +3478,7 @@ def test_the_cocktail_index_never_matches_an_ingredient_by_substring():
 
 
 def test_the_cocktail_search_thresholds_are_not_hardcoded():
-    """The three numbers live in the vocabulary, not in the algorithm.
+    """The two numbers live in the vocabulary, not in the algorithm.
 
     Same rule food's `family_button_min_chars` follows, and for the same reason:
     how much typing earns a pool of candidates is a question about this
@@ -3446,18 +3490,19 @@ def test_the_cocktail_search_thresholds_are_not_hardcoded():
     search = vocab.get("search")
     assert isinstance(search, dict), (
         "_data/cocktails/ingredients.yml has no `search:` block. It carries the "
-        "drinks index's minimum query length, family-button threshold and pool "
-        "cap; without it cocktail-search.js falls back to defaults and the "
+        "drinks index's minimum query length and family-button threshold "
+        "(there was a pool cap too, until 2026-10-11); without it "
+        "cocktail-search.js falls back to defaults and the "
         "numbers stop being editable."
     )
-    for key in ("min_query_chars", "family_button_min_chars", "pool_cap"):
+    for key in ("min_query_chars", "family_button_min_chars"):
         assert isinstance(search.get(key), int), (
             f"_data/cocktails/ingredients.yml's `search:` block is missing an "
             f"integer `{key}`."
         )
 
     js = _strip_js_comments(read("assets", "js", "cocktail-search.js"))
-    for key in ("min_query_chars", "family_button_min_chars", "pool_cap"):
+    for key in ("min_query_chars", "family_button_min_chars"):
         assert re.search(rf"cfg\.{key}\b", js), (
             f"assets/js/cocktail-search.js no longer reads `{key}` from the "
             f"vocabulary it was handed."

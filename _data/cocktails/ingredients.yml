@@ -312,7 +312,7 @@ juice_yields:
     ml_max: 240
 
 # --- what the index's ingredient pickers do with all this --------------------
-# THREE NUMBERS, HERE RATHER THAN IN THE SCRIPT, and for the reason food's
+# TWO NUMBERS (three until 2026-10-11), HERE RATHER THAN IN THE SCRIPT, and for the reason food's
 # `search: family_button_min_chars` is in _data/food/ingredient_words.yml: how
 # much typing earns a pool of candidates is a question about this vocabulary,
 # not about the algorithm that reads it. assets/js/cocktail-search.js writes
@@ -352,14 +352,24 @@ juice_yields:
 # Changing it needs no code touched, and `test_the_cocktail_search_config_is_
 # not_hardcoded` keeps it that way.
 #
-# `pool_cap` is how many candidates are shown at once. The remainder is always
-# COUNTED and said out loud ("+16 more -- keep typing"), never silently
-# dropped: a pool that stops at eight looks like a complete answer, and the one
-# you wanted may be the ninth.
+# AND IT IS 1 SINCE 2026-10-11, WHICH IS FOOD'S RULE AFTER ALL. Helen: "please
+# make the three cocktail search filters start filtering from the first
+# character, as we do for food. Mostly because I think this is very very cute
+# in a static site, but also because seeing a list provides inspiration."
+# Everything above is still true as measurement -- one and two letters
+# mostly overflow the cap, so the pool is eight chips and a "+N more" -- and
+# she has chosen the list over the tidy answer. The name box never had a
+# minimum. `family_button_min_chars` is untouched.
+#
+# AND THE CAP WENT THE SAME DAY, so the figures above describe a pool that no
+# longer exists. Helen: "I don't want to have the 'N more' behaviour for
+# cocktails -- please remove it. It's helpful to see the list when e.g. rum
+# has so many results. (Plus super cute, as I said!)" `pool_cap` was 8, with
+# the remainder counted out loud as "+16 more". Every candidate is offered
+# now, as food's picker has always done.
 search:
-  min_query_chars: 3
+  min_query_chars: 1
   family_button_min_chars: 3
-  pool_cap: 8
 
   # --- PROSE IS NOT A BOTTLE NAME -------------------------------------------
   # A `suggestion` is free text typed while transcribing a recipe, and some of

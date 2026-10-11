@@ -47,11 +47,12 @@
 //
 // Before adding a property here, ask whether it can change a box's size. If it
 // can, it belongs on the resting base as well or not at all.
-%btn-active-base {
-  text-transform: uppercase;
-  font-weight: 900;
-  background-color: rgba($color-text, $saturation-badge-bg);
-}
+//
+// `%btn-active-base` STOOD HERE AND IS @mixin index-chip-chosen IN
+// shared/_rule.scss SINCE 2026-10-11. Its last consumer was the chosen HAS
+// TO HAVE chip (_search.scss), and cocktails' chosen HAS TO HAVE chip is that
+// chip now, so the declarations moved to where both can include them. The
+// warning above went with them and still binds.
 
 // --- Filter Label Bases & Background Highlighters ---------------------------------
 // --- Index density ----------------------------------------------------------
@@ -119,9 +120,18 @@
     // $font-headings, NOT $font-label -- see _palette.scss. The five type
     // values are shared with cocktails' own filter labels; see
     // @mixin index-section-label in shared/_rule.scss.
-    @include index-section-label;
-    // 1.05rem (was 1.35rem before the 2026-09-02 index fold tightening) sits
-    // between the two offset values. Staying at 1px rather than rounding up
+    //
+    // 1.4rem SINCE 2026-10-11, #1219 -- cocktails' size, passed as an
+    // argument. Helen, choosing the bigger chips below: "Please increase
+    // the size of food's headings to match cocktails' as well, because
+    // they're a bit lost amongst the newly chunky chips." SIZE ONLY:
+    // cocktails' regular weight and wider tracking are corrections for a
+    // light glyph on a dark ground (#680), which this page does not have.
+    // This undoes the 2026-09-02 fold tightening for these labels, and she
+    // took the height knowingly.
+    @include index-section-label($size: 1.4rem);
+    // 1.05rem (was 1.35rem before the 2026-09-02 index fold tightening, and
+    // 1.4rem since 2026-10-11, above) sat between the two offset values. Staying at 1px rather than rounding up
     // to 2: this is a control-panel label with five of them stacked in a
     // screenful, not a landmark, and the ratio
     // matters least at the size where both values are close. Try
@@ -196,7 +206,9 @@
     border: 0;
     background: none;
     padding: 0;
-    color: inherit;
+    // Text colour at rest, the site's magenta under the pointer, for every
+    // clear on the page -- @mixin index-clear-link, 2026-10-11.
+    @include index-clear-link($color-accent);
 
     font-family: $font-body;
     font-size: 0.78rem;
@@ -209,17 +221,11 @@
     white-space: nowrap;
   }
 
-  // Inline clear colours per group — hover lightens to the raw root hue,
-  // same "hover goes lighter" rule article.recipe a and .btn-clear itself
-  // both already follow, rather than the previous opacity fade (a second,
-  // unrelated hover mechanism).
-  &.category--star      { .btn-clear-inline { color: $color-star-active;           &:hover { color: $color-star-root; } } }
-  &.category--mood      { .btn-clear-inline { color: $color-mood-active;           &:hover { color: $color-mood-root; } } }
-  &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; &:hover { color: $color-practicalities-root; } } }
-  // The two searches never had one. They do now, for the same reason the other
-  // three do: the clear link belongs to its section and should say so.
-  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active;     &:hover { color: $color-ingredient-root; } } }
-  &.search--name        { .btn-clear-inline { color: $color-name-search-active;    &:hover { color: $color-name-search-root; } } }
+  // FIVE PER-SECTION CLEAR COLOURS STOOD HERE AND ARE GONE, 2026-10-11 --
+  // each section's clear rested in the dark of its hue and lightened to the
+  // hue. Helen: "I'm fed up with the clear and clear all buttons! Please
+  // show each one in normal link colours, so not derived from the section
+  // colour." The one colour rule is in .btn-clear-inline above.
 
   // Active states -- compound selectors (.category--star .btn-star.active)
   // have higher specificity than the base .btn-tag/.btn-star rule above,
@@ -247,8 +253,16 @@
   // second colour. .tag-shape's own fill lightened further too (mix with
   // white, 12% -> 18%), Helen's second nudge on the same "back off the
   // loudness" idea.
+  //
+  // LOWERCASE WHEN CHOSEN SINCE 2026-10-11, #1219 -- the three rules below
+  // no longer @extend %btn-active-base, whose capitals and weight 900 were
+  // food's own chosen state. Cocktails' chosen chip never changed case
+  // (Helen, 2026-08-30: it "read as the word changing rather than the word
+  // being chosen"), and treatment F is cocktails' chip on both sites. The
+  // placeholder stays for the search pills in _search.scss. `background:
+  // none` stays too: it is what keeps the focus ring's 15% tint off a
+  // chosen chip.
   &.category--star .btn-star.active {
-    @extend %btn-active-base;
     background: none;
     color: $color-text;
     text-shadow: none;
@@ -257,7 +271,6 @@
   }
 
   &.category--mood .btn-tag.active {
-    @extend %btn-active-base;
     background: none;
     color: $color-text;
     text-shadow: none;
@@ -266,7 +279,6 @@
   }
 
   &.category--practicalities .btn-tag.active {
-    @extend %btn-active-base;
     background: none;
     color: $color-text;
     text-shadow: none;
@@ -286,6 +298,64 @@
 
   &.category--practicalities .btn-tag:focus-visible {
     outline-color: $color-practicalities-root;
+  }
+
+  // COCKTAILS' CHIP, WITH FOOD'S TAPE -- #1219, 2026-10-11. Helen, from the
+  // control-layer candidates page, where she had expected to take the tape
+  // OFF food: "I find myself wanting to add the tape to the cocktail
+  // tags", then "I'm leaning towards F -- cocktail chips, and tape on both
+  // sites!... at least the sites will be consistent now even if I'm leaning
+  // even further into more is more".
+  //
+  // So the three chip sections take cocktails' numbers, from
+  // _sass/cocktails/_filters.scss: 0.9rem, line-height 1.2, full-strength
+  // text, 0.5rem between chips on top of each chip's own margin. Under the
+  // pointer the WORD takes its section's colour, as cocktails' does -- the
+  // dark of each hue, the one the section's own clear link uses, because
+  // lime and yellow cannot be read as words on paper. The tape keeps food's
+  // colours: 15% of the ink at rest (_buttons.scss), the section's hue under
+  // the pointer and when chosen.
+  //
+  // `:not(.search)` IS THE SCOPE: the ingredient pool's candidates are
+  // .btn-tag too and stay as they were, as cocktails' own pool chips did
+  // ("the search returns could stay as they are").
+  //
+  // Nothing here applies to `.active` alone, so a chosen chip still measures
+  // what it measured at rest (#389).
+  &:not(.search) {
+    .category-buttons { gap: $space-sm; }
+
+    .btn-star,
+    .btn-tag {
+      font-size: 0.9rem;
+      line-height: 1.2;
+      color: $color-text;
+
+      // THE TAPE LIGHTS UNDER THE POINTER TOO -- Helen, the same day, on the
+      // first build: "the darkened text on the darkened tape is hard to
+      // read, plus I'd just like some more colour. I like the hover
+      // behaviour we use for the chips on the recipe list below, so please
+      // match that". So this is `a.badge-star:hover` (_badges.scss): the
+      // word in the dark of its hue on the tape in the lightened hue, which
+      // is also the tape a chosen chip wears. Chosen keeps its black word.
+      &:hover:not(.active) {
+        color: var(--chip-hover, #{$color-text});
+        .tag-shape { color: var(--chip-tape, #{rgba($color-text, 0.4)}); }
+      }
+    }
+  }
+
+  &.category--star {
+    --chip-hover: #{$color-star-active};
+    --chip-tape: #{mix($color-star-root, $color-white, 82%)};
+  }
+  &.category--mood {
+    --chip-hover: #{$color-mood-active};
+    --chip-tape: #{mix($color-mood-root, $color-white, 82%)};
+  }
+  &.category--practicalities {
+    --chip-hover: #{$color-practicalities-active};
+    --chip-tape: #{mix($color-practicalities-root, $color-white, 82%)};
   }
 
   .category-buttons {

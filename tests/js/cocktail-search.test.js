@@ -30,7 +30,6 @@ const VOCAB = {
   search: {
     min_query_chars: 2,
     family_button_min_chars: 3,
-    pool_cap: 8,
     // The real list, from _data/cocktails/ingredients.yml. `and` is absent on
     // purpose: `Wray and Nephew` is one bottle.
     prose_words: ['a', 'an', 'or', 'if', 'you', 'your', 'need', 'needs', 'best',
@@ -221,9 +220,12 @@ test('a word match is flagged, so the picker can mark what you actually meant', 
   assert.strictEqual(byEntry['galliano'].hasWordMatch, false);
 });
 
-// --- the cap, and saying so --------------------------------------------------
+// --- no cap -------------------------------------------------------------------
+// There was one, of eight, with the remainder counted as "+N more". Helen,
+// 2026-10-11: "I don't want to have the 'N more' behaviour for cocktails...
+// It's helpful to see the list when e.g. rum has so many results."
 
-test('the pool is capped and the remainder is COUNTED, never silently dropped', () => {
+test('every candidate is offered, however many there are', () => {
   const many = [];
   // Two letters, not one: a bare "a" is a prose word, so `liqueur a` is
   // correctly not a bottle name and the first version of this fixture built
@@ -231,13 +233,9 @@ test('the pool is capped and the remainder is COUNTED, never silently dropped', 
   for (let i = 0; i < 12; i++) many.push('liqueur x' + String.fromCharCode(97 + i));
   const pool = S.buildPool(pours(...many));
   const result = S.search('liq', pool);
-  assert.strictEqual(result.results.length, 8);
-  assert.strictEqual(result.hidden, 4);
-});
-
-test('nothing hidden reports zero rather than a negative', () => {
-  const pool = S.buildPool(pours('gin', 'absinthe'));
-  assert.strictEqual(S.search('gin', pool).hidden, 0);
+  assert.strictEqual(result.results.length, 12);
+  assert.strictEqual('hidden' in result, false,
+    'a count of what was left out has nothing to count, and a caller that reads it is stale.');
 });
 
 // --- the minimum query length ------------------------------------------------
@@ -251,7 +249,6 @@ test('a query shorter than the declared minimum offers nothing at all', () => {
   // group is read as a bottle FOR that group's generic.
   const pool = S.buildPool([attr('gin'), attr('gin liqueur')]);
   assert.deepStrictEqual(S.search('g', pool).results, []);
-  assert.strictEqual(S.search('g', pool).hidden, 0);
   assert.strictEqual(S.search('gi', pool).results.length, 2);
 });
 
@@ -916,12 +913,11 @@ test('with no umbrella offered, the bare chip is offered as usual', () => {
   assert.ok(found.results.some((r) => r.entry === 'gin'));
 });
 
-test('the cap counts what will be shown, not what was suppressed', () => {
-  // Filtered BEFORE the slice, so "+N more" never counts a chip nobody is
-  // going to be offered.
+test('a bare word its umbrella suppresses is not offered beside it', () => {
   const pool = S.buildPool(pours('gin', 'sloe gin', 'Old Tom'));
   const found = S.search('gin', pool, []);
-  assert.strictEqual(found.hidden, 0);
+  assert.strictEqual(found.results.some((r) => r.entry === 'gin'), false);
+  assert.ok(found.results.some((r) => r.entry === 'sloe gin'));
 });
 
 test('a multi-word query matches a hidden name from its start', () => {

@@ -738,8 +738,26 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   gap: $space-lg;
 }
 
+// WHAT COLOUR A CLEAR IS, ONCE, FOR EVERY CLEAR ON BOTH INDEXES -- 2026-10-11.
+// Helen: "I'm fed up with the clear and clear all buttons! Please show each
+// one in normal link colours, so not derived from the section colour. Normal
+// base text, site colour on hover (both woo woo)." So a clear rests in the
+// page's text colour, as shared/_base.scss's `a` does, and goes to the hot
+// magenta under the pointer on both sites. Each site passes its own name for
+// that magenta, because shared/ may only name the palette contract.
+//
+// This ends a long run of rulings: food's clears took their section's hue,
+// cocktails' took theirs and then one grey, and the clear-alls were grey.
+// Do not colour one by its section again without asking.
+@mixin index-clear-link($hover) {
+  color: $color-text;
+
+  &:hover,
+  &:focus-visible { color: $hover; }
+}
+
 // The clear-all, pinned to the panel's top-right corner.
-@mixin index-clear-all {
+@mixin index-clear-all($hover) {
   visibility: hidden;
   border: none;
   cursor: pointer;
@@ -753,7 +771,7 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   font-weight: 400;
   text-transform: lowercase;
   letter-spacing: 0.04em;
-  color: $color-clear-text;
+  @include index-clear-link($hover);
   text-decoration: underline;
 
   position: absolute;
@@ -854,4 +872,69 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 @mixin index-search-placeholder {
   color: lighten($color-clear-text, 30%);
   font-weight: 300;
+}
+
+
+// --- The chip in a search pool, and the plain chip under it -------------------
+// ONE CHIP FOR BOTH SITES' SEARCH POOLS, AND IT IS FOOD'S -- 2026-10-11. Helen:
+// "I would like the cocktail has to have and leave out search results to take
+// all their styling from food's... (can we reuse the code? if not then why
+// not?)". We can, and these four mixins are that: they were food's rules
+// (_sass/food/_buttons.scss, _search.scss), lifted out with their colours
+// turned into arguments, because a site's palette is the one thing here that is
+// genuinely its own. Food's `.btn-tag` and cocktails' `.btn-pool` both include
+// them, so the two cannot drift.
+//
+// The base chip: food's `.btn-tag` type and box. Bare -- no fill, no outline.
+// What sits behind it, if anything, is a `.tag-shape` slot the site colours.
+@mixin index-chip($rest) {
+  position: relative;
+  display: inline-block;
+  font-family: $font-headings;
+  white-space: nowrap;
+  text-transform: lowercase;
+  font-weight: 700;
+  border: none;
+  background: none;
+  color: $rest;
+  padding: $space-xs $space-md;
+  cursor: pointer;
+  font-size: 0.75rem;
+  margin: 0.2rem 0.45rem 0.2rem 0;
+  transition: all 0.1s ease-in-out;
+}
+
+// A candidate where a word starts with what was typed. Colour, and a stroke in
+// the same colour for weight -- the face has no heavier cut than Bold. The
+// 0.5px is absolute on purpose; see food/_buttons.scss for why it is not an em.
+@mixin index-chip-word-match($colour) {
+  color: $colour;
+  -webkit-text-stroke: 0.5px $colour;
+}
+
+// A chosen chip on its tape. THIS MAY NOT DECLARE ANYTHING THAT CHANGES THE
+// CHIP'S WIDTH (#389: a chosen chip that resizes slides every chip after it).
+// 900 is safe only because the face ships no weight above Bold. 0.05em is
+// food's $faux-bold-stroke, written out because shared/ cannot see a site's
+// palette.
+//
+// NO CAPITALS SINCE 2026-10-11. Helen: "Let's stop capitalising selected
+// search result tags, both sites please." The filter chips above the pools
+// stopped the same day, so nothing chosen on either index changes case.
+@mixin index-chip-chosen($ink) {
+  font-weight: 900;
+  color: $ink;
+  text-shadow: none;
+  -webkit-text-stroke: 0.05em $ink;
+}
+
+// A chosen LEAVE OUT chip: the word struck through, its x left alone. The
+// label is a span of its own on both sites for exactly that.
+@mixin index-chip-struck($ink, $hover, $label) {
+  color: $ink;
+
+  #{$label} { text-decoration: line-through; }
+
+  &:hover,
+  &:focus-visible { color: $hover; }
 }
