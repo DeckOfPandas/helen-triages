@@ -10,7 +10,7 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 mood:
   - "sugar craving"
   - "pudding in a glass"
