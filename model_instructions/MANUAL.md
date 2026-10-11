@@ -1304,8 +1304,17 @@ principle, but because that's meaningless.'*).
     [7]   portions of Moules Marinière             serves:, one person at a time
     [2]   batches of 12 Grandma's Fairy Cakes      makes: a count above one
     [0.5] batch of Ben's Chocolate Ice Cream       makes: a measure; ½ offered
-    [2]   × 8-inch cakes: Beetroot Chocolate Cake  makes: "one 8-inch cake"
-    [1]   jar: Peanut Sauce                        makes: "1 jar"
+    [1]   batch of 24 Guinness … Cake squares      makes: "24 squares"
+    [2]   × 8-inch Beetroot Chocolate Cake         makes: "one 8-inch cake"
+    [2]   jars: Peanut Sauce                       makes: "1 jar"
+
+Every recipe's name in the panel is a link to it, in the index row title's own
+type (`.shopping-list-recipe-link`; Helen, 2026-10-11: *"the same way we do in
+the recipe list row titles, just smaller of course, and make them links"*).
+The same links follow, in brackets, any item in the totals that has a line
+nobody scaled — "olive oil (Chicken Satay, Peanut Sauce)" — *"so the user
+knows what to do"*: `unscaledRecipes` on the row, from
+`food-shopping-list.js`. The "(Not scaled: …)" line above the totals stays.
 
 - **The three figures are the recipe page's own** (#1286, below): the blob
   carries `w` (`page.whole_recipes`), `h` (`page.half_recipe`) and `m`
@@ -1315,17 +1324,25 @@ principle, but because that's meaningless.'*).
 - **The figure after "of" is what ONE batch makes and never moves.** It is
   shown only for a count above one: "2 batches of 750 ml Gelato" reads worse
   than the name alone, and a yield that is itself "3 batches" shows none.
-  `batchThing` in `filters.js`.
-- **A YIELD THAT IS ONE NAMED THING IS COUNTED AS THAT THING, NOT AS A
-  BATCH** (Helen, 2026-10-11: *'When the "makes" contains a word like cake, or
-  something that doesn't make a "batch", we should do the same, so "two
-  13x9-in traybakes".'*). `makes: "one 8-inch cake"` reads "× 8-inch cakes:"
-  and then the title; `"1 jar"` reads "jars:"; `"1 dozen mince pies"` keeps
-  its dozen. The words are the recipe page's (`thingText` in `food-scale.js`):
-  plural above one, a `×` before a thing that opens with a digit. A colon
-  joins it to the title because "2 pies of Lemon Meringue Pie" does not read.
-  `singleThing` and `countWord` in `filters.js`. **It needs the noun**: a
-  `makes: "12"` has nothing to name and stays "batches of" the title.
+- **THE THING MADE IS SAID ONCE: after the title where the title does not
+  name it** (Helen, 2026-10-11: *'should say "batch of 24 Guinness, Beetroot
+  and Chocolate Cake squares"'*), and not at all where it does ("18 Peanut
+  Butter Cookies"). "Names it" is the stem's last word found in the title,
+  singular against singular. A `dozen` goes before the title: "3 dozen
+  Homemade Florentines".
+- **A YIELD THAT IS ONE NAMED THING IS NOT A BATCH** (Helen, the same day:
+  *'When the "makes" contains a word like cake ... we should do the same'*).
+  Where the title names it, the row is a `×`, whatever stood before the noun,
+  and the title — her form, *'"× 8-inch Beetroot Chocolate Cake"'*; `one pie`
+  is "× Lemon Meringue Pie". The title is not made plural, so the `×` is
+  there at one too. Where the title does not name it, the thing and a colon
+  come first: "jars: Peanut Sauce", "× 9x13 inch traybakes: Zucchini Orange
+  Cake", plural above one as on the recipe page; `1 dozen mince pies` keeps
+  its words. All of it is `rowWords` in `filters.js`.
+- **IT NEEDS THE NOUN, so a `makes:` that opens with a number names the
+  thing** (`"16 bars"`, never `"16"`): a bare count has nothing to print and
+  its row is "batch of" the title. 33 drafts were given theirs on 2026-10-11
+  and the ingest document now asks for it.
 - **"Set all to N portions" sets the `serves:` rows and skips the batch
   rows.** Converting would have to decide how many cookies a portion is. This
   is the skip #815 removed; it is back because the row it skips now says
@@ -1752,8 +1769,12 @@ only; `1` is never a slug), and the slugs are matched to live keys by
 shortlist view with `sharedKeys` answering "is this one on it" instead of the
 store, so #918 holds unchanged, and the page drops the list the moment the view
 goes. Over a shared list: the note `[data-shared-shortlist]` says how many and
-names any slug nothing answers to; the shopping list hides (its numbers write
-to the store); `shortlisted (N)` is not lit, and pressing it shows YOUR list;
+names any slug nothing answers to; **the shopping list is open and totals the
+link's recipes as written** (since 2026-10-11 — it hid until Helen asked for
+it: *"show the index page with the shortlist open (i.e. with shopping list
+open)"*; opening still saves nothing, and a number typed into a box is saved
+as that recipe's count); `shortlisted (N)` is not lit, and pressing it shows
+YOUR list;
 **"keep these"** merges the list in (`HTF.shortlist.addAll`) and shows yours.
 **The link is the whole panel** at the foot of each index, "Share or save the
 shortlist" (`[data-shortlist-export-panel]`, shown only while something is

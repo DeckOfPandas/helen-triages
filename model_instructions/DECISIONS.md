@@ -1921,16 +1921,40 @@ unless stated.
     because "2 batches of 1 Beetroot Chocolate Cake" was worse, and the thing
     went with it. 19 recipes were in that state, 7 of them published — cakes,
     a pie, a dozen mince pies, six jars, a tin, a traybake.
-  - **What it says now**: "[2] × 8-inch cakes: Beetroot Chocolate Cake",
-    "[2] jars: Peanut Sauce", "[2] dozen mince pies: …". The words are the
-    recipe page's own (#1286): plural above one, `dozen` invariable, a `×`
-    before a thing that opens with a digit.
-  - **A colon before the title is a session's choice, not hers.** "of" suits
-    a jar and fails a pie ("2 pies of Lemon Meringue Pie"); the colon reads
-    the same for all nineteen. Put to her with the examples.
-  - **It needs the noun.** 31 drafts say `makes: "12"` and nothing else, so
-    their rows stay "batches of" the title, without even the 12. Reported to
-    her; the fix is in the data, not the list.
+  - **The first build said "[2] × 8-inch cakes: Beetroot Chocolate Cake",
+    and she corrected it the same hour**: *'For whole cakes, could we please
+    have: "× 8-inch Beetroot Chocolate Cake"?'* So where the TITLE already
+    names the thing, the noun is not said twice: a `×`, whatever stood before
+    the noun, and the title, unpluralised. Where it does not ("1 jar" of
+    Peanut Sauce) the thing and a colon come first: "[2] jars: Peanut Sauce".
+    **The colon is a session's choice**, kept for that second case only; she
+    saw it and did not object.
+  - **The same rule the other way round, for a batch**: *'Currently the
+    shopping list shows "batch of 24 Guinness, Beetroot and Chocolate Cake" ...
+    should say "batch of 24 Guinness, Beetroot and Chocolate Cake squares".'*
+    The thing follows the title where the title does not name it. It gives
+    "batch of 16 Sweet Potato Chocolate Brownies squares" and "batch of 2
+    Grandma's Scones large rounds of 4", which follow from her example and
+    were shown to her as they are.
+  - **A bare count is fixed in the data, not the list.** *'Cookie dough bars
+    currently just show "batch of Cookie Dough Bars", even though the recipe
+    has makes 16.'* A `makes: "16"` names nothing. Asked whether to add the
+    noun to the 31 drafts in that state: *"yes please"*. 33 were changed
+    (two more had the noun after the wrong number) and the ingest document
+    now requires it.
+  - **Three more asks in the same message**, all hers:
+    - *"when I enter a URL for a shortlist, please show the index page with
+      the shortlist open (i.e. with shopping list open)"* — **this reverses
+      #1093's third ruling** (2026-09-15: the shopping list hides over a sent
+      list). Read as the sent-list link, since `?shortlist=1` already opened
+      it; that reading is a session's. Opening still saves nothing.
+    - *"render the name of the recipe in this shopping list feature the same
+      way we do in the recipe list row titles, just smaller of course, and
+      make them links"* — `.shopping-list-recipe-link`.
+    - *"where an item hasn't been scaled, please list its recipe name in
+      brackets after the item so the user knows what to do"* — after the
+      item in the totals, as the same links. Yesterday's "(Not scaled: …)"
+      line was left in place; she did not ask for it to go.
   - **The recipe page was already right** ("1 × 8-inch cake", "2 × 8-inch
     cakes") and is untouched.
 

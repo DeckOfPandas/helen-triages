@@ -98,9 +98,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* A SHORTLIST SOMEONE SENT -- #1093, `?shortlist=slug,slug`. Helen's
      rulings, 2026-09-15: opening the link SHOWS the list and saves none of it
-     ("Show it, don't save it"); the shopping list hides while it is showing,
-     because its numbers write to this browser's store; and a "keep these"
-     button makes it yours in one tap.
+     ("Show it, don't save it"); and a "keep these" button makes it yours in
+     one tap. The shopping list hid while it was showing until 2026-10-11,
+     when she asked for it open -- see renderShoppingList().
 
      THE VIEW IS THE SHORTLIST VIEW, with a different answer to "is this row
      on it". `state.shortlisted` is true exactly as `?shortlist=1` sets it, so
@@ -1448,12 +1448,16 @@ function renderResultsPool() {
      UNMARKED title stashed at load, so a recipe found by a name search still
      lists under its real name rather than one carrying <mark> tags -- the same
      care cocktail-index.js takes with card-name highlighting. */
+  // And the row's own href beside it, for the shopping list's links: the blob's
+  // keys are site-relative and the row's link already carries the base URL.
+  var hrefByUrl = {};
   var titleByUrl = (function () {
     var map = {};
     items.forEach(function (li) {
       var link = li.querySelector('.recipe-title-link');
       if (li.dataset.url && link) {
         map[li.dataset.url] = link.dataset.titleText || link.textContent;
+        hrefByUrl[li.dataset.url] = link.getAttribute('href') || li.dataset.url;
       }
     });
     return map;
@@ -1464,7 +1468,8 @@ function renderResultsPool() {
      longer on the page are dropped, the same silence a renamed recipe already
      gets everywhere else in this feature. */
   function shortlistedRecipes() {
-    return HTF.shortlist.list().filter(function (url) {
+    // A list someone sent is totalled as it stands (see renderShoppingList).
+    return (sharedKeys || HTF.shortlist.list()).filter(function (url) {
       return Object.prototype.hasOwnProperty.call(RECIPES, url);
     });
   }
@@ -1581,39 +1586,93 @@ function renderResultsPool() {
     return n;
   }
 
-  /* "18 Peanut Butter Cookies", or the title alone. THE FIGURE IS SHOWN ONLY
-     FOR A COUNT ABOVE ONE: "2 batches of 750 ml Blackberry Gelato" reads
-     worse than the name by itself, and a yield of ONE thing is not a batch
-     at all -- countWord() below names the thing instead. */
-  function batchThing(url, title) {
-    var made = RECIPES[url].m;
-    // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
-    if (made && made.kind === 'count' && Number(made.base) > 1 && made.box &&
-        !/^batch/i.test(String(made.stem || ''))) {
-      return made.box + ' ' + title;
+  /* IS THE THING MADE ALREADY NAMED IN THE TITLE? "18 cookies" of Peanut
+     Butter Cookies, yes; "24 squares" of Guinness, Beetroot and Chocolate
+     Cake, no. The noun is the last word of the stem, and the comparison is in
+     the singular both sides (shopping-list.js `foldUnit`), so "pies" finds
+     "Pie". */
+  function nounInTitle(stem, title) {
+    var fold = HTF.shoppingList.foldUnit;
+    var words = String(stem).trim().split(/\s+/);
+    var noun = fold(words[words.length - 1]);
+    if (!noun) return false;
+    return String(title).toLowerCase().split(/[\s,()\/&]+/).some(function (word) {
+      return word !== '' && fold(word) === noun;
+    });
+  }
+
+  function batchWord(n) {
+    return n > 1 ? 'batches of' : 'batch of';
+  }
+
+  /* THE WORDS OF A ROW, AROUND THE RECIPE'S NAME: `word` is what the number
+     counts (and is the one piece that moves with it), `pre` and `post` sit
+     either side of the title, which is a link. Helen's rulings, 2026-10-11,
+     each on a row she was looking at:
+
+       [2] batches of 18 [Peanut Butter Cookies]        the noun is in the title
+       [1] batch of 24 [Guinness ... Cake] squares      "should say ... squares"
+       [1] batch of 3 dozen [Homemade Florentines]      a dozen stays a dozen
+       [2] × 8-inch [Beetroot Chocolate Cake]           '"× 8-inch Beetroot
+                                                         Chocolate Cake"'
+       [2] × [Lemon Meringue Pie]                       "one pie"
+       [2] jars: [Peanut Sauce]                         one thing the title
+                                                         does not name
+       [1] batch of [Blackberry Gelato]                 a measure, or no count
+       [7] portions of [Moules Marinière]               `serves:`
+
+     A WHOLE CAKE IS NOT A BATCH: where the yield is ONE thing the title
+     already names, the row is a ×, whatever stood before the noun, and the
+     title -- which is not made plural, so the × is there at one as well. */
+  function rowWords(url, title, n) {
+    if (!isBatch(url)) {
+      return { word: n === 1 ? 'portion of' : 'portions of', pre: '', post: '' };
     }
-    return title;
+    var made = RECIPES[url].m;
+    if (made && made.kind === 'count' && made.stem) {
+      var stem = String(made.stem);
+      var words = stem.split(/\s+/);
+      if (Number(made.base) === 1) {
+        if (!made.invariable && nounInTitle(stem, title)) {
+          return {
+            word: '×',
+            pre: words.length > 1 ? words.slice(0, -1).join(' ') + ' ' : '',
+            post: ''
+          };
+        }
+        return { word: thingWords(made, n) + ':', pre: '', post: '' };
+      }
+      // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
+      if (made.box && !/^batch/i.test(stem)) {
+        var lead = made.box + ' ';
+        if (made.invariable) lead += words.shift() + ' ';
+        var named = !words.length || nounInTitle(words.join(' '), title);
+        return {
+          word: batchWord(n),
+          pre: lead,
+          post: named ? '' : ' ' + words.join(' ') + String(made.rest || '')
+        };
+      }
+    }
+    return { word: batchWord(n), pre: '', post: '' };
   }
 
   /* --- A YIELD THAT IS ONE NAMED THING IS COUNTED AS THAT THING --------------
      Helen, 2026-10-11: 'we now display e.g. "2 batches of 12 cookies". When
      the "makes" contains a word like cake, or something that doesn't make a
      "batch", we should do the same, so "two 13x9-in traybakes".' Nobody bakes
-     a batch of one cake; they bake two cakes.
+     a batch of one cake; they bake two cakes. Until then these rows read "2
+     batches of Beetroot Chocolate Cake", the thing dropped because "2 batches
+     of 1 ..." read worse still.
 
-     So `makes: "one 8-inch cake"` reads "[2] × 8-inch cakes: Beetroot
-     Chocolate Cake", and `makes: "1 jar"` reads "[2] jars: Peanut Sauce". It
-     replaced "2 batches of Beetroot Chocolate Cake", which dropped the thing
-     because "2 batches of 1 Beetroot Chocolate Cake" read worse still.
-
-     THE WORDS ARE THE RECIPE PAGE'S OWN (food-scale.js `thingText`, which
-     this page does not load): the noun takes its plural above one, `dozen
-     mince pies` never changes, and a thing that opens with a digit gets a
-     `×`, because the box is a number and "2 8-inch cakes" is unreadable.
-
-     A COLON, NOT "of", BEFORE THE TITLE. "2 jars of Peanut Sauce" is fine and
-     "2 pies of Lemon Meringue Pie" is not; the colon reads the same for
-     both. */
+     WHERE THE TITLE DOES NOT NAME THE THING ("1 jar" of Peanut Sauce, "one
+     9x13 inch traybake" of a Zucchini Orange Cake), the row says it and then
+     the title: "[2] jars: Peanut Sauce". The words are the recipe page's own
+     (food-scale.js `thingText`, which this page does not load): plural above
+     one, `dozen mince pies` never changes, and a `×` before a thing that
+     opens with a digit. A COLON, NOT "of": "2 jars of Peanut Sauce" is fine
+     and "2 tins of School-Dinner Sponge" is not. Where the title DOES name
+     it, rowWords() above has the shorter form she asked for. */
   function singleThing(url) {
     var made = RECIPES[url] && RECIPES[url].m;
     return (made && made.kind === 'count' && Number(made.base) === 1 &&
@@ -1627,10 +1686,24 @@ function renderResultsPool() {
   }
 
   function countWord(url, n) {
-    var thing = singleThing(url);
-    if (thing) return thingWords(thing, n) + ':';
-    if (isBatch(url)) return n > 1 ? 'batches of' : 'batch of';
-    return n === 1 ? 'portion of' : 'portions of';
+    return rowWords(url, titleByUrl[url] || url, n).word;
+  }
+
+  /* THE RECIPE'S NAME, AS THE LIST ABOVE WRITES IT, AND A LINK -- Helen,
+     2026-10-11: "please render the name of the recipe in this shopping list
+     feature the same way we do in the recipe list row titles, just smaller of
+     course, and make them links please." The href is the row's own. */
+  function recipeLink(url) {
+    return '<a class="shopping-list-recipe-link" href="' +
+      HTF.escapeHtml(hrefByUrl[url] || url) + '">' +
+      HTF.escapeHtml(titleByUrl[url] || url) + '</a>';
+  }
+
+  function rowSentence(url, n) {
+    var words = rowWords(url, titleByUrl[url] || url, n);
+    return '<span><span class="shopping-list-count-word">' +
+      HTF.escapeHtml(words.word) + '</span> ' + HTF.escapeHtml(words.pre) +
+      recipeLink(url) + HTF.escapeHtml(words.post) + '</span>';
   }
 
   /* What a screen reader is told the box counts: "batches of", or the thing
@@ -1659,9 +1732,15 @@ function renderResultsPool() {
 
   function renderShoppingList() {
     if (!shoppingEl) return;
-    // Hidden over a shared list (#1093): its numbers write to this browser's
-    // store, and a list you were sent is not yours until you keep it.
-    shoppingEl.hidden = !state.shortlisted || !!sharedKeys;
+    /* SHOWN OVER A SHARED LIST TOO, SINCE 2026-10-11 -- Helen: "when I enter a
+       URL for a shortlist, please show the index page with the shortlist open
+       (i.e. with shopping list open)". It was hidden there from #1093
+       (2026-09-15) because its numbers write to this browser's store and a
+       list you were sent is not yours until you keep it. OPENING THE LINK
+       STILL SAVES NOTHING: the list is totalled from the link, every recipe
+       as written. A number typed into a box is saved, as that recipe's count
+       -- her own figure, and not the list. */
+    shoppingEl.hidden = !state.shortlisted;
     if (shoppingEl.hidden) return;
 
     var urls = shortlistedRecipes();
@@ -1712,8 +1791,7 @@ function renderResultsPool() {
             'data-url="' + HTF.escapeHtml(url) + '" data-batches ' +
             'title="' + HTF.escapeHtml(title + makes) + '" ' +
             'aria-label="' + HTF.escapeHtml(boxLabel(url) + title + makes) + '">' +
-            '<span><span class="shopping-list-count-word">' + countWord(url, batches) +
-            '</span> ' + HTF.escapeHtml(batchThing(url, title)) + '</span>' +
+            rowSentence(url, batches) +
             '</li>';
         }
 
@@ -1752,9 +1830,7 @@ function renderResultsPool() {
           /* "7 portions of Moules Marinière" -- #1297. The word is what the
              number counts, so the row reads as a sentence and the batch rows
              beside it are visibly a different kind of number. */
-          '<span><span class="shopping-list-count-word">' +
-          countWord(url, portionsFor(url)) + '</span> ' +
-          HTF.escapeHtml(title) + '</span>' +
+          rowSentence(url, portionsFor(url)) +
           '</li>';
       }).join('');
     }
@@ -1854,6 +1930,15 @@ function renderResultsPool() {
                is what to buy, this is what the recipes use. */
             (row.aside ? '<span class="shopping-list-aside">(' +
               HTF.escapeHtml(row.aside) + ')</span>' : '') +
+            /* "(Chicken Satay, Peanut Sauce)" -- WHOSE LINE WAS NOT SCALED,
+               Helen, 2026-10-11: "where an item hasn't been scaled, please
+               list its recipe name in brackets after the item so the user
+               knows what to do." Each is a link to the recipe, in the same
+               face as the rows above. */
+            (row.unscaledRecipes && row.unscaledRecipes.length
+              ? '<span class="shopping-list-unscaled">(' +
+                row.unscaledRecipes.map(recipeLink).join(', ') + ')</span>'
+              : '') +
             '</li>';
         }).join('') +
         '</ul></section>';

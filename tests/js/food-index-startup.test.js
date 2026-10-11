@@ -611,9 +611,12 @@ test('one cake is a cake, not a batch: the row names the thing made', () => {
   showTheList(doc);
 
   assert.deepStrictEqual(rowText(panel), [
-    // A thing that opens with a digit takes a ×: the box before it is a number.
-    '× 8-inch cake: Beetroot Chocolate Cake',
+    // THE TITLE NAMES THE THING ("Cake"), so the row is her own form: '"×
+    // 8-inch Beetroot Chocolate Cake"'. The noun is not said twice.
+    '× 8-inch Beetroot Chocolate Cake',
+    // The title does not say "jar", so the row does, and then the title.
     'jar: Peanut Sauce',
+    // A dozen is counted in dozens and keeps its own words.
     'dozen mince pies: Mince Pies'
   ]);
   const html = recipesHtml(panel);
@@ -633,11 +636,72 @@ test('two of them take the plural, and a dozen stays a dozen', () => {
   showTheList(doc);
 
   assert.deepStrictEqual(rowText(panel), [
-    '× 8-inch cakes: Beetroot Chocolate Cake',
+    // The title is not made plural, which is why the × is there at one too.
+    '× 8-inch Beetroot Chocolate Cake',
     'jars: Peanut Sauce',
     'dozen mince pies: Mince Pies'
   ]);
   assert.match(aislesHtml(panel), /500 g/, 'and two cakes is twice the flour');
+});
+
+test('a batch says what it is a batch OF when the title does not', () => {
+  // Helen, 2026-10-11, of `makes: "24 squares"`: 'The shopping list entry
+  // should say "batch of 24 Guinness, Beetroot and Chocolate Cake squares".'
+  // The cookies' title already says cookies; a dozen stays a dozen.
+  const recipes = {
+    '/food/recipes/cake/': {
+      p: 12, e: true, y: '24 squares', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 24, stem: 'squares', rest: '', box: '24' },
+      i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
+    },
+    '/food/recipes/cookies/': RECIPES['/food/recipes/cookies/'],
+    '/food/recipes/pies/': {
+      p: 12, e: true, y: 'about 3 dozen', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 3, stem: 'dozen', rest: '', box: '3', invariable: true },
+      i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  Object.keys(recipes).forEach((url) => win.HTF.shortlist.toggle(url));
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), [
+    'batch of 24 Beetroot Chocolate Cake squares',
+    'batch of 18 Peanut Butter Cookies',
+    'batch of 3 dozen Mince Pies'
+  ]);
+});
+
+test('every recipe named in the panel is a link to it, in the row title\'s class', () => {
+  // "render the name of the recipe ... the same way we do in the recipe list
+  // row titles, just smaller of course, and make them links please."
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  showTheList(doc);
+  const html = recipesHtml(panel);
+  assert.ok(html.includes(
+    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>'), html);
+  assert.ok(html.includes(
+    '18 <a class="shopping-list-recipe-link" href="/food/recipes/cookies/">Peanut Butter Cookies</a>'),
+    'the figure and the words stay outside the link: ' + html);
+});
+
+test('an item nobody scaled names the recipe it came from, as a link', () => {
+  // "where an item hasn't been scaled, please list its recipe name in
+  // brackets after the item so the user knows what to do." Recipe `a` lists
+  // olive oil with no amount; its flour and onions are scaled and say nothing.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  showTheList(doc);
+  const html = aislesHtml(panel);
+  assert.ok(html.includes(
+    '<span class="shopping-list-name">olive oil</span>' +
+    '<span class="shopping-list-unscaled">(' +
+    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>)</span>'),
+    html);
+  assert.strictEqual(html.split('shopping-list-unscaled').length - 1, 1,
+    'only the unscaled row carries a bracket');
 });
 
 test('a count above one is still batches of that many', () => {
@@ -925,8 +989,9 @@ test('#1011: a shortlisted recipe is what the link shows', () => {
 //
 // `?shortlist=a,gelato` opens the same VIEW `?shortlist=1` does, answering "is
 // this row on it" from the link. Helen's three rulings, 2026-09-15, each with
-// its assertion: the link SHOWS the list and saves none of it; the shopping
-// list hides while it shows; "keep these" makes it yours in one tap.
+// its assertion: the link SHOWS the list and saves none of it; "keep these"
+// makes it yours in one tap. (The third, that the shopping list hides while
+// it shows, she reversed on 2026-10-11 -- see the test that replaced it.)
 
 const sharedNote = (doc) => doc.querySelector('[data-shared-shortlist]');
 const visibleUrls = (list) => visibleRows(list).map((li) => li.getAttribute('data-url'));
@@ -964,10 +1029,17 @@ test('#1093: the note says how many, and names what it could not find', () => {
   assert.match(text, /renamed-thing/);
 });
 
-test('#1093: the shopping list hides over a sent list', () => {
-  const { panel } = boot({ search: '?shortlist=gelato,a' });
-  assert.strictEqual(panel.hidden, true,
-    'its numbers write to this browser\'s store, and the list is not yours yet.');
+test('a sent list opens WITH its shopping list, totalled from the link', () => {
+  // Helen, 2026-10-11: "when I enter a URL for a shortlist, please show the
+  // index page with the shortlist open (i.e. with shopping list open)". It hid
+  // here from #1093 until then.
+  const { win, panel } = boot({ search: '?shortlist=gelato,a' });
+  assert.strictEqual(panel.hidden, false);
+  assert.deepStrictEqual(rowText(panel),
+    ['portions of Aubergine thing', 'batch of Blackberry gelato']);
+  assert.match(aislesHtml(panel), /500 ml/, 'the gelato\'s milk, as written');
+  assert.strictEqual(win.HTF.shortlist.count(), 0,
+    'and showing it still saved nothing: "Show it, don\'t save it".');
 });
 
 test('#1093: keep these merges the list in and shows YOUR shortlist', () => {
