@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "40 mins"
 main_ingredients: ["pancetta", "white beans", "cavolo nero", "carrot", "celery", "onion", "chicken stock", "parmesan rind", "sherry vinegar"]
 star_ingredient: "pork"
-tags: ["make-ahead", "one-handed food"]
+tags: ["make-ahead", "one-handed food", "main"]
 ingredient_groups:
   - items:
     - amount: "150 g"

@@ -9,7 +9,7 @@ cook_time: "45 mins"
 main_ingredients: ["whole chicken", "pineapple", "fresh ginger"]
 star_ingredient: "poultry"
 internal_temp_ref: poultry.chicken
-tags: ["showstopper"]
+tags: ["showstopper", "main"]
 ingredient_groups:
   - name: "chicken"
     items:

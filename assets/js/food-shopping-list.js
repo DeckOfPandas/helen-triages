@@ -327,6 +327,8 @@
         name: name,
         aisle: entry.aisle,
         scale: entry.scale,
+        // Carried through for build(), which names it beside an unscaled row.
+        recipe: entry.recipe,
         parts: Array.isArray(entry.parts) ? entry.parts : [],
         pointer: !!entry.pointer,
         drop: false
@@ -498,7 +500,8 @@
           units: {},
           unitOrder: [],
           unquantified: {},
-          unquantifiedOrder: []
+          unquantifiedOrder: [],
+          unscaledRecipes: []
         };
         order.push(key);
       }
@@ -528,6 +531,13 @@
           group.unquantifiedOrder.push(text);
         }
         group.unquantified[text] += 1;
+        /* WHICH RECIPE THE UNSCALED LINE CAME FROM -- Helen, 2026-10-11:
+           "where an item hasn't been scaled, please list its recipe name in
+           brackets after the item so the user knows what to do." Each once,
+           in the order the list met them. */
+        if (entry.recipe && group.unscaledRecipes.indexOf(entry.recipe) === -1) {
+          group.unscaledRecipes.push(entry.recipe);
+        }
         return;
       }
 
@@ -626,6 +636,9 @@
         aisle: group.aisle || fallback,
         totals: totals,
         unquantified: unquantified,
+        // The `recipe` keys of the entries behind `unquantified`, for the
+        // page to name beside the row.
+        unscaledRecipes: group.unscaledRecipes,
         text: parts.join(' + ')
       };
     });

@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "10 mins"
 main_ingredients: ["mussels", "white wine", "shallots", "salted butter", "fresh flat-leaf parsley"]
 star_ingredient: "shellfish"
-tags: ["starter", "virtuous"]
+tags: ["starter", "virtuous", "main"]
 ingredient_groups:
   - items:
     - amount: "2 kg"

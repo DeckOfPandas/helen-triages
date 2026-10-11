@@ -782,7 +782,28 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # grant is the one above, for editing the live files in this tag review without
 # flipping the flag. Proved with `135e4487` still in place: this test named
 # exactly those twelve, each "last touched by d563db61", and nothing else.
-BASELINE_COMMIT = "d563db61"   # `fiddly and fun` on twelve published recipes, on Helen's grant
+#
+# MOVED 2026-10-11, FOR ANOTHER NEW TAG AND ONE LINE SHE DICTATED. `d920e1f9`
+# declares the practicality `main` and appends it to 31 published recipes, the
+# ones the subtraction rule leaves no doubt about (none of ten tags); the 40
+# it could not settle were not touched. Her grant, given before the edit:
+# "when we're in agreement about the main tag, you can edit the live recipes to
+# add it without flipping the flag", after "Declare it, please seed by
+# subtraction ... Please go ahead." `9575761d`, behind it, is the scones'
+# `makes:` in her own words ('Grandma's scones should have makes: 8 scones (2
+# large rounds of 4)'), with "Please edit the live scones recipe, no need to
+# flip the proofreading flag". Proved with `d563db61` still in place: this test
+# named exactly those 32 files, 31 "last touched by d920e1f9" and one "by
+# 9575761d", and nothing else.
+#
+# AND FOR HER RULINGS ON THE EDGE CASES, THE SAME DAY. `54f4915b` appends one
+# tag to each of six published recipes she ruled on by name, from a numbered
+# table: `main` on the quiche and the moules ("These are: ..." and the rows of
+# the proposal she did not strike), `extras` on the cauliflower cheese, Mum's
+# rice salad and the two sprout salads ("These are sides: 19, 20, 22, 23, 33,
+# 37."). The grants are the two above. Proved with `d920e1f9` still in place:
+# this test named exactly those six, each "last touched by 54f4915b".
+BASELINE_COMMIT = "54f4915b"   # `main` and `extras` on six published recipes, Helen's row-by-row rulings
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato

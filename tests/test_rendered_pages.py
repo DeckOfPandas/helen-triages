@@ -1293,7 +1293,9 @@ def test_a_makes_recipe_counts_what_it_makes_and_never_says_portions(prod_site):
         "beetroot-chocolate-cake": ("1", "× 8-inch cake"),
         "sweet-shortcrust-pastry-mince-pies": ("1", "dozen mince pies"),
         "macarons": ("64+", "tiny macarons"),
-        "grandmas-scones": ("2", "large rounds of 4"),
+        # "8 scones (2 large rounds of 4)" since 2026-10-11, in Helen's words;
+        # it was "2 large rounds of 4" and counted rounds.
+        "grandmas-scones": ("8", "scones"),
     }
     problems = []
     for slug, (box, word) in expected.items():

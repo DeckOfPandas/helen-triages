@@ -98,9 +98,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* A SHORTLIST SOMEONE SENT -- #1093, `?shortlist=slug,slug`. Helen's
      rulings, 2026-09-15: opening the link SHOWS the list and saves none of it
-     ("Show it, don't save it"); the shopping list hides while it is showing,
-     because its numbers write to this browser's store; and a "keep these"
-     button makes it yours in one tap.
+     ("Show it, don't save it"); and a "keep these" button makes it yours in
+     one tap. The shopping list hid while it was showing until 2026-10-11,
+     when she asked for it open -- see renderShoppingList().
 
      THE VIEW IS THE SHORTLIST VIEW, with a different answer to "is this row
      on it". `state.shortlisted` is true exactly as `?shortlist=1` sets it, so
@@ -1486,16 +1486,28 @@ function renderResultsPool() {
     (shoppingEl && shoppingEl.getAttribute('data-count-nouns')) || '')
     .split(',').filter(Boolean);
 
+  /* THE THINGS THAT HOLD WHAT A RECIPE MAKES -- a jar, a tin -- so its row
+     reads "2 jars of Peanut Sauce": `yields.container_words` from the same
+     file, by the same route. Absent, such a row puts the thing after the
+     title like any other. */
+  var CONTAINER_NOUNS = String(
+    (shoppingEl && shoppingEl.getAttribute('data-container-nouns')) || '')
+    .split(',').filter(Boolean);
+
   /* The row's own title, read off the DOM once. `dataset.titleText` is the
      UNMARKED title stashed at load, so a recipe found by a name search still
      lists under its real name rather than one carrying <mark> tags -- the same
      care cocktail-index.js takes with card-name highlighting. */
+  // And the row's own href beside it, for the shopping list's links: the blob's
+  // keys are site-relative and the row's link already carries the base URL.
+  var hrefByUrl = {};
   var titleByUrl = (function () {
     var map = {};
     items.forEach(function (li) {
       var link = li.querySelector('.recipe-title-link');
       if (li.dataset.url && link) {
         map[li.dataset.url] = link.dataset.titleText || link.textContent;
+        hrefByUrl[li.dataset.url] = link.getAttribute('href') || li.dataset.url;
       }
     });
     return map;
@@ -1506,7 +1518,8 @@ function renderResultsPool() {
      longer on the page are dropped, the same silence a renamed recipe already
      gets everywhere else in this feature. */
   function shortlistedRecipes() {
-    return HTF.shortlist.list().filter(function (url) {
+    // A list someone sent is totalled as it stands (see renderShoppingList).
+    return (sharedKeys || HTF.shortlist.list()).filter(function (url) {
       return Object.prototype.hasOwnProperty.call(RECIPES, url);
     });
   }
@@ -1623,22 +1636,159 @@ function renderResultsPool() {
     return n;
   }
 
-  /* "18 Peanut Butter Cookies", or the title alone. THE FIGURE IS SHOWN ONLY
-     FOR A COUNT ABOVE ONE: "2 batches of 1 Lemon Drizzle Cake" and "2 batches
-     of 750 ml Blackberry Gelato" both read worse than the name by itself. */
-  function batchThing(url, title) {
-    var made = RECIPES[url].m;
-    // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
-    if (made && made.kind === 'count' && Number(made.base) > 1 && made.box &&
-        !/^batch/i.test(String(made.stem || ''))) {
-      return made.box + ' ' + title;
-    }
-    return title;
+  /* IS A WORD OF THE YIELD ALREADY IN THE TITLE? "cookies" of Peanut Butter
+     Cookies, yes; "squares" of Guinness, Beetroot and Chocolate Cake, no.
+     Compared in the singular both sides (shopping-list.js `foldUnit`), so
+     "pies" finds "Pie". */
+  function wordInTitle(word, title) {
+    var fold = HTF.shoppingList.foldUnit;
+    var wanted = fold(word);
+    if (!wanted) return false;
+    return String(title).toLowerCase().split(/[\s,()\/&]+/).some(function (w) {
+      return w !== '' && fold(w) === wanted;
+    });
   }
 
-  function countWord(url, n) {
-    if (isBatch(url)) return n > 1 ? 'batches of' : 'batch of';
-    return n === 1 ? 'portion of' : 'portions of';
+  function batchWord(n) {
+    return n > 1 ? 'batches of' : 'batch of';
+  }
+
+  /* "Sweet Potato Chocolate Brownies" BEFORE "squares" IS "Brownie" --
+     Helen, 2026-10-11: 'Can we get to "batch of 16 brownie squares", so where
+     the thing name word in the title is plural we make it singular?' The
+     thing-name word is taken to be the last one before any " with ...", so
+     "Cake with Pistachios" is left alone. Only a plain plural is touched:
+     `-ss` and `-us` words (Swiss, hummus, couscous) are not plurals. */
+  function singularHead(title) {
+    var text = String(title);
+    var cut = text.search(/\s+with\s+/i);
+    var head = cut === -1 ? text : text.slice(0, cut);
+    var tail = cut === -1 ? '' : text.slice(cut);
+    var match = /^(.*?)([A-Za-zÀ-ɏ]+)$/.exec(head);
+    if (!match || !/[^su]s$/i.test(match[2])) return text;
+    var single = HTF.shoppingList.foldUnit(match[2]);
+    if (!single || single === match[2].toLowerCase()) return text;
+    if (/^[A-Z]/.test(match[2])) single = single.charAt(0).toUpperCase() + single.slice(1);
+    return match[1] + single + tail;
+  }
+
+  /* THE WORDS OF A ROW, AROUND THE RECIPE'S NAME. `word` is what the number
+     counts, `pre` and `post` sit either side of the name, and `title` is the
+     name as this row writes it (a link). Helen's rulings, 2026-10-11, each
+     on a row she was looking at:
+
+       [2] batches of 18 [Peanut Butter Cookies]       the title names the thing
+       [1] batch of 24 [Guinness ... Cake] squares     it does not: said after
+       [1] batch of 16 [Sweet Potato ... Brownie] squares   and the title's own
+                                                        noun goes singular
+       [1] batch of 3 dozen [Homemade Florentines]     a dozen stays a dozen
+       [2] × 8-inch [Beetroot Chocolate Cake]          ONE thing the title names:
+       [2] × [Lemon Meringue Pie]                      a ×, never "a batch"
+       [2] dozen [... Mince Pies]                      one dozen of them
+       [2] jars of [Peanut Sauce]                      one thing that HOLDS it
+       [3] [Rainbow Confetti] traybakes                one thing that IS it
+       [1] batch of [Blackberry Gelato]                a measure, or no count
+       [7] portions of [Moules Marinière]              `serves:`
+
+     THE THING MADE IS SAID ONCE. Where the title already names it, the yield's
+     noun is dropped; where it does not, the noun follows the title, plural
+     above one. A WHOLE CAKE IS NOT A BATCH (her words: 'When the "makes"
+     contains a word like cake, or something that doesn't make a "batch"'):
+     nobody bakes a batch of one cake. Its title is not made plural, which is
+     why the × is there at one as well.
+
+     A CONTAINER COMES FIRST, WITH "of" -- 'please write "[2] jars of peanut
+     sauce", "[3] rainbow confetti traybakes"'. A jar is full of the sauce; a
+     traybake is the cake. Which is which is `container_words` in
+     _data/food/scaling.yml.
+
+     A `×` ALSO GOES BEFORE A YIELD THAT OPENS WITH A DIGIT, the recipe page's
+     rule (food-scale.js `thingText`): the box is a number, and "2 8-inch ..."
+     is unreadable. */
+  function rowWords(url, title, n) {
+    var out = { word: '', pre: '', title: title, post: '' };
+    if (!isBatch(url)) {
+      out.word = n === 1 ? 'portion of' : 'portions of';
+      return out;
+    }
+    out.word = batchWord(n);
+    var made = RECIPES[url].m;
+    if (!(made && made.kind === 'count' && made.stem)) return out;
+
+    var unitLabel = HTF.shoppingList.unitLabel;
+    var words = String(made.stem).split(/\s+/);
+    // "dozen" is counted as itself and never changes with the number.
+    var group = made.invariable ? words.shift() : '';
+    var noun = words.length ? words[words.length - 1] : '';
+    var named = !noun || wordInTitle(noun, title);
+    // What stood before the noun, less anything the title already says
+    // ("mince" of "dozen mince pies").
+    var before = words.slice(0, -1).filter(function (w) {
+      return !wordInTitle(w, title);
+    }).join(' ');
+    var lead = (group ? group + ' ' : '') + (before ? before + ' ' : '');
+
+    if (Number(made.base) === 1) {
+      var times = made.times ? '× ' : '';
+      if (!named && CONTAINER_NOUNS.indexOf(HTF.shoppingList.foldUnit(noun)) !== -1) {
+        out.word = times + lead + (n > 1 ? unitLabel(noun, 2) : noun) + ' of';
+        return out;
+      }
+      if (named) {
+        out.word = group || '×';
+        out.pre = before ? before + ' ' : '';
+        return out;
+      }
+      out.word = (times + group).trim();
+      out.pre = before ? before + ' ' : '';
+      out.title = singularHead(title);
+      out.post = ' ' + (n > 1 ? unitLabel(noun, 2) : noun);
+      return out;
+    }
+
+    // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
+    if (!made.box || /^batch/i.test(String(made.stem))) return out;
+    out.pre = made.box + ' ' + (group ? group + ' ' : '');
+    if (!named) {
+      out.title = singularHead(title);
+      out.post = ' ' + words.join(' ') + String(made.rest || '');
+    }
+    return out;
+  }
+
+  /* The recipe's name, as the list above writes it, and a link -- Helen,
+     2026-10-11: "please render the name of the recipe in this shopping list
+     feature the same way we do in the recipe list row titles, just smaller of
+     course, and make them links please." The href is the row's own. `text`
+     is the name as a row has reworded it ("... Brownie" before "squares"). */
+  function recipeLink(url, text) {
+    return '<a class="shopping-list-recipe-link" href="' +
+      HTF.escapeHtml(hrefByUrl[url] || url) + '">' +
+      HTF.escapeHtml(text || titleByUrl[url] || url) + '</a>';
+  }
+
+  /* Everything after the box. ITS OWN FUNCTION BECAUSE THE INPUT HANDLER
+     REWRITES IT IN PLACE: the box cannot be re-rendered under a typing
+     cursor, and more than one word of the row moves with the number
+     ("batch"/"batches", "jar"/"jars", "traybake"/"traybakes"). */
+  function rowInner(url, n) {
+    var words = rowWords(url, titleByUrl[url] || url, n);
+    return '<span class="shopping-list-count-word">' +
+      HTF.escapeHtml(words.word) + '</span>' + (words.word ? ' ' : '') +
+      HTF.escapeHtml(words.pre) + recipeLink(url, words.title) +
+      HTF.escapeHtml(words.post);
+  }
+
+  function rowSentence(url, n) {
+    return '<span>' + rowInner(url, n) + '</span>';
+  }
+
+  /* What a screen reader is told the box counts. It cannot move with the
+     number, so a row that is not batches says "how many". */
+  function boxLabel(url) {
+    var made = RECIPES[url] && RECIPES[url].m;
+    var single = made && made.kind === 'count' && Number(made.base) === 1 && made.stem;
+    return single ? 'how many: ' : 'batches of ';
   }
 
   /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
@@ -1659,9 +1809,15 @@ function renderResultsPool() {
 
   function renderShoppingList() {
     if (!shoppingEl) return;
-    // Hidden over a shared list (#1093): its numbers write to this browser's
-    // store, and a list you were sent is not yours until you keep it.
-    shoppingEl.hidden = !state.shortlisted || !!sharedKeys;
+    /* SHOWN OVER A SHARED LIST TOO, SINCE 2026-10-11 -- Helen: "when I enter a
+       URL for a shortlist, please show the index page with the shortlist open
+       (i.e. with shopping list open)". It was hidden there from #1093
+       (2026-09-15) because its numbers write to this browser's store and a
+       list you were sent is not yours until you keep it. OPENING THE LINK
+       STILL SAVES NOTHING: the list is totalled from the link, every recipe
+       as written. A number typed into a box is saved, as that recipe's count
+       -- her own figure, and not the list. */
+    shoppingEl.hidden = !state.shortlisted;
     if (shoppingEl.hidden) return;
 
     var urls = shortlistedRecipes();
@@ -1711,9 +1867,8 @@ function renderResultsPool() {
             '" max="99" step="' + floor + '" inputmode="decimal" value="' + batches + '" ' +
             'data-url="' + HTF.escapeHtml(url) + '" data-batches ' +
             'title="' + HTF.escapeHtml(title + makes) + '" ' +
-            'aria-label="batches of ' + HTF.escapeHtml(title + makes) + '">' +
-            '<span><span class="shopping-list-count-word">' + countWord(url, batches) +
-            '</span> ' + HTF.escapeHtml(batchThing(url, title)) + '</span>' +
+            'aria-label="' + HTF.escapeHtml(boxLabel(url) + title + makes) + '">' +
+            rowSentence(url, batches) +
             '</li>';
         }
 
@@ -1752,9 +1907,7 @@ function renderResultsPool() {
           /* "7 portions of Moules Marinière" -- #1297. The word is what the
              number counts, so the row reads as a sentence and the batch rows
              beside it are visibly a different kind of number. */
-          '<span><span class="shopping-list-count-word">' +
-          countWord(url, portionsFor(url)) + '</span> ' +
-          HTF.escapeHtml(title) + '</span>' +
+          rowSentence(url, portionsFor(url)) +
           '</li>';
       }).join('');
     }
@@ -1854,6 +2007,15 @@ function renderResultsPool() {
                is what to buy, this is what the recipes use. */
             (row.aside ? '<span class="shopping-list-aside">(' +
               HTF.escapeHtml(row.aside) + ')</span>' : '') +
+            /* "(Chicken Satay, Peanut Sauce)" -- WHOSE LINE WAS NOT SCALED,
+               Helen, 2026-10-11: "where an item hasn't been scaled, please
+               list its recipe name in brackets after the item so the user
+               knows what to do." Each is a link to the recipe, in the same
+               face as the rows above. */
+            (row.unscaledRecipes && row.unscaledRecipes.length
+              ? '<span class="shopping-list-unscaled">(' +
+                row.unscaledRecipes.map(recipeLink).join(', ') + ')</span>'
+              : '') +
             '</li>';
         }).join('') +
         '</ul></section>';
@@ -1877,11 +2039,12 @@ function renderResultsPool() {
       } else {
         shown = HTF.shortlist.setPortions(url, input.value) || portionsFor(url);
       }
-      /* "1 batch of", "2 batches of". The word is patched in place: the row
-         cannot be re-rendered from here (the caret rule below). */
+      /* "1 batch of", "2 batches of"; "jar of", "jars of". The row's words are
+         rewritten in place, beside the box: the row itself cannot be
+         re-rendered from here (the caret rule below). */
       var word = input.parentNode && input.parentNode.querySelector &&
         input.parentNode.querySelector('.shopping-list-count-word');
-      if (word) word.textContent = countWord(url, shown);
+      if (word && word.parentNode) word.parentNode.innerHTML = rowInner(url, shown);
       // Totals only. Re-rendering the recipe list would replace the very input
       // being typed into and take the caret with it.
       renderTotals();

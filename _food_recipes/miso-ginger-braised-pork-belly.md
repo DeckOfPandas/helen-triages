@@ -9,7 +9,7 @@ cook_time: "2 hrs 45 mins"
 main_ingredients: ["pork belly", "barley miso", "fresh ginger", "mirin", "spring onions"]
 star_ingredient: "pork"
 internal_temp_ref: pork.slow_cooked
-tags: ["make-ahead", "one-handed food", "fakeaway"]
+tags: ["make-ahead", "one-handed food", "fakeaway", "main"]
 ingredient_groups:
   - name: pork
     items:

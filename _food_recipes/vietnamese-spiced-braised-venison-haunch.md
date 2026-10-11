@@ -9,7 +9,7 @@ cook_time: "2 hrs"
 main_ingredients: ["venison haunch", "lemongrass stalks", "fresh ginger", "cinnamon stick", "star anise", "fish sauce", "coconut palm sugar", "beef stock", "yellow loomi"]
 star_ingredient: "game"
 internal_temp_ref: venison.braised
-tags: ["make-ahead"]
+tags: ["make-ahead", "main"]
 ingredient_groups:
   - items:
     - amount: "1 kg"

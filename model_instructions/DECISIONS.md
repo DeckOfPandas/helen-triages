@@ -1462,6 +1462,36 @@ unless stated.
     freezes. The checker reads the phrases that are a claim (`freezes well`,
     `frozen for up to`) and not bare `frozen`, which is peas. It found 15
     recipes that say they freeze and do not carry the tag.
+- **2026-10-11 — A `main` TAG, SEEDED BY SUBTRACTION; and three rulings from
+  the drafts review.** Helen: *"how about I finally give in and add a 'main'
+  tag under food practicalities? Sometimes I might just want to cook dinner,
+  scrolling through a list for inspiration without having to visually filter
+  out kale crisps and various cakes."* Asked for an honest answer and given
+  yes: *"I think deep down I knew the answer. Declare it, please seed by
+  subtraction, then as we go forward from this baseline now, we derive."*
+  - **Why a real tag and not a derived "dinner" button**, which was the
+    alternative put to her: a button never goes stale but is wrong at the
+    edges (a soup that is a meal, a starter that is also dinner), and the
+    edges are the dishes she would be scrolling for.
+  - **The seed**: never with `dessert`, `sweet snack`, `ice cream`, `drinks`,
+    `nibbles`; a main with none of those and none of `bakes`, `extras`,
+    `starter`, `breakfast`, `hot snack`. 213 recipes took it, 31 published.
+    152 were held for her: the second five, and seven the rule would have
+    tagged but a reading doubted (a cauliflower cheese, two sprout salads).
+    Published files keep `proofread: true` on her words: *"when we're in
+    agreement about the main tag, you can edit the live recipes to add it
+    without flipping the flag."*
+  - **"We derive" is read as: the same rule is the PROPOSAL at ingest**
+    (`INGEST_ONE_RECIPE.md` §4), not a deriver that writes tags. That reading
+    is a session's. The entry above still stands: no food tag is written
+    without her.
+  - **The review of every draft finished the same day** (eight batches). Its
+    rulings that change a written meaning: **no soup is `one-handed food`**
+    (*"soup is never called one-handed food"* — thick spoonable ones carried
+    it until then); **melting chocolate is prep**, so a fridge cake is
+    `no-cook` (she first agreed the opposite, then: *"pulsing chocolate in the
+    microwave isn't messy like cooking!"*); **a `sweet snack` is named for
+    the piece** (a brownie, a bar), and a cake cut up to serve is not one.
 
 ## §8 Ingredient search
 
@@ -1907,6 +1937,69 @@ unless stated.
     proofread baseline moved for the three published files in a commit of its
     own. `test_incidental_not_in_main_ingredients` learned that a flagged line
     may share its name with a real one.
+- **2026-10-11** — **On the shopping list, a yield that is ONE named thing is
+  counted as that thing, not as a batch.** Helen, during the drafts tag
+  review, on moving four yields from `serves:` to `makes:`: *'anything that
+  creates a batch should get "makes" -- I don't want to tell anyone what a
+  portion size of biscuits is!!!! We just did some work to improve the
+  shopping list for "makes" items -- we now display e.g. "2 batches of 12
+  cookies". When the "makes" contains a word like cake, or something that
+  doesn't make a "batch", we should do the same, so "two 13x9-in
+  traybakes".'*
+  - **What it replaced.** `makes: "one 8-inch cake"` read "2 batches of
+    Beetroot Chocolate Cake": #1297 dropped the figure for a count of one
+    because "2 batches of 1 Beetroot Chocolate Cake" was worse, and the thing
+    went with it. 19 recipes were in that state, 7 of them published — cakes,
+    a pie, a dozen mince pies, six jars, a tin, a traybake.
+  - **The first build said "[2] × 8-inch cakes: Beetroot Chocolate Cake",
+    and she corrected it the same hour**: *'For whole cakes, could we please
+    have: "× 8-inch Beetroot Chocolate Cake"?'* So where the TITLE already
+    names the thing, the noun is not said twice: a `×`, whatever stood before
+    the noun, and the title, unpluralised. Where it does not ("1 jar" of
+    Peanut Sauce) the thing and a colon come first: "[2] jars: Peanut Sauce".
+    **The colon is a session's choice**, kept for that second case only; she
+    saw it and did not object.
+  - **The same rule the other way round, for a batch**: *'Currently the
+    shopping list shows "batch of 24 Guinness, Beetroot and Chocolate Cake" ...
+    should say "batch of 24 Guinness, Beetroot and Chocolate Cake squares".'*
+    The thing follows the title where the title does not name it. It gives
+    "batch of 16 Sweet Potato Chocolate Brownies squares" and "batch of 2
+    Grandma's Scones large rounds of 4", which follow from her example and
+    were shown to her as they are.
+  - **A bare count is fixed in the data, not the list.** *'Cookie dough bars
+    currently just show "batch of Cookie Dough Bars", even though the recipe
+    has makes 16.'* A `makes: "16"` names nothing. Asked whether to add the
+    noun to the 31 drafts in that state: *"yes please"*. 33 were changed
+    (two more had the noun after the wrong number) and the ingest document
+    now requires it.
+  - **Three more asks in the same message**, all hers:
+    - *"when I enter a URL for a shortlist, please show the index page with
+      the shortlist open (i.e. with shopping list open)"* — **this reverses
+      #1093's third ruling** (2026-09-15: the shopping list hides over a sent
+      list). Read as the sent-list link, since `?shortlist=1` already opened
+      it; that reading is a session's. Opening still saves nothing.
+    - *"render the name of the recipe in this shopping list feature the same
+      way we do in the recipe list row titles, just smaller of course, and
+      make them links"* — `.shopping-list-recipe-link`.
+    - *"where an item hasn't been scaled, please list its recipe name in
+      brackets after the item so the user knows what to do"* — after the
+      item in the totals, as the same links. Yesterday's "(Not scaled: …)"
+      line was left in place; she did not ask for it to go.
+  - **A third round, on the two rows named to her as awkward and on the
+    colon.** *'please write "[2] jars of peanut sauce", "[3] rainbow confetti
+    traybakes" (made up example)'* — so the colon is gone: a CONTAINER comes
+    first with "of", anything else follows the title. The split is data
+    (`yields.container_words`), a session's list of nine. *'Can we get to
+    "batch of 16 brownie squares", so where the thing name word in the title
+    is plural we make it singular? I can't imagine this is common.'* — the
+    title's noun, taken as the last word before any " with", loses its plural
+    when a thing follows it. And **the scones were fixed in the recipe, by
+    her**: *'Grandma's scones should have makes: 8 scones (2 large rounds of
+    4), meaning we know we can drop the brackets for the shopping list, giving
+    us "2 batches of 8 scones"'*, with *"Please edit the live scones recipe,
+    no need to flip the proofreading flag"*.
+  - **The recipe page was already right** ("1 × 8-inch cake", "2 × 8-inch
+    cakes") and is untouched.
 
 ---
 

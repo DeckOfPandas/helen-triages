@@ -115,7 +115,36 @@ const TITLES = {
   '/food/recipes/a/': 'Aubergine thing',
   '/food/recipes/b/': 'Beetroot cake',
   '/food/recipes/gelato/': 'Blackberry gelato',
-  '/food/recipes/cookies/': 'Peanut Butter Cookies'
+  '/food/recipes/cookies/': 'Peanut Butter Cookies',
+  // Only in the list when a test passes SINGLE_THINGS as `options.recipes`.
+  '/food/recipes/cake/': 'Beetroot Chocolate Cake',
+  '/food/recipes/sauce/': 'Peanut Sauce',
+  '/food/recipes/pies/': 'Mince Pies'
+};
+
+/* THREE `makes:` RECIPES WHOSE YIELD IS ONE NAMED THING, as
+   _plugins/food_yield.rb reads "one 8-inch cake", "1 jar" and "1 dozen mince
+   pies". None is offered a half: a yield has to halve to at least one of
+   itself. Passed as `options.recipes`, so the standing fixture keeps its four. */
+const SINGLE_THINGS = {
+  '/food/recipes/cake/': {
+    p: 12, e: true, y: 'one 8-inch cake', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: '8-inch cake', rest: '', box: '1',
+      singular: true, times: true, invariable: false },
+    i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
+  },
+  '/food/recipes/sauce/': {
+    p: 4, e: true, y: '1 jar', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: 'jar', rest: '', box: '1',
+      singular: true, times: false, invariable: false },
+    i: [{ a: '200 g', n: 'peanuts', s: 'cupboard' }]
+  },
+  '/food/recipes/pies/': {
+    p: 12, e: true, y: '1 dozen mince pies', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: 'dozen mince pies', rest: '', box: '1',
+      singular: true, times: false, invariable: true },
+    i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
+  }
 };
 
 /* `data-ingredients` -- main_ingredients, comma-joined as food/index.html
@@ -222,7 +251,7 @@ function boot(options) {
 
   const panel = el('section', 'shopping-list', {
     id: 'shopping-list', 'data-whole-measures': 'handful,pinch',
-    'data-count-nouns': 'onion,lemon'
+    'data-count-nouns': 'onion,lemon', 'data-container-nouns': 'jar,tin,batch'
   });
   const head = el('div', 'shopping-list-head');
   head.appendChild(el('input', '', { id: 'shopping-list-setall', type: 'number' }));
@@ -566,6 +595,160 @@ test('the figure after "of" is shown only for a count above one', () => {
     'batch of Blackberry gelato');
 });
 
+// --- a yield that is ONE named thing is counted as that thing ------------------
+// Helen, 2026-10-11: 'When the "makes" contains a word like cake, or something
+// that doesn't make a "batch", we should do the same, so "two 13x9-in
+// traybakes".' These rows read "batches of Beetroot Chocolate Cake" until then.
+
+const rowText = (panel) => recipesHtml(panel).split('</li>')
+  .map((row) => row.replace(/<[^>]*>/g, '').trim()).filter(Boolean);
+
+test('one cake is a cake, not a batch: the row names the thing made', () => {
+  const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
+  win.HTF.shortlist.toggle('/food/recipes/cake/');
+  win.HTF.shortlist.toggle('/food/recipes/sauce/');
+  win.HTF.shortlist.toggle('/food/recipes/pies/');
+  showTheList(doc);
+
+  assert.deepStrictEqual(rowText(panel), [
+    // THE TITLE NAMES THE THING ("Cake"), so the row is her own form: '"×
+    // 8-inch Beetroot Chocolate Cake"'. The noun is not said twice.
+    '× 8-inch Beetroot Chocolate Cake',
+    // A jar HOLDS the sauce, so it comes first with "of": 'please write "[2]
+    // jars of peanut sauce"'. `jar` is in the fixture's data-container-nouns.
+    'jar of Peanut Sauce',
+    // A dozen is counted in dozens; "mince pies" is already in the title.
+    'dozen Mince Pies'
+  ]);
+  const html = recipesHtml(panel);
+  assert.ok(!/batch/.test(html.replace(/data-batches/g, '')
+    .replace(/shopping-list-recipe--first-batch/g, '')), html);
+  // The label cannot move with the number, so it does not try to.
+  assert.ok(html.includes('aria-label="how many: Beetroot Chocolate Cake, which makes one 8-inch cake"'), html);
+});
+
+test('two of them take the plural, and a dozen stays a dozen', () => {
+  const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
+  ['cake', 'sauce', 'pies'].forEach((slug) => {
+    win.HTF.shortlist.toggle('/food/recipes/' + slug + '/');
+    win.HTF.shortlist.setBatches('/food/recipes/' + slug + '/', 2);
+  });
+  showTheList(doc);
+
+  assert.deepStrictEqual(rowText(panel), [
+    // The title is not made plural, which is why the × is there at one too.
+    '× 8-inch Beetroot Chocolate Cake',
+    'jars of Peanut Sauce',
+    'dozen Mince Pies'
+  ]);
+  assert.match(aislesHtml(panel), /500 g/, 'and two cakes is twice the flour');
+});
+
+test('one thing that IS the dish, and is not in its name, follows the name', () => {
+  // '"[3] rainbow confetti traybakes" (made up example)'. A traybake is not a
+  // container, so there is no "of"; the noun takes the plural above one.
+  const recipes = {
+    '/food/recipes/cake/': {
+      p: 12, e: true, y: 'one traybake', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 1, stem: 'traybake', rest: '', box: '1',
+        singular: true, times: false, invariable: false },
+      i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/cake/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['Beetroot Chocolate Cake traybake']);
+  win.HTF.shortlist.setBatches('/food/recipes/cake/', 3);
+  doc.dispatch('htf:shortlist-change');
+  assert.deepStrictEqual(rowText(panel), ['Beetroot Chocolate Cake traybakes']);
+});
+
+test('the title\'s own noun goes singular before the thing made', () => {
+  // 'Can we get to "batch of 16 brownie squares", so where the thing name
+  // word in the title is plural we make it singular?' The cookies' row, where
+  // nothing follows the title, keeps its plural.
+  const recipes = {
+    '/food/recipes/cookies/': Object.assign({}, RECIPES['/food/recipes/cookies/'], {
+      y: '16 squares',
+      m: { kind: 'count', base: 16, stem: 'squares', rest: '', box: '16' }
+    })
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['batch of 16 Peanut Butter Cookie squares']);
+});
+
+test('a batch says what it is a batch OF when the title does not', () => {
+  // Helen, 2026-10-11, of `makes: "24 squares"`: 'The shopping list entry
+  // should say "batch of 24 Guinness, Beetroot and Chocolate Cake squares".'
+  // The cookies' title already says cookies; a dozen stays a dozen.
+  const recipes = {
+    '/food/recipes/cake/': {
+      p: 12, e: true, y: '24 squares', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 24, stem: 'squares', rest: '', box: '24' },
+      i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
+    },
+    '/food/recipes/cookies/': RECIPES['/food/recipes/cookies/'],
+    '/food/recipes/pies/': {
+      p: 12, e: true, y: 'about 3 dozen', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 3, stem: 'dozen', rest: '', box: '3', invariable: true },
+      i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  Object.keys(recipes).forEach((url) => win.HTF.shortlist.toggle(url));
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), [
+    'batch of 24 Beetroot Chocolate Cake squares',
+    'batch of 18 Peanut Butter Cookies',
+    'batch of 3 dozen Mince Pies'
+  ]);
+});
+
+test('every recipe named in the panel is a link to it, in the row title\'s class', () => {
+  // "render the name of the recipe ... the same way we do in the recipe list
+  // row titles, just smaller of course, and make them links please."
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  showTheList(doc);
+  const html = recipesHtml(panel);
+  assert.ok(html.includes(
+    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>'), html);
+  assert.ok(html.includes(
+    '18 <a class="shopping-list-recipe-link" href="/food/recipes/cookies/">Peanut Butter Cookies</a>'),
+    'the figure and the words stay outside the link: ' + html);
+});
+
+test('an item nobody scaled names the recipe it came from, as a link', () => {
+  // "where an item hasn't been scaled, please list its recipe name in
+  // brackets after the item so the user knows what to do." Recipe `a` lists
+  // olive oil with no amount; its flour and onions are scaled and say nothing.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/a/');
+  win.HTF.shortlist.toggle('/food/recipes/b/');
+  showTheList(doc);
+  const html = aislesHtml(panel);
+  assert.ok(html.includes(
+    '<span class="shopping-list-name">olive oil</span>' +
+    '<span class="shopping-list-unscaled">(' +
+    '<a class="shopping-list-recipe-link" href="/food/recipes/a/">Aubergine thing</a>)</span>'),
+    html);
+  assert.strictEqual(html.split('shopping-list-unscaled').length - 1, 1,
+    'only the unscaled row carries a bracket');
+});
+
+test('a count above one is still batches of that many', () => {
+  // The cookies are untouched by the rule above: 18 of something is a batch.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  win.HTF.shortlist.setBatches('/food/recipes/cookies/', 2);
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['batches of 18 Peanut Butter Cookies']);
+});
+
 test('NO PORTION FIGURE IS PRINTED FOR A `makes:` RECIPE, anywhere on its row', () => {
   // "That stops us saying 2 cookies is a portion". The estimate is still in
   // the blob (`p: 9`) and must not reach the row, its title or its label.
@@ -842,8 +1025,9 @@ test('#1011: a shortlisted recipe is what the link shows', () => {
 //
 // `?shortlist=a,gelato` opens the same VIEW `?shortlist=1` does, answering "is
 // this row on it" from the link. Helen's three rulings, 2026-09-15, each with
-// its assertion: the link SHOWS the list and saves none of it; the shopping
-// list hides while it shows; "keep these" makes it yours in one tap.
+// its assertion: the link SHOWS the list and saves none of it; "keep these"
+// makes it yours in one tap. (The third, that the shopping list hides while
+// it shows, she reversed on 2026-10-11 -- see the test that replaced it.)
 
 const sharedNote = (doc) => doc.querySelector('[data-shared-shortlist]');
 const visibleUrls = (list) => visibleRows(list).map((li) => li.getAttribute('data-url'));
@@ -881,10 +1065,17 @@ test('#1093: the note says how many, and names what it could not find', () => {
   assert.match(text, /renamed-thing/);
 });
 
-test('#1093: the shopping list hides over a sent list', () => {
-  const { panel } = boot({ search: '?shortlist=gelato,a' });
-  assert.strictEqual(panel.hidden, true,
-    'its numbers write to this browser\'s store, and the list is not yours yet.');
+test('a sent list opens WITH its shopping list, totalled from the link', () => {
+  // Helen, 2026-10-11: "when I enter a URL for a shortlist, please show the
+  // index page with the shortlist open (i.e. with shopping list open)". It hid
+  // here from #1093 until then.
+  const { win, panel } = boot({ search: '?shortlist=gelato,a' });
+  assert.strictEqual(panel.hidden, false);
+  assert.deepStrictEqual(rowText(panel),
+    ['portions of Aubergine thing', 'batch of Blackberry gelato']);
+  assert.match(aislesHtml(panel), /500 ml/, 'the gelato\'s milk, as written');
+  assert.strictEqual(win.HTF.shortlist.count(), 0,
+    'and showing it still saved nothing: "Show it, don\'t save it".');
 });
 
 test('#1093: keep these merges the list in and shows YOUR shortlist', () => {

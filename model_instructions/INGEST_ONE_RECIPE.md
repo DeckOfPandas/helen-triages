@@ -127,7 +127,7 @@ name you give is a courtesy rather than a contract.
 | `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. |
 | `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen, 2026-10-08: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
-| `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. |
+| `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
 | `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **If the source does not support an estimate, ASK Helen rather than guess** -- her rule: "Claudes can check with me if unsure." |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. Not in the source? `"QQ"`. **Never estimate one** — an invented time publishes, a `QQ` does not. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
@@ -395,7 +395,7 @@ An undeclared tag or star ingredient fails her test suite. These lists are the
 whole vocabulary. If nothing fits, **leave the field out** rather than coin a
 term.
 
-### `tags` — pick from these 23 and no others
+### `tags` — pick from these 24 and no others
 
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
@@ -406,16 +406,27 @@ term.
 
 **Practicalities** — *what the occasion demands of you, regardless:*
 <!-- vocab:tags:practicalities start -->
-`breakfast`, `extras`, `festive`, `freezable`, `make-ahead`, `no-cook`,
+`breakfast`, `extras`, `festive`, `freezable`, `main`, `make-ahead`, `no-cook`,
 `starter`
 <!-- vocab:tags:practicalities end -->
 
 Meanings you would not guess:
 
+- **`main`** — this could be dinner. **Work it out by subtraction, last, once
+  the other tags are chosen.** With any of `dessert`, `sweet snack`,
+  `ice cream`, `drinks` or `nibbles`: never. With none of those and none of
+  `bakes`, `extras`, `starter`, `breakfast` or `hot snack`: add `main`. With
+  one of that second five, it depends on the dish (a quiche is a bake and
+  dinner; a starter for two may be a main; a sauce is not), so decide and say
+  which way you went in the hand-back list. **Eggs and fritters are breakfast
+  or a snack, not dinner**: an omelette, a frittata, baked eggs, savoury
+  pancakes, griddle cakes and fritters are never `main`, even where the source
+  says "for lunch or dinner".
 - **`one-handed food`** — eat it curled on the sofa. Anything that rolls, spills
-  or has to be chased is out. Thick spoonable soups are in; noodle soups are not.
+  or has to be chased is out. A soup never takes it, however thick.
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice
   blend is uncooked and a useless answer to that question, so it stays untagged.
+  Melting chocolate is prep, not cooking: a fridge cake is `no-cook`.
 - **`make-ahead`** — a substantial part of the dish is genuinely finished ahead.
   **A bake that merely keeps is not make-ahead** ("will keep three days in a
   tin" describes leftovers), and **an overnight marinade is not make-ahead**

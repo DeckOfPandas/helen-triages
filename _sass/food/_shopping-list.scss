@@ -150,6 +150,43 @@
   color: $color-clear-text;
 }
 
+// A RECIPE'S NAME IN THE SHOPPING LIST IS THE INDEX ROW'S TITLE, SMALLER, AND
+// A LINK -- Helen, 2026-10-11: "please render the name of the recipe in this
+// shopping list feature the same way we do in the recipe list row titles,
+// just smaller of course, and make them links please." So it is
+// `.recipe-title-link`'s type, value for value (_recipe-list.scss: the
+// heading face, bold, lowercase, 0.04em, ink, the star colour on hover), at
+// the size of the text it sits in rather than 1.2rem. "The same as the
+// titles" has to keep meaning that when the titles move: change both.
+.shopping-list-recipe-link {
+  font-family: $font-headings;
+  font-size: 1em;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+  color: $color-text;
+  text-decoration: none;
+  transition: color 0.12s ease-in-out;
+
+  &:hover {
+    color: $color-star-root;
+  }
+}
+
+// "(Chicken Satay, Peanut Sauce)" after an item whose amount was not scaled:
+// the recipes to go and read. The bracket is the quiet grey of the note
+// beside it; the names inside are the links above.
+.shopping-list-unscaled {
+  // THE BRACKET TAKES WHAT THE NAME LEAVES, and wraps inside itself. Left to
+  // share the row evenly, two long recipe names squeezed "orange zest" onto
+  // two lines (seen on the first build of this, 2026-10-11).
+  flex: 1 1 0%;
+  min-width: 8rem;
+  margin-left: $space-xs;
+  font-size: 0.85rem;
+  color: $color-clear-text;
+}
+
 // "(Not scaled: salt, olive oil)" -- the recipe page's `.recipe-scale-note`,
 // value for value, so the same sentence looks the same in both places. The
 // rows' own bottom margin is taken back so it sits with them.

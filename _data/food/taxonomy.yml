@@ -253,14 +253,58 @@ retired_star_ingredients:
 # it without them finds the savoury faff she was after.
 # -----------------------------------------------------------------------------
 #
+# `main` -- A NEW PRACTICALITY, 2026-10-11: THIS COULD BE DINNER.
+#
+# Helen: "how about I finally give in and add a 'main' tag under food
+# practicalities? Sometimes I might just want to cook dinner, scrolling
+# through a list for inspiration without having to visually filter out kale
+# crisps and various cakes." And, on being told yes: "I think deep down I
+# knew the answer. Declare it, please seed by subtraction, then as we go
+# forward from this baseline now, we derive."
+#
+# A practicality, beside `starter` and `extras`: it says which slot of a meal
+# a dish fills. None of the other 23 could say "this is dinner" except by
+# absence, which is what the seed read.
+#
+# SEEDED BY SUBTRACTION, the day after every recipe's tags had been reviewed:
+#   never a main    dessert, sweet snack, ice cream, drinks, nibbles
+#   perhaps         bakes, extras, starter, breakfast, hot snack
+#   a main          everything else
+# 213 recipes took it from the third line -- 31 published, 182 drafts. The
+# "perhaps" rows (a quiche is a bake AND dinner; a plum sauce is neither) and
+# seven the rule would have tagged but a reading doubted (a cauliflower
+# cheese, two sprout salads) were put to her row by row.
+#
+# HER RULINGS ON THE "PERHAPS" ROWS, the same day, 39 put to her by name:
+#   A MAIN: a quiche, moules marinière, both tartes tatin, a goat's cheese
+#     soufflé, calzones, mackerel or scallops with a salad for two, scallops à
+#     la Bretonne, a rarebit cauliflower cheese, a peach and burrata salad, the
+#     saucy lentils, cabbage wedges ("2 as a main").
+#   NOT A MAIN, though each was proposed as one: griddle cakes, fritters, a
+#     frittata, an omelette, baked eggs, savoury pancakes -- EGGS AND FRITTERS
+#     ARE BREAKFAST OR A SNACK, NOT DINNER -- and kale with chana, though its
+#     source says "2 as a main".
+#   A SIDE, so `extras`: the plain cauliflower cheese, Mum's rice salad, both
+#     sprout salads, charred baby gem, beer-braised lentils.
+# The eggs-and-fritters line began as a session's summary of eight separate
+# noes. Put to her as that: "Your observation about eggs and fritters is
+# sound -- please add as a rule." It is in the ingest document as one.
+#
+# GOING FORWARD THE SAME RULE IS THE PROPOSAL AT INGEST: a new recipe with
+# none of the ten tags above is a `main`; one with a "perhaps" tag is asked
+# about. It is still a proposal for her yes or no, like every food tag.
+# -----------------------------------------------------------------------------
+#
 # The other eight already had hers: `make-ahead` and `freezable` above,
 # `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
 # group note above, `no-cook`, `virtuous` and `ice cream` in MANUAL §7.
 #
-# MELTING CHOCOLATE ON THE HOB IS COOKING, so the fridge cake nests keep their
-# 5 mins and do not take `no-cook`. Helen, 2026-10-11, on being reminded the
-# tag requires `cook_time: "None"`: "good spot, I'd forgotten about the
-# melting."
+# MELTING CHOCOLATE IS PREP, NOT COOKING, so the fridge cake nests and the
+# cookie dough bars are `no-cook` with `cook_time: "None"`. Helen, 2026-10-11,
+# reversing her own first answer an hour earlier ("good spot, I'd forgotten
+# about the melting"): "pulsing chocolate in the microwave isn't messy like
+# cooking! If the melting chocolate is prep then there's still no cooking for
+# either." The nests melt theirs on the hob and she ruled the two the same.
 # -----------------------------------------------------------------------------
 tags:
   mood:
@@ -286,6 +330,7 @@ tags:
     - extras
     - festive
     - freezable
+    - main
     - make-ahead
     - no-cook
     - starter
@@ -315,6 +360,11 @@ tags:
 #       be chased or picked out disqualifies itself. Thick spoonable soups still
 #       carry the tag; noodle soups, pho, wontons and tom kha gai no longer do.
 #       Tagged by hand now, on the eating mechanics rather than the category.
+#
+#       AND SINCE 2026-10-11 NO SOUP CARRIES IT AT ALL. Helen, when a session
+#       proposed taking it off a minestrone for its spaghetti: "soup is never
+#       called one-handed food". The thick spoonable ones lost it the same
+#       day -- three drafts; no published soup had it.
 #
 #       A MEATBALL ON ITS OWN IS ONE-HANDED; IT IS THE COMPANY THAT DISQUALIFIES
 #       IT. Helen, 2026-10-10, when a session proposed taking the tag off

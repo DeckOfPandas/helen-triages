@@ -136,6 +136,7 @@ argument and the rules each field is read by.
 - 2026-08-01 · §7 · Splitting "declared" from "filterable" (point recipe_badges.html at taxonomy.tags) proposed and rejected: no user stands in the gap between a fact you read (a note says more) and …
 - 2026-10-10 · §7 · TWELVE TAGS GET A WRITTEN MEANING, AND TAGS ARE PROPOSED BY READING.
 - 2026-10-08 · §7 · FOOD GETS NO TAG DERIVER; IT GETS A REPORT.
+- 2026-10-11 · §7 · A main TAG, SEEDED BY SUBTRACTION; and three rulings from the drafts review.
 - 2026-08-01 · §8 · Kept: 600 distinct main ingredients across 300+ files, 54% in exactly one recipe; 26–29% of recipes have no star.
 - 2026-08-16 · §8 · #281 #52 · Why the exclude picker's words are worse: same code, harder input (every ingredient_groups item, chosen deliberately by #52).
 - 2026-08-20 · §8 · Re-affirmed on the identical symptom: Helen — "The synonym collapse on the exclude filter has gone wrong again...
@@ -161,6 +162,7 @@ argument and the rules each field is read by.
 - 2026-10-07 · §8.2 · A makes: range starts from its lower number; the midpoint above is REVERSED, three days on.
 - 2026-10-09 · §8.2 · #1297 · On the shopping list a makes: recipe counts BATCHES, and a handful is bought in whole ones.
 - 2026-10-10 · §8.2 · #1297 · Round two, on reading the summary: "2 lemons", a Not-scaled line, and the batch rows grouped.
+- 2026-10-11 · §8.2 · On the shopping list, a yield that is ONE named thing is counted as that thing, not as a batch.
 - 2026-09-10 · §8.3 · Helen, having used both indexes for a weekend's planning
 - 2026-09-10 · §8.3 · Every one of those is the same fact — shortlisted was declared as an ordinary filter in filter-state.js and so ANDed with everything else.
 - 2026-09-10 · §8.3 · The rule now, held in two pure functions and generated tests across BOTH field tables (tests/js/shortlist-view.test.js)

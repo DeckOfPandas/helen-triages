@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "45 mins"
 main_ingredients: ["chicken breast", "mushrooms", "crème fraîche", "peas", "white wine", "chicken stock"]
 star_ingredient: "poultry"
-tags: ["freezable", "make-ahead", "one-handed food"]
+tags: ["freezable", "make-ahead", "one-handed food", "main"]
 ingredient_groups:
   - name: sauce
     items:

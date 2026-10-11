@@ -1118,16 +1118,28 @@ cheese-tastic, dessert, drinks, fakeaway, fiddly and fun, hot snack, ice
 cream, nibbles,
 one-handed food, salad, showstopper, soup, sweet snack, virtuous.
 **Practicalities** — *what the occasion demands of you, regardless*: breakfast,
-extras, festive, freezable, make-ahead, no-cook, starter.
+extras, festive, freezable, main, make-ahead, no-cook, starter.
+
+**`main` — this could be dinner** (2026-10-11; `taxonomy.yml` has Helen's
+words). It is the one tag with a rule behind its proposal: never with
+`dessert`, `sweet snack`, `ice cream`, `drinks` or `nibbles`; a main with none
+of those and none of `bakes`, `extras`, `starter`, `breakfast`, `hot snack`;
+and a question to her with one of that second five — **except that eggs and
+fritters are breakfast or a snack, never dinner** (omelette, frittata, baked
+eggs, savoury pancakes, griddle cakes, fritters; her rule, from eight noes in
+a row). The collection was seeded
+by that rule the day after the tag review, and `INGEST_ONE_RECIPE.md` §4 asks
+a new recipe the same thing. Still a proposal, never a deriver.
 
 **Co-tags.** Only `ice cream → dessert, make-ahead`. Test for adding another:
 sound when a ROLLUP or a genuine AFFORDANCE, unsound when DEFINITIONAL.
 
 **Meanings you would not guess:** `one-handed food` — eat curled on the sofa;
-anything that rolls, spills or needs chasing is out (thick spoonable soups in,
-noodle soups out). `no-cook` answers "can I put this on the table without
-cooking?" — a spice blend is uncooked and a useless answer, so it stays
-untagged. `make-ahead` — a substantial part is genuinely finished ahead; a
+anything that rolls, spills or needs chasing is out, and no soup takes it,
+however thick (2026-10-11; thick spoonable soups were in until then).
+`no-cook` answers "can I put this on the table without cooking?" — a spice
+blend is uncooked and a useless answer, so it stays untagged; melting
+chocolate is prep, so a fridge cake is `no-cook`. `make-ahead` — a substantial part is genuinely finished ahead; a
 bake that merely keeps is not, and an overnight marinade is not. `freezable`
 and `make-ahead` are separate axes. `drinks` is anything drinkable that is not
 a cocktail. `virtuous` is narrow: lean protein, or genuinely veg-forward with
@@ -1303,7 +1315,18 @@ principle, but because that's meaningless.'*).
     [7]   portions of Moules Marinière             serves:, one person at a time
     [2]   batches of 12 Grandma's Fairy Cakes      makes: a count above one
     [0.5] batch of Ben's Chocolate Ice Cream       makes: a measure; ½ offered
-    [1]   batch of Beetroot Chocolate Cake         makes: "one 8-inch cake"
+    [1]   batch of 24 Guinness … Cake squares      makes: "24 squares"
+    [2]   × 8-inch Beetroot Chocolate Cake         makes: "one 8-inch cake"
+    [2]   jars of Peanut Sauce                     makes: "1 jar"
+    [3]   Lemon Feather Sponge cakes               one thing, not in the title
+
+Every recipe's name in the panel is a link to it, in the index row title's own
+type (`.shopping-list-recipe-link`; Helen, 2026-10-11: *"the same way we do in
+the recipe list row titles, just smaller of course, and make them links"*).
+The same links follow, in brackets, any item in the totals that has a line
+nobody scaled — "olive oil (Chicken Satay, Peanut Sauce)" — *"so the user
+knows what to do"*: `unscaledRecipes` on the row, from
+`food-shopping-list.js`. The "(Not scaled: …)" line above the totals stays.
 
 - **The three figures are the recipe page's own** (#1286, below): the blob
   carries `w` (`page.whole_recipes`), `h` (`page.half_recipe`) and `m`
@@ -1311,9 +1334,33 @@ principle, but because that's meaningless.'*).
   `_plugins/food_half_recipe.rb` allows), 1, 2, 3 and never 1½ — the same
   steps as that recipe's own page.
 - **The figure after "of" is what ONE batch makes and never moves.** It is
-  shown only for a count above one: "2 batches of 1 Lemon Drizzle Cake" and
-  "2 batches of 750 ml Gelato" read worse than the name alone, and a yield
-  that is itself "3 batches" shows none. `batchThing` in `filters.js`.
+  shown only for a count above one: "2 batches of 750 ml Gelato" reads worse
+  than the name alone, and a yield that is itself "3 batches" shows none.
+- **THE THING MADE IS SAID ONCE: after the title where the title does not
+  name it** (Helen, 2026-10-11: *'should say "batch of 24 Guinness, Beetroot
+  and Chocolate Cake squares"'*), and not at all where it does ("18 Peanut
+  Butter Cookies"). "Names it" is the stem's last word found in the title,
+  singular against singular. A `dozen` goes before the title: "3 dozen
+  Homemade Florentines". **Before a thing that follows it, the title's own
+  noun goes singular** (*'"batch of 16 brownie squares"'*): the last word
+  before any " with …", and only a plain plural (`singularHead`).
+- **A YIELD THAT IS ONE NAMED THING IS NOT A BATCH** (Helen, the same day:
+  *'When the "makes" contains a word like cake ... we should do the same'*).
+  Where the title names it, the row is a `×`, whatever stood before the noun,
+  and the title — her form, *'"× 8-inch Beetroot Chocolate Cake"'*; `one pie`
+  is "× Lemon Meringue Pie". The title is not made plural, so the `×` is
+  there at one too. Where the title does not name it, **a container comes
+  first with "of" and anything else follows the title** (*'please write "[2]
+  jars of peanut sauce", "[3] rainbow confetti traybakes"'*): a jar holds the
+  sauce, a traybake is the cake. Which is which is `yields.container_words`
+  in `scaling.yml`, handed to the page as `data-container-nouns`. The noun is
+  plural above one either way; `1 dozen mince pies` is "dozen" and the title.
+  All of it is `rowWords` in `filters.js`, and the input handler rewrites the
+  row's words in place (`rowInner`), since more than one of them moves.
+- **IT NEEDS THE NOUN, so a `makes:` that opens with a number names the
+  thing** (`"16 bars"`, never `"16"`): a bare count has nothing to print and
+  its row is "batch of" the title. 33 drafts were given theirs on 2026-10-11
+  and the ingest document now asks for it.
 - **"Set all to N portions" sets the `serves:` rows and skips the batch
   rows.** Converting would have to decide how many cookies a portion is. This
   is the skip #815 removed; it is back because the row it skips now says
@@ -1740,8 +1787,12 @@ only; `1` is never a slug), and the slugs are matched to live keys by
 shortlist view with `sharedKeys` answering "is this one on it" instead of the
 store, so #918 holds unchanged, and the page drops the list the moment the view
 goes. Over a shared list: the note `[data-shared-shortlist]` says how many and
-names any slug nothing answers to; the shopping list hides (its numbers write
-to the store); `shortlisted (N)` is not lit, and pressing it shows YOUR list;
+names any slug nothing answers to; **the shopping list is open and totals the
+link's recipes as written** (since 2026-10-11 — it hid until Helen asked for
+it: *"show the index page with the shortlist open (i.e. with shopping list
+open)"*; opening still saves nothing, and a number typed into a box is saved
+as that recipe's count); `shortlisted (N)` is not lit, and pressing it shows
+YOUR list;
 **"keep these"** merges the list in (`HTF.shortlist.addAll`) and shows yours.
 **The link is the whole panel** at the foot of each index, "Share or save the
 shortlist" (`[data-shortlist-export-panel]`, shown only while something is

@@ -10,7 +10,7 @@ main_ingredients: ["beef fillet"]
 star_ingredient: "beef"
 internal_temp_ref: beef.tender_roast
 doneness: medium_rare
-tags: ["showstopper"]
+tags: ["showstopper", "main"]
 ingredient_groups:
   - items:
     - amount: "1.2 kg"

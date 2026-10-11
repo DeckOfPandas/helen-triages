@@ -9,7 +9,7 @@ cook_time: "3 hrs 30 mins"
 main_ingredients: ["beef short ribs", "red wine", "beef stock", "garlic cloves", "tomato purée"]
 star_ingredient: "beef"
 internal_temp_ref: beef.tough_cuts
-tags: ["make-ahead", "one-handed food"]
+tags: ["make-ahead", "one-handed food", "main"]
 ingredient_groups:
   - items:
     - amount: "6"
