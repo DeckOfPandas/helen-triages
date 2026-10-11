@@ -2348,7 +2348,10 @@ the two drifted**: the strings were in both places, Helen changed the wording
 (#880, `and` → `then`), and editing the declaration left the page emitting the
 old one with nothing watching the pair.
 `test_the_layout_takes_the_twist_step_from_methods_yml` watches it now, and
-also pins the list's ORDER, which the template indexes.
+also pins the list's ORDER, which the template indexes. **The page names the
+twist**: the declared sentence says "the twist" and the layout swaps in the
+garnish as written, less its `(discarded)` tail — *"Express the lemon twist
+over the drink then drop it in."* `test_the_express_step_names_the_twist`.
 
 **THERE IS NO `item` FIELD — retired 2026-09-21.** It held what the SOURCE
 called a pour until the category was known, and Helen ended it: *"'item' needs

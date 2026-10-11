@@ -294,10 +294,15 @@ layout: default
                  points at appear together or not at all. The star is a
                  SIBLING of `.cocktail-amount`, never inside it, for the
                  reason `.cocktail-use` is. {% endcomment %}
+              {% comment %} ...AND ONCE MEANS ONCE (2026-10-11): a rinse with no
+                 measure is `amount: "(rinse)"` AND `as: "rinse"`, since the
+                 suite wants both, and it printed "(rinse)(rinse)". Where the
+                 amount already IS the mark, the use line is not repeated. {% endcomment %}
+              {% capture use_mark %}({{ item.as }}){% endcapture %}
               {% assign amount_lower = item.amount | append: "" | downcase %}
               {% assign in_dashes = false %}
               {% if amount_lower contains "dash" or amount_lower contains "drop" %}{% assign in_dashes = true %}{% endif %}
-              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}{% if in_dashes %} data-dashes{% endif %}>{{ amount_shown }}</span>{% if in_dashes %}<span class="cocktail-amount-star" aria-hidden="true" hidden>*</span>{% endif %}{% endif %}{% if item.as %}<span class="cocktail-use">({{ item.as }})</span>{% endif %}</span>{% endif %}
+              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}{% if in_dashes %} data-dashes{% endif %}>{{ amount_shown }}</span>{% if in_dashes %}<span class="cocktail-amount-star" aria-hidden="true" hidden>*</span>{% endif %}{% endif %}{% if item.as and amount_shown != use_mark %}<span class="cocktail-use">{{ use_mark }}</span>{% endif %}</span>{% endif %}
               {% comment %} AFTER THE NAME: the bottle in brackets, then
                  "(optional)" (#1141). The name has its own span so nothing
                  aimed at it reaches the brackets. The brackets are markup, so
@@ -395,12 +400,17 @@ layout: default
       {% comment %} The sentences are methods.yml `canonical.express`, READ, never
          spelled here: [0] drop in, [1] discard. DECISIONS §11 (#880). {% endcomment %}
       {% assign express_steps = site.data.cocktails.methods.canonical.express %}
+      {% comment %} THE STEP NAMES THE TWIST (Helen, 2026-10-11): the declared
+         sentence says "the twist", and the page says which one -- the garnish
+         as written, less its "(discarded)" tail. {% endcomment %}
+      {% assign twist_name = g | remove: " (discarded)" %}
+      {% capture named_twist %}the {{ twist_name }}{% endcapture %}
       {% if g contains "discard" %}
         {% if twist_step == "" %}
-          {% assign twist_step = express_steps[1] %}
+          {% assign twist_step = express_steps[1] | replace: "the twist", named_twist %}
         {% endif %}
       {% else %}
-        {% assign twist_step = express_steps[0] %}
+        {% assign twist_step = express_steps[0] | replace: "the twist", named_twist %}
       {% endif %}
     {% endif %}
   {% endfor %}

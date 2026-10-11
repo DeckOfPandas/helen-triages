@@ -5500,6 +5500,42 @@ def test_the_layout_takes_the_twist_step_from_methods_yml():
     )
 
 
+def test_the_express_step_names_the_twist():
+    """The page says WHICH twist: "Express the lemon twist over the drink...".
+
+    Helen, 2026-10-11. The declared sentences keep "the twist" and the layout
+    swaps the garnish in, so both halves are needed: the phrase to replace must
+    be in each sentence, and the layout must do the replacing.
+    """
+    express = (_methods().get("canonical") or {}).get("express") or []
+    lacking = [s for s in express if "the twist" not in s]
+    assert not lacking, (
+        "methods.yml `canonical.express` sentence(s) without \"the twist\", "
+        "which _layouts/cocktail.html replaces with the garnish's own name:\n  "
+        + "\n  ".join(lacking)
+    )
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+    assert layout.count('replace: "the twist", named_twist') == 2, (
+        "_layouts/cocktail.html no longer names the twist in both express "
+        "forms (drop-in and discard)."
+    )
+
+
+def test_a_bracketed_amount_does_not_repeat_its_use():
+    """`amount: "(rinse)"` with `as: "rinse"` prints "(rinse)" once.
+
+    Helen saw the doubled mark on Tailspin, 2026-10-11. Both fields are
+    required of an unmeasured rinse -- test_every_ingredient_has_an_amount and
+    test_a_method_that_floats_or_rinses_says_so_in_a_field -- so the data
+    cannot drop one; the layout skips the use line where the amount is it.
+    """
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+    assert "item.as and amount_shown != use_mark" in layout, (
+        "_layouts/cocktail.html prints `as` without checking whether the "
+        "amount already says it, so an unmeasured rinse reads \"(rinse)(rinse)\"."
+    )
+
+
 def test_no_method_step_opens_with_express():
     """The twist step is the LAYOUT's, not a drink's -- Helen's ruling, 2026-09-04.
 
