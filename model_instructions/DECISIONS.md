@@ -10042,10 +10042,14 @@ verification. Dates are when the correction landed.
     block stays as a fallback behind `:has(.tag-shape svg)`, because a chosen
     word there is the page's dark ground and would vanish if the artwork had
     not arrived.
-  - **Not changed, and worth knowing:** the candidates in both search pools,
-    and the badges on food's recipe rows, which are still 0.75rem and still
-    go to capitals when a filter matches them. The chip and the row badge
-    for one tag are no longer the same size.
+  - **Food's row badges keep their size and their muted colour, and lost
+    their capitals after the merge.** They are still 0.75rem, so the chip and
+    the row badge for one tag are no longer the same size. A matched one went
+    to capitals (2026-08-26, to agree with the chosen chip); with the chip no
+    longer changing case it was the last tag that did. Helen: *"I think it's
+    right that the colour stays muted, but yes, please take off the
+    capitalisation on hit."* The title-search hit still goes to capitals;
+    that was her own ask and nobody has changed it.
   - **The artwork moved** to `assets/img/chrome/tag-shapes/` and is fetched
     with `HTF.chromeAsset`. It is not chrome; it is the only other artwork
     both sites wear, and a per-site copy is the drift #223 records.
