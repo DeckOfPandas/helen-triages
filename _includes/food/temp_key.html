@@ -1,29 +1,14 @@
-{% comment %}
-  The key for ONE chart, sitting at its top right.
+{% comment %} The key for one chart, sitting at its top right.
 
-  Parameters
-    solid    label for the filled bar ("out at", or "reaches" where the figure
-             is an endpoint rather than a moment you act on)
-    rested   true if this chart draws the open rested bar
-    carry    true if this chart draws the carryover connector
+   Parameters
+   solid    label for the filled bar ("out at", or "reaches" where the figure
+   is an endpoint rather than a moment you act on)
+   rested   true if this chart draws the open rested bar
+   carry    true if this chart draws the carryover connector
 
-  NO ENTRY FOR THE SHADED ZONE, since 2026-10-09. There was an `unsafe`
-  parameter and a hatched swatch reading "below the cited safety figure";
-  Helen asked for that label to go, with every other run of words on the
-  figures. The zone still has a label of its own on the plot, at the line
-  ("FSA/USDA 63°C →"), which is where the reader's eye is when they want it.
-
-  WHY IT MOVED OUT OF THE PAGE HEADER. There was one key at the top covering
-  every chart below it, which is the arrangement that requires the reader to
-  hold four definitions in their head while scrolling — and worse, to work out
-  for themselves which of the four apply to whichever chart they are looking at.
-  Poultry has no rested bar and no carryover; the overview has neither and no
-  safety zone either; only three charts shade anything. A key that lists marks a
-  chart doesn't contain is not a key, it's a glossary.
-
-  Helen, and she is right that this is the scientific convention: a figure
-  carries its own legend. Each chart now declares only what it draws, so a key
-  entry appearing at all is itself information.
+   A figure carries its own legend: each chart declares only the marks it
+   draws, so an entry appearing at all is information. No entry for the shaded
+   zone, which has a label of its own on the plot, at the line.
 {% endcomment %}
 
 <div class="tc-key">

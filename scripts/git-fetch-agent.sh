@@ -25,17 +25,23 @@
 # disk.
 #
 # USAGE:
-#   sh scripts/git-fetch-agent.sh <dir> <repo> [ref]
+#   sh scripts/git-fetch-agent.sh <dir> <repo> [ref] [--keep-head]
 #
 #   sh scripts/git-fetch-agent.sh _cocktail_drafts helen-triages-cocktails-private
 #   sh scripts/git-fetch-agent.sh _food_drafts helen-triages-food-private
 #   sh scripts/git-fetch-agent.sh _cocktail_drafts helen-triages-cocktails-private some/branch
+#   sh scripts/git-fetch-agent.sh _cocktail_drafts helen-triages-cocktails-private main --keep-head
 #
 # IT DETACHES ONTO THE FETCHED REF RATHER THAN CHECKING OUT A BRANCH, which is
 # MANUAL §9.1's own instruction -- "to bring a test clone up to date without
 # standing on `main`: git checkout --detach origin/main". A detached HEAD cannot
 # be committed onto by accident, which is the property that matters in a repo
 # whose `main` is protected by a rule and a hook.
+#
+# `--keep-head` fetches and leaves HEAD where it is, then prints how many
+# commits HEAD is behind the fetched ref. Use it mid-work on a branch, where
+# detaching would take you off it; a non-zero count means a red test may not
+# be yours.
 #
 # `git -C` rather than `cd`, so the command stays one statically-analysable
 # thing (guard-unanalyzable-bash.py refuses a leading `cd`), and so
@@ -57,10 +63,12 @@ refuse() {
   exit 2
 }
 
-[ "$#" -ge 2 ] || refuse "usage: sh scripts/git-fetch-agent.sh <dir> <repo> [ref]"
+[ "$#" -ge 2 ] && [ "$#" -le 4 ] \
+  || refuse "usage: sh scripts/git-fetch-agent.sh <dir> <repo> [ref] [--keep-head]"
 dir="$1"
 repo="$2"
 ref="${3:-main}"
+keep="${4:-}"
 
 case "$dir" in
   /* | *..* | -*) refuse "'$dir' is outside this checkout" ;;
@@ -71,6 +79,10 @@ case "$repo" in
 esac
 case "$ref" in
   -* | *..* | *:* | *" "*) refuse "'$ref' is not a branch name" ;;
+esac
+case "$keep" in
+  "" | --keep-head) ;;
+  *) refuse "'$keep' is not --keep-head" ;;
 esac
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -85,6 +97,12 @@ git -C "$dir" \
   -c "credential.helper=!sh '${here}/git-credential-agent-token.sh'" \
   fetch --quiet "https://github.com/DeckOfPandas/${repo}.git" \
   "+refs/heads/${ref}:refs/remotes/origin/${ref}"
+
+if [ -n "$keep" ]; then
+  printf 'behind origin/%s by: ' "$ref"
+  git -C "$dir" rev-list --count "HEAD..origin/${ref}"
+  exit 0
+fi
 
 git -C "$dir" checkout --quiet --detach "origin/${ref}"
 

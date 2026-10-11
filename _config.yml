@@ -1,42 +1,20 @@
-# =============================================================================
-# PRODUCTION CONFIG — this is what deploys.
-# Anything that should only ever be visible on your own machine belongs in
-# _config_local.yml, not here.
-# =============================================================================
+# Production config: this is what deploys. Anything that should only be
+# visible on your own machine belongs in _config_local.yml.
 #
-# THIS IS A MONO-REPO. One Jekyll build serves two sites:
-#
-#   /helen-triages/food/       Helen Triages Food
-#   /helen-triages/cocktails/  Helen Triages Cocktails
-#
-# They share an outer layout, a spacing/type scale and a base stylesheet, and
-# fork everything below that — palette, decoration, page anatomy, taxonomy.
-# Per-site identity (wordmark, title, stylesheet) lives in _data/sites.yml and
-# is selected by `site_key`, set in `defaults:` at the bottom of this file.
-# =============================================================================
+# A mono-repo: one Jekyll build serves /helen-triages/food/ and
+# /helen-triages/cocktails/. Per-site identity (wordmark, title, stylesheet)
+# lives in _data/sites.yml, selected by `site_key`, set in `defaults:` below.
 
-# The repo-level identity. Each site overrides this with its own entry in
-# _data/sites.yml — this is only what the root landing page shows.
-#
-# `description` IS CURRENTLY RENDERED NOWHERE, and that is worth knowing before
-# editing it and wondering why nothing changed. It is only ever a fallback:
-# default.html reads `this_site.description | default: site.description`, and
-# both sites declare their own in _data/sites.yml. The one page that could have
-# reached the fallback was the root landing page, which since issue #204 is a
-# bare redirect with no layout at all (§2.4). So it waits for a third site, or
-# for a page belonging to none.
-#
-# `title` is different and IS used: the footer's copyright line reads
-# `{{ site.title }}` on every page.
+# The repo-level identity. `title` is the footer's copyright line on every
+# page. `description` is only a fallback for a page of neither site: both
+# sites declare their own in _data/sites.yml.
 title: Helen Triages
 description: What not How.
 
-# The link-preview card for a page that belongs to NEITHER site (/about/ and
-# /404.html, the site_neutral pages): the wordmark on [ ?? ] tape. Each site's
-# own card is `social_image` in _data/sites.yml, and all three are rendered by
-# scripts/render_social_images.py from the built site's real header --
-# 2026-09-15, #1086. _layouts/default.html reads this only for a site-neutral
-# page, or as the fallback when a site declares no card of its own.
+# The link-preview card for a page that belongs to neither site (/about/ and
+# /404.html): the wordmark on [ ?? ] tape. Each site's own card is
+# `social_image` in _data/sites.yml; scripts/render_social_images.py renders
+# all three (#1086).
 social_image: /assets/img/social/neutral.png
 
 # GitHub Pages project site. Repo is helen-triages, so the published URL is
@@ -45,123 +23,50 @@ social_image: /assets/img/social/neutral.png
 url: "https://deckofpandas.github.io"
 baseurl: "/helen-triages"
 
-# Whether the index shows recipes still carrying the SOURCE'S wording -- ones
-# where `meta.rewritten` is false, so Helen hasn't yet put the prose in her own
-# voice. False here, so production shows only recipes she has rewritten;
-# _config_local.yml sets it true so you can see and work on the rest.
-#
-# RENAMED FROM `show_unrewritten` 2026-08-21, Helen's ask. "show" plus "un" is
-# two negations to hold at once, and the old name also read as though it were
-# about DRAFTS. It never was: drafts are hidden by `output: false` on the
-# collection, a completely separate mechanism, and someone flipping this hoping
-# to see drafts would get unrewritten recipes instead. The old comment here said
-# "Drafts and unrewritten recipes are never shown in production", which was true
-# of production but wrong about this flag, which governs only the second half.
-#
-# Read four times in food/index.html and nowhere else.
+# Whether the index shows recipes still carrying the source's wording
+# (`meta.rewritten: false`). False here; _config_local.yml sets it true. Not
+# about drafts, which are hidden by `output: false` on their collections.
 show_source_wording: false
 
-# Whether a recipe page offers its "pdf" link (GitHub issue #86). True here, so
-# it appears both on the deployed site and on the jekyll-prod mockup, which
-# exists precisely to show what deploys. _config_local.yml turns it off for the
-# jekyll-local working view, where the file genuinely is not there: the PDFs are
-# rendered from a finished build by scripts/generate_pdfs.py, so a link in the
-# view you work in all day would be a permanent 404.
-#
-# It used to be `{% if jekyll.environment == "production" %}` in the layout,
-# which was wrong in a way only testing found: jekyll-prod serves with
-# --config _config.yml and no JEKYLL_ENV, so it is "development" too, and the
-# link rendered nowhere you could actually look at it.
+# Whether a recipe page offers its "pdf" link (#86). True here and so on the
+# jekyll-prod mockup. _config_local.yml turns it off for jekyll-local, where
+# the PDFs do not exist: scripts/generate_pdfs.py renders them from a
+# finished build.
 pdf_downloads: true
 
-# The "click for short method" toggle and its "In short:" print/PDF section --
-# Helen, 2026-08-14: undeployed. Both beef-wellington.md and chocolate-mousse.md
-# render it oddly. Off everywhere (no _config_local.yml override, so this one
-# value covers jekyll-local, jekyll-prod and the deployed site alike) rather
-# than deleting page.method_short data or the rendering code -- flip this back
-# to true once the feature itself is fixed and she's happy with it again.
+# The "click for short method" toggle and its "In short:" print section. Off
+# everywhere (no _config_local.yml override) until the feature is fixed; the
+# `method_short` data and the rendering code stay.
 short_method_enabled: false
 
-# DO NOT PUBLISH A RECIPE WAITING ON A FIX, OR ONE NOBODY HAS PROOFREAD.
-# GitHub issues #331 and #667. A page publishes only on `meta.awaiting_fix:
-# false` AND `meta.proofread: true`; false here means production removes every
-# other page entirely -- no URL, no sitemap entry -- via
-# _plugins/publish_gate.rb. _config_local.yml sets it true so you can still see
-# and fix them locally.
-#
-# The key is still named for the first flag alone. It switches the WHOLE gate,
-# both legs together, and always has; renaming it would touch two configs, two
-# tests and every mention in the manual for no behavioural gain.
-#
-# The point of the flag is that ONE broken page does not hold the site back.
-# Flag it, ship everything else, fix it, unflag it.
+# False here: production removes every page that does not say
+# `meta.awaiting_fix: false` and `meta.proofread: true` (and
+# `meta.rewritten: true` on a cocktail), via _plugins/publish_gate.rb.
+# _config_local.yml sets it true so every page builds locally. Named for the
+# first flag; it switches the whole gate (#331, #667, #1137).
 show_awaiting_fix: false
 
 # --- Collections -------------------------------------------------------------
-# WHY THE SOURCE DIRECTORIES ARE AT THE REPO ROOT AND NOT INSIDE food/
-#
-# Jekyll only discovers a collection at `_<name>` directly under the source
-# root (or under a single shared `collections_dir`). A collection source at
-# `food/_recipes/` is not found — and it fails SILENTLY: the build succeeds and
-# emits nothing at all. That was tested rather than assumed before this config
-# was written.
-#
-# So the site each collection belongs to is carried in its NAME, and `permalink`
-# is what puts the output under /food/ or /cocktails/. The URLs are exactly the
-# ones agreed; only the on-disk location differs from the original sketch.
+# Source directories sit at the repo root: Jekyll only discovers a collection
+# at `_<name>` directly under the source root, and one placed at
+# `food/_recipes/` silently builds nothing. The site is carried in the
+# collection's name, and `permalink` puts the output under /food/ or
+# /cocktails/.
 collections:
   dev:
-    # INTERNAL REFERENCE PAGES, AND THE REASON THIS IS A COLLECTION RATHER THAN
-    # A LOOSE .html SOMEWHERE.
-    #
-    # Issue #276 deleted food/swatch.html and food/swatch-scribbles.html for
-    # exactly the failure this avoids: they were internal colour references,
-    # linked from nowhere on the site, and they were PUBLISHED ANYWAY, because
-    # Jekyll gives any page it renders a default permalink whether or not an
-    # <a href> points at it. "Unlinked" is not "unpublished", and the only
-    # thing that had noticed was test_page_links.py's PUBLISHED set, which
-    # picked them up through that very fallback.
-    #
-    # `output: false` is the mechanism that actually holds -- the same one
-    # protecting both drafts collections -- so a dev page has no URL and no
-    # sitemap entry in a production build. _config_local.yml flips it to true.
+    # Internal reference pages. A collection with `output: false`, not loose
+    # .html files: Jekyll publishes any page it renders, linked or not (#276).
+    # _config_local.yml flips it to true.
     output: false
   food_recipes:
     output: true
     permalink: /food/recipes/:path/
   food_magic_bag:
-    # THE MAGIC BAG -- dishes Helen makes without a recipe. Helen's own name for
-    # her brain, and the collection is named after it because that is genuinely
-    # where these live: in her head, not on the site.
-    #
-    # A magic-bag entry is NOT a recipe and must never be mistaken for one. It
-    # has no method, no times, no source, and an ingredients list that is
-    # explicitly INCOMPLETE -- whatever she remembered when she jotted it down.
-    # Its whole job is the README's problem #1, "what shall I cook, out of
-    # everything I already know how to make?", for the dishes that never got
-    # written down and never will.
-    #
-    # WHY A SEPARATE COLLECTION rather than a `kind:` field inside
-    # _food_recipes/. Every structural guard in tests/test_front_matter.py is
-    # unconditional, and that is what makes them worth having --
-    # test_method_xor_method_groups treats "neither" as an error, which is a real
-    # catch across the 86 published recipes. A magic-bag entry has no method BY
-    # DEFINITION, so folding it in would force that guard (and the required-field
-    # list, and the source-attribution rules) to grow an `if`. Weakening a live
-    # guard to admit a new shape is the wrong trade: the recipe rules stay
-    # absolute, and the new shape gets rules that actually fit it, in
-    # tests/test_magic_bag.py.
-    #
-    # THE INCOMPLETENESS IS ENFORCED BY THE SCHEMA, NOT ANNOUNCED ON THE PAGE.
-    # There is nowhere in this shape to put a method and tests/test_magic_bag.py
-    # rejects one outright, so a magic-bag list is one that CANNOT be completed
-    # here -- a stronger statement than any paragraph saying it might not be.
-    #
-    # A standing caveat WAS rendered on every page for about an hour on
-    # 2026-08-26, and Helen had it removed the moment she saw it: "I am the
-    # user, and I know exactly what is going on." It explained the collection to
-    # a reader who does not exist on this site (see the README, which is blunt
-    # about who it is not for). The name is already carrying the meaning.
+    # The magic bag: dishes Helen makes without a recipe. Not a recipe: no
+    # method, times or source, and an ingredients list that is incomplete by
+    # design. A separate collection so the unconditional recipe guards in
+    # tests/test_front_matter.py need no exception; its own rules are
+    # tests/test_magic_bag.py. No caveat is printed on the page.
     output: true
     permalink: /food/magic-bag/:path/
   food_drafts:
@@ -172,23 +77,16 @@ collections:
     output: true
     permalink: /cocktails/recipes/:path/
   cocktail_drafts:
-    # Same two-part protection as food_drafts, for the same reason: `output:
-    # false` stops Jekyll publishing them, and _cocktail_drafts/ being its own
-    # git repo (pushed to helen-triages-cocktails-private, gitignored here)
-    # stops the source reaching this public repo at all. Neither half is
-    # redundant -- GitHub issue #235 is the case where output: false held and
-    # the index still listed ten drafts, linking to URLs Jekyll never wrote.
-    # _config_local.yml flips this back to true so they are readable locally.
+    # Same two-part protection as food_drafts: `output: false` stops Jekyll
+    # publishing them, and _cocktail_drafts/ is its own gitignored git repo.
+    # `output: false` does not take a draft out of `site.cocktail_drafts`, so
+    # an index must not list them (#235). _config_local.yml flips this to true.
     output: false
 
 # --- Defaults ----------------------------------------------------------------
-# `site_key` is the one value that makes the shared layout site-aware. It keys
-# into _data/sites.yml for the wordmark, page title, stylesheet and footer
-# decoration, and into _data/<key>/ for that site's vocabulary. A page with no
-# site_key falls back to the repo-level identity above — in practice this is
-# only the root index.html, which since GitHub issue #204 is a bare redirect
-# to food/ rather than a rendered page, so the fallback is largely academic
-# now.
+# `site_key` makes the shared layout site-aware: it keys into _data/sites.yml
+# and into _data/<key>/ for that site's vocabulary. A page with no site_key
+# falls back to the repo-level identity above.
 defaults:
   - scope:
       path: ""
@@ -236,34 +134,15 @@ defaults:
 # Keep non-site files out of the build. Setting `exclude` REPLACES Jekyll's
 # defaults, so the standard entries are repeated here.
 exclude:
-  # Scratch space (CLAUDE.md: never machine /tmp, always this folder). Gitignored,
-  # so a CI build never sees it -- but a LOCAL build copied the whole thing into
-  # _site/tmp/, which is how a stray *.test.js backup there ended up being
-  # collected by `node --test` and failing against a path that doesn't resolve
-  # from its copied location. The scratch folder is not part of the site.
+  # Scratch space. Gitignored, but a local build would copy it into
+  # _site/tmp/, where `node --test` collects stray test files.
   - tmp/
-  # `.claude/` AND THE REASON IS THE WATCHER, NOT THE OUTPUT. Nothing in here
-  # was ever being served -- Jekyll skips dotfiles when it collects site files
-  # -- but `exclude:` is ALSO what Jekyll hands listen as its ignore list, and
-  # listen is not so fussy. Running `jekyll-local` from the repo root walked
-  # every agent worktree under `.claude/worktrees/`, and died:
-  #
-  #     Directory: .../worktrees/big-design/tmp/serve/helen-triages
-  #     is already being watched through: .../worktrees/big-design/tmp/site
-  #     ** ERROR: directory is already being watched! **
-  #
-  # `scripts/browser/serve.sh` symlinks `tmp/serve/helen-triages -> ../site`,
-  # so a worktree that has ever taken a screenshot holds two paths to one
-  # directory, and listen refuses the second. Nothing cleans that symlink up
-  # and nothing should -- Helen, 2026-09-16, on the worktrees themselves:
-  # "Leave the worktrees -- I may well want to go back and look." So the count
-  # of these only ever grows, and every one of them is a mine under her own
-  # dev server.
-  #
-  # THE `tmp/` LINE ABOVE DOES NOT COVER IT: exclude patterns anchor at the
-  # source root, so `tmp/` matches `<root>/tmp/` and never
-  # `.claude/worktrees/<name>/tmp/`. Diagnosed 2026-09-19, when the symptom
-  # ("stop your dev server") named a server that did not exist.
+  # `.claude/` is excluded for the watcher: `exclude:` is also listen's ignore
+  # list, and an agent worktree under `.claude/worktrees/` can hold two paths
+  # to one directory (scripts/browser/serve.sh symlinks tmp/serve/helen-triages
+  # to ../site), which stops `jekyll-local` with "directory is already being
+  # watched". The `tmp/` line above does not cover it: exclude patterns anchor
+  # at the source root.
   - .claude/
   - .jekyll-cache/
   - .sass-cache/
@@ -276,14 +155,9 @@ exclude:
   - tests/
   - pytest.ini
   - requirements-test.txt
-  # Python build tooling (generate_pdfs.py, generate_tape.py,
-  # build_cooking_methods.py and the rest) — GitHub issue #247. Without this
-  # line it was copied whole into _site/scripts/ and served as ordinary
-  # static files: harmless, since nothing links to it, but not part of the
-  # site. generate_pdfs.py in particular runs from the repo checkout, not
-  # from _site, and reads the FINISHED _site as its input after the Jekyll
-  # build has already happened (.github/workflows/build-and-deploy.yml) —
-  # so excluding this directory from what Jekyll builds cannot touch it.
+  # Python build tooling (#247), not part of the site. scripts/generate_pdfs.py
+  # runs from the checkout and reads the finished _site, so excluding this
+  # cannot affect it.
   - scripts/
   # Project-local Node install for the JS tests. Dev-only, and large.
   - .node-runtime/
@@ -291,32 +165,18 @@ exclude:
   - model_instructions/
   - CLAUDE.md
   # WSL writes a "<name>:Zone.Identifier" sidecar beside every file dragged in
-  # from Windows. The colon makes Jekyll read the name as a URI scheme, and
-  # jekyll-sitemap then crashes the ENTIRE build — no output, a raw Ruby
-  # backtrace, no mention of the offending file's real location.
-  #
-  # It only crashes for names that are not legal schemes. Hyphens are legal, so
-  # chai-spice.md:Zone.Identifier slipped through for weeks; underscores are
-  # not, so RECIPES_SEEN_v23.md:Zone.Identifier killed the build the moment it
-  # appeared. .gitignore already covers these, but that only stops them being
-  # committed — Jekyll still reads the working directory.
+  # from Windows. The colon makes Jekyll read the name as a URI scheme and
+  # jekyll-sitemap crashes the whole build. .gitignore covers them, but Jekyll
+  # reads the working directory.
   - "*Zone.Identifier"
   # Build output. `_site` is auto-excluded when it is the destination, but the
   # production preview builds to _site_prod, so each server would otherwise
   # watch the other's output and rebuild in a loop.
   - _site/
   - _site_prod/
-  # Sublime's project and workspace files. SAME REASON AS *Zone.Identifier
-  # above, and worth reading that comment as one thought with this: .gitignore
-  # stops a file being COMMITTED, and Jekyll reads the WORKING DIRECTORY. Two
-  # different questions, and being ignored by one says nothing about the other.
-  #
-  # So these were never on the live site -- a CI checkout has only tracked
-  # files, and these are not tracked (verified with `git archive HEAD`, after
-  # issue #414 claimed otherwise on the strength of a local build). What they
-  # were doing was appearing in the jekyll-prod mockup on :4002, which exists
-  # precisely to show what deploys and was therefore lying about two files.
-  # Small, but that mockup's whole job is fidelity.
+  # Sublime's project and workspace files. Untracked, so never on the live
+  # site, but a local build reads the working directory and they appeared in
+  # the jekyll-prod mockup (#414).
   - htf-sublime.sublime-project
   - htf-sublime.sublime-workspace
 

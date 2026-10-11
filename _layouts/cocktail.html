@@ -2,28 +2,23 @@
 layout: default
 ---
 
-{% comment %} ─────────────────────────────────────────────────────────────────
-  COCKTAIL PAGE. Deliberately not modelled on recipe.html: a drink is a
-  FORMULA (a spirit bill, a glass, a garnish, a short build), not a procedure.
-  The page's anatomy is MANUAL §9.13; each block below names where its reasons
-  are in DECISIONS.
+{% comment %} COCKTAIL PAGE. Deliberately not modelled on recipe.html: a drink
+   is a formula (a spirit bill, a glass, a garnish, a short build), not a
+   procedure. The page's anatomy is MANUAL §9.13.
 
-  EMPTY ARRAY AND EMPTY STRING ARE BOTH TRUTHY IN LIQUID, and this layout has
-  been bitten four times. A list-gated section tests `.size > 0`; a
-  string-gated one tests against "". Never a bare truth test.
-  And tag delimiters are PARSED inside a comment block, so a comment
-  describes a tag in words and never quotes one: it broke this build once.
-  MANUAL §9.7 / DECISIONS §9.7.
-────────────────────────────────────────────────────────────────────────────{% endcomment %}
+   An empty array and an empty string are both truthy in Liquid: a list-gated
+   section tests `.size > 0`, a string-gated one tests against "", never a bare
+   truth test. Tag delimiters are parsed inside a comment block, so a comment
+   describes a tag in words and never quotes one. MANUAL §9.7. {% endcomment %}
 
 {% include back-to-index.html actions=true %}
 
 <article class="cocktail">
 
-  {% comment %} THE GLASS ICON is the FIRST glass in `page.glass` with artwork in
-     glasses.yml `icons`; none renders nothing, never a broken image. The
-     accumulator starts at "" and is tested against "" (see the header).
-     MANUAL §9.11 / DECISIONS §9.11 (2026-08-17), §9.7. {% endcomment %}
+  {% comment %} The glass icon is the first glass in `page.glass` with artwork
+     in glasses.yml `icons`; none renders nothing, never a broken image. The
+     accumulator starts at "" and is tested against "" (see the header). MANUAL
+     §9.11. {% endcomment %}
   {% assign glass_icon = "" %}
   {% for g in page.glass %}
     {% if glass_icon == "" %}
@@ -33,12 +28,11 @@ layout: default
   {% endfor %}
   {% capture glass_icon_file %}icons/glasses/{{ glass_icon }}.svg{% endcapture %}
 
-  {% comment %} HOW TALL: `heights_mm` against the tallest glass, COUNTED LIVE,
-     compressed onto 0.32–1.0 (the tallest fills the title block, a shot about
-     half of it) and sent as a FRACTION of the block, so `make it` shrinks it
-     from a fixed top edge. No `display_scale` here: that is the card's. A
-     glass with no `heights_mm` falls back to the SCSS default.
-     MANUAL §9.14 / DECISIONS §9.11 (2026-08-26). {% endcomment %}
+  {% comment %} How tall: `heights_mm` against the tallest glass, counted live,
+     compressed onto 0.32–1.0 and sent as a fraction of the title block, so
+     `make it` shrinks it from a fixed top edge. No `display_scale` here: that
+     is the card's. A glass with no `heights_mm` falls back to the SCSS default.
+     MANUAL §9.14. {% endcomment %}
   {% assign heights_mm = site.data.cocktails.glasses.heights_mm %}
   {% assign tallest_mm = 0 %}
   {% for icon in site.data.cocktails.glasses.all_icons %}
@@ -52,27 +46,25 @@ layout: default
     {% capture glass_icon_style %} style="--glass-fill: {{ compressed }};"{% endcapture %}
   {% endif %}
 
-  {% comment %} WHERE THE INDEX IS, from _data/sites.yml via `page.site_key`,
-     never a literal `/cocktails/` -- the lookup _includes/back-to-index.html
+  {% comment %} Where the index is: from _data/sites.yml via `page.site_key`,
+     never a literal `/cocktails/`, the lookup _includes/back-to-index.html
      makes. Read by the head's chips and the related cards' chips. {% endcomment %}
   {% assign index_home = site.data.sites[page.site_key].home %}
 
-  {% comment %} TWO STATES, ONE PAGE. The toggle adds `is-making` and
+  {% comment %} Two states, one page. The toggle adds `is-making` and
      _sass/cocktails/_cocktail.scss does the rest. Nothing leaves the DOM, so
-     print and a no-JS reader get the read state, which carries the most.
-     MANUAL §9.13. {% endcomment %}
+     print and a no-JS reader get the read state. MANUAL §9.13. {% endcomment %}
   <div class="cocktail-title-block{% if glass_icon == "" %} cocktail-title-block--no-glass{% endif %}">
     {% if glass_icon != "" %}
       <span class="cocktail-glass-icon"{{ glass_icon_style }}>{% include {{ glass_icon_file }} %}</span>
     {% endif %}
     <div class="cocktail-head-words">
-      {% comment %} THE NAME IS ON THE CARD'S DYMO TAPE: the same four classes
-         _cards.scss styles and decorations.js's cardTapes() fills. A `<div>`,
-         not the card's `<p>`, because it holds a real `<h1>`; the h1 is
-         `display: contents` so the tape word's lettering is the only emboss.
-         No wrapper row round it (#1086). The draft badge flows beside the tape,
-         or under it when there is no room (#1162).
-         MANUAL §9.13 / DECISIONS §9.13 (2026-09-02, #1086), §13 (#1162). {% endcomment %}
+      {% comment %} The name is on the card's tape: the same four classes
+         _cards.scss styles and decorations.js's cardTapes() fills. A <div>, not
+         the card's <p>, because it holds a real <h1>; the h1 is `display:
+         contents` so the tape word's lettering is the only emboss. No wrapper
+         row round it (#1086). The draft badge flows beside the tape, or under
+         it when there is no room (#1162). {% endcomment %}
       <div class="drink-card-name">
         <span class="drink-card-tape">
           <span class="drink-card-tape-bg" data-card-tape="{{ page.url | size }}"></span>
@@ -81,18 +73,17 @@ layout: default
         {% include cocktails/draft-badge.html doc=page %}
       </div>
 
-      {% comment %} `QQ` is the ingest placeholder, never a tagline to print --
-         model_instructions/INGEST_ONE_COCKTAIL.md, "Leave both as QQ". {% endcomment %}
+      {% comment %} `QQ` is the ingest placeholder, never a tagline to print
+         (model_instructions/INGEST_ONE_COCKTAIL.md). {% endcomment %}
       {% if page.tagline and page.tagline != "QQ" %}
         <p class="cocktail-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>
       {% endif %}
 
-      {% comment %} THE META IS THREE FACTS AND NOTHING ELSE: glass, garnish, SHIP
-         IT?. No control goes in this row. Glass reads "A, B or C", no Oxford
-         comma ("nick and nora" is one glass). SHIP IT? is the index card's own
-         include, unconditional (an unrated drink says `???`), and hidden in
-         `make it` by the stylesheet.
-         MANUAL §9.13 / DECISIONS §9.13 (2026-09-02 / 2026-09-05), §13 (#704). {% endcomment %}
+      {% comment %} The meta is three facts and nothing else: glass, garnish,
+         SHIP IT?. No control goes in this row. Glass reads "A, B or C", no
+         Oxford comma. SHIP IT? is the index card's own include, unconditional
+         (an unrated drink says `???`), and hidden in `make it` by the
+         stylesheet. MANUAL §9.13. {% endcomment %}
       <dl class="cocktail-meta">
         {% if page.glass.size > 0 %}
           <div><dt>Glass</dt><dd>
@@ -111,12 +102,11 @@ layout: default
         <div class="cocktail-meta-ship"><dt>Ship it?</dt><dd class="cocktail-ship">{% include cocktails/ship.html ship=page.meta.ship %}</dd></div>
       </dl>
 
-      {% comment %} MOOD CHIPS: the card's chips, as LINKS to the index filtered on
-         the word. `url_encode` spells a space `+`, which filter-state.js's
+      {% comment %} Mood chips: the card's chips, as links to the index filtered
+         on the word. `url_encode` spells a space `+`, which filter-state.js's
          `decodeValue` undoes; the fragment lands on the section holding the lit
-         chip (#1059). `sort_natural`, not `sort`: `sort` is ASCII and puts
-         "I want to faff" first.
-         DECISIONS §9.13 (2026-09-05, #710), §9.7 (2026-09-06), §13 (#1059). {% endcomment %}
+         chip (#1059). `sort_natural`, not `sort`: `sort` is ASCII and puts "I
+         want to faff" first (#710). {% endcomment %}
       {% assign mood_groups = site.data.cocktails.taxonomy.mood_groups %}
       {% if page.mood.size > 0 %}
         {% assign sorted_moods = page.mood | sort_natural %}
@@ -127,11 +117,10 @@ layout: default
     </div>
   </div>
 
-  {% comment %} THE CONTROLS ROW, under the head's rule: read it / make it at the
-     left (both labels always visible, the active one bold), the shortlist pair
-     at the right -- page-actions.html, the include a recipe page puts on its
-     INGREDIENTS line. Print and pdf are on the furniture line since #1210.
-     MANUAL §9.13, §13.13 / DECISIONS §9.13 (#897, #1005, #1086), §13 (#1210). {% endcomment %}
+  {% comment %} The controls row, under the head's rule: read it / make it at
+     the left (both labels always visible), the shortlist pair at the right from
+     page-actions.html, the include a recipe page also uses. Print and pdf are
+     on the furniture line (#1210). MANUAL §9.13, §13.13. {% endcomment %}
   <div class="cocktail-controls">
     <div class="cocktail-toggle" role="group" aria-label="read it or make it">
       <button type="button" class="cocktail-toggle-label is-active" data-mode="read" aria-pressed="true">read it</button>
@@ -143,36 +132,33 @@ layout: default
     {% include page-actions.html %}
   </div>
 
-  {% comment %} THE INGREDIENT LIST IS FULL, not triaged like food's
-     main_ingredients. The keys are MANUAL §9.3. `generic` and `suggestion` may
-     be a string or a list: Liquid's `for` treats a bare string as a one-item
-     list, so one loop handles both. `optional` is NOT food's `incidental`:
-     `incidental` hides a line, `optional` shows it and marks it.
-     MANUAL §9.3, §9.10 / DECISIONS §9.10 (#544). {% endcomment %}
+  {% comment %} The ingredient list is full, not triaged like food's
+     main_ingredients. `generic` and `suggestion` may be a string or a list:
+     Liquid's `for` treats a bare string as a one-item list, so one loop handles
+     both. `optional` is not food's `incidental`: `incidental` hides a line,
+     `optional` shows it and marks it. MANUAL §9.3, §9.10. {% endcomment %}
   {% comment %} `always_fresh` and `standing_notes` (#707) are read once here,
-     not per pour: Liquid re-resolves a `site.data` path on every reference.
-     DECISIONS §9.3.1 (#707). {% endcomment %}
+     not per ingredient: Liquid re-resolves a `site.data` path on every
+     reference. {% endcomment %}
   {% assign always_fresh = site.data.cocktails.ingredients.always_fresh %}
   {% assign standing_notes = site.data.cocktails.ingredients.standing_notes %}
   {% if page.ingredients.size > 0 %}
-    {% comment %} THE SCALER sits under the list it re-reads: a box, a word and
+    {% comment %} The scaler sits under the list it re-reads: a box, a word and
        two step buttons, no other text (the `aria-label`s carry the sentences).
        Whole multiples of the recipe as written; `serves:` is not read here.
-       `hidden` until assets/js/cocktail-scale.js reveals it.
-       MANUAL §9.13 / DECISIONS §9.13 (#545, #720, #721, #731). {% endcomment %}
+       `hidden` until assets/js/cocktail-scale.js reveals it. MANUAL §9.13. {% endcomment %}
     <h2 class="cocktail-section-heading cocktail-section-heading--ingredients"><span>Ingredients</span></h2>
     <ul class="cocktail-ingredients">
       {% for item in page.ingredients %}
-        {% comment %} THE GATE NAMES WHAT THIS BRANCH RENDERS. A dict missing
+        {% comment %} The gate names what this branch renders: a dict missing
            both would fall to the bare-string branch and print as a raw hash.
-           `item` is the LOOP variable, not the retired field: read
-           `item.generic`. DECISIONS §9.10 (2026-09-05), §9.3 (2026-09-21). {% endcomment %}
+           `item` is the loop variable, not the retired field: read
+           `item.generic`. DECISIONS §9.10. {% endcomment %}
         {% if item.amount or item.generic %}
-          {% comment %} THE LINE IS THE GENERIC, WITH THE BOTTLE IN BRACKETS (#544).
-             A list generic joins with an italic "or" -- either would do, never
-             "and" (#441). "fresh " is prefixed per generic, not per line, and
-             the standing note is picked up in the same pass (#707).
-             DECISIONS §9.10 (#544), §9.3.1 (#707). {% endcomment %}
+          {% comment %} The line is the generic, with the bottle in brackets
+             (#544). A list generic joins with an italic "or", never "and"
+             (#441). "fresh " is prefixed per generic, not per line, and the
+             standing note is picked up in the same pass (#707). {% endcomment %}
           {% assign headline = "" %}
           {% assign standing_note = "" %}
           {% assign g_count = 0 %}
@@ -192,31 +178,14 @@ layout: default
             {% endif %}
           {% endfor %}
 
-          {% comment %} A UNIT THE NAME ALREADY SAYS IS NOT SAID TWICE -- #1132,
-             Helen's whole report: "1 cube sugar cube". The data is right
-             (`amount: "1 cube"`, `generic: "sugar cube"` -- the unit is
-             required, and the generic is the thing she will not make the drink
-             without), so the fix is here, in what the line PRINTS.
-
-             TWO CASES, one mark. `each` is never printed: "1.5 each passion
-             fruit" reads "1.5 passion fruit". And a unit that is the name's
-             own last word MOVES INTO THE NAME: "1 cube" + "sugar cube" prints
-             "1" + "sugar cube", "12 cubes" prints "12" + "sugar cubes", "8
-             leaves" + "kaffir lime leaves" prints "8" + "kaffir lime leaves".
-             The name's last word is REPLACED by the unit as the amount wrote
-             it, so the plural is the amount's and nothing here pluralises.
-
-             THE COMPARISON FOLDS BOTH WORDS TO A SINGULAR by the `|` trick
-             below (cube/cubes, leaf/leaves, dash/dashes), because Liquid has
-             no regex. Only a ONE-WORD unit after the number, and only a
-             single generic -- "30 ml X or Y" is left exactly as written.
-
-             `data-amount` KEEPS THE WRITTEN AMOUNT FOR THE SCALER, which has
-             always preferred that attribute to the span's text;
-             `data-unit-quiet` tells cocktail-scale.js to print the number
-             alone and put the unit in `.cocktail-unit-in-name` if the row has
-             one. assets/js/shopping-list.js applies the same rule to the
-             index's shopping list (`quietUnit`). MANUAL §9.10. {% endcomment %}
+          {% comment %} A unit the name already says is not said twice (#1132).
+             `each` is never printed. A one-word unit that is the name's own
+             last word replaces that word as the amount wrote it, so the plural
+             is the amount's; both are folded to a singular by the `|` trick
+             below, Liquid having no regex. Single generic only. `data-amount`
+             keeps the written amount and `data-unit-quiet` tells
+             cocktail-scale.js to print the number alone, with the unit in
+             `.cocktail-unit-in-name`. MANUAL §9.10. {% endcomment %}
           {% assign amount_shown = item.amount %}
           {% assign unit_quiet = false %}
           {% assign unit_in_name = "" %}
@@ -240,8 +209,9 @@ layout: default
             {% if unit_quiet %}{% assign amount_shown = a_parts[0] %}{% endif %}
           {% endif %}
 
-          {% comment %} The bottle, oxford-joined, in brackets after the class.
-             `suggestion` is name(s) only since #457, so it needs no shaping. {% endcomment %}
+          {% comment %} The bottles, joined "A, B, or C", for the brackets after
+             the name. `suggestion` is names only (#457), so it needs no
+             shaping. {% endcomment %}
           {% assign s_count = 0 %}
           {% for s in item.suggestion %}{% assign s_count = s_count | plus: 1 %}{% endfor %}
           {% assign bottles = "" %}
@@ -261,10 +231,10 @@ layout: default
             {% endfor %}
           {% endif %}
 
-          {% comment %} `character` gets a labelled LINE, never a bare
-             parenthetical (#441). DECISIONS §9.10 (#544). The label has its
-             own span since #1226 so it can be set in Plex Mono; the colon
-             stays in the markup so the line copies as it reads. {% endcomment %}
+          {% comment %} `character` gets a labelled line, never a bare
+             parenthetical (#441). The label has its own span so it can take its
+             own face (#1226); the colon stays in the markup so the line copies
+             as it reads. {% endcomment %}
           {% assign class_html = "" %}
           {% if item.character %}
             {% assign character_joined = item.character | join: ", " %}
@@ -273,40 +243,27 @@ layout: default
 
           <li class="cocktail-ingredient">
             <div class="cocktail-ingredient-top">
-              {% comment %} `as` -- "(float)", "(shell)" -- SITS UNDER THE AMOUNT
-                 since #1263; it was after the bottle (#1217) and easy to miss
-                 there. It still pairs with a bracketed AMOUNT so the mark
-                 appears once: a pour with no measure says "(top)" as the
-                 amount, a pour with one says it on the line below. It is a
-                 SIBLING of `.cocktail-amount`, never inside it, because
-                 cocktail-scale.js reads that span's whole text as a quantity.
-                 MANUAL §9.3 / DECISIONS §9.3 (#1263). {% endcomment %}
-              {% comment %} A POUR IN DASHES OR DROPS IS MARKED, #1293. Above x1 the
-                 scaler still multiplies it, and the note under the scaler has
-                 said since #713 that it should not be trusted. Helen,
-                 2026-10-04: "make it more obvious that bitters shouldn't be
-                 scaled by updating the ingredient line as well as showing the
-                 note under the scaler... e.g. strikethrough text for the
-                 amount, then a *, and a * before" the note. So the amount
-                 carries `data-dashes`, and a `*` sits beside it, hidden until
-                 cocktail-scale.js goes above x1. THE SAME TEST AS
-                 `has_dashes` BELOW, on purpose: the star and the note it
-                 points at appear together or not at all. The star is a
-                 SIBLING of `.cocktail-amount`, never inside it, for the
-                 reason `.cocktail-use` is. {% endcomment %}
-              {% comment %} ...AND ONCE MEANS ONCE (2026-10-11): a rinse with no
-                 measure is `amount: "(rinse)"` AND `as: "rinse"`, since the
-                 suite wants both, and it printed "(rinse)(rinse)". Where the
-                 amount already IS the mark, the use line is not repeated. {% endcomment %}
+              {% comment %} `as` ("(float)", "(shell)") sits under the amount
+                 (#1263). It is a sibling of `.cocktail-amount`, never inside
+                 it, because cocktail-scale.js reads that span's whole text as a
+                 quantity. Where the amount already IS the mark -- an unmeasured
+                 rinse is `amount: "(rinse)"` and `as: "rinse"` -- it is not
+                 printed twice. MANUAL §9.3. {% endcomment %}
+              {% comment %} An amount in dashes or drops carries `data-dashes`
+                 and a `*` beside it, hidden until cocktail-scale.js goes above
+                 x1 (#1293). The same test as `has_dashes` below, on purpose:
+                 the star and the note it points at appear together or not at
+                 all. The star is a sibling of `.cocktail-amount`, never inside
+                 it, for the reason `.cocktail-use` is. {% endcomment %}
               {% capture use_mark %}({{ item.as }}){% endcapture %}
               {% assign amount_lower = item.amount | append: "" | downcase %}
               {% assign in_dashes = false %}
               {% if amount_lower contains "dash" or amount_lower contains "drop" %}{% assign in_dashes = true %}{% endif %}
               {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}{% if in_dashes %} data-dashes{% endif %}>{{ amount_shown }}</span>{% if in_dashes %}<span class="cocktail-amount-star" aria-hidden="true" hidden>*</span>{% endif %}{% endif %}{% if item.as and amount_shown != use_mark %}<span class="cocktail-use">{{ use_mark }}</span>{% endif %}</span>{% endif %}
-              {% comment %} AFTER THE NAME: the bottle in brackets, then
+              {% comment %} After the name: the bottle in brackets, then
                  "(optional)" (#1141). The name has its own span so nothing
                  aimed at it reaches the brackets. The brackets are markup, so
-                 the words copy as they read. DECISIONS §9.10 (#1141). {% endcomment %}
+                 the words copy as they read. {% endcomment %}
               <span class="cocktail-item"><span class="cocktail-item-name">{{ headline }}{% if unit_in_name != "" %} <span class="cocktail-unit-in-name">{{ unit_in_name }}</span>{% endif %}</span>{% if bottles != "" %} <span class="cocktail-suggestion">({{ bottles }})</span>{% endif %}{% if item.optional %} <span class="cocktail-optional">(optional)</span>{% endif %}</span>
             </div>
             {% if class_html != "" %}
@@ -315,8 +272,8 @@ layout: default
             {% if item.note %}
               <p class="cocktail-note">{{ item.note }}</p>
             {% endif %}
-            {% comment %} THE STANDING NOTE never replaces the drink's own note: it
-               fills the gap, or follows the drink's own. DECISIONS §9.3.1 (#707). {% endcomment %}
+            {% comment %} The standing note never replaces the drink's own note:
+               it fills the gap, or follows it (#707). {% endcomment %}
             {% if standing_note != "" %}
               <p class="cocktail-note">{{ standing_note }}</p>
             {% endif %}
@@ -326,45 +283,36 @@ layout: default
         {% endif %}
       {% endfor %}
     </ul>
-    {% comment %} `data-total-ml` IS THE RECIPE AS WRITTEN, IN ML, AND NOTHING ON
-       THE PAGE PRINTS IT (#1257, 2026-10-02). It was "Approximately X ml", a
-       line under the scaler that moved with the box (#1121); Helen took the
-       line off. The figure stays as an attribute because
-       scripts/glass_fit_report.py and the volume tests read it -- the plugin's
-       sum (`volume_for` in _plugins/cocktail_units.rb), never a second one.
-       No script reads it. No `page.volume`, no attribute.
-       `data-top-ml` (how much of that total is a `(top)`, #1179) and
-       `data-method-family` (the dilution family the plugin read the method
-       as) ride beside it for the same reader, the fit report, and are as
-       unprinted as it is. So do `data-after-ml` (in the glass but added after
-       the shake, so never watered) and `data-aside-ml` (in the recipe and not
-       in the glass: the rum in a fruit shell), since #1244's
-       audit; each is absent when it is nothing.
-       MANUAL §9.3.6 / DECISIONS §9.3.6. {% endcomment %}
+    {% comment %} `data-total-ml` is the recipe as written, in ml, and nothing
+       prints it (#1257): scripts/glass_fit_report.py and the volume tests read
+       it, no browser script does. It is the plugin's sum (`volume_for`,
+       _plugins/cocktail_units.rb), never a second one. `data-top-ml` (how much
+       of it is a `(top)`, #1179), `data-method-family`, `data-after-ml` (added
+       after the shake, so never watered) and `data-aside-ml` (in the recipe,
+       not in the glass) sit beside it for the same reader, each absent when it
+       is nothing. MANUAL §9.3.6. {% endcomment %}
     <div class="cocktail-scale-controls"{% if page.volume %} data-total-ml="{{ page.volume.total_ml }}"{% if page.volume.top_ml %} data-top-ml="{{ page.volume.top_ml }}" data-top-from="{{ page.volume.top_from }}"{% endif %} data-method-family="{{ page.volume.method_family }}"{% if page.volume.after_ml %} data-after-ml="{{ page.volume.after_ml }}"{% endif %}{% if page.volume.aside_ml %} data-aside-ml="{{ page.volume.aside_ml }}"{% endif %}{% endif %} hidden>
-      {% comment %} THE STEP BUTTONS share the box's `hidden` wrapper, so one reveal
-         shows all three. `−` is U+2212, not a hyphen. Wordless on purpose; each
-         click goes through `apply()`, the function a typed value reaches.
-         DECISIONS §9.13 (#731). {% endcomment %}
+      {% comment %} The step buttons share the box's `hidden` wrapper, so one
+         reveal shows all three. `−` is U+2212, not a hyphen. Wordless on
+         purpose; each click goes through `apply()`, the function a typed value
+         reaches (#731). {% endcomment %}
       <button type="button" class="cocktail-scale-step cocktail-scale-minus" aria-label="one fewer">−</button>
       <label class="cocktail-scale">
-        {% comment %} WHOLE RECIPES ONLY. `type="text"` (no spinner at two
+        {% comment %} Whole recipes only. `type="text"` (no spinner at two
            characters wide) with `inputmode="numeric"`; the script rounds and
-           clamps, so the input type enforces nothing. DECISIONS §9.13 (2026-09-05). {% endcomment %}
+           clamps, so the input type enforces nothing. {% endcomment %}
         <input type="text" value="1" inputmode="numeric" class="cocktail-scale-multiple" aria-label="make this many times the recipe">
-        {% comment %} "drinks" is final (#1088). Markup rather than CSS `content:`,
-           so the word can be found, selected and translated; `aria-hidden`
-           because the input's `aria-label` already names the count.
-           MANUAL §9.13 / DECISIONS §13 (#1086, #1088). {% endcomment %}
+        {% comment %} "drinks" is final (#1088). Markup, not CSS `content:`, so
+           the word can be found, selected and translated; `aria-hidden` because
+           the input's `aria-label` already names the count. {% endcomment %}
         <span class="cocktail-scale-mark" aria-hidden="true">drinks</span>
       </label>
       <button type="button" class="cocktail-scale-step cocktail-scale-plus" aria-label="one more">+</button>
     </div>
-    {% comment %} THE BATCH NOTE IS THE BITTERS CAVEAT AND NOTHING ELSE, and only
-       on a drink that pours something in dashes or drops -- a caveat that fires
-       where it does not apply teaches you to stop reading caveats. The floor
-       refusal is silent (#1088). MANUAL §9.13 / DECISIONS §9.3.6 (#1121),
-       §9.13 (#713, #720, #1088). {% endcomment %}
+    {% comment %} The batch note is the bitters caveat and nothing else, and
+       only on a drink with an amount in dashes or drops: a caveat that fires
+       where it does not apply teaches you to stop reading caveats (#713).
+       MANUAL §9.13. {% endcomment %}
     {% assign has_dashes = false %}
     {% for ingredient in page.ingredients %}
       {% assign amount_text = ingredient.amount | downcase %}
@@ -378,13 +326,12 @@ layout: default
   {% endif %}
 
 
-  {% comment %} `method` is an ORDERED LIST; a bare string is still accepted for a
-     one-step build. {% endcomment %}
-  {% comment %} A CITRUS TWIST ADDS THE LAST STEP, and no drink writes it. The
-     garnish must MATCH a twist declared in garnish.yml (a coin is not a twist);
+  {% comment %} `method` is an ordered list; a bare string is still accepted for
+     a one-step build. {% endcomment %}
+  {% comment %} A citrus twist adds the last step, and no drink writes it. The
+     garnish must match a twist declared in garnish.yml (a coin is not a twist);
      an undeclared spelling gets no step. "(discarded)" picks the discard form,
-     and a kept twist wins where a drink carries both.
-     MANUAL §9.12 / DECISIONS §9.3 (2026-09-04). {% endcomment %}
+     and a kept twist wins where a drink carries both. MANUAL §9.12. {% endcomment %}
   {% assign declared_twists = "" %}
   {% for group in site.data.cocktails.garnish.canonical %}
     {% for declared in group[1] %}
@@ -397,12 +344,12 @@ layout: default
   {% for g in page.garnish %}
     {% capture bounded %}|{{ g }}|{% endcapture %}
     {% if declared_twists contains bounded %}
-      {% comment %} The sentences are methods.yml `canonical.express`, READ, never
-         spelled here: [0] drop in, [1] discard. DECISIONS §11 (#880). {% endcomment %}
+      {% comment %} The sentences are methods.yml `canonical.express`, read,
+         never spelled here: [0] drop in, [1] discard (#880). {% endcomment %}
       {% assign express_steps = site.data.cocktails.methods.canonical.express %}
-      {% comment %} THE STEP NAMES THE TWIST (Helen, 2026-10-11): the declared
-         sentence says "the twist", and the page says which one -- the garnish
-         as written, less its "(discarded)" tail. {% endcomment %}
+      {% comment %} The declared sentence says "the twist"; the page says which
+         one -- the garnish as written, less its "(discarded)" tail.
+         MANUAL §9.3. {% endcomment %}
       {% assign twist_name = g | remove: " (discarded)" %}
       {% capture named_twist %}the {{ twist_name }}{% endcapture %}
       {% if g contains "discard" %}
@@ -415,11 +362,10 @@ layout: default
     {% endif %}
   {% endfor %}
 
-  {% comment %} THE STRAIN STEP IS COMPOSED, never stored: the technique from
-     `method`, the glass's phrase from glasses.yml `serving`, the ice clause from
-     serve.yml `in_the_glass` ("filled" swapped for `serve.fill`'s word), and the
-     rim. Only a bare technique is rewritten.
-     MANUAL §9.10a / DECISIONS §9.10a (2026-09-05, 2026-09-28). {% endcomment %}
+  {% comment %} The strain step is composed, never stored: the technique from
+     `method`, the glass's phrase from glasses.yml `serving`, the ice clause
+     from serve.yml `in_the_glass` ("filled" swapped for `serve.fill`'s word),
+     and the rim. Only a bare technique is rewritten. MANUAL §9.10a. {% endcomment %}
   {% assign glass_phrase = "" %}
   {% for g in page.glass %}
     {% assign key = g | downcase %}
@@ -440,13 +386,12 @@ layout: default
       {% assign ice_clause = ice_clause | replace: "filled", fill_word %}
     {% endif %}
   {% endif %}
-  {% comment %} THE RIM RIDES ON THE GLASS, before the ice. `rim_shown` is the
-     fallback: a rimmed drink with no strain step keeps its rim under "To serve". {% endcomment %}
-  {% comment %} THE RIM READS AS A GARNISH DOES (Helen, 2026-10-11): "Strain
-     into a martini glass with a sugar rim." `serve.rim` is a noun phrase
-     holding the word "rim", so "with a"/"with an" always lands on one; and an
-     ice clause that would run on from it ("...a salt rim filled with ice")
-     takes a comma first. DECISIONS §9.10a. {% endcomment %}
+  {% comment %} The rim rides on the glass, before the ice, and reads as a
+     garnish does: "...into a martini glass with a sugar rim". `serve.rim`
+     holds the word "rim", so "with a"/"with an" lands on a noun; an ice
+     clause that would run on from it takes a comma first. `rim_shown` is the
+     fallback: a rimmed drink with no strain step keeps its rim under "To
+     serve". MANUAL §9.10a. {% endcomment %}
   {% assign rim_clause = "" %}
   {% if page.serve.rim %}
     {% assign rim_first = page.serve.rim | slice: 0 | downcase %}
@@ -470,10 +415,10 @@ layout: default
     {% endunless %}
   {% endfor %}
 
-  {% comment %} THE GLASS GENERATOR (#1214): the FIRST step methods.yml
-     `in_the_glass` knows is rewritten to name the glass. DRAFTS ONLY until Helen
-     has re-read the published set; `page.collection` is the whole condition.
-     MANUAL §9.10a / DECISIONS §9.10a (#1214). {% endcomment %}
+  {% comment %} The glass generator (#1214): the first step methods.yml
+     `in_the_glass` knows is rewritten to name the glass. Drafts only until
+     Helen has re-read the published set; `page.collection` is the whole
+     condition. MANUAL §9.10a. {% endcomment %}
   {% assign glass_step = "" %}
   {% if page.collection == "cocktail_drafts" and glass_phrase != "" %}
     {% for step in page.method %}
@@ -486,30 +431,26 @@ layout: default
       {% endunless %}
     {% endfor %}
   {% endif %}
-  {% comment %} ...and a strain step then drops the glass, unless an ice or rim
-     clause gives it something new to say. `glass_step` is only ever set for a
-     draft, so a published page is untouched.
-     DECISIONS §9.10a (2026-09-28). {% endcomment %}
+  {% comment %} A strain step then drops the glass, unless an ice or rim clause
+     gives it something new to say. `glass_step` is only ever set for a draft,
+     so a published page is untouched. {% endcomment %}
   {% assign glass_step_done = false %}
 
   {% if page.method.size > 0 and page.method.first %}
     <h2 class="cocktail-section-heading cocktail-section-heading--method"><span>Method</span></h2>
     <ol class="cocktail-method">
-      {% comment %} A step is a string or a `{step, note}` pair; the note renders
-         under its step as `.cocktail-note`. DECISIONS §9.3 (2026-09-04). {% endcomment %}
+      {% comment %} A step is a string or a `{step, note}` pair; the note
+         renders under its step as `.cocktail-note`. {% endcomment %}
       {% for step in page.method %}{% if step.step %}<li>{{ step.step | markdownify | remove: '<p>' | remove: '</p>' }}{% if step.note %}<p class="cocktail-note cocktail-method-note">{{ step.note }}</p>{% endif %}</li>{% else %}{% assign shown = step %}{% assign bare = step | remove: "." %}{% if bare == "Strain" or bare == "Fine strain" or bare == "Double strain" or bare == "Dump" or bare == "Pour" %}{% if glass_phrase != "" %}{% assign name_the_glass = true %}{% if glass_step_done and ice_clause == "" and rim_clause == "" %}{% assign name_the_glass = false %}{% endif %}{% if name_the_glass %}{% capture shown %}{{ bare }} into {{ glass_phrase }}{{ rim_clause }}{{ ice_clause }}.{% endcapture %}{% endif %}{% endif %}{% elsif glass_step_done == false and step == glass_step %}{% assign shown = site.data.cocktails.methods.in_the_glass[step] | replace: "<glass>", glass_phrase %}{% assign glass_step_done = true %}{% endif %}<li>{{ shown | markdownify | remove: '<p>' | remove: '</p>' }}</li>{% endif %}{% endfor %}
       {% if twist_step != "" %}<li>{{ twist_step }}</li>{% endif %}
-      {% comment %} A GARNISH STEP FOR EVERYTHING THAT IS NOT A TWIST (twists have
-         the express step above). Article: "a", "an" before a vowel, none before
-         a final `s`, none for garnish.yml `no_article`. `no garnish` gets no
-         step. Three or more read "A, B and C", no serial comma; the parts are
-         joined on `|` because Liquid cannot append to an array.
-         MANUAL §9.10a / DECISIONS §9.10a (2026-09-05), §9.12 (#1138, #1143).
-         A FILLED SHELL GETS NO STEP EITHER (#1256, 2026-10-01): where an
-         ingredient says `as: "shell"`, the method's own "Fill the ... shell"
-         step places it, exactly as the express step places a twist. The shell
-         stays in `garnish:` so the meta line names it before the ingredients
-         say "(shell)". A shell with no rum (Mai Tai) keeps its step. {% endcomment %}
+      {% comment %} A garnish step for everything that is not a twist (twists
+         have the express step above). Article: "a", "an" before a vowel, none
+         before a final `s`, none for garnish.yml `no_article`. `no garnish`
+         gets no step. Three or more read "A, B and C", no serial comma; the
+         parts are joined on `|` because Liquid cannot append to an array. A
+         filled shell gets no step either (#1256): where an ingredient says `as:
+         "shell"`, the method's own step places it, and the shell stays in
+         `garnish:` so the meta line names it. MANUAL §9.10a. {% endcomment %}
       {% assign shell_pours = page.ingredients | where: "as", "shell" %}
       {% assign garnish_joined = "" %}
       {% for g in page.garnish %}
@@ -557,11 +498,10 @@ layout: default
     <p class="cocktail-method">{{ page.method | markdownify | remove: '<p>' | remove: '</p>' }}</p>
   {% endif %}
 
-  {% comment %} TO SERVE: the rim, only when no strain step carried it, then
-     `to_serve`, which is PRESENTATION ("over crushed ice, with a straw"), never
+  {% comment %} To serve: the rim, only when no strain step carried it, then
+     `to_serve`, which is presentation ("over crushed ice, with a straw"), never
      an instruction. The ice is a clause on the strain step, not a line here.
-     `to_serve` is stripped and tested against "" (#1212).
-     DECISIONS §9.4 (2026-08-16), §9.10a (2026-09-05), §9.7 (#1212). {% endcomment %}
+     `to_serve` is stripped and tested against "" (#1212). {% endcomment %}
   {% assign to_serve_text = page.to_serve | strip %}
   {% if to_serve_text != "" or page.serve.rim and rim_shown == false %}
     <h2 class="cocktail-section-heading">To serve</h2>
@@ -573,20 +513,11 @@ layout: default
     {% endif %}
   {% endif %}
 
-  {% comment %} Notes take food's shape, {label, text}, so that a note jotted on
-     a draft has keys to type into. The bare string the shape allowed until
-     2026-10-01 is retired; an empty pair is the placeholder.
-
-     AN EMPTY NOTE IS NOT A NOTE, and is counted out before the heading is
-     decided. This matches `_layouts/recipe.html`, whose comment carries the
-     argument in full: the shape test is on the KEYS and not the value, because
-     a pair whose text is empty would otherwise fall through to the bare-string
-     branch, be rendered as the MAPPING, and come out as nothing at all —
-     measured on 115 drafts, and the reason the keys test is what makes the skip
-     work. Placeholder notes — a label and a text that are both empty strings,
-     which is what a draft now carries while it waits to be written — are why
-     any of this has to exist.
-  {% endcomment %}
+  {% comment %} Notes take food's shape, {label, text}; an empty pair is the
+     draft placeholder. An empty note is not a note, and is counted out before
+     the heading is decided, as in _layouts/recipe.html. The shape test is on
+     the keys, not the value: a pair whose text is empty would otherwise fall to
+     the bare-string branch and be rendered as the mapping. {% endcomment %}
   {% assign shown_notes = 0 %}
   {% for note in page.notes %}
     {% if note.label == nil and note.text == nil %}
@@ -622,17 +553,14 @@ layout: default
     <div class="cocktail-body-content">{{ content }}</div>
   {% endif %}
 
-  {% comment %} THE FOOTER, in Helen's order (#1099): source, units, cost.
-     THE UNITS LINE is units, not ABV, in Helen's words ("Roughly X units of
-     alcohol in a serving of Y ml") -- do not polish them. It is PER SERVING and
-     must never move with the scaler: nothing the scaler writes reaches
-     `.cocktail-units`. Since #1257 no volume figure moves at all.
-     `page.units.exact` is computed and rendered by nothing, on purpose.
-     THE COST LINE IS LOCAL ONLY: `site.show_costs` lives in _config_local.yml
-     and never in _config.yml. `cost.complete` false withholds the figure;
-     `cost.exact` prints one figure rather than a range.
-     MANUAL §9.3.4–§9.3.6 / DECISIONS §9.3.4 (2026-09-06), §9.3.5, §9.3.6
-     (#1121), §9.13 (#1001). {% endcomment %}
+  {% comment %} The footer, in Helen's order (#1099): source, units, cost. The
+     units line is units, not ABV, in her words: do not polish them. It is per
+     serving and must never move with the scaler: nothing the scaler writes
+     reaches `.cocktail-units`. `page.units.exact` is computed and rendered by
+     nothing, on purpose. The cost line is local only: `site.show_costs` lives
+     in _config_local.yml and never in _config.yml. `cost.complete` false
+     withholds the figure; `cost.exact` prints one figure, not a range. MANUAL
+     §9.3.4–§9.3.6. {% endcomment %}
   {% assign has_source = false %}
   {% if page.source != "" or page.source_url != "" %}{% assign has_source = true %}{% endif %}
   {% assign has_cost = false %}
@@ -648,16 +576,10 @@ layout: default
           {% endif %}
         </p>
       {% endif %}
-      {% comment %} "(undiluted)" FOLLOWS THE MILLILITRES AND APPEARS ONLY WITH
-         THEM -- #1291, 2026-10-04. Helen: "I just want to make it clear that
-         120 ml of drink won't end up in a 120-ml glass." Her first wording
-         was "in an (undiluted) serving of 120 ml", and she caught it herself:
-         that "leaves 'an serving' outside the brackets". So: "in a serving of
-         120 ml (undiluted)." -- the article stays right and the word sits
-         against the figure it qualifies. The figure is the recipe as poured
-         into the shaker; shaking adds a quarter again and the ice takes room
-         (§9.11.2). A drink that states no volume says "in a serving." as
-         before: there is no figure for the word to qualify. {% endcomment %}
+      {% comment %} "(undiluted)" follows the millilitres and appears only with
+         them (#1291): the figure is the recipe as it goes into the shaker, and
+         dilution and ice mean it will not fit a glass of that size (MANUAL
+         §9.11.2). A drink that states no volume says "in a serving." {% endcomment %}
       {% if page.units %}
         <p class="cocktail-units"
            data-units-per-serve="{{ page.units.per_serve }}"
@@ -668,9 +590,8 @@ layout: default
           {%- else %} in a serving{% endif %}
           {%- if page.volume %} of {{ page.volume.serve_ml }} ml (undiluted){% endif %}.</p>
       {% endif %}
-      {% comment %} `min_text` / `max_text` are the PRINTED figures, to two
-         places; `min` / `max` stay numbers on the data attributes, for the
-         scripts. DECISIONS §9.3.5 (#1215). {% endcomment %}
+      {% comment %} `min_text` / `max_text` are the printed figures, to two
+         places; `min` / `max` stay numbers on the data attributes (#1215). {% endcomment %}
       {% if has_cost %}
         <p class="cocktail-cost"
            data-cost-min="{{ page.cost.min }}"
@@ -681,27 +602,19 @@ layout: default
     </div>
   {% endif %}
 
-  {% comment %} ─────────────────────────────────────────────────────────────────
-     IF YOU LIKED THIS, HOW ABOUT … -- coincidental tagging and nothing else.
-     Score = shared MOODS + shared ingredient GENERICS, ties broken by title.
-     `python3 scripts/related_drinks.py [slug]` is the same scoring in Python;
-     re-run it after a promotion batch or a vocabulary edit that moves moods.
-
-     `site.cocktail_recipes` is already the published set (publish_gate.rb
-     removes held-back drinks at :post_read). DRAFTS ARE A DIFFERENT COLLECTION
-     and are deliberately not concatenated in, on any config (#235).
-
-     Liquid cannot sort by a computed number, so each candidate is a
-     `rank~title~url` string with rank = 999 - score, sorted as text:
-     highest score first, A-Z within a score. `sort_natural`, as for the chips.
-     MANUAL §9.13 / DECISIONS §9.13 (#927).
-  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+  {% comment %} IF YOU LIKED THIS, HOW ABOUT…: score = shared moods + shared
+     ingredient generics, ties broken by title; scripts/related_drinks.py is the
+     same scoring in Python. `site.cocktail_recipes` is already the published
+     set (publish_gate.rb), and drafts are deliberately never concatenated in,
+     on any config (#235). Liquid cannot sort by a computed number, so each
+     candidate is a `rank~title~url` string with rank = 999 - score, sorted as
+     text. MANUAL §9.13. {% endcomment %}
   {% capture my_generics %}{% for ing in page.ingredients %}{% for g in ing.generic %}|{{ g }}|{% endfor %}{% endfor %}{% endcapture %}
   {% assign related_keys = "" %}
   {% for other in site.cocktail_recipes %}
     {% unless other.url == page.url %}
       {% assign score = 0 %}
-      {% comment %} `contains` ON AN ARRAY IS MEMBERSHIP, not a substring probe,
+      {% comment %} `contains` on an array is membership, not a substring probe,
          so a mood needs no delimiters round it. A generic does: it is compared
          against one flat string of every generic on this page, and `|lime|`
          must not match inside `|lime juice|`. {% endcomment %}
@@ -723,18 +636,16 @@ layout: default
   {% assign related_sorted = related_keys | split: ";" | sort_natural %}
 
   {% if related_sorted.size > 0 %}
-    {% comment %} The heading is FINAL (#1088) and wears the first-level mark; it
-       wraps on a phone, so its span is in last-line-rule.js's TARGETS (#920).
-       The section's rule above it is `.cocktail-footer`'s (#955).
-       MANUAL §9.13 / DECISIONS §13 (#1088), §9.13 (#955). {% endcomment %}
+    {% comment %} The heading is final (#1088); it wraps on a phone, so its span
+       is in last-line-rule.js's TARGETS (#920). The section's rule above it is
+       `.cocktail-footer`'s (#955). {% endcomment %}
     <section class="cocktail-related-section">
     <h2 class="cocktail-section-heading cocktail-section-heading--related"><span>If you liked this, how about&hellip;</span></h2>
-    {% comment %} THE INDEX CARD, NOT A VARIANT OF IT (#991): cocktails/index.html's
-       card, same classes in the same order, every rule _cards.scss's. Two
-       differences, neither geometry: chips are LINKS, and there are no `data-*`
-       search attributes. FOUR cards: `HOW_MANY` in scripts/related_drinks.py and
-       the rendered-pages test must move with this.
-       MANUAL §9.13 / DECISIONS §9.13 (#991). {% endcomment %}
+    {% comment %} The index card, not a variant of it (#991):
+       cocktails/index.html's card, same classes in the same order. Two
+       differences, neither geometry: chips are links, and there are no `data-*`
+       search attributes. Four cards: `HOW_MANY` in scripts/related_drinks.py
+       must move with the `limit`. {% endcomment %}
     <ul class="cocktail-related drink-cards">
       {% for entry in related_sorted limit: 4 %}
         {% assign parts = entry | split: "~" %}
@@ -785,16 +696,15 @@ layout: default
             {% include cocktails/card-tagline.html doc=rel part="line" %}
           </div>
           <div class="drink-card-foot">
-            {% comment %} The page's own chips: `sort_natural`, `mood_groups`, links
-               to the filtered index. The ship is the foot's second child, pinned
-               out of flow as on the index. DECISIONS §9.13 (#991). {% endcomment %}
+            {% comment %} The page's own chips: `sort_natural`, `mood_groups`,
+               links to the filtered index. The ship is the foot's second child,
+               pinned out of flow as on the index. {% endcomment %}
             <span class="drink-card-moods">{% assign rel_moods = rel.mood | sort_natural %}{% for m in rel_moods %}{% if mood_groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<a class="drink-card-mood drink-card-mood--{{ chip }}" href="{{ index_home | relative_url }}?mood={{ m | url_encode }}#filter-{{ chip }}">{{ m }}</a>{% endfor %}</span>
             <span class="drink-card-ship">{% include cocktails/ship.html ship=rel_ship short=true %}</span>
           </div>
-          {% comment %} THE SHORTLIST `+`: the index card's button exactly, keyed on
-             the related drink's own url, so it is the same entry the index
-             shortlists. Last in the markup, so it is last in the tab order.
-             DECISIONS §9.13 (#977, #991). {% endcomment %}
+          {% comment %} The shortlist `+`: the index card's button exactly,
+             keyed on the related drink's own url, so it is the same entry the
+             index shortlists. Last in the markup, so last in the tab order. {% endcomment %}
           <button type="button"
                   class="btn-shortlist btn-shortlist--card"
                   data-shortlist-key="{{ rel.url }}"
@@ -814,15 +724,13 @@ layout: default
    default.html: the arrow is page furniture, so a page with no arrow loads no
    script for one. {% endcomment %}
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
-{% comment %} page-search.js, the search box's dropdown, was loaded here beside
-   the arrow's script from #1050 until 2026-10-01; the box is the header's now
-   (#1210, local builds only) and _includes/page-search.html loads the script
-   with it. {% endcomment %}
+{% comment %} page-search.js is not loaded here: _includes/page-search.html
+   loads it with the header's search box (#1210). {% endcomment %}
 {% comment %} The print button's reveal and wiring (#1005; food's #86). {% endcomment %}
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cocktail-make.js' | relative_url }}"></script>
-{% comment %} THE SCALER, IN DEPENDENCY ORDER (#545): shopping-list.js (the amount
-   parser, shared with the index's shopping list), then scale.js, then
+{% comment %} The scaler, in dependency order (#545): shopping-list.js (the
+   amount parser, shared with the index's shopping list), then scale.js, then
    cocktail-scale.js. Each reads the one before off `HTF` at parse time, so the
    wrong order leaves the control silently hidden.
    test_the_scaler_scripts_load_in_dependency_order guards it. {% endcomment %}

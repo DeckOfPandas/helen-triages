@@ -1,84 +1,22 @@
-// food-shopping-list.js
-// =============================================================================
-// WHAT A SHORTLIST OF RECIPES ADDS UP TO, BY AISLE. No DOM.
-// =============================================================================
-// GitHub issue #801, Helen: "add scaler and shopping list feature to food
-// recipe shortlist page ... I would like all the same features ... no need to
-// cost the portions ... Group the shopping list by grocery aisle."
+// What a shortlist of recipes adds up to, by aisle (#801). No DOM.
 //
-// Pure, and loaded the two ways shopping-list.js and filter-state.js are: as a
-// plain <script> attaching to window.HTF, and via require() for
-// tests/js/food-shopping-list.test.js. The DOM half is filters.js, which is
-// food's index script and already owns `state.shortlisted` -- the same place
-// cocktail-index.js keeps its half, for the same reason.
+// Pure, and loaded two ways: as a plain <script> attaching to window.HTF, and
+// via require() for tests/js/food-shopping-list.test.js. filters.js is the
+// DOM half. The amount parsing is shopping-list.js's: there is one parser.
 //
-// -----------------------------------------------------------------------------
-// WHY THIS IS NOT shopping-list.js WITH A FLAG
-// -----------------------------------------------------------------------------
-// The two lists answer the same question about different data, and every
-// difference is load-bearing rather than cosmetic:
+// Each entry arrives with a `scale` (portions wanted over portions made, or
+// whole batches); filters.js chooses it and this file only multiplies.
 //
-//   - A drink groups by its `generic` and carries a BOTTLE; a recipe groups by
-//     the ingredient name and carries nothing.
-//   - A drink's amounts are 682 plain decimals on a 2.5 ml grid. A recipe's
-//     are `½ tsp`, `30–50 g`, `~2 tbsp`, `2 x 400 g cans` and `1 tbsp (6 g)`.
-//   - A drink is scaled by whole numbers of glasses and clamped at x1
-//     (MANUAL 9.13). A recipe is scaled by PORTIONS WANTED over portions the
-//     recipe makes, so x0.67 is ordinary.
-//   - A drink list sorts by descending volume; this one groups by aisle.
-//
-// So the ARITHMETIC is shared and the shape is not. `parseAmount`,
-// `splitParenthetical`, `foldKey`, `foldUnit`, `unitLabel` and `fractionText`
-// all come from shopping-list.js, which stays the one place that knows how to
-// read an amount this repo has written down (MANUAL 9.13's one-parser rule).
-//
-// -----------------------------------------------------------------------------
-// THE SCALER IS PORTIONS FOR A `serves:` RECIPE (and batches for a `makes:`
-// one since #1297 -- that choice is filters.js's; this file is only ever
-// handed a `scale`)
-// -----------------------------------------------------------------------------
-// Helen asked for a serving-size guess for every recipe in the same breath as
-// the scaler, which only earns its keep if the number on screen is people
-// rather than repeats: "we are four tonight" is the question, and a recipe
-// that serves six answers it at x0.67. `_plugins/food_shopping.rb` resolves
-// _plugins/food_shopping.rb resolves it from `serves:` first and each recipe's
-// own `serves_estimate:` second (#815); an estimate is printed with a `~`.
-//
-// NOTHING IS ROUNDED TO ANYTHING COARSER THAN A GRAM -- Helen, 2026-09-07,
-// asked directly whether the output should be tidied: "For now, don't
-// tidy/round beyond 1 g precision", and then, to be sure it had been
-// understood: "I mean don't round to 10 g or 5 g, round to 1g". So two thirds
-// of 200 g is 133 g and not 130 g or 150 g. Spoons and counts keep their
-// fractions instead, because ⅔ tsp is a real measure and 0.67 tsp is not a
-// number anyone has a spoon for -- that is notation, not rounding, and
-// `fractionText` is careful to print ⅔ only for exactly two thirds.
-//
-// A SUB-GRAM TOTAL KEEPS A DECIMAL rather than rounding to `0 g`, which is the
-// one place the gram rule has to bend: a fifth of a gram of saffron is a real
-// entry on a real list and `0 g` is a lie about it.
-//
-// -----------------------------------------------------------------------------
-// RANGES AND TILDES SURVIVE THE ARITHMETIC
-// -----------------------------------------------------------------------------
-// `30–50 g` doubled is `60–100 g`, and `~2 tbsp` doubled is `~4 tbsp`. Both
-// ends are carried and scaled independently, and an entry with no range simply
-// has both ends equal, so a group mixing "50 g" with "30–50 g" totals to
-// "80–100 g" without any branch. A range that collapses prints once.
-//
-// AN UNQUANTIFIED ENTRY IS COUNTED, NOT SUMMED -- `some` salt, and every
-// ingredient of a magic-bag entry, which carries no amounts at all by design
-// (MANUAL 4.3). This is shopping-list.js's own rule and the reason it is right
-// here too: "salt (x3)" says three of the shortlisted dishes want salt, which
-// is all anyone can honestly be told.
-// =============================================================================
+// Nothing is rounded coarser than a gram: two thirds of 200 g is 133 g.
+// Spoons and counts keep cook's fractions. A sub-gram total keeps a decimal
+// rather than printing `0 g`. Ranges and tildes survive the arithmetic:
+// `30–50 g` doubled is `60–100 g`. An entry with no amount is counted, not
+// summed.
 
 (function (root, factory) {
-  /* Loaded the two ways shopping-list.js is. It is required FIRST because
-     everything below is built on it, and every one of its helpers is read at
-     module scope rather than on first use, so a page that loads them the wrong
-     way round fails at startup instead of on the first shortlist toggle.
-     tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order
-     guards the order in the template. */
+  /* shopping-list.js must load first: its helpers are read at module scope, so
+     the wrong order fails at startup rather than on the first toggle
+     (test_the_food_shopping_scripts_load_in_dependency_order). */
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = factory(require('./shopping-list.js'));
   } else {
@@ -96,32 +34,15 @@
   var fractionText = shoppingList.fractionText;
   var tidy = shoppingList.tidy;
 
-  /* THE UNITS THAT ARE MEASURED RATHER THAN COUNTED, and how finely each may
-     be written. A gram is Helen's stated floor, so `g` and `ml` print whole;
-     `kg` and `l` print to three places, which is the SAME precision expressed
-     in a bigger unit rather than a looser rule. Everything absent from here --
-     spoons, cloves, bunches, bare counts -- goes through `fractionText` and
-     keeps its halves and thirds. */
+  /* Decimal places for the measured units: `g` and `ml` print whole, `kg` and
+     `l` to three places (the same precision in a bigger unit). Any unit absent
+     from here goes through `fractionText`. */
   var DECIMALS = { g: 0, ml: 0, kg: 3, l: 3, cl: 1, oz: 1 };
 
-  /* GRAMS AND MILLILITRES ARE THE ONLY UNITS TOTALLED IN, and the bigger ones
-     are folded into them on the way in. `1½ l` of stock in one recipe and
-     `500 ml` in another are 2 litres of the same stock, and without this they
-     were two rows you had to add up yourself -- while a twelfth of the first
-     printed as `0.125 l`, which is a real number nobody has ever shopped by.
-
-     THIS IS NOT THE CONVERSION shopping-list.js REFUSES. That file's rule --
-     "a group holding 45 ml and 2 dashes is `45 ml + 2 dashes`" -- is about
-     units with no defined relationship, where a conversion would have to be
-     invented: nobody can say how many millilitres a dash of Angostura is. A
-     litre is a thousand millilitres by definition, on both sides of every
-     recipe in the collection. Nothing is invented here, and `tbsp`, `oz`,
-     `clove` and every bare count are left exactly where they were, because
-     each of those WOULD need inventing.
-
-     THE UNIT COMES BACK FOR DISPLAY. `displayUnit` below re-expresses a total
-     of 1000 or more, so `1.333 kg` of beef stays kilograms and 83 g of pearl
-     barley stops being 0.083 of one. */
+  /* Grams and millilitres are the only units totalled in; kilograms, litres
+     and centilitres fold into them by definition, so `1½ l` and `500 ml` of
+     stock are one row. Nothing else is converted. `displayUnit` re-expresses
+     a total of a thousand or more. */
   var CANONICAL = {
     kg: { unit: 'g', factor: 1000 },
     l: { unit: 'ml', factor: 1000 },
@@ -141,30 +62,9 @@
     return { unit: unit, factor: 1 };
   }
 
-  /* A PLURAL IS THE SAME SHOPPING AS ITS SINGULAR, and until this existed the
-     list said so twice. Across the real collection: `onion` and `onions`,
-     `carrot` and `carrots`, `lemon` and `lemons`, `garlic clove` and `garlic
-     cloves`, `cinnamon stick` and `cinnamon sticks` are each two recipes
-     writing one thing, and each printed two rows with two totals that you then
-     had to add up yourself -- which is the one job this panel has.
-
-     THE UNIT RULE, REUSED ON THE NAME. `foldUnit` already knows how to take a
-     plural back to its singular, because `1 clove` and `3 cloves` of garlic
-     had the identical problem one column to the left. Applying the same
-     function rather than writing a second one means the two can never disagree
-     about what `cloves` is, and it is `foldUnit(foldKey(name))` rather than
-     either alone because foldKey owns the curly apostrophe ("goat's cheese")
-     and foldUnit owns the plural.
-
-     NOT `singulars` FROM _data/food/ingredient_words.yml, which is 29 declared
-     words and none of the five above: that map exists so the ingredient SEARCH
-     can match what you typed, and widening it to serve this would change what
-     the search does to earn a fix for something else.
-
-     A KEY, NEVER A LABEL. `hummus` folds to `hummu` and `tomatoes` to
-     `tomatoe`, which are not words and are never shown to anybody -- the row
-     is labelled with the first spelling an entry actually used. All a key has
-     to be is the same for two things that are the same thing. */
+  /* The grouping key for a name: `onion` and `onions` are one row. foldKey
+     owns the curly apostrophe and foldUnit the plural. A key, never a label:
+     `hummus` folds to `hummu`, which is never shown. */
   function foldName(name) {
     return foldUnit(foldKey(name));
   }
@@ -176,22 +76,16 @@
     var factor = Math.pow(10, places);
     var rounded = Math.round(quantity * factor) / factor;
 
-    /* NEVER `0 g` FOR SOMETHING THAT IS THERE. A fifth of a gram of saffron
-       survives as `0.2 g`; showing more precision than the floor is not the
-       thing Helen ruled against, and printing zero for a real ingredient is. */
+    // Never `0 g` for something that is there: 0.2 g of saffron prints so.
     if (rounded === 0 && quantity > 0) return String(tidy(quantity));
     return String(rounded);
   }
 
   /** "60–100 g", "133 g", "⅔ tsp", "~4 tbsp", "3 tbsp (18 g)".
    *
-   * THE RAW SUM GOES TO `amountNumber`, NEVER `tidy()`'s version of it, and
-   * that is not fussiness: `tidy` rounds to three decimals, which turns two
-   * thirds into 0.667, and 0.667 is not within `fractionText`'s tolerance of
-   * ⅔ -- so tidying first printed `3.33 carrots` where the answer is `3⅓`.
-   * `tidy` is for the float noise in a SUM and for comparing the two ends;
-   * deciding how a number is written is the other function's job, and it does
-   * its own rounding.
+   * The raw sum goes to `amountNumber`, never `tidy()`'s version of it: tidy
+   * turns two thirds into 0.667, which is outside `fractionText`'s tolerance
+   * of ⅔. `tidy` is only for comparing the two ends.
    */
   function totalText(total) {
     var lo = tidy(total.lo);
@@ -204,9 +98,8 @@
     if (hi > lo) number += '–' + amountNumber(total.hi * as.factor, as.unit);
 
     var shown = unitLabel(as.unit, hi * as.factor);
-    /* A UNIT THAT OPENS WITH PUNCTUATION IS JOINED, NOT SPACED. `2.5-cm piece`
-       keeps its hyphen through the parser (see NUMBER's lookahead there), and
-       "2.5 -cm piece" would be the only place that hyphen looked like a typo. */
+    /* A unit that opens with punctuation is joined, not spaced: `2.5-cm
+       piece` keeps its hyphen through the parser. */
     var text = !shown
       ? number
       : (/^[^a-z0-9]/.test(shown) ? number + shown : number + ' ' + shown);
@@ -225,50 +118,14 @@
     return total.approx ? '~' + text : text;
   }
 
-  /* =========================================================================
-     A STEPPED MEASURE IS BOUGHT IN WHOLE ONES, ROUNDED UP, AND THE LIST SAYS
-     WHAT THE RECIPES CALL FOR -- #1297, Helen, 2026-10-10
-     =========================================================================
-     "I'd like the shopping list not to write 1.17 sprigs either, so please
-     round that upwards to the next integer like this: '2 handfuls fresh
-     parsley (1 1/4 in the recipes)'."
-
-     TWO FIGURES, AND EACH IS HONEST ABOUT WHAT IT IS. The one in the amount
-     column is what to BUY: a whole number, rounded up, because nobody buys a
-     quarter of a sprig. The one in brackets is what the recipes ASK FOR, to
-     the nearest quarter and always as a fraction, never a decimal.
-
-         1 handful, seven portions of a recipe for six   2 handfuls (1¼ in the recipes)
-         1 sprig, seven for six                          2 sprigs   (1¼ in the recipes)
-         1 handful at x1.5                               2 handfuls (1½ in the recipes)
-         4 sprigs doubled                                8 sprigs
-
-     QUARTERS FOR EVERY ONE OF THEM, HERE. The recipe page steps a handful in
-     halves and would call 1.17 "1 handful"; the first build of this quoted
-     that figure and so bought one. Helen, the same day: "1.17 handfuls should
-     buy 2, again giving the bracketed requested number." Her example had
-     said so already -- a handful at 1¼ -- and a bracket reading "(1 in the
-     recipes)" beside a 2 would have explained nothing. So the list does not
-     borrow the recipe page's step: it says the amount asked for as finely as
-     a fraction reads, and buys the next whole one above it.
-
-     NO BRACKET WHEN THE TWO AGREE, which includes a total within an eighth
-     of a whole number: 1.02 handfuls is one.
-
-     THE TOTAL IS STEPPED, ONCE, never each recipe's share.
-
-     THIS IS HER THIRD ANSWER IN TWO DAYS AND IT IS THE FIRST ONE AGAIN, with
-     the fraction where the decimal was: up-with-a-bracket (2026-10-09, a.m.),
-     nearest-with-no-bracket ("round up ... is inaccurate", p.m.), and this.
-     What changed is that the bracket now says the accurate figure in a form
-     a cook can read.
-
-     WHICH MEASURES is data, handed in: `options.wholeMeasures` are the
-     recipe page's half-step ones (`half_step_measures` and `half_step_counts`
-     in _data/food/scaling.yml) and `options.quarterMeasures` its quarter-step
-     ones. The two are treated alike here; they arrive apart because that is
-     how the data keeps them. With neither, nothing is rounded -- every
-     caller before #1297. */
+  /* A stepped measure (handful, sprig, pinch) is bought in whole ones, rounded
+     up (#1297). Where that differs from what the recipes ask for, the row
+     carries an aside giving the asked-for amount as a fraction: "2 handfuls
+     (1¼ in the recipes)". The asked-for amount is stepped as the recipe page
+     steps it: `options.quarterMeasures` to the nearest quarter,
+     `options.wholeMeasures` to the nearest half (half a pinch makes no sense
+     in smaller parts). The TOTAL is stepped, once, never each recipe's share.
+     With neither option, nothing is rounded. */
   function wholeMeasurePattern(measures) {
     var words = (measures || [])
       .map(function (m) { return String(m).trim().toLowerCase(); })
@@ -284,36 +141,18 @@
     return Math.max(0.25, Math.round(tidy(quantity) * 4) / 4);
   }
 
-  /* =========================================================================
-     ONE FRUIT, TWO PARTS; AND A LINE THAT ONLY POINTS -- #1297, 2026-10-09
-     =========================================================================
-     Helen: 'I would like to cleverly combine e.g. "zest of 1 lemon" and "juice
-     of 1 lemon" to make "1 lemon" in the shopping list.'
+  function inHalves(quantity) {
+    return Math.max(0.5, Math.round(tidy(quantity) * 2) / 2);
+  }
 
-     _plugins/food_shopping.rb MARKS the lines; this does the sums. Three
-     things happen, each inside ONE RECIPE and never across two -- which is
-     why an entry now says which recipe it came from:
-
-     1. THE COUNT WRITTEN INSIDE AN ITEM IS READ. `item: "juice of 1 lemon"`
-        arrives with `fruit: "lemon"` and `count: "1"`, and is totalled as one
-        lemon rather than printed as a row with no figure.
-
-     2. DIFFERENT PARTS OF THE SAME FRUIT ARE THE SAME FRUIT. The juice of one
-        lemon and the zest of one lemon is one lemon; four zested and two and
-        a half juiced is four. Each part is summed, the part that needs the
-        most fruit decides, and the lines that do not use that part are
-        dropped. THE SAME PART TWICE STILL ADDS: two lines of juice are two
-        lemons' worth of juice. A line naming no part ("lemon, cut into
-        wedges") is always added -- that one is a different lemon.
-
-     3. A POINTER BUYS NOTHING. "olive oil, the rest of the oil above" beside
-        an amounted line of olive oil is dropped, where it used to add a stray
-        "×2" to the row. Keyed on the pointer's own words and never on "no
-        amount, same name": "salted butter, extra, for greasing" really is
-        extra. A pointer with nothing beside it to point at stays a line.
-
-     AN ENTRY WITH NO `recipe` IS LEFT EXACTLY AS IT WAS, so nothing merges
-     unless the caller says which lines share a recipe. */
+  /* Lines that belong together inside ONE recipe, never across two (#1297);
+     _plugins/food_shopping.rb marks them. A count written inside an item
+     ("juice of 1 lemon") arrives as `fruit` and `count`. Different parts of
+     one fruit are the same fruit: each part is summed, the part needing the
+     most decides, and lines not using it are dropped; a line naming no part
+     is always added. A `pointer` line ("the rest of the oil above") is
+     dropped when another line of that name stands beside it. An entry with
+     no `recipe` is never merged. */
   function reunite(entries) {
     var list = [];
     var byRecipe = {};
@@ -375,35 +214,13 @@
     return list.filter(function (l) { return !l.drop; });
   }
 
-  /* =========================================================================
-     "2 lemons", NOT "2 lemon" -- #1297, Helen, 2026-10-10
-     =========================================================================
-     The row is labelled with the first spelling seen, which is right for
-     "500 g plain flour" and wrong for a COUNT: one lemon from each of two
-     recipes printed "2 lemon", and two half "lemons" printed "1 lemons".
-
-     ONLY A ROW THAT IS ONE BARE COUNT is touched -- "2", "2 large", "½" -- with
-     nothing unquantified beside it. Anything with a unit already agrees
-     ("2 cloves garlic" is the unit's plural), and a mixed row ("4 + 2 large")
-     is left as written.
-
-     MORE THAN ONE IS PLURAL; ONE OR LESS IS SINGULAR ("½ lemon", "1½ lemons").
-
-     A SPELLING A RECIPE ACTUALLY USED IS ALWAYS SAFE, and is tried first: the
-     two were folded onto one row, so they are the same noun.
-
-     A FORM NO RECIPE WROTE IS MADE ONLY FOR A NOUN ON A LIST -- `count_nouns`
-     in _data/food/scaling.yml, handed in as `options.countNouns`. Making one
-     from any last word was measured against the collection on 2026-10-10 and
-     was wrong for about a quarter of 251 names: the counted noun is often the
-     FIRST word ("sprigs thyme" -> "sprigs thymes", "spoons butter" ->
-     "spoons butters"), some plurals are not regular ("goose" -> "gooses"),
-     and some names are cut short at a comma ("skinless" -> "skinlesses").
-     The plural is shopping-list.js's `unitLabel` and the singular its
-     `foldUnit`. With no list given, only a used spelling is ever chosen.
-
-     LEFT AS WRITTEN OTHERWISE, and where the name is itself a choice or a
-     phrase ("lemon or 30 ml lemon juice", "rashers of bacon"). */
+  /* The row label agrees with a bare count: "2 lemons", "½ lemon" (#1297).
+     Only a row that is one bare or size-only count, with nothing unquantified
+     beside it. A spelling a recipe used is tried first; a form no recipe
+     wrote is made only for a noun in `options.countNouns` (`count_nouns` in
+     _data/food/scaling.yml), because the last word of a name is often not
+     the counted noun. Left as written otherwise, and where the name is a
+     choice or a phrase. */
   var SIZE_UNITS = { large: true, medium: true, small: true };
 
   function isPluralName(name) {
@@ -489,10 +306,7 @@
       var key = foldName(name);
       if (!groups[key]) {
         groups[key] = {
-          /* THE LABEL IS THE FIRST SPELLING SEEN, the key is the folded one --
-             shopping-list.js's own rule, and here it is what stops "Parma ham"
-             and "parma ham", or "onion" and "onions", being two lines of the
-             same shopping. Whichever recipe was shortlisted first names it. */
+          // The label is the first spelling seen; the key is the folded one.
           label: name,
           // Every spelling used, for `countedLabel`: "lemon", then "lemons".
           spellings: [],
@@ -508,10 +322,8 @@
       var group = groups[key];
       if (group.spellings.indexOf(name) === -1) group.spellings.push(name);
 
-      /* THE FIRST AISLE WINS, and it cannot honestly be otherwise: the aisle
-         is derived from the name at build time, so two entries sharing a
-         folded name were given the same aisle by construction. This is here
-         only so that a group formed before any aisle was seen still has one. */
+      /* The first aisle wins: the aisle is derived from the name at build
+         time, so entries sharing a folded name share an aisle. */
       if (group.aisle === null) {
         group.aisle = known[entry.aisle] ? entry.aisle : fallback;
       }
@@ -522,19 +334,14 @@
       var parsed = parseAmount(entry.amount);
       if (!parsed) {
         var text = String(entry.amount || '').trim();
-        /* NO AMOUNT AT ALL IS STILL AN INGREDIENT. Every magic-bag item and
-           100 of the 778 recipe items are written without one, and the line
-           they earn is the name with a count beside it. `''` is the key those
-           share, and it prints as nothing but the count. */
+        /* No amount at all is still an ingredient: counted under `''`, which
+           prints as nothing but the count. */
         if (group.unquantified[text] === undefined) {
           group.unquantified[text] = 0;
           group.unquantifiedOrder.push(text);
         }
         group.unquantified[text] += 1;
-        /* WHICH RECIPE THE UNSCALED LINE CAME FROM -- Helen, 2026-10-11:
-           "where an item hasn't been scaled, please list its recipe name in
-           brackets after the item so the user knows what to do." Each once,
-           in the order the list met them. */
+        // Which recipes the unscaled line came from, each once, in order met.
         if (entry.recipe && group.unscaledRecipes.indexOf(entry.recipe) === -1) {
           group.unscaledRecipes.push(entry.recipe);
         }
@@ -584,8 +391,9 @@
         var total = group.units[unit];
         // A stepped measure is bought in whole ones, rounded up from what
         // the recipes ask for; see the note above `wholeMeasurePattern`.
-        var step = ((byEye && byEye.test(unit)) ||
-          (byQuarter && byQuarter.test(unit))) ? inQuarters : null;
+        // A unit on both lists steps in quarters.
+        var step = (byQuarter && byQuarter.test(unit)) ? inQuarters
+          : (byEye && byEye.test(unit)) ? inHalves : null;
         var used = null;
         if (step) {
           var usedLo = step(total.lo);
@@ -612,9 +420,8 @@
         return { text: text, recipes: group.unquantified[text] };
       });
 
-      /* ONE STRING FOR THE WHOLE AMOUNT, built here and not in the template,
-         so a row and any copy of it can never say different things -- the
-         reason shopping-list.js builds its own `text` in the same place. */
+      /* One string for the whole amount, built here and not in the caller, so
+         a row and any copy of it cannot say different things. */
       var parts = totals.map(function (t) { return t.text; })
         .concat(unquantified.map(function (u) {
           var count = u.recipes > 1 ? '×' + u.recipes : '';
@@ -643,14 +450,8 @@
       };
     });
 
-    /* ALPHABETICAL WITHIN THE AISLE, and that is a departure from the drinks
-       list on purpose. There, Helen asked for descending volume: "the big
-       pours are what you shop for". Here the aisle heading has already done
-       that job -- you are standing in front of the vegetables -- and what is
-       left is finding a name in a list of names, which wants an alphabet. It
-       is also the only order available: a food aisle mixes grams, spoons,
-       cloves and bare counts, and ranking 500 g against 2 cloves would need
-       the conversion this codebase refuses to invent. */
+    /* Alphabetical within the aisle: an aisle mixes grams, spoons and counts,
+       and ranking across them would need a conversion. */
     return aisles.map(function (aisle) {
       // Sorted on the FOLDED name, so "lemon" becoming "lemons" moves nothing.
       var items = rows.filter(function (row) { return row.aisle === aisle.key; })

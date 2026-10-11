@@ -309,7 +309,9 @@ test('a real weeknight, end to end', () => {
 // =============================================================================
 
 const PRODUCE = [{ key: 'produce', label: 'produce' }];
-const BY_EYE = ['handful', 'pinch', 'dash', 'splash', 'knob'];
+// As food/index.html passes them: `half_step_measures` step in halves,
+// `quarter_step_measures` in quarters.
+const BY_EYE = ['pinch', 'dash', 'splash', 'knob'];
 
 const line = (entries, label, options) => {
   const built = F.build(entries, Object.assign({ aisles: PRODUCE }, options || {}));
@@ -320,7 +322,7 @@ const line = (entries, label, options) => {
   return found[0].text;
 };
 
-const QUARTERS = ['sprig', 'bunch'];
+const QUARTERS = ['handful', 'sprig', 'bunch'];
 const STEPPED = { wholeMeasures: BY_EYE.concat(['drop', 'twist', 'lot', 'pat']),
   quarterMeasures: QUARTERS };
 
@@ -345,8 +347,16 @@ test('#1297: a stepped measure is bought whole, rounded UP, with what the recipe
   assert.strictEqual(eye('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
   assert.strictEqual(eye('1 sprig', 2 / 3), '1 sprig (¾ in the recipes)');
   assert.strictEqual(eye('1 handful', 2 / 3), '1 handful (¾ in the recipes)');
-  assert.strictEqual(eye('5 twists', 2 / 3), '4 twists (3¼ in the recipes)');
-  assert.strictEqual(eye('2 pats', 2 / 3), '2 pats (1¼ in the recipes)');
+});
+
+test('a half-step measure is quoted to the nearest half, as the recipe page steps it', () => {
+  // Helen, 2026-10-11: "Half a pinch doesn't make sense, but half a handful
+  // sort of does. Let's round pinches to the nearest 1/2."
+  assert.strictEqual(eye('1 pinch', 7 / 6), '1 pinch');
+  assert.strictEqual(eye('1 pinch', 1.5), '2 pinches (1½ in the recipes)');
+  assert.strictEqual(eye('1 pinch', 1 / 3), '1 pinch (½ in the recipes)');
+  assert.strictEqual(eye('5 twists', 2 / 3), '4 twists (3½ in the recipes)');
+  assert.strictEqual(eye('2 pats', 2 / 3), '2 pats (1½ in the recipes)');
 });
 
 test('#1297: 1.17 handfuls buys TWO -- the list does not borrow the recipe page\'s half step', () => {
@@ -355,7 +365,6 @@ test('#1297: 1.17 handfuls buys TWO -- the list does not borrow the recipe page\
   // bracketed requested number."
   assert.strictEqual(eye('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(eye('2 handfuls', 7 / 6), '3 handfuls (2¼ in the recipes)');
-  assert.strictEqual(eye('1 pinch', 7 / 6), '2 pinches (1¼ in the recipes)');
 });
 
 test('#1297: no bracket when what to buy is what the recipes ask for', () => {

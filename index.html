@@ -2,37 +2,15 @@
 permalink: /
 ---
 
-{%- comment %} ─────────────────────────────────────────────────────────────────
-  THE SITE ROOT at /helen-triages/.
-
-  GitHub issue #204: nobody arrives here on purpose. Helen's own reasoning —
-  "No user is going to end up at the root without having tried to, which would
-  be super weird. Everyone else will come in via food or drink" — so rather
-  than a two-door landing page asking a question nobody wants asked, this now
-  just forwards straight to food/.
-
-  This used to be the landing page (layout: default, no site_key, a door each
-  for food and cocktails). That page, its styles (assets/css/root.scss and
-  _sass/root/) and the default.html branch that linked root.css are all gone —
-  see the commit that closed #204 if you want the history.
-
-  No `jekyll-redirect-from` plugin is installed (_config.yml lists only
-  jekyll-sitemap), so this is hand-rolled: a meta-refresh with no delay, a
-  canonical link pointing at the same place for anyone who follows a stale
-  bookmark straight past the redirect, and a visible fallback link for the
-  minority whose browser has meta-refresh disabled or blocked, or who is
-  reading this with JS/CSS off entirely.
-
-  No `layout:` on purpose. default.html renders the two-site chrome (header,
-  nav icons, footer) built for a page that has content to show — wrong frame
-  for a redirect, which should show as little as possible before it leaves.
-
-  The target is built with `relative_url` rather than written as a literal
-  path, because this site's baseurl (`/helen-triages`) applies in production
-  but not when Jekyll serves locally at the filesystem root — a hardcoded
-  `/food/` would be correct on one and silently wrong on the other, and
-  nothing would tell you.
-────────────────────────────────────────────────────────────────────────────{% endcomment -%}
+{%- comment %}
+  The site root forwards to food/ (#204): nobody arrives here on purpose.
+  Hand-rolled, because no redirect plugin is installed: a meta-refresh with no
+  delay, a canonical link, and a visible link for a browser that ignores the
+  refresh. No `layout:` on purpose: a redirect should show as little as
+  possible. The target goes through `relative_url` because the baseurl is not
+  the same on every build, and a literal `/food/` would be silently wrong on
+  one of them.
+{% endcomment -%}
 {%- assign redirect_url = "/food/" | relative_url -%}
 <!DOCTYPE html>
 <html lang="en">

@@ -1,40 +1,23 @@
 // decorations.js
-// =============================================================================
-// HAND-DRAWN SVG DECORATION — every slot on the site, in one place.
-// =============================================================================
-// Replaces js/highlighter.js and roughly a hundred lines of inline JavaScript
-// that had accumulated in _layouts/default.html. All five behaviours were the
-// same shape — find slots, pick an asset, fetch it, inject it — expressed five
-// different ways, in two different files, one of which was a template.
+// Hand-drawn SVG decoration: every slot on the site, in one place.
 //
 //   .highlighter-slot          scratchy highlighter behind ingredient amounts
 //   .tape-bg                   masking tape behind the site logo
+//   [data-card-tape]           masking tape behind a cocktail card's title
 //   .site-footer-hearts        footer hearts
-//   .annotation-mark           hand-drawn sparkles beside a note
+//   .annotation-mark           hand-drawn arrows beside a note
 //   .tag-shape                 torn-tape shape behind a tag pill/filter button
 //
-// Two more lived here until 2026-08-01. `.watercolour-brush-slot` drew the
-// brush washes, which the blocky rule replaced on both pages; `[data-index-doodle]`
-// drew doodles beside the index filter labels and had been dead far longer —
-// no template has emitted that attribute for as long as git remembers.
-//
-// Base URL, fetching, caching and error reporting all live in js/assets.js.
-// Nothing here knows a URL prefix and nothing here swallows an error.
-//
-// Requires: assets.js (loaded first).
-// =============================================================================
+// Base URL, fetching, caching and error reporting all live in assets.js,
+// which must be loaded first.
 
 (function () {
 
   var HTF = window.HTF;
 
-  // ---------------------------------------------------------------------------
-  // Highlighters
-  //
-  // Shapes 1 and 13 are excluded from the pool but retained in the library.
-  // Pool is shapes 2–12 plus their flips: 22 options, shuffled once per page
-  // load so a page has variety and a reload gives you something different.
-  // ---------------------------------------------------------------------------
+  // --- Highlighters ----------------------------------------------------------
+  // Shapes 1 and 13 are excluded from the pool. Shapes 2–12 plus their flips,
+  // shuffled once per page load.
   function highlighters() {
     var slots = document.querySelectorAll('.highlighter-slot');
     if (!slots.length) return;
@@ -67,42 +50,23 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Masking tape behind the wordmark — one of N, at random.
+  // --- Masking tape behind the wordmark --------------------------------------
+  // Header chrome: one set of files for the whole repo (assets/img/chrome/tape/,
+  // #223). How many there are comes from `tape_count` in _data/chrome.yml, via
+  // the slot's data-tape-count.
   //
-  // The tape is HEADER CHROME, so there is one set of files for the whole repo
-  // (assets/img/chrome/tape/) rather than a copy per site. It used to be a copy
-  // per site, and keeping the two in step was a manual chore policed by a note
-  // in the manual: food's redesign shipped seven new files on 2026-08-10 and
-  // cocktails sat on the old four for five days before anyone noticed, which is
-  // issue #223. One directory cannot drift from itself.
-  //
-  // How many files there are still has to be told to this script — a directory
-  // listing is not a thing a browser can ask for — and it now comes from
-  // _data/chrome.yml, which is chrome config rather than site identity.
-  // ---------------------------------------------------------------------------
-  // BOTH INJECTED ATTRIBUTES ARE REQUIRED and neither is optional decoration.
-  // The tape files carry `width="100%"` and NO height, so without `height="100%"`
-  // the element keeps its intrinsic 1400x170 ratio and LETTERBOXES -- scaling to
-  // fit its box entirely rather than stretching to fill it. A narrow tape then
-  // draws far shorter than its box while a wide one fills it, so two tapes on
-  // one page disagree with each other. That cost a round of Helen's time on
-  // 2026-09-01, from a hand-copied version of this line that dropped the height.
-  // It is a named constant now so there is one copy of it to get right.
+  // Both injected attributes are required. The tape files carry width="100%"
+  // and no height, so without height="100%" the element keeps its intrinsic
+  // ratio and letterboxes: a narrow tape draws shorter than its box.
   var TAPE_ATTRS = '<svg preserveAspectRatio="none" height="100%"';
 
-  // `<svg` + any whitespace OR `>`, for the reason spelled out in brushes()
-  // above: two exporters are in use and a literal '<svg ' silently no-ops on
-  // the other kind, because a failed String.replace returns its input.
+  // `<svg` followed by whitespace OR `>`: two exporters are in use, and a
+  // literal '<svg ' silently no-ops on the other kind, because a failed
+  // String.replace returns its input.
   var TAPE_OPEN = /<svg(?=[\s>])/;
 
-  // #779, SETTLED -- Helen, 2026-09-11: "random each page load please."
-  // "Random every load" vs "fixed" was offered on a candidates page
-  // (DECISIONS.md §13.9, 2026-09-10) alongside the #644 batch, and she chose
-  // random, so NULL IS THE DECISION, not a placeholder: a fresh pick from
-  // 1..count (1-15 since 2026-09-11) on every load. The constant stays because
-  // it is still the whole of what "fixed" would need in code if she ever
-  // changed her mind -- an integer here, and nothing else in tape() moves.
+  // Null is the decision, not a placeholder: a fresh pick on every load
+  // (#779). An integer here is all that "fixed" would need.
   var FIXED_TAPE_INDEX = null;
 
   function tape() {
@@ -119,30 +83,11 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Card titles on tape — issue #469, the cocktails index.
-  //
-  // RANDOM PER SLOT PER LOAD, LIKE THE WORDMARK -- Helen, 2026-09-11, ruling
-  // #779 with the fifteen tapes in front of her: "#958/#779: random each page
-  // load please." and then, straight after, "All tape." Read as: the ruling
-  // covers every tape slot on the page, the card tapes as well as the
-  // wordmark's, so each card draws its own tape afresh on every load. If "all
-  // tape" meant something else, this comment and the line below are the whole
-  // of what to change.
-  //
-  // SUPERSEDED, kept for the argument: until then these ~124 slots were STABLE
-  // -- tape ((i - 1) % count) + 1 from the card's `data-card-tape` index -- so
-  // a card wore the same shape on every visit and a reload was a comparison
-  // rather than a lottery. That was the reason for a second function rather
-  // than a widened tape(); what is left of it is that these are many slots and
-  // that is one, and they still share the artwork, the fetch and the two
-  // attributes above, which is where the duplication actually mattered.
-  //
-  // `data-card-tape` stays in both templates: universe.js still selects the
-  // slots by it, and it costs nothing. The count comes from the header's own
-  // slot, so there is still exactly one place that knows how many tape files
-  // exist (_data/chrome.yml).
-  // ---------------------------------------------------------------------------
+  // --- Card titles on tape (#469) --------------------------------------------
+  // Random per slot per load, like the wordmark (#779). The value of
+  // `data-card-tape` is not read here; universe.js selects the slots by the
+  // attribute. The count comes from the header's own slot, so one place knows
+  // how many tape files exist.
   function cardTapes() {
     var slots = document.querySelectorAll('[data-card-tape]');
     if (!slots.length) return;
@@ -159,24 +104,11 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Centre the capitals on the band.
-  //
-  // Everything in CSS centres BOXES, which it does correctly and which is not
-  // what the eye judges. What is left is where capitals sit inside their own
-  // line box: with line-height 1 the baseline lands at half-leading plus the
-  // font's ascent, that leading is negative, and the caps hang off the baseline
-  // by their cap height. So it is a fact about the FACE.
-  //
-  // ESTIMATING IT FAILED THREE TIMES. Courier Prime ships here as woff2 only and
-  // there is no font parser in the build environment; across plausible metric
-  // sets the required nudge ranges from -1.5px to +2.2px and does not even have
-  // a reliable sign. Canvas TextMetrics knows it exactly, so ask.
-  //
-  // After document.fonts.ready, because measuring before Courier Prime has
-  // loaded measures the FALLBACK -- a different face, different metrics, and a
-  // confidently wrong constant baked in for the life of the page.
-  // ---------------------------------------------------------------------------
+  // --- Centre the capitals on the band ---------------------------------------
+  // CSS centres the line BOX; where the capitals sit inside it is a fact about
+  // the face, and Canvas TextMetrics is the only thing here that knows it.
+  // Must run after document.fonts.ready: measured earlier, it measures the
+  // fallback face and bakes in a wrong nudge for the life of the page.
   function centreTapeCaps() {
     var probe = document.querySelector('.drink-card-tape-word');
     if (!probe || !window.CanvasRenderingContext2D) return;
@@ -190,9 +122,8 @@
     var ascent = m.fontBoundingBoxAscent;
     var descent = m.fontBoundingBoxDescent;
     var capAscent = m.actualBoundingBoxAscent;
-    // Older engines report none of these. Leaving the property unset falls back
-    // to a translateY of 0, which is the box-centred version -- close, and never
-    // broken.
+    // Older engines report none of these. Unset, the property falls back to a
+    // translateY of 0: box-centred, close, and never broken.
     if (!ascent || !descent || !capAscent) return;
 
     var baseline = (size - (ascent + descent)) / 2 + ascent;
@@ -200,21 +131,9 @@
     document.documentElement.style.setProperty('--tape-text-nudge', nudge.toFixed(2) + 'px');
   }
 
-  // ---------------------------------------------------------------------------
-  // Footer decoration
-  //
-  // The artwork used to be a 2,500-character path string concatenated inside
-  // this file's predecessor. It is now assets/img/chrome/hearts/
-  // site-footer-hearts.svg, and takes its colour from `currentColor`, set on
-  // .site-footer-hearts in _sass/shared/_footer.scss, so no colour is written
-  // down here.
-  //
-  // WHICH file used to be a per-site decision, carried on a `data-footer-svg`
-  // attribute fed by _data/sites.yml. It is not a decision any more: there is
-  // one footer for the whole repo, so there is one graphic, named here. A site
-  // that wants a different one is asking for a second footer, which is the
-  // thing this shape exists to prevent.
-  // ---------------------------------------------------------------------------
+  // --- Footer decoration -----------------------------------------------------
+  // One footer for the whole repo, so one graphic, named here. It takes its
+  // colour from `currentColor`, set on .site-footer-hearts in the stylesheet.
   function footerDecoration() {
     var slot = document.querySelector('.site-footer-hearts');
     if (!slot) return;
@@ -223,17 +142,9 @@
     HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
   }
 
-  // ---------------------------------------------------------------------------
-  // Annotation marks — a small hand-drawn arrow beside each ingredient/step
-  // note. Both step and ingredient marks are dealt from their own
-  // shuffled pool (same mechanism as highlighters() above — no repeats until
-  // every arrow in the pool has been used on the page), just with different
-  // artwork: ingredients get four horizontal arrows, steps get three curved
-  // ones. A single repeated glyph reads as more "system," not less; a
-  // handful of slightly different hand-drawn arrows reads as one hand,
-  // drawn fresh each time, which is closer to what a marginal note in a
-  // paper recipe actually looks like.
-  // ---------------------------------------------------------------------------
+  // --- Annotation marks ------------------------------------------------------
+  // A small hand-drawn arrow beside each ingredient or step note, each kind
+  // dealt from its own shuffled pool: no repeats until the pool is used up.
   function annotationMarks() {
     var slots = document.querySelectorAll('.annotation-mark');
     if (!slots.length) return;
@@ -258,43 +169,20 @@
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Tag shapes — the torn-tape background behind a recipe-row pill or a
-  // STAR/MOOD/PRACTICALITIES filter button on food, and behind a YOLO?/MOOD/
-  // HASSLE filter button on cocktails since #1219 (index pages only; a no-op
-  // elsewhere since .tag-shape only appears in that markup).
+  // --- Tag shapes ------------------------------------------------------------
+  // The torn-tape background behind a pill or a filter button, on both sites'
+  // index pages (#1219).
   //
-  // Assigned by a deterministic hash of the tag's own text, not randomly and
-  // not by position — the same tag gets the same shape everywhere it
-  // appears (a filter button and a recipe-row pill for "greens" match),
-  // which is the whole point (Helen: "this will give some visual stability
-  // between the filter section and the recipe list section"). Random or
-  // per-position picks would both break that.
+  // Assigned by a hash of the tag's own text, never randomly or by position:
+  // the same tag must wear the same shape in the filter section and in the
+  // list.
   //
-  // POOL, not all 18: with both the original and flip of every shape in
-  // play, a row mixed torn-left-clean-right shapes with their mirror image
-  // at random, which read as "drunken" (Helen, 2026-08-03) rather than
-  // varied — most of these were evidently drawn with the same consistent
-  // hand motion, so the originals mostly already agree with each other on
-  // which end is torn vs clean, and flipping half of them at random is what
-  // broke that agreement, not the individual shapes themselves. Kept every
-  // original; shape 4 also keeps its flip, since torn evenly at both ends
-  // it reads as genuinely symmetric rather than pointing either way.
-  //
-  // Shape 8 dropped entirely 2026-08-03 — Helen's read on "root veg" and
-  // "shellfish" (both landed on it): too diagonal next to the rest of the
-  // set, and with nine other options there was no need to keep it. Shape 9
-  // is a wedge with a diagonal that spans the shape's FULL width, unlike
-  // the others, where the torn/ragged detail is concentrated at the ends
-  // and the middle stretches safely — stretched to a very narrow pill, that
-  // diagonal reads as a much steeper, near-vertical cut than it does at
-  // full width, so it's excluded for short tag text specifically rather
-  // than dropped outright; it still gets used on longer tags where it
-  // stretches fine.
-  //
-  // None of the unwired shapes (1, 2, 3, 5, 6, 7, 8, 9-flip) are deleted
-  // from doodles/ — still real files, just not in this pool, in case any of
-  // these calls needs revisiting.
+  // The pool is the originals without their mirror images, because a row that
+  // mixes both disagrees about which end is torn. Shape 4 keeps its flip (it
+  // is torn at both ends) and shape 8 is out as too diagonal. Shape 9's
+  // diagonal spans its full width and turns near-vertical on a narrow pill, so
+  // it is excluded for short text only. The unused files stay in
+  // assets/img/chrome/tag-shapes/.
   function tagShapes() {
     var slots = document.querySelectorAll('.tag-shape');
     if (!slots.length) return;
@@ -318,33 +206,14 @@
       return pool[Math.abs(hash) % pool.length];
     }
 
-    // A title hit is an arbitrary substring of whatever's currently typed —
-    // it changes every keystroke, so the hash-based pool's whole point
-    // (the SAME tag always gets the SAME shape everywhere it appears) has
-    // no meaning here; there's no stable "tag identity" to be consistent
-    // about. One fixed shape instead, chosen deliberately rather than left
-    // to the hash — Helen, 2026-08-04, assumed it already had been ("I
-    // expect you chose the highlighter shape deliberately") and asked for
-    // one "slightly less square at the ends." It hadn't been picked at
-    // all; rendered every candidate in the pool to a PNG at this exact
-    // narrow width to actually look before choosing. tag-shape-6 has a
-    // genuinely jagged, organic tear at one end rather than a straight or
-    // notched-rectangular cut, which reads least "square" of the set —
-    // tag-shape-5 was the opposite extreme, essentially a flat rectangle.
+    // A title hit is whatever substring is currently typed, so it has no
+    // stable identity to hash. One fixed shape, chosen for its jagged end.
     var TITLE_HIT_SHAPE = 'tag-shape-6';
 
     slots.forEach(function (slot) {
-      // .ingredient-pill and .title-hit added 2026-08-04 -- both got a
-      // .tag-shape slot the same way badges and buttons do, but this list
-      // was never updated to match, so `host` came back null and the guard
-      // below silently skipped them: no shape ever fetched, no fill ever
-      // shown (Helen: "There's no fill though, just the scratched,
-      // capitalised font"). Same bug for both, just more obvious on
-      // .title-hit sitting on the plain page background than on
-      // .ingredient-pill's already-busier row.
-      // .btn-chaos and .btn-mood added 2026-10-11, #1219: cocktails' filter
-      // chips wear the tape too. Same silent skip as above if a host is
-      // missing from this list.
+      // Every element that can hold a .tag-shape slot must be in this list. A
+      // host missing from it makes `host` null and the slot is silently
+      // skipped: no shape fetched, no fill shown.
       var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood, .btn-pool');
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
@@ -354,34 +223,24 @@
         shape = TITLE_HIT_SHAPE;
       } else {
         shape = pickShape(text);
-        // tag-shape-2's torn top-left corner reads fine at most widths but
-        // draws the eye on a wide pill -- stretched further via the
-        // --stretch modifier (see .tag-shape in _layout.scss) rather than
-        // dropped from the pool, since it's genuinely fine at other widths
-        // (Helen: fine for "duck", not fine for "make-ahead", same shape).
-        // Gated on the same SHORT_TEXT_MAX cutoff used above: duck is short
-        // text and was never the problem, so it must never pick this class
-        // up just because it happens to land on the same shape as
-        // make-ahead.
+        // tag-shape-2's torn top-left corner draws the eye on a wide pill, so
+        // long text on it is marked for extra stretch. Short text must never
+        // get the class.
         if (shape === 'tag-shape-2' && text.length > SHORT_TEXT_MAX) {
           slot.classList.add('tag-shape--stretch');
         }
       }
 
-      // chromeAsset, not siteAsset, since #1219: both sites' chips wear these,
-      // so the artwork is one set (assets/img/chrome/tag-shapes/) and never
-      // null.
+      // chromeAsset, not siteAsset: both sites' chips wear these (#1219), and
+      // tests/test_site_config.py pins this exact call.
       var url = HTF.chromeAsset('/tag-shapes/' + shape + '.svg');
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
     });
   }
 
-  // Exposed so filters.js can re-run it after creating a .tag-shape slot of
-  // its own — the active ingredient-search tag is built by JS, after this
-  // file's own one-time pass over the page has already happened, so nothing
-  // would ever fill that slot in without a way to ask for another pass.
-  // Safe to call repeatedly: fetchSvg caches by URL (assets.js), so re-scanning
-  // slots that already have their shape costs no extra network activity.
+  // Exposed so a script that builds a .tag-shape slot after this file's one
+  // pass (filters.js, for the active ingredient-search tag) can ask for
+  // another. Safe to call repeatedly: fetchSvg caches by URL.
   HTF.tagShapes = tagShapes;
 
   highlighters();
@@ -391,11 +250,8 @@
   annotationMarks();
   tagShapes();
 
-  // AFTER THE FONTS, not with the rest. Everything above fetches artwork and
-  // does not care what has loaded; this one MEASURES a typeface, and measuring
-  // before Courier Prime arrives measures the fallback. Guarded because
-  // document.fonts is absent in older engines, where the untouched property
-  // leaves the lettering centred on its box -- close, and never broken.
+  // After the fonts, not with the rest: this one measures a typeface. Guarded
+  // because document.fonts is absent in older engines.
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(centreTapeCaps);
   } else {

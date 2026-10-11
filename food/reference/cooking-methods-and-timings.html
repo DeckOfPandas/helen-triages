@@ -4,40 +4,10 @@ title: "Cooking Methods and Timings"
 permalink: /food/reference/cooking-methods-and-timings/
 ---
 
-{% comment %}
-  Every figure comes from _data/food/cooking_methods.yml, generated from
-  food/reference/cooking-methods.html's own tables -- same numbers, same
-  wording. The finishing temperatures come from internal_temperatures.yml,
-  which is where the two halves of the reference layer join up: a method that
-  ends on a time is only half an answer.
-
-  Promoted out of /food/reference-demo/ on 2026-08-14, with the charts page.
-
-  ONE QUESTION NOW, NOT TWO -- issue #244. The "eating at" and "rest" boxes are
-  gone, and so is everything that existed only to serve them: the
-  in-at/out-at/rest-until list on each card, and the rest box's tooltip about
-  whether the figure was cited or a working default. What is left answers "how
-  long does this take", not "what time do I put it in". Helen: "needs to be
-  much clearer for a user." The clock arithmetic itself is still in
-  assets/js/cook-schedule.js, unused and deliberately kept -- see the note at
-  the top of that file before deleting anything there.
-
-  THE TITLE CHANGED FIRST, THE PERMALINK FOLLOWED. "Cooking Methods and
-  Timings" is Helen's wording, from issue #243; this file used to explain at
-  length why the URL stayed /food/reference/timings/ anyway, on the reasoning
-  that eleven crosslinks pointed at it (several carrying ?protein=) and the URL
-  is the part of a reference page other pages depend on.
-
-  Issue #383 moved it on 2026-08-19. That reasoning was sound and it was an
-  argument for doing the rename CAREFULLY, not for never doing it: the
-  crosslinks are all in this repo, tests/test_page_links.py resolves every href
-  in every template back to a literal path, and tests/test_rendered_pages.py
-  scans the built production site again. There is no redirect from the old URL
-  -- see the note in internal-temperatures.html, renamed in the same pass.
-
-  THIS PAGE ALSO ABSORBED FISH AND SHELLFISH on 2026-08-19, issue #382, when
-  food/reference/cooking-methods.html was deleted. See the comment above those
-  two sections at the foot of the page.
+{% comment %} Every figure comes from _data/food/cooking_methods.yml; the finishing
+   temperatures come from internal_temperatures.yml. The page answers "how long
+   does this take", not "what time do I put it in" (#244). Other pages link
+   here, several with ?protein=; there is no redirect from the old URL (#383).
 {% endcomment %}
 
 
@@ -52,41 +22,18 @@ permalink: /food/reference/cooking-methods-and-timings/
 
     <p class="ct-strapline">Cooking methods and timings for proteins, by weight.</p>
 
-    {% comment %} NO HORIZONTAL RULE HERE, though issue #243's sketch draws one.
-       This site has no <hr> anywhere: what separates one band from the next is
-       the section heading itself -- $spacing-section-top (4.5rem) of air above
-       it and the lime-over-violet double rule painted under its lettering
-       (food/_rule.scss, .section-heading-text--reference). That treatment is
-       already a rule plus a label, and stacking a bare <hr> on top of it would
-       draw the same boundary twice in two different vocabularies.
-
-       THE HEADING IS THE SELECTED PROTEIN, filled by cook-timer.js and updated
-       whenever the dropdown changes -- so the band below reads as "BEEF: this
-       is what beef does", which is what makes the finishing temperature under
-       it work where it didn't before. Same treatment the temperature charts
-       use for their per-protein sections, deliberately: moving between the two
-       pages should feel like moving within one reference layer, and this page
-       inventing a third heading style would break that. Empty in the served
-       HTML because the protein list itself comes from the JSON above.
-       {% endcomment %}
-    {% comment %} THE "WHAT" SELECTOR SITS ABOVE THE HEADING IT CHANGES, which
-       is issue #253's own correction to #243 after Helen looked at the built
-       page. It reads as the control it is: you pick a protein, and everything
-       below re-titles itself. Underneath the heading it was the other way
-       round -- the page announced BEEF and then offered a box that turned out
-       to change what it had just announced.
-
-       AND THE WEIGHT SITS DIRECTLY UNDER IT, since 2026-10-09. From #253 the
-       weight box lived in a band of its own under the protein heading, a
-       section away from the dropdown; Helen: "move the weight input field to
-       just below the protein selector dropdown, so the user is saying 'I have
-       chicken, 3 kg'." So the two inputs are one form again, stacked, and
-       the heading below retitles itself from the first of them.
-
-       The weight is outside #ct-calculator but is put away with it:
-       cook-timer.js hides this one field when the dropdown says fish, since
-       fish are not cooked by weight. The dropdown itself is never hidden,
-       because it is how you get back. {% endcomment %}
+    {% comment %} No <hr> here: a section heading, with its air above and the double rule
+       under its lettering (.section-heading-text--reference), is already the
+       boundary. The heading below is the selected protein, filled by cook-timer.js
+       and updated when the dropdown changes; it is empty in the served HTML
+       because the protein list comes from the JSON above. Same treatment as the
+       temperature charts' sections, so the two pages read as one reference layer.
+    {% endcomment %}
+    {% comment %} The "what" selector sits above the heading it changes (#253), and the weight
+       directly under it, so the two inputs are one form. The weight is outside
+       #ct-calculator but is put away with it: cook-timer.js hides this one field
+       when the dropdown says fish, which is not cooked by weight. The dropdown
+       itself is never hidden, because it is how you get back. {% endcomment %}
     <div class="ct-inputs">
       <div class="ct-form">
         <label class="ct-field">
@@ -100,108 +47,51 @@ permalink: /food/reference/cooking-methods-and-timings/
       </div>
     </div>
 
-    {% comment %} EVERYTHING FROM HERE TO </div id=ct-calculator> IS THE
-       INSTRUMENT'S ANSWER, and it is wrapped so the dropdown can put it away.
-       Issue #412 gives fish and shellfish their own entry in that dropdown;
-       picking it swaps this whole block for the section below rather than
-       showing a schedule that cannot answer anything. {% endcomment %}
+    {% comment %} Everything inside #ct-calculator is the instrument's answer, wrapped so the
+       dropdown can put it away: picking fish and shellfish (#412) swaps this block
+       for the section below. {% endcomment %}
     <div id="ct-calculator">
-    {% comment %} `data-last-line-rule="skip"` because THIS heading's text is
-       cook-timer.js's, rewritten every time the dropdown changes.
-       assets/js/last-line-rule.js rebuilds a heading out of its own text to put
-       the double rule under its last line only (2026-09-04) -- and the next
-       protein pick would overwrite the spans it inserted, leaving the element
-       carrying `rule-split` with nothing left to paint the mark. A protein
-       label is one short line and never wrapped, so the opt-out costs this page
-       nothing. {% endcomment %}
+    {% comment %} `data-last-line-rule="skip"` because this heading's text is cook-timer.js's,
+       rewritten every time the dropdown changes: assets/js/last-line-rule.js
+       rebuilds a heading out of its own text, and the next protein pick would
+       overwrite the spans it inserted. {% endcomment %}
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference" id="ct-protein-name" data-last-line-rule="skip"></span></h2>
 
-    {% comment %} THE FINISHING TEMPERATURE SITS ABOVE THE CONTROLS, and this
-       reverses the arrangement this file argued for until 2026-08-16. The old
-       note here said it was an OUTPUT and that above the inputs it "was
-       answering a question nobody had asked yet" (Helen: "it makes no sense
-       where it is"), which was true of where it sat THEN: directly under a
-       summary sentence, with four unexplained boxes below it and nothing
-       saying what it was the temperature OF.
-
-       Under a protein heading it is a different statement. "Done at 52-54°C"
-       beneath BEEF reads as a property of the beef -- the one figure that
-       holds however you cook it and whatever it weighs -- rather than as
-       something the form below computed. That is why the same line works here
-       and read as lost there: it has stopped being an answer and become part
-       of the heading. Issue #243, Helen's own sketch.
-
-       The way out to the full spectrum stays with it. This page shows a single
-       doneness at a time and should say so where it says the figure.
-       {% endcomment %}
+    {% comment %} The finishing temperature sits above the controls, under the protein heading
+       (#243): there it reads as a property of the protein, whatever the method or
+       weight, not as something the form computed. The link out to the full
+       spectrum stays with it, since this page shows one doneness at a time.
+    {% endcomment %}
     <p class="ct-doneat" id="ct-doneat"></p>
 
-    {% comment %} The weight box sat here, in a .ct-controls band closed by a
-       rule (#253's horizontal line), from 2026-08-16 to 2026-10-09. It is
-       under the dropdown now, above the heading -- see there. {% endcomment %}
+    {% comment %} The weight box is under the dropdown, above the heading, not here. {% endcomment %}
 
-    {% comment %} One heading over the methods, replacing "Details" -- issue
-       #253. THE CARDS THAT SAT UNDER THE TABLE ARE GONE, #873, Helen
-       2026-09-09: "they're not adding information beyond the table, and
-       remain a little hard to read." AND THE TABLE WENT ON 2026-10-08
-       (#1329): cook-timer.js writes one section per cut group now, each a
-       list of method blocks carrying the oven setting -- see
-       _sass/food/_timings.scss for the shape and Helen's words.
-
-       #ct-summary is kept but no longer carries the count. "7 ways to cook
-       2.4 kg of beef" duplicated what sat immediately beneath it. What is
-       left is the prompt when there is no usable weight, which is the one
-       thing the list cannot say for itself -- it is empty at exactly that
-       moment. role="status" so a recalculation is announced rather than only
-       seen. {% endcomment %}
+    {% comment %} One heading over the methods (#253). cook-timer.js writes one section per
+       cut group, each a list of method blocks carrying the oven setting (#1329);
+       _sass/food/_timings.scss has the shape. #ct-summary carries only the prompt
+       shown when there is no usable weight, which the empty list cannot say for
+       itself; role="status" so a recalculation is announced. {% endcomment %}
     <h2 class="recipe-section-heading"><span class="section-heading-text section-heading-text--reference">Cooking Methods</span></h2>
 
     <p class="ct-summary" id="ct-summary" role="status"></p>
 
     {% comment %} The methods, by cut: which method, at what oven setting,
        for how long. Populated by cook-timer.js. {% endcomment %}
-    {% comment %} ct-method-groups, not ct-methods: the JSON block at the top
-       of this file already carries id="ct-methods", and the round-one build
-       gave this div the same id (2026-10-08). document.getElementById found
-       the script first and the page worked by accident; the duplicate was
-       caught by a locator on 2026-10-09. {% endcomment %}
+    {% comment %} ct-method-groups, not ct-methods: the JSON block at the top of this file
+       already carries id="ct-methods", and a duplicate id works only by accident. {% endcomment %}
     <div id="ct-method-groups"></div>
     </div>{%- comment -%} /#ct-calculator {%- endcomment -%}
 
-    {% comment %} The long explanation of why some rows decline used to live
-       here -- four paragraphs restating what the cards already say for
-       themselves at the moment it matters. Helen: "the whole bottom section can
-       go, other than see also." A card that says "Won't guess this one" and
-       shows its own conflicting range needs no essay three screens below it.
-       {% endcomment %}
+    {% comment %} No explanation of why some rows decline: a row that declines says so itself.
+    {% endcomment %}
 
-    {% comment %} ── FISH AND SHELLFISH ──────────────────────────────────────
-       Moved here on 2026-08-19, issue #382, when food/reference/cooking-methods.html
-       was deleted. Nine of that page's twelve sections were a genuine duplicate
-       of the calculator above -- same data, same numbers, rendered as static
-       tables. These two were not: nothing else on the site holds them.
-
-       Helen's call on the third, steak, was to drop it outright: "I know how to
-       cook steak. I'm hovering over deleting fish and shellfish, because ditto,
-       but it's good to have the reminder about options of how to cook. Since
-       neither have target temperatures... they still have methods so they go on
-       the methods page."
-
-       THEY ARE DELIBERATELY NOT PART OF THE CALCULATOR, and the intro line
-       below says so. The protein dropdown lists nine roasting proteins and will
-       never list these: fish is governed by THICKNESS and shellfish by the
-       shell opening, so there is no weight-driven schedule to compute. Without
-       a line saying that, two lists sitting under an instrument read as a
-       section of it whose controls have gone missing.
-
-       LISTS, NOT TABLES, SINCE 2026-10-08 (#1330). They were two hand-written
-       tables -- fish by form with eleven rowspans, and a Notes column that was
-       mostly empty -- 453px wide in a 390px screen and 5,000px tall. Helen
-       chose "list, no notes" on the candidates page, so each fish is a <dt>
-       and each of its forms a <dd>, and the notes are deleted rather than
-       hidden (git history has them). Still hand-written rather than data:
-       they carry no timings to reconcile against cooking_methods.yml, and a
-       list this plain is as easy to edit here as anywhere.
+    {% comment %} ── Fish and shellfish (#382) ──
+       Nothing else on the site holds these two lists. They are deliberately not
+       part of the calculator, and the line below says so: fish is governed by
+       thickness and shellfish by the shell opening, so there is no weight-driven
+       schedule to compute. Lists, not tables, and no notes (#1330): each fish is a
+       <dt> and each of its forms a <dd>. Hand-written rather than data: they
+       carry no timings to reconcile against cooking_methods.yml.
     {% endcomment %}
     <div id="ct-fish-shellfish" hidden>
 
@@ -287,13 +177,10 @@ permalink: /food/reference/cooking-methods-and-timings/
       </div>
     </dl>
 
-    {% comment %} NO <strong> AT THE START OF THESE <li>s, and that is the whole
-       of "no courier font" in issue #412. _sass/food/_recipe-notes-body.scss has
-       `> ul > li:have(> strong:first-child)` -- written `:has()` in the file --
-       which promotes a leading bold run to a block-level label in $font-headings
-       for the longform Tips treatment. It fires on any such list anywhere in
-       .recipe-body-content, so a bold lead-in here was silently getting a label
-       treatment built for a different job. Plain text keeps the sans face.
+    {% comment %} No <strong> at the start of these <li>s (#412).
+       _sass/food/_recipe-notes-body.scss promotes a leading bold run in any list
+       in .recipe-body-content to a block-level label in $font-headings, for the
+       longform Tips treatment. Plain text keeps the sans face.
     {% endcomment %}
     <p>Other methods:</p>
     <ul>
@@ -310,21 +197,9 @@ permalink: /food/reference/cooking-methods-and-timings/
 
     <p>Endpoint is opaque and flaking if not deliberately rare. See <a href="{{ '/food/reference/internal-temperatures/' | relative_url }}#all">internal temperatures</a> for salmon and tuna.</p>
 
-    {% comment %} THREE PARAGRAPHS WERE DELETED HERE on 2026-08-20, at Helen's
-       explicit instruction in issue #412 ("delete next three paragraphs"): a
-       2026-08-12 correction note about the oven-bake rate, a FOOD SAFETY note,
-       and the sources line.
-
-       Worth recording rather than just doing, because two of them were the kind
-       this repo normally protects. MANUAL §14 says the "checked once... remove
-       once confirmed" source notes are Helen's own scaffolding and must not be
-       tidied away unprompted -- this was prompted. And the safety note is not
-       lost so much as compressed: "if not deliberately rare" carries the
-       distinction it was making, and the link above goes to the chart that
-       holds salmon's own safety_min/safety_label shading (§14).
-
-       The correction note had done its job: it explained a fix to a figure that
-       has been correct for over a week, to nobody who was ever going to read it.
+    {% comment %} No correction note, food-safety note or sources line here (#412, Helen's
+       instruction). "if not deliberately rare" carries the safety distinction, and
+       the link above goes to the chart holding salmon's safety_min shading.
     {% endcomment %}
 
     <h2 class="recipe-section-heading" id="shellfish"><span class="section-heading-text section-heading-text--reference">Shellfish</span></h2>
@@ -388,21 +263,16 @@ permalink: /food/reference/cooking-methods-and-timings/
       </div>
     </dl>
 
-    {% comment %} The bottom "See also: internal temperatures" line went with
-       issue #412. It is not the loss it looks like: the fish section above still
-       links the charts where it actually matters (salmon and tuna), and every
-       protein card the calculator renders carries its own "see other doneness"
-       link built by cook-timer.js. The crosslink §14 asks for is still there,
-       just attached to the thing it is about rather than trailing the page.
+    {% comment %} No trailing "see also" line (#412): the fish section above links the charts
+       for salmon and tuna, and the calculator's "Done at" line carries its own
+       link, built by cook-timer.js.
     {% endcomment %}
     </div>{%- comment -%} /#ct-fish-shellfish {%- endcomment -%}
 
   </div>
 </article>
 
-{% comment %} cook-schedule.js FIRST: cook-timer.js reads HTF.cookSchedule at
-   startup, so the arithmetic module has to exist by then. Same trap as
-   ingredient-search.js/filters.js on the index; tests/test_site_config.py has a
-   guard for each. {% endcomment %}
+{% comment %} cook-schedule.js first: cook-timer.js reads HTF.cookSchedule at startup.
+   tests/test_site_config.py guards the order. {% endcomment %}
 <script src="{{ '/assets/js/cook-schedule.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/cook-timer.js' | relative_url }}"></script>

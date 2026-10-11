@@ -1,51 +1,26 @@
 // shortlist.js
-// =============================================================================
-// THE SHORTLIST'S DOM HALF — every control that marks or unmarks one thing.
-// =============================================================================
-// GitHub issue #546. HTF.shortlist (assets/js/assets.js) is the STORE and knows
-// nothing about a page; this is the wiring, and knows nothing about storage.
-// Same split filters.js and filter-state.js already run on, for the same
-// reason: the store is the part worth testing without a browser.
+// The shortlist's DOM half: every control that marks or unmarks one thing
+// (#546). HTF.shortlist (assets.js) is the store and knows nothing about a
+// page; this is the wiring and knows nothing about storage.
 //
-// FOUR PLACES, ONE SCRIPT, and the placements are Helen's (2026-09-04):
-//   - the right-hand end of a recipe row on the food index
-//   - the top-right corner of a drink card on the cocktail index
-//   - the right-hand end of the INGREDIENTS line on a recipe page (#1210)
-//   - the right-hand end of the read it / make it line on a drink page
-// Every one of them is `.btn-shortlist` carrying `data-shortlist-key`, so this
-// file needs no per-site branch and no list of selectors to keep in step. A
-// fifth placement is markup and a stylesheet rule, and nothing here.
-//
-// THE CONTROLS SHIP `hidden` AND THIS REVEALS THEM. `.btn-print` established
-// the rule and _layouts/recipe.html states it: "a control that silently fails
-// is worse than no control", so the markup assumes JavaScript did not run and
-// this is the thing that proves it did. CSS cannot ask that question.
-//
-// THE WORD NEVER CHANGES; the mark and the colour carry the state. That is
-// #494's finding (DECISIONS §9.13): a label that swaps between
-// two words has to be read as either the state or the action, and there is
-// nothing on screen to say which. So the button says `shortlist` in both
-// states, `_sass/*/_shortlist.scss` draws a `+` or a `✓` in front of it via
-// ::before, and only the class and aria-pressed move. It also means the control
-// cannot change width, which is what lets it sit in a drink card's top-right
-// corner without unpinning the fixed anchors _cards.scss is built on.
-//
-// WHY A DOCUMENT EVENT RATHER THAN A CALLBACK REGISTRY. Both indexes filter on
-// "is this shortlisted", and both already have one apply()/updateResults() that
-// repaints everything from state. `htf:shortlist-change` lets each of them
-// subscribe with one line and stay the only thing that decides what its own
-// page looks like -- where a registry here would make this file a second place
-// that knows the two indexes exist.
-// =============================================================================
+// - Every control, on either site, is `.btn-shortlist` carrying
+//   `data-shortlist-key`. A new placement is markup and a stylesheet rule,
+//   and nothing here.
+// - The controls ship `hidden` and this reveals them: the markup assumes
+//   JavaScript did not run, and a control that silently fails is worse than
+//   no control.
+// - The word never changes; the class and aria-pressed carry the state, and
+//   the stylesheet draws the mark (DECISIONS §9.13). So the control cannot
+//   change width.
+// - Changes are announced with a document event, `htf:shortlist-change`, so
+//   each index repaints itself and this file does not know they exist.
 
 (function () {
   'use strict';
 
   var HTF = window.HTF;
 
-  // No store, no controls. The root landing page has no site-key and so has no
-  // shortlist at all -- see HTF.shortlist's own note on why that is a refusal
-  // rather than a fallback to a shared list.
+  // No store, no controls: a page with no site key has no shortlist at all.
   if (!HTF || !HTF.shortlist || !HTF.site) return;
 
   var EVENT = 'htf:shortlist-change';
@@ -56,27 +31,21 @@
     );
   }
 
-  /* Paint one control from the store. Class for the eye, aria-pressed for
-     everyone else -- a screen reader cannot see `is-on`, and this is a toggle
-     button, which is exactly what aria-pressed is for. */
+  /* Paint one control from the store. Class for the eye, aria-pressed for a
+     screen reader. */
   function paint(btn) {
     var on = HTF.shortlist.has(btn.dataset.shortlistKey);
     btn.classList.toggle('is-on', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 
-  /* Every count on the page, from one place. The index's own "shortlisted"
-     filter shows how many there are to see; nothing else does today, and a
-     second reader costs this function nothing.
+  /* Every count on the page, from one place.
 
-     HOW MANY THERE ARE TO SEE, NOT HOW MANY THE STORE HOLDS -- #847. The store
-     keeps whatever was ever marked, and a key can outlive its page: a recipe
-     renamed, a draft promoted to a new URL, a drink whose slug changed. Such a
-     key is still in the list, so `count()` said "(1)" on an index where nothing
-     was marked and the filter showed an empty list. The filter can only ever
-     show the controls on THIS page, so this counts those -- the same set
-     `controls()` paints -- and the store is left alone, because the key may be
-     right on some other page and forgetting it here would be a guess. */
+     `[data-shortlist-count]` is how many there are to SEE on this page, not
+     how many the store holds (#847): a key can outlive its page (a rename, a
+     promoted draft), and the index's filter can only show this page's
+     controls. The store is left alone, because the key may be right on some
+     other page. */
   function paintCounts() {
     var n = controls().filter(function (btn) {
       return HTF.shortlist.has(btn.dataset.shortlistKey);
@@ -84,33 +53,22 @@
     Array.prototype.slice.call(document.querySelectorAll('[data-shortlist-count]'))
       .forEach(function (el) { el.textContent = String(n); });
 
-    /* THE STORE'S OWN COUNT, for a link that promises a different page --
-       "see shortlist (N)" on a recipe or drink page (#1005/#1011, 2026-09-14,
-       _includes/page-actions.html). The page-count above is #847's honest
-       number for the index's filter, which can only show this page's controls;
-       this link goes TO the index, so the honest number is everything the
-       store holds. A stale key (a renamed page) counts one too many here and
-       is the same key #847 chose to leave in the store rather than guess at. */
+    /* `[data-shortlist-total]` is the store's own count, for the "see
+       shortlist (N)" link on a recipe or drink page
+       (_includes/page-actions.html): that link goes TO the index, so the
+       number is everything the store holds. */
     var total = HTF.shortlist.count();
     Array.prototype.slice.call(document.querySelectorAll('[data-shortlist-total]'))
       .forEach(function (el) { el.textContent = String(total); });
 
-    /* THE LINK EXISTS ONLY WHILE THERE IS SOMETHING TO SEE -- #1210,
-       2026-09-30. It ships `hidden` (see wire()), and this is the one place
-       that decides whether it shows: a link reading "see shortlist (0)" goes
-       to an empty list, and Helen's redesign took it off the page rather than
-       leaving it to say so. Re-run on every change, so marking the first
-       recipe reveals it and unmarking the last hides it again. */
+    /* The link ships `hidden` and shows only while there is something to see
+       (#1210). This is the one place that decides. */
     Array.prototype.slice.call(document.querySelectorAll('.btn-see-shortlist'))
       .forEach(function (link) { link.hidden = total === 0; });
   }
 
-  /* THE WHOLE PAGE, NOT THE BUTTON THAT WAS CLICKED. A row and a card are one
-     control each today, but the drink page has one and its own index card is a
-     back-navigation away in the same bfcache entry -- and the cost of repainting
-     every control on a page is one class toggle per control. Painting only the
-     clicked one is the optimisation that goes stale the first time two controls
-     share a key. */
+  /* The whole page, not the button that was clicked: painting only the
+     clicked one goes stale the first time two controls share a key. */
   function repaint() {
     controls().forEach(paint);
     paintCounts();
@@ -124,17 +82,10 @@
       // The proof that JavaScript ran. See the header.
       btn.hidden = false;
     });
-    // The see-shortlist link ships `hidden` for the same reason: its count is
-    // this script's, and a link reading "(0)" for ever is a control that lies.
-    // paintCounts() reveals it -- and only while the count is above zero.
     paintCounts();
 
-    /* ONE DELEGATED LISTENER, on the document. The food index reorders its rows
-       on every filter pass and the cocktail index reorders its cards, but
-       neither destroys them -- so a per-button listener would in fact survive.
-       This is delegation for a different reason: `.recipe-list` is paginated and
-       `.drink-cards` is re-ranked, and both are cheaper to reason about if the
-       handler does not care which nodes exist when it is attached. */
+    /* One delegated listener on the document, so the handler does not care
+       which rows or cards exist when it is attached. */
     document.addEventListener('click', function (ev) {
       var btn = ev.target.closest && ev.target.closest('.btn-shortlist[data-shortlist-key]');
       if (!btn) return;
@@ -144,10 +95,6 @@
       HTF.shortlist.toggle(key);
       repaint();
 
-      /* `detail` carries what changed, for a listener that wants to be cleverer
-         than "repaint everything". Neither index is, today: both re-run the pass
-         they already re-run for every other filter, which is what keeps the
-         shortlisted view from ever disagreeing with the toggles on it. */
       document.dispatchEvent(new CustomEvent(EVENT, {
         detail: { key: key, on: HTF.shortlist.has(key) }
       }));

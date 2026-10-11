@@ -1,28 +1,17 @@
 // =============================================================================
-// THE SHOPPING LIST — what a shortlist of recipes adds up to
+// THE SHOPPING LIST — what a shortlist of recipes adds up to (#801)
 // =============================================================================
-// GitHub issue #801. The last thing on the index, shown only while the
-// shortlisted-only filter is on — see food/index.html for why that is the
-// literal reading of "the food recipe shortlist page".
+// The last thing on the index, shown only while the shortlisted-only filter is
+// on (food/index.html).
 //
-// A DELIBERATE COPY OF _sass/cocktails/_shortlist.scss's shopping-list block,
-// class for class, because Helen's brief was "I would like all the same
-// features" and two lists doing the same job in different shapes is the drift
-// MANUAL 2.2 warns about. The colours are food's own, which is the whole of
-// what 2.3's palette contract asks: the same structure, each site's hues.
+// A deliberate copy of the shopping-list block in
+// _sass/cocktails/_shortlist.scss, class for class, in food's colours: two
+// lists doing one job in different shapes is the drift MANUAL §2.2 warns
+// about. Change both.
 //
-// AMOUNT FIRST, NAME SECOND, and a fixed column for the amount. A shopping
-// list is read down its left edge for "how much", and a ragged amount against
-// a ragged name is two ragged columns and no way in. The column is wider here
-// than on cocktails (8.5rem against 7rem) because food's totals are longer:
-// `60–100 g`, `3 tbsp (18 g)` and `~4 tbsp` are all ordinary, where a drink
-// total is `45 ml`.
-//
-// THE AISLE HEADINGS ARE THE FEATURE. Helen: "Group the shopping list by
-// grocery aisle, e.g. produce, dairy, fish, meat, non-perishable etc." So the
-// headings have to be findable while walking a shop with a phone in one hand,
-// which is what the small caps and the rule above each one are for — they are
-// scanned, not read.
+// Amount first in a fixed column, name second: a shopping list is read down
+// its left edge for "how much". The aisle headings are what a reader scans for
+// while walking a shop, hence the small caps and the rule under each.
 // =============================================================================
 
 .shopping-list {
@@ -40,8 +29,8 @@
   margin-bottom: $space-md;
 }
 
-// Its own class rather than `.results-heading`, which on this index is a flex
-// wrapper around the survivor count and carries that job's margins.
+// Its own class, not `.results-heading`, which on this index is a flex wrapper
+// around the survivor count and carries that job's margins.
 .shopping-list-title {
   margin: 0;
   font-family: $font-body;
@@ -50,14 +39,10 @@
   color: $color-text;
 }
 
-// --- the two typed numbers ---------------------------------------------------
-// FOOD'S FIRST NUMBER INPUTS. Cocktails put theirs in a shared placeholder
-// (`%cocktail-number-input`) once a third control wanted one; here there are
-// two and they are both in this file, so a placeholder would be a layer with
-// nothing on either side of it. If a third appears, lift this the same way.
-//
-// PLEX, because it is a number you act on — _palette.scss's own rule, and the
-// same one that puts the ingredient amounts on a recipe page in $font-label.
+// --- the typed numbers -------------------------------------------------------
+// Also @extended by food/_recipe-scale.scss, which is imported after this file
+// for that reason. Plex, because it is a number you act on (_palette.scss,
+// $font-label).
 %food-number-input {
   width: 3.4em;
   padding: 0.15em 0.3em;
@@ -88,12 +73,8 @@
 }
 
 // --- one count per recipe ----------------------------------------------------
-// ONE RECIPE PER LINE since #1297 -- Helen, 2026-10-09: "recipes on the
-// shopping list should appear 1 per line to make it easier for the user to
-// scan". It was a wrapping row of number-and-name pairs until then, to keep
-// the totals above the fold on a phone; each row is now a sentence ("2
-// batches of 18 Peanut Butter Cookies"), and sentences side by side do not
-// scan.
+// One recipe per line (#1297): each row is a sentence ("2 batches of 18 Peanut
+// Butter Cookies"), and sentences side by side do not scan.
 .shopping-list-recipes {
   list-style: none;
   margin: 0 0 $space-lg;
@@ -113,25 +94,15 @@
   input { @extend %food-number-input; }
 }
 
-// `.shopping-list-times` AND `.shopping-list-batch-note` STOOD HERE and are
-// gone with #815. For a fortnight a recipe with no portion count got a box
-// counting BATCHES, marked with a x, plus a line explaining why "set all to"
-// could not reach it. BATCHES ARE BACK since #1297, for every `makes:`
-// recipe, and need neither class: the row says "batches of" in its own words
-// (`.shopping-list-count-word`, unstyled -- it is part of the sentence).
-//
-// What is left is the case where a NEW recipe has not been given its estimate
-// yet: no box at all, and a note saying which key to add. A control that
-// cannot work must not appear -- this feature learned that twice.
+// A recipe with no estimate yet gets no box at all, and a note saying which
+// key to add: a control that cannot work must not appear (#815).
 .shopping-list-recipe--unscalable {
   color: $color-clear-text;
 }
 
-// THE BATCH ROWS, SET APART -- Helen, 2026-10-10: "Maybe just a little
-// vertical space and a soft hairline separator?" The first batch row carries
-// the rule, so it exists only when there are portions rows above it. It is
-// the section's own border colour and stops short of the full width: a
-// division inside the list, not a second section.
+// The first batch row carries a hairline, so the rule exists only when there
+// are portions rows above it. Short of the full width: a division inside the
+// list, not a second section.
 .shopping-list-recipes li.shopping-list-recipe--first-batch {
   margin-top: $space-sm;
   padding-top: $space-md;
@@ -140,8 +111,7 @@
 }
 
 // "(1¼ in the recipes)" beside an amount that was rounded up to a whole one
-// -- Helen's form, #1297. The quiet grey of the Not-scaled line: it is a note
-// on the row, and the number to act on is the one in the amount column.
+// (#1297). A note on the row; the number to act on is in the amount column.
 .shopping-list-aside {
   // Its own gap: at phone width the name and the bracket share a line as
   // inline text, where the row's flex gap does not reach.
@@ -150,14 +120,9 @@
   color: $color-clear-text;
 }
 
-// A RECIPE'S NAME IN THE SHOPPING LIST IS THE INDEX ROW'S TITLE, SMALLER, AND
-// A LINK -- Helen, 2026-10-11: "please render the name of the recipe in this
-// shopping list feature the same way we do in the recipe list row titles,
-// just smaller of course, and make them links please." So it is
-// `.recipe-title-link`'s type, value for value (_recipe-list.scss: the
-// heading face, bold, lowercase, 0.04em, ink, the star colour on hover), at
-// the size of the text it sits in rather than 1.2rem. "The same as the
-// titles" has to keep meaning that when the titles move: change both.
+// A recipe's name here is the index row's title, smaller, and a link. These
+// are `.recipe-title-link`'s type values (_recipe-list.scss) at the size of
+// the surrounding text: if the titles change, change both.
 .shopping-list-recipe-link {
   font-family: $font-headings;
   font-size: 1em;
@@ -174,12 +139,11 @@
 }
 
 // "(Chicken Satay, Peanut Sauce)" after an item whose amount was not scaled:
-// the recipes to go and read. The bracket is the quiet grey of the note
-// beside it; the names inside are the links above.
+// the recipes to go and read.
 .shopping-list-unscaled {
-  // THE BRACKET TAKES WHAT THE NAME LEAVES, and wraps inside itself. Left to
-  // share the row evenly, two long recipe names squeezed "orange zest" onto
-  // two lines (seen on the first build of this, 2026-10-11).
+  // The bracket takes what the name leaves and wraps inside itself. Sharing
+  // the row evenly, two long recipe names squeeze the item's name onto two
+  // lines.
   flex: 1 1 0%;
   min-width: 8rem;
   margin-left: $space-xs;
@@ -187,9 +151,9 @@
   color: $color-clear-text;
 }
 
-// "(Not scaled: salt, olive oil)" -- the recipe page's `.recipe-scale-note`,
-// value for value, so the same sentence looks the same in both places. The
-// rows' own bottom margin is taken back so it sits with them.
+// "(Not scaled: salt, olive oil)": the recipe page's `.recipe-scale-note`
+// type, so the same sentence looks the same in both places. The negative top
+// margin takes back the rows' own bottom margin.
 .shopping-list-note {
   margin: (-$space-sm) 0 $space-lg;
   max-width: 65ch;
@@ -240,10 +204,8 @@
   }
 }
 
-// PLEX, IN INK — the site's rule for a number you act on (MANUAL 13.10), and
-// the same choice cocktails' shopping list arrived at on 2026-09-04 after
-// trying the heading face first. The ACCENT is spent on the aisle heading
-// instead, which is the thing you are navigating by here.
+// Plex, in ink: a number you act on (MANUAL §13.10). The accent is spent on
+// the aisle heading, which is what the reader navigates by.
 .shopping-list-amount {
   flex: 0 0 8.5rem;
   font-family: $font-label;
@@ -264,10 +226,8 @@
   color: $color-clear-text;
 }
 
-// A phone in a shop is the case this feature is for, and 8.5rem of amount
-// column beside a name is too much of a narrow screen. Below 420px the amount
-// sits on its own line above the name, which keeps both readable and keeps the
-// amount first — the property the fixed column exists for.
+// On a narrow phone the amount sits on its own line above the name, which
+// keeps the amount first without spending 8.5rem of the row on its column.
 @media (max-width: 420px) {
   .shopping-list-items li {
     display: block;

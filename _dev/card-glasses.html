@@ -10,46 +10,18 @@ sitemap: false
 excerpt_separator: ""
 ---
 
-{% comment %} ─────────────────────────────────────────────────────────────────
-  GLASSES ON CARDS — internal, never published. Issues #601, #599.
+{% comment %} Glasses on cards: internal, never published (#601, #599).
 
-  WHY THIS PAGE EXISTS, and it is MANUAL §11.2.1 rather than convenience:
-  how a glass sits in a card panel is a question about a SIZE, and neither
-  Helen nor I can produce the comparison by looking at the real index — the
-  cards are scattered through 114 drinks in random order, so no two glasses
-  that need comparing are ever next to each other. "Is the flute too tall"
-  is a comparison, and a comparison has to be built before it can be made.
+   How a glass sits in a card panel is a question about a size, and the real
+   index never puts two glasses that need comparing side by side (MANUAL
+   11.2.1). It uses the site's own CSS, not a copy: every swatch is a real
+   `.drink-card` holding a real `.drink-card-glass`, with the icon pulled in
+   by the include the index uses. Every number is counted live.
 
-  IT USES THE SITE'S OWN CSS, NOT A COPY. Every swatch below is a real
-  `.drink-card` containing a real `.drink-card-glass`, pulling the icon in with
-  the same include tag the index uses, so the panel width, the wash, the width
-  cap, the stroke weight and the centring are the live rules — not a
-  reproduction of them. _dev/emboss.html's own note is the reason: its
-  predecessor reproduced the treatment by hand, applied half of it, and made
-  the font look like the fault. A swatch that draws itself cannot be trusted
-  about the thing it is swatching.
-
-  EVERY NUMBER IS COUNTED LIVE — the drink counts from site.cocktail_drafts,
-  the heights from glasses.yml, the tallest glass by scanning rather than by
-  being written down. A swatch page with a stale number in it is worse than
-  no swatch page, because it looks like evidence.
-
-  IT IS KEPT AFTER THE DECISION, WHICH IS AN EXCEPTION AND IS HELEN'S —
-  2026-08-31: "Leave that page up for me though please." The standing
-  convention for a comparison switch is that the losers and the switch are
-  DELETED once she picks (§13.9, and the `?narrow=` variants before it),
-  because one left in becomes a permanent branch nobody dares remove. That
-  reasoning is about a switch in the SHIPPED page. This is a dev page whose
-  entire job is the comparison, so keeping it costs the index nothing and
-  saves rebuilding the instrument the next time a glass is redrawn — which
-  §9.11 says happens, and #295 (measuring `heights_mm` for real) will make
-  happen again.
-
-  SO THE CONTROLS MUST KEEP TELLING THE TRUTH ABOUT WHAT SHIPS. Its defaults
-  are the shipped values, and if anyone changes the curve or the headroom
-  without changing them here, this page starts quietly describing a site that
-  no longer exists — which is the failure it was built to fix.
-────────────────────────────────────────────────────────────────────────────{% endcomment %}
+   Kept after the decision it was built for, at Helen's request. So its
+   defaults must stay the shipped values: change the curve or the headroom
+   without changing them here and the page describes a site that no longer
+   exists. {% endcomment %}
 
 {% assign glasses = site.data.cocktails.glasses %}
 
@@ -110,28 +82,12 @@ excerpt_separator: ""
     </fieldset>
   </div>
 
-  {% comment %} THE SOLID ICONS' OWN DIAL. Filled artwork has no stroke, so
-     its ink IS the drawing and `stroke-width` does nothing to it. Such icons
-     carry an <feMorphology erode> filter instead, and this drives its radius
-     live so the amount can be chosen by looking rather than guessed at.
-
-     NO ICON REACHES THIS ANY MORE, and the fieldset renders empty. It said
-     "three of the set (Helen's tiki mug, pineapple and coconut)" until
-     2026-09-05, when she redrew the pineapple and the coconut as line art;
-     the mug followed on 2026-09-06 (#738) and the set is now line art
-     end to end.
-
-     LEFT IN PLACE ON PURPOSE, unlike the prose that described it. The loop
-     keys off `feMorphology` in the rendered SVG, so it is self-emptying and
-     self-refilling: fill-only artwork arrives from outside regularly, and the
-     day one is published with an erode filter this dial reappears with no
-     edit. Deleting it would mean rebuilding it from scratch then. It is the
-     same call as keeping `.glass-icon-solid` and `SOLID` -- see the comment on
-     that rule in _sass/cocktails/_cocktail.scss.
-
-     THE VALUES HERE ARE THE ONES BAKED INTO THE SVGs, read out of the files at
-     render rather than restated -- same rule as the shape dials above. Whatever
-     Helen settles on gets written back into the icons. {% endcomment %}
+  {% comment %} The solid icons' dial. Filled artwork has no stroke, so such an icon
+     carries an <feMorphology erode> filter and this drives its radius live. The
+     loop keys off `feMorphology` in the rendered SVG, so the fieldset is empty
+     while no icon is filled and refills with no edit when one is published; do
+     not delete it (see `.glass-icon-solid` in _sass/cocktails/_cocktail.scss).
+     The values are read out of the SVGs at render, not restated. {% endcomment %}
   <div class="dev-controls dev-controls--ink">
     <fieldset>
       <legend>Solid ink</legend>
@@ -160,12 +116,9 @@ excerpt_separator: ""
 
   <p class="dev-readout" id="readout"></p>
 
-  {% comment %} Which glasses are actually asked for, and how often. Counted
-     from the drafts because that is what the index reads (§9.9). Every glass is
-     DRAWN either way — an unused one still sets the reference, and one of them
-     is exactly the sort of thing that changes the whole set silently — but the
-     count is on the label, because how much a glass matters is how many drinks
-     wear it. {% endcomment %}
+  {% comment %} Which glasses are asked for, and how often, counted from the drafts because
+     that is what the index reads. Every glass is drawn either way, since an
+     unused one can still set the reference; the count goes on the label. {% endcomment %}
   {% assign used = "" %}
   {% for drink in site.cocktail_drafts %}
     {% for g in drink.glass %}
@@ -225,9 +178,8 @@ excerpt_separator: ""
   .dev-card-cell { margin: 0; }
   /* The panel is the full width of the swatch card, so what you see is the
      panel and nothing else -- a real card's words would only be noise here. */
-  /* The column's own value, not a copy of it — this page's whole claim is
-     that it uses the site's CSS rather than a reproduction, and a hardcoded
-     7.6rem went stale the moment the column narrowed to 6.5rem (2026-09-04). */
+  /* The column's own value, not a copy of it: this page's whole claim is
+     that it uses the site's CSS rather than a reproduction. */
   .dev-card { width: var(--card-text-x); }
   .dev-card-label { font-size: 0.72rem; line-height: 1.45; margin: 0.45rem 0 0; }
   .dev-cheat, .dev-height { font-family: var(--dev-mono, monospace); font-size: 0.68rem; }

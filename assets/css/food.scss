@@ -3,105 +3,64 @@
 // Helen Triages FOOD — compiled stylesheet. Linked only by pages whose
 // site_key is `food` (see _data/sites.yml → food.css).
 //
-// Import order matters: palette first, then tokens and base (which reference
-// palette variables), then the index-page partials, then the recipe page.
+// Import order matters: palette first, then tokens and the shared layer (which
+// read palette variables), then the index partials, then the recipe page.
 //
-// shared/ is imported by both sites and may not name either. food/ may assume
-// anything it likes. Nothing in shared/ imports anything from food/.
+// shared/ is imported by both sites and may not name either. Nothing in
+// shared/ imports anything from food/.
 @import "food/palette";
 @import "shared/fonts";
 @import "shared/tokens";
-// The punched-tape mixin, before shared/layout — the wordmark uses it, and a
-// mixin must be defined before the partial that calls it.
+// Before shared/base and shared/layout: both @include its lettering() mixin.
 @import "shared/rule";
 @import "shared/base";
 @import "shared/layout";
-// The chrome's coloured half -- the header nav, its two icons, and the footer.
-// Shared as of issue #374: these were spread across food/_footer.scss and
-// food/_recipe-header.scss, so the shared header and footer were forked in the
-// cascade while looking shared in the markup. After shared/layout, so it
-// overrides the structure it styles.
+// The chrome's colours (#374). After shared/layout, whose structure it
+// overrides.
 @import "shared/chrome";
-// The page furniture -- the back arrow's line with its search box, and the
-// actions row (#1005/#1011/#1024). Shared because the two includes it styles
-// are emitted by both page layouts; after chrome, and before the food partials
-// so a site's own file can re-point a hover.
+// The page furniture. After chrome, and before the food partials so a site's
+// own file can re-point a hover.
 @import "shared/furniture";
-// The results count's digits and the sticky results bar (Helen, 2026-09-26,
-// "both treatments"). Shared because the count line and its bar are the same
-// object on both indexes, and BEFORE the food partials because
-// food/recipe-list reads its $results-bar-height for the list's
-// scroll-margin. Its one rule that competes with a food rule
-// (`.results-bar .btn-clear` against `.btn-clear` in active-filter-states) is
-// written two classes deep so the import order cannot decide it.
+// Before the food partials: food/recipe-list reads its $results-bar-height.
+// Its one rule that competes with a food rule (`.results-bar .btn-clear`) is
+// two classes deep, so import order does not decide it.
 @import "shared/results-bar";
-// The blocky rule, before the index partials below — they use its mixin,
-// same reason.
+// After shared/rule: it re-points one of that file's custom properties.
 @import "food/rule";
-// food/_layout.scss was one 1,111-line file as of 2026-08-09; split
-// 2026-08-10 into the six partials below, one per section it already had
-// (see each file's own header comment, and MANUAL for the full story).
-// Order preserved from the original file except food/category-labels, which
-// now also carries the old CATEGORY LABEL DOODLES and THE BLOCKY RULE ON THE
-// INDEX sections (originally last) -- verified safe to move earlier: neither
-// touches a class any of the sections between its old and new position also
-// styles.
 @import "food/recipe-list";
-// The tape slot both sites' chips wear (#1219); colours are in the three
-// food partials below.
+// The tape slot both sites' chips wear (#1219); its food colours are in the
+// partials below.
 @import "shared/tag-shape";
 @import "food/badges";
 @import "food/buttons";
-// %btn-active-base is defined in category-labels and @extended from here and
-// from search -- must stay imported before both.
 @import "food/category-labels";
 @import "food/search";
 @import "food/active-filter-states";
-// food/_recipe.scss was also 1,088 lines as of 2026-08-10 -- split the same
-// day into the four partials below, straight top-to-bottom (no section
-// needed reordering, unlike the food/layout split above: verified every use
-// of %heading-base and the box-tint variables, both defined in recipe-header,
-// already came after their definition in the original file). recipe-header
-// must stay first -- both shared bases are defined there.
+// recipe-header must stay first of the recipe partials: %heading-base and the
+// box-tint variables are defined there and used by the files after it.
 @import "food/recipe-header";
 @import "food/recipe-ingredients-method";
 @import "food/recipe-notes-body";
 @import "food/recipe-annotations";
-// The shortlist (#546). AFTER recipe-list, because `.recipe-list .btn-shortlist`
-// positions the control against the row layout that file defines; and after
-// category-labels, because its type is deliberately matched to
-// `.btn-clear-inline` there and the two should be read together. It defines its
-// own %shortlist-mark and @extends nothing from anywhere else, so this is the
-// only ordering constraint it has.
+// The shortlist (#546). After recipe-list: it reads that file's
+// $recipe-title-size and $recipe-title-line-height.
 @import "food/shortlist";
-// The export panel (#849), SHARED because it is one disclosure and one textarea
-// and is identical on both indexes -- unlike the shortlist CONTROLS above,
-// which are forked because a control on a recipe row and one in a drink card's
-// corner are different objects. It names palette variables ($color-surface,
-// $font-label) and so must come after food/palette, which it does: that is
-// line 11 of this file. See _sass/shared/_shortlist-export.scss's own header.
+// The export panel (#849), shared because it is identical on both indexes.
 @import "shared/shortlist-export";
-// The shopping list (#801), after shortlist: it is the shortlist's own panel
-// and is read as part of that feature, and it defines its own
-// %food-number-input rather than extending anything above, so this is the only
-// ordering constraint it has either.
+// The shopping list (#801). Defines %food-number-input.
 @import "food/shopping-list";
-// The recipe page's portion scaler (#1005), after shopping-list because it
-// @extends that file's %food-number-input -- the third control of that kind.
+// After shopping-list: it @extends %food-number-input and overrides its
+// width, and the override has to come later in the source to win.
 @import "food/recipe-scale";
-// The about page, last: it sits on top of .recipe-body-content's longform
-// styling (that page uses the same wrapper) and overrides the parts built for a
-// recipe's Troubleshooting section, so it has to be imported after it.
+// After recipe-notes-body: the about page sits on .recipe-body-content and
+// overrides parts of it.
 @import "food/about";
-// The doneness chart, used by the reference charts page and by any recipe whose
-// protein has a spectrum worth choosing from (#189). After recipe-header --
-// it uses %heading-base's siblings and the punched mixin.
+// Both after recipe-header: they @extend %heading-base and override parts of
+// it, which only works from later in the source.
 @import "food/temperature-chart";
 @import "food/timings";
-// PRINT LAST, both of them, and the order is load-bearing rather than tidy:
-// `@media print` adds no specificity, so a print rule and the screen rule it
-// overrides are the same weight and source order is the only thing separating
-// them. shared/print before food/print, same shell-then-page order as every
-// other pair in this file. See shared/_print.scss's header (#86).
+// Print last, both of them: `@media print` adds no specificity, so a print
+// rule and the screen rule it overrides are the same weight and source order
+// decides (#86). shared/print before food/print, shell then page.
 @import "shared/print";
 @import "food/print";

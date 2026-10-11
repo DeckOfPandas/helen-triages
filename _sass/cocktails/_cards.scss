@@ -1,129 +1,50 @@
 // =============================================================================
-// COCKTAIL CARDS — the index's whole vocabulary. Settled 2026-08-26.
+// COCKTAIL CARDS — the index's card, reused for the related drinks on a drink page
 // =============================================================================
-// A card is horizontal: the glass drawn large and pale down a fixed left
-// column, the words beside it. Helen chose this over a vertical card with the
-// glass on top, and over a purely typographic tile, because it is the only one
-// of the three with room for a full ingredient line — which the index needs,
-// since you can search by ingredient and the card has to be able to show you
-// why it matched.
+// A card is horizontal: the glass down a fixed left column, the words beside it.
 //
-// EVERY ANCHOR IS FIXED, AND THAT IS THE DESIGN RATHER THAN A SIDE EFFECT.
-// Helen: the title starts in the same place relative to the top and sides on
-// every card, and the goodness mark sits in the bottom-right corner in exactly
-// the same spot every time. That rules out the obvious layout twice over — a
-// card whose height comes from its content puts the foot somewhere different
-// on every card, and a vertically-centred text block moves the title. So the
-// card has a FIXED HEIGHT, the body is anchored to the top-left of the content
-// box, and the foot is taken out of flow and pinned to the bottom.
+// Every anchor is fixed. The title starts in the same place on every card and
+// the goodness mark sits in the same bottom-right spot, so above 720px a card
+// has a fixed height, the body is anchored top-left and the foot is pinned to
+// the bottom. Content that does not fit is clamped, never allowed to push: a
+// card whose height followed its content would unpin every anchor on it. Each
+// clamp's number lives on the rule that sets it.
 //
-// THE COST IS CLAMPING AND IT IS NOT AVOIDABLE. Content that does not fit is
-// cut rather than allowed to push. A rigid grid buys its rigidity with clamping,
-// and the alternatives are a card whose height varies with its content (which
-// unpins every anchor on it) or no moods on cards at all. Helen named the trade
-// before I did: "it's a shame to lose the card proportion but I can't think of
-// another way."
-//
-// THE NUMBERS THIS USED TO QUOTE HAVE ALL MOVED, so they are not quoted here any
-// more -- each lives on the rule that sets it, where changing one cannot leave
-// this paragraph behind. It said "two lines each for the tagline and the
-// ingredient line, two rows of mood chip" while all three of those were false:
-// as of 2026-09-06 it is THREE lines of ingredients (#552), up to THREE rows of
-// mood chip, and the tagline is not on the card at all (#512, a fortnight ago).
-//
-// WHERE THE THIRD INGREDIENT LINE CAME FROM belongs here, because it is the one
-// place the fixed height nearly failed: the foot used to stack its chips ABOVE
-// the ship and reserve both on every card, whether or not the chips filled the
-// space. Laying them side by side returned 23px to the body without touching
-// $card-height. See `.drink-card-foot`.
-//
-// $card-text-x IS THE SINGLE SOURCE OF THE TITLE'S LEFT EDGE. The glass column
-// is exactly that wide, and the body, the foot and the under-mark all start
-// from it. One value moves all four together and they cannot drift apart.
-// =============================================================================
+// $card-text-x is the single source of the title's left edge. The glass column
+// is exactly that wide, and the body and the foot both start from it.
 
 $card-height:   12.9rem;
-// 6.5rem SINCE 2026-09-04, down from 7.6rem — the design audit's critical #9
-// and Helen's own words off a candidates page on
-// the real index: "Narrower glass column please." About 15% off the column,
-// which is the audit's own number, and every pixel of it goes to the words:
-// the text column is whatever is left after the column, the gutter and the
-// padding, so on a 370px card (the grid's minimum) the name and the ingredient
-// line each get 17px more than they had.
-//
-// NOTHING ELSE HAD TO MOVE FOR IT, which is the point of the paragraph above:
-// the title's left edge, the foot's left edge, the two panel strips and the
-// glass drawing's width cap all read this one value, so the column narrows in
-// one place and the four of them stay in step. The tallest glass is unchanged
-// at $card-glass-scale below — the drawing is capped by height, not by this,
-// except for the eight wide glasses that hit `max-width` first and now draw
-// 1.1rem narrower.
 $card-text-x:   6.5rem;
-// ...AND IT IS A CUSTOM PROPERTY TOO, since #483. The Sass variable is still
-// the single source of the DEFAULT, but Sass resolves at compile time, so five
-// rules each baked their own copy of it (7.6rem then, 6.5rem now) -- which is
-// the exact coupling the comment above exists to prevent, reintroduced the
-// moment anything needs a different value. One custom property, five readers,
-// one line to override.
-//
-// The narrow-screen layout no longer overrides it (it stops using the column
-// altogether), but --card-glass-scale below does exactly this, and the
-// property stays because the argument holds whether or not it is exercised
-// today.
+// Also a custom property (#483): Sass resolves at compile time, so each reader
+// would otherwise bake its own copy and a media query could not move them
+// together.
 :root { --card-text-x: #{$card-text-x}; }
-// #490. The glass column is exactly $card-text-x wide, so text starting at
-// $card-text-x began flush against the tinted panel's edge with nothing
-// between them. This is that gutter, and it is a SEPARATE value rather than a
-// bigger $card-text-x on purpose: $card-text-x is the panel's width, and the
-// panel's under-mark is derived from it. Widening it to buy text margin would
-// have silently lengthened the mark too.
+// The gutter between the glass column and the words (#490). A separate value
+// on purpose: $card-text-x is the column's width, and widening it to buy text
+// margin would widen everything derived from it.
 $card-gutter:   0.95rem;
 $card-pad-x:    1.15rem;
 $card-pad-y:    1.05rem;
 $card-foot-y:   0.95rem;
 $chip-line:     1.15rem;
 
-// THE CARD'S FOUR LAYERS, NAMED -- #971, 2026-09-11, when the whole card became
-// the drink's link. `.drink-card` is `isolation: isolate` below, so these are
-// numbers about THIS card and nothing else on the page can be caught by them.
-// They are written here rather than as three literals on three rules because
-// the ORDER is the design and it is only legible in one place:
-//
-//   the card's own face        no z-index at all -- background, glass, tape,
-//                              ingredient line: everything that is only looked
-//                              at stays where it has always been
-//   $card-z-link          1    the stretched link's overlay, over the face
-//   $card-z-controls      2    the chips and the shortlist mark, over the
-//                              overlay, because they are clicked for their own
-//                              sake
-//   $card-z-ship          3    the goodness mark, over the chips, because it
-//                              MASKS the ones that run under it (#760)
-//
-// The tape's own two layers (`.drink-card-tape-bg` 0, `.drink-card-tape-word`
-// 1) are not in this scale: they sit inside the tape and order each other.
+// The card's layers (#971). `.drink-card` is `isolation: isolate`, so these
+// only order things within one card. The order is the design:
+//   the card's face     no z-index: background, glass, tape, ingredient line
+//   $card-z-link        the stretched link's overlay, over the face
+//   $card-z-controls    chips, shortlist mark, draft badge: over the overlay
+//   $card-z-ship        the goodness mark, over the chips it masks (#760)
+// The tape's own two layers order each other inside the tape and are not in
+// this scale.
 $card-z-link:     1;
 $card-z-controls: 2;
 $card-z-ship:     3;
 
-// The tallest glass, in the card grid's own units. Every glass is drawn at a
-// compressed fraction of this — see cocktails/index.html, which counts the
-// tallest live from glasses.yml rather than hardcoding one.
-//
-// IT WAS 13rem AGAINST A 12.9rem PANEL, so the tallest glass was defined to be
-// taller than the box it lives in — the flute (230 mm, the tallest declared)
-// filled the panel edge to edge, which is issue #601. 10.4rem is Helen's pick
-// from /dev/card-glasses/ on 2026-08-31: the tallest glass now stands at about
-// 81% of the panel and everything else beneath it.
-//
-// THIS IS THE HEADROOM DIAL AND IT LIVES HERE ON PURPOSE. The compression that
-// lifts the SHORT end is in the template, because it is per glass; this is the
-// one number that says how tall the tallest glass may be, which is exactly what
-// this variable already meant. Two multipliers in two files would be one
-// decision split in half.
-//
-// A CUSTOM PROPERTY for the same reason --card-text-x is (#483): the stacked
-// narrow-screen layouts need a smaller drawing, and a Sass value cannot be
-// changed by a media query without restating every rule that reads it.
+// How tall the tallest glass is drawn. Every glass is a fraction of this:
+// `--glass-ratio` comes from cocktails/index.html, which finds the tallest
+// glass in the data. It must stay under $card-height or the tallest glass
+// fills the card edge to edge (#601). A custom property so the narrow-screen
+// blocks below can lower it.
 $card-glass-scale: 10.4rem;
 :root { --card-glass-scale: #{$card-glass-scale}; }
 
@@ -141,32 +62,21 @@ $card-glass-scale: 10.4rem;
   height: $card-height;
   overflow: hidden;
 
-  // A STACKING CONTEXT OF ITS OWN -- #971, 2026-09-11. The stretched link below
-  // gives this card four layers that have to stay in a fixed order (the card's
-  // face, the click overlay, the controls that must stay clickable through it,
-  // and the ship's mask over the chips), and without this they would be four
-  // z-indexes competing with every other z-index on the page -- the header's,
-  // the shortlist panel's -- for no reason. `isolation` makes a stacking
-  // context without positioning anything or painting anything, so the four
-  // numbers mean "within this card" and nothing outside can be caught by them.
+  // A stacking context of its own, so the card's z-indexes cannot compete with
+  // the header's or the shortlist panel's.
   isolation: isolate;
   padding: $card-pad-y $card-pad-x $card-pad-y
            calc(var(--card-text-x) + #{$card-gutter});
   background: $color-surface;
   border: 1px solid $color-border;
 
-  // Colour only, and nothing moves. A card that lifts, grows or gains a shadow
-  // on hover would break the fixed anchors this whole file is built on, and
-  // eight of them twitching down a page is not subtle whatever the values say.
+  // Colour only. A card that lifts, grows or gains a shadow on hover breaks the
+  // fixed anchors this file is built on.
   transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
 // --- the glass column --------------------------------------------------------
-// LARGE, IN THE HOME COLOUR, AND ON NOTHING. This said "pale, large and tinted
-// behind" until 2026-09-02; the tint is gone and the drawing is no longer pale.
-// Its width IS $card-text-x, so the drawing can never push the title along —
-// the same failure _cocktail.scss's 3.2rem cap prevents on a drink page, at a
-// much bigger scale.
+// Its width is $card-text-x, so the drawing can never push the title along.
 .drink-card-glass {
   position: absolute;
   left: 0;
@@ -178,39 +88,19 @@ $card-glass-scale: 10.4rem;
   justify-content: center;
   pointer-events: none;
 
-  // NO PANEL, AND THE DRAWING CARRIES THE COLOUR — Helen, 2026-09-02, choosing
-  // it against three darker and greyer fields on the real index.
-  //
-  // IT WAS A GREEN WASH UNTIL TODAY, and the measurement is the case against
-  // it: at L* 19.40 that field was BRIGHTER THAN THE CARD'S OWN BORDER (18.18)
-  // and two and a half times the card's own lightness — the lightest thing on a
-  // card, on a site whose premise is black on black. It arrived as a 10% tint
-  // that made sense on paper and survived the inversion as a value rather than
-  // as a decision.
-  //
-  // AND THE ARRANGEMENT WAS BACKWARDS. §9.13's claim is that "the glass
-  // drawings carry the personality food gets from colour"; a near-white glass
-  // on a green field is the opposite of that. The colour is in the LINE WORK
-  // now and there is no field at all.
-  //
-  // `color` rather than a rule on the icon: the artwork strokes with
-  // `currentColor` (§3), so this one declaration reaches every glass including
-  // the fill-based ones. 11.11:1 on a card, so nothing is being asked of the
-  // reader's eyes that a hairline cannot deliver.
+  // No panel behind the drawing: the line work carries the home colour. Set as
+  // `color` because the artwork strokes with `currentColor`, so one declaration
+  // reaches every glass.
   color: $color-electric-absinthe;
 
-  // THE DRAWING ITSELF ANSWERS THE CURSOR -- #886, Helen, 2026-09-11: "glass
-  // also turns pink." The value is set in `drink-card-under-the-cursor` below;
-  // this is the easing, at the 0.12s everything else on the card moves at. It
-  // used to ease `background-color` for the two painted strips that bracketed
-  // this column under the cursor, and those are gone (see below).
+  // The drawing turns magenta under the cursor (#886); the value is in
+  // `drink-card-under-the-cursor` below.
   transition: color 0.12s ease;
 
   svg {
     display: block;
-    // The ratio comes from the template (true relative height, from
-    // heights_mm), the cheat from glasses.yml's display_scale. Three separate
-    // decisions, three separate multipliers, none baked into the others.
+    // Three separate multipliers: true relative height (the template), the
+    // per-glass cheat (`display_scale` in the glasses data), and the scale.
     height: calc(var(--glass-ratio, 1) * var(--glass-cheat, 1)
                  * var(--card-glass-scale));
     width: auto;
@@ -218,100 +108,23 @@ $card-glass-scale: 10.4rem;
     overflow: visible;
   }
 
-  // A lighter stroke than a drink page's. The reason has changed with the
-  // panel: it used to be that this was "a wash behind type", which it is not
-  // any more -- there is no wash. What still holds is the other half, that the
-  // drink page's own weight would read as a second drawing competing with the
-  // words, and this one sits beside a title rather than being the hero.
+  // Lighter than a drink page's stroke: at that weight the drawing competes
+  // with the words beside it.
   .glass-icon-line { stroke-width: 1; }
 }
 
-// NO STRIPS ANY MORE, AND NOTHING BRACKETS THE COLUMN -- #886, Helen,
-// 2026-09-11: "without the border above and below the glass." For nine days two
-// 3px painted strips (`.drink-card::after` and `.drink-card-glass::after`,
-// offset -1px to land ON the card's border) sat top and bottom of the glass
-// column: green at rest and magenta under the cursor from 2026-09-02, then
-// transparent at rest from 2026-09-04 ("Agree, no mark, end of." -- the audit
-// had read the green one as "a progress bar stuck at 18 percent") and so, for
-// their last week, the card's whole hover state. That is the state #886 was
-// raised against, and with the field itself answering now (below) the two stubs
-// were the one part of the candidate she asked to lose. The pseudo-elements are
-// deleted rather than left transparent: a strip with no resting colour and no
-// hover colour is a rule about nothing.
+// --- what a card does under the cursor (#886, #971) --------------------------
+// The field lifts to the magenta wash, the glass drawing and the name turn
+// magenta. All are hue moves (at these sizes the eye reads hue, not lightness)
+// and nothing moves: no shadow, no transform, no border change.
 //
-// =============================================================================
-// WHAT A CARD DOES UNDER THE CURSOR -- #886, 2026-09-10 / 2026-09-11
-// =============================================================================
-// Helen: "do something more attractive with cocktail cards on mouseover." Three
-// treatments went on the real index and she chose from them on 2026-09-11:
-// "option c please, but 1. without the border above and below the glass, b)
-// glass also turns pink." So this is C with B's one declaration added and the
-// old strips taken away. The three treatments, for the record: A grew the
-// strips into a whole magenta border, lit the name from anywhere on the card
-// and brought both rows of separator dot up to absinthe; B turned the GLASS
-// DRAWING magenta; C LIFTED THE FIELD one step to $color-wicked-woowoo-wash.
-//
-// WHAT SHIPPED, AND IT IS TWO OBJECTS. The card's field lifts from
-// $color-surface to the magenta wash -- the one treatment that overturns the
-// inversion's "a card is a darker field cut into a lighter one", and the reason
-// C reads as the card coming forward rather than as a mark appearing on it.
-// And the glass drawing, the largest piece of colour on a card, moves from the
-// home green to magenta: one declaration, because the artwork strokes with
-// currentColor (3). The two say the same thing at two scales -- the field
-// says "this one" and the drawing says it louder.
-//
-// BOTH ARE HUE MOVES, which is the bar 12 sets and the bar the four hover
-// states of 2026-09-01 failed: at these sizes the eye reads hue, not lightness,
-// so a brightening is a no-op dressed as a state. The wash is 14% of magenta
-// on the card's own black, which is a hue arriving rather than the black
-// getting paler; absinthe to magenta on the drawing needs no argument.
-//
-// AND NEITHER MOVES ANYTHING. No shadow, no lift, no transform, no border
-// change -- 9.13's rule, and LEOPARD.md 5 restates it for the fur that is
-// parked ("nothing on a card moves under the cursor except colour"). The
-// card's height, padding and every anchor on it are what this file's header is
-// about.
-//
-// THE ONE COUPLING, AND IT LIVES IN THE MIXIN SO IT CANNOT BE FORGOTTEN:
-// `.drink-card-ship` masks the chips that run under the verdict with the
-// card's own background (see its rule). A lifted field with a mask that stayed
-// $color-surface leaves the verdict sitting on a black rectangle in a magenta
-// card, so the mask lifts with the field, at the same 0.12s.
-//
-// THE NAME ANSWERS THE CURSOR FROM ANYWHERE ON THE CARD SINCE 2026-09-11 --
-// #971, and this is candidate A's one surviving piece. She declined it on
-// 2026-09-11 with the rest of A ("it is one selector to add back if she ever
-// asks", said the comment that stood here) and accepted it the same day on
-// seeing the result: "I declined the title turning pink, and should have
-// accepted." So a cursor anywhere on the card now lifts the field, turns the
-// drawing magenta AND lights the name -- the same hue the name has taken under
-// its own letters since 2026-09-02, which is why both states go through one
-// mixin below rather than two copies of the same four values.
-//
-// A's other two pieces are still not in it: the magenta border round the card
-// and the absinthe separator dots.
-//
-// IT WOULD HAPPEN ANYWAY, AND IS STATED ANYWAY. The stretched link below puts
-// an invisible copy of the name's own anchor over the whole card, so `a:hover`
-// is already true wherever the cursor is -- but a colour that depends on a
-// click target's geometry is a colour nobody can find the rule for. This says
-// it, and `:has(:focus-visible)` then gives the keyboard the same state, which
-// the overlay alone never would.
-//
-// A MIXIN, INCLUDED TWICE, AND THE TWO RULES ARE DELIBERATELY NOT ONE COMMA
-// LIST. `:has()` is not a forgiving selector, so a browser that does not
-// understand it drops the ENTIRE selector list it appears in -- which would
-// take the plain `:hover` down with it and leave the card with no state at all.
-// Two rules cost a duplicated block and cannot fail that way.
-// (12 also warns that a property declared twice in one block is invisible to
-// test_no_selector_declares_the_same_property_twice; a mixin is the shape that
-// test's own note asks for.)
-// THE NAME'S MAGENTA, IN ONE PLACE. Two rules want these exact four values:
-// the name under its own letters (2026-09-02) and the whole card under the
-// cursor (#971, 2026-09-11). #FF9BE8 is the hue lightened -- the highlight copy
-// has to be a step brighter than the fill it sits behind, which is the whole
-// argument on `.drink-card-name a` below, and it is written down once here so
-// the two states cannot drift to two different pinks.
+// `.drink-card-ship` masks the chips under it with the card's own background,
+// so the mask must lift with the field or the verdict sits on a black rectangle
+// in a magenta card. That coupling is why it is in the mixin.
+
+// The name's magenta, for the name's own hover and the card's. #FF9BE8 is the
+// highlight copy: it has to be a step brighter than the fill it sits behind
+// (MANUAL §13.9), so it moves with the fill.
 @mixin drink-card-name-under-the-cursor {
   color: $color-wicked-woowoo;
   text-shadow: -1px -1px 0 #FF9BE8,
@@ -326,63 +139,24 @@ $card-glass-scale: 10.4rem;
   .drink-card-name a { @include drink-card-name-under-the-cursor; }
 }
 
+// Two rules, deliberately not one comma list: `:has()` is not a forgiving
+// selector, so a browser without it drops the whole list and `:hover` with it.
 .drink-card:hover { @include drink-card-under-the-cursor; }
 
-// KEYBOARD GETS EXACTLY THE SAME STATE, and `:has(:focus-visible)` rather than
-// `:focus-within` is the whole of why this is a second rule: `:focus-within`
-// fires on a MOUSE click too, so clicking a mood chip would leave one card lit
-// after the cursor had gone. `:focus-visible` is the browser's own answer to
-// "did they arrive here by keyboard", and asking for it through `:has()` is how
-// a card reads a state that only its children can be in.
-//
-// WHERE IT IS UNSUPPORTED NOTHING BREAKS: the card gains no state, every
-// child's own `:focus-visible` still paints, and `:hover` above is untouched --
-// which is the point of the two rules being separate.
+// The keyboard's state. `:has(:focus-visible)`, not `:focus-within`, which
+// fires on a mouse click too and would leave a card lit after clicking a chip.
 .drink-card:has(:focus-visible) { @include drink-card-under-the-cursor; }
 
-// =============================================================================
-// THE WHOLE CARD IS THE LINK -- #971, Helen, 2026-09-11
-// =============================================================================
-// "I also want the whole card to be clickable, which is different." Different
-// from the hover above, which is what the issue was raised about: a card that
-// says "this one" under the cursor and then only opens the drink from the eight
-// characters of its name is a tile that looks like a button and behaves like a
-// footnote.
+// --- the whole card is the link (#971) ---------------------------------------
+// The name's anchor is stretched over the card by a pseudo-element: one link,
+// no nested interactive content, no click handler.
 //
-// ONE ANCHOR, STRETCHED -- the pattern, and the reason it is the pattern. A
-// card has exactly one link on it (the name's `<a>`, in both templates), and
-// this gives that anchor an invisible pseudo-element over the card, so the
-// whole card is that link's own hit area. No second anchor, no nested
-// interactive content, no JavaScript click handler -- the drink's URL is in the
-// status bar, middle-click and cmd-click open a tab, and a screen reader still
-// hears one link named after the drink.
-// `test_every_published_drink_page_offers_four_other_published_drinks` counts
-// name links and is unmoved by this, which is the test saying the same thing.
-//
-// WHY IT IS SIZED IN vmax AND NOT `inset: 0`. `inset: 0` would be the obvious
-// spelling and it would cover the WORD: the anchor's nearest positioned
-// ancestor is `.drink-card-tape-word`, and above that `.drink-card-tape`, both
-// of which are `position: relative` so the tape's artwork has a box to be
-// absolute against. Neither can stop being positioned without moving the
-// artwork somewhere else. So the overlay is drawn far bigger than any card can
-// be and `.drink-card`'s own `overflow: hidden` -- there since the fixed-height
-// design, clipping the three clamps -- cuts it to exactly the card. Clipping
-// governs hit-testing as well as painting, so the click area IS the card's
-// padding box, and `vmax` rather than a literal means no viewport can outgrow
-// it.
-//
-// IT ALSO HAD TO GET OUT OF THE TAPE WORD, which is `overflow: hidden` for the
-// no-JS ellipsis and would otherwise clip this to the lettering.
-// `.drink-card-name--fitted` releases that clip once the fit script has proved
-// it cannot fire; the rule is beside the two fitting states below, and the
-// no-JS case keeps both the ellipsis and this morning's click target.
-//
-// NOTHING MOVES AND NOTHING IS DRAWN, which is §9.13's rule for a card and the
-// bar this had to clear: the pseudo-element has no background, no border and no
-// size in flow, so at rest a card is pixel-for-pixel what it was.
-//
-// THE CURSOR IS THE ONE VISIBLE CHANGE, and it comes free: the overlay is part
-// of the anchor, so the UA's own `cursor: pointer` for a link covers the card.
+// Sized in vmax, not `inset: 0`: the anchor's nearest positioned ancestors are
+// `.drink-card-tape-word` and `.drink-card-tape`, which must stay positioned
+// for the tape artwork, so `inset: 0` would cover only the word. The overlay is
+// drawn far too big and `.drink-card`'s `overflow: hidden` clips it, and its
+// hit area, to the card. It also needs `.drink-card-name--fitted` (below) to
+// release the tape word's own clip.
 .drink-card .drink-card-tape-word a::after {
   content: '';
   position: absolute;
@@ -390,263 +164,89 @@ $card-glass-scale: 10.4rem;
   z-index: $card-z-link;
 }
 
-// WHAT HAS TO STAY ABOVE THE OVERLAY. A stretched link paints over everything
-// that is not lifted past it, and hit-testing follows painting -- so every
-// control on a card is raised by hand, each on its own rule with its own
-// reason: `.drink-card-mood` (the chips are buttons on the index and links on a
-// related card), `.btn-shortlist--card` in _shortlist.scss, and
-// `.drink-card-ship`, which is raised only because the chips were and which
-// declines pointer events so the corner still opens the drink.
+// A stretched link covers every control not lifted past it, so each is raised
+// on its own rule: `.drink-card-mood`, `.btn-shortlist--card` (_shortlist.scss)
+// and `.drink-card-ship`.
 
 // --- the words ---------------------------------------------------------------
 .drink-card-body { min-width: 0; }
 
-// =============================================================================
-// THE TITLE SITS ON PUNCHED TAPE — issue #469, settled with Helen 2026-09-01
-// =============================================================================
-// The header wordmark's own black label tape, at card size, carrying the drink's
-// name. Her idea, and the whole reason this palette went black: "I've been
-// flirting with the idea of letting the cocktail titles on cards be white on
-// black punched tape."
-//
-// FOUR THINGS ARE LOAD-BEARING and each was settled by her looking at it:
-//
-//   1. THE LETTERING IS TWO NEAR-WHITES WITH NO SOFTENING SHADOW. "At this
-//      smaller size, the boldness of the two near-whites with no softening
-//      shadow is exactly what we need." One tight pair, not the wordmark's four
-//      copies -- 1px is 5.9% of this type where the wordmark's 1.8px is 4.5% of
-//      its own, so the four-copy version reads as two overlapping letterforms
-//      down here. Whole pixels, because a fractional shadow offset antialiases
-//      the entire duplicate glyph and reads as floating rather than punched
-//      (§13.4.1).
-//
-//   2. IT ALSO WEARS THE STROKE, which the first version did not. Helen, on the
-//      filter headings: "the YOLO/MOOD etc you've done has outlines over the top
-//      edge of the letter. I think this helps both legibility and the raised
-//      effect. Please treat the title of cocktails the same way." It reads the
-//      same two custom properties every heading does, so it is literally the
-//      same treatment and not a copy of it. §13.4.1's split: STROKE SETS THE
-//      EDGE'S WEIGHT, SHADOW SETS ITS DIRECTION.
-//
-//   3. THE FILL IS BELOW PURE WHITE, and that is the wordmark's own hard-won
-//      reason (§13.9): a highlight copy needs somewhere brighter to be. #ECE9EA
-//      leaves it room; #ffffff does not, and the effect collapses into two
-//      overlapping letterforms.
-//
-//   4. THE TAPE IS A WHOLE OBJECT, never a fragment. It hugs a short title,
-//      caps at the panel for a long one, and the title ellipsises inside it. It
-//      used to be centred and clipped, so a long name showed the MIDDLE of a
-//      tape with both ends cut off.
+// --- the title sits on punched tape (#469, MANUAL §9.13) ---------------------
+// The lettering is two near-whites, one tight pair with no softening shadow, in
+// whole pixels (a fractional offset blurs the duplicate glyph, §13.4.1). The
+// fill is below pure white so the highlight copy has somewhere brighter to be
+// (§13.9). The tape is a whole object: it hugs a short title and caps at the
+// card for a long one.
 $card-tape-pad-y: 0.75em;   // gives a 32px black band around 10.4px capitals
 
-// THE OVERHANG PAST THE LETTERING, EQUAL AT BOTH ENDS. Helen: "extend the tape
-// slightly leftwards, and start the lettering slightly rightwards of where it
-// is now, then balance the tape at the right edge with the same padding IF the
-// cocktail name is short enough to all be shown on one line."
-//
-// One symmetric padding gives the balance for free, and the tape's leftward
-// pull is set separately below -- so the lettering's own left edge is the
-// DIFFERENCE between them. On a long title the tape caps at its max-width and
-// the WORD shrinks inside it, so this padding survives on both ends and the
-// ellipsis appears rather than the air disappearing.
-//
-// SOLVED FOR THE NAME'S WIDTH RATHER THAN NUDGED, 2026-09-02. Helen's goal is
-// the thing to optimise: "what I am trying to achieve is that reasonably
-// lengthed names of cocktails can appear on the one line." The width available
-// to the word is
-//
-//     body width + bleed-left + bleed-right - 2 x pad-x
-//
-// so PADDING COSTS THE NAME TWICE while a bleed pays it back once. That is why
-// the earlier, more generous 1.15em padding was making titles ellipsise: it was
-// taking 39.8px of a ~330px line and giving back only 15.
-//
-// THE BLEED EQUALS THE PADDING, which is what puts the lettering exactly on the
-// ingredient line's left edge -- her second ask, and the alignment the rest of
-// the card is built on. At 0.95em the tape still carries 16.4px of air past the
-// letters at both ends, and the name gets back to within 3px of the full
-// ingredient width: -0.3 of a character against -2.3 before.
-// 1.05em RATHER THAN 0.95em, AND THE REASON IS THE FONT SIZE DROPPING. These
-// are `em`, so they shrank with the title: at 1rem a 0.95em bleed is exactly
-// 15.2px, which is exactly $card-gutter -- the tape would land flush against
-// the glass panel instead of a hair over it, losing the overlap Helen approved.
-// 1.05em puts it back 1.6px onto the panel and costs 0.16 of a character.
+// The tape overhangs the lettering equally at both ends. Padding costs the
+// name's width twice and a bleed pays it back once, so keep these small. The
+// left bleed equals the padding, which puts the lettering exactly on the
+// ingredient line's left edge. They are `em`, so they follow the title's size:
+// at 1rem, 0.95em would equal $card-gutter and leave the tape flush against the
+// glass column, where 1.05em keeps it a hair over. The right bleed is `rem`
+// because it is a fact about the card's padding, not a ratio to the title.
 $card-tape-pad-x:      1.05em;   // 16.8px of tape past the letters, each end
 $card-tape-bleed:      1.05em;   // equal, so the lettering aligns exactly
 $card-tape-bleed-right: 0.85rem; // into the card's own 1.15rem of padding
 
 .drink-card-name {
   font-family: $font-headings;
-  // 1rem SINCE 2026-09-02, down from 1.08rem. Helen: "let's change the cocktail
-  // names to 1rem. It's a shame but I think it's the right compromise" -- the
-  // compromise being title size against how many names survive on one line.
-  //
-  // MEASURED, so the trade is on the record rather than assumed. Of 124 titles
-  // (median 14 characters, longest 48), on a 420px card it takes 117 on one
-  // line to 120; on a 470px card both sizes manage 122. So the gain is real and
-  // it is concentrated on NARROW cards -- which is where it matters, since a
-  // wide card was never the case that ellipsised.
-  //
-  // THE SIZE GOES THROUGH A CUSTOM PROPERTY SINCE 2026-09-04, so that ONE step
-  // rule works at card size and at drink-page size. `--card-name-size` is the
-  // base (1rem here, 3.2rem where `.cocktail-title-block` sets it in
-  // _cocktail.scss) and `--card-name-scale` is the step the fitting script
-  // applies. Two properties rather than one because they are two different
-  // decisions: how big this title is, and whether this particular name needed
-  // shrinking to fit. Multiplying them means the drink page's title steps by
-  // the same 14% the card's does without either knowing the other's number.
+  // Two properties because they are two decisions: `--card-name-size` is how
+  // big this title is (1rem on a card; _cocktail.scss sets it for the drink
+  // page's title), and `--card-name-scale` is the step the fitting script
+  // applies. Multiplied, so one step rule works at both sizes.
   font-size: calc(var(--card-name-size, 1rem) * var(--card-name-scale, 1));
   letter-spacing: 0.03em;
   text-transform: uppercase;
   margin: 0 0 0.3rem;
   white-space: nowrap;
 
-  // NOT `overflow: hidden`, and this is not a tidy-up. The tape's top edge is
-  // drawn one pixel ABOVE the tape by a drop-shadow, and this box is exactly
-  // the tape's height -- so hiding overflow here crops that highlight off.
-  // Nothing needs clipping: the tape caps its own width below.
+  // Not `overflow: hidden`: the tape's top highlight is a drop-shadow one pixel
+  // above the tape, and this box is exactly the tape's height, so hiding
+  // overflow crops it.
   overflow: visible;
 
-  // The paragraph's own strut would otherwise compete with the tape for the
-  // line's height. Zero it and the tape alone decides.
+  // Zeroed so the paragraph's own strut does not compete with the tape for the
+  // line's height.
   line-height: 0;
 
   a {
     color: inherit;
     text-decoration: none;
 
-    // It eases now rather than snapping -- #886. The card's field and its glass
-    // move under the cursor at 0.12s, and a title that arrived instantly beside
-    // that read as a second, unrelated event. The same duration every other
-    // state on this page uses.
     transition: color 0.12s ease, text-shadow 0.12s ease;
 
-    // HOT MAGENTA ON HOVER — Helen, 2026-09-02. It was `#ffffff`, which is a
-    // LIGHTNESS-ONLY step from the tape lettering's own near-white #ECE9EA:
-    // about 3% of headroom, and §12's rule is that at these sizes the eye reads
-    // hue rather than lightness. A four-value brightening is a no-op dressed as
-    // a state, which is the exact fault recorded twice on 2026-08-16.
-    //
-    // Magenta also makes the page consistent about what the colour MEANS: it is
-    // already "this matched" on a chip and a band, and a title under the cursor
-    // is the same claim in the interactive tense.
-    // THE HIGHLIGHT COPY HAS TO MOVE WITH THE FILL. Helen, 2026-09-02: "do we
-    // need a lighter pink for the offset letter behind the front one?" Yes, and
-    // that is exactly the diagnosis. `.drink-card-tape-word` paints a near-white
-    // copy one pixel up and left; when the letter turns magenta that copy stays
-    // white and stops reading as a highlight OF the letter, reading instead as a
-    // second white letter behind a pink one.
-    //
-    // #FF9BE8 is the hue lightened, so it is to magenta what #fdfbfe is to
-    // #ECE9EA -- a step brighter than the fill, which is the only thing a
-    // highlight has to be. §13.9's headroom rule is why it cannot just be white:
-    // a highlight needs somewhere brighter to be RELATIVE TO ITS OWN FILL, and
-    // white is not brighter than magenta in any useful sense, it is simply a
-    // different colour.
-    // IT WAS THE NAME'S OWN STATE AND IS THE CARD'S NOW -- #886 then #971,
-    // 2026-09-11, the same day. Candidate A lit the name from anywhere on the
-    // card and Helen took C with the glass instead, so for a few hours the name
-    // went magenta only under its own letters. Then: "I declined the title
-    // turning pink, and should have accepted." `drink-card-under-the-cursor`
-    // carries it now, from the same mixin as this, so the two cannot disagree
-    // about which pink -- and this rule stays because the name is still a link
-    // in its own right, and a link's own hover and focus states are not
-    // something to leave to a hover state on its grandparent.
+    // The card's hover state lights the name too, but the name is a link in
+    // its own right and keeps its own hover and focus states.
     &:hover,
     &:focus-visible { @include drink-card-name-under-the-cursor; }
   }
 }
 
-// =============================================================================
-// A NAME THAT DOES NOT FIT: SHRINK IT, OR WRAP IT — 2026-09-04
-// =============================================================================
-// Design audit critical #9. Helen decided it from a
-// candidates page on the real index, having switched between the treatments:
-// "Let's do: shrink when it's just one short-ish word too long, then two lines
-// where it's more than that. The one super-long title we have I'll just
-// shorten, and retain that principle."
+// --- a name that does not fit: shrink it, or wrap it -------------------------
+// assets/js/card-name-fit.js measures and adds one of two classes. A name over
+// by about one short word takes one step down; a name over by more wraps to a
+// two-line tape. Nothing is cut. Without the script nothing gets either class
+// and the base rule's ellipsis stays.
 //
-// THE PRINCIPLE IS THE PART THAT BINDS, and it is a rule about HOW MUCH is
-// over, not about how long the name is. One step of 0.86 buys about 14% of the
-// line — four or five Courier characters, which is one short-ish word. If that
-// is all the name is over by, shrinking is invisible and the tape stays one
-// object on one line. If it is over by more, no plausible step reaches it and
-// shrinking would only make small type that still ellipsises, so the name wraps
-// to a two-line tape instead. Nothing is ever cut.
-//
-// The measuring is `assets/js/card-name-fit.js`, which adds exactly one of
-// these two classes to a `.drink-card-name` and re-measures after stepping. The
-// classes are the whole of its output; everything about how the two states LOOK
-// is here.
-//
-// WITHOUT THE SCRIPT NOTHING GETS EITHER CLASS AND THE ELLIPSIS STAYS, which is
-// precisely the behaviour this page had before today. No-JS is not a degraded
-// case that needs its own rules — it is the base rule, and both of these are
-// additions to it. Same shape as `.rule-split` in shared/_rule.scss.
-
-// ONE STEP, AND THERE IS DELIBERATELY NO SECOND ONE. A ladder of steps would
-// mean cards down one column carrying titles at three or four different sizes,
-// which is the fixed-anchor design losing its whole argument for a case it can
-// already answer by wrapping.
-//
-// THE TAPE FOLLOWS THE TYPE FOR FREE, and that is why the size moves through
-// font-size rather than through a transform. $card-tape-pad-y, $card-tape-pad-x
-// and $card-tape-bleed are all `em` of the title, so at 0.86 the padding and
-// the leftward bleed shrink by exactly 0.86 too and the tape stays the same
-// object at a smaller scale. The one number that does NOT follow is
-// $card-tape-bleed-right, which is `rem` on purpose — it is a fact about the
-// card's own padding, not a ratio to the title (§9.13's rule about which tape
-// numbers are em and which are not).
-// Named since 2026-09-11. card-name-fit.js's STEP is the same number; see
-// there. (It was named for the portrait related cards, which were set at it
-// from the start so their three titles could not differ in size -- #960. That
-// card is gone with #991 and the related cards fit their names exactly as the
-// index's do, which is what Helen asked for; the name is still worth keeping,
-// because a constant the script also holds should not be a literal here.)
+// One step only: a ladder would put titles at several sizes down one column.
+// It moves through font-size, not a transform, so the tape's `em` padding and
+// bleed shrink with it. card-name-fit.js's STEP is the same number.
 $card-name-step: 0.86;
 
 .drink-card-name--step { --card-name-scale: #{$card-name-step}; }
 
-// AND A THIRD CLASS THAT IS NOT A THIRD STATE -- 2026-09-11, #971.
-// `card-name-fit.js` marks every name it has measured, whatever the answer, and
-// this is the one thing that class does.
-//
-// THE CLIP IT RELEASES IS THE NO-JS FALLBACK. `.drink-card-tape-word` is
-// `overflow: hidden` with `text-overflow: ellipsis` so a name too long for its
-// tape is cut politely when this script has NOT run -- which is the behaviour
-// the page had before the script existed, and the base rule the two states
-// above are additions to. Once the script HAS run the clip can never fire: the
-// name fits, or steps until it fits, or wraps.
-//
-// AND SINCE THE WHOLE CARD BECAME THE LINK, THE CLIP IS NOT MERELY IDLE. The
-// card's click overlay is a pseudo-element on the name's anchor, and that
-// anchor lives inside this box -- so `overflow: hidden` here clips the overlay
-// to the lettering and the rest of the card stops being a click target.
-// Releasing it lets the overlay out to the card, which clips it in turn.
-//
-// THE FALLBACK IS THEREFORE INTACT AND THE FAILURE IS THE SAFE ONE: with no
-// JavaScript there is no class, the ellipsis stays, and the card's click target
-// is the name alone -- exactly where this page was this morning.
+// card-name-fit.js marks every name it has measured. Once it has run the tape
+// word's ellipsis clip can never fire, and that clip also cuts the card's click
+// overlay down to the lettering, so this releases it. With no JavaScript the
+// ellipsis stays and the click target is the name alone.
 .drink-card-name--fitted .drink-card-tape-word { overflow: visible; }
 
-// TWO LINES OF TAPE, for the names a step cannot reach.
-//
-// The background is absolutely positioned at 100%/100% of the tape
-// (`.drink-card-tape-bg`), so it grows with the word and a two-line name gets a
-// two-line tape rather than a one-line tape with letters hanging out of it.
-// Nothing here has to say how tall the tape is.
-//
-// WHAT IT COSTS, stated because a fixed-height card has to pay for it from
-// somewhere: a two-line tape is a taller object, and the space comes out of the
-// clamps beneath it — the ingredient line and the two rows of mood word absorb
-// the line, exactly as this file's header says content that does not fit is cut
-// rather than allowed to push. The foot is pinned to the bottom and does not
-// move, so the goodness mark stays in its corner. Helen accepted the trade in
-// the same breath as choosing the rule.
-//
-// 1.12 rather than the base rule's 1: two lines at line-height 1 collide,
-// because Courier Prime's capitals fill their box and the tape's band is only
-// 70.59% of the artwork.
+// Two lines of tape. `.drink-card-tape-bg` is 100% of the tape, so it grows
+// with the word. The extra line comes out of the clamps beneath it (#776, at
+// the foot of this file); the foot does not move. Line-height 1.12 because two
+// lines of Courier capitals at 1 collide.
 .drink-card-name--wrap {
   white-space: normal;
 
@@ -666,41 +266,20 @@ $card-name-step: 0.86;
   padding: $card-tape-pad-y $card-tape-pad-x;
   vertical-align: baseline;
 
-  // THE TAPE BLEEDS BOTH WAYS. Left past the ingredient line by exactly its own
-  // left padding, so the LETTERING lands on that line's edge; right into the
-  // card's own padding, which costs no alignment and buys the name back the
-  // width the left padding takes.
-  //
-  // IT NOW CROSSES ONTO THE GLASS PANEL BY 1.2px -- 16.4px of bleed against the
-  // $card-gutter's 15.2px. Deliberate rather than drifted: Helen asked for the
-  // tape "slightly leftwards" again after it had been held a fifth of a pixel
-  // short of the drawing. A hair of black tape over a dark panel reads as a
-  // label laid across, which is what the object is.
-  //
-  // The right bleed stops 0.3rem inside the card's border rather than running
-  // to it, so the tape ends ON the card instead of appearing to be cut off by
-  // it.
+  // Bleeds both ways: left by its own left padding, so the lettering lands on
+  // the ingredient line's edge and the tape lies a hair over the glass column;
+  // right into the card's padding, stopping short of the border so the tape
+  // ends on the card.
   margin-left: -$card-tape-bleed;
   margin-right: -$card-tape-bleed-right;
   max-width: calc(100% + #{$card-tape-bleed} + #{$card-tape-bleed-right});
 }
 
-// THE BAND IS CENTRED BY MOVING THE ARTWORK, NOT THE WORDS.
-//
-// Every tape SVG insets its black polygon 16.47% from the top of its viewBox
-// and 12.94% from the bottom -- identical across all fifteen files, measured
-// again when the set grew from seven on 2026-09-11 (#644) --
-// so the visible BAND is 70.59% of the box and its centre sits 1.765% of the
-// height BELOW the box's centre. Shifting the whole SVG up by exactly that puts
-// the band's centre on the box's centre, after which ordinary flex centring
-// places the lettering with no font metric involved.
-//
-// EARLIER VERSIONS COMPENSATED ON THE TEXT INSTEAD and it took three rounds to
-// get right, because that route needs Courier Prime's real ascent and cap
-// height and the face ships here as woff2 only. Correcting a fact about the
-// ARTWORK on the artwork needs no estimate at all. The general form is worth
-// carrying: compensating for object A by adjusting object B is how a one-line
-// fact becomes a standing source of bugs.
+// The band is centred by moving the artwork, not the words. Every tape SVG
+// insets its black polygon 16.47% from the top of its viewBox and 12.94% from
+// the bottom, so the band's centre sits 1.765% below the box's centre; shifting
+// the SVG up by that lets flex centring place the lettering with no font metric
+// involved. A new tape drawing must keep those insets.
 .drink-card-tape-bg {
   position: absolute;
   left: 0;
@@ -710,15 +289,10 @@ $card-name-step: 0.86;
   z-index: 0;
   pointer-events: none;
 
-  // A HAIRLINE ALONG THE RIM, AND THE BOTTOM IS NOT DECORATION. With the tape
-  // at its own black on a card only 4.22 of L* lighter, it has almost no fill
-  // contrast to be seen by -- so the shadow under its lower edge is doing half
-  // the work of saying an object is there. The top is 6%, which is where Helen
-  // settled it after a ladder from 30% down: "L06 is looking great."
-  //
-  // drop-shadow rather than a border, because it follows the SVG's own alpha
-  // and so traces the tape's real skewed outline instead of a rectangle. Same
-  // two-hard-copies logic §13.4.1 uses on glyphs, applied to the object.
+  // A hairline along the rim. The tape has almost no fill contrast against the
+  // card, so the shadow under its lower edge is what says an object is there.
+  // drop-shadow, not a border, because it follows the SVG's alpha and so traces
+  // the tape's skewed outline.
   filter: drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.06))
           drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.95));
 
@@ -738,84 +312,26 @@ $card-name-step: 0.86;
   line-height: 1;
 
   color: #ECE9EA;
-  // `--lettering-heading-stroke-c`, NOT `--emboss-stroke-c` -- #778, 2026-09-21.
-  // This was the last live reader of that alias anywhere in the repo, and the
-  // alias is gone with it (shared/_rule.scss).
-  //
-  // IT IS A RE-POINT AND NOT A RE-VALUE, which is the trap LETTERING §10 names:
-  // both names resolved to `$color-label-stroke` on this site already, because
-  // cocktails/_rule.scss set the two in the same block and said so in as many
-  // words ("--lettering-heading-stroke-c mirrors --emboss-stroke-c above").
-  // Verified as well as reasoned: the computed stroke on this element is
-  // `0.16px rgb(164, 156, 141)` before and after.
-  //
-  // STILL DELIBERATELY UNTIERED (LETTERING §7). Reading one tier's colour is
-  // not the same as taking the tier -- the shadow below is this element's own
-  // pair, tuned at card size, and `@include lettering(heading)` would replace
-  // it. The tier supplies a colour here, nothing more.
+  // Deliberately untiered (LETTERING §7). It reads the heading tier's stroke
+  // colour and nothing else: the shadow below is this element's own pair, tuned
+  // at card size, and `@include lettering(heading)` would replace it.
   -webkit-text-stroke: var(--emboss-stroke-w) var(--lettering-heading-stroke-c);
   text-shadow: -1px -1px 0 #fdfbfe,
                 1px  1px 0 rgba(5, 5, 5, 0.9);
 
-  // The last of it: capitals do not sit centred inside their own line box, and
-  // where they land needs the face's real ascent, descent and cap height.
-  // decorations.js measures those in the browser and sets this; absent, the
-  // lettering is merely centred on its box, which is close. See cardTapes().
+  // Capitals do not sit centred in their own line box. decorations.js
+  // (`cardTapes()`) measures the face in the browser and sets this; absent, the
+  // lettering is centred on its box, which is close.
   transform: translateY(var(--tape-text-nudge, 0px));
 }
 
-// THE TAGLINE IS GONE FROM CARDS — #512 — and its rules go with it rather
-// than lingering for a class nothing emits.
-//
-// The clamp survives, now on one element instead of two. See the note at the
-// top of this file on why clamping is not optional: the card has fixed anchors
-// and content that does not fit has to be cut rather than allowed to push.
-//
-// FOUR LINES OF ROOM CAME BACK and the card is NOT shortened to reclaim them.
-// The fixed height is what keeps the goodness mark in the same corner on every
-// card, and Cobra's Fang still needs two rows of mood chip. Spending the
-// recovered space on air around the ingredients is the better use of it.
 .drink-card-ingredients {
-  // LOWERCASE EVERYTHING -- Helen, 2026-08-27: "I am unhappy about capital
-  // letters on cards. It's just very untidy." #543/#553.
-  //
-  // A DISPLAY DECISION, WHICH IS WHY IT IS HERE AND NOT A `downcase` FILTER IN
-  // THE TEMPLATE. The drink page must keep its capitals -- Helen's own worked
-  // example for a recipe line is `London dry gin (Beefeater)` -- so the
-  // lowercasing has to belong to the card, not to the markup both pages share.
-  // Filtering and match-highlighting are unaffected: both read data- attributes
-  // written pre-lowercased at build time, never rendered text.
-  //
-  // WORTH RE-LOOKING AT NOW THE PREMISE HAS MOVED. When Helen asked, cards
-  // rendered `item` and the line was a genuine jumble -- "Fresh lime juice ·
-  // Yellow chartreuse · Simple syrup · White rum", sentence capitals and brand
-  // capitals together. Since #544/#558 they render the vocabulary, and the 37
-  // remaining capitals are all real proper nouns: Campari, Chartreuse, Curaçao,
-  // Jamaican, Demerara. This rule now lowercases those too.
+  // Lowercased here rather than with a `downcase` in the template: it is a
+  // card's display decision (#543), and other pages keep their capitals.
   text-transform: lowercase;
   display: -webkit-box;
-  // THREE LINES SINCE 2026-09-06 -- #552, and this REVERSES a ruling rather
-  // than filling a gap, so both halves are kept.
-  //
-  // IT WAS TWO, AND THAT WAS HELEN'S CALL TOO, on 2026-09-04, off a candidates
-  // page on the real index. A third line was one of the treatments offered and
-  // she turned it down for a reason about the DATA rather than the card:
-  // "Let's stick with two lines of ingredients -- when we get issue #691 done
-  // (ingredients in importance order) I expect two lines will get the point
-  // across plus leave some comfy real estate on the cards." This comment then
-  // said, in as many words, "Do not raise this to 3."
-  //
-  // #691 LANDED AND THE PREDICTION DID NOT HOLD, which is the honest reading.
-  // Ordering by importance helps and is not enough on its own: "showing three
-  // lines is appropriate given the number of tiki drinks I have!" A tiki drink
-  // is four spirits, three juices, a syrup and a falernum -- nine or ten items
-  // where the median drink has five. Two lines fits the median and clips the
-  // family this collection is largely about.
-  //
-  // THE COST THE OLD COMMENT NAMED IS REAL AND IS BEING PAID. A third line
-  // takes air from the card, and the two-line tape needs somewhere for its
-  // extra line to come from; both were true then and are true now. Helen has
-  // the cards in front of her and has chosen the trade.
+  // Three lines (#552). The line budget at the foot of this file lowers it when
+  // the name wraps.
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -827,41 +343,15 @@ $card-name-step: 0.86;
 
 .drink-card-sep { color: mix($color-text, $color-surface, 25%); }
 
-// =============================================================================
-// THE TAGLINE TAKES THE CARD -- #1292, Helen, 2026-10-04 to 2026-10-06
-// =============================================================================
-// #512 took the tagline off the card and that still holds AT REST: asked again
-// with the spare room measured, "no taglines back on the index cards." What she
-// wanted instead was the tagline as a REVEAL, chosen from four on the real
-// index: "hover takes the card is fantastic!" Pointing at a card, the
-// ingredient line and the mood chips step out and the tagline has their room.
-// The name, the glass, the ship mark and the `+` do not move, which is this
-// file's one rule for a card under the cursor ("Colour only, and nothing
-// moves") bent as little as it can be: what changes is which WORDS are in the
-// box, never where a box is.
+// --- the tagline takes the card (#1292) --------------------------------------
+// There is no tagline on a resting card. Pointing at a card, the ingredient
+// line and the mood chips step out and the tagline has their room; the name,
+// the glass, the ship mark and the `+` do not move.
 //
-// TYPEWRITTEN, LIKE THE DRINK PAGE'S -- the same $font-headings upright she
-// chose there the same week, so the line is recognisably the same line in both
-// places.
-//
-// 0.9rem IS HER PICK FROM FOUR (0.98, 0.94, 0.90, 0.86), and it is the size
-// at which a FIFTH line clears the ship mark under a one-line name. What that
-// buys, measured on the grid's minimum 370px card where the text column is
-// 230px: 26 characters a line and five lines, so 130 if every line were full
-// and about 105 in practice, since words do not fill lines (of her own lines
-// one of 120 fits and one of 118 does not); three lines and about 65 under a
-// two-line name. The numbers are here because the script that measured them
-// was scratch: 9 of 113 written taglines were over on that card. She is cutting
-// the long ones to fit rather than having the type shrink for them: "I know I
-// need to fix some tagline lengths."
-//
-// THE FIRST BASELINE IS THE INGREDIENTS' FIRST BASELINE. "I'd like the top
-// line of the tagline to align in some more convincing way with where the top
-// line of the ingredients list was", and shown both ways, "Baselines match."
-// Two faces at two sizes do not share a baseline by sharing a top margin, so
-// the margin is derived: scripts/card_tagline_baseline.py lays both lines out
-// and reads the difference (9.35px at a 16px root). Re-run it if either rule's
-// size, line height or face moves.
+// The tagline's first baseline is the ingredient line's first baseline. Two
+// faces at two sizes do not share a baseline by sharing a margin, so this one
+// is derived: re-run scripts/card_tagline_baseline.py if either rule's size,
+// line height or face moves.
 $card-tagline-top: 0.584rem;
 
 .drink-card-tagline {
@@ -873,19 +363,17 @@ $card-tagline-top: 0.584rem;
   color: $color-text;
 }
 
-// ONE STATE, TWO WAYS IN. `drink-card--tagline` is on a card whose drink has a
-// written tagline (the template asks the drink page's own question), so a card
-// with nothing to say never changes at all.
+// One state, two ways in. `drink-card--tagline` is only on a card whose drink
+// has a written tagline, so a card with nothing to say never changes.
 @mixin drink-card-tagline-shown {
   .drink-card-ingredients { display: none; }
 
-  // `visibility`, NOT `display`: the foot keeps its box, so the ship mark it
+  // `visibility`, not `display`: the foot keeps its box, so the ship mark it
   // anchors stays in its corner. An invisible chip takes no click and no focus.
   .drink-card-moods { visibility: hidden; }
 
-  // CLAMPED AT WHAT CLEARS THE SHIP, so a line that is still too long is cut
-  // with an ellipsis rather than printed across the mark. A wrapped name takes
-  // two lines of the budget, as it does from the ingredients (#776).
+  // Clamped at the line count that clears the ship mark at this size: five
+  // under a one-line name, three under a wrapped one.
   .drink-card-tagline {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -894,73 +382,26 @@ $card-tagline-top: 0.584rem;
   }
   .drink-card-name--wrap ~ .drink-card-tagline { -webkit-line-clamp: 3; }
 
-  // BELOW THE TWO-COLUMN BREAKPOINT A CARD IS AS TALL AS ITS CONTENT (#1086),
-  // so nothing is cut -- AND THE CARD SHOULD NOT CHANGE SIZE WHEN IT FLIPS.
-  // #1323, Helen, 2026-10-07, with two phone screenshots: "Sometimes when the
-  // card turns over, there's lots of space under the tagline, and cutting it
-  // would allow the card not to change size on flipping."
-  //
-  // WHAT WAS HAPPENING. The ingredient line left the flow and the tagline took
-  // its place, so the card was the tagline's height plus the foot's -- and the
-  // foot was still as tall as its invisible chips. A long tagline over three
-  // rows of hidden chips made the card grow by a line or two while leaving a
-  // band of nothing underneath; a short one made it shrink. Measured on the
-  // 111 tagline cards of the day at 390px: not one kept its height, and the
-  // change ran from 37px shorter to 86px taller.
-  //
-  // THE TAGLINE NOW LIES OVER THE INGREDIENTS AND THE CHIPS, IN THEIR ROOM.
-  // The card becomes a one-column grid of three rows -- name, ingredients,
-  // foot -- which is the order it already stacks in. The ingredient line and
-  // the chips keep their boxes and turn invisible; the tagline is placed
-  // across rows two and three. A grid sizes spanned rows to the taller of what
-  // is in them, so the card is its resting height unless the tagline is
-  // longer than the ingredients and chips together, and then it grows by
-  // exactly the difference and no more.
-  //
-  // `display: contents` ON THE BODY is what lets its three children be rows of
-  // the CARD's grid beside the foot, which is the body's sibling. The body
-  // carries no box of its own to lose -- `min-width: 0` is its whole rule, and
-  // that moves to the column (`minmax(0, 1fr)`) and the name.
-  //
-  // THE LAST LINE SHARES THE SHIP'S ROW, AND KEEPS CLEAR OF IT BY WRAPPING.
-  // The ship mark sits at the foot's bottom right and the tagline now reaches
-  // down beside it. The first build kept them apart with padding under the
-  // whole tagline, one chip line and a gap. Helen, with that build in front
-  // of her at about half a laptop's width: each of five cards "increases the
-  // height of the cocktail card ... BUT there is at least one clear line
-  // between tagline and ship mark each time. I suspect there are others the
-  // same." There were: 24 of 111 at 640px grew by a line with the text ending
-  // 13px above the ship, and on all but one the last line stopped well short
-  // of the ship anyway. The padding charged every tagline for a collision
-  // almost none of them had.
-  //
-  // SO THE ROOM IS RESERVED IN THE LINE, NOT UNDER IT. An empty inline box as
-  // wide as the ship follows the tagline's last word. Where the last line has
-  // that much room to spare, the box sits at its end, under the ship, and
-  // costs nothing. Where it has not, the box wraps to a line of its own, and
-  // that line is the one beside the ship -- which is exactly the case that
-  // needed clearing. 4.6rem is the widest ship drawn (`yes²`, 69px) and
-  // $space-sm is the gap.
-  //
-  // ONLY WHILE SHOWN. A resting card is laid out exactly as before; the grid
-  // exists for the flipped state alone, and produces the same boxes for the
-  // name and the foot, so nothing moves at the moment of the flip.
+  // At 720px and under a card is as tall as its content (#1086), and it must
+  // not change size when it flips (#1323). So the card becomes a one-column
+  // grid of name, ingredients, foot; the ingredients and chips keep their boxes
+  // and turn invisible; and the tagline lies across rows two and three. The
+  // card keeps its resting height unless the tagline is longer than both, and
+  // then grows by exactly the difference. Only while shown: a resting card is
+  // laid out as before.
   @media (max-width: 720px) {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto auto;
 
+    // Lets the body's children be rows of the card's grid beside the foot. Its
+    // own `min-width: 0` moves to the column and the name.
     .drink-card-body { display: contents; }
 
-    // EVERY ITEM NAMES COLUMN ONE. Left to auto-placement, the ingredients and
-    // the foot find column one of their rows already taken by the tagline and
-    // open a second column beside it -- which is what the first build of this
-    // did: a tagline a few characters wide and a card 470px taller.
-    // THE NAME'S BOTTOM MARGIN GOES, BECAUSE MARGINS DO NOT COLLAPSE IN A GRID.
-    // In block flow the name's 0.3rem and the ingredient line's 0.5rem collapse
-    // to the larger; as grid items they add, and every card came out 4.8px
-    // taller when flipped. The ingredient line's own margin is the whole gap,
-    // as it always was in effect.
+    // Every item names column one: left to auto-placement, the ingredients and
+    // the foot find it taken by the tagline and open a second column.
+    // The name's bottom margin goes because margins do not collapse in a grid:
+    // its 0.3rem would add to the ingredient line's 0.5rem.
     .drink-card-name {
       grid-column: 1;
       grid-row: 1;
@@ -989,6 +430,10 @@ $card-tagline-top: 0.584rem;
       grid-row: 2 / 4;
     }
 
+    // The tagline's last line shares the ship mark's row. An empty inline box
+    // as wide as the widest ship word plus a gap follows the last word: where
+    // the line has room it costs nothing, and where it has not it wraps to a
+    // line of its own, which is the one beside the ship.
     .drink-card-tagline::after {
       content: '';
       display: inline-block;
@@ -998,10 +443,9 @@ $card-tagline-top: 0.584rem;
   }
 }
 
-// WHERE THERE IS A POINTER THAT HOVERS. The keyboard's way in is the NAME'S
-// link and only that: `:has(:focus-visible)` on the whole card, which is what
-// the rule above uses for the card's colour, would hide a mood chip at the
-// moment it took focus.
+// Where there is a pointer that hovers. The keyboard's way in is the name's
+// link only: `:has(:focus-visible)` on the whole card would hide a mood chip at
+// the moment it took focus.
 @media (hover: hover) {
   .drink-card--tagline:hover,
   .drink-card--tagline:has(.drink-card-tape-word a:focus-visible) {
@@ -1009,48 +453,19 @@ $card-tagline-top: 0.584rem;
   }
 }
 
-// WHERE THERE IS NOT, the card's `?` sets this (card-tagline.js; the mark
-// itself is in _shortlist.scss, beside the `+` it sits next to).
+// Where there is not, the card's `?` sets this (card-tagline.js; the mark is
+// `.btn-card-tagline` in _shortlist.scss).
 .drink-card--tagline.is-tagline-shown { @include drink-card-tagline-shown; }
 
-// The matched ingredient, in the colour of the field that matched it.
+// The matched ingredient.
 .drink-card-hit {
-  // A BAND UNDER THE WORDS, NOT A BLOCK BEHIND THEM. Helen, 2026-08-28, on a
-  // card with three filled things on it: "there's just a lot going on...
-  // underline the ingredient rather than highlight."
+  // A band under the words, not a block behind them (#1134): a whole ingredient
+  // name inside a line of others covers far more of the card than a chip does,
+  // and it wraps. The same 0.3em as `.drink-name-hit` in _filters.scss, so the
+  // site has one thickness for "this matched".
   //
-  // THICKER SINCE #1134, 0.16em -> 0.3em, AND THAT IS THE WHOLE OF WHAT THAT
-  // ISSUE LEFT HERE. It asked for a block ("Also invert them on the cocktail
-  // cards to make the hits more obvious") and got one for an afternoon, in the
-  // filter chip's exact treatment. She looked: "card ingredient chips aren't
-  // working for me at all. Let's go back to the underline. Can we try a thicker
-  // underline? Or basically anything else you can think of to get some more
-  // pink on the card!" So the band is restored and the WANT is carried by its
-  // weight instead -- more pink, same shape.
-  //
-  // 0.3em IS HER OWN NUMBER FROM THE ONE OTHER PLACE THIS QUESTION AROSE:
-  // `.drink-name-hit` in _filters.scss went 0.22em -> 0.3em on "the purple
-  // underline for searched cocktail titles should be thicker to make it stand
-  // out more". Same ask, same answer, so the site has one thickness for "this
-  // matched" rather than two. The offset comes in a touch (0.16em -> 0.12em) so
-  // the thicker band still reads as belonging to the word rather than floating
-  // under the line.
-  //
-  // WHY THE BLOCK FAILED HERE AND WORKS ON A CHIP, which is worth keeping
-  // because the two look like the same object and are not. A mood chip is two
-  // or three words in a row of its own; this is a whole ingredient name inside
-  // a line of other ingredients, so the same fill covers far more of the card,
-  // and it WRAPS -- the exact objection of 2026-08-28, which
-  // `box-decoration-break: clone` made tidy (two padded chips rather than a
-  // slab with a stub) without making it quiet. Fading it did not rescue it
-  // either: the block composites towards the card as it fades, so the
-  // punched-out letter runs out of contrast almost at once (5.59:1 solid,
-  // 4.71:1 at 90%, 4.29:1 at 85% -- tmp/hit_alpha.py), and a 70% wash with the
-  // light letter was a different treatment rather than a quieter one.
-  //
-  // text-decoration RATHER THAN THE HEADINGS' inset box-shadow, because this
-  // one wraps. A box-shadow paints the element's box and gives a wrapped
-  // fragment an odd stub; text-decoration follows each line properly.
+  // text-decoration, not an inset box-shadow, because this wraps: a box-shadow
+  // gives a wrapped fragment an odd stub.
   background: none;
   color: $color-text;
   text-decoration: underline;
@@ -1058,173 +473,59 @@ $card-tagline-top: 0.584rem;
   text-decoration-thickness: 0.3em;
   text-underline-offset: 0.12em;
   text-decoration-skip-ink: none;
-  // No padding. It was there to give a FILL room to breathe, and with a band
-  // instead it makes the line run wider than the word it underlines.
   font-weight: 600;
 }
 
 // --- the foot ----------------------------------------------------------------
-// TWO ROWS: chips above, the goodness line below. Side by side they competed
-// for one line and the chips lost, truncating on any three-mood drink.
+// The chips and the ship mark share the foot, bottom-aligned, so the foot is
+// only as tall as the chips and the chips' last row sits on the ship's line.
 //
-// THE MARK STILL DOES NOT MOVE, which is the point of pinning the foot at all:
-// the container is anchored to the BOTTOM and the goodness line is its last
-// child at a fixed line-height, so the mark sits in the same place whether the
-// chips take one row or two. Chips grow upward into the card.
-// ONE ROW SINCE 2026-09-06, NOT TWO STACKED BLOCKS -- Helen, with a screenshot
-// of the Sapins Swizzle: "we could stand to move the chips on cards downwards,
-// encroaching into the ship row. This would allow the third line of ingredients
-// even when there are two lines of chips, and even maybe three lines of chips as
-// well where needed."
+// The ship is out of flow (#760), absolutely positioned at the foot's bottom
+// right, so the chips get the full width on every row. Nothing reserves space
+// for it, so the last row can run underneath: the ship masks it with the card's
+// background, and card-line-budget.js orders the chips so that row stops short.
 //
-// WHAT THE OLD SHAPE COST, in the card's own units. The foot is anchored to the
-// bottom and grew upward, and it stacked: chips, then 0.45rem, then the ship's
-// 1rem line. So it always reserved
-//
-//     2 chip rows (2 x $chip-line + 0.28rem + 4px)   45.3px
-//   + the gap                                         7.2px
-//   + the ship's own line                            16.0px
-//   = 68.5px
-//
-// ...even on a card whose chips filled one row, and the ship's line was empty
-// across everything but its right-hand end. That reserved band is the dead
-// space in her screenshot, and it is what the third ingredient line needed.
-//
-// SIDE BY SIDE, BOTTOM-ALIGNED, the foot is as tall as the CHIPS alone: 45.3px
-// at two rows, so 23px comes back to the body -- which is where #552's third
-// ingredient line lives. Three chip rows cost 66px, still under the 68.5px the
-// old shape reserved unconditionally, so no card is worse off than it was.
-//
-// THAT COST WAS REAL AND IS NOW PAID OFF -- #760, 2026-09-09. While the ship
-// was a flex SIBLING it took horizontal room from EVERY chip row rather than
-// none, because a flex row cannot narrow only its last line: "MEH" is about
-// 4rem and "OH GODS YES" about 8, so a chip-heavy drink wrapped a word early on
-// rows that had no ship on them at all. Helen, 2026-09-08: "chip lines above
-// the lowest do seem to wrap early."
-//
-// THE SHIP IS OUT OF FLOW NOW, absolutely positioned at the foot's bottom
-// right, so `.drink-card-moods` is the foot's only flex item and gets the FULL
-// width on every row. That is exactly the complaint, and nothing else changes:
-// the foot is still as tall as the chips, still bottom-anchored, still
-// bottom-aligned with the ship.
-//
-// THE RESIDUE, AND IT IS MASKED RATHER THAN PREVENTED. Rows 1..n-1 now have the
-// whole width; the LAST row can run underneath the ship, because nothing
-// reserves space for an out-of-flow box. So the ship carries the card's own
-// `$color-surface` behind it and a gutter of left padding: a chip that reaches
-// it is covered rather than overlapping it, which reads as the chip being cut
-// off at the verdict instead of as two words printed on top of each other.
-// The card's background DOES change on hover since #886 (it lifts to the
-// magenta wash), so the mask is set beside it in `drink-card-under-the-cursor`
-// and eases at the same 0.12s -- the coupling is in one rule, not two.
-//
-// WHY NOT THE FLOAT THIS ISSUE ORIGINALLY PROPOSED. A float reserves space from
-// the TOP of its block downwards: placed first it wraps the chips around row
-// ONE, placed last nothing flows around it at all and it is pushed to a new row
-// when the chips leave no space -- where `overflow: hidden` deletes it, so the
-// busiest cards would silently lose their verdict. The proper bottom-right
-// float hack needs the container's height to be KNOWN, and ours is one, two or
-// three rows depending on the drink. Tried and reported on the issue, 2026-09-08.
-//
-// AND THE MASK WAS NOT ENOUGH, 2026-09-10. A chip cut off at the verdict read
-// as a chip cut off mid-word -- "sugar crav", "strong brown drin" -- and Helen
-// called it the day the ship left the flow. The fix is the card's own habit:
-// card-line-budget.js measures, and only a card whose last row actually
-// reaches the ship gets `drink-card--chips-clear-ship` and `--ship-w`; the
-// rule below pads its chips clear. Every other card keeps the full width #760
-// bought. A chip pushed to a fourth row by the padding is hidden whole by the
-// row cap, which is the lesser loss.
-//
-// AND IT IS THE LAST RESORT SINCE #1308, 2026-10-06. The padding narrowed
-// EVERY row of the cards that earned it -- 27 of 76 at 1280px -- which was the
-// empty right-hand side Helen raised. card-line-budget.js now orders the chips
-// so the row on the ship's line stops short of it, and this rule is left for
-// the cards no order can free. That was 13 of 76 until #1331, 2026-10-07, let
-// the script end a row early as well; on the present book it is none.
+// The last resort, for a card no order can free: the script adds this class and
+// `--ship-w`, and the chips are padded clear of the ship on every row.
 .drink-card--chips-clear-ship .drink-card-moods {
   padding-right: calc(var(--ship-w, 0px) + #{$card-gutter});
 }
 
 .drink-card-foot {
   position: absolute;
-  // Same gutter as the body above, so the title and the foot share one left
-  // edge. They are two separate rules and drifting apart is exactly what the
-  // fixed-anchor design exists to prevent.
+  // Same left edge as the body's padding, so the title and the foot line up.
   left: calc(var(--card-text-x) + #{$card-gutter});
   right: $card-pad-x;
   bottom: $card-foot-y;
 
   display: flex;
-  // FLEX-END, so the chips' LAST row sits on the ship's line -- which is what
-  // "encroaching into the ship row" means. Aligning to the top would leave the
-  // same dead band, lower down.
+  // flex-end, so the chips' last row sits on the ship's line.
   align-items: flex-end;
-  // The chips' own column-gap is 0.9rem and holds a separator dot. This gap
-  // separates two different things and is the card's own gutter, so the ship
-  // reads as a neighbour rather than as another chip.
   gap: $card-gutter;
 }
 
 .drink-card-moods {
   display: flex;
   flex-wrap: wrap;
-  // ZERO SINCE #846, and the dot supplies the gap itself. It was 0.9rem to hold
-  // an absolutely positioned dot that had no width of its own; the dot is in
-  // flow now and carries 0.234rem of margin either side of a 0.42rem glyph,
-  // which is the same 0.9rem between two chips, to the pixel. Leaving the
-  // column gap as well would have doubled it.
-  //
-  // The ROW gap stays 0.28rem -- it is the number the three-row cap below is
-  // calculated from, and it is untouched by any of this.
+  // Zero (#846): the separator dot is in flow and its own margins are the gap
+  // between two chips. The row gap is the number the row caps are calculated
+  // from.
   column-gap: 0;
   row-gap: 0.28rem;
   min-width: 0;
-  // TWO CHIP ROWS PLUS THE GAP -- AND PLUS THE BORDERS, which is what this was
-  // missing. A chip's rendered height is its `line-height` ($chip-line) plus
-  // 1px of border top and bottom; the cap counted the line-heights and the gap
-  // and forgot the borders, so it fell 4px short of two full rows and sheared
-  // the bottom off the second one. Helen caught it on a card with four chips.
-  //
-  // Stated as a calc against the same tokens rather than a rounded literal, so
-  // changing $chip-line or the chip's border moves this with it instead of
-  // silently re-clipping.
-  // THREE ROWS SINCE 2026-09-06, up from two -- Helen: "even maybe three lines
-  // of chips as well where needed". Same arithmetic as before, one row wider:
-  // three line-heights, the two row-gaps between them, and the 2px of border
-  // each row carries. Still a calc against the tokens rather than a literal, so
-  // changing $chip-line moves it instead of silently re-clipping.
+  // Three chip rows. A calc against $chip-line rather than a literal, so
+  // changing the token moves the cap instead of silently re-clipping.
   max-height: calc(#{$chip-line * 3} + #{0.28rem * 2} + 6px);
   overflow: hidden;
-  // NO BOTTOM MARGIN ANY MORE. It separated the chips from the ship when the
-  // ship sat BELOW them; the ship is now beside them and the foot's `gap` does
-  // that job on the other axis. Leaving it would lift the chips off the ship's
-  // baseline, which is the alignment the whole change is for.
-  //
-  // SINCE #760 THIS IS THE FOOT'S ONLY FLEX ITEM -- the ship is out of flow --
-  // so `1 1 auto` now means the full width on every row, which was the point.
-  // The declaration is kept rather than dropped because it is what makes the
-  // chips fill the foot rather than shrink to their content.
+  // The foot's only flex item, since the ship is out of flow. Kept: it is what
+  // makes the chips fill the foot rather than shrink to their content.
   flex: 1 1 auto;
 }
 
-// A BARE WORD, NOT A BOXED CHIP, SINCE 2026-09-04 -- the design audit's
-// critical #5 ("the same word appears in two shapes... one shape for one
-// idea"). Both directions were built on the real index --
-// the filter words taking this chip's box, or this chip taking the filter
-// word's form -- and Helen chose the second outright: "100% cards take
-// words." So a mood on a card is now set exactly as the mood in the filter
-// list above it: Courier, bold, lowercase, white, no box; hovering to magenta;
-// and when it is the reason the card is here, underlined in its section's
-// colour with the same band the chosen filter word wears. The card answers
-// the button in the button's own shape as well as its own colour.
-//
-// A MIDDLE DOT BETWEEN WORDS, because bare words in a row need a seam that a
-// box used to provide -- Helen: "Let's find a separator though, maybe a
-// single vertically centred dot?" It is the ingredient line's own `·`
-// (`.drink-card-sep`), one row down, so the two lines of a card's body
-// separate their items the same way. On the FOLLOWING word's ::before, as an
-// inline-block so a matched word's underline does not run under the dot: a
-// text decoration propagates to inline children and stops at atomic ones.
+// A mood on a card is a bare word, set as the mood in the filter list is:
+// Courier, bold, lowercase, no box. It rests in its section's colour, hovers to
+// magenta, and when it is the reason the card is here it is inverted, as the
+// filter button's `.is-on` is.
 .drink-card-mood {
   font-family: $font-headings;
   font-size: 0.72rem;
@@ -1232,137 +533,41 @@ $card-tagline-top: 0.584rem;
   text-transform: lowercase;
   line-height: $chip-line;
   letter-spacing: 0;
-  // A FALLBACK ONLY. Every chip carries `--mood` or `--hassle` from the
-  // taxonomy's `mood_groups` (see cocktails/index.html and the drink page's own
-  // loop), and those set the real colour below. This is what a chip would be if
-  // a future group arrived with no colour of its own -- visible rather than
-  // inheriting whatever surrounds it.
+  // A fallback only: every chip carries `--mood` or `--hassle`, which set the
+  // real colour below.
   color: #ffffff;
   border: 0;
   padding: 0;
   flex: none;
 
-  // IT IS A <button> NOW, so the UA's own button styling has to be undone --
-  // background, radius and the inherited-font default it does NOT have. Without
-  // these a chip arrives as a grey system button in the browser's own face,
-  // which is the one thing this card cannot carry.
-  //
-  // `background: none` rather than transparent for the same reason the pool
-  // buttons use it: there is no fill here at rest and none when matched either,
-  // which is §9.13's "bands and washes, not fills".
+  // A chip is a <button> on the index, so the UA's button styling is undone.
   background: none;
   border-radius: 0;
   cursor: pointer;
 
-  // ABOVE THE CARD'S CLICK OVERLAY -- #971, 2026-09-11. The whole card is the
-  // drink's link now, drawn as a pseudo-element over the card, and a stretched
-  // link covers every control it is not lifted past. A chip is a real control
-  // in both templates -- a filter BUTTON on the index, a LINK to the filtered
-  // index on a related card -- so it is lifted. `position: relative` is only
-  // here to make the z-index apply; nothing moves.
+  // Above the card's click overlay (#971): a chip is a real control, a filter
+  // button on the index and a link on a related card. `position: relative` is
+  // only here to make the z-index apply.
   position: relative;
   z-index: $card-z-controls;
 
-  // The card itself is a link now (#971) and the title has always been one, so
-  // this chip has two things competing for its click rather than one. The
-  // handler calls preventDefault for that reason, and the z-index above is what
-  // makes the chip the topmost target in the first place.
-  // A BARE WORD MOVES ITS TEXT on hover, as the filter words do (§9.13, "a
-  // chip has a box and a filter word does not"): with the box gone, the text
-  // is what there is to move.
-  //
-  // THE SECTION'S COLOUR IS THE RESTING STATE, AND MAGENTA IS THE HOVER —
-  // Helen, 2026-09-05, having seen it the other way round earlier the same day:
-  // "in the name of more is more, would it be too much to colour the chips in
-  // their colours to start with, not just on mouse over? I really do love
-  // colour. They could then mouseover in wicked-woowoo like the rest of the
-  // site."
-  //
-  // The first pass had it inverted -- white at rest, section colour on hover --
-  // and that was the smaller idea. Every chip belongs to one of two filter
-  // sections and each owns a colour from the reposado-to-violette ramp that
-  // 2026-09-03 put under the five index headings, on their filter words, and on
-  // the band a matched chip wears. Spending it only on hover meant the card
-  // said which section a word belonged to solely while a mouse was over it,
-  // which is no use at all to a reader scanning a grid, and none whatever on a
-  // phone. At rest it makes a card's moods legible as two kinds of thing on
-  // sight, and it hands hover back to magenta, which is what "you can touch
-  // this" means everywhere else on the site.
-  //
-  // THE MATCHED STATE STILL READS, and since 2026-09-06 it does so WITHOUT
-  // changing hue: a matched chip keeps this colour and gains an underline in it,
-  // plus a faux-bold stroke (see `.is-match` below). Weight and the band carry
-  // the state; the colour goes on saying which section the chip belongs to.
-  //
-  // IT USED TO SWAP INK -- unmatched a coloured word, matched a WHITE word over
-  // a coloured band, so that colour changed PLACE rather than intensity. #756
-  // ended that: turning the word white at the exact moment its section matched
-  // threw away the one thing the colour was for. The old reasoning is recorded
-  // in full on `.is-match` rather than here.
-  //
-  // MEASURED, NOT ASSUMED: coral is 6.66:1 on the page ground and 6.18:1 on a
-  // card, hot pink 6.19:1 and 5.75:1, both well clear of 4.5:1 -- which is the
-  // question a resting colour has to answer and a hover colour does not.
-  //
-  // THROUGH `$color-heading-mood` / `-hassle`, NEVER A LITERAL. Those are the
-  // semantic names, and the matched-band rules below already go through them
-  // (`text-decoration-color`), so a chip's colour and its match state cannot
-  // drift apart. It also means this survives the palette rename in flight on
-  // `worktree-sonnet-naming-things`, which changes what those two aliases point
-  // AT and not what they are called.
+  // Through `$color-heading-mood` / `-hassle`, never a literal, so a chip, its
+  // matched state and the heading that selects it cannot drift apart.
   &--mood { color: $color-heading-mood; }
   &--hassle { color: $color-heading-hassle; }
 
   &:hover,
   &:focus-visible { color: $color-wicked-woowoo; }
 
-  // A TRAILING DOT ON EVERY CHIP BUT THE LAST -- #846, 2026-09-08. Helen, on a
-  // card whose chips ran to several lines: "chips which form more than one line
-  // should have a . in between them even if the final chip on any line before
-  // the first is a whole chip. Currently ingredients have this, but chips do
-  // not... creme de peche is at the end of a line, but still gets a ."
-  //
-  // SO THE DOT IS NOW A SEAM BETWEEN WORDS RATHER THAN A MARK BEFORE ONE, and
-  // that is the whole change. The ingredient line has always read this way,
-  // because `.drink-card-sep` is a real element between two ingredients and
-  // wraps like the text it sits in. Chips now match it.
-  //
-  // THIS REVERSES A DECISION RECORDED ON 2026-09-05, and does so at Helen's
-  // word rather than by accident. `chip-rows.js`'s header listed "move the dot
-  // to the preceding chip's ::after" as considered and rejected, on the grounds
-  // that it "only relocates the orphan to the end of row one, where it reads as
-  // a sentence cut off". She has looked at the built thing and wants exactly
-  // that -- which is how a ruling changes here.
-  //
-  // #698 IS STILL SATISFIED, and by construction rather than by measurement:
-  // "no dot before the first chip" is now true because no chip has a leading
-  // dot at all. That is what makes `chip-rows.js` and its `is-row-start` class
-  // unnecessary -- there is no longer a line break for CSS to be blind to.
-  //
-  // AND THE FEEDBACK LOOP THAT FORCED ABSOLUTE POSITIONING IS GONE, which is
-  // why this can go back in flow. The loop was never about being in flow: it
-  // was that the dot was drawn CONDITIONALLY, so its width fed the wrap
-  // decision that decided whether to draw it. Helen found it on Lita Grey,
-  // whose four moods measure 289.5px with every dot present against a foot of
-  // about 304px -- the row wrapped, `festive` lost its dot, the row lost 11.4px
-  // and then fitted on one line, leaving one line with a dot missing. An
-  // unconditional dot cannot do that: the width is the same whatever the wrap.
-  //
-  // IN FLOW ON PURPOSE, not merely safely. An absolutely positioned `::after`
-  // would have no width, so a dot ending a row would sit past the container's
-  // right edge and be clipped away by the row cap's `overflow` -- invisible in
-  // precisely the case this issue is about. Occupying space is what makes the
-  // line wrap to accommodate it.
-  //
-  // INLINE-BLOCK so a matched chip's underline stops at it: a text decoration
-  // propagates to inline children and stops at atomic ones. Same reason the
-  // original had.
+  // A trailing dot on every chip but the last (#846), so a chip ending a row
+  // still has one. Unconditional and in flow on purpose: a dot drawn only
+  // sometimes changes the width that decides the wrap, and an absolutely
+  // positioned one has no width, so at a row's end it is clipped by the row
+  // cap. Inline-block so a text decoration on the chip stops at it.
   &:not(:last-child)::after {
     content: "·";
     display: inline-block;
-    // The chips' own `column-gap` is 0 now (see `.drink-card-moods`), so these
-    // margins are the whole gap: 0.234rem either side of a 0.42rem dot is the
-    // 0.9rem the column gap used to hold, unchanged to the pixel.
+    // The whole gap between two chips; the chips' `column-gap` is 0.
     margin: 0 0.234rem;
     color: $color-clear-text;
     font-weight: 400;
@@ -1370,104 +575,11 @@ $card-tagline-top: 0.584rem;
     pointer-events: none;
   }
 
-  // NO RULE HERE ANY MORE, AND THE ABSENCE IS THE POINT -- #846, 2026-09-08.
-  //
-  // A `& + &.is-row-start::before { display: none }` stood here from 2026-09-05
-  // until #846, suppressing the LEADING dot on a chip that began a row. #698
-  // needed it: "no dot before the first chip", and a wrapped chip carried its
-  // `::before` over the line break with it, hanging a bullet off the left
-  // margin. 76 of 124 drinks were wide enough to wrap, so it was the common
-  // case rather than a corner.
-  //
-  // The dot is trailing now, so no chip has a leading one and there is nothing
-  // left to suppress. `assets/js/chip-rows.js`, which measured `offsetTop` to
-  // add that class, went with it -- one fewer measurement pass on the index,
-  // and one fewer of the three #828 is about.
-
-  // A chip matching an active mood filter fills, the same treatment a matched
-  // ingredient gets — but in MENTHE, because the mood filter is menthe and the
-  // ingredient field is violet. The card is answering "why am I here", and it
-  // answers in the colour of the control that put it there.
-  // A MATCHED CHIP FILLS IN THE COLOUR OF THE HEADING THAT SELECTED IT. Mood
-  // chips and hassle chips are the same object doing the same job, but they
-  // answer different questions, and a hassle chip lighting up green would
-  // point at the wrong heading -- which is the whole failure this redesign was
-  // for. The group comes from the template (`--hassle`), derived from
-  // taxonomy.yml, so it cannot drift from the buttons above.
-  // MATCHED CHIPS WASH RATHER THAN FILL, same reasoning as the ingredient band
-  // above. A solid chip is a block of colour the size of a word, and a drink
-  // matching two filters got two of them plus a highlighted ingredient.
-  //
-  // The border carries the colour and the text stays INK. Every `-deep` is
-  // solved against paper, so deep-on-wash lands below 4.5 for three of the
-  // five hues -- and a chip does not need coloured text when its border, its
-  // background and its weight have all already changed.
-  // ONE COLOUR FOR EVERY MATCH, and it is no longer the section's -- Helen,
-  // 2026-08-30, choosing magenta off the dev page. A mood chip and a matched
-  // ingredient now wear the same hue, and so does the filter button that lit
-  // them, so magenta means MATCHED across the whole page rather than meaning
-  // "the green heading found this".
-  //
-  // WHAT THIS GIVES UP, stated because the old comment argued for it at length:
-  // a chip no longer says WHICH heading selected it. That mattered while the
-  // headings were five spread hues and a chip could point back at one. They are
-  // five shades of green now, and §12's rule is that the eye reads hue rather
-  // than lightness -- so pointing back was going to stop working anyway, and
-  // one clear "this matched" is worth more than five near-identical ones.
-  //
-  // AND BACK TO THE SECTION'S OWN COLOUR, 2026-09-03, because the headings
-  // are a ramp now and a chip CAN point back at one. A matched mood chip
-  // wears MOOD's coral and a matched hassle chip wears HASSLE's hot pink --
-  // the heading's own variables, so the promise and the thing that keeps it
-  // are one value. Helen chose it off a card carrying both plus a magenta
-  // ingredient band: "There's a lot going on... But I genuinely think it's
-  // really pretty!" The whole rule is written once, at _palette.scss's
-  // heading bars.
-  //
-  // AND THE WASH WENT WITH THE BOX, 2026-09-04: a matched word is underlined,
-  // exactly as `.btn-mood.is-on` is in _filters.scss (same thickness, offset
-  // and faux-bold stroke), in the heading's own variable. The two washes this
-  // used to read are deleted from _palette.scss with their consumer.
-  // IT KEEPS ITS OWN COLOUR SINCE 2026-09-06 -- #756, Helen: "cocktail chips hit
-  // by filters should retain the font colour from its section, and the underline
-  // in the same colour. Currently the underline is in the section colour but the
-  // lettering is white."
-  //
-  // THIS REVERSES THE RULE THE COMMENT ABOVE STILL DESCRIBES, so both are kept.
-  // The old design swapped ink: an unmatched chip was a coloured word and a
-  // matched one a WHITE word over a coloured band, on the reasoning that colour
-  // should change PLACE rather than intensity. That is a real argument and it
-  // lost to a plainer one -- the coloured word is the thing that says which
-  // section a chip belongs to, and turning it white at the exact moment the
-  // section matched threw that away when it mattered most. A card is supposed to
-  // answer the button in the button's own colour (section 9.13); it was
-  // answering in white.
-  //
-  // `currentColor` FOR BOTH, WHICH DELETES A RULE. The chip's colour is already
-  // `--mood` or `--hassle` from the taxonomy, so the stroke and the underline
-  // now follow it by construction -- there is no second place to state a hue and
-  // so no way for the two to disagree. `&--hassle.is-match` existed only to
-  // restate `text-decoration-color` for the other group and is gone with it.
-  //
-  // THE FAUX-BOLD STROKE STAYS, and does more work than it did. With the band no
-  // longer contrasting against white lettering, weight is what separates a
-  // matched chip from its neighbours at a glance -- and 0.04em in the chip's own
-  // colour thickens the word without introducing a hue the card has not already
-  // spent. Same device `.btn-mood.is-on` uses in _filters.scss.
-  //
-  // INVERTED SINCE #1099 / #1100, 2026-09-15, WHICH REVERSES #756 ABOVE. Helen
-  // asked to see "active chips on cocktail cards ... inverted instead of
-  // underlined, same as for active chips in the filter groups", picked from
-  // three candidates on the real index (underlined, inverted tight, inverted
-  // padded): "Chip option B please." So a matched chip is the filter button's
-  // own `.is-on` (#1086): a block in the section's hue with the page's dark as
-  // the letter, and the same-colour faux-bold stroke. Tight, `0 0.25em`, so the
-  // row's rhythm barely moves. #756's point that the colour says which section
-  // matched still holds -- it is the block's colour now, not the word's.
-  //
-  // THE SEPARATOR DOT IS DRAWN INSIDE THE CHIP (`::after` above), so a fill
-  // would swallow it. A matched chip carries it just outside its own box, with
-  // the same room reserved as a right margin.
+  // A matched chip is inverted (#1099): a block in its section's hue with the
+  // page's dark as the letter and a same-colour faux-bold stroke, as
+  // `.btn-mood.is-on` is in _filters.scss. The separator dot is drawn inside
+  // the chip, so a fill would swallow it: a matched chip carries it just
+  // outside its box, with the same room reserved as a right margin.
   &.is-match {
     color: $color-bg;
     -webkit-text-stroke: 0.04em $color-bg;
@@ -1489,78 +601,26 @@ $card-tagline-top: 0.584rem;
 }
 
 // --- the goodness mark -------------------------------------------------------
-// A SHIP AND A WORD, replacing the tinted square -- Helen, 2026-08-30: "I am
-// worried I no longer like the goodness mark. It might well not be clear enough
-// at speed."
-//
-// The square encoded the rung as a FILL PERCENTAGE, which is a quantity, read
-// at a glance, with no name on it. That is exactly the misreading she named
-// when we tried a bar instead: "if we lose them, it looks like we're rating
-// some drinks as 1 or 2 out of 5, which isn't the case, I just don't have any
-// of those. Drinks I've currently rated 'not really' are in here because I
-// judge they will be worth some work." A word cannot be misread as a score,
-// because it is not a quantity.
-//
-// So the rung is the WORD, banded in curaçao, and the ship is a fixed landmark
-// beside it. Her framing, and it is the same anchoring argument the old mark
-// already rested on: "it will have to be the right to keep the icon in the same
-// place on each card, otherwise I think it will create visual noise."
-//
-// THE ICON IS ON THE LEFT OF THE WORD AND THE PAIR IS PINNED RIGHT, which only
-// holds still because every rung is now one short word -- `ship_card_names` in
-// taxonomy.yml maps "oh gods yes" to yes² and "not really" to hmm, and the
-// other three were one word already. Helen: "the motivation is getting
-// everything to the same number of words, i.e. one, so the cards look more
-// stable." In Courier Prime those five run three to four characters, so the
-// ship moves by at most one character between cards.
-//
-// A DRINK OFF THE SCALE GETS THE SHIP AND `???` -- 2026-09-05, Helen, #722:
-// "unambiguously not on the same rating scale. (It's also funny)." `who knows`
-// is the only off-scale value (`QQ` left the vocabulary the same day) and is 20
-// of 124 drinks. It used to draw the ship with NOTHING beside it, which was
-// honest while every such drink was a local draft; once an unmade drink could
-// publish, a mark with no word became a rating that says nothing. The word is
-// punctuation rather than a sixth term, which is the whole of why it is safe.
+// A ship and a word. The rung is a word because a word cannot be misread as a
+// score out of five. The pair is pinned right with the icon on the left, which
+// holds still only because every rung is one short word on a card
+// (`ship_card_names` in taxonomy.yml).
 .drink-card-ship {
-  // OUT OF FLOW SINCE #760, 2026-09-09 -- see `.drink-card-foot` for the whole
-  // argument. As a flex sibling it narrowed every chip row; absolute, it
-  // narrows none. The foot is itself positioned, so it is the containing block,
-  // and `right: 0` lands on the foot's right edge, which is already inset by
-  // the card's `$card-pad-x`.
+  // Out of flow (#760). The foot is positioned, so it is the containing block.
   position: absolute;
   right: 0;
   bottom: 0;
-  // ABOVE THE CHIPS, WHICH IS NEW AND IS NOT ABOUT CLICKING -- #971,
-  // 2026-09-11. The mask below only works because this paints after the chips,
-  // and until today that was DOM order doing it (see the note further down).
-  // The card's click overlay pushed the chips to `$card-z-controls`, which
-  // would have put them above this and silently undone the mask -- the "sugar
-  // crav" chip 2026-09-10 was spent on. So the ship goes one higher.
-  //
-  // AND THEN DECLINES THE CLICK, because being above the overlay would
-  // otherwise make the bottom-right corner the one part of a card that does not
-  // open the drink. Nothing in here is interactive -- it is a ship and a word
-  // -- and #823 already decided which corner a card gives up, which was the
-  // TOP-right one, to the shortlist mark.
+  // Above the chips, because the mask below only works if this paints after
+  // them. It then declines the click, so the bottom-right corner still opens
+  // the drink.
   z-index: $card-z-ship;
   pointer-events: none;
-  // THE MASK, and it is why a chip running under the verdict reads as a chip
-  // cut off rather than as two words overprinted. `$color-surface` is the
-  // card's own background at rest. Under the cursor the card lifts to the
-  // magenta wash (#886) and this lifts with it, from the same mixin and at the
-  // same easing, or the verdict would sit on a black rectangle in a magenta
-  // card. The padding is the card's gutter, so a masked chip stops a sensible
-  // distance from the word rather than hard against it.
+  // The mask: a chip running under the verdict reads as cut off rather than
+  // overprinted. It must be the card's own background, so
+  // `drink-card-under-the-cursor` lifts it with the field.
   background: $color-surface;
   transition: background-color 0.12s ease;
   padding-left: $card-gutter;
-  // The ship is after the chips in the DOM, so it paints above them without a
-  // z-index. Said rather than relied on silently: reordering the markup would
-  // put the chips on top and the mask would stop working.
-  // `flex: none` so the verdict never shrinks or wraps: it is `white-space:
-  // nowrap` below, and a flex item that is allowed to shrink below its content
-  // would overflow rather than compress. Kept even out of flow -- it costs
-  // nothing and survives the rule being moved back into flow one day.
   flex: none;
   display: flex;
   align-items: center;
@@ -1581,66 +641,24 @@ $card-tagline-top: 0.584rem;
   height: 1rem;
   color: $color-raucous-reposado-deep;
 
-  // .ship-icon IS THE CLASS THE PARTIAL EMITS, so it is the one that carries
-  // the rule. Styling `svg` by descendant instead left the emitted class with
-  // no rule anywhere, which test_every_icon_partial_class_has_a_styled_base
-  // catches -- and rightly: a class an icon names and no stylesheet knows about
-  // renders at whatever size the surrounding flow happens to give it.
+  // `.ship-icon` is the class the partial emits, so it carries the rule:
+  // test_every_icon_partial_class_has_a_styled_base fails otherwise.
   .ship-icon {
     display: block;
     width: 100%;
     height: 100%;
-    // An inline <svg> clips its own content by default -- every browser's UA
-    // stylesheet sets overflow:hidden on the root svg specifically, and a
-    // stroke or a fill touching the viewBox edge is sheared off with nothing in
-    // the source to say why. §9.11's trap, and the canvas here is fitted to the
-    // artwork, so the ink does touch the edge.
+    // The UA stylesheet clips an inline <svg>, and this canvas is fitted to the
+    // artwork, so the ink touches the edge (MANUAL §9.11).
     overflow: visible;
     fill: currentColor;
   }
 }
 
-// The band, not a fill: "bands and washes, not fills" (§9.13), and this is the
-// last thing on a card that was still filled.
-//
-// NO RESERVED WIDTH. A `min-width: 4ch` held the ship in exactly one place
-// across every card, including the ones with no word; Helen's call on seeing
-// it: "please don't force the word to be fixed width, it looks weird. The words
-// are similar enough length that I'm hoping the slight movement in the ship
-// icon won't matter."
-//
-// The case it was really defending against is closed by data rather than by
-// CSS: EVERY drink now has a word, because an off-scale ship draws `???`
-// (2026-09-05). The gate that used to make this claim for published drinks
-// only -- test_every_published_drink_names_a_rung_on_the_ship_scale -- is gone,
-// replaced by test_meta_ship_is_a_rung_or_who_knows over the whole collection,
-// and `???` is what covers the half of it that is not a rung. `???` is three
-// characters against `yes²`'s four, so it moves the ship less than the
-// abbreviations Helen already accepted movement for.
-//
-// The :empty rule below is therefore unreachable in practice and is kept as a
-// backstop, not as a live case. Same idiom as .exclude-active:empty on the food
-// side.
-// THE BAND IS text-decoration, NOT AN INSET SHADOW, and that is what aligns the
-// two -- #548 point 10, "vertically align their centres".
-//
-// An inset box-shadow paints INSIDE the element's box, so the band was part of
-// the word's height: `align-items: center` then centred a box made of letters
-// PLUS a band against a box made only of a ship, and the ship rode about half
-// the band's height too high. Nothing was misaligned in the values; the two
-// boxes were measuring different things.
-//
-// text-decoration draws outside the box and changes no geometry, so the word's
-// line box is its letters and the two centres are the same centre. It is also
-// the site's other band already: `.drink-card-hit` uses text-decoration for its
-// own reason (§9.13 -- a box-shadow gives a WRAPPED fragment an odd stub), so
-// this is one mechanism for "a coloured band under text" rather than two.
-//
-// skip-ink: none because a descender interrupting the band would read as damage
-// rather than as typography at this size -- the same call .drink-card-hit makes.
-//
-// No :empty rule needed any more: text-decoration on an empty element draws
-// nothing, where an inset shadow drew a bare orange bar.
+// The band is text-decoration, not an inset box-shadow (#548). An inset shadow
+// is part of the word's box, so `align-items: center` would centre letters plus
+// band against the ship and the ship would ride high; text-decoration changes
+// no geometry. skip-ink: none because a descender interrupting the band reads
+// as damage at this size. No reserved width for the word.
 .drink-card-ship-word {
   font-weight: 700;
   text-decoration: underline;
@@ -1650,29 +668,11 @@ $card-tagline-top: 0.584rem;
   text-decoration-skip-ink: none;
 }
 
-// =============================================================================
-// THE DRAFT MARK -- #1162, 2026-09-21
-// =============================================================================
-// Helen: "add a DRAFT badge on the local site for unpublished cocktails".
-// _includes/cocktails/draft-badge.html emits it, and only a local build has a
-// draft in the loop to emit it for.
-//
-// NO NEW HUE, WHICH IS 13.12'S RULE AND NOT A SHORTAGE OF IDEAS. Every colour
-// on this card is already spoken for -- absinthe is the glass, magenta is
-// "this one, chosen", the reposado orange is the ship's verdict -- and a draft
-// mark makes no claim about the DRINK at all. It says where the file is in
-// Helen's own process, so it takes the card's quiet text colour and earns its
-// visibility from the hairline and the letter-spacing instead. A badge nobody
-// asked a hue for should not spend one.
-//
-// FOOD'S `.badge-draft` IS NOT REUSED, and could not be: that mark is a
-// clip-path "hastily broken highlighter tape" in _sass/food/_badges.scss, which
-// the cocktails stylesheet does not import (2.5 -- the two sites share chrome,
-// not card vocabulary). The word is the same and the drawing is each site's
-// own, which is the same arrangement the two indexes already have.
-//
-// `nowrap` BECAUSE IT IS ONE WORD and a five-character label that wraps to
-// "DRA/FT" in a tight corner is worse than one that pushes the tape a little.
+// --- the draft mark (#1162) --------------------------------------------------
+// _includes/cocktails/draft-badge.html emits it, for a draft only. It spends no
+// hue: every colour on a card is already spoken for, and a draft mark makes no
+// claim about the drink. Food's draft mark is food's own drawing and is not
+// reused.
 .drink-draft-badge {
   font-family: $font-headings;
   font-size: 0.62rem;
@@ -1687,49 +687,15 @@ $card-tagline-top: 0.584rem;
   padding: 0.22em 0.42em;
 }
 
-// --- on a card: top left, over the glass -------------------------------------
-// MOVED HERE ON 2026-10-06, from beside the shortlist `+`. Helen: "Do you think
-// we could put the DRAFT label anywhere else? I actually already find it hard
-// to spot", offering "top left, smaller", and then "Option 1".
+// On a card: top left, over the glass column, which takes nothing from the
+// title. Above 720px it clears every drawing. From 401px to 720px a card is as
+// tall as its content and the rim can sit behind the badge, so
+// `background-color: inherit` gives it the card's own field, hover wash
+// included. Brighter than the base badge, still no hue.
 //
-// WHAT THE OLD SPOT COST. #1162 put it "squished in on the top right", left of
-// the `+`, and it paid for that out of the title the way the `+` does: 3.1rem
-// off every draft's name. When #1292 gave that same spot to the tagline's `?`,
-// a draft card had to draw the `?` somewhere else. Top left takes nothing from
-// the title and leaves that corner to the two controls.
-//
-// THERE IS ROOM ABOVE 720px, AND THE FLUTE IS THE CASE THAT PROVES IT. A card
-// there is 206.4px tall and the tallest drawing, the flute, is 166.4px centred
-// in it, so 20px is clear above the rim; every other glass is shorter. The
-// badge is 47x16px and starts 6px from the card's top and left. Measured over
-// the 62 draft cards of 2026-10-06 at 1280px and 760px: none touches its
-// drawing, and the two flutes clear by 0.3px. Below 400px the glass is a band
-// across the top and the badge sits beside it.
-//
-// BETWEEN 401px AND 720px IT DOES OVERLAP, AND THE BACKGROUND IS FOR THAT. A
-// card there is as tall as its content (#1086), often shorter than 206px, and
-// the drawing fills it: at 600px, 15 of the 62 drafts put some rim behind the
-// badge, 14 of them 1 to 4px and one 10px. `background-color: inherit` gives the
-// badge the card's own field, hover wash included, so it reads as a label
-// over the drawing rather than as lettering scribbled through it. Helen's
-// brief for this move: "It's for my eyes only ... so we don't need to fuss too
-// much." A second position for that band was not worth a breakpoint.
-//
-// NOT SMALLER, AND BRIGHTER WITHOUT A HUE. Smaller was her first thought and
-// the opposite of her complaint. The paragraph above on spending no hue still
-// holds, so on a card the word and its hairline take $color-text where they
-// took the quiet grey: the same mark, legible against a dark card, still
-// making no claim about the drink. The drink page's badge keeps the grey; it
-// sits on the title's own line there and was not the one she could not find.
-//
-// `z-index` WITH THE CONTROLS, because the whole card is a link drawn as a
-// pseudo-element and anything not lifted past it is painted underneath.
-// `pointer-events: none` because it is a label, not a control: that patch of
-// the card still opens the drink.
-//
-// IT USED TO BE POSITIONED IN _shortlist.scss, for an import-order reason: the
-// old offset was derived from `$card-shortlist-size`, which that file declares
-// and this one cannot see. Nothing here depends on the button any more.
+// `z-index` with the controls, or the card's link overlay paints over it;
+// `pointer-events: none` because it is a label and that patch still opens the
+// drink.
 .drink-cards .drink-draft-badge {
   position: absolute;
   z-index: $card-z-controls;
@@ -1741,20 +707,10 @@ $card-tagline-top: 0.584rem;
   background-color: inherit;
 }
 
-//
-// --- on a drink page: to the right of the tape, below if needed --------------
-// Helen's words again, and the second half of them is why this is flow rather
-// than position. `.drink-card-name` is a block everywhere else; here it becomes
-// a wrapping flex row so the badge takes the space beside the tape when there
-// is any and drops under it when there is not, with no width to guess.
-//
-// `align-items: baseline` puts the small word on the title's own line rather
-// than centring it against a 3.2rem tape, and `flex-wrap` is what delivers
-// "below if needed".
-//
-// card-name-fit.js IS UNAFFECTED: it measures `.drink-card-tape-word`'s
-// clientWidth, and the tape is still the flex item it was -- it simply has a
-// sibling now. Verified on a draft page at 1280 and 390.
+// On a drink page: on the tape's line, dropping below when there is no room.
+// `.drink-card-name` is a block everywhere else; here it is a wrapping flex
+// row. `align-items: baseline` puts the small word on the title's own line
+// rather than centring it against the tape.
 .cocktail-title-block .drink-card-name {
   display: flex;
   flex-wrap: wrap;
@@ -1763,19 +719,9 @@ $card-tagline-top: 0.584rem;
   row-gap: $space-xs;
 }
 
-// AT THE RIGHT-HAND END OF THAT LINE, NOT BESIDE THE TAPE -- Helen, 2026-09-21,
-// having looked at the first version: "let's put the draft badge on the right
-// not the left, but still the same line you have it."
-//
-// `margin-left: auto` RATHER THAN `justify-content: space-between` on the row.
-// The row can hold a wrapped title, and `space-between` would spread THOSE
-// items too; an auto margin belongs to the one item that should be pushed and
-// leaves every other line alone. It is also what keeps her second clause true
-// -- the badge is still on the tape's line, moved along it rather than off it.
-//
-// AND IT STILL DROPS "IF NEEDED". When the line has no room the badge wraps as
-// before; the auto margin then simply pushes it to the right of its own line,
-// which is the same edge it was already heading for.
+// At the right-hand end of that line. `margin-left: auto` rather than
+// `justify-content: space-between`, which would also spread the items of a
+// wrapped title.
 .cocktail-title-block .drink-draft-badge {
   margin-left: auto;
 }
@@ -1783,71 +729,21 @@ $card-tagline-top: 0.584rem;
 @media (max-width: 720px) {
   .drink-cards { grid-template-columns: 1fr; }
 
-  // THE GLASS COMES DOWN WITH THE CARD -- #1165, 2026-09-21. Helen: "glasses
-  // are too large and are overflowing vertically on cocktail cards at medium
-  // screen widths."
-  //
-  // IT IS THIS BLOCK'S OWN `height: auto` THAT BROKE IT, which is why the fix
-  // belongs here. Above 720px a card is a fixed $card-height (206.4px) and the
-  // tallest glass is 166.4px -- 81% of the card, Helen's pick from
-  // /dev/card-glasses/ on 2026-08-31, and it always fits because the box is
-  // guaranteed. #1086 gave a card below this width `height: auto` so a short
-  // one would stop carrying a dead band, and the drawing kept its 10.4rem: a
-  // card with one ingredient line and one chip is 133.7px tall holding a
-  // 166.4px glass, which `overflow: hidden` then clips top and bottom.
-  //
-  // MEASURED BEFORE CHOOSING (tmp/card_heights.sh, tmp/card_summary.py, over
-  // the 20 cards each width renders). Cards shorter than their own glass:
-  // 2/20 at 420px, 7/20 at 500px, 14/20 at 620px, 17/20 at 700px, and 20/20 at
-  // 719px -- every card on the page. The shortest card in the band is 133.7px.
-  //
-  // 7.5rem = 120px, WHICH IS 90% OF THAT SHORTEST CARD and clips none of them
-  // at any width sampled. 8rem (128px) also fits everything measured but fills
-  // a short card almost edge to edge; 8.5rem clips 9 to 12 cards again. Helen
-  // chose from the three on the related-drinks row at 620px, which is the one
-  // set of cards that does not reshuffle between builds.
-  //
-  // THE ≤400px BLOCK STILL WINS BELOW 400, where the glass is a band across the
-  // top rather than a left column and takes 6.4rem. It sits later in this file,
-  // so source order does it -- both are `:root`, so neither out-specifies the
-  // other and moving either one past the other would silently swap them.
+  // The glass comes down with the card (#1165): with `height: auto` below, a
+  // short card is shorter than the full-size drawing and `overflow: hidden`
+  // clips it top and bottom. The 400px block further down wins below 400 by
+  // source order alone; both are `:root`, so moving either past the other
+  // swaps them.
   :root { --card-glass-scale: 7.5rem; }
 
-  // BELOW THE TWO-COLUMN BREAKPOINT, "ROW-MATCHED" HEIGHT IS A ROW OF ONE --
-  // design review #1086. `$card-height` is fixed (top of file) because the
-  // grid needs every card in a ROW the same height, and #776's line budget
-  // (below) exists to keep the three stacks inside that fixed height honest.
-  // Both arguments are about a row with more than one card in it. Below this
-  // breakpoint `.drink-cards` is one column, so every row has exactly one
-  // card and nothing is being matched any more -- the fixed height just
-  // leaves a short card (one ingredient line, one chip) with a dead band
-  // between the ingredient line and the foot, which is what #1086 was raised
-  // against (Planteray Pineapple Daiquiri, Apple Cart, Yellow Cactus Flower).
-  // `height: auto` lets each card be exactly as tall as its own content.
-  //
-  // At 1280px and any width down to 721px this rule does not apply at all --
-  // `$card-height` and the line budget are completely untouched there, and
-  // two-column rows still match heights exactly as they did before.
+  // One column, so every row holds one card and there is no row-mate to match
+  // (#1086). A fixed height here only leaves a short card with a dead band
+  // above its foot.
   .drink-card { height: auto; }
 
-  // THE FOOT COMES OUT OF ABSOLUTE POSITIONING TOO, for the same reason.
-  // `.drink-card-foot` is normally pinned to the card's bottom edge --
-  // "EVERY ANCHOR IS FIXED" is the whole point of the two-column card (top of
-  // file), so the goodness mark sits in the same corner on every card in a
-  // row. With `height: auto` there is no longer a fixed bottom edge to pin
-  // it to: an absolutely positioned foot does not contribute to an auto
-  // height at all (it is out of flow), so `bottom: #{$card-foot-y}` would
-  // sit it hard against whatever the in-flow content happened to end at,
-  // overlapping the ingredient line rather than following it. `position:
-  // relative` puts it back in flow, right where the body's own left/right
-  // padding already lines it up (the `left`/`right` values below match the
-  // card's own padding exactly, which is what let them work as absolute
-  // offsets in the first place), with a margin standing in for the gap the
-  // absolute layout used to give it for free. `.drink-card-ship` anchors
-  // itself to the foot's own box (see that rule's comment), and `position:
-  // relative` keeps the foot a positioned containing block for it, so the
-  // ship still sits at the foot's bottom-right corner -- just a corner that
-  // now moves with the card's own content instead of the row's.
+  // The foot goes back into flow for the same reason: an absolutely positioned
+  // foot adds nothing to an auto height and would overlap the ingredient line.
+  // `position: relative` keeps it the containing block for `.drink-card-ship`.
   .drink-card-foot {
     position: relative;
     left: auto;
@@ -1857,117 +753,20 @@ $card-tagline-top: 0.584rem;
   }
 }
 
-// #483. Helen, 2026-08-27: "Are screens realistically going to be narrower
-// than about 380px????" Yes, and by the two commonest widths there are: 360px
-// is the dominant Android portrait width and 375px covers the iPhone SE, 8 and
-// 13 mini. 390 and 412 are the larger common ones; 320 is the historical floor
-// and effectively gone.
-//
-// WHAT THAT COSTS AT THE DEFAULT. The card's text column is whatever is left
-// after the glass column, the gutter and the padding, so at 16px/rem, WITH THE
-// COLUMN AT THE 7.6rem IT WAS WHEN THIS BREAKPOINT WAS ARGUED FOR:
-//
-//     viewport   card   text column   glass takes
-//        360px   312px      157px         39%
-//        375px   327px      172px         37%
-//        412px   364px      209px         33%
-//
-// 157px is about eighteen characters of Courier Prime, which is where the
-// two-line clamps start cutting real content while the drawing keeps its full
-// column. Losing the tagline helped, as Helen said, but it freed a LINE and
-// this is a WIDTH problem.
-//
-// THE COLUMN IS 6.5rem SINCE 2026-09-04, so the same three rows now read 174px
-// / 33%, 189px / 32% and 226px / 29%. That is 17px back at every width and it
-// does NOT close the case for this breakpoint: 174px is still under twenty
-// characters, which is why the stacked layout below stays exactly as it is.
-//
-// SHRINKING, NOT STACKING, and the issue already worked out why: the glass
-// column's width is the title's left edge, the foot's left edge and the
-// under-mark's width, so shrinking is one value and stacking is a relayout.
-// 4.6rem gives the text column 205px at 360px -- a third more -- and keeps the
-// card's horizontal shape, which is what makes the grid scannable.
-//
-// The breakpoint is 400px rather than 380: 390px (iPhone 14/15) is inside the
-// range that hurts, and a breakpoint that stops just short of the commonest
-// phone sold is a breakpoint that does not fire.
-// =============================================================================
-// NARROW SCREENS — the glass goes on top. #483, settled 2026-08-27.
-// =============================================================================
-// Helen, having looked at three candidates side by side: "I think we should go
-// with stack." The other two (`title`, a small glass beside the title; and
-// `shrink`, the original column narrowed) are deleted, along with the switch
-// that selected them and the dev page that showed them.
-//
-// WHY A BREAKPOINT AT ALL. The card is horizontal — a fixed glass column, text
-// beside it — and the text column is whatever is left over. At 16px/rem, and
-// with the column at the 7.6rem it was on the day this was settled:
-//
-//     viewport   card   text column   glass takes
-//        360px   312px      157px         39%
-//        375px   327px      172px         37%
-//        412px   364px      209px         33%
-//
-// 157px is about eighteen characters of Courier Prime, against ingredient
-// strings that now run to 44 (`Grand Marnier or other cognac orange liqueur`,
-// since #531 put categories on cards). Those are the two commonest phone
-// widths there are: 360px is the dominant Android portrait width, 375px covers
-// the iPhone SE, 8 and 13 mini. Losing the tagline (#512) freed a LINE; this
-// was always a WIDTH problem, which is why it did not go away.
-//
-// AT THE 6.5rem COLUMN OF 2026-09-04 the three rows are 174px / 33%, 189px /
-// 32% and 226px / 29%. The narrowing helps at every width and changes nothing
-// here: 174px is still under twenty characters, so the stack still earns its
-// breakpoint. NOTE THAT THIS BLOCK DOES NOT OVERRIDE `--card-text-x` and does
-// not need to — it un-columns the card entirely, so every reader of that value
-// is overridden individually below and the column's width stops applying.
-//
-// THE BREAKPOINT IS 400px, NOT 380. Helen asked whether anything is really
-// narrower than about 380 — 390px (iPhone 14/15) is inside the range that
-// hurts, and a breakpoint stopping just short of the commonest phone sold is a
-// breakpoint that does not fire.
-//
-// WHAT STACKING COSTS, so it is a known trade and not a discovery later: the
-// card stops being scannable as a row of headline-then-detail, and it gets
-// taller, so fewer fit on a screen. What it buys is the full card width for
-// the words, which is the only place the space could come from.
+// --- narrow screens: the glass goes on top (#483) ----------------------------
+// Beside a glass column, the text column on a phone is under twenty characters
+// of Courier. 400px rather than 380 so the breakpoint includes 390px phones.
+// This block does not override `--card-text-x`: it un-columns the card, and
+// each reader of that value is overridden below or by the 720px block above.
 @media (max-width: 400px) {
-  // The glass is no longer a left column, so everything that measured itself
-  // against that column has to stop. A consequence of un-columning, not a
-  // choice: the foot's left edge used to come from the column's width. (The
-  // two panel edges that used to widen here with it are gone -- #886,
-  // 2026-09-11.) NO `left` OVERRIDE HERE ANY MORE -- design review #1086, see
-  // the `@media (max-width: 720px)` block below, which took the foot out of
-  // absolute positioning entirely at this width, so its position comes from
-  // the card's own padding the same way the body's does, and a per-breakpoint
-  // left edge has nothing left to override.
-
-  // THE SCALE COMES DOWN, WHICH IS COUNTERINTUITIVE. The drawing now has the
-  // whole card width available — more than it has ever had — so at the full
-  // 13rem a tall glass would be most of a phone screen. The band is what is
-  // being sized here, not the column.
-  //
-  // On :root rather than bare inside the @media -- a declaration needs a
-  // selector to belong to, and Sass rejects the file outright without one.
+  // Down, though the drawing now has the whole card width: it is the band's
+  // height being sized. On :root because a declaration needs a selector.
   :root { --card-glass-scale: 6.4rem; }
 
   .drink-card {
-    // NO FIXED HEIGHT HERE ANY MORE -- design review #1086. This used to be
-    // "the same budget as the wide card, plus the band"
-    // (`calc(#{$card-height} + 6.6rem - #{$card-pad-y})`, 2026-09-10, solving
-    // Helen's phone: "the chips are written over the ingredients"), which was
-    // the right fix while every card at this width still had to match a
-    // row-mate's height. Below 720px a card is alone in its own grid row (see
-    // the `@media (max-width: 720px)` block below), so nothing needs it to
-    // match anything any more, and the fixed sum left a card whose content
-    // was short (a one-line ingredient list, one chip) with the same empty
-    // band under its foot that #1086 was raised against. `height: auto` there
-    // now applies here too, with nothing to override it back.
-    //
-    // Top padding still clears the band. The glass is absolutely positioned
-    // and so takes no space of its own; this is what stops the title starting
-    // underneath it — the mistake the `title` variant made and Helen caught in
-    // one look at /dev/cards-narrow/, which is why that page existed.
+    // The top padding clears the band. The glass is absolutely positioned and
+    // takes no space of its own, so this is what stops the title starting
+    // underneath it.
     padding: 6.6rem $card-pad-x $card-pad-y $card-pad-x;
   }
 
@@ -1982,44 +781,20 @@ $card-tagline-top: 0.584rem;
   .drink-card-glass svg { max-width: 60%; }
 }
 
-// =============================================================================
-// THE CARD'S LINE BUDGET -- #776
-// =============================================================================
-// Helen: "if cocktail card ingredients have three lines, only allow the chips
-// two lines", and "if the cocktail name has two lines, only allow ingredients
-// and chips two lines each".
+// --- the card's line budget (#776) -------------------------------------------
+// $card-height does not move, so the name, the ingredients and the chips share
+// one budget. A wrapped name takes a line from the ingredients and a row from
+// the chips; three rendered lines of ingredients take a row from the chips.
 //
-// `$card-height` does not move -- the grid needs every card the same height --
-// so the three stacks inside it share one budget. Each cap was set on its own
-// (#552 gave the ingredients a third line, 2026-09-06 gave the chips one) and
-// nothing stopped all three being spent at once.
-//
-// TWO SIGNALS, AND ONLY ONE NEEDS A SCRIPT.
-//
-//   `.drink-card-name--wrap`        card-name-fit.js already sets it, and the
-//                                   name, the ingredient line and the foot are
-//                                   SIBLINGS, so `~` reaches both from it. No
-//                                   new measurement and no `:has()`.
-//   `.drink-card--ingredients-3`    card-line-budget.js, because CSS cannot ask
-//                                   how many lines a clamped element actually
-//                                   rendered -- only how many it may have. Most
-//                                   cards do not reach the clamp; keying on the
-//                                   clamp would punish all of them for what the
-//                                   tiki drinks do.
-//
-// THE ORDER IS NAME, THEN INGREDIENTS, THEN CHIPS, and it is a cascade in the
-// real sense: a wrapped name takes a line from the ingredients, and the
-// ingredients then take a row from the chips only if they still reach three.
-// A wrapped name therefore caps the chips at two directly, rather than relying
-// on the ingredient rule to do it -- the ingredients may well fit two lines
-// once clamped, and the chips still must not have three.
+// `.drink-card-name--wrap` is card-name-fit.js's, and the name, the ingredient
+// line and the foot are siblings, so `~` reaches both. CSS cannot ask how many
+// lines a clamped element rendered, so card-line-budget.js sets
+// `.drink-card--ingredients-3`.
 .drink-card-name--wrap ~ .drink-card-ingredients {
   -webkit-line-clamp: 2;
 }
 
-// TWO ROWS: two line-heights, the one gap between them, and the 2px of border
-// each row carries -- the same arithmetic as the three-row cap above, one row
-// shorter, and stated against the same tokens for the same reason.
+// Two chip rows: the three-row cap's arithmetic, one row shorter.
 .drink-card-name--wrap ~ .drink-card-foot .drink-card-moods,
 .drink-card--ingredients-3 .drink-card-foot .drink-card-moods {
   max-height: calc(#{$chip-line * 2} + 0.28rem + 4px);

@@ -1,62 +1,16 @@
-{% comment %} THE SHIP AND ITS WORD, ONE PLACE — 2026-09-02. This used to be six
-   lines duplicated between cocktails/index.html (the card) and the drink page,
-   which is exactly the trap MANUAL 12 names: markup shared, logic forked, and
-   the two silently disagree the first time one of them is edited and the other
-   is not. Both call sites now read this include instead.
+{% comment %} The ship mark and its word, shared by the index card and the drink
+   page so the two cannot disagree. Takes `ship`, the raw `meta.ship`, which may
+   be absent.
 
-   Takes `ship`, the raw value of `drink.meta.ship` or `page.meta.ship` — never
-   assumed present, since a value the caller does not have is exactly what
-   `default: "who knows"` below exists for.
+   A rung's own word if it is on `ship_scale`, and taxonomy.yml's
+   `ship_unrated_word` if it is not (#722). The template names no vocabulary
+   value: "not a rung" is asked of `ship_scale`, never tested against a literal
+   (MANUAL §9.9).
 
-   A RUNG'S OWN WORD IF IT IS ON THE SCALE, AND `???` IF IT IS NOT. `ship_scale`
-   is the list that means "a real rung", so it is what decides; `ship_card_names`
-   cannot be asked, because it maps only the two rungs the card abbreviates.
+   `short` chooses the card's abbreviations (`ship_card_names`), and only a card
+   passes it: the drink page has room for the rung's real name.
 
-   `???` ARRIVED 2026-09-05 AND REPLACED AN EMPTY STRING -- #722's second bullet,
-   Helen: "I would like the ship mark to have ??? next to it for 'who knows',
-   because that, to me, is unambiguously not on the same rating scale. (It's
-   also funny)." Until then an off-scale value fell through to no word at all,
-   which was honest while every such drink was a draft nobody could see. The
-   same day she ruled that an unmade drink MAY publish, and a published card
-   drawing the ship with nothing beside it is not honesty any more, it is a
-   rating that says nothing.
-
-   IT IS THE SAME WORD IN BOTH CALL SITES, deliberately, and it is NOT in
-   `ship_card_names` -- see taxonomy.yml's note above `ship_unrated_word`. Her
-   reason is about the SCALE rather than about a card foot's width, and it
-   applies wherever the mark is drawn.
-
-   THE TEMPLATE NAMES NO VOCABULARY VALUE. "Not a rung" is asked of `ship_scale`
-   rather than tested against a literal "who knows", which is §9.9's lesson: the
-   one thing this file must never do is keep its own copy of the vocabulary.
-
-   `short` CHOOSES THE CARD'S ABBREVIATIONS, AND ONLY THE CARD PASSES IT --
-   2026-09-05. `ship_card_names` renames two rungs: "not really" to "hmm" and
-   "oh gods yes" to "yes²". Those are CARD names, which is what the key has
-   always been called, and they exist because a card foot is a tight row shared
-   with mood chips.
-
-   The drink page never chose them. It had no ship line at all until 2026-09-02,
-   and when it gained one it was wired straight through this include the day
-   this include was factored out -- so it inherited the card's compressions along
-   with the pairing they were bundled with. Helen, 2026-09-05, correcting a
-   review that had called `yes²` a footnote marker: "that's not a footnote
-   marker, it's a joke, a cocktail so good that it's yes-squared. If this isn't
-   landing then I'd rather rename than re-render."
-
-   NOTHING NEEDS RENAMING, because the rung's real name is already "oh gods yes"
-   and that lands on sight. What failed was the abbreviation, in the one place
-   with room not to abbreviate: a superscript numeral after a word means FOOTNOTE
-   to most readers before it means exponent, and the drink page shows exactly one
-   rung, so there is no scale beside it to read the escalation against. A card
-   grid supplies that context for free -- twenty cards, some "yes", some "yes²" --
-   which is why the card keeps them and the page does not.
-
-   Emits the two inner spans ONLY, not the outer `.drink-card-ship` wrapper —
-   the card and the drink page lay them out differently (the card right-aligns
-   a fixed foot row; the page sits one inside a `<dd>`), so the wrapper is each
-   call site's own, and only the icon-plus-word pairing that must never drift is
-   shared. {% endcomment %}
+   Emits the two inner spans only; the wrapper is each call site's own. {% endcomment %}
 {% assign taxonomy = site.data.cocktails.taxonomy %}
 {% assign ship = include.ship | default: "who knows" %}
 {% if taxonomy.ship_scale contains ship %}

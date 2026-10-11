@@ -1,60 +1,30 @@
 // =============================================================================
-// INGREDIENT SEARCH — pure matching/ranking logic, no DOM.
+// INGREDIENT SEARCH — pure matching and ranking for the food pickers. No DOM;
+// filters.js owns the wiring (MANUAL §3).
 //
-// Extracted out of filters.js so it can be tested directly with Node's
-// built-in test runner (see tests/js/ingredient-search.test.js) instead of
-// only being verified by hand against a live page. filters.js still owns
-// everything DOM-shaped: reading ingredients off the page, click handlers,
-// turning a search() result into <button> elements.
-//
-// Loaded two ways from the one file, no bundler:
-//   - In the browser, as a plain <script> before filters.js, attaching to
-//     window.HTF (the same namespace assets.js already establishes).
-//   - In Node, via require(), for tests.
+// Loaded as a plain <script> before filters.js (attaching to window.HTF), and
+// via require() in tests/js/ingredient-search.test.js.
 // =============================================================================
 (function (root) {
   'use strict';
 
-  // Strip diacritics and normalise hyphens to spaces, for MATCHING ONLY.
-  // Nobody types "comté" into a search box, so folding both sides lets
-  // `comte`, `comté` and `mte` all find the same ingredient. Same idea for
-  // hyphens -- "five-spice" is one compound ingredient name, but a query
-  // typed as "five spice" (a space, the natural way to type two words)
-  // should match it exactly as if the hyphen were a space. Display is
-  // never folded -- buttons render the ingredient's real text, hyphens
-  // and accents intact.
+  // Strip diacritics and turn hyphens into spaces, for matching only: `comte`
+  // finds comté and "five spice" finds five-spice. Display is never folded.
   function fold(str) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ');
   }
 
-  // Splits on hyphens as well as whitespace so "five-spice" tokenises as
-  // ["five", "spice"] for matching, the same as a query typed "five spice"
-  // -- see fold() above for why hyphens are treated as word boundaries.
+  // Splits on hyphens as well as whitespace, to agree with fold().
   function getWords(str) {
     return str.toLowerCase().trim().split(/[\s-]+/).filter(Boolean);
   }
 
-  // ---------------------------------------------------------------------------
-  // THE THREE-BAND RULE — the one place the ORDERING is written down.
-  // ---------------------------------------------------------------------------
-  //
-  //   1  the entry STARTS with the query        "lime juice" for "li"
+  // The three-band rule:
+  //   1  the entry starts with the query        "lime juice" for "li"
   //   2  some word in the entry starts with it  "apricot liqueur" for "li"
   //   3  the entry is in the list for some other reason
-  //
-  // Band 3 deliberately does NOT get promoted into band 1, or a mid-word
-  // coincidence ranks alongside the thing you were obviously typing --
-  // "chocolate chips" beside "chicken breast" for "chi".
-  //
-  // SHARED WITH COCKTAILS SINCE #579, AND ONLY THIS MUCH IS SHARED. What band 3
-  // MEANS differs by site (here, a curated family member; on the cocktail index,
-  // a plain substring hit) and so do the two predicates, because each is
-  // answered in its own vocabulary -- singulars and synonyms here, a flat
-  // declared list there. The ordering is the part that was written twice and
-  // the part that would silently drift, so the ordering is the part extracted.
-  // assets/js/cocktail-search.js calls orderByBand and computes its own
-  // isPrefixMatch/hasWordMatch; cocktail-index.js used to re-derive both.
-  //
+  // Band 3 is never promoted into band 1, or "chocolate chips" ranks beside
+  // "chicken breast" for "chi".
   // A candidate is any object carrying `isPrefixMatch` and `hasWordMatch`.
   function bandOf(candidate) {
     if (candidate.isPrefixMatch) return 1;
@@ -62,18 +32,10 @@
     return 3;
   }
 
-  // STABLE WITHIN A BAND, and that is load-bearing rather than incidental:
-  // "alphabetical within each band" comes free only because the input list is
-  // already sorted and this preserves that order. A comparator-based sort would
-  // not promise it.
-  //
-  // HOW MANY BANDS THERE ARE IS THE CALLER'S BUSINESS. Food has three; the
-  // cocktail index has four, because a chip can be found by a name it does not
-  // display and Helen ranked that between "a word in what you can see" and "a
-  // substring in what you can see". Pass a band function to say so; the default
-  // is bandOf above. What is shared is the DISCIPLINE -- lower band first,
-  // input order preserved inside a band -- which is the part that was written
-  // twice and would drift.
+  // Lower band first, input order preserved inside a band. The stability is
+  // load-bearing: "alphabetical within a band" holds only because the input
+  // is already sorted. Shared with cocktail-search.js (#579), which passes
+  // its own four-band function; the default is bandOf.
   function orderByBand(candidates, bandFor) {
     var band = bandFor || bandOf;
     var buckets = [];
@@ -86,8 +48,7 @@
   }
 
   // Builds a matcher bound to one vocabulary (the parsed contents of
-  // _data/ingredient_words.yml). Everything below is a closure over the
-  // word lists so they're only ever parsed once.
+  // _data/food/ingredient_words.yml, which holds the reasoning for each list).
   function create(vocabulary) {
     var FAMILY_BUTTON_MIN_CHARS = vocabulary.search.family_button_min_chars;
     var singularMap = vocabulary.singulars || {};
@@ -97,10 +58,7 @@
       return singularMap[word] || word;
     }
 
-    // Synonym keys are folded once at startup so a folded query still finds
-    // them. When a query exactly matches a key, any ingredient containing
-    // any of the listed words is treated as a candidate, and the key earns
-    // a forced (all) button.
+    // Synonym keys and words, folded once so a folded query still finds them.
     var foldedSynonymMap = (function () {
       var out = {};
       Object.keys(synonymMap).forEach(function (key) {
@@ -115,73 +73,15 @@
       return foldedSynonymMap[query] || null;
     }
 
-    /* Does any entry in `list` match the picked ingredient key `key`?
-       ---------------------------------------------------------------------
-       A curated synonym family matches on CONTAINMENT of any of its words --
-       typing toward `cheese` has to reach comté, which shares no letters with
-       it -- and anything else matches when every word of the key PREFIXES
-       some word of the entry.
-
-       PREFIX SINCE 2026-09-06, ISSUE #619, AND IT USED TO BE CONTAINMENT.
-       Helen: asking for `salt` handed back twelve recipes whose only salt is
-       UNsalted butter. The rule was `ew.indexOf(kw) !== -1`, and filters.js's
-       own comment had described it as "prefixes" for as long as it existed --
-       the code and its comment disagreed the whole time.
-
-       MEASURED BEFORE AND AFTER, over the real vocabulary and all 429 recipes
-       and drafts: 136 (key, recipe) pairs stopped matching and NOTHING started.
-       104 of the 136 are outright defects --
-
-         49  `ice`            -> rice, five-spice powder, citrus juice
-         12  `salt`           -> unsalted butter
-         12  `salted butter`  -> UNsalted butter, the exact opposite
-          5  `peas`           -> chickpeas
-          5  `milk`           -> buttermilk
-          5  `apple`          -> pineapple
-          5  `sage`           -> sausages, pork sausagemeat
-          2  `bread`          -> shortbread biscuits, flatbread dough
-          2  `gin`            -> aubergine, extra-virgin olive oil
-          1  `currants`       -> blackcurrants
-          1  `ham`            -> Gressingham duck legs
-
-       -- and 17 more were real: typing `nuts` stopped reaching walnuts,
-       hazelnuts and peanuts. Those are carried by the VOCABULARY instead,
-       which is the fix #619 lists first and the one cocktail-search.js already
-       made on the other site. `_data/food/ingredient_words.yml` gains a `nuts`
-       synonym family, and it is a net GAIN: containment had also been MISSING
-       almonds, pistachios, pecans and cashews, none of which contain the
-       letters "nuts". 136 losses become 119.
-
-       THE REMAINING 15 ARE LET GO ON PURPOSE, in three kinds:
-
-         7  `raw king prawns` -> "king prawns", which only ever worked because
-            `raw` sits inside p-RAW-n. Typing `king prawns` finds it.
-         7  `corn flour` -> "cornflour" and `bean sprouts` -> "beansprouts".
-            Two spellings of one ingredient, and the fix is one spelling in the
-            data -- raised as its own issue. An `aliases:` entry was tried and
-            makes it worse; that file's own note says why.
-         1  `echalion shallots` -> "banana shallots (echalions)", where the
-            bracket makes `(echalions)` a word `echalion` does not prefix. A
-            tokenising quirk, not worth widening getWords for one entry.
-
-       MOVED HERE FROM filters.js, issue #506 -- and #619 above is what that
-       move was FOR. It lived in 1,336 lines of DOM wiring where the only way
-       to ask it a question was to open a browser and type, which is the
-       argument back-link.js already makes (MANUAL 3). The extraction changed
-       nothing and made the fault visible; the measurement that settled the fix
-       took minutes because this is a pure function with tests. (This said
-       "unchanged" until 2026-09-06, which was true of the move and stopped
-       being true of the function.) It reads the vocabulary -- singulars and
-       synonyms -- so this instance is its home rather than the module's bare
-       api.
-
-       IT IS ASKED BY BOTH DIRECTIONS AND THAT IS WHY IT IS ONE FUNCTION. The
-       include filter asks it of a row's `main_ingredients`; the exclude
-       filter's "(all)" umbrella asks it of the row's derived entries, through
-       filter-state.js's excludesRow, which takes it as an argument precisely
-       so that module need not grow a vocabulary. Two copies of a rule this
-       fiddly is how `chicken (all)` comes to mean one thing when you filter
-       FOR it and another when you filter it OUT. */
+    // Does any entry in `list` match the picked ingredient key `key`? A
+    // curated synonym family matches on containment of any of its words
+    // (`cheese` has to reach comté); anything else matches when every word of
+    // the key prefixes some word of the entry. Prefix, not containment, or
+    // `salt` matches unsalted butter and `ice` matches rice (#619); a family
+    // that containment used to reach (`nuts` -> walnuts) is declared in the
+    // vocabulary's `synonyms`. Both directions ask this one function: include
+    // of `main_ingredients`, and the exclude "(all)" umbrella through
+    // filter-state.js's excludesRow.
     function entriesMatchKey(list, key) {
       var synonyms = getSynonymWords(key);
       if (synonyms) {
@@ -194,31 +94,26 @@
       return (list || []).some(function (entry) {
         var entryWords = getWords(entry).map(normaliseIngredientWord);
         return keyWords.every(function (kw) {
-          // PREFIX, NOT CONTAINMENT -- #619. `=== 0` is the whole change; see
-          // the note above for what it costs and what pays for it.
+          // Prefix, not containment (#619).
           return entryWords.some(function (ew) { return ew.indexOf(kw) === 0; });
         });
       });
     }
 
-    // Preparation-state words ("chopped", "crispy") describe what was done
-    // to an ingredient, not what it is — recipe files keep them, but the
-    // search UI strips them so "chopped pistachios" and "pistachios" are
-    // treated as the one ingredient. See _data/ingredient_words.yml for the
-    // full reasoning per word.
+    // Preparation-state words ("chopped", "crispy"), stripped so "chopped
+    // pistachios" and "pistachios" are one ingredient.
     var modifierSet = new Set((vocabulary.modifiers || []).map(function (w) {
       return fold(String(w).toLowerCase());
     }));
 
     // Colour/variety words that head 2+ entries but aren't a real family —
-    // "red (all)" would lump together red wine, red onion and red Thai
-    // curry paste. See _data/ingredient_words.yml.
+    // "red (all)" would lump together red wine and red onion.
     var neverFamilySet = new Set((vocabulary.never_family || []).map(function (w) {
       return fold(String(w).toLowerCase());
     }));
 
     // Specific entries excluded from counting towards their own head word's
-    // family — "cherry tomatoes" isn't a cherry. See _data/ingredient_words.yml.
+    // family — "cherry tomatoes" isn't a cherry.
     var familyExceptionSet = new Set((vocabulary.family_exceptions || []).map(function (w) {
       return fold(String(w).toLowerCase());
     }));
@@ -229,14 +124,10 @@
       return fold(String(w).toLowerCase());
     }));
 
-    // Whole-phrase rewrites, in three forms — a name renames ("five-spice
-    // powder" -> "five-spice"), a list SPLITS ("beef or venison stock" ->
-    // beef stock + venison stock), an empty list DROPS. Folded keys, so
-    // "Five-Spice Powder" still matches. Normalised to a list here so there
-    // is one shape downstream and the YAML can keep writing a bare name where
-    // a bare name reads better. See _data/food/ingredient_words.yml for what
-    // is in it and, more importantly, for why it is a named list and not a
-    // rule.
+    // Whole-phrase rewrites, in three forms: a name renames ("five-spice
+    // powder" -> "five-spice"), a list splits ("beef or venison stock" ->
+    // beef stock + venison stock), an empty list drops. Keys are folded;
+    // values are normalised to a list.
     var aliasMap = {};
     Object.keys(vocabulary.aliases || {}).forEach(function (key) {
       var becomes = vocabulary.aliases[key];
@@ -244,21 +135,16 @@
         Array.isArray(becomes) ? becomes.map(String) : [String(becomes)];
     });
 
-    // Returns an ARRAY, always — an unaliased entry is itself, alone, which
-    // is what keeps this a no-op on every entry the list doesn't name. Both
-    // vocabularies are handed to it, so a phrase that appears in
-    // main_ingredients as well as in `item:` text is rewritten in the include
-    // picker too; the YAML names the four that currently do.
-    // hasOwnProperty rather than a truthiness test: an empty list is a real
-    // answer here (drop the entry), not a missing one.
+    // Always returns an array; an unaliased entry is itself, alone.
+    // hasOwnProperty, not a truthiness test: an empty list is a real answer
+    // (drop the entry), not a missing one.
     function applyAlias(ing) {
       var key = fold(ing.toLowerCase());
       return Object.prototype.hasOwnProperty.call(aliasMap, key) ? aliasMap[key] : [ing];
     }
 
-    // Button label overrides, keyed by the match key they relabel — kept
-    // separate from `aliases` because matching still has to run against the
-    // real match key, not the pretty name. See _data/ingredient_words.yml.
+    // Button label overrides, keyed by the match key they relabel. Separate
+    // from `aliases` because matching still runs against the real match key.
     var displayNameMap = {};
     Object.keys(vocabulary.display_names || {}).forEach(function (key) {
       displayNameMap[fold(key.toLowerCase())] = vocabulary.display_names[key];
@@ -268,25 +154,10 @@
       return displayNameMap[fold(ing.toLowerCase())] || ing;
     }
 
-    // A MODIFIER THAT IS HALF OF A COORDINATED PAIR IS NOT A LEADING MODIFIER,
-    // and stripping it leaves a fragment rather than an ingredient. GitHub
-    // issue #366.
-    //
-    // "fresh or frozen cranberries" means cranberries in either state. Take the
-    // "fresh" off and what is left is "or frozen cranberries", which is not a
-    // thing anyone can decide to exclude — it reads as an editing accident,
-    // because it is one. Same for "large or 2 small leeks".
-    //
-    // This only became reachable when `fresh`, `large` and `small` joined the
-    // modifier list: the original five (chopped, crispy, ground, dried,
-    // leftover) are states you would not write on one side of an "or". Eleven
-    // fragments appeared the moment they did.
-    //
-    // Leaving the phrase whole is the right answer rather than a fallback: it
-    // stays one candidate, it still reads as English, and if it deserves
-    // splitting into two ingredients that is what `aliases` is for — a named
-    // phrase judged one at a time, which is what the whole file prefers to a
-    // rule applied sight unseen.
+    // A modifier that is half of a coordinated pair is not stripped (#366):
+    // taking "fresh" off "fresh or frozen cranberries" leaves the fragment
+    // "or frozen cranberries". The phrase stays whole; splitting it is a job
+    // for `aliases`.
     var COORDINATOR = /^(?:or|and)$/i;
 
     function stripModifiers(ing) {
@@ -299,28 +170,16 @@
       return words.join(' ');
     }
 
-    // --- GitHub issue #273: what the DERIVED vocabulary needs extra ---------
-    //
-    // The exclude picker's vocabulary is derived from `item:` free text, not
-    // from the curated main_ingredients, so it arrives carrying quantities
-    // ("1 tsp salt"), portion phrasings ("a good pinch of salt") and method
-    // notes ("herbs to taste"). All three name a real ingredient with
-    // something in front of or behind it; none of them is a different
-    // ingredient. Three strips below. The entries that name TWO ingredients
-    // at once ("beef or venison stock") or none at all need naming rather
-    // than stripping, and are handled by `aliases` above — same mechanism as
-    // "five-spice powder", widened to take a list. See
-    // _data/food/ingredient_words.yml for the word lists and for why each one
-    // is literal phrases rather than a rule.
-    //
-    // Every one of these is a no-op on a clean entry, which is what lets
-    // buildMasterList stay the single door both vocabularies go through.
+    // --- what the derived vocabulary needs extra (#273) -----------------------
+    // The exclude picker's vocabulary comes from `item:` free text, so it
+    // carries quantities ("1 tsp salt"), portion phrasings ("a good pinch of
+    // salt") and method notes ("herbs to taste"). Three strips below; each is
+    // a no-op on a clean entry, which lets buildMasterList be the single door
+    // for both vocabularies.
 
-    // A quantity token is digits and/or vulgar fractions and the characters
-    // that join them, and NOTHING else: "1", "¼–½", "4–5.5" qualify;
-    // "3-bone" and "70%" do not, because a letter or a percent sign means
-    // the token is part of the name. Deliberately conservative — see the
-    // `quantity_units` comment in the YAML.
+    // A quantity token is digits, vulgar fractions and the characters that
+    // join them, and nothing else: "1", "¼–½", "4–5.5" qualify; "3-bone" and
+    // "70%" do not, because a letter or a percent sign is part of the name.
     var QUANTITY_TOKEN = /^[0-9¼-¾⅐-⅞./–—-]+$/;
     var HAS_A_NUMBER = /[0-9¼-¾⅐-⅞]/;
 
@@ -335,9 +194,8 @@
         stripped = false;
         if (words.length > 1 && QUANTITY_TOKEN.test(words[0]) && HAS_A_NUMBER.test(words[0])) {
           var rest = words.slice(1);
-          // Every consecutive unit word after the number, so "3 fl oz" goes
-          // in one pass. Never the last word standing: an entry always keeps
-          // something, even if the whole of it looked like a measurement.
+          // Every consecutive unit word after the number ("3 fl oz"), but
+          // never the last word: an entry always keeps something.
           while (rest.length > 1 && quantityUnitSet.has(rest[0].toLowerCase())) {
             rest.shift();
           }
@@ -383,9 +241,8 @@
       return ing;
     }
 
-    // The one normalisation pipeline. Order is trailing-first so a strip at
-    // the end can never be confused by one at the front, then front-to-back:
-    // quantity, measure phrase, modifier — widest context to narrowest.
+    // The one normalisation pipeline: trailing phrase first, then quantity,
+    // measure phrase, modifier.
     function normaliseEntry(ing) {
       return stripModifiers(stripMeasurePhrase(stripLeadingQuantity(stripTrailingPhrase(ing))));
     }
@@ -403,33 +260,19 @@
       return getMatchWords(ing).map(normaliseIngredientWord).map(fold);
     }
 
-    // WHICH PICKER ENTRY A STRING IS -- #1289. Exported for page-search.js,
-    // whose dropdown hands a word to this picker through `?ing=` and so has to
-    // offer the picker's entries, not the recipes' raw text: it was offering
-    // "sweet potato" and "sweet potatoes" as two things. buildMasterList
-    // below says what an entry is renamed to; this says which of the renamed
-    // entries are one button.
+    // Which picker entry a string is (#1289). Exported for page-search.js,
+    // whose dropdown hands a word to this picker through `?ing=` and so must
+    // treat "sweet potato" and "sweet potatoes" as one entry.
     function entryKey(ing) {
       return matchKeyWords(ing).join(' ');
     }
 
-    // Takes the raw ingredient strings as they appear on the page (one per
-    // recipe, splitting already done by the caller), returns the
-    // deduplicated, normalised, alphabetically sorted master list. Both
-    // vocabularies come through here — main_ingredients for the include
-    // picker, the derived `item:` index for the exclude picker — and
-    // normaliseEntry is a no-op on the curated first one.
-    //
-    // A plain .sort() is case-sensitive — every capital letter sorts before
-    // every lowercase one, so "Chinese five spice" would jump ahead of
-    // "chai", "cheddar" and "cheese" instead of sitting between "chestnuts"
-    // and "chives" where it belongs.
-    //
-    // One raw string can yield more than one entry, or none — an alias may be
-    // a split or a drop as well as a rename, so applyAlias returns a list and
-    // this flattens it. It runs AFTER the strips because its keys are the
-    // post-strip forms: "chopped almonds or whatever you prefer" is keyed as
-    // "almonds or whatever you prefer".
+    // Raw ingredient strings -> the deduplicated, normalised master list,
+    // sorted case-insensitively. Both vocabularies come through here:
+    // main_ingredients for the include picker, the derived `item:` index for
+    // the exclude picker. Aliases apply after the strips, because alias keys
+    // are the post-strip forms; one raw string can yield several entries or
+    // none.
     function buildMasterList(rawIngredientStrings) {
       var set = new Set();
       rawIngredientStrings.forEach(function (ing) {
@@ -442,10 +285,9 @@
       });
     }
 
-    // The core of the search box. Returns:
-    //   { familyButtons: ["cheese"], results: [{ing, isPrefixMatch, hasWordMatch}, ...] }
-    // familyButtons are word stems that earn a "word (all)" button.
-    // results are already deduplicated and in final render order.
+    // Returns { familyButtons: ["cheese"], results: [{ing, label,
+    // isPrefixMatch, hasWordMatch}, ...] }. familyButtons are word stems that
+    // earn a "word (all)" button; results are deduplicated and in render order.
     function search(rawQuery, masterIngredientsList) {
       var query = fold(rawQuery.trim().toLowerCase());
       if (!query) return { familyButtons: [], results: [] };
@@ -454,14 +296,10 @@
       var queryWords = query.split(/\s+/).filter(Boolean);
       var multiWord = queryWords.length > 1;
 
-      // Count how many DISTINCT ingredient entries share each FIRST word. A
-      // word shared as the head of 2+ entries is a "family" and earns an
-      // umbrella (all) button — "chicken" heads chicken breast/leg/thigh.
-      // Only the first word counts, not every word in the phrase — "chop"
-      // is the SECOND word of both "lamb chops" and "pork chops", cuts of
-      // lamb and of pork respectively, not members of a "chop" family.
-      // family_exceptions are skipped entirely: "cherry tomatoes" doesn't
-      // count towards "cherry"'s family.
+      // The distinct entries sharing each first word. A word heading 2+
+      // entries is a family and earns an (all) button — "chicken" heads
+      // chicken breast/leg/thigh. Only the first word counts: "lamb chops"
+      // and "pork chops" are not a "chop" family.
       var wordToEntries = {};
       masterIngredientsList.forEach(function (ing) {
         if (familyExceptionSet.has(fold(ing.toLowerCase()))) return;
@@ -471,9 +309,8 @@
         wordToEntries[headWord].add(normWords.join(' '));
       });
 
-      // Whether the query is a genuine prefix of ANY head word at all,
-      // anywhere in the corpus — used below to decide whether structural
-      // family detection needs to fall back to a looser, substring check.
+      // Whether the query prefixes any head word at all — see the substring
+      // fallback below.
       var anyHeadwordPrefixed = Object.keys(wordToEntries).some(function (hw) {
         return hw.indexOf(query) === 0;
       });
@@ -489,21 +326,13 @@
             return ingWords.some(function (iw) { return iw.indexOf(qw) !== -1; });
           });
           if (!allMatch) return;
-          // Same "start of the string" rule as the single-word path.
           var isPrefixMatch = fold(ing.toLowerCase()).indexOf(query) === 0;
-          // Same "any word" rule as the single-word path's hasWordMatch,
-          // applied per query word: does every word you typed start some
-          // word in this entry (not necessarily the same one, not
-          // necessarily in order)?
+          // Every query word starts some word of the entry, in any order.
           var hasWordMatch = queryWords.every(function (qw) {
             return ingWords.some(function (iw) { return iw.indexOf(qw) === 0; });
           });
           multiMatches.push({ ing: ing, ingKey: ingKey, isPrefixMatch: isPrefixMatch, hasWordMatch: hasWordMatch });
         });
-        // Three-band order, same as the single-word path below — orderByBand
-        // above, shared with the cocktail index since #579 rather than spelled
-        // out here for the second time in this function and the third in the
-        // repo.
         var multiResults = [];
         orderByBand(multiMatches).forEach(function (c) {
           if (!renderedKeys.has(c.ingKey)) {
@@ -519,12 +348,9 @@
       var familyWords = new Set();
       var engagedFamilyWords = new Set();
 
-      // A curated family (declared in _data/ingredient_words.yml
-      // `synonyms`) is ENGAGED once the query is a recognisable prefix of
-      // its name — "chees" is clearly heading towards "cheese". A curated
-      // family has a known, finite membership list, so its members are
-      // surfaced inline rather than gated behind the (all) button, which
-      // stays as a one-click way to select the whole family as a filter.
+      // A curated family (the vocabulary's `synonyms`) is engaged once the
+      // query prefixes its name — "chees" for "cheese". Its members are then
+      // listed inline as well as behind the (all) button.
       if (enableFamilyButtons) {
         Object.keys(foldedSynonymMap).forEach(function (key) {
           if (key.indexOf(query) === 0) {
@@ -539,20 +365,14 @@
         var normWords = matchKeyWords(ing);
         var normKey = normWords.join(' ');
 
-        // Checks each word's normalised form as well as its raw text. Most
-        // plurals in `singulars` are a plain "+s"/"+es", so the singular is
-        // already a literal prefix of the plural and matches without this.
-        // A handful are genuinely irregular ("cherries"→cherry) — the
-        // ending changes rather than just extending, so "cherries" never
-        // contains "cherry" as a raw substring at all.
+        // The normalised form as well as the raw text: an irregular plural
+        // ("cherries") never contains its singular ("cherry") as a substring.
         var matchedAnyWord = ingWords.some(function (word, idx) {
           return fold(word).indexOf(query) !== -1 || normWords[idx].indexOf(query) !== -1;
         });
 
-        // Membership check mirrors how the (all) button itself filters
-        // recipes elsewhere — a substring match against the whole
-        // ingredient text — so "cream cheese" and "goat's cheese" are
-        // recognised as cheeses even though "cheese" is only one word.
+        // Containment against the whole entry, the same rule entriesMatchKey
+        // applies to a synonym family, so "cream cheese" is a cheese.
         var foldedIng = fold(ing.toLowerCase());
         var isFamilyMember = false;
         engagedFamilyWords.forEach(function (syn) {
@@ -561,40 +381,24 @@
 
         if (!matchedAnyWord && !isFamilyMember) return;
 
-        // "Start of the string", not "start of any word" — "chocolate
-        // chips" matching on "chips" would put it ahead of things that
-        // actually start with the query. Also checks the normalised first
-        // word, so "cherries" ranks as a prefix match for "cherry".
+        // Start of the string, not of any word. Also checks the normalised
+        // first word, so "cherries" is a prefix match for "cherry".
         var isPrefixMatch = foldedIng.indexOf(query) === 0 || normWords[0].indexOf(query) === 0;
 
-        // For the tint (a real word match, not just family membership):
-        // does ANY word — not just the first — start with the query?
-        // Deliberately looser than isPrefixMatch, which only ever looks at
-        // the start of the whole string. "cream cheese" isn't ranked as a
-        // top match for "chees" (it doesn't start with "chees"), but it's
-        // still worth marking as a real textual hit rather than a
-        // family-only one like "cheddar".
+        // Does any word start with the query? Marks a real textual hit
+        // ("cream cheese" for "chees") apart from a family-only one
+        // ("cheddar").
         var hasWordMatch = ingWords.some(function (word, idx) {
           return fold(word).indexOf(query) === 0 || normWords[idx].indexOf(query) === 0;
         });
 
         candidates.push({ ing: ing, normKey: normKey, isPrefixMatch: isPrefixMatch, hasWordMatch: hasWordMatch });
 
-        // Check for STRUCTURAL family membership — a FIRST word with no
-        // curated synonym list that nonetheless heads 2+ distinct entries.
-        // Normally only as a PREFIX of the head word — not contained
-        // anywhere in it: "chi" sits inside "pistachios" with no relation
-        // to what was typed. Excludes never_family — "red", "white",
-        // "mixed" genuinely head 2+ entries, but those entries are
-        // unrelated foods that merely share a colour or variety word.
-        //
-        // GitHub issue #56: "hic" should still collapse chicken breast/
-        // thigh/stock into "chicken (all)", even though "hic" isn't a
-        // prefix of "chicken" — it's buried mid-word. Falls back to a
-        // substring check on the head word, but ONLY when the query
-        // doesn't prefix ANY head word anywhere in the corpus — a real
-        // prefix relationship ("chi" → "chicken") always wins outright and
-        // never gets diluted by this looser fallback.
+        // Structural family: a first word heading 2+ distinct entries, minus
+        // never_family. The query must prefix the head word ("chi" sits
+        // inside "pistachios" by coincidence). The substring fallback ("hic"
+        // -> "chicken (all)", #56) applies only when the query prefixes no
+        // head word anywhere, so a real prefix always wins.
         var headIsPrefixMatch = fold(ingWords[0]).indexOf(query) === 0 || normWords[0].indexOf(query) === 0;
         var headIsSubstringFallback = !headIsPrefixMatch && !anyHeadwordPrefixed && normWords[0].indexOf(query) !== -1;
         if (enableFamilyButtons && (headIsPrefixMatch || headIsSubstringFallback)) {
@@ -608,11 +412,7 @@
         }
       });
 
-      // Render order, three bands — orderByBand above, which is where the rule
-      // and its reasoning now live. Here band 3 is a family-only member
-      // ("cheddar" for "chees"), deliberately not promoted as far as the prefix
-      // tier. Alphabetical within each band — masterIngredientsList is already
-      // sorted, filtering preserves that order, and orderByBand is stable.
+      // Here band 3 is a family-only member ("cheddar" for "chees").
       var results = [];
       orderByBand(candidates).forEach(function (c) {
         if (!renderedKeys.has(c.normKey)) {

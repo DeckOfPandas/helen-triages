@@ -1,80 +1,34 @@
-// =============================================================================
-// COOK SCHEDULE — the arithmetic behind the cook timer, no DOM.
+// cook-schedule.js
+// The arithmetic behind the cook timer, no DOM. Nothing here reads the clock,
+// the page or the data files: every impure thing is a parameter, which is what
+// lets tests/js/cook-schedule.test.js call it directly. cook-timer.js owns
+// everything DOM-shaped.
 //
-// Extracted out of cook-timer.js for the same reason ingredient-search.js and
-// list-view.js came out of filters.js: testable directly with Node (see
-// tests/js/cook-schedule.test.js) instead of only ever checked by looking at a
-// live page. cook-timer.js still owns everything DOM-shaped -- reading the
-// weight box, building cards, filling the protein dropdown.
+// One file, two loaders: a plain <script> before cook-timer.js (attaching to
+// window.HTF), and require() in Node.
 //
-// This is the highest-consequence arithmetic on the site: it decides what time
-// a joint goes in the oven so dinner lands when you said it would. Nothing
-// here reads the clock, the page, or the data files. Every impure thing is a
-// parameter: the temperature table is passed to the lookups, "now" is never
-// consulted at all (the module works in minutes-from-midnight and hands the
-// caller a number, which is why it can be tested at all).
-//
-// Loaded two ways from the one file, no bundler:
-//   - In the browser, as a plain <script> before cook-timer.js, attaching to
-//     window.HTF (the same namespace assets.js already establishes).
-//   - In Node, via require(), for tests.
-//
-// -----------------------------------------------------------------------------
-// FIVE FUNCTIONS HERE HAVE NO CALLER, ON PURPOSE AND FOR NOW — issue #244
-// -----------------------------------------------------------------------------
-// 2026-08-16: the timings page dropped its "eating at" and "rest" boxes, and
-// with them the only code that ever called
-//
-//     scheduleBack   parseClock   clock   statedRest   restFor
-//
-// Nothing in cook-timer.js reaches for any of the five today. They are kept
-// anyway, and so are their tests in tests/js/cook-schedule.test.js, at Helen's
-// explicit instruction: she wants to look at the new, simpler page before
-// deciding whether working backwards from a serving time comes back. Deleting
-// the arithmetic now would mean rewriting and re-testing the highest-
-// consequence maths on the site if it does.
-//
-// THIS IS A SUSPENSION OF THE HOUSE RULE, NOT AN OVERSIGHT. This repo deletes
-// orphaned code on sight — that is why there is no back-catalogue and no
-// commented-out block anywhere in it — so an uncalled function here would
-// normally be drift someone should remove. It is not. The next person to touch
-// this file should do one of exactly two things once Helen has decided:
-// reconnect these five to a page, or delete them together with their tests.
-// Leaving them uncalled and unexplained is the one option that isn't open.
-//
-// The other exports are all live: round5, hhmm and span format every duration
-// on the page, resolve/orderMethods/baseFor drive the table and the cards,
-// finishingTemp writes the "Done at" line under the protein heading, and
-// proteinOrder fills the dropdown. round5 is also called by scheduleBack, so it
-// is load-bearing in both halves.
-// =============================================================================
+// scheduleBack, parseClock, clock, statedRest and restFor have no caller on
+// any page, and are kept with their tests on purpose (#244) until it is
+// decided whether working backwards from a serving time comes back. Reconnect
+// them, or delete them together with their tests; do not tidy them away
+// piecemeal.
 (function (root) {
   'use strict';
 
   /* --- formatting ---------------------------------------------------------
-     Minutes are the working unit throughout and only ever become a figure at
-     the edge. "2h5m" rather than "125 mins": you read this while planning a
-     meal, not while timing an experiment. */
-  /* FIVE-MINUTE GRANULARITY, applied once here and reused by the clock
-     arithmetic below so a duration and the time it implies can never disagree.
-     Helen: "let's round cooking times to the nearest 5 mins to preserve
-     sanity." She's right, and not only about sanity: "1 hr 37 mins" claims a
-     precision the underlying figure hasn't got — most of these rates are
-     themselves a range, and several are estimates by analogy. Rounding is
-     honesty about the input, not just tidiness in the output. */
+     Minutes are the working unit throughout and only become a figure at the
+     edge. */
+  /* Five-minute granularity, applied here and reused by the clock arithmetic
+     so a duration and the time it implies can never disagree. The underlying
+     rates are ranges and estimates; finer figures would claim a precision
+     they have not got. */
   function round5(mins) {
     return Math.round(mins / 5) * 5;
   }
 
-  /* COMPACT, SINCE 2026-10-09: "4h50m", "2h", "10m". Helen: "Collapse timing
-     display to e.g. '2h - 3h', '4h - 4h50m', '10m - 15 m'. En dashes." It
-     printed "4 hrs 50 mins" from 2026-08-15 to then, in the house's metadata
-     register (MANUAL §5: "mins", never "min" -- and before 2026-08-15 it
-     emitted the singular, which was a real violation). That register is for
-     a recipe's Prep and Cook lines, read as words; this is a column of
-     figures read against each other, and the words were most of its width
-     -- a range took three lines of a phone's time column. The §5 rule is
-     untouched for the recipe pages. */
+  /* Compact on purpose: "4h50m", "2h", "10m". These are a column of figures
+     read against each other, so MANUAL §5's "mins" register, which governs a
+     recipe's Prep and Cook lines, does not apply here. */
   function hhmm(mins) {
     mins = round5(mins);
     var h = Math.floor(mins / 60), m = mins % 60;
@@ -84,24 +38,18 @@
   }
 
   function span(lo, hi) {
-    /* Compared AFTER rounding: 95 and 97 minutes are one answer once you've
-       decided five minutes is the resolution, and printing "1h35m – 1h35m"
-       would be the arithmetic showing through. An en dash with a space each
-       side, which is where cook-timer.js lets a range break. */
+    /* Compared AFTER rounding: 95 and 97 minutes are one answer. An en dash
+       with a space each side, which is the string cook-timer.js splits a
+       range on. */
     return round5(lo) === round5(hi)
       ? hhmm(lo) : hhmm(lo) + " – " + hhmm(hi);
   }
 
   /* Clock arithmetic in minutes-since-midnight, wrapping backwards over
-     midnight rather than producing a negative time — a 6 kg turkey for a 1pm
-     lunch genuinely does start the night before, and printing "-45:00" instead
-     of "22:15 (the day before)" would be a bug you'd only notice at Christmas. */
+     midnight: a big turkey for lunch starts the night before. */
   function clock(minsFromMidnight) {
-    /* COUNT the wraps, don't just record that one happened. This loop used to
-       assign " (the day before)" on every pass, so a start time two days back
-       was labelled one day back -- and that is reachable from the page's own
-       inputs, not a theoretical case: beef's low-and-slow brisket at 13.2 kg
-       is a 29-43½ hour cook, which crosses midnight twice. Fixed 2026-08-15. */
+    /* COUNT the wraps: a long enough low-and-slow cook crosses midnight
+       twice, and must not be labelled one day back. */
     var daysBack = 0;
     while (minsFromMidnight < 0) { minsFromMidnight += 1440; daysBack += 1; }
     var day = "";
@@ -120,21 +68,19 @@
   /* --- resolving a method to minutes -------------------------------------- */
 
   function baseFor(method, all) {
-    /* A `relative` row borrows another row's timing. The base is the first
-       straightforward `rate` row in the same group — "plain equivalent" in the
-       data's own words. Returned rather than applied silently so the caller can
-       name it in the output: a number you can't trace is a number you can't
-       check. */
+    /* A `relative` row borrows another row's timing: the first `rate` row in
+       the same group. Returned, not applied silently, so the caller can name
+       it in the output. */
     for (var i = 0; i < all.length; i++) {
       if (all[i].group === method.group && all[i].shape === "rate") return all[i];
     }
     return null;
   }
 
-  /* The six shapes, each on its own terms. Two of them REFUSE: `disputed` and
-     `unparsed` return { ok: false } with a reason, because a confident number
-     derived from a row whose own sources disagree by 3:1 is worse than no
-     answer at all. See the header of _data/food/cooking_methods.yml. */
+  /* Each shape on its own terms. Two REFUSE: `disputed` and `unparsed` return
+     { ok: false } with a reason, because a confident number from a row whose
+     own sources disagree is worse than no answer. See the header of
+     _data/food/cooking_methods.yml. */
   function resolve(method, kg, doneness, all) {
     var s = method.shape;
 
@@ -152,37 +98,17 @@
     }
 
     if (s === "by_doneness") {
-      /* Same fallback chain as `rate` above, on purpose (GitHub issue #245):
-         flat_add_max if the level states one, else flat_add, else nothing.
-         This used to add flat_add to both ends and never look at
-         flat_add_max, so an asymmetric upper bound would be silently
-         dropped -- not theoretical. Venison's haunch
-         (haunch_high_heat_start_then_reduce in
-         _data/food/cooking_methods.yml) is a live by_doneness row with
-         flat_add: 20 on both its rare and medium levels; it is symmetric
-         today, so nothing rendered wrong, but it is the row most likely to
-         gain an asymmetric flat_add_max next, and the bug would have taken
-         effect with no error and no failing test. Keep this branch and the
-         `rate` one in agreement. */
+      /* Keep the flat_add fallback chain in agreement with the `rate` branch
+         above (#245): flat_add_max if the level states one, else flat_add,
+         else nothing. Dropping flat_add_max loses an asymmetric upper bound
+         with no error. */
       var d = method.by_doneness[doneness] || method.by_doneness.rare;
 
-      /* EVERY LEVEL, not just the one asked for -- GitHub issue #246. The page
-         hard-wired `doneness` to "rare" and had no control, so the medium rates
-         in cooking_methods.yml were unreachable: real, sourced data that
-         nothing could display. Only two of 73 methods have this shape (beef's
-         standard roast, venison's haunch), which is why the fix is to show
-         both figures rather than to add a control that would do nothing for
-         seven of the nine proteins.
-
-         ADDITIVE ON PURPOSE. lo/hi and the aside still describe the single
-         requested level, so orderMethods -- which sorts on lo -- keeps sorting
-         on one consistent figure, and every existing caller and test sees
-         exactly what it saw before. A caller that wants the whole picture
-         reads `levels`; one that wants a number reads lo/hi as it always did.
-
-         Data order, not alphabetical: cooking_methods.yml lists rare before
-         medium, which is the order the rates rise in and the order a cook
-         thinks in. Alphabetical would put medium first and read as a default. */
+      /* Every level, not just the one asked for (#246): the page has no
+         doneness control, so `levels` is the only way the other rates are
+         shown. Additive: lo/hi and the aside still describe the requested
+         level, so orderMethods sorts on one consistent figure. In data order
+         (rare before medium), not alphabetical. */
       var levels = Object.keys(method.by_doneness).map(function (name) {
         var lv = method.by_doneness[name];
         return {
@@ -237,17 +163,9 @@
     };
   }
 
-  /* ONE ORDER FOR BOTH VIEWS, shortest first. Helen: "either order it by time
-     taken (lower bound) or alphabetically by method name, then same for the
-     cards." Time wins over alphabetical because it makes the table a ranking
-     rather than a list -- "what can I do in the time I have" is the question
-     a sorted column answers for free, and alphabetical answers nothing.
-
-     The two rows that decline to be timed sort last: they have no lower bound
-     to rank on, and an unanswerable row at the top of a table of times would
-     read as the fastest.
-
-     Returns a new array; the caller's list is never reordered under it. */
+  /* Shortest first, by lower bound. Rows that decline to be timed sort last:
+     an unanswerable row at the top of a table of times would read as the
+     fastest. Returns a new array; the caller's list is never reordered. */
   function orderMethods(methods, kg, doneness) {
     return methods.slice().sort(function (a, b) {
       var ra = resolve(a, kg, doneness, methods);
@@ -259,21 +177,15 @@
   }
 
   /* --- working backwards from the plate -----------------------------------
-     Given a resolved range, the rest time and the clock time you're eating at
-     (all in minutes; serveAt is minutes from midnight), when does it go in?
+     Given a resolved range, the rest time and the time you are eating at (all
+     minutes; serveAt is minutes from midnight), when does it go in?
 
-     The LONGER estimate drives `inAt` on purpose: being ready early and holding
-     is recoverable, being late is not. `inAtQuicker` is the same sum against
-     the shorter estimate, and `hasRange` says whether the two differ once
-     five-minute rounding has been applied — the same round5 the printed
-     duration uses, so a card can never show a duration that disagrees with the
-     times either side of it.
+     The LONGER estimate drives `inAt`: ready early and holding is
+     recoverable, late is not. `hasRange` uses the same round5 as the printed
+     duration, so a card cannot show a duration that disagrees with its times.
 
-     Everything comes back as minutes from midnight, negative if it runs back
-     past midnight; clock() is what turns that into "22:15 (the day before)".
-     Nothing here knows what time it is now, deliberately: "is that in the
-     past?" is a question about the reader's clock, and this module never reads
-     one. */
+     Results are minutes from midnight, negative if they run back past it;
+     clock() formats that. Nothing here knows what time it is now. */
   function scheduleBack(lo, hi, serveAt, rest) {
     var outAt = serveAt - (rest || 0);
     var longest = round5(hi), shortest = round5(lo);
@@ -287,9 +199,8 @@
   }
 
   /* --- the temperature table ----------------------------------------------
-     `temps` is the parsed internal_temperatures.yml, passed in rather than
-     read: the page serialises it into the document, and this module has no
-     business knowing that. */
+     `temps` is the parsed internal_temperatures.yml, passed in, never read
+     here. */
   function lookup(temps, ref) {
     if (!ref) return null;
     var node = temps;
@@ -297,9 +208,7 @@
     return node || null;
   }
 
-  /* A schedule that ends on a clock is only half an answer; the oven doesn't
-     know how big your bird is. Every protein carries an internal_temp_ref, so
-     the last line of every card is the figure to actually check. */
+  /* The figure to actually check, from the protein's internal_temp_ref. */
   function finishingTemp(temps, ref) {
     var node = lookup(temps, ref);
     if (!node) return null;
@@ -312,14 +221,9 @@
     return null;
   }
 
-  /* Rest time from the selected protein's own entry rather than a round 20
-     nobody wrote down. Beef, pork and lamb publish one in
-     internal-temperatures.html's own table headers ("After ~15–20 min rest");
-     goose states one in its note. Chicken, turkey, duck and ham publish none —
-     they fall back, and `stated` is false so the caller can say as much rather
-     than presenting a working default with the same confidence as a cited
-     figure. The fallback is injected, not hard-coded here: what to do when the
-     data is silent is a policy the page owns. */
+  /* Rest time from the protein's own entry where the data states one. Where
+     it does not, restFor returns the caller's fallback with `stated: false`,
+     so a working default is never presented as a cited figure. */
   function statedRest(temps, ref) {
     var node = lookup(temps, ref);
     return node && node.rest_min != null ? node.rest_min : null;
@@ -332,9 +236,8 @@
       : { mins: fallback, stated: false };
   }
 
-  /* Alphabetical by the label you actually read, not by the data file's own
-     order -- sorted here rather than in the YAML so the data stays neutral
-     about presentation and the reference page can keep its own sequence. */
+  /* Alphabetical by the label you read, sorted here so the data file can keep
+     its own sequence. */
   function proteinOrder(methodsByKey) {
     return Object.keys(methodsByKey).sort(function (a, b) {
       return methodsByKey[a].label.localeCompare(methodsByKey[b].label);

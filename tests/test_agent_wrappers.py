@@ -502,6 +502,8 @@ def test_git_push_agent_pushes_a_branch_over_a_plain_url(args, repo, directory, 
     ["_cocktail_drafts", "some-other-repo"],
     ["_cocktail_drafts", "helen-triages-cocktails-private", "--upload-pack=x"],
     ["_cocktail_drafts", "helen-triages-cocktails-private", "main:main"],
+    ["_cocktail_drafts", "helen-triages-cocktails-private", "main", "--force"],
+    ["_cocktail_drafts", "helen-triages-cocktails-private", "main", "--keep-head", "x"],
 ])
 def test_git_fetch_agent_refuses_outside_the_checkout_and_the_three_repos(args):
     _assert_refused("git-fetch-agent.sh", args)
@@ -511,6 +513,7 @@ def test_git_fetch_agent_refuses_outside_the_checkout_and_the_three_repos(args):
     (["_cocktail_drafts", "helen-triages-cocktails-private"], "main"),
     (["_food_drafts", "helen-triages-food-private", "content/some-branch"],
      "content/some-branch"),
+    (["_food_drafts", "helen-triages-food-private", "main", "--keep-head"], "main"),
 ])
 def test_git_fetch_agent_fetches_one_branch(args, ref):
     lines = _accepted_lines("git-fetch-agent.sh", args)

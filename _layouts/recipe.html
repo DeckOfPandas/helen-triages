@@ -10,30 +10,20 @@ layout: default
       <span class="recipe-title-text">{{ page.title }}</span>
     </h1>
 
-    {% comment %} THE ACTIONS LEFT THIS LINE ON 2026-09-14 (#1005). From
-       2026-08-14 the print and pdf controls sat here beside the title,
-       bottom-aligned, and the shortlist button joined them on 2026-09-04 with
-       Helen's note that the row "needs a redesign anyway". #1005 moved all of
-       them to a row under the badges; #1210 (2026-09-30) split them -- print
-       and pdf to the furniture line above the title, the shortlist pair to the
-       INGREDIENTS line. The title is alone on its line, which is also what
-       lets a long one wrap without a control to negotiate with. {% endcomment %}
+    {% comment %} The title is alone on its line, so a long one wraps with no control to
+       negotiate with. Print and pdf are on the furniture line above; the shortlist
+       pair is on the INGREDIENTS line (#1210). {% endcomment %}
   </div>
 
   {% if page.tagline %}<p class="recipe-tagline">{{ page.tagline | markdownify | remove: '<p>' | remove: '</p>' }}</p>{% endif %}
 
-  {% comment %} Internal temp meta line -- optional. `internal_temp_ref` is a
-     dot-path into _data/food/internal_temperatures.yml (e.g.
-     "beef.tender_roast"); `doneness` (optional) picks a level within that
-     entry's own `doneness` map (e.g. "medium_rare") where one exists. Front
-     matter is never Liquid-templated (MANUAL §4), so the actual number
-     can't be typed into a method step or note -- this meta line is the one
-     place on a recipe page a value from that data file can actually render,
-     which is why it lives here rather than closer to the relevant method
-     step. The four shapes in the data file (endpoint, doneness/pull+rested,
-     tender_at, target) aren't uniform, so this checks which keys are present
-     on whatever it resolved to rather than assuming one from the protein
-     name -- see that file's own header comment. {% endcomment %}
+  {% comment %} Internal temp wiring, optional. `internal_temp_ref` is a dot-path into
+     _data/food/internal_temperatures.yml (e.g. "beef.tender_roast"); `doneness`
+     picks a level within that entry's `doneness` map where one exists. Front
+     matter is never Liquid-templated (MANUAL §4), so the layout is the only
+     place a value from that file can render. The shapes in the data file are not
+     uniform, so this checks which keys are present on what it resolved to; see
+     that file's header. {% endcomment %}
   {% assign _internal_temp = nil %}
   {% assign _temp_spectrum = nil %}
   {% if page.internal_temp_ref %}
@@ -42,15 +32,10 @@ layout: default
     {% for _key in _temp_path %}
       {% assign _temp_node = _temp_node[_key] %}
     {% endfor %}
-    {% comment %} A node carrying a `doneness` map is a SPECTRUM, and the two
-       cases below are genuinely different. With a `doneness:` in front matter
-       we resolve to that one level. WITHOUT one we must not resolve into the
-       node itself: beef.tender_roast has no pull/endpoint/target/tender_at of
-       its own -- only carryover and the doneness map -- so every test in the
-       chain below failed and the meta line rendered its label and its link with
-       NO FIGURE BETWEEN THEM. Silent, and sitting directly in front of the
-       rollout in issue #202, because `internal_temp_ref: beef.tender_roast` is
-       exactly what you would naturally write. {% endcomment %}
+    {% comment %} A node carrying a `doneness` map is a spectrum. With `doneness:` in front
+       matter, resolve to that one level. Without one, do not resolve into the node
+       itself: it has no figure of its own, only the map, and the page would render
+       a label with no figure (#202). {% endcomment %}
     {% if _temp_node.doneness %}
       {% assign _temp_spectrum = _temp_node %}
       {% if page.doneness %}
@@ -65,43 +50,23 @@ layout: default
     {% if page.serves %}<li><strong>Serves</strong><span>{{ page.serves }}</span></li>{% endif %}
     {% if page.makes %}<li><strong>Makes</strong><span>{{ page.makes }}</span></li>{% endif %}
     {% if page.prep_time %}<li><strong>Prep</strong><span>{{ page.prep_time }}</span></li>{% endif %}
-    {% comment %} A wired recipe's cook time hands off to its own temperatures
-       rather than pretending a single number settles it. Helen, on roast beef
-       fillet: "About 30 mins, but check beef cooking temperatures."
-
-       That is the right shape for the whole collection, not just that recipe.
-       The clock figure was doing two jobs badly -- planning ("when do I start?")
-       and doneness ("when is it ready?") -- and it can only ever do the first.
-       An earlier attempt loaded the second onto it as "40 mins for medium rare",
-       which Helen rejected: qualifying the number doesn't help, because the
-       number was never the answer to that question.
-
-       Added by the layout rather than typed into cook_time, so no markup lives
-       in a metadata field and every wired recipe says it the same way. {% endcomment %}
+    {% comment %} A wired recipe's cook time hands off to its own temperatures: the clock
+       figure answers "when do I start?", never "when is it ready?". Added by the
+       layout rather than typed into cook_time, so no markup lives in a metadata
+       field and every wired recipe says it the same way. {% endcomment %}
     {% if page.cook_time %}
       <li>
         <strong>Cook</strong>
-        {% comment %} "internal temperatures chart", not "cooking temperatures"
-           -- issue #352, and #338 is where Helen worked out why the old wording
-           was wrong: "It's not cooking temperatures, it's internal
-           temperatures." The chart measures the inside of the meat, and the
-           old phrase named the oven instead.
-
-           The METADATA BOX keeps the "but check" hedge because it is
-           qualifying the cook time right next to it. Body copy uses the
-           shorter "(check internal temperatures chart)", because by then the
-           reader is mid-step and the contrast has already been made. Two
-           registers on purpose, per #352. {% endcomment %}
+        {% comment %} "internal temperatures chart", not "cooking temperatures" (#352): the chart
+           measures the inside of the meat, not the oven. The metadata box keeps the
+           "but check" hedge because it qualifies the cook time beside it; body copy
+           uses the shorter "(check internal temperatures chart)". {% endcomment %}
         <span>{{ page.cook_time }}{% if _temp_spectrum or _internal_temp %}, but check <a href="#doneness">internal temperatures chart</a>{% endif %}</span>
       </li>
     {% endif %}
-    {% comment %} NO INTERNAL-TEMP CELL HERE ANY MORE. Helen: "I don't like the
-       internal temperature featuring in the metadata -- it's ugly, it spoils
-       the rule of 3, and it's nowhere in sight when you're actually cooking."
-       All three are true, and the last is the one that decides it: this grid is
-       read once, while deciding whether to cook the thing. A temperature is
-       read with a probe in your hand, twenty minutes in. It lives below Notes
-       now, and the method step that needs it links straight to it. {% endcomment %}
+    {% comment %} No internal-temp cell in this grid: it is read once, while deciding whether
+       to cook, and a temperature is read with a probe in hand. The figure lives
+       below Notes, and the method step that needs it links to it. {% endcomment %}
   </ul>
 
   {% if page.source %}<p class="recipe-source">Source: {{ page.source }}</p>{% endif %}
@@ -111,23 +76,15 @@ layout: default
     {% include recipe_badges.html recipe=page %}
   </div>
 
-  {% comment %} THE HEAD ENDS ON A HAIRLINE, and the shortlist pair sits on the
-     INGREDIENTS heading's line -- #1210, 2026-09-30. From #1005 (2026-09-14,
-     "row under the head") until this, `.recipe-controls` held the actions
-     include in a row of its own between the hairline and INGREDIENTS; Helen's
-     brief put the shortlist "on the same line as INGREDIENTS for Moules where
-     it doesn't have the read it make it toggle", the same place a drink page
-     has it (the toggle's line), so the row went and the hairline is all that
-     is left of it. Print and pdf moved to the furniture line (page-print.html).
-     The heading row is a flex row: heading at the left, the pair at the right;
-     on a phone the pair takes the line above (_sass/food/_recipe-header.scss). {% endcomment %}
+  {% comment %} The head ends on a hairline, and the shortlist pair sits on the INGREDIENTS
+     heading's line (#1210), as on a drink page. The heading row is a flex row:
+     heading at the left, the pair at the right; on a phone the pair takes the
+     line above (_sass/food/_recipe-header.scss). {% endcomment %}
   <hr class="recipe-head-rule">
 
-  {% comment %} `.size > 0` for the same reason the NOTES section below uses it:
-     an empty array is truthy in Liquid, so `ingredient_groups: []` would render
-     an INGREDIENTS heading with nothing beneath it. No file does that today --
-     this is the latent twin of a bug that was live on 49 drafts, fixed at the
-     same time rather than left to be found the same way. {% endcomment %}
+  {% comment %} `.size > 0`, as for NOTES below: an empty array is truthy in Liquid, so
+     `ingredient_groups: []` would render an INGREDIENTS heading with nothing
+     beneath it. {% endcomment %}
   {% if page.ingredient_groups.size > 0 %}
     <div class="recipe-section-ingredients">
       <div class="recipe-section-heading-row">
@@ -147,26 +104,11 @@ layout: default
 
   {% for group in page.ingredient_groups %}
     {% if multiple_ingredient_groups %}
-      {% comment %} A VARIATION IS NOT A PART OF THE RECIPE, and "For the ..."
-         says that it is. Issue #329: a group named `variation: chocolate chip`
-         renders without the "For the", because that phrasing promises the
-         reader something they must make. Caramel is the live case (#342) --
-         its second group is the condensed milk for Millionaire's shortbread,
-         which most people making caramel will never touch, and "For the
-         millionaire's filling:" reads as a required step.
-
-         No trailing colon on this one, deliberately. The others end in a colon
-         because they are a fragment introducing a list; "Variation: X:" would
-         carry two colons doing different jobs.
-
-         A NAME THAT OPENS WITH "to " IS ITS OWN HEADING -- #814. `to serve`
-         was the one name special-cased here, so `to finish` rendered "For the
-         to finish:". Helen: "Can we fix all 'for the to finish' cases? Both
-         existing and when we ingest." Any such name now prints as itself,
-         capitalised, with the colon: "To finish:", "To decorate:", "To
-         garnish:" -- and "To serve:" exactly as before. The test is on the
-         first three characters, lowercased, because Liquid has no
-         starts-with. MANUAL 4. {% endcomment %}
+      {% comment %} A group named `variation: …` renders without "For the" (#329): a variation
+         is not a part the reader must make. No trailing colon on it: "Variation: X:"
+         would carry two colons. A name that opens with "to " is its own heading
+         (#814): "To finish:", "To serve:". The test is on the first three
+         characters, lowercased, because Liquid has no starts-with. MANUAL 4. {% endcomment %}
       {% assign _is_variation = false %}
       {% if group.name contains "variation:" %}{% assign _is_variation = true %}{% endif %}
       {% assign _name_opening = group.name | append: "" | slice: 0, 3 | downcase %}
@@ -183,11 +125,9 @@ layout: default
     <ul class="ingredients">
       {% for item in group.items %}
         {% if item.item and item.incidental %}
-          {% comment %} GitHub issue #75: incidental items (a generic
-          cooking fluid, not a real recipe component) shouldn't be shown
-          in main_ingredients on the index page OR in the ingredients list
-          on the recipe page -- Helen. Still mentioned in the method text
-          itself where it's actually used, just not itemised here. {% endcomment %}
+          {% comment %} Incidental items (a generic cooking fluid, not a real component) are not
+             itemised here or in main_ingredients on the index (#75); the method text
+             still mentions them. {% endcomment %}
         {% elsif item.item %}
           <li class="ingredient ingredient--annotated">
             {% if item.amount %}
@@ -208,84 +148,35 @@ layout: default
     </ul>
   {% endfor %}
 
-  {% comment %} THE SCALER -- #1005, 2026-09-14. PORTIONS, NOT MULTIPLES, which
-     is the one place food and drinks answer the same question differently and
-     Helen ruled it so: "Portions." A drink is scaled by whole recipes because
-     "how many does this make" and "how much am I making" are different
-     questions there (MANUAL 9.13); a recipe already carries its answer to the
-     first, and the index's shopping list has scaled by it since #801. So the
-     box holds PEOPLE, starts at however many the recipe makes, and the
-     amounts are multiplied by wanted over made -- the same arithmetic the
-     shopping list runs, from the same parser (assets/js/food-scale.js).
+  {% comment %} The scaler (#1005). On a `serves:` recipe the box holds people, starts at
+     `page.portions`, and amounts are multiplied by wanted over made, with the
+     shopping list's parser (assets/js/food-scale.js). `page.portions` is
+     _plugins/food_shopping.rb's, from `serves:` or `serves_estimate:` (#815);
+     the `~` marks an estimate, and a recipe with no count gets no control.
+     `hidden` until assets/js/recipe-scale.js reveals it. Amounts with no number,
+     or ingredients with no amount, cannot scale and are named in the note below,
+     which recipe-scale.js builds.
 
-     `page.portions` IS THE PLUGIN'S -- _plugins/food_shopping.rb resolves it
-     from `serves:` first and `serves_estimate:` second (#815), and marks an
-     estimate. A recipe with no count gets no control at all rather than one
-     that cannot work, which is the rule this feature's index half learned
-     twice. The `~` says the number was reasoned rather than written down,
-     as it does on the shopping list.
+     `data-half-step-measures` is _data/food/scaling.yml's `half_step_measures`
+     (#1125); `data-trailing` and `data-singulars` are ingredient_words.yml's
+     `trailing_phrases` and `singulars`. All data: adding a measure is a line of
+     YAML.
 
-     UNDER THE LAST INGREDIENT GROUP, as the drink's sits under its list: a
-     control that RE-READS the list belongs after it. `hidden` until
-     assets/js/recipe-scale.js reveals it, the rule every JS-dependent control
-     on both sites follows.
+     On a `makes:` recipe the box counts the thing made, never portions (#1286).
+     `page.made` is the build's reading of the `makes:` line
+     (_plugins/food_yield.rb); the box starts at its figure, the lower number of
+     a range, and the whole reading goes to the script as JSON in `data-made`
+     (food-scale.js `yieldMode`). Plus and minus move in whole recipes, so a
+     typed number goes to the nearest whole recipe. One step below one recipe, x½,
+     only where the build says so (`data-half-recipe`,
+     _plugins/food_half_recipe.rb); without the mark, minus at one recipe does
+     nothing.
 
-     "2 large" SCALES -- Helen: "Things like '2 large' can scale, surely" --
-     because the parser reads `large` as the unit. What cannot scale is an
-     amount with no number in it ("a few handfuls", "some"), or an ingredient
-     with no amount at all; those are named in the note below when the
-     portions move, so the reader knows which lines are still as written.
-     THE NOTE IS HELEN'S OWN LINE SINCE #1088, 2026-09-20 -- "(Not scaled:
-     salt, black pepper; olive oil)", settled as commas throughout. It shipped
-     as placeholder copy from her "copy tbc, just put in a placeholder";
-     assets/js/recipe-scale.js builds it.
-
-     A HANDFUL SCALES IN HALF STEPS -- #1125, 2026-10-04. "1 handful" used
-     to come out as "1.17 handfuls"; three times the recipe is now "3
-     handfuls", half as much again "1½ handfuls", and seven-sixths of it is
-     still "1 handful".
-     `data-half-step-measures` hands the script _data/food/scaling.yml's
-     `half_step_measures`. `data-trailing` is ingredient_words.yml's
-     `trailing_phrases`, so the note says "Tabasco sauce" and not "Tabasco
-     sauce to taste". Both are data: adding a measure is a line of YAML.
-     MANUAL 8.2.
-
-     ON A `makes:` RECIPE THE BOX COUNTS THE THING MADE -- #1286, 2026-10-04.
-     Helen: "Never tell me how many cookies are in a portion!!!" Henry's
-     waffles said "Makes 4–6 waffles" up top and "~2 portions" down here.
-     `page.made` is _plugins/food_yield.rb's reading of the `makes:` line; where
-     it is set, this branch prints the control and the word "portions" appears
-     nowhere in it. The box starts at the figure the line gives -- THE LOWER
-     NUMBER OF A RANGE since 2026-10-07 ("lower number please, new ruling";
-     the midpoint before) -- and the word after it is the thing: "4 waffles",
-     "950 ml", "1 × 8-inch cake".
-     The whole reading goes to the script as JSON in `data-made`, and
-     assets/js/food-scale.js `yieldMode` does the stepping and the plural.
-
-     PLUS AND MINUS MOVE IN WHOLE RECIPES, on every `makes:` recipe -- "1x is
-     5 waffles, 2x is 10 waffles. Otherwise we'll need to start showing eggs
-     in units of 1/27". The box shows what that many recipes make, so it is a
-     DERIVED figure in an input: a typed number goes to the nearest whole
-     recipe. The aria-label names the thing ("waffles to make").
-
-     ONE STEP BELOW ONE RECIPE, x½, AND ONLY WHERE THE BUILD SAYS SO --
-     `data-half-recipe`. Helen: "Half a recipe would be great where the
-     numbers aren't insane!" and "not having half recipes in between
-     integers, just between 0 and 1". "1 large egg", not "1 large eggs", when
-     a count comes down to one: `data-singulars` is ingredient_words.yml's
-     map for the script. _plugins/food_half_recipe.rb judges the half step;
-     the script only reads the mark. Without it, minus at one recipe does
-     nothing, silently.
-
-     SAME CLASSES AS THE PORTIONS CONTROL, so the script, the stylesheet and
-     the tests find one control whichever it is; `--made` only widens the box.
-     A `makes:` line with no count at its start ("Some") has no `page.made`
-     and falls through to the portions control below, which keeps its word
-     and its "~" -- "we can retain the previous guess we made at portions" --
-     but steps in whole recipes too (`data-whole-recipes`): 'if "some" is
-     originally guessed to be 4 portions, 2x should be 8 portions'. Only a
-     `serves:` recipe steps a portion at a time. MANUAL 8.2.
-     {% endcomment %}
+     Same classes as the portions control, so the script, the stylesheet and the
+     tests find one control; `--made` only widens the box. A `makes:` line with
+     no count has no `page.made` and falls through to the portions control, which
+     then steps in whole recipes too (`data-whole-recipes`). MANUAL 8.2.
+  {% endcomment %}
   {% if page.made and page.ingredient_groups.size > 0 %}
     <div class="recipe-scale-controls" hidden data-half-step-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: '|' | escape }}" data-quarter-step-measures="{{ site.data.food.scaling.quarter_step_measures | join: '|' | escape }}" data-trailing="{{ site.data.food.ingredient_words.trailing_phrases | join: '|' | escape }}" data-singulars="{{ site.data.food.ingredient_words.singulars | jsonify | escape }}">
       <button type="button" class="recipe-scale-step recipe-scale-minus" aria-label="make fewer">&minus;</button>
@@ -311,12 +202,9 @@ layout: default
     <p class="recipe-scale-note" hidden></p>
   {% endif %}
 
-  {% comment %} short_method_enabled (_config.yml) -- Helen, 2026-08-14: the
-     toggle and its print/PDF "In short:" section are both undeployed, off
-     regardless of what page.method_short actually holds. Gating has_short
-     itself rather than each render site separately means both the on-screen
-     button below and the print-only block further down go dark together,
-     with one flag to flip back on rather than two. {% endcomment %}
+  {% comment %} short_method_enabled (_config.yml) turns off both the toggle and the print
+     "In short:" section, whatever page.method_short holds. Gating has_short
+     itself means the two go dark together on one flag. {% endcomment %}
   {% assign has_short = false %}
   {% if site.short_method_enabled %}
     {% for step in page.method_short %}
@@ -375,11 +263,9 @@ layout: default
   {% endif %}
 
   {% if has_short %}
-    {% comment %} Print only (issue #86) -- hidden on screen in
-       food/_recipe-ingredients-method.scss, shown in food/_print.scss. On
-       paper the full and short methods both print, one after the other, so the
-       second one needs saying what it is; on screen they are alternatives and
-       the toggle button already says it. {% endcomment %}
+    {% comment %} Print only (#86): hidden on screen in food/_recipe-ingredients-method.scss,
+       shown in food/_print.scss. On paper the full and short methods both print,
+       so the second needs saying what it is. {% endcomment %}
     <h3 class="recipe-group-heading method-short-heading">In short:</h3>
     <div class="method-short" hidden>
       {% for step in page.method_short %}
@@ -388,46 +274,19 @@ layout: default
     </div>
   {% endif %}
 
-  {% comment %} `.size > 0`, and NOT a bare truth test on page.notes itself. An
-     empty array is TRUTHY in Liquid -- only nil and false are falsy -- so
-     `notes: []` rendered the NOTES heading with an empty grid under it, on 49
-     drafts. Helen spotted it on sticky-tamarind-pork-ribs while checking the
-     print layout; it is not a print bug, it has been on screen the whole time.
-     `.size` on a nil is nil, and nil is not greater than 0, so this handles a
-     missing key too.
+  {% comment %} `.size > 0`, not a bare truth test on page.notes: an empty array is truthy
+     in Liquid, so `notes: []` would render the NOTES heading over an empty grid.
+     `.size` on nil is nil, which is not greater than 0, so a missing key is
+     handled too. Liquid parses tag delimiters inside a comment block: describe a
+     tag in a comment, never quote it. {% endcomment %}
 
-     (Writing the bad version out longhand in this comment is what broke the
-     build the first time round: Liquid parses tag delimiters inside a comment
-     block, so a quoted `if` tag in here is a real tag as far as it is
-     concerned. Describe it, do not quote it.) {% endcomment %}
-
-  {% comment %} AN EMPTY NOTE IS NOT A NOTE, so it is counted out before the
-     heading is decided -- the same bug one level down from the one above.
-     Helen, 2026-10-01, asking for placeholder label and text keys on every
-     draft note: a note waiting to be written is now a pair with two empty
-     strings, and 115 food drafts carry one. Without this pass each of those
-     printed a lone label with nothing after it, and a file whose only note was
-     a placeholder printed the whole NOTES heading to introduce it.
-
-     The count is what the heading and the single-note class both key off, so a
-     note that will not render cannot make a heading appear or stop the one-note
-     layout applying.
-
-     The shape test is on the KEYS, not on the value. A note is a mapping of
-     label and text, or a bare string from before that shape existed; a bare
-     string has neither key, and asking a string for one gives nil. The old code
-     tested the value, so a pair whose text was empty fell through to the
-     bare-string branch and was rendered as the MAPPING -- and the mapping
-     renders as nothing at all, measured, not as the Ruby hash you would expect.
-     Markdown almost certainly eats it: kramdown reads a line that is just
-     braces as an attribute list and consumes it. So the failure is a label with
-     an empty box beside it and no error anywhere, which is also exactly what
-     the placeholder's old spelling did. Testing the keys is what lets the skip
-     above work at all -- on the value, a mapping stringifies to something
-     non-empty and the note renders.
-
-     The one shape this cannot tell from a string is a mapping carrying neither
-     key, which exists nowhere in either collection.
+  {% comment %} An empty note is not a note, so it is counted out before the heading is
+     decided: a draft's placeholder note is a pair of two empty strings. The
+     count is what the heading and the single-note class both key off. The shape
+     test is on the keys, not the value: a note is a mapping of label and text,
+     or a bare string, and a bare string has neither key. Tested on the value, a
+     pair with empty text falls through to the bare-string branch and renders as
+     a label with an empty box and no error.
   {% endcomment %}
   {% assign shown_notes = 0 %}
   {% for note in page.notes %}
@@ -460,15 +319,10 @@ layout: default
     </div>
   {% endif %}
 
-  {% comment %} BELOW NOTES, and with an id, because it is a thing you are sent
-     to rather than a thing you scroll past. Helen: "I like including the image,
-     but it can't go above the fold." It was sitting between the metadata and the
-     ingredients, which put reference material in the middle of the decision to
-     cook at all.
-
-     Rendered for ANY wired recipe, not just the ones with a spectrum: with the
-     meta cell gone this is the only place a single figure appears, so a tough
-     cut's "tender at 90–96°C" would otherwise have nowhere to live. {% endcomment %}
+  {% comment %} Below Notes, and with an id, because it is a thing you are sent to: it must
+     not sit above the fold. Rendered for any wired recipe, not only one with a
+     spectrum: this is the only place a single figure appears, such as a tough
+     cut's "tender at". {% endcomment %}
   {% if _temp_spectrum or _internal_temp %}
     <div id="doneness" class="recipe-section-temp">
       <h2 class="recipe-section-heading">
@@ -484,70 +338,27 @@ layout: default
   </div>
   {% endif %}
 
-  {% comment %} ─────────────────────────────────────────────────────────────────
-     IF YOU LIKED THIS, HOW ABOUT … — three related recipes. #1005, 2026-09-14,
-     the drink page's #927 brought to food at Helen's word, with one rule of
-     her own on top.
+  {% comment %} ── If you liked this, how about … (#1005) ──
+     Three related recipes. The score is shared tags plus shared main
+     ingredients. A candidate sharing this recipe's star ingredient and at least
+     one mood tag outranks every one that does not; the score decides within each
+     half. Ties go to more shared non-larder ingredients, then more shared larder
+     staples (_data/food/pantry.yml), then title. No other weighting:
+     DECISIONS §13.
 
-     THE SCORE IS SHARED TAGS PLUS SHARED MAIN INGREDIENTS, ties broken by
-     title, and nothing else -- the drinks rule ported directly ("Yes"). Then
-     her addition: "prioritise (star*mood)". A candidate sharing this recipe's
-     STAR INGREDIENT and at least one MOOD tag outranks every candidate that
-     does not, whatever the counts say; the score decides within each half.
-     No weighting beyond that, for #927's reason: every knob one could add is
-     a claim about what makes two recipes alike, and nobody has made it.
+     The sort is a string sort: each candidate is one
+     `prio~rank~real~larder~title~url` string (`prio` 0 for a star-and-mood
+     match, `rank = 999 - score`, `real` and `larder` each 99 minus the count),
+     sorted ascending. scripts/related_recipes.py is the same rule in Python;
+     re-run it after a promotion batch or a taxonomy edit that moves tags.
+     Lowercased on both sides, star included.
 
-     THE ROWS ARE THE INDEX'S OWN ROWS -- Helen: "same design as index recipe
-     list rows as a baseline to build from". Same classes, same order: title,
-     ingredient line, badges, the shortlist control at the row's end. Written
-     out here rather than shared as an include for the reason the drink page
-     gives: the index row carries five `data-*` attributes and a derived
-     exclusion vocabulary this page has no use for, and the STYLESHEET is the
-     shared half, which is the half that cannot drift by accident. The pantry
-     ordering of the ingredient line is copied exactly (see food/index.html).
-
-     THE COLLECTION IS ALREADY THE PUBLISHED SET: _plugins/publish_gate.rb
-     removes a held-back recipe from `site.food_recipes` at :post_read, so a
-     live page can only ever offer a live one. Drafts and the magic bag are
-     other collections and are never in this loop.
-
-     A TIE IS BROKEN BY SHARED INGREDIENTS, LARDER STAPLES LAST -- Helen's
-     second ruling, the same evening: "where just one tag is shared, do you
-     think it would be better to pick matched ingredients (in larder order)?"
-     Measured before it was written (DECISIONS §13): weighting ingredients
-     ABOVE tags changed 49 of 69 pages' rows and put chocolate ice cream
-     beside cauliflower cheese on the strength of "whole milk", because
-     _data/food/pantry.yml is exact and conservative by design ("milk" is in
-     it, "whole milk" is not) and that gap decides too much once ingredients
-     outweigh tags. Breaking TIES only changed 37 pages, nearly all of them
-     the cases she meant -- caramel loses the ramen eggs and gains the sponge
-     cake through double cream, cranberry sauce gains the chestnut loaf over
-     two ice-cream bases -- so a lone shared tag never outranks a shared
-     ingredient at the same score, and a shared larder staple never outranks
-     a real one, and nothing else moves.
-
-     THE SORT IS A STRING SORT, as on the drink page: each candidate becomes
-     one `prio~rank~real~larder~title~url` string -- `prio` 0 for a
-     star-and-mood match and 1 otherwise, `rank = 999 - score`, `real = 99 -
-     shared non-larder ingredients`, `larder = 99 - shared larder staples` --
-     and ascending text order is then prioritised first, highest score first
-     within each half, most real ingredients within a score, most larder
-     staples within that, A-Z last. `scripts/related_recipes.py` is the same
-     rule in Python over the same corpus -- re-run it after a promotion batch
-     or a taxonomy edit that moves tags, and read it when the rendered-pages
-     test names a recipe that could not fill its row.
-
-     LOWERCASED ON BOTH SIDES. Tags are a lowercase vocabulary already;
-     main_ingredients are free text and "Demerara sugar" beside "demerara
-     sugar" is one ingredient. The star is compared the same way.
-
-     THE HEADING IS FINAL, NOT A PLACEHOLDER -- Helen on #1088, 2026-09-20:
-     "The if you like this text isn't a placeholder. Final version." It was
-     always her own words (from #927's title), and the marker said only that
-     nobody had confirmed they were meant as the shipped line. Now they are.
-     The drink page carries the identical line and lost its marker in the
-     same pass.
-  ────────────────────────────────────────────────────────────────────────{% endcomment %}
+     The rows are the index's own rows, written out rather than included because
+     the index row carries data attributes this page has no use for; the
+     stylesheet is the shared half, and the pantry ordering is copied from
+     food/index.html. `site.food_recipes` is already the published set:
+     _plugins/publish_gate.rb removes a held-back recipe at :post_read. The
+     heading is Helen's final wording (#1088). {% endcomment %}
   {% assign _mood_tags = site.data.food.taxonomy.tags.mood %}
   {% assign _pantry = site.data.food.pantry %}
   {% capture _my_ings %}|{% for _ing in page.main_ingredients %}{{ _ing | downcase }}|{% endfor %}{% endcapture %}
@@ -630,9 +441,8 @@ layout: default
                 </div>
               </div>
             </div>
-            {% comment %} THE INDEX ROW'S BUTTON, EXACTLY: same class, same key,
-               same `hidden`. shortlist.js finds every `.btn-shortlist` on the
-               document, so this placement is markup and nothing else. {% endcomment %}
+            {% comment %} The index row's button, exactly: same class, same key, same `hidden`.
+               shortlist.js finds every `.btn-shortlist` on the document. {% endcomment %}
             <button type="button"
                     class="btn-shortlist"
                     data-shortlist-key="{{ _rel.url }}"
@@ -648,20 +458,16 @@ layout: default
 </article>
 
 <script src="{{ '/assets/js/back-link.js' | relative_url }}"></script>
-{% comment %} page-search.js, the search box's dropdown, loaded here beside the
-   arrow's script from #1050 until 2026-10-01: the box left the furniture line
-   for the header (#1210, local builds only) and its script went with it --
-   _includes/page-search.html loads both under one gate. {% endcomment %}
+{% comment %} page-search.js is not loaded here: _includes/page-search.html loads it with
+   the box, under one gate. {% endcomment %}
 <script src="{{ '/assets/js/method-toggle.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/print-link.js' | relative_url }}"></script>
-{% comment %} THE SCALER, IN DEPENDENCY ORDER -- #1005. shopping-list.js is the
-   ONE amount parser (MANUAL 9.13), food-shopping-list.js is the food
-   formatting built on it (grams to the gram, spoons in fractions),
-   food-scale.js is one amount times a factor built on both, and
-   recipe-scale.js is the wiring. Each reads the one before it off `HTF` at
-   parse time, so loaded the wrong way round the page throws once, silently,
-   and the control never appears; tests/test_site_config.py guards the
-   order, as it does for the drink page's three. {% endcomment %}
+{% comment %} The scaler, in dependency order (#1005): shopping-list.js is the one amount
+   parser, food-shopping-list.js the food formatting built on it, food-scale.js
+   one amount times a factor built on both, recipe-scale.js the wiring. Each
+   reads the one before it off `HTF` at parse time, so in the wrong order the
+   page throws once and the control never appears; tests/test_site_config.py
+   guards the order. {% endcomment %}
 <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-scale.js' | relative_url }}"></script>

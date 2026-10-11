@@ -1,28 +1,14 @@
-// =============================================================================
-// SHARED DESIGN TOKENS — every site in the mono-repo
-// =============================================================================
-// Non-colour design decisions: spacing, sizing, typography scale, stroke weights.
-// Structural, not aesthetic — this is the layer food and cocktails agree on.
+// SHARED DESIGN TOKENS: the non-colour decisions both sites agree on --
+// spacing, widths, the type scale, breakpoints.
 //
-// NOTHING IN THIS FILE MAY REFERENCE A PALETTE VARIABLE. That is what makes it
-// shareable. `%btn-active-base` used to live here and did reference two
-// ($color-text, $saturation-badge-bg), which quietly made the "shared" token
-// file depend on food's palette; it now sits in _sass/food/_layout.scss beside
-// the buttons that extend it.
-//
-// Imported after the site's palette, because a later partial may reference
-// both.
+// Nothing in this file may reference a palette variable; that is what makes
+// it shareable. Imported after the site's palette, because a later partial
+// may reference both.
 
 // --- Spacing scale -----------------------------------------------------------
-// These six values already accounted for 75 of the ~227 numeric literals in
-// _layout.scss and _recipe.scss before they were named. The scale existed in
-// fact; it just was not written down, which made "tighten everything slightly"
-// a forty-edit job instead of a one-edit job.
-//
-// Use these for margin, padding, gap and offsets. Do NOT use them for
-// font-size — a padding and a type size that happen to share a value are not
-// the same decision, and tying them together means changing one changes the
-// other.
+// For margin, padding, gap and offsets. Not for font-size: a padding and a
+// type size that happen to share a value are not the same decision, and tying
+// them together means changing one changes the other.
 $space-xxs: 0.15rem;
 $space-xs:  0.3rem;
 $space-sm:  0.5rem;
@@ -32,22 +18,16 @@ $space-xl:  1.5rem;
 $space-xxl: 2rem;
 
 // --- Named spacing (specific jobs, not scale steps) --------------------------
-// The spacing scale above stops at 2rem, so every gap bigger than that was a
-// literal: 2.25, 2.5, 3, 3.5, 4.5 and 5rem all appeared in _recipe.scss with
-// nothing relating them. These three are the large steps, named, and they are
-// deliberately far apart — a big gap only reads as a level of hierarchy if it
-// is obviously bigger than the one below it, not 15% bigger.
+// The large steps, deliberately far apart: a big gap only reads as a level of
+// hierarchy if it is obviously bigger than the one below it.
 $spacing-block-gap:   1.75rem;   // between the blocks inside one section
 $spacing-section-gap: 3rem;      // below a section's last content
 $spacing-section-top: 4.5rem;    // above a section heading. Was 3rem, when a
-                                 // scribbled rule sat in the gap as well; with
-                                 // the rule gone the space carries the whole
-                                 // separation on its own
+                                 // scribbled rule sat in the gap as well
 
 // --- Widths ------------------------------------------------------------------
-// NOT a breakpoint — it is the max content width of the page and the recipe
-// column, and was hardcoded as 900px in three places. Named $width- rather than
-// $breakpoint- deliberately: nothing here responds to viewport size.
+// The max content width of the page and the recipe column. Not a breakpoint:
+// nothing responds to it.
 $width-content: 900px;
 
 // --- Typography Scale --------------------------------------------------------
@@ -57,88 +37,38 @@ $line-height-body:   1.65;       // instructions, method-short, notes, body pros
 // --- Label Style (metadata, group headings) ----------------------------------
 $letter-spacing-label: 0.1em;
 
-// --- Stroke Weights ----------------------------------------------------------
-// The three fixed-px tiers that used to live here ($stroke-heavy 0.8px,
-// $stroke-medium 0.6px, $stroke-light 0.5px) are gone, 2026-08-12. They were a
-// scale of the wrong KIND of value: -webkit-text-stroke is absolute, so one
-// token on two different type sizes is two different letterforms, and a "tier"
-// that has to be re-chosen per element every time isn't a scale. Two of the
-// three were already dead -- title and section headings had both been cut to
-// hand-picked literals (0.4px, 0.3px) months before this -- and the third,
-// $stroke-light, was doing 0.5px on everything from 0.85rem to 1.35rem, which
-// is 3.7% of the type on one and 2.3% on another.
-//
-// Replaced by $emboss-stroke in shared/_rule.scss -- one em-based value that
-// is 1.4% of whatever it lands on. That file's own comment has the reasoning
-// and the measurements; it lives there because the stroke is one half of the
-// punched-tape effect and the emboss offset is the other, and separating them
-// is what let them drift apart in the first place.
+// There are no stroke-weight tokens, on purpose: -webkit-text-stroke is an
+// absolute width, so one px value on two type sizes is two different
+// letterforms. The stroke is $emboss-stroke, an em, in shared/_rule.scss.
 
 // --- Borders & Radii ---------------------------------------------------------
 $radius-sm: 2px;   // note boxes, method-short box, meta wash
 
 
 // --- The index panel ---------------------------------------------------------
-// BOTH SITES' INDEXES ARE THE SAME CONTROL PANEL, so these two gaps belong to
-// neither. They lived in _sass/food/_category-labels.scss and cocktails used
-// `$space-xl` and `$space-md` directly -- the same values under different
-// names, which is the arrangement that stays equal only until someone tunes
-// one. Moved 2026-08-30.
-//
-// §13.4's reasoning travels with them: the index is a control panel, where
-// every section should be visible in one glance, and the recipe page is a
-// document, where space isolates the section you are mid-task on. That is why
-// these are NOT $spacing-section-gap -- reaching for the recipe page's token
-// is exactly the mistake cocktails had made, and it spaced its control panel
-// like a document.
-//
-// TIGHTENED A STEP FURTHER, 2026-09-02, with the fold work: the first recipe
-// or card sat about 1,200px down at desktop, and Helen chose the "less
-// height, nothing new" candidate from the mockups over adding anything. Both
-// values moved down one rung of the spacing scale, which also moves the ratio
-// between them from 2:1 to 1.5:1 -- still a bigger gap between sections than
-// within one, just a smaller one than before.
-// BACK UP ONE RUNG, 2026-09-10, from her phone: "I'd like more vertical space
-// between filter sections on the index page." $space-md was chosen for the
-// desktop fold; on a phone every section wraps to more rows and 0.75rem
-// between them read as one continuous list. 1rem, not the 1.5rem it was
-// before the fold work -- the search rows get their own extra room below
-// 600px in each site's search stylesheet, which is where she pointed.
+// Both sites' indexes are the same control panel, so these gaps belong to
+// neither site. They are not $spacing-section-gap (MANUAL §13.4): an index is
+// a control panel, where every section should be visible at a glance, and a
+// recipe page is a document, where space isolates the section in use.
 $index-section-gap: $space-lg;   // between one filter section and the next --
-                                 // was $space-xl (1.5rem), then $space-md
-                                 // (0.75rem), now $space-lg (1rem)
+                                 // bigger than the gap inside a section
 $index-label-gap:   $space-sm;   // a label to its own buttons -- was
-                                 // $space-md (0.75rem), now $space-sm (0.5rem)
+                                 // $space-md (0.75rem)
 
-// The search row: a heading, a text box and an inline clear, on one line.
-// $index-search-max-width was 550px until the clear button started reserving
-// its space at all times -- that space came out of the input's share even at
-// rest, so the row was widened by roughly the button's own footprint (Helen,
-// 2026-08-03: "cut off even before typing anything -- it ends at the first '.'").
+// The search row: a heading, a text box and an inline clear, on one line. The
+// clear reserves its space at all times, and that comes out of the input's
+// share, so the row is wide enough for both.
 $index-search-max-width: 620px;
 
-// WHERE THE TWO INGREDIENT FIELDS STOP SITTING SIDE BY SIDE. Food stacked at
-// 600px and cocktails at 720px, so between those widths food squashed both
-// inputs into half a column each while cocktails had already stacked. Helen,
-// 2026-08-30, seeing them together: "the cocktail version is correct." One
-// number now, so there is no in-between to be wrong in.
+// Where the two ingredient fields stop sitting side by side. One number for
+// both sites (Helen's ruling), so there is no width at which one site has
+// stacked and the other has not.
 $index-stack-width: 720px;
 
-// WHERE THE HEADER STOPS PUTTING THE NAV BESIDE THE WORDMARK, and the number is
-// derived rather than picked. The widest wordmark the site has is
-// `[ COCKTAILS ]`: 13 characters at 2.5rem with 0.18em tracking and 1.4em of
-// padding either side, which is 524px. The nav row is 128px (two 32px icons,
-// "??", two 1.4rem gaps). The header's own padding takes 48px. That is 700px
-// before any air at all, so the two only sit together comfortably above about
-// 820px -- and below that the nav takes its own line.
-//
-// 600px was the old value and it was set for a different job: stopping the tape
-// PAINTING OVER the nav, which the header grid now makes impossible at any
-// width (#551). What is left is whether they FIT, which is a bigger number.
-//
-// It is one number for both sites deliberately, even though food's shorter
-// wordmark would sit happily beside the nav down to about 550px. A per-site
-// breakpoint is a second chrome, which is what #374 exists to prevent -- and
-// the day a third site word arrives, this is the one place that needs looking
-// at. Recompute with tmp/header_width.py if a wordmark ever gets longer.
+// Where the header stops putting the nav beside the wordmark. Derived, not
+// picked: the widest wordmark (`[ COCKTAILS ]`), the nav row and the header's
+// padding have to fit on one line with air between them. It is not about one
+// painting over the other, which the header grid prevents at any width
+// (#551). One number for both sites, because a per-site breakpoint is a
+// second chrome (#374); recompute it if a site word gets longer.
 $header-stack-width: 820px;

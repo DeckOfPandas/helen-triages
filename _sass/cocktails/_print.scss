@@ -1,161 +1,58 @@
 // =============================================================================
-// COCKTAILS — PRINT. Spec: GitHub issue #482.
+// COCKTAILS — PRINT (#482)
 // =============================================================================
-// Helen, 2026-08-27: "The full page should be what ends up in the PDF and
-// prints."
+// Print is the full editorial page, forced. The `make it` toggle only adds a
+// class and both states are always in the DOM, so a reader who prints while in
+// `make it` would otherwise get whichever state they happened to be looking at.
 //
-// THAT IS THE OPPOSITE OF WHAT WAS EXPECTED, and the expectation is worth
-// recording because it was confidently wrong. #482 assumed the `make it` state
-// -- the bar-side spec, amounts enlarged, everything else stripped -- because
-// that is the version you want beside you while pouring. But a PDF is not the
-// thing beside you while pouring; the phone is. A PDF is the archive copy, and
-// an archive copy that has thrown away the tagline, the ingredient class lines
-// and the notes is a worse record than the page it came from.
-//
-// SO PRINT IS THE EDITORIAL STATE, FORCED. The `make it` toggle only adds a
-// class, and both states are always in the DOM, so this is a stylesheet
-// concern with no template or JS involvement -- which is what makes it
-// possible to override at all.
-//
-// The reader may well print WHILE in `make it` mode, having pressed the button
-// to read the spec. Without this they would get whatever they happened to be
-// looking at, which is the actual bug: the same page printed twice would give
-// two different documents depending on an invisible toggle position.
-// WRAPPED IN @media print, and it was not on the first attempt -- the rules
-// compiled to top level and would have applied ON SCREEN, permanently breaking
-// the toggle they exist to override. Caught by reading the built CSS rather
-// than by the build, which succeeded perfectly happily. shared/_print.scss
-// wraps its own rules the same way; a print partial that forgets is just a
-// stylesheet.
+// Everything here must stay inside `@media print`. Outside it the rules apply
+// on screen and break the toggle they override, and the build still succeeds.
 @media print {
   .cocktail.is-making {
     .cocktail-tagline,
     .cocktail-type-line,
     // Reaches the ingredient notes the state block hides. A method step's note
-    // is not hidden in that state at all (see `.cocktail-ingredient
-    // .cocktail-note` in _cocktail.scss), so it needs nothing here and reverting
-    // it would be a rule that changes nothing — the trap the state block's own
-    // footnote warns about.
+    // is not hidden in that state, so it needs nothing here.
     .cocktail-note,
     .notes,
-    // SHIP IT? IS ONE OF THESE AGAIN. It spent an hour on 2026-09-05 hidden in
-    // the editorial state and revealed by `make it`, which needed a rule of its
-    // own here running the opposite way; Helen reversed that the same evening
-    // ("I want ship it to display in read it mode, and not to display in make
-    // it mode"), so it is an ordinary member of this list once more -- a fact
-    // `make it` strips and print puts back.
     .cocktail-meta-ship,
     .cocktail-body-content { display: revert; }
   }
 
 
-  // The toggle itself is furniture, not content -- three controls that cannot
-  // be pressed on paper. Was `.btn-make`, the single button this replaced,
-  // 2026-09-02 -- same reasoning as shared/_print.scss dropping the nav, now
-  // hiding the whole read-it/make-it group in one rule rather than each of its
-  // three elements.
+  // The toggle is furniture: controls cannot be pressed on paper.
   .cocktail-toggle { display: none; }
 
-  // The universe pick is furniture too -- a random deal and "deal again" do
-  // nothing on paper.
+  // So is the universe pick.
   .universe { display: none; }
 
-  // AND SO IS "IF YOU LIKED THIS, HOW ABOUT …" (#927), for the same reason and
-  // one more. It is three links, and a link cannot be followed on paper; it is
-  // also NAVIGATION rather than a fact about this drink, and a printed page is
-  // the archive copy of one drink. Note this is the opposite direction from the
-  // block above: `make it` hides it and print does NOT put it back, because the
-  // editorial state print restores is about carrying MORE information about
-  // this drink, not more ways to leave it.
+  // And the related drinks (#927). The opposite direction from the block
+  // above: `make it` hides them and print does not put them back, because they
+  // are navigation, not a fact about this drink.
   .cocktail-related-section { display: none; }
 
-  // THE SCALER GOES TOO, AND WITH IT ITS FLOOR MESSAGE -- #545, 2026-09-04.
-  // Same argument as the toggle above, plus one of its own: a PRINTED PAGE IS
-  // THE RECIPE AS WRITTEN. The amounts on paper are whatever multiple happened
-  // to be in a box when the reader hit print, and a number box beside them
-  // would invite the reader to believe the sheet could still be changed. The
-  // control cannot be pressed on paper; the amounts it already wrote can, and
-  // do, print exactly as they stand.
-  //
-  // THE TOTAL AND THE TARGET BOX WENT WITH IT — and then went altogether, on
-  // 2026-09-05 (#720, #721), leaving one multiple box and a `×`. The wrapper is
-  // still the thing hidden, so this rule did not have to change when its
-  // contents did, which is the argument for hiding a wrapper rather than a list
-  // of parts.
-  //
-  // THE SHORTLIST BUTTON IS NOT LISTED HERE and does not need to be: it ships
-  // `hidden` and only shortlist.js reveals it, so a printed page that ran no
-  // JavaScript never had one, and one that did gets it hidden by
-  // shared/_print.scss along with every other control.
-  //
-  // `.cocktail-scale-total` (#1121's "Approximately X ml") printed, on purpose,
-  // until the line itself was removed on 2026-10-02 (#1257).
-  // `.cocktail-scale-note` was in this list until #1088 deleted the floor
-  // message it styled.
+  // The scaler goes too (#545): a printed page is the recipe as written, and
+  // the amounts already on it print as they stand. The wrappers are hidden,
+  // not a list of their parts, so this rule survives their contents changing.
+  // The shortlist button is not listed: shared/_print.scss hides it.
   .cocktail-scale-controls,
   .cocktail-scale,
   .cocktail-scale-batch { display: none; }
 
-  // ---------------------------------------------------------------------
-  // COLOUR: DARK ON LIGHT. Design review #1086.
-  // ---------------------------------------------------------------------
-  // shared/_print.scss makes html and body transparent so paper stays white
-  // (see that file's own header) but names no colour -- it can only name the
-  // nine palette-contract variables, and none of them is an "ink for paper"
-  // value. On food that is fine, because food's page IS already dark ink on
-  // a light ground; nothing there needs to change for print. Cocktails
-  // inverted its whole palette for the screen (#469, "black on black"), so
-  // $color-text here is #e8e6e2 -- near-white -- and every explicit
-  // `color: $color-text` / `$color-clear-text` / accent-deep declaration on
-  // this page prints as pale grey-on-white or a washed-out tint, because
-  // each one was solved against a black card or a black page, never against
-  // paper. MEASURED, not assumed -- tmp/contrast.py, kept out of the repo
-  // proper because tmp/ is gitignored, the same note _palette.scss's own
-  // separation check leaves about its own tmp/ tools:
+  // --- colour: dark on light (#1086) ------------------------------------------
+  // shared/_print.scss makes html and body transparent so paper stays white,
+  // and names no colour. This site's palette is inverted for the screen (#469),
+  // so every explicit colour on a drink page was solved against black and
+  // prints as pale grey or a washed-out tint on white.
   //
-  //   $color-ink on white:                1.25:1  (body text)
-  //   $color-clear-text on white:         2.97:1  (units, source, optional,
-  //                                                 the method numerals...)
-  //   mood/hassle chip hues on white:     2.89 / 3.11:1
-  //   ship (reposado) on white:           2.67:1
-  //   suggestion (woowoo) on white:       3.45:1
-  //   notes (lagoon) on white:            1.84:1
-  //   glass icon (absinthe) on white:     1.61:1
+  // So print has a second palette, scoped to `.cocktail`. The two inks are
+  // food's own, which are already solved for paper. Each accent is its screen
+  // hue darkened by the smallest step that clears 4.5:1 on white: the step is a
+  // property of the hue, so re-solve it if a hue moves
+  // (`scripts/palette_measure.py --contrast <fg> <bg>`).
   //
-  // all well under the 4.5:1 body-text floor MANUAL 9.13 sets.
-  //
-  // THE FIX IS A SECOND PALETTE FOR THIS ONE MEDIUM, scoped to `.cocktail`
-  // so it touches nothing on screen. Two of the seven values below are
-  // REUSED rather than invented: $print-ink is food's own $color-text
-  // (_sass/food/_palette.scss) and $print-ink-quiet is food's own
-  // $color-clear-text -- food already solved "near-black ink" and "a
-  // de-emphasised grey" for this exact ground, dark-on-light, and cocktails
-  // has no ink of its own to reach for, having inverted every value it had.
-  // The five accent hues have no food equivalent to borrow -- they are
-  // this site's own -- so each is darken()ed off its own rule colour by the
-  // smallest step that clears 4.5:1 on white, the same method
-  // food/_palette.scss's own $darken-active-lime already uses for the same
-  // reason ("how far to darken is a property of the hue, not of the
-  // section"). Found by search (tmp/darken_search.py) rather than picked by
-  // eye, with a percentage point or two of margin over the measured
-  // minimum:
-  //
-  //   $print-mood        darken(22%)   4.82:1
-  //   $print-hassle       darken(20%)  4.69:1
-  //   $print-ship          darken(18%) 5.02:1
-  //   $print-suggestion   darken( 8%)  4.75:1
-  //   $print-notes         darken(24%) 4.77:1
-  //   $print-glass          darken(26%) 4.69:1 (decorative line art, not
-  //                                              text, but solved to the
-  //                                              same bar so the drawing
-  //                                              reads rather than washes
-  //                                              out)
-  //
-  // THE NAME TAPE IS DELIBERATELY UNTOUCHED. `.cocktail-title` sits inside
-  // `.drink-card-tape-word`, which paints its own black band with light
-  // lettering (§9.13, "the card title sits on punched tape") -- it is
-  // artwork, the same as it is on the index and on a card, and printing it
-  // any other way would be redrawing the mark rather than fixing the bug.
+  // The name tape is deliberately untouched: it paints its own black band with
+  // light lettering and is artwork (MANUAL §9.13).
   $print-ink:        #211f20;  // = food's $color-text
   $print-ink-quiet:  #4f4e4a;  // = food's $color-clear-text
   $print-mood:        darken($color-banging-bellini, 22%);
@@ -170,12 +67,8 @@
 
     a { color: $print-ink; }
 
-    // Explicit $color-text on this page -- inheriting the override above
-    // does not reach these, because each already paints its own colour.
-    // `.cocktail-use` moved up here from the quiet list with #1263: it sits
-    // under the amount in the amount's own type, so it takes the amount's ink.
-    // `.cocktail-character` followed with #1226: the character words are a
-    // labelled fact in full ink, and only their Plex label stays quiet below.
+    // These paint their own $color-text on screen, so the inherited override
+    // above does not reach them.
     .cocktail-tagline,
     .cocktail-amount,
     .cocktail-use,
@@ -183,11 +76,7 @@
       color: $print-ink;
     }
 
-    // Explicit $color-clear-text -- the de-emphasised ink used for the
-    // units line, the source and cost lines, an optional ingredient, the
-    // CHARACTER label, the "or" between alternatives, an
-    // ingredient or method-step note, and the GLASS/GARNISH/SHIP IT?
-    // labels and method numerals.
+    // These paint $color-clear-text on screen.
     .cocktail-source,
     .cocktail-cost,
     .cocktail-units,
@@ -204,27 +93,23 @@
       color: $print-glass;
     }
 
-    // The mood chips -- reused from the index card, solved for a black
-    // card (_cards.scss: "coral is 6.66:1 on the page ground").
+    // The mood chips, reused from the index card.
     .drink-card-mood--mood { color: $print-mood; }
     .drink-card-mood--hassle { color: $print-hassle; }
 
-    // The bottle suggestion in brackets, and the class line above it --
-    // both woowoo-deep.
+    // The bottle suggestion and the class line: woowoo on screen.
     .cocktail-suggestion,
     .cocktail-type-line {
       color: $print-suggestion;
     }
 
-    // SHIP IT? -- the icon and the word's underline, both reposado.
+    // SHIP IT? The icon and the word's underline.
     .drink-card-ship-icon { color: $print-ship; }
     .drink-card-ship-word { text-decoration-color: $print-ship; }
 
-    // A note card. $color-surface (#0d0d0f) is near-black and paints
-    // opaque -- only html/body go transparent (shared/_print.scss) -- so
-    // dark ink on an unpainted note card would be invisible, not merely
-    // grey. Ground goes to paper; the border and the left accent, both
-    // lagoon, follow the label below.
+    // A note card. $color-surface is near-black and paints opaque (only html
+    // and body go transparent), so dark ink on an unpainted note card would be
+    // invisible. The ground goes to paper.
     .note {
       background: $color-white;
       border-left-color: $print-notes;
@@ -233,16 +118,11 @@
       color: $print-notes;
     }
 
-    // INGREDIENTS / METHOD / NOTES -- the punched heading lettering.
-    // shared/_rule.scss's tiers are computed off $color-text, solved once
-    // per site; cocktails/_rule.scss re-points them for light ink on a
-    // black ground (issue #469), which is the inverse problem from print's
-    // dark ink on white. Re-pointed again here, scoped to the section
-    // heading alone so the name tape's own lettering (a different custom
-    // property, read from a different element) is untouched. The formulas
-    // are shared/_rule.scss's own defaults -- "food's values are the
-    // dark-on-light set" -- run against $print-ink since that is this
-    // stylesheet's own ink rather than food's.
+    // The section headings' punched lettering. cocktails/_rule.scss re-points
+    // the heading tier for light ink on black, the inverse of print, so it is
+    // re-pointed again here with shared/_rule.scss's own dark-on-light formulas
+    // run against $print-ink. Scoped to the section heading so the name tape's
+    // lettering is untouched.
     .cocktail-section-heading {
       --lettering-heading-stroke-c: #{darken($print-ink, 5%)};
       --lettering-heading-light:    #{lighten($print-ink, 65%)};

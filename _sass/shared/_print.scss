@@ -1,32 +1,12 @@
-// =============================================================================
-// SHARED PRINT — the page shell, on paper
-// =============================================================================
-// GitHub issue #86. This is the site's FIRST media query, and it is the only
-// kind it is ever likely to want: the layout is fluid end to end and needs no
-// breakpoints (see tests/test_site_config.py's
-// test_no_element_can_force_horizontal_scroll, which stands in for a
-// responsive suite precisely because there are none). Paper is a different
-// medium, not a narrower screen, so it is the one case a query earns.
+// SHARED PRINT: the page shell, on paper (#86).
 //
-// IMPORTED LAST, BY BOTH STYLESHEETS, AND BOTH HALVES OF THAT MATTER.
+// Imported by both stylesheets, after every screen partial. `@media print`
+// adds no specificity, so a `display: none` here and a component's own
+// `display` are the same weight and source order decides: import this
+// earlier and it silently stops working. Both stylesheets, because this
+// styles chrome every site renders.
 //
-// Last, because `@media print` adds no specificity of its own. `.recipe-badges
-// { display: none }` here and `.recipe-badges { display: flex }` in
-// food/_badges.scss are the same weight, so source order is the only thing
-// deciding which wins. Import this earlier and it silently stops working —
-// no error, just badges on the printout.
-//
-// Both, because this file styles the chrome every site renders. There used to
-// be a third — root.scss, for the landing page, which belonged to neither
-// site and was the easy one to miss — but GitHub issue #204 deleted the
-// landing page (and root.scss with it) in favour of a bare redirect at the
-// root, so food.scss and cocktails.scss are the whole list now. Still worth
-// grepping every `@import "shared/` site before assuming you have them all,
-// in case a fourth stylesheet ever turns up.
-//
-// PALETTE CONTRACT applies here as everywhere in shared/: only the nine
-// variables every site's palette guarantees may be named. This file uses one,
-// $color-bg.
+// The palette contract applies here as everywhere in shared/ (MANUAL §2.3).
 
 @media print {
 
@@ -37,53 +17,17 @@
     margin: 15mm 14mm;
   }
 
-  // --- THE ONE DECLARATION THIS WHOLE FEATURE DEPENDS ON -----------------
-  // Browsers strip background colours and images when printing, so that a
-  // dark-themed page does not cost half a cartridge. That default would take
-  // the site's entire visual identity with it: the blocky two-colour mark
-  // under every heading is a `linear-gradient` BACKGROUND, not a border and
-  // not a text-decoration (food/_rule.scss explains at length why it has to
-  // be), so an untreated printout loses every rule on the page while keeping
-  // the lettering that sits on it.
+  // Browsers strip backgrounds when printing, and the mark under every
+  // heading is a `linear-gradient` background (shared/_rule.scss), so
+  // `print-color-adjust: exact` is what keeps the paper version looking like
+  // the site (Helen's ruling). It is inherited, so declaring it at the root
+  // reaches every mark, wash and chart bar. The -webkit- form is for Safari.
   //
-  // Helen's explicit call, 2026-08-14, asked for the paper version to look
-  // like the site — marks and all — so the default is overridden here rather
-  // than designed around.
-  //
-  // The property is inherited, so declaring it once at the root reaches the
-  // marks, the metadata wash, the note boxes and the doneness chart's bars
-  // without any of them naming it. Unprefixed first, then the -webkit- form
-  // for Safari, which still only understands that one.
-  //
-  // NO PAGE BACKGROUND, and this is the deliberate half. $color-bg is a tint
-  // (#faf7f8), not white, so painting it here floods every sheet with a flat
-  // all-over wash -- an unreasonable amount of ink for a decorative ground,
-  // and on a home printer the kind of large flat fill that bands. Helen,
-  // 2026-08-14: "That's simply unfair." The paper IS the ground on paper.
-  //
-  // `transparent`, EXPLICITLY, AND THAT IS THE WHOLE FIX. The first attempt
-  // simply deleted this file's own `background: $color-bg` line, which changed
-  // nothing at all: shared/_base.scss sets `body { background: $color-bg }`
-  // for the screen, that rule is still in the cascade under @media print, and
-  // removing an override is not the same as overriding. The tint printed
-  // exactly as before and it took Helen looking at another preview to catch
-  // it. A print stylesheet has to say what it wants, never merely stop saying
-  // what it does not.
-  //
-  // Both html and body, because a body background propagates to the canvas:
-  // making body transparent alone hands the job to html, which then has to be
-  // transparent too for the paper to show through.
-  //
-  // Three things assume the ground is $color-bg and lose a little by this:
-  // $color-emboss-light (shared/_rule.scss) is $color-bg, so the highlight
-  // copy of the punched lettering no longer sits against a matching ground;
-  // .note-label's tab and the doneness chart's halos paint $color-bg to mask
-  // what is behind them. None of it is serious, and that is worth being
-  // precise about rather than hand-waving: #faf7f8 on white paper is a ~3%
-  // difference, so those three go from matching the ground to being
-  // near-invisible against it, and the emboss keeps its dark copy, which is
-  // the half that carries the raised read anyway. Helen's call, and the right
-  // one: "I don't care if my headings don't look like label tape."
+  // No page background: $color-bg is a tint, and flooding every sheet with
+  // it is a lot of ink for a decorative ground (Helen's ruling). It has to
+  // be `transparent`, stated: shared/_base.scss's `body { background }` is
+  // still in the cascade under @media print. Both html and body, because a
+  // body background propagates to the canvas.
   html,
   body {
     background: transparent;
@@ -92,55 +36,41 @@
   }
 
   // --- Chrome off -------------------------------------------------------
-  // The wordmark, the "?" and the footer are all ways of getting somewhere
-  // else. On paper there is nowhere else, and the header alone is ~140px of
-  // the first sheet.
+  // The header and the footer are ways of getting somewhere else, and on
+  // paper there is nowhere else.
   .site-header,
   .site-footer {
     display: none;
   }
 
-  // The shortlist's controls are furniture, not content — GitHub issue #546,
-  // and the same judgement `.cocktail-toggle` gets in cocktails/_print.scss:
-  // a control that cannot be pressed on paper. Both classes, because both
-  // exist on both sites (a row's or a card's toggle, and the index's
-  // shortlisted-only filter), and HERE rather than in either site's own
-  // partial for exactly that reason.
-  //
-  // The recipe page's one is already covered by `.recipe-actions` in
-  // food/_print.scss and is listed anyway: that rule hides the box this
-  // happens to sit in, and a control moving out of it should not silently
-  // start printing.
+  // The shortlist's controls cannot be pressed on paper (#546). Both classes
+  // exist on both sites, which is why the rule is here and not in a site's
+  // print partial.
   .btn-shortlist,
   .btn-shortlist-only {
     display: none;
   }
 
-  // THE PAGE FURNITURE, #1005/#1024/#1210: the back arrow's line (the arrow
-  // and print · pdf), the shortlist pair, and the search box (in the header
-  // on a local build only, so this reaches nothing on the deployed site and
-  // keeps a local print honest). All of it is a way of getting somewhere else
-  // or doing something to the screen; none of it is the recipe.
+  // The page furniture (shared/_furniture.scss): the back arrow's line, the
+  // shortlist pair and the search box, which is in the header on a local
+  // build only.
   .page-furniture,
   .page-actions,
   .page-search {
     display: none;
   }
 
-  // THE STICKY RESULTS BAR (shared/_results-bar.scss, 2026-09-26) is
-  // `position: fixed`, and a fixed box prints on EVERY sheet in most
-  // browsers. It is a control -- a count and a `× clear all` -- and on paper
-  // there is nothing to clear. The bar is `hidden` unless the reader has
-  // scrolled past the count line, which is exactly the state a long index is
-  // printed from.
+  // The sticky results bar (shared/_results-bar.scss) is `position: fixed`,
+  // and a fixed box prints on every sheet in most browsers. It is showing
+  // whenever the reader has scrolled past the count line, which is the state
+  // a long index is printed from.
   .results-bar {
     display: none;
   }
 
   // <main>'s padding holds the content off the window edge; @page's margin
-  // above does that job on paper, and keeping both would inset the text by
-  // roughly 30mm a side. The width cap goes for the same reason — the sheet
-  // is already the cap.
+  // does that job on paper, and keeping both would inset the text twice. The
+  // width cap goes for the same reason: the sheet is already the cap.
   main {
     max-width: none;
     margin: 0;
@@ -148,11 +78,8 @@
   }
 
   // --- Breaking ---------------------------------------------------------
-  // A heading stranded at the foot of a sheet with its own section overleaf
-  // is the single most common way a printed page reads as broken. `avoid` is
-  // a hint, not a guarantee — a browser will still break inside a heading
-  // taller than the page rather than loop forever — but it is honoured for
-  // anything of a sane size.
+  // Keeps a heading from being stranded at the foot of a sheet with its
+  // section overleaf. `avoid` is a hint, not a guarantee.
   h1,
   h2,
   h3 {

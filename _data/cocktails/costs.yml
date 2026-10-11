@@ -847,20 +847,15 @@ fruit_prices:
 # is what the strength and volume arithmetic read, and a spoon of sugar is still
 # not a millilitre of anything.
 #
-# THE SUGARS ARE HERE BECAUSE THEY ARE WEIGHED SOLIDS AND THE RULING SAYS
-# "weighed solids". Helen's earlier word (2026-09-05, "None of these come into
-# the estimated cost") was about ice, salt and the sugar CUBE dropped in a
-# punch, and the cube is still free. 20 g of palm sugar is the Caipirinha's
-# second ingredient and costs about 10p, which is the same order as the lime
-# beside it. If she would rather sugar by weight stayed free, delete the three
-# sugar rows and the drink goes back to withholding its figure.
+# Sugar by weight costs nothing (#1371). Its rows are zero, not absent: a
+# weighed generic with no row makes the drink withhold its whole figure.
 #
 # `gbp_per_kg`, unrounded ranges, and a `basis` naming the shop price so the
 # derived figure can be checked against the shelf rather than trusted.
 weight_prices:
   honey:               { gbp_per_kg_min: 9.00, gbp_per_kg_max: 18.00, basis: "GBP 3-6 / 340 g jar (supermarket clear honey to Acacia)", confidence: medium }
-  golden caster sugar: { gbp_per_kg_min: 1.50, gbp_per_kg_max: 2.50, basis: "GBP 1.50-2.50 / kg", confidence: medium }
-  palm sugar:          { gbp_per_kg_min: 4.00, gbp_per_kg_max: 8.00, basis: "GBP 2-4 / 500 g block", confidence: low }
+  golden caster sugar: { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
+  palm sugar:          { gbp_per_kg_min: 0, gbp_per_kg_max: 0, basis: "excluded by Helen's ruling", confidence: high }
 
 # --- how much a `to top` actually pours ---------------------------------------
 # HELEN ASKED FOR THIS DIRECTLY, 2026-09-05: "We can calculate top volumes,

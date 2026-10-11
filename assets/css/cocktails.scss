@@ -3,93 +3,51 @@
 // Helen Triages COCKTAILS — compiled stylesheet. Linked only by pages whose
 // site_key is `cocktails` (see _data/sites.yml → cocktails.css).
 //
-// Same import order as food.scss, and deliberately the same shape: palette,
-// then the shared structural layer, then this site's own. What differs is only
-// which palette and which decoration — which is the whole point of the split.
-//
-// `cocktails/cocktail` arrived 2026-08-16 as the title block and its glass
-// icon alone, with the rest to be added as each section earned a decision. It
-// is a whole page anatomy now — designed on /dev/cocktails-design/ with Helen,
-// 2026-08-26 — and `cards` and `filters` join it for the index.
-//
-// `cocktails/goodness` is gone. It was the twenty-minute filter-by-ship
-// scaffold from 2026-08-23 ("I don't care what it looks like"), and every job
-// it did is now done properly: its buttons by `filters`, its cards by `cards`.
-// Deleted rather than left importing nothing, so there is no second place to
-// look for a button style.
+// The same shape as food.scss: palette, then the shared structural layer, then
+// this site's own partials.
 @import "cocktails/palette";
 @import "shared/fonts";
 @import "shared/tokens";
-// The punched-tape mixin, before shared/layout — the wordmark uses it, and a
-// mixin must be defined before the partial that calls it. Same reason food.scss
-// imports it in the same relative position.
+// Before shared/base and shared/layout: both @include its lettering() mixin.
 @import "shared/rule";
 @import "shared/base";
-// This site's own emboss outline, AFTER shared/base rather than after
-// shared/rule, and the order is load-bearing. shared/_base.scss styles
-// h1/h2/h3 with the stroke colour HARDCODED (it may only name the ten
-// variables the palette contract guarantees, and this is not one of them), so
-// cocktails/rule has to come later to override it -- same specificity, so
-// order decides. Imported before shared/base it set a custom property that
-// nothing on the site read, which is how it shipped for one commit.
+// After shared/rule: it re-points that file's custom properties from a `:root`
+// block of the same specificity, so the later one wins.
 @import "cocktails/rule";
 @import "shared/layout";
-// The chrome's coloured half -- issue #374. This import is the whole reason the
-// partial moved out of food/: the header and footer are chrome both sites
-// render, and until this line existed cocktails drew them with no hover states,
-// no heart colour, and TWO COMPLETELY UNSTYLED NAV ICONS. Same relative
-// position as food.scss, after the structure.
+// The chrome's colours (#374). After shared/layout, whose structure it
+// overrides.
 @import "shared/chrome";
-// The page furniture -- the back arrow's line with its search box, and the
-// actions row (#1005/#1011/#1024). Both page layouts emit the two includes it
-// styles; after chrome, before cocktails/shortlist, which re-points its hovers.
+// The page furniture. After chrome, and before cocktails/shortlist, which
+// re-points its hovers.
 @import "shared/furniture";
-// The results count's digits and the sticky results bar (Helen, 2026-09-26,
-// "both treatments"), in the same relative position as food.scss. Its one
-// rule that competes with a cocktails rule (`.results-bar .btn-clear` against
-// `.btn-clear` in cocktails/filters) is two classes deep, so this can sit
-// before the site partials as it does on food.
+// Its one rule that competes with a cocktails rule (`.results-bar .btn-clear`)
+// is two classes deep, so it can sit before the site partials.
 @import "shared/results-bar";
 @import "cocktails/decoration";
-// The leopard on the page ground (#733), and the two custom properties that
-// make the header and footer plain bands over it. After shared/base, whose
-// `body { background }` shorthand would otherwise reset the images.
+// The leopard on the page ground (#733). After shared/base, whose
+// `body { background }` shorthand would otherwise reset the image.
 @import "cocktails/leopard";
 @import "cocktails/cocktail";
 @import "cocktails/cards";
 // The tape slot both sites' chips wear (#1219); cocktails/filters colours it.
 @import "shared/tag-shape";
 @import "cocktails/filters";
-// The shortlist (#546). AFTER cocktails/cocktail, which defines the
-// %cocktail-heading-face this file @extends and the `.cocktail-meta` whose
-// margin the meta row takes over. It has no other ordering constraint.
+// The shortlist (#546). After cocktails/cocktail and cocktails/filters: it
+// @extends %cocktail-heading-face and %cocktail-number-input from the first
+// and %drink-btn-base from the second.
 @import "cocktails/shortlist";
-// The export panel (#849), SHARED because it is one disclosure and one textarea
-// and is identical on both indexes -- unlike the shortlist CONTROLS above,
-// which are forked because a control in a drink card's corner and one on a
-// recipe row are different objects. It names palette variables
-// ($color-surface, $font-label) and so must come after cocktails/palette,
-// which it does. See _sass/shared/_shortlist-export.scss's own header.
+// The export panel (#849), shared because it is identical on both indexes.
 @import "shared/shortlist-export";
-// Universe sits right after filters: it draws the panel it dealt above, and
-// its three cloned parts (.drink-card-name, .drink-card-ingredients,
-// .drink-card-moods) are styled by rules cards already defines.
+// After cocktails/cards: the parts it clones from a card (.drink-card-name
+// and its siblings) are styled by rules cards defines.
 @import "cocktails/universe";
-// The reference layer (#529). AFTER cocktails/cocktail, which is where
-// `overlapping-rule-double`'s two section-heading colours are chosen for this
-// site and where `.cocktail-suggestion`'s woowoo is argued -- this file borrows
-// both rather than restating them, so it reads after the file it agrees with.
-// It has no other ordering constraint: nothing else on the site emits a `.ref-`
-// or `.rum-` class.
+// The reference layer (#529).
 @import "cocktails/reference";
-// Print, last -- see shared/_print.scss's header for why last, and why all
-// three stylesheets take it rather than just the one whose pages prompted it
-// (#86).
+// Print last: see shared/_print.scss's header (#86).
 //
-// cocktails/print comes AFTER shared/print, and the order is load-bearing for
-// the same reason cocktails/rule follows shared/base: it overrides a rule of
-// equal specificity (`.cocktail.is-making` hiding the editorial parts), and at
-// equal specificity the later one wins. Swapping these two lines would make
-// the drink page silently print the `make it` state again -- #482.
+// cocktails/print after shared/print: it overrides rules of equal
+// specificity, and at equal specificity the later one wins. Swapping the two
+// lines would make the drink page print its `make it` state (#482).
 @import "shared/print";
 @import "cocktails/print";

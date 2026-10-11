@@ -1,33 +1,20 @@
 // ============================================================================
 // BUTTONS
 // ============================================================================
-// Filter button appearance and states. Shapes are under BADGES above.
+// Filter button appearance and states. The badges are in _badges.scss.
 
 // --- Button Base Controls -----------------------------------------------------
-// Defined before .category so active-state compound selectors
-// (two classes) correctly win over these single-class rules by specificity.
-
-// Tape shape now, not a flat clip-path fill (see .tag-shape, BADGES above)
-// — position:relative/inline-block/font-family/white-space moved here from
-// the old shared .badge/.btn-tag/.btn-star rule, since these two no longer
-// share a rule with .badge at all. Resting .tag-shape colour is a
-// translucent neutral (rgba($color-text, ...)) matching the previous flat
-// background's visual weight; category colour only appears once a filter is
-// actually chosen (.active rules below) — same principle as the existing
-// active-state colour pop, extended to the shape itself.
-//
-// THE DECLARATIONS ARE @mixin index-chip IN shared/_rule.scss SINCE
-// 2026-10-11, unchanged: cocktails' search-pool chip is this chip now, and
-// including one mixin is how the two stay one. $chip-rest is the softened
-// ink every resting chip and every unmatched candidate wears.
+// The declarations are @mixin index-chip in shared/_rule.scss, which
+// cocktails' chips include too. $chip-rest is the softened ink every resting
+// chip and every unmatched candidate wears. A resting chip's tape is a
+// translucent neutral; the category colour appears only once a filter is
+// chosen (_category-labels.scss).
 $chip-rest: lighten($color-text, 22%);
 
 .btn-tag,
 .btn-star {
   @include index-chip($chip-rest);
 
-  // Resting alpha: 0.35 -> 0.25 -> 0.15, two rounds of "lighten a little"
-  // (Helen, 2026-08-03).
   .tag-shape { color: rgba($color-text, 0.15); }
 
   &:hover {
@@ -36,20 +23,13 @@ $chip-rest: lighten($color-text, 22%);
   }
 }
 
-// WAS `outline: none` PLUS THE 15% TINT ALONE, ISSUE #1086 -- on a page of
-// grey chips a background tint this faint is not a keyboard focus indicator,
-// which the design review found by eye (2026-09-15; axe-core's own ruleset
-// has no automated check for focus-ring visibility, only for things like
-// colour contrast and missing accessible names -- see the footer word below
-// and the ship icon in _includes/icons/ship.svg for what it DID catch). The
-// tint stays (it does no harm and was the previous intent), but the outline is what
-// actually says "this one has focus": 2px, offset 2px so it clears the tape
-// shape rather than sitting on top of it, and never a change to width/
-// border/padding, which is what
+// The outline is the keyboard focus indicator (#1086); the tint alone is too
+// faint to be one. Offset 2px so it clears the tape shape. Never a change to
+// width, border or padding, which
 // test_no_active_filter_button_changes_its_own_width guards.
 //
-// $color-accent is the fallback for a control with no single section of its
-// own -- .btn-clear is the global "clear all", not one filter's chip.
+// $color-accent is the fallback for a control with no section of its own:
+// .btn-clear is the global "clear all".
 .btn-tag, .btn-star, .btn-clear {
   &:focus-visible {
     outline: 2px solid $color-accent;
@@ -58,89 +38,29 @@ $chip-rest: lighten($color-text, 22%);
   }
 }
 
-// .btn-star is emitted by exactly one section (food/index.html's STAR
-// filter, btn_class="btn-star") so it can take its own section hue directly,
-// with no .category--star wrapper needed to disambiguate it -- unlike
-// .btn-tag, which MOOD, PRACTICALITIES and the ingredient search pool all
-// share, and whose section hue is set per-wrapper instead (see
-// _category-labels.scss and _search.scss).
+// .btn-star is emitted by one section only (food/index.html's STAR filter), so
+// it takes its section hue directly. .btn-tag is shared by MOOD,
+// PRACTICALITIES and the ingredient pool, and takes its hue per wrapper
+// (_category-labels.scss, _search.scss).
 .btn-star:focus-visible {
   outline-color: $color-star-root;
 }
 
-// A search-result tag where some word genuinely starts with what was typed
-// (not just a family member pulled in alongside it — see hasWordMatch in
-// filters.js).
+// A search-result chip where some word starts with what was typed (filters.js
+// adds the class). No background and no shape: emphasis cannot be carried by
+// a fill across an unbounded number of results, and a lone survivor that
+// auto-activates would visibly jump from a rectangle to a tape shape.
 //
-// Background dropped entirely 2026-08-03. It had been a flat grey rectangle
-// (rgba($color-text, 0.14)) precisely BECAUSE colouring/shaping an unbounded
-// swarm was the wrong move (see the old reasoning about NEUTRAL, NOT THE
-// SECTION'S COLOUR, preserved in git) — but that grey rectangle turned out
-// to have its own problem: the moment typing narrows the results to one
-// match, that lone survivor auto-activates and gets the full tape-shape
-// treatment, and a flat rectangle suddenly becoming a torn-tape shape read
-// as jarring (Helen: "one suddenly becomes a ta[pe] shape"). Removing the
-// background altogether removes that jump too — there's nothing for the
-// active state to visibly transform FROM. Colour still carries the
-// emphasis, just through text colour alone rather than text + fill: font
-// colour on a genuine word match, $color-ingredient-active (the dark end
-// of the green already used elsewhere for this section, not a new value).
-// Same "colour cannot carry emphasis at unbounded count" logic as before
-// still applies to giving every one of forty results its own shape or its
-// own full-strength fill — that idea was raised and set aside for the same
-// reason.
-// ONE TREATMENT, TWO SECTIONS, TWO HUES -- issue #390, 2026-08-19.
-//
-// The rule below was written for the include picker and was the only one of its
-// kind; LEAVE OUT rendered every candidate identically. Helen: "leave out match
-// highlighting should match ingredient include search, but cobalt." So the
-// treatment is a mixin taking the section's own colour, rather than a second
-// rule that happens to look like the first -- the failure mode #374 documents
-// at length for the site chrome is the same one here at smaller scale, and a
-// copy is what drifts.
-//
-// The colour is each section's own active tone, from _palette.scss's one source
-// per section: lime green for HAS TO HAVE, electric cobalt for
-// LEAVE OUT. Not a new value for either.
-//
-// The 0.5px stroke stays an absolute length rather than moving to
-// $faux-bold-stroke's em. That constant is 0.05em and would be a visible
-// weight change on the include side, which nothing asked for; MANUAL 13.4.2
-// already records that this family of strokes drifts across type sizes and
-// wants its own em constant one day. This is the third instance, noted rather
-// than fixed in a styling issue.
-// THE MIXIN IS shared/_rule.scss's `index-chip-word-match` SINCE 2026-10-11 --
-// it was `word-match-emphasis` here, and cocktails' pools include it too now.
-
+// One treatment for both pickers (#390): @mixin index-chip-word-match in
+// shared/_rule.scss, taking a colour. A stroke, because the chips are already
+// at the face's heaviest weight.
 .btn-ingredient--word-match {
-  // font-weight has nowhere left to go -- these are already font-weight:
-  // 700 (the .btn-tag base above, applied uniformly, matched or not), and
-  // Courier New only ships Regular and Bold as real static faces, so 700 is
-  // already this font's ceiling. Helen confirmed via devtools that matched
-  // and unmatched results were rendering at the same weight, which is
-  // consistent with that: there was never a separate, lighter weight on
-  // unmatched results for a match to stand out from. A stroke (her own
-  // suggestion, once weight was ruled out) is a real, working lever
-  // instead -- same trick @include punched() and .category-label's own
-  // stroke already use site-wide to read heavier than the font alone can
-  // render. Same colour as the fill, not a separate darker value, so it
-  // reads as "thicker green" rather than a mismatched outline.
   @include index-chip-word-match($color-ingredient-active);
 }
 
-// The same emphasis on the LEAVE OUT picker. It was that section's own
-// darkened cobalt until 2026-09-04, when LEAVE OUT stopped spending a hue
-// (_palette.scss); the mark now uses the SEARCH INGREDIENTS tone, exactly as
-// the cocktails site does -- Helen's ruling there: "the chip underline rule
-// should be the same between has to have and leave out". A word match is the
-// same fact in both pickers, and one colour says so.
-//
-// AND THE BASE GREY SINCE 2026-10-11. Helen: "For the food leave out search,
-// hit search results should be a normal base grey (just heavier for hits, as
-// currently), rather than taking their colour from the section." So a hit
-// here is the resting chip's own colour with the stroke: weight, no hue. The
-// same fact is still marked in both pickers (#390); only HAS TO HAVE spends
-// a colour on it. Cocktails' LEAVE OUT does the same.
+// LEAVE OUT marks a hit with weight and no hue: the resting chip's own colour
+// plus the stroke. Only HAS TO HAVE spends a colour on it. Cocktails' LEAVE
+// OUT does the same.
 .btn-exclude--word-match {
   @include index-chip-word-match($chip-rest);
 }

@@ -1,29 +1,16 @@
-{% comment %} Colour comes from the .category--* class on the wrapper below,
-   defined in _sass/_palette.scss. The custom property inherits down to the
-   label, so nothing here needs to know what colour it is.
-
-   The filter buttons carry aria-pressed so assistive tech knows they are
-   toggles. filters.js keeps the value in step with the .active class.
-
-   `include.section_id` -- #1059, 2026-09-15. A STABLE id on the section
-   itself, not derived from `group_class` here: the caller already knows which
-   section this is (it is choosing the label and the items), and a badge or
-   chip on a recipe page needs to name this same id in its own href
-   (recipe_badges.html) without re-deriving it from a class string. Optional,
-   so a filter_group.html call this issue never touched (there are none today)
-   costs nothing by omitting it.
+{% comment %} Colour comes from the .category--* class on the wrapper below; the custom
+   property inherits down to the label. The filter buttons carry aria-pressed,
+   which filters.js keeps in step with the .active class.
+   `include.section_id` (#1059) is a stable id the caller passes, optional: a
+   badge on a recipe page names the same id in its href (recipe_badges.html).
 {% endcomment %}
 <div class="category {{ include.group_class }}"{% if include.section_id %} id="{{ include.section_id }}"{% endif %}>
   <div class="category-label-row">
-    {% comment %} The label text is wrapped rather than bare because the blocky
-       rule is a per-line background on an INLINE box, and .category-label is a
-       flex item — flex items are blockified, so `display: inline` on it would
-       be ignored. The inner span is not a flex item and can stay inline.
-
-       No square brackets. They were tried and cut: light-weight punctuation
-       beside heavy stroked caps is two type systems in one line, and brackets
-       are the WORDMARK's device, where [ FOOD ] really is a variable in a slot.
-       That is why the labels in _data/food/filter_sections.yml have none. {% endcomment %}
+    {% comment %} The label text is wrapped because the blocky rule is a per-line background
+       on an inline box, and .category-label is a flex item, which is blockified.
+       The inner span is not a flex item and can stay inline. No square brackets:
+       they are the wordmark's device, so the labels in
+       _data/food/filter_sections.yml have none. {% endcomment %}
     <span class="category-label">
       <span class="category-label-text">{{ include.label }}</span>
     </span>

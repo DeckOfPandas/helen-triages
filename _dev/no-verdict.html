@@ -7,67 +7,23 @@ sitemap: false
 excerpt_separator: ""
 ---
 
-{% comment %} ─────────────────────────────────────────────────────────────────
-  DRINKS WITH NO VERDICT — internal worklist, never published. Issues #722,
-  #728.
+{% comment %} Drinks with no verdict: internal worklist, never published (#722, #728).
 
-  WHAT IT IS FOR. #728 counts "QQ ship ratings: 14" and says outright that they
-  are "not listed drink-by-drink — they are everything without one, and they are
-  hers by definition rather than a question anybody can hand her". This page is
-  the handing-over. Helen, 2026-09-05: "a quick page listing all the cocktails
-  that don't have the ship field set, and I can go through and either rate the
-  drink or mark it as unmade."
+   Every drink with no ship rating, for Helen to rate or mark unmade. Kept in
+   place because every freshly ingested drink lands with `ship: "QQ"`. The page
+   writes nothing: it reads drink files and never touches one, so it cannot
+   edit a recipe behind a proofread (#367). Answers live in localStorage under
+   one key, and the copy box is how they leave the page.
 
-  IT IS THE WORKLIST, NOT THE FRONT-END FEATURE. #722 also proposes a "chaos
-  only" filter and a ship mark reading `???`. Neither is built, and Helen ruled
-  them out for now on the day she asked for this page: "I don't actually require
-  the front-end feature."
+   "No verdict" is derived from `ship_scale`, not from a list of bad values
+   (MANUAL 9.9): the test is whether the ship value is on the scale, so `QQ`
+   and `who knows` are unrated because taxonomy.yml puts them off it. The row
+   shows which of the two a drink carries.
 
-  THE PAGE STILL WRITES NOTHING. It reads drink files and never touches one, so
-  there is no path by which it edits a recipe behind a proofread (#367). It
-  emits Helen's answers as text; a human applies them.
-
-  IT WAS WORKED ONCE ALREADY, on 2026-09-05, the day it was built — 22 drinks,
-  two ratings and twenty "never made it". That pass is what put `made_before` in
-  the schema, so this page is now reading a field it caused to exist. It is
-  deliberately left in place rather than deleted: the collection grows by
-  ingest, every fresh drink lands with `ship: "QQ"`, and this is where they
-  queue up.
-
-  "NO VERDICT" IS DERIVED FROM `ship_scale`, NOT FROM A LIST OF BAD VALUES.
-  MANUAL §9.9 is explicit about the cost of the other way: a template that
-  hardcodes its own copy of this vocabulary drifts from `taxonomy.yml` silently,
-  and the `meh` collapse nearly shipped 17 drinks sorted dead last because of
-  exactly that. So the question this page asks each drink is "is your ship value
-  ON the scale?" — which makes `QQ` and `who knows` unrated because the file
-  says they are off it, not because they are named here. A sixth rung added to
-  `ship_scale` tomorrow drops out of this list on its own, and a rung removed
-  from it appears in this list on its own. Both are the right answer.
-
-  BOTH OFF-SCALE VALUES ARE HERE, and they are not the same thing. `QQ` is the
-  transcription marker: nobody has asked. `who knows` is Helen's own recorded
-  shrug. taxonomy.yml puts both off the scale deliberately ("an absence of
-  verdict rather than a low one"), and the row shows which one each drink
-  carries so she can tell a question she has already seen from one she has not.
-
-  THE ANSWERS LIVE IN localStorage AND NOWHERE ELSE, under one key. That is a
-  deliberate limit, not a shortcut: nothing here can touch a drink file, so
-  there is no path by which this page edits a recipe behind her proofread
-  (#367). Closing the tab loses nothing; a different browser starts empty. The
-  copy box is how an answer leaves this page.
-
-  `site_key: cocktails` IS LOAD-BEARING — default.html picks the stylesheet
-  through `site.data.sites[page.site_key].css`, and a dev page without one gets
-  no stylesheet at all. _dev/glasses.html's note is the full story.
-
-  NEVER PUBLISHED IS A CONFIG FACT, NOT A PROMISE MADE HERE: the `dev`
-  collection is `output: false` in _config.yml and true only in
-  _config_local.yml, so a production build gives this page no URL and no
-  sitemap entry. It matters more here than on the swatch pages — this one
-  lists PRIVATE drink names out of `_cocktail_drafts/`, which is issue #235's
-  exact failure — but the mechanism is the same one that already holds for the
-  index, and it is the collection's, not this file's.
-────────────────────────────────────────────────────────────────────────────{% endcomment %}
+   `site_key: cocktails` is load-bearing: without it default.html links no
+   stylesheet. Never published is a config fact: the `dev` collection is
+   `output: false` in _config.yml and true only in _config_local.yml. That
+   matters here, because this page lists private drink names (#235). {% endcomment %}
 
 {% assign taxonomy = site.data.cocktails.taxonomy %}
 {% assign scale = taxonomy.ship_scale %}
@@ -78,25 +34,13 @@ excerpt_separator: ""
    how this page would SAY SO rather than hide it. {% endcomment %}
 {% assign every_drink = site.cocktail_drafts | concat: site.cocktail_recipes | sort: "title" %}
 
-{% comment %} COUNTED IN A LOOP RATHER THAN FILTERED INTO AN ARRAY, and that is
-   not a style choice. Liquid has no `push` and Jekyll's `where_exp` has no
-   negation — its conditions do `contains` but never `not contains` — so
-   "everything whose ship is NOT on the scale" cannot be expressed as a filter
-   chain. The same two guards run over the count and the list, so they cannot
-   disagree.
-
-   A DRINK SHE HAS NEVER MADE IS ANSWERED, NOT OUTSTANDING — 2026-09-05, the
-   day she worked this list. `made_before: false` IS the answer to "why is there
-   no rating here", so leaving those 20 on the page would hand her back the
-   questions she had just finished answering, which is how a worklist stops
-   being read. They are counted separately below instead.
-
-   SO THE TWO GUARDS ARE NOT REDUNDANT, THOUGH THEY LOOK IT. Every unmade drink
-   also says `who knows`, so today either test alone would produce the same
-   list. What the pair asks is the question that survives that coincidence:
-   "have you made it, and do you still owe it a verdict?" A drink she makes
-   tomorrow flips `made_before` and appears here with `who knows` intact —
-   which is exactly when it should. {% endcomment %}
+{% comment %} Counted in a loop rather than filtered into an array: Liquid has no `push`
+   and `where_exp` has no negation, so "ship not on the scale" cannot be a
+   filter chain. The same two guards run over the count and the list, so they
+   cannot disagree. A drink with `made_before: false` is answered, not
+   outstanding, and is counted separately below. The two guards are not
+   redundant: a drink she then makes flips `made_before` and appears here with
+   `who knows` intact. {% endcomment %}
 {% assign unrated_count = 0 %}
 {% assign unmade_count = 0 %}
 {% for drink in every_drink %}
@@ -150,10 +94,9 @@ excerpt_separator: ""
       {% if drink.meta.made_before == false %}{% continue %}{% endif %}
       {% if scale contains drink.meta.ship %}{% continue %}{% endif %}
 
-      {% comment %} The id keeps the folder — `to-promote/caipirinha`, not
-         `caipirinha` — because that is how #728 names a staged drink and
-         because two drinks of the same slug in different folders would
-         otherwise share a radio group. {% endcomment %}
+      {% comment %} The id keeps the folder (`to-promote/caipirinha`, not `caipirinha`): two
+         drinks of the same slug in different folders would otherwise share a radio
+         group. {% endcomment %}
       {% assign slug = drink.path | remove_first: "_cocktail_drafts/" | remove_first: "_cocktail_recipes/" | remove: ".md" %}
 
       <li class="dev-verdict-row" data-slug="{{ slug }}">
