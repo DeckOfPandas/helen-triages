@@ -795,7 +795,15 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # flip the proofreading flag". Proved with `d563db61` still in place: this test
 # named exactly those 32 files, 31 "last touched by d920e1f9" and one "by
 # 9575761d", and nothing else.
-BASELINE_COMMIT = "d920e1f9"   # `main` on 31 published recipes and the scones' yield, on Helen's grant
+#
+# AND FOR HER RULINGS ON THE EDGE CASES, THE SAME DAY. `54f4915b` appends one
+# tag to each of six published recipes she ruled on by name, from a numbered
+# table: `main` on the quiche and the moules ("These are: ..." and the rows of
+# the proposal she did not strike), `extras` on the cauliflower cheese, Mum's
+# rice salad and the two sprout salads ("These are sides: 19, 20, 22, 23, 33,
+# 37."). The grants are the two above. Proved with `d920e1f9` still in place:
+# this test named exactly those six, each "last touched by 54f4915b".
+BASELINE_COMMIT = "54f4915b"   # `main` and `extras` on six published recipes, Helen's row-by-row rulings
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
