@@ -8,7 +8,7 @@ prep_time: "30 mins"
 cook_time: "3 hrs 30 mins"
 main_ingredients: ["beef short rib", "orzo", "passata", "red wine", "halloumi", "beef stock"]
 star_ingredient: "beef"
-tags: ["one-handed food", "carbs party"]
+tags: ["one-handed food", "carbs party", "main"]
 ingredient_groups:
   - items:
     - amount: "2 kg"

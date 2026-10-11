@@ -1118,7 +1118,15 @@ cheese-tastic, dessert, drinks, fakeaway, fiddly and fun, hot snack, ice
 cream, nibbles,
 one-handed food, salad, showstopper, soup, sweet snack, virtuous.
 **Practicalities** — *what the occasion demands of you, regardless*: breakfast,
-extras, festive, freezable, make-ahead, no-cook, starter.
+extras, festive, freezable, main, make-ahead, no-cook, starter.
+
+**`main` — this could be dinner** (2026-10-11; `taxonomy.yml` has Helen's
+words). It is the one tag with a rule behind its proposal: never with
+`dessert`, `sweet snack`, `ice cream`, `drinks` or `nibbles`; a main with none
+of those and none of `bakes`, `extras`, `starter`, `breakfast`, `hot snack`;
+and a question to her with one of that second five. The collection was seeded
+by that rule the day after the tag review, and `INGEST_ONE_RECIPE.md` §4 asks
+a new recipe the same thing. Still a proposal, never a deriver.
 
 **Co-tags.** Only `ice cream → dessert, make-ahead`. Test for adding another:
 sound when a ROLLUP or a genuine AFFORDANCE, unsound when DEFINITIONAL.

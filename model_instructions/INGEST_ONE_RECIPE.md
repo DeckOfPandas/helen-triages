@@ -395,7 +395,7 @@ An undeclared tag or star ingredient fails her test suite. These lists are the
 whole vocabulary. If nothing fits, **leave the field out** rather than coin a
 term.
 
-### `tags` — pick from these 23 and no others
+### `tags` — pick from these 24 and no others
 
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
@@ -406,12 +406,19 @@ term.
 
 **Practicalities** — *what the occasion demands of you, regardless:*
 <!-- vocab:tags:practicalities start -->
-`breakfast`, `extras`, `festive`, `freezable`, `make-ahead`, `no-cook`,
+`breakfast`, `extras`, `festive`, `freezable`, `main`, `make-ahead`, `no-cook`,
 `starter`
 <!-- vocab:tags:practicalities end -->
 
 Meanings you would not guess:
 
+- **`main`** — this could be dinner. **Work it out by subtraction, last, once
+  the other tags are chosen.** With any of `dessert`, `sweet snack`,
+  `ice cream`, `drinks` or `nibbles`: never. With none of those and none of
+  `bakes`, `extras`, `starter`, `breakfast` or `hot snack`: add `main`. With
+  one of that second five, it depends on the dish (a quiche is a bake and
+  dinner; a starter for two may be a main; a sauce is not), so decide and say
+  which way you went in the hand-back list.
 - **`one-handed food`** — eat it curled on the sofa. Anything that rolls, spills
   or has to be chased is out. A soup never takes it, however thick.
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice

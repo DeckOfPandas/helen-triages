@@ -253,6 +253,33 @@ retired_star_ingredients:
 # it without them finds the savoury faff she was after.
 # -----------------------------------------------------------------------------
 #
+# `main` -- A NEW PRACTICALITY, 2026-10-11: THIS COULD BE DINNER.
+#
+# Helen: "how about I finally give in and add a 'main' tag under food
+# practicalities? Sometimes I might just want to cook dinner, scrolling
+# through a list for inspiration without having to visually filter out kale
+# crisps and various cakes." And, on being told yes: "I think deep down I
+# knew the answer. Declare it, please seed by subtraction, then as we go
+# forward from this baseline now, we derive."
+#
+# A practicality, beside `starter` and `extras`: it says which slot of a meal
+# a dish fills. None of the other 23 could say "this is dinner" except by
+# absence, which is what the seed read.
+#
+# SEEDED BY SUBTRACTION, the day after every recipe's tags had been reviewed:
+#   never a main    dessert, sweet snack, ice cream, drinks, nibbles
+#   perhaps         bakes, extras, starter, breakfast, hot snack
+#   a main          everything else
+# 213 recipes took it from the third line -- 31 published, 182 drafts. The
+# "perhaps" rows (a quiche is a bake AND dinner; a plum sauce is neither) and
+# seven the rule would have tagged but a reading doubted (a cauliflower
+# cheese, two sprout salads) were put to her row by row.
+#
+# GOING FORWARD THE SAME RULE IS THE PROPOSAL AT INGEST: a new recipe with
+# none of the ten tags above is a `main`; one with a "perhaps" tag is asked
+# about. It is still a proposal for her yes or no, like every food tag.
+# -----------------------------------------------------------------------------
+#
 # The other eight already had hers: `make-ahead` and `freezable` above,
 # `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
 # group note above, `no-cook`, `virtuous` and `ice cream` in MANUAL §7.
@@ -288,6 +315,7 @@ tags:
     - extras
     - festive
     - freezable
+    - main
     - make-ahead
     - no-cook
     - starter

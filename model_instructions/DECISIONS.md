@@ -1462,6 +1462,36 @@ unless stated.
     freezes. The checker reads the phrases that are a claim (`freezes well`,
     `frozen for up to`) and not bare `frozen`, which is peas. It found 15
     recipes that say they freeze and do not carry the tag.
+- **2026-10-11 — A `main` TAG, SEEDED BY SUBTRACTION; and three rulings from
+  the drafts review.** Helen: *"how about I finally give in and add a 'main'
+  tag under food practicalities? Sometimes I might just want to cook dinner,
+  scrolling through a list for inspiration without having to visually filter
+  out kale crisps and various cakes."* Asked for an honest answer and given
+  yes: *"I think deep down I knew the answer. Declare it, please seed by
+  subtraction, then as we go forward from this baseline now, we derive."*
+  - **Why a real tag and not a derived "dinner" button**, which was the
+    alternative put to her: a button never goes stale but is wrong at the
+    edges (a soup that is a meal, a starter that is also dinner), and the
+    edges are the dishes she would be scrolling for.
+  - **The seed**: never with `dessert`, `sweet snack`, `ice cream`, `drinks`,
+    `nibbles`; a main with none of those and none of `bakes`, `extras`,
+    `starter`, `breakfast`, `hot snack`. 213 recipes took it, 31 published.
+    152 were held for her: the second five, and seven the rule would have
+    tagged but a reading doubted (a cauliflower cheese, two sprout salads).
+    Published files keep `proofread: true` on her words: *"when we're in
+    agreement about the main tag, you can edit the live recipes to add it
+    without flipping the flag."*
+  - **"We derive" is read as: the same rule is the PROPOSAL at ingest**
+    (`INGEST_ONE_RECIPE.md` §4), not a deriver that writes tags. That reading
+    is a session's. The entry above still stands: no food tag is written
+    without her.
+  - **The review of every draft finished the same day** (eight batches). Its
+    rulings that change a written meaning: **no soup is `one-handed food`**
+    (*"soup is never called one-handed food"* — thick spoonable ones carried
+    it until then); **melting chocolate is prep**, so a fridge cake is
+    `no-cook` (she first agreed the opposite, then: *"pulsing chocolate in the
+    microwave isn't messy like cooking!"*); **a `sweet snack` is named for
+    the piece** (a brownie, a bar), and a cake cut up to serve is not one.
 
 ## §8 Ingredient search
 

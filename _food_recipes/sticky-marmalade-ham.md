@@ -8,7 +8,7 @@ prep_time: "30 mins"
 cook_time: "5 hrs 45 mins"
 main_ingredients: ["gammon", "orange marmalade", "light brown muscovado sugar", "whole cloves"]
 star_ingredient: "pork"
-tags: ["festive", "make-ahead", "showstopper"]
+tags: ["festive", "make-ahead", "showstopper", "main"]
 ingredient_groups:
   - items:
     - amount: "1"

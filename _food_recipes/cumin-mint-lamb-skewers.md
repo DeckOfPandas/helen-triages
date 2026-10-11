@@ -8,7 +8,7 @@ prep_time: "40 mins plus at least 2 hrs chilling, preferably overnight"
 cook_time: "30 mins"
 main_ingredients: ["lamb shoulder", "Greek yoghurt", "hummus", "pomegranate seeds", "garlic cloves", "coriander", "cumin", "turmeric", "fresh mint"]
 star_ingredient: "lamb"
-tags: ["fakeaway", "one-handed food"]
+tags: ["fakeaway", "one-handed food", "main"]
 ingredient_groups:
   - name: skewers
     items:
