@@ -1124,10 +1124,11 @@ extras, festive, freezable, make-ahead, no-cook, starter.
 sound when a ROLLUP or a genuine AFFORDANCE, unsound when DEFINITIONAL.
 
 **Meanings you would not guess:** `one-handed food` — eat curled on the sofa;
-anything that rolls, spills or needs chasing is out (thick spoonable soups in,
-noodle soups out). `no-cook` answers "can I put this on the table without
-cooking?" — a spice blend is uncooked and a useless answer, so it stays
-untagged. `make-ahead` — a substantial part is genuinely finished ahead; a
+anything that rolls, spills or needs chasing is out, and no soup takes it,
+however thick (2026-10-11; thick spoonable soups were in until then).
+`no-cook` answers "can I put this on the table without cooking?" — a spice
+blend is uncooked and a useless answer, so it stays untagged; melting
+chocolate is prep, so a fridge cake is `no-cook`. `make-ahead` — a substantial part is genuinely finished ahead; a
 bake that merely keeps is not, and an overnight marinade is not. `freezable`
 and `make-ahead` are separate axes. `drinks` is anything drinkable that is not
 a cocktail. `virtuous` is narrow: lean protein, or genuinely veg-forward with

@@ -413,9 +413,10 @@ term.
 Meanings you would not guess:
 
 - **`one-handed food`** — eat it curled on the sofa. Anything that rolls, spills
-  or has to be chased is out. Thick spoonable soups are in; noodle soups are not.
+  or has to be chased is out. A soup never takes it, however thick.
 - **`no-cook`** answers "can I put this on the table without cooking?" A spice
   blend is uncooked and a useless answer to that question, so it stays untagged.
+  Melting chocolate is prep, not cooking: a fridge cake is `no-cook`.
 - **`make-ahead`** — a substantial part of the dish is genuinely finished ahead.
   **A bake that merely keeps is not make-ahead** ("will keep three days in a
   tin" describes leftovers), and **an overnight marinade is not make-ahead**
