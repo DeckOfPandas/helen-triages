@@ -12,8 +12,8 @@ decision-support sites: **food** (what shall we cook) and **cocktails** (what sh
 in this order:
 
 1. **`CLAUDE.md`** at the repo root — the rules for you as an agent: git,
-   pushing, the two hooks, the token, the proofread flag, `tmp/`, and the
-   claude.ai Project. Every line was earned. Read all of it.
+   pushing, the hooks, the token, the proofread flag and `tmp/`. Read all
+   of it.
 2. **`model_instructions/MANUAL.md`** — the manual: how to run it, the repo
    shape, the schemas, the vocabularies, the tests, the traps. Read the header
    and its "read this first, by what you are here to do" guide, then the
@@ -36,9 +36,9 @@ out and back — and, depending on the task, the procedure document that owns it
 *is the answer in the source, or in Helen's head?*), `ingest-inbox.md` (when
 they arrived as GitHub issues), `tidy-drafts.md` (the mechanical half of a
 drafts pass), `model_instructions/PUBLISHING_A_COCKTAIL.md` (getting a cocktail out;
-read it before touching `_cocktail_drafts/to-promote/`),
+read it before touching `_cocktail_drafts/4-promote/`),
 `model_instructions/LETTERING.md` (punched-tape type),
-`model_instructions/CLAUDE_WEB_INGEST.md` (the claude.ai Project).
+`model_instructions/CLAUDE_WEB_INGEST.md` (a claude.ai chat).
 `INGEST_ONE_RECIPE.md` and `INGEST_ONE_COCKTAIL.md` are for a Claude with no
 repository, not for you.
 
@@ -67,8 +67,7 @@ repository, not for you.
   always.
 - **If you learn something that is not written down — a ruling, a reversal, a
   trap — add it to `DECISIONS.md` under its section, dated, and fix the manual
-  if the manual is now wrong.** If you touch `INGEST_ONE_*.md` or
-  `CLAUDE_WEB_INGEST.md` §2, tell me the Project needs re-uploading.
+  if the manual is now wrong.**
 - My hours are mine. Never suggest stopping.
 
 When you finish, tell me: what changed and where, what you verified and how,

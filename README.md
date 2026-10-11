@@ -20,7 +20,7 @@ This public repo holds both the food and cocktails sides, with private repos hol
    - Logged in as Claude, create a new personal access token scoped to "repo"
       - Classic token because fine-grained tokens can only target repos owned by their own account or an organisation
       - Blast radius is only the three repos the account was invited to
-      - Can't push any change under .github/workflows/
+      - Has the `workflow` scope too, so a workflow change arrives as an ordinary PR
       - Merging is always done by me
    - Set `AGENT_GH_TOKEN` in `.claude/settings.local.json`
       - Note that the token goes under the env key in `settings.local.json` (`run.sh` reads `['env']['AGENT_GH_TOKEN']`), and that file is gitignored
@@ -92,7 +92,7 @@ https://github.com/DeckOfPandas/helen-triages/blob/main/model_instructions/PIPEL
 There's a Mermaid diagram at the top, ooOoooh.
 
 Three ways in:
-1. claude.ai Project
+1. A claude.ai chat given three GitHub URLs
 2. An `ingest` issue on a private repo
 3. I dump files in `tmp/inbox-*` 
 

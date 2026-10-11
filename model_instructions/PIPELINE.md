@@ -7,7 +7,7 @@ to hold pieces of it still hold the DETAIL of their own step and point here for
 the journey: `.claude/commands/ingest.md` (the ingest contract, the tiers, the
 `QQ` shapes), `ingest-inbox.md` (the envelope consumer), `tidy-drafts.md` (the
 formatting pass), `PUBLISHING_A_COCKTAIL.md` (the promotion steps, the word
-"final"), `CLAUDE_WEB_INGEST.md` (the claude.ai Project). MANUAL §4.0 and §9.1.1
+"final"), `CLAUDE_WEB_INGEST.md` (a claude.ai chat). MANUAL §4.0 and §9.1.1
 say what the flags MEAN and this file does not restate them.
 
 **Two things carry state, and they answer different questions.** The
@@ -29,7 +29,7 @@ flowchart TD
     classDef live fill:#211f20,stroke:#211f20,color:#faf7f8
 
     subgraph IN["THREE DOORS IN"]
-        W["claude.ai Project<br/>photo · screenshot · paste · URL<br/>→ one envelope per recipe"]:::helen
+        W["claude.ai chat<br/>photo · screenshot · paste · URL<br/>→ one envelope per recipe"]:::helen
         I["ingest issue on the private repo<br/>(pasted from a phone)"]:::helen
         T["files in tmp/inbox-*-recipes/<br/>or pasted into a chat"]:::helen
     end
@@ -58,8 +58,8 @@ flowchart TD
     KP -->|"ready ‹slug›"| PR
     MK -->|"bin ‹slug›"| BIN["deleted"]:::machine
 
-    PR --> MP["MECHANICAL PASS (Claude)<br/>rewritten: true · suite green ·<br/>canonical bottles · one list of judgements ·<br/>then the word: final: ‹slugs›"]:::claude
-    MP --> PF["HELEN PROOFREADS THE RENDERED PAGE<br/>jekyll-local /…/drafts/4-promote/‹slug›/<br/>proofread: true"]:::helen
+    PR --> MP["MECHANICAL PASS (Claude)<br/>suite green · no gate flag touched ·<br/>canonical bottles · one list of judgements ·<br/>then the word: final: ‹slugs›"]:::claude
+    MP --> PF["HELEN PROOFREADS THE RENDERED PAGE<br/>jekyll-local /…/drafts/4-promote/‹slug›/<br/>rewritten: true (hers) · proofread: true"]:::helen
     PF --> PROMO["PROMOTE (Claude, on her word)<br/>re-check the gate · copy · byte-compare ·<br/>delete from private · baseline commit · PR"]:::claude
     PROMO --> MERGE["Helen merges → deploy"]:::helen
     MERGE --> LIVE["_food_recipes/ · _cocktail_recipes/<br/>awaiting_fix: false AND proofread: true"]:::live
@@ -87,7 +87,7 @@ Helen sends material three ways and the difference is TRANSPORT only:
 
 | door | what arrives | who runs what |
 |---|---|---|
-| the claude.ai Project (`CLAUDE_WEB_INGEST.md`) | one envelope per recipe: the complete file plus a "what I could not know" list plus a fingerprint | Helen pastes each envelope into an `ingest` issue on the matching PRIVATE repo, or into the chat |
+| a claude.ai chat (`CLAUDE_WEB_INGEST.md`) | one envelope per recipe: the complete file plus a "what I could not know" list plus a fingerprint | Helen pastes each envelope into an `ingest` issue on the matching PRIVATE repo, or into the chat |
 | an `ingest` issue on the private repo | the envelope, as text | Claude: `/ingest-inbox` — `scripts/ingest_inbox.py` parses, deduplicates by fingerprint, writes the file, never repairs |
 | files in `tmp/inbox-food-recipes/` or `tmp/inbox-cocktail-recipes/`, or a paste | photographs, screenshots, text | Claude: `/ingest` — transcribe by opening every capture |
 
@@ -216,10 +216,12 @@ this week*, which is the question the index exists for.
 `PUBLISHING_A_COCKTAIL.md` has each step in full and the word "final"; both sites
 follow it since 2026-09-14 (food used to have no written procedure for this).
 
-1. **Helen says `ready ‹slug›`** or moves the file into `4-promote/` herself.
-   The move is how she claims the words: it is the ONE place an agent may set
-   `rewritten: true`, on both sites.
-2. **Claude runs the mechanical pass**: `rewritten: true`; suite green
+1. **Helen says `ready ‹slug›`** or moves the file into `4-promote/` herself,
+   and sets `rewritten: true` herself. An agent never writes that flag, on
+   either site (#1137): on a cocktail it is a leg of the publish gate. A file
+   here that still says `rewritten: false` will not publish; say so and let
+   her flip it.
+2. **Claude runs the mechanical pass**, touching no gate flag: suite green
    (spellings the vocabularies declare, missing keys, dashes, canonical bottle
    names, list-shaped `suggestion`s, no `QQ` left anywhere); never a tagline, a
    note's words, a method's words or an amount — except a note that a later
@@ -235,7 +237,8 @@ follow it since 2026-09-14 (food used to have no written procedure for this).
    and sets `proofread: true`, or names the slugs and Claude sets it on her
    word. A small thing wrong: `awaiting_fix: true` in a commit that says what;
    fixed between them; she re-reads; flag back.
-5. **Claude promotes, on her word**: re-check the gate (both flags, explicitly,
+5. **Claude promotes, on her word**: re-check the gate (`awaiting_fix: false`
+   and `proofread: true`, and on a cocktail `rewritten: true`, explicitly,
    failing closed); copy into the public collection; byte-compare; unlink from
    the private repo and let `git add -A` record it there; move the baseline
    constant in a commit of its own and prove the guard still bites; open the

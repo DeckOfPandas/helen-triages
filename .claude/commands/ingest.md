@@ -185,9 +185,9 @@ file say the same things.
    quoting or typography needs it. It never touches a `QQ` line, so the
    transcription is safe. **A COCKTAIL ALWAYS GETS `--only order`** (#1213):
    `python3 scripts/tidy_drafts.py --site cocktails --only order --apply` puts
-   its keys in page order, moving whole blocks and editing no line. A file
-   from a Project that has not been re-uploaded arrives in the old order, and
-   `test_a_draft_drinks_keys_are_in_page_order` fails on it until this runs.
+   its keys in page order, moving whole blocks and editing no line.
+   `test_a_draft_drinks_keys_are_in_page_order` fails on a file in any other
+   order until this runs.
 5. **COCKTAILS: `python3 scripts/resolve_pours.py`**, which does tiers 1 and 2 for
    you and refuses to do tier 3. It reads every pour whose `generic` is still a
    `QQ`, looks the source's words up in `bottles.yml` and in the vocabulary, and
@@ -259,9 +259,10 @@ The order to work in:
 5. `python3 scripts/ingest_preflight.py` for a cocktail.
 6. One list to Helen. Then commit.
 
-**A red test is not always yours.** `cd _<site>_drafts && git fetch origin &&
-git rev-list --count HEAD..origin/main` first: a non-zero answer means the
-failure is probably work someone else has already done (MANUAL §9.1).
+**A red test is not always yours.** `sh scripts/git-fetch-agent.sh
+_<site>_drafts helen-triages-<site>-private main --keep-head` first: a non-zero
+"behind" count means the failure is probably work someone else has already
+done (MANUAL §9.1).
 
 ---
 
@@ -548,10 +549,12 @@ not publish: **say so and let her flip it.** That is the one thing to do about i
 
 1. **Fetch the drafts repo before anything you will act on.**
 
-       cd _cocktail_drafts && git fetch origin && git rev-list --count HEAD..origin/main
+       sh scripts/git-fetch-agent.sh _cocktail_drafts helen-triages-cocktails-private
 
-   A non-zero answer means the next red test is probably not yours. This fires
-   once per MERGE, not once per session.
+   That leaves the clone detached on the fetched `main`, ready to branch from.
+   Mid-work on a branch, add `main --keep-head`: it fetches, stays put and
+   prints how far behind you are. A non-zero count means the next red test is
+   probably not yours. This fires once per MERGE, not once per session.
 
 2. **Branch in the drafts repo**, never commit to its `main`:
 

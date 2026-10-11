@@ -23,13 +23,15 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
 
 1. **Fetch the drafts repo before anything you will act on.**
 
-       cd _<site>_drafts && git fetch origin && git rev-list --count HEAD..origin/main
+       sh scripts/git-fetch-agent.sh _<site>_drafts helen-triages-<site>-private
 
-   A non-zero answer means the next red test is probably not yours.
+   That leaves the clone detached on the fetched `main`. Mid-work on a branch,
+   add `main --keep-head`: a non-zero "behind" count means the next red test is
+   probably not yours.
 
 2. **Branch in the drafts repo**, never commit to its `main`:
 
-       git checkout -b content/inbox-<YYYY-MM-DD>
+       sh scripts/git-drafts.sh _<site>_drafts checkout -b content/inbox-<YYYY-MM-DD>
 
 3. **Dry run, and read the plan.** The default writes nothing.
 

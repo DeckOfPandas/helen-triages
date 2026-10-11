@@ -47,9 +47,7 @@ one way only. INGEST_INBOX_DESIGN.md §5 is the argument for the split.
 """
 from __future__ import annotations
 
-import os
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -681,77 +679,19 @@ def test_the_cocktail_docs_correction_map_matches_glasses_yml():
 
 
 # =============================================================================
-# THE CLAUDE.AI PROJECT THAT HOLDS THE TWO DOCUMENTS
+# THE INSTRUCTIONS A WEB CHAT IS GIVEN
 # =============================================================================
 
 WEB_DOC = DOCS / "CLAUDE_WEB_INGEST.md"
-PROJECT_FILES = [FOOD_DOC, COCKTAIL_DOC, WEB_DOC]
-_UPLOADED_RE = re.compile(r"^Uploaded to the Project as of:\s*`?([0-9a-f]{7,40}|none)`?\s*$", re.M)
 
 
-def test_the_web_project_holds_the_current_documents():
-    """The claude.ai Project is a COPY of the two standalone documents, and a
-    copy nothing re-checks goes stale the first time a vocabulary regenerates.
-
-    `CLAUDE_WEB_INGEST.md` carries one line, `Uploaded to the Project as of:
-    <sha>`, which Helen sets when she re-uploads the files. This test fails
-    whenever any of the three documents has a commit AFTER that sha -- so a
-    session that touches one of them sees, on its next run, exactly which files
-    the Project is missing and what to tell Helen. Only she can clear it,
-    because only she can upload; an agent's job is to say so in its summary
-    (CLAUDE.md), never to bump the line.
-
-    SKIPPED IN CI, DELIBERATELY. The suite gates the deploy (MANUAL §10) and a
-    stale upload to a private chat project must not block a site build. Locally
-    it is the reminder the written rule ("re-upload whenever a commit touches
-    either file") would otherwise be -- and that rule is exactly the shape this
-    repository keeps finding needs a mechanism rather than a sentence.
-    """
-    if os.environ.get("CI"):
-        pytest.skip("the Project upload is Helen's local concern, not a deploy gate")
-    text = _doc(WEB_DOC)
-    m = _UPLOADED_RE.search(text)
-    assert m, (
-        "CLAUDE_WEB_INGEST.md has no `Uploaded to the Project as of: <sha>` "
-        "line. It is the handshake between the repo and the claude.ai Project; "
-        "put it back (see that file's §1, 'Refreshing')."
-    )
-    stamp = m.group(1)
-    if stamp == "none":
-        pytest.skip(
-            "the claude.ai Project has not been set up yet (CLAUDE_WEB_INGEST.md "
-            "says `Uploaded to the Project as of: none`); once Helen has "
-            "uploaded, that line records the commit and this test starts "
-            "watching for drift"
-        )
-    rel = [str(p.relative_to(ROOT)) for p in PROJECT_FILES]
-    out = subprocess.run(
-        ["git", "log", "--oneline", f"{stamp}..HEAD", "--"] + rel,
-        capture_output=True, text=True, cwd=ROOT,
-    )
-    assert out.returncode == 0, (
-        f"`git log {stamp}..HEAD` failed -- is the stamped commit real?\n{out.stderr}"
-    )
-    newer = out.stdout.strip()
-    assert not newer, (
-        "The claude.ai Project is behind the repo. These commits touched a "
-        "document the Project holds, after the last upload:\n  "
-        + newer.replace("\n", "\n  ")
-        + "\n\nHelen: re-upload INGEST_ONE_RECIPE.md and INGEST_ONE_COCKTAIL.md "
-          "to the Project (and paste CLAUDE_WEB_INGEST.md §2 into its "
-          "instructions if that changed), then set the line in "
-          "CLAUDE_WEB_INGEST.md to the commit you uploaded from. Agents: say "
-          "this in your summary; do not bump the line yourself."
-    )
-
-
-def test_the_project_instructions_still_match_the_envelope():
+def test_the_web_instructions_still_match_the_envelope():
     """The instruction block in CLAUDE_WEB_INGEST.md §2 restates four facts
-    about the envelope that live elsewhere. If any of them moves, the browser is
-    taught the wrong shape and every envelope it produces is rejected.
+    about the envelope that live elsewhere. If any of them moves, the web chat
+    is taught the wrong shape and every envelope it produces is rejected.
     """
     text = _doc(WEB_DOC)
-    block = text.split("## 2. Project instructions", 1)[1]
+    block = text.split("## 2. Instructions for the web chat", 1)[1]
     for needle, where in [
         ("INGEST_ONE_RECIPE.md", "the food document's name"),
         ("INGEST_ONE_COCKTAIL.md", "the cocktail document's name"),
@@ -761,10 +701,10 @@ def test_the_project_instructions_still_match_the_envelope():
     ]:
         assert needle in block, (
             f"CLAUDE_WEB_INGEST.md §2 no longer says {needle!r} ({where}). The "
-            f"browser is told only what that block says."
+            f"web chat is told only what that block says."
         )
     for p in (FOOD_DOC, COCKTAIL_DOC):
         assert "## 0. How to hand this back" in _doc(p), (
-            f"{p.name} lost its §0; the Project instructions defer to it for the "
+            f"{p.name} lost its §0; the web instructions defer to it for the "
             f"envelope shape."
         )

@@ -176,9 +176,8 @@ edit files, run `bundle exec jekyll build`, run the JS tests
 (`AGENT_GH_TOKEN` still needs to be passed in -- add `-e AGENT_GH_TOKEN`
 to the `docker run` command, sourced from your host shell, so it's never
 baked into the image or written to disk in the container; `run.sh`
-already does this). `gh` itself reads `GH_TOKEN`, so feed it per-command
-as `GH_TOKEN="$AGENT_GH_TOKEN" gh ...` -- that is a variable name, not a
-second credential. Helen deleted the `GH_TOKEN` secret on 2026-09-09.
+already does this). `gh` itself reads `GH_TOKEN`; `sh scripts/gh-agent.sh
+<args>` hands it over, so no command line ever names the token.
 
 Exit the container (`exit` or Ctrl+D) whenever -- `--rm` cleans up the
 container itself, but the two named volumes (login, gem cache) survive

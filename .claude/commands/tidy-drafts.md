@@ -37,7 +37,7 @@ note that already has a label.
 ## Both collections, since 2026-09-05
 
 `python3 scripts/tidy_drafts.py` covers `_food_drafts/` **and**
-`_cocktail_drafts/`, each recursively, so `to-promote/` is in. Helen asked for
+`_cocktail_drafts/`, each recursively, so `4-promote/` is in. Helen asked for
 the widening in those words: *"Widen please — cocktail drafts passing will save
 me a lot of time."* `--site food` or `--site cocktails` does one alone; an
 absent private repo is announced and skipped, and only BOTH absent is a refusal.
@@ -271,12 +271,10 @@ six faults" cannot pass while something also happened to the other thirty lines.
    rather than skipped — a green run that examined nothing. A tidy pass touches
    many files at once, which is exactly when this matters most.
 
-9. **Push per `CLAUDE.md`, which changed on 2026-08-29 and this line did not.**
-   Pushing `main` in the two PRIVATE drafts repos is fine and needs no ask —
-   nothing there triggers a build, and a commit sitting unpushed on one disk is
-   the real risk. Everything else is unchanged: `helen-triages` itself is never
-   pushed without her explicit confirmation, and COMMITTING to `main` is still
-   forbidden in every repo, hook-enforced.
+9. **Push the branch and open the PR, per `CLAUDE.md`'s agreed workflow.** No
+   ask, in any of the three repos; a commit sitting unpushed on one disk is the
+   real risk. Committing to `main` is forbidden in every repo, and merging is
+   Helen's.
 
 ## What this does not cover
 

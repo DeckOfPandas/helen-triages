@@ -73,7 +73,7 @@ Run `ls model_instructions/` rather than trusting this list.
 | `START_A_SESSION.md` | the prompt Helen pastes to start a session; points here, at the journal and at `CLAUDE.md` |
 | `SOURCE_ATTRIBUTION_SPEC.md` | the full `source` / `source_type` contract; §4 summarises and does not repeat it |
 | `INGEST_ONE_RECIPE.md`, `INGEST_ONE_COCKTAIL.md` | for a Claude with NO repository. They stand alone because the closed vocabularies are small enough to print; every vocabulary block in them sits between `<!-- vocab:… -->` markers and is RENDERED from `_data/` by `scripts/build_ingest_vocab.py` (`--check` / `--write`), which `tests/test_standalone_docs.py` enforces. Hand-edit nothing inside a marker pair. Everything outside one is prose and must be kept in step by hand when §4, §5, §7, §9.3 or the attribution spec changes |
-| `CLAUDE_WEB_INGEST.md` | the claude.ai Project that holds those two files, and what it is told |
+| `CLAUDE_WEB_INGEST.md` | how a claude.ai chat is pointed at those two files by URL, and what it is told |
 | `INGEST_INBOX_DESIGN.md` | §6 the envelope an ingest issue carries, §8 its security argument, §9 the rulings; the rest is stubs |
 | `PIPELINE.md` | **the one map** (#1008, 2026-09-14): the three doors in, the intake pass, Helen's folders and the four words that move a file, the way out, and the way back when an agent touches a published file. Read it before any of the four procedure documents |
 | `PUBLISHING_A_COCKTAIL.md` | the six steps a cocktail goes through from Helen's rewrite to the public repo, the word "final", the one-working-copy rule -- §4 of `PIPELINE.md` is the same journey for both sites |
@@ -1908,11 +1908,10 @@ to branch or commit that did not ask Helen on every call.
 Without `dir` the wrapper pushes the CURRENT checkout's branch to whatever repo
 you named. On 2026-09-14 `sh scripts/git-push-agent.sh <branch>:<branch>
 helen-triages-cocktails-private` pushed the PUBLIC repo's branch, history and
-all, at the private drafts repo, and it was refused only because that history
-contains `.github/workflows/build-and-deploy.yml` and the token has no
-`workflow` scope. The other direction — a drafts clone's branch pushed at
-`helen-triages` — would put private cocktail names into a public repo, and nothing
-would refuse it (#235 is what that costs). The branch names were identical in
+all, at the private drafts repo. It was refused then only because the token
+had no `workflow` scope; it has that scope now, so NOTHING refuses either
+direction. A drafts clone's branch pushed at `helen-triages` would put private
+cocktail names into a public repo (#235 is what that costs). The branch names were identical in
 both repos, which is exactly the case where the mistake is silent. Nothing in
 the wrapper checks that `dir` matches `repo`; until something does, the three
 arguments together are the check.
@@ -2149,8 +2148,8 @@ bind:
   nobody shot — is flagged in the cocktail and raised as an issue, never
   reconstructed.
 
-**A photograph is not the only way in.** Helen also hands a source to the
-claude.ai Project (`CLAUDE_WEB_INGEST.md`) and pastes what comes back into an
+**A photograph is not the only way in.** Helen also hands a source to a
+claude.ai chat (`CLAUDE_WEB_INGEST.md`) and pastes what comes back into an
 `ingest` issue on the private repo; `/ingest-inbox` (§11.0.4) is the consumer,
 and it enforces the Sazerac rule mechanically by comparing a fingerprint of
 the amounts.
@@ -3726,8 +3725,7 @@ never deployed. Three things are load-bearing:
   that skip happens on every CI run, conftest prints **"Not evidence about a
   real browser"** at the end of any run where it skipped, with the launch
   error. `HT_REQUIRE_BROWSER=1` turns the skip into a failure; the workflow
-  should set it in the same edit that installs Chromium, which is Helen's
-  (an agent cannot push under `.github/workflows/`).
+  should set it in the same edit that installs Chromium.
 - **The two session builds, `site` and `prod_site`, are in `conftest.py`**,
   not `test_rendered_pages.py`, since #1200: two modules read them, and a
   session fixture imported into a second module is a second definition that

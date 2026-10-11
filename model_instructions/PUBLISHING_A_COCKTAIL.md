@@ -260,9 +260,8 @@ recipe is promotable the field went long ago. A fresh ingest still writes it, be
   `_data/cocktails/garnish.yml`.
 - The ingest rules a session with no repo can use: `INGEST_ONE_COCKTAIL.md`.
   Its vocabulary blocks are generated — `scripts/build_ingest_vocab.py --write`
-  after any ruling that changes `_data/`, never a hand edit — and the file is
-  re-uploaded to the claude.ai Project (`CLAUDE_WEB_INGEST.md`) whenever it
-  changes.
+  after any ruling that changes `_data/`, never a hand edit. A claude.ai chat
+  reads it from `main` by URL (`CLAUDE_WEB_INGEST.md`).
 - The in-repo procedure: `.claude/commands/ingest.md`.
 - The flags' meaning and the gate: MANUAL §4.0 and §9.1.1.
 - The one-working-copy rule, restated where a worktree is set up: MANUAL §9.1
