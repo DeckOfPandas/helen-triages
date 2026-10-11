@@ -140,7 +140,9 @@ stated. Italics in quotation marks are Helen's own words.
 - **2026-08-15, #204 — `/` is a bare redirect to `/food/`; there is no
   landing page.** The two-door landing page and its `root.scss` were deleted:
   a third stylesheet nobody checked, which broke at the next visit to the page
-  nobody visits. No words of Helen's were recorded.
+  nobody visits. Helen: *"No user is going to end up at the root without having
+  tried to, which would be super weird. Everyone else will come in via food or
+  drink"*.
 - **2026-08-19, #374 — one header and one footer for the whole site, literally
   the same code and assets.** Helen: *"I don't want parity between two footers
   — I want one footer for the whole site. And one header. Literally the same
@@ -186,6 +188,48 @@ stated. Italics in quotation marks are Helen's own words.
   renders them from the built site, so a changed wordmark means re-running it;
   the PNGs are committed and wear one fixed tape, because random-per-load
   (#779) is a ruling about a live page.
+- **Undated — the about link in the header is a bare `??` in the body face: no
+  circle, no border, no heading font.** Helen: *"much more minimalist... a
+  naked ? in body font and style"*. `.site-about-link` in
+  `_sass/shared/_layout.scss` is `$font-body` at weight 400, and its
+  `letter-spacing: normal` is load-bearing: the header's 0.5em tracking is
+  inherited and would pull the two marks apart. It is never spelled "about"
+  where a nav shows it.
+- **2026-08-16 — the footer is three tracks with the hearts page-centred,
+  whether one reference column renders or two.** Helen, when only food had
+  reference pages: *"if it looks really silly without cocktail ref info to
+  balance it out then we can think again"*. `.site-footer-top` is `1fr auto
+  1fr` and all three items are placed explicitly, so a lone column cannot pull
+  the centre stack sideways. Both columns render today; the grid still has to
+  hold for one.
+- **2026-08-16 — a footer link rests in the footer's own colour and takes the
+  accent on hover, focus and click.** Helen, on the resting colour: *"the
+  normal darkened magenta link colour we use across the site won't work here,
+  but I think it'll be obvious enough that those things are links."* On the
+  hover: *"Those footer links don't change on mouseover or click -- please
+  match normal page links (not the colour of the unclicked link)"*. The
+  underline says link at rest. The hover is a hue change because a lightness
+  change at 0.75rem reads as none.
+- **2026-09-07 — the footer's two bracketed site words start on the same
+  line.** Helen: *"vertically align [FOOD] and [COCKTAILS] in the footer --
+  bring [FOOD] upwards."* `.site-footer-top` is `align-items: start`, not
+  `center`: the two reference columns are different heights, so centring them
+  puts their heads on different lines.
+- **2026-09-17, #1139 — each footer column's site icon is small and inline
+  with its heading, on the outside: left of the word for food, right for
+  cocktails.** Helen: *"the footer icons look strange because food and
+  cocktails are different lengths, so reduce the icon size and bring it inline
+  with the heading, left for food and right for the cocktails."* The icon is
+  1.3em. Refined 2026-09-21 (#1177), for the stacked footer below 600px:
+  *"both food and cocktail icons should be to the left of their headings."*
+  Centred, there is no outside edge to mirror towards.
+- **Undated, #915 / #902 — the licences line sits close under the copyright
+  line, and its two sentences stack on a phone.** Helen, on the gap (#915):
+  *"to show they're one object"*. On #902: *"stack the two licences on
+  narrower screens (Code: MIT. / Recipes and writing ... etc)"*.
+  `.site-footer-license` has `$space-xxs` above it, less than the centre
+  stack's own gap, and each `.site-footer-license-line` is a block at 600px
+  and under.
 
 ## §3 The three-layer rule
 
@@ -376,6 +420,39 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   stay ordinary lines, and an amounted "plus extra for the tin" line is not
   flagged, because that hides the real amount. Every other use of the flag
   stays hers.
+- **2026-08-20, #406 — "Adapted from" prefixes published work and only
+  published work.** Helen: *"Bare labels don't need 'adapted from', only work
+  published by other people."* And why the prefix is always true for the rest:
+  *"When `rewritten == true`, we can always say 'adapted from' truthfully, so
+  that should always be there."* `publication`, `book`, `website` and `author`
+  take it; `person`, `place`, `joke` and `unknown` must not.
+  `tests/test_source_attribution.py` enforces it both ways, on drafts too.
+- **2026-08-20, #406 — a source with no date is a `website`; a `publication`
+  is a print issue and always carries one.** Helen: *"Online magazines don't
+  have a publication schedule like print ones do."* Good Food is both a
+  magazine and a site, so the date is the only thing that tells them apart: 64
+  drafts were retyped on it. A month and year or a bare year counts.
+  `magazine` is not a `source_type`; it is `publication`.
+- **2026-08-20, #406 — a source nobody has established is `source: "QQ"` with
+  `source_type: unknown`, and on a published recipe it is meant to break the
+  build.** Helen: *"QQ should be allowed, but will break a test and block
+  build, which is fine."* Not `Unknown` and not blank: the first reads as a
+  finished answer and the second as nothing to see. Each of the pair requires
+  the other. Do not guess a citation to get past it.
+- **2026-08-21, #406 — a `book` source names its author, as `<title>,
+  <author>` or `<Author>'s <title>`; there is no authorless form and no
+  exception list.** Helen: *"I can't imagine knowing the name of a book but
+  not its author."* `Adapted from Wagamama Feed Your Soul` had passed on two
+  published pages. The one book that seemed to have no author was not a book:
+  *"it's from Good Food, from a special one-off section"*, so it is a dateless
+  `website`. If a book seems authorless, check it is a book, then ask her.
+- **2026-09-11, #406 — `source: "unknown"` is the closed answer, and only
+  Helen closes it.** Helen, with the apple coleslaw ready to publish and its
+  source still `QQ`: *"Please write 'unknown' for the source on coleslaw."*
+  `source_type: unknown` takes exactly `QQ` while the question is open and
+  exactly `unknown` once she has ruled nobody will know. Lowercase, no
+  "Adapted from", and the only unknown-typed value that may reach
+  `_food_recipes/`.
 
 ### §4.0 The gate flags
 
@@ -551,6 +628,13 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   "Pool?" label (*"I consider the point settled"*); the Sazerac note no longer
   mentions the distillery (*"I deleted the controversial part!"*); the
   "Some"/"some" serves lines are kept by her word.
+- **2026-10-01 — a number and its unit take a space (`15 ml`, `400 g`), fixed
+  mechanically at ingest and by the tidy pass.** Helen: *"Please add unit
+  spaces (15ml -> 15 ml) as a mechanical fix to perform at ingest, and check
+  when I ask you to check drafts."* Measured that day: `amount:` read `40 g`
+  1,461 times across the food collections and `40g` 13 times. A temperature
+  takes none. `scripts/tidy_drafts.py` does it for drafts and
+  `INGEST_ONE_RECIPE.md` carries the rule.
 
 ## §6 `main_ingredients`
 
@@ -705,6 +789,19 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   stopword or an accent — *"No need to raise the issue as I think that
   behaviour is fine."* A typed plural's shared stem is highlighted, on her
   yes.
+- **Undated, #51 — where a family button "chicken (all)" is offered, the bare
+  "chicken" is not offered beside it.** Helen: *"I am always suspicious of
+  searches like this, so if I read 'chicken (all)' next to 'chicken' I'd look
+  at both"*. Two buttons that look like one answer make her check both, so the
+  umbrella stands alone. The drinks index took the same rule (*"I think gin
+  (all) should suppress gin"*), and an umbrella already chosen is not offered
+  again.
+- **Undated, #52 — LEAVE OUT excludes on every ingredient a recipe lists, not
+  on `main_ingredients`.** Helen: *"I have invited someone for dinner and they
+  hate peas, so I want to see all recipes that do NOT contain peas as an
+  ingredient."* A recipe with peas in it is wrong for that guest wherever the
+  peas rank, so the picker reads the derived `data-all-ingredients` on each
+  row (every `item:`), while HAS TO HAVE reads `main_ingredients`.
 
 ### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
 
@@ -912,6 +1009,19 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   index row titles.** Helen: *"render the name of the recipe in this shopping
   list feature the same way we do in the recipe list row titles, just smaller
   of course, and make them links"*. The class is `.shopping-list-recipe-link`.
+- **2026-09-07, #815 — a component recipe's `serves_estimate` takes its
+  commonest use and a note on the recipe carries the rest; no schema is
+  invented for it.** Helen: *"I have no idea how to model this. Please add all
+  this as a note on the recipe and I will tidy up later."* A ganache glazes one
+  cake, fills another, ices 12 cupcakes or makes 16 truffles; a caramel is a
+  sauce or a tin's filling. `chocolate-ganache` and `caramel` each carry one
+  number and the note. A schema for several yields is hers to ask for.
+- **Undated, #1118 — the food scaler's box is as wide as the drink scaler's:
+  two characters and the caret.** Helen: *"the same number of characters as
+  the cocktail recipe scaler (just over 2)"*. `calc(2ch + 1.6ch)` in
+  `_sass/food/_recipe-scale.scss`, the formula
+  `_sass/cocktails/_cocktail.scss` uses. The wider box on a `makes:` recipe
+  (five characters, #1286) is a session's value and nobody has ruled on it.
 
 ### §8.3 The shortlist is a view, not a facet — #918, 2026-09-10
 
@@ -937,6 +1047,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   open)"*. Read as the sent-list link, since `?shortlist=1` already opened it;
   that reading is a session's. Opening still saves nothing. (Replaces #1093's
   *"Hide it in shared view"* of 2026-09-15.)
+- **Undated, #546 — the shortlist lives in one browser on one device, one
+  list per site, with no account; that is a ceiling, not a first step.**
+  Helen: *"one browser, one device, no sharing, no account etc is truly all I
+  want -- I actively don't want more."* And it *"can be food rows or cocktail
+  cards ... doesn't need to be a mixed list on one page"*. `localStorage`, one
+  store per site. The share link of #1093 is the one thing added since, and it
+  saves nothing. Do not propose sync or sign-in.
+- **2026-10-10, #1342 — the note over a shared shortlist and its "keep these"
+  button keep the wording an agent wrote.** Helen, shown both: *"Both good,
+  thanks!"* "a shared shortlist (N)" and "keep these" are approved strings,
+  not placeholders awaiting her copy. The share panel's two lines are her own
+  words (PR #1100).
 
 ## §9 Cocktails
 
@@ -1557,11 +1679,22 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `cachaça`, `Jamaican overproof rum`; she picked from four candidates on a
   dev page. The bracket uses whichever spelling carried the query, since the
   canonical one may share no letter with what was typed (`ED3`, El Dorado 3).
+  Where the generic that matched contains every word of the card name, the
+  candidate shows the generic alone, with no bracket: it *"should be returned
+  without its display name given that name is a bit of a hack. I don't know if
+  this is a one-off or a principle."*
 - **2026-08-31 — a multi-word query matches a hidden name from its start, and
   each category gets one chip wearing the card's name.** Helen: *"I do want to
   be able to type 'el d' and see el dorado."* A bottle is a way IN to its
   category's chip, not a chip of its own. Food's umbrella suppression (#51) is
   ported.
+- **2026-08-29, #529 — one bottle written several ways is one bottle in the
+  search, and no chip has an "X or Y" shape.** Helen: *"'wray and nephew' and
+  'wray & nephew' should both collapse onto the latter"*; *"I don't want any
+  returned search chips to be an X or Y shape"*. Every alias in `bottles.yml`
+  resolves to the bottle's one declared name before the pool is built, and a
+  `suggestion` string offering alternatives is never offered as a chip. The
+  shopping list collapses spellings through the same aliases.
 
 ### §9.3.4 Units of alcohol — #297, built 2026-09-06
 
@@ -1570,7 +1703,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   etc don't matter."* So dilution, ice and mixers never enter the sum. An amount
   in dashes or drops is not counted either: asked, she chose the same rule as
   costing. The line has been on the live site since 2026-09-14 (#1001, §9.13);
-  its first, local-only form is gone.
+  its first, local-only form is gone. The count is per serving and never the
+  batch's: *"Give units per serving, not total, so scaler setting doesn't
+  matter"*. The plugin emits no data attribute for the scaler to multiply.
 - **2026-09-06, #297 — a strength belongs to a bottle and lives in `abv.yml`,
   never on a category, in `bottles.yml` or in `costs.yml`.** Helen, moving
   Smith & Cross: *"it is aged, so the unaged overproof style was never right.
@@ -1650,12 +1785,51 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   bottles, Helen: *"per drink"*. So two drinks that both use a reposado may
   choose differently, the buttons sit on the drink's own line, and choosing
   collapses that line's price range to the chosen bottle. The range stands
-  until a choice is made.
+  until a choice is made. The list names its drinks one per line, at the top:
+  *"list shopping list cocktail names at the top one per line"*.
 - **2026-09-26, #1215 — the price per glass prints two decimal places.** Helen:
   *"price per glass should have two decimal places."* Liquid cannot pad a
   number, so `_plugins/cocktail_costs.rb` writes `min_text` / `max_text` and
   the page prints those. The numeric `min` / `max` stay on the data attributes,
   because the scripts read them as numbers and a string would break them.
+- **Undated — an unqualified `London dry gin` is priced and given its strength
+  from Tanqueray alone; `blanco tequila` defaults to two bottles, and that is
+  a real range.** Helen: *"London dry gin let's say the default is
+  tanqueray"*; *"Rooster when it doesn't matter loads, Patron Silver if it
+  really does"*. `default_bottles` in `costs.yml`. The other gins stay
+  declared; they are not what the bare category costs. The tequila pair is
+  spanned for cost and averaged for strength, not narrowed to one.
+- **2026-09-06 — what a glass of each drink costs shows beside the shortlist's
+  shopping list, on local builds only, as a quiet suffix on the drink's line;
+  never on the cards.** Helen: *"the only other place I care about this number
+  is when I'm comparing drinks in a shortlist."* Asked how it should look:
+  *"quietly again"*. So it is not a column of its own. `#drink-costs` in
+  `cocktails/index.html`, behind `site.show_costs`.
+- **2026-09-07, #818 — choosing a bottle on the shopping list rewrites the
+  list line as well as the price, and the choice is not remembered across
+  loads.** Helen asked for *"shopping list cocktail names at the top one per
+  line, with radio buttons to choose from where there is a choice of declared
+  bottles for high-volume ingredients"*. Offered a choice that sticks, she
+  took *"price and the list line"*: *"choosing is how you decide what to buy,
+  so the list should say what you decided."* In memory only, on purpose.
+- **2026-09-25, #749 — the build's cost line always says how long ago the
+  prices were checked, and a test fails once that date is two years old.**
+  Helen: *"Build log line always with elapsed time, and also a test that
+  shouts after two years."* `checked:` in `costs.yml`; `checked_age` in
+  `_plugins/cocktail_costs.rb`;
+  `test_the_price_check_date_is_less_than_two_years_old`. The fix for a red
+  test is re-reading the prices, never moving the date alone.
+- **2026-09-04 — a line on the drinks shopping list gives the generic first
+  with the bottle after it in brackets, on the same line, the bottle in wicked
+  woowoo.** Helen: *"show generic first, with bottle on the same line in
+  brackets, like the recipes."* The same shape as the drink page's ingredient
+  line (#544). `.shopping-list-bottle` takes the colour because the bottle is
+  the thing chosen.
+- **2026-09-06 — the drinks shopping list shows each drink's cost, quietly, on
+  a local build only.** Helen: *"please add the cost, quietly again"*.
+  `.shopping-list-cost` is the muted grey, and `costSuffix()` in
+  `assets/js/cocktail-index.js` returns nothing unless `site.show_costs` put
+  the costs block on the page, which only `_config_local.yml` does.
 
 ### §9.3.6 How much liquid is in a drink — #1121, built 2026-09-17
 
@@ -1734,6 +1908,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the two could be different, which I well might do actually, so it's
   honest.'* Two `shapes:` lines in `methods.yml`. A figure in a method step was
   not an option: the scaler does not rewrite steps.
+- **2026-09-04 — a drink's millilitre total counts millilitres only: drops,
+  dashes and pinches are left out.** Helen: *"Ignore drops and dashes and
+  pinches in target ml."* She said it of the target-volume box, which is gone
+  (#721); the rule outlived it as `measures.non_volumetric` in
+  `ingredients.yml`, read by `_plugins/cocktail_units.rb` for the serving
+  volume and by `scale.js` for its total.
 
 ### §9.4 / §9.4.1 / §9.5 Decided, canon, settled apparatus
 
@@ -1796,7 +1976,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   that a rum? Doesn't matter, the category list should eventually contain
   everything"*. A reader who met `o.f.t.d.` among `gin` and `cognac` learned
   nothing. Cards are lowercased in CSS, not in the data or markup (#543 #553),
-  so real proper nouns keep their capitals where they are stored.
+  so real proper nouns keep their capitals where they are stored. Helen,
+  2026-08-27: *"I am unhappy about capital letters on cards. It's just very
+  untidy."*
 - **2026-09-04 — the ingredients list shows the full name; only the card shows
   the short one.** Helen: *"Let's display the full name in the ingredients list
   please, just the short name on the card."* `card_names` is read by the card
@@ -1807,8 +1989,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   largest volume first inside a tier; the recipe's order breaks ties. Helen
   chose *volume, with a per-drink override* (`card_order`) over "most
   typifying the drink", which would have been truer and needed a judgement on
-  every drink. It is a plugin, `_plugins/cocktail_card_ingredients.rb`,
-  because Liquid could not hold the sort.
+  every drink. The sort is `_plugins/cocktail_card_ingredients.rb`. The tiers
+  exist because of #691: *"e.g. seeing 'mint' first in a mastiha mojito takes
+  a minute! We already do this on the food site."* The override's first user
+  is Port Authority (2026-09-07), whose blackberries lead: *"blackberries,
+  cognac, port, cassis, lemon juice, bitters -- that's informative to a reader
+  looking at cards."*
 - **2026-09-06, #691 — sugar, water, salt and zest stay off the cards.** Helen:
   *"don't include things like sugar, water. lemon zest in the ingredient list
   that appears on cocktail cards"*. The list is `not_on_cards` in
@@ -2069,9 +2255,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-29 — LEAVE OUT carries no hue at all.** Helen: *"for food,
   avoiding can be important whereas for drinks surely less so."* Violet spent
   one revision on it and read as "suddenly busy, and jarring": colour weight
-  tracks how much of the page a thing occupies. Food gave its LEAVE OUT a
-  sixth hue; cocktails deliberately does not, and its chosen chip stays
-  colourless.
+  tracks how much of the page a thing occupies. Food followed on 2026-09-04,
+  deleting its cobalt (§13.2); neither site's LEAVE OUT spends a hue.
 - **2026-09-02, #469 — the cocktails site is black on black.** Helen: *"One
   thing for sure: we're going black on black. I wear black on black animal
   print whenever possible. I have some black on black bed linen. This is what
@@ -2114,6 +2299,27 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   ingredient rather than highlight."* 0.3em is her own number for a title hit,
   so one thickness means "this matched". Declined: a faded fill (no alpha
   keeps the letter at 4.5:1) and the word itself in the hue.
+- **Undated, #555 — each cocktails accent is named after a drink.** Helen:
+  *"Yes, this is a bit silly, but humour me."* Electric absinthe, raucous
+  reposado, wicked woowoo, ultra violette, luminous lagoon, banging bellini,
+  charismatic cosmopolitan: the `$color-*` names in
+  `_sass/cocktails/_palette.scss`. A new accent gets a drink's name, and an
+  existing one is not renamed to a description of its hue.
+- **2026-09-01 — cocktails' pink is food's hot magenta, `#FF00C8`.** Helen:
+  *"could we please use the hot magenta from the food site as our pink? I just
+  can't get away from loving it, and honestly that is my personal brand both
+  at home and at work. Extra important if we're doing an inversion that we
+  retain some sisterhood."* `$color-wicked-woowoo` and food's
+  `$color-dazzling-dragonfruit` are the same hex on purpose; do not re-solve
+  one without the other.
+- **2026-09-02 — on the drink page violette marks what is in the drink, lagoon
+  marks notes, reposado is the verdict's alone, and method numerals take no
+  hue.** Helen's brief: violette *"shows what is in something"*; notes are *"a
+  different kind of thing"*; *"the current note bar is reposado — that colour
+  is the verdict's and comes off notes entirely."* Of the method: *"No colour
+  has been claimed for [method]. Must not be absinthe, hot pink, hot
+  curaçao."* So INGREDIENTS and METHOD are absinthe over violette, NOTES and
+  its cards absinthe over lagoon, and the step numerals `$color-clear-text`.
 
 **The nav row.**
 
@@ -2200,6 +2406,118 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   section on phones only. We're not prioritising above the fold on a phone,
   and it's a little hard to work out what goes where now."* A section boundary
   had been worth exactly two chip rows. The search block keeps its extra step.
+- **2026-08-30 — a chosen ingredient chip carries an × at its right, and
+  choosing a candidate clears the search box.** Helen: *"add an x for a clear
+  button to the right of selected chips on the cocktail site, same as food."*
+  Of the clearing: *"it frees the input field for more typing, and reclaims
+  the space on the page."* The box is cleared on add only, never on remove.
+  Food took both on 2026-10-11 (#1219).
+- **2026-09-04, #546 — the shortlist ends in a shopping list that totals each
+  ingredient, with a count of glasses per drink.** Helen asked for
+  *"information at the bottom of my shortlist listing each ingredient (bottle
+  selection if I have one, generic if not) and its amount in total if I were
+  to make 1 glass of each of those drinks. Next step is a scaler."* Offered a
+  count per drink rather than one number for the list: *"Per drink quantities,
+  zomg yes please!"*
+- **2026-09-04, #546 — a shopping-list row leads with the generic as the drink
+  wrote it, with its bottles in brackets on the same line.** Helen: *"show
+  generic first, with bottle on the same line in brackets, like the
+  recipes."*; *"give the long rum names, not the shortened ones we generated
+  for cards."* `card_names` is for cards only (#501), so the list never reads
+  it: two rums that share a card name are two different things to buy.
+- **2026-09-04, #546 — a juice line on the shopping list also says how many
+  whole fruits it comes to, as a range.** Helen: *"Please give the range of
+  whole fruits needed, like this '375 ml lemon juice (X to Y lemons)'."* The
+  range comes from `juice_yields` in `ingredients.yml`, which gives each
+  fruit's yield as a range, so the count is a range too and never one figure.
+- **2026-09-05 — the "ship it?" legend sits in the row under the count, beside
+  the shortlisted button.** Helen: *"move the ship mark into the same row so
+  it's not hovering above the cards."* It had ended the count line.
+  `.drink-count-row` in `cocktails/index.html`: what you can do with the list
+  on the left, what the mark on every card means on the right.
+- **Undated, #692 — "the universe says…" deals only from the top two ship
+  rungs, `yes` and `oh gods yes`.** Helen: *"It's pretty funny when the top
+  line of the site shows a drink loudly marked 'MEH', but it's still not the
+  right call to allow it."* The rungs are named in `data-universe-rows` on the
+  section, not through `data-chaos`, so the chaos buttons never widen the
+  deal.
+- **2026-09-10, #849 — the count row has no link to the share panel; the panel
+  at the foot of the page is the one way in.** Helen, of the jump link she had
+  asked for the day before (*"just export list as JSON and a rightwards
+  arrow"*): *"the engineering is showing."* Do not add a shortcut to the panel
+  from the top of the index.
+- **2026-08-17 — the drinks index has no spirit filter and no glass filter,
+  and neither may be added.** Helen: *"I get really bored of cocktail bars
+  that have enormous bible-like menus sorted by spirit... I probably think
+  browsing by spirit is basic."* Food browses by star ingredient; cocktails
+  has no such axis. The spirit families in `_data/cocktails/ingredients.yml`
+  exist for search and exclusion only, and the glass drawings are the site's
+  identity, not a way to browse. Mood and chaos come first.
+- **2026-08-30 — cocktails takes food's heading mark, index spacing and
+  section-heading type from shared code, not from a lookalike; each site keeps
+  its own mark colours.** Helen: *"we are putting lots of effort to almost
+  exactly match styling we already have on the top of the food page. If we had
+  decided upfront to use very similar styling on the new part of the site,
+  would we have gone about it as we currently are???"* and *"spacing, section
+  heading font and sizes, spacing between sections, I think please copy
+  those"*. The panel mixins and `$rule-*` values are in
+  `_sass/shared/_rule.scss`. #486 closed with the two palettes different:
+  *"the design vision has moved on"*.
+- **2026-08-30 — the drinks index's three text inputs take food's input type
+  and food's neutral grey underline, not a section hue.** Helen: *"match the
+  fonts in cocktail's include, exclude and name search input fields to
+  food's."* and *"please update the border colours of the has to have and I
+  know what I want input fields to the same neutral grey food's input fields
+  use."* One mixin, `index-search-input-type` in `_sass/shared/_rule.scss`,
+  serves every such box on both sites.
+- **2026-09-02 — an index search input's placeholder disappears on focus, not
+  on the first keystroke.** Helen: *"the placeholder text 'ingredient name'
+  doesn't disappear when I click in the input field."* `&:focus::placeholder {
+  color: transparent; }` in `_sass/cocktails/_filters.scss`. The header's
+  search box took the same rule in #1096.
+- **2026-09-02 — a chosen filter chip keeps its chosen colours while the
+  pointer is still over it.** Helen: *"here is what a tag looks like having
+  clicked it but still mouseover... the text should be white."* The
+  lettering's colour has changed since (#1219: a chosen word is black on its
+  section's tape); the rule has not. `:not(.is-on)` on the hover selectors in
+  `_sass/cocktails/_filters.scss` is load-bearing, because `:hover` and
+  `.is-on` are equally specific.
+- **2026-09-05 — the "ship it?" legend sits in the row under the count, at its
+  right, opposite the SHORTLISTED button.** Helen: *"move the ship mark into
+  the same row so it's not hovering above the cards."* `.drink-count-legend`
+  in `.drink-count-row`: the one line on the page that says what the ship on
+  every card means, in the card's own type and muted because it is a caption.
+- **2026-09-05, #729 / #730 — the shortlisted-only control is a bordered pill
+  in the row under the count, on both indexes.** Helen: *"Style it nicely.
+  Maybe as a toggle [show shortlist]. Possibly place it below X survivors."*
+  From three treatments on the real index: *"pill same, perfect."*, and *"we
+  don't use any others so I'm concerned about overload"*. For food: *"Same
+  location, let's say same font and pill etc too because that page already
+  uses a pill as a you-can-click-me. Just take food page colours."* On is the
+  border and a weight, never a fill.
+- **2026-09-05 — on a narrow screen the universe line stacks in two stages and
+  hides nothing.** Helen: *"please allow the line to stack, first line name,
+  second line ingredients. Keep the glass and the deal again button. At even
+  smaller widths, linebreak after 'the universe says...' as well."* The first
+  stage is at `$universe-stack-width` (820px), the second at
+  `$index-stack-width` (720px).
+- **Undated — the universe line has no square brackets round the tape, and
+  ingredients that are cut off end with an ellipsis and a closing round
+  bracket.** Helen: *"my fault for how I explained, but no square brackets
+  around the tape please."* and *"where ingredients need to cut off, end with
+  an ellipsis then a closing round bracket."* The round brackets are generated
+  content in `_sass/cocktails/_universe.scss`, and the closing one is placed
+  where the ellipsis's clip cannot remove it.
+- **Undated, #541 — the drinks index has a clear-all at the top and at the
+  bottom of the filters, as food does, looking the same and in the same
+  place.** Helen: *"very much like food site"* and *"I'd expect the clear all
+  button to look the same and be in the same place too."* Both sites include
+  `index-clear-all` and `index-clear-all-bottom` from
+  `_sass/shared/_rule.scss`, so the two cannot drift.
+- **Undated, #548 — no coloured bar sits above the "N survivors" count.**
+  Helen, of the bar: *"distracting."* The count is not one of the filter
+  sections, so `.drink-count` borrows none of their colours and has no rule
+  over it.
 
 **Cards.**
 
@@ -2297,6 +2615,37 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   reserves the ship mark's width inline, after her second look: *"there is at
   least one clear line between tagline and ship mark each time."* A card grows
   only when the tagline is longer than the room.
+- **2026-08-30 — the goodness mark on a card is a ship icon and a word, pinned
+  to the card's right, not a tinted square.** Helen: *"I am worried I no
+  longer like the goodness mark. It might well not be clear enough at speed.
+  ... it will have to be the right to keep the icon in the same place on each
+  card, otherwise I think it will create visual noise."* A word cannot be
+  misread as a score out of five. `.drink-card-ship` in
+  `_sass/cocktails/_cards.scss`, the icon in reposado.
+- **2026-09-02 — a card's tape overhangs its lettering equally at both ends
+  and bleeds left, so the lettering starts on the ingredient line's edge.**
+  Helen: *"extend the tape slightly leftwards, and start the lettering
+  slightly rightwards of where it is now, then balance the tape at the right
+  edge with the same padding IF the cocktail name is short enough to all be
+  shown on one line."* `$card-tape-pad-x` and `$card-tape-bleed` are both
+  1.05em and must stay equal. Padding costs the name's width twice and the
+  bleed pays it back once, so both stay small.
+- **2026-09-02 — a card's name is 1rem.** Helen: *"let's change the cocktail
+  names to 1rem. It's a shame but I think it's the right compromise"*. It is
+  the default of `--card-name-size` in `_sass/cocktails/_cards.scss`. The
+  drink page sets the same property for its title, and `--card-name-scale` is
+  the fitting step, so the two decisions stay apart.
+- **Undated — the tape's top rim highlight is 6% white.** Helen: *"L06 is
+  looking great."* A `drop-shadow` one pixel above `.drink-card-tape-bg`, not
+  a border, so it follows the tape's torn outline; `.drink-card-name` may not
+  be `overflow: hidden`, which would crop it.
+- **Undated — every ship rung is one short word on a card, and the word has no
+  reserved width.** Helen: *"the motivation is getting everything to the same
+  number of words, i.e. one, so the cards look more stable."* and *"please
+  don't force the word to be fixed width, it looks weird. The words are
+  similar enough length that I'm hoping the slight movement in the ship icon
+  won't matter."* The card's words are `ship_card_names` in
+  `_data/cocktails/taxonomy.yml`; the drink page says the rung in full.
 
 **Chips on a card.**
 
@@ -2320,6 +2669,25 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   shown, fewest rows, the ship's row stopping short of the ship. Refined
   2026-10-07 (#1331): a row may end early. Not ruled: WHICH chip is clipped
   where one still is. (Replaces #710 on a card.)
+- **2026-09-02 — a mood chip on a card is clickable and filters the index by
+  that mood.** Helen: *"please make the chips on cocktail cards clickable,
+  with mouseover outlining the chip in pink as when they're active from
+  filtering, where clicking filters all cocktails by whatever the chip is
+  for."* The whole card became a link on 2026-09-11 (#971); the chip keeps its
+  own click (`.drink-card-mood` in `cocktail-index.js`).
+- **2026-09-10, #760 — a chip is never shown cut off mid-word by the ship
+  mark.** Helen reported chips reading "sugar crav" and "no juici". Where the
+  chips on the ship's row reach its left edge, `card-line-budget.js` sets
+  `--ship-w` on that card and the stylesheet pads the chips clear of the mark
+  there only. #1308's packing builds on it. No fuller words of hers were
+  recorded.
+- **2026-09-05 — a card's mood words rest in their section's colour and hover
+  in magenta.** Helen: *"in the name of more is more, would it be too much to
+  colour the chips in their colours to start with, not just on mouse over? I
+  really do love colour. They could then mouseover in wicked-woowoo like the
+  rest of the site."* `.drink-card-mood--mood` and `--hassle` read
+  `$color-heading-mood` and `$color-heading-hassle`, never a literal, so a
+  chip, its matched state and the heading that selects it cannot drift apart.
 
 **The drink page: head.**
 
@@ -2348,10 +2716,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   which group they came from."* A real `<a href>`, so middle-click and copy
   link work. `sort_natural`, not `sort`.
 - **2026-09-05 — SHIP IT? shows in `read it` only; `make it` hides it in the
-  stylesheet.** Helen dropped the ship mark from `make it`. Nothing leaves the
-  DOM, so print and a no-JS reader keep the fuller page. It shipped the other
-  way round for an hour on a mis-stated instruction; the stylesheet is the
-  authority.
+  stylesheet.** Helen: *"I might have said the wrong thing, but I want ship it
+  to display in read it mode, and not to display in make it mode."* Nothing
+  leaves the DOM, so print and a no-JS reader keep the fuller page. It shipped
+  the other way round for an hour on a mis-stated instruction; the stylesheet
+  is the authority.
 - **2026-09-05 — `yes²` is not renamed: the drink page says the rung's own
   words and the card keeps the compression.** A review read it as a footnote
   marker. Helen: *"that's not a footnote marker, it's a joke, a cocktail so
@@ -2408,11 +2777,56 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   challenged with measurements and confirmed); a tagline of the day on the
   index, *"Too much even for me."*; a sign-off at the foot of `make it`, *"It
   feels messy"*; a page of nothing but taglines, *"not now, not ever"*.
+- **2026-09-02 — the meta's labels are small Courier capitals in the quiet
+  grey with no emboss, and its values are body text.** Helen's brief: *"labels
+  in $font-headings 0.72rem 700 uppercase 0.1em $color-clear-text; values body
+  0.95rem."* The emboss was tried on GLASS / GARNISH / SHIP IT? and came off:
+  *"having seen it, it's too much"*.
+- **2026-09-03 — the drink page's glass is absinthe, drawn bolder, and never
+  shorter than 14rem.** Helen: *"I think our glass styling has fallen off. Can
+  the glass be bigger, bolder and absinthe?"* and *"It looks much better on
+  the narrower screen actually"*. `$glass-min` is the floor and the title
+  block's `min-height` holds the head open for it; `.glass-icon-line` is a
+  non-scaling 2px stroke. `make it` drops both floors, and the phone head
+  (#942) has its own layout.
+- **2026-09-05 — the SHIP IT? word on a drink page is set in the index card's
+  face.** Helen: *"match the font on the ship mark to what we have on the
+  cards on the index page."* The page has no `.drink-card-ship` container, so
+  `.cocktail-ship .drink-card-ship-word` restates the heading face, at 0.88rem
+  to sit with the values beside it. Without it the word inherits the body
+  sans.
+- **2026-09-05 — the mood chips in a drink page's head are larger than a
+  card's.** Helen: *"I'd like to make the chips below them a little larger,
+  which will take up more horizontal space (on the whole) and balance things
+  out a bit."* 0.85rem against the card's 0.72rem, with a line-height of their
+  own, because `$chip-line` is tuned to the card.
+- **2026-09-05 — `make it` closes the head up: the page moves up, the glass
+  shrinks to the name and what is left of the meta, and the title and the
+  head's spacing do not change.** Helen: *"'make it' should move the section
+  rule and the rest of the page upwards, whereas currently the metadata just
+  disappears leaving empty vertical space. The glass should shrink to the
+  height of the name plus remaining metadata."* Of a build that resized the
+  title (#519, #520): *"clicking MAKE IT makes the fonts and spacings go back
+  to before your last victory."* Glass and garnish get larger and heavier in
+  place (#493): *"including moving glass and garnish somewhere more
+  prominent."*
+- **2026-09-09 — a long drink title stays inside the page column: it steps
+  down, then wraps.** Helen: *"Long drink titles run off the cocktail page
+  screen."* The page's tape is the card's markup, so `card-name-fit.js` fits
+  it as it does a card. The title's size is set as `--card-name-size`, never
+  `font-size`, which would opt the page out of the fit, and the name's grid
+  item carries `min-width: 0` so there is an overflow to measure.
+- **2026-09-10, #893 — the head's chips sit `$space-xl` under the GLASS /
+  GARNISH / SHIP IT? row.** Helen: *"add a small amount of vertical space
+  between cocktail glass/garnish line and chips line."* The meta carries
+  `$space-md` and the chips the remainder, because `make it` hides the chips
+  and the meta's own margin is what holds the head open then.
 
 **The drink page: body, scaler, foot and print.**
 
 - **2026-08-27, #482 — a drink page prints as the FULL page, whichever state
-  is on screen.** One of the six open questions; the session's expectation was
+  is on screen.** Helen: *"The full page should be what ends up in the PDF and
+  prints."* One of the six open questions; the session's expectation was
   confidently the other way. `_sass/cocktails/_print.scss` restores the read
   state and hides the controls, the universe line and the related cards.
 - **2026-09-05 — INGREDIENTS, METHOD and NOTES are 1.5rem at weight 400.**
@@ -2461,6 +2875,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   doesn't go below 1."* The message was unreachable, and on a drink with a
   tiny written amount it would have fired on the drink's own recipe. Silence
   degrades correctly: the written amounts stay on screen.
+- **2026-09-04, #545 — scaling a drink never moves its ratios: the multiple is
+  snapped so every amount lands on 2.5 ml, and no amount is rounded.** Helen:
+  *"The ml only matter because I love my glasses and make drinks for them
+  precisely, but that isn't as important as not poisoning my friends."* A
+  multiple that would take a volume under 2.5 ml is refused. `scale.js`. The
+  target-volume box she asked for alongside is gone (#721); the grid is not.
 
 **Related drinks.**
 
@@ -2624,6 +3044,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   empty label printed under the literal word "note". The rule is
   `test_a_published_drink_note_is_a_filled_pair`, published drinks only, no
   exceptions.
+- **Undated — `test_ingredient_notes_are_lowercase_fragments` flags and never
+  rewrites.** Helen: *"I'll look at violations myself because I care about
+  tone of voice."* A failure is hers to read: the fix is her edit to the note,
+  or a word added to `proper_nouns` in `_data/food/taxonomy.yml`, and whether a
+  capitalised word belongs there is her call. Do not script a lowercasing
+  pass to turn it green.
 
 ## §11 Working practices
 
@@ -2716,9 +3142,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   Claude, please tidy up my drafts files."* Widened to cocktail drafts on
   2026-09-05: *"Widen please — cocktail drafts passing will save me a lot of
   time."* Quoting, `tags` and en dashes reached zero and were adopted as draft
-  rules so the backlog cannot regrow. Left out on her call: size words, and a
-  missing `awaiting_fix`, which is hers to set. It never touches a `QQ` line
-  or a drink's amount: `anitas-attitude-adjuster`'s
+  rules so the backlog cannot regrow. Left out on her call: a missing
+  `awaiting_fix`, which is hers to set. Size words joined on 2026-09-24
+  (#577), as a scripted move in its own commit (§11). It never touches a `QQ`
+  line or a drink's amount: `anitas-attitude-adjuster`'s
   `amount: "Top (30-45) ml"`, with a `QQ` note quoting it, is why.
 - **2026-09-01 — a title that differs from its slug is not a finding on a
   draft.** Helen: *"let's not run the 'title matches slug'-ish test over
@@ -2760,8 +3187,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   2026-09-08. Replaces "one agent at a time" (2026-08-16), and is what let the
   push ask go on 2026-09-07.
 - **2026-09-08, #852 — a change that spans the public repo and a drafts repo
-  merges drafts-first.** A session's call, not Helen's ruling; no hook and no
-  rule in `CLAUDE.md` holds it. Public data may name a drafts slug
+  merges drafts-first.** A session's practice, not a rule: asked on 2026-10-11
+  whether to make it one, Helen said *"it sounds like a good rule, but
+  unenforceable, if all not following it does is breaking tests, which is what
+  you'd get anyway. I've noted it for myself."* Do not ask again. Public data may name a drafts slug
   (`mood_include` in `taxonomy.yml` is keyed by slug); drafts never name
   public data. A rename's public half merged while its drafts half sat on a
   branch, and Helen's local `pytest` went red. CI cannot see it: the test
@@ -3056,6 +3485,24 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   myself, or ask Claude to. Claude never decides a file is ready to promote and
   moves it to the published repo."* `PIPELINE.md` and
   `PUBLISHING_A_COCKTAIL.md` had given opposite defaults.
+- **2026-09-03, #672 — the ingest inbox's outcome comment carries the
+  browser's hand-back list, as bullets.** Helen: *"Bullets too please."* The
+  comment `scripts/ingest_inbox.py` leaves on each envelope's issue states the
+  outcome, the notes and then every item the browser session handed back, one
+  bullet each, so the issue is where she reads what still needs her.
+- **2026-09-15, #1080 — the drafts staging folders exist in both private repos
+  even when empty.** Helen: *"These folders should always be present even if
+  they don't contain any drafts."* Git keeps no empty folder, so each holds a
+  `.gitkeep`; `tests/test_staging_folders.py` fails if one is missing. Do not
+  delete a `.gitkeep` as clutter when a folder fills, and do not remove a
+  folder because it is empty.
+- **2026-09-24, #577 — the size-word move on drafts is scripted, lands as its
+  own commit in the drafts repo, and the diff of that commit is Helen's
+  review.** Her option 1: *"script it with a hand-review of the diff, one
+  commit, before promotion"*. `/tidy-drafts`'s `size` rule moves "large" from
+  `item:` to `amount:` only where the published rule would demand it; what it
+  refuses is reported, never rewritten. (Replaces "left out on her call: size
+  words", 2026-08-29.)
 
 ### §11.2 The record of this file being wrong
 
@@ -3118,6 +3565,27 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   join INGREDIENTS and METHOD at first level then yes, okay, I hear it, please
   do it."* No new hue; it is a sentence, so it takes the last-line variant.
   Replaces the "has not earned one" argument that stood from #927.
+- **2026-08-02 — a section heading inside a recipe's long-form body is a peer
+  of INGREDIENTS, METHOD and NOTES, with the same class and mark.** Helen: *"I
+  can imagine TIPS and TROUBLESHOOTING being peer headings with INGREDIENTS
+  etc. I think that would cause the least jar."* Written in the body as `<h2
+  class="recipe-section-heading">` round a `.section-heading-text` span; a
+  bare `## Heading` gets a fallback only.
+- **2026-08-12 — the single violet rule sits exactly where the double rule's
+  lower bar sits, at the same thickness and drop.** Helen, of a thinner,
+  higher bar under the failure names in a long-form section: *"the violet
+  underline is crushing the headings"*. `overlapping-rule-single` in
+  `_sass/shared/_rule.scss` takes every number from the double mixin, so the
+  tiers are one mark and move together. On food it takes violet, never
+  magenta, which means "interactive" there.
+- **2026-08-13 — a page type changes the mark's top bar only: yellow on the
+  about page's FAQ heading, lime on a reference page, both over the shared
+  violet.** Helen, withdrawing a cobalt under-rule tried the day before: *"I
+  love colour, but even I need to accept that adding the cobalt was too
+  much."* Of lime on the reference pages: *"just for a suggestion of own
+  identity"*. Neither is a new hue: `$color-blazing-banana` and
+  `$color-wild-wasabi` are index section roots. The about page's own list
+  marks are violet.
 
 **§13.2 The colour budget.**
 
@@ -3139,6 +3607,31 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   EIGHT, sorry."* The count of devices is a decision the way the count of hues
   is. Eight flattened the metadata box, the mono source line and the tinted
   note boxes; five also dropped the highlighter, the pills and the stepper.
+- **2026-08-14, #199 — a recipe link's hover goes lighter, to the raw magenta,
+  at 3.24:1 on the page ground.** That is under the 4.5:1 body floor, and
+  Helen accepted it with the contrast figures in front of her because a hover
+  is transient; no words of hers were recorded. `$color-recipe-link-hover` is
+  `$color-dazzling-dragonfruit`, and the resting link is that hue darkened
+  12%.
+- **2026-09-04 — food's five section hues are in Helen's order: pink, lime,
+  cerulean, orange, yellow.** Her tests: pink first; no two blues adjacent;
+  star, mood and practicalities accessible and good together; not a rainbow's
+  order (*"to avoid a rainbow"*). Yellow is I KNOW WHAT I WANT: *"so the
+  aureolin is the I KNOW WHAT I WANT -- visible, important, and pleasingly a
+  yellow highlighter over the recipe titles when they're hit, which feels
+  familiar."* Cerulean and lime then swapped places. The `$color-*-root` block
+  in `_sass/food/_palette.scss`.
+- **2026-09-04 — cobalt is deleted and food's LEAVE OUT spends no hue.**
+  Helen: *"we'd drop the cobalt, and drop the colouring on 'leave out', like
+  we do for the cocktail site. It could retain its violet perhaps."*
+  `$color-exclude-active` is `$color-clear-text`, and only the violet
+  structural rule under the heading is left. Food has five section hues, not
+  six.
+- **Undated — the short-method box's tint is deliberately stronger than the
+  meta grid's and the notes' wash.** Helen: *"it's just very faint... darken
+  it enough to see easily."* `$method-short-tint-opacity` is 0.08 in
+  `_sass/food/_recipe-header.scss` against `$box-tint-opacity`'s 0.03; do not
+  fold the two into one dial.
 
 **§13.3 Spacing.**
 
@@ -3163,6 +3656,32 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   drink page's distance — but a drink page has its controls row in that
   distance and food has had nothing there since #1210. On a phone the shortlist
   pill sits `$spacing-block-gap` under the line.
+- **Undated, #94 / #55 — every method step takes the same indent whether or
+  not the recipe has method groups, with real space before a group heading and
+  after one.** Helen: *"when there are no ingredient group headings, the
+  numbering should be at the same level of indentation as when there are."*;
+  *"more space between the steps in a group and the next heading"*; and of a
+  heading and its first step (#55), *"too cramped/close"*. The numerals are
+  the plain body face, not the group headings' stroked Courier: *"confusing
+  with the group headings"*. `$method-group-step-indent` in
+  `_sass/food/_recipe-ingredients-method.scss`; the phone values are #964's.
+- **Undated, #339 — a subtitle under a peer heading sits close under it, and
+  the gap below it is `$space-xl`, not a tagline's 3rem.** Helen: *"so it
+  reads like a tagline, not the first line of content."* Of the gap below: *"I
+  think it's retaining the same gap as under the rest of the page's headings,
+  but it isn't a heading so this gap feels like a yawning chasm."*
+  `.recipe-section-subtitle` in `_sass/food/_recipe-notes-body.scss`.
+- **Undated — the short method takes the long method's vertical spacing, so
+  toggling does not move the top line.** Helen: *"clicking between the long
+  and short methods means the top line jumps around... use the same vertical
+  spacing for the short method as for the long method."* `.method-short`'s
+  negative top margin cancels its own padding; change it and `.method-full`'s
+  top margin together.
+- **Undated — an empty LEAVE OUT pill row reserves no space above the recipe
+  list.** Helen: *"reduce the amount of vertical space between LEAVE OUT and
+  the recipe list."* In `_sass/food/_search.scss` the row's space is gated on
+  the row having something in it, the same construction as the search pools'
+  `:not(:empty)` margin.
 
 **§13.4 The index page.**
 
@@ -3171,11 +3690,16 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-03 — a chosen filter does not wear the emboss.** Helen took it off:
   the punched treatment means "landmark", and a filter's colour lives in its
   shape. She asked again on 2026-08-12 (*"I could argue it either way"*) and
-  the answer stayed no.
+  the answer stayed no. Tag text carries no raised emboss at all, no shadow
+  and one flat stroke width for every category: *"we're fighting the raised
+  font in our tags, and we're losing."* (2026-08-03.)
 - **2026-08-30, #583 / #586 — the food pickers are named for what they ask and
   LEAVE OUT is always on the page.** HAS TO HAVE replaced `SEARCH MAIN
   INGREDIENTS`, which named the mechanism; LEAVE OUT came out from behind its
   reveal link, because the framing was the only thing the disclosure bought.
+  Helen (#586): *"has to have then leave out on the same line"* and *"'leave
+  out' always visible, so delete the show/hide button."* The two sit in one
+  `.search-pair`.
 - **2026-08-30, #562 — the list carries no chips about how finished an entry
   is.** Helen asked for "all metadata chips" off the rows: *"I am perfectly
   well aware of how much work I have done on each drink"*.
@@ -3262,9 +3786,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   results. (Plus super cute, as I said!)"* `pool_cap` (8) is gone from the
   data, the module and the page; one letter offers about fifty chips.
 - **2026-10-11, #1219 — choosing a HAS TO HAVE candidate on food clears the
-  search, and the chosen chip carries an ×, as on cocktails.** This trades away
-  #1092's picking several from one search; the requirement is still AND. Helen
-  asked whether it was a regression and was told it was #1092 as built.
+  search, and the chosen chip carries an ×, as on cocktails.** Helen: *"when a
+  chip in the has to have or leave out search results is selected, it
+  immediately joins others at the top and the other chips disappear. Please
+  make food do the same"*; *"I do want to have the x on the chosen has to have
+  chip, so please add it for food."* This trades away #1092's picking several
+  from one search; the requirement is still AND. Helen asked whether it was a
+  regression and was told it was #1092 as built.
 - **2026-10-11, #1219 — the index panel does not fold on a phone; do not offer
   it again on the grounds that the panel is tall.** She chose *"sections fold"*
   from four treatments on the 10th, then: *"I'm afraid I've changed my mind: I
@@ -3274,12 +3802,112 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   looking, but I don't think it's clear enough"*); on 2026-09-02 a "more" link,
   a side rail and a strip of random rows. The build is on
   `design/1219-phone-fold`.
+- **Undated — the search box's clear link is shown and hidden with
+  `visibility`, never `display`.** Helen: *"the clear link appears cutting off
+  the field rather than to the right of it"*. Toggling `display` adds and
+  removes it from the row, so the field changed width as it came and went. Its
+  space is reserved beside the field at all times. `filters.js`.
+- **Undated — a title search highlights only the part of the title that
+  matched, in the tag styling, and the hit wears one fixed shape.** Helen:
+  *"could the part of the title hit gain the orange background and scratchy,
+  capitalised lettering."* The shape is `tag-shape-6`, chosen by her on
+  2026-08-04 for being *"slightly less square at the ends."* A hit is whatever
+  is typed, so it has no stable text to hash. Its capitals survive #1219.
+- **Undated — a tag's torn-tape shape is chosen by a hash of its own text,
+  never at random or by position.** Helen: *"this will give some visual
+  stability between the filter section and the recipe list section"*. The same
+  tag wears the same shape as a filter button and as a pill on a row.
+  `pickShape` in `decorations.js`; since #1219 it serves both indexes.
+- **2026-08-03 — the tag-shape pool is the original shapes without their
+  mirror images; shape 8 is out, and `tag-shape-2` is stretched on long
+  text.** A row mixing a shape with its flip at random was, in Helen's word,
+  *"drunken"*. Shape 4 keeps its flip, being torn at both ends; shape 8 is too
+  diagonal. `tag-shape-2`'s torn corner was fine on "duck" and not on
+  "make-ahead", so text over six characters gets `tag-shape--stretch`. The
+  unused files stay in `assets/img/chrome/tag-shapes/`.
+- **Undated, #562 — a `draft` row badge is styled exactly as the `magic bag`
+  badge.** Helen: *"styled exactly as 'magic bag' which is already in place"*.
+  It is the one work-state mark #562 left on a row, and it is a badge, not a
+  filter: it writes no row attribute. `.badge-draft` and `.badge-magic-bag`
+  share their rule in `_sass/food/_badges.scss`; do not give `draft` a hue of
+  its own.
+- **2026-08-03 — badges and filter chips sit on a torn-tape SVG shape, not a
+  grey polygon.** Helen: *"the grey shapes... don't really look like anything
+  in particular... hastily broken old-fashioned highlighter tape"*. The
+  clip-path polygon survives only on the two marks that say what a row IS
+  (`_sass/food/_badges.scss`); every tag takes a `.tag-shape` slot, and since
+  #1219 the artwork is one set shared by both sites.
+- **2026-08-03 — the index search row is 620px wide, both inputs on a row end
+  at the same place, and the heading has a little space after it.** Helen, at
+  550px: *"cut off even before typing anything -- it ends at the first '.'"*;
+  *"it would look tidiest if both search input fields ended in the same
+  place"*; *"A little space after the heading"*. The clear button reserves its
+  space at all times and that comes out of the input's share:
+  `$index-search-max-width`, and `min-width: 0` on the input.
+- **2026-08-19, #389 — a chosen filter chip may not change width.** Helen:
+  *"filter tags to the right of a selected one move to the right -- they
+  should stay in the same position."* The chosen state declares nothing that
+  re-measures the button: weight 900 is safe only because Courier Prime ships
+  nothing above Bold, and the extra weight is a stroke. The same rule binds
+  every control on both sites; the cocktail scaler's step buttons cite it.
+- **2026-09-10 — filter sections on an index sit `$index-section-gap` apart,
+  more than the gap inside a section.** Helen: *"I'd like more vertical space
+  between filter sections on the index page."* One token for both sites in
+  `_sass/shared/_tokens.scss`, and deliberately not `$spacing-section-gap`: an
+  index is a control panel, where every section should be visible at a glance.
+  Phones take a further step (#999).
+- **Undated, #586 / #901 — HAS TO HAVE and LEAVE OUT sit side by side, stack
+  at 720px on both sites, and on a phone each search heading has its input
+  beneath it.** Helen: *"has to have then leave out on the same line"*. Of the
+  two sites' different stack widths, 2026-08-30: *"the cocktail version is
+  correct."* (`$index-stack-width`, one number, so no width has one site
+  stacked and the other not.) #901: *"stack HAS TO HAVE with its input field
+  below it for narrower screens, and same for LEAVE OUT and I KNOW WHAT I
+  WANT."*
+- **Undated, #403 — a LEAVE OUT candidate darkens on hover, as every other
+  section's does.** Helen: *"should darken not lighten on hover, same as for
+  the include filter"*. `$color-exclude-hover` is darker than
+  `$color-exclude-active` on purpose: a matched candidate already rests at the
+  active tone.
+- **Undated — tag-shape-2 is stretched 10% on long tags only.** Helen: *"the
+  way the shape rolls off along the top left corner bothers me every time"*,
+  then, of a larger factor, *"too square, sorry, Goldilocks"*.
+  `.tag-shape--stretch` is `scaleX(1.1)`, added by `decorations.js` above its
+  `SHORT_TEXT_MAX`. It moves the torn corner nearer the edge; more than that
+  flattens the shape.
 
 **§13.6 The recipe list.**
 
 - **2026-09-04 — a food row's title is 1.2rem / 700 (`$recipe-title-size`).**
   The design audit's critical #2: "the list reads as metadata with a name
   attached". A punched version was tried and read as "fuzzy".
+- **Undated — a row reads title, ingredient line, then pills, in that
+  order.** The ingredient line outranks the pills because, in Helen's words,
+  scanning it *"makes the decision about opening the page or not"*. It carries
+  the recall case the search exists for ("the one with the sorrel"). Do not
+  promote the pills above it to show off the colours.
+- **2026-08-26 — the index's two empty-state lines are typed as recipe row
+  titles.** Helen: *"doing the same job"*. `.recipe-list-empty` and
+  `.recipe-list-searching` take `.recipe-title-link`'s face, size and weight
+  but not its colour: a title is a link to reach for and these are not. If the
+  titles change, change these.
+- **2026-09-06, #552 — a food index row shows one line of main ingredients,
+  two on a phone, with no fade.** Helen: *"It was actually cocktail cards I
+  meant"* and *"One line of ingredients on food recipe lines please."* Three
+  lines had been built on the wrong site. The clamp's ellipsis is the only
+  sign of truncation (#346: *"main_ingredients line fades out downwards, but
+  should not do so."*).
+- **2026-09-14, #1005 — a recipe page's related recipes are drawn as index
+  recipe-list rows.** Helen: *"same design as index recipe list rows as a
+  baseline to build from"*. `.recipe-related` in
+  `_sass/food/_recipe-list.scss` reuses the row; it is the reuse the drink
+  page makes of the index card (#991).
+- **Undated — the part of a row's title that matches the name search takes the
+  section's tape fill and capitals, with almost no side padding.** Helen:
+  *"the part of the title hit gain the orange background and scratchy,
+  capitalised lettering,"* and, of the padding, *"a trailing space after the
+  active substring"*. `.title-hit` in `_sass/food/_recipe-list.scss`. It is
+  the one thing that still changes case when matched (#1219).
 
 **§13.7 Results heading.**
 
@@ -3288,17 +3916,23 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-12 — the word in "N survivors" is bare body text, no emboss.**
   Helen: *"I liked it bare"* (it had been "fixed" once by accident). Refined
   2026-09-26 from a candidates page, *"both treatments"*: the number alone
-  takes the label face (`.results-count-number`), the word stays bare.
+  takes the label face (`.results-count-number`), the word stays bare. The
+  other of the two treatments is the sticky results bar
+  (`_sass/shared/_results-bar.scss`, `assets/js/results-bar.js`), which
+  repeats the count and clear-all on both indexes once the count line has
+  scrolled away; both indexes took both the same day.
 
 **§13.8 The wordmark and the header.**
 
 - **2026-09-14, #1007 — the header's door to the other site is the bracketed
-  word and an arrow, no icon.** Helen: *"I am genuinely unsure! Could you
-  advise me? I am sure that all three are better than what we have now."* A
-  session's advice, which she accepted on the live page (*"Close this --
-  fixed"*): the row exists because family did not read a small glass as a
-  second site, so the word does the work; a tiny second tape read as a
-  mis-sized copy of the wordmark's.
+  word and an arrow, no icon.** Her complaint, the issue's own words: *"navbar
+  button for other site is too large and busy"*. Asked which of three, Helen:
+  *"I am genuinely unsure! Could you advise me? I am sure that all three are
+  better than what we have now."* A session's advice, which she accepted on
+  the live page (*"Close this -- fixed"*): the row exists because family did
+  not read a small glass as a second site, so the word does the work; a tiny
+  second tape read as a mis-sized copy of the wordmark's. The `icon` key in
+  `sites.yml` and the artwork stay; the footer columns use them (#1139).
 - **2026-09-15, #1086 — below 600px the wordmark lockup is two thirds size
   (`$wordmark-phone-scale: 0.6667`).** Helen, from three candidates: *"B: mark
   at two thirds."* The header was a quarter of a 390px screen. 600px, not
@@ -3331,6 +3965,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   allow them to stack"*. A session's reading, built without a candidates page;
   the mirrored arrow is the tentative half and is two declarations to remove.
   The stack was not built.
+- **Undated, #395 — the about page belongs to no site, and wherever its title
+  would appear it reads `??`.** Helen: *"The name of that page is '??', so
+  wherever a title would appear it should read '??'."* `site_neutral: true`
+  and `wordmark_word: "??"` in `about.html`; `_layouts/default.html` gives a
+  `site_neutral` page its own title with no site name appended, and the tape
+  reads `[ ?? ]`.
 
 **§13.9 The tape background.**
 
@@ -3366,6 +4006,27 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-26, #373 — three self-hosted faces: Selawik, Courier Prime, IBM
   Plex Mono.** With no `@font-face` every reader saw a different typeface.
   Rejected: Open Sans (*"aggressively blah"*), Cousine, Myriad Pro.
+- **Undated, #185 — long-form prose is one size throughout: no lede, and a
+  Tips label is the size of the prose under it.** Helen: *"I think this looks
+  uneven. I'd prefer the size to be the same throughout."* and, of the labels,
+  *"is the mixture of two body font sizes intentional? It feels uneven."*
+  `_sass/food/_recipe-notes-body.scss`.
+- **Undated, #185 — long-form lists take an em dash, Tips are labelled blocks,
+  and troubleshooting items are not numbered.** Helen: *"I find the bullet
+  points choppy"*; *"the numbering is definitely not working for me... the
+  whole thing just doesn't scream oh my god read me now."* The failure name
+  takes the single violet rule, one tier below a section heading.
+- **Undated — bold inside long-form body content is weight 600, not 700.**
+  Helen: *"the font still seems too heavy."* `strong { font-weight: 600; }` in
+  `_sass/food/_recipe-notes-body.scss`; the Tips labels and failure names set
+  their own weight.
+- **Undated — the short-method toggle is a button that looks exactly like a
+  body link.** Helen: *"update the short method link to the sans serif font so
+  all links feel uniform."* and *"match the look of the short method link
+  exactly to body links like Philosophy of Yum."* `%link-button` in
+  `_sass/food/_recipe-header.scss`: sans, the article's own size, the link
+  colour. Its three resets are load-bearing, because the button sits inside a
+  section heading and would inherit the emboss.
 
 **§13.10.1 `$font-label`.**
 
@@ -3399,6 +4060,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   wordmark please, thanks for letting me change my mind"*. `LETTERING.md` §11
   has all seven rulings in order. Replaces the one-rule punched effect of
   2026-08-12 and *"I like the drama"* (#477).
+- **2026-08-26 — the emboss tuning page has no heading dials.** Helen asked for
+  them to be removed so the wordmark and its controls fit on screen together;
+  no words of hers were recorded. `_dev/emboss.html` tunes the wordmark only,
+  and the headings' treatment has its own numbers. Do not add heading dials
+  back to it.
 
 **§13.11 How a design decision gets made.**
 
@@ -3434,6 +4100,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   reading of her sentence, not a pick of hers.** Say so in the PR; the first
   one she looks at and dislikes is a one-line change (#1324, #1325, #1328,
   #1354, #1357, #1358).
+- **Undated — the runner-up long-form design, C, is kept in the project so
+  Helen can change her mind.** Helen: *"C has charm though... keep the
+  stylesheet for C somewhere in the project so I can change my mind."*
+  `assets/css/longform-demo.scss` and the two pages under
+  `food/longform-demo/`, which alone load it. It overrides the live styling
+  and does not copy it, so it cannot go stale. Do not delete it as dead: the
+  file and the pages go together, when she adopts C or lets it go.
 
 **§13.12 Decisions that are Helen's: the words.**
 
@@ -3491,6 +4164,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   "copied" are fine.** Her words at the second sitting, which listed every
   visible string rather than grepping for markers. Lines only a local build
   prints are hers to fix or not.
+- **2026-09-25, #1097 — the cocktails site's description is exactly "What to
+  drink.", full stop included.** The string is Helen's own. It is
+  `description` in `_data/sites.yml`, the fallback `<meta description>` for a
+  cocktails page with no tagline of its own; food's is "What to cook, not how
+  to cook". Do not lengthen it, drop the stop, or rewrite one to match the
+  other.
 
 **§13.13 The page furniture.**
 
@@ -3560,7 +4239,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-30, #1210 — the shortlist pair sits at the right of the first line
   under the head's rule: the toggle's line on a drink page, INGREDIENTS' line
   on food.** Helen: *"on the same line as INGREDIENTS for Moules where it
-  doesn't have the read it make it toggle."* Below 600px it takes the line
+  doesn't have the read it make it toggle."* Helen: *"when the buttons stack
+  don't let them push INGREDIENTS downwards"*. Below 600px it takes the line
   above on both, so the shape never depends on width or count.
 - **2026-09-30, #1210 — the shortlist button and the see-shortlist link are
   deliberately unmatched: a bordered pill, and quiet caps `SEE SHORTLIST (N)`
@@ -3572,6 +4252,89 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `about`.** Helen: *"whether space, a dot, a short hairline, anything"*. A
   session's reading: a line, because #916 already spent the larger gap on the
   break between the two sites' columns.
+- **Undated, #387 — the back arrow returns through browser history when the
+  reader came from the index in this tab, and is a plain link otherwise.**
+  Helen wanted to go back *"so the index page has the same recipe list I left
+  it with"*, and for the arrow to work *"both directly and then opening in a
+  new tab"*. A new tab has one history entry, where `history.back()` does
+  nothing, so `back-link.js` upgrades the link only when it can prove where
+  you came from.
+- **2026-09-16, #1119 — the back arrow is the header door's arrow graphic,
+  mirrored, at 3rem.** Helen: *"back arrow and site door in navbar should use
+  the same graphic"*. One file, `icons/arrow-right.svg`, flipped with
+  `scaleX(-1)`. The size is hers, set by eye over a session's 1.6rem (#411),
+  and it does not follow the door's arrow: it is the only control on its line.
+- **2026-09-17, #1139 — each site's icon sits small and inline with its footer
+  column heading, at the left for food and the right for cocktails.** The
+  cloche and the martini glass came back to the footer in #1122: *"These used
+  to be in the navbar but didn't make the redesign, and I miss them!"* Centred
+  over the links they misled: *"the footer icons look strange because food and
+  cocktails are different lengths, so reduce the icon size and bring it inline
+  with the heading, left for food and right for the cocktails."*
+- **Undated, #902 / #915 — the footer's two licence sentences stack on
+  narrower screens and sit close under the copyright line.** Helen: *"stack
+  the two licences on narrower screens"*; and the closeness is *"to show
+  they're one object"*. One paragraph of two spans, inline at desktop width;
+  `.site-footer-license` has a class of its own so its smaller top margin
+  survives the centre column's resets.
+- **Undated, #1005 — the related recipes on a food recipe page are the index's
+  own rows.** Helen: *"same design as index recipe list rows as a baseline to
+  build from"*. `_layouts/recipe.html` writes the row out rather than
+  including it, because the index row carries filter attributes this page has
+  no use for; the shortlist button is the index's exactly. A change to the
+  index row's design is a change here too.
+- **2026-08-14 — the short-method toggle and its print "In short:" section are
+  not deployed: `short_method_enabled: false` in `_config.yml`.** Recorded as
+  Helen's decision of that date; no words of hers were kept. The flag turns
+  both off whatever `method_short` holds. The key stays required and the
+  rendering code stays, so do not delete either as dead, and do not turn the
+  flag on without her.
+- **2026-09-04 — the about page's footnote sits inside point 2, aligned with
+  the sub-list it annotates.** On the page gutter it read as a third mark;
+  Helen said that position *"puts the footnote at the same place in the
+  hierarchy as the points"* and *"its block isn't aligned with the block that
+  called it, so I have to do work to parse"*. `.about-footnote`, under the
+  a) b) list.
+- **2026-08-04, #54 — the ingredient amount's highlight and lettering cover
+  the unit as well as the number.** Helen: *"Ingredient amounts currently only
+  get bolder, no scratchy lettering. Please simply extend this formatting
+  right-wards."* The unit lives inside `.ingredient-amount-number` in
+  `_layouts/recipe.html`, so one highlighter covers "400 g" as a single run.
+- **2026-08-14, #86 — a printed page looks like the site: the marks keep their
+  colours, the page ground is not printed, and badges are the one thing taken
+  off a recipe.** Helen: *"That's simply unfair."* and *"I don't care if my
+  headings don't look like label tape."* `print-color-adjust: exact` at the
+  root keeps every mark, wash and chart bar, and the body background is
+  `transparent`, stated, so a sheet is not flooded with a tint. No smaller
+  type, no reflow, no monochrome pass, and the yellow amount highlight must
+  print (`_sass/shared/_print.scss`, `_sass/food/_print.scss`).
+- **2026-09-02 — the about page's `<hr>` is the footer's 1px dashed hairline,
+  not an empty heading mark.** Helen overrode the empty-mark divider in a
+  design review; no words of hers were recorded. `_sass/food/_about.scss`.
+- **2026-09-04 — the about page's footnote sits at the a) b) sub-list level,
+  inside the point that calls it, not in the page gutter.** Helen: *"its block
+  isn't aligned with the block that called it, so I have to do work to parse,
+  and I do not like doing work."* `.about-footnote` takes `.about-enum-sub >
+  li`'s padding so the columns match.
+- **2026-09-04, #546 — the shortlist control is grey when off and the site's
+  hot colour when on: wicked woowoo on cocktails, hot magenta on food.**
+  Helen: *"Text and active colour wicked-woowoo on cocktails because it's a
+  thing the user is choosing and that's the language"*; *"I don't have a
+  strong opinion on colour for food, so hot-magenta by default I guess!"*;
+  *"Grey for inactive"*. `$color-clear-text` at rest on both sites.
+- **2026-09-16, #1119 — the back arrow and the header's door use one arrow
+  graphic.** Helen: *"use the same graphic"*. `_includes/back-to-index.html`
+  includes `icons/arrow-right.svg`, mirrored with `scaleX(-1)`; it is a
+  drawing for the reason the door's is (#993). Its 3rem size is hers (#411)
+  and is not the door arrow's.
+- **Undated — a method step may hold a real bullet list.** Helen: *"there's a
+  note for you in the ganache about bullet points [in a method step] -- work
+  out formatting we can use on other pages."* A step's text is markdownified;
+  the nested `ul` resets `counter-increment`, or each bullet would renumber
+  every later step. Outer steps are sequential and inner bullets parallel.
+- **Undated — an FAQ question's title is held to the same measure as its
+  answer.** Helen: *"please constrain the width of FAQ item titles to the same
+  container."* `max-width: $about-measure` in `_sass/food/_about.scss`.
 
 **§13.13 The search-for-anything box.**
 
@@ -3585,12 +4348,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   never a substring, and a card label joining two ingredients ("X or Y") is not
   offered.** Helen's issues. Every typed word must begin a word of the
   candidate, in any order.
-- **2026-09-15, #1050 / #1053 — food's dropdown group headings use the five
-  `-bright` tones; group titles are Selawik 700 at 0.7rem.** Helen: *"food
-  site: group headings need to be brighter, closer to core colours although
-  obviously we're limited by contrast"*. Each `-bright` in
-  `_sass/food/_palette.scss` is its root darkened by exactly what 4.5:1 costs.
-  #1053: *"Switch font to the other one if you have to"*.
+- **2026-09-15, #1050 / #1053 — food's dropdown group titles are Selawik 700
+  at 0.7rem; the five `-bright` tones no longer colour them (#1136).** Helen:
+  *"food site: group headings need to be brighter, closer to core colours
+  although obviously we're limited by contrast"*. Each `-bright` in
+  `_sass/food/_palette.scss` is its root darkened by exactly what 4.5:1 costs;
+  nothing reads them now, because the headings are filled with the section's
+  root hue and lettered dark (§13.13). #1053: *"Switch font to the other one
+  if you have to"*.
 - **2026-09-15, #1096 — the box and the index's own searches both stay as they
   are; the box's placeholder is "I know what I want..." with no label, only
   the magnifying glass.** Helen: *"Retain current behaviour for both."* The
@@ -3616,19 +4381,32 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   live filtering from the IKWIW fields is cuter. ... I will return to this if I
   miss it."* An always-there box costs every phone a third header line. A
   closed grey glass was also tried. Read PR #1310's closing comment first.
+- **2026-09-17, #1136 — the search dropdown's group headings are filled with
+  their section's root hue and lettered dark, on both sites.** Helen:
+  *"omnisearch dropdown result group headings should take their section's
+  background colour with black lettering, like active chips on the index
+  page."*, and *"the same for the food site"*. The root hues, not the
+  `-bright` tones, which exist to be read as text on the panel; this replaces
+  #1053's `-bright` headings. `.page-search-group--<kind>
+  .page-search-group-label`.
 
 **Cocktail cards and the drink page.**
 
 - **2026-09-07, #704 — a drink's glass options read "A, B or C", no Oxford
   comma.** "coupe, or nick and nora" would suggest the last option is a pair.
 - **2026-09-07, #776 — a card's name, ingredient lines and chips share one
-  height budget.** A session's call. A wrapped name caps both others; three
-  rendered ingredient lines cap the chips. `cocktail-index.js` re-measures on
-  every pass, before `markChipRows()`, because a hidden card measures zero.
+  height budget.** Helen: *"if cocktail card ingredients have three lines,
+  only allow the chips two lines ... if the cocktail name has two lines, only
+  allow ingredients and chips two lines each"*. A wrapped name caps both
+  others; three rendered ingredient lines cap the chips. `cocktail-index.js`
+  re-measures on every pass, before `markChipRows()`, because a hidden card
+  measures zero.
 - **2026-09-07, #823 — the card's shortlist mark gets its ~44px target from an
-  absolutely positioned `::after`, not padding.** A session's call: the title's
-  reservation is computed from the button's own metrics, so padding comes off
-  the tape. It claims the card's top-right corner from the card link.
+  absolutely positioned `::after`, not padding.** Helen's report was that the
+  mark was *"a little easy to mis-click"*; the construction is a session's
+  call: the title's reservation is computed from the button's own metrics, so
+  padding comes off the tape. It claims the card's top-right corner from the
+  card link.
 - **2026-09-15, PR #1100 — a matched chip on a cocktail card is inverted and
   tight.** Helen, from underlined / inverted tight / inverted padded: *"Chip
   option B please."* Replaces #756's coloured word and underline. On 2026-10-11
@@ -3668,6 +4446,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   under SHORTLISTED, local builds only.** The labels are the issue's words. A
   session's reading: it is not filter state, so clear-all leaves it alone and
   nothing remembers it across a load.
+- **2026-09-05 — the shortlist mark and its word are centred on each other,
+  and the word does not move when `+` becomes a tick.** Helen: *"please
+  horizontally align the middle of the word shortlist with the middle of its
+  icon."* and *"when I click +shortlist, the word jumps downwards a few
+  pixels."* `✓` is not in Courier Prime, so a fallback face draws it with
+  other metrics: the mark is a flex item with a declared width and height and
+  `overflow: hidden`. Keep it a flex item.
 
 **The leopard ground (cocktails).**
 
@@ -3810,9 +4595,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   the information that nothing roasts past 75.
 - **2026-10-09 — a chart row's words belong to the bar directly under them:
   label and figure share a baseline, the bar sits tight below, and all the
-  row's air is under the bar.** Option A of three put to Helen, for a bar that
-  sat as far below its own caption as above the next row's. B would also have
-  moved the figure beside the label; C was banding. Nothing new is drawn.
+  row's air is under the bar.** Helen: *"It's not clear, even on small
+  screens, which labels belong with the data bar."* and *"the data label e.g.
+  RARE sits higher than the bar, then the numbers labelling it e.g. 48-50 sit
+  higher again."* Option A of three put to her, for a bar that sat as far
+  below its own caption as above the next row's. B would also have moved the
+  figure beside the label; C was banding. Nothing new is drawn.
 - **2026-10-09 — cut-group and fish names on the methods page wear the
   heading-tier lettering with the single violet rule.** Built on Helen's
   request for jollier headings. Her next note was *"I love most of this! It's
@@ -3840,6 +4628,64 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   min", "180°C fan for the rest"). The rows had been close because the block's
   padding lost to the list reset at (0,2,3) since round one; it is declared on
   the `li` reset now, 1.25rem above and below.
+- **Undated, #244 — the timings page answers "how long does this take",
+  not "what time do I put it in".** Helen, of the page with its "eating at"
+  and "rest" boxes and in-at/out-at lists: *"needs to be much clearer for a
+  user."* All four went. The long explanation at its foot of why some rows
+  decline went as well: *"the whole bottom section can go, other than see
+  also."*
+- **2026-08-16, #244 — `scheduleBack`, `parseClock`, `clock`, `statedRest` and
+  `restFor` in `cook-schedule.js` are kept, with their tests, though nothing
+  calls them.** Helen's explicit instruction when the page lost its "eating
+  at" box, until she decides whether working backwards from a serving time
+  comes back; no words of hers were recorded. The next editor reconnects them
+  or deletes them together with their tests, on her say.
+- **Undated — every cooking time on the timings page is rounded to the nearest
+  five minutes.** Helen: *"let's round cooking times to the nearest 5 mins to
+  preserve sanity."* `round5` in `cook-schedule.js`. A figure like "1h37m" is
+  false precision for a roast, and nobody sets a timer to it.
+- **Undated, #412 — fish and shellfish is an entry in the timings dropdown
+  that replaces the calculator with a static section.** Helen: *"Not cooked by
+  time."* It is not a protein with a rate per kilo, so picking it hides the
+  weight box and swaps `#ct-calculator` for `#ct-fish-shellfish`. The dropdown
+  itself never hides: it is the way back.
+- **Undated, #243 — the finishing temperature sits directly under the protein
+  heading.** Helen, of its earlier position: *"it makes no sense where it
+  is"*. There it reads as a property of the protein, whatever the method or
+  weight, not as something the form computed. `#ct-doneat`, with its link to
+  the full chart.
+- **Undated, #338 / #352 — a wired recipe's cook time ends "but check internal
+  temperatures chart", and the words are never "cooking temperatures".**
+  Helen, on roast beef fillet: *"About 30 mins, but check beef cooking
+  temperatures."* A clock figure qualified by doneness ("40 mins for medium
+  rare") was rejected. Then: *"It's not cooking temperatures, it's internal
+  temperatures."* The link goes to `#doneness` on the same page.
+- **Undated — every temperature chart carries its own key, declaring only the
+  marks it draws; the recipe page's doneness chart has one too.** Helen:
+  *"add the key to this chart too (it's tiny)"*. A figure carries its own
+  legend, so there is no single key at the top of the page.
+  `_includes/food/temp_key.html`, called with `rested`, `carry` and `solid`
+  per chart.
+- **Undated — the temperature axis starts at 35°C, not 40.** Helen, of tuna's
+  38°C bar: *"the bar for tuna slightly obscures the word"*. `$tc-min: 35` in
+  `_sass/food/_temperature-chart.scss` keeps that bar inside the track. Ticks,
+  gridlines and bars all come from the same arithmetic, so moving it moves
+  everything.
+- **Undated, #240 — a chart's crosslink sits in a paragraph of its own
+  directly under the heading, not on the heading's line.** Helen: *"an effort
+  to reduce visual confusion (mine)"*. `.tc-crosslink-line`. It replaced #215,
+  which had moved the link up beside the heading because *"it gets buried"*.
+- **Undated, #333 — the doneness chart's "more" link on a recipe page is
+  right-aligned.** Helen: *"so it doesn't feel too close to the footer
+  links"*. `.doneness .doneness-more` in `_sass/food/_temperature-chart.scss`.
+- **2026-08-16, #243 — on the methods page the finishing temperature sits
+  directly under the protein heading.** Helen, of where it had been: *"it
+  makes no sense where it is"*. It is a caption to the heading: the one figure
+  that holds however the thing is cooked.
+- **2026-10-10 — a method's two-line time does not push the left column's
+  content down.** Helen: *"let's not allow the extra line to push the
+  left-column content down too."* The time spans all three rows of the block's
+  grid in `_sass/food/_timings.scss`.
 
 ### The cocktails reference layer, #529
 
@@ -3974,3 +4820,24 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `.recipe-scale-step` take a 2px `outline` on `:focus-visible`, never a
   change of size or border. The ship icon's rating word beside it already
   carries the meaning.
+- **2026-09-10 — the rum page's "two things I care about" list uses the about
+  page's numbered-list styling.** Helen: *"please use the numbered list
+  styling from the start of the about page for my 'two things I care about'
+  bit."* `<ol class="ref-enum">` in `rum-categories.html`. It is one borrowed
+  list, not a licence to bring the about page's other treatments across.
+- **2026-09-10, #919 — the rum-adjacent block renders before the Flavoured
+  shelf.** Helen: *"render rum-adjacent section before flavoured"*. Which
+  shelf it precedes is `rum_adjacent_before` in `ingredients.yml`, and
+  `test_rum_adjacent_before_names_a_real_group` fails if that shelf is
+  renamed away.
+- **2026-09-10 — links in the rum page's prose look like links: absinthe and
+  underlined at rest, wicked woowoo on hover.** Helen: *"please format the
+  links as links"*, *"or something from the cocktail palette that requests
+  interaction"*. She also offered *"either as wicked woowoo and we call that a
+  site decision"*; woowoo at rest was not taken, because on that page woowoo
+  means a bottle. `.ref-prose a` in `_sass/cocktails/_reference.scss`.
+- **2026-09-10 — the rum page's "two things" list uses the about page's
+  numbered-list styling.** Helen: *"please use the numbered list styling from
+  the start of the about page for my 'two things I care about' bit."*
+  `.ref-enum` in `cocktails/reference/rum-categories.html` and
+  `_sass/cocktails/_reference.scss`.
