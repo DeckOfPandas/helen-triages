@@ -7,31 +7,17 @@ sitemap: false
 excerpt_separator: ""
 ---
 
-{% comment %} ─────────────────────────────────────────────────────────────────
-  THE TAPE WORDMARK'S BEVEL — issue #470. Local only (_dev/, output: false).
+{% comment %} The tape wordmark's bevel (#470). Local only: the `dev` collection is
+   `output: false`.
 
-  THIS TUNES THE REAL ELEMENT. .site-logo-word lives in the shared header, which
-  this page renders like any other, so the dials override the live wordmark at
-  the top of this page rather than a copy of it. That is the whole design of
-  this page and the reason it is worth having: its predecessor, a standalone
-  file in tmp/, REPRODUCED the treatment by hand and got it wrong -- stroke with
-  no shadow -- so Courier Prime looked flat and the fault looked like the
-  font's. A reproduction is a second thing to keep in step with the first.
+   This tunes the real element. .site-logo-word lives in the shared header,
+   which this page renders like any other, so the dials override the live
+   wordmark at the top of the page, not a copy of it: a reproduction is a
+   second thing to keep in step. There are no heading dials here; the heading
+   emboss values are settled, in _sass/shared/_rule.scss.
 
-  THE HEADING DIALS USED TO BE HERE TOO and were deleted on 2026-08-26, at
-  Helen's ask: with both panels stacked she could not get the wordmark and its
-  own controls on screen together, which for a look-at-it page is the only thing
-  that matters. Recover them from git history if the smaller type levels ever
-  want tuning; the heading emboss values themselves are settled and live in
-  _sass/shared/_rule.scss.
-
-  WHAT THIS IS NOT. A light copy offset up-and-left reads as a highlight only on
-  DARK type over a LIGHT ground. This is light type on black tape, where the
-  constraint inverts: there is no headroom above pure white, so the fill is
-  pulled DOWN to #e7e2e3 to make room for a brighter copy above it. That is why
-  it has four copies and its own numbers, and why shared/_layout.scss says not
-  to "fix" it with @include punched(). See MANUAL §13.4.1.
-────────────────────────────────────────────────────────────────────────────{% endcomment %}
+   This is light type on black tape, not dark type on a light ground, so it has
+   its own numbers and is not the headings' treatment. MANUAL 13.4.1. {% endcomment %}
 
 <style>
   /* Chrome for the dials only. Nothing here touches the specimens. */

@@ -1,69 +1,26 @@
-# =============================================================================
-# SITE IDENTITY — what distinguishes one site in the mono-repo from the other.
-# =============================================================================
+# Site identity: what distinguishes one site in the mono-repo from the other.
 # Selected by `site_key`, which _config.yml's `defaults:` sets per collection
-# and per page directory. _layouts/default.html reads this and nothing else to
-# decide what the page calls itself and what stylesheet it links.
+# and per page directory. Only what differs between the sites belongs here: a
+# key says where you are. What the chrome is belongs in _data/chrome.yml (#374).
 #
-# This is the VOCABULARY layer for the mono-repo, in exactly the sense the
-# three-layer rule means it: the shared layout knows a site has a wordmark and
-# a stylesheet, and knows nothing about which sites exist or what they say.
-# Adding a third site should be an edit here plus a palette, not a template
-# change.
-#
-# WHAT IS NO LONGER HERE, AND WHY -- issue #374, 2026-08-19.
-# This file used to carry the header nav and the footer decoration as per-site
-# keys: home_icon, switch_site, switch_icon, about_url, footer_svg, tape,
-# tape_count. Every one of them was configuration for chrome that is meant to
-# be IDENTICAL on both sites, which meant "the same header" was something two
-# sets of data had to agree on rather than something the code guaranteed. They
-# did not agree: cocktails had none of the nav keys, so it rendered no header
-# nav at all, and its footer was food's minus three blocks. The tape was worse
-# -- two directories holding byte-identical artwork, kept in step by hand, which
-# had already drifted for five days (issue #223).
-#
-# Helen: "I don't want parity between two footers -- I want one footer for the
-# whole site. And one header. Literally the same code and assets." So the chrome
-# no longer asks this file anything about itself. What is left below is only
-# what genuinely differs, and the test to apply before adding a key is: does
-# this say WHERE YOU ARE, or does it say WHAT THE CHROME IS? The second belongs
-# in _data/chrome.yml, or nowhere.
-#
-# KEYS
-#   title       <title>, og:site_name, the footer, and the second half of the
-#               wordmark's accessible name
-#   word        the bracketed word on the taped strip: [ FOOD ]
-#   description fallback meta description for pages with no tagline of their own
-#   css         basename under assets/css/ — `food` means assets/css/food.scss
-#   home        where this site's own nav icon links, relative to baseurl
-#   icon        basename (no .svg) of an _includes/icons/ partial standing for
-#               this site. It stood in the header nav beside the site's word
-#               until 2026-09-14 (#1007), when Helen took the icon out of the
-#               row -- the word and the arrow are the door now. The key and
-#               the artwork stay: the partial is still the site's mark, and
-#               test_site_nav_links_resolve_to_real_pages still asks for it.
-#   social_image
-#               this site's link-preview card (og:image), a PNG under
-#               assets/img/social/ rendered from the site's own wordmark by
-#               scripts/render_social_images.py -- 2026-09-15, #1086. Per site
-#               because the tape on the card says where you are. The [ ?? ]
-#               card for a page belonging to neither site is `social_image` in
-#               _config.yml.
+# Keys:
+#   title        <title>, og:site_name, the footer, and the second half of the
+#                wordmark's accessible name
+#   word         the bracketed word on the taped strip: [ FOOD ]
+#   description  fallback meta description for pages with no tagline
+#   css          basename under assets/css/: `food` means assets/css/food.scss
+#   home         where this site's own nav link goes, relative to baseurl
+#   icon         basename (no .svg) of an _includes/icons/ partial: the site's
+#                mark. Not drawn in the header nav (#1007);
+#                test_site_nav_links_resolve_to_real_pages still asks for it.
+#   social_image this site's link-preview card (og:image), a PNG under
+#                assets/img/social/ rendered by scripts/render_social_images.py
 #   reference_links
-#               reference pages belonging to THIS site, rendered in the shared
-#               footer as a column headed by this site's own bracketed word. The
-#               footer draws a column per site that has any and skips the ones
-#               that do not, so it is one footer everywhere while still saying
-#               truthfully which material is whose. Both sites have material as
-#               of 2026-09-06 -- the same absent-means-nothing convention still
-#               governs, there is simply nothing absent.
-#               An entry may carry `local_only: true`, which drops it from any
-#               build that does not declare `show_local_reference_links`, i.e.
-#               from production. It is for a page that is itself
-#               `published: false`, and the two flags must be set and cleared
-#               together: a link with no page is a 404, and a page with no link
-#               is reachable only by typing the URL.
-# =============================================================================
+#                this site's reference pages, a footer column under its word.
+#                A site with none gets no column. An entry may carry
+#                `local_only: true`, which drops it from any build without
+#                `show_local_reference_links`; set and clear it together with
+#                the page's own `published: false`.
 
 food:
   title: Helen Triages Food
@@ -73,45 +30,26 @@ food:
   home: /food/
   icon: food-cloche-heart
   social_image: /assets/img/social/food.png
-  # `search_placeholder` STOOD HERE FROM 2026-09-14 TO 2026-09-15 (#1024), the
-  # index's own "recipe name..." repeated in the furniture line's box so the
-  # two boxes read as one control. #1050 made that box a search for anything,
-  # whose placeholder says the same words on both sites -- so it no longer says
-  # where you are, which is this file's test for a key, and it moved into
-  # _includes/back-to-index.html as a literal.
   reference_links:
     - text: internal temperatures
       url: /food/reference/internal-temperatures/
-    # "methods and times", not "times and methods" -- issue #385, 2026-08-19,
-    # in the same pass that renamed the page to cooking-methods-and-timings.
-    # The wording follows the page rather than the other way round.
+    # "methods and times": the wording follows the page's name (#385).
     - text: methods and times
       url: /food/reference/cooking-methods-and-timings/
 
 cocktails:
   title: Helen Triages Cocktails
   word: COCKTAILS
-  # "What to drink." -- Helen's #1097 ruling, 2026-09-25, full stop included.
-  # Read by the visually-hidden h1 on cocktails/index.html and by
-  # _layouts/default.html as the fallback <meta description> / og:description
-  # for any cocktails page with no tagline of its own.
+  # Exactly this, full stop included (#1097). Also the fallback
+  # <meta description> for a cocktails page with no tagline of its own.
   description: What to drink.
   css: cocktails
   home: /cocktails/
   icon: glass-martini
   social_image: /assets/img/social/cocktails.png
-  # THE DAY ARRIVED, 2026-09-06, issue #529 -- and it cost no template change,
-  # which is what the note that used to sit here predicted. The footer's loop
-  # already asked every site rather than food; this key is the whole of it, and
-  # the [ COCKTAILS ] column now draws beside [ FOOD ] on every page of both
-  # sites.
   reference_links:
-    # SHIPPED 2026-09-11, issue #980: "let's get the rum page ready for
-    # publication then publish it!" The `local_only: true` flag that used to sit
-    # on this entry, and the `published: false` on the page itself, were deleted
-    # in the same commit -- they were always halves of one switch.
     - text: rum categories
       url: /cocktails/reference/rum-categories/
-    # #295, 2026-09-29: what each glass type holds, from #1238's survey.
+    # What each glass type holds (#295).
     - text: glasses
       url: /cocktails/reference/glasses/

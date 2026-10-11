@@ -1,36 +1,13 @@
-# Dependabot, added 2026-09-28 for #1203. Before this, `.github/` held only
-# `workflows/`, so nothing noticed a dependency going stale: `actions/checkout@v4`
-# and friends would sit on a major until somebody happened to look.
+# Dependabot (#1203). Monthly and grouped, with `open-pull-requests-limit: 3`
+# per ecosystem: every PR it opens is Helen's to review and merge, and a
+# monthly batch is one she can sit down with.
 #
-# MONTHLY, NOT WEEKLY, AND THAT IS THE WHOLE DESIGN. CLAUDE.md's hardest rule
-# about this repository's GitHub account is "NEVER CREATE ISSUES OR PRs IN A
-# BURST" -- twenty issues and two PRs in under an hour got the agent account
-# flagged as spam on 2026-09-14 and GitHub hid everything it had ever written.
-# Dependabot opens PRs as its own app rather than as that account, so it is not
-# at risk itself and cannot put the account at risk. But a weekly schedule across
-# three ecosystems is a steady stream of PRs for Helen to review, and she is the
-# only person who can merge one. Monthly, grouped, is a batch she can sit down
-# with.
-#
-# `open-pull-requests-limit: 3` per ecosystem for the same reason: a cap that
-# keeps the PR list legible is worth more than complete coverage of every bump.
-#
-# THE WORKFLOW FILE IS HELEN'S TO MERGE, AND SO IS EVERY PR THIS OPENS. A
-# github-actions bump edits `.github/workflows/`, which the agent account cannot
-# push to at all (its token is classic `repo`, without `workflow` scope). That is
-# fine and is arguably the point: these PRs are reviewed by a person.
-#
-# A BUMP THAT TOUCHES THE TEST RUNNER NEEDS THE IMAGE REBUILT. `requirements-test.txt`
-# pins pytest, PyYAML and playwright exactly, and `.devcontainer/Dockerfile`
-# repeats those pins by hand because its build context cannot reach the file.
-# `tests/test_devcontainer_pins.py` fails if a pip bump lands in one and not the
-# other -- so a Dependabot PR here goes red until the Dockerfile is edited to
-# match and the image rebuilt. That red is the reminder, and it is deliberate.
+# A pip bump needs the devcontainer image rebuilt: requirements-test.txt pins
+# pytest, PyYAML and playwright exactly, .devcontainer/Dockerfile repeats the
+# pins by hand, and tests/test_devcontainer_pins.py fails when they differ.
 version: 2
 updates:
-  # Ruby: the site itself. A Jekyll or plugin bump changes what gets built, so
-  # these matter most and are the ones the suite actually exercises -- the test
-  # job runs two real `jekyll build`s.
+  # Ruby: the site itself. A Jekyll or plugin bump changes what gets built.
   - package-ecosystem: "bundler"
     directory: "/"
     schedule:
@@ -50,35 +27,15 @@ updates:
       pip:
         patterns: ["*"]
     ignore:
-      # PLAYWRIGHT MOVES BY HAND, AS A SET OF FOUR. Learned within a day of
-      # adding this file: Dependabot's very first pip PR (#1233) bumped
-      # `playwright` 1.47.0 -> 1.63.0 in requirements-test.txt and nothing else,
-      # because nothing else is visible to it.
-      #
-      # The number lives in FOUR places -- requirements-test.txt, both
-      # .devcontainer/Dockerfile lines (the npm install and the pip install),
-      # and scripts/browser/install.sh -- and a bot can only ever move the one.
-      # tests/test_browser_harness.py and tests/test_devcontainer_pins.py both
-      # fail on the mismatch, which is correct and was measured: simulating
-      # #1233 turned the suite red. With no `pull_request` CI at the time
-      # (#1195), that red would have landed on `main` rather than on the PR --
-      # a deploy outage, from a dependency bump nobody needed.
-      #
-      # It also needs a devcontainer image rebuild to take effect, which no PR
-      # can perform. So this is not a dependency that can be updated by a
-      # proposal; it is one that is updated by a person doing four edits, a
-      # rebuild and a screenshot. Bumping it is a small deliberate job -- see
-      # the 2026-09-28 move to 1.63.0 for the shape, including re-running
-      # `sh scripts/browser/install.sh` and `shoot.sh` to prove the harness
-      # still drives the new Chromium.
-      #
-      # Ignored outright rather than by update-type: playwright's "minor" is
-      # effectively its major, and there is no patch stream worth taking on its
-      # own.
+      # Playwright moves by hand. Its version is written in
+      # requirements-test.txt, .devcontainer/Dockerfile and
+      # scripts/browser/install.sh, and Dependabot can move only the first;
+      # tests/test_browser_harness.py and tests/test_devcontainer_pins.py fail
+      # on a mismatch (#1233). It also needs an image rebuild, which no PR can
+      # perform.
       - dependency-name: "playwright"
 
-  # GitHub Actions: the thing that had no watcher at all, and the reason this
-  # file exists. A pinned-to-major action goes stale silently.
+  # GitHub Actions: a pinned-to-major action goes stale silently.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

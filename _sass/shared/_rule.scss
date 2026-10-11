@@ -1,182 +1,39 @@
-// =============================================================================
-// PUNCHED TAPE — letters that sit slightly proud of the surface
-// =============================================================================
-// Moved here from food/_rule.scss on 2026-08-02 (unchanged, just moved) so the
-// shared header wordmark can use it — HELEN TRIAGES and the bracketed site
-// word both carry it now, on both sites. A mixin is only visible to partials
-// imported AFTER the one that defines it, and shared/_layout.scss (where the
-// wordmark lives) is imported by both food.scss and cocktails.scss BEFORE
-// either site's own partials — so the mixin had to move to something both
-// import that early, not stay food-only. It depends only on $color-bg and
-// $color-text, which the palette CONTRACT guarantees every site defines
-// (MANUAL §2.3), so nothing about it actually assumed food to begin with.
+// SHARED RULE: the punched-tape lettering, the blocky rule under headings, and
+// the mixins both indexes' filter panels are built from. Variables and mixins,
+// plus one `:root` block. Imported after the palette and shared/tokens, and
+// before shared/base and shared/layout, which both @include lettering().
 //
-// Helen's device, and the instinct is right: a label-maker letter reads as
-// raised because it catches light on one edge and drops a shadow on the
-// other.
-//
-// THE MECHANISM MATTERS, THOUGH, AND IT IS NOT THE STROKE. `-webkit-text-stroke`
-// is identical on every side of the glyph, and a uniform outline cannot say
-// which way the light is coming from. A slightly lighter stroke gives a soft
-// EDGE, which reads as "detached from the background" — genuinely nice — but
-// never as "raised", because there is no direction in it. Depth is a claim
-// about a light source.
-//
-// `text-shadow` can make that claim: two offset copies of the glyph, a light one
-// up-and-left where the light falls and a darker one down-and-right where it
-// does not. No blur — a hard offset reads as a crisp edge of a physical thing,
-// a blurred one reads as a drop shadow floating above the page, which is the
-// opposite of what a punched letter does.
-//
-// The two are separable dials and compose: the stroke sets the WEIGHT of the
-// edge, the shadow sets its DIRECTION. Turn either off independently.
-// BOTH DIALS ARE PROPORTIONS OF THE TYPE THEY SIT ON, NOT FIXED WIDTHS, and
-// this is the single thing most likely to be got wrong when adding a new
-// consumer. Added 2026-08-12, after Helen looked at the small Courier labels in
-// a recipe's longform Tips and asked whether she was imagining that they read
-// as more raised than the page's own headings. She wasn't. Both dials had
-// drifted, in opposite directions on different elements, and both drifts do the
-// same damage: THE SHADOW HAS TO CLEAR THE STROKE TO BE SEEN AT ALL.
-//
-// The stroke is the more obvious one, and _sass/food/_category-labels.scss
-// already worked it out for its own element: -webkit-text-stroke is an absolute
-// px width, so the same value on smaller type is a proportionally FATTER
-// letterform. Past about 3% of the type size it stops reading as an edge and
-// starts filling the counters, and the emboss copies have nothing crisp left to
-// sit against.
-//
-// The offset is the one nobody had generalised, though .site-logo-top hit it
-// head-on and fixed itself in place (see its comment: "at 1px the shadow barely
-// clears the stroke at all, so it read as a flat drop-shadow rather than a
-// raised letter", widened to 2px). A fixed 1px offset is ~7% of a 0.9rem label
-// and ~3% of a 1.8rem heading -- so the effect was at full strength on the
-// smallest type on the site and half-swallowed on the biggest, which is exactly
-// backwards from how it looked in the file, where every consumer wrote the same
-// @include and could reasonably expect the same result.
-//
-// The two ratios below are not invented: they are where the two elements that
-// demonstrably work already sit. HELEN TRIAGES is at 6.3% offset after Helen
-// tuned it by hand; the Tips label is at 6.8% and 1.4% stroke, and is what
-// prompted this. Everything else is now brought onto them.
-// THE STROKE IS AN `em`, WHICH IS THE WHOLE TRICK. A length in em resolves
-// against the element's OWN computed font-size, so one value is 1.4% of
-// whatever it lands on without anyone having to know, state or maintain the
-// size. The first version of this was a punched-stroke($size) function taking
-// the size as an argument, which worked but had to be told the number every
-// time -- fine on the six elements that set their own font-size, useless on the
-// global h1/h2/h3 rule in shared/_base.scss, where the size is whatever the
-// document says it is. Since that rule is what makes the treatment reach EVERY
-// heading rather than a list of them, em wins on both counts: it does more and
-// it can't drift.
+// It names only palette-contract variables (MANUAL §2.3); every other colour
+// arrives as an argument. model_instructions/LETTERING.md is the reference
+// for the lettering.
 
-// 1.6% of font-size, self-scaling. Tuned by Helen at /dev/emboss/ against
-// Courier Prime, having been 1.4% against Courier New.
-//
-// It went DOWN to 1.0% first, on the reasoning that Courier Prime's heavier
-// stems and tighter counters would let the same rim fill more counter and read
-// as blur -- and that was wrong, or at least not what she wanted. Looking at it
-// went the other way: a heavier letterform can carry MORE edge, not less, and
-// the value ended up above where it started. Recorded because the argument was
-// plausible, produced a number, and lost to somebody looking at the thing.
+// --- Punched-tape lettering ---------------------------------------------------
+// A stroke sets the weight of the edge; two hard text-shadow copies set its
+// direction, a light one up and left and a darker one down and right. No
+// blur: a blurred copy reads as a drop shadow floating over the page. The
+// shadow has to clear the stroke to be seen at all, so both are kept small
+// against the type they sit on.
+
+// An em, so it is the same share of whatever font-size it lands on, without
+// the rule knowing the size: that is what lets the global h1/h2/h3 rule in
+// shared/_base.scss carry it. Tuned by Helen at /dev/emboss/.
 $emboss-stroke: 0.016em;
 
-// The offset stays a WHOLE PIXEL rather than a computed proportion, unlike the
-// stroke, and the difference is deliberate: a fractional stroke width is already
-// normal here and antialiases harmlessly along a letterform's edge, but a
-// fractional shadow offset antialiases the whole duplicate glyph, which is the
-// soft, floating read the "no blur" rule above exists to avoid.
-//
-// BOTH ARE 1px. There used to be a two-tier rule here -- 1px on small type, 2px
-// on display sizes, both landing near 6.5% of the font-size -- with the
-// arithmetic for four elements written out. It is gone rather than marked
-// historical: it described a ratio nothing now follows, and a paragraph of
-// reasoning for numbers that are equal is worse than no paragraph. Helen tuned
-// the h1 against Courier Prime and 2px read as two letters rather than one
-// raised one.
-//
-// The two variables stay separate anyway, because the smaller type levels have
-// not been tuned yet and may want to diverge again.
+// A whole pixel, not a proportion: a fractional offset antialiases the whole
+// duplicate glyph, which is the soft read the hard copies exist to avoid.
+// Two variables with one value, kept apart so the larger type can be tuned
+// on its own.
 $emboss-offset:       1px;                      // hard, not blurred
 $emboss-offset-large: 1px;                      // was 2px -- see above
 
-// THE HIGHLIGHT NEEDED HEADROOM ABOVE THE GROUND, AND ON THIS SITE IT BARELY
-// HAD ANY -- THIS WAS THE BUG, NOT A TUNING PROBLEM, AND IT TOOK UNTIL
-// 2026-09-02 TO BE NAMED CORRECTLY. The light copy used to be $color-white --
-// the paper catching the light, correct as a MODEL and invisible in practice
-// on a page whose ground IS $color-bg: a copy painted in the background
-// colour, offset over the background, cannot be seen. The shadow copy, to
-// compensate, ran dark (rgba(ink, 0.68)) and did all the work alone -- which
-// reads as a second, slightly offset LETTER, not as one raised one. Helen's
-// name for the result on the FAQ questions: "dissolving in acid".
+// The tier colours (see @mixin lettering() below). The highlight is lighter
+// than the letter but darker than the paper, and the shadow only a faint
+// wash: a highlight in the ground's own colour cannot be seen, and a dark
+// shadow reads as a second letter, not a raised one.
 //
-// THE PHYSICS, STATED PLAINLY, IS WHAT FIXES IT. A raised dark letter under a
-// top-left light source has a lit edge that is LIGHTER THAN THE LETTER BUT
-// DARKER THAN THE PAPER -- it is still ink catching a glancing light, not the
-// paper itself -- and a shadow only slightly darker than the paper it falls
-// on, because a 1px sliver of cast shadow is a thin thing, not a hole. Asking
-// the highlight to be lighter than the page and the shadow to be dramatically
-// darker than the letter both describe the punched-tape MOTIF this mixin is
-// named for (an actual channel cut into black tape, lit from inside) rather
-// than what it draws everywhere else on food: dark ink standing slightly
-// proud of a light page. One set of numbers had been asked to do both jobs.
-//
-// Helen, looking at a candidates page (tmp/mock/lettering.html, not in the
-// repo): "off black front letter with a very thin darker outline, and a
-// lighter black (or even light grey) up and left... similar aggression,
-// without asking physics to go lighter than white." That is the fix in one
-// sentence -- the highlight moves DOWN off pure white to a mid grey, and the
-// shadow moves UP off two-thirds ink to a faint wash, both toward the paper,
-// from opposite directions.
-//
-// FOUR NAMED TIERS CARRY THAT FIX NOW, BY ROLE RATHER THAN BY SIZE -- see
-// @mixin lettering() below, and LETTERING.md for the full table, the values
-// per site and the decision log. $color-emboss-light/-shadow above this
-// paragraph are gone; the values below replace them, and unlike the old pair
-// they come in three sets rather than one, because a wordmark, a page heading
-// and a small label do not want the same amount of edge.
-//
-//   display  HELEN TRIAGES ONLY -- heaviest of the four. A wordmark is a
-//            logo, not a heading, and Helen kept it louder even once it took
-//            on the same construction ("I like the drama").
-//   heading  EVERY HEADING >= 1rem: recipe titles, section headings, filter
-//            labels, reference-page headings, longform section names.
-//   label    EVERY PUNCHED ELEMENT < 1rem: SERVES/PREP/COOK, note labels,
-//            Tips labels, timings field labels, FAQ questions. STROKE ONLY,
-//            NO SHADOW -- "flat with edge", Helen's own phrase, 2026-09-02:
-//            "T2 wordmark, T1 large headings. Surprisingly T1 is good on the
-//            small headings too, but I prefer T3, flat with edge, so let's do
-//            that." At these sizes a shadow copy cannot clear the stroke to
-//            be seen at all -- the mechanism note above this whole section,
-//            "THE SHADOW HAS TO CLEAR THE STROKE TO BE SEEN AT ALL", is
-//            exactly why: a 1px offset on an already-small glyph has nowhere
-//            left to read as raised.
-//   plain    NO EDGE. Already existed as the hand-written pattern
-//            `-webkit-text-stroke: 0; text-shadow: none;` at a handful of
-//            call sites; named here so it is a fourth tier rather than the
-//            absence of one.
-//
-// THE 1rem THRESHOLD IS THE SAME LINE $emboss-offset-large's own history
-// already drew: elements big enough that the offset's proportion of the
-// glyph needs help (a title, a section heading) get the fuller heading
-// treatment; everything smaller gets stroke only.
-//
-// A TIER NAMES A ROLE, NOT A SIZE, deliberately -- a consumer says what it
-// IS ("this is a heading") and the mixin resolves that to numbers, rather
-// than a fresh value copied from whatever's nearby, which is how the
-// pre-tier system drifted apart in the first place (see the $emboss-stroke/
-// $emboss-offset history above: two elements independently converged on
-// almost-but-not-quite the same ratio before either was named).
-//
-// ONLY $color-text FEEDS THESE, same palette-contract constraint the old
-// --emboss-stroke-c comment already stated: shared may only name what every
-// site's palette guarantees (MANUAL §2.3). Each site's own $color-text
-// plugs into the SAME lighten/darken/rgba calls below, so on food (dark ink,
-// light page) these already resolve to the numbers Helen chose; on cocktails
-// (light ink, dark page) the same formulas resolve to something illegible,
-// which is exactly the point already made two sections up about dark-on-light
-// and light-on-dark being inverse problems -- cocktails re-points its own
-// heading and display sets in its own _rule.scss, the same way it already
-// re-points --emboss-stroke-c/-shadow today.
+// Only $color-text feeds them, since shared/ may name nothing a palette does
+// not guarantee. The formulas suit dark ink on a light page; cocktails, the
+// other way round, re-points the custom properties in its own _rule.scss.
 $lettering-display-stroke-c: darken($color-text, 12%);   // ~#000 on food
 $lettering-display-light:    lighten($color-text, 53%);  // ~#aaa4a7 on food
 $lettering-display-shadow:   rgba($color-text, 0.24);
@@ -185,71 +42,24 @@ $lettering-heading-stroke-c: darken($color-text, 5%);    // ~#141213 on food
 $lettering-heading-light:    lighten($color-text, 65%);  // ~#c9c4c7 on food
 $lettering-heading-shadow:   rgba($color-text, 0.16);
 
-// $color-text itself -- the same fallback --emboss-stroke-c always carried
-// before any site re-pointed it. Food re-points this to its own softer
-// $color-label-stroke in food/_rule.scss, same as it always has; cocktails
-// does the equivalent in its own file.
+// Each site re-points this to its own $color-label-stroke in its _rule.scss.
 $lettering-label-stroke-c: $color-text;
 
-// $style: raised   letters standing proud of the tape  (light from top-left)
-//         pressed  letters punched down into it        (the same light, inverted)
-// $offset          $emboss-offset-large on display type; see the note above
-// =============================================================================
-// THE TWO GROUNDS, AND WHY THIS IS CUSTOM PROPERTIES RATHER THAN SASS
-// =============================================================================
-// Helen tuned the emboss twice on 2026-08-24, once for dark type on the page
-// ground and once for light type on a dark one, and the two sets disagreed on
-// every single value:
+// Custom properties, not Sass variables, so a site or a print block re-points
+// a value once and every rule reading it follows, at any depth, with no
+// specificity fight. The Sass variables above are only the defaults.
 //
-//                          dark-on-light      light-on-dark
-//   stroke                 0.016em            0.010em
-//   offset, display        1px                2px
-//   shadow alpha           0.68               0.06
-//   stroke lightness       +30%               +40%
-//
-// THAT IS NOT INDECISION, IT IS THE PHYSICS OF THE TWO CASES. On a light ground
-// the highlight has ~3% of headroom above the paper and the SHADOW does the
-// raised work -- hence 0.68. On a dark ground it inverts completely: a dark
-// shadow on dark is invisible, so the shadow goes to nearly nothing and the
-// LIGHT copy does everything. Two inverse problems, and one set of Sass
-// variables can only ever serve one of them. It is the same reason
-// .site-logo-word had to be excused from this treatment entirely back in
-// August: it is the site's only light-on-dark lettering.
-//
-// SO THE VALUES ARE CUSTOM PROPERTIES AND THE INVERSION IS A CLASS. Sass
-// variables are resolved at compile time and cannot be overridden by context;
-// custom properties inherit, so `.on-dark` redefines six values once and every
-// rule that reads them -- at any nesting depth, in any partial, including ones
-// written later -- picks up the inversion with no specificity fight and no list
-// of selectors to maintain. A `.on-dark h1 { ... }` block would have had to
-// out-specify thirteen existing component rules and would have silently missed
-// the fourteenth.
-//
-// The Sass variables below are still the single source of the DEFAULTS. Nothing
-// else in the codebase should read the custom properties' fallbacks.
-
-// EMITTED ONCE, EVEN THOUGH THIS FILE IS IMPORTED TWICE. food/_timings.scss
-// imports `shared/rule` and `food/rule` again for its own use, which was free
-// for as long as these were pure DEFINITION files -- variables and a mixin emit
-// nothing, so importing them twice cost nothing. The moment this file started
-// emitting real CSS that stopped being true: food.css carried two copies of the
-// block, and the only reason the right value survived was the accident of which
-// copy landed last. A guard rather than untangling the import, because the
-// double import is deliberate on timings.scss's side and this file should stay
-// safe to import from anywhere.
+// Guarded because this file is imported more than once into one stylesheet
+// (food/_timings.scss imports it again for the mixins), and without the
+// guard the block is emitted each time.
 $emboss-vars-emitted: false !default;
 @if not $emboss-vars-emitted {
   :root {
+    // Tier-independent: one stroke width and one offset for every tier.
     --emboss-stroke-w:    #{$emboss-stroke};
     --emboss-offset:      #{$emboss-offset};
     --emboss-offset-lg:   #{$emboss-offset-large};
 
-    // THE THREE TIER SETS. Computed above from $color-text alone -- see the
-    // long comment there for why that is the whole palette-contract budget
-    // shared is allowed to spend, and why the same formulas resolve
-    // correctly on food and illegibly on cocktails (which re-points all
-    // three in its own _rule.scss, the same as it already did for the single
-    // --emboss-stroke-c below).
     --lettering-display-stroke-c: #{$lettering-display-stroke-c};
     --lettering-display-light:    #{$lettering-display-light};
     --lettering-display-shadow:   #{$lettering-display-shadow};
@@ -259,111 +69,24 @@ $emboss-vars-emitted: false !default;
     --lettering-heading-shadow:   #{$lettering-heading-shadow};
 
     --lettering-label-stroke-c:   #{$lettering-label-stroke-c};
-
-    // --emboss-stroke-c/-light/-shadow STOOD HERE AS ALIASES OF THE HEADING
-    // SET AND ARE GONE -- #778, 2026-09-21. They existed so that nothing still
-    // reading the pre-tier names changed underneath the 2026-09-02 migration;
-    // LETTERING §10 said to delete them once nothing read them, and nothing
-    // does. The last two readers went in the same commit: `punched()` below
-    // (which had no callers left) and `.drink-card-tape-word`, repointed at
-    // --lettering-heading-stroke-c, which on cocktails was already the same
-    // value by construction (cocktails/_rule.scss set both in one block).
-    //
-    // --emboss-stroke-w AND --emboss-offset ARE NOT AFFECTED AND ARE NOT
-    // ALIASES. They are tier-INDEPENDENT numbers -- one stroke width and one
-    // offset for the whole site -- and `lettering()` itself reads both. Only
-    // the three COLOURS were duplicated per tier, and only those three went.
   }
 
-  // `.on-dark` LIVED HERE AND IS GONE, 2026-09-02, issue #469 -- and it is
-  // worth knowing that it WORKED rather than that it failed.
-  //
-  // It was a context class re-pointing four of the six values above, so any
-  // SECTION of a light page could carry light type on a dark ground. It never
-  // had a consumer: one swatch on /dev/emboss/, deleted 2026-08-26, and then
-  // nothing. Its values were finally exercised for real on the dev stages where
-  // Helen judged the black cocktails headings, she approved them, and they are
-  // now `_sass/cocktails/_rule.scss`'s defaults.
-  //
-  // WHICH IS THE FINDING, AND IT IS WHY THE CLASS GOES RATHER THAN GAINING A
-  // USER: a dark SECTION on a light site wants a context class; a dark SITE
-  // wants its palette inverted, after which every shared partial follows for
-  // free and the class has nothing left to do. The four numbers are safer in a
-  // palette that renders on every page than in a class nothing renders.
-  //
-  // The mechanism is still the right one if a dark section ever appears on
-  // FOOD: custom properties inherit, so one class re-points four values at any
-  // nesting depth in any partial including ones written later, where a
-  // `.on-dark h1 { ... }` block would have had to out-specify thirteen
-  // component rules and would have silently missed the fourteenth. Recover it
-  // with `git show 0b350c3:_sass/shared/_rule.scss`.
-  //
-  // Two things it never reached, recorded because they were still true of any
-  // successor as of 2026-08-26. Both are now fixed, on the tiered system
-  // below rather than by `.on-dark`'s mechanism: `shared/_base.scss` no
-  // longer hardcodes `$color-text` on plain h1/h2/h3 (it names its tier,
-  // `@include lettering(heading)`, same as everything else), and
-  // `.site-logo-word`'s stroke width was already fixed by the time this note
-  // was written. Left here as the historical record of what `.on-dark` did
-  // and did not reach, not as an open item.
   $emboss-vars-emitted: true !global;
 }
 
-// `@mixin punched($style, $offset)` STOOD HERE AND IS GONE -- #778, 2026-09-21.
-// It drew the two-copy raised (or pressed) shadow from --emboss-light and
-// --emboss-shadow, and it was the reason those two aliases had to survive the
-// 2026-09-02 tier migration. By the time #778 was worked it had no callers at
-// all: `grep -rn "@include punched"` across _sass/ and assets/ returned five
-// hits and every one was prose in a comment. `lettering()` below draws the same
-// two copies per tier and deliberately does NOT call this (its own header says
-// why -- the aliases inherit, so a locally rebound pair would leak into every
-// descendant rather than into the mixin's own output).
-//
-// Recover it with `git show` on this file if a `pressed` treatment is ever
-// wanted again; the tiers have no equivalent, because nothing ever asked for
-// one. Its doc comment below became `lettering()`'s.
+// @mixin lettering($tier, $offset): the only way to draw a punched element.
+// The caller says what the element is, by role and not by size:
+//   display  the heaviest: the wordmark's top line and food's recipe title
+//   heading  headings of 1rem and over: a stroke and the two-copy shadow
+//   label    punched type under 1rem: stroke only, because at that size a
+//            shadow copy cannot clear the stroke
+//   plain    no edge
 
-// =============================================================================
-// @mixin lettering($tier, $offset) -- THE FOUR TIERS, AS ONE CALL
-// =============================================================================
-// Says WHAT a punched element IS -- display, heading, label or plain -- and
-// resolves that to a stroke and a shadow, rather than asking every call site to
-// pair a stroke colour with a shadow by hand and get it right every time. Until
-// #778 that pairing was written out as `-webkit-text-stroke: var(--emboss-
-// stroke-w) var(--emboss-stroke-c); @include punched(raised);`; both halves of
-// it are gone now, and this mixin is the only way to draw a punched element.
-// See the long comment above $lettering-display-stroke-c for the physics this
-// is built on (the highlight-darker-than-paper, shadow-lighter-than-letter
-// finding, 2026-09-02) and LETTERING.md for the full reference -- the table of
-// values per site, the consumer inventory, the traps.
-//
-// IT NEVER CALLED punched(), on purpose, and the argument is worth keeping now
-// that punched() itself is gone (#778) -- it is why the tiers are shaped like
-// this. `display` and `heading` are both a stroke plus a two-copy raised
-// shadow, exactly what punched() drew, so routing a tier through it looked
-// obvious. It read --emboss-light/--emboss-shadow, which were shared,
-// INHERITED custom properties; a tier would have had to locally REDECLARE
-// those two on every display/heading element to make it pick up the right
-// pair, and a locally redeclared custom property inherits into every
-// descendant of that element, not just into the one text-shadow line meant to
-// read it. A heading would have been silently rebinding two general-purpose
-// names for everything inside it. Duplicating the two-line raised-shadow
-// arithmetic here, reading the tier's OWN properties directly, costs four
-// lines and the trap never existed.
-//
-// EVERY TIERED CONSUMER IS `raised` -- nothing on the site uses `pressed`
-// through a tier, so the mixin does not take a $style argument. punched() kept
-// one for a future direct caller that wanted the inverted read; none ever
-// appeared, which is part of why it could go.
-//
-// $offset DEFAULTS TO var(--emboss-offset) (1px) FOR EVERY TIER, since the
-// wordmark's old 2px is gone (see shared/_layout.scss's .site-logo-top). Two
-// heading-tier consumers -- the recipe title and the recipe/about section
-// headings -- pass var(--emboss-offset-lg) explicitly, same as they did
-// through punched() before. The argument stays rather than being dropped
-// along with the wordmark's 2px: $emboss-offset and $emboss-offset-large are
-// still separate variables precisely because the smaller type levels have not
-// been tuned yet and may want to diverge again (see that note above).
+// Each tier reads its own custom properties directly. Do not route two tiers
+// through one shared pair redeclared per element: a redeclared custom
+// property inherits into everything inside that element. $offset defaults to
+// var(--emboss-offset); food's recipe title and section headings pass
+// var(--emboss-offset-lg).
 @mixin lettering($tier, $offset: var(--emboss-offset)) {
   $neg: calc(#{$offset} * -1);
   @if $tier == display {
@@ -375,8 +98,6 @@ $emboss-vars-emitted: false !default;
     text-shadow: #{$neg} #{$neg} 0 var(--lettering-heading-light),
                  #{$offset} #{$offset} 0 var(--lettering-heading-shadow);
   } @else if $tier == label {
-    // Stroke only -- no shadow copy at this size can clear the stroke to be
-    // seen at all. See the tier table above.
     -webkit-text-stroke: var(--emboss-stroke-w) var(--lettering-label-stroke-c);
     text-shadow: none;
   } @else if $tier == plain {
@@ -387,89 +108,38 @@ $emboss-vars-emitted: false !default;
   }
 }
 
-// =============================================================================
-// THE BLOCKY RULE — a bar overlapping the base of a heading
-// =============================================================================
-// MOVED HERE FROM _sass/food/_rule.scss ON 2026-08-30, and the reason is the
-// one this repo keeps relearning. Cocktails had grown a lookalike: its own
-// mixin, its own dials, drawing what was meant to be the same mark. Helen,
-// after the fourth round of spotting a difference between them: "we are putting
-// lots of effort to almost exactly match styling we already have on the top of
-// the food page. If we had decided upfront to use very similar styling on the
-// new part of the site, would we have gone about it as we currently are???"
+// --- The blocky rule: a bar overlapping the base of a heading -----------------
+// Shared because both sites draw the same mark, and two implementations of
+// one mark do not stay equal. Every colour is an argument, so this file names
+// no site's palette.
 //
-// No — we would have shared it. #374 reached the identical conclusion about the
-// header and footer ("I don't want parity between two footers, I want one
-// footer"), and §12 states the failure mode outright: you will make markup
-// shared and leave its CSS forked. Two implementations of one mark do not stay
-// equal; they stay equal until nobody is looking.
-//
-// IT COSTS NO PALETTE COUPLING, which is what makes it legal here. Both mixins
-// take every colour as an argument, so this file still names only the ten
-// variables §2.3's contract guarantees. `overlapping-rule-single` lost its
-// default (food's violet) in the move — every call site already passed one.
-//
-// Same journey `punched()` made, and for the same reason: a mixin used by two
-// sites cannot live inside one of them.
+// A `linear-gradient` background, not `text-decoration`: the bar has to sit
+// behind the lettering, and an underline at a negative offset crosses the
+// glyphs. `display: inline` with `box-decoration-break: clone` gives each
+// line of a wrapped heading its own bar at its own width.
 
-// A saturated bar overlapping the base of a heading with the lettering in front
-// of it: under the title, and under every section name. It replaced watercolour
-// brush washes on 2026-07-31. A wash picked a different random shape on every
-// page load, so the eye had to re-identify it on each recipe; an identical
-// repeated mark becomes something you recognise rather than something you read,
-// and that turned out to matter more than sheer area for the glance test.
-//
-// THE DIALS ARE THE FIRST THING TO REACH FOR. All em, so the title and the
-// section names stay in proportion to each other whatever the font size.
-//
-// HOW IT IS DRAWN, AND WHY NOT `text-decoration`. The rule has to sit BEHIND
-// the lettering, and an underline does not: at a negative offset it crosses the
-// glyphs rather than passing under them, which is the whole reason
-// `text-decoration-skip-ink` exists. A background does paint behind text, by
-// definition — so the rule is a `linear-gradient` background, sized and
-// positioned by hand.
-//
-// The catch a background brings is that it draws on the BOX, so on a two-line
-// title it would be one bar for the whole block. `display: inline` plus
-// `box-decoration-break: clone` fixes exactly that: the box is broken into one
-// fragment per line and the background is drawn on each, so every line gets its
-// own bar at its own width. That is the same per-line property the underline
-// had, kept.
-//
-// The asymmetry is two separate mechanisms, because a background is clipped to
-// its box and cannot overhang:
-//   - the LEFT indent is $rule-indent, shifting the gradient right
-//   - the RIGHT overhang is $rule-overhang as padding, growing the box
+// A background is clipped to its box and cannot overhang, so the two ends are
+// separate mechanisms: the left indent shifts the gradient, the right
+// overhang is padding that grows the box. All em, so every heading keeps the
+// same proportions whatever its font size.
 $rule-thickness: 0.38em;   // bar depth — magenta under the title, spring green
-                           // under section headings. Thicker than the 6px
-                           // underline, since the top of it is now hidden
-                           // behind the letters
+                           // under section headings
 $rule-drop:      0.70em;   // top of the bar, measured down from the top of the
-                           // text box. Larger = lower = less overlap. At 1.8rem
-                           // Courier the baseline is at ~0.83em, so this cuts
-                           // into the bottom quarter of the capitals
+                           // text box. Larger = lower = less overlap. Courier's
+                           // baseline is at ~0.83em, so this cuts into the
+                           // bottom quarter of the capitals
 $rule-indent:    0.15em;   // how far INTO the text the bar starts, from the left
 $rule-overhang:  0.20em;   // how far PAST the text the bar runs, on the right
 $rule-front-opacity: 0.8;  // violet is always the bar rendered in FRONT (the
-                           // lower one, under the title's magenta and under
-                           // each section heading's spring green), painted
-                           // this see-through so where it now overlaps the
-                           // colour behind it, that colour shows through
-                           // rather than being hidden
+                           // lower one), see-through so the colour it overlaps
+                           // shows through
 
-// --- The section headings' second rule ---------------------------------------
-// A violet rule directly beneath the spring green one, sharing its right edge
-// and starting further left — two-colour printing very slightly out of
-// register. With no gap between them the pair reads as ONE bar of two colours
-// with a stepped left edge, rather than as two separate underlines.
-//
-// THE VIOLET IS FLUSH WITH THE LETTERING AND THE GREEN IS INSET, rather than
-// the violet hanging out into the left margin. Everything on the page starts at
-// x=0 — section headings, ingredient lines, step numbers — and a bar to the
-// left of that axis reads as a broken alignment rather than as a design. The
-// misregistration only looks deliberate because ONE of the two marks is on the
-// grid: with both off it, there is no reference and it reads as wobble.
-// To try the radical version anyway, give $rule-under-indent a negative value.
+// --- The under bar -------------------------------------------------------------
+// A thinner bar directly beneath the first, rising into it by $rule-overlap
+// so the pair reads as one two-colour mark with a stepped left edge. The
+// under bar starts on the lettering and the top bar is inset: everything on
+// the page starts at x=0, and a bar left of that axis reads as a broken
+// alignment.
 $rule-under-thickness: 0.20em;                       // thinner, so the pair
                                                      // reads as one mark with
                                                      // a hierarchy
@@ -479,68 +149,39 @@ $rule-under-drop:      $rule-drop + $rule-thickness - $rule-overlap; // still
                                                      // derived from $rule-drop
                                                      // and $rule-thickness, so
                                                      // the two bars move together
-                                                     // — just pulled up by
-                                                     // $rule-overlap instead of
-                                                     // landing flush
-// The violet is trimmed to the INK, not to the box, so it measures the word
-// while the green escapes it. Two insets rather than one, because the two ends
-// are not the same distance from their letterforms:
-//
-//   LEFT   just the glyph's side bearing. Courier New's capitals sit roughly
-//          0.08em inside their advance width on each side.
-//   RIGHT  the side bearing PLUS the trailing letter-space. `letter-spacing`
-//          is added after every character including the last, and this heading
-//          carries 0.08em of it — so the box extends 0.08em further past the
-//          final letter than it does before the first one. Trimming both ends
-//          by the same amount would look symmetric in the code and be visibly
-//          off to the right on the page.
+
+// The under bar is trimmed to the ink, not the box, and its two ends differ.
+// The left inset is the glyph's side bearing. The right is the side bearing
+// plus the trailing letter-space, which `letter-spacing` adds after the last
+// character too: trimming both ends alike looks symmetric here and sits
+// visibly off to the right on the page.
 $rule-under-inset-left:  0.05em;
 $rule-under-inset-right: 0.16em;   // 0.08 side bearing + 0.08 letter-spacing
 $rule-under-indent:    $rule-under-inset-left;
 
-// The title needs its OWN right inset, and the reason is a trap. It carries
-// `letter-spacing: 0.04em` declared on .recipe-main-title at 1.4rem, which
-// computes to an absolute 0.896px and is then INHERITED as that length by
-// .recipe-title-text at 1.8rem — where it is 0.031em, not 0.04em. So the
-// trailing dead space after the last letter is about a third of what the
-// section headings carry, and reusing their 0.16em would trim the title's
-// violet rule visibly short at the right.
+// The title passes its own right inset. Its tracking is declared on
+// `.recipe-main-title` and inherited by `.recipe-title-text` as a computed
+// length, so it is a smaller share of the larger type than the section
+// headings' 0.08em, and their 0.16em would trim the under bar short.
 $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 
-// --- A third tier: the under rule, on its own --------------------------------
-// Added 2026-08-12 for the failure-mode names in a recipe's longform
-// Troubleshooting section (.recipe-body-content ol, see food/_recipe-notes-
-// body.scss). Those sit one level below a section heading and needed a
-// landmark; this is the same device with one bar instead of two.
-//
-// EVERY NUMBER BELOW IS THE DOUBLE MIXIN'S OWN. This is deliberately not a
-// smaller rule of its own invention: it is literally the violet layer of
-// overlapping-rule-double, extracted, so the three tiers on the page (title,
-// section heading, failure name) are one mark at one position, differing only
-// in how many bars they carry. A first pass did give it its own thinner/higher
-// dials and Helen's read was immediate -- "the violet underline is crushing the
-// headings" -- because a shallower $rule-drop puts the bar across the baseline
-// instead of below it. Change $rule-under-* and all three tiers move together;
-// there is nothing to keep in sync by hand.
-//
-// Colour is violet by default and should stay violet: it is the page's quiet
-// structural hue, it already appears alone (the annotation arrow), and magenta
-// is unavailable because magenta means "interactive" here -- a marked-up name
-// in the link colour would read as clickable. See _palette.scss's colour
-// budget.
+// The under bar on its own, for a heading one level below a section heading.
+// Every number is the double mixin's, so the tiers are one mark at one
+// position and move together: a shallower drop of its own puts the bar
+// across the baseline. On food it takes the violet and never the magenta,
+// which means "interactive" there.
 @mixin overlapping-rule-single($colour) {
   display: inline;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 
   padding-right: $rule-overhang;
-  // Same vertical room the double mixin reserves, and needed for the same
-  // reason: the bar runs to 1.18em and Courier's content box is only ~1.13em.
+  // The room the double mixin reserves, for the same reason: the bar runs
+  // past the bottom of Courier's ~1.13em content box.
   padding-bottom: 0.45em;
 
-  // $rule-front-opacity, not solid, even though there is no second bar behind
-  // this one -- so a single rule and the violet half of a double rule are the
-  // same ink on the page rather than two slightly different violets.
+  // $rule-front-opacity, not solid, so a single rule and the front bar of a
+  // double rule are the same ink on the page.
   background-image:
     linear-gradient(rgba($colour, $rule-front-opacity), rgba($colour, $rule-front-opacity));
   background-repeat: no-repeat;
@@ -556,22 +197,20 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   -webkit-box-decoration-break: clone;
 
   padding-right: $rule-overhang;
-  // Vertical room for the second rule. Courier's content box is only ~1.13em
-  // tall, and the violet runs to 1.24em, so without this it would be clipped.
-  // Vertical padding on an inline box grows the background without touching
-  // the line height, so nothing moves.
+  // Room for the under bar, which runs past the bottom of Courier's ~1.13em
+  // content box and would be clipped. Vertical padding on an inline box grows
+  // the background without touching the line height, so nothing moves.
   padding-bottom: 0.45em;
 
-  // First layer paints in front: violet over green/magenta, at $rule-front-opacity
-  // rather than solid, so where the two bars now overlap, the colour behind
-  // shows through instead of being fully hidden.
+  // The first layer paints in front: the under bar over the top bar, at
+  // $rule-front-opacity so the colour behind shows through the overlap.
   background-image:
     linear-gradient(rgba($under-colour, $rule-front-opacity), rgba($under-colour, $rule-front-opacity)),
     linear-gradient($top-colour, $top-colour);
   background-repeat: no-repeat, no-repeat;
-  // The green is sized to make up its own indent, so it runs to the box's right
-  // edge and keeps the full $rule-overhang. The violet gives back the whole
-  // overhang plus both insets, so it stops inside the lettering at both ends.
+  // The top bar is sized to make up its own indent, so it runs to the box's
+  // right edge and keeps the full $rule-overhang. The under bar gives back
+  // the overhang and both insets, so it stops inside the lettering.
   background-size:
     calc(100% - #{$rule-overhang + $rule-under-inset-left + $inset-right}) #{$rule-under-thickness},
     calc(100% - #{$rule-indent}) #{$rule-thickness};
@@ -581,38 +220,14 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 
-// --- The same mark, once, under the LAST line of a wrapped one ---------------
-// Design audit critical #7, decided 2026-09-04 from a
-// candidates page built on the real quiche recipe. Helen, having switched
-// between the treatments on the page itself: "Last line only please, 10000%."
+// The same mark once, under the last line of a wrapped heading. `clone` gives
+// every line its own copy, `slice` does not help (every fragment still
+// paints) and CSS cannot select a last line, so assets/js/last-line-rule.js
+// splits the text into `.rule-lines` and `.rule-last` and sets `.rule-split`.
 //
-// `box-decoration-break: clone` above is what makes the mark measure the
-// LETTERING rather than the box -- the whole reason this is a background and
-// not a `border-bottom` (see the note above .recipe-title-text in
-// food/_recipe-header.scss). Its cost is that every line fragment of a wrapped
-// title gets its own full copy of the background, so a three-line title wears
-// three stacked double rules and the mark stops reading as one mark.
-//
-// `box-decoration-break: slice` DOES NOT FIX IT, and this was checked rather
-// than assumed. Slice treats the fragments as slices of ONE long box: each
-// fragment keeps the full HEIGHT of that box and the background is cut
-// horizontally, so bottom-anchored bars land under the first line and nowhere
-// else, and every fragment still paints. Nor is there a selector for "the last
-// line of a wrapped inline box" -- ::first-line has no counterpart. Which line
-// is last is a measurement, so a script does it: assets/js/last-line-rule.js
-// splits the text into `<span class="rule-lines">` + `<span class="rule-last">`
-// and puts `rule-split` on the element.
-//
-// THE ELEMENT KEEPS ITS OWN RULE, AND THAT IS THE POINT OF THE ORDERING HERE.
-// The double rule is emitted on the element first, unconditionally, so with
-// JavaScript off (or before the script has run, or if it ever throws) the title
-// still wears the mark it wears today -- stacked on a wrapped title, which is
-// the old bug and not a blank heading. `.rule-split` is the script's signal
-// that it has finished, and only then is the element's own background switched
-// off and the mark handed to the last line's span.
-//
-// `.rule-lines` gets nothing of its own: it is the part of the title that is
-// deliberately unmarked now.
+// The element's own rule comes first and unconditionally: without the script
+// a wrapped heading still wears the mark, stacked. Only `.rule-split` switches
+// it off and hands the mark to `.rule-last`.
 @mixin overlapping-rule-double-last-line($top-colour, $under-colour, $inset-right: $rule-under-inset-right) {
   @include overlapping-rule-double($top-colour, $under-colour, $inset-right);
 
@@ -626,90 +241,35 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 
-// --- An index section's heading ----------------------------------------------
-// THE TYPE ONLY, not the mark and not the emboss. Both indexes label their
-// filter sections the same way -- §13.4 calls them "filter labels on a control
-// panel, five of them stacked in a screenful", one step down from a recipe
-// page's section headings -- and cocktails had these five values written out
-// again by hand.
-//
-// A MIXIN RATHER THAN A PLACEHOLDER, deliberately. `@extend` would merge the
-// two sites' selectors into one list and reshape the compiled output; the whole
-// check on this refactor is that food.css comes out byte-identical, and only
-// `@include` can promise that.
-//
-// What each site keeps for itself is everything below the type: the stroke
-// colour, whether it is punched, the mark under it and its hues. Those are the
-// parts that genuinely differ.
-// SIZE AND TRACKING ARE ARGUMENTS, since 2026-09-02, and the defaults are
-// food's unchanged values. Cocktails passes its own because its ground is black
-// and a light glyph blooms into its surround, so the same type reads heavier and
-// less crisp -- Helen: "I'm finding the headings a little hard to read as they
-// are." The corrections are more size and more tracking.
-//
-// ARGUMENTS RATHER THAN AN OVERRIDE AFTER THE @include, which is what it was
-// for an hour: that compiles both values into the same block, the later winning
-// and the mixin's sitting there dead. `test_no_selector_declares_the_same_
-// property_twice` cannot see a duplicate INSIDE one block -- it compares
-// separate blocks -- so this is the shape that test is about, arriving where it
-// cannot look.
-//
-// WHAT STAYS SHARED IS THE TREATMENT: family, case, weight, padding and the
-// punched mark. That is #495's rule -- share the treatment, not the value.
-//
-// THE DEFAULT WENT DOWN A STEP, 2026-09-02, with the index fold tightening --
-// food's filter headings from 1.35rem to 1.05rem. Cocktails' own argument
-// moved with it, 1.6rem to 1.2rem (below, _sass/cocktails/_filters.scss),
-// keeping the same ratio between the two the divergence above already argues
-// for.
-// $weight IS AN ARGUMENT SINCE 2026-09-03, for the same reason $size and
-// $tracking already were: the two grounds want different numbers. Food keeps
-// the default; cocktails passes 400 -- see _sass/cocktails/_filters.scss for
-// the finding (#680), which is that bold light-on-dark type blooms into its
-// own punched highlight and reads as smudged.
+// --- An index section's heading: the type only --------------------------------
+// The treatment is shared (family, case, padding); the mark, the stroke and
+// the hues are each site's. Size, tracking and weight are arguments because
+// the two grounds want different numbers: light type on a dark page reads
+// heavier (#680). Arguments, not an override after the @include, which
+// compiles both values into one block where
+// test_no_selector_declares_the_same_property_twice cannot see the duplicate.
 @mixin index-section-label($size: 1.05rem, $tracking: 0.08em, $weight: 700) {
   font-family: $font-headings;
   text-transform: uppercase;
   font-size: $size;
   font-weight: $weight;
   letter-spacing: $tracking;
-  // 0.22rem TOP AND BOTTOM, and it is the last thing that was making the two
-  // sites' headings sit at different heights. Food had it and cocktails did
-  // not, so food's label box was 7px taller and its words sat 3.5px lower
-  // inside it -- which is a heading "a tiny bit higher" on cocktails, exactly
-  // as Helen described.
-  //
-  // The HORIZONTAL half of this is already gone and should stay gone: it was
-  // `0.22rem 3rem`, room for a ragged brush wash to bleed past the lettering,
-  // and with the blocky rule there is nothing to bleed -- it was pushing the
-  // label 1rem right of the buttons underneath it, invisible under a wash and
-  // obvious under a straight rule.
+  // Top and bottom only, the same on both sites, so their labels sit at the
+  // same height. No horizontal padding: it pushes the label right of the
+  // buttons under it.
   padding: 0.22rem 0;
 }
 
 
-// --- The filter panel's shape ------------------------------------------------
-// BOTH INDEXES ARE THE SAME CONTROL PANEL and were two implementations of it.
-// Sharing the mark and the type was not enough -- the same mixin still drew the
-// bar in a different place, because the BOX it draws on was different: food's
-// heading is an inline span inside a flex column, cocktails' was a blockified
-// h2 in a plain block, and a background positioned 0.70em from the top of the
-// box lands somewhere else when the box is a whole line-height taller.
+// --- The filter panel's shape -------------------------------------------------
+// Both indexes are one control panel, so the boxes are shared as well as the
+// mark: a background positioned from the top of a box lands somewhere else
+// when the box differs. Mixins, not placeholders, because the two sites' class
+// names differ and `@extend` would merge their selector lists.
 //
-// So the structure is shared too. Mixins rather than a placeholder, because the
-// two sites' class names differ (.category vs .drink-filter) and because
-// `@extend` would merge their selector lists and reshape the compiled output --
-// and the check on all of this is that food.css comes out byte-identical.
-//
-// `position: relative` on the panel is LOAD-BEARING and not tidiness: the
-// clear-all button is `position: absolute; top: 0; right: 0`, so the panel is
-// what it anchors to. Cocktails had neither, which is why its clear-all sat
-// somewhere else entirely.
-//
-// PADDING-TOP DOWN TO $space-xs, 2026-09-02, with the index fold tightening --
-// was $space-lg (1rem). Same mechanism as before (padding, not margin, so it
-// adds to the first section's own top margin rather than losing to the larger
-// of the two in a collapse); only the number is smaller.
+// `position: relative` is load-bearing: the absolutely positioned clear-all
+// anchors to the panel. `padding-top`, not margin, so it adds to the first
+// section's top margin and does not collapse into it.
 @mixin index-panel {
   position: relative;
   width: 100%;
@@ -717,12 +277,8 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 // One filter section. The gap is what spaces a label from its own buttons, so
-// nothing inside needs a margin -- and a margin here is how the two drifted.
+// nothing inside needs a margin.
 @mixin index-section {
-  // `margin` first, matching the order food's rule already had. Declaration
-  // order changes nothing about the cascade here (no property is set twice),
-  // but the check on this whole refactor is that food.css comes out
-  // BYTE-identical, and a check that tolerates "near enough" stops being one.
   margin: $index-section-gap 0;
   display: flex;
   flex-direction: column;
@@ -738,17 +294,10 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   gap: $space-lg;
 }
 
-// WHAT COLOUR A CLEAR IS, ONCE, FOR EVERY CLEAR ON BOTH INDEXES -- 2026-10-11.
-// Helen: "I'm fed up with the clear and clear all buttons! Please show each
-// one in normal link colours, so not derived from the section colour. Normal
-// base text, site colour on hover (both woo woo)." So a clear rests in the
-// page's text colour, as shared/_base.scss's `a` does, and goes to the hot
-// magenta under the pointer on both sites. Each site passes its own name for
-// that magenta, because shared/ may only name the palette contract.
-//
-// This ends a long run of rulings: food's clears took their section's hue,
-// cocktails' took theirs and then one grey, and the clear-alls were grey.
-// Do not colour one by its section again without asking.
+// Every clear on both indexes: the page's text colour at rest, the site's
+// hot colour under the pointer (Helen's ruling; do not colour a clear by its
+// section without asking). Each site passes its own hover colour, because
+// shared/ may only name the palette contract.
 @mixin index-clear-link($hover) {
   color: $color-text;
 
@@ -791,8 +340,7 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 // And a third, inside the no-results line (#1093), centred under the words
-// because the line itself is centred. Its own type, not the line's: the line
-// is set as a row title and this is still the clear-all control.
+// because the line itself is centred.
 @mixin index-clear-all-empty {
   position: static;
   display: block;
@@ -801,59 +349,39 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 }
 
 
-// --- A label row with an input in it -----------------------------------------
-// Three mixins rather than one, because the two sites name their children
-// differently (.category-label vs .drink-field-label) and a mixin cannot select
-// what it cannot name. Each site applies these to its own classes; what matters
-// is that the VALUES exist once.
+// --- A label row with an input in it ------------------------------------------
+// Three mixins, not one, because the two sites name their children
+// differently and a mixin cannot select what it cannot name.
 @mixin index-search-row {
   align-items: center;
   gap: $index-label-gap;
-  // `width: 100%` AND a max-width, not the cap alone. The section is a flex
-  // column with `align-items: flex-start`, so without this the row shrinks to
-  // its content and the input ends wherever the words happen to stop -- which
-  // is why cocktails' I KNOW WHAT I WANT box was shorter than food's while both
-  // declared the same 620px cap.
+  // `width: 100%` and a max-width, not the cap alone: the section is a flex
+  // column with `align-items: flex-start`, so without the width the row
+  // shrinks to its content and the input ends wherever the words stop.
   width: 100%;
   max-width: $index-search-max-width;
 }
 
-// The heading must not reflow because of what you typed beside it. Without
-// this it is the LABEL that gives when the row runs short -- wrapping "I KNOW
-// WHAT" / "I WANT" -- rather than the input absorbing the squeeze, which is
-// the behaviour actually wanted: a heading should not move because of how much
-// you have typed elsewhere in the same row.
+// When the row runs short the input absorbs the squeeze, not the label: a
+// heading must not wrap because of what is typed beside it.
 @mixin index-search-row-label {
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-// A text input carries a non-zero intrinsic min-width from the browser, which
-// flex respects unless told otherwise -- so `flex: 1` alone will not let it
-// shrink past that floor and it overflows the row instead. This is the standard
-// fix, and it is what makes the two inputs on a row end in the same place
-// (Helen, 2026-08-03: "it would look tidiest if both search input fields ended
-// in the same place").
+// A text input has a non-zero intrinsic min-width that flex respects, so
+// `flex: 1` alone overflows the row; `min-width: 0` lets it shrink, and makes
+// two inputs on a row end in the same place.
 @mixin index-search-row-input {
   flex: 1;
   min-width: 0;
 }
 
 
-// --- What you type into a filter box -----------------------------------------
-// THE HEADINGS FONT, NOT THE BODY ONE. What you type is a filter value, and it
-// belongs to the same family as the chips it produces and the headings it sits
-// under -- lowercase Courier at 0.78rem, which is deliberately smaller and
-// tighter than a body input would be.
-//
-// Cocktails' three boxes were $font-body at 0.9rem, so typing into them looked
-// like filling in a form rather than naming an ingredient. Helen, 2026-08-30:
-// "match the fonts in cocktail's include, exclude and name search input fields
-// to food's."
-//
-// Shared rather than copied a fourth time. Food already carried this twice --
-// once for the include/exclude pair and once for the name box -- and its own
-// comment said so: "the name search's own copy below is already one too many".
+// --- What you type into a filter box ------------------------------------------
+// The headings face, not the body one: what is typed is a filter value, in
+// the same family as the chips it produces. One mixin for every such box on
+// both sites.
 @mixin index-search-input-type {
   font-family: $font-headings;
   font-size: 0.78rem;
@@ -862,31 +390,21 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   letter-spacing: 0.04em;
 }
 
-// Separate from the type above so each site can place it where its own rule
-// already puts the nested selectors -- `&:focus` and `&::placeholder` compile
-// to their own rules, and their order relative to each other is the only thing
-// that could move.
-//
-// $color-clear-text is one of the ten the palette contract guarantees (§2.3),
-// so naming it here is allowed; each site resolves its own grey.
+// Separate from the type above so each site can place it beside its own
+// nested selectors (`&:focus`, `&::placeholder`). `lighten()` moves a grey
+// towards white, which on a dark page is away from the ground:
+// shared/_furniture.scss overrides the colour for that reason.
 @mixin index-search-placeholder {
   color: lighten($color-clear-text, 30%);
   font-weight: 300;
 }
 
 
-// --- The chip in a search pool, and the plain chip under it -------------------
-// ONE CHIP FOR BOTH SITES' SEARCH POOLS, AND IT IS FOOD'S -- 2026-10-11. Helen:
-// "I would like the cocktail has to have and leave out search results to take
-// all their styling from food's... (can we reuse the code? if not then why
-// not?)". We can, and these four mixins are that: they were food's rules
-// (_sass/food/_buttons.scss, _search.scss), lifted out with their colours
-// turned into arguments, because a site's palette is the one thing here that is
-// genuinely its own. Food's `.btn-tag` and cocktails' `.btn-pool` both include
-// them, so the two cannot drift.
-//
-// The base chip: food's `.btn-tag` type and box. Bare -- no fill, no outline.
-// What sits behind it, if anything, is a `.tag-shape` slot the site colours.
+// --- The chip in a search pool ------------------------------------------------
+// One chip for both sites' search pools, with the colours as arguments:
+// food's `.btn-tag` and cocktails' `.btn-pool` both include these, so the two
+// cannot drift. Bare, with no fill and no outline; what sits behind it is a
+// `.tag-shape` slot the site colours.
 @mixin index-chip($rest) {
   position: relative;
   display: inline-block;
@@ -912,15 +430,11 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
   -webkit-text-stroke: 0.5px $colour;
 }
 
-// A chosen chip on its tape. THIS MAY NOT DECLARE ANYTHING THAT CHANGES THE
-// CHIP'S WIDTH (#389: a chosen chip that resizes slides every chip after it).
-// 900 is safe only because the face ships no weight above Bold. 0.05em is
-// food's $faux-bold-stroke, written out because shared/ cannot see a site's
-// palette.
-//
-// NO CAPITALS SINCE 2026-10-11. Helen: "Let's stop capitalising selected
-// search result tags, both sites please." The filter chips above the pools
-// stopped the same day, so nothing chosen on either index changes case.
+// A chosen chip on its tape. It may not declare anything that changes the
+// chip's width (#389: a chosen chip that resizes slides every chip after it),
+// and it does not change case (Helen's ruling). 900 is safe only because the
+// face ships no weight above Bold. 0.05em is food's $faux-bold-stroke,
+// written out because shared/ cannot see a site's palette.
 @mixin index-chip-chosen($ink) {
   font-weight: 900;
   color: $ink;

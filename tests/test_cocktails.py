@@ -8924,7 +8924,8 @@ def test_fruit_and_weight_price_rows_are_well_formed():
             problems.append(f"weight_prices {name}: not a mapping")
             continue
         lo, hi = row.get("gbp_per_kg_min"), row.get("gbp_per_kg_max")
-        if not (isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and 0 < lo <= hi):
+        # Zero is a price: sugar by weight is free on Helen's word (#1371).
+        if not (isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and 0 <= lo <= hi):
             problems.append(f"weight_prices {name}: gbp_per_kg_min/max are {lo!r}/{hi!r}")
         if row.get("confidence") not in COST_CONFIDENCE:
             problems.append(f"weight_prices {name}: confidence {row.get('confidence')!r}")

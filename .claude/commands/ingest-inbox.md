@@ -9,11 +9,11 @@ nothing but files, the doc decides.
 
 **Read the script's module docstring before the first run**, and
 `model_instructions/INGEST_INBOX_DESIGN.md` §6 for the envelope. This command
-does not restate either -- two copies of a spec drift.
+does not restate either.
 
 ## The boundary, in one line
 
-The script does the MECHANICAL half: parse, slug, deduplicate, write. **Every
+The script does the mechanical half: parse, slug, deduplicate, write. **Every
 judgement it finds is yours to bring to Helen, and none of it is yours to
 fill in.** An envelope arrives from a session that had the page in frame and
 this repository nowhere, so what is missing is exactly what needs the corpus --
@@ -23,13 +23,18 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
 
 1. **Fetch the drafts repo before anything you will act on.**
 
-       cd _<site>_drafts && git fetch origin && git rev-list --count HEAD..origin/main
+       sh scripts/git-fetch-agent.sh _food_drafts helen-triages-food-private
+       sh scripts/git-fetch-agent.sh _cocktail_drafts helen-triages-cocktails-private
 
-   A non-zero answer means the next red test is probably not yours.
+   That leaves the clone detached on the fetched `main`. Mid-work on a branch,
+   add `main --keep-head`: it stays on the branch and prints how far behind it
+   is, and a non-zero count means the next red test is probably not yours.
 
-2. **Branch in the drafts repo**, never commit to its `main`:
+2. **Branch in the drafts repo**, never commit to its `main`. A bare `git
+   checkout -b` would branch the public repo, so use the wrapper:
 
-       git checkout -b content/inbox-<YYYY-MM-DD>
+       sh scripts/git-drafts.sh _food_drafts checkout -b content/inbox-<YYYY-MM-DD>
+       sh scripts/git-drafts.sh _cocktail_drafts checkout -b content/inbox-<YYYY-MM-DD>
 
 3. **Dry run, and read the plan.** The default writes nothing.
 
@@ -45,61 +50,78 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
    `--issue N` works one envelope. `--from-file PATH` parses a local file
    instead of fetching, which is what a paste from the clipboard uses.
 
-4. **Write**: `--write`. Then, per file, **the finishing pass from `/ingest`,
-   in its order**:
+4. **Write**: `--write`. Then the finishing pass from `/ingest`, steps 2 to 8,
+   in its order. `ingest.md` has the detail of each; the order is the one the
+   scripts need:
 
-   1. **COCKTAILS: `python3 scripts/derive_cocktail_moods.py --write`.** The
-      file arrives with `mood: []` and **the suite fails until this runs** --
-      `test_every_drinks_moods_match_the_derivation`, expected, not a fault in
-      the file.
-   2. **`pytest`.** Once, and never two sessions at a time.
-   3. **`/tidy-drafts`**, both collections since 2026-09-05, if the quoting or
-      typography needs it. It never touches a `QQ` line. **A cocktail always
-      gets `python3 scripts/tidy_drafts.py --site cocktails --only order
-      --apply`** (#1213): an envelope written from an older copy of
-      `INGEST_ONE_COCKTAIL.md` arrives with its keys in the old order, and
-      `test_a_draft_drinks_keys_are_in_page_order` fails until this runs.
-   4. **`python3 scripts/ingest_preflight.py`** -- undeclared bottles,
+   1. **Cocktails: `python3 scripts/resolve_pours.py --apply`.** It types the
+      generics an exact dictionary match settles and leaves the rest `QQ`. It
+      runs first because the moods read the generics it writes.
+   2. **Cocktails: `python3 scripts/derive_cocktail_moods.py --write`.** The
+      file arrives with `mood: []`, and
+      `test_every_drinks_moods_match_the_derivation` fails until this runs.
+   3. **Food, only if the file has no `main_ingredients`:** `python3
+      scripts/derive_main_ingredients.py --derive --only <slug>`.
+   4. **Cocktails: `python3 scripts/tidy_drafts.py --site cocktails --only
+      order --apply`.** An envelope can arrive with its keys in another order,
+      and `test_a_draft_drinks_keys_are_in_page_order` fails until this runs.
+      Then `/tidy-drafts`, either collection, if the quoting or typography
+      needs it. It never touches a `QQ` line.
+   5. **`pytest`.** Once, and never two at a time.
+   6. **`python3 scripts/ingest_preflight.py`** -- undeclared bottles,
       near-miss garnishes, unstated times, in the same shape a photo batch
       gets.
 
-5. **Bring Helen ONE list.** Every rejection, every probable duplicate, every
-   Sazerac case, and every hand-back bullet from every envelope, grouped by
-   file, plus whatever the pre-flight found. **Treat each as a TIER 3
-   question**: ask, do not fill in. Not a question at a time -- arriving in a
-   trickle is the failure the pre-flight was built to fix.
+5. **Bring Helen one list.** Every rejection, every probable duplicate, every
+   same-name-different-recipe case (the script's "Sazerac case"), and every
+   hand-back bullet from every envelope, grouped by file, plus whatever the
+   pre-flight found. **Treat each as a tier 3 question**: ask, do not fill in.
+   Not a question at a time -- arriving in a trickle is the failure the
+   pre-flight was built to fix.
 
-6. **Commit in the drafts repo**, one commit per envelope, with a bare
-   `Fixes #N` for the issue it came from. That trailer is valid here and
-   nowhere else in this workflow: the issue and the commit are in the same
-   private repo, so CLAUDE.md's cross-repo trap does not apply. **The trailer
-   is what closes the issue** -- the script never closes one, and neither do
-   you by API. Name the issues before pushing, while the message can still be
-   rewritten. Push without asking -- the private drafts repos need no
-   confirmation for a push (CLAUDE.md, 2026-09-05); only committing to their
-   `main` is forbidden.
-
-   **RUN `python3 scripts/verify.py` BEFORE THE PUSH, EVERY TIME.** It runs the
-   drafts checks, and until the private repos get CI of their own (#1194)
-   nothing else ever will: CI checks out the public repo alone, and most draft
-   checks are parametrised per file, so without a clone they are never CREATED
-   rather than skipped -- a green run that examined nothing. An inbox pass
+6. **Run `python3 scripts/verify.py` before anything is pushed, every time.**
+   Nothing else runs the drafts checks (`PIPELINE.md` §3), and an inbox pass
    writes brand-new files from text Helen pasted off her phone, which is the
    likeliest source of a schema surprise in the whole pipeline.
 
-7. **Report what is still `QQ` and why**, as `/ingest` does.
+7. **Commit in the drafts repo**, one commit per envelope, with a bare
+   `Fixes #N` for the issue it came from. That trailer is valid here and
+   nowhere else in this workflow: the issue and the commit are in the same
+   private repo. **The trailer is what closes the issue** -- the script never
+   closes one, and neither do you by API. Name the issues before pushing, while
+   the message can still be rewritten. Check the branch in a call of its own
+   first:
+
+       sh scripts/git-drafts.sh _cocktail_drafts branch --show-current
+       sh scripts/git-drafts.sh _cocktail_drafts add -- <paths>
+       sh scripts/git-drafts.sh _cocktail_drafts commit -F tmp/commit-msg.txt
+
+   Then push, per `CLAUDE.md`, with no ask:
+
+       sh scripts/git-push-agent.sh <branch>:<branch> helen-triages-cocktails-private _cocktail_drafts
+
+8. **Report what is still `QQ` and why**, as `/ingest` does.
 
 ## What this never does
 
+This list is about the script, `scripts/ingest_inbox.py`. The session running
+it does commit and push (steps 7 and 8), and the finishing pass does type what
+a dictionary settles (step 4); everything else here binds the session too.
+
 - **Repair an envelope.** A rejection goes back to Helen. `--comment` posts the
-  reason on the issue if she wants it there; it is a no-op with `--from-file`.
+  reason on the issue if she wants it there; it does nothing with
+  `--from-file`.
 - **Overwrite a file, or write one twice.** A taken slug gains `-2`; a matching
   fingerprint is reported and not written at all.
-- **Close an issue by API**, commit, push, or touch `main` in either repo.
+- **Commit, push, or close an issue.** The session commits and pushes; the
+  `Fixes #N` trailer closes. Nobody closes one by API, and nobody commits on a
+  `main`.
 - **Fill in a `generic`, a `suggestion`, a `tagline`, a glass or a
   `star_ingredient`**, rewrite the prose, re-derive `main_ingredients`, or
-  "improve" a `QQ Claude` line. A rewrite pass has already happened and redoing
-  it burns Helen's review twice.
+  "improve" a `QQ Claude` line. The script writes the envelope's values as they
+  came. Afterwards `resolve_pours.py` types only the generics and suggestions
+  an exact match settles, and the session types none by hand: a rewrite pass
+  has already happened, and redoing it burns Helen's review twice.
 - **Touch `_food_recipes/` or `_cocktail_recipes/`.** The inbox lands in drafts,
   always.
 - **Merge two recipes that share a name.** They are two recipes until she says
@@ -107,12 +129,13 @@ and what is `QQ` is `QQ` by her standing rulings, not by omission.
 
 ## Traps
 
-- **A probable duplicate is a REPORT, not a verdict.** The fingerprint compares
+- **A probable duplicate is a report, not a verdict.** The fingerprint compares
   formulas, so a match is strong evidence and still hers to confirm -- an
   identical drink transcribed from a second book is a citation worth having.
 - **A missing drafts repo is a refusal, not an empty run.** Both private repos
-  are gitignored and absent in a worktree; the script exits non-zero saying so
-  rather than reporting a clean inbox.
+  are gitignored and absent in a fresh worktree; the script exits non-zero
+  saying so rather than reporting a clean inbox. Clone it: `sh
+  scripts/git-clone-agent.sh helen-triages-cocktails-private _cocktail_drafts`.
 - **The version marker is the handshake.** If the script rejects everything for
   its version, the standalone documents have moved ahead of it. That is a code
   change here, never a hand-edit of the envelope.

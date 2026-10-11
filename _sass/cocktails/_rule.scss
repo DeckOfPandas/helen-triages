@@ -1,253 +1,78 @@
 // =============================================================================
-// COCKTAILS — the one emboss value this site chooses for itself.
+// COCKTAILS — the lettering values this site chooses for itself
 // =============================================================================
-// Mirrors _sass/food/_rule.scss, and exists for the same reason: the softer
-// heading outline is derived from a palette variable that is NOT one of the ten
-// the shared contract guarantees, so it cannot live in shared/_rule.scss.
-// Imported after it (see assets/css/cocktails.scss), so this wins.
+// Mirrors _sass/food/_rule.scss. The heading outline is derived from
+// $color-label-stroke, which is not one of the names the shared palette
+// contract guarantees, so it cannot live in shared/_rule.scss. Imported after
+// shared/rule and shared/base (see assets/css/cocktails.scss), so this wins.
 //
-// WHY IT EXISTS AT ALL, 2026-08-26. Helen, comparing a cocktail title against a
-// food ingredient-group heading: "they don't all need to be identical, but I
-// don't remember which I actively chose, and I'm concerned some may have been
-// automatically swept in."
-//
-// She had it exactly right, and the answer was that COCKTAILS was the swept-in
-// one, not food. Food re-points `--emboss-stroke-c` to its own
-// $color-label-stroke and its comment records that doing so replaced the value
-// being restated at thirteen separate call sites — a decision, made twice over.
-// Cocktails declared no equivalent, so every heading on this site fell through
-// to the shared default of `$color-text`: near-black, at full strength, on the
-// outline of every title and section heading.
-//
-// shared/_base.scss describes that default in its own words as the value that
-// "in practice is only ever seen on a heading nobody has styled". Cocktails'
-// headings were precisely those headings.
-//
-// AND IT EXPLAINS A SECOND SYMPTOM, which is what makes it worth this file
-// rather than a one-line override. The punched effect paints a white highlight
-// one pixel up and left of the glyph. With a soft grey outline that highlight
-// reads; with a near-black outline sitting in exactly the same place, it is
-// drowned — so cocktail headings showed the shadow half of the emboss and none
-// of the light, while food's showed both. One wrong value, two symptoms, and
-// the light looked like the missing thing when the stroke was.
-// AND THE INVERSION MOVED THREE MORE OF THEM, 2026-09-01, issue #469. The
-// shared defaults in `shared/_rule.scss` are solved for DARK TYPE ON A LIGHT
-// GROUND, and this site is now the opposite. The two are inverse problems and
-// the values disagree on every one:
-//
-//   - `--emboss-shadow` is `rgba($color-text, 0.68)` there. `$color-text` is
-//     near-white here, so that computes to a LIGHT shadow -- a highlight in the
-//     shadow's position, which reads as a second letterform rather than depth.
-//     It goes to almost nothing, because A SHADOW COPY IS ONLY VISIBLE WHERE IT
-//     EXTENDS PAST THE GLYPH ONTO THE GROUND, and dark on dark shows nothing.
-//   - `--emboss-light` stays $color-white and now does all the work, for the
-//     same reason from the other side: white spilling past a light letter onto
-//     a near-black ground is the most visible mark available here.
-//   - `--emboss-stroke-w` comes down. A stroke on light-on-dark type reads
-//     heavier than the same stroke on dark-on-light, because the glyph is
-//     already blooming into its surround.
-//
-// THESE ARE `.on-dark`'S OWN NUMBERS, which is the point rather than a
-// coincidence. That class was built for exactly this case and had no consumer
-// anywhere until this palette existed (#469); it was applied to the dev stages
-// where Helen judged the headings and approved them. Adopting them as this
-// site's DEFAULTS is the finding that issue ended on: a dark SECTION on a light
-// site wants a context class, and a dark SITE wants its palette inverted, after
-// which every shared partial follows for free.
+// shared/_rule.scss's defaults are solved for dark type on a light ground and
+// this site is the inverse (#469), so every tier is re-pointed here. Without
+// this, headings take a full-strength outline that drowns the highlight copy,
+// and a "shadow" computed from near-white $color-text that reads as a second
+// letterform.
 $emboss-cocktails-vars-emitted: false !default;
 @if not $emboss-cocktails-vars-emitted {
   :root {
-    // --emboss-stroke-c AND --emboss-shadow STOOD HERE AND WENT WITH THE
-    // ALIASES THEY OVERRODE -- #778, 2026-09-21. They re-pointed the shared
-    // pre-tier names for this site's inverted ground, and the block below
-    // already set --lettering-heading-stroke-c / -shadow to the SAME two
-    // values, saying so in as many words ("--lettering-heading-stroke-c
-    // mirrors --emboss-stroke-c above"). With the aliases deleted upstream
-    // there is nothing left to mirror, and the tier names carry the numbers.
-    //
-    // --emboss-stroke-w STAYS, and it is not an alias of anything: it is this
-    // site's one stroke WIDTH, read by `lettering()` for every tier. The
-    // paragraph above explains why it comes down on light-on-dark type.
+    // This site's one stroke width, read by `lettering()` for every tier. Down
+    // from the shared value: a stroke on light-on-dark type reads heavier,
+    // because the glyph already blooms into its surround.
     --emboss-stroke-w: 0.010em;
 
-    // THE TIER NAMES, RESOLVED FOR THIS SITE, 2026-09-02. shared/_rule.scss's
-    // own defaults for --lettering-heading-* are darken/lighten/rgba of
-    // $color-text solved for FOOD's dark-on-light case; on this site
-    // $color-text is near-white ink on a near-black page, the inverse
-    // problem (see shared/_rule.scss's "THE TWO GROUNDS" note), so those
-    // defaults are illegible here and this site re-points them the same way
-    // it already re-points the three lines above -- which is where these
-    // numbers actually come from: --lettering-heading-stroke-c mirrors
-    // --emboss-stroke-c above, --lettering-heading-shadow mirrors
-    // --emboss-shadow above, and --lettering-heading-light makes explicit
-    // the $color-white this site was already getting from shared's
-    // (pre-tier) default.
-    //
-    // BOTH SETS STAY, DELIBERATELY. shared/_base.scss's h1/h2/h3 rule and
-    // every migrated food/shared consumer now read the --lettering-heading-*
-    // names through @include lettering(heading); _cards.scss's card-tape
-    // word and _cocktail.scss's drink-page headings (that file is briefed
-    // and edited separately -- not touched here) still read --emboss-stroke-c
-    // / --emboss-stroke-w / --emboss-shadow directly. One column feeds the
-    // new mixin, the other feeds what hasn't moved onto it yet, and until it
-    // does both need the same numbers.
+    // The heading tier. The shadow is almost nothing: a shadow copy only shows
+    // where it extends past the glyph onto the ground, and dark on dark shows
+    // nothing. The white highlight does all the work.
     --lettering-heading-stroke-c: #{$color-label-stroke};
     --lettering-heading-light:    #{$color-white};
     --lettering-heading-shadow:   #{rgba($color-paper, 0.06)};
 
-    // No consumer on this site is small enough to want the label tier yet
-    // (see LETTERING.md's consumer table) -- set for parity with food's own
-    // file and so a future one falls back to something chosen rather than to
-    // shared's dark-on-light default. Same value as the heading stroke: this
-    // site has one outline colour, not two.
+    // No rule on this site takes the label tier. Set so a future one falls back
+    // to something chosen rather than to shared's dark-on-light default.
     --lettering-label-stroke-c: #{$color-label-stroke};
 
-    // THE WORDMARK TOOK THE LETTERING HELEN SETTLED ON THE CARDS, 2026-09-01,
-    // AND THAT IS NOW WHERE THE DISPLAY TIER'S NUMBERS COME FROM. Her ask,
-    // seeing the header after the inversion: "the wordmark text is weirrrrrd
-    // ... I would like the same lettering you created for our new white on
-    // black headings." Before that, HELEN TRIAGES had a bug rather than a
-    // preference: shared/_layout.scss hardcoded `#dad7d8` up-left (chosen as
-    // "a touch darker than the page", which is only a highlight on a LIGHT
-    // page) and `rgba($color-text, 0.5)` down-right, and with $color-text
-    // near-white here BOTH copies came out light -- two pale blobs 2px apart
-    // on either side of a near-white letter. TWO NEAR-WHITES, ONE TIGHT PAIR,
-    // NO SOFTENING fixed it: the treatment she chose over the wordmark's own
-    // four copies at card size, matching `.drink-card-tape-word`'s own values.
-    //
-    // CONVERTED ONTO THE DISPLAY TIER, 2026-09-02, RATHER THAN KEPT AS ITS OWN
-    // PAIR. shared/_layout.scss's `.site-logo-top` (HELEN TRIAGES) now reads
-    // `@include lettering(display)` like every other site's wordmark, in place
-    // of the `--wordmark-top-stroke` / `--wordmark-top-shadow` pair that used
-    // to sit here -- see that file's own "#477" comment for why. The three
-    // values below ARE the numbers above, faithfully carried over rather than
-    // re-tuned: --lettering-display-stroke-c is the same $color-label-stroke
-    // --wordmark-top-stroke held, and --lettering-display-light /
-    // -display-shadow are #fdfbfe and rgba(5, 5, 5, 0.9) split out of the two
-    // -1px/1px copies --wordmark-top-shadow used to carry as one string (the
-    // offset itself needed no conversion -- 1px already matches the tier's
-    // own default, var(--emboss-offset)).
+    // The display tier: HELEN TRIAGES (`.site-logo-top` in shared/_layout.scss).
+    // Two near-whites, one tight pair, no softening: the same values as
+    // `.drink-card-tape-word` in _cards.scss.
     --lettering-display-stroke-c: #{$color-label-stroke};
     --lettering-display-light:    #fdfbfe;
     --lettering-display-shadow:   rgba(5, 5, 5, 0.9);
 
-    // HELEN TRIAGES AND [ COCKTAILS ] AGREED FOR ONE DAY, THEN DIVERGED THE
-    // OTHER WAY. Earlier on 2026-09-02, Helen asked for the two halves of the
-    // lockup to match each other -- "please make the punched font treatment
-    // the same for HELEN TRIAGES and [ COCKTAILS ]" -- and this file set
-    // `--wordmark-word-stroke` / `--wordmark-word-shadow` to the exact same
-    // two-copy, no-softening numbers `--lettering-display-*` carries above,
-    // so both words on this site's header tape shared one treatment.
-    //
-    // THAT OVERRIDE IS GONE, SAME DAY, ONCE FOOD'S OWN HEADER TAPE ENTERED THE
-    // COMPARISON. Helen: "Please treat [ COCKTAILS ] the same way we now treat
-    // [ FOOD ]." Food's `[ FOOD ]` (shared/_layout.scss's `.site-logo-word`)
-    // has never taken a tier -- it carries its own hand-tuned four-copy
-    // shadow and no stroke, read from that element's own shared defaults --
-    // and it was never asked to match HELEN TRIAGES either. Matching FOOD
-    // means matching THAT, not matching this site's own wordmark-top. So
-    // `--wordmark-word-stroke` and `--wordmark-word-shadow` are removed
-    // outright rather than re-pointed: with nothing here to override them,
-    // `.site-logo-word` falls through to shared's four-copy default on both
-    // sites, the same way it always has on food.
-    //
-    // THE CARD TAPES KEEP THEIR OWN TWO-COPY TREATMENT, AND THE SPLIT FROM
-    // THE HEADER TAPE IS NOW DELIBERATE RATHER THAN SOMETHING THAT NEEDS
-    // RECONCILING. MANUAL §9.13 ("The card title sits on punched tape",
-    // #469) records why a card's own tape word never used the four-copy
-    // version: at 1rem it reads as two overlapping letterforms rather than
-    // one raised one, so `.drink-card-tape-word` in cocktails/_cards.scss
-    // carries its own explicit two-copy pair, sized for a 1rem card title
-    // rather than the header's 2.5rem word. Header tape and card tape were
-    // never the same size, so there was never really one number for both --
-    // only a coincidence, for one day, that they used the same two.
+    // `[ COCKTAILS ]` (`.site-logo-word`) is treated as `[ FOOD ]` is: it takes
+    // no tier and falls through to shared's own four-copy shadow, so nothing
+    // here sets `--wordmark-word-stroke` or `--wordmark-word-shadow`. Only the
+    // two fills are set. The card tapes keep their own two-copy pair (MANUAL
+    // §9.13).
     --wordmark-top-color:   #ECE9EA;
     --wordmark-word-color:  #ECE9EA;
   }
   $emboss-cocktails-vars-emitted: true !global;
 }
 
-// THE h1, h2, h3 RULE THAT USED TO LIVE HERE IS GONE, 2026-09-02, and it is
-// worth knowing that it WORKED rather than that it failed.
-//
-// SETTING THE VARIABLE WAS NOT ENOUGH, and the first version of this file was
-// inert because of it. `shared/_base.scss` used to style h1/h2/h3 with
-//
-//     -webkit-text-stroke: var(--emboss-stroke-w) $color-text;
-//
-// taking the WIDTH from a custom property and hardcoding the COLOUR --
-// $color-label-stroke is not one of the ten the palette contract guarantees,
-// so shared could not name it, and its own comment said as much: "food
-// overrides it with the softer $color-label-stroke on every component that
-// matters". Food did exactly that, restating the stroke on each component;
-// cocktails restated it nowhere, so every heading kept the hard default. This
-// rule fixed that with one override rather than food's thirteen -- ONE RULE
-// RATHER THAN PER-COMPONENT RESTATEMENT, which is the lesson food's own file
-// records: it carried the stroke at THIRTEEN call sites before they were
-// unified onto a custom property, and the unification is described there as
-// the improvement. Starting at thirteen in order to arrive at one would have
-// been copying the history instead of the conclusion.
-//
-// AND NOW `shared/_base.scss` DOES NOT HARDCODE A COLOUR AT ALL. Its h1/h2/h3
-// rule reads `@include lettering(heading)`, which resolves
-// `--lettering-heading-stroke-c` -- a property this file already re-points
-// above, to the exact same $color-label-stroke this rule used to restate a
-// second time through `--emboss-stroke-c`. So the override stopped changing
-// anything: both paths compute the same value, and a rule that always agrees
-// with what it overrides is not doing a job any more. Removed rather than
-// left as a "just in case" -- the numbers it duplicated are the property
-// declarations two sections up, not a second place to change them.
-//
-// IF A NEW DIVERGENCE EVER APPEARS (say, cocktails wants a heading-tier
-// stroke WIDTH different from --emboss-stroke-w, which today it does not), an
-// `h1, h2, h3 { -webkit-text-stroke: ...; }` rule here, imported after
-// shared/base for the same-specificity win, is exactly the shape to bring
-// back -- see assets/css/cocktails.scss for the import order that makes it
-// win.
+// There is no h1/h2/h3 rule here: shared/_base.scss's reads
+// `lettering(heading)`, which resolves the properties above. If this site ever
+// needs a heading stroke of its own, an `h1, h2, h3` rule here wins by import
+// order.
 
 // =============================================================================
-// @mixin heading-rule($colour) — THE TWO-BAR MARK, ONE PLACE FOR BOTH PAGES
+// @mixin heading-rule($colour) — the one-bar mark under the index's headings
 // =============================================================================
-// MOVED HERE FROM _sass/cocktails/_filters.scss, 2026-09-02. It drew the index's
-// five filter headings (chaos/mood/hassle/include/name) alone until the drink
-// page's own section headings (INGREDIENTS/METHOD/NOTES) needed the identical
-// mark -- the section's own colour hugging the letters, the shared electric
-// absinthe bar beneath it. Filters is imported after cocktails/cocktail (see
-// assets/css/cocktails.scss), so a mixin the drink page could reach had to live
-// somewhere both files import; this file already sits before both.
+// One bar in the section's own colour (`$color-heading-*`). Here rather than in
+// _filters.scss because this file is imported before every cocktails partial
+// that could want it.
 //
-// ONE BAR, NOT TWO, SINCE 2026-09-03. Helen, choosing from a candidates page
-// on the real index with the reposado-to-violette ramp on top of three different
-// under-bars: "Ramp alone, gorgeous!!!!" The shared absinthe bar under every
-// heading was the "stability" she chose on 2026-08-30 -- when the five bars
-// above it were five greens and needed a common anchor. A ramp anchors itself:
-// its steps are visibly one line, so the shared bar read as messy rather than
-// steady ("ramp over absinthe is actually messy, which is a shame"). The pink
-// under-bar that would have tied the headings to the card lights was "a lot of
-// pink up top, even for me".
-//
-// THE GEOMETRY IS THE TOP BAR OF `overlapping-rule-double`, exactly, so a
-// single bar here sits where the upper bar of food's double mark sits: same
-// $rule-drop, same $rule-thickness, same $rule-indent and $rule-overhang. It
-// is NOT `overlapping-rule-single`, which paints the thin LOWER bar's geometry
-// at $rule-front-opacity -- a mark solved for a different job on food's recipe
-// page. Solid, because the top bar of the double has always been solid; the
-// opacity belongs to the bar that overlaps, and nothing overlaps here.
-//
-// Names the shared $rule-* variables rather than restating their values, so if
-// the mark moves on food it moves here: that was the whole argument for
-// extracting overlapping-rule-double in the first place, and it still holds
-// with one bar.
+// The geometry is the top bar of `overlapping-rule-double`, so this bar sits
+// where the upper bar of food's double mark sits. It is not
+// `overlapping-rule-single`, which paints the thin lower bar's geometry at
+// $rule-front-opacity. It names the shared $rule-* variables rather than
+// restating them, so if the mark moves on food it moves here.
 @mixin heading-rule($colour) {
   display: inline;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 
   padding-right: $rule-overhang;
-  // Same vertical room the double mixin reserves. The bar itself ends at
-  // 1.08em, inside Courier's ~1.13em content box, but the padding is what
-  // keeps this heading's box the same height as a double-ruled one, so the
-  // index's label rows do not shift by a few pixels for the loss of a bar.
+  // The same vertical room the double mixin reserves, so this heading's box is
+  // the same height as a double-ruled one.
   padding-bottom: 0.45em;
 
   background-image: linear-gradient($colour, $colour);

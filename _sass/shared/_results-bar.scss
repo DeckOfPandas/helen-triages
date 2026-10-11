@@ -1,40 +1,24 @@
-// =============================================================================
-// THE RESULTS COUNT'S DIGITS, AND THE BAR THAT FOLLOWS THEM DOWN THE PAGE
-// =============================================================================
-// Helen, 2026-09-26, from a candidates page of "N survivors" treatments:
-// "both treatments" -- the mono number AND the sticky bar, together, on BOTH
-// indexes. One partial because they are one object: the bar mirrors the count
-// line, and the digits are set the same way in each.
+// THE RESULTS COUNT'S DIGITS, AND THE BAR THAT FOLLOWS THEM DOWN THE PAGE, on
+// both indexes. One partial because the bar mirrors the count line and the
+// digits are set the same way in each.
 //
-// WHICH VARIABLES IT MAY USE -- the same check shared/_shortlist-export.scss
-// records. The spacing scale and $width-content are shared/_tokens.scss's;
-// $color-bg, $color-border, $color-text and $font-body are the palette
-// contract's (shared/_layout.scss lists the ten); $font-label is declared by
-// both palettes under the same name with the same role (IBM Plex Mono), which
-// is what lets shared/_shortlist-export.scss name it and lets this.
+// Beyond shared/_tokens.scss and the palette contract it names $font-label,
+// which both palettes declare under that name with the same role.
 //
-// IMPORTED BEFORE THE SITE PARTIALS, because $results-bar-height below is read
-// by a site's own list rule, and a Sass variable has to exist before the line
-// that names it. The one rule here that competes with a site's is two classes
-// deep for that reason -- see `.results-bar .btn-clear`.
+// Imported before the site partials: a site's own list rule reads
+// $results-bar-height, and a Sass variable has to exist before the line that
+// names it. The one rule here that competes with a site's is two classes
+// deep for that reason (`.results-bar .btn-clear`).
 
 // --- 1. The digits -----------------------------------------------------------
-// ONLY THE NUMBER TAKES THE LABEL FACE. §13.7's ruling on the word stands --
-// "I liked it bare" -- so `survivors` stays plain body text and this class sits
-// on the digits alone. §13.10.1's rule for $font-label is "numbers you act on":
-// the count is the number the whole panel above it exists to move, which is
-// the same claim an ingredient amount makes. The declarations are food's
-// `.ingredient-amount` (its stylesheet's recipe-annotations partial) -- face,
-// weight 600, 0.05em tracking -- plus tabular figures, so 9 -> 10 does not
-// shove the word beside it, and 1.1em, so the figure stands a step proud of the
-// sentence without being a second size of its own.
+// Only the number takes the label face; the word beside it stays plain body
+// text (MANUAL §13.7). $font-label is for numbers the reader acts on
+// (§13.10.1), and the count is the number the panel above exists to move.
+// Tabular figures so 9 -> 10 does not shove the word beside it.
 //
-// SPECIFICITY IS NOT A FIGHT HERE. Each index resets ITS OWN count element to
-// body text (food's `.results-heading .category-label`, cocktails'
-// `.drink-count`); this is a child of that element, so it inherits nothing it
-// names. Cocktails' number is a <strong>, and the `strong { font-weight:
-// inherit }` that used to sit in its count rule is gone so this can give it a
-// weight -- the note is there.
+// Each index resets its own count element to body text (food's
+// `.results-heading .category-label`, cocktails' `.drink-count`); this is a
+// child of that element, so there is no specificity fight.
 .results-count-number {
   font-family: $font-label;
   font-weight: 600;
@@ -44,21 +28,17 @@
 }
 
 // --- 2. The bar --------------------------------------------------------------
-// ONE LINE FIXED TO THE TOP OF THE VIEWPORT once the count line (`#results`)
-// has scrolled off above it: the live count and a `× clear all`. It is a
-// MIRROR and never a second computation -- assets/js/results-bar.js copies the
-// count spans' text and the top clear-all's visibility, and its own button
-// clicks that one. It ships `hidden`; the script reveals it, and only while
-// IntersectionObserver reports the heading above the viewport -- never while
-// the heading is below the fold or in view, so it cannot sit over the header
-// or the filter panel, both of which are above the heading.
+// One line fixed to the top of the viewport once the count line (`#results`)
+// has scrolled off above it. A mirror, never a second computation:
+// assets/js/results-bar.js copies the count's text and the top clear-all's
+// visibility, and its button clicks that one. It ships `hidden` and the
+// script reveals it only while the heading is above the viewport, so it
+// cannot sit over the header or the filter panel.
 //
-// $results-bar-height IS THE ONE NUMBER A SITE'S LIST RULE READS, for its
-// `scroll-margin-top`: a page turn that scrolls the list's top edge into view
-// leaves `#results` just above the viewport, which is exactly when this bar
-// appears, so the list's first row has to land UNDER the bar rather than
-// beneath it. The heading itself needs no such margin: landing on `#results`
-// puts it in view, and a heading in view is a bar hidden.
+// $results-bar-height is what a site's list rule reads for its
+// `scroll-margin-top`: a page turn that scrolls the list's top into view
+// leaves `#results` just above the viewport, which is when the bar appears,
+// so the first row has to land below the bar.
 $results-bar-height: 2.75rem;
 
 .results-bar {
@@ -73,14 +53,12 @@ $results-bar-height: 2.75rem;
   animation: results-bar-in 0.15s ease;
 }
 
-// Said outright rather than left to the UA stylesheet: `position: fixed` on
-// the rule above must not be mistaken for a display, and a reset that gave
-// [hidden] a weaker rule than ours would put the bar on every page.
+// Stated outright, not left to the UA stylesheet: a reset that gave [hidden]
+// a weaker rule than the one above would put the bar on every page.
 .results-bar[hidden] { display: none; }
 
-// The content column's own width and side padding (`main` in shared/_layout.scss
-// is `max-width: $width-content; padding: … $space-xl`), so the count sits over
-// the count line it stands in for at every viewport width.
+// `main`'s own width and side padding (shared/_layout.scss), so the count
+// sits over the count line it stands in for at every viewport width.
 .results-bar-inner {
   max-width: $width-content;
   min-height: $results-bar-height;
@@ -101,11 +79,11 @@ $results-bar-height: 2.75rem;
   white-space: nowrap;
 }
 
-// THE CLEAR IS EACH SITE'S OWN `.btn-clear`, so it inherits that look rather
-// than restating it. What the shared mixin pins to a panel corner
-// (`position: absolute; top: 0; right: 0`) is undone here, because in this
-// row the button is simply the last flex item. Two classes deep so it beats
-// `.btn-clear` wherever in the cascade a site declares that.
+// The clear is each site's own `.btn-clear`, so it inherits that look. What
+// the shared mixin pins to a panel corner (`position: absolute; top: 0;
+// right: 0`) is undone here, because in this row the button is simply the
+// last flex item. Two classes deep so it beats `.btn-clear` wherever in the
+// cascade a site declares that.
 .results-bar .btn-clear {
   position: static;
   margin: 0;
@@ -116,9 +94,9 @@ $results-bar-height: 2.75rem;
   to   { transform: translateY(0); }
 }
 
-// A READER WHO HAS ASKED FOR LESS MOTION GETS NONE. shared/_base.scss already
-// cuts every animation to 0.01ms; this says it in the bar's own words, so the
-// rule survives if that blanket ever narrows.
+// shared/_base.scss already cuts every animation for a reader who asks for
+// less motion; this says it in the bar's own words, so the rule survives if
+// that blanket ever narrows.
 @media (prefers-reduced-motion: reduce) {
   .results-bar { animation: none; }
 }

@@ -1,27 +1,13 @@
-// ============================================================================
-// THE TAPE SHAPE BEHIND A CHIP
-// ============================================================================
-// Shared since #1219, 2026-10-11, when cocktails' filter chips took the tape
-// food's had always worn -- Helen, from the control-layer candidates page:
-// "I'm leaning towards F -- cocktail chips, and tape on both sites!" It lived
-// in _sass/food/_badges.scss until then, and is moved rather than copied: two
-// copies of one slot are what drifts.
+// THE TAPE SHAPE BEHIND A CHIP, shared by both sites (#1219).
 //
-// THE SLOT ONLY. What colour the shape is, at rest, under the pointer and when
-// chosen, is each site's own and stays in its own partials (food/_buttons,
-// food/_category-labels, food/_badges; cocktails/_filters). The artwork is one
-// set, assets/img/chrome/tag-shapes/, filled in by decorations.js's
-// tagShapes().
+// The slot only. What colour the shape is, at rest, under the pointer and
+// when chosen, is each site's own and stays in its own partials. The artwork
+// is one set, assets/img/chrome/tag-shapes/, filled in by decorations.js's
+// tagShapes(), which picks a shape from the tag's own text, so the same tag
+// wears the same shape wherever it appears.
 //
-// The tape shape itself: absolutely positioned behind the badge/button text,
-// stretched to fill (preserveAspectRatio="none" baked into the SVG files
-// themselves, same technique as the wordmark's own tape). One of a curated
-// pool (see the POOL comment in decorations.js's tagShapes() for the full
-// reasoning) assigned deterministically by the tag's own text -- same tag
-// always gets the same shape wherever it appears (a filter button and a
-// recipe-row pill for "greens" match), and shape 9's full-width diagonal is
-// excluded for short tag text specifically, since it distorts more than the
-// others do when stretched very narrow.
+// Absolutely positioned behind the chip's text and stretched to fill it; the
+// SVG files carry `preserveAspectRatio="none"` themselves.
 .tag-shape {
   position: absolute;
   top: 0;
@@ -39,17 +25,10 @@
     height: 100%;
   }
 
-  // tag-shape-2 specifically stretched further than an exact fit, but only
-  // on a genuinely wide pill — Helen: "the way the shape rolls off along
-  // the top left corner bothers me every time" on make-ahead, "doesn't
-  // bother me at all" on duck, same shape both times. decorations.js only
-  // adds this class on long tag text (the same SHORT_TEXT_MAX cutoff used
-  // to keep tag-shape-9 off short pills), so duck is untouched. First pass
-  // at 1.25 overshot even on make-ahead ("too square, sorry, Goldilocks") —
-  // dialed back to a smaller nudge past 1, still enough to move the torn
-  // corner further toward the edge without flattening the shape's own
-  // character. .tag-shape's own overflow: hidden crops the excess rather
-  // than letting it spill past the pill's edges.
+  // tag-shape-2 on a long tag only (decorations.js adds the class above its
+  // SHORT_TEXT_MAX): stretched a little past an exact fit, which moves its
+  // torn top-left corner towards the edge. A larger factor flattens the
+  // shape (Helen's ruling).
   &--stretch svg {
     transform: scaleX(1.1);
     transform-origin: center;

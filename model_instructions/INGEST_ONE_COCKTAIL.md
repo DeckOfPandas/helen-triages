@@ -5,11 +5,12 @@ book page, a screenshot, a URL, or pasted text — and asked to turn it into a
 file for her cocktail site. You do **not** have her repository or her data
 files. Everything you need is in this document.
 
-**Hand back two things:**
+**Hand back one envelope per recipe, in the shape §0 fixes.** It carries:
 
-1. **One complete `.md` file, in a single code block**, ready to save into
-   `_cocktail_drafts/`. Give the filename on the line above it.
-2. **A short "what I could not know" list.** Four or five bullets.
+- **One complete `.md` file**, ready to save into `_cocktail_drafts/`.
+- **A short "what I could not know" list.** A handful of bullets.
+- **A marker line and a fingerprint line**, which let her repository accept
+  the file and recognise a duplicate.
 
 **This document has a sibling, `INGEST_ONE_RECIPE.md`, for food.** They are not
 interchangeable: a food recipe is a procedure, a cocktail recipe is a formula plus a build,
@@ -22,19 +23,27 @@ and the schemas share almost nothing.
 Helen pastes what you write into a GitHub Issue on her private drafts
 repository, `helen-triages-cocktails-private`, titled `ingest: <slug>` and
 labelled `ingest`. A script there parses it, so the shape matters: anything
-missing is a rejection rather than a guess. `INGEST_INBOX_DESIGN.md` §6 is the
-reference and this is the short form.
+missing is a rejection rather than a guess.
 
-Four parts, in this order, and nothing else at the top level:
+These parts, in this order, and nothing else at the top level:
 
 1. `<!-- ingest v1 cocktail -->`, as the first non-blank line. Exactly that.
 2. **One** fenced `yaml` block, and only one — the complete file, front matter
    and all, beginning `---`.
-3. A `## What I could not know` heading with your list under it. If there is
-   genuinely nothing, write "nothing"; the heading is never absent.
-4. A `## Fingerprint` heading, then ONE line: the title lowercased, then every
+3. A `## What I could not know` heading with your list under it, each bullet
+   on one unwrapped line: the script reads every non-blank line as an item of
+   its own. If there is genuinely nothing, write "nothing"; the heading is
+   never absent.
+4. A `## Fingerprint` heading, then one line: the title lowercased, then every
    amount in build order, separated by ` | `. For the worked example in §9 that
    is `jungle bird | 45 ml | 22.5 ml | 15 ml | 15 ml | 45 ml`.
+
+**In a chat, show the whole envelope inside one outer fence of four
+backticks**, so that its own three-backtick `yaml` fence copies as raw text
+instead of closing the block, and put a line reading exactly `ingest: <slug>`
+above it. That line is the issue title; the slug is the filename from §2
+without its `.md`. The outer fence is there for copying and is not part of the
+envelope. §9 shows a complete one.
 
 **The fingerprint is what compares the FORMULA rather than the name**, which is
 the whole of §6's Sazerac trap made mechanical, so the amounts must be the ones
@@ -50,14 +59,14 @@ issue; never fold two recipes into one block.
 
 A cocktail has two fields that carry its whole identity:
 
-- **`generic`** — what CATEGORY of pour it is: "moderately aged Jamaican rum",
+- **`generic`** — what category of ingredient it is: "moderately aged Jamaican rum",
   "blanc vermouth", "lime juice". A closed vocabulary, printed in §3a.
 - **`suggestion`** — the specific bottle, from a dictionary you do not have.
 
 **`generic` is the field the recipe page, the cards and the search all read.**
-It is the only one a reader sees. So an untyped pour must still SAY something:
-write `QQ`, a space, and then **the source's own words** —
-`generic: "QQ aged Jamaican rum"`. Helen, 2026-09-20: *"if it's not obvious
+It is the only one a reader sees. So an untyped ingredient must still say
+something: write `QQ`, a space, and then **the source's own words** —
+`generic: "QQ aged Jamaican rum"`. Helen: *"if it's not obvious
 write QQ then whatever the source said then I have a chance of being able to fix
 it myself."* A bare `QQ` left her looking at "90 ml QQ" with nothing to fix it
 from.
@@ -75,18 +84,16 @@ syrup` is not a match.
 cannot know whether a bottle is declared or how Helen spells it. Write the key
 with an empty list — `suggestion: []` — which is what she asked for (*"that
 saves me typing YAML when I come to it if I want to note my own suggestion"*),
-and put the bottle the source names in that pour's `note:`, as **`"Originally
-<the bottle, as the source prints it>."`**
+and put the bottle the source names in that ingredient's `note:`, as
+**`"Originally <the bottle, as the source prints it>."`**
 
 **That holds even when Helen tells you in the chat to use the source's
-bottles.** She did, once, for a batch of 73 from Difford's, and 148 of them
-named nothing her dictionary knows — most were the source's sponsors, not her
-shelf. Her ruling when they landed, 2026-10-07: *"Move all the suggestions to
-notes, and I can add my own suggestions where I have them or drop if not. For
-notes, just write 'Originally X'."*
+bottles.** The bottles a source names are mostly its sponsors, not her shelf,
+and her dictionary does not know them. Her ruling: *"Move all the suggestions
+to notes, and I can add my own suggestions where I have them or drop if not.
+For notes, just write 'Originally X'."*
 
-Her standing ruling, made on 2026-08-31 when a book named eleven bottles she did
-not own, is what all of this serves:
+Her standing ruling is what all of this serves:
 
 > "I will update these when I make the drinks, so QQ is right. These won't get
 > promoted until I've made them."
@@ -153,7 +160,7 @@ source_url: "https://..."
 `smokestack-lightning.md`. Accents are stripped in a filename, kept in a title.
 
 **Write the keys in the order above, which is the order the page prints them,
-top to bottom** (Helen, #1213): `title`, `tagline`, `glass`, `garnish`, `meta`,
+top to bottom**: `title`, `tagline`, `glass`, `garnish`, `meta`,
 `mood`, `ingredients`, `serve`, `serves`, `method`, `to_serve`, `notes`,
 `source`, `source_url`. `meta` sits fifth because the page prints her rating
 beside the glass and garnish. Leave out a key you are told to omit; never move
@@ -162,38 +169,38 @@ one.
 | Field | Rule |
 |---|---|
 | `title` | The drink's name. **If the source is a specific bar or book's version, say so in the title** — `"Sazerac (Death & Co)"`. See §6. |
-| `tagline` | **A bare `"QQ"`, and you draft nothing.** This is Helen's voice about a drink she has not made yet, on a page that carries her name. Her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content."* A batch of 73 arrived with a line drafted for every one, and on 2026-10-08 she ended that: *"Let's stop Claude drafting taglines. It turns out me doing them in batches works the best."* **The one exception is HER OWN line, if she gives you one in the chat for that drink**: write it exactly as she gave it, with no `QQ` — `"A Manhattan in a woolly jumper."` — because it is already hers, and add nothing after it. Never the source's line, and never yours. |
+| `tagline` | **A bare `"QQ"`, and you draft nothing.** This is Helen's voice about a drink she has not made yet, on a page that carries her name. Her rulings: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*, and *"Let's stop Claude drafting taglines. It turns out me doing them in batches works the best."* **The one exception is HER OWN line, if she gives you one in the chat for that drink**: write it exactly as she gave it, with no `QQ` — `"A Manhattan in a woolly jumper."` — because it is already hers, and add nothing after it. Never the source's line, and never yours. |
 | `glass` | **A LIST, not a scalar**, even for one glass. **Required — see the warning below.** Canonical spellings in §4. |
 | `mood` | **`mood: []`, unless Helen names a mood for that drink in the chat.** The key is required. Most moods are DERIVED in her repo by a script and you never write one of those. The rest are hers alone, and one she gives you goes in exactly as she said it. Never one of your own. See below. |
 | `garnish` | **A LIST.** `[]` means nobody has filled it in; `["no garnish"]` means the drink genuinely takes none. Vocabulary in §4. |
 | `ingredients` | The FULL list, untriaged, **in build order**. §3. |
 | `ingredients[].amount` | The ONLY quantity field, and **every ingredient has one**. No US units, never a bare number. §3. |
 | `ingredients[].generic` | The category. **Typed only where §3a settles it outright; otherwise `QQ` then the source's own words** — `"QQ aged Jamaican rum"`. §1 and §3a. |
-| `ingredients[].suggestion` | The bottle — **never yours to write**, because you do not have the dictionary. **ALWAYS A LIST, and always present: `suggestion: []`.** The bottle the source names goes in that pour's `note:`, as `"Originally <bottle>."` §3. |
-| `ingredients[].note` | One short SENTENCE about that pour — a capital letter and a full stop, always. `"Originally Luxardo Maraschino liqueur."`, `"Or génépy liqueur."`, `"Unaged."` **Only what changes how the drink is made or bought**: the source's bottle, an alternative it offers, a qualifier the generic does not carry. Not `"from the freezer"`, not `"freshly squeezed"`, not `"chilled"` — Helen, 2026-10-07, on a batch that carried all three: less writing. Leave the key out where there is nothing to say. |
-| `ingredients[].as` | How the pour is USED when it is not simply measured in: `"float"`, `"rinse"`, `"muddle"` or `"shell"`. **If your method floats, rinses or muddles a pour, that pour carries the matching `as:`** — her suite refuses a method that says "Float the port on top." over a port with no `as: "float"`, because the cards and the unit count read the field and not the prose. |
+| `ingredients[].suggestion` | The bottle — **never yours to write**, because you do not have the dictionary. **ALWAYS A LIST, and always present: `suggestion: []`.** The bottle the source names goes in that ingredient's `note:`, as `"Originally <bottle>."` §3. |
+| `ingredients[].note` | One short sentence about that ingredient — a capital letter and a full stop, always. `"Originally Luxardo Maraschino liqueur."`, `"Or génépy liqueur."`, `"Unaged."` **Only what changes how the drink is made or bought**: the source's bottle, an alternative it offers, a qualifier the generic does not carry. Not `"from the freezer"`, not `"freshly squeezed"`, not `"chilled"`: Helen wants less writing. Leave the key out where there is nothing to say. |
+| `ingredients[].as` | How the ingredient is used when it is not simply measured in: `"float"`, `"rinse"`, `"muddle"` or `"shell"`. **If your method floats, rinses or muddles an ingredient, that ingredient carries the matching `as:`** — her suite refuses a method that says "Float the port on top." over a port with no `as: "float"`, because the cards and the unit count read the field and not the prose. |
 | `ingredients[].character` | Why a drink wants a particular bottle. **Never yours to write** — §3. |
 | `serve` | How it is iced, and any rim. **A mapping, and OPTIONAL — omit it entirely if the source does not say.** §4a. |
-| `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. A step is a string, or a `{step, note}` pair — **used sparingly** (Helen, 2026-09-04), for an aside about how she does the step rather than part of the instruction. |
+| `method` | An ORDERED list. The steps are sequential and reordering makes a different drink. §5. A step is a string, or a `{step, note}` pair — **used sparingly**, and almost never from an ingest: the note is her own aside about how she does the step, and a parenthetical that is part of the source's instruction stays in the step. |
 | `to_serve` | **Serveware only** — what the drink is served WITH. `"Straw."`, `"Two straws."`, `"Ladle and punch glasses."` A terse noun phrase, or `""`. **Never the ice** — that is `serve.ice`. |
-| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. **A bare string note is not legal anywhere any more** — 2026-10-01, 298 of them migrated to the pair, `test_note_dicts_have_label_and_text_when_dict` refuses a new one. An EMPTY pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and neither layout prints it. **If you have no note to add, write exactly that one empty pair — never `notes: []`** (#1258, 2026-10-02): it leaves Helen somewhere to type without recalling the shape. Use a note to record what the source could not give you. |
+| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s and replaces the label with a real heading and the text with her own words. **A bare string note is not legal**: her suite refuses one. An empty pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and the page does not print it. **If you have no note to add, write exactly that one empty pair — never `notes: []`**: it leaves Helen somewhere to type without recalling the shape. Use a note to record what the source could not give you. |
 | `source` / `source_url` | Free text here, unlike food — and `""` is a perfectly good answer, on most cocktails. **But if it IS one of the publications in §6a, spell it the way §6a spells it.** `source_url` may be `""`. |
-| a tip printed under the source's own label | **Transcribe the tip; drop the label.** A book or a site that runs its asides under a standing rubric is showing you its furniture, and `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence. **Never carry an unexplained abbreviation across** — eight food drafts kept a `gf tip:` prefix that was read as *gluten-free* for weeks by an issue and a test comment alike, and one proposed fix would have printed a false allergen claim. Expand it now, while the source is in front of you, or drop it. |
-| `meta.made_before` | Has Helen made this drink? **Always `false` on a fresh ingest** — unquoted, never `"false"`. A transcription cannot know whether she has poured it, and this is the field that says so. She flips it herself when she makes it. Issue #722. |
-| `meta.ship` | Helen's rating. **Always `"who knows"`, never `"QQ"`** — you have not drunk it and neither has she, and `QQ` is not a ship value. Helen, 2026-09-05: "I think that's clearer than QQ or leaving it unset, because it's a positive presence." The pair reads straight: she has not made it, so she has no idea. |
-| `meta.rewritten` / `meta.awaiting_fix` / `meta.proofread` | **Exactly these three, in this order, all `false`, unquoted.** The same publish gate a food recipe carries (since 2026-09-02). `rewritten` and `proofread` are Helen's own claims about her own work and you never set either `true`; `awaiting_fix: false` is what lets a cocktail recipe publish once she has, and `false` unquoted is the only value that works. Underscore, never a hyphen. |
+| a tip printed under the source's own label | **Transcribe the tip; drop the label.** A book or a site that runs its asides under a standing rubric is showing you its furniture, and `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence. **Never carry an unexplained abbreviation across** — a food magazine's `gf tip:` prefix reads as *gluten-free*, which is a false allergen claim. Expand it while the source is in front of you, or drop it. |
+| `meta.made_before` | Has Helen made this drink? **Always `false` on a fresh ingest** — unquoted, never `"false"`. A transcription cannot know whether she has poured it, and this is the field that says so. She flips it herself when she makes it. |
+| `meta.ship` | Helen's rating. **Always `"who knows"`, never `"QQ"`** — you have not drunk it and neither has she, and `QQ` is not a ship value. Helen: "I think that's clearer than QQ or leaving it unset, because it's a positive presence." The pair reads straight: she has not made it, so she has no idea. |
+| `meta.rewritten` / `meta.awaiting_fix` / `meta.proofread` | **Exactly these three, in this order, all `false`, unquoted.** The same publish gate a food recipe carries. `rewritten` and `proofread` are Helen's own claims about her own work and you never set either `true`; `awaiting_fix: false` is what lets a cocktail recipe publish once she has, and `false` unquoted is the only value that works. Underscore, never a hyphen. |
 
 > ### EVERY COCKTAIL MUST NAME A GLASS, and you may not guess one.
 >
-> Helen, 2026-08-27: *"All recipes should have a glass."* On a cocktail page the
+> Helen: *"All recipes should have a glass."* On a cocktail page the
 > glass is the hero — it is drawn as tall as the whole title block — so an
 > empty `glass` is not a missing detail, it is a page with a hole where its
 > main image goes. Her suite enforces it.
 >
 > **But which glass a drink wants is her knowledge, not something derivable
 > from the ingredients**, and a wrong glass looks exactly as confident as a
-> right one. When she filled in the last sixteen herself she did it from the
-> ingredients and the total volume, drink by drink.
+> right one. She works it out from the ingredients and the total volume, drink
+> by drink.
 >
 > So: **take the glass from the source if the source names one.** If it does
 > not, write `glass: []` and **put it as the FIRST line of your "what I could
@@ -201,20 +208,14 @@ one.
 > complete, and it is a ten-second question for her.
 
 **`mood: []` — and it is not a gap.** Most moods are derived from the
-ingredients by rule and then STORED, so that Helen can override one. The rules
-live in her `taxonomy.yml` and a script applies them:
+ingredients by rule, by a script in her repository, and then stored so that
+Helen can override one. **Writing a derived mood yourself is worse than leaving
+it empty**, because the next run silently reverts it — and a hand-typed mood
+that happens to match hides the fact that nobody derived it. The key must be
+present; `[]` is the right value.
 
-```
-python3 scripts/derive_cocktail_moods.py --write
-```
-
-That is one command in her repo and it fills the field in. **Writing a derived
-mood yourself is worse than leaving it empty**, because the next run silently
-reverts it — and a hand-typed mood that happens to match hides the fact that
-nobody derived it. The key must be present; `[]` is the right value.
-
-**THE ONE EXCEPTION IS A MOOD HELEN GIVES YOU, IN THE CHAT, FOR THAT DRINK.**
-Twelve moods describe an occasion or a judgement rather than the liquid, and
+**The one exception is a mood Helen gives you, in the chat, for that drink.**
+These moods describe an occasion or a judgement rather than the liquid, and
 only she assigns them: `clear`, `sugar craving`, `tiki`, `aperitivo`,
 `nightcap`, `brunch`, `sunny terrace`, `festive`, `signature`,
 `so wrong it's right`, `easy peasy`, `on fire`. If she says "Roman Punch is a
@@ -222,8 +223,7 @@ sunny terrace drink", write `mood: ["sunny terrace"]`, spelled exactly as in
 that list. Her script keeps a mood from that list and adds the derived ones
 beside it. **Never offer one, never infer one from the recipe, and never write
 a mood that is not in that list** — the same rule as the tagline: hers if she
-gave it, otherwise empty. A batch of 73 carried six of these on five drinks
-(2026-10-07), and they were kept because she had asked for every one.
+gave it, otherwise empty.
 
 ---
 
@@ -247,7 +247,7 @@ ingredients:
 
 > ### NO US UNITS. EVER. Convert them.
 >
-> Helen's ruling, 2026-08-31: *"I don't want any US units, just ml, so please
+> Helen's ruling: *"I don't want any US units, just ml, so please
 > convert for me as part of ingestion."*
 >
 > **1 oz = 30 ml. 1 tsp = 5 ml. 1 tbsp = 15 ml. 1 cl = 10 ml.**
@@ -269,8 +269,8 @@ test rather than rendering:
 `(splash)` · `(float)` · `(sprinkle)` · `to taste`
 <!-- vocab:measures end -->
 
-Four things a source prints as if they were units, and what to do instead
-(Helen's rulings, 2026-09-03):
+Things a source prints as if they were units, and what to do instead (Helen's
+rulings):
 
 - **A barspoon is `"5 ml"`.** Convert it like a teaspoon; her suite rejects
   the word.
@@ -279,20 +279,19 @@ Four things a source prints as if they were units, and what to do instead
   declared generics and both units are declared, so both are exact matches and
   neither needs a `QQ`. **The count still needs its unit** — `amount: "1"` is a
   bare number and is rejected.
-- **Half a fruit is `amount: "half"`** — Helen's ruling, 2026-09-04, on a
-  Caipirinha's lime. `half` and `whole` are units, and a whole fruit is
+- **Half a fruit is `amount: "half"`** — Helen's ruling, on a Caipirinha's
+  lime. `half` and `whole` are units, and a whole fruit is
   COUNTED, never measured: do not turn half a lime into millilitres, because
   the juice a lime gives is a range and a figure here would be precision the
   fruit does not have. The page prints `half`, `1 whole`, `1½ whole`.
-- **An unmeasured pour is a BRACKETED NOUN** — Helen's ruling, 2026-09-26,
-  replacing the `to top` / `to rinse` forms this paragraph used to teach. The
+- **An unmeasured ingredient is a bracketed noun** (Helen's ruling). The
   ingredient added by a top-up is `amount: "(top)"` and the method carries a
   `Top with …` step; a rinse is `amount: "(rinse)"` with a `Rinse …` step. The
-  others are `"(splash)"` (a deliberate small pour that does NOT fill the
+  others are `"(splash)"` (a deliberate small amount that does not fill the
   glass), `"(float)"` (only where no millilitre figure is given — a float
   usually has one) and `"(sprinkle)"` (cinnamon onto a flame).
-- **Rum set alight in a fruit shell is a MEASURED pour with `as: "shell"`** —
-  Helen's ruling, 2026-10-01. `amount: "25 ml"` unless the source gives its own
+- **Rum set alight in a fruit shell is a measured ingredient with
+  `as: "shell"`** (Helen's ruling). `amount: "25 ml"` unless the source gives its own
   figure, written as the LAST ingredient (only a `"(sprinkle)"` of
   `ground cinnamon` may follow it). The method then ENDS on exactly three
   steps: `Fill the passion fruit shell with the <rum> and set on top of the
@@ -304,14 +303,12 @@ Four things a source prints as if they were units, and what to do instead
   `"(garnish)"`, as a float, or as prose in `to_serve` — none of those counts
   its alcohol.
 
-  The brackets are the point: the old form was a sentence fragment sitting in
-  a column of quantities, and the bracketed noun reads as what it is — the
-  slot where a number would be, naming the action instead. **They are in the
-  measures list above; if it and this paragraph ever disagree, the list is
-  generated and this is not, so the list wins.**
-- **`"to taste"` keeps its old shape**, and is the one that did not get
-  brackets. The bracketed words name what the MAKER does with a pour nobody
-  measured; `to taste` hands the decision to the DRINKER — the Ti' Punch is
+  The bracketed noun sits in the slot where a number would be and names the
+  action instead. **The bracketed words are in the measures list above; if it
+  and this paragraph ever disagree, the list wins.**
+- **`"to taste"` takes no brackets.** The bracketed words name what the maker
+  does with an ingredient nobody measured; `to taste` hands the decision to
+  the drinker — the Ti' Punch is
   served with lime and sugar on the side so people can roll their own — so it
   reads as English in the amount column because it is an instruction to
   whoever is holding the glass.
@@ -320,7 +317,7 @@ Four things a source prints as if they were units, and what to do instead
   undeclared — that is a one-line data edit for Helen, and much cheaper than
   a figure you invented.
 
-**NEVER WRITE A BARE NUMBER.** An amount with no unit cannot be read. If the
+**Never write a bare number.** An amount with no unit cannot be read. If the
 source really gives one, write it as it stands **and add a note saying the
 source had no unit** — the ladders 30/22.5/15/7.5 and 0.75/0.5 are thirty
 times apart and a wrong guess looks exactly as confident as a right one.
@@ -345,78 +342,53 @@ Luxardo (Aperol-style liqueur)" — the whole string goes behind the `QQ`, and
 the bottle goes in the note as well: `note: "Originally Aperitivo Luxardo."`
 
 **Write the bottle as the source spells it, and do not tidy it.** Helen's
-bottle dictionary resolves spellings by alias, and her standing rule
-(2026-09-04) is that a cocktail keeps her spelling and the dictionary learns it,
-never the other way round. Two things you can get right from the source
-alone: a HOUSE is not a bottle (Briottet, Monin, Gabriel Boudier make many
+bottle dictionary resolves spellings by alias, and her standing rule is that a
+cocktail keeps her spelling and the dictionary learns it, never the other way
+round. What you can get right from the source alone: a HOUSE is not a bottle (Briottet, Monin, Gabriel Boudier make many
 things — if the source names the product, write the product), and a spirit
 TYPE printed beside its own name is not a bottle at all (a source's
 "aguardiente" next to aguardiente is the generic, not a suggestion).
 
 ### There is no `item` field. Do not write one.
 
-There used to be. It held the source's own wording for a pour while the category
-was unknown, and it was **retired on 2026-09-21** — Helen: *"'item' needs to go.
-Kill it with fire. Data can be read straight into generic/suggestion with or
-without QQs, and anything genuinely unclear added to a page note for me."*
-
-**It went because nothing rendered it.** The line a reader sees is built from
-`generic` and `suggestion`, so a transcription sitting in a third field was
-invisible on the page, invisible to the cards and the search, and invisible to
-costing and ABV. By 2026-09-05 every one of 683 pours had a real category and
-215 still carried the `item` that had been a placeholder for it. Helen: *"we
-agreed to drop item, but then I was persuaded to allow it back as somewhere to
-hold incoming data, but it's become a dumping ground again."* Emptying it turned
-up 57 bottles the page had never been able to show, 23 of which existed nowhere
-else in the repository — so the field had been quietly hoarding, not holding.
+The line a reader sees is built from `generic` and `suggestion`, so a
+transcription sitting in a third field is invisible on the page, to the cards
+and the search, and to costing and ABV. Helen: *"Data can be read straight into
+generic/suggestion with or without QQs, and anything genuinely unclear added to
+a page note for me."*
 
 **So the source's words go where they can be seen: `generic`, behind a `QQ `.**
 A fact that none of `amount`, `generic` or `suggestion` carries goes in that
-pour's `note:`.
+ingredient's `note:`.
 
 ### `suggestion` is ALWAYS a list, and always present
 
-`suggestion: []` on every pour you cannot answer, which is every pour: you do
-not have the bottle dictionary. Helen asked for the empty key rather than no key
-— *"that saves me typing YAML when I come to it if I want to note my own
-suggestion."*
+`suggestion: []` on every ingredient, because you do not have the bottle
+dictionary. Helen asked for the empty key rather than no key — *"that saves me
+typing YAML when I come to it if I want to note my own suggestion."*
 
-Where a bottle IS named, it is `["Beefeater"]`, never `"Beefeater"`. One bottle
-or five, the shape is the same, and a test enforces it.
-
-Liquid treats a bare string as a one-item sequence, so both shapes rendered
-correctly and nothing complained while 194 pours used one and 18 used the
-other. That is precisely why it needed a rule: everything downstream — the
-alcohol-units work, costing, the scaler — would otherwise handle two shapes
-forever.
-
-**`generic` is deliberately NOT held to this**, and the difference is worth
-understanding. There a bare string means "this category" and a list means
-"either of these would do", so the two shapes mean DIFFERENT things. On
-`suggestion` they mean the same thing and differ only in how many bottles are
-named.
+Where a bottle is named, it is `["Beefeater"]`, never `"Beefeater"`. One bottle
+or five, the shape is the same, and her suite enforces it.
 
 ### `character` — the field that is never yours
 
-`character` is the flavour property that made a drink want THIS bottle:
-`blackstrap` on a rum, `peated` on a whisky, the botanical a gin pushes. Helen,
-2026-08-24: *"Blackstrap is only ever given as a character for another rum, like
-this: Moderately aged (character: blackstrap)."* So it rides ALONGSIDE a real
-`generic` and never replaces one — a pour still needs its category, and the
-character says why that particular bottle.
+`character` is the flavour property that made a drink want this bottle:
+`blackstrap` on a rum, `peated` on a whisky, the botanical a gin pushes. Helen:
+*"Blackstrap is only ever given as a character for another rum, like this:
+Moderately aged (character: blackstrap)."* It rides alongside a settled
+`generic` and never replaces one, and its vocabulary is declared in her
+repository, where you cannot see it.
 
-**Which means you cannot write one.** A character with no settled category under
-it is a property attached to nothing, and for rum and whisky the vocabulary is
-closed and declared in her repository, where you cannot see it. Leave the field
-out. If the source names a property beside a pour, it is already in the
-`QQ <the source's words>` you transcribed, and one line in your list is what
-turns it into a `character` when she makes the drink.
+**So leave the field out.** If the source names a property beside an
+ingredient, it is already in the `QQ <the source's words>` you transcribed, and
+one line in your list is what turns it into a `character` when she makes the
+drink.
 
 ---
 
 ## 3a. The generic vocabulary — the whole of it
 
-**These are every category a pour may be declared as.** An item that names one
+**These are every category an ingredient may be declared as.** An item that names one
 of them EXACTLY is a lookup, not a judgement: write it, with no `QQ`. Anything
 else — a bottle, a brand, a near-miss, a category you think you recognise but
 cannot find below — is `QQ` and then the source's own words.
@@ -424,8 +396,8 @@ cannot find below — is `QQ` and then the source's own words.
 **Exactly, and nothing looser.** `agave nectar` is not `agave syrup`. `rye
 whiskey` is not `rye`. `chartreuse` is neither `Chartreuse Verte` nor
 `Chartreuse Jaune` and you cannot know which. `peach liqueur` is not
-`crème de pêche`. Every one of those five was a real wrong guess, caught by a
-test the day the vocabulary was first written down.
+`crème de pêche`. Every one of those is a wrong guess that has really been
+made.
 
 **Some of these are proper nouns and that is deliberate** — Campari, Cynar,
 Bénédictine, Becherovka. Where nothing generalises a bottle, the bottle IS the
@@ -525,7 +497,7 @@ does not give one you cannot pick: that is a `QQ`.
 
 ---
 
-## 4. The two closed vocabularies you CAN use
+## 4. The closed vocabularies you can use
 
 These are complete. Anything outside them fails her test suite, so if nothing
 fits, use the source's own words and flag it in your list.
@@ -616,16 +588,15 @@ Four rules that decide the awkward cases:
   appear alone, never beside a real garnish. Use `[]` if the source is simply
   silent — that is the honest answer.
 
-> ### A GARNISH IS NOT A POUR, A RIM, OR SERVEWARE
+> ### A GARNISH IS NOT AN INGREDIENT, A RIM, OR SERVEWARE
 >
-> The field had absorbed all three by 2026-09-05, because two of them had no
-> home until then. Four things that look like garnishes and are not:
+> Things that look like garnishes and are not:
 >
-> - **Anything with an amount is a POUR.** "3 dashes red creole-style bitters",
->   "5 drops of olive oil". Those go in `ingredients` with their amount, and a
->   method step puts them on top — "Drop the bitters on the top." Helen wants
->   units of alcohol counted (#297), and nothing can count a pour hiding in
->   `garnish`.
+> - **Anything with an amount is an ingredient.** "3 dashes red creole-style
+>   bitters", "5 drops of olive oil". Those go in `ingredients` with their
+>   amount, and a method step puts them on top — "Drop the bitters on the top."
+>   Helen wants units of alcohol counted, and nothing can count an ingredient
+>   hiding in `garnish`.
 > - **A rim is `serve.rim`.** "half-rim of sugar" is done to the glass before
 >   the drink is built. But `lime wedge on rim` IS a garnish — that is a
 >   placement, and a placement carries information.
@@ -657,7 +628,7 @@ listed, write the source's words and flag it in your list.
 **On the side:** `lime and sugar on the side` · `assemblage au choix`
 <!-- vocab:to_serve end -->
 
-**A pour is never a `to_serve` item.** "Shell filled with overproof rum" is an
+**An ingredient is never a `to_serve` item.** "Shell filled with overproof rum" is an
 ingredient with `as: "shell"` (§3); "champagne on the side" is an ingredient
 with a `note`. What `to_serve` may say about fire is the flourish — `more
 fire`, `optional fire if tiki mug` — never the rum.
@@ -667,9 +638,8 @@ fire`, `optional fire if tiki mug` — never the rum.
 ## 4a. `serve` — how it is iced
 
 **The ice that goes in the GLASS, never the ice in the shaker.** That
-distinction is the whole of this field. Of 156 mentions of ice in the
-collection's method steps, 86 were the shaker's: "Shake all ingredients with
-ice" says nothing about how the drink is served.
+distinction is the whole of this field: "Shake all ingredients with ice" says
+nothing about how the drink is served.
 
 ```yaml
 serve:
@@ -697,7 +667,7 @@ Helen, not a blank to fill with a default.
 **`rim` is free text and rare.** `rim: "half-rim of sugar"`. Only if the source
 rims the glass.
 
-**There is no `chill` key and you must not invent one.** Helen, 2026-09-05: *"I
+**There is no `chill` key and you must not invent one.** Helen: *"I
 think it's implied that glasses should be chilled (except hot drinks
 obviously). I am the user after all."* If the source does something MORE than
 chilling — freezing a glass, rinsing it with absinthe — that is a method step in
@@ -778,10 +748,10 @@ that needs two is free text.
 `Fill the lime shell with the <X> and set on top of the drink.`
 <!-- vocab:method end -->
 
-Seven things that will catch you out:
+What will catch you out:
 
-- **A STRAIN STEP IS THE TECHNIQUE AND NOTHING ELSE.** Five strings, and there
-  is no sixth: `Strain.` · `Fine strain.` · `Double strain.` · `Dump.` ·
+- **A strain step is the technique and nothing else.** These strings, and
+  there is no other: `Strain.` · `Fine strain.` · `Double strain.` · `Dump.` ·
   `Pour.` **Never name the glass, never name the ice.** The glass is in
   `glass:`, which draws the icon; the ice is in `serve.ice` (§4a). So:
 
@@ -792,12 +762,6 @@ Seven things that will catch you out:
   | "strain into a rocks glass over a big cube" | `Strain.` + `serve: {ice: "large cube"}` |
   | "strain over crushed ice" | `Strain.` + `serve: {ice: "crushed"}` |
 
-  This group held SEVENTEEN strings until 2026-09-05 and every retired one
-  named where the drink landed, because the ice had no field. Two of the
-  seventeen turned out to be truncated sentences nobody had noticed —
-  "Fine strain into a chilled." and "Fine-strain into pre-chilled." — which is
-  the argument for the change in one line: prose that varies is prose nobody
-  can check.
 - **"Shake all ingredients" and "Shake" mean different things.** After a build
   step — a muddle, a rinse, an "add the rest" — "Shake with ice." means *shake
   what is in the shaker*, and that is a different instruction. **Read the step
@@ -806,18 +770,13 @@ Seven things that will catch you out:
 - **A step may not start with "Serve" or "Garnish".** Those belong in
   `to_serve` and `garnish`. "Serve with a straw" becomes `to_serve: "Straw."`
 - **A step may not start with "Express" either, and this one is not obvious.**
-  Helen's ruling, 2026-09-04: a garnish of any citrus twist makes the recipe
+  Helen's ruling: a garnish of any citrus twist makes the recipe
   page add `Express the twist over the drink then drop it in.` as the last
   step, on its own — so a cocktail that writes it says one fact twice. If the
   source's last line expresses a twist, put the twist in `garnish:` and write
   no step. (`orange twist (discarded)` gets `...and discard it.` instead.)
   The two sentences are in the **Express** group above for recognition only;
   you never type either.
-- **A step may carry a `note`** — `{step, note}` instead of a string — but
-  **used sparingly**, and almost never from an ingest: the note is Helen's own
-  aside about how she does the step ("my giant spiky muddler not the polite
-  smooth one"), not something a source can give you. If the source's step has
-  a parenthetical that is part of the INSTRUCTION, leave it in the step.
 - **Everything expressive stays free text.** "Muddle the lime chunks hard with
   the sugar in the bottom of a shaker until the sugar has dissolved" cannot be
   collapsed without losing the drink. Don't try.
@@ -826,9 +785,8 @@ Seven things that will catch you out:
 
 ## 6. What the source cannot give you, and the one trap that has bitten
 
-**A COCKTAIL ALREADY IN THE COLLECTION MAY SHARE A NAME AND NOT BE THE
-SAME DRINK.** This is the real hazard, and it caught a session on 2026-08-31.
-Helen's Sazerac splits the spirit three ways across rye, bourbon and cognac and
+**A cocktail already in the collection may share a name and not be the same
+drink.** This is the real hazard. Helen's Sazerac splits the spirit three ways across rye, bourbon and cognac and
 pours absinthe and chilled water into the glass. Death & Co's rinses and
 discards the absinthe, has no bourbon and no water, runs 3:1 rye to cognac, and
 sweetens with demerara. Two of *her* suggested bottles are *its* specified
@@ -846,9 +804,8 @@ bar or book.
 a screenshot that ends below the ingredients. These do not announce themselves,
 and the sibling recipes on the same page ending the same way is not evidence —
 that is *their* wording. Transcribe what is in frame, write a `QQ` note saying
-where the frame ended, and say so in your list. Two cocktails in her collection
-are unmakeable for exactly this reason and are tracked as open issues rather
-than guessed at.
+where the frame ended, and say so in your list. A cocktail she cannot make yet
+is the right outcome; a guessed one is not.
 
 **AN INFUSION OR A SYRUP ON ANOTHER PAGE IS MISSING DATA, not a detail.** If a
 cocktail recipe pours "jalapeño-infused blanco tequila" and the infusion recipe is not in
@@ -860,7 +817,7 @@ inferable.
 
 ## 6a. `source` — the publications, and how each spells itself
 
-**Most cocktails say `source: ""` and that is right.** Helen, 2026-08-30: *"I sort
+**Most cocktails say `source: ""` and that is right.** Helen: *"I sort
 of don't care about this. You can't copyright facts, and I am taking no prose
 from anywhere. Some will be attributable to a big-name inventor, bar or maybe
 hotel, and it's nice to note that, but I'm not going to sweat it."* So this is
@@ -890,11 +847,11 @@ and leaves the field that holds links empty beside it.
 
 ---
 
-## 6b. Difford's Guide — how its page reads, and four rulings that are its alone
+## 6b. Difford's Guide — how its page reads, and the rulings that are its alone
 
-Most of what Helen sends is a paste of a Difford's recipe page: 73 in one
-sitting on 2026-10-07. Its layout is regular enough to be worth knowing, and
-four of her rulings apply to it and to nothing else.
+Most of what Helen sends is a paste of a Difford's recipe page. Its layout is
+regular enough to be worth knowing, and some of her rulings apply to it and to
+nothing else.
 
 **Paste beats fetching.** A fetched page comes back in US fluid ounces with US
 bottles, and a community recipe hides its method and garnish from a logged-out
@@ -912,24 +869,24 @@ ___". **Never the "Photographed in a ___" caption**, which names the prop in
 the picture and often disagrees. Where the page offers two — "Coconut shell or
 Collins glass" — list both.
 
-**THE FOUR RULINGS, Helen's, 2026-10-07, for Difford's only:**
+**Helen's rulings, for Difford's only:**
 
 | Difford's prints | You write |
 |---|---|
 | "Saline solution" or "Difford's Saline Solution (or merest pinch of salt)", any number of drops | `amount: "1 small pinch"`, `generic: "salt"`. She does not keep saline. Carry an "(optional)" across as `optional: true`. |
 | "Sugar syrup 'rich' (2 sugar to 1 water) 65.0°Brix", or "Monin Pure Cane sugar syrup (65.0°brix, equivalent to 2 sugar to 1 water)" | `generic: "cane sugar syrup 2:1"`, no `QQ`, no note. The Brix and the brand are both dropped — this is the one bottle that gets no "Originally". |
 | a bottle with its category in brackets, or a bottle alone | the whole printed string behind the `QQ`, and `note: "Originally <bottle>."` §3. |
-| "(freshly squeezed)", "(chilled)", "(from freezer)", "(pasteurised)", an ABV or a proof beside a pour | dropped, unless it is the only thing that says WHICH category — "Straight rye whiskey (100 proof /50% alc./vol.)" keeps all of it behind the `QQ`, because the proof is what makes it her `bonded rye`. |
+| "(freshly squeezed)", "(chilled)", "(from freezer)", "(pasteurised)", an ABV or a proof beside an ingredient | dropped, unless it is the only thing that says WHICH category — "Straight rye whiskey (100 proof /50% alc./vol.)" keeps all of it behind the `QQ`, because the proof is what makes it her `bonded rye`. |
 
-**An alternative printed in the pour line goes in that pour's note**: "Yellow
+**An alternative printed in the ingredient line goes in that ingredient's note**: "Yellow
 Chartreuse (or génépy liqueur)" is `note: "Or génépy liqueur."`; "Peychaud's or
 other Creole-style bitters" is `note: "Or other Créole-style bitters."`
 
 **Its build lines, and what each becomes:**
 
-- "SHAKE first 4 ingredients with ice" names the pours by COUNT. Name the one
-  left out instead: `Shake all ingredients other than the <X> with ice.` Count
-  carefully, and check that a pour the method adds later is not shaken too.
+- "SHAKE first 4 ingredients with ice" names the ingredients by count. Name
+  the one left out instead: `Shake all ingredients other than the <X> with ice.`
+  Count carefully, and check that one the method adds later is not shaken too.
 - "STRAIN into ice-filled glass (preferably over a large cube or chunk of block
   ice)" is `Strain.` and `serve: {ice: "large cube"}`. Plain "ice-filled glass"
   is `cubed`; "glass filled with crushed ice" is `crushed`; "chilled glass" is
@@ -953,11 +910,13 @@ other Creole-style bitters" is `note: "Or other Créole-style bitters."`
 - British spellings. Em dash for `--` in prose. `°C` with the degree sign.
 - **Reproduce a bottle or brand exactly as it spells itself**, accents and all:
   `Bénédictine`, `Cointreau`, `St-Germain`, `Difford's`.
+- **A space between a number and its unit**: `"45 ml"`, never `"45ml"`, which
+  her suite rejects.
 
 **Accented words her house style declares.** The list is shared with the food
 site, so most of it is culinary — but `crème`, `piña` and `purée` all turn up
-in a cocktail recipe, and a missing accent on one of these is a mechanical fault
-her formatter would fix on a food recipe and does not yet fix on a cocktail recipe:
+in a cocktail recipe. A missing accent on one of these is a mechanical fault,
+and her formatter fixes it in the fields she writes:
 
 <!-- vocab:accents start -->
 açaí · aïoli · béarnaise · béchamel · brûlée · café · canapé · canapés ·
@@ -976,16 +935,18 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
   it; everything else is `QQ` and then the source's own words. A near-miss is a
   guess.
 - **Never write a `suggestion`, and never leave the key out.** `suggestion: []`,
-  every pour, every time — including when Helen says in the chat to use the
-  source's bottles. The bottle the source names goes in that pour's `note:`,
+  every ingredient, every time — including when Helen says in the chat to use
+  the source's bottles. The bottle the source names goes in that one's `note:`,
   as `"Originally <bottle>."`
-- **Never write an `item:`.** There is no such field — it was retired on
-  2026-09-21 and a file carrying one fails her schema outright.
+- **Never write an `item:`.** There is no such field, and a file carrying one
+  fails her schema outright.
 - **Never draft a `tagline`.** A bare `"QQ"`, or Helen's own line if she gave
   you one for that drink. It is her voice on a published page and it is never
   yours, and never the source's.
-- **Never leave a pour's `note` as a fragment.** A capital and a full stop.
-- **Never float, rinse or muddle a pour in the method without its `as:`.**
+- **Never leave an ingredient's `note` as a fragment.** A capital and a full
+  stop.
+- **Never float, rinse or muddle an ingredient in the method without its
+  `as:`.**
 - **Never invent `meta.ship`** — that is Helen's rating of a drink she has
   drunk. `"who knows"` is the only value an ingest writes, and **never `"QQ"`**:
   `QQ` is not in the ship vocabulary at all.
@@ -998,20 +959,20 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
 - **Never name the glass OR the ice inside a method step.** §5.
 - **Never write `suggestion` as a bare string.** Always a list.
 - **Never invent a `serve.chill`** — a chilled glass is assumed. §4a.
-- **Never put a pour in `garnish`.** Anything with an amount is an ingredient.
+- **Never put an ingredient in `garnish`.** Anything with an amount belongs in
+  `ingredients`.
 - **Never give a note you add any label but `QQ`, and never write one as a bare
   string.** Both fields set, both beginning `QQ`. A recipe page titles a note
   with no label "note", which looks finished, so a note nobody has read would
   publish under a heading that says nothing is wrong. `QQ` is the title she can
-  see and search for (#1120, Helen).
+  see and search for.
 - **Never reconstruct a truncated method**, however obvious the pattern. But
-  **do say in your list that it looks truncated** — three of these were found
-  in one day in 2026-09, all by machine and none by a reader.
+  **do say in your list that it looks truncated.**
 - **Never assume a familiar name means a familiar drink.**
 
-> ### FOUR RUM WORDS THAT ARE NOT CATEGORIES
+> ### RUM WORDS THAT ARE NOT CATEGORIES
 >
-> Other people's recipes ask for these constantly. Helen, 2026-09-05: *"there
+> Other people's recipes ask for these constantly. Helen: *"there
 > is no such thing as navy rum or overproof navy rum"*, and *"there's no such
 > thing as black rum, even though it will often be requested by other people's
 > recipes."* `dark`, `light`, `gold` and `spiced` are out for the same reason —
@@ -1019,13 +980,12 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
 > adjusted with caramel.
 >
 > **This changes nothing about what you write**, because none of those words is
-> in §3a, so the pour is a `QQ` either way. It matters for the WORDS after the
+> in §3a, so the ingredient is a `QQ` either way. It matters for the WORDS after the
 > QQ and for your list: transcribe the source's word faithfully — `generic: "QQ
 > navy rum"` — and **say in your "what I could not know" list that the source
 > asked for a category Helen does not use.** If the source also
 > names a BOTTLE, say so in the same bullet — her bottle dictionary resolves
-> the category from the bottle mechanically, and that is the answer in 13 cases
-> out of 22 when it was measured.
+> the category from the bottle mechanically, and that is often the answer.
 
 ---
 
@@ -1040,7 +1000,13 @@ ragù · rösti · sauté · sautés · sautéed · soufflé · soufflés · vel
 > filled with crushed ice. Garnish with a pineapple wedge and serve with a
 > straw.
 
-`jungle-bird.md`
+**What you hand back.** The file is `jungle-bird.md`, so the line above the
+envelope is its issue title:
+
+`ingest: jungle-bird`
+
+````
+<!-- ingest v1 cocktail -->
 
 ```yaml
 ---
@@ -1087,18 +1053,19 @@ source_url: ""
 ---
 ```
 
-**What I could not know:**
+## What I could not know
 
-- **Two pours are typed, three are not.** `Campari`, `lime juice` and
-  `pineapple juice` are exact matches in §3a, so they are lookups. "Blackstrap
-  rum" is close to a category but `blackstrap` is a CHARACTER, and "simple
-  syrup" does not say which sugar or what ratio — both carry the source's words
-  behind a `QQ` instead.
-- **`mood: []` needs deriving** — run `python3 scripts/derive_cocktail_moods.py
-  --write`. Until you do, one test fails and it is that one.
-- **No source recorded** — tell me the book and I will write the citation.
-- **Jungle Bird is a well-known drink and may already be in your collection in
-  a different form.** Compare the formula, not the name.
+- **Three ingredients are typed, two are not.** `Campari`, `lime juice` and `pineapple juice` are exact matches in the printed vocabulary, so they are lookups. "Blackstrap rum" is close to a category but `blackstrap` is a character, and "simple syrup" does not say which sugar or what ratio, so both carry the source's words behind a `QQ`.
+- **No source recorded.** Tell me the book and I will write the citation.
+- **Jungle Bird is a well-known drink and may already be in your collection in a different form.** Compare the formula, not the name.
+
+## Fingerprint
+
+jungle bird | 45 ml | 22.5 ml | 15 ml | 15 ml | 45 ml
+````
+
+Each bullet is one line, as §0 asks. `mood: []` gets no bullet: deriving it is
+her repository's job (§10), not a question for her.
 
 Note what the transcription did: **all five amounts converted** (1½ oz → 45 ml,
 ¾ → 22.5, ½ → 15). **"over ice" became "with ice"**, and **"into a
@@ -1114,14 +1081,19 @@ and "serve with a straw" left the method entirely**, into `garnish` and
 ## 10. What happens to your file afterwards
 
 Helen saves it into `_cocktail_drafts/`, which is a private repo — nothing there
-is published. Then, in order:
+is published. Then, in order, in her repository:
 
-1. **`python3 scripts/derive_cocktail_moods.py --write`** fills in `mood`.
-2. **`pytest -m cocktails`** checks the glass, the garnish vocabulary, the
-   units, the citation and the schema. Every mechanical fault you made shows up
-   here and costs seconds.
-3. She fills in `generic` and `suggestion` **when she makes the drink**, which
-   is the point at which she knows what went in the glass.
+1. **`resolve_pours.py`** types every `QQ` generic whose wording she has ruled
+   on before, which is why §3 has you write the source's words exactly.
+2. **`derive_cocktail_moods.py`** fills in `mood`, from the generics the first
+   step wrote.
+3. **Her formatter** puts the keys in page order.
+4. **Her test suite** checks the glass, the garnish vocabulary, the units, the
+   citation and the schema. Every mechanical fault you made shows up here and
+   costs seconds.
+5. She settles whatever `generic` is still a `QQ`, and any `suggestion`,
+   **when she makes the drink**, which is the point at which she knows what
+   went in the glass.
 
 **So spend your care on the transcription.** A wrong garnish spelling is caught
 by a test; a wrong amount is not, because 45 ml is as plausible as 22.5. The

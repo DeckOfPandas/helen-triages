@@ -1,78 +1,37 @@
 // =============================================================================
-// THE SHORTLIST — GitHub issue #546, the drinks side.
+// THE SHORTLIST — #546, the drinks side
 // =============================================================================
 // Three controls:
 //
-//   .btn-shortlist          marks one drink, under the drink page's toggle
+//   .btn-shortlist          marks one drink, on the drink page
 //   .btn-shortlist--card    the same control in a card's top-right corner
 //   .btn-shortlist-only     shows only what is marked, in the row under the count
 //
-// Food's twin of all three is _sass/food/_shortlist.scss, and the store, the
-// wiring and the event are shared — only the colours and the card differ.
+// Food's twin of all three is _sass/food/_shortlist.scss. The store, the
+// wiring and the event are shared (shortlist.js); only the colours and the
+// card differ.
 //
-// GREY OFF, WICKED WOOWOO ON — Helen, 2026-09-04: "Text and active colour
-// wicked-woowoo on cocktails because it's a thing the user is choosing and
-// that's the language", and "Grey for inactive". Neither is a new value.
-// $color-clear-text is $color-grey-mid, this site's de-emphasised UI text at
-// 6.50:1 on the ground; magenta is already what this site means by a reader's
-// choice — a matched ingredient, a matched mood chip, a title under the cursor.
-//
-// -deep FOR THE TEXT, and the two are the same hex today. _palette.scss keeps
-// the pair apart on purpose (`rule` vs `text`, the latter measured at 5.18:1 on
-// a card) so that lightening one for a rule cannot silently drop a text colour
-// below contrast. Naming the text member here is what keeps that true.
-//
-// THE WORD NEVER CHANGES AND THE MARK DOES — the full reasoning is in
-// _sass/food/_shortlist.scss and in shortlist.js. Both sites draw it the same
-// way; only the colours differ, which is the whole shape of this repo's split.
-// =============================================================================
+// Grey off, wicked woowoo on (Helen's ruling): magenta is what this site means
+// by a reader's choice. The text uses -deep, which is the same hex today;
+// _palette.scss keeps the rule and text members apart so lightening one for a
+// rule cannot drop a text colour below contrast.
 
 // --- Shortlisted-only --------------------------------------------------------
-// #729 and #730 (the same issue, raised twice two minutes apart). "Style it
-// nicely. Maybe as a toggle [show shortlist]. Possibly place it below X
-// survivors."
-//
-// IT HAD NO RULE AT ALL UNTIL 2026-09-05, which is the actual bug behind the
-// issue rather than a matter of taste: food styles its own `.btn-shortlist-only`
-// (_sass/food/_shortlist.scss) and this file never did, so on cocktails the
-// control shipped as a raw grey system button in the browser's own face — the
-// one thing this site's chrome cannot carry. Everything below is therefore new,
-// not a revision.
-//
-// A PILL, AND SPECIFICALLY `%drink-btn-base`'s PILL. Helen chose it from three
-// treatments on the real index, with the ingredient pool on screen beside it so
-// the comparison was real: "pill same, perfect." Her stated worry was overload —
-// "we don't use any others so I'm concerned about overload" — and the measurement
-// answers it the other way: the page ALREADY has exactly this shape, on
-// `.btn-pool`, and it is the only thing wearing it. So this is a reuse rather
-// than a sixth invention.
-//
-// WHICH MAKES THE REAL RISK COLLISION, NOT CLUTTER: on this page a bordered box
-// whose border goes magenta already means "an ingredient word you can put into a
-// filter". Two things separate them and both are placement rather than paint —
-// a pool chip only ever appears inside the filter panel and always in a group,
-// and this one stands alone in the row under the count. Helen looked at the two
-// together and took the collision.
-//
-// THE VALUES ARE %drink-btn-base's, NOT COPIES OF THEM, so the two cannot drift:
-// 1.5px, $color-surface, the same padding. Only the face and the states are
-// stated here — Courier because this is a control that names a view rather than
-// an ingredient, and the border going magenta because §9.13's rule is that
-// magenta means "this one" and .btn-pool already says it that way.
+// A bordered pill in the row under the count (#729). The border and the ground
+// are %drink-btn-base's (_filters.scss), extended rather than copied; the
+// face, the size and the states are stated here.
 .btn-shortlist-only {
   @extend %drink-btn-base;
   font-family: $font-headings;
   font-size: 0.8rem;
-  // UPPERCASE SINCE 2026-09-14 (#1005) -- Helen: "let's try all actions in
-  // capitals (shortlist button at top of index lists too) to help show
-  // they're actions". Food's twin made the same move the same day.
+  // Actions are set in capitals (#1005); food's twin does the same.
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 0.25rem 0.65rem;
   white-space: nowrap;
 
   // The punch is for words on the page, not for a control's label — the same
-  // four resets .btn-universe-again makes, and for the same reason.
+  // resets .btn-universe-again makes.
   -webkit-text-stroke: 0;
   text-shadow: none;
 
@@ -81,20 +40,16 @@
   &:hover,
   &:focus-visible { border-color: $color-wicked-woowoo; }
 
-  // ON IS THE BORDER AND A WEIGHT, NEVER A FILL. §9.13: bands and washes, not
-  // fills — the same call .btn-pool makes for its own chosen state, so a
-  // switched-on view switch and a chosen ingredient agree about what "on" looks
-  // like without either being told about the other.
+  // On is the border and a weight, never a fill.
   &.is-on {
     border-color: $color-wicked-woowoo;
     font-weight: 600;
   }
 }
 
-// THE LOCAL-ONLY DRAFTS SWITCH -- #1358, 2026-10-10. The pill above, on a line
-// of its own under it ("Under the SHORTLISTED button is fine"), pulled up by
-// half the count row's gap so the two read as a pair. Only a local build emits
-// the element (cocktails/index.html); the rule is inert on the deployed site.
+// The local-only drafts switch (#1358): the pill above, on a line of its own
+// under it, pulled up by half the count row's gap so the two read as a pair.
+// Only a local build emits the element (cocktails/index.html).
 .btn-drafts-toggle { @extend .btn-shortlist-only; }
 
 .drafts-toggle-row {
@@ -102,11 +57,8 @@
 }
 
 .btn-shortlist {
-  // Matched to `.cocktail-toggle-label` — the read-it/make-it pair this control
-  // is aligned with on the drink page (Helen's placement: "maybe horizontally
-  // aligned with read it / make it"). Same face, same size, same tracking, so
-  // the two read as one row of controls rather than two designs that happen to
-  // share an edge.
+  // Matched to `.cocktail-toggle-label`, the read-it/make-it pair this control
+  // sits with on the drink page: same face, same size, same tracking.
   @extend %cocktail-heading-face;
   font-size: 0.78rem;
   letter-spacing: 0.08em;
@@ -117,54 +69,22 @@
   cursor: pointer;
   white-space: nowrap;
 
-  // THE MARK AND THE WORD ARE CENTRED ON EACH OTHER — Helen, 2026-09-05:
-  // "please horizontally align the middle of the word shortlist with the middle
-  // of its icon."
-  //
-  // This is a flex row rather than two inline boxes because the alternative is
-  // a baseline, and a baseline is what put the `+` up in the air in the first
-  // place. See the `::before` below for that story; the short version is that
-  // an inline-block's baseline is not always its text's baseline, and the one
-  // thing a flex row with `align-items: center` cannot do is care.
+  // A flex row, so the mark and the word are centred on each other and there
+  // is no baseline in the arrangement. See `::before` for why that matters.
   display: inline-flex;
   align-items: center;
 
   color: $color-clear-text;
   transition: color 0.12s ease-in-out;
 
-  // THE WORD MUST NOT MOVE WHEN THE MARK CHANGES — Helen, 2026-09-05: "when I
-  // click +shortlist, the word jumps downwards a few pixels."
+  // The word must not move when the mark changes. `✓` (U+2713) is not in
+  // Courier Prime, so the browser substitutes a fallback face for that one
+  // glyph, and a fallback's metrics are not Courier's. The box has a declared
+  // width and height, and `overflow: hidden` stops a taller glyph spilling.
   //
-  // A fixed WIDTH was already here and was only half the problem. The other
-  // half is height: `+` is in Courier Prime and `✓` (U+2713) is not, so the
-  // browser substitutes a fallback face for that one glyph — and a fallback's
-  // ascent is not Courier's. The mark was an inline-block, so its line box
-  // counted toward the line's height; a taller substituted glyph grew the line
-  // box, and since the button was `align-items: flex-start` in the meta row it
-  // sat in then, its top stayed put and the BASELINE dropped.
-  //
-  // THE FIRST FIX WAS `line-height: 1` PLUS `overflow: hidden`, AND IT TRADED
-  // THE JUMP FOR A SUPERSCRIPT — Helen saw it immediately: the `+` was sitting
-  // up by the cap line instead of level with the word. That is a real rule
-  // rather than a mystery: an inline-block whose `overflow` is anything but
-  // `visible` takes its BOTTOM MARGIN EDGE as its baseline, not its text's
-  // baseline. So `vertical-align: baseline` put the whole 1em box above the
-  // word's baseline and the glyph rode up with it. Adding overflow to pin a
-  // height silently changed what the box was aligned BY.
-  //
-  // BOTH GO AWAY IN A FLEX ROW. With the button `inline-flex` and
-  // `align-items: center` (above) there is no baseline in the arrangement at
-  // all: the mark's box and the word's line box are centred on one another,
-  // which is what Helen asked for, and a substituted glyph inside a box of
-  // declared height cannot move either of them. `height: 1em` with
-  // `line-height: 1` is that declared height; `overflow: hidden` keeps its
-  // meaning here — a taller fallback glyph cannot spill — while no longer
-  // having a baseline to redefine.
-  //
-  // The general shape is worth keeping twice over: a swapped glyph is a swapped
-  // FONT whenever the face lacks it, and a font swap changes metrics rather
-  // than only the picture. And a property added to fix one thing can quietly
-  // change which rules apply to another.
+  // Keep it a flex item. On an inline-block, `overflow` other than `visible`
+  // makes the bottom margin edge the baseline, and the mark rides up to the
+  // cap line.
   &::before {
     content: '+';
     flex: none;
@@ -183,134 +103,67 @@
   &.is-on {
     color: $color-wicked-woowoo-deep;
     // Bold, matching `.cocktail-toggle-label.is-active` beside it: on this page
-    // an active control is its colour AND its weight, and half of that
-    // convention would read as a different kind of state.
+    // an active control is its colour and its weight.
     font-weight: 700;
 
     &::before { content: '\2713'; }   // ✓ U+2713
   }
 }
 
-// --- The drink page's shortlist button ---------------------------------------
-// It used to sit at the right-hand end of a `.cocktail-meta-row` flex wrapper,
-// pushed to the same edge the read-it/make-it toggle takes so the two lined up
-// by construction. On 2026-09-05 Helen moved it under that toggle -- "move the
-// shortlist button up to below make it / read it" -- and the wrapper went with
-// it, because a flex row holding one child is not a layout. It then lived in
-// `.cocktail-head-shortlist` under the toggle until 2026-09-10, when both moved
-// to `.cocktail-controls` under the title block (#897, _cocktail.scss).
-//
-// Nothing about the BUTTON changed in that move, which is why there is no rule
-// here any more -- only this note, so the next person looking for the meta row
-// finds out where it went rather than concluding it was never styled.
-
 // =============================================================================
 // ON A CARD — the mark alone, in the top-right corner
 // =============================================================================
-// Helen's placement, 2026-09-04, with her own reservation recorded: "I'm not
-// confident it should get this prime spot, but I can't think where else it
-// would go." The other three corners are taken and were taken first: the ship
-// mark owns the bottom-right and has since this design was settled, the chips
-// own the foot's left, and the title owns the top-left.
+// It shares the ship mark's right edge, $card-pad-x, so the card has a second
+// fixed anchor in the same column.
 //
-// IT SHARES THE SHIP'S RIGHT EDGE. `.drink-card-foot` is pinned at
-// `right: $card-pad-x`, so pinning this to the same value gives the card a
-// second fixed anchor in the same column rather than a control floating near a
-// corner. That is _cards.scss's whole opening argument, applied to a new object.
+// No word here. The tape runs almost to the card's right edge, so anything in
+// this corner is paid for out of the title, and a word costs several times
+// what the mark does. The button carries an `aria-label` naming the drink.
 //
-// NO WORD, AND IT IS THE ONE PLACEMENT OF FOUR THAT DROPS IT. Helen asked for
-// text and it is text on the other three, because there the text is free. Here
-// it is not: the tape runs to within 0.3rem of the card's right edge, so
-// anything in this corner is paid for out of the title, and the reservation
-// below has to cover the bleed as well as the control. The mark alone costs
-// about 2.16rem of a 16.4rem tape. `+ shortlist` in this face would cost about
-// 7.5rem — nearly half the name, on a card whose title already has to shrink or
-// wrap to fit. The button carries a real `aria-label` naming the drink, so what
-// it is CALLED is not lost, only what it is captioned.
-//
-// A FIXED-WIDTH CONTROL IS A REQUIREMENT HERE, NOT A PREFERENCE. Every anchor
-// on a card is meant to be in the same place on every card; a mark that changed
-// width between its two states would move this one the moment it was pressed.
-// `+` and `✓` are both drawn in a box of the same declared width, so it cannot.
-// THE MARK'S SIZE, NAMED BECAUSE TWO RULES DEPEND ON IT: the button below, and
-// the title's reservation at the foot of this section, which is computed from
-// it. Until 2026-09-11 both carried `0.95rem` as a literal.
-//
-// 1.15rem SINCE 2026-09-11 -- #962, Helen: "let the shortlist button (+) be a
-// little larger so it's easier to click." The hit area was already about 44px
-// square (#823's ::after, below); what read as small was the mark itself. The
-// reservation grows with it by 0.85 x 0.2rem, about 0.17rem of title.
+// Fixed width is a requirement: `+` and `✓` are drawn in a box of the same
+// declared width, so the anchor does not move when the mark is pressed.
+
+// The mark's size, named because two rules depend on it: the button below,
+// and the title's reservation further down, which is computed from it (#962).
 $card-shortlist-size: 1.15rem;
 
 .btn-shortlist--card {
   position: absolute;
 
-  // ABOVE THE CARD'S CLICK OVERLAY -- #971, 2026-09-11. The whole card is the
-  // drink's link now, drawn as a pseudo-element over the card, and a stretched
-  // link covers every control that is not lifted past it. This is the one
-  // control in the card's top-right corner and #823 gave it that corner on
-  // purpose, so it is lifted to the same level as the chips. The scale is named
-  // in _cards.scss, which is imported before this file.
+  // Above the card's click overlay (#971). The whole card is the drink's
+  // link, drawn as a pseudo-element over it, and a stretched link covers
+  // every control that is not lifted past it. The scale is named in
+  // _cards.scss, which is imported before this file.
   z-index: $card-z-controls;
 
-  // Bigger than the drink page's, which is a 0.78rem label sitting in a row of
-  // labels. This is a lone mark with no word beside it to lend it weight, and
-  // at the page's size it read as a stray character rather than a control.
+  // Bigger than the drink page's: a lone mark with no word beside it reads as
+  // a stray character at that size.
   font-size: $card-shortlist-size;
   line-height: 1;
 
-  // A HIT AREA ROUND THE MARK, AND THE OFFSETS PAY FOR IT SO THE MARK DOES NOT
-  // MOVE. One glyph at 0.95rem is about 15px square — a fine thing to look at
-  // and a poor thing to hit with a thumb, which is how this index is most
-  // likely to be read. The padding takes the target to roughly 25px without
-  // making the mark bigger, and subtracting the same value from `top` and
-  // `right` keeps the glyph on the anchor it shares with the ship mark below.
-  // The reservation further down adds this back on the LEFT, which is the only
-  // side where the enlarged box can reach the tape.
+  // A hit area round the mark, and the offsets pay for it: the same value
+  // comes off `top` and `right`, so the glyph stays on the anchor it shares
+  // with the ship mark. The reservation further down adds it back on the
+  // left, the only side where the padded box can reach the tape.
   padding: $space-xs;
   top: calc(#{$card-pad-y} - #{$space-xs});
   right: calc(#{$card-pad-x} - #{$space-xs});
 
-  // The mark IS the button here, so the trailing margin that separates it from
-  // a word would sit the glyph off-centre in its own hit area.
+  // The mark is the button here, so the margin that separates it from a word
+  // would sit the glyph off-centre in its own hit area.
   &::before { margin-right: 0; }
 
-  // --- #823: A BIGGER TARGET THAT COSTS THE LAYOUT NOTHING -------------------
-  // Helen: "a little easy to mis-click". The padded box above is about 22x25px,
-  // which the comment beside it already called "a poor thing to hit with a
-  // thumb" -- it was as far as PADDING could take it, because every extra
-  // millimetre of padding on the left is a millimetre off the title (see the
-  // reservation below, which is computed from this button's own metrics).
+  // A bigger target that costs the layout nothing (#823). An absolutely
+  // positioned ::after extends the clickable region without entering layout,
+  // so the reservation, the tape's width and card-name-fit.js's measurement
+  // are untouched. It reaches only into what is already empty: the card's
+  // padding above and to the right, the gap the reservation keeps clear of
+  // the tape on the left, and a little below.
   //
-  // SO THE TARGET GROWS AND THE BOX DOES NOT. An absolutely-positioned ::after
-  // extends the clickable region without entering layout, so the reservation,
-  // the tape's width and card-name-fit.js's measurement are all untouched.
+  // It takes the corner from the card link on purpose: a click there
+  // shortlists instead of opening the drink.
   //
-  // THE AMOUNTS ARE WHAT IS ALREADY EMPTY, not a round number:
-  //
-  //   top    $card-pad-y - $space-xs   0.75rem   card padding, nothing in it
-  //   right  $card-pad-x - $space-xs   0.85rem   card padding, nothing in it
-  //   left   $space-sm                 0.5rem    the gap the reservation
-  //                                              already keeps clear of the
-  //                                              tape -- so this claims the
-  //                                              gap and never the tape itself
-  //   bottom $space-xs                 0.3rem    modest; the ingredient line
-  //                                              starts below and is a real
-  //                                              target of its own
-  //
-  // That takes it from roughly 22x25px to roughly 44x42px, which is the size
-  // hit-target guidance actually asks for, and every pixel of it was already
-  // dead space in the card's own padding.
-  //
-  // IT DOES CLAIM THE CORNER FROM THE CARD LINK, and that is the trade rather
-  // than a side-effect: a click in the top-right corner now shortlists instead
-  // of opening the drink. That corner is the worst place on a card to aim for
-  // "open this" and the best place to aim for the mark, which is the whole
-  // complaint in #823.
-  //
-  // `content: ''` AND NO BACKGROUND -- it must never be visible. If a future
-  // change needs to see it, give it an outline temporarily rather than shipping
-  // one.
+  // `content: ''` and no background: it must never be visible.
   &::after {
     content: '';
     position: absolute;
@@ -322,96 +175,40 @@ $card-shortlist-size: 1.15rem;
 }
 
 // --- What the corner costs the title -----------------------------------------
-// The tape bleeds RIGHT by $card-tape-bleed-right into the card's own padding,
-// so its right edge sits 0.3rem inside the border — CLOSER to the border than
-// the button, whose right edge is at $card-pad-x. Without this reservation the
-// longest names do not merely touch the button, they run clean under it.
+// The tape bleeds right by $card-tape-bleed-right into the card's padding, so
+// its right edge is closer to the border than the button's. Without this
+// reservation the longest names run under the button.
 //
-// THE BLEED IS ADDED, NOT SUBTRACTED, and getting that backwards is the easy
-// mistake here: the tape starts 0.85rem further right than the box this padding
-// shrinks, so the reservation has to cover the button, the gap AND the bleed.
-// Stated as a calculation from the same three tokens the collision is made of
-// rather than as a rounded literal, so moving any of them moves this with it:
+// The bleed is added, not subtracted: the reservation covers the mark's box,
+// the hit area's padding on the side facing the tape, the gap, and the bleed.
+// Built from the same tokens the collision is made of, so moving one moves
+// this.
 //
-//     mark box (0.85em at 0.95rem) + the hit area's own padding on the side
-//     that faces the tape + the gap it needs + the bleed it starts beyond
+// Scoped to `.drink-cards`, because only a card in a list has the button; the
+// universe pick wears `.drink-card-name` too and must not reserve room. On the
+// name, not the body: the ingredient line keeps the full width.
 //
-// WHAT IT COMES TO, because a fixed-height, fixed-anchor card should have its
-// costs written down: about 2.46rem. On the grid's minimum 370px card the title
-// column is 14.5rem and the tape may be 16.4rem wide, so this is 15% of the
-// tape — four or five characters of Courier at the base size. MEASURED against
-// the real 124 titles rather than estimated (tmp/measure_card_titles.py, and
-// the numbers are here because the script is scratch): at that narrowest width
-// 98 of the 124 names still sit on one line, 16 step down and 10 wrap. 22
-// change treatment — 16 from one line to a step, which is the state Helen chose
-// precisely because nobody can see it, and 6 from a step to a two-line tape.
-// Wider cards change fewer, and most of the collection is nowhere near the
-// limit: the median name is 14 characters against 18.8 that fit.
-//
-// NOTHING IS EVER CUT, which is the guarantee that rule was written to give and
-// which this does not weaken.
-//
-// SCOPED TO `.drink-cards`, NOT TO `.drink-card`, because the padding pays for a
-// shortlist button and only a card IN THE LIST has one. The universe pick also
-// wears `.drink-card-name`, has no button in its corner, and must not reserve
-// room for one. (It used to carry `.drink-card` as well, which made the scoping
-// load-bearing rather than merely correct; it stopped on 2026-09-05 and the
-// scoping stays, because the rule was always "a card in the list", not "whatever
-// happens to collide today".)
-//
-// AND `.drink-card-name`, NOT the body: the ingredient line below has the full
-// width and should keep it. Only the object that collides pays.
-//
-// card-name-fit.js NEEDS NO CHANGE FOR THIS, which is why the width is bought
-// here rather than anywhere cleverer. That script measures the tape word's real
-// `clientWidth`, and this narrows exactly that box — so a name that no longer
-// fits steps down or wraps by the rule Helen chose on the same day, with
-// nothing to keep in step and no second idea of how wide a title may be.
-// A CARD WITH A TAGLINE MARK BUYS A LITTLE MORE -- #1292, 2026-10-06. The mark
-// sits to the LEFT of the button, on the same anchor, so it makes the same kind
-// of collision with the tape and pays for it the same way.
-//
-// A CUSTOM PROPERTY ADDED INTO THIS ONE calc, RATHER THAN A SECOND RULE
-// RESTATING IT. `--card-tagline-reserve` is 0 wherever there is hover, so a
-// card on a computer is byte for byte what it was. A second `padding-right`
-// rule would have been a duplicate of the four terms above, and the reason
-// that matters is written three paragraphs up -- card-name-fit.js measures
-// whatever box this leaves, so there must only ever be one idea of how wide a
-// title may be. Its rule is with the mark, below.
-//
-// THE DRAFT BADGE USED TO BE A TERM HERE TOO (#1162, `--card-draft-reserve`,
-// 3.1rem off every draft's title). It left this corner on 2026-10-06 for the
-// card's top left, over the glass, where it costs the title nothing; its rule
-// is in _cards.scss now, beside the badge's own.
+// There must be only this one `padding-right`. card-name-fit.js measures the
+// tape word's `clientWidth`, which is the box this leaves, so a name that no
+// longer fits steps down or wraps by its rule. The tagline mark (#1292) adds
+// to this calc through `--card-tagline-reserve`, which is 0 wherever there is
+// hover, rather than restating the rule.
 .drink-cards .drink-card-name {
   padding-right: calc(0.85 * #{$card-shortlist-size} + #{$space-xs} + #{$space-sm} + #{$card-tape-bleed-right} + var(--card-tagline-reserve, 0px));
 }
 
 // --- the tagline mark, left of the button, where there is no hover -----------
-// #1292. On a computer, pointing at a card shows its tagline (_cards.scss). A
-// phone or a tablet has nothing to point with, so Helen asked for a mark: "a
-// simple question mark to the left of the + icon, or directly below it", and,
-// shown both, "? next to +, but the active colour needs to be woowoo."
+// #1292. Pointing at a card shows its tagline (_cards.scss); a phone or a
+// tablet has nothing to point with, so it gets a `?`. It is the `+` again, one
+// step left: the same size, box, padding and top anchor, grey off and wicked
+// woowoo on. The step is one button's box and its padding on both sides.
 //
-// IT IS THE `+` AGAIN, ONE STEP LEFT: the same size, the same 0.85em box, the
-// same padding and top anchor, grey off and wicked woowoo on -- this file's own
-// language for "a thing the user is choosing" (top of file). The offset is one
-// button's box and its padding on both sides, with no further gap: the two
-// paddings already stand between the glyphs, and that is the spacing she
-// looked at on the candidates page.
+// Only under `(hover: none)`, and `hidden` until card-tagline.js wires it, so
+// a page with no script has no dead control.
 //
-// ONLY UNDER `(hover: none)`, and `hidden` until card-tagline.js wires it, so a
-// device that can point never sees it and a page with no script has no dead
-// control.
-//
-// WHAT IT COSTS THE TITLE, AND WHERE. The same reservation the `+` pays,
-// through the same one calc: `--card-tagline-reserve` is the mark's own box.
-// Above 400px only -- below that the glass is a band across the top with the
-// `+` and this in it, and the name has the full width of its own row beneath.
-//
-// A DRAFT CARD IS NO LONGER AN EXCEPTION. Its badge sat in this spot until
-// 2026-10-06 and pushed the mark below the `+`; the badge is at the card's top
-// left now, so every card with a tagline draws this the same way.
+// The title pays for it through `--card-tagline-reserve`, above 400px only:
+// below that the glass is a band across the top with both marks in it, and the
+// name has its own row beneath.
 $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs});
 
 .btn-card-tagline { display: none; }
@@ -454,50 +251,9 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   }
 }
 
-// --- IT APPLIES TO EVERY CARD IN EVERY LIST, INCLUDING THE RELATED ONES ------
-// #976 carved an exception out of this rule for `.drink-card--portrait`: the
-// drink page's three related drinks were cards of their own shape, growing
-// rather than fixed, so they could buy the shortlist corner with HEIGHT (a band
-// of top padding above the head row -- #977, Helen: "higher than the tape so it
-// doesn't take up space the name could use") and keep every pixel of the tape.
-//
-// #991 DELETED THAT CARD AND THE EXCEPTION WITH IT, 2026-09-12. Helen: "if you
-// liked this cards should render the same as cards on the index list. We are
-// fighting this design, and trying to invent a new design language, where we
-// should just reuse what we've already made." A related card is an index card
-// now, fixed height and all, so it buys its corner the way every other card on
-// the site does -- out of the title -- and there is one reservation here rather
-// than one and an exemption.
-//
-// #976's MEASUREMENT IS STILL WORTH KEEPING, because it is what a card this
-// narrow costs: at 484px on Arrack Christmas Punch, three across a 900px column
-// gave the name a 165px box and this reservation took 42px of it, and at two
-// across the box was 101px and the reservation 41% of it. That is an argument
-// about how narrow a card may be, not about who pays -- and the index card's
-// own 370px floor is the answer to it.
-
-// --- The drink page's button: on the toggle's line since 2026-09-14 (#1005) --
-// It sat beside the FIRST LINE of the name from #963 (2026-09-11), and on a
-// phone shrank to the `+` alone ("B: + mark only on phones", chosen at 390px)
-// because the word took 110px of a 342px column from the name. Both went with
-// the move: the button is in `.cocktail-controls` now, under the head's rule,
-// with nothing to take width from, so it keeps its word at every size. The
-// phone block that did the shrinking is deleted rather than kept for a
-// selector nothing matches. A PILL SINCE #1210 (2026-09-30): the box is
-// shared/_furniture.scss's and takes its border from `currentColor` on hover
-// and on, so the colours below are still the whole of what "on" means here.
-//
-// THE LINK BESIDE IT HOVERS IN THIS SITE'S "THIS ONE" COLOUR.
-// shared/_furniture.scss gives see shortlist / print / pdf the site's accent
-// under the cursor, which on food is the shortlist button's own magenta and
-// on this site is absinthe -- while `.btn-shortlist` above hovers wicked
-// woowoo, §9.13's rule that magenta means "this one" wherever a pointer is.
-// One row, one hover: the link is re-pointed here to match the button.
-//
-// PRINT AND PDF ARE NOT RE-POINTED ANY MORE -- #1210, 2026-09-30. They left
-// this row for the furniture line, whose other item is the back arrow, and the
-// arrow hovers in $color-accent (shared/_chrome.scss): absinthe here. Same
-// rule, one row, one hover -- it is just a different row now.
+// The drink page's `see shortlist` link hovers in magenta, not in the accent
+// shared/_furniture.scss gives it (absinthe on this site): it shares a row
+// with `.btn-shortlist`, which hovers wicked woowoo. One row, one hover.
 .page-actions .btn-see-shortlist {
   &:hover,
   &:focus-visible { color: $color-wicked-woowoo; }
@@ -506,15 +262,13 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
 // =============================================================================
 // THE SHOPPING LIST — what a shortlist adds up to
 // =============================================================================
-// #546's stretch goal. The last thing on the index, shown only while the
-// shortlisted-only filter is on — see cocktails/index.html for why that is the
-// literal reading of "the bottom of my shortlist listing".
+// The last thing on the index, shown only while the shortlisted-only filter is
+// on (see cocktails/index.html).
 //
-// AMOUNT FIRST, NAME SECOND, and a fixed column for the amount. A shopping list
-// is read down its left edge for "how much", and ragged amounts against a ragged
-// name is two ragged columns and no way in. 7rem holds `540 ml` and
+// Amount first, name second, with a fixed column for the amount: a shopping
+// list is read down its left edge for "how much". 7rem holds
 // `12 drops + 6 dashes` at this size; anything longer pushes the name along
-// rather than wrapping under it, which is the failure worth avoiding.
+// rather than wrapping under it.
 .shopping-list {
   margin: $space-xxl 0 0;
   padding-top: $space-lg;
@@ -530,11 +284,8 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   margin-bottom: $space-md;
 }
 
-// Every typed number in this panel wears the same box, and the box is not this
-// file's any more: `%cocktail-number-input` in `cocktails/_cocktail.scss`, moved
-// there on 2026-09-04 when the drink page's scaler (#545) became the third
-// control of this kind and the second file wanting it. "Set all to", a drink's
-// own count and the scaler's multiple are one control drawn three times.
+// Every typed number in this panel wears `%cocktail-number-input`
+// (_cocktail.scss), the same box as the drink page's scaler.
 
 .shopping-list-setall {
   @extend %cocktail-heading-face;
@@ -549,21 +300,15 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
 }
 
 // --- one count per drink -----------------------------------------------------
-// A wrapping row of number-and-name pairs rather than a column: a weekend's
-// shortlist is a handful of drinks, and a column of six would push the totals —
-// the thing the panel is FOR — below the fold on a phone.
-// ONE DRINK PER LINE SINCE #818, and that is the issue's own title: "list
-// shopping list cocktail names at the top one per line". It was a wrapping flex
-// ROW, which packed four or five drinks across and was the denser reading --
-// but a drink can now carry radio buttons underneath it, and a control belonging
-// to the third of five names on a line has nothing to hang from.
+// One drink per line (#818): a drink can carry bottle radios underneath it,
+// and those need a line of their own to hang from.
 .shopping-list-drinks {
   list-style: none;
   margin: 0 0 $space-lg;
   padding: 0;
 
   li {
-    // BLOCK, so the choice rows below can be blocks of their own. The number
+    // Block, so the choice rows below can be blocks of their own. The number
     // box and the name stay on one line because both are inline.
     display: block;
     font-size: 0.9rem;
@@ -572,19 +317,14 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
     & + & { margin-top: $space-xs; }
   }
 
-  // THE GLASSES BOX BY ITS CLASS, NOT BY `input` -- #818. A bare `input` here
-  // was exact while the only input in this list was the number box; the bottle
-  // radios are inputs too, and would have arrived dressed as number boxes.
+  // The glasses box by its class, not by `input` (#818): the bottle radios
+  // are inputs too, and a bare `input` dresses them as number boxes.
   input.shopping-list-glasses { @extend %cocktail-number-input; }
 }
 
-// A POUR THAT OFFERS A CHOICE OF BOTTLE -- #818. Helen chose "a row per pour
-// that has a choice", labelled with the generic, so it is visible WHICH pour
-// the buttons belong to on a drink that offers two.
-//
-// INDENTED PAST THE NUMBER BOX, so the rows read as belonging to the drink
-// above rather than as a second list. The indent is the box's own width plus
-// its gap, stated against the same tokens so it moves if the box does.
+// An ingredient that offers a choice of bottle (#818): one row each, labelled
+// with the generic, so it is visible which ingredient the buttons belong to.
+// Indented, so the rows read as belonging to the drink above.
 .shopping-list-choice {
   display: block;
   margin: 0.15rem 0 0 calc(#{$space-lg} + #{$space-xs});
@@ -592,38 +332,35 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   line-height: 1.5;
 }
 
-// The generic, so the buttons are labelled by the pour they change. Quiet: it
-// is a heading for the controls beside it, not a thing you act on.
+// The generic. Quiet: it labels the controls beside it and is not something
+// you act on.
 .shopping-list-choice-name {
   color: $color-clear-text;
   margin-right: $space-xs;
 }
 
-// EACH BOTTLE IS A LABEL WRAPPING ITS RADIO, so the whole name is clickable
-// rather than the 13px circle alone -- #823 was exactly this complaint about
-// the shortlist button, and a bottle name is a bigger target for free.
+// Each bottle is a label wrapping its radio, so the whole name is clickable
+// rather than the small circle alone.
 .shopping-list-bottle-choice {
   display: inline-flex;
   align-items: baseline;
   gap: 0.3rem;
   margin-right: $space-sm;
   cursor: pointer;
-  // The bottle is woowoo here for the same reason it is on a list row: it is
-  // the thing Helen chose, and `.shopping-list-bottle` says so already.
+  // Woowoo, as `.shopping-list-bottle` below: the bottle is the thing chosen.
   color: $color-wicked-woowoo-deep;
 
   input { margin: 0; }
 }
 
-// "2 Mai Tai @ £5.24" — the price half. Helen, 2026-09-06: "please add the
-// cost, quietly again", so it is dimmed and tabular rather than emphasised, and
-// it reads as an aside to the drink's name instead of a second column.
+// "2 Mai Tai @ £5.24" — the price half. Dimmed and tabular, an aside to the
+// drink's name.
 //
-// EMPTY ON THE DEPLOYED SITE. The span is always drawn and its contents come
+// Empty on the deployed site. The span is always drawn and its contents come
 // from `costSuffix()` in cocktail-index.js, which returns "" unless
-// `site.show_costs` put a #drink-costs block on the page — _config_local.yml
-// and nowhere else. An empty inline span occupies nothing, so no rule here
-// needs to hide it.
+// `site.show_costs` put a #drink-costs block on the page, and that is set in
+// _config_local.yml only. An empty inline span occupies nothing, so no rule
+// here hides it.
 .shopping-list-cost {
   color: $color-clear-text;
   font-variant-numeric: tabular-nums;
@@ -644,16 +381,9 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   }
 }
 
-// PLEX, IN INK -- the site's own rule for a number you act on, 2026-09-04.
-// It opened in the Courier heading face in woowoo, on the reasoning
-// that "the number is the fact you are shopping by, so it carries the colour
-// that means 'you chose this'". But woowoo means HAS TO HAVE (the
-// matched ingredient, the bottle suggestion) and the site already has a
-// vocabulary for a quantity: `.cocktail-amount` on the drink page and the
-// ingredient amounts on food are $font-label at weight 600 in ink, tabular,
-// because "Plex is for numbers you act on" (_palette.scss, MANUAL 13.10).
-// A shopping total is exactly such a number. The bottle beside it keeps the
-// pink, which is the drink page's own pairing of amount and suggestion.
+// Plex, in ink: the site's treatment for a number you act on, as
+// `.cocktail-amount` on the drink page. Not woowoo, which means HAS TO HAVE;
+// the bottle beside it keeps that.
 .shopping-list-amount {
   flex: 0 0 7rem;
   font-family: $font-label;
@@ -670,48 +400,29 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
 }
 
 // The bottles the drinks named, and the whole-fruit count, in one bracket on
-// the same line as the generic — Helen, 2026-09-04: "show generic first, with
-// bottle on the same line in brackets, like the recipes." That is the drink
-// page's `.cocktail-suggestion` shape, so a line reads the same way in both
-// places. INLINE, not a block: it was a second line under the name for one
-// version, which is what made this a list of two-line entries rather than of
-// ingredients.
+// the same line as the generic — the drink page's `.cocktail-suggestion`
+// shape. Inline, not a block, so an entry stays one line.
 .shopping-list-note {
   font-size: 0.85rem;
   color: $color-clear-text;
 }
 
-// THE BOTTLE IS WOOWOO — Helen, 2026-09-04, and it is the drink page's own
-// `.cocktail-suggestion` colour rather than a new decision. _cocktail.scss states
-// the reason where it refuses the same hue to `optional`: "woowoo
-// precisely BECAUSE a bottle name is a thing has-to-have matches against". The
-// bottle in a shopping list is the same claim — the thing you chose — so the two
-// pages say it the same way.
+// Woowoo, the drink page's `.cocktail-suggestion` colour: a bottle name is
+// what has-to-have matches against, and here it is the thing you chose.
 .shopping-list-bottle {
   color: $color-wicked-woowoo-deep;
 }
 
-// The whole-fruit count stays quiet. It is arithmetic this page did, not
-// something Helen chose, and colouring it would spend the hue on the wrong half
-// of the bracket.
+// The whole-fruit count stays quiet: it is arithmetic this page did, not
+// something chosen.
 .shopping-list-fruit {
   color: $color-clear-text;
 }
 
-// WHAT THE LINE COSTS — #820. Local-only: the span is absent on the deployed
-// site, because `site.show_costs` is declared in _config_local.yml and nowhere
-// else, so nothing here needs a production fallback.
-//
-// PLEX AND TABULAR, like `.shopping-list-amount` above and for the same stated
-// reason — "Plex is for numbers you act on" — and pushed to the right by the
-// `auto` margin so the prices form a column you can read down. That column is
-// the whole point of #817's total: a figure at the bottom you can check by
-// looking up.
-//
-// QUIETER THAN THE AMOUNT, at $color-clear-text rather than ink. The millilitres
-// are what you are shopping by; the price is context. Helen asked for the
-// drink-page figure "quietly again", and this is the same claim in the same
-// register.
+// What the line costs — #820. Local only, like `.shopping-list-cost` above.
+// Plex and tabular, and pushed right by the `auto` margin so the prices form a
+// column you can read down to the total. Quieter than the amount: the
+// millilitres are what you shop by and the price is context.
 .shopping-list-price {
   margin-left: auto;
   flex: 0 0 auto;
@@ -723,8 +434,8 @@ $card-tagline-mark-step: calc(0.85 * #{$card-shortlist-size} + 2 * #{$space-xs})
   white-space: nowrap;
 }
 
-// THE TOTAL — #817. Sits under the list rather than inside it, so it is not one
-// more row to read past; the rule above it is what says the column has ended.
+// The total — #817. Under the list rather than inside it, so it is not one
+// more row to read past.
 .shopping-list-total {
   margin: $space-sm 0 0;
   padding-top: $space-xs;

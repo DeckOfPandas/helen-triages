@@ -1,31 +1,25 @@
 // =============================================================================
-// THE SCALER ON A RECIPE PAGE -- #1005, 2026-09-14. Portions, under the list.
+// THE SCALER ON A RECIPE PAGE (#1005). Portions, under the list.
 // =============================================================================
-// The drink page's control (`.cocktail-scale-*`, cocktails/_cocktail.scss)
-// drawn in food's own materials: the same three pieces in a row -- a step
-// button, a box, a step button -- with one word after the box because the
-// number here is PEOPLE and a bare `×` would say the wrong thing. Helen's
-// ruling for food is portions, not multiples (_layouts/recipe.html has it).
+// The drink page's control (`.cocktail-scale-*`, cocktails/_cocktail.scss) in
+// food's materials: a step button, a box, a step button, and one word after
+// the box, because the number here is people (or what is made), not a
+// multiple.
 //
-// THE BOX IS `%food-number-input`, the third control of that kind on this site
-// and the one _shopping-list.scss's own comment said would arrive: "If a third
-// appears, lift this the same way." It is @extended rather than lifted, because
-// the placeholder is still in one file and two @extends do not make it a
-// layer; if a fourth wants it, move the placeholder to a partial of its own.
-// This file is imported after food/shopping-list so the placeholder exists.
+// The box @extends `%food-number-input` from _shopping-list.scss, so this file
+// must be imported after food/shopping-list. If another file wants the
+// placeholder, move it to a partial of its own.
 //
-// UNDER THE LIST, WITH THE LIST'S OWN GAP. `.ingredients li` carries
-// $space-md below each row, so the control sits one row-gap under the last
-// ingredient and hands the section's space to METHOD's own top margin.
+// `.ingredients li` carries $space-md below each row, so the control sits one
+// row-gap under the last ingredient.
 .recipe-scale-controls {
   display: inline-flex;
   align-items: center;
   gap: $space-xs;
   margin: $space-sm 0 0;
 
-  // ONE WRAPPER, ONE `hidden`, and it has to beat its own display -- the
-  // attribute's UA rule loses to any author `display`, so without this the
-  // control would ship VISIBLE to a reader whose JavaScript never ran.
+  // The `hidden` attribute's UA rule loses to any author `display`, so
+  // without this the control shows to a reader whose JavaScript never ran.
   &[hidden] { display: none; }
 }
 
@@ -40,63 +34,46 @@
 
   input {
     @extend %food-number-input;
-    // TWO CHARACTERS AND THE CARET, THE DRINK SCALER'S OWN WIDTH -- #1118,
-    // Helen: "the same number of characters as the cocktail recipe scaler
-    // (just over 2)". The formula is copied from `.cocktail-scale input`
-    // (cocktails/_cocktail.scss) rather than converted to a number, because it
-    // is the same decision: `2ch` is the two digits, in THIS box's own face,
-    // and the 1.6ch is the caret and the box's breathing room, not a third
-    // character. Stated in `ch` it stays two characters wide whatever the face
-    // or the root size, which `3.4em` never guaranteed.
+    // Two characters and the caret, the drink scaler's own width (#1118): the
+    // same formula as `.cocktail-scale input` (cocktails/_cocktail.scss).
+    // `2ch` is two digits in this box's face; the 1.6ch is the caret and
+    // breathing room. Portions are whole numbers, so two is enough.
     //
-    // THE OVERRIDE IS LOCAL AND HAS TO BE. `%food-number-input` is 3.4em and is
-    // @extended by the shopping list's two boxes as well (food/_shopping-list.scss);
-    // those hold totals like `12`, were not asked about, and do not move.
-    //
-    // PORTIONS ARE WHOLE NUMBERS, which is what makes two characters honest
-    // here -- the same argument the drink scaler's own comment makes about
-    // integer multiples. `recipe-scale.js` steps the value in whole portions.
+    // A local override: the shopping list's boxes share the placeholder and
+    // keep its 3.4em.
     width: calc(2ch + 1.6ch);
     text-align: center;
     letter-spacing: normal;
   }
 }
 
-// ON A `makes:` RECIPE THE BOX HOLDS WHAT IS MADE -- #1286 -- and that is not
-// always two characters: "950" of millilitres, "2850" three orders on, "5–6"
-// where a midpoint lands on a half, "64" macarons. Five characters and the
-// caret, by the same formula as above. A WIDTH NOBODY HAS RULED ON: it is the
-// smallest that holds every figure the published collection can show at three
-// times the recipe, and it is here to be looked at.
+// On a `makes:` recipe the box holds what is made (#1286), which can run to
+// four digits or a range like "5–6": five characters and the caret, by the
+// same formula. Nobody has ruled on this width.
 .recipe-scale--made input {
   width: calc(5ch + 1.6ch);
 }
 
-// "about", "approx." -- the yield's own word, kept in front of the figure it
-// qualifies. The word's register, not the `~` mark's: this one is the recipe's.
+// "about", "approx.": the yield's own word, in front of the figure.
 .recipe-scale-prefix {
   text-transform: lowercase;
 }
 
-// The word is the unit. Lowercase Plex in the control's grey, the register the
-// shopping list's "set all to" label already speaks in.
+// The word after the box is the unit.
 .recipe-scale-word {
   text-transform: lowercase;
 }
 
-// `~` FOR AN ESTIMATE, the shopping list's own mark (#815): the only thing on
-// the page saying the number was reasoned rather than written down. Ink, not
-// grey, so it reads as part of the figure.
+// `~` for an estimate, the shopping list's own mark (#815). Ink, not grey, so
+// it reads as part of the figure.
 .recipe-scale-approx {
   color: $color-text;
   font-weight: 600;
   letter-spacing: normal;
 }
 
-// THE STEP BUTTONS: the site's interactive colour at rest, lighter on hover,
-// the direction every link on this site takes. No box growth on hover or
-// focus (#389's rule): the border is transparent at rest and only its colour
-// moves.
+// The step buttons: the interactive colour at rest, lighter on hover. The box
+// must not grow on hover or focus: the border is always 1px transparent.
 .recipe-scale-step {
   display: inline-block;
   box-sizing: border-box;
@@ -113,19 +90,9 @@
 
   &:hover { color: $color-recipe-link-hover; }
 
-  // WAS `outline: none` with the colour move carried by `border-color`
-  // alone, ISSUE #1086 -- a 1px border this close to a 0.95rem glyph, in the
-  // same colour the text itself was already moving to, read as no focus
-  // style at all in the design review (found by eye, 2026-09-15 --
-  // axe-core's own ruleset has no automated check for focus-ring
-  // visibility). `border` stays untouched here -- it is always
-  // `1px solid transparent`, at rest and focused alike, so this control
-  // never grows -- and a real `outline` carries the visible ring instead:
-  // 2px, offset 2px so it clears the glyph rather than crowding it. No
-  // section hue applies on a recipe page (§13.5: colour there is decoration,
-  // rationed, not a filter code), so this takes the recipe page's own accent
-  // family, same value $color-recipe-link-hover already used ($color-accent
-  // on food, MANUAL 13.2).
+  // A real outline is the focus ring (#1086); a colour change alone does not
+  // read as focus. Offset 2px to clear the glyph. The recipe page's accent,
+  // since no section hue applies there (MANUAL §13.5).
   &:focus-visible {
     outline: 2px solid $color-recipe-link-hover;
     outline-offset: 2px;
@@ -133,10 +100,9 @@
   }
 }
 
-// THE NOTE -- which lines are still as written once the portions move. Quiet,
-// under the control, in the grey the control itself wears; a paragraph of its
-// own so its sentence cannot push the box along. The words are Helen's since
-// #1088 (the layout has the ruling).
+// Which lines are still as written once the portions move. A paragraph of its
+// own, so its sentence cannot push the box along. `.shopping-list-note`
+// matches its type.
 .recipe-scale-note {
   margin: $space-sm 0 0;
   max-width: 65ch;

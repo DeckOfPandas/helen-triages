@@ -1,131 +1,32 @@
-# =============================================================================
-# WHAT A CARD'S INGREDIENT LINE SAYS, AND IN WHAT ORDER. Issues #567, #640, #691.
-# =============================================================================
-# Helen, on #691: "e.g. seeing 'mint' first in a mastiha mojito takes a minute!
-# We already do this on the food site." The food site does it with
-# `_data/food/pantry.yml`, which sinks 34 staples to the end of a row; this is
-# the same idea with the ORDER of everything else settled as well, because a
-# drink's ingredients have a natural hierarchy that a dish's do not.
+# What a card's ingredient line says, and in what order (#567, #640, #691).
 #
-# WHY A PLUGIN AND NOT LIQUID, which is the same answer cocktail_costs.rb gives.
-# The line this replaces was ONE 1,400-character Liquid statement doing four
-# jobs at once -- hiding, labelling, joining and emitting search data -- and it
-# was already at the edge of what anybody could read. Adding a seven-tier sort
-# and a per-drink override to it in a language with no sort-by-computed-key
-# would have produced something nobody could ever change again. Every comment
-# from that line is preserved below, at the step it describes.
-#
-# --- THE ORDER, WHICH IS HELEN'S, FROM #567 ----------------------------------
-# She wrote it as seven tiers and predicted her own preference:
-#
-#   1  higher-proof spirits          the base spirits: rum, gin, whisky,
-#                                    brandy, agave, vodka, arrack, cachaca
-#   2  lower-proof spirits           liqueurs, amari, vermouth and sherry,
-#                                    wine and sparkling
-#   3  citrus, then other juices     and the split within the tier is real:
-#                                    lime and lemon before pineapple
-#   4  sugar syrups                  syrups, honeys and sugars
-#   5  anything else                 fruit, herbs, dairy, coconut cream, soda
-#   6  bitters
-#   7  floats and rinses             from `as:` -- see below
-#
-# WITHIN A TIER, LARGEST VOLUME FIRST. Helen ruled on the tie-break directly on
-# 2026-09-06, choosing "volume, with a per-drink override field" over "most
-# typifying the drink" -- which would have been truer and would have needed a
-# judgement recorded on all 124 drinks, making it her worklist rather than a
-# rule. Volume is computed from the data that is already there, so every drink
-# orders itself and nothing has to be maintained.
-#
-# TIES INSIDE A TIER KEEP THE RECIPE'S OWN ORDER. A Last Word is three equal
-# pours and a Negroni is three equal pours; there is no fact to sort them by, so
-# the order Helen typed stands. That is #567's option (c) doing exactly the job
-# she ranked it for -- last, and only where the first two say nothing.
-#
-# --- TIER 7 IS BUILT NOW, AND `as:` IS WHAT BUILT IT -------------------------
-# #754, Helen 2026-09-06. A float used to be recorded nowhere a plugin could
-# read, so tier 1 took it and sorted it by volume -- landing it at the bottom of
-# the SPIRITS instead of the bottom of the CARD. `ingredient_as` in
-# ingredients.yml is the closed vocabulary; `as: float` and `as: rinse` both
-# mean tier 7, Helen's ruling of 2026-09-07 that a rinse goes with the floats
-# because both are added outside the main build.
-#
-# #754 SAID THREE DRINKS FLOAT AND IT IS FIVE. It counted the ones recording it
-# in QQ prose and missed `fog-cutter-bramble-style` (sherry) and
-# `kamaniwanalaya` (prosecco), which say so properly in a method step -- which
-# is exactly why they were invisible to a search for the problem.
-#
-# --- THE MUDDLE CLAUSE IS DELIBERATELY NOT BUILT -----------------------------
-# #567 asks for "for recipes with a muddling step, group the ingredients by
-# muddle then rest". It was BUILT on 2026-09-07, looked at, and dropped.
-#
-# WHAT LOOKING AT IT SHOWED. Grouping muddled ingredients first reorders 7 of
-# the 10 drinks that muddle, and three of them read worse: Ti' Punch became
-# `lime juice . sugar syrup . rhum agricole blanc`, putting the rhum last on a
-# rhum drink; P Five Punch led with its orgeat; Sapins Swizzle pushed its rum to
-# fourth. The cause is that a muddle covers two unlike things -- muddling a lime
-# to EXPRESS it, and muddling sugar to DISSOLVE it -- and only the first is a
-# statement about what the drink tastes of.
-#
-# A `muddle_staples` list was tried, to say which muddled things do not lead.
-# Helen's call, shown the three cards: don't let a muddle reorder at all. So the
-# rule is unbuilt rather than half-built, and the list is deleted rather than
-# kept unread.
-#
-# `as: muddle` IS STILL RECORDED ON THE DRINKS and that is not a contradiction:
-# it is a true fact about the pour, the drink page may want it, and
-# `test_a_method_that_floats_or_rinses_says_so_in_a_field` keeps it honest. It
-# simply does not sort anything. If this is ever revisited, the finding above is
-# the thing to start from, not the clause.
-#
-# --- THE OVERRIDE, AND ITS FIRST USER ----------------------------------------
-# An ingredient may carry `card_order: <n>`, and it replaces that entry's TIER.
-# The number space is the tier space, so `card_order: 1` means "sort this with
-# the base spirits" and `card_order: 9` means "after everything". Volume still
-# breaks ties within the new tier.
-#
-# ZERO IS LEGAL AND MEANS "BEFORE EVERYTHING", which is worth stating because it
-# is a trap in every language but this one. Ruby's `||` treats 0 as truthy so
-# the line below does the right thing; a Python reimplementation of this sort --
-# and one was written to preview the ordering -- uses `if x:` and silently
-# ignores a 0. Test with `is not None`, as
-# `test_every_poured_generic_has_a_tier` already does.
-#
-# ITS FIRST USER ARRIVED 2026-09-07: Port Authority's four blackberries. They
-# are `fruit_and_herbs`, so the default rule sorted them FIFTH, after the lemon
-# juice -- and they are what the drink is about. Helen: "blackberries, cognac,
-# port, cassis, lemon juice, bitters -- that's informative to a reader looking
-# at cards." That is exactly the case the field was built for and the reason it
-# was deliberately left empty until she named one: inventing which drinks need
-# it would have been making the judgement she declined to hand over.
-# =============================================================================
+# Tiers, from #567:
+#   1  base spirits                 2  liqueurs, amari, fortified, wine
+#   3  citrus, then other juices    4  syrups, honeys, sugars
+#   5  anything else                6  bitters
+#   7  floats, rinses and shells, from `as:` (#754)
+# Within a tier, largest volume first; ties keep the recipe's own order.
+# `card_order: <n>` on an ingredient replaces its tier; 0 is legal and means
+# before everything, so test for nil and not for truthiness.
+# `as: muddle` is recorded on drinks and deliberately sorts nothing: grouping
+# muddled ingredients first put the base spirit last on several drinks.
 
 require_relative "amount"
 
 module HelenTriages
   class CocktailCardIngredients < Jekyll::Generator
     safe true
-    # AFTER cocktail_costs AND cocktail_units, both of which are :normal. This
-    # one only reads `ingredients`, so the order does not actually matter today
-    # -- :low is here to say that it is a PRESENTATION step and must never
-    # become something the arithmetic plugins read back.
+    # After cocktail_costs and cocktail_units, which are :normal. A presentation
+    # step: the arithmetic plugins must never read its output back.
     priority :low
 
     COLLECTIONS = %w[cocktail_recipes cocktail_drafts].freeze
 
-    # Which section of ingredients.yml puts a generic in which tier.
-    #
-    # THE SECTIONS ARE THE CLASSIFIER AND THAT IS THE POINT. Every generic is
-    # declared in exactly one of these blocks already, by Helen, and the blocks
-    # are the vocabulary's own idea of what kind of thing something is. Writing
-    # a second classification here -- a list of "these are the strong ones" --
-    # would be a second truth that drifts the first time a generic is added to
-    # ingredients.yml and not to this file. Instead, a generic in NO listed
-    # section is a build-time warning and a test failure.
-    #
-    # `wine_and_sparkling` IS TIER 2 AND NOT TIER 5, which is worth stating
-    # because champagne is usually a topper. It is alcohol, it is the thing a
-    # French 75 tastes of, and #567's tier 2 is "lower-proof spirits" -- an
-    # 11% prosecco belongs there far more than beside the soda water.
+    # Which section of ingredients.yml puts a generic in which tier. The
+    # sections are the classifier: do not add a second list here. A generic in no
+    # listed section gets a build warning and fails
+    # test_every_poured_generic_has_a_tier. `wine_and_sparkling` is tier 2, not 5:
+    # champagne is alcohol and is what a French 75 tastes of.
     TIERS = {
       1 => %w[rum_styles gin_styles whisky_styles agave_styles brandy_styles
               cane_and_palm_spirits other_base_spirits],
@@ -137,15 +38,10 @@ module HelenTriages
       6 => %w[bitters]
     }.freeze
 
-    # CITRUS BEFORE THE REST OF THE JUICES, which is tier 3's own internal
-    # order and is stated separately because it is the one place #567 splits a
-    # tier: "citrus then other juices". Volume would get this wrong regularly --
-    # a Painkiller pours more pineapple than orange, and the drink is still a
-    # citrus drink first.
-    # Quoted rather than `%w[]`: every name here has a space in it, and `%w`
-    # needs each one backslash-escaped, which reads like a typo and parses like
-    # one too -- `test_the_citrus_that_sorts_first_is_juice_that_exists` read
-    # `lime\ juice` as "lime" and "juice" the first time it ran.
+    # Citrus before the other juices: tier 3's own order (#567), which volume
+    # would get wrong (a Painkiller pours more pineapple than orange). Quoted,
+    # not `%w[]`: every name has a space in it, and
+    # test_the_citrus_that_sorts_first_is_juice_that_exists reads this literal.
     CITRUS = [
       "lime juice", "lemon juice", "orange juice", "grapefruit juice"
     ].freeze
@@ -155,11 +51,9 @@ module HelenTriages
     # and the warning below is what actually gets it fixed.
     UNKNOWN_TIER = 5
 
-    # `as:` values that mean "after everything else on the card" -- #567's tier
-    # 7, and Helen's 2026-09-07 ruling that a rinse joins the floats there.
-    # `muddle` is deliberately NOT here: it is a GROUPING, handled before the
-    # tier, not a place in the order. `shell` joined 2026-10-01 (#1256): the
-    # rum set alight in a fruit shell is added outside the main build too.
+    # `as:` values that sort after everything else on the card, because they
+    # are added outside the main build (#567 tier 7; `shell` is #1256). `muddle`
+    # is deliberately not here.
     LAST_TIER = 7
     SORTS_LAST = %w[float rinse shell].freeze
 
@@ -200,41 +94,26 @@ module HelenTriages
 
     private
 
-    # Millilitres for a pour, or 0 for anything not measured by volume.
-    #
-    # ZERO RATHER THAN NIL, because this is a SORT key and not arithmetic. A
-    # dash of bitters and a mint sprig genuinely have no volume to compare, and
-    # they are already in tiers 5 and 6 where nothing else is competing with
-    # them. `to top` is 0 for the same reason: a topper's volume is a property
-    # of the glass, not of the recipe, so ranking it against a measured pour
-    # would be comparing two different kinds of number.
+    # Millilitres for a pour, or 0 for anything not measured by volume: this is
+    # a sort key, not arithmetic. A `(top)` is 0 too, since a topper's volume
+    # belongs to the glass and not to the recipe.
     def volume_ml(amount)
       Amount.millilitres(amount, @per_ml, @ignored) || 0.0
     end
 
-    # SUBSTITUTE ONLY IF EVERY GENERIC HAS A CARD NAME. A list generic means
-    # "either would do" (#441) and ten rum entries carry one, so they join with
-    # the same italic-free " or " the drink page uses. A list mixing a named rum
-    # with something unnamed would otherwise print half a fact; there is no such
-    # entry today, and this is what stops one appearing silently.
-    #
-    # THE JOIN IS THEN LOOKED UP in `card_name_joins`, because a pair sharing a
-    # head word reads badly and no rule collapses it well: `Demerara overproof
-    # rum or Demerara rum` is Helen's `Demerara rum or overproof`, which drops
-    # two words from the second option and reorders the pair. Absent means the
-    # default join stands, which is the case for six of the seven pairs.
+    # Each generic prints its card name, or itself where it has none. A list
+    # generic means "either would do" (#441) and joins with " or "; the joined
+    # string is then looked up in `card_name_joins`, where a pair that reads
+    # badly is worded by hand. Falls back to `item` when there is no generic.
     def label_for(generics, item)
       label = generics.map { |g| @card_names[g] || g }.join(" or ")
       label = @joins[label] if @joins[label]
       label.to_s.empty? ? item.to_s : label
     end
 
-    # `data-ing` IS `|`-SEPARATED, the same self-delimiting shape
-    # data-ingredients uses on the card and food/index.html's
-    # data-all-ingredients uses on a recipe row. It carries the generic, its
-    # card name and the suggestion for ONE ingredient, so the script can ask
-    # "does this ingredient answer the chip?" without a substring probe that
-    # could match across the seam between two of them.
+    # `|`-separated: the generic, its card name and the suggestion for one
+    # ingredient, so a filter can ask about this ingredient without a substring
+    # match crossing into the next one.
     def search_key(generics, suggestions)
       parts = []
       generics.each do |g|
@@ -254,20 +133,14 @@ module HelenTriages
 
         generics = Array(ing["generic"]).map(&:to_s)
 
-        # HIDDEN ONLY WHEN EVERY GENERIC IS HIDDEN. An entry offering "raw sugar
-        # or molasses sugar" is one ingredient with two acceptable answers, and
-        # it disappears only if the card would decline both. The same rule the
-        # Liquid used, kept exactly.
+        # Hidden only when every generic is hidden: "raw sugar or molasses sugar"
+        # is one ingredient with two acceptable answers.
         next if generics.any? && generics.all? { |g| @hidden.include?(g) }
 
         label = label_for(generics, ing["item"])
         next if label.to_s.empty?
 
-        # `as:` OVERRIDES THE TIER, `card_order:` OVERRIDES EVERYTHING. The two
-        # answer different questions -- `as` says what KIND of pour this is and
-        # the tier follows from that, while `card_order` is Helen naming a
-        # position outright for a drink whose small pour IS the drink. So the
-        # explicit number wins where both are present.
+        # `card_order:` wins over `as:`, which wins over the generic's tier.
         use = ing["as"].to_s
         tier = if ing["card_order"]
                  ing["card_order"]
@@ -286,39 +159,14 @@ module HelenTriages
           "ml"     => volume_ml(ing["amount"]),
           "citrus" => generics.any? { |g| CITRUS.include?(g) } ? 0 : 1,
           "index"  => index,
-          # HOW MANY GENERICS EARNED THIS LABEL -- #1051. 1 for an ordinary
-          # ingredient, 2+ when `label_for` joined a disjunctive list with
-          # " or ". The card still prints the joined label as before (it is a
-          # true fact about the pour); this is here so a CONSUMER that must
-          # not offer a joined label -- cocktails/search.json's omnisearch
-          # feed -- can tell the two apart without re-parsing the string for
-          # the word "or", which a real ingredient name could itself contain.
+          # How many generics earned this label (#1051): 2+ when `label_for`
+          # joined a list. Lets cocktails/search.json tell a joined label apart
+          # without parsing it for " or ".
           "generics" => generics.length,
-          # THE LABEL, IN THE PIECES A FILTER CAN ACTUALLY APPLY -- #1130.
-          # One entry for an ordinary pour; one PER GENERIC where `label_for`
-          # joined a disjunctive list.
-          #
-          # WHY THE FEED CANNOT JUST SPLIT `label` ON " or ". Two reasons, and
-          # the second is the one that would bite quietly. A real ingredient
-          # name may contain the word (nothing does today, which is not a
-          # guarantee). And `card_name_joins` REWRITES the joined string --
-          # `Demerara overproof rum or Demerara rum` is Helen's
-          # `Demerara rum or overproof`, which drops two words from the second
-          # option -- so splitting the display string yields "overproof",
-          # which is no chip at all. These come from the generics themselves,
-          # through the same `card_names` map the chips are built from, so
-          # each one IS a chip and `?ing=` resolves it whole.
-          #
-          # HIDDEN GENERICS ARE LEFT OUT. A row is dropped entirely only when
-          # EVERY generic on it is hidden, so a MIXED row survives and its
-          # label names something the card declined to print. There is no such
-          # row today (measured over all 139 drinks, 8 multi-generic pours,
-          # none mixed) -- this is what stops the first one silently offering
-          # `white sugar` in the search box.
-          #
-          # FALLS BACK TO THE LABEL when no generic is left: a row labelled
-          # from its `item` has none to begin with (`generics: 0`), and that
-          # row is a real searchable ingredient.
+          # The label in the pieces a filter can apply (#1130): one per visible
+          # generic. Not `label` split on " or ": `card_name_joins` rewrites the
+          # joined string, so a split piece need not be a chip. Hidden generics
+          # are left out; with none left it falls back to the label.
           "search_labels" => (
             visible = generics.reject { |g| @hidden.include?(g) }
                               .map { |g| @card_names[g] || g }
@@ -327,19 +175,13 @@ module HelenTriages
         }
       end
 
-      # `-ml` FOR DESCENDING VOLUME, `index` LAST TO KEEP TIES STABLE. Ruby's
-      # sort_by is not guaranteed stable, so the original position is carried
-      # explicitly rather than relied upon -- which is what makes "ties keep the
-      # recipe's own order" a promise instead of an accident.
+      # `-ml` for descending volume, `index` last: sort_by is not stable, so the
+      # original position is carried to keep ties in the recipe's own order.
       rows.sort_by { |r| [r["tier"], r["citrus"], -r["ml"], r["index"]] }
     end
 
-    # A LIST GENERIC TAKES THE STRONGEST TIER OF ITS OPTIONS, via `min` above.
-    # "aguardiente or kirschwasser" is two brandies and lands in tier 1 either
-    # way; the rule matters for a pair that crosses a boundary, where sorting by
-    # the more prominent of the two answers is the reading that matches how the
-    # entry is offered -- "either would do" means the drink is at least the
-    # better one.
+    # A list generic takes the strongest tier of its options (`min` in
+    # `card_rows`).
     def tier_for(generic, unclassified)
       tier = @tier_of[generic]
       return tier if tier

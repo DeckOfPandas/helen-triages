@@ -1,33 +1,18 @@
-// =============================================================================
-// SHARED LAYOUT — the page shell every site in the mono-repo renders
-// =============================================================================
-// This is the CSS for _layouts/default.html and nothing else: the content
-// column, the header, the wordmark and the footer. If default.html emits a
-// class, its rule belongs here — otherwise a site with its own palette but no
-// copy of these rules gets an unstyled header, which is exactly what happened
-// when cocktails was first stood up.
+// SHARED LAYOUT: the CSS for _layouts/default.html and nothing else -- the
+// content column, the header, the wordmark and the footer. If default.html
+// emits a class, its rule belongs here or in shared/_chrome.scss; a site with
+// its own palette and no copy of these rules gets unstyled chrome (#374).
 //
-// PALETTE CONTRACT
-// The shared partials use palette variables by NAME and never define them.
-// Every site palette (_sass/<site>/_palette.scss) must declare all ten that
-// _base.scss, this file and _chrome.scss between them consume:
+// Palette contract (MANUAL §2.3): shared partials use palette variables by
+// name and never define them. Every _sass/<site>/_palette.scss must declare
+//   $color-accent $color-bg $color-border $color-clear-text $color-mood-root
+//   $color-surface $color-text $color-white $font-body $font-headings
+// SHARED_PALETTE_CONTRACT in tests/test_site_config.py enforces the list: a
+// missing one is a Sass compile error that names a line in a shared file, not
+// the palette that forgot it.
 //
-//   $color-accent $color-bg       $color-border      $color-clear-text
-//   $color-mood-root  $color-surface  $color-text    $color-white
-//   $font-body    $font-headings
-//
-// $color-accent is the newest (issue #374) and is the one that let the chrome
-// stop being forked: it is each site's own "this is interactive / branded"
-// colour, so shared/_chrome.scss can ask for one without naming food's magenta.
-//
-// tests/test_site_config.py enforces the list, because a missing variable is a
-// Sass compile error on the deploy build rather than something you notice
-// locally — and the error names a line in a shared file, not the palette that
-// actually forgot it.
-//
-// No class in this file may name one site. `.site-logo-food` used to live here
-// and was renamed `.site-logo-word` when the layout became shared — the word in
-// the brackets comes from _data/sites.yml, so the class cannot assume it.
+// No class in this file may name one site: the bracketed word comes from
+// _data/sites.yml.
 main {
   max-width: $width-content;
   margin: 0 auto;
@@ -35,10 +20,7 @@ main {
   position: relative;
 }
 
-// ============================================================================
-// SITE CHROME
-// ============================================================================
-// Header, footer, logo. Everything outside <main>.
+// --- Site chrome: header, footer, logo. Everything outside <main> -----------
 
 .site-header {
   -webkit-text-stroke: 1px;
@@ -54,29 +36,15 @@ main {
 
 .site-header {
   position: relative;   // anchors .site-header-inner's inset:0, below
-  // $space-sm UNDER THE DOOR'S ROW -- #1322, 2026-10-08. ("Nothing over it",
-  // the other half below, lasted an afternoon: it is 15 over as well now, see
-  // `.site-nav-icons`. This half of the ruling stands.)
-  // Helen: "mobile: navbar has too much padding to its bottom edge", and from
-  // the candidates page, "0 over, 15 under." The bottom was $space-xl like the
-  // other three sides, which put 31.4px under the row at every width; since
-  // #733 gave cocktails' header a band of its own that space reads as the
-  // band's bottom, not as page, and food's was "all that plain white".
-  //
-  // THE 15 IS 0.5rem + 6.4px + THE 1px BORDER, measured: the row's grid line is
-  // as tall as `??` (26.9px), which is 6.4px taller than the door's lettering.
-  // So "15 under" is the door's box to the header's edge, 15.4px, and the
-  // other half of the ruling -- nothing over the row -- is the zero margins on
-  // `.site-nav-icons` and `.site-about-link` and the stacked grid's missing
-  // gap, below. One value at every width; there is no phone variant of either.
+  // $space-sm under the second row, at every width (#1322). With the row's
+  // own 0.9rem top margin that is 15px over the row and 15px under it: the
+  // row's grid line is as tall as `??`, 6.4px taller than the door's
+  // lettering, and that plus the 1px border makes up the rest.
   padding: $space-xl $space-xl $space-sm;
   border-bottom: 1px solid $color-border;
-  // A CUSTOM PROPERTY WITH THE PALETTE'S VALUE AS ITS FALLBACK -- #733,
-  // 2026-10-06. Cocktails re-points it to a darker band of its own
-  // (_sass/cocktails/_leopard.scss); food sets nothing and compiles to the
-  // $color-surface it always had. The same shape as the emboss tiers in
-  // shared/_rule.scss, for the same reason: one header, and a site that
-  // differs says so in one declaration rather than in a competing rule.
+  // A custom property with the palette's value as its fallback (#733):
+  // cocktails re-points it to a darker band (_sass/cocktails/_leopard.scss),
+  // food sets nothing.
   background: var(--chrome-ground, #{$color-surface});
 
   .site-title {
@@ -89,113 +57,38 @@ main {
   }
 }
 
-// .site-header itself is edge-to-edge, full viewport width -- it has no
-// content column of its own to align anything against. This shares main's own
-// max-width/margin:auto formula so the nav lines up with the right edge of the
-// actual content column beneath it, at every viewport width, not just a fixed
-// offset from the header's own edge.
+// `.site-header` is edge to edge; this is the column inside it. Three tracks,
+// `1fr auto 1fr`, so the wordmark's middle track cannot grow into the track
+// the nav occupies at any width (#551). `.site-footer-top` is the same shape.
 //
-// A GRID, NOT AN ABSOLUTELY POSITIONED OVERLAY -- issue #551, 2026-08-30.
-//
-// It was `position: absolute; inset: 0` holding a nav pinned to its
-// bottom-right, with the wordmark a separate centred link in normal flow
-// underneath. Nothing kept those two apart: the wordmark grows from the middle
-// outwards, the nav sits at the right edge, and at some width they meet. They
-// met on COCKTAILS first because `[ COCKTAILS ]` is wider than HELEN TRIAGES
-// and the wordmark's own grid takes the width of whichever row is wider (§13.8)
-// -- so the tape ran under the nav icons and, being `position: relative` with a
-// `transform`, painted over them (§12).
-//
-// Helen's first instinct was to collapse cocktails to one column earlier than
-// food. That is a per-site chrome rule, which is exactly what #374 exists to
-// prevent, and it would have left the overlap live on both sites -- just at a
-// different width each. `1fr auto 1fr` removes it at EVERY width instead: the
-// middle track holds the wordmark and cannot grow into the track the nav
-// occupies. `.site-footer-top` is the same three tracks for the same reason.
-//
-// PLACED EXPLICITLY, NOT AUTO-FLOWED, and that is load-bearing rather than
-// fussy: the nav comes FIRST in the markup because it is first in the tab order
-// (§12), so under auto-placement it would take column 1 and the wordmark column
-// 2, putting the nav on the left and the wordmark off-centre. The footer's
-// hearts carry the identical note for the identical reason.
-//
-// The old `pointer-events: none/auto` pair is gone with the overlay. It existed
-// because an absolutely positioned box hit-tests above in-flow content whatever
-// the DOM order, so the empty area around the nav swallowed clicks meant for
-// the wordmark. Nothing overlaps now, so nothing needs excusing.
+// Every child is placed explicitly, never auto-flowed: the nav comes first in
+// the markup because it is first in the tab order (MANUAL §12), so under
+// auto-placement it would take column 1 and push the wordmark off centre.
 .site-header-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  // TWO ROWS SINCE 2026-09-10: the wordmark, then a second row with `??` at
-  // its left end and the door to the other site at its right end (since
-  // 2026-09-11, #965; centred under the wordmark for the day before that).
+  // Row 1 is the wordmark; row 2 has `??` at its left end and the door to
+  // the other site at its right end.
   grid-template-rows: auto auto;
   align-items: end;
-  // THE CARDS' WIDTH, NOT MAIN'S, SINCE 2026-09-11. The comment above says this
-  // shares main's formula so the nav lines up with the content column -- but
-  // `main` is $width-content INCLUDING its $space-xl padding, so its content
-  // column is 852px, and this was 900px inside the header's own padding. Over
-  // 948px the header's edges sat 24px outside the cards' (measured at 1280:
-  // `??` at 202px, the cards at 214px). Nobody could see it while the row was
-  // centred. With the row on the right-hand edge and `??` on the left, both on
-  // the cards' edges (#965, Helen: "Both on the cards' edge"), this width is
-  // what makes that true at every viewport width rather than below 948px.
-  // `calc()`, because $width-content is px and $space-xl rem: Sass cannot
-  // subtract them at compile time, the browser can.
+  // The cards' width, not main's (#965): `main` is $width-content including
+  // its $space-xl padding, so `??` and the door land on the cards' edges only
+  // if this column is narrower by that padding. `calc()` because the two are
+  // px and rem, which Sass cannot subtract at compile time.
   max-width: calc(#{$width-content} - #{2 * $space-xl});
   margin: 0 auto;
 }
 
-// Header nav row -- one icon per site in _data/sites.yml, in that file's own
-// order, then the about link (see default.html's own comment). The SAME row on
-// every page since issue #374: it used to be built from per-site keys and so
-// rendered nothing at all on cocktails.
+// The door to the other site: default.html loops over _data/sites.yml and
+// skips the page's own `site_key`, so the row holds one link (the bracketed
+// word and an arrow). A `site_neutral` page (about) belongs to no site and
+// gets every site's link.
 //
-// THE 0.5rem IS THE OLD 2rem, RE-EXPRESSED. It used to be `bottom: 2rem`
-// measured from .site-header-inner's bottom edge, which sat $space-xl (1.5rem)
-// below the wordmark -- so the row rested 0.5rem above the wordmark's own
-// bottom. Aligned to the grid row's end instead, that same 0.5rem is a margin.
-//
-// What it is FOR is unchanged, and is an eyeballed offset rather than a
-// mechanism: Helen wanted the row roughly level with the black tape's bottom
-// ink line, and the tape graphic does not fill its own box -- the polygon's
-// visible bottom sits about 9px shy of it at .site-logo-tape's 70px height. Her
-// own call was "approximately level ... does not need to change with different
-// tape SVGs", so if that height or the SVG's margins change, re-eyeball this by
-// hand rather than expecting it to follow.
-//
-// AND THE OFFSET IS ZERO SINCE #1322 (2026-10-08): the row starts where the
-// wordmark's box ends, at every width. It was 0.9rem (0.45rem under 600px,
-// #1086). Helen, from the candidates page: "0 over, 15 under", and of the
-// tilted tape's low corner coming close over `??` on a phone, "The clearance
-// for the cocktails tape is fine!" The tape's ink stops short of its box, so
-// zero box-to-box still shows a few pixels of ground. `.site-header`'s
-// padding, above, has the other half.
-//
-// AND 0.9rem AGAIN, LATER THE SAME DAY, AT EVERY WIDTH. Helen, having seen the
-// zero live: "Sorry, changed my mind, 15 over 15 under please!" The margin is
-// the WHOLE of the space over the row now -- the stacked grid still has no
-// gap and the phone block still has no variant -- so it is one number where
-// before #1322 it was a margin plus a gap that added up to 15px on a phone and
-// at desktop width and to 30px in between. `.site-about-link` carries the same.
+// The 0.9rem top margin is the whole of the space over the row (#1322): the
+// stacked grid has no gap and there is no phone variant. `.site-about-link`
+// carries the same margin and must move with it.
 .site-nav-icons {
-  // AT THE RIGHT-HAND END OF ROW 2, ON THE CARDS' RIGHT EDGE, SINCE 2026-09-11
-  // -- column 3, `justify-self: end`, and the header's column is the cards'
-  // width (`.site-header-inner`, above). Helen, having seen the centred row on
-  // her phone: "the design I would like is for the link to the other site (and
-  // icon and arrow) to be on the right-hand side at desktop width. I have
-  // changed my mind since seeing the centred design on mobile." It was centred
-  // under the wordmark in column 2 from 2026-09-10 (her idea then, picked by
-  // looking), and in row 1 column 3 from #551 before that.
-  //
-  // COLUMN 3 IS WIDE ENOUGH AT EVERY WIDTH ABOVE THE STACK, measured: the
-  // widest wordmark, `[ COCKTAILS ]`, is 488.8px, which at 821px leaves 142px of
-  // each side track for a 141px row.
-  //
-  // WHAT IS IN THE ROW: the OTHER site's icon, its bracketed word and an arrow
-  // -- Helen: "D: the other site, icon and word, arrow on." The site you are on
-  // is on the tape above and is not repeated here (default.html has the
-  // reasoning). On the about page, which belongs to no site, both appear.
+  // Row 2, column 3, ending on the cards' right edge (#965).
   grid-row: 2;
   grid-column: 3;
   justify-self: end;
@@ -205,81 +98,20 @@ main {
   align-items: center;
   gap: 1.6rem;
 
-  // WRAPS RATHER THAN OVERFLOWS -- a `site_neutral` page (about) renders BOTH
-  // sites' links in this row, one icon-word-arrow group each plus the 1.6rem
-  // gap, where every other page renders only one. That second group is what a
-  // single-site page never had to make room for: `shoot.sh` found
-  // `.site-nav-icons` running 4px past a 360px viewport on /about/, the row's
-  // own two groups wider than the column even though neither group alone
-  // would be. `flex-wrap: wrap` lets the second group drop to a line of its
-  // own instead of forcing the row wider than the page. `justify-content:
-  // flex-end` (since 2026-09-11; `center` while the row was centred) hangs a
-  // wrapped line from the right edge, like the row itself. Harmless everywhere
-  // else: one group never has reason to wrap.
-  //
-  // AND ON /about/ IT NO LONGER FIRES, SINCE 2026-09-15 (#1086). This comment
-  // used to end "on /about/ the two groups are 340px, wider than column 3 at
-  // desktop width too, so they wrap there as well as on a phone" -- which was
-  // the wrap doing its job and the about page alone wearing a two-line nav.
-  // Helen chose "C: doors on one line, no ??", so `.site-neutral
-  // .site-nav-icons` below gives that page the full header width and sets
-  // `nowrap` explicitly. The 340px is stale as well: the icon left the row on
-  // 2026-09-14 (#1007) and the two groups measure 268.6px now.
-  //
-  // THIS DECLARATION STAYS, and not only for the pages that still use it. It is
-  // the reason nothing here can ever overflow rather than a layout choice, so
-  // it remains the base and the about page overrides it -- which is the right
-  // way round: a new site_neutral page, or a third site, gets the safe
-  // behaviour by default and has to ask for the other one.
+  // Wraps rather than overflows, and that is the base on purpose: a page that
+  // renders more than one door (a new site_neutral page, a third site) is
+  // safe by default and has to ask for `nowrap`, as the about page does
+  // below. `flex-end` hangs a wrapped line from the right edge.
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-// =============================================================================
-// THE ABOUT PAGE'S ROW GETS THE WHOLE WIDTH — #1086, 2026-09-15
-// =============================================================================
-// Helen, picking C from the about-header candidates page: "C: doors on one line,
-// no ??". Two halves, and the other half is in _layouts/default.html, which
-// stops emitting the `??` on this page (it pointed at the page you were on) and
-// puts `.site-neutral` on the header so this rule has something to hang off.
-//
-// THE PROBLEM IS ARITHMETIC, NOT TASTE, which is why it shows up on exactly one
-// page. `.site-header-inner` is `1fr auto 1fr`: the wordmark takes the middle
-// track and the two side tracks split what is left. On food at 1280 that leaves
-// each side track about 264px. Every ordinary page puts ONE door in the row
-// (the site you are not on), which fits; /about/ belongs to no site (§13.8), so
-// its loop emits BOTH, and two doors plus the 1.6rem between them measured
-// 267.9px. Four pixels over, so `flex-wrap: wrap` -- which is there precisely so
-// this overflows nothing -- dropped the second door onto a line of its own, and
-// the about page alone wore a two-line nav.
-//
-// `grid-column: 1 / -1` IS THE FIX AND IT COSTS THE OTHER TRACKS NOTHING. The
-// row is `justify-self: end`, so it still ends exactly where column 3 ended --
-// on the cards' right edge (#965) -- and it is the only thing in row 2 on this
-// page now that `??` is gone, so spanning all three tracks takes room from
-// nobody. On every other page this selector does not match and the row stays in
-// column 3.
-//
-// `flex-wrap: nowrap` IS THE INSTRUCTION, NOT AN OPTIMISATION: with the width
-// available the row would no longer wrap at 1280 anyway, but "both doors on one
-// line" is what was chosen, and saying it means the row cannot quietly go back
-// to two lines at some width nobody screenshotted.
-//
-// SAFE ON A PHONE, MEASURED RATHER THAN ASSUMED, because `nowrap` is the one
-// declaration here that could overflow. Below $header-stack-width the header is
-// one column, so the row already has the full width; the two doors measure
-// 268.6px, and the narrowest viewport this site is checked at (360px) gives them
-// 312px. They were already on one line there -- the `??` is a grid sibling, not
-// a flex child, so removing it never made this row narrower -- which is why the
-// candidates page showed no change on a phone. `shoot.sh` reports OVERFLOW at
-// 360 and 390 if that ever stops being true.
-//
-// `margin-bottom: 0.4rem` IS THE `??` THIS PAGE DOES NOT HAVE -- #1322,
-// 2026-10-08. On every other page the row's grid line is as tall as `??`
-// (26.9px), 6.4px taller than the doors' lettering, and that 6.4px is part of
-// the 15px Helen picked under the row. Here there is no `??`, so without this
-// the doors sat 9px from the header's edge where every other page has 15.
-// Nobody saw the difference while the padding under them was 24px.
+// The about page's row holds both doors, wider together than column 3, so it
+// spans all three tracks (#1086); default.html emits no `??` there, so the
+// span takes room from nothing. `nowrap` is the one declaration here that
+// could overflow a phone: scripts/browser/shoot.sh reports OVERFLOW if it
+// does. `margin-bottom` stands in for the `??` this page lacks (#1322), which
+// elsewhere makes the row's grid line taller than the lettering.
 .site-neutral .site-nav-icons {
   grid-column: 1 / -1;
   justify-self: end;
@@ -287,61 +119,15 @@ main {
   margin-bottom: 0.4rem;
 }
 
-// The row's own word and arrow. Courier in the site's own bracket device --
-// this IS naming a site from sites.yml, which is MANUAL 13.4.1's test for the
-// brackets -- at a size that reads as a row under the tape rather than a
-// second tape. `letter-spacing` is set explicitly on both because .site-header
+// The door's word. `letter-spacing` is explicit because `.site-header`
 // carries 0.5em for the wordmark and everything in it inherits that.
-// THE LETTERING SITS ON THE MARKS' LINE, 2026-09-14, and the last 1px of #993.
-// With the arrow drawn (below) the icon and the arrow agree exactly, because
-// `align-items: center` centres their BOXES and both have their ink centred in
-// their own viewBox. Type does not: all-caps ink runs from the baseline up to
-// the cap line, while the line box keeps the descender depth underneath it, so
-// the ink's centre sits ABOVE the box's centre and the word floated over the
-// row it was supposedly centred in.
 //
-// 0.1em IS MEASURED, NOT CHOSEN, and measuring is the only honest way to get
-// it: the correction is (line box centre - ink centre), which needs Courier
-// Prime's real ascent, descent and cap height, and the face ships here as woff2
-// only -- the same wall _sass/cocktails/_cards.scss hit compensating for the
-// tape band on the text, which it escaped by correcting the ARTWORK instead.
-// There is no artwork to correct here.
-//
-// MEASURE IT IN ONE IMAGE, NOT TWO. Crop the whole LINK and compare the ink
-// bands inside that single crop. An element screenshot pads its box by about a
-// pixel, so measuring the word in its own crop and the icon in its own and
-// subtracting the two page positions is wrong by that padding -- which at this
-// size is most of the answer. Doing exactly that produced a first version of
-// this rule at 0.082em, and the word was still visibly high.
-//
-// THE NUMBERS. In one crop of `.site-nav-icon-link` at 1280px and
-// deviceScaleFactor 2, the ink bands read glass 25.5, `[` 22.5, caps 22.0,
-// `]` 22.5, arrow 25.5: the word sat 3 device pixels -- 1.5 CSS px -- above the
-// two marks. 0.082em moved it 2 device pixels and left it 1 above; 0.117em
-// moved it 3 and left it 1 BELOW; and 0.1em paints identically to 0.117em.
-// So the true correction is 2.5 device pixels, 1.25 CSS px, 0.0977em, and the
-// raster can only land on 2 or 3. 0.1em is that value to two places and rounds
-// the way that costs half a device pixel at DPR 2 -- below anything a display
-// can show, and the nearest either side is worse.
-//
-// THE BRACKETS ARE WHAT IS ALIGNED, not the capitals: `[ COCKTAILS ]` is one
-// object and the brackets bound it, so the object's ink centre is theirs. The
-// capitals sit half a device pixel above that, which is the object being
-// centred rather than its tallest part.
-//
-// IN `em`, SO IT TRACKS THE SIZE. The offset is a fact about the FACE, not
-// about this font-size, and it scales with the type the way the tape's padding
-// does. To re-measure after any change to the face or the size:
-// `sh scripts/browser/crop.sh /food/ ".site-nav-icon-link" nav` then
-// `python3 scripts/browser/inkbox.py tmp/shots/crop-nav.png 6`.
-//
-// `position: relative` MOVES NOTHING ELSE. The row's height and every other
-// item's place are unchanged, which is what makes this safe to carry: it is a
-// correction to what is drawn, not to the layout.
+// `top: 0.1em` puts the lettering on the arrow's line (#993): the flex row
+// centres boxes, and all-caps ink sits above its line box's centre. A fact
+// about the face, so in em. To re-measure, crop the whole link with
+// scripts/browser/crop.sh and compare ink bands inside that one image with
+// scripts/browser/inkbox.py; the brackets are what is aligned.
 .site-nav-word {
-  // NO LEFT MARGIN SINCE 2026-09-14 (#1007): the icon it stood off is out of
-  // the row, and the word is the row's first mark. The 0.55rem is kept on the
-  // arrow after it.
   margin-left: 0;
   font-family: $font-headings;
   font-size: 0.8rem;
@@ -353,23 +139,11 @@ main {
   top: 0.1em;
 }
 
-// THE ARROW IS DRAWN, NOT SET -- #993, 2026-09-12. It was `&rarr;` in
-// $font-headings at 1rem/700 until then; _layouts/default.html carries the
-// reasoning, and the short version is that Courier Prime has no arrow, so the
-// glyph came from whatever face the reader's machine substitutes -- which
-// decides both the box's height and where the ink sits inside it, and neither
-// is something a stylesheet can correct for.
-//
-// SIZED BY WIDTH, so it keeps the 0.6em the monospace arrow occupied in the
-// row and the height follows the viewBox. `display: block` because an inline
-// SVG otherwise sits on the text baseline and brings the line box's descender
-// back into the arrangement -- exactly what was being escaped. With that, the
-// flex row centres this box on the icon's box, and both boxes have their ink
-// centred in them, so the three marks agree by construction at any size.
-//
-// `stroke: currentColor` IS IN THE FILE and the colour comes from
-// `.site-nav-icon-link` by inheritance, so the hover carries it with no rule
-// here -- the same contract every other icon under _includes/icons/ keeps.
+// The arrow is a drawing (_includes/icons/arrow-right.svg), not `&rarr;`:
+// Courier Prime has no arrow, so a glyph would come from whatever face the
+// reader's machine substitutes, box and ink both (#993). `display: block`
+// keeps it off the text baseline, so the flex row centres its box. Its stroke
+// is `currentColor`, so the link's hover reaches it with no rule here.
 .site-nav-arrow {
   margin-left: 0.55rem;
   flex: none;
@@ -378,39 +152,18 @@ main {
   height: auto;
 }
 
-// Centre track. NO `min-width: 0`, and that is the whole of issue #551's
-// second half.
-//
-// It was there on the reasoning that a long wordmark should shrink its track
-// rather than overflow the grid. That is exactly backwards here: `min-width: 0`
-// drops the item's minimum contribution to zero, so the auto track is free to
-// be sized SMALLER than the thing in it -- and `.site-logo` inside is
-// `grid-template-columns: max-content`, which cannot shrink. So the track got
-// squeezed, the wordmark kept its width, and the surplus spilled out of the
-// track and over the nav in column 3. The tape appeared to cover the icons
-// again, for a different reason than the first time.
-//
-// Left at `auto`, the track's minimum is the wordmark's own min-content, so
-// column 3 can only ever begin after the wordmark ends. Overlap is impossible
-// rather than unlikely, which is the point of the three tracks.
-//
-// A wordmark genuinely too wide for the viewport is handled where it should be:
-// `.site-logo-top` carries `max-width: 92vw` as the mobile safety net, and
-// below 600px the header stacks.
+// Centre track. No `min-width: 0` (#551): that would let the auto track be
+// sized smaller than the wordmark, and `.site-logo` is `max-content` and
+// cannot shrink, so the surplus would spill over the nav in column 3. A
+// wordmark too wide for the viewport is handled by `.site-logo-top`'s 92vw
+// cap and by the header stacking below $header-stack-width.
 .site-title-link {
   grid-row: 1;
   grid-column: 2;
 }
 
-// Shared link styling for every item in the nav row -- icons and the "??"
-// text both use it, so one rule covers all of them. RESTING COLOUR ONLY; the
-// hover is in shared/_chrome.scss.
-//
-// That used to say the hover "lives as an override in food/_recipe-header.scss,
-// not here", because the magenta Helen asked for was not one of the guaranteed
-// palette variables. True, and it meant the shared nav had a hover on food and
-// not on cocktails -- issue #374. $color-accent exists so the hover can be
-// stated once, for both.
+// Every link in the header's second row, the doors and `??` alike. Resting
+// colour only; the accent hover is in shared/_chrome.scss.
 .site-nav-icon-link {
   display: inline-flex;
   align-items: center;
@@ -423,132 +176,48 @@ main {
   }
 }
 
-// Every icon partial under _includes/icons/ drops its own width/height so
-// this is the one place icon size is decided -- was 36px, shrunk to 22px
-// alongside the move to the bottom of the header (Helen's ask: smaller, and
-// lower). Height-only: each icon keeps its own natural aspect ratio (the
-// cloche is wider than tall, the martini taller than wide) rather than
-// being squashed into a square.
-// 28px -- issue #388, 2026-08-19. Was 36px, shrunk to 22px when the row moved
-// to the bottom of the header, and back up to 28px now that Helen has lived
-// with it. Height-only: each icon keeps its own natural aspect ratio (the
-// cloche is wider than tall, the martini taller than wide) rather than being
-// squashed into a square.
-//
-// One value for the whole repo since #374 -- this row is shared chrome, so
-// both sites move together and there is no second number to keep in step.
+// A site icon's default size: the partials under _includes/icons/ carry no
+// width or height. Height only, so each keeps its own aspect ratio. Only the
+// footer renders one now, and resizes it (`.site-footer-ref-icon`).
 .nav-icon {
   display: block;
-  // 24px SINCE 2026-09-10, the size on the header candidates page Helen chose
-  // from: beside its word and under the tape the icon is one part of a row,
-  // not the row, and 28px shouted next to 0.8rem Courier.
   height: 24px;
   width: auto;
 }
 
-// The small print / about link. Deliberately not spelled out as "about"
-// anywhere a nav shows it -- Helen's explicit call, and the about page's
-// own title ("???") echoes the same instinct. Deliberately bare -- Helen:
-// "much more minimalist... a naked ? in body font and style" -- no circle,
-// no border, no heading font: just a character sitting quietly in the row,
-// in the page's own body font. Now "??", still Helen's call. Shrunk from
-// 1.1rem to 0.8rem alongside the icons above, for the same reason.
+// The about link: a bare `??` in the body face, never spelled "about" where a
+// nav shows it (Helen's call, MANUAL §2.5).
 //
-// letter-spacing: normal is load-bearing, not decorative -- .site-header
-// carries 0.5em (meant for the all-caps wordmark elsewhere in the header)
-// and this link inherits it same as everything else in .site-header, which
-// on a two-character glyph like "??" reads as a huge gap between the two
-// question marks. Nothing else in the nav row needed this reset because
-// nothing else in the row is text -- the icons ignore letter-spacing entirely.
+// `letter-spacing: normal` is load-bearing: `.site-header`'s 0.5em is
+// inherited and would open a wide gap between the two question marks.
 .site-about-link {
-  // ALONE AT THE RIGHT, LEVEL WITH THE ROW, SINCE 2026-09-10. It is not a
-  // site, so it left the row when the row became the door to the other site;
-  // row 2, column 3 puts it on the row's line at the column's right edge --
-  // Helen: "the ?? should probably be horizontally aligned with the new arrow
-  // line" -- and `align-self: center` is what does the aligning. A step
-  // larger than the 0.8rem it was in the icon row, her call as well.
-  // AT THE LEFT END OF THE ROW SINCE 2026-09-10 (later the same day). At the
-  // right end it sat where the other-site link's arrow was pointing -- Helen:
-  // "move the ?? link to the about page to the left, so it doesn't look like
-  // the arrow from the central icon and link is pointing at it." Column 1,
-  // start-aligned; the row itself stays centred in column 2.
+  // Row 2, column 1: the left end of the door's line, on the cards' left
+  // edge (#965), so the door's arrow does not point at it.
   grid-row: 2;
   grid-column: 1;
   justify-self: start;
   align-self: center;
-  // ON THE CARDS' LEFT EDGE, SINCE 2026-09-11: no side margin, now that the
-  // header's column is the cards' width. It carried "the same $space-md of air
-  // from the page edge the row used to carry" until then, which put it 12px
-  // inside the cards; Helen, on #965: "Both on the cards' edge". The top
-  // margin is the row's, beside it: 0.9rem at every width (#1322).
+  // The same top margin as `.site-nav-icons` (#1322).
   margin: 0.9rem 0 0;
   font-family: $font-body;
   font-size: 1.05rem;
   font-weight: 400;
   letter-spacing: normal;
-  // LEVEL WITH THE ROW'S INK, NOT JUST ITS BOX -- #1148's second round,
-  // 2026-09-21. Helen, after the first fix shipped: "The navbar lines are still
-  // misaligned for me. This is both locally and on the recently deployed site."
-  //
-  // THE FIRST FIX WAS RIGHT AND NOT ENOUGH. It halved this element's top margin
-  // inside the phone block, which the `@media (max-width: 600px)` rule below had
-  // forgotten, and that put the two BOXES on the same `y` at every width --
-  // measured across eight widths from 360 to 1280, all equal. But the two boxes
-  // are different heights (20.5px against 26.9px) and their ink sits differently
-  // inside them, because `[ COCKTAILS ]` is 0.8rem $font-headings and this is
-  // 1.05rem $font-body. Aligning the boxes left the INK 1.5px apart, which is
-  // what she could still see.
-  //
-  // `position: relative` MOVES NOTHING ELSE, which is why this and not a margin:
-  // the header's height, the tape gap Helen eyeballed for #1086 and every other
-  // item's place are untouched. It is a correction to what is drawn.
-  //
-  // WHY NOT `align-self: baseline` ON BOTH, which would have been alignment by
-  // construction rather than a measured number (#993's own preference): tried
-  // and measured, and it moves the ROW down 6px (y 109.3 -> 115.3) because the
-  // larger `??` sets the shared baseline. That changes the gap under the tape,
-  // which is a value Helen picked by eye on a candidates page. The row is the
-  // anchor; this is the mark that moves.
-  //
-  // 0.12em, AND THE LAST DEVICE PIXEL IS UNREACHABLE. Walked at 390px --
-  // 0.10em lands the ink 1 device pixel LOW, 0.12/0.14/0.16 land it 1 HIGH,
-  // 0.18 lands it 3 high. Nothing lands it level, and the reason is parity: the
-  // `??`'s ink band is 26 device pixels tall and the brackets' is 24, so their
-  // centres are always half a pixel out of step with each other. 0.10 and 0.12
-  // are equidistant from true; 0.12 is the one that reads level, and a question
-  // mark carries no descender while the brackets do, so its mass wants to sit
-  // slightly high of a pure centre.
-  //
-  // TO RE-MEASURE after any change to either face or size, and it must be done
-  // in ONE image (tmp/nav_candidate.py builds it): hide `.site-logo`, then
-  // `sh scripts/browser/crop.sh /food/ ".site-header-inner" nav 390` and
-  // `python3 scripts/browser/inkbox.py tmp/shots/crop-nav.png 30`. Two separate
-  // crops are wrong by their own padding -- doing it that way here reported a
-  // 0.7px shift where the true one was 1.68px.
+  // Level with the door's ink, not only its box (#1148): the two are
+  // different faces at different sizes, so equal boxes leave the ink apart.
+  // Not `align-self: baseline` on both, which moves the door's row down and
+  // changes the gap under the tape. To re-measure, crop `.site-header-inner`
+  // in one image and run scripts/browser/inkbox.py on it.
   position: relative;
   top: -0.12em;
 }
 
-// THE SEARCH BOX, UNDER THE DOOR TO THE OTHER SITE -- #1210, 2026-09-30, and
-// on a local build only (_includes/page-search.html renders it, gated on
-// `show_header_search`, which _config_local.yml alone declares). Helen:
-// "directly under [ FOOD ] ->". A third row, then, in the door's own column
-// and on its own right edge -- `justify-self: end` is what puts the glass on
-// the cards' edge where the arrow already sits -- and the box itself is
-// shared/_furniture.scss's, unchanged from the furniture line it left.
-//
-// THE ROW IS PAID FOR ONLY WHERE IT EXISTS. Every rule above is `grid-row: 1`
-// or `2` and `grid-template-rows: auto auto` names two; a third `auto` row is
-// created implicitly by this placement and costs the deployed header nothing,
-// because there the element is not in the page at all.
-//
-// `margin-top` WAS THE HALF-ROW GAP THE NAV ROW ITSELF USED (0.45rem, the
-// #1086 phone value), eyeballed at 1280 and 390 on #1210's candidates page.
-// The row's own offset moved twice with #1322 (to zero, then back to 0.9rem at
-// every width) and this was NOT re-eyeballed with it: it is still 0.45rem
-// under the door at every width, and below the stack width it lost the grid
-// gap that used to sit on top of that. Local builds only, so nobody but Helen
-// sees it; hers to ask for.
+// The search box, on a local build only (#1210): _includes/page-search.html
+// renders it when `show_header_search` is set, which only _config_local.yml
+// does. A third, implicit row in the door's column, on its right edge; the
+// deployed header has no such element and so no such row. The box itself is
+// shared/_furniture.scss's. The margin has not been re-tuned since the door's
+// own margin became 0.9rem (#1322).
 .site-header .page-search {
   grid-row: 3;
   grid-column: 3;
@@ -556,29 +225,17 @@ main {
   margin-top: 0.45rem;
 }
 
-// THE FOOTER IS AS WIDE AS THE ARTICLE, AND ITS OUTER COLUMNS SIT UNDER THE
-// ARTICLE'S EDGES -- #783, settled 2026-09-07 after one wrong turn worth
-// recording.
-//
-// THE FIRST ATTEMPT REMOVED THIS max-width, on the reading that "right-align
-// with whole page" meant the viewport. It sent the LEFT column to the viewport
-// edge, left the right one exactly where it had been, and broke the alignment
-// the comment further down had deliberately built ("flush with where the page's
-// own text starts"). Helen, seeing it: "I would like each to be under the sides
-// of the main page container." So the cap comes back, and the real fault was
-// never here -- it was in the grid below, where the second column was not in
-// column 3 at all.
+// As wide as the article, so the two reference columns sit under the content
+// column's edges, not the viewport's (#783).
 .site-footer {
   max-width: $width-content;
   margin: 0 auto;
   padding: 1.5rem 1.5rem calc(1.5rem * 2) 1.5rem;
   border-top: 1px dashed $color-border;
-  // AN OPTIONAL FULL-WIDTH BAND BEHIND THE FOOTER -- #733, 2026-10-06. `none`
-  // unless a site sets it, and with `none` the dashed border above draws as it
-  // always did, so food is unchanged. Cocktails sets it
-  // (_sass/cocktails/_leopard.scss) because its page ground carries a print
-  // the footer must not. A border-image and not a 100vw pseudo-element: its
-  // outset is paint, not layout, so it cannot give the page a sideways scroll.
+  // An optional full-width band behind the footer (#733): `none` unless a
+  // site sets it, as cocktails does (_sass/cocktails/_leopard.scss). A
+  // border-image, not a 100vw pseudo-element: its outset is paint, not
+  // layout, so it cannot give the page a sideways scroll.
   border-image: var(--footer-band, none);
   text-align: center;
   font-family: $font-headings;
@@ -587,69 +244,25 @@ main {
   letter-spacing: 0.01em;
 }
 
-// Heart doodle above the footer copyright line.
-// SVG is injected by js/decorations.js.
-// Width set here; height auto to preserve natural proportions.
-// The hearts and the reference block, side by side. THREE COLUMNS, with an
-// empty third, so the graphic stays page-centred exactly where it already was
-// -- a two-item flex row centred as a pair would have shifted it, which is a
-// change to something already settled and not what was asked for.
-//
-// The block is asymmetric on purpose for now. Helen, 2026-08-16: "if it looks
-// really silly without cocktail ref info to balance it out then we can think
-// again" -- so the empty right column is a deliberate placeholder for a
-// question that is still open, not an oversight.
+// A reference column each side and the centre stack between them. Three
+// tracks so the hearts stay page-centred whether one reference column renders
+// or two.
 .site-footer-top {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
 
-  // `start`, NOT `center` -- Helen, 2026-09-07: "vertically align [FOOD] and
-  // [COCKTAILS] in the footer -- bring [FOOD] upwards."
-  //
-  // WHY CENTRING MISALIGNED THEM, which is not obvious from the word "center".
-  // It centres each column against the ROW, and the row is as tall as the
-  // middle one -- the hearts, the about link, the mark and two lines of
-  // licence. The two reference columns are shorter than that and shorter than
-  // each other: food lists two pages, cocktails one. Centring two blocks of
-  // different heights against a third puts their FIRST LINES at different
-  // heights by exactly half the difference, so the two bracketed words never
-  // agreed.
-  //
-  // Aligning to the start makes the two words start on the same line, which is
-  // the thing being asked for, and lifts both columns -- food included, which
-  // is the other half of her sentence.
-  //
-  // THE MIDDLE COLUMN DOES NOT MOVE. It is the tallest item, so it defines the
-  // row and fills it; `start` and `center` place it identically. That matters
-  // because the hearts' position is the one thing this grid exists to hold
-  // still.
+  // `start`, not `center`: the reference columns are different heights, so
+  // centring them against the row puts their bracketed words on different
+  // lines. The centre column is the tallest item and does not move.
   align-items: start;
   gap: $space-lg;
 }
 
-// THE HEARTS ARE PLACED, NOT AUTO-FLOWED, and this is load-bearing rather than
-// explicit-for-its-own-sake. Issue #374 made the reference block a column PER
-// SITE rather than the current site's column, so this row holds one nav today
-// and two the day cocktails has reference pages of its own. Under auto
-// placement that second nav would take column 2 and shove the graphic into
-// column 3 -- the hearts stop being page-centred, which is the one thing the
-// three-column grid above exists to guarantee and was settled on 2026-08-16.
-//
-// PINNING THE GRAPHIC ALONE DID NOT RESOLVE IT, and this comment used to say it
-// did. `grid-column: 2` with an AUTO ROW does not reserve that cell ahead of
-// auto-placement: the two navs are placed first, in DOM order, so nav 2 took row
-// 1 column 2 and the centre -- still needing column 2 -- dropped to ROW 2. The
-// hearts sat underneath both reference columns instead of between them.
-//
-// IT WAS INVISIBLE UNTIL 2026-09-07 for the reason the comment on
-// `.site-footer-ref:nth-of-type(2)` gives: "nothing renders a second column
-// yet". The rum reference page (#529) made cocktails render one, and the fault
-// arrived with a DATA edit and no code change, on every page at once -- which is
-// exactly the failure the original comment said it was preventing.
-//
-// ALL THREE ARE PLACED EXPLICITLY NOW, so auto-placement has nothing to decide.
-// That is what makes the centring a guarantee rather than a consequence of DOM
-// order, and it holds whether one reference column renders or two.
+// All three items are placed explicitly. Pinning the centre alone is not
+// enough: with an auto row the two navs are placed first, in DOM order, the
+// second takes row 1 column 2 and the centre drops to row 2. Which columns
+// render depends on data (a site gets one once it has reference pages), so
+// this must hold for one column and for two.
 .site-footer-ref     { grid-column: 1; grid-row: 1; }
 .site-footer-ref:nth-of-type(2) { grid-column: 3; grid-row: 1; }
 
@@ -657,95 +270,48 @@ main {
   grid-column: 2;
   grid-row: 1;
 
-  // THE COLUMN IS A STACK, in Helen's revised running order for issue #969:
-  // about / [GitHub logo] / copyright / licences line / [heart drawing] —
-  // superseding #915's "about / [GitHub logo] / [heart drawing] / copyright /
-  // licences line", which itself superseded #652's "[heart drawing] / about /
-  // [GitHub logo] / licences line". #652's own case for gathering these four
-  // into the grid's middle track (rather than as siblings below it, centred
-  // by `.site-footer`'s own `text-align`, which ran two alignment systems in
-  // one footer) is unchanged; only the order within the stack moved.
-  //
-  // `justify-items` rather than `text-align`: the GitHub mark is a link around
-  // an SVG, not text, so centring its BOX is what actually centres it. The
-  // footer's `text-align: center` still handles the prose inside each item.
+  // A stack, in the order default.html emits it (#969). `justify-items`, not
+  // `text-align`: the GitHub mark is a link around an SVG, so centring its
+  // box is what centres it.
   display: grid;
   justify-items: center;
   gap: $space-sm;
 }
 
-// #915: A CLASS OF ITS OWN, SO THE RESET BELOW CANNOT ALSO CATCH
-// `.site-footer-license` (a `.site-footer-centre p` reset would win on
-// specificity over that class alone and silently cancel its own margin-top --
-// found by measuring the actual rendered gap rather than trusting the rule).
+// A class of its own (#915): a `.site-footer-centre p` reset would also catch
+// `.site-footer-license` and, on specificity, cancel its margin-top.
 .site-footer-copyright {
-  // A BROWSER'S DEFAULT MARGIN-BLOCK ON <p> WAS QUIETLY FIGHTING THE
-  // "LICENCES SIT CLOSE TO COPYRIGHT" INTENT BELOW. Nothing in this file ever
-  // reset it, so on top of the grid's own row gap, this paragraph was ALSO
-  // carrying ~1em of its own UA-default margin on both sides -- measured 12px
-  // at this column's font-size, more than the whole rest of the intentional
-  // spacing in the stack. That is the actual reason the licences line never
-  // read as close to the copyright line above it despite
-  // `.site-footer-license`'s own tight margin-top: the tight margin was real,
-  // it was just being added to an invisible 12px nobody had accounted for.
+  // The UA's default <p> margin would otherwise be added to the grid's gap.
   margin: 0;
 }
 
-// STILL PLACED IN THE MIDDLE TRACK, just via its wrapper now. The reasoning
-// above is unchanged and is still the thing keeping the graphic page-centred
-// when cocktails contributes a second reference nav.
 .site-footer-hearts {
   grid-column: auto;
 }
 
 // The right-hand column reads outward from the centre, mirroring the left.
-// UNVERIFIED BY EYE: nothing renders a second column yet, so this is reasoning
-// about a layout rather than a judgement about one. Worth looking at properly
-// the day cocktails earns reference pages -- it may want to stay left-aligned
-// with its own bracketed word, which is a thing to see rather than argue.
 .site-footer-ref:nth-of-type(2) {
   justify-self: end;
   align-items: flex-end;
   text-align: right;
 }
 
-// Flush with where the page's own text starts, not tucked against the graphic
-// (Helen, 2026-08-16). No offset needed to achieve that: `main` and
-// .site-footer are both max-width: $width-content, margin: 0 auto, and both
-// pad their left edge by 1.5rem ($space-xl for main, a literal here), so
-// column one of this grid already begins on main's text edge. If either
-// padding changes, this alignment goes with it -- they are the same number by
-// coincidence rather than by a shared token, which is worth knowing before
-// editing one of them.
+// Column one begins on main's text edge only because `main` and
+// `.site-footer` share max-width and both pad their left edge by 1.5rem
+// ($space-xl there, a literal here). The two are equal by coincidence, not by
+// a shared token: change one and this alignment goes.
 .site-footer-ref {
   justify-self: start;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  // $space-xxs (0.15rem) was too tight to read as separate lines once the
-  // links carry underlines -- Helen, 2026-08-23, from a phone. $space-sm is
-  // still small enough that the column reads as one block, not a list.
+  // $space-xxs is too tight to read as separate lines once the links carry
+  // underlines.
   gap: $space-sm;
   text-align: left;
 
-  // NO ACCENT COLOUR AT REST. The site's "this is interactive" colour belongs
-  // to the reading surfaces -- a footer wearing it would claim the same weight
-  // as a cross-recipe link mid-method. Helen: "the normal darkened magenta link
-  // colour we use across the site won't work here, but I think it'll be obvious
-  // enough that those things are links." So the signal is the underline and the
-  // pointer, and the colour stays the footer's own.
-  //
-  // Font is inherited, not restated: .site-footer is already $font-headings at
-  // 0.75rem in $color-clear-text, which is the Courier-not-heavy this wanted.
-  //
-  // THE RESTING COLOUR IS ALL THIS RULE SETS; the hover/active colour is in
-  // _sass/shared/_footer.scss. That used to say _sass/food/_footer.scss, and
-  // the reason given was that the hover colour was not in the palette contract
-  // so naming it here would break the cocktails build -- true, and the
-  // conclusion drawn from it was wrong. It meant the shared footer's hover
-  // states existed on food and nowhere else, silently, which is issue #374.
-  // The colour is now $color-accent, the tenth contract variable, so both sites
-  // owe one and neither can quietly go without.
+  // No accent colour at rest (Helen's ruling): the signal is the underline
+  // and the pointer. Resting colour only; the hover is in shared/_chrome.scss.
   a {
     color: inherit;
     text-decoration: underline;
@@ -754,77 +320,23 @@ main {
   }
 }
 
-// The bracketed site word. Quieter than the links it heads -- it says whose
-// pages these are, and it is the column's head rather than one of its entries.
+// A column's head: the site's icon and its bracketed word, one link to that
+// site's index (#1149). Each icon sits on the outside of its own word, so the
+// second column reverses the row (#1139).
 //
-// IT IS A THING TO CLICK SINCE #1149, 2026-09-19, and this comment used to end
-// "not a thing to click". The resting colour did not move with it: the word is
-// still the quietest mark in the column, because what changed is that the head
-// now goes somewhere, not that it should shout. The link, the underline
-// question and the hover all live on `.site-footer-ref-head` below, which wraps
-// this span and the icon.
-//
-// WAS `opacity: 0.65`, ISSUE #1086 -- that faded $color-clear-text to 3.27:1
-// on food and 3.37:1 on cocktails against $color-bg, both under the 4.5:1
-// WCAG AA text minimum (axe-core's color-contrast rule, design review
-// 2026-09-15). Opacity and `mix()` compute the same blended colour -- the bug
-// was never the mechanism, it was the 65% weight -- so this stays a mix of
-// two palette variables, not a new hex, and just leans harder toward
-// $color-clear-text: 82% of it against $color-bg reaches 4.90:1 on food and
-// 4.71:1 on cocktails (tmp/contrast.py), while staying visibly lighter than
-// the full-strength $color-clear-text the links under it rest at.
-// THE SITE'S ICON, ON THE HEADING'S OWN LINE -- #1122 put it back in the
-// footer, #1139 moved it beside the word the next day. Helen: "the footer icons
-// look strange because food and cocktails are different lengths, so reduce the
-// icon size and bring it inline with the heading, left for food and right for
-// the cocktails."
-//
-// WHY THE STACKED VERSION LOOKED WRONG, and it is a useful trap: the icon WAS
-// centred, correctly, over its own column -- but `[ FOOD ]` and `[ COCKTAILS ]`
-// are different widths, so "centred on the column" put the two icons at
-// different horizontal offsets, in two columns that sit at opposite edges of
-// the footer where the eye compares them directly. Centred on its own container
-// is not the same as agreeing with its neighbour.
-//
-// EACH ICON SITS ON THE OUTSIDE OF ITS OWN WORD, which is what makes the pair
-// read as a mirror rather than as two attempts at the same thing: column one is
-// left-aligned and takes the icon first, column three is right-aligned and
-// takes it last. One row in the markup, reversed here for the second column, so
-// the template still emits one shape per site.
-// AND IT IS A LINK SINCE #1149, 2026-09-19 -- an anchor to this site's index,
-// wrapping the icon and the word together. _layouts/default.html carries why
-// it is one link rather than two, and why "and the icons" put the icon inside
-// it.
-//
-// THE FOOTER'S OTHER LINKS UNDERLINE AND THIS ONE DOES NOT, which is a
-// deliberate split and not an oversight. The links below are a LIST OF PAGES,
-// where the underline is what says "these are links" in a footer that rests in
-// its own colour (shared/_chrome.scss has Helen's ruling against the accent at
-// rest). The head is a DOOR TO A SITE, the same object as the header's
-// `[ COCKTAILS ]` row -- and that one is `text-decoration: none` with a hover
-// that darkens (`.site-nav-icon-link`). Matching the header keeps one idea
-// looking like itself in both pieces of chrome; matching the list below would
-// have made the column's head read as its first entry.
-//
-// THE OVERRIDE IS LOAD-BEARING. `.site-footer-ref a` up at the column rule sets
-// `text-decoration: underline` on every anchor in the column, so an anchor here
-// gets it unless this says otherwise. Same specificity, later in the file --
-// so this block must stay BELOW `.site-footer-ref`, and moving it above
-// silently underlines both heads.
+// No underline, unlike the list below it: the head is a door to a site, the
+// same object as the header's row. This must stay BELOW `.site-footer-ref`,
+// whose `a` rule has the same specificity and would underline both heads.
 .site-footer-ref-head {
   display: flex;
   align-items: center;
   gap: $space-xs;
   text-decoration: none;
 
-  // THE HOVER HAS TO NAME THE WORD, and this is the trap worth recording.
-  // `.site-footer-ref a:hover` (shared/_chrome.scss) sets `color: $color-accent`
-  // on the ANCHOR -- which the icon picks up by inheritance, because an SVG
-  // here paints in `currentColor`, but the word does NOT: `.site-footer-ref-word`
-  // sets its own `color`, and a direct declaration on the child beats an
-  // inherited value from the parent no matter what the parent's specificity is.
-  // Without this rule the head hovers with the icon changing colour and the
-  // word sitting still, which reads as a broken target rather than a quiet one.
+  // The hover has to name the word: `.site-footer-ref a:hover`
+  // (shared/_chrome.scss) colours the anchor, which the icon inherits through
+  // `currentColor`, but `.site-footer-ref-word` sets its own colour and a
+  // direct declaration beats an inherited one.
   &:hover,
   &:focus-visible,
   &:active {
@@ -838,15 +350,8 @@ main {
   flex-direction: row-reverse;
 }
 
-// SMALLER THAN THE HEADER'S 24px, BECAUSE IT IS NOW TYPE-SIZED RATHER THAN
-// BLOCK-SIZED. `.nav-icon`'s 24px is the size Helen chose on 2026-09-10 for an
-// icon standing on its own beside a wordmark; beside 0.75rem lettering it is
-// twice the height of the word it labels. 1.3em of the footer's own text is
-// ~15.6px, which sits on the line with `[ FOOD ]` rather than towering over it,
-// and stated in `em` so it follows the footer if that size ever moves.
-//
-// `line-height: 0` for the reason `.site-footer-hearts` has it: the span is a
-// box around a drawing, and the inherited line-height would otherwise add a
+// Type-sized here, in em so it follows the footer's size. `line-height: 0`
+// because the span is a box around a drawing and would otherwise carry a
 // strip of text leading under it.
 .site-footer-ref-icon {
   line-height: 0;
@@ -857,51 +362,36 @@ main {
   }
 }
 
+// Quieter than the links it heads. A mix of two palette variables, not
+// opacity and not a hex; 82% is what keeps it over the 4.5:1 WCAG AA text
+// minimum against $color-bg on both sites (#1086).
 .site-footer-ref-word {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: mix($color-clear-text, $color-bg, 82%);
 }
 
+// The SVG is injected by assets/js/decorations.js.
 .site-footer-hearts {
   display: flex;
   justify-content: center;
   line-height: 0;
-  // #915: SPACE ON BOTH SIDES NOW, not just below. The graphic sat first in
-  // the stack under #652's order, so nothing preceded it and only its
-  // margin-bottom existed; #915 moved it to the middle of the stack, between
-  // the GitHub mark and the copyright line, and it still reads as a distinct
-  // graphic element rather than a fourth line of text only if it keeps that
-  // same breathing room on the side that's now adjacent to something too.
   margin-top: $space-md;
   margin-bottom: $space-md;
 
   svg {
     display: block;
-    // ~60% of natural rendered size, but never more than a share of the
-    // viewport. At a flat 240px this sat in the middle column of a
-    // `1fr auto 1fr` grid and refused to give any of it back, so on a phone
-    // the two reference columns were squeezed to a few characters each and
-    // nothing could centre -- Helen, 2026-08-23. Note this is exactly the
-    // failure test_no_element_can_force_horizontal_scroll does NOT catch: at
-    // 240px it never overflowed, it just crowded everything else out.
+    // Capped by the viewport: at a flat 240px the middle column of the
+    // `1fr auto 1fr` grid gives nothing back and squeezes the reference
+    // columns on a phone. test_no_element_can_force_horizontal_scroll does
+    // not catch that, because nothing overflows.
     width: min(240px, 45vw);
     height: auto;
   }
 }
 
-// Licence line and GitHub link, centred under the copyright line -- both
-// inherit .site-footer's own colour/size rather than setting their own.
-// The about link's own line. Underlined like every other footer link rather
-// than styled as a button -- it is one of the boring links, which is the whole
-// reason it is down here as well as up in the header (see default.html).
-// Font, size and colour are inherited from .site-footer, same as .site-footer-ref.
-//
-// NO EXTRA MARGIN-TOP, SINCE #915 -- this used to carry `$space-md` to clear
-// the hearts graphic that sat above it under #652's order. #915 put "about"
-// first in the stack instead, so a margin here would only push it down off
-// the row's own top edge, where `.site-footer-top`'s `align-items: start`
-// means it should line up with the two reference columns' bracketed words.
+// The about link's own line, first in the centre stack. No margin-top, so it
+// lines up with the reference columns' bracketed words.
 .site-footer-about {
   a {
     color: inherit;
@@ -911,13 +401,8 @@ main {
   }
 }
 
-// #915: Helen wants the licences line sitting close to the copyright line "to
-// show they're one object" -- unaffected by that issue's reordering above,
-// since copyright and licences stay adjacent, in that order, at the foot of
-// the stack. `$space-xxs` on top of the grid's `$space-sm` row gap is already
-// noticeably tighter than every other pair of rows in this column (about
-// 10px here against ~20px elsewhere), which is what reads the two lines as
-// one object rather than two.
+// Closer to the copyright line than the stack's own gap, so the two read as
+// one object (#915).
 .site-footer-license {
   margin-top: $space-xxs;
 
@@ -929,12 +414,8 @@ main {
   }
 }
 
-// THE TWO LICENCE SENTENCES STACK ON A PHONE -- #902, Helen: "stack the two
-// licences on narrower screens (Code: MIT. / Recipes and writing ... etc)".
-// One paragraph, two spans (default.html); inline until the line would have to
-// wrap mid-sentence, then each sentence takes its own line. Shared chrome, so
-// a media query here rather than a per-site rule, and the identical-footer
-// guard is untouched because the markup is the same on every page.
+// The two licence sentences are one paragraph of two spans, inline until a
+// phone, where each takes its own line (#902).
 .site-footer-license-line {
   display: inline;
 }
@@ -957,78 +438,31 @@ main {
   }
 }
 
-// Bigger, per issue #360. 1.1rem put the GitHub mark at roughly the height of
-// the licence text beneath it, so it read as punctuation rather than as the one
-// graphic element in the footer.
-//
-// 1.6rem was the first attempt and was still too timid -- Helen, 2026-08-18,
-// looking at it deployed: it "has gone back to being small". It had not; the
-// deployed stylesheet was byte-identical to the branch. 25.6px simply is not a
-// large enough step from 17.6px to read as a deliberate change next to type
-// this size, which is worth recording because "nothing happened" and "the
-// change was too small to see" produce the same report.
-//
-// 2.2rem (35px) is roughly double the original, and still below the footer
-// heart graphic -- the order of prominence stays hearts, then mark, then type.
-//
-// SHARED ON PURPOSE, unlike the magenta hover next to it in food/_footer.scss.
-// A size is not a palette value, both sites carry the same GitHub link to the
-// same repository, and letting them drift would mean two footers that are
-// almost-but-not-quite the same -- the thing #288 and #289 exist to stop.
+// Large enough to read as the footer's one graphic mark and not as
+// punctuation (#360), and still smaller than the hearts.
 .footer-icon {
   width: 2.2rem;
   height: 2.2rem;
   fill: currentColor;
 }
 
-// How far past the tape's CORE (see .site-logo-tape below) the tape graphic
-// itself is allowed to extend on each side. Small deliberately, and trimmed
-// smaller again on Helen's request (was 1.5rem, then 0.5rem): the current
-// tape SVGs are a single near-rectangular polygon with no separate corner
-// geometry (see MANUAL §13 for why that's next up for a redesign), so any
-// protrusion here is currently just "more of the same plain tape" rather than
-// a distinct corner tab — the closer this sits to zero, the closer the tape
-// hugs the lettering rather than reading as a placeholder gap. One value,
-// shared by both sites' .tape-bg — food and cocktails were never sized
-// independently here, so "make cocktails' shorter, then match food to it"
-// is already just this one number changing.
+// How far past the tape's core (see `.site-logo-tape`) the tape graphic
+// extends on each side. One value for both sites.
 $tape-protrusion: 0.2rem;
 
-// THE WORDMARK'S THREE SIZES, NAMED SO THE PHONE CAN BE DERIVED FROM THEM
-// RATHER THAN RE-TYPED -- 2026-09-15, #1086. All three were literals sitting in
-// the three rules below, which was fine while there was one size; it stopped
-// being fine the moment a second size had to be two thirds of the first, because
-// "1.33rem" in a media query is a number nobody can check against "2rem" three
-// hundred lines up. They are here rather than in shared/_tokens.scss for the
-// same reason $tape-protrusion above is: they are facts about this one lockup,
-// not values any other component may reach for.
-//
-// THE RATIO IS THE DECISION, NOT THE RESULTS. Helen, 2026-09-15, picking B from
-// the phone-header candidates page: "B: mark at two thirds". So the phone block
-// at the bottom of this file multiplies each of these by the factor, and the
-// three rendered sizes (1.33rem, 1.67rem, 46.7px) are consequences -- change the
-// factor and all three move together, which is what "two thirds" means.
-//
-// 0.6667 RATHER THAN 2/3, deliberately: `/` is division-deprecated in Dart Sass
-// and this file is loaded through @import, so it cannot carry a `@use
-// "sass:math"`. Four places is 2/3 to within a third of a device pixel on the
-// largest of the three (46.669px against the candidates page's own 47px), which
-// is below anything a screen can draw.
+// The wordmark's sizes, named so the phone block can derive from them (#1086).
+// Here and not in shared/_tokens.scss because they are facts about this one
+// lockup. The ratio is the decision: change the factor and all three move.
+// 0.6667, not 2/3: `/` as division is deprecated in Dart Sass, and this file
+// is loaded through @import so it cannot `@use "sass:math"`.
 $wordmark-top-size:    2rem;     // HELEN TRIAGES
 $wordmark-word-size:   2.5rem;   // the ceiling for [ FOOD ] / [ COCKTAILS ]
 $wordmark-tape-height: 70px;     // the black tape behind the word
 $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
 
-// The CORE (what .tape-bg's protrusion is measured from) is whichever of the
-// two rows is naturally wider, not always HELEN TRIAGES. Both
-// .site-logo-top and .site-logo-tape report their own natural width to the
-// SAME grid column (grid-template-columns: max-content takes the max across
-// every item placed in it) and neither is forced to any other width, so the
-// column — and with it the tape's core — becomes exactly as wide as whichever
-// line actually needs more room. On food that's still HELEN TRIAGES, same as
-// before. On cocktails it's "[ COCKTAILS ]", which is why that word can stay
-// at food's own 2.5rem instead of needing its own smaller size — see
-// .site-logo-word below for why that used to be impossible.
+// One `max-content` column, to which both rows report their natural width:
+// the column, and with it the tape's core, is as wide as whichever row is
+// wider (MANUAL §13.8). Neither row may be forced to another width.
 .site-logo {
   display: inline-grid;
   grid-template-columns: max-content;
@@ -1039,111 +473,31 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   grid-column: 1;
   width: max-content;
   max-width: 92vw;   // mobile safety net — see .site-logo-tape's old comment;
-                      // it's the text now driving the width, so the cap moved
-                      // to the text
+                      // the text drives the width, so the cap is on the text
   font-family: $font-headings;
   font-size: $wordmark-top-size;
   font-weight: 1000;
   letter-spacing: 0.18em;
-  // Cancels the trailing letter-spacing gap `letter-spacing` adds after the
-  // LAST character too (the same trap food/_rule.scss's own inset comment
-  // documents) -- without this, HELEN TRIAGES's own box (width:max-content,
-  // above) is 0.18em wider than its visible glyphs, so justify-items:center
-  // on .site-logo centres that phantom trailing space along with the text,
-  // and the actual lettering sits visibly left of true centre. Helen spotted
-  // this by eye: "HELEN TRIAGES... not centred over [ FOOD ]."
-  //
-  // .site-logo-tape doesn't need the same fix -- its own trailing character
-  // is the closing "]", inside .site-logo-bracket, which already resets
-  // letter-spacing to 0 (see that rule below) for unrelated reasons and
-  // happens to leave that row with no phantom space to begin with. That
-  // asymmetry -- one row corrected, one row never broken -- is what made the
-  // two rows visibly disagree; margin, not padding, because padding here
-  // would ADD width instead of cancelling it (see .site-logo-top's own
-  // comment on cocktails, where padding-right made a mismatch worse, not
-  // better).
+  // Cancels the gap `letter-spacing` adds after the LAST character, which
+  // would otherwise be centred along with the text and leave the lettering
+  // left of true centre. A negative margin, never padding-right: padding adds
+  // width where this has to cancel it. `.site-logo-tape` needs no such fix,
+  // because its last character is a `.site-logo-bracket` with no tracking.
   margin-right: -0.18em;
-  // A variable so the two halves of the lockup can be made to MATCH. They have
-  // always been styled independently -- one is dark type on the page, the other
-  // light type on black tape, which on a light site are genuinely different
-  // problems. On a dark site they are the same problem, and Helen asked for one
-  // answer: "please make the punched font treatment the same for HELEN TRIAGES
-  // and [ COCKTAILS ]." Food's default is unchanged.
+  // A variable so a dark site can make the two halves of the lockup match;
+  // cocktails sets it (_sass/cocktails/_rule.scss), food keeps the default.
   color: var(--wordmark-top-color, #{$color-text});
   text-transform: uppercase;
-  // NOT padding-right: 0.18em, deliberately -- that was here before and it's
-  // why HELEN TRIAGES visibly shifted right on cocktails. letter-spacing adds
-  // a trailing gap after the LAST character too (same trap the recipe
-  // title's rule already documents), so this box's own max-content width
-  // already runs slightly past the visible glyphs. Matching padding-right on
-  // top of that doesn't compensate, it doubles the same bias. Harmless while
-  // this box always defined its own column (food), visible the moment
-  // something else (cocktails' wider word) does instead -- the box gets
-  // centered in extra space and the built-in right-bias becomes a shift.
-  // THE DISPLAY TIER, 2026-09-02. See @mixin lettering() in shared/_rule.scss
-  // for the mechanism and LETTERING.md for the full table.
+  // The display tier: see @mixin lettering() in shared/_rule.scss. A tier,
+  // not hand-tuned numbers, so a site re-points it through custom properties
+  // (#477).
   @include lettering(display);
 }
 
-// =============================================================================
-// #477 WAS SETTLED, THEN REOPENED, THEN SETTLED THE OTHER WAY -- READ THIS
-// BEFORE CHANGING THE ELEMENT ABOVE.
-// =============================================================================
-// THREE STATES, IN ORDER. (1) Pre-#470: this element carried its own
-// hand-tuned numbers, entirely outside the shared emboss system -- a heavier
-// 1.2px stroke, a 2px offset, a literal `#dad7d8` highlight and `rgba(ink,
-// 0.5)` shadow, written as a Sass expression rather than a custom property.
-// (2) #477, 2026-08-26: Helen asked why it looked different from a heading,
-// a switch was built to match it to the shared values, and she looked at the
-// match and kept the ORIGINAL instead -- "I prefer the old HELEN TRIAGES,
-// even though it's on its own in terms of styling. I like the drama." The
-// switch was deleted and this section documented the difference as a decision
-// rather than an oversight. (3) 2026-09-02: Helen reopened it anyway --
-// "HELEN TRIAGES is not treated the same way as the other headings and should
-// be" -- and this time the answer is state (3), not a reversion to (1).
-//
-// WHAT CHANGED IN BETWEEN, AND WHY THE OLD "DRAMA" ARGUMENT NO LONGER APPLIES.
-// States (1) and (2) both predate the 2026-09-02 finding (shared/_rule.scss,
-// above $lettering-display-stroke-c) that FOOD'S HEADINGS THEMSELVES WERE
-// WRONG -- a highlight lighter than the page and a shadow two-thirds ink both
-// asked the physics to do something a raised dark letter on a light page
-// cannot do. "The drama" state (2) kept was, in hindsight, closer to correct
-// than the headings it was being compared against: a stronger stroke, more
-// highlight headroom, a shadow with real presence. Once the headings were
-// fixed to the same physics, matching them stopped being a demotion and
-// became "the same construction, one tier harder" -- which is exactly what
-// the display tier is: display's numbers (darken 12%/lighten 53%/rgba 0.24)
-// are heading's own formula (darken 5%/lighten 65%/rgba 0.16) pushed further
-// in the same three directions, not a different idea.
-//
-// SO THE WORDMARK NOW READS `@include lettering(display)`, THE SAME
-// CONSTRUCTION EVERY HEADING USES, AT A TIER OF ITS OWN. It keeps its own
-// numbers -- nothing here converged onto the heading tier's values, only onto
-// the heading tier's MECHANISM -- and it keeps the offset at the shared 1px:
-// the old 2px was solved for the old, too-thin shadow needing extra distance
-// to clear a heavy stroke; the new shadow has real weight of its own and does
-// not need the extra throw. Cocktails supplies its own display set in its own
-// _rule.scss, converted from the numbers Helen tuned for its wordmark under
-// the black-on-black inversion (2026-09-01) rather than re-derived.
-//
-// THE STRUCTURAL COMPLAINT #477 ALSO RAISED IS RESOLVED AS A SIDE EFFECT: this
-// element's stroke width was a Sass value outside the custom-property system,
-// so `.on-dark` (since removed, see shared/_rule.scss) could never have
-// reached it. @include lettering(display) reads var(--emboss-stroke-w) like
-// every other tier, so a future dark section on food would reach the wordmark
-// the same way it reaches a heading.
-
 .site-logo-tape {
   grid-column: 1;
-  // No explicit width here — deliberately. An earlier version set width:100%,
-  // which pins the core to HELEN TRIAGES no matter what, and that's exactly
-  // what made "[ COCKTAILS ]" at food's height impossible: 13 characters at
-  // 2.5rem is wider than HELEN TRIAGES's 13 characters at 2rem, so it could
-  // only ever fit by shrinking. Leaving width unset lets .site-logo-tape
-  // report ITS OWN natural size (the word plus its padding, both in em so
-  // they scale with the word's own font-size — see .site-logo-word) to the
-  // grid column instead, same as .site-logo-top does above, and the column
-  // takes whichever is bigger.
+  // No explicit width, deliberately: `width: 100%` would pin the core to
+  // HELEN TRIAGES, and a longer word could then only fit by shrinking.
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -1157,10 +511,9 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     position: absolute;
     left: 50%;
     top: 0;
-    // min(..., 92vw): same mobile safety net the old fixed-425px version had
-    // — rotation (above) makes the rendered bounding box slightly wider than
-    // the declared width, and this is the one element that has previously
-    // forced horizontal scroll on a phone.
+    // min(..., 92vw): the rotation above makes the rendered box slightly
+    // wider than the declared width, and this element can force horizontal
+    // scroll on a phone.
     width: min(calc(100% + #{$tape-protrusion * 2}), 92vw);
     transform: translateX(-50%);
     height: 100%;
@@ -1174,29 +527,17 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   }
 }
 
-// Same size on both sites now — 2.5rem, food's original height, applies to
-// "[ COCKTAILS ]" unchanged. Padding is em, not the earlier version's 13%:
-// percentage padding resolves against the CONTAINING block's width, but
-// .site-logo-tape's width is now itself derived FROM this element's content
-// (see above) — a percentage here would be circular, sized against a number
-// that's trying to size itself off this element. em has no such problem, and
-// scales with this element's own font-size same as the percentage used to
-// scale with the tape's.
+// The bracketed site word. Its padding is em, not a percentage: a percentage
+// resolves against the containing block's width, and `.site-logo-tape`'s
+// width is derived from this element's content, which would be circular.
 .site-logo-word {
   position: relative;
   z-index: 1;
   font-family: $font-headings;
-  // 2.5rem, OR WHATEVER FITS 92vw -- #899, 2026-09-10. `[ COCKTAILS ]` at
-  // 2.5rem is 491px wide: `white-space: nowrap` below is right (a wordmark
-  // must not wrap) and `.tape-bg` is already capped at 92vw, but the WORD had
-  // no cap, so every cocktails page overflowed a phone by 124px and the whole
-  // site could be dragged sideways -- the first thing family on a phone would
-  // meet. The width of this element is its character count times (0.6em of
-  // Courier advance + 0.18em of letter-spacing) plus the 2.8em of padding, so
-  // the size that fits is 92vw divided by that; `--wordmark-chars` comes from
-  // the template (default.html), brackets counted. `[ FOOD ]` is 8 characters
-  // and the formula gives 2.5rem for it down to about 250px, so food's
-  // wordmark does not move on any phone that exists.
+  // The ceiling, or whatever fits 92vw (#899): a wordmark must not wrap, so
+  // without a cap a long word overflows a phone. Its width is its character
+  // count times (0.6em of Courier advance + 0.18em of tracking) plus 2.8em of
+  // padding; default.html supplies `--wordmark-chars`, brackets counted.
   font-size: min($wordmark-word-size, calc(92vw / (var(--wordmark-chars, 13) * 0.78 + 2.8)));
   font-weight: 1000;
   letter-spacing: 0.18em;
@@ -1205,105 +546,20 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
   line-height: 1;
   padding: 0 1.4em;
   white-space: nowrap;
-  // ==========================================================================
-  // THE ONE HEADING ON THE SITE THAT IS DELIBERATELY EXCLUDED FROM THE FOUR
-  // LETTERING TIERS. DO NOT "FIX" IT BY GIVING IT A TIER OR @include punched()
-  // -- both are what it had at different points, and neither worked.
-  // ==========================================================================
-  // Confirmed as a permanent exception by Helen on 2026-08-12, when the
-  // treatment went site-wide and everything else came onto one ratio: "please
-  // note in the docs that [ FOOD ] is handled differently -- I think it needs
-  // the special treatment." Written up in MANUAL §13.4.1 as well as here,
-  // because a future pass tidying up "the one element that doesn't match" is
-  // the obvious way to lose this.
+  // Outside the lettering tiers, permanently (Helen's ruling; MANUAL
+  // §13.4.1): this is light type on the tape SVG, and the tiers are built
+  // for type on the page ground. Do not give it a tier.
   //
-  // THE REASON IS THE BACKGROUND, and it applies to nothing else on the site.
-  // Every other heading is dark type on $color-bg, where a light copy offset
-  // up-and-left genuinely reads as a highlight. This word is LIGHT TYPE ON THE
-  // TAPE SVG. Its sibling .site-logo-top (HELEN TRIAGES) IS a normal consumer
-  // of the tiered treatment -- it reads @include lettering(display), see that
-  // rule above -- and the two halves of the lockup have always been styled
-  // independently regardless: one is a page-ground wordmark, the other is
-  // light type on an SVG tape, and only one of those two problems has ever
-  // had a tier built for it. This word's own defaults, below, are the
-  // untiered fourth case -- see cocktails/_rule.scss for how the two sites'
-  // header tapes came to agree on using them (2026-09-02, #469), and
-  // cocktails/_cards.scss for the CARD tape's own, deliberately different,
-  // two-copy version of this same idea.
-  //
-  // Redesigned in the issue #122 pass (2026-08-10), replacing the
-  // @include punched(raised) + single-pair-shadow version this used to be.
-  // That version's fill was pure $color-white -- already the top of the
-  // brightness range, so the "light" shadow copy (a mid grey) was actually
-  // DARKER than the letter it was meant to highlight. No headroom, no real
-  // raised read, just two overlapping letterforms at a glance ("just looks
-  // like two sets of lettering", Helen).
-  //
-  // Fixed two ways: fill pulled off pure white to #e7e2e3 so a genuinely
-  // brighter copy has room to exist above it; and the single shadow pair
-  // became two pairs -- one tight/crisp right at the glyph edge (a cut
-  // line), one wider/softer further out (the glow) -- same multi-copy
-  // bevel logic as the tape's own edge highlight
-  // (assets/img/chrome/tape/*.svg), not a new effect invented for text.
-  // Helen's own verdict after comparing a higher-contrast pull: this
-  // lighter version read better -- less "realistic" contrast, more
-  // effective as a label.
-  // RE-TUNED 2026-08-26 FOR COURIER PRIME (issue #470), by Helen at
-  // /dev/emboss/, which overrides this live element rather than a copy of it.
-  // Was #e7e2e3 with offsets 0.6px / 2.2px and the outer highlight at 0.55.
-  //
-  // THE TWO COPIES MOVED TOWARDS EACH OTHER. Tight went UP 0.6 -> 1.0 and wide
-  // came DOWN 2.2 -> 1.8, narrowing the gap between them from 1.6px to 0.8px,
-  // with the outer highlight strengthened 0.55 -> 0.75 to keep its presence at
-  // the shorter throw. The bevel is tighter and better defined rather than
-  // spread -- which is what a heavier letterform wants, having more ink of its
-  // own for the copies to sit against.
-  //
-  // HALF OF THAT WAS PREDICTED AND HALF WAS BACKWARDS, and the backwards half is
-  // the one worth writing down. The wide offset coming down was expected: it is
-  // the same move $emboss-offset-large made (2px -> 1px) on the same face, for
-  // the same reason -- a wide copy on heavy stems reads as two overlapping
-  // letters rather than one raised one. The TIGHT offset was predicted to stay,
-  // on the grounds that it is a proportion of the edge rather than of the
-  // letterform. It went up by two thirds. A 0.6px cut line on a thicker stem is
-  // proportionally less visible, so it needed more.
-  //
-  // That is now twice that a reasoned "the heavier face needs LESS" lost to
-  // looking at it -- $emboss-stroke went 0.014 -> 0.016 the same way. THE EDGE
-  // TREATMENTS ON THIS FACE WANT MORE, NOT LESS. Assume that next time.
-  //
-  // The fill is #ECE9EA, one step lighter than before (Helen's dial read
-  // hsl(340 6% 92%); written as hex to match its neighbours). It still has to
-  // sit BELOW pure white -- see the paragraph above about headroom, which is the
-  // whole reason this element does not use @include punched().
+  // The fill sits below pure white on purpose: the highlight copy in the
+  // shadow has to be brighter than the letter. Tune at /dev/emboss/.
   color: var(--wordmark-word-color, #ECE9EA);
 
-  // THE STROKE IS A VARIABLE TOO, DEFAULTING TO NONE. This element has carried
-  // `-webkit-text-stroke: 0px` since #122 because its four-copy shadow did all
-  // the work and an edge on top of it was one treatment too many. A site whose
-  // wordmark uses the SHARED punched lettering wants the shared edge with it --
-  // 13.4.1's rule is that stroke sets an edge's weight and shadow sets its
-  // direction, so half the treatment is half the effect. Food keeps 0px.
-  //
-  // COCKTAILS BRIEFLY OVERRODE THIS, AND DOESN'T ANY MORE, 2026-09-02
-  // (#469). For part of one day this and the text-shadow below both read a
-  // `--wordmark-word-*` pair cocktails/_rule.scss set to the card tape's own
-  // two-copy, no-stroke numbers, so its header tape word matched HELEN
-  // TRIAGES on that site. Superseded the same day when Helen asked to treat
-  // [ COCKTAILS ] the way [ FOOD ] is treated instead -- and [ FOOD ] has
-  // never overridden either property, so matching it means matching THIS
-  // fallback, on both sites. Both variables still exist for any site that
-  // wants a genuinely different treatment; none currently supplies one. See
-  // cocktails/_rule.scss for the fuller history and cocktails/_cards.scss for
-  // why the CARD tape word stays on its own two-copy version regardless.
+  // No stroke by default: the four-copy shadow below does the work. A
+  // variable so a site can supply a different treatment.
   -webkit-text-stroke: var(--wordmark-word-stroke, 0px);
 
-  // A CUSTOM PROPERTY FOR THE SAME REASON AS .site-logo-top ABOVE, though this
-  // one was never broken by the inversion: it is already light type on black
-  // tape, so the ground moving underneath it changed nothing. Food's own
-  // values, below, are #470's and are hers, and are now what both sites'
-  // header tape word renders -- see the stroke note just above for how
-  // cocktails arrived at the same fallback rather than a re-point of its own.
+  // Two pairs of copies: a tight one at the glyph edge and a wider, softer
+  // one. No site overrides this fallback.
   text-shadow: var(--wordmark-word-shadow,
                    -1.0px -1.0px 0 #fdfbfe,
                    -1.8px -1.8px 0 rgba(253, 251, 254, 0.75),
@@ -1316,83 +572,39 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
 }
 
 
-// =============================================================================
-// NARROW VIEWPORTS — the two places the chrome stops working on a phone
-// =============================================================================
-// Helen cooked from her phone for the first time on 2026-08-23 and found both
-// of these. They are the only two, and each is a LAYOUT failure rather than a
-// sizing one, which is why neither showed up in
-// test_no_element_can_force_horizontal_scroll: nothing here overflows, it just
-// lands on top of something else or crowds it out.
-//
-// 600px matches the one breakpoint the site already had
-// (food/_recipe-list.scss) rather than introducing a second number. The
-// docstring on that test still says the site has no media queries; it has had
-// one since before this file did, and this block makes it two.
+// --- Narrow viewports -------------------------------------------------------
+// None of the failures these blocks prevent is an overflow, so
+// test_no_element_can_force_horizontal_scroll sees none of them: things land
+// on top of each other or crowd each other out.
 
 @media (max-width: $header-stack-width) {
 
-  // --- 1. The header stacks, rather than squeezing --------------------------
-  // WHAT THIS RULE IS FOR CHANGED WITH #551, and the old reason is worth
-  // keeping because it explains why the shape below is the shape it is.
+  // The header stacks: three tracks leave the wordmark about a third of a
+  // phone, so each row gets the full width. Placement, not a DOM change: the
+  // nav stays first in the markup for the tab order.
   //
-  // It used to fix an OVERLAP. The nav was absolutely positioned into the
-  // header's bottom-right corner and `.site-logo-tape` carries both
-  // `position: relative` and a `transform`, so the tape paints in the
-  // positioned layer and, being later in the DOM at the same auto z-index, won
-  // outright. On a wide header the two never met; on a phone the wordmark spans
-  // nearly the full width and the tape landed squarely on the icons -- painted
-  // over them AND swallowed their clicks.
+  // `minmax(0, 1fr)`, not `1fr`: a bare `1fr` track cannot be narrower than
+  // the wordmark's min-content, which on a narrow phone is wider than the
+  // container, and the door's row would then end past the cards' edge. With
+  // one column there is no neighbour for the wordmark to spill over, which is
+  // the reason `min-width: 0` is refused for the centre track above.
   //
-  // That cannot happen at any width now: the header is a `1fr auto 1fr` grid
-  // and the wordmark's track cannot grow into the nav's. So this is no longer a
-  // fix, it is a LAYOUT CHOICE -- three tracks on a phone leaves the wordmark
-  // about a third of the screen, which is not enough for it, so the row moves
-  // to its own line and both get the full width.
-  //
-  // `order`, not a DOM change: the nav is FIRST in the markup because it is
-  // first in the tab order, and it stays that way.
-  // `minmax(0, 1fr)`, NOT `1fr`, SINCE 2026-09-11 -- the one place the
-  // centre-track argument above does not hold. A bare `1fr` track cannot be
-  // narrower than its widest item's min-content, and at 390px the wordmark's is
-  // 343.5px in a 342px container, so the track ran 1.5px past the header's
-  // edge. Nobody could see that while the row was centred; once #965 put the
-  // row on the right-hand edge, the row ended 1.5px past the cards it is meant
-  // to line up with. With one column there is no neighbour for the wordmark to
-  // spill over -- the reason `min-width: 0` is refused for the centre track --
-  // so the track keeps the container's width and the wordmark overhangs by
-  // under a pixel each side, inside the page padding.
-  // NO `gap` SINCE #1322 (2026-10-08): it was $space-lg here ($space-sm under
-  // 600px, #1086) and was the larger half of the space over the door's row,
-  // which Helen took to zero at every width. It stays gone now that she has
-  // 15px back over the row: the row's own 0.9rem margin is all of it.
+  // No `gap`: the row's own 0.9rem margin is all the space over it (#1322).
   .site-header-inner {
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
   }
 
-  // EXPLICIT ROWS, RELEASING THE ONES THE WIDE LAYOUT PINS. Both items carry
-  // `grid-row: 1` up there, so that the nav (which comes first in the markup,
-  // for tab order) does not push the wordmark into a second row under sparse
-  // auto-placement. Left in place here they land in the SAME CELL -- one
-  // column, one row -- and draw on top of each other, which is exactly what it
-  // looked like: the icons behind the tape.
-  //
-  // `order` went with the fix rather than being kept beside it. It only ever
-  // reordered auto-placed items, and these are placed; naming the row says the
-  // same thing once instead of twice.
+  // Explicit rows and columns, releasing the ones the wide layout pins:
+  // left as they are, two items would land in one cell and draw on top of
+  // each other.
   .site-title-link {
     grid-row: 1;
     grid-column: 1;
   }
 
-  // ONCE THE HEADER STACKS, the row and `??` share the one column there is:
-  // `??` at its start and the row at its end, both on the cards' edges, as at
-  // full width (the rules above) -- #965, Helen: "on mobile, please move the
-  // icon, other site name and arrow to the right-hand edge of the page, in line
-  // with the edge of the cocktail cards which is symmetrical with the about ??
-  // link", and, asked which when the two edges were 12px apart, "Both on the
-  // cards' edge". Only the column changes here; the ends come from above.
+  // `??` and the door share the one column, at its start and its end (#965).
+  // Only the column changes here; the ends come from the rules above.
   .site-nav-icons {
     grid-column: 1;
   }
@@ -1401,30 +613,16 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     grid-column: 1;
   }
 
-  // And the local-only search box (#1210) keeps its row and its right edge in
-  // the one column, under the door exactly as at full width. The stacked grid
-  // is `justify-items: center`; the rule above says `justify-self: end`, and
-  // a self-alignment beats the container's, so nothing more is needed here
-  // than the column.
+  // The base rule's `justify-self: end` beats the stacked grid's
+  // `justify-items: center`, so only the column is needed.
   .site-header .page-search {
     grid-column: 1;
   }
 
-  // THE ABOUT PAGE'S TWO DOORS TAKE AN EDGE EACH ONCE THE HEADER STACKS --
-  // #1328, 2026-10-10. Helen: "about page on a phone should have the two site
-  // doors left and right on the navbar, to be symmetrical", and "Possibly with
-  // the arrows both pointing outwards???" The row ended on the cards' right
-  // edge and started wherever 268.6px left it, so under a centred wordmark the
-  // pair hung off to one side. Stretched across the one column with the space
-  // between them, the first door starts on the cards' left edge -- where `??`
-  // sits on every other page -- and the second still ends on the right.
-  //
-  // THE FIRST DOOR IS MIRRORED, NOT REDRAWN: `row-reverse` puts its arrow
+  // The about page's two doors take an edge each once the header stacks
+  // (#1328). The first is mirrored, not redrawn: `row-reverse` puts its arrow
   // before its word and `scaleX(-1)` turns the one drawn arrow round, so both
-  // point away from the wordmark. One include, one shape in the markup.
-  //
-  // ABOVE THE STACK WIDTH NOTHING CHANGES: the row is still #1086's, both
-  // doors together at the right-hand end.
+  // point away from the wordmark.
   .site-neutral .site-nav-icons {
     justify-self: stretch;
     justify-content: space-between;
@@ -1442,54 +640,23 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
 
 }
 
-// =============================================================================
-// THE MARK AT TWO THIRDS ON A PHONE — #1086, 2026-09-15
-// =============================================================================
-// Helen, picking B from the phone-header candidates page: "B: mark at two
-// thirds". The header was 211.5px on a 390px screen, which is a quarter of the
-// phone spent on chrome before a single recipe title; at two thirds it is
-// 168.4px (169px on the candidates page, which rounded the three sizes rather
-// than deriving them). Three candidates were built on the real
-// header (A shrank the type alone, B shrank the whole lockup and halved the gap
-// under it, C moved the row beside the wordmark); she looked and chose B.
+// The mark at two thirds on a phone (#1086). 600px, not $header-stack-width:
+// that is where the wordmark and the nav stop fitting on one line; this is a
+// size judgement, and a tablet between the two has room for the full mark.
+// It must stay after the $header-stack-width block: its rules override ones
+// there at the same specificity, so source order decides.
 //
-// 600px, NOT $header-stack-width (820px), AND THE DIFFERENCE IS THE POINT. The
-// two questions are genuinely different. 820px is "the wordmark and the nav no
-// longer fit on one line", which is a LAYOUT limit and where the header stacks.
-// This is "the stacked header is eating a phone", which is a SIZE judgement, and
-// a tablet at 700px has the stacked layout and plenty of room for it -- shrinking
-// the mark there would be fixing a problem that viewport does not have. 600px is
-// also the number the candidates were built and picked at, so it is the width
-// Helen's eye actually ruled on, and it is already in this file (the footer
-// block below) rather than being a third breakpoint arriving.
-//
-// AFTER THE $header-stack-width BLOCK, NOT INSIDE IT. Every rule here overrides
-// one set up there at the same specificity, so source order is what decides --
-// `gap` in particular. Moving this block above that one silently reverts the
-// gap on every phone.
-//
-// EACH ROW'S font-size MOVES; NOTHING IS `transform: scale()`d. §13.8: .site-logo
-// is an inline-grid whose single `max-content` column takes the width of
-// whichever row is naturally wider, so both rows must go on reporting their own
-// natural width. A transform paints smaller and reports the UNSCALED box, so
-// the column -- and with it the tape, whose width derives from it -- would stay
-// sized for a wordmark half as big again as the one actually drawn on it.
+// Each row's font-size moves; nothing is `transform: scale()`d. A transform
+// paints smaller and reports the unscaled box, so `.site-logo`'s column, and
+// the tape whose width derives from it, would stay sized for the larger mark.
 @media (max-width: 600px) {
 
-  // HELEN TRIAGES and the tape, each two thirds of the size it is above 600px.
-  // The derivation is up at $wordmark-phone-scale; these read as multiplications
-  // so that the ratio stays checkable against the wide values.
   .site-logo-top {
     font-size: $wordmark-top-size * $wordmark-phone-scale;
   }
 
-  // ONLY THE CEILING SCALES. The second term is #899's guard -- the size at which
-  // `[ COCKTAILS ]` still fits 92vw -- and it is a fact about the viewport, not
-  // about the mark's size, so it is untouched. min() keeps picking whichever is
-  // smaller, exactly as before; all that changes is that the ceiling it is being
-  // compared against is now the phone's. On a 390px screen the guard gives
-  // ~2.32rem for 13 characters, so the ceiling is what bites and the word lands
-  // at two thirds like its neighbours; the guard still catches a longer word.
+  // Only the ceiling scales. The second term is #899's guard, a fact about
+  // the viewport and not about the mark's size.
   .site-logo-word {
     font-size: min(
       $wordmark-word-size * $wordmark-phone-scale,
@@ -1497,59 +664,30 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     );
   }
 
-  // The tape is sized to the lettering (§13.8), so its height takes the same
-  // factor, and so does the negative margin that pulls it up under HELEN
-  // TRIAGES -- that lift is a proportion of the lockup, not a fixed gap.
+  // The tape is sized to the lettering, so its height and the negative
+  // margin that lifts it take the same factor.
   .site-logo-tape {
     height: $wordmark-tape-height * $wordmark-phone-scale;
     margin-top: -$space-lg * $wordmark-phone-scale;
   }
 
-  // THE GAP UNDER THE MARK WAS HALVED HERE, AND IS NOW GONE AT EVERY WIDTH --
-  // #1322, 2026-10-08. #1086's other half was "mark at two thirds, gap under
-  // them halved": this block set the grid's gap to $space-sm and the row's top
-  // margin to 0.45rem, and #1148 (2026-09-19) added the same 0.45rem for `??`
-  // after the block was found half-written -- the row halved and `??` not, so
-  // under 600px they sat 7.2px apart. All three rules are deleted, not zeroed:
-  // the base rules carry no gap and one margin now (0.9rem, the whole 15px
-  // over the row at every width), so there is nothing here to halve, and
-  // nothing left for the pair to disagree about by width.
-  //
-  // To re-measure the pair after any change to either face or size:
-  // `sh scripts/browser/crop.sh /food/ ".site-nav-icons" ink-row 390` and
-  // `... ".site-about-link" ink-about 390`, then
-  // `python3 scripts/browser/inkbox.py` on each -- the BRACKETS bound the row's
-  // object, so its ink centre is theirs, not the capitals'.
-
 }
 
-// THE FOOTER STACKS AT ITS OWN WIDTH, NOT THE HEADER'S, and the two were one
-// block until 2026-08-30. They were both 600px and both about "this row has run
-// out of room", but they run out at different widths -- the header's limit is
-// set by the widest wordmark plus the nav (see $header-stack-width), and the
-// footer's by the hearts' flat 240px plus two reference columns. Sharing one
-// number meant raising the header's would have stacked the footer 220px earlier
-// than it needs, for no reason anyone could have found later.
+// The footer stacks at its own width, not the header's: its limit is set by
+// the hearts plus two reference columns, the header's by the widest wordmark
+// plus the nav.
 @media (max-width: 600px) {
 
-  // --- 2. The footer could not centre anything -----------------------------
-  // `1fr auto 1fr` gives the middle column whatever it asks for and splits
-  // what is left. The hearts asked for a flat 240px, so on a 360px phone the
-  // two reference columns got a few characters each and the row read as
-  // lopsided rather than centred. The width cap up at .site-footer-hearts is
-  // half the fix; this is the other half, because three columns is the wrong
-  // shape for this width whatever the middle one costs.
+  // Three columns is the wrong shape at this width whatever the middle one
+  // asks for.
   .site-footer-top {
     grid-template-columns: 1fr;
     justify-items: center;
     gap: $space-lg;
   }
 
-  // Both reference columns, including the one that flips itself right-aligned
-  // at wide sizes. Stated together so a third site inherits it too.
-  // `grid-column: auto` UNDOES THE EXPLICIT PLACEMENT ABOVE, which is new as of
-  // 2026-09-07 and is required rather than tidy: the single-column stack has no
-  // column 3, and an item asking for one would create an implicit track and sit
+  // `auto` undoes the explicit placement above, and is required: the stack
+  // has no column 3, and an item asking for one creates an implicit track
   // off the side of a phone.
   .site-footer-ref,
   .site-footer-ref:nth-of-type(2),
@@ -1565,32 +703,15 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     text-align: center;
   }
 
-  // BOTH ICONS SIT TO THE LEFT OF THEIR WORD ONCE THE COLUMNS STACK -- #1177,
-  // 2026-09-21. Above 600px the second column mirrors the first outward from
-  // the centre (`row-reverse` on its head, so its icon is on the outside
-  // edge), which is right for two columns flanking the hearts. Stacked and
-  // centred there is no outside edge to mirror towards, and the cocktail
-  // column's head read icon-after-word while food's read icon-before -- two
-  // heads, one shape each, and not the same shape. Helen: "both food and
-  // cocktail icons should be to the left of their headings."
+  // Both icons sit to the left of their word once the columns stack (#1177):
+  // centred, there is no outside edge to mirror towards.
   .site-footer-ref:nth-of-type(2) .site-footer-ref-head {
     flex-direction: row;
   }
 
-  // #916: THE GRID'S OWN `gap: $space-lg` (1rem) READS AS THE SAME BREATH AS
-  // ONE REFERENCE COLUMN'S OWN INTERNAL LINE SPACING ($space-sm, half of it),
-  // not as a break between two different sites' material. A phone screenshot
-  // showed [ FOOD ]'s last link sitting no more distinctly apart from
-  // [ COCKTAILS ]'s bracketed word than that word sits from its own link
-  // underneath -- the boundary between two columns needs to read as a bigger
-  // gap than the boundary between two lines of the same column, and doubling
-  // $space-sm to $space-lg was not enough of a jump to do that at this size.
-  //
-  // The adjacent-sibling selector only ever matches when a second reference
-  // column is actually rendered (default.html only emits one per site with
-  // material), so a food-only page's stack is untouched -- same
-  // gated-on-having-material convention #529 already uses for the column
-  // itself.
+  // The break between two sites' columns has to read as bigger than the gap
+  // between two lines of one column (#916). Matches only when a second
+  // reference column renders.
   .site-footer-ref + .site-footer-ref {
     margin-top: $space-md;
   }
@@ -1599,18 +720,11 @@ $wordmark-phone-scale: 0.6667;   // two thirds, below 600px
     grid-column: 1;
   }
 
-  // A SHORT HAIRLINE BETWEEN THE LAST REFERENCE LIST AND `about` -- #1354,
-  // 2026-10-10. Helen: "add some separation between the cocktails ref pages
-  // list and the about link, whether space, a dot, a short hairline, anything".
-  // Stacked, `about` sat one grid gap under `glasses` in the same face and the
-  // same underline, and read as the cocktails column's third page.
-  //
-  // A LINE RATHER THAN MORE SPACE, because #916 already spent the bigger gap
-  // on the break between the two sites' columns: a third, larger one would be
-  // a ladder of gaps to tell apart by eye. The centre column is a grid, so the
-  // pseudo-element is its first item; $space-sm of margin on top of the grid's
-  // own $space-sm puts `about` as far under the line as the line is under the
-  // list. No markup, so the identical-footer guard has nothing new to compare.
+  // A short hairline between the last reference list and `about` (#1354),
+  // which otherwise reads as that column's next page. A line and not more
+  // space, because #916 already uses the bigger gap between the two sites'
+  // columns. The centre column is a grid, so the pseudo-element is its first
+  // item.
   .site-footer-centre::before {
     content: "";
     width: 2rem;

@@ -1,44 +1,15 @@
 // =============================================================================
-// HELEN TRIAGES COCKTAILS — DECORATION. MOSTLY EMPTY ON PURPOSE.
+// HELEN TRIAGES COCKTAILS — DECORATION. Empty on purpose.
 // =============================================================================
-// Food's decorative layer is watercolour brush washes, torn tape, scribbled
-// underlines and doodles, injected as SVG by assets/js/decorations.js and
-// assets/js/heading-underline.js from assets/img/food/.
+// Cocktails has no injected page decoration of its own, and nothing here
+// attempts a fetch. The leopard on the page ground is a CSS background and has
+// its own partial, _leopard.scss.
 //
-// Cocktails has none of that drawn for itself yet, and the scaffold does not
-// fake it: this site's PAGE decoration is still empty, and nothing here
-// attempts a fetch, so the console stays clean.
+// The header tape and the footer hearts are shared chrome, one set for the
+// whole repo in assets/img/chrome/ (#374). There is one header and one footer,
+// so giving cocktails its own tape is a decision about the header, not a
+// directory to add.
 //
-// EXCEPT THE LEOPARD, since 2026-10-06 (#733): the black-on-black print on the
-// page ground is this site's own artwork, in assets/img/cocktails/, and it has
-// a partial of its own -- _leopard.scss -- because it is CSS backgrounds, not
-// injected SVG.
-//
-// THE TAPE AND THE FOOTER HEARTS ARE NOT THIS FILE'S BUSINESS ANY MORE — issue
-// #374, 2026-08-19. They are header and footer chrome, one set for the whole
-// repo, in assets/img/chrome/. This file used to explain at length that
-// assets/img/cocktails/tape/ held a direct COPY of food's seven tape SVGs,
-// kept in step by hand as a standing rule after the two drifted for five days
-// (issue #223) — that whole arrangement is gone, and with it the chore. There
-// is one directory; it cannot drift from itself.
-//
-// So "when cocktails gets its own tape artwork" is no longer a swap-the-files
-// operation. Helen, settling this: "I don't want parity between two footers —
-// I want one footer for the whole site. And one header." Giving cocktails its
-// own tape means giving it its own header, which is a decision to argue rather
-// than a directory to add. The override below stays valid either way; nothing
-// here assumes which SVG is behind it.
-//
-// When more artwork arrives it goes in assets/img/cocktails/, the keys go
-// back into _data/sites.yml, and the styling for it goes here. Colour comes
-// from _sass/cocktails/_palette.scss and nowhere else — the same rule food
-// follows, and the reason SVGs use currentColor rather than baked-in fills.
-//
-// NO font-size override for "[ COCKTAILS ]" here, deliberately — an earlier
-// version of this file shrank it to 1.5rem to fit a tape core pinned to
-// HELEN TRIAGES's width. shared/_layout.scss no longer pins the core that
-// way (it's whichever of the two rows is naturally wider), so "[ COCKTAILS ]"
-// stays at food's own 2.5rem and the tape widens for it instead. If this
-// file ever needs a wordmark override again, check whether that mechanism
-// changed before reintroducing one.
-// =============================================================================
+// When artwork arrives it goes in assets/img/cocktails/ and its styling goes
+// here. Colour comes from _palette.scss and nowhere else, which is why the SVGs
+// use currentColor.

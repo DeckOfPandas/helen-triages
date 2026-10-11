@@ -1,81 +1,20 @@
-// =============================================================================
-// SHOPPING LIST — what a shortlist of drinks adds up to. No DOM.
-// =============================================================================
-// GitHub issue #546's stretch goal, asked for directly on 2026-09-04: "each
-// ingredient (bottle selection if I have one, generic if not) and its amount in
-// total if I were to make 1 glass of each of those drinks", plus a scaler.
+// Shopping list: what a shortlist of drinks adds up to (#546). No DOM.
 //
-// Pure, and loaded the two ways filter-state.js is: as a plain <script> that
-// attaches to window.HTF, and via require() for tests/js/shopping-list.test.js.
-// The DOM half is cocktail-index.js, exactly as filters.js is filter-state.js's.
+// Pure, and loaded two ways: as a plain <script> attaching to window.HTF, and
+// via require() for tests/js/shopping-list.test.js. cocktail-index.js is the
+// DOM half; scale.js, food-shopping-list.js and food-scale.js reuse the
+// amount parser, which is the only one in the repo.
 //
-// -----------------------------------------------------------------------------
-// THE GROUPING KEY IS THE GENERIC, AND THAT IS A DEPARTURE WORTH STATING
-// -----------------------------------------------------------------------------
-// Read literally, "bottle if I have one, generic if not" makes the BOTTLE the
-// identity, and that produces a list you cannot shop from. Measured against the
-// real 124 drinks before this was written (tmp/survey_identity.py, scratch):
-// of 156 distinct generics, 41 appear both with a bottle named and without, and
-// 20 carry more than one distinct bottle. `London dry gin` alone appears bare
-// and as Beefeater, Portobello, Rutte, Tanqueray, and "Hayman's or Beefeater or
-// Tanqueray". A three-gin shortlist would print three lines and three totals for
-// one bottle you have to buy.
+// A row is one GENERIC, as the drink wrote it (never the shortened
+// `card_names` form); the bottles named for it follow in brackets, as on the
+// drink page. Grouping by bottle would print one line per spelling.
 //
-// The data is also noisy in ways only a grouping key notices: `Woodford's
-// Reserve` and `Woodford’s Reserve` differ by an apostrophe, `Dolin Dry` and
-// `Dolin dry` by a capital, and El Dorado 3 is written five ways.
-//
-// So the GROUP is the generic — the thing there is one of in a cupboard.
-//
-// THE GENERIC ALWAYS LEADS, AND THE BOTTLES FOLLOW IN BRACKETS — Helen,
-// 2026-09-04, settling it after seeing the first version: "show generic first,
-// with bottle on the same line in brackets, like the recipes." That is the drink
-// page's own shape (`.cocktail-item-name` then `.cocktail-suggestion` in
-// parentheses, _layouts/cocktail.html), so a line reads the same way in both
-// places. The earlier rule — bottle leading whenever a group was unanimous —
-// made a list whose left column changed KIND from row to row, which is exactly
-// what a shopping list scanned down its edge cannot afford.
-//
-// The generic is the one a drink WROTE, never the shortened name a card shows:
-// `card_names` exists to fit "moderately aged Jamaican rum" onto a 370px card
-// (#501) and nothing in this file reads it. Helen, same message: "give the long
-// rum names, not the shortened ones we generated for cards."
-//
-// -----------------------------------------------------------------------------
-// AMOUNTS
-// -----------------------------------------------------------------------------
-// Surveyed rather than assumed. All 682 entries carry an amount; 568 are `N ml`
-// and every number in the collection is a plain decimal — no fractions, no
-// ranges. The rest are dashes, drops, cubes, pinches, leaves, a sprig, a strip,
-// grams, bare counts, and eleven that are not quantities at all: `to top` (9)
-// and `to rinse` (2).
-//
-// TOTALS ARE PER UNIT, NEVER CONVERTED. A group holding 45 ml and 2 dashes is
-// "45 ml + 2 dashes", because 2 dashes of Angostura is not some number of
-// millilitres anyone should be told by this file. Merging units would be
-// inventing a conversion the source never made.
-//
-// AN UNQUANTIFIED ENTRY IS COUNTED, NOT SUMMED — UNLESS SOMEBODY HAS DECLARED
-// WHAT IT POURS. An entry with no volume scales with the number of drinks, so
-// it reports as "to rinse (x3)": three drinks want rinsing, and multiplying by
-// the scaler multiplies the drinks, which is the only honest reading.
-//
-// `to top` USED TO BE THE HEADLINE EXAMPLE HERE AND IS NOW THE EXCEPTION
-// (#746). `top_up_ml` in costs.yml declares champagne and prosecco at 75-100 ml
-// and soda water at 100-150, so a top reports a VOLUME RANGE — three sodas are
-// "300–450 ml", not "to top (x3)". That is reading a number somebody wrote
-// down rather than inventing a conversion, which is the standing `juice_yields`
-// already has. The count reading survives for every pour nobody has measured.
-// =============================================================================
+// Totals are per unit and never converted: 45 ml and 2 dashes is
+// "45 ml + 2 dashes". An amount with no number is counted per drink, not
+// summed, unless `top_up_ml` in costs.yml declares a volume for it (#746).
 
 (function (root) {
   'use strict';
-
-  /* `water` IS EXCLUDED, and the list of what to exclude is NOT this file's.
-     _data/cocktails/ingredients.yml declares `not_on_cards: ['water']` and the
-     index template already honours it when drawing a card's ingredient line.
-     Passing it in rather than restating it here is what stops the shopping list
-     and the cards from ever disagreeing about what an ingredient is. */
 
   /** Anything YAML gave us as scalar-or-list-or-nothing, as a list. */
   function asList(value) {
@@ -83,20 +22,15 @@
     return Array.isArray(value) ? value : [value];
   }
 
-  /* THE JOIN IS " or " BECAUSE THAT IS WHAT A LIST MEANS HERE — issue #441, and
-     the index template's own wording. A generic written as a list is "either
-     would do", not two ingredients, so it is one line on a shopping list and
-     one key in this map. */
+  /* A generic written as a list means "either would do" (#441): one line and
+     one key, joined with " or ". */
   function joined(value) {
     return asList(value).map(function (v) { return String(v).trim(); })
       .filter(Boolean).join(' or ');
   }
 
-  /* THE KEY, NOT THE LABEL. Case and the two apostrophes are the noise the
-     survey found, and they must not split a group; the LABEL is always built
-     from a real entry's own text, so nothing here is ever shown to anybody.
-     U+2019 folds to U+0027 rather than the other way round because either is
-     arbitrary and one of them has to win. */
+  /* The grouping key, never shown: case, spacing and the curly apostrophe must
+     not split a group. Labels are built from an entry's own text. */
   function foldKey(text) {
     return String(text || '')
       .replace(/’/g, "'")
@@ -105,28 +39,13 @@
       .replace(/\s+/g, ' ');
   }
 
-  /* UNITS ARE FOLDED TO THEIR SINGULAR, so `dash` and `dashes` are one total
-     rather than two lines of the same bitters. Only the plurals the collection
-     actually contains are handled -- `dashes`, `drops`, `cubes`, `leaves` --
-     plus a general trailing `s` for anything that appears later, which is safe
-     because a unit that does not end in `s` is untouched and one that does is
-     already the plural of the one before it.
-
-     The empty unit is a bare count (`1` orange wedge) and stays empty: it has
-     no name, and giving it one would be inventing a word for it. */
+  /* Irregular plurals, folded to the singular so `dash` and `dashes` total as
+     one. The empty unit is a bare count and stays empty. */
   var UNIT_PLURALS = { dashes: 'dash', drops: 'drop', cubes: 'cube', leaves: 'leaf' };
 
-  /* THE LAST WORD CARRIES THE NUMBER, and that is what makes a compound unit
-     work. Food writes `2 heaped tbsp`, `1 large head`, `2 x 400 g cans` and
-     `1 small stick (8 g)`; the noun being counted is always the last word, and
-     the words in front of it are adjectives that never change. Splitting here
-     rather than special-casing each phrase is what keeps `dash` -> `dashes`
-     (every cocktail unit is one word, so the last word IS the word) working
-     unchanged while `x 400 g can` -> `x 400 g cans` starts working at all.
-
-     A PARENTHETICAL IS NOT A WORD. `tbsp (8 g)` counts `tbsp` -- the bracket
-     restates the same quantity in grams and is handled by splitParenthetical
-     below, which the food shopping list calls before it ever gets here. */
+  /* The last word of a unit is the noun being counted (`2 heaped tbsp`,
+     `2 x 400 g cans`); the words before it never change. A parenthetical is
+     not a word: splitParenthetical takes it off first. */
   function lastWord(unit) {
     var parts = String(unit).split(' ');
     return parts[parts.length - 1];
@@ -138,18 +57,9 @@
     return parts.join(' ');
   }
 
-  /* A PLURAL UNIT IS FOLDED TO ITS SINGULAR so that two recipes writing
-     `1 clove` and `3 cloves` of garlic total onto one line rather than two.
-     The declared map above is checked first, for the four irregulars the
-     cocktails collection contains; everything else follows the ordinary
-     English rule read backwards -- `bunches` -> `bunch`, `cloves` -> `clove`,
-     `handfuls` -> `handful`.
-
-     `ss` IS NEVER A PLURAL (`glass`), and neither is a two-letter symbol that
-     happens to end in one. Both are left alone, and `unitLabel` puts whatever
-     this removed back for display, so a unit that round-trips wrongly here
-     shows wrongly on the page rather than silently splitting a total -- which
-     is the failure that is at least visible. */
+  /* Plural unit to singular, so `1 clove` and `3 cloves` total on one line.
+     Must round-trip with unitLabel, which puts the plural back for display.
+     `ss` (`glass`) and short symbols are not plurals. */
   function foldUnit(unit) {
     var u = String(unit || '').trim().toLowerCase().replace(/\s+/g, ' ');
     if (UNIT_PLURALS[u]) return UNIT_PLURALS[u];
@@ -162,24 +72,9 @@
     return u;
   }
 
-  /* The plural again, for display, and derived rather than stored: a total is
-     only pluralised when it is not exactly one, and `ml`/`g` are never
-     pluralised at all because they are symbols rather than words.
-
-     `each` JOINED THEM ON 2026-09-04. It is a word rather than a symbol, but it
-     is one that has no plural, and the sibilant rule below turns it into
-     `eaches` -- `9 each` cucumber wheels doubled printed `18 eaches`. Three
-     drinks are written with it (east river underground, la fee noir punch, porn
-     star martini), and the drink page's scaler (#545) multiplies exactly these
-     strings, so the wart showed up on a page rather than only in a total.
-
-     THE FOOD UNITS JOINED THEM FOR #801, and every one is here for the same
-     reason the originals were: `2 tbsps` and `8 mediums` are not English.
-     `tsp`, `tbsp`, `kg`, `cm` and `mm` are symbols like `ml`; `large`, `small`
-     and `medium` are adjectives standing in for a noun nobody writes ("4
-     medium bay leaves"), so they have no plural either. Words that DO
-     pluralise -- `litre`, `clove`, `bunch`, `slice`, `sprig` -- are
-     deliberately absent, because the rule below gets those right. */
+  /* Units that never take a plural: symbols (`ml`, `tbsp`), `each`, the bare
+     count, and the size adjectives standing in for a noun ("4 medium"). Words
+     that do pluralise are absent on purpose; unitLabel's rule handles them. */
   var SYMBOL_UNITS = {
     ml: true, g: true, cl: true, l: true, oz: true, each: true, '': true,
     kg: true, tsp: true, tbsp: true, cm: true, mm: true,
@@ -190,9 +85,8 @@
     if (SYMBOL_UNITS[unit]) return unit;
     if (quantity === 1) return unit;
 
-    /* THE LAST WORD AGAIN, and it must agree with foldUnit or a unit will not
-       survive the round trip: `x 400 g can` has to print as `x 400 g cans`,
-       and `heaped tbsp` has to print unchanged because `tbsp` is a symbol. */
+    /* Must agree with foldUnit or a unit will not survive the round trip:
+       `x 400 g can` prints `x 400 g cans`, `heaped tbsp` prints unchanged. */
     var word = lastWord(unit);
     if (SYMBOL_UNITS[word]) return unit;
 
@@ -200,28 +94,13 @@
     if (/f$/.test(word)) return replaceLastWord(unit, word.replace(/f$/, 'ves'));
     if (word !== unit) return replaceLastWord(unit, pluralise(word));
 
-    /* A SIBILANT TAKES `es`, EVERYTHING ELSE TAKES `s` -- pluralise() above.
-       Written as a rule rather than a list, because a list is what got this
-       wrong: `dash` and `pinch` are the two the collection contains, `pinch`
-       had a line of its own and `dash` fell through to the default and printed
-       `2 dashs` -- in the single most common non-millilitre unit in the data
-       (45 entries). The rule covers both, and whichever sibilant unit is
-       written next. */
+    // A rule, not a list of units: a sibilant takes `es` (`dashes`).
     return pluralise(unit);
   }
 
-  /* HOW MANY WHOLE FRUITS, IN WORDS -- Helen, 2026-09-04: `amount: "half"` on
-     caipirinha's lime, with `half` and `whole` added to `measures:`.
-
-     "0.5 whole" IS THE THING THIS EXISTS TO PREVENT. Nobody halves a lime by
-     writing 0.5 of one, and `unitLabel` would go further and print "0.5 wholes".
-     So a count in this unit prints as Helen writes it: `half`, `1 whole`,
-     `1½ whole`, `2 whole` -- and `quarter` and `¾ whole`, because ×0.5 of half a
-     lime is a real thing this control can produce and a decimal there would be
-     the same wart one line further down.
-
-     ANYTHING THE FRACTIONS DO NOT COVER FALLS BACK TO THE NUMBER, rather than
-     being rounded to one that reads nicely: a third of a lime is not a half. */
+  /* A count of whole fruit prints in words: `half`, `quarter`, `1½ whole`,
+     never "0.5 wholes". A fraction this map does not hold falls back to the
+     number rather than being rounded to one that reads nicely. */
   var FRACTIONS = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
 
   function wholeText(quantity) {
@@ -237,21 +116,9 @@
     return number + ' whole';
   }
 
-  /* THE NUMBER, WRITTEN THE WAY A COOK WRITES IT -- #801. `⅔ tsp` rather than
-     `0.667 tsp`, and `1½ tbsp` rather than `1.5 tbsp`.
-
-     THIS IS NOTATION AND NOT ROUNDING, which is the distinction Helen drew on
-     2026-09-07 when she was asked whether the food scaler should tidy its
-     output: "don't round to 10 g or 5 g, round to 1 g". So ⅔ is printed for
-     exactly two thirds and never for 0.7, and a number that is not one of
-     these fractions prints as a decimal rather than being nudged onto one that
-     reads more nicely. The tolerance is there for floating point -- 2/3 of 1
-     is 0.6666666666666666, and that IS two thirds -- and is far tighter than
-     any difference a spoon could show.
-
-     `wholeText` above stays as it is. It answers a different question (how
-     many whole limes, in Helen's own words `half` and `quarter`) and #545's
-     scaler prints its answers on a drink page. */
+  /* The number as a cook writes it: `⅔ tsp`, `1½ tbsp` (#801). Notation, not
+     rounding: a fraction is printed only for exactly that value (the tolerance
+     is for floating point), anything else as a decimal. */
   var COOKS_FRACTIONS = [
     [1 / 8, '⅛'], [1 / 4, '¼'], [1 / 3, '⅓'], [3 / 8, '⅜'], [1 / 2, '½'],
     [5 / 8, '⅝'], [2 / 3, '⅔'], [3 / 4, '¾'], [7 / 8, '⅞']
@@ -275,21 +142,13 @@
     return String(Math.round(n * factor) / factor);
   }
 
-  /* A UNIT THE NAME ALREADY SAYS IS NOT SAID TWICE -- #1132. Helen's whole
-     report was the line "1 cube sugar cube": `amount: "1 cube"` beside
-     `generic: "sugar cube"`, each right on its own, and the page printing the
-     word twice. Two shapes, measured over both collections on 2026-10-04
-     (765 pours): the unit is the name's own last word (sugar cube by the
-     `cube`, kaffir lime leaves by the `leaf`), or the unit is `each`, which
-     only ever meant "this is a count" ("1.5 each passion fruit").
+  /* A unit the name already says is not said twice (#1132): "1 cube" of
+     "sugar cube". The unit matches when it is the name's own last word, both
+     folded to singular; a one-word name never matches. The same rule is
+     restated in _layouts/cocktail.html, which builds the drink page before
+     any script runs: change both.
 
-     THE RULE IS STATED TWICE, HERE AND IN _layouts/cocktail.html, because the
-     drink page is built before any script runs. Both fold the two words to a
-     singular and compare them; a name of ONE word never matches, so "2 sprigs"
-     of something called "sprig" would keep its unit rather than print a bare
-     number beside nothing.
-
-     @param {string} unit - FOLDED, as parseAmount returns it: `cube`, `leaf`
+     @param {string} unit - folded, as parseAmount returns it: `cube`, `leaf`
      @param {string} name - the generic as written */
   function unitRepeatsName(unit, name) {
     if (!unit || SYMBOL_UNITS[unit]) return false;
@@ -309,15 +168,9 @@
     return shown ? quantity + ' ' + shown : String(quantity);
   }
 
-  /* A RANGE, FOR A TOTAL THAT IS HONESTLY NOT ONE NUMBER (#746). Topping a
-     glass is not measuring -- `top_up_ml` declares champagne as 75-100 ml
-     because you pour until the glass looks right, and the glass differs. The
-     unit is pluralised off the TOP of the range, since that is the number the
-     word is agreeing with in "1-2 lemons".
-
-     An en dash, not a hyphen: house style, and the same dash `costs.yml`'s own
-     `basis` strings use. Collapses to the plain form when the two ends meet,
-     so a caller never has to ask which it is getting. */
+  /* A total that is honestly a range (#746). The unit is pluralised off the
+     top end; the dash is an en dash; the plain form is returned when the two
+     ends meet. */
   function amountRangeText(low, high, unit) {
     if (low === high) return amountText(low, unit);
     if (unit === 'whole') return wholeText(low) + '–' + wholeText(high);
@@ -327,48 +180,21 @@
       : low + '–' + high;
   }
 
-  /* MONEY, IN THE SHAPE THE DRINK PAGE ALREADY USES -- "£11.34", or
-     "£11.34–£14.70" where the line spans a range. Two decimal places always,
-     because a price with one looks like a mistake. The dash is the en dash
-     `costSuffix` in cocktail-index.js uses for the same job. */
+  /* "£11.34", or "£11.34–£14.70" for a range: the same shape as `costSuffix`
+     in cocktail-index.js. Always two decimal places. */
   function moneyText(low, high) {
     var lo = '£' + Number(low).toFixed(2);
     if (Math.abs(Number(high) - Number(low)) < 0.005) return lo;
     return lo + '–£' + Number(high).toFixed(2);
   }
 
-  /* WHAT A LINE COSTS -- #820. Millilitres times a declared rate, and nothing
-     cleverer, because every rule about what a generic costs was applied at
-     build time by `_plugins/cocktail_costs.rb` (see the rate table it emits).
-     This multiplies; it does not resolve.
+  /* What a line costs (#820, #748): quantity times a rate resolved at build
+     time by _plugins/cocktail_costs.rb. This multiplies; it does not resolve.
 
-     THE NAMED BOTTLES WIN OVER THE GENERIC, when they are all priced. A line
-     whose drinks all say Tanqueray is a line you would buy Tanqueray for, and
-     the generic's range spans everything that COULD fill it. Where the drinks
-     named several bottles the range runs cheapest to dearest across them, which
-     is what #820 asks for: "a range where suggested bottles are a range".
-
-     ALL OR NOTHING ON THE NAMED SET, deliberately. If one named bottle has no
-     price, pricing from the others would quietly report a range narrower than
-     the truth -- it would look more certain for knowing less. Falling back to
-     the generic is wider and honest, and the generic's own range already spans
-     every bottle under it.
-
-     NO RATE MEANS NO PRICE, never a zero. Eleven generics in the collection
-     have none: herbs, zest, oil and bitters-by-the-dash, which are free under
-     Helen's rule ("I'm catering for family, not running a bar"). A line with
-     no rate prints no figure, the same silence the drink page keeps for an
-     incomplete drink.
-
-     A COUNTED FRUIT AND A WEIGHED SOLID ARE PRICED TOO, SINCE #748 (Helen,
-     2026-09-06: "Price whole fruit and weighed solids"). The rate table
-     carries two more maps, `fruit` (GBP per piece) and `weight` (GBP per
-     kilo), resolved by the same plugin from `fruit_prices` and
-     `weight_prices` in costs.yml; a line's `whole`, `each` and `cube` totals
-     are pieces, its `g` total is grams. The named-bottle rule above is a rule
-     about VOLUMES -- nobody names a bottle of pear -- so those two are always
-     read from the generic. Whatever parts of a line have a rate are summed;
-     a line with no priceable part at all is null, as before. */
+     Named bottles win over the generic only when every one of them is priced:
+     pricing from some would report a range narrower than the truth. Pieces
+     (`whole`, `each`, `cube`) and grams are always priced from the generic.
+     No rate means null, never zero. */
   function linePrice(mlMin, mlMax, generic, bottleNames, rates, units) {
     if (!rates) return null;
 
@@ -421,15 +247,9 @@
     };
   }
 
-  /* WHAT THE WHOLE LIST COSTS -- #817. Summed from the rows rather than from
-     the entries, so the figure at the bottom is by construction the sum of the
-     figures above it: a total that can disagree with its own column is worse
-     than no total.
-
-     `unpriced` IS PART OF THE ANSWER, not an error. A list containing mint and
-     a pear reports a total plus "3 lines have no price", because a bare figure
-     would claim to be the cost of the shop and would be short by whatever those
-     lines are worth. */
+  /* What the whole list costs (#817). Summed from the rows, so the total cannot
+     disagree with its own column. `unpriced` is part of the answer: a bare
+     figure would claim to be the whole shop. */
   function total(rows) {
     var min = 0;
     var max = 0;
@@ -455,24 +275,12 @@
     };
   }
 
-  /* WHAT COUNTS AS A TOP, AND DELIBERATELY NOTHING ELSE. All nine topped pours
-     in the collection write exactly `to top`; this also accepts `to top up`
-     and tolerates case and spacing, and matches nothing else on purpose.
-     A phrase this does not recognise keeps the old `(x3)` reading, which is
-     the honest fallback for a pour nobody has declared a volume for. */
+  /* Only an amount written exactly `(top)` is a top; any other unquantified
+     phrase keeps the counted reading. */
   var TOP_UP = /^\(top\)$/i;
 
-  /* VULGAR FRACTIONS ARE NUMBERS, and food writes a great many of them --
-     `½ tsp`, `¼–½ tsp`, `1½ tbsp`, `1¾ cups`, `⅛ tsp`. Every one of these
-     returned null before #801 and was counted as an unquantified phrase, so
-     "½ tsp salt" and "¼ tsp salt" appeared as two lines saying `(×1)` instead
-     of adding up to ¾ tsp.
-
-     NOT ONE OF THEM APPEARS IN THE COCKTAILS COLLECTION -- 682 pours, every
-     number a plain decimal on the 2.5 ml grid (see AMOUNTS above) -- so this
-     widens what parses without changing a single existing answer, which is
-     what lets one parser serve both sites. tests/js/shopping-list.test.js
-     holds that claim. */
+  /* Vulgar fractions are numbers: food writes `½ tsp`, `¼–½ tsp`, `1½ tbsp`
+     (#801). */
   var VULGAR = {
     '½': 0.5, '⅓': 1 / 3, '⅔': 2 / 3, '¼': 0.25, '¾': 0.75,
     '⅕': 0.2, '⅖': 0.4, '⅗': 0.6, '⅘': 0.8,
@@ -482,22 +290,14 @@
 
   var VULGAR_CLASS = '[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞⅑⅒]';
 
-  /* A NUMBER IS DIGITS, A FRACTION, OR DIGITS FOLLOWED BY A FRACTION. `1½` is
-     one token and not two, which is the whole reason this is built up from
-     pieces rather than written as one regex with a `\d+` in it.
-
-     THE LOOKAHEAD IS LOAD-BEARING, and it is what stops both halves being
-     optional from meaning "matches nothing, successfully". Without it the
-     range branch below happily matches a bare separator followed by no number
-     at all, and `2.5-cm piece` loses its hyphen to a range that is not there.
-     With it, a separator that is really part of a unit is simply not a
-     separator. */
+  /* A number is digits, a fraction, or digits then a fraction (`1½` is one
+     token). The lookahead is load-bearing: without it both halves are
+     optional, the range branch matches a bare separator, and `2.5-cm piece`
+     loses its hyphen. */
   var NUMBER = '(?=\\d|' + VULGAR_CLASS + ')(\\d+(?:\\.\\d+)?)?(' + VULGAR_CLASS + ')?';
 
-  /* THE RANGE SEPARATOR IS AN EN DASH, A HYPHEN OR THE WORD `to`, and it only
-     counts as one when a NUMBER follows it. That is not fussiness: `2.5-cm
-     piece` and `2 x 400-g tins` both carry a hyphen that is part of the unit,
-     and both would lose their unit to a looser rule. */
+  /* The range separator is a dash, a hyphen or ` to`, and only when a NUMBER
+     follows it: the hyphen in `2 x 400-g tins` is part of the unit. */
   var AMOUNT = new RegExp(
     '^\\s*(~)?\\s*' + NUMBER +
     '(?:\\s*(?:–|—|-|\\s+to)\\s*' + NUMBER + ')?' +
@@ -515,29 +315,19 @@
   /**
    * Split "22.5 ml" into a number and a unit.
    *
-   * Returns null when the string is not a quantity at all -- `to top`, `to
-   * rinse`, `some` -- which is a real answer rather than a failure, and the
-   * caller counts those entries instead of summing them.
+   * Returns null when the string is not a quantity at all (`(top)`, `some`);
+   * the caller counts those entries instead of summing them.
    *
    * `max` and `approx` are present only when the source said so: "30–50 g"
-   * gives {quantity: 30, max: 50}, "~2 tbsp" gives {approx: true}. A reader
-   * that ignores both fields gets the low end and no tilde, which is why
-   * adding them broke nothing that already read this.
+   * gives {quantity: 30, max: 50}, "~2 tbsp" gives {approx: true}.
    *
    * @param {string} amount
    * @returns {{quantity: number, unit: string, max?: number,
    *            approx?: boolean}|null}
    */
   function parseAmount(amount) {
-    /* `half` IS A NUMBER WITH NO DIGITS IN IT -- Helen, 2026-09-04, ruling on
-       caipirinha's lime: `amount: "half"`, with `half` and `whole` declared as
-       units in `measures.non_volumetric`. A whole fruit is COUNTED, never
-       measured, so it has no millilitre figure and does not want one.
-
-       IT READS AS 0.5 OF A `whole` so that the arithmetic is ordinary: half a
-       lime doubled is one lime, tripled is one and a half, and neither the
-       scaler nor the shopping list needs a rule of its own to say so. Only the
-       PRINTING is special -- `wholeText` below. */
+    /* `half` is 0.5 of a `whole`, so scaling and totalling need no rule of
+       their own; only the printing is special (wholeText). */
     if (String(amount || '').trim().toLowerCase() === 'half') {
       return { quantity: 0.5, unit: 'whole' };
     }
@@ -551,33 +341,17 @@
     var parsed = { quantity: quantity, unit: foldUnit(match[6]) };
 
     var max = numberFrom(match[4], match[5]);
-    /* A RANGE THAT RUNS BACKWARDS IS NOT A RANGE. Nothing in either collection
-       writes one, and treating "5–2" as a range would have the totals for the
-       two ends cross over; dropping the second number leaves the first, which
-       is the same answer this function has always given for text it cannot
-       read past. */
+    // A range that runs backwards is not a range: the second number goes.
     if (max !== null && max > quantity) parsed.max = max;
 
     if (match[1]) parsed.approx = true;
     return parsed;
   }
 
-  /* THE BRACKET THAT RESTATES THE SAME QUANTITY -- `1 tbsp (6 g)` of whole
-     cloves, `4 medium (1 g)` of bay leaves, `1 tbsp (9–10 g)` of peppercorns.
-     Two of Helen's spice-blend recipes are written this way throughout, and it
-     is a genuinely useful thing to have written down: the tablespoon is how
-     you measure it and the gram is how you check it.
-
-     IT HAS TO COME OFF THE UNIT BEFORE ANYTHING ELSE HAPPENS, for two reasons.
-     Grouping: `tbsp (6 g)` and `tbsp (12 g)` are the same unit written twice,
-     and left alone they make two totals of one spice. Scaling: the bracket is
-     the same quantity as the number in front of it, so doubling one without
-     the other prints a contradiction.
-
-     RETURNED, NOT APPLIED. This says what the bracket is; the food shopping
-     list decides what to do with it, and cocktails -- which has no brackets in
-     any of its 682 amounts -- never calls it. That is why the change to
-     parseAmount above could be additive and this could not.
+  /* The bracket that restates the same quantity: `1 tbsp (6 g)`. It has to
+     come off the unit before grouping (`tbsp (6 g)` and `tbsp (12 g)` are one
+     unit) and before scaling (both figures must move together). Returned, not
+     applied: the food callers decide what to do with it.
 
      @param {string} unit
      @returns {{unit: string, lo: number, hi: number|null, unit2: string}|
@@ -604,28 +378,15 @@
     };
   }
 
-  /* HOW MANY WHOLE FRUITS A VOLUME OF JUICE COMES TO — #546, Helen 2026-09-04:
-     "Please give the range of whole fruits needed, like this '375 ml lemon juice
-     (X to Y lemons)'."
-
-     THE YIELDS ARE DATA, in _data/cocktails/ingredients.yml under `juice_yields`,
-     and are passed in. Only four juices have them, and only the four you squeeze
-     yourself: pineapple, cranberry and apple arrive in a carton, so "how many
-     whole fruits" is not a question anyone is asking in the shop.
-
-     THE DIVISION RUNS THE OTHER WAY ROUND FROM THE INSTINCT, which is the one
-     thing here worth getting wrong slowly rather than quickly: the FEWEST fruits
-     is the total over the LARGEST yield. More juice per lemon means fewer
-     lemons. Both ends round UP, because three quarters of a lemon is a lemon you
-     had to buy.
-
-     A RANGE THAT COLLAPSES IS PRINTED ONCE. 60 ml of lime is 2 to 3 limes; 20 ml
-     is 1 to 1, and "1 to 1 limes" is a worse sentence than "1 lime". */
   function pluralise(word) {
     if (/(s|sh|ch|x|z)$/.test(word)) return word + 'es';
     return word + 's';
   }
 
+  /* How many whole fruits a volume of juice comes to (#546). `yields` is one
+     entry of `juice_yields` in _data/cocktails/ingredients.yml. The fewest
+     fruits is the total over the LARGEST yield; both ends round up, because
+     part of a lemon is a lemon bought. A range that collapses prints once. */
   function fruitCount(ml, yields) {
     if (!yields || !(ml > 0)) return null;
 
@@ -648,10 +409,8 @@
     return { fewest: fewest, most: most, fruit: fruit, text: text };
   }
 
-  /* FLOATING POINT, AND IT SHOWS UP IMMEDIATELY HERE: the collection is full of
-     22.5 and 7.5, so three drinks make 67.5 and 0.1 + 0.2 arithmetic is one
-     addition away. Rounded to three decimals -- far finer than any amount
-     written down, and coarse enough that a sum cannot print as 67.49999999. */
+  /* Rounds away float noise in sums of 22.5s and 7.5s: three decimals is finer
+     than any written amount. */
   function tidy(n) {
     return Math.round(n * 1000) / 1000;
   }
@@ -660,7 +419,8 @@
    * Total up a shortlist.
    *
    * @param {Array} entries - one per ingredient of every shortlisted drink:
-   *        { amount: string, generic: string|string[], bottle: string|string[] }
+   *        { amount: string, generic: string|string[], bottle: string|string[],
+   *          glasses?: number }
    * @param {Object} [options]
    * @param {number} [options.multiplier=1] - glasses of each drink
    * @param {string[]} [options.exclude=[]] - generics to leave out, folded the
@@ -670,22 +430,20 @@
    * @param {Object} [options.juiceYields] - generic -> {fruit, ml_min, ml_max},
    *        `juice_yields` from _data/cocktails/ingredients.yml
    * @param {Object} [options.topUpMl] - generic -> {ml_min, ml_max}, `top_up_ml`
-   *        from _data/cocktails/costs.yml. Turns an unquantified `to top` into
-   *        a declared volume range (#746); absent, a top stays a count.
+   *        from _data/cocktails/costs.yml. Absent, a top stays a count.
    * @param {Object} [options.rates] - {generics: {name: [lo, hi]}, bottles:
-   *        {name: rate}}, GBP per litre, resolved at build time by
-   *        _plugins/cocktail_costs.rb (#820), plus `fruit: {name: [lo, hi]}`
-   *        (GBP per piece) and `weight: {name: [lo, hi]}` (GBP per kilo) for
-   *        the counted fruit and weighed solids of #748. Absent, no row
-   *        carries a price.
+   *        {name: rate}}, GBP per litre, from _plugins/cocktail_costs.rb, plus
+   *        `fruit: {name: [lo, hi]}` (GBP per piece) and `weight: {name:
+   *        [lo, hi]}` (GBP per kilo). Absent, no row carries a price.
    * @param {Object} [options.shelves] - {order: string[], of: {generic: shelf}},
-   *        `shopping_shelves` and `shelf_of` from ingredients.yml (#848).
-   *        Absent, rows sort by volume alone as they always did.
-   * @returns {Array} one row per ingredient, sorted by label:
+   *        `shopping_shelves` and `shelf_of` from ingredients.yml. Absent,
+   *        rows sort by volume alone.
+   * @returns {Array} one row per ingredient, sorted by shelf, then descending
+   *        millilitres, then label:
    *        { label, note, generic, bottles: string[],
    *          totals: [{quantity, quantityMax, unit, text}],
-   *          unquantified: [{text, drinks}], millilitres, millilitresMax,
-   *          text }
+   *          unquantified: [{text, drinks}], fruit, price, millilitres,
+   *          millilitresMax, shelf, text }
    */
   function build(entries, options) {
     var opts = options || {};
@@ -695,45 +453,27 @@
     var excluded = {};
     asList(opts.exclude).forEach(function (name) { excluded[foldKey(name)] = true; });
 
-    /* ONE BOTTLE, HOWEVER IT WAS WRITTEN DOWN. bottles.yml has declared aliases
-       for exactly this -- Helen, #529: "'wray and nephew' and 'wray & nephew'
-       should both collapse onto the latter" -- and the ingredient search already
-       resolves suggestions through them. Without it a shopping list prints
-       `El Dorado 3 / ED3 / El Dorado 3yo / Havana 3` beside one line, which is
-       four spellings of two bottles.
-
-       Case-folding alone does not reach these, which is why this is a declared
-       map rather than more string cleverness: nothing about `ED3` says
-       `El Dorado 3` except that Helen wrote it down in bottles.yml. Absent, the
-       fold below is the whole answer and the list still works. */
+    /* One bottle however it was written (#529). The aliases are declared
+       data: nothing about `ED3` says `El Dorado 3`. */
     var aliases = opts.bottleAliases || {};
     function canonicalBottle(name) {
       return aliases[foldKey(name)] || name;
     }
 
-    /* Keyed the same way the groups are, so a yield declared as `lemon juice`
-       is found however the drink capitalised it. Absent, no line gets a fruit
-       count and every total is still right. */
+    // Folded like the group keys, so a yield is found whatever the drink's
+    // capitalisation.
     var yields = {};
     Object.keys(opts.juiceYields || {}).forEach(function (generic) {
       yields[foldKey(generic)] = opts.juiceYields[generic];
     });
 
-    /* Same folding, same reason: a top declared as `soda water` is found
-       however the drink capitalised it. Absent, every `to top` keeps the count
-       reading it has always had. */
     var topUps = {};
     Object.keys(opts.topUpMl || {}).forEach(function (generic) {
       topUps[foldKey(generic)] = opts.topUpMl[generic];
     });
 
-    /* WHERE IN THE SHOP EACH LINE BELONGS -- #848, Helen: "list items in shelf
-       order then volume". Folded to a rank up front so the comparator is an
-       integer test rather than two lookups per comparison.
-
-       AN UNKNOWN GENERIC SORTS LAST, never first and never at random. A shelf
-       nobody declared is a gap in the data, and the end of the list is where a
-       gap is visible without being in the way. */
+    /* Shelf order is the outer sort key (#848), folded to a rank up front. A
+       generic with no declared shelf sorts last, where the gap is visible. */
     var shelfRank = {};
     var shelfOrder = asList(opts.shelves && opts.shelves.order);
     shelfOrder.forEach(function (name, i) { shelfRank[foldKey(name)] = i; });
@@ -763,36 +503,18 @@
       if (!groups[key]) {
         groups[key] = {
           generic: generic,
-          /* TWO VIEWS OF THE SAME BOTTLES, and they answer different questions.
-
-             `bottles` holds each SUGGESTION AS WRITTEN, so "El Dorado 3 or
-             Havana Club 3" is one entry -- that is the form the label needs when
-             a group is unanimous, because the "or" is Helen's own wording for a
-             choice she is happy with (#441).
-
-             `bottleNames` holds the individual bottles, flattened and deduped,
-             which is the form the NOTE needs. Without it a group carrying both
-             `Havana Club 3` and `El Dorado 3 or Havana Club 3` prints
-             "Havana Club 3 / El Dorado 3 or Havana Club 3 / El Dorado 3" --
-             three entries, two bottles, one of them twice. Seen on the real
-             data for `lightly aged and filtered rum`, which is why this is two
-             lists rather than one. */
+          /* `bottles` holds each suggestion as written ("El Dorado 3 or Havana
+             Club 3" is one entry); `bottleNames` the individual bottles,
+             flattened and deduped, which the note and the price lookup need. */
           bottles: [],
           bottleKeys: {},
           bottleNames: [],
           bottleNameKeys: {},
-          /* HOW MANY ENTRIES NAMED NO BOTTLE. This is the whole test for
-             whether Helen's bottle-first rule can apply to a group: it can
-             only when every entry agreed on one bottle, and one bare entry
-             means the group is really "the generic, sometimes as this". */
           bare: 0,
           units: {},
           unitOrder: [],
-          /* A TOP'S VOLUME RIDES BESIDE THE FIXED TOTAL, not inside it (#746).
-             45 ml of gin plus a 75-100 ml top is 120-145 ml, and that is two
-             numbers -- keeping the declared range separate is what lets the
-             row report the pair instead of picking one and calling it the
-             total. Both stay 0 for every generic nobody tops. */
+          /* A top's declared range rides beside the fixed `ml` total, not
+             inside it, so the row can report both ends (#746). */
           topUpMin: 0,
           topUpMax: 0,
           unquantified: {},
@@ -802,9 +524,8 @@
       }
       var group = groups[key];
 
-      /* Resolved PER ALTERNATIVE, not on the joined string: a suggestion
-         written as a list is "Havana 3 or El Dorado 3", and only its members
-         are names bottles.yml could know. */
+      /* Aliases are resolved per alternative, not on the joined string: only
+         the members of "Havana 3 or El Dorado 3" are names an alias can know. */
       var named = asList(entry.bottle)
         .map(function (b) { return canonicalBottle(String(b).trim()); })
         .filter(Boolean);
@@ -826,14 +547,8 @@
         group.bare += 1;
       }
 
-      /* PER-DRINK QUANTITIES — Helen, 2026-09-04, asked for after the global
-         scaler: two negronis and six daiquiris is a real weekend, and one
-         number for everything cannot say it.
-
-         An entry's own `glasses` wins; `options.multiplier` is the fallback for
-         everything that does not carry one. So the global scaler is simply the
-         case where no entry has an opinion, which is why it needed no second
-         code path and why every existing test still describes what it did. */
+      /* An entry's own `glasses` wins; `options.multiplier` is the fallback
+         for every entry that carries none. */
       var scale = (typeof entry.glasses === 'number' && entry.glasses > 0)
         ? entry.glasses : multiplier;
 
@@ -848,21 +563,12 @@
         var text = String(entry.amount || '').trim();
         if (!text) return;
 
-        /* A DECLARED TOP BECOMES A VOLUME (#746). `shopping-list.js` refuses to
-           invent a conversion for an unquantified pour, and that is still the
-           rule -- what changed is that `top_up_ml` DECLARES one, at Helen's
-           request: "We can calculate top volumes, well, slightly, can't we."
-           So this is reading a number somebody wrote down, not guessing one,
-           which is the same standing `juice_yields` has two branches up.
-
-           BOTH ENDS SCALE. Three glasses of a 75-100 ml top is 225-300 ml, not
-           three tops. */
+        /* A declared top becomes a volume range (#746), and both ends scale
+           with the glasses. */
         var topUp = TOP_UP.test(text) ? topUps[key] : null;
         if (topUp) {
-          /* The row has to have an `ml` total to add a range to, and a generic
-             that is ONLY ever topped (soda water) has never seen a parsed
-             amount, so `ml` is not in the order yet. Seeding it at 0 is what
-             makes "100-150 ml" possible for a line with no fixed pour at all. */
+          /* A generic that is only ever topped has no parsed amount, so `ml`
+             must be seeded here for the range to have a total to widen. */
           if (group.units.ml === undefined) {
             group.units.ml = 0;
             group.unitOrder.push('ml');
@@ -883,19 +589,11 @@
     return order.map(function (key) {
       var group = groups[key];
 
-      /* THE GENERIC LEADS, ALWAYS. See the header: Helen settled this after
-         looking at the first version, and it matches the drink page's own
-         `name (bottle)` shape.
-
-         The bracketed part is the flat, deduped list of individual bottles --
-         see `bottleNames` above for the real line this shape is fixing. The
-         group's bottles AS WRITTEN are still on the row for a caller that wants
-         the "or" form back. */
+      // The generic leads; the note is the flat, deduped list of bottles.
       var label = group.generic;
       var note = group.bottleNames.join(' / ');
 
-      /* The declared top only ever adds millilitres, so it only ever widens the
-         `ml` total; every other unit is the single number it always was. */
+      // A declared top only ever widens the `ml` total.
       var mlFixed = tidy(group.units.ml || 0);
       var mlMin = tidy(mlFixed + group.topUpMin);
       var mlMax = tidy(mlFixed + group.topUpMax);
@@ -921,11 +619,9 @@
         };
       });
 
-      /* ...AND THE NAME TAKES THE PLURAL THE UNIT WOULD HAVE CARRIED, so the
-         row reads "13" + "sugar cubes" rather than "13 sugar cube". Only when
-         that unit is the row's ONE total: a line totalling "30 ml + 2 leaves"
-         has two amounts leaning on one name, and the name stays as written.
-         `generic` is untouched -- it is the key callers look things up by. */
+      /* ...and the name takes the plural the unit would have carried: "13" +
+         "sugar cubes". Only when that unit is the row's one total. `generic`
+         is untouched: callers look things up by it. */
       if (totals.length === 1 && !group.unquantifiedOrder.length &&
           unitRepeatsName(totals[0].unit, label)) {
         label = replaceLastWord(label, unitLabel(totals[0].unit, totals[0].quantity));
@@ -935,18 +631,12 @@
         return { text: text, drinks: group.unquantified[text] };
       });
 
-      /* HOW MANY LEMONS. Only ever from the ml total: the yields are declared in
-         millilitres, and "2 dashes of lemon juice" is not a fruit.
-
-         FROM THE FIXED TOTAL, NOT THE TOPPED ONE. Nothing you squeeze is
-         something you top -- the four declared yields are the citrus juices --
-         so this can never differ today, and if a topped juice ever existed,
-         counting fruit for a volume of champagne would be the wrong answer. */
+      /* Fruit is counted from the fixed ml total only, never from a top or
+         from another unit: yields are declared in millilitres. */
       var fruit = fruitCount(mlFixed, yields[foldKey(group.generic)]);
 
-      /* ONE STRING FOR THE WHOLE AMOUNT, built here rather than in the template,
-         so that the copy-to-clipboard text and the rendered row can never say
-         different things. */
+      /* One string for the whole amount, built here rather than in the caller,
+         so the copied text and the rendered row cannot say different things. */
       var parts = totals.map(function (t) { return t.text; })
         .concat(unquantified.map(function (u) {
           return u.drinks > 1 ? u.text + ' (×' + u.drinks + ')' : u.text;
@@ -960,47 +650,29 @@
         totals: totals,
         unquantified: unquantified,
         fruit: fruit,
-        /* #820. The bottles the drinks actually named, not the group's "or"
-           form, because a rate is looked up per bottle. */
+        // Priced per bottle named, not per "or" form: rates are per bottle.
         price: linePrice(mlMin, mlMax, group.generic, group.bottleNames,
                          opts.rates, group.units),
-        /* THE SORT AND THE CALLERS BOTH READ THE LOW END, which is why this
-           stays the single number it has always been: an untopped row has
-           `millilitres === millilitresMax` and nothing downstream changes.
-           Sorting on the low end means a topped line ranks by what you are
-           certain to pour rather than by the most it could be. */
+        /* The low end: the sort and the callers read this, so a topped line
+           ranks by what is certain to be poured. */
         millilitres: mlMin,
         millilitresMax: mlMax,
-        /* #848. On the row so a caller can group or label by it without
-           re-deriving the mapping; the sort below reads the rank, not this. */
+        // For a caller to group or label by; the sort reads the rank.
         shelf: shelfOf[foldKey(group.generic)] === undefined
           ? null
           : declaredShelves[group.generic] || shelfOrder[rankOf(group.generic)],
         text: parts.join(' + ')
       };
     }).sort(function (a, b) {
-      /* SHELF FIRST, THEN VOLUME -- #848, Helen: "list items in shelf order
-         then volume". The shelf order is hers and is a walk round the shop, so
-         it is the outer key; the volume rule below is unchanged and now orders
-         WITHIN a shelf rather than across the whole list.
-
-         ABSENT `options.shelves`, EVERY ROW RANKS THE SAME and this test falls
-         through to the volume comparison that has always been here -- which is
-         what keeps every pre-#848 caller and test describing what it did. */
+      /* Shelf first (#848); with no `options.shelves` every row ranks the
+         same and this falls through to volume. */
       var shelfA = rankOf(a.generic);
       var shelfB = rankOf(b.generic);
       if (shelfA !== shelfB) return shelfA - shelfB;
 
-      /* DESCENDING BY VOLUME — Helen, 2026-09-04: "order by descending volume
-         required." The big pours are what you shop for and what you might not
-         have; two dashes of bitters is a bottle you almost certainly own.
-
-         MILLILITRES DECIDE, AND ONLY MILLILITRES. Sorting across units would
-         mean ranking 45 ml against 2 dashes, which needs the conversion this
-         file refuses to invent everywhere else. So everything with a volume
-         sorts first, largest to smallest; everything without one (bitters by
-         the dash, mint by the leaf, a `to top`) follows in a block of its own,
-         alphabetically, which is the only order left that means anything. */
+      /* Then descending millilitres, and only millilitres: ranking 45 ml
+         against 2 dashes would need a conversion. Rows with no volume follow,
+         alphabetically. */
       if (a.millilitres !== b.millilitres) return b.millilitres - a.millilitres;
       return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
     });
@@ -1020,7 +692,7 @@
     amountRangeText: amountRangeText,
     // #1132. What build() asks before printing a unit beside a name.
     quietUnit: quietUnit,
-    // #801. Used by food-shopping-list.js only; see their own headers.
+    // Used by food-shopping-list.js and food-scale.js.
     splitParenthetical: splitParenthetical,
     fractionText: fractionText,
     tidy: tidy

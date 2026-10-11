@@ -1,104 +1,23 @@
 // card-name-fit.js
-// =============================================================================
-// A NAME THAT DOES NOT FIT: SHRINK IT IF ONE STEP REACHES IT, OTHERWISE WRAP.
-// =============================================================================
-// Design audit critical #9, decided 2026-09-04 from a
-// candidates page on the real cocktails index. Helen, having switched between
-// the treatments on the page itself:
+// A drink name that does not fit its tape: shrink it if one size step reaches
+// it, otherwise wrap it to two lines. The rule is about HOW MUCH the name is
+// over by, so it is a measurement, never a character count.
 //
-//   "Let's do: shrink when it's just one short-ish word too long, then two
-//    lines where it's more than that. The one super-long title we have I'll
-//    just shorten, and retain that principle."
+// Two states and no more: one step and one re-measure, never a search for the
+// scale each name needs, or a grid of cards carries titles at a dozen sizes.
 //
-// THE PRINCIPLE, WHICH IS THE PART THAT BINDS: the rule is about HOW MUCH the
-// name is over by, not about how long the name is. One size step of 0.86 buys
-// about 14% of the line — four or five characters of Courier Prime, which is
-// what "one short-ish word" comes to. If the overflow is inside that, stepping
-// makes the name fit and nobody can see that it stepped. If it is outside it,
-// no plausible step reaches the name and shrinking would only produce small
-// type that still ellipsises, so the tape takes a second line instead.
-//
-// Which is why the test is a MEASUREMENT rather than a character count. A
-// character count would need the face's real advance width (Courier Prime ships
-// here as woff2 only, with no parser available), would be wrong for a card at
-// one width and right at another, and would have to know which of the two sizes
-// the element is currently rendering at. The browser already knows all three.
-//
-// WHAT IT DOES, per `.drink-card-name` on the page:
-//
-//   0. Leave a name whose box has no client rects entirely alone -- it is
-//      paginated away or otherwise not laid out, and every measurement below
-//      would come back as zero and read as "it fits" (#1115). It keeps the
-//      no-JS base state, not even `--fitted`, until a later pass can measure
-//      it.
-//   0a. Mark the name `--fitted`, which is not a state: it says this script has
-//      run, and it releases the no-JS ellipsis clip. See FITTED_CLASS below.
-//   1. Reset the two state classes, so every run measures the UNSTEPPED,
-//      UNWRAPPED element. Without this the second run measures the first run's
-//      output and a name can never step back up when the card gets wider.
-//   2. Ask its `.drink-card-tape-word` whether it overflows — the width of its
-//      CONTENT (a Range over it; see `contentWidth`, and why it is not
-//      `scrollWidth` any more) against `clientWidth + 1`. The 1px is sub-pixel
-//      layout: a word exactly filling its box measures a fraction over.
-//   3. If it does and `content width <= clientWidth / 0.86`, the step reaches it:
-//      add `drink-card-name--step`. Dividing rather than multiplying is the
-//      right way round — the QUESTION is how wide the box would have to be to
-//      hold today's word, and 0.86 of the type needs 1/0.86 of the space.
-//   4. Re-measure once after stepping. The predicted fit is a linear model of
-//      type, and type is not quite linear: hinting, letter-spacing rounding and
-//      the tape's own em padding all move a little. If it still overflows, the
-//      step is undone and the name wraps. One re-measure, not a loop — see
-//      below.
-//   5. Otherwise add `drink-card-name--wrap`, and the Sass turns the tape into
-//      a two-line object (`_sass/cocktails/_cards.scss`).
-//
-// ONE STEP AND ONE RE-MEASURE, NEVER A BINARY SEARCH. A search would settle on
-// whatever scale each individual name needs, and a grid of cards would then
-// carry titles at a dozen sizes — which is the fixed-anchor card design losing
-// its argument for a case it can already answer by wrapping. Helen asked for
-// two states and the file has two states.
-//
-// IT RUNS THREE TIMES, each load-bearing and each the same three-line pattern
-// as `last-line-rule.js`, which was written the day before this for the same
-// reason. Once at load; again on `document.fonts.ready`, because until the real
-// face arrives every width is measured in the fallback and the answers change
-// when it lands; and on a debounced resize, because a card's width follows the
-// viewport — the grid is `auto-fill, minmax(370px, 1fr)`, so a card grows and
-// shrinks continuously between breakpoints and a name that fits at 470px does
-// not at 380px.
-//
-// THE PASS IS ALSO EXPOSED AS `HTF.fitCardNames()`, for anything that puts a
-// new `.drink-card-name` on the page after load. `universe.js` is the one
-// caller today and its reason is in the comment at that call. HTF is optional
-// here: this file works with no namespace at all, so it can never be the reason
-// a page fails to draw.
-//
-// SITE-AGNOSTIC, like print-link.js, universe.js and last-line-rule.js: it
-// queries a class list and does nothing on a page that has none. Food has no
-// `.drink-card-name`, so it finds nothing and returns. Cocktails has them on
-// the index (every card, plus the universe pick) and on a drink page (the
-// title, at 3.2rem through the same classes) — one rule covers all three,
-// because the size lives in `--card-name-size` and this file never reads it.
-//
-// THE UNIVERSE PICK IS MEASURED AND NEVER CLASSIFIED, since 2026-09-05, and
-// that is correct rather than wasted: its name is `flex: none` in a row of its
-// own, so at max-content the tape word cannot overflow and neither class is
-// ever added. The pass still has to run over it — the pick is re-cloned on
-// every deal and nothing else would clear a stale class if that ever changed.
-// AND IT CHANGED ON 2026-10-10 (#1324), BELOW 820px ONLY: once the pick wraps,
-// _universe.scss caps the name to the width left beside the glass and lets it
-// shrink, so a long name there steps or wraps like any card's. On one row it
-// is still `flex: none` and still never classified.
-// =============================================================================
+// Runs at load, on `document.fonts.ready` (until the real face arrives every
+// width is measured in the fallback) and on a debounced resize (a card's
+// width follows the viewport). Also exposed as `HTF.fitCardNames()` for
+// anything that puts a `.drink-card-name` on the page later or un-hides one.
+// Site-agnostic: it does nothing on a page with no `.drink-card-name`, and it
+// never reads the type size, so cards and the drink page's title share it.
 
 (function () {
 
-  // The step, and the two places it has to agree. `.drink-card-name--step` sets
-  // `--card-name-scale: 0.86` in _sass/cocktails/_cards.scss; this is the same
-  // number, used to predict whether stepping will be enough. They are two
-  // copies of one decision and there is no way to have only one — CSS cannot
-  // do the arithmetic in step 3 and JS should not be setting type sizes — so
-  // the pairing is named here rather than left to be discovered.
+  // Must equal the scale `.drink-card-name--step` sets in
+  // _sass/cocktails/_cards.scss (`$card-name-step`). Two copies of one
+  // decision: CSS cannot do the arithmetic and JS should not set type sizes.
   var STEP = 0.86;
 
   var NAME = '.drink-card-name';
@@ -106,49 +25,19 @@
   var STEP_CLASS = 'drink-card-name--step';
   var WRAP_CLASS = 'drink-card-name--wrap';
 
-  // A THIRD CLASS, AND IT IS NOT A THIRD STATE -- 2026-09-11, #971. The two
-  // states above are still the two states; this one says only "this script has
-  // run over this name", and every name gets it whatever the answer.
-  //
-  // WHAT IT IS FOR. `.drink-card-tape-word` is `overflow: hidden` so that a
-  // name too long for its tape ellipsises when this script has NOT run -- the
-  // no-JS fallback, and the behaviour the page had before this file existed.
-  // With the script running that clip can never fire: a name either fits, steps
-  // until it fits, or wraps. And since #971 the clip is actively harmful, because
-  // the card's click overlay is a pseudo-element on the name's anchor, which
-  // lives inside this box -- an ancestor's `overflow: hidden` clips it to the
-  // lettering and the rest of the card stops being clickable.
-  //
-  // So the clip is released once it is provably unnecessary, by the one thing
-  // that can know: the measurement itself. The rule is in
-  // _sass/cocktails/_cards.scss beside the two states.
+  // Not a third state: it says this script has measured the name, and every
+  // measured name gets it. The stylesheet uses it to release the no-JS
+  // ellipsis clip (`overflow: hidden` on the tape word), which would otherwise
+  // clip the card's click overlay to the lettering (#971).
   var FITTED_CLASS = 'drink-card-name--fitted';
 
   /**
-   * How wide is the CONTENT of this element -- the lettering itself?
-   *
-   * A Range over the element's contents, rather than the `scrollWidth` this
-   * used until 2026-09-11. The two answered the same question until #971 put
-   * the card's click overlay inside this very box: the drink's name is the
-   * card's only link, the whole card is that link's hit area, and the way that
-   * is expressed is an absolutely positioned pseudo-element on the anchor. The
-   * anchor sits inside `.drink-card-tape-word`, which is `position: relative`
-   * AND transformed (the tape's text nudge), so it is the overlay's containing
-   * block however the overlay is written -- and an out-of-flow descendant
-   * counts towards its containing block's scrollable overflow. `scrollWidth`
-   * therefore came back as the word plus most of a viewport, every name looked
-   * like it overflowed, and every name wrapped. Measured on Cobra's Fang at
-   * 1280: 1389px of "scroll" for a 109px word in a 165px box.
-   *
-   * A RANGE MEASURES THE DOM, AND A PSEUDO-ELEMENT IS NOT IN THE DOM. So this
-   * asks what the question always meant -- how wide is the lettering -- rather
-   * than "does anything inside this box stick out of it", which was only ever a
-   * proxy for it and stopped being true the moment something else moved in.
-   *
-   * It also measures the drink page's title correctly, where the word wraps a
-   * real `<h1>` at `display: contents`: that element generates no box of its
-   * own, so asking IT for a rect would give zero, while a Range over the text
-   * inside it is exactly right.
+   * How wide is the lettering itself? A Range over the contents, not
+   * `scrollWidth`: the card's click overlay is an absolutely positioned
+   * pseudo-element whose containing block is this box, so it counts towards
+   * scrollWidth and every name would read as overflowing (#971). A Range
+   * measures the DOM, and a pseudo-element is not in it. It also measures the
+   * drink page's `<h1>` at `display: contents`, which has no box of its own.
    */
   function contentWidth(el) {
     var range = document.createRange();
@@ -159,11 +48,8 @@
   }
 
   /**
-   * Does this element's content run wider than its box?
-   *
-   * 1px of tolerance rather than a bare `>`: sub-pixel layout makes a word that
-   * exactly fills its box measure a fraction larger, and without the tolerance
-   * a comfortable name would be stepped for nothing.
+   * Does this element's content run wider than its box? The 1px is sub-pixel
+   * layout: a word that exactly fills its box measures a fraction larger.
    */
   function overflows(el) {
     return contentWidth(el) > el.clientWidth + 1;
@@ -173,55 +59,32 @@
     var word = name.querySelector(WORD);
     if (!word) return;
 
-    // A BOX WITH NO WIDTH CANNOT BE MEASURED, AND SILENCE IS THE RIGHT ANSWER
-    // -- #1115, 2026-09-16. The cocktails index paginates by setting
-    // `card.hidden` rather than by removing the card, and a hidden element
-    // measures ZERO in both directions. Asking this element anything in that
-    // state produces `0 > 0 + 1`, which is false, which reads as "the name
-    // fits" -- so every name on page two was classified as fitting at load,
-    // however long it was.
-    //
-    // RETURNING BEFORE `FITTED_CLASS` IS THE POINT, not an oversight. That class
-    // releases the no-JS ellipsis clip on the strength of a measurement having
-    // happened; released on the strength of a measurement that could not happen,
-    // it takes away the fallback and puts nothing in its place, which is a name
-    // running off its tape rather than one politely cut. An unmeasurable name
-    // keeps the base state until it can be measured -- and it will be, because
-    // cocktail-index.js re-runs this pass on every apply(), which is what a page
-    // turn is.
-    //
-    // NOT A `hidden` CHECK. This asks the browser whether it got an answer,
-    // which also covers `display: none` on an ancestor, a card inside a closed
-    // panel, and the drink page's title before its own layout settles -- none of
-    // which this file should have to know about.
+    // A box with no client rects cannot be measured (#1115): a card paginated
+    // away with `hidden` measures zero, and `0 > 0 + 1` reads as "it fits".
+    // Returning BEFORE FITTED_CLASS is the point: the class releases the
+    // no-JS clip on the strength of a measurement, and none happened. The
+    // name is measured on a later pass; cocktail-index.js re-runs this on
+    // every filter pass. Not a `hidden` check, so it also covers
+    // `display: none` on an ancestor.
     if (!word.getClientRects().length) return;
 
-    // ALWAYS FROM THE BASE STATE. Every run has to measure the element as the
-    // stylesheet would draw it with no class on it, or the second run measures
-    // the first run's output: a stepped name looks like it fits, so it stays
-    // stepped for ever even on a card twice as wide.
+    // Always from the base state, or the second run measures the first run's
+    // output and a stepped name can never step back up on a wider card.
     name.classList.remove(STEP_CLASS);
     name.classList.remove(WRAP_CLASS);
 
-    // NOT reset with the two above, and deliberately: it is not a state, it is
-    // a fact about this script having run, and that does not stop being true
-    // between passes. Adding it here rather than after the measurement means a
-    // name that returns early below still carries it.
+    // Not reset with the two above: it is not a state.
     name.classList.add(FITTED_CLASS);
 
     if (!overflows(word)) return;
 
-    // How much wider the box would have to be to hold this word. At 0.86 of the
-    // type the word needs 0.86 of the width it needs now, so it fits exactly
-    // when today's content width is within clientWidth / 0.86 — about 16% over.
+    // At STEP of the type the word needs STEP of the width, so the step
+    // reaches it when today's content width is within clientWidth / STEP.
     if (contentWidth(word) <= word.clientWidth / STEP) {
       name.classList.add(STEP_CLASS);
 
-      // THE PREDICTION IS A MODEL AND THE BROWSER IS THE FACT. Re-measure once,
-      // now the smaller type is actually laid out; if the model was optimistic
-      // (hinting, letter-spacing rounding, the tape's own em padding shrinking
-      // with the type) the name wraps rather than sitting at a smaller size and
-      // ellipsising anyway, which would be the worst of both treatments.
+      // The prediction is a linear model and type is not quite linear.
+      // Re-measure once; a stepped name that still overflows wraps instead.
       if (overflows(word)) {
         name.classList.remove(STEP_CLASS);
         name.classList.add(WRAP_CLASS);
@@ -233,34 +96,29 @@
   }
 
   /**
-   * Measure and classify every card name on the page.
-   *
-   * Re-queries the document each time rather than caching the list, because
-   * the index deals a fresh name into `.universe-pick` after load — see the
-   * call in universe.js. A cached list would classify the first pick and never
-   * any later one.
+   * Measure and classify every card name on the page. Re-queries the document
+   * each time: universe.js deals a fresh name into the page after load, and a
+   * cached list would never classify it.
    */
   function fitAll() {
     var names = document.querySelectorAll(NAME);
     for (var i = 0; i < names.length; i++) fit(names[i]);
   }
 
-  // Exposed BEFORE the first pass, so a caller that runs during this file's own
-  // parse still finds it. Guarded, because this file has no dependency on the
-  // namespace and must not acquire one: on a page where assets.js somehow did
-  // not run, the three passes below still work.
+  // Exposed BEFORE the first pass. Guarded: this file must work with no HTF
+  // namespace at all.
   if (window.HTF) window.HTF.fitCardNames = fitAll;
 
   fitAll();
 
+  // card-line-budget.js waits longer than this on resize so that it runs
+  // after the names are refitted; keep this delay the shorter of the two.
   var timer;
   window.addEventListener('resize', function () {
     clearTimeout(timer);
     timer = setTimeout(fitAll, 120);
   });
 
-  // The real face is wider than the fallback at these sizes, so a name measured
-  // before it loads is measured against the wrong type.
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(fitAll);
   }

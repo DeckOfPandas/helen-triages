@@ -1,61 +1,22 @@
-{% comment %} ── THE SHORTLIST PAIR: the same two controls, in the same place, on
-  both sites -- #1005 and #1011 (2026-09-14) for the one include, #1210
-  (2026-09-30) for what is in it. A recipe page puts this on the INGREDIENTS
-  heading's line; a drink page puts it on the READ IT / MAKE IT toggle's line,
-  in `.cocktail-controls`. Both are "the first line under the rule that closes
-  the head, at the right" -- Helen: "Shortlist buttons in the same place for
-  Moules as Daiquiri, meaning on the same line as INGREDIENTS for Moules where
-  it doesn't have the read it make it toggle." One include, so the two cannot
-  drift: the reason the shortlist button alone had moved four times in ten
-  days was that nothing defined where actions live.
+{% comment %} ── The shortlist pair: the same two controls, in the same place, on both
+   sites (#1005, #1011, #1210) ──
+   A recipe page puts this on the INGREDIENTS heading's line; a drink page on
+   the read it / make it toggle's line, in `.cocktail-controls`. One include,
+   so the two cannot drift. Print and pdf are not here: they are on the
+   furniture line (page-print.html). DECISIONS §13 (#1210).
 
-  PRINT AND PDF ARE NOT HERE ANY MORE. From #1005 until #1210 this include held
-  four controls -- shortlist, see shortlist (N), print, pdf -- and six issues
-  in two weeks rearranged them (#1086, #1163, #1164, #1176, #1182, #1210)
-  without asking whether they belonged together. They did not: print and pdf
-  are things you do WITH the page and sit on the furniture line now
-  (page-print.html, the top right); these two are things you do TO it.
-  DECISIONS §13 (#1210).
+   The shortlist button is a pill, drawn in shared/_furniture.scss as the
+   index's `.btn-shortlist-only` shape. The link beside it is deliberately not
+   made to look like it: one changes this page, the other goes to a different
+   one. Plain quiet caps, words first, count in brackets, no arrow.
 
-  THE SHORTLIST BUTTON IS A PILL, drawn in shared/_furniture.scss as the
-  index's own `.btn-shortlist-only` shape -- the one bordered control on the
-  line, because it is the one that changes something. THE LINK BESIDE IT IS
-  DELIBERATELY NOT MADE TO LOOK LIKE IT. Helen: "The button for + SHORTLIST
-  then (3) for the see list link just isn't clear to me at all. I've struggled
-  with this the whole time. I can't make them look similar." They are not
-  similar: one is a button that changes this page, the other a link to a
-  different one. So the link is a plain quiet-caps link in the same face as
-  print and pdf, with the count in brackets after the words. NO ARROW -- "I
-  also dislike the -> arrow so please remove that at least."
-
-  "SEE SHORTLIST (N)", WORD FIRST -- which reverses #1164 (2026-09-21, "(0)
-  SEE SHORTLIST"). That ruling put the count first so the pair would repeat
-  `+ SHORTLIST`'s mark-then-word shape; the pair no longer tries to match, so
-  the reason is gone and the words come in reading order.
-
-  EVERY CONTROL THAT NEEDS JAVASCRIPT SHIPS `hidden` and is revealed by the
-  script that makes it work -- both of these by shortlist.js. The rule is
-  _layouts/recipe.html's own: a control that silently fails is worse than no
-  control. AND THE LINK STAYS HIDDEN WHILE THE COUNT IS ZERO: shortlist.js
-  shows it only when there is something to see, so "(0)" is never on the page.
-
-  `page.url`, NOT `relative_url`, on the shortlist key -- the same key the
-  index row or card for this page emits, which is what makes the two agree.
-
-  THE COUNT ON "SEE SHORTLIST" IS THE STORE'S, not this page's. shortlist.js
-  paints `[data-shortlist-count]` with how many controls ON THIS PAGE are
-  marked (#847's rule for the index filter, where that is the honest number);
-  this link promises a different page, so it carries `data-shortlist-total`
-  and gets `HTF.shortlist.count()`. The link is `?shortlist=1` on this site's
-  index, which enters the shortlist view (MANUAL 8.9; food's half since #1011).
-
-  ENDS IN `#results` -- #1057, 2026-09-15. The shortlisted list is the count
-  line both indexes already carry that id on (#1050), so landing here is the
-  same landing a search-dropdown link gets: the index's own startup block
-  scrolls to `location.hash` again once the shortlisted-only view has
-  revealed, the same generalised scroll #1059 needed for a badge or chip's own
-  section fragment. Going back (#387) is untouched -- that restore skips the
-  hash scroll entirely, same as it already did for a search result. {% endcomment %}
+   Both ship `hidden` and shortlist.js reveals them; the link stays hidden
+   while the count is zero. The shortlist key is `page.url`, not
+   `relative_url`: the same key the index row or card for this page emits. The
+   link's count is the store's (`data-shortlist-total`), not
+   `[data-shortlist-count]`, which counts marked controls on this page. The
+   link is `?shortlist=1` on this site's index, the shortlist view (MANUAL
+   8.9), and ends in `#results` (#1057) so the index scrolls to the list. {% endcomment %}
 {% assign actions_site = site.data.sites[page.site_key] %}
 <div class="page-actions">
   <button type="button"

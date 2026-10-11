@@ -1,6 +1,5 @@
-// =============================================================================
-// GLOBAL TYPOGRAPHIC ENGINE & BASICS
-// =============================================================================
+// BASE: element defaults for both sites. Imported after shared/rule, whose
+// lettering() mixin the heading rule includes.
 
 * {
   box-sizing: border-box;
@@ -24,13 +23,11 @@ a {
   }
 }
 
-// A READER WHO HAS ASKED FOR LESS MOTION GETS NONE -- #1093. The sites move
-// very little (colour fades on hover, the make-it knob sliding across), which
-// is why this is one blanket rule and not a line on each: every `transition`
-// in both stylesheets is a nicety, none carries meaning, so there is nothing
-// to keep. `!important` because this has to beat component rules written
-// after it, and 0.01ms rather than 0 because `transitionend` still fires at
-// that duration, so a script waiting on one is not left waiting forever.
+// A reader who has asked for less motion gets none (#1093). One blanket rule,
+// because no transition on either site carries meaning. `!important` because
+// it has to beat component rules written after it, and 0.01ms, not 0, because
+// `transitionend` still fires at that duration, so a script waiting on one
+// is not left waiting.
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -42,42 +39,12 @@ a {
   }
 }
 
-// EVERY HEADING ON EVERY SITE GETS THE PUNCHED-TAPE LETTERING FROM HERE, not
-// from a list of named components. Helen, 2026-08-12: "Did your heading
-// lettering change touch all headings on the whole site? That is what I want."
-// It hadn't -- the first pass fixed the six or seven elements that already
-// carried the effect and left the ones that had never opted in, which is how it
-// drifted apart in the first place. A heading that hasn't been styled yet is
-// exactly the heading most likely to get missed again.
-//
-// The stroke is $emboss-stroke, an em, so it is 1.4% of whatever size the
-// heading turns out to be WITHOUT this rule knowing the size -- which it can't,
-// since h1/h2/h3 here take the browser's own 2em/1.5em/1.17em unless a
-// component overrides them. See shared/_rule.scss; that self-scaling is the
-// entire reason this rule can exist at all.
-//
-// The offset stays the default 1px, which is right up to about 1.2rem. The two
-// elements big enough to need $emboss-offset-large (the recipe title and the
-// recipe section headings) already pass it explicitly, and they'd have to
-// override this rule anyway.
-//
-// NAMES ITS TIER, 2026-09-02, RATHER THAN HARDCODING A COLOUR. This used to
-// read `-webkit-text-stroke: var(--emboss-stroke-w) $color-text;` directly --
-// $color-text rather than food's softer $color-label-stroke, because only the
-// nine palette-contract variables may be named here (MANUAL §2.3), and the
-// comment on that line said plainly that "in practice this colour is only ever
-// seen on a heading nobody has styled" and flagged a KNOWN GAP: such a heading
-// inside `.on-dark` would get a near-black stroke on a dark ground, because
-// the colour was a literal Sass value rather than something a context class
-// could reach.
-//
-// @include lettering(heading) closes that gap as a side effect of closing a
-// bigger one -- every heading this rule reaches now gets the SAME tiered
-// stroke and shadow every explicitly-styled heading gets (see
-// shared/_rule.scss for the tier table), through custom properties a site or
-// a future dark section can re-point, rather than a hardcoded fallback colour
-// nobody chose. Any heading that lands here unstyled is treated as a heading,
-// full stop -- which is what this rule has always tried to guarantee.
+// Every heading on both sites gets the punched-tape lettering from here,
+// not from a list of named components, so a heading nobody has styled is
+// still treated as a heading (Helen's ruling). It names its tier and no
+// colour: the stroke is an em and the colours are custom properties a site
+// re-points (shared/_rule.scss), so this rule needs to know neither the
+// heading's size nor its site.
 h1, h2, h3 {
   font-family: $font-headings;
   font-weight: 700;
@@ -92,13 +59,11 @@ body, button {
   letter-spacing: 0.01em;
 }
 
-// No global button background here -- each button component sets its own.
-// Browser default (transparent) is the correct starting point for the
-// filter-clear button.
+// No global button background here: each button component sets its own.
 
 // --- Highlighter utility -----------------------------------------------------
-// Apply to any element that needs a heading_with_highlighter SVG behind it.
-// The SVG inside is position:absolute so this provides the positioning context.
+// The positioning context for a highlighter SVG placed behind an element's
+// text; the SVG inside is `position: absolute`.
 .highlighted {
   position: relative;
   display: inline-flex;
@@ -107,13 +72,10 @@ body, button {
                      // clipping is not needed and breaks title blob on recipe page.
 }
 // --- Visually hidden ---------------------------------------------------------
-// Present to assistive tech and search engines, absent from the page.
-// Used for the index page's h1: the logo is the visible title, but a page with
-// no heading of any level is both an accessibility failure and nothing for a
-// search engine to anchor to.
-//
-// Not `display: none` and not `visibility: hidden` — both remove the element
-// from the accessibility tree, which is the opposite of the intent.
+// Present to assistive tech and search engines, absent from the page: the
+// index pages' h1, where the logo is the visible title. Not `display: none`
+// or `visibility: hidden`, which both remove the element from the
+// accessibility tree.
 .visually-hidden {
   position: absolute;
   width: 1px;

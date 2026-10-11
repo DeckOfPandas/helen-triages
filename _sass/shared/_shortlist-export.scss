@@ -1,51 +1,23 @@
-// =============================================================================
-// THE SHORTLIST EXPORT PANEL — GitHub issue #849. BOTH SITES.
-// =============================================================================
-// Helen, 2026-09-08: "allow me to export my food or cocktail shortlist as a
-// YAML/JSON dump -- can be just a text area at the bottom of the page."
+// THE SHORTLIST EXPORT PANEL (#849), on both indexes.
 //
-// WHY THIS IS IN shared/ AND THE SHORTLIST ITSELF IS NOT. `food/_shortlist.scss`
-// and `cocktails/_shortlist.scss` are forked on purpose: a shortlist control on
-// a recipe ROW and one in a drink CARD's corner are different objects in
-// different layouts, and #546 decided that. This panel is not -- it is one
-// disclosure, one hint and one textarea, identical on both indexes, emitted by
-// one script from one block of markup that is copied verbatim between the two
-// index templates. Forking it would be three declarations duplicated for no
-// difference, which is exactly what MANUAL §2.5 means by "shared" being a claim
-// about markup, cascade AND assets together.
+// In shared/ although each site's _shortlist.scss is forked on purpose: the
+// shortlist controls differ by layout, but this panel is one block of markup
+// on both index templates, driven by one script (MANUAL §2.5).
 //
-// WHICH VARIABLES IT MAY USE, and this was checked rather than assumed --
-// MANUAL §12: "you will assume you know how many stylesheets import shared/.
-// Grep." The spacing scale IS in shared/_tokens.scss. THE COLOURS AND THE
-// FACES ARE NOT: `$color-text`, `$color-border`, `$color-surface`,
-// `$color-clear-text` and `$font-label` are declared separately in
-// `food/_palette.scss` and `cocktails/_palette.scss`, under the same names with
-// the same roles -- which is the palette contract of §2.3, and is exactly what
-// lets a shared partial name them. Both stylesheets import their own palette
-// FIRST (line 11 of each), so the values are in scope by the time this is read.
-//
-// THERE IS NO `$font-mono`, and reaching for one is the obvious mistake here.
-// `$font-label` is IBM Plex Mono on both sites and is the monospace face this
-// repo actually has.
-//
-// `assets/css/longform-demo.scss` imports neither palette in full and does NOT
-// import this -- it takes only tokens and rule, which is why adding this to the
-// two site stylesheets is the whole change.
-// =============================================================================
+// Beyond shared/_tokens.scss it names palette-contract colours and
+// $font-label, which both palettes declare under that name. There is no
+// `$font-mono`: $font-label is the monospace face this repo has.
 
-// SITS UNDER THE SHOPPING LIST AND READS AS A FOOTNOTE TO IT. The same
-// top-border-and-space idiom `.shopping-list` uses, one step quieter: this is a
-// hatch, not part of choosing what to cook or drink.
+// Sits under the shopping list as a footnote to it, with the same
+// top-border-and-space idiom, one step quieter.
 .shortlist-export {
   margin: $space-xl 0 0;
   padding-top: $space-md;
   border-top: 1px solid $color-border;
 }
 
-// THE DISCLOSURE'S OWN WORD, in the label face so it reads as chrome rather
-// than as content. `cursor: pointer` because a summary does not get one on its
-// own in every browser, and a control that does not look clickable is one
-// Helen will not find at the bottom of a long index.
+// The disclosure's own word, in the label face so it reads as chrome.
+// `cursor: pointer` because a summary does not get one in every browser.
 .shortlist-export > summary {
   font-family: $font-label;
   font-size: 0.9rem;
@@ -53,24 +25,15 @@
   cursor: pointer;
 }
 
-// `.shortlist-export-jump` -- the "export list as JSON →" link beside the
-// `shortlisted (n)` button -- lived here from 2026-09-09 to 2026-09-10 and is
-// gone with the link; cocktails/index.html has the note.
-
 .shortlist-export-hint {
   margin: $space-sm 0 0;
   font-size: 0.9rem;
   color: $color-clear-text;
 }
 
-// THE JSON BOX, THE PASTE BOX, RESTORE AND CLEAR ARE GONE -- #1100, Helen:
-// "Remove the rest of the apparatus: no JSON export or import, no clear." The
-// panel is the share link alone; git has the rules if they are ever wanted.
-
-// THE SHARE LINK -- #1093. Monospace on the surface ground, as the JSON box it
-// sat above was drawn: something this browser wrote for you to take away.
-// Readonly but selectable, because select-all is how it is copied on a phone
-// with no clipboard API; shortlist-export.js selects it whole on focus.
+// The share link (#1093), which is all the panel holds (#1100). Readonly but
+// selectable, because select-all is how it is copied on a phone with no
+// clipboard API; shortlist-export.js selects it whole on focus.
 .shortlist-share-link {
   display: block;
   width: 100%;
@@ -86,11 +49,9 @@
   user-select: text;
 }
 
-// THE NOTE OVER A SHARED LIST -- #1093. The hint's voice, because it says
-// where the list came from rather than being part of it, and "keep these" is
-// the panel's own button so a save looks like the other saves.
-// Under the count row on both indexes, taking that row's own gap above it and
-// giving the same gap to the list below.
+// The note over a list opened from a share link (#1093), in the hint's
+// voice. Under the count row on both indexes, taking that row's gap above it
+// and giving the same gap to the list below.
 .shared-shortlist {
   margin: 0 0 $space-lg;
   font-size: 0.9rem;
@@ -99,9 +60,9 @@
   .btn-shared-keep { margin-left: $space-sm; }
 }
 
-// SHIPS `hidden` AND shortlist-export.js REVEALS IT, so a browser where the
-// script did not run, or has no clipboard, never shows a copy button that does
-// nothing. Same rule as `.btn-print` and `.btn-shortlist`.
+// Ships `hidden` and shortlist-export.js reveals it, so a browser where the
+// script did not run, or has no clipboard, never shows a copy button that
+// does nothing.
 .btn-shortlist-copy {
   margin-top: $space-sm;
 }

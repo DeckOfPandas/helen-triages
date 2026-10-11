@@ -1,24 +1,15 @@
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: NOTES, BODY CONTENT, GROUP HEADINGS
 // =============================================================================
-// Split out of the old food/_recipe.scss (2026-08-10). Uses %heading-base and
-// the box-tint variables, both defined in food/_recipe-header.scss -- must
-// stay imported after it.
+// Uses %heading-base and the box-tint variables, both defined in
+// food/_recipe-header.scss, so it must stay imported after that file.
 
 // --- Notes (plural: the grid) -------------------------------------------------
-// Two per row rather than a stack — a page with 2–3 notes read as a set of
-// thin horizontal stripes, one under the other. Exactly 2 columns (not an
-// auto-fit that could quietly become 3 on a wide screen) so it stays
-// deliberately "a couple of things side by side," not "however many fit."
-// The common case is a single note (20 of the 37 recipes that have any) —
-// .notes--single drops to one column so it isn't stranded at half width.
+// Exactly two columns, not auto-fit, so a wide screen cannot make it three.
+// A single note takes .notes--single and the full width.
 //
-// align-items: start, not stretch: a short note next to a tall one keeps its
-// own height rather than being stretched to match, leaving a gap beneath it
-// instead of an oddly empty box. Two different-sized things sitting side by
-// side reads more like items placed on a corkboard than a layout bug — closer
-// to this site's general hand-placed, imperfect character than forcing every
-// box to match its neighbour.
+// align-items: start, so a short note beside a tall one keeps its own height
+// rather than stretching into an empty box.
 .notes {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -31,18 +22,8 @@
   }
 }
 
-// TWO PER ROW IS A CLAIM ABOUT A WIDE SCREEN, and it stops being true on a
-// phone. Found by test_a_multi_track_row_can_become_one (issue #468) rather
-// than by anyone looking: at a 360px viewport, two 1fr tracks and a
-// $spacing-block-gap leave each note about 142px, which is roughly eighteen
-// characters of prose per line inside a box that also has its own padding.
-//
-// The reasoning above survives intact -- a set of thin horizontal stripes is
-// what stacking looks like when there is room for two abreast, and there is
-// not. .notes--single already drops to one column for the commonest case; this
-// is the same drop for the same reason, decided by width instead of by count.
-//
-// 600px is the site's existing breakpoint, not a new one.
+// One column on a phone, where two tracks leave each note a few words wide.
+// test_a_multi_track_row_can_become_one requires it (#468).
 @media (max-width: 600px) {
   .notes {
     grid-template-columns: 1fr;
@@ -50,11 +31,7 @@
 }
 
 // --- Note (singular: one box) -------------------------------------------------
-// Was a flat neutral mix (mix($color-border, $color-surface, 35%)), left that
-// way pending a proper answer — see DEV_JOBS_v24.md §1.8. Now shares the
-// metadata grid's own tint ($color-box-tint / $box-tint-opacity, both defined
-// above), so the two boxes read as the same device rather than the note being
-// an unrelated fainter grey next to the meta grid's violet.
+// Shares the metadata grid's tint, so the two boxes read as the same device.
 .note {
   position: relative;
   // font-family, font-weight, color, font-size, line-height inherited from article.recipe
@@ -72,34 +49,14 @@
   }
 }
 
-// Was a CSS-generated ::after reading the same static "note" on every box —
-// couldn't say anything about what the note actually is, and started looking
-// odd once boxes sit two per row under one "NOTES" heading (every tab in the
-// row saying "note" again). Now a real element carrying page data
-// (notes: [{label, text}] in front matter) instead of a fixed string.
+// A real element carrying page data (notes: [{label, text}] in front matter),
+// not generated content.
 .note-label {
   position: absolute;
   top: -0.65rem;
   left: 1.1rem;
-  // BACK IN COURIER PRIME, 2026-09-02. This spent since 2026-08-24 in
-  // $font-label -- Helen: "our styling for the notes box labels is a little
-  // unloved... I'm wondering about trying our new Plex Mono there" -- on a
-  // functional argument: at 0.62rem UPPERCASE, about as small as type gets on
-  // this site, Plex Mono's larger x-height and more open counters read better
-  // than Courier Prime, which closes up at that size.
-  //
-  // THE RULE THAT REPLACED IT IS NARROWER AND THIS FAILS IT. Plex Mono is for
-  // numbers you act on, and a note label ("TIP", "MAKE AHEAD") is a word, not
-  // a figure -- see food/_palette.scss's $font-label comment for the rule and
-  // MANUAL §13.10.1 for the full history. It was the last label-shaped
-  // consumer standing once the other four (category labels, filter tags,
-  // badges, the recipe-title link) had already come back to Courier; this one
-  // survived only because "recipe page, hands full" and "a number" happened to
-  // agree for every OTHER consumer at the time the rule was written.
-  //
-  // NO SYNTHESIS AT THIS WEIGHT: Courier Prime ships a real 700 face (see
-  // shared/_fonts.scss), so this doesn't fall back to a browser-faked bold the
-  // way an in-between weight would.
+  // Courier, not $font-label: a note label is a word, not a number you act
+  // on (the rule is at $font-label in _palette.scss; MANUAL §13.10.1).
   font-family: $font-headings;
   font-size: 0.62rem;
   font-weight: 700;
@@ -111,78 +68,43 @@
 }
 
 // --- Body Content (long-form prose via {{ content }}) -----------------------
-// A recipe's Markdown body below its front matter -- rare (one file as of
-// 2026-08-02, dark-chocolate-ganache.md, see MANUAL.md §4.1) but real.
+// A recipe's Markdown body below its front matter, and the wrapper the
+// reference and about pages reuse. MANUAL §4.1.
 //
-// Section headings in here are PEERS of INGREDIENTS/METHOD/NOTES, per
-// Helen's call 2026-08-02: "I can imagine TIPS and TROUBLESHOOTING being
-// peer headings with INGREDIENTS etc. I think that would cause the least
-// jar." Plain `## Heading` markdown can't do this -- kramdown gives it no
-// class and no nested span, and .recipe-section-heading's mark needs both
-// (the span is what overlapping-rule-double hugs). Write raw HTML directly
-// in the body instead, blank-line-separated so kramdown still parses the
-// surrounding markdown as markdown:
+// Section headings in here are peers of INGREDIENTS/METHOD/NOTES. A plain
+// `## Heading` cannot be one: kramdown gives it no class and no nested span,
+// and the mark needs both. Write raw HTML in the body, blank-line-separated:
 //
 //   <h2 class="recipe-section-heading"><span class="section-heading-text">Tips</span></h2>
 //
-// A subtitle directly under a peer heading (dark-chocolate-ganache's own
-// "a.k.a. ganache is the worst", split out of the heading text itself) is a
-// <p class="recipe-section-subtitle"> straight after it, same approach.
-//
-// A bare `## Heading` still gets a reasonable fallback below rather than
-// unstyled browser default -- but it will not match the page's other
-// section headings, which is the entire distinction peer status is for.
+// A subtitle under a peer heading is a <p class="recipe-section-subtitle">
+// straight after it.
 article.recipe .recipe-body-content {
   margin-top: 0;
-  // No padding-top: a peer heading brings its own $spacing-section-top
-  // (4.5rem) exactly like INGREDIENTS/METHOD/NOTES do, unconditionally, not
-  // just on first-child -- the same rhythm the rest of the page already
-  // uses between sections, not a bespoke gap invented for this one area.
-  // Adding a second gap here would double up.
+  // No padding-top: a peer heading brings its own $spacing-section-top, and a
+  // second gap here would double it.
 
-  // Fallback for a heading that didn't opt into peer status via the raw-HTML
-  // pattern above. :not(.recipe-section-heading) so this never fights that
-  // class on specificity when both are present on the same element.
+  // Fallback for a bare `## Heading`. :not(.recipe-section-heading) so it
+  // never fights that class on specificity.
   h2:not(.recipe-section-heading) {
     @extend %heading-base;
     font-size: 1rem;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    // Heading tier, 2026-09-02: 1rem clears the tier line. See LETTERING.md.
     @include lettering(heading);
     margin: $spacing-section-gap 0 $space-md 0;
   }
 
-  // The "a.k.a." subtitle pattern -- same voice as .recipe-tagline (italic,
-  // lightened text colour), smaller, sitting under a peer heading instead of
-  // under the page title.
-  // Spacing modelled directly on .recipe-title/.recipe-tagline's own
-  // relationship (1.25rem above the tagline, 3rem below it, from
-  // .recipe-title and .recipe-meta's margins respectively) -- Helen: "so it
-  // reads like a tagline, not the first line of content."
+  // Same voice as .recipe-tagline, under a peer heading.
   //
-  // Above: adjacent margins collapse to their max, so a plain margin-top
-  // here couldn't shrink the gap below .recipe-section-heading's own 2rem
-  // bottom margin -- only a margin big enough in the other direction can.
-  // -0.75rem collapsed against that 2rem gives exactly 1.25rem (positive
-  // and negative margins sum when they collapse, they don't take the max of
-  // one positive and one negative).
+  // Above: the negative margin is the only way to shrink the gap, because it
+  // collapses against .recipe-section-heading's 2rem bottom margin and a
+  // positive and a negative margin sum. 2rem - 0.75rem leaves 1.25rem, the
+  // title-to-tagline distance.
   //
-  // Below: $space-xl, and it has now been wrong in BOTH directions, which is
-  // why the middle value is written down rather than re-derived next time.
-  // $space-lg (1rem) was too tight -- the subtitle read as the first line of
-  // the paragraph that followed. $spacing-section-gap (3rem) was reached for
-  // because it matches the real tagline's gap to .recipe-meta exactly, and
-  // overshot: issue #339, Helen -- "I think it's retaining the same gap as
-  // under the rest of the page's headings, but it isn't a heading so this gap
-  // feels like a yawning chasm."
-  //
-  // The tagline comparison was the flaw in that reasoning. A page tagline sits
-  // under the TITLE with the whole page below it, so 3rem reads as the end of
-  // a masthead. This one sits under a section heading with that section's own
-  // first paragraph directly beneath, and the same measurement reads as a
-  // missing paragraph. 1.5rem is clearly more than the line gap above it and
-  // clearly less than a section break.
+  // Below: $space-xl (#339). $space-lg reads as the first line of the
+  // paragraph that follows; the tagline's own 3rem reads as a missing
+  // paragraph.
   .recipe-section-subtitle {
     font-size: 0.9rem;
     font-style: italic;
@@ -190,27 +112,9 @@ article.recipe .recipe-body-content {
     margin: -0.75rem 0 $space-xl 0;
   }
 
-  // The quiet sub-level: any h3 a reference page writes that isn't the about
-  // page's FAQ. It never carried the punched-tape lettering at all until the
-  // global h1/h2/h3 rule in shared/_base.scss started handing it out
-  // unconditionally (2026-08-12) -- one of the headings the first calibration
-  // pass missed precisely because it had never opted in.
-  //
-  // LABEL TIER, 2026-09-02: 0.78rem is under the 1rem line, so stroke only --
-  // which is what this rule already was (no shadow was ever set here; it
-  // predates the tiers and happened to already be the shape @include
-  // lettering(label) draws). See LETTERING.md.
-  //
-  // THE ABOUT PAGE'S FAQ QUESTIONS USED TO GET THIS RULE'S COLOUR TOO --
-  // .about-faq-item h3 is inside .recipe-body-content (about.html shares the
-  // wrapper deliberately, see that file's own comment), so it fell through to
-  // this selector and inherited `lighten($color-clear-text, 10%)`, a fair bit
-  // greyer than SERVES/PREP/COOK. Helen, 2026-09-02: "FAQ headings need to be
-  // darker, possibly simply matching SERVES / PREP / COOK even though they're
-  // on different pages." food/_about.scss now gives `.about-faq-item h3` its
-  // own override that does exactly that (full $color-text, not this grey), so
-  // this rule's own colour is now specific to a BARE reference-page h3 -- one
-  // that opted into nothing beyond landing inside .recipe-body-content.
+  // The quiet sub-level: a bare h3 on a reference page. The about page's FAQ
+  // questions also match this selector; food/_about.scss overrides their
+  // colour to full $color-text.
   h3 {
     @extend %heading-base;
     font-size: 0.78rem;
@@ -221,64 +125,21 @@ article.recipe .recipe-body-content {
   }
 
   // --- Reading width -----------------------------------------------------
-  // THIS REVERSES A DELIBERATE EARLIER CALL, knowingly. Body content used to
-  // set max-width: none to match Method rather than Notes (MANUAL.md
-  // §4.1, Helen's decision 2026-08-02) -- but that call was made when the only
-  // question was which of two existing caps to copy, and "no cap" and "65ch"
-  // look identical on Method, where a step is a short imperative that rarely
-  // reaches the right edge anyway. They do not look identical here: a real
-  // paragraph runs the full 900px column, which at $font-size-body-sm is ~105
-  // characters, against the 60-75 every other prose element on the site
-  // respects.
-  //
-  // 68ch rather than reusing Notes' 65ch: this is the section you sit and READ
-  // rather than glance at, so it takes a slightly longer line -- and a visible
-  // difference reads as a decision where 2ch would read as a failed attempt to
-  // match.
+  // Uncapped, a paragraph runs the full column, far past a readable measure.
+  // 68ch rather than Notes' 65ch: a visible difference reads as a decision
+  // where 2ch would read as a failed attempt to match.
   p {
     // font-family, font-weight, color, font-size, line-height inherited from article.recipe
     max-width: 68ch;
     margin: 0 0 $space-lg 0;
   }
 
-  // --- NO LEDE. Prose is one size, end to end. -----------------------------
-  // There WAS one here for a day: the first paragraph under a longform heading,
-  // set one step up (1.06rem/62ch), as half the answer to "the whole thing just
-  // doesn't scream oh my god read me now" (issue #185). The idea was that the
-  // section headings shout and then everything beneath them was flat grey, so
-  // the heading had nowhere to hand off to.
-  //
-  // It didn't survive being looked at. Helen: "I think this looks uneven. I'd
-  // prefer the size to be the same throughout." The reasoning was circular, and
-  // the screenshots showed why: a lede works when it is visibly a SHORT
-  // standalone opener, and these run three and four lines -- near enough the
-  // same length as the paragraph after them. Nothing marked them as the opener
-  // except the size change itself, so it read as inconsistency rather than as
-  // hierarchy.
-  //
-  // DON'T RE-ADD IT, and don't reach for a smaller version of the same idea
-  // either. Everything a lede was there to do is being done by devices that
-  // don't touch the prose: the section heading's own mark, the Tips labels, and
-  // the violet rule on each failure name. The prose underneath is one size, one
-  // weight and one colour, deliberately -- it is the thing being read, not a
-  // thing being navigated by (_palette.scss's colour budget makes the same
-  // split for colour, and it applies to size just as well).
+  // No lede. Prose is one size, one weight and one colour end to end (#185,
+  // Helen's ruling); do not add a larger first paragraph. The hierarchy is
+  // carried by the heading marks and labels, not by the prose.
 
   // --- Bulleted lists, the plain case --------------------------------------
-  // A light em dash rather than the browser default disc. Issue #185, Helen:
-  // "I find the bullet points choppy" -- a round disc reads as a checklist-app
-  // default dropped into a page that otherwise sets every rule itself, and the
-  // dash matches this site's own prose voice (em dashes throughout, house
-  // style §5) instead of introducing a shape nothing else here uses.
-  //
-  // The dash alone did NOT fix "choppy", and it was never going to: what made
-  // Tips choppy is that each item welds two different things into one sentence
-  // -- a rule ("use a dry bowl") and the reason for it -- read at the same
-  // size, weight and indent, so the eye gets rule, reason, rule, reason. The
-  // marker was incidental. See the labelled-list rule below, which is the
-  // actual answer; this base case is what's left over for a plain list (the
-  // contents lists on food/reference/*, which open with a link rather than a
-  // bold lead-in).
+  // A light em dash rather than the browser's disc (#185).
   ul {
     // font-family, font-weight, color, font-size, line-height inherited from article.recipe
     padding-left: 0;
@@ -300,42 +161,17 @@ article.recipe .recipe-body-content {
   }
 
   // --- Labelled lists (Tips) -----------------------------------------------
-  // A top-level list whose items each open with a bold lead-in. Both current
-  // longform recipes use exactly this shape for Tips, and the fix for the
-  // choppiness above is to stop pretending it's a bullet list at all: split the
-  // rule from the reason, promote the rule to a LABEL in the page's own label
-  // voice, and drop the marker entirely. A labelled block doesn't need a
-  // marker -- the label is the marker.
+  // A top-level list whose items each open with a bold lead-in. The lead-in
+  // becomes a Courier label on its own line and the marker goes: the label is
+  // the marker. Not uppercase, because these run to a sentence. Same size as
+  // the prose under it.
   //
-  // Courier with the punched-tape lettering, i.e. what every heading, group
-  // heading and meta label on this site already wears. NOT uppercase, unlike
-  // .recipe-group-heading and the meta labels: those are one or two words,
-  // while these run to eight ("Whisk manually with a balloon whisk for better
-  // control of texture"), and a sentence of uppercase Courier at that length
-  // stops reading as a label and starts reading as shouting. The face does the
-  // work; the case doesn't have to.
+  // :has() rather than a class, because kramdown emits a bare <ul>. It must be
+  // `> ul >`, a direct child, so it cannot reach the nested causes inside a
+  // diagnostic block below, which open with a bold lead-in too.
   //
-  // Size is $font-size-body-sm -- the SAME size as the prose under it, not a
-  // step up. Helen, on the first pass: "is the mixture of two body font sizes
-  // intentional? It feels uneven." It wasn't; five sizes had accreted between
-  // 0.88 and 1.06rem, several within 4% of each other -- too close to read as
-  // deliberate steps, too far apart to read as the same size. That collapsed to
-  // two, and then, once the lede went, to ONE for everything you read: every
-  // paragraph, every Tips label and every symptom line is $font-size-body-sm.
-  // The only other size left in longform is the failure name, which is a
-  // heading wearing a rule, not prose. Everything else is
-  // separated by face, case, colour, italic or the mark, which is this page's
-  // own logic already (see $color-step-number's comment: "face, size, weight
-  // and stroke all differ, which is more than enough").
-  //
-  // :has() rather than a class, because kramdown emits a bare <ul> and can't be
-  // told otherwise. It also has to be `> ul >` -- a direct child -- so it can't
-  // reach the nested causes inside a diagnostic block below, which open with a
-  // bold lead-in too but must NOT become labels.
-  //
-  // AUTHORING CONVENTION: the lead-in must carry its own closing punctuation
-  // INSIDE the bold -- `**Use clarified butter.**` not `**Use clarified
-  // butter**.` -- or the stray full stop starts the next line on its own.
+  // Authoring: the lead-in carries its closing punctuation inside the bold
+  // (`**Use clarified butter.**`), or the stray full stop starts the next line.
   > ul > li:has(> strong:first-child) {
     padding-left: 0;
     margin-bottom: $space-xl;
@@ -350,15 +186,6 @@ article.recipe .recipe-body-content {
       letter-spacing: 0.02em;
       line-height: 1.35;
       color: $color-text;
-      // The element the site's emboss ratios were calibrated from, once Helen
-      // noticed it read as more raised than the page's own headings and asked
-      // whether she was imagining it. Now expressed through the function like
-      // everything else -- $emboss-stroke on 0.92rem is 0.206px, which is the
-      // 0.2px this was hand-set to.
-      //
-      // LABEL TIER, 2026-09-02: $font-size-body-sm is 0.92rem, under the 1rem
-      // line, so stroke only now -- this element loses the shadow copy it
-      // used to carry through punched(raised). See LETTERING.md.
       @include lettering(label);
       margin-bottom: $space-xs;
       // Shorter than the prose it labels, so a long label wraps before the
@@ -367,74 +194,34 @@ article.recipe .recipe-body-content {
     }
   }
 
-  // --- Diagnostic blocks (a numbered list's <li>s, each with its own
-  // nested <ul> of causes) ------------------------------------------------
-  // Issue #185, Helen: "the numbering is definitely not working for me...
-  // the whole thing just doesn't scream oh my god read me now." The
-  // previous version gave these Method's own step-numeral treatment (see
-  // the commit that added it) -- visually correct in isolation, but wrong
-  // for what this content actually is: Method's numbers promise "step 1,
-  // then step 2," a sequence to follow in order, and a set of independent
-  // failure modes (Splitting, Under-melting, Seizing... ganache and
-  // hollandaise both use this exact shape) isn't a sequence at all. Borrowing
-  // that visual language implied an order that doesn't exist. The count ("here
-  // are four ways") lives in the sentence above the list, which is where it
-  // belongs; the list itself never needed to carry it.
+  // --- Diagnostic blocks ---------------------------------------------------
+  // A numbered list's <li>s, each a failure name, a symptom and a nested <ul>
+  // of causes. Unnumbered on purpose: these are independent failure modes,
+  // not a sequence (#185). Not tinted cards either: a tinted box on this page
+  // means "aside". The failure name takes the single violet rule, one tier
+  // below a section heading (overlapping-rule-single, shared/_rule.scss).
   //
-  // That was one of two problems. The second, and the bigger one, survived the
-  // numbers being removed:
-  // each item packs three levels -- name, symptom, causes -- and gave them
-  // bold, italic and a bullet. Three inline tweaks, all at 0.92rem, all at the
-  // same indent. Nothing was a landmark, so nothing screamed.
-  //
-  // A round of tinted CARDS was tried for this and rejected: a tinted box on
-  // this page already means "aside" (.note, and the metadata grid's own wash),
-  // so four of them said "here are four asides" about the most important
-  // content in the section -- and a fill plus a grey left border adds visual
-  // weight without adding any hierarchy INSIDE the block, which is where the
-  // flatness actually lived. It also cut against the grain of the site, where
-  // every device is a MARK (rule, punched tape, highlighter, annotation arrow)
-  // and there is no card anywhere except that one aside.
-  //
-  // What's here instead: the failure name takes the blocky mark, one tier below
-  // a section heading -- title (magenta + violet), section heading (green +
-  // violet), failure name (violet alone). One device the reader already
-  // recognises, at three sizes, spending no new colour. See
-  // overlapping-rule-single in food/_rule.scss.
-  //
-  // Authoring convention for any future list of this shape: kramdown must emit
-  // `<strong>Name</strong> <em>symptom</em>` as the first two inline children
-  // of the <li>, then a nested `<ul>` of causes -- see chocolate-ganache.md or
-  // henrys-quick-bulletproof-hollandaise-sauce.md for the exact markdown to
-  // copy. NO COLON after the name: it used to be `**Splitting:**` and the colon
-  // sat on top of the rule.
+  // Authoring: kramdown must emit `<strong>Name</strong> <em>symptom</em>` as
+  // the first two inline children of the <li>, then the nested `<ul>`. No
+  // colon after the name: it sits on top of the rule.
   ol {
     list-style: none;
     padding-left: 0;
     display: flex;
     flex-direction: column;
-    // $spacing-block-gap, not $space-lg: bigger than the gap between a name and
-    // its own causes by enough to read as a level of hierarchy rather than as
-    // 15% more air, which is the whole principle the named spacing scale is
-    // built on (MANUAL §13.3).
+    // Clearly bigger than the gap between a name and its own causes, so it
+    // reads as a level of hierarchy.
     gap: $spacing-block-gap;
 
     > li {
       max-width: 68ch;
 
-      // The failure name. Stays an INLINE <strong> -- that is what makes the
-      // mark work at all, since the background has to be cloned per line box
-      // (see food/_rule.scss for why a background and not an underline). The
-      // line break beneath it comes from the symptom being display: block, not
-      // from this being a block itself.
+      // The failure name. It must stay an inline <strong>: the mark is a
+      // background cloned per line box. The line break beneath it comes from
+      // the symptom being display: block.
       //
-      // 1.06rem, and the ONLY size in longform that isn't $font-size-body-sm.
-      // It survives the "one size throughout" rule the prose now follows
-      // because it isn't prose: uppercase Courier wearing a violet rule reads
-      // as a heading whatever size it is set at, so if this ever looks like
-      // part of the unevenness rather than apart from it, drop it to
-      // $font-size-body-sm and nothing else has to change -- the mark, the case
-      // and the face carry the whole distinction on their own.
+      // The only size in longform that is not $font-size-body-sm. It is a
+      // heading, not prose.
       > strong:first-child {
         font-family: $font-headings;
         font-weight: 700;
@@ -442,24 +229,13 @@ article.recipe .recipe-body-content {
         letter-spacing: 0.06em;
         text-transform: uppercase;
         color: $color-text;
-        // Heading tier, 2026-09-02: 1.06rem clears the 1rem line -- the one
-        // size in longform that isn't $font-size-body-sm (see the note above)
-        // is also the one that reads as a heading under the tier table, which
-        // agrees with how it was already being used: uppercase, a violet
-        // rule, one tier below a section heading. See LETTERING.md.
         @include lettering(heading);
         @include overlapping-rule-single($color-section-underline-2);
       }
 
-      // The symptom -- same voice as .recipe-tagline/.recipe-section-subtitle
-      // (italic, lightened text colour), reused rather than a third italic
-      // invented for the job, since too many type voices is half of what went
-      // wrong here in the first place. No font-size: it inherits the article's
-      // own, which is the point.
-      //
-      // 0.7rem above rather than a token: the mark hangs below the lettering
-      // (it runs to 1.18em, close to the bottom of the line box), so this gap
-      // is measured from the RULE, not from the letters.
+      // The symptom, in the tagline's voice. No font-size: it inherits the
+      // article's. The gap above is measured from the rule, which hangs below
+      // the lettering, not from the letters.
       > em:first-of-type {
         display: block;
         font-style: italic;
@@ -467,9 +243,7 @@ article.recipe .recipe-body-content {
         margin: 0.7rem 0 $space-lg 0;
       }
 
-      // The causes. Violet dash rather than the plain list's grey one, tying
-      // them to the marked name above them -- violet's existing job as the
-      // page's quiet structural colour, not a new one.
+      // The causes. A violet dash ties them to the marked name above.
       ul {
         margin: 0;
 
@@ -486,28 +260,12 @@ article.recipe .recipe-body-content {
     }
   }
 
-  // 600 rather than the browser default 700 -- Helen: "the font still seems too
-  // heavy." The weight was never really the problem, though; the COUNT was.
-  // Bold used to open every Tips item AND every cause, twelve to fifteen runs
-  // in a screenful, which stops being emphasis and becomes texture. Tips'
-  // lead-ins are Courier labels now and the failure names are marks, so bold is
-  // left with exactly one job on this page -- the cause lead-ins -- and can go
-  // back to meaning something.
-  //
-  // No :not() exclusion needed any more: both of those rules out-specify this
-  // one on their own (three classes and two, against this rule's one).
+  // 600 rather than the browser's 700. The Tips labels and failure names set
+  // their own weight in more specific rules above, so no :not() is needed.
   strong { font-weight: 600; }
 
-  // No link colour/underline override here any more -- article.recipe a
-  // (above) covers it now, same magenta treatment as every other
-  // cross-recipe link on the page. One link style, not two.
-
   // --- Tables ------------------------------------------------------------
-  // No table existed anywhere on the site before the reference pages
-  // (food/reference/*.html, 2026-08-11) -- MVP styling only: readable rows
-  // and a distinct header, not a designed component. Wrapped in a
-  // horizontally-scrolling div in the pages themselves, since these tables
-  // are wide and max-width: none (above) means they aren't otherwise capped.
+  // Minimal styling: readable rows and a distinct header.
   table {
     width: 100%;
     border-collapse: collapse;
@@ -532,8 +290,8 @@ article.recipe .recipe-body-content {
     white-space: nowrap;
   }
 
-  // Wraps each table individually (not the whole page) so a wide one scrolls
-  // on its own rather than pushing the page itself wider than the viewport.
+  // Wraps one table, so a wide one scrolls on its own rather than widening
+  // the page.
   .table-scroll {
     overflow-x: auto;
     margin: 0 0 $space-lg 0;
@@ -544,13 +302,8 @@ article.recipe .recipe-body-content {
 
 // --- Group Headings ----------------------------------------------------------
 // "For the dressing:" in the ingredients, and the phase names in a grouped
-// method. A bare h3 — it carried two nested spans until 2026-07-31, purely so
-// heading-underline.js could measure the text width and hang a scribbled SVG
-// underneath it. The scribble was cut and the content below the heading indents
-// by $space-xxl instead (see the group indent block in food/_recipe-ingredients-
-// method.scss): the underline marked where a group STARTED, the indent shows
-// how far it EXTENDS, which is what you actually need when checking you have
-// everything for one component.
+// method. A bare h3; the content below it indents (the group indent block in
+// food/_recipe-ingredients-method.scss), which shows how far a group extends.
 .recipe-group-heading {
   @extend %heading-base;
   display: block;
@@ -559,11 +312,6 @@ article.recipe .recipe-body-content {
   font-size: 1rem;
   letter-spacing: $letter-spacing-label;
   color: $color-text;
-  // Raised label-tape lettering (MANUAL.md §13.4.1). Stroke was
-  // $stroke-light's flat 0.5px, i.e. 3.1% of this element's own 1rem -- same
-  // swallowing problem the meta labels had, see food/_recipe-header.scss.
-  //
-  // Heading tier, 2026-09-02: 1rem clears the tier line. See LETTERING.md.
   @include lettering(heading);
   line-height: 1.4;
 }

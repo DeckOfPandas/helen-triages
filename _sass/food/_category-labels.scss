@@ -1,175 +1,39 @@
 // ============================================================================
 // FILTER LABELS AND CATEGORIES
 // ============================================================================
-// Category wrappers, labels, and the highlighter backgrounds behind them.
-// Also holds the category label doodles and the blocky underline rule --
-// both decorate the same label this file is already about, and were too
-// small (26 and 31 lines) to earn their own file in the 2026-08-10 split.
-
-// --- Active filter button base -----------------------------------------------
-// All active filter states share these four properties; each rule then adds
-// its colour-specific ones (color, -webkit-text-stroke) on top. Extended
-// from here and from food/_search.scss -- lives in whichever of the two is
-// imported first.
+// The index's filter sections: their wrappers, labels, chosen and hover chip
+// states, the label doodles and the blocky rule under each label.
 //
-// Lives here rather than in shared/_tokens.scss because it reads $color-text
-// and $saturation-badge-bg. A "shared" token that depends on one site's palette
-// is not shared, and this was the only thing in that file that did.
-// THIS PLACEHOLDER MAY NOT DECLARE ANYTHING THAT CHANGES THE BUTTON'S WIDTH.
-// Issue #389, 2026-08-19. Helen: "filter tags to the right of a selected one
-// move to the right -- they should stay in the same position."
+// A chosen chip's shared declarations are @mixin index-chip-chosen in
+// shared/_rule.scss, with the rule that binds every state here: nothing
+// applied only to a chosen chip may change its width (#389).
 //
-// It used to set `font-size: 0.74rem` and `letter-spacing: 0.04em`. Both are
-// layout properties, and neither matched the resting state they replaced, so
-// selecting a tag re-measured it and everything after it on the row slid along.
-//
-// The letter-spacing was the bulk of it: 0.04em on Courier adds that gap after
-// EVERY character including the last (the same trailing-gap fact §13.8's
-// wordmark trap turns on), so the button grew by roughly 0.38px per character
-// -- about 5.7px on `one-handed food`. The font-size drop pulled ~1.3% back the
-// other way, which is why the shift was small enough to live with for a while
-// rather than obvious.
-//
-// IT WAS TWO BUGS, NOT ONE, because two resting bases extended this:
-//   .btn-tag / .btn-star  0.75rem, no letter-spacing
-//   .btn-meta             0.72rem, letter-spacing 0.02em   (retired 2026-09-06)
-// One pair of values could not agree with both. Declaring NEITHER makes each
-// active button inherit its own resting metrics, so both families stop moving
-// -- which is why the fix is a deletion rather than a matching pair of numbers.
-//
-// What is left is safe by inspection: `text-transform` and `font-weight` cannot
-// change the width here. $font-headings is Courier New with a monospace
-// fallback, so every glyph has the same advance whatever its case; and Courier
-// New ships only Regular and Bold as static faces, so 900 resolves to the Bold
-// that 700 already selected (§13.6). The selected state still reads as selected
-// through colour, the .tag-shape fill and $faux-bold-stroke -- none of which
-// occupies space.
-//
-// Before adding a property here, ask whether it can change a box's size. If it
-// can, it belongs on the resting base as well or not at all.
-//
-// `%btn-active-base` STOOD HERE AND IS @mixin index-chip-chosen IN
-// shared/_rule.scss SINCE 2026-10-11. Its last consumer was the chosen HAS
-// TO HAVE chip (_search.scss), and cocktails' chosen HAS TO HAVE chip is that
-// chip now, so the declarations moved to where both can include them. The
-// warning above went with them and still binds.
-
-// --- Filter Label Bases & Background Highlighters ---------------------------------
-// --- Index density ----------------------------------------------------------
-// THE INDEX IS A CONTROL PANEL, NOT A DOCUMENT, and its own two spacing values
-// say so. These are deliberately NOT $spacing-section-top / $space-xxl.
-//
-// Its job is to be taken in at a glance: every filter section visible in one
-// eye pass, so nothing is missed on a first look. That is a DENSITY
-// requirement, and it is the exact opposite of the recipe page's, where a cook
-// mid-task needs to land on one section and space is what isolates it. The same
-// numbers cannot serve both.
-//
-// Matching the recipe page token for token was tried on 2026-08-01 and rejected
-// on sight — it pushed the five sections about 340px apart and you could no
-// longer see them together, which is the one thing this page has to do.
-//
-// Tune density here. Keep the ratio near 2:1 or the structure blurs: the gap
-// BETWEEN sections has to read as clearly larger than the gap WITHIN one.
-// $index-section-gap and $index-label-gap moved to _sass/shared/_tokens.scss on
-// 2026-08-30 -- cocktails' index is the same control panel and was spelling the
-// same two values as $space-xl and $space-md. Same values, imported before this
-// file, so nothing here changes.
+// The index's own spacing tokens, $index-section-gap and $index-label-gap,
+// are in shared/_tokens.scss.
 
 .category {
-  // TYPOGRAPHY MATCHED TO THE RECIPE PAGE'S SECTION HEADINGS, ONE STEP DOWN.
-  // These carry the same blocky rule, so they have to belong to the same voice
-  // — but they are filter labels on a control panel, five of them stacked in a
-  // screenful, not the three landmarks of a long scrolling page. Same family,
-  // lower level.
-  //
-  // Was 0.78rem / weight 900 / 0.8px stroke, which was neither.
-  //
-  // THE STROKE IS SET BY PROPORTION, NOT BY COPYING THE NUMBER. -webkit-text-stroke
-  // is an absolute px width, so the same token on smaller type is a
-  // proportionally FATTER letterform — which reads as a different, chunkier
-  // font rather than as the same font smaller.
-  //
-  // 0.8px on 0.78rem, for comparison, was 6.4% — three times heavier than the
-  // biggest headings on the site. Nobody chose that; it accumulated under a
-  // brush wash that was absorbing it.
-  //
-  // This file worked that out first, for this element alone, and matched it by
-  // hand to $stroke-light (2.31% here against the section headings' 2.08%).
-  // Both numbers moved on 2026-08-12: the ratio is now $emboss-stroke in
-  // shared/_rule.scss and sits at 1.4%, because the whole scale turned out to
-  // be running heavy enough to swallow the emboss shadow that is the other
-  // half of the effect. Same principle this comment already stated, applied
-  // everywhere instead of in one place.
-  //
-  // SCOPED TO .category ON PURPOSE, AND THE SCOPE IS LOAD-BEARING. It is what
-  // keeps the results heading's "N survivors" count out of this rule -- that
-  // count is the one .category-label in the markup with no .category ancestor
-  // (food/index.html: `<div class="results-heading"><span
-  // class="category-label">`), so it has never picked any of this up, despite
-  // that element's own comment claiming it "reuses the exact filter-heading
-  // treatment".
-  //
-  // Un-scoped on 2026-08-12 on the reading that the mismatch was a bug, and put
-  // back the same day. Helen: "please revert the N survivors change. I liked it
-  // bare -- just actively style it to control it, but leave it looking how it
-  // was." So the scope stays, and the bare look is now DECLARED rather than
-  // left to the absence of a matching rule -- see .results-heading
-  // .category-label directly below.
+  // Scoped to .category on purpose. The scope keeps the results heading's
+  // count out of this rule: it is the one .category-label with no .category
+  // ancestor (food/index.html), and it is deliberately bare; see
+  // .results-heading .category-label below.
   .category-label {
-    // $font-headings, NOT $font-label -- see _palette.scss. The five type
-    // values are shared with cocktails' own filter labels; see
-    // @mixin index-section-label in shared/_rule.scss.
-    //
-    // 1.4rem SINCE 2026-10-11, #1219 -- cocktails' size, passed as an
-    // argument. Helen, choosing the bigger chips below: "Please increase
-    // the size of food's headings to match cocktails' as well, because
-    // they're a bit lost amongst the newly chunky chips." SIZE ONLY:
-    // cocktails' regular weight and wider tracking are corrections for a
-    // light glyph on a dark ground (#680), which this page does not have.
-    // This undoes the 2026-09-02 fold tightening for these labels, and she
-    // took the height knowingly.
+    // $font-headings, not $font-label (see _palette.scss). The type is shared
+    // with cocktails' filter labels through the mixin; the size is cocktails'
+    // too (#1219). Size only: cocktails' regular weight and wider tracking
+    // correct for a light glyph on a dark ground (#680), which this page does
+    // not have.
     @include index-section-label($size: 1.4rem);
-    // 1.05rem (was 1.35rem before the 2026-09-02 index fold tightening, and
-    // 1.4rem since 2026-10-11, above) sat between the two offset values. Staying at 1px rather than rounding up
-    // to 2: this is a control-panel label with five of them stacked in a
-    // screenful, not a landmark, and the ratio
-    // matters least at the size where both values are close. Try
-    // $emboss-offset-large here if the index reads flatter than the recipe
-    // page once both are in front of you.
-    //
-    // HEADING TIER, 2026-09-02: 1.05rem clears the >= 1rem line the tier
-    // table draws (see shared/_rule.scss), so this gets the fuller
-    // stroke+shadow treatment rather than the small labels' stroke-only one,
-    // same as it always got through the pre-tier --emboss-stroke-c/punched()
-    // pair. See LETTERING.md.
+    // Heading tier. See LETTERING.md.
     @include lettering(heading);
-    // Was $color-highlighter-label — "text sitting on top of a highlighter",
-    // of which there is none here any more. Plain body text colour, same as
-    // every heading on the recipe page.
     color: $color-text;
     position: relative;   // anchors the absolutely-positioned wash slot
-    // The 0.22rem vertical padding moved into @mixin index-section-label with
-    // the rest of this label's type -- cocktails' heading needs the same box,
-    // and not having it was the last thing sitting the two at different
-    // heights. The full story of the horizontal half is in the mixin.
   }
 }
 
-// THE RESULTS COUNT IS DELIBERATELY BARE, and this rule exists to say so.
-// Helen: "I liked it bare -- just actively style it to control it, but leave it
-// looking how it was."
-//
-// Every value below is what the element was already inheriting when nothing
-// matched it at all, so this changes nothing on the page today. That is the
-// point: the count reads as plain body text because someone decided it should,
-// not because a selector happens to miss it. Without this rule the look
-// survives only as an accident of .category-label being scoped -- and that
-// scoping was un-scoped once already, on exactly the reasoning that a label
-// class not looking like a label must be a bug.
-//
-// If you are here because you want the count to match the filter labels above
-// it: that was tried on 2026-08-12 and Helen preferred it bare. Don't.
+// The results count is deliberately bare, and this rule exists to say so
+// (Helen's ruling). Every value is what the element inherits when nothing
+// matches it, so the look is declared rather than an accident of
+// .category-label being scoped. Do not restyle it to match the filter labels.
 .results-heading .category-label {
   font-family: $font-body;
   font-size: 1rem;          // body default; no size of its own
@@ -183,31 +47,20 @@
 }
 
 .category {
-  // Shared -- @mixin index-section in shared/_rule.scss. The gap is what
-  // spaces a label from its own buttons, so nothing inside needs a margin.
+  // The mixin's gap spaces a label from its own buttons, so nothing inside
+  // needs a margin.
   @include index-section;
 
-  // Shared -- @mixin index-label-row. The gap is horizontal, label to its
-  // own inline clear link.
   .category-label-row { @include index-label-row; }
 
-  // Brought closer to .btn-clear (the global "clear all", below) and to
-  // article.recipe a — Helen, 2026-08-03: this page already has multiple
-  // link designs (the global clear, the recipe page's own links), and this
-  // inline one, being bold Courier with an opacity-fade hover, was a THIRD
-  // distinct design competing with both. Sans, regular weight and a
-  // colour-shift hover now, same mechanism every other link on the site
-  // uses — still its own colour per section (unlike the neutral global
-  // clear), since that context IS worth keeping, just not the typography.
   .btn-clear-inline {
-    // A real <button> since 2026-07-29 — it was a <span> with a click handler,
-    // so it was unreachable by keyboard. These four lines strip the browser
-    // chrome so it looks exactly as it did.
+    // A real <button>, so it is reachable by keyboard; these lines strip the
+    // browser chrome.
     border: 0;
     background: none;
     padding: 0;
-    // Text colour at rest, the site's magenta under the pointer, for every
-    // clear on the page -- @mixin index-clear-link, 2026-10-11.
+    // One colour rule for every clear on the page: text colour at rest, the
+    // accent under the pointer. Not derived from the section's colour.
     @include index-clear-link($color-accent);
 
     font-family: $font-body;
@@ -221,47 +74,11 @@
     white-space: nowrap;
   }
 
-  // FIVE PER-SECTION CLEAR COLOURS STOOD HERE AND ARE GONE, 2026-10-11 --
-  // each section's clear rested in the dark of its hue and lightened to the
-  // hue. Helen: "I'm fed up with the clear and clear all buttons! Please
-  // show each one in normal link colours, so not derived from the section
-  // colour." The one colour rule is in .btn-clear-inline above.
-
-  // Active states -- compound selectors (.category--star .btn-star.active)
-  // have higher specificity than the base .btn-tag/.btn-star rule above,
-  // so no !important needed here.
-  // Shared typography via %btn-active-base; each adds its own colour.
-  //
-  // background: none cancels %btn-active-base's generic flat grey — the
-  // tape shape (.tag-shape) is the fill now, not a background-color. Colour
-  // there jumps from the resting translucent neutral to the solid category
-  // root hue, the tape-shape equivalent of the pop the matched recipe-row
-  // pills already get. RESTING .btn-tag/.btn-star (not .active) is
-  // untouched -- only the chosen state changes.
-  //
-  // Text colour is $color-text (near-black), not the category -active hue —
-  // Helen's read: the coloured text wasn't very readable once it was sitting
-  // on the full-colour tape shape rather than a pale background tint.
-  //
-  // No emboss/raised text-shadow here any more (dropped 2026-08-03, see the
-  // comment above %tag-emboss-soft's old spot) — flat stroke only, same
-  // $faux-bold-stroke for all three categories rather than a value per category, and
-  // in $color-text (same dark colour as the letter itself) rather than the
-  // category -active hue — Helen's correction once she saw it: the
-  // category colour lived in .tag-shape already, and a stroke that matched
-  // the letter reads as one solid dark letterform instead of introducing a
-  // second colour. .tag-shape's own fill lightened further too (mix with
-  // white, 12% -> 18%), Helen's second nudge on the same "back off the
-  // loudness" idea.
-  //
-  // LOWERCASE WHEN CHOSEN SINCE 2026-10-11, #1219 -- the three rules below
-  // no longer @extend %btn-active-base, whose capitals and weight 900 were
-  // food's own chosen state. Cocktails' chosen chip never changed case
-  // (Helen, 2026-08-30: it "read as the word changing rather than the word
-  // being chosen"), and treatment F is cocktails' chip on both sites. The
-  // placeholder stays for the search pills in _search.scss. `background:
-  // none` stays too: it is what keeps the focus ring's 15% tint off a
-  // chosen chip.
+  // Chosen chips. The tape shape (.tag-shape) is the fill, in the section's
+  // lightened root hue. The word is $color-text, not the section's -active
+  // hue, which is hard to read on the full-colour tape, and the stroke is the
+  // letter's own colour. The word stays lowercase when chosen (#1219).
+  // `background: none` keeps the focus ring's tint off a chosen chip.
   &.category--star .btn-star.active {
     background: none;
     color: $color-text;
@@ -286,12 +103,9 @@
     .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
   }
 
-  // FOCUS-VISIBLE RINGS, ISSUE #1086 -- .btn-tag's shared base
-  // (_sass/food/_buttons.scss) gives every chip a $color-accent ring; these
-  // two sections override the colour to their own hue, the same way the
-  // active-state block above overrides .tag-shape's fill. .btn-star does not
-  // need an entry here: it is emitted only by the STAR section, so its
-  // override sits directly on the class in _buttons.scss.
+  // Focus rings (#1086). .btn-tag's base in _buttons.scss gives every chip a
+  // $color-accent ring; these two sections override it with their own hue.
+  // .btn-star's override is on the class itself in _buttons.scss.
   &.category--mood .btn-tag:focus-visible {
     outline-color: $color-mood-root;
   }
@@ -300,28 +114,14 @@
     outline-color: $color-practicalities-root;
   }
 
-  // COCKTAILS' CHIP, WITH FOOD'S TAPE -- #1219, 2026-10-11. Helen, from the
-  // control-layer candidates page, where she had expected to take the tape
-  // OFF food: "I find myself wanting to add the tape to the cocktail
-  // tags", then "I'm leaning towards F -- cocktail chips, and tape on both
-  // sites!... at least the sites will be consistent now even if I'm leaning
-  // even further into more is more".
+  // Cocktails' chip with food's tape (#1219): the three chip sections take
+  // the size and spacing of _sass/cocktails/_filters.scss's chips.
   //
-  // So the three chip sections take cocktails' numbers, from
-  // _sass/cocktails/_filters.scss: 0.9rem, line-height 1.2, full-strength
-  // text, 0.5rem between chips on top of each chip's own margin. Under the
-  // pointer the WORD takes its section's colour, as cocktails' does -- the
-  // dark of each hue, the one the section's own clear link uses, because
-  // lime and yellow cannot be read as words on paper. The tape keeps food's
-  // colours: 15% of the ink at rest (_buttons.scss), the section's hue under
-  // the pointer and when chosen.
+  // `:not(.search)` is the scope: the ingredient pool's candidates are
+  // .btn-tag too and keep their own treatment.
   //
-  // `:not(.search)` IS THE SCOPE: the ingredient pool's candidates are
-  // .btn-tag too and stay as they were, as cocktails' own pool chips did
-  // ("the search returns could stay as they are").
-  //
-  // Nothing here applies to `.active` alone, so a chosen chip still measures
-  // what it measured at rest (#389).
+  // Nothing here applies to `.active` alone, so a chosen chip measures what
+  // it measured at rest (#389).
   &:not(.search) {
     .category-buttons { gap: $space-sm; }
 
@@ -331,13 +131,10 @@
       line-height: 1.2;
       color: $color-text;
 
-      // THE TAPE LIGHTS UNDER THE POINTER TOO -- Helen, the same day, on the
-      // first build: "the darkened text on the darkened tape is hard to
-      // read, plus I'd just like some more colour. I like the hover
-      // behaviour we use for the chips on the recipe list below, so please
-      // match that". So this is `a.badge-star:hover` (_badges.scss): the
-      // word in the dark of its hue on the tape in the lightened hue, which
-      // is also the tape a chosen chip wears. Chosen keeps its black word.
+      // Under the pointer: the word in the dark of its section's hue (lime
+      // and yellow cannot be read as words on paper) on the tape in the
+      // lightened hue, matching `a.badge-star:hover` in _badges.scss. A
+      // chosen chip keeps its black word.
       &:hover:not(.active) {
         color: var(--chip-hover, #{$color-text});
         .tag-shape { color: var(--chip-tape, #{rgba($color-text, 0.4)}); }
@@ -365,32 +162,15 @@
     width: 100%;
   }
 
-  // THE GAP AFTER THE INGREDIENT SEARCH THAT NOTHING ELSE HAS.
-  // .search--ingredients holds two flex children: the input, and the results
-  // pool that filters.js fills as you type. The pool is EMPTY on load — but a
-  // flex `gap` applies between items regardless of their size, so an empty div
-  // still buys a full gap of dead air. .search--name has one child and no such
-  // gap, which is why the space below SEARCH INGREDIENTS has always looked
-  // bigger than the space below PRACTICALITIES. It is not an illusion; it was a
-  // real $space-md of extra space, and briefly a real $space-xxl.
+  // A search section's results pool is empty on load, and a flex `gap` applies
+  // between items whatever their size, so an empty pool would still buy a gap.
+  // The gap is zeroed and put on the pool itself, only when it has content.
+  // `:not(:empty)` rather than `display: none`, because the pool is an
+  // aria-live region and should stay in the tree.
   //
-  // The gap is moved onto the pool itself, conditional on it having content.
-  // `:not(:empty)` rather than hiding the empty pool with `display: none`,
-  // because the pool carries aria-live and a region announces more reliably if
-  // it stays in the tree rather than appearing at the moment it is filled.
-  //
-  // THIS IS THE ONLY PLACE THE POOL'S TOP MARGIN IS SET, and it has to be --
-  // issue #589. `_search.scss` also declared `margin-top: $space-lg` on
-  // `.search-results`, unconditionally, which meant this rule never removed
-  // any space: a `:not(:empty)` override can only ADD to the base it sits on,
-  // so an empty pool kept the larger 1rem while a full one got this 0.75rem.
-  // The pool was 4px taller with nothing in it than with something in it, and
-  // clicking a LEAVE OUT candidate -- which empties the pool -- dropped the
-  // chosen pill 4px below the chip that had just been clicked.
-  //
-  // So: if this ever needs a second declaration, the second one has to carry
-  // the same condition. `test_an_empty_search_results_pool_reserves_no_space`
-  // is what says so mechanically.
+  // This is the only place the pool's top margin may be set (#589): a second,
+  // unconditional declaration makes the empty pool taller than a full one.
+  // test_an_empty_search_results_pool_reserves_no_space guards it.
   &.search {
     gap: 0;
 
@@ -403,11 +183,8 @@
 // ============================================================================
 // CATEGORY LABEL DOODLES
 // ============================================================================
-// Hand-drawn marks beside the filter labels.
-
-// --- Category label doodles --------------------------------------------------
-// Matches the recipe page section-heading-sparkle pattern.
-// Left and right spans display the SVG inline; text span holds the label.
+// Hand-drawn marks beside the filter labels: left and right spans hold an
+// inline SVG, the text span holds the label.
 .category-label-doodle--left,
 .category-label-doodle--right {
   display: inline-flex;
@@ -428,24 +205,11 @@
 // ============================================================================
 // THE BLOCKY RULE ON THE INDEX
 // ============================================================================
-// The same device as the recipe page (see _sass/food/_rule.scss and
-// MANUAL §13), on the five filter section labels. This settles
-// DEV_JOBS §1.6: the index follows, and the two pages differ on colour
-// DISCIPLINE rather than on marks — five hues here because on the index colour
-// is a CODE, tied to each section's buttons and badges, where on the recipe
-// page it is decoration and had to be rationed.
-//
-// The order is the order they appear down the page, which is not the order they
-// appear in _data/food/filter_sections.yml — the two tag_groups (mood,
-// practicalities) render between star and the two searches.
-// Each section's colour comes from _sass/food/_palette.scss — $color-star-root
-// and its four siblings, which also drive that section's filter buttons, its
-// active states, its clear link and its badges on every recipe row. Nothing
-// about a section's colour is written here.
-//
-// The violet is $color-section-underline-2, shared with the recipe page: it is
-// the same second rule on both, so there is one value for it, not two that have
-// to be kept in step by hand.
+// The same mark as the recipe page (shared/_rule.scss, MANUAL §13.1), on the
+// section labels. Five hues here because on the index colour is a code, tied
+// to each section's chips and badges (MANUAL §13.5). Each colour comes from
+// _palette.scss; none is written here. The violet under-rule is
+// $color-section-underline-2, the same variable the recipe page uses.
 .category .category-label-text {
   display: inline;
 }
@@ -457,32 +221,7 @@
 .search--ingredients       .category-label-text { @include overlapping-rule-double($color-ingredient-root,     $color-section-underline-2); }
 .search--name              .category-label-text { @include overlapping-rule-double($color-name-search-root,    $color-section-underline-2); }
 
-// A SIXTH hue, deliberately. MANUAL §13.5 calls the five rules directly
-// above a CODE: colour on the index is tied to a section's own buttons,
-// active states, clear link and badges, not spent as decoration, which is
-// exactly why LEAVE OUT doesn't reuse one of them — it isn't one of the five
-// filter categories (see _search.scss's own "IT BORROWS NO CATEGORY HUE"
-// comment on .controls .search--exclude), so borrowing star/mood/
-// practicalities/ingredients/name-search would wrongly claim it as a sixth
-// member of a set it was deliberately kept out of. Helen added this heading
-// rule for LEAVE OUT specifically, 2026-08-16, because the panel earned a
-// heading of its own once it had a dismiss and a "stays applied" active-pill
-// row to sit next to — the label needed to look like the other section
-// headings on the page even though the picker beneath it still stays
-// neutral.
-//
-// $color-electric-cobalt over the shared violet: this exact colour lived here
-// once already, as $color-name-search-root, before hot orange took that root
-// over on 2026-08-01 — see _palette.scss's own note on it. A hue returning to
-// the system, not a new one being invented.
-//
-// AND GONE AGAIN, 2026-09-04, THIS TIME WITH THE HUE ITSELF. Helen, reordering
-// the five section colours so that yellow left PRACTICALITIES: "we'd drop the
-// cobalt, and drop the colouring on 'leave out', like we do for the cocktail
-// site. It could retain its violet perhaps." So this heading keeps the violet
-// alone -- the thin lower bar every section shares, the site's structural hue
-// -- in the grey the cocktails site gives its own LEAVE OUT heading, and the
-// paragraph above stands as the record of why a sixth hue was tried. The
-// picker beneath it was always neutral; the heading now agrees with it.
+// LEAVE OUT spends no hue: it is not one of the five filter categories, so it
+// keeps the violet rule alone and a grey label, as cocktails' LEAVE OUT does.
 .search--exclude           .category-label-text { @include overlapping-rule-single($color-section-underline-2); }
 .search--exclude           .category-label      { color: $color-clear-text; }

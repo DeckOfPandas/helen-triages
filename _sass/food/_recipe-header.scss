@@ -1,35 +1,25 @@
 // =============================================================================
 // HELEN TRIAGES FOOD - RECIPE PAGE: HEADER
 // =============================================================================
-// Everything above the ingredients/method content: shared bases both used
-// site-wide in this file (%heading-base, the box-tint variables), the article
-// frame, cross-recipe links, title, tagline, meta grid, the INGREDIENTS/
-// METHOD/NOTES section-heading treatment, the method toggle button, and the
-// recipe-page badges row. Split out of the old food/_recipe.scss (2026-08-10,
-// following the same split food/_layout.scss got) -- see MANUAL for why.
+// Everything above the ingredients/method content: the article frame, links,
+// title, tagline, meta grid, the section-heading treatment, the method toggle
+// and the badges row. It also defines %heading-base and the box-tint
+// variables, which later food partials read, so it is imported before them.
 
 // --- Shared heading base -----------------------------------------------------
-// All recipe headings that are uppercase Courier extend this.
-// Override only what differs per heading (size, colour, stroke weight, spacing).
+// Every uppercase Courier heading extends this and overrides only what
+// differs (size, colour, spacing).
 %heading-base {
   font-family: $font-headings;
   font-weight: 700;
   text-transform: uppercase;
 }
 
-// --- Box tint (shared violet, three consumers now) ----------------------------
-// Was tinted off $color-border mixed with $color-surface — a neutral with no
-// relation to the page's actual accent colours. Re-based on the rule's own
-// violet instead, so the box stops being a fifth, unrelated colour and reads as
-// a quiet echo of the mark the page already spends violet on.
-//
-// The note box was matched to this too on 2026-07-31 and then split back off
-// the same day — it wants a different treatment, not just a fainter version of
-// this one. See `DEV_JOBS_v24.md` §1.8. Kept named generically in case it ends
-// up shared again once notes have their own answer. It did, 2026-08-02 -- and
-// so has .method-short's box, but at its own, much stronger opacity (below):
-// metadata grid and notes are deliberately quiet washes, the short-method box
-// is meant to read as an obviously distinct container, not an echo of them.
+// --- Box tint ----------------------------------------------------------------
+// One violet, the rule's own, behind the metadata grid, the notes, the
+// doneness chart and .method-short. The first three are quiet washes at
+// $box-tint-opacity; .method-short takes its own stronger opacity because it
+// has to read as a distinct container.
 $color-box-tint: $color-blinging-blackberry;   // reuse, not a new hue
 $box-tint-opacity: 0.03;   // TRANSPARENCY DIAL — turn up for a stronger wash,
                            // down for a fainter one. Metadata grid and notes
@@ -43,13 +33,6 @@ $method-short-tint-opacity: 0.08;   // Helen, on noticing the box for the
 
 // --- Body text base ----------------------------------------------------------
 // Set once on the recipe article so children inherit and only override exceptions.
-//
-// position/width folded in from food/_layout.scss during the 2026-08-10 split
-// -- article.recipe used to be declared in both files, an orphaned duplicate
-// rather than a deliberate split. The old --annotation-gutter custom property
-// that lived alongside it is dropped, not carried over: declared for a
-// margin-annotations feature that was never built, and read by nothing
-// anywhere in _sass/.
 article.recipe {
   position: relative;
   width: 100%;
@@ -60,165 +43,63 @@ article.recipe {
   line-height: $line-height-body;
 }
 
-// Constrain prose reading width on the recipe page.
-// 65ch ≈ the typographic sweet spot of 60–65 characters per line.
+// The reading measure for prose on the recipe page.
 article.recipe p,
 article.recipe .note,
 article.recipe .method-short {
   max-width: 65ch;
 }
 
-// --- Cross-recipe links -------------------------------------------------
-// Covers every prose field a link can appear in: tagline, ingredient items/
-// notes, method steps/notes, and (as of the .recipe-body-content
-// MVP pass below) long-form body content too -- one link style for the whole
-// page, no separate override left anywhere. Deliberately more specific than
-// the shared `a { color: $color-text }` (_sass/shared/_base.scss) so it wins
-// without needing !important — article.recipe + a beats a plain a on
-// specificity. Re-declares :hover, because the base a:hover (-> $color-
-// mood-root, the MOOD filter's cerulean) would otherwise win here on hover
-// even though it has lower specificity for everything else — a link that
-// changed to a completely unrelated hue on hover would be worse than the
-// bug this is fixing.
+// --- Links in the article ----------------------------------------------------
+// One link style for the whole page. It re-declares :hover because the shared
+// a:hover (shared/_base.scss, $color-mood-root) would otherwise win on hover.
+// Weight 600 rather than an underline is what marks a link as interactive.
 //
-// font-weight 600 rather than the article's base 300: the sans-serif body
-// font has real weight gradations (unlike Courier New, see §13.6 in
-// MANUAL), so a heavier weight reads as "different and interactive"
-// without needing an underline too.
-// `a:not(.badge)`, not a bare `a`, since GitHub issue #40 made the taxonomy
-// badges in .recipe-badges genuine links. Without the exclusion this rule
-// (0,1,1) beats .badge-star/.badge-mood/.badge-practicalities (0,1,0) and
-// repaints all three magenta, which would delete the whole category colour
-// code from the recipe page's badge row. `:not()` takes its argument's
-// specificity, so this is (0,2,1) -- still comfortably ahead of the shared
-// `a { color: $color-text }` it exists to beat, and the exclusion is free.
-//
-// `.btn-see-shortlist` and `.btn-pdf` JOIN THE EXCLUSION, issue #1058. Two of
-// the actions row's four controls (then _includes/page-actions.html) were `<a>`
-// tags, not `<button>`s, and with no exclusion this rule outranked
-// shared/_furniture.scss's `.btn-see-shortlist, .btn-print, .btn-pdf` (0,1,0)
-// the same way it would have outranked the badges: PDF and SEE SHORTLIST (N)
-// rendered in $color-recipe-link at font-weight 600 -- this page's prose-link
-// colour and weight -- while SHORTLIST and PRINT (both `<button>`s, never
-// touched by an `a` selector) rendered correctly in $color-clear-text at 700.
-// Found by measuring the row's computed styles against cocktails', where
-// `.cocktail-controls` has no such generic link rule to fight and all four
-// controls already agreed. `:not()`'s specificity is its most specific
-// argument, so adding two more class names here costs nothing.
-//
-// SINCE #1210 (2026-09-30) ONLY `.btn-see-shortlist` IS STILL INSIDE THE
-// ARTICLE -- on the INGREDIENTS line. The pdf link moved to the furniture
-// line above `<article class="recipe">`, where this rule cannot reach it;
-// its name stays in the exclusion because a control that moves back in should
-// not have to rediscover #1058.
+// The :not() list is load-bearing. This rule is (0,2,1) and each excluded
+// class has its own (0,1,0) rule that it would repaint: the taxonomy badges
+// are links (#40), and so are two of the page's action controls (#1058).
+// .btn-pdf sits outside the article today (#1210); it stays in the list so a
+// control that moves back in is still excluded.
 article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   color: $color-recipe-link;
   font-weight: 600;
 
-  // Lighter on hover, not darker -- Helen's ask, and the opposite of the
-  // usual "darken for hover" instinct. $color-recipe-link-hover is measured
-  // for this specifically (see _palette.scss), not a generic lighten().
+  // Lighter on hover, not darker: Helen's ruling (#199, see _palette.scss).
   &:hover {
     color: $color-recipe-link-hover;
   }
 }
 
-// THE HEADER NAV ROW AND ITS TWO ICON SHAPES USED TO BE HERE -- the hover
-// colour, .cloche-body/.cloche-heart, .martini-outline/.martini-bowl/
-// .martini-liquid. They moved to _sass/shared/_chrome.scss in issue #374.
-//
-// They were here because they wanted $color-dazzling-dragonfruit, which is not one of
-// the variables every site's palette is guaranteed to declare, so a shared
-// partial could not name it. That was true, and the conclusion -- "food-only
-// override; cocktails gets a plainer hover from the shared default" -- was the
-// bug. The nav shows BOTH sites' icons on BOTH sites now, so on a cocktails
-// page these two icons had no rules at all and rendered as raw unstyled SVG.
-//
-// $color-accent (the tenth contract variable) is what let them move. Do not add
-// a chrome rule back into this file: if _layouts/default.html emits the class,
-// it belongs in shared/_chrome.scss.
+// No chrome rules in this file: if _layouts/default.html emits the class, its
+// rule belongs in shared/_chrome.scss, which both sites load (#374).
 
 // --- Title -------------------------------------------------------------------
-// Left-aligned, was centred.
-// Centring is what made a two-line title read as two separate headings: two
-// rules of different widths, sharing no edge, look like two objects. Left
-// alignment gives every line the same left edge, so the block reads as one
-// thing however many lines it runs to. The width cap is what forces the wrap in
-// the first place — without it the long titles simply run to the full 900px.
-// The 5rem that used to sit below the title was set when the title was CENTRED
-// and the tagline was centred under it — two separate centred objects needed a
-// canyon between them to stop reading as one paragraph. Now that both are left
-// aligned at the same width they already read as one block, and the canyon just
-// pushed the meta off the first screen. The gap that matters moved down: it is
-// now below the tagline, where the title block ends.
-// A flex ROW since 2026-08-14, holding the title and the print/pdf controls
-// (GitHub issue #86) -- Helen asked for both links "to the right of the title,
-// bottom aligned", and this is the layout that delivers that without a
-// collision the site has no media queries to fix.
+// Left-aligned, so a title that wraps keeps one left edge and reads as one
+// block.
 //
-// TWO `align-items` DECLARATIONS, ON PURPOSE -- do not delete the first one.
-// It is the standard CSS fallback pattern: a browser that cannot parse `last
-// baseline` drops that line and keeps `flex-end`, and one that can takes the
-// later declaration. (This is why it does not trip
-// test_no_selector_declares_the_same_property_twice, which looks for the same
-// property in two separate BLOCKS -- one block deliberately overriding itself
-// is a different thing.)
-//
-// `flex-end` alone was the first attempt at "bottom aligned" and Helen's read
-// was that the links sat too low. It was right about the BOXES and wrong about
-// the ink: the title's box does not end where its lettering does. The mark
-// hangs below the baseline (food/_rule.scss: the violet bar runs to 1.18em of a
-// ~1.13em content box), and beneath that sits the half-leading of an inherited
-// 1.65 line-height on 2.2rem type -- so aligning the two boxes' bottom edges
-// drops the links about a rem below the title's own baseline, with the bar
-// between them.
-//
-// `last baseline` aligns what you actually read: the links' baseline and the
-// title's, so the two sit on one line. LAST rather than plain `baseline`
-// because a title that wraps has two of them, and bottom-aligned means the
-// final line, not the first.
-//
-// justify-content: space-between is the "to the right" half, and it puts them
-// on the content column's own right edge -- the same edge the metadata grid
-// below already ends on, so they line up rather than nearly lining up.
-//
-// FLEX RATHER THAN ABSOLUTE POSITIONING, deliberately. .recipe-main-title is
-// capped at 70%, so there is always an empty 30% beside it, and dropping an
-// absolutely-positioned control into that gap is the obvious move -- until a
-// title actually needs the room, at which point an absolute box has no idea
-// anything else exists and the two overlap. Laid out as flex items they are
-// measured against each other instead: a long title just narrows the gap.
+// Two `align-items` declarations on purpose; do not delete the first. A
+// browser that cannot parse `last baseline` drops that line and keeps
+// `flex-end`. `last baseline` aligns a neighbour to the lettering of the
+// title's final line: the title's box ends below its ink, because the mark
+// hangs under the baseline.
 .recipe-title {
   display: flex;
   align-items: flex-end;      // fallback -- see above, keep both
   align-items: last baseline;
   justify-content: space-between;
   gap: $space-xl;
-  // 2rem ABOVE WHERE THERE IS NO ARROW SINCE #1093 (2026-09-15), from
-  // $spacing-section-gap. Every recipe page carries the furniture line and
-  // takes $space-lg from the rule below, so this value is now only the
-  // reference pages' and the about page's -- which opened 48px under the
-  // header where rum categories opens 32px (`.ref-title-block`). Helen, shown
-  // both: "All at 32px".
+  // The top margin applies where there is no furniture line above the article
+  // (the about and reference pages); see the rule below (#1093).
   margin: $space-xxl 0 1.25rem 0;
   text-align: left;
   position: relative;
 }
 
-// The back arrow (shared/_chrome.scss) is a 3rem glyph with its own 1rem
-// margin-bottom, rendered immediately before article.recipe. The arrow
-// already separates the title from the header, so the section gap above
-// stacked a second gap on top of it -- about 4rem of dead space below the
-// arrow's baseline for one job. Scoped to pages that actually render the
-// arrow; where there is none, .recipe-title above keeps its 2rem.
-//
-// `.page-furniture +`, NOT `.back-to-index +`, SINCE #1093 (2026-09-15). #1024
-// wrapped the arrow and the search box in `.page-furniture` on 2026-09-14,
-// after which `.back-to-index` was no longer the article's sibling, this rule
-// matched nothing, and every recipe title sat 3rem under the arrow where the
-// drink page sits 1rem -- the gap the two sites were ruled to share on
-// 2026-09-10 (see `.cocktail-title-block` in _sass/cocktails/_cocktail.scss).
-// Found by measuring, in the spacing review: 48px on food, 16px on cocktails.
+// Under the furniture line the back arrow already separates the title from
+// the header, so the title takes the smaller gap, the same one a drink page
+// has (#1093). The selector must name `.page-furniture`, the article's actual
+// previous sibling (_includes/back-to-index.html): a sibling selector naming
+// anything inside that wrapper matches nothing.
 .page-furniture + .recipe .recipe-title {
   margin-top: $space-lg;
 }
@@ -229,92 +110,33 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   position: relative;
   padding: 0;
   margin: 0;
-  // No font-size here -- the only content is the nested .recipe-title-text
-  // span below, which sets its own (larger) size. A font-size here would
-  // never render against anything; this h1 previously carried 1.4rem that
-  // did exactly that, unnoticed since 2026-07-09.
+  // No font-size here: the nested .recipe-title-text sets its own.
   letter-spacing: 0.04em;
-  // Was 60% (GitHub issue #66: too narrow). 70% of the 900px column is
-  // 630px. `text-wrap: balance` keeps whatever lines that wraps to a
-  // similar length, so no line ends up carrying a stub of a rule.
+  // The cap makes a long title wrap (#66 set its width); `text-wrap: balance`
+  // keeps the lines a similar length, so the marked last line is not a
+  // two-word tail.
   max-width: 70%;
   text-wrap: balance;
 }
 
 
-// WHY THE RULE IS A BACKGROUND AND NOT `border-bottom`. A border draws on the
-// BOX. The title is an inline-block with `text-wrap: balance`, so its box is as
-// wide as its LONGEST line — a border under a two-line title would run the full
-// width of line one and sit under line two, overhanging it at both ends. That
-// is the ragged-edge problem the wash had, rebuilt in a straight line. The
-// per-line background in the mixin above is what avoids it.
-//
-// The 4em horizontal padding went with the wash. It existed only to give the
-// ragged brush shape room to cover the lettering, and at that size it was also
-// forcing titles onto more lines than they needed.
+// The rule is a per-line background (shared/_rule.scss), not a
+// `border-bottom`: a border draws on the box, which is as wide as the longest
+// line, so it would overhang a shorter last line at both ends.
 .recipe-title-text {
   display: inline-block;
   position: relative;
   color: $color-text;
-  // Was 1.8rem -- identical to .recipe-section-heading below, since
-  // 2026-07-09 (the recipe page's very first redesign commit set both to
-  // 1.8rem in the same change). Same font, same weight, same transform (both
-  // extend %heading-base), so the title and a section heading rendered as
-  // the same size text -- unnoticed until today's punched-tape pass made
-  // both carry the same stroke+emboss treatment too, which is what made the
-  // collision visible. 2.2rem re-establishes the h1 as bigger than any h2 on
-  // the page. Titles wrap within max-width: 60% above, so a longer title now
-  // wraps to slightly more lines than before -- worth another look once
-  // real titles are in front of you.
+  // Larger than .recipe-section-heading's 1.8rem: both extend %heading-base
+  // and wear the same lettering, so size is all that keeps the h1 above an h2.
   font-size: 2.2rem;
-  // Raised label-tape lettering, matching the index's .category-label and
-  // the shared wordmark (MANUAL.md §13.4.1) -- was plain stroke, the
-  // same "scratched" look every other recipe-page heading carries too, until
-  // now. Independent of overlapping-rule-double below: that mixin paints
-  // background-image only, so there's no property collision with the
-  // text-shadow punched() sets.
-  //
-  // Stroke width was cut from $stroke-heavy (0.8px) to a hand-picked 0.4px --
-  // Helen: "the section headings feel far too bold... I don't know if just
-  // dropping the font weight is right." Font-weight isn't the right lever:
-  // Courier New only ships Regular/Bold as static faces (§13.6), so
-  // anything ≤500 jumps straight to Regular with no middle ground. 0.4px was
-  // the right call and $emboss-stroke lands within a rounding error of it
-  // (2.2rem x 1.4% = 0.0308rem, or 0.49px) -- the change here is that the
-  // number is now derived from the size instead of guessed against it.
-  //
-  // The EMBOSS OFFSET is the real fix on this element. At the shared 1px it
-  // was 2.8% of a 2.2rem glyph, the smallest proportion anywhere on the site,
-  // so the raised read this treatment exists for was barely present at the
-  // one size it should be most obvious. See shared/_rule.scss.
-  //
-  // DISPLAY TIER, WITH THE LARGE OFFSET, 2026-09-02. The title shipped on the
-  // heading tier for an hour under "T2 wordmark, T1 large headings", then
-  // Helen, looking at Beef Wellington: "recipe title goes hard like the
-  // wordmark please". So the page has three strengths of one construction --
-  // hard on the wordmark and the title, soft on the 1.8rem section headings,
-  // edge only below 1rem -- and the title is the only element besides HELEN
-  // TRIAGES on the display tier. The reference-page titles share this class
-  // and come with it. It still passes $emboss-offset-large explicitly rather
-  // than taking the tier's default; see @include lettering() in
-  // shared/_rule.scss for why that argument outlived the wordmark's 2px.
-  // See LETTERING.md.
+  // Display tier, shared only with the wordmark; the reference-page and about
+  // titles use this class and come with it. See LETTERING.md.
   @include lettering(display, var(--emboss-offset-lg));
   padding: 0;
-  // THE MARK SITS UNDER THE LAST LINE ONLY, since 2026-09-04. This is the
-  // element the decision was made on -- a candidates page on the real quiche
-  // recipe, whose title wraps to two lines and wore two stacked double rules
-  // (design audit critical #7). Helen: "Last line only
-  // please, 10000%."
-  //
-  // `text-wrap: balance` on .recipe-title above already keeps the lines a
-  // similar length "so no line ends up carrying a stub of a rule" -- that was
-  // the mitigation while every line carried one. With the mark on the last line
-  // alone, balance is now doing a plainer job: keeping the marked line a
-  // sensible width rather than a two-word tail.
-  //
-  // See shared/_rule.scss for the mixin, why `box-decoration-break: slice` is
-  // not the fix, and what happens with JavaScript off.
+  // The mark sits under the last line only. The mixin needs
+  // assets/js/last-line-rule.js to find that line; shared/_rule.scss says
+  // what happens without JavaScript.
   @include overlapping-rule-double-last-line(
     $color-dazzling-dragonfruit,
     $color-section-underline-2,
@@ -327,35 +149,18 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   font-size: 0.95rem;
   font-style: italic;
   color: lighten($color-text, 20%);
-  // Left, and matched to the title's 60% so the two share a right edge. A
-  // left-aligned title above a centred tagline reads as a mistake.
   // No margins of its own. The gap above comes from .recipe-title and the gap
-  // below from .recipe-meta, so a recipe with no tagline gets the same
-  // title-to-meta distance as one with a tagline — margin collapsing does the
-  // work instead of a rule that has to know whether the tagline exists.
+  // below from .recipe-meta, so a recipe with no tagline keeps the same
+  // title-to-meta distance as one with a tagline.
   margin: 0;
   line-height: 1.5;
   max-width: 60%;
   text-align: left;
 }
 
-// THE MAGIC BAG HAS NO METADATA GRID, SO THE BADGES NEED THEIR OWN GAP.
-//
-// .recipe-tagline above deliberately carries no margins: on a recipe page the
-// gap beneath it comes from .recipe-meta, which is what lets a recipe with no
-// tagline keep the same title-to-meta distance as one with a tagline. A
-// magic-bag entry has no .recipe-meta and no .recipe-source, so its badges sat
-// directly against the tagline with nothing between them.
-//
-// PUT ON THE BADGES, NOT ON THE TAGLINE, and scoped to this collection so no
-// recipe page moves by a pixel. Two reasons for choosing the badges as the
-// anchor: the tagline is OPTIONAL here (an empty `tagline: ""` renders nothing
-// at all), so a margin hung on it would vanish exactly when it is still needed
-// — the badges would then sit against the title instead. And a margin on the
-// tagline would have to be undone for the recipe pages that already get their
-// gap from the metadata grid, which is the alteration this must not make.
-//
-// Matches the badges' existing bottom margin, so the row sits in equal space.
+// A magic-bag entry has no .recipe-meta to supply the gap under the tagline.
+// The margin goes on the badges, not the tagline: the tagline is optional
+// there, and a margin on it would also move every recipe page.
 .recipe--magic-bag .recipe-badges {
   margin-top: $spacing-block-gap;
 }
@@ -380,31 +185,12 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 
     &:last-child { border-right: none; }
 
-    // The scribbled underline that used to sit beneath each label was cut in
-    // the 2026-07-31 redesign: three of them stacked in a row were the fussiest
-    // marks on the page, and this block reads faster without them. The label no
-    // longer needs `display: inline` — that was there so Range.getClientRects()
-    // could measure the text width to size the underline SVG.
     strong {
       @extend %heading-base;
       display: block;
       font-size: 0.85rem;
       letter-spacing: $letter-spacing-label;
       color: $color-text;
-      // Raised label-tape lettering (MANUAL.md §13.4.1).
-      //
-      // This is the element the whole 2026-08-12 emboss pass came out of: it
-      // sits at 0.85rem, a hair under the longform Tips label Helen liked, and
-      // carried $stroke-light's flat 0.5px -- 3.7% of its own type size, the
-      // heaviest proportion anywhere on the site and nearly three times the
-      // label's. At that weight the outline fills the letterform and the
-      // emboss copies have no crisp edge to sit against, so SERVES/PREP/COOK
-      // read as outlined rather than raised. Offset was already fine here
-      // (1px on 0.85rem is 7.4%); it's the stroke that was swallowing it.
-      //
-      // LABEL TIER, 2026-09-02: stroke only, no shadow -- "T3, flat with
-      // edge", Helen's own name for it when she chose the tier over the
-      // heading treatment for every element this size. See LETTERING.md.
       @include lettering(label);
       margin-bottom: $space-xs;
     }
@@ -418,12 +204,8 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 }
 
 // --- Source --------------------------------------------------------------
-// Moved here from a page-footer block, 2026-08-11 -- source is recipe
-// metadata, so it reads as metadata: directly under the meta grid, not as
-// a footnote at the bottom of the page. Font-size/colour unchanged from the
-// footer version -- GitHub issue #96 already settled that this needs to be
-// legible, not a muted afterthought, and that reasoning doesn't change just
-// because the block moved.
+// Recipe metadata, so it sits directly under the meta grid. It has to be
+// legible, not a muted footnote (#96).
 .recipe-source {
   font-family: $font-headings;
   font-size: 0.82rem;
@@ -438,169 +220,67 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 }
 
 // --- Section Headings --------------------------------------------------------
-// INGREDIENTS / METHOD / NOTES, each on a single brush wash. These are the
-// page's landmarks: the whole point is that a cook glancing at a propped-up
-// iPad mid-task lands on the right one without reading. So the separation
-// between sections is carried entirely by this heading and the space above it —
-// there is no longer a rule drawn between them.
-//
-// $spacing-section-top was the gap when a scribbled section rule also sat in
-// it. With the rule gone the gap has to do that work alone, hence the larger
-// value here rather than a change to the shared token, which other pages use.
+// INGREDIENTS / METHOD / NOTES and every peer heading in .recipe-body-content.
+// These are the page's landmarks. Nothing is drawn between sections; the
+// heading and the space above it carry the separation.
 .recipe-section-heading {
   @extend %heading-base;
   display: block;
-  // 4.5rem above, 2rem below — but the gap below LOOKS like 1.5rem, because the
-  // violet rule hangs about 0.5rem past the bottom of the lettering. Three to
-  // one is what makes a heading belong to what follows it rather than float
-  // between two blocks; measuring it off the letters rather than off the ink is
-  // what keeps it at three to one.
+  // The gap below looks smaller than its value because the violet rule hangs
+  // below the lettering. Roughly three to one, above to below, is what makes
+  // a heading belong to what follows it.
   margin: $spacing-section-top 0 $space-xxl 0;
   font-size: 1.8rem;
   letter-spacing: 0.08em;
   color: $color-text;
-  // Raised label-tape lettering (MANUAL.md §13.4.1), same treatment as
-  // .category-label on the index and the shared wordmark.
-  //
-  // Stroke was cut from $stroke-medium (0.6px) to a hand-picked 0.3px -- see
-  // the matching note on .recipe-title-text above (Helen: "the section
-  // headings feel far too bold"). $emboss-stroke gives 0.0252rem, or
-  // 0.40px, a touch heavier than the guess but on the same ratio as every
-  // other punched element now rather than on its own.
-  //
-  // As with the title, the offset is the substantive change: 1px on 1.8rem is
-  // 3.5%, half the proportion the small labels get, so these read flat where
-  // a 0.9rem label reads raised. This is the class INGREDIENTS/METHOD/NOTES
-  // and every peer heading in .recipe-body-content share, so it reaches all
-  // of them at once.
-  //
-  // HEADING TIER, WITH THE LARGE OFFSET, 2026-09-02 -- see the matching note
-  // on .recipe-title-text above for why the offset argument stays explicit
-  // and LETTERING.md for the tier's values.
+  // Heading tier. See LETTERING.md.
   @include lettering(heading, var(--emboss-offset-lg));
   position: relative;  // anchor for absolute-positioned method toggle
 
-  // The horizontal padding that used to give the ragged brush shape room to
-  // cover every letter, and the negative left margin that cancelled it, are
-  // both zero: a rule has no bleed, so it starts and stops on the letters and
-  // the word sits flush on the page's left axis.
   .section-heading-text {
     position: relative;
     display: inline-block;
     padding: 0;
     margin-left: 0;
-    // Last line only, 2026-09-04, same call as the title above -- a section
-    // heading is a block at the full column width, so a long one wraps and
-    // stacked its rule exactly as the title did. Nothing about the mark
-    // changes on a heading that fits on one line.
+    // Last line only, as on the title: a long heading wraps.
     @include overlapping-rule-double-last-line($color-section-underline, $color-section-underline-2);
   }
 
 }
 
-// Aureolin over cobalt, Helen's call -- the About page's own "FAQ" heading
-// only (food/about.html), not a site-wide change to .section-heading-text
-// above. Scoped with its own modifier class rather than touching
-// $color-section-underline/-2 directly, which every recipe page's section
-// headings also use. Compound selector (.section-heading-text AND the
-// modifier, not the modifier alone) so its specificity actually beats
-// .recipe-section-heading .section-heading-text above -- a bare
-// .section-heading-text--about-faq is only one class, lower specificity
-// than that two-class descendant selector, and would silently lose.
-// Aureolin over VIOLET, not over cobalt. Cobalt was tried here on 2026-08-12
-// and pulled the next day -- Helen: "I love colour, but even I need to accept
-// that adding the cobalt was too much." Aureolin alone is the departure that
-// earns its keep (this is the one page that isn't a recipe, and the top rule
-// says so); pairing it with a second unfamiliar hue made the mark read as an
-// unrelated device rather than as the site's own mark in a different key.
+// The page-type variants change the top bar only; the violet under-rule stays,
+// so the mark is still the site's. Spring green is a recipe, yellow the about
+// page's FAQ heading, lime a reference page. Neither is a new hue: both are
+// index section roots (_palette.scss).
 //
-// Violet is the under-rule under every section heading on every recipe page,
-// so keeping it here means only ONE thing has changed about this mark, which
-// is exactly as much difference as "this page is not a recipe" needs.
+// Compound selectors on purpose: a bare modifier class is (0,1,0) and loses
+// to `.recipe-section-heading .section-heading-text` above.
 .section-heading-text.section-heading-text--about-faq {
   @include overlapping-rule-double-last-line($color-blazing-banana, $color-section-underline-2);
 }
 
-// The REFERENCE pages' own variant: bright lime over the same violet, where a
-// recipe page uses spring green over it. Helen's ask, and the reasoning she
-// gave for it is the whole design -- "just for a suggestion of own identity".
-//
-// One thing changes and one thing only, exactly as with the about page's
-// aureolin above. Violet stays, so the mark is still recognisably the site's;
-// the top bar shifts hue, so you can tell at a glance which KIND of page you
-// are on without anything spelling it out. Three keys for three page types:
-// spring green (a recipe), aureolin (about), lime (reference).
-//
-// $color-wild-wasabi is not a new hue -- it is already the SEARCH
-// INGREDIENTS category root on the index. Spending an existing swatch rather
-// than a fifth is the same test _palette.scss's colour budget applies, and the
-// same way the about page's aureolin passed it.
-//
-// The two greens are close enough in name to be worth being explicit about:
-// spring green is #00FF9F (a cool, blue-leaning green) and lime is #8AE800 (a
-// warm, yellow-leaning one). Side by side they read as clearly different keys,
-// which is the point -- if they didn't, this would be a distinction nobody
-// could use.
 .section-heading-text.section-heading-text--reference {
   @include overlapping-rule-double-last-line($color-wild-wasabi, $color-section-underline-2);
 }
 
 
 // --- Anchored section headings ------------------------------------------------
-// The reference pages carry a contents list of in-page anchors, and until now
-// nothing on this site did -- so nothing had ever needed scroll-margin.
-//
-// WITHOUT IT THE JUMP LANDS BADLY, and specifically badly for THIS heading. The
-// blocky rule is painted as a background that hangs BELOW the lettering
-// (food/_rule.scss), and the punched lettering reads as raised partly because
-// there is paper above it. Scrolling a heading flush to the viewport edge cuts
-// the top of the letters and leaves the rule as the first thing you see, which
-// is the mark upside down. This is roughly the gap the heading would have had
-// if you had scrolled to it yourself.
+// An anchor jump otherwise lands the heading flush against the viewport's top
+// edge, cutting the lettering and leaving the rule, which hangs below it, as
+// the first thing seen.
 .recipe-section-heading {
   scroll-margin-top: $space-xxl;
 }
 
-// ".cm-totop" -- the "↑ top" control beside a reference-page section heading --
-// used to be styled here. Deleted 2026-08-19 with its last consumer: issue #382
-// removed food/reference/cooking-methods.html, which was the only page with a
-// contents list and an `id="top"` to go back to. The fish and shellfish tables
-// that survived it moved onto the calculator page, which has neither, so the
-// links would have pointed nowhere.
-//
-// tests/test_site_config.py::test_print_rules_target_classes_that_exist is what
-// caught the matching print rule still being there -- see _print.scss.
-
 // --- A button that looks like a body link ------------------------------------
-// One consumer since 2026-09-14: .btn-method-toggle (below). .btn-print was the
-// other (#86) until #1005 moved it into the actions row -- and #1210 on to the
-// furniture line -- where it wears Courier caps (shared/_furniture.scss)
-// rather than a body link's sans.
-// A <button> rather than a link because it DOES something to this page rather
-// than going anywhere, and it should be indistinguishable from
-// article.recipe a -- Helen's standing rule for anything clickable in the
-// recipe's own text: "update the short method link to the sans serif font so
-// all links feel uniform." Not Courier's heading family, and not
-// .btn-clear-inline on the index, which this used to be matched to.
+// For a <button> that acts on this page and must be indistinguishable from
+// `article.recipe a`. A body link has no font-size of its own, so this names
+// the article's token to match it exactly.
 //
-// A body link has no font-size of its own; it inherits article.recipe's
-// $font-size-body-sm. Naming that token here, rather than a number picked to
-// look close, is what makes this an exact match instead of an approximation --
-// Helen: "match the look of the short method link exactly to body links like
-// Philosophy of Yum."
-//
-// THE THREE RESETS ARE THE LOAD-BEARING PART, and the main reason this is a
-// shared base rather than a second copy. .btn-method-toggle sits inside
-// .recipe-section-heading, which sets letter-spacing, -webkit-text-stroke and
-// (via punched(raised)) text-shadow -- all three inherit, so without resetting
-// them the button quietly wears the heading's emboss on top of its own
-// styling. Helen: "the PoY link text seems bouncier and maybe slightly
-// wider-spaced letters? And is it a shade lighter in colour?" -- all three
-// consistent with an inherited shadow+stroke neither of us had checked for
-// (dev tools greys inherited values out under Computed, easy to skim past).
-// See MANUAL §12. .btn-print sits in no heading today; it carries the resets
-// anyway, so that moving one of these buttons somewhere that does cannot
-// reintroduce the bug.
+// The three resets (letter-spacing, -webkit-text-stroke, text-shadow) are
+// load-bearing: .btn-method-toggle sits inside .recipe-section-heading, which
+// sets all three, and all three inherit. Without them the button wears the
+// heading's emboss.
 %link-button {
   font-family: $font-body;
   font-size: $font-size-body-sm;
@@ -616,16 +296,14 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   cursor: pointer;
   white-space: nowrap;
 
-  // Lighter on hover, same colour and direction as every other link on the
-  // page (see article.recipe a above -- $color-recipe-link-hover is measured
-  // for this, not a generic lighten()).
+  // Lighter on hover, as every other link on the page.
   &:hover { color: $color-recipe-link-hover; }
 }
 
 // --- Method Toggle Button ----------------------------------------------------
-// Everything about how it LOOKS is %link-button above; what is left here is
-// where it sits -- pinned to the right-hand end of the METHOD heading, which is
-// why .recipe-section-heading carries position: relative.
+// How it looks is %link-button; this is where it sits: the right-hand end of
+// the METHOD heading, which is why .recipe-section-heading is
+// position: relative.
 .btn-method-toggle {
   @extend %link-button;
   transition: opacity 0.1s ease-in-out;
@@ -633,29 +311,13 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  // No .active rule any more (was opacity: 0.7, toggled by method-toggle.js
-  // whenever short method is showing) -- Helen: the persistent "click for full
-  // method" button, when short method is active, should look like a normal
-  // resting link, not the dimmed/faded read opacity: 0.7 actually gave it.
-  // method-toggle.js still toggles the .active class every time it switches
-  // modes; it's just unstyled here on purpose now, not a leftover.
+  // method-toggle.js toggles `.active` on this button. It is unstyled on
+  // purpose: the button looks like a resting link in both modes.
 }
 
 // --- The hairline that closes the head, and the INGREDIENTS line -------------
-// #1210, 2026-09-30. `.recipe-controls` -- the row under the head that held
-// the four actions from #1005 (2026-09-14, "row under the head") -- is gone.
-// Before it, `.recipe-actions` held print and pdf on the title's bottom edge
-// from #86 and the shortlist button from 2026-09-04. Helen's brief this time:
-// print and pdf to the top right of the page (the furniture line,
-// shared/_furniture.scss), and the shortlist "on the same line as INGREDIENTS
-// for Moules where it doesn't have the read it make it toggle" -- the same
-// place a drink page has it, on the first line under the rule. So the row
-// went, the hairline stayed as an `<hr>`, and the pair sits at the right-hand
-// end of the heading's own line.
-//
-// `.recipe-head-rule` IS THE HAIRLINE ALONE. `<hr>` carries browser margins
-// and an inset border of its own, so both are reset; the only thing it draws
-// is the 1px $color-border line `.recipe-controls` used to carry as its top.
+// `.recipe-head-rule` is an <hr>, which carries browser margins and an inset
+// border of its own; both are reset so it draws one 1px line.
 .recipe-head-rule {
   border: 0;
   border-top: 1px solid $color-border;
@@ -663,54 +325,10 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   height: 0;
 }
 
-// THE FIRST SECTION HEADING SITS WHERE A DRINK PAGE'S DOES -- #1124,
-// 2026-09-17. Helen: "begin the INGREDIENTS heading at the same place
-// vertically on both sites -- food should match cocktails", and, asked which
-// space she meant: "the vertical space between the rule underneath the header
-// material and the word INGREDIENTS."
-//
-// THAT CLARIFICATION IS WHAT MAKES THIS A TEN-MINUTE CHANGE RATHER THAN A
-// DESIGN PROBLEM. Read as "the same absolute y", it is not achievable: this
-// page's head varies with a wrapped title, an optional tagline, 0-2 source
-// lines and a meta grid that stacks under 600px, so a fixed position would mean
-// dead air on a short recipe or a clamped title on a long one. Measured from
-// the RULE, the head's height drops out of the question entirely and only one
-// gap has to move.
-//
-// MEASURED, BOTH SITES, AT 1280 (scripts/browser/styles.sh), #1124:
-//   cocktails  rule y=524.0, INGREDIENTS y=619.2  ->  95.2px
-//   food       rule y=642.4, INGREDIENTS y=757.4  -> 115.0px
-// Then, food's fixed part after the rule was the 43px controls box, and the
-// gap that closed the difference was 95.2 - 43 = 52.2px, or 3.25rem.
-//
-// RE-MEASURED FOR #1210 (2026-09-30), because the drink page's own distance
-// moved with it: its controls row is the toggle beside the shortlist PILL now,
-// and the pill is the taller of the two at 28.9px, so its rule-to-INGREDIENTS
-// is $spacing-block-gap (28px) + 28.9px + the heading's 3rem (48px) = 104.9px
-// (title block bottom y=531.2, INGREDIENTS y=636.1). Food's controls box is
-// gone, so the whole distance is this one margin: 6.55rem is 104.8px. It lives
-// on the ROW rather than the heading, because the heading is a flex item now
-// and a margin on a flex item would push the pill beside it off the heading's
-// centre. Measured after: food rule y=628.5 -> INGREDIENTS y=734.3, 105.8px
-// from the hr's box top, 104.8px from the line it draws -- the drink page's
-// distance within a pixel.
-//
-// THE FIRST HEADING ONLY, AND MANUAL §13.3 IS WHY. That section records the two
-// sites' heading rhythms as DELIBERATELY different -- 4.5rem/2rem here against
-// 3rem/1.25rem on a drink page (#1006, Helen's "half way") -- and she asked
-// about one gap, not about the scale. So METHOD, NOTES and everything below
-// keep their 4.5rem and this rule reaches exactly one heading: the one directly
-// after the hairline.
-//
-// WHAT IS NOT MATCHED, because it cannot be from here: the two headings are set
-// at different sizes (47.5px tall against 38.4px), so the word's INK sits a
-// little differently inside each box even with the boxes' tops aligned. The box
-// is what a rule can move; the leading is the type's own.
-//
-// THE ROW: heading at the left, the shortlist pair at the right, centred on
-// each other. The heading's own 4.5rem/2rem margins move to the row -- the top
-// replaced by the 6.55rem above, the bottom kept -- so the ingredient list
-// below opens at exactly the distance it always did.
+// The INGREDIENTS line: the heading at the left, the shortlist pair
+// (.page-actions) at the right, centred on each other (#1210). The heading's
+// margins live on the row, because a margin on a flex item would push the
+// pair off the heading's centre.
 .recipe-section-heading-row {
   display: flex;
   align-items: center;
@@ -721,38 +339,23 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   .recipe-section-heading { margin: 0; }
 }
 
-//
-// AND THE MATCH IS LET GO -- #1325, 2026-10-10. Helen, with a phone and a
-// desktop screenshot of the gap under the hairline: "there's too much space
-// under the metadata section for food recipes". The drink page's 104.9px has a
-// row of controls IN it; food's has had nothing in it since #1210 took
-// `.recipe-controls` away, so the same distance read as a hole here. The
-// heading now takes the 4.5rem every other heading on this page has over it
-// ($spacing-section-top, MANUAL §13.3): 72px from the line, where it was 104.8.
+// The first heading sits $spacing-section-top under the hairline, the gap
+// every other section heading on this page has above it (#1325).
 .recipe-head-rule + .recipe-section-ingredients .recipe-section-heading-row {
   margin-top: $spacing-section-top;
 }
 
-// ON A PHONE THE TITLE TAKES THE WHOLE WIDTH. #899/#900 wrapped the old action
-// row under it at 600px; with the row gone the cap is the only thing left to
-// lift, and 70% of 296px still breaks PINEAPPLE / AND / GINGER / SPATCHCOCK /
-// CHICKEN one word to a line (#875 item 8).
 @media (max-width: 600px) {
+  // On a phone the title takes the whole width: at 70% a long title breaks
+  // one word to a line (#875).
   .recipe-main-title {
     max-width: 100%;
   }
 
-  // THE SHORTLIST PAIR TAKES THE LINE ABOVE INGREDIENTS ON A PHONE -- #1210.
-  // The heading is 224px wide in a 312px column at 360 (measured,
-  // scripts/browser/styles.sh), so the pill cannot share its line; the column
-  // puts the pair first, at the left, and the heading under it -- the same
-  // shape a drink page's controls take on a phone (cocktails/_cocktail.scss).
-  // THE PAIR SITS A BLOCK GAP UNDER THE HAIRLINE SINCE #1325 (2026-10-10), as
-  // a drink page's controls do under its own rule. The row kept the full
-  // 6.55rem until then, which on a phone put 105px of nothing over the pill
-  // and INGREDIENTS 151px under the line. $spacing-block-gap + the pill's
-  // 28.9px + the 1.1rem below lands the heading 74.5px under the line, within
-  // 3px of the 4.5rem it has above 600px.
+  // The heading is too wide to share its line with the shortlist pair on a
+  // phone, so the row becomes a column with the pair first (#1210), a block
+  // gap under the hairline (#1325). A drink page's controls take the same
+  // shape.
   .recipe-section-heading-row {
     flex-direction: column;
     align-items: flex-start;
@@ -765,16 +368,9 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
     margin-top: $spacing-block-gap;
   }
 
-  // STACK THE THREE METADATA BOXES ON A PHONE -- design review #1086, from
-  // Helen directly (2026-09-15): "I'd like to try stacking the three
-  // metadata boxes on a phone, avoiding the jar in length differences, but
-  // also allowing more space for any 'cook' line." Side by side at this
-  // width, SERVES/PREP hold one word each while COOK's "but check internal
-  // temperatures chart" hedge (added by the layout, see recipe.html) wraps
-  // eight lines tall in a column no wider than the other two, and the three
-  // cells sit at wildly different heights. One column gives every cell the
-  // full width for its own text, so COOK gets the room it actually needs.
-  // Desktop and tablet (above 600px) keep the three-column grid untouched.
+  // One column on a phone (#1086): side by side, COOK's longer text wraps
+  // many lines in a cell no wider than the other two and the three sit at
+  // different heights.
   .recipe-meta {
     grid-template-columns: 1fr;
 
@@ -787,18 +383,10 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
   }
 }
 
-// A NARROWER PHONE STEPS THE TITLE DOWN A SIZE AND TIGHTENS ITS LEADING --
-// design review #1086. Below 400px (where a 390/360px phone lands but a
-// 600px tablet does not) a title like PINEAPPLE AND GINGER SPATCHCOCK
-// CHICKEN wraps to several lines of display caps at the inherited 1.6
-// line-height, and each line reads as its own island rather than one title.
-// One step down the site's size rhythm (2.2rem, matching .recipe-section-
-// heading's 1.8rem step below it, without dropping to that size and losing
-// the h1-bigger-than-any-h2 rule the 2.2rem comment above states) plus a
-// tighter ~1.1 line-height for a display size closes the gaps between lines
-// without touching the desktop/tablet size. `assets/js/last-line-rule.js`
-// re-measures the rendered element on every load, so the double rule (13.1)
-// keeps finding the true last line at this size with no change of its own.
+// A narrow phone steps the title down a size and tightens its leading (#1086),
+// so a title wrapping to several lines still reads as one. It stays above
+// .recipe-section-heading's 1.8rem. last-line-rule.js re-measures on load, so
+// the mark still finds the last line.
 @media (max-width: 400px) {
   .recipe-title-text {
     font-size: 1.9rem;
@@ -807,12 +395,6 @@ article.recipe a:not(.badge, .btn-see-shortlist, .btn-pdf) {
 }
 
 // --- Recipe Badges on recipe page --------------------------------------------
-// Was split across two files: _layout.scss held the flex properties and a
-// `margin: $space-xxl 0`, this held the margin that overrode it. The comment
-// here used to say the index listing needed the _layout.scss copy — it did not.
-// The index emits no .recipe-badges at all, so that rule only ever applied on
-// this page, 550 lines away in a file about a different one, with its margin
-// permanently overridden. All of it is here now.
 .recipe-badges {
   display: flex;
   align-items: center;

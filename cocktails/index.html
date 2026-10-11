@@ -8,51 +8,20 @@ permalink: /cocktails/
 
 <h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
 
-{% comment %} ─────────────────────────────────────────────────────────────────
-  COCKTAILS INDEX. Designed with Helen on /dev/cocktails-design/, 2026-08-26.
+{% comment %} COCKTAILS INDEX. Mood and chaos above the fold, ingredient include
+   then exclude below: the order is the design. No glass filter, as a rule: the
+   drawings are the site's identity, not an axis.
 
-  MOOD AND CHAOS ABOVE THE FOLD, INGREDIENT INCLUDE THEN EXCLUDE BELOW. Her
-  words, and the order is the design: the first question is what you feel like,
-  and what you have in the cupboard is a constraint you apply afterwards.
+   Recipes always, drafts only locally (#668). `output: false` stops Jekyll
+   writing a draft but leaves it in `site.cocktail_drafts`, so looping that
+   collection unconditionally prints private drink names into public HTML
+   (#235). The drafts are gated on `site.show_drafts`, a key only
+   _config_local.yml declares: do not widen that condition. The empty-state test
+   is on `all_drinks`, which has already had the draft question asked of it.
 
-  NO GLASS FILTER, and this is a rule rather than an omission — the drawings are
-  this site's identity, not an axis. It sits alongside taxonomy.yml's older and
-  much stronger ruling that there is no SPIRIT filter either.
-
-  IT READS RECIPES ALWAYS AND DRAFTS ONLY LOCALLY — food's shape, adopted
-  2026-09-02 for #668. Helen's call for how this ships is unchanged: "for food,
-  we build drafts locally only, so let's do the same." What changed is the
-  other half of the sentence.
-
-  THIS COMMENT USED TO SAY "an index over site.cocktail_recipes is an index
-  over nothing", and it was true of the day it was written and false of the day
-  after the first promotion. Nothing is promoted yet, so production still
-  renders the empty state — but it does so because the collection is EMPTY, not
-  because the template refuses to look at it. The day a drink is promoted the
-  index lists it, with no template change and nobody having to remember.
-
-  THE GUARD MATTERS MORE THAN THE PAGE, and it is unchanged in substance.
-  `output: false` stops Jekyll WRITING a draft; it does NOT remove it from
-  site.cocktail_drafts, so a template that loops that collection
-  unconditionally will happily print 115 private drink names into public HTML
-  and link them to URLs that were never written. That is issue #235 exactly,
-  and it is why the DRAFTS — and only the drafts — are gated on
-  `site.show_drafts`, a key that exists ONLY in _config_local.yml. Production
-  has no such key, so `all_drinks` there is `site.cocktail_recipes` alone.
-  Do not widen that condition, and never let a draft into `all_drinks` on any
-  test other than this one.
-
-  THE EMPTY-STATE TEST IS ON `all_drinks`, DELIBERATELY. Testing the collection
-  for non-emptiness is what #235 warns against when the collection is the
-  DRAFTS; here the variable being tested is the one that has already had the
-  draft question asked of it, so an empty `all_drinks` in production means
-  exactly "nothing is published".
-
-  EVERYTHING IS IN THE DOM AND FILTERING ONLY TOGGLES [hidden]. 115 drinks is
-  nothing, and it means no reflow of the cards and no dependency on the rest of
-  the site's JavaScript. The filter state lives in data- attributes written at
-  build time, so the script never parses text to decide what a card is.
-────────────────────────────────────────────────────────────────────────────{% endcomment %}
+   Every card is in the DOM and filtering only toggles `hidden`. Filter state
+   lives in data- attributes written at build time, so the script never parses
+   text to decide what a card is. {% endcomment %}
 
 {% assign all_drinks = site.cocktail_recipes %}
 {% if site.show_drafts %}
@@ -63,145 +32,47 @@ permalink: /cocktails/
 
   {% assign taxonomy   = site.data.cocktails.taxonomy %}
   {% assign glasses    = site.data.cocktails.glasses %}
-  {% comment %} `ship_card_names` used to be assigned here for the ship-word
-     lookup below. That lookup moved into _includes/cocktails/ship.html,
-     2026-09-02, and so did the assignment -- an unread variable is the
-     template equivalent of the dead selector it went with. {% endcomment %}
+  {% comment %} The card's ingredient line is built by
+     _plugins/cocktail_card_ingredients.rb, which reads `card_names`,
+     `card_name_joins` and `not_on_cards` itself; nothing below reads these
+     three assignments. {% endcomment %}
   {% assign card_names = site.data.cocktails.ingredients.card_names %}
   {% assign card_name_joins = site.data.cocktails.ingredients.card_name_joins %}
-  {% comment %} #580 and #640: things a card never mentions. TEN ENTRIES since
-     2026-09-06 -- bare `water` was the only one for a fortnight, and #640 added
-     the bare sugars, the bare salt, the zest and the honey. See the list's own
-     reasoning in ingredients.yml, which is where the judgement lives.
-
-     EXACT MEMBERSHIP, which is what `contains` gives on a Liquid list, and it
-     is the whole of Helen's caveat: `soda water` is a real choosing fact and
-     only the BARE word is not. The same distinction keeps every syrup on the
-     card while `white sugar` comes off it.
-
-     READ BY THE PLUGIN, NOT HERE, since the card's ingredient line moved to
-     _plugins/cocktail_card_ingredients.rb. This assignment survives because
-     the template still hands the list to nothing -- it is kept as the one place
-     a reader looking at the template can see that such a list exists at all.
-     {% endcomment %}
+  {% comment %} `not_on_cards` (#580, #640): what a card never mentions, by
+     exact membership of the bare word, so `soda water` stays while `water`
+     goes. ingredients.yml holds the list and its reasoning. {% endcomment %}
   {% assign not_on_cards = site.data.cocktails.ingredients.not_on_cards %}
 
-  {% comment %} Tallest glass counted live from the data, never hardcoded —
-     the same rigour _layouts/cocktail.html and _dev/glasses.html hold
-     themselves to. A new glass with a bigger heights_mm must not need this
-     template touched. {% endcomment %}
+  {% comment %} Tallest glass counted live from the data, never hardcoded: a new
+     glass with a bigger `heights_mm` must not need this template touched. {% endcomment %}
   {% assign tallest_mm = 0 %}
   {% for icon in glasses.all_icons %}
     {% assign mm = glasses.heights_mm[icon] | times: 1.0 %}
     {% if mm > tallest_mm %}{% assign tallest_mm = mm %}{% endif %}
   {% endfor %}
 
-  {% comment %} ===========================================================
-     THE ORDER IS THE DIAGNOSIS, NOT A LAYOUT. Helen, 2026-08-27: "I feel like
-     I am doing work to understand what to click in order to maximise my chance
-     of getting the drink I want."
+  {% comment %} Five questions, each named, in the order Helen asks them: chaos
+     first because it is the widest cut, mood and hassle as the two halves of
+     what she wants, the ingredient fields to narrow, and the name search last
+     because it is the way past all of it. {% endcomment %}
 
-     The page used to ask ONE question -- "what do you fancy?" -- and offer ten
-     answers belonging to three different ones. "No juicing" is not a flavour;
-     "I want to faff" is not a mood. Sorting them into questions was work the
-     reader was doing silently, every visit.
+  {% comment %} THE UNIVERSE SAYS: one random drink dealt above the panel, with
+     a control to deal again. One line, not a card (#719): a three-column grid
+     of label, offer and `deal again` at the far right (#693). No ship mark and
+     no moods. Food has no such panel (MANUAL §13.4). Absent JavaScript the
+     section is empty and hidden. {% endcomment %}
+  {% comment %} It deals from the top two rungs only (#692), and names them in
+     `data-universe-rows`, deliberately not through `data-chaos`: that attribute
+     is the YOLO? filter's word, and widening `no chaos please` must not
+     silently change what the site offers unprompted.
 
-     So: five questions, each named, in the order Helen actually asks them.
-     Chaos comes FIRST because it is the widest cut and the one that changes
-     with the occasion -- hosting versus a Tuesday. Mood and hassle are the two
-     halves of "what do I want", split because they are different halves. The
-     ingredient fields narrow. And I KNOW WHAT I WANT is last because it is the
-     way PAST all of it: food has had that escape hatch since the beginning and
-     this page had none.
-  ========================================================================= {% endcomment %}
-
-  {% comment %} THE UNIVERSE SAYS -- Helen, 2026-09-02, from the fold mockups: the
-     index opened with a screenful of questions and no answer, so one random
-     survivor is dealt above the panel, with a control to deal again.
-
-     ONE LINE, NOT A CARD, SINCE 2026-09-05 (#719, #714, #693). It was a
-     collapsed `.drink-card` in the right-hand column for a day; four rounds of
-     candidates on the real index took the box away entirely. Helen: "the line
-     layout is really working for me. Really really... it's less obtrusive than
-     a box and I think that's what I like about it." The section is now a
-     three-column grid reading straight across -- the label, the offer, and
-     `deal again` at the far right -- and the offer is a tiny glass, the drink's
-     name on its tape, and its ingredients in round brackets.
-
-     THAT LAST COLUMN IS ALSO THE WHOLE OF #693. The control used to sit under
-     the label in a column of its own, so the eye read the two down the page as
-     "the universe says deal again" -- Helen: "lol". Putting it at the far right
-     of the SAME row is her placement and it dissolves the sentence rather than
-     renaming anything.
-
-     NO SHIP MARK AND NO MOODS, both her call. The pick is an invitation, not a
-     card: "I want it to be a happy invitation" rather than the page's best real
-     estate, which is also why the offer is capped by the grid instead of running
-     the full width. The same feature came off food entirely on 2026-09-04 and
-     must not come back there (MANUAL section 13.4); Helen kept this one --
-     "I am almost always more open to persuasion about what I drink than what I
-     eat."
-
-     Absent JavaScript the section is empty and hidden. {% endcomment %}
-  {% comment %} IT DEALS FROM THE TOP TWO RUNGS ONLY, SINCE #692 -- Helen: "It's
-     pretty funny when the top line of the site shows a drink loudly marked
-     'MEH', but it's still not the right call to allow it." An unfiltered offer
-     is the one place on the page where the site speaks first, so it has to be
-     an invitation rather than a lucky dip. 61 of the 124 drinks qualified on the
-     day this was written.
-
-     IT NAMES THE RUNGS, AND DELIBERATELY DOES NOT GO THROUGH `data-chaos`. That
-     attribute is on every card, is derived a few dozen lines below as exactly
-     "ship is yes or oh gods yes", and would have said this in one word -- which
-     is precisely the trap. `chaos` is the YOLO? FILTER'S word (its only reader
-     is cocktail-index.js's `state.chaos === 'good'`), and "which drinks does no
-     chaos please show?" and "which drinks may the site offer unprompted?" are
-     two different questions that happen to share an answer today. Borrowing the
-     attribute would weld them: a later widening of `no chaos please` -- to admit
-     `sure`, say -- would silently change what the universe deals, with no test
-     watching and nothing on the page to reveal it. Helen caught this on review,
-     2026-09-05. Two rules that agree by coincidence should each say what they
-     mean.
-
-     universe.js needs no change and gets none: which rows a deal is drawn from
-     has been this attribute's business since the file was written.
-
-     THE SAME IS TRUE OF `data-universe-parts`, WHICH IS WHY THE GLASS COULD BE
-     PLACED AT ALL. universe.js copies parts in the order THIS ATTRIBUTE lists
-     them rather than in document order, so naming the name before the glass
-     would put the glass between the tape and the ingredients, and naming the
-     glass first puts it in front -- which is where Helen chose it. The parts are
-     also named individually rather than as `.drink-card-body`: a body wrapper
-     would make the glass a sibling of the whole block and it could then only
-     ever sit beside it, never inside the row.
-
-     THIS USED TO CARRY A WARNING that cloning the foot would oblige universe.js
-     to call `HTF.markChipRows()` beside its `HTF.fitCardNames()`, because the
-     chips' row-start marks were a measurement of the container they sat in
-     (#698). #846 deleted that pass — the separator dot trails every chip but
-     the last now, so nothing measures where a chip row breaks — and the warning
-     went with it. Cloning the foot is free again.
-
-     AND IT FAILS SHUT, WHICH MATTERS FOR THE FIRST PROMOTION. Production has no
-     drafts, so on the day the first drink is promoted this selector may well
-     match nothing -- and universe.js returns before unhiding on an empty row
-     list, so the section stays `hidden` rather than drawing an empty frame with
-     a "deal again" button that cannot. Nothing to remember and nothing to
-     revert. {% endcomment %}
-  {% comment %} THREE GRID CHILDREN AND NO WRAPPERS. The label and the control
-     used to share a `.universe-row` div because they stood in one column
-     together; with the control at the far right they are simply the first and
-     third things in the row, and the div went with the reason for it.
-
-     THE PICK NO LONGER CARRIES `drink-card`, EITHER. It did so that _cards.scss
-     would style the tape, the ingredient line and the chips inside it -- but
-     every one of those rules is written against the CHILD class
-     (`.drink-card-name`, `.drink-card-ingredients`, `.drink-card-glass`) and not
-     one of them needs a `.drink-card` ancestor; checked across the compiled
-     stylesheet, not assumed. All the class actually contributed was a 12.9rem
-     fixed height, a border, a surface fill, card padding and the two painted
-     panel strips on `::after` -- five things _universe.scss then had to undo,
-     and an `::after` the closing bracket needs. {% endcomment %}
+     universe.js copies the parts `data-universe-parts` names, in the order it
+     lists them. It returns before unhiding when the rows selector matches
+     nothing, so the section stays `hidden`. {% endcomment %}
+  {% comment %} Three grid children and no wrappers. `.universe-pick` does not
+     carry `drink-card`: the tape, the ingredient line and the glass are styled
+     through their own child classes, and the card's height, border, fill and
+     padding would all have to be undone. {% endcomment %}
   <section class="universe" data-universe-rows=".drink-cards > li[data-ship='yes'], .drink-cards > li[data-ship='oh gods yes']" data-universe-parts=".drink-card-name, .drink-card-glass, .drink-card-ingredients" hidden>
     <span class="universe-label">the universe says…</span>
     <div class="universe-pick" aria-live="polite"></div>
@@ -210,51 +81,23 @@ permalink: /cocktails/
 
   <div class="drink-filters">
 
-    {% comment %} Each section clears only itself — #488. The buttons are real
+    {% comment %} Each section clears only itself (#488). The buttons are real
        <button>s and start hidden; the script shows one the moment its own
        filter has something in it. {% endcomment %}
 
-    {% comment %} 1. CHAOS, and the wording is load-bearing. It used to be
-       "definitely good" / "YOLO", where YOLO meant ship is NOT yes-or-better
-       -- so the button for "I'll try anything" was the one button guaranteed
-       to hide all 55 of the best drinks. Helen: "'I'm open to chaos'...
-       includes all drinks, not just not-known-to-be-definitely-good drinks."
-       `open` is therefore a visible state that applies NO filter, rather than
-       a second filter. {% endcomment %}
+    {% comment %} 1. CHAOS. `open` is a visible state that applies no filter,
+       not a second filter: open to chaos includes every drink. {% endcomment %}
     <div class="drink-filter drink-filter--chaos">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">YOLO?</span></h2>
         <button type="button" class="btn-clear-filter" id="clear-chaos" hidden>&times; clear</button>
       </div>
-      {% comment %} THE THIRD BUTTON NARROWS, AND THE OTHER TWO DO NOT — #732,
-         split out of #722 whose other three bullets landed on 2026-09-05. It is
-         `meta.made_before: false`, which is 20 of the 124 drinks today.
-
-         IT MUST NOT READ `data-ship`, which looks equivalent and is, today:
-         every unmade drink says `ship: "who knows"` and every made one names a
-         rung. They come apart the moment Helen makes one of the 20 — the
-         `made_before` flag flips and `ship` stays `who knows` until she rates
-         it, so a filter reading `ship` would quietly drop the drink she just
-         made from the list of drinks she has made. Same distinction
-         _dev/no-verdict.html draws in its own comment. Hence a second attribute
-         on the card rather than a cleverer reading of the first.
-
-         `chaos only` IS HELEN'S WORDING, given 2026-09-06, and it replaced the
-         label this shipped with a few hours earlier. #732 had argued for that
-         one on the grounds that a button's label "just has to say what it
-         narrows to". She overruled it, which is hers twice over -- the voice is
-         hers, and the argument was weaker than it looked.
-
-         IT IS A NAME, NOT A DESCRIPTION, AND SO ARE THE OTHER TWO. `no chaos
-         please` does not say "ship is yes-or-better" either. This section is a
-         SCALE and its three rungs are read against each other, so `chaos only`
-         is the far end of `no chaos please` -- which is the choice a reader is
-         actually making. A label accurate about the mechanism can still be mute
-         about the question.
-
-         WHAT IT NARROWS TO IS UNCHANGED: `meta.made_before: false`, 20 drinks.
-         The words moved; nothing behind them did, and no test reads them --
-         every one goes through `data-chaos="unmade"`. {% endcomment %}
+      {% comment %} The third button narrows to `meta.made_before: false`
+         (#732), through `data-made-before` and never `data-ship`: the two come
+         apart when Helen makes an unrated drink, whose `ship` stays `who knows`
+         until she rates it. The three labels are her names for the rungs of one
+         scale, not descriptions of the mechanism; the script reads
+         `data-chaos`, not the words. {% endcomment %}
       <div class="drink-btns">
         <button type="button" class="btn-chaos" data-chaos="good" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>no chaos please</button>
         <button type="button" class="btn-chaos" data-chaos="open" aria-pressed="false"><span class="tag-shape" aria-hidden="true"></span>I&rsquo;m open to chaos</button>
@@ -262,22 +105,15 @@ permalink: /cocktails/
       </div>
     </div>
 
-    {% comment %} 2 and 3. MOOD and HASSLE, from taxonomy.yml's `mood_groups`.
-       The split is in DATA rather than here, so a mood added tomorrow lands in
-       a named group or fails a test -- see
-       test_every_mood_belongs_to_exactly_one_group.
-
-       A MOOD WITH NO DRINKS RENDERS NO BUTTON. taxonomy.yml says so outright
-       about `pudding in a glass`, declared with zero members on purpose: it is
-       a spec, not an inventory. Counting members here rather than listing
-       exceptions means the rule holds for whichever mood is empty next.
-    {% endcomment %}
+    {% comment %} 2 and 3. MOOD and HASSLE, from taxonomy.yml `mood_groups`;
+       test_every_mood_belongs_to_exactly_one_group holds the split. A mood with
+       no drinks renders no button: members are counted here, not listed as
+       exceptions. {% endcomment %}
     {% assign groups = taxonomy.mood_groups %}
 
-    {% comment %} `id="filter-mood"` -- #1059, 2026-09-15. A drink page's own
-       mood chips (_layouts/cocktail.html) end their `?mood=` link in this
-       fragment when the mood belongs to this group, so the reader lands on
-       the section holding the lit chip rather than the top of the page. {% endcomment %}
+    {% comment %} `id="filter-mood"` (#1059): a drink page's mood chips
+       (_layouts/cocktail.html) end their `?mood=` link in this fragment, so the
+       reader lands on the section holding the lit chip. {% endcomment %}
     <div class="drink-filter drink-filter--mood" id="filter-mood">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">Mood</span></h2>
@@ -293,8 +129,8 @@ permalink: /cocktails/
       </div>
     </div>
 
-    {% comment %} `id="filter-hassle"` -- #1059, same argument as MOOD above,
-       for a chip whose mood is in the hassle group instead. {% endcomment %}
+    {% comment %} `id="filter-hassle"` (#1059), for a chip whose mood is in the
+       hassle group. {% endcomment %}
     <div class="drink-filter drink-filter--hassle" id="filter-hassle">
       <div class="drink-label-row">
         <h2 class="drink-field-label"><span class="drink-field-label-text">Hassle</span></h2>
@@ -310,31 +146,13 @@ permalink: /cocktails/
       </div>
     </div>
 
-    {% comment %} 4. The ingredient fields. HAS TO HAVE carries magenta and
-       LEAVE OUT carries no colour at all — Helen: "for food, avoiding can be
-       important whereas for drinks surely less so." Food gave its LEAVE OUT a
-       sixth hue; this deliberately does not. {% endcomment %}
-      {% comment %} LABEL, INPUT, CLEAR -- ONE ROW, as food's three search
-         sections are. Issue #587, and #548 point 9 is the same change seen from
-         the other end ("move the clear button to the end of the input field
-         rather than next to the section heading"), with point 5 (element widths
-         copied from food) falling out of it.
-
-         `.drink-label-row--search` is a modifier rather than a new class: this
-         is still the label row, with one more thing in it. Chaos, mood and
-         hassle keep the bare `.drink-label-row`, because they have no input to
-         put in it.
-
-         THE CLEAR BUTTON HAS TO RESERVE ITS SPACE NOW. It used the `hidden`
-         attribute, and _filters.scss argued for that over food's
-         `visibility: hidden` on the grounds that "these sit on a label line
-         whose height is fixed by the text beside them, so there is nothing to
-         reserve space for". That was true and is not any more -- beside an
-         input, display:none means the box jumps narrower the instant the button
-         arrives, which is the exact fault food fixed once already (Helen: "cut
-         off even before typing anything -- it ends at the first '.'"). See the
-         rule in _filters.scss; the attribute stays, its CSS meaning changes for
-         these three only. {% endcomment %}
+    {% comment %} 4. The ingredient fields. HAS TO HAVE carries a colour and
+       LEAVE OUT none, deliberately, unlike food's: avoiding matters less for
+       drinks. {% endcomment %}
+      {% comment %} Label, input, clear: one row, as food's search sections are
+         (#587). In a `.drink-label-row--search` the clear button keeps its box
+         while `hidden`, so the input does not jump narrower when it appears;
+         the rule is in _filters.scss. {% endcomment %}
     <div class="drink-searches">
       <div class="drink-filter drink-search drink-search--include">
         <div class="drink-label-row drink-label-row--search">
@@ -357,19 +175,9 @@ permalink: /cocktails/
       </div>
     </div>
 
-    {% comment %} 5. THE ESCAPE HATCH, and the reason it is last rather than
-       first. If you already know you want a Negroni, none of the above is for
-       you -- but a name search at the TOP would invite you to treat the page
-       as a search box, which is not what it is for. Helen browses here on
-       purpose: "I find browsing quick and inspirational... I want to steer
-       myself then read for a while then settle." Last means it is available
-       without being the offer.
-
-       "recipe name...", NOT "drink name…", SINCE #1097 (2026-09-15). Helen's
-       words for content: "Food recipes / Cocktail recipes. 'Recipes' means
-       recipes across both sites." Food's box already said "recipe name...",
-       and the three placeholders here take its three dots too, so one box reads
-       the same on both sites. {% endcomment %}
+    {% comment %} 5. The name search is last on purpose: at the top it would
+       invite the reader to treat the page as a search box, and Helen browses
+       here. "recipe name..." matches food's placeholder (#1097). {% endcomment %}
     <div class="drink-filter drink-filter--name">
       <div class="drink-label-row drink-label-row--search">
         <h2 class="drink-field-label"><label for="drink-name"><span class="drink-field-label-text">I know what I want</span></label></h2>
@@ -380,37 +188,27 @@ permalink: /cocktails/
     </div>
   </div>
 
-  {% comment %} "survivors", matching food's own results heading — #489. The
-     pluralisation is Liquid's for the FIRST render only; the script rewrites
-     both the number and the word as filters change, so the two have to agree
-     on the rule. See assets/js/cocktail-index.js. {% endcomment %}
-  {% comment %} THE COUNT IS ONE SENTENCE AGAIN, SINCE 2026-09-05. It held the
-     ship legend and the shortlist button too, which is why it was a flex row
-     with the legend pushed to the far end by `margin-left: auto`. Both have
-     moved to the row below, so it is a plain paragraph once more -- and #675's
-     missing word space goes with it, because a flex container discarding the
-     whitespace between its items was the entire cause. That fix is deleted
-     rather than kept as insurance: a workaround outliving its bug is how a
-     stylesheet stops being readable. {% endcomment %}
-  {% comment %} `id="results"` IS WHERE A SEARCH RESULT LANDS -- #1050; the
-     food index carries the same id on its count line and says why. {% endcomment %}
-  {% comment %} `.results-count-number` ON THE DIGITS -- Helen, 2026-09-26,
-     from the "N survivors" candidates page: "both treatments". The number
-     takes the label face (IBM Plex Mono, the same declarations as an
-     ingredient amount; _sass/shared/_results-bar.scss) and the word stays
-     bare. The element stays a <strong> -- the count IS the emphasis of this
-     sentence -- and _filters.scss no longer strips its weight. Food's count
-     took the same two-span shape the same day. {% endcomment %}
+  {% comment %} "survivors", matching food's results heading (#489). Liquid
+     pluralises for the first render only; assets/js/cocktail-index.js rewrites
+     the number and the word as filters change, so the two must agree on the
+     rule. {% endcomment %}
+  {% comment %} A plain paragraph, not a flex row: a flex container discards the
+     whitespace between its items, which here is the word space after the number
+     (#675). {% endcomment %}
+  {% comment %} `id="results"` is where a search result lands (#1050), as on the
+     food index. {% endcomment %}
+  {% comment %} `.results-count-number` sets the digits in the label face
+     (_sass/shared/_results-bar.scss); the word stays bare. It stays a <strong>:
+     the count is the emphasis of the sentence. {% endcomment %}
   <p class="drink-count" id="results">
     <strong class="results-count-number" id="drink-count-n">{{ all_drinks.size }}</strong>
     <span id="drink-count-word">survivor{% unless all_drinks.size == 1 %}s{% endunless %}</span>
   </p>
 
-  {% comment %} THE STICKY RESULTS BAR -- Helen, 2026-09-26, "both treatments".
-     food/index.html carries the identical block and the note: a mirror of the
-     count above and of the top `× clear all`, fixed to the top of the viewport
-     once `#results` has scrolled off it, revealed by assets/js/results-bar.js
-     and `hidden` otherwise, so the no-JS page is unchanged. {% endcomment %}
+  {% comment %} The sticky results bar: a mirror of the count above and of the
+     top `× clear all`, revealed by assets/js/results-bar.js once `#results` has
+     scrolled off and `hidden` otherwise, so the no-JS page is unchanged.
+     food/index.html carries the identical block. {% endcomment %}
   <div class="results-bar" data-results-bar hidden>
     <div class="results-bar-inner">
       <span class="results-bar-count"><span class="results-count-number" data-results-bar-n></span> <span data-results-bar-word></span></span>
@@ -418,62 +216,33 @@ permalink: /cocktails/
     </div>
   </div>
 
-  {% comment %} THE ROW UNDER THE COUNT -- Helen, 2026-09-05: "move the ship mark
-     into the same row so it's not hovering above the cards."
-
-     The legend used to sit at the right-hand end of the count line, and once the
-     shortlist button dropped to a line of its own the legend was left alone up
-     there, directly over the card grid, belonging to nothing. This row pairs
-     them: what you can DO with the list on the left, what the mark on every card
-     MEANS on the right. The count above is then just the count.
-
-     A `<p>` AND NOT A SECOND `.drink-count`. It is a different fact -- these are
-     a control and a caption, not a number -- and giving it the count's class to
-     borrow the spacing would have been the sort of reuse that reads as identity.
-
-     THE SHORTLISTED-ONLY VIEW is #546, and food/index.html carries the twin of
-     this with the full argument for why it is a filter on this index rather than
-     a page of its own. It is not one of the five filter sections because those
-     are all questions about what a drink IS, and a sixth holding one button
-     about what this browser has marked would read as another of them.
-
-     THE WORD IS AFFORDABLE HERE, unlike on a card: this line has room, and the
-     control has to say what it does rather than only mark a state.
-
-     SHIPS `hidden`, and cocktail-index.js reveals it rather than shortlist.js --
-     the same rule as every other control here, applied to the script that
-     actually wires it. The legend beside it is static, and cocktail-index.js
-     never looks for it. {% endcomment %}
+  {% comment %} The row under the count: what you can do with the list on the
+     left, what the mark on every card means on the right. The shortlisted-only
+     view (#546) is a filter on this index, not a page of its own and not a
+     sixth filter section. It ships `hidden` and cocktail-index.js reveals it;
+     the legend is static. {% endcomment %}
   <p class="drink-count-row">
     <button type="button"
             class="btn-shortlist-only"
             id="shortlist-only"
             aria-pressed="false"
             hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
-    {% comment %} THE JUMP LINK TO THE JSON PANEL WAS HERE from 2026-09-09
-       (#849's second placement, Helen: "just export list as JSON and a
-       rightwards arrow") until 2026-09-10, when she agreed it read as
-       developer furniture to anyone else looking at the page: "the
-       engineering is showing." The panel at the foot of the page is the one
-       way in now, and its summary line says what it does in plain words.
-       {% endcomment %}
+    {% comment %} No link to the share panel here (#849): the panel at the foot
+       of the page is the one way in. {% endcomment %}
     <span class="drink-count-legend"><span class="drink-count-legend-icon">{% include icons/ship.svg %}</span>ship it?</span>
   </p>
-  {% comment %} HIDE / SHOW DRAFTS, ON A LOCAL BUILD ONLY -- #1358, 2026-10-10.
-     Helen: "I'd like a 'show drafts' (or hide) button on the local build.
-     Under the SHORTLISTED button is fine". Inside the same gate that lets a
-     draft into `all_drinks` at all, so the deployed index has no such element.
-     Ships `hidden`; cocktail-index.js reveals and wires it. The identical
-     block is on food/index.html. {% endcomment %}
+  {% comment %} Hide / show drafts, local builds only (#1358): inside the gate
+     that lets a draft into `all_drinks`, so the deployed index has no such
+     element. Ships `hidden`; cocktail-index.js reveals and wires it.
+     food/index.html carries the identical block. {% endcomment %}
   {% if site.show_drafts %}
   <p class="drafts-toggle-row">
     <button type="button" class="btn-drafts-toggle" id="drafts-toggle" aria-pressed="false" hidden>hide drafts</button>
   </p>
   {% endif %}
-  {% comment %} A SHORTLIST SOMEONE SENT -- #1093, food/index.html has the
-     note. Its own line under the count row rather than inside it: that row
-     is a <p>, and this is a second sentence with a button in it.
-     The words are Helen's since #1342, 2026-10-10. {% endcomment %}
+  {% comment %} A shortlist someone sent (#1093); food/index.html has the note.
+     Its own line, because the count row is a <p> and this is a second sentence
+     with a button in it. The words are Helen's (#1342). {% endcomment %}
   <p class="shared-shortlist" data-shared-shortlist hidden>
     <span data-shared-shortlist-text></span>
     <button type="button" class="btn-shared-keep" data-shared-shortlist-keep hidden>keep these</button>
@@ -483,21 +252,12 @@ permalink: /cocktails/
     {% assign sorted_drinks = all_drinks | sort: "title" %}
     {% for drink in sorted_drinks %}
 
-      {% comment %} GLASS IS AN ORDERED LIST, FIRST WITH ARTWORK WINS — the same
-         contract _layouts/cocktail.html follows. A drink whose preferred glass
-         has no drawing gets its second choice rather than nothing, and "any"
-         is a real member with deliberately no icon.
-
-         The accumulator starts "" and is tested against "", NOT truth-tested:
-         an empty string is TRUTHY in Liquid, and 14 drinks carry no glass at
-         all, so a bare test sent an empty filename to the include tag and took
-         the whole build down with "File contains invalid characters or
-         sequences".
-
-         This comment does not quote the offending tag, deliberately: tag
-         delimiters are PARSED inside a comment block, so writing it here is
-         itself a syntax error. _layouts/cocktail.html's own comments carry the
-         same warning, having broken the build that way once. {% endcomment %}
+      {% comment %} Glass is an ordered list and the first with artwork wins, as
+         in _layouts/cocktail.html; "any" is a real member with no icon. The
+         accumulator starts "" and is tested against "", never truth-tested: an
+         empty string is truthy in Liquid, and an empty filename sent to the
+         include tag takes the build down (MANUAL §9.7). A comment never quotes
+         a tag: delimiters are parsed inside a comment block. {% endcomment %}
       {% assign glass_icon = "" %}
       {% for g in drink.glass %}
         {% if glass_icon == "" %}
@@ -507,118 +267,59 @@ permalink: /cocktails/
       {% endfor %}
 
       {% assign ship = drink.meta.ship | default: "who knows" %}
-      {% comment %} THE WORD ITSELF IS NOW DERIVED IN _includes/cocktails/ship.html,
-         shared with the drink page (2026-09-02) so the two can never disagree
-         about what a rung is called. `ship` stays assigned here regardless — it
-         also drives `data-ship` below, for filtering, which the include has no
-         reason to know about. {% endcomment %}
+      {% comment %} `ship` is assigned here although
+         _includes/cocktails/ship.html derives the word: it also drives
+         `data-ship` below, for filtering. {% endcomment %}
 
-      {% comment %} `definitely good` is ship yes or oh gods yes; everything
-         else is YOLO, duds included — remaking something you disliked IS a
-         chaotic choice. taxonomy.yml's `chaos`. {% endcomment %}
+      {% comment %} `good` is ship yes or oh gods yes; everything else is
+         `yolo`, duds included. taxonomy.yml `chaos`. {% endcomment %}
       {% if ship == "yes" or ship == "oh gods yes" %}
         {% assign chaos = "good" %}
       {% else %}
         {% assign chaos = "yolo" %}
       {% endif %}
 
-      {% comment %} The searchable ingredient text, built once at build time so
-         the script never has to read the rendered markup. THREE SOURCES, and
-         `item` is deliberately not one of them: the VOCABULARY (`generic`), the
-         short form the card shows (`card_names`), and the bottle a drink
-         actually suggests. `item` is the transcription — #544 retires it from
-         display and #558 took it out of here, because 307 raw item strings were
-         what made typing "li" offer nine spellings of one rum.
-
-         This comment said `item` was included until 2026-08-29, three commits
-         after it stopped being. A comment describing code that no longer exists
-         is the mirror of the trap in MANUAL 12 where prose defeats a
-         source-scanning guard, and it is the more common direction.
-
-         Lowercased here so the script can compare without lowering 115 strings
-         on every keystroke. {% endcomment %}
-      {% comment %} `generic` IS A STRING OR A LIST and Liquid's `for` quietly
-         treats a bare string as a one-item sequence — verified against the real
-         liquid gem by _layouts/cocktail.html, not assumed — so one loop handles
-         both shapes with no type check. {% endcomment %}
-      {% comment %} SUPPRESSED ONLY WHEN EVERY GENERIC IS SUPPRESSED, counted
-         rather than tested on the first one. A disjunctive `[water, soda water]`
-         is half a choosing fact and must survive; nothing carries that shape
-         today, which is exactly when to write the rule rather than after.
-
-         THE DUPLICATION IS GONE AS OF 2026-09-06. This used to be a near-copy of
-         the card's own derivation loop, with a comment saying "the two must stay
-         in step" and nothing making them — the honest shape of a rule that has
-         no enforcement. Both now read `card_ingredients`, which
-         _plugins/cocktail_card_ingredients.rb builds once per drink, so the
-         search pool and the visible line are the same list by construction and
-         can no longer drift.
-
-         THE ORDER OF THIS STRING DOES NOT MATTER and it is now the card's order
-         rather than the recipe's. Nothing reads it positionally: cocktail-
-         search.js splits on `|` and asks set questions of the pieces. {% endcomment %}
+      {% comment %} The searchable ingredient text, built at build time so the
+         script never reads the rendered markup, and lowercased so it need not
+         lower every string on each keystroke. It is the plugin's
+         `card_ingredients`, the list the visible line prints, so the search
+         pool and the line cannot drift. {% endcomment %}
+      {% comment %} The order of this string does not matter: cocktail-search.js
+         splits on `|` and asks set questions of the pieces. {% endcomment %}
+      {% comment %} What is hidden, how it is labelled and how a list generic is
+         joined are _plugins/cocktail_card_ingredients.rb's; this only joins the
+         `search` strings it built. {% endcomment %}
       {% capture searchable %}{% for ing in drink.card_ingredients %}{{ ing.search }}|{% endfor %}{% endcapture %}
 
-      {% comment %} `data-url` IS THE SHORTLIST'S KEY -- #546, `drink.url` and not
-         its `relative_url`, for the reason HTF.shortlist gives in
-         assets/js/assets.js: the baseurl is deployment configuration, and a key
-         carrying it would neither survive a change to it nor match the key this
-         drink's own page emits. food/index.html's row carries the same
-         attribute for the same reason. {% endcomment %}
-      {% comment %} `.drink-card--draft` MARKS THE CARD, AND NOTHING READS IT
-         TODAY. It carried `--card-draft-reserve` from #1162 until 2026-10-06,
-         when the badge moved to the card's top left and stopped taking room
-         from the title. Kept because "is this card a draft" is a fact about
-         the CARD that a rule or a script may want again, and the badge itself
-         is a child emitted further down by _includes/cocktails/draft-badge.html.
-         Both ask `collection`, which is food/index.html's idiom (#562).
-         {% endcomment %}
+      {% comment %} `data-url` is the shortlist's key (#546): `drink.url`, not
+         its `relative_url`, because the baseurl is deployment configuration and
+         the key must match the one the drink's own page emits (HTF.shortlist,
+         assets/js/assets.js). {% endcomment %}
+      {% comment %} `.drink-card--draft` marks the card, and cocktail-index.js
+         reads it for the hide-drafts toggle. The visible badge is a child,
+         emitted below by _includes/cocktails/draft-badge.html. Both ask
+         `collection`, food/index.html's idiom (#562). {% endcomment %}
       <li class="drink-card{% if drink.collection == 'cocktail_drafts' %} drink-card--draft{% endif %}{% if drink.tagline and drink.tagline != 'QQ' %} drink-card--tagline{% endif %}"
           data-url="{{ drink.url }}"
           data-ship="{{ ship }}"
           data-chaos="{{ chaos }}"
-          {% comment %} STRAIGHT OFF THE DRINK, not derived from `ship` like
-             `chaos` above it — #732. The two answer different questions and
-             come apart the moment Helen makes an unmade drink; the button's
-             own comment has the case. `| default: false` because a drink
-             predating `meta.made_before` (2026-09-05) would otherwise emit an
-             empty attribute, which reads as neither true nor false — there are
-             none today and that is exactly when to write the guard. {% endcomment %}
+          {% comment %} Straight off the drink, not derived from `ship` like
+             `chaos` above it (#732). `| default: false` so a drink with no
+             `meta.made_before` does not emit an empty attribute, which reads as
+             neither true nor false. {% endcomment %}
           data-made-before="{{ drink.meta.made_before | default: false }}"
           data-moods="{% for m in drink.mood %}{{ m }}|{% endfor %}"
           data-ingredients="{{ searchable | downcase }}"
           data-name="{{ drink.title | downcase }}">
 
         {% if glass_icon != "" %}
-          {% comment %} THE HEIGHT IS COMPRESSED, NOT PROPORTIONAL — Helen,
-             2026-08-31, choosing from /dev/card-glasses/ after #599/#601. True
-             relative height is correct information and, at card size, a bad
-             drawing: a 180 mm Collins beside an 85 mm old-fashioned is accurate
-             and reads as a stripe. So the ratio is mapped onto 0.5–1.0.
-
-             ONE NUMBER FOR THE RANGE, WHICH IS WHAT THIS FILE'S OWN DATA ALWAYS
-             SAID TO REACH FOR. `display_scale` in glasses.yml is a per-glass
-             cheat and its header has always said to try a global curve first —
-             while claiming, wrongly, that this template already applied one. It
-             did not; it does now, and the two per-glass lines the cheat held
-             (collins 0.82, hurricane 0.74) are gone, because the curve does
-             their job for every glass rather than for the two that were
-             noticed. The mechanism stays: a genuine one-drawing judgement may
-             still want a line, and it composes with this.
-
-             MEASURED, on the collision the curve exists to fix: collins stood
-             1.74x the old-fashioned beside it and now stands 1.34x.
-
-             IT IS NOT THE DRINK PAGE'S CURVE, and the two are deliberately
-             different. _layouts/cocktail.html maps onto 0.32–1.0, because there
-             is one glass on that page and it is the hero; here there are ~114 in
-             a grid and the short end has to stay legible against its neighbours
-             rather than against a title block.
-
-             HEADROOM IS NOT HERE — it is $card-glass-scale in _cards.scss, which
-             is already the "how tall is the tallest glass" knob. Putting a
-             second multiplier here would have split one decision across two
-             files. {% endcomment %}
+          {% comment %} The height is compressed, not proportional: true
+             relative height reads as a stripe at card size, so the ratio is
+             mapped onto 0.5–1.0 for every glass. `display_scale` in glasses.yml
+             is a per-glass cheat that composes with it. Not the drink page's
+             curve (0.32–1.0): there the one glass is the hero, here the short
+             end has to stay legible in a grid. Headroom is `$card-glass-scale`
+             in _cards.scss, not a second multiplier here. {% endcomment %}
           {% assign icon_mm = glasses.heights_mm[glass_icon] %}
           {% assign ratio = 1.0 %}
           {% if icon_mm and tallest_mm > 0 %}
@@ -633,255 +334,99 @@ permalink: /cocktails/
         {% else %}
           {% comment %} No artwork: the column still exists, so the title's left
              edge does not move between cards. Absent means no icon, never a
-             broken one — _data/cocktails/glasses.yml's own convention. {% endcomment %}
+             broken one. {% endcomment %}
           <span class="drink-card-glass"></span>
         {% endif %}
 
         <div class="drink-card-body">
-          {% comment %} THE NAME SITS ON PUNCHED TAPE — #469. The empty span is
-             a slot; decorations.js fills it with one of the chrome tape SVGs
-             through HTF.chromeAsset, the same door the header wordmark's tape
-             uses. Absent JavaScript it renders as plain light lettering on the
-             card, which is legible and unremarkable rather than broken.
-
-             The word is wrapped rather than the anchor styled directly, because
-             the tape needs a flex item it can let SHRINK (min-width: 0) for the
-             ellipsis to fire on a long title. {% endcomment %}
+          {% comment %} The name sits on punched tape (#469). The empty span is
+             a slot that decorations.js fills with a tape SVG; absent JavaScript
+             it is plain lettering on the card. The word is wrapped, not the
+             anchor styled, because the tape needs a flex item it can let shrink
+             (min-width: 0) for the ellipsis to fire. {% endcomment %}
           <p class="drink-card-name">
             <span class="drink-card-tape">
               <span class="drink-card-tape-bg" data-card-tape="{{ forloop.index }}"></span>
               <span class="drink-card-tape-word"><a href="{{ drink.url | relative_url }}">{{ drink.title }}</a></span>
             </span>
           </p>
-          {% comment %} NO TAGLINE HERE — #512, and that still holds AT REST.
-             It was two clamped lines of italic between the name and the
-             ingredients, and the ingredients are what the card is for: they
-             tell you what the drink IS and they are what the search matches
-             against. Helen was asked again on 2026-10-04 with the spare room
-             measured, and said "no taglines back on the index cards."
-
-             IT IS IN THE MARKUP AGAIN, AFTER THE INGREDIENTS, AS A REVEAL —
-             #1292. #512 took it out of the markup "so the clamped text is not
-             sitting in the DOM of 115 cards being ignored"; it is not ignored
-             now. Pointing at a card, or pressing its `?` where there is no
-             hover, lets the tagline take the card. The include is below the
-             ingredient line and _cards.scss has the rest. {% endcomment %}
+          {% comment %} No tagline at rest (#512): the ingredients are what the
+             card is for. It is in the markup after them as a reveal (#1292), on
+             hover or by the card's tagline mark where there is no hover; the
+             include is below and _cards.scss has the rest. {% endcomment %}
           {% if drink.ingredients.size > 0 %}
-            {% comment %} Items only. Amounts are noise at this distance, and
-               Helen knows how to make drinks.
-
-               `data-ing` IS `|`-SEPARATED, the same self-delimiting shape
-               data-ingredients uses on the card above and food/index.html's
-               data-all-ingredients uses on a recipe row. It carries the generic,
-               its card name and the suggestion for ONE ingredient, so the script
-               can ask "does this ingredient answer the chip?" without a
-               substring probe that could match across the seam between two of
-               them.
-
-               EXCEPT FOR RUM, WHERE THE ITEM CANNOT BE TRUSTED — #501. The
-               source's own words for a rum are the colour vocabulary #314
-               retired, and eight of those strings each name two or three
-               DIFFERENT rums across the collection: `Overproof Navy rum` is a
-               Demerara aged on one card, a moderately aged Jamaican on another
-               and an O.F.T.D. on a third. So a rum shows its CATEGORY, via
-               `card_names` in _data/cocktails/ingredients.yml, and the
-               drink page keeps the bottle in its headline. Helen's call,
-               2026-08-27, asked with `El Dorado 12 year old rum` -> `Demerara
-               rum` in front of her: category always, so that a rum-shaped word
-               on a card is reliably the same kind of fact.
-
-               SUBSTITUTE ONLY IF EVERY GENERIC HAS A CARD NAME. A list generic
-               means "either would do" (#441) and ten rum entries carry one, so
-               they join with the same italic-free " or " the drink page uses.
-               A list mixing a named rum with something unnamed would otherwise
-               print half a fact; there is no such entry today, and this is
-               what stops one appearing silently.
-
-               THE JOIN IS THEN LOOKED UP in `card_name_joins`, because a
-               pair sharing a head word reads badly and no rule collapses it
-               well: `Demerara overproof rum or Demerara rum` is Helen's
-               `Demerara rum or overproof`, which drops two words from the
-               second option and reorders the pair. Absent means the default
-               join stands, which is the case for six of the seven pairs.
-
-               A drink wanting two pours of the same rum is NOT this case and
-               needs nothing — each ingredient entry renders its own card name,
-               so the name simply appears twice, correctly. {% endcomment %}
-            {% comment %} THE HIDING, LABELLING, JOINING AND ORDERING ALL MOVED
-               TO _plugins/cocktail_card_ingredients.rb ON 2026-09-06 — #567,
-               #640, #691. What stood here was one 1,400-character Liquid
-               statement doing four jobs, and it was already at the limit of
-               what could be read; a seven-tier sort was not going to fit into
-               it. Every comment that lived on that line now lives in the plugin,
-               at the step it describes.
-
-               THE ORDER IS NOW HELEN'S, FROM #567: base spirits, then
-               lower-proof, then citrus and juice, then syrups, then everything
-               else, then bitters — largest volume first inside each tier, and
-               the recipe's own order breaking ties. `card_ingredients` arrives
-               already sorted, so this loop must NOT re-sort it. {% endcomment %}
-            {% comment %} #917 -- NO WHITESPACE BETWEEN THE <p> TAG AND THE
-               LOOP, ON EITHER SIDE. On a normal card this is invisible: any
-               indentation here is LEADING/TRAILING whitespace inside the box
-               and browsers drop it unrendered. In the universe pick, though,
-               `.universe-pick .drink-card-ingredients::before` inserts "(" as
-               generated content ahead of everything real in this element, so
-               a text node that used to be "leading" (dropped) stops being the
-               first thing in the box and starts being a real, rendered space
-               -- one that the closing bracket, sitting outside this element
-               entirely as a flex sibling, never had a matching copy of. That
-               produced exactly the asymmetry #744 already named once: a gap
-               after "(" with none before ")". #744's fix made the closing
-               side hug flush; this closes the same gap on the opening side by
-               removing the whitespace that was creating it, rather than
-               inventing a matching gap on the other bracket -- "brackets hug
-               their text", per that fix's own words. {% endcomment %}
+            {% comment %} Items only, no amounts. `data-ing` is `|`-separated
+               and carries one ingredient's search terms, so the script can ask
+               whether this ingredient answers a chip without a substring probe
+               matching across two of them. A rum shows its category, never the
+               source's words for it (#501); the plugin applies `card_names`. {% endcomment %}
+            {% comment %} `card_ingredients` arrives hidden, labelled, joined
+               and sorted by _plugins/cocktail_card_ingredients.rb (#567, #640,
+               #691): this loop must not re-sort it. {% endcomment %}
+            {% comment %} No whitespace between the <p> tag and the loop, on
+               either side (#917). In the universe pick
+               `.drink-card-ingredients::before` inserts "(" ahead of the
+               content, so leading whitespace stops being leading and renders as
+               a gap after the bracket. {% endcomment %}
             <p class="drink-card-ingredients">{% for ing in drink.card_ingredients %}{% unless forloop.first %} <span class="drink-card-sep">·</span> {% endunless %}<span class="drink-card-ing" data-ing="{{ ing.search }}">{{ ing.label }}</span>{% endfor %}</p>
           {% endif %}
           {% include cocktails/card-tagline.html doc=drink part="line" %}
         </div>
 
         <div class="drink-card-foot">
-          {% comment %} NO GATE BADGES ON A CARD, and it was built and taken out
-             again on 2026-09-02. A local-only include drew `needs rewrite` /
-             `awaiting fix` / `needs proofread` here for one commit, on the
-             premise that food's cards showed the same. They do not: #562 took
-             every work-state chip off the food rows because "a work-state note
-             on every unfinished row is a to-do list down the side of the page
-             you use to decide what to cook", and Helen ruled the same for
-             drinks. The flags live in the file and in the build log; the card
-             is for choosing a drink. {% endcomment %}
+          {% comment %} No gate badges on a card, as on food's rows (#562): the
+             flags live in the file and the build log, and the card is for
+             choosing a drink. {% endcomment %}
           <span class="drink-card-moods">
-            {% comment %} The group is derived from taxonomy.yml here rather than
-               stored on the drink, because it is a property of the MOOD and a
-               drink that gains a mood should not need retyping.
-
-               A <button>, NOT A <span>, SINCE 2026-09-02 -- Helen asked for card
-               chips to filter the index. It is a real button rather than a span
-               with a click handler because it now DOES something: that is what
-               gets it keyboard focus, Enter and Space, and an accessible role,
-               none of which a span gets for free. `cocktail-index.js` delegates
-               one listener on the list and calls the mood buttons' own toggle,
-               so a chip and its filter button cannot drift apart.
-
-               The chip's `is-match` class is painted from state in apply(), not
-               toggled at click time -- clear-all reassigns the whole state
-               object without touching markup.
-
-               ALPHABETICAL, NOT AUTHORED -- #710, and Helen asked for the card
-               after the drink page: "and on cocktail cards as well please".
-
-               THE SECOND REASON IS THE COLOUR, and it is hers: sorting
-               "muddles the colours, which will look reallly pretty." The
-               authored order follows taxonomy.yml's groups closely enough that
-               the hassle chips clump -- so a card tends to show a run of one
-               hue and then a run of the other, which reads as a claim the card
-               is not making. Alphabetical interleaves them, and the `--hassle`
-               / `--mood` colour goes on saying which group a chip belongs to
-               without the ORDER restating it badly.
-
-               THE SAME `| sort_natural` THE DRINK PAGE USES, and it is
-               `sort_natural` rather than `sort` because `I want to faff` is
-               capitalised and Liquid's `sort` is ASCII -- a capital I sorts
-               ahead of every lowercase letter, so that one mood would jump to
-               the front of the 18 cards carrying it. See the drink page for
-               the measurement.
-
-               AND THIS IS NO LONGER THE ORDER A CARD SHOWS -- #1308,
-               2026-10-06. card-line-budget.js packs the chips to the card's
-               width, fullest row first, and alphabetical is only its
-               tie-break. What is emitted here is where that starts from, and
-               what a card shows with no script. {% endcomment %}{% assign card_moods = drink.mood | sort_natural %}{% for m in card_moods %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<button type="button" class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}" aria-pressed="false">{{ m }}</button>{% endfor %}
+            {% comment %} The chip's group is derived from taxonomy.yml here,
+               not stored on the drink. A real <button>: cocktail-index.js
+               delegates one listener on the list and paints `is-match` from
+               state in apply(). Alphabetical by `sort_natural`, as on the drink
+               page (#710): `sort` is ASCII and puts the capitalised `I want to
+               faff` first. card-line-budget.js then packs the chips to the
+               card's width (#1308), so this is what a card shows only with no
+               script. {% endcomment %}{% assign card_moods = drink.mood | sort_natural %}{% for m in card_moods %}{% if groups.hassle contains m %}{% assign chip = "hassle" %}{% else %}{% assign chip = "mood" %}{% endif %}<button type="button" class="drink-card-mood drink-card-mood--{{ chip }}" data-mood="{{ m }}" aria-pressed="false">{{ m }}</button>{% endfor %}
           </span>
-          {% comment %} THE SHIP IS ALWAYS DRAWN, the word only when there is
-             one. `--ship-tint` is gone from here: it filled the old square, and
-             a word is not a quantity.
-
-             THIS COMMENT USED TO SAY "_layouts/cocktail.html does not mention
-             `ship` at all", AND THAT IS NOW FALSE ON PURPOSE: the drink page
-             gained its own SHIP IT? line, 2026-09-02, reading `page.meta.ship`
-             through the same _includes/cocktails/ship.html this card now calls,
-             so the two can never render a different word for the same rung.
-             `ship_tints` itself was unread by anything from that day on, and
-             was deleted from taxonomy.yml on 2026-09-06 (MANUAL §9.5). {% endcomment %}
+          {% comment %} The ship mark and its word come from
+             _includes/cocktails/ship.html, which the drink page also calls, so
+             the two cannot render a different word for the same rung.
+             `short=true` asks for the card's abbreviations. {% endcomment %}
           <span class="drink-card-ship">{% include cocktails/ship.html ship=ship short=true %}</span>
         </div>
 
-        {% comment %} THE SHORTLIST TOGGLE, top-right -- #546, Helen's placement
-           (2026-09-04) with her own reservation recorded: "I'm not confident it
-           should get this prime spot, but I can't think where else it would go."
-           The bottom-right is the ship mark's; the foot's left is the chips'.
-           It shares the ship's right edge ($card-pad-x), so the card gains one
-           more fixed anchor rather than a floating control.
-
-           THE MARK ALONE HERE, WITHOUT THE WORD, and it is the only one of the
-           four placements that drops it. The word is not free on a card: the
-           tape runs to within 0.3rem of the card's right edge, so anything in
-           this corner is paid for out of the title. The mark and its hit area
-           cost about 2.46rem of a 16.4rem tape on the grid's minimum card;
-           `+ shortlist` would cost about 7.8rem, nearly half the name. Helen
-           asked for text,
-           so it is text at all three placements where text is affordable; here
-           it is the mark plus a real `aria-label` naming the drink.
-
-           IT COMPOSES WITH card-name-fit.js FOR FREE, which is why the width is
-           reserved by padding on `.drink-card-name` rather than by anything
-           cleverer: that script measures the tape word's real box, so a name
-           that no longer fits the narrowed box steps down or wraps by the rule
-           Helen chose on 2026-09-04, with no change to it and nothing to keep
-           in step.
-
-           LAST IN THE MARKUP, ABSOLUTELY POSITIONED IN THE CSS -- the card's
-           own habit, as `.drink-card-foot` does. Last so the tab order runs
-           name, ingredients, chips, then this, rather than putting a secondary
-           control ahead of the drink's own link. {% endcomment %}
+        {% comment %} The shortlist toggle, top right (#546). The mark alone,
+           without the word: anything in this corner is paid for out of the
+           title, so the word is a real `aria-label` naming the drink. Last in
+           the markup and absolutely positioned, so the tab order runs name,
+           ingredients, chips, then this. {% endcomment %}
         <button type="button"
                 class="btn-shortlist btn-shortlist--card"
                 data-shortlist-key="{{ drink.url }}"
                 aria-label="shortlist {{ drink.title }}"
                 aria-pressed="false"
                 hidden></button>
-        {% comment %} THE TAGLINE MARK, LEFT OF THE `+` -- #1292. Only where
+        {% comment %} The tagline mark, left of the `+` (#1292). Only where
            there is no hover, and only on a card with a written tagline; the
            include emits nothing otherwise. After the `+` in the markup so the
            tab order is name, chips, shortlist, then this. {% endcomment %}
         {% include cocktails/card-tagline.html doc=drink part="mark" %}
-        {% comment %} THE DRAFT MARK, TOP LEFT OVER THE GLASS -- #1162, moved
-           2026-10-06. It was "squished in on the top right" beside the `+` and
-           took 3.1rem from the title; Helen found it hard to spot there and
-           chose the top left. Positioned in _sass/cocktails/_cards.scss. Still
-           last in the markup: it is a label, so its place in the source does
-           not matter to the tab order. {% endcomment %}
+        {% comment %} The draft mark, top left over the glass (#1162),
+           positioned in _sass/cocktails/_cards.scss. It is a label, so its
+           place in the source does not matter to the tab order. {% endcomment %}
         {% include cocktails/draft-badge.html doc=drink %}
       </li>
     {% endfor %}
   </ul>
 
-  {% comment %} #496. "Nothing that good, sorry" was written when the only
-     filter was goodness, so the joke was about the drinks. With four filters
-     it lands as an insult to a search that was simply too narrow. {% endcomment %}
+  {% comment %} The empty result must not be a joke about the drinks: with
+     several filters it lands on a search that was simply too narrow (#496). {% endcomment %}
   <p class="drink-none" hidden>Blank canvas.</p>
 
-  {% comment %} PAGINATION -- #694, and it is food's control ported rather than
-     a second design. Same three buttons, same `(see all)` escape, same shared
-     arithmetic (`HTF.recipeList.paginate` in assets/js/list-view.js), same
-     `display: none` until the script has something to page.
-
-     TWENTY A PAGE, WHICH IS FOOD'S NUMBER AND DIVIDES THIS GRID EXACTLY. The
-     card grid is `repeat(auto-fill, minmax(370px, 1fr))` in a 900px column,
-     which is two columns -- so 20 is ten full rows and no ragged last one. It
-     is also the number that was already chosen once for this job, and picking a
-     different one for the same control on the other site would be a decision
-     nobody made.
-
-     IT SHIPS `display: none` RATHER THAN `hidden`, matching food exactly: the
-     script sets `style.display` on it, and an element carrying both would need
-     the attribute removing as well as the property setting. One mechanism.
-
-     ABSENT JAVASCRIPT THERE IS NO PAGINATION AND NO TRUNCATION EITHER -- every
-     card is in the DOM and visible, which is the same no-JS answer the rest of
-     this index gives. A control that cannot work must not appear; see the
-     shortlist button's own note above. {% endcomment %}
+  {% comment %} Pagination (#694): food's control ported, with the same
+     arithmetic (`HTF.listView.paginate`, assets/js/list-view.js). It ships
+     `display: none`, not `hidden`, because the script sets `style.display` on
+     it: one mechanism. Absent JavaScript there is no pagination and no
+     truncation. {% endcomment %}
   <div class="drink-pagination" style="display: none;">
     <div class="drink-pagination-nav">
       <button type="button" class="btn-page" id="drink-page-prev">&larr; prev</button>
@@ -891,68 +436,39 @@ permalink: /cocktails/
     <button type="button" class="btn-page btn-page-see-all" id="drink-page-see-all">(see all)</button>
   </div>
 
-  {% comment %} THE SHOPPING LIST -- #546's stretch goal, Helen 2026-09-04:
-     "information at the bottom of my shortlist listing each ingredient (bottle
-     selection if I have one, generic if not) and its amount in total if I were
-     to make 1 glass of each of those drinks. Next step is a scaler."
-
-     AT THE BOTTOM OF THE SHORTLIST LISTING, LITERALLY: it is the last thing on
-     the index and it appears only while the shortlisted-only filter is on. That
-     is what makes it "my shortlist listing" rather than a running total under a
-     browse -- and it needs no page of its own for the same reason the shortlist
-     itself did not (see the filter button above).
-
-     THE SCALER IS A NUMBER INPUT, not a pair of steppers. It is one control,
-     it takes a typed 12 as fast as a 2, it gets a numeric keypad on the phone
-     this is most likely to be read on, and it is keyboard-reachable without
-     anything written here. `min=1` because zero glasses of each is an empty
-     list with extra steps.
-
-     THE TOTALS ARE assets/js/shopping-list.js, which is pure and tested; this
-     is the markup it fills and cocktail-index.js is the wiring. Same three-way
-     split as filter-state.js / filters.js, for the same reason -- the arithmetic
-     is the part worth testing without a browser, and summing 682 hand-written
-     amounts across 124 files has more edge cases than it looks. {% endcomment %}
+  {% comment %} The shopping list (#546): last on the index, shown only while
+     the shortlisted-only filter is on. The totals are
+     assets/js/shopping-list.js, which is pure and tested; this is the markup it
+     fills and cocktail-index.js is the wiring. {% endcomment %}
   <section class="shopping-list" id="shopping-list" hidden aria-live="polite">
     <div class="shopping-list-head">
       <h2 class="drink-field-label"><span class="drink-field-label-text">Shopping list</span></h2>
-      {% comment %} SET ALL, NOT A MULTIPLIER. It writes every drink's own count
-         and then has no further opinion -- so there is one number per drink and
-         one place it lives, rather than a global factor multiplying a per-drink
-         figure and nobody able to say what six times two means. {% endcomment %}
+      {% comment %} Set all, not a multiplier: it writes every drink's own count
+         and has no further opinion, so there is one number per drink and one
+         place it lives. {% endcomment %}
       <label class="shopping-list-setall">
         <span>set all to</span>
         <input type="number" id="shopping-list-setall" value="1" min="1" max="99" step="1" inputmode="numeric">
       </label>
     </div>
 
-    {% comment %} ONE COUNT PER DRINK -- Helen, 2026-09-04: "Per drink
-       quantities, zomg yes please!" Two negronis and six daiquiris is a real
-       weekend and one number for the whole list cannot say it. Rendered by
-       cocktail-index.js from the shortlist, because only the browser knows what
-       is in it. {% endcomment %}
+    {% comment %} One count per drink, rendered by cocktail-index.js from the
+       shortlist, because only the browser knows what is in it. {% endcomment %}
     <ul class="shopping-list-drinks"></ul>
 
     <ul class="shopping-list-items"></ul>
 
-    {% comment %} WHAT THE SHOP COMES TO -- #817, and local-only for the same
-       reason every other price here is: `site.show_costs` lives in
-       _config_local.yml and nowhere else, so this paragraph is empty on the
-       deployed site and cocktail-index.js writes nothing into it.
-
-       AT THE BOTTOM, because that is where Helen asked for it and because a
-       total above its own column is a claim you cannot check by looking down.
-       It is summed from the rendered rows rather than from the pours, so it is
-       by construction the sum of the figures above it. {% endcomment %}
+    {% comment %} What the shop comes to (#817), local only: `site.show_costs`
+       is declared in _config_local.yml and nowhere else, so this is empty on
+       the deployed site. Summed from the rendered rows, so it is the sum of the
+       figures above it. {% endcomment %}
     <p class="shopping-list-total" hidden></p>
 
     <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
   </section>
 
-  {% comment %} SHARE OR SAVE THE SHORTLIST -- one link, and nothing else since
-     #1100. food/index.html carries the identical block and the note: Helen,
-     2026-09-15, "Remove the rest of the apparatus: no JSON export or import, no
-     clear." The words below are hers. {% endcomment %}
+  {% comment %} Share or save the shortlist: one link and nothing else (#1100).
+     food/index.html carries the identical block. The words are Helen's. {% endcomment %}
   <details class="shortlist-export" id="shortlist-export"
            data-shortlist-export-panel hidden>
     <summary>Share or save the shortlist</summary>
@@ -964,76 +480,32 @@ permalink: /cocktails/
     </button>
   </details>
 
-  {% comment %} A `?panel=` SWITCH STOOD HERE for one round, offering four glass
-     panels against the shipped green wash. Helen chose `none` -- no panel at
-     all, the home colour in the line work -- so the switch and the three losers
-     are gone and the winner is the default in _sass/cocktails/_cards.scss.
-     MANUAL 9.13: a comparison switch left in becomes a permanent branch
-     nobody dares remove. {% endcomment %}
+  {% comment %} The data blocks below are read by cocktail-index.js at startup,
+     each by its id. {% endcomment %}
 
-  {% comment %} THE INGREDIENT VOCABULARY — declared families, card names and
-     the three search thresholds — comes from _data/cocktails/ingredients.yml.
-     cocktail-search.js reads it from here rather than hardcoding any of it, the
-     same contract food/index.html has with filters.js.
-
-     `family_of` HAS EXISTED SINCE #322 AND WAS READ BY NOTHING until #579. Its
-     own header says what it is for: "the ingredient search's `(all)` buttons ...
-     and exclusion. 'I don't like Scotch' is a family-level operation." 68
-     generics are mapped across 10 families, and #549 point 1 is asking for
-     exactly this rather than for a new mechanism.
-
-     The whole file is emitted, not a hand-picked subset, so adding a key to the
-     YAML never needs this template touched -- which is the property #501 already
-     values about `card_names`. It is 12 KB of JSON on a page that already
-     carries 115 cards, and every byte of it is public in this repo anyway
-     (MANUAL §9.1: the shell is public, the drinks are not). {% endcomment %}
+  {% comment %} The ingredient vocabulary, from _data/cocktails/ingredients.yml:
+     the scripts read it from here and hardcode none of it. The whole file is
+     emitted, so a new key never needs this template touched; all of it is
+     public in this repo already (MANUAL §9.1). {% endcomment %}
   <script type="application/json" id="drink-vocabulary">
     {{ site.data.cocktails.ingredients | jsonify }}
   </script>
 
-  {% comment %} THE BOTTLE DICTIONARY, #529. The search reads it for two things
-     and both are Helen's, 2026-08-29:
-
-       "'wray and nephew' and 'wray & nephew' should both collapse onto the
-       latter" -- `aliases` is how a bottle keeps ONE identity, which that file
-       has said since it was written and the search had never read. MANUAL
-       §9.10.1 names the gap: "suggestions go in raw rather than resolved through
-       bottles.yml's aliases, so `Havana 3` and `Havana Club 3` can both appear."
-
-       "I don't want any returned search chips to be an X or Y shape" --
-       `unresolved_suggestions` is that file's own list of the ten suggestion
-       strings that are not a usable bottle name, each carrying its reason.
-
-     7 KB, and public in this repo already. {% endcomment %}
+  {% comment %} The bottle dictionary (#529). The search reads each bottle's
+     `aliases`, so a bottle keeps one identity however a drink spells it, and
+     `unresolved_suggestions`, the suggestion strings that are not a usable
+     bottle name. {% endcomment %}
   <script type="application/json" id="drink-bottles">
     {{ site.data.cocktails.bottles | jsonify }}
   </script>
 
-  {% comment %} WHAT EACH DRINK IS MADE OF, FOR THE SHOPPING LIST -- #546's
-     stretch goal, asked for on 2026-09-04: "each ingredient (bottle selection if
-     I have one, generic if not) and its amount in total if I were to make 1
-     glass of each of those drinks".
-
-     IT HAS TO BE EVERY DRINK, not the shortlisted ones, and that is not
-     wastefulness: the shortlist lives in this browser's localStorage and the
-     build cannot know what is in it. The same fact that makes the whole feature
-     client-side makes this blob unconditional.
-
-     THREE FIELDS, NOT THE WHOLE INGREDIENT. `item`, `note`, `optional` and the
-     rest are what a drink PAGE renders; a shopping list needs the amount, the
-     generic and the bottle, and nothing else. That is about 30 KB rather than
-     the ~90 KB `drink.ingredients | jsonify` would emit, on a page that already
-     carries 124 cards and 19 KB of vocabulary.
-
-     EACH VALUE THROUGH `jsonify` INDIVIDUALLY, never hand-quoted. Bottles and
-     generics carry apostrophes (`John D Taylor's Velvet Falernum`), accents and
-     the odd ampersand, and `jsonify` on the string is what escapes them
-     correctly. It also does the right thing for the fields that are sometimes a
-     LIST and sometimes a scalar -- `generic` has five list entries, `suggestion`
-     nineteen (#441, "either would do") -- and for `suggestion` being absent
-     altogether on 490 of the 682, where it emits `null` and the reader treats it
-     as "no bottle named". Keys are one letter because this is machine-read and
-     682 entries pay for the difference. {% endcomment %}
+  {% comment %} What each drink is made of, for the shopping list (#546). Every
+     drink, because the shortlist lives in this browser's localStorage and the
+     build cannot know what is in it. Three fields only (amount, generic,
+     bottle), under one-letter keys. Each value goes through `jsonify` on its
+     own, never hand-quoted: names carry apostrophes and ampersands, `generic`
+     and `suggestion` may be a list, and an absent `suggestion` must emit
+     `null`. {% endcomment %}
   <script type="application/json" id="drink-ingredients">
 {
 {%- for drink in sorted_drinks %}{% unless forloop.first %},{% endunless %}
@@ -1046,68 +518,22 @@ permalink: /cocktails/
 }
   </script>
 
-  {% comment %} HOW MUCH A `to top` ACTUALLY POURS — #746.
-
-     NOT GATED, unlike the costs below, and that is deliberate: `top_up_ml`
-     lives in costs.yml because the costing needed it first, but it is a VOLUME,
-     not a price. "300–450 ml of soda water" is what the shopping list should
-     say on the deployed site as much as on this one, and nothing about it
-     reveals what anything costs.
-
-     THREE ROWS, so this is about 100 bytes. Emitted whole rather than picked
-     apart, because the shape the JS wants (`generic -> {ml_min, ml_max}`) is
-     exactly the shape the YAML already has.
-
-     WHY IT IS A RANGE. costs.yml's own header: "topping is not measuring. You
-     pour until the glass looks right, and the glass differs -- a flute takes
-     less than a collins." A single figure here would be the false precision
-     `juice_yields` refuses, and this follows that file's shape on purpose.
-     {% endcomment %}
+  {% comment %} How much a `to top` adds (#746). Not gated like the costs below:
+     `top_up_ml` lives in costs.yml but is a volume, not a price. A range,
+     because topping is not measuring. {% endcomment %}
   <script type="application/json" id="drink-top-ups">
     {{ site.data.cocktails.costs.top_up_ml | jsonify }}
   </script>
 
-  {% comment %} WHAT EACH DRINK COSTS A GLASS — LOCAL ONLY, and the whole block
-     is absent on the deployed site because `site.show_costs` is declared in
-     _config_local.yml and nowhere else. Same gate as the drink page's own cost
-     line; see _layouts/cocktail.html.
-
-     WHY IT IS HERE AT ALL. Helen, 2026-09-06: "the only other place I care
-     about this number is when I'm comparing drinks in a shortlist." So it rides
-     with the shopping list rather than appearing on 124 cards — a shortlist is
-     where two drinks get compared, and a card grid is where a price column
-     would just be noise.
-
-     ALREADY COMPUTED, NOT RECOMPUTED. `_plugins/cocktail_costs.rb` did every
-     sum at build and hung the result on `drink.cost`; this copies two numbers
-     out of it. cocktail-index.js therefore needs none of the resolution logic —
-     no alias map, no bottle-or-generic fallback — which is the same division
-     that keeps `cocktail-scale.js` ignorant of prices.
-
-     INCOMPLETE DRINKS ARE OMITTED, not emitted as zero. A drink has
-     `cost.complete: false` when what the exclusion rule drops IS the drink;
-     the reader below prints no price for a drink it has no entry for, which
-     is the same silence the drink page keeps. None is incomplete today: the
-     two that were (the Bellini and the Caipirinha) had their fruit and sugar
-     priced by #748 on 2026-09-24. The gate stays for the next one.
-     {% endcomment %}
-  {% comment %} GBP PER LITRE, RESOLVED AT BUILD — #820, #817, #818. Same gate as
-     the per-drink costs below, and about 10 KB.
-
-     WHY A SECOND BLOCK RATHER THAN MORE OF `drink-costs`. They answer different
-     questions and neither can be derived from the other: `drink-costs` is what
-     one glass of one drink costs, and this is what a litre of an ingredient
-     costs. A shopping list totals by GENERIC across every shortlisted drink,
-     which no drink's own figure contains.
-
-     ALREADY RESOLVED, NOT RAW COSTS.YML. `_plugins/cocktail_costs.rb` applied
-     every rule about what a generic costs before this was written — the union
-     of declared bottles and the generic's own row, `default_bottles` narrowing
-     it where Helen has ruled, a squeezed juice priced from the fruit and the
-     yield. The browser multiplies millilitres by a number and does nothing
-     else, which is the same division that keeps `cocktail-scale.js` ignorant of
-     prices. Emitting costs.yml raw would put a second copy of those rules in
-     JavaScript. {% endcomment %}
+  {% comment %} Local only: both blocks below are absent on the deployed site,
+     because `site.show_costs` is declared in _config_local.yml and nowhere
+     else. `drink-costs`, the second, is what a glass of each drink costs,
+     copied from the `drink.cost` that _plugins/cocktail_costs.rb computed. A
+     drink whose `cost.complete` is false is omitted, not emitted as zero. {% endcomment %}
+  {% comment %} `drink-rates` is GBP per litre by ingredient, already resolved
+     by _plugins/cocktail_costs.rb (#820), so the browser multiplies millilitres
+     by a number and holds no copy of the costing rules. A shopping list totals
+     by generic across drinks, which no single drink's figure contains. {% endcomment %}
   {% if site.show_costs %}
   <script type="application/json" id="drink-rates">
     {{ site.data.cocktails.rates | jsonify }}
@@ -1128,56 +554,33 @@ permalink: /cocktails/
   </script>
   {% endif %}
 
-  {% comment %} ORDER MATTERS, and each of these is read at startup rather than
-     on first use, so a page that loads them out of order fails immediately
-     rather than on the first keystroke:
-
-       ingredient-search.js  fold, getWords and orderByBand — the three-band
-                             ordering rule, shared with the food index since
-                             #579 rather than re-derived here.
-       filter-state.js       COCKTAIL_FIELDS: what this index's filter state IS.
-       cocktail-search.js    the pool, the ranking and the two matching rules.
-                             Requires the first of these.
-       shopping-list.js      the totals a shortlist adds up to (#546).
-                             cocktail-index.js calls HTF.shoppingList.foldKey at
-                             STARTUP, building its bottle-alias map, so this is
-                             the same trap as the three above rather than a
-                             looser dependency.
-
-     Guarded by tests/test_site_config.py, the same way food's four are.
-  {% endcomment %}
-  {% comment %} `list-view.js` is three pure helpers -- shuffle, paginate,
-     titleMatchTier -- that the food index happened to need first. #694 brought
-     the cocktails index to the SAME `paginate`, so the two pagers cannot drift
-     about what "page 3 of 7" means. Loaded before cocktail-index.js, which
-     calls it.
-
-     IT WAS `recipe-list.js` UNTIL 2026-09-20 (#759), which is why a reader may
-     remember that name: it was named after where it was born rather than what
-     it does, and a cocktails developer was reading a script tag for recipes on
-     a page with no recipes on it. {% endcomment %}
+  {% comment %} Order matters: each of these is read at startup, so a page that
+     loads them out of order fails immediately. cocktail-search.js needs
+     ingredient-search.js; cocktail-index.js needs filter-state.js,
+     cocktail-search.js and shopping-list.js (it calls HTF.shoppingList.foldKey
+     as it starts).
+     tests/test_site_config.py::test_the_cocktail_index_scripts_load_in_dependency_order
+     guards all but shopping-list.js. {% endcomment %}
+  {% comment %} list-view.js is shared with the food index (#694), so the two
+     pagers agree on what a page is. Loaded before cocktail-index.js, which
+     calls it. {% endcomment %}
   <script src="{{ '/assets/js/list-view.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-search.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
   <script src="{{ '/assets/js/cocktail-index.js' | relative_url }}"></script>
-  {% comment %} THE STICKY RESULTS BAR, AFTER cocktail-index.js (2026-09-26).
-     It mirrors the count spans and the top `× clear all` that script builds,
-     wiring itself on DOMContentLoaded; food/index.html has the same tag in
-     the same place for the same reason, and
+  {% comment %} After cocktail-index.js: results-bar.js mirrors the count spans
+     and the top `× clear all` that script builds.
      tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes
-     holds both. {% endcomment %}
+     holds it. {% endcomment %}
   <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
-  {% comment %} AFTER cocktail-index.js and, more to the point, before
-     _layouts/default.html's own decorations.js -- see universe.js's header
-     comment for why that order is load-bearing: it is what lets a cloned,
-     emptied tape slot get its tape for free on the FIRST deal. {% endcomment %}
+  {% comment %} After cocktail-index.js and before _layouts/default.html's
+     decorations.js: that order is what tapes the first deal (see universe.js's
+     header). {% endcomment %}
   <script src="{{ '/assets/js/universe.js' | relative_url }}"></script>
-  {% comment %} #849. ORDER DOES NOT MATTER for this one, unlike universe.js
-     above it: it reads HTF.shortlist at run time rather than lifting helpers
-     off another module at startup, and it subscribes to an event rather than
-     being called by anybody. {% endcomment %}
+  {% comment %} Order does not matter for this one (#849): it reads
+     HTF.shortlist at run time and subscribes to an event. {% endcomment %}
   <script src="{{ '/assets/js/shortlist-export.js' | relative_url }}"></script>
 
 {% else %}

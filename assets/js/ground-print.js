@@ -1,31 +1,13 @@
 // ground-print.js
-// =============================================================================
-// THE PAGE GROUND'S PRINT, DRAWN ONCE ON THE DEVICE AND KEPT. #733.
-// =============================================================================
-// Cocktails' page ground is a black-on-black leopard (model_instructions/
-// LEOPARD.md). It is an SVG, and for one afternoon it was simply a CSS
-// background: the browser redrew ten thousand fur strokes, behind a mask, for
-// every strip of page that scrolled into view, and Helen's phone and laptop
-// both juddered. "The page is slow to load, even top to bottom, and scrolling
-// is juddery even after lots of scrolling up and down."
+// The page ground's print, drawn once on the device and kept (#733;
+// model_instructions/LEOPARD.md). The SVG print is too costly to repaint as a
+// CSS background while scrolling, and the site ships no images, so the SVG is
+// drawn once into a canvas and the stylesheet uses that picture. The picture
+// is kept in IndexedDB, so only the first visit after the artwork changes
+// pays for the drawing.
 //
-// The usual fix is to ship a bitmap. This site ships no images, on purpose --
-// Helen: "one of the very coolest things I wanted to achieve here was great
-// styling with zero images." So the bitmap is made HERE instead: the SVG is
-// drawn once into a canvas, the canvas becomes a picture in memory, and the
-// stylesheet uses that picture as the background. Scrolling then moves a
-// picture, which is what a browser is good at. She chose it over a slimmed-down
-// vector by scrolling both on her phone ("it all looks like spiders"), and
-// liked that it comes out a little soft on a dense screen.
-//
-// AND IT IS KEPT. "Can drawn once not be saved page to page...?" It is: the
-// picture goes into IndexedDB, keyed by the artwork's version, so only the
-// first visit after the artwork changes pays for the drawing. Every other page
-// load reads it back.
-//
-// THIS FILE KNOWS NO SITE (MANUAL §3). A stylesheet opts in by declaring
-// `--ground-print` on :root; one that declares nothing -- food -- gets nothing,
-// and this returns at once. What it reads, all from _sass/<site>/_leopard.scss:
+// Site-agnostic (MANUAL §3): a stylesheet opts in by declaring
+// `--ground-print` on :root. What it reads, from _sass/<site>/_leopard.scss:
 //
 //   --ground-print           the print's file under the site's own artwork
 //   --ground-nap             an optional texture laid under it
@@ -34,23 +16,9 @@
 //   --ground-print-strength  how strongly to draw the print; 1 if unset
 //   --ground-nap-strength    the same for the nap
 //
-// THE TWO STRENGTHS, 2026-10-08. The artwork at face value "doesn't show up
-// well on a phone" (Helen), and the remedy was never going to be a second
-// drawing: both files are white at a few percent alpha, so drawing one twice
-// is very nearly twice as light. A stylesheet asks for 1.5 and gets one full
-// pass and one at half. Either strength can sit in a media query, which is how
-// a phone gets a fainter nap than a desktop, and everything that changes the
-// picture is in the key it is kept under.
-//
-// and what it sets: `--ground-picture`, a url() the same partial uses as the
-// body's background-image. Until it is set the page shows the plain ground,
-// which is also everything a browser with scripts off will ever show.
-//
-// EVERY PATH FAILS QUIET, INTO THAT PLAIN GROUND. No IndexedDB (private mode,
-// blocked site data): it draws on each load instead. No canvas, no blob, a
-// tile that will not load: no print. A texture is not worth breaking a page
-// for.
-// =============================================================================
+// What it sets: `--ground-picture`, a url() for the body's background-image.
+// Every path fails quiet into the plain ground, which is also what a browser
+// with scripts off shows.
 
 (function (root) {
   'use strict';
@@ -73,10 +41,8 @@
 
   /**
    * The alphas to draw the print at, one per pass, to reach a strength.
-   * 2.5 -> [1, 1, 0.5]. The artwork is white at a few percent alpha, so n
-   * passes are very nearly n times as light; a canvas can only draw an image
-   * FAINTER than it is, never stronger, which is why this is passes and not
-   * one multiplication.
+   * 2.5 -> [1, 1, 0.5]. Passes, not one multiplication: a canvas can only
+   * draw an image FAINTER than it is, never stronger.
    */
   function passes(strength) {
     var out = [];
@@ -89,17 +55,15 @@
   }
 
   /**
-   * The key a picture is stored under. The site is in it because both sites
-   * share one origin and so one database; the version is in it so new artwork
-   * is never answered with an old picture; and the strength and the nap are
-   * in it because a phone and a laptop may be asked for different pictures
-   * (a stylesheet can set either inside a media query) and a window dragged
-   * across that line must not be handed the other one's.
+   * The key a picture is stored under: everything that changes the picture.
+   * The site, because both sites share one origin and so one database; the
+   * version, so new artwork is never answered with an old picture; the
+   * strength and the nap, because a stylesheet can set either inside a media
+   * query.
    */
   function keyFor(site, version, strength, nap, ground) {
     /* The ground colour too: it is painted INTO the picture, so a palette
-       change that left the key alone would leave every returning browser
-       with the old black under the new page. */
+       change must not leave a returning browser with the old ground. */
     return [site, version, strength == null ? 1 : strength, nap || '-', ground || '-']
       .map(String).join('/');
   }
@@ -116,7 +80,7 @@
   var STORE = 'pictures';
 
   /* What the stylesheet is asking for, read fresh each time: null if it
-     declares no print at all, which is how a site (food) opts out. */
+     declares no print at all, which is how a site opts out. */
   function wanted() {
     var style = root.getComputedStyle(doc.documentElement);
     var print = unquote(style.getPropertyValue('--ground-print'));
@@ -196,8 +160,8 @@
 
   /* Ground, then the nap tiled across it, then the print: one opaque picture
      at the print's own size in CSS pixels. Deliberately NOT multiplied up for
-     a dense screen -- three times the pixels each way is nine times the
-     memory, and Helen preferred the softer one on her phone anyway. */
+     a dense screen: three times the pixels each way is nine times the
+     memory, and the softer picture is the preferred one. */
   function draw(want, printImage, napImage, then) {
     try {
       var canvas = doc.createElement('canvas');
@@ -245,9 +209,8 @@
   /**
    * Put the print the stylesheet is asking for on the ground: the kept
    * picture if there is one for exactly that request, a fresh drawing if not.
-   * Run once at load, below. Also callable -- a candidates page changes
-   * `--ground-print-strength` on the root element and calls this, so what
-   * Helen compares is drawn by the code that will ship.
+   * Run once at load, below. Also callable, for a page that changes a
+   * strength on the root element and wants the result drawn by this code.
    *
    * @param {boolean} [now] - draw at once rather than waiting for `load`
    */
@@ -257,11 +220,8 @@
     open(function (db) {
       recall(db, want.key, function (blob) {
         if (blob) { show(blob); return; }
-        /* THE FIRST DRAWING WAITS FOR THE PAGE. It is the one expensive thing
-           here -- about a second -- and done at parse time it would be a
-           second in which the page could not be read or scrolled. After
-           `load` it is a second in which the ground is plain, which nobody
-           is waiting on. */
+        /* The first drawing waits for `load`: it is the one expensive thing
+           here, and at parse time it would block reading and scrolling. */
         if (now || doc.readyState === 'complete') { make(db, want); }
         else { root.addEventListener('load', function () { make(db, want); }); }
       });

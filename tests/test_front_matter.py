@@ -1529,10 +1529,9 @@ def test_agent_edited_recipes_are_not_marked_proofread():
 def test_every_recipe_declares_awaiting_fix():
     """The flag is present on every recipe, so its absence is never the answer.
 
-    An absent key reads as "not flagged" and publishes, which is the right
-    DEFAULT but the wrong way to arrive at it: you cannot tell a recipe nobody
-    has considered from one deliberately cleared. Helen sets this during
-    proofreading, and a recipe that never got the field never went through that.
+    The gate fails closed: a recipe with no `awaiting_fix` key is held back
+    from the live site. This names the file, so a page going dark is a red
+    test and not a surprise.
     """
     missing = []
     for path in sorted((ROOT / "_food_recipes").glob("*.md")):
@@ -1542,25 +1541,19 @@ def test_every_recipe_declares_awaiting_fix():
             missing.append(path.name)
     assert not missing, (
         "Recipe(s) with no `meta.awaiting_fix` key:\n  " + "\n  ".join(missing)
-        + "\n\nAdd `awaiting_fix: false`. Absent reads as not-flagged and "
-          "publishes, which is the right default reached the wrong way -- it "
-          "makes 'nobody considered this' indistinguishable from 'deliberately "
-          "cleared'."
+        + "\n\nThe publish gate fails closed, so these pages are held back "
+          "from the live site. Add `awaiting_fix: false` if nothing is open on "
+          "the recipe."
     )
 
 
 def test_awaiting_fix_is_a_real_boolean():
-    """`awaiting_fix: "true"` is a STRING and the gate ignores it.
+    """`awaiting_fix: "false"` is a STRING, and the gate holds the page back.
 
-    THIS IS THE SILENT ONE. The plugin drops a document when
-    `meta["awaiting_fix"] == true` -- Ruby's `true`, not a truthy value. A
-    quoted "true", or YAML's `yes` resolving to a string in some parsers, is not
-    equal to it, so the page you flagged publishes and the build stays green.
-    You would only find out by looking at the live site.
-
-    Same family as _data/cocktails/taxonomy.yml's `ship_scale`, where a bare
-    `yes` parsed as the BOOLEAN True and silently failed every comparison
-    against the string "yes" -- the same trap pointing the other way.
+    The plugin publishes only when `meta["awaiting_fix"] == false` -- Ruby's
+    `false`, not a falsy value. A quoted "false" is not equal to it, so a page
+    meant to be live goes dark. A quoted "true" is held back too, but for the
+    wrong reason, and stops meaning anything to code that tests for `true`.
     """
     bad = []
     for path in sorted((ROOT / "_food_recipes").glob("*.md")):
@@ -1570,9 +1563,8 @@ def test_awaiting_fix_is_a_real_boolean():
             bad.append(f"{path.name}: {meta['awaiting_fix']!r} ({type(meta['awaiting_fix']).__name__})")
     assert not bad, (
         "`meta.awaiting_fix` must be an unquoted true/false:\n  " + "\n  ".join(bad)
-        + "\n\nThe plugin compares with `== true`, so a string never matches "
-          "and the page publishes despite being flagged -- silently, with a "
-          "green build. Never quote this value."
+        + "\n\nThe publish gate needs exactly `false`, so a quoted value "
+          "holds the page back from the live site. Never quote this value."
     )
 
 

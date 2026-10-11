@@ -20,7 +20,7 @@ This public repo holds both the food and cocktails sides, with private repos hol
    - Logged in as Claude, create a new personal access token scoped to "repo"
       - Classic token because fine-grained tokens can only target repos owned by their own account or an organisation
       - Blast radius is only the three repos the account was invited to
-      - Can't push any change under .github/workflows/
+      - Has the `workflow` scope too, so a workflow change arrives as an ordinary PR
       - Merging is always done by me
    - Set `AGENT_GH_TOKEN` in `.claude/settings.local.json`
       - Note that the token goes under the env key in `settings.local.json` (`run.sh` reads `['env']['AGENT_GH_TOKEN']`), and that file is gitignored
@@ -92,15 +92,15 @@ https://github.com/DeckOfPandas/helen-triages/blob/main/model_instructions/PIPEL
 There's a Mermaid diagram at the top, ooOoooh.
 
 Three ways in:
-1. claude.ai Project
+1. A claude.ai chat given three GitHub URLs
 2. An `ingest` issue on a private repo
 3. I dump files in `tmp/inbox-*` 
 
 Then an intake pass results in ONE list of questions for me. Anything the source doesn't say is `QQ`.
 
-The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/` (food only because cocktails are usually less garbage on the way in), `2-make/`, `3-keep/`, `4-promote/`, and for cocktails `5-final-proofread/`.
+The private drafts repos have numbered folders showing state to help me keep track of recipes I want to try: `1-rewrite/`, `2-make/`, `3-keep/`, `4-promote/`, and for cocktails `5-final-proofread/`.
 
-Then Claude does a mechanical pass on what's in `4-promote`, then I proofread the rendered page, Claude promotes it in a PR, I merge, and the merge deploys.
+Then Claude does a mechanical pass on what's in `4-promote`, then I proofread the rendered page, then I promote it or ask Claude to, in a PR, I merge, and the merge deploys.
 
 `5-final-proofread/` is for the ones that come back to me. The mechanical pass fixes what the tests can name, but some things need a ruling only I can give — a garnish nothing has declared yet, an ingredient that turns out to be two ingredients — and those used to sit in `4-promote/` looking identical to the ones that were ready. Now `4-promote/` means waiting on Claude and `5-final-proofread/` means waiting on me, so I can see at a glance which pile is mine.
 

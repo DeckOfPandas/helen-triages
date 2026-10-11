@@ -98,9 +98,11 @@ WHAT IT DELIBERATELY ALLOWS, because these are how the token is legitimately
 used and a guard that blocked them would be routed around within a day:
 
   * `${TOK}` or `$TOK` anywhere that is not an echo, a URL, or a literal --
-    passing it to `GH_TOKEN="$AGENT_GH_TOKEN" gh ...`, or reading it inside
-    `scripts/git-credential-agent-token.sh` to answer git's credential
-    protocol, are both CONSUMING the value rather than printing it.
+    `scripts/gh-agent.sh` exporting it as `GH_TOKEN` for gh, or
+    `scripts/git-credential-agent-token.sh` reading it to answer git's
+    credential protocol, are both CONSUMING the value rather than printing
+    it. (A leading `GH_TOKEN=... gh` on a command line is refused by
+    guard-unanalyzable-bash.py; use the wrapper.)
   * The whole thing inside SINGLE quotes, for the echo/default-expansion
     checks only -- so prose and commit messages may discuss those forms. See
     the stripping note below, which is where this hook differs from its
@@ -139,8 +141,8 @@ import sys
 # AGENT_GH_TOKEN, the only credential this repo still carries since GH_TOKEN
 # was retired on 2026-09-09, plus the obvious siblings -- and GH_TOKEN itself
 # still matches, which is wanted: the name survives as the variable `gh` reads
-# (`GH_TOKEN="$AGENT_GH_TOKEN" gh ...`) and a guard should not stop covering a
-# name just because the secret behind it was rotated away.
+# (scripts/gh-agent.sh sets it) and a guard should not stop covering a name
+# just because the secret behind it was rotated away.
 SECRET_NAME = re.compile(r"^(.*_)?(TOKEN|SECRET|PASSWORD|PASSWD)$")
 
 # `${NAME:-`, `${NAME:=`, `${NAME-`, `${NAME=` -- the four expansions that
