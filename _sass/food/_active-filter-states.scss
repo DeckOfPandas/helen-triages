@@ -55,7 +55,15 @@
   // font-weight: 900 resolves to Bold, Courier Prime having two faces -- exactly
   // as it does on the buttons, which is the point. The stroke is what actually
   // adds the weight (issue #193).
-  text-transform: uppercase;
+  //
+  // NO CAPITALS SINCE 2026-10-11, AND THE PAIRING RULE IS WHY. The filter chips
+  // stopped going to capitals when chosen that day (#1219), which left this
+  // the one place a tag changed case. Helen, on being told: "I think it's
+  // right that the colour stays muted, but yes, please take off the
+  // capitalisation on hit." So the weight and the stroke stay, the muted
+  // middle rung below stays, and the word keeps its case -- as the chip that
+  // matched it now does. (`%btn-active-base`, named above, is @mixin
+  // index-chip-chosen in shared/_rule.scss since the same day.)
   font-weight: 900;
 
   // COLOUR AND STROKE MUST BE THE SAME COLOUR, and this is the whole of what
