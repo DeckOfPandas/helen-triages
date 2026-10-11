@@ -5,13 +5,14 @@ screenshot, a URL, or pasted text — and asked to turn it into a file for her
 recipe site. You do **not** have her repository, her test suite, or her data
 files. Everything you need is in this document.
 
-**Hand back two things, in this order:**
+**Hand back one envelope per recipe, in the shape §0 fixes.** It carries:
 
-1. **One complete `.md` file, in a single code block**, ready to save into
-   `_food_drafts/`. Give the filename on the line above it.
-2. **A short "what I could not know" list** — every place you left a `QQ`, every
-   figure you took on trust, anything the source cut off. Four or five bullets,
-   not an essay. This is the part that makes the file cheap for her to finish.
+- **One complete `.md` file**, ready to save into `_food_drafts/`.
+- **A short "what I could not know" list** — every place you left a `QQ`, every
+  figure you took on trust, anything the source cut off. A handful of bullets,
+  not an essay. This is the part that makes the file cheap for her to finish.
+- **A marker line and a fingerprint line**, which let her repository accept
+  the file and recognise a duplicate.
 
 **The bar is not perfection.** A file she can cook from is the goal; a file she
 can cook from after two minutes' tidying is a fine result. Her repository has a
@@ -26,19 +27,27 @@ not garbling, and the quality of the rewritten method.
 Helen pastes what you write into a GitHub Issue on her private drafts
 repository, `helen-triages-food-private`, titled `ingest: <slug>` and labelled
 `ingest`. A script there parses it, so the shape matters: anything missing is a
-rejection rather than a guess. `INGEST_INBOX_DESIGN.md` §6 is the reference and
-this is the short form.
+rejection rather than a guess.
 
-Four parts, in this order, and nothing else at the top level:
+These parts, in this order, and nothing else at the top level:
 
 1. `<!-- ingest v1 food -->`, as the first non-blank line. Exactly that.
 2. **One** fenced `yaml` block, and only one — the complete file, front matter
    and all, beginning `---`.
-3. A `## What I could not know` heading with your list under it. If there is
-   genuinely nothing, write "nothing"; the heading is never absent.
-4. A `## Fingerprint` heading, then ONE line: the title lowercased, then every
+3. A `## What I could not know` heading with your list under it, each bullet
+   on one unwrapped line: the script reads every non-blank line as an item of
+   its own. If there is genuinely nothing, write "nothing"; the heading is
+   never absent.
+4. A `## Fingerprint` heading, then one line: the title lowercased, then every
    amount in ingredient order, separated by ` | `. For the worked example in §9
    that is `crispy sage butter gnocchi | 500 g | 60 g | 12 | 1 | 30 g`.
+
+**In a chat, show the whole envelope inside one outer fence of four
+backticks**, so that its own three-backtick `yaml` fence copies as raw text
+instead of closing the block, and put a line reading exactly `ingest: <slug>`
+above it. That line is the issue title; the slug is the filename from §2
+without its `.md`. The outer fence is there for copying and is not part of the
+envelope. §9 shows a complete one.
 
 **The fingerprint is how her repo tells a real duplicate from two dishes
 sharing a name**, so the amounts must be the ones in the file, in the file's
@@ -99,7 +108,7 @@ ingredient_groups:
       item: "onions, sliced"
 method:
   - "QQ original Heat the oven to 180C fan and grease a 20cm tin."
-  - "QQ Claude Heat the oven to 180°C fan. Grease a 20cm tin."
+  - "QQ Claude Heat the oven to 180°C fan. Grease a 20 cm tin."
 method_short:
   - ""
 notes:
@@ -112,9 +121,9 @@ meta:
 ---
 ```
 
-**The filename** is the whole title, lowercased, hyphenated, ASCII only, `.md`
-(Helen's ruling, 2026-09-03 — it used to be the head clause before any
-"with …"). "Charred Asparagus and Fennel Salad with Crispy Prosciutto" →
+**The filename** is the whole title, any "with …" clause included, lowercased,
+hyphenated, ASCII only, `.md`.
+"Charred Asparagus and Fennel Salad with Crispy Prosciutto" →
 `charred-asparagus-and-fennel-salad-with-crispy-prosciutto.md`. Accents and
 apostrophes are stripped in a filename even though they are kept in the
 title. Her repo derives the same slug from your `title:` regardless, so the
@@ -125,10 +134,10 @@ name you give is a courtesy rather than a contract.
 | Field | Rule |
 |---|---|
 | `title` | The dish's name. **`and`, never `&`.** Keep the source's own name unless it is unusable. |
-| `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen, 2026-10-08: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling, 2026-09-21: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
+| `tagline` | One line, **and it always begins `QQ `, because it is never yours.** **If the source has an intro, the tagline is a PAIR on one line, the same pair a method step is**: `"QQ original <the intro, verbatim> QQ Claude <your plain rewrite of it>"`. Helen: *"QQ original yes, then QQ claude rewrite, then I'll do my own and delete the other two."* The rewrite says what the intro says, shorter, by §3's rules — **it is not a joke, a pitch or a line of your own**, and you do not invent enthusiasm. **If the source has no intro, write `"QQ"` alone and draft nothing.** The tagline is Helen's voice on a published page, and the `QQ` is what stops somebody else's copy, or yours, reaching it under her name (her ruling: *"a drink without a tagline written by me gets a QQ, so I protect my voice in the public content"*). |
 | `source` / `source_type` | Section 5. Both required, and they must agree. |
 | `serves` **xor** `makes` | Never both. `makes` for things you produce (bakes, sauces, a spice blend); `serves` for what you portion out. Free text is fine — `"6–8 as a side"`, `"Depends on appetite"`. **Anything made as a batch is `makes`, even where the source prints "Serves 12"** over a tin of brownies. **A `makes` that opens with a number NAMES THE THING, straight after it: `"12 muffins"`, `"16 large brownies or 32 bite-sized"`, `"one 8-inch cake"`, never a bare `"12"`.** The scaler and the shopping list print that word. |
-| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **If the source does not support an estimate, ASK Helen rather than guess** -- her rule: "Claudes can check with me if unsure." |
+| `serves_estimate` | **An integer, PEOPLE, unquoted, and REQUIRED unless `serves:` opens with a number.** The shopping list divides by it, so "About 750 ml" and "one 8-inch cake" and "Depends on appetite" all need one. Estimate it from the recipe: a round cake is 12, a loaf 10, 18 cookies is 9 (two each), a 950 ml tub of ice cream is 8. **`makes` is never read as people** however numeric it looks. **If the source does not support an estimate, ask Helen in your list rather than guess** — her rule: "Claudes can check with me if unsure." |
 | `prep_time` / `cook_time` | `"20 mins"`, `"1 hr 30 mins"`, `"2 hrs"`. Not in the source? `"QQ"`. **Never estimate one** — an invented time publishes, a `QQ` does not. `cook_time: "None"` for a genuinely uncooked dish. |
 | `main_ingredients` | Section 4. Lowercase, a flat list. |
 | `star_ingredient` | Section 4. **Optional** — leave it out rather than force one. |
@@ -136,8 +145,8 @@ name you give is a courtesy rather than a contract.
 | `ingredient_groups` | Below. |
 | `method` **xor** `method_groups` | Section 3 — the part that matters most. Flat `method:` for a recipe with one phase, `method_groups:` when the source has more. **Never both** — the layout renders one and silently drops the other. |
 | `method_short` | Always exactly `[""]`. It means "not written", and Helen writes it herself. |
-| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen, 2026-09-04: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. **A bare string note is not legal anywhere any more** — 2026-10-01, 298 of them migrated to the pair, `test_note_dicts_have_label_and_text_when_dict` refuses a new one. An EMPTY pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and neither layout prints it. **If you have no note to add, write exactly that one empty pair — never `notes: []`** (#1258, 2026-10-02): it leaves Helen somewhere to type without recalling the shape. Three at most; more than that and the material wants to be prose. |
-| a tip printed under the source's own label | **Transcribe the tip; drop the label.** Good Food runs its asides under a standing `gf tip` rubric, and eight drafts carry that prefix verbatim — where it reads as an abbreviation nobody can expand. `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence (*"the magazine likes Kallo"* stays). **Never carry an unexplained abbreviation across**: `gf` was read as *gluten-free* for weeks by an issue and a comment in `tests/test_style.py` alike, and one of the fixes they proposed would have printed a false allergen claim on a recipe page. Expand it now, while the source is in front of you, or drop it. |
+| `notes` | A list. **Every note you add is the `{label, text}` form with BOTH fields set, and both begin `QQ`** — Helen: "It's annoying for me to remember how to type YAML every time." She finds the `QQ`s, replaces the label with a real heading and the text with her own words, and never has to recall the shape. **A bare string note is not legal**: her suite refuses one. An empty pair (`label: ""`, `text: ""`) is the placeholder for a note you have nothing to put in yet, and the page does not print it. **If you have no note to add, write exactly that one empty pair — never `notes: []`**: it leaves Helen somewhere to type without recalling the shape. Three at most; more than that and the material wants to be prose. |
+| a tip printed under the source's own label | **Transcribe the tip; drop the label.** Good Food runs its asides under a standing `gf tip` rubric, which on her page is an abbreviation nobody can expand, or one that reads as *gluten-free*: a false allergen claim. `source:` already carries the attribution. Keep the label only where it is doing work inside the sentence (*"the magazine likes Kallo"* stays). **Never carry an unexplained abbreviation across**: expand it while the source is in front of you, or drop it. |
 | `meta` | Exactly these three keys, in this order, all `false`. See below. |
 
 **`meta:` is three flags, in that order, and on a new file all three are
@@ -158,7 +167,7 @@ ingredient_groups:
       note: "Sherry vinegar is better if you have it."
 ```
 
-Three things to get right, in descending order of how much they cost if wrong:
+What to get right, in descending order of how much it costs if wrong:
 
 - **The quantity belongs in `amount:`, never inside `item:` text.** The page
   highlights `amount` and does not scan `item` for a leading number, so
@@ -173,8 +182,8 @@ Three things to get right, in descending order of how much they cost if wrong:
   one phase — use `name: ""` or omit `name`. **With more than one group,
   EVERY group needs a name, the first included**: a main block left unnamed
   above a `to serve` prints as an unlabelled list followed by labelled ones,
-  and her suite refuses it (8 of 23 files in the batch of 2026-10-10). Name
-  the main block for the dish: `curry`, `pie`, `salad`.
+  and her suite refuses it. Name the main block for the dish: `curry`, `pie`,
+  `salad`.
 
 **How a group's `name` is printed, which is what decides how to write it.**
 The page puts "For the " in front and a colon after, so `name: dressing` reads
@@ -191,13 +200,12 @@ The page puts "For the " in front and a colon after, so `name: dressing` reads
 
 **Write every qualifier the source states.** Sugar type, egg size, butter salted
 or unsalted, flour type, milk type, garlic form, ginger form, soy dark or light,
-vinegar type, mustard type, chocolate percentage. Two thirds of the drafts
-already in her collection are missing one of these, every answer was printed on
-the page they came from, and every one now costs her a trip back to a source she
+vinegar type, mustard type, chocolate percentage. The answer is printed on the
+page in front of you, and one left off costs her a trip back to a source she
 may no longer have. If the source is silent, write what it says and no more.
 
-**BUTTER IS THE ONE QUALIFIER WHOSE SILENCE YOU MARK.** Where the source says
-"butter" and not which, the item is `QQ butter` — Helen, 2026-10-08: *"Write QQ
+**Butter is the one qualifier whose silence you mark.** Where the source says
+"butter" and not which, the item is `QQ butter` — Helen: *"Write QQ
 butter in the ingredients list where it isn't specified."* Salted or unsalted
 changes a bake and she always has to decide it, so the `QQ` puts the question
 where she will see it. **Never choose for her**, in either direction: not
@@ -205,14 +213,13 @@ where she will see it. **Never choose for her**, in either direction: not
 precise bake. Where the source does say — "unsalted butter", "slightly salted
 butter" — that is reading, and you write it.
 
-**THE INGREDIENT LIST IS THE SOURCE'S OWN LIST. NEVER ADD TO IT FROM THE
-METHOD.** Helen, 2026-10-10: *"We shouldn't list incidentals. We can trust the
+**The ingredient list is the source's own list. Never add to it from the
+method.** Helen: *"We shouldn't list incidentals. We can trust the
 cook."* "Pour over 75 ml boiling water" in step 1, "a pinch of salt", flour for
 dusting the worktop, a bare "season": none of them becomes an ingredient line,
 with a quantity or without one. The step still says it, in both halves of its
-pair, and that is where the cook reads it. (This reverses the rule of
-2026-10-07, which lifted any quantity the method named into the list.)
-Everything the source's own list prints is still kept.
+pair, and that is where the cook reads it. Everything the source's own list
+prints is kept.
 
 - **The one exception is a source with no ingredient list at all**, where the
   quantities exist only in the method. Lift them into one group, in the order
@@ -291,12 +298,10 @@ A step may be two short sentences. It is often better as two.
 
 ### One source step, one pair — never split a step
 
-**A source step is ONE pair, however many actions it holds.** Helen's ruling,
-2026-10-10, after working through a batch that had been split: the split
-files were harder for her to read, not easier. So a step that makes a dough, proves
-it and lines a tin is one `QQ original` line holding the whole step, verbatim,
-and one `QQ Claude` line rewriting all of it. (This reverses the rule of
-2026-10-08, which cut a step into one pair per action.)
+**A source step is one pair, however many actions it holds.** Helen's ruling:
+a file whose steps have been split is harder for her to read, not easier. So a
+step that makes a dough, proves it and lines a tin is one `QQ original` line
+holding the whole step, verbatim, and one `QQ Claude` line rewriting all of it.
 
 - **The `QQ original` line is the source's whole step**, exactly as printed,
   however long.
@@ -317,10 +322,8 @@ a filling is made. This is the same rule the ingredient groups follow and for
 the same reason: it is cheap while the whole recipe is in front of you and
 expensive afterwards, when it means re-reading a page that may be gone.
 
-`method_groups:` replaces `method:`. **Never write both** — they are mutually
-exclusive and a file carrying both renders one and silently drops the other.
-Every group needs a `name` and a non-empty `steps`, and the pairs work exactly
-as they do above:
+`method_groups:` replaces `method:`; never write both. Every group needs a
+`name` and a non-empty `steps`, and the pairs work exactly as they do above:
 
 ```yaml
 method_groups:
@@ -339,16 +342,14 @@ supplies "For the " itself, so an article there renders as "For the for the
 custard". `steps`, plural: a `step:` typo produces a group with no content and
 no error.
 
-**THE TRIGGER, because this is the field that gets skipped.** Measured across
-340 drafts on 2026-09-07: **142 have named ingredient groups and no method
-groups, and exactly one is the other way round.** The cause is the schema, not
-carelessness — `ingredient_groups:` is the only container for ingredients, so
-you are already inside the grouped shape and naming a second group is a small
-edit; grouping the method means *switching fields*, against the two warnings
-just above. Left alone, the path of least resistance writes grouped
-ingredients and a flat method every single time.
+**The trigger, because this is the field that gets skipped.** Named ingredient
+groups above a flat method are common in her drafts, and the reverse almost
+never happens. The cause is the schema: `ingredient_groups:` is the only
+container for ingredients, so naming a second group is a small edit, while
+grouping the method means switching fields. Left alone, the path of least
+resistance writes grouped ingredients and a flat method every time.
 
-So: **if you wrote more than one NAMED ingredient group, the method almost
+So: **if you wrote more than one named ingredient group, the method almost
 certainly has the same phases. Write `method_groups:` and give the groups the
 same names.** A recipe whose ingredients split into `ragù` and `white sauce`
 does not have a one-phase method.
@@ -367,7 +368,7 @@ is correct for plenty of recipes.
 - **Never convert a temperature, and never guess which figure is the fan
   one.** The `QQ original` line keeps whatever the source prints, all of it.
   **The `QQ Claude` line gives the FAN figure alone, where the source LABELS
-  one** — "200C/180C fan/gas 6" becomes "180°C fan" (Helen, 2026-10-07). Where
+  one** — "200C/180C fan/gas 6" becomes "180°C fan" (Helen's ruling). Where
   the pair is not labelled ("180C/160C/gas 4"), or there is only one figure,
   or it is 350°F, the rewrite keeps what the source has and your list says so:
   the figures are not always in the same order, and picking one is a guess.
@@ -384,8 +385,7 @@ Some sources are spliced, repeat themselves, or list an ingredient twice with
 two different quantities. **Do not paraphrase a corrupted step** — deciding what
 it meant is writing the recipe rather than rewriting it. Write the
 `QQ original` line as it stands, write **no** `QQ Claude` line for it, and say
-so clearly in your list. Three files in her collection are in exactly this
-state and it is the correct outcome for them.
+so clearly in your list. That is the correct outcome for such a file.
 
 ---
 
@@ -395,7 +395,7 @@ An undeclared tag or star ingredient fails her test suite. These lists are the
 whole vocabulary. If nothing fits, **leave the field out** rather than coin a
 term.
 
-### `tags` — pick from these 24 and no others
+### `tags` — pick from these and no others
 
 **Mood** — *what you feel like eating, a craving:*
 <!-- vocab:tags:mood start -->
@@ -439,7 +439,7 @@ Meanings you would not guess:
   or citrus sauce doing the work. Not "contains a vegetable".
 - **`ice cream`** implies `dessert` and `make-ahead` — write all three.
 
-And the plainer ones, as Helen means them (agreed 2026-10-10):
+And the plainer ones, as Helen means them:
 
 - **`bakes`** — a baked good out of the oven: cake, biscuit, bread, pastry.
   Not anything that merely goes in the oven. Her tests: *"would this appear on
@@ -452,8 +452,7 @@ And the plainer ones, as Helen means them (agreed 2026-10-10):
   brownies, biscuits, fudge, truffles, a fairy cake, a scone, a muffin. Her
   test: *"would I serve it on a cake plate at 4 o clock after a long
   improving walk?"* **It has to be made as individual pieces: a whole cake
-  served in slices is not one.** (This tag was called `sweets` until
-  2026-10-10.)
+  served in slices is not one.**
 - **`fiddly and fun`** — you make it because you want to potter: several
   components or stages, hands-on work, some precision. The PROCESS is the
   point. Pastry from scratch, anything piped, rolled or filled one at a time,
@@ -543,7 +542,8 @@ you have no date, it is the website.**
 **A book must name its author**, in one shape or the other. There is no
 authorless-book form: Helen's ruling is *"I can't imagine knowing the name of a
 book but not its author."* If you have a title and no author, you are probably
-looking at a magazine's one-off special, which is a dateless `publication`.
+looking at a magazine's one-off special. Cite the magazine: a `publication` if
+you have its date, a `website` if you do not.
 
 **Reproduce a publication's name as it spells itself.** `Cafe Delites` keeps its
 missing accent — accenting it would misquote the title.
@@ -566,12 +566,14 @@ website). Keep one that points into the same book the recipe came from.
 - **En dash for a number range**: `3–4 mins`, `170–180°C`, `36–40% fat`. Not a
   hyphen. This one is by far the most common thing to get wrong.
 - **Unicode fractions**: `½`, `¼`, `¾`. Not `1/2`.
+- **A space between a number and its unit**, imperial included: `15 ml`,
+  `400 g`, `20 cm`, `9 in`, `2 tbsp`. Not `15ml`. A temperature takes none:
+  `180°C`.
 - `°C` with the degree sign. Em dash for `--` in prose. `→` for arrows.
 - **British spellings** throughout, and `yoghurt` with its h.
 - **Times**: `20 mins`, `1 hr 30 mins`, `2 hrs` in the metadata fields;
   `mins` / `hours` / `seconds` in prose. Only numeric quantities abbreviate.
-  **So a `QQ Claude` line says "1 hour 30 mins" and never "1 hr 30 mins"** —
-  nine of seventeen files in one batch carried the metadata form into a step.
+  **So a `QQ Claude` line says "1 hour 30 mins" and never "1 hr 30 mins".**
 - Cross-recipe links, if you write one at all, are relative markdown:
   `[display text](../other-slug/)`. Never root-relative.
 - **Accents on food words** — the two lists below. In prose only, never in the
@@ -629,9 +631,9 @@ Worth knowing, because it tells you where to spend effort and where not to.
 
 Helen saves it into `_food_drafts/`, where it is private and unpublished. Her
 test suite then checks the schema, the citation, the tags, the typography and
-the ingredient spellings, and a formatter called `/tidy-drafts` fixes quoting,
-dashes, accents and the `meta:` block mechanically. **So a mechanical fault
-costs her seconds.**
+the ingredient spellings, and a formatter fixes quoting, dashes, unit spaces,
+accents and the `meta:` block mechanically. **So a mechanical fault costs her
+seconds.**
 
 What no machine of hers can recover is a step you garbled, a quantity you
 guessed, or a qualifier you invented — because the page it came from is gone by
@@ -663,7 +665,13 @@ else.
 > 3. Add the minced garlic to the butter and cook for about 30 seconds until
 >    fragrant, being careful not to let it burn or it will turn bitter.
 
-`crispy-sage-butter-gnocchi.md`
+**What you hand back.** The file is `crispy-sage-butter-gnocchi.md`, so the
+line above the envelope is its issue title:
+
+`ingest: crispy-sage-butter-gnocchi`
+
+````
+<!-- ingest v1 food -->
 
 ```yaml
 ---
@@ -709,22 +717,22 @@ meta:
 ---
 ```
 
-**What I could not know:**
+## What I could not know
 
-- **The recipe is cut off.** The source ends mid-build: the gnocchi are drained,
-  the butter is made, and no step brings them together or uses the parmesan.
-  Flagged in a note rather than finished.
-- **No `tagline`.** The source has no intro, so a bare `QQ` and nothing
-  drafted in its place.
-- **The salted water in step 1 is not an ingredient line.** The method names
-  it and the source's list does not, so it stays in the step. "Salt and
-  pepper" is in the source's list, and is kept.
-- **No `star_ingredient`.** Gnocchi is not one of the fourteen and nothing else
-  is the hero.
-- **`carbs party` is a proposal.** `cheese-tastic` is arguable on 30 g of
-  parmesan; I did not add it.
-- **"Medium heat" is the source's own**, and there is no oven, so no
-  fan-temperature question arises here.
+- **The recipe is cut off.** The source ends mid-build: the gnocchi are drained, the butter is made, and no step brings them together or uses the parmesan. Flagged in a note rather than finished.
+- **No `tagline`.** The source has no intro, so a bare `QQ` and nothing drafted in its place.
+- **The salted water in step 1 is not an ingredient line.** The method names it and the source's list does not, so it stays in the step. "Salt and pepper" is in the source's list, and is kept.
+- **No `star_ingredient`.** Gnocchi is not on the list and nothing else is the hero.
+- **`carbs party` is a proposal.** `cheese-tastic` is arguable on 30 g of parmesan; I did not add it.
+- **"Medium heat" is the source's own**, and there is no oven, so no fan-temperature question arises here.
+
+## Fingerprint
+
+crispy sage butter gnocchi | 500 g | 60 g | 12 | 1 | 30 g
+````
+
+Each bullet is one line, as §0 asks. "Salt and pepper" has no amount, so the
+fingerprint skips it.
 
 Note what the rewrites did: dropped "large pot", "according to the packet
 instructions", and the entire warning about burning the garlic — which "until
