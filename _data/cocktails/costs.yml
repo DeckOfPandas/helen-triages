@@ -570,9 +570,8 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: medium
-  # NEW 2026-10-11 with the bottle. HELEN'S FIGURE, 2026-10-10 (#1351):
-  # "Myrtille can default to Briottet, 18%, £23 for 70 cl" -- the same bottle
-  # as the `crème de myrtille` generic row below.
+  # Helen's figure (#1351); the same bottle as the `crème de myrtille` generic
+  # row below.
   "Briottet Crème de Myrtille":
     size_ml: 700
     gbp: 23
@@ -598,6 +597,11 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
+  # Priced from the Boudier beside it, not from a shop. Helen's to correct.
+  "Briottet Liqueur de Gingembre":
+    size_ml: 700
+    gbp: 20
+    confidence: low
   # BOTTLES NAMED 2026-09-14 (#1012) for two categories that had none, at the
   # figures the category rows in `generics:` had carried -- and PRICED BY HELEN
   # the same evening (#747): "Briottet Sapin: £40", "La Tomato: £24". The
@@ -1208,7 +1212,7 @@ generics:
   # neither tin price is shop-checked, which is what `low` says. The sum: Coco
   # Lopez GBP 3-4 / 425 ml (7.05-9.40/L) x 3, coconut milk GBP 1-1.60 / 400 ml
   # (2.50-4.00/L) x 1, over 4 -> GBP 5.90-8.05/L. Overwrite when she prices it.
-  "Coco mix (3:1 Coco Lopez to coconut milk)": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
+  "Coco mix": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
   grenadine:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }

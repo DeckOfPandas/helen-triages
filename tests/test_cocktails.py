@@ -3013,11 +3013,8 @@ def test_to_serve_is_serveware_and_not_the_ice():
 def test_a_rim_says_rim():
     """`serve.rim` is a noun phrase containing the word "rim".
 
-    The layout writes it after "with a": "Strain into a martini glass with a
-    sugar rim." Helen, 2026-10-11, on Californian Margarita's `rim: "salt"`,
-    which read "...glass with a salt filled with ice": the rim is mentioned
-    in the strain step "in the same way a garnish is, so ... 'with a salt
-    half-rim' or '...sugar rim'". Free text otherwise (serve.yml).
+    The layout writes it after "with a" on the strain step, so a bare
+    ingredient reads "...glass with a salt". DECISIONS §9.10a.
     """
     bad = []
     for slug, fm in _load():
@@ -5527,9 +5524,9 @@ def test_the_layout_takes_the_twist_step_from_methods_yml():
 def test_the_express_step_names_the_twist():
     """The page says WHICH twist: "Express the lemon twist over the drink...".
 
-    Helen, 2026-10-11. The declared sentences keep "the twist" and the layout
-    swaps the garnish in, so both halves are needed: the phrase to replace must
-    be in each sentence, and the layout must do the replacing.
+    The declared sentences keep "the twist" and the layout swaps the garnish
+    in, so both halves are needed: the phrase to replace must be in each
+    sentence, and the layout must do the replacing. DECISIONS §9.3.
     """
     express = (_methods().get("canonical") or {}).get("express") or []
     lacking = [s for s in express if "the twist" not in s]
@@ -5548,8 +5545,8 @@ def test_the_express_step_names_the_twist():
 def test_a_bracketed_amount_does_not_repeat_its_use():
     """`amount: "(rinse)"` with `as: "rinse"` prints "(rinse)" once.
 
-    Helen saw the doubled mark on Tailspin, 2026-10-11. Both fields are
-    required of an unmeasured rinse -- test_every_ingredient_has_an_amount and
+    Both fields are required of an unmeasured rinse --
+    test_every_ingredient_has_an_amount and
     test_a_method_that_floats_or_rinses_says_so_in_a_field -- so the data
     cannot drop one; the layout skips the use line where the amount is it.
     """
