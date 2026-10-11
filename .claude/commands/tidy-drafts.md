@@ -271,10 +271,9 @@ six faults" cannot pass while something also happened to the other thirty lines.
    rather than skipped — a green run that examined nothing. A tidy pass touches
    many files at once, which is exactly when this matters most.
 
-9. **Push the branch and open the PR, per `CLAUDE.md`'s agreed workflow.** No
-   ask, in any of the three repos; a commit sitting unpushed on one disk is the
-   real risk. Committing to `main` is forbidden in every repo, and merging is
-   Helen's.
+9. **Push, per `CLAUDE.md`.** No ask. In a private drafts repo a small tidy
+   may be pushed straight to its `main`; a pass with a bigger footprint is a
+   branch and a PR. Committing on `main` is forbidden in every repo.
 
 ## What this does not cover
 

@@ -56,8 +56,8 @@ private drafts repos, so it cannot check for duplicates.
   vocabulary**, and is `QQ` plus the source's own words everywhere else.
   `scripts/resolve_pours.py` then types the wordings you have ruled on before
   (`_data/cocktails/source_wordings.yml`).
-- **Every `suggestion` is `[]`**, with the source's bottle in that pour's
-  `note:` as "Originally X." Every `ship` is `"who knows"`. `mood` is `[]`
+- **Every `suggestion` is `[]`**, with the source's bottle in that
+  ingredient's `note:` as "Originally X." Every `ship` is `"who knows"`. `mood` is `[]`
   unless you named one of your hand-assigned moods for that drink.
 - **Every food method step arrives as a pair** (`QQ original` verbatim, then
   `QQ Claude`), one pair per source step. Nothing the method alone names is
@@ -134,7 +134,7 @@ A wrong "whole milk" or a wrong glass looks exactly as confident as a right
 one, and Helen would far rather answer a question than find an invention. On a
 cocktail, a generic is typed only on an EXACT match in the printed vocabulary and
 is otherwise "QQ" plus the source's own words, exactly as printed; every
-suggestion is [], with the source's bottle in that pour's note as "Originally
+suggestion is [], with the source's bottle in that ingredient's note as "Originally
 X."; ship is "who knows" and made_before is false — always, by her standing
 ruling, and whatever she says in the chat about either. Mood is [] unless she
 names, for that drink, one of the moods only she assigns (the cocktail document
