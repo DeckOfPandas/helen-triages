@@ -1,33 +1,15 @@
 // back-link.js
-// =============================================================================
-// THE BACK ARROW ON A RECIPE OR COCKTAIL PAGE — GitHub issue #387.
-// =============================================================================
-// _includes/back-to-index.html renders `.back-to-index` as an ordinary link to
-// this site's index. That link is correct on its own and this file is not
-// required for it to work. All this does is upgrade it, in the one case where
-// the upgrade is provably right: you got here FROM that index, IN THIS TAB, so
-// going back through history returns the page you actually left.
+// The back arrow on a recipe or cocktail page (#387).
 //
-// WHY THAT MATTERS MORE THAN IT SOUNDS. Following the plain link re-renders the
-// index, and with no filters set the index reshuffles on every load
-// (MANUAL 13.7) -- so you would land on a correctly filtered list in a
-// different order, having lost your place. history.back() restores the page
-// from the browser's cache with its DOM intact: same filters, same page number,
-// same shuffled order, same scroll position. Nothing is serialised, nothing is
-// rebuilt, and nothing can drift out of step with the index's real state,
-// because there is no second copy of that state.
+// _includes/back-to-index.html renders `.back-to-index` as an ordinary link
+// to the index, which works without this file. This upgrades it in one case:
+// you came FROM that index IN THIS TAB, so history.back() returns the page
+// you left, with its filters, page, shuffled order and scroll, where the
+// plain link would re-render and reshuffle it (MANUAL §13.7).
 //
-// EVERY UNCERTAIN CASE FALLS THROUGH TO THE PLAIN LINK, deliberately. The
-// failure mode of guessing wrong is "the arrow did nothing", or "back went
-// somewhere I did not expect", both worse than a refresh; the failure mode of
-// standing down is a refresh, which is what you would have got anyway.
-//
-// THE DECISION IS A PURE FUNCTION, and the DOM wiring is the rest of the file.
-// MANUAL §3: once a module gets non-trivial, the algorithm splits from the
-// wiring so Node can test it directly. This one earned that immediately -- see
-// the new-tab case below, which was WRONG in the first version and is invisible
-// to any check that does not model a tab's history length.
-// =============================================================================
+// Every uncertain case falls through to the plain link: a refresh is a
+// better failure than an arrow that does nothing. The decision is a pure
+// function so Node can test it (MANUAL §3); the DOM wiring is the rest.
 
 (function (root) {
   'use strict';
@@ -50,17 +32,9 @@
     // a browser that withholds it. Nothing to be confident about.
     if (!ctx.referrer) return false;
 
-    // A TAB WITH NO HISTORY CANNOT GO BACK, and this is the case that makes the
-    // referrer check insufficient on its own. Opening a recipe in a NEW TAB
-    // (cmd/ctrl-click, middle-click, "open link in new tab") still sets the
-    // referrer to the index -- those links carry no rel="noreferrer" -- so the
-    // referrer alone says "you came from the index" quite truthfully, while the
-    // new tab's session history holds exactly one entry and history.back() is a
-    // silent no-op. The arrow would do NOTHING, which is the worst outcome
-    // available: not a wrong page, no page at all, and no clue why.
-    //
-    // Helen asked precisely this ("both directly and then opening in a new
-    // tab") and the first version of this file failed it.
+    // A tab with no history cannot go back. A recipe opened in a NEW TAB
+    // still has the index as its referrer, but its history holds one entry
+    // and history.back() is a silent no-op: the arrow would do nothing.
     if (!(ctx.historyLength > 1)) return false;
 
     var from, to;
@@ -73,21 +47,13 @@
 
     if (from.origin !== ctx.origin) return false;
 
-    // Compared on pathname alone: the index carries no query string of its own
-    // today, and a future `?tag=soup` on it should still count as "came from
-    // the index" rather than disqualifying the shortcut.
-    //
-    // This also, correctly, declines the cross-recipe case. Index -> recipe A
-    // -> recipe B by a link in A's method: on B the referrer is A, not the
-    // index, so the arrow follows its href. Going back from B would land on A,
-    // which is not what an arrow pointing at the index should do.
+    // Pathname alone, so a query string on the index still counts as "came
+    // from the index". This also declines index -> recipe A -> recipe B: on B
+    // the referrer is A, and going back would land on A, not the index.
     return from.pathname === to.pathname;
   }
 
-  // --- Exported the same way every other split module here is ------------------
-  // Node requires it to test the decision; the browser gets it on window.HTF and
-  // runs the wiring below. Same shape as list-view.js and ingredient-search.js
-  // (MANUAL §3), so there is one convention rather than three.
+  // Node requires it to test the decision; the browser gets window.HTF.
   var api = { shouldGoBackToIndex: shouldGoBackToIndex };
 
   if (typeof module !== 'undefined' && module.exports) {
@@ -119,10 +85,8 @@
   })) return;
 
   link.addEventListener('click', function (event) {
-    // Let the browser handle anything that is not a plain left click -- a
-    // middle click, or ctrl/cmd-click to open in a new tab, must still follow
-    // the real href rather than being swallowed into a history call that would
-    // do nothing in the new tab it just opened.
+    // Only a plain left click: a middle click or ctrl/cmd-click must still
+    // follow the real href into its new tab.
     if (event.defaultPrevented) return;
     if (event.button !== 0) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;

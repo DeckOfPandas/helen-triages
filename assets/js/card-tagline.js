@@ -1,28 +1,16 @@
 // card-tagline.js
-// =============================================================================
-// A CARD'S TAGLINE, WHERE THERE IS NOTHING TO HOVER WITH -- #1292.
-// =============================================================================
-// On a computer, pointing at a drink card lets its tagline take the card, and
-// that half is the stylesheet's alone (`_sass/cocktails/_cards.scss`). A phone
-// or a tablet has no pointer to hover with, so each card with a written
-// tagline carries a `?` beside its shortlist `+`: press it and the card shows
-// the tagline, press it again and the ingredients come back. Helen,
-// 2026-10-06: "a simple question mark to the left of the + icon".
+// A card's tagline where there is nothing to hover with (#1292): the `?`
+// beside the shortlist `+` swaps the card between tagline and ingredients.
 //
-// THE STYLESHEET DECIDES WHO SEES THE MARK, not this file: the button is drawn
-// only under `(hover: none)`. This file un-hides it (it ships `hidden`, the
-// shortlist button's habit, so a page with no script has no dead control) and
-// keeps two things in step when it is pressed: `is-tagline-shown` on the card,
-// which is the state the stylesheet reads, and `aria-pressed` on the button.
+// The stylesheet decides who sees the mark (only under `(hover: none)`). This
+// file un-hides it, since it ships `hidden` so a page with no script has no
+// dead control, and keeps `is-tagline-shown` on the card and `aria-pressed`
+// on the button in step.
 //
-// ONE LISTENER ON THE DOCUMENT, so a card that arrives later needs no wiring of
-// its own. `preventDefault` and `stopPropagation` because the whole card is the
-// drink's link (#971) and this must not open it.
-//
-// LOADED FROM THE SHARED LAYOUT, like card-name-fit.js: a related card on a
-// drink page is the index card (#991) and gets the same mark. A page with no
-// card finds nothing and does nothing.
-// =============================================================================
+// One listener on the document, so a card added later needs no wiring.
+// `preventDefault` and `stopPropagation` because the whole card is the
+// drink's link (#971). Loaded from the shared layout: a related card on a
+// drink page is the index card (#991).
 (function () {
   'use strict';
 

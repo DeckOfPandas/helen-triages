@@ -1,52 +1,20 @@
-// food-scale.js
-// =============================================================================
-// ONE FOOD AMOUNT, TIMES A FACTOR. No DOM.
-// =============================================================================
-// GitHub issue #1005, 2026-09-14: the recipe page's portion scaler. This is
-// the arithmetic and the printing; assets/js/recipe-scale.js is the wiring,
-// the same split scale.js and cocktail-scale.js run on for the drink page.
+// One food amount, times a factor (#1005). No DOM.
 //
-// NOTHING HERE IS NEW, AND THAT IS THE POINT. The parser is shopping-list.js's
-// `parseAmount` -- the ONE amount parser this repo has (MANUAL 9.13) -- and
-// the printing is food-shopping-list.js's `totalText`, which already knows
-// every rule Helen has given about how a scaled food amount is written: grams
-// to the gram and never coarser ("don't round to 10 g or 5 g, round to 1 g"),
-// spoons and counts in cook's fractions (⅔ tsp, 1½ tbsp), a range carried at
-// both ends (30–50 g doubled is 60–100 g), a tilde kept (~2 tbsp), a bracket
-// that restates the quantity scaled with it (1 tbsp (6 g) doubled is 2 tbsp
-// (12 g)), and a total of a thousand grams shown as kilograms. A second
-// formatter here would be a second answer to "how is 133 g written".
+// The arithmetic and the printing for the recipe page's scaler;
+// assets/js/recipe-scale.js is the wiring. Loaded as a plain <script>
+// attaching to window.HTF, and via require() for tests/js/food-scale.test.js.
 //
-// KILOGRAMS AND LITRES ARE FOLDED DOWN FIRST, as the shopping list folds them,
-// so that a kilogram halved comes back as grams rather than as `0.6 kg` --
-// `totalText` promotes a total of a thousand or more back up, so 1.2 kg at x1
-// is still 1.2 kg and at x0.5 is 600 g.
+// Nothing here parses or formats for itself: the parser is shopping-list.js's
+// `parseAmount` and the printing is food-shopping-list.js's `totalText`, so a
+// scaled amount is written the same way on both pages. Kilograms and litres
+// are folded down first, so a kilogram halved prints as grams.
 //
-// WHAT CANNOT SCALE SAYS SO. An amount with no COUNT in it -- "a few
-// handfuls", "some", "to taste" -- comes back untouched with `scaled: false`,
-// and the page names it under the control (Helen: "let's add a note to
-// bitters and handfuls"). `parseAmount` returning null is a real answer, not
-// a failure, exactly as the shopping list treats it.
-//
-// A MEASURE TAKEN BY HAND SCALES IN HALF STEPS -- #1125. "1 handful" for
-// three times the people is "3 handfuls", and never "1.17 handfuls": see
-// `halfStep` below, the one place the rounding is decided. (The INDEX's
-// shopping list buys the same measures in WHOLE ones, rounded up, and says
-// the amount asked for beside them to the nearest QUARTER, #1297 --
-// food-shopping-list.js does that for itself and never calls this.)
-//
-// "2 large" SCALES, because `large` is a unit to the parser and a SYMBOL to
-// the labeller (no plural), so it prints "4 large" -- Helen: "Things like
-// '2 large' can scale, surely".
-//
-// Loaded the two ways food-shopping-list.js is: as a plain <script> attaching
-// to window.HTF, and via require() for tests/js/food-scale.test.js.
-// =============================================================================
+// An amount with no count in it ("a few handfuls", "some") comes back
+// untouched with `scaled: false`, and the page names it under the control.
 
 (function (root, factory) {
-  /* BOTH DEPENDENCIES ARE READ AT MODULE SCOPE, so a page loading them the
-     wrong way round fails at startup rather than on the first keystroke --
-     tests/test_site_config.py guards the order in _layouts/recipe.html. */
+  /* Both dependencies are read at module scope, so the wrong load order fails
+     at startup; tests/test_site_config.py guards it in _layouts/recipe.html. */
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = factory(require('./shopping-list.js'),
                              require('./food-shopping-list.js'));
@@ -62,12 +30,11 @@
   var unitLabel = shoppingList.unitLabel;
   var totalText = foodShoppingList.totalText;
 
-  /* The same fold food-shopping-list.js applies on the way in, restated here
-     because that file keeps it private. Same four units, same factors. */
-  /* A size standing in for a noun nobody writes -- shopping-list.js's own
-     SYMBOL_UNITS says the same of them. "2 large" counts the item. */
+  // A size standing in for a noun nobody writes: "2 large" counts the item.
   var SIZE_UNITS = { large: true, medium: true, small: true };
 
+  /* The same fold food-shopping-list.js applies on the way in; that file
+     keeps its copy private. */
   var CANONICAL = {
     kg: { unit: 'g', factor: 1000 },
     l: { unit: 'ml', factor: 1000 },
@@ -75,53 +42,18 @@
     cl: { unit: 'ml', factor: 10 }
   };
 
-  /* =========================================================================
-     THE HALF-STEP RULE, AND THE ONE PLACE IT IS DECIDED -- #1125, 2026-10-04
-     =========================================================================
-     Helen, raising the issue: "Currently some recipes scale 1 handful to e.g.
-     1.17 handfuls, which is obvious nonsense." Asked what should happen
-     instead: 'If a recipe calls for "a handful of parsley", three orders of
-     that recipe should call for "3 handfuls of parsley".' And, shown what
-     whole steps did at x1.5: "Handfuls can scale in half steps."
-
-     So a measure taken by hand or eye SCALES, but only to a figure a person
-     could act on: THE NEAREST HALF, AND NEVER LESS THAN A HALF.
-
-         1 handful  x3    -> 3 handfuls
-         1 handful  x1.5  -> 1½ handfuls
-         1 handful  x7/6  -> 1 handful      (not 1.17)
-         1 handful  x2/3  -> ½ handfuls     (0.67 is nearer a half than one)
-
-     THE PLURAL IS THE SITE'S EXISTING RULE, not a new one: shopping-list.js's
-     `unitLabel` gives the singular for exactly one and the plural for every
-     other quantity, a half included -- "½ tsp" has no plural to show it, but
-     "½ pats" and "1½ sachets" are what the scaler already prints. "½
-     handfuls" follows that; changing it is `unitLabel`'s business.
-
-     HER SENTENCE NAMES HANDFULS. It is applied to the whole by-eye list as
-     one rule; a measure she wants treated differently comes out of the list.
-
-     WHICH MEASURES is data: `half_step_measures` in _data/food/scaling.yml
-     -- and, since 2026-10-10, `half_step_counts` beside it (drop, twist,
-     lot, pat: "please round to the nearest 1/2"), joined on by the layout --
-     PASSED IN -- the layout emits the list, recipe-scale.js hands it over,
-     and this file names no measure. With no list given, a handful scales
-     like any other count, which is what every caller before #1125 gets. */
+  /* A measure taken by hand or eye scales to the nearest half, never less
+     than a half (#1125): 1 pinch ×3 is 3, ×1.5 is 1½, ×2/3 is ½. Which
+     measures is data, passed in as `options.halfStep` (`half_step_measures`
+     and `half_step_counts` in _data/food/scaling.yml); this file names none.
+     With no list given, such a measure scales like any other count. */
   function halfStep(quantity) {
     return Math.max(0.5, Math.round(quantity * 2) / 2);
   }
 
-  /* A HANDFUL, A SPRIG AND A BUNCH SCALE IN QUARTERS. The handful joined on
-     2026-10-10 ("Recipe page handfuls and sprigs in 1/4 too please"), which
-     REPLACES the half step above for it: 1 handful x7/6 is 1¼ handfuls, where
-     it was 1. Pinch, dash, splash and knob keep the half step.
-
-     For the sprig and the bunch -- #1297, Helen, the same day, shown
-     "1.17 sprigs" on this page: "Sprigs: Let's round to 1/4 please, and
-     express in fractions not decimals." The nearest quarter, never less than
-     one: 1 sprig x7/6 is 1¼ sprigs, x2/3 is ¾ sprigs, and 4 sprigs doubled is
-     still 8. `quarter_step_measures` in scaling.yml, passed in as
-     `options.quarterStep` exactly as the half-step list is. */
+  /* The nearest quarter, never less than one (#1297): 1 sprig ×7/6 is 1¼.
+     `quarter_step_measures` in scaling.yml, passed in as
+     `options.quarterStep`. */
   function quarterStep(quantity) {
     return Math.max(0.25, Math.round(quantity * 4) / 4);
   }
@@ -149,9 +81,9 @@
     return new RegExp('(^|[^a-z])(' + words + ')(?:e?s)?(?![a-z])', 'i');
   }
 
-  /* A numbered amount in a half-step measure: "1 handful", "~2 handfuls",
+  /* A numbered amount in a stepped measure: "1 handful", "~2 handfuls",
      "1–2 pinches", "1 large handful each". The number is stepped, and the
-     measure word -- wherever it sits in the unit -- takes the plural of the
+     measure word, wherever it sits in the unit, takes the plural of the
      number it ends up beside. Null when the unit holds no such measure. */
   function scaleSteppedMeasure(parsed, factor, words, step) {
     if (!words) return null;
@@ -167,29 +99,13 @@
     return { text: (parsed.approx ? '~' : '') + number + ' ' + unit, scaled: true };
   }
 
-  /* =========================================================================
-     THE SAME MEASURE WRITTEN WITH NO NUMBER -- "a handful of fresh parsley"
-     =========================================================================
-     Helen's own example has no `amount:` at all; the measure is the opening
-     of the `item:` text. 96 items in the two collections are written that
-     way (5 published), and 5 draft amounts are a bare "pinch" or "a handful".
-
-     WHAT COUNTS AS ONE: `a`, `an`, `one`, or nothing at all before a
-     SINGULAR measure ("pinch of salt"). A digit counts as itself. A size word
-     may sit between ("a large handful of", "small pinch of") and is kept.
-
-     WHAT IS NOT A NUMBER AND IS LEFT ALONE: "a few", "some", "a couple of",
-     "several", and a bare plural ("handfuls of rocket"). "a few dashes of
-     Tabasco sauce to taste" therefore does not scale, and is named on the
-     Not-scaled line -- which is what Helen asked that line to say.
-
-     AT ONE, THE WORDS ARE THE RECIPE'S OWN. A result that equals what was
-     written gives back the text untouched -- "a handful of" stays "a handful
-     of", not "1 handful of". Anything else is a number: "½ handfuls of",
-     "1½ handfuls of", "3 handfuls of".
-
+  /* The same measure written with no number: "a handful of fresh parsley".
+     `a`, `an`, `one` or nothing before a SINGULAR measure counts as one; a
+     digit counts as itself; a size word may sit between and is kept. "a few",
+     "some" and a bare plural are not numbers and are left alone. A result
+     equal to what was written gives back the recipe's own words untouched.
      `tail` is what must follow the measure: " of " inside an item's text, or
-     the end of the string for an `amount:` that is only the measure. */
+     the end of the string for an amount that is only the measure. */
   var COUNT_OF_ONE = '(?:(an?|one|\\d+)\\s+)?';
   var SIZE_WORD = '((?:small|large|big|good|generous|little)\\s+)?';
 
@@ -232,11 +148,8 @@
     return eitherStep(text, factor, options, '\\s+of\\s+');
   }
 
-  /* A MEASURE WITH NO NUMBER, IN WHICHEVER STEP IT TAKES. "a pinch of salt"
-     is a half-step measure and "a handful of parsley" a quarter-step one
-     since 2026-10-10 ("Recipe page handfuls and sprigs in 1/4 too please");
-     each list is tried with its own rounding, and a word is on one list only
-     (tests/test_site_config.py refuses one on both). */
+  /* A measure with no number, in whichever step it takes: each list is tried
+     with its own rounding, and a word belongs on one list only. */
   function eitherStep(text, factor, options, tail) {
     var halves = scaleMeasurePhrase(text, factor,
       measureWords(options && options.halfStep), tail, halfStep);
@@ -299,11 +212,10 @@
       };
     }
 
-    /* `one` SAYS THE NOUN IN THE ITEM MUST NOW BE SINGULAR. "2 large eggs" at
-       half a recipe is "1 large egg": the amount holds no noun of its own (it
-       is a bare count or a size word), it was written for more than one, and
-       it has come down to exactly one. "2 cloves" of garlic is not this case:
-       its noun is the unit and `totalText` already prints "1 clove". */
+    /* `one` says the noun in the ITEM must now be singular: a bare count or
+       size word, written for more than one, has come down to exactly one
+       ("2 large eggs" halved). "2 cloves" is not this case: its noun is the
+       unit and `totalText` already prints "1 clove". */
     var bareCount = unit === '' || SIZE_UNITS[unit] === true;
     var one = bareCount && split.lo === undefined &&
       Math.abs(total.lo - 1) < 1e-9 && Math.abs(total.hi - 1) < 1e-9 &&
@@ -312,41 +224,19 @@
     return { text: totalText(total), scaled: true, one: one };
   }
 
-  /* =========================================================================
-     "1 large egg", NOT "1 large eggs" -- #1286, Helen, 2026-10-04
-     =========================================================================
-     "Waffles: at 0.5x, that should read '1 large egg' not 'eggs'. Going from
-     1x to 0.5x eggs will be the only kind of occasion where a plural reduces
-     to a single. Can we fix please?"
-
-     THE NOUN IS IN THE ITEM, not the amount, so the amount's own plural rule
-     never reached it. This takes the item's text and makes its LEADING NOUN
-     singular: the last word before the first comma or bracket -- "eggs,
-     separated" -> "egg, separated", "egg yolks" -> "egg yolk", "free-range
-     eggs" -> "free-range egg". Everything after is untouched.
-
-     THE HOUSE'S OWN SINGULARS, not a new rule: first the `singulars` map in
-     _data/food/ingredient_words.yml (potatoes -> potato, leaves -> leaf),
-     passed in; then shopping-list.js's `foldUnit`, which is what
-     food-shopping-list.js's `foldName` already uses to make "onions" and
-     "onion" one line.
-
-     LEFT AS WRITTEN WHEN IT CANNOT BE DONE SAFELY, because a wrong singular
-     is worse than a plural: a head that names two things ("shallots or 1
-     onion"), a word with a capital in it, a word ending -oes or -ies that
-     the map does not hold (`foldUnit` would give "tomatoe"), and a word
-     ending -ss or with no plural to remove.
-
-     (She expected this only at half a recipe. A `serves:` recipe reaches it
-     too -- two eggs for four people, shown for two -- and gets the same
-     answer.) */
+  /* "1 large egg", not "1 large eggs" (#1286). Makes the item's LEADING NOUN
+     singular: the last word before the first comma or bracket. Singulars come
+     from the `singulars` map in _data/food/ingredient_words.yml, passed in,
+     then shopping-list.js's `foldUnit`. Left as written when it cannot be
+     done safely: a head naming two things, a capitalised word, an ending
+     `foldUnit` would get wrong (-oes, -ies, -ss, -us, -is) that the map does
+     not hold, or no plural to remove. */
   function singularItem(text, singulars) {
     var written = String(text === undefined || text === null ? '' : text);
     var match = /^(\s*)([^,(]*?)(\s*(?:[,(][\s\S]*)?)$/.exec(written);
     if (!match || match[2] === '') return written;
-    /* THE NOUN IS BEFORE ANY "of", "in", "like" ...: "rashers of streaky
-       bacon" is a rasher, "spring onions in thin strips" a spring onion. The
-       rest of the head is carried along untouched. */
+    /* The noun is before any "of", "in", "like" ...: "rashers of streaky
+       bacon" is a rasher. The rest of the head is carried along untouched. */
     var cut = /\s(?:of|in|for|with|like|from)\s/i.exec(match[2]);
     var head = cut ? match[2].slice(0, cut.index) : match[2];
     var after = cut ? match[2].slice(cut.index) : '';
@@ -371,31 +261,13 @@
     return match[1] + words.join(' ') + after + match[3];
   }
 
-  /* THE NAME ON HELEN'S "(Not scaled: ...)" LINE -- #1125. Her example is the
-     specification: "few dashes of Tabasco sauce to taste, unless feeding
-     Helen" is listed as "Tabasco sauce". The line names the INGREDIENT, not
-     the recipe's whole sentence about it. Three cuts, in this order:
-
-     1. A LEADING MEASURE PHRASE, where the recipe wrote the quantity into
-        `item:` -- "a few dashes of", "a few handfuls of". Only a phrase
-        holding one of the declared measures AND ending in `of` is taken, so
-        "cream of tartar" and "leg of lamb" are untouched: the trap
-        _data/food/ingredient_words.yml's `measure_phrases` header names.
-     2. EVERYTHING FROM THE FIRST COMMA OR OPEN BRACKET -- the preparation
-        ("parsley, chopped"), the aside ("paprika, unless feeding Helen"). The
-        same cut _plugins/food_shopping.rb makes for the shopping list, and it
-        is what makes her comma-joined line safe: #1088 gave up the semicolon
-        knowing "a name containing a comma would read as two", and after this
-        cut no name contains one. THE COST: an item that is itself a list
-        ("fresh parsley, thyme and sage") is named by its first member --
-        accepted, Helen: "doesn't state an amount, so scaling is by common
-        sense."
-     3. A TRAILING INSTRUCTION -- "to taste", "to serve" -- from
-        `trailing_phrases` in ingredient_words.yml, passed in like the
-        measures. Only at the END, which is that list's own rule.
-
-     Never cuts a name to nothing: if a step would leave an empty string, the
-     text before that step stands. */
+  /* The name on the "(Not scaled: ...)" line (#1125): the ingredient, not the
+     recipe's whole sentence about it. Three cuts, in order: a leading measure
+     phrase ending in `of` and holding a declared measure (so "cream of
+     tartar" is untouched); everything from the first comma or open bracket,
+     which is what keeps the comma-joined line unambiguous; a trailing
+     instruction from `trailing_phrases` in ingredient_words.yml, passed in.
+     A cut that would leave nothing is not made. */
   var QUANTIFIER = '(?:(?:an?|one|two|a\\s+few|few|some|a\\s+couple\\s+of|several)\\s+)?';
   var SIZE = '(?:(?:small|large|big|good|generous|little)\\s+)?';
 
@@ -435,11 +307,7 @@
     return name;
   }
 
-  /* =========================================================================
-     WHAT THE SCALER'S BOX COUNTS -- portions, or the thing made (#1286)
-     =========================================================================
-     A MODE is five small answers the wiring asks for, and recipe-scale.js
-     holds no arithmetic of its own for any kind:
+  /* A MODE is what the wiring asks for; recipe-scale.js holds no arithmetic.
 
        base        the figure the recipe is written for; factor = value / base
        clamp(n)    a typed or stepped value, made into one the box can hold
@@ -447,30 +315,10 @@
        box(n)      what the input shows
        word(n)     what follows the input, or null to leave the markup alone
 
-     TWO WAYS OF STEPPING, and which one a recipe gets is the whole of #1286:
-
-     A `serves:` RECIPE STEPS ONE PORTION AT A TIME (#1005, unchanged): four
-     portions of a recipe for six is x0.67.
-
-     EVERY `makes:` RECIPE STEPS IN WHOLE RECIPES -- x1, x2, x3 -- and the box
-     shows what that many recipes make. Helen, 2026-10-04: "the buttons should
-     still multiply the recipe in integers, just showing number of waffles. So
-     1x is 5 waffles, 2x is 10 waffles. Otherwise we'll need to start showing
-     eggs in units of 1/27 or something." And for a yield with no number: 'if
-     "some" is originally guessed to be 4 portions, 2x should be 8 portions.'
-     So waffles, millilitres, dozens, 8-inch cakes and guessed portions are
-     ONE shape: `wholeRecipes` below. A typed figure goes to the nearest
-     whole multiple (8 on the waffles is 10).
-
-     AND ONE STEP BELOW ONE RECIPE: x½, WHERE THE BUILD ALLOWS IT. Helen:
-     "Half a recipe would be great where the numbers aren't insane! Can we
-     judge that?" and, on the shape, "not having half recipes in between
-     integers, just between 0 and 1". So the steps are ½, 1, 2, 3 ... and
-     never 1½. `half` is the build's verdict (_plugins/food_half_recipe.rb,
-     `data-half-recipe`); this file does not judge. With it, minus at one
-     recipe gives a half, and a typed figure under three quarters of a recipe
-     is a half. Without it the floor is one recipe and minus there does
-     nothing, with no message. */
+     A `makes:` recipe steps in whole recipes (#1286), and the box shows what
+     that many make; a typed figure goes to the nearest whole multiple. One
+     step exists below one recipe, ×½, only where the build allows it (`half`,
+     from _plugins/food_half_recipe.rb): the steps are ½, 1, 2, 3, never 1½. */
   function wholeRecipes(base, box, word, half) {
     function multiple(n) {
       var m = n / base;
@@ -513,11 +361,9 @@
     };
   }
 
-  /* A FIGURE ON A HALF IS SHOWN AS A RANGE OF ONE -- Helen: "Midpoints that
-     land on a half can become a range of one." 4–7 is 5.5 and reads "5–6";
-     two recipes are 11 and read "11"; three are 16.5 and read "16–17". The
+  /* A figure on a half is shown as a range of one: 5.5 reads "5–6". The
      ingredients scale by the whole multiple, so the half never reaches them.
-     _plugins/food_yield.rb `box` is this rule for the page as built. */
+     _plugins/food_yield.rb applies the same rule to the page as built. */
   function yieldBox(value) {
     if (value === Math.floor(value)) return String(value);
     return Math.floor(value) + '–' + Math.ceil(value);
@@ -529,19 +375,11 @@
     return words.join(' ');
   }
 
-  /* THE THING MADE, AGREEING WITH THE NUMBER BESIDE IT. A line written for
-     ONE takes a plural at two ("one 8-inch cake"); a line written for several
-     loses it only at exactly one, which a half recipe can reach ("2 burgers"
-     halved is "1 burger").
-
-     THE NOUN IS THE LAST WORD OF THE STEM -- the part before any " of " --
-     and the plural is shopping-list.js's `unitLabel`, the rule every amount
-     on the page already uses. `dozen mince pies` is INVARIABLE: it is the
-     dozen that is counted ('"1 dozen" doubled can be "two dozen"').
-
-     `× ` IN FRONT OF A THING THAT OPENS WITH A DIGIT -- Helen: a digit
-     directly before "8-inch" is unreadable. The box is a number, so the count
-     cannot be spelled as a word; "2 × 8-inch cakes" is the form shown. */
+  /* The thing made, agreeing with the number beside it: a line written for
+     one takes a plural at two; one written for several loses it only at
+     exactly one. The noun is the last word of the stem. `invariable` is for
+     "dozen mince pies", where the dozen is counted. `× ` goes in front of a
+     thing that opens with a digit: "2 × 8-inch cakes". */
   function thingText(spec, value) {
     var stem = String(spec.stem || '');
     if (!spec.invariable && spec.singular && value !== 1) {
@@ -563,8 +401,7 @@
     if (!spec || !(Number(spec.base) > 0)) return null;
     var base = Number(spec.base);
 
-    /* A MEASURE -- Helen: "950 ml for one order of a recipe becomes 1900 ml
-       for 2". */
+    // A measure: 950 ml for one recipe is 1900 ml for two.
     if (spec.kind === 'measure') {
       var unit = shoppingList.foldUnit(String(spec.unit || ''));
       /* Half of an odd measure is shown as a range of one, like a count:
@@ -573,8 +410,7 @@
         function (n) { return unitLabel(unit, n); }, half);
     }
 
-    /* A COUNT. THE `+` OF "64+" TRAVELS WITH THE FIGURE -- Helen: "64+ tiny
-       macarons, 128+ tiny macarons". */
+    // A count. The `+` of "64+" travels with the figure.
     var more = spec.plus ? '+' : '';
     return wholeRecipes(base,
       function (n) { return yieldBox(n) + more; },

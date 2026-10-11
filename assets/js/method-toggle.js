@@ -1,10 +1,5 @@
 // method-toggle.js
 // Switches a recipe page between the full method and the short one.
-//
-// Elements are found by CLASS, not id. The full list used to carry
-// class="instructions" and id="method-full" simultaneously — one concept with
-// two names, which is exactly the sort of thing that makes a codebase hard to
-// hold in your head. The data calls it `method`, so everything calls it method.
 (function () {
   var SESSION_KEY = 'htf-method-short';
 

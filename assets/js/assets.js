@@ -1,30 +1,9 @@
 // assets.js
-// =============================================================================
-// BASE URL, SVG ASSET LOADING, AND THE HELPERS BOTH INDEX PAGES SHARE.
-// =============================================================================
-// Must be the FIRST script loaded. Everything that reaches for a file under
-// assets/ goes through here.
-//
-// WHY THIS FILE EXISTS
-// The base-URL derivation used to be copy-pasted in four places: highlighter.js,
-// section-rule.js, and twice inside _layouts/default.html. They had drifted —
-// one handled a missing meta tag differently from the others. Since every
-// decorative asset URL is built from this value, and the value changes when
-// baseurl changes, four copies is four chances to be subtly wrong on the day
-// you deploy.
-//
-// The five SVG fetches were also swallowing every error with an empty catch, so
-// a wrong baseurl produced a site with no decoration at all and a completely
-// clean console. That is the worst possible diagnostic position, and it is what
-// fetchSvg below is really for.
-//
-// THE SAME ARGUMENT ADDED TWO NON-ASSET HELPERS, GitHub issue #686. escapeHtml
-// and the sessionStorage index memory were each written twice, once in
-// filters.js and once in cocktail-index.js, and were identical in both. This is
-// the file every page loads first and the namespace every other script already
-// reaches into, so it is where a thing that belongs to both indexes lives.
-// Neither knows which site it is on; that is what makes them shareable at all.
-// =============================================================================
+// Base URL, SVG/JSON loading, and the helpers both index pages share.
+// Must be the FIRST script loaded: every other script reaches into window.HTF,
+// and every URL under assets/ is built here so there is one derivation of the
+// base URL and one place that warns when a fetch fails. Nothing here knows
+// which site it is on beyond HTF.site (#686).
 
 window.HTF = window.HTF || {};
 
@@ -44,45 +23,24 @@ window.HTF = window.HTF || {};
     );
   }
 
-  /**
-   * Build a URL for a file under the site root.
-   * @param {string} path - root-relative path, e.g. '/assets/img/favicon.svg'
-   */
+  /** URL for a root-relative path, e.g. '/assets/img/favicon.svg'. */
   HTF.asset = function (path) {
     return HTF.base + path;
   };
 
   // --- Site key --------------------------------------------------------------
-  // This repo serves two sites from one build. A site's own PAGE artwork is not
-  // shared between them — assets/img/food/ and assets/img/cocktails/ are
-  // separate sets — so every decorative fetch inside a page needs to know which
-  // site it is on. (The header and footer are the exception and do not: their
-  // artwork lives in assets/img/chrome/ and goes through HTF.chromeAsset below.)
-  //
-  // Derived here for the same reason the base URL is: it is read from the page
-  // by several scripts, it changes per page rather than per deployment, and a
-  // second copy is a second thing to get wrong. _layouts/default.html emits
-  // <meta name="site-key" content="{{ page.site_key }}">.
-  //
-  // Empty is legitimate — the root landing page belongs to neither site and
-  // draws no site artwork — so an absent value is not warned about. A wrong
-  // one announces itself through fetchSvg below.
+  // From <meta name="site-key">, emitted by _layouts/default.html. Empty is
+  // legitimate: the root landing page belongs to neither site and draws no
+  // site artwork, so an absent value is not warned about.
   var siteMeta = document.querySelector('meta[name="site-key"]');
   HTF.site = siteMeta ? (siteMeta.getAttribute('content') || '').trim() : '';
 
   /**
-   * Build a URL for a file in THIS site's artwork set.
+   * URL for a file in THIS site's artwork set:
    * siteAsset('/highlighters/highlighter-3.svg')
    *   -> '<base>/assets/img/food/highlighters/highlighter-3.svg'
-   *
-   * The example used to be the tape, which is no longer a per-site asset at
-   * all -- see HTF.chromeAsset below.
-   *
-   * Returns null when the page has no site key, so callers can skip the fetch
+   * Returns null when the page has no site key, so callers skip the fetch
    * rather than request a path with a hole in it.
-   *
-   * @param {string} path - path under the site's image directory, leading slash
-   * @returns {string|null}
    */
   HTF.siteAsset = function (path) {
     if (!HTF.site) { return null; }
@@ -90,24 +48,13 @@ window.HTF = window.HTF || {};
   };
 
   /**
-   * Build a URL for a file in the SHARED CHROME's artwork set.
+   * URL for a file in the shared chrome's artwork set (header and footer):
    * chromeAsset('/tape/tape-3.svg') -> '<base>/assets/img/chrome/tape/tape-3.svg'
-   *
-   * The header and the footer are one artefact for the whole repo, not two that
-   * are kept looking alike — so their artwork is one set, named by no site and
-   * needing no site key. It therefore never returns null: chrome renders on
-   * every page, including one belonging to no site.
-   *
-   * This is deliberately a THIRD helper rather than a call to the generic
-   * asset() above, so that test_artwork_fetches_go_through_site_asset can go on
-   * banning any image path built through that one, with no exception carved out.
-   * The ban is what stops a script hardcoding one site's directory; a shared
-   * directory is a different claim, and it gets to say so in the function name.
-   * (That test greps source text and cannot tell a comment from code, so this
-   * paragraph deliberately does not spell the banned call out literally.)
-   *
-   * @param {string} path - path under assets/img/chrome/, leading slash
-   * @returns {string}
+   * Never null: chrome renders on every page, including one with no site.
+   * A helper of its own, not a call to the generic asset() above, so that
+   * test_artwork_fetches_go_through_site_asset can ban every image path built
+   * through that one with no exception. That test greps source text, comments
+   * included, so do not spell the banned call out literally here.
    */
   HTF.chromeAsset = function (path) {
     return HTF.base + '/assets/img/chrome' + path;
@@ -115,31 +62,16 @@ window.HTF = window.HTF || {};
 
   // --- SVG loading -----------------------------------------------------------
   var cache = {};
-  // URLs with a fetch already in flight, each holding the callbacks still
-  // waiting on it. `cache` only gets written once a fetch RESOLVES, so
-  // without this, N callers asking for the same not-yet-cached URL before
-  // the first one resolves each saw a cache miss and fired their own
-  // fetch() -- harmless for one or two callers, but decorations.js's
-  // tagShapes() calls this once per .tag-shape slot, and a page can easily
-  // have 100+ of those sharing a pool of ~9 SVG files (Helen, 2026-08-04:
-  // the index page's ingredient pills took "up to 7 seconds" to fill in,
-  // "in groups" -- the classic signature of a browser's per-host connection
-  // cap queueing dozens of redundant requests for the same handful of
-  // files). Now the first caller for a URL starts the one real fetch and
-  // every other caller just joins its callback list.
+  // URLs with a fetch in flight, each holding the callbacks waiting on it.
+  // `cache` is written only when a fetch resolves, so without this every
+  // caller that arrives before then fires its own fetch: decorations.js asks
+  // once per .tag-shape slot, and a page has far more slots than SVG files.
   var pending = {};
 
   /**
-   * Fetch an SVG's source text and hand it to cb. Responses are cached, so
-   * repeated requests for the same URL cost one network call -- including
-   * concurrent requests that land before the first one has resolved.
-   *
-   * A failure warns with the URL and points at the likely cause. It does not
-   * throw: decoration is not worth breaking a page for, but it IS worth saying
-   * out loud.
-   *
-   * @param {string} url - full URL, usually from HTF.asset()
-   * @param {function(string)} cb - receives the SVG source text
+   * Fetch an SVG's source text and hand it to cb. One network call per URL,
+   * concurrent requests included. A failure warns with the URL and does not
+   * throw, and cb is never called.
    */
   HTF.fetchSvg = function (url, cb) {
     if (cache[url]) { cb(cache[url]); return; }
@@ -170,20 +102,11 @@ window.HTF = window.HTF || {};
   };
 
   /**
-   * Fetch a JSON file and hand the parsed value to cb, or null if it could not
-   * be had -- #1050, for the search-for-anything box's per-site index
-   * (food/search.json, cocktails/search.json). The one other thing on the
-   * site fetched at run time, and it goes through here for the reason the
-   * SVGs do: one place that caches, one place that warns, and
-   * test_svg_fetching_goes_through_the_shared_helper holds every other file to
-   * that.
-   *
-   * UNLIKE fetchSvg, THE CALLBACK IS CALLED ON FAILURE TOO, with null. A
-   * decoration that fails to load has nothing to do next; a search box does --
-   * it stays a plain form, and it has to be told so rather than left waiting.
-   *
-   * @param {string} url
-   * @param {function(?Object)} cb - receives the parsed JSON, or null
+   * Fetch a JSON file and hand the parsed value to cb (#1050, the search
+   * index). Unlike fetchSvg, cb is called on failure too, with null: the
+   * search box has to be told to stay a plain form.
+   * test_svg_fetching_goes_through_the_shared_helper holds every other file
+   * to fetching through this file.
    */
   var jsonCache = {};
   var jsonPending = {};
@@ -214,12 +137,8 @@ window.HTF = window.HTF || {};
   };
 
   /**
-   * Deal names from a shuffled pool without repeats until it is exhausted.
-   * Shuffled once per page load, so a given page has variety and a reload
-   * gives you something different.
-   *
-   * @param {string[]} names
-   * @returns {function(): string}
+   * Deal names from a pool without repeats until it is exhausted. Shuffled
+   * once per page load.
    */
   HTF.makeShuffledPicker = function (names) {
     var shuffled = names
@@ -232,21 +151,9 @@ window.HTF = window.HTF || {};
 
   // --- HTML escaping ---------------------------------------------------------
   /**
-   * Escape a string for insertion into HTML.
-   *
-   * Both indexes rebuild a title with a <mark> around the matched run, which
-   * means building HTML from text that came out of a recipe or drink file —
-   * Helen's own prose, not an attacker's, but "Bangers & Mash" is enough to
-   * make the point, and the escaping is what keeps an ampersand an ampersand.
-   *
-   * FIVE CHARACTERS, NOT THE THREE THE TWO COPIES ESCAPED. `&`, `<` and `>` are
-   * all a text position needs; the quotes cost nothing there (a browser renders
-   * &quot; as ") and mean the same call is still right the first time somebody
-   * builds an attribute value with it. `&` is replaced FIRST, or the escapes
-   * would then be escaped again into &amp;lt;.
-   *
-   * @param {string} text
-   * @returns {string}
+   * Escape a string for insertion into HTML, text position or attribute value.
+   * `&` is replaced FIRST, or the other escapes would be escaped again into
+   * &amp;lt;.
    */
   HTF.escapeHtml = function (text) {
     return String(text)
@@ -258,32 +165,15 @@ window.HTF = window.HTF || {};
   };
 
   // --- Index memory ----------------------------------------------------------
-  // GitHub issue #387, and #686 for this being one function rather than two.
-  // Both indexes remember the order and filters they were left in, so that
-  // going BACK from a recipe or a drink returns you to the list you were
-  // reading rather than to a freshly shuffled one. Same store, same shape, same
-  // two failure rules -- only the key and the record differ, so those are what
-  // the caller passes, the way filter-state.js is parameterised by its spec.
-  //
-  // WHAT IS DELIBERATELY NOT HERE: the decision to restore at all. That is
-  // FilterState.arrivedByGoingBack(), asked at each call site, and it stays
-  // there because it is about the NAVIGATION rather than the storage -- a page
-  // may well want to read this record for some other reason. Its own reasoning
-  // (why performance navigation type and not bfcache) lives with it in
-  // filter-state.js.
-  //
-  // EVERY PATH IS WRAPPED, and not only for the obvious throw. Private mode
-  // throws on setItem; a browser with site data blocked can make even the
-  // getter throw; and in a context with no sessionStorage at all the bare
-  // reference is a ReferenceError. All three end the same way, because the
-  // fallback -- a fresh list -- is what you had before the feature existed and
-  // is not worth breaking a page for.
+  // Both indexes remember the order and filters they were left in, so going
+  // BACK from a recipe returns to the list being read (#387). The caller
+  // passes its own key and record, and decides whether to restore at all
+  // (FilterState.arrivedByGoingBack).
+  // Every path is wrapped: private mode throws on setItem, blocked site data
+  // can make the getter throw, and a context with no sessionStorage is a
+  // ReferenceError. All end as a fresh list.
   HTF.indexMemory = {
-    /**
-     * Store an index's state under its own key. Silent on failure.
-     * @param {string} key - the caller's own, e.g. 'htf-index-memory-v1'
-     * @param {Object} state - anything JSON can carry
-     */
+    /** Store an index's state under the caller's key. Silent on failure. */
     save: function (key, state) {
       try {
         sessionStorage.setItem(key, JSON.stringify(state));
@@ -291,16 +181,9 @@ window.HTF = window.HTF || {};
     },
 
     /**
-     * Read back what save() stored, or null.
-     *
-     * NULL MEANS "CARRY ON AS A FRESH LOAD" and every failure returns it:
-     * nothing stored, unparseable, storage unreachable. The caller checks the
-     * SHAPE of what comes back -- this function knows nothing about the record
-     * beyond it being JSON, and a record written by an older version of a page
-     * is exactly as untrusted as any other stored input.
-     *
-     * @param {string} key
-     * @returns {Object|null}
+     * Read back what save() stored. Null on every failure, and null means
+     * "carry on as a fresh load". The caller checks the SHAPE of what comes
+     * back: a record written by an older build is untrusted input.
      */
     restore: function (key) {
       try {
@@ -312,44 +195,16 @@ window.HTF = window.HTF || {};
   };
 
   // --- The shortlist ---------------------------------------------------------
-  // GitHub issue #546. Recipes and drinks you have marked to come back to, held
-  // in this browser and nowhere else. Helen's brief, and it is a ceiling rather
-  // than a first step: "one browser, one device, no sharing, no account etc is
-  // truly all I want -- I actively don't want more."
-  //
-  // HERE, FOR THE REASON THIS FILE'S OWN HEADER GIVES. Both indexes need it,
-  // both content layouts need it, and none of them knows which site it is on.
-  // That is the same argument that moved escapeHtml and indexMemory in #686.
-  //
-  // localStorage, NOT sessionStorage, AND THAT IS THE WHOLE POINT OF THE
-  // FEATURE. Everything else stored by this site is a within-visit convenience
-  // -- which list you were reading, which method mode you had open -- and dies
-  // with the tab, correctly. A shortlist that died with the tab would be a
-  // shortlist you could not come back to, which is the only thing it is for.
-  //
-  // ONE STORE PER SITE. Both sites are served from one origin, so one
-  // localStorage holds both; Helen asked for two lists rather than a mixed one
-  // ("can be food rows or cocktail cards ... doesn't need to be a mixed list on
-  // one page"), and HTF.site already says which page this is. A page with no
-  // site-key (the root landing page) gets no store at all rather than a shared
-  // one, which is what stops a stray key appearing under a third name.
-  //
-  // AN ENTRY IS A COLLECTION URL -- `/food/recipes/dal/`, `page.url` in Liquid,
-  // NOT `relative_url`. The baseurl is deployment configuration: prefixing it
-  // would make a stored list read as empty the day baseurl changed, and would
-  // make the key emitted by a row and the key emitted by that recipe's own page
-  // two different strings on the same site. filters.js's rowKey() uses the href
-  // for its own record and is right to -- that record is one page's ordering,
-  // written and read within a single visit. This one outlives the page.
-  //
-  // WHY THERE IS AN IN-MEMORY COPY, and why it is the source of truth rather
-  // than a cache. indexMemory swallows a storage failure and carries on with a
-  // fresh list, which is exactly right for it: nobody asked for that record, so
-  // nobody misses it. Here somebody has just clicked a control. If private mode
-  // or blocked site data makes setItem throw, the honest behaviour is that the
-  // control still responds and the list still works for as long as the page is
-  // open -- it simply will not be there tomorrow. Reading back through the
-  // memory copy is what makes that true, and it costs one array.
+  // Recipes and drinks marked to come back to, held in this browser and
+  // nowhere else (#546).
+  // - localStorage, not sessionStorage: the list must outlive the tab.
+  // - One store per site, keyed by HTF.site; both sites share one origin. A
+  //   page with no site key gets no store.
+  // - An entry is a collection URL (`page.url` in Liquid, NOT `relative_url`):
+  //   a baseurl prefix would empty every stored list the day baseurl changed.
+  // - The in-memory copy is the source of truth, not a cache: when setItem
+  //   throws, the control still responds and the list works until the page
+  //   closes.
   var shortlist = (function () {
     var KEY_PREFIX = 'htf-shortlist-';
     var GLASSES_PREFIX = 'htf-shortlist-glasses-';
@@ -367,12 +222,9 @@ window.HTF = window.HTF || {};
       return HTF.site ? GLASSES_PREFIX + HTF.site + VERSION : '';
     }
 
-    /* Stored state is UNTRUSTED INPUT, the same standing this codebase already
-       gives the index-memory record: it can be hand-edited in devtools, left by
-       an older build, or simply not an array. Anything that is not a list of
-       strings falls back to an empty shortlist rather than to a half-read one,
-       because a shortlist that is quietly missing three entries is worse than
-       one that is visibly empty. */
+    /* Stored state is untrusted input: hand-edited, left by an older build,
+       or not an array. Anything that is not a list of strings reads as an
+       empty shortlist, never a half-read one. */
     function read() {
       if (entries) return entries;
       entries = [];
@@ -397,10 +249,8 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
-    /* The glasses map, read and written exactly as the list above is, and with
-       the same standing: untrusted input, and a failure to persist must not
-       cost you the number you just typed. Only positive numbers survive the
-       read -- anything else is a value nobody could have meant. */
+    /* The glasses map: untrusted input like the list above. Only whole numbers
+       above one are kept, because a missing entry already means one glass. */
     function readGlasses() {
       if (counts) return counts;
       counts = {};
@@ -426,38 +276,13 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
-    /* --- HOW MANY PORTIONS — GitHub issue #801 -----------------------------
-       A THIRD KEY, and not the glasses map under another name. The two look
-       alike and mean different things in the one place it matters: a MISSING
-       glasses entry is one glass, because a drink is a drink; a missing
-       portions entry is "however many this recipe makes", which the browser
-       cannot know and the build has to tell it. So `1` is a real, storable
-       answer here -- one portion of a thing that serves six is a Tuesday --
-       where `setGlasses` deletes it as the default.
-
-       The two sites are already namespaced apart (`HTF.site`), so food never
-       reads a glasses map and cocktails never reads this one. Keeping them as
-       separate keys rather than one map with two meanings is what stops a
-       future reader having to know which site they are on to know what a `1`
-       in storage means.
-
-       Read and written exactly as the other two are, and with the same
-       standing: untrusted input, and a failure to persist must not cost you
-       the number you just typed. */
+    /* --- How many portions (#801) ------------------------------------------
+       A key of its own, not the glasses map: a missing glasses entry is one
+       glass, a missing portions entry is "however many this recipe makes",
+       which only the build knows. So `1` is a real, storable answer here.
+       `-v2` because `-v1` values include batch counts that cannot be told
+       from portion counts; a version bump discards them, never reinterprets. */
     function portionsKey() {
-      /* `-v2`, AND THE BUMP IS THE POINT. For a few hours on 2026-09-07 this
-         map held BATCH counts for recipes with no portion count -- the box
-         beside them counted times-the-recipe rather than people (#801), and
-         #815 replaced that with an estimate on every recipe. So a number
-         stored during that window means something this code no longer means,
-         and there is nothing in the value itself to tell the two apart: `2`
-         is a plausible batch count and a plausible portion count.
-
-         A version bump discards them all rather than reinterpreting them,
-         which is the only honest option -- and costs a browser one forgotten
-         set of numbers rather than silently shopping for twice the gelato.
-         The shortlist ITSELF is untouched: what she marked is still marked,
-         and only how many she wanted is forgotten. */
       return HTF.site ? PORTIONS_PREFIX + HTF.site + '-v2' : '';
     }
 
@@ -488,20 +313,12 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
-    /* --- HOW MANY BATCHES — GitHub issue #1297 -----------------------------
-       A FOURTH KEY, and not the portions map with halves let in. On the
-       shopping list a `makes:` recipe's box counts BATCHES since 2026-10-09
-       (Helen: 'X batches of 18 Peanut Butter Cookies'), and a `serves:`
-       recipe's still counts people. A stored `6` cannot say which it was, and
-       every `makes:` recipe had a portions entry until that day -- so the two
-       are kept apart rather than one reinterpreted, the lesson `-v2` above
-       already paid for. The old portions entries of `makes:` recipes are
-       simply never read again.
-
-       A HALF IS STORABLE HERE and nothing else below one is: half a batch is
-       offered where the build judges it sane (page.half_recipe). Whether THIS
-       recipe may have one is the caller's question; the store only refuses
-       what no recipe can have. A missing entry is one batch. */
+    /* --- How many batches (#1297) ------------------------------------------
+       A key of its own, not the portions map: a `makes:` recipe counts
+       BATCHES and a `serves:` recipe counts people, and a stored `6` cannot
+       say which it is. A half is storable and nothing else below one; whether
+       THIS recipe may have a half (page.half_recipe) is the caller's question.
+       A missing entry is one batch. */
     var BATCHES_PREFIX = 'htf-shortlist-batches-';
     var batchCounts = null;
 
@@ -541,11 +358,9 @@ window.HTF = window.HTF || {};
       } catch (e) { /* this visit still has it; tomorrow will not */ }
     }
 
-    /* A KEY'S SLUG: the last non-empty path segment, lowercased.
-       `/food/recipes/dal/` and `/food/drafts/dal/` both answer `dal`. A key
-       with no segment at all ("/") answers '', and is nobody. Shared by
-       the share link (#1093) and, until #1100 removed it, restore() (#850): both had to find a
-       live card from a name that may have been written somewhere else. */
+    /* A key's slug: the last non-empty path segment, lowercased.
+       `/food/recipes/dal/` and `/food/drafts/dal/` both answer `dal`; "/"
+       answers ''. The share link (#1093) is built from it. */
     function slugOf(key) {
       var parts = String(key).split('/');
       for (var i = parts.length - 1; i >= 0; i -= 1) {
@@ -560,8 +375,7 @@ window.HTF = window.HTF || {};
       (Array.isArray(liveKeys) ? liveKeys : []).forEach(function (key) {
         if (typeof key !== 'string') return;
         var slug = slugOf(key);
-        // First one wins. Two cards sharing a slug would be two pages at
-        // one URL, which Jekyll refuses, so this is belt and braces.
+        // First one wins.
         if (slug && !Object.prototype.hasOwnProperty.call(bySlug, slug)) {
           bySlug[slug] = key;
         }
@@ -580,9 +394,7 @@ window.HTF = window.HTF || {};
       count: function () { return read().length; },
 
       /**
-       * Flip one entry and persist. Returns the state it ENDED in, so a caller
-       * can paint from the answer rather than asking again.
-       * @param {string} url
+       * Flip one entry and persist.
        * @returns {boolean} true if it is now shortlisted
        */
       toggle: function (url) {
@@ -594,7 +406,8 @@ window.HTF = window.HTF || {};
         return at === -1;
       },
 
-      /** Empty it — the marks and all three count maps together. @returns {void} */
+      /** Empty it — the marks and all three count maps together. No page
+          control calls it (#1100); the store's tests do. */
       clear: function () {
         entries = [];
         write();
@@ -606,29 +419,17 @@ window.HTF = window.HTF || {};
         writeBatches();
       },
 
-      /* --- HOW MANY OF EACH — GitHub issue #546, Helen 2026-09-04 ------------
-         "Per drink quantities, zomg yes please!" -- two negronis and six
-         daiquiris is a real weekend, and one number for the whole list cannot
-         say it.
-
-         A SECOND KEY, NOT A RICHER ENTRY. Making the shortlist an array of
-         `{url, glasses}` would change the shape of everything already stored in
-         every browser that has used the feature, and would put a planning
-         number inside the record of what is marked -- two facts with different
-         lifetimes in one place. This is a plain map beside it: the shortlist
-         still says WHAT, this says HOW MANY.
-
-         A MISSING ENTRY IS ONE GLASS, which is what makes the map sparse and
-         self-healing: a drink dropped from the shortlist leaves a number behind
-         that nothing reads, and setting a count back to 1 removes it rather
-         than storing the default. Nothing has to tidy up after the shortlist. */
+      /* --- How many glasses of each (#546) ----------------------------------
+         A second key, not a richer entry: an array of `{url, glasses}` would
+         change the shape of every list already stored. A missing entry is one
+         glass, so setting a count back to 1 removes it, and a number left
+         behind by a dropped drink is read by nothing. */
       glasses: function (url) {
         var n = readGlasses()[url];
         return typeof n === 'number' && n > 0 ? n : 1;
       },
 
       /**
-       * @param {string} url
        * @param {number} n - glasses; 1 or less removes the entry
        * @returns {number} what it ended up as
        */
@@ -643,15 +444,9 @@ window.HTF = window.HTF || {};
       },
 
       /**
-       * How many portions of this recipe are wanted — #801.
-       *
-       * `null` means nobody has said, and the caller substitutes the recipe's
-       * own portion count. That is the whole difference from `glasses` above:
-       * there the default is a constant this file can hold, here it is a
-       * per-recipe fact only the build knows.
-       *
-       * @param {string} url
-       * @returns {number|null}
+       * How many portions of this recipe are wanted (#801).
+       * @returns {number|null} `null` means nobody has said, and the caller
+       *          substitutes the recipe's own portion count
        */
       portions: function (url) {
         var n = readPortions()[url];
@@ -659,9 +454,7 @@ window.HTF = window.HTF || {};
       },
 
       /**
-       * @param {string} url
-       * @param {number|null} n - portions; anything below 1 forgets the entry,
-       *        which puts the recipe back to however many it makes
+       * @param {number|null} n - portions; anything below 1 forgets the entry
        * @returns {number|null} what it ended up as
        */
       setPortions: function (url, n) {
@@ -679,9 +472,7 @@ window.HTF = window.HTF || {};
       },
 
       /**
-       * How many batches of this `makes:` recipe are wanted — #1297.
-       *
-       * @param {string} url
+       * How many batches of this `makes:` recipe are wanted (#1297).
        * @returns {number|null} a whole number or 0.5; `null` means nobody has
        *          said, which is one batch
        */
@@ -691,10 +482,8 @@ window.HTF = window.HTF || {};
       },
 
       /**
-       * @param {string} url
-       * @param {number|null} n - batches: goes to the nearest whole number, or
-       *        to a half below three quarters; nothing or zero forgets the
-       *        entry, which puts the recipe back to one batch
+       * @param {number|null} n - batches: the nearest whole number, or a half
+       *        below three quarters; nothing or zero forgets the entry
        * @returns {number|null} what it ended up as
        */
       setBatches: function (url, n) {
@@ -711,34 +500,20 @@ window.HTF = window.HTF || {};
         return value;
       },
 
-      /* `snapshot()` (the JSON export, #849) and `restore()` (pasting one back,
-         #850) lived here until #1100, 2026-09-15 -- Helen: "Remove the rest of
-         the apparatus: no JSON export or import, no clear." The share link is
-         the one way a list leaves a browser now. Their idea that outlived them
-         is below: a list names drinks by SLUG, because the folders around a
-         key move and the last segment does not. `clear()` above stays; the
-         store's own tests use it, and it is the obvious call for any future
-         control. git has the two functions if they are ever wanted back. */
-      /* --- A SHORTLIST SOMEONE SENT — #1093 ---------------------------------
-         `?shortlist=aviation,negroni` names drinks by slug, because a link is
-         read and typed by people and a slug is the part of a key that
-         survives a folder move.
-
-         slugOf() is the one spelling of "a key's slug"; the share link is
-         built from it, so a link this site writes always resolves here.
-         @param {string} key @returns {string} */
+      /* --- A shortlist someone sent (#1093) ---------------------------------
+         `?shortlist=aviation,negroni` names drinks by slug: the folders
+         around a key move and the last segment does not. slugOf() is the one
+         spelling of "a key's slug", so a link this site writes resolves here. */
       slugOf: slugOf,
 
       /**
-       * Which live keys a list of slugs names. READS NOTHING AND WRITES
-       * NOTHING: Helen's ruling is that opening a shared link shows the list
-       * and saves none of it, so this only answers the question.
+       * Which live keys a list of slugs names. Reads nothing and writes
+       * nothing: opening a shared link shows the list and saves none of it.
        *
        * @param {string[]} slugs - as parsed from the URL, in link order
        * @param {string[]} liveKeys - every `data-shortlist-key` on the page
        * @returns {{keys:string[], unmatched:string[]}} `keys` in link order,
-       *          once each; `unmatched` the slugs nothing on the page answers
-       *          to, reported rather than dropped in silence
+       *          once each; `unmatched` the slugs nothing on the page answers to
        */
       resolveSlugs: function (slugs, liveKeys) {
         var bySlug = keysBySlug(liveKeys);
@@ -757,10 +532,8 @@ window.HTF = window.HTF || {};
       },
 
       /**
-       * Mark every one of these and persist once — the shared view's
-       * "keep these" (#1093). A MERGE: what is already
-       * marked stays marked and keeps its place in the order.
-       * @param {string[]} urls
+       * Mark every one of these and persist once: the shared view's "keep
+       * these" (#1093). A merge: what is already marked keeps its place.
        * @returns {number} how many were not already marked
        */
       addAll: function (urls) {
@@ -774,9 +547,8 @@ window.HTF = window.HTF || {};
         return added;
       },
 
-      /* FOR TESTS ONLY, and named so nobody mistakes it for API. The module
-         reads localStorage once and caches; a test that wants a second scenario
-         in the same page needs to say so. */
+      /* For tests only: drops the cached reads so a test can stage a second
+         scenario in the same page. */
       _forget: function () { entries = null; counts = null; servings = null; batchCounts = null; }
     };
   })();

@@ -1,54 +1,17 @@
-// recipe-scale.js
-// =============================================================================
-// THE RECIPE SCALER'S DOM HALF -- read the amounts, write them back for N people.
-// =============================================================================
-// GitHub issue #1005, 2026-09-14. The arithmetic is assets/js/food-scale.js
-// (HTF.foodScale) and this file holds none of it -- the split cocktail-scale.js
-// runs against scale.js, for the same reason: the maths is the part worth
-// testing without a browser, and tests/js/food-scale.test.js is where it is.
+// The recipe scaler's DOM half (#1005): read the amounts, write them back for
+// N people. The arithmetic is assets/js/food-scale.js (HTF.foodScale), tested
+// in tests/js/food-scale.test.js; this file holds none of it.
 //
-// PORTIONS, NOT MULTIPLES. The box starts at however many the recipe makes
-// (`data-portions`, from _plugins/food_shopping.rb via the layout) and the
-// factor is wanted over made, so a recipe for six shown for four is at x0.67
-// -- the shopping list's own arithmetic. Helen's ruling for food; the drink
-// page's whole-recipes rule is the drink page's.
+// The written amounts are stashed on first run and every redraw scales from
+// those; scaling the displayed text would compound. At the recipe's own count
+// the original text goes back byte for byte, not a re-rendering of it.
 //
-// THE ORIGINAL AMOUNTS ARE STASHED ON FIRST RUN and every redraw scales from
-// those, never from what is on screen -- scaling the displayed text would
-// compound. AT THE RECIPE'S OWN COUNT THE ORIGINAL TEXT GOES BACK, byte for
-// byte, rather than a re-rendering of it: "1.2 kg" as Helen wrote it, not the
-// formatter's opinion of it.
+// `.ingredient-amount-number` holds a decoration slot and then the amount as
+// text. Only the text nodes are read and replaced.
 //
-// THE AMOUNT SPAN HOLDS A DECORATION AND A TEXT NODE. `.ingredient-amount-number`
-// wraps the highlighter's slot (an aria-hidden span decorations.js fills with
-// an SVG) and then the amount as text. Only the text nodes are read and
-// replaced; the slot is left alone, so the yellow stays under the number.
-//
-// THE NOTE NAMES WHAT DID NOT MOVE. Helen: "let's add a note to bitters and
-// handfuls (copy tbc, just put in a placeholder)". Two kinds of line cannot
-// scale: an amount with no count in it ("a few handfuls", "some") and an
-// ingredient with no amount at all ("salt, to taste"). When the portions
-// differ from the recipe's own, both kinds are listed by name under the
-// control; at the recipe's own count the note is hidden, because nothing has
-// moved.
-//
-// A HANDFUL SCALES, IN HALF STEPS -- #1125. "1 handful" for three times the
-// people is "3 handfuls", for half as many again "1½ handfuls"; seven for six
-// used to come out as 1.17 and is now still 1. And a row with NO
-// amount whose text opens with such a measure scales too: Helen's own example
-// is `item: "a handful of fresh parsley"`, which becomes "3 handfuls of fresh
-// parsley". That is the one place this file writes outside an amount span --
-// see `leadFor` below. The rounding is HTF.foodScale's, in one function.
-// HELEN'S WORDS SINCE #1088, 2026-09-20 -- "(Not scaled: salt, black pepper;
-// olive oil)", settled as commas throughout. See `apply` below.
-//
-// THE CONTROL SHIPS `hidden` AND THIS REVEALS IT -- the rule every
-// JS-dependent control on both sites follows.
-//
-// AN EMPTY OR HALF-TYPED BOX IS NO CHANGE (the backspace rule, from
-// cocktail-scale.js: `input` fires on every keystroke and clearing the box to
-// type `4` must not flash anything), and the box is tidied on the way out.
-// =============================================================================
+// The control ships `hidden` and this reveals it. An empty or half-typed box
+// is no change (`input` fires on every keystroke); the box is tidied on the
+// way out.
 (function () {
   'use strict';
 
@@ -65,16 +28,11 @@
   var note = article.querySelector('.recipe-scale-note');
   if (!control || !input || !minus || !plus || !note) return;
 
-  /* PORTIONS, OR THE THING MADE -- #1286. A `makes:` recipe's control carries
+  /* Portions, or the thing made (#1286). A `makes:` recipe's input carries
      `data-made`, the build's reading of that line as JSON, and the box then
-     counts waffles (or millilitres, or 8-inch cakes) and never portions --
-     Helen: "Never tell me how many cookies are in a portion!!!" It steps in
-     WHOLE RECIPES and shows what that many make: 5 waffles, 10, 15. Everything
-     that differs between the two is in the MODE, which is HTF.foodScale's:
-     this file asks it what a press of plus means and what the box should
-     say, and holds no arithmetic for either. A `data-made` that cannot be
-     read leaves the control hidden, which is the rule for any control here
-     that cannot work. */
+     counts the thing made, never portions. What differs between the two is
+     the MODE, which is HTF.foodScale's. A `data-made` that cannot be read
+     leaves the control hidden. */
   var word = control.querySelector('.recipe-scale-word');
   var mode = null;
   if (input.hasAttribute('data-made')) {
@@ -87,9 +45,8 @@
     }
   } else {
     var people = parseInt(input.getAttribute('data-portions'), 10);
-    /* `data-whole-recipes`: a `makes:` recipe with no count to show keeps
-       the word "portions" and steps 4, 8, 12 -- whole recipes, like every
-       other `makes:` recipe. A `serves:` recipe has no such mark. */
+    /* `data-whole-recipes`: a `makes:` recipe with no count to show keeps the
+       word "portions" and steps in whole recipes. */
     if (people > 0) {
       mode = HTF.foodScale.portionsMode(people,
         input.hasAttribute('data-whole-recipes'),
@@ -124,12 +81,8 @@
 
   var original = spans.map(textOf);
 
-  /* THE TWO WORD LISTS ARE THE BUILD'S, #1125 -- `data-half-step-measures` is
-     _data/food/scaling.yml's `half_step_measures` (a handful, a pinch: measures
-     that scale in half steps) and `data-trailing` is ingredient_words.yml's
-     `trailing_phrases` ("to taste"). _layouts/recipe.html joins each with `|`
-     onto the control. Absent, both are empty and the scaler behaves as it did
-     before the issue. */
+  /* The word lists are the build's: _layouts/recipe.html joins each with `|`
+     onto the control. Absent, a list is empty. */
   function listFrom(attribute) {
     return (control.getAttribute(attribute) || '').split('|')
       .map(function (word) { return word.trim(); })
@@ -138,21 +91,16 @@
 
   var words = {
     halfStep: listFrom('data-half-step-measures'),
-    // A sprig, a bunch: the nearest quarter (#1297). Same route, same file.
+    // Measures stepped to the nearest quarter (#1297).
     quarterStep: listFrom('data-quarter-step-measures'),
     trailing: listFrom('data-trailing')
   };
 
-  /* "1 large egg", NOT "1 large eggs" -- #1286. When a counted ingredient
-     comes down to exactly one, the noun in its ITEM goes singular
-     (HTF.foodScale.singularItem has Helen's words and the rule).
-     `data-singulars` is ingredient_words.yml's `singulars` map, for the
-     plurals a trailing `s` does not explain.
-
-     THE ITEM'S FIRST TEXT NODE IS THE ONLY THING WRITTEN, and its written
-     value is stashed here once, so going back to the recipe's own count puts
-     back exactly what the recipe said. An item that opens with a link has no
-     such node and is left alone. */
+  /* When a counted ingredient comes down to exactly one, the noun in its ITEM
+     goes singular (#1286, HTF.foodScale.singularItem). Only the item's first
+     text node is written, and its written value is stashed so the recipe's
+     own count puts back what the recipe said. An item that opens with a link
+     has no such node and is left alone. */
   var singulars = {};
   try {
     singulars = JSON.parse(control.getAttribute('data-singulars') || '{}') || {};
@@ -180,16 +128,10 @@
     return { node: node, written: node ? node.nodeValue : '' };
   });
 
-  /* A ROW WITH NO AMOUNT, AND THE TEXT NODE ITS WORDS START IN. "a handful of
-     fresh parsley" has no span to rewrite: the measure is the opening of the
-     item's own text. `leadFor` finds the row's FIRST text, and only if it is
-     a bare text node directly inside the <li> -- an item that opens with a
-     link or any other element has no lead and is simply not scaled. The
-     node's original value is stashed here, once, for the same reason the
-     amounts are: every redraw scales from what the recipe wrote.
-
-     ONLY THAT ONE NODE IS EVER WRITTEN, so a link, an emphasis or the
-     annotation later in the row is never touched. */
+  /* A row with no amount: the measure may open the item's own text ("a
+     handful of fresh parsley"). `leadFor` finds the row's first text, only if
+     it is a bare text node directly inside the <li>; that one node is the
+     only thing written, and its original value is stashed. */
   function leadFor(row) {
     for (var i = 0; i < row.childNodes.length; i += 1) {
       var node = row.childNodes[i];
@@ -250,10 +192,9 @@
       }
     });
 
-    /* An ingredient with no amount is as written whatever the box says --
-       UNLESS its text opens with a countable by-eye measure ("a handful of",
-       "pinch of"), which scales in place. The name for the note is taken
-       after the text is put back, so it is always the recipe's own words. */
+    /* An ingredient with no amount is as written, unless its text opens with
+       a countable by-eye measure, which scales in place. The name for the
+       note is taken after the text is put back. */
     bare.forEach(function (item) {
       if (item.lead) item.lead.nodeValue = item.written;
       if (n === base) return;
@@ -275,24 +216,9 @@
     var said = mode.word(n);
     if (word && said !== null) word.textContent = said;
 
-    /* HELEN'S LINE, #1088, 2026-09-20: "(Not scaled: salt, black pepper;
-       olive oil)". Parenthesised, no full stop, and COMMAS between the names
-       -- her example carried one of each and she settled it as commas
-       throughout when asked, so the semicolon this used to join with is gone
-       along with the trailing period.
-
-       A NAME CONTAINING A COMMA WOULD READ AS TWO. That is the one thing the
-       semicolon bought, and it was given up knowingly. SINCE #1125 NO NAME
-       HAS ONE: `noteName` cuts each at its first comma, which is also what
-       turns "paprika, unless feeding Helen" into the "paprika" her line
-       wants. (This comment used to say the names came from
-       `.recipe-item-name` and so never held a comma. No such class exists;
-       they were the whole `item:` text, and dozens of published lines had one
-       -- "salt, to taste" among them.)
-
-       A NAME IS LISTED ONCE. Two rows can cut down to the same ingredient --
-       "salt" in the cake and "salt" in the icing -- and saying it twice says
-       nothing more. */
+    /* "(Not scaled: salt, black pepper)" (#1088): parenthesised, no full stop,
+       commas between the names. `noteName` cuts each name at its first comma,
+       so no name holds one. A name is listed once. */
     var named = still.filter(function (name, index) {
       return name !== '' && still.indexOf(name) === index;
     });

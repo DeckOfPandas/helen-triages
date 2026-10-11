@@ -1,121 +1,55 @@
 document.addEventListener('DOMContentLoaded', function () {
   var FilterState = HTF.filterState;
 
-  /* ONE state object, not six loose variables — GitHub issue #52, step one.
-     Its fields, its cleared value and both "is anything set" answers all come
-     from assets/js/filter-state.js, which is where the reasoning for each
-     field now lives and where tests/js/filter-state.test.js can reach it.
-     Read FIELD_SPEC there before adding a filter kind here.
-
-     Reassigned wholesale by clearAllFilters(), never rebuilt field by field:
-     that is the whole point. Every reader below goes through this one
-     variable, so a reassignment reaches all of them.
-
-       state.tags        Set, the MOOD/PRACTICALITIES tag buttons
-       state.star        string|null, single-select STAR INGREDIENT
-       state.includedIngredients
-                         Set, HAS TO HAVE (issue #1092). AND across chosen
-                         entries -- adding a second means "and this one too",
-                         the way excludedIngredients' OR and cocktails' own
-                         `include` cupboard already work. Matched against
-                         main_ingredients via IS.entriesMatchKey, never as a
-                         substring -- see FilterState.includesRow.
-       state.excludedIngredients
-                         Set, the "they hate peas" exclusions (issue #52).
-                         Entries of the DERIVED ingredient index
-                         (data-all-ingredients), matched as whole entries, not
-                         as substrings -- see rowIsExcluded() below.
-       state.nameQuery   the title search — folded (accents stripped,
-                         HTF.ingredientSearch.fold) and lowercased, the same
-                         treatment ingredient-search.js gives its own query.
-                         GitHub issue #45: typing "creme brulee" found nothing
-                         against a title that actually reads "Crème Brûlée".
-                         Every match against a title (here and in
-                         updateTitleHighlights() below) folds that title's text
-                         the same way before comparing, so an accented title
-                         still matches an unaccented query and vice versa; the
-                         title itself is never folded for display.
-       state.isSearching NOT A FILTER — "the ingredient box has text and
-                         nothing is chosen yet". Clearable, so it counts
-                         towards the clear button; not narrowing, so it does
-                         not count towards suppressList.
-       state.isExcludeSearching
-                         isSearching's sibling for the LEAVE OUT box
-                         (#exclude-search-box, issue #52). GitHub issue #274:
-                         this had no field at all, so a half-finished exclude
-                         search set no state, and the clear button stayed
-                         hidden beside a pool of results with no other way to
-                         dismiss them. Same treatment as isSearching. */
+  /* One state object; its fields, its cleared value and both "is anything
+     set" answers come from assets/js/filter-state.js. Read FIELD_SPEC there
+     before adding a filter kind. clearAllFilters() reassigns it wholesale, so
+     every reader must go through this variable (#52). */
   var state = FilterState.emptyState();
 
-  /* HAS TO HAVE's display text per chosen KEY, GitHub issue #1092. Not part
-     of `state` -- FilterState only ever holds the match key an aliased entry
-     collapses to (e.g. "five-spice"), never the prettier label the button
-     showed ("Chinese five-spice powder", display_names in
-     ingredient_words.yml), and a filter's identity has to be the key or two
-     spellings of one ingredient would count as two. Kept here, alongside the
-     Set it labels, and carried through go-back memory the same way (see
-     saveIndexMemory/restoreIndexMemory) since a restored chip needs a label
-     to show and `state` alone cannot supply one. */
+  /* Display text per chosen HAS TO HAVE key (#1092). Not in `state`: a
+     filter's identity is the match key ("five-spice"), or two spellings of
+     one ingredient would count as two. The label ("Chinese five-spice
+     powder") is carried through go-back memory beside it. */
   var ingredientLabels = {};
 
   var PAGE_SIZE = 20;
   var currentPage = 1;
   var showAll = false;
 
-  // An array, not a live NodeList: shuffleRecipeList() reorders it in place
-  // and re-appends in that order, so every later pass over `items` — matching,
-  // pagination, the code bars — walks in whatever order is currently on
-  // screen rather than the page's original load-time order.
+  // An array, not a live NodeList: shuffleRecipeList() reorders it, so every
+  // later pass walks the order currently on screen.
   var items = Array.from(document.querySelectorAll('.recipe-list li'));
 
-  // Original, unmarked-up title text per link, read once. updateTitleHighlights()
-  // always rebuilds from this rather than the link's current (possibly already
-  // wrapped) textContent, so re-running it on every keystroke never compounds.
+  // The unmarked title text, read once: updateTitleHighlights() rebuilds from
+  // it, never from the link's current (possibly wrapped) content.
   var titleLinks = Array.from(document.querySelectorAll('.recipe-title-link'));
   titleLinks.forEach(function (a) { a.dataset.titleText = a.textContent; });
 
   var matrix = document.querySelector('.controls');
   var recipeList = document.querySelector('.recipe-list');
 
-  /* THE SHORTLISTED-ONLY BUTTON — #546, on the results heading rather than in
-     the matrix. It was kept out of the META FILTERS block because that block
-     was local-only and a shortlist is not; the block itself went on 2026-09-06,
-     so the reason has outlived the thing it was distinguishing from, and this
-     button's placement is now simply its own. See food/index.html for why there
-     is no separate shortlist page. Wired below, revealed there too: it ships
-     `hidden`, and it is this script rather than shortlist.js that proves the
-     filter half exists. */
+  /* The shortlisted-only button (#546) sits on the results heading, not in
+     the matrix. It ships `hidden` and is revealed below. */
   var shortlistOnlyBtn = document.getElementById('shortlist-only');
 
-  /* HIDE THE DRAFTS, ON A LOCAL BUILD ONLY -- #1358, 2026-10-10; the twin of
-     cocktail-index.js's, which has Helen's words and why this is not a field
-     of `state`. The button exists only where the template is built with
-     `show_drafts`, so on the deployed index this is null. A row is a draft if
-     it wears the `draft` pill, which is the one mark the template gives it. */
+  /* Hide the drafts (#1358). The button exists only on a local build, so
+     this is null on the deployed index. A row is a draft if it wears the
+     `.badge-draft` pill. Not a field of `state`; cocktail-index.js has the
+     twin. */
   var draftsBtn = document.getElementById('drafts-toggle');
   var hideDrafts = false;
 
-  /* A SHORTLIST SOMEONE SENT -- #1093, `?shortlist=slug,slug`. Helen's
-     rulings, 2026-09-15: opening the link SHOWS the list and saves none of it
-     ("Show it, don't save it"); and a "keep these" button makes it yours in
-     one tap. The shopping list hid while it was showing until 2026-10-11,
-     when she asked for it open -- see renderShoppingList().
-
-     THE VIEW IS THE SHORTLIST VIEW, with a different answer to "is this row
-     on it". `state.shortlisted` is true exactly as `?shortlist=1` sets it, so
-     #918's rule holds unchanged -- any filter, clear all, or the button takes
-     the view off -- and update() drops this list the moment it does. It is
-     not in `state` because it is not a filter anyone sets on this page, and
-     the back-memory must not carry a stranger's list into this browser's
-     next visit. null whenever no shared list is showing. */
+  /* A shortlist someone sent, `?shortlist=slug,slug` (#1093): opening the
+     link shows the list and saves none of it. It is the shortlist view with a
+     different answer to "is this row on it": `state.shortlisted` is true, so
+     any filter takes the view off (#918) and update() drops this list when it
+     does. Not in `state`, so the back-memory never carries a stranger's list
+     into this browser's next visit. null when no shared list is showing. */
   var sharedKeys = null;
   var sharedUnmatched = [];
   var sharedNote = document.querySelector('[data-shared-shortlist]');
-  // Two buttons, same action -- issue #67. The top one is the original,
-  // pinned top-right of the matrix; the bottom one repeats it after the last
-  // filter section so clearing doesn't mean scrolling back up past five
-  // sections. Both stay in sync (visibility, click) via clearButtons below.
+  // Top and bottom of the matrix (#67), kept in step through clearButtons.
   var clearButtons = [];
   if (matrix) {
     var clearBtnTop = document.createElement('button');
@@ -133,11 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     clearButtons.push(clearBtnBottom);
   }
 
-  // A third, under "Blank canvas." -- #1093. On a phone the other two
-  // are screens away from the empty list, so the way out of a search that
-  // found nothing was out of sight of the line saying so. One more entry in
-  // clearButtons, so its click and its visibility are the other two's by
-  // construction; inside the line, so it hides with it.
+  // A third, inside the empty-list line (#1093), so it hides with it.
   var emptyMessageEl = document.querySelector('.recipe-list-empty');
   if (emptyMessageEl) {
     var clearBtnEmpty = document.createElement('button');
@@ -154,19 +84,14 @@ document.addEventListener('DOMContentLoaded', function () {
   var nameSearchBox = document.getElementById('name-search-box');
   var nameSearchClear = document.getElementById('name-search-clear');
 
-  // The dislike navigator (GitHub issue #52). It is a plain section beside HAS
-  // TO HAVE now, always visible -- #exclude-reveal and #exclude-panel went with
-  // issue #586, and with them this module's only piece of disclosure state.
+  // LEAVE OUT, the dislike navigator (#52): a plain, always-visible section.
   var excludeBox = document.getElementById('exclude-search-box');
   var excludeClear = document.getElementById('exclude-search-clear');
   var excludePool = document.getElementById('exclude-results-pool');
   var excludeActive = document.getElementById('exclude-active');
 
-  // ---------------------------------------------------------------------------
-  // Ingredient vocabulary — read from _data/ingredient_words.yml, emitted as
-  // JSON by index.html. Nothing about ingredient words is written down in this
-  // file; to change search behaviour, edit the YAML.
-  // ---------------------------------------------------------------------------
+  // --- Ingredient vocabulary: _data/food/ingredient_words.yml, emitted as JSON
+  // by food/index.html. No ingredient words are written in this file.
   var VOCABULARY = (function () {
     var fallback = { search: { family_button_min_chars: 3 }, singulars: {}, synonyms: {} };
     var node = document.getElementById('ingredient-vocabulary');
@@ -194,45 +119,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   })();
 
-  // The actual matching/ranking algorithm lives in ingredient-search.js —
-  // pure, no DOM, testable directly with Node. This file only wires it to
-  // the page: read ingredients off the DOM, call IS.search(), turn the
-  // result into buttons.
+  // Matching and ranking live in ingredient-search.js (pure, tested with
+  // Node); this file only wires them to the page.
   var IS = HTF.ingredientSearch.create(VOCABULARY);
   var fold = HTF.ingredientSearch.fold;
   var getWords = HTF.ingredientSearch.getWords;
 
-  /* TWO PREDICATES, NOT ONE, AND THEY ARE NOT THE SAME QUESTION -- GitHub
-     issue #248. There used to be three near-identical expressions scattered
-     through this file and the issue read as "unify them". Unifying them would
-     have been wrong: two of the three ask genuinely different things, and
-     collapsing them would have traded a documented difference for a silent
-     behaviour change in whichever call site lost its own answer.
-
-     What they actually ask:
-
-       hasNarrowingFilter()  "while the ingredient box is being typed into, is
-                             anything ELSE still narrowing the list?" -- the
-                             one input to suppressList, which decides whether
-                             the list hides behind the "searching" message.
-
-       hasAnythingToClear()  "is there anything for the clear-all button to
-                             clear?" -- purely the button's visibility, and it
-                             must agree with what clearAllFilters() actually
-                             clears, or the button hides while still having
-                             work to do.
-
-     BOTH ARE NOW ANSWERED BY assets/js/filter-state.js, by walking its field
-     table rather than by a hand-written run of `||`s -- GitHub issue #52,
-     step one. The run of `||`s is what kept going wrong: it disagreed with
-     clearAllFilters() about nameQuery, then about isSearching, and each time
-     the clear button hid while it still had work to do. Both wrappers stay,
-     because both call sites want the sentence rather than the mechanism, and
-     because they are the proof that the two questions are still two.
-
-     Which fields each one counts, and why each excluded field is excluded, is
-     recorded on the fields themselves in FIELD_SPEC. Do not re-derive either
-     answer here. */
+  /* Two predicates, and they are different questions (#248); do not merge
+     them. hasNarrowingFilter(): is anything other than a half-typed
+     ingredient search narrowing the list? It alone feeds suppressList.
+     hasAnythingToClear(): the clear-all button's visibility, which must agree
+     with what clearAllFilters() clears. Which fields each counts is on
+     FIELD_SPEC in filter-state.js. */
   function hasNarrowingFilter() {
     return FilterState.hasNarrowingFilter(state);
   }
@@ -241,75 +139,38 @@ document.addEventListener('DOMContentLoaded', function () {
     return FilterState.hasAnythingToClear(state);
   }
 
-  // The shuffle itself is pure -- assets/js/list-view.js, tested directly
-  // with Node. This is the DOM half: re-appending in the new order.
-  // appendChild on a node already in the document MOVES it rather than
-  // duplicating it, so this reorders the real DOM, not a detached copy.
+  // DOM half of HTF.listView.shuffle: appendChild on an attached node moves it.
   function shuffleRecipeList() {
     if (!recipeList) return;
     items = HTF.listView.shuffle(items);
     items.forEach(function(li) { recipeList.appendChild(li); });
   }
 
-  // ---------------------------------------------------------------------------
-  // INDEX MEMORY — GitHub issue #387
-  // ---------------------------------------------------------------------------
-  // Going BACK to the index restores the list you left: same shuffle order,
-  // same filters, same page, same scroll position. Arriving any other way is
-  // untouched, so §13.7's rule that a fresh visit shuffles still holds exactly.
-  //
-  // WHY THIS EXISTS RATHER THAN JUST TRUSTING THE BROWSER. The first attempt at
-  // #387 leaned on the back/forward cache: go back, the browser restores the
-  // page without re-running anything, the order survives for free. It does not
-  // work. Jekyll's dev server sends `Cache-Control: ... no-store ...` (measured,
-  // not assumed -- curl -I against :4001), and no-store disqualifies a page from
-  // bfcache in Chrome and Firefox. So on the machine this site is actually
-  // developed on, bfcache can NEVER apply: the index re-renders and reshuffles,
-  // which is what Helen saw, with her own back button as well as the new arrow.
-  //
-  // The deeper problem is that bfcache is an optimisation a browser may decline
-  // for its own reasons. Building a feature on it means the feature works
-  // sometimes -- and worse here, it would likely work on the deployed site and
-  // never on :4001, so the page she looks at all day would disagree with the
-  // live one. That is issue #235's trap running backwards.
-  //
-  // performance navigation type is a FACT rather than an optimisation: it says
-  // whether this load was a back/forward navigation, and it says so whether or
-  // not bfcache was involved. Paired with sessionStorage it needs nothing from
-  // the browser's goodwill.
+  // --- Index memory (#387) ----------------------------------------------------
+  // Going back to the index restores the list you left: order, filters, page,
+  // scroll. Any other arrival shuffles (MANUAL §13.7). It rests on the
+  // navigation type plus sessionStorage, not on bfcache, which a browser may
+  // decline (a `no-store` response disqualifies the page).
   var MEMORY_KEY = 'htf-index-memory-v1';
 
-  // Rows carry no id of their own; the title link's href is the one thing on a
-  // row that is unique and stable. Named class, not querySelector('a') -- see
-  // reorderForTitleSearch() for why the first <a> stopped being the title.
+  // Rows carry no id; the title link's href is unique and stable. By class,
+  // never "the first <a>": badge links share the row (#40).
   function rowKey(li) {
     var a = li.querySelector('.recipe-title-link');
     return a ? a.getAttribute('href') : '';
   }
 
-  // FilterState.arrivedByGoingBack since #595, where the cocktail index needed
-  // the same fact. The reasoning above moved with it, into that module's own
-  // comment, where a test can reach the function it explains.
   var arrivedByGoingBack = FilterState.arrivedByGoingBack;
 
-  /* Saved on pagehide rather than on every update: it fires on the way out of
-     the page, including into bfcache, and unlike `unload` it does not itself
-     disqualify the page from bfcache -- which matters on the deployed site,
-     where bfcache DOES apply and this whole mechanism should stay out of its
-     way. Storage being full, disabled or blocked is not worth breaking a page
-     over; the fallback is a fresh list, which is what you had before -- and
-     since #686 that swallowing lives once, in HTF.indexMemory, which the drinks
-     index shares. The KEY and the RECORD stay here: they are this index's. */
+  /* Saved on pagehide, which fires on the way into bfcache too and, unlike
+     `unload`, does not disqualify the page from it. Storage failures are
+     swallowed in HTF.indexMemory (#686), shared with the drinks index. */
   function saveIndexMemory() {
     if (!recipeList) return;
     HTF.indexMemory.save(MEMORY_KEY, {
       order: items.map(rowKey),
       filters: FilterState.serialise(state),
-      // Every chosen entry's DISPLAY text, keyed by its match key -- an
-      // aliased entry like "five-spice" shows as "Chinese five-spice powder"
-      // (see display_names in ingredient_words.yml), and a plain object
-      // round-trips through JSON exactly like the ingredient set itself,
-      // one label per member of state.includedIngredients.
+      // Display text per chosen key: see ingredientLabels.
       ingredientLabels: ingredientLabels,
       page: currentPage,
       showAll: showAll,
@@ -317,20 +178,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  /* Returns the saved record when it restored, or null. Null means "carry on as
-     a fresh load" and every failure path returns it: not a back navigation,
-     nothing stored, unparseable, or a record whose shape does not fit. Stored
-     state is untrusted input -- see FilterState.deserialise's own note. */
+  /* Returns the saved record, or null for "carry on as a fresh load": not a
+     back navigation, nothing stored, or a record that does not fit. Stored
+     state is untrusted input. */
   function restoreIndexMemory() {
     if (!recipeList || !arrivedByGoingBack()) return null;
 
     var saved = HTF.indexMemory.restore(MEMORY_KEY);
     if (!saved || !Array.isArray(saved.order)) return null;
 
-    // Reorder by the saved keys, then append anything the record did not know
-    // about. A recipe added since the record was written is new to the list and
-    // belongs at the end rather than being dropped -- and dropping it would be
-    // silent, which is the failure mode to avoid.
+    // Saved order first, then any row the record did not know: a recipe added
+    // since belongs at the end, never silently dropped.
     var byKey = {};
     items.forEach(function (li) { byKey[rowKey(li)] = li; });
     var ordered = [];
@@ -343,30 +201,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     state = FilterState.deserialise(saved.filters);
 
-    /* HALF-FINISHED SEARCHES ARE NOT RESTORED, deliberately. isSearching and
-       isExcludeSearching mean "there is text in that box and nothing chosen
-       from its results yet" -- a pool of candidates mid-thought, not a filter.
-       Rebuilding one would mean re-running a search to recreate buttons nobody
-       had picked, and getting it slightly wrong leaves a results pool that does
-       not match the text above it. A CHOSEN result is different and is restored
-       below: it is an applied filter. */
+    /* Half-finished searches are not restored: a pool of candidates nobody
+       picked is not a filter. Chosen results are, below. */
     state.isSearching = false;
     state.isExcludeSearching = false;
 
     if (nameSearchBox) nameSearchBox.value = state.nameQuery || '';
     if (excludeBox) excludeBox.value = '';
-    // Cleared rather than filled -- with more than one entry possibly chosen
-    // there is no longer one label the box could echo. The chosen entries are
-    // rebuilt below instead, same as LEAVE OUT's own #exclude-active never
-    // lived in its search box to begin with.
+    // Cleared, not filled: with several entries chosen there is no one label
+    // to echo. The chosen chips are rebuilt below.
     if (searchBox) searchBox.value = '';
 
-    /* Rebuild every chosen ingredient's button exactly as choosing it leaves
-       things (see the .btn-ingredient branch of the matrix click handler):
-       the pool holds one button per entry in state.includedIngredients,
-       active, each with its tape shape. Reproducing the end state rather than
-       replaying a search -- a replay would re-derive a whole candidate pool
-       for each one just to keep a single button out of it. */
+    /* One active button per chosen ingredient, as choosing it leaves things;
+       the end state is reproduced, no search is replayed. */
     ingredientLabels = (saved.ingredientLabels && typeof saved.ingredientLabels === 'object')
       ? saved.ingredientLabels : {};
     if (state.includedIngredients.size && resultsPool) {
@@ -382,25 +229,14 @@ document.addEventListener('DOMContentLoaded', function () {
     return saved;
   }
 
-  // GitHub issues #63/#78: while a title search is active, matching rows
-  // are grouped into three tiers (title starts with the query > some other
-  // word in the title starts with it > query is only a mid-word substring
-  // somewhere) — see HTF.listView.titleMatchTier's own comment for the
-  // exact rule. Each tier is independently shuffled, same "fair shot" idea
-  // as shuffleRecipeList() above, so no recipe is permanently stuck at the
-  // bottom of a tier it shares with dozens of others. Runs on every
-  // keystroke, same as the matching itself — the ranking is only ever
-  // correct for the query that's currently typed.
+  // While a title search is active, matching rows are grouped into the tiers
+  // of HTF.listView.titleMatchTier (#63, #78) and each tier is shuffled, so no
+  // recipe is stuck at the bottom of its tier. Runs on every keystroke.
   function reorderForTitleSearch() {
     if (!recipeList) return;
     var byTier = { 0: [], 1: [], 2: [], 3: [] };
     items.forEach(function(li) {
-      // .recipe-title-link, not the first <a> in the row. It used to be
-      // querySelector('a'), which worked only by accident: the title link
-      // happened to be the first link in the <li>. GitHub issue #40 put
-      // badge links in the same <li>, at which point "the first <a>" is
-      // still the title today and stops being it the moment anything is
-      // added above it. Named, so it cannot drift.
+      // By class, never "the first <a>" (see rowKey).
       var title = (li.querySelector('.recipe-title-link') || {}).textContent || '';
       var tier = HTF.listView.titleMatchTier(title, state.nameQuery, fold);
       byTier[tier].push(li);
@@ -423,26 +259,12 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   var masterIngredientsList = IS.buildMasterList(rawIngredientStrings);
 
-  // ---------------------------------------------------------------------------
-  // THE DERIVED INGREDIENT INDEX — GitHub issue #52's exclusions
-  // ---------------------------------------------------------------------------
-  //
-  // A SECOND vocabulary, over data-all-ingredients (every ingredient_groups
-  // item on the row, incidentals included) rather than over data-ingredients
-  // (main_ingredients). They are not interchangeable and the difference is the
-  // whole reason this feature is built on the derived list: main_ingredients is
-  // a deliberately partial hint, which is fine to include ON and dangerous to
-  // exclude BY. Nine rows list an olive oil in ingredient_groups and none of
-  // them names it in main_ingredients; coriander is 3 against 8, mushrooms 3
-  // against 4. "No olives, please" answered from main_ingredients hands back
-  // nine recipes containing the thing.
-  //
-  // Each row's own entries go through buildMasterList too, not just the
-  // corpus-wide list. That is what makes exact membership WORK: the picker
-  // offers "roasted peanuts" (buildMasterList strips the leading modifier from
-  // "chopped roasted peanuts"), so a row compared in its raw form would never
-  // match the entry the user was actually shown. One function, applied to both
-  // sides, and the two cannot drift.
+  // --- The derived ingredient index, for exclusions (#52) ---------------------
+  // A second vocabulary, over data-all-ingredients (every ingredient_groups
+  // item) and not data-ingredients (main_ingredients): the latter is a partial
+  // hint, fine to include on and dangerous to exclude by. Each row's entries
+  // go through buildMasterList as the corpus-wide list does, so the entry the
+  // picker offers ("roasted peanuts") is the form the row is compared in.
   var rowExcludeEntries = new Map();
   var allDerivedEntries = [];
   items.forEach(function (li) {
@@ -457,27 +279,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var FAMILY_SUFFIX = FilterState.FAMILY_SUFFIX;
 
-  /* Does any entry in `list` match the picked ingredient key `key`, by the
-     rules ingredient search already uses?
-
-     THE RULE ITSELF IS IS.entriesMatchKey, moved into ingredient-search.js by
-     issue #506 so it can be asked a question without a browser. It reads the
-     vocabulary (singulars, synonyms), which is why it lives on the instance
-     rather than here. This name stays as the local alias because it is what
-     both call sites below already read as, and because it is what gets handed
-     to FilterState.excludesRow -- which takes a matcher precisely so that
-     module need not grow a vocabulary of its own. */
+  /* IS.entriesMatchKey reads the vocabulary, so it lives on the instance. It
+     is the matcher handed to FilterState.excludesRow and rowMatchesFilters. */
   var entriesMatchKey = IS.entriesMatchKey;
 
-  /* The RULE itself — set membership, never substring — is
-     FilterState.excludesRow, next to the state it acts on and where
-     tests/js/filter-state.test.js can reach it without a DOM. Read its comment
-     before changing anything here: it is the line that stops "peas" taking the
-     peanut butter and the pearl barley with it.
-
-     This wrapper is the DOM half and nothing else: which entries this row has,
-     and the one thing the rule cannot know on its own — how to match a "(all)"
-     family button, which needs the ingredient vocabulary. */
+  /* The rule is FilterState.excludesRow: set membership, never substring, so
+     "peas" does not take the peanut butter with it. This is the DOM half:
+     which entries the row has. */
   function rowIsExcluded(li) {
     if (!state.excludedIngredients.size) return false;
     return FilterState.excludesRow(
@@ -497,12 +305,9 @@ document.addEventListener('DOMContentLoaded', function () {
     return btn;
   }
 
-  /* A CHOSEN HAS TO HAVE CHIP CARRIES ITS OWN x -- Helen, 2026-10-11: "I do
-     want to have the x on the chosen has to have chip, so please add it for
-     food." Cocktails' has had one since 2026-08-30 and LEAVE OUT's on both.
-     A span of its own, so nothing that reads the chip's label picks it up,
-     and aria-hidden: the accessible name says what a click does instead,
-     in cocktails' words. Still ONE button -- a click anywhere removes it. */
+  /* A chosen HAS TO HAVE chip carries its own x, in a span of its own so
+     nothing reading the chip's label picks it up; aria-hidden, and the
+     accessible name says what a click does. Still one button. */
   function markIngredientChosen(btn) {
     if (btn.querySelector('.btn-ingredient-x')) return;
     btn.setAttribute('aria-label', 'stop requiring ' + btn.textContent.trim());
@@ -519,22 +324,10 @@ document.addEventListener('DOMContentLoaded', function () {
     btn.removeAttribute('aria-label');
   }
 
-  // The tape-shape treatment other active filters get (STAR/MOOD/
-  // PRACTICALITIES) needs a .tag-shape slot in the markup, same as
-  // _includes/filter_group.html adds for those. Ingredient buttons are all
-  // built by makeIngredientButton() above with no slot at all, deliberately
-  // — a shape on every one of an unbounded swarm of search results would be
-  // exactly the "count is unbounded" noise .btn-ingredient--word-match's own
-  // comment already argues against. Only ACTIVE buttons (Helen: "apply the
-  // same tag styling to active ingredient search tags") get a slot, added
-  // here rather than at creation time since which buttons end up active
-  // isn't always known yet when they are built (renderResultsPool's
-  // narrow-to-one-match case sets .active on an already-built button).
-  //
-  // EVERY .btn-ingredient.active, PLURAL SINCE #1092: HAS TO HAVE went from
-  // one chosen entry to a Set of them, so more than one button can be active
-  // in the matrix at once -- a family (all) button chosen earlier keeps its
-  // shape while a second, unrelated entry gets chosen this call.
+  // Only ACTIVE ingredient buttons get a .tag-shape slot (the tape shape the
+  // other active filters wear): a shape on every search result would be noise.
+  // Added here, not at creation, because a button can become active after it
+  // is built. Several can be active at once (#1092).
   function ensureActiveIngredientShapes() {
     if (!matrix) return;
     var any = false;
@@ -552,24 +345,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function updateIngredientClear() {
     if (ingredientClear) {
-      // visibility, not display -- see the button's own comment in
-      // food/index.html. Toggling display added/removed it from the flex
-      // row entirely, so the input's rendered width jumped the instant it
-      // appeared instead of the clear link calmly sitting in space that
-      // was already there (Helen: "the clear link appears cutting off the
-      // field rather than to the right of it").
+      // visibility, not display: toggling display adds and removes it from
+      // the flex row, and the input's width jumps.
       ingredientClear.style.visibility =
         (state.includedIngredients.size || (searchBox && searchBox.value.trim())) ? 'visible' : 'hidden';
     }
   }
 
-  // Wraps the substring of each recipe title that matches state.nameQuery in a
-  // .title-hit span, same "same tag styling" idea as the ingredient pills
-  // above -- Helen's stretch goal: "could the part of the title hit gain
-  // the orange background and scratchy, capitalised lettering." Only the
-  // MATCHED substring gets the treatment, not the whole title, so this
-  // rebuilds from the original text (stashed once, above) every time
-  // rather than patching whatever's currently in the DOM.
+  // Wraps the part of each title that matches state.nameQuery in
+  // mark.title-hit. Rebuilt from the stashed original text every time.
   function updateTitleHighlights() {
     titleLinks.forEach(function (a) {
       var original = a.dataset.titleText;
@@ -603,14 +387,8 @@ function renderResultsPool() {
   resultsPool.innerHTML = '';
   state.isSearching = !!query;
 
-  /* CHOSEN ENTRIES STAY VISIBLE AND CLICKABLE (TO REMOVE) REGARDLESS OF WHAT
-     IS TYPED -- GitHub issue #1092. HAS TO HAVE is AND-multi-select now, the
-     same shape as LEAVE OUT and cocktails' own HAS TO HAVE ("adding an
-     ingredient means and this one too"), and a chosen requirement must not
-     disappear the instant you go looking for the next one -- unlike the
-     single-value picker this replaces, typing here is never a way to clear
-     what is already required; that is ingredientClear's job, and it clears
-     the SEARCH, not the choices (see its own handler below). */
+  /* Chosen entries stay visible, and clickable to remove, whatever is typed
+     (#1092): typing never clears a requirement. */
   state.includedIngredients.forEach(function (key) {
     resultsPool.appendChild(makeIngredientButton(key, ingredientLabels[key] || key, true));
   });
@@ -626,29 +404,20 @@ function renderResultsPool() {
     var label = fw + ' (all)';
     // Already shown above as a chosen entry -- never offered twice.
     if (state.includedIngredients.has(label)) return;
-    // Always a word match by construction — a family only ever forms
-    // (curated or structural) when its word already starts with the
-    // query, so this is never in doubt for an (all) button.
+    // A family only forms when its word starts with the query: a word match.
     resultsPool.appendChild(makeIngredientButton(label, label, true));
   });
   result.results.forEach(function(r) {
-    // GitHub issue #51: if "chicken (all)" is already offered, don't also
-    // show a bare "chicken" row right next to it — Helen: "I am always
-    // suspicious of searches like this, so if I read 'chicken (all)' next
-    // to 'chicken' I'd look at both". Only suppresses an exact bare-word
-    // entry, never a real multi-word one like "chicken breast".
+    // No bare "chicken" beside "chicken (all)" (#51); a multi-word entry
+    // like "chicken breast" still shows.
     if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
     // Already shown above as a chosen entry -- never offered twice.
     if (state.includedIngredients.has(r.ing)) return;
     resultsPool.appendChild(makeIngredientButton(r.ing, r.label || r.ing, r.hasWordMatch));
   });
 
-  // Auto-select on a unique match, same as ever -- but "unique" now means
-  // unique among what is NOT already chosen, so searching towards a second
-  // or third requirement still commits it the moment nothing else in the
-  // vocabulary could be meant. A plain JS filter rather than a `:not(.active)`
-  // selector -- the same answer, without asking a CSS engine for something
-  // this file can just check itself.
+  // Auto-select on a unique match, where unique means among what is not
+  // already chosen.
   var freshButtons = Array.prototype.filter.call(
     resultsPool.querySelectorAll('.btn-ingredient'),
     function (b) { return !b.classList.contains('active'); }
@@ -675,25 +444,12 @@ function renderResultsPool() {
 
 
 
-  // ---------------------------------------------------------------------------
-  // THE DISLIKE NAVIGATOR — GitHub issue #52
-  // ---------------------------------------------------------------------------
+  // --- LEAVE OUT, the dislike navigator (#52) --------------------------------
 
-  /* `wordMatch` is the same flag makeIngredientButton() has always taken, and
-     the two pickers now agree on it -- issue #390. They did not: this builder
-     simply dropped `r.hasWordMatch` on the floor, so LEAVE OUT rendered every
-     candidate identically while HAS TO HAVE, one box above, picked
-     out the genuine matches. Same query, same ranked results, same code path
-     (MANUAL 8.1) -- one of them just never used the answer.
-
-     What the flag means is worth restating here because it is the whole point
-     of the treatment: it is a WORD-PREFIX match, not a substring one. Typing
-     "pas" word-matches "anchovy paste" and "choux pastry", and does NOT match
-     "antipasti vegetables" -- which is in the list, correctly, on a substring
-     match. Nor does it match "farfalle" or "gnocchi", which are there as
-     members of the `pasta` family and contain no "pas" at all. So the styled
-     entries are the ones you meant, and the plain ones are the ones the
-     vocabulary brought along. */
+  /* `wordMatch` is a word-PREFIX match, as on makeIngredientButton (#390):
+     "pas" marks "anchovy paste" and not "antipasti vegetables", which is in
+     the list on a substring match, nor the family members the vocabulary
+     brought along. */
   function makeExcludeButton(value, label, wordMatch) {
     var btn = document.createElement('button');
     btn.type = 'button';
@@ -704,13 +460,8 @@ function renderResultsPool() {
     return btn;
   }
 
-  /* THE ACTIVE PILL, NOT makeExcludeButton -- it used to be one text node
-     ("peas ×") so .btn-exclude--active's line-through ran through the × as
-     well as the ingredient, which reads as "this control is disabled" rather
-     than "this ingredient is out". The name and the × are now separate
-     elements so _search.scss can strike only .btn-exclude-label; the × stays
-     plain. Still one clickable <button> throughout -- the × is not a second
-     control, same as before -- and the aria-label is unchanged. */
+  /* The name and the × are separate elements so the stylesheet can strike
+     only .btn-exclude-label. Still one button; the × is not a second control. */
   function makeActiveExcludeButton(value) {
     var btn = document.createElement('button');
     btn.type = 'button';
@@ -727,22 +478,16 @@ function renderResultsPool() {
     return btn;
   }
 
-  /* The picker's own search is FUZZY, and that is correct. It runs
-     HTF.ingredientSearch — folding, modifier-stripping, singulars, the lot —
-     over the derived vocabulary, so typing "pea" offers peas, peanut butter
-     AND pearl barley. All three are real entries in this collection; you pick
-     the one you meant, and what you picked is then matched as a whole entry
-     (rowIsExcluded above). Fuzzy to FIND, exact to FILTER. */
+  /* Fuzzy to find, exact to filter: "pea" offers peas, peanut butter and
+     pearl barley, and the one picked is matched as a whole entry
+     (rowIsExcluded). */
   function renderExcludePool() {
     if (!excludeBox || !excludePool) return;
     var query = fold(excludeBox.value.trim().toLowerCase());
     excludePool.innerHTML = '';
     if (excludeClear) excludeClear.style.visibility = query ? 'visible' : 'hidden';
-    // isSearching's sibling for this box (GitHub issue #274) -- see its entry
-    // in FIELD_SPEC. Set here, in step with the pool it describes, rather
-    // than left for toggleExcluded/excludeClear alone to unset, so the clear
-    // button appears the instant a half-finished search puts a pool on
-    // screen and not only once something is picked out of it.
+    // Set in step with the pool, so the clear button appears as soon as a
+    // half-finished search puts results on screen (#274).
     state.isExcludeSearching = !!query;
     if (!query) {
       update();
@@ -752,54 +497,31 @@ function renderResultsPool() {
     var result = IS.search(query, excludeMasterList);
     result.familyButtons.forEach(function (fw) {
       var label = fw + FAMILY_SUFFIX;
-      // Always a word match by construction, same as the include picker's
-      // (all) buttons: a family only ever forms when its word already starts
-      // with the query, so this is never in doubt.
+      // A family is a word match by construction, as in renderResultsPool.
       excludePool.appendChild(makeExcludeButton(label, label, true));
     });
     result.results.forEach(function (r) {
-      // Same "don't offer 'chicken' next to 'chicken (all)'" suppression
-      // renderResultsPool() applies, and for the same reason (issue #51):
-      // two adjacent buttons that look like the same answer make you check
-      // both.
+      // No bare "chicken" beside "chicken (all)" (#51).
       if (result.familyButtons.indexOf(fold(r.ing.trim().toLowerCase())) !== -1) return;
       excludePool.appendChild(makeExcludeButton(r.ing, r.label || r.ing, r.hasWordMatch));
     });
     update();
   }
 
-  /* WHAT IS BEING LEFT OUT, painted from state rather than at each place state
-     changes — the argument syncFilterButtons() already makes one layer up.
-     Clear-all reassigns the whole state object and never touches this markup,
-     so anything painted at click time would survive a clear that emptied the
-     state underneath it.
-
-     THE LINE IS "hiding peas" -- Helen on #1088, 2026-10-07: '"hiding peas"
-     please.' It said "hiding 1 recipe that lists peas", with a count and a
-     separate sentence for zero ("hiding nothing from the recipes left"); the
-     count is gone, so there is one line whatever the exclusion removed, and it
-     makes no claim about how many recipes list the thing. Still about the
-     INGREDIENT and never about what a recipe is free of: this index is derived
-     from what each recipe happens to write down. */
+  /* What is being left out, painted from state and not at click time:
+     clear-all reassigns the state object and never touches this markup. The
+     line reads "hiding peas" (#1088): about the ingredient, with no count and
+     no claim about what a recipe is free of. */
   function renderExcludeActive() {
     if (!excludeActive) return;
     excludeActive.innerHTML = '';
     if (!state.excludedIngredients.size) return;
 
-    /* NO "leaving out" LABEL ANY MORE -- GitHub issue #363. The struck-through
-       pill already says it, and the line after it ("hiding peas") says it
-       again, so the words were the third telling of the same fact and the
-       only one that could not also be clicked.
-
-       The aria-label on each pill still says "stop leaving out <value>", and
-       that is deliberate rather than an oversight: a screen reader gets no
-       strikethrough, so for that reader the words were never redundant. What
-       came out is the redundant VISIBLE copy, not the accessible name. */
+    /* No visible "leaving out" label (#363); each pill's aria-label keeps the
+       words, because a screen reader gets no strikethrough. */
     var names = [];
     state.excludedIngredients.forEach(function (value) {
-      // The line reads about the ingredient, so the "(all)" that qualifies
-      // the BUTTON comes off here -- "hiding chicken (all)" is not a
-      // sentence. The pill keeps it, because there it is the control's name.
+      // The line drops the "(all)" that the pill keeps as the control's name.
       names.push(value.replace(FAMILY_SUFFIX, ''));
       excludeActive.appendChild(makeActiveExcludeButton(value));
     });
@@ -812,42 +534,22 @@ function renderResultsPool() {
     excludeActive.appendChild(count);
   }
 
-  // Multi-select, like the tag buttons and unlike the star: you can be cooking
-  // for someone who hates peas AND coriander, and a second pick that replaced
-  // the first would be useless for the one job this feature has.
+  // Multi-select: cooking for someone who hates peas AND coriander.
   function toggleExcluded(value) {
     if (!value) return;
     if (state.excludedIngredients.has(value)) {
       state.excludedIngredients.delete(value);
     } else {
       state.excludedIngredients.add(value);
-      // Emptied on a pick rather than left standing: the next thing you want
-      // is to name the NEXT thing they hate, and the entry you just chose is
-      // now shown in the active list below anyway.
+      // Emptied on a pick, ready for the next thing to leave out.
       if (excludeBox) excludeBox.value = '';
       if (excludePool) excludePool.innerHTML = '';
       if (excludeClear) excludeClear.style.visibility = 'hidden';
-      // isSearching's sibling -- a result was just chosen, so the box is no
-      // longer mid-search (renderResultsPool's own auto-select does the same
-      // for state.isSearching).
       state.isExcludeSearching = false;
     }
     update();
   }
 
-  /* THE DISCLOSURE IS GONE -- issue #586, and what it took with it is the
-     interesting part. This module used to own a reveal button, two label
-     strings ("(I know what I don't want)" / "(hide leave out)"), an
-     aria-expanded attribute, a `hidden` attribute on the panel, and a focus
-     hand-off on open. Six moving parts, all of them bookkeeping for a piece of
-     state that was deliberately NOT filter state -- so clear-all had to know to
-     leave it alone, and #exclude-active had to live outside the panel so
-     chosen pills survived a dismiss.
-
-     None of that is here now, because the section is simply visible. Helen's
-     ruling was that pairing LEAVE OUT with HAS TO HAVE frames it better than
-     hiding it did, and the framing was the only thing the disclosure was
-     buying. */
 
   if (excludeBox) {
     excludeBox.addEventListener('input', renderExcludePool);
@@ -860,7 +562,6 @@ function renderResultsPool() {
       if (excludeBox) excludeBox.value = '';
       if (excludePool) excludePool.innerHTML = '';
       excludeClear.style.visibility = 'hidden';
-      // isSearching's sibling -- see ingredientClear's own handler below.
       state.isExcludeSearching = false;
       if (excludeBox) excludeBox.focus();
       update();
@@ -873,23 +574,15 @@ function renderResultsPool() {
 
   if (ingredientClear) {
     ingredientClear.addEventListener('click', function() {
-      // Clears the SEARCH, not the choices -- issue #1092 gives HAS TO HAVE
-      // the rule LEAVE OUT's own clear already follows: those come off one
-      // at a time by their own chip, or all at once with clear all.
-      // renderResultsPool() with an empty box repaints exactly the chosen
-      // chips and nothing else -- the same thing this handler used to do by
-      // hand, back when there was only ever one to keep.
+      // Clears the SEARCH, not the choices (#1092): an empty box repaints
+      // exactly the chosen chips.
       if (searchBox) searchBox.value = '';
       renderResultsPool();
     });
   }
 
-  // Keep aria-pressed in step with the .active class.
-  //
-  // .active is toggled in fifteen places; aria-pressed is set in one. Syncing
-  // from update() rather than at each toggle site means there is a single place
-  // to be right, and no way for the visual state and the announced state to
-  // disagree.
+  // aria-pressed is synced from .active here, in one place, so the visual and
+  // the announced state cannot disagree.
   function syncAriaPressed() {
     if (!matrix) return;
     matrix.querySelectorAll('.btn-star, .btn-tag').forEach(function(btn) {
@@ -897,18 +590,10 @@ function renderResultsPool() {
     });
   }
 
-  // Paint .active on the filter buttons FROM STATE, rather than at each of
-  // the places state changes. Exactly the argument syncAriaPressed's own
-  // comment above makes, one layer down: .active used to be toggled inline at
-  // every toggle site, which was survivable while the only way to change a
-  // filter was to click its own button. Issue #40 adds a second way in (a
-  // badge on a recipe row), and a query string at load is a third -- and
-  // neither of those has a `target` button to reach for at all. One place to
-  // be right; the toggles below just change state and call update().
-  //
-  // .btn-ingredient is excluded deliberately: those buttons also carry
-  // .btn-tag, but their selected state is state.includedIngredients', not
-  // state.tags', and it is maintained where they are built and clicked.
+  // .active is painted from state, never at a toggle site: a row badge (#40)
+  // and a query string change state with no button to reach for.
+  // .btn-ingredient is skipped: it also wears .btn-tag, but its state is
+  // state.includedIngredients, kept where the button is built and clicked.
   function syncFilterButtons() {
     if (!matrix) return;
     matrix.querySelectorAll('.btn-tag').forEach(function(btn) {
@@ -920,32 +605,19 @@ function renderResultsPool() {
     });
   }
 
-  /* THE SHORTLISTED-ONLY BUTTON — #546. Painted from state for exactly the
-     reason syncFilterButtons() above is, and separately from it because it does
-     not live in `.controls`: it sits on the results heading, beside the count it
-     changes. `clear all` reassigns the whole state object without touching any
-     markup, so a class toggled at click time would survive a clear that had
-     already turned the filter off.
-
-     BOTH THE CLASS AND aria-pressed HERE, where the matrix buttons have those
-     painted by two functions one after the other. There is one of these, the
-     ordering hazard that split them does not arise, and a single call site is
-     one fewer thing to keep in step. */
+  /* The shortlisted-only button (#546) is outside `.controls`, so it is
+     painted from state here, class and aria-pressed together. */
   function syncShortlistOnly() {
     if (!shortlistOnlyBtn) return;
-    /* `is-on`, NOT the `.active` every button in the matrix above wears. This
-       one is not in the matrix, and `is-on` is what the shortlist's own
-       controls already use on both sites (shortlist.js, and the cocktail
-       index's mood and chaos buttons). One feature, one state class. */
-    // A shared list is not YOUR shortlist, so the button that says how many
-    // you have does not claim to be what is showing (#1093).
+    // `is-on`, the shortlist controls' state class on both sites, not the
+    // matrix's `.active`. A shared list is not YOUR shortlist, so the button
+    // is not on while one shows (#1093).
     var own = !!state.shortlisted && !sharedKeys;
     shortlistOnlyBtn.classList.toggle('is-on', own);
     shortlistOnlyBtn.setAttribute('aria-pressed', own ? 'true' : 'false');
   }
 
-  /* THE NOTE OVER A SHARED LIST, and its "keep these". Helen ruled the words
-     on #1342, 2026-10-10: "Both good, thanks!" */
+  /* The note over a shared list, and its "keep these" (#1342). */
   function syncSharedNote() {
     if (!sharedNote) return;
     sharedNote.hidden = !sharedKeys;
@@ -959,10 +631,8 @@ function renderResultsPool() {
     if (keep) keep.hidden = sharedKeys.length === 0;
   }
 
-  // The three toggles, lifted out of the matrix click handler so a badge
-  // click (and, later, issue #52's exclusion) can be the SAME action rather
-  // than a second implementation of it. Note what they do not do: touch a
-  // button's classes. That is syncFilterButtons()' job now.
+  // The toggles change state and call update(); a badge click is the same
+  // action. Button classes are syncFilterButtons()' job.
   function toggleTag(value) {
     if (!value) return;
     if (state.tags.has(value)) state.tags.delete(value);
@@ -980,10 +650,8 @@ function renderResultsPool() {
 
   function update(preservePage) {
     if (!preservePage) { currentPage = 1; showAll = false; }
-    /* THE SHORTLIST VIEW GIVES WAY TO ANY OTHER FILTER -- #918. Every handler
-       that sets a field ends in update(), so this one line is the whole of
-       "touching a filter leaves the view", and it also reconciles a state
-       restored from before the rule existed. See filter-state.js. */
+    /* The shortlist view gives way to any other filter (#918): every handler
+       that sets a field ends in update(), so this line is the whole rule. */
     FilterState.reconcileShortlistView(state);
     if (!state.shortlisted) { sharedKeys = null; sharedUnmatched = []; }
     syncSharedNote();
@@ -994,47 +662,24 @@ function renderResultsPool() {
 
     updateTitleHighlights();
 
-    // Matching runs regardless of suppressList, so the "N survivors" count
-    // below always reflects the filters actually in effect (title search,
-    // tags, star) rather than freezing at a stale number. GitHub
-    // issue #60: Helen typed a title search (ten rows), then an ingredient
-    // search that matched nothing -- the list correctly emptied, but the
-    // count stayed stuck at "10 survivors" because this whole block, count
-    // included, used to be skipped outright while suppressList was true.
-    // Only the actual <li> visibility/pagination stays gated by
-    // suppressList below -- whether the list itself should keep showing
-    // rows while you're still picking an ingredient search result is a
-    // separate, open design question Helen hasn't resolved yet.
+    // Matching runs even while the list is suppressed, so the count reflects
+    // the filters in effect (#60). Only row visibility and paging are gated.
     var matchingLis = [];
 
     items.forEach(function(li) {
-      /* THE ROW, AS THE PREDICATE NEEDS IT. Every rule that used to be spelled
-         out here is FilterState.rowMatchesFilters now (issue #506) -- the same
-         decisions, with a DOM-free shape so they can be asked a question
-         without a browser. What is left here is reading the attributes, which
-         is this file's actual job.
-
-         `titleFolded` IS BUILT ONLY WHEN THERE IS A NAME QUERY, exactly as the
-         old inline branch did: it is a querySelector plus a fold per row per
-         update, and there are ~370 rows on the local build. The predicate reads
-         it only under the same condition, and its own comment says an empty one
-         means "not asked". */
+      /* The row as FilterState.rowMatchesFilters needs it (#506).
+         `shortlisted` and `titleFolded` are built only when asked for: each is
+         a lookup per row per update. `shortlisted` is the one fact not on a
+         data- attribute: it is in this browser's localStorage (#546). */
       var row = {
         tags: (li.dataset.tags || '').split(',').filter(Boolean),
         star: li.dataset.star || '',
         ingredients: (li.dataset.ingredients || '').split(',').map(function(s) { return s.trim(); }),
-        /* THE ONE ROW FACT THE BUILD DID NOT WRITE — #546. Every other key
-           above is read off a data- attribute Jekyll emitted; this one is in
-           this browser's localStorage and cannot be. Asked only when the filter
-           is on, for the reason `titleFolded` below is: it is a lookup per row
-           per update, and a lookup nobody is waiting on is worth not doing. */
         shortlisted: state.shortlisted
           ? (sharedKeys
             ? sharedKeys.indexOf(li.dataset.url || '') !== -1
             : HTF.shortlist.has(li.dataset.url || ''))
           : false,
-        // Named class, not querySelector('a') -- see reorderForTitleSearch()
-        // above for why that stopped being safe with issue #40's badge links.
         titleFolded: state.nameQuery
           ? HTF.ingredientSearch.fold(
             ((li.querySelector('.recipe-title-link') || {}).textContent || '').toLowerCase())
@@ -1043,10 +688,7 @@ function renderResultsPool() {
 
       var visible = FilterState.rowMatchesFilters(row, state, entriesMatchKey);
 
-      /* LAST, deliberately. Everything above decides whether this row is one
-         you asked for; this decides whether it is one you can't serve. It
-         used to count what it dropped, for a line that said how many; the
-         line is "hiding peas" since #1088 and nothing reads a count. */
+      /* Last: above is what you asked for, this is what you can't serve. */
       if (visible && rowIsExcluded(li)) visible = false;
 
       /* The local-only drafts switch, #1358. */
@@ -1059,10 +701,8 @@ function renderResultsPool() {
     visibleCount = matchingLis.length;
 
     if (!suppressList) {
-      // The maths is pure -- assets/js/list-view.js -- and returns a
-      // legal currentPage even if the one we asked for no longer exists
-      // (a filter can narrow the results out from under whatever page you
-      // were on), so it's adopted back rather than just read.
+      // paginate() returns a legal currentPage when a filter has narrowed the
+      // results out from under the one asked for, so it is adopted back.
       var pageInfo = HTF.listView.paginate(visibleCount, currentPage, PAGE_SIZE, showAll);
       currentPage = pageInfo.currentPage;
       totalPages = pageInfo.totalPages;
@@ -1072,32 +712,20 @@ function renderResultsPool() {
       });
     }
 
-    // Matched by the badge's own data-tag/data-star, not by its text. The
-    // text comparison this replaces could not tell a MOOD badge from a STAR
-    // one: any badge whose words happened to equal the active star lit up as
-    // matched. Latent while the two vocabularies had no overlap, and no
-    // longer worth relying on now that issue #40 gives every badge the exact
-    // value it stands for. Meta/draft badges carry neither attribute, so
-    // they fall through both tests and are never matched, as before.
+    // Matched on the badge's own data-tag/data-star, not its text, which
+    // could not tell a MOOD badge from a STAR one. Meta and draft badges
+    // carry neither and never match.
     document.querySelectorAll('.recipe-list .badge').forEach(function(badge) {
       var badgeTag = badge.dataset.tag;
       var badgeStar = badge.dataset.star;
-      // 'badge-ingredient-hit' used to be removed here too. Nothing in the
-      // repo ever ADDED it -- it was removed on every pass and applied on
-      // none, so it could only ever be a no-op. Found when issue #237 deleted
-      // its last stylesheet rule and the class turned out to have no other
-      // reference anywhere. Gone with the rule.
       badge.classList.remove('badge--matched');
       if ((badgeTag && state.tags.has(badgeTag)) || (badgeStar && state.star === badgeStar)) {
         badge.classList.add('badge--matched');
       }
     });
 
-    // Highlight matching ingredient pills -- GitHub issue #1092 widened this
-    // from one active key to a set. A pill lights up if it matches ANY
-    // chosen entry (this is a visual "which ingredient earned this row" aid,
-    // not the AND requirement itself -- that is FilterState.includesRow's
-    // question, already asked above in rowMatchesFilters).
+    // A pill lights up if it matches ANY chosen entry (#1092): a visual aid,
+    // not the AND requirement, which is FilterState.includesRow's.
     var activeKeys2 = [];
     state.includedIngredients.forEach(function (k) {
       activeKeys2.push(String(k).replace(' (all)', '').trim());
@@ -1105,11 +733,8 @@ function renderResultsPool() {
     document.querySelectorAll('.recipe-list .ingredient-pill').forEach(function(pill) {
       pill.classList.remove('ingredient-pill--matched');
       if (!activeKeys2.length) {
-        // Strip any shape left from a previous match -- .ingredient-pill
-        // has no default .tag-shape colour of its own (unlike .badge/
-        // .btn-tag), so an orphaned slot here would render at whatever
-        // colour this pill's own text is, a faint stray shape behind
-        // ordinary unmatched text.
+        // Strip a shape left from a previous match: .ingredient-pill has no
+        // .tag-shape colour of its own, so an orphan would show faintly.
         var stale = pill.querySelector('.tag-shape');
         if (stale) stale.remove();
         return;
@@ -1139,12 +764,7 @@ function renderResultsPool() {
     });
     if (activeKeys2.length && window.HTF && HTF.tagShapes) HTF.tagShapes();
 
-    // Null-guarded like every other lookup in this function. It was the one
-    // exception among roughly fifteen, and the consequences were out of all
-    // proportion to the omission: on a page without this element update()
-    // threw HERE, three statements before updateInlineLabels() and
-    // syncAriaPressed(), so two unrelated
-    // things silently stopped happening and nothing said why.
+    // Null-guarded: a throw here would silently skip everything below it.
     var emptyMessage = document.querySelector('.recipe-list-empty');
     if (emptyMessage) {
       emptyMessage.style.display = (!suppressList && visibleCount === 0) ? 'block' : 'none';
@@ -1160,13 +780,9 @@ function renderResultsPool() {
       if (nameSearchClear) nameSearchClear.style.visibility = state.nameQuery ? 'visible' : 'hidden';
     }
 
-    /* THE NUMBER AND THE WORD ARE TWO SPANS SINCE 2026-09-26 -- Helen, from
-       the "N survivors" candidates page: the digits take the label face
-       (`.results-count-number`, shared/_results-bar.scss) and the word stays
-       bare, which is the shape cocktails' count has always had
-       (`#drink-count-n` / `#drink-count-word`). The outer `#recipe-count`
-       still reads "N survivors" as one sentence. The fallback keeps an older
-       template, or a fixture with only the outer element, painting. */
+    /* Number and word are two spans, so the digits can take the label face
+       (`.results-count-number`); results-bar.js mirrors both. The fallback
+       keeps a template or fixture with only the outer element painting. */
     var recipeCountEl = document.getElementById('recipe-count');
     if (recipeCountEl) {
       var survivorWord = visibleCount === 1 ? 'survivor' : 'survivors';
@@ -1180,8 +796,7 @@ function renderResultsPool() {
       }
     }
 
-    // Hidden entirely once showAll is set, not just its prev/next disabled --
-    // there's nothing left in it to do once every matching row is on screen.
+    // Hidden entirely under showAll: nothing left in it to do.
     var pagination = document.querySelector('.recipe-pagination');
     if (pagination) {
       pagination.style.display = (!suppressList && totalPages > 1 && !showAll) ? 'grid' : 'none';
@@ -1197,11 +812,8 @@ function renderResultsPool() {
     // class syncFilterButtons() has just painted.
     syncFilterButtons();
     syncShortlistOnly();
-    /* #801. Unconditional, exactly like syncShortlistOnly() beside it: the
-       list has to disappear when the filter goes off as surely as it has to
-       appear when it comes on, and a recipe un-shortlisted while the filter is
-       on has to leave the totals. renderShoppingList() returns immediately
-       when the filter is off, so a browse pays one property read. */
+    /* Unconditional (#801): the list must disappear when the filter goes off
+       and lose a recipe un-shortlisted while it is on. */
     renderShoppingList();
     updateInlineLabels();
     updateIngredientClear();
@@ -1232,12 +844,9 @@ function renderResultsPool() {
       var ingredientBtn = target.closest && target.closest('.btn-ingredient');
       if (ingredientBtn) target = ingredientBtn;
 
-      /* The exclude section is claimed whole, before any other branch. Its
-         buttons wear .btn-tag for their appearance, so without this they would
-         fall into the tag branch immediately below and toggle a MOOD tag
-         called "peas" -- which does not exist, so the visible result would be
-         a button that does nothing at all. The section's own inline clear has
-         its own listener; this just declines to second-guess it. */
+      /* The exclude section is claimed whole, first: its buttons wear
+         .btn-tag for looks and would otherwise toggle a MOOD tag called
+         "peas". */
       if (target.closest && target.closest('.search--exclude')) {
         if (target.classList.contains('btn-exclude')) toggleExcluded(target.dataset.exclude);
         return;
@@ -1271,9 +880,7 @@ function renderResultsPool() {
       if (target.classList.contains('btn-ingredient')) {
         var ing = target.dataset.ingredient;
         if (state.includedIngredients.has(ing)) {
-          // Remove just this one requirement -- GitHub issue #1092. No
-          // longer exclusive: the other buttons in the pool, chosen or not,
-          // are left exactly where they are.
+          // Remove just this one requirement (#1092).
           state.includedIngredients.delete(ing);
           delete ingredientLabels[ing];
           target.classList.remove('active');
@@ -1281,30 +888,13 @@ function renderResultsPool() {
           var staleShape = target.querySelector('.tag-shape');
           if (staleShape) staleShape.remove();
         } else {
-          // Add it as ANOTHER requirement -- AND, not replace (#1092). A
-          // second pick used to collapse the pool down to itself and
-          // discard the rest; now it joins the first, the way LEAVE OUT's
-          // own exclusions and cocktails' `include` cupboard already do, so
-          // several chips from one search can be picked without retyping.
+          // Another requirement: AND, not replace (#1092).
           state.includedIngredients.add(ing);
-          // The label the button actually SHOWS, not its internal match
-          // key -- for an aliased entry like "five-spice" displayed as
-          // "Chinese five-spice powder", the two differ (display_names in
-          // _data/ingredient_words.yml). Recorded here rather than read off
-          // the box, which may hold a different search by the time this
-          // label is next needed (a repaint, a saved go-back record).
+          // The label the button SHOWS, not its match key, recorded now: the
+          // box may hold a different search by the time it is next needed.
           ingredientLabels[ing] = target.textContent.replace(' (all)', '').trim();
-          /* CHOOSING ONE CLEARS THE SEARCH -- Helen, 2026-10-11: "when a chip
-             in the has to have or leave out search results is selected, it
-             immediately joins others at the top and the other chips
-             disappear. Please make food do the same". LEAVE OUT already
-             did (toggleExcluded); this one kept the pool open so several
-             could be picked from one search (#1092), and that is what she
-             is trading away. The requirement itself is still AND.
-
-             Emptying the box is the whole mechanism, as on cocktails:
-             renderResultsPool() draws the chosen chips first and, with no
-             query, nothing after them. */
+          /* Choosing one clears the search, as LEAVE OUT does: with an empty
+             box renderResultsPool() draws the chosen chips and nothing else. */
           if (searchBox) searchBox.value = '';
           renderResultsPool();
           updateIngredientClear();
@@ -1317,26 +907,15 @@ function renderResultsPool() {
     });
   }
 
-  // GitHub issue #40: a badge on a recipe row filters the list, and does
-  // EXACTLY what clicking that filter's own button does -- same toggle, same
-  // state, no second set of semantics to keep in step.
-  //
-  // Delegated on .recipe-list rather than bound per badge: there are eight
-  // hundred-odd badges on this page, and pagination hides rows rather than
-  // removing them, so a per-badge listener would be eight hundred listeners
-  // for one behaviour.
-  //
-  // preventDefault(), because the href is a genuine link (see
-  // _includes/recipe_badges.html) and following it would reload the index to
-  // do in-place what has just been done in place. The href still earns its
-  // keep: middle-click, ctrl/cmd-click and "open in new tab" never reach this
-  // handler at all, and on a recipe page nothing intercepts it.
+  // A badge on a recipe row does exactly what its filter's own button does
+  // (#40). Delegated: there are hundreds of badges, and paging hides rows, it
+  // does not remove them. preventDefault() because the href is a real link
+  // (_includes/recipe_badges.html) and following it would reload the index.
   if (recipeList) {
     recipeList.addEventListener('click', function(e) {
       if (!e.target || !e.target.closest) return;
-      // closest(), not a check on e.target itself: a badge contains a
-      // .tag-shape span with an injected <svg> inside it, so the click can
-      // land on a descendant.
+      // closest(): a badge holds a .tag-shape span, so a click can land on a
+      // descendant.
       var badge = e.target.closest('.badge[data-tag], .badge[data-star]');
       if (!badge || !recipeList.contains(badge)) return;
       e.preventDefault();
@@ -1348,10 +927,8 @@ function renderResultsPool() {
   if (nameSearchBox) {
     nameSearchBox.addEventListener('input', function() {
       state.nameQuery = HTF.ingredientSearch.fold(nameSearchBox.value.trim().toLowerCase());
-      // Reshuffle to a fresh random base order once the query is cleared —
-      // same "returning to unfiltered" moment shuffleRecipeList() already
-      // covers for the "clear all" button, so titles don't stay stuck in
-      // whatever tiered order the last search left them in.
+      // A cleared query reshuffles, so rows do not stay in the last search's
+      // tiers.
       if (state.nameQuery) {
         reorderForTitleSearch();
       } else {
@@ -1371,26 +948,14 @@ function renderResultsPool() {
     });
   }
 
-  /* THE TEXT BOXES AND POOLS THAT ARE NOT STATE. emptyState() empties every
-     field, but a box's text and a results pool's chips are DOM, and something
-     has to empty those too. Two callers: clear-all, and the shortlist button
-     when it turns the view on (#918), which is a clear-all with one field
-     kept. One function, so the two can never disagree about which boxes
-     exist -- the exact drift issue #52 was about, one layer down. */
+  /* The boxes and pools that are DOM, not state. Shared by clear-all and the
+     shortlist button (#918), so the two cannot disagree about which exist. */
   function resetFilterControls() {
     if (searchBox) searchBox.value = '';
     if (nameSearchBox) nameSearchBox.value = '';
     if (nameSearchClear) nameSearchClear.style.visibility = 'hidden';
     if (resultsPool) resultsPool.innerHTML = '';
-    // The exclusions themselves are already gone -- emptyState() cleared the
-    // Set, and update() repaints the "leaving out" list from it. These three
-    // are the exclude picker's half-typed SEARCH, the same loose ends the
-    // ingredient box's own box/pool/clear are being tidied for two lines up.
-    // There is no panel to leave open any more (issue #586). The reasoning
-    // that used to sit here -- that revealing it was a decision about what
-    // this session is doing rather than a filter, so clear-all must not undo
-    // it -- is the reasoning the disclosure needed and the plain section
-    // does not.
+    // The exclude picker's half-typed search; the exclusions are state.
     if (excludeBox) excludeBox.value = '';
     if (excludePool) excludePool.innerHTML = '';
     if (excludeClear) excludeClear.style.visibility = 'hidden';
@@ -1398,20 +963,12 @@ function renderResultsPool() {
 
   if (clearButtons.length) {
     var clearAllFilters = function() {
-      // ONE assignment, not a field-by-field emptying -- GitHub issue #52,
-      // step one. A field-by-field version is a list that has to be kept in
-      // step with hasAnythingToClear()'s list, and three times in two days it
-      // wasn't. emptyState() walks the same FIELD_SPEC that predicate walks,
-      // so a field added there is cleared here without this line changing.
+      // One assignment (#52): emptyState() walks the FIELD_SPEC that
+      // hasAnythingToClear() walks, so the two cannot drift.
       state = FilterState.emptyState();
       resetFilterControls();
-      // No button-class loop here any more: update() below calls
-      // syncFilterButtons(), which paints every filter button from the state
-      // this function has just emptied.
-      // Reshuffles only here, on the deliberate "clear everything at once"
-      // action — not on every incidental path back to zero active filters
-      // (e.g. toggling the last individual tag off), which reads as an
-      // unrelated action reordering the page underneath you.
+      // Reshuffles only on this deliberate action, never on an incidental
+      // return to zero filters, which would reorder the page under the reader.
       shuffleRecipeList();
       update();
     };
@@ -1420,19 +977,10 @@ function renderResultsPool() {
     });
   }
 
-  /* --- the shopping list -----------------------------------------------------
-     GitHub issue #801. The arithmetic is assets/js/food-shopping-list.js; this
-     gathers the entries and paints the answer. Same three-way split
-     filter-state.js / filters.js already runs on, and the same one
-     cocktail-index.js runs on for the drinks version of this feature (#546).
-
-     SHOWN ONLY WHILE THE SHORTLISTED FILTER IS ON, which is what makes it "the
-     bottom of my shortlist listing" rather than a running total under a browse.
-
-     IT READS THE STORE, NOT THE VISIBLE ROWS, and the difference matters the
-     moment a second filter is on: shortlist three recipes, then narrow to
-     `quick`, and the rows on screen are a subset of the shortlist. The list you
-     shop from is the one you shortlisted. */
+  /* --- The shopping list (#801) ----------------------------------------------
+     The arithmetic is assets/js/food-shopping-list.js; this gathers entries
+     and paints. Shown only while the shortlist view is on. It reads the
+     store, not the visible rows: you shop from what you shortlisted. */
   var shoppingEl = document.getElementById('shopping-list');
   var shoppingRecipes = shoppingEl && shoppingEl.querySelector('.shopping-list-recipes');
   var shoppingAisles = shoppingEl && shoppingEl.querySelector('.shopping-list-aisles');
@@ -1440,10 +988,9 @@ function renderResultsPool() {
   var shoppingNote = shoppingEl && shoppingEl.querySelector('.shopping-list-note');
   var setAllInput = document.getElementById('shopping-list-setall');
 
-  /* WHAT EVERY RECIPE IS MADE OF AND HOW MANY IT FEEDS, emitted by index.html
-     from _plugins/food_shopping.rb. Absent or unreadable, the shopping list
-     renders nothing and every other filter on this page still works, which is
-     the same standing #ingredient-vocabulary has above. */
+  /* Each recipe's ingredients and yield, emitted by food/index.html from
+     _plugins/food_shopping.rb. Absent or unreadable, the shopping list
+     renders nothing and every filter still works. */
   var RECIPES = (function () {
     var node = document.getElementById('recipe-ingredients');
     if (!node) return {};
@@ -1467,9 +1014,8 @@ function renderResultsPool() {
     }
   })();
 
-  /* THE HALF-STEP MEASURES, bought in whole ones (#1297): `half_step_measures`
-     and `half_step_counts` from _data/food/scaling.yml, joined onto the panel
-     by food/index.html. Absent, nothing is rounded -- the list as it was. */
+  /* Measures bought whole (#1297): `half_step_measures` and
+     `half_step_counts` from _data/food/scaling.yml. Absent, nothing rounds. */
   var WHOLE_MEASURES = String(
     (shoppingEl && shoppingEl.getAttribute('data-whole-measures')) || '')
     .split(',').filter(Boolean);
@@ -1479,27 +1025,21 @@ function renderResultsPool() {
     (shoppingEl && shoppingEl.getAttribute('data-quarter-measures')) || '')
     .split(',').filter(Boolean);
 
-  /* THE NOUNS BOUGHT BY COUNT, so two recipes' lemons read "2 lemons" (#1297):
-     `count_nouns` from the same file, by the same route. Absent, a row keeps
-     the spelling a recipe wrote. */
+  /* Nouns bought by count, so two recipes' lemons read "2 lemons" (#1297):
+     `count_nouns`. Absent, a row keeps the recipe's spelling. */
   var COUNT_NOUNS = String(
     (shoppingEl && shoppingEl.getAttribute('data-count-nouns')) || '')
     .split(',').filter(Boolean);
 
-  /* THE THINGS THAT HOLD WHAT A RECIPE MAKES -- a jar, a tin -- so its row
-     reads "2 jars of Peanut Sauce": `yields.container_words` from the same
-     file, by the same route. Absent, such a row puts the thing after the
-     title like any other. */
+  /* Things that hold what a recipe makes (a jar, a tin), so a row reads
+     "2 jars of Peanut Sauce": `container_words`. */
   var CONTAINER_NOUNS = String(
     (shoppingEl && shoppingEl.getAttribute('data-container-nouns')) || '')
     .split(',').filter(Boolean);
 
-  /* The row's own title, read off the DOM once. `dataset.titleText` is the
-     UNMARKED title stashed at load, so a recipe found by a name search still
-     lists under its real name rather than one carrying <mark> tags -- the same
-     care cocktail-index.js takes with card-name highlighting. */
-  // And the row's own href beside it, for the shopping list's links: the blob's
-  // keys are site-relative and the row's link already carries the base URL.
+  /* Title and href per row, read once. `dataset.titleText` is the unmarked
+     title, so a name search's <mark> never reaches the list. The blob's keys
+     are site-relative; the row's link already carries the base URL. */
   var hrefByUrl = {};
   var titleByUrl = (function () {
     var map = {};
@@ -1513,10 +1053,8 @@ function renderResultsPool() {
     return map;
   })();
 
-  /* THE RECIPES, IN THE ORDER THEY WERE SHORTLISTED -- the store keeps
-     insertion order, which is the order Helen marked them in. Recipes no
-     longer on the page are dropped, the same silence a renamed recipe already
-     gets everywhere else in this feature. */
+  /* In the order they were shortlisted (the store keeps insertion order).
+     Recipes no longer on the page are dropped. */
   function shortlistedRecipes() {
     // A list someone sent is totalled as it stands (see renderShoppingList).
     return (sharedKeys || HTF.shortlist.list()).filter(function (url) {
@@ -1524,91 +1062,38 @@ function renderResultsPool() {
     });
   }
 
-  /* --- EVERY `serves:` RECIPE COUNTS PEOPLE ---------------------------------
-     (A `makes:` recipe counts BATCHES again since #1297: see isBatch() below,
-     which says what is different about this batch box from the one this
-     comment buries.)
+  /* --- A `serves:` recipe counts people (#815) -------------------------------
+     `p` is its portion count: from `serves:`, or else `serves_estimate:`,
+     which arrives flagged `e` so yieldText() can mark it `~`.
 
-     #815, Helen: "clearly 750 ml of gelato doesn't feed 50. We need estimate
-     the number of people served by 750 ml, then add that to the front matter
-     somehow."
-
-     THE BATCH BOX THAT STOOD HERE IS GONE. For a fortnight in the middle of
-     #801 a recipe with no portion count got a box counting BATCHES (x1, x2)
-     with a `x` beside it, because `makes: "About 750 ml"` cannot be turned
-     into people without inventing a portion size. It was honest and it was
-     wrong: "set all to 6 portions" could not reach those recipes, and a
-     shopping list where one control silently means something else on some
-     rows is a worse thing than a guessed number. **Batches were a workaround
-     for missing data, and the fix was the data.**
-
-     SO `serves_estimate:` NOW SITS IN THE FRONT MATTER of every recipe whose
-     `serves:` does not state a number -- 129 of 423 files, produced at ingest
-     from the recipe's own words and checked by Helen. `_data/food/servings.yml`
-     is deleted: one home for the number, not two. `_plugins/food_shopping.rb`
-     resolves `serves:` first and `serves_estimate:` second, and flags the
-     second so this file can mark it.
-
-     AN ESTIMATE IS MARKED WITH A `~`, her ruling in the same message. It is
-     the only thing saying a figure was reasoned rather than written down. */
-
-  /* The number in the box: what she last typed, or however many the recipe
-     makes, so an untouched list shops for every recipe exactly as written. */
-  /* CAN THIS RECIPE BE SCALED AT ALL? Asked of the RECIPE and never of the
-     store, which is the distinction a second silent box was built on.
-
-     Helen, 2026-09-07, with a screenshot: the gelato's box read 200 and
-     nothing moved, while the cheesecake beside it scaled to ⅝ of an egg. Her
-     localStorage held a 200 she had typed hours earlier, from before this
-     recipe had a portion count -- and `portionsFor()` returned that stored
-     number BEFORE looking at the recipe, so "is there a number to show?"
-     answered yes and "can this be scaled?" was never asked. A box appeared,
-     took her 200, and scaled by 1.
-
-     A STORED NUMBER IS A PREFERENCE, NOT A CAPABILITY. It says what she wants;
-     only the recipe says whether that is answerable. Ask the recipe. */
+     Can this recipe be scaled? Asked of the recipe, never of the store: a
+     stored number is a preference, not a capability. */
   function hasPortions(url) {
     var recipe = RECIPES[url];
     return !!(recipe && recipe.p > 0);
   }
 
-  /* The number in the box: what she last typed, or however many the recipe
-     makes, so an untouched list shops for every recipe exactly as written.
-     `null` only where the recipe carries no count, and then there is no box. */
+  /* The number in the box: what was last typed, or the recipe's own count.
+     null where the recipe carries none, and then there is no box. */
   function portionsFor(url) {
     if (!hasPortions(url)) return null;
     return HTF.shortlist.portions(url) || RECIPES[url].p;
   }
 
-  /* PORTIONS WANTED OVER PORTIONS MADE. No fallback branch: a recipe with no
-     portion count gets no box at all (see renderShoppingList), so nothing
-     reaches here without one -- which is the rule this feature broke twice
-     before learning it. A CONTROL THAT SILENTLY FAILS IS WORSE THAN NO
-     CONTROL. */
+  /* Portions wanted over portions made; batches for a `makes:` recipe. A
+     recipe with no count scales by 1 and gets no box. */
   function scaleFor(url) {
     if (isBatch(url)) return batchesFor(url);
     if (!hasPortions(url)) return 1;
     return portionsFor(url) / RECIPES[url].p;
   }
 
-  /* --- A `makes:` RECIPE COUNTS BATCHES -------------------------------------
-     #1297, Helen, 2026-10-09: 'The shopping list scaler could show e.g. "X
-     batches of 18 Peanut Butter Cookies", allowing half-batches where that
-     doesn't split eggs. ... That stops us saying 2 cookies is a portion -- not
-     out of principle, but because that's meaningless.'
-
-     THIS IS THE BATCH BOX #815 REMOVED, BACK ON PURPOSE, and what is different
-     is that the row now SAYS so. The old one was a number box that looked
-     exactly like the portions boxes beside it and meant something else; this
-     one reads "2 batches of 18 Peanut Butter Cookies" in words. A `serves:`
-     recipe is untouched and still counts people, one at a time.
-
-     THE THREE FIGURES ARE THE RECIPE PAGE'S OWN (#1286) -- `w` whole recipes,
-     `h` half offered, `m` what one makes -- so the box here and the scaler on
-     the recipe's page step the same way: ½ where the build allows it, then
-     1, 2, 3, and never 1½. The count lives in its own store
-     (`HTF.shortlist.batches`), because a stored 6 cannot say whether it meant
-     people or batches. */
+  /* --- A `makes:` recipe counts batches (#1297) ------------------------------
+     The row says "batches" in words, so the box cannot be mistaken for a
+     portions box. `w`, `h` and `m` are the recipe page's own figures (#1286):
+     whole recipes, half offered, what one makes. Both step ½, 1, 2, 3 and
+     never 1½. The count has its own store (HTF.shortlist.batches): a stored
+     6 cannot say whether it meant people or batches. */
   function isBatch(url) {
     var recipe = RECIPES[url];
     return !!(recipe && recipe.w);
@@ -1636,10 +1121,9 @@ function renderResultsPool() {
     return n;
   }
 
-  /* IS A WORD OF THE YIELD ALREADY IN THE TITLE? "cookies" of Peanut Butter
-     Cookies, yes; "squares" of Guinness, Beetroot and Chocolate Cake, no.
-     Compared in the singular both sides (shopping-list.js `foldUnit`), so
-     "pies" finds "Pie". */
+  /* Is a word of the yield already in the title? "cookies" of Peanut Butter
+     Cookies, yes. Compared in the singular both sides (`foldUnit`), so "pies"
+     finds "Pie". */
   function wordInTitle(word, title) {
     var fold = HTF.shoppingList.foldUnit;
     var wanted = fold(word);
@@ -1653,12 +1137,9 @@ function renderResultsPool() {
     return n > 1 ? 'batches of' : 'batch of';
   }
 
-  /* "Sweet Potato Chocolate Brownies" BEFORE "squares" IS "Brownie" --
-     Helen, 2026-10-11: 'Can we get to "batch of 16 brownie squares", so where
-     the thing name word in the title is plural we make it singular?' The
-     thing-name word is taken to be the last one before any " with ...", so
-     "Cake with Pistachios" is left alone. Only a plain plural is touched:
-     `-ss` and `-us` words (Swiss, hummus, couscous) are not plurals. */
+  /* "Sweet Potato Chocolate Brownies" before "squares" is "Brownie". The
+     thing-name word is the last one before any " with ...". Only a plain
+     plural is touched: `-ss` and `-us` words (Swiss, hummus) are not. */
   function singularHead(title) {
     var text = String(title);
     var cut = text.search(/\s+with\s+/i);
@@ -1672,39 +1153,14 @@ function renderResultsPool() {
     return match[1] + single + tail;
   }
 
-  /* THE WORDS OF A ROW, AROUND THE RECIPE'S NAME. `word` is what the number
-     counts, `pre` and `post` sit either side of the name, and `title` is the
-     name as this row writes it (a link). Helen's rulings, 2026-10-11, each
-     on a row she was looking at:
-
-       [2] batches of 18 [Peanut Butter Cookies]       the title names the thing
-       [1] batch of 24 [Guinness ... Cake] squares     it does not: said after
-       [1] batch of 16 [Sweet Potato ... Brownie] squares   and the title's own
-                                                        noun goes singular
-       [1] batch of 3 dozen [Homemade Florentines]     a dozen stays a dozen
-       [2] × 8-inch [Beetroot Chocolate Cake]          ONE thing the title names:
-       [2] × [Lemon Meringue Pie]                      a ×, never "a batch"
-       [2] dozen [... Mince Pies]                      one dozen of them
-       [2] jars of [Peanut Sauce]                      one thing that HOLDS it
-       [3] [Rainbow Confetti] traybakes                one thing that IS it
-       [1] batch of [Blackberry Gelato]                a measure, or no count
-       [7] portions of [Moules Marinière]              `serves:`
-
-     THE THING MADE IS SAID ONCE. Where the title already names it, the yield's
-     noun is dropped; where it does not, the noun follows the title, plural
-     above one. A WHOLE CAKE IS NOT A BATCH (her words: 'When the "makes"
-     contains a word like cake, or something that doesn't make a "batch"'):
-     nobody bakes a batch of one cake. Its title is not made plural, which is
-     why the × is there at one as well.
-
-     A CONTAINER COMES FIRST, WITH "of" -- 'please write "[2] jars of peanut
-     sauce", "[3] rainbow confetti traybakes"'. A jar is full of the sauce; a
-     traybake is the cake. Which is which is `container_words` in
-     _data/food/scaling.yml.
-
-     A `×` ALSO GOES BEFORE A YIELD THAT OPENS WITH A DIGIT, the recipe page's
-     rule (food-scale.js `thingText`): the box is a number, and "2 8-inch ..."
-     is unreadable. */
+  /* The words of a row around the recipe's name: `word` is what the number
+     counts, `pre`/`post` sit either side, `title` is the name as written.
+       [2] batches of 18 [Peanut Butter Cookies]    title names the thing
+       [1] batch of 24 [Guinness ... Cake] squares  it does not: said after
+       [2] × [Lemon Meringue Pie]                   one whole thing: never "batch"
+       [2] jars of [Peanut Sauce]                   a container holds it: "of"
+       [3] [Rainbow Confetti] traybakes             one thing that is it
+     A × also precedes a yield that opens with a digit ("2 × 8-inch"). */
   function rowWords(url, title, n) {
     var out = { word: '', pre: '', title: title, post: '' };
     if (!isBatch(url)) {
@@ -1756,21 +1212,17 @@ function renderResultsPool() {
     return out;
   }
 
-  /* The recipe's name, as the list above writes it, and a link -- Helen,
-     2026-10-11: "please render the name of the recipe in this shopping list
-     feature the same way we do in the recipe list row titles, just smaller of
-     course, and make them links please." The href is the row's own. `text`
-     is the name as a row has reworded it ("... Brownie" before "squares"). */
+  /* The recipe's name as a link to the row's own href. `text` is the name as
+     a row has reworded it ("... Brownie" before "squares"). */
   function recipeLink(url, text) {
     return '<a class="shopping-list-recipe-link" href="' +
       HTF.escapeHtml(hrefByUrl[url] || url) + '">' +
       HTF.escapeHtml(text || titleByUrl[url] || url) + '</a>';
   }
 
-  /* Everything after the box. ITS OWN FUNCTION BECAUSE THE INPUT HANDLER
-     REWRITES IT IN PLACE: the box cannot be re-rendered under a typing
-     cursor, and more than one word of the row moves with the number
-     ("batch"/"batches", "jar"/"jars", "traybake"/"traybakes"). */
+  /* Everything after the box. Its own function because the input handler
+     rewrites it in place: the box cannot be re-rendered under a typing
+     cursor, and several words of the row move with the number. */
   function rowInner(url, n) {
     var words = rowWords(url, titleByUrl[url] || url, n);
     return '<span class="shopping-list-count-word">' +
@@ -1791,17 +1243,12 @@ function renderResultsPool() {
     return single ? 'how many: ' : 'batches of ';
   }
 
-  /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
-     `k` is `serves` or `makes` straight off the front matter, so a `makes:`
-     value can never be printed behind the word "serves" -- it read
-     "serves About 750 ml" until 2026-09-07. */
+  /* The yield in the recipe's own words and key: `k` is `serves` or `makes`,
+     so a `makes:` value is never printed behind the word "serves". */
   function yieldText(url) {
     var recipe = RECIPES[url];
     if (!recipe) return '';
-    // AN ESTIMATE IS MARKED WITH A `~` -- Helen's ruling, #815. It is the
-    // only thing saying a figure was reasoned from `makes:` rather than
-    // written down in `serves:`. A stated one is her words, quoted, never
-    // tidied into a number.
+    // An estimate is marked `~` (#815); a stated yield is quoted as written.
     if (recipe.e) return recipe.p ? '~' + recipe.p + ' portions' : '';
     if (!recipe.y) return '';
     return (recipe.k || 'serves') + ' ' + recipe.y;
@@ -1809,33 +1256,20 @@ function renderResultsPool() {
 
   function renderShoppingList() {
     if (!shoppingEl) return;
-    /* SHOWN OVER A SHARED LIST TOO, SINCE 2026-10-11 -- Helen: "when I enter a
-       URL for a shortlist, please show the index page with the shortlist open
-       (i.e. with shopping list open)". It was hidden there from #1093
-       (2026-09-15) because its numbers write to this browser's store and a
-       list you were sent is not yours until you keep it. OPENING THE LINK
-       STILL SAVES NOTHING: the list is totalled from the link, every recipe
-       as written. A number typed into a box is saved, as that recipe's count
-       -- her own figure, and not the list. */
+    /* Shown over a shared list too. Opening the link still saves nothing:
+       the list is totalled from the link. A number typed into a box is saved,
+       as that recipe's count. */
     shoppingEl.hidden = !state.shortlisted;
     if (shoppingEl.hidden) return;
 
     var urls = shortlistedRecipes();
     if (shoppingEmpty) shoppingEmpty.hidden = urls.length > 0;
 
-    /* THE PER-RECIPE COUNTS. Rebuilt whole, like the totals below -- but NOT
-       while one of its own inputs has focus, because replacing the node under
-       a typing cursor loses the caret and the keystroke. `renderTotals()` is
-       called on its own from the input handler for exactly that reason. */
-    /* THE BATCH ROWS GO LAST, UNDER A HAIRLINE -- Helen, 2026-10-10: "If we
-       group the batched recipes at the bottom of the shopping list scaler
-       section, it's clear the portions scaler multiplies portions whereas the
-       batches are manual. Maybe just a little vertical space and a soft
-       hairline separator?" So "set all to N portions" sits over the rows it
-       sets, and the rows it leaves alone are visibly a second group. Each
-       group keeps the order its recipes were shortlisted in; the rule is
-       drawn on the first batch row, and only when there are portions rows
-       above it to be separated from. */
+    /* Rebuilt whole, but never from the input handler: replacing the node
+       under a typing cursor loses the caret (it calls renderTotals() alone).
+       Batch rows go last, under a hairline drawn on the first one when
+       portions rows sit above it, so "set all" sits over the rows it sets.
+       Each group keeps shortlist order. */
     var portionRows = urls.filter(function (url) { return !isBatch(url); });
     var batchRows = urls.filter(isBatch);
     var firstBatch = portionRows.length ? batchRows[0] : null;
@@ -1844,19 +1278,10 @@ function renderResultsPool() {
       shoppingRecipes.innerHTML = portionRows.concat(batchRows).map(function (url) {
         var title = titleByUrl[url] || url;
         var yielded = yieldText(url);
-        /* NO PORTION COUNT, NO BOX -- asked of the RECIPE, never of the store.
-           See hasPortions() for the screenshot that made that distinction
-           load-bearing. Every recipe carries one since #815, and
-           test_every_food_recipe_states_how_many_it_feeds keeps it that way --
-           so this is what a NEW recipe looks like between being written and
-           being given its `serves_estimate:`. It contributes its ingredients
-           at x1 and says why it cannot be scaled, rather than offering a
-           control that would do nothing. That rule cost this feature two bug
-           reports before it was learned. */
-        /* A `makes:` RECIPE: "2 batches of 18 Peanut Butter Cookies" -- #1297.
-           The figure after "of" is what ONE batch makes and never moves; the
-           number in the box is the only one that does, and the words between
-           them are why the two cannot be read as one expression. */
+        /* No portion count, no box (hasPortions): such a recipe contributes
+           its ingredients at x1 and says why it cannot be scaled.
+           A `makes:` recipe reads "2 batches of 18 Peanut Butter Cookies"
+           (#1297): the figure after "of" is one batch's and never moves. */
         if (isBatch(url)) {
           var batches = batchesFor(url);
           var floor = halfOffered(url) ? '0.5' : '1';
@@ -1880,23 +1305,9 @@ function renderResultsPool() {
             '</span></li>';
         }
 
-        /* THE YIELD IS NOT PRINTED BESIDE THE NAME -- Helen, 2026-09-07, with
-           a screenshot: "please don't say 'serves X' after the recipe name at
-           the top of the scaler. This screenshot makes it look like I'm asking
-           for 28 portions of mussels."
-
-           She was reading `7  Moules Marinière serves 4` and the row is one
-           line, so the eye takes the number, the name and the yield as a
-           single sentence -- 7 × serves 4. It is not a wording problem and no
-           amount of dimming fixes it: a figure at each END of a short line
-           reads as an expression whatever the middle says, and this row
-           already HAS to open with a number.
-
-           SO IT MOVES INTO THE CONTROL ITSELF, where the yield is what it
-           always was -- the thing the number is relative to -- and is
-           available on hover and to a screen reader without competing with the
-           number on screen. What is left visible is the two facts a glance
-           needs: how many, and of what. */
+        /* The yield is not printed beside the name: "7 Moules Marinière
+           serves 4" reads as 7 × 4. It goes in the control's title and
+           aria-label instead. */
         var relative = yielded ? ', which ' + yielded : '';
         return '<li>' +
           '<input type="number" class="shopping-list-portions" min="1" max="99" step="1" ' +
@@ -1904,9 +1315,6 @@ function renderResultsPool() {
           'data-url="' + HTF.escapeHtml(url) + '" ' +
           'title="' + HTF.escapeHtml(title + relative) + '" ' +
           'aria-label="portions of ' + HTF.escapeHtml(title + relative) + '">' +
-          /* "7 portions of Moules Marinière" -- #1297. The word is what the
-             number counts, so the row reads as a sentence and the batch rows
-             beside it are visibly a different kind of number. */
           rowSentence(url, portionsFor(url)) +
           '</li>';
       }).join('');
@@ -1932,24 +1340,9 @@ function renderResultsPool() {
       });
     });
 
-    /* A PANEL WITH BOXES AND NO TOTALS SAYS SO -- Helen, 2026-09-07, with a
-       screenshot of exactly that: three recipes, three number boxes, and
-       nothing underneath.
-
-       IT WAS NOT THIS SCRIPT. `_plugins/food_shopping.rb` had not run, so
-       every recipe reached the page with no ingredients and no portion count
-       -- and JEKYLL LOADS `_plugins/` ONCE AT BOOT AND NEVER RELOADS THEM ON
-       WATCH, so a `jekyll serve` started before the plugin existed serves a
-       page built without it, indefinitely, with no error anywhere. Reproduced
-       with `--plugins` pointed at an empty directory: 427 recipes, 0 with a
-       portion count, 0 with ingredients. Restarting the server is the whole
-       fix.
-
-       SO THE PAGE SAYS IT RATHER THAN SHOWING A BLANK. An empty panel under a
-       shortlist you can see is indistinguishable from a broken script, and the
-       last two things Helen has had to report were both silences. The console
-       carries the remedy; the page carries the fact, because the page is where
-       she is looking. */
+    /* A panel with boxes and no totals says so. The usual cause is
+       _plugins/food_shopping.rb not having run: Jekyll loads plugins once at
+       boot and does not reload them on watch. */
     if (shortlisted.length && !entries.length) {
       console.warn(
         'filters.js: every shortlisted recipe reached the page with no '
@@ -1970,16 +1363,9 @@ function renderResultsPool() {
       quarterMeasures: QUARTER_MEASURES, countNouns: COUNT_NOUNS
     });
 
-    /* WHAT THE NUMBERS ABOVE DID NOT REACH -- Helen, 2026-10-10: the recipe
-       page says "(Not scaled: extra teriyaki sauce, ...)" under its scaler
-       (#1088), and "adding this to the shopping list page would at least show
-       the user in what ways the list is incomplete."
-
-       A row is named when any line behind it had no amount to scale: "salt, to
-       taste", "some", a magic-bag item. Its own row below still lists it --
-       it has to be bought -- this says its quantity is the cook's to judge.
-       Her format, as on the recipe page: bracketed, comma-joined, no full
-       stop; in the list's own order, aisle by aisle. */
+    /* What the numbers did not reach, as on the recipe page (#1088): a row
+       is named when any line behind it had no amount to scale ("salt, to
+       taste"). Bracketed, comma-joined, no full stop, in the list's order. */
     if (shoppingNote) {
       var unscaled = [];
       aisles.forEach(function (aisle) {
@@ -1992,9 +1378,7 @@ function renderResultsPool() {
       shoppingNote.hidden = unscaled.length === 0;
     }
 
-    /* REBUILT WHOLE, not patched -- a couple of dozen rows that change only
-       when the shortlist or a number does, where a diffing render would be
-       complexity bought for nothing. */
+    /* Rebuilt whole: a few dozen rows are not worth a diffing render. */
     shoppingAisles.innerHTML = aisles.map(function (aisle) {
       return '<section class="shopping-list-aisle">' +
         '<h3 class="shopping-list-aisle-name">' + HTF.escapeHtml(aisle.label) + '</h3>' +
@@ -2003,15 +1387,10 @@ function renderResultsPool() {
           return '<li>' +
             '<span class="shopping-list-amount">' + HTF.escapeHtml(row.text) + '</span>' +
             '<span class="shopping-list-name">' + HTF.escapeHtml(row.label) + '</span>' +
-            /* "(1¼ in the recipes)" -- Helen's own form, #1297: the amount
-               is what to buy, this is what the recipes use. */
+            /* "(1¼ in the recipes)" (#1297): the amount is what to buy. */
             (row.aside ? '<span class="shopping-list-aside">(' +
               HTF.escapeHtml(row.aside) + ')</span>' : '') +
-            /* "(Chicken Satay, Peanut Sauce)" -- WHOSE LINE WAS NOT SCALED,
-               Helen, 2026-10-11: "where an item hasn't been scaled, please
-               list its recipe name in brackets after the item so the user
-               knows what to do." Each is a link to the recipe, in the same
-               face as the rows above. */
+            /* Whose line was not scaled: each a link to its recipe. */
             (row.unscaledRecipes && row.unscaledRecipes.length
               ? '<span class="shopping-list-unscaled">(' +
                 row.unscaledRecipes.map(recipeLink).join(', ') + ')</span>'
@@ -2039,9 +1418,7 @@ function renderResultsPool() {
       } else {
         shown = HTF.shortlist.setPortions(url, input.value) || portionsFor(url);
       }
-      /* "1 batch of", "2 batches of"; "jar of", "jars of". The row's words are
-         rewritten in place, beside the box: the row itself cannot be
-         re-rendered from here (the caret rule below). */
+      /* The row's words move with the number and are rewritten in place. */
       var word = input.parentNode && input.parentNode.querySelector &&
         input.parentNode.querySelector('.shopping-list-count-word');
       if (word && word.parentNode) word.parentNode.innerHTML = rowInner(url, shown);
@@ -2050,8 +1427,8 @@ function renderResultsPool() {
       renderTotals();
     });
 
-    /* ONCE SHE HAS FINISHED TYPING, a batch box shows what it was taken as:
-       "0.2" where no half is offered is one batch, and says so. */
+    /* On `change`, a batch box shows what it was taken as: "0.2" where no
+       half is offered is one batch. */
     shoppingRecipes.addEventListener('change', function (ev) {
       var input = ev.target;
       if (!input.classList || !input.classList.contains('shopping-list-portions')) return;
@@ -2060,30 +1437,14 @@ function renderResultsPool() {
   }
 
   if (setAllInput) {
-    /* SET ALL: it writes every recipe's own number and then has no further
-       opinion. One figure per recipe, one place it lives.
-
-       IT SHIPS EMPTY, unlike the drinks list's `value="1"`, and that is the
-       one place the two controls differ. There is no number here that means
-       "as written" for every recipe at once -- each starts at its own yield --
-       so a box showing `1` would be claiming a state the list is not in. Empty
-       says nothing until she says something.
-
-       IT REACHED EVERY SHORTLISTED RECIPE FROM #815 TO #1297. Before #815 a
-       recipe with no portion count got a box counting batches, which this
-       control could not honestly write into -- so it skipped one, Helen
-       typed 50 and watched the gelato ignore her. #815 gave every recipe a
-       `serves_estimate:`; #1297 gave `makes:` recipes their batches back,
-       and the skip with them -- see the loop below for why that is safe
-       this time. */
+    /* Set all writes every recipe's own number and keeps no state. It ships
+       empty: each recipe starts at its own yield, so no one number means "as
+       written". */
     setAllInput.addEventListener('input', function () {
       var n = parseInt(setAllInput.value, 10);
       if (!isFinite(n) || n < 1) return;
-      /* A BATCH ROW IS LEFT ALONE -- #1297. "Set all to 6 portions" has no
-         answer for a recipe that makes 18 cookies without deciding how many
-         cookies a portion is, which is the figure Helen wants gone. This is
-         the skip #815 removed, and it is safe to have back for one reason:
-         the row it skips now says "batches" in words. */
+      /* A batch row is left alone (#1297): "6 portions" has no answer for a
+         recipe that makes 18 cookies. */
       shortlistedRecipes().forEach(function (url) {
         if (!isBatch(url)) HTF.shortlist.setPortions(url, n);
       });
@@ -2091,21 +1452,11 @@ function renderResultsPool() {
     });
   }
 
-  /* --- the shortlist ---------------------------------------------------------
-     GitHub issue #546. Two listeners: one for the filter's own button, one for
-     any shortlist toggle anywhere on the page.
-
-     REVEALED HERE. It ships `hidden` like every other JS-dependent control on
-     both sites, and this is the script that makes its half of the feature real
-     -- shortlist.js reveals the per-row toggles, this reveals the filter. A
-     page that somehow loaded one and not the other shows exactly the half that
-     works, rather than a filter that does nothing when pressed. */
-  /* A VIEW, NOT A FACET -- #918. Pressing it ON shows the whole shortlist and
-     nothing else: every other filter is cleared, boxes and pools included,
-     exactly as clear-all does it, because a shortlist seen through a title
-     search is what Helen walked into ("see just one recipe, the lasagne").
-     Pressing it OFF is the plain toggle. Filters set while the view is on
-     take it off again -- that half is reconcileShortlistView in update(). */
+  /* --- The shortlist (#546) ---------------------------------------------------
+     The button ships `hidden` and is revealed here, by the script that makes
+     the filter real. It is a view, not a facet (#918): pressing it on clears
+     every other filter, boxes and pools included; a filter set while it is on
+     takes it off again (reconcileShortlistView, in update()). */
   if (shortlistOnlyBtn) {
     shortlistOnlyBtn.hidden = false;
     shortlistOnlyBtn.addEventListener('click', function () {
@@ -2137,29 +1488,16 @@ function renderResultsPool() {
     });
   }
 
-  /* A ROW'S OWN TOGGLE CHANGED — dispatched by shortlist.js, which owns the
-     store and the controls and knows nothing about this page's filters.
-
-     UNCONDITIONAL, not gated on `state.shortlisted`. When the filter is on, the
-     row that was just un-shortlisted has to leave the list, which is what the
-     filter means. When it is off, `update()` still has work: it repaints the
-     count on the button, and the row object it rebuilds is the only place the
-     shortlisted flag is ever read from.
-
-     `update(true)` PRESERVES THE PAGE NUMBER, and that is the point. Marking
-     something on page 3 of the results must not throw you back to page 1 --
-     you did not change what you were looking for. Every other caller that
-     passes `true` here (the pager, the see-all button, the restore) is making
-     the same claim: the filter set has not changed. */
+  /* A row's own toggle changed (dispatched by shortlist.js). Unconditional,
+     and `update(true)` keeps the page number: marking a row on page 3 must
+     not throw you back to page 1. */
   document.addEventListener('htf:shortlist-change', function () {
     update(true);
   });
 
-  /* KEEP THESE -- #1093. Merges the shared list into this browser's
-     shortlist (HTF.shortlist.addAll, which never un-marks anything), then
-     shows YOUR shortlist, which now holds them: the view stays on and only its
-     source changes. The change event is what repaints every row's toggle and
-     the button's count, exactly as a restore does. */
+  /* Keep these (#1093): merges the shared list into this browser's shortlist
+     (addAll never un-marks anything), then shows that shortlist. The change
+     event repaints every row's toggle. */
   var sharedKeep = sharedNote && sharedNote.querySelector('[data-shared-shortlist-keep]');
   if (sharedKeep) {
     sharedKeep.addEventListener('click', function () {
@@ -2199,26 +1537,12 @@ function renderResultsPool() {
     });
   }
 
-  // GitHub issue #40: `/food/?star=lamb&tag=soup` arrives already filtered.
-  // The grammar is assets/js/filter-state.js's; what belongs HERE is the
-  // validation, because only this file can see which filters the page
-  // actually offers.
-  //
-  // VALIDATED BY ITERATING THE BUTTONS AND COMPARING dataset, not by building
-  // a `[data-tag="..."]` attribute selector out of the query string. The value
-  // is arbitrary text off a URL, so a selector would raise the whole question
-  // of quoting and escaping (and throw a SyntaxError on the wrong answer) for
-  // no gain; a string comparison has no syntax to get wrong.
-  //
-  // Anything that survives parsing but matches no button is dropped in
-  // silence -- same policy cook-timer.js already applies to `?protein=beef`.
-  // A stale link to a retired tag lands on a perfectly good unfiltered index,
-  // which is a better outcome than an error on a page that works fine.
+  // `/food/?star=lamb&tag=soup` arrives filtered (#40). The grammar is
+  // filter-state.js's; the validation is here, where the offered buttons are.
+  // Values are compared against each button's dataset, never built into an
+  // attribute selector: text off a URL would need escaping. A value matching
+  // no button is dropped in silence, so a stale link lands on a working index.
   (function applyQueryString() {
-    // No `!HTF.filterState` guard any more: since issue #52 this file's own
-    // state object comes from that module at the top, so a page that loaded
-    // filters.js without it never reaches this line. Same stance the file
-    // already takes on HTF.ingredientSearch and HTF.listView.
     if (!matrix) return;
     var wanted = FilterState.parseQuery(location.search);
 
@@ -2235,34 +1559,17 @@ function renderResultsPool() {
       if (isOffered('.btn-tag', 'tag', value)) state.tags.add(value);
     });
 
-    // Single-select, so the last one NAMED IN THE URL wins -- consistent with
-    // clicking two star buttons in a row, where the second replaces the first.
-    // Driven off the parsed list rather than off the buttons for exactly that
-    // reason: iterating buttons would make DOM order, not the URL, decide.
+    // Single-select: the last star NAMED IN THE URL wins, so this iterates
+    // the parsed list, not the buttons.
     wanted.star.forEach(function(value) {
       if (isOffered('.btn-star', 'star', value)) state.star = value;
     });
 
-    /* AN INGREDIENT, FROM THE SEARCH-FOR-ANYTHING BOX -- `?ing=`, #1050
-       (2026-09-15). filter-state.js's header called this "the obvious third
-       ... deliberately not implemented, because nothing emits it yet"; the
-       dropdown on a recipe page emits it now, carrying a main_ingredients
-       entry it offered. It lands in HAS TO HAVE exactly as typing the word
-       there would: the text goes into the box and the pool is painted by the
-       same function a keystroke calls, which already chooses the result when
-       it is the only one. When the vocabulary offers several, the one whose
-       name IS the word is chosen through its own button, so the choice takes
-       the click handler's path and not a second copy of it. When none is,
-       the pool is left on screen for the reader to pick from: a half-finished
-       search, which is a truthful state and the one the box would be in had
-       they typed it. THAT CASE IS RARE SINCE #1289: the dropdown used to
-       offer the recipes' raw text, so every entry this picker renames (a
-       modifier stripped, an alias applied, a plural folded) arrived with no
-       button of its name -- 81 of its 740 words. It now reads its words
-       through IS.buildMasterList and IS.entryKey, as this file does, and what
-       is left is a hand-typed or stale link, and an entry the picker's own
-       multi-word search cannot reach (one with a stopword or an accent in
-       it). Last value wins, as with the star. */
+    /* `?ing=` (#1050), from the search-for-anything box. The text goes into
+       HAS TO HAVE and the pool is painted as a keystroke would paint it,
+       which chooses a unique result. With several, the button whose name IS
+       the word is clicked, so the choice takes the click handler's path. With
+       none, the pool stays for the reader to pick from. Last value wins. */
     if (wanted.ing.length && searchBox && resultsPool) {
       var wantedIng = wanted.ing[wanted.ing.length - 1];
       searchBox.value = wantedIng;
@@ -2275,58 +1582,26 @@ function renderResultsPool() {
         var byLabel = fold(String(btn.textContent || '').replace(' (all)', '').trim().toLowerCase()) === wantedKey;
         if (byKey || byLabel) exact = btn;
       });
-      // Skip the click when renderResultsPool()'s own auto-select-on-a-
-      // unique-match already added it (#1092: the matrix's click handler now
-      // TOGGLES a chosen entry, so clicking an already-active button would
-      // remove the very thing this block exists to add).
+      // Not when auto-select already chose it: a click on an active button
+      // removes it (#1092).
       if (exact && !exact.classList.contains('active') && typeof exact.click === 'function') {
         exact.click();
       }
     }
   })();
 
-  // A fresh page load starts from the same random base order "clear all"
-  // produces, for the same reason: no recipe should be permanently stuck at
-  // the bottom. That holds whether or not the query string above put a filter
-  // on -- a filter narrows which rows show, it doesn't decide their order.
-  // .recipe-list starts visibility:hidden in CSS specifically so this can run
-  // before anything is shown — revealing it only now means the shuffled order
-  // is what paints, not the server-rendered alphabetical order flashing first.
-  //
-  // ARRIVING BY GOING BACK IS THE ONE EXCEPTION (issue #387): the list you left
-  // is restored instead, order and filters together, and the shuffle is skipped
-  // because reshuffling is precisely what you did not want. Every other way of
-  // reaching this page -- typed, bookmarked, followed, reloaded -- still
-  // shuffles, so the rule above is unchanged rather than weakened.
+  // A fresh load starts shuffled, filtered or not, so no recipe is stuck at
+  // the bottom. .recipe-list starts visibility:hidden in CSS so the shuffled
+  // order is the first one painted. Arriving by going back restores the list
+  // you left instead (#387).
   var restored = restoreIndexMemory();
   if (!restored) shuffleRecipeList();
 
-  /* ARRIVING AT THE SHORTLIST BY URL -- `?shortlist=1`, #1011 (2026-09-14),
-     food's half of what #994 gave the drinks index on 2026-09-12. The "see
-     shortlist" action on a recipe page links here, so a reader who has just
-     marked something has one click to see everything they have marked.
-
-     IT CALLS THE BUTTON'S OWN FUNCTION, not a second path to the same place:
-     `enterShortlistView()` plus `resetFilterControls()` is exactly what
-     pressing `shortlisted (N)` does a few hundred lines above, so a reader who
-     arrives by the link and one who presses the button are in one state, and
-     #918's rule that this is a VIEW and not a facet holds for both.
-
-     AFTER THE QUERY-STRING FILTERS AND THE MEMORY, AND IT REPLACES BOTH: a
-     `?tag=` in the same URL narrows a list, and this is the opposite
-     instruction -- show me everything I have saved -- so the last word is the
-     link's own. The remembered scroll goes with the remembered list, for the
-     reason cocktail-index.js gives: 2,400px into a three-recipe shortlist
-     lands past the end of it.
-
-     NOT `parseQuery`, as on cocktails: `shortlisted` is a view, not a field a
-     URL may set. `parseShortlist` since #1093, which gave the parameter a
-     second meaning -- a list of slugs someone sent -- and a literal
-     `indexOf('shortlist=1')` could not tell the two apart.
-
-     A SENT LIST ENTERS THE SAME VIEW and answers "is this row on it" from the
-     link instead of the store (`sharedKeys`, at the top of this file). The
-     slugs are matched by HTF.shortlist.resolveSlugs, which writes nothing. */
+  /* `?shortlist=1` (#1011) enters the shortlist view exactly as the button
+     does, after the query-string filters and the memory, and replaces both;
+     the remembered scroll goes with the remembered list. `?shortlist=a,b`
+     (#1093) enters the same view and answers "is this row on it" from the
+     link (`sharedKeys`); resolveSlugs writes nothing. */
   var arrivedShortlist = FilterState.parseShortlist(location.search);
   if (arrivedShortlist.own || arrivedShortlist.slugs.length) {
     state = FilterState.enterShortlistView();
@@ -2340,13 +1615,9 @@ function renderResultsPool() {
     }
   }
 
-  /* ARRIVING WITH A NAME -- `?q=`, #1024 (2026-09-14), from the search box
-     (a recipe page's furniture line then; the header, on a local build, since
-     #1210). Exactly what typing into the name box does
-     (its `input` handler above): the box shows the text, the query is folded
-     the same way, and the list is reordered by title tier. Applied after the
-     memory and the shuffle, because a name you just typed is a fresh
-     instruction, and the remembered scroll goes with the remembered list. */
+  /* `?q=` (#1024), from the search box: exactly what typing into the name
+     box does. After the memory and the shuffle, because a name just typed is
+     a fresh instruction. */
   var arrivedName = FilterState.parseName(location.search);
   if (arrivedName && nameSearchBox) {
     nameSearchBox.value = arrivedName;
@@ -2363,23 +1634,10 @@ function renderResultsPool() {
     window.scrollTo(0, restored.scrollY);
   }
 
-  /* ARRIVING AT A FRAGMENT -- `#results`, #1050 (2026-09-15), widened to ANY
-     fragment for #1057/#1059 (2026-09-15). The search dropdown on a recipe
-     page ends every filtered link in `#results`, the count line above the
-     list; a badge or chip at the top of a recipe page ends its own link in
-     the id of the filter SECTION holding it (`#filter-star`, `#filter-mood`,
-     `#filter-practicalities` -- see recipe_badges.html) so the reader lands on
-     the lit chip rather than the top of the page; and the recipe page's "see
-     shortlist" link (page-actions.html) ends in `#results` too, since the
-     shortlisted list is the same count line. All three need the same repeat
-     scroll: the browser has already jumped to the fragment once, against a
-     page whose rows were all still in place (or, for the shortlist view,
-     still showing the unfiltered list) and whose fonts may not have loaded;
-     this does it again AFTER the reveal, once the page has its real height.
-     Not on a back navigation, where the remembered scroll is the truer
-     answer. Reading the id off `location.hash` rather than naming `results`
-     specifically is what makes one block serve every fragment a link on this
-     site ends in, present or future, with no second copy of this comment. */
+  /* Arriving at a fragment (`#results`, `#filter-star`, ...; #1050, #1057):
+     the browser jumped once against the unrevealed, unfiltered page, so the
+     scroll is repeated after the reveal. Not on a back navigation, where the
+     remembered scroll is the truer answer. */
   if (!restored && location.hash && location.hash.length > 1) {
     var target = document.getElementById(location.hash.slice(1));
     if (target && typeof target.scrollIntoView === 'function') {
