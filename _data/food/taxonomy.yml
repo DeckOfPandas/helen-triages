@@ -257,10 +257,12 @@ retired_star_ingredients:
 # `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
 # group note above, `no-cook`, `virtuous` and `ice cream` in MANUAL §7.
 #
-# MELTING CHOCOLATE ON THE HOB IS COOKING, so the fridge cake nests keep their
-# 5 mins and do not take `no-cook`. Helen, 2026-10-11, on being reminded the
-# tag requires `cook_time: "None"`: "good spot, I'd forgotten about the
-# melting."
+# MELTING CHOCOLATE IS PREP, NOT COOKING, so the fridge cake nests and the
+# cookie dough bars are `no-cook` with `cook_time: "None"`. Helen, 2026-10-11,
+# reversing her own first answer an hour earlier ("good spot, I'd forgotten
+# about the melting"): "pulsing chocolate in the microwave isn't messy like
+# cooking! If the melting chocolate is prep then there's still no cooking for
+# either." The nests melt theirs on the hob and she ruled the two the same.
 # -----------------------------------------------------------------------------
 tags:
   mood:
