@@ -8,7 +8,7 @@ prep_time: "15 mins"
 cook_time: "10 mins"
 main_ingredients: ["unsalted butter", "egg yolks", "lemon juice", "apple cider vinegar"]
 star_ingredient:
-tags: ["extras"]
+tags: ["extras", "fiddly and fun"]
 ingredient_groups:
   - items:
     - amount: "8 oz"

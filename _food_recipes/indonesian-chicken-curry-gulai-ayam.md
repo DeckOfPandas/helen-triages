@@ -8,7 +8,7 @@ prep_time: "20 mins plus marinating"
 cook_time: "1 hr"
 main_ingredients: ["chicken thighs", "coconut cream", "lemongrass stalks", "lime", "cinnamon sticks", "green cardamom pods", "galangal", "fresh ginger", "whole nutmeg", "tamarind paste", "macadamia nuts", "lime leaves", "coconut palm sugar", "banana shallots (echalions)"]
 star_ingredient: "poultry"
-tags: ["fakeaway", "freezable", "make-ahead", "one-handed food"]
+tags: ["fakeaway", "freezable", "make-ahead", "one-handed food", "fiddly and fun"]
 ingredient_groups:
   - name: curry
     items:

@@ -736,7 +736,53 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # Proved with the old value first: against `91431cf6` this test named exactly
 # those three files, each "last touched by c89d3ae9", and nothing else. Covers
 # c89d3ae9 and nothing after.
-BASELINE_COMMIT = "c89d3ae9"   # #1356: three incidental flags, on Helen's grant
+#
+# MOVED TO A MERGE, 2026-10-10, FOR EIGHT RECIPES -- #1343 AND #1348.
+# `92a132f6` replaces the tagline of seven recipes with Helen's own words,
+# verbatim from her comments on #1343 (classic masala chai, lemon feather
+# sponge, the one true chocolate brownies, dark chocolate soufflés, macarons,
+# chicken à la king, teriyaki salmon), and sets `proofread: true` on the
+# savoury plum sauce, which she proofread on 2026-10-08 (#1348). Nothing else
+# in any of the eight changes.
+#
+# HER GRANT, asked for before the edit ("I'd want your grant up front to move
+# the baseline for these") and given 2026-10-10: "Explicit grant now to update
+# all those files, including the live ones -- I'll need to reproofread anyway
+# (argh), and these changes are minor so I trust you!"
+#
+# A MERGE, FOR THE REASON `91431cf6` WAS: `c89d3ae9` above reached `main`
+# through #1355 while `92a132f6` was made on its own branch, and neither is an
+# ancestor of the other. `efe55b56` is the merge of `main` into that branch and
+# has both behind it. The branch's other commits touch no recipe.
+#
+# Proved in the merge, with `c89d3ae9` still in place: this test named exactly
+# those eight files, each "last touched by 92a132f6", and nothing else.
+#
+# MOVED AGAIN THE SAME DAY, 2026-10-10, FOR THE TAG REVIEW -- NINETEEN RECIPES.
+# Helen asked for every published food recipe to be read against the tag
+# meanings written down that afternoon, and ruled on each proposal. `f7f6f1f1`
+# (eight files) and `135e4487` (eleven) hold what she took: seventeen tag
+# lines -- among them the rename of `sweets` to `sweet snack` -- and two
+# `cook_time` values she gave ("B&J: yes please, fix the cooking time", "Creme
+# Pat: cook time is 15 mins"). One line changes in each file and nothing else.
+#
+# HER GRANT, asked for before the first edit: "You have the grant -- edit the
+# live files without flipping the flag please -- this is under the 'life is
+# too short' test..."
+#
+# `135e4487` is the later of the two and has `f7f6f1f1` and `efe55b56` behind
+# it, so no merge is needed this time. Proved with `efe55b56` still in place:
+# this test named exactly those nineteen files, eight "last touched by
+# f7f6f1f1" and eleven "by 135e4487", and nothing else.
+#
+# AND ONCE MORE THAT DAY, FOR A TAG THAT DID NOT EXIST AT BREAKFAST. `d563db61`
+# declares the mood `fiddly and fun` and adds it to twelve published recipes,
+# one tag appended to one line in each and nothing else. She was shown the
+# twelve by name and answered "Yes! Great! Let's do it -- declare the tag". The
+# grant is the one above, for editing the live files in this tag review without
+# flipping the flag. Proved with `135e4487` still in place: this test named
+# exactly those twelve, each "last touched by d563db61", and nothing else.
+BASELINE_COMMIT = "d563db61"   # `fiddly and fun` on twelve published recipes, on Helen's grant
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato

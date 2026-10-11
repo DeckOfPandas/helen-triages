@@ -206,14 +206,13 @@ bottles:
     size_ml: 700
     gbp: 28
     confidence: medium
-  # A GUESS, 2026-09-25, with the bottle (#1108). Helen named it for Away
-  # Colour and gave no price; this is a UK-retail estimate from memory, not a
-  # shop, and is the row to overwrite first. 70cl assumed.
+  # A GUESS OF 2026-09-25 (#1108) THAT HELEN TICKED AS RIGHT on #1351,
+  # 2026-10-10. Not a shop figure and not one she typed, hence `medium`.
   "Cruzan Single Barrel":
     size_ml: 700
     gbp: 36
-    confidence: low
-    basis: "guess: UK retail for a single-barrel Cruzan, not shop-checked and not Helen's figure"
+    confidence: medium
+    basis: "a guess Helen ticked as right on #1351, 2026-10-10; not shop-checked"
   # --- rum: light, blended and flavoured ---------------------------------
   "Havana Club 3 year old":
     size_ml: 700
@@ -223,15 +222,13 @@ bottles:
     size_ml: 700
     gbp: 22
     confidence: medium
-  # A GUESS, 2026-09-25, with the bottle (#1108). Helen named it for Fanny
-  # Chu's Piña Colada and gave no price; UK-retail estimate from memory, not a
-  # shop. Not a pricing input for the category (`default_bottles`). 70cl
-  # assumed.
+  # A GUESS OF 2026-09-25 (#1108) THAT HELEN TICKED AS RIGHT on #1351,
+  # 2026-10-10. Not a pricing input for the category (`default_bottles`).
   "Pedro Mandinga Panama silver rum":
     size_ml: 700
     gbp: 30
-    confidence: low
-    basis: "guess: UK retail for a Panamanian silver rum, not shop-checked and not Helen's figure"
+    confidence: medium
+    basis: "a guess Helen ticked as right on #1351, 2026-10-10; not shop-checked"
   "Planteray 3 Stars":
     size_ml: 700
     gbp: 22
@@ -306,12 +303,12 @@ bottles:
     size_ml: 700
     gbp: 24
     confidence: medium
-  # A PLACEHOLDER, 2026-10-07. Helen named the bottle and not its price; GBP 38
-  # for 70cl is a rough shelf figure, NOT SHOP-CHECKED, and she has not seen it.
+  # HELEN'S FIGURE, 2026-10-10 (#1351): "Barbancourt 5 Star: £42". It replaces a
+  # GBP 38 placeholder. 70cl, as its sibling.
   "Barbancourt 5 Star":
     size_ml: 700
-    gbp: 38
-    confidence: low
+    gbp: 42
+    confidence: high
   "Sagatiba":
     size_ml: 700
     gbp: 22
@@ -385,10 +382,13 @@ bottles:
     size_ml: 700
     gbp: 26
     confidence: high
+  # HELEN'S FIGURE, 2026-10-10 (#1351): "Bonded rye can default to Rittenhouse
+  # 50%, £36 for 70 cl". The same bottle as the `bonded rye` row below, so the
+  # one figure is written in both places. It was GBP 34, `medium`.
   "Rittenhouse 100":
     size_ml: 700
-    gbp: 34
-    confidence: medium
+    gbp: 36
+    confidence: high
   "Bulleit Rye":
     size_ml: 700
     gbp: 28
@@ -651,12 +651,12 @@ bottles:
     size_ml: 750
     gbp: 18
     confidence: high
-  # A PLACEHOLDER, 2026-10-07. Helen named the bottle and not its price; GBP 22
-  # for 75cl is a rough shelf figure, NOT SHOP-CHECKED, and she has not seen it.
+  # HELEN'S FIGURE, 2026-10-10 (#1351): "Cocchi Americano: £26". It replaces a
+  # GBP 22 placeholder. 75cl.
   "Cocchi Americano":
     size_ml: 750
-    gbp: 22
-    confidence: low
+    gbp: 26
+    confidence: high
   "Carpano Antica Formula":
     size_ml: 1000
     gbp: 28
@@ -1093,8 +1093,10 @@ generics:
   # 22.5 ml with nothing to price it from. A 10-year tawny is not scarce the way
   # an overproof Demerara is, so this range is ordinary rather than punitive.
   tawny port:         { gbp_per_litre_min: 20.00, gbp_per_litre_max: 40.00, basis: "GBP 15-30 / 75cl", confidence: low }
-  # NEW 2026-10-07 with the generic. NOT SHOP-CHECKED; Helen has not seen it.
-  ruby port:          { gbp_per_litre_min: 13.00, gbp_per_litre_max: 24.00, basis: "PLACEHOLDER, a ruby port's rough 75cl shelf range, not shop-checked", confidence: low }
+  # HELEN'S FIGURE, 2026-10-10 (#1351): "Ruby port can default to Taylor's Fine,
+  # 20%, £17 for 75 cl". A category row with the bottle in its basis, the
+  # Swedish flaggpunsch shape: bottles.yml declares no Taylor's.
+  ruby port:          { gbp_per_litre_min: 22.67, gbp_per_litre_max: 22.67, basis: "Taylor's Fine Ruby, GBP 17 / 75cl", confidence: high }
   # HELEN'S OWN FIGURE, 2026-09-05: "Let's say champage is GBP 20 -- I buy
   # crates of Heidsieck Blue Top on sale at Christmas!!!!!" A POINT PRICE, not a
   # range, because she buys ONE THING at ONE PRICE rather than shopping the
@@ -1126,14 +1128,22 @@ generics:
   # pineapple-vodka case: she named the thing she buys.
   peach schnapps:     { gbp_per_litre_min: 17.14, gbp_per_litre_max: 17.14, basis: "GBP 12 / 70cl", confidence: high }
   crème de cassis:    { gbp_per_litre_min: 22.86, gbp_per_litre_max: 34.29, basis: "GBP 16-24 / 70cl", confidence: medium }
-  # FIVE PLACEHOLDERS, 2026-10-07, with their generics -- the Difford's batch.
-  # NOT SHOP-CHECKED, and Helen has not seen these figures: each is a range
-  # wide enough to be true and nothing more. Declaring the bottle replaces it.
-  black raspberry liqueur: { gbp_per_litre_min: 28.00, gbp_per_litre_max: 44.00, basis: "PLACEHOLDER, rough shelf range, not shop-checked", confidence: low }
-  crème de myrtille:  { gbp_per_litre_min: 20.00, gbp_per_litre_max: 34.00, basis: "PLACEHOLDER, a fruit crème's rough 70cl shelf range, not shop-checked", confidence: low }
-  kümmel:             { gbp_per_litre_min: 30.00, gbp_per_litre_max: 45.00, basis: "PLACEHOLDER, rough shelf range, not shop-checked", confidence: low }
-  sake:               { gbp_per_litre_min: 20.00, gbp_per_litre_max: 60.00, basis: "PLACEHOLDER, a wide range because a daiginjo is dear, not shop-checked", confidence: low }
-  tsipouro:           { gbp_per_litre_min: 30.00, gbp_per_litre_max: 50.00, basis: "PLACEHOLDER, rough shelf range, not shop-checked", confidence: low }
+  # THE DIFFORD'S BATCH OF 2026-10-07, PRICED BY HELEN ON 2026-10-10 (#1351).
+  # Five placeholders stood here. For four she named the bottle a pour
+  # defaults to -- "Black raspberry liqueur can default to Chambord, 16.5%,
+  # £25 for 70 cl", "Myrtille can default to Briottet, 18%, £23 for 70 cl",
+  # "Kummel can default to Mentzendorff, 38%, £28 for 50 cl", "Sake can default
+  # to Akashi-Tai Daiginjo Genshu, 17%, £42 for 72 cl" -- so each is a POINT
+  # price with the bottle in its basis, the Swedish flaggpunsch shape:
+  # bottles.yml declares none of them, and declaring a bottle is her call.
+  # THE KÜMMEL IS A 50cl BOTTLE AND THE SAKE 72cl; the per-litre is from those.
+  black raspberry liqueur: { gbp_per_litre_min: 35.71, gbp_per_litre_max: 35.71, basis: "Chambord, GBP 25 / 70cl", confidence: high }
+  crème de myrtille:  { gbp_per_litre_min: 32.86, gbp_per_litre_max: 32.86, basis: "Briottet Crème de Myrtille, GBP 23 / 70cl", confidence: high }
+  kümmel:             { gbp_per_litre_min: 56.00, gbp_per_litre_max: 56.00, basis: "Mentzendorff Kümmel, GBP 28 / 50cl", confidence: high }
+  sake:               { gbp_per_litre_min: 58.33, gbp_per_litre_max: 58.33, basis: "Akashi-Tai Daiginjo Genshu, GBP 42 / 72cl", confidence: high }
+  # The fifth she ticked as right without naming a bottle, so the range
+  # stays and is no longer a placeholder.
+  tsipouro:           { gbp_per_litre_min: 30.00, gbp_per_litre_max: 50.00, basis: "GBP 21-35 / 70cl, a range Helen ticked as right on #1351, 2026-10-10; not shop-checked", confidence: medium }
   # NEW 2026-10-04 (#838), when Helen split `crème de cacao` by colour. The
   # white is priced from Briottet Crème de Cacao Blanc (GBP 17 / 70cl); the
   # brown has no bottle declared. The range starts at that bottle's price and
@@ -1185,11 +1195,11 @@ generics:
   # NEW 2026-10-07 with the generic. The same honey price carried to the third
   # ratio by the two rows above, not a fresh figure.
   honey water 3:1:    { gbp_per_litre_min: 14.60, gbp_per_litre_max: 20.25, basis: "honey @ GBP 17.60/kg, 3:1", confidence: medium }
-  # TWO PLACEHOLDERS, 2026-10-07, with the generics (Cyrano, Electro Batida).
-  # A flavoured-syrup bottle's rough shelf range; NOT SHOP-CHECKED, and Helen
-  # has not seen these figures. Declaring the Monin bottle would replace each.
-  pineapple syrup:    { gbp_per_litre_min: 9.00, gbp_per_litre_max: 14.00, basis: "PLACEHOLDER, a flavoured syrup's rough 70cl shelf range, not shop-checked", confidence: low }
-  hazelnut syrup:     { gbp_per_litre_min: 9.00, gbp_per_litre_max: 14.00, basis: "PLACEHOLDER, a flavoured syrup's rough 70cl shelf range, not shop-checked", confidence: low }
+  # HELEN'S FIGURE, 2026-10-10 (#1351): "Monin Pineapple Syrup is £10 for 70 cl",
+  # "Monin Hazelnut Syrup is £10 for 70 cl" (Cyrano, Electro Batida). Category
+  # rows with the bottle in the basis; neither Monin is declared in bottles.yml.
+  pineapple syrup:    { gbp_per_litre_min: 14.29, gbp_per_litre_max: 14.29, basis: "Monin Pineapple Syrup, GBP 10 / 70cl", confidence: high }
+  hazelnut syrup:     { gbp_per_litre_min: 14.29, gbp_per_litre_max: 14.29, basis: "Monin Hazelnut Syrup, GBP 10 / 70cl", confidence: high }
   # NEW 2026-09-25 (#1108), Helen's generic for Fanny Chu's Piña Colada: three
   # parts Coco Lopez to one part coconut milk. NOT priced off `coconut cream`
   # above -- Coco Lopez is sweetened cream of coconut, a different tin -- and
@@ -1213,35 +1223,40 @@ generics:
   # TWO PLACEHOLDERS, 2026-09-20, added so that typing a pour does not fail
   # the price test -- NOT SHOP-CHECKED, and Helen has not seen these figures.
   # `ginger beer` came in with the Moscow Mule and Dark 'n' Stormy, `milk` with
-  # Rum Cow. Both are a supermarket-shelf range and nothing more precise; replace
-  # them with a real price and raise the confidence.
-  ginger beer:        { gbp_per_litre_min: 1.00, gbp_per_litre_max: 2.50, basis: "PLACEHOLDER, supermarket range, not shop-checked", confidence: low }
-  milk:               { gbp_per_litre_min: 1.00, gbp_per_litre_max: 1.60, basis: "PLACEHOLDER, supermarket range, not shop-checked", confidence: low }
+  # Rum Cow. HELEN'S FIGURE, 2026-10-10 (#1351): "Ginger beer: £2 / 500 ml",
+  # "Milk: £1.50 / l". Point prices, replacing two supermarket-range guesses.
+  ginger beer:        { gbp_per_litre_min: 4.00, gbp_per_litre_max: 4.00, basis: "GBP 2 / 500 ml", confidence: high }
+  milk:               { gbp_per_litre_min: 1.50, gbp_per_litre_max: 1.50, basis: "GBP 1.50 / litre", confidence: high }
   pineapple juice:    { gbp_per_litre_min: 1.20, gbp_per_litre_max: 2.00, basis: "carton", confidence: medium }
   apple juice:        { gbp_per_litre_min: 1.00, gbp_per_litre_max: 1.80, basis: "carton", confidence: medium }
-  # A PLACEHOLDER, 2026-10-07, with the generic itself (Woo Woo, Mexico City).
-  # NOT SHOP-CHECKED, and Helen has not seen this figure.
-  cranberry juice drink: { gbp_per_litre_min: 1.00, gbp_per_litre_max: 2.20, basis: "PLACEHOLDER, supermarket range, not shop-checked", confidence: low }
+  # HELEN'S FIGURE, 2026-10-10 (#1351): "Cranberry juice drink: £2 / l" (Woo Woo,
+  # Mexico City).
+  cranberry juice drink: { gbp_per_litre_min: 2.00, gbp_per_litre_max: 2.00, basis: "GBP 2 / litre", confidence: high }
   cider vinegar:      { gbp_per_litre_min: 3.00, gbp_per_litre_max: 6.00, basis: "supermarket", confidence: medium }
-  # A PLACEHOLDER, 2026-10-07, with the generic (Electro Batida, Dead Parrot
-  # Colada). NOT SHOP-CHECKED, and Helen has not seen this figure.
-  coconut water:      { gbp_per_litre_min: 2.00, gbp_per_litre_max: 4.50, basis: "PLACEHOLDER, supermarket carton range, not shop-checked", confidence: low }
-  # Two more the same day, the same shape (Eccentrica Daiquiri, Ramos Greek Fizz).
-  birch water:        { gbp_per_litre_min: 5.00, gbp_per_litre_max: 12.00, basis: "PLACEHOLDER, a small-bottle shelf range, not shop-checked", confidence: low }
-  natural yoghurt:    { gbp_per_litre_min: 1.50, gbp_per_litre_max: 4.00, basis: "PLACEHOLDER, supermarket tub range, not shop-checked", confidence: low }
+  # HELEN'S FIGURE, 2026-10-10 (#1351): "Coconut water: £4.50 / l" (Electro
+  # Batida, Dead Parrot Colada) and "Natural yoghurt: £4 / kg" (Ramos Greek
+  # Fizz). THE YOGHURT IS SOLD BY WEIGHT AND POURED BY VOLUME: a kilo is taken
+  # as a litre, which is within a few per cent for yoghurt.
+  coconut water:      { gbp_per_litre_min: 4.50, gbp_per_litre_max: 4.50, basis: "GBP 4.50 / litre", confidence: high }
+  # Birch water (Eccentrica Daiquiri) she ticked as right without a figure, so
+  # the range stays and is no longer a placeholder.
+  birch water:        { gbp_per_litre_min: 5.00, gbp_per_litre_max: 12.00, basis: "a small-bottle shelf range Helen ticked as right on #1351, 2026-10-10; not shop-checked", confidence: medium }
+  natural yoghurt:    { gbp_per_litre_min: 4.00, gbp_per_litre_max: 4.00, basis: "GBP 4 / kg, a kilo taken as a litre", confidence: high }
 
-  # --- TWO MORE PLACEHOLDERS, 2026-10-07, the Difford's batch ------------------
+  # --- TWO MORE FROM THE DIFFORD'S BATCH, PRICED BY HELEN 2026-10-10 (#1351) ---
   # `Japanese whisky` was declared ahead of any drink (#1186) and so had no
-  # price. Typing Geisha Martini's whisky is what made the price test ask. NOT
-  # SHOP-CHECKED, and Helen has not seen this figure: a range wide enough to be
-  # true and nothing more. Replace it with a real bottle's price -- or declare
-  # the bottle, which wins over the row.
+  # price; Geisha Martini's whisky is what made the price test ask. "Japanese
+  # whisky can default to Suntory Toki Blended, 43%, £30 for 70 cl." A point
+  # price with the bottle in its basis; declaring the bottle would win over
+  # the row.
   # (`americano` and `lemon vodka` each had a row here for an hour, until Helen
   # named a bottle for each -- Cocchi Americano, Absolut Citron -- and a
   # category with a bottle is priced from the bottle.)
-  Japanese whisky:    { gbp_per_litre_min: 40.00, gbp_per_litre_max: 80.00, basis: "PLACEHOLDER, a blended Japanese whisky's shelf range, not shop-checked", confidence: low }
-  # ANOTHER, the same day: Autumn Leaves pours `bonded rye` with no bottle named.
-  bonded rye:         { gbp_per_litre_min: 45.00, gbp_per_litre_max: 70.00, basis: "PLACEHOLDER, a 100-proof rye's rough 70cl shelf range, not shop-checked", confidence: low }
+  Japanese whisky:    { gbp_per_litre_min: 42.86, gbp_per_litre_max: 42.86, basis: "Suntory Toki, GBP 30 / 70cl", confidence: high }
+  # Autumn Leaves pours `bonded rye` with no bottle named. "Bonded rye can
+  # default to Rittenhouse 50%, £36 for 70 cl." Rittenhouse 100 IS declared,
+  # under `rye`, and carries the same GBP 36 in `bottles:` above.
+  bonded rye:         { gbp_per_litre_min: 51.43, gbp_per_litre_max: 51.43, basis: "Rittenhouse 100, GBP 36 / 70cl", confidence: high }
 
   # --- free -------------------------------------------------------------------
   # `water` is already kept off cards and out of the shopping list by

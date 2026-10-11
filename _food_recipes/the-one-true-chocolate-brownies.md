@@ -1,6 +1,6 @@
 ---
 title: "The One True Chocolate Brownies"
-tagline: "Perfect and foolproof."
+tagline: "Buy an Edge Brownie tin and never look back."
 source: "Adapted from Green & Black's recipe book"
 source_type: book
 makes: "enough for that edge-brownie tin I made James buy me"
@@ -9,7 +9,7 @@ prep_time: "10 mins"
 cook_time: "20–25 mins"
 main_ingredients: ["dark chocolate", "unsalted butter", "eggs", "golden granulated sugar", "plain flour"]
 star_ingredient: "chocolate"
-tags: ["bakes"]
+tags: ["bakes", "sweet snack"]
 ingredient_groups:
   - items:
     - amount: "300 g"

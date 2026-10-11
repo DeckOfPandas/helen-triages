@@ -10,7 +10,7 @@ main_ingredients: ["salmon", "sticky rice", "edamame", "light soy sauce", "oyste
 star_ingredient: "oily fish"
 internal_temp_ref: fish.salmon
 doneness: medium
-tags: ["salad", "virtuous"]
+tags: ["virtuous"]
 ingredient_groups:
   - name: salmon
     items:

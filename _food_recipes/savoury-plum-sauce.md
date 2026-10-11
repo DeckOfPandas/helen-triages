@@ -8,7 +8,7 @@ prep_time: "5 mins"
 cook_time: "15 mins"
 main_ingredients: ["plums", "red wine", "beef stock", "plum jam"]
 star_ingredient: "fruit"
-tags: ["extras"]
+tags: ["extras", "freezable"]
 ingredient_groups:
   - items:
     - amount: "2–3"
@@ -34,6 +34,6 @@ notes:
 meta:
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 
 ---

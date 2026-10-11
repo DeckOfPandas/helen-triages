@@ -9,7 +9,7 @@ prep_time: "30 mins, plus 1 hr 30 mins chilling time"
 cook_time: "20 mins"
 main_ingredients: ["mincemeat", "ground almonds", "unsalted butter", "plain flour", "egg", "golden caster sugar"]
 star_ingredient:
-tags: ["bakes", "festive", "hot snack"]
+tags: ["bakes", "festive", "hot snack", "fiddly and fun"]
 ingredient_groups:
   - items:
     - amount: "350 g"

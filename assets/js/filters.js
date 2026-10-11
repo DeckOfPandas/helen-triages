@@ -920,9 +920,8 @@ function renderResultsPool() {
     shortlistOnlyBtn.setAttribute('aria-pressed', own ? 'true' : 'false');
   }
 
-  /* THE NOTE OVER A SHARED LIST, and its "keep these". PLACEHOLDER COPY in
-     #713's sense: the count and the not-found slugs are the feature, the words
-     around them are Helen's to change. */
+  /* THE NOTE OVER A SHARED LIST, and its "keep these". Helen ruled the words
+     on #1342, 2026-10-10: "Both good, thanks!" */
   function syncSharedNote() {
     if (!sharedNote) return;
     sharedNote.hidden = !sharedKeys;

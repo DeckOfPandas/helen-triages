@@ -2246,7 +2246,24 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # merge itself, with `3df50ce4` still in place: the test named exactly one
 # file, `_cocktail_recipes/christmas-daiquiri.md`, "last touched by f5dd4350",
 # and nothing else.
-COCKTAIL_BASELINE_COMMIT = "91431cf6"   # the merge holding main's grants and the Christmas Daiquiri's
+#
+# MOVED 2026-10-10 FOR ONE LINE IN EACH OF SIX DRINKS -- #1359. `92a132f6`
+# sets `made_before: false` -> `true` on the six published drinks that said
+# false (Bitter Mai Tai, Cadillac Margarita, Caribbean Sazerac, Classic
+# Champagne Cocktail, Haley Traub's Frozen Margarita, White Negroni Piña
+# Colada) and changes nothing else in any of them. Helen on #1359: "I have
+# made all the drinks we ingested from Difford's recently ... Same for all
+# drinks on the live site."
+#
+# HER GRANT, asked for before the edit and given 2026-10-10: "Explicit grant
+# now to update all those files, including the live ones -- I'll need to
+# reproofread anyway (argh), and these changes are minor so I trust you!"
+#
+# `efe55b56` is the merge of `main` into that branch, the same value the food
+# baseline takes for the same commit; it has `91431cf6` behind it. Proved with
+# the old value first: the test named exactly those six files, each "last
+# touched by 92a132f6", and nothing else.
+COCKTAIL_BASELINE_COMMIT = "efe55b56"   # the merge holding main's grants and #1359's six
 
 
 def _newest_commit_per_published_drink():

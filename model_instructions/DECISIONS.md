@@ -877,6 +877,39 @@ unless stated.
   - **`to serve` is the only group name the layout special-cases; any other
     `to …` name renders as "For the to finish:".** New names were kept to bare
     nouns for that reason.
+- **2026-10-10, #1356 — two of the 2026-10-07/08 ingest rulings are REVERSED:
+  a source step is one pair again, and nothing joins the ingredient list from
+  the method.** Both came back from a claude.ai chat that ingested 25 Good
+  Food recipes under them, as rulings Helen made there; that chat's note asked
+  for the documents to follow, and she confirmed it here ("Please go ahead").
+  - **One source step, one pair, however many actions it holds.** The entry
+    below records *"The split steps has been easier for me"* on 2026-10-08.
+    Two days and one more batch later she found the split files harder to
+    read. Her words for the change did not reach this repository, only the
+    chat's report of them, so none are quoted. The `QQ Claude` line carries
+    the readability instead: several short sentences against one verbatim
+    original.
+  - **The ingredient list is the source's own list.** #1356: *"We shouldn't
+    list incidentals. We can trust the cook."* Reverses "an ingredient the
+    method names with a quantity joins the ingredient list" below. The one
+    exception is a source with no ingredient list at all.
+  - **A fat or flour the source lists only for the tin or the pan is kept and
+    flagged `incidental: true`**, at ingest, which moves that one use of the
+    flag out of TIER 3. Flag, not delete, so the exclusion filter still sees
+    the butter; and the line is drawn at fats and flour, so icing sugar to
+    dust and mustard to brush stay ordinary lines. Both were #1356's
+    recommendations, put to her as one reading and answered *"Yes, your
+    interpretation of #1356 is correct."* (spelling tidied).
+  - **Not done here, still open on #1356**: the word list in data, the pass
+    over the 71 existing draft lines, and the test. The three published fats
+    were flagged the same day by another session (#1355, `c89d3ae9`).
+  - **What the batch itself showed**: 8 of its 23 files had a second group
+    (`to serve`, a sauce) under an unnamed first one, which the suite refuses
+    and `INGEST_ONE_RECIPE.md` had never said. It says so now.
+  - **`CLAUDE_WEB_INGEST.md` §2 is unchanged.** Its "a ruling in the chat is
+    for that recipe, not for the contract" paragraph is what the chat set
+    aside, and it is still the right instruction: the fix for a ruling she
+    means to keep is this entry, not a clerk that follows the chat.
 - **2026-10-07/08 — 91 recipes came in from two claude.ai chats, and what they
   taught the ingest documents.** Helen gave each chat the documents by GitHub
   URL instead of the Project (*"I couldn't remember how to run the ingest
@@ -1345,6 +1378,57 @@ unless stated.
   `recipe_badges.html` at `taxonomy.tags`) proposed and rejected: no user
   stands in the gap between a fact you read (a note says more) and a fact you
   browse by (needs the filter).
+- **2026-10-10 — TWELVE TAGS GET A WRITTEN MEANING, AND TAGS ARE PROPOSED BY
+  READING.** The entry below stands: nothing derives a food tag. What Helen
+  asked for instead is a session that reads a draft against what each tag
+  means and proposes, for her yes or no — she had skipped most proposals at
+  ingest (*"I was somewhere where I needed to minimise typing"*). Eight tags
+  had her meaning on record; `bakes`, `dessert`, `sweets`, `carbs party`,
+  `cheese-tastic`, `fakeaway`, `hot snack`, `nibbles`, `breakfast`, `extras`,
+  `festive` and `starter` were names in a list. A session drafted a line for
+  each and she answered *"Agree on all"*, adding the test for `bakes`:
+  *"would this appear on Great British Bake Off?"* — which puts chocolate
+  mousse tartlets in. The twelve lines are in `_data/food/taxonomy.yml`,
+  MANUAL §7 and `INGEST_ONE_RECIPE.md` §4. Also hers, the same day: *"Drafts
+  will be very hit and miss, so tags there should not be used as data"*, and
+  *"Crab pot pies with salad is not a salad"* — the checker's `salad` hint
+  fires on that title and the recipe is right.
+  - **`sweets` IS RENAMED `sweet snack`, the same afternoon.** Hers: *"what
+    if we rename 'sweets' to 'sweet snacks', or something else with the word
+    'sweet' in it? Biscuits should be in there, but every single time I have
+    to remind myself why it's not just toffee and chocolate truffles."*
+    Singular, as `hot snack`'s twin. The name was doing the damage: an hour
+    earlier, under `sweets`, she ruled fairy cakes out; under the new name,
+    *"Fairy cakes are in again now"*, with the test *"would I serve it on a
+    cake plate at 4 o clock after a long improving walk?"* One published
+    recipe and five drafts carried the old word. A saved link filtering on
+    `sweets` no longer matches anything, which was judged a fair price.
+  - **`fiddly and fun` IS A NEW MOOD, AND `showstopper` IS NARROWED TO THE
+    RESULT.** Hers, mid-review: *"I wonder if we need a 'I want to faff' tag
+    ... Sometimes when I want to faff I choose to make fiddly desserts, but I
+    honestly prefer savoury things, so remembering about e.g. tomato tarte
+    tatin would scratch the itch for sure."* `showstopper` was meant to be
+    that (*"let's make something unnecessarily complicated"*) and had
+    drifted to "impresses at the table": it sat on a seared beef fillet and a
+    15-minute venison loin. She agreed (*"I agree that showstopper has
+    drifted"*) and named the new one over "make me think". So: `fiddly and
+    fun` is the PROCESS, `showstopper` the RESULT, a dish may be either, both
+    or neither, and slow is not fiddly. It is a mood, not a practicality as
+    she first put it — a craving by the taxonomy's own test, and so it sits
+    beside `dessert` and `bakes` where she can pick it without them. Twelve
+    published recipes took it the same day, six of which had no `showstopper`
+    and so no way to be found by someone wanting to potter. No `showstopper`
+    was removed from a published recipe: read against the narrowed meaning
+    they all still impress.
+  - **What `bakes` is NOT**, from the review of the 90 published recipes
+    that followed: a soufflé, a beef Wellington, meringue swans (*"No one
+    gets in cosy baking mode and makes ad hoc swans with creme diplomat"*).
+    What it is: a quiche, a baked cheesecake, pizza dough, fondants,
+    puddings, crumbles, burger buns.
+  - **The published review changed 17 of 90**, in two batches of proposals;
+    every other tag and star was read and left. `proofread: true` kept on
+    all of them on her grant: *"edit the live files without flipping the
+    flag please -- this is under the 'life is too short' test"*.
 - **2026-10-08 — FOOD GETS NO TAG DERIVER; IT GETS A REPORT.** Helen, after
   the cocktail moods were measured the same day (§9.3): *"Let's do this now
   please."* The same search — every one- and two-feature rule, scored on
