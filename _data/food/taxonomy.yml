@@ -197,9 +197,10 @@ retired_star_ingredients:
 #                  biscuit, a bun, a muffin, a brownie square.
 #                  NOR IS A TRAYBAKE CUT INTO SQUARES (2026-10-11, the coconut
 #                  chai traybake): "I think sweet snacks are individual
-#                  things, not slices of something else." Brownies and bars
-#                  are cut from a tin too and carry the tag; where that line
-#                  sits was put to her the same day and is not yet ruled.
+#                  things, not slices of something else." THE LINE, AGREED THE
+#                  SAME DAY, since brownies are cut from a tin too: a recipe
+#                  NAMED FOR THE PIECE (a brownie, a bar, a flapjack) is in;
+#                  a cake cut up to serve is out, however small the squares.
 #   carbs party    the starch is the point: pasta, rice, potatoes, pies,
 #                  dumplings.
 #   cheese-tastic  cheese is the pleasure of the dish, not a garnish. FETA
@@ -255,6 +256,11 @@ retired_star_ingredients:
 # The other eight already had hers: `make-ahead` and `freezable` above,
 # `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
 # group note above, `no-cook`, `virtuous` and `ice cream` in MANUAL §7.
+#
+# MELTING CHOCOLATE ON THE HOB IS COOKING, so the fridge cake nests keep their
+# 5 mins and do not take `no-cook`. Helen, 2026-10-11, on being reminded the
+# tag requires `cook_time: "None"`: "good spot, I'd forgotten about the
+# melting."
 # -----------------------------------------------------------------------------
 tags:
   mood:
