@@ -1,70 +1,28 @@
-{% comment %} ── THE PAGE'S FURNITURE LINE: the back arrow, and print · pdf ──
-  Issue #387 (the arrow) and #1210 (print and pdf at its right end,
-  2026-09-30). A row at the top of every recipe and drink page: the arrow at
-  its left end returning to the index it came from, and at its right end the
-  two things you do WITH the page, print and pdf (page-print.html), rendered
-  only when the layout passes `actions=true` -- the two page layouts do, the
-  magic-bag page does not, because no PDF is rendered beside it.
+{% comment %} ── The page's furniture line: the back arrow, and print · pdf ──
+   A row at the top of every recipe and drink page (#387, #1210): the arrow at
+   the left, and at the right print and pdf (page-print.html), rendered only
+   when the layout passes `actions=true`. The magic-bag layout does not: no PDF
+   is rendered for it.
 
-  THE SEARCH BOX HELD THAT RIGHT-HAND END FROM #1024 (2026-09-14) UNTIL #1210.
-  Helen's placement then was "back arrow's line, but on the right not in the
-  centre"; on 2026-09-30 she moved it to the header, directly under the door
-  to the other site, and made it a local-build-only testing tool -- "so I'm not
-  clicking about all over the place" -- and gave its end of this line to print
-  and pdf: "actually on the top right, so where the omnisearch currently is."
-  The box, its script and the whole record of how it came to be what it is are
-  _includes/page-search.html's now.
+   The arrow is a real link first: its href is this site's own index, from
+   _data/sites.yml, and works with no JavaScript. assets/js/back-link.js
+   upgrades it to history.back(), only when it can prove you arrived from that
+   index. history.back() rather than rebuilding the index from a URL, because
+   with no filters set the index reshuffles on every fresh load (MANUAL 13.7);
+   history restores filters, page, order and scroll position.
 
-  THE ARROW IS A REAL LINK FIRST, AND AN ENHANCEMENT SECOND, which is the whole
-  design. The href points at this site's own index (from _data/sites.yml, so a
-  cocktail goes back to /cocktails/ and a recipe to /food/) and works with no
-  JavaScript, from a bookmark, from a search result, anywhere.
-  assets/js/back-link.js then upgrades it to history.back() -- and ONLY when it
-  can prove you actually arrived from that index.
-
-  WHY history.back() RATHER THAN REBUILDING THE INDEX FROM A URL. Helen asked
-  whether this could avoid a refresh "so the index page has the same recipe list
-  I left it with", and the deciding fact is the shuffle: with no filters set the
-  index reshuffles on every fresh load (MANUAL 13.7). So a link that rebuilds
-  the index from a query string -- even a perfect one carrying every filter --
-  hands back a correctly filtered list in a DIFFERENT ORDER, which is not the
-  list she left. Going back through history restores the page from the browser's
-  cache instead: filters, page number, shuffle order and scroll position all
-  intact, because the page was never re-rendered.
-
-  The row is page furniture, not chrome: it lives in the page layouts rather
-  than in default.html, because it is about where THIS page sits, not about
-  the site shell. See MANUAL 2.5 for that boundary -- and page-search.html
-  for the one thing that crossed it the other way.
+   The row is page furniture, not chrome: it lives in the page layouts, not in
+   default.html (MANUAL 2.5).
 {% endcomment %}
 {% assign back_site = site.data.sites[page.site_key] %}
 {% if back_site %}
 <div class="page-furniture">
   <a class="back-to-index" href="{{ back_site.home | relative_url }}" aria-label="Back to {{ back_site.title }}">
-    {% comment %} A DRAWN ARROW, NOT `&larr;` -- #1119, 2026-09-16. Helen: "back
-       arrow and site door in navbar should use the same graphic", and asked for
-       the navbar's: the site door (default.html's `.site-nav-icon-link`) is the
-       word plus icons/arrow-right.svg, and this is that same file, mirrored.
-
-       THIS IS #993'S FIX ARRIVING AT ITS SECOND SITE, and the reason is already
-       written out in full beside the navbar's own include. Courier Prime ships
-       here as an 18KB subset with NO arrow in it, so `&larr;` was drawn by
-       whatever face the reader's machine substitutes for U+2190 -- and a
-       substituted glyph is a substituted FONT, which changes the metrics and not
-       only the picture. #993 replaced `&rarr;` in the navbar for exactly that;
-       the back arrow was the other one and kept the glyph for four more days.
-
-       MIRRORED RATHER THAN A SECOND FILE, because "the same graphic" is the
-       whole of the ask: one artwork, one stroke weight, one set of end caps, and
-       no pair of files to keep in step. `transform: scaleX(-1)` is in
-       shared/_chrome.scss with the size.
-
-       THE SIZE DOES NOT CHANGE AND IS NOT #993'S. Helen set this arrow at 3rem
-       in #411, looking at it, over my 1.6rem -- "this is the only control on a
-       recipe page and has no row of siblings to be consistent with". The navbar's
-       arrow is 0.62rem because it sits beside a word. Same graphic, each at its
-       own size; the width here is measured from what the glyph occupied so the
-       furniture line's geometry does not move. {% endcomment %}
+    {% comment %} A drawn arrow, not `&larr;` (#1119): the navbar door's own
+       icons/arrow-right.svg, mirrored with `transform: scaleX(-1)` in
+       shared/_chrome.scss, so there is one artwork and no second file. The
+       heading face has no arrow glyph (#993). Its 3rem size is Helen's (#411) and
+       is not the navbar arrow's. {% endcomment %}
     {% include icons/arrow-right.svg class="back-to-index-mark" %}
   </a>
   {% if include.actions %}{% include page-print.html %}{% endif %}

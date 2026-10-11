@@ -1,44 +1,27 @@
 // =============================================================================
-// THE SHORTLIST — GitHub issue #546.
+// THE SHORTLIST (#546)
 // =============================================================================
 // Two controls, and they are different kinds of thing:
 //
 //   .btn-shortlist       marks ONE recipe. On a row at the right-hand end of the
-//                        index, and on a recipe page at the right-hand end of
-//                        the INGREDIENTS line, as a pill (#1210; the pill is
-//                        shared/_furniture.scss's, the colours are below).
-//   .btn-shortlist-only  shows only what is marked. One per index, on the
-//                        results heading beside the count it changes.
+//                        index, and on a recipe page as a pill (#1210; the pill
+//                        is shared/_furniture.scss's, the colours are below).
+//   .btn-shortlist-only  shows only what is marked. One per index, under the
+//                        count it changes.
 //
-// GREY OFF, MAGENTA ON — Helen, 2026-09-04: "I don't have a strong opinion on
-// colour for food, so hot-magenta by default I guess!", and "Grey for inactive".
-// Neither is a new value. $color-clear-text is this site's existing
-// de-emphasised-UI grey (the inline clears, the footer), and magenta is what
-// _palette.scss calls "this site's one accent... a colour that already means
-// interactive here". A shortlist toggle is interactive and is a choice the
-// reader is making, which is the same claim every other magenta on the page
-// makes.
+// Grey off, magenta on. $color-recipe-link for the on state, not the raw
+// $color-dazzling-dragonfruit: the darkened one is the text-carrying member of
+// the pair (_palette.scss). Hover goes to the raw, lighter hue, as every link
+// here does.
 //
-// $color-recipe-link, NOT the raw $color-dazzling-dragonfruit, for the ON state. The
-// raw hue is 3.4:1 on this ground and is used for RULES and FILLS; the darkened
-// one is the text-carrying member of the pair at 5.26:1, and _palette.scss
-// spells that division out. Hover goes to the raw hue, which is the "hover goes
-// lighter" direction every other link on this site already takes.
-//
-// THE WORD NEVER CHANGES AND THE MARK DOES. `+` when it is off, `✓` when it is
-// on, drawn here in ::before rather than swapped by JavaScript — see
-// shortlist.js for #494's finding that a label swapping between two words has
-// to be read as either the state or the action with nothing on screen to say
-// which. It also means the control cannot change width, which is what lets one
-// sit at the end of a row without the row's layout moving when it is pressed.
-// aria-pressed carries the state for anyone not looking at the colour.
+// The word never changes and the mark does: `+` off, `✓` on, drawn in ::before
+// (shortlist.js sets the class and aria-pressed). So the control cannot change
+// width, and a row does not move when one is pressed.
 // =============================================================================
 
 // --- The mark ----------------------------------------------------------------
-// A fixed box, so the two glyphs cannot lay out differently. `+` and `✓` are not
-// the same width in $font-body and would otherwise shift the word by a fraction
-// of a character on every press — invisible on one control and obvious down a
-// column of 86 of them.
+// A fixed box: `+` and `✓` are not the same width in the face, and would shift
+// the word on every press.
 %shortlist-mark {
   &::before {
     content: '+';
@@ -46,8 +29,6 @@
     width: 0.85em;
     margin-right: 0.25em;
     text-align: center;
-    // The mark is the state, so it may be a shade heavier than the word without
-    // the word having to change weight with it.
     font-weight: 700;
   }
 
@@ -57,14 +38,9 @@
 .btn-shortlist {
   @extend %shortlist-mark;
 
-  // COURIER CAPS SINCE 2026-09-14 (#1005), the drink page's own treatment for
-  // this control, so the two sites draw one action one way. Helen: "let's try
-  // all actions in capitals (shortlist button at top of index lists too) to
-  // help show they're actions". It was matched to .btn-clear-inline -- sans,
-  // small, lowercase -- which is the index's QUIET control, and this is not
-  // quiet: it is the one thing on a row that changes something. Same size and
-  // tracking as _sass/cocktails/_shortlist.scss's, only the colours differ,
-  // which is the whole shape of this repo's split.
+  // Courier caps (#1005): an action wears capitals on both sites. Same size
+  // and tracking as _sass/cocktails/_shortlist.scss's; only the colours
+  // differ.
   font-family: $font-headings;
   font-size: 0.78rem;
   font-weight: 700;
@@ -77,11 +53,9 @@
   cursor: pointer;
   white-space: nowrap;
 
-  // The three resets %link-button carries, and here for the reason its own
-  // comment gives: this control sits in no heading today, but a heading's
-  // letter-spacing, text-stroke and text-shadow all INHERIT, so a placement
-  // that does sit in one would quietly wear the heading's emboss. Cheaper to
-  // carry than to rediscover.
+  // A heading's letter-spacing, text-stroke and text-shadow all inherit, so a
+  // placement inside one would otherwise wear the heading's emboss (as
+  // %link-button in _recipe-header.scss resets them).
   -webkit-text-stroke: 0;
   text-shadow: none;
 
@@ -93,35 +67,24 @@
 
   &.is-on {
     color: $color-recipe-link;
-    // Not bold. The colour and the ✓ are two signals already, and a third that
-    // changes the word's WIDTH is the one thing the fixed-width argument above
-    // exists to prevent.
+    // Not bold: a weight change would change the word's width.
     &:hover,
     &:focus-visible { color: $color-recipe-link-hover; }
   }
 }
 
 // --- On an index row ---------------------------------------------------------
-// The `<li>` is already `display: flex` with `.recipe-row-content` at `flex: 1`
-// (see _recipe-list.scss), so this needs no positioning: it is the second flex
-// item and lands at the right-hand end on its own.
+// The `<li>` is `display: flex` with `.recipe-row-content` at `flex: 1`
+// (_recipe-list.scss), so the button is the second flex item and lands at the
+// right-hand end.
 //
-// LEVEL WITH THE TITLE, SINCE 2026-09-11 -- #961, Helen: "align shortlist button
-// with title not ingredients." It was `align-self: center`, on the reasoning
-// that a control pinned to the top of a tall row reads as floating -- but the
-// middle of a row is its ingredient line, which on a phone is two lines under
-// a title that may itself wrap, so the button sat beside the wrong thing.
+// Level with the title (#961), by construction: it starts at the row's top and
+// takes the title's own line box as its line-height, in rem because its font
+// is smaller than the title's. Its word then sits on the centre of the title's
+// first line however many lines the title runs to.
 //
-// BY CONSTRUCTION, NOT BY A MEASURED NUDGE: the button starts at the row's top,
-// which is where the title starts, and takes the title's own line box as its
-// line-height -- stated in rem because the button's font is smaller than the
-// title's, so the ratio alone would give it a shorter line. Its word then sits
-// on the centre of the title's FIRST line, whether the title is one line or
-// three, and follows $recipe-title-size if that ever moves.
-//
-// flex-shrink: 0 for the reason .recipe-actions gives on the recipe page: the
-// label is nowrap, so a shrinkable box would let it spill rather than wrap. The
-// ingredient line beside it already clamps and has room to give.
+// flex-shrink: 0 because the label is nowrap, so a shrinkable box would let it
+// spill.
 .recipe-list .btn-shortlist {
   align-self: flex-start;
   line-height: $recipe-title-size * $recipe-title-line-height;
@@ -130,52 +93,19 @@
 }
 
 // --- Shortlisted-only --------------------------------------------------------
-// On the results heading, beside "N survivors" — the same kind of fact, and the
-// reason it is not in META FILTERS is in food/index.html: that block is gated on
-// show_source_wording and so is local-only, and this is the one filter here that
-// exists for a visitor rather than for Helen.
+// A pill on its own line under the count (`.results-count-row`,
+// food/index.html), the same shape and placement as cocktails' in food's
+// colours. Not in META FILTERS: that block is gated on show_source_wording and
+// so is local-only, and this filter is for a visitor.
 //
-// A PILL ON ITS OWN LINE UNDER THE COUNT, SINCE 2026-09-05 — Helen, having
-// settled the cocktails version (#729/#730): "could you style the food page's
-// shortlist toggle the same way? Same location, let's say same font and pill etc
-// too because that page already uses a pill as a you-can-click-me. Just take
-// food page colours."
-//
-// SO THE SHAPE AND THE PLACEMENT ARE SHARED AND ONLY THE PALETTE IS NOT, which
-// is the split this whole repo is built on: the store, the wiring and the event
-// are one implementation and each site brings its own colours. `$font-headings`
-// needs no per-site thought here at all — the two palettes resolve it to the
-// same Courier Prime stack, so "same font" is literally true rather than
-// approximately.
-//
-// IT WAS AN UNDERLINED TEXT LINK, sitting inside `.results-heading` directly
-// after the count. Both of those changed together and the second follows from
-// the first: as a pill it is an OBJECT rather than a word, and an object sharing
-// a baseline with the count read as part of the sentence rather than as a
-// control beside it. `.results-count-row` in food/index.html is where it went.
-//
-// ONE HONEST DIFFERENCE FROM COCKTAILS, and it is food's existing vocabulary
-// rather than a preference. Helen's reason for accepting a pill here is that
-// "that page already uses a pill as a you-can-click-me" — and it does, but food
-// draws its pill as a TAPE SHAPE (`.tag-shape`, an svg behind the word on
-// `.btn-tag` / `.btn-star`), not as a border. Cocktails' pill is a 1.5px border
-// because that is what `%drink-btn-base` already was there. So the two sites
-// agree about the SHAPE a clickable thing takes and differ about how it is
-// drawn, exactly as they already do everywhere else. A border is the right
-// choice of the two here: the tape shape is the filter matrix's own mark and
-// this control is not a filter on a recipe's properties.
-//
-// THE STATE COLOURS ARE UNCHANGED from the link version — $color-clear-text
-// resting, $color-recipe-link when on, $color-recipe-link-hover on hover. They
-// were already food's answer to "a thing the reader is choosing" and nothing
-// about becoming a pill re-opens that question.
+// A border, not the tape shape (`.tag-shape`) food's filter chips wear: the
+// tape is the filter matrix's own mark, and this is not a filter on a recipe's
+// properties.
 .btn-shortlist-only {
   font-family: $font-headings;
   font-size: 0.8rem;
   font-weight: 400;
-  // UPPERCASE SINCE 2026-09-14 (#1005) -- Helen: "shortlist button at top of
-  // index lists too". A view switch is an action, and on both sites an action
-  // now wears capitals; the pill, the border and the colours are unchanged.
+  // A view switch is an action, so capitals (#1005).
   text-transform: uppercase;
   letter-spacing: 0.06em;
 
@@ -191,11 +121,9 @@
   color: $color-clear-text;
   transition: color 0.12s ease-in-out, border-color 0.12s ease-in-out;
 
-  // THE BORDER MOVES WITH THE TEXT, unlike cocktails, where the border alone
-  // carries the state. On a dark ground a 1.5px line going magenta is the
-  // loudest thing on the control; on this paper the same line in dragonfruit
-  // against $color-border's #ebdbe0 is a much quieter event, so the text keeps
-  // the job it already had and the border joins it.
+  // The border moves with the text. On cocktails' dark ground the border
+  // alone carries the state; on this paper a 1.5px line changing colour is
+  // too quiet to do it alone.
   &:hover,
   &:focus-visible {
     color: $color-recipe-link-hover;
@@ -215,10 +143,9 @@
   }
 }
 
-// THE LOCAL-ONLY DRAFTS SWITCH -- #1358, 2026-10-10. The pill above, on a line
-// of its own under it ("Under the SHORTLISTED button is fine"), pulled up by
-// half the count row's gap so the two read as a pair. Only a local build emits
-// the element (food/index.html); the rule is inert on the deployed site.
+// The local-only drafts switch (#1358): the pill above, on a line of its own
+// under it, pulled up so the two read as a pair. Only a local build shows the
+// element (food/index.html).
 .btn-drafts-toggle { @extend .btn-shortlist-only; }
 
 .drafts-toggle-row {

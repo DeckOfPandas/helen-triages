@@ -7,48 +7,27 @@ sitemap: false
 excerpt_separator: ""
 ---
 
-{% comment %} ─────────────────────────────────────────────────────────────────
-  GLASSES SWATCH — internal reference, never published.
+{% comment %} Glasses swatch: internal reference, never published.
 
-  `site_key: cocktails` IS LOAD-BEARING AND IS NOT COSMETIC. default.html picks
-  the stylesheet through `site.data.sites[page.site_key].css`, and its own
-  comment warns exactly what happens without one: "If a future page is ever
-  rendered through default.html with no site_key, it will silently get NO
-  stylesheet at all". This page was that future page. With no CSS there is no
-  `.glass-icon-line` rule, so every path fell back to the SVG default of
-  `fill: black, stroke: none` and the whole set rendered as silhouettes — with
-  compound paths subtracting from each other, which looked like broken artwork
-  rather than a missing stylesheet. Nothing was wrong with the icons.
+   `site_key: cocktails` is load-bearing: default.html picks the stylesheet
+   through it, and without one there is no `.glass-icon-line` rule, so every
+   path falls back to the SVG default fill and the set renders as silhouettes.
+   Check an icon on the page the browser serves, never in a renderer that
+   applies the stroke itself.
 
-  THE LESSON, WHICH IS WHY THIS IS WRITTEN DOWN: the first version of this page
-  was checked against a Python renderer that applied the stroke treatment
-  ITSELF. It therefore looked perfect whether or not the site's CSS ever
-  arrived — a test that could not fail. The only honest check of how an icon
-  looks is the page the browser actually serves.
-
-  NEVER PUBLISHED IS A CONFIG FACT, NOT A PROMISE MADE HERE. The `dev`
-  collection is `output: false` in _config.yml and flipped to true only in
-  _config_local.yml, so a production build gives this page no URL and no
-  sitemap entry. Verified live: port 4002 returns 404 for /dev/glasses/ while
-  serving /food/ fine. Issue #276 deleted the last two swatch pages because
-  they were internal references that got published anyway — "unlinked" is not
-  "unpublished", and this is the mechanism that actually holds.
-
-  EVERY NUMBER ON THIS PAGE IS COUNTED LIVE from site.cocktail_drafts, and
-  every viewBox is read from the SVG itself rather than written down. A swatch
-  page whose numbers are stale is worse than no swatch page: it looks like
-  evidence.
-────────────────────────────────────────────────────────────────────────────{% endcomment %}
+   Never published is a config fact: the `dev` collection is `output: false`
+   in _config.yml and true only in _config_local.yml (#276). Every number on
+   the page is counted live from site.cocktail_drafts, and every viewBox is
+   read from the SVG. {% endcomment %}
 
 {% assign icon_map = site.data.cocktails.glasses.icons %}
 {% assign all_icons = site.data.cocktails.glasses.all_icons %}
 
 {% assign heights = site.data.cocktails.glasses.heights_mm %}
 
-{% comment %} Tallest REAL glass, so the relative-scale view can be sized off it
-   without a magic number. Deliberately NOT the tallest viewBox: a viewBox says
-   how the artwork was drawn, not how big the glass is, and the two disagree —
-   `shot` is drawn taller than `rocks` and is 25mm shorter in the world. {% endcomment %}
+{% comment %} Tallest real glass, so the relative-scale view can be sized off it without
+   a magic number. Deliberately not the tallest viewBox: a viewBox says how
+   the artwork was drawn, not how big the glass is. {% endcomment %}
 {% assign tallest_mm = 0 %}
 {% for icon in all_icons %}
   {% assign mm = heights[icon] | times: 1.0 %}
@@ -89,10 +68,7 @@ excerpt_separator: ""
     {% for icon in all_icons %}
       {% capture icon_file %}icons/glasses/{{ icon }}.svg{% endcapture %}
       {% assign mm = heights[icon] | times: 1.0 %}
-      {% comment %} 10.4, matching _layouts/cocktail.html. This read 2.6 for
-         half a day after the prose above was updated to say 10.4 -- the words
-         changed and the arithmetic did not, which is precisely the failure
-         that paragraph is complaining about. If you edit one, edit both.
+      {% comment %} 10.4 is the figure the prose above states. If you edit one, edit both.
       {% endcomment %}
       {% assign icon_rem = mm | divided_by: tallest_mm | times: 10.4 %}
       <span class="cocktail-glass-icon" style="--glass-icon-height: {{ icon_rem }}rem" title="{{ icon }} — {{ mm | round }}mm">{% include {{ icon_file }} %}</span>
@@ -155,10 +131,9 @@ excerpt_separator: ""
       {% endfor %}
       {% assign spelling_list = spellings | split: "|" %}
 
-      {% comment %} How many drinks land on this icon, counted live. Mirrors the
-         layout's own rule: the FIRST entry in a drink's glass list that has an
-         icon is the one drawn, so a drink is counted once and only for that
-         icon — not once per spelling it happens to mention. {% endcomment %}
+      {% comment %} How many drinks land on this icon, counted live. Mirrors the layout's own
+         rule: the first entry in a drink's glass list that has an icon is the one
+         drawn, so a drink is counted once, for that icon. {% endcomment %}
       {% assign uses = 0 %}
       {% for drink in site.cocktail_drafts %}
         {% assign drawn = "" %}
@@ -222,12 +197,10 @@ excerpt_separator: ""
     {% endif %}
   </ul>
 
-  {% comment %} `drink.glass | size`, NOT `drink.glass.size`. For a drink with no
-     glass key at all the value is nil, and nil.size is nil rather than 0 — so
-     `.size == 0` is false for every one of them and this counter renders a
-     confident 0 while 28 drinks sit unglassed. The `size` FILTER coerces nil to
-     0. Same family as the empty-array-is-truthy trap the layout guards against,
-     and just as silent: a wrong number, not a missing one. {% endcomment %}
+  {% comment %} `drink.glass | size`, not `drink.glass.size`. For a drink with no glass key
+     the value is nil, and nil.size is nil rather than 0, so `.size == 0` is
+     false and the counter renders a confident 0. The `size` filter coerces nil
+     to 0. {% endcomment %}
   {% assign no_glass = 0 %}
   {% for drink in site.cocktail_drafts %}
     {% assign n = drink.glass | size %}
@@ -239,27 +212,15 @@ excerpt_separator: ""
     about the serve, not a key in the map.
   </p>
 
-  {% comment %} ── 5. THE DOUBLE OLD-FASHIONED, AND EVERY CANDIDATE ────────────
-     Added 2026-08-26. Helen dropped a corrected `glass-old-fashioned-double`
-     after saving one file over another, then: "It's possible I'll prefer the
-     original one, the one I thought I'd lost. Could you update the glass
-     swatch page we used earlier with all?"
-
-     THE DOUBLE ROW IS AT TRUE RELATIVE HEIGHT, deliberately, because that is
-     where the difference between the two lives. Canvas size is not what you
-     see: an icon renders at the height `heights_mm` gives it, so a drawing
-     with empty margin inside its viewBox renders SMALLER even though its
-     viewBox is bigger. Measured on the two files -- the previous double's ink
-     fills 99% of its canvas height, the new one's fills 76%.
-
-     Everything below the double row is every drawing in
+  {% comment %} ── 5. The double old-fashioned, and every candidate ──
+     The double row is at true relative height: an icon renders at the height
+     `heights_mm` gives its viewBox, so a drawing with empty margin inside its
+     viewBox renders smaller. The candidates below it are every drawing in
      _design_sources/cocktails/glasses/, normalised into
-     _includes/icons/glass-candidates/ by tmp/build_candidates.py. They are
-     VIEWING COPIES for this page and nothing else: not published icons, not
-     in `all_icons`, and in a sibling directory so the icon-set tests cannot
-     see them. Includes the rejects and the superseded options, which is the
-     point -- this is the drawer, not the shelf.
-  ────────────────────────────────────────────────────────────────────{% endcomment %}
+     _includes/icons/glass-candidates/ by scripts/build_glass_candidates.py.
+     They are viewing copies for this page only: not published icons, not in
+     `all_icons`, and in a sibling directory so the icon-set tests cannot see
+     them. {% endcomment %}
 
   <h2>5. The double old-fashioned &mdash; at the size the site draws it</h2>
   <p class="dev-note">
@@ -280,13 +241,9 @@ excerpt_separator: ""
     from rendering each icon and taking the ink's bounding box.
   </p>
 
-  {% comment %} SETTLED, 2026-08-26, and the row is down to two. Helen chose the
-     drawing that fills its canvas and deleted every other old-fashioned and
-     rocks variant -- seven sources went, two remain, and there is no longer a
-     `-2` to compare against. Kept as a section rather than removed because
-     this is where a future redraw gets checked BEFORE it publishes: the trap
-     it caught is that `heights_mm` sizes the viewBox, so a drawing with margin
-     inside it renders small no matter what the data says. {% endcomment %}
+  {% comment %} Kept as a section because this is where a redraw is checked before it
+     publishes: `heights_mm` sizes the viewBox, so a drawing with margin inside
+     it renders small whatever the data says. {% endcomment %}
   {% assign double_row = "old-fashioned|85,old-fashioned-double|100" | split: "," %}
   <div class="dev-scale">
     {% for entry in double_row %}
@@ -363,41 +320,17 @@ excerpt_separator: ""
   .dev-candidate-art svg { height: 5.4rem; width: auto; max-width: 6.5rem; overflow: visible; }
   .dev-scale-art { display: flex; align-items: flex-end; overflow: visible; }
   /* height comes from the inline style, computed from the real-world mm.
-     overflow:visible on the svg matters because the default UA stylesheet
-     sets `overflow: hidden` on the root <svg> element -- not a CSS default,
-     a browser-specific one for the element itself -- so a stroke whose
-     rounded join or cap sits right on the viewBox edge (a glass belly, a
-     stemmed glass's top corners) gets sheared off. 2026-08-26, Helen: "the
-     tops of nick and nora, one side of the new collins glass, and the outer
-     edges of the brandy glass belly" were all this, not the artwork. */
+     overflow:visible on the svg matters: the UA stylesheet sets
+     `overflow: hidden` on the root <svg>, so a stroke whose rounded join or
+     cap sits on the viewBox edge gets sheared off. */
   .dev-scale-art svg { height: 100%; width: auto; max-width: none; overflow: visible; }
 
-  /* THE STROKE MUST BE SCALED UP WITH THE ICON HERE, AND THIS IS NOT A DETAIL.
-     `vector-effect: non-scaling-stroke` holds the glasses at 1.6 SCREEN pixels
-     however large the icon is drawn — that is correct on the site, where every
-     icon renders at one size. Enlarge them without touching it and the stroked
-     glasses stay hairline while a FILLED drawing, whose lines are geometry
-     rather than stroke, scales normally. The set then looks mismatched and the
-     filled one looks fat, which is exactly what Helen saw on 2026-08-18 and
-     reported as a pineapple problem. It was this page's problem: the artwork is
-     fine.
-
-     THERE IS NO LONGER AN EXAMPLE IN THE SET. The pineapple and the coconut
-     became stroked line art on 2026-09-05 and the tiki mug on 2026-09-06
-     (#738), so every drawing scales with this rule and none is a filled
-     shape. (The mule mug's nine dimples, 2026-10-02, are filled DOTS on a
-     stroked path -- `.glass-icon-dot` -- so they thicken with this rule
-     too.) The rule below
-     is unchanged and still needed -- it is what makes an enlarged view show the
-     weight the site actually draws.
-     Values are the site's 1.6 times each view's magnification over 2.6rem --
-     and 2.6rem is the OLD drink-page scale, replaced by 10.4rem on 2026-08-26.
-     The two numbers below are left exactly as they were rather than
-     recomputed: they were tuned by eye against these views' own
-     magnifications, and this page's views did not change, only the site's
-     baseline did. So the arithmetic in this sentence no longer reconstructs
-     them. Re-derive from the views if they ever look wrong; do not trust the
-     formula. */
+  /* The stroke must be scaled up with the icon here. `vector-effect:
+     non-scaling-stroke` holds the line at a fixed screen width however large
+     the icon is drawn, so an enlarged view would show a hairline, and any
+     filled drawing beside it would look fat. The two values below were tuned
+     by eye against these views' magnifications; re-derive them from the views
+     if they look wrong. */
   .dev-scale-art .glass-icon-line { stroke-width: 4.6; }
   .dev-card-big .glass-icon-line  { stroke-width: 3.7; }
   .dev-scale-label {

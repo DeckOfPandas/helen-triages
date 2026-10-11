@@ -136,6 +136,13 @@ of a bump: `.devcontainer/run.sh` stamps each image with a hash of
 `.devcontainer/` and rebuilds when the hash no longer matches
 (`.devcontainer/README.md`).
 
+**`.devcontainer/build_inputs_hash.py` reads `.dockerignore` as exact
+filenames only, and fails wide**: a line holding `*`, `/`, `!` or `?` makes it
+hash everything, a spurious rebuild and never a missed one. Never list a file
+the Dockerfile copies (`tests/test_devcontainer_hash.py`). The stamp cannot
+see the base image or an apt package moving upstream; that wants
+`docker build --pull --no-cache` by hand.
+
 | Command | Does |
 |---|---|
 | `sh scripts/browser/build.sh` | builds exactly what deploys into `tmp/site` |
@@ -170,6 +177,16 @@ Read the PNGs with the Read tool. Traps:
 - **A control that exists only on a local build** (the header search box,
   §2.5) is not in `build.sh`'s output. Build with
   `--config _config.yml,_config_local.yml -d tmp/site` before cropping it.
+- **Headless Chromium snaps a monospace advance and a baseline to whole
+  pixels**, so a screenshot's line breaks are not Helen's. Compute how many
+  characters fit from the face's 0.6em advance, and measure a baseline on type
+  laid out many times too big, as `scripts/card_tagline_baseline.py` does.
+- **The index shuffles, so `.drink-card:first-child` is a different drink in
+  every screenshot.** For a before and after of a card, crop the related
+  cards on a drink page: the same cards every build.
+- **When a pixel reading disagrees with the CSS you just compiled, suspect the
+  reading.** Say which mark the sample landed on before reporting that a
+  change did not apply.
 
 #### Config, and what `jekyll serve` does not reload
 
@@ -301,6 +318,11 @@ Grep for `@import "shared/` across `assets/css/` and `_sass/` before
 renaming or splitting a shared partial: the importer you forget is the one
 that fails at the next build of a page you never visit.
 
+**A site's own partial loads after the shared one it follows, so a per-site
+rule at equal specificity silently undoes a shared change on that site only.**
+Before changing a shared value, grep `_sass/food/` and `_sass/cocktails/` for
+the same selector.
+
 **Forked**, because cocktails is philosophically distinct and not a reskin (a
 recipe is a procedure; a cocktail is a formula plus a build):
 `_layouts/recipe.html` vs `cocktail.html`; `_data/food/` vs
@@ -412,6 +434,14 @@ second column cannot push them off centre. Once the footer stacks, a short
 hairline sits over `about` so it does not read as the last column's next
 link.
 
+**Trap: a definite `grid-column` with an auto row is still auto-placed.**
+Items are placed in DOM order, so an earlier auto item takes row 1 column 2
+and the pinned one drops to row 2; a `_data/sites.yml` edit alone can do it.
+Every footer item names its row and its column. **And a hover on the link
+does not reach a child that sets its own `color`**: the icon follows
+`currentColor`, `.site-footer-ref-word` does not, so the hover rule names the
+word too.
+
 **A link may be `local_only: true`, and that gates the link, not the page.**
 The template drops such a link unless `show_local_reference_links` is set, and
 a site left with no surviving links draws no column. It is half a switch and
@@ -432,7 +462,10 @@ cocktails page and a recipe, byte for byte, and requires each site's row to
 name the other site and not itself. If it ever needs an exception carved into
 it, that exception is a second header arriving.
 `test_every_chrome_class_has_a_rule_in_every_site_stylesheet` compares the
-compiled CSS for every class the template and the icon partials emit.
+compiled CSS for every class the template and the icon partials emit. Its
+pattern refuses braces, so a Liquid conditional inside a `class` attribute
+drops every class in that attribute from the checked set while the test
+passes. That is why the `site-neutral` header is two whole `<header>` tags.
 
 **The one thing the chrome varies is the wordmark**, `[ FOOD ]` /
 `[ COCKTAILS ]`, in `.site-title-link` above the nav row. §13.8 has its
@@ -721,6 +754,17 @@ document that does not pass:
   visible while you work.
 - Drafts and `dev` pages are protected by `output: false` and are not gated;
   gating a collection whose documents carry no `meta` would delete it.
+- **A new or tighter leg can only take pages off the site**, and whatever
+  passed only the looser rule leaves silently. Before building one, write
+  each combination of flags as a sentence about what does and does not reach
+  the live site and show Helen; then count what it will hold back
+  (`python3 scripts/dark_pages.py origin/main`) before the change, not after.
+- **The gate removes the page and leaves every link to it**, so an agent's
+  flip on a linked-to recipe turns
+  `test_no_link_in_the_production_build_points_at_a_file_that_isnt_there`
+  red, and the caramel recipe is several tests' control page. Such an edit
+  cannot merge by itself: `PIPELINE.md` §5 has the two ways through, and
+  `scripts/needs_helen.py` names the linking pages.
 
 **Always `awaiting_fix` with an underscore.** Liquid parses
 `page.meta.awaiting-fix` as subtraction, so a template asking about the
@@ -1709,7 +1753,9 @@ deliberately holding.
 The staging folders in a drafts repo are `1-rewrite/` (food only), `2-make/`,
 `3-keep/`, `4-promote/` and, for cocktails, `5-final-proofread/`;
 `PIPELINE.md` §3 says what each means. Anything in `4-promote/` is waiting on
-Claude and anything in `5-final-proofread/` is waiting on Helen.
+Claude and anything in `5-final-proofread/` is waiting on Helen. Both drafts
+repos therefore hold subfolders: a script or migration that globs `*.md` at
+the top level misses files, so search them recursively.
 
 ### 9.1.1 The cocktails publication gate — three flags, and the index that reads them
 
@@ -1957,6 +2003,15 @@ hand-edited mood cannot outlive the rule.
   writes and the deriver keeps.
 - `mood_include` / `mood_exclude` are her per-cocktail overrides, each naming
   the single mood it is about.
+- **A mood that keeps coming back after Helen removes it is a wrong field
+  under it** (a `serve.ice` left over from an earlier glass). Fix the field
+  and the mood derives away; `mood_exclude` is for a disagreement with the
+  rule, not with the data.
+- **A new derived mood that lands on published cocktails ships invisible.**
+  The derivation edits each file, the agent edit sets `proofread: false`, the
+  gate holds the page, and `cocktails/index.html` draws no button for a mood
+  with no member in the build. Nothing fails. Tell Helen before the merge how
+  many published cocktails it takes off the site.
 - **A `water` line is invisible to every rule** (`NOT_A_POUR`); the deriver
   drops it before anything is counted.
 - **`no measuring` is the one rule that reads amounts**: every measured amount
@@ -2211,6 +2266,17 @@ it, do not quote its size.
 - **Aliases are how a bottle keeps one identity** (Planteray is Plantation
   renamed; canonical is Planteray, old spellings stay as aliases). The rule
   governs what is written, the alias map what can be read.
+- **A generic with one bottle behind it is that bottle, invisibly.** Removing
+  the bottle zeroes the cost and strength of every cocktail that asks for the
+  generic with no bottle named. `test_every_priceable_pour_has_a_price` and
+  `test_every_counted_pour_can_reach_a_strength` catch this; count the
+  bottles sharing a `generic` before removing one.
+- **A bottle rename spans both repos and no single-repo step stays green**:
+  `test_every_suggestion_is_the_declared_bottle_name` wants the staged
+  cocktail's string to equal the declared key. Merge the public and the
+  drafts pull requests back to back. A generic has no alias mechanism
+  (`family_aliases` maps families), so a generic rename declares both
+  spellings through the gap and drops the old one in a later pull request.
 
 **Why a bottle table is allowed when `character` has none**: a bottle's
 category is bottle-invariant — Appleton 12 is a moderately aged Jamaican in
@@ -2465,7 +2531,7 @@ not yet rated.
 `garnish`'s `["no garnish"]` and `[]` are §9.12.1. The cocktails test suite is
 §10.
 
-### 9.7 Two Liquid traps in the cocktail layout
+### 9.7 Liquid traps in the cocktail layout
 
 General Liquid traps (§12), kept here because the layout's header cites this
 number.
@@ -2475,6 +2541,12 @@ number.
 - **An empty string and an empty array are both truthy.** A bare `if` on
   `source: ""` prints a "Source:" line with nothing after it. A list-gated
   section tests `.size > 0`; a string-gated one compares against `""`.
+- **`sort` is ASCII, so a capital sorts before every lowercase letter** and
+  `I want to faff` jumps ahead of `aperitivo`. Every list of moods or names a
+  reader sees uses `sort_natural`; no test holds it.
+- **`glass_icon` starts at `""` and is tested against `""`, and the guard is
+  not removable** although every cocktail now names a glass: an empty
+  filename handed to the include tag is a hard build failure.
 
 ### 9.8 What cocktails borrows from food
 
@@ -2854,6 +2926,9 @@ champagne" carries all of it. The tail of a method is never canonicalised.
   proposal tests, the ingest preflight, the standalone ingest document. The
   slot takes the ingredient as the recipe names it. One slot is the ceiling; a
   step that needs two is tail.
+- **Order matters among `shapes`: the first match wins.** A narrower sentence
+  sits above the plain one that also matches it, as the two lime-shell lines
+  do; the file's comments say which.
 - **The strain group is five bare techniques**, because the glass and the ice
   are fields (§9.10a).
 - **A vocabulary that keeps growing is usually absorbing a fact that belongs in
@@ -2890,7 +2965,11 @@ The rules for the awkward cases:
 - **A garnish is not** an ingredient (anything with an amount), a rim
   (`serve.rim`) or serveware (`to_serve`), and must not restate a method step.
 - `no_article` lists the garnishes the generated "Garnish with…" step prints
-  without "a" or "an".
+  without "a" or "an". Any garnish ending in `s` also loses it, as a plural,
+  so a singular that ends in `s` would read wrongly: none is declared, and
+  one arriving wants a list of its own in `garnish.yml`, not a cleverer test.
+  The step's parts are joined on `|`;
+  `test_no_garnish_contains_the_join_separator` keeps it out of the names.
 
 ### 9.13 The cocktails visual language, and the index and drink page built from it
 
@@ -3396,6 +3475,13 @@ integer that diagnoses and does not prevent: the failure's first line says
 which side is behind. When a public PR depends on a private branch, name the
 branch in the PR description (`PUBLISHING_A_COCKTAIL.md`).
 
+**The drafts half merges first.** Public data may name a drafts slug
+(`mood_include` in `taxonomy.yml`); drafts never name public data. With the
+public half merged alone,
+`test_every_mood_correction_is_reachable_and_needed` is red on any machine
+holding both clones on `main`, and CI, which has no drafts, cannot see it.
+The one inversion: a drafts PR that names a new public generic merges second.
+
 ### 10.1 Standing rules
 
 - **Auditing coverage is three steps**: grep the tests for `issue #NNN`, diff
@@ -3501,7 +3587,6 @@ the hook wherever there is one.
   clones are present. It makes no network call. **Its first line names the
   checkout: if that is not the worktree you are in, trust nothing else in the
   report.** Its silence is not a guard having passed.
-
 `tests/test_git_guards.py`, `tests/test_text_tool_guards.py` and
 `tests/test_agent_wrappers.py` break each guard and wrapper on purpose.
 
@@ -3565,6 +3650,13 @@ the commit it got. **`scripts/git-push-agent.sh`** refuses a destination of
 `main` on the public repository, a refspec without a colon, one starting `-`,
 and a `dir` outside the checkout; `:<branch>` deletes a remote branch.
 
+**It pushes to a URL, not to the `origin` remote, so `origin/<branch>` never
+moves and cannot answer "is this pushed?"** The tracking ref reads as commits
+behind for the whole session; trusted the other way it licenses rewriting a
+pushed commit. Answer by hash against what this session sent, or with a
+`gh-read.sh` call on the branch or its pull request.
+`scripts/git-fetch-agent.sh` does update the ref, and detaches HEAD.
+
 **`scripts/gh-write.sh`** makes the three routine REST writes:
 
     sh scripts/gh-write.sh pr-create helen-triages data/some-branch "(data) the title" tmp/pr-body.md
@@ -3581,7 +3673,11 @@ not a scope to ask for.
 
 **`scripts/github-public-status.sh <url>`** prints the logged-out HTTP status
 of a page under `DeckOfPandas` or an agent account: 200 is visible; 404 on
-something the API can see is hidden.
+something the API can see is hidden. A hidden account's issues also drop out
+of issue listings, even for that account, while a GET by number still returns
+them; a number missing from both the issue and the pull-request listings is a
+hidden issue. Pace any sweep by number and stop at the first 403: the rate
+limit is shared with every other session.
 
 ### 11.0 The destructive-git hook
 
@@ -3599,7 +3695,10 @@ that tree is dirty, naming what would be lost. Untracked files count as dirty.
 whenever `git stash list` is non-empty, whatever the tree looks like.
 
 Known limit: `bash -c "git reset --hard"` passes, because the command sits in
-a quoted span.
+a quoted span. So does one run from inside a script, which the hook never
+reads. Neither is permission: a proof that needs a commit undone (the one
+that follows a baseline move, §4.0) uses a throwaway branch, checked out,
+committed on, left and deleted.
 
 If it blocks you, read the refusal. The commonest legitimate case is undoing
 an edit you just made, and the answer is to re-edit the file.
@@ -3621,6 +3720,11 @@ a second writable copy of the cocktail drafts (`PUBLISHING_A_COCKTAIL.md`,
 All worktrees share one `.git/config` and one stash list, so a stash made in
 one is poppable from every other. Other worktrees are read-only to you and
 none is ever removed; both rules are `CLAUDE.md`'s.
+
+**The harness removes a helper's worktree that holds no tracked change when
+the helper finishes, and its `tmp/` goes with it.** Work done only inside a
+gitignored drafts clone counts as no change. Such a helper pushes after every
+commit, and a proof script's text goes in the report that cites it.
 
 ### 11.0.2 `/tidy-drafts`
 
@@ -3648,6 +3752,9 @@ engines run in a fixed order and each refuses the next one's job:
 grouped by decision. `scripts/derive_main_ingredients.py` is food's: by
 default it reorders a list and changes no membership, and it never writes to
 `_food_recipes/` (DECISIONS §6).
+
+**A whole method of verbatim book prose in one `Write` can be refused by the
+API's content filter.** Write the source wording one step-pair per `Edit`.
 
 ### 11.0.4 `/ingest-inbox`
 
@@ -3763,8 +3870,18 @@ hand-edited, fix the comment in the generator.
 **A `git fetch` is only good for the moment you ran it.** Fetch again
 immediately before reporting, and say what it showed;
 `session-ground-truth.py` reports only "as last fetched". `git log --branches
---not --remotes --oneline` is the sweep for unpushed work on any branch;
-`git log @{u}..HEAD` asks only the branch you are on.
+--not --remotes --oneline` lists work on any branch that no tracking ref
+holds, but it over-reports here: a push through the wrapper moves no tracking
+ref (§11.-1), so a pushed branch still shows.
+
+**A branch that has sat for days is judged by its diff against today's
+`main`, not its commit message.** The message was true the day it was
+written; `git diff origin/main..<branch>` shows the lines the branch would
+now delete because it predates them, which `git show <branch>` does not.
+
+**A capability measured on the most permissive member of a set proves nothing
+about the set.** What works on the public repo can fail on both private ones.
+Probe the narrowest case, or all three.
 
 **"Lost work" after a disconnect may be sitting in a worktree you have not
 looked in.** `git branch -a -v` and `git worktree list` before reporting
@@ -3792,6 +3909,24 @@ the thing it guards and watch it fail, reading the output and not the exit
 status. Never `return` because a scan came back empty: assert it is non-empty.
 `test_no_whole_corpus_test_can_return_early` catches the bare return, but only
 in a test not parametrised per recipe or draft.
+
+**A proof by mutation can lie in three ways.** Revert the whole change, not
+one branch of it: a half-mutation that passes says nothing about the test.
+Give each run of an in-place mutation its own `PYTHONPYCACHEPREFIX` under
+`tmp/`, because a same-length edit restored within the second leaves a
+bytecode cache that still matches and the next run imports the mutated
+module. And report the fault the proof showed, not the one you reasoned your
+way to.
+
+**A helper defined twice in one test module silently replaces the first**,
+and the failures that follow name the data, not the code. Before defining a
+helper in `tests/test_cocktails.py`, grep for `^def <name>`; when a
+data-shaped failure appears the moment you add code, suspect the code.
+
+**A scan of compiled CSS must print what it matched.** `@extend` puts the
+extending class last in the compound: `&.is-on` inside a placeholder compiles
+to `.is-on.btn-chaos`, so a pattern expecting the button class first misses
+the rule that matters while matching others.
 
 **A source-scanning guard will be fooled by the prose explaining it.** The
 vocabulary of a rule is densest in the comment about it. Strip comments and
@@ -3864,6 +3999,17 @@ and the `..._load_in_dependency_order` tests catch this.
 
 **You will loop a collection that `output: false` did not empty.** §9.1.
 
+**An element named in a script's init guard cannot be deleted from the layout
+alone.** `assets/js/cocktail-scale.js` returns early unless every element it
+needs is present, and the control ships `hidden`, so the scaler vanishes from
+every page with no error while a fixture that still supplies the element
+stays green. When removing markup, grep the scripts and the test fixtures for
+its class.
+
+**`/` is deprecated division in Dart Sass, and a partial loaded by `@import`
+cannot `@use "sass:math"`.** That is why `$wordmark-phone-scale` is the
+literal `0.6667`. Do not tidy it into a fraction.
+
 **CSS: the cascade**
 
 **You will make markup shared and leave its CSS forked** (§2.5).
@@ -3881,6 +4027,12 @@ the width in question.
 capture something that does not exist yet.** Ask whether the container will
 only ever hold one such element. If the answer is "one today", name the class.
 No test can catch it.
+
+**A class borrowed for position brings every other declaration with it.** A
+head row that reuses cell classes to land in their grid tracks inherits their
+colour and size too, and an accidental emphasis reads as a design decision.
+Ask what else the class says and reset all of it (`color: inherit;
+font-size: inherit`).
 
 **A rule nested under a parent is a bet on where the element lives, and moving
 the markup silently voids it.** When you move an element, grep the compiled
@@ -3922,8 +4074,16 @@ among peers at the same level; `position` or `transform` promotes an element
 into the positioned layer. Reach for `order` rather than moving markup when
 the DOM order carries the tab order.
 
+**`padding` cannot inset an absolutely positioned child.** Its containing
+block is the ancestor's padding box, so put the inset on the child
+(`inset: 0 $space-sm`).
+
 **An inline `<svg>` clips its own content by default.** Set `overflow:
 visible` on any icon that touches its own edges.
+
+**A `--` inside an SVG comment is malformed XML, and the browser draws
+nothing at all.** `test_every_shipped_svg_actually_parses` catches this, in
+`tests/test_site_config.py`, not with the page the icon is on.
 
 **You will assume every SVG is formatted the way the last one was.** Match
 `<svg` plus whitespace. And you will read one transform where there are two: a
@@ -4002,6 +4162,11 @@ title still wears the mark (on every line). It runs at load, on
 - It rebuilds from `textContent`, so an element with child elements is
   skipped, and an element whose text another script rewrites opts out with
   `data-last-line-rule="skip"`.
+- The spans it creates sit inside the target, so a descendant selector
+  (`.ref-section-heading span`) redraws the rule on each of them and the mark
+  wears twice; the CSS says `> span`. "The script did not run" and "the CSS
+  undid it" render identically, and a DOM diff proves neither: crop a wrapped
+  heading at 390.
 
 An identical repeated mark is something the eye recognises rather than reads,
 which is why it replaced the watercolour washes. "A filled field is more
@@ -4373,6 +4538,11 @@ by re-arguing it.
   unchanged. Do not trust a list of markers, and do not rely on a grep for
   them either, because it finds only what was marked. A copy audit lists
   every visible string.
+
+  **An empty slot for her words is not neutral.** It reads as a promise and
+  hands her a writing task she did not ask for: show her the page without it
+  first. Take the marker off a word once she has approved it. And copy her
+  line, never a paraphrase of it.
 - **Whether the recipe title takes the tape.** Offered and declined.
 - **Which cocktails are faffy, rich, or otherwise judged.** Moods are
   derived; a disagreement goes in `mood_include` / `mood_exclude` in
@@ -4441,7 +4611,8 @@ the count.
 **Trap:** SEE SHORTLIST and PDF are `<a>`s inside the article, so food's
 prose-link rule is `article.recipe a:not(.badge, .btn-see-shortlist,
 .btn-pdf)`. A new furniture link must join that exclusion or it takes the
-link colour.
+link colour. The same rule beats a chrome class borrowed into the article: a
+bare class loses to it silently, which is what `.not-found-ways` exists for.
 
 #### The search box: `_includes/page-search.html`
 

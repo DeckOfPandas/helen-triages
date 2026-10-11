@@ -1,46 +1,35 @@
 // =============================================================================
-// COCKTAILS — THE REFERENCE PAGE. Issue #529, cocktails/reference/*.
+// COCKTAILS — THE REFERENCE PAGES. #529, cocktails/reference/*.
 // =============================================================================
-// Food's two reference pages reuse `.recipe`/`.recipe-body-content` — the same
-// wrapper about.html already used for a prose page, so no page type was
-// invented (MANUAL §14). That trick is not available here: every one of those
-// classes, and the only table CSS on the site, lives in _sass/food/, and this
-// site's own page anatomy (`.cocktail-*`) is a DRINK's anatomy — a title block
-// that reserves a column for a glass drawing, an ingredients grid built around
-// an amount column. So cocktails' reference layer gets its own small anatomy,
-// which is what `.ref-*` is.
+// `.ref-*` is this site's own small anatomy for a prose page. Food's reference
+// classes live in _sass/food/, which this site does not import, and
+// `.cocktail-*` is a drink's anatomy: a title block that reserves a column for
+// a glass, an ingredients grid built round an amount column.
 //
-// IT BORROWS RATHER THAN REDRAWS wherever there is something to borrow: the
-// section headings take `overlapping-rule-double` in the drink page's own two
-// colours, and a bottle name takes `.cocktail-suggestion`'s wicked-woowoo. That
-// second one is the palette's own logic and not a colour picked to look nice —
-// woowoo means ASKED FOR, the string the index's has-to-have field matches
-// against, and a bottle name on this page is literally the same value as a
-// bottle name in brackets on a drink page.
+// It borrows where there is something to borrow: the section headings take the
+// drink page's double rule in its two colours, and a bottle name takes
+// `.cocktail-suggestion`'s wicked woowoo.
 //
-// ONE HUE, DELIBERATELY. The category name stays in ink and the short name in
-// $color-clear-text, because a new hue is Helen's decision and nobody else's
-// (MANUAL §13.12) and this page needs no second axis: there is one kind of
-// coloured string here, and it is the bottle.
+// One hue, deliberately. Woowoo means a bottle on these pages and nothing
+// else; the category name stays in ink and the short name in
+// $color-clear-text. A second hue is Helen's decision.
 
-// The three columns. The middle one is a short name — the longest is
-// `overproof Demerara rum` at 22 characters — so it is bounded rather than
-// flexible, and the bottles take whatever is left.
+// The first two of the three columns; the bottles take whatever is left. The
+// middle one is a short name, so it is bounded rather than flexible.
 $ref-col-name:    minmax(11rem, 15rem);
 $ref-col-card:    minmax(6rem, 9rem);
 
 .ref-title-block {
-  // Matches `.cocktail-title-block`'s spacing and its absinthe rule, minus the
-  // glass reservation — there is no drawing to hold a column open for.
+  // An absinthe rule under the title. No glass reservation: there is no
+  // drawing to hold a column open for.
   margin: 2rem 0 1.75rem;
   padding-bottom: $space-md;
   border-bottom: 2px solid $color-electric-absinthe;
 }
 
 .ref-title {
-  // 2.2rem is the size food's recipe title and this site's drink tape already
-  // agreed on (MANUAL §9.13). No tape here: the tape is the DRINK's mark, and
-  // a reference page is not a drink.
+  // No tape: the tape is the drink's mark, and a reference page is not a
+  // drink.
   font-size: 2.2rem;
   margin: 0;
 }
@@ -56,53 +45,22 @@ $ref-col-card:    minmax(6rem, 9rem);
   max-width: 34rem;
 }
 
-// HELEN'S OWN PROSE, 2026-09-10 — the rum page stopped being a bare table that
-// day and became a page with an argument on it. IN INK, not `$color-clear-text`:
-// `.ref-intro` was a one-line caption under a title and reads as a caption, and
-// these are the body of the page.
-//
-// THE MEASURE IS THE ONE THING THAT WAS WRONG WITH WHAT SHE WROTE. Unclassed
-// `<p>`s ran the full width of the window — her longest paragraph is 340
-// characters, which at desktop width is a single line you lose your place in.
-// 34rem is the cap `.ref-intro` and `.ref-note` already use, so this introduces
-// no new number. (`.rum-retired-why` used it too and is gone -- see below.)
+// The body of a prose page. In ink, and capped at 34rem: an unclassed <p>
+// runs the full width of the window, which is a line you lose your place in.
 .ref-prose {
   color: $color-text;
   max-width: 34rem;
   margin: 0 0 $space-md;
 }
 
-// A PROSE LINK LOOKED EXACTLY LIKE BODY TEXT, which is what Helen hit on
-// 2026-09-10: "please format the links as links". The base rule in
-// shared/_base.scss is `color: $color-text; text-decoration: none`, so the two
-// Cocktail Wonk citations were unmarked until you happened to hover one. That
-// rule is right for the nav and the footer, where position says "link"; it is
-// wrong for a citation inside a sentence, which is the first inline prose link
-// either site has had.
+// A link inside a sentence must look like one. The base rule in
+// shared/_base.scss gives a link the text colour and no underline, which suits
+// the nav and the footer, where position says "link".
 //
-// ABSINTHE AT REST, WOOWOO ON HOVER, and both halves are existing signals rather
-// than new decisions -- which is what Helen's "or something from the cocktail
-// palette that requests interaction" was asking for.
-//
-//   * ABSINTHE is already what a link BECOMES: `$color-mood-root` is
-//     `$color-electric-absinthe-deep` and it is the base `a:hover` colour for
-//     the whole site. Making it the resting state of a prose link promotes an
-//     existing signal rather than inventing one.
-//   * WOOWOO IS THE SITE'S "you are touching it" COLOUR -- every
-//     `:focus-visible` in _filters.scss, _shortlist.scss and _cards.scss lands
-//     on it, and _shortlist.scss says why in as many words: "wicked-woowoo on
-//     cocktails because it's a thing the user is choosing".
-//
-// SO WHY NOT WOOWOO AT REST, which Helen offered ("either as wicked woowoo and
-// we call that a site decision")? Because on THIS page woowoo already means one
-// specific thing -- it is every bottle name in the third column and nothing
-// else, which the file header calls "one hue, deliberately". A citation in the
-// same pink would read as a bottle. Absinthe is used here only for RULES, never
-// for a string of text, so it collides with nothing.
-//
-// THE UNDERLINE IS WHAT MAKES IT A LINK AT REST rather than a coloured word;
-// colour alone fails anyone who cannot separate absinthe from ink, which is the
-// exact failure #636 is open about for this palette.
+// Absinthe at rest, which is the site's base `a:hover` colour, and woowoo
+// under the pointer. Not woowoo at rest: on this page woowoo means a bottle.
+// The underline is what marks it for anyone who cannot separate absinthe from
+// ink (#636).
 .ref-prose a {
   color: $color-electric-absinthe-deep;
   text-decoration: underline;
@@ -116,29 +74,10 @@ $ref-col-card:    minmax(6rem, 9rem);
   }
 }
 
-// HER TWO `<hr>`s, 2026-09-10. She put them before the two biggest headings, so
-// they are doing the same job as `.ref-title-block`'s rule and take the same
-// treatment — 2px of absinthe — rather than a browser default bevel. No
-// `overlapping-rule-double` here: that mark belongs to a heading's text, and an
-// `<hr>` has none.
-//
-// $spacing-section-top ABOVE IT, NOT $space-xl -- #985, Helen 2026-09-11: "add
-// more space to breathe between sections on the rum page, especially before
-// 'don't recognise' and above the section rule above it."
-//
-// The rule is where a section STARTS, so the gap above it is the gap between
-// two sections and takes the token named for that job (4.5rem, "above a section
-// heading"). It was $space-xl, 1.5rem -- the same gap `.rum-cats` already put
-// below every table, so the biggest division on the page was rendering at
-// exactly the size of the smallest one and the rule was carrying the whole
-// distinction on its own. §13.3: a gap reads as hierarchy only if it is
-// obviously bigger than the one below it.
-//
-// The about page's own `<hr>` between movements is the same shape and reaches
-// the same place from the other side (`margin: $spacing-section-gap 0` in
-// _sass/food/_about.scss) -- space on both sides of the rule rather than only
-// above. Here the space below belongs to the heading, which is the next rule
-// down, so it is set there instead of twice.
+// An <hr> before a major section, drawn as `.ref-title-block`'s rule. The
+// rule is where a section starts, so the gap above it is the gap between two
+// sections and takes $spacing-section-top (#985). The space below belongs to
+// the heading that follows, and is set there.
 .ref-divider {
   border: 0;
   border-top: 2px solid $color-electric-absinthe;
@@ -149,94 +88,34 @@ $ref-col-card:    minmax(6rem, 9rem);
   font-size: 1.5rem;
   font-weight: 400;
   letter-spacing: 0.08em;
-  // $spacing-section-gap ABOVE A SHELF HEADING, #985, was a literal 2.25rem.
-  // The shelves are the second rank of section on this page and they were only
-  // 0.75rem clear of the table above them once `.rum-cats`' own 1.5rem bottom
-  // margin collapsed into this one. 3rem doubles the page's within-a-section
-  // gap, which is what makes it read as a level rather than as a paragraph
-  // break, and it is a token rather than the fourth hand-picked number in this
-  // file.
+  // $spacing-section-gap above a shelf heading (#985). `.rum-cats`' own bottom
+  // margin collapses into this one, so it has to be obviously bigger than
+  // that to read as a level rather than a paragraph break.
   margin: $spacing-section-gap 0 $space-md;
 
-  // The drink page's INGREDIENTS/METHOD mark exactly — absinthe over violette.
-  // Not the notes variant: nothing on this page is Helen's commentary.
+  // The drink page's INGREDIENTS/METHOD mark, absinthe over violette, on the
+  // last line only (#920): these headings are sentences and wrap.
   //
-  // LAST LINE ONLY, #920 -- measured before it was fixed. Every heading here is
-  // a real sentence ("Rum "styles" I do not recognise", "Rum-adjacent sugarcane
-  // spirits"), not the one word a drink page's INGREDIENTS/METHOD/NOTES always
-  // is, so this is the first cocktails consumer of the mark that actually
-  // wraps. `overlapping-rule-double`'s `box-decoration-break: clone` paints a
-  // full copy of the mark on every line fragment -- at 390px "Rum "styles" I do
-  // not recognise" wrapped to two lines and wore the double rule under both,
-  // which is exactly the bug MANUAL §13.1 and `assets/js/last-line-rule.js`
-  // exist to prevent on food (Helen: "Last line only please, 10000%.").
-  // `overlapping-rule-double-last-line` is that same fix, and
-  // `last-line-rule.js`'s TARGETS now includes `.ref-section-heading span` --
-  // see that file's header for why it doesn't reuse `.section-heading-text`.
-  // `> span`, NOT `span`, SINCE 2026-09-11 -- AND #920'S FIX DID NOTHING UNTIL
-  // THIS LINE CHANGED. The mark was still wearing under BOTH lines of every
-  // wrapped heading on this page at 390px, which is the exact bug #920 was
-  // raised for and recorded as fixed. Found by screenshot while measuring #985,
-  // on the same heading.
-  //
-  // WHY THE FIX WAS INERT. `last-line-rule.js` rebuilds the heading as
-  // `<span class="rule-split"><span class="rule-lines">…</span><span
-  // class="rule-last">…</span></span>`, and the mixin above kills the mark on
-  // `.rule-split` and redraws it on `.rule-last`. But a DESCENDANT selector
-  // matches the two inner spans too, so `.rule-lines` -- the earlier lines,
-  // whose whole job is to be unmarked -- was handed the full
-  // `overlapping-rule-double` again by this very rule, one specificity step
-  // below the `&.rule-split { background-image: none }` meant to stop it.
-  // The JS was working perfectly; the CSS was re-drawing what it had removed.
-  //
-  // Food does not have this because its target is a CLASS
-  // (`.section-heading-text`), which the split spans do not carry. Cocktails'
-  // is an unclassed span, so "the heading's span" and "a span the script made
-  // inside it" were the same selector. `>` is the whole difference, and it is
-  // the same lesson this file already carries twice (the EXAMPLES colour, the
-  // three column labels): a selector reaches further than the thing you had in
-  // mind, so say where it stops.
-  //
-  // `last-line-rule.js`'s own TARGETS stays as it is: it queries the DOM once
-  // at load, before any split exists, so it can only ever match the outer span.
+  // `> span`, not `span`. last-line-rule.js rebuilds the heading as
+  // `.rule-split > .rule-lines + .rule-last`, and a descendant selector
+  // matches those inner spans too, handing the full mark back to the lines
+  // the mixin has just unmarked. The script's TARGETS lists
+  // `.ref-section-heading span`; it runs before any split exists, so it only
+  // ever matches the outer one.
   > span {
     display: inline;
     @include overlapping-rule-double-last-line($color-electric-absinthe, $color-ultra-violette);
   }
 }
 
-// THE SECOND TIER, ADDED 2026-09-10 WITH HELEN'S RESTRUCTURE. Her page has three
-// top-level sections ("Rum categories I recognise", "Addendum: Rum Characters",
-// "Rum 'styles' I do not recognise") and the five rum shelves now sit INSIDE the
-// first of them, so there are two ranks of heading where there was one.
+// The upper tier: a page's top-level sections, with the shelves inside one of
+// them. Size and space only; same hues, same mark. 2rem, because the mark is
+// the loudest thing about a heading here and is identical on both tiers, so a
+// smaller step disappears under it.
 //
-// SIZE AND SPACE ONLY, DELIBERATELY: same hues, same mark. A second mark or a
-// second colour would be a new visual decision and those are Helen's (§13.12).
-//
-// 2rem, NOT THE 1.8rem THIS FIRST SHIPPED AS, and the correction came from
-// looking rather than reasoning (MANUAL §1: "looking is cheaper than
-// reasoning"). At 1.8 against the shelves' 1.5 the two ranks read as one rank on
-// the built page: the tape underline is the loudest thing about a heading here
-// and it is identical on both, so a 0.3rem step disappears underneath it. 2rem
-// puts the major tier nearer the 2.2rem title than the shelves, which is where
-// it belongs — these three ARE the page's sections and the shelves are inside
-// one of them.
-//
-// The space above does as much work as the size, and since #985 (2026-09-11) it
-// is the page's largest gap by a wide margin rather than by 0.25rem.
-// $spacing-section-gap sits BELOW the absinthe rule and $spacing-section-top
-// above it, so a major section opens on 7.5rem of clear page against the
-// shelves' 3rem and a table's own 1.5rem -- three levels, each double the one
-// under it. Helen: "add more space to breathe between sections on the rum page,
-// especially before 'don't recognise' and above the section rule above it."
-//
-// 3rem HERE AND 4.5rem ABOVE THE RULE, THAT WAY ROUND, because the rule is in
-// the gap. $spacing-section-top's own note in shared/_tokens.scss is the
-// precedent: it "was 3rem, when a scribbled rule sat in the gap as well; with
-// the rule gone the space carries the whole separation on its own". The rule is
-// still here, so the bigger half of the separation goes above it, where it
-// divides the two sections, and the smaller half below, where it keeps the rule
-// attached to the heading it introduces rather than floating between two.
+// $spacing-section-gap here, below the divider, and $spacing-section-top above
+// it: the bigger half goes above the rule, so the rule stays attached to the
+// heading it introduces.
 .ref-section-heading--major {
   font-size: 2rem;
   margin-top: $spacing-section-gap;
@@ -245,18 +124,10 @@ $ref-col-card:    minmax(6rem, 9rem);
 // =============================================================================
 // THE CATEGORY ROWS
 // =============================================================================
-// TREATMENT A, CHOSEN 2026-09-06 — Helen, from the candidates page: "this is
-// all table A." The stack and the two-column pairing are gone rather than left
-// switchable; a settled question does not need its alternatives kept warm.
-//
-// EVERY ROW IS ITS OWN GRID rather than the list being one grid with
-// `display: contents` rows, and that survives the choice for its own reasons: a
-// per-row grid with a fixed template aligns exactly as a table does (the first
-// two tracks are the same length on every row and only the last is fluid),
-// while a single grid would put every border on a cell and would make the
-// narrow breakpoint below a rewrite rather than two lines. It is also what lets
-// the head row repeat per section without three grids fighting over one set of
-// tracks.
+// A three-column table (Helen's choice). Every row is its own grid with a
+// fixed template, not one grid with `display: contents` rows: the first two
+// tracks are the same length on every row, so the rows align as a table does,
+// the border stays on the row, and the narrow breakpoint below is two lines.
 .rum-cats {
   list-style: none;
   margin: 0 0 $space-xl;
@@ -274,10 +145,9 @@ $ref-col-card:    minmax(6rem, 9rem);
   border-bottom: 1px solid $color-grey-light;
 }
 
-// The column labels, once per section. `aria-hidden` in the markup, because a
-// screen reader gets the list and each row's own three values in order and has
-// no columns to be told about — and repeating three label words before every
-// section would be five interruptions rather than one heading.
+// The column labels, once per section. `aria-hidden` in the markup: a screen
+// reader gets each row's three values in order and has no columns to be told
+// about.
 .rum-cat--head {
   font-family: $font-label;
   font-size: 0.7rem;
@@ -287,40 +157,13 @@ $ref-col-card:    minmax(6rem, 9rem);
   padding-bottom: $space-xs;
   border-bottom-color: $color-clear-text;
 
-  // THE THREE LABELS TAKE THIS ROW'S TREATMENT AND NOTHING ELSE -- #973, Helen,
-  // 2026-09-11: "table headings use three different combinations of size and
-  // colour. I think they should all look the same."
+  // The three labels take this row's treatment and nothing else (#973). The
+  // head row borrows the cell classes only to land in the grid tracks, and a
+  // class carries every declaration: without this each label brings its
+  // cell's own colour or size.
   //
-  // She counted three because there were exactly three, one per label, and not
-  // one of them was chosen. The head row borrows the three CELL classes purely
-  // to land in the three grid tracks, and each one brought its own declarations
-  // along:
-  //
-  //   * `.rum-cat-name`    -> `color: $color-text`, so "category" was in INK
-  //                           where its two siblings were `$color-clear-text`.
-  //   * `.rum-cat-card`    -> `font-size: 0.84rem`, so "site display name" was
-  //                           a fifth larger than the 0.7rem this row sets.
-  //   * `.rum-cat-bottles` -> `color: $color-wicked-woowoo-deep`, which is the
-  //                           same bug found on 2026-09-10 ("change the heading
-  //                           font colour... leave the pink for the bottles")
-  //                           and fixed then with `color: inherit` on this one
-  //                           class alone. WOOWOO MEANS BOTTLE on this page
-  //                           (see the file header); a column label is not one.
-  //
-  // So the 2026-09-10 fix was right about the mechanism and too narrow by two
-  // classes, which is why this is now stated once for all three rather than
-  // patched a class at a time: A CLASS CARRIES EVERY DECLARATION, NOT THE ONE
-  // YOU WANTED (DECISIONS §14), and a cell class borrowed for POSITION should
-  // contribute position and nothing else.
-  //
-  // THE SURVIVING TREATMENT IS THIS ROW'S OWN -- $font-label, 0.7rem,
-  // uppercase, 0.1em, `$color-clear-text` -- because it is the one the most
-  // headings on the page already use: "examples" renders it outright, and
-  // `.rum-origin-head`'s MARTINIQUE/GUADELOUPE labels are the same face, case,
-  // tracking and colour one rank down. `.rum-origin-head` is deliberately not
-  // touched: it labels a group of bottles INSIDE a cell rather than a column,
-  // it was not one of the three she counted, and its 0.66rem is what makes the
-  // rank visible.
+  // `.rum-origin-head` is not reset: it labels a group of bottles inside a
+  // cell, and its smaller size is what makes the rank visible.
   .rum-cat-name,
   .rum-cat-card,
   .rum-cat-bottles {
@@ -329,15 +172,8 @@ $ref-col-card:    minmax(6rem, 9rem);
   }
 }
 
-// THE COUNTRY, INSIDE THE BOTTLES COLUMN -- #813, treatment A.
-//
-// It takes the column-label treatment rather than a new one, because that is
-// what it is: a label over a group of bottles, one rank down from the header
-// row's labels over columns. Same face, same tracking, same case, a size
-// smaller and quieter.
-//
-// NOT WOOWOO, for the reason the header row is not: it names a group of bottles
-// rather than being one.
+// The country, inside the bottles column (#813). The column-label treatment a
+// size smaller. Not woowoo: it names a group of bottles rather than being one.
 .rum-origin-head {
   display: block;
   font-family: $font-label;
@@ -363,18 +199,10 @@ $ref-col-card:    minmax(6rem, 9rem);
   font-size: 0.84rem;
 }
 
-// THE BOTTLES, IN `.cocktail-suggestion`'S OWN COLOUR — see the file header.
-//
-// ONE PER LINE, HELEN'S CALL 2026-09-06: "please write one rum per line in the
-// right-hand column." The first version ran them as a comma-separated sentence
-// on the argument that three to eight names are one answer rather than a list.
-// The agricoles are why that was wrong — eight bottles whose names share their
-// first two words wrap into an unreadable ribbon, and a column you are checking
-// your own shelf against is scanned, not read.
-//
-// `line-height` comes down from the body's 1.65: these are a stack of short
-// names rather than prose, and at 1.65 a row of eight opens a gap the two
-// left-hand columns cannot fill.
+// The bottles, in `.cocktail-suggestion`'s colour (see the file header). One
+// per line (Helen's ruling): a column you check your own shelf against is
+// scanned, not read. `line-height` comes down from the body's because these
+// are a stack of short names, not prose.
 .rum-cat-bottles {
   grid-area: bottles;
   list-style: none;
@@ -388,41 +216,15 @@ $ref-col-card:    minmax(6rem, 9rem);
   display: block;
 }
 
-// `.rum-cat-bottles--none` WAS HERE AND IS GONE, 2026-09-10. A category with no
-// bottle is correct and is not a gap (`overproof Demerara rum, lightly aged`
-// since El Dorado 151 came off on 2026-09-05), and this rule styled the "none
-// in the house" placeholder that used to say so, quiet and un-hued. Helen
-// deleted the words ("If we're not using them, delete them, boom"), so the
-// third track renders empty, on the page's rows and the Rum-adjacent include's
-// alike, and nothing emits the class. Removed rather than left, for the same
-// reason as `.rum-cat-note` below.
-
-// `.rum-cat-note` WAS HERE AND IS GONE, 2026-09-10. It styled Ceylon arrack's
-// `family_less` reason under its row; #889 deleted that note from the page
-// ("delete whole note on arrack on rum page") and Helen's own sentence replaced
-// it outside the list, so nothing emitted the class any more. Removed rather than
-// left: CSS for markup that no longer exists is the kind of thing the next reader
-// trusts as evidence the markup does.
-
 // =============================================================================
 // CHARACTERS AND RETIRED WORDS
 // =============================================================================
-// ONE PER LINE WITH A MARK IN THE GUTTER, BORROWED FROM THE ABOUT PAGE —
-// Helen, 2026-09-10 (#920): "borrow list format from about page". That page's
-// three lists (`about-enum`, `about-enum-sub`, `about-ways`) all draw their own
-// mark in a left gutter in `$font-headings`, and its own comment says why they
-// are one treatment: "Extended rather than repeated so the three lists cannot
-// drift apart -- which is the entire effect."
+// One per line with a mark in the gutter, the about page's list idiom (#920).
+// Re-drawn rather than shared: that page's classes are in _sass/food/, which
+// this site does not import.
 //
-// THE IDIOM IS BORROWED, NOT THE CLASSES, and that is forced rather than chosen.
-// `about-enum` is scoped to `article.recipe .recipe-body-content.about-page`
-// because it has to out-specify food's longform recipe styling — the same reason
-// this file exists at all (see the header). So the pattern is re-drawn here, in
-// this page's own colours.
-//
-// THE MARK IS `$color-clear-text`, NOT A HUE. This page spends exactly one
-// colour and it means "bottle" (see the header); a character is not a bottle, and
-// inventing a second hue is Helen's call, not this file's.
+// The mark is $color-clear-text, not a hue: this page's one colour means
+// "bottle" (see the header).
 $ref-list-gutter: 1.3rem;
 
 @mixin ref-marked-list($mark) {
@@ -436,18 +238,9 @@ $ref-list-gutter: 1.3rem;
     margin-bottom: $space-xs;
     max-width: calc(34rem + #{$ref-list-gutter});
 
-    // `line-height: inherit`, NOT the `1` this first shipped as, and the
-    // difference was visible rather than reasoned (a 2x crop, MANUAL §1).
-    // An absolutely-positioned box with no `top` takes the top of the LINE BOX;
-    // at `line-height: 1` against the body's 1.65 that floated the arrow up
-    // near the cap line of the word, clear of the text it belongs to. Sharing
-    // the item's line-height puts the two on one baseline.
-    //
-    // The about page reaches the same place from the other side -- it sets an
-    // explicit `top` and then nudges its arrow up 0.05rem, because "an arrow is
-    // centred on the x-height where a numeral sits on the baseline". It has
-    // numerals AND arrows to reconcile; this list has only arrows, so inheriting
-    // the line-height is the simpler half of the same fix.
+    // `line-height: inherit`, not 1. An absolutely positioned box with no
+    // `top` takes the top of the line box, so at 1 against the item's own
+    // line-height the mark floats up near the cap line of the word.
     &::before {
       content: $mark;
       position: absolute;
@@ -460,34 +253,17 @@ $ref-list-gutter: 1.3rem;
   }
 }
 
-// WAS A COMMA-SEPARATED RUN until 2026-09-10, and the change is Helen's list
-// ruling rather than a preference: there are four characters, she introduces them
-// with "These words are useful to me:", and a colon followed by an inline
-// sentence reads as prose where she wrote a list.
 .rum-chars {
   @include ref-marked-list("→");
 }
 
-// THE NUMBERED LIST, Helen 2026-09-10: "please use the numbered list styling
-// from the start of the about page for my 'two things I care about' bit."
+// The about page's numbered list, re-drawn for the same reason: a counter,
+// and the numeral drawn by hand in the gutter in $font-headings. The 0.1rem
+// push down is the about page's too: a large numeral hung off a small line
+// sits visibly high when the two boxes are flush.
 //
-// SAME MECHANISM AS `about-enum`, re-drawn rather than imported for the reason
-// given above -- that class is scoped to food's `.about-page` wrapper so it can
-// out-specify longform recipe styling, and importing it would drag that whole
-// context along. What is copied is the behaviour: a counter, `list-style: none`,
-// and the numeral drawn by hand in the gutter in `$font-headings`.
-//
-// THE SIZE AND THE OPTICAL NUDGE ARE THE ABOUT PAGE'S, and both are load-bearing
-// there. 1.6rem sits "between the section headings and body text: big enough to
-// read as a mark rather than as a character in a sentence"; the 0.1rem push down
-// is because "a 1.6rem numeral hung off a 0.92rem line sits visibly high when the
-// two boxes are flush" -- its cap height starts lower inside a much taller line
-// box. Both were arrived at by looking, on that page, and there is no reason for
-// this one to rediscover them.
-//
-// A WIDER GUTTER THAN THE ARROW LIST, because a 1.6rem numeral is a much wider
-// glyph than a → at body size. 2.4rem against the about page's 2.8rem: that page
-// hangs its numerals off a wider measure.
+// A wider gutter than the arrow list's, because the numeral is a much wider
+// glyph than an arrow at body size.
 .ref-enum {
   display: block;
   counter-reset: ref-enum;
@@ -516,31 +292,9 @@ $ref-list-gutter: 1.3rem;
   }
 }
 
-// A definition list, because that is what it is: the word, and what to do about
-// it. The word sits above rather than beside because the line under it is a
-// sentence, not a label.
-//
-// NOTHING GOES UNDER THE WORD, AND THE MARKUP SAYS SO NOW. This was a `<dl>`
-// with a `.rum-retired-why` `<dd>`, through two rulings on the same day. #784
-// took `retired_rum_styles`' reasons off the page (they were written for the
-// next Claude) and moved the reader's line to `_data/cocktails/rum_page.yml`,
-// one empty key per word. Then Helen decided against writing them at all: "I
-// decided not to give silly rum words the dignity of extra copy. I want the
-// list, bare, so please delete unneeded scaffolding."
-//
-// So the file is gone, the `<dd>` rule with it, and the `<dl>` is a `<ul>`: a
-// definition list whose definitions can never exist is a promise the markup
-// cannot keep.
-//
-// AND IT NOW TAKES THE SAME MARKED-LIST FORMAT AS CHARACTERS, #920. It was a
-// bare vertical run with no gutter mark until this page's other borrowed list
-// (`.rum-chars`, below) sat five paragraphs under it in a visibly different
-// shape -- the same failure `ref-marked-list` was built to close on this page,
-// just not yet applied everywhere it fits. Both lists are the same shape (a
-// flat list of members, introduced by a colon sentence), which is the about
-// page's own pattern too: `about-ways` is reused verbatim for "the food side"
-// and "the cocktail side" rather than earning a second mark for the second
-// list. Same reasoning here -- one mark, not a new one per list.
+// The retired words, bare: nothing goes under a word (Helen's ruling). The
+// same marked list as the characters, so the page's two flat lists are one
+// shape.
 .rum-retired {
   @include ref-marked-list("→");
 }
@@ -550,30 +304,22 @@ $ref-list-gutter: 1.3rem;
   color: $color-text;
 }
 
-// `.rum-sipping` WAS HERE AND IS GONE, 2026-09-10. It styled the Sipping
-// shelf's list of bottle names. Helen deleted the section from the page and
-// then the `sipping:` block from bottles.yml -- "delete sipping entirely
-// please" -- so nothing emits the class and nothing can.
-
 // =============================================================================
 // THE GLASSES PAGE — #295, cocktails/reference/glasses.html
 // =============================================================================
-// Every glass on one shelf, at relative scale, in the home green. Helen's brief
-// (2026-09-29) is the whole page -- see the template's header -- so this is a
-// heading, a row of drawings, and three short lines under each. Nothing else.
+// Every glass on one shelf, at relative scale: a heading, a row of drawings,
+// and three short lines under each.
 //
-// THE STAGE IS WHAT MAKES IT A SHELF. Every item reserves the same height, the
+// The stage is what makes it a shelf. Every item reserves the same height, the
 // tallest glass's, and stands its drawing on the bottom of it, so every glass
 // in a row shares one baseline and every name starts on one line. The drawing
-// itself is `--glass-ratio` of that height: its real height over the tallest
-// real glass, set per item by the template. A drawing is never width-capped,
-// because a capped glass would be drawn shorter than it is, and scale is the
-// one thing this page is for.
+// is `--glass-ratio` of that height, set per item by the template. A drawing
+// is never width-capped: a capped glass is drawn shorter than it is, and
+// scale is what this page is for.
 $glass-shelf-height: 11rem;
 
-// "Style GLASSES like a heading" -- the drink page's INGREDIENTS/METHOD mark,
-// which `.ref-section-heading` already is. Only the space above changes: it is
-// the first thing on the page rather than a section under a title.
+// `.ref-section-heading` supplies the mark. Only the space above changes: it
+// is the first thing on the page rather than a section under a title.
 .glasses-heading {
   margin-top: 2rem;
 }
@@ -602,19 +348,16 @@ $glass-shelf-height: 11rem;
   height: $glass-shelf-height;
 }
 
-// THE GREEN IS THE GLASS'S OWN, the colour every drawing on a card and a drink
-// page already strokes in -- "let's try the glasses in green".
 .glass-shelf-art {
   display: block;
   height: calc(var(--glass-ratio) * #{$glass-shelf-height});
   color: $color-electric-absinthe;
 
-  // THE BASE OVER THE LABEL, NOT THE BOX -- `base_centre` in glasses.yml, set
+  // The base over the label, not the box: `base_centre` in glasses.yml, set
   // per item as `--glass-shift`. A translate percentage is of this element's
   // own width, which is the drawing's, so the measured fraction applies as it
   // stands. A transform moves the drawing without moving the layout, so the
-  // label and the row keep their places and only a handle reaches a little
-  // further into the gap beside it.
+  // label and the row keep their places.
   transform: translateX(calc(var(--glass-shift, 0) * -100%));
 
   svg {
@@ -624,13 +367,10 @@ $glass-shelf-height: 11rem;
     overflow: visible;
   }
 
-  // THINNER THAN ANYWHERE ELSE THE SITE DRAWS A GLASS, Helen 2026-09-29: "Can
-  // we make the lines thinner? Thin more for tiki, pineapple and coconut."
-  // `non-scaling-stroke` makes these SCREEN pixels whatever the drawing's
-  // size (see `.glass-icon-line`): the drink page draws at 2 and a card at 1,
-  // and /dev/glasses/ section 2, the view she was looking at, at 4.6. The three
-  // named drawings are the busiest in the set -- carving, a crown of leaves,
-  // husk lines -- so at one width they read darker than their neighbours.
+  // Thinner than elsewhere on the site (Helen's ruling). `non-scaling-stroke`
+  // on `.glass-icon-line` makes these screen pixels whatever the drawing's
+  // size. The three named drawings are the busiest in the set, so at one
+  // width they read darker than their neighbours.
   .glass-icon-line {
     stroke-width: 1.5;
   }
@@ -650,8 +390,7 @@ $glass-shelf-height: 11rem;
   color: $color-text;
 }
 
-// THE MEAN, AND UNDER IT THE RANGE, quieter. "The range and mean ml for each
-// (given the medians are similar we don't need to give those)."
+// The mean, and under it the range, quieter.
 .glass-shelf-ml {
   font-size: $font-size-body-sm;
   color: $color-text;
@@ -665,10 +404,8 @@ $glass-shelf-height: 11rem;
 // =============================================================================
 // NARROW
 // =============================================================================
-// The three-track row cannot hold at phone width — the name column alone wants
-// 11rem — so it stacks. That was candidate B before Helen chose the table, and
-// it stays as the fallback: a choice about the desktop layout is not a choice
-// about what happens when there is no room for it.
+// The three-track row cannot hold at phone width, where the name column alone
+// wants 11rem, so it stacks.
 @media (max-width: 34rem) {
   .rum-cat {
     grid-template-columns: 1fr;
@@ -679,33 +416,15 @@ $glass-shelf-height: 11rem;
     display: none;
   }
 
-  // THE MAJOR HEADINGS COME DOWN, seen at 390px rather than assumed. At 2rem
-  // "Rum "styles" I do not recognise" took three lines against 1.5rem's two.
-  //
-  // THE REASON THIS WAS WRITTEN FOR IS GONE, #920, AND THE RULE STAYS ANYWAY.
-  // This first shipped as a stripe-avoidance measure: the mark had no
-  // last-line-only handling yet, so every extra line was another full copy of
-  // the double rule, and fewer lines read as fewer stripes. `.ref-section-
-  // heading span` now carries `overlapping-rule-double-last-line` and is a
-  // `last-line-rule.js` target, so the mark draws once under whichever line
-  // is last regardless of how many there are -- three lines at 2rem would be
-  // just as correct as two at 1.5rem now. Kept at 1.5rem anyway, on its own
-  // remaining merits: three lines of a 2rem major heading is still more
-  // vertical column than a phone screen wants to spend on one heading, one
-  // rank above shelf headings that never exceed two words. A legibility
-  // choice now, not a bug workaround -- the two happened to want the same
-  // number.
-  //
-  // The shelves are left alone: they are one or two words and already fit.
+  // The major headings come down on a phone, where at 2rem the longest takes
+  // three lines. A legibility choice: the mark is last-line-only, so the
+  // number of lines no longer matters to it. The shelves already fit.
   .ref-section-heading--major {
     font-size: 1.5rem;
   }
 
-  // THREE GLASSES TO A ROW ON A PHONE, NOT TWO. At the desktop's 11rem stage
-  // and 6.5rem items a 390px screen took two, and the page ran to fourteen
-  // screens of mostly empty stage. A shorter stage keeps every ratio -- the
-  // scale is relative, so only the unit shrinks -- and the names are the
-  // widest thing left ("double old fashioned" wraps, which is fine).
+  // Three glasses to a row on a phone, not two. A shorter stage keeps every
+  // ratio, because the scale is relative and only the unit shrinks.
   .glass-shelf {
     gap: $space-lg $space-sm;
     justify-content: space-between;

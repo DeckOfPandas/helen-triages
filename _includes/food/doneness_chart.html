@@ -1,44 +1,29 @@
-{% comment %}
-  A protein's whole doneness spectrum, on a recipe page. GitHub issue #189:
-  "for proteins with discretionary cooking times like steak, show all internal
-  temperature options."
+{% comment %} A protein's whole doneness spectrum, on a recipe page (#189).
 
-  Parameters
-    node       a node from internal_temperatures.yml carrying a `doneness` map
-    suggested  the level this recipe recommends (a recipe's own `doneness:`
-               front matter), or blank
+   Parameters
+   node       a node from internal_temperatures.yml carrying a `doneness` map
+   single     a single-figure node, where there is no spectrum
+   suggested  the level this recipe recommends (its own `doneness:` front
+   matter), or blank
 
-  WHY A CHART AND NOT ONE FIGURE. The meta line above can only hold one number,
-  and for seven of the refs in that data file one number is a lie by omission:
-  doneness is the EATER'S choice, not the recipe's. A recipe can suggest
-  medium-rare; it has no business hiding the other five.
-
-  The recipe's own suggestion is marked rather than isolated -- it stays in
-  place on the scale, so you can see what you are trading when you ignore it.
-  That is the point of drawing the spectrum instead of listing it: the distance
-  between "what this recipe says" and "what you want" is a real distance.
+   Doneness is the eater's choice, so every level is drawn. The recipe's
+   suggestion is marked in place on the scale, not isolated.
 {% endcomment %}
 
 {% if include.node.doneness or include.single %}
   <div class="doneness">
     <div class="tc">
       <div class="tc-plot">
-        {% comment %} THE SHADED ZONE IS NOT OPTIONAL ON A RECIPE PAGE. It was
-           left off when this chart shipped, on the reasoning that the reference
-           page had room to explain it -- which was wrong, and wrong in the one
-           direction that matters: teriyaki salmon then offered "rare, out at
-           43–49°C" as an unqualified choice, with nothing saying that four of
-           its five levels sit below the FSA benchmark. A chart you cook from
-           has to carry its own warning. {% endcomment %}
+        {% comment %} The shaded zone is not optional on a recipe page: without it a level below
+           the safety benchmark is offered as an unqualified choice. A chart you cook
+           from has to carry its own warning. {% endcomment %}
         {% if include.node.safety_min %}
           <div class="tc-unsafe" style="--t:{{ include.node.safety_min }};"></div>
           <div class="tc-threshold-label" style="--t:{{ include.node.safety_min }};">{{ include.node.safety_label }} &rarr;</div>
         {% endif %}
-        {% comment %} A single-figure node (a tough cut, a whole bird, cured
-           ham) draws one row rather than nothing. It has no doneness to choose
-           between -- that is the fact -- but it still has a figure, and since
-           the metadata cell was removed this chart is the only place it
-           appears. {% endcomment %}
+        {% comment %} A single-figure node (a tough cut, a whole bird, cured ham) draws one row
+           rather than nothing: this chart is the only place its figure appears on the
+           page. {% endcomment %}
         {% unless include.node.doneness %}
           {% include food/temp_row.html label=" " spec=include.single %}
         {% endunless %}
@@ -53,19 +38,11 @@
       {% include food/temp_axis.html %}
     </div>
 
-    {% comment %} THE KEY, but only where there is a spectrum. Helen: "add the
-       key to this chart too (it's tiny)". A single-figure chart doesn't get one
-       -- it draws one bar whose own value already reads "tender at 90–96°C",
-       and a key saying "tender at" beside it would be the same three words
-       twice, which is exactly why the charts page's tough-cuts chart lost its
-       key too.
-
-       The flags are computed from the levels actually drawn rather than passed
-       in, so a chart can't claim a mark it doesn't show: `carry` is true only
-       where some level's rested range starts clear of its out-at range, which
-       is beef's 4–6°C but not salmon's 1–2°C. The key has no entry for the
-       shaded zone since 2026-10-09 (see temp_key.html); the line's own label
-       on the plot names the figure. {% endcomment %}
+    {% comment %} The key, only where there is a spectrum: a single-figure chart's one value
+       already says what it is. The flags are computed from the levels drawn, so a
+       chart cannot claim a mark it does not show: `carry` is true only where some
+       level's rested range starts clear of its out-at range. The key has no entry
+       for the shaded zone; its own label on the plot names the figure. {% endcomment %}
     {% if include.node.doneness %}
       {% assign _rested = false %}{% assign _carry = false %}
       {% for level in include.node.doneness %}

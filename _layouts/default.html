@@ -4,77 +4,44 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% comment %} ── Which site is this? ─────────────────────────────────────────
-     One build serves Helen Triages Food and Helen Triages Cocktails. `site_key`
-     is set by _config.yml's `defaults:` — per collection for recipe pages, per
-     directory for ordinary pages — and keys into _data/sites.yml for everything
-     that differs between them.
-
-     A page with no site_key belongs to neither: the root landing page. It falls
-     back to the repo-level title and description in _config.yml and links no
-     site stylesheet, which is why every lookup below goes through `default:`
-     rather than assuming `this_site` exists.
-
-     This is the only place the two sites are told apart. Adding a third should
-     be an entry in _data/sites.yml and a palette, not an edit here.
+     `site_key` is set by _config.yml's `defaults:` (per collection for recipe
+     pages, per directory for ordinary ones) and keys into _data/sites.yml for
+     everything that differs between the two sites. This is the only place they
+     are told apart. A page with no site_key falls back to the repo-level title
+     and description and gets no stylesheet (MANUAL 2.4), which is why every
+     lookup below goes through `default:`.
   {% endcomment %}
   {% assign this_site = site.data.sites[page.site_key] %}
   {% assign site_title = this_site.title | default: site.title %}
   {% assign site_desc = this_site.description | default: site.description %}
 
   {% comment %} ── Page identity ───────────────────────────────────────────────
-     A recipe page describes itself with its own tagline; everything else falls
-     back to the site description. Set once here, reused by every meta tag below.
+     Set once here, reused by every meta tag below.
   {% endcomment %}
   {% assign page_title = site_title %}
-  {% comment %} A page may say it belongs to no site, and exactly one does:
-     about.html. It is reached from the shared header of BOTH sites at a
-     site-neutral /about/, so appending "Helen Triages Food" to its name put
-     one site's identity on a page that speaks for the repo -- issue #395.
-
-     Helen, settling it: "The name of that page is '??', so wherever a title
-     would appear it should read '??'." So the title is the page's own name,
-     with nothing appended. The same key drives the bracketed word on the tape
-     (see the wordmark below), which is what makes this ONE idea rather than a
-     second ad-hoc override sitting beside the first.
-
-     It cannot be inferred from site_key: that page still carries `site_key:
-     food` and must, because that is what gives it a stylesheet at all (see its
-     own front matter). Belonging to no site for DISPLAY and borrowing one
-     site's CSS are different claims, and only the first is declarable here.
+  {% comment %} `site_neutral` (about.html, 404.html): the page belongs to no
+     site for display, so its title is its own name with nothing appended
+     (#395). It cannot be inferred from site_key: those pages carry `site_key:
+     food` only because that is what gives them a stylesheet.
   {% endcomment %}
   {% if page.title %}
     {% if page.site_neutral %}{% assign page_title = page.title %}
     {% else %}{% assign page_title = page.title | append: " | " | append: site_title %}{% endif %}
   {% endif %}
-  {% comment %} `snippet` IS THE TAGLINE FOR SOMEWHERE THAT IS NOT THE PAGE --
-     #1089, 2026-10-08. The description below is what a search result and a
-     pasted link show, and the Negroni's tagline is fine on its own page and
-     not fine there; Helen wrote a second line for it. A page with no
-     `snippet` describes itself with its tagline, as every page did. {% endcomment %}
+  {% comment %} `snippet` is a page's tagline for somewhere that is not the
+     page: a search result or a pasted link (#1089). A page without one
+     describes itself with its tagline. {% endcomment %}
   {% assign page_description = page.snippet | default: page.tagline | default: site_desc | strip_newlines %}
 
   <title>{{ page_title }}</title>
   <meta name="description" content="{{ page_description | escape }}">
 
   {% comment %} ── Link previews ───────────────────────────────────────────────
-     What WhatsApp, Slack, Signal and the rest show when you paste a recipe URL.
-     Without these you get a bare link, which for a site whose entire job is
-     "what shall we cook" is a real loss.
-
-     THE IMAGE IS THE SITE'S OWN WORDMARK, SINCE 2026-09-15 (#1086, the design
-     review). Helen: "The wordmark is fine for a start -- I don't think we have
-     anything else that feels like branding anyway." Each site names its card in
-     _data/sites.yml (`social_image`), because the tape on it says where you
-     are, which is that file's test for a key; the repo-level `social_image` in
-     _config.yml is the [ ?? ] card for a page that belongs to neither site
-     (site_neutral: /about/, /404.html). scripts/render_social_images.py makes
-     all three from the built site's real header and compiled CSS; re-run it
-     when the wordmark changes. The text half of a preview needs nothing per
-     page: og:description above is already the recipe's or drink's own tagline.
-
-     The width and height are what that script writes (1200x630 CSS px at a
-     device scale of 2); tests/test_site_config.py reads the PNG headers and
-     holds them to these two numbers.
+     The image is the site's own wordmark card (#1086): `social_image` in
+     _data/sites.yml per site, and the repo-level one in _config.yml for a
+     site_neutral page. scripts/render_social_images.py makes them; re-run it
+     when the wordmark changes. The width and height below are what that script
+     writes, and tests/test_site_config.py holds the PNG headers to them.
   {% endcomment %}
   {% assign social_image = this_site.social_image | default: site.social_image %}
   {% if page.site_neutral %}{% assign social_image = site.social_image | default: social_image %}{% endif %}
@@ -94,318 +61,115 @@
 
   <link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
   {% comment %} Each site links only its own compiled stylesheet, so the two
-     never share a class name they could fight over. assets/css/food.scss and
-     assets/css/cocktails.scss import the same shared partials and their own
-     palette.
-
-     There is no `{% else %}` branch here any more (GitHub issue #204 deleted
-     the root landing page, assets/css/root.scss and _sass/root/ along with
-     it — this layout's only remaining callers both have a site_key). If a
-     future page is ever rendered through default.html with no site_key, it
-     will silently get NO stylesheet at all — this tag will simply not
-     render — rather than falling back to anything. That is worth knowing
-     before you add one. {% endcomment %}
-  {% comment %} CACHE-BUSTED ON THE BUILD TIME, and this is not a nicety.
-
-     The URL was a bare /assets/css/<site>.css, so a browser that had ever
-     loaded the page reused its stored copy across every subsequent CSS change.
-     On 2026-08-18 that cost three rounds on issue #333: the rule was correct in
-     the source, correct in the compiled file, and correct in what every local
-     server was serving, while Helen's browser kept painting the old stylesheet
-     — and the symptom was indistinguishable from a fix that had not worked.
-
-     `site.time` is the moment of the build, so it changes on every rebuild and
-     on nothing else. Jekyll's dev server rebuilds on save, so an edit reaches
-     the browser without a hard refresh; a deploy gets a fresh value for free.
-
-     A query string rather than a hashed filename because Jekyll has no asset
-     pipeline here and one is not worth adding for two stylesheets. The cost is
-     that the file is re-fetched after any rebuild even when its bytes are
-     identical — two stylesheets, cheap, and the alternative is what happened
-     above. {% endcomment %}
+     never share a class name they could fight over. There is no fallback: a
+     page rendered through this layout with no site_key gets no stylesheet at
+     all, silently (#204). {% endcomment %}
+  {% comment %} Cache-busted on the build time: without ?v= a browser reuses
+     its stored stylesheet across CSS changes, which looks exactly like a fix
+     that did not work (#333). A query string, not a hashed filename: there is
+     no asset pipeline. {% endcomment %}
   {% if this_site %}
   <link rel="stylesheet" href="{{ '/assets/css/' | append: this_site.css | append: '.css' | relative_url }}?v={{ site.time | date: '%s' }}">
   {% endif %}
   <meta name="base-url" content="{{ '/' | relative_url }}">
   {% comment %} Read by assets.js only, which exposes it as HTF.site and builds
-     every artwork URL from it. Food and cocktails have separate SVG sets under
-     assets/img/<key>/, so a decorative fetch cannot be written without it.
-     Empty on the landing page, and assets.js treats empty as "draw nothing".
+     every artwork URL from it. Empty means "draw nothing" there.
   {% endcomment %}
   <meta name="site-key" content="{{ page.site_key }}">
 
-  {% comment %} ── assets.js loads HERE, in the head, and this is load-bearing ──
-     It defines window.HTF — the base URL, the site key, fetchSvg and the
-     shuffled picker — which every other script on the site calls at parse time.
-
-     It used to sit at the end of <body>. That is the usual right answer for a
-     script, and here it was wrong: a page layout's own scripts are emitted
-     inside {{ content }}, which lands in <main> — ABOVE this file's closing
-     scripts. So recipe.html's section-rule.js ran BEFORE assets.js and died on
-     `window.HTF.makeShuffledPicker` of undefined, taking the section rules,
-     the ingredient bullets and the section-heading doodles with it. (All three
-     of those decorations, and that script, were removed in the 2026-07-31
-     redesign — but the load-order rule is about {{ content }}, not about them,
-     and it bites the next script that reaches for window.HTF.)
-
-     It must stay above {{ content }}. It only reads the two meta tags directly
-     above, so the head is safe — it touches no body element at parse time.
+  {% comment %} ── assets.js loads here, in the head ──
+     It defines window.HTF, which other scripts call at parse time, and a page
+     layout's own scripts are emitted inside {{ content }}, above this file's
+     closing scripts. So it must stay above {{ content }}. It reads only the
+     two meta tags directly above and touches no body element.
      tests/test_site_config.py::test_assets_js_loads_before_any_other_script
      guards the order.
   {% endcomment %}
   <script src="{{ '/assets/js/assets.js' | relative_url }}"></script>
-  {% comment %} ── the page ground's print, and why it is in the head too ──
-     ground-print.js puts cocktails' leopard on the page ground by handing the
-     stylesheet a picture it has drawn or kept (#733; the script's header has
-     the argument). It is here rather than at the end of <body> because the
-     common case is a picture already kept: the sooner it asks for it, the
-     shorter the moment a page shows a plain ground. It reads custom
-     properties off the root element and touches nothing in the body, so the
-     head is safe, and on a site whose stylesheet declares no print (food) it
-     returns on its fourth line. AFTER assets.js, which it calls.
+  {% comment %} ground-print.js puts the page ground's print on a site whose
+     stylesheet declares one (#733). In the head so a kept picture is asked for
+     as early as possible; it reads custom properties off the root element and
+     touches nothing in the body. After assets.js, which it calls.
   {% endcomment %}
   <script src="{{ '/assets/js/ground-print.js' | relative_url }}"></script>
 </head>
 <body>
 
-  {% comment %} TWO WHOLE TAGS RATHER THAN A LIQUID TAG INSIDE ONE class=""
-     ATTRIBUTE, AND THAT IS LOAD-BEARING, NOT A STYLE CHOICE.
-     test_every_chrome_class_has_a_rule_in_every_site_stylesheet reads the
-     chrome's class attributes out of this file with
-     `class=['"]([^'"{}]+)['"]` -- a pattern that deliberately refuses braces,
-     so ONE Liquid conditional inside a class attribute makes the whole
-     attribute invisible to it. Written the obvious way (a conditional wrapping
-     just the second class name), `site-header` would have dropped out of the
-     set of classes that test checks and `site-neutral` would never have
-     entered it: the test would go on passing while covering less. Spelled
-     as two literal tags, both classes are scanned and both must be styled on
-     both sites, which is the point of that test.
-
-     WHAT THE CLASS IS FOR: /about/ belongs to no site (§13.8), so its nav row
-     renders BOTH doors where every other page renders one. That row is placed
-     in column 3 of a `1fr auto 1fr` grid, and two doors are wider than that
-     column at every viewport width -- so on the one page that has two, the row
-     wrapped onto a second line. This hook lets shared/_layout.scss give the row
-     the full width on that page alone.
-
-     THE WHITESPACE MARKERS KEEP EVERY OTHER PAGE BYTE-IDENTICAL. `-%}` on the
-     endcomment eats its own newline and the next line's indent, and neither
-     branch below carries an indent of its own -- so the two spaces in front of
-     this comment's own opening tag up there are what indents the header tag,
-     and a page that is not site_neutral renders exactly the bytes it rendered
-     before this comment existed. Verified by diffing the built /food/ and
-     /cocktails/ against a build of the previous template, not by reading the
-     markers. {% endcomment -%}
+  {% comment %} Two whole tags, not a Liquid tag inside one class attribute:
+     test_every_chrome_class_has_a_rule_in_every_site_stylesheet reads class
+     attributes with a pattern that refuses braces, so a conditional inside the
+     attribute would hide both classes from it. `site-neutral` lets
+     shared/_layout.scss give the nav row the full width on a page that shows
+     both doors. The whitespace markers keep the output identical to a plain
+     header tag: `-%}` eats this comment's newline, and the two spaces before
+     its opening tag are what indent the header. {% endcomment -%}
 {%- if page.site_neutral %}<header class="site-header site-neutral">{% else %}<header class="site-header">{% endif %}
-  {% comment %} ── ONE HEADER, NOT TWO THAT MATCH ──────────────────────────────
-     Issue #374, Helen 2026-08-19: "Literally the same code and assets."
-
-     This nav has NO branch on which site the page belongs to, and that is the
-     feature rather than a simplification. It emits one icon per site in
-     _data/sites.yml, in file order, then the about link -- so the row is
-     byte-identical on a recipe, on the index, and on a cocktail, and the icon
-     for the section you are currently in is simply one of the row rather than
-     a special case.
-
-     The version this replaced built the row from three per-site keys
-     (home_icon, switch_site/switch_icon, about_url), each independently
-     optional. Food declared all three; cocktails declared none, so cocktails
-     rendered no nav whatsoever and nothing failed -- "each is independently
-     optional" is exactly how a shared header comes to exist on one site only.
-
-     ORDER IS sites.yml's ORDER. Reordering that file reorders this row, which
-     is the intended knob; there is no second place to change.
-
-     The about link is deliberately not spelled out as "about" anywhere a nav
-     shows it -- Helen's explicit call. It is a literal /about/ now rather than
-     a per-site key: there is one about page for the whole repo (see about.html).
-
-     .site-header-inner shares main's own max-width/margin:auto formula
-     (see _layout.scss) purely so the nav can align with the right edge of
-     the CONTENT column -- .site-header itself is edge-to-edge full width,
-     with no column of its own to align against otherwise. {% endcomment %}
-  {% comment %} THE WORDMARK AND THE NAV ARE SIBLINGS IN ONE GRID -- issue #551.
-
-     They used to be a centred link in normal flow and an absolutely positioned
-     row, with nothing between them but luck about widths. The nav was pinned
-     into the header's bottom-right corner; the wordmark grew from the middle;
-     and on cocktails they met, because `[ COCKTAILS ]` is wider than
-     HELEN TRIAGES and the wordmark's grid takes the width of whichever row is
-     wider (MANUAL 13.8). Helen: the tape "covers the start of the navbar on
-     the right".
-
-     A `1fr auto 1fr` grid makes that impossible at every width rather than
-     below a chosen one: the middle track holds the wordmark and cannot grow
-     into the track the nav occupies. Same shape, and the same reasoning, as
-     `.site-footer-top` -- which also places its children explicitly rather than
-     letting them auto-flow, for the same reason it matters here.
-
-     THE NAV STAYS FIRST IN THE MARKUP. It is first in the tab order on purpose
-     (§12), so its column is assigned in CSS rather than by moving it after the
-     wordmark. {% endcomment %}
-  {% comment %} THE ROW IS THE DOOR TO THE OTHER SITE -- Helen's own idea,
-     2026-09-10, chosen from a header-only candidates page in three readings:
-     "D: the other site, icon and word, arrow on." Centred under the wordmark
-     that day; at the right-hand end of its row, on the cards' right edge, at
-     every width since 2026-09-11 (#965 and her desktop ruling the same
-     afternoon). Family looking at the site once had no reason to think the
-     small glass in the corner was a second site; a row that says
-     "[ COCKTAILS ] →" under "[ FOOD ]" does.
-
-     THE SITE YOU ARE ON IS NOT IN THE ROW. The tape above already names it,
-     and the same word twice, small under large, said nothing (the candidates
-     page showed it as C). So the loop skips `page.site_key`, and on a page
-     that belongs to no site (`site_neutral`, the about page) it shows every
-     site, because there nothing above says where you are.
-
-     THIS IS THE ONE PLACE THE SHARED HEADER'S OUTPUT VARIES BY SITE BESIDES
-     THE WORDMARK, and it varies by the same rule: it says where you are, or
-     rather where you are not. One template, one loop over sites.yml, no
-     per-site key; test_the_header_and_footer_are_identical_on_every_page
-     compares the row within a site and the footer across both, and says why.
-
-     THE ARROW IS A LINK'S ARROW, NOT A SWIPE. It reads "over there"; nothing
-     swipes, on a phone or anywhere. The about link left the row for the same
-     reason the row moved: it is not a site, so it sits alone at the LEFT end
-     of the row's line (moved from the right so the arrow does not point at
-     it), a step larger than it was. `??` and the row end on the cards' left
-     and right edges at every width (#965) -- shared/_layout.scss has the
-     measurements. {% endcomment %}
+  {% comment %} ── One header for both sites (#374) ────────────────────────────
+     One template and one loop over _data/sites.yml, in that file's order, with
+     no per-site key; test_the_header_and_footer_are_identical_on_every_page
+     holds it. `.site-header-inner` takes the content column's width
+     (_layout.scss) so the nav can align with the cards' right edge.
+     {% endcomment %}
+  {% comment %} The wordmark and the nav are siblings in a `1fr auto 1fr` grid
+     (#551), so the wordmark's middle track cannot grow into the nav's. The nav
+     stays first in the markup because it is first in the tab order on purpose;
+     its column is assigned in CSS. {% endcomment %}
+  {% comment %} The row is the door to the other site. The loop skips
+     `page.site_key`, because the tape already names the site you are on; a
+     `site_neutral` page shows every site. The about link is not a site, so it
+     sits outside the nav, at the left end of the row's line (#965).
+     {% endcomment %}
   <div class="site-header-inner">
     <nav class="site-nav-icons">
       {% for entry in site.data.sites %}
       {% assign nav_site = entry[1] %}
       {% if entry[0] != page.site_key or page.site_neutral %}
       <a href="{{ nav_site.home | relative_url }}" class="site-nav-icon-link" aria-label="{{ nav_site.title }}">
-        {% comment %} NO ICON SINCE 2026-09-14 -- #1007, Helen: "navbar button
-           for other site is too large and busy". The site's icon
-           (`nav_site.icon`, _includes/icons/) stood here beside the word from
-           2026-09-10; shown three alternatives on the real header -- the word
-           and the arrow, the icon and the arrow, the word on a tiny tape --
-           she asked for a recommendation and took the word: it is the part
-           that did the work (the row exists because family did not read a
-           small glass as a second site), the icon was the busy part, and a
-           second tape under the wordmark's tape read as a mis-sized copy of
-           it. The key and the artwork stay in sites.yml and _includes/icons/;
-           the class rules stay in shared/_layout.scss and shared/_chrome.scss,
-           so putting it back is this one include line. {% endcomment %}
+        {% comment %} The word and the arrow, no site icon (#1007). The icon
+           heads the site's footer column instead. {% endcomment %}
         <span class="site-nav-word">[ {{ nav_site.word }} ]</span>
-        {% comment %} A DRAWN ARROW, NOT `&rarr;` -- #993, 2026-09-12. Helen:
-           "the go to the other site mark should have its centre horizontally
-           aligned with the arrow", with a screenshot of the food site's row in
-           which the arrow sits about a pixel below the glass and two below the
-           lettering.
-
-           THE ROW WAS ALREADY ALIGNED BY CONSTRUCTION and that is why the bug
-           could not be reproduced here: the link is a flex row with
-           `align-items: center`, so it centres the three BOXES on each other,
-           and every icon's ink is centred in its own viewBox (§9.14 fits each
-           viewBox to its artwork). Measured on this build, the glass, the
-           lettering and the arrow agreed within a quarter of a pixel.
-
-           WHAT VARIED WAS THE GLYPH. Courier Prime ships here as an 18KB
-           subset with no arrow in it, so `&rarr;` was drawn by whatever face
-           the reader's machine substitutes for U+2192 -- and a substituted
-           glyph is a substituted FONT, which changes metrics and not only the
-           picture. That is the same trap `_sass/cocktails/_shortlist.scss`
-           records for the shortlist button's `+` and tick, one step worse:
-           there the fallback moved a box, here it also decides where the ink
-           sits inside one, which no rule in this repo can reach.
-
-           So the arrow is now a mark we draw, like every other mark on the
-           site: ink centred in a viewBox, sized in CSS, aligned by the same
-           flex centring as the icon beside it, and identical on every machine
-           and browser. Helen chose this over a measured nudge, which would
-           have been calibrated against a font only this container has. {% endcomment %}
+        {% comment %} A drawn arrow, not `&rarr;` (#993): the heading face is a
+           subset with no arrow in it, so the glyph would come from whatever
+           font the reader's machine substitutes, metrics included. {% endcomment %}
         {% include icons/arrow-right.svg class="site-nav-arrow" %}
       </a>
       {% endif %}
       {% endfor %}
     </nav>
-    {%- comment %} NOT EMITTED ON THE PAGE IT POINTS AT -- #1086, 2026-09-15.
-       Helen, picking C from the about-header candidates page: "C: doors on one
-       line, no ??". /about/ is the one site_neutral page, so it is the one page
-       whose row carries both doors; C gives that row the full width (see
-       `.site-neutral .site-nav-icons` in shared/_layout.scss) and drops the `??`
-       from it, which on that page was a link to the page you are already on.
-
-       `unless`, NOT `hidden` AND NOT `display: none`. A hidden element is still
-       in the tab order in the first case and still announced by some tooling in
-       neither -- so a keyboard reaching the about page would still stop on a
-       link back to it. The only way for it not to be reachable is for it not to
-       be there.
-
-       IT IS ON EVERY OTHER PAGE, unchanged, at the LEFT end of the row's line
-       (the row's own comment above has why it sits there rather than beside the
-       arrow). This is not the link becoming conditional in general; it is the
-       one page that IS the destination not offering itself.
-
-       test_the_header_and_footer_are_identical_on_every_page is unaffected and
-       it is worth saying why rather than leaving it to be rediscovered: that
-       test compares `<nav class="site-nav-icons">...</nav>`, and this link is a
-       SIBLING of that nav, not a child. It also compares pages of one site, and
-       /about/ is of neither.
-
-       THE WHITESPACE MARKERS ARE THE SAME TRICK THE HEADER TAG USES, for the
-       same reason: every page except /about/ must render the bytes it rendered
-       before. The opening marker eats the newline and indent after `</nav>`;
-       the tag below restores them, and the closing one eats the newline this
-       block would otherwise add. {% endcomment -%}
+    {%- comment %} Not emitted on a site_neutral page (#1086), where it would
+       link to the page you are on. `unless`, not `hidden` or `display: none`:
+       a hidden link can still be reached. It is a sibling of the nav, not a
+       child, so the nav row test does not see it. The whitespace markers keep
+       every other page's output identical: the opening one eats the newline
+       and indent after `</nav>`, the tag below restores them, and the closing
+       one eats the newline this block would add. {% endcomment -%}
 {%- unless page.site_neutral %}
     <a href="{{ '/about/' | relative_url }}" class="site-nav-icon-link site-about-link" aria-label="About this site">??</a>
     {%- endunless %}
-    {% comment %} THE SEARCH BOX, ON A LOCAL BUILD ONLY -- #1210, 2026-09-30.
-       Directly under the door to the other site, on its right edge (row 3,
-       column 3 of this grid; shared/_layout.scss). Helen: "Move the omnisearch
-       to the navbar, directly under [ FOOD ] ->, to show on the local site
-       only -- this is key for me during testing so I'm not clicking about all
-       over the place." The include renders nothing unless _config_local.yml
-       says `show_header_search: true`, so the deployed header is byte for
-       byte what it was; the include's own comment has the rest. {% endcomment %}
+    {% comment %} The search box, on a local build only (#1210): the include
+       renders nothing unless `show_header_search` is true, which only
+       _config_local.yml sets. {% endcomment %}
     {% include page-search.html %}
   <a href="{{ this_site.home | default: '/' | relative_url }}" class="site-title-link">
     <div class="site-logo">
       <div class="site-logo-top">HELEN TRIAGES</div>
-      {% comment %} The bracketed word is the site's, from _data/sites.yml. On
-         the landing page there is no site, so the wordmark is just HELEN
-         TRIAGES with nothing taped underneath it.
-
-         A PAGE MAY OVERRIDE THE WORD, and exactly one does: about.html sets
-         `wordmark_word: "???"`, so the wordmark reads HELEN TRIAGES / [ ??? ].
-         Helen's idea, 2026-08-19. It is not a joke bolted on -- it answers a
-         real problem opened by issue #374 and recorded as #395. That page is
-         reached from the shared header of BOTH sites and lives at a
-         site-neutral /about/, but it carries site_key: food to get a
-         stylesheet at all (see its own front matter), so without this it wore
-         [ FOOD ] while speaking for the whole repo.
-
-         MANUAL 13.4.1's test for a new use of the brackets is "is it naming
-         a SITE, from sites.yml, or is it reaching for brackets because
-         capitals look like they want some?" This is the first thing to sit in
-         between: ??? is not a site, and putting it in the site slot is how the
-         page says it belongs to neither. The page's own <h1> and the nav link
-         that reaches it are already ??? and ??, so the voice is established.
-
-         Deliberately narrow: it overrides the WORD only. The title bar still
-         reads "Helen Triages Food", which is the rest of #395. {% endcomment %}
+      {% comment %} The bracketed word is the site's, from _data/sites.yml. A
+         page may override it with `wordmark_word` (about.html, 404.html) to
+         say it belongs to neither site (#395), since it still carries
+         `site_key: food` to get a stylesheet. Brackets name a site slot and
+         nothing else: MANUAL 13.4.1. {% endcomment %}
       {% assign wordmark_word = page.wordmark_word | default: this_site.word %}
       {% if this_site %}
       <div class="site-logo-tape">
-        {% comment %} One tape set for the whole repo, in assets/img/chrome/tape/.
-           It used to be one directory per site holding byte-identical files, and
-           `tape`/`tape_count` in sites.yml chose between them -- see that file's
-           header, and issue #223, where the two drifted for five days. The count
-           is chrome config, so it comes from _data/chrome.yml. {% endcomment %}
+        {% comment %} One tape set for the whole repo, in
+           assets/img/chrome/tape/ (#223); the count is chrome config, from
+           _data/chrome.yml. {% endcomment %}
         <span class="tape-bg" aria-hidden="true"
               data-tape-count="{{ site.data.chrome.tape_count }}"></span>
-        {% comment %} `--wordmark-chars` IS HOW THE WORD FITS A PHONE -- #899.
-           `[ COCKTAILS ]` at 2.5rem is 491px wide and nothing capped it, so
-           every cocktails page could be dragged sideways on a 390px screen.
-           The stylesheet sizes the word from this count (brackets and their
-           spaces included: 4 extra characters) so the tape never exceeds 92vw,
-           and a short word like `[ FOOD ]` keeps its full size because the
-           formula only bites when the word would not fit. See
-           `.site-logo-word` in _sass/shared/_layout.scss. {% endcomment %}
+        {% comment %} `--wordmark-chars` is how the word fits a phone (#899):
+           `.site-logo-word` in _sass/shared/_layout.scss sizes the word from
+           this count so the tape never exceeds 92vw. The 4 is the brackets and
+           their spaces. {% endcomment %}
         <span class="site-logo-word" style="--wordmark-chars: {{ wordmark_word | size | plus: 4 }};"><span class="site-logo-bracket">[ </span>{{ wordmark_word }}<span class="site-logo-bracket"> ]</span></span>
       </div>
       {% endif %}
@@ -419,49 +183,19 @@
   </main>
 
   <footer class="site-footer">
-    {% comment %} ── ONE FOOTER, NOT TWO THAT MATCH ──────────────────────────
-       Issue #374, same ruling as the header above. Nothing below reads
-       `this_site`: every page in the repo gets the same footer, and the only
-       thing that varies is which reference columns have material to show.
-
-       A three-column grid so the hearts stay exactly where they have always
-       been -- page-centred -- while the reference block sits beside them.
-       Centring the PAIR instead would have moved the graphic, which is not what
-       was asked for and is a change to something already settled.
-
-       THE REFERENCE BLOCK IS A COLUMN PER SITE, not the current site's column.
-       Helen, 2026-08-19: "Site-wide. Gate the [food] and [cocktails] columns to
-       only show if they have material." So a food recipe's footer and a
-       cocktail's footer both list food's two reference pages today, and both
-       will list cocktails' as well the day cocktails has any -- no template
-       change, because the loop already asks every site rather than one.
-
-       THE BRACKETED WORD IS the site's own `word`, NOT THE LITERAL "[ FOOD ]".
-       MANUAL 13.4.1 says brackets are the wordmark's own device and not a
-       flourish to reuse -- and this is that device used for what it means: a
-       label saying which site these pages belong to. With the columns now shown
-       side by side rather than one at a time, that label is doing more work
-       than it was, not less: it is the only thing saying that internal
-       temperatures are food's material. It carries no punched-tape treatment,
-       which is the part 13.4.1 actually forbids.
-
-       A site with no reference_links contributes no column at all, rather than
-       an empty heading -- the same absent-means-nothing convention sites.yml
-       uses throughout.
+    {% comment %} ── One footer for both sites (#374) ──────────────────────────
+       Nothing below reads `this_site`: every page gets the same footer. The
+       reference block is a column per site, not the current site's column, and
+       a site with no reference_links contributes no column. The bracketed word
+       is the site's own `word`, used as a label for whose pages these are
+       (MANUAL 13.4.1). Three grid columns keep the hearts page-centred.
     {% endcomment %}
     <div class="site-footer-top">
-      {% comment %} A LINK MAY BE LOCAL-ONLY, and the column is drawn from what
-         SURVIVES the filter rather than from what is declared -- #529,
-         2026-09-06. A page that is `published: false` has no URL in
-         production, so a footer pointing at it is a 404 in the one place that
-         matters; `local_only: true` on the entry in _data/sites.yml is what
-         keeps the two halves in step.
-
-         `show_local_reference_links` is declared only by _config_local.yml,
-         the same idiom as show_costs / show_units / show_drafts. Filtering
-         BEFORE the emptiness test is the whole of it: a site whose only
-         reference page is local-only draws no column at all in production,
-         rather than a bracketed word with nothing under it. {% endcomment %}
+      {% comment %} A link may be `local_only: true` in _data/sites.yml (#529):
+         its page has no URL in production, so the link is dropped unless
+         `show_local_reference_links` is set, which only _config_local.yml
+         does. Filter before the emptiness test, or a site whose only link is
+         local-only draws an empty column in production. {% endcomment %}
       {% for entry in site.data.sites %}
       {% assign ref_site = entry[1] %}
       {% assign ref_links = ref_site.reference_links %}
@@ -470,84 +204,19 @@
       {% endunless %}
       {% if ref_links and ref_links.size > 0 %}
       <nav class="site-footer-ref" aria-label="{{ ref_site.title }} reference">
-        {% comment %} THE SITE'S ICON, BACK FROM THE NAVBAR -- #1122, 2026-09-16.
-           Helen: "put the cloche (food) and martini glass (cocktails) SVGs in
-           the footer columns, centered over the links for each site", and why:
-           "These used to be in the navbar but didn't make the redesign, and I
-           miss them!"
-
-           IT IS THE SAME KEY AND THE SAME ARTWORK #1007 PARKED. That issue took
-           the icons out of the header ("navbar button for other site is too
-           large and busy") and the note left behind at that spot says exactly
-           what survived: "The key and the artwork stay in sites.yml and
-           _includes/icons/; the class rules stay in shared/_layout.scss and
-           shared/_chrome.scss, so putting it back is this one include line."
-           This is that line, in the footer rather than the header -- so the
-           icons return where they are a column's head rather than a second
-           tape competing with the wordmark's, which was #1007's actual
-           complaint.
-
-           THE ASSIGN IS HOW A DYNAMIC INCLUDE IS SPELLED HERE, kept from the
-           header's own version of this line (dfdf7e8): Liquid's `include`
-           takes a variable only in the `{% include {{ var }} %}` form.
-
-           NO `class` PARAMETER, DELIBERATELY. Both partials carry their classes
-           in the file (`nav-icon nav-icon--food`, `nav-icon nav-icon--martini`),
-           and test_every_chrome_class_has_a_rule_in_every_site_stylesheet reads
-           those files to find them with a pattern that skips anything holding
-           Liquid braces -- so parameterising the class here would hide these
-           icons' classes from the one test that proves both stylesheets style
-           them. The wrapper span takes the footer's own sizing instead.
+        {% comment %} The site's icon heads its column (#1122). No `class`
+           parameter on the include: both partials carry their classes in the
+           file, where test_every_chrome_class_has_a_rule_in_every_site_stylesheet
+           finds them with a pattern that skips anything holding Liquid braces.
+           The assign is how a dynamic include is spelled: `include` takes a
+           variable only in the `{% include {{ var }} %}` form.
         {% endcomment %}
-        {% comment %} ICON AND WORD ON ONE LINE -- #1139, 2026-09-17, replacing
-           #1122's stacked arrangement the day after it shipped. Helen: "the
-           footer icons look strange because food and cocktails are different
-           lengths, so reduce the icon size and bring it inline with the
-           heading, left for food and right for the cocktails."
-
-           WHY CENTRING FAILED, which is the part worth keeping: `[ FOOD ]` and
-           `[ COCKTAILS ]` are different WIDTHS, so an icon centred over each
-           column's links landed at a different horizontal offset in each -- and
-           the two columns sit at opposite edges of the footer, where that
-           difference reads as a mistake rather than as symmetry. Centred on the
-           column is not the same as agreeing with its neighbour.
-
-           ONE ROW, REVERSED IN THE SECOND COLUMN, so each icon sits on the
-           OUTSIDE of its own word: column one is left-aligned and gets the icon
-           first, column three is right-aligned and gets it last. The mirroring
-           is `flex-direction: row-reverse` in the stylesheet, not a second
-           branch here -- the footer stays one template emitting one shape per
-           site, which is what test_the_header_and_footer_are_identical_on_every_page
-           holds it to. {% endcomment %}
-        {% comment %} THE HEAD IS A DOOR TO THE SITE -- #1149, 2026-09-19.
-           Helen's issue is the two words and nothing else: "[ FOOD ]",
-           "[ COCKTAILS ]", under the title "footer group headers should be
-           links, and the icons". So the icon and the word became ONE link to
-           that site's index, rather than the word alone -- "and the icons"
-           reads as the icon coming along, and an icon that sits on a link's
-           line but is not part of it is the kind of near-miss target a phone
-           finds first.
-
-           THIS REVERSES A NOTE, NOT A RULING, and the note is worth naming
-           because it is still in the stylesheet's history: .site-footer-ref-word
-           used to be described as "a label saying whose pages these are, not a
-           thing to click". That was true while the column head was the only
-           thing down here that went nowhere; it stopped being true the moment
-           Helen asked for the link. §13.12: a ruling is not permanent, and this
-           one moved because she looked at the built footer and wanted the word
-           to do something.
-
-           `ref_site.home`, NOT A NEW KEY. _data/sites.yml already declares
-           where each site's front door is -- it is what the header's own
-           `[ COCKTAILS ]` link uses -- so the footer asks the same key and
-           there is no second place to keep in step.
-
-           STILL ONE SHAPE PER SITE. The element changed from a span to an
-           anchor; the class, the two children and the order are untouched, so
-           `.site-footer-ref:nth-of-type(2) .site-footer-ref-head`'s
-           row-reverse mirroring still applies and
-           test_the_header_and_footer_are_identical_on_every_page still sees
-           one template emitting one shape. {% endcomment %}
+        {% comment %} Icon and word on one line (#1139). The second column is
+           mirrored by `flex-direction: row-reverse` in the stylesheet, not by a
+           branch here, so each icon sits on the outside of its own word and
+           the footer stays one shape per site. {% endcomment %}
+        {% comment %} The head is one link to the site's index (#1149), from
+           `ref_site.home`, the key the header's door uses. {% endcomment %}
         {% assign ref_icon_file = "icons/" | append: ref_site.icon | append: ".svg" %}
         <a class="site-footer-ref-head" href="{{ ref_site.home | relative_url }}">
           <span class="site-footer-ref-icon">{% include {{ ref_icon_file }} %}</span>
@@ -561,38 +230,14 @@
       {% endfor %}
       {% comment %} The hearts are chrome, so they are unconditional and named in
          decorations.js rather than chosen by a per-site `footer_svg` key. {% endcomment %}
-      {% comment %} THE CENTRE COLUMN, issue #969 — Helen's revised running
-         order: about / [GitHub logo] / copyright / licences / [heart drawing].
-         SUPERSEDES #915's "about / [GitHub logo] / [heart drawing] /
-         copyright / licences", which itself superseded #652's "[heart
-         drawing] / about / [GitHub logo] / licences line" — a ruling is not
-         permanent, and this is Helen looking at the built page and changing
-         her mind about the order rather than a re-argument of #652's own case
-         for putting these four in the grid's middle track at all, which
-         stands unchanged.
-
-         Putting them in the middle track makes the footer the three columns it
-         has claimed to be since #374: a site's reference links either side, and
-         the things belonging to neither site down the middle.
-
-         `grid-column: 2` lives on this wrapper rather than on the hearts —
-         see _sass/shared/_layout.scss for why the middle track is pinned rather
-         than auto-flowed, which is unchanged and still load-bearing. {% endcomment %}
+      {% comment %} The centre column holds what belongs to neither site, in
+         this order (#969): about, GitHub mark, copyright, licences, hearts.
+         `grid-column: 2` lives on this wrapper; _sass/shared/_layout.scss says
+         why the middle track is pinned rather than auto-flowed. {% endcomment %}
       <div class="site-footer-centre">
-        {% comment %} The about page, reachable from the footer as well as the
-           header -- Helen's ask, 2026-08-23, after cooking from her phone,
-           where the header nav is the harder of the two to hit.
-
-           IT IS SPELLED OUT HERE, WHICH THE HEADER DELIBERATELY DOES NOT DO.
-           The header's own comment records that call: the "??" is bare on
-           purpose and "about" is not written anywhere a nav shows it. A footer
-           is a different job from a nav icon row -- it is where you go looking
-           for the boring links, and an unlabelled one there would be a link to
-           nowhere in particular. Flagged rather than assumed; if Helen would
-           rather it read "???" to match the page's own wordmark, that is a
-           one-word change.
-
-           FIRST IN THE CENTRE COLUMN, since #915 put it there. {% endcomment %}
+        {% comment %} Spelled out as "about" here, which the header's `??`
+           deliberately is not: a footer is where a reader looks for the plain
+           links. {% endcomment %}
         <nav class="site-footer-about" aria-label="About this site">
           <a href="{{ '/about/' | relative_url }}">about</a>
         </nav>
@@ -600,129 +245,55 @@
           {% include icons/github.svg %}
         </a>
         <p class="site-footer-copyright">&copy; {{ site.time | date: "%Y" }} {{ site.title }}</p>
-        {% comment %} TWO SENTENCES, EACH IN ITS OWN SPAN, so a phone can stack
-           them (#902, Helen: "stack the two licences on narrower screens").
-           One paragraph still; the spans are inline at desktop width and
-           `display: block` under the footer's phone breakpoint in
-           _sass/shared/_layout.scss.
-
-           SITS CLOSER TO THE COPYRIGHT LINE THAN THE GRID'S OWN ROW GAP WOULD
-           PUT IT, #915 — Helen: the licences line should sit close to the
-           copyright line "to show they're one object". See
-           `.site-footer-license`'s `margin-top` in _sass/shared/_layout.scss;
-           the tighter distance is set there rather than by this column's
-           general `gap`, which every OTHER pair of rows here still uses.
+        {% comment %} Two sentences, each in its own span, so a phone can stack
+           them (#902): inline at desktop width, `display: block` under the
+           footer's phone breakpoint. `.site-footer-license`'s `margin-top` in
+           _sass/shared/_layout.scss sets it closer to the copyright line than
+           the column's `gap` would (#915).
            {% endcomment %}
         <p class="site-footer-license">
           <span class="site-footer-license-line">Code: <a href="https://github.com/DeckOfPandas/helen-triages/blob/main/LICENSE">MIT</a>.</span>
           <span class="site-footer-license-line">Recipes and writing: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</span>
         </p>
-        {% comment %} LAST IN THE STACK, SINCE #969 -- Helen: "re-order the
-           central column of the footer to put the heart SVG at the bottom --
-           everything else stays in the same place." Previously third, between
-           the GitHub mark and the copyright line (#915). {% endcomment %}
+        {% comment %} Last in the stack (#969). {% endcomment %}
         <div class="site-footer-hearts" aria-hidden="true"></div>
       </div>
     </div>
   </footer>
 
 
-  {% comment %} decorations.js injects every hand-drawn SVG in the page shell —
-     highlighters, brush washes, the tape behind the wordmark, the footer. It
-     runs last because it reads elements from all over the page, and it can:
-     assets.js has already defined window.HTF up in the head.
-
-     There is no longer any JS colour bridge to load. colours.js read food's
-     --colour-* custom properties off :root so that JS-injected SVG could be
-     recoloured; the 2026-07-31 recipe-page redesign removed the last thing that
-     needed it, and both it and the :root block are gone. decorations.js needs
-     no palette: highlighter and brush colour come from CSS, and the footer
-     artwork takes currentColor.
+  {% comment %} decorations.js injects every hand-drawn SVG in the page shell:
+     the tape behind the wordmark, the footer hearts and the rest. It runs last
+     because it reads elements from all over the page; assets.js has already
+     defined window.HTF in the head.
   {% endcomment %}
   <script src="{{ '/assets/js/decorations.js' | relative_url }}"></script>
 
-  {% comment %} last-line-rule.js puts the double rule under the LAST line of a
-     wrapped title or section heading instead of once under every line — design
-     audit critical #7, Helen 2026-09-04: "Last line only
-     please, 10000%."
-
-     LOADED FROM THE SHARED LAYOUT, not from recipe.html, because it is
-     site-agnostic in the same way print-link.js and universe.js are: it queries
-     a class list and does nothing on a page that has none. A DRINK page has no
-     wrapping consumer of the mark (INGREDIENTS/METHOD/NOTES never wrap), but
-     cocktails' reference layer does — #920, the script's own header has the
-     detail. This comment said "cocktails has no wrapping consumer" full stop
-     until then, which was true of drink pages and stopped being true of the
-     site the day the rum reference page grew real sentences for headings.
-
-     AFTER assets.js, which is the one hard ordering rule here
-     (tests/test_site_config.py::test_assets_js_loads_before_any_other_script).
-     It reads nothing off window.HTF, so anywhere below the head would do; it
-     sits beside decorations.js because both are page-shell finishing passes
-     that want the whole document present.
-
-     It measures where the lines break, so it must run when the elements are
-     laid out — and after {{ content }}'s own scripts, one of which
-     (cook-timer.js) writes the text of a heading this would otherwise split.
-     That heading opts out with `data-last-line-rule="skip"`; see the script's
-     header. {% endcomment %}
+  {% comment %} last-line-rule.js puts the double rule under the last line of a
+     wrapped title or heading. In the shared layout because it is
+     site-agnostic: it queries a class list and does nothing on a page with
+     none. It measures where lines break, so it runs after {{ content }}'s own
+     scripts; cook-timer.js writes a heading's text, and that heading opts out
+     with `data-last-line-rule="skip"`. {% endcomment %}
   <script src="{{ '/assets/js/last-line-rule.js' | relative_url }}"></script>
 
-  {% comment %} card-name-fit.js decides, per drink name, whether a name that
-     does not fit its tape should step down one size or wrap to two lines —
-     design audit critical #9, Helen 2026-09-04: "shrink
-     when it's just one short-ish word too long, then two lines where it's more
-     than that."
-
-     LOADED FROM THE SHARED LAYOUT for exactly the reason last-line-rule.js
-     above is: it is site-agnostic, queries `.drink-card-name` and returns
-     having done nothing on a page with none. Food has none.
-
-     AFTER assets.js — the one hard ordering rule
-     (tests/test_site_config.py::test_assets_js_loads_before_any_other_script)
-     — because it hangs HTF.fitCardNames() off the namespace assets.js creates.
-     It degrades rather than throws if that is absent, but the hook is how a
-     later-appended card gets measured.
-
-     It measures rendered widths, so it must run with the elements laid out,
-     and AFTER {{ content }}'s own scripts: cocktails/index.html loads
-     universe.js, which deals a cloned card above the filter panel. Running
-     below it means the first deal is measured by this file's own load pass;
-     every later "deal again" calls HTF.fitCardNames() itself. {% endcomment %}
+  {% comment %} card-name-fit.js steps a drink name down a size, or wraps it,
+     when it does not fit its tape. Site-agnostic: a page with no
+     `.drink-card-name` is left alone. After assets.js, because it hangs
+     HTF.fitCardNames() off that namespace. After {{ content }}'s own scripts,
+     because cocktails/index.html loads universe.js, which deals a cloned card
+     that this file's load pass must measure. {% endcomment %}
   <script src="{{ '/assets/js/card-name-fit.js' | relative_url }}"></script>
 
-  {% comment %} chip-rows.js STOOD HERE until #846, 2026-09-08. It measured
-     `offsetTop` and marked the mood word beginning each row, so the stylesheet
-     could keep the middle dot off it -- #698, Helen: "no dot before the first
-     chip." The dot was never before chip one; it was before chip one of the
-     SECOND row, on the 61% of drinks whose moods wrap.
+  {% comment %} No chip measurement pass loads here: the dot between mood chips
+     is a trailing `::after` on every chip but the last (#846), so nothing
+     depends on where a chip row breaks. {% endcomment %}
 
-     #846 moved the dot to a trailing `::after` on every chip but the last, at
-     Helen's word: "chips which form more than one line should have a . in
-     between them even if the final chip on any line before the first is a whole
-     chip." No chip has a leading dot now, so there is no line break for CSS to
-     be blind to and nothing for a measurement to mark. `_cards.scss` carries
-     the full story where the suppression rule used to be.
-
-     ONE FEWER MEASUREMENT PASS ON THE INDEX, which is worth stating because the
-     remaining two feed each other and #828 is about testing exactly that:
-     card-name-fit.js decides whether the ingredient line is clamped at two
-     lines or three, and card-line-budget.js reads the rendered line to decide
-     whether the chips are capped. Nothing now depends on where a chip row
-     breaks. {% endcomment %}
-
-  {% comment %} card-line-budget.js -- THE TAG WENT MISSING WITH chip-rows.js,
-     2026-09-08, AND NOBODY NOTICED FOR TWO DAYS. #846 deleted chip-rows.js and
-     its tag, and the comment above replaced BOTH tags that stood here; the
-     budget pass (#776: three ingredient lines cap the chips at two rows) was
-     described in that comment and loaded by nothing. cocktail-index.js guards
-     its call with `if (HTF.cardLineBudget)`, so it failed silently -- MANUAL
-     §12's "you will assume 'end of body' means 'loads first'" has a cousin:
-     you will describe a script tag and not write it. Found on 2026-09-10 when
-     the pass gained the ship-collision check and marked nothing on a page
-     where seven cards collided. AFTER card-name-fit.js, which is the one
-     ordering it needs (its header says why), and
-     test_the_card_measurement_passes_are_loaded_in_order now holds the pair.
+  {% comment %} card-line-budget.js loads after card-name-fit.js, the one
+     ordering it needs (its header says why);
+     test_the_card_measurement_passes_are_loaded_in_order holds the pair.
+     cocktail-index.js guards its call with `if (HTF.cardLineBudget)`, so a
+     missing tag fails silently.
      {% endcomment %}
   <script src="{{ '/assets/js/card-line-budget.js' | relative_url }}"></script>
 
@@ -733,25 +304,16 @@
      place among the passes above does not matter. {% endcomment %}
   <script src="{{ '/assets/js/card-tagline.js' | relative_url }}"></script>
 
-  {% comment %} shortlist.js wires every `.btn-shortlist` on the page — GitHub
-     issue #546. HERE, in the shell, because the four placements are spread
-     across two layouts and two index pages and there is nothing site-specific
-     about any of them; a <script> in each would be four copies of one line.
-
-     BELOW `{{ content }}`, WHICH IS SAFE FOR THIS SCRIPT AND IS NOT FOR EVERY
-     SCRIPT — see test_assets_js_loads_before_any_other_script for the failure
-     that rule exists to prevent. Nothing calls into this file at parse time:
-     the STORE it needs (HTF.shortlist) is in assets.js up in the head, and its
-     own wiring waits for DOMContentLoaded. So an index page's filters.js, which
-     lands inside content and therefore runs first, still finds HTF.shortlist
-     defined when it asks. {% endcomment %}
+  {% comment %} shortlist.js wires every `.btn-shortlist` on the page (#546),
+     from the shell because the buttons are spread across layouts and index
+     pages. Below {{ content }} is safe for this script: nothing calls into it
+     at parse time, the store it needs (HTF.shortlist) is in assets.js in the
+     head, and its own wiring waits for DOMContentLoaded. {% endcomment %}
   <script src="{{ '/assets/js/shortlist.js' | relative_url }}"></script>
 
-  {% comment %} #477's comparison switch lived here and is gone: Helen looked
-     at the wordmark matched to page headings and kept the old one. The
-     difference is deliberate now, and the reasoning is recorded beside the
-     values in _sass/shared/_layout.scss rather than here, where nobody
-     editing those values would find it. {% endcomment %}
+  {% comment %} The wordmark deliberately differs from page headings (#477);
+     the reasoning is beside the values in _sass/shared/_layout.scss.
+     {% endcomment %}
 
 </body>
 </html>

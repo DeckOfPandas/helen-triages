@@ -1,370 +1,96 @@
 // =============================================================================
-// HELEN TRIAGES COCKTAILS — PALETTE. Argued from real drinks, 2026-08-26.
+// HELEN TRIAGES COCKTAILS — PALETTE
 // =============================================================================
-// This file was placeholder neutrals for three weeks, with its own instruction:
-// "When the real palette arrives, replace the values. Do not remove the names."
-// That is what this is. The ten contract names are unchanged; every value is a
-// decision, and the decisions were made by looking at cards on
-// /dev/cocktails-design/ rather than at swatches.
+// Black on black (#469, MANUAL §9.13): a near-black ground, near-white ink, and
+// the glass drawings carrying the personality food gets from colour.
 //
-// INK, PAPER AND GLASS. Helen's phrase and the whole idea: a light, nearly
-// monochrome ground where the 25 glass drawings carry the personality that
-// food gets from colour. Food leads with ten saturated brights; this site
-// leads with line work and spends colour sparingly on top of it.
+// The names keep their jobs, not their literal meanings: `$color-paper` is the
+// ground you read on and `$color-ink` is the marks you read, whichever way
+// round the two values sit.
 //
-// THREE ACCENTS, AND THE COUNT WENT UP KNOWINGLY. It was "near-monochrome, one
-// accent" on the morning of 2026-08-26 and three by that evening. Helen, naming
-// the reversal rather than letting it drift: "I'm breaking rules, but I'd like
-// more of the second colour... because it's pretty. I'm interested in adding a
-// third too. I know this is going against what I said earlier, but I had no
-// vision then and we're getting closer now."
-//
-// Recorded because food's palette argues the opposite at length -- its recipe
-// page spends four colours and "the count IS the design". The two sites are
-// allowed to disagree; they are not allowed to disagree by accident. What
-// survives here is not the count but the rule underneath it: every colour has
-// a job, and the jobs are different AXES.
-//
-//     menthe   MOOD        the mood filters, and the glass wash on a card
-//     amber    GOODNESS    the ship mark, the chaos buttons, and the
-//                          structural rules and counts
-//     violet   ASKED FOR   the has-to-have field, its chips, the matching
-//                          ingredient on a card, and a method step's numeral
-//
-// A drink can match your mood, be rated `meh`, and contain something you asked
-// for. Three facts, three colours, and no two of them ever mean the same kind
-// of thing. Violet spent one revision on LEAVE OUT and came straight off it --
-// Helen: "suddenly busy, and jarring" -- because exclusion is RARE and its
-// control is LARGE, so the least-used thing below the fold became the loudest.
-// Colour weight tracks how much of the page something occupies, not how
-// semantically distinct it is. Exclusion is struck-through and dashed, and
-// costs nothing.
-//
-// EVERY PAIR IS TWO TONES, SOLVED, NOT ONE VALUE DARKENED BY A SHARED STEP.
-// At the saturation that makes a good fill, none of these is readable as small
-// text on paper. So each accent is a FILL (~2.30:1, never text) and a TEXT tone
-// (~4.75:1, clearing the 4.5:1 body floor), and the lightness that hits those
-// numbers is a property of the HUE: menthe and amber are far apart in lightness
-// at identical measured contrast. Food learned the same thing the hard way and
-// carries $darken-active-lime because one shared darkening step did not hold
-// across two yellow-greens. Here there is no shared step at all.
-//
-// THE HUES WERE CHOSEN BY COLOUR-BLIND SEPARATION, NOT ONLY BY TASTE. Helen
-// rejected campari red and bitter orange as "too red-green and inaccessible",
-// and simulation agrees exactly: against menthe, campari falls to 24.5 dE under
-// protanopia while reading 101 apart to normal vision -- the failure mode where
-// a palette looks fine to whoever picked it. Menthe/amber never drops below 31
-// across protanopia, deuteranopia and tritanopia. Violet beat slate blue, ink
-// teal and aubergine as the only third staying clear of BOTH under all three;
-// the others collapse against menthe under tritanopia (slate blue 5.6, ink teal
-// 6.3) or against amber (aubergine 12.9).
-//
-// IF A FOURTH ACCENT IS EVER PROPOSED, that is the point to stop and ask what
-// AXIS it names, and then to run the separation check before choosing its hue.
-// =============================================================================
+// Every colour has a job; the table is above the accents. Before adding a hue,
+// say what it names, and check it separates from the others for a dichromat:
+// `scripts/palette_measure.py --separation <a> <b>`.
 
 // --- Raw palette -------------------------------------------------------------
-//
-// BLACK ON BLACK, 2026-09-01, issue #469. Helen: "One thing for sure: we're
-// going black on black. I wear black on black animal print whenever possible. I
-// have some black on black bed linen. This is what we're doing." Settled over
-// several rounds at /dev/card-titles/.
-//
-// THE NAMES KEEP THEIR JOBS, NOT THEIR LITERAL MEANINGS. `$color-paper` is
-// still the ground you read ON and `$color-ink` is still the marks you read;
-// only their values invert. Renaming them would have touched every consumer in
-// the site for no gain, and "ink on paper" remains the right way to think about
-// a page whichever way round the two sit.
-//
-// THIS IS A PALETTE CHANGE AND NOT AN ARCHITECTURE ONE, checked before starting:
-// `test_the_header_and_footer_are_identical_on_every_page` compares rendered
-// HTML and colour is CSS, and
-// `test_every_chrome_class_has_a_rule_in_every_site_stylesheet` checks
-// DIVERGENCE rather than values. The shared chrome already differs in colour
-// between the two sites through `$color-accent`, which is exactly what §2.3's
-// palette contract exists to allow. Food is untouched.
 $color-ink:          #e8e6e2;   // was #1b1b1f
-// DARKER SINCE 2026-10-06, #733: #0e0e10 became #060607 when the leopard went
-// on the page ground (_leopard.scss). Helen, choosing between three grounds
-// with the print on them: "darkest". Every figure in this file that was
-// measured "on the ground" or "against the page" was measured on #0e0e10; a
-// darker ground only widens each of them, so none is a floor that moved the
-// wrong way, and none has been re-measured.
-//
-// AND DARKER AGAIN ON 2026-10-08: #060607 became #030304. Helen, once the fur
-// was drawn stronger: "can we still have the print visible, while darkening
-// the whole thing? So the base colour of everything ... what I'm aiming for is
-// 'black on black', ish." The page, the two bands and the cards all dropped
-// together, each chosen from its own row of a candidates page; the fur is
-// white at low alpha over whatever is here, so it lost nothing. She had pure
-// black on that row and did not take it.
+// The page ground. Page, band (`$color-chrome-ground`) and card
+// (`$color-surface`) are always in that order, each lighter than the one before
+// (LEOPARD.md §2). The contrast figures quoted in this file were measured on
+// lighter grounds than these; a darker ground only widens them.
 $color-paper:        #030304;   // was #060607 until 2026-10-08, #0e0e10 until 2026-10-06, and #fbfbfa before the inversion
 $color-grey-mid:     #97959a;   // 6.50:1 on the old ground -- de-emphasised UI text
 $color-grey-light:   #2c2c31;   // borders; L* 18.2 against the old ground's 4.0
 
-// --- THE FIVE ACCENTS. "Neon bar sign", chosen by Helen 2026-08-27. ----------
+// --- The accents -------------------------------------------------------------
+// Each is named after the drink it is the colour of (#555). Each has a job, and
+// the job is a fact the cards also show:
 //
-// EACH IS NAMED AFTER THE DRINK IT IS THE COLOUR OF — #555, Helen: "Yes, this
-// is a bit silly, but humour me." It is not silly. A hue name describes the
-// pixel; a bottle name describes the SITE, and this palette was chosen partly
-// because the colours are the colours of things you drink. `$color-cyan` could
-// belong to any project; `$color-luminous-lagoon` could not.
+//   absinthe      the home colour: the shared chrome ($color-accent), the glass
+//                 line work, structural rules, the drink page's heading bars
+//   reposado      YOLO? and goodness: the ship mark on a card
+//   woowoo        HAS TO HAVE and the matched ingredient; on hover, "this one"
+//   violette      I KNOW WHAT I WANT and the matched run of a drink's name
+//   lagoon        the drink page's notes
 //
-// The one that is arguably wrong is `raucous-reposado`: reposado is amber-brown
-// and hue 26 is a vivid orange, which is Aperol almost exactly. Helen's name,
-// Helen's call, and recorded here rather than silently corrected.
+// MOOD and HASSLE take the two ramp steps declared with the heading bars below.
+// LEAVE OUT deliberately has no hue.
 //
-// Each hue has a JOB, and the job is the same fact the CARDS already show, so
-// a heading's colour is a promise the card keeps rather than a decoration:
+// Up to three values per hue, and mixing them up is the easy mistake:
+//   (bare)  a band or a rule
+//   -deep   safe as text on a card. On this ground a hue is lightened to make
+//           text, and only violette needs it; the others equal the bare value.
+//   -wash   a tint of the hue over a card, for a field. Text on a wash is ink.
 //
-//   absinthe     MOOD                 the glass wash and hover on a card
-//   tangerine    YOLO? / goodness     the ship mark on a card
-//   magenta      HAS TO HAVE          the matched-ingredient highlight
-//   ultraviolet  HASSLE               (new section, new colour)
-//   cyan         I KNOW WHAT I WANT   (name search)
-//
-// LEAVE OUT DELIBERATELY HAS NO HUE. Helen: "for food, avoiding can be
-// important whereas for drinks surely less so." Food gave its LEAVE OUT a
-// sixth colour; this does not, and the asymmetry is the decision.
-//
-// ABSINTHE IS THE HOME COLOUR and that is why MOOD gets it: Helen, "I really
-// do like the green fairy absinthe-y green as our home colour" -- it carries
-// the card glass panels, the hover, the nav and footer chrome. Food does the
-// same thing with magenta, which is both $color-accent and $color-star-root,
-// and MANUAL 13.2 calls those "one rhyme rather than four coincidences".
-//
-// THREE VALUES PER HUE, and mixing them up is the easy mistake:
-//   (bare)  the RULE. A vivid band under a heading. NEVER text -- most of
-//           these are nowhere near 4.5:1.
-//   -deep   4.75:1 on paper. Safe as type: active buttons, counts, marks.
-//   -wash   a 9% tint, for a panel behind ink.
-//
-// WHY NEON, AND WHAT IT COSTS. Helen ranked it first of four candidates and
-// named the cost herself: "all five colours are close (to my eye) to our food
-// palette". Measured and true -- the closest neon hue lands 15 dE from a food
-// colour where the muted candidate landed 31. FIVE SATURATED HUES THAT AVOID
-// FOOD'S SIX DO NOT EXIST: searching the whole circle, the best possible set
-// still comes within 21 degrees, because food's own six already tile it. So
-// the two sites are siblings by construction, and what separates them is the
-// HOME COLOUR (green here, magenta there) and how freely colour is spent --
-// Helen: "there's not ENOUGH of it for me... cocktails won't be like this."
-//
-// THE DICHROMACY BAR APPLIES TO EXACTLY TWO OF THESE, and applying it to all
-// five was a mistake made and corrected on the way here. A heading rule sits
-// under the section's own name in words, so hue is reinforcement and can
-// safely collapse for a dichromat. But the GOODNESS MARK and the INGREDIENT
-// HIGHLIGHT sit on a card with no word beside them, carrying meaning in colour
-// alone, along with the mood chip's fill. Those three were checked: worst pair
-// is magenta vs tangerine under tritanopia at dE 22.6, against a bar of 10.
-// Re-check with `scripts/palette_measure.py --separation <a> <b>` if any of the
-// three moves. That instruction used to name `tmp/neon_values.py`, which is
-// gone -- tmp/ is gitignored, so the tool an instruction names outlives the
-// instruction only if it is tracked.
+// Colour that carries meaning with no word beside it (the ship mark, the
+// matched ingredient, a mood chip) must stay apart for a dichromat; a heading
+// bar sits under its own name and need not. Re-check with
+// `scripts/palette_measure.py --separation <a> <b>` if one of them moves.
 
-// EVERY `-deep` WAS SOLVED AGAINST PAPER AND HAS BEEN RE-SOLVED AGAINST THE
-// DARK GROUND. On white a hue has to be DARKENED to be readable as text; on
-// black it has to be LIGHTENED, and four of the five are already bright enough
-// that the bare rule colour IS the text colour. Measured on a card, which is
-// the harder of the two grounds:
-//
-//     absinthe  11.11:1     reposado  6.69:1     lagoon  9.73:1
-//     magenta    5.18:1     violette  3.27:1  -> lightened 26% to 5.10:1
-//
-// Ultraviolet is the one exception and its own note below predicted it from the
-// other direction: it was already close to 4.75:1 on paper because the fill is
-// dark, so there was nothing darker to make text from. On black that inverts
-// into an advantage -- there is plenty of room above it.
-
-// MOOD, and the home colour. Absinthe — the green fairy.
+// The home colour. Absinthe.
 $color-electric-absinthe:      #30E88C;   // rule
 $color-electric-absinthe-deep: #30E88C;   // text  11.11:1 on a card
-// NOTHING READS THIS ONE, AND IT IS KEPT ON PURPOSE -- #651, settled
-// 2026-09-07. It was the glass panel's background; the panel went with #469 on
-// 2026-09-02 and no consumer replaced it.
-//
-// KEPT RATHER THAN DELETED, which is #651's own reasoning and still holds: it
-// is one of five `-wash` values, all derived the same way (14% of the hue over
-// a card) and all re-solved together during the inversion. Deleting one member
-// of a set that was derived as a set makes the set look arbitrary, and the next
-// person needing an absinthe wash would re-derive it differently.
-//
-// WHAT #651 SAID MUST NOT HAPPEN is that it sits here unread AND unexplained --
-// the state `ship_tints` was in until someone noticed. This comment is the
-// other half of that bargain. Do not delete it because grep says nothing reads
-// it; the same rule keeps `units.exact` in cocktail_units.rb.
-//
-// ITS LIKELY CONSUMER IS NAMED: #761 lists "add a wash behind it" as the third
-// and largest step if a matched chip ever reads too quietly, and §9.13's "bands
-// and washes, not fills" allows it. #511 and #612 closed without needing one,
-// so it waits.
+// Unread, and kept on purpose (#651): one of five washes derived as a set.
+// Do not delete because grep finds no consumer.
 $color-electric-absinthe-wash: #1A342A;   // 14% of the hue over a card
 
-// YOLO / GOODNESS. Tequila reposado.
+// YOLO? and goodness. Tequila reposado.
 $color-raucous-reposado:      #F47E25;  // rule
 $color-raucous-reposado-deep: #F47E25;  // text  6.69:1 on a card
 
-// HAS TO HAVE. A Woo Woo.
-//
-// NAMED WOO WOO, NOT COSMOPOLITAN, FROM 2026-09-05 -- the drink-name moved
-// so the HASSLE ramp's own hot-pink step (2/3 of the way to this hue
-// already, see the heading bars below) could inherit "cosmopolitan"
-// instead of the non-alcoholic flamingo it briefly wore. Everything below
-// about WHY this hue is here is unchanged -- it was always about the
-// colour, never about which drink's name sat on it.
-//
-// FOOD'S HOT MAGENTA SINCE 2026-09-01, replacing #F127A7. Helen: "could we
-// please use the hot magenta from the food site as our pink? I just can't get
-// away from loving it, and honestly that is my personal brand both at home and
-// at work. Extra important if we're doing an inversion that we retain some
-// sisterhood."
-//
-// AND GOING BLACK IS WHAT MAKES IT USABLE. #FF00C8 as text is 3.33:1 on paper
-// -- a fail -- and 5.18:1 on a card here. On the food site it has to be
-// darkened to $color-dazzling-dragonfruit-dark before it can carry text at all. This
-// palette gets the colour she actually loves, undarkened, because the ground
-// moved.
-//
-// THE ONE THING IT COSTS is recorded on #636 rather than hidden: under
-// protanopia hot magenta is a dark blue, which is 9.79:1 on paper and 1.76:1
-// here. The band that says "this matched" nearly disappears for a protanope
-// specifically BECAUSE the ground went black. Parked at Helen's call, with a
-// colour-vision mode as the shape she chose over compromising the hue.
+// HAS TO HAVE, and hover. A Woo Woo. It is food's hot magenta, undarkened:
+// on this ground it is readable as text, which it is not on paper. The known
+// cost (#636): under protanopia it nearly disappears against black.
 $color-wicked-woowoo:      #FF00C8;    // rule
 $color-wicked-woowoo-deep: #FF00C8;    // text  5.18:1 on a card
 
-// HASSLE. Crème de Violette.
-//
-// Its rule and its deep are nearly the same value, and that is the hue rather
-// than an error: a vivid blue-violet is already close to 4.75:1, so there is
-// no brighter version to make a band from. Ultraviolet's underline will read
-// darker than cyan's however it is set.
-// On a dark ground the constraint reverses and there IS room above it, so this
-// is the only `-deep` that still needs a derived value -- lightened 26%.
+// I KNOW WHAT I WANT. Crème de Violette. The bare hue is too dark to be text
+// on a card, so this is the one `-deep` with a derived, lightened value.
 $color-ultra-violette:      #9233E6;  // rule
 $color-ultra-violette-deep: #AE68EC;  // text  5.10:1 on a card
 
-// I KNOW WHAT I WANT. A Blue Lagoon.
+// The drink page's notes. A Blue Lagoon.
 $color-luminous-lagoon:      #2ED1EA;        // rule
 $color-luminous-lagoon-deep: #2ED1EA;        // text  9.73:1 on a card
 
 // --- The washes -------------------------------------------------------------
-// A 10% tint of each rule colour on white, for the background of something
-// that has MATCHED. Added 2026-08-28 when the cards turned out to be shouting.
-//
-// TEXT ON A WASH IS INK, NEVER THE DEEP, and it stays true after the inversion
-// for the opposite arithmetic: these are now 14% of each hue over a CARD rather
-// than 10% over white, and ink reads 10.7 to 12.9:1 on them where the bare hue
-// manages only 2.95 to 8.32. So the wash and the border still carry the colour
-// and the words still do not.
-//
-// 14% RATHER THAN 10%, MEASURED. A tint toward a dark ground moves the eye less
-// per percentage point than a tint toward white, because the same proportion
-// spans less of the perceptual range down here. 10% was almost invisible
-// against the card; 14% is the first step where every one of the five reads as
-// tinted rather than as a slightly different black.
-// Absinthe's own is declared with its hue above, because it is the glass
-// panel's colour rather than only a matched-state tint.
+// Hex literals, so they do not follow `$color-surface` when it moves. Of the
+// five, only the woowoo wash has a reader: a card under the cursor.
 $color-raucous-reposado-wash: #36251C;
 $color-ultra-violette-wash:   #281B37;
 $color-wicked-woowoo-wash:    #371432;
 $color-luminous-lagoon-wash:  #1A3137;
 
 // --- The heading bars --------------------------------------------------------
-// FIVE GREENS OVER ONE SHARED ELECTRIC ABSINTHE, and both halves are the
-// decision. Helen, 2026-08-30, choosing this off the palette page: "there's
-// something very attractive about the stability" -- the shared lower bar is the
-// stability -- and, immediately afterwards, "definitely not with all headings
-// having the same underline".
+// The index's five headings, top to bottom: a ramp from reposado to woowoo
+// through two interpolated steps, then violette. The two steps are points on a
+// line between two accents, not accents of their own.
 //
-// So the mark is two bars: the section's own green hugging the letters, and one
-// electric absinthe beneath it on every heading. It is the same DEVICE food's
-// index uses (a stepped two-colour bar, §13.1) in cocktails' own colours, which
-// is what stops the two sites reading as near-misses of each other.
-//
-// SEPARATED BY HUE, NOT BY LIGHTNESS, deliberately. The first set ran 96-186
-// degrees at 34% saturation and Helen's read was "the different greens under
-// the headings don't actually look that different any more". They were about
-// two points of contrast apart from each other -- §12's rule is that the eye
-// reads hue rather than lightness, so lightness was never going to carry this.
-// These span 78 to 196 (warm yellow-green to a cyan-leaning teal) at 62%, so
-// neighbours differ by roughly 30 degrees of hue while sitting at almost the
-// same luminance, which is the arrangement that actually reads.
-//
-// These are BANDS, not text, so they carry no contrast bar -- the heading's
-// words stay ink -- and they stay LIGHT ink now, the ground having inverted
-// under this paragraph on 2026-09-02. The bands themselves needed nothing: all
-// six clear 6:1 against the black page, checked rather than assumed.
-// `scripts/palette_measure.py --lstar <hexes>` prints the figures; this used to
-// name `tmp/greens2.py`, which is gone.
-//
-// THE GREENS ARE GONE, 2026-09-03 -- the design audit's critical #4, and the
-// paragraph above explains why they failed in its own words. Thirty degrees
-// of hue at the same luminance "is the arrangement that actually reads" on a
-// palette page; in a bar 0.38em tall it does not, and YOLO, MOOD and HASSLE
-// read as green on green. Measured: each green sat between 1.25:1 and 1.9:1
-// against the absinthe bar beneath it.
-//
-// A RAMP FROM REPOSADO TO WOOWOO THROUGH PINK, top of the page to bottom.
-// Helen's own shape, chosen from a candidates page on the real index against
-// the five accents and a shades-of-cosmopolitan version: "the ramp colours
-// are gorgeous!" The two ends and the centre are palette colours already
-// doing these jobs -- YOLO is reposado because the ship mark is, HAS TO HAVE
-// is woowoo because a matched ingredient is, I KNOW WHAT I WANT is
-// violette because the matched run of a title is (`.drink-name-hit`). MOOD
-// and HASSLE are the two even steps between reposado and woowoo -- HASSLE's
-// own step earning the name "cosmopolitan" in its own right below, since at
-// 2/3 of the way there it was already practically wearing a shade of one.
-//
-// INTERPOLATED IN OKLCH, NOT PICKED BY EYE, taking the short arc through red
-// rather than the long one through green, and gamut-clipped by pulling chroma
-// in so each step keeps its hue. The workings are in the commit that shipped
-// this. Neighbours are 15 to 21 dE apart (`scripts/palette_measure.py
-// --separation`), against the 10 that MANUAL 9.13 sets as the bar -- and a
-// heading sits under its own name in words, so the bar does not even apply
-// here; it is cleared anyway.
-//
-// TWO NEW HUES, AND THAT IS HELEN'S CALL, MADE KNOWINGLY. The coral and the
-// hot pink are the first colours on this site that are not one of the five
-// accents. They are steps on a line between two of them rather than a sixth
-// and seventh idea, which is why they do not join the accent table above.
-//
-// NAMED 2026-09-05, having gone a couple of days as bare hex with only a
-// hue word in the comment ("coral", "hot pink") -- the two colours that had
-// fallen out of the drink-name convention every other accent on this site
-// uses. `$color-banging-bellini` (a peach prosecco cocktail) is the coral.
-//
-// THE HOT PINK WAS `$color-flamboyant-flamingo` FOR ABOUT A DAY, and came
-// off it the same day Helen caught the problem: a flamingo is a bird, not
-// a drink, and every other name on this site is alcoholic. It becomes
-// `$color-charismatic-cosmopolitan` instead -- a name freed up the same
-// day HAS TO HAVE moved to woowoo (above), and not an arbitrary landing
-// spot: this step already sits 2/3 of the way to that exact hue, so it was
-// practically wearing a shade of cosmopolitan before it had the name.
-//
-// Neither joins the accent table above -- they're still ramp-only.
-//
-// A SECTION'S COLOUR IS THE PROMISE THE CARD KEEPS -- THE RULE FROM THE TOP
-// OF THIS FILE, IN FORCE AGAIN FROM 2026-09-03, AND IT NOW REACHES THE
-// CHIPS. Each of the five is worn in exactly three places: the heading's
-// bar, the chosen filter word's underline beneath it, and the thing it lit
-// on a card -- a matched MOOD chip in coral, a matched HASSLE chip in hot
-// pink, a matched ingredient in woowoo, the matched run of a title in
-// violette, and the ship mark in reposado. Helen, looking at a card carrying
-// three of them at once: "There's a lot going on... But I genuinely think
-// it's really pretty!" It reads because the five are steps on one line, so
-// a card lit in three of them reads as one family and not three claims.
-//
-// WHAT THIS REVERSES: 2026-08-30's "magenta means MATCHED everywhere"
-// (_cards.scss, _filters.scss), made when the headings were greens a chip
-// could not point back at. With a ramp it can, so woowoo goes back to
-// meaning HAS TO HAVE alone. Hover keeps it for "this one" (§9.13); that is
-// a transient state and the one place two meanings share a hue.
-//
-// MOOD NO LONGER WEARS ABSINTHE, and that is cleaner than it was. Absinthe is
-// the home colour -- the chrome, the glass line work, a card's bottom rule --
-// and stops also meaning "this section", which it only ever meant for one of
-// the five. The shared absinthe bar under every heading went the same day:
-// see cocktails/_rule.scss's heading-rule.
+// A section's colour is a promise the card keeps. Each is worn by the heading's
+// bar, by the chosen filter button under it, and by the thing it lit on a card:
+// the ship mark, a mood word, a hassle word, a matched ingredient, the matched
+// run of a name. Use these names, not the hues behind them, wherever a rule
+// means "this section".
 $color-banging-bellini:        #FD6758;   // coral,    1/3 of the way to pink
 $color-charismatic-cosmopolitan: #FD5289; // hot pink, 2/3 of the way
 
@@ -374,131 +100,41 @@ $color-heading-hassle:  $color-charismatic-cosmopolitan;
 $color-heading-include: $color-wicked-woowoo;
 $color-heading-name:    $color-ultra-violette;
 
-// Two washes for the derived steps -- 14% over a card, for a matched chip's
-// field -- stood here for one day and went on 2026-09-04 when the card chips
-// became bare words (see _cards.scss): a word has no field to
-// wash. If a boxed consumer ever returns, the derivation is the one the five
-// accent washes above use, and $color-surface is declared BELOW this point.
-
-// `$color-heading-shared` STOOD HERE -- "the one every heading shares, under
-// its own" -- and went with the shared bar on 2026-09-03. Deleted rather than
-// left declared: a variable with no consumer is an invitation to bring the
-// bar back without re-reading why it left (cocktails/_rule.scss, heading-rule).
-
-// `$color-menthe`/`$color-amber`/`$color-violet` STOOD HERE as migration
-// aliases from the three-accent era, mapped BY AXIS rather than by hue --
-// deliberately marked TEMPORARY, and gone now the migration is finished and
-// nothing still calls them (checked 2026-09-05): an alias that outlives its
-// migration is just a second name for a colour, which this file already
-// said about itself.
-
-// --- The ten the shared partials require -------------------------------------
+// --- The names the shared partials require (MANUAL §2.3) ----------------------
 $color-bg:         $color-paper;
 $color-text:       $color-ink;
 $color-border:     $color-grey-light;
-// A CARD, and it is now DARKER than the page rather than lighter. That is the
-// inversion's one genuinely structural choice: on paper a card is a white panel
-// laid on a tinted ground, and here it is a darker field cut into a lighter
-// one. Helen chose it looking at both -- "the background a little lighter even,
-// to give the cards more drama" -- and the drama is that the card recedes
-// instead of floating.
-//
-// L* 7.85 against the page's 4.02, a difference of 3.84, where the border sits
-// at 18.18 and holds the card's shape however close the two fills get.
-//
-// THE PAGE WENT DARKER UNDER IT ON 2026-10-06 (#733, $color-paper above) AND
-// THE CARD DID NOT MOVE. Helen: "I like the cards sitting light on the leopard,
-// so don't touch those." So the gap is wider than the 3.84 above, and the
-// header and footer, which had shared this value, left it for a darker one of
-// their own, below: "They seemed dark before, but now they really don't."
-//
-// THEN THE CARD DID MOVE, ON 2026-10-08: #17171a became #0d0d0f, "darker
-// still" from three, in the same round that dropped the page to #030304
-// ($color-paper above has her words). It is still LIGHTER than the page, so a
-// card still sits light on the leopard; everything is simply nearer black.
-// This is every surface on the site, not only cards -- buttons, the notes box,
-// and each `-wash`, which Sass mixes over this value and so follows it. The
-// candidates page could not move the washes; the built site does.
+// A card, and every other surface on the site. Lighter than the page, so a
+// card sits light on the leopard (LEOPARD.md §2).
 $color-surface:    #0d0d0f;
 
-// THE HEADER AND FOOTER BANDS, on cocktails only -- #733, 2026-10-06. Not one
-// of the ten: shared/_layout.scss reads it through a custom property that
-// _leopard.scss sets, and falls back to $color-surface where none is set.
-// Between the page (#060607) and a card (#17171a), and Helen's second answer.
-// From four on a candidates page she first took "same as the page"; that page
-// had the nap texture on its bands, which the shipped bands do not, and once
-// she knew: "I prefer the flat. Let's lift to 'darker still' please." That
-// was #0c0c0d, and it was live for less than an hour: "I prefer #111113 for
-// header and footer", the option called "darker", a step lighter again.
-//
-// 2026-10-08: #060607, with the page and the cards (see $color-paper). The
-// order is unchanged -- page, then band, then card, each lighter than the
-// last -- and all three moved down together.
+// The header and footer bands, on cocktails only (#733): between the page and
+// a card. Not one of the contract names: shared/_layout.scss reads it through
+// custom properties that _leopard.scss sets, and falls back to $color-surface
+// where none is set.
 $color-chrome-ground: #060607;
 $color-clear-text: $color-grey-mid;   // footer, de-emphasised UI text
-// STAYS WHITE, and it is the one value the inversion must not touch: this is
-// the wordmark's lettering sitting on BLACK TAPE, which was already
-// light-on-dark before any of this and is unaffected by the ground moving.
+// Stays white whichever way the ground sits: it is the highlight copy of the
+// heading lettering (cocktails/_rule.scss) and the paper of a printed note.
 $color-white:      #ffffff;
 
-// The shared chrome reads this for link hovers and section colouring. Menthe,
-// because on this site the interactive/branded colour is the one that means
-// "this matches what you asked for", and a nav link is that.
+// shared/_base.scss reads this for a link's hover. The home colour.
 $color-mood-root:  $color-electric-absinthe-deep;
 
-// THE PLACEHOLDER THIS REPLACES WAS THE WEAKEST LINE IN THE FILE, and it said
-// so itself: $color-accent was $color-grey-mid, and the comment recorded that
-// grey-mid on grey-mid "is the lightness-only change MANUAL 12 records as
-// reading like nothing at all at footer size". Helen, 2026-08-19, asked
-// directly: "Cocktail styling is almost totally unstarted, so this doesn't
-// matter." It matters now, and a hue change rather than a lightness one is
-// what makes the shared footer work on this site at all.
-//
-// MENTHE, NOT AMBER -- #487, Helen, 2026-08-26. It shipped as amber for a few
-// hours on the reasoning that amber does the structural work, and the chrome
-// is structure. That was the wrong cut. The nav and footer are the way OUT of
-// a page, and on this site the colour that means "this is the thing you
-// asked for" is menthe -- the mood filters, the glass wash, and a link you
-// are about to follow are the same gesture. Amber's job is a verdict about a
-// drink; it has no business on a nav icon.
+// The shared chrome's colour: nav, footer, page furniture. The home colour (#487),
+// and a hue rather than a grey, because a lightness-only change reads as
+// nothing at footer size (MANUAL §12).
 $color-accent:     $color-electric-absinthe-deep;
 
-// The heading outline. Food has had `$color-label-stroke` since long before
-// this site existed; cocktails never declared an equivalent, so every heading
-// here fell through to the shared default of full ink — see _rule.scss for
-// what that looked like and why it was never a decision.
-//
-// Same derivation as food's: the text colour lightened, so it stays related to
-// the letters it outlines rather than being a standalone grey.
-// DARKEN, NOT LIGHTEN, SINCE THE INVERSION. The derivation is unchanged in
-// spirit -- the outline is the text colour moved toward the ground, so it stays
-// related to the letters it outlines rather than being a standalone grey -- but
-// on a dark ground "toward the ground" means down. Lightening a near-white ink
-// by 30% gives a near-white outline, which is no outline at all.
-//
-// This is the mid grey Helen singled out: "the YOLO/MOOD etc you've done has
-// outlines over the top edge of the letter. I think this helps both legibility
-// and the raised effect."
+// The heading outline: the text colour moved toward the ground, so it stays
+// related to the letters it outlines. On a dark ground that is `darken`;
+// lightening a near-white ink gives no outline at all.
 $color-label-stroke: darken($color-ink, 30%);
 
 // --- Typography --------------------------------------------------------------
-// THE SCAFFOLD'S OWN NOTE SAID TYPOGRAPHY IS THE FAMILY RESEMBLANCE BETWEEN
-// THE TWO SITES, and asked that any change here be made as a decision rather
-// than by drift -- true of $font-headings and $font-body, which stay unchanged
-// below. $font-label is a decision now rather than an absence of one, and the
-// argument is food's own, finally made rather than borrowed.
-//
-// PLEX IS FOR NUMBERS YOU ACT ON, and a drink amount is exactly that -- the
-// same fact `.ingredient-amount` states on food (see food/_palette.scss's
-// $font-label comment for the rule and its history). This site declared no
-// $font-label until 2026-09-02 on the reasoning that borrowing the survivor of
-// someone else's argument is not the same as having made one; the argument is
-// made now, not borrowed, and it happens to land on the same face. Helen:
-// "Please apply Plex amounts on the drinks page" -- which is the sisterhood
-// she asked for elsewhere the same day ("if we're doing an inversion that we
-// retain some sisterhood", of the shared magenta) applied to type rather than
-// colour: both sites set the number you act on in the same mono, for the same
-// reason, and everything else in Courier stays exactly as different as it was.
+// $font-headings and $font-body are the family resemblance between the two
+// sites: change them as a decision, never by drift. $font-label is for numbers
+// you act on, a drink's amounts (MANUAL §13.10.1).
 $font-label:    "IBM Plex Mono", "Courier Prime", monospace;
 $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;

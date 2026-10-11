@@ -1,54 +1,17 @@
-# =============================================================================
-# CAN THIS RECIPE BE MADE BY HALVES? -- the judge for the scaler's x½ step.
-# Data: `half_recipe:` in _data/food/scaling.yml
-# =============================================================================
-# GitHub issue #1286. A `makes:` recipe is scaled in whole recipes -- x1, x2,
-# x3. Helen, 2026-10-04, asked whether it could go below one: "Half a recipe
-# would be great where the numbers aren't insane! Can we judge that?" And the
-# shape: "not having half recipes in between integers, just between 0 and 1".
-#
-# So there is ONE extra step, x½, and a recipe gets it only if halving every
-# figure on the page gives something a person could act on. THE BUILD DECIDES,
-# here, once; the page carries the answer as `data-half-recipe` and the
-# browser never judges anything.
-#
-# -----------------------------------------------------------------------------
-# THE RULE -- conservative: one line that will not halve refuses the recipe
-# -----------------------------------------------------------------------------
-# An ingredient with NO number in its amount, or no amount, does not scale and
-# so cannot object. Otherwise, by its unit:
-#
-#   a WEIGHT, VOLUME or LENGTH (`divisible_units`)   always halves: the scaler
-#       already prints 31 g and 313 ml.
-#   a SPOON, CUP or IMPERIAL measure (`quarter_units`)   halves if the amount
-#       is a multiple of a quarter, because an eighth is the smallest fraction
-#       the page has a glyph for: ¼ tsp -> ⅛ tsp is fine, ⅛ tsp -> 0.06 tsp is
-#       not.
-#   a CUP (`half_units`)   halves only if the amount is a multiple of a HALF,
-#       so it never goes below a quarter cup. Helen, on "⅞ cups whole milk":
-#       "Please take the half step off the waffles."
-#   a BY-EYE measure (`half_step_measures`: handful, pinch ...)   always: it
-#       has its own rule and never prints less than a half.
-#   anything else is a COUNT of things -- "3" eggs, "2 large", "1 sprig",
-#       "2 x 400 g cans" -- and halves only if the count is EVEN, or the thing
-#       is on the `halvable` list (half a lemon is a real thing; half an egg
-#       is not).
-#
-# AND THE YIELD has to halve too: half of what one recipe makes must be at
-# least one of it. "one 8-inch cake", "1 jar", "1 dozen mince pies" and
-# "1 litre" are refused; "5 waffles" halves to "2–3". A recipe that keeps the
-# portions box halves only an EVEN number of portions.
-#
-# NO JEKYLL IN THIS FILE, for the reason _plugins/food_yield.rb gives:
-# scripts/food_yield.rb runs it over JSON, and tests/test_food_yield.py checks
-# it without a build.
-#
-# THIS READS AMOUNTS, which _plugins/food_shopping.rb's header says the build
-# does not do. It still does no arithmetic that reaches the page: the one
-# thing computed here is a yes or a no. The number is read by the smallest
-# rule that answers "is it even / is it a quarter" -- not a second amount
-# parser for anyone else to use (#1199).
-# =============================================================================
+# Can this recipe be made by halves? The judge for the scaler's x½ step
+# (#1286). Data: `half_recipe:` in _data/food/scaling.yml. The build decides;
+# the page carries the answer as `data-half-recipe`. One line that will not
+# halve refuses the recipe. An amount with no number cannot object. Otherwise:
+#   `divisible_units` (weight, volume, length)   always halves
+#   `quarter_units` (spoons, imperial)   if the amount is a multiple of a
+#       quarter: an eighth is the smallest fraction the page can print
+#   `half_units` (cups)   if a multiple of a half: never below a quarter cup
+#   a by-eye measure (handful, pinch)   always
+#   anything else is a count   only if even, or the thing is `halvable`
+# The yield must halve to at least one; a portions box needs an even number.
+# No Jekyll here: scripts/food_yield.rb and tests/test_food_yield.py run it
+# without a build. The amount reading below answers "is it even / a quarter"
+# and is not a second amount parser for anyone else (#1199).
 
 module HelenTriages
   module HalfRecipe
@@ -69,11 +32,10 @@ module HelenTriages
     # @return [Hash] {"ok" => true/false, "why" => the line that decided it}
     def judge(groups, made, portions, vocab, by_eye)
       vocab ||= {}
-      # `handful` STEPS IN QUARTERS since 2026-10-10 and so left
-      # `half_step_measures`, but it is as much a by-eye measure as it ever
-      # was: `half_recipe.by_eye_also` names it. Added HERE, not by the
-      # callers, because there are two of them (_plugins/food_shopping.rb and
-      # scripts/food_yield.rb) and the first attempt changed only one.
+      # `half_recipe.by_eye_also` names by-eye measures that are not in
+      # `half_step_measures` (handful). Added here and not by the callers,
+      # because there are two: _plugins/food_shopping.rb and
+      # scripts/food_yield.rb.
       by_eye = Array(by_eye) + Array(vocab["by_eye_also"]).map(&:to_s)
       verdict = yield_halves(made, portions)
       return verdict unless verdict["ok"]

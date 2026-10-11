@@ -1,8 +1,7 @@
-{% comment %}
-  The chart's axis. One file so the charts page and a recipe page can't drift
-  onto different scales — the ticks are meaningless unless every chart on the
-  site reads against the same one, which is the whole argument for a shared
-  35–100°C axis in the first place (see _sass/food/_temperature-chart.scss).
+{% comment %} The chart's axis, for a recipe page's doneness chart. Every chart on the
+   site must read against the same scale ($tc-min/$tc-max in
+   _sass/food/_temperature-chart.scss), so these ticks must match the `axis`
+   capture in food/reference/internal-temperatures.html, which writes its own.
 {% endcomment %}
 <div class="tc-axis">
   <div class="tc-axis-scale">

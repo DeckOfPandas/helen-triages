@@ -1,102 +1,29 @@
-{% comment %} ── THE SEARCH FOR ANYTHING, IN THE HEADER, ON A LOCAL BUILD ONLY ──
-  #1210, 2026-09-30. Helen: "Move the omnisearch to the navbar, directly under
-  [ FOOD ] ->, to show on the local site only -- this is key for me during
-  testing so I'm not clicking about all over the place." And on whether it
-  stays at all: "honestly it's very useful for md proofreading in the local
-  build so it's staying at least for now."
+{% comment %} ── The search for anything, in the header, on a local build only (#1210) ──
+   Rendered only when `site.show_header_search` is true, and only
+   _config_local.yml declares that key: the deployed site has no search box. A
+   `site_neutral` page gets none either, having no index to search. Everything
+   reads `page.site_key`, so a food page searches food and a drink page
+   cocktails. shared/_layout.scss places it under the door to the other site.
 
-  So the box is a TESTING TOOL now, and it sits where a testing tool sits: in
-  the shared header, on every page of a site, under the door to the other
-  site and on the same right edge (shared/_layout.scss places it). It was the
-  right-hand end of the back arrow's line on a recipe or drink page from #1024
-  (2026-09-14) until this; that end now holds print and pdf (page-print.html).
+   The box is a plain form first and works with no JavaScript: a GET to the
+   index with `q=`, which assets/js/filter-state.js's `parseName` reads. The
+   glass is a real submit button, after the input in the markup.
+   assets/js/page-search.js, loaded here under the same gate, adds the
+   dropdown: it fetches the site's search.json (`data-search-index`) on first
+   focus, and each result is a real link to a page or to the filtered index.
+   The dropdown element is rendered here, empty and hidden.
 
-  RENDERED ONLY WHEN `site.show_header_search` IS TRUE, and only
-  _config_local.yml declares that key -- the same idiom as show_drafts and
-  show_costs, and it must stay out of _config.yml for the same reason: the
-  deployed site has no search box anywhere. `page.site_neutral` (the about
-  page) gets none either: it belongs to no site, so there is no index to
-  search. Everything below reads `page.site_key`, exactly as back-to-index.html
-  does, so a food page searches food and a drink page searches cocktails.
+   The input is right-aligned, so what scrolls out of a short box is the start
+   of a long word, never the letters being typed (#1099), and its width in
+   _sass/shared/_furniture.scss is the placeholder's length, since the
+   placeholder can never scroll into view (#1123). The placeholder is the same
+   on both sites and is the only visible wording (#1096); the aria-label
+   carries the same words. _includes/icons/search.svg carries no comment
+   because test_every_shipped_svg_actually_parses reads it as XML.
 
-  THE DROPDOWN'S SCRIPT LOADS HERE TOO, since 2026-10-01, under the same gate.
-  page-search.js was a page-layout script from #1050 to #1210 ("page
-  furniture, not chrome"); for a day after #1210 the box was in the header on
-  every page but only a recipe or drink page loaded the script, so the index
-  pages had a plain form with no dropdown -- a testing tool that worked on
-  some pages. The script and the box are one thing and ship together: both
-  only on a local build, and on every page of a site there. It hangs
-  HTF.pageSearch off the namespace assets.js creates in the head and reaches
-  for nothing else while the page loads, so loading it at the end of the
-  header costs the page nothing it did not already pay. (On first focus it
-  fetches the JSON and, on food, ingredient-search.js if the page has not
-  loaded it -- #1289, so the ingredient words are the index picker's own.)
-
-  THE BOX IS A PLAIN FORM FIRST, AND IT WORKS WITH NO JAVASCRIPT. A GET to the
-  index with `q=<what you typed>`; assets/js/filter-state.js's `parseName`
-  reads it and each index puts the text into its own I KNOW WHAT I WANT box
-  and applies it. Pressing Enter, or the magnifying glass (a real submit
-  button), does exactly that. That was the whole of #1024.
-
-  THE GLASS MOVED TO THE RIGHT END -- #1056, reversing #1050's own layout on
-  seeing it built. It is AFTER the input in the markup, which is also the
-  natural tab order (type, then reach the submit control).
-
-  THEN assets/js/page-search.js MAKES IT A SEARCH FOR ANYTHING -- #1050. As you
-  type, a dropdown under the box offers what the word could mean on this site,
-  grouped by kind and in the index's own order: a recipe or drink by name
-  first, then the star ingredients, moods, practicalities or hassles, then the
-  ingredients. Each result is a real link -- to the page, or to the index
-  already filtered by that word (`?star=`, `?tag=`, `?mood=`, `?ing=`, the
-  grammar in filter-state.js). What it searches is this site's search.json,
-  fetched the first time the box takes focus; `data-search-index` says where.
-  The dropdown element is rendered here, empty and hidden, so the no-script
-  page is exactly this page minus the script.
-
-  THE GLASS IS HELEN'S OWN ARTWORK, _includes/icons/search.svg -- SVG Repo's
-  "Interface / Search_Magnifying_Glass", pasted into #1050 -- redrawn to the
-  site's icon contract the way icons/arrow-right.svg is: no fixed width or
-  height, `currentColor` for the stroke so it takes the button's colour and
-  hover, and a `class` parameter. The 800px canvas and the black stroke of the
-  original were the repo's export settings, not the design. The partial
-  carries no comment of its own because a Liquid tag inside an SVG file is not
-  XML, and test_every_shipped_svg_actually_parses reads the file as XML.
-
-  THE INPUT IS 22 CHARACTERS WIDE AND RIGHT-ALIGNED -- the width is #1123
-  (2026-09-16) and the alignment is #1099, which reversed #1056's on seeing it
-  built: Helen's own picture of what she wanted is "____r ___rh __rhu _rhum",
-  the word anchored at the glass and growing leftwards. That pairing is what
-  makes a short box safe for TYPING: what scrolls out of sight is the BEGINNING
-  of a long word, never the letters being typed.
-
-  THE WIDTH IS THE PLACEHOLDER'S LENGTH, AND THAT IS THE WHOLE RULE. #1123 went
-  24 -> 12 first ("reduce the width of the omnisearch input text field to 12
-  chars"), and 12 cut the resting box to "i know what": the placeholder is the
-  one string that can never scroll into view, because nobody is typing it.
-  Helen, looking at it: "the omnisearch placeholder needs to all be visible, so
-  I guess our input field needs to be 10 chars wider". "I know what I want..."
-  is 20 characters, which at the box's 0.04em tracking measures about 21.3ch,
-  so the box is 22ch.
-
-  AND THE THING SHE ACTUALLY WANTED WAS QUIET, NOT SMALL -- "to make it less
-  obtrusive, which is what I actually want". That is the colour (the hairline
-  and the placeholder both step towards the page's own ground; see
-  $page-search-quiet in _sass/shared/_furniture.scss), not the width. Worth
-  keeping: a narrow box is not a quiet one.
-
-  THE PLACEHOLDER IS "I know what I want..." ON BOTH SITES -- #1096, Helen's
-  ruling on seeing #1050 built: keep the two searches behaving exactly as
-  built, drop the "search for anything..." placeholder (and any separate
-  written label or title) and give the box no visible words beyond that
-  placeholder and the glass. It is written here rather than read from
-  sites.yml for the same reason #1050's placeholder was: it stopped saying
-  where you are, which is that file's test for a key. The input's aria-label
-  carries the same words, so a screen reader hears what a sighted reader sees.
-
-  TO LOOK AT IT WITH THE BROWSER HARNESS, BUILD WITH THE LOCAL CONFIG.
-  scripts/browser/build.sh builds what deploys, which has no box; the
-  candidates-page build (MANUAL 13.11, `--config _config.yml,_config_local.yml`)
-  is the one that shows it. {% endcomment %}
+   To look at it with the browser harness, build with the local config:
+   scripts/browser/build.sh builds what deploys, which has no box (MANUAL
+   13.11). {% endcomment %}
 {% assign search_site = site.data.sites[page.site_key] %}
 {% if site.show_header_search and search_site and page.site_neutral != true %}
   <form class="page-search" role="search" method="get" action="{{ search_site.home | relative_url }}"

@@ -3,25 +3,10 @@
 // =============================================================================
 
 // --- Raw palette (the swatches everything else is chosen from) ---------------
-// Four swatches left this file on 2026-08-01 with the decorations that were
-// the only things reading them — pencil grey and the near-blacks the logo and
-// highlighter labels used. A swatch nothing chooses from is not a palette, it
-// is a paint chart.
-//
-// $color-vivid-rose briefly came back on 2026-08-02 for cross-recipe links,
-// then was removed again the same day once Helen asked for links to be
-// magenta instead — reusing $color-dazzling-dragonfruit-dark (already a
-// link-ish colour, "for toggle buttons etc.") rather than spending a fifth
-// hue on a job an existing one already does. The recipe page's colour
-// budget stays at four as a result; see the note below.
-//
-// NAMED 2026-09-05, matching the silly-name convention the cocktails site
-// already had (spirits, there; food, here) -- these seven were plain
-// intensity-plus-pigment names (vivid cerulean, hot orange, bright magenta,
-// and so on) until now. The hue and the job are unchanged; only the token
-// is new, so every comment below that describes a hue by its plain colour
-// word (magenta, cerulean, aureolin, orange, violet, lime, spring green)
-// is still accurate and was left alone.
+// Comments across _sass/food/ call these by their plain colour words: lime
+// (wasabi), violet (blackberry), cerulean (spirulina), aureolin or yellow
+// (banana), orange (tangerine), magenta (dragonfruit), spring green (mint).
+// A swatch nothing chooses from does not belong here.
 $color-wild-wasabi:          #8AE800;
 $color-blinging-blackberry:  #7734EA;
 $color-sparkling-spirulina:  #00A7EA;
@@ -40,104 +25,36 @@ $color-surface:   #fdfbfe; // Ultra-soft milk white component surface fill
 
 // --- Typography Stacks -------------------------------------------------------
 $font-headings: "Courier Prime", "Courier New", "Courier", monospace;
-// THE SECOND VOICE, and it took five failed rules and a run of returns to find
-// the one that actually holds.
-//
-// IBM PLEX MONO IS FOR NUMBERS YOU ACT ON. Ingredient amounts here on food,
-// drink amounts on cocktails, the temperature readouts and axis ticks on the
-// doneness charts, the inputs and results of the timings calculator. Nothing
-// else -- not labels, not badges, not buttons, not note labels. Settled
-// 2026-09-02, Helen: "Please apply Plex amounts on the drinks page, and the
-// doneness charts and timing calculator. Send note labels back to Courier."
-//
-// FIVE ELEMENTS TRIED THIS FACE ON A DIFFERENT RULE AND ALL FIVE CAME BACK,
-// which is the evidence the current rule is built on. This variable was
-// called $font-recipe-title, then briefly owned badges, tag buttons, category
-// labels and filter states -- all four failed for reasons that turn out to be
-// the same reason stated differently: `.category-label` at 1.35rem read as a
-// second HEADING font rather than a label font; `.btn-tag`/`.btn-star`/
-// `.btn-meta` and `.badge` broke the pairing between a filter word and the
-// same word elsewhere, which had to match (`.btn-meta` itself has since gone --
-// the META FILTERS block was removed on 2026-09-06 -- but it is left named here
-// because this paragraph is the RECORD of what was tried, and rewriting the
-// evidence to match today's classes would quietly weaken it);
-// `.recipe-title-link` failed on
-// nothing measurable and came back anyway ("I could justify it
-// intellectually... but it could well be that I got used to seeing the
-// typewriter effect and now I miss it"). The FIFTH, `.note-label`, took
-// longer to fail because its own test -- "a recipe page, something you look
-// at with your hands full" -- happened to agree with the real rule for years
-// before anyone noticed it was answering the wrong question; it went back to
-// Courier the same day the real rule was named.
-//
-// SO THE TEST FOR A NEW CONSUMER IS NOT "is this a label", and it is not "is
-// this on a recipe page" either -- both lost to a plainer question: IS IT A
-// NUMBER YOU ACT ON? Every element above that failed was a label of some
-// kind; every element that has ever actually held onto this face is a figure
-// someone reads in order to do something with it.
+// IBM Plex Mono is for numbers you act on: ingredient amounts, the
+// temperature readouts and axis ticks on the doneness charts, the timings
+// calculator's inputs and results. Nothing else: not labels, badges, buttons
+// or note labels. The test for a new consumer is not "is this a label" but
+// "is it a number you act on?". MANUAL §13.10.1.
 $font-label: "IBM Plex Mono", "Courier Prime", monospace;
 $font-body:     "Selawik", -apple-system, "Segoe UI", Roboto, sans-serif;
 
 // --- Category colours --------------------------------------------------------
-// ONE source per category, and it really is one: each of these drives its
-// section's blocky rule on the index, its filter buttons, its active states,
-// its inline clear link, and its badges on every recipe row. Change the value
-// here and all five follow.
+// One source per index section: each root drives its section's blocky rule,
+// the tape on its chips and badges, and its heading in the search dropdown.
+// Change a value here and all of them follow.
 //
-// THE ORDER IS THE ORDER THEY APPEAR DOWN THE INDEX, and it is deliberate —
-// Helen chose these five, in this sequence, on 2026-08-01. It is not the order
-// they appear in _data/food/filter_sections.yml, where the two tag_groups
-// render between star and the two searches.
-//
-// _sass/food/_layout.scss used to carry a duplicate set of these under
-// $index-rule-* and $index-text-*, from when the rule colours were an
-// experiment that did not yet agree with the badges. They agree now, so the
-// duplicates are gone: there is no second place to change a section's colour.
-// REORDERED AGAIN ON 2026-09-04, and the order is Helen's, against five tests
-// she set herself: pink first; no two blues next to each other; star, mood
-// and practicalities decently accessible; star, mood and practicalities
-// looking nice together; and not the classic order of a rainbow. The trigger
-// was the design audit's refinement that yellow was the loudest active state
-// on the page and belonged to PRACTICALITIES, the least appetising axis: a
-// lit "make-ahead" outranked a lit "beef". A tinted fill was tried and did
-// not read; swapping yellow with LEAVE OUT's cobalt was "very visually
-// unbalanced". Her own answer moves the yellow to the LAST question instead:
-//
-//     "so the aureolin is the I KNOW WHAT I WANT -- visible, important, and
-//      pleasingly a yellow highlighter over the recipe titles when they're
-//      hit, which feels familiar."
-//
-// Cerulean and lime then swapped places (her follow-up, "to avoid a
-// rainbow"), and COBALT IS GONE: LEAVE OUT spends no hue, as it does on the
-// cocktails site, keeping only the violet structural rule. Five section hues
-// again, not six.
+// The order is the order the sections appear down the index, and both the
+// order and which hue goes with which section are Helen's ruling. LEAVE OUT
+// has no root: it spends no hue, only the violet structural rule.
 $color-star-root:           $color-dazzling-dragonfruit; // 1. STAR INGREDIENT
 $color-mood-root:           $color-wild-wasabi;          // 2. MOOD
 $color-practicalities-root: $color-sparkling-spirulina;  // 3. PRACTICALITIES
 $color-ingredient-root:     $color-torrid-tangerine;     // 4. SEARCH INGREDIENTS
 $color-name-search-root:    $color-blazing-banana;       // 5. I KNOW WHAT I WANT
 
-// Derived active tones (darkened from the roots for legibility on white).
-// A bar only has to be seen; a word has to be read.
-// Tweak $darken-active / $darken-active-extra to shift all active tones at once.
+// The -active tones: each root darkened until it can be read as a word on
+// $color-bg (4.5:1; these are small labels). A bar only has to be seen; a
+// word has to be read.
 //
-// HOW FAR TO DARKEN IS A PROPERTY OF THE HUE, NOT OF THE SECTION. The two
-// exceptions below are both yellow-greens, and both are here because of where
-// they sit on the spectrum, not because of what they label -- which is why,
-// when the five were reordered on 2026-08-01 and again on 2026-09-04, the
-// deeper cuts moved WITH their hues: the extra step follows aureolin to
-// I KNOW WHAT I WANT, and the lime step follows lime to MOOD. Leaving either
-// behind would give one section near-invisible yellow text and make another
-// needlessly dark, in a change that otherwise looks like a straight swap of
-// five values.
-//
-// Lime green needs its own step: at $darken-active it lands on 4.37:1
-// against $color-bg, and these are button labels at 0.72rem, so 4.5:1 is the
-// line. -22 clears it at 4.99:1 and is the smallest value that does, which
-// keeps the button as green as it can be while staying readable. Measured, not
-// guessed. The other three clear it comfortably at $darken-active: magenta
-// 7.5:1, cerulean 5.3:1, orange 6.4:1, and aureolin 6.4:1 with the extra.
-// Every pair below is one of those five, so the reorder re-solved nothing.
+// How far to darken is a property of the hue, not of the section. Lime and
+// yellow need deeper steps than the shared one, so if the roots are ever
+// reassigned, $darken-active-lime moves with lime and $darken-active-extra
+// with yellow. Re-measure with scripts/palette_measure.py rather than guess.
 $darken-active:       20;
 $darken-active-extra: 30;
 $darken-active-lime:  22;
@@ -147,256 +64,101 @@ $color-practicalities-active: darken($color-practicalities-root, $darken-active)
 $color-ingredient-active:     darken($color-ingredient-root,     $darken-active);
 $color-name-search-active:    darken($color-name-search-root,    $darken-active-extra);
 
-// THE BRIGHT TONES -- the search-for-anything dropdown's group headings, #1050,
-// Helen 2026-09-15: "group headings need to be brighter, closer to core
-// colours although obviously we're limited by contrast." So each is the
-// SMALLEST darkening of its root that clears 4.5:1 on $color-surface, the
-// dropdown's ground, measured with scripts/palette_measure.py rather than
-// picked (tmp/measure_headings.py, 2026-09-15: magenta clears at -8 (4.61:1),
-// cerulean and orange at -12 (4.60, 4.56), lime at -20 (4.53), aureolin at
-// -25 (4.62)). Where the -active tones above darken every hue by one shared
-// step for legibility as a BUTTON LABEL, these take exactly what contrast
-// costs and no more -- which is why they are five numbers and not one. A hue
-// that moves needs its step re-measured, not carried over.
+// The -bright tones (#1050): each root darkened by the smallest step that
+// clears 4.5:1 as text on $color-surface, which is why they are five numbers
+// and not one. A hue that moves needs its step re-measured
+// (scripts/palette_measure.py), not carried over.
 $color-star-bright:           darken($color-star-root,            8);
 $color-mood-bright:           darken($color-mood-root,           20);
 $color-practicalities-bright: darken($color-practicalities-root, 12);
 $color-ingredient-bright:     darken($color-ingredient-root,     12);
 $color-name-search-bright:    darken($color-name-search-root,    25);
 
-// Clear filters button — the background and border went with the wash-era
-// styling; what is left is the text.
+// The quiet grey: secondary text on both pages and in the shared chrome,
+// which names it as part of the palette contract.
 $color-clear-text:   #4f4e4a;
 $weight-clear-font:  800;
 
 // Badge bgs
 $saturation-badge-bg:     0.1;
 
-// Recipe-row taxonomy pills (star/mood/practicalities badges) specifically —
-// separate from $saturation-badge-bg above, which is also used by the active
-// filter-button state (%btn-active-base) and the ingredient-hit badge. Those
-// are different elements with their own tuning history; giving the pills
-// their own dial means changing one doesn't strand a number tuned for the
-// other. Added 2026-08-03, Helen: the shared 0.1 read as too transparent for
-// the pills specifically. Matched state jumps further rather than changing
-// hue — same two-tier idea the deleted category-code bar used (a quiet
-// resting tint, a solid "this one" state), just carried by the pill's own
-// background now that the bar is gone.
 $saturation-tag-pill-bg:         0.22;
 $saturation-tag-pill-bg-matched: 0.42;
 
-// --- Faux-bold stroke (Courier New has no weight above Bold) -----------------
-// Issue #193. Active filter buttons and matched recipe-row tags/badges get
-// their extra "selected" weight from a same-colour text stroke, because
-// font-weight: 900 already resolves to Bold with nothing heavier above it —
-// see MANUAL §13.4.2 for the fuller writeup, including why this is NOT the
-// punched-tape emboss effect (that stroke is a lighter colour than the
-// letter; this one is the same colour, purely for weight).
-//
-// Was a flat 0.6px everywhere, absolute across type running 0.72rem-1rem, so
-// it landed heavier on a small badge than on a title-hit sitting on the same
-// row. 0.6px was tuned by eye against %btn-active-base (0.74rem) and the
-// matched badges (0.72rem) — both land at ~5.07-5.2% of their own font-size —
-// so this constant is that ratio, not a fresh guess, same self-scaling
-// technique $emboss-stroke uses (_sass/shared/_rule.scss) for the same
-// underlying problem in a different effect.
+// --- Faux-bold stroke --------------------------------------------------------
+// Chosen filter chips and matched row tags get their extra weight from a
+// text stroke in the letter's own colour, because Courier has no weight above
+// Bold. This is not the punched-tape emboss, whose stroke is a lighter colour
+// than the letter. In em, so it scales with the type it sits on. MANUAL
+// §13.4.2 (#193).
 $faux-bold-stroke: 0.05em;
 
 // --- Recipe Page Utilities ---------------------------------------------------
 $color-white:                #ffffff;
-// The soft edge on the index filter labels. Derived from the text it outlines
-// rather than a standalone grey, so it stays related to it: the wordmark's
-// rgba(230,230,230,0.9) against white letters and this against dark ones are
-// the same idea, and were two unrelated magic numbers.
+// The label tier's stroke colour (food/_rule.scss). Derived from the text it
+// outlines rather than a standalone grey, so the two stay related.
 $color-label-stroke:         lighten($color-text, 30%);   // 20% -> 30%, Helen, 2026-08-24
 
 // --- Cross-recipe links --------------------------------------------------
-// Added 2026-08-02: links were inheriting the shared a { color: $color-text }
-// (_sass/shared/_base.scss) — a link reading as plain body text is not
-// "more obvious", which is what Helen asked for after one nearly went
-// unnoticed. First answer was a new hue, $color-vivid-rose; same day,
-// Helen's actual preference turned out to be magenta -- reusing an existing
-// hue rather than a fifth. Both links and the short-method toggle share one
-// base colour and one hover behaviour -- see article.recipe a and
-// .btn-method-toggle in _recipe.scss.
+// Links, the short-method toggle and the other link-like controls on the
+// recipe page share one resting colour and one hover. Resting is the title
+// rule's magenta darkened until it clears 4.5:1 on $color-bg: an existing hue,
+// not a fifth.
 //
-// $color-dazzling-dragonfruit-dark (darken 12%, 5.26:1 against $color-bg) is the
-// link colour. Briefly tried darker (20%, to put more distance between a
-// link and the raw-magenta footer hearts when both land in the same view)
-// and reverted the same day -- Helen tried it and preferred the
-// cohesiveness of matching the title rule's own magenta ("the cohesiveness
-// of the title underline and base page function (links) is pleasing"). The
-// footer-hearts near-miss is real but stays open (losing the heart footer
-// entirely was floated as one way to resolve it) -- doesn't block deploy,
-// revisit later rather than solve today by pulling links away from the
-// hue that's working.
-//
-// Hover goes LIGHTER, per Helen's ask. Was darken 8% (4.46:1, "under 4.5 by
-// a hair") until issue #199, 2026-08-14: Helen's own read was that the shift
-// from the 12%-darkened resting colour barely registered, because both ends
-// stayed inside the same hue -- unlike .site-about-link's "?" hover, which
-// jumps from a neutral grey resting colour straight to this same raw
-// $color-dazzling-dragonfruit and is obviously a different colour. Her explicit
-// call, having seen the contrast math (3.24:1 against $color-bg, well under
-// the 4.5:1 body-text floor): the bigger, unambiguous colour jump is worth
-// it for a hover state, which is transient by definition -- text is never
-// read continuously in this colour the way the resting link colour is.
+// Hover goes LIGHTER, to the raw magenta, which is under the 4.5:1 body-text
+// floor. Helen's ruling, having seen the figures: a hover is transient, and
+// the bigger colour jump is worth it (#199).
 $color-recipe-link: $color-dazzling-dragonfruit-dark;
 $color-recipe-link-hover: $color-dazzling-dragonfruit;
 
 // --- The shared chrome's accent ----------------------------------------------
-// The TENTH palette-contract variable (issue #374, 2026-08-19): the one colour
-// _sass/shared/_footer.scss is allowed to name, covering the footer's four link
-// hovers and the hearts. Both sites owe it; see tests/test_site_config.py's
-// SHARED_PALETTE_CONTRACT.
-//
-// Magenta, and not a new hue, because magenta is ALREADY this site's one
-// "interactive / branded" colour -- it carries the title rule, the method
-// toggle, every cross-recipe link and $color-star-root, and MANUAL 13.2 is
-// explicit that those are one rhyme rather than four coincidences. Naming that
-// job out loud costs nothing and gives the shared chrome something to ask for
-// that is not "food's magenta".
-//
-// It resolves to exactly what the two rules it replaced already used
-// ($color-recipe-link-hover for the links, $color-dazzling-dragonfruit for the
-// hearts, which are the same value), so this refactor changes no pixel on food.
+// A palette-contract variable (#374): the shared partials name it for hovers,
+// focus rings and the footer hearts, so both sites must declare it. See
+// SHARED_PALETTE_CONTRACT in tests/test_site_config.py. On this site it is
+// magenta, already the one "interactive / branded" colour (MANUAL §13.2).
 $color-accent: $color-dazzling-dragonfruit;
 
 // --- Reusable Structural Accents ---------------------------------------------
-// Nested bullets in the short method. Was cerulean-mixed; re-based on spring
-// green when cerulean left the recipe page entirely, so it stays a pale echo of
-// the section rule rather than becoming an orphan hue.
+// Nested bullets in the short method: a pale echo of the section rule's
+// spring green, not a hue of its own.
 $color-marker-accent: mix($color-marauding-mint, $color-bg, 35%);
 
 // --- The recipe page's colour budget -----------------------------------------
-// After the 2026-07-31 redesign the recipe page spends FOUR colours, and the
-// count is the design. It was seven — rose, cerulean, orange, spring green,
-// violet, aureolin and pencil grey — which is where "two design languages at
-// once" came from. Cross-recipe links, added 2026-08-02, briefly looked like
-// a fifth ($color-vivid-rose) before Helen asked for magenta instead — which
-// meant a darker derivative of an existing hue rather than spending a new
-// one. The count stays at four.
+// The recipe page spends FOUR hues, and the count is the design (MANUAL
+// §13.2):
 //
-//   1. $color-dazzling-dragonfruit the blocky rule under the title, the
-//                                  footer hearts, the short-method toggle,
-//                                  and (as $color-recipe-link, darken 12%)
-//                                  cross-recipe links
-//   2. $color-section-underline    the upper rule under the section names
-//   3. $color-section-underline-2  the lower rule under them, and (since
-//                                  2026-08-03) the hand-drawn arrow beside
-//                                  an ingredient/step note — see
-//                                  .annotation-mark in _recipe.scss
-//   4. $color-blazing-banana       the highlighter on ingredient amounts
+//   magenta       the rule under the title; darkened, links and link-like
+//                 controls; the footer hearts
+//   spring green  the upper rule under the section names
+//   violet        the lower rule; the quiet structural colour for the box
+//                 tints, the doneness chart and the annotation arrow
+//   yellow        the highlighter on ingredient amounts
 //
-// Everything else is text, $color-clear-text or $color-border — the whole of
-// the method, the notes and the boxes are monochrome apart from a
-// link inside them. The colour is on what you NAVIGATE by and off what you
-// READ, which is what "colour, but more sparing" turned out to mean — a link
-// fits the NAVIGATE side of that line, even mid-sentence, because it takes
-// you somewhere the way the rules and highlighter do, not because it's
-// prettier prose. The annotation arrow is the one deliberate exception —
-// it's decoration, not navigation — and it took violet specifically because
-// magenta already means "interactive" here: an arrow in the link colour
-// would read as clickable when it isn't.
-//
-// Magenta carries three jobs at once (title rule, toggle, links) on top of
-// doubling as $color-star-root — all accepted as the same rhyme, not four
-// separate coincidences: it is the site's one "this is interactive/branded"
-// colour, and a link is exactly that. Violet now carries two (the rule,
-// the annotation arrow) for the equivalent reason — it's the "quiet,
-// structural, secondary" colour, which is what an annotation mark actually
-// is. 2 and 3 no longer *only* appear together, since the arrow is 3 without
-// 2 — that only held while violet's one job was half of a composite mark.
-// If a FIFTH colour is ever proposed, that's the point to stop and ask
-// whether an existing hue could do the job instead, the way magenta and
-// violet both just did — and only past that, whether "colour, but more
-// sparing" still means anything.
+// Everything else is $color-text, $color-clear-text or $color-border. Colour
+// is on what you navigate by and off what you read. Magenta means
+// "interactive", so decoration that is not clickable takes violet. Before
+// proposing a fifth hue, ask whether one of these four can do the job.
 
-// The two colours of the blocky rule under INGREDIENTS / METHOD / NOTES. Both
-// live here rather than in the template, which is the point: the brush wash
-// needed an asset-name slug in the markup because it picked a FILE, so the
-// section colour used to sit in _layouts/recipe.html against the three-layer
-// rule. A background needs no asset, so the colour came home.
+// The two colours of the blocky rule under INGREDIENTS / METHOD / NOTES.
 $color-section-underline: $color-marauding-mint;
 $color-section-underline-2: $color-blinging-blackberry;   // the second, lower rule
 
-// Aureolin over electric cobalt -- Helen's call, 2026-08-13, for one
-// specific heading only: the About page's own "FAQ"
-// (`.section-heading-text--about-faq`, see food/about.html and
-// _recipe-header.scss). NOT a change to the shared
-// $color-section-underline/-2 pair above, which every recipe page's
-// INGREDIENTS/METHOD/NOTES/Tips/Troubleshooting headings still use
-// unmodified -- a first attempt changed those site-wide by mistake, caught
-// and reverted the same day.
-//
-// $color-electric-cobalt existed here before, as $color-name-search-root
-// (the "I KNOW WHAT I WANT" search category) -- removed 2026-08-01 by
-// 65d3c3b, "prune the palette of values nothing reads", when that root
-// colour moved to $color-torrid-tangerine instead and nothing else referenced
-// electric cobalt any more. Restored at its exact original value (#0047FF,
-// confirmed via `git log -S`, not re-guessed) rather than the visually
-// similar #0047AB ("cobalt blue") a first attempt used -- Helen asked for
-// the specific colour that used to exist in this project, not a same-name
-// pigment reference.
-// UNREAD FROM 2026-08-13 TO 2026-08-16. Its one consumer was the about page's
-// FAQ heading, which went back to violet the day after it was restored --
-// Helen: "I love colour, but even I need to accept that adding the cobalt was
-// too much." Kept anyway, against this file's own "a swatch nothing chooses
-// from is not a palette, it is a paint chart" rule, and the exception was
-// deliberate: this value had already been deleted once and recovered by hand
-// (see above), and deleting it a second time the day after it came back would
-// have been churn, not tidying.
-//
-// It was then read by .search--exclude .category-label-text in
-// _sass/food/_category-labels.scss -- the LEAVE OUT heading's own double
-// rule, Helen's sixth deliberately-added section hue, 2026-08-16 -- until
-// 2026-09-04, WHEN IT WENT FOR GOOD. Helen, reordering the five section hues
-// (see their block above): "we'd drop the cobalt, and drop the colouring on
-// 'leave out', like we do for the cocktail site. It could retain its violet
-// perhaps." So LEAVE OUT is colourless the way its sibling is, keeping the
-// violet structural rule alone, and the value this paragraph kept alive twice
-// is deleted rather than parked a third time: the rule it broke says a
-// swatch nothing chooses from is a paint chart, and nothing chooses it now.
-
-// LEAVE OUT'S OWN -active AND -hover, NEUTRAL SINCE 2026-09-04. They were the
-// darkened cobalt and its deeper cut (#403: the hover has to differ from the
-// resting -active, because a word-matched candidate rests at -active and a
-// hover to the same value is a no-op). Both still hold with neutrals: the
-// section's clear link and its chosen exclusions deepen to the page's quiet
-// grey, and its pool candidates darken to full ink under the cursor -- the
-// same "darken, not lighten" direction every other section moves in, without
-// a hue to move in. The names stay so the four consumers in _search.scss and
-// _buttons.scss keep saying which section they belong to.
+// LEAVE OUT's own -active and -hover are neutrals, because the section spends
+// no hue. The hover must differ from -active (#403): a word-matched candidate
+// rests at -active, and a hover to the same value is a no-op. It darkens, as
+// every other section's does.
 $color-exclude-active: $color-clear-text;
 $color-exclude-hover:  $color-text;
 
 // Step numerals in the method, and the top-level bullets in the short method.
-// Body text colour, not a hue of their own. They were violet, then a darkened
-// cerulean; both spent colour on something that is already unmistakable by
-// other means — 1.2rem bold Courier with a text stroke, against 0.92rem light
-// sans. Face, size, weight and stroke all differ, which is more than enough to
-// find your place with, and it keeps the page's colour on the marks that need
-// it. See $stroke-light in _sass/shared/_tokens.scss for the stroke itself.
+// Body text colour, not a hue: face, size, weight and stroke already set them
+// apart from the prose.
 $color-step-number: $color-text;
 
 // --- Highlighter wiring ------------------------------------------------------
-// ONE element on the site carries a highlighter slot: the amount at the start
-// of an ingredient line. Seven other selectors used to set --highlighter-fill
-// here — .category--star, --mood, --practicalities, .search, .search--ingredients,
-// .search--name and .logo-header — and none of them has contained a slot since
-// the index moved to the blocky rule (.logo-header had not existed for far
-// longer than that). A custom property nothing reads is not wiring.
-//
-// Default fill is aureolin — the ingredient-amount highlighter's actual
-// colour (see the recipe page's colour budget above) — not $color-text; the
-// one consumer left is the highlighter itself, not body text.
+// One element carries a highlighter slot: the amount at the start of an
+// ingredient line. The default fill is the highlighter's own yellow.
 .highlighted svg path {
   fill: var(--highlighter-fill, #{$color-blazing-banana});
   fill-opacity: var(--highlighter-opacity, 1);
 }
-
-// The footer hearts rule used to live here. It is chrome, not food's, so it
-// moved to _sass/shared/_footer.scss with the rest of the footer in issue #374
-// — a site that did not declare a heart colour drew the graphic in inherited
-// body text, which is what cocktails was doing. It reads $color-accent, which
-// on this site is the same magenta this rule always used.

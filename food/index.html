@@ -4,23 +4,16 @@ title: Home
 permalink: /food/
 ---
 
-{% comment %} site_key is set to `food` for everything in this directory by
-   _config.yml's `defaults:`, so the identity here comes from _data/sites.yml
-   rather than from site.title — which is now the repo-level name, not this
-   site's. {% endcomment %}
+{% comment %} site_key is `food` for everything in this directory (_config.yml's
+   `defaults:`), so the identity comes from _data/sites.yml; site.title is the
+   repo-level name, not this site's. {% endcomment %}
 {% assign this_site = site.data.sites[page.site_key] %}
 
 <h1 class="visually-hidden">{{ this_site.title }} — {{ this_site.description }}</h1>
 
-{% comment %} "THE UNIVERSE SAYS…" STOOD HERE for two days (PR #660, 2026-09-02
-   to 2026-09-04): one random row dealt above the panel with a "deal again"
-   control, the design audit's answer to "nothing edible above the fold".
-   Helen removed it having seen it deployed: "Having all the dolly mixture
-   colours visible together and first thing pleases me. I don't think anyone
-   (and certainly not me) opens a triage website to click on a random
-   recipe." The panel of choices IS the fold on a triage site. Recover the
-   section from git if the question is ever reopened; do not rebuild it from
-   memory. {% endcomment %}
+{% comment %} No random-deal section above the panel on food (PR #660 added one and Helen
+   removed it): the panel of choices is the fold on a triage site. Recover it
+   from git if the question is reopened; do not rebuild it from memory. {% endcomment %}
 
 <div class="controls">
   {% assign star_data = site.data.food.filter_sections.star %}
@@ -29,55 +22,37 @@ permalink: /food/
   {% assign name_search_data = site.data.food.filter_sections.name_search %}
   {% assign exclude_data = site.data.food.filter_sections.exclude %}
 
-  {% comment %} DRAFTS JOIN THE LIST ONLY IF THEY ACTUALLY PUBLISH. `site.food_drafts`
-     is populated whenever the collection is DECLARED, which _config.yml does
-     unconditionally -- `output: false` stops Jekyll writing the pages, it does
-     not empty the collection. So testing `if site.food_drafts` was testing
-     "does this collection exist", which is always true, and the index listed
-     every draft with meta.rewritten anyway. In production those rows linked to
-     /helen-triages/food_drafts/<slug>.html -- Jekyll's default URL for a
-     document with no output -- and 404'd. Ten of them, live. GitHub issue #235.
-
-     Read from site.collections rather than a flag of our own, so this follows
-     _config_local.yml flipping output back on for the working view without a
-     second thing to keep in sync. {% endcomment %}
+  {% comment %} Drafts join the list only if they actually publish (#235).
+     `site.food_drafts` is populated whenever the collection is declared, which
+     _config.yml does unconditionally: `output: false` stops the pages being
+     written, it does not empty the collection, and the rows would link to URLs
+     that 404. So read `output` from site.collections, which follows
+     _config_local.yml turning it on. {% endcomment %}
   {% assign all_recipes = site.food_recipes %}
-  {% comment %} THE MAGIC BAG JOINS UNCONDITIONALLY, unlike drafts. It is
-     `output: true`, so its entries have real URLs in every build, and the
-     entire point of the collection is that these dishes show up when Helen is
-     browsing for something to cook -- a magic-bag entry hidden from the index
-     is a dish she has forgotten about, which is the problem it exists to
-     solve. See _config.yml's `food_magic_bag` comment. {% endcomment %}
+  {% comment %} The magic bag joins unconditionally, unlike drafts: it is `output: true`, so
+     its entries have real URLs in every build. See _config.yml's
+     `food_magic_bag` comment. {% endcomment %}
   {% assign all_recipes = all_recipes | concat: site.food_magic_bag %}
   {% assign _drafts_collection = site.collections | where: "label", "food_drafts" | first %}
   {% if _drafts_collection.output %}
     {% assign all_recipes = all_recipes | concat: site.food_drafts %}
   {% endif %}
   {% assign all_recipes = all_recipes | sort: "title" %}
-  {% comment %} THE `meta.rewritten` GATE DOES NOT APPLY TO THE MAGIC BAG, and
-     leaving it out would have been a silent production-only bug -- the exact
-     shape MANUAL §12 is full of. `show_source_wording` is true in
-     _config_local.yml and false in _config.yml, so an entry without
-     `meta.rewritten: true` renders perfectly while you build it and VANISHES
-     when it deploys, with a green build and nothing in the log.
-
-     The right fix is the exemption, not `rewritten: true` on every entry. That
-     gate exists because an un-rewritten recipe still carries someone else's
-     words, which is a copyright question (README, and §4's QQ PLACEHOLDER
-     rule). A magic-bag dish has no source to rewrite FROM -- it is Helen's own,
-     out of her own head -- so the concern does not apply and neither should the
-     gate. `meta.rewritten` is not part of the magic-bag schema at all;
-     tests/test_magic_bag.py rejects it. {% endcomment %}
+  {% comment %} The `meta.rewritten` gate does not apply to the magic bag. Without the
+     exemption an entry renders locally, where `show_source_wording` is true, and
+     vanishes from the deployed index with a green build. The gate is about
+     someone else's words; a magic-bag dish has no source, and
+     tests/test_magic_bag.py rejects `meta.rewritten` on one. {% endcomment %}
   {% assign _rendered_recipes = all_recipes | where_exp: "r", "r.meta.rewritten or site.show_source_wording or r.collection == 'food_magic_bag'" %}
 
-  {% comment %} Stars are DECLARED in _data/taxonomy.yml, not derived from front
-     matter. Deriving meant a typo silently minted a new star ingredient. {% endcomment %}
+  {% comment %} Stars are declared in _data/food/taxonomy.yml, not derived from front
+     matter, where a typo would silently mint a new star ingredient. {% endcomment %}
   {% assign all_stars = site.data.food.taxonomy.star_ingredients %}
 
   {% if all_stars.size > 0 %}
-    {% comment %} `section_id="filter-star"` -- #1059. A star badge's own link
-       (recipe_badges.html) ends in this exact fragment, so a reader following
-       it lands on this section rather than the top of the page. {% endcomment %}
+    {% comment %} `section_id="filter-star"` (#1059): a star badge's own link
+       (recipe_badges.html) ends in this exact fragment, so a reader following it
+       lands on this section. {% endcomment %}
     {% include filter_group.html
       group_class=star_data.class
       label=star_data.label
@@ -89,21 +64,18 @@ permalink: /food/
   {% endif %}
 
   {% for group in tag_groups %}
-    {% comment %} Look the group's tags up in _data/taxonomy.yml by iterating the
-       hash rather than using tags[group.name]. Iterating yields [key, value]
-       pairs and always works; the bracket form with a variable key is not
-       reliable in Liquid. {% endcomment %}
+    {% comment %} Look the group's tags up in _data/food/taxonomy.yml by iterating the hash
+       rather than using tags[group.name]: the bracket form with a variable key is
+       not reliable in Liquid. {% endcomment %}
     {% assign group_tags = "" | split: "" %}
     {% for pair in site.data.food.taxonomy.tags %}
       {% if pair[0] == group.name %}{% assign group_tags = pair[1] %}{% endif %}
     {% endfor %}
 
-    {% comment %} `section_id="filter-{{ group.name }}"` -- #1059. `group.name`
-       is `mood` or `practicalities`, the same key recipe_badges.html finds a
-       tag's group under, so the two can never name a different fragment for
-       the same section. Built with `capture` rather than inline in the
-       include's own parameter list -- a Liquid tag parameter is not
-       guaranteed to accept a filter chain the way a plain output does. {% endcomment %}
+    {% comment %} `section_id="filter-{{ group.name }}"` (#1059). `group.name` is the same
+       key recipe_badges.html finds a tag's group under, so the two cannot name a
+       different fragment. Built with `capture`: a Liquid tag parameter is not
+       guaranteed to accept a filter chain. {% endcomment %}
     {% capture group_section_id %}filter-{{ group.name }}{% endcapture %}
     {% include filter_group.html
       group_class=group.class
@@ -115,22 +87,11 @@ permalink: /food/
     %}
   {% endfor %}
 
-  {% comment %} HAS TO HAVE AND LEAVE OUT ARE ONE QUESTION, ASKED ON ONE LINE --
-     GitHub issue #586, and it is the shape cocktails' index already has (its
-     `.drink-searches`, MANUAL 9.13). Helen: "has to have then leave out on
-     the same line".
-
-     They are two halves of "what is in it", answered in opposite directions,
-     and reading them as one row is what says so. Stacked, LEAVE OUT read as a
-     sixth filter category that happened to be about ingredients; beside its
-     own opposite it reads as the other half of a pair.
-
-     The pair is a real wrapper rather than a rule on the two sections, because
-     the GAP has to belong to something: .category carries its own
-     $index-section-gap top and bottom, and grid items do not collapse margins
-     the way the block-flow siblings did, so leaving them on would have doubled
-     the space above and below this row. The wrapper owns it now and its
-     children have theirs zeroed -- one value, in _search.scss. {% endcomment %}
+  {% comment %} Has to have and leave out are one question, asked on one line (#586), the
+     shape cocktails' `.drink-searches` has. The pair is a real wrapper because
+     the gap has to belong to something: grid items do not collapse margins, so
+     the wrapper owns the gap and its children have theirs zeroed, in
+     _search.scss. {% endcomment %}
   <div class="search-pair">
     <div class="category search search--ingredients">
       <div class="search-input">
@@ -138,10 +99,8 @@ permalink: /food/
           <span class="category-label-text">{{ ingredients_data.label }}</span>
         </label>
         <input type="text" id="ingredient-search-box" autocomplete="off" placeholder="ingredient name..." />
-        {% comment %} visibility, not display: none -- the button's own space
-           stays reserved in the row from the start, so the input doesn't
-           suddenly lose width the instant this appears. See its rule in
-           _sass/food/_layout.scss for the fuller story. {% endcomment %}
+        {% comment %} visibility, not display: none: the button's space stays reserved in the row,
+           so the input does not lose width the instant this appears. {% endcomment %}
         <button type="button" class="btn-clear-inline" id="ingredient-search-clear" style="visibility: hidden;">&times; clear</button>
       </div>
       {% comment %} Populated by filters.js as you type; aria-live announces the
@@ -149,34 +108,10 @@ permalink: /food/
       <div class="category-buttons search-results" id="ingredient-results-pool" aria-live="polite"></div>
     </div>
 
-    {% comment %} THE DISLIKE NAVIGATOR -- GitHub issue #52. "I have invited
-       someone for dinner and they hate peas, so I want to see all recipes that
-       do NOT contain peas as an ingredient."
-
-       NO LONGER BEHIND A REVEAL, and the reasoning that put it there is worth
-       recording rather than silently dropping. It opened closed on the
-       progressive-disclosure argument: most sessions never need it, and
-       revealing it deliberately framed it as a dislike navigator rather than a
-       sixth filter everyone has to consider on the way past. Helen's ruling on
-       #586 is that the pairing does that framing better than the hiding did --
-       beside HAS TO HAVE it is visibly the other half of one question, so it
-       needs no door to explain what it is. "'leave out' always visible, so
-       delete the show/hide button."
-
-       So `#exclude-reveal`, `.exclude-reveal-row`, `.name-heading-stack` and
-       `.exclude-panel` are all gone, along with filters.js's open/closed label
-       strings and its aria-expanded bookkeeping. Nothing replaced them: there
-       is no state to keep, which is the point.
-
-       ITS HEADING COMES FROM filter_sections.yml NOW. It was the one section
-       with its label written into this template, because the reveal button WAS
-       the heading and splitting that copy across two files would have been
-       worse. With an ordinary heading it belongs with the other five.
-
-       #exclude-active USED TO LIVE OUTSIDE THE PANEL ON PURPOSE, so the chosen
-       pills survived the panel being dismissed. There is no panel and no
-       dismiss, so that reason is spent -- the pills sit in the section because
-       that is where the answers to this question go. {% endcomment %}
+    {% comment %} The dislike navigator (#52): show every recipe that does not contain an
+       ingredient. Always visible, with no reveal (#586); beside HAS TO HAVE it
+       reads as the other half of one question. Its heading comes from
+       filter_sections.yml like the others. {% endcomment %}
     <div class="category search search--exclude">
       <div class="search-input">
         <label class="category-label" for="exclude-search-box">
@@ -185,33 +120,21 @@ permalink: /food/
         <input type="text" id="exclude-search-box" autocomplete="off" placeholder="ingredient name..." />
         <button type="button" class="btn-clear-inline" id="exclude-search-clear" style="visibility: hidden;">&times; clear</button>
       </div>
-      {% comment %} Populated by filters.js as you type, from the DERIVED
-         vocabulary (every data-all-ingredients entry on the page), not from
-         main_ingredients -- see the data-all-ingredients comment on the rows
-         below. Fuzzy on purpose: typing "pea" offering peas, peanut butter
-         and pearl barley is correct, because you then pick the one you
-         meant, and what gets picked is matched as a whole entry rather than
-         as a substring. {% endcomment %}
-      {% comment %} ABOVE THE POOL SINCE 2026-10-11, so what is already left
-         out stays at the top while you search for the next thing, as on
-         cocktails. It sat under the pool until then. {% endcomment %}
+      {% comment %} Populated by filters.js as you type, from the derived vocabulary (every
+         data-all-ingredients entry on the page), not from main_ingredients. Fuzzy on
+         purpose: "pea" offers peas, peanut butter and pearl barley, and what gets
+         picked is then matched as a whole entry, not as a substring. {% endcomment %}
+      {% comment %} Above the pool, so what is already left out stays at the top while you
+         search for the next thing, as on cocktails. {% endcomment %}
       <div class="exclude-active" id="exclude-active" aria-live="polite"></div>
 
       <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
     </div>
   </div>
 
-  {% comment %} 5. THE ESCAPE HATCH, and it is last for the same reason
-     cocktails' is (MANUAL 9.13): if you already know what you want, none of
-     the above is for you, but a name box at the TOP invites treating the page
-     as a search box, which is not what it is for.
-
-     IT USED TO CARRY THE LEAVE OUT REVEAL as a second row under its heading,
-     centred on it with .name-heading-stack -- the wordmark's max-content grid
-     trick (MANUAL 13.8). Both are gone with issue #586: the picker they
-     opened is now a section of its own, beside HAS TO HAVE, so there is
-     nothing left to reveal and nothing left to centre. This section is back to
-     being one label and one input, like the rest. {% endcomment %}
+  {% comment %} The name box is last, for the same reason cocktails' is (MANUAL 9.13): at
+     the top it invites treating the page as a search box, which is not what it
+     is for. {% endcomment %}
   <div class="category search search--name">
     <div class="search-input">
       <label class="category-label" for="name-search-box">
@@ -222,101 +145,38 @@ permalink: /food/
     </div>
   </div>
 
-  {% comment %} NO META FILTERS BLOCK ANY MORE -- Helen, 2026-09-06: "I don't
-     want this block on the index page any more. It was useful when I was still
-     ingesting recipes I know, but it's not now I've done most of that."
-
-     THE WHOLE SECTION IS GONE, not just hidden. It went the way its own four
-     siblings went under #562, and for the same stated reason: an attribute
-     nothing reads is worse than one that is absent, because it reads as a live
-     fact to the next person. So `data-meta-draft` came off every row,
-     `filters.js`'s four branches went, and `filter-state.js` lost the `meta`
-     field from FOOD_FIELDS entirely.
-
-     THE HISTORY, BECAUSE IT IS THE SECOND HALF OF ONE DECISION. There were five
-     meta filters: needs rewrite, needs proofread, no short method, has short
-     method, and draft. #562 removed four in 2026-08 -- they answered "is this
-     recipe finished yet", which Helen does not need this page to ask ("I am
-     perfectly well aware of how much work I have done on each drink"). `draft`
-     survived because it was a different kind of question: which COLLECTION a row
-     came from. That question has now expired too, for the reason she gives
-     above -- it was a tool for the ingest phase, and the ingest phase is
-     largely done.
-
-     THE DRAFT BADGE ON A ROW STAYS. It is not the filter and was not what she
-     pointed at: `is_draft` still renders a `draft` pill further down, so a row
-     that does not exist on the live site still says so. What has gone is the
-     ability to filter BY it. git log has the control if it is ever wanted
-     back. {% endcomment %}
+  {% comment %} No meta filters block: the index does not filter by work state or by draft
+     (#562). A draft row still carries its `draft` badge, below. {% endcomment %}
 
 </div>
 
-{% comment %} Reuses the exact filter-heading treatment (punched label +
-   stroke) rather than inventing a new decoration -- it just carries no
-   colour rule underneath, the same way META FILTERS above carries none: it
-   isn't one of the five filter categories, so it doesn't borrow one of their
-   hues. The count is the server-rendered resting value; filters.js keeps it
-   live as filters change. {% endcomment %}
-{% comment %} `id="results"` IS WHERE A SEARCH RESULT LANDS -- #1050, Helen,
-   2026-09-15: "load the index page filtered as appropriate, with the screen
-   snapped to the returned recipes (so don't have to scroll down)." Every
-   filtered link the search-for-anything dropdown offers ends in `#results`,
-   the browser scrolls here on arrival, and filters.js does it again once the
-   list is revealed. The same id on the drinks index, so page-search.js knows
-   one word for both sites. {% endcomment %}
-{% comment %} THE NUMBER AND THE WORD ARE TWO SPANS SINCE 2026-09-26 -- Helen,
-   from the "N survivors" candidates page: "both treatments". The digits take
-   the label face (`.results-count-number`, _sass/shared/_results-bar.scss --
-   IBM Plex Mono, the same declarations as an ingredient amount) and the word
-   stays bare, §13.7's ruling. Cocktails' count has had this shape since #489
-   (`#drink-count-n` / `#drink-count-word`); this is food catching up.
-   filters.js paints the two spans; `#recipe-count` still reads "N survivors"
-   as one sentence. The Liquid is the resting value for the first render. {% endcomment %}
+{% comment %} Reuses the filter-heading treatment (punched label and stroke) with no
+   colour rule underneath: it is not a filter category, so it borrows none of
+   their hues. The count is the server-rendered resting value; filters.js keeps
+   it live. {% endcomment %}
+{% comment %} `id="results"` is where a search result lands (#1050): every filtered link
+   the search dropdown offers ends in `#results`, and filters.js scrolls here
+   again once the list is revealed. The same id is on the drinks index, so
+   page-search.js knows one word for both sites. {% endcomment %}
+{% comment %} The number and the word are two spans: the digits take the label face
+   (`.results-count-number`, _sass/shared/_results-bar.scss) and the word stays
+   bare (MANUAL 13.7). filters.js paints both; `#recipe-count` still reads as
+   one sentence. The Liquid is the resting value for the first render. {% endcomment %}
 <div class="results-heading" id="results">
   <span class="category-label"><span class="category-label-text" id="recipe-count"><span class="results-count-number" id="recipe-count-n">{{ _rendered_recipes.size }}</span> <span id="recipe-count-word">survivor{% unless _rendered_recipes.size == 1 %}s{% endunless %}</span></span></span>
 
-  {% comment %} THE SHORTLISTED-ONLY VIEW -- GitHub issue #546's second half,
-     "see a list of recipes they've shortlisted".
-
-     NO SEPARATE PAGE, AND THAT IS THE DESIGN RATHER THAN THE CHEAP OPTION. This
-     index already renders every row, already filters, counts and paginates
-     them -- so "shortlisted" is one more predicate over rows the page is
-     holding anyway. IT DOES NOT COMPOSE WITH THE OTHERS, since 2026-09-10
-     (#918): it is a VIEW of the shortlist, and pressing it clears every other
-     filter, while setting any other filter leaves it. This paragraph used to
-     say "shortlisted AND make-ahead is a question you can now ask"; Helen
-     asked it by accident fourteen steps running and called it a bug. The alternative,
-     a page rendered from the stored list, needs a second copy of the row markup
-     and has to decide what to do about an entry whose recipe has been renamed
-     or held back by the publish gate. Here that entry simply has no row on the
-     page and silently is not in the list, which is the correct answer arrived
-     at by doing nothing.
-
-     NOT IN `META FILTERS` ABOVE, deliberately: that whole block is gated on
-     `show_source_wording` and so is local-only, and a shortlist is the one
-     filter here that exists for a visitor rather than for Helen. It sits with
-     the count instead, because "how many are showing" is the same kind of fact.
-
-     ON ITS OWN LINE UNDER THE COUNT SINCE 2026-09-05, not beside it -- the same
-     move the cocktails index made the same day (#729/#730), and here for the
-     same reason. As a pill it is an object rather than a word, and an object
-     sharing a baseline with the count read as part of the sentence.
-
-     SHIPS `hidden`. It needs shortlist.js like every other control does, and it
-     is revealed by the same pass -- `[data-shortlist-count]` inside it is what
-     that pass fills in. {% endcomment %}
+  {% comment %} The shortlisted-only button is in `.results-count-row` below, on its own
+     line under the count rather than beside it: as a pill on the count's
+     baseline it read as part of the sentence. {% endcomment %}
 </div>
 
-{% comment %} THE STICKY RESULTS BAR -- Helen, 2026-09-26, "both treatments".
-   One line fixed to the top of the viewport once the count line above has
-   scrolled off it: the live count and a `× clear all`. A MIRROR, never a
-   second count: assets/js/results-bar.js copies the two spans above and the
-   top clear-all's visibility, and its button clicks that one. Ships `hidden`
-   and stays so without JavaScript or without IntersectionObserver, so the
-   no-JS page is unchanged. The identical block sits on cocktails/index.html;
-   _sass/shared/_results-bar.scss styles both. The count spans start empty --
-   a third Liquid copy of the count would be a third thing to keep in step,
-   and the script fills them before the bar is ever shown. {% endcomment %}
+{% comment %} The sticky results bar: one line fixed to the top of the viewport once the
+   count line above has scrolled off. A mirror, never a second count:
+   assets/js/results-bar.js copies the two spans above and the top clear-all's
+   visibility, and its button clicks that one. Ships `hidden` and stays so
+   without JavaScript or IntersectionObserver. The identical block sits on
+   cocktails/index.html; _sass/shared/_results-bar.scss styles both. The spans
+   start empty and the script fills them before the bar is shown. {% endcomment %}
 <div class="results-bar" data-results-bar hidden>
   <div class="results-bar-inner">
     <span class="results-bar-count"><span class="results-count-number" data-results-bar-n></span> <span data-results-bar-word></span></span>
@@ -330,20 +190,16 @@ permalink: /food/
           id="shortlist-only"
           aria-pressed="false"
           hidden>shortlisted (<span data-shortlist-count>0</span>)</button>
-  {% comment %} #849, SECOND PLACEMENT. The cocktails index carries the
-     identical link and the same argument: a JUMP LINK rather than a second
-     panel, because two textareas holding the same JSON would be two things to
-     keep in step and a second answer to "where is my list". Ships `hidden`
-     like every other shortlist control -- a link pointing at a panel that a
-     browser without JavaScript never reveals would be a dead end. {% endcomment %}
-  {% comment %} The "export list as JSON →" jump link sat here from 2026-09-09
-     to 2026-09-10; cocktails/index.html has the note on why it went. {% endcomment %}
+  {% comment %} The shortlisted view (#546, #918) is a view of the shortlist, not a filter
+     that composes: pressing it clears every other filter, and setting any other
+     filter leaves it. No separate page: a shortlisted recipe that has no row
+     here is simply not in the list. {% endcomment %}
+  {% comment %} Ships `hidden`, like every shortlist control; shortlist.js reveals it and
+     fills `[data-shortlist-count]`. {% endcomment %}
 </div>
-{% comment %} HIDE / SHOW DRAFTS, ON A LOCAL BUILD ONLY -- #1358, 2026-10-10.
-   Helen: "I'd like a 'show drafts' (or hide) button on the local build. Under
-   the SHORTLISTED button is fine". Gated on `site.show_drafts`, which only
-   _config_local.yml declares, so the deployed index has no such element.
-   Ships `hidden`; filters.js reveals and wires it. The identical block is on
+{% comment %} Hide / show drafts, on a local build only (#1358): gated on
+   `site.show_drafts`, which only _config_local.yml declares. Ships `hidden`;
+   filters.js reveals and wires it. The identical block is on
    cocktails/index.html. {% endcomment %}
 {% if site.show_drafts %}
 <p class="drafts-toggle-row">
@@ -351,13 +207,12 @@ permalink: /food/
 </p>
 {% endif %}
 
-{% comment %} A SHORTLIST SOMEONE SENT -- #1093. Shown only while the index is
-   showing a `?shortlist=slug,slug` link, which it does without saving anything
-   (Helen, 2026-09-15); "keep these" is the one tap that saves it. filters.js
-   fills the text and reveals both. Its own line under the count row, not in
-   it: that row is a flex line, and beside the button a sentence with a button
-   in it wrapped into a narrow column on a phone. The words are Helen's
-   since #1342, 2026-10-10. {% endcomment %}
+{% comment %} A shortlist someone sent (#1093): shown only while the index is showing a
+   `?shortlist=slug,slug` link, which it does without saving anything; "keep
+   these" is the one tap that saves it. filters.js fills the text and reveals
+   both. On its own line, not in the count row: that row is a flex line, and a
+   sentence with a button in it wraps into a narrow column on a phone. The
+   words are Helen's (#1342). {% endcomment %}
 <p class="shared-shortlist" data-shared-shortlist hidden>
   <span data-shared-shortlist-text></span>
   <button type="button" class="btn-shared-keep" data-shared-shortlist-keep hidden>keep these</button>
@@ -372,115 +227,39 @@ permalink: /food/
       {% assign is_draft = false %}
       {% if recipe.collection == "food_drafts" %}{% assign is_draft = true %}{% endif %}
 
-      {% comment %} A MAGIC-BAG DISH CAN BE A DRAFT TOO -- Helen, 2026-10-04, on
-         #1201: "a recipe can have magic bag AND draft. Always sit magic bag on
-         the right."
-
-         WHAT `draft` MEANS HERE IS WHAT IT ALREADY MEANT: this row is not on
-         the live site. For a recipe that is decided by its collection. A
-         magic-bag dish never lives in the drafts collection, so for it the
-         same fact is decided by the publish gate: it is a draft until it says
-         awaiting_fix false AND proofread true, which is the exact test
-         _plugins/publish_gate.rb applies. Written the gate's way round --
-         start as a draft, clear it only on an explicit pass of both flags --
-         so a missing flag or a quoted one reads as held back here exactly as
-         it does there.
-
-         STILL LOCAL-ONLY WITHOUT BEING GATED ON ANYTHING. In production the
-         plugin has already removed a held-back dish from the collection
-         before this page renders, so no row reaches this line with a failing
-         flag; only the local build, which skips the gate, has one to mark.
-
-         A HELD-BACK RECIPE IN THE PUBLISHED COLLECTION IS NOT MARKED, and
-         that is unchanged: her sentence was about the magic bag. {% endcomment %}
+      {% comment %} A magic-bag dish can be a draft too (#1201). `draft` means the row is not on
+         the live site. A recipe's collection decides that; a magic-bag dish is a
+         draft until it says awaiting_fix false and proofread true, the test
+         _plugins/publish_gate.rb applies, written the gate's way round so a missing
+         or quoted flag reads as held back. In production the plugin has already
+         removed a held-back dish, so only a local build has one to mark. A held-back
+         recipe in the published collection is not marked. {% endcomment %}
       {% if is_magic_bag %}
         {% assign is_draft = true %}
         {% if recipe.meta.awaiting_fix == false and recipe.meta.proofread == true %}{% assign is_draft = false %}{% endif %}
       {% endif %}
 
-      {% comment %} `is_draft` IS A BADGE NOW AND NOT A FILTER -- 2026-09-06.
-         It is still derived here and still renders a `draft` pill below, so a
-         row that does not exist on the live site says so. What went with the
-         META FILTERS block is the row ATTRIBUTE it used to write
-         (`data-meta-draft`) and the control that read it.
-
-         Five meta facts have now been through this same door. #562 removed
-         four -- _needs_rewrite, _needs_proofread and a three-valued _has_short,
-         all carefully written so a magic-bag row would fail every one rather
-         than default into them, because left to the defaults an entry answers
-         TRUE to all three and pads three working lists with dishes that can
-         never leave them. That care was not lost, it was spent: the lists it
-         protected stopped existing. `draft` followed on 2026-09-06 for the
-         reason recorded where the block used to be. {% endcomment %}
-      {% comment %} THE DERIVED INGREDIENT INDEX -- GitHub issue #52, the
-         "they hate peas" filter. Every ingredient_groups item on this recipe,
-         not main_ingredients.
-
-         WHY DERIVED, AND WHY NOT A NEW FRONT-MATTER ARRAY. main_ingredients is
-         a deliberately partial HINT: fine to include ON, dangerous to exclude
-         BY. Nine recipes list an olive oil in ingredient_groups and not one of
-         them names it in main_ingredients, so "no olives please" answered from
-         main_ingredients would hand back nine recipes containing the thing.
-         Same shape for coriander (3 vs 8) and mushrooms (3 vs 4). A parallel
-         hand-maintained array would duplicate a required field with nothing
-         able to verify the copy, so this reads the real list.
-
-         INCIDENTALS COUNT. `incidental: true` hides an item from
-         main_ingredients and from the recipe page's own Ingredients section
-         (see §4 of the manual), and that is right for "what is this dish
-         made of" -- but "we didn't itemise the frying oil" is not an answer to
-         someone avoiding it. No `unless item.incidental` here, deliberately.
-
-         THE NAME IS TAKEN UP TO THE FIRST COMMA OR OPEN BRACKET, so
-         "butter beans, drained" indexes as "butter beans" and matches the
-         "butter beans" in another recipe that happens to carry no preparation
-         note. Lowercased, and deduplicated within the row.
-
-         SEPARATED BY `|`, NOT BY COMMAS, unlike data-ingredients above. That
-         attribute joins main_ingredients, a curated vocabulary the taxonomy
-         tests already keep comma-free; these are arbitrary `item:` free text,
-         where the comma is the single commonest character (1,393 of the 3,751
-         item strings across recipes and drafts contain one) and is kept out of
-         the value only by the truncation two lines up -- a separator whose
-         safety depends on another rule in the same expression staying exactly
-         as it is. `|` appears in no item string anywhere in either collection,
-         and is already this file's chosen "cannot appear in the values"
-         separator just below, in the pantry ordering. Leading and trailing
-         `|` are deliberate: the value is self-delimiting, so filters.js's
+      {% comment %} `is_draft` is a badge, not a filter: it writes no row attribute and no
+         control reads it. {% endcomment %}
+      {% comment %} The derived ingredient index (#52): every ingredient_groups item on this
+         recipe, not main_ingredients, which is a deliberately partial hint: fine to
+         include on, dangerous to exclude by. Incidentals count: no
+         `unless item.incidental` here, on purpose. The name is taken up to the first
+         comma or open bracket, lowercased, and deduplicated within the row.
+         Separated by `|`, not commas, because item text is free text full of commas.
+         The leading and trailing `|` make the value self-delimiting, so filters.js's
          split is exact and a substring probe cannot half-match an entry.
       {% endcomment %}
       {% assign _all_ing = "|" %}
       {% for _group in recipe.ingredient_groups %}
         {% for _item in _group.items %}
-          {% comment %} An item is USUALLY {amount, item, note} but is allowed to
-             be a bare string (tests/conftest.py's ingredient_items accepts
-             both). There USED TO BE a third shape, a dict with an `amount:` and
-             no `item:` -- indonesian-chicken-curry-gulai-ayam.md's `200 ml`,
-             whose `item: coconut cream` had landed on the NEXT entry as a
-             duplicate key, silently throwing away that entry's flavourings
-             line -- and `_item.item | default: _item` turned it into a
-             vocabulary entry reading `{"amount"=>"200 ml"}`, because Liquid
-             stringifies the hash rather than admitting there was nothing to
-             take. Named cases instead: a dict with a name uses it, a dict
-             without one is skipped (there is no ingredient there to avoid), and
-             anything else is the bare-string form.
-
-             THE RECIPE WAS FIXED ON 2026-08-16 AND THIS COMMENT WAS NOT, until
-             #983 (2026-09-14) noticed it still said "there is currently one".
-             The branch stays because it is cheap and correct. What stops the
-             CAUSE recurring is
-             tests/test_front_matter.py::test_front_matter_has_no_duplicate_keys,
-             written the same day as the fix: PyYAML keeps the last value of a
-             repeated key in silence, so only a loader that refuses duplicates
-             can see one.
-
-             The dict-without-a-name test asks about `amount`/`note` and
-             deliberately not about the incidental flag, even though that would
-             read as the more complete list: this loop must never mention
-             `incidental` at all, so that
-             test_the_derived_ingredient_index_counts_incidental_items can
-             assert exactly that and mean it. A dict carrying an incidental
-             flag and no name is not a thing that exists. {% endcomment %}
+          {% comment %} An item is usually {amount, item, note} but may be a bare string
+             (tests/conftest.py's ingredient_items accepts both). A dict with a name
+             uses it; a dict without one is skipped, because `_item.item | default:
+             _item` would stringify the hash into a vocabulary entry; anything else is
+             the bare-string form. This loop must never mention `incidental`:
+             test_the_derived_ingredient_index_counts_incidental_items asserts exactly
+             that. {% endcomment %}
           {% assign _raw = "" %}
           {% if _item.item %}
             {% assign _raw = _item.item %}
@@ -489,25 +268,10 @@ permalink: /food/
           {% else %}
             {% assign _raw = _item %}
           {% endif %}
-          {% comment %} A CROSS-RECIPE LINK IS NOT AN INGREDIENT -- GitHub issue
-             #273. Five items name another recipe instead of a food:
-             `item: "[grandma's lemon curd](../grandmas-lemon-curd/)"`. The
-             truncation below takes the name up to the first open bracket, which
-             is exactly right for "butter beans (drained)" and exactly wrong
-             here -- it yields `[grandma's lemon curd]`, square brackets and
-             all, and offered that as something to leave out.
-
-             DROPPED AT DERIVATION, not filtered later, because the square
-             brackets are the accident and not the reason: a link to another
-             recipe is a pointer to a whole other ingredient list, so there is
-             no single food here to avoid, and it should never enter the index
-             in the first place. Helen's call.
-
-             Tests the FIRST CHARACTER, not `contains "["`. A link may sit
-             mid-string ("chicken, marinated in [the paste](...)"), where the
-             comma truncation has already removed it and the real ingredient
-             name is what survives. The case handled here is the one where the
-             link IS the item's name. {% endcomment %}
+          {% comment %} A cross-recipe link is not an ingredient (#273): an item whose name is a
+             link to another recipe is dropped here, since there is no single food to
+             avoid. It tests the first character, not `contains "["`: a link mid-string
+             has already been removed by the comma truncation, leaving the real name. {% endcomment %}
           {% assign _first_char = _raw | slice: 0 %}
           {% if _first_char == "[" %}{% assign _raw = "" %}{% endif %}
           {% assign _name = _raw | split: "," | first | split: "(" | first | strip | downcase %}
@@ -518,31 +282,13 @@ permalink: /food/
         {% endfor %}
       {% endfor %}
 
-      {% comment %} THE MAGIC BAG'S OWN INGREDIENTS FEED THE SAME INDEX, and
-         this is the one place where getting it wrong would be a correctness
-         bug rather than a cosmetic one. The comment above states the rule:
-         main_ingredients is fine to include ON and dangerous to exclude BY.
-         A magic-bag entry has no `ingredient_groups`, so without this loop its
-         derived vocabulary would be EMPTY -- and an empty vocabulary means "no
-         mushrooms please" hands back every magic-bag dish containing mushrooms.
-         Silent, and in the direction that serves you the thing you are
-         avoiding.
-
-         NO BRANCH ON THE COLLECTION, deliberately. A recipe has
-         `ingredient_groups` and no `ingredients`; a magic-bag entry has
-         `ingredients` and no `ingredient_groups`, and tests/test_magic_bag.py
-         plus tests/test_front_matter.py hold both halves of that. So each loop
-         is simply a no-op for the other shape, and the dedupe probe below keeps
-         it correct even if a file somehow carried both.
-
-         The normalisation is duplicated rather than shared because Liquid has
-         no functions, and an include tag called once per ingredient across the
-         whole corpus is the slow way to avoid eight lines. The two must stay in
-         step: comma/bracket truncation, the leading-`[` cross-link drop (#273),
-         downcase, dedupe.
-
-         An `incidental:` flag is not read here for the same reason it is not
-         read above -- and the magic-bag schema has no such key anyway.
+      {% comment %} The magic bag's own ingredients feed the same index. A magic-bag entry has
+         `ingredients` and no `ingredient_groups`, so without this loop its
+         vocabulary is empty and LEAVE OUT hands back dishes containing the thing
+         avoided. No branch on the collection: each loop is a no-op for the other
+         shape. The normalisation is duplicated because Liquid has no functions; the
+         two must stay in step: comma/bracket truncation, the leading-`[` drop
+         (#273), downcase, dedupe.
       {% endcomment %}
       {% for _item in recipe.ingredients %}
         {% assign _raw = "" %}
@@ -561,16 +307,11 @@ permalink: /food/
           {% assign _all_ing = _all_ing | append: _name | append: "|" %}
         {% endunless %}
       {% endfor %}
-      {% comment %} `data-url` IS THE SHORTLIST'S KEY — GitHub issue #546, and it
-         is `recipe.url` rather than the `relative_url` the title link below
-         carries. The baseurl is deployment configuration; a stored list built
-         with it in the key would read as empty the day it changed, and the key
-         a row emits would differ from the key that recipe's own page emits.
-         HTF.shortlist's comment in assets/js/assets.js has the full argument.
-
-         An attribute on the row rather than a querySelector for the button
-         inside it: filters.js asks this question once per row per filter pass,
-         and its own `titleFolded` comment is about exactly that cost.
+      {% comment %} `data-url` is the shortlist's key (#546), and it is `recipe.url`, not the
+         `relative_url` the title link carries: the baseurl is deployment
+         configuration, and a stored list keyed on it would read as empty the day it
+         changed. HTF.shortlist's comment in assets/js/assets.js has the argument. An
+         attribute on the row because filters.js asks once per row per filter pass.
       {% endcomment %}
       <li data-url="{{ recipe.url }}" data-tags="{{ recipe.tags | join: ',' }}" data-star="{{ recipe.star_ingredient }}" data-ingredients="{{ recipe.main_ingredients | join: ',' }}" data-all-ingredients="{{ _all_ing | escape }}">
 
@@ -609,44 +350,13 @@ permalink: /food/
           <div class="badge-group-content">
             {% include recipe_badges.html recipe=recipe %}
           </div>
-          {% comment %} TWO BADGES, AND BOTH SAY WHAT A ROW IS -- issue #562,
-             "remove all metadata chips from recipe rows".
-
-             `needs rewrite` and `needs proofread` stood here and are gone. They
-             were work-state notes, and a work-state note on every unfinished
-             row is a to-do list printed down the side of the page you are
-             using to decide what to cook. Helen sees the same thing four
-             filters were also telling her, and asked for both.
-
-             What is left says what you are about to click, which is a
-             different job and the reason these two survive the cull:
-             `magic bag` warns that there is no method on the other side of the
-             link, and `draft` that the row is not on the live site. Same
-             treatment for both -- Helen: "styled exactly as 'magic bag' which
-             is already in place" -- because they are the same kind of
-             statement.
-
-             `draft` is still local-only in practice without being gated on
-             anything: `is_draft` can only be true for a row from
-             `food_drafts`, which is only built locally, or for a magic-bag
-             dish the publish gate holds back, which production never renders
-             (see where `is_draft` is derived, above).
-
-             THE MAGIC BAG MARK IS A MARK AND NEVER A FILTER -- #1201, which
-             settled #507. Helen, 2026-09-28: "I don't need to filter by this.
-             Let's just give it a quiet mark, where 'draft' is on the live
-             site, and next to it on the local site." So it lives in this one
-             container with `draft`, in the same look (one rule for both in
-             _sass/food/_badges.scss). Do not add a control that reads it.
-
-             MAGIC BAG IS WRITTEN LAST, SO IT IS ALWAYS ON THE RIGHT -- her
-             words, 2026-10-04: "a recipe can have magic bag AND draft. Always
-             sit magic bag on the right." The container is a flex row packed
-             to its right-hand end, so the last mark written is the rightmost:
-             `draft` then `magic bag` on a held-back dish locally, and `magic
-             bag` alone at that same right-hand end on the live site.
-             tests/test_rendered_pages.py pins all of it against fixture
-             dishes, in a production build and a local one. {% endcomment %}
+          {% comment %} Two badges, and both say what you are about to click (#562): `magic bag`
+             that there is no method behind the link, `draft` that the row is not on the
+             live site. One look for both, in _sass/food/_badges.scss. The magic bag mark
+             is a mark and never a filter (#1201): do not add a control that reads it.
+             Magic bag is written last, so it is always on the right: the container is a
+             flex row packed to its right-hand end. tests/test_rendered_pages.py pins it
+             in a production build and a local one. {% endcomment %}
           <div class="badge-group-meta">
             {% if is_draft %}<span class="badge badge-draft">draft</span>{% endif %}
             {% if is_magic_bag %}<span class="badge badge-magic-bag">magic bag</span>{% endif %}
@@ -654,23 +364,11 @@ permalink: /food/
         </div>
         </div>
 
-        {% comment %} THE SHORTLIST TOGGLE, at the right-hand end of the row --
-           Helen's placement, 2026-09-04. A sibling of `.recipe-row-content`
-           rather than something inside it: the `<li>` is already a flex row and
-           the content block already takes `flex: 1`, so this needs no
-           positioning of its own and a long ingredient line pushes against it
-           instead of running underneath it. That is the same property
-           `.recipe-actions` relies on beside a recipe title.
-
-           `hidden` UNTIL shortlist.js REVEALS IT, exactly as `.btn-print` does
-           on the recipe page, and for the reason stated there: a control that
-           silently fails is worse than no control, and CSS cannot ask whether
-           JavaScript ran.
-
-           THE ACCESSIBLE NAME CARRIES THE TITLE, the visible one does not. 86
-           buttons all named "shortlist" is a useless list to navigate by, and
-           the visible word has to stay short and fixed -- see shortlist.js on
-           why it never changes. {% endcomment %}
+        {% comment %} The shortlist toggle is a sibling of `.recipe-row-content`, not inside it:
+           the `<li>` is a flex row, so a long ingredient line pushes against the
+           button instead of running under it. `hidden` until shortlist.js reveals it:
+           CSS cannot ask whether JavaScript ran. The accessible name carries the
+           title; the visible word stays short and fixed (see shortlist.js). {% endcomment %}
         <button type="button"
                 class="btn-shortlist"
                 data-shortlist-key="{{ recipe.url }}"
@@ -691,69 +389,30 @@ permalink: /food/
   <button type="button" class="btn-page btn-page-see-all" id="recipe-page-see-all">(see all)</button>
 </div>
 
-{% comment %} "Blank canvas." ON BOTH INDEXES -- Helen on #1088, 2026-09-20:
-   'Both "blank canvas."' It said "Nothing to see here." here and "Blank
-   canvas." on cocktails, which was two lines for one state; hers is the
-   cocktails one.
-
-   THIS IS THE FILTERED-TO-NOTHING STATE, NOT THE EMPTY-COLLECTION ONE, and
-   the two are different lines on purpose. Cocktails keeps "Nothing to see
-   here yet." for a collection with nothing in it -- Helen, same ruling:
-   "'Nothing to see here yet' is fine for when the cocktail site is empty,
-   which it currently is not." So the word "yet" is doing real work: one line
-   says your search was too narrow, the other says there is nothing here so
-   far. {% endcomment %}
+{% comment %} "Blank canvas." on both indexes (#1088). This is the filtered-to-nothing
+   state, not the empty-collection one, which is a different line on purpose. {% endcomment %}
 <div class="recipe-list-empty" style="display: none;">
   Blank canvas.
 </div>
 
-{% comment %} "(select something)" -- Helen on #1088, 2026-10-07. It said
-   "Select something to see a list." {% endcomment %}
+{% comment %} "(select something)": Helen's words (#1088). {% endcomment %}
 <div class="recipe-list-searching" style="display: none;">
   (select something)
 </div>
 
-{% comment %} THE SHOPPING LIST -- GitHub issue #801, Helen: "add scaler and
-   shopping list feature to food recipe shortlist page. This can be copied
-   directly from the [cocktail] page -- I would like all the same features. But
-   there is no need to cost the portions. When serving size is unclear, please
-   make your best guess. Group the shopping list by grocery aisle, e.g.
-   produce, dairy, fish, meat, non-perishable etc."
-
-   COPIED FROM cocktails/index.html, DELIBERATELY, down to the class names --
-   `.shopping-list`, `.shopping-list-head`, `.shopping-list-setall`,
-   `.shopping-list-items`, `.shopping-list-empty`. "All the same features" is
-   the brief, and two lists that look alike and are built out of different
-   words would be the kind of drift MANUAL 2.2 is about. What is NOT here is
-   `#drink-costs`: costing was #547 and she has ruled it out for food.
-
-   AT THE BOTTOM OF THE SHORTLIST LISTING, and it appears only while the
-   shortlisted filter is on -- the same rule the drinks list follows, and for
-   the same reason: that is what makes it "my shortlist listing" rather than a
-   running total under a browse.
-
-   A `serves:` RECIPE'S BOX COUNTS PORTIONS. A drink's box counts glasses,
-   because a drink is a drink; a recipe's counts PEOPLE, because "we are four
-   tonight" is the question a food shortlist is being asked. That is what
-   makes the serving size Helen asked to be guessed load-bearing rather than
-   decorative: it is the number the portions are divided by.
-   _plugins/food_shopping.rb resolves it, from `serves:` or the recipe's own
-   `serves_estimate:`.
-
-   A `makes:` RECIPE'S BOX COUNTS BATCHES since #1297 (Helen, 2026-10-09: "X
-   batches of 18 Peanut Butter Cookies"), which is why "set all to N portions"
-   below leaves those rows alone. `data-whole-measures` on the section is the
-   same issue: the by-eye measures whose totals are bought in whole ones.
-
-   `min=1` and no maximum beyond 99, matching the drinks list. Zero portions of
-   everything is an empty list with extra steps. {% endcomment %}
+{% comment %} The shopping list (#801), copied from cocktails/index.html down to the
+   class names, without costing. It appears only while the shortlisted filter
+   is on. A `serves:` recipe's box counts portions (people), resolved by
+   _plugins/food_shopping.rb from `serves:` or `serves_estimate:`; a `makes:`
+   recipe's box counts batches (#1297), which is why "set all to N portions"
+   leaves those rows alone. `data-whole-measures` is the by-eye measures whose
+   totals are bought in whole ones. {% endcomment %}
 <section class="shopping-list" id="shopping-list" hidden aria-live="polite" data-whole-measures="{{ site.data.food.scaling.half_step_measures | concat: site.data.food.scaling.half_step_counts | join: ',' | escape }}" data-quarter-measures="{{ site.data.food.scaling.quarter_step_measures | join: ',' | escape }}" data-count-nouns="{{ site.data.food.scaling.count_nouns | join: ',' | escape }}" data-container-nouns="{{ site.data.food.scaling.yields.container_words | join: ',' | escape }}">
   <div class="shopping-list-head">
     <h2 class="shopping-list-title">Shopping list</h2>
-    {% comment %} SET ALL, NOT A MULTIPLIER -- cocktails/index.html's own note
-       says why, and it holds here unchanged: it writes every recipe's own
-       number and then has no further opinion, so there is one figure per
-       recipe and one place it lives. {% endcomment %}
+    {% comment %} Set all, not a multiplier: it writes every recipe's own number and then has
+       no further opinion, so there is one figure per recipe and one place it
+       lives. {% endcomment %}
     <label class="shopping-list-setall">
       <span>set all to</span>
       <input type="number" id="shopping-list-setall" min="1" max="99" step="1" inputmode="numeric">
@@ -761,11 +420,10 @@ permalink: /food/
     </label>
   </div>
 
-  {% comment %} ONE COUNT PER RECIPE, rendered by filters.js from the shortlist
-     because only the browser knows what is in it. Each starts at however many
-     that recipe makes, so an untouched list shops for every recipe exactly as
-     written -- which is the answer you want before you have said anything.
-     {% endcomment %}
+  {% comment %} One count per recipe, rendered by filters.js from the shortlist because
+     only the browser knows what is in it. Each starts at however many that
+     recipe makes, so an untouched list shops for every recipe as written.
+  {% endcomment %}
   <ul class="shopping-list-recipes"></ul>
   {% comment %} "(Not scaled: salt, olive oil)" -- the ingredients the numbers
      above could not reach, named as the recipe page names them (#1088). Filled
@@ -776,16 +434,11 @@ permalink: /food/
   <p class="shopping-list-empty" hidden>Nothing shortlisted yet.</p>
 </section>
 
-{% comment %} SHARE OR SAVE THE SHORTLIST -- one link, and nothing else since
-   #1100 (Helen, 2026-09-15: "Remove the rest of the apparatus: no JSON export
-   or import, no clear."). The JSON dump (#849), the paste-back restore (#850)
-   and the two-click clear are gone; the link (#1093) opens this index showing
-   the list without saving it. The cocktails index carries the identical block.
-   A `<details>` because it is a hatch rather than part of choosing what to
-   cook; it ships `hidden`, and shortlist-export.js reveals it only while
-   something is shortlisted, since there is no link to a list of nothing. The
-   words are Helen's, and the same on both sites: "Loading this shows recipes
-   without saving them." for both, she said, drinks included. {% endcomment %}
+{% comment %} Share or save the shortlist: one link and nothing else (#1100). The link
+   (#1093) opens this index showing the list without saving it. The cocktails
+   index carries the identical block. It ships `hidden`, and
+   shortlist-export.js reveals it only while something is shortlisted. The
+   words are Helen's, and the same on both sites. {% endcomment %}
 <details class="shortlist-export" id="shortlist-export"
          data-shortlist-export-panel hidden>
   <summary>Share or save the shortlist</summary>
@@ -797,57 +450,22 @@ permalink: /food/
   </button>
 </details>
 
-{% comment %} WHAT EACH RECIPE IS MADE OF, AND HOW MANY IT FEEDS -- #801.
+{% comment %} What each recipe is made of, and how many it feeds (#801). Every recipe, not
+   the shortlisted ones: the shortlist lives in this browser's localStorage and
+   the build cannot know it. _plugins/food_shopping.rb has already computed
+   `shopping`, `portions` and `portions_estimated`; this copies them out. The
+   row gate above is repeated here, magic-bag exemption included, or a draft's
+   ingredients ride into a production build.
 
-   IT HAS TO BE EVERY RECIPE, not the shortlisted ones: the shortlist lives in
-   this browser's localStorage and the build cannot know what is in it. The
-   same fact that makes the whole feature client-side makes this blob
-   unconditional. cocktails/index.html carries the identical argument for
-   `#drink-ingredients`.
-
-   THE AISLE AND THE PORTION COUNT ARE ALREADY COMPUTED, not recomputed here.
-   _plugins/food_shopping.rb hangs `shopping`, `portions` and
-   `portions_estimated` on every document at build; this copies them out. So
-   the page never sees _data/food/aisles.yml, there is one implementation of
-   the matching rule, and the template needs no `for` loop over 400 keywords.
-   Same division `_plugins/cocktail_costs.rb` keeps with the drinks scaler.
-
-   THE ROW GATE IS REPEATED, not relaxed. A recipe that has no row on the page
-   above cannot be shortlisted from it, so an entry here would be dead weight
-   at best -- and at worst a draft's ingredients riding into a production
-   build. `is_magic_bag` is exempted in both places, exactly as it is above.
-
-   KEYS ARE ONE LETTER because this is machine-read and the collection carries
-   778 ingredients. `p` portions, `e` estimated, `y` the recipe's own words for
-   its yield, `k` WHICH KEY those words came from, `i` the ingredients -- `a`
-   amount, `n` name, `s` shelf.
-
-   A `makes:` RECIPE ALSO CARRIES `w`, `h` AND `m` -- #1297. `w` says its box
-   counts BATCHES (page.whole_recipes), `h` that half a batch is offered
-   (page.half_recipe, _plugins/food_half_recipe.rb's verdict), and `m` what
-   one batch makes (page.made), for the row's words: "2 batches of 18 Peanut
-   Butter Cookies". They are the three figures the recipe page's own scaler
-   already reads, so the two controls cannot disagree about a recipe.
-
-   AN INGREDIENT MAY CARRY `pt`, `f`/`c` AND `x` -- #1297 again. `pt` the
-   parts of a fruit the line uses (juice, zest), `f` and `c` the fruit and
-   the count where both are written inside the item ("juice of 1 lemon"), `x`
-   a line that only points at another ("the rest of the oil above"). Marked
-   by _plugins/food_shopping.rb, merged by food-shopping-list.js.
-
-   `k` EXISTS BECAUSE `y` ALONE IS A TRAP. `serves` and `makes` are exclusive
-   (MANUAL 4) and `y` takes whichever is there, so a page printing `y` behind
-   a fixed word gets it right for half the collection and wrong for the other
-   half -- it read "serves About 750 ml" for the blackberry gelato until
-   2026-09-07. It is also what tells the shortlist panel whether that recipe's
-   box can count PEOPLE at all: `makes: "About 750 ml"` cannot be turned into
-   portions without inventing a portion size, so the box counts batches
-   instead. See assets/js/filters.js.
-
-   EACH VALUE THROUGH `jsonify` INDIVIDUALLY, never hand-quoted. Ingredient
-   names carry apostrophes ("goat's cheese"), accents ("crème fraîche"), and
-   the odd bracket, and `jsonify` on the string is what escapes them
-   correctly. {% endcomment %}
+   Keys: `p` portions, `e` estimated, `y` the recipe's own words for its yield,
+   `k` which key those words came from, `i` the ingredients (`a` amount, `n`
+   name, `s` shelf). `k` exists because `serves` and `makes` are exclusive and
+   `y` takes whichever is there; it also tells the panel whether the box can
+   count people. A `makes:` recipe also carries `w` (the box counts batches),
+   `h` (half a batch is offered) and `m` (what one batch makes), the figures
+   the recipe page's scaler reads (#1297). An ingredient may carry `pt` (parts
+   of a fruit), `f`/`c` (fruit and count) and `x` (a line that only points at
+   another). Each value goes through `jsonify`, never hand-quoted. {% endcomment %}
 <script type="application/json" id="recipe-ingredients">
 {
 {%- assign _first_recipe = true -%}
@@ -866,50 +484,37 @@ permalink: /food/
 }
 </script>
 
-{% comment %} THE AISLES AND THEIR ORDER, straight out of _data/food/aisles.yml.
-   Only `order` is emitted -- the keyword table stays at build time (see the
-   blob above), and what the page needs is the headings and the sequence they
-   go in. Emitting the file's own list rather than a copy means adding an aisle
-   is a YAML edit and never touches this template, which is the property
-   `#ingredient-vocabulary` below already has. {% endcomment %}
+{% comment %} The aisles and their order, from _data/food/aisles.yml. Only `order` is
+   emitted; the keyword table stays at build time. Adding an aisle is a YAML
+   edit and never touches this template. {% endcomment %}
 <script type="application/json" id="recipe-aisles">
   {{ site.data.food.aisles.order | jsonify }}
 </script>
 
-{% comment %} The ingredient search vocabulary — singulars, synonyms and the
-   family-button threshold — comes from _data/ingredient_words.yml. filters.js
-   reads it from here rather than hardcoding any of it. {% endcomment %}
+{% comment %} The ingredient search vocabulary comes from _data/food/ingredient_words.yml.
+   filters.js reads it from here rather than hardcoding any of it. {% endcomment %}
 <script type="application/json" id="ingredient-vocabulary">
   {{ site.data.food.ingredient_words | jsonify }}
 </script>
 
 <script src="{{ '/assets/js/ingredient-search.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/list-view.js' | relative_url }}"></script>
-{% comment %} filter-state.js before filters.js, same trap as the two above:
-   filters.js reads HTF.filterState at startup to apply `?star=…&tag=…`
-   (GitHub issue #40). Guarded by
+{% comment %} filter-state.js before filters.js: filters.js reads HTF.filterState at
+   startup to apply `?star=…&tag=…` (#40). Guarded by
    tests/test_site_config.py::test_filter_state_js_loads_before_filters_js. {% endcomment %}
 <script src="{{ '/assets/js/filter-state.js' | relative_url }}"></script>
-{% comment %} THE SHOPPING LIST'S TWO SCRIPTS, and this order is load-bearing
-   for the same reason the four above are. food-shopping-list.js reads six
-   helpers off HTF.shoppingList at STARTUP rather than on first use -- see its
-   own header -- so a page that loaded them the wrong way round would fail at
-   load rather than on the first shortlist toggle, and filters.js calls
-   HTF.foodShoppingList.build() the first time the shortlisted filter is
-   pressed. Guarded by
-   tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order,
-   the same way the cocktail scaler's three are (#545). {% endcomment %}
+{% comment %} The shopping list's two scripts, in this order: food-shopping-list.js reads
+   its helpers off HTF.shoppingList at startup, and filters.js calls
+   HTF.foodShoppingList.build(). Guarded by
+   tests/test_site_config.py::test_the_food_shopping_scripts_load_in_dependency_order. {% endcomment %}
 <script src="{{ '/assets/js/shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/food-shopping-list.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/filters.js' | relative_url }}"></script>
-{% comment %} THE STICKY RESULTS BAR, AFTER filters.js AND THE ORDER IS
-   LOAD-BEARING (2026-09-26): both register a DOMContentLoaded handler, and
-   listeners fire in registration order, so the bar's runs after the one that
-   builds the `× clear all` it mirrors. Guarded by
+{% comment %} results-bar.js after filters.js: both register a DOMContentLoaded handler,
+   and listeners fire in registration order, so the bar's runs after the one
+   that builds the `× clear all` it mirrors. Guarded by
    tests/test_site_config.py::test_the_results_bar_loads_after_the_index_script_on_both_indexes. {% endcomment %}
 <script src="{{ '/assets/js/results-bar.js' | relative_url }}"></script>
-{% comment %} #849. ORDER DOES NOT MATTER for this one, unlike the two above it:
-   it reads HTF.shortlist at run time rather than lifting helpers off another
-   module at startup, and it subscribes to an event rather than being called by
-   anybody. Last so it is obvious it is nobody's dependency. {% endcomment %}
+{% comment %} Order does not matter for this one: it reads HTF.shortlist at run time and
+   subscribes to an event. Last so it is obvious it is nobody's dependency. {% endcomment %}
 <script src="{{ '/assets/js/shortlist-export.js' | relative_url }}"></script>

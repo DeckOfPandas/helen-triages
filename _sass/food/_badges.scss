@@ -1,9 +1,8 @@
 // ============================================================================
 // BADGES
 // ============================================================================
-// Star, mood and practicality badges on each recipe entry.
-// Note: the clip-path SHAPES for .btn-star and .badge live here, deliberately
-// grouped with the badges. Their appearance is under BUTTONS below.
+// Star, mood and practicality badges on each recipe entry, and the quiet
+// `draft` / `magic bag` marks. The filter buttons are in _buttons.scss.
 
 .badge-group {
   display: flex;
@@ -13,10 +12,8 @@
   width: 100%;
   gap: $space-md;
 
-  // Flat hyphenation, not BEM __element -- matches every other nested class
-  // on the site (e.g. .site-logo-word inside .site-logo). Renamed from
-  // .badge-group__content/__meta 2026-08-10, the one BEM-element holdout
-  // in the whole codebase; see MANUAL's CSS naming section.
+  // Flat hyphenation, not BEM __element, like every other nested class on the
+  // site (MANUAL §11.3).
   &-content {
     display: flex;
     flex-wrap: wrap;
@@ -36,32 +33,12 @@
 }
 
 
-// Clip-path shape — now for .badge only. Two consumers, and BOTH say what a
-// row IS rather than what state it is in: `.badge-magic-bag` (there is no
-// method on the other side of this link) and `.badge-draft` (this row is not
-// on the live site).
-//
-// ONE RULE FOR BOTH, SINCE #1201 (2026-10-04) -- `&-draft, &-magic-bag` below.
-// Helen's ruling on the magic bag, 2026-09-28: "Let's just give it a quiet
-// mark, where 'draft' is on the live site, and next to it on the local site."
-// So the magic bag takes the draft mark's own look, and nothing new was
-// designed for it.
-//
-// THIS COMMENT USED TO SAY SOMETHING THAT WAS NOT TRUE, and it is worth the
-// two lines. From #562 it read "neither declares anything of its own, which is
-// why they look identical". `&-draft` has declared a tint and a lighter text
-// colour since the first commit; `.badge-magic-bag` declared nothing, so the
-// two were never identical -- `magic bag` was bare text in the row's own
-// colour, the louder of the pair. tests/test_rendered_pages.py now reads the
-// COMPILED css and fails if the two marks stop sharing one rule.
-//
-// `.badge-meta-rewrite` and `.badge-meta-proofread` were named here too, and
-// went with #562: a work-state note on every unfinished row is a to-do list
-// down the side of the page you use to decide what to cook.
-// .badge-star/mood/practicalities
-// and .btn-tag/.btn-star moved to the tape-shape SVG system below
-// (Helen, 2026-08-03: "the grey shapes... don't really look like anything
-// in particular... hastily broken old-fashioned highlighter tape").
+// The clip-path shape is for the two marks that say what a row IS:
+// `.badge-magic-bag` (no method behind this link) and `.badge-draft` (not on
+// the live site). They share one rule on purpose (#1201):
+// test_the_magic_bag_mark_is_the_draft_marks_look_and_is_written_last reads
+// the compiled CSS and fails if any rule names one and not the other.
+// The star, mood and practicalities badges wear the tape-shape SVG instead.
 .badge {
   display: inline-block;
   font-family: $font-headings;   // NOT $font-label -- see _palette.scss
@@ -91,6 +68,7 @@
     color: lighten($color-clear-text, 12%);
   }
 
+  // No template emits the next two classes (#562).
   &-meta-rewrite {
     background-color: rgba($color-text, 0.05);
     color: lighten($color-clear-text, 12%);
@@ -101,52 +79,26 @@
     color: lighten($color-clear-text, 12%);
   }
 
-  // Tape shape instead of clip-path + flat fill -- no background-color at
-  // all, the SVG itself is the visible fill, ragged edges and all. .tag-shape
-  // gets its OWN colour (the raw root hue) separate from the text colour
-  // (the darker -active hue), same two-tone split the rest of the page's
-  // colour system already uses -- text needs to stay readable sitting on
-  // top of the shape, not disappear into it.
-  // GitHub issue #40: these three are <a> elements now (see
-  // _includes/recipe_badges.html) and clicking one filters the index by it.
-  // A pointer cursor is the only resting affordance -- they already look
-  // distinct enough that adding an underline or a border would just make the
-  // row noisier for something you find by moving the mouse anyway.
+  // Tape shape, no clip-path and no background: the SVG is the fill.
+  // .tag-shape takes its own colour, separate from the text colour, so the
+  // word stays readable on top of the shape. These three are <a> elements
+  // (_includes/recipe_badges.html) that filter the index (#40); the pointer
+  // is their only resting affordance.
   &-star, &-mood, &-practicalities {
     clip-path: none;
     cursor: pointer;
   }
 
-  // Resting pill shape, take two: rgba(..., 0.4) was still too loud (Helen,
-  // 2026-08-03: "still too loud for me... please try mixing with a grey").
-  // mix() with $color-border (the site's own "quiet, crisp structural
-  // lines" token, already the lightest neutral in the palette) rather than
-  // a transparency dial this time -- a semi-transparent hue over a white
-  // page just lightens it (still reads as a pale, bright tint), where an
-  // actual mix desaturates it into a dustier, quieter version of the same
-  // hue. Solid colour, not rgba -- the desaturation is doing the calming
-  // work here, not opacity.
-  //
-  // TAKE THREE, 2026-09-04: MUTED ENTIRELY AT REST. The design audit's
-  // critical #2 -- "the row's most saturated element is its badge trio, so
-  // the eye lands on 'beef showstopper make-ahead' before it lands on 'beef
-  // wellington'" -- and Helen, choosing from the real index: "leave the
-  // buttons entirely muted until hit by a filter, when they should take your
-  // middle saturation, then the loudest active state for mouseover." So the
-  // ladder has three rungs now, and the 35% dusty mix that WAS the resting
-  // shape is the middle one:
+  // Three rungs, and the badges rest on the quietest so a row's title is
+  // read first:
   //
   //     rest      a hint of the hue in the tape (14%), grey text
-  //     matched   the 35% mix, text in the category's own dark colour
-  //               (_active-filter-states.scss)
+  //     matched   a 35% mix, set in _active-filter-states.scss
   //     hover     the lightened full-strength hue, below
   //
-  // What this gives up, knowingly: at rest you can no longer find
-  // practicalities by its colour. Helen took that trade for a list
-  // whose titles scan first -- "that scan makes the decision about opening
-  // the page or not". ONLY THE BADGE'S OWN HOVER LIGHTS IT: a candidate that
-  // lit the whole trio when the cursor crossed the row was rejected outright
-  // ("feels weird").
+  // mix() with $color-border, not opacity: a transparent hue over the page
+  // only lightens it, where a mix desaturates it. Only the badge's own hover
+  // lights it, never the row's.
   &-star {
     color: $color-clear-text;
     .tag-shape { color: mix($color-star-root, $color-border, 14%); }
@@ -163,32 +115,15 @@
   }
 }
 
-// --- Badge hover (GitHub issue #40) ------------------------------------------
-// WHAT IT DOES: previews the matched state. The resting .tag-shape above is
-// the category hue mixed down into $color-border; on hover it goes to the same
-// lightened full-strength hue .badge--matched uses
-// (_active-filter-states.scss), so hovering shows you what clicking is about
-// to do to that badge. No new colour is introduced -- both ends of the move
-// are values the page already spends, which is what §13.5's five-hue code and
-// the palette's colour budget require.
+// --- Badge hover (#40) -------------------------------------------------------
+// The loudest of the three rungs. No new colour: each is the category's own
+// hue, which the index's colour code requires (MANUAL §13.5).
 //
-// NOT A PREVIEW ANY MORE, 2026-09-04: hover is the LOUDEST of three rungs
-// (rest, matched, hover -- see the resting block above), and matched sits a
-// step below it. The lightened hue below is unchanged; what moved is what it
-// is compared against. The text colour still holds the category against
-// shared/_base.scss's `a:hover`, for the reason given next.
-//
-// WHY EACH SELECTOR LEADS WITH `a`, AND WHY THAT IS NOT COSMETIC.
-// shared/_base.scss sets `a:hover { color: $color-mood-root }` -- (0,1,1),
-// which BEATS a bare `.badge-star` (0,1,0). Written as `.badge-star:hover`
-// these rules would set the shape colour and then lose the text colour, so
-// hovering a STAR or a PRACTICALITIES badge would turn its lettering MOOD's
-// cerulean: the category code saying the wrong thing, on hover only, on the
-// one page where the code is load-bearing. `a.badge-star:hover` is (0,1,2) and
-// wins on its own merits rather than on source order, which a partial in an
-// @import list can never safely rely on. The `color` line is therefore
-// deliberate and not a redundant restatement of the resting rule -- it is what
-// holds the category colour against the base stylesheet.
+// Each selector leads with `a`, and the `color` line is not redundant.
+// shared/_base.scss's `a:hover` sets $color-mood-root and out-specifies a bare
+// `.badge-star`, so without both a STAR or PRACTICALITIES badge would turn
+// MOOD's colour on hover. `a.badge-star:hover` wins on specificity, not on
+// import order.
 a.badge-star:hover {
   color: $color-star-active;
   .tag-shape { color: mix($color-star-root, $color-white, 82%); }
@@ -204,16 +139,5 @@ a.badge-practicalities:hover {
   .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
 }
 
-// THE `.tag-shape` SLOT ITSELF MOVED TO _sass/shared/_tag-shape.scss, #1219,
-// 2026-10-11 -- cocktails' filter chips wear it too now. Its colours stay
-// here and in the two partials after this one.
-
-// Matched/active tag text had a raised emboss here through several rounds
-// (2026-08-03) — softened alpha, per-category alpha, a hand-tuned colour
-// per category, a widened stroke, all chasing star/mood legibility against
-// practicalities' own softer version, none of it landing. Helen's call: no
-// shadow at all, one flat stroke width for all three categories — "we're
-// fighting the raised font in our tags, and we're losing." Full history is
-// in git; the abandoned %tag-emboss-soft placeholder and
-// tag-emboss-strong($light-colour) mixin aren't worth keeping around only
-// to explain why they're gone.
+// The `.tag-shape` slot itself is in _sass/shared/_tag-shape.scss (#1219); its
+// food colours are here and in _buttons.scss and _category-labels.scss.

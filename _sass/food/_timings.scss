@@ -1,38 +1,22 @@
 // =============================================================================
 // HELEN TRIAGES FOOD - THE TIMINGS AND METHODS PAGE
 // =============================================================================
-// Promoted out of assets/css/reference-demo.scss on 2026-08-14, when the page
-// stopped being a proposal. That stylesheet is gone: it existed to let two
-// demos be styled without touching the real site, and there are no demos left.
-// Loaded by /food/reference/cooking-methods-and-timings/ via food.scss. The temperature chart
-// styles that used to live here moved to _sass/food/_temperature-chart.scss on
-// 2026-08-14, when recipe pages started drawing doneness spectra too (#189):
-// two pages using a device is the point at which it stops being a demo. What is
-// left here is the timings calculator, which is still a proposal.
+// The timings calculator (.ct-*) and the fish lists on
+// /food/reference/cooking-methods-and-timings/, loaded via food.scss. The
+// doneness charts are in _sass/food/_temperature-chart.scss.
+//
+// These four are already imported by food.scss before this file. Importing
+// shared/rule and food/rule twice is safe only because each guards its own
+// :root block.
 
 @import "food/palette";
 @import "shared/tokens";
 @import "shared/rule";
 @import "food/rule";
 
-// =============================================================================
-// THE TIMING CALCULATOR
-// =============================================================================
-// Scoped to .ct-* and loaded by the same demo stylesheet as the charts, because
-// the two instruments are meant to read as one family: same Courier labels,
-// same violet, same restraint about colour.
-//
-// A CARD PER METHOD, not a table row. The calculator's whole job is to answer
-// "how long, which way?", which means comparing seven methods at a glance --
-// and a table forces every method into the same columns even when they don't
-// have the same shape (one is timed by the piece, one runs in two stages, two
-// refuse to answer at all). Cards let a row say something different without
-// leaving a hole in a grid.
+// --- The timing calculator ---------------------------------------------------
 
-// The page's opening sentence, under the title and above the first protein
-// heading. Measure-limited like every other run of prose here; the 4.5rem of
-// air below it belongs to .recipe-section-heading, which is what separates this
-// band from the calculator (see the template -- there is no <hr>).
+// The page's opening sentence, under the title.
 .ct-strapline {
   font-size: 1.06rem;
   line-height: 1.5;
@@ -40,14 +24,8 @@
   margin: $space-xl 0 0 0;
 }
 
-// THE TWO INPUTS, STACKED: WHAT, THEN HOW HEAVY -- 2026-10-09. Helen: "move
-// the weight input field to just below the protein selector dropdown, so the
-// user is saying 'I have chicken, 3 kg'." Until then the weight sat in its
-// own band under the protein heading (#253), a section away from the box it
-// refines, and this form was a two-row grid of side-by-side fields with
-// `display: contents` on each -- built for four boxes (#244) whose labels
-// had to share a baseline. Two boxes one above the other have no baseline
-// to share, so each field is a small grid of its own: label over control.
+// The two inputs, stacked: what, then how heavy. Each field is a small grid of
+// its own, label over control.
 .ct-form {
   display: grid;
   justify-items: start;
@@ -59,10 +37,9 @@
   display: grid;
   gap: $space-xs;
 
-  // The weight is put away with the calculator when the dropdown says fish
-  // (cook-timer.js). An author `display` beats the browser's own
-  // `[hidden] { display: none }`, so it is restated here, as everywhere on
-  // the site that hides a grid or flex box.
+  // cook-timer.js hides the weight field when the dropdown says fish. An
+  // author `display` beats the browser's `[hidden] { display: none }`, so it
+  // is restated.
   &[hidden] { display: none; }
 
   > span {
@@ -71,16 +48,14 @@
     text-transform: uppercase;
     letter-spacing: $letter-spacing-label;
     color: $color-text;
-    // Label tier, 2026-09-02 -- a 0.7rem field label is well under the 1rem
-    // line, so stroke only, no shadow. See LETTERING.md.
+    // Under 1rem, so the label tier: stroke only, no shadow (LETTERING.md).
     @include lettering(label);
   }
 
   input, select {
-    // PLEX MONO, 2026-09-02: what you type or pick here (a weight, a protein)
-    // drives the arithmetic below -- a number you act on, per food/_palette.
-    // scss's $font-label rule. The field's own LABEL above it (WEIGHT,
-    // PROTEIN) stays Courier, two rules up -- it names the input, it isn't one.
+    // Plex Mono: what is typed or picked here is a figure you act on
+    // (food/_palette.scss, $font-label). The field's label above stays
+    // Courier: it names the input.
     font-family: $font-label;
     font-weight: 600;
     font-size: 1rem;
@@ -99,20 +74,9 @@
   }
 }
 
-// THE FINISHING TEMPERATURE, DIRECTLY UNDER THE PROTEIN HEADING AND ABOVE THE
-// CONTROLS — the opposite of where this file put it until 2026-08-16, and the
-// note that used to sit here argued the opposite case. Worth being explicit
-// about why both were right in turn. Below the form it was an OUTPUT: the page
-// opened on a summary sentence, then this figure, then four boxes, and it was
-// answering a question nobody had asked yet (Helen: "it makes no sense where it
-// is"). Under a heading that reads BEEF it is a caption to the heading, not a
-// result of the form: the one figure that holds however you cook it and
-// whatever it weighs. Issue #243, Helen's sketch.
-//
-// Figure left, way-out right: the two are different kinds of thing -- one is
-// the temperature, one is an admission that this page shows a single doneness
-// at a time -- and pushing them apart stops the link reading as part of the
-// sentence.
+// The finishing temperature, directly under the protein heading: a caption to
+// the heading, the one figure that holds however the thing is cooked (#243).
+// Figure left, link right, so the link does not read as part of the sentence.
 .ct-doneat {
   display: flex;
   flex-wrap: wrap;
@@ -120,13 +84,10 @@
   justify-content: space-between;
   gap: $space-md;
   font-size: 1.06rem;
-  // Close under the heading (whose own 2rem does that side), a block gap clear
-  // of the first label below.
   margin: 0 0 $spacing-block-gap 0;
 
   // A protein with no published finishing temperature renders this empty, and
-  // an empty <p> keeping its bottom margin would open a gap where the line
-  // isn't.
+  // an empty <p> would keep its bottom margin.
   &:empty { display: none; }
 
   a {
@@ -137,82 +98,35 @@
   }
 }
 
-// THE RULE UNDER THE WEIGHT BOX IS GONE WITH THE BAND, 2026-10-09. From #243
-// the weight sat in a `.ct-controls` band under the protein heading, closed
-// by a border that separated the inputs from the answers; now both inputs
-// sit above the heading, and the heading's own double rule is the seam.
-//
-// The inputs, above the heading they retitle (#253 put the WHAT box there;
-// the weight joined it on 2026-10-09). No border and no section-sized gap on
-// the BOTTOM: the heading immediately below already brings
-// $spacing-section-top with it, and a second value there would fight one
-// that is already correct -- the same adjacent-margin reasoning
-// .tc-crosslink-line follows on the temperature charts.
-//
-// The TOP is a different question, and nothing else answers it: .ct-
-// strapline's own margin is top-only (it opens the page under the h1), so
-// without a value here the strapline's last line and the "What" box sit
-// flush. Issue #254, Helen: air above the input, not just below it.
+// The inputs, above the heading they retitle (#253). No bottom margin: the
+// heading below brings its own top margin. The top margin is needed because
+// .ct-strapline's margin is top-only, so without it the strapline and the
+// first box sit flush (#254).
 .ct-inputs {
   margin: $spacing-block-gap 0 0 0;
 }
 
-// The count of methods, which now leads the TABLE rather than the page: it is
-// the sentence the rows below it are seven of. It opened the page while the
-// controls needed a "why" above them -- Helen: "otherwise you get some
-// selection boxes with no Why" -- and the strapline and protein heading carry
-// that now.
 .ct-summary {
   font-size: 1.06rem;
   line-height: 1.5;
-  // Tight to the table it introduces; the gap above it belongs to .ct-controls.
   margin: 0 0 $space-xl 0;
   max-width: 62ch;
 }
 
-// =============================================================================
-// THE METHODS, STACKED AND GROUPED BY CUT -- 2026-10-08, #1329, #1330
-// =============================================================================
-// The decision table (Method / What you get / Time, #253) is gone. On a phone
-// its three columns wrapped a method name to four lines and a time to three,
-// and it had never shown the oven setting at all: the cards that carried it
-// went in #873 because they repeated the table, and the table had not picked
-// it up. Helen, asked whether that was what sent her to Google after her own
-// notes: "Do you mean e.g. 200° fan for 10 mins then 180° fan for an hour? If
-// so then yes." Then, from the candidates page: "stacked, by cut".
-//
-// So cook-timer.js writes one <section> per cut group, in the data's own
-// order, each a list of methods -- and a method is a block: its name and its
-// time on the first line, the oven setting under them, the outcome last and
-// quiet. The arithmetic and the shortest-first order within a group are
-// unchanged (HTF.cookSchedule.orderMethods); only the shape is new.
+// --- The methods, stacked and grouped by cut (#1329, #1330) ------------------
+// cook-timer.js writes one <section> per cut group, in the data's order, each
+// a list of method blocks, shortest first (HTF.cookSchedule.orderMethods).
 #ct-method-groups {
   margin-bottom: $spacing-section-gap;
 }
 
-// A section's worth between one cut group and the next (2026-10-10, with
-// the block restyle): the groups are the page's sections within a protein,
-// and a block gap read as one more row.
 .ct-group + .ct-group {
   margin-top: $spacing-section-gap;
 }
 
-// The cut group's name, in the data's words ("Tender roasting cuts"), with the
-// cuts it covers on a line under it in the body face.
-//
-// JOLLIER, 2026-10-09. It was a 0.74rem Courier label over a grey border;
-// Helen: "Could the table headings on the methods pages please be jollier
-// too, e.g. WHOLE BIRD, ROASTING METHODS." So it wears what the site already
-// has for a name one tier below a section heading: the heading-tier
-// lettering at 1.15rem and the single violet rule (overlapping-rule-single,
-// the same mark the troubleshooting names and the recipe page's DONENESS
-// heading carry). The rule sits on the title span, not the h3, because it is
-// an inline background that measures the lettering, and the cuts line must
-// not be under it.
-//
-// SCOPED, because the body's quiet sub-level rule (`article.recipe
-// .recipe-body-content h3`, _recipe-notes-body.scss, 0.78rem and grey at
-// (0,2,1)) otherwise wins and the heading comes out as the label it was.
+// The cut group's name: heading-tier lettering with the single violet rule.
+// Scoped this deeply because the body's quiet `h3` rule in
+// _recipe-notes-body.scss (0.78rem, grey) otherwise wins.
 article.recipe .recipe-body-content h3.ct-group-name {
   @extend %heading-base;
   font-size: 1.15rem;
@@ -223,6 +137,8 @@ article.recipe .recipe-body-content h3.ct-group-name {
   margin: 0 0 $space-md 0;
 }
 
+// The rule is on the title span, not the h3: it is an inline background that
+// measures the lettering, and the cuts line must not be under it.
 .ct-group-title {
   @include overlapping-rule-single($color-section-underline-2);
 }
@@ -239,17 +155,12 @@ article.recipe .recipe-body-content h3.ct-group-name {
   margin: $space-sm 0 0 0;
 }
 
-// Scoped under article.recipe .recipe-body-content for the same reason the
-// charts' contents list is: the body's own list rule gives every li a dash
-// and an indent at (0,2,3), and anything less specific than this loses to it.
+// Scoped under article.recipe .recipe-body-content because the body's own list
+// rule gives every li a dash and an indent, and a less specific rule loses.
 //
-// THE BLOCK'S OWN PADDING LIVES HERE, ON THE li, since 2026-10-10 -- and
-// this is the finding behind "the rows are all too close together". From
-// round one `.ct-method` declared `padding: $space-md 0` at (0,1,0), and
-// this reset's `padding: 0` at (0,2,3) beat it on every block: the rows
-// had NO vertical padding at all, two rounds of "more air" moved a value
-// nothing read, and the last line of each block sat on its rule. Found by
-// reading the compiled food.css for the two rules side by side.
+// A method block's vertical padding has to be declared here, on the li: a
+// `padding` on a bare `.ct-method` loses to this reset and the rows end up
+// with none.
 article.recipe .recipe-body-content .ct-methods {
   list-style: none;
   margin: 0;
@@ -264,54 +175,14 @@ article.recipe .recipe-body-content .ct-methods {
   }
 }
 
-// One method, as a block -- RESTYLED FROM SCRATCH ON 2026-10-10, after two
-// rounds. Round three put the outcome second in violet at 600 and the oven
-// setting third in small grey, and Helen's read was: "the rows are all too
-// close together. The e.g. 160-180 fan at the bottom of one row is so close
-// to the bottom of the row it can barely be seen. Then the top line of the
-// row below is so close to that I can't tell which row is which. The new
-// cacophony of font styles is absolutely not helping visual cohesion... I'm
-// very open to you just starting this table styling again from scratch."
-// Her choices from the round-four candidates: outcome first, method next in
-// Courier; the timings as they were ("I like the timings on their own on
-// the right, and their styling, so keep those!"); the violet off the
-// outcome; and the oven setting in Plex Mono, the site's face for a figure
-// you act on (food/_palette.scss, $font-label).
+// One method, as a block. Three faces, one job each: body for the outcome
+// (read), Courier for the method's name (a label), Plex Mono for the time and
+// the oven stages (figures you act on).
 //
-// THREE FACES, EACH WITH ONE JOB, and no fourth:
-//   body      the outcome -- a description, read ("Crusted outside, pink
-//             centre"), 600 so it is the line the eye lands on, ink colour
-//   Courier   the method's name -- a label, like the cut-group heading above
-//             it and the row labels on the charts, small and grey
-//   Plex Mono the time and the oven stages -- figures you act on, both at
-//             600, the time large at the right and the stages small under
-//             the name, one line per stage
-//
-// THE AIR IS THE OTHER HALF OF THE FIX. 1.25rem above and below each block
-// (declared on the li reset above, where it can win), a clear row gap
-// between its lines, and the oven stages set off from the name by a little
-// more -- so a block's last line is not against its rule and the next
-// block's first line is not against it either.
-//
-// The two-column grid: the outcome, the name and the oven stages down the
-// first column, the time in the second. THE TIME SPANS ALL THREE ROWS AND
-// SITS AT THE TOP (2026-10-10, the last note of the round): when it shared
-// only the first row, a by-doneness method's two stacked times ("rare
-// 1h55m" / "medium 2h25m") made that row two lines tall and pushed the name
-// and the oven stages down with it -- Helen: "let's not allow the extra
-// line to push the left-column content down too." Spanning the column, its
-// height is the block's and the left column flows on its own. On a phone
-// the time column is capped so a long range wraps -- at its dash only, see
-// .ct-t -- rather than squeezing the outcome into one word a line.
-//
-// ON A PHONE THE TIME CANNOT HAVE A COLUMN OF ITS OWN: a two-line time is
-// 12rem wide and the column is 21, so spanning the block would fold every
-// name and every oven stage beside it ("100–120°C fan for most of / cook").
-// So below 600px the time shares only the first row, as it did, and the two
-// methods whose time is two lines (beef's standard roast, venison's haunch,
-// the by-doneness shape) give the time a row of its own under the outcome
-// instead -- nothing pushed, nothing narrowed, and only those two blocks
-// look any different.
+// The time spans all three rows, so a two-line time cannot push the name and
+// the oven stages down. Below 600px it cannot have a column to itself, so it
+// shares the first row only, and a method with a by-doneness time (two lines)
+// gives the time a row of its own under the outcome.
 .ct-method {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -346,8 +217,6 @@ article.recipe .recipe-body-content .ct-methods {
   line-height: 1.4;
 }
 
-// The figure. Plex Mono, per food/_palette.scss's $font-label rule: a number
-// you act on.
 .ct-method-time {
   grid-area: time;
   align-self: start;
@@ -356,9 +225,8 @@ article.recipe .recipe-body-content .ct-methods {
   font-family: $font-label;
   font-weight: 600;
 
-  // 12rem since 2026-10-09: "medium 1h20m – 1h50m", the widest by-doneness
-  // line, is about 11.5rem, and at the old 10.5rem its last figure dropped
-  // to a line of its own.
+  // Wide enough for the widest by-doneness line ("medium 1h20m – 1h50m");
+  // narrower and its last figure drops to a line of its own.
   @media (max-width: 600px) {
     max-width: 12rem;
   }
@@ -370,11 +238,7 @@ article.recipe .recipe-body-content .ct-methods {
   white-space: nowrap;
 }
 
-// The oven setting: a line per stage, in the face for a figure you act on.
-// The data writes each stage as a short line ("220°C fan for 20 min", "180°C
-// fan for the rest"), since 2026-10-10 -- it was one sentence per method
-// ("Start 220°C fan for 15–20 min, drop to 180°C fan"), which buried the
-// two figures in the words around them.
+// The oven setting: one line per stage.
 .ct-method-oven {
   grid-area: oven;
   margin-top: $space-xs;
@@ -389,13 +253,9 @@ article.recipe .recipe-body-content .ct-methods {
   display: block;
 }
 
-// --- Fish and shellfish -------------------------------------------------------
-// Lists, not tables, since 2026-10-08 (#1330): one entry per fish, each form
-// a line of its own with the methods after it. The tables were a fish-by-form
-// matrix drawn with eleven rowspans, 453px wide in a 390px screen and 5,000px
-// tall, with a Notes column that was mostly empty. The notes are gone with
-// the column -- Helen chose the list "no notes" on the candidates page; git
-// history has them.
+// --- Fish and shellfish ------------------------------------------------------
+// Lists, not tables (#1330): one entry per fish, each form a line of its own
+// with the methods after it.
 .fish-list {
   margin: 0 0 $space-xl 0;
   max-width: 62ch;
@@ -409,11 +269,9 @@ article.recipe .recipe-body-content .ct-methods {
     margin: 0 0 $space-xs 0;
   }
 
-  // The fish's name, jollier since 2026-10-09 (Helen: "the headings like COD
-  // / HADDOCK, HALIBUT / TURBOT and so on"): the same heading-tier lettering
-  // and single violet rule as .ct-group-name above, a step smaller. On a
-  // span inside the <dt> because the rule is an inline background that
-  // measures the lettering, and a <dt> is a block.
+  // The same lettering and rule as .ct-group-name, a step smaller. On a span
+  // inside the <dt> because the rule is an inline background and a <dt> is a
+  // block.
   .fish-name {
     @extend %heading-base;
     font-size: 1rem;
@@ -434,27 +292,12 @@ article.recipe .recipe-body-content .ct-methods {
   }
 }
 
-// The one line left of what used to be four paragraphs of explanation.
 .ct-seealso {
   margin-top: $spacing-section-gap;
 }
 
-// THE METHOD CARDS ARE GONE -- #873, Helen, 2026-09-09: "they're not adding
-// information beyond the table, and remain a little hard to read." `.ct-results`,
-// `.ct-card`, `.ct-card-head`, `.ct-card-name`, `.ct-total`, `.ct-settings`,
-// `.ct-declined`, `.ct-stages`, `.ct-aside` and `.ct-notes` were the rules; the
-// table above the cards was already the answer, and cook-timer.js stopped
-// rendering them the same day. The table went in its turn on 2026-10-08
-// (above). What survives below is the by-doneness block, which a method's
-// time cell still emits.
-
-// A method whose rate depends on doneness shows every level rather than one --
-// GitHub issue #246, beef's standard roast and venison's haunch, the only two
-// of 73 that have the shape. Stacked, because the two times are the same kind
-// of fact and a reader compares them vertically; the label is quiet because
-// the FIGURE is what the eye is here for, and "rare"/"medium" only has to say
-// which is which. Each figure must not break mid-span ("1 hr 40" split across
-// two lines reads as two numbers). The stacking here is between levels, not
+// A method whose rate depends on doneness shows every level, stacked (#246).
+// Each figure must not break mid-span; the stacking is between levels, not
 // inside one.
 .ct-doneness {
   display: inline-flex;
@@ -468,19 +311,11 @@ article.recipe .recipe-body-content .ct-methods {
 }
 
 .ct-doneness-label {
-  // NAMED EXPLICITLY, 2026-09-02. This sits inside the table's time cell
-  // (below), which is Plex Mono -- and without its own font-family this word
-  // ("rare", "medium") would silently inherit that, which is exactly
-  // backwards: "rare" is not a number you act on, the figure beside it is.
-  // See food/_palette.scss's $font-label rule.
+  // Named explicitly: this sits inside .ct-method-time, which is Plex Mono,
+  // and "rare" is a label, not a figure you act on.
   font-family: $font-headings;
   font-weight: 400;
   color: $color-clear-text;
   margin-right: $space-sm;
-  // Lighter than the figure it labels, but not so light it stops being
-  // readable against the card -- this is the word that says which time you
-  // are looking at, so it is not decoration.
   font-size: 0.85em;
 }
-
-

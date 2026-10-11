@@ -1,44 +1,20 @@
-// =============================================================================
-// PAGE FURNITURE — the back arrow's line, the shortlist pair, and the search
-// box, on both sites
-// =============================================================================
-// #1005 / #1011 / #1024, 2026-09-14, redrawn by #1210, 2026-09-30. The rows
-// every recipe and drink page carries, styled once because they are the same
-// object on both sites and Helen's complaint (#1005) was precisely that they
-// were not: "I always find myself surprised by the locations of the back,
-// shortlist, print and pdf buttons." The markup is _includes/back-to-index.html
-// (the arrow and, via page-print.html, print · pdf), _includes/page-actions.html
-// (the shortlist pair) and _includes/page-search.html (the box, in the header,
-// local builds only); each site's stylesheet imports this after shared/chrome,
-// and names only the ten palette-contract variables.
+// PAGE FURNITURE: the back arrow's line, the shortlist pair and the search
+// box, the same objects on both sites and so styled once (#1005, #1210;
+// MANUAL §13.13). The markup is _includes/back-to-index.html (the arrow and,
+// through page-print.html, print · pdf), _includes/page-actions.html (the
+// shortlist pair) and _includes/page-search.html (the box, in the header, on
+// a local build only). Imported after shared/chrome; names only
+// palette-contract variables.
 //
-// WHAT STAYS PER SITE: the shortlist button's own colours and states
-// (food/_shortlist.scss, cocktails/_shortlist.scss), and the row the shortlist
-// pair sits in -- `.recipe-section-heading-row` on food, `.cocktail-controls`
-// on a drink page, each a flex row in its own file. This file styles what is
-// INSIDE the row and the furniture line above the title.
-//
-// #1210, 2026-09-30, REDREW BOTH ROWS, and the shape of the change is worth
-// one paragraph here because six issues in two weeks (#1086, #1163, #1164,
-// #1176, #1182, #1210) each rearranged four controls without asking whether
-// they belonged together. They did not. Print and pdf are things you do WITH
-// the page and sit on the furniture line now, at its right end where the
-// search box was; the shortlist button and its see-shortlist link are things
-// you do TO the page and sit on the first line under the rule that closes the
-// head -- the toggle's line on a drink page, the INGREDIENTS line on a recipe.
-// The search box went to the header (page-search.html, local builds only).
+// Per site: the shortlist button's colours and states (food/_shortlist.scss,
+// cocktails/_shortlist.scss) and the row the pair sits in
+// (`.recipe-section-heading-row` on food, `.cocktail-controls` on a drink
+// page). This file styles what is inside that row, and the furniture line.
 
 // --- The furniture line: arrow left, print · pdf right -----------------------
-// `space-between` puts the two at the column's edges. The arrow keeps its own
-// rule in shared/_chrome.scss (size, colour, hover); only its bottom margin is
-// taken over by the row, so the two sites' title blocks start the same distance
-// under it (each layout's own rule does that).
-//
-// NO WRAP ANY MORE. The row wrapped while the search box was its right-hand
-// item (#1024), so the box could drop under the arrow on a phone; PRINT · PDF
-// is 11 characters of 0.78rem Courier caps, about 93px beside a 48px arrow,
-// and fits a 312px phone column with room to spare -- measured at 360 on the
-// candidates page (tmp/action_candidates/, 2026-09-30).
+// The arrow keeps its own rule in shared/_chrome.scss; the row takes over
+// only its bottom margin, so both sites' title blocks start the same distance
+// under the line.
 .page-furniture {
   display: flex;
   align-items: center;
@@ -49,10 +25,9 @@
   .back-to-index { margin-bottom: 0; }
 }
 
-// Print, a dot, pdf: one quiet group at the line's right end. The dot is
-// markup (page-print.html), not a gap, so the two words read as two controls;
-// it is hidden while the print button still is, so a no-script page shows
-// `pdf` alone and never `· pdf`.
+// Print, a dot, pdf. The dot is markup (page-print.html), not a gap, and is
+// hidden while the print button still is, so a no-script page shows `pdf`
+// alone and never `· pdf`.
 .page-print-actions {
   display: inline-flex;
   align-items: center;
@@ -62,54 +37,15 @@
 
 .btn-print[hidden] + .page-print-sep { display: none; }
 
-// THE SEARCH BOX IS THE INDEX'S OWN BOX, DRAWN HERE. Same type mixin, same
-// hairline, same placeholder tone (shared/_rule.scss), so a reader who has used
-// I KNOW WHAT I WANT recognises it.
+// --- The search box -----------------------------------------------------------
+// The index's own box (type mixin, hairline and placeholder from
+// shared/_rule.scss); its place in the header's grid is shared/_layout.scss's.
+// `letter-spacing: normal` resets the 0.5em `.site-header` carries for the
+// wordmark. `position: relative` anchors the dropdown.
 //
-// IN THE HEADER SINCE #1210 (2026-09-30), LOCAL BUILDS ONLY -- under the door
-// to the other site, on its right edge; _includes/page-search.html says why,
-// and its place in the header's grid is shared/_layout.scss's. Everything
-// below is about the box itself and is unchanged by the move, bar one line:
-// `.site-header` carries 0.5em of letter-spacing for the wordmark and
-// everything in it inherits that, so the form resets it (the input's own
-// mixin sets its tracking explicitly and needs nothing).
-//
-// THE GLASS ON THE RIGHT, THE TEXT GROWING TOWARDS IT -- #1056 moved the
-// glass from #1050's original left end to the right end (the markup in
-// _includes/page-search.html puts `.page-search-input` before
-// `.page-search-go`, so this is simply the row's DOM order -- no `order:`
-// needed). The input is RIGHT-aligned, so typing grows the word leftwards
-// from the glass -- Helen, #1099: "____r ___rh __rhu _rhum". (#1056's first
-// build left-aligned it, reasoning that text should grow towards a glass on
-// the right; she looked and wanted the word anchored at the glass instead.)
-// A flex row of two, the glass a submit button of fixed size, the input
-// `22ch` wide, so the glass never moves because nothing about the input's box
-// changes as it fills. `ch` is the width of a zero in the box's own face,
-// which is exactly "characters wide" for a monospace face.
-//
-// TWENTY-TWO CHARACTERS, AND THE NUMBER IS THE PLACEHOLDER'S -- #1123,
-// 2026-09-16. It went 24 -> 12 first ("reduce the width of the omnisearch input
-// text field to 12 chars"), and at 12 the resting box read `i know what`:
-// `I know what I want...` is 20 characters and the placeholder is the one
-// string that CANNOT scroll into view, because nobody is typing it. Helen, on
-// seeing it: "the omnisearch placeholder needs to all be visible, so I guess
-// our input field needs to be 10 chars wider". So the width is now the
-// placeholder's own length plus its tracking: 20 characters at
-// `letter-spacing: 0.04em` need about 21.3ch, and 22ch clears it.
-//
-// WHICH IS WHY MAKING IT SMALLER WAS THE WRONG TOOL FOR THE JOB. What she
-// actually wanted was the box to stop shouting -- "to make it less obtrusive,
-// which is what I actually want" -- and that is the COLOUR below, not the
-// width. A narrow box is not a quiet one; it is a quiet box's worth of loud.
-//
-// TYPED TEXT STILL SCROLLS OFF TO THE LEFT and that is untouched: the box is
-// RIGHT-aligned (#1099), so a word longer than the box scrolls its beginning
-// off the left edge while its end stays against the glass -- the newest letters
-// are always the visible ones. The dropdown below is `min-width: 100%` and
-// `width: max-content`, so it keeps its own readable width whatever this is.
-//
-// `position: relative` is the dropdown's anchor: the results panel hangs
-// under the box from its right edge (below).
+// The glass is on the right simply by DOM order, and the input is
+// right-aligned so a word grows leftwards from the glass and a long one
+// scrolls its beginning off the left (#1099).
 .page-search {
   position: relative;
   margin: 0;
@@ -142,41 +78,26 @@
   height: 1.15rem;
 }
 
-// HOW QUIET THE RESTING BOX IS, as a share of $color-clear-text mixed towards
-// each site's own ground -- #1123, 2026-09-16. Named rather than written twice
-// because the hairline and the placeholder must not drift apart: they are one
-// object, and the day they take different numbers is the day the box reads as
-// a line and a word rather than as a control.
-//
-// 45%, WHICH IS ONE STEP DOWN FROM #1099's 55% AND IS MEASURED, NOT PICKED.
-// Against each site's ground (tmp/quiet_step.py): food 2.63:1 -> 2.15:1,
-// cocktails 2.73:1 -> 2.23:1. Going on to 40% lands at 1.96:1 and 1.99:1,
-// which is where the hairline starts to disappear on food's chalk ground
-// rather than merely quieten -- so this is the step before the one that costs
-// the reader the box.
-//
-// The TYPED text is not this colour and deliberately so: it stays
-// `$color-text` below, because what you have typed is the one thing in this
-// control you have to be able to read back.
+// How quiet the resting box is: the share of $color-clear-text mixed towards
+// each site's own ground (#1123). One name because the hairline and the
+// placeholder must not drift apart. A step lower and the hairline starts to
+// disappear on food's ground. The typed text is not this colour: it is the
+// one thing here the reader has to read back.
 $page-search-quiet: 45%;
 
 .page-search-input {
   @include index-search-input-type;
+  // The placeholder's own length plus its tracking (#1123): a placeholder
+  // cannot scroll into view, so the resting box has to show all of it. A
+  // fixed `ch` width also means the glass never moves as the box fills.
   width: 22ch;
   max-width: 100%;
   box-sizing: content-box;
   text-align: right;
   background: transparent;
   border: none;
-  // LIGHTER SINCE #1099, both sites. Mixed towards the page's own ground
-  // rather than `lighten()`ed, which it was: on cocktails' dark page a
-  // lightened grey is a BRIGHTER line, the opposite of what was asked.
-  //
-  // ONE STEP QUIETER AGAIN, 55% -> $page-search-quiet -- #1123, 2026-09-16,
-  // Helen: "to make it less obtrusive, which is what I actually want... please
-  // step its colour (border and font) closer to the background". The line and
-  // the lettering take the SAME value, so the box is one object at one volume
-  // rather than a hairline and a word that disagree.
+  // Mixed towards the page's ground, never `lighten()`ed: on cocktails' dark
+  // page a lightened grey is a brighter line, not a quieter one (#1099).
   border-bottom: 1px solid mix($color-clear-text, $color-bg, $page-search-quiet);
   border-radius: 0;
   padding: 0 0 3px 0;
@@ -187,71 +108,40 @@ $page-search-quiet: 45%;
   -webkit-appearance: none;
   appearance: none;
 
-  // FOCUS IS THE UNDERLINE, NOT A BOX -- #1099, Helen: "Remove the bordered
-  // box around the omnisearch input field when it's active", and, told the box
-  // was #1087's keyboard focus ring (#1086), her pick was the underline
-  // instead. So the hairline takes $color-accent and a second pixel, drawn as
-  // an inset shadow so the box does not change height and nothing beside it
-  // moves. A text input matches `:focus-visible` on a mouse click too, which
-  // is why the ring showed for everybody; `:focus` says what is meant here.
-  // Still visible to a keyboard user, which was #1086's whole finding.
+  // Focus is the underline, not a ring (#1099, Helen's choice): the hairline
+  // takes the accent and a second pixel, drawn as an inset shadow so the box
+  // keeps its height. `:focus`, not `:focus-visible`, which a text input
+  // matches on a mouse click too; it stays visible to a keyboard user.
   &:focus {
     outline: none;
     border-bottom-color: $color-accent;
     box-shadow: inset 0 -1px 0 $color-accent;
   }
-  // THE LETTERING TAKES THE LINE'S OWN TONE -- #1123, 2026-09-16, and this is
-  // the half of "less obtrusive" that was actually doing the shouting.
-  //
-  // The mixin's own `lighten($color-clear-text, 30%)` is #1099's trap surviving
-  // in the one place that issue did not reach: lightening a grey moves it
-  // towards WHITE, which on cocktails' #0e0e10 ground is away from the page and
-  // not towards it. That site had already had to say something else for exactly
-  // this reason (cocktails/_filters.scss, Helen 2026-09-15) -- and that override
-  // is deleted with this change, because mixing towards each site's OWN ground
-  // is the same intent expressed once for both.
-  //
-  // Overridden here rather than in the mixin, because the mixin also dresses
-  // each index's I KNOW WHAT I WANT boxes -- those pages' primary control, and
-  // not what was asked about. `font-weight: 300` is still the mixin's, which is
-  // why it is still included.
-  //
-  // MEASURED OFF THE RENDERED PIXELS, not off the Sass: food 2.63:1 -> 2.15:1,
-  // cocktails 3.88:1 -> 2.23:1. DECISIONS §13 (2026-09-16, #1123) has the
-  // numbers, what 40% would have cost, and the trap that made the first reading
-  // of them wrong.
+  // The lettering takes the line's own tone (#1123). The mixin's
+  // `lighten()` is wrong on a dark ground, so the colour is overridden here
+  // and not in the mixin, which also dresses each index's own search boxes.
+  // The mixin is still included for its `font-weight`.
   &::placeholder {
     @include index-search-placeholder;
     color: mix($color-clear-text, $color-bg, $page-search-quiet);
   }
-  // THE PLACEHOLDER GOES ON FOCUS, NOT ON THE FIRST KEYSTROKE -- Helen,
-  // 2026-09-15: "both sites, remove placeholder on click." The cocktails index
-  // already does this for its three boxes and says why (cocktails/_filters.scss):
-  // a click means "I am about to type", so the field should be empty exactly
-  // then. `color: transparent` rather than emptying the attribute, so the hint
-  // is still there for a screen reader and the box does not change width.
+  // The placeholder goes on focus, not on the first keystroke (Helen's
+  // ruling, both sites). `color: transparent`, not an emptied attribute, so
+  // the hint is still there for a screen reader.
   &:focus::placeholder { color: transparent; }
-  // The clear mark WebKit draws inside a search box sits at the input's own
-  // right edge, right beside the glass now that both are on the right --
-  // hidden for the same reason as always: a hairline box, not a widget.
+  // WebKit's own clear mark would sit right beside the glass.
   &::-webkit-search-cancel-button { display: none; }
 }
 
 // --- The dropdown: everything the word could mean here, grouped by kind ------
-// #1050. Hangs from the box's right edge so it lines up with the GLASS,
-// which is the box's right edge now (#1056, the input having moved to the
-// left of it); the box sits on the header's right edge at every width
-// (#1210), so the panel's left edge is what has to stay on screen --
-// `max-width` against the viewport does that, and the options ellipsise
-// rather than wrap so the panel keeps one row per result.
+// Hangs from the box's right edge, under the glass (#1050). The box is on the
+// header's right edge at every width, so the panel's left edge is the one
+// that has to stay on screen: `max-width` against the viewport does that, and
+// the options ellipsise so the panel keeps one row per result.
 //
-// A SURFACE ON THE PAGE, not a floating widget: the site's card surface and
-// hairline, a shadow only just present, square corners. Names the palette
-// contract's variables and nothing else, so it draws in each site's own ink
-// and paper; the GROUP HEADINGS take the section hue each index already gives
-// that kind of word, and those are the sites' own -- food/_search.scss and
-// cocktails/_filters.scss re-point `.page-search-group--<kind>` because only a
-// site's stylesheet may name its section colours.
+// The group headings take each site's section hues, which only a site's
+// stylesheet may name: food/_search.scss and cocktails/_filters.scss colour
+// `.page-search-group--<kind>`.
 .page-search-results {
   position: absolute;
   top: 100%;
@@ -275,28 +165,11 @@ $page-search-quiet: 45%;
   border-top: 1px solid $color-border;
 }
 
-// THE KIND, HEAVIER AND SLIGHTLY LARGER -- #1053. It used to wear the small
-// Courier caps the actions row wears (above), at 700 -- already the heaviest
-// weight Courier Prime ships (_sass/shared/_fonts.scss: two faces, 400 and
-// 700, so there is no heavier Courier to reach for). Helen: "switch font to
-// the other one if you have to," so this is $font-body (Selawik) at the same
-// 700 -- also its heaviest face -- rather than a font-weight this site cannot
-// actually serve. Selawik's bold reads heavier than Courier Prime's at this
-// size because a sans-serif's strokes fill more of the letterform than a
-// mono's do, which is the visual effect asked for even though the numeric
-// weight is unchanged. `0.7rem`, up from `0.66rem`, is the "slightly larger."
-// INLINE-BLOCK BECAUSE BOTH SITES FILL IT NOW -- #1136, 2026-09-17. The heading
-// is a `<div>` (page-search.js), so a background painted on it would run the
-// dropdown's full width and read as a section bar rather than as a chip; this
-// makes the block hug its words, and the padding above becomes the block's own
-// margin exactly as it does for an active filter chip.
-//
-// HERE RATHER THAN IN EACH SITE, and that is the day's other lesson: the same
-// issue's cocktails half went in as a per-site rule in the morning, and food
-// asking for "the same" a few hours later would have made it two copies of one
-// decision -- which is how `.page-search-input::placeholder` came to carry a
-// cocktails override that silently undid #1123 (see this file's own note there).
-// What is per-site is the HUE and the letter; the shape is one rule.
+// The kind. The body face at 700, because Courier Prime ships nothing
+// heavier than the Bold it would otherwise wear (#1053). `inline-block` so
+// the background each site paints on it hugs the words and does not run the
+// dropdown's width (#1136). The shape is this one rule; only the hue is per
+// site.
 .page-search-group-label {
   font-family: $font-body;
   font-size: 0.7rem;
@@ -309,9 +182,8 @@ $page-search-quiet: 45%;
   padding: $space-xs $space-md $space-xs;
 }
 
-// One result, one line. A real link (page-search.js says why), in the same
-// lowercase Courier the box itself is typed in, a step larger so the list
-// reads as the answer and the box as the question.
+// One result, one line: a real link, in the lowercase Courier the box itself
+// is typed in, a step larger.
 .page-search-option {
   display: block;
   padding: $space-xs $space-md;
@@ -326,9 +198,8 @@ $page-search-quiet: 45%;
   overflow: hidden;
   text-overflow: ellipsis;
 
-  // Hover and the keyboard's row are one state, drawn as a wash of the site's
-  // accent -- "this one", the meaning the accent already carries on both
-  // sites' chrome -- rather than a change to the words.
+  // Hover and the keyboard's row are one state: a wash of the site's accent,
+  // not a change to the words.
   &:hover,
   &:focus-visible,
   &.is-active {
@@ -338,8 +209,7 @@ $page-search-quiet: 45%;
   }
 }
 
-// The run that matched what you typed, in the accent: the part of the answer
-// that is your question.
+// The run that matched what was typed.
 .page-search-hit {
   color: $color-accent;
 }
@@ -356,41 +226,18 @@ $page-search-quiet: 45%;
 }
 
 // --- The shortlist pair: [ + SHORTLIST ]  SEE SHORTLIST (N) ------------------
-// ONE TYPE FOR EVERY ACTION, Helen 2026-09-14: "let's try all actions in
-// capitals ... to help show they're actions". The drink page's Courier caps
-// at 0.78rem / 0.08em, which its shortlist button already wore; every other
-// control here and on the furniture line takes the same, and the food
-// shortlist button was matched the same day (food/_shortlist.scss).
+// The button marks this page; the link goes to the list it is marked on.
+// Every action on the page wears the same Courier caps (Helen's ruling).
 //
-// ONE LINE, TWO CONTROLS, SINCE #1210 (2026-09-30). It was a two-by-two grid
-// of four (#1182: "+ SHORTLIST / (0) SEE SHORTLIST" left, "PRINT / PDF"
-// right), and before that two rows of two (#1086) and one per line (#1163);
-// every one of those was a rearrangement of four controls that did not belong
-// together. Print and pdf are on the furniture line now (page-print.html), and
-// what is left is a pair: the button that marks THIS page, and the link to the
-// list it is marked on. A flex row, the include's DOM order, one gap.
-//
-// THE BUTTON IS THE ONE BORDERED THING ON ITS LINE. It wears the pill the
-// index already draws for its shortlist filter (`.btn-shortlist-only`, both
-// sites): the same 1.5px hairline in $color-border on $color-surface, so a
-// reader who has used the index recognises "you can press this". Its type,
-// colours, mark and states are still the per-site base rule's
-// (food/_shortlist.scss, cocktails/_shortlist.scss); this adds the box and
-// nothing about what "on" looks like. Hover and on take the border to
-// `currentColor`, so the box follows whatever colour the site's own rule has
-// already given the words -- no second answer to the same question.
-//
-// THE LINK IS DELIBERATELY NOT MADE TO LOOK LIKE THE BUTTON. Helen, having
-// tried for a fortnight to make the pair match: "I can't make them look
-// similar." They are not similar -- one changes this page, the other leaves
-// it -- so the link is quiet caps like print and pdf, no border, no arrow
-// (her "please remove that at least"), the count in brackets after the words.
-// shortlist.js keeps it hidden while the count is zero.
-//
-// THE PADDING IS ASYMMETRIC ON PURPOSE: the `+` mark carries its own 0.25em
-// of margin on its right, so the box needs a shade less on its left to read
-// as centred on the mark-and-word pair. Measured on the candidates page at
-// 2x (tmp/shots/crop-E-*.png, 2026-09-30).
+// The button is the one bordered thing on its line, in the pill the index
+// draws for `.btn-shortlist-only`. Its type, colours, mark and states stay
+// the per-site rule's; this adds the box, whose border follows
+// `currentColor` on hover and when on. The link is deliberately not made to
+// look like the button (Helen's ruling): no border, no arrow.
+
+// shortlist.js keeps the link hidden while the count is zero. The button's
+// padding is asymmetric on purpose: the `+` mark carries its own right
+// margin, so the box needs a shade less on its left to read as centred.
 .page-actions {
   display: flex;
   align-items: center;

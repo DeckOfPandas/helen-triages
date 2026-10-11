@@ -68,15 +68,10 @@ site_key: food
           <li>locate a magazine/email/screenshot/bookmark or open tab, or</li>
           <li>scroll through pages of boring nonsense about somebody's favourite sauté pan*, or the blow-by-blow of a recent seaside trip that inexplicably precedes a recipe for beans on toast.</li>
         </ul>
-        {% comment %} The footnote lives INSIDE point 2, under the a) b) list
+        {% comment %} The footnote lives inside point 2, under the a) b) list
            it annotates, and takes that list's indent and mark size rather than
-           the page gutter's. The first version hung it off the gutter as a
-           third full-size mark (1 2 *), and Helen, 2026-09-04: it "puts the
-           footnote at the same place in the hierarchy as the points" and "its
-           block isn't aligned with the block that called it, so I have to do
-           work to parse". Here its text column is b)'s text column. Copy
-           rewritten the same day to cover both sites; this replaced a
-           paragraph addressed to cocktail readers. {% endcomment %}
+           the page gutter's: on the gutter it reads as a third point.
+           {% endcomment %}
         <p class="about-footnote">Or artisanally hand-crafted Japanese ice tools. Use your imagination for other cocktail-related nouns and verbs.</p>
       </li>
     </ol>
@@ -91,11 +86,9 @@ site_key: food
        ("Henry's Quick and Bulletproof Hollandaise Sauce", "Chocolate Ganache"),
        which is the rule tests/test_taxonomy.py's
        test_internal_link_text_matches_target_title enforces on recipes. This
-       page isn't in that fixture, so the TEXT rule does not reach it -- but the
-       HREF is checked: tests/test_page_links.py globs every root-level page
-       since issue #374, so a renamed recipe fails
-       test_internal_links_point_at_a_published_page naming this file.
-       No styling needed: article.recipe a covers every link on the site. {% endcomment %}
+       page isn't in that fixture, so the text rule does not reach it, but the
+       href is checked: a renamed recipe fails tests/test_page_links.py's
+       test_internal_links_point_at_a_published_page naming this file. {% endcomment %}
     <p>That said, a few recipes carry more troubleshooting than seems reasonable, such as <a href="{{ '/food/recipes/henrys-quick-bulletproof-hollandaise-sauce/' | relative_url }}">Hollandaise sauce</a> and <a href="{{ '/food/recipes/chocolate-ganache/' | relative_url }}">chocolate ganache</a>. The length of extra writing on any recipe is proportional to how much that food has personally wronged me.</p>
 
     <hr>

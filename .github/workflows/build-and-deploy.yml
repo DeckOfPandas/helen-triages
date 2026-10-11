@@ -12,60 +12,32 @@ permissions:
   pages: write
   id-token: write
 
-# ONE GROUP FOR DEPLOYS, ONE PER PULL REQUEST. #1281.
-#
-# Until this change the whole workflow shared the `pages` group, pull-request
-# runs included, so a PR's test run queued behind whatever deploy was in
-# progress: measured 2026-10-02, a 198s job took 389s to report. Worse, GitHub
-# keeps one WAITING run per group, so a PR run arriving dropped a deploy that
-# was waiting its turn -- three merges sat undeployed that day.
-#
-# A push to `main` (or a manual run) stays in `pages` and is never cancelled
-# mid-run, exactly as before: deploys are serialised, so an older one can
-# never land on top of a newer one. A pull-request run gets a group of its
-# own, and a new push to the same PR cancels the run it supersedes -- that
-# run's answer is about a commit nobody will merge.
+# One group for deploys, one per pull request (#1281). A push to `main` or a
+# manual run stays in `pages` and is never cancelled mid-run, so deploys are
+# serialised and an older one cannot land on top of a newer. A pull-request
+# run has its own group, so it neither queues behind a deploy nor displaces
+# a waiting one, and a new push to the same PR cancels the run it supersedes.
 concurrency:
   group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'pages' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # ===========================================================================
-  # TESTS GATE THE DEPLOY. GitHub issue #369.
-  # ===========================================================================
-  # Until 2026-08-18 this workflow checked out, built, rendered PDFs and
-  # deployed, with no test step anywhere. Every guard in the repository
-  # protected a local `pytest` run and nothing else, so a push to `main` shipped
-  # whatever was on `main` however red the suite was -- including, pointedly,
-  # the `awaiting-fix` publish gate (#331), whose whole job is to stop a flagged
-  # recipe going live.
-  #
-  # THE GATE IS ON `deploy`, NOT ON `build`, SINCE #1281. `build` used to
-  # declare `needs: test`, which made every merge wait for the suite and THEN
-  # for the build and the PDFs. They now run side by side and `deploy` declares
-  # `needs: [test, build]`, so nothing is deployed unless this job is green --
-  # the same guarantee, about two minutes sooner. A red suite now costs one
-  # built-and-uploaded artifact that is never deployed.
+  # Tests gate the deploy (#369). The gate is on `deploy`, not on `build`
+  # (#1281): the two run side by side and `deploy` declares
+  # `needs: [test, build]`, so nothing is deployed unless this job is green.
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          # FULL HISTORY, AND THIS IS LOAD-BEARING. actions/checkout is shallow
-          # by default (depth 1), and in a depth-1 clone `git log -- <file>`
-          # reports the same single commit for every file. #367's test reads
-          # history to find who last touched each recipe, so on a shallow clone
-          # it would examine nothing and pass -- a green that means less than no
-          # result. It asserts the clone is not shallow for exactly that reason,
-          # so getting this wrong fails loudly rather than lying.
+          # Full history, and it is load-bearing. actions/checkout is shallow by
+          # default, and the tests that read git history to find who last
+          # touched each recipe (#367) assert the clone is not shallow.
           fetch-depth: 0
 
-      # Ruby, because the suite is not purely static: test_rendered_pages.py
-      # runs two real `jekyll build`s (one with the local config, one with
-      # production alone) and checks the OUTPUT. That is the only way to catch a
-      # link that resolves locally and 404s in production, which has shipped
-      # here before.
+      # Ruby, because the suite builds the site: tests/test_rendered_pages.py
+      # runs real `jekyll build`s and checks the output.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -88,20 +60,13 @@ jobs:
         with:
           node-version: "24"
 
-      # THE GLOB IS NOT OPTIONAL. `node --test tests/js/` treats the DIRECTORY
-      # as a single test file: it reports "tests 1, fail 1" and tells you
-      # nothing about the 144 tests inside. The glob runs all of them. Checked,
-      # not assumed, on 2026-08-18 -- and worth knowing because the test files'
-      # own header comments suggest the directory form.
-      #
-      # `.node-runtime/` is gitignored, so CI uses its own Node rather than the
-      # vendored one. This suite has form for silently not running: it went
-      # weeks without executing because the vendored binary had lost its execute
-      # bit, and nothing said so.
+      # The glob is not optional: `node --test tests/js/` treats the directory as
+      # a single test file. `.node-runtime/` is gitignored, so CI uses its own
+      # Node.
       - name: JavaScript tests
         run: node --test tests/js/*.test.js
 
-  # NO `needs: test` HERE, ON PURPOSE -- see the note above `test`. This job
+  # No `needs: test` here, on purpose -- see the note above `test`. This job
   # only produces an artifact; `deploy` is the job that publishes it, and
   # `deploy` is the one that waits for the suite.
   build:
@@ -122,17 +87,11 @@ jobs:
         env:
           JEKYLL_ENV: production
 
-      # GitHub issue #86. Renders every built recipe page to a PDF beside it,
-      # so /food/recipes/<slug>.pdf is a real file rather than something the
-      # browser is asked to make. Runs on the FINISHED _site, between the build
-      # and the upload -- Jekyll never sees the PDFs.
-      #
-      # No install step: Google Chrome and Python both ship with the ubuntu
-      # runner image (checked against actions/runner-images, not assumed). The
-      # script exits non-zero if either the browser or a single render is
-      # missing, which fails this job on purpose -- a deploy that quietly
-      # stopped producing PDFs would leave every "pdf" link on the site
-      # pointing at a 404, and nothing else would catch it.
+      # Renders every built recipe page to a PDF beside it (#86), on the finished
+      # _site, between the build and the upload. No install step: Chrome and
+      # Python ship with the runner image. The script exits non-zero if the
+      # browser or any render is missing, which fails this job on purpose:
+      # otherwise every "pdf" link on the site would point at a 404.
       - name: Render recipe PDFs
         run: python3 scripts/generate_pdfs.py --site _site --jobs 4
 
@@ -141,7 +100,7 @@ jobs:
         with:
           path: "_site"
 
-  # BOTH, AND NO STATUS FUNCTION IN THE `if`. A job with `needs` runs only if
+  # Both, and no status function in the `if`. A job with `needs` runs only if
   # every job it needs SUCCEEDED, unless its `if` calls always(), failure(),
   # cancelled() or !cancelled() -- any of which would let a red suite deploy.
   # tests/test_site_config.py refuses all four here.
