@@ -67,7 +67,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §4 · the issue route for ingests stays, beside the bulk route of envelope files.
 - 2026-10-10 · §4 · #1356 · one source step is one pair, however many actions it holds.
 - 2026-10-10 · §4 · #1356 · the ingredient list is the source's own list; nothing joins it from the method.
-- 2026-10-10 · §4 · #1356 · a fat or flour the source lists only for the tin or the pan is kept and flagged incidental: true, at ingest.
+- 2026-10-10 · §4 · #1356 · a fat or flour the source lists only for the tin or the pan is kept and flagged incidental: true, at every ingest.
 - 2026-08-18 · §4.0 · the gate flag is awaiting_fix, with an underscore, and the gate fails CLOSED.
 - 2026-08-18 · §4.0 · a held-back page is REMOVED from its collection, not hidden from the index.
 - 2026-08-18 · §4.0 · #331 #367 · every agent edit to a recipe sets proofread: false in the same commit, whatever its size.
@@ -133,7 +133,7 @@ argument and the rules each field is read by.
 - 2026-10-09 · §8.2 · #1297 · on the shopping list a makes: recipe counts batches, in words; a serves: recipe counts portions.
 - 2026-10-09 · §8.2 · #1297 · the shopping list reads the zest and the juice of one lemon as one lemon.
 - 2026-10-10 · §8.2 · #1125 #1297 · on a recipe page a handful, sprig or bunch scales to the nearest quarter; a pinch, dash, splash, knob, drop, twist, lot or pat to the nearest half.
-- 2026-10-10 · §8.2 · #1297 · on the shopping list a by-eye measure is bought as the next whole one, with the recipes' figure in brackets to the nearest quarter.
+- 2026-10-10 · §8.2 · #1297 · on the shopping list a by-eye measure is bought as the next whole one, with the recipes' figure in brackets, stepped as the recipe page steps it.
 - 2026-10-10 · §8.2 · #1297 · a counted row's label agrees with its number ("2 lemons"), from a list of nouns and never from a general plural rule.
 - 2026-10-10 · §8.2 · #1297 · the shopping list names what it did not scale, and puts the batch rows last under a hairline.
 - 2026-10-11 · §8.2 · on the shopping list a yield that is one named thing is counted as that thing, not as a batch.
@@ -433,7 +433,7 @@ argument and the rules each field is read by.
 - 2026-09-11 · §11 · a routine call gets a committed wrapper under an exact or argument-checked allow rule, never <tool> *.
 - 2026-09-11 · §11 · a script in tmp/ keeps asking Helen; no allow rule covers tmp/.
 - 2026-09-14 · §11 · #1008 · the whole recipe pipeline is drawn in one document, PIPELINE.md.
-- 2026-09-14 · §11 · #1008 · the drafts staging folders are 1-rewrite/, 2-make/, 3-keep/, 4-promote/, the same numbers on both sites, and cocktails have no 1-rewrite/.
+- 2026-09-14 · §11 · #1008 · the drafts staging folders are 1-rewrite/, 2-make/, 3-keep/, 4-promote/, the same four in both drafts repos.
 - 2026-09-14 · §11 · #1008 · Claude moves a draft between the staging folders on Helen's word: rewrite, make, keep, ready or bin, followed by a slug.
 - 2026-09-14 · §11 · never create issues or PRs in a burst: a batch of issues is one issue with a checklist.
 - 2026-09-15 · §11 · the account GitHub recorded is read off what a write returns, never assumed.
@@ -457,6 +457,7 @@ argument and the rules each field is read by.
 - 2026-10-02 · §11 · this repository takes no outside contributions: a stranger's PR is not merged, and the fix ships from the agent account.
 - 2026-10-10 · §11 · $[ outside single quotes is refused by the hook: write a regex in single quotes.
 - 2026-10-11 · §11 · the journal, the manual and code comments are delete-and-replace, never append.
+- 2026-10-11 · §11 · Helen promotes a recipe herself, or asks Claude to; Claude never decides a file is ready to promote.
 - 2026-08-31 · §11.2 · #600 · a claim copied into an issue or a document is re-measured first, not carried over.
 - undated · §12 · Undated (by August 2026) — rejected tooling: jekyll-seo-tag, Stylelint, a bundler, a CSS framework, schema.org/Recipe.
 - 2026-09-12 · §12 · a red main is a deploy outage: the merging session checks the run, and nobody merges over a known-red suite.

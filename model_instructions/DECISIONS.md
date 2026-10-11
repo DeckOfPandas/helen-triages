@@ -366,8 +366,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   all. (Replaces 2026-10-08's "an ingredient the method names with a quantity
   joins the list".)
 - **2026-10-10, #1356 — a fat or flour the source lists only for the tin or
-  the pan is kept and flagged `incidental: true`, at ingest.** Put to Helen as
-  one reading of #1356: *"Yes, your interpretation of #1356 is correct."*
+  the pan is kept and flagged `incidental: true`, at every ingest.** Put to
+  Helen as one reading of #1356: *"Yes, your interpretation of #1356 is
+  correct."* Asked on 2026-10-11 whether that was one pass only: *"They are
+  always incidental. Please can every ingest note this in the ingredients list
+  where it applies."*
   Flagged, not deleted, so the exclusion filter still sees the butter. The
   line is drawn at fats and flour: icing sugar to dust and mustard to brush
   stay ordinary lines, and an amounted "plus extra for the tin" line is not
@@ -849,16 +852,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   knob stayed in halves because her sentence names the handful. (Replaces
   2026-10-04's half-step handful and linear sprigs, drops and pats.)
 - **2026-10-10, #1297 — on the shopping list a by-eye measure is bought as the
-  next whole one, with the recipes' figure in brackets to the nearest
-  quarter.** Helen: *"I'd like the shopping list not to write 1.17 sprigs
+  next whole one, with the recipes' figure in brackets, stepped as the recipe
+  page steps it.** Helen: *"I'd like the shopping list not to write 1.17 sprigs
   either, so please round that upwards to the next integer like this: '2
-  handfuls fresh parsley (1 1/4 in the recipes)'."* and, when the first build
-  bought one: *"1.17 handfuls should buy 2, again giving the bracketed
-  requested number."* Her third answer in two days. Declined on the way: the
-  decimal in brackets, and nearest with no bracket (*"round up ... is
-  inaccurate"*; the bracket is what answers that). The total is rounded once,
-  not each recipe. The list and the recipe page may differ on a pinch, which
-  follows from her rulings and is not a bug.
+  handfuls fresh parsley (1 1/4 in the recipes)'."* and *"1.17 handfuls should
+  buy 2, again giving the bracketed requested number."* A handful, sprig or
+  bunch is quoted to the nearest quarter. Refined 2026-10-11 for the half-step
+  measures: *"Half a pinch doesn't make sense, but half a handful sort of does.
+  Let's round pinches to the nearest 1/2."* Dash, splash, knob, drop, twist,
+  lot and pat follow the pinch, a session's reading. Declined: a decimal in
+  brackets, and nearest with no bracket. The total is rounded once.
 - **2026-10-10, #1297 — a counted row's label agrees with its number ("2
   lemons"), from a list of nouns and never from a general plural rule.**
   Helen: *'Can we fix the "2 lemon" thing?'* A spelling some recipe wrote is
@@ -1628,9 +1631,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   2026-09-06 (#748): whole fruit and weighed solids that ARE the drink are
   priced, through `fruit_prices` (per piece) and `weight_prices` (per kilo),
   built 2026-09-24. A count or weight with no row is still a flourish (the
-  sugar cube). Not yet confirmed by her: sugar by weight is priced, the pear
-  Bellini's figure is its batch syrup plus one top, and the fruit and weight
-  prices are a session's supermarket estimates.
+  sugar cube). Not yet confirmed by her (#1371 asks): sugar by weight is
+  priced, the pear Bellini's figure is its batch syrup plus one top, and the
+  fruit and weight prices are a session's supermarket estimates.
 - **2026-09-05, #547 — a `(top)` is costed as a declared range, `top_up_ml` in
   `costs.yml`.** Helen: *"We can calculate top volumes, well, slightly, can't
   we — I'd like that to be captured actually so it can be added into the
@@ -2370,8 +2373,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   width, the glass beside GLASS / GARNISH / SHIP IT?, chips full width
   beneath.** Helen's complaint: *"All cocktail pages have the glass
   overlapping problem."* The layout is a session's build; her pick between it
-  and a glass-above alternative was never recorded, and #995 and #1086 were
-  ruled on top of it. On this page only, the tape artwork is scaled so a
+  and a glass-above alternative was never recorded (#1370 asks her), and #995
+  and #1086 were ruled on top of it. On this page only, the tape artwork is scaled so a
   wrapped title's lines stay inside the band.
 - **2026-09-11, #979 — the drink page's meta ends where the title tape's
   column ends.** Helen: *"The metadata line could be bounded by whatever
@@ -2514,7 +2517,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   I don't need to proofread, please just let them be live."* The condition was
   proved by diffing all fifteen against `main`, then `COCKTAIL_BASELINE_COMMIT`
   moved. A later derived mood needs her grant again; `CLAUDE.md`'s proofreading
-  rule is otherwise unchanged.
+  rule is otherwise unchanged. Confirmed 2026-10-11: *"Not a standing
+  exemption -- it was probably a one-off."*
 
 **Food, ruled in the same passes.**
 
@@ -2860,11 +2864,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   is laborious and inefficient."* The process worked; it was spread over five
   documents and three manual sections with no picture of the whole.
 - **2026-09-14, #1008 — the drafts staging folders are `1-rewrite/`,
-  `2-make/`, `3-keep/`, `4-promote/`, the same numbers on both sites, and
-  cocktails have no `1-rewrite/`.** Helen: *"I'd like each subfolder to appear
-  in order at the top of my files list -- small usability tweak for
-  future-Helen. So shall we try 1-rewrite, 2-make, and so on?"* Of cocktails:
-  *"they're not as annoying as food recipes"*. `3-keep/` is made and liked,
+  `2-make/`, `3-keep/`, `4-promote/`, the same four in both drafts repos.**
+  Helen: *"I'd like each subfolder to appear in order at the top of my files
+  list -- small usability tweak for future-Helen. So shall we try 1-rewrite,
+  2-make, and so on?"* Cocktails gained `1-rewrite/` too; asked on 2026-10-11
+  why it existed: *"I have the same structure in both private repos, to help
+  me keep track of the work."* `3-keep/` is made and liked,
   not being rewritten yet, a state she named herself. Folders, not a flag:
   the flags are what the suite reads and the folders are hers.
   `5-final-proofread/` joined on 2026-09-18 (`PIPELINE.md`).
@@ -3046,6 +3051,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   entry per live ruling; when a ruling changes, replace its entry. The old
   text is in git history. Replaces the old convention that a superseded entry
   and its successor both stay.
+- **2026-10-11 — Helen promotes a recipe herself, or asks Claude to; Claude
+  never decides a file is ready to promote.** Helen: *"Either I promote
+  myself, or ask Claude to. Claude never decides a file is ready to promote and
+  moves it to the published repo."* `PIPELINE.md` and
+  `PUBLISHING_A_COCKTAIL.md` had given opposite defaults.
 
 ### §11.2 The record of this file being wrong
 

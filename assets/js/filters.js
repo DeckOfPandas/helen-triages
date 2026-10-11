@@ -911,9 +911,12 @@ function renderResultsPool() {
   // (#40). Delegated: there are hundreds of badges, and paging hides rows, it
   // does not remove them. preventDefault() because the href is a real link
   // (_includes/recipe_badges.html) and following it would reload the index.
+  // A modified or non-primary click is left alone, so it opens the link in a
+  // new tab as any link does.
   if (recipeList) {
     recipeList.addEventListener('click', function(e) {
       if (!e.target || !e.target.closest) return;
+      if (e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
       // closest(): a badge holds a .tag-shape span, so a click can land on a
       // descendant.
       var badge = e.target.closest('.badge[data-tag], .badge[data-star]');

@@ -45,7 +45,7 @@ flowchart TD
 
     subgraph DRAFTS["THE PRIVATE DRAFTS REPO — Helen's folders"]
         POOL["pool (root)<br/>ingested, not yet hers"]:::helen
-        RW["1-rewrite/ (food)<br/>picked; she rewrites next"]:::helen
+        RW["1-rewrite/ (both)<br/>picked; she rewrites next"]:::helen
         MK["2-make/ (both)<br/>readable enough to make"]:::helen
         KP["3-keep/ (both)<br/>made and liked;<br/>not rewriting yet"]:::helen
         PR["4-promote/ (both)<br/>her words are in; waiting on<br/>the mechanical pass and her proofread"]:::helen
@@ -61,7 +61,7 @@ flowchart TD
 
     PR --> MP["MECHANICAL PASS (Claude)<br/>suite green · no gate flag touched ·<br/>canonical bottles · one list of judgements ·<br/>a cocktail that needs Helen moves to 5-final-proofread/ ·<br/>then the word: final: ‹slugs›"]:::claude
     MP --> PF["HELEN PROOFREADS THE RENDERED PAGE<br/>jekyll-local /…/drafts/‹folder›/‹slug›/<br/>rewritten: true (hers) · proofread: true"]:::helen
-    PF --> PROMO["PROMOTION (on Helen's word)<br/>re-check the gate · copy · byte-compare ·<br/>delete from private · baseline commit · PR"]:::claude
+    PF --> PROMO["PROMOTION (Helen, or Claude when she asks)<br/>re-check the gate · copy · byte-compare ·<br/>delete from private · baseline commit · PR"]:::claude
     PROMO --> MERGE["Helen merges → deploy"]:::helen
     MERGE --> LIVE["_food_recipes/ · _cocktail_recipes/<br/>awaiting_fix: false AND proofread: true<br/>cocktails also rewritten: true"]:::live
 
@@ -142,7 +142,7 @@ one stage on both sites.
 | folder | food | cocktails | means |
 |---|---|---|---|
 | pool (the root) | ✓ | ✓ | ingested; nobody has touched it since |
-| `1-rewrite/` | ✓ | — | she has picked it and will rewrite it next. Cocktails skip this stage |
+| `1-rewrite/` | ✓ | ✓ | she has picked it and will rewrite it next |
 | `2-make/` | ✓ | ✓ | readable enough to make from |
 | `3-keep/` | ✓ | ✓ | made and liked, and she is not rewriting it yet |
 | `4-promote/` | ✓ | ✓ | her words are in; waiting on the mechanical pass, then her proofread |
@@ -169,7 +169,7 @@ the chat or in an issue, each followed by one or more slugs:
 
 | she types | Claude does |
 |---|---|
-| `rewrite ‹slug›` | moves it to `1-rewrite/` (food) |
+| `rewrite ‹slug›` | moves it to `1-rewrite/` |
 | `make ‹slug›` | moves it to `2-make/` |
 | `keep ‹slug›` | moves it to `3-keep/`: made it, want it, not rewriting it now |
 | `ready ‹slug›` | moves it to `4-promote/` and starts the mechanical pass (§4): made it, rewritten it, it ships. Also the way out of `5-final-proofread/` once she has ruled |
@@ -220,7 +220,7 @@ Six steps, the same on both sites. This is the short version;
 5. **Helen proofreads the rendered page** and sets `proofread: true`. A small
    thing wrong is `awaiting_fix: true` in a commit that says what; it is fixed
    between them, she re-reads, and the flag goes back.
-6. **Promotion, on Helen's word**: re-check the gate at copy time, failing
+6. **Promotion.** Helen promotes a recipe herself, or asks Claude to. Claude never decides a file is ready and never moves one to the public repo unasked. The steps: re-check the gate at copy time, failing
    closed (`awaiting_fix: false` and `proofread: true`, and on a cocktail
    `rewritten: true`); copy into the public collection; byte-compare; delete
    from the private repo; move the baseline constant in a commit of its own

@@ -1750,7 +1750,7 @@ scripts/git-fetch-main.sh` first). Run it after a promotion: the file count
 and the page count should differ by exactly the cocktails Helen is
 deliberately holding.
 
-The staging folders in a drafts repo are `1-rewrite/` (food only), `2-make/`,
+The staging folders in a drafts repo are `1-rewrite/`, `2-make/`,
 `3-keep/`, `4-promote/` and, for cocktails, `5-final-proofread/`;
 `PIPELINE.md` §3 says what each means. Anything in `4-promote/` is waiting on
 Claude and anything in `5-final-proofread/` is waiting on Helen. Both drafts

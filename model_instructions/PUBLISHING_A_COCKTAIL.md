@@ -90,7 +90,7 @@ using, outliving the turn that made it.
      description.** A public merge that lands before its private half leaves
      `main` red with failures naming real cocktails, and nothing else says
      which branch fixes it.
-6. **Promotion happens on Helen's word.** The proofread cocktail is copied
+6. **Promotion.** Helen promotes a recipe herself, or asks Claude to. Claude never decides a file is ready and never moves one to the public repo unasked. The proofread cocktail is copied
    into `_cocktail_recipes/` in the public repo and deleted from the private
    repo, each as a commit; the public one reaches `main` by a PR Helen merges,
    and the merge is the deploy. Promoting what she has passed is what keeps

@@ -389,12 +389,10 @@ test('drops, twists, lots and pats step in halves -- Helen: "round to the neares
   assert.strictEqual(scaleAmount('2 pats', 2, WORDS).scaled, true);
 });
 
-test('the index shopping list buys whole ones, and quotes quarters whatever this page\'s step', () => {
+test('the index shopping list buys whole ones, and quotes this page\'s own figure beside them', () => {
   // The same measures, two jobs. This page says what to USE; the shortlist's
-  // shopping list says what to BUY, the next whole
-  // one, with the amount asked for in brackets to the nearest QUARTER --
-  // Helen, 2026-10-10: "2 handfuls fresh parsley (1 1/4 in the recipes)", and
-  // then "1.17 handfuls should buy 2".
+  // shopping list says what to BUY, the next whole one, with the amount asked
+  // for in brackets, stepped as this page steps it.
   const FSL = require('../../assets/js/food-shopping-list.js');
   const row = (amount, scale) => {
     const item = FSL.build(
@@ -411,9 +409,11 @@ test('the index shopping list buys whole ones, and quotes quarters whatever this
   assert.strictEqual(scaleAmount('1 handful', 7 / 6, WORDS).text, '1¼ handfuls');
   assert.strictEqual(row('1 handful', 7 / 6), '2 handfuls (1¼ in the recipes)');
   assert.strictEqual(row('1 handful', 1.5), '2 handfuls (1½ in the recipes)');
-  // A pinch is in HALVES here and quarters there, so those two can differ.
+  // A pinch is in halves on both, so the two agree.
   assert.strictEqual(scaleAmount('1 pinch', 7 / 6, WORDS).text, '1 pinch');
-  assert.strictEqual(row('1 pinch', 7 / 6), '2 pinches (1¼ in the recipes)');
+  assert.strictEqual(row('1 pinch', 7 / 6), '1 pinch');
+  assert.strictEqual(scaleAmount('1 pinch', 1.5, WORDS).text, '1½ pinches');
+  assert.strictEqual(row('1 pinch', 1.5), '2 pinches (1½ in the recipes)');
   // A sprig is in quarters on both.
   assert.strictEqual(scaleAmount('1 sprig', 7 / 6, WORDS).text, '1¼ sprigs');
   assert.strictEqual(row('1 sprig', 7 / 6), '2 sprigs (1¼ in the recipes)');

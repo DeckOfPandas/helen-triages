@@ -120,11 +120,12 @@
 
   /* A stepped measure (handful, sprig, pinch) is bought in whole ones, rounded
      up (#1297). Where that differs from what the recipes ask for, the row
-     carries an aside giving the asked-for amount to the nearest quarter, as a
-     fraction: "2 handfuls (1¼ in the recipes)". The TOTAL is stepped, once,
-     never each recipe's share. `options.wholeMeasures` and
-     `options.quarterMeasures` are treated alike here; with neither, nothing
-     is rounded. */
+     carries an aside giving the asked-for amount as a fraction: "2 handfuls
+     (1¼ in the recipes)". The asked-for amount is stepped as the recipe page
+     steps it: `options.quarterMeasures` to the nearest quarter,
+     `options.wholeMeasures` to the nearest half (half a pinch makes no sense
+     in smaller parts). The TOTAL is stepped, once, never each recipe's share.
+     With neither option, nothing is rounded. */
   function wholeMeasurePattern(measures) {
     var words = (measures || [])
       .map(function (m) { return String(m).trim().toLowerCase(); })
@@ -138,6 +139,10 @@
 
   function inQuarters(quantity) {
     return Math.max(0.25, Math.round(tidy(quantity) * 4) / 4);
+  }
+
+  function inHalves(quantity) {
+    return Math.max(0.5, Math.round(tidy(quantity) * 2) / 2);
   }
 
   /* Lines that belong together inside ONE recipe, never across two (#1297);
@@ -386,8 +391,9 @@
         var total = group.units[unit];
         // A stepped measure is bought in whole ones, rounded up from what
         // the recipes ask for; see the note above `wholeMeasurePattern`.
-        var step = ((byEye && byEye.test(unit)) ||
-          (byQuarter && byQuarter.test(unit))) ? inQuarters : null;
+        // A unit on both lists steps in quarters.
+        var step = (byQuarter && byQuarter.test(unit)) ? inQuarters
+          : (byEye && byEye.test(unit)) ? inHalves : null;
         var used = null;
         if (step) {
           var usedLo = step(total.lo);
