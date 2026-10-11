@@ -2263,7 +2263,21 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # baseline takes for the same commit; it has `91431cf6` behind it. Proved with
 # the old value first: the test named exactly those six files, each "last
 # touched by 92a132f6", and nothing else.
-COCKTAIL_BASELINE_COMMIT = "efe55b56"   # the merge holding main's grants and #1359's six
+#
+# MOVED 2026-10-11 FOR FOUR DRINKS HELEN PROMOTED HERSELF -- #1368. She copied
+# Blue Hawaiian, Island of Martinique, Lucien Gaudin and Voodoo That You Do
+# into `_cocktail_recipes/` in her own commit (`2afd1f25`), asked for a double
+# check, and asked an agent to make the fixes it found: Voodoo's tagline,
+# source and source_url, Blue Hawaiian's "Paper umbrella.", a bare `notes:`,
+# the key order of three, and `rewritten: true` on two (`8253f32a`, which set
+# all four `proofread: false`). None of them had reached `main`.
+#
+# HER GRANT, told the four were on the PR's branch for her to pull and read,
+# 2026-10-11: "Great, thanks, flip those flags please." `ea203447` flips them
+# and changes nothing else. `efe55b56` is behind it. Proved with the old value
+# first: the test named exactly those four files, each "last touched by
+# ea203447", and nothing else.
+COCKTAIL_BASELINE_COMMIT = "ea203447"   # the flip of #1368's four, on Helen's word
 
 
 def _newest_commit_per_published_drink():
