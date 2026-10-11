@@ -2518,7 +2518,8 @@ the pool, ranking, families and the two matching rules (pure, tested);
   `ingredients.yml`) since 2026-10-11, as food's always has. It was three
   (#584), on a measurement that still holds: short queries overflow the
   cap. Helen chose the list anyway — *"seeing a list provides
-  inspiration"*.
+  inspiration"*. **There is no cap either**, since the same day: every
+  candidate is offered, as on food.
 - **Prose is not a bottle name** (`search.prose_words` / `prose_marks`; `and`
   deliberately absent — Wray and Nephew is one bottle). `family_aliases` /
   `family_labels` make a family reachable however it is spelled (`whisk(e)y`).
@@ -4503,8 +4504,8 @@ weight and tracking, which on cocktails are corrections for a dark ground.
 `@mixin index-chip` and its three companions in `shared/_rule.scss`,
 included by food's `.btn-tag` and cocktails' `.btn-pool`, colours as
 arguments. A HAS TO HAVE hit takes the section's colour; a LEAVE OUT hit is
-the resting grey, heavier. Chosen LEAVE OUT chips sit above the candidates
-on both. **Every clear is `@mixin index-clear-link`: text colour, magenta
+the resting grey, heavier. Chosen chips sit above the candidates on both,
+carry an x, keep their case, and choosing one clears the search. **Every clear is `@mixin index-clear-link`: text colour, magenta
 under the pointer, never a section's hue.**
 **The panel does not fold on a phone, and that was tried**: Helen chose a
 fold from a candidates page and took it back the next day — *"The site is

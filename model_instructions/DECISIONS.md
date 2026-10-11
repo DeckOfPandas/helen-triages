@@ -9996,8 +9996,26 @@ verification. Dates are when the correction landed.
   - **Cocktails' pickers answer from the first character**
     (`min_query_chars` 3 to 1), reversing #584. *"Mostly because I think
     this is very very cute in a static site, but also because seeing a list
-    provides inspiration."* The cap of eight is unchanged, so one letter
-    gives eight chips and a "+43 more"; the name box never had a minimum.
+    provides inspiration."* The name box never had a minimum.
+  - **And cocktails' pools are not capped** (`pool_cap` was 8, with a
+    counted "+N more"). *"I don't want to have the 'N more' behaviour for
+    cocktails -- please remove it. It's helpful to see the list when e.g.
+    rum has so many results. (Plus super cute, as I said!)"* One letter
+    now offers about fifty chips. The key, the count and the note are gone
+    from the data, the module and the page.
+  - **Choosing a HAS TO HAVE candidate on food clears the search**, so the
+    chip joins the chosen ones and the rest go, as on cocktails and as
+    food's LEAVE OUT already did. This trades away #1092's picking several
+    from one search; the requirement is still AND. She asked whether it
+    was a regression: it was not, it was #1092 as built.
+  - **A chosen HAS TO HAVE chip on food carries an x**, as cocktails' does.
+  - **Nothing chosen changes case, on either index.** *"Let's stop
+    capitalising selected search result tags, both sites please."*
+  - **Asked and answered, not built: should a matched mood chip on a
+    cocktail card take the tape?** She could argue it either way. My
+    answer was no: the card chip is cut tight to a small word, and the
+    tear needs the filter chip's padding to read; the cards are laid out
+    by measurement; and the block already answers the filter in its hue.
   - **The fold.** Four phone-panel treatments went on a second candidates
     page on the 10th; she chose *"sections fold"* and declined three boxes on
     one row (*"nice looking, but I don't think it's clear enough"*). It was

@@ -827,14 +827,8 @@
   align-items: center;
 }
 
-// The "+N more" note. Quiet, and not a button: it is telling you the pool is
-// truncated, not offering to untruncate it — the way to see the rest is to
-// type another letter, which is what it says.
-.drink-pool-more {
-  font-size: 0.74rem;
-  color: $color-clear-text;
-  font-style: italic;
-}
+// `.drink-pool-more`, the "+N more" note, stood here until 2026-10-11. The
+// pool is not capped any more, so there is no remainder to announce.
 
 // "hiding lime juice", after the chosen LEAVE OUT chips -- food's own line
 // (`.exclude-count`, #1088), asked for here on 2026-10-11. Quiet prose, not
@@ -875,7 +869,7 @@
 //               ground the hue itself is the readable one. UNTUNED, at her
 //               word. LEAVE OUT: the resting colour with the stroke, weight
 //               and no hue, as food's is since the same day
-//   chosen      HAS TO HAVE: capitals on the tape in the heading's magenta,
+//   chosen      HAS TO HAVE: on the tape in the heading's magenta,
 //               the word in the page's ground. LEAVE OUT: struck through
 //
 // WHAT THIS REPLACED, all of it Helen's own earlier rulings and all in git: a
@@ -885,7 +879,7 @@
 // a hit (#549). The tight block lasted one more build as an inset tape.
 //
 // WHAT IS STILL THIS SITE'S: a chosen HAS TO HAVE chip keeps its x, the "(via
-// a name it does not show)" bracket, and "+N more".
+// a name it does not show)" bracket.
 $pool-chip-rest: mix($color-text, $color-bg, 73%);
 
 .btn-pool {

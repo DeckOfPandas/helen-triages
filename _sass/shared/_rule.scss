@@ -914,11 +914,14 @@ $rule-under-inset-right-title: 0.11em;   // 0.08 side bearing + ~0.03 tracking
 
 // A chosen chip on its tape. THIS MAY NOT DECLARE ANYTHING THAT CHANGES THE
 // CHIP'S WIDTH (#389: a chosen chip that resizes slides every chip after it).
-// Capitals and 900 are safe only because the face is monospaced and ships no
-// weight above Bold. 0.05em is food's $faux-bold-stroke, written out because
-// shared/ cannot see a site's palette.
+// 900 is safe only because the face ships no weight above Bold. 0.05em is
+// food's $faux-bold-stroke, written out because shared/ cannot see a site's
+// palette.
+//
+// NO CAPITALS SINCE 2026-10-11. Helen: "Let's stop capitalising selected
+// search result tags, both sites please." The filter chips above the pools
+// stopped the same day, so nothing chosen on either index changes case.
 @mixin index-chip-chosen($ink) {
-  text-transform: uppercase;
   font-weight: 900;
   color: $ink;
   text-shadow: none;

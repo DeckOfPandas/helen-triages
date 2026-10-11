@@ -119,7 +119,7 @@
   }
 
   var VOCABULARY = (function () {
-    var fallback = { search: { min_query_chars: 2, family_button_min_chars: 3, pool_cap: 8 },
+    var fallback = { search: { min_query_chars: 2, family_button_min_chars: 3 },
                      families: [], family_of: {}, card_names: {} };
     var parsed = readJson('drink-vocabulary', '_data/cocktails/ingredients.yml', fallback);
     parsed.search = parsed.search || fallback.search;
@@ -1454,16 +1454,6 @@
           r.entry
         ));
       });
-
-      /* THE CAP IS STATED, NOT SILENT. A pool that quietly stops at eight looks
-         like a complete answer, and the one you wanted may be the ninth. */
-      if (result.hidden > 0) {
-        var more = document.createElement('span');
-        more.className = 'drink-pool-more';
-        // Helen on #1088, 2026-10-07: '"+3 more" is fine, then that's it.'
-        more.textContent = '+' + result.hidden + ' more';
-        poolEl.appendChild(more);
-      }
 
       // Fill any tape slot chip() just made. Cached by URL, so a redraw
       // that made none costs nothing.

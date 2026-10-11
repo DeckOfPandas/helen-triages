@@ -1102,6 +1102,49 @@ test('#1092: removing one chosen ingredient leaves the others in place', () => {
     'have cleared the whole picker with it.');
 });
 
+// --- choosing from several, 2026-10-11 ------------------------------------------
+// Helen: "when a chip in the has to have or leave out search results is
+// selected, it immediately joins others at the top and the other chips
+// disappear. Please make food do the same", and "I do want to have the x on
+// the chosen has to have chip, so please add it for food."
+
+test('choosing one HAS TO HAVE candidate of several clears the search and keeps only the chosen', () => {
+  const { doc } = boot();
+  typeIngredient(doc, 'o');
+  const pool = doc.getElementById('ingredient-results-pool');
+  const offered = Array.from(pool.querySelectorAll('.btn-ingredient'));
+  assert.ok(offered.length > 1, 'the fixture should offer several candidates for "o".');
+  const picked = offered[0].dataset.ingredient;
+  offered[0].dispatch('click');
+
+  assert.strictEqual(doc.getElementById('ingredient-search-box').value, '',
+    'the box should be free for the next ingredient.');
+  const left = Array.from(pool.querySelectorAll('.btn-ingredient'));
+  assert.deepStrictEqual(left.map((b) => b.dataset.ingredient), [picked],
+    'the other candidates should have gone, leaving the chosen chip.');
+  assert.ok(left[0].classList.contains('active'));
+});
+
+test('a chosen HAS TO HAVE chip carries an x, and a click on the x removes the chip', () => {
+  const { doc } = boot();
+  typeIngredient(doc, 'aubergines');
+  const pool = doc.getElementById('ingredient-results-pool');
+  const chip = Array.from(pool.querySelectorAll('.btn-ingredient'))
+    .find((b) => b.dataset.ingredient === 'aubergines');
+  assert.ok(chip.classList.contains('active'), 'a unique match is chosen as it is typed.');
+  const x = chip.querySelector('.btn-ingredient-x');
+  assert.ok(x, 'the chosen chip should carry its x.');
+  assert.strictEqual(x.textContent, ' ×');
+  assert.strictEqual(chip.getAttribute('aria-label'), 'stop requiring aubergines');
+
+  // The click lands on the span, not the button, in a real browser.
+  x.dispatch('click');
+  assert.strictEqual(chip.classList.contains('active'), false,
+    'a click on the x is a click on the chip, and should remove the requirement.');
+  assert.strictEqual(chip.querySelector('.btn-ingredient-x'), null,
+    'an unchosen chip keeps no x.');
+});
+
 // --- the list of scripts is the template's list --------------------------------
 
 test('this harness loads what food/index.html actually loads', () => {

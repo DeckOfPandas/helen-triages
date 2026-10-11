@@ -3478,7 +3478,7 @@ def test_the_cocktail_index_never_matches_an_ingredient_by_substring():
 
 
 def test_the_cocktail_search_thresholds_are_not_hardcoded():
-    """The three numbers live in the vocabulary, not in the algorithm.
+    """The two numbers live in the vocabulary, not in the algorithm.
 
     Same rule food's `family_button_min_chars` follows, and for the same reason:
     how much typing earns a pool of candidates is a question about this
@@ -3490,18 +3490,19 @@ def test_the_cocktail_search_thresholds_are_not_hardcoded():
     search = vocab.get("search")
     assert isinstance(search, dict), (
         "_data/cocktails/ingredients.yml has no `search:` block. It carries the "
-        "drinks index's minimum query length, family-button threshold and pool "
-        "cap; without it cocktail-search.js falls back to defaults and the "
+        "drinks index's minimum query length and family-button threshold "
+        "(there was a pool cap too, until 2026-10-11); without it "
+        "cocktail-search.js falls back to defaults and the "
         "numbers stop being editable."
     )
-    for key in ("min_query_chars", "family_button_min_chars", "pool_cap"):
+    for key in ("min_query_chars", "family_button_min_chars"):
         assert isinstance(search.get(key), int), (
             f"_data/cocktails/ingredients.yml's `search:` block is missing an "
             f"integer `{key}`."
         )
 
     js = _strip_js_comments(read("assets", "js", "cocktail-search.js"))
-    for key in ("min_query_chars", "family_button_min_chars", "pool_cap"):
+    for key in ("min_query_chars", "family_button_min_chars"):
         assert re.search(rf"cfg\.{key}\b", js), (
             f"assets/js/cocktail-search.js no longer reads `{key}` from the "
             f"vocabulary it was handed."

@@ -493,7 +493,30 @@ document.addEventListener('DOMContentLoaded', function () {
     if (wordMatch) btn.classList.add('btn-ingredient--word-match');
     btn.dataset.ingredient = key;
     btn.textContent = label;
+    if (state.includedIngredients.has(key)) markIngredientChosen(btn);
     return btn;
+  }
+
+  /* A CHOSEN HAS TO HAVE CHIP CARRIES ITS OWN x -- Helen, 2026-10-11: "I do
+     want to have the x on the chosen has to have chip, so please add it for
+     food." Cocktails' has had one since 2026-08-30 and LEAVE OUT's on both.
+     A span of its own, so nothing that reads the chip's label picks it up,
+     and aria-hidden: the accessible name says what a click does instead,
+     in cocktails' words. Still ONE button -- a click anywhere removes it. */
+  function markIngredientChosen(btn) {
+    if (btn.querySelector('.btn-ingredient-x')) return;
+    btn.setAttribute('aria-label', 'stop requiring ' + btn.textContent.trim());
+    var x = document.createElement('span');
+    x.className = 'btn-ingredient-x';
+    x.setAttribute('aria-hidden', 'true');
+    x.textContent = ' \u00d7';
+    btn.appendChild(x);
+  }
+
+  function unmarkIngredientChosen(btn) {
+    var x = btn.querySelector('.btn-ingredient-x');
+    if (x) x.remove();
+    btn.removeAttribute('aria-label');
   }
 
   // The tape-shape treatment other active filters get (STAR/MOOD/
@@ -636,6 +659,7 @@ function renderResultsPool() {
     state.includedIngredients.add(onlyKey);
     ingredientLabels[onlyKey] = onlyBtn.textContent;
     onlyBtn.classList.add('active');
+    markIngredientChosen(onlyBtn);
     state.isSearching = false;
   }
   ensureActiveIngredientShapes();
@@ -1204,6 +1228,10 @@ function renderResultsPool() {
   if (matrix) {
     matrix.addEventListener('click', function(e) {
       var target = e.target;
+      // A chosen HAS TO HAVE chip holds spans now (its x, its tape slot), and
+      // a click on one of those is a click on the chip.
+      var ingredientBtn = target.closest && target.closest('.btn-ingredient');
+      if (ingredientBtn) target = ingredientBtn;
 
       /* The exclude section is claimed whole, before any other branch. Its
          buttons wear .btn-tag for their appearance, so without this they would
@@ -1250,6 +1278,7 @@ function renderResultsPool() {
           state.includedIngredients.delete(ing);
           delete ingredientLabels[ing];
           target.classList.remove('active');
+          unmarkIngredientChosen(target);
           var staleShape = target.querySelector('.tag-shape');
           if (staleShape) staleShape.remove();
         } else {
@@ -1266,8 +1295,21 @@ function renderResultsPool() {
           // the box, which may hold a different search by the time this
           // label is next needed (a repaint, a saved go-back record).
           ingredientLabels[ing] = target.textContent.replace(' (all)', '').trim();
-          target.classList.add('active');
-          ensureActiveIngredientShapes();
+          /* CHOOSING ONE CLEARS THE SEARCH -- Helen, 2026-10-11: "when a chip
+             in the has to have or leave out search results is selected, it
+             immediately joins others at the top and the other chips
+             disappear. Please make food do the same". LEAVE OUT already
+             did (toggleExcluded); this one kept the pool open so several
+             could be picked from one search (#1092), and that is what she
+             is trading away. The requirement itself is still AND.
+
+             Emptying the box is the whole mechanism, as on cocktails:
+             renderResultsPool() draws the chosen chips first and, with no
+             query, nothing after them. */
+          if (searchBox) searchBox.value = '';
+          renderResultsPool();
+          updateIngredientClear();
+          return;
         }
         state.isSearching = !!(searchBox && searchBox.value.trim());
         update();
