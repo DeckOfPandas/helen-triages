@@ -1444,6 +1444,14 @@ function renderResultsPool() {
     (shoppingEl && shoppingEl.getAttribute('data-count-nouns')) || '')
     .split(',').filter(Boolean);
 
+  /* THE THINGS THAT HOLD WHAT A RECIPE MAKES -- a jar, a tin -- so its row
+     reads "2 jars of Peanut Sauce": `yields.container_words` from the same
+     file, by the same route. Absent, such a row puts the thing after the
+     title like any other. */
+  var CONTAINER_NOUNS = String(
+    (shoppingEl && shoppingEl.getAttribute('data-container-nouns')) || '')
+    .split(',').filter(Boolean);
+
   /* The row's own title, read off the DOM once. `dataset.titleText` is the
      UNMARKED title stashed at load, so a recipe found by a name search still
      lists under its real name rather than one carrying <mark> tags -- the same
@@ -1586,18 +1594,16 @@ function renderResultsPool() {
     return n;
   }
 
-  /* IS THE THING MADE ALREADY NAMED IN THE TITLE? "18 cookies" of Peanut
-     Butter Cookies, yes; "24 squares" of Guinness, Beetroot and Chocolate
-     Cake, no. The noun is the last word of the stem, and the comparison is in
-     the singular both sides (shopping-list.js `foldUnit`), so "pies" finds
-     "Pie". */
-  function nounInTitle(stem, title) {
+  /* IS A WORD OF THE YIELD ALREADY IN THE TITLE? "cookies" of Peanut Butter
+     Cookies, yes; "squares" of Guinness, Beetroot and Chocolate Cake, no.
+     Compared in the singular both sides (shopping-list.js `foldUnit`), so
+     "pies" finds "Pie". */
+  function wordInTitle(word, title) {
     var fold = HTF.shoppingList.foldUnit;
-    var words = String(stem).trim().split(/\s+/);
-    var noun = fold(words[words.length - 1]);
-    if (!noun) return false;
-    return String(title).toLowerCase().split(/[\s,()\/&]+/).some(function (word) {
-      return word !== '' && fold(word) === noun;
+    var wanted = fold(word);
+    if (!wanted) return false;
+    return String(title).toLowerCase().split(/[\s,()\/&]+/).some(function (w) {
+      return w !== '' && fold(w) === wanted;
     });
   }
 
@@ -1605,113 +1611,142 @@ function renderResultsPool() {
     return n > 1 ? 'batches of' : 'batch of';
   }
 
-  /* THE WORDS OF A ROW, AROUND THE RECIPE'S NAME: `word` is what the number
-     counts (and is the one piece that moves with it), `pre` and `post` sit
-     either side of the title, which is a link. Helen's rulings, 2026-10-11,
-     each on a row she was looking at:
+  /* "Sweet Potato Chocolate Brownies" BEFORE "squares" IS "Brownie" --
+     Helen, 2026-10-11: 'Can we get to "batch of 16 brownie squares", so where
+     the thing name word in the title is plural we make it singular?' The
+     thing-name word is taken to be the last one before any " with ...", so
+     "Cake with Pistachios" is left alone. Only a plain plural is touched:
+     `-ss` and `-us` words (Swiss, hummus, couscous) are not plurals. */
+  function singularHead(title) {
+    var text = String(title);
+    var cut = text.search(/\s+with\s+/i);
+    var head = cut === -1 ? text : text.slice(0, cut);
+    var tail = cut === -1 ? '' : text.slice(cut);
+    var match = /^(.*?)([A-Za-zÀ-ɏ]+)$/.exec(head);
+    if (!match || !/[^su]s$/i.test(match[2])) return text;
+    var single = HTF.shoppingList.foldUnit(match[2]);
+    if (!single || single === match[2].toLowerCase()) return text;
+    if (/^[A-Z]/.test(match[2])) single = single.charAt(0).toUpperCase() + single.slice(1);
+    return match[1] + single + tail;
+  }
 
-       [2] batches of 18 [Peanut Butter Cookies]        the noun is in the title
-       [1] batch of 24 [Guinness ... Cake] squares      "should say ... squares"
-       [1] batch of 3 dozen [Homemade Florentines]      a dozen stays a dozen
-       [2] × 8-inch [Beetroot Chocolate Cake]           '"× 8-inch Beetroot
-                                                         Chocolate Cake"'
-       [2] × [Lemon Meringue Pie]                       "one pie"
-       [2] jars: [Peanut Sauce]                         one thing the title
-                                                         does not name
-       [1] batch of [Blackberry Gelato]                 a measure, or no count
-       [7] portions of [Moules Marinière]               `serves:`
+  /* THE WORDS OF A ROW, AROUND THE RECIPE'S NAME. `word` is what the number
+     counts, `pre` and `post` sit either side of the name, and `title` is the
+     name as this row writes it (a link). Helen's rulings, 2026-10-11, each
+     on a row she was looking at:
 
-     A WHOLE CAKE IS NOT A BATCH: where the yield is ONE thing the title
-     already names, the row is a ×, whatever stood before the noun, and the
-     title -- which is not made plural, so the × is there at one as well. */
+       [2] batches of 18 [Peanut Butter Cookies]       the title names the thing
+       [1] batch of 24 [Guinness ... Cake] squares     it does not: said after
+       [1] batch of 16 [Sweet Potato ... Brownie] squares   and the title's own
+                                                        noun goes singular
+       [1] batch of 3 dozen [Homemade Florentines]     a dozen stays a dozen
+       [2] × 8-inch [Beetroot Chocolate Cake]          ONE thing the title names:
+       [2] × [Lemon Meringue Pie]                      a ×, never "a batch"
+       [2] dozen [... Mince Pies]                      one dozen of them
+       [2] jars of [Peanut Sauce]                      one thing that HOLDS it
+       [3] [Rainbow Confetti] traybakes                one thing that IS it
+       [1] batch of [Blackberry Gelato]                a measure, or no count
+       [7] portions of [Moules Marinière]              `serves:`
+
+     THE THING MADE IS SAID ONCE. Where the title already names it, the yield's
+     noun is dropped; where it does not, the noun follows the title, plural
+     above one. A WHOLE CAKE IS NOT A BATCH (her words: 'When the "makes"
+     contains a word like cake, or something that doesn't make a "batch"'):
+     nobody bakes a batch of one cake. Its title is not made plural, which is
+     why the × is there at one as well.
+
+     A CONTAINER COMES FIRST, WITH "of" -- 'please write "[2] jars of peanut
+     sauce", "[3] rainbow confetti traybakes"'. A jar is full of the sauce; a
+     traybake is the cake. Which is which is `container_words` in
+     _data/food/scaling.yml.
+
+     A `×` ALSO GOES BEFORE A YIELD THAT OPENS WITH A DIGIT, the recipe page's
+     rule (food-scale.js `thingText`): the box is a number, and "2 8-inch ..."
+     is unreadable. */
   function rowWords(url, title, n) {
+    var out = { word: '', pre: '', title: title, post: '' };
     if (!isBatch(url)) {
-      return { word: n === 1 ? 'portion of' : 'portions of', pre: '', post: '' };
+      out.word = n === 1 ? 'portion of' : 'portions of';
+      return out;
     }
+    out.word = batchWord(n);
     var made = RECIPES[url].m;
-    if (made && made.kind === 'count' && made.stem) {
-      var stem = String(made.stem);
-      var words = stem.split(/\s+/);
-      if (Number(made.base) === 1) {
-        if (!made.invariable && nounInTitle(stem, title)) {
-          return {
-            word: '×',
-            pre: words.length > 1 ? words.slice(0, -1).join(' ') + ' ' : '',
-            post: ''
-          };
-        }
-        return { word: thingWords(made, n) + ':', pre: '', post: '' };
+    if (!(made && made.kind === 'count' && made.stem)) return out;
+
+    var unitLabel = HTF.shoppingList.unitLabel;
+    var words = String(made.stem).split(/\s+/);
+    // "dozen" is counted as itself and never changes with the number.
+    var group = made.invariable ? words.shift() : '';
+    var noun = words.length ? words[words.length - 1] : '';
+    var named = !noun || wordInTitle(noun, title);
+    // What stood before the noun, less anything the title already says
+    // ("mince" of "dozen mince pies").
+    var before = words.slice(0, -1).filter(function (w) {
+      return !wordInTitle(w, title);
+    }).join(' ');
+    var lead = (group ? group + ' ' : '') + (before ? before + ' ' : '');
+
+    if (Number(made.base) === 1) {
+      var times = made.times ? '× ' : '';
+      if (!named && CONTAINER_NOUNS.indexOf(HTF.shoppingList.foldUnit(noun)) !== -1) {
+        out.word = times + lead + (n > 1 ? unitLabel(noun, 2) : noun) + ' of';
+        return out;
       }
-      // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
-      if (made.box && !/^batch/i.test(stem)) {
-        var lead = made.box + ' ';
-        if (made.invariable) lead += words.shift() + ' ';
-        var named = !words.length || nounInTitle(words.join(' '), title);
-        return {
-          word: batchWord(n),
-          pre: lead,
-          post: named ? '' : ' ' + words.join(' ') + String(made.rest || '')
-        };
+      if (named) {
+        out.word = group || '×';
+        out.pre = before ? before + ' ' : '';
+        return out;
       }
+      out.word = (times + group).trim();
+      out.pre = before ? before + ' ' : '';
+      out.title = singularHead(title);
+      out.post = ' ' + (n > 1 ? unitLabel(noun, 2) : noun);
+      return out;
     }
-    return { word: batchWord(n), pre: '', post: '' };
+
+    // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
+    if (!made.box || /^batch/i.test(String(made.stem))) return out;
+    out.pre = made.box + ' ' + (group ? group + ' ' : '');
+    if (!named) {
+      out.title = singularHead(title);
+      out.post = ' ' + words.join(' ') + String(made.rest || '');
+    }
+    return out;
   }
 
-  /* --- A YIELD THAT IS ONE NAMED THING IS COUNTED AS THAT THING --------------
-     Helen, 2026-10-11: 'we now display e.g. "2 batches of 12 cookies". When
-     the "makes" contains a word like cake, or something that doesn't make a
-     "batch", we should do the same, so "two 13x9-in traybakes".' Nobody bakes
-     a batch of one cake; they bake two cakes. Until then these rows read "2
-     batches of Beetroot Chocolate Cake", the thing dropped because "2 batches
-     of 1 ..." read worse still.
-
-     WHERE THE TITLE DOES NOT NAME THE THING ("1 jar" of Peanut Sauce, "one
-     9x13 inch traybake" of a Zucchini Orange Cake), the row says it and then
-     the title: "[2] jars: Peanut Sauce". The words are the recipe page's own
-     (food-scale.js `thingText`, which this page does not load): plural above
-     one, `dozen mince pies` never changes, and a `×` before a thing that
-     opens with a digit. A COLON, NOT "of": "2 jars of Peanut Sauce" is fine
-     and "2 tins of School-Dinner Sponge" is not. Where the title DOES name
-     it, rowWords() above has the shorter form she asked for. */
-  function singleThing(url) {
-    var made = RECIPES[url] && RECIPES[url].m;
-    return (made && made.kind === 'count' && Number(made.base) === 1 &&
-      made.stem) ? made : null;
-  }
-
-  function thingWords(made, n) {
-    var stem = String(made.stem);
-    if (!made.invariable && n > 1) stem = HTF.shoppingList.unitLabel(stem, 2);
-    return (made.times ? '× ' : '') + stem + String(made.rest || '');
-  }
-
-  function countWord(url, n) {
-    return rowWords(url, titleByUrl[url] || url, n).word;
-  }
-
-  /* THE RECIPE'S NAME, AS THE LIST ABOVE WRITES IT, AND A LINK -- Helen,
+  /* The recipe's name, as the list above writes it, and a link -- Helen,
      2026-10-11: "please render the name of the recipe in this shopping list
      feature the same way we do in the recipe list row titles, just smaller of
-     course, and make them links please." The href is the row's own. */
-  function recipeLink(url) {
+     course, and make them links please." The href is the row's own. `text`
+     is the name as a row has reworded it ("... Brownie" before "squares"). */
+  function recipeLink(url, text) {
     return '<a class="shopping-list-recipe-link" href="' +
       HTF.escapeHtml(hrefByUrl[url] || url) + '">' +
-      HTF.escapeHtml(titleByUrl[url] || url) + '</a>';
+      HTF.escapeHtml(text || titleByUrl[url] || url) + '</a>';
+  }
+
+  /* Everything after the box. ITS OWN FUNCTION BECAUSE THE INPUT HANDLER
+     REWRITES IT IN PLACE: the box cannot be re-rendered under a typing
+     cursor, and more than one word of the row moves with the number
+     ("batch"/"batches", "jar"/"jars", "traybake"/"traybakes"). */
+  function rowInner(url, n) {
+    var words = rowWords(url, titleByUrl[url] || url, n);
+    return '<span class="shopping-list-count-word">' +
+      HTF.escapeHtml(words.word) + '</span>' + (words.word ? ' ' : '') +
+      HTF.escapeHtml(words.pre) + recipeLink(url, words.title) +
+      HTF.escapeHtml(words.post);
   }
 
   function rowSentence(url, n) {
-    var words = rowWords(url, titleByUrl[url] || url, n);
-    return '<span><span class="shopping-list-count-word">' +
-      HTF.escapeHtml(words.word) + '</span> ' + HTF.escapeHtml(words.pre) +
-      recipeLink(url) + HTF.escapeHtml(words.post) + '</span>';
+    return '<span>' + rowInner(url, n) + '</span>';
   }
 
-  /* What a screen reader is told the box counts: "batches of", or the thing
-     in the plural ("8-inch cakes:"), since the label does not change as the
-     number does. */
+  /* What a screen reader is told the box counts. It cannot move with the
+     number, so a row that is not batches says "how many". */
   function boxLabel(url) {
-    var thing = singleThing(url);
-    return thing ? thingWords(thing, 2).replace(/^× /, '') + ': ' : 'batches of ';
+    var made = RECIPES[url] && RECIPES[url].m;
+    var single = made && made.kind === 'count' && Number(made.base) === 1 && made.stem;
+    return single ? 'how many: ' : 'batches of ';
   }
 
   /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
@@ -1962,11 +1997,12 @@ function renderResultsPool() {
       } else {
         shown = HTF.shortlist.setPortions(url, input.value) || portionsFor(url);
       }
-      /* "1 batch of", "2 batches of". The word is patched in place: the row
-         cannot be re-rendered from here (the caret rule below). */
+      /* "1 batch of", "2 batches of"; "jar of", "jars of". The row's words are
+         rewritten in place, beside the box: the row itself cannot be
+         re-rendered from here (the caret rule below). */
       var word = input.parentNode && input.parentNode.querySelector &&
         input.parentNode.querySelector('.shopping-list-count-word');
-      if (word) word.textContent = countWord(url, shown);
+      if (word && word.parentNode) word.parentNode.innerHTML = rowInner(url, shown);
       // Totals only. Re-rendering the recipe list would replace the very input
       // being typed into and take the caret with it.
       renderTotals();

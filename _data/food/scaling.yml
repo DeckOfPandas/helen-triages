@@ -190,6 +190,23 @@ yields:
   group_words:
     - dozen
 
+  # A thing that HOLDS what the recipe makes, for the shopping list's row
+  # only (assets/js/filters.js `rowWords`). Helen, 2026-10-11: 'please write
+  # "[2] jars of peanut sauce", "[3] rainbow confetti traybakes"'. A jar is
+  # full OF the sauce, so the title follows it; a traybake IS the cake, so it
+  # follows the title. Singular; the last word of the yield is what is
+  # looked up ("large jar", '9"-square tin').
+  container_words:
+    - jar
+    - tin
+    - batch
+    - bottle
+    - tub
+    - pot
+    - tray
+    - dish
+    - loaf
+
 # -----------------------------------------------------------------------------
 # Half a recipe -- the words _plugins/food_half_recipe.rb judges by. A `makes:`
 # recipe steps x1, x2, x3; it is offered ONE step below, x½, only where

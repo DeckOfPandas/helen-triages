@@ -1306,7 +1306,8 @@ principle, but because that's meaningless.'*).
     [0.5] batch of Ben's Chocolate Ice Cream       makes: a measure; ½ offered
     [1]   batch of 24 Guinness … Cake squares      makes: "24 squares"
     [2]   × 8-inch Beetroot Chocolate Cake         makes: "one 8-inch cake"
-    [2]   jars: Peanut Sauce                       makes: "1 jar"
+    [2]   jars of Peanut Sauce                     makes: "1 jar"
+    [3]   Lemon Feather Sponge cakes               one thing, not in the title
 
 Every recipe's name in the panel is a link to it, in the index row title's own
 type (`.shopping-list-recipe-link`; Helen, 2026-10-11: *"the same way we do in
@@ -1329,16 +1330,22 @@ knows what to do"*: `unscaledRecipes` on the row, from
   and Chocolate Cake squares"'*), and not at all where it does ("18 Peanut
   Butter Cookies"). "Names it" is the stem's last word found in the title,
   singular against singular. A `dozen` goes before the title: "3 dozen
-  Homemade Florentines".
+  Homemade Florentines". **Before a thing that follows it, the title's own
+  noun goes singular** (*'"batch of 16 brownie squares"'*): the last word
+  before any " with …", and only a plain plural (`singularHead`).
 - **A YIELD THAT IS ONE NAMED THING IS NOT A BATCH** (Helen, the same day:
   *'When the "makes" contains a word like cake ... we should do the same'*).
   Where the title names it, the row is a `×`, whatever stood before the noun,
   and the title — her form, *'"× 8-inch Beetroot Chocolate Cake"'*; `one pie`
   is "× Lemon Meringue Pie". The title is not made plural, so the `×` is
-  there at one too. Where the title does not name it, the thing and a colon
-  come first: "jars: Peanut Sauce", "× 9x13 inch traybakes: Zucchini Orange
-  Cake", plural above one as on the recipe page; `1 dozen mince pies` keeps
-  its words. All of it is `rowWords` in `filters.js`.
+  there at one too. Where the title does not name it, **a container comes
+  first with "of" and anything else follows the title** (*'please write "[2]
+  jars of peanut sauce", "[3] rainbow confetti traybakes"'*): a jar holds the
+  sauce, a traybake is the cake. Which is which is `yields.container_words`
+  in `scaling.yml`, handed to the page as `data-container-nouns`. The noun is
+  plural above one either way; `1 dozen mince pies` is "dozen" and the title.
+  All of it is `rowWords` in `filters.js`, and the input handler rewrites the
+  row's words in place (`rowInner`), since more than one of them moves.
 - **IT NEEDS THE NOUN, so a `makes:` that opens with a number names the
   thing** (`"16 bars"`, never `"16"`): a bare count has nothing to print and
   its row is "batch of" the title. 33 drafts were given theirs on 2026-10-11

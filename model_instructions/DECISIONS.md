@@ -1955,6 +1955,19 @@ unless stated.
       brackets after the item so the user knows what to do"* — after the
       item in the totals, as the same links. Yesterday's "(Not scaled: …)"
       line was left in place; she did not ask for it to go.
+  - **A third round, on the two rows named to her as awkward and on the
+    colon.** *'please write "[2] jars of peanut sauce", "[3] rainbow confetti
+    traybakes" (made up example)'* — so the colon is gone: a CONTAINER comes
+    first with "of", anything else follows the title. The split is data
+    (`yields.container_words`), a session's list of nine. *'Can we get to
+    "batch of 16 brownie squares", so where the thing name word in the title
+    is plural we make it singular? I can't imagine this is common.'* — the
+    title's noun, taken as the last word before any " with", loses its plural
+    when a thing follows it. And **the scones were fixed in the recipe, by
+    her**: *'Grandma's scones should have makes: 8 scones (2 large rounds of
+    4), meaning we know we can drop the brackets for the shopping list, giving
+    us "2 batches of 8 scones"'*, with *"Please edit the live scones recipe,
+    no need to flip the proofreading flag"*.
   - **The recipe page was already right** ("1 × 8-inch cake", "2 × 8-inch
     cakes") and is untouched.
 

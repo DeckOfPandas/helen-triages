@@ -251,7 +251,7 @@ function boot(options) {
 
   const panel = el('section', 'shopping-list', {
     id: 'shopping-list', 'data-whole-measures': 'handful,pinch',
-    'data-count-nouns': 'onion,lemon'
+    'data-count-nouns': 'onion,lemon', 'data-container-nouns': 'jar,tin,batch'
   });
   const head = el('div', 'shopping-list-head');
   head.appendChild(el('input', '', { id: 'shopping-list-setall', type: 'number' }));
@@ -614,17 +614,17 @@ test('one cake is a cake, not a batch: the row names the thing made', () => {
     // THE TITLE NAMES THE THING ("Cake"), so the row is her own form: '"×
     // 8-inch Beetroot Chocolate Cake"'. The noun is not said twice.
     '× 8-inch Beetroot Chocolate Cake',
-    // The title does not say "jar", so the row does, and then the title.
-    'jar: Peanut Sauce',
-    // A dozen is counted in dozens and keeps its own words.
-    'dozen mince pies: Mince Pies'
+    // A jar HOLDS the sauce, so it comes first with "of": 'please write "[2]
+    // jars of peanut sauce"'. `jar` is in the fixture's data-container-nouns.
+    'jar of Peanut Sauce',
+    // A dozen is counted in dozens; "mince pies" is already in the title.
+    'dozen Mince Pies'
   ]);
   const html = recipesHtml(panel);
   assert.ok(!/batch/.test(html.replace(/data-batches/g, '')
     .replace(/shopping-list-recipe--first-batch/g, '')), html);
-  // The label cannot move with the number, so it is the plural, without the ×.
-  assert.ok(html.includes('aria-label="8-inch cakes: Beetroot Chocolate Cake, which makes one 8-inch cake"'), html);
-  assert.ok(html.includes('aria-label="jars: Peanut Sauce'), html);
+  // The label cannot move with the number, so it does not try to.
+  assert.ok(html.includes('aria-label="how many: Beetroot Chocolate Cake, which makes one 8-inch cake"'), html);
 });
 
 test('two of them take the plural, and a dozen stays a dozen', () => {
@@ -638,10 +638,46 @@ test('two of them take the plural, and a dozen stays a dozen', () => {
   assert.deepStrictEqual(rowText(panel), [
     // The title is not made plural, which is why the × is there at one too.
     '× 8-inch Beetroot Chocolate Cake',
-    'jars: Peanut Sauce',
-    'dozen mince pies: Mince Pies'
+    'jars of Peanut Sauce',
+    'dozen Mince Pies'
   ]);
   assert.match(aislesHtml(panel), /500 g/, 'and two cakes is twice the flour');
+});
+
+test('one thing that IS the dish, and is not in its name, follows the name', () => {
+  // '"[3] rainbow confetti traybakes" (made up example)'. A traybake is not a
+  // container, so there is no "of"; the noun takes the plural above one.
+  const recipes = {
+    '/food/recipes/cake/': {
+      p: 12, e: true, y: 'one traybake', k: 'makes', w: true, h: false,
+      m: { kind: 'count', base: 1, stem: 'traybake', rest: '', box: '1',
+        singular: true, times: false, invariable: false },
+      i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
+    }
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/cake/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['Beetroot Chocolate Cake traybake']);
+  win.HTF.shortlist.setBatches('/food/recipes/cake/', 3);
+  doc.dispatch('htf:shortlist-change');
+  assert.deepStrictEqual(rowText(panel), ['Beetroot Chocolate Cake traybakes']);
+});
+
+test('the title\'s own noun goes singular before the thing made', () => {
+  // 'Can we get to "batch of 16 brownie squares", so where the thing name
+  // word in the title is plural we make it singular?' The cookies' row, where
+  // nothing follows the title, keeps its plural.
+  const recipes = {
+    '/food/recipes/cookies/': Object.assign({}, RECIPES['/food/recipes/cookies/'], {
+      y: '16 squares',
+      m: { kind: 'count', base: 16, stem: 'squares', rest: '', box: '16' }
+    })
+  };
+  const { win, doc, panel } = boot({ recipes });
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['batch of 16 Peanut Butter Cookie squares']);
 });
 
 test('a batch says what it is a batch OF when the title does not', () => {
