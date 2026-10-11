@@ -579,7 +579,7 @@ lemon wheel and skewered maraschino cherry (like a sail)
 **Fruit:** pineapple wedge ·
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wedge on rim ·
 apricot wedge on rim · pineapple wheel · blackberry · dried apple slice ·
-apple slice · banana chip · skewered raspberry ·
+apple slice · banana chip · skewered raspberry · skewered blueberry ·
 three skewered blueberries and a long slice of pineapple · raspberries ·
 fruit wedges · half an empty passion fruit shell
 
@@ -597,8 +597,8 @@ basil leaf (floated) · thin cucumber slice (floated) · length of cucumber peel
 **Spice and other:** grated nutmeg · Angostura bitters · whipped cream ·
 cinnamon stick · ginger wheel · stem ginger slice ·
 skewered crystallised ginger · desiccated coconut · star anise (floated) ·
-skewered green olive · skewered black olives · small stuffed dead parrot ·
-three coffee beans
+skewered green olive · skewered black olives ·
+small stuffed dead Norwegian Blue · three coffee beans
 <!-- vocab:garnish end -->
 
 Four rules that decide the awkward cases:

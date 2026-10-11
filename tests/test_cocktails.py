@@ -3010,6 +3010,30 @@ def test_to_serve_is_serveware_and_not_the_ice():
     )
 
 
+def test_a_rim_says_rim():
+    """`serve.rim` is a noun phrase containing the word "rim".
+
+    The layout writes it after "with a": "Strain into a martini glass with a
+    sugar rim." Helen, 2026-10-11, on Californian Margarita's `rim: "salt"`,
+    which read "...glass with a salt filled with ice": the rim is mentioned
+    in the strain step "in the same way a garnish is, so ... 'with a salt
+    half-rim' or '...sugar rim'". Free text otherwise (serve.yml).
+    """
+    bad = []
+    for slug, fm in _load():
+        rim = (fm.get("serve") or {}).get("rim")
+        if rim is None:
+            continue
+        if not isinstance(rim, str) or not re.search(r"\brim\b", rim):
+            bad.append(f"{slug}: {rim!r}")
+    assert not bad, (
+        "`serve.rim` value(s) the strain step cannot read as \"with a ...\":\n  "
+        + "\n  ".join(bad)
+        + "\n\nName the rim: \"salt rim\", \"sugar half-rim\", \"half-rim of "
+          "salt\"."
+    )
+
+
 def test_a_garnish_is_not_an_ingredient_or_a_rim():
     """`garnish` holds garnishes, not pours, not rims, not serveware.
 

@@ -1028,6 +1028,14 @@ bottles:
     generic: "cherry liqueur"
     aliases: ["Briottet Cérise", "Briottet Cerise", "Briottet cerise",
               "Briottet Crème de Cérise", "Briotte Cérise"]
+  # THE TENTH, 2026-10-11, for Myrtille Martini. Helen wrote "Briottet Creme de
+  # Myrtille" as the suggestion; asked whether to declare it under the label's
+  # spelling at the figures she gave on 2026-10-10 (#1351, "Myrtille can default
+  # to Briottet, 18%, £23 for 70 cl"): "yes". Her unaccented spelling is the
+  # alias.
+  "Briottet Crème de Myrtille":
+    generic: "crème de myrtille"
+    aliases: ["Briottet Creme de Myrtille"]
   # `Luxardo` KEEPS THE BARE BRAND AS AN ALIAS, and it is the one place this
   # file lets a house name a product. Helen, 2026-09-04: in this collection
   # Luxardo only ever means the maraschino -- the four drinks that write it

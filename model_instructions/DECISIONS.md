@@ -4224,6 +4224,18 @@ unless stated.
   `crushed`; `test_a_fill_has_something_to_fill` refuses the rest rather than
   letting the substitution quietly no-op, because a silent no-op reads as
   though somebody recorded how full it is.
+- **2026-10-11 — the rim stays on the strain step, and `serve.rim` must say
+  "rim".** Californian Margarita's `rim: "salt"` rendered *"Strain into an old
+  fashioned glass with a salt filled with ice."* and Helen read the page as
+  having no rim at all. Offered a rim step of its own, opening the method, she
+  refused it: *"I don't rim a glass straight away because the rim can melt in
+  the liquid, and because i usually stand my glasses with chilled water and an
+  ice cube. The rim should be mentioned in the strain step in the same way a
+  garnish is, so, yes, strain into a martini glass with a salt half-rim or
+  ...sugar rim."* So the field stays free text but is a noun phrase holding the
+  word (`test_a_rim_says_rim`); the layout picks "a"/"an", and puts a comma
+  before an ice clause that would otherwise run on — *"…with a salt rim,
+  filled with ice."* Do not propose the separate step again.
 
 ### §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 Glass icons
 

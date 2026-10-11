@@ -314,6 +314,7 @@ argument and the rules each field is read by.
 - 2026-09-28 · §9.10a · #1214 · The glass generator — and it is 2026-09-05's composition finished.
 - 2026-09-28 · §9.10a · A strain step stops repeating the glass when it has nothing to add
 - 2026-09-28 · §9.10a · serve.fill, because serve.ice may not say quantity.
+- 2026-10-11 · §9.10a · the rim stays on the strain step, and serve.rim must say "rim".
 - 2026-08-25 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #298 · Sized by real height from heights_mm.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · Scale 2.6rem → 10.4rem when the glass became the drink page's hero; width cap moved in proportion.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #295 · heights_mm sizes the CANVAS: Helen's redrawn double old-fashioned drew 0.90× the single (75.7% ink fill) despite a 1.29× viewBox.

@@ -393,6 +393,8 @@ bottles:
   # is tighter than the guess of 18 assumed.
   "Gabriel Boudier Crème de Menthe":  { abv: 21,   confidence: high }
   "Briottet Crème de Violette":       { abv: 16,   confidence: medium }
+  # Helen's figure, 2026-10-10 (#1351): "Briottet, 18%".
+  "Briottet Crème de Myrtille":       { abv: 18,   confidence: high }
   "Gabriel Boudier Crème de Banane":  { abv: 25,   confidence: medium }
 
   # --- amari and bitter aperitivi ----------------------------------------
@@ -523,8 +525,9 @@ generics:
   # to: Chambord 16.5, Briottet myrtille 18 (it was a guessed 16), Mentzendorff
   # kümmel 38, Akashi-Tai Daiginjo Genshu 17 (it was a guessed 16). The
   # tsipouro's 42 she ticked as right without naming a bottle.
+  # `crème de myrtille` LEFT ON 2026-10-11: Briottet Crème de Myrtille is
+  # declared now, at the same 18, and the bottle carries the figure (above).
   black raspberry liqueur: { abv: 16.5, confidence: high }
-  crème de myrtille:      { abv: 18,   confidence: high }
   kümmel:                 { abv: 38,   confidence: high }
   sake:                   { abv: 17,   confidence: high }
   tsipouro:               { abv: 42,   confidence: medium }

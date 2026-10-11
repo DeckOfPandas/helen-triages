@@ -570,6 +570,13 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: medium
+  # NEW 2026-10-11 with the bottle. HELEN'S FIGURE, 2026-10-10 (#1351):
+  # "Myrtille can default to Briottet, 18%, £23 for 70 cl" -- the same bottle
+  # as the `crème de myrtille` generic row below.
+  "Briottet Crème de Myrtille":
+    size_ml: 700
+    gbp: 23
+    confidence: high
   "Gabriel Boudier Crème de Banane":
     size_ml: 700
     gbp: 17

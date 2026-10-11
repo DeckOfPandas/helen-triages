@@ -173,6 +173,15 @@ fill:
 # wherever, because it's easily missed just on the glass mark in the metadata."
 # A rim is an ACTION, and an action filed only as metadata is an action that
 # does not happen.
+#
+# IT RIDES ON THE STRAIN STEP, AS A GARNISH WOULD, AND MUST SAY "rim". Helen,
+# 2026-10-11, offered a rim step of its own: "I don't rim a glass straight away
+# because the rim can melt in the liquid, and because i usually stand my
+# glasses with chilled water and an ice cube. The rim should be mentioned in
+# the strain step in the same way a garnish is, so, yes, strain into a martini
+# glass with a salt half-rim or ...sugar rim." So the value is a noun phrase
+# the layout can put after "with a" -- "salt rim", "sugar half-rim" -- never
+# the bare ingredient. test_a_rim_says_rim holds it.
 rim: "free text"
 
 # --- `to_serve` --------------------------------------------------------------

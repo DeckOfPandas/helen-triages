@@ -2980,7 +2980,12 @@ right. **The page COMPOSES the strain step** — `"Strain."` + the glass's
 `serve.yml` → *"Strain into an old fashioned glass, over a large ice cube."* —
 so each fact is stored once and a cocktail that changes glass gets a corrected
 method for free. Ice you pour ONTO takes a comma and "over"; ice the glass is
-FULL of takes "filled with". **The rim rides on the glass, before the ice.**
+FULL of takes "filled with". **The rim rides on the glass, before the ice**,
+written as a garnish would be: *"…into a martini glass with a sugar rim."*
+`serve.rim` is free text but must hold the word "rim" (`"salt rim"`, never
+`"salt"` — `test_a_rim_says_rim`); the layout picks "a"/"an" and puts a comma
+before a "filled with" clause: *"…with a salt rim, filled with ice."* **It is
+not a step of its own** — Helen rims late, so the rim cannot melt.
 
 **`fill` SAYS HOW FULL, AND IT IS A SECOND FIELD BECAUSE `ice` MAY NOT** —
 2026-09-28, for the Milliners Punch's *"Strain into a hurricane glass
