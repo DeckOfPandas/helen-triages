@@ -47,6 +47,9 @@
 // touches a class any of the sections between its old and new position also
 // styles.
 @import "food/recipe-list";
+// The tape slot both sites' chips wear (#1219); colours are in the three
+// food partials below.
+@import "shared/tag-shape";
 @import "food/badges";
 @import "food/buttons";
 // %btn-active-base is defined in category-labels and @extended from here and

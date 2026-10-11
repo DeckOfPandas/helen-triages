@@ -9907,6 +9907,60 @@ verification. Dates are when the correction landed.
     The universe line may still deal a hidden draft. Both labels are the
     issue's own words.
 
+- **2026-10-11, #1219 — ONE CHIP ON BOTH INDEXES: COCKTAILS' TYPE, FOOD'S
+  TAPE. FOOD'S HEADINGS AT COCKTAILS' SIZE. AND THE PHONE FOLD, CHOSEN ON THE
+  10TH, IS NOT BUILT.** The issue was the design review's "the two indexes'
+  controls differ" finding. Checked against the code first, because work had
+  moved on: the text inputs had already converged and clear-all was identical;
+  the chips and the section labels still differed.
+  - **The chips.** Five treatments went on a candidates page. Helen: *"I
+    expected to agree to dropping the tape backgrounds from food tag chips. In
+    fact, I find myself wanting to add the tape to the cocktail tags"*, and
+    asked for a sixth — *"keeping cocktail tag styling otherwise, just adding
+    the tape, meaning same for the food site"*. Then: *"I'm leaning towards F
+    -- cocktail chips, and tape on both sites! I do know this was supposed to
+    be an exercise in editing...but at least the sites will be consistent now
+    even if I'm leaning even further into more is more"*. So both sites'
+    chips are 0.9rem bold lowercase at full strength on a torn shape: 15% of
+    the text colour at rest, 40% under the pointer, the section's hue when
+    chosen. **This reverses two earlier rulings and she knew it**: cocktails'
+    *"just not the background shape"* (2026-08-30), and food's capitals on a
+    chosen chip — cocktails' chosen chip never changed case, and F is
+    cocktails' chip.
+  - **What each site keeps:** its colours. Food's chosen tape is its section
+    hue lightened as before, with the dark of the hue on a hovered word
+    (lime and yellow cannot be read as words on paper). Cocktails' chosen
+    tape is the heading's own variable, the one the #1086 block used. That
+    block stays as a fallback behind `:has(.tag-shape svg)`, because a chosen
+    word there is the page's dark ground and would vanish if the artwork had
+    not arrived.
+  - **Not changed, and worth knowing:** the candidates in both search pools,
+    and the badges on food's recipe rows, which are still 0.75rem and still
+    go to capitals when a filter matches them. The chip and the row badge
+    for one tag are no longer the same size.
+  - **The artwork moved** to `assets/img/chrome/tag-shapes/` and is fetched
+    with `HTF.chromeAsset`. It is not chrome; it is the only other artwork
+    both sites wear, and a per-site copy is the drift #223 records.
+  - **Food's headings: 1.05rem to 1.4rem.** *"Please increase the size of
+    food's headings to match cocktails' as well, because they're a bit lost
+    amongst the newly chunky chips."* Size only — cocktails' weight 400 and
+    0.14em tracking are #680's corrections for light type on a dark ground.
+    This undoes the 2026-09-02 fold tightening for these labels.
+  - **The cost is all food's.** Panel at 1280px: 476 to 558px, first recipe
+    824 to 906px down. At 390px: 815 to 1033px, first recipe 1128 to 1346px.
+    Cocktails measures exactly as before (517 / 953px; 985 / 1433px).
+  - **The fold.** Four phone-panel treatments went on a second candidates
+    page on the 10th; she chose *"sections fold"* and declined three boxes on
+    one row (*"nice looking, but I don't think it's clear enough"*). It was
+    built and opened as PR #1363 (food's panel 815 to 567px at 390). The next
+    day: *"I'm afraid I've changed my mind: I don't want to fold the sections.
+    The site is for me, and on my iPad I can see everything at the same time
+    just fine, which is what I want. It's even fine on my phone too,
+    honestly."* **Do not offer it again on the grounds that the panel is
+    tall**: it is taller now than when she said that, and she chose both in
+    the same message. The branch `design/1219-phone-fold` holds the build if
+    it is ever wanted.
+
 ## §14 Reference pages
 
 - **2026-08-11/12** — Built at Helen's request from 15 draft tables in

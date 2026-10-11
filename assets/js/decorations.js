@@ -260,7 +260,8 @@
 
   // ---------------------------------------------------------------------------
   // Tag shapes — the torn-tape background behind a recipe-row pill or a
-  // STAR/MOOD/PRACTICALITIES filter button (index page only; a no-op
+  // STAR/MOOD/PRACTICALITIES filter button on food, and behind a YOLO?/MOOD/
+  // HASSLE filter button on cocktails since #1219 (index pages only; a no-op
   // elsewhere since .tag-shape only appears in that markup).
   //
   // Assigned by a deterministic hash of the tag's own text, not randomly and
@@ -341,7 +342,10 @@
       // capitalised font"). Same bug for both, just more obvious on
       // .title-hit sitting on the plain page background than on
       // .ingredient-pill's already-busier row.
-      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit');
+      // .btn-chaos and .btn-mood added 2026-10-11, #1219: cocktails' filter
+      // chips wear the tape too. Same silent skip as above if a host is
+      // missing from this list.
+      var host = slot.closest('.badge, .btn-tag, .btn-star, .ingredient-pill, .title-hit, .btn-chaos, .btn-mood');
       var text = (host ? host.textContent : '').trim().toLowerCase();
       if (!text) return;
 
@@ -364,8 +368,10 @@
         }
       }
 
-      var url = HTF.siteAsset('/doodles/' + shape + '.svg');
-      if (!url) return;
+      // chromeAsset, not siteAsset, since #1219: both sites' chips wear these,
+      // so the artwork is one set (assets/img/chrome/tag-shapes/) and never
+      // null.
+      var url = HTF.chromeAsset('/tag-shapes/' + shape + '.svg');
       HTF.fetchSvg(url, function (svg) { slot.innerHTML = svg; });
     });
   }

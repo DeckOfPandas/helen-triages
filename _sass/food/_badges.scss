@@ -204,48 +204,9 @@ a.badge-practicalities:hover {
   .tag-shape { color: mix($color-practicalities-root, $color-white, 82%); }
 }
 
-// The tape shape itself: absolutely positioned behind the badge/button text,
-// stretched to fill (preserveAspectRatio="none" baked into the SVG files
-// themselves, same technique as the wordmark's own tape). One of a curated
-// pool (see the POOL comment in decorations.js's tagShapes() for the full
-// reasoning) assigned deterministically by the tag's own text -- same tag
-// always gets the same shape wherever it appears (a filter button and a
-// recipe-row pill for "greens" match), and shape 9's full-width diagonal is
-// excluded for short tag text specifically, since it distorts more than the
-// others do when stretched very narrow.
-.tag-shape {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  // Lets --stretch below overflow the slot itself without spilling into
-  // whatever sits next to the pill.
-  overflow: hidden;
-
-  svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  // tag-shape-2 specifically stretched further than an exact fit, but only
-  // on a genuinely wide pill — Helen: "the way the shape rolls off along
-  // the top left corner bothers me every time" on make-ahead, "doesn't
-  // bother me at all" on duck, same shape both times. decorations.js only
-  // adds this class on long tag text (the same SHORT_TEXT_MAX cutoff used
-  // to keep tag-shape-9 off short pills), so duck is untouched. First pass
-  // at 1.25 overshot even on make-ahead ("too square, sorry, Goldilocks") —
-  // dialed back to a smaller nudge past 1, still enough to move the torn
-  // corner further toward the edge without flattening the shape's own
-  // character. .tag-shape's own overflow: hidden crops the excess rather
-  // than letting it spill past the pill's edges.
-  &--stretch svg {
-    transform: scaleX(1.1);
-    transform-origin: center;
-  }
-}
+// THE `.tag-shape` SLOT ITSELF MOVED TO _sass/shared/_tag-shape.scss, #1219,
+// 2026-10-11 -- cocktails' filter chips wear it too now. Its colours stay
+// here and in the two partials after this one.
 
 // Matched/active tag text had a raised emboss here through several rounds
 // (2026-08-03) — softened alpha, per-category alpha, a hand-tuned colour

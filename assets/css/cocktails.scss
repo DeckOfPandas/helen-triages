@@ -57,6 +57,8 @@
 @import "cocktails/leopard";
 @import "cocktails/cocktail";
 @import "cocktails/cards";
+// The tape slot both sites' chips wear (#1219); cocktails/filters colours it.
+@import "shared/tag-shape";
 @import "cocktails/filters";
 // The shortlist (#546). AFTER cocktails/cocktail, which defines the
 // %cocktail-heading-face this file @extends and the `.cocktail-meta` whose

@@ -119,9 +119,18 @@
     // $font-headings, NOT $font-label -- see _palette.scss. The five type
     // values are shared with cocktails' own filter labels; see
     // @mixin index-section-label in shared/_rule.scss.
-    @include index-section-label;
-    // 1.05rem (was 1.35rem before the 2026-09-02 index fold tightening) sits
-    // between the two offset values. Staying at 1px rather than rounding up
+    //
+    // 1.4rem SINCE 2026-10-11, #1219 -- cocktails' size, passed as an
+    // argument. Helen, choosing the bigger chips below: "Please increase
+    // the size of food's headings to match cocktails' as well, because
+    // they're a bit lost amongst the newly chunky chips." SIZE ONLY:
+    // cocktails' regular weight and wider tracking are corrections for a
+    // light glyph on a dark ground (#680), which this page does not have.
+    // This undoes the 2026-09-02 fold tightening for these labels, and she
+    // took the height knowingly.
+    @include index-section-label($size: 1.4rem);
+    // 1.05rem (was 1.35rem before the 2026-09-02 index fold tightening, and
+    // 1.4rem since 2026-10-11, above) sat between the two offset values. Staying at 1px rather than rounding up
     // to 2: this is a control-panel label with five of them stacked in a
     // screenful, not a landmark, and the ratio
     // matters least at the size where both values are close. Try
@@ -247,8 +256,16 @@
   // second colour. .tag-shape's own fill lightened further too (mix with
   // white, 12% -> 18%), Helen's second nudge on the same "back off the
   // loudness" idea.
+  //
+  // LOWERCASE WHEN CHOSEN SINCE 2026-10-11, #1219 -- the three rules below
+  // no longer @extend %btn-active-base, whose capitals and weight 900 were
+  // food's own chosen state. Cocktails' chosen chip never changed case
+  // (Helen, 2026-08-30: it "read as the word changing rather than the word
+  // being chosen"), and treatment F is cocktails' chip on both sites. The
+  // placeholder stays for the search pills in _search.scss. `background:
+  // none` stays too: it is what keeps the focus ring's 15% tint off a
+  // chosen chip.
   &.category--star .btn-star.active {
-    @extend %btn-active-base;
     background: none;
     color: $color-text;
     text-shadow: none;
@@ -257,7 +274,6 @@
   }
 
   &.category--mood .btn-tag.active {
-    @extend %btn-active-base;
     background: none;
     color: $color-text;
     text-shadow: none;
@@ -266,7 +282,6 @@
   }
 
   &.category--practicalities .btn-tag.active {
-    @extend %btn-active-base;
     background: none;
     color: $color-text;
     text-shadow: none;
@@ -287,6 +302,45 @@
   &.category--practicalities .btn-tag:focus-visible {
     outline-color: $color-practicalities-root;
   }
+
+  // COCKTAILS' CHIP, WITH FOOD'S TAPE -- #1219, 2026-10-11. Helen, from the
+  // control-layer candidates page, where she had expected to take the tape
+  // OFF food: "I find myself wanting to add the tape to the cocktail
+  // tags", then "I'm leaning towards F -- cocktail chips, and tape on both
+  // sites!... at least the sites will be consistent now even if I'm leaning
+  // even further into more is more".
+  //
+  // So the three chip sections take cocktails' numbers, from
+  // _sass/cocktails/_filters.scss: 0.9rem, line-height 1.2, full-strength
+  // text, 0.5rem between chips on top of each chip's own margin. Under the
+  // pointer the WORD takes its section's colour, as cocktails' does -- the
+  // dark of each hue, the one the section's own clear link uses, because
+  // lime and yellow cannot be read as words on paper. The tape keeps food's
+  // three colours: 15% of the ink at rest, 40% under the pointer
+  // (_buttons.scss), the section's hue when chosen (above).
+  //
+  // `:not(.search)` IS THE SCOPE: the ingredient pool's candidates are
+  // .btn-tag too and stay as they were, as cocktails' own pool chips did
+  // ("the search returns could stay as they are").
+  //
+  // Nothing here applies to `.active` alone, so a chosen chip still measures
+  // what it measured at rest (#389).
+  &:not(.search) {
+    .category-buttons { gap: $space-sm; }
+
+    .btn-star,
+    .btn-tag {
+      font-size: 0.9rem;
+      line-height: 1.2;
+      color: $color-text;
+
+      &:hover:not(.active) { color: var(--chip-hover, #{$color-text}); }
+    }
+  }
+
+  &.category--star           { --chip-hover: #{$color-star-active}; }
+  &.category--mood           { --chip-hover: #{$color-mood-active}; }
+  &.category--practicalities { --chip-hover: #{$color-practicalities-active}; }
 
   .category-buttons {
     display: flex;

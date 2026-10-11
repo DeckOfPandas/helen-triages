@@ -612,6 +612,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §13 · #1288 · THE OMNISEARCH BOX STAYS LOCAL-ONLY. Built for the live header, looked at four ways, and not done.
 - 2026-10-08 · §13 · #1322 · again — 15px OVER THE DOOR'S ROW AS WELL AS UNDER IT. The "0 over" above lasted an afternoon.
 - 2026-10-10 · §13 · #1324 #1325 #1328 #1354 #1357 #1358 · SIX SMALL DESIGN JOBS IN ONE PR, AND NONE OF THEM WENT ON A CANDIDATES PAGE.
+- 2026-10-11 · §13 · #1219 · ONE CHIP ON BOTH INDEXES: COCKTAILS' TYPE, FOOD'S TAPE. FOOD'S HEADINGS AT COCKTAILS' SIZE. AND THE PHONE FOLD, CHOSEN ON THE 10TH, IS NOT BUILT.
 - 2026-08-11 · §14 · Built at Helen's request from 15 draft tables in _food_drafts/reference-info/.
 - 2026-08-13 · §14 · "Out at", never "pull at": pull is American.
 - 2026-08-14 · §14 · #183 · The single page split into temperatures and timings (#183/#189/#202).

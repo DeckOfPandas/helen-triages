@@ -612,6 +612,47 @@
 .drink-filter--mood   .btn-mood.is-on  { background: $color-heading-mood; }
 .drink-filter--hassle .btn-mood.is-on  { background: $color-heading-hassle; }
 
+// THE TAPE, ON EVERY CHIP -- #1219, 2026-10-11. Helen, from the control-layer
+// candidates page: "I find myself wanting to add the tape to the cocktail
+// tags", then "I'm leaning towards F -- cocktail chips, and tape on both
+// sites!" Everything about the chip above is unchanged; what is new is the
+// torn shape behind it, which is food's (`.tag-shape`, shared/_tag-shape.scss,
+// one set of artwork for both sites).
+//
+// THIS REVERSES "JUST NOT THE BACKGROUND SHAPE" (2026-08-30, above), and
+// she said so herself: "I do know this was supposed to be an exercise in
+// editing". The fills she found too loud then were ten solid boxes; this is
+// 15% of the text colour at rest.
+//
+// FOOD'S THREE STEPS, IN THIS SITE'S COLOURS: 15% of the text colour at rest,
+// 40% under the pointer, the section's own hue when chosen -- the same three
+// variables the block used, so a chosen chip still answers its heading.
+//
+// THE BLOCK ABOVE STAYS AS THE FALLBACK, AND `:has()` IS WHAT RETIRES IT. A
+// chosen chip's word is the page's dark ground; if the artwork has not
+// arrived, with no block it would be dark on dark and unreadable, which food
+// never risks because its word is dark on paper either way. So the flat block
+// shows until the slot actually holds a shape, and then gives way to it.
+//
+// `isolation: isolate` because the slot sits at z-index -1: without a
+// stacking context of the chip's own it would paint behind the panel.
+.btn-mood,
+.btn-chaos {
+  position: relative;
+  isolation: isolate;
+  white-space: nowrap;
+
+  .tag-shape { color: rgba($color-text, 0.15); }
+
+  &:hover:not(.is-on) .tag-shape { color: rgba($color-text, 0.4); }
+
+  &.is-on:has(.tag-shape svg) { background: none; }
+}
+
+.drink-filter--chaos  .btn-chaos.is-on .tag-shape { color: $color-heading-yolo; }
+.drink-filter--mood   .btn-mood.is-on  .tag-shape { color: $color-heading-mood; }
+.drink-filter--hassle .btn-mood.is-on  .tag-shape { color: $color-heading-hassle; }
+
 // BIGGER, WHITE, AND HOVERING TO MAGENTA — Helen's settings, 2026-09-02.
 //
 // THE REST STATE GOING TO WHITE IS WHAT FORCES THE HOVER TO CHANGE, and the two
