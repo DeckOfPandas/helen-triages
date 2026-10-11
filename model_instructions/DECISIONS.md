@@ -1907,6 +1907,32 @@ unless stated.
     proofread baseline moved for the three published files in a commit of its
     own. `test_incidental_not_in_main_ingredients` learned that a flagged line
     may share its name with a real one.
+- **2026-10-11** — **On the shopping list, a yield that is ONE named thing is
+  counted as that thing, not as a batch.** Helen, during the drafts tag
+  review, on moving four yields from `serves:` to `makes:`: *'anything that
+  creates a batch should get "makes" -- I don't want to tell anyone what a
+  portion size of biscuits is!!!! We just did some work to improve the
+  shopping list for "makes" items -- we now display e.g. "2 batches of 12
+  cookies". When the "makes" contains a word like cake, or something that
+  doesn't make a "batch", we should do the same, so "two 13x9-in
+  traybakes".'*
+  - **What it replaced.** `makes: "one 8-inch cake"` read "2 batches of
+    Beetroot Chocolate Cake": #1297 dropped the figure for a count of one
+    because "2 batches of 1 Beetroot Chocolate Cake" was worse, and the thing
+    went with it. 19 recipes were in that state, 7 of them published — cakes,
+    a pie, a dozen mince pies, six jars, a tin, a traybake.
+  - **What it says now**: "[2] × 8-inch cakes: Beetroot Chocolate Cake",
+    "[2] jars: Peanut Sauce", "[2] dozen mince pies: …". The words are the
+    recipe page's own (#1286): plural above one, `dozen` invariable, a `×`
+    before a thing that opens with a digit.
+  - **A colon before the title is a session's choice, not hers.** "of" suits
+    a jar and fails a pie ("2 pies of Lemon Meringue Pie"); the colon reads
+    the same for all nineteen. Put to her with the examples.
+  - **It needs the noun.** 31 drafts say `makes: "12"` and nothing else, so
+    their rows stay "batches of" the title, without even the 12. Reported to
+    her; the fix is in the data, not the list.
+  - **The recipe page was already right** ("1 × 8-inch cake", "2 × 8-inch
+    cakes") and is untouched.
 
 ---
 

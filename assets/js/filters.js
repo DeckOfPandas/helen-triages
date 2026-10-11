@@ -1582,8 +1582,9 @@ function renderResultsPool() {
   }
 
   /* "18 Peanut Butter Cookies", or the title alone. THE FIGURE IS SHOWN ONLY
-     FOR A COUNT ABOVE ONE: "2 batches of 1 Lemon Drizzle Cake" and "2 batches
-     of 750 ml Blackberry Gelato" both read worse than the name by itself. */
+     FOR A COUNT ABOVE ONE: "2 batches of 750 ml Blackberry Gelato" reads
+     worse than the name by itself, and a yield of ONE thing is not a batch
+     at all -- countWord() below names the thing instead. */
   function batchThing(url, title) {
     var made = RECIPES[url].m;
     // `makes: "3 batches (...)"` counts batches already: "batch of 3" is noise.
@@ -1594,9 +1595,50 @@ function renderResultsPool() {
     return title;
   }
 
+  /* --- A YIELD THAT IS ONE NAMED THING IS COUNTED AS THAT THING --------------
+     Helen, 2026-10-11: 'we now display e.g. "2 batches of 12 cookies". When
+     the "makes" contains a word like cake, or something that doesn't make a
+     "batch", we should do the same, so "two 13x9-in traybakes".' Nobody bakes
+     a batch of one cake; they bake two cakes.
+
+     So `makes: "one 8-inch cake"` reads "[2] × 8-inch cakes: Beetroot
+     Chocolate Cake", and `makes: "1 jar"` reads "[2] jars: Peanut Sauce". It
+     replaced "2 batches of Beetroot Chocolate Cake", which dropped the thing
+     because "2 batches of 1 Beetroot Chocolate Cake" read worse still.
+
+     THE WORDS ARE THE RECIPE PAGE'S OWN (food-scale.js `thingText`, which
+     this page does not load): the noun takes its plural above one, `dozen
+     mince pies` never changes, and a thing that opens with a digit gets a
+     `×`, because the box is a number and "2 8-inch cakes" is unreadable.
+
+     A COLON, NOT "of", BEFORE THE TITLE. "2 jars of Peanut Sauce" is fine and
+     "2 pies of Lemon Meringue Pie" is not; the colon reads the same for
+     both. */
+  function singleThing(url) {
+    var made = RECIPES[url] && RECIPES[url].m;
+    return (made && made.kind === 'count' && Number(made.base) === 1 &&
+      made.stem) ? made : null;
+  }
+
+  function thingWords(made, n) {
+    var stem = String(made.stem);
+    if (!made.invariable && n > 1) stem = HTF.shoppingList.unitLabel(stem, 2);
+    return (made.times ? '× ' : '') + stem + String(made.rest || '');
+  }
+
   function countWord(url, n) {
+    var thing = singleThing(url);
+    if (thing) return thingWords(thing, n) + ':';
     if (isBatch(url)) return n > 1 ? 'batches of' : 'batch of';
     return n === 1 ? 'portion of' : 'portions of';
+  }
+
+  /* What a screen reader is told the box counts: "batches of", or the thing
+     in the plural ("8-inch cakes:"), since the label does not change as the
+     number does. */
+  function boxLabel(url) {
+    var thing = singleThing(url);
+    return thing ? thingWords(thing, 2).replace(/^× /, '') + ': ' : 'batches of ';
   }
 
   /* WHAT THE RECIPE SAYS ITS YIELD IS, in its own words and its own key.
@@ -1669,7 +1711,7 @@ function renderResultsPool() {
             '" max="99" step="' + floor + '" inputmode="decimal" value="' + batches + '" ' +
             'data-url="' + HTF.escapeHtml(url) + '" data-batches ' +
             'title="' + HTF.escapeHtml(title + makes) + '" ' +
-            'aria-label="batches of ' + HTF.escapeHtml(title + makes) + '">' +
+            'aria-label="' + HTF.escapeHtml(boxLabel(url) + title + makes) + '">' +
             '<span><span class="shopping-list-count-word">' + countWord(url, batches) +
             '</span> ' + HTF.escapeHtml(batchThing(url, title)) + '</span>' +
             '</li>';

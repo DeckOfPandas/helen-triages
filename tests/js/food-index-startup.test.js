@@ -115,7 +115,36 @@ const TITLES = {
   '/food/recipes/a/': 'Aubergine thing',
   '/food/recipes/b/': 'Beetroot cake',
   '/food/recipes/gelato/': 'Blackberry gelato',
-  '/food/recipes/cookies/': 'Peanut Butter Cookies'
+  '/food/recipes/cookies/': 'Peanut Butter Cookies',
+  // Only in the list when a test passes SINGLE_THINGS as `options.recipes`.
+  '/food/recipes/cake/': 'Beetroot Chocolate Cake',
+  '/food/recipes/sauce/': 'Peanut Sauce',
+  '/food/recipes/pies/': 'Mince Pies'
+};
+
+/* THREE `makes:` RECIPES WHOSE YIELD IS ONE NAMED THING, as
+   _plugins/food_yield.rb reads "one 8-inch cake", "1 jar" and "1 dozen mince
+   pies". None is offered a half: a yield has to halve to at least one of
+   itself. Passed as `options.recipes`, so the standing fixture keeps its four. */
+const SINGLE_THINGS = {
+  '/food/recipes/cake/': {
+    p: 12, e: true, y: 'one 8-inch cake', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: '8-inch cake', rest: '', box: '1',
+      singular: true, times: true, invariable: false },
+    i: [{ a: '250 g', n: 'plain flour', s: 'cupboard' }]
+  },
+  '/food/recipes/sauce/': {
+    p: 4, e: true, y: '1 jar', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: 'jar', rest: '', box: '1',
+      singular: true, times: false, invariable: false },
+    i: [{ a: '200 g', n: 'peanuts', s: 'cupboard' }]
+  },
+  '/food/recipes/pies/': {
+    p: 12, e: true, y: '1 dozen mince pies', k: 'makes', w: true, h: false,
+    m: { kind: 'count', base: 1, stem: 'dozen mince pies', rest: '', box: '1',
+      singular: true, times: false, invariable: true },
+    i: [{ a: '300 g', n: 'mincemeat', s: 'cupboard' }]
+  }
 };
 
 /* `data-ingredients` -- main_ingredients, comma-joined as food/index.html
@@ -564,6 +593,60 @@ test('the figure after "of" is shown only for a count above one', () => {
   showTheList(doc);
   assert.strictEqual(recipesHtml(panel).replace(/<[^>]*>/g, '').trim(),
     'batch of Blackberry gelato');
+});
+
+// --- a yield that is ONE named thing is counted as that thing ------------------
+// Helen, 2026-10-11: 'When the "makes" contains a word like cake, or something
+// that doesn't make a "batch", we should do the same, so "two 13x9-in
+// traybakes".' These rows read "batches of Beetroot Chocolate Cake" until then.
+
+const rowText = (panel) => recipesHtml(panel).split('</li>')
+  .map((row) => row.replace(/<[^>]*>/g, '').trim()).filter(Boolean);
+
+test('one cake is a cake, not a batch: the row names the thing made', () => {
+  const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
+  win.HTF.shortlist.toggle('/food/recipes/cake/');
+  win.HTF.shortlist.toggle('/food/recipes/sauce/');
+  win.HTF.shortlist.toggle('/food/recipes/pies/');
+  showTheList(doc);
+
+  assert.deepStrictEqual(rowText(panel), [
+    // A thing that opens with a digit takes a ×: the box before it is a number.
+    '× 8-inch cake: Beetroot Chocolate Cake',
+    'jar: Peanut Sauce',
+    'dozen mince pies: Mince Pies'
+  ]);
+  const html = recipesHtml(panel);
+  assert.ok(!/batch/.test(html.replace(/data-batches/g, '')
+    .replace(/shopping-list-recipe--first-batch/g, '')), html);
+  // The label cannot move with the number, so it is the plural, without the ×.
+  assert.ok(html.includes('aria-label="8-inch cakes: Beetroot Chocolate Cake, which makes one 8-inch cake"'), html);
+  assert.ok(html.includes('aria-label="jars: Peanut Sauce'), html);
+});
+
+test('two of them take the plural, and a dozen stays a dozen', () => {
+  const { win, doc, panel } = boot({ recipes: SINGLE_THINGS });
+  ['cake', 'sauce', 'pies'].forEach((slug) => {
+    win.HTF.shortlist.toggle('/food/recipes/' + slug + '/');
+    win.HTF.shortlist.setBatches('/food/recipes/' + slug + '/', 2);
+  });
+  showTheList(doc);
+
+  assert.deepStrictEqual(rowText(panel), [
+    '× 8-inch cakes: Beetroot Chocolate Cake',
+    'jars: Peanut Sauce',
+    'dozen mince pies: Mince Pies'
+  ]);
+  assert.match(aislesHtml(panel), /500 g/, 'and two cakes is twice the flour');
+});
+
+test('a count above one is still batches of that many', () => {
+  // The cookies are untouched by the rule above: 18 of something is a batch.
+  const { win, doc, panel } = boot();
+  win.HTF.shortlist.toggle('/food/recipes/cookies/');
+  win.HTF.shortlist.setBatches('/food/recipes/cookies/', 2);
+  showTheList(doc);
+  assert.deepStrictEqual(rowText(panel), ['batches of 18 Peanut Butter Cookies']);
 });
 
 test('NO PORTION FIGURE IS PRINTED FOR A `makes:` RECIPE, anywhere on its row', () => {

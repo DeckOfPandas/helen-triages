@@ -1304,7 +1304,8 @@ principle, but because that's meaningless.'*).
     [7]   portions of Moules Marinière             serves:, one person at a time
     [2]   batches of 12 Grandma's Fairy Cakes      makes: a count above one
     [0.5] batch of Ben's Chocolate Ice Cream       makes: a measure; ½ offered
-    [1]   batch of Beetroot Chocolate Cake         makes: "one 8-inch cake"
+    [2]   × 8-inch cakes: Beetroot Chocolate Cake  makes: "one 8-inch cake"
+    [1]   jar: Peanut Sauce                        makes: "1 jar"
 
 - **The three figures are the recipe page's own** (#1286, below): the blob
   carries `w` (`page.whole_recipes`), `h` (`page.half_recipe`) and `m`
@@ -1312,9 +1313,19 @@ principle, but because that's meaningless.'*).
   `_plugins/food_half_recipe.rb` allows), 1, 2, 3 and never 1½ — the same
   steps as that recipe's own page.
 - **The figure after "of" is what ONE batch makes and never moves.** It is
-  shown only for a count above one: "2 batches of 1 Lemon Drizzle Cake" and
-  "2 batches of 750 ml Gelato" read worse than the name alone, and a yield
-  that is itself "3 batches" shows none. `batchThing` in `filters.js`.
+  shown only for a count above one: "2 batches of 750 ml Gelato" reads worse
+  than the name alone, and a yield that is itself "3 batches" shows none.
+  `batchThing` in `filters.js`.
+- **A YIELD THAT IS ONE NAMED THING IS COUNTED AS THAT THING, NOT AS A
+  BATCH** (Helen, 2026-10-11: *'When the "makes" contains a word like cake, or
+  something that doesn't make a "batch", we should do the same, so "two
+  13x9-in traybakes".'*). `makes: "one 8-inch cake"` reads "× 8-inch cakes:"
+  and then the title; `"1 jar"` reads "jars:"; `"1 dozen mince pies"` keeps
+  its dozen. The words are the recipe page's (`thingText` in `food-scale.js`):
+  plural above one, a `×` before a thing that opens with a digit. A colon
+  joins it to the title because "2 pies of Lemon Meringue Pie" does not read.
+  `singleThing` and `countWord` in `filters.js`. **It needs the noun**: a
+  `makes: "12"` has nothing to name and stays "batches of" the title.
 - **"Set all to N portions" sets the `serves:` rows and skips the batch
   rows.** Converting would have to decide how many cookies a portion is. This
   is the skip #815 removed; it is back because the row it skips now says
