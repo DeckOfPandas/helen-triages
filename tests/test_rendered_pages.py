@@ -2030,8 +2030,8 @@ def test_both_ingredient_pickers_mark_their_word_matches(site):
         "The two ingredient pickers have drifted apart:\n  " + "\n  ".join(problems)
         + "\n\nThey share one code path and one set of ranked results (MANUAL "
           "8.1). A match treatment on one and not the other is drift. The shared "
-          "emphasis lives in _sass/food/_buttons.scss as @mixin "
-          "word-match-emphasis($colour); each picker passes its own section "
+          "emphasis lives in _sass/shared/_rule.scss as @mixin "
+          "index-chip-word-match($colour); each picker passes its own "
           "colour."
     )
 
@@ -2712,15 +2712,21 @@ def test_a_control_with_no_colouring_rule_is_reported():
 WORD_MATCH = ".btn-pool--word-match"
 PICKER_SECTIONS = ("drink-search--include", "drink-search--exclude")
 
-# `text-decoration` and its longhand. The mark is an underline; a shorthand
-# `text-decoration: none` and a longhand `text-decoration-line: none` cancel it
-# identically, and only one of the two was ever written here.
+# THE MARK IS A STROKE SINCE 2026-10-11, when both pools took food's chip
+# (@mixin index-chip-word-match: the hit's colour, and a stroke in it for
+# weight). It was an underline, and this read `text-decoration`. What can cancel
+# a stroke is its shorthand or its width going to zero; `-color` is not matched,
+# because the hover rule moves that and is not unstyling anything.
 DECORATION = re.compile(
-    r"(?<![-\w])text-decoration(?:-line)?\s*:\s*([^;}]+)")
+    r"(?<![-\w])-webkit-text-stroke(?:-width)?\s*:\s*([^;}]+)")
+
+
+def _is_no_stroke(value):
+    return value.strip() in ("0", "none") or value.strip().startswith(("0 ", "0px"))
 
 
 def _word_match_decoration(css: str):
-    """Effective text-decoration for the mark, per picker section.
+    """Effective stroke for the mark, per picker section.
 
     Returns {section: value|None}. `None` means no rule in that section's
     cascade says anything, so the base rule stands.
@@ -2752,6 +2758,10 @@ def test_the_word_match_mark_survives_in_both_pickers(site):
     Helen, 2026-09-02, settling it: "the chip underline rule should be the same
     between has to have and leave out, namely that prefix matching of any word
     gets the pink whereas substring matching does not."
+
+    The mark changed on 2026-10-11 and the rule did not: a hit is heavier in
+    both pools (a stroke), in magenta under HAS TO HAVE and in the resting
+    grey under LEAVE OUT, which is food's treatment on both sites.
     """
     css_path = site / "assets" / "css" / "cocktails.css"
     assert css_path.exists(), "cocktails.css was not built."
@@ -2764,16 +2774,16 @@ def test_the_word_match_mark_survives_in_both_pickers(site):
     )
 
     base, per_section = _word_match_decoration(css)
-    assert base and base != "none", (
-        f"the base `{WORD_MATCH}` rule declares text-decoration "
-        f"{base!r}. The mark IS the underline; without it the class is emitted "
+    assert base and not _is_no_stroke(base), (
+        f"the base `{WORD_MATCH}` rule declares -webkit-text-stroke "
+        f"{base!r}. The mark IS the stroke; without it the class is emitted "
         f"and paints nothing."
     )
 
     cancelled = [
-        f"{name}: text-decoration {value!r}"
+        f"{name}: -webkit-text-stroke {value!r}"
         for name, value in per_section.items()
-        if value is not None and value.strip() == "none"
+        if value is not None and _is_no_stroke(value)
     ]
     assert not cancelled, (
         "One picker cancels the word-match mark that the other one shows. This "
@@ -2811,28 +2821,34 @@ def test_the_decoration_resolver_sees_a_cancelling_rule():
     Without this the resolver could return `None` for everything and the test
     above would pass on a stylesheet that cancels the mark in both pickers.
     """
-    good = (".btn-pool--word-match { text-decoration: underline; }"
+    good = (".btn-pool--word-match { color: #f0c; -webkit-text-stroke: 0.5px #f0c; }"
             ".drink-search--exclude .btn-pool--word-match { color: #eee; }")
     base, sections = _word_match_decoration(good)
-    assert base == "underline"
+    assert base == "0.5px #f0c"
     assert sections["drink-search--exclude"] is None
 
-    # The rule as it actually stood, and the reason the issue exists.
+    # #653's shape, in the mark's present terms: one section styling it away.
     bad = good + (".drink-search--exclude .btn-pool--word-match "
-                  "{ text-decoration: none; }")
+                  "{ -webkit-text-stroke: 0; }")
     base, sections = _word_match_decoration(bad)
-    assert sections["drink-search--exclude"] == "none", (
+    assert _is_no_stroke(sections["drink-search--exclude"]), (
         "the resolver did not see a sectioned rule cancelling the mark."
     )
 
     # The longhand cancels identically and must not slip past.
     longhand = good + (".drink-search--include .btn-pool--word-match "
-                       "{ text-decoration-line: none; }")
+                       "{ -webkit-text-stroke-width: 0px; }")
     _, sections = _word_match_decoration(longhand)
-    assert sections["drink-search--include"] == "none"
+    assert _is_no_stroke(sections["drink-search--include"])
 
-    # `text-decoration-color` is not the mark going away.
-    assert DECORATION.search("text-decoration-color: red") is None
+    # A section restating the stroke in its own colour is not a cancellation.
+    restated = good + (".drink-search--exclude .btn-pool--word-match "
+                       "{ -webkit-text-stroke: 0.5px #aaa; }")
+    _, sections = _word_match_decoration(restated)
+    assert not _is_no_stroke(sections["drink-search--exclude"])
+
+    # `-webkit-text-stroke-color` is not the mark going away.
+    assert DECORATION.search("-webkit-text-stroke-color: red") is None
 
 
 # =============================================================================

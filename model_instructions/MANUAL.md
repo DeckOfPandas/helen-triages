@@ -4499,6 +4499,13 @@ it by a hash of the chip's words — **a new chip class must be added to its
 host list or it silently gets no shape**. Each site keeps its own colours.
 Food's section headings are cocktails' SIZE (1.4rem) and keep their own
 weight and tracking, which on cocktails are corrections for a dark ground.
+**The chips in the two search pools are one chip too, and it is food's**:
+`@mixin index-chip` and its three companions in `shared/_rule.scss`,
+included by food's `.btn-tag` and cocktails' `.btn-pool`, colours as
+arguments. A HAS TO HAVE hit takes the section's colour; a LEAVE OUT hit is
+the resting grey, heavier. Chosen LEAVE OUT chips sit above the candidates
+on both. **Every clear is `@mixin index-clear-link`: text colour, magenta
+under the pointer, never a section's hue.**
 **The panel does not fold on a phone, and that was tried**: Helen chose a
 fold from a candidates page and took it back the next day — *"The site is
 for me, and on my iPad I can see everything at the same time just fine,

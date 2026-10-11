@@ -15,22 +15,16 @@
 // background's visual weight; category colour only appears once a filter is
 // actually chosen (.active rules below) — same principle as the existing
 // active-state colour pop, extended to the shape itself.
+//
+// THE DECLARATIONS ARE @mixin index-chip IN shared/_rule.scss SINCE
+// 2026-10-11, unchanged: cocktails' search-pool chip is this chip now, and
+// including one mixin is how the two stay one. $chip-rest is the softened
+// ink every resting chip and every unmatched candidate wears.
+$chip-rest: lighten($color-text, 22%);
+
 .btn-tag,
 .btn-star {
-  position: relative;
-  display: inline-block;
-  font-family: $font-headings;   // NOT $font-label -- see _palette.scss
-  white-space: nowrap;
-  text-transform: lowercase;
-  font-weight: 700;
-  border: none;
-  background: none;
-  color: lighten($color-text, 22%);
-  padding: $space-xs $space-md;
-  cursor: pointer;
-  font-size: 0.75rem;
-  margin: 0.2rem 0.45rem 0.2rem 0;
-  transition: all 0.1s ease-in-out;
+  @include index-chip($chip-rest);
 
   // Resting alpha: 0.35 -> 0.25 -> 0.15, two rounds of "lighten a little"
   // (Helen, 2026-08-03).
@@ -115,10 +109,8 @@
 // already records that this family of strokes drifts across type sizes and
 // wants its own em constant one day. This is the third instance, noted rather
 // than fixed in a styling issue.
-@mixin word-match-emphasis($colour) {
-  color: $colour;
-  -webkit-text-stroke: 0.5px $colour;
-}
+// THE MIXIN IS shared/_rule.scss's `index-chip-word-match` SINCE 2026-10-11 --
+// it was `word-match-emphasis` here, and cocktails' pools include it too now.
 
 .btn-ingredient--word-match {
   // font-weight has nowhere left to go -- these are already font-weight:
@@ -133,7 +125,7 @@
   // stroke already use site-wide to read heavier than the font alone can
   // render. Same colour as the fill, not a separate darker value, so it
   // reads as "thicker green" rather than a mismatched outline.
-  @include word-match-emphasis($color-ingredient-active);
+  @include index-chip-word-match($color-ingredient-active);
 }
 
 // The same emphasis on the LEAVE OUT picker. It was that section's own
@@ -142,6 +134,13 @@
 // the cocktails site does -- Helen's ruling there: "the chip underline rule
 // should be the same between has to have and leave out". A word match is the
 // same fact in both pickers, and one colour says so.
+//
+// AND THE BASE GREY SINCE 2026-10-11. Helen: "For the food leave out search,
+// hit search results should be a normal base grey (just heavier for hits, as
+// currently), rather than taking their colour from the section." So a hit
+// here is the resting chip's own colour with the stroke: weight, no hue. The
+// same fact is still marked in both pickers (#390); only HAS TO HAVE spends
+// a colour on it. Cocktails' LEAVE OUT does the same.
 .btn-exclude--word-match {
-  @include word-match-emphasis($color-ingredient-active);
+  @include index-chip-word-match($chip-rest);
 }

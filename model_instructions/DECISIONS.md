@@ -9959,15 +9959,38 @@ verification. Dates are when the correction landed.
   - **The cost is all food's.** Panel at 1280px: 476 to 558px, first recipe
     824 to 906px down. At 390px: 815 to 1033px, first recipe 1128 to 1346px.
     Cocktails measures exactly as before (517 / 953px; 985 / 1433px).
-  - **Cocktails' two search pools, the same day, matched to food.** *"add
-    the tape on has to have, and drop the outline on leave out."* A chosen
-    HAS TO HAVE chip wears the tape in its heading's magenta, inset to the
-    tight box #1134 measured for the block it replaces. LEAVE OUT's chips
-    lose their dashed box at rest and chosen. **Read literally: HAS TO
-    HAVE's candidates keep their outline**, because she named leave out's
-    and the 2026-09-02 hover ruling (*"mouseover outlines the box"*)
-    depends on the box. Food's candidates have none; ask before taking it.
-    *"The styling for the three search groups is perfect"* is about food's.
+  - **Cocktails' two search pools are food's, from food's code — two passes
+    the same day.** First: *"add the tape on has to have, and drop the outline
+    on leave out"*, which I read literally and built as an inset tape with HAS
+    TO HAVE's candidates still boxed. She corrected the reading: *"I would
+    like the cocktail has to have and leave out search results to take all
+    their styling from food's. So the tape in has to have should be the same
+    size with the same spacing (can we reuse the code? if not then why not?),
+    search results appear in courier with the same spacing and the analogous
+    woo woo (start with this even if we then need to tune for visibility), no
+    outline or underline at rest, all of it. Same for leave out."* **When she
+    says match, she means all of it; do not ration it against an older
+    ruling.** The code is reused: four mixins in `shared/_rule.scss`
+    (`index-chip`, `-word-match`, `-chosen`, `-struck`) that food's `.btn-tag`
+    and cocktails' `.btn-pool` both include, with colours as arguments. That
+    retires the 1.5px box, the box-moves-on-hover ruling, #1134's tight
+    block and #549's magenta underline. A HAS TO HAVE hit is the hot magenta,
+    **untuned at her word**. Cocktails keeps the × on a chosen HAS TO HAVE
+    chip, the "(via)" bracket and "+N more".
+  - **A LEAVE OUT hit is the base grey, heavier, on both sites.** *"For the
+    food leave out search, hit search results should be a normal base grey
+    (just heavier for hits, as currently), rather than taking their colour
+    from the section."* It had borrowed HAS TO HAVE's tone since 2026-09-04.
+    Both pickers still mark a hit (#390); only HAS TO HAVE spends a hue.
+  - **Food's chosen LEAVE OUT pills sit above the candidates**, as
+    cocktails' do: *"retains selected terms at the top of the list when
+    further searches are made, which I prefer"*.
+  - **Every clear, on both sites, is the text colour and goes magenta under
+    the pointer.** *"I'm fed up with the clear and clear all buttons! Please
+    show each one in normal link colours, so not derived from the section
+    colour. Normal base text, site colour on hover (both woo woo)."* One
+    mixin, `index-clear-link`. This ends the per-section clear colours on
+    food and the grey on cocktails (2026-09-02) and on both clear-alls.
   - **"hiding gin" under cocktails' LEAVE OUT**, food's #1088 line word for
     word, after the chosen chips and ending its row.
   - **Cocktails' pickers answer from the first character**

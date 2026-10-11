@@ -47,11 +47,12 @@
 //
 // Before adding a property here, ask whether it can change a box's size. If it
 // can, it belongs on the resting base as well or not at all.
-%btn-active-base {
-  text-transform: uppercase;
-  font-weight: 900;
-  background-color: rgba($color-text, $saturation-badge-bg);
-}
+//
+// `%btn-active-base` STOOD HERE AND IS @mixin index-chip-chosen IN
+// shared/_rule.scss SINCE 2026-10-11. Its last consumer was the chosen HAS
+// TO HAVE chip (_search.scss), and cocktails' chosen HAS TO HAVE chip is that
+// chip now, so the declarations moved to where both can include them. The
+// warning above went with them and still binds.
 
 // --- Filter Label Bases & Background Highlighters ---------------------------------
 // --- Index density ----------------------------------------------------------
@@ -205,7 +206,9 @@
     border: 0;
     background: none;
     padding: 0;
-    color: inherit;
+    // Text colour at rest, the site's magenta under the pointer, for every
+    // clear on the page -- @mixin index-clear-link, 2026-10-11.
+    @include index-clear-link($color-accent);
 
     font-family: $font-body;
     font-size: 0.78rem;
@@ -218,17 +221,11 @@
     white-space: nowrap;
   }
 
-  // Inline clear colours per group — hover lightens to the raw root hue,
-  // same "hover goes lighter" rule article.recipe a and .btn-clear itself
-  // both already follow, rather than the previous opacity fade (a second,
-  // unrelated hover mechanism).
-  &.category--star      { .btn-clear-inline { color: $color-star-active;           &:hover { color: $color-star-root; } } }
-  &.category--mood      { .btn-clear-inline { color: $color-mood-active;           &:hover { color: $color-mood-root; } } }
-  &.category--practicalities { .btn-clear-inline { color: $color-practicalities-active; &:hover { color: $color-practicalities-root; } } }
-  // The two searches never had one. They do now, for the same reason the other
-  // three do: the clear link belongs to its section and should say so.
-  &.search--ingredients { .btn-clear-inline { color: $color-ingredient-active;     &:hover { color: $color-ingredient-root; } } }
-  &.search--name        { .btn-clear-inline { color: $color-name-search-active;    &:hover { color: $color-name-search-root; } } }
+  // FIVE PER-SECTION CLEAR COLOURS STOOD HERE AND ARE GONE, 2026-10-11 --
+  // each section's clear rested in the dark of its hue and lightened to the
+  // hue. Helen: "I'm fed up with the clear and clear all buttons! Please
+  // show each one in normal link colours, so not derived from the section
+  // colour." The one colour rule is in .btn-clear-inline above.
 
   // Active states -- compound selectors (.category--star .btn-star.active)
   // have higher specificity than the base .btn-tag/.btn-star rule above,

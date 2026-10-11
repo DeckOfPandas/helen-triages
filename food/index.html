@@ -175,7 +175,7 @@ permalink: /food/
 
        #exclude-active USED TO LIVE OUTSIDE THE PANEL ON PURPOSE, so the chosen
        pills survived the panel being dismissed. There is no panel and no
-       dismiss, so that reason is spent -- the pills sit under the pool because
+       dismiss, so that reason is spent -- the pills sit in the section because
        that is where the answers to this question go. {% endcomment %}
     <div class="category search search--exclude">
       <div class="search-input">
@@ -192,9 +192,12 @@ permalink: /food/
          and pearl barley is correct, because you then pick the one you
          meant, and what gets picked is matched as a whole entry rather than
          as a substring. {% endcomment %}
-      <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
-
+      {% comment %} ABOVE THE POOL SINCE 2026-10-11, so what is already left
+         out stays at the top while you search for the next thing, as on
+         cocktails. It sat under the pool until then. {% endcomment %}
       <div class="exclude-active" id="exclude-active" aria-live="polite"></div>
+
+      <div class="category-buttons search-results" id="exclude-results-pool" aria-live="polite"></div>
     </div>
   </div>
 

@@ -294,33 +294,9 @@
 // specifically; it has nothing to do with the buttons, links and pills below,
 // which stay neutral exactly as this comment already argues.)
 .controls .search--exclude {
-  // THIS RULE WAS DEFENSIVE AND NO LONGER NEEDS TO BE, which is worth saying
-  // rather than deleting. While .search--exclude lived INSIDE .search--name,
-  // #exclude-search-clear was a descendant of .category.search--name too, so
-  // _category-labels.scss's
-  // `&.search--name { .btn-clear-inline { color: $color-name-search-active } }`
-  // reached in and painted it I KNOW WHAT I WANT's hot orange. This rule was
-  // restated at equal specificity to hold it off.
-  //
-  // #586 made the section a sibling, so nothing reaches in any more. The
-  // declaration stays because it is this section's own colour on its own
-  // terms -- it says which hue LEAVE OUT owns, not merely which one it
-  // refuses -- and that was already the reason it named the value outright
-  // instead of using `inherit`.
-  .btn-clear-inline {
-    // $color-exclude-active, the same $darken-active treatment every other
-    // section's clear button gets from its own root hue -- Helen, 2026-08-16.
-    // (A NEUTRAL SINCE 2026-09-04: LEAVE OUT spends no hue any more, see
-    // _palette.scss. The variable and the reasoning below both survive.)
-    // This used to be `inherit`, which was the safe answer when the concern
-    // was only "don't let I KNOW WHAT I WANT's hot orange leak in through the
-    // nesting". Naming the colour outright settles that better than inherit
-    // did: it cannot be reached by the parent rule described above, and it
-    // says which hue this section owns instead of merely which one it refuses.
-    color: $color-exclude-active;
-
-    &:hover { color: $color-text; }
-  }
+  // LEAVE OUT'S CLEAR HAD ITS OWN COLOUR RULE HERE UNTIL 2026-10-11 (grey,
+  // to ink under the pointer). Every clear takes one rule now -- see
+  // .btn-clear-inline in _category-labels.scss.
 
   // `.exclude-panel` and `.exclude-panel[hidden]` stood here and are gone with
   // issue #586. One worked example is worth keeping out of them: `hidden` IS
@@ -349,6 +325,12 @@
     display: none;
   }
 
+  // THE PILLS SIT ABOVE THE POOL SINCE 2026-10-11 -- Helen: "the cocktail
+  // leave out search retains selected terms at the top of the list when
+  // further searches are made, which I prefer, so please make food match
+  // that." The div moved in food/index.html; the gap rules below hold either
+  // way round, since each is conditional on its own box having content.
+  //
   // THE PILLS NEED THEIR OWN TOP GAP NOW, and this is a real consequence of
   // #586 rather than a tidy-up. While this section lived inside .search--name
   // it was a flex column with `gap: $index-label-gap`, which spaced the panel
@@ -400,11 +382,10 @@
   // a single text node ("peas ×") struck the × through as well, which reads
   // as "this control is disabled" rather than "this ingredient is out".
   .btn-exclude--active {
-    color: $color-text;
-
-    .btn-exclude-label {
-      text-decoration: line-through;
-    }
+    // The colour, the strike and the hover are @mixin index-chip-struck
+    // (shared/_rule.scss) since 2026-10-11; cocktails' chosen LEAVE OUT chip
+    // includes it too. The hover it emits is the one argued for below.
+    @include index-chip-struck($color-text, $color-exclude-active, '.btn-exclude-label');
 
     // HOVER KEEPS THE STRIKE AND MOVES THE HUE INSTEAD. Issue #364.
     //
@@ -419,10 +400,6 @@
     // deepens toward its section colour under the cursor while still reading as
     // struck out. The pool candidates below go the other way, to the brighter
     // cobalt, which keeps "considering" and "chosen" visually apart.
-    &:hover,
-    &:focus-visible {
-      color: $color-exclude-active;
-    }
   }
 
   // POOL CANDIDATES: DARKER than they rest -- issues #365 then #403. "Cobalt"
@@ -473,11 +450,8 @@
 // a template, since this button is built dynamically as you type — see the
 // comment there for why it's the only ingredient-search button that gets one.
 .search .btn-tag.btn-ingredient.active {
-  @extend %btn-active-base;
+  @include index-chip-chosen($color-text);
   background: none;
-  color: $color-text;
-  text-shadow: none;
-  -webkit-text-stroke: $faux-bold-stroke $color-text;
   .tag-shape { color: mix($color-ingredient-root, $color-white, 82%); }
 }
 
