@@ -1766,9 +1766,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   2026-09-06 (#748): whole fruit and weighed solids that ARE the drink are
   priced, through `fruit_prices` (per piece) and `weight_prices` (per kilo),
   built 2026-09-24. A count or weight with no row is still a flourish (the
-  sugar cube). Not yet confirmed by her (#1371 asks): sugar by weight is
-  priced, the pear Bellini's figure is its batch syrup plus one top, and the
-  fruit and weight prices are a session's supermarket estimates.
+  sugar cube). Asked on 2026-10-11 (#1371) about three things a session had
+  guessed: *"Sugar should be £0 here. It just doesn't matter at this scale!"*
+  (its `weight_prices` rows are zero); the pear Bellini as batch syrup plus one
+  top, *"yes"*; and the estimated prices, *"rough is more than fine. The
+  expensive part of cocktails is absolutely not the fruit..."*
 - **2026-09-05, #547 — a `(top)` is costed as a declared range, `top_up_ml` in
   `costs.yml`.** Helen: *"We can calculate top volumes, well, slightly, can't
   we — I'd like that to be captured actually so it can be added into the
@@ -1936,8 +1938,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-09-05, #722 — an unmade drink's `ship` says `who knows`; `QQ` is not a
   ship value.** Helen: *"I think that's clearer than QQ or leaving it unset,
   because it's a positive presence"*. The page shows it as `???`
-  (`ship_unrated_word` in `taxonomy.yml`), which she said she did not require
-  and which was built anyway. `_dev/no-verdict.html` is the worklist.
+  (`ship_unrated_word` in `taxonomy.yml`), which is not a rating. Helen,
+  2026-10-11: *"The ??? mark means 'I've never made this so I simply don't
+  know'."* `_dev/no-verdict.html` is the worklist.
 
 ### §9.7 / §9.8
 
@@ -2741,9 +2744,9 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-10, #942 — on a phone the head is a grid: tape and tagline full
   width, the glass beside GLASS / GARNISH / SHIP IT?, chips full width
   beneath.** Helen's complaint: *"All cocktail pages have the glass
-  overlapping problem."* The layout is a session's build; her pick between it
-  and a glass-above alternative was never recorded (#1370 asks her), and #995
-  and #1086 were ruled on top of it. On this page only, the tape artwork is scaled so a
+  overlapping problem."* Asked on 2026-10-11 (#1370) to choose between this
+  and a glass-above alternative: *"Definitely what has shipped. I choose what
+  has shipped."* #995 and #1086 were ruled on top of it. On this page only, the tape artwork is scaled so a
   wrapped title's lines stay inside the band.
 - **2026-09-11, #979 — the drink page's meta ends where the title tape's
   column ends.** Helen: *"The metadata line could be bounded by whatever
