@@ -87,6 +87,22 @@ WHAT IT REFUSES, each with the `CLAUDE.md` rule it belongs to:
      "across the board" is what she asked for. Its LOWERCASE sibling
      `git -c key=value` is a different flag and stays allowed -- see below.
      NOT refused, because neither was measured: `--git-dir=` and `--work-tree=`.
+ 11. `$[` OUTSIDE SINGLE QUOTES -- since 2026-10-10. It is the shell's legacy
+     arithmetic (`$[1+2]`), and nobody here means that: it arrives as a regex
+     written in DOUBLE quotes, where a class follows a dollar sign. The call
+     that asked Helen was a read-only grep,
+
+         grep -n -E "max-width: *\\$|^\\$[a-z-]*(phone|stack|width)[a-z-]*:" ...
+
+     and the checker's words were "Legacy $[...] arithmetic inside
+     double-quotes -- recursive subscript eval ... a command the shell parser
+     cannot analyze asks the person". She declined it and asked whether such a
+     call could stop asking. No allow rule can vouch for a command the parser
+     has given up on, so it is refused here instead and lands on the session.
+     In SINGLE quotes the same pattern is inert and passes. A `$` that is
+     itself backslash-escaped (`\$[`) is not this shape; `\\$[` is, because the
+     two backslashes are one escaped backslash and the dollar after them is
+     live. NOT refused, because it was not measured: `${...}`.
 
 WHAT IT DELIBERATELY ALLOWS, because a guard that fires on harmless
 invocations is one you learn to route around (the lesson `guard-destructive-git
@@ -151,6 +167,12 @@ _LEADING_CD = re.compile(r"^\s*cd(\s|$)")
 # the start, because Helen asked for it refused "across the board"; in practice
 # a non-leading one is already inside a chain or a pipe, both refused above.
 _GIT_DASH_C = re.compile(r"(?:^|\s)git\s+-C(?=\s|$)")
+
+# `$[` with a LIVE dollar -- shape 11. Applied to the text with only single
+# quotes stripped, since double quotes do not stop the shell reading it. The
+# lookbehind and the pairs of backslashes are what tell `\$[` (an escaped
+# dollar, inert) from `\\$[` (an escaped backslash, then a live dollar).
+_LEGACY_ARITHMETIC = re.compile(r"(?<!\\)(?:\\\\)*\$\[")
 
 # A glob character in an unquoted token. `?` is deliberately excluded: it is
 # far more often a regex or a URL query than a glob, and `*` is the form every
@@ -265,6 +287,14 @@ def _offence(command: str) -> tuple[str, str] | None:
                 "pass the file: `git commit -F tmp/commit-msg.txt`, "
                 "`gh pr create --body-file tmp/pr-body.md`. Otherwise put the "
                 "whole thing in a script in `tmp/` and run the script")
+
+    if _LEGACY_ARITHMETIC.search(live):
+        return ("`$[` outside single quotes, which the shell reads as legacy "
+                "arithmetic and the checker's parser cannot analyse",
+                "put the pattern in SINGLE quotes, where `$[` is two ordinary "
+                "characters: `grep -n -E '^\\$[a-z-]*width:' _sass/`. If the "
+                "pattern also needs a single quote, put the command in a "
+                "script in `tmp/` and run the file")
 
     if _LEADING_CD.match(bare):
         return ("a leading `cd`, which breaks every prefix-based allow rule",
@@ -394,9 +424,9 @@ def main() -> int:
                 "Quoted text is exempt for `&&`, `||`, `;`, `|` and globs, "
                 "which are inert inside either kind of quote -- EXCEPT a "
                 "quoted `[`, `]` or `|` given to `sh scripts/...`. NOT for "
-                "`$(...)` and backticks: the shell expands those inside "
-                "DOUBLE quotes, so prose about substitution belongs in single "
-                "quotes. Redirection to a static path is fine, `2>&1` "
+                "`$(...)`, backticks and `$[`: the shell reads those inside "
+                "DOUBLE quotes, so prose about substitution, and a regex with "
+                "a class after a dollar, belong in single quotes. Redirection to a static path is fine, `2>&1` "
                 "included -- it is only the pipe that hides a later stage."
             ),
         }

@@ -7960,6 +7960,20 @@ verification. Dates are when the correction landed.
   (#1098). An unquoted parenthesis is a subshell or a parse error and never an
   ordinary argument, so refusing it costs nothing; a quoted or backslash-escaped
   one passes. Tests in `tests/test_agent_wrappers.py` carry the exact command.
+- **2026-10-10: `guard-unanalyzable-bash.py` refuses `$[` outside single
+  quotes, its eleventh shape.** A session grepped the Sass for breakpoint
+  variables with the regex in DOUBLE quotes, a character class after an
+  escaped backslash and a dollar. The checker read `$[` as the shell's legacy
+  arithmetic ("recursive subscript eval ... a command the shell parser cannot
+  analyze asks the person") and put a read-only grep to Helen. She declined it
+  and asked *"Can we adjust settings to allow non-scary requests of this
+  sort?"* Settings cannot: an allow rule is not consulted for a command the
+  parser has given up on, and one broad enough to cover it would vouch for
+  commands nobody can read. So the answer is the one 2026-09-15 gave the
+  unquoted parenthesis: refuse it, and it lands on the session. The same
+  pattern in single quotes is inert and passes, as does a backslash-escaped
+  dollar. `${...}` was not measured and is not refused. Tests in
+  `tests/test_agent_wrappers.py` carry the exact command.
 
 ## §12 Traps — the stories
 
