@@ -782,7 +782,20 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # grant is the one above, for editing the live files in this tag review without
 # flipping the flag. Proved with `135e4487` still in place: this test named
 # exactly those twelve, each "last touched by d563db61", and nothing else.
-BASELINE_COMMIT = "d563db61"   # `fiddly and fun` on twelve published recipes, on Helen's grant
+#
+# MOVED 2026-10-11, FOR ANOTHER NEW TAG AND ONE LINE SHE DICTATED. `d920e1f9`
+# declares the practicality `main` and appends it to 31 published recipes, the
+# ones the subtraction rule leaves no doubt about (none of ten tags); the 40
+# it could not settle were not touched. Her grant, given before the edit:
+# "when we're in agreement about the main tag, you can edit the live recipes to
+# add it without flipping the flag", after "Declare it, please seed by
+# subtraction ... Please go ahead." `9575761d`, behind it, is the scones'
+# `makes:` in her own words ('Grandma's scones should have makes: 8 scones (2
+# large rounds of 4)'), with "Please edit the live scones recipe, no need to
+# flip the proofreading flag". Proved with `d563db61` still in place: this test
+# named exactly those 32 files, 31 "last touched by d920e1f9" and one "by
+# 9575761d", and nothing else.
+BASELINE_COMMIT = "d920e1f9"   # `main` on 31 published recipes and the scones' yield, on Helen's grant
 #
 # MOVED AGAIN, 2026-09-10, LATE -- TWO RECIPES, AND THE BASELINE RATHER THAN
 # HELEN_CLEARED ON PURPOSE. `ae13155` sets `proofread: true` on the tomato
