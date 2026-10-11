@@ -1,6 +1,6 @@
 ---
 title: "Voodoo That You Do"
-tagline: "Who do? You trueDo what? Remind me of an evening class in a Hackney bar where we made love potions, then heard a lecture on schizophrenia and withcraft."
+tagline: "Who do? You do. Do what? Remind me of an evening class in a Hackney bar where we made love potions, then heard a lecture on schizophrenia and witchcraft."
 glass:
   - "coupe"
 garnish:
@@ -8,9 +8,9 @@ garnish:
 meta:
   made_before: true
   ship: "sure"
-  rewritten: false
+  rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
   - "sharp"
   - "aperitivo"
@@ -38,6 +38,6 @@ method:
 notes:
   - label: "Rhum agricoles are like snowflakes"
     text: "Tried with Vaval not Communal, which was fine, but also not right."
-source: "Victor Wynd (Spirits of the Otherworld)"
-source_url: "N/A"
+source: "Viktor Wynd (Spirits of the Otherworld)"
+source_url: ""
 ---

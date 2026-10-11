@@ -5,8 +5,16 @@ glass:
   - "coupe"
 garnish:
   - "no garnish"
-serve:
-  ice: "none"
+meta:
+  made_before: true
+  ship: "sure"
+  rewritten: true
+  awaiting_fix: false
+  proofread: false
+mood:
+  - "sharp"
+  - "tiki"
+  - "sunny terrace"
 ingredients:
   - amount: "45 ml"
     generic: "rhum agricole vieux"
@@ -20,20 +28,12 @@ ingredients:
   - amount: "2 dashes"
     generic: "aromatic bitters"
     suggestion: ["Angostura"]
+serve:
+  ice: "none"
 method:
   - "Shake all ingredients with ice."
   - "Strain."
-mood:
-  - "sharp"
-  - "tiki"
-  - "sunny terrace"
-notes:
+notes: []
 source: ""
 source_url: ""
-meta:
-  made_before: true
-  ship: "sure"
-  rewritten: true
-  awaiting_fix: false
-  proofread: true
 ---

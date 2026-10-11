@@ -5,8 +5,16 @@ glass:
   - "nick and nora"
 garnish:
   - "lemon twist"
-serve:
-  ice: "none"
+meta:
+  made_before: true
+  ship: "meh"
+  rewritten: true
+  awaiting_fix: false
+  proofread: false
+mood:
+  - "clear"
+  - "aperitivo"
+  - "no juicing"
 ingredients:
   - amount: "45 ml"
     generic: "London dry gin"
@@ -19,20 +27,12 @@ ingredients:
     suggestion: ["Cointreau"]
   - amount: "10 ml"
     generic: "Campari"
+serve:
+  ice: "none"
 method:
   - "Stir all ingredients with ice."
   - "Strain."
-mood:
-  - "clear"
-  - "aperitivo"
-  - "no juicing"
 notes: []
 source: ""
 source_url: ""
-meta:
-  made_before: true
-  ship: "meh"
-  rewritten: true
-  awaiting_fix: false
-  proofread: true
 ---
