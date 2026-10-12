@@ -1,45 +1,23 @@
 #!/usr/bin/env python3
 """Refuse any Bash command that mentions `sed`, anywhere in it, full stop.
 
-WHY THIS EXISTS. Helen's standing rule is "never sed, ever" -- not "never
-sed -i", not "never sed with an e command", the whole tool, unconditionally.
-Her reasoning, confirmed 2026-09-08: sed -i can silently corrupt a file with
-a subtly-wrong regex, with none of the visible-diff review an Edit tool call
-gives her, in a project full of hand-curated content where that's expensive
-to notice later. Python already covers everything sed does, more precisely
-and more reviewably, so banning sed outright costs her nothing real.
+Helen's rule covers the whole tool, not only `sed -i`: a subtly wrong regex
+corrupts a file silently, with none of the visible diff an Edit call gives
+her, and Python covers everything sed does. DECISIONS §11.
 
-The two `permissions.deny` rules that already tried to express this --
-`Bash(sed -i*)` and `Bash(sed*e*)` in settings.local.json -- are BOTH prefix
-patterns: they only match a command that literally STARTS with `sed`. A
-command like `grep -rn "x" dir/ | sed 's|dir/||' | sort` starts with `grep`,
-so neither deny rule ever sees it, and it falls through to a confirmation
-prompt instead of an automatic block -- exactly the kind of pattern-matching
-gap this repository keeps finding and keeps closing with a hook instead of a
-cleverer pattern, because the pattern-matching engine here is prefix-only and
-cannot express "contains, anywhere in a pipeline." See guard-main-branch.py
-and guard-destructive-git.py for the same shape of fix for a different verb.
+A hook rather than a `deny` rule because a permission pattern matches a
+command's prefix and cannot express "anywhere in a pipeline". For the same
+reason it has no `"if"` filter in its wiring: it runs on every Bash call and
+does its own check.
 
-DELIBERATELY NOT CLEVER. This does not try to distinguish a safe sed (no -i,
-no e/w/r command, pure stream filter) from an unsafe one. That distinction is
-exactly the kind of detection logic that could itself grow a gap later --
-the whole reason this hook exists is that clever pattern-matching keeps
-missing cases. A flat, unconditional block is easy to verify correct and
-matches the policy Helen actually wants: no sed, full stop.
+It does not tell a safe sed from an unsafe one; that detection is where the
+next gap grows.
 
-WHAT IT DELIBERATELY ALLOWS: mentioning "sed" inside a quoted string or a
-heredoc body, so a commit message or comment can still discuss it (e.g. this
-file's own introducing commit, or CLAUDE.md's prose about the rule).
+Allowed on purpose: the word inside a quoted string or a heredoc body, so a
+commit message can discuss it, and tokens that merely contain it
+(`guard-sed.py`, `processed.txt`). Tested in `tests/test_text_tool_guards.py`.
 
-No `"if"` filter in its hooks wiring, unlike the two existing git guards --
-an `"if": "Bash(sed *)"` filter would have the exact same prefix-only blind
-spot this hook exists to close, since it uses the same permission-pattern
-matching engine. Instead this runs on every Bash call and does its own cheap
-regex check, so there is no gate to bypass by putting something else first.
-
-Invoked as `python3 .claude/hooks/guard-sed.py` so it needs no execute bit:
-CLAUDE.md forbids changing file permissions without asking, and a hook that
-required a chmod to install would be self-defeating.
+Invoked as `python3 <path>` so it needs no execute bit.
 """
 from __future__ import annotations
 
@@ -47,13 +25,9 @@ import json
 import re
 import sys
 
-# Split on shell word-separators (whitespace and the operators that start a
-# new command: pipes, semicolons, ampersands, parens). Deliberately NOT a
-# `\bsed\b` substring regex -- that also matches "sed" inside an unrelated
-# filename like this very file, guard-sed.py (word boundaries exist on both
-# sides of "sed" there too, right before the hyphen and the dot), which
-# would self-trigger on any command that so much as mentions this hook by
-# name. Checking whole tokens instead of substrings avoids that.
+# Split on whitespace and the operators that start a new command. Whole tokens,
+# not a word-boundary substring match: that also matches the `sed` in
+# `guard-sed.py`, so any command naming this hook would trigger it.
 TOKEN_SPLIT = re.compile(r"[\s|;&()]+")
 
 # Same stripping as the other guards, and for the same reason: a guard that

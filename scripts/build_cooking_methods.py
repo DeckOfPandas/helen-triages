@@ -1,17 +1,25 @@
 """Emit _data/food/cooking_methods.yml from cooking-methods.html's own tables.
 
-Parsed, not retyped: ~66 rows of digits that have already been fact-checked in
-place. No figure is changed and no method is reworded.
+DO NOT RUN THIS. It is a spent migration tool, kept as the record of how the
+data file was made. It has no flags and no `__main__` guard: running or
+importing it OVERWRITES `_data/food/cooking_methods.yml`, which has been
+edited by hand since and is the source of truth (DECISIONS §14, MANUAL §14).
+Edit the data file directly.
 
-TWO THINGS ARE DROPPED ON THE WAY THROUGH, both at Helen's instruction ("keep
-safety and sources, drop correction history"):
-  - "Corrected from ~15 min/kg, which was roughly half real UK timings" and its
-    siblings. That was scaffolding for a fact-check pass that is finished; it
-    speaks to the page's history rather than to cooking.
-  - Parenthetical asides about sourcing inside a Timing cell, which belong with
-    the sources note under the table, not inside the number.
-Everything else -- the trade-offs, the covering instructions, the weight
-caveats -- survives verbatim.
+It reads `food/reference/cooking-methods.html` as it stood at the commit
+PRE_MIGRATION, through `git show`, and expects the repository root as the
+working directory. Rows are parsed, not retyped: no figure is changed and no
+method is reworded.
+
+What it does to a row on the way through:
+
+  - classifies the Timing cell into a `shape` (`classify`), reading the cell
+    without its parenthetical asides;
+  - labels a bare oven temperature `fan` and drops a conventional figure
+    (`fan_only`);
+  - splits Notes into sentences, drops correction history, and moves sourcing
+    sentences to `source_note` (`clean`);
+  - adds the short `outcome` from OUTCOMES and skips the rows in EXCLUDE.
 """
 import pathlib
 import re
@@ -19,24 +27,10 @@ import subprocess
 
 SRC = pathlib.Path("food/reference/cooking-methods.html")
 OUT = pathlib.Path("_data/food/cooking_methods.yml")
-# ---------------------------------------------------------------------------
-# THE SOURCE IS PINNED TO GIT, NOT READ FROM THE WORKING TREE, and it has to be.
-#
-# This script parses food/reference/cooking-methods.html's tables. That page now
-# RENDERS FROM THIS SCRIPT'S OUTPUT -- so reading the working copy makes the
-# generator its own consumer: it finds no tables, emits an empty data file, and
-# the page it feeds goes blank. That happened once, and the completeness test
-# caught it within a minute; without the pin it would happen every time anyone
-# ran this again.
-#
-# So this is a MIGRATION TOOL, run against the last version of the page that
-# still held the tables. Re-running it reproduces that migration exactly rather
-# than reflecting whatever the page says today. The data file is the source of
-# truth from here on. EDIT IT DIRECTLY. Do NOT edit this script and re-run:
-# the data file has been hand-edited since the migration -- the venison section
-# and its own header were both written by hand and exist nowhere in the pinned
-# page -- so a re-run does not regenerate it, it OVERWRITES it, dropping 166
-# lines. Verified by measurement on 2026-08-21, after nearly doing it.
+# The source is pinned to git, not read from the working tree: the page now
+# renders from this script's output, so the working copy holds no tables and
+# would yield an empty data file. A re-run reproduces the migration and
+# overwrites every hand edit made to the data file since.
 PRE_MIGRATION = "8bdbd27"
 html = subprocess.run(
     ["git", "show", f"{PRE_MIGRATION}:food/reference/cooking-methods.html"],
@@ -66,21 +60,10 @@ def num(s):
 
 
 # --- notes: drop correction history without damaging the sentence ------------
-# THE FIRST VERSION OF THIS CUT NOTES IN HALF. It matched `Corrected from[^.]*\.?`
-# -- and `[^.]*` stops at the FIRST period, which in "a 1.7-2 kg bird takes ~3
-# hrs" is the one inside the number. Two notes ended up with a fragment welded
-# on ("...rather than throughout7-2 kg bird takes ~3 hrs at this temperature)")
-# and four more had a sentence fused onto the previous one. Invisible in a demo;
-# not invisible once this data renders the published page.
-#
-# Rewritten to split into SENTENCES first and drop whole ones. The splitter
-# requires whitespace and a capital after the full stop, so a decimal point
-# can't end a sentence and the class of bug can't recur.
-#
-# Nothing is thrown away silently either: every sentence lands in `notes`,
-# lands in `source_note`, or is recorded as a deliberate drop, and the totals
-# are reconciled at the end of this script. A sentence that matched nothing
-# would show up as a discrepancy rather than just disappearing.
+# Split into sentences first and drop whole ones. The splitter requires
+# whitespace and a capital after the full stop, so the decimal point in
+# "a 1.7-2 kg bird" cannot end a sentence. Every sentence lands in `notes`,
+# lands in `source_note`, or is recorded in `dropped_sentences`.
 SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z(\u201c])")
 
 DROP = re.compile(
@@ -88,9 +71,8 @@ DROP = re.compile(
     r"|didn't even match|doesn't match the formula|the previous \w+ (here|figure)"
     r"|this used to claim|corrected 20\d\d", re.I)
 
-# Sourcing belongs beside the figure it vouches for, not inside the sentence
-# describing what you get to eat -- and once these come out, `notes` reads as
-# an outcome, which is exactly what the decision table needs from it.
+# Sourcing belongs beside the figure it vouches for, so that `notes` reads as
+# an outcome.
 SOURCE = re.compile(
     r"^(confirmed|rate confirmed|drop-to temperature confirmed|widely-cited"
     r"|not independently|timing temperature|temperature itself|estimated by analogy"
@@ -124,20 +106,12 @@ def clean(note):
 
 
 # --- oven temperatures: fan, always -------------------------------------------
-# House style is fan-only (MANUAL §5). The source page doesn't follow it:
-# three rows spell out a fan/conventional pair, the other 63 give a bare figure
-# with no basis stated at all.
-#
-# WHICH IS THE BARE FIGURE? Tested, using the three rows that DO state a pair as
-# a key against bare figures elsewhere in the SAME protein: chicken's stated fan
-# 180°C matches its bare "drop to 180°C" and its bare foil-wrapped "180°C";
-# turkey's stated fan 160-170°C matches its bare "drop to 160-170°C". Three
-# matches, all fan, none conventional -- so a bare figure is already fan and the
-# fix is to LABEL it, not convert it. No number changes.
-#
-# That is also the safer error if the inference is ever wrong: labelling a
-# conventional figure "fan" sends a cook 20°C hot, where subtracting 20 from a
-# figure that was already fan would undercook it.
+# House style is fan-only (MANUAL §5). A bare figure on the source page is
+# already fan: the rows that state a fan/conventional pair match the bare
+# figures elsewhere in the same protein. So a bare figure is labelled, not
+# converted, and no number changes. That is also the safer error: a
+# conventional figure labelled "fan" runs 20°C hot, where subtracting 20 from
+# a fan figure would undercook.
 CONVENTIONAL = re.compile(
     r"\s*[/(]?\s*≈?\s*\d+(?:\s*[–-]\s*\d+)?\s*°C\s*conventional\s*\)?")
 BARE_TEMP = re.compile(r"(\d+(?:\s*[–-]\s*\d+)?\s*°C)(?!\s*fan)")
@@ -153,19 +127,10 @@ def fan_only(oven):
     return out, basis
 
 
-# --- what you get, in four words ---------------------------------------------
-# The calculator answers "how long" per method and left "which one?" unanswered
-# -- seven chicken rows, seven times, no help choosing. Helen: "summarising the
-# cooking options by user need... the method name then the description of the
-# chicken you get."
-#
-# The notes already say this, but as a sentence per row, which you have to read
-# all of before you can compare any of it. These are the same information at a
-# glance-able length, drafted FROM those notes rather than invented: the notes
-# stay as the fuller answer beside them.
-#
-# Authored here rather than in the YAML so a regeneration keeps them. Helen owns
-# the wording -- edit freely, the guard only checks length and presence.
+# --- what you get, in a few words --------------------------------------------
+# A short answer to "which method?", drafted from each row's notes, which stay
+# beside it as the fuller answer. test_every_method_has_a_short_outcome checks
+# presence and length.
 OUTCOMES = {
     "chicken/standard_constant_roast": "Reliable default",
     "chicken/high_heat_start_then_reduce": "Crisp skin, moist meat",
@@ -256,16 +221,8 @@ CHART_ANCHOR = {
 }
 
 
-# Methods Helen has decided against keeping. Removed at source rather than
-# hidden in the template, so they disappear from the reference page and the
-# instruments together -- there is one list of cooking methods now, and a row
-# that only exists in one of the two places is exactly the divergence this data
-# layer was built to end.
-#
-# beef/closed_oven_off_method: Helen, 2026-08-14, "it's just not for me". It was
-# also the page's only `unparsed` row -- "~1.5-3 hrs in residual heat,
-# oven-dependent" is a description of an oven, not a formula -- so removing it
-# leaves every remaining shape computable or explicitly disputed.
+# Methods Helen has decided against keeping, removed at source so that they
+# leave every reader of the data together.
 EXCLUDE = {"beef/closed_oven_off_method"}
 
 

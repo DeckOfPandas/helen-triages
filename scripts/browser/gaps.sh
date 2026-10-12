@@ -4,12 +4,11 @@
 # line names the element's tag.class, its height, its margin/padding
 # top/bottom, and the gap to the sibling before it. Skips inline elements,
 # absolutely/fixed positioned elements, and anything under 6px in both
-# dimensions. This is the tool that found two spacing drifts in #1093's
-# review.
+# dimensions.
 # Usage: sh scripts/browser/gaps.sh <path> [width] [root-selector]
 #
-# THE PORT COMES FROM tmp/browser/port, written by THIS worktree's serve.sh
-# -- see shoot.sh. 4010 only when no server is running here.
+# The port comes from tmp/browser/port, written by this worktree's serve.sh;
+# see shoot.sh. 4010 only when no server is running here.
 set -eu
 
 refuse() {

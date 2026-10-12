@@ -1,41 +1,29 @@
 #!/usr/bin/env python3
 """Render the link-preview images (og:image) from the site's own wordmark.
 
-Design review 2026-09-15, #1086; Helen: "The wordmark is fine for a start --
-I don't think we have anything else that feels like branding anyway."
-
     sh scripts/browser/build.sh
     python3 scripts/render_social_images.py --site tmp/site \\
         --chrome tmp/browser/ms-playwright/chromium-1134/chrome-linux/chrome
 
-Writes assets/img/social/food.png, cocktails.png and neutral.png -- one per
-site plus one for the pages that belong to neither (/about/, /404.html) --
-each 1200x630 CSS pixels at a device scale of 2, which is the shape every
-preview renderer (WhatsApp, Slack, Signal, iMessage, Facebook) asks for.
-_layouts/default.html points at them through `social_image` in
-_data/sites.yml and _config.yml.
+`--site` is the built site, `--chrome` the browser binary if it is not on
+PATH, `--tape` which tape file the cards wear, `--out` where the PNGs go.
 
-THE IMAGE IS THE REAL WORDMARK, NOT A REDRAWING. Each card is a page made
-from the BUILT site: the site's own compiled stylesheet, the `<a
-class="site-title-link">` block lifted verbatim from that site's built index
-(so HELEN TRIAGES, the tape, the bracketed word and the `--wordmark-chars`
-custom property are exactly what the header renders), and one tape SVG
-inlined with the two attributes decorations.js injects at runtime. The card
-scales the lockup up to fill the frame and screenshots it. If the wordmark's
-lettering, tape or palette ever change, re-run this and the previews follow;
-nothing here restates a colour or a size.
+Writes assets/img/social/food.png, cocktails.png and neutral.png (one per
+site, and one for the pages that belong to neither), each 1200x630 CSS pixels
+at a device scale of 2. _layouts/default.html points at them through
+`social_image` in _data/sites.yml and _config.yml (#1086).
 
-ONE TAPE, FIXED, ON PURPOSE. The header rolls a random tape per load (#779,
-"random each page load please"), which is a decision about a live page. A
-preview image is a file, so it wears one tape and the same one every run --
-`--tape` picks it and the default is written here so two runs agree.
+The image is the real wordmark, not a redrawing. Each card is a page made
+from the built site: its compiled stylesheet, the `<a
+class="site-title-link">` block lifted verbatim from that site's built index,
+and one tape SVG inlined with the two attributes decorations.js injects at
+runtime. Nothing here restates a colour or a size; re-run it when the
+wordmark's lettering, tape or palette change.
 
-The PNGs are committed, so CI never runs this: a preview renderer fetches the
-image from the live site, and a deploy that failed to produce it would be a
-link with no picture, which is what the site had before.
-
-Headless Chrome, like scripts/generate_pdfs.py and for the same reasons; its
-_chrome() and _serve() are imported rather than copied.
+The header rolls a random tape per load; a preview image is a file, so it
+wears one fixed tape (`DEFAULT_TAPE`) and two runs agree. The PNGs are
+committed and CI never runs this. `_chrome()` and `_serve()` are imported from
+scripts/generate_pdfs.py.
 """
 from __future__ import annotations
 

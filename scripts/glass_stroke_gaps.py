@@ -1,48 +1,24 @@
 """Open stroke ends: where does a drawing have a hole the stroke cannot cover?
 
-REPRODUCES the rendered-pixel gaps MANUAL.md §9.11 sends you here for, and the
-margarita's that became #739 (1.76 units, 3.2px on a card against a 1px stroke).
-
     python3 scripts/glass_stroke_gaps.py
 
-WHAT IT MEASURES. Every unclosed subpath's endpoints, against the nearest other
-endpoint in the same drawing. Two ends meeting exactly is a join; two ends near
-each other but not touching is a gap. `stroke-linecap: round` extends each end
-by half the stroke, so a gap is covered when it is no wider than the stroke --
-1px on a card, 2px on a drink page (2026-09-05; it was 3 until #650).
+Reads every drawing in `_includes/icons/glasses/` and writes nothing (MANUAL
+§9.11). For each unclosed subpath endpoint it finds the nearest other endpoint
+in the same drawing: two ends meeting exactly are a join, two ends near each
+other but not touching are a gap. `stroke-linecap: round` extends each end by
+half the stroke, so a gap shows only when it is wider than the stroke drawn
+over it: 1px on a card, 2px on a drink page.
 
-WHY IT REPORTS PIXELS AND NOT USER UNITS, which is the whole reason it exists
-rather than a note in a commit message. Each drawing has its own viewBox and is
-rendered to a fixed HEIGHT, so one user unit is worth a different number of
-screen pixels in every icon: a 2-unit gap in the punch bowl's 70-unit canvas and
-the same 2 units in the sling's 116 are completely different defects. The
-2026-08-31 pass that found the first batch quoted user units, and that is why it
-could not say which ones actually showed.
+It reports pixels, not user units: each drawing has its own viewBox and is
+rendered to a fixed height, so one user unit is worth a different number of
+screen pixels in every icon.
 
-TWO LIMITS, AND THE SECOND IS THE SERIOUS ONE.
-
-1. A flag means "two unclosed endpoints land closer together than the stroke can
-   bridge". On a single-outline glass that is nearly always a broken join. On a
-   drawing made of many separate strokes -- the pineapple has 21 -- it may
-   equally be two tips that genuinely sit near each other. It flags; it does not
-   diagnose. Look at the drawing.
-
-2. **IT IS AN END-TO-END SCAN, AND MANUAL 9.13 RECORDS THAT THOSE MISS A WHOLE
-   CLASS OF FAULT.** Its words, from the 2026-08-31 pass: *"Measure ends against
-   STROKES, not against other ends. The goblet's endpoints all met within 0.26
-   units; its one fault was a line stopping 1.56 units short of the MIDDLE of
-   another line. An end-to-end scan reports it clean."* This is that scan. So a
-   clean report here means "no end-to-end gap", NOT "no open ends" -- a line
-   stopping short of the middle of another is invisible to it, and the goblet is
-   the proof that such faults are real in this set.
-
-   Closing that would mean measuring each endpoint against every other path's
-   GEOMETRY rather than its endpoints -- point-to-curve distance over flattened
-   paths, which `scripts/svgrender.py`'s `flatten()` already provides. Worth
-   doing if a second fault ever turns up by eye that this reported clean.
-
-Found #739 (the margarita). Read that as "the worst one an end-to-end scan
-finds", which is how the issue is now worded.
+A flag is a candidate, not a diagnosis (#739 was a designed free end): on a
+drawing of many separate strokes two tips may simply sit near each other. And
+this is an end-to-end scan, so a clean report does not mean no open ends: a
+line stopping short of the MIDDLE of another line is invisible to it. Catching
+that means measuring each endpoint against the other paths' geometry, which
+`scripts/svgrender.py`'s `flatten()` provides.
 """
 import glob
 import io
@@ -164,14 +140,9 @@ def compose(m, t):
 def endpoints_of(svg):
     """Every unclosed subpath endpoint, with the transforms above it applied.
 
-    WALKS THE TREE. An earlier version took the FIRST `<g transform>` and applied
-    it to every path, which is right for a flat drawing and wrong for the six
-    that nest (absinthe, goblet, nick-and-nora, old-fashioned,
-    old-fashioned-double, tiki-mug): a path inside an inner group lost that
-    group's transform and every distance involving it was nonsense. This is the
-    same stack `_emit` keeps in scripts/normalise_glass_icons.py, and it is the
-    third time in this repo that dropping a nested transform has produced a
-    confident wrong answer -- see that file's "this is the absinthe bug".
+    Walks the tree keeping a transform stack, because some drawings nest
+    groups: a path inside an inner group takes that group's transform too, or
+    every distance involving it is nonsense.
     """
     pts = []
     stack = [[1.0, 0.0, 0.0, 1.0, 0.0, 0.0]]
@@ -219,12 +190,9 @@ def gaps_for(path):
             dist = math.hypot(p[0] - q[0], p[1] - q[1])
             if best is None or dist < best:
                 best, at = dist, q
-        # A nearest neighbour of 0 means this end is JOINED to another and is
-        # not a candidate at all. A small non-zero one is a candidate; whether
-        # it is a fault is a question for the eye, not for this number -- see
-        # the docstring, and #739, which was a false positive of exactly this
-        # kind (a designed free end 1.76 units outside a junction that itself
-        # met exactly).
+        # A nearest neighbour of 0 means this end is joined to another and is
+        # not a candidate. A small non-zero one is a candidate; whether it is
+        # a fault is a question for the eye (#739 was a designed free end).
         if best is not None and 0 < best <= 4.0 and best > worst:
             worst, where = best, ((p[0] + at[0]) / 2, (p[1] + at[1]) / 2)
 

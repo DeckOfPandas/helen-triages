@@ -1,29 +1,22 @@
 """Where does a card's tagline start, so its first baseline is the ingredients'?
 
-REPRODUCES `$card-tagline-top` in `_sass/cocktails/_cards.scss`.
-
-WHAT IT IS FOR. On the cocktail index a card's tagline takes the card when it
-is pointed at (#1292): the ingredient line steps out and the tagline is drawn
-where it was. Helen, 2026-10-06, of the candidates page: "I'd like the top line
-of the tagline to align in some more convincing way with where the top line of
-the ingredients list was", and, shown both ways, "Baselines match."
-
-WHY IT IS NOT ARITHMETIC ON THE TWO FONT SIZES. The two lines are in different
-faces (Selawik, Courier Prime) at different sizes and line heights, and where a
-baseline sits inside its line box depends on each face's own ascent and
-descent. So this asks a browser: it lays out one line of each, exactly as the
-stylesheet declares them, drops a zero-size inline-block at the start of each
-(whose bottom edge IS the baseline) and reads how far below the top of its box
-each baseline falls. The tagline's top margin is then the ingredients' top
-margin plus the difference.
-
     python3 scripts/card_tagline_baseline.py
 
+Derives `$card-tagline-top` in `_sass/cocktails/_cards.scss` (#1292): on the
+cocktail index a pointed-at card swaps its ingredient line for its tagline,
+and the tagline's first baseline lands where the ingredients' was.
+
+The two lines are in different faces, sizes and line heights, and where a
+baseline sits in its line box depends on each face's ascent and descent, so
+this asks a browser. It lays out one line of each as the stylesheet declares
+them, drops a zero-size inline-block at the start of each (its bottom edge is
+the baseline) and reads how far below the top of its box each falls. The
+tagline's top margin is the ingredients' top margin plus the difference.
+
 Needs Playwright's Chromium, found the way tests/test_browser_smoke.py finds
-it. It reads the two font files straight from assets/fonts, so it needs no
-`jekyll build`. RE-RUN IT if either rule's size, line height or face changes;
-the four constants below are copies of the stylesheet's and are the only thing
-to keep in step.
+it. Reads the two font files from assets/fonts, so it needs no build, and
+writes tmp/card_tagline_baseline.html. Re-run it if either rule's size, line
+height or face changes; the constants below are copies of the stylesheet's.
 """
 import os
 import pathlib
@@ -33,10 +26,9 @@ FONTS = ROOT / "assets" / "fonts"
 
 ROOT_PX = 16
 
-# LAID OUT A HUNDRED TIMES TOO BIG, THEN DIVIDED. Chromium snaps a line's
-# baseline to a whole pixel, so at the real 16px root both baselines come back
-# as integers (14 and 13) and the answer is 9px on every run whatever the faces
-# are doing underneath. At 1600px the snap is a hundredth of a real pixel.
+# Laid out a hundred times too big, then divided: Chromium snaps a line's
+# baseline to a whole pixel, so at the real 16px root both baselines come
+# back as integers and the answer never moves.
 SCALE = 100
 
 # `.drink-card-ingredients` in _sass/cocktails/_cards.scss

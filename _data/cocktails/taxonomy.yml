@@ -1,56 +1,13 @@
-# =============================================================================
-# COCKTAILS TAXONOMY — mood, and the chaos dial. Spec: GitHub issue #292.
-# =============================================================================
-# This file was a deliberately empty scaffold until 2026-08-17. Its own comment
-# said the schema should "arrive the same way [as food's], from the real
-# recipes rather than from general knowledge about cocktails". It did: every
-# mood below was tested against all 117 drinks before it was written down, and
-# three candidates were changed or dropped because the data said so.
+# Cocktail taxonomy: moods, the chaos dial and the ship scale (#292).
 #
-# THE PRINCIPLE THIS WHOLE COLLECTION ANSWERS TO. Helen, 2026-08-23, settling
-# the `character` question (#441):
+# There is no star axis and no spirit filter: cocktails do not browse by
+# spirit. The spirit families in ingredients.yml exist for search and exclusion
+# only (DECISIONS §9.3).
 #
-#   "Take as a principle that everything we do is focused on the user (i.e.
-#    me), and making sure the user gets the drink they want. Being an
-#    encyclopaedia of drinks sounds like busywork and it's not for me."
+# Nothing reference-table-shaped belongs here either. The test for any addition
+# is whether it gets Helen closer to the drink she wants (#441, #459).
 #
-# Recorded here at her request (#459) so it is citable rather than remembered.
-# It is the deciding argument, not a sentiment: `character` (Gosling's
-# blackstrap quality, say) is not a bottle-encyclopaedia fact, it is WHY THIS
-# DRINK WANTS THIS BOTTLE -- so it belongs on the recipe, and the general
-# bottle-reference table that would otherwise have held it was not built.
-#
-# APPLY IT FORWARD, to anything reference-table-shaped -- a bottle dictionary, a
-# spirits glossary, anything describing a spirit in the abstract rather than in
-# service of one recipe decision. The test is whether it gets Helen closer to
-# the drink she wants, or whether it is collecting knowledge for its own sake.
-#
-# It is also the reason for the rule immediately below. An encyclopaedia sorts
-# by spirit because that is how bottles are shelved; this does not, because that
-# is not how anyone decides what to drink.
-#
-# THERE IS NO STAR AXIS, AND THAT IS DELIBERATE. Food browses by star
-# ingredient; cocktails does not browse by spirit at all. Helen, 2026-08-17:
-# "I get really bored of cocktail bars that have enormous bible-like menus
-# sorted by spirit... I probably think browsing by spirit is basic." The spirit
-# families in _data/cocktails/ingredients.yml exist for SEARCH and EXCLUSION
-# only. Do not add a spirit filter to the index.
-#
-# WHAT WAS LEARNED BY TESTING EACH CANDIDATE, kept because each is a trap that
-# would otherwise be re-entered:
-#
-#   - "fruity" first counted citrus juice and covered 51% of the collection --
-#     the same too-broad failure that retired food's `one-pot` at 57%. Citrus
-#     is the SOUR component, not the fruit. Excluding it gives 28%.
-#   - "sugar craving" defined as "has any sweetener" was 68%. Nearly every
-#     cocktail contains sugar; sweetening is construction, not craving. Narrowed
-#     to pudding flavours it is 11%.
-#   - The first pudding list wrongly included crème de violette and pulled in
-#     Aviation, which is floral and sharp. Fruit liqueurs came out too -- they
-#     belong to `fruity`.
-#   - 30% of drinks matched NO mood, and they turned out to be one genre: the
-#     classic short sour. That gap is what `short and sharp` exists to fill.
-# =============================================================================
+# A mood's definition and a correction's `why:` are YAML values, not comments.
 
 # A drink may carry several. Order is not significance -- a mood list is a set.
 moods:
@@ -301,49 +258,17 @@ moods:
     is not faff, and neither is opening a cola -- Julien Sorel and Anita's
     Attitude Adjuster are in on her ruling, and Anita's is seven equal pours.
 
-# =============================================================================
-# WHAT THE DEFINITIONS ABOVE MEAN IN INGREDIENTS — the derivation's vocabulary
-# =============================================================================
-# Every mood above states a rule. These are the ingredient sets those rules
-# read, and `scripts/derive_cocktail_moods.py` is the only thing that reads
-# them.
+# The ingredient sets the mood rules read. Only
+# scripts/derive_cocktail_moods.py reads them, against generics and characters
+# alike. A renamed generic left behind here matches nothing and raises nothing,
+# so test_every_mood_ingredient_is_declared requires every member to be a
+# declared generic or character.
 #
-# THEY LIVED IN A SCRIPT UNTIL 2026-08-30 AND THAT IS WHY THEY WENT WRONG.
-# Moods were derived once, on 2026-08-17 (`d2c76dc` in the drafts repo), from
-# nine hardcoded sets of generic names inside `ingest_from_csv.py`. The
-# vocabulary then moved underneath them and nothing could see it:
-#
-#   #335 finished typing every generic — the derivation's own commit message
-#        says "17 carry none, mostly blocked by untyped ingredients"
-#   #314 reclassified the rums and moved `blackstrap` from generic to CHARACTER
-#   #561 renamed ten generics, including every rum and both gins
-#   #568 added five aromatised-wine generics
-#        `sloe gin` split out; the Chartreuses took their French names
-#
-# **34 of the sets' strings named nothing at all** when this was measured.
-# Nine of `_AGED`'s 29 — every rum and every whisky in it — so `strong brown
-# drink` could no longer fire on a rum. Five of `_CLEAR`'s 17. Five of
-# `_TIKI`'s 13. Nine of `_LOUD`'s 23, including both Chartreuses.
-#
-# A SET INTERSECTION AGAINST A RENAMED STRING RETURNS EMPTY. It does not raise,
-# it does not warn, and the derivation had already been run and its output
-# frozen into 114 files — so the drift was invisible from both ends. This is
-# §9.12's bargain stated from the other side: duplicate live data only
-# alongside the test that keeps the duplicate honest. There was no test,
-# because the duplicate was in a private repo's script.
-#
-# So the sets are data now, and `test_every_mood_ingredient_is_declared`
-# requires every member to be a declared generic or a declared character.
-# A rename cannot silently empty one again.
-#
-# MATCHED AGAINST GENERICS **AND** CHARACTERS. `blackstrap` is a
-# `rum_characters` value since #314, not a generic — it appears here in `tiki`
-# and `loud` and would match nothing if only generics were read. That is one of
-# the 34.
+# `clear`, `pudding_flavour`, `aperitivo` and `loud` are read by no rule: their
+# moods are hand-assigned. They are kept as starting lists for a future rule.
 mood_ingredients:
 
-  # Aged and/or bitter-amaro. Used by `strong brown drink`, which also needs
-  # 60% of the volume to be a base spirit and more aged than clear.
+  # Aged and/or bitter-amaro. Read by `strong brown drink`.
   aged:
     - moderately aged Jamaican rum
     - caramel-forward Jamaican rum
@@ -376,7 +301,8 @@ mood_ingredients:
     - molasses sugar
     - raw sugar
 
-  # Transparent. Not the opposite of `aged` — a drink can be neither.
+  # Clear spirits and modifiers. Not the opposite of `aged`: a drink can be
+  # neither.
   clear:
     - lightly aged and filtered rum
     - clear blended multi-region rum
@@ -399,7 +325,7 @@ mood_ingredients:
     - prosecco
     - champagne
 
-  # Tiki MARKERS. Two or more, plus complexity, makes a drink tiki.
+  # Tiki markers. The `tiki` definition above says how many a drink needs.
   tiki:
     - orgeat
     - falernum
@@ -424,23 +350,9 @@ mood_ingredients:
     - pink grapefruit juice
     - orange juice
 
-  # Non-citrus fruit.
-  # ORANGE JUICE IS FRUIT, NOT SOUR -- added 2026-08-30. The note above says
-  # citrus does not count because "it is the sour component", which is true of
-  # lime and lemon and false of orange: nobody builds a sour on orange juice.
-  # It cost this rule four drinks Helen calls fruity (Cactus Banger, Copenhagen
-  # Special, Fog Cutter, Witches' Daiquiri). GRAPEFRUIT STAYS OUT -- a Brown
-  # Derby really is a sour.
-  #
-  # THE ORANGE LIQUEURS ARE DELIBERATELY NOT HERE, and that is the same
-  # distinction from the other side: orange juice is fruit, orange liqueur is
-  # construction. Adding triple sec, Curaçao and maraschino reaches every drink
-  # she tagged and wrongly tags NINE more -- Brooklyn, Last Word, Aviation,
-  # El Presidente. Measured before deciding.
-  #
-  # `crème de banane` LEFT on the same pass, at her instruction: she took
-  # `fruity` off Banana Boulevardier. It is a pudding flavour and is already in
-  # that set, which is where it belongs.
+  # Non-citrus fruit, plus orange juice: nobody builds a sour on orange juice,
+  # so it counts as fruit. Grapefruit stays out (a Brown Derby is a sour). The
+  # orange liqueurs stay out too: they are construction, not fruit.
   fruity:
     - pineapple juice
     - orange juice
@@ -455,8 +367,7 @@ mood_ingredients:
     - pear
     - calvados
     - apple schnapps
-    # NEW 2026-09-14 with the generic (#1013), by this block's own standing rule
-    # that the fruit liqueurs are `fruity` -- see `pudding_flavour` below.
+    # Fruit liqueurs and schnapps are `fruity`, not `pudding_flavour` (#1013).
     - peach schnapps
     - fruit purée
     - passion fruit syrup
@@ -468,9 +379,7 @@ mood_ingredients:
     - crème de pêche
     - apricot liqueur
     - cherry liqueur
-    # NEW 2026-09-14, split out of `cherry liqueur` for Cherry Heering -- the
-    # same fruit, and the same rule, so the Singapore Sling's pour cannot lose
-    # `fruity` by being retyped to name both.
+    # Beside `cherry liqueur` so a pour typed either way stays `fruity`.
     - cherry brandy
     - passion fruit liqueur
     - dried apricots
@@ -491,8 +400,7 @@ mood_ingredients:
     - cola
     - chocolate bitters
 
-  # Rich BODY, not sweetness — `pudding in a glass`. Zero members in the
-  # collection on purpose; see #337 and the mood's own note above.
+  # Rich body, not sweetness: any one of these makes `pudding in a glass`.
   rich:
     - coconut cream
     - cream
@@ -500,20 +408,13 @@ mood_ingredients:
     - whole egg
 
   sweet:
-    # The sugar is in the generic since 2026-09-04 -- Helen: "Most 'sugar
-    # syrup' means 'cane sugar syrup', possibly all." Renamed here in the
-    # same commit, because a mood list naming a retired generic derives
-    # nothing and fails nothing.
     - cane sugar syrup 1:1
     - cane sugar syrup 2:1
     - demerara sugar syrup 2:1
     - turbinado sugar syrup 2:1
     - honey
-    # ALL THREE HONEY WATERS, and the flat one is the default -- Helen ruled one
-    # flat generic on the afternoon of 2026-09-04 and put the two ratios back
-    # the same evening for the Bee's Knees. A mood list is the one place the
-    # three must NOT collapse: `honey water 2:1` missing from here took `sharp`
-    # off that drink the moment it was retyped.
+    # Every honey water ratio is listed. A ratio missing here takes `sharp` off
+    # a drink the moment its pour is retyped to that ratio.
     - honey water
     - honey water 1:1
     - honey water 2:1
@@ -537,20 +438,8 @@ mood_ingredients:
     - maraschino liqueur
     - Grand Marnier
 
-  # `warming` -- warm spice, never temperature. See the mood's own note.
-  #
-  # THE TWO HERBAL LIQUEURS ARE HELEN'S ADDITION, 2026-08-30, spotted while
-  # skimming the review table: "Jagermeister, Strega and Becherovka could hint
-  # at warming too." Both are warm-spiced rather than merely herbal --
-  # Jägermeister runs on star anise, cinnamon and ginger, Strega on saffron and
-  # mint over a spiced base. Becherovka is the third and the collection has
-  # none; add it here the day a drink does.
-  #
-  # THAT DAY IS 2026-08-31. P-Five Punch pours two ounces of Becherovka, and
-  # Helen described it in exactly these terms, unprompted and before seeing this
-  # comment: "I'd reach for Becherovka if a recipe wanted something cinnamon- or
-  # ginger-forward." Added on her words plus the standing instruction above,
-  # rather than as a fresh judgement.
+  # `warming`: warm spice, never temperature. Jägermeister, Strega and
+  # Becherovka are here as warm-spiced liqueurs, not as herbal ones.
   warming:
     - ginger syrup
     - ginger liqueur
@@ -562,9 +451,7 @@ mood_ingredients:
     - Strega
     - Becherovka
 
-  # `aperitivo` -- what an appetite-opening drink is built on. The amari and
-  # the aromatised wines; the mood then requires the drink not to be a
-  # strong brown one, which is what keeps a Boulevardier out of it.
+  # `aperitivo`: the amari and the aromatised wines.
   aperitivo:
     - Campari
     - Aperol
@@ -572,37 +459,14 @@ mood_ingredients:
     - fernet
     - Amaro Nonino
     - Amaro Ciociaro
-    # `Punt e Mes` WAS HERE AND CAME OUT ON 2026-09-05, when Helen demoted it
-    # from a generic to a bottle under `sweet vermouth`. This list keys off
-    # GENERICS, so a bottle cannot sit in it.
-    #
-    # THE REPLACEMENT IS NOT `sweet vermouth`, and that is the point worth
-    # recording. Punt e Mes was the one sweet vermouth bitter enough to open an
-    # appetite; adding the category would fire this mood on every Manhattan and
-    # Ridgwell in the collection, which is the too-broad failure this file
-    # already retired "fruity" and "sugar craving" for.
-    #
-    # IT COSTS NOTHING TODAY. Both drinks that pour Punt e Mes are covered
-    # anyway -- Spiced Negroni matches on Campari, and The Ridgwell is not an
-    # aperitivo drink. (The Ridgwell was deleted at Helen's word on 2026-09-10,
-    # so Spiced Negroni is now the only pour; the argument is unchanged.)
-    # If a future drink is built on Punt e Mes ALONE and wants
-    # this mood, the honest fix is to let mood lists name a bottle as well as a
-    # generic, not to widen the category.
+    # No sweet vermouth. This list keys off generics, Punt e Mes is a bottle,
+    # and the whole category would put the mood on every Manhattan.
     - quinquina
     - americano
     - gentian liqueur
 
-  # Things you TOP A DRINK UP with. Read by `strong brown drink` and `sharp`,
-  # neither of which survives being made long.
-  #
-  # THE JUICES ARE NOT HERE, and they were until they broke `sharp`. Orange,
-  # grapefruit and pineapple juice lengthen a brown drink but they are simply
-  # ingredients in a sour -- listing them cost Brown Derby (bourbon,
-  # grapefruit, honey), Witches Daiquiri and Cactus Banger their mood, which is
-  # the same shape of error as treating a pinch of salt as a sixth ingredient.
-  # `strong brown drink` keeps them out by its own route: the non-whisky path
-  # already refuses citrus, and `juice` below covers the rest.
+  # What a drink is topped up with. Read by `strong brown drink`, which does
+  # not survive being made long. Juices are not here; `juice` below has them.
   lengthener:
     - soda water
     - prosecco
@@ -624,9 +488,7 @@ mood_ingredients:
     - ruby grapefruit juice
     - pink grapefruit juice
 
-  # LOUD: ingredients carrying a whole flavour layer alone. Helen's insight,
-  # and the thing that rescues `tiki` from being a headcount — "Better and
-  # Better is a tiki drink. Only three ingredients, but they're bonkers."
+  # Ingredients that carry a whole flavour layer alone.
   loud:
     - overproof Demerara rum, lightly aged
     - overproof Jamaican rum, unaged
@@ -653,45 +515,13 @@ mood_ingredients:
     - liqueur de sapin
 
 # --- Helen's corrections, which beat the derivation --------------------------
-# DERIVATION IS A STARTING POINT, NOT THE AUTHORITY. A drink she thinks is tiki
-# is tiki whatever the ingredient count says.
-#
-# TWO NARROW HOOKS RATHER THAN ONE BLUNT ONE, and the reasoning is the original
-# derivation's own: replacing a drink's whole mood list would FREEZE it against
-# every later improvement to the rules, so a correction names the one mood it
-# is about and leaves the rest derived. That mattered immediately — every drink
-# below still gained moods from the 2026-08-30 re-derivation while keeping its
-# correction.
-#
-# Ported here from `MOOD_INCLUDE`/`MOOD_EXCLUDE` in the drafts repo's
-# `ingest_from_csv.py`, where they were invisible to this repo entirely.
+# Each entry names the ONE mood it corrects and why, so every other mood on the
+# drink stays derived and later rule changes still reach it.
+# test_every_mood_correction_is_reachable_and_needed fails an entry that names
+# no drink or changes nothing, so a correction a rule has caught up with is
+# deleted. A mood in `moods_by_hand` needs no entry in either map: Helen adds
+# and removes it in the drink file.
 mood_include:
-  # THE SAZERAC'S ENTRY IS GONE, 2026-08-30, and that is the good outcome.
-  # It read: "the archetype of the mood, and it derives at 44% base spirit
-  # because its 60 ml of chilled water belongs to the absinthe rinse and is
-  # thrown away at method step 4." The rewritten rule ignores water entirely
-  # and compares by spirit family, so the Sazerac's 40 ml of whisky now leads
-  # its 20 ml of cognac and it qualifies on its own. A correction retired by
-  # fixing the rule is worth more than one that stands for ever.
-
-  # ---------------------------------------------------------------------
-  # THE 2026-08-30 PASS. Helen went through all 114 drinks on a review page
-  # and these 31 are where her answer and a rule disagree. Every relaxation
-  # that would have closed them was measured first and cost more than it
-  # bought -- dropping `sharp`'s ingredient cap fixes 9 and wrongly tags 20;
-  # `warming` + falernum fixes 2 and wrongly tags 8; one muddle instead of two
-  # fixes 3 and wrongly tags 11. The rules stay narrow and precise (`sharp` is
-  # 40 right and 0 wrong) and her calls are recorded here instead.
-  #
-  # THE ONE RULE THAT DID CHANGE was `fruity`, because there the measurement
-  # went the other way: orange juice moved into the fruit set and `crème de
-  # banane` out, taking it from 8 misses and 1 false positive to 2 and 0.
-  # See its own note in `mood_ingredients`.
-  #
-  # A CORRECTION IS NOT A DEFEAT FOR THE RULE. Every drink below still gets
-  # every OTHER mood derived, and any later improvement reaches it -- that is
-  # the whole reason these name one mood each rather than replacing the list.
-
   18th-century-cocktail:
     moods: [sharp]
     why: >-
@@ -712,31 +542,8 @@ mood_include:
     moods: [strong brown drink, warming]
     why: >-
       she calls it one; no aged BASE spirit leads it by volume; she calls it warming and it carries no declared warm spice.
-  # `I want to faff` JOINED BOTH SAZERACS ON 2026-09-05 AND LEFT THIS ONE ON
-  # 2026-09-06. Helen, #758: "Caribbean Sazerac should not have the chip 'I want
-  # to faff'." Both halves are kept, because the reasoning that put it here was
-  # sound and she is answering a different question from the one it answered.
-  #
-  # WHAT THE 2026-09-05 CORRECTION WAS FOR. Both drinks scored two faff hits
-  # until that day, and both hits were the SAME RINSE: once in "Rinse a frozen
-  # glass with the overproof rum" and again in "Strain into the rinsed glass".
-  # The serve pass collapsed that second step to a bare "Strain." -- the
-  # destination moved to `serve.chill: rinsed` -- and with the duplicate gone the
-  # count fell to one and the mood fell off. The OLD count was wrong and the new
-  # one is right: the drink rinses once. The correction re-asserted the mood on
-  # the judgement that a drink which rinses a glass and throws it away IS faff.
-  #
-  # WHY IT COMES OFF THIS ONE AND NOT THE OTHER. That judgement is Helen's to
-  # make per drink and she has now made it for the Caribbean Sazerac: rinse
-  # aside, it is a shake and a strain with six ingredients, and calling it faffy
-  # oversells it. The plain `sazerac` keeps the mood -- she did not name it, and
-  # its rinse is absinthe into an iced glass, which is a fussier moment than
-  # discarding a little overproof rum.
-  #
-  # SO THE RULE IS UNTOUCHED, AGAIN, and for the same reason as before: adding
-  # "discard" to `step_words` would reach several twist-and-discard drinks nobody
-  # thinks are faffy, and loosening the count would re-add the mood to both. A
-  # per-drink judgement belongs in a per-drink correction.
+  # caribbean-sazerac carries no `I want to faff` entry (#758): rinse aside it
+  # is a shake and a strain. The plain sazerac below keeps its own.
   sazerac:
     moods: [I want to faff]
     why: >-
@@ -781,21 +588,6 @@ mood_include:
     moods: [ice ice baby, sharp]
     why: >-
       Helen, 2026-09-18, asked directly because this and gunmetal-blue were the collection's only two `ice ice baby` corrections and the other one turned out to be wrong: "Fish House Punch: a) I call 'ice tea', and b) comes over lots and lots of ice." SO THIS ENTRY IS RIGHT AND STAYS, and the reason is now a fact about the drink rather than the vague "she calls it icy" it said before. `serve.ice` is `cubed`, which the rule deliberately does not count -- crushed, large cube, block and blended are the values that earn the mood -- and the thing the field cannot carry is QUANTITY. Lots and lots of cubed ice is an icy drink; one cube in a rocks glass is not, and both are spelled `cubed`. She calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  # GUNMETAL-BLUE'S `ice ice baby` ENTRY WAS HERE AND IS GONE, 2026-09-18. It
-  # read "she calls it icy; the method does not say how" -- word for word what
-  # fish-house-punch's said above, written on the same pass -- and it was the
-  # only thing giving that drink the mood: `serve.ice` is `none`, the method
-  # shakes and strains into a coupe, and no other drink in the collection
-  # carried `ice ice baby` on `serve.ice: "none"`. Helen, 2026-09-18, reading
-  # her own moods back: "Gunmetal Blue doesn't have ice..."
-  #
-  # WHAT THE PAIR IS WORTH REMEMBERING FOR. Two entries, identical wording,
-  # one right and one wrong, and the words could not tell them apart: "she
-  # calls it icy" records that she answered, not what is true of the drink.
-  # Asked again about both, she gave a checkable fact for one -- lots and lots
-  # of ice -- and withdrew the other. A `why` that paraphrases an answer
-  # instead of naming the property is a `why` nobody can audit later, which is
-  # this field's whole job.
   hurricane-classic:
     moods: [I want to faff]
     why: >-
@@ -812,18 +604,6 @@ mood_include:
     moods: [sharp]
     why: >-
       she calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  # MILLINERS PUNCH'S `on fire` CAME OFF 2026-09-26, and it is the best kind of
-  # retirement: the entry said "she sets it alight; the method does not say
-  # so", and then Helen rewrote the drink and the method said so. Its fourth
-  # step is "Set the empty lime half-shell on top, pour in the overproof rum,
-  # and set alight", which `mood_step_words.fire` reads for `alight`. Nothing
-  # was argued away -- the fact arrived.
-  #
-  # `test_every_mood_correction_is_reachable_and_needed` is what found it,
-  # within a minute of the rewrite landing, by saying the entry "does nothing
-  # and should go". A correction left standing after its reason is answered
-  # reads as a live judgement while doing nothing, which is the rot that guard
-  # exists for.
   north-sea-oil:
     moods: [strong brown drink]
     why: >-
@@ -848,10 +628,6 @@ mood_include:
     moods: [sharp]
     why: >-
       she calls it sharp; the rule's five-poured-ingredient cap excludes it.
-  # `arrack-punch` AND `tiki-max` LEFT ON 2026-10-01 (#1256). Both were here for
-  # "she sets it alight; the method does not say so" -- and the method says so
-  # now, because the shell of rum became an ingredient and three steps.
-
   south-sider:
     moods: [strong brown drink]
     why: >-
@@ -891,44 +667,7 @@ mood_include:
       per drink rather than by colour. `no juicing` needed no correction; the
       derivation already gives Rosita that one on its own.
 
-# THE SWIZZLE'S `tiki` CORRECTION DIED WITH THE DRINK AND IS NOT REPLACED HERE,
-# because reinstating it would be deciding something that is Helen's.
-#
-# `MOOD_INCLUDE = {"Swizzle": ["tiki"]}` existed because she said that drink was
-# tiki. On 2026-08-30 the Swizzle became the **Martinique Swizzle** (`b42939b`)
-# and the correction stayed behind, naming a drink that no longer exists —
-# caught by `test_every_mood_correction_is_reachable_and_needed` on its first
-# run, which is the whole reason that test is here.
-#
-# THE SUCCESSOR DERIVES NO `tiki` AND IT IS NOT OBVIOUS THAT IT SHOULD.
-# Martinique Swizzle is agricole blanc, lemon, sugar syrup, absinthe and
-# Angostura: **zero** tiki markers, where the rule wants two. But its `source`
-# reads "Don the Beachcomber via Beachbum Berry", which is about as tiki a
-# provenance as exists. So either the drink is not tiki after all, or the marker
-# list is missing something a swizzle has — and that is a ruling, not a guess.
-# Add it back here if she says tiki; leave it if she does not.
-
 mood_exclude:
-  # BIGGLES SIDECAR WAS BRIEFLY HERE, 2026-09-19, AND SHOULD NEVER HAVE BEEN.
-  # Helen said "Biggles: drop mood 'sugar craving'" and the reflex was a
-  # correction, because the two mood changes before it needed one. This one did
-  # not: `sugar craving` is in `moods_by_hand` below, so no rule derives it on
-  # any drink and there was nothing to correct -- dropping it is an ordinary
-  # edit to the drink file. `test_every_mood_correction_is_reachable_and_needed`
-  # caught it in one line ("'sugar craving' is not derived anyway -- nothing to
-  # remove, so this entry does nothing"), which is the guard earning its keep
-  # against exactly the failure it was written for: a correction that reads as
-  # a live reason while doing nothing.
-  #
-  # THE TELL, FOR NEXT TIME: check `moods_by_hand` before reaching for
-  # `mood_exclude`. A hand-assigned mood is Helen's to add and remove in the
-  # file, and the ten in that list are precisely the ones where the rules were
-  # measured against her own pass and lost.
-  # BLUE HAWAIIAN'S EXCLUSION IS GONE, 2026-08-30. It read: "it has coconut
-  # cream, which is genuinely on the rich list... don't take it off the dessert
-  # list until it's failed us more than this." It has not failed -- Helen
-  # tagged the drink `pudding in a glass` herself on the review pass, so the
-  # correction had started arguing with her.
   mastiha-mojito:
     moods: [ice ice baby]
     why: >-
@@ -976,332 +715,58 @@ mood_exclude:
       The drink is left on three moods, which Helen confirmed on sight: "fine
       with three moods".
 
-# `mood_up_glasses` WENT WITH `up`, 2026-08-30. It listed the stemmed glasses
-# and nothing reads it any more. Recovering it means recovering the mood; both
-# are one commit away in git.
 # Words read from the METHOD steps rather than the ingredients. Same drift risk
 # as the sets above, one field over: a step reworded stops matching and nothing
 # says so. Matched case-insensitively as substrings, so `swizzle` catches
 # "swizzling" and `dehydrat` catches both spellings.
 mood_step_words:
   # Two or more of these makes `I want to faff` (or nine-plus ingredients).
-  #
-  # `swizzle` AND `churn` CAME OUT ON 2026-09-09. Helen: "Swizzles are not
-  # faff." She is right and the list was making the same mistake twice: a
-  # swizzle IS churning, so the two words were one technique counted as two
-  # faff moments, and a plain swizzle scored the threshold on its own.
-  #
-  # TWO DRINKS LOSE THE MOOD, AND THE SECOND ONE IS THE INTERESTING ONE.
-  # coffey-park-swizzle is the drink Helen ruled on. sapins-swizzle is not:
-  # it MUDDLES AND SWIZZLES, which was two faff moments and is now one, and
-  # the threshold here is two. So it falls under the rule's own existing line
-  # -- the same line kill-devil-punch and arrack-punch already have
-  # `mood_include` entries for, both reading "one muddle or one long prep,
-  # where the rule wants two".
-  #
-  # THAT IS A CONSEQUENCE OF HER RULING RATHER THAN A SEPARATE JUDGEMENT, and
-  # it is flagged to her rather than corrected away here: if she thinks a
-  # muddled swizzle is faff, the fix is a `mood_include` for that one drink,
-  # exactly like the two punches. Nine others keep the mood untouched, from
-  # `muddle` plus something else, from `alight`/`flame`, or from their own
-  # correction.
-  #
-  # A FIRST PASS AT THIS SAID "EXACTLY ONE DRINK", and it was wrong: it
-  # checked whether any faff word survived rather than whether TWO did, so it
-  # missed the drink that had two and now has one. The derivation script
-  # caught it. Counting the wrong thing confidently is worth a line here
-  # because the next person measuring a blast radius will reach for the same
-  # shortcut.
-  #
-  # `swizzle` AND `churn` STAY IN `ice` AND `churned` BELOW, deliberately.
-  # They are excellent evidence about how a drink is SERVED and useless
-  # evidence about how much work it is, which is the whole of the correction.
+  # `swizzle` and `churn` are absent on purpose: they say how a drink is
+  # served, not how much work it is, and they are one technique, not two.
   faff:
     [muddle, alight, flame, shell, blend, rinse,
      dehydrat, infus, steep, clarif]
-  # Any one of these TECHNIQUES makes `ice ice baby`. The other half of that
-  # rule is the drink's own `serve.ice` value -- see `mood_serve_ice` below.
-  #
-  # THIS BLOCK WAS DEAD DATA FROM 2026-09-05 TO 2026-09-20 (#1147). It declared
-  # eight entries and nothing read one of them: the rule kept its own hardcoded
-  # copy in `derive_cocktail_moods.py`. Every other list here IS read, so this
-  # one looked live and was not -- editing it to change which steps make a
-  # drink icy would have done nothing at all, with no error and no failing
-  # test. `test_every_mood_step_word_list_is_actually_read` is what stops a
-  # third one of these appearing: it RUNS the derivation over the collection
-  # and asks which keys were touched, so a list nothing reads fails by name.
-  #
-  # IT LOST FOUR ENTRIES RATHER THAN BEING WIRED UP AS IT STOOD, and that is
-  # the part to read before restoring them. "crushed ice", "large ice",
-  # "giant ice" and "ice block" are the PRE-2026-09-05 PROSE PROXY: the rule
-  # used to grep method steps for them, the serve pass reworded 63 steps at
-  # once, and nine drinks silently lost the mood. `serve.ice` records the fact
-  # directly now and cannot be broken by rewording. Reading those four back in
-  # would re-break exactly that, so they are gone and the field carries them.
-  #
-  # What is left is the three that were never about ice: a swizzle, a churn and
-  # a blend are TECHNIQUES, they appear in the method because that is where a
-  # technique belongs, and a swizzle is this mood's own example.
-  #
-  # IT DECIDES NO DRINK TODAY, AND IT STILL EARNS ITS PLACE. Measured 2026-09-20
-  # over all 139 files: 14 drinks satisfy both halves of the rule, 24 the
-  # `serve.ice` half alone, and NONE this half alone -- every drink whose method
-  # swizzles, churns or blends also records an icy serve. That is not an
-  # accident, it is serve.yml's own design: its `crushed` entry reads "Every
-  # swizzle". So emptying this list moves nothing, and a reader who tries it
-  # will conclude it is still dead. It is not.
-  #
-  # WHAT IT IS FOR IS THE DRINK THAT HAS NOT BEEN DECIDED YET. `serve.ice` is
-  # OPTIONAL -- "absent is always legal and means nobody has decided yet",
-  # test_serve_block_uses_only_declared_keys_and_values, with Pic-a-de-Crop
-  # Punch as the live case -- so a freshly ingested swizzle carries no serve
-  # value at all, and this half is what gives it the mood until Helen rules.
-  # Deleting it would cost exactly that drink, silently, at the moment the
-  # collection is least able to notice.
+  # Any one of these techniques makes `ice ice baby`; `mood_serve_ice` below is
+  # the other half of the rule. This half decides the drink whose `serve.ice`
+  # is still absent, so it stays although it rarely decides one (#1147). No
+  # phrase describing the ice belongs here: `serve.ice` records that.
   ice: [swizzle, churn, blend]
-  # A NARROWER LIST, and it is not `ice` above. `strong brown drink` is
-  # disqualified by being crushed, swizzled or blended -- but NOT by a big
-  # block of ice, which is precisely how you serve one. Banana Boulevardier
-  # says "strain into a glass over a large ice block" and lost the mood
-  # outright while the two lists were the same list.
+  # Disqualifies `strong brown drink`, together with `serve.ice` crushed or
+  # blended. A big block of ice does not: that is how one is served.
   churned: ["crushed ice", swizzle, churn, blend]
-  # A THIRD LIST, 2026-09-26, AND IT IS `sharp`'s ALONE. Helen, on the Moscow
-  # Mule: "Moscow Mule is sharp. The ginger beer probably supports this, as
-  # well as acting as a sweetener. This isn't an exception to the rule -- it is
-  # perfectly consistent with how I intend the rule to apply."
-  #
-  # It failed on `churned` above, and on both of that rule's limbs: its
-  # `serve.ice` is `crushed`, and its own method step says "Two-thirds fill the
-  # mug with crushed ice." Neither of those is a churn. `sharp`'s reason for
-  # excluding a churned drink, in the deriver's own words, is that blending and
-  # swizzling "turn a drink into a slushy iced one where the ice is the point"
-  # -- and a mug packed with crushed ice is not that. It is how you serve a
-  # long sharp drink.
-  #
-  # SO THE DISQUALIFIER IS THE ACTION, NOT THE ICE, and that is the whole
-  # difference between this list and `churned`. `strong brown drink` keeps the
-  # wider one, where the ice genuinely is the evidence: a big block is how you
-  # serve one, crushed ice is not. Measured before splitting them -- 13 drinks
-  # are churned under the wide rule and not this one, and NOT ONE of them is a
-  # strong brown drink, so the wider rule loses nothing by staying as it is.
-  #
-  # THE SERVE HALF SPLITS THE SAME WAY. The deriver pairs this list with
-  # `serve.ice: blended` alone, where `churned` also takes `crushed`: a blended
-  # drink really is a slushy, which is the one case where the field says the
-  # action without the method having to.
-  #
-  # IT RETIRES NO `mood_include` ENTRY, AND THAT WAS WORTH CHECKING RATHER THAN
-  # ASSUMING. Mai Tai, Carta Switchel and Don's Mai Tai all carry `sharp` by
-  # correction and are all crushed-ice drinks, so this split looked as though
-  # it would make three corrections redundant. It does not: each of the three
-  # pours SIX measured ingredients against a cap of five, which is what their
-  # own `why:` lines have said all along -- "the rule's five-poured-ingredient
-  # cap excludes it", never the ice. Martinique Swizzle keeps its correction
-  # too, and for the honest reason: it is actually swizzled.
-  # `test_every_mood_correction_is_reachable_and_needed` is what settled this,
-  # by staying silent when a draft of this comment claimed otherwise.
-  #
-  # FOUR DRINKS GAIN `sharp`: Bitter Mai Tai, Cobra Effect and Moscow Mule --
-  # all three of which Helen had typed `sharp` on herself, so the rule is
-  # catching up with her rather than overruling her -- and German Vacation,
-  # which is published.
-  #
-  # HALEY TRAUB'S FROZEN MARGARITA DOES NOT, and it is the case that shows the
-  # line is in the right place. Helen typed `sharp` on it too, but its method
-  # blends, so it stays disqualified by this list rather than by its ice. A
-  # frozen margarita IS the slushy the rule is talking about.
+  # Disqualifies `sharp`, together with `serve.ice: blended`. It is the action
+  # alone: a drink churned into a slushy is not sharp, and one served over
+  # crushed ice still is (the Moscow Mule).
   slushy: [swizzle, churn, blend]
   # Any one makes `on fire`.
   fire: [alight, flame, burn]
 
-# The `serve.ice` values that earn `ice ice baby` -- the OTHER half of that
-# rule, and data since 2026-09-20 (#1147) for the same reason the list above
-# is: the rule held its own hardcoded copy, which is the vocabulary living in
-# the guard instead of in the data.
-#
-# `serve.yml` DECLARES WHAT THE FIELD MAY SAY -- none, cubed, crushed, large
-# cube, block, blended -- AND THIS SAYS WHICH OF THOSE ARE ICY ENOUGH TO BE A
-# MOOD. Two different questions, so two different lists:
-# `test_every_icy_serve_value_is_a_real_one` requires every name here to be a
-# declared `serve.ice` value, so a rename in serve.yml cannot silently empty
-# this the way #452's renames emptied `mood_ingredients`.
-#
-# `cubed` IS DELIBERATELY ABSENT and Fish House Punch is why. Helen,
-# 2026-09-18: "comes over lots and lots of ice" -- and the thing the field
-# cannot carry is QUANTITY. Lots of cubed ice is an icy drink; one cube in a
-# rocks glass is not, and both spell `cubed`. That drink carries a
-# `mood_include` instead, which is the right shape for a judgement the data
-# cannot make.
+# The `serve.ice` values that earn `ice ice baby`. serve.yml declares what the
+# field may say; this says which of those are icy enough, and
+# test_every_icy_serve_value_is_a_real_one holds each name to serve.yml.
+# `cubed` is absent on purpose: the field cannot carry quantity, so a drink
+# served over a lot of cubed ice takes a `mood_include` instead.
 mood_serve_ice: [crushed, large cube, block, blended]
 
-# =============================================================================
-# APPETITE FOR CHAOS — how much risk you want tonight
-# =============================================================================
-# Helen's own axis, and the one she actually starts from with company. Built
-# from `meta.ship`, which was already in the spreadsheet.
-#
-# Two buckets, revised down from three, 2026-08-23: `meta.status` is
-# retired (below) and its only job here was defining `haven't tried` --
-# and a drink Helen hasn't tried never gets published anyway, since she
-# keeps track of that herself rather than in the data, so the bucket had
-# nothing left to hold. Duds still fold into `YOLO` -- remaking something
-# you disliked IS a chaotic choice -- unchanged from the earlier
-# three-from-four revision.
-# =============================================================================
-# THE TWO GROUPS THE INDEX ASKS AS SEPARATE QUESTIONS — Helen, 2026-08-27.
-# =============================================================================
-# Every mood above belongs to exactly one of these, and the index renders them
-# under separate headings. `tests/test_cocktails.py` asserts the partition is
-# total and non-overlapping, so a mood added above without a group here fails
-# rather than silently vanishing from the page.
-#
-# WHY THE SPLIT. The index used to ask one question -- "what do you fancy?" --
-# and offer ten answers belonging to three different questions. "No juicing" is
-# not a flavour and "I want to faff" is not a mood; they answer *can I be
-# bothered*, and sitting them in a row headed *what do you fancy* meant sorting
-# them yourself before choosing. Helen: "I feel like I am doing work to
-# understand what to click in order to maximise my chance of getting the drink
-# I want."
-#
-# TASTE AND STYLE ARE **NOT** SPLIT, and that was tried. The first proposal had
-# three groups -- taste, style, hassle. Helen: "honestly I think taste and
-# style in those columns are the same, and should be called Mood. Splitting out
-# Hassle though feels good." So the cut that earns its place is the one between
-# what a drink IS and what it COSTS, and only that one.
-#
-# `pudding in a glass` is in `mood` and has zero members, which is deliberate
-# -- see its own note above. The index renders no button for an empty mood, so
-# it is grouped here for completeness rather than for display.
-# =============================================================================
-# MOODS ONLY HELEN ASSIGNS — no rule derives these, and none ever should
-# =============================================================================
-# Every mood above this list is computed from ingredients, method and glass.
-# These are not, because they name an OCCASION or a judgement rather than a
-# property of the liquid, and that is precisely what makes them worth having.
-#
-# HELEN, 2026-08-30, ON A SET OF PROPOSED FLAVOUR TAGS -- `bitter`, `smoky`,
-# `herbal`, `vegetal` -- ALL OF WHICH WERE DROPPED BECAUSE OF THIS:
-#
-#   "they're flat descriptors, which is fine in moderation, whereas I'd hoped
-#    for more evocative moods, you know, something I can offer beyond what one
-#    might guess from the ingredients list."
-#
-# That is the sharper test and it is the one to apply to any future mood: a tag
-# meaning "contains one of these bottles" is a worse copy of the HAS TO HAVE
-# field, which already does exactly that and does it better.
-#
-# WHAT THIS COSTS, AND WHY IT IS WORTH IT. `test_every_drinks_moods_match_the
-# _derivation` exists so stored moods cannot drift from the rules that made
-# them -- that drift is what left 23 drinks unbrowsable. A mood no rule
-# produces would fail it on every drink. So these are named here, the deriver
-# never emits one, and the check preserves whatever a drink already carries for
-# them rather than asking where it came from. The guarantee stays exactly as
-# strong for the moods it applies to.
-#
-# ADDING A NAME HERE IS WHAT MAKES A MOOD HERS. Removing one hands it back to
-# the rules, and needs a rule to hand it back TO.
-# =============================================================================
-# ONE MOOD CANCELLING ANOTHER -- #853
-# =============================================================================
-# Helen, 2026-09-08: "LIIT is easy peasy, and this should suppress the
-# derivation." Long Island Iced Tea carried `easy peasy` AND `I want to faff`,
-# which say opposite things -- one that the drink asks nothing of you, the
-# other that it asks a lot -- and both rendered as chips side by side.
-#
-# NEITHER WAS WRONG BY ITS OWN RULE, which is what makes this a vocabulary
-# question rather than a bug. `easy peasy` is hers, applied by hand. `I want to
-# faff` is derived, and its rule is "muddling, flaming, shells, blending,
-# swizzling, or nine-plus ingredients" -- five OPERATIONS and one COUNT. The
-# count is the odd one out: it is a proxy for effort that holds for a tiki drink
-# with nine things happening to it and fails for this one, whose entire method
-# is "shake the first 8 ingredients with ice" and then pour the ninth on top.
-#
-# SHE SUPPRESSES RATHER THAN RE-SCORES, and that is the cheaper correction: the
-# nine-ingredient rule stays exactly as it is for the 124 drinks it is right
-# about, and a drink she has personally called easy stops being contradicted by
-# it. Her hand-applied judgement wins over a derived one, which is the same
-# order of precedence `moods_by_hand` already establishes.
-#
-# LEFT is the mood that wins; RIGHT is what it removes. Only ever removes a
-# DERIVED mood -- suppressing a hand-applied one would mean the file arguing
-# with itself about something Helen typed twice on purpose.
+# One mood cancelling another (#853). LEFT wins; RIGHT is removed. Only a
+# DERIVED mood is ever removed: Helen's hand-applied `easy peasy` beats the
+# derived `I want to faff`, whose nine-ingredient count misreads a drink she
+# has called easy.
 mood_suppresses:
   easy peasy:
     - I want to faff
 
+# Moods Helen assigns by hand: an occasion or a judgement, not a property of
+# the liquid. The deriver keeps whatever a drink already carries for these, so
+# a rule for one of them can only ADD and has to be precise rather than
+# complete. Removing a name hands the mood back to the rules, and needs a rule
+# to hand it back to.
 moods_by_hand:
-  # THE FOUR BELOW MOVED HERE ON 2026-08-30, after every rule was scored
-  # against a full pass Helen made over all 114 drinks. The fit, as
-  # intersection over union:
-  #
-  #     no juicing 1.00 | ice ice baby .88 | warming .79 | sharp .78
-  #     strong brown drink .76 | fruity .76 | I want to faff .73
-  #     clear .67 | tiki .53 | on fire .40 | aperitivo .36
-  #     sugar craving .23
-  #
-  # The bottom four are here now. `sugar craving` is the clearest case: she
-  # tagged 47 drinks, the rule found 11, and the 36 she added share nothing the
-  # data can see. `clear` is the sharpest: it turns out to mean mouthfeel,
-  # complexity and how filling a drink is -- see its own note above, and the
-  # thirteen days it spent claiming to mean "transparent".
-  #
-  # ACROSS THE WHOLE TABLE THE RULES UNDER-FIRE, and that is the reassuring
-  # half: only FOUR times in the entire pass did a rule tag something she did
-  # not. Everything else was her adding. A conservative rule is the right kind
-  # of wrong, and the ones that stay derived are gaps to widen rather than
-  # judgements to distrust.
-  # `clear` WAS ASKED THE SAME QUESTION AS `tiki` ON 2026-09-28 AND THE ANSWER
-  # WAS NO -- measured, so nobody has to wonder again. Helen: "Let's do
-  # something on tiki and clear."
-  #
-  # Every candidate of the obvious shape -- a spirit from the `clear` set, a
-  # cap on poured ingredients, nothing rich, no tiki marker -- scored between
-  # .26 and .34 against her own 19 tagged drinks, against .67 for the rule that
-  # was retired here. Under the precision test that made `tiki` viable they are
-  # far worse: the best would ADD `clear` to 25 drinks she did not tag, and the
-  # loosest to 45. A rule for a hand mood can only add, so that is 25 wrong
-  # chips, not 25 near misses.
-  #
-  # THE DEFINITION EXPLAINS WHY, and it is above: "glassy mouthfeel, low
-  # complexity, not filling". Brooklyn is brown and IS clear; the Negroni is
-  # transparent and is NOT. None of the three is a property of an ingredient
-  # list, which is exactly what the 2026-08-30 pass concluded and what the
-  # thirteen days of "transparent" got wrong.
+  # No rule: every candidate adds `clear` to drinks Helen did not tag.
   - clear
   - sugar craving
-  # `tiki` IS BOTH, SINCE 2026-09-28 (#1187) -- derived AND hand-assigned, the
-  # second mood to lead that double life after `on fire`. It STAYS on this list
-  # and gains a rule, which is a different thing from coming off it.
-  #
-  # WHY THAT COMBINATION IS SAFE RATHER THAN A FUDGE. `expected_moods`
-  # PRESERVES whatever a drink already carries for a mood on this list, and
-  # folds the derivation in beside it. So a rule for a hand mood can only ADD:
-  # a miss costs nothing and needs no `mood_include`, and the only measurable
-  # cost is a drink tagged that Helen did not tag. That inverts what the rule
-  # has to be good at -- PRECISION, not coverage -- and this block has always
-  # said a conservative rule is the right kind of wrong.
-  #
-  # Helen asked for it: "Let's do something on tiki and clear. I'm sure we used
-  # to have a tiki deriver -- something like more than x ingredients, fewer
-  # than y, and at least two typical tiki ingredients???" She was right that
-  # one existed; `derive_cocktail_moods.py` had kept its COMMENT with the code
-  # deleted since the .53 score above moved the mood here.
-  #
-  # Two markers plus four ingredients, measured over all 140 drinks: it fires
-  # 19 times, 17 of them hers. The deriver carries the marker distribution and
-  # the six she tags with no marker at all.
-  #
-  # `sugar craving` JOINED IT ON 2026-10-08, the third mood with a rule that
-  # only adds. EVERY HAND MOOD WAS SEARCHED THAT DAY for any one- or
-  # two-feature rule, scored on drinks held out of the search and against the
-  # same search run on shuffled tags. `clear` and `signature` have real signal
-  # (.71 and .70 against .44 and .47 shuffled); `sugar craving` and `nightcap`
-  # are weak; `sunny terrace`, `aperitivo`, `festive`, `brunch`, `easy peasy`
-  # and `so wrong it's right` score AT OR BELOW the shuffled search, which is
-  # to say the data cannot see them at all. That is a statement about rules,
-  # not about the tags. `clear` got no rule anyway -- its best one has six
-  # false alarms, and Helen: "Don't add things I'll need to remove -- easier
-  # for me to notice the gaps." DECISIONS has the table.
+  # `tiki`, like `sugar craving` above and `on fire` below, also has a rule
+  # that only adds.
   - tiki
   - aperitivo
   - nightcap
@@ -1310,40 +775,15 @@ moods_by_hand:
   - festive
   - signature
   - so wrong it's right
-  # #775. Earned rather than derived -- Helen tags it once she has MADE the
-  # drink, which is a fact about her and not about the liquid, so no rule can
-  # produce it. It is also the one hassle that is not a cost: the other four
-  # say what a drink will ask of you, and this one says it will ask nothing.
+  # Earned, not derived: Helen tags it once she has made the drink (#775).
   - easy peasy
-  # ADDED 2026-09-09, AND THIS BLOCK'S OWN COMMENT SAYS IT SHOULD HAVE BEEN HERE
-  # ALL ALONG. The scores above rank the rules by fit and then say "the bottom
-  # four are here now" -- and the bottom four by those numbers are
-  # `sugar craving` .23, `aperitivo` .36, `on fire` .40 and `tiki` .53. Three of
-  # them were added. This one was not, and nothing noticed for ten days, because
-  # the derivation happened to agree with Helen on all five drinks that had it.
-  #
-  # COBRA'S FANG IS WHAT FOUND IT. Proofreading, she added "passion fruit shells
-  # filled with Overproof rum and fire" to `to_serve` and tagged the drink
-  # `on fire` -- and the derivation stripped it, because `mood_step_words.fire`
-  # reads METHOD STEPS for 'alight', 'flame' and 'burn'. Her fire is in the
-  # SERVE, and the word is "fire", which is not in the list either.
-  #
-  # HAND-ASSIGNED RATHER THAN A WIDER RULE, and that is the choice worth
-  # recording. Adding `to_serve` to the fire scan would also have caught Mai
-  # Tai's "Optional fire if tiki mug" -- and whether an optional flourish makes
-  # a drink `on fire` is a judgement, not a parse. The derivation still tags the
-  # five drinks whose METHOD sets something alight; this only stops it deleting
-  # a sixth that Helen typed on purpose.
-  #
-  # RULED 2026-09-10 (#894): an optional flourish CAN make a drink `on fire` --
-  # "yes in principle" -- and the Mai Tai specifically does not get it. So the
-  # rule stays as it is, the Mai Tai stays unlit, and a future drink whose
-  # optional flame she wants offered is hand-assigned like Cobra's Fang.
+  # The rule reads METHOD steps only. A flame in `to_serve`, or an optional
+  # one Helen wants offered, is hand-assigned (#894).
   - on fire
 
-# THE ORDER OF EACH LIST IS THE ORDER THE INDEX SHOWS ITS BUTTONS IN --
-# cocktails/index.html iterates these as written. Both orders are Helen's own,
-# typed out on #966 (mood) and #967 (hassle), 2026-09-11. Do not sort them.
+# The index asks these as two separate questions and shows each list's buttons
+# in the order written here (#966, #967): do not sort them. Every mood belongs
+# to exactly one group; tests/test_cocktails.py fails a mood with none.
 mood_groups:
   mood:
     - signature
@@ -1363,49 +803,26 @@ mood_groups:
     - festive
   hassle:
     - no juicing
-    # NEXT TO `no juicing` DELIBERATELY, #1127: the two chips that name a piece
-    # of equipment you will not have to get out read as a pair, and both are
-    # the low-effort end of the row. Helen's orders above are hers; this one
-    # position is the only thing in either list that was not typed by her.
+    # Beside `no juicing` on purpose (#1127): the two chips that name a piece
+    # of equipment you will not have to get out.
     - no measuring
     - ice ice baby
     - on fire
     - easy peasy
     - I want to faff
 
+# Appetite for chaos: how much risk tonight, read off `meta.ship`.
 chaos:
   definitely good: "ship is yes or oh gods yes"
   YOLO: "everything else, including the five drinks rated `not really`"
 
-# `who knows` is NOT on the ship scale -- Helen, 2026-08-17. It means "I have no
-# idea", which is an absence of verdict rather than a low one, so it belongs
-# with the unrated rather than as a low rung on the scale.
+# `who knows` is not on this scale: it is an absence of verdict, not a low one,
+# and the only `meta.ship` value that is not a rung
+# (test_meta_ship_is_a_rung_or_who_knows). A drink Helen has not made says
+# `who knows` and may still publish (DECISIONS §9.4).
 #
-# IT IS ALSO, SINCE 2026-09-05, THE ONLY VALUE OFF THE SCALE. `QQ` used to sit
-# beside it here and is now not a ship value at all: a drink Helen has not made
-# says `who knows`, and `made_before: false` carries the "nobody has asked"
-# that `QQ` used to. Helen, ruling on it: "I think that's clearer than QQ or
-# leaving it unset, because it's a positive presence." Two markers for one fact
-# is how they drift. `tests/test_cocktails.py::test_meta_ship_is_a_rung_or_who_knows`
-# holds the closed vocabulary.
-#
-# AN UNMADE DRINK MAY PUBLISH, and that is deliberate -- the drink side parts
-# company with food here. Helen, 2026-09-05: "there's no prose except the
-# tagline which I will always write from scratch, so no copyright or author
-# respect issue. It will be much easier for me to browse drinks I want to try
-# from the live site than a local build."
-#
-# `maybe` and `okay` collapsed into `meh`, 2026-08-23 -- Helen: the two only
-# ever meant the same shrug, unlike `okay`/`sure`, which stayed distinct
-# because `sure` is a genuinely more positive verdict.
-#
-# EVERY VALUE QUOTED, and `yes` is why. YAML 1.1 parses a bare `yes` as the
-# BOOLEAN True, so this list came out as [..., 'sure', True, 'oh gods yes'] and
-# would have silently failed every comparison against `meta.ship`, which is the
-# string "yes" on 37 drinks. No error anywhere -- just a scale with a hole in
-# it. The mirror image of food's own note on `meta:` booleans, where quoting
-# `rewritten: true` would turn it into the STRING "true" and break every
-# `is True` check in the suite.
+# Every value is quoted: YAML reads a bare `yes` as the boolean true, which
+# silently fails every comparison against `meta.ship`.
 ship_scale:
   - "not really"
   - "meh"
@@ -1413,119 +830,20 @@ ship_scale:
   - "yes"
   - "oh gods yes"
 
-# =============================================================================
-# HOW THE SCALE IS DRAWN — the goodness mark's tint, as a percentage of the
-# second accent. Settled with Helen on the design page, 2026-08-26.
-# =============================================================================
-# The mark on a cocktail card is a small square filled with this much accent
-# and the rest paper. It lives HERE rather than in the stylesheet because the
-# scale and how the scale is drawn are one decision, and splitting them across
-# two files means a sixth rung could be added to `ship_scale` above and render
-# as blank paper with nothing to say why.
-#
-# IT IS NOT A LINEAR RAMP AND MUST NOT BE MADE INTO ONE. `yes` and `oh gods
-# yes` are BOTH 100, because both mean "make this" -- the difference between
-# them is enthusiasm, not decision, and spacing them evenly would invent a
-# distinction Helen's verdicts do not carry. The whole range is spent on the
-# gap that matters: between "make this" and everything below it.
-#
-# `sure` and `meh` were 62 and 30 for one afternoon and are 42 and 16 now. At
-# 62 a `sure` was near enough a `yes` to be mistaken for one at a glance, which
-# is the one thing a scale exists to prevent.
-#
-# `who knows` IS NOT ON THE SHIP SCALE -- see the note above; it means "I have
-# no idea", an absence of verdict rather than a low one. It draws the same
-# empty mark as `not really` and is told apart by its label. That is also why
-# the mark keeps its BORDER at every rung: an empty square reads as "rated, and
-# rated low", where a square that vanished would read as "not rated", which is
-# a different fact this scale already holds separately.
-# =============================================================================
-# WHAT A RUNG IS CALLED ON A CARD — the display map. Added 2026-08-30.
-# =============================================================================
-# THE SAME IDIOM `card_names` USES IN ingredients.yml, and for the same reason:
-# a card name may be lossy where the real value may not. `meta.ship` keeps
-# saying "oh gods yes" — Helen's own words, and §9.9 records that the vocabulary
-# existed on 18 drinks before anyone asked for a rating — while the card says
-# `yes²`.
-#
-# WHY THE CARD WANTS SHORTER. The mark is a ship pinned to the card's
-# bottom-right with the word beside it, so the word's length decides where the
-# ship sits. Helen: "the motivation is getting everything to the same number of
-# words, i.e. one, so the cards look more stable." Three of the five were one
-# word already; these two were not.
-#
-# `²` IS THE CHARACTER, NOT MARKUP. House style already prefers a real glyph to
-# a synthetic one — §5 uses unicode fractions (½) rather than markup for exactly
-# this — and it keeps HTML out of a data file, which is where it would have to
-# be escaped or deliberately un-escaped in the template.
-#
-# A RUNG WITH NO ENTRY GETS NO WORD, which is what `who knows` wants: it is
-# deliberately off the scale (see the note below), it is 20 of 124 drinks, and
-# the card draws the ship without a label rather than inventing a sixth term
-# for "not rated". (`QQ` was named here too until 2026-09-05 and is no longer a
-# ship value at all.)
-#
-# THAT BECOMES A LIVE-SITE QUESTION THE DAY AN UNMADE DRINK IS PROMOTED, and it
-# is not one yet only because nothing is promoted. Those 20 drinks may now
-# publish (Helen's ruling, 2026-09-05 -- see the note above `ship_scale`), and
-# on a published card a `who knows` renders the ship with nothing beside it.
-# #722's own second bullet is the intended answer -- "Ship mark reads ???" --
-# and it needs a change to `_includes/cocktails/ship.html`, which gates the word
-# on scale membership before it ever reaches this map, not just a line here.
-# Helen has not asked for it: "I don't actually require the front-end feature."
+# What a rung is called on a CARD, where one word keeps the cards steady.
+# `meta.ship` keeps the full words, and the drink page prints them: only a card
+# asks `_includes/cocktails/ship.html` for these. A rung with no entry shows
+# its own name. `²` is the character, not markup.
 ship_card_names:
   "not really": "hmm"
   "oh gods yes": "yes²"
 
-# =============================================================================
-# WHAT AN OFF-SCALE SHIP IS CALLED — `???`. Helen, 2026-09-05, closing #722's
-# second bullet.
-# =============================================================================
-# "I would like the ship mark to have ??? next to it for 'who knows', because
-# that, to me, is unambiguously not on the same rating scale. (It's also
-# funny)."
-#
-# BOTH HALVES OF THAT ARE THE ARGUMENT. The scale's five rungs are words and
-# this is punctuation, so it cannot be misread as a sixth rung the way any
-# sixth WORD would be -- and the joke is doing real work, because the thing it
-# is funny about ("I have no idea") is exactly what it means.
-#
-# IT IS NOT IN `ship_card_names` AND MUST NOT MOVE THERE. That map is the
-# CARD's abbreviations, and the drink page deliberately does not read it (see
-# the note above it, and `_includes/cocktails/ship.html`, where Helen ruled
-# `yes²` off the drink page on 2026-09-05). This word belongs in BOTH places:
-# a rating that says nothing is exactly as confusing on a drink page as on a
-# card, and the reason she gave -- "unambiguously not on the same rating
-# scale" -- is about the scale, not about the space in a card foot.
-#
-# A SCALAR, NOT A MAP KEYED BY "who knows", so the include never names a
-# vocabulary value. It asks `ship_scale` whether a value is a rung and uses
-# this for everything that is not, which is the same derivation §9.9 exists to
-# insist on. The vocabulary is closed to the scale plus "who knows"
-# (test_meta_ship_is_a_rung_or_who_knows), so "everything else" is precisely
-# one value today -- and if that ever stops being true, the fallback is still
-# right rather than silently absent.
+# What an off-scale ship is called, on the card and on the drink page (#722).
+# A scalar, not a map keyed by "who knows", so the include names no vocabulary
+# value: it asks `ship_scale` whether a value is a rung and prints this for
+# everything else. It does not belong in `ship_card_names`, which is the
+# card's alone.
 ship_unrated_word: "???"
 
-# `ship_tints` LIVED HERE UNTIL 2026-09-06 AND WAS RETIRED, NOT LOST. It was
-# the ramp the card's old tinted square filled along (`not really` 0, `meh` 16,
-# `sure` 42, `yes` 100, `oh gods yes` 100, `who knows` 0). The square became a
-# ship icon plus a word on 2026-09-02 and nothing read the numbers after that.
-# The block stayed for one reason: #511 and #612 wanted a graduated scale on
-# the DRINK page, and the ramp's SHAPE -- deliberately not linear, `yes` and
-# `oh gods yes` both full because both mean "make this" -- was the argument
-# that scale would need. Both issues closed on 2026-09-02 with the drink page
-# showing the rung WORD instead, on a different footing, which is exactly the
-# condition the old comment here set for deleting the block. The reasoning
-# survives in MANUAL §9.5 ("The goodness mark"), with the numbers. A value
-# nothing reads is only safe while a comment says why it is here, and there
-# was no longer a why. `test_every_ship_rung_has_a_tint` went with it.
-
-# =============================================================================
-# DELIBERATELY ABSENT
-# =============================================================================
-# star_ingredients: there is no star axis. See the header.
-# co_tags: food kept exactly one co-tag rule and the test for adding another is
-#   strict -- sound when a ROLLUP or a real AFFORDANCE, unsound when
-#   DEFINITIONAL. No cocktail mood has met it yet. `on fire` implies `worth the
-#   faff` in practice, but that is definitional, so it is not encoded.
+# Deliberately absent: `star_ingredients` (there is no star axis) and `co_tags`
+# (no cocktail mood has met food's test for one).

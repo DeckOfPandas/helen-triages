@@ -3,40 +3,22 @@
     python3 scripts/glass_survey_stats.py --check    # diff, exit 1 if stale
     python3 scripts/glass_survey_stats.py --write    # rewrite the block
 
-THE SURVEY IS THE FACT AND THE STATISTICS ARE ITS SHADOW. Every product in
-`_data/cocktails/glass_survey.yml` carries its own figure and the page it came
-from; `_data/cocktails/glasses.yml` carries only what those figures add up to --
-n, min, median, mean and max -- between a pair of marker comments. Typing the
-summary by hand would be a second copy of the survey waiting to disagree with
-it, so it is generated, and
-tests/test_cocktails.py::test_glass_survey_statistics_are_current runs `--check`
-so the two cannot drift.
+Reads `_data/cocktails/glass_survey.yml`, where every product carries its own
+figure and source, and writes the block between the marker comments in
+`_data/cocktails/glasses.yml`: n, min, median, mean and max per type, and
+`heights_mm` (MANUAL §9.11.2).
+tests/test_cocktails.py::test_glass_survey_statistics_are_current runs `check()`.
 
-WHAT COUNTS TOWARDS A CAPACITY. `brimful`, `unstated` and `documented` do; a
-`nominal` figure does NOT, because it is a pour size or a filling line rather
-than what the glass holds -- one wine glass in the survey is sold as "125 ml",
-its design pour, and averaging that in as a capacity would call it a thimble.
-The entry stays in the survey (it is a true fact about the page) and simply is
-not counted. Heights have no such distinction: an overall height is an overall
-height.
+  capacity    `brimful`, `unstated` and `documented` figures count. `nominal`
+              does not: it is a filling line or a serving size, not what the
+              glass holds. The row stays in the survey.
+  heights_mm  each icon's median surveyed height, or its `height_overrides`
+              entry where Helen kept a number on purpose.
+  exclude     `exclude: "<why>"` takes a whole row out of both statistics and
+              keeps it recorded with its reason.
 
-`heights_mm` IS WRITTEN HERE TOO, since 2026-09-29 -- the size every icon is
-drawn at, as each icon's median surveyed height, or its `height_overrides`
-entry where Helen kept a number on purpose (the punch bowl, which at its real
-256 mm would become the tallest glass and so the scale's denominator; and the
-two old fashioneds).
-
-`exclude: "<why>"` TAKES A WHOLE ROW OUT OF BOTH, and it is the one place a
-row is judged rather than read. The rule for getting INTO the survey is that
-the maker or retailer names the product as that type, which is objective and
-admits a few things that are plainly not it -- a flat stemless tumbler sold as
-an "absinthe glass", a novelty beer-mug shot. They stay recorded, with the
-reason, so the judgement is visible and reversible.
-
-A SPEC, NOT AN INVENTORY. Helen, 2026-09-28: "I don't want inventory, just
-spec. I might buy new glasses... let's offer rules, then I'll happily break
-them in the kitchen." These are what the glass types on the market measure,
-not what is in the cupboard.
+These are what the glass types on the market measure: a spec, not an inventory
+of the cupboard (DECISIONS §9.11).
 """
 import argparse
 import difflib

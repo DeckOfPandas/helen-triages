@@ -1,13 +1,13 @@
 #!/bin/sh
 # Screenshot pages of the served build at 360, 390 and 1280 px and report any
 # element past the viewport. Usage: sh scripts/browser/shoot.sh <label> <path>...
-# With no paths, the family-weekend set of 2026-09-10 (both indexes, three
-# drinks, two recipes, both reference pages, about). Output: tmp/shots/.
+# With no paths, a default set (both indexes, three drinks, two recipes, both
+# reference pages, about). Output: tmp/shots/.
 #
-# THE PORT COMES FROM tmp/browser/port, written by THIS worktree's serve.sh
-# (2026-09-11), so the page measured is this worktree's own build and never
-# another session's. With no port file (no server running here) it falls back
-# to 4010 and the ERROR lines name the refused connection.
+# The port comes from tmp/browser/port, written by this worktree's serve.sh,
+# so the page measured is this worktree's own build and never another
+# session's. With no port file (no server running here) it falls back to 4010
+# and the ERROR lines name the refused connection.
 label="$1"
 shift
 if [ "$#" -eq 0 ]; then

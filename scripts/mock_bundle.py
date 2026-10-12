@@ -1,20 +1,15 @@
 """Bundle a locally built page into one self-contained HTML file for an Artifact.
 
-Restored 2026-09-02 after an agent's tmp/ clean-up removed it. Inlines the
-compiled stylesheet (with the woff2 fonts as data URIs), every script the page
-loads, and every SVG under assets/img so decorations.js's fetches are answered
-from memory instead of the network. Output is body content only (no
-<html>/<head>/<body>): the Artifact tool wraps it. Build the site first:
+Inlines the compiled stylesheet (with the woff2 fonts as data URIs), every
+script the page loads, and every SVG under assets/img so decorations.js's
+fetches are answered from memory instead of the network. Output is body
+content only (no <html>/<head>/<body>): the Artifact tool wraps it. Build the
+site first:
   bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
 """
 import base64, glob, json, os, re
 
-# TWO dirnames, not three, since 2026-09-04. This file was restored into
-# scripts/ from tmp/mock/, one level deeper, and kept the three-dirname root
-# that was right there and one level too high here -- so from scripts/ it
-# pointed at the parent of the checkout and every mock of the week re-pointed
-# ROOT and SITE by hand after importing. Anchored on the file's own location
-# because that is what it always meant.
+# Anchored on this file's own location: two dirnames up is the checkout.
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = os.path.join(ROOT, "tmp", "site-mock")
 BASE = "/helen-triages"

@@ -1,13 +1,17 @@
 """The food reference pages' candidates page: MANUAL 13.11, round one. Ships nothing.
 
-REPRODUCES NO NUMBER -- it rebuilds the pages Helen chooses from, and is kept in
-scripts/ so round two does not start from a script that was in tmp/ and is gone
-(the lesson of the leopard's round two, LEOPARD.md section 4).
+Build first:
+  bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
+Then:
+  python3 scripts/reference_candidates.py
 
-ROUND ONE, 2026-10-08, from Helen's three rulings that day: the oven setting
-goes back on a method row ("200 fan for 10 mins then 180 fan for an hour? If
-so then yes"); the charts stay one scroll "with good nav"; every tooltip is
-gone (#1326, already shipped). ON THE BAR:
+Writes tmp/refcand/index.html (the Artifact's body: the charts page),
+charts.html and methods.html (full documents, published beside it) and
+phone.html (both pages at 390px, several treatments side by side, for a screen
+on which a 600px breakpoint never fires, MANUAL §11.2.1). Parse
+tmp/refcand/switcher.js before publishing.
+
+The switches on the bar:
 
   charts   row    today | one line (label and figure on one line, bar under)
                         | thermometer (a vertical scale, levels as brackets)
@@ -17,22 +21,13 @@ gone (#1326, already shipped). ON THE BAR:
            groups flat (shortest first) | by cut (the data's own `group`)
            fish   table | list | list, no notes
 
-Everything here sits on top of the built stylesheet as overrides keyed off
-html[data-*]; nothing in _sass/ changes until she has chosen. The methods page
-drops the live cook-timer.js and inlines a candidate renderer (CAND_TIMER) that
-writes BOTH tables so the switch is pure CSS; the arithmetic is still the live
-HTF.cookSchedule. The fish and shellfish lists are parsed out of the page's own
-tables (fish_lists), so they cannot drift from them.
-
-Build first:
-  bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
-Then:
-  python3 scripts/reference_candidates.py
-Writes tmp/refcand/index.html (the Artifact's body: the charts page),
-charts.html and methods.html (full documents, published beside it) and
-phone.html (both pages at 390px, three treatments side by side, for an iPad or
-a desktop where a 600px breakpoint never fires -- MANUAL 11.2.1). Parse
-tmp/refcand/switcher.js before publishing.
+Everything sits on top of the built stylesheet as overrides keyed off
+html[data-*]; nothing in _sass/ changes. The methods page drops the live
+cook-timer.js and inlines a candidate renderer (CAND_TIMER) that writes both
+tables so the switch is pure CSS; the arithmetic is the live
+HTF.cookSchedule. The fish and shellfish lists are parsed out of the page's
+own tables (fish_lists), so they cannot drift from them.
+`scripts/methods_candidates.py` imports the bar and the switcher from here.
 """
 import json, os, re, sys
 

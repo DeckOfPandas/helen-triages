@@ -1,50 +1,31 @@
 """Would regenerating the glass icons reproduce what is shipped, byte for byte?
 
-REPRODUCES DECISIONS.md §9.11's "a wholesale regeneration reproduces all 27
-shipped icons byte for byte" (27 = 27 on 2026-09-29; 28 = 28 on 2026-10-02,
-with the mule mug), and
-`scripts/normalise_glass_icons.py` says to run it after touching its registries.
-
     python3 scripts/check_glass_regen.py
 
-WHY THIS EXISTS. `scripts/normalise_glass_icons.py` rebuilds the whole icon set
-from the archive, and its first act is `shutil.rmtree` on the published
-directory. Which archived source becomes which published icon is decided by
-three hand-maintained registries in that file -- SKIP, SOLID and RENAME -- and
-until 2026-09-05 nothing ever checked that they still agreed with the set on
-disk. A missing entry does not fail: it silently reverts a drawing, or writes an
-orphan icon beside the right one, and the git diff blames the generator.
+`scripts/normalise_glass_icons.py` rebuilds the whole icon set from
+`_design_sources/cocktails/glasses/`, deleting the published directory first.
+Which source becomes which icon is decided by three hand-maintained registries
+in that file: SKIP, SOLID and RENAME. A missing entry does not fail there: it
+silently reverts a drawing, or writes an orphan beside the right one. Run this
+after touching them (DECISIONS §9.11).
 
-That is not hypothetical. On 2026-09-05 Helen redrew the pineapple and the
-coconut; without the SKIP and RENAME entries added the same day, a regeneration
-would have republished both from the superseded compound fills AND emitted
-`pineapple-8.svg` and `coconut-4.svg` as orphans.
+It deletes and writes nothing: it resolves names and classes as the
+generator's main() does, normalises in memory, and diffs against
+`_includes/icons/glasses/`. Exit 1 on any unexpected line.
 
-IT NEVER DELETES ANYTHING. It resolves names and classes exactly as the
-generator's main() does, normalises in memory, and diffs against what is
-shipped. Safe to run any time, including on a dirty tree.
-
-WHAT A REPORT LINE MEANS:
-
-  COLLISION  two archived sources resolve to one published name. `sorted()`
-             decides the winner, which is the trap #484 exists about. Add the
-             loser to SKIP.
+  COLLISION  two archived sources resolve to one published name, and
+             `sorted()` decides the winner. Add the loser to SKIP.
   ORPHAN     a source resolves to a name nothing ships. Usually a missing
-             RENAME entry, which would add a file the icon tests then reject.
-  UNREACHED  a shipped icon that no archived source produces. The archive is
-             the record; if this fires, something was hand-made and never
-             written back, and regenerating will delete it.
-  DIFFERS    regenerating would change the file. Either the shipped copy was
-             hand-edited after generation, or the source changed and was never
-             republished.
-  REFUSED    the generator's own guards rejected the source. The message is
-             theirs and says which guard.
+             RENAME entry.
+  UNREACHED  a shipped icon that no archived source produces: regenerating
+             would delete it.
+  DIFFERS    regenerating would change the file: the shipped copy was
+             hand-edited, or the source changed and was never republished.
+  REFUSED    the generator's own guards rejected the source; the message says
+             which guard.
 
-NOTHING IS EXPECTED TO DIFFER. One thing did until 2026-09-06 -- the tiki mug's
-hand-added `feMorphology` thinning filter, which the generator does not emit --
-and it went when Helen redrew the mug as line art (#738). `KNOWN` is where to
-record such a thing if it ever returns, and an empty `KNOWN` is the state worth
-defending: every entry in it is a documented lie about the archive.
+Nothing is expected to differ. `KNOWN` is where a deliberate divergence is
+recorded, and it is meant to stay empty.
 """
 import os
 import pathlib

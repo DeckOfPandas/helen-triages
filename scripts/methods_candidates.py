@@ -1,17 +1,16 @@
 """The methods page's candidates page: MANUAL 13.11, round four. Ships nothing.
 
-Kept in scripts/ beside reference_candidates.py (round one) for the same
-reason it is: a later round should not start from a tmp/ that is gone.
+Build first:
+  bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
+Then:
+  python3 scripts/methods_candidates.py
 
-ROUND FOUR, 2026-10-09. Round three promoted the outcome to the second line of
-a method block (violet, 600) and gave the cut-group and fish names the
-heading lettering with the violet rule, and Helen's read was: "I love most
-of this! It's just the 'jollier headings' request. There is a LOT going on
-now. Perhaps some extra vertical space between sections (particularly above
-the top rows) would help. Perhaps giving in and swapping the outcome to be
-first place would help. Maybe a different font for the method (e.g.
-'sugar-rubbed roast') would help?" Three perhapses, so three switches on
-the real page rather than a guess:
+Writes tmp/refcand4/index.html (the Artifact's body), methods.html (a full
+document) and phone.html (several treatments at 390px side by side). The bar,
+the switcher and the document wrapper are imported from
+reference_candidates.py.
+
+The switches on the bar:
 
   space   today | more        air above each group heading, between the
                                heading and its first block, between blocks
@@ -20,15 +19,8 @@ the real page rather than a guess:
   face    body | courier | italic   the method name's face
 
 Everything sits on top of the built stylesheet as overrides keyed off
-html[data-*]; nothing in _sass/ changes until she has chosen. The live
-cook-timer.js renders the blocks; only CSS moves.
-
-Build first:
-  bundle exec jekyll build --config _config.yml,_config_local.yml -d tmp/site-mock
-Then:
-  python3 scripts/methods_candidates.py
-Writes tmp/refcand4/index.html (the Artifact's body), methods.html (a full
-document) and phone.html (three treatments at 390px side by side).
+html[data-*]; nothing in _sass/ changes. The live cook-timer.js renders the
+blocks; only CSS moves. A later round starts by changing GROUPS and css().
 """
 import os, sys
 

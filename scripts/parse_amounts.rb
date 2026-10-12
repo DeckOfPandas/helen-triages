@@ -7,12 +7,11 @@
 # {"amount", "number", "unit", "ml"}: `number` is null for an amount with no
 # figure, `ml` is null for one that is not a volume.
 #
-# IT EXISTS SO THE RUBY PARSER HAS A TEST THAT DOES NOT COST A JEKYLL BUILD
-# (#1199). tests/test_amount_parser.py shells out to it; a file rather than
-# `ruby -e` because an inline program is refused by
-# .claude/hooks/guard-inline-script.py, and rightly.
+# It gives the Ruby parser a test that does not cost a Jekyll build (#1199):
+# tests/test_amount_parser.py shells out to it. A file, not `ruby -e`, because
+# .claude/hooks/guard-inline-script.py refuses an inline program.
 #
-# READS ONLY: the file named, and _data/cocktails/ingredients.yml for the
+# Reads only: the file named, and _data/cocktails/ingredients.yml for the
 # ignored words and the millilitre table the plugins themselves use.
 require "json"
 require "yaml"

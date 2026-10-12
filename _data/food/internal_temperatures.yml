@@ -1,45 +1,21 @@
-# =============================================================================
-# THE VOCABULARY LAYER for internal temperatures — out_at temps, rested temps,
-# endpoints and carryover, single source of truth.
-#
-# Read by:
-#   food/reference/internal-temperatures.html   the lookup page — every number
-#                                                 on it is a Liquid reference
-#                                                 into this file, not a literal
-#   _layouts/recipe.html                        a recipe's own "Internal temp"
-#                                                 meta line, resolved from
-#                                                 `internal_temp_ref` (+
-#                                                 `doneness` where relevant) in
-#                                                 that recipe's front matter
-#
-# Change a number here and both update together — that's the entire point.
-# Before this file existed, the same figures were typed out by hand in the
-# reference page's markdown source and, separately, in whichever recipes
-# happened to mention a temperature — no relationship between the two copies,
-# so a correction in one never reached the other. See MANUAL's "next step"
-# note on this, 2026-08-11.
-#
-# SHAPE: deliberately not uniform across proteins, because the source data
-# wasn't uniform either — a whole roast bird has one endpoint, a steak has six
-# doneness levels, a tough cut has no doneness spectrum at all, just a
-# tenderness threshold. Four shapes, used as fits:
-#   endpoint + carryover              whole poultry
-#   doneness: { level: {pull, rested} } + carryover   things with a doneness
-#                                                       spectrum (beef/pork/
-#                                                       lamb tender roasts,
-#                                                       ham fresh, steak)
-#   tender_at                         tough/slow-cooked cuts (collagen
-#                                       breakdown, not a out_at temperature)
-#   target + carryover                cured ham (one figure, not a range of
-#                                       doneness choices)
-# A consumer (recipe.html, the reference page) checks which keys exist on the
-# node it resolved to, rather than assuming a shape from the protein name.
-# =============================================================================
+# Internal temperatures: out-at and rested figures, endpoints and carryover.
+# food/reference/internal-temperatures.html draws every number from here, and
+# _layouts/recipe.html resolves a recipe's `internal_temp_ref` (a dot-path into
+# this file, plus `doneness` where relevant) to its "Internal temp" line.
+# Four shapes; a consumer checks which keys exist on the node, never the name:
+#   endpoint + carryover            whole poultry, fish in general
+#   doneness: {level: {out_at, rested}} + carryover   a doneness spectrum
+#   tender_at                       slow-cooked cuts: a tenderness threshold
+#   target + carryover              cured ham: one figure
+# Keys any node may carry:
+#   chart_anchor  the section of the temperature charts a recipe links to
+#   rest_min      minutes of rest, only where a figure is published; the
+#                 timings page falls back where there is none
+#   safety_min    the cited safety threshold in °C; every chart shades below it
+#                 and labels the line, so it sits on each node that needs it
 
 poultry:
   chicken:
-    # All four whole birds share one section of the temperature charts --
-    # they share one endpoint too, which is the point that section makes.
     chart_anchor: poultry
     endpoint: "74–75°C in the thigh"
     endpoint_min: 74
@@ -48,13 +24,7 @@ poultry:
     carryover_min: 1
     carryover_max: 3
   turkey:
-    # All four whole birds share one section of the temperature charts --
-    # they share one endpoint too, which is the point that section makes.
     chart_anchor: poultry
-    # "in the thigh", like the other three birds, since 2026-10-09. It read
-    # "74–75°C in the thickest part of the thigh, not touching bone", which is
-    # what the calculator printed after "Done at"; Helen asked for the short
-    # form there, and the probing instruction moved into the note below.
     endpoint: "74–75°C in the thigh"
     endpoint_min: 74
     endpoint_max: 75
@@ -63,11 +33,8 @@ poultry:
     carryover_max: 3
     note: "Probe the thickest part of the thigh, not touching bone. Also check the breast reaches at least 70°C."
   goose:
-    # All four whole birds share one section of the temperature charts --
-    # they share one endpoint too, which is the point that section makes.
     chart_anchor: poultry
-    # Stated in this entry's own note below ("Rest a full 20–30 minutes
-    # regardless"), not in a table header like the roasting cuts.
+    # From this entry's own note ("Rest a full 20–30 minutes regardless").
     rest_min: 20
     endpoint: "74–75°C in the thigh"
     endpoint_min: 74
@@ -77,8 +44,6 @@ poultry:
     carryover_max: 3
     note: "Rest a full 20–30 minutes regardless — goose is fatty enough that this matters more than the temperature reading does."
   duck:
-    # All four whole birds share one section of the temperature charts --
-    # they share one endpoint too, which is the point that section makes.
     chart_anchor: poultry
     endpoint: "74–75°C in the thigh"
     endpoint_min: 74
@@ -88,8 +53,6 @@ poultry:
     carryover_max: 3
     note: "Cooking a whole duck as one piece means accepting the breast will be more well-done than it would be cooked alone."
   duck_breast_separate:
-    # All four whole birds share one section of the temperature charts --
-    # they share one endpoint too, which is the point that section makes.
     chart_anchor: poultry
     endpoint: "54–57°C for pink meat, then rested"
     endpoint_min: 54
@@ -102,15 +65,7 @@ poultry:
 
 beef:
   tender_roast:
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: beef-tender-roasting-cuts
-    # Rest time as STATED by internal-temperatures.html's own table header
-    # ("After ~15–20 min rest"), so the timings page can default its rest box
-    # to the figure this data already publishes rather than to a round 20 that
-    # nobody wrote down. Only the four proteins whose rest time is actually
-    # stated carry this -- chicken, turkey, duck and ham have no published
-    # figure, and the page falls back rather than inventing one.
     rest_min: 15
     carryover: "4–6°C"
     carryover_min: 4
@@ -145,11 +100,8 @@ beef:
         rested_min: 72
         rested_max: 72
   tough_cuts:
-    # ONE SLOW-COOKED SECTION FOR EVERY ANIMAL, since 2026-10-09: beef, lamb,
-    # pork and venison's collagen figures all draw in it, because they are one
-    # figure (90–96°C) under four names and because a roasting chart with one
-    # bar off at 90 was using half its axis for a different question. It was
-    # `beef-tough-cuts`, a section of its own.
+    # One slow-cooked section for every animal: the beef, lamb, pork and
+    # venison collagen figures all draw in it.
     chart_anchor: slow-cooked-cuts
     passes_through: "60–70°C while still tough"
     passes_through_min: 60
@@ -160,29 +112,10 @@ beef:
 
 pork:
   roasting:
-    # THE SAFETY THRESHOLD, as a figure rather than as prose. Every chart that
-    # draws this spectrum shades everything below it and labels the line, so a
-    # doneness level that doesn't clear the cited guidance can't be presented as
-    # an unqualified option.
-    #
-    # Added 2026-08-14 after the recipe-page chart shipped WITHOUT the shading:
-    # teriyaki salmon offered "rare, out at 43–49°C" with nothing to say that
-    # four of its five levels sit under the FSA benchmark. The reference page had
-    # the zone; the recipe page -- the one you actually cook from -- did not. It
-    # had been a hard-coded --t: on the charts page, which is why it couldn't
-    # travel.
     safety_min: 70
     safety_label: "FSA pork 70°C"
     safety_summary: "FSA wants pork held at 70°C for 2 minutes — held, not passed through as it cools. Only well done clears it."
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: pork
-    # Rest time as STATED by internal-temperatures.html's own table header
-    # ("After ~15 min rest"), so the timings page can default its rest box
-    # to the figure this data already publishes rather than to a round 20 that
-    # nobody wrote down. Only the four proteins whose rest time is actually
-    # stated carry this -- chicken, turkey, duck and ham have no published
-    # figure, and the page falls back rather than inventing one.
     rest_min: 15
     carryover: "3–4°C"
     carryover_min: 3
@@ -205,8 +138,6 @@ pork:
         rested_max: 72
     safety_note: "FOOD SAFETY: the 'medium' out_at temp above (60–62°C) does not clear the UK FSA's own core-temperature equivalence table for pork specifically (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec — held at that temperature, not passed through via carryover). FSA does not extend beef/lamb's 'pink is fine' reasoning to pork (hepatitis E risk cited). USDA's own standard is more permissive (145°F/62.8°C + 3min rest), but that's a different regulatory bar. The well-done option (68–70°C, clears 70°C at out_at with margin) is the one that unambiguously satisfies FSA guidance. Flagging, not changing the medium figure — your call whether to keep it, since plenty of UK cooking still serves pork pink. Checked once, 2026-08-12 — remove this note once you've made your own call and confirmed the figure you want to keep."
   slow_cooked:
-    # The shared slow-cooked section since 2026-10-09 (see beef.tough_cuts);
-    # this row drew on the pork chart until then.
     chart_anchor: slow-cooked-cuts
     tender_at: "90–95°C"
     tender_at_min: 90
@@ -214,15 +145,7 @@ pork:
 
 lamb:
   roasting:
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: lamb
-    # Rest time as STATED by internal-temperatures.html's own table header
-    # ("After ~15 min rest"), so the timings page can default its rest box
-    # to the figure this data already publishes rather than to a round 20 that
-    # nobody wrote down. Only the four proteins whose rest time is actually
-    # stated carry this -- chicken, turkey, duck and ham have no published
-    # figure, and the page falls back rather than inventing one.
     rest_min: 15
     carryover: "3–4°C"
     carryover_min: 3
@@ -257,8 +180,6 @@ lamb:
         rested_min: 71
         rested_max: 72
   slow_cooked:
-    # The shared slow-cooked section since 2026-10-09 (see beef.tough_cuts);
-    # this row drew on the lamb chart until then.
     chart_anchor: slow-cooked-cuts
     tender_at: "90–95°C"
     tender_at_min: 90
@@ -266,22 +187,9 @@ lamb:
 
 ham:
   fresh:
-    # THE SAFETY THRESHOLD, as a figure rather than as prose. Every chart that
-    # draws this spectrum shades everything below it and labels the line, so a
-    # doneness level that doesn't clear the cited guidance can't be presented as
-    # an unqualified option.
-    #
-    # Added 2026-08-14 after the recipe-page chart shipped WITHOUT the shading:
-    # teriyaki salmon offered "rare, out at 43–49°C" with nothing to say that
-    # four of its five levels sit under the FSA benchmark. The reference page had
-    # the zone; the recipe page -- the one you actually cook from -- did not. It
-    # had been a hard-coded --t: on the charts page, which is why it couldn't
-    # travel.
     safety_min: 70
     safety_label: "FSA pork 70°C"
     safety_summary: "A fresh ham is pork leg, so the same FSA figures apply: held at 70°C for 2 minutes, not passed through. Only well done clears it."
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: ham
     carryover: "3–4°C"
     carryover_min: 3
@@ -300,8 +208,6 @@ ham:
         out_at_max: 70
     safety_note: "FOOD SAFETY: same issue as pork's medium doneness above (a fresh ham is pork leg) — 60–62°C doesn't clear the FSA's pork-specific core-temperature equivalence table (gov.uk: 60°C/45min, 65°C/10min, 70°C/2min, 75°C/30sec, 80°C/6sec, held not passed-through). The well-done option (68–70°C) is the one that clears FSA guidance unambiguously. Flagging, not changing the hint-of-pink figure. Checked once, 2026-08-12 — remove once you've made your own call."
   cured:
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: ham
     carryover: "3–4°C"
     carryover_min: 3
@@ -313,8 +219,6 @@ ham:
     sources: "Waitrose targets 75°C; FSA's general reference point is 70°C. Corrected 2026-08-12 from an original 68–72°C, which sat a little under both. Checked once — remove once confirmed."
 
 steak:
-  # Which section of the temperature charts holds this spectrum, so a
-  # recipe can link straight to it rather than to the top of a long page.
   chart_anchor: beef-steak
   carryover: "2–3°C"
   carryover_min: 2
@@ -364,26 +268,19 @@ steak:
       out_at: "70°C+"
       out_at_min: 70
       out_at_max: 70
-      # The one open-ended figure in the file. "70°C+" has no upper bound, so
-      # out_at_max repeats out_at_min and this flag is what stops a consumer
-      # drawing it as a range that stops at 70 -- the charts render an open
-      # end instead. Any future "X°C+" needs the same flag; the guard test
-      # checks the flag matches the string rather than trusting either alone.
+      # An open-ended figure: "70°C+" has no upper bound, so out_at_max
+      # repeats out_at_min and this flag stops a chart drawing a range that
+      # ends at 70. Any other "X°C+" needs the same flag.
       out_at_open: true
       rested: "~72–74°C"
       rested_min: 72
       rested_max: 74
       description: "No pink"
 
-# Only salmon and tuna get a doneness spectrum. Everything else on the
-# cooking-methods page (cod, haddock, sea bass, sea bream, trout, mackerel,
-# halibut, turbot, plaice, sole, swordfish, monkfish, red mullet, John Dory,
-# herring, skate) is conventionally cooked through in UK home cooking, with
-# no rare/medium option worth codifying — `general` below covers those.
+# Only salmon and tuna get a doneness spectrum. Every other fish is
+# conventionally cooked through, and `general` covers those.
 fish:
   general:
-    # Which section of the temperature charts holds this figure, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: fish-salmon
     endpoint: "~63°C, opaque and flaking"
     endpoint_min: 63
@@ -394,22 +291,9 @@ fish:
     note: "The FSA/USDA food-safety benchmark for fish generally, and where most fish are conventionally taken in UK home cooking. cooking-methods.html's own rule of thumb used to say ~55–60°C, which sits below this and reflects chef/texture preference (many out_at salmon and similar fish lower for a moister result) rather than the safety endpoint — both pages now say the same thing, reconciled 2026-08-12."
     sources: "USDA FSIS: 145°F/62.8°C. UK FSA points to ~63°C as the standard fish safety benchmark. Checked once — remove this note once you've confirmed it yourself."
   salmon:
-    # THE SAFETY THRESHOLD, as a figure rather than as prose. Every chart that
-    # draws this spectrum shades everything below it and labels the line, so a
-    # doneness level that doesn't clear the cited guidance can't be presented as
-    # an unqualified option.
-    #
-    # Added 2026-08-14 after the recipe-page chart shipped WITHOUT the shading:
-    # teriyaki salmon offered "rare, out at 43–49°C" with nothing to say that
-    # four of its five levels sit under the FSA benchmark. The reference page had
-    # the zone; the recipe page -- the one you actually cook from -- did not. It
-    # had been a hard-coded --t: on the charts page, which is why it couldn't
-    # travel.
     safety_min: 63
     safety_label: "FSA/USDA 63°C"
     safety_summary: "FSA advice is a minimum serving temperature of 63°C."
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: fish-salmon
     carryover: "1–2°C"
     carryover_min: 1
@@ -457,8 +341,6 @@ fish:
         description: "Fully opaque. Clears the FSA/USDA ~63°C recommendation."
     safety_note: "Farmed salmon (most UK supermarket salmon) carries negligible parasite risk per FSA/EFSA and doesn't need pre-freezing to eat rare. Wild-caught salmon is the case where freezing first genuinely matters if serving it under well-done."
   tuna:
-    # Which section of the temperature charts holds this figure, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: fish-salmon
     carryover: "Often larger than other fish, given how hot the sear usually is — out_at 5–10°C below the target, more towards the low end for a very hot pan."
     doneness:
@@ -484,26 +366,16 @@ fish:
         description: "Cooked through, dry and firm — not traditional for tuna, but the figure to use for no pink at all"
     safety_note: "Standard for sushi-grade tuna, which is typically previously frozen to kill parasites — a supplier/labelling fact, not something a thermometer confirms. Buy from a source that states it, same as for any fish eaten raw or rare."
 
-# Four cuts, in two shapes: the two tender cuts carry a doneness spectrum, the
-# two slow-cooked ones carry a tenderness threshold and no doneness at all.
-#
-# LOIN AND HAUNCH SHARE THEIR OUT-AT FIGURES, and that is a fact about the
-# sources rather than a shortcut -- UK game sources publish core temperatures
-# for venison, not per cut. What genuinely differs is the carryover: a 600 g
-# loin and a 1.8 kg haunch do not carry the same hot mass off the heat, so the
-# rested figures diverge even though the out-at ones don't.
-#
-# NO SAFETY THRESHOLD ANYWHERE IN HERE, deliberately. FSA treats a whole cut of
-# venison the way it treats beef and lamb -- surface bacteria, killed by the
-# sear -- so there is no line to draw and nothing to shade. See the safety_note
-# on loin and haunch for the one case that is different (mince).
+# Four cuts in two shapes: loin and haunch carry a doneness spectrum; shoulder,
+# braised and shank carry a tenderness threshold. Loin and haunch share their
+# out-at figures because sources publish core temperatures for venison, not
+# per cut; the carryover differs with the size of the joint, so the rested
+# figures diverge. No safety threshold on purpose: a whole cut is treated like
+# beef and lamb. The `safety_note` on loin and haunch covers mince.
 venison:
   loin:
-    # Covers tenderloin/fillet as well as loin: same muscle group, same figures,
-    # and nothing in the sources separates them.
-    #
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
+    # Covers tenderloin and fillet as well as loin: same muscle group, same
+    # figures.
     chart_anchor: venison-tender-roasting-cuts
     carryover: "2–3°C"
     carryover_min: 2
@@ -540,13 +412,8 @@ venison:
     safety_note: "Venison is a whole muscle, and FSA treats it the way it treats beef and lamb: the bacteria are on the surface, the sear kills them, and pink in the middle is fine. Mince is the exception. FSA's less-than-thoroughly-cooked guidance covers beef burgers only — its advice for a burger made from any other meat, venison included, is to cook it through. Mincing moves the surface into the middle, so a rare venison burger is a different question from a rare venison loin."
     sources: "medium_rare 52–57°C is the strongest figure here: four independent UK game sources land inside it — Farmison 54°C, Wild Meat Company 'circa 55°C', Eversfield Organic 'at least 56°C', Church Farm Oxford 57°C. medium 58–62°C is Great British Recipes' haunch guide (58°C core rising to ~62°C rested). well_done 68–70°C matches UK game guidance ('70°C if you prefer it well done') and this site's own beef and lamb figures. rare 48–50°C is the WEAKEST of the four — no UK venison source publishes a rare figure at all, and this one sits between Wild Meat Company's 45–47°C 'rare, with resting' and Thomas Joseph Butchery's 50°C beef pull. The 2–3°C carryover is INFERRED from this site's own steak node rather than cited: a 600 g loin cannot carry the 5°C a 1.3 kg haunch does."
   haunch:
-    # Which section of the temperature charts holds this spectrum, so a
-    # recipe can link straight to it rather than to the top of a long page.
     chart_anchor: venison-tender-roasting-cuts
-    # Rest time in the sense the other entries use it -- a figure this data
-    # publishes so the timings page doesn't have to invent one. A haunch is a
-    # big lean joint carrying 4–6°C of carryover, and 20 minutes is what the
-    # carryover figure implies rather than a round number picked for it.
+    # What the 4–6°C carryover of a big lean joint implies.
     rest_min: 20
     carryover: "4–6°C"
     carryover_min: 4
@@ -580,50 +447,31 @@ venison:
         rested: "~72–76°C"
         rested_min: 72
         rested_max: 76
-    # THE SAME NOTE AS LOIN'S, ON PURPOSE. A chart resolves one node at a time,
-    # so a note that only exists on loin is invisible to a haunch recipe -- the
-    # same reasoning that moved safety_min onto the node itself after the
-    # teriyaki-salmon failure.
+    # The same note as loin's, on purpose: a chart resolves one node at a
+    # time, so a note that exists only on loin is invisible to a haunch recipe.
     safety_note: "Venison is a whole muscle, and FSA treats it the way it treats beef and lamb: the bacteria are on the surface, the sear kills them, and pink in the middle is fine. Mince is the exception. FSA's less-than-thoroughly-cooked guidance covers beef burgers only — its advice for a burger made from any other meat, venison included, is to cook it through. Mincing moves the surface into the middle, so a rare venison burger is a different question from a rare venison loin."
     sources: "The out-at figures are venison.loin's, deliberately — UK sources publish core temperatures for venison generally, not per cut; see there for the four that agree on medium rare, and for how little the rare figure rests on. What is haunch's own is the carryover: 4–6°C comes from Great British Recipes' haunch guide, which takes a haunch out at 58°C and has it resting to ~62°C, and every rested figure above is that carryover applied to the shared out-at range."
   shoulder:
-    # SHOULDER AND NECK BOTH. They are the same braising job on the same
-    # animal, they come off the same forequarter, and no source separates them.
-    #
-    # The shared slow-cooked section since 2026-10-09 (see beef.tough_cuts);
-    # venison had a slow-cooked section of its own until then. Shoulder,
-    # braised and shank below all point at it.
+    # Shoulder and neck both: the same braising job, and no source separates
+    # them.
     chart_anchor: slow-cooked-cuts
     tender_at: "90–95°C"
     tender_at_min: 90
     tender_at_max: 95
     sources: "90–95°C is this site's own collagen figure (see pork.slow_cooked and lamb.slow_cooked), applied to venison by chemistry rather than by citation: NO UK venison source publishes one. Every shoulder and neck recipe found ends 'until it falls off the bone' with no number in it at all. Collagen doesn't know which animal it came from, so the house figure is the honest answer — but it is an inference, and recorded as one."
   braised:
-    # ANY VENISON CUT BRAISED TO TENDERNESS, and the only node here keyed by a
-    # METHOD rather than a cut. That is deliberate, and it is the file's own
-    # older pattern -- pork.roasting/slow_cooked and lamb.roasting/slow_cooked
-    # are method keys too.
-    #
-    # It exists because a braised HAUNCH had nowhere honest to point. venison.
-    # haunch is a roasting spectrum and a braise never stops at a doneness;
-    # venison.shoulder is the right physics under the wrong cut name. Collagen
-    # gives way at the same temperature whatever the cut, so the figure a
-    # braise needs is not about the cut at all -- which is exactly what this
-    # key says and the other two cannot.
-    #
-    # Same 90–95°C, same basis, same caveat as shoulder and shank below.
+    # Any venison cut braised to tenderness: keyed by method, not cut, as
+    # pork.slow_cooked and lamb.slow_cooked are. A braised haunch points here,
+    # because venison.haunch is a roasting spectrum and a braise never stops at
+    # a doneness.
     chart_anchor: slow-cooked-cuts
     tender_at: "90–95°C"
     tender_at_min: 90
     tender_at_max: 95
     sources: "The house collagen figure again — see venison.shoulder for why 90–95°C is an inference from chemistry rather than a citation, and treat it with the same caution. Nothing about braising changes that reasoning; it is the same connective tissue giving way at the same temperature."
   shank:
-    # Same figure and same basis as shoulder above -- another collagen-heavy
-    # forequarter cut with no published venison-specific number behind it. Kept
-    # as its own node rather than folded into shoulder because a recipe naming
-    # a shank should be able to say so.
-    #
-    # The shared slow-cooked section, as shoulder above.
+    # Same figure and basis as shoulder; its own node so that a recipe naming
+    # a shank can say so.
     chart_anchor: slow-cooked-cuts
     tender_at: "90–95°C"
     tender_at_min: 90

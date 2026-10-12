@@ -1,7 +1,7 @@
-# Where the browser harness finds Playwright. SOURCED by shoot.sh and crop.sh
+# Where the browser harness finds Playwright. SOURCED by the harness scripts
 # (`. scripts/browser/env.sh`), never run on its own.
 #
-# Two places, in this order (2026-09-15):
+# Two places, in this order:
 #   1. tmp/browser/ -- this worktree's own `sh scripts/browser/install.sh`. It
 #      wins when present because somebody installed it on purpose: on a host
 #      with no devcontainer, or while the image is older than the pin.

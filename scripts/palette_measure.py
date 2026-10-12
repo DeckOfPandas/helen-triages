@@ -1,42 +1,22 @@
 #!/usr/bin/env python3
 """Measure a palette: WCAG contrast, dichromat simulation, CIEDE2000, CIELAB L*.
 
-REPRODUCES the contrast and separation figures quoted in
-`_sass/cocktails/_filters.scss` (#716F74 at 3.88:1), `_sass/cocktails/_palette.scss`
-and `_sass/food/_palette.scss`, each of which names it.
-
-WHY THIS IS IN scripts/ AND NOT tmp/
-====================================
-Three comments in this repo told their reader to "re-run tmp/neon_values.py" or
-"tmp/greens2.py". Both were written to settle real questions -- the five-accent
-separation check and the heading greens -- and both are GONE, because tmp/ is
-gitignored. So three instructions pointed at nothing, and the next person asking
-"is this hue still far enough from that one" had to rebuild the tool before they
-could answer.
-
-That happened again on 2026-09-01: the black-on-black work (#469) needed exactly
-these measurements and rebuilt them from scratch in tmp/. This is that rebuild,
-kept. MANUAL 12's rule about instructions applies to tooling too -- an
-instruction to re-run something is only as good as the something.
-
-WHAT IT IS FOR
-==============
-Any question of the form "can this colour carry text there", "will these two
-still read apart to Simon", or "how much lighter is this than that". It knows
-nothing about this repo's palette on purpose: pass hex values in and it answers.
+It knows nothing about this repo's palette: pass hex values in and it answers
+"can this colour carry text there", "will these two still read apart under
+dichromacy" or "how much lighter is this than that". The palette partials in
+`_sass/` name it as the way to re-measure. It reads and writes no files.
 
     python3 scripts/palette_measure.py --contrast '#FF00C8' '#0e0e10'
     python3 scripts/palette_measure.py --separation '#30E88C' '#F47E25'
     python3 scripts/palette_measure.py --lstar '#0e0e10' '#17171a' '#2c2c31'
+    python3 scripts/palette_measure.py --over '#FFFFFF' 0.04 '#030304'
 
-THE BARS, AND WHERE THEY COME FROM
-==================================
+The bars:
   4.5:1   text, WCAG AA
   3.0:1   a decorative mark, and large text
-  dE 10   two colours that must stay apart under dichromacy -- MANUAL 9.13's
-          bar, and it applies ONLY where colour carries meaning alone. A heading
-          sits under its own name in words, so its hue is reinforcement and may
-          safely collapse. A goodness MARK and a matched ingredient may not.
+  dE 10   two colours that must stay apart under dichromacy. It applies only
+          where colour carries meaning alone (MANUAL §9.13): a heading sits
+          under its own name in words, so its hue may collapse; a mark may not.
   L* 1.0  roughly a just-noticeable lightness step on a good screen in a dark
           room, and several times that in daylight.
 """
@@ -98,8 +78,8 @@ def lab(h):
 
 
 def lstar(h):
-    """Perceptual lightness. Equal steps LOOK equal, which equal steps in hex
-    emphatically do not -- the reason the card ladder was measured in it."""
+    """Perceptual lightness: equal steps look equal, which equal steps in hex
+    do not."""
     return lab(h)[0]
 
 

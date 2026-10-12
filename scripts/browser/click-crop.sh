@@ -9,8 +9,8 @@
 # go quiet plus a short beat, then crops <crop-selector> as crop.sh does and
 # prints its box in CSS px.
 #
-# THE PORT COMES FROM tmp/browser/port, written by THIS worktree's serve.sh
-# -- see shoot.sh. 4010 only when no server is running here.
+# The port comes from tmp/browser/port, written by this worktree's serve.sh;
+# see shoot.sh. 4010 only when no server is running here.
 set -eu
 
 refuse() {

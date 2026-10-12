@@ -1,40 +1,38 @@
 #!/bin/sh
 # The three GitHub writes a session makes routinely, over REST, each checked.
+# It builds the `gh api` call itself and accepts nothing it does not
+# understand, which is why `.claude/settings.json` can allow
+# `sh scripts/gh-write.sh *`. A bare `gh-agent.sh api` cannot be allow-listed:
+# `-F body=@<file>` is a read gh performs at run time, which the checker cannot
+# see as a path, and `api` also reaches every other write the token can make,
+# a merge included. DECISIONS §11.
 #
-# WHY THIS EXISTS (2026-09-15). Helen, after a session opened two PRs, posted a
-# comment and corrected a PR body through `sh scripts/gh-agent.sh api -X ...`
-# and every one of them asked her: "When you want to run commands that build
-# paths at runtime, please find a way into scripts that can be statically
-# analysed so read/write scope can be checked without asking me." Those calls
-# could never be allow-listed, for two reasons at once: `-F body=@tmp/x.md` is a
-# file read gh performs at run time, which the checker cannot see as a path,
-# and `api` is also the door to every other write the token can make --
-# including PUT .../pulls/N/merge, which is a merge, on a token that has had
-# nothing but a written rule between it and merging since 2026-09-09.
-#
-# So this wrapper builds the `gh api` call itself and accepts nothing it does
-# not understand. `.claude/settings.json` allows `sh scripts/gh-write.sh *`, and
-# tests/test_agent_wrappers.py proves what that rule lets through.
-#
-# USAGE -- the body is ALWAYS a file under tmp/, written with the Write tool:
+# USAGE -- the body is always a file under tmp/, written with the Write tool:
 #   sh scripts/gh-write.sh pr-create <repo> <branch> "<title>" tmp/<body>.md
 #   sh scripts/gh-write.sh pr-body   <repo> <number> tmp/<body>.md
 #   sh scripts/gh-write.sh comment   <repo> <number> tmp/<body>.md
 #
 # <repo> is one of the three, bare: helen-triages, helen-triages-food-private,
-# helen-triages-cocktails-private. A PR's base is ALWAYS main (CLAUDE.md: every
-# PR's base is main, never another PR's branch), and its head is never main.
-# `comment` takes an issue OR a PR number -- GitHub files both under issues/.
+# helen-triages-cocktails-private. A PR's base is always main, and its head is
+# never main. `comment` takes an issue or a PR number: GitHub files both under
+# issues/.
 #
-# WHAT IT CANNOT DO, BY CONSTRUCTION: merge, approve, close, delete, change a
-# title or state, touch settings, or talk to any other repository. Those stay
-# prompts (or rules), which is where they belong.
+# REFUSES: an action other than those three, or the wrong number of arguments;
+# a repo outside the three; a number that is not plain digits; a branch that
+# is `main`, starts `-` or `refs/`, ends `/`, or contains `..` or anything but
+# letters, digits and `._/-` (so no option and no `owner:` prefix); an empty
+# title; and a body that is not an existing regular file with a plain path
+# under tmp/, since `..` or a symlink would let gh read a file outside the
+# project and post it.
 #
-# AGENT_WRAPPER_DRY_RUN=1 prints the command it would run, one argument per
-# line, and exits -- for the tests, which need neither network nor credential.
+# It cannot merge, approve, close, delete, change a title or state, touch
+# settings, or talk to any other repository. Those stay prompts.
 #
-# Invoked via `sh` so it needs no execute bit, and it calls gh-agent.sh rather
-# than naming the credential, so the token's name stays in one file.
+# AGENT_WRAPPER_DRY_RUN=1 prints the command instead of running it, one
+# argument per line, for tests/test_agent_wrappers.py.
+#
+# Invoked via `sh` so it needs no execute bit. It calls gh-agent.sh rather than
+# naming the credential, so the token's name stays in one file.
 set -eu
 
 refuse() {

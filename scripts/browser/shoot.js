@@ -1,6 +1,6 @@
 // Screenshot a list of built pages at phone and desktop widths, and report any
 // page whose document is wider than its viewport, naming the widest elements.
-// Usage: node tmp/browser/shoot.js <base-url> <out-dir> <label> <path>...
+// Usage: node scripts/browser/shoot.js <base-url> <out-dir> <label> <path>...
 const { chromium } = require('playwright');
 const path = require('path');
 

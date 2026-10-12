@@ -3,28 +3,21 @@
     python3 scripts/glass_base_centres.py --check    # diff, exit 1 if stale
     python3 scripts/glass_base_centres.py --write    # rewrite the block
 
-A LABEL CENTRED ON A DRAWING'S BOX IS CENTRED ON ITS HANDLE TOO. Helen,
-2026-09-29, on /cocktails/reference/glasses/: "The text isn't always centred
-underneath the glass. For example, the text under the normal mug is way off to
-the right, and the text for mule mug and pineapple are slightly right of
-centre." Every label was centred exactly -- on the viewBox, which for a mug
-includes the handle and for the pineapple its umbrella. The eye centres a
-glass on what it STANDS on.
+A label centred on a drawing's viewBox is centred on its handle or umbrella
+too; the eye centres a glass on what it stands on (DECISIONS §9.11). So each
+icon in `_includes/icons/glasses/` is rasterised with `svgrender`, the ink in
+its bottom band is found, and the band's centre is recorded as a signed
+fraction of the drawing's width from the centre of its viewBox: negative means
+the base is left of centre. The glasses page shifts each drawing by minus
+that much.
 
-So this measures that: each published icon is rasterised with the repo's own
-`svgrender`, the ink in its bottom band is found, and the centre of that band
-is recorded as a signed fraction of the drawing's width from the centre of its
-viewBox. Negative means the base is left of centre (the handle pulls the box
-right). The glasses page shifts each drawing by minus that much, so its base
-sits over the label.
-
-GENERATED, because a number typed from a screenshot is right for the drawing
-it was measured on and silently wrong after the next redraw.
+Writes the `base_centre` block between the marker comments in
+`_data/cocktails/glasses.yml`. Generated, because a typed number is wrong
+after the next redraw.
 tests/test_cocktails.py::test_glass_base_centres_are_current runs `check()`.
 
-ONLY THE ONES THAT MATTER ARE WRITTEN. Under `THRESHOLD` of the width the
-offset is the stroke's own asymmetry, not the drawing's, and a list of 27
-near-zeros would hide the four that are real.
+Only offsets of at least `THRESHOLD` of the width are written: under that the
+offset is the stroke's own asymmetry, not the drawing's.
 """
 import argparse
 import difflib

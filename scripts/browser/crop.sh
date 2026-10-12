@@ -4,16 +4,15 @@
 # Output: tmp/shots/crop-<name>.png
 #
 # The last two type <text> into the element <type-into-selector> before the
-# shot (2026-09-15, #1050) -- for a control that only shows itself once
-# somebody has typed, such as the search box's dropdown:
+# shot, for a control that only shows itself once somebody has typed, such as
+# the search box's dropdown (#1050):
 #   sh scripts/browser/crop.sh /food/recipes/caramel/ .page-search dropdown 1280 .page-search-input ch
-# THAT BOX IS LOCAL-BUILD ONLY SINCE #1210 (2026-09-30), in the header, and
-# build.sh builds what deploys, which has none -- so to look at it, build with
-# `--config _config.yml,_config_local.yml` into tmp/site instead (MANUAL 13.11
-# has the command), then serve and crop as usual.
+# That box is local-build only (#1210) and build.sh builds what deploys, which
+# has none: to look at it, build with `--config _config.yml,_config_local.yml`
+# into tmp/site instead (MANUAL §13.11), then serve and crop as usual.
 #
-# The port comes from tmp/browser/port, written by this worktree's serve.sh
-# (2026-09-11) -- see shoot.sh for why. 4010 only when no server is running here.
+# The port comes from tmp/browser/port, written by this worktree's serve.sh;
+# see shoot.sh. 4010 only when no server is running here.
 port=4010
 if [ -f tmp/browser/port ]; then
   read -r port < tmp/browser/port

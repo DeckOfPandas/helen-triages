@@ -1,65 +1,17 @@
-# =============================================================================
-# HOW A DRINK IS SERVED — the ice, and the rim.
-# =============================================================================
-# WHY THIS EXISTS, and it is the shortest version of a long diagnosis. A drink
-# has a BUILD and a SERVE. The build had `method`. The serve had `glass` for
-# the vessel, `garnish` for the garnish and `to_serve` for the serveware —
-# and NOTHING for the ice that goes in the glass.
+# How a drink is served: the ice in the glass, how full, the rim, and the
+# serveware. A drink's `serve` block takes its values from here
+# (test_serve_block_uses_only_declared_keys_and_values).
 #
-# Having no field, the ice rode in the last method step, in free prose. So
-# "strain" was written SEVENTEEN ways across 124 drinks:
+# The ice has a field so that no method step restates it: the page composes
+# the strain sentence from fields (see `in_the_glass`). There is no `chill`
+# field, because a chilled glass is implied (DECISIONS §9.10a).
 #
-#   Strain into a chilled glass.        Strain over a giant ice cube.
-#   Fine strain into a chilled glass.   Strain over two giant ice cubes.
-#   Strain into an ice-filled glass.    Strain over ice, preferably a large cube.
-#   Strain over crushed ice.            Strain into a snifter filled with crushed ice.
-#   Fine-strain into pre-chilled.       ... and eight more
-#
-# Two of those are truncated sentences — "Fine strain into a chilled." and
-# "Fine-strain into pre-chilled." — which had been sitting in the collection
-# unnoticed, because prose that varies is prose nobody can check. A sweep for
-# the same shape afterwards found one more, Chartreuse Swizzle's "Add to the.",
-# vestigial from "Add to the [glass]".
-#
-# Moving the ice into a field collapsed 94 uses of 31 spellings into FIVE
-# techniques: Strain, Fine strain, Double strain, Pour, Dump. That is
-# methods.yml's own argument, applied one layer out — a shape that changes
-# every time has to be RE-READ; an identical repeated one becomes something you
-# RECOGNISE. Helen's reason for wanting that, from #290: people in the house,
-# and thirsty.
-#
-# IT DID NOT REPLACE `to_serve`, WHICH IS THE SERVEWARE FIELD AND STAYS.
-# Cobra's Fang: "Plastic giraffes, paper umbrella, teeny flamingos." The
-# swizzles: "Straw." The punches: "Ladle and punch glasses." Blue Hawaiian had
-# put its cocktail umbrella in `garnish` instead, and Gin Sour had put ICE
-# information into `to_serve` ("Without ice."). Both moved to the field that
-# owns them. Helen, 2026-09-05, on precisely this: "things to serve with (like
-# a paper umbrella) aren't written or laid out the same way."
-#
-# THERE IS NO `chill` FIELD, AND THERE WAS FOR ABOUT AN HOUR. It held `chilled`
-# on 21 drinks until Helen ruled it out: "I think it's implied that glasses
-# should be chilled (except hot drinks obviously). I am the user after all."
-# Its other three values — `frozen` once, `rinsed` three times — were each
-# already a method step in their own right ("Rinse a frozen glass with the
-# overproof rum", "Rinse the glasses with Campari"), so the whole field went
-# rather than just the one value, and nothing it held was lost. Worth recording
-# because a field that is redundant with a default is exactly the kind of thing
-# that gets re-proposed.
-#
-# ABSENT MEANS NOBODY HAS DECIDED. `ice: "none"` MEANS SERVED UP.
-# The same distinction `garnish` draws between `[]` and `["no garnish"]`, and
-# it is load-bearing rather than tidy: Pic-a-de-Crop Punch strains into a small
-# punch bowl and its method never says whether ice goes in, while both its
-# sibling punches say a large block. That is a real question for Helen, not a
-# blank to fill with a default.
-# =============================================================================
+# Absent means nobody has decided; `ice: "none"` means served up.
 
 # --- `ice` -------------------------------------------------------------------
-# THE ICE IN THE GLASS, NEVER THE ICE IN THE SHAKER. That distinction is the
-# whole job: of 156 mentions of ice in the collection's method steps, 86 were
-# the shaker's. "Shake all ingredients with ice" says nothing about how the
-# drink is served, and a rule that cannot tell the two apart gets 109 drinks
-# wrong out of 124.
+# The ice in the GLASS, never the ice in the shaker. Each value's note opens
+# with the sentence that defines it: scripts/build_ingest_vocab.py prints that
+# first sentence in the ingest document.
 ice:
   none: >-
     Served up, in an empty glass. 79 drinks, the commonest answer by a wide
@@ -87,37 +39,11 @@ ice:
     and it is why the value exists even though it PRINTS NOTHING (see below).
 
 # --- how the page says it ----------------------------------------------------
-# THE ICE IS A CLAUSE ON THE STRAIN STEP, not a line of its own. It rode on the
-# glass line in the metadata panel first ("hurricane, blended" — nonsense), then
-# as its own line under "To serve", and Helen moved it a third time to where it
-# actually belongs: "ice pedantry will be more likely to be seen at the point in
-# the make where it happens", and then "I'd like to name the glass too where it
-# appears."
-#
-# So `_layouts/cocktail.html` composes the final strain step from three fields —
-# the technique, the glass's `serving` phrase from glasses.yml, and this clause:
-#
-#     "Strain."  +  "an old fashioned glass"  +  ", over a large ice cube"
-#         ->  "Strain into an old fashioned glass, over a large ice cube."
-#     "Fine strain."  +  "a coupe"  +  ""
-#         ->  "Fine strain into a coupe."
-#     "Strain."  +  "a highball"  +  " filled with crushed ice"
-#         ->  "Strain into a highball filled with crushed ice."
-#
-# NOTE THE TWO SHAPES. Ice you pour the drink ONTO takes a comma and "over";
-# ice the glass is already FULL of takes "filled with" and no comma. That is
-# not decoration — it is the difference between building on a rock and
-# straining into a packed glass, and Helen's own examples use both.
-#
-# GENERATED, NEVER STORED, and that is the whole point. Storing these sentences
-# is exactly what produced seventeen spellings of "strain" and two truncated
-# ones. Each fact is written once, in the field that owns it, and the sentence
-# is assembled at render time — so a drink that changes glass gets a corrected
-# method for free and no copy can go stale.
-#
-# `none` AND `blended` HAVE NO CLAUSE. A drink served up needs no words added
-# ("Fine strain into a coupe." is complete), and a blended drink has no strain
-# step to attach one to.
+# The ice is a clause on the strain step. `_layouts/cocktail.html` composes
+# the technique, the glass's `serving` phrase from glasses.yml and this
+# clause: "Strain." + "an old fashioned glass" + ", over a large ice cube".
+# Ice the drink is poured ONTO takes a comma and "over"; ice the glass is FULL
+# of takes "filled with" and no comma. `none` and `blended` have no clause.
 in_the_glass:
   cubed: " filled with ice"
   crushed: " filled with crushed ice"
@@ -125,91 +51,33 @@ in_the_glass:
   block: ", over a large block of ice"
 
 # --- `fill` -------------------------------------------------------------------
-# HOW FULL, WHICH `ice` DELIBERATELY DOES NOT SAY. Added 2026-09-28 for the
-# Milliners Punch. Helen's sentence: "Strain into a hurricane glass half-filled
-# with crushed ice."
-#
-# WHY A SECOND FIELD RATHER THAN A SIXTH `ice` VALUE. This file already says,
-# of Fish House Punch, that "the thing the field cannot carry is QUANTITY" --
-# `ice` names the KIND, and lots of cubed ice and one cube in a rocks glass
-# both spell `cubed`. A `half crushed` value would be that same overload, and
-# it would cost more than it looks: `derive_cocktail_moods.py` tests
-# `serve.ice in ("crushed", "blended")` in two places and `mood_serve_ice`
-# lists it in a third, so a new spelling of crushed would silently change
-# `ice ice baby`, `strong brown drink` and `sharp` on the drink that used it.
-# A separate field leaves `ice: crushed` exactly as it was, and NOTHING about
-# the moods moves.
-#
-# IT REPLACES THE WORD `filled`, which is why the values read as they do. The
-# clause above is composed first -- " filled with crushed ice" -- and this
-# swaps the one word, giving " half-filled with crushed ice". One substitution,
-# and no combinatorial table of fill-by-ice.
-#
-# SO IT ONLY MEANS ANYTHING WHERE THE CLAUSE SAYS `filled`, which is `cubed`
-# and `crushed`. `large cube` and `block` are ice you pour the drink ONTO --
-# ", over a large ice cube" -- and half of one cube is not a quantity anybody
-# is describing. `test_a_fill_has_something_to_fill` refuses that pairing
-# rather than letting the substitution quietly do nothing.
-#
-# ABSENT MEANS FULL, and that is the ordinary case: 24 drinks say `cubed` or
-# `crushed` and one says how full.
+# How full, which `ice` does not say. The value replaces the word `filled` in
+# the clause above (" half-filled with crushed ice"), so it means something
+# only for `cubed` and `crushed`; test_a_fill_has_something_to_fill refuses
+# any other pairing. Absent means full. A separate field, not another `ice`
+# value: scripts/derive_cocktail_moods.py and taxonomy.yml `mood_serve_ice`
+# read `serve.ice` by its exact values.
 fill:
   half: "half-filled"
 
 # --- `rim` -------------------------------------------------------------------
-# FREE TEXT, deliberately. Two drinks rim today and a closed vocabulary for two
-# members would be inventing structure ahead of the data — the mistake
-# taxonomy.yml's own notes record three times over. If rimming becomes common,
-# this becomes a list like the one above.
-#
-# A rim is done to the glass BEFORE the drink is built, which is why it is here
-# and not in `garnish`, where Apple Cart's "half-rim of sugar" had been sitting.
-# Dapper Sap's "lime wedge on rim" stays a GARNISH: that is a garnish with a
-# placement, and garnish.yml already rules that "lime wedge on rim says where to
-# put it" is information worth keeping.
-#
-# IT PRINTS IN THE "TO SERVE" BLOCK AND NOT ONLY ON THE GLASS LINE. Helen,
-# 2026-09-05: "things like half-rim should be repeated in the method or serve or
-# wherever, because it's easily missed just on the glass mark in the metadata."
-# A rim is an ACTION, and an action filed only as metadata is an action that
-# does not happen.
+# Free text. A rim is done to the glass before the drink is built, which is
+# why it is here and not in `garnish`; a garnish placed on the rim (`lime
+# wedge on rim`) stays a garnish. The page says it on the strain step, or
+# under "To serve" when no strain step carries it.
 rim: "free text"
 
 # --- `to_serve` --------------------------------------------------------------
-# A DECLARED VOCABULARY SINCE 2026-10-01 (#1256, #1249), AND FREE TEXT BEFORE.
-# Helen asked for "canonical language for fun presentation decorations like
-# plastic giraffes". The field had 12 non-empty values across live and drafts
-# and they had already drifted the way every free-text field here has: Blue
-# Hawaiian's "Cocktail umbrella." beside Cobra's Fang's "paper umbrella", and
-# two drinks (Cobra's Fang, Tiki Max) describing a shell of flaming rum in
-# prose, where nothing counted the rum.
-#
-# THE FIELD IS STILL ONE STRING, because test_to_serve_is_a_string and the
-# layout's `markdownify` both depend on that. What is declared is the ITEMS:
-# the string is split on full stops and commas, and each piece, lowercased,
-# must be one of these. So "Straw. Zero umbrellas." and "Plastic giraffes,
-# paper umbrella." are both legal, and neither separator had to be migrated
-# onto the live site to get the vocabulary.
-#
-# `fire` HOLDS THE FLOURISHES AND NOT THE RUM. Helen, 2026-10-01: "Fire is to
-# serve!" -- so the Mai Tai's optional flame stays here, uncounted. The rum a
-# drink DOES call for is an ingredient line with `as: "shell"`
-# (ingredients.yml), and the method lights it; what this field may then add is
-# MORE: "more fire", and "more cinnamon sparkles", her addition the same day.
-#
-# NOT HERE: the ice (`serve.ice` above), a garnish, or a pour. Porn Star
-# Martini's "Champagne on the side." left on 2026-10-01 -- Helen: "It's an
-# ingredient not an optional serving suggestion." It was already a measured
-# ingredient line; the `to_serve` copy was the second statement of one fact.
-#
-# ADDING A MEMBER IS HELEN'S, as with every closed vocabulary in this folder.
-# test_every_to_serve_item_is_declared holds it.
+# The field is one string. It is split on full stops and commas, and each
+# piece, lowercased, must be an item below
+# (test_every_to_serve_item_is_declared, #1256). `fire` holds flourishes only:
+# rum a drink calls for is an ingredient line with `as: "shell"`, and the
+# method lights it. Not here: the ice, a garnish, or a pour. Adding an item is
+# Helen's.
 to_serve:
   serveware:
     - "straw"
     - "two straws"
-    # NEW 2026-10-07, for Dead Parrot Colada, whose Difford's source says
-    # "Serve with straws" and gives no count. Helen: "Add straws."
     - "straws"
     - "stirrer"
     - "ladle and punch glasses"

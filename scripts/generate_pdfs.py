@@ -1,41 +1,34 @@
 #!/usr/bin/env python3
-"""Render every built recipe and drink page to a PDF sitting beside it.
-GitHub issue #86 (food); #1005 brought cocktails in on 2026-09-14.
-
-Runs against a FINISHED BUILD, after `jekyll build` and before the Pages
-artifact is uploaded, and writes into _site/ directly -- Jekyll never sees the
-PDFs, so there is no collection, no permalink and no front matter to keep in
-step. `_site/food/recipes/beef-wellington/index.html` gets
-`_site/food/recipes/beef-wellington.pdf` next to it, which is the URL
-_layouts/recipe.html links to; `_site/cocktails/recipes/negroni/index.html`
-gets `negroni.pdf` beside it the same way, for _layouts/cocktail.html.
+"""Render every built recipe and drink page to a PDF sitting beside it (#86,
+#1005).
 
     python3 scripts/generate_pdfs.py                 # against ./_site
     python3 scripts/generate_pdfs.py --site _site_prod --jobs 8
+    python3 scripts/generate_pdfs.py --chrome /path/to/chrome
 
-WHY HEADLESS CHROME AND NOTHING ELSE. A PDF library in the page was the
-obvious alternative and is the wrong shape for this repo twice over: it means
-vendoring a few hundred KB of third-party JavaScript into assets/js/ (where
-test_palette_is_the_only_place_hex_colours_are_written would fail on its
-colour literals -- the suite correctly noticing that nothing here is built
-that way), and it means a second renderer that would have to be taught the
-print stylesheet all over again. Chrome already has that stylesheet. The PDF
-and the browser's own Print are the same document by construction, not by
-being kept in sync.
+--site is the built site directory (default `_site`), --jobs the number of
+parallel renders (default 4), and --chrome a browser that is not on PATH as
+google-chrome or chromium.
 
-It costs nothing to install: Google Chrome ships with the GitHub ubuntu
-runner image (checked against actions/runner-images before this was written,
-not assumed). If that ever stops being true this script fails loudly rather
-than skipping -- see _chrome() below. That is deliberate: a deploy that
-quietly stops producing PDFs would leave every "pdf" link on the site
-pointing at a 404, and nothing else would notice.
+It runs against a finished build, after `jekyll build` and before the Pages
+artifact is uploaded, and writes into the build directly, so Jekyll never sees
+the PDFs. `_site/food/recipes/beef-wellington/index.html` gets
+`_site/food/recipes/beef-wellington.pdf` beside it, and a drink under
+`cocktails/recipes/` likewise; that is the URL `_includes/page-print.html`
+links to. Scratch (the Chrome profiles and the staging symlink) goes in the
+repo's own `tmp/`.
 
-WHY A LOCAL SERVER RATHER THAN file:// URLs. The site is served from a
-baseurl (/helen-triages/), so every asset URL in the built HTML is absolute
-from the domain root. Opened as a file, all of them miss, and the PDF comes
-out unstyled -- which looks enough like "a plain document" to pass a glance.
-Serving a directory that mirrors the deployed shape makes the rendered page
-identical to the real one, decorations and all.
+The rules:
+
+  - Headless Chrome is the renderer, so the PDF and the browser's own Print
+    are the same document, through the same print stylesheet.
+  - No Chrome is a failure, never a skip, and so are a collection with no
+    pages and a render that writes nothing: a deploy that quietly stopped
+    producing PDFs would leave every "pdf" link on the site a 404.
+  - Pages are served from a local HTTP server that mirrors the deployed shape,
+    not opened as file:// URLs. The site is served under a baseurl, so every
+    asset URL in the built HTML is absolute; opened as a file they all miss
+    and the PDF comes out unstyled.
 """
 from __future__ import annotations
 
@@ -54,18 +47,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Scratch goes in the repo's own tmp/, never the machine's /tmp -- CLAUDE.md is
-# explicit about it, and a script that quietly ignored that rule whenever
-# somebody ran it locally would be the worst place to break it. Gitignored, so
-# it may not exist on a fresh CI checkout.
+# Scratch goes in the repo's own tmp/, never the machine's /tmp (CLAUDE.md).
+# Gitignored, so it may not exist on a fresh CI checkout.
 SCRATCH = ROOT / "tmp"
 
-# Long enough for decorations.js to fetch and inject every SVG (the
-# highlighters behind the amounts, the annotation arrows, the tag shapes) --
-# they arrive over HTTP after load, so a render that does not wait for them
-# produces a PDF missing exactly the hand-drawn character the print stylesheet
-# went to the trouble of keeping. Chrome exits as soon as the page is idle, so
-# this is a ceiling, not a delay every page pays.
+# Long enough for decorations.js to fetch and inject every SVG: they arrive
+# over HTTP after load, and a render that does not wait prints without them.
+# Chrome exits as soon as the page is idle, so this is a ceiling, not a delay
+# every page pays.
 VIRTUAL_TIME_BUDGET_MS = 15000
 
 
@@ -73,9 +62,7 @@ def _chrome(explicit: str | None = None) -> str:
     """The Chrome binary, or exit non-zero saying so.
 
     `explicit` is --chrome, for a browser that is not on PATH under one of the
-    usual names. That is the normal case on this machine rather than an exotic
-    one: WSL has no Linux Chrome unless you install one, and the Windows
-    install next door is chrome.exe.
+    usual names: WSL has no Linux Chrome unless one is installed.
     """
     if explicit:
         found = shutil.which(explicit) or (explicit if Path(explicit).exists() else None)
@@ -166,13 +153,9 @@ def main() -> int:
     SCRATCH.mkdir(exist_ok=True)
     chrome = _chrome(args.chrome)
 
-    # BOTH SITES SINCE #1005 (2026-09-14): a drink page gets a pdf beside it at
-    # /cocktails/recipes/<slug>.pdf exactly as a recipe does, rendered through
-    # cocktails' own print stylesheet (_sass/cocktails/_print.scss, which
-    # forces the full editorial page whatever the read-it/make-it toggle was
-    # left at). Each collection is checked for emptiness on its own: a build
-    # that lost one collection's pages would otherwise be hidden by the other
-    # still rendering, and a pdf link on every page of that site would 404.
+    # Each collection is checked for emptiness on its own: a build that lost
+    # one collection's pages would otherwise be hidden by the other still
+    # rendering, and every pdf link on that site would 404.
     recipes = []
     for collection in ("food/recipes", "cocktails/recipes"):
         pages = sorted(site.glob(f"{collection}/*/index.html"))
@@ -184,13 +167,10 @@ def main() -> int:
             )
         recipes.extend(pages)
 
-    # Read the baseurl off the BUILD rather than out of _config.yml. Every page
-    # states it, because assets.js needs it (_layouts/default.html emits
-    # `<meta name="base-url">`), so taking it from here means this script
-    # cannot disagree with the site it is rendering -- which parsing the config
-    # separately would eventually let it do. Nothing needs installing to read
-    # it either, which keeps this script to Python's standard library and the
-    # workflow to no setup step at all.
+    # Read the baseurl off the build, not out of _config.yml. Every page
+    # states it (_layouts/default.html emits `<meta name="base-url">`), so
+    # this script cannot disagree with the site it is rendering, and it needs
+    # nothing outside the standard library.
     baseurl_match = re.search(
         r'<meta name="base-url" content="([^"]*)"',
         recipes[0].read_text(encoding="utf-8"),
@@ -204,10 +184,9 @@ def main() -> int:
         )
     baseurl = baseurl_match.group(1).strip("/")
 
-    # Mirror the deployed shape: the built site has to sit UNDER its baseurl
-    # for the absolute asset URLs in the HTML to resolve. A symlink rather
-    # than a copy -- 90-odd pages plus artwork is not worth duplicating, and
-    # SimpleHTTPRequestHandler follows it happily.
+    # Mirror the deployed shape: the built site has to sit under its baseurl
+    # for the absolute asset URLs to resolve. A symlink, not a copy;
+    # SimpleHTTPRequestHandler follows it.
     stage_root = Path(tempfile.mkdtemp(prefix="htf-pdf-root-", dir=SCRATCH))
     stage = stage_root
     if baseurl:
@@ -222,9 +201,8 @@ def main() -> int:
     try:
         jobs = []
         for page in recipes:
-            # The URL is the page's own path under the build, so a recipe and
-            # a drink are one loop and neither collection's prefix is written
-            # here a second time.
+            # The URL is the page's own path under the build, so neither
+            # collection's prefix is written here a second time.
             rel = page.parent.relative_to(site).as_posix()
             slug = page.parent.name
             url = f"http://127.0.0.1:{port}{prefix}/{rel}/"

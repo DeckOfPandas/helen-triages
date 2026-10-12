@@ -18,9 +18,8 @@
 #
 # The vocabulary is the real one, _data/food/scaling.yml.
 #
-# WHY IT EXISTS: both readers are a Jekyll plugin's helpers, and the only
-# other way to ask them anything is a full build. tests/test_food_yield.py
-# runs this over every shape the two collections write (#1286).
+# Both readers are a Jekyll plugin's helpers, and the only other way to ask
+# them anything is a full build. tests/test_food_yield.py runs this (#1286).
 #
 # It reads files in this repository (plus the one JSON file named) and writes
 # nothing.

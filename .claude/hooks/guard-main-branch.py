@@ -1,49 +1,27 @@
 #!/usr/bin/env python3
 """Refuse `git commit` and `git merge` while the current branch is `main`.
 
-WHY THIS EXISTS. CLAUDE.md has said "NEVER commit or merge directly onto main,
-for any reason, even a one-line fix" since 2026-08-18, when it happened twice in
-one day. It then added a second sentence -- "Check `git branch --show-current`
-IMMEDIATELY before every `git commit`. Not at the start of the task -- Helen
-merges PRs and checks out main while I am working" -- and on 2026-08-20 an agent
-that had read both did it anyway.
+A branch check run in the same shell command as the commit prints after the
+commit has happened; this is the check that can stop the call. DECISIONS §11.
 
-The instructive part is HOW it failed, because it was not carelessness. The
-agent DID run the check. It ran it in the same shell command as the commit:
+It asks the repository the command is aimed at, not the hook's own directory:
+it reads a `cd <path>` and then a `git -C <path>` out of the command, because
+the nested private drafts repos have their own `main` and the same rule.
+`master` is protected too.
 
-    git branch --show-current
-    git add ...
-    git commit -F ...
+Allowed on purpose:
 
-so the check printed "main" in the output of the very call that had already
-committed. A check that reports a problem after the fact is not a check, it is
-a narration. This hook is the same instruction expressed as something that can
-actually stop the call, which is the conclusion this repository keeps reaching:
-a rule read and broken needs enforcement, not rewording. See
-guard-destructive-git.py, meta.awaiting_fix and meta.proofread.
+  - Every other git command on `main`: reading, fetching, branching, checking
+    out, pushing an existing commit. Only the two verbs that write history to
+    the branch are refused.
+  - `git commit` and `git merge` on any other branch, on a detached HEAD, or
+    outside a repository.
+  - These commands named inside a quoted string or a heredoc body, so a commit
+    message may discuss them.
 
-WHICH REPOSITORY IT ASKS ABOUT. The rule covers every repo in the tree, not just
-helen-triages -- the nested private drafts repos (_food_drafts/,
-_cocktail_drafts/) have their own main and the same rule, and four commits went
-onto _cocktail_drafts' main on 2026-08-17 because the rule read as if there were
-only one repo. So this does not assume the hook's own directory: it reads any
-leading `cd <path>` out of the command and asks git about THAT directory. The
-sibling hook documents not doing this as an accepted limitation; here it is the
-common case rather than an edge one.
+Tested in `tests/test_git_guards.py`.
 
-WHAT IT DELIBERATELY ALLOWS:
-
-  - Every other git command on main. Reading, fetching, pulling, branching,
-    checking out, pushing an already-made commit. Only the two verbs that write
-    history to the branch are refused.
-  - `git commit` on any branch that is not main. That is the whole workflow.
-  - Any mention of these commands inside a quoted string or a heredoc body, so
-    a commit message may discuss them. Commit messages here do that constantly
-    -- this file's own introducing commit will.
-
-Invoked as `python3 .claude/hooks/guard-main-branch.py` so it needs no execute
-bit: CLAUDE.md forbids changing file permissions without asking, and a hook that
-required a chmod to install would be self-defeating.
+Invoked as `python3 <path>` so it needs no execute bit.
 """
 from __future__ import annotations
 
@@ -69,24 +47,8 @@ HEREDOC = re.compile(
 # A leading `cd <path>` -- the command may be operating on a nested repo.
 CD = re.compile(r"\bcd\s+([^\s;&|]+)")
 
-# `git -C <path>` -- THE OTHER WAY TO OPERATE ON A NESTED REPO, and until
-# 2026-09-10 this hook did not read it. `WRITES_HISTORY` above has always
-# MATCHED the form ("allowing for global flags like `git -C x commit`"), so a
-# `git -C _food_drafts commit` was recognised as a commit and then checked
-# against the WRONG REPOSITORY: `_repo_dir` looked only for a `cd`, found none,
-# and asked the outer worktree which branch it was on. Outer branch not `main`,
-# so allowed -- while the drafts repo sat on `main`.
-#
-# THAT IS EXACTLY THE FAILURE THIS HOOK EXISTS TO PREVENT, and it is the one
-# that happened on 2026-08-17: four commits straight onto `_cocktail_drafts`'
-# `main`. The gap was harmless for as long as `cd _food_drafts && git ...` was
-# the habit, which is what CLAUDE.md documents. It stopped being harmless the
-# moment `guard-unanalyzable-bash.py` started refusing a leading `cd` (same
-# day), because the only remaining way to reach a nested repo is `git -C`.
-#
-# A GUARD THAT PUSHES YOU TOWARDS A FORM ANOTHER GUARD CANNOT READ HAS MOVED THE
-# HOLE, NOT CLOSED IT. Worth stating because the two hooks were written months
-# apart and neither is wrong on its own.
+# `git -C <path>`, the other way to aim at a nested repo. Read as well as `cd`,
+# or a commit there is checked against the outer worktree's branch.
 GIT_C = re.compile(r"\bgit\s+(?:-\S+\s+\S+\s+)*?-C\s+([^\s;&|]+)")
 
 PROTECTED = {"main", "master"}
@@ -111,16 +73,8 @@ def _resolve(raw: str, base: pathlib.Path) -> pathlib.Path | None:
 def _repo_dir(command: str) -> pathlib.Path:
     """The directory git will actually run in, modelling the shell in order.
 
-    A `cd` moves the shell; a later `-C` moves git again, RELATIVE TO WHERE THE
-    `cd` LEFT IT. So the two compose rather than compete, and reading only one
-    of them is how you end up asking the wrong repository which branch it is on.
-    `cd a && git -C b commit` runs in `a/b`, not `a` and not `b`.
-
-    Found by breaking this on purpose: the first version of the -C fix took the
-    -C path alone and resolved it against the worktree root, so exactly that
-    command resolved to a directory that does not exist, fell back to cwd, and
-    allowed a commit onto a nested `main`. One guard's fix reopening the same
-    hole one case to the left.
+    A `cd` moves the shell; a later `-C` moves git again, relative to where the
+    `cd` left it. `cd a && git -C b commit` runs in `a/b`, not `a` and not `b`.
     """
     base = pathlib.Path.cwd()
 

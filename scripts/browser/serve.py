@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 """Serve tmp/serve (the symlinked local build) on the first free port from 4010.
 
-WHY A PORT SEARCH AND NOT A FIXED PORT (2026-09-11). serve.sh bound 4010 and
-nothing else, and shoot.sh and crop.sh asked 4010 and nothing else. Two
-sessions in one container -- Helen runs Claudes in worktrees, several at once
--- meant the second server died with `Address already in use` while its
-shoot.sh happily measured the FIRST session's build and reported "ok". DECISIONS
-§14 (2026-09-10, #920) records the day that was noticed by hand, via
-/proc/<pid>/cwd. This makes it structurally impossible: each worktree's server
-takes its own port and writes it to that worktree's tmp/browser/port, which its
-own shoot.sh and crop.sh read. The port file is under tmp/, so it is per
-worktree and gitignored, and it is removed when the server exits, so a stale
-file cannot point a later shoot at a dead or foreign port.
+A port search, not a fixed port, because several sessions run in one
+container, each in its own worktree: on one fixed port the second server dies
+and its shoot.sh measures the first session's build. Each worktree's server
+takes its own port and writes it to that worktree's tmp/browser/port, which
+its own shoot.sh and crop.sh read. The file is removed when the server exits,
+so a stale one cannot point a later shoot at a dead or foreign port.
 
 Run through `sh scripts/browser/serve.sh`, in the background; the allow rule is
 on that exact command.

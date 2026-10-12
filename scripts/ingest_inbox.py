@@ -6,44 +6,47 @@
     python3 scripts/ingest_inbox.py --site food --issue 12 --comment
     python3 scripts/ingest_inbox.py --site food --from-file tmp/pasted.md
 
-RUN IT THROUGH `/ingest-inbox`, which is the procedure; this file is only the
-engine, the same split `/tidy-drafts` and `/ingest` already use.
+Run it through `/ingest-inbox`, which is the procedure; this file is the
+engine. `model_instructions/INGEST_INBOX_DESIGN.md` §6 describes the envelope
+and §8 argues for the issue route; `parse_envelope` is the authority on the
+envelope.
 
-WHY AN ISSUE AND NOT A BRANCH (INGEST_INBOX_DESIGN.md §8). Helen finds recipes
-away from her desk and hands them to a claude.ai session that has no checkout;
-that session's output has to reach `_food_drafts/` or `_cocktail_drafts/`
-somehow. A branch would need contents-write on a private repo from a session
-that runs neither of this repo's git guard hooks. An issue needs only issue
-access, the private repos have no build so nothing an issue carries can
-publish, and the session that finally writes the file is a local one, under
-every guard. So the envelope travels as issue text and lands here.
+Flags:
 
-ONE LEG OF THAT ARGUMENT WENT AWAY ON 2026-09-09 and the conclusion did not.
-It used to read "an issue needs nothing any token here does not already have
--- `GH_TOKEN` is issues-only on the three repos", i.e. the narrow token made
-the branch route impossible as well as unwise. `GH_TOKEN` is now retired and
-`AGENT_GH_TOKEN` is classic `repo`-scoped, so a branch on a private repo IS
-within reach of the credential. What still holds is the part that was always
-doing the real work: the writing session is local and guarded, and an issue
-cannot publish. The route is a choice now rather than the only option --
-INGEST_INBOX_DESIGN.md §8 is the place to argue it, not here.
+    --site food|cocktail   required; picks the private repo and drafts folder
+    --write                write the files; without it the run is a dry run
+    --dry-run              the default, accepted so it can be said out loud;
+                           contradicts --write
+    --issue N              read that one issue, whatever its label or state
+    --from-file PATH       parse a local envelope file instead of fetching
+    --comment              post each outcome back on its issue; ignored with
+                           --from-file
+    --drafts-dir DIR       use DIR as the drafts folder, to prove a run on a
+                           copy
 
-IT PARSES, IT NEVER INTERPRETS. Every rule in `parse_envelope` is a rejection
-with a one-line reason rather than a repair: a marker that is not there, two
-fenced blocks, YAML that is a list, a fingerprint that disagrees with the file
-it sits under. This script exists to keep inventions out of the drafts, so
-guessing what a malformed envelope meant would be the invention.
+It reads the open issues labelled `ingest` on the site's private repo, through
+the GitHub API with `AGENT_GH_TOKEN`, and every `.md` under the drafts folder,
+recursively. With `--write` it creates `<slug>.md` at the top of the drafts
+folder. Its only write to GitHub is the comment `--comment` posts.
 
-IT NEVER COMMITS, NEVER PUSHES, NEVER CLOSES AN ISSUE and never overwrites a
-file. The `Fixes #N` trailer on the commit the command doc asks for is what
-closes an issue, so the closure is tied to the commit that earned it (CLAUDE.md,
-Helen's standing preference). `--write` is the only thing here that touches the
-disk, and only ever at a path that does not yet exist.
+The rules:
 
-EVERY SCHEMA RULE IS IMPORTED FROM THE TEST SUITE, NEVER RE-TYPED, for the
-reason `tidy_drafts.py`'s header gives at length: a checker carrying its own
-copy of the contract eventually accepts a shape the suite rejects while looking
-green the whole time.
+  - It parses, it never interprets. Every rule in `parse_envelope` is a
+    rejection with a one-line reason, never a repair: a missing marker, two
+    fenced blocks, YAML that is not a mapping, a fingerprint that disagrees
+    with the file it sits under. Guessing what a malformed envelope meant
+    would be an invention in the place built to keep inventions out.
+  - A duplicate is found by fingerprint (the title, then every amount), never
+    by title. A matching fingerprint is reported and not written. A matching
+    title with a different fingerprint is a different recipe: it is written,
+    and reported for Helen to name.
+  - The slug is the whole title. A taken slug gets `-2`, then `-3`, and so on.
+  - The file written is the fenced block byte for byte, at a path that does
+    not yet exist. Nothing is ever overwritten. One line may differ: an empty
+    `notes:` becomes an empty label/text pair.
+  - It never commits, never pushes and never closes an issue. The `Fixes #N`
+    trailer on the commit the command doc asks for closes the issue.
+  - The envelope's version must be in SUPPORTED_VERSIONS.
 """
 from __future__ import annotations
 
@@ -64,11 +67,11 @@ sys.path.insert(0, str(ROOT / "tests"))
 
 from test_taxonomy import _fold  # noqa: E402
 
-# THE VERSIONS THIS SCRIPT IMPLEMENTS. §0 of each standalone document tells a
-# repo-less browser which one to write, and
+# The envelope versions this script implements. §0 of each INGEST_ONE_*.md
+# tells a browser which one to write, and
 # tests/test_ingest_inbox.py::test_both_documents_name_a_supported_version
-# holds the two ends together -- the one failure mode §8 calls silent is a
-# document teaching v2 to a browser while this file understands only v1.
+# holds the two ends together: a document teaching a version this file does
+# not implement is the one failure that would otherwise be silent.
 SUPPORTED_VERSIONS = frozenset({1})
 
 SITES = ("food", "cocktail")
@@ -99,9 +102,7 @@ class Rejected(Exception):
     """A malformed envelope, with the one line that says which rule it broke."""
 
 
-# =============================================================================
-# THE ENVELOPE
-# =============================================================================
+# --- The envelope ---
 
 @dataclass
 class Envelope:
@@ -164,14 +165,10 @@ def _section(prose: str, heading: str) -> list:
 def _reject_unlabelled_notes(fm: dict) -> None:
     """Every note an ingest adds is `label: "QQ"` with text beginning `QQ`.
 
-    #1120, Helen: the page titles a note with no label "note", which looks
-    finished, so a note nobody has read would publish under a heading that says
-    nothing is wrong. `QQ` is the title she can see and search for. Both
-    documents have said so since 2026-09-04 and nothing checked it here.
-
-    A FRESH INGEST HAS NO NOTE OF HELEN'S, which is what makes this safe to
-    demand of every entry: her own remarks are added afterwards, by her, to a
-    file that is already in the drafts. Only an envelope is held to it.
+    The page titles a note with no label "note", which looks finished, so an
+    unread note would publish under a heading that says nothing is wrong
+    (#1120). An envelope carries no note of Helen's, so this is demanded of
+    every entry but the empty pair.
     """
     notes = fm.get("notes")
     if not isinstance(notes, list):
@@ -198,7 +195,7 @@ def _reject_unlabelled_notes(fm: dict) -> None:
 
 
 def parse_envelope(body: str, site: str) -> Envelope:
-    """§6 of the design, rule for rule. Raises `Rejected` with one line."""
+    """INGEST_INBOX_DESIGN.md §6, rule for rule. Raises `Rejected` with one line."""
     lines = [line.rstrip() for line in body.replace("\r\n", "\n").split("\n")]
     first = next((line for line in lines if line.strip()), "")
     match = MARKER.match(first.strip())
@@ -279,10 +276,8 @@ def parse_envelope(body: str, site: str) -> Envelope:
 def fingerprint(fm: dict, site: str) -> str:
     """The title lowercased, then every amount in the file's own order.
 
-    THE POINT IS TO COMPARE FORMULAS, NEVER TITLES -- §9.2.1's Sazerac, where
-    two genuinely different drinks share a name and four of Helen's own
-    ingredient suggestions. An entry with no amount contributes nothing, which
-    is why "salt and pepper" is absent from the food document's own example.
+    It compares formulas, never titles: two different drinks can share a name
+    (the Sazerac case). An entry with no amount contributes nothing.
     """
     amounts = []
     if site == "food":
@@ -301,22 +296,16 @@ def fingerprint(fm: dict, site: str) -> str:
 
 
 def slug_for(title: str) -> str:
-    """The WHOLE title, folded and hyphenated -- Helen's ruling, 2026-09-03.
+    """The whole title, folded and hyphenated, not its head clause.
 
-    The first version took the head clause (the part before "with ..."), which
-    is what `ingest.md` asked of a photo batch. Asked whether two "with" dishes
-    sharing a head clause should collide and land as `-2`, Helen chose the
-    whole title. `test_title_and_slug_dont_diverge` is still satisfied on a
-    promoted recipe, because a slug holding every word holds the head clause's
-    words; and on a draft that test does not run at all (MANUAL §11.0.3).
+    Two "with" dishes that share a head clause get distinct slugs
+    (DECISIONS §4).
     """
     text = _fold(title.replace("’", "").replace("'", ""))
     return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", text)).strip("-")
 
 
-# =============================================================================
-# THE DRAFTS ALREADY HERE
-# =============================================================================
+# --- The drafts already here ---
 
 @dataclass
 class Existing:
@@ -361,9 +350,7 @@ def scan_drafts(root: Path, site: str) -> list:
     return out
 
 
-# =============================================================================
-# ONE ENVELOPE -> ONE PLAN
-# =============================================================================
+# --- One envelope -> one plan ---
 
 @dataclass
 class Plan:
@@ -390,11 +377,9 @@ class Plan:
         return f"{verb} {self.path.name}"
 
     def comment_text(self) -> str:
-        """What `--comment` posts on the issue: the outcome, then everything
-        the run knows that Helen would otherwise have to open the file for --
-        the notes (a collision, a Sazerac case) and the browser's own hand-back
-        list. Her ruling, 2026-09-03: "Bullets too please." The issue is where
-        she reads on her phone, so the list goes where she is.
+        """What `--comment` posts on the issue: the outcome, then the notes (a
+        collision, a Sazerac case) and the browser's hand-back list as
+        bullets. The issue is where Helen reads on her phone (DECISIONS §11).
         """
         lines = [self.one_line()]
         for note in self.notes:
@@ -457,17 +442,13 @@ def plan_for(body: str, site: str, existing: list, root: Path, number=None) -> P
 def write(plan: Plan) -> None:
     """The fenced block, byte for byte. Never a YAML round-trip.
 
-    A dumper would lose comment placement, key order and the exact `[""]` shape
-    `method_short` depends on -- `tidy_drafts.py` refuses one for the same
-    reason. What the browser wrote is what Helen proofreads.
+    A dumper would lose comment placement, key order and the `[""]` shape
+    `method_short` depends on. What the browser wrote is what Helen proofreads.
 
-    ONE EXCEPTION, AND IT IS A LINE NOBODY WROTE: an empty `notes:` becomes the
-    empty `{label, text}` pair (#1258 -- "at ingest ... leave me with a notes
-    placeholder I don't have to retype"). A source that answers everything has
-    no note to carry, and a draft with `notes: []` has nowhere to type one. The
-    rule is `tidy_drafts.fix_notes_slot`, imported rather than retyped, and its
-    other half -- labelling unlabelled text `QQ` -- cannot fire here, because
-    `_reject_unlabelled_notes` has already refused any such envelope.
+    One exception: an empty `notes:` becomes the empty label/text pair
+    (#1258), through `tidy_drafts.fix_notes_slot`, imported and not retyped.
+    That function's other half, labelling unlabelled text `QQ`, cannot fire
+    here: `_reject_unlabelled_notes` has already refused any such envelope.
     """
     if not plan.ok:
         raise ValueError("refusing to write a rejected or duplicate envelope")
@@ -483,14 +464,11 @@ def write(plan: Plan) -> None:
     plan.written = True
 
 
-# =============================================================================
-# GITHUB -- the only two functions that touch the network
-# =============================================================================
+# --- GitHub: the only functions that touch the network ---
 
 def _api(path: str, method="GET", payload=None):
-    # AGENT_GH_TOKEN since 2026-09-09, when GH_TOKEN was retired (CLAUDE.md).
-    # Read at the point of use and never printed -- note that the failure below
-    # names the VARIABLE and never renders it.
+    # Read at the point of use and never printed: the failure below names the
+    # variable and never renders it.
     token = os.environ.get("AGENT_GH_TOKEN")
     if not token:
         sys.exit("AGENT_GH_TOKEN is not set, so there is no way to read the issues.")
@@ -511,11 +489,11 @@ def _api(path: str, method="GET", payload=None):
 
 
 def fetch_issues(site: str, number=None) -> list:
-    """THE ONE FUNCTION THE TESTS REPLACE. Open `ingest` issues, newest last.
+    """Open `ingest` issues: the one network read, and the one function the
+    tests replace.
 
-    Kept to a single door on purpose: a test that has to stub two of these will
-    one day stub one, and a suite that reaches GitHub is a suite that fails on a
-    train. Everything above this line is pure.
+    A single door on purpose: a suite that reaches GitHub fails offline.
+    Everything above this line is pure.
     """
     repo = REPOS[site]
     if number is not None:

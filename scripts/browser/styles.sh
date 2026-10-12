@@ -9,14 +9,8 @@
 # and four padding longhands, gap, display. A comma list of lowercase-hyphen
 # property names overrides that -- e.g. `color,background-color`.
 #
-# THE PORT COMES FROM tmp/browser/port, written by THIS worktree's serve.sh
-# (2026-09-11), so the page measured is this worktree's own build and never
-# another session's -- see shoot.sh. 4010 only when no server is running here.
-#
-# Added 2026-09-15, alongside gaps.sh and click-crop.sh, so a Playwright
-# question ("what's the computed spacing here") is a committed, allow-listed
-# call rather than a one-off tmp/ script naming PLAYWRIGHT_BROWSERS_PATH and
-# NODE_PATH by hand (which guard-unanalyzable-bash.py now refuses outright).
+# The port comes from tmp/browser/port, written by this worktree's serve.sh;
+# see shoot.sh. 4010 only when no server is running here.
 set -eu
 
 refuse() {

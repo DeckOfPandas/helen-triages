@@ -1,37 +1,37 @@
 #!/usr/bin/env python3
-"""Derive every drink's `mood` from taxonomy.yml's own definitions -- #452/#292.
-
-WHY THIS SCRIPT EXISTS RATHER THAN THE ONE THAT DID THE JOB BEFORE.
-Moods were derived once, on 2026-08-17, by `ingest_from_csv.py` in the private
-drafts repo, and written into the 114 files. That script carried nine hardcoded
-sets of generic names. The vocabulary then moved -- #335 typed everything, #314
-reclassified the rums and made `blackstrap` a character, #561 renamed ten
-generics, #568 added five -- and **34 of those strings named nothing at all**.
-
-A set intersection against a renamed string returns empty. So the derivation
-kept "working", the stored moods kept looking derived, and `strong brown drink`
-quietly stopped being able to fire on any rum. 23 drinks ended up with no mood
-at all, including one Helen rates `oh gods yes`.
-
-Three things follow, and all three are the point of this file:
-
-  * THE SETS ARE DATA. `mood_ingredients` in _data/cocktails/taxonomy.yml, with
-    `test_every_mood_ingredient_is_declared` requiring each member to be a real
-    generic or character. The same drift cannot happen silently again.
-  * THE SCRIPT IS COMMITTED, IN THE PUBLIC REPO, so re-running it after a
-    vocabulary change is a thing anyone can do rather than a thing one session
-    knew how to do.
-  * IT DEFAULTS TO A DRY RUN. Writing needs --write. MANUAL 12: run it once
-    and diff before letting it near a tracked file.
-
-DERIVATION IS A STARTING POINT, NOT THE AUTHORITY. A drink Helen thinks is tiki
-is tiki whatever the ingredient count says. `mood_include` and `mood_exclude` in
-taxonomy.yml carry her rulings and always win; this script never argues with one.
-Each names the single mood it is about, so a corrected drink still tracks every
-later improvement to the rules.
+"""Derive every drink's `mood` from taxonomy.yml's own definitions (#452, #292).
 
     python3 scripts/derive_cocktail_moods.py            # report differences
     python3 scripts/derive_cocktail_moods.py --write    # apply them
+
+It defaults to a dry run; writing needs `--write`. Run it after a change to
+the ingredient vocabulary or to a mood rule, and read the report first.
+
+It reads `_data/cocktails/taxonomy.yml` (`moods`, `mood_ingredients`,
+`mood_step_words`, `mood_serve_ice`, `moods_by_hand`, `mood_include`,
+`mood_exclude`, `mood_suppresses`), `_data/cocktails/ingredients.yml`
+(`measures`, `family_of`, `whisky_styles`) and every `.md` under
+`_cocktail_recipes/` and `_cocktail_drafts/`, recursively. With `--write` it
+replaces the `mood:` block of each file that differs, as text and never
+through a YAML dumper.
+
+The rules:
+
+  - The ingredient sets are data: `mood_ingredients` in taxonomy.yml, each
+    member a declared generic or character
+    (`test_every_mood_ingredient_is_declared`). A set naming a renamed
+    generic matches nothing and raises no error, which is why the names are
+    checked.
+  - Derivation is a starting point, not the authority. `mood_include` and
+    `mood_exclude` carry Helen's per-drink rulings and always win. Each names
+    the single mood it is about, so a corrected drink still tracks every
+    later change to the rules.
+  - A mood in `moods_by_hand` is kept as stored. A rule here may add one
+    (`tiki`, `sugar craving`, `on fire`) and never removes one.
+  - `mood_suppresses` lets one mood cancel another (#853).
+  - `expected_moods` is the one function this script and
+    tests/test_cocktails.py both call, so the two cannot disagree. The prose
+    definitions in taxonomy.yml's `moods:` block are the spec for `derive`.
 """
 from __future__ import annotations
 
@@ -51,20 +51,17 @@ COLLECTIONS = (ROOT / "_cocktail_recipes", ROOT / "_cocktail_drafts")
 FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 
 
-# -----------------------------------------------------------------------------
-# Quantities. `ml:` was retired in #571, so the volume `strong brown drink`
-# needs is derived from `amount` through taxonomy's measures table -- the same
-# table and the same rules tests/test_cocktails.py checks every amount against.
-# -----------------------------------------------------------------------------
+# Quantities. A drink's volume is derived from `amount` through the `measures`
+# table in ingredients.yml, the same table tests/test_cocktails.py checks
+# every amount against.
 AMOUNT = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*(?:/\s*(\d+))?\s*(.*?)\s*$")
 
 
 def millilitres(amount, measures):
     """Millilitres, or None where the unit is not a volume or cannot be read.
 
-    NONE AND ZERO ARE DIFFERENT ANSWERS and the caller must keep them apart: a
-    dash has no volume, which is not the same as contributing nothing to a
-    ratio it should not be counted in at all.
+    None and zero are different answers and the caller must keep them apart:
+    a dash has no volume, which is not the same as contributing nothing.
     """
     match = AMOUNT.match(str(amount))
     if not match:
@@ -80,45 +77,33 @@ def millilitres(amount, measures):
     return None
 
 
-# -----------------------------------------------------------------------------
-# Families that can be a drink's BASE. `fortified`, `amaro` and `herbal` are
-# modifiers however aged they are -- a Negroni's sweet vermouth ties with its
-# gin for the largest pour, and that tie is the whole reason this list is
-# written down rather than assumed.
+# Families that can be a drink's base. `fortified`, `amaro` and `herbal` are
+# modifiers however aged they are: a Negroni's sweet vermouth ties with its
+# gin for the largest volume.
 BASE_FAMILIES = {"rum", "gin", "whisky", "brandy", "agave", "vodka", "aquavit"}
 
 # Never counted toward a drink's volume. Water is a rinse or a dilution and
-# never the drink; counting the Sazerac's discarded 60 ml is what used to drag
-# it to 44% base spirit and force a hand-correction.
+# never the drink: the Sazerac's discarded 60 ml would drag its base share down.
 NOT_A_POUR = {"water"}
 
-# `no measuring` -- the most pours of the smallest measure a drink may take and
-# still be a one-receptacle drink. Helen's number, 2026-09-19 (#1127), chosen
-# over a printed list of what six, eight, ten and twelve each catch.
-#
-# A NUMBER, NOT A SHAPE, IS WHAT MAKES THIS A FILTER AT ALL. Uncapped the rule
-# is 58% of the collection and test_no_mood_covers_more_than_half_the_collection
-# refuses it. taxonomy.yml's definition carries the reasoning; this is the
-# number the definition's own prose states, and the two must agree.
+# `no measuring` (#1127): the most multiples of its smallest measure a drink
+# may take. Uncapped, the rule covers more than half the collection and
+# test_no_mood_covers_more_than_half_the_collection refuses it. taxonomy.yml's
+# definition of the mood states the same number in prose; the two must agree.
 MAX_POURS = 8
 
-# A 5 ml POUR IS A BAR SPOON, NOT A MEASURE -- Helen, 2026-09-26 (#1216): "if
-# any amounts are 5 ml, this is just a bar spoon, and doesn't count as needing
-# to be measured." So `pour_count` sets a 5 ml amount aside the way it sets a
-# dash aside: it neither joins the ratio nor becomes the smallest measure the
-# rest are divided by. Exactly 5, not "5 or less": 2.5 ml and 7.5 ml are
-# quarter- and half-jiggers on the page, and she named the spoon.
+# A 5 ml amount is a bar spoon, not a measure (#1216): `pour_count` sets it
+# aside as it does a dash. Exactly 5, not "5 or less": 2.5 ml and 7.5 ml are
+# quarter- and half-jiggers.
 BARSPOON_ML = 5
 
 
 def spirit_volumes(entries, measures, family_of, whisky):
-    """Millilitres per spirit FAMILY, not per ingredient.
+    """Millilitres per spirit family, not per ingredient.
 
-    BY FAMILY BECAUSE SINGLE INGREDIENTS TIE. The Sazerac pours equal 20 ml of
-    cognac, rye and bourbon, so "the biggest pour" was being decided by which
-    key came first in the file -- and 34 of the collection's 114 drinks have
-    such a tie. Summed by family, its whisky is 40 ml against cognac's 20 and
-    the answer stops depending on YAML ordering.
+    Single ingredients tie (the Sazerac takes equal cognac, rye and bourbon),
+    and a tie between ingredients is decided by key order in the file. Summed
+    by family, the answer does not depend on YAML ordering.
     """
     out = {}
     for entry in entries:
@@ -142,34 +127,26 @@ def _listed(value):
 
 
 def pour_count(entries, measures):
-    """How many pours of the SMALLEST measured amount the drink takes.
+    """How many multiples of the smallest measured amount the drink takes.
 
     None where the amounts are not whole-number multiples of the smallest, and
-    none where nothing in the drink is measured by volume at all. `no measuring`
-    is the only caller -- #1127.
+    None where nothing is measured by volume. `no measuring` is the only
+    caller (#1127).
 
-    EXACT ARITHMETIC, THROUGH `Fraction`, AND NOT BECAUSE ANYONE LIKES THEM.
-    `millilitres` returns a float, and 45.0 / 22.5 is exactly 2.0 while
-    22.5 / 7.5 is 2.9999999999999996 on some values -- so `is_integer()` over
-    floats decides a drink's mood by the binary expansion of a decimal amount.
-    `Fraction(str(x))` reads the DECIMAL the float prints, which is the number
-    the recipe actually says, and the division is then exact.
+    The arithmetic is exact, through `Fraction(str(x))`: `millilitres` returns
+    a float, and `is_integer()` over float division would decide a mood by the
+    binary expansion of a decimal amount.
 
-    NOTHING IS SET ASIDE BY INGREDIENT, unlike `easy peasy`. Helen, 2026-09-19:
-    "No ingredient in the Aperol Spritz is a top." A top is an AMOUNT -- the
-    literal string `to top` -- and it drops out here for free, along with
-    dashes, drops, pinches, `to taste` and half a lime, because `millilitres`
-    hands back None for every one of them. Prosecco written `90 ml` is an
-    ingredient in the ratio, and the Spritz is 3 : 2 : 1.
+    Nothing is set aside by ingredient. `to top`, dashes, drops, pinches and
+    `to taste` drop out because `millilitres` returns None for them; prosecco
+    written `90 ml` is in the ratio (DECISIONS §9).
     """
     amounts = []
     for entry in entries:
         millilitres_ = millilitres(entry.get("amount", ""), measures)
         if millilitres_ is None or millilitres_ == 0:
             continue
-        # A 5 ML POUR IS A BAR SPOON (#1216, Helen, 2026-09-26) and is set
-        # aside like a dash: it neither joins the ratio nor becomes the
-        # smallest measure the rest are divided by. See BARSPOON_ML.
+        # A bar spoon; see BARSPOON_ML.
         if millilitres_ == BARSPOON_ML:
             continue
         amounts.append(Fraction(str(millilitres_)))
@@ -182,12 +159,10 @@ def pour_count(entries, measures):
 
 
 def hits_in(text, words):
-    """OCCURRENCES of any of `words` in `text`, not distinct words matched.
+    """Occurrences of any of `words` in `text`, not distinct words matched.
 
-    The difference is load-bearing: `I want to faff` wants two or more faff
-    MOMENTS, and Coffey Park Swizzle swizzles twice while Mastiha Mojito churns
-    twice. Counting distinct words scores both at one and drops a mood each.
-    Caught by diffing against the stored values, not by reading the code.
+    `I want to faff` wants two or more faff moments, and a drink that swizzles
+    twice has two.
     """
     if not words:
         return 0
@@ -205,24 +180,15 @@ def derive(drink, sets, step_words, families):
             return []
         return value if isinstance(value, list) else [value]
 
-    # WATER IS NOT AN INGREDIENT TO ANY RULE HERE -- Helen, 2026-10-08:
-    # "dilution water just isn't something I care about ... let's say dilution
-    # water should be excluded from every mood derivation rule." Difford's
-    # writes dilution as a measured line ("10 ml water, omit if using wet
-    # ice"), and that line was costing Clergyman's Lapse, Princess Marina and
-    # Última Palabra `no measuring` for an amount nobody measures, and Última
-    # Palabra `sharp` for being a sixth ingredient. Dropped HERE, once, so no
-    # rule below can count it by accident: not toward a volume, a ratio, the
-    # smallest measure, or how many ingredients a drink has. The Sazerac's
-    # 60 ml of chilled water goes the same way, which is what `NOT_A_POUR`
-    # already said about its volume.
+    # Dilution water is not an ingredient to any rule here (DECISIONS §9). It
+    # is dropped once, so no rule below counts it toward a volume, a ratio,
+    # the smallest measure or the number of ingredients.
     entries = [e for e in (drink.get("ingredients") or [])
                if isinstance(e, dict)
                and not ({str(g) for g in _listed(e.get("generic"))} & NOT_A_POUR)]
 
-    # GENERICS AND CHARACTERS TOGETHER. `blackstrap` is a character since #314
-    # and appears in the `tiki` and `loud` sets; reading generics alone was one
-    # of the 34 dead strings this script was written to fix.
+    # Generics and characters together: a mood set may name a character, as
+    # `blackstrap` is (#314).
     present = set()
     for entry in entries:
         present |= {str(g) for g in listed(entry.get("generic"))}
@@ -234,24 +200,10 @@ def derive(drink, sets, step_words, families):
     def count(name):
         return len(present & set(sets.get(name) or []))
 
-    # A STEP IS A STRING OR A `{step, note}` PAIR -- Helen, 2026-09-04. The
-    # rules below match WORDS in the build ("churn", "muddle"), so a pair has to
-    # give up its sentence: `str(dict)` would hand the matcher
-    # "{'step': 'Muddle the lime...', 'note': '...'}" and find `muddle` inside a
-    # repr, which is the kind of accidental pass that looks like a working rule.
-    #
-    # THE NOTE IS SEARCHED TOO, AND THE CAIPIRINHA IS WHY. Its muddle step used
-    # to end "(my giant spiky muddler, not the polite smooth one)" and that
-    # `muddler` was the SECOND faff hit -- the rule wants two -- so moving the
-    # remark into a `note:` field, which is a change of shape and not of words,
-    # silently took `I want to faff` off the drink. Caught by the dry run
-    # against the stored moods, which is what that comparison is for.
-    #
-    # THE PRINCIPLE IS BIGGER THAN THE DRINK: reshaping the same words must not
-    # change what is derived from them. A note is Helen's own sentence about how
-    # this step is done, so it is part of the build's prose by every test this
-    # file applies -- and if it were not, the mood would have been wrong for as
-    # long as the words sat in brackets.
+    # A step is a string or a `{step, note}` pair (DECISIONS §9). The rules
+    # match words in the build, so a pair gives up both sentences: `str(dict)`
+    # would match inside a repr, and skipping the note would change a mood
+    # when a remark moves from brackets into `note:`.
     parts = []
     for s in listed(drink.get("method")):
         if isinstance(s, dict):
@@ -262,38 +214,21 @@ def derive(drink, sets, step_words, families):
     steps = " ".join(parts)
     n_ingredients = len(entries)
 
-    # `clear`, `sugar craving`, `tiki` and `aperitivo` ARE NOT DERIVED HERE
-    # ANY MORE -- they moved to `moods_by_hand` on 2026-08-30 after every rule
-    # was scored against a full pass of Helen's. Their fit was .67, .23, .53
-    # and .36; the ones that remain are .73 and above. The sets they used
-    # (`tiki`, `loud`, `pudding_flavour`, `aperitivo`) stay in taxonomy.yml:
-    # `tiki` and `loud` are still read by nothing, and are kept because they
-    # are a good starting list if a rule is ever wanted again.
     out = []
 
-    # `strong brown drink` -- whisky leads; or another aged BASE spirit leads
-    # and the drink has not been turned into a sour. Revised 2026-08-30
-    # against Helen's own rulings on 23 drinks; see taxonomy.yml for what the
-    # previous rule got wrong and why each clause is here.
+    # `strong brown drink`: whisky leads, or another aged base spirit leads
+    # and the drink is not a sour. taxonomy.yml says why each clause is here.
     by_family = spirit_volumes(entries, sets["_measures"],
                                sets["_family_of"], sets["_whisky"])
     lengthened = has("lengthener")
-    # `churned` DISQUALIFIES a strong brown drink and a sour, and it too now
-    # reads the field first -- same reason as `ice ice baby` below. It stays
-    # NARROWER than that mood on purpose: a big block of ice is precisely how
-    # you serve a strong brown drink, so `large cube` and `block` are absent
-    # here while `crushed` and `blended` disqualify. Banana Boulevardier lost
-    # the mood outright for one commit when these two lists were the same list.
+    # `churned` disqualifies a strong brown drink. It is narrower than
+    # `mood_serve_ice` on purpose: a big block of ice is how a strong brown
+    # drink is served, so `large cube` and `block` are absent here.
     churned = (drink.get("serve") or {}).get("ice") in ("crushed", "blended") \
         or bool(hits_in(steps, step_words.get("churned") or []))
-    # `slushy` IS `sharp`'s OWN DISQUALIFIER, AND IT IS NARROWER -- 2026-09-26.
-    # Helen, on the Moscow Mule: "Moscow Mule is sharp ... This isn't an
-    # exception to the rule -- it is perfectly consistent with how I intend the
-    # rule to apply." It was failing `churned` on both limbs, for having
-    # crushed ice in the mug rather than for being churned. The disqualifier
-    # `sharp` wants is the ACTION that turns a drink into a slushy; the one
-    # `strong brown drink` wants reads the ice itself. Two questions, two
-    # lists, exactly as `ice` and `churned` in taxonomy.yml already are.
+    # `slushy` is `sharp`'s own disqualifier and is narrower (DECISIONS §9):
+    # it asks for the action that turns a drink into a slushy, where `churned`
+    # reads the ice itself. A Moscow Mule on crushed ice is still sharp.
     slushy = (drink.get("serve") or {}).get("ice") == "blended" \
         or bool(hits_in(steps, step_words.get("slushy") or []))
     if by_family and not lengthened and not churned and not has("juice"):
@@ -302,9 +237,7 @@ def derive(drink, sets, step_words, families):
         if "whisky" in leaders:
             out.append("strong brown drink")
         else:
-            # An aged base spirit may lead instead -- but citrus makes it a
-            # sour, which is the line Helen drew between Art de Vivre and the
-            # Sidecar.
+            # An aged base spirit may lead instead, but citrus makes it a sour.
             aged = set(sets.get("aged") or [])
             aged_leads = any(
                 f in BASE_FAMILIES
@@ -314,36 +247,13 @@ def derive(drink, sets, step_words, families):
                 out.append("strong brown drink")
 
 
-    # `sharp` -- a base, a citrus, a sweetener, in five ingredients or fewer.
-    # The count replaced an UP-GLASS requirement on 2026-08-30: that bar cost
-    # drinks their mood for want of a `glass:` value, and five is Helen's own
-    # number from this mood's definition. With no bar at all it catches 72 of
-    # 114 and narrows nothing.
-    # POURED ingredients, not every line. Between the Sheets is rum, cognac,
-    # triple sec, lemon and syrup -- a textbook short sour -- plus half a pinch
-    # of salt, and the salt took it over five and cost it the mood outright. A
-    # dash of bitters or a pinch of seasoning does not make a drink less
-    # simple, and this cap is about simplicity.
-    #
-    # `tiki` and `I want to faff` deliberately keep the FULL count below: there
-    # the question is complexity, and three dashes of tiki bitters genuinely
-    # are another layer to taste.
-    # NOT CHURNED, BUT LENGTH IS FINE. Helen, 2026-08-30: "I think a Tom
-    # Collins is sharp, so is Airmail and Green Flash." All three are topped up
-    # -- soda for the Collins, champagne for the other two -- and excluding
-    # them was the last of the "short" smuggling itself back into a mood no
-    # longer called that. Being long does not stop a drink being sharp.
-    #
-    # Blending and swizzling still do, and that is not the same clause wearing
-    # a disguise: those turn a drink into a slushy iced one where the ice is
-    # the point, which is what `ice ice baby` is for. Allowing them too takes
-    # this from 42 of 114 to 51, at which point it stops narrowing anything.
-    #
-    # A SHELL POUR IS NOT COUNTED EITHER -- 2026-10-01, #1256. The rum set
-    # alight in a fruit shell became a measured line that day (it had been
-    # `to_serve` prose, or nothing), and Arrack Punch lost `sharp` on the spot:
-    # five pours became six. The drink in the bowl had not changed. This cap is
-    # about how simple the BUILD is, and the shell sits on top of it.
+    # `sharp`: a base, a citrus, a sweetener, in five measured ingredients or
+    # fewer, and not slushy. The cap is about how simple the build is, so it
+    # counts only lines with a volume: a dash of bitters or a pinch of salt
+    # does not count, and nor does a shell's rum, which sits on top of the
+    # drink (#1256). Being topped up does not stop a drink being sharp.
+    # `tiki` and `I want to faff` keep the full count: there the question is
+    # complexity, and three dashes of bitters are another layer.
     poured = sum(1 for e in entries
                  if e.get("as") != "shell"
                  and millilitres(e.get("amount", ""), sets["_measures"]) is not None)
@@ -356,148 +266,30 @@ def derive(drink, sets, step_words, families):
     if has("rich"):
         out.append("pudding in a glass")
 
-    # `tiki` -- two markers AND complexity. RESTORED 2026-09-28 (#1187), and
-    # this comment had outlived its code since 2026-08-30: the mood moved to
-    # `moods_by_hand` and the `if` went with it, leaving the explanation
-    # orphaned. Helen remembered it anyway -- "I'm sure we used to have a tiki
-    # deriver -- something like more than x ingredients, fewer than y, and at
-    # least two typical tiki ingredients???" -- which is the shape below.
-    #
-    # Her definition stands: tiki is "a complex drink with lots of ingredients
-    # and lots of taste layers which is why it's not just a jar full of sugar".
-    #
-    # IT ADDS AND NEVER REMOVES, WHICH IS WHY IT CAN BE CONSERVATIVE. `tiki`
-    # STAYS in `moods_by_hand`, so `expected_moods` preserves whatever a drink
-    # already carries and this rule only ever adds -- the same double life
-    # `on fire` has led since 2026-09-09. So a MISS costs nothing at all and
-    # needs no `mood_include`, and the only thing worth measuring is how often
-    # the rule tags a drink Helen did not.
-    #
-    # MEASURED BEFORE CHOOSING, over all 140 drinks (tmp/ in the #1187 branch).
-    # She tags 36. By marker count:
-    #
-    #     markers    tagged tiki    not tagged
-    #        0             6            82
-    #        1            13            19
-    #        2            10             3
-    #        3             7             0
-    #
-    # Two markers is where the signal is: of the 20 drinks carrying two or
-    # more, 17 are hers. Adding the ingredient floor takes it to 19 firings,
-    # 17 of them hers -- and the two it adds are the Chartreuse Swizzle
-    # (falernum, pineapple juice) and the Milliners Punch (overproof Jamaican,
-    # passion fruit syrup, ten ingredients, on fire), neither of which looks
-    # like a wrong answer. `mood_exclude` is there if she disagrees.
-    #
-    # THE SIX SHE TAGS WITH NO MARKER AT ALL are the ceiling on any rule of
-    # this shape -- Daiquiri, Ti' Punch, Chartreuse Daiquiri, Arrack Punch,
-    # Daisy de Santiago, Martinique Swizzle. They keep their hand tag, which is
-    # the whole reason the mood stays in `moods_by_hand`.
-    #
-    # ONE MARKER IS ENOUGH IN EIGHT INGREDIENTS OR MORE -- Helen, 2026-10-08:
-    # "three dots, and fog are absolutely tiki, so if we need to change the
-    # rules to rule them in then so be it." Three Dots and a Dash (falernum)
-    # and the Difford's Fog Cutter (orgeat) each carry one marker in eight
-    # ingredients. Measured over the 139 drinks she had tagged before that
-    # batch: the second limb fires on four more, three of them hers, and the
-    # fourth is P-Five Punch, a draft she has never hand-tagged at all. On the
-    # 73 new drinks it adds exactly the two she named.
-    #
-    # STEEL DRUM STAYS OUT, AND SHE SAID IT COULD: "I could go either way, so
-    # if the data says No then so be it." It has one marker in six
-    # ingredients, and reaching six tags eleven older drinks she did not --
-    # Pink Lady and the Porn Star Martini among them.
+    # `tiki`: two markers and at least four ingredients, or one marker in
+    # eight or more (DECISIONS §9). The mood stays in `moods_by_hand`, so
+    # `expected_moods` keeps whatever a drink carries and this rule only adds:
+    # a miss costs nothing, and `mood_exclude` answers a wrong tag.
     n_markers = count("tiki")
     if (n_markers >= 2 and n_ingredients >= 4) \
             or (n_markers >= 1 and n_ingredients >= 8):
         out.append("tiki")
 
-    # `sugar craving` -- THE ONE SLICE OF IT THE DATA CAN SEE, 2026-10-08.
-    # Two tiki markers in a drink of 90 ml or more: the long, syrupy tiki
-    # drink. Helen tags 46 of 139 older drinks; this finds 16 of them and one
-    # she did not (Jungle Bird, which carries a `mood_exclude`). The other 30
-    # share nothing an ingredient list shows -- the 2026-08-30 score of .23
-    # stands -- so the mood STAYS in `moods_by_hand` and this only ever adds,
-    # exactly as `tiki` above does. The 90 ml floor is what keeps the short
-    # ones out: Caribbean Sazerac and Nuclear Daiquiri have two markers each
-    # and she tagged neither.
+    # `sugar craving`: two tiki markers in a drink of 90 ml or more. It also
+    # stays in `moods_by_hand` and only adds. The 90 ml floor keeps short
+    # two-marker drinks out.
     measured = [millilitres(e.get("amount", ""), sets["_measures"]) for e in entries]
     if n_markers >= 2 and sum(v for v in measured if v) >= 90:
         out.append("sugar craving")
 
-    # `warming` -- ONE COPY OF THIS RULE, and it was two until 2026-09-20
-    # (#1147). The duplicate sat eleven lines below, separated by a shorter
-    # paste of the `up` note that follows, so neither copy was visible from the
-    # other. It changed no drink's moods, because `expected_moods` re-sorts the
-    # result through taxonomy's key order and that pass dedupes -- an accident,
-    # not a guarantee, and anything counting moods or reading `out` before the
-    # sort saw `warming` twice. The real cost was the next edit: a rule written
-    # twice is a rule where a fix lands on one copy and silently disagrees with
-    # the other.
     if has("warming"):
         out.append("warming")
 
-    # `up` -- PARKED, NOT DELETED, 2026-08-30. Read straight off the glass, and
-    # possible only because #491 closed: 15 drinks named none until that day.
-    #
-    # IT MEASURES 58 OF 114, WHICH IS 51%, and
-    # test_no_mood_covers_more_than_half_the_collection refuses it -- the guard
-    # that retired food's `one-pot` at 57% and caught `fruity` at 51% before it
-    # was ever written down. Helen said "I'm not sold on up. Let's retain it,
-    # but with suspicion", and the suite reached her conclusion independently
-    # an hour later, which is about as good a reason to believe an instinct as
-    # this repo produces.
-    #
-    # Narrowing it does not help: the coupe alone is 40 drinks, so any version
-    # that excludes the coupe is not `up` any more. Half of what she makes is
-    # served up, which is a true fact about the collection and exactly why the
-    # tag cannot narrow anything.
-    #
-    # The mood stays DECLARED in taxonomy.yml with zero members, which renders
-    # no button (`pudding in a glass` precedent), so reinstating it is
-    # uncommenting these two lines. Hers to call.
-    #
-
-    # `aperitivo` -- an amaro or an aromatised wine, and not a strong brown
-    # drink. That second clause is what keeps a Boulevardier out: same
-    # Campari, entirely different moment in the evening.
-
-    # `ice ice baby` READS THE FIELD NOW, not the prose. 2026-09-05.
-    #
-    # It used to grep the method steps for "crushed ice", "large ice", "giant
-    # ice", "ice block" -- and taxonomy.yml's own comment beside that list said
-    # what was wrong with it: "A step reworded out of this list silently loses
-    # the mood... it is exactly what four drinks did for one commit." The serve
-    # pass reworded 63 steps at once and took the mood off nine drinks, which is
-    # that warning arriving at scale.
-    #
-    # The prose was only ever a proxy for a fact nothing recorded. `serve.ice`
-    # records it, so the mood asks the drink directly and cannot be broken by
-    # rewording. `swizzle`/`churn`/`blend` stay on the step list because those
-    # are TECHNIQUES rather than ice, and a swizzle is the mood's own example.
-    #
-    # BOTH LISTS ARE DATA SINCE 2026-09-20 (#1147), AND NEITHER WAS. This rule
-    # carried two hardcoded vocabularies where every other rule in this file
-    # reads one from taxonomy.yml -- and `mood_step_words.ice` was declared
-    # there, looked live, and was read by nothing at all. Editing it to change
-    # which steps make a drink icy would have done exactly nothing, with no
-    # error and no failing test. That is the same shape of bug the `faff` list
-    # was safe from only because the data is what the code reads.
-    #
-    # `mood_step_words.ice` NOW HOLDS THE THREE TECHNIQUES, not the eight
-    # entries it held while nothing read it -- four of those were the pre-
-    # 2026-09-05 prose proxy ("crushed ice", "large ice", "giant ice", "ice
-    # block"), and reading them back in would have re-broken the rule this
-    # comment describes. The serve values live in `mood_serve_ice`.
-    #
-    # THE STEP HALF DECIDES NO DRINK TODAY AND IS NOT REDUNDANT. Measured
-    # 2026-09-20 over all 139 files: 14 drinks satisfy both halves, 24 the
-    # serve half alone, none the step half alone -- serve.yml's `crushed`
-    # entry says "Every swizzle", so the overlap is by design. It matters
-    # because `serve.ice` is OPTIONAL: a freshly ingested swizzle has no serve
-    # value until Helen rules on one, and this half is what gives it the mood
-    # in the meantime. taxonomy.yml carries the measurement so the next reader
-    # does not empty the list, see nothing move, and conclude it is still dead.
+    # `ice ice baby` reads `serve.ice` against `mood_serve_ice`, not the prose,
+    # so rewording a step cannot remove it. `mood_step_words.ice` holds only
+    # techniques (a swizzle is the mood's own example). That half decides no
+    # drink while every swizzle has a serve value, and is kept because
+    # `serve.ice` is optional on a fresh ingest (#1147).
     serve = drink.get("serve") or {}
     served_ice = serve.get("ice")
     if served_ice in set(sets.get("_serve_ice") or []) \
@@ -508,10 +300,8 @@ def derive(drink, sets, step_words, families):
     if not has("citrus"):
         out.append("no juicing")
 
-    # `no measuring` -- #1127, and it reads AMOUNTS where every other rule here
-    # reads ingredients or steps. Whole multiples of the smallest measure, in
-    # MAX_POURS of it or fewer. See taxonomy.yml for why there is a cap and why
-    # a drink with a single measured line still qualifies.
+    # `no measuring` (#1127) reads amounts: whole multiples of the smallest
+    # measure, MAX_POURS of it or fewer. taxonomy.yml says why there is a cap.
     pours = pour_count(entries, sets["_measures"])
     if pours is not None and pours <= MAX_POURS:
         out.append("no measuring")
@@ -527,23 +317,13 @@ def expected_moods(slug, drink, stored, taxonomy, sets,
                    step_words, families):
     """A drink's `mood`: derived, corrected, hers preserved, and cancelled.
 
-    ONE FUNCTION SO THE SCRIPT AND THE TEST CANNOT DISAGREE. They ran the same
-    four steps separately until 2026-08-30, and the copies drifted the first
-    time the derivation gained an input.
+    One function, so the script and tests/test_cocktails.py cannot disagree.
 
-    CANCELLED IS THE NEWEST STEP AND THE ONLY ONE THAT REMOVES A MOOD ON THE
-    STRENGTH OF ANOTHER -- `mood_suppresses` in taxonomy.yml, #853. It runs
-    after the hand-assigned moods are folded in, because the mood doing the
-    cancelling is one of them, and before `mood_exclude`, which is the
-    per-drink escape hatch rather than a rule.
-
-    HAND-ASSIGNED MOODS ARE PRESERVED, NEVER DERIVED. `moods_by_hand` in
-    taxonomy.yml names the ones that describe an occasion rather than the
-    liquid -- `nightcap`, `so wrong it's right` -- and no rule produces them.
-    Whatever a drink already carries for those is kept as-is; everything else
-    is recomputed. So the guarantee that stored moods match their rules stays
-    exactly as strong for the moods that HAVE rules, and Helen's own judgement
-    is never argued with or overwritten by a re-run.
+    Whatever a drink already carries from `moods_by_hand` is kept, and
+    everything else is recomputed. `mood_suppresses` (#853) runs after the
+    hand-assigned moods are folded in, because the mood doing the cancelling
+    is one of them, and before `mood_exclude`, the per-drink escape hatch.
+    The result is in taxonomy.yml's own order.
     """
     by_hand = set(taxonomy.get("moods_by_hand") or [])
     include = (taxonomy.get("mood_include") or {}).get(slug, {}).get("moods") or []
@@ -553,11 +333,8 @@ def expected_moods(slug, drink, stored, taxonomy, sets,
     moods += [m for m in include if m not in moods]
     moods += [m for m in stored if m in by_hand and m not in moods]
 
-    # ONE MOOD CANCELS ANOTHER -- #853, and it runs AFTER the hand-assigned
-    # moods are folded in, because the mood doing the cancelling is one of
-    # them. `easy peasy` removes `I want to faff`: Helen has called the drink
-    # easy, and the nine-ingredient half of the faff rule counts INGREDIENTS
-    # where the mood means OPERATIONS. The pairs live in taxonomy.yml.
+    # After the hand-assigned moods are folded in: the cancelling mood is one
+    # of them (#853).
     for winner, losers in (taxonomy.get("mood_suppresses") or {}).items():
         if winner in moods:
             moods = [m for m in moods if m not in losers]
@@ -568,35 +345,17 @@ def expected_moods(slug, drink, stored, taxonomy, sets,
 
 
 def load_sets(taxonomy, vocab):
-    """The ingredient sets `derive()` reads, assembled in ONE place.
+    """The ingredient sets `derive()` reads, assembled in one place.
 
-    Both this script and tests/test_cocktails.py need them, and building them
-    twice is how they drift: adding `_family_of` and `_whisky` for the revised
-    `strong brown drink` rule broke the tests instantly, because their copy of
-    this setup did not know about them. Same argument as `mood_ingredients`
-    living in data rather than in a script, one level down.
-
-    NOTE ON THE WORD "REVISED" ABOVE, which is not fussiness. `scripts/` is on
-    the render surface that test_invisible_keys_are_really_invisible scans, and
-    that guard keeps string literals deliberately, because a string literal is
-    exactly how front matter gets read. One of the keys it protects is named
-    with an ordinary English past participle meaning "written again". Using that
-    word anywhere in this file -- in a docstring, in prose, describing this rule
-    rather than any key -- reports the key as rendered and fails the suite.
-
-    It happened twice while this file was being written, the second time in a
-    paragraph explaining the first. MANUAL 12 lists five prior instances of
-    prose defeating a source-scanning guard, the very first of which is a hook
-    refusing the commit that introduced it. Say "revised".
+    This script and tests/test_cocktails.py both call it; a second copy of
+    this setup would miss the next key `derive()` comes to need.
     """
     sets = dict(taxonomy.get("mood_ingredients") or {})
     sets["_measures"] = vocab.get("measures") or {}
     sets["_family_of"] = vocab.get("family_of") or {}
     sets["_whisky"] = set(vocab.get("whisky_styles") or [])
-    # The `serve.ice` values that earn `ice ice baby` -- data since 2026-09-20
-    # (#1147), hardcoded in the rule before that. `_data/cocktails/serve.yml`
-    # declares what the field may say; taxonomy.yml says which of those are icy
-    # enough to be a mood, and `test_every_icy_serve_value_is_a_real_one` keeps
+    # The `serve.ice` values that earn `ice ice baby`. serve.yml declares what
+    # the field may say, and `test_every_icy_serve_value_is_a_real_one` keeps
     # the two in step.
     sets["_serve_ice"] = list(taxonomy.get("mood_serve_ice") or [])
     return sets
@@ -606,9 +365,8 @@ def load_drinks():
     for root in COLLECTIONS:
         if not root.is_dir():
             continue
-        # rglob, not glob, since 2026-09-04: Helen stages drinks for publication
-        # in _cocktail_drafts/4-promote/, and the suite (which walks the folder
-        # recursively) was disputing moods this script could not even see.
+        # rglob, not glob: drinks are staged in subfolders of
+        # _cocktail_drafts/, and the suite walks the folder recursively.
         for path in sorted(root.rglob("*.md")):
             text = path.read_text(encoding="utf-8")
             match = FRONT_MATTER.match(text)
@@ -618,12 +376,10 @@ def load_drinks():
 
 
 def rewrite_mood(text, moods):
-    """Replace the `mood:` block, as TEXT.
+    """Replace the `mood:` block, as text.
 
-    NEVER THROUGH A YAML DUMPER. MANUAL 12: not one of the several hundred
-    front-matter edits in this project's history has gone through one, because
-    a round trip loses comment placement, key order and quoting style -- right
-    in a spot check and wrong across a hundred files.
+    Never through a YAML dumper: a round trip loses comment placement, key
+    order and quoting style.
     """
     lines = text.split("\n")
     start = next((i for i, l in enumerate(lines)

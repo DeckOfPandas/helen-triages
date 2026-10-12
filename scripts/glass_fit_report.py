@@ -3,36 +3,32 @@
     python3 scripts/glass_fit_report.py                 # build, then report
     python3 scripts/glass_fit_report.py --site tmp/x    # reuse a local build
 
-Writes `tmp/glass_fit_report.md`, a GitHub checklist, and prints a summary.
+Without `--site` it builds the site with the local config (drafts render
+there) into `tmp/_glass_fit_site`. It reads the built drink pages, every `.md`
+in `_cocktail_recipes/` and `_cocktail_drafts/`, and `glasses.yml` and
+`costs.yml` in `_data/cocktails/`. It writes `tmp/glass_fit_report.md`, a
+GitHub checklist, and prints a summary.
 
-A REPORT AND NOT A TEST, deliberately. A red `main` is a deploy outage, and
-every line this prints is a judgement for Helen about ONE drink -- the glass
-may be right and the recipe generous, or the reverse, or she may simply like
-it that way ("let's offer rules, then I'll happily break them in the
-kitchen"). A test would force an answer; a checklist asks the question.
+The rules:
 
-THE VOLUME IS THE SITE'S OWN, READ OFF THE BUILT PAGE. `volume_for` in
-`_plugins/cocktail_units.rb` computes it at build time and the drink page
-carries it as `data-total-ml`; a second parse of the amounts here would be a
-second answer to "how big is this drink" waiting to disagree with the page. So
-this builds the site with the local config (drafts render there) and reads the
-attribute. A drink the plugin withholds a figure for is listed as unchecked
-rather than guessed at.
-
-WHAT GOES IN THE GLASS IS NOT THE RECIPE. Shaking or stirring with ice adds
-water, and ice served in the glass takes up room. The factors are data --
-`fit_rules` in `_data/cocktails/glasses.yml`, each a sourced {low, high}
-range -- because they are the rules the glasses page states, and one copy read
-twice beats two. THIS REPORT READS THE FORGIVING END OF EVERY RANGE, so a flag
-means the drink does not fit even on the kindest reading of the sources; the
-first run took the middles and flagged a Tom Collins in a highball.
-
-THE READING OF A METHOD INTO A DILUTION FAMILY IS THE PLUGIN'S TOO, since
-#1179: `method_family` in `_plugins/cocktail_units.rb`, carried on the page as
-`data-method-family`. It was here until a `(top)` began to be sized from the
-glass, which needs the same reading at build time -- and two readings of one
-method, in two languages, is the disagreement this file's second paragraph is
-about. It is still a heuristic over the method's verbs and still says so.
+  - A report and not a test. Every line is a judgement for Helen about one
+    drink: the glass may be right and the recipe generous, or the reverse, or
+    she may like it that way (DECISIONS §9). A test would force an answer.
+  - The volume is the site's own, read off the built page. `volume_for` in
+    `_plugins/cocktail_units.rb` computes it and the page carries it as
+    `data-total-ml`, with `data-top-ml`, `data-after-ml`, `data-aside-ml` and
+    `data-method-family` beside it. Nothing is parsed a second time here, so
+    the report and the page cannot disagree. A drink the plugin withholds a
+    figure for is listed as unchecked.
+  - What goes in the glass is not the recipe: shaking or stirring adds water,
+    and ice in the glass takes room. The factors are `fit_rules` in
+    glasses.yml, each a sourced {low, high} range. This report reads the
+    forgiving end of every range, so a flag means the drink does not fit on
+    the kindest reading.
+  - Only what was shaken or stirred is watered: `after` is in the glass
+    undiluted and `aside` is not in the glass at all.
+  - A drink is flagged only when it is over by more than `tolerance`, and a
+    drink with several glasses is fine if any one of them fits.
 """
 import argparse
 import html
@@ -48,16 +44,14 @@ DATA = ROOT / "_data" / "cocktails"
 BUILD = ROOT / "tmp" / "_glass_fit_site"
 OUT = ROOT / "tmp" / "glass_fit_report.md"
 
-# On the scaler's controls since #1257 (2026-10-02), when the visible
-# "Approximately X ml" line that used to carry it was removed.
+# On the scaler's controls (#1257).
 TOTAL_ML = re.compile(r'class="cocktail-scale-controls" data-total-ml="([\d.]+)"')
-# Beside it since #1179: how much of that total is a `(top)`, and the dilution
-# family the plugin read the method as. Both are the plugin's answers, so this
-# report and the site cannot read one drink two ways.
+# Beside it (#1179): how much of that total is a `(top)`, and the dilution
+# family the plugin read the method as.
 TOP_ML = re.compile(r'class="cocktail-scale-controls"[^>]* data-top-ml="([\d.]+)"')
 FAMILY = re.compile(r'class="cocktail-scale-controls"[^>]* data-method-family="([a-z_]+)"')
-# And since #1244's audit: what is in the glass but was added AFTER the shake
-# (so never watered), and what is in the recipe but not in the glass at all.
+# What is in the glass but was added after the shake, so never watered, and
+# what is in the recipe but not in the glass at all (#1244).
 AFTER_ML = re.compile(r'class="cocktail-scale-controls"[^>]* data-after-ml="([\d.]+)"')
 ASIDE_ML = re.compile(r'class="cocktail-scale-controls"[^>]* data-aside-ml="([\d.]+)"')
 
@@ -84,12 +78,10 @@ def drinks():
 
 
 def top_least(ingredients, top_up):
-    """The least the declared range allows a `(top)` to pour.
+    """The least the declared range allows a `(top)` to be.
 
-    That is what a glass must leave room for. What the top actually SPENDS is
-    no longer worked out here: since #1179 the plugin sizes it from the glass
-    (or falls back to the range's midpoint) and the page says which figure is
-    inside its total, as `data-top-ml`.
+    That is what a glass must leave room for. What the top actually spends is
+    the plugin's figure, `data-top-ml` (#1179).
     """
     least = 0.0
     for ing in ingredients or []:
@@ -124,11 +116,10 @@ def room(capacity, ice, family, key, rules, fill=None):
 
 
 def served_ml(base, family, rules):
-    """What the BUILD becomes in the glass, on the forgiving end.
+    """What the build becomes in the glass, on the forgiving end.
 
-    A top is not in `base`. It is poured after the shaker, so it takes no
-    dilution, and it FILLS WHAT IS LEFT -- which is the #1076 argument, a top
-    being capacity less build less ice -- so a topped drink is judged on
+    A top is not in `base`: it is added after the shaker, so it takes no
+    dilution, and it fills what is left (#1076). A topped drink is judged on
     whether its build fits and on how much room that leaves for the top.
     """
     if family == "blended":
@@ -151,25 +142,15 @@ def check(fm, total, top, family, glasses, rules, top_up, after=0.0, aside=0.0):
     """(context line, [(glass, verdict, detail)]) for one drink.
 
     `total`, `top`, `family`, `after` and `aside` are the plugin's, read off
-    the built page.
+    the built page. Three rules keep a flag honest (#1244):
 
-    FOUR THINGS CHANGED AFTER THE FIRST LIST WAS AUDITED LINE BY LINE (#1244,
-    2026-10-04), and each removed flags that were the model's fault:
-
-      1. ONLY WHAT WAS SHAKEN IS WATERED. `after` is in the glass undiluted (a
-         float, a measured champagne added after the strain); `aside` is not
-         in the glass at all (the rum in a fruit shell). The first list
-         watered both and flagged a Dark 'n' Stormy for its ginger beer.
-      2. A FLAG NEEDS A MARGIN. `tolerance` in fit_rules: a drink over by less
-         than that share is not flagged. Every figure here is a survey median
-         times a wash line times an ice allowance; 3% over is not a finding.
-      3. THE TOP FLAG FIRES ONLY WHEN THERE IS HARDLY ANY ROOM. It compared the
-         room with the house range's minimum, which the site stopped spending
-         when a top began to be sized from the glass (#1179). It now fires
-         when the room is under `top_room_min` of that minimum -- the Arrack
-         Christmas Punch, whose build fills its flute.
-      4. (In the plugin) "shake ... with a few" is a short shake wherever the
-         words fall in the sentence.
+      1. Only what was shaken is watered. `after` is in the glass undiluted
+         (a float, a champagne added after the strain); `aside` is not in the
+         glass at all (the rum in a fruit shell).
+      2. A flag needs a margin: `tolerance` in fit_rules. Every figure is a
+         survey median times a wash line times an ice allowance.
+      3. The top flag fires only when the room left is under `top_room_min`
+         of the house range's minimum.
     """
     serve = fm.get("serve") or {}
     ice = serve.get("ice") or "none"
@@ -306,8 +287,8 @@ def main(argv=None) -> int:
             continue
         worst = min(ORDER.index(v) for _, v, _ in results)
         title = html.unescape(str(fm.get("title") or label))
-        # ONE QUESTION, ASKED ONCE. Every punch whose only problem is the cup
-        # has the same problem, so they share a checklist item.
+        # Every punch whose only problem is the cup has the same problem, so
+        # they share one checklist item.
         if all(v == "cup" for _, v, _ in results):
             cups.append(f"  - {title} (`{label}`): {results[0][2]}")
             continue

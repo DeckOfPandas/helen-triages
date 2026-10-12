@@ -1,136 +1,36 @@
-# =============================================================================
-# COCKTAIL GARNISHES. Requested by Helen, 2026-08-31.
-# =============================================================================
-# WHY THIS EXISTS, AND IT IS NOT SO ANYTHING CAN BE FILTERED. There is no
-# garnish filter on the index and this file is not a step towards one -- the
-# same ruling taxonomy.yml makes about glasses and spirits. It exists for
-# #290's reason, the one that earned methods.yml: a shape that changes every
-# time has to be RE-READ, where an identical repeated one becomes something you
-# RECOGNISE. That matters most in the situation Helen named for the method
-# steps -- people in the house, and thirsty.
+# Cocktail garnishes: a closed vocabulary, so one garnish is written one way
+# on every drink. Not a filter: the index has no garnish filter.
+# test_every_garnish_is_declared requires each garnish on each drink to appear
+# under `canonical`.
 #
-# THE CENSUS THAT PRODUCED IT, 2026-08-31: 130 garnish entries across 123
-# drinks, in 65 distinct strings, for perhaps 35 actual garnishes. `mint sprig`
-# / `mint sprigs` / `mint bouquet` / `mint sprigs bouquet` was one garnish
-# wearing four faces; so were `brandied cherry` / `brandied cherries`, both
-# wheel pairs, and `lime wedge` / `one lime wedge`. Collapsing only the
-# unambiguous drift -- singulars, plurals, a stray article -- took 65 to 55
-# without losing a word that carried information.
-#
-# THEN 55 TO 49, working the proposals through with Helen the next day: the
-# four zest-twist pairs collapsed to their short form, three compound strings
-# split into the two garnishes they each named, and one incidental count came
-# off. 65 to 49 in total, with every rejection recorded in place rather than
-# as an absence.
-#
-# WHAT IS DELIBERATELY NOT COLLAPSED. `lime wedge on rim` says where to put it.
-# `orange zest twist (discarded)` says it does not stay in the drink.
-# `luxardo maraschino cherry` names a bottle that genuinely differs from a
-# bright red cocktail cherry. Applying methods.yml's own test -- does the
-# phrasing carry information? -- keeps all three apart.
-#
-# HOW IT IS ENFORCED. `test_every_garnish_is_declared` requires each garnish on
-# each drink to appear below. The list starts as the collection's real
-# vocabulary, undeclared values and all, so it is a RATCHET: it cannot fail on
-# what is already here and it bites on the next new spelling. That is the same
-# bargain glasses.yml's canonical map and the `<family>_characters` lists
-# strike -- declaring a value is what switches enforcement on.
-#
-# NOTHING HERE REWRITES A DRINK. `proposals` holds the strings that still want
-# a judgement, left beside what they might become, exactly as methods.yml does.
-# Helen, on that file: "Prefer both, leaving my original too, then I delete
-# whatever I don't want." Deleting a row is how a suggestion is rejected.
-# =============================================================================
+# Strings whose extra words carry information stay apart: `lime wedge on rim`
+# says where it goes, `(discarded)` and `(floated)` say how it is handled,
+# `Luxardo maraschino cherry` names a different object. A count stays only
+# where the count is the spec (`three coffee beans`).
 
-# THE DECISION, NOT A GARNISH. `["no garnish"]` means this drink takes one;
-# `[]` means nobody has filled it in yet. It may only ever appear ALONE, which
-# is what stops it becoming a fake member of the vocabulary below --
-# test_no_garnish_is_stated_as_no_garnish_and_nothing_else owns that rule.
-#
-# IT WAS `none` UNTIL 2026-08-31 AND THE RENAME IS ABOUT THE PAGE. The layout
-# joins this list straight into the drink page, so the stored word is the word
-# a reader sees. Helen: "'no garnish' actually, because none might read like
-# 'not filled in' even though you and I know that's not the case."
+# The decision, not a garnish: `["no garnish"]` means this drink takes none,
+# `[]` means nobody has filled it in. It may only appear alone
+# (test_no_garnish_is_stated_as_no_garnish_and_nothing_else). The layout
+# prints the stored word, which is why it is not `none`.
 no_garnish: "no garnish"
 
-# "EITHER OF THESE, MAKER'S CHOICE" IS A SINGLE STRING, NOT A LIST.
-# Settled 2026-08-31 on fake-id's `orange or lemon twist`. Helen: "either of
-# these are lovely and the maker can choose. I like this approach on principle."
-#
-# IT HAS TO BE ONE STRING BECAUSE A LIST ALREADY MEANS SOMETHING ELSE. A
-# `garnish:` list is conjunctive -- Cobra's Fang wants a mint sprig AND a lime
-# wheel -- so `["orange twist", "lemon twist"]` would ask for both. `generic`
-# solved the identical problem the other way round (#441), where a list means
-# "any of these would do"; the two fields cannot share one convention because
-# they start from opposite defaults, and that is worth knowing before anyone
-# tries to unify them.
-#
-# SO THE OR LIVES INSIDE THE STRING and the whole thing is declared as one
-# entry under `canonical`. Both halves should be real garnishes in their own
-# right, so the reader can act on either.
-#
-# A SECOND DRINK USES IT NOW, 2026-09-14 -- #984's Grasshopper, whose source
-# offers three alternatives rather than two: "mint sprig, mint leaf or grated
-# nutmeg". The shape generalises without changing it: a comma between every
-# option but the last, "or" before the last, still one string, still declared
-# under `canonical` in whichever category fits (this one spans two --
-# herbs_and_leaves and spice_and_other -- so it sits with the first-named
-# option's group rather than needing a third). Still not enough to build
-# machinery for -- #459's rule about not becoming an encyclopaedia. If this
-# keeps recurring, the question to ask is whether every combination declaring
-# its own string has become the wrong shape; until then this costs one line
-# per combination.
+# "Either of these, maker's choice" is ONE string with the "or" inside it
+# (`orange or lemon twist`; three options take commas and a final "or"). A
+# `garnish:` list is conjunctive, so two entries would ask for both. Declared
+# under `canonical` in the first-named option's group.
 
 # --- THE VOCABULARY ----------------------------------------------------------
-# tests/test_cocktails.py flattens every list under `canonical`, so a group
-# added tomorrow is covered tomorrow -- the same shape methods.yml and
-# ingredients.yml both use.
-#
-# THE GROUPING IS NO LONGER "FOR READING ONLY", WHICH IS WHAT IT SAID HERE
-# UNTIL 2026-09-02. Ruling D11 of INGEST_INBOX_DESIGN.md asked for every
-# declared garnish to carry a group, so that the grouping the repo-less ingest
-# document prints is data rather than a map living in a script. This mapping
-# already WAS that data: `canonical:` is group name -> list, so every garnish
-# sits in exactly one group by construction. The design doc allows this shape
-# explicitly ("a `groups:` map from group name to list is acceptable"), and it
-# is the better of the two -- a per-entry `group:` key would turn each entry
-# from a string into a dict, which is precisely the change that would empty
-# `_declared_garnishes()` in silence and take every garnish check with it.
-#
-# WHAT IS DIFFERENT IS THE CONSEQUENCE. `scripts/build_ingest_vocab.py` renders
-# these group names and their members straight into INGEST_ONE_COCKTAIL.md §4,
-# with the key title-cased for the heading (`citrus_peel` -> "Citrus peel"). So
-# renaming a group renames a heading in a document handed to a session that
-# cannot check it, and moving a garnish between groups moves it in print.
-# `test_every_declared_garnish_has_exactly_one_group` in
-# tests/test_standalone_docs.py is the guard, and the generator's own test is
-# what keeps the document in step.
-#
-# FIVE ENTRIES NO DRINK USED CAME OFF ON 2026-09-25 -- #1186, Helen: "Fine to
-# delete those garnishes." `cherry flag`, `lemon twist after expressing over
-# cocktail`, `mint leaf`, `orange crescent` and `pineapple and brandied cherry`
-# were declared by the 2026-08-31 census from strings that drinks have since
-# stopped saying, and the ratchet only ever bites on what is declared, so an
-# unused entry was costing a line in the generated ingest document and
-# guarding nothing. `mint sprig, mint leaf or grated nutmeg` is ONE string
-# (see above) and is unaffected. The next drink to want one of the five
-# declares it again, with the drink.
+# Group name -> list, so every garnish sits in exactly one group
+# (test_every_declared_garnish_has_exactly_one_group). An entry stays a plain
+# string. scripts/build_ingest_vocab.py prints each group key as a heading in
+# the ingest document, so renaming a group or moving a garnish changes that
+# document. A garnish no drink uses is deleted, not kept (#1186).
 canonical:
 
-  # Peel. The commonest garnish in the collection by a distance.
-  #
-  # A TWIST IS A STRIP OF ZEST, so `lemon zest twist` and `lemon twist` were one
-  # garnish written two ways. Helen collapsed all four pairs to the short form
-  # on 2026-08-31 -- the shortest name that says what it is, which is the rule
-  # she already applied to card names. Ten strings became eight, and eleven
-  # drinks were retyped.
-  #
-  # THE TAILS SURVIVE THE COLLAPSE because they carry information the head does
-  # not: `(discarded)` says the peel does not stay in the drink. Only the head
-  # form was normalised. `flamed orange zest coin` keeps its `zest` -- a coin
-  # is a different cut from a twist, not a longer name for one. (`lemon twist
-  # after expressing over cocktail`, the tail that said the opposite of
-  # `(discarded)`, was deleted unused on 2026-09-25 -- #1186.)
+  # A twist is a strip of zest, so the name is `lemon twist`, never `lemon zest
+  # twist`. `twist` in a garnish makes the layout add an "Express the twist"
+  # step; a coin, a spiral or a length of peel is a different cut and gets
+  # none.
   citrus_peel:
     - "lemon twist"
     - "lemon twist (discarded)"
@@ -139,50 +39,24 @@ canonical:
     - "orange or lemon twist"
     - "grapefruit twist"
     - "flamed orange zest coin"
-    # NEW 2026-09-20, for the Gin Rickey, whose Difford's source garnishes with
-    # a "length of lime peel". Helen declared the source's own words rather than
-    # `lime twist`, and the difference is real: `twist` in a garnish makes
-    # _layouts/cocktail.html append an "Express the twist..." step, and this
-    # source never says to express anything. It is not a second spelling of a
-    # twist and must not be collapsed into one.
+    # Not a twist: the source never says to express it.
     - "length of lime peel"
-    # NEW 2026-10-07, the Difford's batch of 73 -- Helen ruled on all 28
-    # undeclared garnishes in one sitting, and the ones that extend a pattern
-    # already here she took as a list: "Your add new list is great."
-    #
-    # `lime twist` and its `(discarded)` tail complete the set the lemon and
-    # orange already have. Six drinks between them, and every source says to
-    # express it, so the layout's "Express the twist..." step is right.
     - "lime twist"
     - "lime twist (discarded)"
-    # NOT `flamed orange zest coin` above: a coin is a different cut from a
-    # twist (this file's own rule), and Eeyore's Requiem asks for the twist.
+    # A twist, not the coin above.
     - "flamed orange twist"
-    # A SPIRAL IS NOT A TWIST, and the word is what keeps the express step off.
-    # Helen, 2026-10-07: "lemon spiral, no express step" -- Rum Daisy's source
-    # never says to express it.
+    # A spiral is not a twist: the word keeps the express step off.
     - "lemon spiral"
-    # Gold Florin, maker's choice, ONE string by the convention at the top of
-    # this file. The source says "lemon spiral or mint sprigs bouquet pegged to
-    # rim"; the second half is written as the declared `mint bouquet`, and the
-    # peg is gone on her word: "no note, just drop".
+    # Maker's choice, one string.
     - "lemon spiral or mint bouquet"
-    # Golden Bird. The source says only "orange 'beak' on rim" and not what the
-    # beak is cut from; the words are Helen's, 2026-10-07, on the pattern of
-    # `pineapple wedge (cut to resemble a bird's plumage)` in `fruit`. In
-    # `no_article` below, because the string is written to complete the
-    # sentence she asked for: "Garnish with orange peel over the rim (cut to
-    # look like a beak)".
+    # Worded to complete "Garnish with ...", so it is in `no_article` below.
     - "orange peel over the rim (cut to look like a beak)"
 
   citrus_cut:
     - "lime wedge"
     - "lime wedge on rim"
     - "lime wheel"
-    # NEW 2026-09-20, for the Cadillac Margarita: the source says "lime wheel
-    # or wedge" and leaves the cut to the maker. ONE STRING, not two, by the
-    # convention documented at the top of this file (`orange or lemon twist`):
-    # the list is conjunctive, so two entries would ask for both.
+    # Maker's choice, one string.
     - "lime wheel or wedge"
     - "lemon wheel"
     - "lemon slice"
@@ -191,281 +65,108 @@ canonical:
     - "grapefruit crescents"
     - "citrus wheel"
     - "dehydrated lime slice wheel"
-    # `half an empty lime shell` SINCE 2026-09-19, was `half lime shell`.
-    # Helen, given the choice between rewording it and adding the old form to
-    # `no_article`, picked the words: the step had been reading "Garnish with a
-    # half lime shell", which is correct data and not English anybody writes.
-    # The new form brings its own article, exactly as `half an empty passion
-    # fruit shell` does in `fruit` below, so the two shells now match -- and
-    # `empty` is the fact that makes it a garnish rather than an ingredient:
-    # the lime has been juiced into the drink and the husk is what is left.
-    # Both Mai Tais retyped in the same commit.
+    # `empty` is what makes it a garnish: the lime is juiced into the drink
+    # and the husk is left. It brings its own article.
     - "half an empty lime shell"
-    # NEW 2026-10-07, the Difford's batch.
     - "grapefruit wedge"
     - "dehydrated blood orange slice wheel"
-    # The Tolerance Foundation. ONE garnish you build, not two to split --
-    # splitting it into `lemon wheel` and `skewered maraschino cherry` loses
-    # the sail, which is the point. Helen's words, 2026-10-07.
+    # One garnish you build, not two to split: the sail is the point.
     - "lemon wheel and skewered maraschino cherry (like a sail)"
 
   fruit:
     - "pineapple wedge"
     - "pineapple wedge (cut to resemble a bird's plumage)"
-    # NEW 2026-10-07: `on rim` says where to put it, the reason `lime wedge on
-    # rim` was kept apart from `lime wedge` above.
+    # `on rim` says where to put it.
     - "pineapple wedge on rim"
     - "apricot wedge on rim"
-    # Cannonball's source says "quarter pineapple slice wheel" and it was
-    # proposed as a `pineapple wedge`. Helen, 2026-10-07: "a quarter of a wheel
-    # is a quarter of a disc, not a wedge, but let's just call that garnish
-    # 'pineapple wheel'". So the quarter is not recorded, on purpose.
+    # A quarter of a wheel in its source; the quarter is not recorded.
     - "pineapple wheel"
     - "blackberry"
     - "dried apple slice"
-    # NOT a second spelling of the dried one. All Jacked Up's source says
-    # "fresh or dehydrated"; Helen, 2026-10-07: "Apple slice is a new garnish."
+    # Not a second spelling of the dried one.
     - "apple slice"
-    # Fay Wray's "speared dehydrated banana chips" is this entry: a banana chip
-    # is already dehydrated and the spear is presentation.
     - "banana chip"
     # One on a pick, not the scatter `raspberries` below names.
     - "skewered raspberry"
-    # Three Dots and a Dash. THE COUNT IS THE SPEC, as with `three coffee
-    # beans`: three dots, one dash. Spelled out because a garnish that opens
-    # with a digit reads as a pour to
-    # test_a_garnish_is_not_an_ingredient_or_a_rim. Agreed by Helen 2026-10-07.
+    # The count is the spec. Spelled out because a garnish opening with a
+    # digit reads as a pour to test_a_garnish_is_not_an_ingredient_or_a_rim.
     - "three skewered blueberries and a long slice of pineapple"
-    # `12 raspberries` until 2026-08-31. A COUNT STAYS ONLY WHERE THE COUNT IS
-    # THE SPEC -- Helen's rule, settling this and `three coffee beans` together.
-    # Twelve is how many that punch happened to want; three coffee beans is the
-    # drink. See spice_and_other.
+    # No count: a count stays only where it is the spec.
     - "raspberries"
-    # DELIBERATELY UNSPECIFIC, and that is the whole value of it -- Helen,
-    # 2026-09-17, asked whether a draft's `fruit wedges` wanted a narrower
-    # name: "Honestly fruit wedges is enough, the maker can choose." It names
-    # the SHAPE and leaves the fruit to whoever is standing at the counter,
-    # which is a different kind of entry from the ones around it: every other
-    # value here names a specific thing because the drink wants that thing.
-    #
-    # IT NEEDS NO `no_article` ENTRY, which is the point of #1143's rule. Its
-    # final `s` is what drops the article, so it reads "Garnish with a mint
-    # sprig, fruit wedges and a maraschino cherry" without anyone remembering
-    # to list it. Declared plurals added before that rule (`raspberries`,
-    # `cucumber wheels`, `kaffir lime leaves`, `grapefruit crescents`) are
-    # still in the list and no longer need to be; they are left there because
-    # an explicit ruling is not worth deleting to save four lines.
-    #
-    # IT IS A KNOWN EXCEPTION TO THIS FILE'S OWN RULE, NOT A PRECEDENT, and
-    # she was offered the alternatives before choosing it: `pineapple wedge`,
-    # declared above and used by three drinks, or Modern Zombie's `no garnish`.
-    # #1079 settled the general case the other way -- "'citrus slice' shouldn't
-    # be the generic because citrus fruits aren't interchangeable" -- but that
-    # ruling was about a POUR, where the fruit changes the drink. This is
-    # decoration on a heaped tiki mug, where it does not. The next vague
-    # garnish still gets asked about rather than added on the strength of this
-    # one.
-    #
-    # THIS ENTRY WAS WRITTEN TWICE, by two sessions on the same day, and the
-    # merge kept the better half of each. That is the cost of two agents in one
-    # collection; the duplicate was caught by reading the merged file rather
-    # than by any test, because a YAML list happily holds the same string twice.
+    # Deliberately unspecific: it names the shape and leaves the fruit to the
+    # maker. A known exception, not a precedent for another vague garnish.
     - "fruit wedges"
     - "half an empty passion fruit shell"
 
-  # THE THREE QUALIFIED CHERRIES ALL STAY, ruled 2026-08-31. A Luxardo really is
-  # a different object from a bright red cocktail cherry, `skewered` says how it
-  # is served, and a fruit stick is one thing you build rather than two garnishes
-  # to split. Each was proposed for collapsing and each was rejected.
-  #
-  # `Luxardo` gained its capital in the same pass -- it is a proper noun and was
-  # lowercased, which is a typo whichever way the collapse question had gone.
+  # The qualified cherries stay apart: a Luxardo is a different object from a
+  # cocktail cherry, and `skewered` says how it is served.
   cherries:
     - "brandied cherry"
     - "maraschino cherry"
     - "Luxardo maraschino cherry"
     - "skewered maraschino cherry"
-    # NEW 2026-09-14, for the Pink Lady, whose source garnishes with three
-    # brandied cherries on a cocktail pick. The draft had dropped the pick and
-    # the count as presentation; asked, Helen kept the detail, in THIS shape --
-    # singular like `skewered maraschino cherry` beside it, and "no note", so
-    # the count stays out of the garnish the way it does for every other entry.
+    # Singular, and no count, like `skewered maraschino cherry`.
     - "skewered brandied cherry"
     - "fruit stick (skewered pineapple cubes and a maraschino cherry)"
-    # Roman Punch's stick adds a raspberry and names the cherry. Offered the
-    # collapse onto the one above, Helen kept it: "second fruit stick"
-    # (2026-10-07).
+    # A second fruit stick, kept apart from the one above on Helen's word.
     - "fruit stick (skewered pineapple cube, raspberry and Luxardo maraschino cherry)"
-    # NEW 2026-09-20, for Fanny Chu's Piña Colada, whose Punch source garnishes
-    # with "cherries" and no kind. Helen: "'Cherries' is just cherries, so maybe
-    # 'fresh cherries'". The word says what the source does not say outright and
-    # what every other entry here is not: NOT a brandied or maraschino cherry,
-    # which are preserved and have their own entries above. Plural, so its final
-    # `s` drops the article without a `no_article` line (#1143).
+    # Fresh, as against the preserved cherries above.
     - "fresh cherries"
 
   herbs_and_leaves:
     - "mint sprig"
     - "mint bouquet"
     - "rosemary sprig"
-    # NEW 2026-09-20, for the White Negroni Piña Colada. The source's garnish
-    # line says "frond" and its directions say "pineapple leaf"; Helen declared
-    # the garnish line's word.
     - "pineapple frond"
     - "kaffir lime leaves"
     - "cucumber wheels"
     - "edible violet"
-    # NEW 2026-09-20, Fanny Chu's Piña Colada: "an edible orchid". A flower, so
-    # it sits beside the violet; `an` comes from the first letter, no entry
-    # needed in `no_article`.
     - "edible orchid"
-    # #984's Grasshopper: "mint sprig, mint leaf or grated nutmeg" -- the
-    # source's own three-way choice, one string, the same pattern as "orange
-    # or lemon twist" above, generalised past two options (see that entry's
-    # own comment).
+    # Maker's choice of three, one string.
     - "mint sprig, mint leaf or grated nutmeg"
-    # NEW 2026-10-07, the Difford's batch. The three below the thyme are
-    # near-misses Helen ruled on, each offered beside what it might have
-    # collapsed onto.
     - "thyme sprig"
-    # A FLOATED GARNISH CARRIES `(floated)` AS A TAIL, the way `(discarded)`
-    # does on a twist: the bracket says how the thing is handled and the head
-    # stays the thing. Settled 2026-10-07 after two other shapes. `floated
-    # basil leaf` read well and `floated thin cucumber slice` did not (Helen:
-    # "awkward"); `X, floated` puts a comma inside a list the page joins with
-    # commas. Three entries, here and in spice_and_other.
-    #
-    # Both Dantes. The source's "basil leaf boat floated on surface" arrived
-    # spelled two ways; the boat is dropped.
+    # A floated garnish carries `(floated)` as a tail, as `(discarded)` does on
+    # a twist: the head stays the thing.
     - "basil leaf (floated)"
-    # Geisha Martini's "wafer thin cucumber slice". NOT `cucumber wheels`
-    # above, which is plural and sits on the rim of a long drink.
+    # Not `cucumber wheels` above, which sit on the rim of a long drink.
     - "thin cucumber slice (floated)"
-    # Zakuski Cocktail's "cucumber peel", named to match `length of lime peel`
-    # in citrus_peel -- and like it, never expressed.
+    # Named to match `length of lime peel`; never expressed.
     - "length of cucumber peel"
 
   spice_and_other:
     - "grated nutmeg"
-    # NEW 2026-09-20, all three from the Punch batch (#606) at Helen's word:
-    # "add all those garnishes to garnish.yml".
-    #
-    # `Angostura bitters` IS A GARNISH HERE, NOT A POUR, because the White
-    # Negroni Piña Colada tops the drink with "several dashes" and gives no
-    # count -- an amount nothing could total. The capital is the brand's, as
-    # with `Luxardo maraschino cherry`. Its final `s` drops the article
-    # without a `no_article` entry (#1143).
+    # A garnish here, not a pour: dashed over the top with no count.
     - "Angostura bitters"
-    # OPTIONAL IN ITS SOURCE (Rum Cow, and only for some glasses), which this
-    # list cannot say: a garnish is present or absent. The drink's own note
-    # carries the condition. A mass noun, so it IS in `no_article` below.
+    # A mass noun, so it is in `no_article` below.
     - "whipped cream"
     - "cinnamon stick"
-    # GINGER, TWO ENTRIES, 2026-09-17. Helen: "Ginger, yes, two entries (and
-    # counting)" -- so this is deliberately not one `ginger` garnish with the
-    # cut left to the maker. A wheel cut off a raw root and a slice of stem
-    # ginger out of its syrup are different objects: one is hot and fibrous,
-    # the other sweet and soft, and a drink that wants one does not want the
-    # other. Biggles Sidecar takes the wheel, German Vacation the stem slice.
-    #
-    # `ginger wheel` AND NOT `fresh ginger wheel`, which is how Biggles Sidecar
-    # wrote it. Raw is the default for a root, the same way `lemon wheel` does
-    # not say fresh -- and `stem ginger slice` beside it is the one that has to
-    # say what it is, because preserved is the departure. Shortest name that
-    # says what it is, the rule that collapsed the twists above.
-    #
-    # "and counting" is a warning, not a shrug: more ginger is expected, so the
-    # next cut gets its own entry here rather than widening one of these two.
+    # Different objects: a wheel off a raw root, and a slice of stem ginger
+    # out of its syrup. Another cut of ginger gets its own entry.
     - "ginger wheel"
     - "stem ginger slice"
-    # THE THIRD GINGER, 2026-10-07, as "and counting" said there would be:
-    # crystallised, on a pick, for Mon Dernier Mot and When The Smoke Cleared.
     - "skewered crystallised ginger"
-    # NEW 2026-10-07, the Difford's batch. A mass noun, so it is in
-    # `no_article` below.
+    # A mass noun, so it is in `no_article` below.
     - "desiccated coconut"
-    # Scandinavian Daiquiri, and the Christmas Daiquiri from the same source,
-    # which said `no garnish` until Helen corrected it the same day. The
-    # `(floated)` tail is explained at `basil leaf (floated)` above.
     - "star anise (floated)"
-    # TWO OLIVES, because the colour is the garnish: green on Obituario, black
-    # on Curtain Call. Singular and plural as each source has it; the plural's
-    # final `s` drops the article without a `no_article` entry (#1143).
+    # The colour is the garnish.
     - "skewered green olive"
     - "skewered black olives"
-    # Dead Parrot Colada. Difford's garnish line is the whole Monty Python
-    # speech; Helen, 2026-10-07, kept the short form here and put "the full
-    # thing in a note, labelled 'Norwegian Blue'" on the drink.
     - "small stuffed dead parrot"
-    # THE COUNT IS THE SPEC HERE, which is why it survives where `12
-    # raspberries` did not. Three coffee beans is the Espresso Martini, not an
-    # arbitrary number of beans.
+    # The count is the spec: three coffee beans is the Espresso Martini.
     - "three coffee beans"
 
-# =============================================================================
-# PROPOSALS -- both halves kept, so the choice is Helen's and not mine
-# =============================================================================
-# LEFT: the string exactly as a drink says it today.
-# RIGHT: what it might become, or `QQ` where there is no clean answer and a
-#        judgement is needed. `QQ` means unfinished, not absent -- the same
-#        thing it means on an ingredient.
-#
-# THE COMPOUNDS ARE THE REAL WORK HERE. `garnish:` is a LIST, so a drink
-# wanting two garnishes should carry two entries rather than one string with
-# "and" in it. Splitting them is a data edit to somebody else's drink, though,
-# and a count or a construction can be part of the garnish rather than noise --
-# so every one is proposed and none is applied.
-# ALL TEN ORIGINAL ROWS ARE GONE, inside two days, which is what this block is
-# for: methods.yml's bargain is that a proposal is resolved by DELETION, in one
-# direction or the other, and never by sitting here looking outstanding.
-#
-# WHAT HAPPENED TO EACH, so the absences are readable. Four splits applied
-# (singapore-sling, carta-switchel, pic-a-de-crop-punch, port-au-prince);
-# `12 raspberries` became `raspberries`; four rejected outright -- `three coffee
-# beans`, the fruit stick, and the skewered and Luxardo cherries, each keeping
-# words a shorter string would lose; and `orange or lemon twist` KEPT, which
-# turned it from a wart into the maker's-choice convention documented at the top
-# of this file.
-#
-# port-au-prince was the last to need Helen and she settled it on 2026-08-31:
-# `pineapple` there is a WEDGE. The collection uses both wedge and wheel, which
-# is exactly why guessing was not available.
-#
-# THE BLOCK STAYS, EMPTY. It is where the next census's proposals go, and an
-# empty mapping says "nothing outstanding" where a deleted key would say
-# nothing at all -- the same reason GLASSLESS_ON_2026_08_27 was kept and
-# asserted empty rather than removed.
+# LEFT: the string exactly as a drink says it today. RIGHT: what it might
+# become, or `QQ` where a judgement is needed. A row is resolved by deleting
+# it, one way or the other. The key stays when empty: a missing key switches
+# test_every_garnish_proposal_still_matches_a_real_string off.
 proposals: {}
 
-# =============================================================================
-# NO ARTICLE — garnishes the generated garnish step must not put "a" in front of.
-# =============================================================================
-# The method now ends with a step naming the garnish, built by
-# _layouts/cocktail.html. Helen, 2026-09-05: "I'd like to add a garnish step
-# that names the garnish -- I've gone backwards and forwards on this, but
-# garnish is important, and it's easy to miss at the top of the page."
-#
-# The step reads "Garnish with a lime wedge." — an article, then the declared
-# string. `a` vs `an` is decided by the first letter and needs no data. What
-# needs data is the third case: a plural, a mass noun, or a phrase that brings
-# its own article. "Garnish with a raspberries." is the failure this list
-# prevents, and no rule short of a dictionary tells you that `raspberries` is
-# plural while `brandied cherry` is not.
-#
-# A LIST OF EXCEPTIONS RATHER THAN AN ARTICLE ON ALL 43, because the default is
-# right for 35 of them and a field that is almost always the same value stops
-# being read.
+# Garnishes the generated "Garnish with ..." step must not put an article in
+# front of. `_layouts/cocktail.html` picks `a` or `an` from the first letter
+# and drops the article before a final `s` (#1143), so this needs only what
+# that cannot reach: a mass noun, or a phrase that brings its own article.
+# The plurals listed are from before #1143 and are harmless.
 no_article:
-  # `fruit wedges` WAS ADDED HERE ON 2026-09-19 AND TAKEN OUT AGAIN IN THE
-  # SAME DAY'S MERGE, which is worth a line because the two fixes disagreed
-  # about the shape and the other one was right. Two sessions hit Helen's
-  # "Garnish with a fruit wedges" independently: one added the plural to this
-  # list, the other (#1143) made a trailing `s` drop the article on its own
-  # and left this list holding only what `s` cannot reach. A LIST CAN ONLY
-  # NAME A GARNISH SOMEONE HAS DECLARED, and the value that broke was a
-  # draft's, declared nowhere -- so the list-only fix would have gone on being
-  # silent about exactly the values nobody has classified yet, which is where
-  # a new spelling always appears first.
   - grapefruit crescents
   - raspberries
   - kaffir lime leaves
@@ -478,7 +179,4 @@ no_article:
   - orange peel over the rim (cut to look like a beak)
   - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"
-  # `pineapple and brandied cherry` ("two things, not one") left this list
-  # with the garnish on 2026-09-25 (#1186); a list may only name a declared
-  # garnish.
   - no garnish                          # never rendered as a step anyway

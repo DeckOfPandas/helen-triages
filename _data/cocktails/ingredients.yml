@@ -1,85 +1,25 @@
-# =============================================================================
-# COCKTAIL INGREDIENT VOCABULARY. Spec: GitHub issue #322. Rum half: #314.
-# Index design that consumes this: #292.
-# =============================================================================
-# TWO LAYERS, AND THE DISTINCTION IS THE WHOLE DESIGN.
+# Cocktail ingredient vocabulary (#322; the rum half is #314). A closed
+# vocabulary, and every entry is Helen's ruling: DECISIONS §9.3.1.
 #
-#   `generic`  the precise ingredient category, on each `ingredients:` entry.
-#              Campari, Aperol, Cynar and Fernet are FOUR generics -- they
-#              taste nothing alike and are not substitutable.
-#   `family`   the roll-up, for SEARCH and EXCLUSION only. All four are
-#              `amaro`. See the families block below for why this is not a
-#              browse axis.
+# Two layers. `generic` is the precise category on each `ingredients:` entry:
+# Campari, Aperol, Cynar and fernet are four generics, not substitutable.
+# `family` is the roll-up, for search and exclusion only, and only bases have
+# one: `family_of` maps them and `family_less` records the deliberate gaps.
 #
-# ONLY BASES HAVE A FAMILY. `lime juice` has none and should not -- nobody
-# excludes "all juices". `family_of` maps the bases and nothing else, and
-# `family_less` records the bases that deliberately have none.
+# `generic` is stored, never derived: no rule gets `rye` out of "Rittenhouse".
+# A preferred bottle is a `suggestion`, never a generic, unless no category
+# name would help Helen choose: then the bottle is the category (Créole
+# Shrubb, Campari, Chartreuse Verte, Strega, Bénédictine).
 #
-# `generic` IS STORED, NEVER DERIVED. 61 distinct ingredients in this
-# collection are named only by brand -- Campari, Cointreau, Cynar, Kahlua,
-# Carpano Antica, Rittenhouse, Roots Mastiha, Swedish Flaggpunsch -- affecting
-# 56 of the 109 drinks that have ingredients. No rule gets "rye whiskey" out of
-# "Ritthenhouse".
-#
-# A PREFERRED BOTTLE IS A `suggestion`, NEVER A `generic`. Helen, 2026-08-17,
-# on Cherry Heering: "I'd note my preference as the example not the category."
-# So Velvet Falernum -> falernum, Luxardo -> maraschino liqueur, Carpano Antica
-# -> sweet vermouth, with the bottle in `suggestion`.
-#
-# THE EXCEPTION, AND THE TEST FOR IT: "IS THERE A CATEGORY NAME THAT WOULD HELP
-# HELEN CHOOSE?" If yes, name the category and the bottle is a `suggestion`. If
-# no, THE BOTTLE IS THE CATEGORY and that is correct, not a compromise.
-#
-#   Créole Shrubb, Campari, Chartreuse Verte, Strega, Bénédictine -- all stay as
-#   they are. Helen, 2026-09-05: Créole Shrubb "should appear on lists with gin
-#   and cognac -- it's not replaceable, and calling it a type of rhum agricole
-#   isn't at all useful". A category name nobody would reach for is not a
-#   category, it is a paraphrase.
-#
-#   `pineapple rum`, `coconut rum` and `blended overproof rum` went the other
-#   way, because a useful name DID exist for each -- #314's 2026-08-29
-#   amendment. Their bottles (Stiggins' Fancy, Malibu, O.F.T.D.) are
-#   `suggestion`s now and are in `retired_rum_styles` below.
-#
-# This is taxonomy.yml's governing principle applied to the vocabulary: does it
-# get Helen closer to the drink she wants, or is it knowledge for its own sake.
-#
-# WRITTEN DOWN 2026-09-05 BECAUSE THE ABSENCE COST REAL TIME. Until today these
-# three lines named "planteray stiggins' fancy, planteray o.f.t.d. overproof,
-# malibu, blackstrap" as the only permitted brand-generics -- a list retired on
-# 2026-08-29 and recorded as retired 1,470 lines below, in this same file. The
-# header and the data disagreed for a week, and an audit read the header first
-# and reported Créole Shrubb as a rule violation on the strength of it. Helen,
-# on the wider pattern: "some of this has gone round and round and round." A
-# rule stated once and never restated is how that happens; the fix is that the
-# rule now describes a TEST rather than enumerating a list, so it cannot go
-# stale the next time a bottle changes sides.
-# =============================================================================
+# A top-level LIST here is read as generic values unless its key ends
+# `_characters` or NOT_GENERIC_LISTS in tests/test_cocktails.py names it.
 
 # --- how an `amount` becomes a number ----------------------------------------
-# THIS REPLACES THE `ml:` KEY, WHICH IS GONE -- #571, 2026-08-30. Every
-# ingredient used to carry its quantity twice: `amount: "25 ml"` beside
-# `ml: 25`. Helen: "Food YAML has this structure, and I'd like cocktails to
-# match" -- one quantity field, a display string, as a food recipe has.
-#
-# MEASURED BEFORE DELETING, because the pair was justified (MANUAL 9.3) on
-# the grounds that "the string carries units a number cannot". True of
-# "0.5 oz" and "3 dashes". False of "25 ml", which was 376 of the 619 entries.
-# Across the whole collection 521 entries carried both and ALL 521 derive
-# exactly from the table below; the other 98 are non-volumetric and not one of
-# them carried an `ml` at all. So the data already obeyed this rule and was
-# writing the answer down anyway.
-#
-# WHAT `ml:` WAS ACTUALLY BUYING was not the number but the GUARANTEE that a
-# number exists -- which #545 (scaler), #294/#297 (units of alcohol) and #547
-# (cost) all need. A hand-maintained duplicate cannot promise that: it can
-# simply be absent, and it was, on all 19 unitless amounts. The guarantee lives
-# in `test_every_amount_is_readable_as_a_quantity` now, which is stronger,
-# because it fails on an amount nothing can read rather than shrugging.
-#
-# THE CONVERSIONS ARE A DECISION, NOT ARITHMETIC. 1 oz is 30 ml here and not
-# 29.5735 -- bar-standard rounding, which keeps ratios clean. Recorded in
-# MANUAL 9.4 as a decision and written down nowhere executable until now.
+# An ingredient carries one quantity, the display string `amount`; there is no
+# `ml:` key (#571). Every amount must read through this block:
+# test_every_amount_is_readable_as_a_quantity fails on one that does not.
+# The conversions are decisions, not arithmetic: 1 oz is 30 ml, bar-standard
+# rounding, not 29.5735.
 measures:
   per_ml:
     ml: 1
@@ -88,9 +28,8 @@ measures:
     tsp: 5
 
   # Units that count or weigh something, never a volume. An amount in one of
-  # these has no millilitre figure and is not missing one -- MANUAL 9.3: "a
-  # dash is not 0.8 ml in any way worth writing down". A consumer checks
-  # whether a figure came back rather than assuming one did.
+  # these has no millilitre figure and is not missing one, so a consumer
+  # checks whether a figure came back.
   non_volumetric:
     - dash
     - dashes
@@ -99,184 +38,60 @@ measures:
     - cube
     - cubes
     - pinch
-    # `1 small pinch`, on man-o-war's salt. Declared beside `pinch` rather than
-    # collapsed into it because the drink says small and the amount is the only
-    # field that can carry it -- the `item` that used to say "Tiny pinch of
-    # salt" was deleted the same day for restating the quantity.
+    # A two-word unit: the amount is the only field that can say "small".
     - small pinch
     - each
     - leaf
     - leaves
     - sprig
     - strip
-    # NEW 2026-10-07, for Fay Wray: `1 wedge` of lime, squeezed and dropped
-    # into the shaker. Helen: "1 wedge should be allowed as a unit." A cut of
-    # fruit you pick up, like `half` below, and no more a millilitre figure.
+    # A cut of fruit you pick up, like `half` below.
     - wedge
-    # NEW 2026-10-07, for Zakuski Cocktail, whose Difford's source asks for "1
-    # inch" of cucumber and calls it a log. Helen: "2.5-cm cucumber log, or
-    # 2.5-cm log of cucumber." The amount is `2.5 cm log` and the line reads
-    # "2.5 cm log cucumber". A TWO-WORD UNIT, like `small pinch` above, because
-    # the amount is the only field that can say both how long and what shape --
-    # and centimetres, since the house writes no imperial measure.
+    # A two-word unit, as in `2.5 cm log` of cucumber: length and shape
+    # together, in centimetres because the house writes no imperial measure.
     - cm log
-    # NEW 2026-10-07, for Cyrano's lime: `1 thick coin` of `lime zest with
-    # flesh`, Helen's own wording. A coin is a cut, like `strip` and `wedge`.
+    # A cut, like `strip` and `wedge`: `1 thick coin` of `lime zest with flesh`.
     - thick coin
     - g
 
-    # HALF A LIME -- Helen's ruling, 2026-09-04, on caipirinha's `amount: "0.5"`
-    # and its QQ note: yes to `amount: "half"`, with `half` and `whole` as
-    # units. A WHOLE FRUIT IS COUNTED, NEVER MEASURED. The drink says half a
-    # lime because that is what you pick up and cut, not because anyone has
-    # decided it is 12 ml of anything -- and the juice a lime gives is a range
-    # (`juice_yields` below says 20-30 ml), so a millilitre figure here would be
-    # inventing precision the fruit does not have.
-    #
-    # `half` IS A UNIT WITH NO NUMBER IN FRONT OF IT, which is why it is
-    # declared rather than written `0.5 whole`: it reads by the same path `to
-    # top` and `to rinse` read by (a whole-string lookup in this list), and
-    # "half" is the word Helen writes. `whole` is its partner for the counts the
-    # scaler produces from it -- half a lime doubled is `1 whole` -- and for the
-    # day a drink wants a whole one to start with.
+    # A whole fruit is counted, never measured. `half` is a unit with no number
+    # in front of it, read by whole-string lookup as `(top)` is; `whole` is its
+    # partner for the counts the scaler produces (half doubled is `1 whole`).
     - half
     - whole
 
-    # ACTIONS, NOT COUNTS -- Helen's ruling, 2026-09-02. Every ingredient has an
-    # amount, and for an ingredient the method ADDS rather than measures, the
-    # amount is a verb phrase: the list reads "champagne, to top" and "absinthe,
-    # to rinse". Eleven entries carried no `amount` at all before this and no
-    # test noticed.
-    #
-    # THEY ARE DECLARED HERE AND NOWHERE ELSE, which is the point. A unit is
-    # readable because `measures:` says so -- that is the bargain
-    # test_every_amount_is_readable_as_a_quantity strikes with every other unit
-    # in this block, and special-casing two strings inside the test would have
-    # put the vocabulary in the guard instead of in the data.
-    #
-    # The matching method step is what actually pours it: `Top with champagne.`
-    # / `Top with soda water.` / `Rinse the glass with absinthe and dump.` in
-    # methods.yml. The amount says how much (all of it, none of it), the step
-    # says when.
-    #
-    # THE SHAPE IS A BRACKETED NOUN SINCE 2026-09-26, AND IT WAS `to top` /
-    # `to rinse` BEFORE. Helen, ruling on #1217 with the candidates page in
-    # front of her: "just use '(top)' as the amount where it's an unspecified
-    # ml top, or '(splash)' for an unspecified splash. A float will be a ml
-    # amount, right (?), as they're usually alcoholic, but if none is given
-    # then again simply '(float)' as the amount please."
-    #
-    # WHY THE BRACKETS EARN THEIR KEEP. The old form was a sentence fragment
-    # sitting in a column of quantities -- "to top" under "45 ml" -- and it
-    # read as prose that had escaped into the data. A bracketed noun reads as
-    # what it is: the slot where a number would be, naming the action instead.
-    # It is also the same mark the ingredient line already uses for `as:`
-    # (#1217's option A, `(float)` after the bottle), so ONE punctuation means
-    # one thing across the line -- a use, rather than a measure. SINCE #1263
-    # (2026-10-02) THE TWO ALSO SHARE A PLACE: `as:` renders under the amount,
-    # in the amount's type, so every direction is read in the amount column.
-    #
-    # `(float)` IS DECLARED THOUGH NOTHING USES IT YET, and that is deliberate
-    # rather than the dead vocabulary #1186 went after. Helen's ruling names
-    # the case in as many words -- a float with no millilitre figure -- and
-    # every float in the collection today HAS one, which is her own "they're
-    # usually alcoholic". Declaring it is what makes the next one writable
-    # without a ruling.
-    #
-    # THE RENAME IS NOT ONLY A DATA CHANGE, which is the thing to know before
-    # touching it again: `to top` was compared as a literal in five places
-    # (cocktail_costs.rb twice, cocktail_units.rb twice, abv_worklist.py) and
-    # parsed by a regex in shopping-list.js. A reader left on the old spelling
-    # does not error -- it silently stops matching, and a topped drink then
-    # costs nothing and counts no units. What makes that safe to change is
-    # THIS list: drop the old string here and every unmigrated file fails
-    # test_every_amount_is_readable_as_a_quantity by name.
+    # Actions, not counts (#1217): an ingredient the method adds rather than
+    # measures names the action as a bracketed noun where the number would be.
+    # The cost and units plugins and scripts/abv_worklist.py compare `(top)`
+    # as a literal, so a respelling that misses one does not error: it stops
+    # matching, and a topped drink costs nothing and counts no units. Dropping
+    # the old string from this list is what makes every unmigrated file fail
+    # test_every_amount_is_readable_as_a_quantity.
     - (top)
     - (rinse)
-    # `(splash)` WAS `splash` FOR ABOUT AN HOUR, on 2026-09-26. Helen asked for
-    # the word -- "Let's add 'splash'", for the Gin Rickey's soda water -- and
-    # then bracketed it with the rest when she ruled on #1217.
-    #
-    # IT IS NOT A SMALL `(top)`, AND THAT IS WHY IT EARNS A WORD. A top means
-    # all the room that is left -- the whole of #1179's unfinished sum,
-    # capacity minus the build minus the ice. A splash is a deliberate small
-    # pour that does NOT fill the glass, and writing it as a top would have
-    # told the reader, and `top_up_ml`, the opposite of what the drink wants.
-    # Writing it as `15 ml` was the other wrong answer: nobody measures it.
+    # Not a small `(top)`: a top fills the room left in the glass, a splash is
+    # a deliberate small amount that does not. `(float)` is for a float given
+    # no millilitre figure.
     - (splash)
     - (float)
-    # TWO MORE THE SAME DAY, from the Milliners Punch, and they are the first
-    # test of whether the bracketed shape generalises. Helen's rewrite wrote
-    # `amount: garnish` and `amount: to sprinkle` -- unquoted, undeclared, and
-    # reaching for exactly this idea before it had a spelling.
-    #
-    # THE RUM AND THE CINNAMON ARE INGREDIENTS, NOT SERVEWARE, and that is her
-    # call rather than a tidy-up. Cobra's Fang puts its flaming passion fruit
-    # shells in `to_serve`, where nothing costs, counts or shops for them. An
-    # overproof rum you set alight is alcohol somebody drinks, so hers is the
-    # better filing: as pours they reach the cost, the unit count and the
-    # shopping list, and the only thing missing is a number -- which is what
-    # these two words supply.
-    #
-    # `(garnish)` RATHER THAN `as: garnish`, on the pairing rule the layout
-    # states: a pour with a measure names its use in `as:`, a pour without one
-    # names it in the amount. Neither of these has a measure.
-    #
-    # `(garnish)` IS RETIRED, 2026-10-01 (#1256), BY THAT SAME PAIRING RULE.
-    # Helen gave the shell rum a measure -- "let's do real ml. Default to 25
-    # ml, nice and tidy" -- so it names its use in `as: "shell"` (see
-    # `ingredient_as` below) and the word amount has no user left. A word
-    # amount counted no units, which was the whole reason for moving the rum
-    # into the ingredients. `(sprinkle)` stays: nobody measures the cinnamon.
+    # For a seasoning nobody measures. A measured line names its use in `as:`
+    # instead: see `ingredient_as`.
     - (sprinkle)
-    # A THIRD ACTION, 2026-09-14 (#752): the Ti' Punch. Helen: "let's say 60 ml
-    # rum, then lime and sugar to taste -- this drink is typically served as
-    # rhum in a glass with lime and sugar on the side so people can roll their
-    # own." The drinker decides how much, so no figure is honest -- and, as she
-    # said, "This obviously doesn't change the units in the drink." It reads by
-    # the same whole-string lookup as the two above: cost and units skip it,
-    # scale.js passes it through untouched, and the shopping list counts it
-    # the way it counts `(rinse)`.
-    #
-    # IT KEPT ITS OLD SHAPE WHEN THE OTHERS WERE BRACKETED, 2026-09-26, and the
-    # difference is real rather than an oversight. The bracketed three name
-    # what the MAKER does with a pour whose volume nobody has written down.
-    # `to taste` hands the decision to the DRINKER -- Helen's Ti' Punch is
-    # "served as rhum in a glass with lime and sugar on the side so people can
-    # roll their own" -- and it reads as English in the amount column because
-    # it is an instruction to whoever is holding the glass. Her #1217 ruling
-    # named the top, the splash and the float, and did not name this one.
+    # The drinker decides how much (#752), so cost and units skip it. Not
+    # bracketed: the bracketed ones name what the maker does, and this is an
+    # instruction to whoever holds the glass.
     - to taste
 
   # Words that may sit between the number and its unit without changing either.
-  # One entry, and it is real: "1 heaping oz" on Kill Devil Punch.
   ignored_words:
     - heaping
 
 # --- how much juice one fruit gives ------------------------------------------
-# GitHub issue #546's shopping list. Helen, 2026-09-04: "Lemons give about 30-45
-# ml of juice. Limes 20-30 ml. Medium oranges about 60-80 ml. Grapefruit 180-240
-# ml. Please give the range of whole fruits needed."
-#
-# A RANGE, NOT AN AVERAGE, and that is the whole point of the feature. A single
-# figure would print "375 ml lemon juice (10 lemons)" and be wrong in the shop
-# roughly half the time. The honest answer to "how many lemons" is a span,
-# because a lemon is not a unit of volume, and the list says so: "375 ml lemon
-# juice (9 to 13 lemons)".
-#
-# THE ARITHMETIC RUNS THE OTHER WAY ROUND FROM THE INSTINCT: the FEWEST fruits
-# is the total divided by the LARGEST yield, and the most is the total divided
-# by the smallest. Both are rounded UP -- three quarters of a lemon is a lemon
-# you have to have bought.
-#
-# ONLY THE FOUR THAT ARE SQUEEZED. `juices:` below also lists pineapple,
-# cranberry and apple, and they are absent on purpose rather than forgotten:
-# those arrive in a carton, so "how many whole fruits" is not a question anyone
-# is asking in the shop. An entry here is a claim that you juice this yourself.
-#
-# The KEY is the generic exactly as a drink writes it, so nothing has to map
-# between two spellings -- all four are single, settled strings across the
-# collection (58 lime, 34 lemon, 10 orange, 6 grapefruit).
+# For the shopping list (#546). A range, not an average: the list prints a
+# span of whole fruits. The fewest is the total over the largest yield and the
+# most is the total over the smallest, both rounded up.
+# An entry is a claim that you squeeze this yourself: the carton juices in
+# `juices:` are absent on purpose. The key is the generic as a drink writes it.
 juice_yields:
   lemon juice:
     fruit: lemon
@@ -286,8 +101,7 @@ juice_yields:
     fruit: lime
     ml_min: 20
     ml_max: 30
-  # "Medium oranges", Helen's word, and the size that matters: a large one is
-  # nearer a small grapefruit and would make this range a fiction.
+  # A medium orange: a large one is nearer a small grapefruit.
   orange juice:
     fruit: orange
     ml_min: 60
@@ -312,90 +126,19 @@ juice_yields:
     ml_max: 240
 
 # --- what the index's ingredient pickers do with all this --------------------
-# TWO NUMBERS (three until 2026-10-11), HERE RATHER THAN IN THE SCRIPT, and for the reason food's
-# `search: family_button_min_chars` is in _data/food/ingredient_words.yml: how
-# much typing earns a pool of candidates is a question about this vocabulary,
-# not about the algorithm that reads it. assets/js/cocktail-search.js writes
-# none of them down and test_the_cocktail_search_config_is_not_hardcoded keeps
-# it that way.
-#
-# `min_query_chars` WAS ISSUE #584, and it is 3 as of 2026-08-31 on Helen's
-# instruction to settle it. It sat at 2 only because that is what the page did
-# before the search moved into a tested module, which was the right reason then
-# and stopped being one once the numbers existed.
-#
-# RE-MEASURED THE DAY IT CHANGED, because the figures in #584 were taken over
-# 240 pool terms and #603 has since dropped prose and collapsed aliases -- so
-# the issue's own evidence was two changes stale. Swept over every prefix the
-# chips' own words actually produce, across 150 chips and 124 drinks:
-#
-#            queries   median candidates   over the cap of 8
-#   2 chars    132            6             41  (31%)
-#   3 chars    250            2              7  (3%)
-#   4 chars    257            1              2  (1%)
-#
-# THE MEASUREMENT HAS TO LIFT THE MINIMUM IT IS MEASURING. Run with the live
-# config, the two-character row reports a tidy zero candidates -- because the
-# change under test is what produced it. That is a check measuring itself, and
-# it read as a clean result.
-#
-# AT TWO CHARACTERS THE PICKER IS MOSTLY A PROMISE THAT THERE IS MORE: more
-# than a quarter of two-letter queries overflow the cap, so what you get is
-# eight arbitrary chips and "+21 more -- keep typing". At three it is nearly
-# always the answer. The step from 3 to 4 buys 2% and costs a keystroke on
-# every search, so it is not taken.
-#
-# FOOD HAS NO MINIMUM AT ALL and that stays true: its picker sits above a list
-# that remains on screen, so a wide pool is noise beside the answer rather than
-# instead of it. This one replaces the page's whole result area.
-#
-# Changing it needs no code touched, and `test_the_cocktail_search_config_is_
-# not_hardcoded` keeps it that way.
-#
-# AND IT IS 1 SINCE 2026-10-11, WHICH IS FOOD'S RULE AFTER ALL. Helen: "please
-# make the three cocktail search filters start filtering from the first
-# character, as we do for food. Mostly because I think this is very very cute
-# in a static site, but also because seeing a list provides inspiration."
-# Everything above is still true as measurement -- one and two letters
-# mostly overflow the cap, so the pool is eight chips and a "+N more" -- and
-# she has chosen the list over the tidy answer. The name box never had a
-# minimum. `family_button_min_chars` is untouched.
-#
-# AND THE CAP WENT THE SAME DAY, so the figures above describe a pool that no
-# longer exists. Helen: "I don't want to have the 'N more' behaviour for
-# cocktails -- please remove it. It's helpful to see the list when e.g. rum
-# has so many results. (Plus super cute, as I said!)" `pool_cap` was 8, with
-# the remainder counted out loud as "+16 more". Every candidate is offered
-# now, as food's picker has always done.
+# How much typing earns a pool of candidates is a question about this
+# vocabulary, so the numbers live here and assets/js/cocktail-search.js writes
+# neither down: test_the_cocktail_search_thresholds_are_not_hardcoded.
+# The pickers answer from the first character and no pool is capped (#1219).
 search:
   min_query_chars: 1
   family_button_min_chars: 3
 
-  # --- PROSE IS NOT A BOTTLE NAME -------------------------------------------
-  # A `suggestion` is free text typed while transcribing a recipe, and some of
-  # it is a sentence rather than a bottle. As a filter chip a sentence means
-  # nothing -- clicking `ED3 or Havana 3` asks for drinks whose ingredient list
-  # contains that literal string.
-  #
-  # WHY A RULE AND NOT A LIST. Helen met four of these one at a time -- the
-  # Havana disjunction, `Tesco Finest`, `Avallen -- a round, fresh taste if you
-  # need to sub`, then `Jack Daniels > Bulleit` -- and naming them one by one is
-  # how the fifth arrives. #585 is still the backlog of FIXING the data; this is
-  # what keeps them out of the picker meanwhile.
-  #
-  # MEASURED AGAINST ALL 87 SUGGESTIONS BEFORE IT WAS TRUSTED, 2026-08-29: it
-  # flags 17, every one of them genuinely prose, and catches no bottle name. The
-  # clean 70 include every awkward shape the collection has -- `Smith & Cross`,
-  # `Gosling's Black Seal`, `Appleton 8-year`, `La Favorite L'Authentique
-  # Ambré`, `Pierre Ferrand ambre`, `acacia honey`.
-  #
-  # THESE APPLY TO SUGGESTIONS ONLY. A declared generic is a name Helen chose
-  # and is never dropped, which is why `ginger and lemongrass cordial` survives
-  # -- and it is why `and` is deliberately absent below, since `Wray and Nephew`
-  # is one bottle.
-  #
-  # `the` AND `that` WERE IN A FIRST DRAFT AND CAME OUT: a bottle can carry them
-  # ("The Botanist") and neither flagged anything.
+  # A `suggestion` is free text, and some of it is a sentence rather than a
+  # bottle, which means nothing as a filter chip. One containing any of these
+  # words or marks is not offered (#585). Suggestions only: a declared generic
+  # is never dropped. `and`, `the` and `that` are absent on purpose: `Wray and
+  # Nephew` and `The Botanist` are bottles.
   prose_words:
     - a
     - an
@@ -421,69 +164,19 @@ search:
     - though
     - is
 
-  # A comma catches the three two-bottles-in-one-string entries (`Havana 7,
-  # Appleton 8`) and nothing else in the real 87 -- checked, not assumed. `>`
-  # catches `Jack Daniels > Bulleit`, which was a shape nobody had predicted.
-  # The failure mode if a bottle ever legitimately carries one is mild and
-  # visible: it is not offered as a chip, and it is one line to fix here.
+  # A comma catches two bottles in one string; `>` catches `Jack Daniels >
+  # Bulleit`. A bottle that legitimately carries one is simply not offered.
   prose_marks: ["--", "—", "?", "!", ">", ","]
 
 # --- things a card never mentions --------------------------------------------
-# #580. Helen: "never write 'water' on a cocktail card and never return it in a
-# search. This is bare 'water', and does not apply to 'honey water' or
-# 'sparkling water' or any such thing."
-#
-# A card answers "what is this drink LIKE", and the answer is never water. It is
-# on the recipe because 60 ml of it is how a Sazerac gets diluted, and that is a
-# MAKING fact -- the same distinction §9.10.1 draws when it collapses both syrup
-# ratios to `sugar syrup`: a ratio matters while you pour and not while you
-# choose. Water is that argument at its limit.
-#
-# EXACT MATCHES ONLY, and that is the whole of Helen's caveat. `soda water` is
-# a real choosing fact -- it is what makes a drink long -- so nothing here may
-# be treated as a substring. The picker was matching `water` against `honey
-# water` by substring until 2026-08-29 and the fix for THAT is upstream in
-# cocktail-search.js; this list is a different rule and must not lean on the old
-# bug's shape. (`honey water` was the other example until 2026-09-04, when
-# Helen flattened both ratios into `honey water`; the rule it illustrated is
-# unchanged, and `soda water` still illustrates it.)
-#
-# ONE ENTRY TODAY, and a list rather than a special case in the template because
-# the next one will not be water: `ice` is the obvious candidate the day a drink
-# writes it down.
-#
-# TEN ENTRIES SINCE 2026-09-06 -- #640, and the prediction above was right about
-# everything except which ingredient came next. Helen: "don't include things like
-# sugar, water. lemon zest in the ingredient list that appears on cocktail
-# cards."
-#
-# "THINGS LIKE" IS READ THE WAY #580 READ IT: THE BARE THING. That caveat is the
-# whole precedent -- bare `water` and never `honey water` or `soda water` -- so
-# this adds the BARE sugars, the bare salt and the bare zest, and leaves every
-# syrup alone. `sugar syrup` is on 39 of 124 cards and stays: a syrup is a
-# choosing fact, it is what makes a sour a sour, and orgeat is most of what a Mai
-# Tai tastes like. `white sugar` on a card is the undissolved granule, and it
-# tells you nothing.
-#
-# WHAT THIS ALSO DOES, AND HELEN SHOULD SAY IF SHE WANTS IT SPLIT. This list
-# governs the card AND the search pool -- #580 asked for both in one breath
-# ("never write 'water' on a cocktail card and never return it in a search").
-# #640 asked only about cards. The two were left coupled because the search half
-# is defensible for every entry here: nobody chooses a drink by its salt, and
-# `sugar syrup`, `honey water` and `lemon juice` all remain searchable, so the
-# drinks are still reachable by the sweet or citrus thing in them. If she wants
-# them searchable anyway, this list splits in two and the template reads one for
-# the card and the union for `data-ingredients`.
-#
-# `salt` IS THE ENTRY THAT MOST EARNS ITS PLACE. It is on five cards, and on the
-# Mai Tai it is the TENTH item -- the line ends "absinthe . salt" after nine real
-# ingredients. It is a seasoning pinch in every one of the five.
+# Never on a card and never in the search pool (#580, #691): each is a making
+# fact, not a choosing one. EXACT matches only, never substrings: bare `water`
+# is here, while `soda water` and `honey water` are choosing facts and stay.
+# So the bare sugars, the salt and the zest, and no syrup.
 not_on_cards:
   - water
   - salt
-  # 2026-09-28, with the Milliners Punch. A sprinkle over a lit lime shell is
-  # seasoning by every test this list applies -- the same reason `salt` is the
-  # entry that most earns its place.
+  # A sprinkle is seasoning, as `salt` is.
   - ground cinnamon
   - white sugar
   - raw sugar
@@ -494,48 +187,13 @@ not_on_cards:
   - honey
   - lemon zest
 
-# --- HOW A POUR IS USED, not what it is --------------------------------------
-# #754, Helen 2026-09-06: "Add `as:` -- float, rinse, muddle."
-#
-# WHY A FIELD AND NOT PROSE. #567 orders a card's ingredients in seven tiers and
-# the seventh is "Floats" -- which could not be built, because nothing recorded
-# that a pour WAS one. Five drinks float something and four rinse with
-# something; before this they said so in a method step or a QQ note, which the
-# plugin cannot read. A float is a small pour of something strong, so tier 1
-# took it and sorted it by volume, landing it at the bottom of the SPIRITS
-# instead of the bottom of the CARD. Don's Mai Tai read
-# `Jamaican rum . absinthe . orange Curacao ...` with a rinse in second place,
-# ahead of an ingredient poured fifteen times its volume.
-#
-# THIS IS A CLOSED VOCABULARY and `test_ingredient_as_is_declared` holds it, the
-# same guard `rum_characters` has and for the same reason: a typo must not be
-# able to mint a new value in silence. Adding a member is a vocabulary decision
-# and therefore Helen's.
-#
-# `float` AND `rinse` BOTH SORT LAST. #567 names only floats, and Helen ruled on
-# 2026-09-07 that a rinse goes with them: both are added outside the main build,
-# so both belong at the end of the line rather than among the spirits.
-#
-# `muddle` SORTS NOTHING, AND IS DECLARED ANYWAY. #567 also asks for muddled
-# ingredients to be grouped first; that was built on 2026-09-07, looked at, and
-# dropped -- it put Ti' Punch's rhum last on a rhum drink and led P Five Punch
-# with its orgeat, because a muddle covers both expressing a lime and dissolving
-# a sugar. Helen: don't let a muddle reorder at all. The VALUE stays because it
-# is a true fact about the pour and the drink page may want it; the card simply
-# does not read it. See the plugin's header for the full finding.
-#
-# `shell` JOINED 2026-10-01 (#1256, #1249): the overproof rum poured into a
-# fruit half-shell and set alight. It had been written five ways on five drinks
-# -- `as: float`, no role at all, `amount: "(garnish)"`, and twice as prose in
-# `to_serve` where nothing counted it. Helen: "let's do real ml. Default to 25
-# ml, nice and tidy. Use that for all my cocktail recipes unless otherwise
-# stated, and retroapply this." So a shell pour is ALWAYS a measured line, 25 ml
-# unless she says otherwise for that drink, and the method's three shell steps
-# (methods.yml `shapes.shell`, `canonical.fire`) are what place and light it.
-#
-# IT SORTS LAST, with the float and the rinse and for their reason: it is added
-# outside the main build. It is NOT a float -- Zombie Intoxica called it one,
-# and a float goes on the drink where this goes in a shell on top of it.
+# --- how an ingredient is used, not what it is (#754) ------------------------
+# A closed vocabulary, held by test_ingredient_as_is_declared; adding a member
+# is Helen's decision. `float`, `rinse` and `shell` sort last on a card: each
+# is added outside the main build. `muddle` reorders nothing, and is declared
+# because it is a true fact the drink page may want.
+# A `shell` is the overproof rum in a lit fruit half-shell: always a measured
+# line, 25 ml unless Helen says otherwise (#1256). It is not a float.
 ingredient_as:
   - "float"
   - "rinse"
@@ -543,92 +201,33 @@ ingredient_as:
   - "shell"
 
 # --- other names for a family ------------------------------------------------
-# A FAMILY IS REACHED BY ITS NAME, so a family nobody spells that way is a
-# family nobody can reach. Helen, 2026-08-29: "'whiskey (all)' should return all
-# whisky and bourbon and rye, and the same for 'whisky'." The family already
-# HELD all three; it was the spelling that found nothing.
-#
-# The button always carries the family's CANONICAL name, so typing `scotch`
-# offers `whisky (all)` rather than a second umbrella claiming to be scotch.
-# That matters most for the one alias that is genuinely wider than the word
-# typed: `whisky (all)` includes bourbon and rye, and saying `whisky` on the
-# button is what stops it looking like a scotch filter that has gone wrong.
-# Helen was shown that trade and asked for it anyway.
-#
-# `agave` is the family that most needed this: it is named after the plant
-# because it holds mezcal as well, so nobody types it. `rhum` and `ron` are the
-# spellings that appear in our own ingredient names -- `rhum agricole blanc`,
-# `Ron del Barrito`.
-#
-# NOT A SYNONYM LAYER FOR INGREDIENTS. These name FAMILIES and nothing else; an
-# ingredient reached by two names is a `card_names` question, below.
+# A family is reached by its name, so these are the other spellings people
+# type. The button always carries the family's canonical name: typing `scotch`
+# offers the whisky family, which also holds bourbon and rye.
+# Families only: an ingredient reached by two names is a `card_names` question.
 family_aliases:
   whiskey: whisky
   scotch: whisky
   tequila: agave
   rhum: rum
   ron: rum
-  # `bitter` AND `amari` REACH THE AMARO FAMILY, added 2026-08-30. Nobody
-  # browsing for a bitter drink types "amaro" first, and the family held
-  # Campari, Aperol, Cynar, fernet and both Amari while the word found nothing
-  # -- precisely the failure that put `whiskey` and `scotch` in this list.
-  #
-  # This is what was left of a proposal to add `bitter` as a MOOD. Helen:
-  # "do we need families -- thinking of bitter and herbal? Why? They're not
-  # browsable or searchable." She was right twice over: `amaro` and `herbal`
-  # already exist as families, so there was nothing to build, and a mood that
-  # means "contains one of these bottles" is a worse copy of HAS TO HAVE. What
-  # was genuinely missing was two words.
+  # Nobody browsing for a bitter drink types "amaro" first.
   bitter: amaro
   amari: amaro
 
-# --- what the (all) button SAYS ----------------------------------------------
-# Helen, 2026-08-29, on the whisky umbrella: "I think that chip should be
-# 'whisk(e)y (all)', even though it's clunky, to avoid ever having to split or
-# claim they combine."
-#
-# The clunkiness IS the point. Either spelling on the button is a claim about
-# which drinks are in it -- `whisky (all)` reads as excluding the Irish and the
-# bourbon, `whiskey (all)` as excluding the scotch -- and the family holds all
-# of them. A name that refuses to choose is the only one that describes it.
-#
-# A LABEL, NOT A RENAME OF THE FAMILY, and the reason is mechanical rather than
-# aesthetic: `whisky_characters` is keyed off the family's name --
-# test_a_declared_character_vocabulary_is_enforced strips the `_characters`
-# suffix to find it -- so renaming the family would drag `whisk(e)y_characters`
-# along with it and put parentheses into a key three tests derive by string
-# surgery. Same separation `card_names` already draws for generics: matching
-# runs on the key, the button shows the name.
-#
-# A family with no entry here keeps its own name, which is right for all nine
-# others: nobody spells `gin` two ways.
+# --- what the (all) button says ----------------------------------------------
+# A label, not a rename of the family: `whisky_characters` is keyed off the
+# family's name. Either spelling alone on the button would read as excluding
+# half the family (DECISIONS §9.3.3). A family with no entry shows its name.
 family_labels:
   whisky: "whisk(e)y"
 
-# --- spirit families: FOR SEARCH AND EXCLUSION, NOT A BROWSE AXIS ------------
-# THIS IS NOT A "SORTED BY SPIRIT" MENU, and that is deliberate. Helen,
-# 2026-08-17: "I get really bored of cocktail bars that have enormous
-# bible-like menus sorted by spirit... I probably think browsing by spirit is
-# basic." Do not put a spirit filter on the index.
-#
-# The families exist to serve two things in her actual index design:
-#   1. the ingredient search's `(all)` buttons -- typing toward "rum" offers
-#      "rum (all)" alongside "Havana Club Anejo 3 Anos", the same shape food's
-#      ingredient search already has;
-#   2. exclusion. "I don't like Scotch" is a family-level operation, and so is
-#      "no whisky tonight".
-#
-# FOOD'S FAMILY MECHANISM CANNOT DERIVE THESE. On the food site an `(all)`
-# button forms when entries share a head word after normalisation -- "cheese
-# (all)" from cheddar/feta/comte. These styles share NO common word:
-# "moderately aged Jamaican rum" and "aged Demerara rum" have nothing in common
-# textually. So the family has to be DECLARED, which is what `family_of` is.
-#
-# `fortified` exists because 19 drinks have no spirit at all -- Bamboo,
-# Brooklyn, Toronto, Aperol Spritz, Lucien Gaudin, the Bellini, mulled wine --
-# and without it they cannot be excluded or searched as a group. `herbal`
-# exists because Chartreuse is the BASE of Chartreuse Swizzle, not merely a
-# modifier in it.
+# --- spirit families: for search and exclusion, not a browse axis ------------
+# Do not put a spirit filter on the index. The families serve the ingredient
+# search's `(all)` buttons and exclusion ("no whisky tonight"). They are
+# declared because the styles share no head word a rule could group on.
+# `fortified` is for the drinks with no spirit at all; `herbal` is here
+# because Chartreuse is the base of a Chartreuse Swizzle.
 families:
   - rum
   - gin
@@ -641,33 +240,15 @@ families:
   - aquavit
   - herbal
 
-# =============================================================================
-# BASE SPIRITS -- one style list per family, the pattern #314 set for rum
-# =============================================================================
-# Styles Helen does not currently own are declared anyway. This is a spec, not
-# an inventory: she chose that explicitly for gin, where Plymouth, New Western
-# and Genever are all absent from the collection.
+# === BASE SPIRITS: one style list per family, the pattern #314 set for rum ===
+# A spec, not an inventory: a style is declared whether or not a drink or a
+# bottle of Helen's uses it, and an unused one is not a gap to fill.
 
 # --- generics only Helen may put on a drink ----------------------------------
-# A DECLARED STYLE WITH NO USER IS NOT A GAP TO FILL. These are real categories
-# with real bottles behind them, and applying one to a drink is her judgement
-# about what she reaches for -- never an inference from what the source
-# happened to call the rum.
-#
-# THIS EXISTS BECAUSE IT HAPPENED TWICE AND SHE SAID SO TWICE. #542, and
-# Helen on 2026-08-30: "I remain annoyed about this. I have discussed this at
-# least twice... If I have to deal with this again I will simply delete those
-# recipes." That issue diagnosed its own invisibility exactly -- "a
-# wrong-but-declared value with no contradicting evidence is invisible to every
-# guard in the suite" -- and then nothing was built, so the next session had
-# nothing to stop it.
-#
-# It is the repo's own repeated conclusion, from the two hooks in .claude/ and
-# from `meta.awaiting_fix` and `meta.proofread` before them: a rule that gets
-# read and broken needs a mechanism, not firmer wording. Adding a line here is
-# what switches enforcement on -- test_no_drink_uses_a_generic_that_is_helens
-# _to_apply -- and REMOVING one is how she grants it, in the same commit as
-# the drink that earns it.
+# Applying one of these is her judgement about what she reaches for, never an
+# inference from a source's words (#542). A line here switches on
+# test_no_drink_uses_a_generic_that_is_helens_to_apply; removing one is how
+# she grants it, in the same commit as the drink that earns it.
 hers_to_apply:
   "caramel-forward Jamaican rum": >-
     Blackwell and Myers are declared bottles for this style and no drink uses
@@ -677,13 +258,8 @@ hers_to_apply:
     `moderately aged Jamaican rum` with no suggestion at all. MANUAL 9.3.2
     already said "it is hers to apply: never retype a drink into it from item
     text", in prose, and prose did not hold.
-  # THE SECOND MEMBER, 2026-09-25 (#1186). It meets this list's own definition
-  # -- a bottle (`Acacia honey`, bottles.yml) and no drink -- and was argued in
-  # MANUAL 9.3 prose instead, which is exactly the "unlisted case hard to tell
-  # from an oversight" #1186 was about. Helen: "Please keep all the others."
-  # The flat generic is the DEFAULT for a honey drink whose ratio does not
-  # matter (see `honeys` below); the ratioed pair are ordinary generics and
-  # are NOT reserved. Removing this line is her grant, with the drink.
+  # The flat generic is the default for a honey drink whose ratio does not
+  # matter (see `honeys`). The ratioed ones are ordinary generics, not reserved.
   "honey water": >-
     Acacia honey is a declared bottle for it and no drink pours it -- every
     honey-water drink today carries a ratio. Kept as the default for a drink
@@ -691,7 +267,7 @@ hers_to_apply:
     Helen, 2026-09-25 (#1186): keep. Hers to apply, never a session's guess
     at which honey water a source meant.
 
-# GitHub issue #314. `light`, `gold` and `dark` are RETIRED -- see the bottom.
+# #314. `light`, `gold` and `dark` are retired: see `retired_rum_styles`.
 rum_styles:
   - "moderately aged Jamaican rum"
   - "caramel-forward Jamaican rum"
@@ -702,56 +278,25 @@ rum_styles:
   - "overproof Jamaican rum, unaged"
   - "rhum agricole blanc"
   - "rhum agricole vieux"
-  # Added to #314 after the first transcription. Haitian cane-juice spirit; a
-  # category like cachaca or mezcal, so lowercase under the proper-noun rule.
-  #
-  # FOUR GENERICS, ONE PER CLAIRIN, since 2026-10-04 (#1108), and the plain
-  # `clairin` is retired. Helen: "I've changed my mind: Each type of clairin
-  # should be a generic because they are not interchangeable... (three of
-  # those aren't used yet but will be)". Capitalised because each is a
-  # product's name, the `Chartreuse Jaune` case, not a category. Voodoo That
-  # You Do pours Communal and is the only drink using any of them today.
+  # One generic per clairin (#1108): they are not interchangeable. Capitalised
+  # because each is a product's name, as `Chartreuse Jaune` is.
   - "Clairin Vaval"
   - "Clairin Casimir"
   - "Clairin Communal"
   - "Clairin Sajous"
   - "clear blended multi-region rum"
-  # #314's amendment, 2026-08-29 -- were brand-generics in `rum_untyped`.
-  # `blended overproof rum` is Guyana/Jamaica/Barbados at 69%, and it also gives
-  # Pusser's 151 the home `moderately aged rum` could not: that generic says
-  # nothing about strength.
+  # `blended overproof rum` is Guyana, Jamaica and Barbados at 69%: a home
+  # `moderately aged rum` cannot give, since it says nothing about strength.
   - "pineapple rum"
   - "blended overproof rum"
   - "coconut rum"
 
-# HOW THE FOURTEEN GROUP, FOR READING. Helen, 2026-09-06, on the #529 reference
-# page: "reorganise the table into useful sections like Jamaican rum, Demerara
-# rum, cane juice, (no name unless you can think of one, but organised by
-# agedness), flavoured."
-#
-# A GROUPING IS NOT A NEW VOCABULARY. Nothing here may name a style
-# `rum_styles` does not already declare, and every style must appear exactly
-# once -- `test_rum_groups_partition_the_styles` holds both. So this file still
-# has ONE list of what a rum may be, and this is a second reading of it.
-#
-# IT IS ALSO NOT `family_of`. That map exists for search and exclusion (see the
-# families block above) and answers "is this a rum?"; this answers "which shelf
-# is it on?", and the two are different questions with different answers --
-# cachaça is in the rum FAMILY and is on nobody's rum shelf, so it is absent
-# here and present there.
-#
-# THE FOURTH GROUP IS `Non-geographical`, HELEN'S OWN NAME, 2026-09-06. Her
-# brief had said "no name unless you can think of one, but organised by
-# agedness"; the placeholder offered was "By age", and she replaced it.
-#
-# THE NAME AND THE ORDER NOW SAY DIFFERENT THINGS, WHICH IS THE IMPROVEMENT.
-# The styles are still in age order -- clear, lightly aged, moderately aged,
-# and the overproof blend last -- so the shelf reads the way she asked for. But
-# what these four have in COMMON is not their age, it is that none of them
-# names a place: the other three groups are Jamaica, Guyana and the cane-juice
-# islands, and this is everything left once origin stops being the answer.
-# "By age" named the sort order and left the reader to work out the membership
-# rule; this names the membership rule.
+# How the styles group for reading on the rum reference page (#529). Not a
+# second vocabulary: every `rum_styles` entry appears exactly once and nothing
+# else may (test_rum_groups_partition_the_styles). Not `family_of` either:
+# cachaça is in the rum family and on no rum shelf.
+# `Non-geographical` is Helen's name for the styles that name no place; they
+# are in age order.
 rum_groups:
   - name: "Jamaican rum"
     styles:
@@ -762,9 +307,7 @@ rum_groups:
     styles:
       - "aged Demerara rum"
       - "overproof Demerara rum, lightly aged"
-  # Cane JUICE rather than cane spirit, which is the line that puts clairin here
-  # and cachaça in neither list: all three of these are pressed juice fermented
-  # fresh, and the rest of the fourteen are molasses.
+  # Pressed cane juice fermented fresh; the other groups are molasses.
   - name: "Cane juice"
     styles:
       - "rhum agricole blanc"
@@ -784,391 +327,123 @@ rum_groups:
       - "pineapple rum"
       - "coconut rum"
 
-# WHERE THE RUM PAGE PUTS ITS "Rum-adjacent sugarcane spirits" BLOCK: the name of
-# the shelf it renders immediately BEFORE. Helen, 2026-09-10 (#919): "render
-# rum-adjacent section before flavoured". Cachaça, Batavia arrack and Ceylon
-# arrack read as near-rum in a way pineapple and coconut rum do not, so the
-# flavoured pair is the right thing to end on.
-#
-# DECLARED RATHER THAN WRITTEN INTO THE TEMPLATE, for the reason every other name
-# on that page is a lookup and not a literal: renaming this shelf would otherwise
-# move the block silently back to the end of the page, with nothing noticing.
-# `test_rum_adjacent_before_names_a_real_group` is what holds that.
+# The rum page renders its rum-adjacent block immediately before the shelf
+# named here (#919). Declared so that renaming the shelf cannot silently move
+# the block: test_rum_adjacent_before_names_a_real_group.
 rum_adjacent_before: "Flavoured"
 
-# Permitted WITHOUT a style per #314, because nothing generalises them.
-#
-# BLACKSTRAP USED TO BE HERE AND IS NOT ANY MORE. Helen closed the question on
-# #314, 2026-08-24: "blackstrap is only ever given as a character for another
-# rum, like this: Moderately aged (character: blackstrap)". It is in
-# rum_characters below, in retired_rum_styles at the bottom, and nowhere else.
-# RETIRED AS A GROUP, 2026-08-29 -- #314's amendment. The premise was "nothing
-# generalises them"; all three have now been generalised, so the exception has
-# lost its reason and the bottles go back to being `suggestion`s, which is this
-# file's primary rule. `pineapple rum`, `blended overproof rum` and `coconut rum`
-# are in rum_styles. Kept as an empty declaration rather than deleted, so the
-# next reader finds out the group existed and why it went.
+# Empty: every rum has a style in `rum_styles`, and the bottle names that
+# stood here as generics are in `retired_rum_styles`.
 rum_untyped: []
 
-# CHARACTER: a separate, optional field, not `generic`. Some rums have a
-# `generic` style (or none decided yet) but also carry a distinctive flavour
-# marker worth recording on its own -- e.g. Ron del Barrito is "moderately
-# aged" generically, but its defining trait is a sherry-cask, Spanish-style
-# tradition rather than a Jamaican or Demerara profile.
-#
-# THESE ARE NOT GENERICS AND MUST NEVER BE USED AS ONE. This list read as a
-# declared generic vocabulary until 2026-08-26, because tests/test_cocktails.py
-# derives the permitted generics from every top-level LIST in this file and
-# excluded only `families`. So `sherry` and `Spanish-style` silently passed as
-# generics on any ingredient, and Helen's #314 decision below could not be
-# enforced at all -- dropping `blackstrap` from rum_untyped would have changed
-# nothing while this list still declared it. `NOT_GENERIC_LISTS` now names this
-# group too. The whole point of #441 was to separate these two fields; the
-# guard was quietly merging them back.
+# A character is a separate, optional field beside `generic` (#441): a flavour
+# marker orthogonal to the style. Never a generic. A closed list, held by
+# test_a_declared_character_vocabulary_is_enforced.
 rum_characters:
   - "blackstrap"
   - "sherry"
   - "Spanish-style"
-  # Helen's addition, 2026-09-06. The ester-heavy, high-funk note -- and a
-  # CHARACTER for the reason every entry in this list is one: it is orthogonal
-  # to the style. Wray & Nephew has it unaged and overproof, Smith & Cross has
-  # it at 57% and moderately aged, Appleton Signature mostly does not, and all
-  # three are Jamaican -- so "Jamaican" cannot carry it and one field cannot
-  # hold both. Same shape as `peated` in whisky_characters below.
+  # The ester-heavy, high-funk note. Orthogonal to style: an unaged overproof
+  # Jamaican and a moderately aged one can both have it, so "Jamaican" cannot
+  # carry it.
   - "hogo"
-  # Helen, 2026-09-25 (#1108), for Fanny Chu's Piña Colada: the raw-cane-sugar
-  # (raspadura / panela) note of a Panamanian silver rum, Pedro Mandinga.
+  # The raw-cane-sugar (panela) note of a Panamanian silver rum (#1108).
   - "raspadura"
 
-# PEAT IS A CHARACTER, NOT A STYLE -- Helen, 2026-08-27, working it out aloud:
-# "so single malt whisky, character: peated ???" Yes, and for the reason #441
-# settled for blackstrap: peat is ORTHOGONAL to single-malt-versus-blended, so a
-# peated single malt is both and one field cannot hold it.
-#
-# The collection was already straining against this. The two drinks typed
-# `peated Scotch` have items reading "Peated single malt whisky" and "Peated
-# Scotch whisky" -- one of them was saying style and character through the same
-# slot because there was nowhere else to put the second half.
-#
-# CLOSED VOCABULARY, LIKE RUM'S AND UNLIKE GIN'S. Helen's call, 2026-08-26: a
-# rum's character comes from a handful of production traits and closes into a
-# list, while a gin's is whatever went in the still. Whisky is rum-shaped --
-# peat, sherry cask, bonded -- so it gets a list and a guard.
-#
-# `peated Scotch` IS STILL IN whisky_styles and is not retired yet: two drinks
-# use it, and retyping them needs the drafts repo. Retire it in the same pass
-# that retypes them, not before.
+# Peat is orthogonal to single-malt-versus-blended, so it is a character and
+# not a style. A closed list, like rum's; a gin's character is free text.
 whisky_characters:
   - "peated"
 
-# NO `fortified_characters` LIST, AND ONE STOOD HERE FOR AN HOUR ON 2026-10-07.
-# Helen typed Cocchi Americano as a `quinquina` with `character: "americano"`
-# ("I care about how something works in a drink far more than what it
-# technically is"), and then the same afternoon turned it round: "I think
-# Cocchi Americano is an americano." So Picotin and North Sea Oil pour the
-# `americano` generic -- its first two drinks -- and suggest the bottle. HOW
-# TO SAY "and a quinquina works in its place" was still open when this was
-# written; see the note at `americano` in `fortified_and_aromatised` below.
+# There is no `fortified_characters` list: a character names a flavour trait,
+# and "either works" is a list `generic` on the drink (DECISIONS §9.3.1).
 
-# =============================================================================
-# WHERE A BOTTLE IS FROM -- #591, Helen's ruling 2026-09-07
-# =============================================================================
-# "RULED: `origin` goes on the BOTTLE." Chosen over origin-qualified generics
-# (`Martinique agricole blanc`) and over a fourth field on the ingredient. She
-# asked for this on 2026-08-30, writing the Martinique Swizzle: "we need to add
-# a way of noting the origin of agricole given flavour varies so much."
-#
-# IT SITS ON THE SAME SIDE OF THE LINE AS `abv`. bottles.yml's own header draws
-# it: a bottle's category is INVARIANT -- "Appleton 12 is a moderately-aged
-# Jamaican in every drink that pours it" -- and where a distillery stands is
-# just as invariant. `character` is the other side, because that is what a
-# RECIPE wants from a pour, and #441 separated the two deliberately.
-#
-# THE ACCEPTED COST, WRITTEN DOWN SO IT IS NOT REDISCOVERED AS A BUG: a RECIPE
-# cannot require an origin. `martinique-swizzle` still says
-# `generic: "rhum agricole blanc"`, and what makes it Martinican is that its
-# suggestions are JM, Trois Rivières and La Favorite -- all of which this field
-# now says are Martinique. `island-of-martinique` and `lisle-martinique` are
-# named after an origin they still cannot state in data. Helen accepted that
-# explicitly when she chose this shape.
-#
-# TWO MECHANISMS FOR ORIGIN NOW COEXIST AND THAT IS DELIBERATE. Five rum styles
-# already carry an origin IN THE WORD -- the three Jamaicans, both Demeraras,
-# and `clairin`, which is Haitian by definition and was declared separately for
-# that reason. Those are NOT being unpicked. The rule is: in the generic where
-# it changes the CATEGORY, on the bottle where it changes the FLAVOUR.
-#
-# A CLOSED LIST, like rum's characters and unlike gin's, so a typo cannot mint
-# an origin in silence. `test_bottle_origin_is_declared` holds it. Only the
-# values actually used are here -- adding one is a small decision, and inventing
-# a world atlas up front would be declaring a vocabulary for bottles nobody owns.
-#
-# NOT A GENERIC LIST, AND THIS IS THE FOURTH TIME THAT TRAP HAS BEEN SET.
-# tests/test_cocktails.py derives the permitted generics from every top-level
-# LIST in this file, so without an entry in `NOT_GENERIC_LISTS` these four words
-# would silently become pourable generics. `families`, `not_on_cards`,
-# `rum_groups` and `ingredient_as` each learned that the hard way; the comment
-# above `NOT_GENERIC_LISTS` says "the next such block will not be so obliging",
-# and this is that block.
-#
-# WHETHER IT SPREADS BEYOND CANE SPIRITS IS NOT DECIDED. It is just as invariant
-# for a tequila or a pisco and the field would support it, but nothing needs it
-# today. Helen left that open on purpose.
+# === WHERE A BOTTLE IS FROM (#591) ===
+# `origin` goes on the bottle, in bottles.yml, so a recipe cannot require one.
+# Origin is in the generic where it changes the category (the Jamaicans, the
+# Demeraras, the clairins) and on the bottle where it changes the flavour.
+# A closed list of the values in use, held by test_bottle_origin_is_declared,
+# and named in NOT_GENERIC_LISTS so that these do not become generics.
 bottle_origins:
   - "Martinique"
   - "Guadeloupe"
   - "Haiti"
   - "Brazil"
 
-# THE CARD NAME FOR EACH RUM CATEGORY. Issue #501, Helen 2026-08-27: "set a
-# display name for each rum category, to be used as a short name on cocktail
-# cards. The recipe page can then display the full category name."
-#
-# ONE SURFACE READS THIS MAP, AND IT IS THE CARD -- `cocktails/index.html`.
-# `_layouts/cocktail.html` prints `generic` VERBATIM and does not look anything
-# up here, which is Helen's second sentence above and her ruling again on
-# 2026-09-04: "Let's display the full name in the ingredients list please, just
-# the short name on the card." So a drink page reads `cane sugar syrup 2:1` and
-# `honey water 2:1` while its card reads `sugar syrup` and `honey water`. That
-# split is what makes a long, precise generic free: the ratio and the sugar are
-# on the page where you are POURING, and off the card where you are CHOOSING.
-#
-# WHAT THIS REPLACES IS NOT A LONG NAME, IT IS AN AMBIGUOUS ONE. The card used
-# to render `item` -- the source's own words -- and eight of those strings each
-# named two or three DIFFERENT rums across the collection:
-#
-#   `Overproof Navy rum`  -> Demerara aged / Jamaican moderately aged / O.F.T.D.
-#   `Light aged rum`      -> Demerara aged / blended clear / lightly aged filtered
-#   `Demerara rum`        -> Demerara aged / Demerara overproof
-#   `White rum`           -> agricole unaged / lightly aged and filtered
-#   `Gold rum`, `Navy rum`, `Light rum`, `Lightly aged rum` -> two each
-#
-# So the colour words #314 retired were not merely unfashionable on the index,
-# they were the one thing on the card that could not be trusted. Measured, not
-# assumed: the substitution also SHORTENS the card line in every case (median
-# 98 -> 92 chars, Caribbean Sazerac -87, Mai Tai -69, worst case -1).
-#
-# THE NAMES MUST STAY DISTINCT FROM EACH OTHER, which is the whole point and is
-# what test_rum_card_names_are_distinct enforces. Two rums reading the same on a
-# card would rebuild the exact fault this map exists to fix -- UNLESS the
-# collapse is deliberate, in which case it goes in
-# `card_names_may_collide` below with its reason, the same shape
-# `family_less` uses. No drink in the collection shows the same card name twice
-# either way, which test_no_drink_shows_the_same_card_name_twice holds
-# separately: that is the failure a reader would actually SEE.
-#
-# EVERY RUM-FAMILY GENERIC HAS ONE, including the four that need no shortening
-# (clairin, Malibu, cachaça, Batavia arrack) and the three brand-generics. The
-# map is complete rather than exceptional so the card rule is "substitute when
-# the generic has a card name", with no second question about which rums count.
-#
-# RUM ONLY, deliberately. Four non-rum generics are also over twenty characters
-# (`Full-strength clear fruit brandy`, `ginger and lemongrass cordial`,
-# `Lavender-forward bitters`, `passion fruit liqueur`) and none of them is
-# AMBIGUOUS on a card, which is the problem this solves. Extend it when one is.
-#
-# HELEN'S NAMES, 2026-08-27, tweaked from a first cut. Her edits went one way:
-# the spirit word is SAID rather than implied wherever the style name alone
-# would not read as a rum -- `filtered rum` became `lightly aged rum`,
-# `clear blend` became `clear blended rum`, and both overproofs gained a
-# trailing "rum". Two of them are consequently LONGER than the generic they
-# stand for, which is fine: this map's job is a name you can read at card
-# distance, and brevity was only ever the means.
+# The name each generic shows on a card (#501, DECISIONS §9.10). The drink
+# page does not read this map: it prints `generic` verbatim, so a ratio or a
+# long style name is on the page where you make the drink and off the card
+# where you choose it. Every rum-family generic has a row; any other generic
+# needs one only where its card name differs. A card name says the spirit
+# word out loud. Two generics may share one only if `card_names_may_collide`
+# lists it: test_rum_card_names_are_distinct.
 card_names:
   "moderately aged Jamaican rum": "Jamaican rum"
-  # DELIBERATELY THE SAME as the moderately aged one above -- see
-  # card_names_may_collide. Declared in rum_styles and used by NO DRINK as
-  # of 2026-08-27; named here anyway, so the map covers the vocabulary rather
-  # than today's data.
-  #
-  # HELEN APPLIES THIS ONE HERSELF and it is not a gap to be filled in by
-  # inference, 2026-08-27: "needs to be applied by me where I need it, for
-  # example where I usually reach for Blackwell or Myers." Those two bottles are
-  # the marker -- a drink whose Jamaican is reached for because it is dark and
-  # molasses-sweet rather than funky. Do not retype a drink into this style
-  # from the item text; `Pot-still dark Jamaican rum` and `Dark aged rum` look
-  # like candidates and are hers to call.
+  # Deliberately the same as the one above: see `card_names_may_collide`. The
+  # style is in `hers_to_apply`.
   "caramel-forward Jamaican rum": "Jamaican rum"
   "overproof Jamaican rum, unaged": "overproof Jamaican rum"
   "aged Demerara rum": "Demerara rum"
   "overproof Demerara rum, lightly aged": "overproof Demerara rum"
   # The honest name for what everyone else calls white rum.
   "lightly aged and filtered rum": "lightly aged rum"
-  # The weakest name in this map, and flagged as such: it is the residual
-  # category -- a rum with no region and no other distinguishing trait -- so
-  # there is nothing to name it AFTER. "aged rum" beside "Demerara rum" reads
-  # faintly as though the Demerara were not also aged.
+  # The residual category, a rum with no region, so there is nothing to name
+  # it after.
   "moderately aged rum": "aged rum"
   "clear blended multi-region rum": "clear blended rum"
-  # THE SPIRIT WORD STAYS, and these two lost it by accident. Helen, 2026-08-29,
-  # looking at `agricole blanc` and `rhum agricole blanc` offered as two separate
-  # chips in HAS TO HAVE: "'agricole' and 'rhum agricole' should both be 'rhum
-  # agricole'."
-  #
-  # This is her own #561 rule -- "her names say the spirit word out loud", which
-  # is what turned `filtered rum` into `lightly aged rum` and `clear blend` into
-  # `clear blended rum` -- and it simply was not applied here. `agricole blanc`
-  # among `gin`, `cognac` and `sugar syrup` asks the reader to already know that
-  # agricole is a rum. Two of the three names in that pass got LONGER for exactly
-  # this reason: brevity was the means, legibility was the point.
-  #
-  # Now identical to the generic, which is a legitimate entry in this map and
-  # already the case for eight others (`clairin`, `coconut rum`, `cachaça`...).
+  # The spirit word stays: `agricole blanc` alone asks the reader to know that
+  # agricole is a rum.
   "rhum agricole blanc": "rhum agricole blanc"
   "rhum agricole vieux": "rhum agricole vieux"
   "Clairin Vaval": "Clairin Vaval"
   "Clairin Casimir": "Clairin Casimir"
   "Clairin Communal": "Clairin Communal"
   "Clairin Sajous": "Clairin Sajous"
-  # The brand-generics #314 permits because nothing generalises them. O.F.T.D.
-  # earns its place: its item strings are `Overproof Navy rum` and `Navy rum
-  # (float)`, both of which name other rums elsewhere in the collection.
-  # THE THREE BRAND-GENERICS GET DESCRIPTIVE CARD NAMES -- Helen, 2026-08-29.
-  # #314 permits these three as generics because nothing generalises the BOTTLE;
-  # that ruling is untouched. What changes is only the card LABEL, which is what
-  # card names are for -- and these were the only three brands on any card, so
-  # a reader met `O.F.T.D.` among `gin`, `cognac` and `sugar syrup` and learned
-  # nothing from it (#556's worry, exactly).
-  #
-  # LOWERCASING IS WHAT SURFACED IT. `o.f.t.d.` and `stiggins' fancy` read badly
-  # in a lowercase line in a way the capitalised forms hid.
-  #
-  # Real estate goes the other way for two of the three and that is fine: this
-  # buys legibility, not width. O.F.T.D. 8 -> 17 chars, Malibu 6 -> 11,
-  # Stiggins' Fancy 15 -> 13.
   "pineapple rum": "pineapple rum"
-  # Guyana/Jamaica/Barbados at 69%, so "blended overproof" is what it IS rather
-  # than a summary of it. Distinct from `overproof Demerara rum` and
-  # `overproof Jamaican rum`, which are the single-origin overproofs.
+  # Distinct from the two single-origin overproofs above.
   "blended overproof rum": "blended overproof rum"
   "coconut rum": "coconut rum"
   "cachaça": "cachaça"
   "Batavia arrack": "Batavia arrack"
-  # THE FIRST NON-RUM ENTRY, and it is deliberate. Helen, 2026-08-27, on Ceylon
-  # arrack: "is that a rum? Doesn't matter, the category list should eventually
-  # contain everything, so let's add it now." It has no `family` and should not
-  # get one -- it is coconut flower sap, and `family_less` above carries the
-  # reason -- so it is outside the rum machinery entirely, which is precisely
-  # why its card would otherwise fall back to the raw item text.
-  #
-  # THE KEY NAME IS NOW HALF A LIE and that is a known debt, not an oversight:
-  # `cocktails/index.html` reads this map by name and is off-limits this
-  # session (another agent). Rename it to `card_names` the next time that file
-  # is open. Nothing else needs to change -- the template only ever looks a
-  # generic up in it.
-  #
-  # `coconut-flower arrack` SINCE 2026-09-14 (#796), renamed from `Ceylon
-  # arrack`. Helen: "the generic is 'coconut flower-arrack'", and she picked
-  # this spelling of the three her comment used. The BOTTLE is still called
-  # Ceylon Arrack; it is the category that was mis-named.
+  # Not a rum and in no family (see `family_less`); it has a row so that the
+  # map covers every cane and palm spirit.
   "coconut-flower arrack": "coconut-flower arrack"
 
-  # --- BEYOND RUM, 2026-08-29 -------------------------------------------------
-  # Helen's model, from her own worked examples: the card shows the shortest
-  # name that tells you what the drink is LIKE -- not the family, not the style,
-  # but whichever of those actually matters. "gin", because London dry versus
-  # Plymouth does not change your evening. "bourbon" and "blanco tequila",
-  # because bourbon versus rye and blanco versus anejo absolutely do.
-  #
-  # ONLY WHERE THE CARD NAME DIFFERS FROM THE GENERIC. A generic that already
-  # reads well on a card (`cognac`, `Campari`, `lime juice`) needs no entry;
-  # adding one would be 140 rows of the same string twice.
+  # --- beyond rum -------------------------------------------------------------
+  # The card shows the shortest name that tells you what the drink is like:
+  # "gin", because London dry versus Plymouth does not change your evening. A
+  # generic that already reads well on a card needs no row.
   "London dry gin": "gin"
-  # NOT collapsed to "gin", deliberately, and the line is Helen's own rum rule:
-  # collapse where the difference is a nuance, keep it where it changes the
-  # STRENGTH or the drink. Navy strength does; genever is a different drink
-  # altogether. Old Tom, Plymouth, New Western dry gin and speciality are the
-  # genuinely open ones -- see the note in the issue rather than guessing here.
+  # Not collapsed to "gin": collapse where the difference is a nuance, keep it
+  # where it changes the strength or the drink.
   "navy strength gin": "navy strength gin"
   "genever": "genever"
   "blended scotch whisky": "scotch"
-  # `single malt whisky`, not `single malt` -- Helen, 2026-09-08 (#844). The
-  # short form leaned on the neighbouring `scotch` to supply the noun, and a
-  # card names one ingredient at a time: read alone, "single malt" is an
-  # adjective with nothing after it.
+  # Not `single malt` (#844): a card names one ingredient at a time, and that
+  # is an adjective with nothing after it.
   "single malt scotch whisky": "single malt whisky"
-  # Bonded stays its own word. Helen, 2026-08-27: "bonded rye is a different
-  # thing, like overproof demerara rum" -- and five of seven rye entries in the
-  # collection are bonded, so collapsing it to `rye` would hide the majority
-  # case behind the exception.
+  # Bonded stays its own word: a category, not a strength.
   "bonded rye": "bonded rye"
-  # THE RATIO IS A RECIPE FACT, NOT A CARD FACT. Helen, 2026-08-27: "On the card
-  # I would expect to see sugar syrup, and on the recipe ingredient line cane
-  # sugar syrup, 2:1." Both ratios therefore read the same on a card, which is a
-  # declared collapse below -- it loses real information and it is meant to.
-  #
-  # HER SENTENCE ALREADY SAID `cane sugar syrup` ON THE RECIPE LINE, a week
-  # before the generics were renamed to match it on 2026-09-04. That is the
-  # whole of this pair: the card keeps the short name she asked for and the
-  # generic is now the long one she was already writing.
+  # The ratio is a making fact, not a card fact: both read the same, a
+  # collapse declared in `card_names_may_collide`.
   "cane sugar syrup 1:1": "sugar syrup"
   "cane sugar syrup 2:1": "sugar syrup"
-  # THE SUGAR IS THE POINT AND THE WORD "sugar" IS NOT -- the card said
-  # `demerara syrup` before the rename and says it after, because at card
-  # distance `demerara` is the whole fact. Helen, 2026-09-04: "Sometimes I say
-  # 'demerara sugar syrup' when I mean that." The recipe line gets her full
-  # phrase; the card does not need it.
+  # At card distance `demerara` is the whole fact.
   "demerara sugar syrup 2:1": "demerara syrup"
-  # THE TWO HONEY WATERS CAME OFF ON 2026-09-04 with the generics they named,
-  # and went back on the same evening with them. Helen: "Bee's Knees needs to
-  # say honey water 2:1. I'm sorry if I said the wrong thing about this before,
-  # but I really do need that generic here." So there are three honey-water
-  # generics and ONE card name for all of them -- the flat `honey water` needs
-  # no row, because this map only ever carries a generic whose card name DIFFERS
-  # from it, and the two ratios need one for exactly the reason the sugar syrups
-  # do: a ratio is a MAKING fact, not a CHOOSING fact.
+  # One card name for every ratio; the flat `honey water` needs no row.
   "honey water 1:1": "honey water"
   "honey water 2:1": "honey water"
   "honey water 3:1": "honey water"
 
-# HOW A DISJUNCTIVE RUM READS ON A CARD, where the default join reads badly.
-#
-# A list `generic` on ONE ingredient means "either would do" (#441), and the
-# card joins the two card names with " or ". Seven distinct pairs occur and six
-# of them read fine -- `lightly aged rum or agricole blanc` is exactly the
-# choice `White rum` used to conceal. The seventh repeats its own head word:
-# `overproof Demerara rum or Demerara rum`.
-#
-# KEYED ON THE DEFAULT JOIN, so the left-hand side is the string this replaces
-# and you can read the before and after together. AN EXPLICIT MAP RATHER THAN A
-# RULE, Helen 2026-08-27: "not perfect, but we can try. I expect we'll need an
-# explicit mapping of cases like this." Collapsing a shared word is a judgement
-# about two specific names -- her form drops `Demerara` AND `rum` from the
-# second option and reorders the pair -- and no rule recovers that.
-#
-# THIS IS NOT THE "TWO POURS OF THE SAME RUM" CASE, which is a different thing
-# and needs nothing: two separate ingredient entries each render their own card
-# name, so a drink genuinely wanting two Demeraras prints the name twice, which
-# is correct. Helen, same conversation: "where a recipe wants more than one kind
-# of the same rum we obviously should write the display name twice."
-#
-# Every key must still be a join some drink actually produces --
-# test_every_card_name_join_is_reachable -- the same bargain
-# `methods.yml`'s proposals strike: a replacement whose work is already done
-# reads as outstanding, and one whose left-hand side has drifted does nothing
-# while looking live.
-# EMPTY SINCE 2026-08-30, and the mechanism stays. Its one entry replaced the
-# Swizzle's `Demerara overproof rum or Demerara rum` (the card names of the
-# day -- see #781, which reordered both) with Helen's own
-# `Demerara rum or overproof`; that drink was rewritten the same day into the
-# Martinique Swizzle -- 60 ml of unaged agricole, no Demerara anywhere -- so the
-# pair it fixed is no longer produced by any drink.
-#
-# `test_every_card_name_join_is_reachable` is what said so, refusing to let a
-# replacement sit there matching nothing, and it SKIPS on an empty map rather
-# than passing. So this block currently checks nothing, which is worth knowing
-# rather than discovering: the day a disjunctive pair reads badly again, the
-# entry goes back here and the guard wakes up with it.
+# How a list `generic` (either would do, #441) reads on a card where the
+# default " or " join of the two card names reads badly. Keyed on the default
+# join. An explicit map, because collapsing a shared word is a judgement about
+# two specific names. Every key must be a join some drink produces:
+# test_every_card_name_join_is_reachable, which skips while this is empty.
 card_name_joins: {}
 
-# CARD NAMES THAT ARE ALLOWED TO BE THE SAME, with the reason attached -- the
-# idiom `family_less` above and tests/test_reference_data.py's
-# NO_TEMPERATURE_BECAUSE both use, so "why do two rums read alike?" is answered
-# in the repo rather than in someone's memory.
-#
-# Listing a name here is what makes the collapse permitted; an undeclared
-# duplicate still fails. A collapse is a real loss of information on the index,
-# so it should cost a sentence.
+# Card names that are allowed to be the same, each with its reason. An
+# undeclared duplicate fails test_rum_card_names_are_distinct.
 card_names_may_collide:
   "sugar syrup": >-
     `cane sugar syrup 1:1` and `cane sugar syrup 2:1` both read `sugar syrup` on
@@ -1182,12 +457,6 @@ card_names_may_collide:
     too: the card said `sugar syrup` when the generic did, and still does.
     Nine drinks carry both a syrup and something else sweet; none carries both
     ratios at once.
-  # `honey water` CAME OFF ON 2026-09-04 with the pair it permitted and went
-  # back on the same evening with them -- Helen needed `honey water 2:1` on the
-  # Bee's Knees. In between, leaving it here would have failed
-  # test_rum_card_names_are_distinct's staleness half, which is the guard doing
-  # its job -- a permission whose names have diverged silently blesses the next
-  # accidental duplicate on the same string.
   "honey water": >-
     `honey water 1:1` and `honey water 2:1` both read `honey water` on a card,
     which is also what the flat `honey water` generic reads. Exactly the sugar
@@ -1210,121 +479,38 @@ card_names_may_collide:
     in rum_styles and used by no drink, and no drink calls for both Jamaicans.
     The full category names are on the drink page either way.
 
-# Helen's own list, 2026-08-26, given in full when `flavoured` was queried:
-# "London Dry, Old Tom, Plymouth, Navy strength, Genever and speciality, where
-# speciality should always carry a character field." Written lowercase here at
-# her direction -- the file's commodity-lowercasing rule wins over the way a
-# style gets capitalised in prose, so `blended Scotch` and `Demerara, aged`
-# keep their shape too.
-#
-# `genever`, `navy strength gin` and `gin liqueur` HAVE NO DRINK AND STAY --
-# Helen, 2026-09-25 (#1186), asked style by style whether the unpoured
-# generics were spec or residue: "Please keep all the others." Vocabulary
-# declared ahead of a drink, which is what this file's header calls a spec
-# rather than an inventory; they are not gaps to fill.
+# Lowercase where the word is a commodity, whatever capitals a style takes in
+# prose.
 gin_styles:
   - "London dry gin"
   - "Old Tom"
   - "Plymouth"
-  # `New Western dry gin` SINCE 2026-09-25, was `New Western dry` -- Helen,
-  # #1186: "'New Western dry' should become 'New Western dry gin'." The naming
-  # rule above (spirit word on the end: `London dry gin`, `navy strength gin`)
-  # was simply not applied to this one. No drink pours it; the old name is in
-  # `retired_gin_styles`.
+  # The spirit word goes on the end, as in `London dry gin`.
   - "New Western dry gin"
   - "genever"
   - "navy strength gin"
-  # REPLACES `flavoured`, which is retired -- see retired_gin_styles. A gin
-  # whose point is a botanical other than juniper: Hendrick's cucumber and
-  # rose, Malfy's lemon, a rhubarb gin. The style name alone says nothing
-  # useful, which is why Helen's rule is that this generic ALWAYS carries a
-  # `character` naming what the gin actually pushes. Enforced by
-  # tests/test_cocktails.py::test_speciality_gin_declares_a_character.
-  #
-  # Character is FREE TEXT here, unlike rum's -- Helen's call, 2026-08-26. A
-  # rum's character comes from a handful of production traits and closes into a
-  # list; a gin's is whatever went in the still, and closing that list would
-  # mean a vocabulary edit for every new bottle.
+  # A gin whose point is a botanical other than juniper. The name alone says
+  # nothing, so it always carries a `character` naming what the gin pushes:
+  # test_speciality_gin_declares_a_character. Free text, unlike rum's: a gin's
+  # character is whatever went in the still.
   - "speciality"
-  # Helen's own parenthesis: "not a gin though". Deliberately NOT one of the
-  # styles above -- her 2026-08-26 list is types of GIN, and this is not one; it
-  # sits in this group so that `family_of` can still roll it up to gin for
-  # exclusion.
-  #
-  # NO DRINK USES IT AS OF 2026-08-30, and that is the intended state rather
-  # than a gap: it is the catch-all for the next gin liqueur that is not sloe.
-  # See `sloe gin` immediately below for why the two are not one.
+  # Not a gin: filed here so that `family_of` can roll it up to gin for
+  # exclusion. The catch-all for a gin liqueur that is not sloe.
   - "gin liqueur"
-  # SPLIT OUT OF `gin liqueur` ON 2026-08-30, and it is the `flavoured` mistake
-  # caught a second time. Helen, looking at the Cobra Effect's card: "specialty
-  # gins and gin liqueurs got recoded and it looks like this one got squashed,
-  # suggesting our taxonomy isn't right here."
-  #
-  # She was right, and `retired_gin_styles` above already argues her case in her
-  # own words: `flavoured` was retired for "covering everything from sloe to
-  # rhubarb to cucumber, which are not substitutable for each other", and it was
-  # replaced by `speciality` CARRYING A CHARACTER. Both sloe gins were recoded
-  # to `gin liqueur` instead -- a name with the identical fault and, unlike
-  # `speciality`, no character requirement to say which botanical. The category
-  # meant "sloe gin" for both of its members while claiming to mean any gin
-  # liqueur.
-  #
-  # A GENERIC RATHER THAN A CHARACTER, Helen's call when shown both: sloe gin is
-  # a standard named category with a legal definition, not one distiller's
-  # botanical, and `character` is recipe-only (#441) so it would have left the
-  # card still reading `gin liqueur` -- which is the thing she was looking at
-  # when she spotted this. Same reasoning the eleven rum styles get: when the
-  # difference changes what you are making, it earns a name.
+  # Its own generic, not a `gin liqueur` with a character: a standard named
+  # category, and a character never reaches the card.
   - "sloe gin"
 
-# NAME THEM CORRECTLY RATHER THAN DODGING THE SPELLING -- Helen, 2026-08-27:
-# "please apply correctness rather than the fudge of dropping the word." Scotch
-# and Japanese take WHISKY; Irish and American take WHISKEY. `blended Scotch`,
-# `Irish` and `Japanese` said neither, which looked tidy and was really an
-# unmade decision.
-#
-# `rye` and `bourbon` stay BARE, and that is not an inconsistency. Helen's own
-# test is the name you would say out loud: nobody says "bourbon whiskey", and
-# nobody says just "Irish". The word goes in where the style alone is not an
-# ingredient.
-#
-# `scotch` is lowercase for the same reason `cognac`, `champagne` and `calvados`
-# are -- a protected appellation that has become a common noun in English. The
-# demonyms keep their capitals.
-#
-# `bonded rye`, `blended scotch whisky`, `Irish whiskey` and `Japanese whisky`
-# HAVE NO DRINK AND STAY -- Helen, 2026-09-25 (#1186): "Please keep all the
-# others." Declared ahead of a drink, as a spec; not residue.
+# Scotch and Japanese take `whisky`; Irish and American take `whiskey`. `rye`
+# and `bourbon` stay bare: the test is the name you would say out loud.
+# `scotch` is lowercase as `cognac` and `champagne` are; the demonyms keep
+# their capitals.
 whisky_styles:
   - "rye"
-  # Bottled-in-bond: 100 proof, one distillery, one season, four years minimum.
-  # A CATEGORY, NOT A STRENGTH -- Helen, 2026-08-27: "bonded rye is a different
-  # thing, like overproof demerara rum." Which is the right comparison, and the
-  # data agrees emphatically: five of the seven rye entries in the collection
-  # already say bonded or 100 proof in their item text (Rittenhouse 100 x3,
-  # "straight bottled-in-bond rye whiskey", "Rye whiskey (100% proof)"). Bonded
-  # is what she actually pours; plain `rye` was the exception wearing the
-  # default's clothes.
-  #
-  # ASKED AGAIN AND ANSWERED THE SAME WAY, 2026-09-04: "Bonded rye and rye are
-  # different generics." Recorded here so that the next reader counting five
-  # bonded entries against two plain ones does not propose collapsing them.
+  # Bottled-in-bond: 100 proof, one distillery, one season, four years
+  # minimum. A category, not a strength, so never collapsed into `rye`.
   - "bonded rye"
   - "bourbon"
-  # PENDING RETIREMENT, and deliberately untouched today. Peat is orthogonal to
-  # single-malt-versus-blended -- a peated single malt is both -- so it belongs
-  # in `character` beside the style, exactly as blackstrap does for rum (#441,
-  # #314). Both drinks using it prove the point: their items read "Peated single
-  # malt whisky" and "Peated Scotch whisky", so one of them was already trying
-  # to say two things through one field.
-  #
-  # NOT DONE YET BECAUSE THE GUARD HAS TO MOVE FIRST. A `whisky_characters` list
-  # added here would silently become a list of permitted GENERICS --
-  # tests/test_cocktails.py derives them from every top-level list and excludes
-  # only the names in NOT_GENERIC_LISTS. That is the precise hole this file
-  # already documents for `rum_characters`, which passed `sherry` and
-  # `Spanish-style` as generics for four days. Vocabulary and guard move
-  # together or not at all.
   - "blended scotch whisky"
   - "single malt scotch whisky"
   - "Irish whiskey"
@@ -1336,66 +522,36 @@ agave_styles:
   - "añejo tequila"
   - "mezcal"
 
-# `armagnac` and `grappa` HAVE NO DRINK AND STAY -- Helen, 2026-09-25 (#1186):
-# "Please keep all the others." Declared ahead of a drink, as a spec.
 brandy_styles:
   - "cognac"
   - "armagnac"
   - "calvados"
   - "pisco"
   - "grappa"
-  # NEW 2026-10-07, for Ramos Greek Fizz, where it is the base spirit: "yes".
   # A Greek pomace brandy, so it sits beside the grappa.
   - "tsipouro"
-  # Helen, 2026-08-31, on Pink Lady's Laird's Bonded: applejack's generic is
-  # `apple brandy`. It is NOT `calvados`, which names a French appellation --
-  # the same distinction the two Demeraras turn on, where the category is a
-  # checkable fact about the bottle rather than an argument from the glass.
-  # Naming it after the fruit rather than the country is what lets an American
-  # applejack and a Spanish or English apple brandy share it honestly.
+  # Named after the fruit, not a country, so an applejack and an English apple
+  # brandy share it. Not `calvados`, which is a French appellation.
   - "apple brandy"
   # The category term rather than one country's word for it, so a slivovitz or
   # a framboise has somewhere to go. Cherry eau de vie is the live example.
   - "eau de vie"
-  # BOTH ARE GENERICS, Helen 2026-09-04, revisiting the "for now" the line
-  # below used to carry: asked whether `aguardiente` and `kirschwasser` were
-  # bottles or categories, "both are generics." So Bali Hai's suggestions --
-  # which repeated its own item text rather than naming anything on a shelf --
-  # become the thing the recipe actually asks for, as a list `generic` meaning
-  # either would do (#441).
-  #
-  # `full-strength clear fruit brandy` WENT WITH THEM, see retired_brandy_styles
-  # at the bottom: it was invented for Bali Hai in 2026-08-22 and Bali Hai was
-  # its only user, so naming the two spirits leaves it describing nothing.
+  # Both are generics, not bottles. A drink that takes either says so with a
+  # list `generic` (#441).
   - "aguardiente"
   - "kirschwasser"
-  # Added 2026-08-29. Distilled peach wine, ~35%, clear or aged -- and NOT the
-  # same thing as crème de pêche (an infusion of fresh peaches with lots of
-  # sugar, ~20%) or a peach eau de vie (clear, unaged, from whole fruit, ~45%).
-  #
-  # NOT PEDANTRY: the collection already had a drink wrong because this was
-  # missing. Gunmetal Blue asks for "Peach brandy" and is typed
-  # `crème de pêche`, so a 20% sweetened infusion is standing in for a 35%
-  # distillate. Same axis the cherry pair is already split on -- Helen's own
-  # note there is "a liqueur is sweetened, an eau de vie is not".
+  # Distilled peach wine, about 35%. Not `crème de pêche` (a sweetened
+  # infusion, about 20%) and not a peach eau de vie (unaged, about 45%).
   - "peach brandy"
 
-# Cane and palm spirits that are NOT rum. #314: "cachaca is its own generic" --
-# same raw material as an agricole rhum, completely different product. Batavia
-# arrack is a cane-and-rice spirit and Helen's call is that it stars as `rum`.
-# Coconut-flower arrack is coconut flower sap and shares only the name -- and
-# the category was called `Ceylon arrack`, after its origin, until #796
-# (2026-09-14), when Helen named it for what it is made from.
+# Cane and palm spirits that are not rum styles. Cachaça is its own generic
+# (#314). Batavia arrack is cane and rice, and its family is `rum`.
+# Coconut-flower arrack is coconut flower sap and shares only the name (#796).
 cane_and_palm_spirits:
   - "cachaça"
   - "Batavia arrack"
   - "coconut-flower arrack"
 
-# NEW BLOCK 2026-09-14. The same `retired_*` shape every other section uses, so
-# test_no_drink_uses_a_retired_generic catches the old name coming back -- which
-# is a real risk here and not a formality: _cocktail_drafts/ingest_from_csv.py
-# maps a bare "Arrack" onto this generic, and an ingest run from an older copy
-# of that script would type the retired spelling.
 retired_cane_and_palm_spirits:
   "Ceylon arrack": >-
     Renamed `coconut-flower arrack`, 2026-09-14 (#796). Helen: "the name of the
@@ -1406,48 +562,16 @@ retired_cane_and_palm_spirits:
 
 other_base_spirits:
   - "vodka"
-  # `flavoured vodka` RETIRED 2026-09-04, and it goes for the reason this file
-  # keeps giving: Helen, "'flavoured vodka' is not a useful generic because
-  # members aren't substitutable. I suggest 'pineapple vodka' and 'vanilla
-  # vodka' or whatever." The same test that makes Campari, Aperol, Cynar and
-  # fernet four generics rather than one amaro, and the same one that retired
-  # `flavoured` from the gin styles on 2026-08-26 -- a filter button reading
-  # "flavoured" tells you nothing, and swapping a pineapple vodka into a Porn
-  # Star Martini is a different drink rather than a variation.
-  #
-  # NAMED BY FLAVOUR, consistent with crème de X and with the bitters. Two
-  # today because two drinks use them; "or whatever" is her invitation to add
-  # the next one the same way rather than a licence to guess at a range.
+  # Named by flavour, one generic each: flavoured vodkas are not substitutable
+  # for one another.
   - "vanilla vodka"
   - "pineapple vodka"
-  # THE THIRD, 2026-10-07, "the same way": Lemon Drop Martini and Zakuski
-  # Cocktail pour Ketel One Citroen. Offered `lemon vodka` or `citron vodka`,
-  # Helen: "lemon vodka."
   - "lemon vodka"
   - "absinthe"
   - "aquavit"
 
-# `pastis` RETIRED 2026-08-30, and it is worth saying that this was a
-# CONSEQUENCE rather than a judgement about pastis.
-#
-# Its `family_less` entry gave one reason for existing -- "Swizzle uses 6 drops
-# of Pernod or absinthe" -- and that drink was rewritten the same day into the
-# Martinique Swizzle, which takes 1 dash of absinthe. So the only drink cited
-# stopped citing it.
-#
-# The other thread was Don's Mai Tai suggesting `Pernod` against `absinthe`,
-# which looked like a pastis-for-absinthe substitution and was carrying a note
-# saying so. It was not: "Pernod" names two bottles, and Helen owns the 68%
-# absinthe, which is also what the source asks for. So the substitution was an
-# artefact of a brand name written without its product, and it took the note
-# with it.
-#
-# A pastis is still a real thing -- Ricard, Henri Bardouin -- and nothing here
-# says otherwise. The day a drink wants one, put this line back.
-#
-# THE MAPPING BELOW WAS EMPTY UNTIL 2026-09-04 and now carries one entry, which
-# is the shape every other `retired_*` block already has: a name that used to
-# mean something must not blend into the not-declared pile.
+# `pastis` is not declared: no drink takes one. The day one does, it goes
+# back in `other_base_spirits`.
 retired_other_base_spirits:
   "flavoured vodka": >-
     covered a vanilla vodka and a pineapple one, which are not substitutable
@@ -1456,67 +580,40 @@ retired_other_base_spirits:
     and 'vanilla vodka' or whatever." Both are declared in
     `other_base_spirits` above. Same call as `flavoured` gin, 2026-08-26.
 
-# =============================================================================
-# MODIFIERS
-# =============================================================================
+# === MODIFIERS ===
 
 liqueurs:
-  # Orange, four ways -- Helen's call. Grand Marnier stays apart because its
-  # cognac base genuinely changes a drink.
-  #
-  # CURAÇAO KEEPS ITS CAPITAL, Helen's call 2026-08-17, and it is a deliberate
-  # exception to the lowercase-the-commodity rule that keeps cognac, champagne
-  # and calvados lowercase. The distinction that justifies it: those three are
-  # protected appellations that have become common nouns in English, whereas
-  # curaçao is not protected and still reads as the island's name. Her own data
-  # writes it capitalised throughout, which is the stronger argument.
+  # The orange liqueurs. Grand Marnier stays apart because its cognac base
+  # changes a drink. Curaçao keeps its capital: unlike cognac or champagne it
+  # is not an appellation turned common noun, and reads as the island's name.
   - "triple sec"
   - "orange Curaçao"
   - "dry orange Curaçao"
   - "Grand Marnier"
   - "blue Curaçao"
-  # Rhum Clément Créole Shrubb. A rhum-based ORANGE LIQUEUR, and filed here
-  # rather than under rum on Helen's question, 2026-08-17. The deciding case is
-  # exclusion: under `rum` it would make "no rum tonight" wrongly drop Ginger
-  # Snap and Accoutrement, whose only rum-derived element is 15 ml of this.
-  # Stiggins' Fancy sits under rum because it genuinely IS rum; a shrubb is a
-  # sweetened orange liqueur that happens to be rhum-based.
+  # A rhum-based orange liqueur, filed here and not under rum: there, "no rum
+  # tonight" would drop drinks whose only rum is a little of this.
   - "Créole Shrubb"
   - "maraschino liqueur"
-  # Each by flavour, deliberately: precision chosen over collapsing.
+  # Each by flavour: precision over collapsing.
   - "crème de mûre"
   - "crème de cassis"
   - "crème de pêche"
   - "crème de banane"
   - "crème de violette"
-  # TWO GENERICS, BY COLOUR, since 2026-10-04 (#838). Until then one
-  # `crème de cacao` carried both, with "brown or dark" and "white" in a
-  # pour's note -- which a Brandy Alexander, pouring both, had to say twice.
-  # Helen: "Brown and white CdC should each be a generic, then no notes are
-  # needed." The unqualified word is no longer a generic: a source that does
-  # not say which is a question for her.
+  # Two generics, by colour (#838). The unqualified word is not a generic: a
+  # source that does not say which is a question for Helen.
   - "brown crème de cacao"
   - "white crème de cacao"
-  # NEW 2026-09-20, PROVISIONAL, for White Negroni Piña Colada (#606): Clement
-  # Mahina Coconut Rhum Liqueur. Helen: "I guess the generic is coconut rhum.
-  # Add it for now and I can review another time." Filed here and not under
-  # rum, for the reason `Créole Shrubb` above is: it is a rhum-based LIQUEUR, so
-  # "no rum tonight" should not drop it. `coconut rum` is a rum style in
-  # `rum_styles`, and she has said it means Malibu for now (see below); this
-  # is not folded into it.
+  # Provisional (#606). A rhum-based liqueur, so filed here for the reason
+  # `Créole Shrubb` is. Not `coconut rum`, which is a rum style.
   - "coconut rhum"
   - "crème de menthe"
-  # Cherry: the distinction Helen believes in. A liqueur is sweetened, an eau
-  # de vie is not, and her own note says "Don't use plain kirsch". The eau de
-  # vie itself lives under brandy_styles.
+  # A liqueur is sweetened and an eau de vie is not: the eau de vie is under
+  # `brandy_styles`.
   - "cherry liqueur"
-  # AND A SECOND CHERRY SINCE 2026-09-14. "Cherry Heering is a cherry brandy,
-  # Briottet Cerise is a cherry liqueur." Asked which bottle an unqualified
-  # cherry liqueur should mean, Helen split the category rather than pick. It
-  # sits HERE and not under brandy_styles: a cherry brandy in this sense is a
-  # sweetened liqueur made on a brandy base, not an eau de vie -- the Singapore
-  # Sling's own note, "De Kuyper cherry brandy makes this a bit horrible", is
-  # the same product family.
+  # A sweetened liqueur on a brandy base, not an eau de vie, so it sits here
+  # and not under `brandy_styles`. Not interchangeable with `cherry liqueur`.
   - "cherry brandy"
   - "apricot liqueur"
   - "coffee liqueur"
@@ -1524,45 +621,21 @@ liqueurs:
   - "passion fruit liqueur"
   - "gentian liqueur"
   - "apple schnapps"
-  # NEW 2026-09-14 (#1013). Helen: "Add 'peach schnapps' as a generic". Not
-  # `peach brandy` (a distilled spirit, ~35%) and not `apple schnapps` (a
-  # different fruit): its own thing, at 18%. Peach Me is its only pour.
+  # Not `peach brandy` (a distilled spirit) and not `apple schnapps` (#1013).
   - "peach schnapps"
   - "mastiha liqueur"
-  # THREE MORE LIQUEURS, 2026-10-07, the Difford's batch, each a "yes" from
-  # Helen to a named proposal.
-  #
-  # `black raspberry liqueur` (French Daiquiri; Difford's adds "e.g. Chambord").
-  # NOT `crème de mûre` above, which is blackberry.
+  # Raspberry: not `crème de mûre` above, which is blackberry.
   - "black raspberry liqueur"
-  # `crème de myrtille` (Myrtle Martini, Giffard). BILBERRY, named like the
-  # other crèmes. Difford's own ingredient index files this drink under
-  # "Myrtle/Mirto liqueur", which is a different thing; the recipe pours
-  # myrtille and the drink follows the recipe. Helen, told of the mismatch:
-  # "disjoint is fine, no one else knows this anyway".
+  # Bilberry, named like the other crèmes. Not a myrtle (mirto) liqueur.
   - "crème de myrtille"
-  # `kümmel` (The Dante). Its sibling Mezcal Dante swaps it for aquavit, on
-  # Helen's own note on the Difford's page.
   - "kümmel"
   - "tomato liqueur"
   - "amaretto"
 
-# Own generics, family = `herbal`. Chartreuse is the BASE of Chartreuse
-# Swizzle, which is why these are not filed as mere modifiers.
-#
-# THE FRENCH NAMES, AND THIS IS THE SECOND TIME THE DECISION HAS BEEN MADE.
-# Helen, 2026-08-29, on seeing `green chartreuse` in the picker: "an earlier
-# Claude and I agreed that names were chartreuse verte and jaune". The agreement
-# was real and was written down NOWHERE -- not here, not in the manual, not in
-# either repo's history, checked before asking her to repeat herself. So it was
-# made, never applied, and had no way of surviving the session it happened in.
-# That is MANUAL §11.2's failure in its purest form, and the note is the fix:
-# a decision that lives only in a conversation gets made again.
-#
-# They are what the bottles say on their labels. `Chartreuse Verte` also stops
-# the colour reading as a modifier of a generic "chartreuse" -- these are two
-# different liqueurs, not one in two shades, which is the same distinction #314
-# drew for the rums.
+# Own generics, family `herbal`. None is substitutable for another, so each is
+# a proper noun and the group is a filing drawer, never a category a drink is
+# described by. The Chartreuses take the names on their labels, never green
+# and yellow.
 herbal_liqueurs:
   - "Chartreuse Verte"
   - "Chartreuse Jaune"
@@ -1572,24 +645,6 @@ herbal_liqueurs:
   - "Jägermeister"
   - "liqueur de sapin"
   - "Swedish flaggpunsch"
-  # P-Five Punch pours two ounces of it, which is too much of the drink to
-  # leave as a QQ. Helen, 2026-08-31, worried that filing it here would read as
-  # a claim it swaps for the rest: "'Herbal liqueur (Becherovka)' would be
-  # misleading. This will come up over and over."
-  #
-  # IT NEVER RENDERS THAT WAY, AND THAT IS WHAT THIS GROUP IS FOR. Every member
-  # above is already a proper noun, for exactly her reason -- nothing
-  # generalises them and none is substitutable for another. So the group is a
-  # filing drawer, not a category a drink is described by: a recipe line shows
-  # the GENERIC, which is `Becherovka`. `herbal` is the family, and a family is
-  # only ever a search and exclusion roll-up, never a browse axis. Same shape as
-  # the amari, where Campari, Aperol, Cynar and fernet are four generics rather
-  # than one "amaro" for precisely this reason.
-  #
-  # WHERE HER ACTUAL FACT GOES. "I'd reach for Becherovka if a recipe wanted
-  # something cinnamon- or ginger-forward" is a statement about a drink's use of
-  # a bottle, not about the bottle in the abstract -- so it is a per-ingredient
-  # `note` on the drink that wants it, which is what #457 built that key for.
   - "Becherovka"
 
 # Separate generics, one family. Not substitutable for each other -- swapping
@@ -1600,55 +655,17 @@ amari:
   - "Cynar"
   - "fernet"
   - "Amaro Nonino"
-  # AMARO CIOCIARO, NOT CIOCIANO -- Paolucci, Lazio, 30%. The collection
-  # misspelled it until 2026-09-07 (#701). It was renamed by declaring BOTH
-  # spellings for one merge and then dropping the old one, because a generic
-  # has no alias mechanism the way a bottle does, and the drink that names it
-  # lives in the other repo: the two cannot land in one commit, so there is no
-  # single-repo step that keeps `test_every_generic_is_declared` green.
-  # DECISIONS 9.3.2 has the full shape if another generic ever needs renaming.
+  # Ciociaro, not Ciociano (#701).
   - "Amaro Ciociaro"
 
-# FIVE AROMATISED-WINE GENERICS, AND "AROMATISED WINE" IS NOT ONE OF THEM.
-# Helen, 2026-08-30, settling #568: "I would never write 'aromatised wine' as a
-# cocktail ingredient or generic, because it suggests some equivalence between
-# the types where none or very little exists. So I decided to jump down a level
-# of abstraction, and make the generics three vermouths, americano and
-# quinquina, because those are what I'd actually write on a recipe."
-#
-# That is this file's own two-layer rule, applied by her rather than to her: the
-# GENERIC is the precise thing a recipe says, and the roll-up belongs in
-# `family`, which is "for SEARCH and EXCLUSION only, never a browse axis". The
-# family already exists and is `fortified`. So the abstraction she declined to
-# write is available to exclude by and appears on no recipe line, and nothing
-# needed building.
-#
-# A QUINQUINA AND AN AMERICANO ARE NOT VERMOUTHS. Both are quinine-led rather
-# than wormwood-led, which is why they sit beside the vermouths here rather than
+# There is no "aromatised wine" generic (#568): each kind is its own, and the
+# roll-up is the `fortified` family. A quinquina and an americano are
+# quinine-led rather than wormwood-led, so they sit beside the vermouths, not
 # under them.
-#
-# `americano` IS NEW, and the line below it used to do both jobs -- its comment
-# read "Aperitif wines, not vermouths: Lillet, Cocchi Americano", filing a
-# quinquina and an americano under one word. That is the conflation #568 is
-# about, one level down. THREE DRINKS CURRENTLY SAY `quinquina` and at least one
-# of them may mean the other: #569 asks for Corpse Reviver No. 2 to accept
-# either, which only became expressible now. north-sea-oil and
-# voodoo-that-you-do have not been looked at.
-#
-# `americano` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186): "Please keep
-# all the others." Declared ahead of a drink, as a spec.
-#
-# IT HAS TWO DRINKS SINCE 2026-10-07: Picotin, from Difford's, and North Sea
-# Oil, which is one of the three this block says "have not been looked at" and
-# said `quinquina` until then. Both pour Difford's "Americano bianco". Helen:
-# "I think Cocchi Americano is an americano", with `Cocchi Americano` as the
-# suggestion -- declared in bottles.yml the same day.
 fortified_and_aromatised:
   - "sweet vermouth"
   - "dry vermouth"
   - "blanc vermouth"
-  # A vermouth-amaro hybrid; swapping it for sweet vermouth is audible.
-  #
   # Lillet Blanc, Dubonnet, Byrrh.
   - "quinquina"
   # Cocchi Americano Bianco.
@@ -1656,67 +673,33 @@ fortified_and_aromatised:
   - "amontillado sherry"
   - "oloroso sherry"
   - "tawny port"
-  # NEW 2026-10-07, for Roman Punch, which floats 5 ml of Cockburn's ruby.
-  # Offered as a second port beside the tawny, Helen: "yes".
   - "ruby port"
 
-# `cider` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186): "Please keep all
-# the others." Declared ahead of a drink, as a spec.
 wine_and_sparkling:
   - "champagne"
   - "prosecco"
   - "red wine"
   - "white wine"
-  # NEW 2026-10-07, for Geisha Martini: "yes". ONE generic for sake; the
-  # source's style (a daiginjo genshu) stays in the pour's note.
+  # One generic for sake; a source's style stays in the ingredient's note.
   - "sake"
   - "cider"
 
-# Every flavour by name, Helen's call -- consistent with crème de X.
-#
-# LOWERCASED 2026-08-26. `Lavender-forward` and `Warm-spiced` were the only
-# two capitalised descriptive bitters, sitting among nine lowercase ones. Same
-# rule Helen applied to the gin styles the same day: a proper noun keeps its
-# capital (Créole does), a description does not.
-#
-# ONE LAVENDER AGAIN SINCE 2026-09-04, and it is Helen's third and final word
-# on a question this file has now answered three ways. #451 merged the two;
-# 2026-08-26 split them again ("lavender bitters is fine"); asked once more with
-# the Bee's Knees in front of her she ruled: "the generic should be
-# 'lavender-forward bitters', and Bob's Margarita bitters is an example of this
-# I reach for. I don't own 'lavender bitters' but I expect I will at some point,
-# and they would be an example of 'lavender-forward bitters' too."
-#
-# So the SUBSTITUTABILITY argument that split them in August is answered rather
-# than overruled: a plain lavender bitters and Bob's Margarita really are
-# different, and both are lavender-forward, so the difference is which bottle
-# you pour -- which is a `suggestion`, and never a generic. `lavender bitters`
-# is in retired_bitters at the bottom; the Bee's Knees is retyped.
-#
-# `margarita bitters` HAS NO DRINK AND STAYS -- Helen, 2026-09-25 (#1186):
-# "Please keep all the others." Declared ahead of a drink, as a spec. (Bob's
-# Margarita Bitters, the bottle, sits under `lavender-forward bitters`, which
-# is the category the one drink that pours it asks for.)
+# Every flavour by name, as the crèmes are. A description is lowercase and a
+# proper noun keeps its capital (Créole). One lavender generic: a plain
+# lavender bitters is a bottle under `lavender-forward bitters`.
 bitters:
   - "aromatic bitters"
   - "orange bitters"
-  # SAME SHAPE AS `lavender-forward bitters`, 2026-09-14 (#984's Peach Me).
-  # Angostura orange bitters needed a bottle, and `Angostura` was already
-  # declared under `aromatic bitters` -- a bottle name is unique across
-  # bottles.yml, so it could not also sit under plain `orange bitters`.
-  # Helen's ruling: a new generic, `Angostura orange bitters` its own bottle.
+  # A bottle name is unique across bottles.yml and `Angostura` is the aromatic
+  # one, so Angostura's orange bitters has this generic of its own.
   - "orange-forward bitters"
   - "Créole bitters"
   - "chocolate bitters"
   - "tiki bitters"
   - "lavender-forward bitters"
   - "peppermint bitters"
-  # THREE MORE, 2026-10-07, the Difford's batch -- each asked of Helen as "add
-  # it the way `margarita bitters` is?" and each answered "yes". All three are
-  # optional in their drinks. `daiquiri bitters` is Difford's own product
-  # (French Daiquiri, Scandinavian Daiquiri) and is named for the drink it is
-  # made for, as `margarita bitters` is; `grapefruit bitters` (Pompanski
-  # Martini) and `peach bitters` (Woo Woo) are named by flavour.
+  # `daiquiri bitters` is named for the drink it is made for, as `margarita
+  # bitters` is; the other two are named by flavour.
   - "daiquiri bitters"
   - "grapefruit bitters"
   - "peach bitters"
@@ -1725,34 +708,12 @@ bitters:
   - "margarita bitters"
   - "pimento bitters"
 
-# =============================================================================
-# SWEETENERS, JUICES, FRUIT
-# =============================================================================
+# === SWEETENERS, JUICES, FRUIT ===
 
-# A SUGAR SYRUP IS NAMED BY ITS SUGAR, 2026-09-04. Helen: "Most 'sugar syrup'
-# means 'cane sugar syrup', possibly all. Sometimes I say 'demerara sugar syrup'
-# when I mean that. Let's standardise this please." So the sugar is IN the
-# generic on all three -- `sugar syrup 1:1` -> `cane sugar syrup 1:1`, `sugar
-# syrup 2:1` -> `cane sugar syrup 2:1`, `demerara syrup` -> `demerara sugar
-# syrup` -- and the old names are in `retired_syrups` at the bottom pointing at
-# the new ones.
-#
-# HER OWN BATCH HAD ALREADY WRITTEN IT. "Cane sugar syrup 2:1" appears five
-# times in the drinks she typed the same day, which is the collection saying
-# what the vocabulary had not: the word was never optional, it was implied, and
-# an implied word is one a reader has to already know.
-#
-# THE CARD IS UNCHANGED, which is what makes this cheap: both cane forms still
-# read `sugar syrup` on a card (see `card_names`, and the reasoning there is
-# Helen's own), and `demerara sugar syrup` reads `demerara syrup`. The longer
-# name is a RECIPE-LINE fact -- §9.10.1's rule that a card name may be lossy and
-# a recipe line may not.
-#
-# 1:1 AND 2:1 ARE SEPARATE GENERICS. "Simple syrup" means 1:1. Only 2 of 27
-# entries state a ratio, and syrup-to-citrus volume CANNOT tell them apart -- a
-# declared 1:1 (Daisy de Santiago) and a declared 2:1 (Long Island) both sit at
-# 0.50, because Helen adjusts sugar deliberately. See MANUAL §9.4.1: the site
-# is canon and she deviates in the kitchen.
+# A sugar syrup is named by its sugar and its ratio (#594); the card name
+# drops both (`card_names`). 1:1 and 2:1 are separate generics, and "simple
+# syrup" means 1:1. Syrup-to-citrus volume cannot tell the two apart, because
+# Helen adjusts sugar deliberately (MANUAL §9.4.1).
 syrups:
   - "cane sugar syrup 1:1"
   - "cane sugar syrup 2:1"
@@ -1762,10 +723,6 @@ syrups:
   - "ginger syrup"
   - "passion fruit syrup"
   - "cinnamon syrup"
-  # TWO MORE FLAVOURED SYRUPS, 2026-10-07, the Difford's batch. Both are Monin
-  # bottles in the source. `pineapple syrup` (Cyrano): "yes". `hazelnut syrup`
-  # (Electro Batida) is Difford's "roasted hazelnut syrup" -- asked whether to
-  # keep the "roasted", Helen: "hazelnut syrup".
   - "pineapple syrup"
   - "hazelnut syrup"
   - "agave syrup"
@@ -1775,152 +732,66 @@ syrups:
   - "lime cordial"
   - "ginger and lemongrass cordial"
 
-# ONE FLAT `honey water` SINCE 2026-09-04, and the ratio is gone from the name.
-# Helen: "Honey: one flat honey syrup please, because I don't think I'll often
-# request a specific type. Acacia is a bit special." -- and then, an hour
-# later, on seeing `honey syrup` and `honey water` side by side: "I actually
-# prefer water and should have said so earlier." So the WORD stays as the
-# collection always had it and only the ratio goes.
-#
-# THIS REVERSES 2026-08-26, WHICH IS WORTH SAYING PLAINLY. That day the ratio
-# was ruled always-stated, on the argument that a diluted honey and a
-# twice-concentrated one are poured at different volumes for the same
-# sweetness -- the same argument that keeps `sugar syrup 1:1` and `sugar syrup
-# 2:1` apart, and it is still true of the sugar syrups. What changed is her
-# answer to how often she will ASK for one rather than the other: not often. So
-# the distinction went to where the collection was already keeping it -- the
-# `item` line and the drink's own note, which is where island-of-martinique's
-# "Honey water 2:1 (clover)" has said it all along.
-#
-# THE RATIOS CAME BACK THE NEXT DAY, 2026-09-04 evening, AND THE FLAT ONE
-# STAYED. Helen, on the Bee's Knees: "Bee's Knees needs to say honey water 2:1.
-# I'm sorry if I said the wrong thing about this before, but I really do need
-# that generic here." So this is not a reversal of the paragraph above -- it is
-# the paragraph above plus a case it did not cover. THREE GENERICS:
-#
-#   `honey water`      THE DEFAULT, for a drink where the ratio does not
-#                      matter -- which is most of them, and is exactly what she
-#                      ruled in the afternoon. Six of the seven honey drinks
-#                      keep it.
-#   `honey water 1:1`  for a drink where the ratio DOES matter and is 1:1.
-#   `honey water 2:1`  the same, at 2:1. The Bee's Knees is the one that asked.
-#
-# ONE CARD NAME, `honey water`, FOR ALL THREE, so the card is unaffected either
-# way -- §9.10.1's rule, that a ratio is a MAKING fact and not a CHOOSING fact,
-# is what makes three generics cost the index nothing. Both `card_names` rows
-# are back and so is the `card_names_may_collide` permission that covers them.
-#
-# ONLY THE BEE'S KNEES WAS RETYPED. The other six honey drinks stay flat: she
-# named one drink, and retyping the rest into a ratio nobody stated would be
-# inventing the very fact the flat generic exists to not claim.
-#
-# BARE `honey` SURVIVES AND IS NOT THE SAME THING -- Helen, same conversation,
-# on the pear Bellini: it "really does use plain honey, cooked into a syrup on
-# the stove with the fruit". So `honey` is the raw thing you cook WITH (the
-# Bellini's pear, honey and thyme syrup, weighed in grams) and `honey water` is
-# the ready-made pour. Acacia versus clover remains a bottle on the shelf and
-# therefore a `suggestion`, which is the 2026-08-26 half that stands: the
-# bottle dictionary declares `Acacia honey` and the drinks point at it.
+# `honey water` is the default, for a drink whose ratio does not matter, and
+# is in `hers_to_apply`; the ratioed ones are for a drink where it does. All
+# of them read `honey water` on a card. Bare `honey` is the raw thing you cook
+# with. Acacia versus clover is a bottle, so a `suggestion`.
 honeys:
   - "honey"
   - "honey water"
   - "honey water 1:1"
   - "honey water 2:1"
-  # A THIRD RATIO, 2026-10-07, for Three Dots and a Dash, whose Difford's source
-  # says "honey syrup (3 parts honey to 1 water by weight)". Offered the flat
-  # `honey water` with the ratio in a note instead, Helen: "yes, add 3:1".
   - "honey water 3:1"
 
-# DELIBERATELY MIXES FORM WITH TYPE, and the reasoning is a browsing one rather
-# than a purity one -- Helen: "if I don't have a sugar cube I won't make a
-# Classic Champagne Cocktail". A cube can also be brown; Arrack Punch uses 16
-# demerara cubes. So form and type really are orthogonal here.
-# Her revisit clause: "if having this many turns out to feel mad once I'm using
-# the site, then we can revisit."
+# Deliberately mixes form with type: a cube can also be brown, and a drink can
+# depend on having a cube at all.
 sugars:
   - "white sugar"
   - "raw sugar"
-  # Added 2026-08-26. The Pear/Apricot Bellini was typed `molasses sugar`,
-  # which is nearly muscovado -- a long way from a light unrefined caster, and
-  # it would have coloured a pale fruit syrup wrong. Helen's call was its own
-  # generic rather than folding it into `raw sugar`, which is consistent with
-  # this list's stated willingness to mix form with type.
+  # Its own generic, not folded into `raw sugar`: a light unrefined caster, a
+  # long way from `molasses sugar`.
   - "golden caster sugar"
   - "molasses sugar"
   - "palm sugar"
   - "sugar cube"
 
-# "FRESH" IS NOT PART OF THE GENERIC. Freshly squeezed is implied for every
-# juice, and `lime cordial` being named separately is what makes the
-# implication safe. Helen is writing this up on an About page.
+# "Fresh" is not part of the generic: freshly squeezed is implied for every
+# juice, and `lime cordial` being named separately is what makes that safe.
 juices:
   - "lime juice"
   - "lemon juice"
   - "orange juice"
-  # NEW 2026-10-07, for Succulent Blood: "yes", on the precedent of the three
-  # grapefruits -- a variety earns a name when it changes what you are making.
+  # A variety earns a name when it changes what you are making.
   - "blood orange juice"
   - "pineapple juice"
   - "grapefruit juice"
-  # RUBY IS A SECOND GENERIC, NOT A NOTE -- Helen, 2026-09-07, settling how
-  # Pic-a-de-Crop Punch should record what its source states. Ruby grapefruit is
-  # sweeter and much less bitter than white, which is the rum-styles test: a
-  # difference earns a name when it changes what you are making. The cost, and
-  # she took it knowingly, is that the index filters and excludes the two
-  # separately -- "no grapefruit tonight" has to name both.
+  # Sweeter and much less bitter than white, so a second generic. The cost is
+  # that the index filters and excludes each grapefruit separately.
   - "ruby grapefruit juice"
-  # A THIRD GRAPEFRUIT, 2026-10-07, for Pompanski Martini and Smoky Tears.
-  # Asked which of the two above a pink one is, Helen: "pink grapefruit juice
-  # is a new thing." The cost she accepted for ruby applies again: "no
-  # grapefruit tonight" now has to name three.
   - "pink grapefruit juice"
   - "cranberry juice"
-  # NEW 2026-10-07, for Woo Woo and Mexico City, whose Difford's source pours
-  # "cranberry juice drink". Offered `cranberry juice`, Helen: "cranberry juice
-  # drink needs to be a new generic." It is the sweetened, diluted carton --
-  # the bottle declared under `cranberry juice` is Biona's UNSWEETENED juice,
-  # and the two are not substitutes in a drink that counts on the sugar.
+  # The sweetened, diluted carton. Not a substitute for `cranberry juice`,
+  # which is unsweetened, in a drink that counts on the sugar.
   - "cranberry juice drink"
   - "apple juice"
 
-# "FRESH" MADE EXPLICIT ON THE PAGE -- #707. The comment above says freshly
-# squeezed is implied for every juice; Helen decided four of them should say
-# so out loud on the drink page: "they should all display like 'fresh lime
-# juice'." `_layouts/cocktail.html` prefixes the ingredient headline with
-# "fresh " for a generic named here.
-#
-# A SUBSET OF `juices:` ABOVE, NOT A NEW SOURCE OF GENERIC VALUES -- every
-# member must already be declared there, so this cannot mint a generic nothing
-# pours. Registered in `NOT_GENERIC_LISTS` (tests/test_cocktails.py, #930) for
-# exactly that reason.
-#
-# RUBY GRAPEFRUIT JUICE IS LEFT OUT, DELIBERATELY. It is squeezed the same way
-# and sits in the same `freshly squeezed fruit juice` shelf (below), but #707
-# names four juices and ruby grapefruit is its own generic (2026-09-07,
-# above) that the issue never mentioned -- widening the list is Helen's call,
-# not an inference from a shelf grouping.
-#
-# CARDS DO NOT SAY "FRESH". §9.10.1: a card is a lossy scan that shows the
-# shortest name that tells you what the drink is LIKE, and nobody filters a
-# card by freshness -- it would only cost budget (#776) on an already tight
-# name. `_plugins/cocktail_card_ingredients.rb` is untouched.
+# The drink page prefixes these with "fresh " (#707); a card does not. A
+# subset of `juices:`, declaring nothing new, so it is named in
+# NOT_GENERIC_LISTS. Widening it is Helen's call: the other squeezed juices
+# are left out on purpose.
 always_fresh:
   - "lime juice"
   - "lemon juice"
   - "orange juice"
   - "grapefruit juice"
 
-# THE OPPOSITE WARNING -- #707: "pineapple juice should always carry the note
-# 'Don't use fresh.'" A STANDING note, Helen's rather than a drink's own, so a
-# pour with no `note:` of its own still gets it and one that has a note gets
-# both, the drink's own first (`_layouts/cocktail.html`). A MAPPING, not a
-# list, so `_declared_generics` (tests/test_cocktails.py) skips it on shape
-# alone -- it names existing generics as KEYS rather than declaring new ones,
-# same reason `card_names` below needs no entry in `NOT_GENERIC_LISTS`.
+# A standing note (#707): the drink page prints it on every line of this
+# generic, after the drink's own note if it has one. A mapping keyed by
+# existing generics, so it declares none.
 standing_notes:
   "pineapple juice": "Don't use fresh."
 
-# FRUIT IS NOT JUICE. You muddle one and pour the other, and a Caipirinha made
+# Fruit is not juice. You muddle one and pour the other, and a Caipirinha made
 # with lime juice is a different drink.
 fruit_and_herbs:
   - "lime"
@@ -1931,57 +802,27 @@ fruit_and_herbs:
   - "pear"
   - "dried apricots"
   - "lemon zest"
-  # NEW 2026-10-07, for Cyrano, which muddles "a large coin-sized lime zest
-  # twist, thick cut with some of the fruit's flesh on the skin (Ti'
-  # Punch-style)" in the glass. Helen's line for it, whole: "1 thick coin, lime
-  # zest with flesh" -- so `thick coin` is the unit (`measures:` above) and the
-  # flesh is in the name, because it is what makes this not a twist.
+  # The flesh is in the name because it is what makes this not a twist.
   - "lime zest with flesh"
   - "mint"
   - "basil"
   - "rosemary"
   - "fruit purée"
-  # #984's Peach Me muddles a whole cherry and a whole orange slice as
-  # ingredients, not garnishes -- the garnish vocabulary already has
-  # `maraschino cherry` and `orange slice`/`orange crescent`, but nothing here
-  # covered the same objects poured rather than perched on the rim.
-  #
-  # `orange slice`, NOT `citrus slice`, SINCE 2026-09-15 (#1079). The first
-  # version coined a fruit-agnostic `citrus slice` on the argument that a slice
-  # muddled for its oil and juice is the same act whichever citrus it is.
-  # Helen: "'citrus slice' shouldn't be the generic because citrus fruits
-  # aren't interchangeable." A muddled slice names its fruit, the same as the
-  # garnish forms do; a second citrus gets its own generic when a drink pours it.
+  # Muddled as ingredients, not garnishes. A muddled slice names its fruit
+  # (#1079): citrus fruits are not interchangeable.
   - "maraschino cherry"
   - "orange slice"
-  # Both from East River Underground, which muddles them and then garnishes
-  # with them again. Helen, 2026-08-31: "Cucumber and kaffir lime leaves will
-  # need to go in the dictionary naked" -- bare, no qualifier, because neither
-  # is a form of anything already here.
-  #
-  # `kaffir lime leaves` is NOT a variety of `lime`, which is the fruit you
-  # muddle. The leaf is an aromatic and tastes nothing like the fruit, so the
-  # two must not collapse -- excluding one would otherwise silently drop drinks
-  # built on the other.
+  # `kaffir lime leaves` is not a variety of `lime`: the leaf is an aromatic,
+  # and excluding one must not drop drinks built on the other.
   - "cucumber"
   - "kaffir lime leaves"
 
 other:
   - "soda water"
-  # NEW 2026-09-20, for the Moscow Mule (#1068) and Dark 'n' Stormy (#1069),
-  # both Difford's. Helen: "Ginger Beer is a new ingredient, no category, so
-  # that's the name." Declared as its own thing rather than filed under a
-  # ginger syrup or liqueur, which it is not: the nearest declared generics
-  # (`ginger syrup`, `ginger liqueur`, a cordial) are all different pours. A
-  # top, like `soda water` and `cola`, so it shelves with them.
+  # Its own thing, not a ginger syrup or liqueur. A top, like `soda water`.
   - "ginger beer"
-  # NEW 2026-10-07, for Electro Batida (90 ml) and Dead Parrot Colada (45 ml),
-  # both Difford's. Helen: "yes". A measured pour in both, not a top, so it
-  # shelves in the larder beside the coconut cream rather than with the tops.
+  # Measured, not a top, so it shelves in the larder.
   - "coconut water"
-  # TWO MORE, 2026-10-07, the Difford's batch. `birch water` (Eccentrica
-  # Daiquiri, 30 ml): "yes". `natural yoghurt` (Ramos Greek Fizz, two barspoons)
-  # -- offered `yoghurt`, Helen: "natural yoghurt".
   - "birch water"
   - "natural yoghurt"
   - "water"
@@ -1989,63 +830,28 @@ other:
   - "espresso"
   - "cola"
   - "coconut cream"
-  # NEW 2026-09-25 (#1108), FOR FANNY CHU'S PIÑA COLADA, and the name is
-  # Helen's own: asked what the draft's `QQ Coco mix (3:1, Coco Lopez to
-  # coconut milk)` pour should be, she wrote the generic exactly so. It is a
-  # MADE mix -- Coco Lopez (sweetened cream of coconut) loosened with coconut
-  # milk, three to one -- and is not `coconut cream` beside it, which is the
-  # unsweetened tin; the draft's own note says Coco Lopez stands in for half
-  # coconut cream and half 2:1 syrup. The ratio is in the name for the reason
-  # `cane sugar syrup 2:1` carries one: it is a making fact, and a recipe line
-  # may be long. Priced as made-not-bought in costs.yml; 0% in abv.yml.
-  # THE COMMA AFTER `3:1` WENT ON 2026-10-02 (#1255), Helen's respelling.
+  # A made mix: Coco Lopez (sweetened cream of coconut) loosened with coconut
+  # milk. Not `coconut cream`, which is the unsweetened tin (#1108).
   - "Coco mix (3:1 Coco Lopez to coconut milk)"
   - "egg white"
   - "salt"
-  # HELEN'S ANSWER, 2026-09-28, to the `QQ ground cinnamon` on the Milliners
-  # Punch: "Please add sprinkle!" She sprinkles it over the lit lime shell, so
-  # it is a real pour with a real (unmeasured) amount -- `(sprinkle)` -- and
-  # not a garnish: `grated nutmeg` and `cinnamon stick` are garnishes because
-  # they sit ON the finished drink, and this goes onto a flame.
-  #
-  # FILED BESIDE `salt` IN EVERY RESPECT, because it is the same kind of thing:
-  # a dry larder seasoning, on the `larder` shelf, in `not_on_cards` so it does
-  # not take a slot on a card from a real ingredient, and priced at zero under
-  # Helen's 2026-09-05 ruling that a seasoning is not a cost. Its amount is in
-  # `excluded_units`, so it reaches no arithmetic either way.
+  # Sprinkled onto a flame, so an ingredient with the amount `(sprinkle)` and
+  # not a garnish. Filed as `salt` is: the larder shelf and `not_on_cards`.
   - "ground cinnamon"
   - "cider vinegar"
-  # 2026-09-05, arriving with the Mastiha Mojito, which floats five drops on
-  # top. It had been living in `garnish` as "5 drops of olive oil" -- a pour
-  # with an amount, sitting in the field for things that are not poured, where
-  # nothing could count it. `other` is where this collection keeps the pours
-  # that are neither juice nor syrup nor alcohol.
+  # A measured ingredient, not a garnish: `other` holds what is neither juice,
+  # syrup nor alcohol.
   - "olive oil"
-  # THE THREE BELOW HAVE NO DRINK, ON PURPOSE, and they are declared for the
-  # reason this file already declares Plymouth, New Western dry gin and genever
-  # while owning none of them: it is a SPEC, not an inventory. (`cream` and
-  # `milk` have drinks since 2026-09-14 and 2026-09-20; `whole egg` still has
-  # none and STAYS -- Helen, 2026-09-25, #1186: "Please keep all the others.")
-  #
-  # They are what `pudding in a glass` is made of -- taxonomy.yml's
-  # `mood_ingredients.rich` -- and that mood is likewise declared with zero
-  # members, pending the whole flips-and-Alexanders family in #337. Until
-  # 2026-08-30 the derivation named all three and the vocabulary declared none,
-  # so the mood could not have fired even once a drink arrived, and nothing
-  # anywhere would have said why.
-  #
-  # `egg white` above is a different ingredient and not a substitute: it does
-  # FOAM, not richness, which is why the Gin Sour is not a pudding.
+  # With `coconut cream`, what `mood_ingredients.rich` in taxonomy.yml is made
+  # of. `egg white` is not a substitute: it gives foam, not richness.
   - "cream"
   - "milk"
   - "whole egg"
 
-# =============================================================================
-# GENERIC -> FAMILY. Bases only.
-# =============================================================================
-# A generic absent from here has no family, which is correct for lime juice and
-# every other modifier -- nobody excludes "all juices". A BASE absent from here
-# is a gap, and `family_less` records a deliberate one with its reason.
+# === GENERIC -> FAMILY. Bases only. ===
+# A generic absent from here has no family, which is correct for every
+# modifier. A base absent from here is a gap, unless `family_less` records it
+# with its reason.
 family_of:
   "moderately aged Jamaican rum": rum
   "caramel-forward Jamaican rum": rum
@@ -2129,42 +935,13 @@ family_of:
   "Galliano": herbal
   "Becherovka": herbal
 
-# =============================================================================
-# THE SHOPPING SHELF -- what order a shopping list reads in. #848
-# =============================================================================
-# Helen, 2026-09-08: "for cocktail shopping list, list items in shelf order then
-# volume", and she gave the order. `fortified` is the one addition, on her
-# ruling the same day, because her list had nowhere for vermouth to go and
-# vermouth is in a lot of drinks.
-#
-# IT IS A SHOPPING ORDER, NOT A TAXONOMY, and that is why it is a second map
-# rather than more columns on `family_of`. A family says what a spirit IS; a
-# shelf says where you find it and in what order you would rather read it.
-# The two disagree on purpose in three places: an amaro and a herbal liqueur
-# are different FAMILIES and one shelf, champagne is `fortified` by family and
-# sits under `tops` here because that is what you do with it, and the sugars
-# share a shelf with the syrups because they do the same job in a drink.
-#
-# EVERY DECLARED GENERIC HAS A ROW. A generic with none falls to the end of the
-# list rather than breaking it -- the sort treats an unknown shelf as "last" --
-# but that is a silent degradation, so a new generic gains a row here in the
-# same commit that introduces it. tests/test_cocktails.py refuses a declared
-# generic with no row, a row for an undeclared one, and a shelf that
-# `shopping_shelves` does not list (#1175).
-#
-# FRESH PRODUCE EARNED ITS OWN SHELF ON THE FIRST READING -- Helen, 2026-09-08:
-# "Fresh produce should get its own shelf, I agree." It was the soft edge of the
-# first cut, where a pear, a cucumber and a sprig of mint sat under
-# `larder` with the oil and the salt, and that shelf was carrying 24
-# rows against every other shelf's handful.
-#
-# IT SITS BEFORE THE SQUEEZED JUICES, because the citrus you squeeze IS produce
-# and this puts the fresh things together. One line to move if a real list reads
-# better with it first.
-#
-# `dried apricots` DELIBERATELY DID NOT MOVE. Dried fruit is a dry good and
-# belongs with the store cupboard; `lemon zest` DID, because what you buy for it
-# is a lemon.
+# === THE SHOPPING SHELF: the order a shopping list reads in (#848) ===
+# A shopping order, not a taxonomy, so a second map and not more columns on
+# `family_of`: an amaro and a herbal liqueur are two families and one shelf,
+# and the sugars shelve with the syrups. Every declared generic has a row,
+# on a shelf listed here: test_every_declared_generic_is_on_a_shopping_shelf.
+# `dried apricots` is larder, a dry good; `lemon zest` is fresh produce,
+# because what you buy for it is a lemon.
 shopping_shelves:
   - spirits
   - fortified
@@ -2178,7 +955,7 @@ shopping_shelves:
   - tops
 
 shelf_of:
-  # spirits (52)
+  # spirits
   Batavia arrack: spirits
   Clairin Casimir: spirits
   Clairin Communal: spirits
@@ -2236,7 +1013,7 @@ shelf_of:
   speciality: spirits
   vanilla vodka: spirits
   vodka: spirits
-  # fortified (11)
+  # fortified
   americano: fortified
   amontillado sherry: fortified
   blanc vermouth: fortified
@@ -2250,7 +1027,7 @@ shelf_of:
   sweet vermouth: fortified
   tawny port: fortified
   ruby port: fortified
-  # liqueurs (42)
+  # liqueurs
   Amaro Ciociaro: liqueurs
   Amaro Nonino: liqueurs
   Aperol: liqueurs
@@ -2297,7 +1074,7 @@ shelf_of:
   tomato liqueur: liqueurs
   triple sec: liqueurs
   white crème de cacao: liqueurs
-  # freshly squeezed fruit juice (5)
+  # freshly squeezed fruit juice
   grapefruit juice: freshly squeezed fruit juice
   lemon juice: freshly squeezed fruit juice
   lime juice: freshly squeezed fruit juice
@@ -2305,12 +1082,12 @@ shelf_of:
   blood orange juice: freshly squeezed fruit juice
   ruby grapefruit juice: freshly squeezed fruit juice
   pink grapefruit juice: freshly squeezed fruit juice
-  # bottled fruit juice (4)
+  # bottled fruit juice
   apple juice: bottled fruit juice
   cranberry juice: bottled fruit juice
   cranberry juice drink: bottled fruit juice
   pineapple juice: bottled fruit juice
-  # fresh produce and larder (30)
+  # fresh produce and larder
   "Coco mix (3:1 Coco Lopez to coconut milk)": larder
   basil: fresh produce
   black tea: larder
@@ -2346,7 +1123,7 @@ shelf_of:
   salt: larder
   water: larder
   whole egg: larder
-  # sugar syrup (22)
+  # sugar syrup
   agave syrup: sugar syrup
   "cane sugar syrup 1:1": sugar syrup
   "cane sugar syrup 2:1": sugar syrup
@@ -2372,7 +1149,7 @@ shelf_of:
   "turbinado sugar syrup 2:1": sugar syrup
   vanilla syrup: sugar syrup
   white sugar: sugar syrup
-  # bitters (15)
+  # bitters
   Créole bitters: bitters
   aromatic bitters: bitters
   chocolate bitters: bitters
@@ -2388,17 +1165,14 @@ shelf_of:
   tiki bitters: bitters
   warm-spiced bitters: bitters
   wood smoke bitters: bitters
-  # tops (5)
+  # tops
   champagne: tops
   cola: tops
   ginger beer: tops
   prosecco: tops
   soda water: tops
 
-# Bases with NO family, deliberately. Same idea as
-# tests/test_reference_data.py's NO_TEMPERATURE_BECAUSE: a decision with its
-# reason attached, so "why is this not groupable?" is answered in the repo
-# rather than in someone's memory.
+# Bases with no family, deliberately, each with its reason.
 family_less:
   "coconut-flower arrack": >-
     Coconut flower sap, sharing only a name with Batavia arrack. Used once, in
@@ -2414,20 +1188,10 @@ family_less:
     never as a base. Same reasoning: give it a family if a drink ever builds
     on it.
 
-# =============================================================================
-# RETIRED -- removed actively, not merely deprecated
-# =============================================================================
-# Same treatment _data/food/taxonomy.yml gives retired_star_ingredients, and
-# for the same reason: a value that used to mean something silently blends into
-# the "not declared" pile unless something names it.
-#
-# EVERY `retired_*` MAPPING IN THIS FILE IS READ, not just the rum one.
-# tests/test_cocktails.py used to name `retired_rum_styles` literally, so this
-# second block would have been invisible to it and a drink still saying
-# `flavoured` would have failed as "undeclared generic" -- exactly the silent
-# blending-in that these blocks exist to prevent, arriving through the test
-# rather than the data. The tests now derive the set from the `retired_`
-# prefix, the same way `_declared_generics` derives from the file's shape.
+# === RETIRED: removed actively, not merely deprecated ===
+# A value that used to mean something must not blend into the "not declared"
+# pile. Every `retired_*` mapping in this file is read, found by its prefix:
+# test_no_drink_uses_a_retired_generic.
 retired_rum_styles:
   "Planteray Stiggins' Fancy": >-
     was permitted as a generic because nothing generalised it. Something does:
@@ -2449,20 +1213,8 @@ retired_rum_styles:
   dark: >-
     same reason again, and the most misleading of the three: a dark rum may be
     Jamaican caramel-forward, Demerara aged, or a blackstrap. Issue #314.
-  # --- ADDED 2026-09-05. THESE HAD NO RETIREMENT ENTRY AND SO NOTHING CAUGHT
-  # THEM. #314 says navy "has been split out case by case and should not be
-  # re-admitted", and its closing comment confirms "no `navy` anywhere in the
-  # file" -- which was true of the STYLE LIST and false of the collection: six
-  # pours still say "Navy rum" or "Overproof Navy rum" in `item`. A term ruled
-  # out of existence with no retirement entry cannot fail loudly, because there
-  # is nothing for it to fail against. Helen, 2026-09-05: "there is no such
-  # thing as navy rum or overproof navy rum" and "there's no such thing as black
-  # rum, even though it will often be requested by other people's recipes."
-  #
-  # THE LAST CLAUSE IS WHY THESE STAY FOREVER. Unlike `light`/`gold`/`dark`,
-  # which were once OUR vocabulary, these are other people's and will keep
-  # arriving in every ingested source. The entry is not a tombstone, it is a
-  # permanent inbound filter.
+  # Other people's vocabulary, which keeps arriving in ingested sources: the
+  # three below are a permanent inbound filter, not tombstones.
   navy: >-
     not a category. It describes strength and a naval-rations heritage, not
     production, and the bottles wearing the word land in three different real
@@ -2493,11 +1245,6 @@ retired_rum_styles:
     it. Don's Own Grog and Georgetown Punch already have this shape.
 
 retired_honeys:
-  # `honey water` (bare) sat here from 2026-08-26 -- "the ratio is now always
-  # stated, as it always was for sugar syrup" -- and came OFF this list on
-  # 2026-09-04 when Helen retired the ratios instead (see the `honeys` block
-  # above). A generic cannot be both live and retired, and the guard that
-  # reads this list said so within the hour.
   "Honey water 2:1": >-
     capitalisation only -- it is `honey water 2:1` now, matching `sugar syrup
     2:1` and every other lowercase commodity in this file. It sat two lines
@@ -2508,22 +1255,7 @@ retired_honeys:
     a varietal, not a category. Folded into `honey`, with acacia carried as a
     `suggestion` -- the file's own rule that a preferred bottle is a
     suggestion and never a generic. Helen, 2026-08-26.
-  # `honey water 1:1` AND `honey water 2:1` SAT HERE FOR ONE AFTERNOON, retired
-  # on 2026-09-04 in favour of a flat `honey water`, and came OFF again the same
-  # evening. Helen, on the Bee's Knees: "Bee's Knees needs to say honey water
-  # 2:1. I'm sorry if I said the wrong thing about this before, but I really do
-  # need that generic here." Both are live generics in `honeys` above, BESIDE
-  # the flat one, which is the default for a drink where the ratio does not
-  # matter. A generic cannot be both live and retired, so they cannot stay here.
 
-# NEW BLOCK 2026-09-04. A SUGAR SYRUP IS NAMED BY ITS SUGAR -- Helen: "Most
-# 'sugar syrup' means 'cane sugar syrup', possibly all. Sometimes I say
-# 'demerara sugar syrup' when I mean that. Let's standardise this please."
-#
-# All three names had users -- 43 ingredient lines across 43 drinks -- so unlike
-# the three whisky renames this block WILL fire if a drink is missed, which is
-# the point of writing it rather than trusting the pass. The full reasoning is
-# on `syrups` above.
 retired_syrups:
   "sugar syrup 1:1": >-
     the sugar is in the name now. It is `cane sugar syrup 1:1` -- Helen,
@@ -2540,9 +1272,6 @@ retired_syrups:
     that." The CARD still reads `demerara syrup`, because at card distance
     `demerara` is the whole fact; the long form is the recipe line's.
 
-# NEW BLOCK 2026-09-04, and it exists for the same reason as every other one:
-# `full-strength clear fruit brandy` meant something for thirteen days and must
-# not blend into the not-declared pile now that it does not.
 retired_brandy_styles:
   "full-strength clear fruit brandy": >-
     invented for Bali Hai on 2026-08-22 "for now", against the day someone
@@ -2552,8 +1281,6 @@ retired_brandy_styles:
     either would do, the #441 list shape -- and this style, which had exactly
     one user, is describing nothing. Both new names are in `brandy_styles`.
 
-# NEW BLOCK 2026-09-04. One lavender, not two -- see the comment on `bitters`.
-# Punt e Mes, and the argument that kept it until 2026-09-05.
 retired_fortified_and_aromatised:
   "Punt e Mes": >-
     demoted to a BOTTLE under `sweet vermouth`, Helen 2026-09-05. It had been
@@ -2585,11 +1312,6 @@ retired_bitters:
     `suggestion`. Re-type as `lavender-forward bitters`; the Bee's Knees was
     its only user.
 
-# Renamed 2026-08-27 for correctness (Helen: "apply correctness rather than the
-# fudge of dropping the word"). All three were used by ZERO drinks, so nothing
-# broke and nothing here will ever fire -- kept anyway, because a name that used
-# to mean something must not blend into the not-declared pile, and the next
-# reader should find out these were renamed rather than invented.
 retired_whisky_styles:
   "peated Scotch": >-
     peat is ORTHOGONAL to single-malt-versus-blended -- a peated single malt is

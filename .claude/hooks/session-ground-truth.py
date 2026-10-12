@@ -1,54 +1,26 @@
 #!/usr/bin/env python3
 """Tell a starting session where it actually is, before it assumes.
 
-WHY THIS EXISTS. Helen, 2026-09-21, of a list of devops suggestions:
-*"Yes please let's do this."* Every other hook in this directory REFUSES
-something. Not one of them ever told a session a fact. That asymmetry is the
-gap this fills, and `CLAUDE.md` had been compensating for it with prose:
+`/workspace` is a bind mount of Helen's checkout, so another session, or
+Helen, switching branch moves the ground under a running Claude with no
+signal. A SessionStart hook puts the facts in the first thing a session reads.
 
-    So the question the check answers is not only "am I on `main`" but "am I
-    still where I left off" -- and the answer can be no even when nothing you
-    did changed it.
+It reports the checkout's path, then: the branch, and whether it is `main` or
+detached; how many uncommitted changes are already there; the position against
+`origin/main` as last fetched; and whether the two private drafts clones are
+present, with the command that clones each absent one, since without them most
+of the suite is never collected and a green run says nothing about them.
 
-That paragraph exists because `/workspace` is a bind mount of Helen's checkout,
-so another session -- or Helen -- switching branch moves the ground under a
-running Claude with no signal at all. Prose can only ask a session to remember
-to look. A SessionStart hook makes looking unnecessary: the facts are simply
-there, in the first thing the session reads.
+It makes no network call and runs no fetch: a hook that waits on GitHub delays
+every session start. `origin/main` is read as it stands on disk.
 
-WHAT IT REPORTS, and every line is something a session has got wrong before:
+It never blocks and never fails loudly: every git call is wrapped, and anything
+that goes wrong degrades to a line saying so.
 
-  * THE BRANCH, and whether it is `main`. Commits landed on `main` three times
-    (2026-08-18 twice, 2026-08-20) before `guard-main-branch.py` existed.
-  * WHETHER THE TREE IS DIRTY, and how many files. An uncommitted edit rode
-    into somebody else's branch on 2026-09-08 because nobody looked.
-  * POSITION AGAINST `origin/main`, as last fetched. Not a network call --
-    see below.
-  * WHETHER THE TWO PRIVATE DRAFTS CLONES ARE PRESENT, with the exact commands
-    when they are not. A bare worktree collects 10,660 tests where a complete
-    one collects 30,901, and the skip count FALLS, because most of the missing
-    checks are parametrised per file and are never created at all. That green
-    is true of what it scanned and silent about what it never opened -- the
-    failure mode `conftest.py`'s DRAFTS_PRESENT already fights on one front.
+`additionalContext` gives the report to the model; `systemMessage` shows Helen
+the same text.
 
-IT MAKES NO NETWORK CALL AND RUNS NO FETCH, deliberately. A hook that waits on
-GitHub delays every session start by however long the network takes today, and
-a hook that is slow is one Helen turns off. `origin/main` is read as it stands
-on disk, and the line says "as last fetched" rather than pretending to be
-current. `sh scripts/git-fetch-main.sh` is the session's job, not this hook's.
-
-IT NEVER BLOCKS AND NEVER FAILS LOUDLY. Every git call is wrapped; anything
-that goes wrong degrades to a line saying so, because a broken status report
-must not stop a session starting. `SessionStart` has no permission decision to
-make, so there is nothing here that can refuse anything.
-
-BOTH AUDIENCES GET IT. `additionalContext` puts the facts into the model's
-context, which is the point -- the session KNOWS where it is rather than having
-to ask. `systemMessage` shows Helen the same thing, so she can see at a glance
-that a session started somewhere she did not expect.
-
-Invoked as `python3 .claude/hooks/session-ground-truth.py` so it needs no
-execute bit -- `CLAUDE.md` forbids changing file permissions without asking.
+Invoked as `python3 <path>` so it needs no execute bit.
 """
 from __future__ import annotations
 
@@ -58,33 +30,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-# WHICH REPOSITORY IS THIS ABOUT? -- fixed 2026-09-24, and it reported the WRONG
-# ONE on its first real outing, which is worse than reporting nothing.
-#
-# It used to be `Path(__file__).resolve().parent.parent.parent`, i.e. "the
-# checkout this script was loaded from". Claude Code invokes the hook as
-# `$CLAUDE_PROJECT_DIR/.claude/hooks/session-ground-truth.py`, and in a worktree
-# session $CLAUDE_PROJECT_DIR is the PRIMARY clone -- so the hook opened a
-# session in `.claude/worktrees/opus-improve-devops` by announcing
-# `branch: main`, `1 uncommitted change`, `13 behind`. Every word was true of
-# `/workspace` and none of it was true of the session. The session then read its
-# own hook and nearly acted on it.
-#
-# This is the `--show-toplevel` bug of DECISIONS §1 arriving from the other
-# side: `run.sh` needed the primary clone and was getting the worktree; this
-# needed the worktree and was getting the primary.
-#
-# TWO CHANGES, and the second is the one that makes a future mistake survivable.
-# It now prefers the hook payload's own `cwd`, then the process's, and only then
-# falls back to its own location -- and it asks git for `--show-toplevel` from
-# there, so the answer is whatever git itself would use. And it PRINTS THE PATH
-# in the first line. A fact with no subject attached is what made this
-# misleading rather than merely wrong.
+# The checkout this FILE was loaded from, which is not the session's: Claude
+# Code invokes the hook from $CLAUDE_PROJECT_DIR, and in a worktree session
+# that is the primary clone. So it is only resolve_root's last resort.
 _FALLBACK_ROOT = Path(__file__).resolve().parent.parent.parent
 
-# The two private drafts repos, and the wrapper that clones each. Helen's
-# standing grant, 2026-09-21: clone them into a fresh worktree whenever you
-# want them, no ask, because cloning is reading.
+# The two private drafts repos, as (folder, repository).
 DRAFTS = [
     ("_cocktail_drafts", "helen-triages-cocktails-private"),
     ("_food_drafts", "helen-triages-food-private"),
@@ -107,12 +58,9 @@ def resolve_root(payload: dict) -> Path:
     """The checkout this session is actually working in.
 
     In order of trust: the `cwd` the hook was handed, the process's own cwd,
-    then this file's location. The first two are where the SESSION is; the third
-    is only where this SCRIPT is, which in a worktree is the primary clone and
-    is what made the first version report someone else's branch.
-
-    Each candidate is confirmed by asking git for `--show-toplevel` from it, so
-    the returned path is the one git itself would act on rather than a guess.
+    then this file's location, which in a worktree session is the primary
+    clone. Each candidate is confirmed by asking git for `--show-toplevel`
+    from it, so the returned path is the one git itself would act on.
     """
     candidates = []
     for value in (payload.get("cwd"), os.getcwd()):
@@ -197,10 +145,8 @@ def main() -> int:
         root = resolve_root(payload if isinstance(payload, dict) else {})
         lines = [_branch_line(root), _dirty_line(root), _position_line(root)]
         lines += _drafts_lines(root)
-        # THE PATH IS THE FIRST THING PRINTED, and that is the fix for the
-        # 2026-09-24 bug rather than a nicety: the old report stated a
-        # branch with no subject, so a reader had no way to notice it
-        # described a different checkout.
+        # The path comes first: a branch reported with no subject cannot be
+        # told from a report about a different checkout.
         report = f"Where this session actually is -- {root}:\n" + "\n".join(
             f"  {line}" for line in lines
         )

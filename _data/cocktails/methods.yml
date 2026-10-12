@@ -1,81 +1,37 @@
-# =============================================================================
-# COCKTAIL METHOD STEPS. Spec: GitHub issue #290.
-# =============================================================================
-# A CLOSED VOCABULARY FOR THE MECHANICAL SPINE, FREE TEXT FOR THE REST. The
-# argument for it is not tidiness, it is #290's own: the same one §13.1 makes
-# about the punched-tape mark beating the watercolour washes. A shape that
-# changes every time has to be RE-READ; an identical repeated one becomes
-# something you RECOGNISE. That is exactly the difference between a canonical
-# "Shake all ingredients with ice." and thirteen near-variants of it, and it
-# matters most in the situation Helen named -- people in the house, and thirsty.
+# Cocktail method steps (#290): a closed vocabulary for the mechanical spine,
+# free text for the rest. A step belongs here only if its phrasing carries no
+# information: "with ice" versus "over ice" carries none, "other than the
+# champagne" carries all of it. The informative tail is never canonicalised.
 #
-# THE TEST FOR WHETHER A STEP BELONGS HERE: does its phrasing carry
-# information? "with ice" versus "over ice" carries none. "other than the
-# champagne" carries all of it. So the tail is deliberately NOT canonicalised
-# and never will be -- "Muddle the lime chunks hard with the sugar in the
-# bottom of a shaker until the sugar has dissolved" cannot be collapsed
-# without losing the drink.
-#
-# WHAT THE DATA LOOKED LIKE WHEN THIS WAS WRITTEN, 2026-08-26: 277 steps
-# across 105 drinks, 144 of them distinct. One instruction accounted for 42
-# uses written three ways, and Strain alone had eleven forms.
-#
-# THIS FILE DOES NOT REWRITE ANY DRINK, and nothing here is enforced against
-# the collection. Helen, 2026-08-26, asked for the choice to be recorded
-# rather than taken: "Prefer both, leaving my original too, then I delete
-# whatever I don't want." So `proposals` below holds HER EXACT EXISTING STRING
-# on the left and the suggested canonical form on the right. Deleting a row is
-# how a suggestion gets rejected. Nothing touches a recipe until the map has
-# been pruned -- and a later pass applies only what survives.
-# =============================================================================
+# A change to a drink's step is proposed in `proposals:` and never applied
+# directly (DECISIONS §9.12).
 
 # --- THE SPINE ---------------------------------------------------------------
-# Grouped by verb for reading only. tests/test_cocktails.py derives the flat
-# set from this mapping's shape, so a group added tomorrow is covered
-# tomorrow -- the same reasoning `_declared_generics` uses on ingredients.yml.
+# tests/test_cocktails.py flattens every group, so a new group is covered at
+# once. scripts/build_ingest_vocab.py prints each group key as a heading in
+# the ingest document, so renaming a group renames a heading there.
 canonical:
 
   shake:
     - "Shake all ingredients with ice."
     - "Shake all ingredients hard with ice."
-    # SHAKE WHAT IS IN THE SHAKER, after an earlier build step. Helen's ruling,
-    # 2026-09-01, on sapins-swizzle: "should retain 'shake with ice'". It is
-    # not drift -- it says something the line above does not, so by this file's
-    # own test (does the phrasing carry information?) it belongs here. Declared
-    # rather than left in the tail so the next census does not re-propose
-    # collapsing it: a settled question left looking unsettled gets asked again.
+    # What is already in the shaker, after an earlier build step. Not a
+    # variant of the lines above: do not propose collapsing it.
     - "Shake with ice."
-    # AFTER A RINSE, and the rinse is the reason it is not "all ingredients":
-    # some of the spirit went into the glass and was discarded. Three drinks
-    # rinse, and tailspin and sazerac-death-and-co already said "the remaining
-    # ingredients" while caribbean-sazerac said "the rest" -- Helen's ruling,
-    # 2026-09-01, was to match the two. Both verbs are declared because the
-    # stir form has two live users and the shake form one; this is NOT the
-    # asymmetry noted under `proposals`, where the second form has no user.
+    # After a rinse: some of the spirit went into the glass and was discarded.
     - "Shake the remaining ingredients with ice."
-    # The champagne exclusion is standardised because it is frequent -- eight
-    # uses across shake and stir. The rest of the exclusion tail (Prosecco,
-    # soda, bitters, a named rum) is open-ended and stays free text, which is
-    # why there is no attempt at a general form here.
+    # The champagne exclusion is frequent enough to be a literal. Any other
+    # excluded ingredient is a `shapes.exclusion` sentence below.
     - "Shake all ingredients other than the champagne with ice."
 
-  # SHORT SHAKE IS ITS OWN GROUP, 2026-09-10 (#705). Six drinks short shook in
-  # six wordings, four of them live, and the group the 2026-08-26 census missed
-  # is simply this one. "with three ice cubes" IS the technique -- three cubes
-  # is what makes a shake short -- so by this file's own test the phrase carries
-  # information and every form here says it. The three mirror `shake:` exactly:
-  # all ingredients, the remaining ones after a build, and the bare form for
-  # what is already in the shaker (port-au-prince's, kept for the same reason
-  # sapins-swizzle's "Shake with ice." was). The exclusion form is a SHAPE
-  # below, because the excluded ingredient is the drink's own.
+  # "with three ice cubes" IS the technique: three cubes is what makes a shake
+  # short. The three forms mirror `shake:`.
   short_shake:
     - "Short shake all ingredients with three ice cubes."
     - "Short shake the remaining ingredients with three ice cubes."
     - "Short shake with three ice cubes."
 
-  # DRY SHAKE, 2026-09-10 -- no ice, the egg-white technique. Two drafts say it
-  # (pink-lady, dolores-park-swizzle); "dry" is the whole instruction, so it is
-  # not a variant of `shake:` and must not be proposed into one.
+  # No ice, the egg-white technique. Not a variant of `shake:`.
   dry_shake:
     - "Dry shake all ingredients."
 
@@ -85,44 +41,18 @@ canonical:
     - "Stir all ingredients other than the champagne with ice."
     - "Stir until cold."
     - "Stir."
-    # BUILT IN THE GLASS AND STIRRED, NO ICE YET -- Helen's wording on PR #906,
-    # 2026-09-10, for the Martinique Swizzle's "Combine all in a Collins glass
-    # and stir.": "'Add all ingredients.' doesn't need to be a step on its own.
-    # I'd prefer something more concise." The ice comes in the swizzle step
-    # after it, which is why this is not "with ice".
+    # Built in the glass and stirred before any ice goes in, so not "with ice".
     - "Stir all ingredients together."
 
   blend_and_swizzle:
     - "Blend all ingredients until smooth."
     - "Swizzle until the glass frosts."
-    # Two swizzles finish the same way in two wordings (coffey-park,
-    # dolores-park); this is coffey-park's, and the other is proposed to it.
     - "Add the bitters then swizzle them into the top."
 
-  # STRAIN IS WHERE THE SPRAWL WAS -- eleven distinct forms for what is really
-  # four decisions: how fine, and into what. Note that NAMING THE GLASS is
-  # duplication, not information: the glass is already in the drink's `glass:`
-  # field and renders as an icon. "Fine strain into a chilled coupe" says
-  # coupe twice.
-  # THE STRAIN GROUP IS FIVE STRINGS AND USED TO BE SEVENTEEN — 2026-09-05.
-  #
-  # Every retired one named where the drink LANDS: "Strain into a chilled
-  # glass.", "Strain over crushed ice.", "Strain over two giant ice cubes."
-  # That was the only way to record the ice, because the ice had no field. It
-  # has one now — `serve.ice` — and `tests/test_cocktails.py::
-  # test_serve_ice_is_not_restated_in_the_method` refuses a strain step that
-  # describes the serve, so these strings cannot come back.
-  #
-  # This file's own header asked for it: eleven forms of Strain was the census
-  # that started it, and the answer was a canonical set. The set was still
-  # growing — a "slot for ice pedantry" was added on 2026-09-04 and the group
-  # went from eleven to seventeen — because the vocabulary was absorbing a fact
-  # that belonged in a field. Move the fact, and the vocabulary stops growing.
-  #
-  # HELEN'S `giant ice cube` RULING IS NOT LOST. It moved from a method string
-  # to `ice: "large cube"` in _data/cocktails/serve.yml, where the page renders
-  # it as "Over a large ice cube." Her reason was that she wanted to SAY it, and
-  # she still can; what changed is that she says it once.
+  # A strain step names the technique only. Where the drink lands is composed
+  # by the layout from `glass:` and `serve.ice`, and
+  # test_serve_ice_is_not_restated_in_the_method refuses a strain step that
+  # describes the serve.
   strain:
     - "Strain."
     - "Double strain."
@@ -131,170 +61,56 @@ canonical:
     - "Pour."
 
   build:
-    # THE BUILD-IN-THE-GLASS OPENER, 2026-09-10. The glass is in `glass:` and
-    # draws the icon, so "Add all ingredients to the glass." names it twice --
-    # the same duplication the strain group shed. A PITCHER is not the glass and
-    # is information, which is why the punches' "in a pitcher" steps stay free.
+    # The glass is in `glass:`, so the opener does not name it. A pitcher is
+    # not the glass and is information: "in a pitcher" steps stay free text.
     - "Add all ingredients."
     - "Add the remaining ingredients."
     - "Fill the pitcher half full with ice cubes."
-    # Four Death & Co punches fill three-quarters, and arrack-punch's note says
-    # its source did too. A different amount of ice is information.
+    # A different amount of ice is information.
     - "Fill the pitcher three-quarters full with ice cubes."
     - "Fill with crushed ice."
-    # HALF, 2026-09-28, and it is Helen's own wording from her Chartreuse
-    # Swizzle rewrite ("Half-fill a highball with crushed ice."). HOW FULL IS
-    # THE INFORMATION: "Fill with crushed ice." says the glass is full and this
-    # says there is room left for what comes next, which on a swizzle is the
-    # crushed ice you top it with afterwards. The glass comes off the string
-    # and is composed by `in_the_glass` below, the same trade the strain group
-    # made in 2026-09-05.
+    # How full is the information: this leaves room for what comes next.
     - "Half-fill with crushed ice."
-    # TWO THIRDS, 2026-09-29, and it is the Moscow Mule's own wording with the
-    # glass taken off the string. It said "Two-thirds fill the mug with crushed
-    # ice." -- which names a vessel without saying WHICH, the exact complaint
-    # #1214 was raised about, one step further along. HOW FULL IS THE
-    # INFORMATION and is why this is a third fill step rather than a rewording
-    # of `Fill with crushed ice.`
     - "Two-thirds fill with crushed ice."
     - "Top with champagne."
-    # SODA WATER, NEVER CLUB SODA -- Helen's ruling, 2026-09-02: she is not in
-    # the US and doubts the difference is more than marketing. Eight drinks said
-    # club soda in a step or an `item` and were normalised the same day; the one
-    # remaining mention sits inside a QQ note on la-fee-noir-punch, which is a
-    # record of what a source said and is not rewritten.
+    # Soda water, never club soda (DECISIONS §9.3).
     - "Top with soda water."
     - "Top with more crushed ice."
-    # NEW 2026-09-20, Helen's wording, for the Moscow Mule (#1068): the mug is
-    # filled with cubed ice, the ginger beer goes in, and crushed ice is
-    # crowned over the rim. HEAPING IS THE INFORMATION: "Fill with crushed ice."
-    # says the glass is full, and this says the ice stands above it. It is the
-    # tail of two free-text steps already in the collection -- german-vacation
-    # ("Top and heap with more crushed ice...") and zombie-intoxica ("...then
-    # top and heap with crushed ice") -- each of which also carries something
-    # else, so neither collapses to this one.
+    # The ice stands above the rim, where "Fill with crushed ice." says only
+    # that the glass is full.
     - "Heap crushed ice on top."
 
-  # RINSE AND RIM -- added 2026-09-02 with the amount ruling that needed them.
-  # An ingredient whose amount is `to rinse` is poured by one of these steps and
-  # by nothing else, so the two halves are declared together or neither is
-  # legible. Both strings are the drinks' own, unchanged: sazerac-death-and-co
-  # says the first, tailspin the second. `glasses` plural on the second is
-  # tailspin's own wording for a batch and is left alone -- this file collapses
-  # variance that carries no information, and how many glasses are being made is
+  # An ingredient whose amount is `to rinse` is poured by one of these steps
+  # and by nothing else. A rinse worded for one drink (a frozen glass, a named
+  # rum) stays free text. `glasses` is plural for a batch, which is
   # information.
-  #
-  # THE THIRD RINSE IS DELIBERATELY NOT HERE. caribbean-sazerac says "Rinse a
-  # frozen glass with the overproof rum, then discard the excess." -- the frozen
-  # glass and the rum are both facts about that drink, so by this file's own
-  # test the phrasing carries information and the step stays in the free-text
-  # tail.
   rinse_and_rim:
     - "Rinse the glass with absinthe and dump."
     - "Rinse the glasses with Campari."
-    # THE MARGARITA'S OWN SENTENCE IS THE RIM STEP NOW -- Helen's ruling,
-    # 2026-09-04: "her Margarita sentence is canonical, but swap the tequila for
-    # the leading spirit in the rare case it isn't tequila." It replaces "Salt a
-    # half-rim of the glass.", her 2026-09-02 wording, which she then wrote past
-    # herself when she rewrote the drink for publication: this one says the
-    # WETTING and the COARSE salt, and by this file's own test -- does the
-    # phrasing carry information? -- both of those are information the shorter
-    # form loses.
-    #
-    # THE SPIRIT NAMED IS THE DRINK'S LEADING SPIRIT, and `tequila` is the
-    # Margarita's. This file has no way to parameterise a step -- `canonical` is
-    # a flat list of literal strings, and every consumer (the drift check, the
-    # ingest document, the preflight) compares whole strings -- so a
-    # non-tequila drink WRITES THE SAME SENTENCE WITH ITS OWN SPIRIT and is
-    # simply part of the informative tail, exactly as the third rinse below is.
-    # Inventing a placeholder syntax for a case with no live user would be
-    # machinery for a drink that does not exist; the rule is recorded here so
-    # the first one that does exist knows what to write.
+    # The rim step. A drink whose leading spirit is not tequila writes the same
+    # sentence with its own spirit, as free text: `canonical` holds literal
+    # strings and every consumer compares whole strings (DECISIONS §9.3).
     - "Dip only half the rim in water (or tequila) then coarse salt."
 
-  # THE TWIST STEP IS EMITTED BY THE LAYOUT, AND NO DRINK WRITES IT -- Helen's
-  # ruling, 2026-09-04, answering el-presidente's QQ ("Express the orange twist
-  # and use it as a garnish. This should become canonical, for each type of
-  # citrus twist"): yes, a garnish of any citrus twist adds the step
-  # automatically, so no drink has to say it.
-  #
-  # THAT MAKES THIS THE ONE GROUP HERE THAT IS NOT A VOCABULARY TO WRITE FROM.
-  # _layouts/cocktail.html appends whichever of these two the drink's `garnish`
-  # earns -- `(discarded)` in the garnish is what picks the second -- and
-  # test_no_method_step_opens_with_express refuses a hand-written one, because a
-  # drink that states the twist in `garnish:` and again in `method:` states one
-  # fact twice. Three drinks had written it by hand, in three wordings, and all
-  # three were deleted the day this landed (corpse-reviver-no-2, man-o-war,
-  # north-sea-oil).
-  #
-  # IT IS DECLARED HERE ANYWAY, and that is the point of declaring it: the step
-  # appears on the page, so the sentence is a decision like every other canonical
-  # form, and it belongs where the decisions are rather than only inside a
-  # template.
-  #
-  # AND SINCE 2026-09-09 THE TEMPLATE READS IT, which it did not before. The two
-  # sentences were written out in `_layouts/cocktail.html` as well as declared
-  # here -- one fact in two places, and it drifted the instant Helen changed the
-  # wording: editing this list left the page emitting the old string with
-  # nothing to notice. The template now takes `canonical.express` directly.
-  #
-  # ORDER IS LOAD-BEARING NOW. The template indexes this list: [0] is the
+  # Emitted by `_layouts/cocktail.html` for a garnish of any citrus twist. No
+  # drink writes it, and test_no_method_step_opens_with_express refuses one
+  # that does. ORDER IS LOAD-BEARING: the layout indexes this list, [0] the
   # drop-in form and [1] the discard form, chosen by whether the garnish says
-  # "discard". Reordering these two silently swaps what every twist-garnished
-  # drink tells you to do with the peel, so a test asserts which is which.
-  # `then` RATHER THAN `and` SINCE 2026-09-09 -- #880 item 3, Helen's own
-  # wording. She found the collection saying "Squeeze the twist over the drink
-  # THEN discard it" in one place and "Express the twist over the drink AND drop
-  # it in" in another, and ruled on the pair: "Suggest: 'Express the twist over
-  # the drink then discard it.' and 'Express the twist over the drink then drop
-  # it in.'"
-  #
-  # THE `Squeeze` VERSION SHE SAW IS ALREADY GONE -- it was julien-sorel's, and
-  # she deleted it herself proofreading the same afternoon, which is what the
-  # 2026-09-04 ruling above requires of every drink. So the only thing left to
-  # settle was the conjunction, and `then` is the better word anyway: these are
-  # two actions in sequence, not one action with a property.
+  # "discard".
   express:
     - "Express the twist over the drink then drop it in."
     - "Express the twist over the drink then discard it."
 
-  # THE FLAMING SHELL'S LAST TWO STEPS, 2026-10-01 (#1256). The same act had
-  # been written "Set alight." on the two Zombies, "...and set alight." inside a
-  # longer step on Milliners Punch, and as `to_serve` prose ("filled with
-  # Overproof rum and fire") on Cobra's Fang and Tiki Max, where it was not an
-  # instruction at all. These are the Zombies' own two sentences, which Helen
-  # proofread onto the live site, so nothing here is new wording.
-  #
-  # THEY FOLLOW `shapes.shell` BELOW AND ARE ALWAYS THE DRINK'S LAST STEPS, in
-  # this order. test_a_shell_pour_is_written_one_way holds all three.
-  #
-  # THE CINNAMON LIVES HERE, in the method -- Helen, same day: "Cinnamon
-  # sparkles can sit in method." What `to_serve` may add is MORE of them.
+  # A flaming shell's last two steps, in this order, after its `shapes.shell`
+  # sentence (#1256). test_a_shell_pour_is_written_one_way holds all three.
   fire:
     - "Set alight."
     - "Sprinkle the flame with cinnamon."
 
-# =============================================================================
-# SHAPES -- a canonical sentence with ONE slot, 2026-09-10
-# =============================================================================
-# The exclusion tail was the sprawl `canonical:` could not close. "other than
-# the champagne" is declared above because it is frequent; the live drinks also
-# said "everything except the cola", "first four ingredients", "the first seven
-# ingredients", "all the other ingredients", "all the ingredients except the
-# bitters", "with three ice cubes, other than the soda water" -- six wordings of
-# one instruction, differing only in WHICH ingredient stays out. That word is
-# the drink's own and cannot be enumerated here; the sentence around it can.
-#
-# So a shape is a canonical string with exactly one `<X>`, and a step that fills
-# the slot -- with the ingredient AS THE RECIPE NAMES IT -- is canonical. The
-# literal champagne forms above are kept: they were declared first, they are
-# still exact, and tests/test_cocktails.py treats a literal and a filled shape
-# alike. Nothing is parameterised beyond the one slot; a step needing two is
-# tail, and that is the rule that keeps this from growing into a grammar.
-#
-# THE FLOAT FORMS ARE HERE AND NOT IN `canonical:` because every float names
-# its own pour. "on top" rather than "on the surface" / "on the top": three
-# spellings of one position, and none of them carried anything.
+# A canonical sentence with exactly ONE slot, `<X>`, which the drink fills with
+# an ingredient as the recipe names it. tests/test_cocktails.py treats a
+# literal and a filled shape alike. A step needing two slots is free text:
+# that rule keeps this from growing into a grammar (#705).
 shapes:
   exclusion:
     - "Shake all ingredients other than the <X> with ice."
@@ -308,82 +124,27 @@ shapes:
   float:
     - "Float the <X> on top."
     - "Drop the <X> on top."
-    # ONE SPIRIT, POURED TWICE -- #1294, 2026-10-04. Tiki Max floats 15 ml of
-    # blended overproof rum and fills a lime shell with 25 ml more, and its
-    # method said "the blended overproof rum" both times. Helen's wording, for
-    # this line and its partner under `shell`: "Float the first blended
-    # overproof rum" and "fill ... with the second" -- "That implies the two
-    # could be different, which I well might do actually, so it's honest."
-    # NO MILLILITRES IN THE SENTENCE, on purpose: the scaler does not rewrite
-    # a method, so a figure here would be wrong at x2. And not "pour", which
-    # she called "a highly American word" that "doesn't mean much to me".
+    # One spirit poured twice (#1294): this, and `shell`'s "second" line. No
+    # millilitres in the sentence, because the scaler does not rewrite a
+    # method.
     - "Float the first <X>."
-  # THE SHELL STEP, 2026-10-01 (#1256). `<X>` is the rum, as the recipe names
-  # it -- the ingredient carrying `as: "shell"`. The sentence is Modern
-  # Zombie's, unchanged.
-  #
-  # TWO SENTENCES RATHER THAN A SECOND SLOT FOR THE FRUIT. The one-slot rule
-  # above is what keeps this file a dictionary, and there are exactly two
-  # shells in the collection -- garnish.yml's `half an empty passion fruit
-  # shell` and `half an empty lime shell`. A third fruit is a third line.
+  # `<X>` is the rum, the ingredient carrying `as: "shell"` (#1256). One
+  # sentence per fruit rather than a second slot.
   shell:
     - "Fill the passion fruit shell with the <X> and set on top of the drink."
-    # The partner of `float`'s "Float the first <X>." (#1294): the same spirit
-    # a second time. A third line for a third case, as the note above says.
-    # ABOVE THE PLAIN LIME LINE ON PURPOSE: the plain sentence also matches
-    # this one (with "second ..." as the rum), and the first match is the one
-    # test_a_shell_pour_is_written_one_way reads the rum's name out of.
+    # Above the plain lime line on purpose: the plain sentence also matches
+    # this one, and test_a_shell_pour_is_written_one_way reads the rum's name
+    # out of the first match.
     - "Fill the lime shell with the second <X> and set on top of the drink."
     - "Fill the lime shell with the <X> and set on top of the drink."
 
-# =============================================================================
-# THE GLASS GENERATOR -- #1214, 2026-09-28. A step that acts on the glass says
-# WHICH glass, and the sentence is composed rather than typed.
-# =============================================================================
-# Helen: "Let's write the glass generator now please -- I've come up against
-# this a few times now, notably in the Sazerac on the live site."
-#
-# WHAT WAS MISSING. The STRAIN step has composed its glass since 2026-09-05 --
-# "Strain." + glasses.yml `serving` + serve.yml `in_the_glass` -> "Strain into
-# an old fashioned glass, over a large ice cube." Nothing else did. So a drink
-# BUILT in the glass has no strain step to carry it and never names the glass
-# anywhere: every swizzle, the Moscow Mule, the Milliners Punch. #1214 is
-# exactly that, on the Chartreuse Swizzle, and the Sazerac's "Ice the glass"
-# is the same hole from the other end -- it says "the glass" and never says
-# which.
-#
-# LEFT is the canonical step as a drink writes it; RIGHT is the sentence the
-# page composes, with `<glass>` filled from glasses.yml `serving`.
-#
-# `<glass>` AND NOT `<X>`, DELIBERATELY. The slot in `shapes:` above is filled
-# by the DRINK, with an ingredient it names. This one is filled by the PAGE,
-# from a field. Same-looking marker, opposite direction, so it gets its own
-# spelling and nobody has to remember which block they are in.
-#
-# ONLY THE FIRST SUCH STEP IN A DRINK IS COMPOSED, and that rule is why this is
-# a generator rather than a find-and-replace. Measured over both collections
-# before writing it: the Chartreuse Swizzle opens "Add all ingredients." and
-# then "Half-fill with crushed ice.", and the Milliners Punch half-fills and
-# then strains. Composing every match gives "Add all ingredients to a highball.
-# Half-fill a highball with crushed ice." -- the duplication this file's whole
-# strain group exists to have removed. Say it once, on the step that first
-# reaches for the glass.
-#
-# WHAT IS DELIBERATELY ABSENT. "Add the remaining ingredients.", "Top with more
-# crushed ice." and "Heap crushed ice on top." all FOLLOW a step that has
-# already named the glass, so they would only ever be the second mention.
-# "Swizzle until the glass frosts." is left alone because Helen has asked for
-# that step to get SHORTER, not longer (#1214: "Swizzle.").
-#
-# "Rinse the glasses with Campari." IS ABSENT TOO, and the plural is why:
-# tailspin writes it for a batch, and how many glasses are being made is
-# information this file does not collapse.
-#
-# DRAFTS ONLY FOR NOW, AND THE LAYOUT IS WHERE THAT LIVES. Helen, the same day:
-# "this will require re-proofreading everything on the live site, so for now
-# please let's just apply it to drafts (and drafts currently being worked on)
-# and not on the live recipes." See _layouts/cocktail.html; the condition comes
-# off when she has read the published set again.
+# The glass generator (#1214). LEFT is the canonical step as a drink writes
+# it; RIGHT is the sentence the page composes, `<glass>` filled from
+# glasses.yml `serving`. Only the FIRST such step in a drink is composed, so
+# the glass is named once; a step that always follows one is absent for that
+# reason. `<glass>` is filled by the page and `<X>` by the drink, hence two
+# spellings. `_layouts/cocktail.html` applies this to drafts only
+# (DECISIONS §9.10a).
 in_the_glass:
   "Add all ingredients.": "Add all ingredients to <glass>."
   "Fill with crushed ice.": "Fill <glass> with crushed ice."
@@ -391,140 +152,11 @@ in_the_glass:
   "Two-thirds fill with crushed ice.": "Two-thirds fill <glass> with crushed ice."
   "Rinse the glass with absinthe and dump.": "Rinse <glass> with absinthe and dump."
 
-# =============================================================================
-# PROPOSALS -- both halves kept, so the choice is Helen's and not mine
-# =============================================================================
-# LEFT: the string exactly as it appears in a drink today.
-# RIGHT: the canonical form it would become, or `QQ` where there isn't a clean
-#        one and a judgement is needed.
-#
-# `QQ` here means the SAME thing it means on an ingredient: unfinished, not
-# absent. A QQ row is a step whose variance might be real, so it is listed
-# rather than quietly collapsed.
-#
-# THE DANGEROUS ONES ARE THE SHORT ONES, and they are all QQ for one reason:
-# "Shake with ice.", "Shake the rest with ice." and "Stir with ice." follow an
-# earlier build step, so they mean shake WHAT IS IN THE SHAKER, not shake all
-# ingredients. Collapsing them into the plain canonical form would silently
-# change the drink. This is the trap that makes a fuzzy matcher the wrong tool
-# here and an explicit map the right one.
-# THE TWENTY MECHANICAL ROWS WERE APPLIED AND DELETED ON 2026-09-01, #630 --
-# 62 steps across 61 drinks, by tmp/apply_method_proposals.py, as text edits.
-# They were the "with" vs "over" pairs, a missing article, the glass named
-# twice, and two spellings of one exclusion word. Every one had sat here since
-# 2026-08-26 for Helen to reject, and none was.
-#
-# DELETING THEM IS HOW THIS FILE RECORDS THAT, and it is not optional: the
-# moment a drink stops saying the left-hand string,
-# test_every_proposal_still_matches_a_real_step goes red. Apply and prune are
-# one commit or the suite is broken between them. The two straw rows went the
-# same way on 2026-08-30 (#573), and the note at the bottom of this file
-# records that they were RESOLVED rather than rejected -- the same distinction
-# applies here.
+# LEFT: a step exactly as a drink writes it today. RIGHT: the canonical form
+# it would become, or `QQ` where a judgement is needed. Deleting a row rejects
+# it; applying one deletes it in the same commit, because
+# test_every_proposal_still_matches_a_real_step fails a row no drink says.
+# A short form ("Shake with ice.") is decided by the step ABOVE it in the
+# drink, never by its shape. The key stays when nothing is proposed: a missing
+# key switches that test off.
 proposals:
-  # EMPTIED AGAIN 2026-09-10, THE SAME DAY IT WAS FILLED. The second census put
-  # 31 rows here (48 drinks live: 313 steps, 119 distinct, 45 live strings
-  # outside the dictionary). Helen on PR #906: "Rest fine, great, please
-  # amend." -- every row accepted, plus two rulings of her own: the Martinique
-  # Swizzle's build-and-stir is "Stir all ingredients together." (her wording,
-  # canonical above), and Sazerac (Death & Co)'s twist is a garnish, `lemon
-  # twist (discarded)`, so its hand-written squeeze step went. The four QQ rows
-  # were resolved by hand as the pull request proposed: fish-house-punch's one
-  # step became two, dons-mai-tai's two became one, pic-a-de-crop's pitcher
-  # step stayed free text. Applied by tmp/apply_proposals.py as text edits,
-  # 12 live drinks and 16 drafts; the private half is on the drafts repo's
-  # `content/method-proposals-applied`.
-
-  # EMPTY, 2026-09-01, and the key stays. An empty mapping says "nothing
-  # outstanding"; a missing one says nothing at all, and would switch off
-  # test_every_proposal_still_matches_a_real_step for whatever is proposed
-  # next. Same reasoning as garnish.yml's own empty block, and the same
-  # reasoning that keeps GLASSSLESS_ON_2026_08_27 asserted rather than deleted.
-  #
-  # THIS IS A WORKLIST, NOT A RATCHET. It empties and it will refill, so the
-  # guard asserts the KEY exists and never that the map is non-empty -- getting
-  # that backwards on garnish.yml made finishing the work a test failure, for
-  # one day, on 2026-08-31.
-  #
-  # REFILLED 2026-09-02 with one row, which is what a worklist doing its job
-  # looks like. Helen gave the rim wording while ruling on man-o-war's salt, and
-  # the drink it applies to is not the drink that prompted it: man-o-war's salt
-  # goes IN the drink and gets no rim step at all. So the wording is canonical
-  # above and margarita-classic is proposed for it here, to be accepted or
-  # deleted like every other row -- propose, never apply.
-  #
-  # AND EMPTIED AGAIN 2026-09-04: Helen rewrote the Margarita for publication
-  # and the step reads "Dip only half the rim in water (or tequila) then coarse
-  # salt." -- her own words, more than the canonical row says (the wetting, the
-  # coarse salt), so the proposal was spent rather than accepted.
-  #
-  # SHE THEN ANSWERED THE QUESTION THIS PARAGRAPH LEFT OPEN, the same day: that
-  # sentence IS the canonical rim wording now, and the old one is gone. Her
-  # ruling is above, on the step itself. The worklist stays empty; a rewrite
-  # that arrives as a ruling never passes through here, because there is nothing
-  # to propose -- the drink already says the winning string.
-
-# =============================================================================
-# HOW THE FOUR QQ ROWS WERE ANSWERED, 2026-09-01 -- the reasoning, not the rows
-# =============================================================================
-# Worth keeping because it is what a future short-form step needs, and because
-# the reason originally given for parking them was WRONG for two of the four.
-#
-# The comment used to say all four "follow an earlier build step, so they mean
-# shake WHAT IS IN THE SHAKER". That was reasoned from the STRING -- exactly
-# the mistake a fuzzy matcher would make, made by hand instead. Read per
-# instance, with the step above each one:
-#
-#   north-sea-oil "Stir with ice."     IT WAS THE FIRST STEP. Nothing had been
-#                                      built, so it did mean all ingredients.
-#                                      -> "Stir all ingredients with ice."
-#
-#   sapins-swizzle "Shake with ice."   follows "Add the remaining ingredients",
-#                                      so everything IS in the shaker by then.
-#                                      Helen: "should retain 'shake with ice'".
-#                                      -> UNCHANGED, and now canonical.
-#
-#   caribbean-sazerac "Shake the       follows a rinse. tailspin and
-#   rest with ice."                    sazerac-death-and-co already said "the
-#                                      remaining ingredients"; Helen: "match
-#                                      please." -> that form, now canonical.
-#
-#   smokestack-lightning "Fine         MEANINGLESS AS WRITTEN, and Helen named
-#   strain with ice."                  it: "I bet I meant 'fine strain over
-#                                      ice'." The drink said `coupe`, which
-#                                      holds no ice -- so the GLASS was the
-#                                      wrong field, not the step. Now
-#                                      `old fashioned` and "Fine strain over
-#                                      ice.", which is canonical beside the
-#                                      existing "Strain over ice."
-#
-# TWO THINGS GENERALISE, and they pull in opposite directions:
-#
-#   THE PRECEDING STEP IS THE WHOLE QUESTION for any short verb form. Two
-#   identical-looking rows went opposite ways on nothing but the line above
-#   them. Never decide one from its shape.
-#
-#   WHEN A STEP IS INCOHERENT, ASK WHICH FIELD IS WRONG. Smokestack's step
-#   read as a transcription fault for as long as the glass was assumed right.
-#   `glass:`, `garnish:` and the method all describe one serve, so an
-#   impossible instruction may be a correct instruction beside a wrong glass.
-#
-# "Stir with ice." IS DELIBERATELY NOT DECLARED, though its shake twin is: no
-# drink stirs after a build today. A future one should say it and be declared
-# then. That is a form with no user yet, not drift, and adding it now would be
-# machinery for a case that does not exist.
-
-  # THE TWO STRAW PROPOSALS ARE GONE, 2026-08-30, #573 -- resolved rather than
-  # rejected. They sat here as QQ because moving them to `to_serve` was "a
-  # wording decision rather than a relocation", and Helen made it: "Serve with
-  # a straw." is now `to_serve: "Straw."` on Mai Tai and Coffey Park Swizzle,
-  # and "Serve with two straws." is "Two straws." on Pic-a-de-Crop Punch --
-  # matching the terse noun phrase the three existing values already use.
-  #
-  # Deleting the rows is how this file records that, and
-  # test_every_proposal_still_matches_a_real_step is what forced it: the moment
-  # the last drink stopped saying the string, the proposal went red. That is
-  # the bargain this file strikes working exactly as intended.
-  #
-  # It cannot happen again -- test_no_method_step_restates_to_serve_or_garnish
-  # now refuses a step opening with "Serve" or "Garnish" outright.

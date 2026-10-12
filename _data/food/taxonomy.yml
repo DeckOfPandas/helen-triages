@@ -1,70 +1,21 @@
-# =============================================================================
-# THE VOCABULARY LAYER — single source of truth for the taxonomy.
-#
-# What exists, and how the terms relate to each other. Nothing about how any of
-# it LOOKS: no colours, no labels, no CSS classes. Those live in
-# _data/filter_sections.yml (labels, classes, order) and _sass (colour).
-#
-# Everything downstream reads this file:
-#   index.html            builds the filter buttons from it
-#   recipe_badges.html    decides which badge class a tag gets
-#   tests/test_taxonomy.py enforces it against every recipe
-#
-# Adding a term here is all that is needed to make it real. A tag not listed
-# here will render on a recipe page but will have no filter button, so nobody
-# browsing the index can ever find it.
-# =============================================================================
+# The food vocabulary: which star ingredients and tags exist, and how they
+# relate. Nothing about how they look: labels, classes and order are in
+# _data/food/filter_sections.yml, colour is in _sass. food/index.html builds
+# the filter buttons from this file, _includes/recipe_badges.html picks a
+# badge class from it, and tests/test_taxonomy.py holds every recipe to it.
+# A tag not listed here renders on a recipe page but has no filter button.
+# DECISIONS §7.
 
-# -----------------------------------------------------------------------------
-# Star ingredients
-#
-# The one thing a recipe is ABOUT. Declared, not derived: before this file
-# existed the list was built by mapping over front matter, which meant a typo
-# silently created a brand new star ingredient with one recipe under it.
-#
-# `star_ingredient` is OPTIONAL. Roughly a quarter of the collection leaves it
-# blank, and that is correct — a plain sponge, a spice blend or a dressing has
-# no hero ingredient, and inventing one for them would be worse than nothing.
-#
-# `something unusual` retired 2026-08-09, Helen's call: it's the only entry
-# defined relative to a subjective, cultural norm rather than an actual food
-# group, it isn't a real craving the way "beef" or "greens" are, and it was
-# barely used (1 of 77 recipes) — and not even consistently: peanut-butter-
-# cookies.md has the identical headline ingredient (peanut butter) and was
-# left blank instead. peanut-butter-ice-cream.md, its one user, is blank now.
-#
-# `legumes` considered and NOT added, same date: only two candidate recipes
-# existed (lemony-cavolo-nero-butter-bean-soup.md, pancetta-white-bean-
-# stew.md, both already covered by `greens`/`pork`) — not enough to be a
-# useful discriminator across the collection. Don't re-raise this on your
-# own; Helen will bring it back if her own cooking makes it worth it.
-#
-# `eggs` retired 2026-08-09, reinstated 2026-08-12 (issue #187), both
-# Helen's explicit call. The 2026-08-09 retirement was sound for the six
-# members it was retired over (asparagus-gruyere-quiche, ben-jerrys-sweet-
-# cream-base-1, delias-classic-pancakes, henrys-quick-bulletproof-
-# hollandaise-sauce, henrys-sunday-waffles, mrs-nicholsons-yorkshire-
-# puddings) — every one used egg as a technique or structural ingredient,
-# not the thing the dish is actually about, and all six stayed blank. But
-# by 2026-08-12 eight _food_drafts/ recipes had `star_ingredient: eggs`
-# sitting invalid against the retirement, which is what surfaced this as a
-# real, not hypothetical, question — checked recipe by recipe against the
-# same test ("is egg the craving, or just doing technique/structural
-# work"), not reinstated wholesale: ajitsuke-tamago (literally "seasoned
-# egg", nothing else in the dish), green-baked-eggs, pink-eggs-beetroot-
-# yogurt-chilli-butter (the poached eggs' colour is the tagline's own
-# selling point), and spring-onion-feta-frittata kept eggs. quick-creme-
-# brulees, spring-herb-goats-cheese-souffle (egg whites are the leavening
-# mechanism, same reasoning that already correctly keeps dark-chocolate-
-# souffles.md on "chocolate"), caramelised-leek-udon-sesame-fried-eggs
-# (title's own head clause, before "with", is "Caramelised Leek Udon") and
-# broad-bean-herb-and-ricotta-fritters (egg as fritter binder) went back to
-# blank, the original retirement reasoning applied to them specifically.
-# -----------------------------------------------------------------------------
+# The one thing a recipe is about. Declared, not derived, so a typo fails a
+# test and does not create a new value. `star_ingredient` is optional: a plain
+# sponge, a spice blend or a dressing has no hero and stays blank.
+# `legumes` was considered and not added; do not re-raise it.
 star_ingredients:
   - beef
   - chocolate
   - duck
+  # Only where the dish is about the egg. Blank where egg is technique or
+  # structure: a quiche, a soufflé, pancakes, a fritter's binder (#187).
   - eggs
   - fruit
   - game
@@ -77,20 +28,9 @@ star_ingredients:
   - shellfish
   - white fish
 
-# Retired star_ingredient values, with the reason -- same shape as
-# test_front_matter.py's RETIRED dict for front-matter fields. A value here
-# is a NAME COLLISION waiting to happen: `star_ingredient` isn't declared
-# anywhere else, so a retired value left in a file renders no filter button
-# and looks like ordinary undeclared-star noise until you know the value used
-# to mean something. test_star_ingredient_is_declared (test_taxonomy.py,
-# test_drafts.py) checks this dict first so the failure names the reason
-# instead of just "not declared" -- caught for real 2026-08-12: five drafts
-# (hazelnut-paris-brest, leratos-tanzanian-banana-curry, matcha-white-
-# chocolate-blondies, ukrainian-dumplings-chestnuts-kraut-filling,
-# zucchini-orange-cake-with-pistachios) were still carrying `something
-# unusual` three days after it was retired, invisible until someone actually
-# read the test output rather than trusting a green run. All five are blank
-# now, the correct state per the retirement note above.
+# Retired values, each with its reason. test_star_ingredient_is_declared reads
+# this first, so a file still carrying one fails with the reason and not just
+# "not declared".
 retired_star_ingredients:
   something unusual: >-
     Retired 2026-08-09 -- defined relative to a subjective, cultural norm
@@ -98,336 +38,105 @@ retired_star_ingredients:
     "greens" are, and barely/inconsistently used. Not coming back -- blank
     the field, don't reintroduce it.
 
-# -----------------------------------------------------------------------------
-# Tags
-#
-# Two groups, deliberately different in kind:
-#
-#   mood            what you feel like eating -- a craving
-#   practicalities  what the occasion or the recipe demands of you, regardless
-#                   of what you feel like -- breakfast happens at breakfast
-#                   time whether or not you crave it
-#
-# A recipe may carry any number from either group. Reclassified 2026-08-01:
-# breakfast, extras, festive and starter moved out of mood on this test --
-# nobody wakes up craving a starter, they're cooking for a dinner party and
-# need one. showstopper stayed in mood on the same test: it IS a craving, for
-# Helen specifically -- "let's make something unnecessarily complicated".
-#
-# -----------------------------------------------------------------------------
-# `make-ahead` -- DEFINED 2026-08-16, GitHub issue #216, Helen's own words:
-#
-#   "a substantial part -- or the entirety -- of the dish can be prepared well
-#   in advance of serving without losing quality, flavour or structural
-#   integrity."
-#
-# The definition alone did not settle the collection, because three large
-# groups of recipes can each be argued either way. Her rulings on all three,
-# recorded so the tag stays applied the same way next time:
-#
-#   A BAKE THAT MERELY KEEPS IS NOT MAKE-AHEAD. "Will keep for three days in an
-#   airtight tin" describes leftovers, not planning, and almost every cake in
-#   the collection says it -- so counting it would make the tag mean roughly
-#   "is a bake" and stop it narrowing anything. Same test that retired
-#   `one-pot` for honestly covering 57% of the collection. A bake DOES qualify
-#   when it is genuinely assembled ahead and finished later: a cheesecake set
-#   overnight, an arctic roll, anything that has to wait.
-#
-#   AN OVERNIGHT MARINADE IS NOT MAKE-AHEAD. Satay, char siu, buttermilk
-#   chicken: real advance work, but nothing is FINISHED ahead and the whole
-#   dish still has to be cooked at serving time. It is a constraint on your
-#   planning rather than a reduction in the work on the day, which is the
-#   opposite of what someone browsing this tag wants.
-#
-#   THE EXCEPTION SHE DREW ON 2026-10-10, of a BBQ spatchcock duck rubbed a day
-#   ahead: "keep make ahead -- the rub is the thing here, and roasting on the
-#   day is trivial." So the test is where the WORK is, not whether heat is
-#   applied on the day: if what is left for serving time is trivial, the dish
-#   is make-ahead. A Christmas turkey buttered the day before is not, because
-#   the roast is the work.
-#
-#   A BASE RECIPE OR CONDIMENT DOES NOT CARRY IT. A spice blend, a curry paste,
-#   a dukkah, a lemon curd, a cranberry sauce: these have no "serving" to be
-#   ahead of, so the tag tells you nothing you did not already know from what
-#   the thing is. Removed from the nine that had it.
-#
-# FREEZABLE AND MAKE-AHEAD ARE SEPARATE AXES, and deliberately NOT a co-tag.
-# Making freezable imply make-ahead was considered and rejected the same day:
-# it would have forced the tag onto 19 files, about 11 of them the very cakes
-# ruling A excludes, plus three freezable base recipes ruling C excludes --
-# a rule that quietly overturns two others is worse than no rule. `freezable`
-# answers "can I keep the leftovers", `make-ahead` answers "can I do this on
-# Saturday". A dish may be either, both or neither.
-#
-# -----------------------------------------------------------------------------
-# THE TWELVE THAT HAD NO WRITTEN MEANING -- AGREED 2026-10-10. Until then
-# these were names in a list, which is why an ingest's proposals for them were
-# hit and miss. A session drafted one line each and Helen answered "Agree on
-# all", adding the test for `bakes` in her own words. (One of the twelve was
-# then renamed the same day: `sweets` became `sweet snack`.)
-#
-#   bakes          a baked good out of the oven: cake, biscuit, bread, pastry.
-#                  Not anything that merely goes in the oven. HER TEST: "would
-#                  this appear on Great British Bake Off?" -- so chocolate
-#                  mousse tartlets, with their baked pastry cases, are in.
-#                  And, the same day: "Pizza dough, fondants, cheesecake (if
-#                  the baked kind of cheesecake not the set kind of
-#                  cheesecake), puddings and crumbles are all 'bakes'." The
-#                  burger buns are in too, though they "gave me a moment".
-#                  NOT bakes, also hers: a soufflé, and a beef Wellington
-#                  ("10 is not a bake"), pastry or no pastry. A quiche is.
-#                  Nor meringue swans, which gave the second half of the
-#                  test: "No one gets in cosy baking mode and makes ad hoc
-#                  swans with creme diplomat..." A BAKE IS WHAT YOU MAKE IN
-#                  COSY BAKING MODE.
-#   dessert        a pudding course you serve at the table.
-#   sweet snack    small sweet things eaten by hand outside a meal: brownies,
-#                  biscuits, fudge, truffles, a fairy cake, a scone. HER
-#                  TEST: "would I serve it on a cake plate at 4 o clock after
-#                  a long improving walk?"
-#                  THIS TAG WAS `sweets` UNTIL 2026-10-10, and the name was
-#                  the fault: "every single time I have to remind myself why
-#                  it's not just toffee and chocolate truffles." Under the
-#                  old name she ruled fairy cakes OUT; under the new one,
-#                  the same afternoon, "Fairy cakes are in again now." It
-#                  is `hot snack`'s twin, singular like it.
-#                  A WHOLE CAKE SERVED IN SLICES IS NOT ONE. Asked outright,
-#                  since the cake-plate test would let every loaf and sponge
-#                  in: "No." It has to be made as individual pieces -- a
-#                  biscuit, a bun, a muffin, a brownie square.
-#                  NOR IS A TRAYBAKE CUT INTO SQUARES (2026-10-11, the coconut
-#                  chai traybake): "I think sweet snacks are individual
-#                  things, not slices of something else." THE LINE, AGREED THE
-#                  SAME DAY, since brownies are cut from a tin too: a recipe
-#                  NAMED FOR THE PIECE (a brownie, a bar, a flapjack) is in;
-#                  a cake cut up to serve is out, however small the squares.
-#   carbs party    the starch is the point: pasta, rice, potatoes, pies,
-#                  dumplings.
-#   cheese-tastic  cheese is the pleasure of the dish, not a garnish. FETA
-#                  DOES NOT COUNT, even a whole baked block of it ("oooh,
-#                  yeah, feta doesn't count for cheese-tastic"). Burrata
-#                  does.
-#   fakeaway       a home version of something you would order in.
-#   hot snack      small, hot and eaten between meals: toasties, fritters,
-#                  things on toast.
-#   nibbles        finger food to pass round with drinks.
-#   breakfast      eaten in the morning.
-#   extras         not a dish by itself: sides, sauces, stocks, pickles, doughs.
-#   festive        Christmas, or another named feast. The dish has to BE the
-#                  feast's: a chicken that uses up the Seder horseradish is
-#                  not festive, though a Rosh Hashanah honey cake is.
-#   starter        works as a first course at a dinner party.
-#
-# -----------------------------------------------------------------------------
-# `fiddly and fun` -- A NEW MOOD, 2026-10-10, AND WHAT IT TAKES OFF
-# `showstopper`'s SHOULDERS.
-#
-# Helen: "I wonder if we need a 'I want to faff' tag ... Sometimes when I want
-# to faff I choose to make fiddly desserts, but I honestly prefer savoury
-# things, so remembering about e.g. tomato tarte tatin would scratch the itch
-# for sure."
-#
-# `showstopper` was MEANT to be this -- the group note above has her calling it
-# "let's make something unnecessarily complicated" -- but the name pulled it
-# towards the RESULT, and it came to sit on a beef fillet that is seared and
-# roasted and a venison loin that takes 15 minutes. She agreed it had drifted.
-# So there are two tags now, one for each half:
-#
-#   fiddly and fun   you make it because you want to potter. Several
-#                    components or stages, hands-on work, some precision. The
-#                    PROCESS is the point, whatever it looks like at the end.
-#   showstopper      it makes people gasp when it lands on the table. About
-#                    the RESULT, however little work it took.
-#
-# A dish may carry both (macarons, a Wellington), the first alone (a quiche
-# with pastry from scratch, a ganache, wontons) or the second alone (a roast
-# fillet, a goose). Slow is not fiddly: a stew that sits in the oven for six
-# hours is neither. Nor is threading skewers (the chicken satay: "isn't
-# fiddly"). AND THE FIDDLE HAS TO BE ONE SHE WOULD ACTUALLY DO: the crab salad
-# with homemade crispbreads is out, "because, come on, who's going to be
-# making those crispbreads from scratch!!!"
-#
-# The name is hers, chosen over "make me think". It is a MOOD by this file's
-# own test -- wanting to faff is a craving, not something an occasion demands
-# -- which also puts it beside `dessert` and `bakes` in the filter, so picking
-# it without them finds the savoury faff she was after.
-# -----------------------------------------------------------------------------
-#
-# `main` -- A NEW PRACTICALITY, 2026-10-11: THIS COULD BE DINNER.
-#
-# Helen: "how about I finally give in and add a 'main' tag under food
-# practicalities? Sometimes I might just want to cook dinner, scrolling
-# through a list for inspiration without having to visually filter out kale
-# crisps and various cakes." And, on being told yes: "I think deep down I
-# knew the answer. Declare it, please seed by subtraction, then as we go
-# forward from this baseline now, we derive."
-#
-# A practicality, beside `starter` and `extras`: it says which slot of a meal
-# a dish fills. None of the other 23 could say "this is dinner" except by
-# absence, which is what the seed read.
-#
-# SEEDED BY SUBTRACTION, the day after every recipe's tags had been reviewed:
-#   never a main    dessert, sweet snack, ice cream, drinks, nibbles
-#   perhaps         bakes, extras, starter, breakfast, hot snack
-#   a main          everything else
-# 213 recipes took it from the third line -- 31 published, 182 drafts. The
-# "perhaps" rows (a quiche is a bake AND dinner; a plum sauce is neither) and
-# seven the rule would have tagged but a reading doubted (a cauliflower
-# cheese, two sprout salads) were put to her row by row.
-#
-# HER RULINGS ON THE "PERHAPS" ROWS, the same day, 39 put to her by name:
-#   A MAIN: a quiche, moules marinière, both tartes tatin, a goat's cheese
-#     soufflé, calzones, mackerel or scallops with a salad for two, scallops à
-#     la Bretonne, a rarebit cauliflower cheese, a peach and burrata salad, the
-#     saucy lentils, cabbage wedges ("2 as a main").
-#   NOT A MAIN, though each was proposed as one: griddle cakes, fritters, a
-#     frittata, an omelette, baked eggs, savoury pancakes -- EGGS AND FRITTERS
-#     ARE BREAKFAST OR A SNACK, NOT DINNER -- and kale with chana, though its
-#     source says "2 as a main".
-#   A SIDE, so `extras`: the plain cauliflower cheese, Mum's rice salad, both
-#     sprout salads, charred baby gem, beer-braised lentils.
-# The eggs-and-fritters line began as a session's summary of eight separate
-# noes. Put to her as that: "Your observation about eggs and fritters is
-# sound -- please add as a rule." It is in the ingest document as one.
-#
-# GOING FORWARD THE SAME RULE IS THE PROPOSAL AT INGEST: a new recipe with
-# none of the ten tags above is a `main`; one with a "perhaps" tag is asked
-# about. It is still a proposal for her yes or no, like every food tag.
-# -----------------------------------------------------------------------------
-#
-# The other eight already had hers: `make-ahead` and `freezable` above,
-# `one-handed food` and `drinks` beside `co_tags` below, `showstopper` in the
-# group note above, `no-cook`, `virtuous` and `ice cream` in MANUAL §7.
-#
-# MELTING CHOCOLATE IS PREP, NOT COOKING, so the fridge cake nests and the
-# cookie dough bars are `no-cook` with `cook_time: "None"`. Helen, 2026-10-11,
-# reversing her own first answer an hour earlier ("good spot, I'd forgotten
-# about the melting"): "pulsing chocolate in the microwave isn't messy like
-# cooking! If the melting chocolate is prep then there's still no cooking for
-# either." The nests melt theirs on the hob and she ruled the two the same.
-# -----------------------------------------------------------------------------
+# Two groups, different in kind. A recipe may carry any number from either.
+#   mood            what you feel like eating: a craving
+#   practicalities  what the occasion or the recipe demands of you, whatever
+#                   you feel like
+# The note above a tag is its meaning, and is what an ingest proposal is read
+# against.
 tags:
   mood:
+    # A baked good out of the oven: cake, biscuit, bread, pastry, and a quiche,
+    # a baked cheesecake, pizza dough, fondants, puddings, crumbles. The test:
+    # would it appear on Great British Bake Off? Not a soufflé or a Wellington.
     - bakes
+    # The starch is the point: pasta, rice, potatoes, pies, dumplings.
     - carbs party
+    # Cheese is the pleasure of the dish, not a garnish. Feta does not count,
+    # even a whole baked block; burrata does.
     - cheese-tastic
+    # A pudding course served at the table.
     - dessert
+    # Anything made to drink that is not a cocktail: a frappé, a cordial, a
+    # hot chocolate. Cocktails belong to the sibling site.
     - drinks
+    # A home version of something you would order in.
     - fakeaway
+    # The process is the point: several components or stages, hands-on work,
+    # some precision. Slow is not fiddly, nor is threading skewers, and the
+    # fiddle has to be one a cook would really do. May sit with `showstopper`.
     - fiddly and fun
+    # Small, hot and eaten between meals: toasties, fritters, things on toast.
     - hot snack
     - ice cream
+    # Finger food to pass round with drinks.
     - nibbles
+    # Food you can eat curled on the sofa: nothing that rolls, spills or has to
+    # be chased. Tagged by hand on the eating mechanics. Never a soup; a
+    # meatball alone is, on spaghetti or in a broth it is not.
     - one-handed food
     - salad
+    # The result makes people gasp at the table, however little work it took.
     - showstopper
     - soup
+    # Small sweet things eaten by hand outside a meal, made or named as
+    # individual pieces: a biscuit, a bun, a brownie, a bar, a scone. Not a
+    # whole cake in slices, nor a traybake cut into squares.
     - sweet snack
     - virtuous
 
   practicalities:
+    # Eaten in the morning.
     - breakfast
+    # Not a dish by itself: sides, sauces, stocks, pickles, doughs.
     - extras
+    # Christmas or another named feast, and the dish has to be the feast's
+    # own: using up the Seder horseradish does not make a chicken festive.
     - festive
+    # You can make this and stash it for later. A separate axis from
+    # `make-ahead` and never a co-tag of it.
     - freezable
+    # This could be dinner. Never with dessert, sweet snack, ice cream, drinks
+    # or nibbles; asked about with bakes, extras, starter, breakfast or hot
+    # snack. Eggs and fritters are breakfast or a snack, never a main.
     - main
+    # A substantial part of the dish, or all of it, is prepared well before
+    # serving without losing quality, and what is left for the day is trivial
+    # (#216). Not a bake that merely keeps, not an overnight marinade whose
+    # dish is still cooked at serving time, not a base recipe or condiment.
     - make-ahead
+    # `cook_time: "None"`, which test_no_cook_tag_implies_no_cook_time holds
+    # to the tag. Melting chocolate is prep, not cooking.
     - no-cook
+    # Works as a first course at a dinner party.
     - starter
 
-# -----------------------------------------------------------------------------
-# Co-tags — tags that imply other tags.
-#
-# THE TEST FOR ADDING ONE: an implied tag is sound when it is either a ROLLUP
-# (a broader category someone might browse, where you want this to appear) or a
-# GENUINE AFFORDANCE (it tells you something you could not have guessed). It is
-# unsound when it is DEFINITIONAL — true by the meaning of the words, and
-# therefore carrying no information while quietly polluting the filter it
-# belongs to.
-#
-# Two rules were removed in July 2026 on exactly that test:
-#
-#   ice cream -> freezable
-#       Definitional. Ice cream lives in the freezer; that is not a property,
-#       it is the definition. `freezable` should mean "you can make this and
-#       stash it for later", which is a discovery. Filling that filter with
-#       things that are trivially freezable makes it useless for the case it
-#       exists to serve.
-#
-#   soup -> one-handed food
-#       Unsound because it is only sometimes true. `one-handed food` means food
-#       you can eat curled on the sofa, so anything that rolls, spills or has to
-#       be chased or picked out disqualifies itself. Thick spoonable soups still
-#       carry the tag; noodle soups, pho, wontons and tom kha gai no longer do.
-#       Tagged by hand now, on the eating mechanics rather than the category.
-#
-#       AND SINCE 2026-10-11 NO SOUP CARRIES IT AT ALL. Helen, when a session
-#       proposed taking it off a minestrone for its spaghetti: "soup is never
-#       called one-handed food". The thick spoonable ones lost it the same
-#       day -- three drafts; no published soup had it.
-#
-#       A MEATBALL ON ITS OWN IS ONE-HANDED; IT IS THE COMPANY THAT DISQUALIFIES
-#       IT. Helen, 2026-10-10, when a session proposed taking the tag off
-#       Bronte's Swedish meatballs as "the chasing-with-a-fork case": "I think
-#       chasing meatballs is funny, and I'd call that one-handed food if I
-#       didn't also have to deal with e.g. spaghetti, or fish the meatballs
-#       out of a soup." So the Swedish meatballs keep it; meatballs on
-#       spaghetti or in a broth do not.
-# -----------------------------------------------------------------------------
-# `drinks` covers anything you make to drink that is not a cocktail — the frappé,
-# a cordial, a hot chocolate. Cocktails proper belong to the sibling cocktails
-# site; a frappuccino has no place in a cocktail book but certainly does in a
-# recipe book.
+# Tags that imply other tags. An implied tag is sound when it is a rollup (a
+# broader category someone browses) or a genuine affordance (something you
+# could not have guessed). It is unsound when it is definitional or only
+# sometimes true: `ice cream -> freezable` and `soup -> one-handed food` are
+# deliberately absent on that test.
 co_tags:
   ice cream:
     - dessert
     - make-ahead
 
-# -----------------------------------------------------------------------------
-# Tag hints — what `scripts/check_food_tags.py` reads. A REPORT, NEVER A RULE.
-#
-# Measured 2026-10-08, when Helen asked whether food tags could be derived the
-# way cocktail moods are. Every one- and two-feature rule was searched over 90
-# published recipes and 359 drafts, and scored on recipes held out of the
-# search. The answer was no deriver: the only tags the data can see are the
-# ones the TITLE already says, and the ingest proposal gets those right anyway.
-# What the same rules are good for is the opposite job -- noticing a draft
-# whose tag and whose title disagree, for her to look at when she proofreads.
-#
-# So nothing here writes a tag, and no test fails a recipe on one. A hint that
-# fires says "worth an eye", and the recipe may well be right: a chicken and
-# chorizo stew can be about the pork.
-#
-# ONLY THE ONES THAT HELD UP ARE HERE. `salad`, `bakes` and the `chocolate`,
-# `poultry` and `beef` stars scored .75 to .95 against her own published
-# recipes with the rule found on drafts alone; `soup`, `ice cream`, `duck`,
-# `lamb`, `white fish` and `shellfish` fit the drafts as well and have too few
-# published recipes to confirm. `virtuous`, `carbs party`, `showstopper`,
-# `festive`, `starter` and the other judgement tags scored at or below a
-# search run on shuffled tags and have no hint, because there is none to find.
-#
-# SHAPE. `title:` is any of these as a whole word in the title, with or
-# without a plural `s`. `ingredients_all:` is every one of these as a whole
-# word somewhere in the ingredient items. `text_any:` is any of these phrases
-# anywhere in the tagline, the method or the notes.
-#
-# `no-cook` HAS NO HINT BECAUSE IT ALREADY HAS A TEST. `cook_time: "None"` is
-# the fact and the tag is the filter (test_no_cook_tag_matches_cook_time); on
-# 2026-10-08 all 17 recipes with one had the other.
-# -----------------------------------------------------------------------------
+# What scripts/check_food_tags.py reads: a report, never a rule. Nothing here
+# writes a tag and no test fails a recipe on one; a hint that fires says "worth
+# an eye", and the recipe may well be right. Only tags the title or text can
+# show have a hint; the judgement tags have none because there is none to find.
+#   title            any of these as a whole word in the title, plural or not
+#   ingredients_all  every one of these as a whole word in the ingredient items
+#   text_any         any of these phrases in the tagline, method or notes
 tag_hints:
   tags:
     salad:     { title: [salad] }
     soup:      { title: [soup] }
     ice cream: { title: [ice cream] }
     bakes:     { ingredients_all: [flour, sugar] }
-    # `freezable` IS A CLAIM THE RECIPE MAKES IN ITS OWN WORDS, and there is no
-    # field for it: 39 of the 51 recipes that carry the tag mention freezing
-    # in a step, a note or the tagline, and the other 12 are stews and bakes
-    # tagged from knowing they freeze. So the hint reads the prose, for the
-    # phrases that are a CLAIM. Bare `frozen` and `freeze` are deliberately
-    # absent: they are frozen peas, frozen cherries and every ice cream's
-    # last step.
+    # There is no field for freezing, so the hint reads the prose for phrases
+    # that are a claim. Bare `frozen` and `freeze` are deliberately absent:
+    # they are frozen peas and every ice cream's last step.
     freezable:
       text_any:
         - freezes well
@@ -445,29 +154,19 @@ tag_hints:
     poultry:    { title: [chicken, turkey] }
     duck:       { title: [duck] }
     lamb:       { title: [lamb] }
-    # `steak` WAS HERE FOR ONE RUN and fired on cauliflower steaks and venison
-    # steaks. A cut is not an animal.
+    # Not `steak`: it fires on cauliflower steaks and venison steaks. A cut is
+    # not an animal.
     beef:       { title: [beef] }
     pork:       { title: [pork] }
     oily fish:  { title: [salmon, mackerel] }
     white fish: { title: [cod, haddock] }
     shellfish:  { title: [prawn] }
 
-# -----------------------------------------------------------------------------
-# Proper nouns
-#
-# GitHub issue #71: ingredient tips/notes are lower case except for proper
-# nouns (the pronoun "I" is also always allowed, checked separately --
-# it isn't a noun). Declared here for the same reason star_ingredients and
-# tags are declared above: whether a word is a genuine proper noun (Parmesan)
-# or just a sentence-initial capital that needs lowercasing (Preferably,
-# Thaw, Use...) is Helen's judgement call, not something a test can infer.
-# Seeded 2026-08-04 from words recurring across the recipe corpus (brands,
-# place names, demonyms, cultivar names). test_ingredient_annotation_style
-# only checks the FIRST WORD of a tip/note, so compound names (Maris Piper,
-# Granny Smith, Yukon Gold) are split into their individual words -- either
-# one could plausibly open a sentence.
-# -----------------------------------------------------------------------------
+# Words that may open an ingredient tip or note with a capital (#71); every
+# other first word must be lower case. Whether a word is a proper noun is
+# Helen's call, not something a test can infer.
+# test_ingredient_notes_are_lowercase_fragments checks only the first word, so
+# a compound name (Maris Piper, Granny Smith) is listed as its separate words.
 proper_nouns:
   - Aleppo
   - Bart
@@ -509,17 +208,8 @@ proper_nouns:
   - Worcestershire
   - Yukon
 
-# -----------------------------------------------------------------------------
-# Ampersand proper nouns
-#
-# House style is "and", never "&", in a title (MANUAL.md §5)
-# -- but a real brand or proper name that is itself spelled with an ampersand
-# ("Ben & Jerry's") would be misspelled by swapping it for "and". Same
-# reasoning and same shape as proper_nouns above: whether an "&" is a genuine
-# part of a name or just a lazy join is Helen's call, declared here rather
-# than guessed at. test_no_ampersand_in_title only waives the ampersands
-# actually covered by an exact phrase below -- anything else still fails, so
-# a new stylistic "&" still needs fixing, not a new taxonomy entry.
-# -----------------------------------------------------------------------------
+# Names that are themselves spelled with an ampersand. House style is "and" in
+# a title; test_no_ampersand_in_title waives only an exact phrase listed here,
+# so a stylistic "&" still fails.
 ampersand_proper_nouns:
   - "Ben & Jerry's"

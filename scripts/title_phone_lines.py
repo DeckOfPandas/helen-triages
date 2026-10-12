@@ -1,33 +1,24 @@
 """How many lines does a drink page's title take on a phone, at each size?
 
-REPRODUCES `$title-size-phone` (1.6rem) in `_sass/cocktails/_cocktail.scss`:
-the largest tenth of a rem at which no title takes four lines of tape at
-either phone width and, at 390px, all but one fit in two (2026-10-10: 16 of
-212 took three or four at 2rem).
-
-THE QUESTION IS #1357. Helen, 2026-10-10: "We can reduce font size a little for
-cocktail titles on mobile to reduce the linebreaking", with Haley Traub's Frozen
-Margarita printed over four lines. At 2rem the tape's word box on a 390px phone
-holds 12 characters, and HALEY TRAUB'S is 13.
-
-WHY IT IS CALCULABLE: Courier Prime is monospace (0.6em advance, plus the
-0.03em tracking `.drink-card-name` sets), and everything else is a token. Below
-600px the tape spans the column plus the artwork's own left inset
-(`$tape-art-inset-x`), and carries `$title-tape-pad-x` of bare tape either side
-of the word, in em OF THE TITLE -- so a smaller title gains twice: each
-character is narrower, and the padding gives width back.
-
-THE FIT RULE IS card-name-fit.js's, restated: a name that fits stays; one that
-is over by no more than 1/0.86 steps down to 0.86 and stays on one line; any
-other wraps AT ITS FULL SIZE, breaking at spaces and after hyphens.
-
-RE-RUN IT WHEN THE COLLECTION GROWS. A long new title is the thing that would
-move this, and the symptom is a four-line tape on a phone.
-
     python3 scripts/title_phone_lines.py
 
-It reads titles off the collections, so it needs no build. The drafts repo is
-gitignored and may be absent in a fresh worktree; it says so and carries on.
+Derives `$title-size-phone` in `_sass/cocktails/_cocktail.scss` (#1357): the
+largest size at which no title takes four lines of tape at either phone width.
+It reads that stylesheet and the titles in `_cocktail_recipes/` and
+`_cocktail_drafts/`, needs no build, and writes nothing. An absent drafts
+clone is reported and its titles are not counted.
+
+Courier Prime is monospace (0.6em advance, plus the 0.03em tracking
+`.drink-card-name` sets), and everything else is a token. Below 600px the tape
+spans the column plus the artwork's own left inset (`$tape-art-inset-x`), and
+carries `$title-tape-pad-x` of bare tape either side of the word, in em of
+the title: a smaller title gains twice.
+
+The fit rule is card-name-fit.js's, restated: a name that fits stays; one that
+is over by no more than 1/0.86 steps down to 0.86 and stays on one line; any
+other wraps at its full size, breaking at spaces and after hyphens.
+
+Re-run it when the collection grows: a long new title is what moves this.
 """
 import glob
 import os

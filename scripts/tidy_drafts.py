@@ -1,111 +1,98 @@
 #!/usr/bin/env python3
 """Tidy `_food_drafts/` and `_cocktail_drafts/` -- the mechanical half only.
 
-RUN IT THROUGH `/tidy-drafts`, not by hand, unless you know why you are here.
-`.claude/commands/tidy-drafts.md` is the procedure: branch the drafts repo,
-report, apply, run pytest, commit there. This file is only the engine.
+Run it through `/tidy-drafts`: `.claude/commands/tidy-drafts.md` is the
+procedure (branch the drafts repo, report, apply, run pytest, commit there).
+This file is the engine, and each rule's exact behaviour is in the docstring
+of its `fix_*` function.
 
     python3 scripts/tidy_drafts.py                  # report, change nothing
     python3 scripts/tidy_drafts.py --apply          # write the fixes
     python3 scripts/tidy_drafts.py --only quoting,meta
-    python3 scripts/tidy_drafts.py --only size      # #577's pass, food only
-    python3 scripts/tidy_drafts.py --only order     # #1213's pass, cocktails only
-    python3 scripts/tidy_drafts.py --only titles    # #1089's pass, cocktails only
     python3 scripts/tidy_drafts.py --site cocktails # one collection only
+    python3 scripts/tidy_drafts.py --apply --allow-dirty
+    python3 scripts/tidy_drafts.py --drafts-dir <copy> --site food
 
-WHY A SCRIPT AND NOT AN AGENT EDITING 340 FILES. Three of these rules have a
-trap in them that is easy to state and easy to forget on the hundredth file:
-`meta:` booleans must never be quoted (quoting a flag's `true` makes it the
-STRING "true" and every `is True` check in the suite silently reads False);
-house style stops at a `QQ` line, because that is the source's wording awaiting
-a rewrite and correcting its dash edits someone else's words; and no edit here
-may go through a YAML dumper, which would lose comment placement, key order and
-the exact `[""]` shape `method_short` depends on. Encoded once beats remembered
-340 times.
+`--only` takes a comma-separated subset of RULE_NAMES: `notes`, `quoting`,
+`dashes`, `typography`, `units` and `accents` run on both collections, `meta`
+and `size` on food alone, `titles` and `order` on cocktails alone.
 
-WHAT IT WILL NOT DO, AND THIS IS THE LOAD-BEARING HALF.
+It reads every `.md` with front matter under the two drafts folders (a file
+without front matter, such as a README, is named and skipped),
+`_data/accented_words.yml`, and the rule definitions in `tests/`. It writes
+only with `--apply`, in place, and never through a YAML dumper: a dumper loses
+comment placement, key order and the `[""]` shape `method_short` depends on.
+`--apply` refuses while a drafts repo has uncommitted changes unless
+`--allow-dirty` is given, so that the diff afterwards is this script's work
+alone. An absent drafts repo is announced and skipped; both absent is a
+refusal. `--drafts-dir` points one collection's rules at another directory (a
+copy to prove a pass on) and needs `--site`.
 
-  - It never touches a `QQ` line. MANUAL §5, issue #426.
-  - It never touches `source:` -- a citation is reproduced as the publication
-    spells it, so "Cafe Delites" is correct and accenting it is a misquote.
-  - It never touches a slug or filename, which must stay ASCII.
-  - It never resolves a CONTENT judgement. Which milk, which flour, which
-    mustard, whether an oven figure is the fan one, whether a note's first word
-    is a proper noun -- ~25 rules and 600-odd hits across the corpus, listed in
-    test_drafts.py's NOT_FOR_DRAFTS, every one of which needs Helen or her
-    source material. They are reported and left alone.
-  - It never renames a file, and never retitles one, and as of 2026-09-01 it no
-    longer even reports the two disagreeing. Helen ruled the class out for
-    drafts: a draft's title is still the SOURCE's title while the slug is
-    already the dish, so the divergence is the ingest working. See
-    test_title_and_slug_dont_diverge in test_drafts.py's NOT_FOR_DRAFTS.
-  - It never runs a YAML dumper over a draft.
+Every rule is imported from the suite, never re-typed, so the script cannot
+tidy a file into a shape the tests reject.
 
-SCOPE SETTLED WITH HELEN, 2026-08-29: pure formatting, plus the #429 `meta:`
-migration. It also reported title/slug divergence until 2026-09-01, when she
-ruled that out; the entry above says why. Size words (108 drafts, moving a word
-between `amount:` and `item:`) were considered and excluded that day --
-mechanical in shape, but it rewrites two fields per hit and the precedent
-records real fixes that needed an eye. THEY JOINED ON 2026-09-24, as #577's
-option 1 -- "Script it with a hand-review of the diff, one commit, before
-promotion" -- Helen's call. The `size` rule below does the move only where the
-suite's own predicate fires, refuses the shapes that needed the eye, and the
-diff of the one commit is the review.
+WHAT IT DOES
 
-COCKTAIL DRAFTS JOINED THE PASS ON 2026-09-05, at Helen's request: *"Widen
-please -- cocktail drafts passing will save me a lot of time."* They were out
-while the drink schema was mid-migration (#544, #571, #573), on the grounds that
-tidying a shape about to change is work done twice; #571 and #573 have landed
-and #544's mechanical half is spent, so the reason had expired.
+On both collections:
 
-WHAT THE PASS DOES ON A DRINK, and the boundary is narrower than food's because
-a drink's front matter is mostly NOT prose. Four fifths of its lines are a
-closed vocabulary, somebody else's words, or a number.
+  - quotes the scalar string fields, and never a `meta:` boolean: a quoted
+    flag is the STRING "true", which the publish gate holds back;
+  - `3-4` -> an en dash, `--` -> an em dash, `->` -> an arrow;
+  - `15ml` -> `15 ml`, imperial units included, never a temperature;
+  - accents from `_data/accented_words.yml`;
+  - an empty `notes:` becomes one empty label/text pair, and a note with text
+    and an empty label is labelled `QQ` (#1258).
 
-  - It fixes only what `tests/test_cocktails.py` already demands and calls
-    mechanical: the quoted scalars (`test_drink_scalar_fields_are_quoted`),
-    hyphenated number ranges (`test_drink_number_ranges_use_en_dashes`), `--`
-    and `->` (`test_drink_typography`), and accents from the curated list
-    (`test_drink_accents`). Nothing the drinks suite would not ask for.
-  - It fixes them only in Helen's OWN prose: `title`, `tagline`, `to_serve`, a
-    `notes` entry's label and text, an ingredient's `note`.
-  - It never touches a `QQ` line -- by the SUITE's predicate, not the food one
-    twenty lines below. On a drink the marker sits behind a key
-    (`tagline: "QQ ..."`, `text: "QQ - ..."`) and the food pattern, which allows
-    only a list dash and a quote before it, matches none of them. See
-    `drink_editable`.
-  - It never touches `item`, `suggestion`, `source` or `source_url`. Those are
-    somebody else's words -- test_cocktails.VERBATIM_KEYS, imported below rather
-    than re-listed -- and the drinks suite blanks them before it looks, so it
-    does not ask for them either.
-  - It never touches `glass`, `garnish`, `mood`, `generic` or `character`. Each
-    is a closed vocabulary declared in `_data/cocktails/` and enforced against
-    that declaration; an accent or an em dash written into one is a change to
-    the VOCABULARY, which is a question for `_data/`, not a formatting fix.
-  - It never touches a `method` step. `_data/cocktails/methods.yml` holds the
-    canonical steps and a `proposals` mechanism for changing one, so editing a
-    step in a drink file quietly de-canonicalises it.
-  - **It never touches an `amount`, and that one is a RECORDED HARM rather than
-    a principle.** anitas-attitude-adjuster said `amount: "Top (30-45) ml"` with
-    a `QQ` note quoting that string back verbatim; en-dashing the amount would
-    have desynchronised the note from the value it describes. The drinks suite
-    checks amounts and is right to -- they render -- so this script REPORTS a
-    range in one and leaves it, which is what the section below is for.
-  - **It reorders a drink's TOP-LEVEL KEYS into page order (#1213), and that
-    is the one thing it does outside her prose.** Whole blocks move and no
-    line is edited, so none of the entries above is touched by it: a `method`
-    step, an `amount` and a `QQ` line all travel inside their block exactly as
-    written. See `fix_key_order`.
-  - **It puts a drink's `title` in Title Case (#1089).** Capitals only: a
-    word outside brackets gains its first capital unless it is a small word,
-    nothing is lowered, and a qualifier in brackets is left as written. The
-    words do not change, so this is not the retitling ruled out above, and a
-    `QQ` title is never touched. Cocktails only. See `fix_title_case`.
+On food alone: `main_ingredients` and `tags` flow quoting, the quoting of a
+group's `- name:`, the #429 `meta:` block (retired keys dropped, flags in
+`META_ORDER`), and the #577 size word (`2` / `large onions` -> `2 large` /
+`onions`).
 
-Food's own rules stay food's: `main_ingredients` and `tags` flow quoting, and
-the #429 `meta:` migration, run on `_food_drafts/` and on nothing else. A drink's
-`meta:` block is a different list in a different order (test_cocktails.
-META_KEYS_IN_ORDER) and migrating it was never asked for.
+On cocktails alone: Title Case for `title` (#1089: capitals only, nothing is
+lowered, a qualifier in brackets is left as written) and top-level keys in
+page order (#1213: whole blocks move and no line is edited).
+
+WHAT IT WILL NOT DO
+
+  - Touch a `QQ` line: that is the source's wording awaiting Helen's rewrite,
+    and correcting its dash edits someone else's words (MANUAL §5). A
+    `QQ Claude` line is ours and is tidied like any other prose.
+  - Touch `source:`: a citation is spelled as the publication spells itself,
+    so "Cafe Delites" is correct and accenting it is a misquote.
+  - Touch a slug or filename, rename a file, or retitle one. A draft's title
+    disagreeing with its slug is not reported either: the title is still the
+    source's while the slug is already the dish
+    (`test_title_and_slug_dont_diverge` in test_drafts.py's NOT_FOR_DRAFTS).
+  - Resolve a content judgement: which milk, which flour, which mustard,
+    whether an oven figure is the fan one, whether a note's first word is a
+    proper noun. Those rules are listed in NOT_FOR_DRAFTS and each needs Helen
+    or her source material.
+  - Invent a missing `meta:` flag. It is reported.
+
+A COCKTAIL'S BOUNDARY IS NARROWER
+
+Most of a drink's front matter is a closed vocabulary, somebody else's words,
+or a number. Every rule except `notes` and `order` reaches only Helen's own
+prose (`title`, `tagline`, `snippet`, `to_serve`, a `notes` entry's label and
+text, an ingredient's `note`) and fixes there only what
+`tests/test_cocktails.py` demands. On a cocktail it never touches:
+
+  - a `QQ` line, by the suite's predicate (`conftest.checkable_text`), which
+    sees a marker behind a key (`tagline: "QQ ..."`). See `drink_editable`.
+  - `suggestion`, `source` or `source_url`: somebody else's words
+    (`test_cocktails.VERBATIM_KEYS`), which the drinks suite blanks too.
+  - `glass`, `garnish`, `mood`, `generic` or `character`: closed vocabularies
+    declared in `_data/cocktails/`. A dash or an accent written into one is a
+    change to the vocabulary, which is a question for `_data/`.
+  - a `method` step: `_data/cocktails/methods.yml` holds the canonical steps
+    and a `proposals` mechanism for changing one, so editing a step in a drink
+    file de-canonicalises it.
+  - an `amount`: a `QQ` note may quote the amount back verbatim
+    (`amount: "Top (30-45) ml"`), and en-dashing the amount desynchronises the
+    note from the value. The drinks suite does check amounts, so a range in
+    one is reported and left; see `report_drink_faults_left_alone`.
+  - a drink's `meta:` block, which is a different list in a different order
+    (`test_cocktails.META_KEYS_IN_ORDER`).
 """
 from __future__ import annotations
 
@@ -128,39 +115,18 @@ ACCENTS = ROOT / "_data" / "accented_words.yml"
 
 FRONT_MATTER = re.compile(r"\A(---\n)(.*?\n)(---\n?)", re.S)
 
-# =============================================================================
-# EVERY RULE IS IMPORTED FROM THE SUITE, NEVER RE-TYPED HERE
-# =============================================================================
-# A fixer that carries its own copy of the contract is a fixer that will one day
-# tidy files INTO a shape the tests reject, which is worse than not tidying them
-# -- and it fails in the direction nobody checks, because the script is green by
-# construction. So: one definition, and the tests own it.
-#
-# THIS ALSO RESOLVED A GUARD I TRIPPED, and the resolution is the interesting
-# part rather than the trip. The first draft of this file hardcoded
-# `["cooked_before", "date_last_edited"]`, and
-# test_invisible_keys_are_really_invisible failed: `scripts` is deliberately in
-# its RENDER_SURFACE, and those keys are on INVISIBLE_KEYS precisely because
-# nothing -- "no layout, include, plugin or script" -- reads them. The test's
-# own message says "do not narrow this test", and it is right.
-#
-# The tempting fixes were all bad: narrow the guard, drop the keys from
-# INVISIBLE_KEYS (which would make a future source_type-only commit invalidate
-# every proofread), or spell the names so the scanner misses them, which is
-# routing around a safety rail. Importing is none of those. The literals are
-# gone because they were duplication, the guard is untouched, and the script can
-# no longer drift from the contract it enforces.
+# --- Every rule is imported from the suite, never re-typed here ---
+# A fixer carrying its own copy of the contract can tidy files into a shape the
+# tests reject while its own report stays green. Importing also keeps the
+# INVISIBLE_KEYS names out of this file, which
+# test_invisible_keys_are_really_invisible scans `scripts/` for.
 sys.path.insert(0, str(ROOT / "tests"))
 from test_front_matter import (  # noqa: E402
     META_ORDER, RETIRED, SCALAR_STRING_FIELDS,
 )
-# THE DRINKS HALF IMPORTS THE SAME WAY, and the private name is deliberate.
-# `_checkable` is the drinks suite's own definition of "the part of a drink file
-# these rules look at" -- QQ lines and verbatim-key lines blanked, including the
-# indented block a bare `suggestion:` opens. Re-typing it here is exactly the
-# drift this section's heading forbids, and it is the one function whose
-# disagreement with the suite would be invisible: the script would report a
-# collection clean while the suite failed on it.
+# `_checkable` is private to the drinks suite and imported on purpose: it is
+# the suite's definition of which lines of a drink these rules look at. A copy
+# that disagreed would report a collection clean while the suite failed on it.
 from conftest import (  # noqa: E402
     checkable_text, degreeless_temperatures, spelling_problems,
 )
@@ -168,83 +134,40 @@ from test_cocktails import (  # noqa: E402
     DRINK_SCALAR_FIELDS, TOP_LEVEL_KEYS_IN_ORDER, VERBATIM_KEYS,
     _checkable as drink_suite_scope, keys_out_of_page_order, title_cased,
 )
-# The size-word pattern is the recipe rule's own (#149, #577). The 2026-09-01
-# re-measurement on #577 already imported it rather than retyping it, for the
-# reason this section's heading gives; the fixer does the same.
+# The size-word pattern is the recipe rule's own (#149, #577).
 from test_style import _LEADING_SIZE_WORD  # noqa: E402
 
 FLOW_FIELDS = ["main_ingredients", "tags"]
 
-# The retired keys that live under `meta:` -- derived from the suite's own
-# authoritative RETIRED dict (MANUAL §4 calls it that), not listed again.
-# Anything retired at the TOP level is a different rule and not this script's.
+# The retired keys that live under `meta:`, derived from the suite's RETIRED.
+# Anything retired at the top level is a different rule and not this script's.
 META_RETIRED = [k for k in RETIRED if k not in META_ORDER]
 
-# Optional and additive, and legitimate on a DRAFT alongside the three
-# (MANUAL §4, issue #418). The recipe-side rule forbids it outright, which is
-# why it is named here and not in META_ORDER.
+# Optional and additive, and legitimate on a draft alongside the three (#418).
+# The recipe-side rule forbids it outright, which is why it is named here and
+# not in META_ORDER.
 META_OPTIONAL = ["claude_rewritten"]
 
 ISO_DATE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 NUMBER_RANGE = re.compile(r"(?<![\d.])(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)(?![\d.])")
-# `QQ Claude` IS EXCLUDED, and deliberately -- see the long note on `_QQ_LINE`
-# in tests/conftest.py, which this mirrors. The marker protects SOMEBODY ELSE'S
-# wording; a `QQ Claude` line is the paraphrase written here, and MANUAL §4
-# holds it to normal house style like any other prose. Fifteen hyphenated
-# number ranges were hiding behind the old pattern on 2026-09-01.
-#
-# IT NOW ALLOWS A KEY IN FRONT OF THE MARKER, AND THIS WAS A REAL HOLE -- fixed
-# 2026-09-22. The pattern permitted an optional list dash and an optional quote
-# and nothing else, so `- "QQ original ..."` was skipped and
-# `text: "QQ - ..."`, `tagline: "QQ ..."` and `prep_time: "QQ"` were NOT. A
-# marker behind a key was invisible to the food pass, which then "corrected"
-# somebody else's words -- the exact harm MANUAL §5 exists to prevent.
-#
-# THE DRINKS HALF NEVER HAD THE BUG, which is what makes this a copy that
-# drifted rather than an oversight. `drink_editable` below asks
-# `conftest.checkable_text` precisely because "a drink puts the source's own
-# wording behind a key", and its docstring says using this pattern there "would
-# have left every QQ tagline in the collection open to editing while the report
-# claimed the rule was applied". Every word of that was true of FOOD as well and
-# nobody checked.
-#
-# MEASURED BEFORE AND AFTER, because the exposure is not the same as the damage.
-# 534 lines in `_food_drafts/` are QQ lines the old pattern could not see, 248
-# of them taglines added on 2026-09-21; of those, five in four files actually
-# carried a fault the pass would have rewritten (`QQ - pulled out as its own
-# recipe from ...` notes, an en dash and four em dashes). A latent hole that one
-# day's work quadrupled.
-#
-# THE KEY PATTERN IS conftest's, CHARACTER FOR CHARACTER: `[a-z_]+:` and a
-# single optional space, so `main_ingredients:` and `text:` match and a
-# capitalised or dotted key does not. Keeping the two literally identical is the
-# point -- this file already carries one copy of a rule that drifted from its
-# original, and a second spelling would be a third thing to keep in step.
+# A QQ line is somebody else's wording and is never edited (MANUAL §5). A key
+# may sit in front of the marker (`text: "QQ - ..."`, `tagline: "QQ ..."`).
+# `QQ Claude` is excluded: that line is our paraphrase and is held to house
+# style. This mirrors `_QQ_LINE` in tests/conftest.py; keep the two in step.
 QQ_LINE = re.compile(r"^\s*(-\s*)?(?:[a-z_]+:\s*)?[\"']?QQ\b(?!\s+Claude\b)")
 
 
-# =============================================================================
-# Reading the corpus
-# =============================================================================
+# --- Reading the corpus ---
 
 def load_drafts(root):
-    """One collection's drafts, `None` if that private repo is simply absent.
+    """One collection's drafts and its skipped files; `(None, [])` if absent.
 
-    #537's lesson, and it cost the glass icons twice in two days: a script whose
-    input is legitimately empty most of the time must check BEFORE it acts, not
-    report `0 files ->` as though that were a result.
-
-    ABSENT AND EMPTY ARE STILL DIFFERENT ANSWERS; what changed on 2026-09-05 is
-    that ONE absent root is no longer fatal, because there are now two and they
-    are two separate private repos. A worktree routinely has one and not the
-    other. `main()` makes the loud refusal when NEITHER is here -- the same
-    three-way answer `tests/test_cocktails.py`'s header settles at length: skip
-    when neither collection is present, assert non-empty when one is.
-
-    A `.md` WITH NO FRONT MATTER IS NOT A DRAFT and is named, not silently
-    dropped. `_cocktail_drafts/README.md` is the live case, and the fixers that
-    do not parse front matter (dashes, typography, accents) would happily have
-    em-dashed a README's prose.
+    Absent and empty are different answers. One absent root is not fatal: the
+    two collections are separate private repos and a worktree often has only
+    one, so `main()` refuses when neither is here. A present root with no
+    `.md`, or none with front matter, exits instead of reporting an empty
+    corpus clean. A `.md` with no front matter (a README) is not a draft and
+    is returned as skipped, so that no fixer rewrites its prose.
     """
     if not root.is_dir():
         return None, []
@@ -281,22 +204,10 @@ def has_front_matter(text):
     return FRONT_MATTER.match(text) is not None
 
 
-# =============================================================================
-# WHICH LINES OF A DRINK THIS SCRIPT MAY REWRITE
-# =============================================================================
-# The module docstring argues each entry; this is only the list. Two of the
-# three groups are imported rather than named:
-#
-#   VERBATIM_KEYS          somebody else's words (test_cocktails)
-#   the closed vocabularies declared in `_data/cocktails/`
-#   `amount`               the recorded harm, see the docstring
-#   `method`               methods.yml's canonical steps
-#
-# LONGEST FIRST IN THE ALTERNATION. `source` and `source_url` share a prefix,
-# and Python's alternation is first-match-then-backtrack rather than
-# longest-match, so the order is doing real work the moment a trailing group
-# stops forcing the backtrack. Sorting removes the dependency on that rather
-# than relying on it, which is worth one call to `sorted` at import time.
+# --- Which lines of a drink this script may rewrite ---
+# The module docstring gives the reason for each key. The alternation is sorted
+# longest first because `source` and `source_url` share a prefix and Python's
+# alternation takes the first match, not the longest.
 DRINK_VOCABULARY_KEYS = ("glass", "garnish", "mood", "generic", "character")
 DRINK_NEVER_EDIT = tuple(VERBATIM_KEYS) + DRINK_VOCABULARY_KEYS \
                    + ("amount", "method")
@@ -310,24 +221,13 @@ DRINK_NEVER_EDIT_LINE = re.compile(
 def drink_editable(text):
     """One bool per line: may this script rewrite it?
 
-    THE QQ TEST IS THE SUITE'S, NOT THE ONE AT THE TOP OF THIS FILE, and the
-    difference is not cosmetic. `QQ_LINE` above allows an optional list dash and
-    an optional quote before the marker, which is every shape a FOOD draft uses.
-    A drink puts the source's own wording behind a key -- `tagline: "QQ"`,
-    `text: "QQ - generic values INFERRED"` -- and the food pattern matches none
-    of those. Using it here would have left every QQ tagline in the collection
-    open to editing while the report claimed the rule was applied, which is the
-    shape of exclusion that looks right in the file and does nothing.
-    `conftest.checkable_text` is the pattern that knows about the key, and
-    asking it which lines it blanked is the same rule rather than a second copy.
+    The QQ test is the suite's: `conftest.checkable_text` is asked which lines
+    it blanked, so a marker behind a key (`tagline: "QQ"`) is seen. `QQ_LINE`
+    above is not consulted here.
 
-    A NEVER-EDIT KEY WITH AN EMPTY VALUE OPENS A BLOCK and the indented lines
-    under it go too. `method:`, `glass:`, `garnish:` and `mood:` are always that
-    shape, and `suggestion:` is that shape on the couple of dozen drinks that
-    name two bottles. Matching the key line alone would blank the header and
-    leave the values under it in scope -- the bug `test_cocktails._checkable`'s
-    own docstring records, avoided here by copying its algorithm rather than its
-    key list.
+    A never-edit key with an empty value opens a block, and the indented lines
+    under it go too (`method:`, `glass:`, a two-bottle `suggestion:`).
+    Matching the key line alone would leave the values under it in scope.
     """
     lines = text.split("\n")
     blanked = checkable_text(text).split("\n")
@@ -354,20 +254,13 @@ def drink_editable(text):
 
 
 def only_where_editable(fixer):
-    """Wrap a LINE-WISE fixer so it sees, and answers for, the editable lines.
+    """Wrap a line-wise fixer so it sees, and answers for, the editable lines.
 
-    Blank the rest, run the fixer over that, then take its answer line by line
-    where the line was editable and the ORIGINAL everywhere else. Blanking
-    rather than dropping is what makes the splice possible at all: the index of
-    a line has to survive, which is the same reason `conftest.checkable_text`
-    blanks and the reason it says so in its own docstring.
-
-    THE LENGTH CHECK IS NOT PARANOIA. Every fixer wrapped here is line-wise
-    today; `fix_meta_block` is not, and is food's alone. Wrapping a
-    line-count-changing fixer would splice its output against the wrong lines
-    and write a plausible-looking, wrong file to 125 drinks in one pass -- the
-    exact failure this script's `meta:` bug already produced once, caught then
-    only because the result stopped parsing. Here it would still parse.
+    The rest are blanked, not dropped, so a line's index survives; the fixer's
+    answer is taken where the line was editable and the original elsewhere.
+    Only a line-wise fixer may be wrapped. One that changes the line count
+    would be spliced against the wrong lines into a file that still parses,
+    so that raises.
     """
     def run(text, path):
         editable = drink_editable(text)
@@ -386,18 +279,16 @@ def only_where_editable(fixer):
     return run
 
 
-# =============================================================================
-# FIXERS -- each takes the whole file text and returns (new_text, [what changed])
-# =============================================================================
+# --- Fixers: (text, path) -> (new_text, [what changed]) ---
 
 def fix_scalar_quoting(text, path, fields=None):
-    """`fields` is the collection's own list, imported, never re-typed here.
+    """Quote the collection's scalar string fields; `fields` is imported.
 
     Food's is `test_front_matter.SCALAR_STRING_FIELDS`, a drink's is
-    `test_cocktails.DRINK_SCALAR_FIELDS`. Neither contains a boolean, and that
-    is load-bearing rather than incidental: quoting a `meta:` flag makes it the
-    STRING "true", which the publish gate reads as neither true nor false and
-    which holds the page back for ever.
+    `test_cocktails.DRINK_SCALAR_FIELDS`. Neither may contain a boolean:
+    quoting a `meta:` flag makes it the STRING "true", which the publish gate
+    reads as neither true nor false, so the page is held back. A value
+    containing a double quote is reported, not escaped.
     """
     fields = SCALAR_STRING_FIELDS if fields is None else fields
     parts = split_front_matter(text)
@@ -425,18 +316,9 @@ def fix_scalar_quoting(text, path, fields=None):
 def fix_group_name_quoting(text, path):
     """A food group's `- name:` is quoted, like every other string in the file.
 
-    Helen, 2026-10-04, shown that `- name: cake` and `- name: "Make the
-    batter"` sat side by side after #814: "Let's make future recipes quote
-    group titles, so add that to the tidy pass instructions, and ingestion
-    instructions." Both spellings parse to the same string and render the
-    same heading, so this is tidiness and nothing else -- which is exactly
-    what this script is for.
-
     `- name:` at the start of a list item is a group and nothing else in a
-    food file: notes are `label`/`text`, ingredients are `amount`/`item`. A
-    value already quoted either way is left alone, and one containing a
-    double quote is reported rather than escaped, the line
-    `fix_scalar_quoting` draws.
+    food file. A value already quoted either way is left alone, and one
+    containing a double quote is reported, not escaped. DECISIONS §4.
     """
     parts = split_front_matter(text)
     if not parts:
@@ -479,6 +361,7 @@ def _split_flow(inner):
 
 
 def fix_flow_quoting(text, path):
+    """Quote every entry of food's `main_ingredients` and `tags` flow lists."""
     changed = text
     notes = []
     for field in FLOW_FIELDS:
@@ -509,10 +392,7 @@ def fix_flow_quoting(text, path):
 def fix_en_dashes(text, path):
     """`3-4 mins` -> `3–4 mins`, skipping QQ lines and ISO dates.
 
-    The QQ skip is why this is worth a script. Two thirds of the corpus-wide
-    hits for this rule sit inside source wording awaiting a rewrite -- 86 of 130,
-    measured 2026-08-29 -- and MANUAL §5 says in as many words that
-    correcting a dash there is editing someone else's text.
+    Correcting a dash on a QQ line is editing someone else's text (MANUAL §5).
     """
     out, changed = [], []
     for line in text.split("\n"):
@@ -538,6 +418,7 @@ TYPOGRAPHY_FIXES = [
 
 
 def fix_typography(text, path):
+    """`--` -> an em dash and `->` -> an arrow, skipping QQ lines."""
     out, changed = [], []
     for line in text.split("\n"):
         if is_qq(line):
@@ -551,29 +432,11 @@ def fix_typography(text, path):
     return "\n".join(out), changed
 
 
-# A NUMBER AND ITS UNIT TAKE A SPACE -- Helen, 2026-10-01: "Please add unit
-# spaces (15ml -> 15 ml) as a mechanical fix to perform at ingest, and check
-# when I ask you to check drafts."
-#
-# MEASURED BEFORE IT WAS WRITTEN, which is what makes it a fix and not a
-# preference: across both food collections, `amount:` reads `40 g` 1461 times
-# and `40g` 13 times. The spaced form is the house form by a factor of 112, and
-# the thirteen are the drift.
-#
-# IMPERIAL TOO, 2026-10-01: Helen, on finding `9in (23 cm)` in the drafts,
-# "All units need them, including imperial."
-#
-# THE ALTERNATION IS SORTED BY LENGTH IN CODE, NOT BY HAND, and that is the one
-# piece of engineering in this rule. A short-first list turns `2kg` into `2k g`
-# and `5inches` into `5 in ches` -- answers that parse fine and read almost
-# right, so nothing else would catch them. Sorting longest-first makes the whole
-# class impossible rather than tested-for, and adding a unit tomorrow cannot
-# reintroduce it.
-#
-# WHAT IS DELIBERATELY ABSENT. A bare `l` (never measured, and `1ltr` is a real
-# string this would mangle), `mins` (a duration is not a measure), and anything
-# temperature-shaped: `180C` wants a degree sign, which is a DIFFERENT rule and
-# a reported-never-fixed one, so putting it here would quietly half-fix it.
+# A number and its unit take a space, imperial included (DECISIONS §5). The
+# alternation is sorted longest first in code: a short-first list turns `2kg`
+# into `2k g`, which parses and reads almost right. Deliberately absent: a
+# bare `l` (`1ltr` would be mangled), `mins` (a duration is not a measure),
+# and temperatures, where `180C` wants a degree sign and is a reported rule.
 UNITS = [
     # metric
     "kg", "g", "ml", "cl", "cm", "mm",
@@ -587,20 +450,11 @@ UNIT_SPACE = re.compile(
 
 
 def fix_unit_spacing(text, path):
-    """`15ml` -> `15 ml`, skipping QQ lines.
+    """`15ml` -> `15 ml`, skipping QQ lines but not `QQ Claude` (MANUAL §5).
 
-    THE QQ SKIP IS THE SAME ONE `fix_en_dashes` MAKES and for the same reason:
-    a `QQ original` line is the source's own wording awaiting Helen's rewrite,
-    and respacing it is editing someone else's text (MANUAL §5). `QQ Claude` is
-    NOT skipped -- `is_qq` encodes `QQ\\b(?!\\s+Claude\\b)` -- because that half
-    of the pair is ours and is held to house style like any other prose.
-
-    ON A DRINK THIS RUNS ONLY WHERE HELEN WRITES, through
-    `only_where_editable`, so a cocktail's `amount` is never touched. That is
-    the recorded harm this script's own doc describes: anitas-attitude-adjuster
-    said `amount: "Top (30-45) ml"` with a QQ note quoting the string back, and
-    editing the amount desynchronised the note from the value. Food's amounts
-    have no such pairing and are fixed.
+    On a drink this runs through `only_where_editable`, so a cocktail's
+    `amount` is never touched; the module docstring says why. Food's amounts
+    are fixed.
     """
     out, changed = [], []
     for line in text.split("\n"):
@@ -618,9 +472,8 @@ def fix_unit_spacing(text, path):
 def _accent_map():
     """The curated unaccented->accented map, and the words that keep no accent.
 
-    Read as text rather than through a YAML parser so this script has no
-    dependency the test suite does not already carry; the file is a flat
-    two-block mapping and has been since it was written.
+    Read as text, not through a YAML parser: the file is a flat two-block
+    mapping, `words:` and `no_accent:`.
     """
     words, no_accent, section = {}, set(), None
     for line in ACCENTS.read_text(encoding="utf-8").split("\n"):
@@ -676,17 +529,15 @@ def fix_accents(text, path, _cache={}):
 
 
 def fix_meta_block(text, path):
-    """The #429 migration: drop two retired keys, put the three in order.
+    """The #429 migration: drop the retired keys, put the flags in order.
 
-    THE ORDER IS test_front_matter.META_ORDER, taken from there rather than
-    named again here. It is the order a recipe moves through the flags, and
-    it is asserted rather than merely preferred
-    (test_meta_block_is_exactly_the_three_flags_in_order).
+    The order is `test_front_matter.META_ORDER`, asserted by
+    test_meta_block_is_exactly_the_three_flags_in_order. An optional
+    `claude_rewritten` sits after the first flag.
 
-    A MISSING `awaiting_fix` IS REPORTED, NEVER INVENTED. The flag fails closed:
-    `false` is the only value that publishes a page, so writing one in is
-    asserting the recipe is fit to publish, which is Helen's to say and not a
-    formatting fix. Two drafts are in this state.
+    A missing flag is reported, never invented. `awaiting_fix` fails closed,
+    so writing `false` in asserts the recipe is fit to publish, which is
+    Helen's to say. An unrecognised key leaves the whole block alone.
     """
     parts = split_front_matter(text)
     if not parts:
@@ -697,13 +548,10 @@ def fix_meta_block(text, path):
     start = next((i for i, l in enumerate(lines) if l.rstrip() == "meta:"), None)
     if start is None:
         return text, []
-    # `^  \S`, NOT "indented or blank". Splitting the front matter on "\n" leaves
-    # a trailing "" (the text ends with a newline), and an "or blank" scan
-    # swallowed it -- so the rebuilt block absorbed the final newline and every
-    # file came out ending `proofread: false---`. 341 of 342 drafts, silently,
-    # and the front-matter regex then matched none of them. Caught by parsing
-    # the output rather than by reading the diff, which is the only reason this
-    # comment is here and not a git history entry.
+    # `^  \S`, not "indented or blank". Splitting the front matter on "\n"
+    # leaves a trailing "", and a scan that accepts blanks swallows it: the
+    # rebuilt block eats the final newline and the file ends
+    # `proofread: false---`, which no longer parses as front matter.
     end = start + 1
     while end < len(lines) and re.match(r"^  \S", lines[end]):
         end += 1
@@ -744,48 +592,12 @@ def fix_meta_block(text, path):
     return open_ + "\n".join(lines) + close + body, changed
 
 
-# =============================================================================
-# THE SIZE WORD, #577 -- excluded 2026-08-29, scripted 2026-09-24
-# =============================================================================
-# `amount: "2"` / `item: "large onions"` renders the "2" highlighted and the
-# "large" as part of the ingredient's name; the recipe rule
-# (test_style.test_size_word_is_with_the_count_not_the_item, issue #149) wants
-# `amount: "2 large"` / `item: "onions"`. The 2026-08-29 tidy left it out
-# because it rewrites two fields per hit and #149's own fix needed an eye on
-# five of them. On 2026-09-24 Helen chose the issue's option 1: script it, hand-
-# review the diff, one commit, before promotion. So the script is deliberately
-# CONSERVATIVE: every shape that ever needed the eye is refused and named, and
-# the diff the reviewer reads holds only the moves nobody has yet found wrong.
-#
-# THE PREDICATE IS THE TEST'S, BOTH HALVES. `_LEADING_SIZE_WORD` is imported
-# above; the "bare count" half is inline in the test --
-# `re.fullmatch(r"\d+", amount)` -- and BARE_COUNT spells it character for
-# character. The test stops at a bare integer on purpose (its module comment):
-# `400 g` / `large open mushrooms` reads fine with the size as an adjective,
-# `½` / `small bunch of chives` likewise, and a `small handful of parsley` with
-# no amount at all IS the amount. None of those is moved, and only the last is
-# reported, because it is the one a reader of the diff would otherwise take for
-# a miss.
-#
-# WHAT IT REFUSES, EACH NAMED IN THE REPORT RATHER THAN GUESSED AT:
-#   - no `amount:`, or an empty one: no count to attach the word to. Surfaced
-#     by `report_size_words_with_no_count`, never rewritten. All 38 on
-#     2026-09-24 were the handful/bunch idiom the test calls the amount.
-#   - a remainder starting `or`: `1` / `large or 2 small onions` carries a
-#     second count inside the item, and `1 large` / `or 2 small onions` is
-#     worse than what was there. Three drafts. An eye, not a rule.
-#   - `baby`: the regex has it, and it is a KIND as often as a size -- baby
-#     gem, baby corn, baby spinach, baby plum tomatoes. DECISIONS §6 records
-#     Helen's ruling that `baby gem` is a kind, and a script that strips it
-#     produces `2 baby` / `gem lettuce`, which passes the test and is wrong.
-#     Skipped and named, for the reviewer to move by hand if she wants it.
-#   - an escape or an inner quote in either value, or a bare item whose
-#     remainder would start with a YAML indicator: rewrapping it is a
-#     judgement about the text, the same line fix_scalar_quoting draws.
-#
-# BYTE-PRESERVING BY CONSTRUCTION. It touches exactly two lines per hit, keeps
-# each line's indentation, gap and quote style, and never goes through a
-# dumper. `tests/test_tidy_drafts.py` proves the whole file byte for byte.
+# --- The size word, #577 ---
+# The predicate is the test's, both halves: `_LEADING_SIZE_WORD` is imported,
+# and BARE_COUNT spells the `re.fullmatch(r"\d+", amount)` that
+# test_size_word_is_with_the_count_not_the_item has inline. Two lines change
+# per hit, each keeping its indentation, gap and quote style;
+# `tests/test_tidy_drafts.py` proves the rest of the file byte for byte.
 BARE_COUNT = re.compile(r"\d+")
 KEYED_LINE = re.compile(
     r"^(?P<lead>\s*(?:-\s+)?)(?P<key>amount|item):(?P<gap>[ \t]*)"
@@ -801,11 +613,9 @@ def _ingredient_pairs(lines):
     carries an `item:` key of its own.
 
     An entry is a `- ` line plus the lines indented deeper than its dash; its
-    own keys sit at the column the dash line's key starts in, so a nested
-    mapping's `item:` (deeper) and the enclosing group's (shallower) are both
-    left to their own entries. `ingredient_groups:` is a list of groups each
-    holding a list of items, and this is what stops the group entry -- which
-    spans every item under it -- from claiming the first item's lines.
+    own keys sit at the column the dash line's key starts in. That is what
+    stops an `ingredient_groups:` group entry, which spans every item under
+    it, from claiming the first item's lines.
     """
     for i, line in enumerate(lines):
         m = LIST_ENTRY.match(line)
@@ -847,9 +657,17 @@ def _rebuild(keyed, value):
 def fix_size_words(text, path):
     """`amount: "2"` + `item: "large onions"` -> `amount: "2 large"` + `item: "onions"`.
 
-    Only where the suite's predicate fires -- a bare integer count beside an
-    item starting with a size word -- and never in the shapes the section
-    comment above lists, each of which is SKIPPED and says so.
+    Only where the suite's predicate fires: a bare integer count beside an
+    item starting with a size word. A weight or a fraction is not moved.
+    Refused, each named SKIPPED in the report:
+
+      - a remainder starting `or` (`1` / `large or 2 small onions`): a second
+        count sits inside the item;
+      - `baby`, which is a kind as often as a size (DECISIONS §6);
+      - an escape or inner quote in either value, or a bare remainder starting
+        with a YAML indicator: rewrapping is a judgement about the text.
+
+    No `amount:`, or an empty one, is `report_size_words_with_no_count`'s.
     """
     parts = split_front_matter(text)
     if not parts:
@@ -908,11 +726,8 @@ def fix_size_words(text, path):
 def report_size_words_with_no_count(path, text):
     """A size word on an item with no `amount:` to carry it. Surfaced, never moved.
 
-    Every one measured on 2026-09-24 was `small handful of ...` or `small bunch
-    of ...`, which the recipe rule's own comment says is the amount and not a
-    stray adjective. It is reported anyway because a reader of the pass's diff
-    who knows 108 drafts were the wrong way round would otherwise take a
-    `small handful` that survived it for a miss.
+    `small handful of ...` is the amount, not a stray adjective. It is
+    reported so that a reader of the pass's diff does not take it for a miss.
     """
     parts = split_front_matter(text)
     if not parts:
@@ -934,26 +749,9 @@ def report_size_words_with_no_count(path, text):
     return found
 
 
-# =============================================================================
-# THE NOTES SLOT, #1258 -- somewhere to type, and a label Helen cannot miss
-# =============================================================================
-# Helen, #1258: "at ingest, or draft check, leave me with a notes placeholder I
-# don't have to retype". Two moves, both on a draft's `notes:` and nothing else.
-#
-#   1. `notes: []` (or a bare `notes:`) BECOMES THE EMPTY PAIR. The 2026-10-01
-#      migration left 77 of these alone on the grounds that an empty list says
-#      the ingest found nothing; Helen, 2026-10-02, on being asked: "yes, thank
-#      god, yes yes yes please fix the notes: []". An empty pair renders as
-#      nothing in either layout, so the slot costs the page nothing.
-#   2. A NOTE WITH TEXT AND AN EMPTY LABEL IS LABELLED `QQ`. Those are the 182
-#      bare strings the same migration turned into `label: ""`. Her reason,
-#      2026-10-02: "this will stop them being published by accident (i.e.
-#      without me having spotted and fixed the imported text)" -- a published
-#      recipe may not contain `QQ`, so the label is the gate.
-#
-# THE TEXT IS NEVER TOUCHED. It is imported wording; the label is the only
-# thing this writes. And a published recipe never passes through here, so
-# `notes: []` stays the right spelling for a finished page with no notes.
+# --- The notes slot, #1258 ---
+# A published recipe never passes through here, so `notes: []` stays the right
+# spelling for a finished page with no notes.
 NOTES_KEY = re.compile(r"^notes:[ \t]*(?P<value>\[\s*\])?[ \t]*$")
 NOTE_EMPTY_LABEL = re.compile(
     r"^(?P<lead>\s*(?:-\s+)?)label:[ \t]*(?:\"\"|'')?[ \t]*$")
@@ -962,6 +760,13 @@ NOTES_PLACEHOLDER = ['notes:', '  - label: ""', '    text: ""']
 
 
 def fix_notes_slot(text, path):
+    """Give a draft a notes slot, and label imported note text `QQ`.
+
+    An empty `notes:` (or `notes: []`) becomes one empty label/text pair,
+    which renders as nothing. A note with text and an empty label is labelled
+    `QQ`: a published recipe may not contain `QQ`, so the label stops imported
+    text publishing unread. A note's text is never touched. DECISIONS §4.
+    """
     parts = split_front_matter(text)
     if not parts:
         return text, []
@@ -972,8 +777,7 @@ def fix_notes_slot(text, path):
     if start is None:
         return text, []
     # The block is every following line that is indented or a list dash; the
-    # next top-level key ends it. The trailing "" that split leaves is neither,
-    # which is the lesson fix_meta_block's comment records.
+    # next top-level key ends it, and so does the trailing "" that split leaves.
     end = start + 1
     while end < len(lines) and re.match(r"^(\s+\S|-\s)", lines[end]):
         end += 1
@@ -1008,33 +812,7 @@ def fix_notes_slot(text, path):
     return open_ + "\n".join(lines) + close + body, changed
 
 
-# =============================================================================
-# KEY ORDER, #1213 -- a drink's keys in the order the page prints them
-# =============================================================================
-# Helen: "yaml fields should be rewritten in the order they appear on the page,
-# top to bottom". Drafts and new ingests, her words; never a published recipe,
-# which this script cannot reach anyway. Cocktails only -- food was not asked.
-#
-# THE ORDER IS THE SUITE'S, `test_cocktails.TOP_LEVEL_KEYS_IN_ORDER`, which a
-# test there derives from `_layouts/cocktail.html`. Nothing is named here.
-#
-# IT MOVES WHOLE BLOCKS AND EDITS NO LINE. A top-level key's block is its own
-# line and every line under it up to the next top-level key; the blocks are
-# re-dealt in the declared order and each is written back byte for byte --
-# indentation, quoting, comments inside the block, all of it. No dumper.
-#
-# IT CHECKS ITS OWN WORK BEFORE RETURNING IT, which is the 2026-08-29 lesson
-# (DECISIONS §11: the `meta:` rewrite broke 341 of 342 drafts behind a diff
-# that looked plausible, and was caught only by parsing both sides). Three
-# claims, and a failure of any is a raised error rather than a written file:
-# the same lines, as a multiset; the same parsed data; and the declared order.
-#
-# WHAT IT REFUSES, EACH NAMED IN THE REPORT RATHER THAN GUESSED AT:
-#   - a key the schema does not declare: it has no place to be put;
-#   - the same key twice: which block is the real one is not a formatting fix;
-#   - a column-0 comment, or any other column-0 line that is not a key: it
-#     belongs to no block, and whether a comment describes the key above it or
-#     the key below it is something only its author knows.
+# --- Key order, #1213: a drink's keys in the order the page prints them ---
 TOP_LEVEL_KEY = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*):(?:[ \t]|$)")
 
 
@@ -1059,6 +837,18 @@ def _top_level_blocks(lines):
 
 
 def fix_key_order(text, path):
+    """Deal a cocktail draft's top-level keys into page order (DECISIONS §9).
+
+    The order is `test_cocktails.TOP_LEVEL_KEYS_IN_ORDER`. A key's block is
+    its own line and every line under it up to the next top-level key; blocks
+    move whole and are written back byte for byte. Before returning it raises
+    unless the lines are the same multiset, the parsed data is equal and the
+    declared order is reached: a reorder that breaks a file can still look
+    plausible in a diff.
+
+    Refused, each named SKIPPED: an undeclared key, the same key twice, and a
+    column-0 line that is not a key (a comment there belongs to no block).
+    """
     parts = split_front_matter(text)
     if not parts:
         return text, []
@@ -1101,23 +891,17 @@ def fix_key_order(text, path):
              f"{' '.join(problem[0])} -> {' '.join(problem[1])}"])
 
 
-# =============================================================================
-# TITLE CASE, COCKTAILS ONLY -- #1089
-# =============================================================================
-# Helen, 2026-10-08: "Add title case to cocktail drafts too please, why not.
-# Add that to our draft-tidying script." The rule is the suite's `title_cased`,
-# imported above: it raises the first letter of a word outside brackets and
-# never lowers one, so it changes capitals and no words. That is why this is
-# not the RETITLING the docstring rules out -- the title still says what the
-# source called the drink.
-#
-# FOOD IS NOT IN IT. Her ruling is about cocktail titles, and a food draft's
-# title is the source's own until it is promoted.
+# --- Title case, cocktails only, #1089 ---
 TITLE_LINE = re.compile(r'^(?P<head>title:[ \t]*")(?P<title>[^"]*)(?P<tail>"[ \t]*)$')
 
 
 def fix_title_case(text, path):
-    """Line-wise, and wrapped: a `title: "QQ ..."` line never reaches it."""
+    """Title Case for a cocktail draft's `title`, by the suite's `title_cased`.
+
+    It raises the first letter of a word outside brackets and never lowers
+    one, so capitals change and words do not. Line-wise, and wrapped: a
+    `title: "QQ ..."` line never reaches it. A food title stays the source's.
+    """
     parts = split_front_matter(text)
     if not parts:
         return text, []
@@ -1146,25 +930,14 @@ FOOD_FIXERS = [
     ("size", fix_size_words),
 ]
 
-# THE MISSING ENTRIES ARE THE POINT OF HAVING TWO TABLES.
-# `fix_flow_quoting` reads `main_ingredients` and `tags`, which no drink has;
-# `fix_meta_block` runs the #429 migration over food's three flags, and a
-# drink's `meta:` is a five-key block in its own order that nobody asked to
-# migrate; `fix_size_words` rewrites an `amount`, which on a drink is the
-# recorded harm above, beside an `item`, which a drink retired on 2026-09-21.
-# A single table with an `if site == ...` inside each fixer would have been the
-# same code and a worse place to read the answer.
-# `units` IS IN BOTH TABLES AND MEANS TWO DIFFERENT THINGS, which is exactly
-# what the two tables are for. On FOOD it runs over the whole file, so an
-# `amount: "40g"` is fixed. On a DRINK it is wrapped, so it reaches only Helen's
-# own prose and a drink's `amount` stays untouched -- the recorded harm above.
-# A drink cannot carry an unspaced amount anyway (`15ml` fails
-# test_every_amount_is_readable_as_a_quantity, because `measures:` declares the
-# unit and not the glue), so the wrap costs nothing and states the rule.
-# `notes` IS UNWRAPPED ON A DRINK, the one fixer here that is. It changes the
-# line count (which `only_where_editable` refuses) and it has to see a
-# `text: "QQ - ..."` line to know the note has text, which the wrap would blank.
-# It writes a `label:` line and a fresh empty pair, never anybody's words.
+# Two tables, not one with a site test inside each fixer. A drink has no
+# `main_ingredients` or `tags` for `fix_flow_quoting`, its `meta:` is not
+# food's, and `fix_size_words` would rewrite an `amount`.
+# `units` is in both: unwrapped on food, so `amount: "40g"` is fixed; wrapped
+# on a drink, so it reaches only Helen's prose.
+# `notes` is unwrapped on a drink: it changes the line count, which
+# `only_where_editable` refuses, and it must see a `text: "QQ - ..."` line to
+# know the note has text. It writes only a `label:` line or an empty pair.
 DRINK_FIXERS = [
     ("notes", fix_notes_slot),
     ("quoting", only_where_editable(
@@ -1185,26 +958,10 @@ DRINK_FIXERS = [
 RULE_NAMES = sorted({n for n, _ in FOOD_FIXERS} | {n for n, _ in DRINK_FIXERS})
 
 
-# =============================================================================
-# REPORTERS -- never fixed, always surfaced
-# =============================================================================
+# --- Reporters: never fixed, always surfaced ---
 
-# THE PREDICATE IS IMPORTED FROM THE SUITE, NOT RE-TYPED, and the first draft of
-# this file proves why: a CLAUDE-marker scan with re.I on it matched `QQ Claude
-# ...`, which is the documented interleaved-rewrite convention (MANUAL §4) and
-# not an instruction at all. It reported hundreds of files as needing attention
-# and every one was that convention. The real rule is case-sensitive. MANUAL
-# §12: "if you scan and find lots of problems, be suspicious of your own
-# findings before reporting them."
-#
-# THERE WAS A SECOND REPORTER HERE AND IT IS GONE, 2026-09-01. It flagged a
-# title whose head-clause words are absent from the filename, 19 drafts, and
-# Helen ruled the whole class out: "let's not run the title matches slug-ish
-# test over drafts". A draft's title is still the SOURCE's title while the slug
-# is already the dish, so the divergence is the ingest working, not failing --
-# see the reason on test_title_and_slug_dont_diverge in test_drafts.py's
-# NOT_FOR_DRAFTS. It was 19 of the 21 lines this script printed, so removing it
-# is most of what makes the report readable.
+# Case-sensitive on purpose: `QQ Claude ...` is the interleaved-rewrite
+# convention (MANUAL §5), not an instruction left for Claude.
 CLAUDE_MARKER = re.compile(r"[^\"\n]{0,10}\bCLAUDE\b[^\"\n]{0,40}")
 
 
@@ -1214,19 +971,13 @@ def report_claude_markers(path, text):
 
 
 def report_drink_faults_left_alone(path, text):
-    """Mechanical faults the DRINKS SUITE names that this script will not fix.
+    """Mechanical faults the drinks suite names that this script will not fix.
 
-    WITHOUT THIS THE REPORT WOULD BE MISLEADING RATHER THAN MERELY INCOMPLETE.
-    The drinks suite blanks only the verbatim keys before it looks, so it checks
-    an `amount`, a `generic`, a `glass` and a method step; this script edits
-    none of them. A drink with a hyphenated range in its amount would print
-    nothing here and fail pytest, and the natural reading of that is "the tidy
-    pass missed one" rather than "the tidy pass declined one on purpose".
-
-    Two of the three kinds are not fixed for EITHER collection and are listed
-    for the same reason: a non-house spelling (`demarara -> demerara`) is a
-    word rather than a character, and a temperature without its degree sign
-    turns up in a drink about once a year and has never yet turned up wrong.
+    The suite checks an `amount`, a `generic`, a `glass` and a method step;
+    this script edits none of them. Naming them here lets a fault the pass
+    declined be told from one it missed when pytest fails. A non-house
+    spelling and a temperature without its degree sign are reported for the
+    same reason and are fixed on neither collection.
     """
     scope = drink_suite_scope(SimpleNamespace(raw=text))
     editable = drink_editable(text)
@@ -1260,9 +1011,7 @@ def dirty_drafts(root):
     return [l for l in r.stdout.split("\n") if l.strip()]
 
 
-# ONE ROW PER PRIVATE REPO. The name is what `--site` takes, the root is where
-# the files are, and the two tables are what makes the food/drink boundary a
-# thing you can read in one place rather than a condition inside six fixers.
+# One row per private repo. The name is what `--site` takes.
 SITES = {
     "food": (FOOD_DRAFTS, FOOD_FIXERS, FOOD_REPORTERS,
              "helen-triages-food-private"),
@@ -1324,7 +1073,7 @@ def print_collection(root, verb, files, skipped, fixed, reports, total):
 
 def main(argv=None):
     # `argv` is for tests/test_tidy_drafts.py, which calls this in its own
-    # process (#1271). None means the command line, as it always did.
+    # process (#1271). None means the command line.
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--apply", action="store_true",
                     help="write the fixes; without it nothing is changed")

@@ -1,43 +1,31 @@
 #!/usr/bin/env python3
 """Which strengths in abv.yml are still guesses, and which LIVE drinks read them.
 
-#1001 put the unit count on the public site, so every unsettled strength in
-`_data/cocktails/abv.yml` is now an unsettled number a stranger can read. This
-prints the worklist: the rows that are not settled, each with the PUBLISHED
-drinks whose figure moves if the row changes.
-
     python3 scripts/abv_worklist.py              # the worklist, as markdown
     python3 scripts/abv_worklist.py --counts     # just the numbers
 
-WHY IT IS NOT `grep -n 'qq:'`. That grep is the list of rows, which abv.yml's
-own header points at and which is the right tool for "what is unsettled". It
-cannot answer the question that matters once the figure is public -- WHICH OF
-THEM CHANGE A NUMBER SOMEBODY CAN SEE -- because that depends on how a pour
-resolves to a strength, and on whether the pour counts at all. Both Bob's
-bitters carry a `qq:` and neither can move any figure, because a dash never
-reaches the arithmetic.
+Prints the rows of `_data/cocktails/abv.yml` that are not settled (a `qq:`, or
+`confidence: low`), each with the published drinks whose unit figure moves if
+the row changes. It writes nothing.
 
-SO IT REPLAYS `_plugins/cocktail_units.rb`'s RESOLUTION, in the same order:
+A grep for `qq:` lists the rows but cannot say which of them reach a figure,
+because that depends on how an ingredient resolves to a strength. So this
+replays `_plugins/cocktail_units.rb`'s resolution, in the same order (MANUAL
+§9.3.4):
 
-  * a pour whose amount does not parse to millilitres does not count (the
-    exclusion list and the per-unit table are read out of the same data the
-    plugin reads, never restated here);
-  * a `suggestion:` resolving through bottles.yml's aliases to a bottle WITH a
+  * an amount that does not parse to millilitres does not count; the
+    exclusion list and the per-unit table are read from the data the plugin
+    reads;
+  * a `suggestion:` resolving through bottles.yml's aliases to a bottle with a
     strength wins outright;
-  * otherwise each `generic:` resolves to `default_bottles[g]` where Helen has
-    ruled one, else to every bottle declared under that generic, else to the
+  * otherwise each `generic:` resolves to `default_bottles[g]` where there is
+    one, else to every bottle declared under that generic, else to the
     generic's own row.
 
-That makes this a second implementation of the plugin's lookup, in the way
-`scripts/related_drinks.py` is a second implementation of the related-drinks
-scoring -- run it after any change to the vocabulary, the bottle list or the
-default_bottles ruling, and it will disagree with the site if one of them has
-moved underneath the other.
-
-PUBLISHED MEANS THE GATE'S ANSWER, not "is in the collection": `awaiting_fix:
-false` AND `proofread: true`, both, exactly as `_plugins/publish_gate.rb` reads
-them (MANUAL 4.0). A drink held back for proofreading is not showing anyone a
-unit count.
+It is a second implementation of the plugin's lookup: re-run it after a change
+to the vocabulary, the bottle list or `default_bottles`. A drink counts as
+published on `awaiting_fix: false` and `proofread: true`; it does not read
+the gate's third cocktail flag, `rewritten`.
 """
 import glob
 import os
@@ -58,7 +46,7 @@ def load(name):
 
 
 class Resolver:
-    """The plugin's strength lookup, over the same five files it reads."""
+    """The plugin's strength lookup, over the data files it reads."""
 
     def __init__(self):
         abv = load("abv.yml")
@@ -69,8 +57,8 @@ class Resolver:
         self.abv_bottles = abv.get("bottles") or {}
         self.abv_generics = abv.get("generics") or {}
         self.non_alcoholic = set(abv.get("non_alcoholic") or [])
-        # Bitters never count -- Helen, #1012, 2026-09-14, and the plugin's
-        # DIFFERENCE 5. Read from the list a bitters is declared in.
+        # Bitters never count (#1012). Read from the list a bitters is
+        # declared in.
         self.bitters = set(ingredients.get("bitters") or [])
 
         self.per_ml = ingredients["measures"]["per_ml"]
@@ -89,7 +77,7 @@ class Resolver:
             self.by_generic.setdefault(row.get("generic"), []).append(name)
 
     def volume_ml(self, amount):
-        """Millilitres, or None when the pour does not reach the arithmetic."""
+        """Millilitres, or None when the amount does not reach the arithmetic."""
         a = str(amount).strip()
         if a in self.excluded:
             return None
@@ -108,10 +96,9 @@ class Resolver:
         return bool(row and row.get("abv") is not None)
 
     def rows_for_generic(self, g):
-        # EVERY BOTTLE UNDER THE GENERIC, even though since #1016 the plugin
-        # reads only their MODE. For a worklist that is the right answer, not an
-        # approximation: an unsettled strength on any one of them can change
-        # which value is the mode, so every one of them reaches the figure.
+        # Every bottle under the generic, though the plugin reads only their
+        # mode (#1016): an unsettled strength on any one of them can change
+        # which value is the mode, so every one reaches the figure.
         if g in self.non_alcoholic:
             return []
         names = self.defaults.get(g) or self.by_generic.get(g) or []
@@ -121,7 +108,7 @@ class Resolver:
         return [("generic", g)] if g in self.abv_generics else []
 
     def rows_for_pour(self, ing):
-        """Every abv.yml row this pour's strength is computed from."""
+        """Every abv.yml row this ingredient's strength is computed from."""
         amount = str(ing.get("amount", "")).strip()
         raw = ing.get("generic")
         generics = [str(x) for x in raw] if isinstance(raw, list) else \
@@ -184,9 +171,8 @@ def build():
                 for key in r.rows_for_pour(ing):
                     users.setdefault(key, set()).add(title)
 
-    # A bitters bottle is never on the worklist, however unsure its strength:
-    # by Helen's ruling it cannot reach a unit figure, so asking her shelf about
-    # it is a question about a number nothing reads.
+    # A bitters bottle is never on the worklist: it cannot reach a unit
+    # figure (#1012).
     bottle_generic = {}
     for generic, names in r.by_generic.items():
         for n in names:

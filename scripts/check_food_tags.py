@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """Report food recipes whose tags or star disagree with what the title says.
 
-A REPORT. IT WRITES NOTHING AND IT IS NOT A TEST. Helen, 2026-10-08, asked
-whether food tags could be derived the way cocktail moods are. Measured, they
-cannot: the tags the data can see are the ones the title already states, and
-the judgement tags (`virtuous`, `showstopper`, `festive`...) score at chance.
-So there is no food deriver. What the reliable rules ARE good for is a list to
-have open while proofreading -- "salad" in the title and no `salad` tag.
-
-The hints are data: `tag_hints` in _data/food/taxonomy.yml, which also records
-which ones held up and why the rest are absent.
-
     python3 scripts/check_food_tags.py              # drafts and published
     python3 scripts/check_food_tags.py --drafts     # drafts only
     python3 scripts/check_food_tags.py --published  # published only
+
+A report: it writes nothing and it is not a test. Food tags cannot be derived
+the way cocktail moods are, because the only tags the data can see are the
+ones the title already states, so there is no food deriver. What the reliable
+rules are good for is a list to have open while proofreading: "salad" in the
+title and no `salad` tag.
+
+The hints are data: `tag_hints` in _data/food/taxonomy.yml. It reads that, and
+the recipes in `_food_recipes/` and `_food_drafts/`.
 
 A line here is "worth an eye", not "wrong". A chicken and chorizo stew may be
 about the pork, and a savoury recipe with flour and sugar in it is not a bake.
@@ -36,7 +35,7 @@ FRONT_MATTER = re.compile(r"\A---\n(.*?)\n---", re.S)
 def has_word(text, word):
     """`word` as a whole word in `text`, with or without a plural `s`.
 
-    WHOLE WORDS, because `cod` is inside `codswallop` and `ham` inside
+    Whole words, because `cod` is inside `codswallop` and `ham` inside
     `Graham`; and the plural because a title says "Prawns" as often as
     "Prawn". Case is ignored.
     """
@@ -56,9 +55,8 @@ def ingredient_text(fm):
 def prose(fm):
     """Everything the recipe SAYS: tagline, every method step, every note.
 
-    `method_groups` as well as `method` -- about half the collection writes
-    its steps in named groups, and a first measurement that read `method`
-    alone was blind to all of them.
+    `method_groups` as well as `method`: many recipes write their steps in
+    named groups.
     """
     parts = [str(fm.get("tagline") or "")]
 

@@ -1,21 +1,22 @@
 #!/bin/sh
 # A headless Chromium for looking at the built site -- MANUAL §1.
 #
-# IN THE DEVCONTAINER THIS USUALLY DOES NOTHING, SINCE 2026-09-15. The image
-# carries Playwright, its Chromium and Chromium's system libraries under
-# /opt/playwright (.devcontainer/Dockerfile), and scripts/browser/env.sh finds
-# them there. This script checks that copy is the pinned version and stops.
+# In the devcontainer this usually does nothing: the image carries Playwright,
+# its Chromium and Chromium's system libraries under /opt/playwright
+# (.devcontainer/Dockerfile), and scripts/browser/env.sh finds them there. This
+# script checks that copy is the pinned version and stops.
 #
 # Otherwise -- on a host, or in an image built before the pin moved -- it
-# installs Playwright and its Chromium ENTIRELY under tmp/browser/ (gitignored),
-# Helen's grant of 2026-09-10: nothing lands in ~ or on the system. On a host
-# without Chromium's libraries the launch names the missing packages and stops.
+# installs Playwright and its Chromium entirely under tmp/browser/ (gitignored):
+# nothing lands in ~ or on the system. On a host without Chromium's libraries
+# the launch names the missing packages and stops.
 #
-# THE VERSION IS PINNED HERE AND IN THE DOCKERFILE; tests/test_browser_harness.py
+# The version is pinned here and in the Dockerfile; tests/test_browser_harness.py
 # fails if they differ.
 #
 #   sh scripts/browser/install.sh        # once per fresh tmp/, and only outside the image
-#   sh scripts/browser/serve.sh          # serve tmp/site at 127.0.0.1:4010, in the background
+#   sh scripts/browser/build.sh          # build what deploys into tmp/site
+#   sh scripts/browser/serve.sh          # serve tmp/site on the first free port from 4010, in the background
 #   sh scripts/browser/shoot.sh <label> <path>...   # screenshots + overflow report
 #   sh scripts/browser/crop.sh <path> <selector> <name> [width] [type-into] [text]   # one element at 2x, after typing
 set -e

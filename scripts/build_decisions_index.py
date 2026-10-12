@@ -3,48 +3,30 @@
     python3 scripts/build_decisions_index.py --check    # diff, exit 1 if stale
     python3 scripts/build_decisions_index.py --write    # rewrite the index
 
-WHY (#1202, 2026-09-29). DECISIONS.md is thousands of lines and no session can
-read it whole, so "find its section in the journal before re-opening anything"
-works only by grep -- and a ruling you do not know the keyword for is a ruling
-you cannot find. The index is one line per top-level entry, in journal order:
+Reads `model_instructions/DECISIONS.md` and writes one line per top-level
+entry, in journal order, so a session greps the headlines and then greps the
+journal for a headline's words:
 
-    - 2026-09-20 · §10 · #1127 · "It's not useful to have a situation where …
+    - <date> · <§section> · <#issues> · <headline>
 
-so a session greps a few hundred lines of headlines, then greps the journal for
-the headline's words to land on the entry itself.
-
-NO LINE NUMBERS, ON PURPOSE (Helen, 2026-09-29). The issue proposed them, and a
-generated, test-enforced file is the one place the "name files, never line
-numbers" rule could bend. It was not bent because of merges: nearly every
-branch adds a journal entry, one entry near the top renumbers every entry
-below it, so two open branches would each rewrite most of the index and
-conflict on every merge -- and an index merged wrong is a red test on `main`,
-which is a deploy outage (MANUAL §10). Without them, a new entry is one new
-index line, and two branches' additions merge exactly as the journal does.
-
-NOTHING IN THE JOURNAL CHANGES. Every rule below reads the journal as it is
-written, which is in several shapes; the least lossy reading of each:
+No line numbers (#1202, DECISIONS §10): one new entry would renumber every
+line below it, so two branches that each add an entry would conflict on every
+merge. How each field is read:
 
   ENTRY    a line starting `- ` in column 0, running to the next one, a
            heading, or a `---` rule. Indented bullets are part of their entry.
   SECTION  the `§…` label of the nearest `##`/`###` heading above it.
   DATE     the first YYYY-MM-DD in the entry's first bold span, else in its
            first paragraph, else anywhere in the entry, else in its section's
-           heading (§8.2's sub-entries are dated only there), else `undated`.
+           heading, else `undated`.
   ISSUES   every `#N` in the date span and the headline, in order, deduped.
   HEADLINE the first bold span in the first paragraph that says something
-           once dates, issue numbers and joining words are stripped out --
-           "**2026-09-20, #1127** — **"It's not useful…"**" indexes the second
-           span. A leading date or issue is stripped, since both are fields
-           already. A span under SHORT characters -- §12's stories are
-           named "**The unpushed branch**" and nothing else -- takes the rest
-           of its sentence with it, because a name alone gives grep nothing.
-           No such span: the paragraph's first sentence, plain. Markdown
-           emphasis and code ticks are removed so the words grep, and
-           anything past HEADLINE_MAX characters ends in an ellipsis.
-
-Measured on 2026-09-29: 547 entries, 21 undated -- §12's stories and a few
-sub-entries that name no date anywhere, which is the truth about them.
+           once dates, issue numbers and joining words are stripped. A leading
+           date or issue is dropped, since both are fields already. A span
+           under SHORT characters takes the rest of its sentence with it. No
+           such span: the paragraph's first sentence, plain. Emphasis and
+           code ticks are removed so the words grep, and anything past
+           HEADLINE_MAX characters ends in an ellipsis.
 
 tests/test_decisions_index.py runs `check()`, so the index cannot go stale:
 edit the journal, run `--write`, commit both.
@@ -151,8 +133,8 @@ def _entry(body_lines, section, heading):
     if headline_span is not None:
         headline = _plain(LEAD.sub("", _plain(headline_span)))
         if len(headline) < SHORT:
-            # "**The unpushed branch** — the story…": a name alone gives grep
-            # nothing to find, so the sentence it opens comes with it.
+            # A short name alone gives grep nothing to find, so the sentence
+            # it opens comes with it.
             after = first_para.split("**" + headline_span + "**", 1)[-1]
             after = re.split(r"(?<=[.!?])\s", _plain(after), 1)[0]
             if after:
