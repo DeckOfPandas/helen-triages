@@ -246,17 +246,20 @@ layout: default
               {% comment %} `as` ("(float)", "(shell)") sits under the amount
                  (#1263). It is a sibling of `.cocktail-amount`, never inside
                  it, because cocktail-scale.js reads that span's whole text as a
-                 quantity. MANUAL §9.3. {% endcomment %}
+                 quantity. Where the amount already IS the mark -- an unmeasured
+                 rinse is `amount: "(rinse)"` and `as: "rinse"` -- it is not
+                 printed twice. MANUAL §9.3. {% endcomment %}
               {% comment %} An amount in dashes or drops carries `data-dashes`
                  and a `*` beside it, hidden until cocktail-scale.js goes above
                  x1 (#1293). The same test as `has_dashes` below, on purpose:
                  the star and the note it points at appear together or not at
                  all. The star is a sibling of `.cocktail-amount`, never inside
                  it, for the reason `.cocktail-use` is. {% endcomment %}
+              {% capture use_mark %}({{ item.as }}){% endcapture %}
               {% assign amount_lower = item.amount | append: "" | downcase %}
               {% assign in_dashes = false %}
               {% if amount_lower contains "dash" or amount_lower contains "drop" %}{% assign in_dashes = true %}{% endif %}
-              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}{% if in_dashes %} data-dashes{% endif %}>{{ amount_shown }}</span>{% if in_dashes %}<span class="cocktail-amount-star" aria-hidden="true" hidden>*</span>{% endif %}{% endif %}{% if item.as %}<span class="cocktail-use">({{ item.as }})</span>{% endif %}</span>{% endif %}
+              {% if item.amount or item.as %}<span class="cocktail-measure">{% if item.amount %}<span class="cocktail-amount"{% if unit_quiet %} data-amount="{{ item.amount | escape }}" data-unit-quiet{% endif %}{% if in_dashes %} data-dashes{% endif %}>{{ amount_shown }}</span>{% if in_dashes %}<span class="cocktail-amount-star" aria-hidden="true" hidden>*</span>{% endif %}{% endif %}{% if item.as and amount_shown != use_mark %}<span class="cocktail-use">{{ use_mark }}</span>{% endif %}</span>{% endif %}
               {% comment %} After the name: the bottle in brackets, then
                  "(optional)" (#1141). The name has its own span so nothing
                  aimed at it reaches the brackets. The brackets are markup, so
@@ -344,12 +347,17 @@ layout: default
       {% comment %} The sentences are methods.yml `canonical.express`, read,
          never spelled here: [0] drop in, [1] discard (#880). {% endcomment %}
       {% assign express_steps = site.data.cocktails.methods.canonical.express %}
+      {% comment %} The declared sentence says "the twist"; the page says which
+         one -- the garnish as written, less its "(discarded)" tail.
+         MANUAL §9.3. {% endcomment %}
+      {% assign twist_name = g | remove: " (discarded)" %}
+      {% capture named_twist %}the {{ twist_name }}{% endcapture %}
       {% if g contains "discard" %}
         {% if twist_step == "" %}
-          {% assign twist_step = express_steps[1] %}
+          {% assign twist_step = express_steps[1] | replace: "the twist", named_twist %}
         {% endif %}
       {% else %}
-        {% assign twist_step = express_steps[0] %}
+        {% assign twist_step = express_steps[0] | replace: "the twist", named_twist %}
       {% endif %}
     {% endif %}
   {% endfor %}
@@ -378,12 +386,24 @@ layout: default
       {% assign ice_clause = ice_clause | replace: "filled", fill_word %}
     {% endif %}
   {% endif %}
-  {% comment %} The rim rides on the glass, before the ice. `rim_shown` is the
+  {% comment %} The rim rides on the glass, before the ice, and reads as a
+     garnish does: "...into a martini glass with a sugar rim". `serve.rim`
+     holds the word "rim", so "with a"/"with an" lands on a noun; an ice
+     clause that would run on from it takes a comma first. `rim_shown` is the
      fallback: a rimmed drink with no strain step keeps its rim under "To
-     serve". {% endcomment %}
+     serve". MANUAL §9.10a. {% endcomment %}
   {% assign rim_clause = "" %}
   {% if page.serve.rim %}
-    {% capture rim_clause %} with a {{ page.serve.rim }}{% endcapture %}
+    {% assign rim_first = page.serve.rim | slice: 0 | downcase %}
+    {% assign rim_article = "a" %}
+    {% if rim_first == "a" or rim_first == "e" or rim_first == "i" or rim_first == "o" or rim_first == "u" %}
+      {% assign rim_article = "an" %}
+    {% endif %}
+    {% capture rim_clause %} with {{ rim_article }} {{ page.serve.rim }}{% endcapture %}
+    {% assign ice_first = ice_clause | slice: 0 %}
+    {% if ice_clause != "" and ice_first != "," %}
+      {% capture ice_clause %},{{ ice_clause }}{% endcapture %}
+    {% endif %}
   {% endif %}
   {% assign rim_shown = false %}
   {% for step in page.method %}

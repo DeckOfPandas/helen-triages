@@ -3010,6 +3010,27 @@ def test_to_serve_is_serveware_and_not_the_ice():
     )
 
 
+def test_a_rim_says_rim():
+    """`serve.rim` is a noun phrase containing the word "rim".
+
+    The layout writes it after "with a" on the strain step, so a bare
+    ingredient reads "...glass with a salt". DECISIONS §9.10a.
+    """
+    bad = []
+    for slug, fm in _load():
+        rim = (fm.get("serve") or {}).get("rim")
+        if rim is None:
+            continue
+        if not isinstance(rim, str) or not re.search(r"\brim\b", rim):
+            bad.append(f"{slug}: {rim!r}")
+    assert not bad, (
+        "`serve.rim` value(s) the strain step cannot read as \"with a ...\":\n  "
+        + "\n  ".join(bad)
+        + "\n\nName the rim: \"salt rim\", \"sugar half-rim\", \"half-rim of "
+          "salt\"."
+    )
+
+
 def test_a_garnish_is_not_an_ingredient_or_a_rim():
     """`garnish` holds garnishes, not pours, not rims, not serveware.
 
@@ -5497,6 +5518,42 @@ def test_the_layout_takes_the_twist_step_from_methods_yml():
         "methods.yml `canonical.express`[1] must be the DISCARD form; the "
         f"layout takes it for a garnish that says 'discard'. It is "
         f"{express[1]!r}."
+    )
+
+
+def test_the_express_step_names_the_twist():
+    """The page says WHICH twist: "Express the lemon twist over the drink...".
+
+    The declared sentences keep "the twist" and the layout swaps the garnish
+    in, so both halves are needed: the phrase to replace must be in each
+    sentence, and the layout must do the replacing. DECISIONS §9.3.
+    """
+    express = (_methods().get("canonical") or {}).get("express") or []
+    lacking = [s for s in express if "the twist" not in s]
+    assert not lacking, (
+        "methods.yml `canonical.express` sentence(s) without \"the twist\", "
+        "which _layouts/cocktail.html replaces with the garnish's own name:\n  "
+        + "\n  ".join(lacking)
+    )
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+    assert layout.count('replace: "the twist", named_twist') == 2, (
+        "_layouts/cocktail.html no longer names the twist in both express "
+        "forms (drop-in and discard)."
+    )
+
+
+def test_a_bracketed_amount_does_not_repeat_its_use():
+    """`amount: "(rinse)"` with `as: "rinse"` prints "(rinse)" once.
+
+    Both fields are required of an unmeasured rinse --
+    test_every_ingredient_has_an_amount and
+    test_a_method_that_floats_or_rinses_says_so_in_a_field -- so the data
+    cannot drop one; the layout skips the use line where the amount is it.
+    """
+    layout = (ROOT / "_layouts" / "cocktail.html").read_text(encoding="utf-8")
+    assert "item.as and amount_shown != use_mark" in layout, (
+        "_layouts/cocktail.html prints `as` without checking whether the "
+        "amount already says it, so an unmeasured rinse reads \"(rinse)(rinse)\"."
     )
 
 

@@ -1989,17 +1989,16 @@ other:
   - "espresso"
   - "cola"
   - "coconut cream"
-  # NEW 2026-09-25 (#1108), FOR FANNY CHU'S PIÑA COLADA, and the name is
-  # Helen's own: asked what the draft's `QQ Coco mix (3:1, Coco Lopez to
-  # coconut milk)` pour should be, she wrote the generic exactly so. It is a
-  # MADE mix -- Coco Lopez (sweetened cream of coconut) loosened with coconut
-  # milk, three to one -- and is not `coconut cream` beside it, which is the
-  # unsweetened tin; the draft's own note says Coco Lopez stands in for half
-  # coconut cream and half 2:1 syrup. The ratio is in the name for the reason
-  # `cane sugar syrup 2:1` carries one: it is a making fact, and a recipe line
-  # may be long. Priced as made-not-bought in costs.yml; 0% in abv.yml.
-  # THE COMMA AFTER `3:1` WENT ON 2026-10-02 (#1255), Helen's respelling.
-  - "Coco mix (3:1 Coco Lopez to coconut milk)"
+  # A made mix: Coco Lopez (sweetened cream of coconut) loosened with coconut
+  # milk, three to one. Not `coconut cream`, the unsweetened tin. The name is
+  # the ingredient alone; how it is made, and what stands in for it, is a note
+  # on the drink. DECISIONS §9.3.1.
+  #
+  # THE LINE TO REUSE, every time a drink asks for it, word for word:
+  #     - amount: "<n> ml"
+  #       generic: "Coco mix"
+  #       note: "3:1 Coco Lopez to coconut milk."
+  - "Coco mix"
   - "egg white"
   - "salt"
   # HELEN'S ANSWER, 2026-09-28, to the `QQ ground cinnamon` on the Milliners
@@ -2311,7 +2310,7 @@ shelf_of:
   cranberry juice drink: bottled fruit juice
   pineapple juice: bottled fruit juice
   # fresh produce and larder (30)
-  "Coco mix (3:1 Coco Lopez to coconut milk)": larder
+  "Coco mix": larder
   basil: fresh produce
   black tea: larder
   blackberries: fresh produce

@@ -231,6 +231,8 @@ canonical:
     - "banana chip"
     # One on a pick, not the scatter `raspberries` below names.
     - "skewered raspberry"
+    # No article in the string: the garnish step adds its own.
+    - "skewered blueberry"
     # Three Dots and a Dash. THE COUNT IS THE SPEC, as with `three coffee
     # beans`: three dots, one dash. Spelled out because a garnish that opens
     # with a digit reads as a pour to
@@ -396,7 +398,8 @@ canonical:
     # Dead Parrot Colada. Difford's garnish line is the whole Monty Python
     # speech; Helen, 2026-10-07, kept the short form here and put "the full
     # thing in a note, labelled 'Norwegian Blue'" on the drink.
-    - "small stuffed dead parrot"
+    # The breed is in the garnish; the drink's note carries the speech.
+    - "small stuffed dead Norwegian Blue"
     # THE COUNT IS THE SPEC HERE, which is why it survives where `12
     # raspberries` did not. Three coffee beans is the Espresso Martini, not an
     # arbitrary number of beans.

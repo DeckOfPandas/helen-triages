@@ -173,6 +173,10 @@ fill:
 # wherever, because it's easily missed just on the glass mark in the metadata."
 # A rim is an ACTION, and an action filed only as metadata is an action that
 # does not happen.
+#
+# The layout writes the value after "with a" on the strain step, so it is a
+# noun phrase holding the word "rim" -- "salt rim", "sugar half-rim" -- never
+# the bare ingredient. DECISIONS §9.10a.
 rim: "free text"
 
 # --- `to_serve` --------------------------------------------------------------

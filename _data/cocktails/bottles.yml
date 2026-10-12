@@ -1028,6 +1028,11 @@ bottles:
     generic: "cherry liqueur"
     aliases: ["Briottet Cérise", "Briottet Cerise", "Briottet cerise",
               "Briottet Crème de Cérise", "Briotte Cérise"]
+  # Myrtille Martini's. The label's spelling is canonical; the unaccented one
+  # is the alias. Figures from #1351.
+  "Briottet Crème de Myrtille":
+    generic: "crème de myrtille"
+    aliases: ["Briottet Creme de Myrtille"]
   # `Luxardo` KEEPS THE BARE BRAND AS AN ALIAS, and it is the one place this
   # file lets a house name a product. Helen, 2026-09-04: in this collection
   # Luxardo only ever means the maraschino -- the four drinks that write it
@@ -1065,6 +1070,9 @@ bottles:
   "Gabriel Boudier Liqueur de Gingembre":
     generic: "ginger liqueur"
     aliases: ["Gabriel Boudier Gingembre"]
+  # Frozen Ginger Daiquiri pours it where the recipe asks for ginger syrup.
+  "Briottet Liqueur de Gingembre":
+    generic: "ginger liqueur"
   # THE BOTTLE THE `coconut rhum` GENERIC WAS ADDED FOR, and it took six days
   # to arrive. ingredients.yml declared the generic on 2026-09-20 on Helen's
   # word -- "I guess the generic is coconut rhum. Add it for now and I can

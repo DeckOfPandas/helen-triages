@@ -2085,7 +2085,10 @@ every unmigrated file into a named failure of
   `test_no_method_step_opens_with_express` refuses one that does. The template
   reads `canonical.express` rather than spelling the sentences out, and
   indexes the list by position;
-  `test_the_layout_takes_the_twist_step_from_methods_yml` pins both.
+  `test_the_layout_takes_the_twist_step_from_methods_yml` pins both. The page
+  names the twist: the layout swaps the garnish, less its `(discarded)` tail,
+  in for "the twist" — *"Express the lemon twist over the drink…"*
+  (`test_the_express_step_names_the_twist`).
 
 #### `generic` and `suggestion`
 
@@ -2709,8 +2712,12 @@ gets a corrected method.
 
 - Ice you pour onto takes a comma and "over"; ice the glass is full of takes
   "filled with".
-- The rim rides on the glass, before the ice. A rimmed drink with no strain
-  step prints its rim under "To serve".
+- The rim rides on the glass, before the ice, written as a garnish would be:
+  *"…into a martini glass with a sugar rim."* `serve.rim` is free text that
+  must hold the word "rim" (`test_a_rim_says_rim`); the layout picks "a" or
+  "an" and puts a comma before a "filled with" clause — *"…with a salt rim,
+  filled with ice."* It is never a step of its own. A rimmed drink with no
+  strain step prints its rim under "To serve".
 - **`fill` replaces the word "filled"** in the clause, so it means something
   only where the clause has one. `test_a_fill_has_something_to_fill` refuses
   the other pairings.
