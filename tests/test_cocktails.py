@@ -5193,7 +5193,7 @@ def test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note():
 
 
 def _published_note_problem(note) -> str | None:
-    """Why this note is not a filled `{label, text}` pair, or None if it is."""
+    """Why this note is neither a filled pair nor the empty one, or None."""
     if not isinstance(note, dict):
         return f"is a bare {type(note).__name__}, not a `{{label, text}}` mapping"
     missing = sorted({"label", "text"} - set(note))
@@ -5204,6 +5204,8 @@ def _published_note_problem(note) -> str | None:
     if extra:
         return ("carries " + " and ".join(f"`{k}`" for k in extra)
                 + ", which nothing renders")
+    if note == {"label": "", "text": ""}:
+        return None
     for key in ("label", "text"):
         if not (isinstance(note[key], str) and note[key].strip()):
             return f"has an empty `{key}`"
@@ -5211,31 +5213,13 @@ def _published_note_problem(note) -> str | None:
 
 
 def test_a_published_drink_note_is_a_filled_pair():
-    """Every note on a published drink is `{label, text}`, both written.
+    """A published drink's note is `{label, text}`, both written or both "".
 
-    THE RULE WAS STATED AND NOTHING ENFORCED IT. The test above has said since
-    2026-10-02 that a published drink's notes "are held to the stricter
-    filled-pair rule". Food has that rule (`test_note_dicts_have_label_and_text`);
-    drinks did not, and it was found on 2026-10-04 by breaking a published
-    drink's note four ways and watching this module stay green each time.
-
-    WHAT EACH SHAPE DOES ON THE PAGE, read off `_layouts/cocktail.html`:
-
-      - `note:` typed for `text:` -- the body is empty, so the layout skips the
-        note. It VANISHES from the page with no error anywhere. This is the one
-        that matters, and the same typo the food rule was written for.
-      - an empty `label`, or a bare string -- the note prints under the literal
-        word "note".
-      - the draft placeholder `{label: "", text: ""}` left in at promotion --
-        prints nothing, and is noise in the file.
-
-    Helen, 2026-10-04, asked which of these a published drink may do: "Require
-    a real label". PUBLISHED ONLY, through `_load_published`, so it runs in CI:
-    a draft's empty halves are placeholders and the test above owns those.
-
-    ONE DRINK FAILED IT THE DAY IT WAS WRITTEN: `gin-sour`, promoted two days
-    earlier with `label: ""`. The word is hers -- "fun flavouring" -- and it
-    was written in the same PR, so the rule started with no exceptions.
+    The layout skips a note with no text and heads one with no label "note",
+    so a half-written note either vanishes or prints under a word nobody
+    chose; `note:` typed for `text:` is the usual cause. The pair with both
+    halves "" is the slot every draft carries: it prints nothing, and it
+    stays through promotion so Helen has somewhere to type. DECISIONS §4.
     """
     bad = []
     checked = 0
@@ -5253,7 +5237,8 @@ def test_a_published_drink_note_is_a_filled_pair():
         "Published drink note(s) that are not a filled `{label, text}` pair:\n  "
         + "\n  ".join(bad)
         + "\n\nThe label is the word on the note's tab and is Helen's to write. "
-          "A drink with nothing to say writes `notes: []`."
+          'A drink with nothing to say keeps the empty pair, `label: ""` and '
+          '`text: ""`, or writes `notes: []`.'
     )
 
 

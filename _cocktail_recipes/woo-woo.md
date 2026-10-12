@@ -37,7 +37,9 @@ method:
   - "Shake all ingredients with ice."
   - "Strain."
 to_serve: ""
-notes: []
+notes:
+  - label: ""
+    text: ""
 source: "Adapted from Difford's"
 source_url: "https://www.diffordsguide.com/cocktails/recipe/2110/woo-woo"
 ---

@@ -35,7 +35,9 @@ serve:
 method:
   - "Shake all ingredients with ice."
   - "Fine strain."
-notes: []
+notes:
+  - label: ""
+    text: ""
 source: "Difford's"
 source_url: ""
 ---

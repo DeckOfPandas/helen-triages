@@ -37,7 +37,9 @@ method:
   - "Shake all ingredients with ice."
   - "Fine strain."
 to_serve: ""
-notes: []
+notes:
+  - label: ""
+    text: ""
 source: "Adapted from Difford's"
 source_url: "https://www.diffordsguide.com/cocktails/recipe/1380/myrtle-martini"
 ---
