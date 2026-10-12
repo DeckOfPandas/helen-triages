@@ -633,7 +633,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   spaces (15ml -> 15 ml) as a mechanical fix to perform at ingest, and check
   when I ask you to check drafts."* Measured that day: `amount:` read `40 g`
   1,461 times across the food collections and `40g` 13 times. A temperature
-  takes none. `scripts/tidy_drafts.py` does it for drafts and
+  takes none. Imperial units take one too: *"All units need them, including
+  imperial."* `scripts/tidy_drafts.py` does it for drafts and
   `INGEST_ONE_RECIPE.md` carries the rule.
 
 ## §6 `main_ingredients`
@@ -750,8 +751,47 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   Helen first agreed the opposite, then: *"pulsing chocolate in the microwave
   isn't messy like cooking!"*
 - **2026-10-11 — a `sweet snack` is named for the piece.** A brownie or a bar
-  is one; a cake cut up to serve is not. From the review of every draft's
-  tags, with no words of hers recorded.
+  is one; a cake cut up to serve is not. Helen: *"I think sweet snacks are
+  individual things, not slices of something else."* So not a traybake cut
+  into squares either.
+- **2026-08-16, #216 — `make-ahead` means a substantial part of the dish, or
+  all of it, is prepared well ahead of serving; it is a separate axis from
+  `freezable`.** Helen: *"a substantial part -- or the entirety -- of the dish
+  can be prepared well in advance of serving without losing quality, flavour
+  or structural integrity."* Not a bake that merely keeps, an overnight
+  marinade, a base recipe or a condiment, and `freezable` is never a co-tag of
+  it. Refined 2026-10-10: where the advance work is the real work the tag
+  stays, as on a BBQ spatchcock duck rubbed a day ahead, *"keep make ahead --
+  the rub is the thing here, and roasting on the day is trivial."* A Christmas
+  turkey buttered the day before is not.
+- **2026-10-10 — feta does not count for `cheese-tastic`, even a whole baked
+  block; burrata does.** Helen: *"oooh, yeah, feta doesn't count for
+  cheese-tastic"*. The tag is for cheese as the pleasure of the dish, and the
+  line is drawn by the cheese, not by how much of it there is.
+  `_data/food/taxonomy.yml` carries it in the tag's meaning.
+- **2026-10-10 — `fiddly and fun` needs a fiddle a cook would really do, and
+  threading skewers is not one.** Helen, on a chicken satay: *"isn't fiddly"*;
+  on a crab salad with homemade crispbreads: *"because, come on, who's going to
+  be making those crispbreads from scratch!!!"* So a recipe is not tagged for
+  a component she would buy in, nor for assembly that is only repetitive.
+- **2026-10-10 — a meatball on its own is `one-handed food`; on spaghetti or
+  in a broth it is not.** Helen: *"I think chasing meatballs is funny, and I'd
+  call that one-handed food if I didn't also have to deal with e.g. spaghetti,
+  or fish the meatballs out of a soup."* The tag's meaning says nothing that
+  has to be chased; this is her exception to it, and it stops at the meatball.
+- **2026-10-10 — `festive` needs the dish to be the feast's own.** A chicken
+  that uses up the Seder horseradish is not festive; a Rosh Hashanah honey
+  cake is. From the review of every draft's tags, with no words of hers
+  recorded.
+- **2026-10-11 — a quiche, a tarte tatin, a soufflé and a salad that is the
+  meal are a `main`; a plain cauliflower cheese and a sprout salad are
+  `extras`.** Helen's answers to the "perhaps" rows. Mains: a quiche, moules
+  marinière, both tartes tatin, a goat's cheese soufflé, calzones, mackerel or
+  scallops with a salad, scallops à la Bretonne, a rarebit cauliflower cheese,
+  a peach and burrata salad, the saucy lentils, and the cabbage wedges (*"2 as
+  a main"*). Not a main: kale with chana. Sides: the plain cauliflower cheese,
+  Mum's rice salad, both sprout salads, charred baby gem, beer-braised
+  lentils. Per-recipe calls, so #72 applies: they are not evened out.
 
 ## §8 Ingredient search
 
@@ -802,6 +842,26 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   ingredient."* A recipe with peas in it is wrong for that guest wherever the
   peas rank, so the picker reads the derived `data-all-ingredients` on each
   row (every `item:`), while HAS TO HAVE reads `main_ingredients`.
+- **Undated, #273 — in the exclude picker a descriptor that does not change
+  what the thing is collapses into the plain ingredient.** Helen: *"No one is
+  going to dislike sesame oil but not toasted sesame oil, and this isn't an
+  allergen avoider tool."* Smoked, roasted, toasted, a cut or a prep: each is
+  an alias in `_data/food/ingredient_words.yml`, phrase by phrase, never a
+  rule. A different product keeps its entry (smoked haddock, cocoa powder, the
+  brown sugars). The vocabulary serves avoidance, not allergy.
+- **2026-08-16, #281 — an "X or Y" ingredient splits into two picker entries
+  only where both halves are already known ingredients; two joined by a method
+  both count; a citrus fruit covers its juice and zest.** Helen's calls,
+  recorded each time without her words. "Bicarbonate of soda dissolved in 3 fl
+  oz milk" still contains milk, so leaving out milk hides it; leaving out
+  lemon hides a recipe that uses only the juice or the zest. Each compound is
+  a named row in `_data/food/ingredient_words.yml`, not a pattern.
+- **Undated — `gressingham` is stripped as a modifier, "five-spice powder" is
+  "five-spice", and `to glaze` is a trailing phrase.** Each recorded as
+  Helen's explicit call, with no words. Gressingham is a breed name and is not
+  a precedent for stripping other brand names. The two five-spice spellings
+  are one picker entry and get no "(all)" button.
+  `_data/food/ingredient_words.yml`.
 
 ### §8.2 The food shopping list and its scaler — #801, built 2026-09-07
 
@@ -1213,6 +1273,14 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the answer; only a `QQ` that was wrong to ask is deleted.** Helen, asked a
   third time about Pic-a-de-Crop Punch's 12 oz of overproof: *"we've agreed
   this twice now, so stop tracking it."*
+- **2026-08-30 — a drink's `source` is optional and always will be;
+  `sources.yml` fixes spelling, never coverage.** Helen: *"I sort of don't
+  care about this. You can't copyright facts, and I am taking no prose from
+  anywhere. Some will be attributable to a big-name inventor, bar or maybe
+  hotel, and it's nice to note that, but I'm not going to sweat it."* So
+  `source: ""` is correct, nothing requires one, and the publications list
+  must not become a closed vocabulary. `scripts/build_ingest_vocab.py` prints
+  it to the ingest documents as spellings only.
 
 ### §9.3 The schema
 
@@ -1354,7 +1422,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   fog are absolutely tiki, so if we need to change the rules to rule them in
   then so be it."* `sugar craving`: two tiki markers in 90 ml or more, Jungle
   Bird excluded by name. Both stay on `moods_by_hand`, so a rule can only add
-  to what she typed.
+  to what she typed. Steel Drum, one marker in six ingredients, stays outside
+  the rule: *"I could go either way, so if the data says No then so be it."* A
+  floor of six tags eleven drinks she did not.
 - **2026-10-08 — no rule is added for a hand mood if it would tag drinks Helen
   must then untag.** Helen: *"Don't add things I'll need to remove -- easier
   for me to notice the gaps."* Every one- and two-feature rule was searched
@@ -1376,11 +1446,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 
 ### §9.3.1 The ingredient vocabulary
 
-- **2026-08-21, #441 — a list `generic` means OR, and only OR.** Daisy de
-  Santiago takes Havana 3 OR an agricole blanc: either makes the drink. A
-  bottle with two properties (Gosling's: moderately aged AND blackstrap) is a
-  generic plus a `character`. Write a list only when both bottles can be named
-  and a reason given; "I don't know which" stays `QQ`.
+- **2026-08-21, #441 — a list `generic` means OR, and only OR.** Bali Hai
+  takes `aguardiente` OR `kirschwasser`: either makes the drink. A bottle
+  with two properties (Gosling's: moderately aged AND blackstrap) is a generic
+  plus a `character`. Write a list only when both bottles can be named and a
+  reason given; "I don't know which" stays `QQ`.
 - **2026-08-23, #441 — `character` lives on the recipe line, never on a
   bottle.** It is why THIS drink wants this bottle, so restating it per recipe
   is each recipe stating its own reasoning; Helen overturned the issue's
@@ -1440,7 +1510,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   own.** Helen: *"I would never write 'aromatised wine' as a cocktail
   ingredient or generic, because it suggests some equivalence between the
   types where none or very little exists"*. Sweet, dry and blanc vermouth,
-  `quinquina` and `americano`. `Punt e Mes` stays a generic of its own.
+  `quinquina` and `americano`. `Punt e Mes` is not one of them: Helen demoted
+  it to a bottle under `sweet vermouth` on 2026-09-05, so The Ridgwell reads
+  "sweet vermouth (Punt e Mes)" beside "sweet vermouth (Martini Rosso)". A
+  brand is its own generic only where no category name would help her choose.
 - **2026-08-30 — `Chartreuse Verte` / `Chartreuse Jaune`, never green /
   yellow; `sloe gin` is its own generic; `pastis` is retired.** Sloe gin was
   split out of `gin liqueur`, the fault `flavoured` was retired for; no guard
@@ -1507,7 +1580,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-09-14 — `cherry brandy` and `cherry liqueur` are two generics.**
   Helen: *"Cherry Heering is a cherry brandy, Briottet Cerise is a cherry
   liqueur."* A new generic, not a default bottle. The Singapore Sling, which
-  named both for one line, takes `[cherry brandy, cherry liqueur]`.
+  named both for one line, takes `[cherry brandy, cherry liqueur]`. The cherry
+  eau de vie is a third thing, under `brandy_styles`, and never stands in for
+  the liqueur: *"Don't use plain kirsch"*.
 - **2026-09-14, #752 — `to taste` is an amount.** For the Ti' Punch's lime and
   syrup. Helen: *"typically served as rhum in a glass with lime and sugar on
   the side so people can roll their own"*. Her step "Serve the lime and the
@@ -1553,7 +1628,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the mapping."* `resolve_pours.py` reads it. A call she made about one drink
   is not a rule and stays out (`cherry (brandy) liqueur` was asked *"one by
   one"*). Aperitivo Luxardo maps to `Aperol` and Strucchi Red Bitter to
-  `Campari`; wider generics for those two families were declined.
+  `Campari`; wider generics for those two families were declined. Refined
+  2026-10-08: a wording that is one of her generics plus words that say
+  nothing new may be listed without being asked one at a time, approved by her
+  as a list: *"Yes please, let's get a list in and avoid the work."*
 - **2026-10-07 — twenty generics and three units from the Difford's batch, each
   Helen's yes.** `cranberry juice drink` (*"needs to be a new generic"*),
   `lemon vodka`, `pink grapefruit juice`, `blood orange juice`, `daiquiri` /
@@ -1576,6 +1654,77 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   live food recipes on her grant). A capital stays where the word still names
   the place or a brand: `Demerara rum`, Dijon mustard, `Luxardo maraschino
   cherry`.
+- **2026-08-17 — Curaçao keeps its capital, and Grand Marnier is a generic of
+  its own.** Helen's calls, with no words recorded. Curaçao is the deliberate
+  exception to lowercasing a commodity: it is not an appellation turned common
+  noun and still reads as the island's name, the test of 2026-10-07 applied
+  early. Grand Marnier stays apart from the orange Curaçaos because its cognac
+  base changes a drink.
+- **2026-08-26 — the gin styles are Helen's own list, and `speciality` always
+  carries a `character`.** Helen: *"London Dry, Old Tom, Plymouth, Navy
+  strength, Genever and speciality, where speciality should always carry a
+  character field."* `speciality` replaced the retired `flavoured`;
+  `test_speciality_gin_declares_a_character` holds it. `gin liqueur` is filed
+  in `gin_styles` so that excluding gin rolls it up, and is not one (*"not a
+  gin though"*).
+- **2026-09-04 — `aguardiente` and `kirschwasser` are generics, not bottles.**
+  Asked about the two things Bali Hai suggested, Helen: *"both are generics."*
+  The drink carries them as a list `generic`, either would do, with no
+  suggestion. `full-strength clear fruit brandy`, invented for that one drink,
+  is retired. Massenez Kirsch Vieux is a bottle under `eau de vie`.
+- **2026-09-05 — `Créole Shrubb` is its own generic, filed under `liqueurs`:
+  where no category name would help Helen choose, the bottle is the
+  category.** Helen: it *"should appear on lists with gin and cognac -- it's
+  not replaceable, and calling it a type of rhum agricole isn't at all
+  useful"*. It sits with the liqueurs and not under rum (decided on her
+  question, 2026-08-17), so "no rum tonight" does not drop a drink whose only
+  rum is a little of it (Ginger Snap, Accoutrement). The same shape as Strega
+  and Bénédictine.
+- **2026-09-05, #314 — `navy`, `overproof navy` and `black` are not rum
+  categories and are retired for good.** Helen: *"there is no such thing as
+  navy rum or overproof navy rum"*, and *"there's no such thing as black rum,
+  even though it will often be requested by other people's recipes."*
+  `retired_rum_styles` in `ingredients.yml` gives each its reason, so a
+  source's "navy rum" fails with an explanation and is typed by what the
+  bottle is: strength belongs to the bottle, and a black rum is an aged
+  Jamaican or a `blackstrap` character.
+- **2026-09-20, #606 — `coconut rhum` is a provisional generic, Helen's to
+  rename.** Helen: *"I guess the generic is coconut rhum. Add it for now and I
+  can review another time."* For Clément Mahina Coconut Rhum Liqueur in the
+  White Negroni Piña Colada; her figures, 2026-09-26: *"18% ABV, £22"*. Filed
+  under `liqueurs` for the reason Créole Shrubb is, and not `coconut rum`,
+  which is a rum style. Do not tidy the spelling to match.
+- **2026-09-20, #1068 #1069 — `ginger beer` is its own generic, in no
+  category.** Helen: *"Ginger Beer is a new ingredient, no category, so that's
+  the name."* It is under `other` in `ingredients.yml` and shelves with the
+  tops. It is not a ginger syrup or a ginger liqueur.
+- **2026-09-25, #1108 — `Coco mix (3:1 Coco Lopez to coconut milk)` is a
+  generic, and the name is Helen's.** For Fanny Chu's Piña Colada. She removed
+  the comma after `3:1` on 2026-10-02 (#1255). No words of hers were recorded.
+  It is sweetened cream of coconut loosened with coconut milk, so it is not
+  `coconut cream`, the unsweetened tin, and `costs.yml` prices it from its two
+  parts.
+- **2026-09-25, #1186 — a declared generic or glass that no drink uses stays:
+  the vocabulary is a spec, not residue.** Asked style by style about genever,
+  navy strength gin, gin liqueur, bonded rye, blended scotch whisky, Irish
+  whiskey, Japanese whisky, armagnac, grappa, americano, cider, margarita
+  bitters, whole egg and the flat `honey water`, Helen: *"Please keep all the
+  others."* The glass phrases for `brandy glass` and `martini glass` were kept
+  the same day. Garnishes went the other way (§9.12): an unused one is
+  deleted.
+- **Undated, #314 — `cachaça` is its own generic, and Batavia arrack's family
+  is `rum`.** Helen: *"cachaca is its own generic"*. Both sit in
+  `cane_and_palm_spirits`, not in `rum_styles`: cachaça is in the rum family
+  for exclusion and on no shelf of the rum page. Batavia arrack is cane and
+  rice and counts as rum, her call. `coconut-flower arrack` shares only the
+  name and is in no family (#796).
+- **Undated — `sugars` deliberately mixes form with type: `sugar cube` is a
+  generic beside `white sugar`.** Helen: *"if I don't have a sugar cube I
+  won't make a Classic Champagne Cocktail"*, and *"if having this many turns
+  out to feel mad once I'm using the site, then we can revisit."* A cube can
+  also be brown, and that is accepted. `golden caster sugar` is its own
+  generic too (her call, 2026-08-26), not folded into `raw sugar`: the
+  Bellinis had been typed `molasses sugar`, which is nearly muscovado.
 
 ### §9.3.2 The bottle dictionary
 
@@ -1635,7 +1784,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   recipe cannot REQUIRE an origin; Martinique Swizzle is Martinican because of
   its `suggestion` list. Barbancourt is correctly `rhum agricole vieux`.
   Origin stays inside the generic where it changes the CATEGORY (Demerara,
-  Jamaican); those styles are not being unpicked.
+  Jamaican); those styles are not being unpicked. Whether `origin` spreads
+  beyond cane spirits (a tequila, a pisco) is left open by Helen on purpose;
+  `bottle_origins` lists only the values in use.
 - **2026-09-09 — Pusser's 151 is an `overproof Demerara rum, lightly aged`.**
   Helen: *"Minimalist Tiki thinks Pusser's 151 is a Demerara rum, so so do I.
   It's 100% Guyanese."* And: *"I made a mistake, my overproof Demerara rum is
@@ -1655,6 +1806,68 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `Giffard Crème de Mûre` stays declared: it is the only bottle behind `crème
   de mûre`, and deleting it zeroed the cost and strength of every drink using
   that generic unnamed.
+- **2026-08-27, #314 — Rum Fire is its own bottle beside Wray & Nephew, and
+  Blackwell and Myers are the markers for `caramel-forward Jamaican rum`.**
+  Helen, on Rum Fire: *"choice of that or W&N is mood by mood."* So it is not
+  an alias, although both are `overproof Jamaican rum, unaged`. On the other
+  style: *"Blackwell is Jamaican, caramel forward"*. Myers is declared
+  although no drink names it. The style itself is on `hers_to_apply`: the
+  bottles mark it, and no session types a drink into it.
+- **2026-08-31 — `Sazerac` is a rye Helen owns, declared although no drink
+  suggests it.** Helen: *"the product name is Sazerac, though, I promise, and
+  I have it and use it elsewhere."* It is a bottle under `rye` as well as the
+  name of a drink. Do not delete it as an orphan or rename it.
+- **2026-09-04 — the bottles are `Appleton Estate 8 Year Reserve`, `Havana
+  Club 7 year old` and `3 year old`, and `Rittenhouse 100`; every Briottet is
+  declared; the tiki bitters are Bittermens'.** Helen: *"Appleton Estate 8
+  Year Reserve is correct, I was wrong in Cobra's Fang."* "Appleton Estate
+  Reserve" is not an alias, because an unnumbered Reserve exists.
+  *"Rittenhouse and Rittenhouse 100 are different, but 100 is the same as
+  bottled-in-bond"*, so the bare name is not its alias either. Of the six
+  Briottet products written bare: *"I own all of those."* *"the maker is
+  Bittermens, 100%."*, with no leading apostrophe on Elemakule (#879,
+  2026-09-10: *"delete those two apostrophes"*).
+- **2026-09-05 — a bottle's name takes its diacritics and the plain spelling
+  is an alias: Patrón, Añejo, Pierre Ferrand Ambré.** Helen: *"It's Patron
+  with the diacritic, and Rooster Rojo Bianco."* (2026-09-02), then *"Rooster
+  Rojo Tequila Anejo, Rooster Rojo Tequila Reposado, Patron Reposado, Patron
+  Anejo -- all need diacritics."* The cognac is `Pierre Ferrand Ambré`,
+  without the category word: *"I shouldn't have given 'Cognac' in the name,
+  just Pierre Ferrand Ambré, sorry!"* The plain forms stay as aliases, so a
+  suggestion typed without accents still resolves.
+- **2026-09-07 — the El Dorados are `El Dorado N Year Old`, for 3, 5, 8 and
+  12; `El Dorado 151` is unchanged.** Asked whether renaming the 3 alone was
+  intended, Helen: *"all four"*. 15 and 21 take the same form if they appear.
+  `Planteray 5 Year Old Barbados` was fixed the same day. The older spellings
+  ("El Dorado 3 year old rum", `ED3`) are aliases (replaces her pattern of
+  2026-09-04, *"always like 'El Dorado 3 year old rum'"*).
+- **2026-09-09 — the label's name is canonical and Helen's own wording is an
+  alias: `Dolin Rouge`, `Briottet Crème de Cerise`, `Ciroc Pineapple Flavoured
+  Vodka`.** She writes "Dolin red", and *"Briotte Cérise turns this into a
+  Haribo cherry"*; both resolve. The pineapple vodka is declared by its
+  product name, in her words *"Ciroc Pineapple Flavoured Vodka"*, not by the
+  house. Dolin Dry, Blanc and Rouge are three bottles, not spellings of one.
+- **2026-09-14, #1012 #796 — `Ardbeg An Oa`, `Gabriel Boudier Liqueur de
+  Gingembre` and `Batavia Arrack van Oosten` are the bottles; the old
+  spellings are aliases.** Helen: *"Ardbeg XO should be 'Ardbeg An Oa', ABV
+  46.6 %."*; *"'Gabriel Boudier Liqueur de Gingembre' is 18 % -- and please
+  update the name string."*; *"the bottle I own is 'Batavia Arrack van Oosten'
+  (note misspelling on current site)"*. Declared the same day: Clément Rhum
+  Agricole Canne Bleue (*"Yes, add it."*), Briottet Liqueur de Sapin, and La
+  Tomato Liqueur, *"the only tomato liqueur I have (shocker)"*.
+- **2026-09-25, #1108 — Away Colour takes Cruzan Single Barrel with
+  `character: blackstrap`; Fanny Chu's Piña Colada takes Pedro Mandinga with
+  `character: raspadura`.** Helen: *"generic is moderately aged rum,
+  suggestion is Cruzan Single Barrel, character is blackstrap."* and
+  *"generic: lightly aged and filtered, suggestion Pedro Mandinga Panama
+  silver rum, character raspadura."* `raspadura` joined `rum_characters` for
+  it: the raw-cane-sugar (panela) note of a Panamanian silver rum. Her
+  spelling of the bottle is its key.
+- **2026-10-07 — Barbancourt 5 Star is a `rhum agricole vieux`, like the 3
+  Star, and is the suggestion on Port au Prince (Smuggler's Cove).** Asked
+  both, Helen: *"Yes, and bottle as suggestion."* It is cane juice, whatever
+  the label calls it. Neither Barbancourt is the category's default (§9.3.5):
+  both are 43% and an unbottled `rhum agricole vieux` is 45%.
 
 ### §9.3.3 The drinks index's search
 
@@ -1695,6 +1908,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   resolves to the bottle's one declared name before the pool is built, and a
   `suggestion` string offering alternatives is never offered as a chip. The
   shopping list collapses spellings through the same aliases.
+- **2026-08-29 — a family is reached by its other spellings, and the button
+  always carries the family's canonical name.** Helen: *"'whiskey (all)'
+  should return all whisky and bourbon and rye, and the same for 'whisky'."*
+  `family_aliases` in `ingredients.yml`: `whiskey` and `scotch` reach whisky,
+  `tequila` agave, `rhum` and `ron` rum. Added 2026-08-30: `bitter` and
+  `amari` reach `amaro`, because `bitter` is not a mood and a family is not a
+  browse axis (*"do we need families -- thinking of bitter and herbal? Why?
+  They're not browsable or searchable."*). Families only: an ingredient with
+  two names is a `card_names` question.
 
 ### §9.3.4 Units of alcohol — #297, built 2026-09-06
 
@@ -1746,6 +1968,18 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   Woodford's Reserve, Vieux Pontarlier, Sagatiba, Lustau, Gabriel Boudier
   Liqueur de Gingembre, Luxardo, and a split for cherry. She was told first
   that a default also sets the price where no bottle is named.
+- **2026-09-06 — `abv.yml` is filled from knowledge, with a web check only for
+  the doubtful rows.** Helen: *"knowledge first, web only for the doubtful
+  ones"*. Each row's `confidence` records which it was. A strength does not
+  decay, so the file is not re-checked on a schedule the way prices are.
+- **2026-09-14, #1012 — a strength Helen states is her figure, not a guess: it
+  goes in `abv.yml` at `confidence: high`.** She corrects them as they scroll
+  past: *"Damoiseau Rhum Agricole Blanc Pure Cane is 50%, just saw 40% scroll
+  past and wanted to correct in case I mistyped."*; *"Apple schnapps: 20% (the
+  40% is the brandies)."*; *"Clement Rhum Agricole Canne Bleue is 50 %.
+  Clement Rhum Agricole Blanc is 40%"*. Do not "correct" one of these from a
+  web search. A row she only waved through keeps a lower confidence (white
+  wine, *"12.5% is fine"*, is `medium`).
 
 ### §9.3.5 What a drink costs — #547, built 2026-09-05/06
 
@@ -1832,6 +2066,44 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `.shopping-list-cost` is the muted grey, and `costSuffix()` in
   `assets/js/cocktail-index.js` returns nothing unless `site.show_costs` put
   the costs block on the page, which only `_config_local.yml` does.
+- **2026-09-05, #547 — a generic that names one product is priced as a point
+  and carries its own strength, with no bottle entry.** Helen: *"Campari is
+  just Campari, as is chartreuse. They have prices."* So Campari and both
+  Chartreuses have a row under `generics:` in `costs.yml`, min equal to max,
+  and one in `abv.yml`. Do not declare a bottle called Campari under a generic
+  called Campari to make the lookup uniform.
+- **2026-09-05, #547 — orgeat is priced from Monin, mezcal from Del Maguey
+  Vida, cognac across Courvoisier and Pierre Ferrand Ambré, and `lightly aged
+  and filtered rum` across Havana Club 3 and El Dorado 3.** Helen: *"orgeat is
+  always Monin"*; *"Mezcal is always Del Maguey Vida unless I discover I need
+  to downgrade!!!!"*; *"Cognac is Pierre Ferrand Ambre when it matters more,
+  Hine/Corvoisier/Hennessey when less (not that they're really less expensive,
+  just harsher)."*; *"Lightly aged and filtered rum will be one of Havana 3 or
+  El Dorado 3 99% of the time."* `default_bottles` in `costs.yml`. The 1840 is
+  not a cognac input. One bottle gives a point price; a pair is a real range.
+- **2026-09-05 — champagne is a point price, £20 for 75 cl.** Helen: *"Let's
+  say champage is GBP 20 -- I buy crates of Heidsieck Blue Top on sale at
+  Christmas!!!!!"* Heidsieck Blue Top is the reason for the figure, named in
+  the row's `basis`, and is not declared as a bottle.
+- **2026-09-14, #1014 — cream is £4.50 a litre and is non-alcoholic.** Helen:
+  *"Use £4.50/litre for both sites."* and *"Cream is non-alcoholic."* A point
+  price under `generics:` in `costs.yml` and a line in `non_alcoholic` in
+  `abv.yml`, so it never asks for a strength.
+- **2026-10-07 — an unbottled `rhum agricole vieux` is 45%, and `lemon vodka`
+  is 40% from Absolut Citron.** Asked the agricole's strength, Helen:
+  *"45%."* So both 45% bottles, La Favorite L'Authentique Ambré and Rhum JM
+  Ambré, are its `default_bottles`, and the 43% Barbancourts stay declared
+  without being inputs. *"Lemon vodka: 40% abv, default is Absolut Citron at
+  £25 for 70 cl."*
+- **2026-10-10, #1351 — a category may be priced and given its strength from a
+  named default bottle that is not declared in `bottles.yml`.** Helen's
+  figures, each a point: *"Black raspberry liqueur can default to Chambord,
+  16.5%, £25 for 70 cl"*; crème de myrtille from Briottet, kümmel from
+  Mentzendorff, sake from Akashi-Tai, ruby port from Taylor's Fine, Japanese
+  whisky from Suntory Toki, bonded rye from *"Rittenhouse 50%, £36 for 70
+  cl"*. The bottle is named in the row's `basis` only. Swedish flaggpunsch has
+  had this shape since 2026-09-14 (#747): *"Carlshamns Flaggpunsch: £21
+  (default)"*. Declaring any of them as a bottle is her call.
 
 ### §9.3.6 How much liquid is in a drink — #1121, built 2026-09-17
 
@@ -2025,6 +2297,26 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   ("1 cube" + "sugar") and a bare number beside an unchanged name ("2 sugar
   cube" at ×2). Stated in Liquid and in JS (`data-unit-quiet`, `quietUnit`)
   because the page is built before a script runs.
+- **2026-08-27 — where a list `generic` joins badly on a card, the fix is an
+  explicit row in `card_name_joins`, never a rule.** Helen: *"not perfect, but
+  we can try. I expect we'll need an explicit mapping of cases like this."*
+  The default is the two card names joined by " or ". The map is keyed on that
+  default join and is empty today; `test_every_card_name_join_is_reachable`
+  refuses a key no drink produces. Collapsing a shared word is a judgement
+  about two specific names.
+- **2026-08-29 — the agricoles' card names keep the spirit word: `rhum
+  agricole blanc`, `rhum agricole vieux`.** Helen: *"'agricole' and 'rhum
+  agricole' should both be 'rhum agricole'."* Bare `agricole blanc` asks the
+  reader to know that agricole is a rum. The same rule made `single malt
+  scotch whisky` read `single malt whisky` and not `single malt` (#844,
+  2026-09-08): a card names one ingredient at a time, and an adjective with
+  nothing after it names none.
+- **2026-09-07 — on a card a `rinse` sorts last with the floats, and a
+  `muddle` reorders nothing.** Helen's rulings, with no words recorded. A
+  rinse, a float and a shell are each added outside the main build, so they
+  close the card's ingredient line. Grouping muddled ingredients first was
+  built, looked at and dropped; `muddle` stays in `ingredient_as` because it
+  is a true fact the drink page may want.
 
 ### §9.10a `serve`
 
@@ -2067,6 +2359,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `crushed`. `fill` replaces the word "filled" in the composed clause, so it
   is allowed only with `cubed` or `crushed`
   (`test_a_fill_has_something_to_fill`).
+- **2026-09-05 — a rim is said again in the method or under "To serve", never
+  only on the glass line.** Helen: *"things like half-rim should be repeated
+  in the method or serve or wherever, because it's easily missed just on the
+  glass mark in the metadata."* `_layouts/cocktail.html` puts `serve.rim` into
+  the composed strain step; a rimmed drink with no strain step prints it under
+  "To serve" instead (`rim_shown`). Do not drop the fallback as duplication.
 
 ### §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 Glass icons
 
@@ -2121,7 +2419,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   than 'right' glasses. Basically, as usual with this site, let's offer rules,
   then I'll happily break them in the kitchen."* So there is no list of what
   is in her cupboard. `glass_survey.yml` holds surveyed products per type; she
-  asked for range, mean and median, and for sourced heights.
+  asked for range, mean and median, and for sourced heights. The drawings are
+  ahead of demand for the same reason. The goblet was published with no drink
+  asking for one (2026-08-17): *"I have lots of tiki recipes that aren't in
+  the database I gave you today, and given my rum obsession I bet we'll need
+  it at some point."* The coconut likewise (#528, 2026-08-31): *"we might not
+  use it, but why not try"*.
 - **2026-09-29, #295 — `heights_mm` is generated from the survey median, with
   `height_overrides` for the glasses Helen left alone.** Helen: *"Leave
   punchbowl as we currently have it -- what we have is perfectly clear."* and
@@ -2169,6 +2472,17 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   only under `top_room_min`; a held-back amount the method never mentions
   again still counts in the glass. Audit a report before posting it to her as
   questions.
+- **2026-08-17 — `brandy glass` is the canonical name and `snifter` the alias,
+  against bar convention.** Helen dislikes the word "snifter"; no words of
+  hers were recorded. Do not "correct" it back.
+- **2026-08-26 — `mug` is a glass: Apple and Ginger Mulled Wine is served in a
+  plain mug.** Helen: *"I actually use a mug for this like I do for tea!"* The
+  plain tapered drawing serves it; the Moscow Mule's hammered `mule mug` is a
+  separate drawing (2026-10-02).
+- **2026-09-05, #676 — the glasses are `hollowed pineapple` and `coconut
+  shell`, and `martini glass` resolves to `martini`.** Helen: *"hollowed
+  pineapple, coconut shell"*. The bare words name the fruit. `glasses.yml`
+  maps the old spellings onto the canonical ones.
 
 ### §9.12 / §9.12.1 Methods and garnishes
 
@@ -2192,9 +2506,11 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   *"Orange wheel is real and distinct new garnish — please add."* A floated
   garnish is said by `garnish:`, never by a method step.
 - **2026-08-31 — a garnish carries no count.** `12 raspberries` is
-  `raspberries`. Refined 2026-09-14: the Pink Lady's three cherries on a pick
-  are `skewered brandied cherry`, singular like `skewered maraschino cherry`,
-  and Helen wanted *"no note"* recording the three.
+  `raspberries`. Except where the count is the spec: `three coffee beans` is
+  the Espresso Martini, and `three skewered blueberries and a long slice of
+  pineapple` stays as written. Refined 2026-09-14: the Pink Lady's three
+  cherries on a pick are `skewered brandied cherry`, singular like `skewered
+  maraschino cherry`, and Helen wanted *"no note"* recording the three.
 - **2026-09-08, #845 #775 — `easy peasy` goes on an equal-parts drink, or a
   short measure-and-stir one, once Helen has made it.** *"any cocktail with
   equal parts of all ingredients (bar maybe bitters) should get the tag 'easy
@@ -2242,6 +2558,48 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `sharp` reads the narrower `mood_step_words.slushy` (swizzle, churn, blend,
   or `serve.ice: blended`); `strong brown drink` keeps the wider test. A frozen
   Margarita is still not `sharp`, because it blends.
+- **2026-09-01 — "Shake with ice." stays a canonical step of its own, and
+  after a rinse the step is "Shake the remaining ingredients with ice."**
+  Helen: it *"should retain 'shake with ice'"*. The short form shakes what is
+  already in the shaker after a build step, and is not collapsed into "Shake
+  all ingredients with ice." Caribbean Sazerac's "the rest" was matched to the
+  other two drinks' wording: *"match please."* The stirred form is "Stir the
+  remaining ingredients with ice."
+- **2026-09-09, #880 — the two generated twist steps say `then`, not `and`.**
+  Helen: *"Suggest: 'Express the twist over the drink then discard it.' and
+  'Express the twist over the drink then drop it in.'"* `express:` in
+  `methods.yml`; the layout emits one of them for any citrus twist and no
+  drink writes it.
+- **2026-09-20, #606 — `fresh cherries`, `Angostura bitters`, `whipped cream`,
+  `pineapple frond` and `edible orchid` are garnishes.** Helen, on the Punch
+  batch: *"add all those garnishes to garnish.yml"*, and *"'Cherries' is just
+  cherries, so maybe 'fresh cherries'"*, which keeps them apart from the
+  maraschino and brandied ones. Bitters dashed on top at the end are a garnish
+  here and an ingredient everywhere else.
+- **2026-09-25, #1186 — a declared garnish that no drink uses is deleted.**
+  Helen: *"Fine to delete those garnishes."* The next drink to want one
+  declares it again. The opposite of the generics and glasses asked about in
+  the same issue, which stay as spec (§9.3.1).
+- **2026-10-07 — `lemon spiral` is a garnish of its own and gets no "Express
+  the twist" step.** Helen: *"lemon spiral, no express step"*. The layout adds
+  the step for the word `twist`, so a spiral, a coin or a length of peel is
+  named as a different cut. Gold Florin's is `lemon spiral or mint bouquet`,
+  with the source's peg dropped: *"no note, just drop"*.
+- **2026-10-07 — `pineapple wheel`, `apple slice` and a second fruit stick are
+  garnishes, and a floated garnish carries `(floated)` as a tail.** Helen, on
+  Cannonball's quarter slice: *"a quarter of a wheel is a quarter of a disc,
+  not a wedge, but let's just call that garnish 'pineapple wheel'"*; the
+  quarter is not recorded. *"Apple slice is a new garnish."*, apart from
+  `dried apple slice`. The second fruit stick is declared, not collapsed onto
+  the first. `(floated)` follows the name as `(discarded)` does: `floated thin
+  cucumber slice` was *"awkward"*. `straws`, uncounted, joined `serve.yml` the
+  same day (*"Add straws."*).
+- **2026-10-07 — a garnish is worded to complete "Garnish with…", and a joke
+  too long for that goes in a note.** Golden Bird's is `orange peel over the
+  rim (cut to look like a beak)`, from Helen's sentence *"Garnish with orange
+  peel over the rim (cut to look like a beak)"*. Dead Parrot Colada's is the
+  short `small stuffed dead parrot`, with *"the full thing in a note, labelled
+  'Norwegian Blue'"*.
 
 ### §9.13 The visual language — the rounds
 
@@ -2942,6 +3300,35 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   moved. A later derived mood needs her grant again; `CLAUDE.md`'s proofreading
   rule is otherwise unchanged. Confirmed 2026-10-11: *"Not a standing
   exemption -- it was probably a one-off."*
+- **2026-08-30 — Jägermeister, Strega and Becherovka count towards `warming`,
+  as warm-spiced liqueurs.** Helen: *"Jagermeister, Strega and Becherovka
+  could hint at warming too."* And on P-Five Punch, 2026-08-31: *"I'd reach
+  for Becherovka if a recipe wanted something cinnamon- or ginger-forward."*
+  `mood_ingredients.warming` in `taxonomy.yml`. Warm spice, never temperature,
+  and not because they are herbal.
+- **2026-08-30 — being topped up does not stop a drink being `sharp`.** Helen:
+  *"I think a Tom Collins is sharp, so is Airmail and Green Flash."* A long
+  drink with a base, a citrus and a sweetener still qualifies; blending and
+  swizzling are what disqualify it (2026-09-26).
+- **2026-09-06, #758 — Caribbean Sazerac does not carry `I want to faff`; the
+  plain Sazerac does.** Helen: *"Caribbean Sazerac should not have the chip 'I
+  want to faff'."* Its `mood_include` entry came out. The Sazerac keeps one,
+  because icing, rinsing and discarding count as one faff moment where the
+  rule wants two.
+- **2026-09-26, #1216 — for `no measuring`, an amount of exactly 5 ml is a bar
+  spoon and is set aside like a dash.** Helen: *"if any amounts are 5 ml, this
+  is just a bar spoon, and doesn't count as needing to be measured."* It
+  neither joins the ratio nor becomes the smallest measure. `BARSPOON_ML` in
+  `scripts/derive_cocktail_moods.py`. For `no measuring` only: the same
+  exemption was measured for `sharp` on 2026-10-08 and declined.
+- **2026-09-28, #1187 — `tiki` has a derivation rule again: two tiki markers
+  in a drink of four or more ingredients.** Helen: *"I'm sure we used to have
+  a tiki deriver -- something like more than x ingredients, fewer than y, and
+  at least two typical tiki ingredients???"* Her definition is what the
+  ingredient floor stands for: *"a complex drink with lots of ingredients and
+  lots of taste layers which is why it's not just a jar full of sugar"*. The
+  mood stays in `moods_by_hand`, so the rule only adds. `clear` was measured
+  the same day and got none. The one-marker-in-eight slice is 2026-10-08's.
 
 **Food, ruled in the same passes.**
 
@@ -3506,6 +3893,20 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `item:` to `amount:` only where the published rule would demand it; what it
   refuses is reported, never rewritten. (Replaces "left out on her call: size
   words", 2026-08-29.)
+- **2026-09-21 — a SessionStart hook tells every session where it is before it
+  assumes.** Helen: *"Yes please let's do this."*
+  `.claude/hooks/session-ground-truth.py` reports the checkout's path, the
+  branch, the count of uncommitted changes, the position against `origin/main`
+  as last fetched, and whether the two drafts clones are present. `/workspace`
+  is a bind mount, so another session switching branch moves the ground with
+  no signal. It makes no network call and never blocks. It reports; it does
+  not replace the branch check before a commit.
+- **2026-09-21 — the two private drafts repos may be cloned into a fresh
+  worktree whenever wanted, with no ask.** Helen's standing grant; her words
+  were not recorded. Cloning is reading, and both folders are gitignored here.
+  `sh scripts/git-clone-agent.sh <repo> <dir>`; never a symlink. Without the
+  clones most of the suite is never collected and reports green, which is why
+  the session-start hook names an absent clone and prints the command.
 
 ### §11.2 The record of this file being wrong
 
@@ -3855,10 +4256,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   every control on both sites; the cocktail scaler's step buttons cite it.
 - **2026-09-10 — filter sections on an index sit `$index-section-gap` apart,
   more than the gap inside a section.** Helen: *"I'd like more vertical space
-  between filter sections on the index page."* One token for both sites in
-  `_sass/shared/_tokens.scss`, and deliberately not `$spacing-section-gap`: an
-  index is a control panel, where every section should be visible at a glance.
-  Phones take a further step (#999).
+  between filter sections on the index page."* And *"especially between the
+  search input fields and the heading below."*: on a phone the stacked search
+  pair takes a step more than the section gap beneath it. One token for both
+  sites in `_sass/shared/_tokens.scss`, and deliberately not
+  `$spacing-section-gap`: an index is a control panel, where every section
+  should be visible at a glance. Phones take a further step (#999).
 - **Undated, #586 / #901 — HAS TO HAVE and LEAVE OUT sit side by side, stack
   at 720px on both sites, and on a phone each search heading has its input
   beneath it.** Helen: *"has to have then leave out on the same line"*. Of the
@@ -3878,6 +4281,17 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   `.tag-shape--stretch` is `scaleX(1.1)`, added by `decorations.js` above its
   `SHORT_TEXT_MAX`. It moves the torn corner nearer the edge; more than that
   flattens the shape.
+- **2026-08-03 — a search row's heading never wraps; the input absorbs the
+  squeeze.** Helen reported the label breaking onto two lines ("search main" /
+  "ingredients"); no words of hers were recorded. The label is pinned at its
+  natural width by `@mixin index-search-row` in `_sass/shared/_rule.scss`. On
+  a phone the heading takes a line of its own instead (#901).
+- **Undated, #589 — an empty search-results pool reserves no space.** Helen:
+  *"if I click a chip, it then jumps downwards by a few pixels"*. Clicking a
+  LEAVE OUT candidate emptied the pool, which still held its top margin, and
+  the chosen pill moved. The margin is set once, gated on `:not(:empty)`, and
+  `test_an_empty_search_results_pool_reserves_no_space` guards it: an
+  unconditional margin in `_sass/food/_search.scss` brings the jump back.
 
 **§13.6 The recipe list.**
 
@@ -3911,6 +4325,13 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   capitalised lettering,"* and, of the padding, *"a trailing space after the
   active substring"*. `.title-hit` in `_sass/food/_recipe-list.scss`. It is
   the one thing that still changes case when matched (#1219).
+- **2026-08-03 — an ingredient that matches the search wears the active-tag
+  treatment in the ingredient green, on the search button and on the row.**
+  Helen: *"apply the same tag styling to active ingredient search tags, based
+  on the green obviously"*. On a row, a matched word had been *"just turning
+  the text green"*; it takes the tape fill and a flat stroke
+  (`.ingredient-pill--matched`). Its weight is 500 (2026-08-04): 900 and 700
+  beside the stroke were *"aggressive."*
 
 **§13.7 Results heading.**
 
@@ -4689,6 +5110,21 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   content down.** Helen: *"let's not allow the extra line to push the
   left-column content down too."* The time spans all three rows of the block's
   grid in `_sass/food/_timings.scss`.
+- **2026-08-13 — the notes in the cooking-methods data keep safety and sources
+  and drop correction history.** Helen: *"keep safety and sources, drop
+  correction history"*. A note says what is safe and where the figure comes
+  from, never "Corrected from ~15 min/kg…". What changed is git's to keep.
+- **2026-08-14 — the beef closed-oven-off method is not in the cooking
+  methods.** Helen: *"it's just not for me"*. It is absent from
+  `_data/food/cooking_methods.yml`, and so from the methods page and the
+  calculator together; `EXCLUDE` in `scripts/build_cooking_methods.py` names
+  it. Do not restore it for completeness.
+- **Undated — every cooking method carries a short `outcome`, so methods are
+  compared by what the cook gets.** Helen: *"summarising the cooking options
+  by user need... the method name then the description of the chicken you
+  get."* `outcome:` in `cooking_methods.yml`, held by
+  `test_every_method_has_a_short_outcome`. Since 2026-10-10 the page prints it
+  first in each block.
 
 ### The cocktails reference layer, #529
 
@@ -4717,7 +5153,10 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   Helen's words.** They replaced a session's "By age" and "Next to rum, and
   not rum". "By age" named the sort order and left the membership rule to be
   worked out; "Non-geographical" states the rule — what is left once origin
-  stops being the answer. The styles inside are still in age order.
+  stops being the answer. The styles inside are still in age order. The
+  shelves themselves are her brief: *"reorganise the table into useful
+  sections like Jamaican rum, Demerara rum, cane juice, (no name unless you
+  can think of one, but organised by agedness), flavoured."*
 - **2026-09-06 — `rum_groups` is declared, not derived, and the rum page walks
   the groups.** A session's call, not Helen's ruling: no rule recovers the
   shelves ("Jamaican" is in two of that shelf's three style names and absent

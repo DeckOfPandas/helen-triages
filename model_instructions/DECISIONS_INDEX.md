@@ -124,12 +124,21 @@ argument and the rules each field is read by.
 - 2026-10-11 · §7 · no soup is one-handed food — Helen: "soup is never called one-handed food".
 - 2026-10-11 · §7 · melting chocolate is prep, so a fridge cake is no-cook.
 - 2026-10-11 · §7 · a sweet snack is named for the piece — A brownie or a bar is one; a cake cut up to serve is not.
+- 2026-08-16 · §7 · #216 · make-ahead means a substantial part of the dish, or all of it, is prepared well ahead of serving; it is a separate axis from freezable.
+- 2026-10-10 · §7 · feta does not count for cheese-tastic, even a whole baked block; burrata does.
+- 2026-10-10 · §7 · fiddly and fun needs a fiddle a cook would really do, and threading skewers is not one.
+- 2026-10-10 · §7 · a meatball on its own is one-handed food; on spaghetti or in a broth it is not.
+- 2026-10-10 · §7 · festive needs the dish to be the feast's own.
+- 2026-10-11 · §7 · a quiche, a tarte tatin, a soufflé and a salad that is the meal are a main; a plain cauliflower cheese and a sprout salad are extras.
 - 2026-08-01 · §8 · the ingredient picker stays, and so does title search.
 - 2026-08-16 · §8 · #281 · a bad candidate in the exclude (LEAVE OUT) picker is fixed for what ships, not for the drafts.
 - 2026-09-15 · §8 · #1092 · food's HAS TO HAVE picks several ingredients, ANDed.
 - 2026-10-04 · §8 · #1289 · the search-for-anything box offers the index picker's ingredient words, never the recipes' raw ones.
 - undated · §8 · #51 · Undated, #51 — where a family button "chicken (all)" is offered, the bare "chicken" is not offered beside it.
 - undated · §8 · #52 · Undated, #52 — LEAVE OUT excludes on every ingredient a recipe lists, not on main_ingredients.
+- undated · §8 · #273 · Undated, #273 — in the exclude picker a descriptor that does not change what the thing is collapses into the plain ingredient.
+- 2026-08-16 · §8 · #281 · an "X or Y" ingredient splits into two picker entries only where both halves are already known ingredients; two joined by a method both count; a citrus fruit covers its juice and …
+- undated · §8 · Undated — gressingham is stripped as a modifier, "five-spice powder" is "five-spice", and to glaze is a trailing phrase.
 - 2026-09-07 · §8.2 · #801 · the food index has cocktails' shopping list and scaler, with every feature except costing.
 - 2026-09-07 · §8.2 · a scaled amount is never rounded coarser than 1 g.
 - 2026-09-07 · §8.2 · the shopping list has ten aisles, in shop order: produce, meat, fish, dairy & eggs, bakery, frozen, store cupboard, spices & seasonings, drinks, other.
@@ -182,6 +191,7 @@ argument and the rules each field is read by.
 - 2026-10-01 · §9.1.1 · #1256 · to_serve items are a declared vocabulary; the field stays one string.
 - 2026-08-31 · §9.2 / §9.2.1 · a named bar's or book's version of a drink Helen already has says so in its title.
 - 2026-09-01 · §9.2 / §9.2.1 · a QQ that has been ANSWERED becomes a plain note recording the answer; only a QQ that was wrong to ask is deleted.
+- 2026-08-30 · §9.2 / §9.2.1 · a drink's source is optional and always will be; sources.yml fixes spelling, never coverage.
 - 2026-08-17 · §9.3 · a preferred bottle is a suggestion, never a generic; and glass is a list.
 - 2026-08-26 · §9.3 · #291 · what a drink is served WITH lives in to_serve, and no method step restates it or the garnish.
 - 2026-08-30 · §9.3 · #571 · no ml: key on an ingredient; the amount is one string read through measures:.
@@ -210,7 +220,7 @@ argument and the rules each field is read by.
 - 2026-10-08 · §9.3 · no rule is added for a hand mood if it would tag drinks Helen must then untag.
 - 2026-10-08 · §9.3 · a hand mood Helen NAMES for a drink in the ingest chat is written at ingest.
 - 2026-10-08 · §9.3 · ginger beer is not warming; ice ice baby needs no widening.
-- 2026-08-21 · §9.3.1 · #441 · a list generic means OR, and only OR — Daisy de Santiago takes Havana 3 OR an agricole blanc: either makes the drink.
+- 2026-08-21 · §9.3.1 · #441 · a list generic means OR, and only OR — Bali Hai takes aguardiente OR kirschwasser: either makes the drink.
 - 2026-08-23 · §9.3.1 · #441 · character lives on the recipe line, never on a bottle.
 - 2026-08-23 · §9.3.1 · #457 · suggestion is bottle names only; the reason goes in that ingredient's note.
 - 2026-08-24 · §9.3.1 · #314 · blackstrap is only ever a character, never a generic.
@@ -244,6 +254,17 @@ argument and the rules each field is read by.
 - 2026-10-07 · §9.3.1 · twenty generics and three units from the Difford's batch, each Helen's yes.
 - 2026-10-07 · §9.3.1 · Cocchi Americano is an americano; there is no fortified_characters list.
 - 2026-10-07 · §9.3.1 · lowercase when the word has become the thing.
+- 2026-08-17 · §9.3.1 · Curaçao keeps its capital, and Grand Marnier is a generic of its own.
+- 2026-08-26 · §9.3.1 · the gin styles are Helen's own list, and speciality always carries a character.
+- 2026-09-04 · §9.3.1 · aguardiente and kirschwasser are generics, not bottles.
+- 2026-09-05 · §9.3.1 · Créole Shrubb is its own generic, filed under liqueurs: where no category name would help Helen choose, the bottle is the category.
+- 2026-09-05 · §9.3.1 · #314 · navy, overproof navy and black are not rum categories and are retired for good.
+- 2026-09-20 · §9.3.1 · #606 · coconut rhum is a provisional generic, Helen's to rename.
+- 2026-09-20 · §9.3.1 · #1068 #1069 · ginger beer is its own generic, in no category.
+- 2026-09-25 · §9.3.1 · #1108 · Coco mix (3:1 Coco Lopez to coconut milk) is a generic, and the name is Helen's.
+- 2026-09-25 · §9.3.1 · #1186 · a declared generic or glass that no drink uses stays: the vocabulary is a spec, not residue.
+- undated · §9.3.1 · #314 · Undated, #314 — cachaça is its own generic, and Batavia arrack's family is rum.
+- 2026-08-26 · §9.3.1 · Undated — sugars deliberately mixes form with type: sugar cube is a generic beside white sugar.
 - 2026-08-30 · §9.3.2 · every bottle a drink names is declared in bottles.yml and classified; never derive a bottle's category from the ingredient beside it.
 - 2026-08-30 · §9.3.2 · #534 · a suggested bottle may sit outside the generic's category, and then the ingredient must carry a note; QQ counts.
 - 2026-09-02 · §9.3.2 · #585 · a bare brand is not a bottle and is never added as an alias.
@@ -257,12 +278,22 @@ argument and the rules each field is read by.
 - 2026-09-09 · §9.3.2 · Pusser's 151 is an overproof Demerara rum, lightly aged.
 - 2026-09-14 · §9.3.2 · #745 · Pierre Ferrand Ambré and Pierre Ferrand 1840 are different bottles.
 - 2026-09-14 · §9.3.2 · #984 · Giffard is not suggested: not for crème de menthe, not for crème de cacao.
+- 2026-08-27 · §9.3.2 · #314 · Rum Fire is its own bottle beside Wray & Nephew, and Blackwell and Myers are the markers for caramel-forward Jamaican rum.
+- 2026-08-31 · §9.3.2 · Sazerac is a rye Helen owns, declared although no drink suggests it.
+- 2026-09-04 · §9.3.2 · the bottles are Appleton Estate 8 Year Reserve, Havana Club 7 year old and 3 year old, and Rittenhouse 100; every Briottet is declared; the tiki bitters are Bittermens'.
+- 2026-09-05 · §9.3.2 · a bottle's name takes its diacritics and the plain spelling is an alias: Patrón, Añejo, Pierre Ferrand Ambré.
+- 2026-09-07 · §9.3.2 · the El Dorados are El Dorado N Year Old, for 3, 5, 8 and 12; El Dorado 151 is unchanged.
+- 2026-09-09 · §9.3.2 · the label's name is canonical and Helen's own wording is an alias: Dolin Rouge, Briottet Crème de Cerise, Ciroc Pineapple Flavoured Vodka.
+- 2026-09-14 · §9.3.2 · #1012 #796 · Ardbeg An Oa, Gabriel Boudier Liqueur de Gingembre and Batavia Arrack van Oosten are the bottles; the old spellings are aliases.
+- 2026-09-25 · §9.3.2 · #1108 · Away Colour takes Cruzan Single Barrel with character: blackstrap; Fanny Chu's Piña Colada takes Pedro Mandinga with character: raspadura.
+- 2026-10-07 · §9.3.2 · Barbancourt 5 Star is a rhum agricole vieux, like the 3 Star, and is the suggestion on Port au Prince (Smuggler's Cove).
 - 2026-08-29 · §9.3.3 · #579 · fuzzy to find, exact-or-family to exclude; candidates rank in four bands.
 - 2026-08-29 · §9.3.3 · the whisky family chip is labelled whisk(e)y.
 - 2026-08-30 · §9.3.3 · #580 · bare water is never on a card and never in the search.
 - 2026-08-31 · §9.3.3 · #603 · a chip found through a name it does not show carries that name.
 - 2026-08-31 · §9.3.3 · a multi-word query matches a hidden name from its start, and each category gets one chip wearing the card's name.
 - 2026-08-29 · §9.3.3 · #529 · one bottle written several ways is one bottle in the search, and no chip has an "X or Y" shape.
+- 2026-08-29 · §9.3.3 · a family is reached by its other spellings, and the button always carries the family's canonical name.
 - 2026-09-06 · §9.3.4 · #297 · a drink page states units of alcohol, not ABV.
 - 2026-09-06 · §9.3.4 · #297 · a strength belongs to a bottle and lives in abv.yml, never on a category, in bottles.yml or in costs.yml.
 - 2026-09-06 · §9.3.4 · #713 #753 · the units line says "Roughly" on every drink, and its words are Helen's.
@@ -270,6 +301,8 @@ argument and the rules each field is read by.
 - 2026-09-14 · §9.3.4 · #1012 · bitters are never counted in the units — Helen: "Don't include bitters in our ABV calculations." It is a rule about bitters, not a side-effect of dashes going uncounted, so …
 - 2026-09-14 · §9.3.4 · #1016 · an ingredient with no bottle named takes the MODE strength of the bottles declared for its category.
 - 2026-09-14 · §9.3.4 · #1016 · a category with no mode gets a default bottle that Helen names.
+- 2026-09-06 · §9.3.4 · abv.yml is filled from knowledge, with a web check only for the doubtful rows.
+- 2026-09-14 · §9.3.4 · #1012 · a strength Helen states is her figure, not a guess: it goes in abv.yml at confidence: high.
 - 2026-09-05 · §9.3.5 · #547 · a drink's cost shows on the locally built site only, as an incidental line in the footer.
 - 2026-09-05 · §9.3.5 · #547 · default_bottles are pricing inputs and are never named on a recipe.
 - 2026-09-05 · §9.3.5 · #547 · dashes, garnishes and ice are not costed; a volume, a priced count or a priced weight is.
@@ -283,6 +316,12 @@ argument and the rules each field is read by.
 - 2026-09-25 · §9.3.5 · #749 · the build's cost line always says how long ago the prices were checked, and a test fails once that date is two years old.
 - 2026-09-04 · §9.3.5 · a line on the drinks shopping list gives the generic first with the bottle after it in brackets, on the same line, the bottle in wicked woowoo.
 - 2026-09-06 · §9.3.5 · the drinks shopping list shows each drink's cost, quietly, on a local build only.
+- 2026-09-05 · §9.3.5 · #547 · a generic that names one product is priced as a point and carries its own strength, with no bottle entry.
+- 2026-09-05 · §9.3.5 · #547 · orgeat is priced from Monin, mezcal from Del Maguey Vida, cognac across Courvoisier and Pierre Ferrand Ambré, and lightly aged and filtered rum across Havana Club 3 and El Dorado …
+- 2026-09-05 · §9.3.5 · champagne is a point price, £20 for 75 cl.
+- 2026-09-14 · §9.3.5 · #1014 · cream is £4.50 a litre and is non-alcoholic.
+- 2026-10-07 · §9.3.5 · an unbottled rhum agricole vieux is 45%, and lemon vodka is 40% from Absolut Citron.
+- 2026-10-10 · §9.3.5 · #1351 · a category may be priced and given its strength from a named default bottle that is not declared in bottles.yml.
 - 2026-09-17 · §9.3.6 · #1121 · the units line also states the serving's volume.
 - 2026-09-17 · §9.3.6 · #1121 · a topped drink's volume takes the midpoint of top_up_ml.
 - 2026-09-17 · §9.3.6 · #1121 · a drink whose uncounted ingredients ARE the drink states no volume.
@@ -309,12 +348,16 @@ argument and the rules each field is read by.
 - 2026-09-17 · §9.10 / §9.10.1 · #1141 · an optional ingredient reads "(optional)" after its name.
 - 2026-10-02 · §9.10 / §9.10.1 · #1226 · the character line is a labelled fact: CHARACTER: in Plex Mono, the words upright in full-strength text, and no hue.
 - 2026-10-04 · §9.10 / §9.10.1 · #1132 · a unit the ingredient's name already says is not printed twice.
+- 2026-08-27 · §9.10 / §9.10.1 · where a list generic joins badly on a card, the fix is an explicit row in card_name_joins, never a rule.
+- 2026-08-29 · §9.10 / §9.10.1 · the agricoles' card names keep the spirit word: rhum agricole blanc, rhum agricole vieux.
+- 2026-09-07 · §9.10 / §9.10.1 · on a card a rinse sorts last with the floats, and a muddle reorders nothing.
 - 2026-09-05 · §9.10a · there is no chill field; a chilled glass is assumed.
 - 2026-09-05 · §9.10a · the strain step names the glass and the ice, composed at render time from glass and serve.ice, never stored.
 - 2026-09-05 · §9.10a · a garnish step closes the method — Helen: "garnish is important, and it's easy to miss at the top of the page." It is a method step, not a serving note: "To serve" is what happens …
 - 2026-09-28 · §9.10a · #1214 · the glass generator names the glass in the first build-in-the-glass step, on DRAFTS ONLY.
 - 2026-09-28 · §9.10a · a strain step repeats the glass only when the clause riding on it is new.
 - 2026-09-28 · §9.10a · how full the ice is goes in serve.fill, not in a new serve.ice value.
+- 2026-09-05 · §9.10a · a rim is said again in the method or under "To serve", never only on the glass line.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · the drink page draws the FIRST listed glass that has artwork.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · on the drink page the glass is compressed and drawn as a fraction of the title block.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #347 · old fashioned is the canonical glass name and rocks fails a test.
@@ -330,6 +373,9 @@ argument and the rules each field is read by.
 - 2026-10-02 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · mule mug has its own drawing, dimples included; mug stays the plain mug.
 - 2026-10-04 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #1179 · the dilution figures are Helen's: stirred 20%, shaken 27.5%, short shake 15%.
 - 2026-10-04 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #1244 · the glass-fit report waters only what was shaken, and flags only what is over by more than 10%.
+- 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · brandy glass is the canonical name and snifter the alias, against bar convention.
+- 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · mug is a glass: Apple and Ginger Mulled Wine is served in a plain mug.
+- 2026-09-05 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #676 · the glasses are hollowed pineapple and coconut shell, and martini glass resolves to martini.
 - 2026-08-26 · §9.12 / §9.12.1 · #290 · a change to a canonical method step is proposed, never applied.
 - 2026-08-31 · §9.12 / §9.12.1 · a drink that takes no garnish says no garnish; [] means nobody has filled the field in.
 - 2026-08-31 · §9.12 / §9.12.1 · alternative garnishes are ONE string, the maker's choice.
@@ -341,6 +387,13 @@ argument and the rules each field is read by.
 - 2026-09-14 · §9.12 / §9.12.1 · #883 · citrus is shaken, with Helen's exceptions; a guide, not a test.
 - 2026-09-17 · §9.12 / §9.12.1 · #1138 #1143 · the garnish step reads as English: "A, B and C", and no "a" before a plural.
 - 2026-09-26 · §9.12 / §9.12.1 · sharp is disqualified by a drink being CHURNED, not by crushed ice.
+- 2026-09-01 · §9.12 / §9.12.1 · "Shake with ice." stays a canonical step of its own, and after a rinse the step is "Shake the remaining ingredients with ice."
+- 2026-09-09 · §9.12 / §9.12.1 · #880 · the two generated twist steps say then, not and.
+- 2026-09-20 · §9.12 / §9.12.1 · #606 · fresh cherries, Angostura bitters, whipped cream, pineapple frond and edible orchid are garnishes.
+- 2026-09-25 · §9.12 / §9.12.1 · #1186 · a declared garnish that no drink uses is deleted.
+- 2026-10-07 · §9.12 / §9.12.1 · lemon spiral is a garnish of its own and gets no "Express the twist" step.
+- 2026-10-07 · §9.12 / §9.12.1 · pineapple wheel, apple slice and a second fruit stick are garnishes, and a floated garnish carries (floated) as a tail.
+- 2026-10-07 · §9.12 / §9.12.1 · a garnish is worded to complete "Garnish with…", and a joke too long for that goes in a note.
 - 2026-08-29 · §9.13 · the cocktails palette is five saturated accents, "neon bar sign", and campari red and bitter orange are not among them.
 - 2026-08-29 · §9.13 · LEAVE OUT carries no hue at all — Helen: "for food, avoiding can be important whereas for drinks surely less so." Violet spent one revision on it and read as "suddenly busy, and …
 - 2026-09-02 · §9.13 · #469 · the cocktails site is black on black — Helen: "One thing for sure: we're going black on black.
@@ -451,6 +504,11 @@ argument and the rules each field is read by.
 - 2026-09-19 · §9.13 · #1127 · no measuring means every measured amount is a whole-number multiple of the smallest, in eight measures or fewer.
 - 2026-09-19 · §9.13 · #1127 · for no measuring, a measured top is an amount like any other; lengtheners are not set aside by name.
 - 2026-09-20 · §9.13 · #1127 · fifteen published drinks that gained only the no measuring chip went live without a re-read: a single grant, not a standing rule.
+- 2026-08-30 · §9.13 · Jägermeister, Strega and Becherovka count towards warming, as warm-spiced liqueurs.
+- 2026-08-30 · §9.13 · being topped up does not stop a drink being sharp.
+- 2026-09-06 · §9.13 · #758 · Caribbean Sazerac does not carry I want to faff; the plain Sazerac does.
+- 2026-09-26 · §9.13 · #1216 · for no measuring, an amount of exactly 5 ml is a bar spoon and is set aside like a dash.
+- 2026-09-28 · §9.13 · #1187 · tiki has a derivation rule again: two tiki markers in a drink of four or more ingredients.
 - 2026-09-11 · §9.13 · #961 · the food index row's shortlist button sits level with the title's first line.
 - 2026-09-11 · §9.13 · #964 · on a phone the food method's step numbers sit closer to the edge and closer to their text.
 - 2026-08-12 · §10 · every closed issue is represented by a test, and the suite is self-sufficient.
@@ -525,6 +583,8 @@ argument and the rules each field is read by.
 - 2026-09-03 · §11 · #672 · the ingest inbox's outcome comment carries the browser's hand-back list, as bullets.
 - 2026-09-15 · §11 · #1080 · the drafts staging folders exist in both private repos even when empty.
 - 2026-09-24 · §11 · #577 · the size-word move on drafts is scripted, lands as its own commit in the drafts repo, and the diff of that commit is Helen's review.
+- 2026-09-21 · §11 · a SessionStart hook tells every session where it is before it assumes.
+- 2026-09-21 · §11 · the two private drafts repos may be cloned into a fresh worktree whenever wanted, with no ask.
 - 2026-08-31 · §11.2 · #600 · a claim copied into an issue or a document is re-measured first, not carried over.
 - undated · §12 · Undated (by August 2026) — rejected tooling: jekyll-seo-tag, Stylelint, a bundler, a CSS framework, schema.org/Recipe.
 - 2026-09-12 · §12 · a red main is a deploy outage: the merging session checks the run, and nobody merges over a known-red suite.
@@ -585,12 +645,15 @@ argument and the rules each field is read by.
 - 2026-08-30 · §13 · #586 #901 · Undated, #586 / #901 — HAS TO HAVE and LEAVE OUT sit side by side, stack at 720px on both sites, and on a phone each search heading has its input beneath it.
 - undated · §13 · #403 · Undated, #403 — a LEAVE OUT candidate darkens on hover, as every other section's does.
 - undated · §13 · Undated — tag-shape-2 is stretched 10% on long tags only.
+- 2026-08-03 · §13 · a search row's heading never wraps; the input absorbs the squeeze.
+- undated · §13 · #589 · Undated, #589 — an empty search-results pool reserves no space.
 - 2026-09-04 · §13 · a food row's title is 1.2rem / 700 ($recipe-title-size).
 - undated · §13 · Undated — a row reads title, ingredient line, then pills, in that order.
 - 2026-08-26 · §13 · the index's two empty-state lines are typed as recipe row titles.
 - 2026-09-06 · §13 · #552 · a food index row shows one line of main ingredients, two on a phone, with no fade.
 - 2026-09-14 · §13 · #1005 · a recipe page's related recipes are drawn as index recipe-list rows.
 - undated · §13 · Undated — the part of a row's title that matches the name search takes the section's tape fill and capitals, with almost no side padding.
+- 2026-08-03 · §13 · an ingredient that matches the search wears the active-tag treatment in the ingredient green, on the search button and on the row.
 - 2026-08-03 · §13 · the results heading is left-aligned — Right-aligned it "read as stray rather than placed".
 - 2026-08-12 · §13 · the word in "N survivors" is bare body text, no emboss.
 - 2026-09-14 · §13 · #1007 · the header's door to the other site is the bracketed word and an arrow, no icon.
@@ -725,6 +788,9 @@ argument and the rules each field is read by.
 - undated · §14 · #333 · Undated, #333 — the doneness chart's "more" link on a recipe page is right-aligned.
 - 2026-08-16 · §14 · #243 · on the methods page the finishing temperature sits directly under the protein heading.
 - 2026-10-10 · §14 · a method's two-line time does not push the left column's content down.
+- 2026-08-13 · §14 · the notes in the cooking-methods data keep safety and sources and drop correction history.
+- 2026-08-14 · §14 · the beef closed-oven-off method is not in the cooking methods.
+- 2026-10-10 · §14 · Undated — every cooking method carries a short outcome, so methods are compared by what the cook gets.
 - 2026-09-06 · §14 · #529 #459 · a cocktails reference page must answer a question the cards stopped answering; a bare list does not pass #459.
 - 2026-09-06 · §14 · the rum page has its own anatomy (the .ref- classes), in one hue.
 - 2026-09-06 · §14 · the rum page is a table, with column labels on every section and one rum per line.
