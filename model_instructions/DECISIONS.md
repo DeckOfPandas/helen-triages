@@ -313,9 +313,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   this will stop them being published by accident (i.e. without me having
   spotted and fixed the imported text). Then yes, thank god, yes yes yes
   please fix the notes: [] !!!!"* A draft never says `notes: []`, it carries
-  the empty pair; a published page with no notes still writes `notes: []`.
+  the empty pair; a published food page with no notes still writes
+  `notes: []`.
   `QQ` on a label means "Helen has not read this" whatever the text says, and
   text beginning `QQ` must be labelled `QQ`. `tidy_drafts.py --only notes`.
+- **2026-10-12 — a published drink may keep the draft's empty notes pair.**
+  Helen: *"Let's change that test to only allow label "" and text "", given we
+  set drafts to write that out of convenience for me."* Both halves empty is
+  allowed and prints nothing; one half empty is still refused. A drink is
+  promoted byte-for-byte, slot and all.
 - **2026-10-04, #814 — an ingredient-group name opening with "to " prints as
   itself, with no "For the".** Helen: *"Can we fix all 'for the to finish'
   cases? Both existing and when we ingest."* The layout had special-cased `to
@@ -2208,8 +2214,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-31 — alternative garnishes are ONE string, the maker's choice.**
   Helen, on `orange or lemon twist`: *"either of these are lovely and the maker
   can choose. I like this approach on principle."* Refined 2026-09-14 (#984)
-  to three or more: commas, then "or" before the last ("mint sprig, mint leaf
-  or grated nutmeg"), declared under `canonical` in `garnish.yml`. Same day:
+  to three or more: commas, then "or" before the last, declared under
+  `canonical` in `garnish.yml`. Same day:
   *"Orange wheel is real and distinct new garnish — please add."* A floated
   garnish is said by `garnish:`, never by a method step.
 - **2026-08-31 — a garnish carries no count.** `12 raspberries` is

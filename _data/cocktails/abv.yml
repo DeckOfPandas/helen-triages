@@ -359,6 +359,7 @@ bottles:
   "Luxardo Maraschino":               { abv: 32,   confidence: high }
   "Briottet Maraschino":              { abv: 24,   confidence: medium }
   "John D Taylor's Velvet Falernum":  { abv: 11,   confidence: high }
+  "Bitter Truth Pimento Dram":        { abv: 22,   confidence: high }
   "Roots Mastiha":                    { abv: 30,   confidence: high }
   "Disaronno":                        { abv: 28,   confidence: high }
   # A `cherry brandy` since 2026-09-14 (#1012 follow-up), not a `cherry
@@ -485,7 +486,7 @@ generics:
   Clairin Communal:   { abv: 43,   confidence: high }
 
   # --- genuinely a category, no bottle declared yet ----------------------
-  Plymouth:               { abv: 41.2, confidence: high }
+  Plymouth gin:           { abv: 41.2, confidence: high }
   navy strength gin:      { abv: 57,   confidence: high }
   sloe gin:               { abv: 26,   confidence: medium }
   pisco:                  { abv: 40,   confidence: medium }

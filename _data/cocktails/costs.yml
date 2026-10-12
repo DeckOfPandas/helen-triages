@@ -637,6 +637,10 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
+  "Bitter Truth Pimento Dram":
+    size_ml: 500
+    gbp: 23
+    confidence: high
   "Bénédictine D.O.M.":
     size_ml: 700
     gbp: 30
@@ -1058,7 +1062,7 @@ generics:
   # declares no Carlshamns and a bottle nobody pours is a different decision;
   # the basis names the bottle so the row can become one when she wants it.
   Swedish flaggpunsch: { gbp_per_litre_min: 30.00, gbp_per_litre_max: 30.00, basis: "Carlshamns Flaggpunsch, GBP 21 / 70cl", confidence: high }
-  Plymouth:           { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }
+  Plymouth gin:       { gbp_per_litre_min: 37.14, gbp_per_litre_max: 37.14, basis: "GBP 26 / 70cl", confidence: medium }
   # `coconut-flower arrack` HAD A ROW HERE UNTIL 2026-09-24 (GBP 28 / 75cl,
   # low). It is gone: the Ceylon Arrack bottle prices the category and is its
   # default since Helen's "(default coconut flower arrack)" on 2026-09-14

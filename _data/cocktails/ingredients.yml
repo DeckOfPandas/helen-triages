@@ -1077,7 +1077,7 @@ card_names:
   # NOT collapsed to "gin", deliberately, and the line is Helen's own rum rule:
   # collapse where the difference is a nuance, keep it where it changes the
   # STRENGTH or the drink. Navy strength does; genever is a different drink
-  # altogether. Old Tom, Plymouth, New Western dry gin and speciality are the
+  # altogether. Old Tom gin, Plymouth gin, New Western dry gin and speciality are the
   # genuinely open ones -- see the note in the issue rather than guessing here.
   "navy strength gin": "navy strength gin"
   "genever": "genever"
@@ -1224,8 +1224,10 @@ card_names_may_collide:
 # rather than an inventory; they are not gaps to fill.
 gin_styles:
   - "London dry gin"
-  - "Old Tom"
-  - "Plymouth"
+  # The spirit word is on the end so each line skims as a gin; the bare
+  # names are in `retired_gin_styles`.
+  - "Old Tom gin"
+  - "Plymouth gin"
   # `New Western dry gin` SINCE 2026-09-25, was `New Western dry` -- Helen,
   # #1186: "'New Western dry' should become 'New Western dry gin'." The naming
   # rule above (spirit word on the end: `London dry gin`, `navy strength gin`)
@@ -1529,6 +1531,7 @@ liqueurs:
   # different fruit): its own thing, at 18%. Peach Me is its only pour.
   - "peach schnapps"
   - "mastiha liqueur"
+  - "allspice dram"
   # THREE MORE LIQUEURS, 2026-10-07, the Difford's batch, each a "yes" from
   # Helen to a named proposal.
   #
@@ -2021,7 +2024,7 @@ other:
   # that are neither juice nor syrup nor alcohol.
   - "olive oil"
   # THE THREE BELOW HAVE NO DRINK, ON PURPOSE, and they are declared for the
-  # reason this file already declares Plymouth, New Western dry gin and genever
+  # reason this file already declares Plymouth gin, New Western dry gin and genever
   # while owning none of them: it is a SPEC, not an inventory. (`cream` and
   # `milk` have drinks since 2026-09-14 and 2026-09-20; `whole egg` still has
   # none and STAYS -- Helen, 2026-09-25, #1186: "Please keep all the others.")
@@ -2066,8 +2069,8 @@ family_of:
   "cachaça": rum
   "Batavia arrack": rum
   "London dry gin": gin
-  "Old Tom": gin
-  "Plymouth": gin
+  "Old Tom gin": gin
+  "Plymouth gin": gin
   "New Western dry gin": gin
   "genever": gin
   "speciality": gin
@@ -2187,8 +2190,8 @@ shelf_of:
   Japanese whisky: spirits
   London dry gin: spirits
   New Western dry gin: spirits
-  Old Tom: spirits
-  Plymouth: spirits
+  Old Tom gin: spirits
+  Plymouth gin: spirits
   absinthe: spirits
   aged Demerara rum: spirits
   aguardiente: spirits
@@ -2290,6 +2293,7 @@ shelf_of:
   liqueur de sapin: liqueurs
   maraschino liqueur: liqueurs
   mastiha liqueur: liqueurs
+  allspice dram: liqueurs
   orange Curaçao: liqueurs
   passion fruit liqueur: liqueurs
   peach schnapps: liqueurs
@@ -2618,3 +2622,9 @@ retired_gin_styles:
     Western dry gin'." No drink ever poured the old name, so nothing was
     retyped; kept here so the old spelling cannot blend into the not-declared
     pile.
+  "Old Tom": >-
+    the spirit word was missing, as with `New Western dry`. It is `Old Tom
+    gin` now, Helen, 2026-10-12: "'Old Tom' should be declared as 'Old Tom
+    gin'... For ease of skimming a recipe."
+  "Plymouth": >-
+    the same, the same day: "Please update to 'Plymouth gin' too."

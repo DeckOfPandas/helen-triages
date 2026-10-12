@@ -69,17 +69,10 @@ no_garnish: "no garnish"
 # entry under `canonical`. Both halves should be real garnishes in their own
 # right, so the reader can act on either.
 #
-# A SECOND DRINK USES IT NOW, 2026-09-14 -- #984's Grasshopper, whose source
-# offers three alternatives rather than two: "mint sprig, mint leaf or grated
-# nutmeg". The shape generalises without changing it: a comma between every
-# option but the last, "or" before the last, still one string, still declared
-# under `canonical` in whichever category fits (this one spans two --
-# herbs_and_leaves and spice_and_other -- so it sits with the first-named
-# option's group rather than needing a third). Still not enough to build
-# machinery for -- #459's rule about not becoming an encyclopaedia. If this
-# keeps recurring, the question to ask is whether every combination declaring
-# its own string has become the wrong shape; until then this costs one line
-# per combination.
+# THREE OR MORE OPTIONS TAKE THE SAME SHAPE: a comma between every option but
+# the last, "or" before the last, still one string, declared under
+# `canonical` in the first-named option's group. Each combination declares
+# its own string; that is one line apiece and no machinery (#459).
 
 # --- THE VOCABULARY ----------------------------------------------------------
 # tests/test_cocktails.py flattens every list under `canonical`, so a group
@@ -106,15 +99,14 @@ no_garnish: "no garnish"
 # tests/test_standalone_docs.py is the guard, and the generator's own test is
 # what keeps the document in step.
 #
-# FIVE ENTRIES NO DRINK USED CAME OFF ON 2026-09-25 -- #1186, Helen: "Fine to
+# FOUR ENTRIES NO DRINK USED CAME OFF ON 2026-09-25 -- #1186, Helen: "Fine to
 # delete those garnishes." `cherry flag`, `lemon twist after expressing over
-# cocktail`, `mint leaf`, `orange crescent` and `pineapple and brandied cherry`
+# cocktail`, `orange crescent` and `pineapple and brandied cherry`
 # were declared by the 2026-08-31 census from strings that drinks have since
 # stopped saying, and the ratchet only ever bites on what is declared, so an
 # unused entry was costing a line in the generated ingest document and
-# guarding nothing. `mint sprig, mint leaf or grated nutmeg` is ONE string
-# (see above) and is unaffected. The next drink to want one of the five
-# declares it again, with the drink.
+# guarding nothing. The next drink to want one of the four declares it
+# again, with the drink.
 canonical:
 
   # Peel. The commonest garnish in the collection by a distance.
@@ -234,10 +226,10 @@ canonical:
     # No article in the string: the garnish step adds its own.
     - "skewered blueberry"
     # Three Dots and a Dash. THE COUNT IS THE SPEC, as with `three coffee
-    # beans`: three dots, one dash. Spelled out because a garnish that opens
-    # with a digit reads as a pour to
-    # test_a_garnish_is_not_an_ingredient_or_a_rim. Agreed by Helen 2026-10-07.
-    - "three skewered blueberries and a long slice of pineapple"
+    # beans`: the cherries are the dots, the frond the dash. Spelled out
+    # because a garnish that opens with a digit reads as a pour to
+    # test_a_garnish_is_not_an_ingredient_or_a_rim.
+    - "three skewered maraschino cherries and a pineapple frond"
     # `12 raspberries` until 2026-08-31. A COUNT STAYS ONLY WHERE THE COUNT IS
     # THE SPEC -- Helen's rule, settling this and `three coffee beans` together.
     # Twelve is how many that punch happened to want; three coffee beans is the
@@ -321,11 +313,9 @@ canonical:
     # it sits beside the violet; `an` comes from the first letter, no entry
     # needed in `no_article`.
     - "edible orchid"
-    # #984's Grasshopper: "mint sprig, mint leaf or grated nutmeg" -- the
-    # source's own three-way choice, one string, the same pattern as "orange
-    # or lemon twist" above, generalised past two options (see that entry's
-    # own comment).
-    - "mint sprig, mint leaf or grated nutmeg"
+    # The Grasshopper wears this with a mint sprig and grated nutmeg, all
+    # three at once.
+    - "mint leaf"
     # NEW 2026-10-07, the Difford's batch. The three below the thyme are
     # near-misses Helen ruled on, each offered beside what it might have
     # collapsed onto.
@@ -349,6 +339,7 @@ canonical:
 
   spice_and_other:
     - "grated nutmeg"
+    - "grated chocolate"
     # NEW 2026-09-20, all three from the Punch batch (#606) at Helen's word:
     # "add all those garnishes to garnish.yml".
     #
@@ -474,10 +465,11 @@ no_article:
   - kaffir lime leaves
   - cucumber wheels
   - grated nutmeg
+  - grated chocolate
   - whipped cream                       # a mass noun
   - desiccated coconut                  # a mass noun
   - three coffee beans
-  - three skewered blueberries and a long slice of pineapple
+  - three skewered maraschino cherries and a pineapple frond
   - orange peel over the rim (cut to look like a beak)
   - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"

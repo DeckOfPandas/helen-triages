@@ -54,6 +54,7 @@ argument and the rules each field is read by.
 - 2026-09-07 · §4 · #814 · a grouping an ingest left out is derived from the draft and reviewed by Helen: no proposals: block, no calibration round, no re-reading of sources.
 - 2026-10-01 · §4 · a note is always {label, text}; the bare-string form is retired on both sites.
 - 2026-10-02 · §4 · #1258 · every draft has a notes slot, and imported note text is labelled QQ.
+- 2026-10-12 · §4 · a published drink may keep the draft's empty notes pair.
 - 2026-10-04 · §4 · #814 · an ingredient-group name opening with "to " prints as itself, with no "For the".
 - 2026-10-04 · §4 · #814 · the closing METHOD group is assemble, the verb, never assembly.
 - 2026-10-04 · §4 · #814 · an ingredient used in two phases is split only where the method states the amount for one of them.
