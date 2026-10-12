@@ -416,7 +416,7 @@ does not give one you cannot pick: that is a `QQ`.
 `clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
 `coconut rum`
 
-**Gin styles:** `London dry gin` · `Old Tom gin` · `Plymouth` ·
+**Gin styles:** `London dry gin` · `Old Tom gin` · `Plymouth gin` ·
 `New Western dry gin` · `genever` · `navy strength gin` · `speciality` ·
 `gin liqueur` · `sloe gin`
 
@@ -563,8 +563,8 @@ fresh cherries
 
 **Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
 pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
-edible orchid · mint sprig, mint leaf or grated nutmeg · thyme sprig ·
-basil leaf (floated) · thin cucumber slice (floated) · length of cucumber peel
+edible orchid · mint leaf · thyme sprig · basil leaf (floated) ·
+thin cucumber slice (floated) · length of cucumber peel
 
 **Spice and other:** grated nutmeg · grated chocolate · Angostura bitters ·
 whipped cream · cinnamon stick · ginger wheel · stem ginger slice ·

@@ -2214,8 +2214,8 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-31 — alternative garnishes are ONE string, the maker's choice.**
   Helen, on `orange or lemon twist`: *"either of these are lovely and the maker
   can choose. I like this approach on principle."* Refined 2026-09-14 (#984)
-  to three or more: commas, then "or" before the last ("mint sprig, mint leaf
-  or grated nutmeg"), declared under `canonical` in `garnish.yml`. Same day:
+  to three or more: commas, then "or" before the last, declared under
+  `canonical` in `garnish.yml`. Same day:
   *"Orange wheel is real and distinct new garnish — please add."* A floated
   garnish is said by `garnish:`, never by a method step.
 - **2026-08-31 — a garnish carries no count.** `12 raspberries` is

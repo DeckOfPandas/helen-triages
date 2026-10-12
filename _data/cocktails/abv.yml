@@ -486,7 +486,7 @@ generics:
   Clairin Communal:   { abv: 43,   confidence: high }
 
   # --- genuinely a category, no bottle declared yet ----------------------
-  Plymouth:               { abv: 41.2, confidence: high }
+  Plymouth gin:           { abv: 41.2, confidence: high }
   navy strength gin:      { abv: 57,   confidence: high }
   sloe gin:               { abv: 26,   confidence: medium }
   pisco:                  { abv: 40,   confidence: medium }
