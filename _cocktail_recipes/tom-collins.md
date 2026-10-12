@@ -25,6 +25,7 @@ method:
 mood:
   - "sharp"
   - "sunny terrace"
+  - "signature"
   - "easy peasy"
 notes:
   - label: "Be bitchier"

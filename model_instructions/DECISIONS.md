@@ -2942,6 +2942,17 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   Helen: *"I'm not sold on up, let's retain it but with suspicion"*, and
   `test_no_mood_covers_more_than_half_the_collection` reached the same
   conclusion the same day. No mood may cover more than half the drinks.
+- **2026-10-12 — no mood cues how strong a drink is.** A "school night" tag
+  built from the units was proposed and refused. Helen: *"I don't want to cue
+  strength. Alcohol is a drug and people dose it. A unit is a unit, and I
+  declare those on every page."*
+- **2026-10-12 — `nightcap` and `sugar craving` both stay.** `nightcap` sits
+  mostly inside `strong brown drink` today (8 of 12 published); Helen: *"Nightcap
+  will gain more drinks of the pudding in a glass variety, which addresses that
+  problem too."* `sugar craving` no longer matches its written definition on
+  most of its drinks, and is left alone until her own pass: *"I'll do a full
+  pass over everything tag by tag when I'm closer to having all my drinks in
+  the set."* Do not prune or redefine either before then.
 - **2026-09-19, #1127 — `no measuring` means every measured amount is a
   whole-number multiple of the smallest, in eight measures or fewer.** Helen:
   *"for drinks I can make with just one receptacle, if that's all I have. Such

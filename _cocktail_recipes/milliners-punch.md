@@ -11,10 +11,10 @@ meta:
   awaiting_fix: false
   proofread: true
 mood:
-  - "aperitivo"
   - "fruity"
   - "sugar craving"
   - "tiki"
+  - "nightcap"
   - "festive"
   - "ice ice baby"
   - "I want to faff"
