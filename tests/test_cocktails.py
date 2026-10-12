@@ -2277,7 +2277,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # and changes nothing else. `efe55b56` is behind it. Proved with the old value
 # first: the test named exactly those four files, each "last touched by
 # ea203447", and nothing else.
-COCKTAIL_BASELINE_COMMIT = "aefda263"   # thirteen promoted, each the bytes Helen proofread
+COCKTAIL_BASELINE_COMMIT = "e5d693ab"   # the merge holding both grants: #1375's fourteen, #1378's thirteen
 
 
 def _newest_commit_per_published_drink():
