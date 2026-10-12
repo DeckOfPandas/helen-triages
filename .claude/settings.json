@@ -8,6 +8,7 @@
     "allow": [
       "Read(//dev/null)",
       "Edit(//dev/null)",
+      "Read(//workspace/.claude/worktrees/**)",
       "Bash(pytest *)",
       "Bash(python3 -m pytest *)",
       "Bash(git status *)",
