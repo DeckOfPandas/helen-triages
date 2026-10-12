@@ -547,7 +547,7 @@ bottles:
     generic: "London dry gin"
   # SPLIT 2026-09-05. One entry called "Hayman's" typed `London dry gin` could
   # not serve both drinks that pour the brand, and it silently mistyped one:
-  # La Fée Noir Punch asks for `Old Tom` and carried a QQ note saying the
+  # La Fée Noir Punch asks for `Old Tom gin` and carried a QQ note saying the
   # suggestion crossed a category. Helen confirmed the source pours Hayman's
   # Old Tom. Fog Cutter names "Hayman's London Dry Gin" outright.
   #
@@ -567,7 +567,7 @@ bottles:
     generic: "London dry gin"
     aliases: ["Hayman's London Dry Gin"]
   "Hayman's Old Tom":
-    generic: "Old Tom"
+    generic: "Old Tom gin"
     aliases: ["Hayman's Old Tom Gin"]
   "Rutte":
     generic: "London dry gin"
@@ -964,9 +964,11 @@ bottles:
     # a name -- resolvable here precisely because the falernum is the only
     # velvet-anything in the collection.
     aliases: ["Velvet", "Velvet Falernum", "Velvet falernum"]
-  "St Elizabeth Allspice Dram":
+  # Pimento is the allspice berry, so a pimento dram is an allspice dram.
+  "Bitter Truth Pimento Dram":
     generic: "allspice dram"
-    aliases: ["St Elizabeth allspice dram", "St. Elizabeth Allspice Dram"]
+    aliases: ["The Bitter Truth Pimento Dram", "The Bitter Truth Pimento Dram Liqueur",
+              "Bitter Truth Pimento Dram Liqueur"]
   # ================= THE BRIOTTET HOUSE, 2026-09-04 =========================
   # Helen: "A house, not a bottle. Declare each Briottet product you own by its
   # name and retype the drinks to the product." Asked whether she owned all six

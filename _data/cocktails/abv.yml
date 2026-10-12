@@ -359,7 +359,7 @@ bottles:
   "Luxardo Maraschino":               { abv: 32,   confidence: high }
   "Briottet Maraschino":              { abv: 24,   confidence: medium }
   "John D Taylor's Velvet Falernum":  { abv: 11,   confidence: high }
-  "St Elizabeth Allspice Dram":       { abv: 22.5, confidence: medium }
+  "Bitter Truth Pimento Dram":        { abv: 22,   confidence: high }
   "Roots Mastiha":                    { abv: 30,   confidence: high }
   "Disaronno":                        { abv: 28,   confidence: high }
   # A `cherry brandy` since 2026-09-14 (#1012 follow-up), not a `cherry

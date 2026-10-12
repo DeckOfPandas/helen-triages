@@ -637,10 +637,10 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
-  "St Elizabeth Allspice Dram":
-    size_ml: 375
-    gbp: 30
-    confidence: low
+  "Bitter Truth Pimento Dram":
+    size_ml: 500
+    gbp: 23
+    confidence: high
   "Bénédictine D.O.M.":
     size_ml: 700
     gbp: 30

@@ -1077,7 +1077,7 @@ card_names:
   # NOT collapsed to "gin", deliberately, and the line is Helen's own rum rule:
   # collapse where the difference is a nuance, keep it where it changes the
   # STRENGTH or the drink. Navy strength does; genever is a different drink
-  # altogether. Old Tom, Plymouth, New Western dry gin and speciality are the
+  # altogether. Old Tom gin, Plymouth, New Western dry gin and speciality are the
   # genuinely open ones -- see the note in the issue rather than guessing here.
   "navy strength gin": "navy strength gin"
   "genever": "genever"
@@ -1224,7 +1224,9 @@ card_names_may_collide:
 # rather than an inventory; they are not gaps to fill.
 gin_styles:
   - "London dry gin"
-  - "Old Tom"
+  # The spirit word is on the end so the line skims as a gin; the bare
+  # name is in `retired_gin_styles`.
+  - "Old Tom gin"
   - "Plymouth"
   # `New Western dry gin` SINCE 2026-09-25, was `New Western dry` -- Helen,
   # #1186: "'New Western dry' should become 'New Western dry gin'." The naming
@@ -2067,7 +2069,7 @@ family_of:
   "cachaça": rum
   "Batavia arrack": rum
   "London dry gin": gin
-  "Old Tom": gin
+  "Old Tom gin": gin
   "Plymouth": gin
   "New Western dry gin": gin
   "genever": gin
@@ -2188,7 +2190,7 @@ shelf_of:
   Japanese whisky: spirits
   London dry gin: spirits
   New Western dry gin: spirits
-  Old Tom: spirits
+  Old Tom gin: spirits
   Plymouth: spirits
   absinthe: spirits
   aged Demerara rum: spirits
@@ -2620,3 +2622,7 @@ retired_gin_styles:
     Western dry gin'." No drink ever poured the old name, so nothing was
     retyped; kept here so the old spelling cannot blend into the not-declared
     pile.
+  "Old Tom": >-
+    the spirit word was missing, as with `New Western dry`. It is `Old Tom
+    gin` now, Helen, 2026-10-12: "'Old Tom' should be declared as 'Old Tom
+    gin'... For ease of skimming a recipe."

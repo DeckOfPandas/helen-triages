@@ -416,7 +416,7 @@ does not give one you cannot pick: that is a `QQ`.
 `clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
 `coconut rum`
 
-**Gin styles:** `London dry gin` · `Old Tom` · `Plymouth` ·
+**Gin styles:** `London dry gin` · `Old Tom gin` · `Plymouth` ·
 `New Western dry gin` · `genever` · `navy strength gin` · `speciality` ·
 `gin liqueur` · `sloe gin`
 
@@ -552,7 +552,6 @@ lemon wheel and skewered maraschino cherry (like a sail)
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wedge on rim ·
 apricot wedge on rim · pineapple wheel · blackberry · dried apple slice ·
 apple slice · banana chip · skewered raspberry · skewered blueberry ·
-three skewered blueberries and a long slice of pineapple ·
 three skewered maraschino cherries and a pineapple frond · raspberries ·
 fruit wedges · half an empty passion fruit shell
 

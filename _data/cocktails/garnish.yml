@@ -234,12 +234,9 @@ canonical:
     # No article in the string: the garnish step adds its own.
     - "skewered blueberry"
     # Three Dots and a Dash. THE COUNT IS THE SPEC, as with `three coffee
-    # beans`: three dots, one dash. Spelled out because a garnish that opens
-    # with a digit reads as a pour to
-    # test_a_garnish_is_not_an_ingredient_or_a_rim. Agreed by Helen 2026-10-07.
-    - "three skewered blueberries and a long slice of pineapple"
-    # The classic Three Dots and a Dash: the cherries are the dots, the
-    # frond the dash.
+    # beans`: the cherries are the dots, the frond the dash. Spelled out
+    # because a garnish that opens with a digit reads as a pour to
+    # test_a_garnish_is_not_an_ingredient_or_a_rim.
     - "three skewered maraschino cherries and a pineapple frond"
     # `12 raspberries` until 2026-08-31. A COUNT STAYS ONLY WHERE THE COUNT IS
     # THE SPEC -- Helen's rule, settling this and `three coffee beans` together.
@@ -482,7 +479,6 @@ no_article:
   - whipped cream                       # a mass noun
   - desiccated coconut                  # a mass noun
   - three coffee beans
-  - three skewered blueberries and a long slice of pineapple
   - three skewered maraschino cherries and a pineapple frond
   - orange peel over the rim (cut to look like a beak)
   - half an empty lime shell            # brings its own "half an"
