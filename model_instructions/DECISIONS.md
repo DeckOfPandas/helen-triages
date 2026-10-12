@@ -1584,8 +1584,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-10-11 — a made ingredient is named plainly, and how to make it or
   what stands in for it is a note.** On `Coco mix (3:1 Coco Lopez to coconut
   milk)`, Helen: *"Coco mix should be the ingredient, with a note giving the
-  substitution. New rule, everywhere."* So the generic is `Coco mix`. A sugar
-  syrup's ratio is not a recipe in brackets and stays in its name.
+  substitution. New rule, everywhere."* So the generic is `Coco mix`, and its
+  ingredient note is always *"3:1 Coco Lopez to coconut milk."*, no comma —
+  the line is written out beside the generic in `ingredients.yml` so the next
+  drink copies it. A sugar syrup's ratio is not a recipe in brackets and stays
+  in its name.
 
 ### §9.3.2 The bottle dictionary
 

@@ -1993,6 +1993,11 @@ other:
   # milk, three to one. Not `coconut cream`, the unsweetened tin. The name is
   # the ingredient alone; how it is made, and what stands in for it, is a note
   # on the drink. DECISIONS §9.3.1.
+  #
+  # THE LINE TO REUSE, every time a drink asks for it, word for word:
+  #     - amount: "<n> ml"
+  #       generic: "Coco mix"
+  #       note: "3:1 Coco Lopez to coconut milk."
   - "Coco mix"
   - "egg white"
   - "salt"

@@ -597,11 +597,11 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
-  # Priced from the Boudier beside it, not from a shop. Helen's to correct.
+  # Helen's figure.
   "Briottet Liqueur de Gingembre":
     size_ml: 700
-    gbp: 20
-    confidence: low
+    gbp: 26
+    confidence: high
   # BOTTLES NAMED 2026-09-14 (#1012) for two categories that had none, at the
   # figures the category rows in `generics:` had carried -- and PRICED BY HELEN
   # the same evening (#747): "Briottet Sapin: £40", "La Tomato: £24". The

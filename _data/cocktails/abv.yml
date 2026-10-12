@@ -372,8 +372,8 @@ bottles:
   # de Gingembre' is 18 % -- and please update the name string." The guess
   # was 20; the old name `Gabriel Boudier Gingembre` is its alias.
   "Gabriel Boudier Liqueur de Gingembre": { abv: 18, confidence: high }
-  # A guess from the Boudier above; no label read. Helen's to correct.
-  "Briottet Liqueur de Gingembre":    { abv: 18,   confidence: low, qq: "What does the label say? 18 is the Boudier's figure, not this bottle's." }
+  # Helen's figure.
+  "Briottet Liqueur de Gingembre":    { abv: 18,   confidence: high }
   # BOTTLES WHERE THERE WERE ONLY CATEGORIES, 2026-09-14 (#1012). Each was a
   # `generics:` row with a `qq:` because the file could not tell which bottle
   # the drink meant; Helen named the one on her shelf. "Briottet Liqueur de
