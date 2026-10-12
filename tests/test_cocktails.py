@@ -2277,7 +2277,7 @@ def test_no_drink_uses_the_old_hyphenated_awaiting_fix_key():
 # and changes nothing else. `efe55b56` is behind it. Proved with the old value
 # first: the test named exactly those four files, each "last touched by
 # ea203447", and nothing else.
-COCKTAIL_BASELINE_COMMIT = "441eb5f4"   # thirteen promoted from Helen's proofread, notes slots emptied
+COCKTAIL_BASELINE_COMMIT = "aefda263"   # thirteen promoted, each the bytes Helen proofread
 
 
 def _newest_commit_per_published_drink():
@@ -5245,13 +5245,14 @@ def test_a_published_drink_note_is_a_filled_pair():
 def test_the_published_note_check_sees_each_broken_shape():
     """The check above passes on today's drinks, so prove each shape fails it."""
     assert _published_note_problem({"label": "Rum", "text": "Any aged rum works."}) is None
+    assert _published_note_problem({"label": "", "text": ""}) is None
     for broken in (
+        {"label": " ", "text": ""},
         "Any aged rum works.",
         {"label": "Rum", "note": "Any aged rum works."},
         {"label": "Rum", "text": "Any aged rum works.", "note": "x"},
         {"label": "", "text": "Any aged rum works."},
         {"label": "Rum", "text": ""},
-        {"label": "", "text": ""},
         {"label": "Rum", "text": None},
     ):
         assert _published_note_problem(broken), broken
