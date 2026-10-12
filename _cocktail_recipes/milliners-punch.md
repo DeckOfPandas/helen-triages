@@ -9,7 +9,7 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: false
+  proofread: true
 mood:
   - "fruity"
   - "sugar craving"
