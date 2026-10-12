@@ -25,6 +25,7 @@ mood:
   - "fruity"
   - "sugar craving"
   - "brunch"
+  - "signature"
   - "ice ice baby"
 notes:
   - label: "Sugar me"
@@ -36,5 +37,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

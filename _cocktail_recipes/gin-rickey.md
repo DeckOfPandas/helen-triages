@@ -25,6 +25,7 @@ to_serve: ""
 mood:
   - "sharp"
   - "sunny terrace"
+  - "signature"
   - "easy peasy"
 notes: []
 source: "Difford's"
@@ -34,5 +35,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

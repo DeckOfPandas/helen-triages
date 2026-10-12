@@ -29,6 +29,7 @@ mood:
   - "strong brown drink"
   - "clear"
   - "festive"
+  - "signature"
   - "no juicing"
   - "no measuring"
   - "easy peasy"
@@ -42,5 +43,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

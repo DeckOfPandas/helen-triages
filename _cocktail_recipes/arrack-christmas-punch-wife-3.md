@@ -32,6 +32,7 @@ mood:
   - "aperitivo"
   - "sunny terrace"
   - "festive"
+  - "signature"
 notes: []
 source: ""
 source_url: ""
@@ -40,5 +41,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

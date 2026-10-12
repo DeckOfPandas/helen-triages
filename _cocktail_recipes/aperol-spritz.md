@@ -21,6 +21,7 @@ mood:
   - "aperitivo"
   - "brunch"
   - "sunny terrace"
+  - "signature"
   - "no juicing"
   - "no measuring"
   - "easy peasy"
@@ -32,5 +33,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

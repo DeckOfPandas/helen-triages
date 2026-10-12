@@ -29,6 +29,7 @@ mood:
   - "aperitivo"
   - "brunch"
   - "festive"
+  - "signature"
   - "no measuring"
   - "easy peasy"
 notes: []
@@ -39,5 +40,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

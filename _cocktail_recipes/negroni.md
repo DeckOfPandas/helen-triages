@@ -25,6 +25,7 @@ method:
 mood:
   - "clear"
   - "aperitivo"
+  - "signature"
   - "no juicing"
   - "easy peasy"
 notes:
@@ -37,5 +38,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

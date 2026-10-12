@@ -9,12 +9,12 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 mood:
-  - "aperitivo"
   - "fruity"
   - "sugar craving"
   - "tiki"
+  - "nightcap"
   - "festive"
   - "ice ice baby"
   - "I want to faff"

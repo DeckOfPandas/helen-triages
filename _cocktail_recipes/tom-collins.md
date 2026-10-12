@@ -25,6 +25,7 @@ method:
 mood:
   - "sharp"
   - "sunny terrace"
+  - "signature"
   - "easy peasy"
 notes:
   - label: "Be bitchier"
@@ -36,5 +37,5 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

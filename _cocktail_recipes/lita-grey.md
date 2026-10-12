@@ -28,6 +28,7 @@ mood:
   - "fruity"
   - "sugar craving"
   - "festive"
+  - "signature"
   - "easy peasy"
 notes:
   - label: "Seasonal"
@@ -39,6 +40,6 @@ meta:
   ship: "oh gods yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
   
 ---

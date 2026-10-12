@@ -33,6 +33,7 @@ mood:
   - "ice ice baby"
   - "no juicing"
   - "no measuring"
+  - "easy peasy"
 notes: []
 source: ""
 source_url: ""
@@ -41,5 +42,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---

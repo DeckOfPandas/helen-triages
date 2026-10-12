@@ -23,6 +23,7 @@ mood:
   - "signature"
   - "no juicing"
   - "no measuring"
+  - "easy peasy"
 notes:
   - label: "Assemblage au choix"
     text: "Sometimes I squeeze the lime over; sometimes I muddle the lime with the sugar and pour the rum over that."
@@ -33,5 +34,5 @@ meta:
   ship: "yes"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
