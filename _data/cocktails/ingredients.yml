@@ -831,8 +831,15 @@ other:
   - "cola"
   - "coconut cream"
   # A made mix: Coco Lopez (sweetened cream of coconut) loosened with coconut
-  # milk. Not `coconut cream`, which is the unsweetened tin (#1108).
-  - "Coco mix (3:1 Coco Lopez to coconut milk)"
+  # milk, three to one. Not `coconut cream`, the unsweetened tin. The name is
+  # the ingredient alone; how it is made, and what stands in for it, is a note
+  # on the drink. DECISIONS §9.3.1.
+  #
+  # THE LINE TO REUSE, every time a drink asks for it, word for word:
+  #     - amount: "<n> ml"
+  #       generic: "Coco mix"
+  #       note: "3:1 Coco Lopez to coconut milk."
+  - "Coco mix"
   - "egg white"
   - "salt"
   # Sprinkled onto a flame, so an ingredient with the amount `(sprinkle)` and
@@ -1088,7 +1095,7 @@ shelf_of:
   cranberry juice drink: bottled fruit juice
   pineapple juice: bottled fruit juice
   # fresh produce and larder
-  "Coco mix (3:1 Coco Lopez to coconut milk)": larder
+  "Coco mix": larder
   basil: fresh produce
   black tea: larder
   blackberries: fresh produce

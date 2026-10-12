@@ -499,6 +499,10 @@ bottles:
     generic: "cherry liqueur"
     aliases: ["Briottet Cérise", "Briottet Cerise", "Briottet cerise",
               "Briottet Crème de Cérise", "Briotte Cérise"]
+  # The label's spelling is canonical; the unaccented one is the alias.
+  "Briottet Crème de Myrtille":
+    generic: "crème de myrtille"
+    aliases: ["Briottet Creme de Myrtille"]
   # A bare house alias, safe because Luxardo only ever means the maraschino
   # here. A second Luxardo product is a second entry, and the alias comes off.
   "Luxardo Maraschino":
@@ -515,6 +519,9 @@ bottles:
   "Gabriel Boudier Liqueur de Gingembre":
     generic: "ginger liqueur"
     aliases: ["Gabriel Boudier Gingembre"]
+  # Frozen Ginger Daiquiri uses it where the recipe asks for ginger syrup.
+  "Briottet Liqueur de Gingembre":
+    generic: "ginger liqueur"
   # A rhum-based liqueur, filed with the liqueurs like Créole Shrubb, so "no
   # rum tonight" does not drop it.
   "Clément Mahina Coconut Rhum Liqueur":

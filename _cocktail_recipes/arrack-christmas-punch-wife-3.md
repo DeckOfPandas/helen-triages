@@ -32,6 +32,7 @@ mood:
   - "aperitivo"
   - "sunny terrace"
   - "festive"
+  - "signature"
 notes: []
 source: ""
 source_url: ""

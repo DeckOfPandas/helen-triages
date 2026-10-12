@@ -25,6 +25,7 @@ mood:
   - "fruity"
   - "sugar craving"
   - "brunch"
+  - "signature"
   - "ice ice baby"
 notes:
   - label: "Sugar me"

@@ -21,6 +21,7 @@ mood:
   - "aperitivo"
   - "brunch"
   - "sunny terrace"
+  - "signature"
   - "no juicing"
   - "no measuring"
   - "easy peasy"

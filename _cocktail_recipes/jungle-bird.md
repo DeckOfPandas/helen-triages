@@ -30,6 +30,7 @@ mood:
   - "aperitivo"
   - "fruity"
   - "tiki"
+  - "signature"
 notes: []
 source: "Difford's"
 source_url: "https://www.diffordsguide.com/cocktails/recipe/1082/jungle-bird"

@@ -29,6 +29,7 @@ mood:
   - "strong brown drink"
   - "clear"
   - "festive"
+  - "signature"
   - "no juicing"
   - "no measuring"
   - "easy peasy"

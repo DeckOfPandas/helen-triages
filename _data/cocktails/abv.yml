@@ -184,6 +184,8 @@ bottles:
   "King's Ginger":                    { abv: 41,   confidence: high }
   # Helen's figure (#1012).
   "Gabriel Boudier Liqueur de Gingembre": { abv: 18, confidence: high }
+  # Helen's figure.
+  "Briottet Liqueur de Gingembre":    { abv: 18,   confidence: high }
   # Helen's figures (#1012). Each is the bottle under its generic, so neither
   # generic has a row below.
   "Briottet Liqueur de Sapin":        { abv: 40,   confidence: high }
@@ -196,6 +198,8 @@ bottles:
   "Briottet Crème de Menthe Blanche": { abv: 21,   confidence: medium }
   "Gabriel Boudier Crème de Menthe":  { abv: 21,   confidence: high }
   "Briottet Crème de Violette":       { abv: 16,   confidence: medium }
+  # Helen's figure (#1351).
+  "Briottet Crème de Myrtille":       { abv: 18,   confidence: high }
   "Gabriel Boudier Crème de Banane":  { abv: 25,   confidence: medium }
 
   # --- amari and bitter aperitivi ----------------------------------------
@@ -272,8 +276,8 @@ generics:
   peach schnapps:         { abv: 18,   confidence: medium }
   crème de cassis:        { abv: 20,   confidence: medium }
   # Helen's figures (#1351); the tsipouro's she confirmed without a bottle.
+  # `crème de myrtille` has no row here: its declared bottle carries the figure.
   black raspberry liqueur: { abv: 16.5, confidence: high }
-  crème de myrtille:      { abv: 18,   confidence: high }
   kümmel:                 { abv: 38,   confidence: high }
   sake:                   { abv: 17,   confidence: high }
   tsipouro:               { abv: 42,   confidence: medium }
@@ -338,7 +342,7 @@ non_alcoholic:
   - black tea
   - espresso
   - coconut cream
-  - "Coco mix (3:1 Coco Lopez to coconut milk)"
+  - "Coco mix"
   - cream
   - milk
   - fruit purée

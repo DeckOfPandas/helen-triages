@@ -63,8 +63,10 @@ fill:
 # --- `rim` -------------------------------------------------------------------
 # Free text. A rim is done to the glass before the drink is built, which is
 # why it is here and not in `garnish`; a garnish placed on the rim (`lime
-# wedge on rim`) stays a garnish. The page says it on the strain step, or
-# under "To serve" when no strain step carries it.
+# wedge on rim`) stays a garnish. The page says it on the strain step, after
+# "with a", or under "To serve" when no strain step carries it; so the value
+# is a noun phrase holding the word "rim" ("salt rim", "sugar half-rim"),
+# never the bare ingredient. DECISIONS §9.10a.
 rim: "free text"
 
 # --- `to_serve` --------------------------------------------------------------

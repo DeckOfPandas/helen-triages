@@ -462,6 +462,12 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: medium
+  # Helen's figure (#1351); the same bottle as the `crème de myrtille` generic
+  # row below.
+  "Briottet Crème de Myrtille":
+    size_ml: 700
+    gbp: 23
+    confidence: high
   "Gabriel Boudier Crème de Banane":
     size_ml: 700
     gbp: 17
@@ -481,6 +487,11 @@ bottles:
   "Gabriel Boudier Liqueur de Gingembre":
     size_ml: 700
     gbp: 20
+    confidence: high
+  # Helen's figure.
+  "Briottet Liqueur de Gingembre":
+    size_ml: 700
+    gbp: 26
     confidence: high
   # Helen's figures for these two (#747).
   "Briottet Liqueur de Sapin":
@@ -853,7 +864,7 @@ generics:
   hazelnut syrup:     { gbp_per_litre_min: 14.29, gbp_per_litre_max: 14.29, basis: "Monin Hazelnut Syrup, GBP 10 / 70cl", confidence: high }
   # Not priced off `coconut cream`: Coco Lopez is sweetened cream of coconut,
   # a different tin.
-  "Coco mix (3:1 Coco Lopez to coconut milk)": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
+  "Coco mix": { gbp_per_litre_min: 5.90, gbp_per_litre_max: 8.05, basis: "(3 x Coco Lopez @ GBP 7.05-9.40/L + 1 x coconut milk @ GBP 2.50-4.00/L) / 4, tin prices guessed", confidence: low }
   agave syrup:        { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "GBP 3.50 / 350g", confidence: medium }
   vanilla syrup:      { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }
   grenadine:          { gbp_per_litre_min: 8.00,  gbp_per_litre_max: 14.00, basis: "Monin GBP 8 / 70cl, or made", confidence: medium }

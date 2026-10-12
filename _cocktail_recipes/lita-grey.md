@@ -28,6 +28,7 @@ mood:
   - "fruity"
   - "sugar craving"
   - "festive"
+  - "signature"
   - "easy peasy"
 notes:
   - label: "Seasonal"
