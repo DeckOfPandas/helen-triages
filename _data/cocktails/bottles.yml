@@ -964,6 +964,9 @@ bottles:
     # a name -- resolvable here precisely because the falernum is the only
     # velvet-anything in the collection.
     aliases: ["Velvet", "Velvet Falernum", "Velvet falernum"]
+  "St Elizabeth Allspice Dram":
+    generic: "allspice dram"
+    aliases: ["St Elizabeth allspice dram", "St. Elizabeth Allspice Dram"]
   # ================= THE BRIOTTET HOUSE, 2026-09-04 =========================
   # Helen: "A house, not a bottle. Declare each Briottet product you own by its
   # name and retype the drinks to the product." Asked whether she owned all six

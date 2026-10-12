@@ -1529,6 +1529,7 @@ liqueurs:
   # different fruit): its own thing, at 18%. Peach Me is its only pour.
   - "peach schnapps"
   - "mastiha liqueur"
+  - "allspice dram"
   # THREE MORE LIQUEURS, 2026-10-07, the Difford's batch, each a "yes" from
   # Helen to a named proposal.
   #
@@ -2290,6 +2291,7 @@ shelf_of:
   liqueur de sapin: liqueurs
   maraschino liqueur: liqueurs
   mastiha liqueur: liqueurs
+  allspice dram: liqueurs
   orange Curaçao: liqueurs
   passion fruit liqueur: liqueurs
   peach schnapps: liqueurs

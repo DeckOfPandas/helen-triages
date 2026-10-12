@@ -637,6 +637,10 @@ bottles:
     size_ml: 700
     gbp: 20
     confidence: high
+  "St Elizabeth Allspice Dram":
+    size_ml: 375
+    gbp: 30
+    confidence: low
   "Bénédictine D.O.M.":
     size_ml: 700
     gbp: 30

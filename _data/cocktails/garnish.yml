@@ -238,6 +238,9 @@ canonical:
     # with a digit reads as a pour to
     # test_a_garnish_is_not_an_ingredient_or_a_rim. Agreed by Helen 2026-10-07.
     - "three skewered blueberries and a long slice of pineapple"
+    # The classic Three Dots and a Dash: the cherries are the dots, the
+    # frond the dash.
+    - "three skewered maraschino cherries and a pineapple frond"
     # `12 raspberries` until 2026-08-31. A COUNT STAYS ONLY WHERE THE COUNT IS
     # THE SPEC -- Helen's rule, settling this and `three coffee beans` together.
     # Twelve is how many that punch happened to want; three coffee beans is the
@@ -349,6 +352,7 @@ canonical:
 
   spice_and_other:
     - "grated nutmeg"
+    - "grated chocolate"
     # NEW 2026-09-20, all three from the Punch batch (#606) at Helen's word:
     # "add all those garnishes to garnish.yml".
     #
@@ -474,10 +478,12 @@ no_article:
   - kaffir lime leaves
   - cucumber wheels
   - grated nutmeg
+  - grated chocolate
   - whipped cream                       # a mass noun
   - desiccated coconut                  # a mass noun
   - three coffee beans
   - three skewered blueberries and a long slice of pineapple
+  - three skewered maraschino cherries and a pineapple frond
   - orange peel over the rim (cut to look like a beak)
   - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"
