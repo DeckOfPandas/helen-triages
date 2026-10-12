@@ -1,6 +1,6 @@
 ---
 title: "Cynar Toronto"
-tagline: "Politely artichoke-y."
+tagline: "A Manhattan / Old Fashioned for artichoke enthusiasts. Grab a giant ice cube and just go nuts."
 glass:
   - "old fashioned"
 garnish: ["orange twist"]
@@ -23,9 +23,7 @@ mood:
   - "strong brown drink"
   - "nightcap"
   - "no juicing"
-notes:
-  - label: "If you like giant ice cubes..."
-    text: "...just do it, go nuts."
+notes: []
 source: "kindredcocktails.com"
 source_url: ""
 meta:
@@ -33,5 +31,5 @@ meta:
   ship: "sure"
   rewritten: true
   awaiting_fix: false
-  proofread: true
+  proofread: false
 ---
