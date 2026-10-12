@@ -452,6 +452,8 @@ argument and the rules each field is read by.
 - 2026-09-12 · §9.13 · #991 · the related cards ARE the index's cards; there is no variant.
 - 2026-08-30 · §9.13 · #452 · a mood is evocative, not a flat flavour descriptor.
 - 2026-08-30 · §9.13 · #452 · up is not a mood — It covered 51% of the collection.
+- 2026-10-12 · §9.13 · no mood cues how strong a drink is — A "school night" tag built from the units was proposed and refused.
+- 2026-10-12 · §9.13 · nightcap and sugar craving both stay — nightcap sits mostly inside strong brown drink today (8 of 12 published); Helen: "Nightcap will gain more drinks of the pudding in a glass …
 - 2026-09-19 · §9.13 · #1127 · no measuring means every measured amount is a whole-number multiple of the smallest, in eight measures or fewer.
 - 2026-09-19 · §9.13 · #1127 · for no measuring, a measured top is an amount like any other; lengtheners are not set aside by name.
 - 2026-09-20 · §9.13 · #1127 · fifteen published drinks that gained only the no measuring chip went live without a re-read: a single grant, not a standing rule.

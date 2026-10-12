@@ -29,6 +29,7 @@ mood:
   - "aperitivo"
   - "brunch"
   - "festive"
+  - "signature"
   - "no measuring"
   - "easy peasy"
 notes: []

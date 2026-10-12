@@ -25,6 +25,7 @@ method:
 mood:
   - "clear"
   - "aperitivo"
+  - "signature"
   - "no juicing"
   - "easy peasy"
 notes:

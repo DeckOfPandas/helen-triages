@@ -33,6 +33,7 @@ mood:
   - "ice ice baby"
   - "no juicing"
   - "no measuring"
+  - "easy peasy"
 notes: []
 source: ""
 source_url: ""
