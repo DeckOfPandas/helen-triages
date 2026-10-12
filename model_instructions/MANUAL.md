@@ -679,7 +679,9 @@ takes `proofread` down with it.
   `test_a_draft_has_a_notes_slot_and_no_unlabelled_note` (food) and
   `test_a_draft_drink_has_a_notes_slot_and_no_unlabelled_note` refuse
   either. A published page with no notes may write `notes: []` or omit the
-  key.
+  key; a published drink may also keep the draft's empty pair, which prints
+  nothing. A note with only one half written is refused
+  (`test_a_published_drink_note_is_a_filled_pair`).
 - **`internal_temp_ref`** (with `doneness`) pulls a live figure from
   `_data/food/internal_temperatures.yml` (§14); opt-in.
 - **Filenames are stable by default.** If a rename is clearly indicated, say

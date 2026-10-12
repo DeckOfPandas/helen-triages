@@ -54,6 +54,7 @@ argument and the rules each field is read by.
 - 2026-09-07 · §4 · #814 · a grouping an ingest left out is derived from the draft and reviewed by Helen: no proposals: block, no calibration round, no re-reading of sources.
 - 2026-10-01 · §4 · a note is always {label, text}; the bare-string form is retired on both sites.
 - 2026-10-02 · §4 · #1258 · every draft has a notes slot, and imported note text is labelled QQ.
+- 2026-10-12 · §4 · a published drink may keep the draft's empty notes pair.
 - 2026-10-04 · §4 · #814 · an ingredient-group name opening with "to " prints as itself, with no "For the".
 - 2026-10-04 · §4 · #814 · the closing METHOD group is assemble, the verb, never assembly.
 - 2026-10-04 · §4 · #814 · an ingredient used in two phases is split only where the method states the amount for one of them.
@@ -257,6 +258,7 @@ argument and the rules each field is read by.
 - 2026-10-07 · §9.3.1 · lowercase when the word has become the thing.
 - 2026-08-17 · §9.3.1 · Curaçao keeps its capital, and Grand Marnier is a generic of its own.
 - 2026-08-26 · §9.3.1 · the gin styles are Helen's own list, and speciality always carries a character.
+- 2026-10-12 · §9.3.1 · a gin style carries the word gin: Old Tom gin, Plymouth gin.
 - 2026-09-04 · §9.3.1 · aguardiente and kirschwasser are generics, not bottles.
 - 2026-09-05 · §9.3.1 · Créole Shrubb is its own generic, filed under liqueurs: where no category name would help Helen choose, the bottle is the category.
 - 2026-09-05 · §9.3.1 · #314 · navy, overproof navy and black are not rum categories and are retired for good.

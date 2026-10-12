@@ -270,7 +270,7 @@ bottles:
     generic: "London dry gin"
     aliases: ["Hayman's London Dry Gin"]
   "Hayman's Old Tom":
-    generic: "Old Tom"
+    generic: "Old Tom gin"
     aliases: ["Hayman's Old Tom Gin"]
   "Rutte":
     generic: "London dry gin"
@@ -471,6 +471,11 @@ bottles:
   "John D Taylor's Velvet Falernum":
     generic: "falernum"
     aliases: ["Velvet", "Velvet Falernum", "Velvet falernum"]
+  # Pimento is the allspice berry, so a pimento dram is an allspice dram.
+  "Bitter Truth Pimento Dram":
+    generic: "allspice dram"
+    aliases: ["The Bitter Truth Pimento Dram", "The Bitter Truth Pimento Dram Liqueur",
+              "Bitter Truth Pimento Dram Liqueur"]
 
   # --- Briottet: a house, so each product is declared by name ---
   # The white cacao and menthe are named for their colour; a brown cacao or a

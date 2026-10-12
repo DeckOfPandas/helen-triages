@@ -416,7 +416,7 @@ does not give one you cannot pick: that is a `QQ`.
 `clear blended multi-region rum` · `pineapple rum` · `blended overproof rum` ·
 `coconut rum`
 
-**Gin styles:** `London dry gin` · `Old Tom` · `Plymouth` ·
+**Gin styles:** `London dry gin` · `Old Tom gin` · `Plymouth gin` ·
 `New Western dry gin` · `genever` · `navy strength gin` · `speciality` ·
 `gin liqueur` · `sloe gin`
 
@@ -443,8 +443,9 @@ does not give one you cannot pick: that is a `QQ`.
 `coconut rhum` · `crème de menthe` · `cherry liqueur` · `cherry brandy` ·
 `apricot liqueur` · `coffee liqueur` · `ginger liqueur` ·
 `passion fruit liqueur` · `gentian liqueur` · `apple schnapps` ·
-`peach schnapps` · `mastiha liqueur` · `black raspberry liqueur` ·
-`crème de myrtille` · `kümmel` · `tomato liqueur` · `amaretto`
+`peach schnapps` · `mastiha liqueur` · `allspice dram` ·
+`black raspberry liqueur` · `crème de myrtille` · `kümmel` · `tomato liqueur` ·
+`amaretto`
 
 **Herbal liqueurs:** `Chartreuse Verte` · `Chartreuse Jaune` · `Bénédictine` ·
 `Galliano` · `Strega` · `Jägermeister` · `liqueur de sapin` ·
@@ -551,7 +552,7 @@ lemon wheel and skewered maraschino cherry (like a sail)
 pineapple wedge (cut to resemble a bird's plumage) · pineapple wedge on rim ·
 apricot wedge on rim · pineapple wheel · blackberry · dried apple slice ·
 apple slice · banana chip · skewered raspberry · skewered blueberry ·
-three skewered blueberries and a long slice of pineapple · raspberries ·
+three skewered maraschino cherries and a pineapple frond · raspberries ·
 fruit wedges · half an empty passion fruit shell
 
 **Cherries:** brandied cherry · maraschino cherry · Luxardo maraschino cherry ·
@@ -562,11 +563,11 @@ fresh cherries
 
 **Herbs and leaves:** mint sprig · mint bouquet · rosemary sprig ·
 pineapple frond · kaffir lime leaves · cucumber wheels · edible violet ·
-edible orchid · mint sprig, mint leaf or grated nutmeg · thyme sprig ·
-basil leaf (floated) · thin cucumber slice (floated) · length of cucumber peel
+edible orchid · mint leaf · thyme sprig · basil leaf (floated) ·
+thin cucumber slice (floated) · length of cucumber peel
 
-**Spice and other:** grated nutmeg · Angostura bitters · whipped cream ·
-cinnamon stick · ginger wheel · stem ginger slice ·
+**Spice and other:** grated nutmeg · grated chocolate · Angostura bitters ·
+whipped cream · cinnamon stick · ginger wheel · stem ginger slice ·
 skewered crystallised ginger · desiccated coconut · star anise (floated) ·
 skewered green olive · skewered black olives ·
 small stuffed dead Norwegian Blue · three coffee beans

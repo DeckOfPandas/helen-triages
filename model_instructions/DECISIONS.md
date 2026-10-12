@@ -313,9 +313,15 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   this will stop them being published by accident (i.e. without me having
   spotted and fixed the imported text). Then yes, thank god, yes yes yes
   please fix the notes: [] !!!!"* A draft never says `notes: []`, it carries
-  the empty pair; a published page with no notes still writes `notes: []`.
+  the empty pair; a published food page with no notes still writes
+  `notes: []`.
   `QQ` on a label means "Helen has not read this" whatever the text says, and
   text beginning `QQ` must be labelled `QQ`. `tidy_drafts.py --only notes`.
+- **2026-10-12 — a published drink may keep the draft's empty notes pair.**
+  Helen: *"Let's change that test to only allow label "" and text "", given we
+  set drafts to write that out of convenience for me."* Both halves empty is
+  allowed and prints nothing; one half empty is still refused. A drink is
+  promoted byte-for-byte, slot and all.
 - **2026-10-04, #814 — an ingredient-group name opening with "to " prints as
   itself, with no "For the".** Helen: *"Can we fix all 'for the to finish'
   cases? Both existing and when we ingest."* The layout had special-cased `to
@@ -1672,6 +1678,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `test_speciality_gin_declares_a_character` holds it. `gin liqueur` is filed
   in `gin_styles` so that excluding gin rolls it up, and is not one (*"not a
   gin though"*).
+- **2026-10-12 — a gin style carries the word `gin`: `Old Tom gin`, `Plymouth
+  gin`.** Helen: *"'Old Tom' should be declared as 'Old Tom gin'... For ease
+  of skimming a recipe."* and *"Please update to 'Plymouth gin' too."* The
+  same rule made `New Western dry` into `New Western dry gin` (#1186). The
+  bare names are in `retired_gin_styles`, so a drink that writes one fails
+  with the reason.
 - **2026-09-04 — `aguardiente` and `kirschwasser` are generics, not bottles.**
   Asked about the two things Bali Hai suggested, Helen: *"both are generics."*
   The drink carries them as a list `generic`, either would do, with no
@@ -2518,14 +2530,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-08-31 — alternative garnishes are ONE string, the maker's choice.**
   Helen, on `orange or lemon twist`: *"either of these are lovely and the maker
   can choose. I like this approach on principle."* Refined 2026-09-14 (#984)
-  to three or more: commas, then "or" before the last ("mint sprig, mint leaf
-  or grated nutmeg"), declared under `canonical` in `garnish.yml`. Same day:
+  to three or more: commas, then "or" before the last, declared under
+  `canonical` in `garnish.yml`. Same day:
   *"Orange wheel is real and distinct new garnish — please add."* A floated
   garnish is said by `garnish:`, never by a method step.
 - **2026-08-31 — a garnish carries no count.** `12 raspberries` is
   `raspberries`. Except where the count is the spec: `three coffee beans` is
-  the Espresso Martini, and `three skewered blueberries and a long slice of
-  pineapple` stays as written. Refined 2026-09-14: the Pink Lady's three
+  the Espresso Martini, and `three skewered maraschino cherries and a
+  pineapple frond` is Three Dots and a Dash. Refined 2026-09-14: the Pink Lady's three
   cherries on a pick are `skewered brandied cherry`, singular like `skewered
   maraschino cherry`, and Helen wanted *"no note"* recording the three.
 - **2026-09-08, #845 #775 — `easy peasy` goes on an equal-parts drink, or a

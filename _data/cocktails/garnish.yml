@@ -90,9 +90,10 @@ canonical:
     - "skewered raspberry"
     # No article in the string: the garnish step adds its own.
     - "skewered blueberry"
-    # The count is the spec. Spelled out because a garnish opening with a
-    # digit reads as a pour to test_a_garnish_is_not_an_ingredient_or_a_rim.
-    - "three skewered blueberries and a long slice of pineapple"
+    # The count is the spec: the cherries are the dots, the frond the dash.
+    # Spelled out because a garnish opening with a digit reads as a pour to
+    # test_a_garnish_is_not_an_ingredient_or_a_rim.
+    - "three skewered maraschino cherries and a pineapple frond"
     # No count: a count stays only where it is the spec.
     - "raspberries"
     # Deliberately unspecific: it names the shape and leaves the fruit to the
@@ -124,8 +125,9 @@ canonical:
     - "cucumber wheels"
     - "edible violet"
     - "edible orchid"
-    # Maker's choice of three, one string.
-    - "mint sprig, mint leaf or grated nutmeg"
+    # The Grasshopper wears this with a mint sprig and grated nutmeg, all
+    # three at once.
+    - "mint leaf"
     - "thyme sprig"
     # A floated garnish carries `(floated)` as a tail, as `(discarded)` does on
     # a twist: the head stays the thing.
@@ -137,6 +139,7 @@ canonical:
 
   spice_and_other:
     - "grated nutmeg"
+    - "grated chocolate"
     # A garnish here, not a pour: dashed over the top with no count.
     - "Angostura bitters"
     # A mass noun, so it is in `no_article` below.
@@ -175,10 +178,11 @@ no_article:
   - kaffir lime leaves
   - cucumber wheels
   - grated nutmeg
+  - grated chocolate
   - whipped cream                       # a mass noun
   - desiccated coconut                  # a mass noun
   - three coffee beans
-  - three skewered blueberries and a long slice of pineapple
+  - three skewered maraschino cherries and a pineapple frond
   - orange peel over the rim (cut to look like a beak)
   - half an empty lime shell            # brings its own "half an"
   - half an empty passion fruit shell   # brings its own "half an"

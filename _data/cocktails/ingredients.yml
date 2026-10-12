@@ -483,9 +483,10 @@ card_names_may_collide:
 # prose.
 gin_styles:
   - "London dry gin"
-  - "Old Tom"
-  - "Plymouth"
-  # The spirit word goes on the end, as in `London dry gin`.
+  # The spirit word is on the end so each line skims as a gin; the bare
+  # names are in `retired_gin_styles`.
+  - "Old Tom gin"
+  - "Plymouth gin"
   - "New Western dry gin"
   - "genever"
   - "navy strength gin"
@@ -624,6 +625,7 @@ liqueurs:
   # Not `peach brandy` (a distilled spirit) and not `apple schnapps` (#1013).
   - "peach schnapps"
   - "mastiha liqueur"
+  - "allspice dram"
   # Raspberry: not `crème de mûre` above, which is blackberry.
   - "black raspberry liqueur"
   # Bilberry, named like the other crèmes. Not a myrtle (mirto) liqueur.
@@ -880,8 +882,8 @@ family_of:
   "cachaça": rum
   "Batavia arrack": rum
   "London dry gin": gin
-  "Old Tom": gin
-  "Plymouth": gin
+  "Old Tom gin": gin
+  "Plymouth gin": gin
   "New Western dry gin": gin
   "genever": gin
   "speciality": gin
@@ -972,8 +974,8 @@ shelf_of:
   Japanese whisky: spirits
   London dry gin: spirits
   New Western dry gin: spirits
-  Old Tom: spirits
-  Plymouth: spirits
+  Old Tom gin: spirits
+  Plymouth gin: spirits
   absinthe: spirits
   aged Demerara rum: spirits
   aguardiente: spirits
@@ -1075,6 +1077,7 @@ shelf_of:
   liqueur de sapin: liqueurs
   maraschino liqueur: liqueurs
   mastiha liqueur: liqueurs
+  allspice dram: liqueurs
   orange Curaçao: liqueurs
   passion fruit liqueur: liqueurs
   peach schnapps: liqueurs
@@ -1348,3 +1351,9 @@ retired_gin_styles:
     Western dry gin'." No drink ever poured the old name, so nothing was
     retyped; kept here so the old spelling cannot blend into the not-declared
     pile.
+  "Old Tom": >-
+    the spirit word was missing, as with `New Western dry`. It is `Old Tom
+    gin` now, Helen, 2026-10-12: "'Old Tom' should be declared as 'Old Tom
+    gin'... For ease of skimming a recipe."
+  "Plymouth": >-
+    the same, the same day: "Please update to 'Plymouth gin' too."
