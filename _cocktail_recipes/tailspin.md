@@ -34,9 +34,7 @@ method:
   - "Rinse the coupe with Campari."
   - "Stir the remaining ingredients with ice."
   - "Strain."
-notes:
-  - label: ""
-    text: ""
+notes: []
 source: ""
 source_url: ""
 ---

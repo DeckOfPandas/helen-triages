@@ -30,9 +30,7 @@ serve:
 method:
   - "Stir all ingredients with ice."
   - "Strain."
-notes:
-  - label: ""
-    text: ""
+notes: []
 source: ""
 source_url: ""
 ---

@@ -48,9 +48,7 @@ serve:
 method:
   - "Shake all ingredients with ice."
   - "Pour."
-notes:
-  - label: ""
-    text: ""
+notes: []
 source: "Satan's Whiskers, London, via punchdrink.com"
 source_url: ""
 ---

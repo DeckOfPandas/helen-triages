@@ -33,9 +33,7 @@ method:
   - "Stir all ingredients with ice."
   - "Fine strain."
 to_serve: ""
-notes:
-  - label: ""
-    text: ""
+notes: []
 source: "Adapted from Difford's"
 source_url: "https://www.diffordsguide.com/cocktails/recipe/15793/cherry-bakewell"
 ---

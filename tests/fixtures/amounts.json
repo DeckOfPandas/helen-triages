@@ -7,6 +7,13 @@
   "js": null
  },
  {
+  "amount": "(rinse)",
+  "number": null,
+  "unit": "(rinse)",
+  "ml": null,
+  "js": null
+ },
+ {
   "amount": "(splash)",
   "number": null,
   "unit": "(splash)",
@@ -208,6 +215,26 @@
   }
  },
  {
+  "amount": "16 cubes",
+  "number": 16.0,
+  "unit": "cubes",
+  "ml": null,
+  "js": {
+   "quantity": 16,
+   "unit": "cube"
+  }
+ },
+ {
+  "amount": "180 ml",
+  "number": 180.0,
+  "unit": "ml",
+  "ml": 180.0,
+  "js": {
+   "quantity": 180,
+   "unit": "ml"
+  }
+ },
+ {
   "amount": "2 dashes",
   "number": 2.0,
   "unit": "dashes",
@@ -398,6 +425,16 @@
   }
  },
  {
+  "amount": "5 dashes",
+  "number": 5.0,
+  "unit": "dashes",
+  "ml": null,
+  "js": {
+   "quantity": 5,
+   "unit": "dash"
+  }
+ },
+ {
   "amount": "5 drops",
   "number": 5.0,
   "unit": "drops",
@@ -458,12 +495,32 @@
   }
  },
  {
+  "amount": "7 each",
+  "number": 7.0,
+  "unit": "each",
+  "ml": null,
+  "js": {
+   "quantity": 7,
+   "unit": "each"
+  }
+ },
+ {
   "amount": "7.5 ml",
   "number": 7.5,
   "unit": "ml",
   "ml": 7.5,
   "js": {
    "quantity": 7.5,
+   "unit": "ml"
+  }
+ },
+ {
+  "amount": "70 ml",
+  "number": 70.0,
+  "unit": "ml",
+  "ml": 70.0,
+  "js": {
+   "quantity": 70,
    "unit": "ml"
   }
  },
