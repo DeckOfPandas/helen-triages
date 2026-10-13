@@ -138,24 +138,27 @@ site_key: food
 
     <div class="about-faq-item">
       <h3>Why do cocktails have ratings but food doesn't?</h3>
-      <p>All my food recipes are excellent. Cocktail ratings are Helen-facing. My cocktail recipes are mostly excellent too, but differently robust to things like bottle selection, ice pedantry, and being distracted while making them. An El Presidente is famously unforgiving about vermouth. Ask me how I know.</p>
+      <p>All my food recipes are excellent. My cocktail recipes, while also mostly excellent, are differently robust to things like bottle selection, ice pedantry, and being distracted while making them. An El Presidente is famously unforgiving about vermouth. Ask me how I know.</p>
       {% comment %} The two names are the buttons' own words on the cocktails
          index, set in <code> so they read as the controls. {% endcomment %}
       <p>The <code>no chaos please</code> filter gives me a reliably good drink. The <code>chaos only</code> filter gives me an unreliably good drink. Future-Helen can decide whether she wants a sure thing or YOLO.</p>
     </div>
 
-    {% comment %} The three names are the cocktails palette's own variables,
-       shortened for prose: _sass/cocktails/_palette.scss spells them
-       $color-wicked-woowoo and so on. Set in <code> so they read as
-       names rather than as words that happen to start with a dollar. {% endcomment %}
+    {% comment %} The four names are the two palettes' own variables,
+       shortened for prose: _sass/food/_palette.scss spells the first
+       $color-dazzling-dragonfruit, _sass/cocktails/_palette.scss the rest
+       $color-wicked-woowoo and so on. The first two are one colour, which
+       is the joke. Set in <code> so they read as names rather than as
+       words that happen to start with a dollar. {% endcomment %}
     <div class="about-faq-item">
       <h3>Why is the cocktail site dark?</h3>
-      <p>I was running out of ways to use <code>$wicked-woowoo</code> (#FF00C8) on white, and <code>$electric-absinthe</code> and <code>$ultra-violette</code> look far better on black. But truthfully, the moment I realised I could include black-on-black leopard print, my lifetime-favourite texture, the decision made itself.</p>
+      <p>I was running out of ways to use <code>$dazzling-dragonfruit</code> on white, so I renamed it <code>$wicked-woowoo</code>. And <code>$electric-absinthe</code> and <code>$ultra-violette</code> look far better on black. But truthfully, the moment I realised I could include black-on-black leopard print, my lifetime-favourite texture, the decision made itself.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Did you write any of this code yourself directly?</h3>
-      <p>Absolutely not. Not one single line, for better or worse, mostly better. This is an experiment in agentic engineering. I could have written most of the code myself the old-fashioned way...eventually. But I certainly wouldn't have north of 20,000 tests were I left to my own devices. Or a decision log that mostly quotes me saying silly things.</p>
+      <p>Absolutely not. Not one single line, for better or worse, mostly better.</p>
+      <p>This is an experiment in agentic engineering. I could have written most of the code myself the old-fashioned way...eventually. But I certainly wouldn't have north of 20,000 tests were I left to my own devices. Or a decision log that mostly quotes me saying silly things.</p>
       <p>For this project, I've chosen not to open a single file containing code. On the data side, every time I find myself about to edit some YAML, I revisit my life choices and request new tests instead. While TDD has always been great, I'm feeling particularly fond of it now that neither writing the test nor satisfying it is my problem. Claudes-in-Claudes trampling other Claudes-in-Claudes is easier for Claude to unpick than whatever mess I'd create myself.</p>
     </div>
 
