@@ -283,6 +283,9 @@ def test_temperatures_use_degree_c(recipe):
 # brown muscovado sugar"). `\b` matters: a substring check would find "salted"
 # inside "unsalted".
 _QUALIFIED_BUTTER = {"salted butter", "unsalted butter"}
+# A line that is butter for the tin and nothing else. "plus extra" means the
+# line is an ingredient of the dish too, so it does not match.
+_ONLY_FOR_GREASING = re.compile(r"^(?!.*\bplus\b).*,\s*(?:extra,\s*)?(?:for greasing|to grease)\b", re.I)
 _QUALIFIED_FLOUR = {"plain flour", "self-raising flour", "rice flour", "gluten-free flour"}
 _QUALIFIED_SUGAR = {
     "golden caster sugar", "golden granulated sugar", "white caster sugar",
@@ -334,9 +337,11 @@ def _unqualified(recipe, word: str, allowed: set[str]) -> list[str]:
 
 def test_butter_specifies_salted_or_unsalted(recipe):
     """#74, #140. Butter is "salted butter" or "unsalted butter" and nothing
-    else: the choice changes the recipe.
+    else: the choice changes the recipe. Butter only for greasing is exempt;
+    "plus extra for greasing" is not, because that line is also in the dish.
     """
-    bad = _unqualified(recipe, "butter", _QUALIFIED_BUTTER)
+    bad = [b for b in _unqualified(recipe, "butter", _QUALIFIED_BUTTER)
+           if not _ONLY_FOR_GREASING.search(b)]
     assert not bad, (
         f"{where(recipe)} has unqualified butter: {bad!r}. "
         f"Allowed: salted butter, unsalted butter."
@@ -956,10 +961,7 @@ def test_pan_and_ingredient_sizes_use_digits_in_drafts():
 
 
 # --- oven temperature: fan required ------------------------------------------
-# #146. House style is fan oven only (MANUAL §5). A checklist, not a guard
-# expected to be green: a figure without "fan" is not assumed to be a fan
-# figure. Helen confirms each against its source and adds the word by hand,
-# so never add "fan" in bulk to make this pass.
+# #146. House style is fan oven only (MANUAL §5).
 _OVEN_WORD_RE = re.compile(r"\b(?:bake|roast|blast|oven)\w*\b", re.I)
 _OVEN_TEMP_RE = re.compile(r"\d{2,3}(?:[–-]\d{2,3})?\s*°C(\s*fan)?\b", re.I)
 # The phrasings that mark a °C figure as an INTERNAL temperature, so the fan

@@ -115,7 +115,7 @@ argument and the rules each field is read by.
 - 2026-10-01 · §5 · a number and its unit take a space (15 ml, 400 g), fixed mechanically at ingest and by the tidy pass.
 - 2026-09-06 · §5 · #711 · every note starts with a capital letter and ends with a full stop, on both sites.
 - undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
-- undated · §5 · #146 · Undated, #146 — an oven temperature without "fan" is never assumed to be a fan figure, and "fan" is never added in bulk.
+- 2026-10-13 · §5 · #146 · "never add fan in bulk" is withdrawn — It was a rule from before ingest supplied the fan figure: a bare oven temperature might have been the source's conventional number, so each …
 - 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
 - 2026-08-10 · §5 · #74 · butter is always "salted butter" or "unsalted butter", and sugar and flour each have a closed list of allowed names.
 - undated · §5 · #136 · Undated, #136 — ginger says fresh, ground or paste, in the ingredient list as well as in main_ingredients.
@@ -278,7 +278,7 @@ argument and the rules each field is read by.
 - 2026-09-04 · §9.3.1 · aguardiente and kirschwasser are generics, not bottles.
 - 2026-09-05 · §9.3.1 · Créole Shrubb is its own generic, filed under liqueurs: where no category name would help Helen choose, the bottle is the category.
 - 2026-09-05 · §9.3.1 · #314 · navy, overproof navy and black are not rum categories and are retired for good.
-- 2026-09-20 · §9.3.1 · #606 · coconut rhum is a provisional generic, Helen's to rename.
+- 2026-10-13 · §9.3.1 · #606 · coconut rhum is a generic, and no longer provisional.
 - 2026-09-20 · §9.3.1 · #1068 #1069 · ginger beer is its own generic, in no category.
 - 2026-09-25 · §9.3.1 · #1186 · a declared generic or glass that no drink uses stays: the vocabulary is a spec, not residue.
 - undated · §9.3.1 · #314 · Undated, #314 — cachaça is its own generic, and Batavia arrack's family is rum.

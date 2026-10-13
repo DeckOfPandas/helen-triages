@@ -229,26 +229,11 @@ test('a range counts its LOWER end in the total', () => {
   assert.strictEqual(scaler.totalMl(['20–30 ml', '30 ml'], 1), 50);
 });
 
-test('the helper for the removed batch line is gone with it', () => {
-  assert.strictEqual(scaler.batchTotalMl, undefined);
-});
+// --- snapping a typed multiple -------------------------------------------------
 
-// --- a target total -----------------------------------------------------------
-
-test('a target total becomes the multiple that reaches it', () => {
-  // The Aviation: 52.5 + 15 + 7.5 + 15 = 90 ml as written, so 180 is ×2.
-  const AVIATION = ['52.5 ml', '15 ml', '7.5 ml', '15 ml'];
-  assert.strictEqual(scaler.totalMl(AVIATION, 1), 90);
-  assert.strictEqual(scaler.multipleForTotal(AVIATION, 180), 2);
-  assert.deepStrictEqual(
-    scaler.scale(AVIATION, scaler.multipleForTotal(AVIATION, 180)).amounts,
-    ['105 ml', '30 ml', '15 ml', '30 ml']);
-});
-
-test('a target is worked backwards and then made sane', () => {
-  // 100 ml of an 82.5 ml drink is ×1.212 on paper; the nearest allowed multiple
-  // is ×1⅓, which makes 110 ml, the sane figure to show instead.
-  assert.strictEqual(scaler.multipleForTotal(NEGRONI, 100), 1.212);
+test('a multiple between two allowed ones snaps to the nearest', () => {
+  // ×1.212 of the Negroni is not a multiple it can be measured at; the nearest
+  // allowed one is ×1⅓, which makes 110 ml.
   const snapped = scaler.snapMultiple(NEGRONI, 1.212);
   assert.strictEqual(snapped.steps, 4);
   assert.strictEqual(snapped.text, '1⅓');
@@ -278,24 +263,13 @@ test('a snapped multiple prints as a person would write it', () => {
   assert.strictEqual(scaler.multipleText(['50 ml', '5 ml'], 1.5), '1½');
 });
 
-test('a target below the floor is refused like any other multiple', () => {
-  // 27.5 ml is the least ['50 ml', '5 ml'] can be poured as, so 10 ml is not a
-  // drink this page can offer — the same refusal the multiple box gives, with
-  // the same floor and the same smallest total to report.
-  const out = scaler.scale(['50 ml', '5 ml'],
-                           scaler.multipleForTotal(['50 ml', '5 ml'], 10));
+test('a multiple below the floor is refused, with the smallest total it can make', () => {
+  // 27.5 ml is the least ['50 ml', '5 ml'] can be measured as, so ×0.182 (10 ml)
+  // is refused.
+  const out = scaler.scale(['50 ml', '5 ml'], 0.182);
   assert.strictEqual(out.ok, false);
   assert.strictEqual(out.floor, 0.5);
   assert.strictEqual(out.floorTotalMl, 27.5);
-});
-
-test('a target with nothing to scale, or no number, is null', () => {
-  // Nothing volumetric: there is no total to divide into, so the control has
-  // no answer rather than a wrong one.
-  assert.strictEqual(scaler.multipleForTotal(['2 dashes', '(top)'], 50), null);
-  [0, -30, '', null, undefined, 'lots'].forEach((bad) => {
-    assert.strictEqual(scaler.multipleForTotal(NEGRONI, bad), null, String(bad));
-  });
 });
 
 // --- half a lime --------------------------------------------------------------

@@ -518,8 +518,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   flip the proofread flag. Does this sound reasonable? Can we allow for this
   formally so we don't keep asking the same question?"* The mechanism is a
   session's: `source_type` and the retired meta keys, with the body
-  byte-identical (`meta.rewritten` is not one: the drinks gate reads it); `test_invisible_keys_are_really_invisible` scans
-  the render surface, which excludes pages. Declined (#428): renaming
+  byte-identical (`meta.rewritten` is not one: the drinks gate reads it);
+  `test_invisible_keys_are_really_invisible` scans the render surface, which
+  excludes pages. That list is the whole exemption. "It renders identically"
+  is not a wider rule of hers (2026-10-13: *"I never asked for Claude to say
+  it"*): a change outside those keys takes the flip or her grant. Declined (#428): renaming
   `rewritten` to `human_rewritten`, because `food/index.html` reads it and a
   rename would invalidate proofreads.
 - **2026-09-01 — `awaiting_fix: true` is a bookmark on a page Helen HAS
@@ -605,8 +608,8 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   the public repo. If you do this then I don't have to fish through one by one
   to find out which I still need to proofread."* The test reads this repo's
   history only, so a promotion looks like an agent edit. The copy is
-  byte-identical to what she read, or differs only in something that renders
-  nothing; a file that changed visibly stays behind at `false`. An agent
+  byte-identical to what she read, or differs only in an `INVISIBLE_KEYS`
+  key; a file that changed visibly stays behind at `false`. An agent
   still never sets the flag unasked (2026-09-14).
 - **2026-09-10 — Helen may grant `proofread: true` ahead of her own read, and
   only she may; a red `main` is what has made her do it.** Helen, with deploys
@@ -723,13 +726,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   only, one temperature: never "180°C fan (160°C conventional)" in any form. A
   conventional figure left in place is 20 degrees too hot in her kitchen.
   `test_no_oven_conversions` in `tests/test_taxonomy.py`.
-- **Undated, #146 — an oven temperature without "fan" is never assumed to be a
-  fan figure, and "fan" is never added in bulk.** Helen's explicit call; no
-  words of hers were recorded. House style says every oven figure is a fan
-  figure, which is exactly why a bare one cannot be trusted: it may be the
-  source's conventional number. She confirms each against its source and adds
-  the word by hand. `test_oven_temperature_says_fan` is a checklist of what is
-  left, so a failure there is a question for her, never a find-and-replace.
+- **2026-10-13, #146 — "never add fan in bulk" is withdrawn.** It was a rule
+  from before ingest supplied the fan figure: a bare oven temperature might
+  have been the source's conventional number, so each was confirmed by hand.
+  Asked whether that is still her wish, Helen: *"No"*. Every oven temperature
+  says "fan" (`test_oven_temperature_says_fan`), and a bare one is fixed like
+  any other house-style fault, with `proofread: false` on a recipe.
 - **2026-08-10 — within one ingredient group the base spices run coriander,
   cumin, turmeric, fennel, and the warm spices follow in any order.** Helen's
   own cooking convention, confirmed that day and prompted by
@@ -745,7 +747,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   wrong, because the cook is left guessing golden or white, soft or
   muscovado. `_QUALIFIED_BUTTER`, `_QUALIFIED_SUGAR` and `_QUALIFIED_FLOUR` in
   `tests/test_style.py`; a new name joins a list on her say. At ingest an
-  unspecified butter is `QQ butter` (§4).
+  unspecified butter is `QQ butter` (§4). Butter that is only for greasing is
+  exempt (Helen, 2026-10-13); "plus extra for greasing" is not, because that
+  line is also in the dish.
 - **Undated, #136 — ginger says fresh, ground or paste, in the ingredient list
   as well as in `main_ingredients`.** Helen's call; no words of hers were
   recorded. A prep word alone does not say which kind was used: "grated
@@ -1841,12 +1845,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   source's "navy rum" fails with an explanation and is typed by what the
   bottle is: strength belongs to the bottle, and a black rum is an aged
   Jamaican or a `blackstrap` character.
-- **2026-09-20, #606 — `coconut rhum` is a provisional generic, Helen's to
-  rename.** Helen: *"I guess the generic is coconut rhum. Add it for now and I
-  can review another time."* For Clément Mahina Coconut Rhum Liqueur in the
-  White Negroni Piña Colada; her figures, 2026-09-26: *"18% ABV, £22"*. Filed
-  under `liqueurs` for the reason Créole Shrubb is, and not `coconut rum`,
-  which is a rum style. Do not tidy the spelling to match.
+- **2026-10-13, #606 — `coconut rhum` is a generic, and no longer
+  provisional.** Helen, asked whether it still was: *"No, it's an official
+  generic."* For Clément Mahina Coconut Rhum Liqueur in the White Negroni Piña
+  Colada; her figures, 2026-09-26: *"18% ABV, £22"*. Filed under `liqueurs`
+  for the reason Créole Shrubb is, and not `coconut rum`, which is a rum
+  style. Do not tidy the spelling to match.
 - **2026-09-20, #1068 #1069 — `ginger beer` is its own generic, in no
   category.** Helen: *"Ginger Beer is a new ingredient, no category, so that's
   the name."* It is under `other` in `ingredients.yml` and shelves with the
@@ -1944,9 +1948,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   recipe cannot REQUIRE an origin; Martinique Swizzle is Martinican because of
   its `suggestion` list. Barbancourt is correctly `rhum agricole vieux`.
   Origin stays inside the generic where it changes the CATEGORY (Demerara,
-  Jamaican); those styles are not being unpicked. Whether `origin` spreads
-  beyond cane spirits (a tequila, a pisco) is left open by Helen on purpose;
-  `bottle_origins` lists only the values in use. `bottle_origins` is a closed
+  Jamaican); those styles are not being unpicked. `origin` is for cane
+  spirits only (Helen, 2026-10-13: *"Origin isn't a thing beyond cane
+  spirits."*): no tequila or pisco takes one. `bottle_origins` is a closed
   vocabulary, so a typo cannot mint an origin in silence, and adding a value
   is Helen's (`test_bottle_origin_is_declared`); every bottle on the Cane
   juice shelf declares one (`test_cane_juice_bottles_declare_an_origin`).

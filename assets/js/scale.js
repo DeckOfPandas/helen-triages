@@ -299,26 +299,6 @@
   }
 
   /**
-   * The multiple that gets this drink to a target volume, before snapping.
-   *
-   * @param {string[]} amounts
-   * @param {number} millilitres
-   * @returns {number|null} null when the drink has no volume to scale (nothing
-   *          but dashes) or the target is not a positive number
-   */
-  function multipleForTotal(amounts, millilitres) {
-    var target = Number(millilitres);
-    if (!isFinite(target) || target <= 0) return null;
-    var here = plan(amounts);
-    // The base is the drink at ×1, which is always an allowed multiple.
-    var atOne = stepsFor(here.step, 1);
-    if (atOne === null) return null;
-    var base = totalFor(here.entries, here.step, atOne);
-    if (!(base > 0)) return null;
-    return tidy(target / base);
-  }
-
-  /**
    * The nearest multiple this drink can actually be poured at. Nearest, not
    * next one down, and never below the floor.
    *
@@ -442,7 +422,6 @@
     splitUnit: splitUnit,
     floorMultiple: floorMultiple,
     totalMl: totalMl,
-    multipleForTotal: multipleForTotal,
     snapMultiple: snapMultiple,
     allowedStep: allowedStep,
     multipleText: multipleText,

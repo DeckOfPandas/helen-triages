@@ -606,8 +606,8 @@ liqueurs:
   # source that does not say which is a question for Helen.
   - "brown crème de cacao"
   - "white crème de cacao"
-  # Provisional (#606). A rhum-based liqueur, so filed here for the reason
-  # `Créole Shrubb` is. Not `coconut rum`, which is a rum style.
+  # A rhum-based liqueur (#606), so filed here for the reason `Créole
+  # Shrubb` is. Not `coconut rum`, which is a rum style.
   - "coconut rhum"
   - "crème de menthe"
   # A liqueur is sweetened and an eau de vie is not: the eau de vie is under
