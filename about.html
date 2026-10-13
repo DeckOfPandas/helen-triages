@@ -133,13 +133,15 @@ site_key: food
 
     <div class="about-faq-item">
       <h3>Can I see your to-try cocktail recipes?</h3>
-      <p>Sort of. Some of the cocktails marked ??? are ones I haven't made yet. They're on the site anyway, because cocktail drafts are &gt;99% fact and &lt;1% prose, meaning they take almost no time to tidy up compared with food drafts.</p>
+      <p>Sort of. Some of the cocktails marked ??? are ones I haven't made yet. They're on the site anyway, because cocktail drafts are &gt;99% fact (uncopyrightable) and &lt;1% prose (very copyrightable), meaning they take almost no time to tidy compared with food drafts.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Why do cocktails have ratings but food doesn't?</h3>
       <p>All my food recipes are excellent. Cocktail ratings are Helen-facing. My cocktail recipes are mostly excellent too, but differently robust to things like bottle selection, ice pedantry, and being distracted while making them. An El Presidente is famously unforgiving about vermouth. Ask me how I know.</p>
-      <p>The no-chaos-please filter gives me a reliably good drink. The chaos-only filter gives me an unreliably good drink. Future-Helen can decide whether she wants a sure thing or YOLO.</p>
+      {% comment %} The two names are the buttons' own words on the cocktails
+         index, set in <code> so they read as the controls. {% endcomment %}
+      <p>The <code>no chaos please</code> filter gives me a reliably good drink. The <code>chaos only</code> filter gives me an unreliably good drink. Future-Helen can decide whether she wants a sure thing or YOLO.</p>
     </div>
 
     {% comment %} The three names are the cocktails palette's own variables,
@@ -153,16 +155,15 @@ site_key: food
 
     <div class="about-faq-item">
       <h3>Did you write any of this code yourself directly?</h3>
-      <p>Absolutely not. Not one single line, for better or worse, mostly better. This is an experiment in agentic engineering. My main architecture concern is to keep parallel Claudes-running-Claudes from trampling each other's work when I can't be bothered to supervise them.</p>
-      <p>I could have written most of the code myself the old-fashioned way...eventually. But I certainly wouldn't have north of 20,000 tests were I left to my own devices. Or a decision log that mostly quotes me saying silly things.</p>
-      <p>For this project, I've chosen not to open a single file containing code. On the data side, every time I find myself about to edit some YAML, I request new tests instead, throwing the problem to my happy coding buddy. While TDD has always been great, I'm feeling particularly fond of it now that neither writing the test nor satisfying it is my problem.</p>
+      <p>Absolutely not. Not one single line, for better or worse, mostly better. This is an experiment in agentic engineering. I could have written most of the code myself the old-fashioned way...eventually. But I certainly wouldn't have north of 20,000 tests were I left to my own devices. Or a decision log that mostly quotes me saying silly things.</p>
+      <p>For this project, I've chosen not to open a single file containing code. On the data side, every time I find myself about to edit some YAML, I revisit my life choices and request new tests instead. While TDD has always been great, I'm feeling particularly fond of it now that neither writing the test nor satisfying it is my problem. Claudes-in-Claudes trampling other Claudes-in-Claudes is easier for Claude to unpick than whatever mess I'd create myself.</p>
     </div>
 
     <div class="about-faq-item">
       <h3>Can you share the prompts or scripts or workflows you used to ingest, clean and generally wrangle your recipe data?</h3>
-      <p>Not really. There are some manuals, decision logs, and Claude-to-Claude advice in <a href="https://github.com/DeckOfPandas/helen-triages/tree/main/model_instructions"><code>model_instructions/</code></a>. But ingestion and cleaning were mainly done interactively because, incredibly, that turned out to be quicker given I was "designing" my data model into the void. I didn't log any of this, or even really think it through — welcome to the future: it looks Claude-y.</p>
-      <p>I don't have Repeatable Analysis Pipelines. I do have opinionated dictionaries (none of which I wrote myself), an outrageous number of tests (none of which I wrote myself), and a happy co-worker to do all the boring heavy lifting every time I change my mind about something. And slightly too much time on my hands at the moment — but still not enough to write YAML.</p>
-      <p>See <a href="https://github.com/DeckOfPandas/helen-triages">the repository</a> for all the data machinery if you care.</p>
+      <p>Not really. There are some manuals, decision logs, and Claude-to-Claude advice in <a href="https://github.com/DeckOfPandas/helen-triages/tree/main/model_instructions"><code>model_instructions/</code></a>. But ingestion and cleaning were mainly done interactively because, incredibly, that turned out to be quicker given I was "designing" — a word that flatters me — my data model into the void.</p>
+      <p>Welcome to the future: it looks Claude-y. I don't have Repeatable Analysis Pipelines. I do have opinionated dictionaries (none of which I wrote myself), an outrageous number of tests (none of which I wrote myself), and a happy co-worker to do all the boring heavy lifting I would otherwise mangle every time I changed my mind about something. I also have slightly too much time on my hands at the moment — but still not enough to write YAML.</p>
+      <p>See <a href="https://github.com/DeckOfPandas/helen-triages">the repository</a> for all the data machinery if you're not already asleep.</p>
     </div>
 
     <div class="about-faq-item">
