@@ -4962,12 +4962,6 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   both off whatever `method_short` holds. The key stays required and the
   rendering code stays, so do not delete either as dead, and do not turn the
   flag on without her.
-- **2026-09-04 — the about page's footnote sits inside point 2, aligned with
-  the sub-list it annotates.** On the page gutter it read as a third mark;
-  Helen said that position *"puts the footnote at the same place in the
-  hierarchy as the points"* and *"its block isn't aligned with the block that
-  called it, so I have to do work to parse"*. `.about-footnote`, under the
-  a) b) list.
 - **2026-08-04, #54 — the ingredient amount's highlight and lettering cover
   the unit as well as the number.** Helen: *"Ingredient amounts currently only
   get bolder, no scratchy lettering. Please simply extend this formatting
@@ -4984,11 +4978,15 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
 - **2026-09-02 — the about page's `<hr>` is the footer's 1px dashed hairline,
   not an empty heading mark.** Helen overrode the empty-mark divider in a
   design review; no words of hers were recorded. `_sass/food/_about.scss`.
-- **2026-09-04 — the about page's footnote sits at the a) b) sub-list level,
-  inside the point that calls it, not in the page gutter.** Helen: *"its block
-  isn't aligned with the block that called it, so I have to do work to parse,
-  and I do not like doing work."* `.about-footnote` takes `.about-enum-sub >
-  li`'s padding so the columns match.
+- **2026-10-13 — the about page's footnote is a normal asterisk footnote below
+  point 2b, inside the point that calls it and not in the page gutter.**
+  Helen: *"make this a normal asterisk footnote below point 2b, not a styled
+  \*"*; and of the gutter position, 2026-09-04, *"puts the footnote at the
+  same place in the hierarchy as the points"* and *"its block isn't aligned
+  with the block that called it, so I have to do work to parse, and I do not
+  like doing work."* Of where it starts: *"I'd prefer the \* lined up with
+  the indent"*. The asterisk is a character in `about.html`;
+  `.about-footnote` draws no mark and takes `.about-enum-sub > li`'s padding.
 - **2026-09-04, #546 — the shortlist control is grey when off and the site's
   hot colour when on: wicked woowoo on cocktails, hot magenta on food.**
   Helen: *"Text and active colour wicked-woowoo on cocktails because it's a
