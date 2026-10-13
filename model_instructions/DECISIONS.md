@@ -257,8 +257,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   is never a step where "has it been cooked?" is open.** `cooked_before` and
   `date_last_edited` are retired; both were read by nothing. Helen's ruling: a
   recipe is cooked-and-liked (promoted), cooked-and-disliked (deleted) or not
-  cooked, *"why would I put it on my battle tested site?"* The made-and-liked
-  state short of a rewrite is now the drafts folder `3-keep/`, not a flag.
+  cooked, *"why would I put it on my battle tested site?"* And *"I never want
+  to publish anything I haven't tested."* No test enforces it on food: it is
+  hers to decide at promotion. The made-and-liked state short of a rewrite is
+  now the drafts folder `3-keep/`, not a flag.
 - **2026-08-29 — the ingest contract is one question: is the answer in the
   source document, or in Helen's head?** In the source, the ingest does it; in
   her head, it is a `QQ`. Measured that day, 266 of 342 drafts carried a gap
@@ -313,10 +315,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   this will stop them being published by accident (i.e. without me having
   spotted and fixed the imported text). Then yes, thank god, yes yes yes
   please fix the notes: [] !!!!"* A draft never says `notes: []`, it carries
-  the empty pair; a published food page with no notes still writes
-  `notes: []`.
-  `QQ` on a label means "Helen has not read this" whatever the text says, and
-  text beginning `QQ` must be labelled `QQ`. `tidy_drafts.py --only notes`.
+  the empty pair, because *"leave me with a notes placeholder I don't have to
+  retype"*; a published food page with no notes still writes `notes: []`. `QQ`
+  on a label means "Helen has not read this" whatever the text says, and text
+  beginning `QQ` must be labelled `QQ`. `tidy_drafts.py --only notes`.
 - **2026-10-12 — a published drink may keep the draft's empty notes pair.**
   Helen: *"Let's change that test to only allow label "" and text "", given we
   set drafts to write that out of convenience for me."* Both halves empty is
@@ -459,6 +461,23 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   exactly `unknown` once she has ruled nobody will know. Lowercase, no
   "Adapted from", and the only unknown-typed value that may reach
   `_food_recipes/`.
+- **2026-08-20, #406 — a citation names its source and never its publisher.**
+  Helen's ruling in the source-attribution pass; no words of hers were
+  recorded. A trailing bracketed publisher comes off the `source:` line: it
+  took "(Hodder & Stoughton)" off the beef wellington, the only one in the
+  corpus. `SOURCE_ATTRIBUTION_SPEC.md` holds it as "No publishers", and
+  `tests/test_source_attribution.py` refuses one on recipes and drafts alike.
+  A bracket that is part of the real title is the one way through, and the
+  failure message says how to declare it.
+- **Undated, #69, #68 — ingredient groups are ordered by title relevance: the
+  group named for the dish leads; within a group, ingredients follow call
+  order.** Helen's ruling; no words of hers were recorded. A dressing,
+  marinade or glaze the title does not call out never sits above the group
+  the dish is named for. `test_ingredient_group_order_matches_title` holds the
+  group order, conservatively: it compares only a non-matching group listed
+  before a matching one. Call order within a group (#68) is the rule too, but
+  it is not reliably automatable and has no test, so a green suite says
+  nothing about it.
 
 ### §4.0 The gate flags
 
@@ -487,16 +506,22 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   2026-08-20, each on her own review: three sweeping and content-free, the
   fourth a nine-recipe backlog walked through one file at a time. A move goes
   in a commit of its own, quotes her grant, and is proved by running the test
-  with the old value and watching it name the files. Measure first how many
-  recipes the rule is holding: a move asserts she has read every one of them.
+  with the old value and watching it name the files. Her review may be of the
+  diff rather than of the built pages, and may be agreed before the edit: for
+  twelve method lines (2026-09-10, #705) she chose *"Line by line. I can just
+  grind it out."* over re-reading twelve pages. Measure first how many recipes
+  the rule is holding: a move asserts she has read every one of them.
   `COCKTAIL_BASELINE_COMMIT` is the same rule.
 - **2026-08-21, #417 — a commit that changes only keys nothing renders needs
-  no flip (`INVISIBLE_KEYS`).** A session's mechanism, not Helen's ruling:
-  `source_type`, `meta.rewritten` and the retired meta keys, with the body
-  byte-identical; `test_invisible_keys_are_really_invisible` scans the render
-  surface, which excludes pages. Declined (#428): renaming `rewritten` to
-  `human_rewritten`, because `food/index.html` reads it and a rename would
-  invalidate proofreads.
+  no flip (`INVISIBLE_KEYS`).** Helen asked for it, 2026-08-20, #406: *"Adding
+  source_type to every recipe doesn't change how they render, so no need to
+  flip the proofread flag. Does this sound reasonable? Can we allow for this
+  formally so we don't keep asking the same question?"* The mechanism is a
+  session's: `source_type` and the retired meta keys, with the body
+  byte-identical (`meta.rewritten` is not one: the drinks gate reads it); `test_invisible_keys_are_really_invisible` scans
+  the render surface, which excludes pages. Declined (#428): renaming
+  `rewritten` to `human_rewritten`, because `food/index.html` reads it and a
+  rename would invalidate proofreads.
 - **2026-09-01 — `awaiting_fix: true` is a bookmark on a page Helen HAS
   proofread, not "unfinished".** Helen: *"'awaiting_fix' means I've proofread,
   but one small thing has been raised as a ticket, meaning that once that's
@@ -565,6 +590,33 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   live recipes to add it without flipping the flag."* Each landed as a
   baseline move in a commit of its own. Neither is a standing permission for
   the next tag edit.
+- **2026-08-20 — a no-flip grant covers exactly the change Helen named, and a
+  conditional grant is proved before the flag moves.** Helen, of a link she
+  had specified herself: *"I trust you to make that change without making
+  others, so no need to flip the proofread flag again."* And 2026-09-27,
+  #1217: *"if those are the only changes then flip the flag back to make them
+  live again"*. The condition is checked by diffing each named file against
+  `origin/main` first, and the result is said. A grant covers its commit and
+  nothing after it; one she bounded *"in this session only, normal rules again
+  after this"* (2026-09-21) ended with the session.
+- **2026-09-09, #624 — a recipe Helen proofread in the private repo is
+  promoted already `proofread: true`, as an unchanged copy, and the promotion
+  needs a baseline move.** Helen: *"please move all proofread: true files into
+  the public repo. If you do this then I don't have to fish through one by one
+  to find out which I still need to proofread."* The test reads this repo's
+  history only, so a promotion looks like an agent edit. The copy is
+  byte-identical to what she read, or differs only in something that renders
+  nothing; a file that changed visibly stays behind at `false`. An agent
+  still never sets the flag unasked (2026-09-14).
+- **2026-09-10 — Helen may grant `proofread: true` ahead of her own read, and
+  only she may; a red `main` is what has made her do it.** Helen, with deploys
+  blocked: *"Break the rule, explicit permission, and get everything up on the
+  site with proofread=true. Then hand on heart I'll look at them myself to
+  confirm everything is fine."* Again 2026-09-16, offered a flip or a baseline
+  move for two mechanical fixes: *"Fix and keep proofread true"*; and
+  2026-09-26: *"I'll double check, but I'm happy to do that live."* Put the
+  choice to her with the fact that forces it; never take it. It lands as a
+  baseline move, so the next agent edit to the file trips the test again.
 
 ### §4.3 The magic bag
 
@@ -594,6 +646,17 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   every per-entry test collected nothing and read green. The issue's own fix
   was declined: the dishes come from her head, and a non-empty assertion would
   hold `main` red, and so every deploy, until she wrote one.
+- **2026-08-26 — a magic-bag entry always has a `tagline:` line, and its value
+  may be empty.** Helen: *"Optional. Always add the line to file front matter
+  so I don't have to remember to add it."* The tagline is optional; the KEY is
+  not. `tagline: ""` renders nothing and is always a string, never null.
+  `test_tagline_key_is_present_even_when_empty` in `tests/test_magic_bag.py`.
+- **Undated — a magic-bag entry's minimum is an ingredients list.** Helen:
+  *"as a minimum I should dash off ingredients lists."* So `ingredients` is in
+  `REQUIRED` and must be a non-empty list, though it may be incomplete: the
+  entry is a dish she cooks from memory, and the list is what makes it
+  findable and shoppable. No method is demanded.
+  `test_ingredients_is_a_non_empty_list`.
 
 ## §5 House style
 
@@ -601,9 +664,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   `cook_time: "20-25 mins"`: *"These still render to the user, so correct to
   en dash please."* So house style reaches front matter that renders, the
   prose pages and the reference data, not only recipe prose.
-- **2026-08-21, #426 — house style stops at a `QQ` line.** Correcting the
-  source's dash edits someone else's words that are about to be deleted. A
-  `QQ Claude` line is NOT exempt (since 2026-08-31): it is ours.
+- **2026-08-21, #426 — house style stops at a `QQ` line.** Helen: *"don't
+  normalise oven temp, the dash, or 'minutes' -- ideally just skip the whole
+  line for simple normalisation tasks"*. Correcting the source's dash edits
+  someone else's words that are about to be deleted. A `QQ Claude` line is NOT
+  exempt (since 2026-08-31): it is ours.
 - **2026-09-07, #800 — a tip printed under a source's own rubric is
   transcribed without the label; `gf tip:` is Good Food, the magazine, not
   gluten-free.** Helen, asked what it meant: *"I actually have no idea what
@@ -642,6 +707,69 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   takes none. Imperial units take one too: *"All units need them, including
   imperial."* `scripts/tidy_drafts.py` does it for drafts and
   `INGEST_ONE_RECIPE.md` carries the rule.
+- **2026-09-06, #711 — every note starts with a capital letter and ends with
+  a full stop, on both sites.** Helen: *"notes should always start with a
+  capital letter and end with a full stop"*, and *"I'd prefer you add tests
+  for this then fix them for me!!!! Or flag if my copy is too garbled to
+  fix."* It covers each `notes:` entry on a recipe or a drink and a drink
+  ingredient's `note:`, as method-step notes already were. A `QQ` note is a
+  placeholder and is skipped; a digit or a quoted term may open a note, and
+  `!` or `?` may close one. An exception is declared with its reason in
+  `NOTE_EXCEPTIONS` (`tests/test_style.py`) or `DRINK_NOTE_EXCEPTIONS`. A food
+  ingredient's `note:` is the opposite: a lowercase fragment.
+- **Undated — "180°C fan" is correct and is not a conversion; what is banned
+  is a second, conventional-oven temperature beside it, and gas marks
+  always.** Helen: *"saying 'fan' isn't a conversion."* The site is fan-oven
+  only, one temperature: never "180°C fan (160°C conventional)" in any form. A
+  conventional figure left in place is 20 degrees too hot in her kitchen.
+  `test_no_oven_conversions` in `tests/test_taxonomy.py`.
+- **Undated, #146 — an oven temperature without "fan" is never assumed to be a
+  fan figure, and "fan" is never added in bulk.** Helen's explicit call; no
+  words of hers were recorded. House style says every oven figure is a fan
+  figure, which is exactly why a bare one cannot be trusted: it may be the
+  source's conventional number. She confirms each against its source and adds
+  the word by hand. `test_oven_temperature_says_fan` is a checklist of what is
+  left, so a failure there is a question for her, never a find-and-replace.
+- **2026-08-10 — within one ingredient group the base spices run coriander,
+  cumin, turmeric, fennel, and the warm spices follow in any order.** Helen's
+  own cooking convention, confirmed that day and prompted by
+  `indian-mutton-raan-roast.md`; no words of hers were recorded. The warm
+  spices are cinnamon, cloves, nutmeg, cardamom, star anise, ajwain and mace,
+  always after the base ones. A recipe for a named spice blend is exempt: its
+  order is the blend's own (`_SPICE_BLEND_RECIPES`).
+  `test_spice_order_within_group`.
+- **2026-08-10, #74 — butter is always "salted butter" or "unsalted butter",
+  and sugar and flour each have a closed list of allowed names.** Helen's
+  ruling; no words of hers were recorded. The lists are closed, not merely "is
+  not bare": "caster sugar" and "muscovado sugar" are qualified and still
+  wrong, because the cook is left guessing golden or white, soft or
+  muscovado. `_QUALIFIED_BUTTER`, `_QUALIFIED_SUGAR` and `_QUALIFIED_FLOUR` in
+  `tests/test_style.py`; a new name joins a list on her say. At ingest an
+  unspecified butter is `QQ butter` (§4).
+- **Undated, #136 — ginger says fresh, ground or paste, in the ingredient list
+  as well as in `main_ingredients`.** Helen's call; no words of hers were
+  recorded. A prep word alone does not say which kind was used: "grated
+  ginger" fails and "grated fresh ginger" passes.
+  `test_ginger_specifies_fresh_ground_or_paste`.
+- **Undated — cardamom is always green or black, and always pods, powder or
+  seeds.** Helen's rule; no words of hers were recorded. Both halves are
+  required: "cardamom pods" and "green cardamom" each fail. The singular forms
+  pass, since a recipe can call for one pod. `_QUALIFIED_CARDAMOM` and
+  `test_cardamom_specifies_type` in `tests/test_style.py`.
+- **2026-08-12, #167 — milk names its type from the source, and "milk (any
+  kind)" is a real answer for a recipe that does not care.** Helen's explicit
+  call; no words of hers were recorded. A bare "milk" is never bulk-converted
+  to "whole milk": which milk a recipe used is confirmed from its source, so
+  `test_milk_specifies_type` is a checklist of what is still to confirm. "(any
+  kind)" is recognised only as a trailing parenthetical on the ingredient
+  line, and it then excuses a bare `milk` in `main_ingredients`.
+- **Undated, #139 — dark-family chocolate carries its cacao percentage on the
+  ingredient list and never in `main_ingredients`.** Helen's ruling; no words
+  of hers were recorded. Dark is 70%, very dark 90%, unsweetened 100%, so the
+  cook knows what to buy; `main_ingredients` names the type only, because it
+  is the index's pill. Milk and white chocolate never take a percentage. Chips
+  and shavings need a type word and no percentage. `_CHOCOLATE_PERCENT` and
+  the three chocolate tests in `tests/test_style.py`.
 
 ## §6 `main_ingredients`
 
@@ -1345,9 +1473,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-09-06, #754 — an ingredient may carry `as:`, a closed vocabulary.**
   Asked whether a field earned its place for three floats, a rinse and some
   muddles, against `card_order:` by hand or leaving the card order wrong,
-  Helen chose the field. `float`, `rinse`, `muddle`, and `shell` since
-  2026-10-01 (#1256). Declare a vocabulary and its guard BEFORE any drink
-  carries a new value: the suite gates the deploy.
+  Helen chose the field. Helen, 2026-09-07: *"`as:` on every one, and a test
+  that finds the rest"*;
+  `test_a_method_that_floats_or_rinses_says_so_in_a_field` is that test.
+  `float`, `rinse`, `muddle`, and `shell` since 2026-10-01 (#1256). Declare a
+  vocabulary and its guard BEFORE any drink carries a new value: the suite
+  gates the deploy.
 - **2026-09-21 — `QQ` is a tripwire, not a grammar: nothing publishes with
   `QQ` anywhere in it, on either site.** Helen: *"QQ just means 'Helen pay
   attention to this for some reason', then 'QQ CLAUDE' means that Claude
@@ -1387,9 +1518,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   character: blackstrap'. But if a recipe gives 'blackstrap' Claude shouldn't
   suggest anything."* Proposals go in `generic_claude` / `suggestion_claude` /
   `character_claude`, her flat shape, chosen over a nested block and over a
-  report, and are legal only while that ingredient still carries a `QQ`.
-  `scripts/resolve_pours.py` reads exactly and never guesses; it skips
-  `not_reached_for` bottles and `hers_to_apply` generics.
+  report, so the source's words stay behind the `QQ` beside the proposal for
+  her to check one against the other (*"I'd want to make sure Claude doesn't
+  always confidently write 'Gosling's' instead of both."*), and are legal only
+  while that ingredient still carries a `QQ`. `scripts/resolve_pours.py` reads
+  exactly and never guesses; it skips `not_reached_for` bottles and
+  `hers_to_apply` generics.
 - **2026-09-26, #1217 — an unmeasured amount is a bracketed noun: `(top)`,
   `(splash)`, `(float)`, `(rinse)`, `(sprinkle)`.** Helen: *"option A please,
   certain … just use '(top)' as the amount where it's an unspecified ml top,
@@ -1458,10 +1592,12 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 ### §9.3.1 The ingredient vocabulary
 
 - **2026-08-21, #441 — a list `generic` means OR, and only OR.** Bali Hai
-  takes `aguardiente` OR `kirschwasser`: either makes the drink. A bottle
-  with two properties (Gosling's: moderately aged AND blackstrap) is a generic
-  plus a `character`. Write a list only when both bottles can be named and a
-  reason given; "I don't know which" stays `QQ`.
+  takes `aguardiente` OR `kirschwasser`: either makes the drink. A bottle with
+  two properties (Gosling's: moderately aged AND blackstrap) is a generic plus
+  a `character`. Write a list only when both bottles can be named and a reason
+  given; "I don't know which" stays `QQ`. Helen, 2026-08-17, of lines such as
+  "Demerara or dark Muscovado sugar": *"What I have there is fine. I can do
+  what I want on the spot."*
 - **2026-08-23, #441 — `character` lives on the recipe line, never on a
   bottle.** It is why THIS drink wants this bottle, so restating it per recipe
   is each recipe stating its own reasoning; Helen overturned the issue's
@@ -1760,9 +1896,11 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   category, and then the ingredient must carry a `note`; `QQ` counts.** Helen:
   *"a recipe might call for cherry brandy, and I suggest Cherry Heering OR
   Briottet cerise even though that's a cherry liqueur not a brandy, leaving it
-  to future Helen to choose what kind of drink I want at the time."* And: *"be
-  permissive with the test"*. A list generic crosses only if the bottle
-  matches none of its options.
+  to future Helen to choose what kind of drink I want at the time."* Why the
+  note: *"Substituting it isn't straightforward and will vary by drink. Please
+  add notes for me on recipe pages when I've substituted in a surprising
+  way."* And: *"be permissive with the test"*. A list generic crosses only if
+  the bottle matches none of its options.
 - **2026-09-02, #585 — a bare brand is not a bottle and is never added as an
   alias.** `Planteray` names four products and `Bulleit` a bourbon and a rye;
   Helen chose `Planteray 3 Stars` and `Bulleit Bourbon`. The bare `JM` alias
@@ -1792,8 +1930,9 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-09-06, #701 — a `suggestion` is the bottle's full declared name, not
   an alias.** A suggestion prints verbatim, so El Presidente read "(ED3 or
   Havana 3)". Helen ruled against shorthand and against a separate display
-  field. `test_every_suggestion_is_the_declared_bottle_name`; aliases stay,
-  for search and for reading a source.
+  field. Helen, 2026-09-04, on Fish House Punch: *"'ED3' isn't a bottle"*.
+  `test_every_suggestion_is_the_declared_bottle_name`; aliases stay, for
+  search and for reading a source.
 - **2026-09-06 — `La Favorite`, no `u`, is a standing correction.** Helen:
   *"Favorite is correct, my mistyping, please always correct."* Each bottle
   key is spelled the French way and keeps `La Favourite` as an alias, so a
@@ -1807,7 +1946,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   Origin stays inside the generic where it changes the CATEGORY (Demerara,
   Jamaican); those styles are not being unpicked. Whether `origin` spreads
   beyond cane spirits (a tequila, a pisco) is left open by Helen on purpose;
-  `bottle_origins` lists only the values in use.
+  `bottle_origins` lists only the values in use. `bottle_origins` is a closed
+  vocabulary, so a typo cannot mint an origin in silence, and adding a value
+  is Helen's (`test_bottle_origin_is_declared`); every bottle on the Cane
+  juice shelf declares one (`test_cane_juice_bottles_declare_an_origin`).
 - **2026-09-09 — Pusser's 151 is an `overproof Demerara rum, lightly aged`.**
   Helen: *"Minimalist Tiki thinks Pusser's 151 is a Demerara rum, so so do I.
   It's 100% Guyanese."* And: *"I made a mistake, my overproof Demerara rum is
@@ -1889,13 +2031,24 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   both, Helen: *"Yes, and bottle as suggestion."* It is cane juice, whatever
   the label calls it. Neither Barbancourt is the category's default (§9.3.5):
   both are 43% and an unbottled `rhum agricole vieux` is 45%.
+- **Undated, #582 — no drink writes `plantation`; it is always corrected to
+  Planteray.** Helen: *"'plantation' is not permitted as a kind of rum and
+  should always be corrected to 'planteray'."* The rule governs what is
+  WRITTEN: a drink's filename, title, `generic`, `suggestion` and `note`
+  (`test_no_drink_writes_plantation`). The old spellings stay in `bottles.yml`
+  as aliases, which govern what can be READ, so a source that still says
+  Plantation resolves at ingest. Do not delete the aliases to "finish" the
+  rename, and do not leave the old word in a draft because it resolves.
 
 ### §9.3.3 The drinks index's search
 
 - **2026-08-29, #579 — fuzzy to find, exact-or-family to exclude; candidates
   rank in four bands.** Helen: *"It should be prefix matching of first word,
   prefix matching of any word, then prefix matching of any word in the bottle
-  name, then substring."* Food's asymmetry, adopted because `gin` was hiding
+  name, then substring."* The substring band is for names a chip SHOWS: a
+  hidden generic or bottle alias earns its chip a place only on a word-start
+  match. Helen: *"'el' returns both 'aged rum' and 'jamaican rum', which is
+  counterintuitive."* Food's asymmetry, adopted because `gin` was hiding
   drinks with ginger and `apple juice` matched pineapple. The search is a pure
   module and `cocktail-index.js` is wiring. `and` is deliberately not treated
   as a connector word (Wray and Nephew).
@@ -1920,8 +2073,10 @@ No live ruling. The layering, its helpers and the traps met building it are in `
 - **2026-08-31 — a multi-word query matches a hidden name from its start, and
   each category gets one chip wearing the card's name.** Helen: *"I do want to
   be able to type 'el d' and see el dorado."* A bottle is a way IN to its
-  category's chip, not a chip of its own. Food's umbrella suppression (#51) is
-  ported.
+  category's chip, not a chip of its own. So a bottle is never offered beside
+  its own category; Helen, 2026-08-29: *"the first chip being 'falernum (all)'
+  would at least stop me worrying that the two sets were disjoint."* Food's
+  umbrella suppression (#51) is ported.
 - **2026-08-29, #529 — one bottle written several ways is one bottle in the
   search, and no chip has an "X or Y" shape.** Helen: *"'wray and nephew' and
   'wray & nephew' should both collapse onto the latter"*; *"I don't want any
@@ -1938,6 +2093,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   browse axis (*"do we need families -- thinking of bitter and herbal? Why?
   They're not browsable or searchable."*). Families only: an ingredient with
   two names is a `card_names` question.
+- **2026-09-02, #653 — HAS TO HAVE and LEAVE OUT mark the same chips: a prefix
+  match of any word is marked in both pools, a substring match in neither.**
+  Helen: *"the chip underline rule should be the same between has to have and
+  leave out, namely that prefix matching of any word gets the pink whereas
+  substring matching does not."* What the mark looks like has changed since
+  (a stroke; hot magenta in HAS TO HAVE, heavier base grey in LEAVE OUT,
+  #1219); which chips carry it has not. `hasWordMatch` in `cocktail-search.js`
+  decides it once for both pools, and
+  `test_the_word_match_mark_survives_in_both_pickers` fails if a section
+  cancels the mark.
 
 ### §9.3.4 Units of alcohol — #297, built 2026-09-06
 
@@ -2228,12 +2393,16 @@ No live ruling. The layering, its helpers and the traps met building it are in `
   live site than a local build."* It is first in `meta:`. Do not add a "has
   been made" or "names a rung" publish gate: both existed and were retired by
   this ruling, the first never having been asked for.
-- **2026-09-05, #722 — an unmade drink's `ship` says `who knows`; `QQ` is not a
-  ship value.** Helen: *"I think that's clearer than QQ or leaving it unset,
-  because it's a positive presence"*. The page shows it as `???`
-  (`ship_unrated_word` in `taxonomy.yml`), which is not a rating. Helen,
-  2026-10-11: *"The ??? mark means 'I've never made this so I simply don't
-  know'."* `_dev/no-verdict.html` is the worklist.
+- **2026-09-05, #722 — an unmade drink's `ship` says `who knows`; `QQ` is not
+  a ship value.** Helen: *"I think that's clearer than QQ or leaving it unset,
+  because it's a positive presence"*. A published drink's ship is never empty
+  (Helen, 2026-08-30: *"every cocktail we publish must have the ship field
+  filled in"*), and `who knows` counts as filled in. The page shows it as
+  `???` (`ship_unrated_word` in `taxonomy.yml`), which is not a rating. The
+  word must not be a rung of `ship_scale`: *"unambiguously not on the same
+  rating scale. (It's also funny)."* Helen, 2026-10-11: *"The ??? mark means
+  'I've never made this so I simply don't know'."* `_dev/no-verdict.html` is
+  the worklist.
 
 ### §9.7 / §9.8
 
@@ -2512,6 +2681,24 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   shell`, and `martini glass` resolves to `martini`.** Helen: *"hollowed
   pineapple, coconut shell"*. The bare words name the fruit. `glasses.yml`
   maps the old spellings onto the canonical ones.
+- **2026-08-27, #491 — every drink names a glass: there is no exemption list
+  and no value meaning "it does not matter".** Helen: *"All recipes should
+  have a glass."* Which glass is her call and is not derivable from the
+  ingredients: on 2026-08-30 she named one for each of the sixteen drinks that
+  had none, by taste (*"I made this up so I can say what I like!"*), and
+  several read differently today. A drink with no glass is a question for her, never a
+  guess from its method. A glass she wants and the vocabulary lacks goes in a
+  note on the drink (the Modern Zombie's zombie glass).
+  `test_every_drink_names_a_glass`; `GLASSLESS_ON_2026_08_27` is empty and a
+  test keeps it empty.
+- **2026-09-28 — every glass type has a surveyed capacity and height,
+  including an icon no drink uses yet.** Helen: *"All 27 please."* (the
+  count on the day). The glasses page states the figures for
+  everything it declares, so a type is not skipped because no drink asks for
+  it. `test_every_glass_type_has_a_sourced_capacity_and_height` holds
+  `typical_ml` and `typical_height_mm` in `glasses.yml` to the icons plus
+  `survey_only_types`; a missing figure is fixed by adding survey rows, never
+  by typing a number in.
 
 ### §9.12 / §9.12.1 Methods and garnishes
 
@@ -2908,6 +3095,14 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   Helen, of the bar: *"distracting."* The count is not one of the filter
   sections, so `.drink-count` borrows none of their colours and has no rule
   over it.
+- **2026-09-04, #546 — the drinks shopping list is ordered by descending
+  volume.** Helen: *"order by descending volume required."* Since #848
+  (2026-09-08) the shelf comes first and volume orders the rows within each
+  shelf. Millilitres only: ranking 45 ml against 2 dashes would need a
+  conversion nobody can state, so rows with no volume follow, alphabetically.
+  The sort is in `shopping-list.js`. Food's list is alphabetical within an
+  aisle and that is not a precedent for this one: a food aisle has no single
+  axis to rank on, a shelf of bottles does.
 
 **Cards.**
 
@@ -3397,12 +3592,16 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   proofread-provenance test passes over nothing. The journal recorded the
   decision without Helen's words.
 - **2026-08-29, #540 — private drinks are gated at promotion and are never
-  checked by a runner.** Helen chose option 4 of four. Every drink test reads
-  both `_cocktail_recipes/` and `_cocktail_drafts/` through `_load()`, so a
-  promoted drink is checked everywhere, CI included. A claim about a whole
-  corpus is not checkable against a partial one: the ratchet half of a guard
-  runs everywhere, and the staleness half calls `_require_whole_collection`
-  and skips with a reason.
+  checked by a runner.** Helen chose option 4 of four. Helen: *"my preference
+  is not to leave things in a state where tests fail and we have to remember
+  why every time we run the suite, but the solution to that is not to turn off
+  or otherwise avoid the tests."* So a test that cannot be answered on a
+  partial corpus is split and its answerable half keeps running. Every drink
+  test reads both `_cocktail_recipes/` and `_cocktail_drafts/` through
+  `_load()`, so a promoted drink is checked everywhere, CI included. A claim
+  about a whole corpus is not checkable against a partial one: the ratchet
+  half of a guard runs everywhere, and the staleness half calls
+  `_require_whole_collection` and skips with a reason.
 - **2026-09-05 — the public and private repos are kept in step by a schema
   handshake: a hand-maintained integer.** Helen's choice among four options,
   after #624: the garnish vocabulary merged here while the drink-side rename
@@ -5051,11 +5250,12 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   the bars.
 - **2026-10-09 — on the methods page the weight sits under the dropdown, the
   four birds read "(whole)", and times are compact (`4h50m – 5h30m`).** Helen:
-  *"So the user is saying 'I have chicken, 3 kg'."* The two inputs are one
-  stacked form above the protein heading, and the weight hides when the
-  dropdown says fish. The compact time is for this column of figures only: the
-  house rule "mins, never min" is about recipe pages' time lines and is not
-  re-opened.
+  *"So the user is saying 'I have chicken, 3 kg'."* Of the times: *"Collapse
+  timing display to e.g. '2h - 3h', '4h - 4h50m', '10m - 15 m'. En dashes."*
+  (`hhmm` and `span` in `cook-schedule.js`). The two inputs are one stacked
+  form above the protein heading, and the weight hides when the dropdown says
+  fish. The compact time is for this column of figures only: the house rule
+  "mins, never min" is about recipe pages' time lines and is not re-opened.
 - **2026-10-09 — the slow-cooked cuts are one chart section of their own.**
   Asked whether pulling them out of the roasting charts would read as
   scattered, Helen: *"okay great, let's do it."* Beef, lamb, pork and venison
@@ -5171,6 +5371,20 @@ designed index on 2026-08-26 (§9.13) and `_goodness.scss` is deleted.
   get."* `outcome:` in `cooking_methods.yml`, held by
   `test_every_method_has_a_short_outcome`. Since 2026-10-10 the page prints it
   first in each block.
+- **2026-08-14 — no test sums a method's timings against `cook_time`; the
+  nudge to the temperature chart is the answer.** Helen: *"if a recipe
+  contains complicated meat, a nudge to the temperature chart should catch
+  most users."* Roast beef fillet said "30 mins" where its method adds up to
+  nearer 40. A clock figure cannot answer "is it done", and half the methods
+  say "until golden", so the test would need an exception list longer than
+  its logic. Do not add it; a drifting figure is fixed in that recipe.
+- **Undated — every oven figure in `cooking_methods.yml` says "fan"; none is
+  left bare and none names a conventional temperature.** Helen, of the timings
+  calculator: *"only one option has fan oven though, the rest say nothing...
+  so 'fan' every time."* A bare figure cannot be acted on without guessing
+  which oven it means, a 20°C guess either way.
+  `test_every_oven_temperature_says_fan` in `tests/test_reference_data.py`
+  reads each `oven` value, string or list of stage lines.
 
 ### The cocktails reference layer, #529
 

@@ -80,6 +80,8 @@ argument and the rules each field is read by.
 - 2026-08-20 · §4 · #406 · a source nobody has established is source: "QQ" with source_type: unknown, and on a published recipe it is meant to break the build.
 - 2026-08-21 · §4 · #406 · a book source names its author, as <title>, <author> or <Author>'s <title>; there is no authorless form and no exception list.
 - 2026-09-11 · §4 · #406 · source: "unknown" is the closed answer, and only Helen closes it.
+- 2026-08-20 · §4 · #406 · a citation names its source and never its publisher.
+- undated · §4 · #69 #68 · Undated, #69, #68 — ingredient groups are ordered by title relevance: the group named for the dish leads; within a group, ingredients follow call order.
 - 2026-08-18 · §4.0 · the gate flag is awaiting_fix, with an underscore, and the gate fails CLOSED.
 - 2026-08-18 · §4.0 · a held-back page is REMOVED from its collection, not hidden from the index.
 - 2026-08-18 · §4.0 · #331 #367 · every agent edit to a recipe sets proofread: false in the same commit, whatever its size.
@@ -95,17 +97,31 @@ argument and the rules each field is read by.
 - 2026-09-20 · §4.0 · there is no per-recipe exemption list: HELEN_CLEARED is deleted and is not rebuilt in that shape.
 - 2026-10-08 · §4.0 · #1089 · if Helen reads the rendered pages on the branch and says so, the flags go back in a second commit and the baseline moves in a third.
 - 2026-10-10 · §4.0 · a grant to edit live files without the flip is Helen's, is given per batch, and covers only what she named.
+- 2026-08-20 · §4.0 · a no-flip grant covers exactly the change Helen named, and a conditional grant is proved before the flag moves.
+- 2026-09-09 · §4.0 · #624 · a recipe Helen proofread in the private repo is promoted already proofread: true, as an unchanged copy, and the promotion needs a baseline move.
+- 2026-09-10 · §4.0 · Helen may grant proofread: true ahead of her own read, and only she may; a red main is what has made her do it.
 - 2026-08-26 · §4.3 · the magic bag is its own collection with its own schema and test file, and its pages carry no standing caveat.
 - 2026-10-04 · §4.3 · #1201 #507 · the magic bag is filled, not retired, and it gets a quiet mark, not a filter.
 - 2026-10-04 · §4.3 · #1201 · a magic-bag dish can be a draft, and magic bag always sits on the right.
 - 2026-10-04 · §4.3 · #1201 · the magic-bag schema is tested through a committed fixture entry, not by asserting the collection is non-empty.
+- 2026-08-26 · §4.3 · a magic-bag entry always has a tagline: line, and its value may be empty.
+- undated · §4.3 · Undated — a magic-bag entry's minimum is an ingredients list.
 - 2026-08-21 · §5 · #413 · en dashes are scoped by what a reader SEES.
-- 2026-08-21 · §5 · #426 · house style stops at a QQ line — Correcting the source's dash edits someone else's words that are about to be deleted.
+- 2026-08-21 · §5 · #426 · house style stops at a QQ line — Helen: "don't normalise oven temp, the dash, or 'minutes' -- ideally just skip the whole line for simple normalisation tasks".
 - 2026-09-07 · §5 · #800 · a tip printed under a source's own rubric is transcribed without the label; gf tip: is Good Food, the magazine, not gluten-free.
 - 2026-10-08 · §5 · #1089 · cocktail titles are Title Case, and a qualifier in brackets is not.
 - 2026-10-08 · §5 · #1089 · snippet: is an optional second tagline for the meta description and link preview.
 - 2026-10-08 · §5 · #1089 · copy Helen settled at the design review's sitting stays as she left it.
 - 2026-10-01 · §5 · a number and its unit take a space (15 ml, 400 g), fixed mechanically at ingest and by the tidy pass.
+- 2026-09-06 · §5 · #711 · every note starts with a capital letter and ends with a full stop, on both sites.
+- undated · §5 · Undated — "180°C fan" is correct and is not a conversion; what is banned is a second, conventional-oven temperature beside it, and gas marks always.
+- undated · §5 · #146 · Undated, #146 — an oven temperature without "fan" is never assumed to be a fan figure, and "fan" is never added in bulk.
+- 2026-08-10 · §5 · within one ingredient group the base spices run coriander, cumin, turmeric, fennel, and the warm spices follow in any order.
+- 2026-08-10 · §5 · #74 · butter is always "salted butter" or "unsalted butter", and sugar and flour each have a closed list of allowed names.
+- undated · §5 · #136 · Undated, #136 — ginger says fresh, ground or paste, in the ingredient list as well as in main_ingredients.
+- undated · §5 · Undated — cardamom is always green or black, and always pods, powder or seeds.
+- 2026-08-12 · §5 · #167 · milk names its type from the source, and "milk (any kind)" is a real answer for a recipe that does not care.
+- undated · §5 · #139 · Undated, #139 — dark-family chocolate carries its cacao percentage on the ingredient list and never in main_ingredients.
 - 2026-08-29 · §6 · main_ingredients has no cap; the old eight had been read as a budget.
 - 2026-09-06 · §6 · #762 · where two spellings of one ingredient exist the majority wins, and it is fixed in the data: cornflour, beansprouts.
 - 2026-09-22 · §6 · derive_main_ingredients.py reorders a list and never changes its members, and never writes to _food_recipes/.
@@ -290,6 +306,7 @@ argument and the rules each field is read by.
 - 2026-09-14 · §9.3.2 · #1012 #796 · Ardbeg An Oa, Gabriel Boudier Liqueur de Gingembre and Batavia Arrack van Oosten are the bottles; the old spellings are aliases.
 - 2026-09-25 · §9.3.2 · #1108 · Away Colour takes Cruzan Single Barrel with character: blackstrap; Fanny Chu's Piña Colada takes Pedro Mandinga with character: raspadura.
 - 2026-10-07 · §9.3.2 · Barbancourt 5 Star is a rhum agricole vieux, like the 3 Star, and is the suggestion on Port au Prince (Smuggler's Cove).
+- undated · §9.3.2 · #582 · Undated, #582 — no drink writes plantation; it is always corrected to Planteray.
 - 2026-08-29 · §9.3.3 · #579 · fuzzy to find, exact-or-family to exclude; candidates rank in four bands.
 - 2026-08-29 · §9.3.3 · the whisky family chip is labelled whisk(e)y.
 - 2026-08-30 · §9.3.3 · #580 · bare water is never on a card and never in the search.
@@ -297,6 +314,7 @@ argument and the rules each field is read by.
 - 2026-08-31 · §9.3.3 · a multi-word query matches a hidden name from its start, and each category gets one chip wearing the card's name.
 - 2026-08-29 · §9.3.3 · #529 · one bottle written several ways is one bottle in the search, and no chip has an "X or Y" shape.
 - 2026-08-29 · §9.3.3 · a family is reached by its other spellings, and the button always carries the family's canonical name.
+- 2026-09-02 · §9.3.3 · #653 · HAS TO HAVE and LEAVE OUT mark the same chips: a prefix match of any word is marked in both pools, a substring match in neither.
 - 2026-09-06 · §9.3.4 · #297 · a drink page states units of alcohol, not ABV.
 - 2026-09-06 · §9.3.4 · #297 · a strength belongs to a bottle and lives in abv.yml, never on a category, in bottles.yml or in costs.yml.
 - 2026-09-06 · §9.3.4 · #713 #753 · the units line says "Roughly" on every drink, and its words are Helen's.
@@ -380,6 +398,8 @@ argument and the rules each field is read by.
 - 2026-08-17 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · brandy glass is the canonical name and snifter the alias, against bar convention.
 - 2026-08-26 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · mug is a glass: Apple and Ginger Mulled Wine is served in a plain mug.
 - 2026-09-05 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #676 · the glasses are hollowed pineapple and coconut shell, and martini glass resolves to martini.
+- 2026-08-27 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · #491 · every drink names a glass: there is no exemption list and no value meaning "it does not matter".
+- 2026-09-28 · §9.11 / §9.11.1 / §9.14 / §9.15 / §9.16 · every glass type has a surveyed capacity and height, including an icon no drink uses yet.
 - 2026-08-26 · §9.12 / §9.12.1 · #290 · a change to a canonical method step is proposed, never applied.
 - 2026-08-31 · §9.12 / §9.12.1 · a drink that takes no garnish says no garnish; [] means nobody has filled the field in.
 - 2026-08-31 · §9.12 / §9.12.1 · alternative garnishes are ONE string, the maker's choice.
@@ -442,6 +462,7 @@ argument and the rules each field is read by.
 - undated · §9.13 · Undated — the universe line has no square brackets round the tape, and ingredients that are cut off end with an ellipsis and a closing round bracket.
 - undated · §9.13 · #541 · Undated, #541 — the drinks index has a clear-all at the top and at the bottom of the filters, as food does, looking the same and in the same place.
 - undated · §9.13 · #548 · Undated, #548 — no coloured bar sits above the "N survivors" count.
+- 2026-09-04 · §9.13 · #546 · the drinks shopping list is ordered by descending volume.
 - 2026-08-26 · §9.13 · a drink card is horizontal, the glass in a fixed left column, and every anchor on it is fixed.
 - 2026-08-31 · §9.13 · below 400px a card stacks: the glass above, the words full width.
 - 2026-09-02 · §9.13 · a drink's name is on worn black Dymo tape, on the card and on the drink page.
@@ -798,6 +819,8 @@ argument and the rules each field is read by.
 - 2026-08-13 · §14 · the notes in the cooking-methods data keep safety and sources and drop correction history.
 - 2026-08-14 · §14 · the beef closed-oven-off method is not in the cooking methods.
 - 2026-10-10 · §14 · Undated — every cooking method carries a short outcome, so methods are compared by what the cook gets.
+- 2026-08-14 · §14 · no test sums a method's timings against cook_time; the nudge to the temperature chart is the answer.
+- undated · §14 · Undated — every oven figure in cooking_methods.yml says "fan"; none is left bare and none names a conventional temperature.
 - 2026-09-06 · §14 · #529 #459 · a cocktails reference page must answer a question the cards stopped answering; a bare list does not pass #459.
 - 2026-09-06 · §14 · the rum page has its own anatomy (the .ref- classes), in one hue.
 - 2026-09-06 · §14 · the rum page is a table, with column labels on every section and one rum per line.
